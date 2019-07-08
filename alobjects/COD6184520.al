@@ -209,13 +209,4 @@ codeunit 6184520 "EFT Adyen Cloud Sign Dialog"
         'drawAdyenSignature();');
 
     end;
-
-    trigger Model::OnModelControlEvent(control: DotNet Control;eventName: Text;data: DotNet Dictionary_Of_T_U)
-    begin
-    end;
-
-    trigger Model::OnTimer()
-    begin
-    end;
 }
-

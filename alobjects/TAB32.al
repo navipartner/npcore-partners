@@ -55,32 +55,4 @@ tableextension 70000030 tableextension70000030 extends "Item Ledger Entry"
             Description = 'NPR7.100.000';
         }
     }
-    keys
-    {
-        key(Key1;"Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code")
-        {
-            SumIndexFields = Quantity;
-        }
-        key(Key2;"Item No.","Entry Type","Posting Date")
-        {
-            SumIndexFields = Quantity,"Remaining Quantity";
-        }
-        key(Key3;"Item No.","Posting Date","Entry Type","Salesperson Code","Global Dimension 1 Code","Global Dimension 2 Code","Location Code","Variant Code")
-        {
-            SumIndexFields = Quantity,"Invoiced Quantity";
-        }
-        key(Key4;"Item No.","Salesperson Code")
-        {
-            SumIndexFields = Quantity,"Invoiced Quantity";
-        }
-        key(Key5;"Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code","Item Group No.","Vendor No.","Salesperson Code","Item No.","Source No.")
-        {
-            SumIndexFields = Quantity;
-        }
-        key(Key6;"Entry Type","Posting Date","Item Group No.","Vendor No.")
-        {
-            SumIndexFields = Quantity;
-        }
-    }
 }
-

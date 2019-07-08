@@ -266,7 +266,7 @@ table 6184495 "EFT Transaction Request"
         {
             Caption = 'Processing Type';
             OptionCaption = ',Payment,Refund,Open,Close,Auxiliary,Other,Void,Lookup,Setup';
-            OptionMembers = ,Payment,Refund,Open,Close,Auxiliary,Other,Void,Lookup,Setup;
+            OptionMembers = ,Payment,Refund,Open,Close,Auxiliary,Other,Void,xLookup,Setup;
         }
         field(460;"Processed Entry No.";Integer)
         {

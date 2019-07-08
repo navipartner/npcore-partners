@@ -226,49 +226,5 @@ codeunit 6014523 "NavTable To DotNet Table Tool"
     begin
         Message(Format(VarParm));
     end;
-
-    trigger DotNetDataTable::ColumnChanging(sender: Variant;e: DotNet DataColumnChangeEventArgs)
-    begin
-    end;
-
-    trigger DotNetDataTable::ColumnChanged(sender: Variant;e: DotNet DataColumnChangeEventArgs)
-    begin
-    end;
-
-    trigger DotNetDataTable::Initialized(sender: Variant;e: DotNet EventArgs)
-    begin
-    end;
-
-    trigger DotNetDataTable::RowChanged(sender: Variant;e: DotNet DataRowChangeEventArgs)
-    begin
-    end;
-
-    trigger DotNetDataTable::RowChanging(sender: Variant;e: DotNet DataRowChangeEventArgs)
-    begin
-    end;
-
-    trigger DotNetDataTable::RowDeleting(sender: Variant;e: DotNet DataRowChangeEventArgs)
-    begin
-    end;
-
-    trigger DotNetDataTable::RowDeleted(sender: Variant;e: DotNet DataRowChangeEventArgs)
-    begin
-    end;
-
-    trigger DotNetDataTable::TableClearing(sender: Variant;e: DotNet DataTableClearEventArgs)
-    begin
-    end;
-
-    trigger DotNetDataTable::TableCleared(sender: Variant;e: DotNet DataTableClearEventArgs)
-    begin
-    end;
-
-    trigger DotNetDataTable::TableNewRow(sender: Variant;e: DotNet DataTableNewRowEventArgs)
-    begin
-    end;
-
-    trigger DotNetDataTable::Disposed(sender: Variant;e: DotNet EventArgs)
-    begin
-    end;
 }
 

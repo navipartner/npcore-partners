@@ -126,7 +126,7 @@ codeunit 6014404 "NPR Event Subscriber"
     end;
 
     [EventSubscriber(ObjectType::Table, 13, 'OnAfterDeleteEvent', '', true, false)]
-    local procedure T13OnAfterDeleteEvent(var Rec: Record "Salesperson/Purchaser";RunTrigger: Boolean)
+    local procedure T13OnAfterDeleteEvent(var Rec: Record "Salesperson/Purchaser"; RunTrigger: Boolean)
     var
         AuditRoll: Record "Audit Roll";
     begin
@@ -137,26 +137,26 @@ codeunit 6014404 "NPR Event Subscriber"
         //+NPR7.100.000
 
         if RunTrigger then begin
-          with Rec do begin
-            AuditRoll.SetRange(Posted,false);
-            AuditRoll.SetRange("Salesperson Code",Code);
-            if not AuditRoll.IsEmpty then
-              Error(SalesPersonDeleteError,Code);
-          end;
+            with Rec do begin
+                AuditRoll.SetRange(Posted, false);
+                AuditRoll.SetRange("Salesperson Code", Code);
+                if not AuditRoll.IsEmpty then
+                    Error(SalesPersonDeleteError, Code);
+            end;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 13, 'OnAfterValidateEvent', 'Register Password', true, false)]
-    local procedure T13OnAfterValidateEventRegisterPassword(var Rec: Record "Salesperson/Purchaser";var xRec: Record "Salesperson/Purchaser";CurrFieldNo: Integer)
+    local procedure T13OnAfterValidateEventRegisterPassword(var Rec: Record "Salesperson/Purchaser"; var xRec: Record "Salesperson/Purchaser"; CurrFieldNo: Integer)
     begin
         //-NPR5.32 [249432]
         //-NPR-3.0
         //RetailCode.SIKassekodeOV(Rec);
         //+NPR-3.0
         with Rec do begin
-          SetRange("Register Password", "Register Password");
-          if not IsEmpty then
-            Error(RegisterCodeAlreadyUsed,"Register Password");
+            SetRange("Register Password", "Register Password");
+            if not IsEmpty then
+                Error(RegisterCodeAlreadyUsed, "Register Password");
         end;
         //+NPR5.32 [249432]
     end;
@@ -166,12 +166,12 @@ codeunit 6014404 "NPR Event Subscriber"
     end;
 
     [EventSubscriber(ObjectType::Table, 83, 'OnAfterValidateEvent', 'Cross-Reference No.', false, false)]
-    local procedure T83OnAfterValidateEventCrossReferenceNo(var Rec: Record "Item Journal Line";var xRec: Record "Item Journal Line";CurrFieldNo: Integer)
+    local procedure T83OnAfterValidateEventCrossReferenceNo(var Rec: Record "Item Journal Line"; var xRec: Record "Item Journal Line"; CurrFieldNo: Integer)
     var
         StdTableCode: Codeunit "Std. Table Code";
     begin
         //-240777
-        StdTableCode.ItemJnlLineCrossReferenceOV(Rec,xRec);
+        StdTableCode.ItemJnlLineCrossReferenceOV(Rec, xRec);
         //+240777
     end;
 
@@ -180,47 +180,47 @@ codeunit 6014404 "NPR Event Subscriber"
     end;
 
     [EventSubscriber(ObjectType::Table, 352, 'OnAfterInsertEvent', '', false, false)]
-    local procedure T352OnAfterInsertEvent(var Rec: Record "Default Dimension";RunTrigger: Boolean)
+    local procedure T352OnAfterInsertEvent(var Rec: Record "Default Dimension"; RunTrigger: Boolean)
     var
         StdTableCode: Codeunit "Std. Table Code";
         GLSetup: Record "General Ledger Setup";
     begin
         if RunTrigger then begin
-          GLSetup.Get;
-          if Rec."Dimension Code" = GLSetup."Global Dimension 1 Code" then
-            StdTableCode.UpdateGlobalDimCode(1,Rec."Table ID",Rec."No.",Rec."Dimension Value Code");
-          if Rec."Dimension Code" = GLSetup."Global Dimension 2 Code" then
-            StdTableCode.UpdateGlobalDimCode(2,Rec."Table ID",Rec."No.",Rec."Dimension Value Code");
+            GLSetup.Get;
+            if Rec."Dimension Code" = GLSetup."Global Dimension 1 Code" then
+                StdTableCode.UpdateGlobalDimCode(1, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
+            if Rec."Dimension Code" = GLSetup."Global Dimension 2 Code" then
+                StdTableCode.UpdateGlobalDimCode(2, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 352, 'OnAfterModifyEvent', '', false, false)]
-    local procedure T352OnAfterModifyEvent(var Rec: Record "Default Dimension";var xRec: Record "Default Dimension";RunTrigger: Boolean)
+    local procedure T352OnAfterModifyEvent(var Rec: Record "Default Dimension"; var xRec: Record "Default Dimension"; RunTrigger: Boolean)
     var
         StdTableCode: Codeunit "Std. Table Code";
         GLSetup: Record "General Ledger Setup";
     begin
         if RunTrigger then begin
-          GLSetup.Get;
-          if Rec."Dimension Code" = GLSetup."Global Dimension 1 Code" then
-            StdTableCode.UpdateGlobalDimCode(1,Rec."Table ID",Rec."No.",Rec."Dimension Value Code");
-          if Rec."Dimension Code" = GLSetup."Global Dimension 2 Code" then
-            StdTableCode.UpdateGlobalDimCode(2,Rec."Table ID",Rec."No.",Rec."Dimension Value Code");
+            GLSetup.Get;
+            if Rec."Dimension Code" = GLSetup."Global Dimension 1 Code" then
+                StdTableCode.UpdateGlobalDimCode(1, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
+            if Rec."Dimension Code" = GLSetup."Global Dimension 2 Code" then
+                StdTableCode.UpdateGlobalDimCode(2, Rec."Table ID", Rec."No.", Rec."Dimension Value Code");
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 352, 'OnAfterDeleteEvent', '', false, false)]
-    local procedure T352OnAfterDeleteEvent(var Rec: Record "Default Dimension";RunTrigger: Boolean)
+    local procedure T352OnAfterDeleteEvent(var Rec: Record "Default Dimension"; RunTrigger: Boolean)
     var
         StdTableCode: Codeunit "Std. Table Code";
         GLSetup: Record "General Ledger Setup";
     begin
         if RunTrigger then begin
-          GLSetup.Get;
-          if Rec."Dimension Code" = GLSetup."Global Dimension 1 Code" then
-            StdTableCode.UpdateGlobalDimCode(1,Rec."Table ID",Rec."No.",'');
-          if Rec."Dimension Code" = GLSetup."Global Dimension 2 Code" then
-            StdTableCode.UpdateGlobalDimCode(2,Rec."Table ID",Rec."No.",'');
+            GLSetup.Get;
+            if Rec."Dimension Code" = GLSetup."Global Dimension 1 Code" then
+                StdTableCode.UpdateGlobalDimCode(1, Rec."Table ID", Rec."No.", '');
+            if Rec."Dimension Code" = GLSetup."Global Dimension 2 Code" then
+                StdTableCode.UpdateGlobalDimCode(2, Rec."Table ID", Rec."No.", '');
         end;
     end;
 
@@ -237,11 +237,11 @@ codeunit 6014404 "NPR Event Subscriber"
     begin
         //-NPR5.38 [300683]
         if NavAppMgt.NavAPP_IsInstalling then
-          exit;
+            exit;
         //+NPR5.38 [300683]
 
-        if not (CurrentClientType in [CLIENTTYPE::Windows,CLIENTTYPE::Web,CLIENTTYPE::Tablet,CLIENTTYPE::Phone,CLIENTTYPE::Desktop]) then
-          exit;
+        if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop]) then
+            exit;
 
         //-NPR5.40 [308907]
         //ServiceTierUserManagement.UseAction := 'Login';
@@ -259,17 +259,17 @@ codeunit 6014404 "NPR Event Subscriber"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterFindPrinter', '', false, false)]
-    local procedure C1OnAfterFindPrinter(ReportID: Integer;var PrinterName: Text[250])
+    local procedure C1OnAfterFindPrinter(ReportID: Integer; var PrinterName: Text[250])
     var
         Printer: Record Printer;
         ObjectOutputMgt: Codeunit "Object Output Mgt.";
     begin
         //-NPR5.30 [267710]
         if PrinterName = '' then
-          exit;
-        Printer.SetRange(Name,PrinterName);
+            exit;
+        Printer.SetRange(Name, PrinterName);
         if not Printer.IsEmpty then
-          exit;
+            exit;
         PrinterName := ObjectOutputMgt.ResolvePrinterName(PrinterName);
         //+NPR5.30 [267710]
     end;
@@ -279,7 +279,7 @@ codeunit 6014404 "NPR Event Subscriber"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 22, 'OnBeforeInsertTransferEntry', '', true, false)]
-    local procedure C22OnBeforeInsertTransferEntry(var NewItemLedgerEntry: Record "Item Ledger Entry";var OldItemLedgerEntry: Record "Item Ledger Entry";var ItemJournalLine: Record "Item Journal Line")
+    local procedure C22OnBeforeInsertTransferEntry(var NewItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; var ItemJournalLine: Record "Item Journal Line")
     var
         RetailCodeunitCode: Codeunit "Std. Codeunit Code";
         RetailSetup: Record "Retail Setup";
@@ -301,7 +301,7 @@ codeunit 6014404 "NPR Event Subscriber"
         NewItemLedgerEntry."Register Number" := OldItemLedgerEntry."Register Number";
         NewItemLedgerEntry."Salesperson Code" := OldItemLedgerEntry."Salesperson Code";
         if RetailSetup."Transfer SeO Item Entry" then
-          NewItemLedgerEntry."Cross-Reference No." := OldItemLedgerEntry."Cross-Reference No.";
+            NewItemLedgerEntry."Cross-Reference No." := OldItemLedgerEntry."Cross-Reference No.";
         //+NPR5.32 [249432]
     end;
 
@@ -312,19 +312,19 @@ codeunit 6014404 "NPR Event Subscriber"
     begin
         //-NPR5.33 [264324]
         if (ItemJournalLine."Vendor No." <> '') and (ItemJournalLine."Item Group No." <> '') then
-          exit;
+            exit;
         if not Item.Get(ItemJournalLine."Item No.") then
-          exit;
+            exit;
 
         if ItemJournalLine."Vendor No." = '' then
-          ItemJournalLine."Vendor No." := Item."Vendor No.";
+            ItemJournalLine."Vendor No." := Item."Vendor No.";
         if ItemJournalLine."Item Group No." = '' then
-          ItemJournalLine."Item Group No." := Item."Item Group";
+            ItemJournalLine."Item Group No." := Item."Item Group";
         //+NPR5.33 [264324]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 22, 'OnAfterInitItemLedgEntry', '', true, false)]
-    local procedure C22OnAfterInitItemLedgEntry(var NewItemLedgEntry: Record "Item Ledger Entry";var ItemJournalLine: Record "Item Journal Line")
+    local procedure C22OnAfterInitItemLedgEntry(var NewItemLedgEntry: Record "Item Ledger Entry"; ItemJournalLine: Record "Item Journal Line"; var ItemLedgEntryNo: Integer)
     var
         Item: Record Item;
     begin
@@ -335,34 +335,34 @@ codeunit 6014404 "NPR Event Subscriber"
         //+NPR7.000.000
 
         with NewItemLedgEntry do begin
-          //Ops�tning.GET;
-          "Vendor No."       := ItemJournalLine."Vendor No.";
-          "Item Group No."   := ItemJournalLine."Item Group No.";
-          //not needed - its a standard field that is always transferred by CU22
-          //IF Ops�tning."Transfer SeO Item Entry" THEN
-          //  Varepost2."Cross-Reference No." := "Cross-Reference No.";
-          "Discount Type"    := ItemJournalLine."Discount Type";
-          "Discount Code"    := ItemJournalLine."Discount Code";
-          "Register Number"  := ItemJournalLine."Register Number";
-          "Group Sale"       := ItemJournalLine."Group Sale";
-          "Salesperson Code" := ItemJournalLine."Salespers./Purch. Code";
-          "Document Time"    := ItemJournalLine."Document Time";
+            //Ops�tning.GET;
+            "Vendor No." := ItemJournalLine."Vendor No.";
+            "Item Group No." := ItemJournalLine."Item Group No.";
+            //not needed - its a standard field that is always transferred by CU22
+            //IF Ops�tning."Transfer SeO Item Entry" THEN
+            //  Varepost2."Cross-Reference No." := "Cross-Reference No.";
+            "Discount Type" := ItemJournalLine."Discount Type";
+            "Discount Code" := ItemJournalLine."Discount Code";
+            "Register Number" := ItemJournalLine."Register Number";
+            "Group Sale" := ItemJournalLine."Group Sale";
+            "Salesperson Code" := ItemJournalLine."Salespers./Purch. Code";
+            "Document Time" := ItemJournalLine."Document Time";
 
-          //-NPR5.33 [264324]
-        //  IF ("Vendor No." = '') OR ("Item Group No." = '') THEN
-        //    IF Item.GET("Item No.") THEN BEGIN
-        //      IF "Vendor No." = '' THEN
-        //        "Vendor No." := Item."Vendor No.";
-        //      IF "Item Group No." = '' THEN
-        //        "Item Group No." := Item."Item Group";
-        //    END;
-          //+NPR5.33 [264324]
+            //-NPR5.33 [264324]
+            //  IF ("Vendor No." = '') OR ("Item Group No." = '') THEN
+            //    IF Item.GET("Item No.") THEN BEGIN
+            //      IF "Vendor No." = '' THEN
+            //        "Vendor No." := Item."Vendor No.";
+            //      IF "Item Group No." = '' THEN
+            //        "Item Group No." := Item."Item Group";
+            //    END;
+            //+NPR5.33 [264324]
         end;
         //+NPR5.32 [249432]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 22, 'OnBeforeInsertValueEntry', '', false, false)]
-    local procedure C22OnBeforeInsertValueEntry(var ValueEntry: Record "Value Entry";var ItemJournalLine: Record "Item Journal Line")
+    local procedure C22OnBeforeInsertValueEntry(var ValueEntry: Record "Value Entry"; ItemJournalLine: Record "Item Journal Line")
     var
         Item: Record Item;
     begin
@@ -372,26 +372,26 @@ codeunit 6014404 "NPR Event Subscriber"
         //+NPR7.000.000
 
         with ValueEntry do begin
-          "Item Group No."   := ItemJournalLine."Item Group No.";
-          "Vendor No."       := ItemJournalLine."Vendor No.";
-          "Discount Type"    := ItemJournalLine."Discount Type";
-          "Discount Code"    := ItemJournalLine."Discount Code";
-          "Register No."     := ItemJournalLine."Register Number";
-          "Group Sale"       := ItemJournalLine."Group Sale";
-          "Salesperson Code" := ItemJournalLine."Salespers./Purch. Code";
-          //- NPR5.43 [312575]
-          "Item Category Code" := ItemJournalLine."Item Category Code";
+            "Item Group No." := ItemJournalLine."Item Group No.";
+            "Vendor No." := ItemJournalLine."Vendor No.";
+            "Discount Type" := ItemJournalLine."Discount Type";
+            "Discount Code" := ItemJournalLine."Discount Code";
+            "Register No." := ItemJournalLine."Register Number";
+            "Group Sale" := ItemJournalLine."Group Sale";
+            "Salesperson Code" := ItemJournalLine."Salespers./Purch. Code";
+            //- NPR5.43 [312575]
+            "Item Category Code" := ItemJournalLine."Item Category Code";
 
-          //+ NPR5.43 [312575]
-          //-NPR5.33 [264324]
-        //   IF ("Vendor No." = '') OR ("Item Group No." = '') THEN
-        //    IF Item.GET("Item No.") THEN BEGIN
-        //      IF "Vendor No." = '' THEN
-        //        "Vendor No." := Item."Vendor No.";
-        //      IF "Item Group No." = '' THEN
-        //        "Item Group No." := Item."Item Group";
-        //    END;
-        //  //+264324 [264324]
+            //+ NPR5.43 [312575]
+            //-NPR5.33 [264324]
+            //   IF ("Vendor No." = '') OR ("Item Group No." = '') THEN
+            //    IF Item.GET("Item No.") THEN BEGIN
+            //      IF "Vendor No." = '' THEN
+            //        "Vendor No." := Item."Vendor No.";
+            //      IF "Item Group No." = '' THEN
+            //        "Item Group No." := Item."Item Group";
+            //    END;
+            //  //+264324 [264324]
         end;
     end;
 
@@ -411,12 +411,12 @@ codeunit 6014404 "NPR Event Subscriber"
 
         RetailSetup.Get;
         if RetailSetup."Salespersoncode on Salesdoc." = RetailSetup."Salespersoncode on Salesdoc."::Forced then
-          SalesHeader.TestField("Salesperson Code");
+            SalesHeader.TestField("Salesperson Code");
         //+NPR5.32 [249432]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', false, false)]
-    local procedure C80OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header";var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";SalesShptHdrNo: Code[20];RetRcpHdrNo: Code[20];SalesInvHdrNo: Code[20];SalesCrMemoHdrNo: Code[20])
+    local procedure C80OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20])
     var
         RecRef: RecordRef;
         SalesInvHeader: Record "Sales Invoice Header";
@@ -448,27 +448,27 @@ codeunit 6014404 "NPR Event Subscriber"
         //-NPR5.40.01
 
         if SalesHeader.Ship then
-          if (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) or
-              ((SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) and SalesSetup."Shipment on Invoice") then
-            if SalesShptHeader.Get(SalesShptHdrNo) then begin
-        //-PS1.01
-              if (PacsoftSetup.Get) and (PacsoftSetup."Create Pacsoft Document") then begin
-                RecRefShipment.GetTable(SalesShptHeader);
-                ShipmentDocument.AddEntry(RecRefShipment,false);
-              end;
-        //+PS1.01
-        //-NPR5.29 [249684]
-        //-NPR5.26 [248912]
-        //      IF (PacsoftSetup.GET) AND (PacsoftSetup."Use Pakkelabels") THEN BEGIN
-        //        RecRefShipment.GETTABLE(SalesShptHeader);
-        //        ShipmentDocument.AddEntryPakkelabels(RecRefShipment,FALSE);
-        //      END;
-        //+NPR5.26 [248912]
-        //-NPR5.29 [249684]
-              //-237639
-              ConsignorEntry.InsertFromShipmentHeader(SalesShptHeader."No.");
-              //+237639
-            end;
+            if (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) or
+                ((SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) and SalesSetup."Shipment on Invoice") then
+                if SalesShptHeader.Get(SalesShptHdrNo) then begin
+                    //-PS1.01
+                    if (PacsoftSetup.Get) and (PacsoftSetup."Create Pacsoft Document") then begin
+                        RecRefShipment.GetTable(SalesShptHeader);
+                        ShipmentDocument.AddEntry(RecRefShipment, false);
+                    end;
+                    //+PS1.01
+                    //-NPR5.29 [249684]
+                    //-NPR5.26 [248912]
+                    //      IF (PacsoftSetup.GET) AND (PacsoftSetup."Use Pakkelabels") THEN BEGIN
+                    //        RecRefShipment.GETTABLE(SalesShptHeader);
+                    //        ShipmentDocument.AddEntryPakkelabels(RecRefShipment,FALSE);
+                    //      END;
+                    //+NPR5.26 [248912]
+                    //-NPR5.29 [249684]
+                    //-237639
+                    ConsignorEntry.InsertFromShipmentHeader(SalesShptHeader."No.");
+                    //+237639
+                end;
     end;
 
     local procedure "--Page 30 Item Card--"()
@@ -480,14 +480,14 @@ codeunit 6014404 "NPR Event Subscriber"
     var
         NPRAttrManagement: Codeunit "NPR Attribute Management";
     begin
-        NPRAttrManagement.ShowMasterDataAttributeValues (DATABASE::Item, Rec."No.");
+        NPRAttrManagement.ShowMasterDataAttributeValues(DATABASE::Item, Rec."No.");
     end;
 
     local procedure "--Page42 Sales Order"()
     begin
     end;
 
-    [EventSubscriber(ObjectType::Page, 42, 'OnAfterActionEvent', 'Action6150629', false, false)]
+    [EventSubscriber(ObjectType::Page, 42, 'OnAfterActionEvent', 'Consignor Label', false, false)]
     local procedure P42OnAfterActionEventConsignorLabel(var Rec: Record "Sales Header")
     var
         ConsignorEntry: Record "Consignor Entry";
@@ -522,45 +522,45 @@ codeunit 6014404 "NPR Event Subscriber"
         InputDialog: Page "Input Dialog";
     begin
         //-NPR5.38 [298368]
-        Rec.TestField(Status,Rec.Status::Open);
+        Rec.TestField(Status, Rec.Status::Open);
         Rec.TestField("Sell-to Customer No.");
         RetailItemList.SetLocationCode(Rec."Location Code");
         RetailItemList.SetBlocked(2);
         RetailItemList.LookupMode := true;
         while RetailItemList.RunModal = ACTION::LookupOK do begin
-          RetailItemList.GetRecord(Item);
+            RetailItemList.GetRecord(Item);
 
-          InputQuantity := 1;
-          InputDialog.SetAutoCloseOnValidate(true);
-          InputDialog.SetInput(1,InputQuantity,SalesLine.FieldCaption(Quantity));
-          InputDialog.RunModal;
-          InputDialog.InputDecimal(1,InputQuantity);
-          Clear(InputDialog);
+            InputQuantity := 1;
+            InputDialog.SetAutoCloseOnValidate(true);
+            InputDialog.SetInput(1, InputQuantity, SalesLine.FieldCaption(Quantity));
+            InputDialog.RunModal;
+            InputDialog.InputDecimal(1, InputQuantity);
+            Clear(InputDialog);
 
-          LastSalesLine.Reset;
-          LastSalesLine.SetRange("Document Type",Rec."Document Type");
-          LastSalesLine.SetRange("Document No.",Rec."No.");
-          if not LastSalesLine.FindLast then
-           LastSalesLine.Init;
+            LastSalesLine.Reset;
+            LastSalesLine.SetRange("Document Type", Rec."Document Type");
+            LastSalesLine.SetRange("Document No.", Rec."No.");
+            if not LastSalesLine.FindLast then
+                LastSalesLine.Init;
 
-          SalesLine.Init;
-          SalesLine.Validate("Document Type",Rec."Document Type");
-          SalesLine.Validate("Document No.",Rec."No.");
-          SalesLine.Validate("Line No.",LastSalesLine."Line No." + 10000);
-          SalesLine.Insert(true);
-          SalesLine.Validate(Type,SalesLine.Type::Item);
-          SalesLine.Validate("No.",Item."No.");
-          SalesLine.Validate(Quantity,InputQuantity);
-          SalesLine.Modify(true);
-          Commit;
-          ViewText := RetailItemList.GetViewText;
-          Clear(RetailItemList);
-          RetailItemList.SetLocationCode(Rec."Location Code");
-          RetailItemList.SetVendorNo(Rec."Buy-From Vendor No.");
-          Item.SetView(ViewText);
-          RetailItemList.SetTableView(Item);
-          RetailItemList.SetRecord(Item);
-          RetailItemList.LookupMode := true;
+            SalesLine.Init;
+            SalesLine.Validate("Document Type", Rec."Document Type");
+            SalesLine.Validate("Document No.", Rec."No.");
+            SalesLine.Validate("Line No.", LastSalesLine."Line No." + 10000);
+            SalesLine.Insert(true);
+            SalesLine.Validate(Type, SalesLine.Type::Item);
+            SalesLine.Validate("No.", Item."No.");
+            SalesLine.Validate(Quantity, InputQuantity);
+            SalesLine.Modify(true);
+            Commit;
+            ViewText := RetailItemList.GetViewText;
+            Clear(RetailItemList);
+            RetailItemList.SetLocationCode(Rec."Location Code");
+            RetailItemList.SetVendorNo(Rec."Buy-From Vendor No.");
+            Item.SetView(ViewText);
+            RetailItemList.SetTableView(Item);
+            RetailItemList.SetRecord(Item);
+            RetailItemList.LookupMode := true;
         end;
         //+NPR5.38 [298368]
     end;
@@ -615,7 +615,7 @@ codeunit 6014404 "NPR Event Subscriber"
     begin
         //-NPR5.31
         //-NPR5.33 [272843]
-        Rec.TestField(Status,Rec.Status::Open);
+        Rec.TestField(Status, Rec.Status::Open);
         //+NPR5.33 [272843]
         Rec.TestField("Buy-from Vendor No.");
         RetailItemList.SetLocationCode(Rec."Location Code");
@@ -625,46 +625,46 @@ codeunit 6014404 "NPR Event Subscriber"
         //  IF RetailItemList.RUNMODAL <> ACTION::LookupOK THEN
         //    EXIT;
         while RetailItemList.RunModal = ACTION::LookupOK do begin
-        //+NPR5.33 [272843]
-          RetailItemList.GetRecord(Item);
-          //-NPR5.34 [282922]
-          InputQuantity := 1;
-          InputDialog.SetAutoCloseOnValidate(true);
-          InputDialog.SetInput(1,InputQuantity,PurchaseLine.FieldCaption(Quantity));
-          InputDialog.RunModal;
-          InputDialog.InputDecimal(1,InputQuantity);
-          Clear(InputDialog);
-          //-NPR5.34 [282922]
+            //+NPR5.33 [272843]
+            RetailItemList.GetRecord(Item);
+            //-NPR5.34 [282922]
+            InputQuantity := 1;
+            InputDialog.SetAutoCloseOnValidate(true);
+            InputDialog.SetInput(1, InputQuantity, PurchaseLine.FieldCaption(Quantity));
+            InputDialog.RunModal;
+            InputDialog.InputDecimal(1, InputQuantity);
+            Clear(InputDialog);
+            //-NPR5.34 [282922]
 
-          LastPurchaseLine.Reset;
-          LastPurchaseLine.SetRange("Document Type",Rec."Document Type");
-          LastPurchaseLine.SetRange("Document No.",Rec."No.");
-          if not LastPurchaseLine.FindLast then
-           LastPurchaseLine.Init;
+            LastPurchaseLine.Reset;
+            LastPurchaseLine.SetRange("Document Type", Rec."Document Type");
+            LastPurchaseLine.SetRange("Document No.", Rec."No.");
+            if not LastPurchaseLine.FindLast then
+                LastPurchaseLine.Init;
 
-          PurchaseLine.Init;
-          PurchaseLine.Validate("Document Type",Rec."Document Type");
-          PurchaseLine.Validate("Document No.",Rec."No.");
-          PurchaseLine.Validate("Line No.",LastPurchaseLine."Line No." + 10000);
-          PurchaseLine.Insert(true);
-          PurchaseLine.Validate(Type,PurchaseLine.Type::Item);
-          PurchaseLine.Validate("No.",Item."No.");
-        //-NPR5.33 [272843]
-          //PurchaseLine.MODIFY(TRUE);
-          //-NPR5.34 [282922]
-          //PurchaseLine.VALIDATE(Quantity,1);
-          PurchaseLine.Validate(Quantity,InputQuantity);
-          //+NPR5.34 [282922]
-          PurchaseLine.Modify(true);
-          Commit;
-          ViewText := RetailItemList.GetViewText;
-          Clear(RetailItemList);
-          RetailItemList.SetLocationCode(Rec."Location Code");
-          RetailItemList.SetVendorNo(Rec."Buy-from Vendor No.");
-          Item.SetView(ViewText);
-          RetailItemList.SetTableView(Item);
-          RetailItemList.SetRecord(Item);
-          RetailItemList.LookupMode := true;
+            PurchaseLine.Init;
+            PurchaseLine.Validate("Document Type", Rec."Document Type");
+            PurchaseLine.Validate("Document No.", Rec."No.");
+            PurchaseLine.Validate("Line No.", LastPurchaseLine."Line No." + 10000);
+            PurchaseLine.Insert(true);
+            PurchaseLine.Validate(Type, PurchaseLine.Type::Item);
+            PurchaseLine.Validate("No.", Item."No.");
+            //-NPR5.33 [272843]
+            //PurchaseLine.MODIFY(TRUE);
+            //-NPR5.34 [282922]
+            //PurchaseLine.VALIDATE(Quantity,1);
+            PurchaseLine.Validate(Quantity, InputQuantity);
+            //+NPR5.34 [282922]
+            PurchaseLine.Modify(true);
+            Commit;
+            ViewText := RetailItemList.GetViewText;
+            Clear(RetailItemList);
+            RetailItemList.SetLocationCode(Rec."Location Code");
+            RetailItemList.SetVendorNo(Rec."Buy-from Vendor No.");
+            Item.SetView(ViewText);
+            RetailItemList.SetTableView(Item);
+            RetailItemList.SetRecord(Item);
+            RetailItemList.LookupMode := true;
         end;
         //+NPR5.33 [272843]
         //+NPR5.31
@@ -730,7 +730,7 @@ codeunit 6014404 "NPR Event Subscriber"
         //+PS1.00
     end;
 
-    [EventSubscriber(ObjectType::Page, 130, 'OnAfterActionEvent', 'Action6150627', false, false)]
+    [EventSubscriber(ObjectType::Page, 130, 'OnAfterActionEvent', 'Consignor Label', false, false)]
     local procedure P130OnAfterActionEventConsignorLabel(var Rec: Record "Sales Shipment Header")
     var
         ConsignorEntry: Record "Consignor Entry";
@@ -744,7 +744,7 @@ codeunit 6014404 "NPR Event Subscriber"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Page, 132, 'OnAfterActionEvent', 'Action6014406', false, false)]
+    [EventSubscriber(ObjectType::Page, 132, 'OnAfterActionEvent', 'Consignor Label', false, false)]
     local procedure P132OnAfterActionEventConsignorLabel(var Rec: Record "Sales Invoice Header")
     var
         ConsignorEntry: Record "Consignor Entry";
@@ -804,8 +804,8 @@ codeunit 6014404 "NPR Event Subscriber"
         Text6014400: Label 'Kill Session   ?';
     begin
         //+NPR70.01.00.01
-        if Confirm(Text6014400 , false ) then
-          StopSession(Rec."Session ID") ;
+        if Confirm(Text6014400, false) then
+            StopSession(Rec."Session ID");
         //-NPR70.01.00.01
     end;
 
@@ -813,7 +813,7 @@ codeunit 6014404 "NPR Event Subscriber"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014453, 'OnAfterActionEvent', 'Action6150615', false, false)]
+    [EventSubscriber(ObjectType::Page, 6014453, 'OnAfterActionEvent', 'Transfer from Period Discount', false, false)]
     local procedure P6014453OnAfterActionEventTransferFromPeriodDiscount(var Rec: Record "Period Discount")
     var
         FromPeriodDiscount: Record "Period Discount";
@@ -824,27 +824,27 @@ codeunit 6014404 "NPR Event Subscriber"
         ErrorNo2: Label 'Item No. %1 already exists in the period';
         OkMsg: Label '%1 Items has been transferred to Period %2';
     begin
-        FromPeriodDiscount.SetFilter(Code,'<>%1',Rec.Code);
+        FromPeriodDiscount.SetFilter(Code, '<>%1', Rec.Code);
         CampaignDiscounts.LookupMode := true;
         CampaignDiscounts.Editable := false;
         CampaignDiscounts.SetTableView(FromPeriodDiscount);
         if CampaignDiscounts.RunModal = ACTION::LookupOK then begin
-          CampaignDiscounts.GetRecord(FromPeriodDiscount);
-          FromPeriodDiscountLine.SetRange(Code,FromPeriodDiscount.Code);
-          if not FromPeriodDiscountLine.FindSet then
-            Error(ErrorNo1)
-          else
-            repeat
-              if ToPeriodDiscountLine.Get(Rec.Code,FromPeriodDiscountLine."Item No.",FromPeriodDiscountLine."Variant Code") then
-                Message(ErrorNo2,FromPeriodDiscountLine."Item No.")
-              else begin
-                ToPeriodDiscountLine.Init;
-                ToPeriodDiscountLine := FromPeriodDiscountLine;
-                ToPeriodDiscountLine.Code := Rec.Code;
-                ToPeriodDiscountLine.Insert(true);
-              end;
-            until FromPeriodDiscountLine.Next = 0;
-          Message(OkMsg,FromPeriodDiscountLine.Count,Rec.Code);
+            CampaignDiscounts.GetRecord(FromPeriodDiscount);
+            FromPeriodDiscountLine.SetRange(Code, FromPeriodDiscount.Code);
+            if not FromPeriodDiscountLine.FindSet then
+                Error(ErrorNo1)
+            else
+                repeat
+                    if ToPeriodDiscountLine.Get(Rec.Code, FromPeriodDiscountLine."Item No.", FromPeriodDiscountLine."Variant Code") then
+                        Message(ErrorNo2, FromPeriodDiscountLine."Item No.")
+                    else begin
+                        ToPeriodDiscountLine.Init;
+                        ToPeriodDiscountLine := FromPeriodDiscountLine;
+                        ToPeriodDiscountLine.Code := Rec.Code;
+                        ToPeriodDiscountLine.Insert(true);
+                    end;
+                until FromPeriodDiscountLine.Next = 0;
+            Message(OkMsg, FromPeriodDiscountLine.Count, Rec.Code);
         end;
     end;
 }

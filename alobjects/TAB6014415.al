@@ -6,67 +6,67 @@ table 6014415 "Quantity Discount Line"
 
     fields
     {
-        field(1;"Item No.";Code[20])
+        field(1; "Item No."; Code[20])
         {
             Caption = 'Item No.';
             TableRelation = Item."No.";
         }
-        field(2;Quantity;Decimal)
+        field(2; Quantity; Decimal)
         {
             Caption = 'Quantity';
-            DecimalPlaces = 2:2;
+            DecimalPlaces = 2 : 2;
             MaxValue = 9.999;
             MinValue = 2;
             NotBlank = true;
         }
-        field(3;"Unit Price";Decimal)
+        field(3; "Unit Price"; Decimal)
         {
             Caption = 'Unit Price';
-            DecimalPlaces = 2:2;
-            MaxValue = 9.999.999;
+            DecimalPlaces = 2 : 2;
+            MaxValue = 9999999;
             MinValue = 0;
 
             trigger OnValidate()
             begin
                 ValidateValues;
-                Total := "Unit Price"*Quantity;
+                Total := "Unit Price" * Quantity;
             end;
         }
-        field(4;Total;Decimal)
+        field(4; Total; Decimal)
         {
             Caption = 'Total';
-            DecimalPlaces = 2:2;
-            MaxValue = 9.999.999;
+            DecimalPlaces = 2 : 2;
+            MaxValue = 9999999;
             MinValue = 0;
 
             trigger OnValidate()
             begin
-                "Unit Price" := Total/Quantity;
+                "Unit Price" := Total / Quantity;
                 ValidateValues;
             end;
         }
-        field(5;"Created Date";Date)
+        field(5; "Created Date"; Date)
         {
             Caption = 'Created Date';
             Editable = false;
         }
-        field(6;"Last Date Modified";Date)
+        field(6; "Last Date Modified"; Date)
         {
             Caption = 'Last Date Modified';
             Editable = false;
         }
-        field(7;"Price Includes VAT";Boolean)
+        field(7; "Price Includes VAT"; Boolean)
         {
-            CalcFormula = Lookup(Item."Price Includes VAT" WHERE ("No."=FIELD("Item No.")));
+            CalcFormula = Lookup (Item."Price Includes VAT" WHERE ("No." = FIELD ("Item No.")));
             Caption = 'Price Includes VAT';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(8;"Start Date";Decimal)
+        field(8; "Start Date"; Decimal)
         {
             Caption = 'Start Date';
         }
-        field(9;"Main no.";Code[20])
+        field(9; "Main no."; Code[20])
         {
             Caption = 'Main no.';
         }
@@ -74,10 +74,10 @@ table 6014415 "Quantity Discount Line"
 
     keys
     {
-        key(Key1;"Item No.","Main no.",Quantity)
+        key(Key1; "Item No.", "Main no.", Quantity)
         {
         }
-        key(Key2;"Last Date Modified")
+        key(Key2; "Last Date Modified")
         {
         }
     }
@@ -127,26 +127,26 @@ table 6014415 "Quantity Discount Line"
         QuantityDiscountLine: Record "Quantity Discount Line";
         Vare: Record Item;
     begin
-        QuantityDiscountLine.SetRange("Item No.","Item No.");
+        QuantityDiscountLine.SetRange("Item No.", "Item No.");
         //-NPR5.31 [262904]
         //IF QuantityDiscountLine.FIND('-') THEN
         if QuantityDiscountLine.FindSet then
-        //+NPR5.31 [262904]
-          repeat
-            if ("Unit Price" > QuantityDiscountLine."Unit Price")  and (Quantity > QuantityDiscountLine.Quantity) then begin
-              Message(Text1060000+
-                      Text1060001+
-                      Text1060002,QuantityDiscountLine."Item No.",QuantityDiscountLine.Quantity);
-              exit;
-            end;
-          until QuantityDiscountLine.Next = 0;
+            //+NPR5.31 [262904]
+            repeat
+              if ("Unit Price" > QuantityDiscountLine."Unit Price") and (Quantity > QuantityDiscountLine.Quantity) then begin
+                  Message(Text1060000 +
+                          Text1060001 +
+                          Text1060002, QuantityDiscountLine."Item No.", QuantityDiscountLine.Quantity);
+                  exit;
+              end;
+            until QuantityDiscountLine.Next = 0;
 
 
         Vare.Get("Item No.");
         if "Unit Price" > Vare."Unit Price" then
-          Message(Text1060000+
-                  Text1060001+
-                  Text1060002,QuantityDiscountLine."Item No.",1);
+            Message(Text1060000 +
+                    Text1060001 +
+                    Text1060002, QuantityDiscountLine."Item No.", 1);
     end;
 }
 

@@ -10,141 +10,146 @@ table 6151003 "POS Quote Line"
 
     fields
     {
-        field(1;"Quote Entry No.";BigInteger)
+        field(1; "Quote Entry No."; BigInteger)
         {
             Caption = 'Quote Entry No.';
             Editable = false;
             TableRelation = "POS Quote Entry";
         }
-        field(5;"Line No.";Integer)
+        field(5; "Line No."; Integer)
         {
             Caption = 'Line No.';
         }
-        field(10;Type;Option)
+        field(10; Type; Option)
         {
             Caption = 'Type';
             InitValue = Item;
             OptionCaption = 'G/L,Item,Item Group,Repair,,Payment,Open/Close,Inventory,Customer,Comment';
             OptionMembers = "G/L Entry",Item,"Item Group",Repair,,Payment,"Open/Close","BOM List",Customer,Comment;
         }
-        field(15;"No.";Code[20])
+        field(15; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type=CONST("G/L Entry")) "G/L Account"."No."
-                            ELSE IF (Type=CONST("Item Group")) "Item Group"."No."
-                            ELSE IF (Type=CONST(Repair)) "Customer Repair"."No."
-                            ELSE IF (Type=CONST(Payment)) "Payment Type POS"."No." WHERE (Status=CONST(Active),
-                                                                                          "Via Terminal"=CONST(false))
-                                                                                          ELSE IF (Type=CONST(Customer)) Customer."No."
-                                                                                          ELSE IF (Type=CONST(Item)) Item."No.";
+            TableRelation = IF (Type = CONST ("G/L Entry")) "G/L Account"."No."
+            ELSE
+            IF (Type = CONST ("Item Group")) "Item Group"."No."
+            ELSE
+            IF (Type = CONST (Repair)) "Customer Repair"."No."
+            ELSE
+            IF (Type = CONST (Payment)) "Payment Type POS"."No." WHERE (Status = CONST (Active),
+                                                                                          "Via Terminal" = CONST (false))
+            ELSE
+            IF (Type = CONST (Customer)) Customer."No."
+            ELSE
+            IF (Type = CONST (Item)) Item."No.";
             ValidateTableRelation = false;
         }
-        field(20;"Variant Code";Code[10])
+        field(20; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type=CONST(Item)) "Item Variant".Code WHERE ("Item No."=FIELD("No."));
+            TableRelation = IF (Type = CONST (Item)) "Item Variant".Code WHERE ("Item No." = FIELD ("No."));
         }
-        field(25;Description;Text[80])
+        field(25; Description; Text[80])
         {
             Caption = 'Description';
         }
-        field(27;"Description 2";Text[80])
+        field(27; "Description 2"; Text[80])
         {
             Caption = 'Description 2';
         }
-        field(30;"Unit of Measure Code";Code[10])
+        field(30; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE ("Item No."=FIELD("No."));
+            TableRelation = "Item Unit of Measure".Code WHERE ("Item No." = FIELD ("No."));
         }
-        field(35;Quantity;Decimal)
+        field(35; Quantity; Decimal)
         {
             Caption = 'Quantity';
-            DecimalPlaces = 0:5;
+            DecimalPlaces = 0 : 5;
             MaxValue = 99.999;
         }
-        field(40;"Price Includes VAT";Boolean)
+        field(40; "Price Includes VAT"; Boolean)
         {
             Caption = 'Price Includes VAT';
         }
-        field(45;"Currency Code";Code[10])
+        field(45; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
             Editable = false;
             TableRelation = Currency;
         }
-        field(50;"Unit Price";Decimal)
+        field(50; "Unit Price"; Decimal)
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Price';
-            DecimalPlaces = 2:2;
+            DecimalPlaces = 2 : 2;
             Editable = true;
-            MaxValue = 9.999.999;
+            MaxValue = 9999999;
         }
-        field(55;Amount;Decimal)
+        field(55; Amount; Decimal)
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
-            DecimalPlaces = 2:2;
-            MaxValue = 1.000.000;
+            DecimalPlaces = 2 : 2;
+            MaxValue = 1000000;
         }
-        field(60;"Amount Including VAT";Decimal)
+        field(60; "Amount Including VAT"; Decimal)
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount Including VAT';
-            MaxValue = 99.999.999;
+            MaxValue = 99999999;
         }
-        field(65;"Customer Price Group";Code[10])
+        field(65; "Customer Price Group"; Code[10])
         {
             Caption = 'Customer Price Group';
             Description = 'NPR5.48';
             TableRelation = "Customer Price Group";
         }
-        field(100;"Discount Type";Option)
+        field(100; "Discount Type"; Option)
         {
             Caption = 'Discount Type';
             OptionCaption = ' ,Period,Mixed,Multiple Unit,Salesperson Discount,Inventory,,Rounding,Combination,Customer';
             OptionMembers = " ",Campaign,Mix,Quantity,Manual,"BOM List",,Rounding,Combination,Customer;
         }
-        field(105;"Discount %";Decimal)
+        field(105; "Discount %"; Decimal)
         {
             Caption = 'Discount %';
-            DecimalPlaces = 0:1;
+            DecimalPlaces = 0 : 1;
             MaxValue = 100;
             MinValue = 0;
         }
-        field(110;"Discount Amount";Decimal)
+        field(110; "Discount Amount"; Decimal)
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'Discount';
             MinValue = 0;
         }
-        field(115;"Discount Code";Code[20])
+        field(115; "Discount Code"; Code[20])
         {
             Caption = 'Discount Code';
         }
-        field(120;"Discount Authorised by";Code[20])
+        field(120; "Discount Authorised by"; Code[20])
         {
             Caption = 'Discount Authorised by';
             TableRelation = "Salesperson/Purchaser";
         }
-        field(200;"Sale Date";Date)
+        field(200; "Sale Date"; Date)
         {
             Caption = 'Sale Date';
             Description = 'NPR5.48';
         }
-        field(205;"Sale Type";Option)
+        field(205; "Sale Type"; Option)
         {
             Caption = 'Sale Type';
             Description = 'NPR5.48';
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Deposit,Out payment,Comment,Cancelled,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,Cancelled,"Open/Close";
         }
-        field(210;"Sale Line No.";Integer)
+        field(210; "Sale Line No."; Integer)
         {
             Caption = 'Sale Line No.';
             Description = 'NPR5.48';
@@ -153,7 +158,7 @@ table 6151003 "POS Quote Line"
 
     keys
     {
-        key(Key1;"Quote Entry No.","Line No.")
+        key(Key1; "Quote Entry No.", "Line No.")
         {
             MaintainSIFTIndex = false;
         }

@@ -11,14 +11,14 @@ codeunit 6151385 "CS UI Stock-Take WorkSheet"
         MiniformMgmt: Codeunit "CS UI Management";
     begin
         MiniformMgmt.Initialize(
-          MiniformHeader,Rec,DOMxmlin,ReturnedNode,
-          RootNode,XMLDOMMgt,CSCommunication,CSUserId,
-          CurrentCode,StackCode,WhseEmpId,LocationFilter,CSSessionId);
+          MiniformHeader, Rec, DOMxmlin, ReturnedNode,
+          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
-          PrepareData
+            PrepareData
         else
-          ProcessInput;
+            ProcessInput;
 
         Clear(DOMxmlin);
     end;
@@ -83,23 +83,23 @@ codeunit 6151385 "CS UI Stock-Take WorkSheet"
         NewStockTakeWorksheetLine: Record "Stock-Take Worksheet Line";
         LineNo: Integer;
     begin
-        if XMLDOMMgt.FindNode(RootNode,'Header/Input',ReturnedNode) then
-          TextValue := ReturnedNode.InnerText
+        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.InnerText
         else
-          Error(Text006);
+            Error(Text006);
 
-        Evaluate(TableNo,CSCommunication.GetNodeAttribute(ReturnedNode,'TableNo'));
+        Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         RecRef.Open(TableNo);
-        Evaluate(RecId,CSCommunication.GetNodeAttribute(ReturnedNode,'RecordID'));
+        Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
         if RecRef.Get(RecId) then begin
-          RecRef.SetTable(StockTakeWorksheet);
-          CSCommunication.SetRecRef(RecRef);
+            RecRef.SetTable(StockTakeWorksheet);
+            CSCommunication.SetRecRef(RecRef);
         end else begin
-          CSCommunication.RunPreviousUI(DOMxmlin);
-          exit;
+            CSCommunication.RunPreviousUI(DOMxmlin);
+            exit;
         end;
 
-        FuncGroup.KeyDef := CSCommunication.GetFunctionKey(MiniformHeader.Code,TextValue);
+        FuncGroup.KeyDef := CSCommunication.GetFunctionKey(MiniformHeader.Code, TextValue);
         ActiveInputField := 1;
 
         //-NPR5.43
@@ -107,85 +107,85 @@ codeunit 6151385 "CS UI Stock-Take WorkSheet"
         //+NPR5.43
 
         case FuncGroup.KeyDef of
-          FuncGroup.KeyDef::Esc:
-            CSCommunication.RunPreviousUI(DOMxmlin);
-          FuncGroup.KeyDef::"Function":
-            begin
-              Evaluate(FuncTableNo,CSCommunication.GetNodeAttribute(ReturnedNode,'FuncTableNo'));
-              FuncRecRef.Open(FuncTableNo);
-              Evaluate(FuncRecId,CSCommunication.GetNodeAttribute(ReturnedNode,'FuncRecordID'));
-              if FuncRecRef.Get(FuncRecId) then begin
-                FuncRecRef.SetTable(StockTakeWorkSheetLine);
-                StockTakeWorkSheetLine.Delete(true);
-                //WhseActivityLine.SplitLine(WhseActivityLine);
-              end;
-            end;
-          FuncGroup.KeyDef::Input:
-            begin
+            FuncGroup.KeyDef::Esc:
+                CSCommunication.RunPreviousUI(DOMxmlin);
+            FuncGroup.KeyDef::"Function":
+                begin
+                    Evaluate(FuncTableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'FuncTableNo'));
+                    FuncRecRef.Open(FuncTableNo);
+                    Evaluate(FuncRecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'FuncRecordID'));
+                    if FuncRecRef.Get(FuncRecId) then begin
+                        FuncRecRef.SetTable(StockTakeWorkSheetLine);
+                        StockTakeWorkSheetLine.Delete(true);
+                        //WhseActivityLine.SplitLine(WhseActivityLine);
+                    end;
+                end;
+            FuncGroup.KeyDef::Input:
+                begin
 
-              Qty := 1;
-              QtyTxt := CSCommunication.GetNodeAttribute(ReturnedNode,'valueTwo');
-              if QtyTxt <> '' then
-                if Evaluate(QtyVal,QtyTxt) then
-                  if QtyVal > 0 then
-                    Qty := QtyVal;
+                    Qty := 1;
+                    QtyTxt := CSCommunication.GetNodeAttribute(ReturnedNode, 'valueTwo');
+                    if QtyTxt <> '' then
+                        if Evaluate(QtyVal, QtyTxt) then
+                            if QtyVal > 0 then
+                                Qty := QtyVal;
 
-              //IF TextValue = '' THEN BEGIN
-              //  Remark := Text011;
-              //END ELSE BEGIN
-                if StrLen(TextValue) <= MaxStrLen(Item."No.") then //BEGIN
-                  if BarcodeLibrary.TranslateBarcodeToItemVariant(TextValue, ItemNo2, VariantCode, ResolvingTable, true) then// BEGIN
-                    if not Item.Get(ItemNo2) then
-                      //-NPR5.43
-                      if CSSetup."Error On Invalid Barcode" then
-                      //+NPR5.43
-                        Remark := StrSubstNo(Text014,TextValue);
-                  //END ELSE
+                    //IF TextValue = '' THEN BEGIN
+                    //  Remark := Text011;
+                    //END ELSE BEGIN
+                    if StrLen(TextValue) <= MaxStrLen(Item."No.") then //BEGIN
+                        if BarcodeLibrary.TranslateBarcodeToItemVariant(TextValue, ItemNo2, VariantCode, ResolvingTable, true) then// BEGIN
+                            if not Item.Get(ItemNo2) then
+                                //-NPR5.43
+                                if CSSetup."Error On Invalid Barcode" then
+                                    //+NPR5.43
+                                    Remark := StrSubstNo(Text014, TextValue);
+                    //END ELSE
                     //Remark := STRSUBSTNO(Text013,TextValue);
-                //END ELSE
-                  //Remark := STRSUBSTNO(Text010,TextValue);
-              //END;
+                    //END ELSE
+                    //Remark := STRSUBSTNO(Text010,TextValue);
+                    //END;
 
-              if Remark = '' then begin
+                    if Remark = '' then begin
 
-                SessionName := Format(CurrentDateTime(), 0, 9);
+                        SessionName := Format(CurrentDateTime(), 0, 9);
 
-                StockTakeMgr.ImportPreHandler(StockTakeWorksheet);
+                        StockTakeMgr.ImportPreHandler(StockTakeWorksheet);
 
-                Clear(NewStockTakeWorksheetLine);
-                NewStockTakeWorksheetLine.SetRange("Stock-Take Config Code", StockTakeWorksheet."Stock-Take Config Code");
-                NewStockTakeWorksheetLine.SetRange("Worksheet Name", StockTakeWorksheet.Name);
-                LineNo := 0;
-                if NewStockTakeWorksheetLine.FindLast then
-                  LineNo := NewStockTakeWorksheetLine."Line No." + 1000
-                else
-                  LineNo := 1000;
+                        Clear(NewStockTakeWorksheetLine);
+                        NewStockTakeWorksheetLine.SetRange("Stock-Take Config Code", StockTakeWorksheet."Stock-Take Config Code");
+                        NewStockTakeWorksheetLine.SetRange("Worksheet Name", StockTakeWorksheet.Name);
+                        LineNo := 0;
+                        if NewStockTakeWorksheetLine.FindLast then
+                            LineNo := NewStockTakeWorksheetLine."Line No." + 1000
+                        else
+                            LineNo := 1000;
 
-                Clear(StockTakeWorkSheetLine);
-                StockTakeWorkSheetLine."Stock-Take Config Code" := StockTakeWorksheet."Stock-Take Config Code";
-                StockTakeWorkSheetLine."Worksheet Name" := StockTakeWorksheet.Name;
-                StockTakeWorkSheetLine."Line No." := LineNo;
-                StockTakeWorkSheetLine.Validate(Barcode, TextValue);
-                //StockTakeWorkSheetLine."Shelf  No." := Shelf;
-                StockTakeWorkSheetLine."Qty. (Counted)" := Qty;
-                StockTakeWorkSheetLine."Session Name" := SessionName;
-                StockTakeWorkSheetLine."Date of Inventory" := WorkDate;
-                StockTakeWorkSheetLine.Insert(true);
+                        Clear(StockTakeWorkSheetLine);
+                        StockTakeWorkSheetLine."Stock-Take Config Code" := StockTakeWorksheet."Stock-Take Config Code";
+                        StockTakeWorkSheetLine."Worksheet Name" := StockTakeWorksheet.Name;
+                        StockTakeWorkSheetLine."Line No." := LineNo;
+                        StockTakeWorkSheetLine.Validate(Barcode, TextValue);
+                        //StockTakeWorkSheetLine."Shelf  No." := Shelf;
+                        StockTakeWorkSheetLine."Qty. (Counted)" := Qty;
+                        StockTakeWorkSheetLine."Session Name" := SessionName;
+                        StockTakeWorkSheetLine."Date of Inventory" := WorkDate;
+                        StockTakeWorkSheetLine.Insert(true);
 
-                if StockTakeWorkSheetLine."Item Translation Source" = 0 then
-                  Remark := StrSubstNo(Text010,TextValue);
+                        if StockTakeWorkSheetLine."Item Translation Source" = 0 then
+                            Remark := StrSubstNo(Text010, TextValue);
 
-                StockTakeMgr.ImportPostHandler(StockTakeWorksheet);
+                        StockTakeMgr.ImportPostHandler(StockTakeWorksheet);
 
-              end;
+                    end;
 
-            end;
-          else
-            Error(Text000);
+                end;
+            else
+                Error(Text000);
         end;
 
-        if not (FuncGroup.KeyDef in [FuncGroup.KeyDef::Esc,FuncGroup.KeyDef::Register]) then
-          SendForm(ActiveInputField);
+        if not (FuncGroup.KeyDef in [FuncGroup.KeyDef::Esc, FuncGroup.KeyDef::Register]) then
+            SendForm(ActiveInputField);
     end;
 
     local procedure PrepareData()
@@ -195,18 +195,18 @@ codeunit 6151385 "CS UI Stock-Take WorkSheet"
         TableNo: Integer;
         Lookup: Integer;
     begin
-        XMLDOMMgt.FindNode(RootNode,'Header/Input',ReturnedNode);
+        XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode);
 
-        Evaluate(TableNo,CSCommunication.GetNodeAttribute(ReturnedNode,'TableNo'));
+        Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         RecRef.Open(TableNo);
-        Evaluate(RecId,CSCommunication.GetNodeAttribute(ReturnedNode,'RecordID'));
+        Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
         if RecRef.Get(RecId) then begin
-          RecRef.SetTable(StockTakeWorksheet);
-          CSCommunication.SetRecRef(RecRef);
-          ActiveInputField := 1;
-          SendForm(ActiveInputField);
+            RecRef.SetTable(StockTakeWorksheet);
+            CSCommunication.SetRecRef(RecRef);
+            ActiveInputField := 1;
+            SendForm(ActiveInputField);
         end else
-          Error(Text007);
+            Error(Text007);
     end;
 
     local procedure SendForm(InputField: Integer)
@@ -214,22 +214,22 @@ codeunit 6151385 "CS UI Stock-Take WorkSheet"
         Records: DotNet XmlElement;
     begin
         // Prepare Miniform
-        CSCommunication.EncodeUI(MiniformHeader,StackCode,DOMxmlin,InputField,Remark,CSUserId);
+        CSCommunication.EncodeUI(MiniformHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
 
         //DebugTxt := DOMxmlin.OuterXml;
 
         CSCommunication.GetReturnXML(DOMxmlin);
 
         if AddSummarize(Records) then
-          DOMxmlin.DocumentElement.AppendChild(Records);
+            DOMxmlin.DocumentElement.AppendChild(Records);
 
         CSManagement.SendXMLReply(DOMxmlin);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet XmlNode;AttribName: Text[250];AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: DotNet XmlNode; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild,AttribName,AttribValue) > 0 then
-          Error(Text002,AttribName);
+        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
+            Error(Text002, AttribName);
     end;
 
     local procedure AddSummarize(var Records: DotNet XmlElement): Boolean
@@ -244,88 +244,68 @@ codeunit 6151385 "CS UI Stock-Take WorkSheet"
         StockTakeWorkSheetLine: Record "Stock-Take Worksheet Line";
     begin
         RecRef.SetTable(StockTakeWorksheet);
-        StockTakeWorkSheetLine.SetRange("Stock-Take Config Code",StockTakeWorksheet."Stock-Take Config Code");
-        StockTakeWorkSheetLine.SetRange("Worksheet Name",StockTakeWorksheet.Name);
+        StockTakeWorkSheetLine.SetRange("Stock-Take Config Code", StockTakeWorksheet."Stock-Take Config Code");
+        StockTakeWorkSheetLine.SetRange("Worksheet Name", StockTakeWorksheet.Name);
         if StockTakeWorkSheetLine.FindSet then begin
-          Records := DOMxmlin.CreateElement('Records');
-          repeat
-            Record := DOMxmlin.CreateElement('Record');
+            Records := DOMxmlin.CreateElement('Records');
+            repeat
+                Record := DOMxmlin.CreateElement('Record');
 
-            StockTakeWorkSheetLine.CalcFields("Item Description","Variant Description");
+                StockTakeWorkSheetLine.CalcFields("Item Description", "Variant Description");
 
-            CurrRecordID := StockTakeWorkSheetLine.RecordId;
-            TableNo := CurrRecordID.TableNo;
+                CurrRecordID := StockTakeWorkSheetLine.RecordId;
+                TableNo := CurrRecordID.TableNo;
 
-            if StockTakeWorkSheetLine."Item Translation Source" = 0 then
-              Indicator := 'minus'
-            else
-              Indicator := 'ok';
+                if StockTakeWorkSheetLine."Item Translation Source" = 0 then
+                    Indicator := 'minus'
+                else
+                    Indicator := 'ok';
 
-            Line := DOMxmlin.CreateElement('Line');
-            AddAttribute(Line,'Descrip','Description');
-            AddAttribute(Line,'Indicator',Indicator);
-            if (Indicator = 'ok') then
-              Line.InnerText := StrSubstNo(Text015,StockTakeWorkSheetLine."Qty. (Counted)",StockTakeWorkSheetLine."Item No.",StockTakeWorkSheetLine."Item Description")
-            else
-              Line.InnerText := StrSubstNo(Text016,StockTakeWorkSheetLine."Qty. (Counted)", StockTakeWorkSheetLine.Barcode);
-            Record.AppendChild(Line);
+                Line := DOMxmlin.CreateElement('Line');
+                AddAttribute(Line, 'Descrip', 'Description');
+                AddAttribute(Line, 'Indicator', Indicator);
+                if (Indicator = 'ok') then
+                    Line.InnerText := StrSubstNo(Text015, StockTakeWorkSheetLine."Qty. (Counted)", StockTakeWorkSheetLine."Item No.", StockTakeWorkSheetLine."Item Description")
+                else
+                    Line.InnerText := StrSubstNo(Text016, StockTakeWorkSheetLine."Qty. (Counted)", StockTakeWorkSheetLine.Barcode);
+                Record.AppendChild(Line);
 
-            Line := DOMxmlin.CreateElement('Line');
-            AddAttribute(Line,'Descrip','Delete..');
-            AddAttribute(Line,'Type',Format(LineType::BUTTON));
-            AddAttribute(Line,'TableNo',Format(TableNo));
-            AddAttribute(Line,'RecordID',Format(CurrRecordID));
-            Record.AppendChild(Line);
+                Line := DOMxmlin.CreateElement('Line');
+                AddAttribute(Line, 'Descrip', 'Delete..');
+                AddAttribute(Line, 'Type', Format(LineType::BUTTON));
+                AddAttribute(Line, 'TableNo', Format(TableNo));
+                AddAttribute(Line, 'RecordID', Format(CurrRecordID));
+                Record.AppendChild(Line);
 
-            Line := DOMxmlin.CreateElement('Line');
-            AddAttribute(Line,'Descrip',StockTakeWorkSheetLine.FieldCaption(Barcode));
-            AddAttribute(Line,'Type',Format(LineType::TEXT));
-            Line.InnerText := StockTakeWorkSheetLine.Barcode;
-            Record.AppendChild(Line);
+                Line := DOMxmlin.CreateElement('Line');
+                AddAttribute(Line, 'Descrip', StockTakeWorkSheetLine.FieldCaption(Barcode));
+                AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                Line.InnerText := StockTakeWorkSheetLine.Barcode;
+                Record.AppendChild(Line);
 
-            if (Indicator = 'ok') then begin
-              Line := DOMxmlin.CreateElement('Line');
-              AddAttribute(Line,'Descrip',StockTakeWorkSheetLine.FieldCaption("Variant Code"));
-              AddAttribute(Line,'Type',Format(LineType::TEXT));
-              Line.InnerText := StockTakeWorkSheetLine."Variant Code";
-              Record.AppendChild(Line);
+                if (Indicator = 'ok') then begin
+                    Line := DOMxmlin.CreateElement('Line');
+                    AddAttribute(Line, 'Descrip', StockTakeWorkSheetLine.FieldCaption("Variant Code"));
+                    AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                    Line.InnerText := StockTakeWorkSheetLine."Variant Code";
+                    Record.AppendChild(Line);
 
-              Line := DOMxmlin.CreateElement('Line');
-              AddAttribute(Line,'Descrip',StockTakeWorkSheetLine.FieldCaption("Variant Description"));
-              AddAttribute(Line,'Type',Format(LineType::TEXT));
-              Line.InnerText := StockTakeWorkSheetLine."Variant Description";
-              Record.AppendChild(Line);
-            end;
+                    Line := DOMxmlin.CreateElement('Line');
+                    AddAttribute(Line, 'Descrip', StockTakeWorkSheetLine.FieldCaption("Variant Description"));
+                    AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                    Line.InnerText := StockTakeWorkSheetLine."Variant Description";
+                    Record.AppendChild(Line);
+                end;
 
-            Records.AppendChild(Record);
-          until StockTakeWorkSheetLine.Next = 0;
-          exit(true);
+                Records.AppendChild(Record);
+            until StockTakeWorkSheetLine.Next = 0;
+            exit(true);
         end else
-          exit(false);
+            exit(false);
     end;
 
-    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
 
-    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
 
-    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
 
-    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
 }
 

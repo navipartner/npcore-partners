@@ -10,17 +10,17 @@ codeunit 6151375 "CS UI Logon"
         MiniformMgmt: Codeunit "CS UI Management";
     begin
         MiniformMgmt.Initialize(
-          MiniformHeader,Rec,DOMxmlin,ReturnedNode,
-          RootNode,XMLDOMMgt,CSCommunication,CSUserId,
-          CurrentCode,StackCode,WhseEmpId,LocationFilter,CSSessionId);
+          MiniformHeader, Rec, DOMxmlin, ReturnedNode,
+          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
-        if CSCommunication.GetNodeAttribute(ReturnedNode,'RunReturn') = '0' then begin
-          if Code <> CurrentCode then
-            PrepareData
-          else
-            ProcessInput;
+        if CSCommunication.GetNodeAttribute(ReturnedNode, 'RunReturn') = '0' then begin
+            if Code <> CurrentCode then
+                PrepareData
+            else
+                ProcessInput;
         end else
-          PrepareData;
+            PrepareData;
 
         Clear(DOMxmlin);
     end;
@@ -58,59 +58,59 @@ codeunit 6151375 "CS UI Logon"
         FldNo: Integer;
         TextValue: Text[250];
     begin
-        if XMLDOMMgt.FindNode(RootNode,'Header/Input',ReturnedNode) then
-          TextValue := ReturnedNode.InnerText
+        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.InnerText
         else
-          Error(Text003);
+            Error(Text003);
 
-        if Evaluate(TableNo,CSCommunication.GetNodeAttribute(ReturnedNode,'TableNo')) then begin
-          RecRef.Open(TableNo);
-          Evaluate(RecId,CSCommunication.GetNodeAttribute(ReturnedNode,'RecordID'));
-          if RecRef.Get(RecId) then begin
-            RecRef.SetTable(CSUser);
-            CSCommunication.SetRecRef(RecRef);
-          end else
-            Error(Text004);
+        if Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo')) then begin
+            RecRef.Open(TableNo);
+            Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
+            if RecRef.Get(RecId) then begin
+                RecRef.SetTable(CSUser);
+                CSCommunication.SetRecRef(RecRef);
+            end else
+                Error(Text004);
         end;
 
-        FuncGroup.KeyDef := CSCommunication.GetFunctionKey(MiniformHeader.Code,TextValue);
+        FuncGroup.KeyDef := CSCommunication.GetFunctionKey(MiniformHeader.Code, TextValue);
 
         case FuncGroup.KeyDef of
-          FuncGroup.KeyDef::Esc:
-            PrepareData;
-          FuncGroup.KeyDef::Input:
-            begin
-              Evaluate(FldNo,CSCommunication.GetNodeAttribute(ReturnedNode,'FieldID'));
-              case FldNo of
-                CSUser.FieldNo(Name):
-                  if not GetUser(UpperCase(TextValue)) then
-                    exit;
-                CSUser.FieldNo(Password):
-                  if not CheckPassword(TextValue) then
-                    exit;
-                else begin
-                  CSCommunication.FieldSetvalue(RecRef,FldNo,TextValue);
-                  RecRef.SetTable(CSUser);
+            FuncGroup.KeyDef::Esc:
+                PrepareData;
+            FuncGroup.KeyDef::Input:
+                begin
+                    Evaluate(FldNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'FieldID'));
+                    case FldNo of
+                        CSUser.FieldNo(Name):
+                            if not GetUser(UpperCase(TextValue)) then
+                                exit;
+                        CSUser.FieldNo(Password):
+                            if not CheckPassword(TextValue) then
+                                exit;
+                        else begin
+                                CSCommunication.FieldSetvalue(RecRef, FldNo, TextValue);
+                                RecRef.SetTable(CSUser);
+                            end;
+                    end;
+
+                    ActiveInputField := CSCommunication.GetActiveInputNo(CurrentCode, FldNo);
+                    if CSCommunication.LastEntryField(CurrentCode, FldNo) then begin
+                        CSCommunication.GetNextUI(MiniformHeader, MiniformHeader2);
+                        MiniformHeader2.SaveXMLin(DOMxmlin);
+                        CODEUNIT.Run(MiniformHeader2."Handling Codeunit", MiniformHeader2);
+                    end else
+                        ActiveInputField += 1;
+
+                    RecRef.GetTable(CSUser);
+                    CSCommunication.SetRecRef(RecRef);
                 end;
-              end;
-
-              ActiveInputField := CSCommunication.GetActiveInputNo(CurrentCode,FldNo);
-              if CSCommunication.LastEntryField(CurrentCode,FldNo) then begin
-                CSCommunication.GetNextUI(MiniformHeader,MiniformHeader2);
-                MiniformHeader2.SaveXMLin(DOMxmlin);
-                CODEUNIT.Run(MiniformHeader2."Handling Codeunit",MiniformHeader2);
-              end else
-                ActiveInputField += 1;
-
-              RecRef.GetTable(CSUser);
-              CSCommunication.SetRecRef(RecRef);
-            end;
         end;
 
         if not (FuncGroup.KeyDef in [FuncGroup.KeyDef::Esc]) and
-           not CSCommunication.LastEntryField(CurrentCode,FldNo)
+           not CSCommunication.LastEntryField(CurrentCode, FldNo)
         then
-          SendForm(ActiveInputField);
+            SendForm(ActiveInputField);
     end;
 
     local procedure GetUser(TextValue: Text[250]) ReturnValue: Boolean
@@ -119,31 +119,31 @@ codeunit 6151375 "CS UI Logon"
         NewCSUser: Record "CS User";
     begin
         if CSUser.Get(TextValue) then begin
-          CSUserId := CSUser.Name;
-          CSUser.Password := '';
-          if not CSCommunication.GetWhseEmployee(CSUserId,WhseEmpId,LocationFilter) then begin
-            CSManagement.SendError(Text001);
-            ReturnValue := false;
-            exit;
-          end;
-        end else begin
-          WhseEmployee.SetCurrentKey(Default);
-          WhseEmployee.SetRange("User ID",TextValue);
-          if WhseEmployee.FindFirst then begin
-            NewCSUser.Name := TextValue;
-            NewCSUser.Insert;
-            CSUserId := NewCSUser.Name;
-            NewCSUser.Password := '';
-            if not CSCommunication.GetWhseEmployee(CSUserId,WhseEmpId,LocationFilter) then begin
-              CSManagement.SendError(Text001);
-              ReturnValue := false;
-              exit;
+            CSUserId := CSUser.Name;
+            CSUser.Password := '';
+            if not CSCommunication.GetWhseEmployee(CSUserId, WhseEmpId, LocationFilter) then begin
+                CSManagement.SendError(Text001);
+                ReturnValue := false;
+                exit;
             end;
-          end else begin
-            CSManagement.SendError(Text001);
-            ReturnValue := false;
-            exit;
-          end;
+        end else begin
+            WhseEmployee.SetCurrentKey(Default);
+            WhseEmployee.SetRange("User ID", TextValue);
+            if WhseEmployee.FindFirst then begin
+                NewCSUser.Name := TextValue;
+                NewCSUser.Insert;
+                CSUserId := NewCSUser.Name;
+                NewCSUser.Password := '';
+                if not CSCommunication.GetWhseEmployee(CSUserId, WhseEmpId, LocationFilter) then begin
+                    CSManagement.SendError(Text001);
+                    ReturnValue := false;
+                    exit;
+                end;
+            end else begin
+                CSManagement.SendError(Text001);
+                ReturnValue := false;
+                exit;
+            end;
         end;
         ReturnValue := true;
     end;
@@ -153,14 +153,14 @@ codeunit 6151375 "CS UI Logon"
         CSUser.Get(CSUserId);
 
         if (CSUser.Password = '') and (TextValue <> '') then begin
-          CSUser.Password := CSUser.CalculatePassword(CopyStr(TextValue,1,30));
-          CSUser.Modify;
+            CSUser.Password := CSUser.CalculatePassword(CopyStr(TextValue, 1, 30));
+            CSUser.Modify;
         end;
 
-        if CSUser.Password <> CSUser.CalculatePassword(CopyStr(TextValue,1,30)) then begin
-          CSManagement.SendError(Text002);
-          ReturnValue := false;
-          exit;
+        if CSUser.Password <> CSUser.CalculatePassword(CopyStr(TextValue, 1, 30)) then begin
+            CSManagement.SendError(Text002);
+            ReturnValue := false;
+            exit;
         end;
         ReturnValue := true;
     end;
@@ -173,34 +173,10 @@ codeunit 6151375 "CS UI Logon"
 
     local procedure SendForm(InputField: Integer)
     begin
-        CSCommunication.EncodeUI(MiniformHeader,StackCode,DOMxmlin,InputField,Remark,CSUserId);
+        CSCommunication.EncodeUI(MiniformHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
         DebugTxt := DOMxmlin.OuterXml;
         CSManagement.SendXMLReply(DOMxmlin);
-    end;
-
-    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
     end;
 }
 

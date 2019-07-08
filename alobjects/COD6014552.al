@@ -648,7 +648,7 @@ codeunit 6014552 "Touch - Sales Line POS"
         Register: Record Register;
     begin
         //-NPR5.23
-        if Register.Get(SaleLinePOSGlobal."Register No.") then
+        if Register.Get(SaleLinePOSGlobal."Register No.") then;
           //-NPR5.46 [328581]
           //CustomerDisplayMgt.OnSaleLineAction(SaleLinePOSGlobal,Register);
           //+NPR5.46 [328581]

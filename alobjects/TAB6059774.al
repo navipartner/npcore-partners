@@ -69,7 +69,7 @@ table 6059774 "Member Card Issued Cards"
                                                                                       "Posting Date"=FIELD("Expiration Date Filter")));
             Caption = 'Points (Total)';
             FieldClass = FlowField;
-            MaxValue = 9.999.999;
+            MaxValue = 9999999;
         }
         field(8;Status;Option)
         {

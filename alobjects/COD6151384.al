@@ -11,14 +11,14 @@ codeunit 6151384 "CS UI Stock Worksheet List"
         MiniformMgmt: Codeunit "CS UI Management";
     begin
         MiniformMgmt.Initialize(
-          MiniformHeader,Rec,DOMxmlin,ReturnedNode,
-          RootNode,XMLDOMMgt,CSCommunication,CSUserId,
-          CurrentCode,StackCode,WhseEmpId,LocationFilter,CSSessionId);
+          MiniformHeader, Rec, DOMxmlin, ReturnedNode,
+          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
-          PrepareData
+            PrepareData
         else
-          ProcessSelection;
+            ProcessSelection;
 
         Clear(DOMxmlin);
     end;
@@ -54,56 +54,56 @@ codeunit 6151384 "CS UI Stock Worksheet List"
         RecId: RecordID;
         TableNo: Integer;
     begin
-        if XMLDOMMgt.FindNode(RootNode,'Header/Input',ReturnedNode) then
-          TextValue := ReturnedNode.InnerText
+        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.InnerText
         else
-          Error(Text006);
+            Error(Text006);
 
-        Evaluate(TableNo,CSCommunication.GetNodeAttribute(ReturnedNode,'TableNo'));
+        Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         RecRef.Open(TableNo);
-        Evaluate(RecId,CSCommunication.GetNodeAttribute(ReturnedNode,'RecordID'));
+        Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
         if RecRef.Get(RecId) then begin
-          RecRef.SetTable(StockTakeWorksheet);
-          RecRef.GetTable(StockTakeWorksheet);
-          CSCommunication.SetRecRef(RecRef);
+            RecRef.SetTable(StockTakeWorksheet);
+            RecRef.GetTable(StockTakeWorksheet);
+            CSCommunication.SetRecRef(RecRef);
         end else begin
-          CSCommunication.RunPreviousUI(DOMxmlin);
-          exit;
+            CSCommunication.RunPreviousUI(DOMxmlin);
+            exit;
         end;
 
-        FuncGroup.KeyDef := CSCommunication.GetFunctionKey(MiniformHeader.Code,TextValue);
+        FuncGroup.KeyDef := CSCommunication.GetFunctionKey(MiniformHeader.Code, TextValue);
         ActiveInputField := 1;
 
         case FuncGroup.KeyDef of
-          FuncGroup.KeyDef::Esc:
-            CSCommunication.RunPreviousUI(DOMxmlin);
-          FuncGroup.KeyDef::First:
-            CSCommunication.FindRecRef(RecRef,0,MiniformHeader."No. of Records in List");
-          FuncGroup.KeyDef::LnDn:
-            if not CSCommunication.FindRecRef(RecRef,1,MiniformHeader."No. of Records in List") then
-              Remark := Text009;
-          FuncGroup.KeyDef::LnUp:
-            CSCommunication.FindRecRef(RecRef,2,MiniformHeader."No. of Records in List");
-          FuncGroup.KeyDef::Last:
-            CSCommunication.FindRecRef(RecRef,3,MiniformHeader."No. of Records in List");
-          FuncGroup.KeyDef::PgDn:
-            if not CSCommunication.FindRecRef(RecRef,4,MiniformHeader."No. of Records in List") then
-              Remark := Text009;
-          FuncGroup.KeyDef::PgUp:
-            CSCommunication.FindRecRef(RecRef,5,MiniformHeader."No. of Records in List");
-          FuncGroup.KeyDef::Input:
-            begin
-              CSCommunication.IncreaseStack(DOMxmlin,MiniformHeader.Code);
-              CSCommunication.GetNextUI(MiniformHeader,MiniformHeader2);
-              MiniformHeader2.SaveXMLin(DOMxmlin);
-              CODEUNIT.Run(MiniformHeader2."Handling Codeunit",MiniformHeader2);
-            end;
-          else
-            Error(Text000);
+            FuncGroup.KeyDef::Esc:
+                CSCommunication.RunPreviousUI(DOMxmlin);
+            FuncGroup.KeyDef::First:
+                CSCommunication.FindRecRef(RecRef, 0, MiniformHeader."No. of Records in List");
+            FuncGroup.KeyDef::LnDn:
+                if not CSCommunication.FindRecRef(RecRef, 1, MiniformHeader."No. of Records in List") then
+                    Remark := Text009;
+            FuncGroup.KeyDef::LnUp:
+                CSCommunication.FindRecRef(RecRef, 2, MiniformHeader."No. of Records in List");
+            FuncGroup.KeyDef::Last:
+                CSCommunication.FindRecRef(RecRef, 3, MiniformHeader."No. of Records in List");
+            FuncGroup.KeyDef::PgDn:
+                if not CSCommunication.FindRecRef(RecRef, 4, MiniformHeader."No. of Records in List") then
+                    Remark := Text009;
+            FuncGroup.KeyDef::PgUp:
+                CSCommunication.FindRecRef(RecRef, 5, MiniformHeader."No. of Records in List");
+            FuncGroup.KeyDef::Input:
+                begin
+                    CSCommunication.IncreaseStack(DOMxmlin, MiniformHeader.Code);
+                    CSCommunication.GetNextUI(MiniformHeader, MiniformHeader2);
+                    MiniformHeader2.SaveXMLin(DOMxmlin);
+                    CODEUNIT.Run(MiniformHeader2."Handling Codeunit", MiniformHeader2);
+                end;
+            else
+                Error(Text000);
         end;
 
-        if not (FuncGroup.KeyDef in [FuncGroup.KeyDef::Esc,FuncGroup.KeyDef::Input]) then
-          SendForm(ActiveInputField);
+        if not (FuncGroup.KeyDef in [FuncGroup.KeyDef::Esc, FuncGroup.KeyDef::Input]) then
+            SendForm(ActiveInputField);
     end;
 
     local procedure PrepareData()
@@ -114,57 +114,37 @@ codeunit 6151384 "CS UI Stock Worksheet List"
         CSSetup.Get;
 
         with StockTakeWorksheet do begin
-          Reset;
-          SetRange(Status,StockTakeWorksheet.Status::OPEN);
-          if (WhseEmpId <> '') and CSSetup."Filter Worksheets by Location" then
-            SetFilter("Conf Location Code",LocationFilter);
-          if not FindFirst then begin
-            if CSCommunication.GetNodeAttribute(ReturnedNode,'RunReturn') = '0' then begin
-              CSMgt.SendError(Text009);
-              exit;
+            Reset;
+            SetRange(Status, StockTakeWorksheet.Status::OPEN);
+            if (WhseEmpId <> '') and CSSetup."Filter Worksheets by Location" then
+                SetFilter("Conf Location Code", LocationFilter);
+            if not FindFirst then begin
+                if CSCommunication.GetNodeAttribute(ReturnedNode, 'RunReturn') = '0' then begin
+                    CSMgt.SendError(Text009);
+                    exit;
+                end;
+                CSCommunication.DecreaseStack(DOMxmlin, PreviousCode);
+                MiniformHeader2.Get(PreviousCode);
+                MiniformHeader2.SaveXMLin(DOMxmlin);
+                CODEUNIT.Run(MiniformHeader2."Handling Codeunit", MiniformHeader2);
+            end else begin
+                RecRef.GetTable(StockTakeWorksheet);
+                CSCommunication.SetRecRef(RecRef);
+                ActiveInputField := 1;
+                SendForm(ActiveInputField);
             end;
-            CSCommunication.DecreaseStack(DOMxmlin,PreviousCode);
-            MiniformHeader2.Get(PreviousCode);
-            MiniformHeader2.SaveXMLin(DOMxmlin);
-            CODEUNIT.Run(MiniformHeader2."Handling Codeunit",MiniformHeader2);
-          end else begin
-            RecRef.GetTable(StockTakeWorksheet);
-            CSCommunication.SetRecRef(RecRef);
-            ActiveInputField := 1;
-            SendForm(ActiveInputField);
-          end;
         end;
     end;
 
     local procedure SendForm(InputField: Integer)
     begin
-        CSCommunication.EncodeUI(MiniformHeader,StackCode,DOMxmlin,InputField,Remark,CSUserId);
+        CSCommunication.EncodeUI(MiniformHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
         CSMgt.SendXMLReply(DOMxmlin);
     end;
 
-    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
 
-    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
 
-    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
 
-    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
 }
 

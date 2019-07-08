@@ -28,23 +28,23 @@ codeunit 6014595 "NAV Webservice Library"
     var
         NodeList: DotNet XmlNodeList;
     begin
-        if PingUrl.InvokeAddres(Url,ServiceDomainName,ServiceUserName,ServicePassword) then begin
-          Succes := InvokeWithResponse(ReturnValue, NodeList);
-          if Succes then begin
-            if ServiceType = 'Codeunit' then
-              ReturnValue := GetNodeValue('return_value');
-            exit(true);
-          end else begin
-           ReturnValue := NodeList.Item(0).ChildNodes.Item(0).FirstChild.Value;//returning error msg
-           exit(false);
-          end;
+        if PingUrl.InvokeAddres(Url, ServiceDomainName, ServiceUserName, ServicePassword) then begin
+            Succes := InvokeWithResponse(ReturnValue, NodeList);
+            if Succes then begin
+                if ServiceType = 'Codeunit' then
+                    ReturnValue := GetNodeValue('return_value');
+                exit(true);
+            end else begin
+                ReturnValue := NodeList.Item(0).ChildNodes.Item(0).FirstChild.Value;//returning error msg
+                exit(false);
+            end;
         end else begin
-          ReturnValue := 'Web Service is down : ' + HttpStatusMsg;
-          exit(false);
+            ReturnValue := 'Web Service is down : ' + HttpStatusMsg;
+            exit(false);
         end;
     end;
 
-    procedure InvokeWithResponse(var ReturnValue: Text;var NodeList: DotNet XmlNodeList) Result: Boolean
+    procedure InvokeWithResponse(var ReturnValue: Text; var NodeList: DotNet XmlNodeList) Result: Boolean
     var
         XMLDocument: DotNet XmlDocument;
         StringLibrary: Codeunit "String Library";
@@ -61,20 +61,20 @@ codeunit 6014595 "NAV Webservice Library"
         BuildRequestEnvelope(XMLDocument);
 
         // Invoke the service
-        ReturnStatusCode := InvokeWebService(Url,ServiceDomainName,ServiceUserName,ServicePassword,XMLDocument);
+        ReturnStatusCode := InvokeWebService(Url, ServiceDomainName, ServiceUserName, ServicePassword, XMLDocument);
 
         // If status is OK - Get Result XML
         if ReturnStatusCode = 200 then begin
-          SelectNode(StrSubstNo('%1_Result',ServiceMethod),NameSpace,XMLDocument,ResultNode);
-          ReturnValue := ResultNode.InnerText;
-          exit(true)
+            SelectNode(StrSubstNo('%1_Result', ServiceMethod), NameSpace, XMLDocument, ResultNode);
+            ReturnValue := ResultNode.InnerText;
+            exit(true)
         end else begin
-          ReturnValue := StrSubstNo('ERROR On the Communication Channel : %1', ReturnStatusCode);
-          exit(false);
+            ReturnValue := StrSubstNo('ERROR On the Communication Channel : %1', ReturnStatusCode);
+            exit(false);
         end;
     end;
 
-    procedure InvokeWebService(Url: Text;Domain: Text;Username: Text;Password: Text;var XMLDocument: DotNet XmlDocument) ReturnStatus: Integer
+    procedure InvokeWebService(Url: Text; Domain: Text; Username: Text; Password: Text; var XMLDocument: DotNet XmlDocument) ReturnStatus: Integer
     var
         HttpWebRequest: DotNet HttpWebRequest;
         HttpWebResponse: DotNet HttpWebResponse;
@@ -82,17 +82,17 @@ codeunit 6014595 "NAV Webservice Library"
         RequestStream: DotNet StreamWriter;
     begin
         // Create XMLHTTP and SEND
-        HttpWebRequest     := HttpWebRequest.Create(Url);
+        HttpWebRequest := HttpWebRequest.Create(Url);
         NetworkCredentials := NetworkCredentials.NetworkCredential();
 
         HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
-        HttpWebRequest.Method      := 'POST';
-        HttpWebRequest.Headers.Add('SOAPAction',ServiceMethod);
+        HttpWebRequest.Method := 'POST';
+        HttpWebRequest.Headers.Add('SOAPAction', ServiceMethod);
 
         NetworkCredentials.Password := Password;
         NetworkCredentials.UserName := Username;
-        NetworkCredentials.Domain   := Domain;
-        HttpWebRequest.Credentials  := NetworkCredentials;
+        NetworkCredentials.Domain := Domain;
+        HttpWebRequest.Credentials := NetworkCredentials;
 
         RequestStream := HttpWebRequest.GetRequestStream();
 
@@ -102,7 +102,7 @@ codeunit 6014595 "NAV Webservice Library"
         if HttpWebResponse.StatusCode <> 200 then Message(HttpWebResponse.StatusDescription);
         XMLDocument.Load(HttpWebResponse.GetResponseStream());
 
-        ResultDocument:= XMLDocument;
+        ResultDocument := XMLDocument;
 
         exit(HttpWebResponse.StatusCode);
     end;
@@ -115,13 +115,13 @@ codeunit 6014595 "NAV Webservice Library"
         SoapMethod: DotNet XmlElement;
         XMLDocumentParams: DotNet XmlDocument;
     begin
-        SoapEnvelope := XMLDocument.CreateElement('Soap','Envelope','http://schemas.xmlsoap.org/soap/envelope/');
-        SoapEnvelope.SetAttribute('xmlns:Soap','http://schemas.xmlsoap.org/soap/envelope/');
+        SoapEnvelope := XMLDocument.CreateElement('Soap', 'Envelope', 'http://schemas.xmlsoap.org/soap/envelope/');
+        SoapEnvelope.SetAttribute('xmlns:Soap', 'http://schemas.xmlsoap.org/soap/envelope/');
         XMLDocument.PreserveWhitespace(true);
         XMLDocument.AppendChild(SoapEnvelope);
 
         // Create SOAP Body
-        SoapBody := XMLDocument.CreateElement('Soap','Body','http://schemas.xmlsoap.org/soap/envelope/');
+        SoapBody := XMLDocument.CreateElement('Soap', 'Body', 'http://schemas.xmlsoap.org/soap/envelope/');
         SoapEnvelope.AppendChild(SoapBody);
 
         // Create Method Element
@@ -134,41 +134,41 @@ codeunit 6014595 "NAV Webservice Library"
         XMLDocumentParams.LoadXml('<parameters>' + ParameterList + '</parameters>');
         XMLDocumentParams.PreserveWhitespace(true);
         if XMLDocumentParams.FirstChild.HasChildNodes then begin
-          while XMLDocumentParams.FirstChild.ChildNodes.Count > 0 do begin
-            Node := XMLDocumentParams.FirstChild.FirstChild;
-            Node := XMLDocumentParams.FirstChild.RemoveChild(Node);
-            Node := SoapMethod.OwnerDocument.ImportNode(Node,true);
-            SoapMethod.AppendChild(Node);
-          end;
+            while XMLDocumentParams.FirstChild.ChildNodes.Count > 0 do begin
+                Node := XMLDocumentParams.FirstChild.FirstChild;
+                Node := XMLDocumentParams.FirstChild.RemoveChild(Node);
+                Node := SoapMethod.OwnerDocument.ImportNode(Node, true);
+                SoapMethod.AppendChild(Node);
+            end;
         end;
     end;
 
-    procedure SelectNodes(Name: Text;NameSpace: Text;var XMLDocument: DotNet XmlDocument;var NodeList: DotNet XmlNodeList)
+    procedure SelectNodes(Name: Text; NameSpace: Text; var XMLDocument: DotNet XmlDocument; var NodeList: DotNet XmlNodeList)
     var
         XMLNameSpaceManager: DotNet XmlNamespaceManager;
         XMLNameTable: DotNet XmlNameTable;
     begin
         XMLNameSpaceManager := XMLNameSpaceManager.XmlNamespaceManager(XMLDocument.NameTable);
-        XMLNameSpaceManager.AddNamespace('tns',NameSpace);
-        NodeList := XMLDocument.SelectNodes(StrSubstNo('//tns:%1',Name),XMLNameSpaceManager);
+        XMLNameSpaceManager.AddNamespace('tns', NameSpace);
+        NodeList := XMLDocument.SelectNodes(StrSubstNo('//tns:%1', Name), XMLNameSpaceManager);
     end;
 
-    procedure SelectNode(Name: Text;NameSpace: Text;var XMLDocument: DotNet XmlDocument;var Node: DotNet XmlNode)
+    procedure SelectNode(Name: Text; NameSpace: Text; var XMLDocument: DotNet XmlDocument; var Node: DotNet XmlNode)
     var
         XMLNameSpaceManager: DotNet XmlNamespaceManager;
         XMLNameTable: DotNet XmlNameTable;
     begin
         XMLNameSpaceManager := XMLNameSpaceManager.XmlNamespaceManager(XMLDocument.NameTable);
-        XMLNameSpaceManager.AddNamespace('tns',NameSpace);
-        Node := XMLDocument.SelectSingleNode(StrSubstNo('//tns:%1',Name),XMLNameSpaceManager);
+        XMLNameSpaceManager.AddNamespace('tns', NameSpace);
+        Node := XMLDocument.SelectSingleNode(StrSubstNo('//tns:%1', Name), XMLNameSpaceManager);
     end;
 
-    procedure StoreXMLClientSide(var XMLDocument: DotNet XmlDocument;Path: Text)
+    procedure StoreXMLClientSide(var XMLDocument: DotNet XmlDocument; Path: Text)
     var
         [RunOnClient]
         StreamWriter: DotNet StreamWriter;
     begin
-        StreamWriter := StreamWriter.StreamWriter(Path,false);
+        StreamWriter := StreamWriter.StreamWriter(Path, false);
         StreamWriter.Write(XMLDocument.OuterXml);
         StreamWriter.Close();
     end;
@@ -177,14 +177,14 @@ codeunit 6014595 "NAV Webservice Library"
     begin
         ParameterList := '';
         ServiceMethod := '';
-        ServiceType   := '';
+        ServiceType := '';
     end;
 
-    procedure AddParameter(Name: Text;Value: Text)
+    procedure AddParameter(Name: Text; Value: Text)
     var
         Parameter: Text;
     begin
-        Parameter     := StrSubstNo('<%1>%2</%1>',Name,Value);
+        Parameter := StrSubstNo('<%1>%2</%1>', Name, Value);
         ParameterList := ParameterList + Parameter;
     end;
 
@@ -195,17 +195,17 @@ codeunit 6014595 "NAV Webservice Library"
     local procedure Url() Url: Text
     begin
         if ServiceUrl <> '' then
-          exit(ServiceUrl)
+            exit(ServiceUrl)
         else
-          Url := StrSubstNo('%1/%2/ws/%3/%4/%5',ServiceBaseUrl,ServiceInstanceName,ServiceCompanyName,ServiceType,ServiceName)
+            Url := StrSubstNo('%1/%2/ws/%3/%4/%5', ServiceBaseUrl, ServiceInstanceName, ServiceCompanyName, ServiceType, ServiceName)
     end;
 
     local procedure NameSpace() NameSpace: Text
     begin
         if LowerCase(ServiceType) = 'page' then
-          NameSpace := StrSubstNo('urn:microsoft-dynamics-schemas/%1/%2',LowerCase(ServiceType),LowerCase(ServiceName))
+            NameSpace := StrSubstNo('urn:microsoft-dynamics-schemas/%1/%2', LowerCase(ServiceType), LowerCase(ServiceName))
         else
-          NameSpace := StrSubstNo('urn:microsoft-dynamics-schemas/%1/%2',LowerCase(ServiceType),ServiceName);
+            NameSpace := StrSubstNo('urn:microsoft-dynamics-schemas/%1/%2', LowerCase(ServiceType), ServiceName);
     end;
 
     procedure "-- Result Accessors"()
@@ -216,7 +216,7 @@ codeunit 6014595 "NAV Webservice Library"
     var
         Node: DotNet XmlNode;
     begin
-        SelectNode(NodeName,NameSpace,ResultDocument,Node);
+        SelectNode(NodeName, NameSpace, ResultDocument, Node);
         exit(Node.InnerText)
     end;
 
@@ -254,7 +254,7 @@ codeunit 6014595 "NAV Webservice Library"
         StringLibrary: Codeunit "String Library";
     begin
         StringLibrary.Construct(ServiceCompanyNameIn);
-        StringLibrary.Replace(' ','%20');
+        StringLibrary.Replace(' ', '%20');
         ServiceCompanyName := StringLibrary.Text;
     end;
 
@@ -265,41 +265,17 @@ codeunit 6014595 "NAV Webservice Library"
 
     procedure UseServiceType(ServiceTypeIn: Text)
     begin
-        ServiceType   := ServiceTypeIn;
+        ServiceType := ServiceTypeIn;
     end;
 
     procedure UseServiceName(ServiceNameIn: Text)
     begin
-        ServiceName   := ServiceNameIn;
+        ServiceName := ServiceNameIn;
     end;
 
     procedure UseServiceMethod(ServiceMethodIn: Text)
     begin
         ServiceMethod := ServiceMethodIn;
-    end;
-
-    trigger ResultDocument::NodeInserting(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger ResultDocument::NodeInserted(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger ResultDocument::NodeRemoving(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger ResultDocument::NodeRemoved(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger ResultDocument::NodeChanging(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger ResultDocument::NodeChanged(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
     end;
 }
 

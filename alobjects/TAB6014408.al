@@ -91,7 +91,7 @@ table 6014408 "Credit Voucher"
         field(9;Amount;Decimal)
         {
             Caption = 'Amount';
-            MaxValue = 9.999.999;
+            MaxValue = 9999999;
         }
         field(10;Name;Text[50])
         {

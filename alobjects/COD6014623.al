@@ -695,49 +695,5 @@ codeunit 6014623 "POS Event Marshaller"
         Marshaller.SetObjectProperty('[n$.State.Context.View.Context.EanBoxText]',String);
         //+NPR5.23
     end;
-
-    trigger POS::OnFrameworkReady()
-    begin
-    end;
-
-    trigger POS::OnScreenSize(screen: DotNet Screen)
-    begin
-    end;
-
-    trigger POS::OnMessage(eventArgs: DotNet MessageEventArgs)
-    begin
-    end;
-
-    trigger POS::OnResponse(response: DotNet ResponseInfo)
-    begin
-    end;
-
-    trigger POS::OnJavaScriptCallback(js: DotNet JavaScript)
-    begin
-    end;
-
-    trigger POS::OnDialogResponse(response: DotNet Response)
-    begin
-    end;
-
-    trigger POS::OnDataUpdated(dataSource: DotNet DataSource)
-    begin
-    end;
-
-    trigger POS::OnInvokeMethodResponse(envelope: Text)
-    begin
-    end;
-
-    trigger POS::OnServiceCallError(message: Text)
-    begin
-    end;
-
-    trigger POS::OnObjectModel(id: Text;eventName: Text;jsonData: Text)
-    begin
-    end;
-
-    trigger POS::OnProtocol(eventName: Text;serializedData: Text;doCallback: Boolean)
-    begin
-    end;
 }
 

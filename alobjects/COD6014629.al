@@ -159,17 +159,5 @@ codeunit 6014629 "Managed Package Builder"
 
         exit(JObject.ToString());
     end;
-
-    trigger GlobalJArray::ListChanged(sender: Variant;e: DotNet ListChangedEventArgs)
-    begin
-    end;
-
-    trigger GlobalJArray::AddingNew(sender: Variant;e: DotNet AddingNewEventArgs)
-    begin
-    end;
-
-    trigger GlobalJArray::CollectionChanged(sender: Variant;e: DotNet NotifyCollectionChangedEventArgs)
-    begin
-    end;
 }
 
