@@ -1,0 +1,35 @@
+{
+  "id": "992c2309-cca4-43cb-9e41-911f482ec088",
+  "name": "NPR-to-AL-Conversion",
+  "publisher": "NaviPartner",
+  "version": "1.0.0.0",
+  "brief": "",
+  "description": "",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "dependencies": [],
+  "screenshots": [],
+  "platform": "14.0.0.0",
+  "application": "14.0.0.0",
+  "idRanges": [
+    {
+      "from": 50100,
+      "to": 50149
+    },
+    {
+      "from": 6014400,
+      "to": 6900000
+    },
+    {
+      "from": 70000000,
+      "to": 79999999
+    }
+  ],
+  "contextSensitiveHelpUrl": "https://ALProject14.com/help/",
+  "showMyCode": true,
+  "runtime": "3.0",
+  "target": "Internal"
+}
