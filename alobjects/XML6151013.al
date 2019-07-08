@@ -8,44 +8,44 @@ xmlport 6151013 "NpRv Partners"
     Encoding = UTF8;
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-    XMLVersionNo = 1.1;
+    XMLVersionNo = V11;
 
     schema
     {
         textelement(retail_voucher_partners)
         {
-            tableelement(tempnprvpartner;"NpRv Partner")
+            tableelement(tempnprvpartner; "NpRv Partner")
             {
                 MinOccurs = Zero;
                 XmlName = 'retail_voucher_partner';
                 UseTemporary = true;
-                fieldattribute(partner_code;TempNpRvPartner.Code)
+                fieldattribute(partner_code; TempNpRvPartner.Code)
                 {
                 }
-                fieldelement(name;TempNpRvPartner.Name)
+                fieldelement(name; TempNpRvPartner.Name)
                 {
                 }
-                fieldelement(service_url;TempNpRvPartner."Service Url")
+                fieldelement(service_url; TempNpRvPartner."Service Url")
                 {
                 }
-                fieldelement(service_username;TempNpRvPartner."Service Username")
+                fieldelement(service_username; TempNpRvPartner."Service Username")
                 {
                 }
-                fieldelement(service_password;TempNpRvPartner."Service Password")
+                fieldelement(service_password; TempNpRvPartner."Service Password")
                 {
                 }
                 textelement(relations)
                 {
                     MaxOccurs = Once;
                     MinOccurs = Zero;
-                    tableelement(tempnprvpartnerrelation;"NpRv Partner Relation")
+                    tableelement(tempnprvpartnerrelation; "NpRv Partner Relation")
                     {
-                        LinkFields = "Partner Code"=FIELD(Code);
+                        LinkFields = "Partner Code" = FIELD (Code);
                         LinkTable = TempNpRvPartner;
                         MinOccurs = Zero;
                         XmlName = 'relation';
                         UseTemporary = true;
-                        fieldattribute(voucher_type;TempNpRvPartnerRelation."Voucher Type")
+                        fieldattribute(voucher_type; TempNpRvPartnerRelation."Voucher Type")
                         {
                         }
 
@@ -71,10 +71,10 @@ xmlport 6151013 "NpRv Partners"
         }
     }
 
-    procedure GetSourceTables(var TempNpRvPartner2: Record "NpRv Partner" temporary;var TempNpRvPartnerRelation2: Record "NpRv Partner Relation" temporary)
+    procedure GetSourceTables(var TempNpRvPartner2: Record "NpRv Partner" temporary; var TempNpRvPartnerRelation2: Record "NpRv Partner Relation" temporary)
     begin
-        TempNpRvPartner2.Copy(TempNpRvPartner,true);
-        TempNpRvPartnerRelation2.Copy(TempNpRvPartnerRelation,true);
+        TempNpRvPartner2.Copy(TempNpRvPartner, true);
+        TempNpRvPartnerRelation2.Copy(TempNpRvPartnerRelation, true);
     end;
 }
 

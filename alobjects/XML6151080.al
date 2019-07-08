@@ -8,49 +8,49 @@ xmlport 6151080 "ExRv Vouchers"
     FormatEvaluate = Xml;
     PreserveWhiteSpace = true;
     UseDefaultNamespace = true;
-    XMLVersionNo = 1.1;
+    XMLVersionNo = V11;
 
     schema
     {
         textelement(vouchers)
         {
             MaxOccurs = Once;
-            tableelement(tempexrvvoucher;"ExRv Voucher")
+            tableelement(tempexrvvoucher; "ExRv Voucher")
             {
                 MinOccurs = Zero;
                 XmlName = 'voucher';
                 UseTemporary = true;
-                fieldattribute(voucher_type;TempExRvVoucher."Voucher Type")
+                fieldattribute(voucher_type; TempExRvVoucher."Voucher Type")
                 {
                 }
-                fieldattribute(voucher_no;TempExRvVoucher."No.")
+                fieldattribute(voucher_no; TempExRvVoucher."No.")
                 {
                 }
-                fieldelement(amount;TempExRvVoucher.Amount)
-                {
-                    MinOccurs = Zero;
-                }
-                fieldelement(issued_at;TempExRvVoucher."Issued at")
+                fieldelement(amount; TempExRvVoucher.Amount)
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(reference_no;TempExRvVoucher."Reference No.")
+                fieldelement(issued_at; TempExRvVoucher."Issued at")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(online_reference_no;TempExRvVoucher."Online Reference No.")
+                fieldelement(reference_no; TempExRvVoucher."Reference No.")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(open;TempExRvVoucher.Open)
+                fieldelement(online_reference_no; TempExRvVoucher."Online Reference No.")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(remaining_amount;TempExRvVoucher."Remaining Amount")
+                fieldelement(open; TempExRvVoucher.Open)
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(closed_at;TempExRvVoucher."Closed at")
+                fieldelement(remaining_amount; TempExRvVoucher."Remaining Amount")
+                {
+                    MinOccurs = Zero;
+                }
+                fieldelement(closed_at; TempExRvVoucher."Closed at")
                 {
                     MinOccurs = Zero;
                 }
@@ -72,12 +72,12 @@ xmlport 6151080 "ExRv Vouchers"
 
     procedure GetSourceTable(var TempExRvVoucherCopy: Record "ExRv Voucher" temporary)
     begin
-        TempExRvVoucherCopy.Copy(TempExRvVoucher,true);
+        TempExRvVoucherCopy.Copy(TempExRvVoucher, true);
     end;
 
     procedure SetSourceTable(var NewTempExRvVoucher: Record "ExRv Voucher" temporary)
     begin
-        TempExRvVoucher.Copy(NewTempExRvVoucher,true);
+        TempExRvVoucher.Copy(NewTempExRvVoucher, true);
     end;
 }
 

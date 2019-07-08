@@ -1,4 +1,4 @@
-tableextension 70000026 tableextension70000026 extends Item 
+tableextension 70000026 tableextension70000026 extends Item
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields with Description starting NPR7.100.000
@@ -49,241 +49,242 @@ tableextension 70000026 tableextension70000026 extends Item
     DrillDownPageID = "Retail Item List";
     fields
     {
-        field(6014400;"Item Group";Code[10])
+        field(6014400; "Item Group"; Code[10])
         {
             Caption = 'Item Group';
             Description = 'NPR7.100.000';
             TableRelation = "Item Group";
         }
-        field(6014401;"Group sale";Boolean)
+        field(6014401; "Group sale"; Boolean)
         {
             Caption = 'Various item sales';
             Description = 'NPR7.100.000';
         }
-        field(6014408;Season;Code[3])
+        field(6014408; Season; Code[3])
         {
             Caption = 'Season';
             Description = 'NPR7.100.000';
         }
-        field(6014409;"Create Alt. No. Automatic";Boolean)
+        field(6014409; "Create Alt. No. Automatic"; Boolean)
         {
-            CalcFormula = Lookup("Variety Setup"."Create Alt. No. automatic");
+            CalcFormula = Lookup ("Variety Setup"."Create Alt. No. automatic");
             Caption = 'Create Alt. No. Automatic';
             Description = 'NPR5.30';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(6014410;"Label Barcode";Code[20])
+        field(6014410; "Label Barcode"; Code[20])
         {
             Caption = 'Label barcode';
             Description = 'NPR7.100.000';
-            TableRelation = IF ("Create Alt. No. Automatic"=CONST(false)) "Item Cross Reference"."Cross-Reference No." WHERE ("Cross-Reference Type"=CONST("Bar Code"),
-                                                                                                                              "Item No."=FIELD("No."),
-                                                                                                                              "Cross-Reference No."=FILTER(<>''),
-                                                                                                                              "Variant Code"=CONST(''))
-                                                                                                                              ELSE IF ("Create Alt. No. Automatic"=CONST(true)) "Alternative No."."Alt. No." WHERE (Type=CONST(Item),
-                                                                                                                                                                                                                    Code=FIELD("No."),
-                                                                                                                                                                                                                    "Alt. No."=FILTER(<>''),
-                                                                                                                                                                                                                    "Variant Code"=CONST(''));
+            TableRelation = IF ("Create Alt. No. Automatic" = CONST (false)) "Item Cross Reference"."Cross-Reference No." WHERE ("Cross-Reference Type" = CONST ("Bar Code"),
+                                                                                                                              "Item No." = FIELD ("No."),
+                                                                                                                              "Cross-Reference No." = FILTER (<> ''),
+                                                                                                                              "Variant Code" = CONST (''))
+            ELSE
+            IF ("Create Alt. No. Automatic" = CONST (true)) "Alternative No."."Alt. No." WHERE (Type = CONST (Item),
+                                                                                                                                                                                                                    Code = FIELD ("No."),
+                                                                                                                                                                                                                    "Alt. No." = FILTER (<> ''),
+                                                                                                                                                                                                                    "Variant Code" = CONST (''));
         }
-        field(6014418;"Explode BOM auto";Boolean)
+        field(6014418; "Explode BOM auto"; Boolean)
         {
             Caption = 'Auto-explode BOM';
             Description = 'NPR7.100.000';
         }
-        field(6014419;"Guarantee voucher";Boolean)
+        field(6014419; "Guarantee voucher"; Boolean)
         {
             Caption = 'Guarantee voucher';
             Description = 'NPR7.100.000';
         }
-        field(6014424;"Cannot edit unit price";Boolean)
+        field(6014424; "Cannot edit unit price"; Boolean)
         {
             Caption = 'Can''t edit unit price';
             Description = 'NPR7.100.000';
         }
-        field(6014428;"Primary Key Length";Integer)
+        field(6014428; "Primary Key Length"; Integer)
         {
             Caption = 'Primary Key Length';
             Description = 'NPR7.100.000';
         }
-        field(6014435;"Last Changed at";DateTime)
+        field(6014435; "Last Changed at"; DateTime)
         {
             Caption = 'Last Changed at';
             Description = 'NPR5.48';
         }
-        field(6014440;"Last Changed by";Code[50])
+        field(6014440; "Last Changed by"; Code[50])
         {
             Caption = 'Last Changed by';
             Description = 'NPR5.48';
         }
-        field(6014500;"Second-hand number";Code[20])
+        field(6014500; "Second-hand number"; Code[20])
         {
             Caption = 'Second-hand number';
             Description = 'NPR7.100.000';
         }
-        field(6014502;Condition;Option)
+        field(6014502; Condition; Option)
         {
             Caption = 'Condition';
             Description = 'NPR7.100.000';
             OptionCaption = 'New,Mint,Mint boxed,A,B,C,D,E,F,B+';
             OptionMembers = New,Mint,"Mint boxed",A,B,C,D,E,F,"B+";
         }
-        field(6014503;"Second-hand";Boolean)
+        field(6014503; "Second-hand"; Boolean)
         {
             Caption = 'Second-hand';
             Description = 'NPR7.100.000';
         }
-        field(6014504;"Guarantee Index";Option)
+        field(6014504; "Guarantee Index"; Option)
         {
             Caption = 'Guarantee Index';
             Description = 'NPR7.100.000';
             OptionCaption = ' ,Move to Warranty';
             OptionMembers = " ","Flyt til garanti kar.";
         }
-        field(6014506;"Has Accessories";Boolean)
+        field(6014506; "Has Accessories"; Boolean)
         {
-            CalcFormula = Exist("Accessory/Spare Part" WHERE (Code=FIELD("No.")));
+            CalcFormula = Exist ("Accessory/Spare Part" WHERE (Code = FIELD ("No.")));
             Caption = 'Has Accessories';
             Description = 'NPR5.40';
             FieldClass = FlowField;
         }
-        field(6014508;"Insurrance category";Code[50])
+        field(6014508; "Insurrance category"; Code[50])
         {
             Caption = 'Insurance Section';
             Description = 'NPR7.100.000';
             TableRelation = "Insurance Category";
         }
-        field(6014509;"Item Brand";Code[10])
+        field(6014509; "Item Brand"; Code[10])
         {
             Caption = 'Item brand';
             Description = 'NPR7.100.000';
         }
-        field(6014512;"No Print on Reciept";Boolean)
+        field(6014512; "No Print on Reciept"; Boolean)
         {
             Caption = 'No Print on Reciept';
             Description = 'NPR7.100.000';
         }
-        field(6014513;"Print Tags";Text[100])
+        field(6014513; "Print Tags"; Text[100])
         {
             Caption = 'Print Tags';
         }
-        field(6014609;"Has Variants";Boolean)
+        field(6014609; "Has Variants"; Boolean)
         {
-            CalcFormula = Exist("Item Variant" WHERE ("Item No."=FIELD("No.")));
+            CalcFormula = Exist ("Item Variant" WHERE ("Item No." = FIELD ("No.")));
             Caption = 'Has Variants';
             Description = 'NPR7.100.000';
             FieldClass = FlowField;
         }
-        field(6014625;"Std. Sales Qty.";Decimal)
+        field(6014625; "Std. Sales Qty."; Decimal)
         {
             Caption = 'Std. Sales Qty.';
             Description = 'NPR7.100.000';
         }
-        field(6014630;"Blocked on Pos";Boolean)
+        field(6014630; "Blocked on Pos"; Boolean)
         {
             Caption = 'Blocked on Pos';
             Description = 'NPR7.100.001';
         }
-        field(6014635;"Sale Blocked";Boolean)
+        field(6014635; "Sale Blocked"; Boolean)
         {
             Caption = 'Sale Blocked';
             Description = 'NPR5.38';
         }
-        field(6014640;"Purchase Blocked";Boolean)
+        field(6014640; "Purchase Blocked"; Boolean)
         {
             Caption = 'Purchase Blocked';
             Description = 'NPR5.38';
         }
-        field(6014641;"Custom Discount Blocked";Boolean)
+        field(6014641; "Custom Discount Blocked"; Boolean)
         {
             Caption = 'Custom Discount Blocked';
             Description = 'NPR5.42 [297569]';
         }
-        field(6059784;"Ticket Type";Code[10])
+        field(6059784; "Ticket Type"; Code[10])
         {
             Caption = 'Ticket Type';
             Description = 'NPR7.100.000,Ticket';
             TableRelation = "TM Ticket Type";
         }
-        field(6059970;"Variety 1";Code[10])
+        field(6059970; "Variety 1"; Code[10])
         {
             Caption = 'Variety 1';
             Description = 'VRT1.00';
             TableRelation = Variety;
         }
-        field(6059971;"Variety 1 Table";Code[40])
+        field(6059971; "Variety 1 Table"; Code[40])
         {
             Caption = 'Variety 1 Table';
             Description = 'VRT1.00';
-            TableRelation = "Variety Table".Code WHERE (Type=FIELD("Variety 1"));
+            TableRelation = "Variety Table".Code WHERE (Type = FIELD ("Variety 1"));
         }
-        field(6059973;"Variety 2";Code[10])
+        field(6059973; "Variety 2"; Code[10])
         {
             Caption = 'Variety 2';
             Description = 'VRT1.00';
             TableRelation = Variety;
         }
-        field(6059974;"Variety 2 Table";Code[40])
+        field(6059974; "Variety 2 Table"; Code[40])
         {
             Caption = 'Variety 2 Table';
             Description = 'VRT1.00';
-            TableRelation = "Variety Table".Code WHERE (Type=FIELD("Variety 2"));
+            TableRelation = "Variety Table".Code WHERE (Type = FIELD ("Variety 2"));
         }
-        field(6059976;"Variety 3";Code[10])
+        field(6059976; "Variety 3"; Code[10])
         {
             Caption = 'Variety 3';
             Description = 'VRT1.00';
             TableRelation = Variety;
         }
-        field(6059977;"Variety 3 Table";Code[40])
+        field(6059977; "Variety 3 Table"; Code[40])
         {
             Caption = 'Variety 3 Table';
             Description = 'VRT1.00';
-            TableRelation = "Variety Table".Code WHERE (Type=FIELD("Variety 3"));
+            TableRelation = "Variety Table".Code WHERE (Type = FIELD ("Variety 3"));
         }
-        field(6059979;"Variety 4";Code[10])
+        field(6059979; "Variety 4"; Code[10])
         {
             Caption = 'Variety 4';
             Description = 'VRT1.00';
             TableRelation = Variety;
         }
-        field(6059980;"Variety 4 Table";Code[40])
+        field(6059980; "Variety 4 Table"; Code[40])
         {
             Caption = 'Variety 4 Table';
             Description = 'VRT1.00';
-            TableRelation = "Variety Table".Code WHERE (Type=FIELD("Variety 4"));
+            TableRelation = "Variety Table".Code WHERE (Type = FIELD ("Variety 4"));
         }
-        field(6059981;"Cross Variety No.";Option)
+        field(6059981; "Cross Variety No."; Option)
         {
             Caption = 'Cross Variety No.';
             Description = 'VRT1.00';
             OptionCaption = 'Variety 1,Variety 2,Variety 3,Variety 4';
             OptionMembers = Variety1,Variety2,Variety3,Variety4;
         }
-        field(6059982;"Variety Group";Code[20])
+        field(6059982; "Variety Group"; Code[20])
         {
             Caption = 'Variety Group';
             Description = 'VRT1.00';
             TableRelation = "Variety Group";
         }
-        field(6060054;"Item Status";Code[10])
+        field(6060054; "Item Status"; Code[10])
         {
             Caption = 'Item Status';
             Description = 'NPR5.25';
             TableRelation = "Item Status";
         }
-        field(6151125;"Item AddOn No.";Code[20])
+        field(6151125; "Item AddOn No."; Code[20])
         {
             Caption = 'Item AddOn No.';
             Description = 'NPR5.48';
             TableRelation = "NpIa Item AddOn";
         }
-        field(6151400;"Magento Item";Boolean)
+        field(6151400; "Magento Item"; Boolean)
         {
             Caption = 'Magento Item';
             Description = 'MAG2.00';
         }
-        field(6151405;"Magento Status";Option)
+        field(6151405; "Magento Status"; Option)
         {
             BlankZero = true;
             Caption = 'Magento Status';
@@ -292,97 +293,97 @@ tableextension 70000026 tableextension70000026 extends Item
             OptionCaption = ',Active,Inactive';
             OptionMembers = ,Active,Inactive;
         }
-        field(6151410;"Attribute Set ID";Integer)
+        field(6151410; "Attribute Set ID"; Integer)
         {
             Caption = 'Attribute Set ID';
             Description = 'MAG2.00';
             TableRelation = "Magento Attribute Set";
         }
-        field(6151415;"Magento Description";BLOB)
+        field(6151415; "Magento Description"; BLOB)
         {
             Caption = 'Magento Description';
             Description = 'MAG2.00';
         }
-        field(6151420;"Magento Name";Text[250])
+        field(6151420; "Magento Name"; Text[250])
         {
             Caption = 'Magento Name';
             Description = 'MAG2.00';
         }
-        field(6151425;"Magento Short Description";BLOB)
+        field(6151425; "Magento Short Description"; BLOB)
         {
             Caption = 'Magento Short Description';
             Description = 'MAG2.00';
         }
-        field(6151430;"Magento Brand";Code[20])
+        field(6151430; "Magento Brand"; Code[20])
         {
             Caption = 'Magento Brand';
             Description = 'MAG2.00';
             TableRelation = "Magento Brand";
         }
-        field(6151435;"Seo Link";Text[250])
+        field(6151435; "Seo Link"; Text[250])
         {
             Caption = 'Seo Link';
             Description = 'MAG2.00';
         }
-        field(6151440;"Meta Title";Text[70])
+        field(6151440; "Meta Title"; Text[70])
         {
             Caption = 'Meta Title';
             Description = 'MAG2.00,MAG2.07';
         }
-        field(6151445;"Meta Description";Text[250])
+        field(6151445; "Meta Description"; Text[250])
         {
             Caption = 'Meta Description';
             Description = 'MAG2.00';
         }
-        field(6151450;"Product New From";Date)
+        field(6151450; "Product New From"; Date)
         {
             Caption = 'Product New From';
             Description = 'MAG2.00';
         }
-        field(6151455;"Product New To";Date)
+        field(6151455; "Product New To"; Date)
         {
             Caption = 'Product New To';
             Description = 'MAG2.00';
         }
-        field(6151460;"Special Price";Decimal)
+        field(6151460; "Special Price"; Decimal)
         {
             Caption = 'Special Price';
             Description = 'MAG2.00';
         }
-        field(6151465;"Special Price From";Date)
+        field(6151465; "Special Price From"; Date)
         {
             Caption = 'Special Price From';
             Description = 'MAG2.00';
         }
-        field(6151470;"Special Price To";Date)
+        field(6151470; "Special Price To"; Date)
         {
             Caption = 'Special Price To';
             Description = 'MAG2.00';
         }
-        field(6151475;"Featured From";Date)
+        field(6151475; "Featured From"; Date)
         {
             Caption = 'Featured From';
             Description = 'MAG2.00';
         }
-        field(6151480;"Featured To";Date)
+        field(6151480; "Featured To"; Date)
         {
             Caption = 'Featured To';
             Description = 'MAG2.00';
         }
-        field(6151485;Backorder;Boolean)
+        field(6151485; Backorder; Boolean)
         {
             Caption = 'Backorder';
             Description = 'MAG2.00';
         }
-        field(6151490;"Display Only";Boolean)
+        field(6151490; "Display Only"; Boolean)
         {
             Caption = 'Display Only';
             Description = 'MAG2.00';
         }
-        field(6151495;"Custom Options";Integer)
+        field(6151495; "Custom Options"; Integer)
         {
-            CalcFormula = Count("Magento Item Custom Option" WHERE ("Item No."=FIELD("No."),
-                                                                    Enabled=CONST(true)));
+            CalcFormula = Count ("Magento Item Custom Option" WHERE ("Item No." = FIELD ("No."),
+                                                                    Enabled = CONST (true)));
             Caption = 'Custom Options';
             Description = 'MAG2.00';
             Editable = false;
@@ -391,10 +392,10 @@ tableextension 70000026 tableextension70000026 extends Item
     }
     keys
     {
-        key(Key1;"Group sale","Item Group","Vendor No.")
+        key(Key1; "Group sale", "Item Group")
         {
         }
-        key(Key2;"Primary Key Length")
+        key(Key2; "Primary Key Length")
         {
         }
     }

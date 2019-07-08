@@ -470,7 +470,7 @@ table 6151061 "Retai Repl. Demand Line"
         field(6151057;"Campaign Unit Price";Decimal)
         {
             Caption = 'Period Price';
-            MaxValue = 9.999.999;
+            MaxValue = 9999999;
             MinValue = 0;
         }
         field(6151058;"Campaign Unit Cost";Decimal)

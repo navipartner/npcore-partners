@@ -150,7 +150,7 @@ table 6150661 "NPRE Waiter Pad Line"
             Caption = 'Unit Price';
             DecimalPlaces = 2:2;
             Editable = true;
-            MaxValue = 9.999.999;
+            MaxValue = 9999999;
         }
         field(61;"Discount Type";Option)
         {

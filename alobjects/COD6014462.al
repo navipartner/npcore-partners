@@ -19,8 +19,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 42, 'OnBeforeActionEvent', 'Action29', true, true)]
@@ -29,8 +29,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 42, 'OnBeforeActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -39,8 +39,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
-            Error(Pdf2NavActionDisabledMsg1);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
+                Error(Pdf2NavActionDisabledMsg1);
     end;
 
     [EventSubscriber(ObjectType::Page, 42, 'OnAfterActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -55,8 +55,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 43, 'OnBeforeActionEvent', 'Action17', true, true)]
@@ -65,8 +65,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 43, 'OnBeforeActionEvent', 'PostAndSend', true, true)]
@@ -75,8 +75,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 43, 'OnBeforeActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -85,8 +85,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
-            Error(Pdf2NavActionDisabledMsg2);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
+                Error(Pdf2NavActionDisabledMsg2);
     end;
 
     [EventSubscriber(ObjectType::Page, 43, 'OnAfterActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -101,8 +101,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 44, 'OnBeforeActionEvent', 'Action17', true, true)]
@@ -111,8 +111,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 44, 'OnBeforeActionEvent', 'PostAndSend', true, true)]
@@ -121,8 +121,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 44, 'OnBeforeActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -131,8 +131,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
-            Error(Pdf2NavActionDisabledMsg2);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
+                Error(Pdf2NavActionDisabledMsg2);
     end;
 
     [EventSubscriber(ObjectType::Page, 44, 'OnAfterActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -147,8 +147,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 6630, 'OnBeforeActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -157,8 +157,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
-            Error(Pdf2NavActionDisabledMsg3);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
+                Error(Pdf2NavActionDisabledMsg3);
     end;
 
     [EventSubscriber(ObjectType::Page, 6630, 'OnAfterActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -173,8 +173,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 9301, 'OnBeforeActionEvent', 'Action8', true, true)]
@@ -183,8 +183,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 9301, 'OnBeforeActionEvent', 'PostAndSend', true, true)]
@@ -193,8 +193,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 9301, 'OnBeforeActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -203,8 +203,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
-            Error(Pdf2NavActionDisabledMsg2);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
+                Error(Pdf2NavActionDisabledMsg2);
     end;
 
     [EventSubscriber(ObjectType::Page, 9301, 'OnAfterActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -219,8 +219,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 9302, 'OnBeforeActionEvent', 'Action8', true, true)]
@@ -229,8 +229,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 9302, 'OnBeforeActionEvent', 'PostAndSend', true, true)]
@@ -239,8 +239,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 9302, 'OnBeforeActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -249,8 +249,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
-            Error(Pdf2NavActionDisabledMsg2);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
+                Error(Pdf2NavActionDisabledMsg2);
     end;
 
     [EventSubscriber(ObjectType::Page, 9302, 'OnAfterActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -265,8 +265,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 9304, 'OnBeforeActionEvent', 'Action12', true, true)]
@@ -275,8 +275,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 9304, 'OnBeforeActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -285,8 +285,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
-            Error(Pdf2NavActionDisabledMsg1);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
+                Error(Pdf2NavActionDisabledMsg1);
     end;
 
     [EventSubscriber(ObjectType::Page, 9304, 'OnAfterActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -301,8 +301,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 9305, 'OnBeforeActionEvent', 'Action14', true, true)]
@@ -311,8 +311,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 9305, 'OnBeforeActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -321,8 +321,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
-            Error(Pdf2NavActionDisabledMsg1);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
+                Error(Pdf2NavActionDisabledMsg1);
     end;
 
     [EventSubscriber(ObjectType::Page, 9305, 'OnAfterActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -337,8 +337,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 6014518, 'OnBeforeActionEvent', 'Action29', true, true)]
@@ -347,8 +347,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
-            Error(StdActionDisabledMsg);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Pdf2Nav Only" then
+                Error(StdActionDisabledMsg);
     end;
 
     [EventSubscriber(ObjectType::Page, 6014518, 'OnBeforeActionEvent', 'PostAndSendPdf2Nav', true, true)]
@@ -357,8 +357,8 @@ codeunit 6014462 "Sales-Post Action Mgt"
         SalesPostandPdf2NavSetup: Record "Sales-Post and Pdf2Nav Setup";
     begin
         if SalesPostandPdf2NavSetup.Get then
-          if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
-            Error(Pdf2NavActionDisabledMsg1);
+            if SalesPostandPdf2NavSetup."Post and Send" = SalesPostandPdf2NavSetup."Post and Send"::"Std. NAV Only" then
+                Error(Pdf2NavActionDisabledMsg1);
     end;
 
     [EventSubscriber(ObjectType::Page, 6014518, 'OnAfterActionEvent', 'PostAndSendPdf2Nav', true, true)]

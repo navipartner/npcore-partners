@@ -9,14 +9,14 @@ codeunit 6151394 "CS UI Refill Handling"
         MiniformMgmt: Codeunit "CS UI Management";
     begin
         MiniformMgmt.Initialize(
-          CSUIHeader,Rec,DOMxmlin,ReturnedNode,
-          RootNode,XMLDOMMgt,CSCommunication,CSUserId,
-          CurrentCode,StackCode,WhseEmpId,LocationFilter,CSSessionId);
+          CSUIHeader, Rec, DOMxmlin, ReturnedNode,
+          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
-          PrepareData
+            PrepareData
         else
-          ProcessInput;
+            ProcessInput;
 
         Clear(DOMxmlin);
     end;
@@ -64,38 +64,38 @@ codeunit 6151394 "CS UI Refill Handling"
         Separator: DotNet String;
         Value: Text;
     begin
-        if XMLDOMMgt.FindNode(RootNode,'Header/Input',ReturnedNode) then
-          TextValue := ReturnedNode.InnerText
+        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.InnerText
         else
-          Error(Text006);
+            Error(Text006);
 
-        Evaluate(TableNo,CSCommunication.GetNodeAttribute(ReturnedNode,'TableNo'));
+        Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         RecRef.Open(TableNo);
-        Evaluate(RecId,CSCommunication.GetNodeAttribute(ReturnedNode,'RecordID'));
+        Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
         if RecRef.Get(RecId) then begin
-          RecRef.SetTable(CSTempData);
-          RecRef.SetRecFilter;
-          CSCommunication.SetRecRef(RecRef);
+            RecRef.SetTable(CSTempData);
+            RecRef.SetRecFilter;
+            CSCommunication.SetRecRef(RecRef);
         end else begin
-          CSCommunication.RunPreviousUI(DOMxmlin);
-          exit;
+            CSCommunication.RunPreviousUI(DOMxmlin);
+            exit;
         end;
 
-        FuncGroup.KeyDef := CSCommunication.GetFunctionKey(CSUIHeader.Code,TextValue);
+        FuncGroup.KeyDef := CSCommunication.GetFunctionKey(CSUIHeader.Code, TextValue);
         ActiveInputField := 1;
 
         case FuncGroup.KeyDef of
-          FuncGroup.KeyDef::Esc:
-            begin
-              DeleteEmptyDataLines();
-              CSCommunication.RunPreviousUI(DOMxmlin);
-            end;
-          else
-            Error(Text000);
+            FuncGroup.KeyDef::Esc:
+                begin
+                    DeleteEmptyDataLines();
+                    CSCommunication.RunPreviousUI(DOMxmlin);
+                end;
+            else
+                Error(Text000);
         end;
 
-        if not (FuncGroup.KeyDef in [FuncGroup.KeyDef::Esc,FuncGroup.KeyDef::Register]) then
-          SendForm(ActiveInputField);
+        if not (FuncGroup.KeyDef in [FuncGroup.KeyDef::Esc, FuncGroup.KeyDef::Register]) then
+            SendForm(ActiveInputField);
     end;
 
     local procedure PrepareData()
@@ -122,7 +122,7 @@ codeunit 6151394 "CS UI Refill Handling"
     var
         Records: DotNet XmlElement;
     begin
-        CSCommunication.EncodeUI(CSUIHeader,StackCode,DOMxmlin,InputField,Remark,CSUserId);
+        CSCommunication.EncodeUI(CSUIHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
 
         CSMgt.SendXMLReply(DOMxmlin);
@@ -138,11 +138,11 @@ codeunit 6151394 "CS UI Refill Handling"
         Clear(NewCSTempData);
         NewCSTempData.SetRange(Id, CSSessionId);
         if NewCSTempData.FindLast then
-          LineNo := NewCSTempData."Line No." + 1
+            LineNo := NewCSTempData."Line No." + 1
         else
-          LineNo := 1;
+            LineNo := 1;
 
-        Location.SetFilter(Code,LocationFilter);
+        Location.SetFilter(Code, LocationFilter);
         Location.FindFirst();
 
         CSTempData.Init;
@@ -166,32 +166,8 @@ codeunit 6151394 "CS UI Refill Handling"
     var
         CSTempData: Record "CS Temp Data";
     begin
-        CSTempData.SetRange(Id,CSSessionId);
+        CSTempData.SetRange(Id, CSSessionId);
         CSTempData.DeleteAll(true);
-    end;
-
-    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
     end;
 }
 

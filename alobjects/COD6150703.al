@@ -396,45 +396,4 @@ codeunit 6150703 "POS JSON Management"
         if IsNull(Context) then
           Context := Context.Dictionary();
     end;
-
-    trigger JRoot::PropertyChanged(sender: Variant;e: DotNet PropertyChangedEventArgs)
-    begin
-    end;
-
-    trigger JRoot::PropertyChanging(sender: Variant;e: DotNet PropertyChangingEventArgs)
-    begin
-    end;
-
-    trigger JRoot::ListChanged(sender: Variant;e: DotNet ListChangedEventArgs)
-    begin
-    end;
-
-    trigger JRoot::AddingNew(sender: Variant;e: DotNet AddingNewEventArgs)
-    begin
-    end;
-
-    trigger JRoot::CollectionChanged(sender: Variant;e: DotNet NotifyCollectionChangedEventArgs)
-    begin
-    end;
-
-    trigger JObjectBefore::PropertyChanged(sender: Variant;e: DotNet PropertyChangedEventArgs)
-    begin
-    end;
-
-    trigger JObjectBefore::PropertyChanging(sender: Variant;e: DotNet PropertyChangingEventArgs)
-    begin
-    end;
-
-    trigger JObjectBefore::ListChanged(sender: Variant;e: DotNet ListChangedEventArgs)
-    begin
-    end;
-
-    trigger JObjectBefore::AddingNew(sender: Variant;e: DotNet AddingNewEventArgs)
-    begin
-    end;
-
-    trigger JObjectBefore::CollectionChanged(sender: Variant;e: DotNet NotifyCollectionChangedEventArgs)
-    begin
-    end;
 }
-

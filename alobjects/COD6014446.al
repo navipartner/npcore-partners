@@ -15,15 +15,15 @@ codeunit 6014446 "M2 Demo Picture Mgt2"
     end;
 
     [EventSubscriber(ObjectType::Table, 6151411, 'OnGetMagentoUrl', '', true, true)]
-    local procedure GetM2DemoPictureUrl(var Sender: Record "Magento Picture";var MagentoUrl: Text;var Handled: Boolean)
+    local procedure GetM2DemoPictureUrl(var Sender: Record "Magento Picture"; var MagentoUrl: Text; var Handled: Boolean)
     var
         MagentoSetup: Record "Magento Setup";
         MagentoSetupEventSub: Record "Magento Setup Event Sub.";
         MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
         String: DotNet String;
     begin
-        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Magento Picture Url",CurrCodeunitId(),'GetM2DemoPictureUrl') then
-          exit;
+        if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Magento Picture Url", CurrCodeunitId(), 'GetM2DemoPictureUrl') then
+            exit;
 
         Handled := true;
 
@@ -33,7 +33,7 @@ codeunit 6014446 "M2 Demo Picture Mgt2"
 
     local procedure CurrCodeunitId(): Integer
     begin
-        exit(CODEUNIT::Codeunit50012);
+        exit(CODEUNIT::"M2 Demo Picture Mgt2");
     end;
 }
 

@@ -759,29 +759,5 @@ codeunit 6151371 "CS Communication"
 
         exit(true);
     end;
-
-    trigger XMLDOM::NodeInserting(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger XMLDOM::NodeInserted(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger XMLDOM::NodeRemoving(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger XMLDOM::NodeRemoved(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger XMLDOM::NodeChanging(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger XMLDOM::NodeChanged(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
 }
 

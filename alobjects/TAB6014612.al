@@ -45,13 +45,13 @@ table 6014612 "Retail Campaign Items"
             Caption = 'Unit Price';
             Editable = false;
             FieldClass = FlowField;
-            MaxValue = 9.999.999;
+            MaxValue = 9999999;
             MinValue = 0;
         }
         field(15;"Campaign Unit Price";Decimal)
         {
             Caption = 'Period Price';
-            MaxValue = 9.999.999;
+            MaxValue = 9999999;
             MinValue = 0;
 
             trigger OnValidate()
@@ -106,7 +106,7 @@ table 6014612 "Retail Campaign Items"
         field(111;"Discount Amount";Decimal)
         {
             Caption = 'Discount Amount';
-            MaxValue = 9.999.999;
+            MaxValue = 9999999;
             MinValue = 0;
 
             trigger OnValidate()

@@ -8,125 +8,125 @@ xmlport 6151010 "NpRv Global Vouchers"
     Encoding = UTF8;
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
-    XMLVersionNo = 1.1;
+    XMLVersionNo = V11;
 
     schema
     {
         textelement(vouchers)
         {
             MaxOccurs = Once;
-            tableelement(nprvvoucherbuffer;"NpRv Voucher Buffer")
+            tableelement(nprvvoucherbuffer; "NpRv Voucher Buffer")
             {
                 MinOccurs = Zero;
                 XmlName = 'voucher';
                 UseTemporary = true;
-                fieldattribute(reference_no;NpRvVoucherBuffer."Reference No.")
+                fieldattribute(reference_no; NpRvVoucherBuffer."Reference No.")
                 {
                 }
-                fieldattribute(voucher_type;NpRvVoucherBuffer."Voucher Type")
+                fieldattribute(voucher_type; NpRvVoucherBuffer."Voucher Type")
                 {
                 }
-                fieldelement(description;NpRvVoucherBuffer.Description)
-                {
-                    MinOccurs = Zero;
-                }
-                fieldelement(starting_date;NpRvVoucherBuffer."Starting Date")
+                fieldelement(description; NpRvVoucherBuffer.Description)
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(ending_date;NpRvVoucherBuffer."Ending Date")
+                fieldelement(starting_date; NpRvVoucherBuffer."Starting Date")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(account_no;NpRvVoucherBuffer."Account No.")
+                fieldelement(ending_date; NpRvVoucherBuffer."Ending Date")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(amount;NpRvVoucherBuffer.Amount)
+                fieldelement(account_no; NpRvVoucherBuffer."Account No.")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(name;NpRvVoucherBuffer.Name)
+                fieldelement(amount; NpRvVoucherBuffer.Amount)
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(name_2;NpRvVoucherBuffer."Name 2")
+                fieldelement(name; NpRvVoucherBuffer.Name)
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(address;NpRvVoucherBuffer.Address)
+                fieldelement(name_2; NpRvVoucherBuffer."Name 2")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(address_2;NpRvVoucherBuffer."Address 2")
+                fieldelement(address; NpRvVoucherBuffer.Address)
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(post_code;NpRvVoucherBuffer."Post Code")
+                fieldelement(address_2; NpRvVoucherBuffer."Address 2")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(city;NpRvVoucherBuffer.City)
+                fieldelement(post_code; NpRvVoucherBuffer."Post Code")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(county;NpRvVoucherBuffer.County)
+                fieldelement(city; NpRvVoucherBuffer.City)
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(country_code;NpRvVoucherBuffer."Country/Region Code")
+                fieldelement(county; NpRvVoucherBuffer.County)
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(email;NpRvVoucherBuffer."E-mail")
+                fieldelement(country_code; NpRvVoucherBuffer."Country/Region Code")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(phone_no;NpRvVoucherBuffer."Phone No.")
+                fieldelement(email; NpRvVoucherBuffer."E-mail")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(voucher_message;NpRvVoucherBuffer."Voucher Message")
+                fieldelement(phone_no; NpRvVoucherBuffer."Phone No.")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(issue_date;NpRvVoucherBuffer."Issue Date")
+                fieldelement(voucher_message; NpRvVoucherBuffer."Voucher Message")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(issue_register_no;NpRvVoucherBuffer."Issue Register No.")
+                fieldelement(issue_date; NpRvVoucherBuffer."Issue Date")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(issue_sales_ticket_no;NpRvVoucherBuffer."Issue Sales Ticket No.")
+                fieldelement(issue_register_no; NpRvVoucherBuffer."Issue Register No.")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(issue_user_id;NpRvVoucherBuffer."Issue User ID")
+                fieldelement(issue_sales_ticket_no; NpRvVoucherBuffer."Issue Sales Ticket No.")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(issue_partner_code;NpRvVoucherBuffer."Issue Partner Code")
+                fieldelement(issue_user_id; NpRvVoucherBuffer."Issue User ID")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(redeem_date;NpRvVoucherBuffer."Redeem Date")
+                fieldelement(issue_partner_code; NpRvVoucherBuffer."Issue Partner Code")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(redeem_register_no;NpRvVoucherBuffer."Redeem Register No.")
+                fieldelement(redeem_date; NpRvVoucherBuffer."Redeem Date")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(redeem_sales_ticket_no;NpRvVoucherBuffer."Redeem Sales Ticket No.")
+                fieldelement(redeem_register_no; NpRvVoucherBuffer."Redeem Register No.")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(redeem_user_id;NpRvVoucherBuffer."Redeem User ID")
+                fieldelement(redeem_sales_ticket_no; NpRvVoucherBuffer."Redeem Sales Ticket No.")
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(redeem_partner_code;NpRvVoucherBuffer."Redeem Partner Code")
+                fieldelement(redeem_user_id; NpRvVoucherBuffer."Redeem User ID")
+                {
+                    MinOccurs = Zero;
+                }
+                fieldelement(redeem_partner_code; NpRvVoucherBuffer."Redeem Partner Code")
                 {
                     MinOccurs = Zero;
                 }
@@ -148,12 +148,12 @@ xmlport 6151010 "NpRv Global Vouchers"
 
     procedure GetSourceTable(var NpRvVoucherBuffer2: Record "NpRv Voucher Buffer" temporary)
     begin
-        NpRvVoucherBuffer2.Copy(NpRvVoucherBuffer,true);
+        NpRvVoucherBuffer2.Copy(NpRvVoucherBuffer, true);
     end;
 
     procedure SetSourceTable(var NpRvVoucherBuffer2: Record "NpRv Voucher Buffer" temporary)
     begin
-        NpRvVoucherBuffer.Copy(NpRvVoucherBuffer2,true);
+        NpRvVoucherBuffer.Copy(NpRvVoucherBuffer2, true);
     end;
 }
 

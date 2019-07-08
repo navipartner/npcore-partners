@@ -161,9 +161,9 @@ codeunit 6014427 "System Event Wrapper"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 9015, 'OnAfterGetApplicationVersion', '', true, true)]
-    local procedure C9015OnAfterGetApplicationVersion(var AppVersion: Text[80])
+    local procedure C9015OnAfterGetApplicationVersion(var ApplicationVersion: Text[248])
     begin
-        OnAfterGetApplicationVersion(AppVersion);
+        OnAfterGetApplicationVersion(ApplicationVersion);
     end;
 }
 

@@ -223,29 +223,5 @@ codeunit 6151368 "CS UI Shipments List"
         CSCommunication.GetReturnXML(DOMxmlin);
         CSManagement.SendXMLReply(DOMxmlin);
     end;
-
-    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
 }
 

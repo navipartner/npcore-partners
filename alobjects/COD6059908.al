@@ -487,25 +487,5 @@ codeunit 6059908 "Chilkat FTP/SFTP"
         Clear(ChilkatSFTP);
         //+TQ1.20
     end;
-
-    trigger ChilkatSFTP::OnDownloadRate(sender: Variant;args: DotNet DataRateEventArgs)
-    begin
-    end;
-
-    trigger ChilkatSFTP::OnUploadRate(sender: Variant;args: DotNet DataRateEventArgs)
-    begin
-    end;
-
-    trigger ChilkatSFTP::OnProgressInfo(sender: Variant;args: DotNet ProgressInfoEventArgs)
-    begin
-    end;
-
-    trigger ChilkatSFTP::OnPercentDone(sender: Variant;args: DotNet PercentDoneEventArgs)
-    begin
-    end;
-
-    trigger ChilkatSFTP::OnAbortCheck(sender: Variant;args: DotNet AbortCheckEventArgs)
-    begin
-    end;
 }
 

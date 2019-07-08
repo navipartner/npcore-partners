@@ -74,7 +74,7 @@ table 6150660 "NPRE Waiter Pad"
             DecimalPlaces = 2:2;
             Editable = true;
             FieldClass = FlowField;
-            MaxValue = 9.999.999;
+            MaxValue = 9999999;
         }
         field(100;"Print Category Filter";Code[10])
         {

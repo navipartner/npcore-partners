@@ -16,14 +16,14 @@ codeunit 6151388 "CS UI Warehouse Receipt"
         MiniformMgmt: Codeunit "CS UI Management";
     begin
         MiniformMgmt.Initialize(
-          MiniformHeader,Rec,DOMxmlin,ReturnedNode,
-          RootNode,XMLDOMMgt,CSCommunication,CSUserId,
-          CurrentCode,StackCode,WhseEmpId,LocationFilter,CSSessionId);
+          MiniformHeader, Rec, DOMxmlin, ReturnedNode,
+          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
-          PrepareData
+            PrepareData
         else
-          ProcessInput;
+            ProcessInput;
 
         Clear(DOMxmlin);
     end;
@@ -88,141 +88,141 @@ codeunit 6151388 "CS UI Warehouse Receipt"
         Separator: DotNet String;
         Value: Text;
     begin
-        if XMLDOMMgt.FindNode(RootNode,'Header/Input',ReturnedNode) then
-          TextValue := ReturnedNode.InnerText
+        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.InnerText
         else
-          Error(Text006);
+            Error(Text006);
 
-        Evaluate(TableNo,CSCommunication.GetNodeAttribute(ReturnedNode,'TableNo'));
+        Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         RecRef.Open(TableNo);
-        Evaluate(RecId,CSCommunication.GetNodeAttribute(ReturnedNode,'RecordID'));
+        Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
         if RecRef.Get(RecId) then begin
-          RecRef.SetTable(CSWarehouseReceiptHandling);
-          RecRef.SetRecFilter;
-          CSCommunication.SetRecRef(RecRef);
+            RecRef.SetTable(CSWarehouseReceiptHandling);
+            RecRef.SetRecFilter;
+            CSCommunication.SetRecRef(RecRef);
         end else begin
-          CSCommunication.RunPreviousUI(DOMxmlin);
-          exit;
+            CSCommunication.RunPreviousUI(DOMxmlin);
+            exit;
         end;
 
-        FuncGroup.KeyDef := CSCommunication.GetFunctionKey(MiniformHeader.Code,TextValue);
+        FuncGroup.KeyDef := CSCommunication.GetFunctionKey(MiniformHeader.Code, TextValue);
         ActiveInputField := 1;
 
         case FuncGroup.KeyDef of
-          FuncGroup.KeyDef::Esc:
-            begin
-              DeleteEmptyDataLines();
-              CSCommunication.RunPreviousUI(DOMxmlin);
-            end;
-          FuncGroup.KeyDef::"Function":
-            begin
-              FuncName := CSCommunication.GetNodeAttribute(ReturnedNode,'FuncName');
-              case FuncName of
-                  'DEFAULT':
-                  begin
-                    FuncValue := CSCommunication.GetNodeAttribute(ReturnedNode,'FuncValue');
-                    Evaluate(FuncFieldId,CSCommunication.GetNodeAttribute(ReturnedNode,'FieldID'));
-                    if CSFieldDefaults.Get(CSUserId,CurrentCode,FuncFieldId) then begin
-                      CSFieldDefaults.Value := FuncValue;
-                      CSFieldDefaults.Modify;
-                    end else begin
-                      Clear(CSFieldDefaults);
-                      CSFieldDefaults.Id := CSUserId;
-                      CSFieldDefaults."Use Case Code" := CurrentCode;
-                      CSFieldDefaults."Field No" := FuncFieldId;
-                      CSFieldDefaults.Insert;
-                      CSFieldDefaults.Value := FuncValue;
-                      CSFieldDefaults.Modify;
+            FuncGroup.KeyDef::Esc:
+                begin
+                    DeleteEmptyDataLines();
+                    CSCommunication.RunPreviousUI(DOMxmlin);
+                end;
+            FuncGroup.KeyDef::"Function":
+                begin
+                    FuncName := CSCommunication.GetNodeAttribute(ReturnedNode, 'FuncName');
+                    case FuncName of
+                        'DEFAULT':
+                            begin
+                                FuncValue := CSCommunication.GetNodeAttribute(ReturnedNode, 'FuncValue');
+                                Evaluate(FuncFieldId, CSCommunication.GetNodeAttribute(ReturnedNode, 'FieldID'));
+                                if CSFieldDefaults.Get(CSUserId, CurrentCode, FuncFieldId) then begin
+                                    CSFieldDefaults.Value := FuncValue;
+                                    CSFieldDefaults.Modify;
+                                end else begin
+                                    Clear(CSFieldDefaults);
+                                    CSFieldDefaults.Id := CSUserId;
+                                    CSFieldDefaults."Use Case Code" := CurrentCode;
+                                    CSFieldDefaults."Field No" := FuncFieldId;
+                                    CSFieldDefaults.Insert;
+                                    CSFieldDefaults.Value := FuncValue;
+                                    CSFieldDefaults.Modify;
+                                end;
+                            end;
                     end;
-                  end;
                 end;
-              end;
-          FuncGroup.KeyDef::Reset:
-            Reset(CSWarehouseReceiptHandling);
-          FuncGroup.KeyDef::Register:
-            begin
-              Register(CSWarehouseReceiptHandling);
-              if Remark = '' then begin
-                DeleteEmptyDataLines();
-                CSCommunication.RunPreviousUI(DOMxmlin)
-              end else
-                SendForm(ActiveInputField);
-            end;
-          FuncGroup.KeyDef::Input:
-            begin
-              Evaluate(FldNo,CSCommunication.GetNodeAttribute(ReturnedNode,'FieldID'));
-              //-NPR5.50 [346068]
-              CommaString := TextValue;
-              Separator := ',';
-              Values := CommaString.Split(Separator.ToCharArray());
-
-              foreach Value in Values do begin
-
-                if Value <> '' then begin
-              //+NPR5.50 [346068]
-
-                case FldNo of
-                  CSWarehouseReceiptHandling.FieldNo(Barcode):
-                    //-NPR5.50 [346068]
-                    //CheckBarcode(CSWarehouseReceiptHandling,TextValue);
-                    CheckBarcode(CSWarehouseReceiptHandling,Value);
-                    //+NPR5.50 [346068]
-                  CSWarehouseReceiptHandling.FieldNo(Qty):
-                    //-NPR5.50 [346068]
-                    //CheckQty(CSWarehouseReceiptHandling,TextValue);
-                    CheckQty(CSWarehouseReceiptHandling,Value);
-                    //+NPR5.50 [346068]
-                  CSWarehouseReceiptHandling.FieldNo("Bin Code"):
-                    //-NPR5.50 [346068]
-                    //CheckBin(CSWarehouseReceiptHandling,TextValue);
-                    CheckBin(CSWarehouseReceiptHandling,Value);
-                    //+NPR5.50 [346068]
-                  else begin
-                    //-NPR5.50 [346068]
-                    //CSCommunication.FieldSetvalue(RecRef,FldNo,TextValue);
-                    CSCommunication.FieldSetvalue(RecRef,FldNo,Value);
-                    //+NPR5.50 [346068]
-                  end;
+            FuncGroup.KeyDef::Reset:
+                Reset(CSWarehouseReceiptHandling);
+            FuncGroup.KeyDef::Register:
+                begin
+                    Register(CSWarehouseReceiptHandling);
+                    if Remark = '' then begin
+                        DeleteEmptyDataLines();
+                        CSCommunication.RunPreviousUI(DOMxmlin)
+                    end else
+                        SendForm(ActiveInputField);
                 end;
+            FuncGroup.KeyDef::Input:
+                begin
+                    Evaluate(FldNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'FieldID'));
+                    //-NPR5.50 [346068]
+                    CommaString := TextValue;
+                    Separator := ',';
+                    Values := CommaString.Split(Separator.ToCharArray());
 
-                CSWarehouseReceiptHandling.Modify;
+                    foreach Value in Values do begin
 
-                RecRef.GetTable(CSWarehouseReceiptHandling);
-                CSCommunication.SetRecRef(RecRef);
-                ActiveInputField := CSCommunication.GetActiveInputNo(CurrentCode,FldNo);
-                if Remark = '' then
-                  if CSCommunication.LastEntryField(CurrentCode,FldNo) then begin
+                        if Value <> '' then begin
+                            //+NPR5.50 [346068]
 
-                    Clear(CSFieldDefaults);
-                    CSFieldDefaults.SetRange(Id,CSUserId);
-                    CSFieldDefaults.SetRange("Use Case Code",CurrentCode);
-                    if CSFieldDefaults.FindSet then begin
-                      repeat
-                        CSCommunication.FieldSetvalue(RecRef,CSFieldDefaults."Field No",CSFieldDefaults.Value);
-                        RecRef.SetTable(CSWarehouseReceiptHandling);
-                        RecRef.SetRecFilter;
-                        CSCommunication.SetRecRef(RecRef);
-                      until CSFieldDefaults.Next = 0;
+                            case FldNo of
+                                CSWarehouseReceiptHandling.FieldNo(Barcode):
+                                    //-NPR5.50 [346068]
+                                    //CheckBarcode(CSWarehouseReceiptHandling,TextValue);
+                                    CheckBarcode(CSWarehouseReceiptHandling, Value);
+                                    //+NPR5.50 [346068]
+                                CSWarehouseReceiptHandling.FieldNo(Qty):
+                                    //-NPR5.50 [346068]
+                                    //CheckQty(CSWarehouseReceiptHandling,TextValue);
+                                    CheckQty(CSWarehouseReceiptHandling, Value);
+                                    //+NPR5.50 [346068]
+                                CSWarehouseReceiptHandling.FieldNo("Bin Code"):
+                                    //-NPR5.50 [346068]
+                                    //CheckBin(CSWarehouseReceiptHandling,TextValue);
+                                    CheckBin(CSWarehouseReceiptHandling, Value);
+                                    //+NPR5.50 [346068]
+                                else begin
+                                        //-NPR5.50 [346068]
+                                        //CSCommunication.FieldSetvalue(RecRef,FldNo,TextValue);
+                                        CSCommunication.FieldSetvalue(RecRef, FldNo, Value);
+                                        //+NPR5.50 [346068]
+                                    end;
+                            end;
+
+                            CSWarehouseReceiptHandling.Modify;
+
+                            RecRef.GetTable(CSWarehouseReceiptHandling);
+                            CSCommunication.SetRecRef(RecRef);
+                            ActiveInputField := CSCommunication.GetActiveInputNo(CurrentCode, FldNo);
+                            if Remark = '' then
+                                if CSCommunication.LastEntryField(CurrentCode, FldNo) then begin
+
+                                    Clear(CSFieldDefaults);
+                                    CSFieldDefaults.SetRange(Id, CSUserId);
+                                    CSFieldDefaults.SetRange("Use Case Code", CurrentCode);
+                                    if CSFieldDefaults.FindSet then begin
+                                        repeat
+                                            CSCommunication.FieldSetvalue(RecRef, CSFieldDefaults."Field No", CSFieldDefaults.Value);
+                                            RecRef.SetTable(CSWarehouseReceiptHandling);
+                                            RecRef.SetRecFilter;
+                                            CSCommunication.SetRecRef(RecRef);
+                                        until CSFieldDefaults.Next = 0;
+                                    end;
+
+                                    UpdateDataLine(CSWarehouseReceiptHandling);
+                                    CreateDataLine(CSWarehouseReceiptHandling2, CSWarehouseReceiptHandling);
+                                    RecRef.GetTable(CSWarehouseReceiptHandling2);
+                                    CSCommunication.SetRecRef(RecRef);
+                                    ActiveInputField := 1;
+                                end else
+                                    ActiveInputField += 1;
+                        end;
+                        //-NPR5.50 [346068]
                     end;
-
-                    UpdateDataLine(CSWarehouseReceiptHandling);
-                    CreateDataLine(CSWarehouseReceiptHandling2,CSWarehouseReceiptHandling);
-                    RecRef.GetTable(CSWarehouseReceiptHandling2);
-                    CSCommunication.SetRecRef(RecRef);
-                    ActiveInputField := 1;
-                  end else
-                    ActiveInputField += 1;
                 end;
-            //-NPR5.50 [346068]
-              end;
-            end;
             //+NPR5.50 [346068]
-          else
-            Error(Text000);
+            else
+                Error(Text000);
         end;
 
-        if not (FuncGroup.KeyDef in [FuncGroup.KeyDef::Esc,FuncGroup.KeyDef::Register]) then
-          SendForm(ActiveInputField);
+        if not (FuncGroup.KeyDef in [FuncGroup.KeyDef::Esc, FuncGroup.KeyDef::Register]) then
+            SendForm(ActiveInputField);
     end;
 
     local procedure PrepareData()
@@ -232,17 +232,17 @@ codeunit 6151388 "CS UI Warehouse Receipt"
         RecId: RecordID;
         TableNo: Integer;
     begin
-        XMLDOMMgt.FindNode(RootNode,'Header/Input',ReturnedNode);
+        XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode);
 
-        Evaluate(TableNo,CSCommunication.GetNodeAttribute(ReturnedNode,'TableNo'));
-        Evaluate(RecId,CSCommunication.GetNodeAttribute(ReturnedNode,'RecordID'));
+        Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
+        Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
 
         RecRef.Open(TableNo);
         RecRef.Get(RecId);
         RecRef.SetTable(WarehouseReceiptHeader);
 
         DeleteEmptyDataLines();
-        CreateDataLine(CSWarehouseReceiptHandling,WarehouseReceiptHeader);
+        CreateDataLine(CSWarehouseReceiptHandling, WarehouseReceiptHeader);
 
         RecRef.Close;
 
@@ -261,16 +261,16 @@ codeunit 6151388 "CS UI Warehouse Receipt"
     var
         Records: DotNet XmlElement;
     begin
-        CSCommunication.EncodeUI(MiniformHeader,StackCode,DOMxmlin,InputField,Remark,CSUserId);
+        CSCommunication.EncodeUI(MiniformHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
 
         if AddSummarize(Records) then
-          DOMxmlin.DocumentElement.AppendChild(Records);
+            DOMxmlin.DocumentElement.AppendChild(Records);
 
         CSMgt.SendXMLReply(DOMxmlin);
     end;
 
-    local procedure CheckBarcode(var CSWarehouseReceiptHandling: Record "CS Warehouse Receipt Handling";InputValue: Text)
+    local procedure CheckBarcode(var CSWarehouseReceiptHandling: Record "CS Warehouse Receipt Handling"; InputValue: Text)
     var
         BarcodeLibrary: Codeunit "Barcode Library";
         ItemNo: Code[20];
@@ -280,86 +280,86 @@ codeunit 6151388 "CS UI Warehouse Receipt"
         ItemCrossReference: Record "Item Cross Reference";
     begin
         if InputValue = '' then begin
-          Remark := Text005;
-          exit;
+            Remark := Text005;
+            exit;
         end;
 
         if StrLen(InputValue) > MaxStrLen(CSWarehouseReceiptHandling.Barcode) then begin
-          Remark := Text008;
-          exit;
+            Remark := Text008;
+            exit;
         end;
 
         if BarcodeLibrary.TranslateBarcodeToItemVariant(InputValue, ItemNo, VariantCode, ResolvingTable, true) then begin
-          if not Item.Get(ItemNo) then begin
-            Remark := StrSubstNo(Text014,InputValue);
-            exit;
-          end;
-
-          CSWarehouseReceiptHandling."Item No." := ItemNo;
-          CSWarehouseReceiptHandling."Variant Code" := VariantCode;
-
-          //-NPR5.48 [335606]
-          if (ResolvingTable = DATABASE::"Item Cross Reference") then begin
-            with ItemCrossReference do begin
-              if (StrLen(InputValue) <= MaxStrLen("Cross-Reference No.")) then begin
-                SetCurrentKey("Cross-Reference Type", "Cross-Reference No.");
-                SetFilter("Cross-Reference Type", '=%1', "Cross-Reference Type"::"Bar Code");
-                SetFilter("Cross-Reference No.", '=%1', UpperCase (InputValue));
-                if FindFirst() then
-                  CSWarehouseReceiptHandling."Unit of Measure" := ItemCrossReference."Unit of Measure";
-              end;
+            if not Item.Get(ItemNo) then begin
+                Remark := StrSubstNo(Text014, InputValue);
+                exit;
             end;
-          end;
-          //+NPR5.48 [335606]
+
+            CSWarehouseReceiptHandling."Item No." := ItemNo;
+            CSWarehouseReceiptHandling."Variant Code" := VariantCode;
+
+            //-NPR5.48 [335606]
+            if (ResolvingTable = DATABASE::"Item Cross Reference") then begin
+                with ItemCrossReference do begin
+                    if (StrLen(InputValue) <= MaxStrLen("Cross-Reference No.")) then begin
+                        SetCurrentKey("Cross-Reference Type", "Cross-Reference No.");
+                        SetFilter("Cross-Reference Type", '=%1', "Cross-Reference Type"::"Bar Code");
+                        SetFilter("Cross-Reference No.", '=%1', UpperCase(InputValue));
+                        if FindFirst() then
+                            CSWarehouseReceiptHandling."Unit of Measure" := ItemCrossReference."Unit of Measure";
+                    end;
+                end;
+            end;
+            //+NPR5.48 [335606]
 
         end else begin
-          Remark := StrSubstNo(Text010,InputValue);
-          exit;
+            Remark := StrSubstNo(Text010, InputValue);
+            exit;
         end;
 
         CSWarehouseReceiptHandling.Barcode := InputValue;
     end;
 
-    local procedure CheckQty(var CSWarehouseReceiptHandling: Record "CS Warehouse Receipt Handling";InputValue: Text)
+    local procedure CheckQty(var CSWarehouseReceiptHandling: Record "CS Warehouse Receipt Handling"; InputValue: Text)
     var
         Qty: Decimal;
     begin
         if InputValue = '' then begin
-          Remark := Text011;
-          exit;
+            Remark := Text011;
+            exit;
         end;
 
-        if not Evaluate(Qty,InputValue) then begin
-          Remark := Text013;
-          exit;
+        if not Evaluate(Qty, InputValue) then begin
+            Remark := Text013;
+            exit;
         end;
 
         CSWarehouseReceiptHandling.Qty := Qty;
     end;
 
-    local procedure CheckBin(var CSWarehouseReceiptHandling: Record "CS Warehouse Receipt Handling";InputValue: Text)
+    local procedure CheckBin(var CSWarehouseReceiptHandling: Record "CS Warehouse Receipt Handling"; InputValue: Text)
     var
         Bin: Record Bin;
     begin
         if InputValue = '' then begin
-          Remark := Text019;
-          exit;
+            Remark := Text019;
+            exit;
         end;
 
         if (StrLen(InputValue) > MaxStrLen(Bin.Code)) then begin
-          Remark := Text008;
-          exit;
+            Remark := Text008;
+            exit;
         end;
 
-        if not Bin.Get(CSWarehouseReceiptHandling."Location Code",InputValue) then begin
-          Remark := StrSubstNo(Text017,InputValue);
-          exit;
+        if not Bin.Get(CSWarehouseReceiptHandling."Location Code", InputValue) then begin
+            Remark := StrSubstNo(Text017, InputValue);
+            exit;
         end;
 
         CSWarehouseReceiptHandling."Bin Code" := InputValue;
     end;
 
-    local procedure CreateDataLine(var CSWarehouseReceiptHandling: Record "CS Warehouse Receipt Handling";RecordVariant: Variant)
+    local procedure CreateDataLine(var CSWarehouseReceiptHandling: Record "CS Warehouse Receipt Handling"; RecordVariant: Variant)
     var
         NewCSWarehouseReceiptHandling: Record "CS Warehouse Receipt Handling";
         LineNo: Integer;
@@ -368,14 +368,14 @@ codeunit 6151388 "CS UI Warehouse Receipt"
         WarehouseReceiptHeaderByVar: Record "Warehouse Receipt Header";
     begin
         if not RecordVariant.IsRecord then
-          Error(Text020);
+            Error(Text020);
 
         Clear(NewCSWarehouseReceiptHandling);
         NewCSWarehouseReceiptHandling.SetRange(Id, CSSessionId);
         if NewCSWarehouseReceiptHandling.FindLast then
-          LineNo := NewCSWarehouseReceiptHandling."Line No." + 1
+            LineNo := NewCSWarehouseReceiptHandling."Line No." + 1
         else
-          LineNo := 1;
+            LineNo := 1;
 
         CSWarehouseReceiptHandling.Init;
         CSWarehouseReceiptHandling.Id := CSSessionId;
@@ -392,15 +392,15 @@ codeunit 6151388 "CS UI Warehouse Receipt"
         CSWarehouseReceiptHandling."Table No." := RecRefByVariant.Number;
 
         if RecRefByVariant.Number = 7316 then begin
-          WarehouseReceiptHeaderByVar := RecordVariant;
-          CSWarehouseReceiptHandling."No." := WarehouseReceiptHeaderByVar."No.";
-          CSWarehouseReceiptHandling."Assignment Date" := WarehouseReceiptHeaderByVar."Assignment Date";
-          CSWarehouseReceiptHandling."Record Id" := WarehouseReceiptHeaderByVar.RecordId;
+            WarehouseReceiptHeaderByVar := RecordVariant;
+            CSWarehouseReceiptHandling."No." := WarehouseReceiptHeaderByVar."No.";
+            CSWarehouseReceiptHandling."Assignment Date" := WarehouseReceiptHeaderByVar."Assignment Date";
+            CSWarehouseReceiptHandling."Record Id" := WarehouseReceiptHeaderByVar.RecordId;
         end else begin
-          CSWarehouseReceiptHandlingByVar := RecordVariant;
-          CSWarehouseReceiptHandling."No." := CSWarehouseReceiptHandlingByVar."No.";
-          CSWarehouseReceiptHandling."Assignment Date" := CSWarehouseReceiptHandlingByVar."Assignment Date";
-          CSWarehouseReceiptHandling."Record Id" := CSWarehouseReceiptHandlingByVar.RecordId;
+            CSWarehouseReceiptHandlingByVar := RecordVariant;
+            CSWarehouseReceiptHandling."No." := CSWarehouseReceiptHandlingByVar."No.";
+            CSWarehouseReceiptHandling."Assignment Date" := CSWarehouseReceiptHandlingByVar."Assignment Date";
+            CSWarehouseReceiptHandling."Record Id" := CSWarehouseReceiptHandlingByVar.RecordId;
         end;
 
         CSWarehouseReceiptHandling.Insert(true);
@@ -412,8 +412,8 @@ codeunit 6151388 "CS UI Warehouse Receipt"
         CSWarehouseReceiptHandling.Modify(true);
 
         if TransferDataLine(CSWarehouseReceiptHandling) then begin
-          CSWarehouseReceiptHandling."Transferred to Document" := true;
-          CSWarehouseReceiptHandling.Modify(true);
+            CSWarehouseReceiptHandling."Transferred to Document" := true;
+            CSWarehouseReceiptHandling.Modify(true);
         end;
     end;
 
@@ -421,15 +421,15 @@ codeunit 6151388 "CS UI Warehouse Receipt"
     var
         CSWarehouseReceiptHandling: Record "CS Warehouse Receipt Handling";
     begin
-        CSWarehouseReceiptHandling.SetRange(Id,CSSessionId);
-        CSWarehouseReceiptHandling.SetRange(Handled,false);
+        CSWarehouseReceiptHandling.SetRange(Id, CSSessionId);
+        CSWarehouseReceiptHandling.SetRange(Handled, false);
         CSWarehouseReceiptHandling.DeleteAll(true);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet XmlNode;AttribName: Text[250];AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: DotNet XmlNode; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild,AttribName,AttribValue) > 0 then
-          Error(Text002,AttribName);
+        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
+            Error(Text002, AttribName);
     end;
 
     local procedure AddSummarize(var Records: DotNet XmlElement): Boolean
@@ -444,143 +444,145 @@ codeunit 6151388 "CS UI Warehouse Receipt"
         TableNo: Integer;
     begin
         Clear(CSWarehouseReceiptHandling);
-        CSWarehouseReceiptHandling.SetRange(Id,CSSessionId);
+        CSWarehouseReceiptHandling.SetRange(Id, CSSessionId);
         if not CSWarehouseReceiptHandling.FindLast then
-          exit(false);
+            exit(false);
 
-        WhseReceiptLine.SetRange("No.",CSWarehouseReceiptHandling."No.");
+        WhseReceiptLine.SetRange("No.", CSWarehouseReceiptHandling."No.");
         if WhseReceiptLine.FindSet then begin
-          Records := DOMxmlin.CreateElement('Records');
-          repeat
-            Record := DOMxmlin.CreateElement('Record');
-
-            CurrRecordID := WhseReceiptLine.RecordId;
-            TableNo := CurrRecordID.TableNo;
-
-            if (WhseReceiptLine."Qty. to Receive" < WhseReceiptLine."Qty. Outstanding") then
-              Indicator := 'minus'
-            else if (WhseReceiptLine."Qty. to Receive" = WhseReceiptLine."Qty. Outstanding") then
-              Indicator := 'ok'
-            else
-              Indicator := 'plus';
-
-            if Indicator = 'minus' then begin
-              Line := DOMxmlin.CreateElement('Line');
-              AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption(Description));
-              AddAttribute(Line,'Indicator',Indicator);
-              AddAttribute(Line,'Type',Format(LineType::TEXT));
-              //-NPR5.49 [346224]
-              if WhseReceiptLine."Variant Code" <> '' then
-                Line.InnerText := StrSubstNo(Text015,WhseReceiptLine."Qty. to Receive",WhseReceiptLine."Qty. Outstanding",WhseReceiptLine."Item No." + '-' + WhseReceiptLine."Variant Code",WhseReceiptLine.Description)
-              else
-              //+NPR5.49 [346224]
-              Line.InnerText := StrSubstNo(Text015,WhseReceiptLine."Qty. to Receive",WhseReceiptLine."Qty. Outstanding",WhseReceiptLine."Item No.",WhseReceiptLine.Description);
-              Record.AppendChild(Line);
-
-              Line := DOMxmlin.CreateElement('Line');
-              AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption(Description));
-              AddAttribute(Line,'Type',Format(LineType::TEXT));
-              Line.InnerText := WhseReceiptLine.Description;
-              Record.AppendChild(Line);
-
-              Line := DOMxmlin.CreateElement('Line');
-              AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption("Source Document"));
-              AddAttribute(Line,'Type',Format(LineType::TEXT));
-              Line.InnerText := Format(WhseReceiptLine."Source Document");
-              Record.AppendChild(Line);
-
-              Line := DOMxmlin.CreateElement('Line');
-              AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption("Source No."));
-              AddAttribute(Line,'Type',Format(LineType::TEXT));
-              Line.InnerText := WhseReceiptLine."Source No.";
-              Record.AppendChild(Line);
-
-              Line := DOMxmlin.CreateElement('Line');
-              AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption("Unit of Measure Code"));
-              AddAttribute(Line,'Type',Format(LineType::TEXT));
-              Line.InnerText := WhseReceiptLine."Unit of Measure Code";
-              Record.AppendChild(Line);
-
-              Line := DOMxmlin.CreateElement('Line');
-              AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption("Qty. per Unit of Measure"));
-              AddAttribute(Line,'Type',Format(LineType::TEXT));
-              Line.InnerText := Format(WhseReceiptLine."Qty. per Unit of Measure");
-              Record.AppendChild(Line);
-
-              Records.AppendChild(Record);
-            end;
-          until WhseReceiptLine.Next = 0;
-
-          //-NPR5.50 [247747]
-          if not MiniformHeader."Hid Fulfilled Lines" then begin
-          //+NPR5.50 [247747]
-            if WhseReceiptLine.FindSet then begin
-              repeat
+            Records := DOMxmlin.CreateElement('Records');
+            repeat
                 Record := DOMxmlin.CreateElement('Record');
 
                 CurrRecordID := WhseReceiptLine.RecordId;
                 TableNo := CurrRecordID.TableNo;
 
                 if (WhseReceiptLine."Qty. to Receive" < WhseReceiptLine."Qty. Outstanding") then
-                  Indicator := 'minus'
-                else if (WhseReceiptLine."Qty. to Receive" = WhseReceiptLine."Qty. Outstanding") then
-                  Indicator := 'ok'
+                    Indicator := 'minus'
                 else
-                  Indicator := 'plus';
+                    if (WhseReceiptLine."Qty. to Receive" = WhseReceiptLine."Qty. Outstanding") then
+                        Indicator := 'ok'
+                    else
+                        Indicator := 'plus';
 
-                if Indicator <> 'minus' then begin
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption(Description));
-                  AddAttribute(Line,'Indicator',Indicator);
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  //-NPR5.49 [346224]
-                  if WhseReceiptLine."Variant Code" <> '' then
-                    Line.InnerText := StrSubstNo(Text015,WhseReceiptLine."Qty. to Receive",WhseReceiptLine."Qty. Outstanding",WhseReceiptLine."Item No." + '-' + WhseReceiptLine."Variant Code",WhseReceiptLine.Description)
-                  else
-                  //+NPR5.49 [346224]
-                  Line.InnerText := StrSubstNo(Text015,WhseReceiptLine."Qty. to Receive",WhseReceiptLine."Qty. Outstanding",WhseReceiptLine."Item No.",WhseReceiptLine.Description);
-                  Record.AppendChild(Line);
+                if Indicator = 'minus' then begin
+                    Line := DOMxmlin.CreateElement('Line');
+                    AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption(Description));
+                    AddAttribute(Line, 'Indicator', Indicator);
+                    AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                    //-NPR5.49 [346224]
+                    if WhseReceiptLine."Variant Code" <> '' then
+                        Line.InnerText := StrSubstNo(Text015, WhseReceiptLine."Qty. to Receive", WhseReceiptLine."Qty. Outstanding", WhseReceiptLine."Item No." + '-' + WhseReceiptLine."Variant Code", WhseReceiptLine.Description)
+                    else
+                        //+NPR5.49 [346224]
+                        Line.InnerText := StrSubstNo(Text015, WhseReceiptLine."Qty. to Receive", WhseReceiptLine."Qty. Outstanding", WhseReceiptLine."Item No.", WhseReceiptLine.Description);
+                    Record.AppendChild(Line);
 
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption(Description));
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  Line.InnerText := WhseReceiptLine.Description;
-                  Record.AppendChild(Line);
+                    Line := DOMxmlin.CreateElement('Line');
+                    AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption(Description));
+                    AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                    Line.InnerText := WhseReceiptLine.Description;
+                    Record.AppendChild(Line);
 
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption("Source Document"));
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  Line.InnerText := Format(WhseReceiptLine."Source Document");
-                  Record.AppendChild(Line);
+                    Line := DOMxmlin.CreateElement('Line');
+                    AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Source Document"));
+                    AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                    Line.InnerText := Format(WhseReceiptLine."Source Document");
+                    Record.AppendChild(Line);
 
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption("Source No."));
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  Line.InnerText := WhseReceiptLine."Source No.";
-                  Record.AppendChild(Line);
+                    Line := DOMxmlin.CreateElement('Line');
+                    AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Source No."));
+                    AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                    Line.InnerText := WhseReceiptLine."Source No.";
+                    Record.AppendChild(Line);
 
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption("Unit of Measure Code"));
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  Line.InnerText := WhseReceiptLine."Unit of Measure Code";
-                  Record.AppendChild(Line);
+                    Line := DOMxmlin.CreateElement('Line');
+                    AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Unit of Measure Code"));
+                    AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                    Line.InnerText := WhseReceiptLine."Unit of Measure Code";
+                    Record.AppendChild(Line);
 
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip',WhseReceiptLine.FieldCaption("Qty. per Unit of Measure"));
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  Line.InnerText := Format(WhseReceiptLine."Qty. per Unit of Measure");
-                  Record.AppendChild(Line);
+                    Line := DOMxmlin.CreateElement('Line');
+                    AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Qty. per Unit of Measure"));
+                    AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                    Line.InnerText := Format(WhseReceiptLine."Qty. per Unit of Measure");
+                    Record.AppendChild(Line);
 
-                  Records.AppendChild(Record);
+                    Records.AppendChild(Record);
                 end;
-              until WhseReceiptLine.Next = 0;
-             end;
+            until WhseReceiptLine.Next = 0;
+
             //-NPR5.50 [247747]
+            if not MiniformHeader."Hid Fulfilled Lines" then begin
+                //+NPR5.50 [247747]
+                if WhseReceiptLine.FindSet then begin
+                    repeat
+                        Record := DOMxmlin.CreateElement('Record');
+
+                        CurrRecordID := WhseReceiptLine.RecordId;
+                        TableNo := CurrRecordID.TableNo;
+
+                        if (WhseReceiptLine."Qty. to Receive" < WhseReceiptLine."Qty. Outstanding") then
+                            Indicator := 'minus'
+                        else
+                            if (WhseReceiptLine."Qty. to Receive" = WhseReceiptLine."Qty. Outstanding") then
+                                Indicator := 'ok'
+                            else
+                                Indicator := 'plus';
+
+                        if Indicator <> 'minus' then begin
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption(Description));
+                            AddAttribute(Line, 'Indicator', Indicator);
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            //-NPR5.49 [346224]
+                            if WhseReceiptLine."Variant Code" <> '' then
+                                Line.InnerText := StrSubstNo(Text015, WhseReceiptLine."Qty. to Receive", WhseReceiptLine."Qty. Outstanding", WhseReceiptLine."Item No." + '-' + WhseReceiptLine."Variant Code", WhseReceiptLine.Description)
+                            else
+                                //+NPR5.49 [346224]
+                                Line.InnerText := StrSubstNo(Text015, WhseReceiptLine."Qty. to Receive", WhseReceiptLine."Qty. Outstanding", WhseReceiptLine."Item No.", WhseReceiptLine.Description);
+                            Record.AppendChild(Line);
+
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption(Description));
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            Line.InnerText := WhseReceiptLine.Description;
+                            Record.AppendChild(Line);
+
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Source Document"));
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            Line.InnerText := Format(WhseReceiptLine."Source Document");
+                            Record.AppendChild(Line);
+
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Source No."));
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            Line.InnerText := WhseReceiptLine."Source No.";
+                            Record.AppendChild(Line);
+
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Unit of Measure Code"));
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            Line.InnerText := WhseReceiptLine."Unit of Measure Code";
+                            Record.AppendChild(Line);
+
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', WhseReceiptLine.FieldCaption("Qty. per Unit of Measure"));
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            Line.InnerText := Format(WhseReceiptLine."Qty. per Unit of Measure");
+                            Record.AppendChild(Line);
+
+                            Records.AppendChild(Record);
+                        end;
+                    until WhseReceiptLine.Next = 0;
+                end;
+                //-NPR5.50 [247747]
             end;
             //+NPR5.50 [247747]
-          exit(true);
+            exit(true);
         end else
-          exit(false);
+            exit(false);
     end;
 
     local procedure Reset(CSWarehouseReceiptHandling: Record "CS Warehouse Receipt Handling")
@@ -588,14 +590,14 @@ codeunit 6151388 "CS UI Warehouse Receipt"
         WhseReceiptLine: Record "Warehouse Receipt Line";
     begin
         Remark := '';
-        WhseReceiptLine.SetRange("No.",CSWarehouseReceiptHandling."No.");
+        WhseReceiptLine.SetRange("No.", CSWarehouseReceiptHandling."No.");
         if WhseReceiptLine.FindSet then begin
-          repeat
-              WhseReceiptLine.Validate("Qty. to Receive",0);
-              WhseReceiptLine.Modify;
-          until WhseReceiptLine.Next = 0;
+            repeat
+                WhseReceiptLine.Validate("Qty. to Receive", 0);
+                WhseReceiptLine.Modify;
+            until WhseReceiptLine.Next = 0;
         end else
-          Error(Text007);
+            Error(Text007);
 
         CSCommunication.SetRecRef(RecRef);
         ActiveInputField := 1;
@@ -607,7 +609,7 @@ codeunit 6151388 "CS UI Warehouse Receipt"
         WhseReceiptLine: Record "Warehouse Receipt Line";
     begin
         Remark := '';
-        WhseReceiptLine.SetRange("No.",CSWarehouseReceiptHandling."No.");
+        WhseReceiptLine.SetRange("No.", CSWarehouseReceiptHandling."No.");
 
         //-NPR5.50 [335606]
         // IF WhseReceiptLine.FINDSET THEN BEGIN
@@ -617,65 +619,41 @@ codeunit 6151388 "CS UI Warehouse Receipt"
         //    CLEAR(WhsePostReceipt);
         //  UNTIL WhseReceiptLine.NEXT = 0;
         if WhseReceiptLine.FindFirst then begin
-          WhsePostReceipt.Run(WhseReceiptLine);
-          WhsePostReceipt.GetResultMessage;
-          Clear(WhsePostReceipt);
+            WhsePostReceipt.Run(WhseReceiptLine);
+            WhsePostReceipt.GetResultMessage;
+            Clear(WhsePostReceipt);
 
-          WhseReceiptLine.DeleteQtyToReceive(WhseReceiptLine);
+            WhseReceiptLine.DeleteQtyToReceive(WhseReceiptLine);
 
-        //+NPR5.50 [335606]
+            //+NPR5.50 [335606]
         end else
-          Error(Text007);
+            Error(Text007);
     end;
 
     local procedure TransferDataLine(CSWarehouseReceiptHandling: Record "CS Warehouse Receipt Handling"): Boolean
     var
         WhseReceiptLine: Record "Warehouse Receipt Line";
     begin
-        WhseReceiptLine.SetCurrentKey("Source Type","Source Subtype","Source No.","Source Line No.");
-        WhseReceiptLine.SetRange("No.",CSWarehouseReceiptHandling."No.");
-        WhseReceiptLine.SetRange("Item No.",CSWarehouseReceiptHandling."Item No.");
+        WhseReceiptLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.");
+        WhseReceiptLine.SetRange("No.", CSWarehouseReceiptHandling."No.");
+        WhseReceiptLine.SetRange("Item No.", CSWarehouseReceiptHandling."Item No.");
         if WhseReceiptLine.FindSet then begin
-          if WhseReceiptLine."Qty. to Receive" = WhseReceiptLine."Qty. Outstanding" then begin
-            Remark := StrSubstNo(Text016);
-            exit(false);
-          end;
-          WhseReceiptLine.Validate("Qty. to Receive",WhseReceiptLine."Qty. to Receive" + CSWarehouseReceiptHandling.Qty);
-          //-NPR5.48 [335606]
-          if CSWarehouseReceiptHandling."Unit of Measure" <> '' then
-            WhseReceiptLine.Validate("Unit of Measure Code",CSWarehouseReceiptHandling."Unit of Measure");
-          //+NPR5.48 [335606]
-          WhseReceiptLine.Modify(true);
+            if WhseReceiptLine."Qty. to Receive" = WhseReceiptLine."Qty. Outstanding" then begin
+                Remark := StrSubstNo(Text016);
+                exit(false);
+            end;
+            WhseReceiptLine.Validate("Qty. to Receive", WhseReceiptLine."Qty. to Receive" + CSWarehouseReceiptHandling.Qty);
+            //-NPR5.48 [335606]
+            if CSWarehouseReceiptHandling."Unit of Measure" <> '' then
+                WhseReceiptLine.Validate("Unit of Measure Code", CSWarehouseReceiptHandling."Unit of Measure");
+            //+NPR5.48 [335606]
+            WhseReceiptLine.Modify(true);
         end else begin
-          Remark := StrSubstNo(Text021,CSWarehouseReceiptHandling."Item No.",CSWarehouseReceiptHandling."No.");
-          exit(false);
+            Remark := StrSubstNo(Text021, CSWarehouseReceiptHandling."Item No.", CSWarehouseReceiptHandling."No.");
+            exit(false);
         end;
 
         exit(true);
-    end;
-
-    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
-    begin
     end;
 }
 

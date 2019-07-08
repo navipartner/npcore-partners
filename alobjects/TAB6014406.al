@@ -102,29 +102,29 @@ table 6014406 "Sale Line POS"
 
     fields
     {
-        field(1;"Register No.";Code[10])
+        field(1; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
             NotBlank = true;
             TableRelation = Register;
         }
-        field(2;"Sales Ticket No.";Code[20])
+        field(2; "Sales Ticket No."; Code[20])
         {
             Caption = 'Sales Ticket No.';
             Editable = false;
             NotBlank = true;
         }
-        field(3;"Sale Type";Option)
+        field(3; "Sale Type"; Option)
         {
             Caption = 'Sale Type';
             OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Deposit,Out payment,Comment,Cancelled,Open/Close';
             OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,Cancelled,"Open/Close";
         }
-        field(4;"Line No.";Integer)
+        field(4; "Line No."; Integer)
         {
             Caption = 'Line No.';
         }
-        field(5;Type;Option)
+        field(5; Type; Option)
         {
             Caption = 'Type';
             Description = 'NPR5.30';
@@ -132,16 +132,21 @@ table 6014406 "Sale Line POS"
             OptionCaption = 'G/L,Item,Item Group,Repair,,Payment,Open/Close,Inventory,Customer,Comment';
             OptionMembers = "G/L Entry",Item,"Item Group",Repair,,Payment,"Open/Close","BOM List",Customer,Comment;
         }
-        field(6;"No.";Code[20])
+        field(6; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type=CONST("G/L Entry")) "G/L Account"."No."
-                            ELSE IF (Type=CONST("Item Group")) "Item Group"."No."
-                            ELSE IF (Type=CONST(Repair)) "Customer Repair"."No."
-                            ELSE IF (Type=CONST(Payment)) "Payment Type POS"."No." WHERE (Status=CONST(Active),
-                                                                                          "Via Terminal"=CONST(false))
-                                                                                          ELSE IF (Type=CONST(Customer)) Customer."No."
-                                                                                          ELSE IF (Type=CONST(Item)) Item."No.";
+            TableRelation = IF (Type = CONST ("G/L Entry")) "G/L Account"."No."
+            ELSE
+            IF (Type = CONST ("Item Group")) "Item Group"."No."
+            ELSE
+            IF (Type = CONST (Repair)) "Customer Repair"."No."
+            ELSE
+            IF (Type = CONST (Payment)) "Payment Type POS"."No." WHERE (Status = CONST (Active),
+                                                                                          "Via Terminal" = CONST (false))
+            ELSE
+            IF (Type = CONST (Customer)) Customer."No."
+            ELSE
+            IF (Type = CONST (Item)) Item."No.";
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -153,74 +158,75 @@ table 6014406 "Sale Line POS"
                 RetailSetup.Get;
 
                 if (Type = Type::Item) and ("No." = '*') then begin
-                  Type := Type::Comment;
-                  "Sale Type" := "Sale Type"::Comment;
+                    Type := Type::Comment;
+                    "Sale Type" := "Sale Type"::Comment;
                 end;
 
                 case Type of
-                  Type::"G/L Entry":
-                    begin
-                      InitFromGLAccount();
-                      UpdateVATSetup();
-                    end;
-                  Type::Item,Type::"BOM List":
-                    begin
-                      InitFromItem();
-                      UpdateVATSetup();
-                      CalculateCostPrice();
-                      "Unit Price" := FindItemSalesPrice();
-                      Validate(Quantity);
-                    end;
-                  Type::"Item Group":
-                    begin
-                      InitFromItemGroup();
-                      UpdateVATSetup();
-                    end;
-                  Type::Payment:
-                    begin
-                      InitFromPaymentTypePOS();
-                    end;
-                  Type::Customer:
-                    begin
-                      InitFromCustomer();
-                    end;
-                  else
-                    exit;
+                    Type::"G/L Entry":
+                        begin
+                            InitFromGLAccount();
+                            UpdateVATSetup();
+                        end;
+                    Type::Item, Type::"BOM List":
+                        begin
+                            InitFromItem();
+                            UpdateVATSetup();
+                            CalculateCostPrice();
+                            "Unit Price" := FindItemSalesPrice();
+                            Validate(Quantity);
+                        end;
+                    Type::"Item Group":
+                        begin
+                            InitFromItemGroup();
+                            UpdateVATSetup();
+                        end;
+                    Type::Payment:
+                        begin
+                            InitFromPaymentTypePOS();
+                        end;
+                    Type::Customer:
+                        begin
+                            InitFromCustomer();
+                        end;
+                    else
+                        exit;
                 end;
 
                 CreateDim(
-                  DATABASE::Register,"Register No.",
-                  NPRDimMgt.TypeToTableNPR(Type),"No.",
-                  NPRDimMgt.DiscountTypeToTableNPR("Discount Type"),"Discount Code",
-                  0,'');
+                  DATABASE::Register, "Register No.",
+                  NPRDimMgt.TypeToTableNPR(Type), "No.",
+                  NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
+                  0, '');
                 //+NPR5.45 [324395]
             end;
         }
-        field(7;"Location Code";Code[10])
+        field(7; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
             TableRelation = Location;
         }
-        field(8;"Posting Group";Code[10])
+        field(8; "Posting Group"; Code[10])
         {
             Caption = 'Posting Group';
             Editable = false;
-            TableRelation = IF (Type=CONST(Item)) "Inventory Posting Group";
+            TableRelation = IF (Type = CONST (Item)) "Inventory Posting Group";
         }
-        field(9;"Qty. Discount Code";Code[20])
+        field(9; "Qty. Discount Code"; Code[20])
         {
             Caption = 'Qty. Discount Code';
         }
-        field(10;Description;Text[80])
+        field(10; Description; Text[80])
         {
             Caption = 'Description';
         }
-        field(11;"Unit of Measure Code";Code[10])
+        field(11; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type=CONST(Item),
-                                "No."=FILTER(<>'')) "Item Unit of Measure".Code WHERE ("Item No."=FIELD("No."))
-                                ELSE "Unit of Measure";
+            TableRelation = IF (Type = CONST (Item),
+                                "No." = FILTER (<> '')) "Item Unit of Measure".Code WHERE ("Item No." = FIELD ("No."))
+            ELSE
+            "Unit of Measure";
 
             trigger OnValidate()
             var
@@ -234,7 +240,7 @@ table 6014406 "Sale Line POS"
                 //
                 // VALIDATE("Quantity (Base)",ItemUoM."Qty. per Unit of Measure" * Quantity);
                 GetItem;
-                "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item,"Unit of Measure Code");
+                "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
                 "Quantity (Base)" := CalcBaseQty(Quantity);
                 //+NPR5.48 [335967]
 
@@ -243,10 +249,10 @@ table 6014406 "Sale Line POS"
                 //+NPR5.45 [324395]
             end;
         }
-        field(12;Quantity;Decimal)
+        field(12; Quantity; Decimal)
         {
             Caption = 'Quantity';
-            DecimalPlaces = 0:5;
+            DecimalPlaces = 0 : 5;
             MaxValue = 99.999;
 
             trigger OnValidate()
@@ -268,106 +274,106 @@ table 6014406 "Sale Line POS"
                 if ("Serial No." <> '') and
                   ("Sale Type" = "Sale Type"::Sale) and
                     (Abs(Quantity) <> 1) then
-                      Error(Err001,
-                        "Serial No.",FieldName("Serial No."));
+                    Error(Err001,
+                      "Serial No.", FieldName("Serial No."));
 
                 if ("Serial No." <> '') then
-                  Validate("Serial No.","Serial No.");
+                    Validate("Serial No.", "Serial No.");
 
                 //-NPR5.48 [335967]
                 //Cost := "Unit Cost" * Quantity;
                 //+NPR5.48 [335967]
 
                 case Type of
-                  Type::"G/L Entry":
-                    begin
-                      if not Silent then begin
-                        if RegisterGlobal.Get("Register No.") then
-                          if RegisterGlobal."Credit Voucher Account" = "No." then
-                            Error(Err002,"No.");
-                        if Quantity = 0 then
-                          Error(Err003);
-                      end;
-                      "Amount Including VAT" := "Unit Price" * Quantity;
-                      Amount := "Amount Including VAT";
-                    end;
-                  Type::Item:
-                    begin
-                      //-NPR5.48 [335967]
-                      // //-NPR5.45 [324395]
-                      // //RetailSalesLineCode.QuantityValidate(Rec,xRec,CustomerDiscount);
-                      // RetailSalesLineCode.QuantityValidate(Rec,xRec);
-                      // //+NPR5.45 [324395]
-                      // Copied code from RetailSalesLineCode.QuantityValidate (im not sure its correct, but its copyed "as is")
-                      GetItem;
-                      "Quantity (Base)" := CalcBaseQty(Quantity);
+                    Type::"G/L Entry":
+                        begin
+                            if not Silent then begin
+                                if RegisterGlobal.Get("Register No.") then
+                                    if RegisterGlobal."Credit Voucher Account" = "No." then
+                                        Error(Err002, "No.");
+                                if Quantity = 0 then
+                                    Error(Err003);
+                            end;
+                            "Amount Including VAT" := "Unit Price" * Quantity;
+                            Amount := "Amount Including VAT";
+                        end;
+                    Type::Item:
+                        begin
+                            //-NPR5.48 [335967]
+                            // //-NPR5.45 [324395]
+                            // //RetailSalesLineCode.QuantityValidate(Rec,xRec,CustomerDiscount);
+                            // RetailSalesLineCode.QuantityValidate(Rec,xRec);
+                            // //+NPR5.45 [324395]
+                            // Copied code from RetailSalesLineCode.QuantityValidate (im not sure its correct, but its copyed "as is")
+                            GetItem;
+                            "Quantity (Base)" := CalcBaseQty(Quantity);
 
-                      UpdateDependingLinesQuantity;
+                            UpdateDependingLinesQuantity;
 
-                      if ( "Discount Type" = "Discount Type"::Manual ) and ( "Discount %" <> 0 ) then
-                        Validate( "Discount %" );
+                            if ("Discount Type" = "Discount Type"::Manual) and ("Discount %" <> 0) then
+                                Validate("Discount %");
 
-                      CalculateCostPrice;
-                      UpdateAmounts(Rec);
+                            CalculateCostPrice;
+                            UpdateAmounts(Rec);
 
-                      if not Item."Group sale" then begin
-                        OldUnitPrice := "Unit Price";
-                        "Unit Price" := Rec.FindItemSalesPrice();
-                        if OldUnitPrice <> "Unit Price" then
-                          UpdateAmounts(Rec);
-                      end;
-                      //+NPR5.48 [335967]
-                    end;
-                  Type::"Item Group":
-                    begin
-                      if Quantity = 0 then
-                        Error(Err003);
-                //-NPR5.40 [294655]
-                //      IF RetailSetup.GET THEN
-                //+NPR5.40 [294655]
-                        if "Price Includes VAT" then
-                          "Amount Including VAT" := Round("Unit Price" * Quantity,0.01)
-                        else
-                          "Amount Including VAT" := Round("Unit Price" * Quantity * ( 1 + "VAT %"/100),0.01);
-                    end;
-                  Type::Repair:
-                    begin
-                      Error(Txt001);
-                    end;
-                  Type::"BOM List":
-                    begin
-                      SaleLinePOS.SetRange("Register No.","Register No.");
-                      SaleLinePOS.SetRange("Sales Ticket No.","Sales Ticket No.");
-                      SaleLinePOS.SetRange("Sale Type","Sale Type");
-                      SaleLinePOS.SetRange(Date,Date);
-                      SaleLinePOS.SetRange("Discount Code","Discount Code");
-                      SaleLinePOS.SetFilter("No.",'<>%1',"No.");
-                      "Amount Including VAT" := 0;
-                    end;
+                            if not Item."Group sale" then begin
+                                OldUnitPrice := "Unit Price";
+                                "Unit Price" := Rec.FindItemSalesPrice();
+                                if OldUnitPrice <> "Unit Price" then
+                                    UpdateAmounts(Rec);
+                            end;
+                            //+NPR5.48 [335967]
+                        end;
+                    Type::"Item Group":
+                        begin
+                            if Quantity = 0 then
+                                Error(Err003);
+                            //-NPR5.40 [294655]
+                            //      IF RetailSetup.GET THEN
+                            //+NPR5.40 [294655]
+                            if "Price Includes VAT" then
+                                "Amount Including VAT" := Round("Unit Price" * Quantity, 0.01)
+                            else
+                                "Amount Including VAT" := Round("Unit Price" * Quantity * (1 + "VAT %" / 100), 0.01);
+                        end;
+                    Type::Repair:
+                        begin
+                            Error(Txt001);
+                        end;
+                    Type::"BOM List":
+                        begin
+                            SaleLinePOS.SetRange("Register No.", "Register No.");
+                            SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
+                            SaleLinePOS.SetRange("Sale Type", "Sale Type");
+                            SaleLinePOS.SetRange(Date, Date);
+                            SaleLinePOS.SetRange("Discount Code", "Discount Code");
+                            SaleLinePOS.SetFilter("No.", '<>%1', "No.");
+                            "Amount Including VAT" := 0;
+                        end;
                 end;
                 //-NPR5.48 [335967]
                 UpdateCost;
                 //+NPR5.48 [335967]
             end;
         }
-        field(13;"Invoice (Qty)";Decimal)
+        field(13; "Invoice (Qty)"; Decimal)
         {
             Caption = 'Invoice (Qty)';
-            DecimalPlaces = 0:5;
+            DecimalPlaces = 0 : 5;
         }
-        field(14;"To Ship (Qty)";Decimal)
+        field(14; "To Ship (Qty)"; Decimal)
         {
             Caption = 'To Ship (Qty)';
-            DecimalPlaces = 0:5;
+            DecimalPlaces = 0 : 5;
         }
-        field(15;"Unit Price";Decimal)
+        field(15; "Unit Price"; Decimal)
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Price';
-            DecimalPlaces = 2:2;
+            DecimalPlaces = 2 : 2;
             Editable = true;
-            MaxValue = 9.999.999;
+            MaxValue = 9999999;
 
             trigger OnValidate()
             var
@@ -394,110 +400,112 @@ table 6014406 "Sale Line POS"
                 RetailSetup.Get;
                 RegisterGlobal.Get("Register No.");
                 case Type of
-                  Type::"G/L Entry":
-                    begin
-                      if Quantity <> 0 then begin
-                        "Amount Including VAT" := "Unit Price" * Quantity;
-                        Amount := "Amount Including VAT";
-                      end;
-                //-NPR5.40 [294655]
-                //      IF RegisterGlobal.GET("Register No.") AND ("Sale Type" <> "Sale Type"::"Out payment") THEN
-                      if ("Sale Type" <> "Sale Type"::"Out payment") then
-                //+NPR5.40 [294655]
-                        if not Silent then
-                          if RegisterGlobal."Credit Voucher Account" = "No." then
-                            Error(Err002)
-                        else if RegisterGlobal."Gift Voucher Account" = "No." then begin
-                          if GiftVoucher.Get("Discount Code") then begin
-                            GiftVoucher.Amount := "Amount Including VAT";
-                            GiftVoucher.Modify(true);
-                          end;
+                    Type::"G/L Entry":
+                        begin
+                            if Quantity <> 0 then begin
+                                "Amount Including VAT" := "Unit Price" * Quantity;
+                                Amount := "Amount Including VAT";
+                            end;
+                            //-NPR5.40 [294655]
+                            //      IF RegisterGlobal.GET("Register No.") AND ("Sale Type" <> "Sale Type"::"Out payment") THEN
+                            if ("Sale Type" <> "Sale Type"::"Out payment") then
+                                //+NPR5.40 [294655]
+                                if not Silent then
+                                    if RegisterGlobal."Credit Voucher Account" = "No." then
+                                        Error(Err002)
+                                    else
+                                        if RegisterGlobal."Gift Voucher Account" = "No." then begin
+                                            if GiftVoucher.Get("Discount Code") then begin
+                                                GiftVoucher.Amount := "Amount Including VAT";
+                                                GiftVoucher.Modify(true);
+                                            end;
+                                        end;
                         end;
-                    end;
-                  Type::Item:
-                    begin
-                      if "Unit Price" < 0 then
-                        Error(ErrItemBelow);
-                      //-NPR5.48 [335967]
-                      //ItemGlobal.GET("No.");
-                      GetItem;
-                      //+NPR5.48 [335967]
+                    Type::Item:
+                        begin
+                            if "Unit Price" < 0 then
+                                Error(ErrItemBelow);
+                            //-NPR5.48 [335967]
+                            //ItemGlobal.GET("No.");
+                            GetItem;
+                            //+NPR5.48 [335967]
 
-                      if not Item."Group sale" then begin
-                        if not ForceApris then begin
-                          case RetailSetup."Unit Cost Control" of
-                            RetailSetup."Unit Cost Control"::Enabled:
-                              begin
-                              end;
-                            RetailSetup."Unit Cost Control"::Disabled:
-                              begin
-                                if not (RetailSetup."Reset unit price on neg. sale" and (Quantity < 0)) then
-                                  Error(ErrDisabled);
-                              end;
-                            RetailSetup."Unit Cost Control"::"Disabled if Quantity > 0":
-                              begin
-                                if Quantity > 0 then
-                                  Error(ErrDisNo);
-                              end;
-                            RetailSetup."Unit Cost Control"::"Disabled if xUnit Cost > Unit Cost":
-                              begin
-                                if xRec."Unit Price" > "Unit Price" then
-                                  Error(ErrDisX);
-                              end;
-                            RetailSetup."Unit Cost Control"::"Disabled if Quantity > 0 and xUnit Cost > Unit Cost":
-                              begin
-                                //-NPR5.45 [323705]
-                                //IF NOT((Quantity < 0) OR ("Unit Price" >= FindItemSalesPrice(Rec))) THEN
-                                if not((Quantity < 0) or ("Unit Price" >= FindItemSalesPrice())) then
-                                //+NPR5.45 [323705]
-                                  Error(ErrDisX);
-                              end;
-                          end;
+                            if not Item."Group sale" then begin
+                                if not ForceApris then begin
+                                    case RetailSetup."Unit Cost Control" of
+                                        RetailSetup."Unit Cost Control"::Enabled:
+                                            begin
+                                            end;
+                                        RetailSetup."Unit Cost Control"::Disabled:
+                                            begin
+                                                if not (RetailSetup."Reset unit price on neg. sale" and (Quantity < 0)) then
+                                                    Error(ErrDisabled);
+                                            end;
+                                        RetailSetup."Unit Cost Control"::"Disabled if Quantity > 0":
+                                            begin
+                                                if Quantity > 0 then
+                                                    Error(ErrDisNo);
+                                            end;
+                                        RetailSetup."Unit Cost Control"::"Disabled if xUnit Cost > Unit Cost":
+                                            begin
+                                                if xRec."Unit Price" > "Unit Price" then
+                                                    Error(ErrDisX);
+                                            end;
+                                        RetailSetup."Unit Cost Control"::"Disabled if Quantity > 0 and xUnit Cost > Unit Cost":
+                                            begin
+                                                //-NPR5.45 [323705]
+                                                //IF NOT((Quantity < 0) OR ("Unit Price" >= FindItemSalesPrice(Rec))) THEN
+                                                if not ((Quantity < 0) or ("Unit Price" >= FindItemSalesPrice())) then
+                                                    //+NPR5.45 [323705]
+                                                    Error(ErrDisX);
+                                            end;
+                                    end;
+                                end;
+                            end;
+
+                            "Eksp. Salgspris" := true;
+                            //-NPR5.40 [294655]
+                            //      ItemGlobal.GET("No.");
+                            //+NPR5.40 [294655]
+                            GetAmount(Rec, Item, "Unit Price");
+                            if ("No." <> '') then begin
+                                //-NPR5.40 [294655]
+                                //        IF (ItemGlobal.GET("No.") AND ItemGlobal."Group sale") OR (ItemGlobal.GET("No.") AND (ItemGlobal."Unit Cost" = 0)) THEN BEGIN
+                                if (Item."Group sale") or (Item."Unit Cost" = 0) then begin
+                                    //+NPR5.40 [294655]
+                                    CalculateCostPrice();
+                                end else
+                                    if ("Serial No." <> '') and (Quantity > 0) then
+                                        Error(Err003);
+                            end;
+                            "Custom Price" := true;
                         end;
-                      end;
-
-                      "Eksp. Salgspris" := true;
-                //-NPR5.40 [294655]
-                //      ItemGlobal.GET("No.");
-                //+NPR5.40 [294655]
-                      GetAmount(Rec,Item,"Unit Price");
-                      if ("No." <> '') then begin
-                //-NPR5.40 [294655]
-                //        IF (ItemGlobal.GET("No.") AND ItemGlobal."Group sale") OR (ItemGlobal.GET("No.") AND (ItemGlobal."Unit Cost" = 0)) THEN BEGIN
-                        if (Item."Group sale") or (Item."Unit Cost" = 0) then begin
-                //+NPR5.40 [294655]
-                          CalculateCostPrice();
-                        end else if ("Serial No." <> '') and (Quantity > 0) then
-                          Error(Err003);
-                      end;
-                      "Custom Price" := true;
-                    end;
-                  Type::"Item Group":
-                    begin
-                      if Quantity = 0 then
-                        Error(Err001);
-                      if RetailSetup.Get then
-                        if "Price Includes VAT" then
-                          "Amount Including VAT" := Round("Unit Price" * Quantity,0.01) - "Discount Amount"
-                        else
-                          "Amount Including VAT" := Round("Unit Price" * Quantity * (1 + "VAT %"/100),0.01);
-                    end;
-                  Type::"BOM List":
-                    begin
-                      "Unit Price" := xRec."Unit Price";
-                      exit;
-                    end;
-                  Type::Customer:
-                    begin
-                      if Quantity <> 0 then begin
-                        "Amount Including VAT" := "Unit Price" * Quantity;
-                        Amount := "Amount Including VAT";
-                      end;
-                    end;
+                    Type::"Item Group":
+                        begin
+                            if Quantity = 0 then
+                                Error(Err001);
+                            if RetailSetup.Get then
+                                if "Price Includes VAT" then
+                                    "Amount Including VAT" := Round("Unit Price" * Quantity, 0.01) - "Discount Amount"
+                                else
+                                    "Amount Including VAT" := Round("Unit Price" * Quantity * (1 + "VAT %" / 100), 0.01);
+                        end;
+                    Type::"BOM List":
+                        begin
+                            "Unit Price" := xRec."Unit Price";
+                            exit;
+                        end;
+                    Type::Customer:
+                        begin
+                            if Quantity <> 0 then begin
+                                "Amount Including VAT" := "Unit Price" * Quantity;
+                                Amount := "Amount Including VAT";
+                            end;
+                        end;
                 end;
             end;
         }
-        field(16;"Unit Cost (LCY)";Decimal)
+        field(16; "Unit Cost (LCY)"; Decimal)
         {
             AutoFormatType = 2;
             Caption = 'Unit Cost (LCY)';
@@ -513,23 +521,23 @@ table 6014406 "Sale Line POS"
                 //+NPR5.48 [335967]
             end;
         }
-        field(17;"VAT %";Decimal)
+        field(17; "VAT %"; Decimal)
         {
             Caption = 'VAT %';
-            DecimalPlaces = 0:5;
+            DecimalPlaces = 0 : 5;
             Editable = false;
         }
-        field(18;"Qty. Discount %";Decimal)
+        field(18; "Qty. Discount %"; Decimal)
         {
             Caption = 'Qty. Discount %';
-            DecimalPlaces = 0:5;
+            DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
         }
-        field(19;"Discount %";Decimal)
+        field(19; "Discount %"; Decimal)
         {
             Caption = 'Discount %';
-            DecimalPlaces = 0:1;
+            DecimalPlaces = 0 : 1;
             MaxValue = 100;
             MinValue = 0;
 
@@ -545,10 +553,10 @@ table 6014406 "Sale Line POS"
                 Trans0003: Label 'Financial posts cannot be given a rebate';
             begin
                 if "Discount %" < 0 then
-                  Error(ErrMin);
+                    Error(ErrMin);
 
                 if "Discount %" > 100 then
-                  Error(ErrMax);
+                    Error(ErrMax);
 
                 //-NPR5.48 [334922]
                 // IF CurrFieldNo = FIELDNO("Discount %") THEN
@@ -560,72 +568,72 @@ table 6014406 "Sale Line POS"
                 RetailSetup.Get;
 
                 case Type of
-                  Type::"G/L Entry":
-                    begin
-                      if not ("Sale Type" = "Sale Type"::Deposit) then
-                        Error(Trans0003);
-                      "Discount Type" := "Discount Type"::" ";
-                      "Discount Code" := '';
-                      "Discount Amount" := Round("Unit Price" * "Discount %" / 100,RetailSetup."Amount Rounding Precision");
-                      "Amount Including VAT" := "Unit Price" - "Discount Amount";
-                    end;
-                  Type::Item:
-                    begin
-                      RemoveBOMDiscount;
-                      //-NPR5.34 [282799]
-                      //"Discount Type" := "Discount Type"::Manual;
-                      if "Discount %" > 0 then
-                        "Discount Type" := "Discount Type"::Manual;
-                      //+NPR5.34 [282799]
-                      "Discount Code" :=  xRec."Discount Code";
-                      "Amount Including VAT" := 0;
-                      "Discount Amount" := 0;
-                      if Modify then;
-                      RetailSalesLineCode.CalcAmounts(Rec);
-                    end;
-                  Type::"Item Group":
-                    Error(Trans0002);
-                  Type::"BOM List":
-                    begin
-                      "Discount %" := xRec."Discount %";
-                      exit;
-                    end;
-                  Type::Customer:
-                    Error(Trans0001);
+                    Type::"G/L Entry":
+                        begin
+                            if not ("Sale Type" = "Sale Type"::Deposit) then
+                                Error(Trans0003);
+                            "Discount Type" := "Discount Type"::" ";
+                            "Discount Code" := '';
+                            "Discount Amount" := Round("Unit Price" * "Discount %" / 100, RetailSetup."Amount Rounding Precision");
+                            "Amount Including VAT" := "Unit Price" - "Discount Amount";
+                        end;
+                    Type::Item:
+                        begin
+                            RemoveBOMDiscount;
+                            //-NPR5.34 [282799]
+                            //"Discount Type" := "Discount Type"::Manual;
+                            if "Discount %" > 0 then
+                                "Discount Type" := "Discount Type"::Manual;
+                            //+NPR5.34 [282799]
+                            "Discount Code" := xRec."Discount Code";
+                            "Amount Including VAT" := 0;
+                            "Discount Amount" := 0;
+                            if Modify then;
+                            RetailSalesLineCode.CalcAmounts(Rec);
+                        end;
+                    Type::"Item Group":
+                        Error(Trans0002);
+                    Type::"BOM List":
+                        begin
+                            "Discount %" := xRec."Discount %";
+                            exit;
+                        end;
+                    Type::Customer:
+                        Error(Trans0001);
                 end;
 
                 GiftFound := false;
                 if ("Gift Voucher Ref." <> '') and not Silent then begin
-                  SaleLinePOS.Reset;
-                  if GiftCrtLine <> 0 then begin
-                    SaleLinePOS.SetRange("Register No.","Register No.");
-                    SaleLinePOS.SetRange("Sales Ticket No.","Sales Ticket No.");
-                    SaleLinePOS.SetRange("Sale Type",SaleLinePOS."Sale Type"::"Out payment");
-                    SaleLinePOS.SetRange(Type,SaleLinePOS.Type::"G/L Entry");
-                    SaleLinePOS.SetRange("Line No.",GiftCrtLine);
-                    if SaleLinePOS.FindSet(true,false) then begin
-                      if "Discount %" = 0 then begin
-                        SaleLinePOS.Delete;
-                      end else begin
-                        GiftFound := true;
-                        SaleLinePOS.Validate("Unit Price","Unit Price" * "Discount %" / 100);
-                        SaleLinePOS.Modify;
+                    SaleLinePOS.Reset;
+                    if GiftCrtLine <> 0 then begin
+                        SaleLinePOS.SetRange("Register No.", "Register No.");
+                        SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
+                        SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::"Out payment");
+                        SaleLinePOS.SetRange(Type, SaleLinePOS.Type::"G/L Entry");
+                        SaleLinePOS.SetRange("Line No.", GiftCrtLine);
+                        if SaleLinePOS.FindSet(true, false) then begin
+                            if "Discount %" = 0 then begin
+                                SaleLinePOS.Delete;
+                            end else begin
+                                GiftFound := true;
+                                SaleLinePOS.Validate("Unit Price", "Unit Price" * "Discount %" / 100);
+                                SaleLinePOS.Modify;
+                                Silent := true;
+                                Validate("Discount %", 0);
+                                Silent := false;
+                            end;
+                        end
+                    end;
+                    if not GiftFound and ("Discount %" <> 0) then begin
+                        GiftCrtLine := RetailFormCode.InsertGiftCrtDiscLine(Rec, "Line No." + 558, "Unit Price" * "Discount %" / 100);
                         Silent := true;
-                        Validate("Discount %",0);
+                        Validate("Discount %", 0);
                         Silent := false;
-                      end;
-                    end
-                  end;
-                  if not GiftFound and ("Discount %" <> 0) then begin
-                    GiftCrtLine := RetailFormCode.InsertGiftCrtDiscLine(Rec,"Line No." + 558,"Unit Price" * "Discount %" / 100);
-                    Silent := true;
-                    Validate("Discount %",0);
-                    Silent := false;
-                  end;
+                    end;
                 end;
             end;
         }
-        field(20;"Discount Amount";Decimal)
+        field(20; "Discount Amount"; Decimal)
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
@@ -636,30 +644,30 @@ table 6014406 "Sale Line POS"
             begin
                 //-NPR5.38 [296851]
                 if "Price Includes VAT" then begin
-                  Validate("Discount %","Discount Amount" / "Unit Price" / Quantity * 100);
+                    Validate("Discount %", "Discount Amount" / "Unit Price" / Quantity * 100);
                 end else begin
-                  Validate("Discount %","Discount Amount" / "Unit Price" / Quantity / (100 + "VAT %") * 10000);
+                    Validate("Discount %", "Discount Amount" / "Unit Price" / Quantity / (100 + "VAT %") * 10000);
                 end;
                 //+NPR5.38 [296851]
             end;
         }
-        field(21;"Manual Item Sales Price";Boolean)
+        field(21; "Manual Item Sales Price"; Boolean)
         {
             Caption = 'Manual Item Sales Price';
             Description = 'NPR5.48';
             InitValue = false;
         }
-        field(25;Date;Date)
+        field(25; Date; Date)
         {
             Caption = 'Date';
         }
-        field(30;Amount;Decimal)
+        field(30; Amount; Decimal)
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
-            DecimalPlaces = 2:2;
-            MaxValue = 1.000.000;
+            DecimalPlaces = 2 : 2;
+            MaxValue = 1000000;
 
             trigger OnValidate()
             var
@@ -669,43 +677,43 @@ table 6014406 "Sale Line POS"
                 //RegisterGlobal.GET("Register No.");
                 //+NPR5.40 [294655]
                 if Amount <> xRec.Amount then begin
-                  case Type of
-                    Type::Item:
-                      begin
-                        //-NPR5.48 [335967]
-                        //IF ItemGlobal.GET("No.") THEN BEGIN
-                        GetItem;
-                        //+NPR5.48 [335967]
-                        if Amount * xRec.Amount <> Abs(Amount) * Abs(xRec.Amount) then
-                          Error(Trans0001);
+                    case Type of
+                        Type::Item:
+                            begin
+                                //-NPR5.48 [335967]
+                                //IF ItemGlobal.GET("No.") THEN BEGIN
+                                GetItem;
+                                //+NPR5.48 [335967]
+                                if Amount * xRec.Amount <> Abs(Amount) * Abs(xRec.Amount) then
+                                    Error(Trans0001);
 
-                        if not "Price Includes VAT" then
-                          "Discount %" := (1 - Amount / ("Unit Price" * Quantity)) * 100
-                        else
-                          "Discount %" := (1 - Amount * ((100 + "VAT %") / 100) / ("Unit Price" * Quantity)) * 100;
+                                if not "Price Includes VAT" then
+                                    "Discount %" := (1 - Amount / ("Unit Price" * Quantity)) * 100
+                                else
+                                    "Discount %" := (1 - Amount * ((100 + "VAT %") / 100) / ("Unit Price" * Quantity)) * 100;
 
-                        "Discount Type" := "Discount Type"::Manual;
-                        "Discount Code" := '';
-                        "Discount Amount" := 0;
-                        "Amount Including VAT" := 0;
+                                "Discount Type" := "Discount Type"::Manual;
+                                "Discount Code" := '';
+                                "Discount Amount" := 0;
+                                "Amount Including VAT" := 0;
 
-                        if Modify then;
+                                if Modify then;
 
-                        RetailSalesLineCode.CalcAmounts(Rec);
-                        //-NPR5.48 [335967]
-                        //END;
-                        //+NPR5.48 [335967]
-                      end;
-                  end;
+                                RetailSalesLineCode.CalcAmounts(Rec);
+                                //-NPR5.48 [335967]
+                                //END;
+                                //+NPR5.48 [335967]
+                            end;
+                    end;
                 end;
             end;
         }
-        field(31;"Amount Including VAT";Decimal)
+        field(31; "Amount Including VAT"; Decimal)
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount Including VAT';
-            MaxValue = 99.999.999;
+            MaxValue = 99999999;
 
             trigger OnValidate()
             begin
