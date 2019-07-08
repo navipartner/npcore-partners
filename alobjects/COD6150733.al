@@ -9,16 +9,16 @@ codeunit 6150733 "POS Workflows 2.0"
 
     var
         Text001: Label 'Action %1 does not seem to have a registered handler, or the registered handler failed to notify the framework about successful processing of the action.';
-        Stopwatches: DotNet Dictionary_Of_T_U;
+        Stopwatches: DotNet npNetDictionary_Of_T_U;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
-    local procedure OnAction20(Method: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction20(Method: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         ActionCode: Text;
         WorkflowId: Integer;
         Workflowstep: Text;
         ActionId: Integer;
-        ActionContext: DotNet JObject;
+        ActionContext: DotNet npNetJObject;
     begin
         if Method <> 'OnAction20' then
           exit;
@@ -29,10 +29,10 @@ codeunit 6150733 "POS Workflows 2.0"
         InvokeAction20(ActionCode,WorkflowId,Workflowstep,ActionId,ActionContext,POSSession,FrontEnd);
     end;
 
-    local procedure RetrieveActionContext(Context: DotNet JObject;var ActionCode: Text;var WorkflowId: Integer;var WorkflowStep: Text;var ActionId: Integer;var ActionContext: DotNet JObject)
+    local procedure RetrieveActionContext(Context: DotNet npNetJObject;var ActionCode: Text;var WorkflowId: Integer;var WorkflowStep: Text;var ActionId: Integer;var ActionContext: DotNet npNetJObject)
     var
-        ContextArray: DotNet JArray;
-        JToken: DotNet JToken;
+        ContextArray: DotNet npNetJArray;
+        JToken: DotNet npNetJToken;
     begin
         ContextArray := Context;
 
@@ -52,15 +52,15 @@ codeunit 6150733 "POS Workflows 2.0"
         ActionContext := JToken;
     end;
 
-    local procedure InvokeAction20("Action": Text;WorkflowId: Integer;WorkflowStep: Text;ActionId: Integer;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure InvokeAction20("Action": Text;WorkflowId: Integer;WorkflowStep: Text;ActionId: Integer;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         POSAction: Record "POS Action";
         JavaScriptInterface: Codeunit "POS JavaScript Interface";
         JSON: Codeunit "POS JSON Management";
         State: Codeunit "POS Workflows 2.0 - State";
         FrontEnd20: Codeunit "POS Front End Management";
-        Signal: DotNet WorkflowCallCompletedRequest;
-        ActionContext: DotNet Dictionary_Of_T_U;
+        Signal: DotNet npNetWorkflowCallCompletedRequest;
+        ActionContext: DotNet npNetDictionary_Of_T_U;
         Handled: Boolean;
         Executing: Boolean;
     begin
@@ -121,7 +121,7 @@ codeunit 6150733 "POS Workflows 2.0"
 
     local procedure StopwatchStart(Id: Text)
     var
-        Stopwatch: DotNet Stopwatch;
+        Stopwatch: DotNet npNetStopwatch;
     begin
         if IsNull(Stopwatches) then
           Stopwatches := Stopwatches.Dictionary();
@@ -137,7 +137,7 @@ codeunit 6150733 "POS Workflows 2.0"
 
     local procedure StopwatchStop(Id: Text): Integer
     var
-        Stopwatch: DotNet Stopwatch;
+        Stopwatch: DotNet npNetStopwatch;
     begin
         Stopwatch := Stopwatches.Item(Id);
         Stopwatch.Stop();
@@ -146,7 +146,7 @@ codeunit 6150733 "POS Workflows 2.0"
 
     local procedure StopwatchGetDuration(Id: Text): Integer
     var
-        Stopwatch: DotNet Stopwatch;
+        Stopwatch: DotNet npNetStopwatch;
     begin
         if Stopwatches.ContainsKey(Id) then begin
           Stopwatch := Stopwatches.Item(Id);
@@ -160,12 +160,12 @@ codeunit 6150733 "POS Workflows 2.0"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInvokeAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnBeforeInvokeAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInvokeAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnAfterInvokeAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
     end;
 }

@@ -77,8 +77,8 @@ table 6150633 "POS Payment Bin Eject Param."
     procedure LookupValue()
     var
         tmpRetailList: Record "Retail List" temporary;
-        Parts: DotNet Array;
-        "Part": DotNet String;
+        Parts: DotNet npNetArray;
+        "Part": DotNet npNetString;
         OptionStringCaption: Text;
     begin
         //-NPR5.50 [350812]
@@ -220,10 +220,10 @@ table 6150633 "POS Payment Bin Eject Param."
         OptionOut := SelectStr(Ordinal + 1, OptionStringIn);
     end;
 
-    local procedure SplitString(Text: Text;var Parts: DotNet Array)
+    local procedure SplitString(Text: Text;var Parts: DotNet npNetArray)
     var
-        String: DotNet String;
-        Char: DotNet String;
+        String: DotNet npNetString;
+        Char: DotNet npNetString;
     begin
         String := Text;
         Char := ',';

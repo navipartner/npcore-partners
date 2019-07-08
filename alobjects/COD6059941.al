@@ -13,9 +13,9 @@ codeunit 6059941 "NaviDocs Handling Profile Tmpl"
 
     procedure DoHandleNaviDocs(RecordVariant: Variant): Boolean
     var
-        HttpResponseMessage: DotNet HttpResponseMessage;
-        StringContent: DotNet StringContent;
-        Encoding: DotNet Encoding;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
+        StringContent: DotNet npNetStringContent;
+        Encoding: DotNet npNetEncoding;
         IComm: Record "I-Comm";
         ServiceCalc: Codeunit "NP Service Calculation";
         SMSHandled: Boolean;

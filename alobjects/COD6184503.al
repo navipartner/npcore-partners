@@ -12,15 +12,15 @@ codeunit 6184503 "CleanCash Proxy"
 
     var
         POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
-        ExpectedResponseType: DotNet Type;
+        ExpectedResponseType: DotNet npNetType;
         ExpectedResponseId: Guid;
         ProtocolManagerId: Guid;
         ProtocolStage: Integer;
         "--Response Variabel --": Integer;
         SerialNo: Text[100];
         ControlCode: Text[100];
-        CCCommunicationResult: DotNet CommunicationResult;
-        CCCommunicationStatus: DotNet CommunicationStatus;
+        CCCommunicationResult: DotNet npNetCommunicationResult;
+        CCCommunicationStatus: DotNet npNetCommunicationStatus;
         LastUnitStatusList: Text[250];
         NotSet: Boolean;
         LastExtendedError: Integer;
@@ -29,7 +29,7 @@ codeunit 6184503 "CleanCash Proxy"
         PosID: Text[16];
         DateTime: Text[12];
         ReceiptNo: Text[30];
-        ReceiptType: DotNet CommunicationReceipt;
+        ReceiptType: DotNet npNetCommunicationReceipt;
         ReceiptTotal: Text[30];
         NegativeTotal: Text[30];
         Vat: array [4] of Text[30];
@@ -46,9 +46,9 @@ codeunit 6184503 "CleanCash Proxy"
 
     local procedure ProcessSignal(var TempBlob: Record TempBlob)
     var
-        Signal: DotNet Signal;
-        StartSignal: DotNet StartSession;
-        Response: DotNet MessageResponse;
+        Signal: DotNet npNetSignal;
+        StartSignal: DotNet npNetStartSession;
+        Response: DotNet npNetMessageResponse;
     begin
         POSDeviceProxyManager.DeserializeObject(Signal,TempBlob);
         case true of
@@ -72,7 +72,7 @@ codeunit 6184503 "CleanCash Proxy"
         ProtocolStage1();
     end;
 
-    local procedure MessageResponse(Envelope: DotNet ResponseEnvelope)
+    local procedure MessageResponse(Envelope: DotNet npNetResponseEnvelope)
     begin
         if Envelope.MessageId <> ExpectedResponseId then begin
           Message('Unknown response: %1 (expected %2)',Envelope.MessageId,ExpectedResponseId);
@@ -95,9 +95,9 @@ codeunit 6184503 "CleanCash Proxy"
 
     local procedure ProtocolStage1()
     var
-        CleanCashRequest: DotNet CleanCashRequest;
-        CleanCashResponse: DotNet CleanCashResponse;
-        VoidResponse: DotNet VoidResponse;
+        CleanCashRequest: DotNet npNetCleanCashRequest;
+        CleanCashResponse: DotNet npNetCleanCashResponse;
+        VoidResponse: DotNet npNetVoidResponse;
     begin
         ProtocolStage := 1;
         CleanCashRequest := CleanCashRequest.CleanCashRequest();
@@ -119,18 +119,18 @@ codeunit 6184503 "CleanCash Proxy"
         ExpectedResponseId := POSDeviceProxyManager.SendMessage(ProtocolManagerId,CleanCashRequest);
     end;
 
-    local procedure ProtocolStage1Close(Envelope: DotNet Envelope)
+    local procedure ProtocolStage1Close(Envelope: DotNet npNetEnvelope)
     var
-        CleanCashResponse: DotNet CleanCashResponse;
+        CleanCashResponse: DotNet npNetCleanCashResponse;
     begin
         POSDeviceProxyManager.DeserializeEnvelopeFromId(CleanCashResponse,Envelope,ProtocolManagerId);
         POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
     end;
 
-    local procedure ProtocolStage1Response(Envelope: DotNet Envelope)
+    local procedure ProtocolStage1Response(Envelope: DotNet npNetEnvelope)
     var
-        CleanCashResponse: DotNet CleanCashResponse;
-        EventResponseEnum: DotNet CleanCashRequest_ActionStatus;
+        CleanCashResponse: DotNet npNetCleanCashResponse;
+        EventResponseEnum: DotNet npNetCleanCashRequest_ActionStatus;
         EventResponseInt: Integer;
     begin
         //CleanCashResponce = CleanCashResponce.CleanCashResponse
@@ -150,7 +150,7 @@ codeunit 6184503 "CleanCash Proxy"
         //POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
     end;
 
-    local procedure AwaitResponse(Type: DotNet Type;Id: Guid)
+    local procedure AwaitResponse(Type: DotNet npNetType;Id: Guid)
     begin
         ExpectedResponseType := Type;
         ExpectedResponseId := Id;
@@ -161,7 +161,7 @@ codeunit 6184503 "CleanCash Proxy"
         POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
     end;
 
-    procedure Init(pOrganisationNumber: Text[10];pPosId: Text[16];pDateTime: Text[12];pReceiptNo: Text[30];pReceiptType: DotNet CommunicationReceipt;pReceiptTotal: Text[30];pNegativeTotal: Text[30];pVat: array [4] of Text[30];pConnectionString: Text[100];pMultiOrganizationIDPerPOS: Boolean;pShowErrorMessage: Boolean)
+    procedure Init(pOrganisationNumber: Text[10];pPosId: Text[16];pDateTime: Text[12];pReceiptNo: Text[30];pReceiptType: DotNet npNetCommunicationReceipt;pReceiptTotal: Text[30];pNegativeTotal: Text[30];pVat: array [4] of Text[30];pConnectionString: Text[100];pMultiOrganizationIDPerPOS: Boolean;pShowErrorMessage: Boolean)
     begin
         OrganisationNumber := pOrganisationNumber;
         PosID := pPosId;
@@ -193,14 +193,14 @@ codeunit 6184503 "CleanCash Proxy"
         exit(ControlCode);
     end;
 
-    procedure GetCCCommunicationResult(var EnumCommResult: DotNet CommunicationResult)
+    procedure GetCCCommunicationResult(var EnumCommResult: DotNet npNetCommunicationResult)
     var
         tempInt: Integer;
     begin
         EnumCommResult := CCCommunicationResult;
     end;
 
-    procedure GetCCCommunicationStatus(var EnumCommStatus: DotNet CommunicationStatus)
+    procedure GetCCCommunicationStatus(var EnumCommStatus: DotNet npNetCommunicationStatus)
     begin
         EnumCommStatus := CCCommunicationStatus;
     end;

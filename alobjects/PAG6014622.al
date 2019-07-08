@@ -199,7 +199,7 @@ page 6014622 "POS Web Fonts"
                     var
                         ManagedDepMgt: Codeunit "Managed Dependency Mgt.";
                         Rec2: Record "POS Web Font";
-                        JArray: DotNet JArray;
+                        JArray: DotNet npNetJArray;
                     begin
                         CurrPage.SetSelectionFilter(Rec2);
                         //-NPR5.32.10 [265454]
@@ -297,8 +297,8 @@ page 6014622 "POS Web Fonts"
     local procedure ExportConfiguration()
     var
         TempBlob: Record TempBlob;
-        Font: DotNet Font;
-        JsonSerializer: DotNet DataContractJsonSerializer;
+        Font: DotNet npNetFont;
+        JsonSerializer: DotNet npNetDataContractJsonSerializer;
         OutStr: OutStream;
     begin
         GetFontDotNet_Obsolete(Font);
@@ -314,8 +314,8 @@ page 6014622 "POS Web Fonts"
     var
         WebFont: Record "POS Web Font";
         TempBlob: Record TempBlob;
-        Font: DotNet Font;
-        JsonSerializer: DotNet DataContractJsonSerializer;
+        Font: DotNet npNetFont;
+        JsonSerializer: DotNet npNetDataContractJsonSerializer;
         InStr: InStream;
         Choice: Integer;
     begin
@@ -356,7 +356,7 @@ page 6014622 "POS Web Fonts"
         end;
     end;
 
-    local procedure SaveFontConfiguration(WebFont: Record "POS Web Font";Font: DotNet Font)
+    local procedure SaveFontConfiguration(WebFont: Record "POS Web Font";Font: DotNet npNetFont)
     var
         OutStr: OutStream;
     begin

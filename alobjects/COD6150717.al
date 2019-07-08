@@ -9,11 +9,11 @@ codeunit 6150717 "POS Front End Keeper"
     var
         POSSession: Codeunit "POS Session";
         [RunOnClient]
-        Framework: DotNet IFramework0;
+        Framework: DotNet npNetIFramework0;
         FrontEnd: Codeunit "POS Front End Management";
         Initialized: Boolean;
 
-    procedure Initialize(FrameworkIn: DotNet IFramework0;FrontEndIn: Codeunit "POS Front End Management";POSSessionIn: Codeunit "POS Session")
+    procedure Initialize(FrameworkIn: DotNet npNetIFramework0;FrontEndIn: Codeunit "POS Front End Management";POSSessionIn: Codeunit "POS Session")
     begin
         FrontEnd := FrontEndIn;
         Framework := FrameworkIn;
@@ -30,7 +30,7 @@ codeunit 6150717 "POS Front End Keeper"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150704, 'OnDetectFramework', '', false, false)]
-    local procedure DetectFramework(var FrameworkOut: DotNet IFramework0;var POSSessionOut: Codeunit "POS Session")
+    local procedure DetectFramework(var FrameworkOut: DotNet npNetIFramework0;var POSSessionOut: Codeunit "POS Session")
     begin
         FrameworkOut := Framework;
         POSSessionOut := POSSession;

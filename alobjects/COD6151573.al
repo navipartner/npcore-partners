@@ -32,19 +32,19 @@ codeunit 6151573 "AF API - Spire Barcode"
 
     local procedure BuildRequest(var AFArgumentTableSpire: Record "AF Arguments - Spire Barcode"): Boolean
     var
-        Parameters: DotNet Dictionary_Of_T_U;
+        Parameters: DotNet npNetDictionary_Of_T_U;
         AFManagement: Codeunit "AF Management";
         AFHelperFunctions: Codeunit "AF Helper Functions";
-        HttpResponseMessage: DotNet HttpResponseMessage;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
         Path: Text;
         Window: Dialog;
-        WebUtility: DotNet WebUtility;
-        ImageStream: DotNet MemoryStream;
+        WebUtility: DotNet npNetWebUtility;
+        ImageStream: DotNet npNetMemoryStream;
         OutStr: OutStream;
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
-        StringContent: DotNet StringContent;
-        Encoding: DotNet Encoding;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
+        StringContent: DotNet npNetStringContent;
+        Encoding: DotNet npNetEncoding;
     begin
         // Old functionality >>
         // Path := AFArgumentTableSpire."Base Url" + AFRequestUrl(AFArgumentTableSpire."API Key") + STRSUBSTNO('&type=%1&data=%2&imageformat=%3&showtext=%4&hasborder=%5&reversecolor=%6',

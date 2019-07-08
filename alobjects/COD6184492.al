@@ -11,12 +11,12 @@ codeunit 6184492 "Pepper Trx Transaction TSD"
     var
         InitializedRequest: Boolean;
         InitializedResponse: Boolean;
-        TransactionRequest: DotNet TransactionRequest0;
-        TransactionResponse: DotNet TransactionResponse0;
+        TransactionRequest: DotNet npNetTransactionRequest0;
+        TransactionResponse: DotNet npNetTransactionResponse0;
         LastRestCode: Integer;
-        TrxResult: DotNet TrxResult0;
+        TrxResult: DotNet npNetTrxResult0;
         NEGATIVE_NOT_ALLOWED: Label 'Negative amount %1 is not allowed in a Pepper capture transaction.';
-        Labels: DotNet ProcessLabels0;
+        Labels: DotNet npNetProcessLabels0;
         PepperTerminalCaptions: Codeunit "Pepper Terminal Captions TSD";
         TrxIsAbandoned: Boolean;
 
@@ -65,7 +65,7 @@ codeunit 6184492 "Pepper Trx Transaction TSD"
 
     procedure SetRecovery() SuccessCode: Integer
     var
-        TrxParam: DotNet TrxParam0;
+        TrxParam: DotNet npNetTrxParam0;
     begin
         if not InitializedRequest then
           InitializeProtocol();
@@ -89,7 +89,7 @@ codeunit 6184492 "Pepper Trx Transaction TSD"
 
     procedure SetPaymentOfGoods(OriginalAmountInDecimal: Decimal;PepperAmountInCents: Integer;CashBackAmountInCents: Integer;Currency: Code[10];TrackPresence: Integer;CardInformation: Text[40];TrxRefNbr: Text[12];MbxPosRefNbr: Text[20];Offline: Boolean) SuccessCode: Integer
     var
-        TrxParam: DotNet TrxParam0;
+        TrxParam: DotNet npNetTrxParam0;
     begin
         if not InitializedRequest then
           InitializeProtocol();
@@ -133,7 +133,7 @@ codeunit 6184492 "Pepper Trx Transaction TSD"
 
     procedure SetVoidPaymentOfGoods(OriginalAmountInDecimal: Decimal;PepperAmountInCents: Integer;Currency: Code[10];TrxRefNbr: Text[12]) SuccessCode: Integer
     var
-        TrxParam: DotNet TrxParam0;
+        TrxParam: DotNet npNetTrxParam0;
     begin
         if not InitializedRequest then
           InitializeProtocol();
@@ -161,7 +161,7 @@ codeunit 6184492 "Pepper Trx Transaction TSD"
 
     procedure SetRefund(OriginalAmountInDecimal: Decimal;PepperAmountInCents: Integer;Currency: Code[10];TrxRefNbr: Text[12]) SuccessCode: Integer
     var
-        TrxParam: DotNet TrxParam0;
+        TrxParam: DotNet npNetTrxParam0;
     begin
         if not InitializedRequest then
           InitializeProtocol();
@@ -324,7 +324,7 @@ codeunit 6184492 "Pepper Trx Transaction TSD"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
-    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet ResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet npNetResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
 
         if (ActionName <> 'Pepper_EftTrx') then
@@ -338,7 +338,7 @@ codeunit 6184492 "Pepper Trx Transaction TSD"
     var
         PaymentRequest: Integer;
         EFTTransactionRequest: Record "EFT Transaction Request";
-        TrxParam: DotNet TrxParam0;
+        TrxParam: DotNet npNetTrxParam0;
         PepperConfiguration: Record "Pepper Configuration";
         PepperTerminal: Record "Pepper Terminal";
     begin

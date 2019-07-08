@@ -102,7 +102,7 @@ codeunit 6151520 "Nc Trigger Sync. Mgt."
         TextNoOutput: Label 'FTP Task not executed because there was no output to send.';
         TextOutputNotFound: Label 'Output Task %1 could not be found. The task with output may have been deleted before it could be transferred.';
         IStream: InStream;
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
     begin
         if not NcTask.Get(NcTaskentryNo) then
           Error(TextOutputNotFound,Format(NcTaskentryNo));

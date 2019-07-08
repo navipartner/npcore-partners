@@ -10,10 +10,10 @@ codeunit 6150716 "POS Stargate Management"
     end;
 
     var
-        Requests: DotNet Dictionary_Of_T_U;
-        States: DotNet Dictionary_Of_T_U;
-        RepeatCounts: DotNet Dictionary_Of_T_U;
-        InstallRepeatCounts: DotNet Dictionary_Of_T_U;
+        Requests: DotNet npNetDictionary_Of_T_U;
+        States: DotNet npNetDictionary_Of_T_U;
+        RepeatCounts: DotNet npNetDictionary_Of_T_U;
+        InstallRepeatCounts: DotNet npNetDictionary_Of_T_U;
         TextUnhandledStargateError: Label 'An unhandled Stargate error of type %1 has occurred while executing method %2, step %3.\\The error message is:\%4';
         TextUnsupportedStargateMethodError: Label 'An unknown or unsupported Stargate method %1 has been invoked. You must register the corresponding Stargate package for this method before you can call it.';
         TextDeserializationError: Label 'Stargate was unable to process the response envelope for type %1 due to an exception of type %2.\\The error message is:\%3';
@@ -22,7 +22,7 @@ codeunit 6150716 "POS Stargate Management"
         TextExpectedAppGatewayResponse: Label 'Stargate method %1 expects a response for event %2, but either no subscribers handled it, or an active subscriber failed to indicate successful handling of the event.';
         LastKnownActionName: Text;
 
-    procedure StoreRequest(Request: DotNet Request0;ActionName: Text;Step: Text)
+    procedure StoreRequest(Request: DotNet npNetRequest0;ActionName: Text;Step: Text)
     var
         State: Option SendingRequest,InstallingAssemblies,RepeatingRequest;
         RepeatCount: Integer;
@@ -65,7 +65,7 @@ codeunit 6150716 "POS Stargate Management"
 
     procedure DeviceResponse(Method: Text;Response: Text;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";ActionName: Text;Step: Text)
     var
-        Envelope: DotNet ResponseEnvelope0;
+        Envelope: DotNet npNetResponseEnvelope0;
         State: Option SendingRequest,InstallingAssemblies,RepeatingRequest;
         RepeatCount: Integer;
         InstallRepeatCount: Integer;
@@ -97,7 +97,7 @@ codeunit 6150716 "POS Stargate Management"
 
     procedure DeviceError(Method: Text;Response: Text;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
-        Envelope: DotNet ResponseEnvelope0;
+        Envelope: DotNet npNetResponseEnvelope0;
     begin
         OnDeviceDoesNotSupportStargate(Method,Response,POSSession,FrontEnd);
         FrontEnd.AbortWorkflows();
@@ -136,9 +136,9 @@ codeunit 6150716 "POS Stargate Management"
               'ProtocolClosed')); // This is a non-localizable constant
     end;
 
-    procedure DeserializeEnvelope(Envelope: DotNet ResponseEnvelope0;var Response: DotNet Response1;FrontEnd: Codeunit "POS Front End Management")
+    procedure DeserializeEnvelope(Envelope: DotNet npNetResponseEnvelope0;var Response: DotNet npNetResponse1;FrontEnd: Codeunit "POS Front End Management")
     var
-        Type: DotNet Type;
+        Type: DotNet npNetType;
     begin
         Type := GetDotNetType(Response);
 
@@ -150,7 +150,7 @@ codeunit 6150716 "POS Stargate Management"
     end;
 
     [TryFunction]
-    local procedure TryDeserializeEnvelope(Envelope: DotNet ResponseEnvelope0;var Response: DotNet Response1)
+    local procedure TryDeserializeEnvelope(Envelope: DotNet npNetResponseEnvelope0;var Response: DotNet npNetResponse1)
     begin
         Response := Envelope.Deserialize(GetDotNetType(Response));
     end;
@@ -205,10 +205,10 @@ codeunit 6150716 "POS Stargate Management"
         InstallRepeatCounts.Add(ActionName,InstallRepeatCount);
     end;
 
-    local procedure ProcessErrorResponse(Envelope: DotNet ResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Method: Text;ActionName: Text;Step: Text)
+    local procedure ProcessErrorResponse(Envelope: DotNet npNetResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Method: Text;ActionName: Text;Step: Text)
     var
-        ErrorResponse: DotNet ErrorResponse0;
-        InvalidMethodException: DotNet InvalidMethodException;
+        ErrorResponse: DotNet npNetErrorResponse0;
+        InvalidMethodException: DotNet npNetInvalidMethodException;
     begin
         LastKnownActionName := ActionName;
         DeserializeEnvelope(Envelope,ErrorResponse,FrontEnd);
@@ -220,7 +220,7 @@ codeunit 6150716 "POS Stargate Management"
         end;
     end;
 
-    local procedure DeviceErrorResponse(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Method: Text;ActionName: Text;Step: Text;ErrorResponse: DotNet ErrorResponse0)
+    local procedure DeviceErrorResponse(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Method: Text;ActionName: Text;Step: Text;ErrorResponse: DotNet npNetErrorResponse0)
     var
         Handled: Boolean;
     begin
@@ -234,9 +234,9 @@ codeunit 6150716 "POS Stargate Management"
     var
         StargateMethod: Record "POS Stargate Package Method";
         StargatePackage: Record "POS Stargate Package";
-        Package: DotNet Package;
-        Request: DotNet PackageRequest;
-        IOFile: DotNet File;
+        Package: DotNet npNetPackage;
+        Request: DotNet npNetPackageRequest;
+        IOFile: DotNet npNetFile;
         TempFile: File;
         TempFileName: Text;
         State: Option SendingRequest,InstallingAssemblies,RepeatingRequest;
@@ -261,10 +261,10 @@ codeunit 6150716 "POS Stargate Management"
         FrontEnd.InvokeDeviceInternal(Request,ActionName,Step,false);
     end;
 
-    local procedure CompleteInstallingMissingAssemblies(Envelope: DotNet ResponseEnvelope0;FrontEnd: Codeunit "POS Front End Management";Method: Text;ActionName: Text;Step: Text)
+    local procedure CompleteInstallingMissingAssemblies(Envelope: DotNet npNetResponseEnvelope0;FrontEnd: Codeunit "POS Front End Management";Method: Text;ActionName: Text;Step: Text)
     var
-        Request: DotNet Request0;
-        EmptyResponse: DotNet EmptyResponse;
+        Request: DotNet npNetRequest0;
+        EmptyResponse: DotNet npNetEmptyResponse;
         State: Option SendingRequest,InstallingAssemblies,RepeatingRequest;
     begin
         LastKnownActionName := ActionName;
@@ -275,7 +275,7 @@ codeunit 6150716 "POS Stargate Management"
         FrontEnd.InvokeDeviceInternal(Request,ActionName,Step,true);
     end;
 
-    local procedure ThrowUnhandledStargateError(ErrorResponse: DotNet ErrorResponse0;FrontEnd: Codeunit "POS Front End Management";Method: Text;ActionName: Text;Step: Text)
+    local procedure ThrowUnhandledStargateError(ErrorResponse: DotNet npNetErrorResponse0;FrontEnd: Codeunit "POS Front End Management";Method: Text;ActionName: Text;Step: Text)
     var
         ErrorMessage: Text;
     begin
@@ -304,7 +304,7 @@ codeunit 6150716 "POS Stargate Management"
         FrontEnd.ReportBug(ErrorMessage);
     end;
 
-    local procedure ThrowDeserializationError(Exception: DotNet Exception;Type: DotNet Type;FrontEnd: Codeunit "POS Front End Management";ActionName: Text)
+    local procedure ThrowDeserializationError(Exception: DotNet npNetException;Type: DotNet npNetType;FrontEnd: Codeunit "POS Front End Management";ActionName: Text)
     begin
         ResetRequestState(ActionName);
         FrontEnd.AbortWorkflows();
@@ -316,7 +316,7 @@ codeunit 6150716 "POS Stargate Management"
             Exception.Message));
     end;
 
-    local procedure ThrowUnexpectedResponseTypeError(var ExpectedType: DotNet Type;ActualTypeName: Text;FrontEnd: Codeunit "POS Front End Management";ActionName: Text)
+    local procedure ThrowUnexpectedResponseTypeError(var ExpectedType: DotNet npNetType;ActualTypeName: Text;FrontEnd: Codeunit "POS Front End Management";ActionName: Text)
     begin
         ResetRequestState(ActionName);
         FrontEnd.AbortWorkflows();
@@ -338,12 +338,12 @@ codeunit 6150716 "POS Stargate Management"
     end;
 
     [BusinessEvent(false)]
-    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet ResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet npNetResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
     end;
 
     [BusinessEvent(false)]
-    local procedure OnDeviceErrorResponse(ActionName: Text;Step: Text;Response: DotNet ErrorResponse0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnDeviceErrorResponse(ActionName: Text;Step: Text;Response: DotNet npNetErrorResponse0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     begin
     end;
 

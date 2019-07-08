@@ -51,7 +51,7 @@ codeunit 6014582 "Print Method Mgt."
         end;
     end;
 
-    procedure PrintFileLocal(PrinterName: Text;var Stream: DotNet MemoryStream;FileExtension: Text)
+    procedure PrintFileLocal(PrinterName: Text;var Stream: DotNet npNetMemoryStream;FileExtension: Text)
     var
         FilePrintProxyProtocol: Codeunit "File Print Proxy Protocol";
         POSFrontEnd: Codeunit "POS Front End Management";
@@ -88,7 +88,7 @@ codeunit 6014582 "Print Method Mgt."
         WebPrintMgt.CreatePrintJob(PrinterName, SlavePrinterName, PrintBytes, TargetEncoding);
     end;
 
-    procedure PrintViaGoogleCloud(PrinterID: Text;var Stream: DotNet MemoryStream;ContentType: Text;ObjectType: Option "Report","Codeunit";ObjectID: Integer): Boolean
+    procedure PrintViaGoogleCloud(PrinterID: Text;var Stream: DotNet npNetMemoryStream;ContentType: Text;ObjectType: Option "Report","Codeunit";ObjectID: Integer): Boolean
     var
         GoogleCloudPrintMgt: Codeunit "GCP Mgt.";
     begin
@@ -101,7 +101,7 @@ codeunit 6014582 "Print Method Mgt."
         exit(GoogleCloudPrintMgt.PrintFile(PrinterID, Stream, ContentType, GoogleCloudPrintMgt.GetCustomCJT(PrinterID, ObjectType, ObjectID), '', ''));
     end;
 
-    procedure PrintViaEmail(PrinterName: Text;var Stream: DotNet MemoryStream)
+    procedure PrintViaEmail(PrinterName: Text;var Stream: DotNet npNetMemoryStream)
     var
         SmtpMail: Codeunit "SMTP Mail";
         InStream: InStream;
@@ -121,7 +121,7 @@ codeunit 6014582 "Print Method Mgt."
     procedure PrintBytesViaClientAddin(PrinterName: Text;PrintBytes: Text;TargetEncoding: Text)
     var
         [RunOnClient]
-        StringBufferDotNet: DotNet StringBuffer;
+        StringBufferDotNet: DotNet npNetStringBuffer;
     begin
         StringBufferDotNet := StringBufferDotNet.StringBuffer();
         StringBufferDotNet.ClearBuffer;
@@ -134,18 +134,18 @@ codeunit 6014582 "Print Method Mgt."
         Clear(StringBufferDotNet);
     end;
 
-    procedure PrintFileViaClientDotNet(PrinterName: Text;PrinterDialog: Boolean;var Stream: DotNet MemoryStream;FileExtension: Text)
+    procedure PrintFileViaClientDotNet(PrinterName: Text;PrinterDialog: Boolean;var Stream: DotNet npNetMemoryStream;FileExtension: Text)
     var
         [RunOnClient]
-        Process: DotNet Process;
+        Process: DotNet npNetProcess;
         [RunOnClient]
-        ProcessStartInfo: DotNet ProcessStartInfo;
+        ProcessStartInfo: DotNet npNetProcessStartInfo;
         [RunOnClient]
-        ProcessWindowStyle: DotNet ProcessWindowStyle;
+        ProcessWindowStyle: DotNet npNetProcessWindowStyle;
         [RunOnClient]
-        PrintDialog: DotNet PrintDialog;
+        PrintDialog: DotNet npNetPrintDialog;
         [RunOnClient]
-        DialogResult: DotNet DialogResult;
+        DialogResult: DotNet npNetDialogResult;
         FileMgt: Codeunit "File Management";
         TempBlob: Record TempBlob temporary;
         OutStream: OutStream;

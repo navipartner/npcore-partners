@@ -59,7 +59,7 @@ codeunit 6150813 "POS Action - Item Lookup"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode) then
           exit;
@@ -76,7 +76,7 @@ codeunit 6150813 "POS Action - Item Lookup"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
         JSON: Codeunit "POS JSON Management";
@@ -92,7 +92,7 @@ codeunit 6150813 "POS Action - Item Lookup"
     begin
     end;
 
-    local procedure OnLookup(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure OnLookup(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         JSON: Codeunit "POS JSON Management";
     begin
@@ -134,7 +134,7 @@ codeunit 6150813 "POS Action - Item Lookup"
         exit; //debug
     end;
 
-    local procedure OnLookupItem(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure OnLookupItem(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         JSON: Codeunit "POS JSON Management";
         POSSaleLine: Codeunit "POS Sale Line";
@@ -192,7 +192,7 @@ codeunit 6150813 "POS Action - Item Lookup"
         //+NPR5.41 [311104]
     end;
 
-    local procedure CompleteLookup(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure CompleteLookup(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         JSON: Codeunit "POS JSON Management";
         ItemList: Page "Retail Item List";
@@ -212,7 +212,7 @@ codeunit 6150813 "POS Action - Item Lookup"
         //+NPR5.41 [311104]
     end;
 
-    local procedure OnLookupSKU(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure OnLookupSKU(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         JSON: Codeunit "POS JSON Management";
         POSSetup: Codeunit "POS Setup";
@@ -263,7 +263,7 @@ codeunit 6150813 "POS Action - Item Lookup"
         //+NPR5.41 [311104]
     end;
 
-    local procedure AddItemToSale(ItemNo: Code[20];POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure AddItemToSale(ItemNo: Code[20];POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         POSSaleLine: Codeunit "POS Sale Line";
         NewSaleLinePOS: Record "Sale Line POS";

@@ -9,17 +9,17 @@ codeunit 6059955 "MCS Face Service API"
     end;
 
     var
-        FaceServiceAPI: DotNet FaceServiceAPI;
-        GroupEntity: DotNet GroupEntity;
-        ErrorEntity: DotNet ErrorEntity;
-        PersonEntity: DotNet PersonEntity;
-        ResponseEntity: DotNet FaceResponseEntity;
+        FaceServiceAPI: DotNet npNetFaceServiceAPI;
+        GroupEntity: DotNet npNetGroupEntity;
+        ErrorEntity: DotNet npNetErrorEntity;
+        PersonEntity: DotNet npNetPersonEntity;
+        ResponseEntity: DotNet npNetFaceResponseEntity;
         DebugString: Text;
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
         PersonGroups: Record "MCS Person Groups";
         Counter: Integer;
-        FaceEntity: DotNet FaceEntity;
-        InnerFaceEntity: DotNet FaceEntity;
+        FaceEntity: DotNet npNetFaceEntity;
+        InnerFaceEntity: DotNet npNetFaceEntity;
 
     procedure GetPersonGroups()
     begin
@@ -221,12 +221,12 @@ codeunit 6059955 "MCS Face Service API"
         MCSAPISetup: Record "MCS API Setup";
         MCSPersonGroupsSetup: Record "MCS Person Groups Setup";
         MCSPerson: Record "MCS Person";
-        StreamDotNet1: DotNet Stream;
-        FileDotNet: DotNet File;
+        StreamDotNet1: DotNet npNetStream;
+        FileDotNet: DotNet npNetFile;
         MCSFaces: Record "MCS Faces";
-        Convert: DotNet Convert;
-        StreamDotNet2: DotNet Stream;
-        StreamDotNet3: DotNet Stream;
+        Convert: DotNet npNetConvert;
+        StreamDotNet2: DotNet npNetStream;
+        StreamDotNet3: DotNet npNetStream;
         UserData: Text;
         PersonId: Text;
     begin

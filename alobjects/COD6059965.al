@@ -25,9 +25,9 @@ codeunit 6059965 "MPOS Webservice"
     procedure GetCompanyLogo() PictureBase64: Text
     var
         CompanyInformation: Record "Company Information";
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
     begin
         CompanyInformation.Get;
@@ -99,12 +99,12 @@ codeunit 6059965 "MPOS Webservice"
     procedure GetCompanyInfo(): Text
     var
         CompanyInformation: Record "Company Information";
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
         Base64String: Text;
         MPOSHelperFunctions: Codeunit "MPOS Helper Functions";
     begin

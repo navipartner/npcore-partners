@@ -28,7 +28,7 @@ page 6014548 "POS Accessory AddOn Selection"
 
                 trigger OnInvokeMethod(method: Text;eventContent: Variant)
                 var
-                    JObjectIn: DotNet JObject;
+                    JObjectIn: DotNet npNetJObject;
                 begin
                     case method of
                       'ApproveItemAddOns':

@@ -43,8 +43,8 @@ table 6014624 "Web Client Dependency"
     local procedure GetBLOB(DependencyType: Integer;DependencyCode: Code[10]): Text
     var
         WebDependency: Record "Web Client Dependency";
-        MemStr: DotNet MemoryStream;
-        Encoding: DotNet Encoding;
+        MemStr: DotNet npNetMemoryStream;
+        Encoding: DotNet npNetEncoding;
         InStr: InStream;
     begin
         with WebDependency do begin

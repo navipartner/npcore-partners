@@ -70,7 +70,7 @@ codeunit 6151005 "POS Action - Load POS Quote"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         ControlId: Text;
@@ -161,7 +161,7 @@ codeunit 6151005 "POS Action - Load POS Quote"
         POSQuoteMgt: Codeunit "POS Quote Mgt.";
         POSSale: Codeunit "POS Sale";
         POSSaleLine: Codeunit "POS Sale Line";
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
         QuoteEntryNo: BigInteger;
     begin
         QuoteEntryNo := JSON.GetInteger('quote_entry_no',true);

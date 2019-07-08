@@ -55,8 +55,8 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
         SoapAction: Text;
         ResponseMessage: Text;
         XmlRequest: Text;
-        XmlRequestDoc: DotNet XmlDocument;
-        XmlResponseDoc: DotNet XmlDocument;
+        XmlRequestDoc: DotNet npNetXmlDocument;
+        XmlResponseDoc: DotNet npNetXmlDocument;
         Success: Boolean;
     begin
 
@@ -118,7 +118,7 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
         exit (TransformOk);
     end;
 
-    local procedure HandleWebServiceResult(EFTTransactionRequest: Record "EFT Transaction Request";ServiceSuccess: Boolean;ResponseMessage: Text;var XmlRequestDoc: DotNet XmlDocument;var XmlResponseDoc: DotNet XmlDocument)
+    local procedure HandleWebServiceResult(EFTTransactionRequest: Record "EFT Transaction Request";ServiceSuccess: Boolean;ResponseMessage: Text;var XmlRequestDoc: DotNet npNetXmlDocument;var XmlResponseDoc: DotNet npNetXmlDocument)
     var
         OStream: OutStream;
     begin
@@ -316,12 +316,12 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
     begin
     end;
 
-    local procedure HandleReservePointsResult(EFTTransactionRequest: Record "EFT Transaction Request";var XmlResponseDoc: DotNet XmlDocument)
+    local procedure HandleReservePointsResult(EFTTransactionRequest: Record "EFT Transaction Request";var XmlResponseDoc: DotNet npNetXmlDocument)
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlElement: DotNet XmlElement;
-        XmlPoints: DotNet XmlElement;
-        XmlResponseMessage: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        XmlPoints: DotNet npNetXmlElement;
+        XmlResponseMessage: DotNet npNetXmlElement;
         OStream: OutStream;
         ResponseCode: Code[20];
         ResponseMessage: Text;
@@ -373,12 +373,12 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
         EFTTransactionRequest.Modify ();
     end;
 
-    local procedure HandleRegisterSalesResult(EFTTransactionRequest: Record "EFT Transaction Request";var XmlResponseDoc: DotNet XmlDocument)
+    local procedure HandleRegisterSalesResult(EFTTransactionRequest: Record "EFT Transaction Request";var XmlResponseDoc: DotNet npNetXmlDocument)
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlElement: DotNet XmlElement;
-        XmlPoints: DotNet XmlElement;
-        XmlResponseMessage: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        XmlPoints: DotNet npNetXmlElement;
+        XmlResponseMessage: DotNet npNetXmlElement;
         ResponseCode: Code[20];
         ResponseMessage: Text;
         MessageCode: Text;

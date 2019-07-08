@@ -298,9 +298,9 @@ codeunit 6014558 "RP Data Join Buffer Mgt."
         ChildDataItems: Record "RP Data Items";
         DataItemLinks: Record "RP Data Item Links";
         ChildRecRef: RecordRef;
-        StringArray: DotNet Array;
-        Regex: DotNet Regex;
-        String: DotNet String;
+        StringArray: DotNet npNetArray;
+        Regex: DotNet npNetRegex;
+        String: DotNet npNetString;
         IntegerBuffer: Integer;
         FieldRef: FieldRef;
         DataProcessed: Boolean;

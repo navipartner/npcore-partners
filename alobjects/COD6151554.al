@@ -45,9 +45,9 @@ codeunit 6151554 "NpXml Dom Mgt."
     begin
     end;
 
-    procedure AddAttribute(var XmlNode: DotNet XmlNode;Name: Text[260];NodeValue: Text[260]) ExitStatus: Integer
+    procedure AddAttribute(var XmlNode: DotNet npNetXmlNode;Name: Text[260];NodeValue: Text[260]) ExitStatus: Integer
     var
-        NewAttributeXmlNode: DotNet XmlNode;
+        NewAttributeXmlNode: DotNet npNetXmlNode;
     begin
         NewAttributeXmlNode := XmlNode.OwnerDocument.CreateAttribute(Name);
 
@@ -62,9 +62,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         XmlNode.Attributes.SetNamedItem(NewAttributeXmlNode);
     end;
 
-    procedure AddAttributeNamespace(var XmlNode: DotNet XmlNode;Name: Text[260];Namespace: Text;NodeValue: Text[260]) ExitStatus: Integer
+    procedure AddAttributeNamespace(var XmlNode: DotNet npNetXmlNode;Name: Text[260];Namespace: Text;NodeValue: Text[260]) ExitStatus: Integer
     var
-        NewAttributeXmlNode: DotNet XmlNode;
+        NewAttributeXmlNode: DotNet npNetXmlNode;
     begin
         //-NC2.03 [267094]
         NewAttributeXmlNode := XmlNode.OwnerDocument.CreateAttribute(Name,Namespace);
@@ -80,20 +80,20 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.03 [267094]
     end;
 
-    procedure AddElement(var XmlElement: DotNet XmlElement;ElementName: Text[250];var CreatedXmlElement: DotNet XmlElement)
+    procedure AddElement(var XmlElement: DotNet npNetXmlElement;ElementName: Text[250];var CreatedXmlElement: DotNet npNetXmlElement)
     var
-        NewChildXmlElement: DotNet XmlElement;
-        XmlNodeType: DotNet XmlNodeType;
+        NewChildXmlElement: DotNet npNetXmlElement;
+        XmlNodeType: DotNet npNetXmlNodeType;
     begin
         NewChildXmlElement := XmlElement.OwnerDocument.CreateNode(XmlNodeType.Element,ElementName,'');
         XmlElement.AppendChild(NewChildXmlElement);
         CreatedXmlElement := NewChildXmlElement;
     end;
 
-    procedure AddElementNamespace(var XmlElement: DotNet XmlElement;ElementName: Text;Namespace: Text;var CreatedXmlElement: DotNet XmlElement)
+    procedure AddElementNamespace(var XmlElement: DotNet npNetXmlElement;ElementName: Text;Namespace: Text;var CreatedXmlElement: DotNet npNetXmlElement)
     var
-        NewChildXmlElement: DotNet XmlElement;
-        XmlNodeType: DotNet XmlNodeType;
+        NewChildXmlElement: DotNet npNetXmlElement;
+        XmlNodeType: DotNet npNetXmlNodeType;
     begin
         if Namespace = '' then
           Namespace := XmlElement.OwnerDocument.NamespaceURI();
@@ -102,7 +102,7 @@ codeunit 6151554 "NpXml Dom Mgt."
         CreatedXmlElement := NewChildXmlElement;
     end;
 
-    procedure FindNode(XmlNode: DotNet XmlNode;NodePath: Text[250];var XmlNodeChild: DotNet XmlNode): Boolean
+    procedure FindNode(XmlNode: DotNet npNetXmlNode;NodePath: Text[250];var XmlNodeChild: DotNet npNetXmlNode): Boolean
     begin
         if IsNull(XmlNode) then
           exit(false);
@@ -112,14 +112,14 @@ codeunit 6151554 "NpXml Dom Mgt."
         exit(not IsNull(XmlNodeChild));
     end;
 
-    procedure FindNodes(XmlNode: DotNet XmlNode;NodePath: Text[250];var XmlNodeList: DotNet XmlNodeList): Boolean
+    procedure FindNodes(XmlNode: DotNet npNetXmlNode;NodePath: Text[250];var XmlNodeList: DotNet npNetXmlNodeList): Boolean
     begin
         XmlNodeList := XmlNode.SelectNodes('//' + NodePath);
 
         exit(not IsNull(XmlNodeList));
     end;
 
-    procedure InitDoc(var XmlDoc: DotNet XmlDocument;var XmlDocNode: DotNet XmlNode;NodeName: Text[1024])
+    procedure InitDoc(var XmlDoc: DotNet npNetXmlDocument;var XmlDocNode: DotNet npNetXmlNode;NodeName: Text[1024])
     begin
         if not IsNull(XmlDoc) then
           Clear(XmlDoc);
@@ -131,9 +131,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         XmlDocNode := XmlDoc.DocumentElement();
     end;
 
-    procedure IsLeafNode(XmlNode: DotNet XmlNode): Boolean
+    procedure IsLeafNode(XmlNode: DotNet npNetXmlNode): Boolean
     var
-        XmlNode2: DotNet XmlNode;
+        XmlNode2: DotNet npNetXmlNode;
     begin
         if not XmlNode.HasChildNodes then
           exit(true);
@@ -148,9 +148,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         exit(true);
     end;
 
-    procedure GetXmlText(XmlElement: DotNet XmlElement;NodePath: Text;MaxLength: Integer;Required: Boolean): Text
+    procedure GetXmlText(XmlElement: DotNet npNetXmlElement;NodePath: Text;MaxLength: Integer;Required: Boolean): Text
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         if IsNull(XmlElement) then begin
           if Required then
@@ -171,9 +171,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         exit(XmlElement2.InnerText);
     end;
 
-    procedure GetXmlTextNamespace(XmlElement: DotNet XmlElement;NodePath: Text;XmlNsManager: DotNet XmlNamespaceManager;MaxLength: Integer;Required: Boolean): Text
+    procedure GetXmlTextNamespace(XmlElement: DotNet npNetXmlElement;NodePath: Text;XmlNsManager: DotNet npNetXmlNamespaceManager;MaxLength: Integer;Required: Boolean): Text
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         if IsNull(XmlElement) then begin
           if Required then
@@ -194,14 +194,14 @@ codeunit 6151554 "NpXml Dom Mgt."
         exit(XmlElement2.InnerText);
     end;
 
-    procedure GetXmlAttributeText(XmlElement: DotNet XmlElement;AttributeName: Text;Required: Boolean) AttributeText: Text
+    procedure GetXmlAttributeText(XmlElement: DotNet npNetXmlElement;AttributeName: Text;Required: Boolean) AttributeText: Text
     begin
         AttributeText := XmlElement.GetAttribute(AttributeName);
         if Required and (AttributeText = '') then
           Error(Error004,AttributeName,XmlElement.Name);
     end;
 
-    procedure LoadXml(var MemoryStream: DotNet MemoryStream;var XmlDoc: DotNet XmlDocument) XmlLoaded: Boolean
+    procedure LoadXml(var MemoryStream: DotNet npNetMemoryStream;var XmlDoc: DotNet npNetXmlDocument) XmlLoaded: Boolean
     begin
         //-NC2.01 [256392]
         // ASSERTERROR BEGIN
@@ -224,7 +224,7 @@ codeunit 6151554 "NpXml Dom Mgt."
     end;
 
     [TryFunction]
-    procedure TryLoadXml(XmlString: Text;var XmlDoc: DotNet XmlDocument)
+    procedure TryLoadXml(XmlString: Text;var XmlDoc: DotNet npNetXmlDocument)
     begin
         //-NC2.01
         XmlDoc := XmlDoc.XmlDocument;
@@ -233,7 +233,7 @@ codeunit 6151554 "NpXml Dom Mgt."
     end;
 
     [TryFunction]
-    local procedure TryLoadXmlStream(var MemoryStream: DotNet MemoryStream;var XmlDoc: DotNet XmlDocument)
+    local procedure TryLoadXmlStream(var MemoryStream: DotNet npNetMemoryStream;var XmlDoc: DotNet npNetXmlDocument)
     begin
         //-NC2.01 [256392]
         XmlDoc := XmlDoc.XmlDocument;
@@ -243,8 +243,8 @@ codeunit 6151554 "NpXml Dom Mgt."
 
     procedure PrettyPrintXml(XmlString: Text) PrettyXml: Text
     var
-        StreamReader: DotNet StreamReader;
-        XmlDoc: DotNet XmlDocument;
+        StreamReader: DotNet npNetStreamReader;
+        XmlDoc: DotNet npNetXmlDocument;
         TempBlob: Record TempBlob temporary;
         InStream: InStream;
         OutStream: OutStream;
@@ -263,14 +263,14 @@ codeunit 6151554 "NpXml Dom Mgt."
     end;
 
     [TryFunction]
-    procedure RemoveNameSpaces(var XmlDoc: DotNet XmlDocument)
+    procedure RemoveNameSpaces(var XmlDoc: DotNet npNetXmlDocument)
     var
-        MemoryStream: DotNet MemoryStream;
-        MemoryStream2: DotNet MemoryStream;
-        XmlStyleSheet: DotNet XmlDocument;
-        XslCompiledTransform: DotNet XslCompiledTransform;
-        XmlReader: DotNet XmlReader;
-        XmlWriter: DotNet XmlWriter;
+        MemoryStream: DotNet npNetMemoryStream;
+        MemoryStream2: DotNet npNetMemoryStream;
+        XmlStyleSheet: DotNet npNetXmlDocument;
+        XslCompiledTransform: DotNet npNetXslCompiledTransform;
+        XmlReader: DotNet npNetXmlReader;
+        XmlWriter: DotNet npNetXmlWriter;
     begin
         if IsNull(XmlStyleSheet) then begin
           XmlStyleSheet := XmlStyleSheet.XmlDocument;
@@ -316,7 +316,7 @@ codeunit 6151554 "NpXml Dom Mgt."
     begin
     end;
 
-    procedure FindElement(XmlElement: DotNet XmlElement;Path: Text;Required: Boolean;var XmlElement2: DotNet XmlElement): Boolean
+    procedure FindElement(XmlElement: DotNet npNetXmlElement;Path: Text;Required: Boolean;var XmlElement2: DotNet npNetXmlElement): Boolean
     begin
         //-NC2.19 [345261]
         if IsNull(XmlElement) then begin
@@ -334,9 +334,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetElementBigInt(XmlElement: DotNet XmlElement;Path: Text;Required: Boolean) Value: BigInteger
+    procedure GetElementBigInt(XmlElement: DotNet npNetXmlElement;Path: Text;Required: Boolean) Value: BigInteger
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         //-NC2.19 [345261]
         XmlElement2 := XmlElement;
@@ -356,9 +356,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetElementBoolean(XmlElement: DotNet XmlElement;Path: Text;Required: Boolean) Value: Boolean
+    procedure GetElementBoolean(XmlElement: DotNet npNetXmlElement;Path: Text;Required: Boolean) Value: Boolean
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         //-NC2.19 [345261]
         XmlElement2 := XmlElement;
@@ -378,9 +378,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetElementCode(XmlElement: DotNet XmlElement;Path: Text;MaxLength: Integer;Required: Boolean) Value: Code[1024]
+    procedure GetElementCode(XmlElement: DotNet npNetXmlElement;Path: Text;MaxLength: Integer;Required: Boolean) Value: Code[1024]
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         TextValue: Text;
     begin
         //-NC2.19 [345261]
@@ -400,9 +400,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetElementDate(XmlElement: DotNet XmlElement;Path: Text;Required: Boolean) Value: Date
+    procedure GetElementDate(XmlElement: DotNet npNetXmlElement;Path: Text;Required: Boolean) Value: Date
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         //-NC2.19 [345261]
         XmlElement2 := XmlElement;
@@ -422,9 +422,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetElementDec(XmlElement: DotNet XmlElement;Path: Text;Required: Boolean) Value: Decimal
+    procedure GetElementDec(XmlElement: DotNet npNetXmlElement;Path: Text;Required: Boolean) Value: Decimal
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         //-NC2.19 [345261]
         XmlElement2 := XmlElement;
@@ -444,9 +444,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetElementDT(XmlElement: DotNet XmlElement;Path: Text;Required: Boolean) Value: DateTime
+    procedure GetElementDT(XmlElement: DotNet npNetXmlElement;Path: Text;Required: Boolean) Value: DateTime
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         //-NC2.19 [345261]
         XmlElement2 := XmlElement;
@@ -466,9 +466,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetElementGuid(XmlElement: DotNet XmlElement;Path: Text;Required: Boolean) Value: Guid
+    procedure GetElementGuid(XmlElement: DotNet npNetXmlElement;Path: Text;Required: Boolean) Value: Guid
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         //-NC2.19 [345261]
         XmlElement2 := XmlElement;
@@ -488,9 +488,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetElementInt(XmlElement: DotNet XmlElement;Path: Text;Required: Boolean) Value: Integer
+    procedure GetElementInt(XmlElement: DotNet npNetXmlElement;Path: Text;Required: Boolean) Value: Integer
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         //-NC2.19 [345261]
         XmlElement2 := XmlElement;
@@ -510,9 +510,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetElementText(XmlElement: DotNet XmlElement;Path: Text;MaxLength: Integer;Required: Boolean) Value: Text
+    procedure GetElementText(XmlElement: DotNet npNetXmlElement;Path: Text;MaxLength: Integer;Required: Boolean) Value: Text
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         //-NC2.19 [345261]
         XmlElement2 := XmlElement;
@@ -529,9 +529,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetElementTime(XmlElement: DotNet XmlElement;Path: Text;Required: Boolean) Value: Time
+    procedure GetElementTime(XmlElement: DotNet npNetXmlElement;Path: Text;Required: Boolean) Value: Time
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         //-NC2.19 [345261]
         XmlElement2 := XmlElement;
@@ -551,9 +551,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetElementDuration(XmlElement: DotNet XmlElement;Path: Text;Required: Boolean) Value: Duration
+    procedure GetElementDuration(XmlElement: DotNet npNetXmlElement;Path: Text;Required: Boolean) Value: Duration
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         //-NC2.21 [344264]
         XmlElement2 := XmlElement;
@@ -573,9 +573,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.21 [344264]
     end;
 
-    procedure GetAttributeBigInt(XmlElement: DotNet XmlElement;Path: Text;Name: Text;Required: Boolean) Value: BigInteger
+    procedure GetAttributeBigInt(XmlElement: DotNet npNetXmlElement;Path: Text;Name: Text;Required: Boolean) Value: BigInteger
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         TextValue: Text;
         FullPath: Text;
     begin
@@ -602,9 +602,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetAttributeBoolean(XmlElement: DotNet XmlElement;Path: Text;Name: Text;Required: Boolean) Value: Boolean
+    procedure GetAttributeBoolean(XmlElement: DotNet npNetXmlElement;Path: Text;Name: Text;Required: Boolean) Value: Boolean
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         TextValue: Text;
         FullPath: Text;
     begin
@@ -631,9 +631,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetAttributeCode(XmlElement: DotNet XmlElement;Path: Text;Name: Text;MaxLength: Integer;Required: Boolean) Value: Code[1024]
+    procedure GetAttributeCode(XmlElement: DotNet npNetXmlElement;Path: Text;Name: Text;MaxLength: Integer;Required: Boolean) Value: Code[1024]
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         TextValue: Text;
     begin
         //-NC2.19 [345261]
@@ -653,9 +653,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetAttributeDate(XmlElement: DotNet XmlElement;Path: Text;Name: Text;Required: Boolean) Value: Date
+    procedure GetAttributeDate(XmlElement: DotNet npNetXmlElement;Path: Text;Name: Text;Required: Boolean) Value: Date
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         TextValue: Text;
         FullPath: Text;
     begin
@@ -682,9 +682,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetAttributeDec(XmlElement: DotNet XmlElement;Path: Text;Name: Text;Required: Boolean) Value: Decimal
+    procedure GetAttributeDec(XmlElement: DotNet npNetXmlElement;Path: Text;Name: Text;Required: Boolean) Value: Decimal
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         TextValue: Text;
         FullPath: Text;
     begin
@@ -711,9 +711,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetAttributeDT(XmlElement: DotNet XmlElement;Path: Text;Name: Text;Required: Boolean) Value: DateTime
+    procedure GetAttributeDT(XmlElement: DotNet npNetXmlElement;Path: Text;Name: Text;Required: Boolean) Value: DateTime
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         TextValue: Text;
         FullPath: Text;
     begin
@@ -740,9 +740,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetAttributeGuid(XmlElement: DotNet XmlElement;Path: Text;Name: Text;Required: Boolean) Value: Guid
+    procedure GetAttributeGuid(XmlElement: DotNet npNetXmlElement;Path: Text;Name: Text;Required: Boolean) Value: Guid
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         TextValue: Text;
         FullPath: Text;
     begin
@@ -769,9 +769,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetAttributeInt(XmlElement: DotNet XmlElement;Path: Text;Name: Text;Required: Boolean) Value: Integer
+    procedure GetAttributeInt(XmlElement: DotNet npNetXmlElement;Path: Text;Name: Text;Required: Boolean) Value: Integer
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         TextValue: Text;
         FullPath: Text;
     begin
@@ -798,9 +798,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetAttributeText(XmlElement: DotNet XmlElement;Path: Text;Name: Text;MaxLength: Integer;Required: Boolean) Value: Text
+    procedure GetAttributeText(XmlElement: DotNet npNetXmlElement;Path: Text;Name: Text;MaxLength: Integer;Required: Boolean) Value: Text
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         //-NC2.19 [345261]
         XmlElement2 := XmlElement;
@@ -817,9 +817,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetAttributeTime(XmlElement: DotNet XmlElement;Path: Text;Name: Text;Required: Boolean) Value: Time
+    procedure GetAttributeTime(XmlElement: DotNet npNetXmlElement;Path: Text;Name: Text;Required: Boolean) Value: Time
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         TextValue: Text;
         FullPath: Text;
     begin
@@ -846,9 +846,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetAttributeDuration(XmlElement: DotNet XmlElement;Path: Text;Name: Text;Required: Boolean) Value: Duration
+    procedure GetAttributeDuration(XmlElement: DotNet npNetXmlElement;Path: Text;Name: Text;Required: Boolean) Value: Duration
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         TextValue: Text;
         FullPath: Text;
     begin
@@ -883,7 +883,7 @@ codeunit 6151554 "NpXml Dom Mgt."
 
     procedure GetDotNetTime(Provider: Text): Text
     var
-        DotNetDateTime: DotNet DateTime;
+        DotNetDateTime: DotNet npNetDateTime;
     begin
         //-NC2.19 [342218]
         DotNetDateTime := DotNetDateTime.Now();
@@ -893,9 +893,9 @@ codeunit 6151554 "NpXml Dom Mgt."
 
     procedure ComputeSha256Hash("Key": Text;Value: Text;EncodingName: Text) Hash: Text
     var
-        BitConverter: DotNet BitConverter;
-        Encoding: DotNet Encoding;
-        HmacSha256: DotNet HMACSHA256;
+        BitConverter: DotNet npNetBitConverter;
+        Encoding: DotNet npNetEncoding;
+        HmacSha256: DotNet npNetHMACSHA256;
     begin
         //-NC2.19 [342218]
         Encoding := Encoding.GetEncoding(EncodingName);
@@ -907,8 +907,8 @@ codeunit 6151554 "NpXml Dom Mgt."
 
     procedure ToBase64String(Input: Text;EncodingName: Text): Text
     var
-        Convert: DotNet Convert;
-        Encoding: DotNet Encoding;
+        Convert: DotNet npNetConvert;
+        Encoding: DotNet npNetEncoding;
     begin
         //-NC2.19 [342218]
         Encoding := Encoding.GetEncoding(EncodingName);
@@ -920,10 +920,10 @@ codeunit 6151554 "NpXml Dom Mgt."
     begin
     end;
 
-    procedure GetWebExceptionMessage(var WebException: DotNet WebException) ExceptionMessage: Text
+    procedure GetWebExceptionMessage(var WebException: DotNet npNetWebException) ExceptionMessage: Text
     var
-        HttpWebResponse: DotNet HttpWebResponse;
-        InnerWebException: DotNet WebException;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        InnerWebException: DotNet npNetWebException;
         LastErrorText: Text;
     begin
         //-NC2.19 [345261]
@@ -960,9 +960,9 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetWebExceptionInnerMessage(var WebException: DotNet WebException) ExceptionMessage: Text
+    procedure GetWebExceptionInnerMessage(var WebException: DotNet npNetWebException) ExceptionMessage: Text
     var
-        InnerWebException: DotNet WebException;
+        InnerWebException: DotNet npNetWebException;
     begin
         //-NC2.01 [256392]
         // ASSERTERROR BEGIN
@@ -983,12 +983,12 @@ codeunit 6151554 "NpXml Dom Mgt."
         exit('');
     end;
 
-    procedure GetWebResponseText(var HttpWebResponse: DotNet HttpWebResponse) ResponseText: Text
+    procedure GetWebResponseText(var HttpWebResponse: DotNet npNetHttpWebResponse) ResponseText: Text
     var
-        HttpWebException: DotNet WebException;
-        BinaryReader: DotNet BinaryReader;
-        Stream: DotNet Stream;
-        StreamReader: DotNet StreamReader;
+        HttpWebException: DotNet npNetWebException;
+        BinaryReader: DotNet npNetBinaryReader;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
         APIUsername: Text;
         ElementName: Text;
         Response: Text;
@@ -1014,7 +1014,7 @@ codeunit 6151554 "NpXml Dom Mgt."
         exit('');
     end;
 
-    procedure SendWebRequest(var XmlDoc: DotNet XmlDocument;HttpWebRequest: DotNet HttpWebRequest;var HttpWebResponse: DotNet HttpWebResponse;var WebException: DotNet WebException): Boolean
+    procedure SendWebRequest(var XmlDoc: DotNet npNetXmlDocument;HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse;var WebException: DotNet npNetWebException): Boolean
     begin
         //-NC2.01 [256392]
         // ASSERTERROR BEGIN
@@ -1053,7 +1053,7 @@ codeunit 6151554 "NpXml Dom Mgt."
         exit(false);
     end;
 
-    procedure SendWebRequestText(Request: Text;HttpWebRequest: DotNet HttpWebRequest;var HttpWebResponse: DotNet HttpWebResponse;var WebException: DotNet WebException): Boolean
+    procedure SendWebRequestText(Request: Text;HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse;var WebException: DotNet npNetWebException): Boolean
     begin
         //-NC2.05 [265609]
         if TryGetWebResponseText(Request,HttpWebRequest,HttpWebResponse) then
@@ -1073,16 +1073,16 @@ codeunit 6151554 "NpXml Dom Mgt."
         exit(false);
     end;
 
-    procedure SetTrustedCertificateValidation(var HttpWebRequest: DotNet HttpWebRequest)
+    procedure SetTrustedCertificateValidation(var HttpWebRequest: DotNet npNetHttpWebRequest)
     var
-        NpWebRequest: DotNet NpWebRequest;
+        NpWebRequest: DotNet npNetNpWebRequest;
     begin
         NpWebRequest := NpWebRequest.NpWebRequest;
         NpWebRequest.SetTrustedCertificateValidation(HttpWebRequest);
     end;
 
     [TryFunction]
-    local procedure TryGetInnerWebException(var WebException: DotNet WebException;var InnerWebException: DotNet WebException)
+    local procedure TryGetInnerWebException(var WebException: DotNet npNetWebException;var InnerWebException: DotNet npNetWebException)
     begin
         //-NC2.01 [256392]
         InnerWebException := WebException.InnerException;
@@ -1090,7 +1090,7 @@ codeunit 6151554 "NpXml Dom Mgt."
     end;
 
     [TryFunction]
-    procedure TryGetWebExceptionResponse(var WebException: DotNet WebException;var HttpWebResponse: DotNet HttpWebResponse)
+    procedure TryGetWebExceptionResponse(var WebException: DotNet npNetWebException;var HttpWebResponse: DotNet npNetHttpWebResponse)
     begin
         //-NC2.01 [256392]
         HttpWebResponse := WebException.Response;
@@ -1098,9 +1098,9 @@ codeunit 6151554 "NpXml Dom Mgt."
     end;
 
     [TryFunction]
-    local procedure TryGetWebResponse(var XmlDoc: DotNet XmlDocument;HttpWebRequest: DotNet HttpWebRequest;var HttpWebResponse: DotNet HttpWebResponse)
+    local procedure TryGetWebResponse(var XmlDoc: DotNet npNetXmlDocument;HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse)
     var
-        MemoryStream: DotNet MemoryStream;
+        MemoryStream: DotNet npNetMemoryStream;
     begin
         //-NC2.01 [256392]
         MemoryStream := HttpWebRequest.GetRequestStream;
@@ -1114,10 +1114,10 @@ codeunit 6151554 "NpXml Dom Mgt."
     end;
 
     [TryFunction]
-    local procedure TryGetWebResponseText(var Request: Text;HttpWebRequest: DotNet HttpWebRequest;var HttpWebResponse: DotNet HttpWebResponse)
+    local procedure TryGetWebResponseText(var Request: Text;HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse)
     var
-        StreamWriter: DotNet StreamWriter;
-        Stream: DotNet Stream;
+        StreamWriter: DotNet npNetStreamWriter;
+        Stream: DotNet npNetStream;
     begin
         //-NC2.05 [265609]
         //-NC2.06 [288285]
@@ -1138,10 +1138,10 @@ codeunit 6151554 "NpXml Dom Mgt."
     end;
 
     [TryFunction]
-    local procedure TryReadResponseText(var HttpWebResponse: DotNet HttpWebResponse;var ResponseText: Text)
+    local procedure TryReadResponseText(var HttpWebResponse: DotNet npNetHttpWebResponse;var ResponseText: Text)
     var
-        Stream: DotNet Stream;
-        StreamReader: DotNet StreamReader;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
     begin
         //-NC2.01 [256392]
         Stream := HttpWebResponse.GetResponseStream;

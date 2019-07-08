@@ -199,7 +199,7 @@ codeunit 6014550 "RP Aux - Misc. Library"
 
     procedure IntToHex(BigInt: BigInteger): Text
     var
-        IntPtr: DotNet IntPtr;
+        IntPtr: DotNet npNetIntPtr;
     begin
         //-NPR5.48 [327107]
         IntPtr := IntPtr.IntPtr(BigInt);
@@ -209,10 +209,10 @@ codeunit 6014550 "RP Aux - Misc. Library"
 
     procedure StringToHex(Text: Text): Text
     var
-        Encoding: DotNet Encoding;
-        ByteArray: DotNet Array;
-        BitConverter: DotNet BitConverter;
-        Regex: DotNet Regex;
+        Encoding: DotNet npNetEncoding;
+        ByteArray: DotNet npNetArray;
+        BitConverter: DotNet npNetBitConverter;
+        Regex: DotNet npNetRegex;
     begin
         //-NPR5.48 [327107]
         exit(Regex.Replace(BitConverter.ToString(Encoding.Unicode.GetBytes(Text)), '-', ''));

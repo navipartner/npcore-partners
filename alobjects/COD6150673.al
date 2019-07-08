@@ -10,10 +10,10 @@ codeunit 6150673 "Retail Model Script Library"
     procedure InitAngular() Angular: Text
     var
         WebClientDependency: Record "Web Client Dependency";
-        MemoryStream: DotNet MemoryStream;
-        StreamReader: DotNet StreamReader;
-        Uri: DotNet Uri;
-        WebClient: DotNet WebClient;
+        MemoryStream: DotNet npNetMemoryStream;
+        StreamReader: DotNet npNetStreamReader;
+        Uri: DotNet npNetUri;
+        WebClient: DotNet npNetWebClient;
         InStr: InStream;
         OutStr: OutStream;
     begin
@@ -40,10 +40,10 @@ codeunit 6150673 "Retail Model Script Library"
     procedure InitJQueryUi() JQueryUI: Text
     var
         WebClientDependency: Record "Web Client Dependency";
-        MemoryStream: DotNet MemoryStream;
-        StreamReader: DotNet StreamReader;
-        Uri: DotNet Uri;
-        WebClient: DotNet WebClient;
+        MemoryStream: DotNet npNetMemoryStream;
+        StreamReader: DotNet npNetStreamReader;
+        Uri: DotNet npNetUri;
+        WebClient: DotNet npNetWebClient;
         InStr: InStream;
         OutStr: OutStream;
     begin
@@ -70,10 +70,10 @@ codeunit 6150673 "Retail Model Script Library"
     procedure InitTouchPunch() TouchPunch: Text
     var
         WebClientDependency: Record "Web Client Dependency";
-        MemoryStream: DotNet MemoryStream;
-        StreamReader: DotNet StreamReader;
-        Uri: DotNet Uri;
-        WebClient: DotNet WebClient;
+        MemoryStream: DotNet npNetMemoryStream;
+        StreamReader: DotNet npNetStreamReader;
+        Uri: DotNet npNetUri;
+        WebClient: DotNet npNetWebClient;
         InStr: InStream;
         OutStr: OutStream;
     begin

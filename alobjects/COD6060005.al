@@ -128,20 +128,20 @@ codeunit 6060005 "GIM - File Fetch"
     local procedure FetchAndProcess(ObjectType: Option File,Folder;FolderPathOrFileName: Text;FileAction: Option Archive,Delete;ArchiveFolderPath: Text;DataSourceHere: Integer)
     var
         [RunOnClient]
-        DirectoryInfo: DotNet DirectoryInfo;
+        DirectoryInfo: DotNet npNetDirectoryInfo;
         [RunOnClient]
-        FileInfo: DotNet FileInfo;
+        FileInfo: DotNet npNetFileInfo;
         [RunOnClient]
-        List: DotNet List_Of_T;
+        List: DotNet npNetList_Of_T;
         [RunOnClient]
-        Enumerator: DotNet IEnumerator;
+        Enumerator: DotNet npNetIEnumerator;
         [RunOnClient]
-        Obj: DotNet Object;
+        Obj: DotNet npNetObject;
         [RunOnClient]
-        Folder: DotNet Directory;
+        Folder: DotNet npNetDirectory;
         i: Integer;
         [RunOnClient]
-        FileDotNet: DotNet File;
+        FileDotNet: DotNet npNetFile;
     begin
         case ObjectType of
           ObjectType::File:

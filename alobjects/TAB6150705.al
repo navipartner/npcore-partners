@@ -70,7 +70,7 @@ table 6150705 "POS Parameter Value"
     }
 
     var
-        OptionStringCache: DotNet Dictionary_Of_T_U;
+        OptionStringCache: DotNet npNetDictionary_Of_T_U;
         ParamFilterIndicator: Boolean;
 
     procedure InitForMenuButton(MenuButton: Record "POS Menu Button")
@@ -138,10 +138,10 @@ table 6150705 "POS Parameter Value"
         Value := Param."Default Value";
     end;
 
-    procedure AddParameterToAction(Target: DotNet Action)
+    procedure AddParameterToAction(Target: DotNet npNetAction)
     var
         Param: Record "POS Action Parameter";
-        OptionsDict: DotNet Dictionary_Of_T_U;
+        OptionsDict: DotNet npNetDictionary_Of_T_U;
         Date: Date;
         Decimal: Decimal;
         "Integer": Integer;
@@ -194,10 +194,10 @@ table 6150705 "POS Parameter Value"
         end;
     end;
 
-    procedure AddParameterToJObject(Target: DotNet JObject)
+    procedure AddParameterToJObject(Target: DotNet npNetJObject)
     var
         Param: Record "POS Action Parameter";
-        JProperty: DotNet JProperty;
+        JProperty: DotNet npNetJProperty;
         Date: Date;
         Decimal: Decimal;
         "Integer": Integer;
@@ -246,7 +246,7 @@ table 6150705 "POS Parameter Value"
     var
         TempRetailList: Record "Retail List" temporary;
         POSActionParamMgt: Codeunit "POS Action Parameter Mgt.";
-        Parts: DotNet Array;
+        Parts: DotNet npNetArray;
         Options: Text;
         "Part": Text;
         OptionsCaption: Text;

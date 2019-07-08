@@ -30,8 +30,8 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
 
     procedure GenerateTicketPrint(EntryNo: Integer;MarkTicketAsPrinted: Boolean;var FailReasonText: Text): Boolean
     var
-        TicketRequestXml: DotNet XmlDocument;
-        ServiceResponse: DotNet XmlDocument;
+        TicketRequestXml: DotNet npNetXmlDocument;
+        ServiceResponse: DotNet npNetXmlDocument;
         TicketReservationRequest: Record "TM Ticket Reservation Request";
         ErrorCode: Code[10];
         ErrorText: Text;
@@ -118,21 +118,21 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
         exit (true);
     end;
 
-    local procedure WebServiceApi(var ReasonText: Text;var XmlDocIn: DotNet XmlDocument;var XmlDocOut: DotNet XmlDocument): Boolean
+    local procedure WebServiceApi(var ReasonText: Text;var XmlDocIn: DotNet npNetXmlDocument;var XmlDocOut: DotNet npNetXmlDocument): Boolean
     var
         TicketSetup: Record "TM Ticket Setup";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        Convert: DotNet Convert;
+        Credential: DotNet npNetNetworkCredential;
+        Convert: DotNet npNetConvert;
         B64Credential: Text[200];
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
-        WebInnerException: DotNet WebException;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
+        WebInnerException: DotNet npNetWebException;
         Url: Text;
         ErrorMessage: Text;
         ResponseText: Text;
-        Exception: DotNet Exception;
+        Exception: DotNet npNetException;
         StatusCode: Code[10];
         StatusDescription: Text[50];
         "---": Integer;
@@ -204,9 +204,9 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
     end;
 
     [TryFunction]
-    local procedure TrySendWebRequest(var XmlDoc: DotNet XmlDocument;HttpWebRequest: DotNet HttpWebRequest;var HttpWebResponse: DotNet HttpWebResponse)
+    local procedure TrySendWebRequest(var XmlDoc: DotNet npNetXmlDocument;HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse)
     var
-        MemoryStream: DotNet MemoryStream;
+        MemoryStream: DotNet npNetMemoryStream;
     begin
 
         MemoryStream := HttpWebRequest.GetRequestStream;
@@ -218,10 +218,10 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
     end;
 
     [TryFunction]
-    local procedure TryReadResponseText(var HttpWebResponse: DotNet HttpWebResponse;var ResponseText: Text)
+    local procedure TryReadResponseText(var HttpWebResponse: DotNet npNetHttpWebResponse;var ResponseText: Text)
     var
-        Stream: DotNet Stream;
-        StreamReader: DotNet StreamReader;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
     begin
 
         StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream());
@@ -231,14 +231,14 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
     end;
 
     [TryFunction]
-    local procedure TryReadExceptionResponseText(var WebException: DotNet WebException;var StatusCode: Code[10];var StatusDescription: Text;var ResponseXml: Text)
+    local procedure TryReadExceptionResponseText(var WebException: DotNet npNetWebException;var StatusCode: Code[10];var StatusDescription: Text;var ResponseXml: Text)
     var
-        Stream: DotNet Stream;
-        StreamReader: DotNet StreamReader;
-        WebResponse: DotNet WebResponse;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebExceptionStatus: DotNet WebExceptionStatus;
-        SystemConvert: DotNet Convert;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
+        WebResponse: DotNet npNetWebResponse;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebExceptionStatus: DotNet npNetWebExceptionStatus;
+        SystemConvert: DotNet npNetConvert;
         StatusCodeInt: Integer;
     begin
 
@@ -273,9 +273,9 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
     local procedure ToBase64(StringToEncode: Text) B64String: Text
     var
         TempBlob: Record TempBlob temporary;
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
         Outstr: OutStream;
     begin
@@ -299,7 +299,7 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
     begin
     end;
 
-    local procedure CreatTicketPrintOrderXml(var XmlDoc: DotNet XmlDocument;var Token: Text[100];MarkTicketAsPrinted: Boolean)
+    local procedure CreatTicketPrintOrderXml(var XmlDoc: DotNet npNetXmlDocument;var Token: Text[100];MarkTicketAsPrinted: Boolean)
     var
         XmlText: Text;
         TempBlob: Record TempBlob temporary;
@@ -330,11 +330,11 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
         if (UserId = 'TSA') then Message (XmlText);
     end;
 
-    local procedure WebExceptionResponse(var XmlDoc: DotNet XmlDocument;var ErrorCode: Code[10];var ErrorText: Text): Boolean
+    local procedure WebExceptionResponse(var XmlDoc: DotNet npNetXmlDocument;var ErrorCode: Code[10];var ErrorText: Text): Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         ElementPath: Text;
         Parameter: Text;
         Value: Text;

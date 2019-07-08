@@ -20,7 +20,7 @@ codeunit 6014492 "NPR Environment Mgt."
     procedure ClientEnvironment(Property: Text[50]) Value: Text[1024]
     var
         [RunOnClient]
-        Environment: DotNet Environment;
+        Environment: DotNet npNetEnvironment;
     begin
         //-NPR5.23 [239435]
         if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Desktop])then
@@ -33,7 +33,7 @@ codeunit 6014492 "NPR Environment Mgt."
     procedure ServerEnvironment(Property: Text[50]) Value: Text
     var
         [RunOnClient]
-        Environment: DotNet Environment;
+        Environment: DotNet npNetEnvironment;
     begin
         //-NPR5.23 [239435]
         if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Desktop])then
@@ -50,7 +50,7 @@ codeunit 6014492 "NPR Environment Mgt."
     procedure GetWindowsPrincipalUsername(): Text
     var
         [RunOnClient]
-        WindowsIndenty: DotNet WindowsIdentity;
+        WindowsIndenty: DotNet npNetWindowsIdentity;
     begin
         //-NPR5.23 [239435]
         if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Desktop])then
@@ -63,7 +63,7 @@ codeunit 6014492 "NPR Environment Mgt."
     procedure GetOSVersion(): Text[50]
     var
         [RunOnClient]
-        Environment: DotNet Environment;
+        Environment: DotNet npNetEnvironment;
     begin
         //#-238210
         if (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Desktop])then

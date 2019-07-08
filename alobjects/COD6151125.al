@@ -66,7 +66,7 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
-    local procedure OnDiscover(DataSourceName: Text;Extensions: DotNet List_Of_T)
+    local procedure OnDiscover(DataSourceName: Text;Extensions: DotNet npNetList_Of_T)
     begin
         if DataSourceName <> 'BUILTIN_SALELINE' then
           exit;
@@ -77,9 +77,9 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
-    local procedure OnGetExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet DataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    local procedure OnGetExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
     var
-        DataType: DotNet DataType;
+        DataType: DotNet npNetDataType;
     begin
         if DataSourceName <> 'BUILTIN_SALELINE' then
           exit;
@@ -92,7 +92,7 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
-    local procedure OnReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet DataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet npNetDataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         ItemAddOn: Record "NpIa Item AddOn";
         SaleLinePOS: Record "Sale Line POS";
@@ -214,8 +214,8 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
 
     local procedure FormatJson(Value: Text) JsonValue: Text
     var
-        JsonConvert: DotNet JsonConvert;
-        Formatting: DotNet Formatting;
+        JsonConvert: DotNet npNetJsonConvert;
+        Formatting: DotNet npNetFormatting;
     begin
         //-NPR5.50 [355080]
         JsonValue := JsonConvert.SerializeObject(Value,Formatting.None);
@@ -229,11 +229,11 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
     begin
     end;
 
-    procedure InsertPOSAddOnLines(NpIaItemAddOn: Record "NpIa Item AddOn";AddOnLines: DotNet JToken;POSSession: Codeunit "POS Session";AppliesToLineNo: Integer)
+    procedure InsertPOSAddOnLines(NpIaItemAddOn: Record "NpIa Item AddOn";AddOnLines: DotNet npNetJToken;POSSession: Codeunit "POS Session";AppliesToLineNo: Integer)
     var
         SaleLinePOS: Record "Sale Line POS";
-        AddOnLine: DotNet JToken;
-        AddOnLineList: DotNet IList;
+        AddOnLine: DotNet npNetJToken;
+        AddOnLineList: DotNet npNetIList;
     begin
         //-NPR5.48 [334922]
         AddOnLineList := AddOnLines.SelectTokens('$[?(@[''line_no''] > 0)]');
@@ -244,7 +244,7 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
         //+NPR5.48 [334922]
     end;
 
-    procedure InsertPOSAddOnLine(NpIaItemAddOn: Record "NpIa Item AddOn";AddOnLine: DotNet JToken;POSSession: Codeunit "POS Session";AppliesToLineNo: Integer;var SaleLinePOS: Record "Sale Line POS"): Boolean
+    procedure InsertPOSAddOnLine(NpIaItemAddOn: Record "NpIa Item AddOn";AddOnLine: DotNet npNetJToken;POSSession: Codeunit "POS Session";AppliesToLineNo: Integer;var SaleLinePOS: Record "Sale Line POS"): Boolean
     var
         NpIaItemAddOnLine: Record "NpIa Item AddOn Line";
         SaleLinePOSAddOn: Record "NpIa Sale Line POS AddOn";
@@ -329,7 +329,7 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
         //+NPR5.48 [334922]
     end;
 
-    local procedure InsertPOSAddOnLineComment(AddOnLine: DotNet JToken;NpIaItemAddOn: Record "NpIa Item AddOn";var SaleLinePOS: Record "Sale Line POS")
+    local procedure InsertPOSAddOnLineComment(AddOnLine: DotNet npNetJToken;NpIaItemAddOn: Record "NpIa Item AddOn";var SaleLinePOS: Record "Sale Line POS")
     var
         POSInfo: Record "POS Info";
         POSInfoTransaction: Record "POS Info Transaction";
@@ -381,10 +381,10 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
         //+NPR5.48 [334922]
     end;
 
-    local procedure ParsePOSAddOnLine(NpIaItemAddOn: Record "NpIa Item AddOn";AddOnLine: DotNet JToken;var NpIaItemAddOnLine: Record "NpIa Item AddOn Line")
+    local procedure ParsePOSAddOnLine(NpIaItemAddOn: Record "NpIa Item AddOn";AddOnLine: DotNet npNetJToken;var NpIaItemAddOnLine: Record "NpIa Item AddOn Line")
     var
         NpIaItemAddOnLineOption: Record "NpIa Item AddOn Line Option";
-        AddOnLineVariant: DotNet JToken;
+        AddOnLineVariant: DotNet npNetJToken;
         LineNo: Integer;
         SelectedVariant: Integer;
     begin
@@ -442,9 +442,9 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
     begin
     end;
 
-    local procedure GetValueAsString(JToken: DotNet JToken;JPath: Text): Text
+    local procedure GetValueAsString(JToken: DotNet npNetJToken;JPath: Text): Text
     var
-        JToken2: DotNet JToken;
+        JToken2: DotNet npNetJToken;
     begin
         //-NPR5.48 [334922]
         JToken2 := JToken.SelectToken(JPath);
@@ -455,9 +455,9 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
         //+NPR5.48 [334922]
     end;
 
-    local procedure GetValueAsInt(JToken: DotNet JToken;JPath: Text) IntValue: Integer
+    local procedure GetValueAsInt(JToken: DotNet npNetJToken;JPath: Text) IntValue: Integer
     var
-        JToken2: DotNet JToken;
+        JToken2: DotNet npNetJToken;
     begin
         //-NPR5.48 [334922]
         JToken2 := JToken.SelectToken(JPath);
@@ -471,9 +471,9 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
         //+NPR5.48 [334922]
     end;
 
-    local procedure GetValueAsDec(JToken: DotNet JToken;JPath: Text) DecValue: Decimal
+    local procedure GetValueAsDec(JToken: DotNet npNetJToken;JPath: Text) DecValue: Decimal
     var
-        JToken2: DotNet JToken;
+        JToken2: DotNet npNetJToken;
     begin
         //-NPR5.48 [334922]
         JToken2 := JToken.SelectToken(JPath);
@@ -510,7 +510,7 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
     local procedure GetItemAddOnComment(NpIaItemAddOn: Record "NpIa Item AddOn";SaleLinePOS: Record "Sale Line POS") Comment: Text
     var
         POSInfoTransaction: Record "POS Info Transaction";
-        NavContent: DotNet String;
+        NavContent: DotNet npNetString;
     begin
         //-NPR5.48 [334922]
         POSInfoTransaction.SetRange("POS Info Code",NpIaItemAddOn."Comment POS Info Code");

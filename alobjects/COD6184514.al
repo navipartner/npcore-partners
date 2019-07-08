@@ -11,7 +11,7 @@ codeunit 6184514 "EFT MobilePay Protocol"
     end;
 
     var
-        Model: DotNet Model;
+        Model: DotNet npNetModel;
         ActiveModelID: Guid;
         EntryNo: Integer;
         EFTMobilePayIntegration: Codeunit "EFT MobilePay Integration";
@@ -56,7 +56,7 @@ codeunit 6184514 "EFT MobilePay Protocol"
     local procedure CreateUserInterface(EFTTransactionRequest: Record "EFT Transaction Request")
     var
         WebClientDependency: Record "Web Client Dependency";
-        Factory: DotNet ControlFactory;
+        Factory: DotNet npNetControlFactory;
     begin
         Model := Model.Model();
         Model.Append(
@@ -227,7 +227,7 @@ codeunit 6184514 "EFT MobilePay Protocol"
     begin
     end;
 
-    trigger Model::OnModelControlEvent(control: DotNet Control;eventName: Text;data: DotNet Dictionary_Of_T_U)
+    trigger Model::OnModelControlEvent(control: DotNet npNetControl;eventName: Text;data: DotNet npNetDictionary_Of_T_U)
     begin
     end;
 

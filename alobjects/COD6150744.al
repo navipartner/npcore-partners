@@ -16,7 +16,7 @@ codeunit 6150744 "POS Keyboard Binding Mgt."
         KeyBindFormatErr: Label 'Keybind must begin with a supported key.';
         ProcessNotSupportedErr: Label 'This process is no longer supported.';
 
-    procedure DiscoverKeyboardBindings(var KeyboardBindings: DotNet List_Of_T)
+    procedure DiscoverKeyboardBindings(var KeyboardBindings: DotNet npNetList_Of_T)
     var
         POSKeyboardBindingSetupTemp: Record "POS Keyboard Binding Setup" temporary;
     begin
@@ -119,7 +119,7 @@ codeunit 6150744 "POS Keyboard Binding Mgt."
           until POSKeyboardBindingSetup.Next = 0;
     end;
 
-    local procedure BuildKeyCollection(var KeyboardBindings: DotNet List_Of_T)
+    local procedure BuildKeyCollection(var KeyboardBindings: DotNet npNetList_Of_T)
     var
         POSKeyboardBindingSetup: Record "POS Keyboard Binding Setup";
     begin
@@ -146,10 +146,10 @@ codeunit 6150744 "POS Keyboard Binding Mgt."
     var
         AvailablePOSKeybindTemp: Record "Available POS Keybind" temporary;
         AvailablePOSKeybind: Record "Available POS Keybind";
-        "Keys": DotNet Keys;
-        "Key": DotNet Keys;
-        StringArray: DotNet Array;
-        Type: DotNet Type;
+        "Keys": DotNet npNetKeys;
+        "Key": DotNet npNetKeys;
+        StringArray: DotNet npNetArray;
+        Type: DotNet npNetType;
         EntryNo: Integer;
     begin
         Type := GetDotNetType(Keys);
@@ -326,7 +326,7 @@ codeunit 6150744 "POS Keyboard Binding Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', true, true)]
-    local procedure InvokeKeyPressMethod(Method: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure InvokeKeyPressMethod(Method: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         POSKeyboardBindingSetup: Record "POS Keyboard Binding Setup";
         JSON: Codeunit "POS JSON Management";

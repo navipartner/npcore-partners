@@ -15,9 +15,9 @@ codeunit 6059956 "MCS Webcam API"
         PersonGroupsSetup: Record "MCS Person Groups Setup";
         PersonGroups: Record "MCS Person Groups";
         OutS: OutStream;
-        Convert: DotNet Convert;
-        Bytes: DotNet Array;
-        MemoryStream: DotNet MemoryStream;
+        Convert: DotNet npNetConvert;
+        Bytes: DotNet npNetArray;
+        MemoryStream: DotNet npNetMemoryStream;
         ProxyDialog: Page "Proxy Dialog";
         WebcamProxy: Codeunit "MCS Webcam Proxy";
         Txt001: Label 'Member card is blocked';

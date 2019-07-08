@@ -31,9 +31,9 @@ codeunit 6014600 "Security Protocol Switcher"
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterCompanyOpen', '', false, false)]
     local procedure OnAfterCompanyOpen()
     var
-        ServicePointManager: DotNet ServicePointManager;
-        SecurityProtocolType: DotNet SecurityProtocolType;
-        NewSecurityProtocol: DotNet SecurityProtocolType;
+        ServicePointManager: DotNet npNetServicePointManager;
+        SecurityProtocolType: DotNet npNetSecurityProtocolType;
+        NewSecurityProtocol: DotNet npNetSecurityProtocolType;
     begin
         //-NPR5.41 [311962]
         //-NPR5.40.02 [311401]

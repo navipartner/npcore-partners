@@ -979,11 +979,11 @@ codeunit 6060150 "Event Management"
         TempBlob2: Record TempBlob;
         FileMgt: Codeunit "File Management";
         [RunOnClient]
-        WordApplication: DotNet ApplicationClass;
+        WordApplication: DotNet npNetApplicationClass;
         [RunOnClient]
-        WordDocument: DotNet Document;
+        WordDocument: DotNet npNetDocument;
         [RunOnClient]
-        WdWindowState: DotNet WdWindowState;
+        WdWindowState: DotNet npNetWdWindowState;
         FileName: Text;
         NewFileName: Text;
         NewFileName2: Text;

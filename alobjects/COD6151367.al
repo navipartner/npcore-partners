@@ -27,9 +27,9 @@ codeunit 6151367 "CS UI Warehouse Shipment"
         CSCommunication: Codeunit "CS Communication";
         CSMgt: Codeunit "CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet XmlDocument;
-        ReturnedNode: DotNet XmlNode;
-        RootNode: DotNet XmlNode;
+        DOMxmlin: DotNet npNetXmlDocument;
+        ReturnedNode: DotNet npNetXmlNode;
+        RootNode: DotNet npNetXmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -75,9 +75,9 @@ codeunit 6151367 "CS UI Warehouse Shipment"
         CSWarehouseShipmentHandling: Record "CS Warehouse Shipment Handling";
         CSWarehouseShipmentHandling2: Record "CS Warehouse Shipment Handling";
         CSFieldDefaults: Record "CS Field Defaults";
-        CommaString: DotNet String;
-        Values: DotNet Array;
-        Separator: DotNet String;
+        CommaString: DotNet npNetString;
+        Values: DotNet npNetArray;
+        Separator: DotNet npNetString;
         Value: Text;
         ActionIndex: Integer;
     begin
@@ -246,7 +246,7 @@ codeunit 6151367 "CS UI Warehouse Shipment"
 
     local procedure SendForm(InputField: Integer;CSWarehouseShipmentHandling: Record "CS Warehouse Shipment Handling")
     var
-        Records: DotNet XmlElement;
+        Records: DotNet npNetXmlElement;
     begin
         CSCommunication.EncodeUI(MiniformHeader,StackCode,DOMxmlin,InputField,Remark,CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
@@ -413,16 +413,16 @@ codeunit 6151367 "CS UI Warehouse Shipment"
         CSWarehouseShipmentHandling.DeleteAll(true);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet XmlNode;AttribName: Text[250];AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: DotNet npNetXmlNode;AttribName: Text[250];AttribValue: Text[250])
     begin
         if XMLDOMMgt.AddAttribute(NewChild,AttribName,AttribValue) > 0 then
           Error(Text002,AttribName);
     end;
 
-    local procedure AddSummarize(var Records: DotNet XmlElement): Boolean
+    local procedure AddSummarize(var Records: DotNet npNetXmlElement): Boolean
     var
-        "Record": DotNet XmlElement;
-        Line: DotNet XmlElement;
+        "Record": DotNet npNetXmlElement;
+        Line: DotNet npNetXmlElement;
         Indicator: Text;
         CSWarehouseShipmentHandling: Record "CS Warehouse Shipment Handling";
         WhseShipmentLine: Record "Warehouse Shipment Line";
@@ -566,10 +566,10 @@ codeunit 6151367 "CS UI Warehouse Shipment"
           exit(false);
     end;
 
-    local procedure AddAdditionalInfo(var xmlout: DotNet XmlDocument;CSWarehouseShipmentHandling: Record "CS Warehouse Shipment Handling")
+    local procedure AddAdditionalInfo(var xmlout: DotNet npNetXmlDocument;CSWarehouseShipmentHandling: Record "CS Warehouse Shipment Handling")
     var
-        CurrentRootNode: DotNet XmlNode;
-        XMLFunctionNode: DotNet XmlNode;
+        CurrentRootNode: DotNet npNetXmlNode;
+        XMLFunctionNode: DotNet npNetXmlNode;
         StrMenuTxt: Text;
     begin
         StrMenuTxt := 'Ship,Ship and Invoice';
@@ -653,27 +653,27 @@ codeunit 6151367 "CS UI Warehouse Shipment"
         exit(true);
     end;
 
-    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 }

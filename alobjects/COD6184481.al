@@ -14,19 +14,19 @@ codeunit 6184481 "Pepper Begin Workshift"
 
     var
         POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
-        ExpectedResponseType: DotNet Type;
+        ExpectedResponseType: DotNet npNetType;
         ExpectedResponseId: Guid;
         ProtocolManagerId: Guid;
         ProtocolStage: Integer;
-        QueuedRequests: DotNet Stack;
-        QueuedResponseTypes: DotNet Stack;
+        QueuedRequests: DotNet npNetStack;
+        QueuedResponseTypes: DotNet npNetStack;
         "--RequestSpecific": Integer;
         InitializedRequest: Boolean;
-        StartWorkShiftRequest: DotNet StartWorkshiftRequest;
-        StartWorkShiftResponse: DotNet StartWorkshiftResponse;
-        ConfigDriver: DotNet ConfigDriverParam;
-        PepperOpen: DotNet OpenParam;
-        Labels: DotNet ProcessLabels;
+        StartWorkShiftRequest: DotNet npNetStartWorkshiftRequest;
+        StartWorkShiftResponse: DotNet npNetStartWorkshiftResponse;
+        ConfigDriver: DotNet npNetConfigDriverParam;
+        PepperOpen: DotNet npNetOpenParam;
+        Labels: DotNet npNetProcessLabels;
         PepperTerminalCaptions: Codeunit "Pepper Terminal Captions";
         LastRestCode: Integer;
 
@@ -36,10 +36,10 @@ codeunit 6184481 "Pepper Begin Workshift"
 
     local procedure ProcessSignal(var TempBlob: Record TempBlob)
     var
-        Signal: DotNet Signal;
-        StartSignal: DotNet StartSession;
-        QueryCloseSignal: DotNet QueryClosePage;
-        Response: DotNet MessageResponse;
+        Signal: DotNet npNetSignal;
+        StartSignal: DotNet npNetStartSession;
+        QueryCloseSignal: DotNet npNetQueryClosePage;
+        Response: DotNet npNetMessageResponse;
     begin
 
         POSDeviceProxyManager.DeserializeObject(Signal,TempBlob);
@@ -66,7 +66,7 @@ codeunit 6184481 "Pepper Begin Workshift"
     local procedure Start(ProtocolManagerIdIn: Guid)
     var
         WebClientDependency: Record "Web Client Dependency";
-        VoidResponse: DotNet VoidResponse;
+        VoidResponse: DotNet npNetVoidResponse;
     begin
         ProtocolManagerId := ProtocolManagerIdIn;
 
@@ -79,7 +79,7 @@ codeunit 6184481 "Pepper Begin Workshift"
              ProtocolManagerId, StartWorkShiftRequest));
     end;
 
-    local procedure MessageResponse(Envelope: DotNet ResponseEnvelope)
+    local procedure MessageResponse(Envelope: DotNet npNetResponseEnvelope)
     begin
         if Envelope.ResponseTypeName <> Format(ExpectedResponseType) then
           Error('Unknown response type: %1 (expected %2)',Envelope.ResponseTypeName,Format(ExpectedResponseType));
@@ -95,7 +95,7 @@ codeunit 6184481 "Pepper Begin Workshift"
         POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
     end;
 
-    local procedure AwaitResponse(Type: DotNet Type;Id: Guid)
+    local procedure AwaitResponse(Type: DotNet npNetType;Id: Guid)
     begin
         ExpectedResponseType := Type;
         ExpectedResponseId := Id;

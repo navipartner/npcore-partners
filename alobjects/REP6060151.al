@@ -476,8 +476,8 @@ report 6060151 "Event Team Template"
                 trigger OnAfterGetRecord()
                 var
                     NoteInStream: InStream;
-                    BinaryReader: DotNet BinaryReader;
-                    MemoryStream: DotNet MemoryStream;
+                    BinaryReader: DotNet npNetBinaryReader;
+                    MemoryStream: DotNet npNetMemoryStream;
                 begin
                     Clear(NoteText);
                     FromTo := '';

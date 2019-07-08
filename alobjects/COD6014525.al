@@ -48,7 +48,7 @@ codeunit 6014525 "DotNet File Library"
 
     var
         [RunOnClient]
-        FileWrap: DotNet FileWrapper;
+        FileWrap: DotNet npNetFileWrapper;
         IsInWriteMode: Boolean;
         IsInReadMode: Boolean;
         IsInTextmode: Boolean;
@@ -102,7 +102,7 @@ codeunit 6014525 "DotNet File Library"
 
     procedure READ(var Variable: Text): Integer
     var
-        Bytes: DotNet Byte;
+        Bytes: DotNet npNetByte;
         i: Integer;
     begin
         TestInit;
@@ -120,7 +120,7 @@ codeunit 6014525 "DotNet File Library"
     procedure SEEK(Position: Integer)
     var
         [RunOnClient]
-        SeekOriginDotNet: DotNet SeekOrigin;
+        SeekOriginDotNet: DotNet npNetSeekOrigin;
     begin
         TestInit;
         FileWrap.SEEK(Position);

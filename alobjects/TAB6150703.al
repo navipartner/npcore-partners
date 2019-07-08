@@ -123,9 +123,9 @@ table 6150703 "POS Action"
     var
         DiscoveredAction: Record "POS Action" temporary;
         POSSession: Codeunit "POS Session";
-        WorkflowObj: DotNet Workflow;
-        WorkflowInvocationParameters: DotNet Dictionary_Of_T_U;
-        WorkflowInvocationContext: DotNet Dictionary_Of_T_U;
+        WorkflowObj: DotNet npNetWorkflow;
+        WorkflowInvocationParameters: DotNet npNetDictionary_Of_T_U;
+        WorkflowInvocationContext: DotNet npNetDictionary_Of_T_U;
         ActionInDiscovery: Text;
         Text001: Label 'A workflow step cannot be registered because the Workflow object has not been instantiated.';
         Text002: Label 'Discovery has started for action %1 while discovery for action %2 has not yet completed.';
@@ -333,7 +333,7 @@ table 6150703 "POS Action"
     procedure RegisterWorkflowStep(Label: Text;"Code": Text)
     var
         FrontEnd: Codeunit "POS Front End Management";
-        WorkflowStep: DotNet WorkflowStep;
+        WorkflowStep: DotNet npNetWorkflowStep;
     begin
         if IsNull(WorkflowObj) then
           FrontEnd.ReportBug(Text001);
@@ -374,7 +374,7 @@ table 6150703 "POS Action"
     procedure RegisterWorkflow20("Code": Text)
     var
         FrontEnd: Codeunit "POS Front End Management";
-        WorkflowStep: DotNet WorkflowStep;
+        WorkflowStep: DotNet npNetWorkflowStep;
     begin
         //-NPR5.50 [338666]
         RequireVersion20();
@@ -490,9 +490,9 @@ table 6150703 "POS Action"
     [Scope('Personalization')]
     procedure RegisterCustomJavaScriptLogic(Method: Text;JavaScriptCode: Text)
     var
-        Dictionary: DotNet Dictionary_Of_T_U;
-        MemStr: DotNet MemoryStream;
-        StreamWriter: DotNet StreamWriter;
+        Dictionary: DotNet npNetDictionary_Of_T_U;
+        MemStr: DotNet npNetMemoryStream;
+        StreamWriter: DotNet npNetStreamWriter;
         OutStr: OutStream;
     begin
         //-NPR5.44 [286547]
@@ -592,8 +592,8 @@ table 6150703 "POS Action"
 
     local procedure StreamWorkflowToBlob()
     var
-        MemStr: DotNet MemoryStream;
-        StreamWriter: DotNet StreamWriter;
+        MemStr: DotNet npNetMemoryStream;
+        StreamWriter: DotNet npNetStreamWriter;
         OutStr: OutStream;
     begin
         Clear(Workflow);
@@ -604,14 +604,14 @@ table 6150703 "POS Action"
         StreamWriter.Close();
     end;
 
-    local procedure StreamCustomJavaScriptToBlob(Dictionary: DotNet Dictionary_Of_T_U)
+    local procedure StreamCustomJavaScriptToBlob(Dictionary: DotNet npNetDictionary_Of_T_U)
     var
-        Converters: DotNet Array;
-        Converter: DotNet JsonConverter;
-        KeyValuePairConverter: DotNet KeyValuePairConverter;
-        MemStr: DotNet MemoryStream;
-        StreamWriter: DotNet StreamWriter;
-        JsonConvert: DotNet JsonConvert;
+        Converters: DotNet npNetArray;
+        Converter: DotNet npNetJsonConverter;
+        KeyValuePairConverter: DotNet npNetKeyValuePairConverter;
+        MemStr: DotNet npNetMemoryStream;
+        StreamWriter: DotNet npNetStreamWriter;
+        JsonConvert: DotNet npNetJsonConvert;
         OutStr: OutStream;
     begin
         Converters := Converters.CreateInstance(GetDotNetType(Converter),1);
@@ -629,12 +629,12 @@ table 6150703 "POS Action"
     end;
 
     [Scope('Personalization')]
-    procedure GetCustomJavaScriptLogic(var "Object": DotNet Object)
+    procedure GetCustomJavaScriptLogic(var "Object": DotNet npNetObject)
     var
-        Dictionary: DotNet Dictionary_Of_T_U;
-        KeyValuePair: DotNet KeyValuePair_Of_T_U;
-        JObject: DotNet JObject;
-        StreamReader: DotNet StreamReader;
+        Dictionary: DotNet npNetDictionary_Of_T_U;
+        KeyValuePair: DotNet npNetKeyValuePair_Of_T_U;
+        JObject: DotNet npNetJObject;
+        StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
     begin
         //-NPR5.44 [286547]
@@ -653,11 +653,11 @@ table 6150703 "POS Action"
         Object := Dictionary;
     end;
 
-    local procedure CreateDotNetDict(var Dict: DotNet Dictionary_Of_T_U)
+    local procedure CreateDotNetDict(var Dict: DotNet npNetDictionary_Of_T_U)
     var
-        Type: DotNet Type;
-        Activator: DotNet Activator;
-        Arr: DotNet Array;
+        Type: DotNet npNetType;
+        Activator: DotNet npNetActivator;
+        Arr: DotNet npNetArray;
     begin
         Arr := Arr.CreateInstance(GetDotNetType(Type),2);
         Arr.SetValue(GetDotNetType(''),0);
@@ -694,7 +694,7 @@ table 6150703 "POS Action"
         exit(Value.IsBigInteger or Value.IsInteger or Value.IsChar);
     end;
 
-    local procedure SetWorkflowInvocationDictionary(var Dictionary: DotNet Dictionary_Of_T_U;Name: Text;Value: Variant)
+    local procedure SetWorkflowInvocationDictionary(var Dictionary: DotNet npNetDictionary_Of_T_U;Name: Text;Value: Variant)
     begin
         if IsNull(Dictionary) then
           Dictionary := Dictionary.Dictionary();
@@ -719,7 +719,7 @@ table 6150703 "POS Action"
     end;
 
     [Scope('Personalization')]
-    procedure GetWorkflowInvocationContext(var WorkflowInvocationParametersOut: DotNet Dictionary_Of_T_U;var WorkflowInvocationContextOut: DotNet Dictionary_Of_T_U)
+    procedure GetWorkflowInvocationContext(var WorkflowInvocationParametersOut: DotNet npNetDictionary_Of_T_U;var WorkflowInvocationContextOut: DotNet npNetDictionary_Of_T_U)
     begin
         WorkflowInvocationParametersOut := WorkflowInvocationParameters;
         WorkflowInvocationContextOut := WorkflowInvocationContext;
@@ -770,7 +770,7 @@ table 6150703 "POS Action"
     end;
 
     [IntegrationEvent(TRUE, false)]
-    local procedure OnRegisterActionWorkflow(Workflow: DotNet Workflow;var Handled: Boolean)
+    local procedure OnRegisterActionWorkflow(Workflow: DotNet npNetWorkflow;var Handled: Boolean)
     begin
     end;
 

@@ -61,7 +61,7 @@ codeunit 6150850 "POS Action - CK Payment"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
         JSON: Codeunit "POS JSON Management";
@@ -74,8 +74,8 @@ codeunit 6150850 "POS Action - CK Payment"
         PaidAmount: Decimal;
         SubTotal: Decimal;
         ReturnPaymentTypePOS: Record "Payment Type POS";
-        CurrentView: DotNet View0;
-        CurrentViewType: DotNet ViewType0;
+        CurrentView: DotNet npNetView0;
+        CurrentViewType: DotNet npNetViewType0;
         CashKeeperSetup: Record "CashKeeper Setup";
     begin
         if not Action.IsThisAction(ActionCode()) then
@@ -108,7 +108,7 @@ codeunit 6150850 "POS Action - CK Payment"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         EFTHandled: Boolean;
         PaymentTypeNo: Code[20];
@@ -257,7 +257,7 @@ codeunit 6150850 "POS Action - CK Payment"
     var
         PaymentTypeNo: Code[10];
         PaymentTypePOS: Record "Payment Type POS";
-        Context: DotNet JObject;
+        Context: DotNet npNetJObject;
         JSON: Codeunit "POS JSON Management";
         Txt001: Label 'CashKeeper error: %1 - %2';
         Txt002: Label 'Payment was cancelled';
@@ -347,7 +347,7 @@ codeunit 6150850 "POS Action - CK Payment"
         exit (Round(Amount, PaymentTypePOS."Rounding Precision", '='));
     end;
 
-    local procedure UpdatePaymentLine(CashKeeperTransaction: Record "CashKeeper Transaction";PaymentTypePOS: Record "Payment Type POS";Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management") Handled: Boolean
+    local procedure UpdatePaymentLine(CashKeeperTransaction: Record "CashKeeper Transaction";PaymentTypePOS: Record "Payment Type POS";Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management") Handled: Boolean
     var
         POSPaymentLine: Codeunit "POS Payment Line";
         AlternativTransactionRequest: Record "EFT Transaction Request";
@@ -412,9 +412,9 @@ codeunit 6150850 "POS Action - CK Payment"
 
     procedure OnInvokeDevice(var CashKeeperTransaction: Record "CashKeeper Transaction")
     var
-        CashKeeperRequest: DotNet CashKeeperRequest0;
-        State: DotNet State4;
-        StateEnum: DotNet State_Action2;
+        CashKeeperRequest: DotNet npNetCashKeeperRequest0;
+        State: DotNet npNetState4;
+        StateEnum: DotNet npNetState_Action2;
         CashKeeperSetup: Record "CashKeeper Setup";
         FrontEnd: Codeunit "POS Front End Management";
         POSSession: Codeunit "POS Session";
@@ -466,7 +466,7 @@ codeunit 6150850 "POS Action - CK Payment"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', true, true)]
-    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet ResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet npNetResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
         if (ActionName <> 'CK_PAYMENT') then
           exit;
@@ -492,7 +492,7 @@ codeunit 6150850 "POS Action - CK Payment"
 
     local procedure CloseForm(Data: Text)
     var
-        State: DotNet State4;
+        State: DotNet npNetState4;
         FrontEnd: Codeunit "POS Front End Management";
         CashKeeperTransaction: Record "CashKeeper Transaction";
         POSSession: Codeunit "POS Session";

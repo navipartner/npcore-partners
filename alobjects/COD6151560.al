@@ -39,9 +39,9 @@ codeunit 6151560 "NpXml Value Base64"
     local procedure GetBase64(RecRef: RecordRef;FieldNo: Integer) Value: Text
     var
         TempBlob: Record TempBlob temporary;
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         FieldRef: FieldRef;
         InStr: InStream;
         Outstr: OutStream;

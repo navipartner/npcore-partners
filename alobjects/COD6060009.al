@@ -7,9 +7,9 @@ codeunit 6060009 "GIM - Web Service"
 
     procedure SendFile(DocTypeCode: Text[10];SenderID: Text[20];FileHere: BigText;FileName: Text[250];FileExt: Text[10])
     var
-        Bytes: DotNet Array;
-        Convert: DotNet Convert;
-        MemoryStream: DotNet MemoryStream;
+        Bytes: DotNet npNetArray;
+        Convert: DotNet npNetConvert;
+        MemoryStream: DotNet npNetMemoryStream;
         MyStream: OutStream;
         WSFileReceive: Record "GIM - WS Received File";
         EntryNo: Integer;

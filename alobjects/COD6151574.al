@@ -52,19 +52,19 @@ codeunit 6151574 "AF API - Notification Hub"
 
     local procedure BuildRequest(var AFArgumentsNotificationHub: Record "AF Arguments - NotificationHub"): Boolean
     var
-        Parameters: DotNet Dictionary_Of_T_U;
+        Parameters: DotNet npNetDictionary_Of_T_U;
         AFManagement: Codeunit "AF Management";
         AFHelperFunctions: Codeunit "AF Helper Functions";
-        HttpResponseMessage: DotNet HttpResponseMessage;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
         Path: Text;
         Window: Dialog;
-        WebUtility: DotNet WebUtility;
-        ImageStream: DotNet MemoryStream;
+        WebUtility: DotNet npNetWebUtility;
+        ImageStream: DotNet npNetMemoryStream;
         OutStr: OutStream;
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
-        StringContent: DotNet StringContent;
-        Encoding: DotNet Encoding;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
+        StringContent: DotNet npNetStringContent;
+        Encoding: DotNet npNetEncoding;
         Request: BigText;
         Response: BigText;
         Ostream: OutStream;

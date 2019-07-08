@@ -8,8 +8,8 @@ codeunit 6151201 "NpCs Lookup Sales Document"
     var
         NpCsDocument: Record "NpCs Document";
         NpCsDocumentMapping: Record "NpCs Document Mapping";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
     begin
         if not Rec.LoadXmlDoc(XmlDoc) then
           Error(Text000);
@@ -38,9 +38,9 @@ codeunit 6151201 "NpCs Lookup Sales Document"
         Text000: Label 'Invalid Xml data';
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
 
-    local procedure MarkOrderMappings(XmlElement: DotNet XmlElement;var NpCsDocumentMapping: Record "NpCs Document Mapping")
+    local procedure MarkOrderMappings(XmlElement: DotNet npNetXmlElement;var NpCsDocumentMapping: Record "NpCs Document Mapping")
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         FromStore: Code[20];
         FromNo: Code[20];
     begin
@@ -70,7 +70,7 @@ codeunit 6151201 "NpCs Lookup Sales Document"
           NpCsDocumentMapping.Mark(true);
     end;
 
-    local procedure FindNpCsDocuments(XmlElement: DotNet XmlElement;var NpCsDocument: Record "NpCs Document"): Boolean
+    local procedure FindNpCsDocuments(XmlElement: DotNet npNetXmlElement;var NpCsDocument: Record "NpCs Document"): Boolean
     var
         DocType: Integer;
         DocNo: Text;
@@ -93,7 +93,7 @@ codeunit 6151201 "NpCs Lookup Sales Document"
         exit(NpCsDocument.FindFirst);
     end;
 
-    local procedure GetFromStoreCode(XmlElement: DotNet XmlElement) StoreCode: Code[20]
+    local procedure GetFromStoreCode(XmlElement: DotNet npNetXmlElement) StoreCode: Code[20]
     begin
         StoreCode := UpperCase(NpXmlDomMgt.GetAttributeText(XmlElement,'/*/sales_document/from_store','store_code',MaxStrLen(StoreCode),true));
         exit(StoreCode);

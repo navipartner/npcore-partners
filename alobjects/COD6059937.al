@@ -9,24 +9,24 @@ codeunit 6059937 "RSS Feed Channel Handling"
 
     procedure ImportRss(RssFeedChannelSub: Record "RSS Feed Channel Subscription";var RssReaderActivity: Record "RSS Reader Activity" temporary)
     var
-        XRss: DotNet XDocument;
-        SimplifiedRss: DotNet XDocument;
-        rss: DotNet XElement;
-        channel: DotNet XElement;
-        item: DotNet XElement;
+        XRss: DotNet npNetXDocument;
+        SimplifiedRss: DotNet npNetXDocument;
+        rss: DotNet npNetXElement;
+        channel: DotNet npNetXElement;
+        item: DotNet npNetXElement;
         FeedDate: Text;
-        xName: DotNet XName;
-        rssNew: DotNet XElement;
-        channelNew: DotNet XElement;
-        itemNew: DotNet XElement;
-        link: DotNet XElement;
-        title: DotNet XElement;
-        date: DotNet XElement;
-        list: DotNet IEnumerable_Of_T;
+        xName: DotNet npNetXName;
+        rssNew: DotNet npNetXElement;
+        channelNew: DotNet npNetXElement;
+        itemNew: DotNet npNetXElement;
+        link: DotNet npNetXElement;
+        title: DotNet npNetXElement;
+        date: DotNet npNetXElement;
+        list: DotNet npNetIEnumerable_Of_T;
         RssReaderActivityImport: XMLport "Rss Reader Activity Import";
-        MemoryStream: DotNet MemoryStream;
-        Encoding: DotNet UTF32Encoding;
-        DateTimeParser: DotNet DateTime;
+        MemoryStream: DotNet npNetMemoryStream;
+        Encoding: DotNet npNetUTF32Encoding;
+        DateTimeParser: DotNet npNetDateTime;
     begin
         XRss := XRss.Load(RssFeedChannelSub.Url);
         rss := XRss.Element(xName.Get('rss'));

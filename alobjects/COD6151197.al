@@ -16,12 +16,12 @@ codeunit 6151197 "NpCs Send Order"
     var
         NpCsStore: Record "NpCs Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         ExceptionMessage: Text;
     begin
         if not (NpCsDocument."Send Order Module" in ['',WorkflowCode()]) then
@@ -49,7 +49,7 @@ codeunit 6151197 "NpCs Send Order"
         end;
     end;
 
-    local procedure InitReqBody(NpCsDocument: Record "NpCs Document";var XmlDoc: DotNet XmlDocument)
+    local procedure InitReqBody(NpCsDocument: Record "NpCs Document";var XmlDoc: DotNet npNetXmlDocument)
     var
         Customer: Record Customer;
         NpCsStore: Record "NpCs Store";
@@ -176,8 +176,8 @@ codeunit 6151197 "NpCs Send Order"
     local procedure InitCallback(NpCsDocument: Record "NpCs Document") Callback: Text
     var
         NpCsStore: Record "NpCs Store";
-        Encoding: DotNet Encoding;
-        Convert: DotNet Convert;
+        Encoding: DotNet npNetEncoding;
+        Convert: DotNet npNetConvert;
     begin
         NpCsStore.Get(NpCsDocument."From Store Code");
         if NpCsStore."Service Url" = '' then

@@ -28,7 +28,7 @@ codeunit 6060116 "TM Ticket WebService Mgr"
 
     trigger OnRun()
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
         ImportType: Record "Nc Import Type";
         FunctionName: Text[100];
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
@@ -67,15 +67,15 @@ codeunit 6060116 "TM Ticket WebService Mgr"
         XML_NODE: Label '%1 not found (this is a programming error.)';
         MUST_BE_POSITIVE: Label 'Quantity must be positive.';
 
-    local procedure ImportTicketReservations(XmlDoc: DotNet XmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
+    local procedure ImportTicketReservations(XmlDoc: DotNet npNetXmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
     var
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
         TicketReservationResponse: Record "TM Ticket Reservation Response";
         TicketReservationRequest: Record "TM Ticket Reservation Request";
-        XmlElement: DotNet XmlElement;
-        XmlTokenElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
-        XmlTokenNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlTokenElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
+        XmlTokenNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         Token_i: Integer;
         Token: Text[50];
@@ -134,7 +134,7 @@ codeunit 6060116 "TM Ticket WebService Mgr"
           TicketRequestManager.DeleteReservationRequest (Token, false);
     end;
 
-    local procedure ImportTicketReservation(XmlElement: DotNet XmlElement;Token: Text[100];DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportTicketReservation(XmlElement: DotNet npNetXmlElement;Token: Text[100];DocumentID: Text[100]) Imported: Boolean
     var
         TicketReservationRequest: Record "TM Ticket Reservation Request";
         TicketReservationResponse: Record "TM Ticket Reservation Response";
@@ -149,10 +149,10 @@ codeunit 6060116 "TM Ticket WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportTicketPreConfirmation(XmlDoc: DotNet XmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
+    local procedure ImportTicketPreConfirmation(XmlDoc: DotNet npNetXmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         Token: Text[100];
         TicketReservationResponse: Record "TM Ticket Reservation Response";
@@ -215,11 +215,11 @@ codeunit 6060116 "TM Ticket WebService Mgr"
         end;
     end;
 
-    local procedure ImportTicketConfirmation(XmlDoc: DotNet XmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
+    local procedure ImportTicketConfirmation(XmlDoc: DotNet npNetXmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
     var
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         Token: Text[100];
         ResponseMessage: Text;
@@ -249,11 +249,11 @@ codeunit 6060116 "TM Ticket WebService Mgr"
         end;
     end;
 
-    local procedure ImportTicketCancelation(XmlDoc: DotNet XmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
+    local procedure ImportTicketCancelation(XmlDoc: DotNet npNetXmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
     var
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         Token: Text[100];
         TicketReservationResponse: Record "TM Ticket Reservation Response";
@@ -277,10 +277,10 @@ codeunit 6060116 "TM Ticket WebService Mgr"
         //XCOMMIT;
     end;
 
-    local procedure ImportTicketReservationConfirmArriveDoc(XmlDoc: DotNet XmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
+    local procedure ImportTicketReservationConfirmArriveDoc(XmlDoc: DotNet npNetXmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         Token: Text[50];
         MemberTicketManager: Codeunit "MM Member Ticket Manager";
@@ -383,14 +383,14 @@ codeunit 6060116 "TM Ticket WebService Mgr"
         TicketRequestManager.RegisterArrivalRequest (Token);
     end;
 
-    local procedure ImportTicketAttributes(XmlDoc: DotNet XmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
+    local procedure ImportTicketAttributes(XmlDoc: DotNet npNetXmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
     var
         Token: Text[50];
         AdmissionCode: Code[20];
         AttributeCode: Code[20];
         AttributeValue: Text[250];
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         //-TM1.23 [284752]
@@ -550,7 +550,7 @@ codeunit 6060116 "TM Ticket WebService Mgr"
         exit (TicketReservationResponse.Status);
     end;
 
-    local procedure InsertTicketReservation(XmlElement: DotNet XmlElement;Token: Text[100];var TicketReservationRequest: Record "TM Ticket Reservation Request")
+    local procedure InsertTicketReservation(XmlElement: DotNet npNetXmlElement;Token: Text[100];var TicketReservationRequest: Record "TM Ticket Reservation Request")
     begin
 
         Initialize;
@@ -571,7 +571,7 @@ codeunit 6060116 "TM Ticket WebService Mgr"
         TicketReservationRequest.Insert ();
     end;
 
-    local procedure InsertTemporaryTicketReservation(XmlElement: DotNet XmlElement;Token: Text[100];var TmpTicketReservationRequest: Record "TM Ticket Reservation Request" temporary)
+    local procedure InsertTemporaryTicketReservation(XmlElement: DotNet npNetXmlElement;Token: Text[100];var TmpTicketReservationRequest: Record "TM Ticket Reservation Request" temporary)
     begin
 
         //-#335889 [335889]

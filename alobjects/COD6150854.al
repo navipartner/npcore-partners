@@ -63,7 +63,7 @@ codeunit 6150854 "POS Action - CK Management"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         ObjectId: Integer;
@@ -84,9 +84,9 @@ codeunit 6150854 "POS Action - CK Management"
 
     procedure OnInvokeDevice(POSSession: Codeunit "POS Session")
     var
-        CashKeeperRequest: DotNet CashKeeperRequest0;
-        State: DotNet State4;
-        StateEnum: DotNet State_Action2;
+        CashKeeperRequest: DotNet npNetCashKeeperRequest0;
+        State: DotNet npNetState4;
+        StateEnum: DotNet npNetState_Action2;
         CashKeeperSetup: Record "CashKeeper Setup";
         FrontEnd: Codeunit "POS Front End Management";
         StepTxt: Text;
@@ -115,7 +115,7 @@ codeunit 6150854 "POS Action - CK Management"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', true, true)]
-    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet ResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet npNetResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
         if (ActionName <> 'CK_MANAGEMENT') then
           exit;
@@ -143,7 +143,7 @@ codeunit 6150854 "POS Action - CK Management"
 
     local procedure CloseForm(Data: Text)
     var
-        State: DotNet State4;
+        State: DotNet npNetState4;
         FrontEnd: Codeunit "POS Front End Management";
         POSSession: Codeunit "POS Session";
         Register: Record Register;

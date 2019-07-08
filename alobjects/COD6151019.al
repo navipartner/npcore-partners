@@ -55,12 +55,12 @@ codeunit 6151019 "NpRv Module Validate - Global"
         NpRvPartner: Record "NpRv Partner";
         NpRvVoucherType: Record "NpRv Voucher Type";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
         LastErrorText: Text;
     begin
@@ -213,12 +213,12 @@ codeunit 6151019 "NpRv Module Validate - Global"
         NpRvVoucherType: Record "NpRv Voucher Type";
         SaleLinePOSReference: Record "NpRv Sale Line POS Reference";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
         LastErrorText: Text;
     begin
@@ -325,11 +325,11 @@ codeunit 6151019 "NpRv Module Validate - Global"
         NpRvGlobalVoucherSetup: Record "NpRv Global Voucher Setup";
         NpRvVoucherType: Record "NpRv Voucher Type";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
         LastErrorText: Text;
     begin
@@ -422,12 +422,12 @@ codeunit 6151019 "NpRv Module Validate - Global"
         VoucherEntry: Record "NpRv Voucher Entry";
         NpRvVoucherMgt: Codeunit "NpRv Voucher Mgt.";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
         LastErrorText: Text;
         ReferenceNo: Text;
@@ -583,12 +583,12 @@ codeunit 6151019 "NpRv Module Validate - Global"
         Voucher: Record "NpRv Voucher";
         VoucherType: Record "NpRv Voucher Type";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
         LastErrorText: Text;
     begin
@@ -659,12 +659,12 @@ codeunit 6151019 "NpRv Module Validate - Global"
         NpRvVoucherType: Record "NpRv Voucher Type";
         NpRvPartnerMgt: Codeunit "NpRv Partner Mgt.";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
         LastErrorText: Text;
     begin

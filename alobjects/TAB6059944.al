@@ -56,7 +56,7 @@ table 6059944 "NaviDocs Entry Attachment"
     var
         SyncMgt: Codeunit "Nc Sync. Mgt.";
         FileMgt: Codeunit "File Management";
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
         Path: Text;
         Content: Text;

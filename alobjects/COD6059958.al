@@ -12,10 +12,10 @@ codeunit 6059958 "MCS Webcam Proxy TSD"
     var
         POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
         ProtocolStage: Integer;
-        ExpectedResponseType: DotNet Type;
+        ExpectedResponseType: DotNet npNetType;
         ExpectedResponseId: Guid;
-        QueuedRequests: DotNet Stack;
-        QueuedResponseTypes: DotNet Stack;
+        QueuedRequests: DotNet npNetStack;
+        QueuedResponseTypes: DotNet npNetStack;
         ProtocolManagerId: Guid;
         WebcamArgumentTable: Record "MCS Webcam Argument Table";
         Base64String: Text;
@@ -32,7 +32,7 @@ codeunit 6059958 "MCS Webcam Proxy TSD"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', true, true)]
-    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet ResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet npNetResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
 
         if (ActionName <> 'MCS_WebCam') then
@@ -54,12 +54,12 @@ codeunit 6059958 "MCS Webcam Proxy TSD"
 
     local procedure Start()
     var
-        VoidResponse: DotNet VoidResponse;
-        State: DotNet State3;
-        WebcamCaptureRequest: DotNet WebcamCaptureRequest0;
-        ActionEnum: DotNet State_Action1;
-        PersonEntity: DotNet PersonEntity1;
-        WebcamIdentityRequest: DotNet WebcamIdentityRequest0;
+        VoidResponse: DotNet npNetVoidResponse;
+        State: DotNet npNetState3;
+        WebcamCaptureRequest: DotNet npNetWebcamCaptureRequest0;
+        ActionEnum: DotNet npNetState_Action1;
+        PersonEntity: DotNet npNetPersonEntity1;
+        WebcamIdentityRequest: DotNet npNetWebcamIdentityRequest0;
         FrontEnd: Codeunit "POS Front End Management";
         POSSession: Codeunit "POS Session";
     begin
@@ -129,17 +129,17 @@ codeunit 6059958 "MCS Webcam Proxy TSD"
 
     local procedure CloseForm(Data: Text)
     var
-        State: DotNet State3;
-        JsonConvert: DotNet JsonConvert;
-        PersonEntity: DotNet PersonEntity1;
-        FaceEntity: DotNet FaceEntity1;
+        State: DotNet npNetState3;
+        JsonConvert: DotNet npNetJsonConvert;
+        PersonEntity: DotNet npNetPersonEntity1;
+        FaceEntity: DotNet npNetFaceEntity1;
         MCSPerson: Record "MCS Person";
         MCSFaces: Record "MCS Faces";
         OutS: OutStream;
-        Convert: DotNet Convert;
-        Bytes: DotNet Array;
-        MemoryStream: DotNet MemoryStream;
-        FacesEntity: DotNet FaceEntity1;
+        Convert: DotNet npNetConvert;
+        Bytes: DotNet npNetArray;
+        MemoryStream: DotNet npNetMemoryStream;
+        FacesEntity: DotNet npNetFaceEntity1;
         MCSPersonBusinessEntities: Record "MCS Person Business Entities";
     begin
         State := State.Deserialize(Data);
@@ -228,16 +228,16 @@ codeunit 6059958 "MCS Webcam Proxy TSD"
     begin
     end;
 
-    local procedure DeserializeState(Data: Text;var State: DotNet State2)
+    local procedure DeserializeState(Data: Text;var State: DotNet npNetState2)
     var
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
     begin
         State := JsonConvert.DeserializeObject(Data,GetDotNetType(State));
     end;
 
     local procedure SerializeJson("Object": Variant): Text
     var
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
     begin
         exit(JsonConvert.SerializeObject(Object));
     end;

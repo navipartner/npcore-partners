@@ -30,8 +30,8 @@ codeunit 6150742 "POS Cancel Sale Key Bind"
     [EventSubscriber(ObjectType::Codeunit, 6150744, 'OnInvokeKeyPress', '', false, false)]
     local procedure OnKeyPress(KeyPress: Text;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
-        POSView: DotNet View0;
-        POSViewType: DotNet ViewType0;
+        POSView: DotNet npNetView0;
+        POSViewType: DotNet npNetViewType0;
         POSKeyboardBindingMgt: Codeunit "POS Keyboard Binding Mgt.";
     begin
         //-NPR5.48 [323835]
@@ -62,8 +62,8 @@ codeunit 6150742 "POS Cancel Sale Key Bind"
 
     local procedure OnKeyPressEsc(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
-        POSView: DotNet View0;
-        POSViewType: DotNet ViewType0;
+        POSView: DotNet npNetView0;
+        POSViewType: DotNet npNetViewType0;
     begin
         //-NPR5.48 [323835]
         /* not needed as entire codeunit is for Cancel Sale process, for new keybind, new codeunit will be created
@@ -87,7 +87,7 @@ codeunit 6150742 "POS Cancel Sale Key Bind"
         SaleLinePOS: Record "Sale Line POS";
         POSSale: Codeunit "POS Sale";
         POSSaleLine: Codeunit "POS Sale Line";
-        Context: DotNet JObject;
+        Context: DotNet npNetJObject;
         POSJavaScriptInterface: Codeunit "POS JavaScript Interface";
         POSAction: Record "POS Action";
     begin

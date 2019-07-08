@@ -9,7 +9,7 @@ codeunit 6150720 "POS Caption Management"
 
     var
         FrontEnd: Codeunit "POS Front End Management";
-        Captions: DotNet Dictionary_Of_T_U;
+        Captions: DotNet npNetDictionary_Of_T_U;
         Duplicate: Integer;
         Initialized: Boolean;
         Text001: Label 'Caption management has not been initialized, and an attempt was made to use it. This is a programming bug, not a user error.';
@@ -25,9 +25,9 @@ codeunit 6150720 "POS Caption Management"
     end;
 
     [Scope('Personalization')]
-    procedure Finalize(CaptionsOut: DotNet Dictionary_Of_T_U)
+    procedure Finalize(CaptionsOut: DotNet npNetDictionary_Of_T_U)
     var
-        KeyValuePair: DotNet KeyValuePair_Of_T_U;
+        KeyValuePair: DotNet npNetKeyValuePair_Of_T_U;
         DuplicateWarning: Text;
     begin
         FailIfNotInitialized();
@@ -52,7 +52,7 @@ codeunit 6150720 "POS Caption Management"
           Error(Text001);
     end;
 
-    local procedure AddCaptionToCollection(Target: DotNet Dictionary_Of_T_U;CaptionId: Text;CaptionText: Text;RejectDuplicate: Boolean)
+    local procedure AddCaptionToCollection(Target: DotNet npNetDictionary_Of_T_U;CaptionId: Text;CaptionText: Text;RejectDuplicate: Boolean)
     begin
         if Target.ContainsKey(CaptionId) then begin
           FrontEnd.ReportWarning(StrSubstNo(Text002,CaptionId),false);

@@ -12,7 +12,7 @@ codeunit 6184519 "EFT Adyen Cloud Trx Dialog"
     end;
 
     var
-        Model: DotNet Model;
+        Model: DotNet npNetModel;
         ActiveModelID: Guid;
         ProtocolError: Label 'An unexpected error ocurred in the %1 protocol:\%2';
         ERROR_SESSION: Label 'Critical Error: Session object could not be retrieved for %1 payment. ';
@@ -241,11 +241,11 @@ codeunit 6184519 "EFT Adyen Cloud Trx Dialog"
 
     local procedure Html(EFTTransactionRequest: Record "EFT Transaction Request"): Text
     var
-        Factory: DotNet ControlFactory;
-        Dialog: DotNet Panel;
-        DialogCaption: DotNet Label;
-        DialogAbortButton: DotNet Label;
-        DialogAmount: DotNet Label;
+        Factory: DotNet npNetControlFactory;
+        Dialog: DotNet npNetPanel;
+        DialogCaption: DotNet npNetLabel;
+        DialogAbortButton: DotNet npNetLabel;
+        DialogAmount: DotNet npNetLabel;
     begin
         //-NPR5.50 [352465]
         // EXIT(
@@ -332,7 +332,7 @@ codeunit 6184519 "EFT Adyen Cloud Trx Dialog"
         //+NPR5.50 [352465]
     end;
 
-    trigger Model::OnModelControlEvent(control: DotNet Control;eventName: Text;data: DotNet Dictionary_Of_T_U)
+    trigger Model::OnModelControlEvent(control: DotNet npNetControl;eventName: Text;data: DotNet npNetDictionary_Of_T_U)
     begin
     end;
 

@@ -6,95 +6,95 @@ dotnet
         Culture='neutral';
         PublicKeyToken='b77a5c561934e089';
 
-        type("System.Xml.XmlDocument";"XmlDocument")
+        type("System.Xml.XmlDocument";"npNetXmlDocument")
         {
         }
 
-        type("System.Xml.XmlNodeList";"XmlNodeList")
+        type("System.Xml.XmlNodeList";"npNetXmlNodeList")
         {
         }
 
-        type("System.Xml.XmlNamespaceManager";"XmlNamespaceManager")
+        type("System.Xml.XmlNamespaceManager";"npNetXmlNamespaceManager")
         {
         }
 
-        type("System.Xml.XmlNode";"XmlNode")
+        type("System.Xml.XmlNode";"npNetXmlNode")
         {
         }
 
-        type("System.Xml.XmlElement";"XmlElement")
+        type("System.Xml.XmlElement";"npNetXmlElement")
         {
         }
 
-        type("System.Xml.XmlTextReader";"XmlTextReader")
+        type("System.Xml.XmlTextReader";"npNetXmlTextReader")
         {
         }
 
-        type("System.Xml.XmlNodeType";"XmlNodeType")
+        type("System.Xml.XmlNodeType";"npNetXmlNodeType")
         {
         }
 
-        type("System.Xml.XmlAttribute";"XmlAttribute")
+        type("System.Xml.XmlAttribute";"npNetXmlAttribute")
         {
         }
 
-        type("System.Xml.XmlNameTable";"XmlNameTable")
+        type("System.Xml.XmlNameTable";"npNetXmlNameTable")
         {
         }
 
-        type("System.Xml.XmlNodeChangedEventArgs";"XmlNodeChangedEventArgs")
+        type("System.Xml.XmlNodeChangedEventArgs";"npNetXmlNodeChangedEventArgs")
         {
         }
 
-        type("System.Xml.Serialization.XmlSerializer";"XmlSerializer")
+        type("System.Xml.Serialization.XmlSerializer";"npNetXmlSerializer")
         {
         }
 
-        type("System.Xml.XmlComment";"XmlComment")
+        type("System.Xml.XmlComment";"npNetXmlComment")
         {
         }
 
-        type("System.Xml.Xsl.XslCompiledTransform";"XslCompiledTransform")
+        type("System.Xml.Xsl.XslCompiledTransform";"npNetXslCompiledTransform")
         {
         }
 
-        type("System.Xml.XmlReader";"XmlReader")
+        type("System.Xml.XmlReader";"npNetXmlReader")
         {
         }
 
-        type("System.Xml.XmlWriter";"XmlWriter")
+        type("System.Xml.XmlWriter";"npNetXmlWriter")
         {
         }
 
-        type("System.Xml.XmlConvert";"XmlConvert")
+        type("System.Xml.XmlConvert";"npNetXmlConvert")
         {
         }
 
-        type("System.Xml.XmlAttributeCollection";"XmlAttributeCollection")
+        type("System.Xml.XmlAttributeCollection";"npNetXmlAttributeCollection")
         {
         }
 
-        type("System.Xml.XmlCDataSection";"XmlCDataSection")
+        type("System.Xml.XmlCDataSection";"npNetXmlCDataSection")
         {
         }
 
-        type("System.Xml.XmlNamedNodeMap";"XmlNamedNodeMap")
+        type("System.Xml.XmlNamedNodeMap";"npNetXmlNamedNodeMap")
         {
         }
 
-        type("System.Xml.XmlException";"XmlException")
+        type("System.Xml.XmlException";"npNetXmlException")
         {
         }
 
-        type("System.Xml.XPath.XPathNavigator";"XPathNavigator")
+        type("System.Xml.XPath.XPathNavigator";"npNetXPathNavigator")
         {
         }
 
-        type("System.Xml.XPath.XPathNodeType";"XPathNodeType")
+        type("System.Xml.XPath.XPathNodeType";"npNetXPathNodeType")
         {
         }
 
-        type("System.Xml.XmlNamespaceScope";"XmlNamespaceScope")
+        type("System.Xml.XmlNamespaceScope";"npNetXmlNamespaceScope")
         {
         }
     }
@@ -105,478 +105,478 @@ dotnet
         Culture='neutral';
         PublicKeyToken='b77a5c561934e089';
 
-        type("System.Diagnostics.Process";"Process")
+        type("System.Diagnostics.Process";"npNetProcess")
         {
         }
 
-        type("System.Diagnostics.ProcessStartInfo";"ProcessStartInfo")
+        type("System.Diagnostics.ProcessStartInfo";"npNetProcessStartInfo")
         {
         }
 
-        type("System.Net.FtpWebRequest";"FtpWebRequest")
+        type("System.Net.FtpWebRequest";"npNetFtpWebRequest")
         {
         }
 
-        type("System.Net.FtpWebResponse";"FtpWebResponse")
+        type("System.Net.FtpWebResponse";"npNetFtpWebResponse")
         {
         }
 
-        type("System.Net.NetworkCredential";"NetworkCredential")
+        type("System.Net.NetworkCredential";"npNetNetworkCredential")
         {
         }
 
-        type("System.Net.HttpWebRequest";"HttpWebRequest")
+        type("System.Net.HttpWebRequest";"npNetHttpWebRequest")
         {
         }
 
-        type("System.Net.HttpWebResponse";"HttpWebResponse")
+        type("System.Net.HttpWebResponse";"npNetHttpWebResponse")
         {
         }
 
-        type("System.Uri";"Uri")
+        type("System.Uri";"npNetUri")
         {
         }
 
-        type("System.Net.WebException";"WebException")
+        type("System.Net.WebException";"npNetWebException")
         {
         }
 
-        type("System.Net.CredentialCache";"CredentialCache")
+        type("System.Net.CredentialCache";"npNetCredentialCache")
         {
         }
 
-        type("System.Net.WebExceptionStatus";"WebExceptionStatus")
+        type("System.Net.WebExceptionStatus";"npNetWebExceptionStatus")
         {
         }
 
-        type("System.Net.HttpStatusCode";"HttpStatusCode")
+        type("System.Net.HttpStatusCode";"npNetHttpStatusCode")
         {
         }
 
-        type("System.Diagnostics.ProcessWindowStyle";"ProcessWindowStyle")
+        type("System.Diagnostics.ProcessWindowStyle";"npNetProcessWindowStyle")
         {
         }
 
-        type("System.Text.RegularExpressions.Regex";"Regex")
+        type("System.Text.RegularExpressions.Regex";"npNetRegex")
         {
         }
 
-        type("System.Net.NetworkInformation.Ping";"Ping")
+        type("System.Net.NetworkInformation.Ping";"npNetPing")
         {
         }
 
-        type("System.Net.NetworkInformation.PingReply";"PingReply")
+        type("System.Net.NetworkInformation.PingReply";"npNetPingReply")
         {
         }
 
-        type("System.Net.NetworkInformation.IPStatus";"IPStatus")
+        type("System.Net.NetworkInformation.IPStatus";"npNetIPStatus")
         {
         }
 
-        type("System.Net.WebRequest";"WebRequest")
+        type("System.Net.WebRequest";"npNetWebRequest")
         {
         }
 
-        type("System.CodeDom.CodeNamespace";"CodeNamespace")
+        type("System.CodeDom.CodeNamespace";"npNetCodeNamespace")
         {
         }
 
-        type("System.CodeDom.CodeCompileUnit";"CodeCompileUnit")
+        type("System.CodeDom.CodeCompileUnit";"npNetCodeCompileUnit")
         {
         }
 
-        type("System.CodeDom.Compiler.CodeGeneratorOptions";"CodeGeneratorOptions")
+        type("System.CodeDom.Compiler.CodeGeneratorOptions";"npNetCodeGeneratorOptions")
         {
         }
 
-        type("System.CodeDom.Compiler.CompilerParameters";"CompilerParameters")
+        type("System.CodeDom.Compiler.CompilerParameters";"npNetCompilerParameters")
         {
         }
 
-        type("System.CodeDom.Compiler.CompilerResults";"CompilerResults")
+        type("System.CodeDom.Compiler.CompilerResults";"npNetCompilerResults")
         {
         }
 
-        type("Microsoft.CSharp.CSharpCodeProvider";"CSharpCodeProvider")
+        type("Microsoft.CSharp.CSharpCodeProvider";"npNetCSharpCodeProvider")
         {
         }
 
-        type("System.Net.ServicePointManager";"ServicePointManager")
+        type("System.Net.ServicePointManager";"npNetServicePointManager")
         {
         }
 
-        type("System.Net.SecurityProtocolType";"SecurityProtocolType")
+        type("System.Net.SecurityProtocolType";"npNetSecurityProtocolType")
         {
         }
 
-        type("System.Net.WebClient";"WebClient")
+        type("System.Net.WebClient";"npNetWebClient")
         {
         }
 
-        type("System.ComponentModel.ListChangedEventArgs";"ListChangedEventArgs")
+        type("System.ComponentModel.ListChangedEventArgs";"npNetListChangedEventArgs")
         {
         }
 
-        type("System.ComponentModel.AddingNewEventArgs";"AddingNewEventArgs")
+        type("System.ComponentModel.AddingNewEventArgs";"npNetAddingNewEventArgs")
         {
         }
 
-        type("System.Collections.Specialized.NotifyCollectionChangedEventArgs";"NotifyCollectionChangedEventArgs")
+        type("System.Collections.Specialized.NotifyCollectionChangedEventArgs";"npNetNotifyCollectionChangedEventArgs")
         {
         }
 
-        type("System.Collections.Specialized.NameValueCollection";"NameValueCollection")
+        type("System.Collections.Specialized.NameValueCollection";"npNetNameValueCollection")
         {
         }
 
-        type("System.Text.RegularExpressions.Match";"Match")
+        type("System.Text.RegularExpressions.Match";"npNetMatch")
         {
         }
 
-        type("System.Diagnostics.FileVersionInfo";"FileVersionInfo")
+        type("System.Diagnostics.FileVersionInfo";"npNetFileVersionInfo")
         {
         }
 
-        type("System.Net.NetworkInformation.NetworkInterface";"NetworkInterface")
+        type("System.Net.NetworkInformation.NetworkInterface";"npNetNetworkInterface")
         {
         }
 
-        type("System.Text.RegularExpressions.MatchCollection";"MatchCollection")
+        type("System.Text.RegularExpressions.MatchCollection";"npNetMatchCollection")
         {
         }
 
-        type("System.Net.WebResponse";"WebResponse")
+        type("System.Net.WebResponse";"npNetWebResponse")
         {
         }
 
-        type("System.Diagnostics.Stopwatch";"Stopwatch")
+        type("System.Diagnostics.Stopwatch";"npNetStopwatch")
         {
         }
 
-        type("System.ComponentModel.PropertyChangedEventArgs";"PropertyChangedEventArgs")
+        type("System.ComponentModel.PropertyChangedEventArgs";"npNetPropertyChangedEventArgs")
         {
         }
 
-        type("System.ComponentModel.PropertyChangingEventArgs";"PropertyChangingEventArgs")
+        type("System.ComponentModel.PropertyChangingEventArgs";"npNetPropertyChangingEventArgs")
         {
         }
 
-        type("System.Collections.Generic.Stack`1";"Stack_Of_T")
+        type("System.Collections.Generic.Stack`1";"npNetStack_Of_T")
         {
         }
 
-        type("System.Net.Security.AuthenticationLevel";"AuthenticationLevel")
+        type("System.Net.Security.AuthenticationLevel";"npNetAuthenticationLevel")
         {
         }
 
-        type("System.Net.WebUtility";"WebUtility")
+        type("System.Net.WebUtility";"npNetWebUtility")
         {
         }
 
-        type("System.Security.Cryptography.X509Certificates.X509Certificate2";"X509Certificate2")
+        type("System.Security.Cryptography.X509Certificates.X509Certificate2";"npNetX509Certificate2")
         {
         }
     }
 
     assembly("mscorlib")
     {
-        type("System.String";"String")
+        type("System.String";"npNetString")
         {
         }
 
-        type("System.IO.Stream";"Stream")
+        type("System.IO.Stream";"npNetStream")
         {
         }
 
-        type("System.IO.StreamReader";"StreamReader")
+        type("System.IO.StreamReader";"npNetStreamReader")
         {
         }
 
-        type("System.IO.File";"File")
+        type("System.IO.File";"npNetFile")
         {
         }
 
-        type("System.IO.StreamWriter";"StreamWriter")
+        type("System.IO.StreamWriter";"npNetStreamWriter")
         {
         }
 
-        type("System.Text.Encoding";"Encoding")
+        type("System.Text.Encoding";"npNetEncoding")
         {
         }
 
-        type("System.IO.BinaryReader";"BinaryReader")
+        type("System.IO.BinaryReader";"npNetBinaryReader")
         {
         }
 
-        type("System.Convert";"Convert")
+        type("System.Convert";"npNetConvert")
         {
         }
 
-        type("System.Array";"Array")
+        type("System.Array";"npNetArray")
         {
         }
 
-        type("System.Char";"Char")
+        type("System.Char";"npNetChar")
         {
         }
 
-        type("System.Globalization.CultureInfo";"CultureInfo")
+        type("System.Globalization.CultureInfo";"npNetCultureInfo")
         {
         }
 
-        type("System.IO.MemoryStream";"MemoryStream")
+        type("System.IO.MemoryStream";"npNetMemoryStream")
         {
         }
 
-        type("System.Text.StringBuilder";"StringBuilder")
+        type("System.Text.StringBuilder";"npNetStringBuilder")
         {
         }
 
-        type("System.Environment";"Environment")
+        type("System.Environment";"npNetEnvironment")
         {
         }
 
-        type("System.Security.Principal.WindowsIdentity";"WindowsIdentity")
+        type("System.Security.Principal.WindowsIdentity";"npNetWindowsIdentity")
         {
         }
 
-        type("System.Type";"Type")
+        type("System.Type";"npNetType")
         {
         }
 
-        type("System.EventArgs";"EventArgs")
+        type("System.EventArgs";"npNetEventArgs")
         {
         }
 
-        type("System.IO.FileStream";"FileStream")
+        type("System.IO.FileStream";"npNetFileStream")
         {
         }
 
-        type("System.Collections.IEnumerable";"IEnumerable")
+        type("System.Collections.IEnumerable";"npNetIEnumerable")
         {
         }
 
-        type("System.IO.Directory";"Directory")
+        type("System.IO.Directory";"npNetDirectory")
         {
         }
 
-        type("System.Byte";"Byte")
+        type("System.Byte";"npNetByte")
         {
         }
 
-        type("System.IO.SeekOrigin";"SeekOrigin")
+        type("System.IO.SeekOrigin";"npNetSeekOrigin")
         {
         }
 
-        type("System.Collections.Stack";"Stack")
+        type("System.Collections.Stack";"npNetStack")
         {
         }
 
-        type("System.BitConverter";"BitConverter")
+        type("System.BitConverter";"npNetBitConverter")
         {
         }
 
-        type("System.IntPtr";"IntPtr")
+        type("System.IntPtr";"npNetIntPtr")
         {
         }
 
-        type("System.Collections.Generic.Dictionary`2";"Dictionary_Of_T_U")
+        type("System.Collections.Generic.Dictionary`2";"npNetDictionary_Of_T_U")
         {
         }
 
-        type("System.Collections.Generic.KeyValuePair`2";"KeyValuePair_Of_T_U")
+        type("System.Collections.Generic.KeyValuePair`2";"npNetKeyValuePair_Of_T_U")
         {
         }
 
-        type("System.Int32";"Int32")
+        type("System.Int32";"npNetInt32")
         {
         }
 
-        type("System.TimeSpan";"TimeSpan")
+        type("System.TimeSpan";"npNetTimeSpan")
         {
         }
 
-        type("System.Activator";"Activator")
+        type("System.Activator";"npNetActivator")
         {
         }
 
-        type("System.Reflection.Assembly";"Assembly")
+        type("System.Reflection.Assembly";"npNetAssembly")
         {
         }
 
-        type("System.Object";"Object")
+        type("System.Object";"npNetObject")
         {
         }
 
-        type("System.Collections.Generic.List`1";"List_Of_T")
+        type("System.Collections.Generic.List`1";"npNetList_Of_T")
         {
         }
 
-        type("System.Reflection.PropertyInfo";"PropertyInfo")
+        type("System.Reflection.PropertyInfo";"npNetPropertyInfo")
         {
         }
 
-        type("System.Reflection.MethodInfo";"MethodInfo")
+        type("System.Reflection.MethodInfo";"npNetMethodInfo")
         {
         }
 
-        type("System.IO.StringWriter";"StringWriter")
+        type("System.IO.StringWriter";"npNetStringWriter")
         {
         }
 
-        type("System.Reflection.ParameterInfo";"ParameterInfo")
+        type("System.Reflection.ParameterInfo";"npNetParameterInfo")
         {
         }
 
-        type("System.Enum";"Enum")
+        type("System.Enum";"npNetEnum")
         {
         }
 
-        type("System.Globalization.NumberFormatInfo";"NumberFormatInfo")
+        type("System.Globalization.NumberFormatInfo";"npNetNumberFormatInfo")
         {
         }
 
-        type("System.Globalization.DateTimeFormatInfo";"DateTimeFormatInfo")
+        type("System.Globalization.DateTimeFormatInfo";"npNetDateTimeFormatInfo")
         {
         }
 
-        type("System.Decimal";"Decimal")
+        type("System.Decimal";"npNetDecimal")
         {
         }
 
-        type("System.DateTime";"DateTime")
+        type("System.DateTime";"npNetDateTime")
         {
         }
 
-        type("System.Globalization.DateTimeStyles";"DateTimeStyles")
+        type("System.Globalization.DateTimeStyles";"npNetDateTimeStyles")
         {
         }
 
-        type("System.Globalization.NumberStyles";"NumberStyles")
+        type("System.Globalization.NumberStyles";"npNetNumberStyles")
         {
         }
 
-        type("System.Collections.Generic.IEnumerator`1";"IEnumerator_Of_T")
+        type("System.Collections.Generic.IEnumerator`1";"npNetIEnumerator_Of_T")
         {
         }
 
-        type("System.Collections.IEnumerator";"IEnumerator")
+        type("System.Collections.IEnumerator";"npNetIEnumerator")
         {
         }
 
-        type("System.Collections.Generic.IEnumerable`1";"IEnumerable_Of_T")
+        type("System.Collections.Generic.IEnumerable`1";"npNetIEnumerable_Of_T")
         {
         }
 
-        type("System.IO.StringReader";"StringReader")
+        type("System.IO.StringReader";"npNetStringReader")
         {
         }
 
-        type("System.IO.DirectoryInfo";"DirectoryInfo")
+        type("System.IO.DirectoryInfo";"npNetDirectoryInfo")
         {
         }
 
-        type("System.IO.FileInfo";"FileInfo")
+        type("System.IO.FileInfo";"npNetFileInfo")
         {
         }
 
-        type("System.Text.UTF32Encoding";"UTF32Encoding")
+        type("System.Text.UTF32Encoding";"npNetUTF32Encoding")
         {
         }
 
-        type("System.IO.Path";"Path")
+        type("System.IO.Path";"npNetPath")
         {
         }
 
-        type("System.Reflection.AssemblyName";"AssemblyName")
+        type("System.Reflection.AssemblyName";"npNetAssemblyName")
         {
         }
 
-        type("System.Math";"Math")
+        type("System.Math";"npNetMath")
         {
         }
 
-        type("System.Exception";"Exception")
+        type("System.Exception";"npNetException")
         {
         }
 
-        type("System.IO.BinaryWriter";"BinaryWriter")
+        type("System.IO.BinaryWriter";"npNetBinaryWriter")
         {
         }
 
-        type("System.TimeZoneInfo";"TimeZoneInfo")
+        type("System.TimeZoneInfo";"npNetTimeZoneInfo")
         {
         }
 
-        type("System.DateTimeOffset";"DateTimeOffset")
+        type("System.DateTimeOffset";"npNetDateTimeOffset")
         {
         }
 
-        type("System.Collections.IList";"IList")
+        type("System.Collections.IList";"npNetIList")
         {
         }
 
-        type("System.Security.Cryptography.MD5CryptoServiceProvider";"MD5CryptoServiceProvider")
+        type("System.Security.Cryptography.MD5CryptoServiceProvider";"npNetMD5CryptoServiceProvider")
         {
         }
 
-        type("System.Text.UTF8Encoding";"UTF8Encoding")
+        type("System.Text.UTF8Encoding";"npNetUTF8Encoding")
         {
         }
 
-        type("System.Security.Cryptography.HMACSHA256";"HMACSHA256")
+        type("System.Security.Cryptography.HMACSHA256";"npNetHMACSHA256")
         {
         }
 
-        type("System.Collections.Generic.IDictionary`2";"IDictionary_Of_T_U")
+        type("System.Collections.Generic.IDictionary`2";"npNetIDictionary_Of_T_U")
         {
         }
 
-        type("System.Boolean";"Boolean")
+        type("System.Boolean";"npNetBoolean")
         {
         }
 
-        type("System.Security.Cryptography.TripleDESCryptoServiceProvider";"TripleDESCryptoServiceProvider")
+        type("System.Security.Cryptography.TripleDESCryptoServiceProvider";"npNetTripleDESCryptoServiceProvider")
         {
         }
 
-        type("System.Security.Cryptography.ICryptoTransform";"ICryptoTransform")
+        type("System.Security.Cryptography.ICryptoTransform";"npNetICryptoTransform")
         {
         }
 
-        type("System.Security.Cryptography.CipherMode";"CipherMode")
+        type("System.Security.Cryptography.CipherMode";"npNetCipherMode")
         {
         }
 
-        type("System.Security.Cryptography.PaddingMode";"PaddingMode")
+        type("System.Security.Cryptography.PaddingMode";"npNetPaddingMode")
         {
         }
 
-        type("System.DateTimeKind";"DateTimeKind")
+        type("System.DateTimeKind";"npNetDateTimeKind")
         {
         }
 
-        type("System.Security.Cryptography.SHA256Managed";"SHA256Managed")
+        type("System.Security.Cryptography.SHA256Managed";"npNetSHA256Managed")
         {
         }
 
-        type("System.Security.Cryptography.RSACryptoServiceProvider";"RSACryptoServiceProvider")
+        type("System.Security.Cryptography.RSACryptoServiceProvider";"npNetRSACryptoServiceProvider")
         {
         }
 
-        type("System.Security.Cryptography.CryptoConfig";"CryptoConfig")
+        type("System.Security.Cryptography.CryptoConfig";"npNetCryptoConfig")
         {
         }
 
-        type("System.Security.Cryptography.SHA1CryptoServiceProvider";"SHA1CryptoServiceProvider")
+        type("System.Security.Cryptography.SHA1CryptoServiceProvider";"npNetSHA1CryptoServiceProvider")
         {
         }
 
-        type("System.Security.Cryptography.MD5";"MD5")
+        type("System.Security.Cryptography.MD5";"npNetMD5")
         {
         }
 
-        type("System.Security.Cryptography.SHA512Managed";"SHA512Managed")
+        type("System.Security.Cryptography.SHA512Managed";"npNetSHA512Managed")
         {
         }
     }
@@ -587,7 +587,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='31bf3856ad364e35';
 
-        type("Microsoft.Dynamics.Nav.SMTP.SmtpMessage";"SmtpMessage")
+        type("Microsoft.Dynamics.Nav.SMTP.SmtpMessage";"npNetSmtpMessage")
         {
         }
     }
@@ -598,295 +598,295 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.LookupTemplate.Template";"Template")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.LookupTemplate.Template";"npNetTemplate")
         {
         }
 
-        type("NaviPartner.Retail.Nav.App.Signalling.Signal";"Signal")
+        type("NaviPartner.Retail.Nav.App.Signalling.Signal";"npNetSignal")
         {
         }
 
-        type("NaviPartner.Retail.Nav.App.Signalling.StartSession";"StartSession")
+        type("NaviPartner.Retail.Nav.App.Signalling.StartSession";"npNetStartSession")
         {
         }
 
-        type("NaviPartner.Retail.Nav.App.Signalling.QueryClosePage";"QueryClosePage")
+        type("NaviPartner.Retail.Nav.App.Signalling.QueryClosePage";"npNetQueryClosePage")
         {
         }
 
-        type("NaviPartner.Retail.Nav.App.Signalling.MessageResponse";"MessageResponse")
+        type("NaviPartner.Retail.Nav.App.Signalling.MessageResponse";"npNetMessageResponse")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.DataGrid.DataGrid";"DataGrid")
+        type("NaviPartner.Retail.Nav.Classes.Json.DataGrid.DataGrid";"npNetDataGrid")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Enums.ViewType";"ViewType")
+        type("NaviPartner.Retail.Nav.Enums.ViewType";"npNetViewType")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.View.SaleView";"SaleView")
+        type("NaviPartner.Retail.Nav.Classes.Json.View.SaleView";"npNetSaleView")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Enums.ClientType";"ClientType")
+        type("NaviPartner.Retail.Nav.Enums.ClientType";"npNetClientType")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.View.PaymentView";"PaymentView")
+        type("NaviPartner.Retail.Nav.Classes.Json.View.PaymentView";"npNetPaymentView")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.View.View";"View")
+        type("NaviPartner.Retail.Nav.Classes.Json.View.View";"npNetView")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.View.IMenuButtonView";"IMenuButtonView")
+        type("NaviPartner.Retail.Nav.Classes.Json.View.IMenuButtonView";"npNetIMenuButtonView")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.ButtonGrid.ButtonGrid";"ButtonGrid")
+        type("NaviPartner.Retail.Nav.Classes.Json.ButtonGrid.ButtonGrid";"npNetButtonGrid")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.ButtonGrid.Button";"Button")
+        type("NaviPartner.Retail.Nav.Classes.Json.ButtonGrid.Button";"npNetButton")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.DataGrid.DataColumn";"DataColumn0")
+        type("NaviPartner.Retail.Nav.Classes.Json.DataGrid.DataColumn";"npNetDataColumn0")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Enums.TextAlign";"TextAlign")
+        type("NaviPartner.Retail.Nav.Enums.TextAlign";"npNetTextAlign")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Enums.NumberFormat";"NumberFormat")
+        type("NaviPartner.Retail.Nav.Enums.NumberFormat";"npNetNumberFormat")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.CalendarGrid";"CalendarGrid")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.CalendarGrid";"npNetCalendarGrid")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.LookupTemplate.Row";"Row")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.LookupTemplate.Row";"npNetRow")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.LookupTemplate.Info";"Info")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.LookupTemplate.Info";"npNetInfo")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Marshaller";"Marshaller")
+        type("NaviPartner.Retail.Nav.Classes.Eventing.Marshaller";"npNetMarshaller")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Font";"Font")
+        type("NaviPartner.Retail.Nav.Classes.Json.Font";"npNetFont")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Enums.ButtonColor";"ButtonColor")
+        type("NaviPartner.Retail.Nav.Enums.ButtonColor";"npNetButtonColor")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Enums.ShowBehavior";"ShowBehavior")
+        type("NaviPartner.Retail.Nav.Enums.ShowBehavior";"npNetShowBehavior")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Screen";"Screen")
+        type("NaviPartner.Retail.Nav.Classes.Json.Screen";"npNetScreen")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Eventing.MarshalResult.Result";"Result")
+        type("NaviPartner.Retail.Nav.Classes.Eventing.MarshalResult.Result";"npNetResult")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Enums.MarshalStatus";"MarshalStatus")
+        type("NaviPartner.Retail.Nav.Enums.MarshalStatus";"npNetMarshalStatus")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.ResponseInfo";"ResponseInfo")
+        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.ResponseInfo";"npNetResponseInfo")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.ResponseContent";"ResponseContent")
+        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.ResponseContent";"npNetResponseContent")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Enums.ResponseStatus";"ResponseStatus")
+        type("NaviPartner.Retail.Nav.Enums.ResponseStatus";"npNetResponseStatus")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Eventing.KnownEvent";"KnownEvent")
+        type("NaviPartner.Retail.Nav.Classes.Eventing.KnownEvent";"npNetKnownEvent")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Error";"Error")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Error";"npNetError")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Confirm";"Confirm")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Confirm";"npNetConfirm")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.SearchBox";"SearchBox")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.SearchBox";"npNetSearchBox")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Numpad";"Numpad")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Numpad";"npNetNumpad")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Enums.NumpadType";"NumpadType")
+        type("NaviPartner.Retail.Nav.Enums.NumpadType";"npNetNumpadType")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.ProtocolContext";"ProtocolContext")
+        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.ProtocolContext";"npNetProtocolContext")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Lookup";"Lookup")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Lookup";"npNetLookup")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.InfoBox";"InfoBox")
+        type("NaviPartner.Retail.Nav.Classes.Json.InfoBox";"npNetInfoBox")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.MessageEventArgs";"MessageEventArgs")
+        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.MessageEventArgs";"npNetMessageEventArgs")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.JavaScript";"JavaScript")
+        type("NaviPartner.Retail.Nav.Classes.Json.JavaScript";"npNetJavaScript")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.Response";"Response")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.Response";"npNetResponse")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.DataSource";"DataSource")
+        type("NaviPartner.Retail.Nav.Classes.Json.DataSource";"npNetDataSource")
         {
         }
 
-        type("NaviPartner.Retail.Nav.App.ProtocolState";"ProtocolState")
+        type("NaviPartner.Retail.Nav.App.ProtocolState";"npNetProtocolState")
         {
         }
 
-        type("NaviPartner.Retail.Nav.App.ProtocolManager";"ProtocolManager")
+        type("NaviPartner.Retail.Nav.App.ProtocolManager";"npNetProtocolManager")
         {
         }
 
-        type("NaviPartner.Retail.Nav.ObjectModel.Model";"Model")
+        type("NaviPartner.Retail.Nav.ObjectModel.Model";"npNetModel")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.State";"State0")
+        type("NaviPartner.Retail.Nav.Classes.State";"npNetState0")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.Response.NumPadResponseContent";"NumPadResponseContent")
+        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.Response.NumPadResponseContent";"npNetNumPadResponseContent")
         {
         }
 
-        type("NaviPartner.Retail.Nav.ObjectModel.Control";"Control")
+        type("NaviPartner.Retail.Nav.ObjectModel.Control";"npNetControl")
         {
         }
 
-        type("NaviPartner.Retail.Nav.ObjectModel.ControlFactory";"ControlFactory")
+        type("NaviPartner.Retail.Nav.ObjectModel.ControlFactory";"npNetControlFactory")
         {
         }
 
-        type("NaviPartner.Retail.Nav.ObjectModel.Panel";"Panel")
+        type("NaviPartner.Retail.Nav.ObjectModel.Panel";"npNetPanel")
         {
         }
 
-        type("NaviPartner.Retail.Nav.ObjectModel.Label";"Label")
+        type("NaviPartner.Retail.Nav.ObjectModel.Label";"npNetLabel")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Eventing.MarshalEventArgsFactory";"MarshalEventArgsFactory")
+        type("NaviPartner.Retail.Nav.Classes.Eventing.MarshalEventArgsFactory";"npNetMarshalEventArgsFactory")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.View.LoginView";"LoginView")
+        type("NaviPartner.Retail.Nav.Classes.Json.View.LoginView";"npNetLoginView")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Enums.EventType";"EventType")
+        type("NaviPartner.Retail.Nav.Enums.EventType";"npNetEventType")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.CancelRequestMessageData";"CancelRequestMessageData")
+        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.CancelRequestMessageData";"npNetCancelRequestMessageData")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Context";"Context")
+        type("NaviPartner.Retail.Nav.Classes.Json.Context";"npNetContext")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Enums.ButtonType";"ButtonType")
+        type("NaviPartner.Retail.Nav.Enums.ButtonType";"npNetButtonType")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.EanCodeScannedMessageData";"EanCodeScannedMessageData")
+        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.EanCodeScannedMessageData";"npNetEanCodeScannedMessageData")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.KeyPressMessageData";"KeyPressMessageData")
+        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.KeyPressMessageData";"npNetKeyPressMessageData")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Enums.KeyCode";"KeyCode")
+        type("NaviPartner.Retail.Nav.Enums.KeyCode";"npNetKeyCode")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.LoginMessageData";"LoginMessageData")
+        type("NaviPartner.Retail.Nav.Classes.Eventing.Message.LoginMessageData";"npNetLoginMessageData")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Event.ChangeScreenEventArgs";"ChangeScreenEventArgs")
+        type("NaviPartner.Retail.Nav.Classes.Eventing.Event.ChangeScreenEventArgs";"npNetChangeScreenEventArgs")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Event.MarshalEventArgs";"MarshalEventArgs")
+        type("NaviPartner.Retail.Nav.Classes.Eventing.Event.MarshalEventArgs";"npNetMarshalEventArgs")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Dialog";"Dialog")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Dialog";"npNetDialog")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.RequestFactory";"RequestFactory")
+        type("NaviPartner.Retail.Nav.Classes.Json.Protocol.RequestFactory";"npNetRequestFactory")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Enums.DialogType";"DialogType")
+        type("NaviPartner.Retail.Nav.Enums.DialogType";"npNetDialogType")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.NumpadResponse";"NumpadResponse")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.NumpadResponse";"npNetNumpadResponse")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.ConfirmResponse";"ConfirmResponse")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.ConfirmResponse";"npNetConfirmResponse")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.SearchBoxResponse";"SearchBoxResponse")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.SearchBoxResponse";"npNetSearchBoxResponse")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.CalendarGridResponse";"CalendarGridResponse")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.CalendarGridResponse";"npNetCalendarGridResponse")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.LookupResponse";"LookupResponse")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.Response.LookupResponse";"npNetLookupResponse")
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.RegisterBalancing";"RegisterBalancing")
+        type("NaviPartner.Retail.Nav.Classes.Json.Dialog.RegisterBalancing";"npNetRegisterBalancing")
         {
         }
     }
@@ -897,31 +897,31 @@ dotnet
         Culture='neutral';
         PublicKeyToken='b77a5c561934e089';
 
-        type("System.Data.DataTable";"DataTable")
+        type("System.Data.DataTable";"npNetDataTable")
         {
         }
 
-        type("System.Data.DataColumn";"DataColumn")
+        type("System.Data.DataColumn";"npNetDataColumn")
         {
         }
 
-        type("System.Data.DataRow";"DataRow")
+        type("System.Data.DataRow";"npNetDataRow")
         {
         }
 
-        type("System.Data.DataColumnChangeEventArgs";"DataColumnChangeEventArgs")
+        type("System.Data.DataColumnChangeEventArgs";"npNetDataColumnChangeEventArgs")
         {
         }
 
-        type("System.Data.DataRowChangeEventArgs";"DataRowChangeEventArgs")
+        type("System.Data.DataRowChangeEventArgs";"npNetDataRowChangeEventArgs")
         {
         }
 
-        type("System.Data.DataTableClearEventArgs";"DataTableClearEventArgs")
+        type("System.Data.DataTableClearEventArgs";"npNetDataTableClearEventArgs")
         {
         }
 
-        type("System.Data.DataTableNewRowEventArgs";"DataTableNewRowEventArgs")
+        type("System.Data.DataTableNewRowEventArgs";"npNetDataTableNewRowEventArgs")
         {
         }
     }
@@ -932,35 +932,35 @@ dotnet
         Culture='neutral';
         PublicKeyToken='1cee9f8bde3db106';
 
-        type("Renci.SshNet.SftpClient";"SftpClient")
+        type("Renci.SshNet.SftpClient";"npNetSftpClient")
         {
         }
 
-        type("Renci.SshNet.ConnectionInfo";"ConnectionInfo")
+        type("Renci.SshNet.ConnectionInfo";"npNetConnectionInfo")
         {
         }
 
-        type("Renci.SshNet.PasswordAuthenticationMethod";"PasswordAuthenticationMethod")
+        type("Renci.SshNet.PasswordAuthenticationMethod";"npNetPasswordAuthenticationMethod")
         {
         }
 
-        type("Renci.SshNet.AuthenticationMethod";"AuthenticationMethod")
+        type("Renci.SshNet.AuthenticationMethod";"npNetAuthenticationMethod")
         {
         }
 
-        type("Renci.SshNet.Sftp.SftpDownloadAsyncResult";"SftpDownloadAsyncResult")
+        type("Renci.SshNet.Sftp.SftpDownloadAsyncResult";"npNetSftpDownloadAsyncResult")
         {
         }
 
-        type("Renci.SshNet.Sftp.SftpFile";"SftpFile")
+        type("Renci.SshNet.Sftp.SftpFile";"npNetSftpFile")
         {
         }
 
-        type("Renci.SshNet.Common.ExceptionEventArgs";"ExceptionEventArgs")
+        type("Renci.SshNet.Common.ExceptionEventArgs";"npNetExceptionEventArgs")
         {
         }
 
-        type("Renci.SshNet.Common.HostKeyEventArgs";"HostKeyEventArgs")
+        type("Renci.SshNet.Common.HostKeyEventArgs";"npNetHostKeyEventArgs")
         {
         }
     }
@@ -971,7 +971,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='828b6037e4db846c';
 
-        type("SFTPClientWrapper.SFTPClientWrapper";"SFTPClientWrapper")
+        type("SFTPClientWrapper.SFTPClientWrapper";"npNetSFTPClientWrapper")
         {
         }
     }
@@ -982,15 +982,15 @@ dotnet
         Culture='neutral';
         PublicKeyToken='867142ff84820aec';
 
-        type("NaviPartner.Utility.FileWrapper";"FileWrapper")
+        type("NaviPartner.Utility.FileWrapper";"npNetFileWrapper")
         {
         }
 
-        type("NaviPartner.Utilities.CRC32";"CRC32")
+        type("NaviPartner.Utilities.CRC32";"npNetCRC32")
         {
         }
 
-        type("NaviPartner.Utility.StringBuffer";"StringBuffer")
+        type("NaviPartner.Utility.StringBuffer";"npNetStringBuffer")
         {
         }
     }
@@ -1001,15 +1001,15 @@ dotnet
         Culture='neutral';
         PublicKeyToken='663f351905198cb3';
 
-        type("Spire.Barcode.BarCodeType";"BarCodeType")
+        type("Spire.Barcode.BarCodeType";"npNetBarCodeType")
         {
         }
 
-        type("Spire.Barcode.BarcodeSettings";"BarcodeSettings")
+        type("Spire.Barcode.BarcodeSettings";"npNetBarcodeSettings")
         {
         }
 
-        type("Spire.Barcode.BarCodeGenerator";"BarCodeGenerator")
+        type("Spire.Barcode.BarCodeGenerator";"npNetBarCodeGenerator")
         {
         }
     }
@@ -1020,63 +1020,63 @@ dotnet
         Culture='neutral';
         PublicKeyToken='b03f5f7f11d50a3a';
 
-        type("System.Drawing.Image";"Image")
+        type("System.Drawing.Image";"npNetImage")
         {
         }
 
-        type("System.Drawing.Imaging.ImageFormat";"ImageFormat")
+        type("System.Drawing.Imaging.ImageFormat";"npNetImageFormat")
         {
         }
 
-        type("System.Drawing.Bitmap";"Bitmap")
+        type("System.Drawing.Bitmap";"npNetBitmap")
         {
         }
 
-        type("System.Drawing.Color";"Color")
+        type("System.Drawing.Color";"npNetColor")
         {
         }
 
-        type("System.Drawing.Graphics";"Graphics")
+        type("System.Drawing.Graphics";"npNetGraphics")
         {
         }
 
-        type("System.Drawing.Imaging.PixelFormat";"PixelFormat")
+        type("System.Drawing.Imaging.PixelFormat";"npNetPixelFormat")
         {
         }
 
-        type("System.Drawing.Drawing2D.PixelOffsetMode";"PixelOffsetMode")
+        type("System.Drawing.Drawing2D.PixelOffsetMode";"npNetPixelOffsetMode")
         {
         }
 
-        type("System.Drawing.Rectangle";"Rectangle")
+        type("System.Drawing.Rectangle";"npNetRectangle")
         {
         }
 
-        type("System.Drawing.Size";"Size")
+        type("System.Drawing.Size";"npNetSize")
         {
         }
 
-        type("System.Drawing.Drawing2D.InterpolationMode";"InterpolationMode")
+        type("System.Drawing.Drawing2D.InterpolationMode";"npNetInterpolationMode")
         {
         }
 
-        type("System.Drawing.GraphicsUnit";"GraphicsUnit")
+        type("System.Drawing.GraphicsUnit";"npNetGraphicsUnit")
         {
         }
 
-        type("System.Drawing.ImageConverter";"ImageConverter")
+        type("System.Drawing.ImageConverter";"npNetImageConverter")
         {
         }
 
-        type("System.Drawing.Font";"Font1")
+        type("System.Drawing.Font";"npNetFont1")
         {
         }
 
-        type("System.Drawing.FontStyle";"FontStyle")
+        type("System.Drawing.FontStyle";"npNetFontStyle")
         {
         }
 
-        type("System.Drawing.SolidBrush";"SolidBrush")
+        type("System.Drawing.SolidBrush";"npNetSolidBrush")
         {
         }
     }
@@ -1087,15 +1087,15 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Device.Messaging.PaymentGateway.Process.State";"State")
+        type("NaviPartner.Retail.Device.Messaging.PaymentGateway.Process.State";"npNetState")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PaymentGateway.Process.PaymentGatewayProcessRequest";"PaymentGatewayProcessRequest")
+        type("NaviPartner.Retail.Device.Messaging.PaymentGateway.Process.PaymentGatewayProcessRequest";"npNetPaymentGatewayProcessRequest")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PaymentGateway.Process.PaymentGateway";"PaymentGateway")
+        type("NaviPartner.Retail.Device.Messaging.PaymentGateway.Process.PaymentGateway";"npNetPaymentGateway")
         {
         }
     }
@@ -1106,59 +1106,59 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Device.Messaging.VoidResponse";"VoidResponse")
+        type("NaviPartner.Retail.Device.Messaging.VoidResponse";"npNetVoidResponse")
         {
         }
 
-        type("NaviPartner.Retail.Device.Envelope.ResponseEnvelope";"ResponseEnvelope")
+        type("NaviPartner.Retail.Device.Envelope.ResponseEnvelope";"npNetResponseEnvelope")
         {
         }
 
-        type("NaviPartner.Retail.Device.Envelope.Envelope";"Envelope")
+        type("NaviPartner.Retail.Device.Envelope.Envelope";"npNetEnvelope")
         {
         }
 
-        type("NaviPartner.Retail.Device.Configuration.PathHelper";"PathHelper")
+        type("NaviPartner.Retail.Device.Configuration.PathHelper";"npNetPathHelper")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.Method.Request";"Request")
+        type("NaviPartner.Retail.Device.Messaging.Method.Request";"npNetRequest")
         {
         }
 
-        type("NaviPartner.Retail.Device.Envelope.RequestEnvelope";"RequestEnvelope")
+        type("NaviPartner.Retail.Device.Envelope.RequestEnvelope";"npNetRequestEnvelope")
         {
         }
 
-        type("NaviPartner.Retail.Device.Encryption.EncryptionManager";"EncryptionManager")
+        type("NaviPartner.Retail.Device.Encryption.EncryptionManager";"npNetEncryptionManager")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.Method.Response";"Response0")
+        type("NaviPartner.Retail.Device.Messaging.Method.Response";"npNetResponse0")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.ErrorResponse";"ErrorResponse")
+        type("NaviPartner.Retail.Device.Messaging.ErrorResponse";"npNetErrorResponse")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.Encryption.PublicKeyRequest";"PublicKeyRequest")
+        type("NaviPartner.Retail.Device.Messaging.Encryption.PublicKeyRequest";"npNetPublicKeyRequest")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.Encryption.PublicKeyResponse";"PublicKeyResponse")
+        type("NaviPartner.Retail.Device.Messaging.Encryption.PublicKeyResponse";"npNetPublicKeyResponse")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.Assembly.GetAssembliesRequest";"GetAssembliesRequest")
+        type("NaviPartner.Retail.Device.Messaging.Assembly.GetAssembliesRequest";"npNetGetAssembliesRequest")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.Assembly.GetAssembliesResponse";"GetAssembliesResponse")
+        type("NaviPartner.Retail.Device.Messaging.Assembly.GetAssembliesResponse";"npNetGetAssembliesResponse")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.Assembly.InstallAssemblyRequest";"InstallAssemblyRequest")
+        type("NaviPartner.Retail.Device.Messaging.Assembly.InstallAssemblyRequest";"npNetInstallAssemblyRequest")
         {
         }
     }
@@ -1169,63 +1169,63 @@ dotnet
         Culture='neutral';
         PublicKeyToken='30ad4fe6b2a6aeed';
 
-        type("Newtonsoft.Json.JsonConvert";"JsonConvert")
+        type("Newtonsoft.Json.JsonConvert";"npNetJsonConvert")
         {
         }
 
-        type("Newtonsoft.Json.Linq.JObject";"JObject")
+        type("Newtonsoft.Json.Linq.JObject";"npNetJObject")
         {
         }
 
-        type("Newtonsoft.Json.JsonSerializer";"JsonSerializer")
+        type("Newtonsoft.Json.JsonSerializer";"npNetJsonSerializer")
         {
         }
 
-        type("Newtonsoft.Json.Linq.JArray";"JArray")
+        type("Newtonsoft.Json.Linq.JArray";"npNetJArray")
         {
         }
 
-        type("Newtonsoft.Json.Linq.JToken";"JToken")
+        type("Newtonsoft.Json.Linq.JToken";"npNetJToken")
         {
         }
 
-        type("Newtonsoft.Json.JsonTextReader";"JsonTextReader")
+        type("Newtonsoft.Json.JsonTextReader";"npNetJsonTextReader")
         {
         }
 
-        type("Newtonsoft.Json.DateParseHandling";"DateParseHandling")
+        type("Newtonsoft.Json.DateParseHandling";"npNetDateParseHandling")
         {
         }
 
-        type("Newtonsoft.Json.JsonTextWriter";"JsonTextWriter")
+        type("Newtonsoft.Json.JsonTextWriter";"npNetJsonTextWriter")
         {
         }
 
-        type("Newtonsoft.Json.Formatting";"Formatting")
+        type("Newtonsoft.Json.Formatting";"npNetFormatting")
         {
         }
 
-        type("Newtonsoft.Json.Linq.JTokenWriter";"JTokenWriter")
+        type("Newtonsoft.Json.Linq.JTokenWriter";"npNetJTokenWriter")
         {
         }
 
-        type("Newtonsoft.Json.Linq.JValue";"JValue")
+        type("Newtonsoft.Json.Linq.JValue";"npNetJValue")
         {
         }
 
-        type("Newtonsoft.Json.Linq.JProperty";"JProperty")
+        type("Newtonsoft.Json.Linq.JProperty";"npNetJProperty")
         {
         }
 
-        type("Newtonsoft.Json.Linq.JContainer";"JContainer")
+        type("Newtonsoft.Json.Linq.JContainer";"npNetJContainer")
         {
         }
 
-        type("Newtonsoft.Json.JsonConverter";"JsonConverter")
+        type("Newtonsoft.Json.JsonConverter";"npNetJsonConverter")
         {
         }
 
-        type("Newtonsoft.Json.Converters.KeyValuePairConverter";"KeyValuePairConverter")
+        type("Newtonsoft.Json.Converters.KeyValuePairConverter";"npNetKeyValuePairConverter")
         {
         }
     }
@@ -1236,11 +1236,11 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Device.Messaging.FilePrint.Requests.FilePrintRequest";"FilePrintRequest")
+        type("NaviPartner.Retail.Device.Messaging.FilePrint.Requests.FilePrintRequest";"npNetFilePrintRequest")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.FilePrint.Responses.FilePrintResponse";"FilePrintResponse")
+        type("NaviPartner.Retail.Device.Messaging.FilePrint.Responses.FilePrintResponse";"npNetFilePrintResponse")
         {
         }
     }
@@ -1251,11 +1251,11 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Device.Messaging.Print.Responses.PrintResponse";"PrintResponse")
+        type("NaviPartner.Retail.Device.Messaging.Print.Responses.PrintResponse";"npNetPrintResponse")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.Print.Requests.PrintRequest";"PrintRequest")
+        type("NaviPartner.Retail.Device.Messaging.Print.Requests.PrintRequest";"npNetPrintRequest")
         {
         }
     }
@@ -1266,19 +1266,19 @@ dotnet
         Culture='neutral';
         PublicKeyToken='b77a5c561934e089';
 
-        type("System.Windows.Forms.PrintDialog";"PrintDialog")
+        type("System.Windows.Forms.PrintDialog";"npNetPrintDialog")
         {
         }
 
-        type("System.Windows.Forms.DialogResult";"DialogResult")
+        type("System.Windows.Forms.DialogResult";"npNetDialogResult")
         {
         }
 
-        type("System.Windows.Forms.Keys";"Keys")
+        type("System.Windows.Forms.Keys";"npNetKeys")
         {
         }
 
-        type("System.Windows.Forms.SendKeys";"SendKeys")
+        type("System.Windows.Forms.SendKeys";"npNetSendKeys")
         {
         }
     }
@@ -1289,47 +1289,47 @@ dotnet
         Culture='neutral';
         PublicKeyToken='b03f5f7f11d50a3a';
 
-        type("System.Net.Http.MultipartFormDataContent";"MultipartFormDataContent")
+        type("System.Net.Http.MultipartFormDataContent";"npNetMultipartFormDataContent")
         {
         }
 
-        type("System.Net.Http.ByteArrayContent";"ByteArrayContent")
+        type("System.Net.Http.ByteArrayContent";"npNetByteArrayContent")
         {
         }
 
-        type("System.Net.Http.Headers.AuthenticationHeaderValue";"AuthenticationHeaderValue")
+        type("System.Net.Http.Headers.AuthenticationHeaderValue";"npNetAuthenticationHeaderValue")
         {
         }
 
-        type("System.Net.Http.HttpResponseMessage";"HttpResponseMessage")
+        type("System.Net.Http.HttpResponseMessage";"npNetHttpResponseMessage")
         {
         }
 
-        type("System.Net.Http.FormUrlEncodedContent";"FormUrlEncodedContent")
+        type("System.Net.Http.FormUrlEncodedContent";"npNetFormUrlEncodedContent")
         {
         }
 
-        type("System.Net.Http.StringContent";"StringContent")
+        type("System.Net.Http.StringContent";"npNetStringContent")
         {
         }
 
-        type("System.Net.Http.HttpContent";"HttpContent")
+        type("System.Net.Http.HttpContent";"npNetHttpContent")
         {
         }
 
-        type("System.Net.Http.HttpClient";"HttpClient")
+        type("System.Net.Http.HttpClient";"npNetHttpClient")
         {
         }
 
-        type("System.Net.Http.Headers.EntityTagHeaderValue";"EntityTagHeaderValue")
+        type("System.Net.Http.Headers.EntityTagHeaderValue";"npNetEntityTagHeaderValue")
         {
         }
 
-        type("System.Net.Http.HttpRequestMessage";"HttpRequestMessage")
+        type("System.Net.Http.HttpRequestMessage";"npNetHttpRequestMessage")
         {
         }
 
-        type("System.Net.Http.HttpMethod";"HttpMethod")
+        type("System.Net.Http.HttpMethod";"npNetHttpMethod")
         {
         }
     }
@@ -1340,19 +1340,19 @@ dotnet
         Culture='neutral';
         PublicKeyToken='b03f5f7f11d50a3a';
 
-        type("System.Web.Services.Description.ServiceDescription";"ServiceDescription")
+        type("System.Web.Services.Description.ServiceDescription";"npNetServiceDescription")
         {
         }
 
-        type("System.Web.Services.Description.ServiceDescriptionImporter";"ServiceDescriptionImporter")
+        type("System.Web.Services.Description.ServiceDescriptionImporter";"npNetServiceDescriptionImporter")
         {
         }
 
-        type("System.Web.Services.Description.ServiceDescriptionImportWarnings";"ServiceDescriptionImportWarnings")
+        type("System.Web.Services.Description.ServiceDescriptionImportWarnings";"npNetServiceDescriptionImportWarnings")
         {
         }
 
-        type("System.Web.Services.Protocols.SoapHttpClientProtocol";"SoapHttpClientProtocol")
+        type("System.Web.Services.Protocols.SoapHttpClientProtocol";"npNetSoapHttpClientProtocol")
         {
         }
     }
@@ -1363,11 +1363,11 @@ dotnet
         Culture='neutral';
         PublicKeyToken='b77a5c561934e089';
 
-        type("System.Collections.Generic.HashSet`1";"HashSet_Of_T")
+        type("System.Collections.Generic.HashSet`1";"npNetHashSet_Of_T")
         {
         }
 
-        type("System.Collections.Generic.HashSet`1+Enumerator";"HashSet_Of_T_Enumerator")
+        type("System.Collections.Generic.HashSet`1+Enumerator";"npNetHashSet_Of_T_Enumerator")
         {
         }
     }
@@ -1378,15 +1378,15 @@ dotnet
         Culture='neutral';
         PublicKeyToken='b03f5f7f11d50a3a';
 
-        type("System.Web.HttpUtility";"HttpUtility")
+        type("System.Web.HttpUtility";"npNetHttpUtility")
         {
         }
 
-        type("System.Web.Security.FormsAuthentication";"FormsAuthentication")
+        type("System.Web.Security.FormsAuthentication";"npNetFormsAuthentication")
         {
         }
 
-        type("System.Web.MimeMapping";"MimeMapping")
+        type("System.Web.MimeMapping";"npNetMimeMapping")
         {
         }
     }
@@ -1397,7 +1397,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Device.Service.RequestHandler";"RequestHandler")
+        type("NaviPartner.Retail.Device.Service.RequestHandler";"npNetRequestHandler")
         {
         }
     }
@@ -1408,7 +1408,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Nav.Client.Controls.IFramework";"IFramework")
+        type("NaviPartner.Retail.Nav.Client.Controls.IFramework";"npNetIFramework")
         {
         }
     }
@@ -1419,7 +1419,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='cc06fd55bdc3ade8';
 
-        type("NavHelper.AssemblyResolver.AssemblyResolver";"AssemblyResolver")
+        type("NavHelper.AssemblyResolver.AssemblyResolver";"npNetAssemblyResolver")
         {
         }
     }
@@ -1430,27 +1430,27 @@ dotnet
         Culture='neutral';
         PublicKeyToken='eb5fc1fc52ef09bd';
 
-        type("Chilkat.Ftp2";"Ftp2")
+        type("Chilkat.Ftp2";"npNetFtp2")
         {
         }
 
-        type("Chilkat.SFtp";"SFtp")
+        type("Chilkat.SFtp";"npNetSFtp")
         {
         }
 
-        type("Chilkat.DataRateEventArgs";"DataRateEventArgs")
+        type("Chilkat.DataRateEventArgs";"npNetDataRateEventArgs")
         {
         }
 
-        type("Chilkat.ProgressInfoEventArgs";"ProgressInfoEventArgs")
+        type("Chilkat.ProgressInfoEventArgs";"npNetProgressInfoEventArgs")
         {
         }
 
-        type("Chilkat.PercentDoneEventArgs";"PercentDoneEventArgs")
+        type("Chilkat.PercentDoneEventArgs";"npNetPercentDoneEventArgs")
         {
         }
 
-        type("Chilkat.AbortCheckEventArgs";"AbortCheckEventArgs")
+        type("Chilkat.AbortCheckEventArgs";"npNetAbortCheckEventArgs")
         {
         }
     }
@@ -1461,15 +1461,15 @@ dotnet
         Culture='neutral';
         PublicKeyToken='b77a5c561934e089';
 
-        type("System.Xml.Linq.XDocument";"XDocument")
+        type("System.Xml.Linq.XDocument";"npNetXDocument")
         {
         }
 
-        type("System.Xml.Linq.XElement";"XElement")
+        type("System.Xml.Linq.XElement";"npNetXElement")
         {
         }
 
-        type("System.Xml.Linq.XName";"XName")
+        type("System.Xml.Linq.XName";"npNetXName")
         {
         }
     }
@@ -1480,19 +1480,19 @@ dotnet
         Culture='neutral';
         PublicKeyToken='f247894af5fce995';
 
-        type("NaviPartner.Retail.Device.Messaging.CashKeeper.Requests.CashKeeperRequest";"CashKeeperRequest")
+        type("NaviPartner.Retail.Device.Messaging.CashKeeper.Requests.CashKeeperRequest";"npNetCashKeeperRequest")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.CashKeeper.Process.State";"State1")
+        type("NaviPartner.Retail.Device.Messaging.CashKeeper.Process.State";"npNetState1")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.CashKeeper.Process.State+Action";"State_Action")
+        type("NaviPartner.Retail.Device.Messaging.CashKeeper.Process.State+Action";"npNetState_Action")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.CashKeeper.Responses.CashKeeperResponse";"CashKeeperResponse")
+        type("NaviPartner.Retail.Device.Messaging.CashKeeper.Responses.CashKeeperResponse";"npNetCashKeeperResponse")
         {
         }
     }
@@ -1503,95 +1503,95 @@ dotnet
         Culture='neutral';
         PublicKeyToken='a2a51e153e198db2';
 
-        type("NaviPartner.Cognitive.Services.FaceServiceAPI";"FaceServiceAPI")
+        type("NaviPartner.Cognitive.Services.FaceServiceAPI";"npNetFaceServiceAPI")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Models.GroupEntity";"GroupEntity")
+        type("NaviPartner.Cognitive.Services.Models.GroupEntity";"npNetGroupEntity")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Models.ErrorEntity";"ErrorEntity")
+        type("NaviPartner.Cognitive.Services.Models.ErrorEntity";"npNetErrorEntity")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Models.PersonEntity";"PersonEntity")
+        type("NaviPartner.Cognitive.Services.Models.PersonEntity";"npNetPersonEntity")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Models.FaceResponseEntity";"FaceResponseEntity")
+        type("NaviPartner.Cognitive.Services.Models.FaceResponseEntity";"npNetFaceResponseEntity")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Models.FaceEntity";"FaceEntity")
+        type("NaviPartner.Cognitive.Services.Models.FaceEntity";"npNetFaceEntity")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.RecommendationServiceAPI";"RecommendationServiceAPI")
+        type("NaviPartner.Cognitive.Services.RecommendationServiceAPI";"npNetRecommendationServiceAPI")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.ModelInfo";"ModelInfo")
+        type("NaviPartner.Cognitive.Services.Helpers.ModelInfo";"npNetModelInfo")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.ModelInfoList";"ModelInfoList")
+        type("NaviPartner.Cognitive.Services.Helpers.ModelInfoList";"npNetModelInfoList")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.CatalogImportStats";"CatalogImportStats")
+        type("NaviPartner.Cognitive.Services.Helpers.CatalogImportStats";"npNetCatalogImportStats")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.UsageImportStats";"UsageImportStats")
+        type("NaviPartner.Cognitive.Services.Helpers.UsageImportStats";"npNetUsageImportStats")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.BuildRequestInfo";"BuildRequestInfo")
+        type("NaviPartner.Cognitive.Services.Helpers.BuildRequestInfo";"npNetBuildRequestInfo")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.BuildParameters";"BuildParameters")
+        type("NaviPartner.Cognitive.Services.Helpers.BuildParameters";"npNetBuildParameters")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.RandomSplitterParameters";"RandomSplitterParameters")
+        type("NaviPartner.Cognitive.Services.Helpers.RandomSplitterParameters";"npNetRandomSplitterParameters")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.RecommendationBuildParameters";"RecommendationBuildParameters")
+        type("NaviPartner.Cognitive.Services.Helpers.RecommendationBuildParameters";"npNetRecommendationBuildParameters")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.SplitterStrategy";"SplitterStrategy")
+        type("NaviPartner.Cognitive.Services.Helpers.SplitterStrategy";"npNetSplitterStrategy")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.BuildType";"BuildType")
+        type("NaviPartner.Cognitive.Services.Helpers.BuildType";"npNetBuildType")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.OperationStatus";"OperationStatus")
+        type("NaviPartner.Cognitive.Services.Helpers.OperationStatus";"npNetOperationStatus")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.OperationInfo";"OperationInfo")
+        type("NaviPartner.Cognitive.Services.Helpers.OperationInfo";"npNetOperationInfo")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.RecommendedItemSetInfoList";"RecommendedItemSetInfoList")
+        type("NaviPartner.Cognitive.Services.Helpers.RecommendedItemSetInfoList";"npNetRecommendedItemSetInfoList")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.RecommendedItemSetInfo";"RecommendedItemSetInfo")
+        type("NaviPartner.Cognitive.Services.Helpers.RecommendedItemSetInfo";"npNetRecommendedItemSetInfo")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.RecommendedItemInfo";"RecommendedItemInfo")
+        type("NaviPartner.Cognitive.Services.Helpers.RecommendedItemInfo";"npNetRecommendedItemInfo")
         {
         }
 
-        type("NaviPartner.Cognitive.Services.Helpers.UpdateActiveBuildInfo";"UpdateActiveBuildInfo")
+        type("NaviPartner.Cognitive.Services.Helpers.UpdateActiveBuildInfo";"npNetUpdateActiveBuildInfo")
         {
         }
     }
@@ -1602,27 +1602,27 @@ dotnet
         Culture='neutral';
         PublicKeyToken='2440db6279d79962';
 
-        type("NaviPartner.Retail.Device.Messaging.Webcam.Process.State";"State2")
+        type("NaviPartner.Retail.Device.Messaging.Webcam.Process.State";"npNetState2")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.Webcam.Requests.WebcamCaptureRequest";"WebcamCaptureRequest")
+        type("NaviPartner.Retail.Device.Messaging.Webcam.Requests.WebcamCaptureRequest";"npNetWebcamCaptureRequest")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.Webcam.Process.State+Action";"State_Action0")
+        type("NaviPartner.Retail.Device.Messaging.Webcam.Process.State+Action";"npNetState_Action0")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.Webcam.Models.PersonEntity";"PersonEntity0")
+        type("NaviPartner.Retail.Device.Messaging.Webcam.Models.PersonEntity";"npNetPersonEntity0")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.Webcam.Requests.WebcamIdentityRequest";"WebcamIdentityRequest")
+        type("NaviPartner.Retail.Device.Messaging.Webcam.Requests.WebcamIdentityRequest";"npNetWebcamIdentityRequest")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.Webcam.Models.FaceEntity";"FaceEntity0")
+        type("NaviPartner.Retail.Device.Messaging.Webcam.Models.FaceEntity";"npNetFaceEntity0")
         {
         }
     }
@@ -1633,43 +1633,43 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Stargate.Envelope.ResponseEnvelope";"ResponseEnvelope0")
+        type("NaviPartner.Retail.Stargate.Envelope.ResponseEnvelope";"npNetResponseEnvelope0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.Method.Request";"Request0")
+        type("NaviPartner.Retail.Stargate.Messaging.Method.Request";"npNetRequest0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Envelope.RequestEnvelope";"RequestEnvelope0")
+        type("NaviPartner.Retail.Stargate.Envelope.RequestEnvelope";"npNetRequestEnvelope0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.Method.Response";"Response1")
+        type("NaviPartner.Retail.Stargate.Messaging.Method.Response";"npNetResponse1")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.ErrorResponse";"ErrorResponse0")
+        type("NaviPartner.Retail.Stargate.Messaging.ErrorResponse";"npNetErrorResponse0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Exceptions.InvalidMethodException";"InvalidMethodException")
+        type("NaviPartner.Retail.Stargate.Exceptions.InvalidMethodException";"npNetInvalidMethodException")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.Packaging.Package";"Package")
+        type("NaviPartner.Retail.Stargate.Messaging.Packaging.Package";"npNetPackage")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.Packaging.PackageRequest";"PackageRequest")
+        type("NaviPartner.Retail.Stargate.Messaging.Packaging.PackageRequest";"npNetPackageRequest")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.EmptyResponse";"EmptyResponse")
+        type("NaviPartner.Retail.Stargate.Messaging.EmptyResponse";"npNetEmptyResponse")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.Packaging.AssemblyPackageContent";"AssemblyPackageContent")
+        type("NaviPartner.Retail.Stargate.Messaging.Packaging.AssemblyPackageContent";"npNetAssemblyPackageContent")
         {
         }
     }
@@ -1680,27 +1680,27 @@ dotnet
         Culture='neutral';
         PublicKeyToken='2440db6279d79962';
 
-        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Models.State";"State3")
+        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Models.State";"npNetState3")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Requests.WebcamCaptureRequest";"WebcamCaptureRequest0")
+        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Requests.WebcamCaptureRequest";"npNetWebcamCaptureRequest0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Models.State+Action";"State_Action1")
+        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Models.State+Action";"npNetState_Action1")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Models.PersonEntity";"PersonEntity1")
+        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Models.PersonEntity";"npNetPersonEntity1")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Requests.WebcamIdentityRequest";"WebcamIdentityRequest0")
+        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Requests.WebcamIdentityRequest";"npNetWebcamIdentityRequest0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Models.FaceEntity";"FaceEntity1")
+        type("NaviPartner.Retail.Stargate.Messaging.Webcam.Models.FaceEntity";"npNetFaceEntity1")
         {
         }
     }
@@ -1711,15 +1711,15 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Json.View.View";"View0")
+        type("NaviPartner.Retail.Json.View.View";"npNetView0")
         {
         }
 
-        type("NaviPartner.Retail.Json.View.ViewType";"ViewType0")
+        type("NaviPartner.Retail.Json.View.ViewType";"npNetViewType0")
         {
         }
 
-        type("NaviPartner.Retail.Json.View.SetViewJsonRequest";"SetViewJsonRequest")
+        type("NaviPartner.Retail.Json.View.SetViewJsonRequest";"npNetSetViewJsonRequest")
         {
         }
     }
@@ -1730,31 +1730,31 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Json.Data.DataSource";"DataSource0")
+        type("NaviPartner.Retail.Json.Data.DataSource";"npNetDataSource0")
         {
         }
 
-        type("NaviPartner.Retail.Json.Data.DataType";"DataType")
+        type("NaviPartner.Retail.Json.Data.DataType";"npNetDataType")
         {
         }
 
-        type("NaviPartner.Retail.Json.Data.DataRow";"DataRow0")
+        type("NaviPartner.Retail.Json.Data.DataRow";"npNetDataRow0")
         {
         }
 
-        type("NaviPartner.Retail.Json.Data.DataStore";"DataStore")
+        type("NaviPartner.Retail.Json.Data.DataStore";"npNetDataStore")
         {
         }
 
-        type("NaviPartner.Retail.Json.Data.DataSet";"DataSet")
+        type("NaviPartner.Retail.Json.Data.DataSet";"npNetDataSet")
         {
         }
 
-        type("NaviPartner.Retail.Json.Data.RefreshDataJsonRequest";"RefreshDataJsonRequest")
+        type("NaviPartner.Retail.Json.Data.RefreshDataJsonRequest";"npNetRefreshDataJsonRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Data.DataColumn";"DataColumn1")
+        type("NaviPartner.Retail.Json.Data.DataColumn";"npNetDataColumn1")
         {
         }
     }
@@ -1765,15 +1765,15 @@ dotnet
         Culture='neutral';
         PublicKeyToken='71e9bce111e9429c';
 
-        type("Microsoft.Office.Interop.Word.ApplicationClass";"ApplicationClass")
+        type("Microsoft.Office.Interop.Word.ApplicationClass";"npNetApplicationClass")
         {
         }
 
-        type("Microsoft.Office.Interop.Word.Document";"Document")
+        type("Microsoft.Office.Interop.Word.Document";"npNetDocument")
         {
         }
 
-        type("Microsoft.Office.Interop.Word.WdWindowState";"WdWindowState")
+        type("Microsoft.Office.Interop.Word.WdWindowState";"npNetWdWindowState")
         {
         }
     }
@@ -1784,95 +1784,95 @@ dotnet
         Culture='neutral';
         PublicKeyToken='31bf3856ad364e35';
 
-        type("Microsoft.Exchange.WebServices.Data.ExchangeService";"ExchangeService")
+        type("Microsoft.Exchange.WebServices.Data.ExchangeService";"npNetExchangeService")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.ExchangeCredentials";"ExchangeCredentials")
+        type("Microsoft.Exchange.WebServices.Data.ExchangeCredentials";"npNetExchangeCredentials")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.NameResolutionCollection";"NameResolutionCollection")
+        type("Microsoft.Exchange.WebServices.Data.NameResolutionCollection";"npNetNameResolutionCollection")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.NameResolution";"NameResolution")
+        type("Microsoft.Exchange.WebServices.Data.NameResolution";"npNetNameResolution")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.ExchangeVersion";"ExchangeVersion")
+        type("Microsoft.Exchange.WebServices.Data.ExchangeVersion";"npNetExchangeVersion")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.ExchangeServerInfo";"ExchangeServerInfo")
+        type("Microsoft.Exchange.WebServices.Data.ExchangeServerInfo";"npNetExchangeServerInfo")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.Appointment";"Appointment")
+        type("Microsoft.Exchange.WebServices.Data.Appointment";"npNetAppointment")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.ItemId";"ItemId")
+        type("Microsoft.Exchange.WebServices.Data.ItemId";"npNetItemId")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.MessageBody";"MessageBody")
+        type("Microsoft.Exchange.WebServices.Data.MessageBody";"npNetMessageBody")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.BodyType";"BodyType")
+        type("Microsoft.Exchange.WebServices.Data.BodyType";"npNetBodyType")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.StringList";"StringList")
+        type("Microsoft.Exchange.WebServices.Data.StringList";"npNetStringList")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.LegacyFreeBusyStatus";"LegacyFreeBusyStatus")
+        type("Microsoft.Exchange.WebServices.Data.LegacyFreeBusyStatus";"npNetLegacyFreeBusyStatus")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.PropertySet";"PropertySet")
+        type("Microsoft.Exchange.WebServices.Data.PropertySet";"npNetPropertySet")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.MeetingResponseType";"MeetingResponseType")
+        type("Microsoft.Exchange.WebServices.Data.MeetingResponseType";"npNetMeetingResponseType")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.Attendee";"Attendee")
+        type("Microsoft.Exchange.WebServices.Data.Attendee";"npNetAttendee")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.DeleteMode";"DeleteMode")
+        type("Microsoft.Exchange.WebServices.Data.DeleteMode";"npNetDeleteMode")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.SendCancellationsMode";"SendCancellationsMode")
+        type("Microsoft.Exchange.WebServices.Data.SendCancellationsMode";"npNetSendCancellationsMode")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.SendInvitationsMode";"SendInvitationsMode")
+        type("Microsoft.Exchange.WebServices.Data.SendInvitationsMode";"npNetSendInvitationsMode")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.ConflictResolutionMode";"ConflictResolutionMode")
+        type("Microsoft.Exchange.WebServices.Data.ConflictResolutionMode";"npNetConflictResolutionMode")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.SendInvitationsOrCancellationsMode";"SendInvitationsOrCancellationsMode")
+        type("Microsoft.Exchange.WebServices.Data.SendInvitationsOrCancellationsMode";"npNetSendInvitationsOrCancellationsMode")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.EmailMessage";"EmailMessage")
+        type("Microsoft.Exchange.WebServices.Data.EmailMessage";"npNetEmailMessage")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.EmailAddress";"EmailAddress")
+        type("Microsoft.Exchange.WebServices.Data.EmailAddress";"npNetEmailAddress")
         {
         }
 
-        type("Microsoft.Exchange.WebServices.Data.EmailAddressCollection";"EmailAddressCollection")
+        type("Microsoft.Exchange.WebServices.Data.EmailAddressCollection";"npNetEmailAddressCollection")
         {
         }
     }
@@ -1883,11 +1883,11 @@ dotnet
         Culture='neutral';
         PublicKeyToken='31bf3856ad364e35';
 
-        type("Microsoft.Dynamics.Nav.Integration.Office.Word.WordHelper";"WordHelper")
+        type("Microsoft.Dynamics.Nav.Integration.Office.Word.WordHelper";"npNetWordHelper")
         {
         }
 
-        type("Microsoft.Dynamics.Nav.Integration.Office.Word.WordHandler";"WordHandler")
+        type("Microsoft.Dynamics.Nav.Integration.Office.Word.WordHandler";"npNetWordHandler")
         {
         }
     }
@@ -1898,7 +1898,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='31bf3856ad364e35';
 
-        type("Microsoft.Dynamics.Nav.DocumentReport.WordReportManager";"WordReportManager")
+        type("Microsoft.Dynamics.Nav.DocumentReport.WordReportManager";"npNetWordReportManager")
         {
         }
     }
@@ -1909,7 +1909,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='31bf3856ad364e35';
 
-        type("Microsoft.Dynamics.Nav.PdfWriter.WordToPdf";"WordToPdf")
+        type("Microsoft.Dynamics.Nav.PdfWriter.WordToPdf";"npNetWordToPdf")
         {
         }
     }
@@ -1920,7 +1920,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='31bf3856ad364e35';
 
-        type("Microsoft.Dynamics.Nav.Exchange.ExchangeServiceWrapper";"ExchangeServiceWrapper")
+        type("Microsoft.Dynamics.Nav.Exchange.ExchangeServiceWrapper";"npNetExchangeServiceWrapper")
         {
         }
     }
@@ -1931,11 +1931,11 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Controls.IBridge";"IBridge")
+        type("NaviPartner.Retail.Controls.IBridge";"npNetIBridge")
         {
         }
 
-        type("NaviPartner.Retail.Controls.IFramework";"IFramework0")
+        type("NaviPartner.Retail.Controls.IFramework";"npNetIFramework0")
         {
         }
     }
@@ -1946,11 +1946,11 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Stargate.Messaging.OPOS.Requests.EjectDrawerRequest";"EjectDrawerRequest")
+        type("NaviPartner.Retail.Stargate.Messaging.OPOS.Requests.EjectDrawerRequest";"npNetEjectDrawerRequest")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.OPOS.Responses.EjectDrawerResponse";"EjectDrawerResponse")
+        type("NaviPartner.Retail.Stargate.Messaging.OPOS.Responses.EjectDrawerResponse";"npNetEjectDrawerResponse")
         {
         }
     }
@@ -1961,43 +1961,43 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Json.Core.Requests.StartTransactionJsonRequest";"StartTransactionJsonRequest")
+        type("NaviPartner.Retail.Json.Core.Requests.StartTransactionJsonRequest";"npNetStartTransactionJsonRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Core.Objects.Font";"Font0")
+        type("NaviPartner.Retail.Json.Core.Objects.Font";"npNetFont0")
         {
         }
 
-        type("NaviPartner.Retail.Json.Core.Requests.SetOptionJsonRequest";"SetOptionJsonRequest")
+        type("NaviPartner.Retail.Json.Core.Requests.SetOptionJsonRequest";"npNetSetOptionJsonRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Core.Requests.ReportBugJsonRequest";"ReportBugJsonRequest")
+        type("NaviPartner.Retail.Json.Core.Requests.ReportBugJsonRequest";"npNetReportBugJsonRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Core.Requests.AppGatewayProtocolResponse";"AppGatewayProtocolResponse")
+        type("NaviPartner.Retail.Json.Core.Requests.AppGatewayProtocolResponse";"npNetAppGatewayProtocolResponse")
         {
         }
 
-        type("NaviPartner.Retail.Json.Core.Requests.SetCaptionsJsonRequest";"SetCaptionsJsonRequest")
+        type("NaviPartner.Retail.Json.Core.Requests.SetCaptionsJsonRequest";"npNetSetCaptionsJsonRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Core.Requests.SetFormatJsonRequest";"SetFormatJsonRequest")
+        type("NaviPartner.Retail.Json.Core.Requests.SetFormatJsonRequest";"npNetSetFormatJsonRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Core.Requests.SetImageJsonRequest";"SetImageJsonRequest")
+        type("NaviPartner.Retail.Json.Core.Requests.SetImageJsonRequest";"npNetSetImageJsonRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Core.Requests.ConfigureFontJsonRequest";"ConfigureFontJsonRequest")
+        type("NaviPartner.Retail.Json.Core.Requests.ConfigureFontJsonRequest";"npNetConfigureFontJsonRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Core.Requests.InvokeDeviceRequest";"InvokeDeviceRequest")
+        type("NaviPartner.Retail.Json.Core.Requests.InvokeDeviceRequest";"npNetInvokeDeviceRequest")
         {
         }
     }
@@ -2008,39 +2008,39 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Json.Workflow.WorkflowCallCompletedRequest";"WorkflowCallCompletedRequest")
+        type("NaviPartner.Retail.Json.Workflow.WorkflowCallCompletedRequest";"npNetWorkflowCallCompletedRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Workflow.WorkflowAction";"WorkflowAction")
+        type("NaviPartner.Retail.Json.Workflow.WorkflowAction";"npNetWorkflowAction")
         {
         }
 
-        type("NaviPartner.Retail.Json.Workflow.ConfigureReusableWorkflowRequest";"ConfigureReusableWorkflowRequest")
+        type("NaviPartner.Retail.Json.Workflow.ConfigureReusableWorkflowRequest";"npNetConfigureReusableWorkflowRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Workflow.WorkflowRequest";"WorkflowRequest")
+        type("NaviPartner.Retail.Json.Workflow.WorkflowRequest";"npNetWorkflowRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Workflow.PauseWorkflowJsonRequest";"PauseWorkflowJsonRequest")
+        type("NaviPartner.Retail.Json.Workflow.PauseWorkflowJsonRequest";"npNetPauseWorkflowJsonRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Workflow.ResumeWorkflowJsonRequest";"ResumeWorkflowJsonRequest")
+        type("NaviPartner.Retail.Json.Workflow.ResumeWorkflowJsonRequest";"npNetResumeWorkflowJsonRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Workflow.ProvideContextRequest";"ProvideContextRequest")
+        type("NaviPartner.Retail.Json.Workflow.ProvideContextRequest";"npNetProvideContextRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Workflow.Workflow";"Workflow")
+        type("NaviPartner.Retail.Json.Workflow.Workflow";"npNetWorkflow")
         {
         }
 
-        type("NaviPartner.Retail.Json.Workflow.WorkflowStep";"WorkflowStep")
+        type("NaviPartner.Retail.Json.Workflow.WorkflowStep";"npNetWorkflowStep")
         {
         }
     }
@@ -2051,39 +2051,39 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Json.Menu.Menu";"Menu")
+        type("NaviPartner.Retail.Json.Menu.Menu";"npNetMenu")
         {
         }
 
-        type("NaviPartner.Retail.Json.Menu.MenuButton";"MenuButton")
+        type("NaviPartner.Retail.Json.Menu.MenuButton";"npNetMenuButton")
         {
         }
 
-        type("NaviPartner.Retail.Json.Menu.ISubMenu";"ISubMenu")
+        type("NaviPartner.Retail.Json.Menu.ISubMenu";"npNetISubMenu")
         {
         }
 
-        type("NaviPartner.Retail.Json.Menu.Actions.Action";"Action")
+        type("NaviPartner.Retail.Json.Menu.Actions.Action";"npNetAction")
         {
         }
 
-        type("NaviPartner.Retail.Json.Menu.MenuRequest";"MenuRequest")
+        type("NaviPartner.Retail.Json.Menu.MenuRequest";"npNetMenuRequest")
         {
         }
 
-        type("NaviPartner.Retail.Json.Menu.Actions.ItemAction";"ItemAction")
+        type("NaviPartner.Retail.Json.Menu.Actions.ItemAction";"npNetItemAction")
         {
         }
 
-        type("NaviPartner.Retail.Json.Menu.Actions.MenuAction";"MenuAction")
+        type("NaviPartner.Retail.Json.Menu.Actions.MenuAction";"npNetMenuAction")
         {
         }
 
-        type("NaviPartner.Retail.Json.Menu.Actions.PaymentAction";"PaymentAction")
+        type("NaviPartner.Retail.Json.Menu.Actions.PaymentAction";"npNetPaymentAction")
         {
         }
 
-        type("NaviPartner.Retail.Json.Menu.Actions.CustomerAction";"CustomerAction")
+        type("NaviPartner.Retail.Json.Menu.Actions.CustomerAction";"npNetCustomerAction")
         {
         }
     }
@@ -2094,7 +2094,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Json.JsonRequest";"JsonRequest")
+        type("NaviPartner.Retail.Json.JsonRequest";"npNetJsonRequest")
         {
         }
     }
@@ -2105,15 +2105,15 @@ dotnet
         Culture='neutral';
         PublicKeyToken='f247894af5fce995';
 
-        type("NaviPartner.Retail.Stargate.Messaging.CashKeeper.Requests.CashKeeperRequest";"CashKeeperRequest0")
+        type("NaviPartner.Retail.Stargate.Messaging.CashKeeper.Requests.CashKeeperRequest";"npNetCashKeeperRequest0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.CashKeeper.Process.State";"State4")
+        type("NaviPartner.Retail.Stargate.Messaging.CashKeeper.Process.State";"npNetState4")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.CashKeeper.Process.State+Action";"State_Action2")
+        type("NaviPartner.Retail.Stargate.Messaging.CashKeeper.Process.State+Action";"npNetState_Action2")
         {
         }
     }
@@ -2124,11 +2124,11 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Stargate.Messaging.Print.Requests.PrintRequest";"PrintRequest0")
+        type("NaviPartner.Retail.Stargate.Messaging.Print.Requests.PrintRequest";"npNetPrintRequest0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.Print.Responses.PrintResponse";"PrintResponse0")
+        type("NaviPartner.Retail.Stargate.Messaging.Print.Responses.PrintResponse";"npNetPrintResponse0")
         {
         }
     }
@@ -2139,15 +2139,15 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Stargate.Messaging.FilePrint.Requests.FilePrintRequest";"FilePrintRequest0")
+        type("NaviPartner.Retail.Stargate.Messaging.FilePrint.Requests.FilePrintRequest";"npNetFilePrintRequest0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.FilePrint.Requests.FilePrintRequest+PrintMethod";"FilePrintRequest_PrintMethod")
+        type("NaviPartner.Retail.Stargate.Messaging.FilePrint.Requests.FilePrintRequest+PrintMethod";"npNetFilePrintRequest_PrintMethod")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.FilePrint.Responses.FilePrintResponse";"FilePrintResponse0")
+        type("NaviPartner.Retail.Stargate.Messaging.FilePrint.Responses.FilePrintResponse";"npNetFilePrintResponse0")
         {
         }
     }
@@ -2158,7 +2158,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='5c893ded5dd60b96';
 
-        type("NaviPartner.Retail.Stargate.Messaging.CustDisplay.Requests.SecondaryMonitorRequest";"SecondaryMonitorRequest")
+        type("NaviPartner.Retail.Stargate.Messaging.CustDisplay.Requests.SecondaryMonitorRequest";"npNetSecondaryMonitorRequest")
         {
         }
     }
@@ -2169,23 +2169,23 @@ dotnet
         Culture='neutral';
         PublicKeyToken='31bf3856ad364e35';
 
-        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.CellData";"CellData")
+        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.CellData";"npNetCellData")
         {
         }
 
-        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.WorkbookReader";"WorkbookReader")
+        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.WorkbookReader";"npNetWorkbookReader")
         {
         }
 
-        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.WorkbookWriter";"WorkbookWriter")
+        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.WorkbookWriter";"npNetWorkbookWriter")
         {
         }
 
-        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.WorksheetReader";"WorksheetReader")
+        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.WorksheetReader";"npNetWorksheetReader")
         {
         }
 
-        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.WorksheetWriter";"WorksheetWriter")
+        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.WorksheetWriter";"npNetWorksheetWriter")
         {
         }
     }
@@ -2196,7 +2196,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='31bf3856ad364e35';
 
-        type("DocumentFormat.OpenXml.Packaging.WorkbookPart";"WorkbookPart")
+        type("DocumentFormat.OpenXml.Packaging.WorkbookPart";"npNetWorkbookPart")
         {
         }
     }
@@ -2207,7 +2207,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='31bf3856ad364e35';
 
-        type("System.Web.Script.Serialization.JavaScriptSerializer";"JavaScriptSerializer")
+        type("System.Web.Script.Serialization.JavaScriptSerializer";"npNetJavaScriptSerializer")
         {
         }
     }
@@ -2218,11 +2218,11 @@ dotnet
         Culture='neutral';
         PublicKeyToken='ebad8a5963bb8e78';
 
-        type("Tamir.SharpSsh.jsch.ChannelSftp+LsEntry";"ChannelSftp_LsEntry")
+        type("Tamir.SharpSsh.jsch.ChannelSftp+LsEntry";"npNetChannelSftp_LsEntry")
         {
         }
 
-        type("Tamir.SharpSsh.Sftp";"Sftp0")
+        type("Tamir.SharpSsh.Sftp";"npNetSftp0")
         {
         }
     }
@@ -2233,7 +2233,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='867142ff84820aec';
 
-        type("NaviPartner.NaviConnect.NpWebRequest.NpWebRequest";"NpWebRequest")
+        type("NaviPartner.NaviConnect.NpWebRequest.NpWebRequest";"npNetNpWebRequest")
         {
         }
     }
@@ -2244,75 +2244,75 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Requests.StartWorkshiftRequest";"StartWorkshiftRequest")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Requests.StartWorkshiftRequest";"npNetStartWorkshiftRequest")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Responses.StartWorkshiftResponse";"StartWorkshiftResponse")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Responses.StartWorkshiftResponse";"npNetStartWorkshiftResponse")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Params.ConfigDriverParam";"ConfigDriverParam")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Params.ConfigDriverParam";"npNetConfigDriverParam")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Params.OpenParam";"OpenParam")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Params.OpenParam";"npNetOpenParam")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Process.ProcessLabels";"ProcessLabels")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Process.ProcessLabels";"npNetProcessLabels")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Requests.TransactionRequest";"TransactionRequest")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Requests.TransactionRequest";"npNetTransactionRequest")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Responses.TransactionResponse";"TransactionResponse")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Responses.TransactionResponse";"npNetTransactionResponse")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Results.TrxResult";"TrxResult")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Results.TrxResult";"npNetTrxResult")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Params.TrxParam";"TrxParam")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Params.TrxParam";"npNetTrxParam")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Requests.EndWorkshiftRequest";"EndWorkshiftRequest")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Requests.EndWorkshiftRequest";"npNetEndWorkshiftRequest")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Responses.EndWorkshiftResponse";"EndWorkshiftResponse")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Responses.EndWorkshiftResponse";"npNetEndWorkshiftResponse")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Requests.AuxRequest";"AuxRequest")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Requests.AuxRequest";"npNetAuxRequest")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Responses.AuxResponse";"AuxResponse")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Responses.AuxResponse";"npNetAuxResponse")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Results.AuxResult";"AuxResult")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Results.AuxResult";"npNetAuxResult")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Params.AuxParam";"AuxParam")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Params.AuxParam";"npNetAuxParam")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Utils.PepperOpCodes";"PepperOpCodes")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Utils.PepperOpCodes";"npNetPepperOpCodes")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Requests.FileManagementRequest";"FileManagementRequest")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Requests.FileManagementRequest";"npNetFileManagementRequest")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Responses.FileManagementResponse";"FileManagementResponse")
+        type("NaviPartner.Retail.Device.Messaging.PepperPayment.Responses.FileManagementResponse";"npNetFileManagementResponse")
         {
         }
     }
@@ -2323,75 +2323,75 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Requests.StartWorkshiftRequest";"StartWorkshiftRequest0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Requests.StartWorkshiftRequest";"npNetStartWorkshiftRequest0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Responses.StartWorkshiftResponse";"StartWorkshiftResponse0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Responses.StartWorkshiftResponse";"npNetStartWorkshiftResponse0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Params.ConfigDriverParam";"ConfigDriverParam0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Params.ConfigDriverParam";"npNetConfigDriverParam0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Params.OpenParam";"OpenParam0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Params.OpenParam";"npNetOpenParam0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Process.ProcessLabels";"ProcessLabels0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Process.ProcessLabels";"npNetProcessLabels0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Requests.TransactionRequest";"TransactionRequest0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Requests.TransactionRequest";"npNetTransactionRequest0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Responses.TransactionResponse";"TransactionResponse0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Responses.TransactionResponse";"npNetTransactionResponse0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Results.TrxResult";"TrxResult0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Results.TrxResult";"npNetTrxResult0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Params.TrxParam";"TrxParam0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Params.TrxParam";"npNetTrxParam0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Requests.EndWorkshiftRequest";"EndWorkshiftRequest0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Requests.EndWorkshiftRequest";"npNetEndWorkshiftRequest0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Responses.EndWorkshiftResponse";"EndWorkshiftResponse0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Responses.EndWorkshiftResponse";"npNetEndWorkshiftResponse0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Requests.AuxRequest";"AuxRequest0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Requests.AuxRequest";"npNetAuxRequest0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Responses.AuxResponse";"AuxResponse0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Responses.AuxResponse";"npNetAuxResponse0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Results.AuxResult";"AuxResult0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Results.AuxResult";"npNetAuxResult0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Params.AuxParam";"AuxParam0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Params.AuxParam";"npNetAuxParam0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Utils.PepperOpCodes";"PepperOpCodes0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Utils.PepperOpCodes";"npNetPepperOpCodes0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Requests.FileManagementRequest";"FileManagementRequest0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Requests.FileManagementRequest";"npNetFileManagementRequest0")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Responses.FileManagementResponse";"FileManagementResponse0")
+        type("NaviPartner.Retail.Stargate.Messaging.PepperPayment.Responses.FileManagementResponse";"npNetFileManagementResponse0")
         {
         }
     }
@@ -2402,31 +2402,31 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("CleanCash_1_1.CommunicationReceipt";"CommunicationReceipt")
+        type("CleanCash_1_1.CommunicationReceipt";"npNetCommunicationReceipt")
         {
         }
 
-        type("CleanCash_1_1.CommunicationResult";"CommunicationResult")
+        type("CleanCash_1_1.CommunicationResult";"npNetCommunicationResult")
         {
         }
 
-        type("CleanCash_1_1.CommunicationStatus";"CommunicationStatus")
+        type("CleanCash_1_1.CommunicationStatus";"npNetCommunicationStatus")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.CleanCash.Requests.CleanCashRequest";"CleanCashRequest")
+        type("NaviPartner.Retail.Device.Messaging.CleanCash.Requests.CleanCashRequest";"npNetCleanCashRequest")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.CleanCash.Responses.CleanCashResponse";"CleanCashResponse")
+        type("NaviPartner.Retail.Device.Messaging.CleanCash.Responses.CleanCashResponse";"npNetCleanCashResponse")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.CleanCash.Requests.CleanCashRequest+ActionStatus";"CleanCashRequest_ActionStatus")
+        type("NaviPartner.Retail.Device.Messaging.CleanCash.Requests.CleanCashRequest+ActionStatus";"npNetCleanCashRequest_ActionStatus")
         {
         }
 
-        type("NaviPartner.Retail.Device.Messaging.CleanCash.Bridge.CleanCashBridge";"CleanCashBridge")
+        type("NaviPartner.Retail.Device.Messaging.CleanCash.Bridge.CleanCashBridge";"npNetCleanCashBridge")
         {
         }
     }
@@ -2437,55 +2437,55 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Captions";"Captions")
+        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Captions";"npNetCaptions")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.TransactionRequest";"TransactionRequest1")
+        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.TransactionRequest";"npNetTransactionRequest1")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.State";"State5")
+        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.State";"npNetState5")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.OpenRequest";"OpenRequest")
+        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.OpenRequest";"npNetOpenRequest")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.CloseRequest";"CloseRequest")
+        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.CloseRequest";"npNetCloseRequest")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.VerifySetupRequest";"VerifySetupRequest")
+        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.VerifySetupRequest";"npNetVerifySetupRequest")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.LookupTransactionRequest";"LookupTransactionRequest")
+        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.LookupTransactionRequest";"npNetLookupTransactionRequest")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.VoidRequest";"VoidRequest")
+        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.VoidRequest";"npNetVoidRequest")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.BalanceEnquiryRequest";"BalanceEnquiryRequest")
+        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.BalanceEnquiryRequest";"npNetBalanceEnquiryRequest")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.ReprintReceiptRequest";"ReprintReceiptRequest")
+        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.ReprintReceiptRequest";"npNetReprintReceiptRequest")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.GenericRequest";"GenericRequest")
+        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Requests.GenericRequest";"npNetGenericRequest")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Responses.GenericResponse";"GenericResponse")
+        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.Responses.GenericResponse";"npNetGenericResponse")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.State+Connection";"State_Connection")
+        type("NaviPartner.Retail.Stargate.Messaging.MockEFT.State+Connection";"npNetState_Connection")
         {
         }
     }
@@ -2496,11 +2496,11 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Stargate.Messaging.PaymentGateway.Process.State";"State6")
+        type("NaviPartner.Retail.Stargate.Messaging.PaymentGateway.Process.State";"npNetState6")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Messaging.PaymentGateway.Process.PaymentGatewayProcessRequest";"PaymentGatewayProcessRequest0")
+        type("NaviPartner.Retail.Stargate.Messaging.PaymentGateway.Process.PaymentGatewayProcessRequest";"npNetPaymentGatewayProcessRequest0")
         {
         }
     }
@@ -2511,7 +2511,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='b77a5c561934e089';
 
-        type("System.Runtime.Serialization.Json.DataContractJsonSerializer";"DataContractJsonSerializer")
+        type("System.Runtime.Serialization.Json.DataContractJsonSerializer";"npNetDataContractJsonSerializer")
         {
         }
     }
@@ -2522,7 +2522,7 @@ dotnet
         Culture='neutral';
         PublicKeyToken='31bf3856ad364e35';
 
-        type("Microsoft.Dynamics.Nav.Client.BusinessChart.BusinessChartDataPoint";"BusinessChartDataPoint")
+        type("Microsoft.Dynamics.Nav.Client.BusinessChart.BusinessChartDataPoint";"npNetBusinessChartDataPoint")
         {
         }
     }
@@ -2533,14 +2533,14 @@ dotnet
         Culture='neutral';
         PublicKeyToken='31bf3856ad364e35';
 
-        type("Microsoft.Dynamics.Nav.Client.Capabilities.CameraProvider";"CameraProvider")
+        type("Microsoft.Dynamics.Nav.Client.Capabilities.CameraProvider";"npNetCameraProvider")
         {
         }
     }
 
     assembly("")
     {
-        type("";"")
+        type("";"npNet")
         {
         }
     }
@@ -2551,11 +2551,11 @@ dotnet
         Culture='neutral';
         PublicKeyToken='909fa1bba7619e33';
 
-        type("NaviPartner.Retail.Stargate.Packager.AssemblyDetector";"AssemblyDetector")
+        type("NaviPartner.Retail.Stargate.Packager.AssemblyDetector";"npNetAssemblyDetector")
         {
         }
 
-        type("NaviPartner.Retail.Stargate.Packager.DetectionResult";"DetectionResult")
+        type("NaviPartner.Retail.Stargate.Packager.DetectionResult";"npNetDetectionResult")
         {
         }
     }

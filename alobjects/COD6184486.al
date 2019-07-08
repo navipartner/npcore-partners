@@ -14,25 +14,25 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
 
     var
         POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
-        ExpectedResponseType: DotNet Type;
+        ExpectedResponseType: DotNet npNetType;
         ExpectedResponseId: Guid;
         ProtocolManagerId: Guid;
         ProtocolStage: Integer;
-        QueuedRequests: DotNet Stack;
-        QueuedResponseTypes: DotNet Stack;
+        QueuedRequests: DotNet npNetStack;
+        QueuedResponseTypes: DotNet npNetStack;
         "--RequestSpecific": Integer;
         InitializedRequest: Boolean;
-        FileMgtRequest: DotNet FileManagementRequest;
-        FileMgtResponse: DotNet FileManagementResponse;
+        FileMgtRequest: DotNet npNetFileManagementRequest;
+        FileMgtResponse: DotNet npNetFileManagementResponse;
         NOT_INITIALIZED: Label 'Please invoke initialprotocol function before setting paramaters.';
-        Labels: DotNet ProcessLabels;
+        Labels: DotNet npNetProcessLabels;
         PepperTerminalCaptions: Codeunit "Pepper Terminal Captions";
         PepperVersion: Record "Pepper Version";
         LastRestultCode: Integer;
         "--": Integer;
         ChunkInStr: InStream;
-        ChunkBinaryReader: DotNet BinaryReader;
-        ChunkMemoryStream: DotNet MemoryStream;
+        ChunkBinaryReader: DotNet npNetBinaryReader;
+        ChunkMemoryStream: DotNet npNetMemoryStream;
         NO_PEPPER_BLOB: Label 'No blob to install for pepper version %1.';
 
     local procedure "---Protocol functions"()
@@ -41,10 +41,10 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
 
     local procedure ProcessSignal(var TempBlob: Record TempBlob)
     var
-        Signal: DotNet Signal;
-        StartSignal: DotNet StartSession;
-        QueryCloseSignal: DotNet QueryClosePage;
-        Response: DotNet MessageResponse;
+        Signal: DotNet npNetSignal;
+        StartSignal: DotNet npNetStartSession;
+        QueryCloseSignal: DotNet npNetQueryClosePage;
+        Response: DotNet npNetMessageResponse;
     begin
 
         POSDeviceProxyManager.DeserializeObject(Signal,TempBlob);
@@ -71,7 +71,7 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
     local procedure Start(ProtocolManagerIdIn: Guid)
     var
         WebClientDependency: Record "Web Client Dependency";
-        VoidResponse: DotNet VoidResponse;
+        VoidResponse: DotNet npNetVoidResponse;
     begin
 
         ProtocolManagerId := ProtocolManagerIdIn;
@@ -82,7 +82,7 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
              ProtocolManagerId, FileMgtRequest));
     end;
 
-    local procedure MessageResponse(Envelope: DotNet ResponseEnvelope)
+    local procedure MessageResponse(Envelope: DotNet npNetResponseEnvelope)
     begin
 
         if Envelope.ResponseTypeName <> Format(ExpectedResponseType) then
@@ -102,7 +102,7 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
         POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
     end;
 
-    local procedure AwaitResponse(Type: DotNet Type;Id: Guid)
+    local procedure AwaitResponse(Type: DotNet npNetType;Id: Guid)
     begin
 
         ExpectedResponseType := Type;
@@ -195,11 +195,11 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
 
     local procedure GetZipFileToInstall(Data: Text;var PepperB64File: Text)
     var
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
         InStr: InStream;
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
     begin
         FileMgtResponse := FileMgtResponse.Deserialize (Data);
 
@@ -216,7 +216,7 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
 
     local procedure GetFirstChunk(Data: Text;var B64FileChunk: Text)
     var
-        Convert: DotNet Convert;
+        Convert: DotNet npNetConvert;
     begin
         //FileMgtResponse := FileMgtResponse.Deserialize (Data);
 
@@ -234,7 +234,7 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
 
     local procedure GetNextChunk(Data: Text;var B64FileChunk: Text)
     var
-        Convert: DotNet Convert;
+        Convert: DotNet npNetConvert;
     begin
         //FileMgtResponse := FileMgtResponse.Deserialize (Data);
 
@@ -265,7 +265,7 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
 
     local procedure SerializeJson("Object": Variant): Text
     var
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
     begin
         exit(JsonConvert.SerializeObject(Object));
     end;

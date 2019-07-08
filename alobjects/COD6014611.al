@@ -116,7 +116,7 @@ codeunit 6014611 "Tax Free PTF PI"
     var
         ErrorText: Text;
         ErrorNo: Text;
-        XMLDoc: DotNet XmlDocument;
+        XMLDoc: DotNet npNetXmlDocument;
     begin
         VoidVoucherRequest(TaxFreeRequest, ExternalVoucherNo);
         HandleResponse(TaxFreeRequest, 'VoidVoucherResult', XMLDoc);
@@ -146,7 +146,7 @@ codeunit 6014611 "Tax Free PTF PI"
         ResponseMessage: Text;
         Value: Text;
         Eligible: Text;
-        XMLDoc: DotNet XmlDocument;
+        XMLDoc: DotNet npNetXmlDocument;
         IIN: Text;
         ErrorNo: Text;
     begin
@@ -172,7 +172,7 @@ codeunit 6014611 "Tax Free PTF PI"
     var
         ResponseMessage: Text;
         ErrorNo: Text;
-        XMLDoc: DotNet XmlDocument;
+        XMLDoc: DotNet npNetXmlDocument;
     begin
         InsertInvoiceRequest(TaxFreeRequest, RecRef);
         HandleResponse(TaxFreeRequest, 'InsertInvoiceResult', XMLDoc);
@@ -194,7 +194,7 @@ codeunit 6014611 "Tax Free PTF PI"
         VoucherRefundAmount: Text;
         TempBlob: Record TempBlob temporary;
         OutStream: OutStream;
-        XMLDoc: DotNet XmlDocument;
+        XMLDoc: DotNet npNetXmlDocument;
         Decimal: Decimal;
         PrintXML: Text;
     begin
@@ -232,11 +232,11 @@ codeunit 6014611 "Tax Free PTF PI"
         end;
     end;
 
-    local procedure GetCDataXML(XMLDoc: DotNet XmlDocument;CDATATagName: Text)
+    local procedure GetCDataXML(XMLDoc: DotNet npNetXmlDocument;CDATATagName: Text)
     var
-        XMLNode: DotNet XmlNode;
-        XMLNodeList: DotNet XmlNodeList;
-        HtmlDecoder: DotNet HttpUtility;
+        XMLNode: DotNet npNetXmlNode;
+        XMLNodeList: DotNet npNetXmlNodeList;
+        HtmlDecoder: DotNet npNetHttpUtility;
     begin
         XMLNodeList := XMLDoc.GetElementsByTagName(CDATATagName);
         XMLNode := XMLNodeList.ItemOf(0);
@@ -244,10 +244,10 @@ codeunit 6014611 "Tax Free PTF PI"
         XMLDoc.LoadXml(HtmlDecoder.HtmlDecode(XMLNode.InnerXml));
     end;
 
-    local procedure GetFirstNodeContent(XMLDoc: DotNet XmlDocument;ElementName: Text;XMLInContent: Boolean): Text
+    local procedure GetFirstNodeContent(XMLDoc: DotNet npNetXmlDocument;ElementName: Text;XMLInContent: Boolean): Text
     var
-        XMLNode: DotNet XmlNode;
-        XMLNodeList: DotNet XmlNodeList;
+        XMLNode: DotNet npNetXmlNode;
+        XMLNodeList: DotNet npNetXmlNodeList;
     begin
         XMLNodeList := XMLDoc.GetElementsByTagName(ElementName);
         XMLNode := XMLNodeList.ItemOf(0);
@@ -260,11 +260,11 @@ codeunit 6014611 "Tax Free PTF PI"
     [TryFunction]
     local procedure GetBarcodeFromPrintXML(PrintXML: Text;var Barcode: Text)
     var
-        XMLNode: DotNet XmlNode;
-        PrintLines: DotNet XmlNodeList;
+        XMLNode: DotNet npNetXmlNode;
+        PrintLines: DotNet npNetXmlNodeList;
         i: Integer;
         Line: Text;
-        XMLDoc: DotNet XmlDocument;
+        XMLDoc: DotNet npNetXmlDocument;
     begin
         XMLDoc := XMLDoc.XmlDocument;
         XMLDoc.LoadXml(PrintXML);
@@ -489,7 +489,7 @@ codeunit 6014611 "Tax Free PTF PI"
     end;
 
     [TryFunction]
-    local procedure TryGetFirstNodeContent(XMLDoc: DotNet XmlDocument;ElementName: Text;XMLInContent: Boolean;var Value: Text)
+    local procedure TryGetFirstNodeContent(XMLDoc: DotNet npNetXmlDocument;ElementName: Text;XMLInContent: Boolean;var Value: Text)
     begin
         Value := GetFirstNodeContent(XMLDoc, ElementName, XMLInContent);
     end;
@@ -497,7 +497,7 @@ codeunit 6014611 "Tax Free PTF PI"
     local procedure ReplaceSpecialChars(Text: Text): Text
     var
         CALText: Text;
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         String := Text;
         String := String.Replace('&', '&amp;');
@@ -544,17 +544,17 @@ codeunit 6014611 "Tax Free PTF PI"
     local procedure PrintThermalReceipt(var TaxFreeRequest: Record "Tax Free Request")
     var
         Printer: Codeunit "RP Line Print Mgt.";
-        XMLNode: DotNet XmlNode;
+        XMLNode: DotNet npNetXmlNode;
         i: Integer;
         Line: Text;
         LineBuffer: Text;
         ObjectOutputMgt: Codeunit "Object Output Mgt.";
         Output: Text;
         OutputType: Integer;
-        XMLDoc: DotNet XmlDocument;
+        XMLDoc: DotNet npNetXmlDocument;
         InStream: InStream;
-        MemoryStream: DotNet MemoryStream;
-        PrintLines: DotNet XmlNodeList;
+        MemoryStream: DotNet npNetMemoryStream;
+        PrintLines: DotNet npNetXmlNodeList;
     begin
         //See page 55 of doc. for print line prefix explanations.
         Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"Report - Tax Free Receipt");
@@ -641,18 +641,18 @@ codeunit 6014611 "Tax Free PTF PI"
 
     local procedure PrintPDF(var TaxFreeRequest: Record "Tax Free Request")
     var
-        XMLNode: DotNet XmlNode;
+        XMLNode: DotNet npNetXmlNode;
         base64: Text;
         ObjectOutputSelection: Record "Object Output Selection";
         PrintMethodMgt: Codeunit "Print Method Mgt.";
-        MemoryStream: DotNet MemoryStream;
+        MemoryStream: DotNet npNetMemoryStream;
         ErrorText: Text;
-        Convert: DotNet Convert;
+        Convert: DotNet npNetConvert;
         Output: Text;
         OutputType: Integer;
         ObjectOutputMgt: Codeunit "Object Output Mgt.";
-        PrintLines: DotNet XmlNodeList;
-        XMLDoc: DotNet XmlDocument;
+        PrintLines: DotNet npNetXmlNodeList;
+        XMLDoc: DotNet npNetXmlDocument;
         InStream: InStream;
     begin
         Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"Report - Tax Free Receipt");
@@ -869,12 +869,12 @@ codeunit 6014611 "Tax Free PTF PI"
     local procedure InvokeService(RequestMessage: Text;var TaxFreeRequest: Record "Tax Free Request")
     var
         BaseAddress: Text;
-        HttpClient: DotNet HttpClient;
-        Uri: DotNet Uri;
-        TimeSpan: DotNet TimeSpan;
-        StringContent: DotNet StringContent;
-        Encoding: DotNet Encoding;
-        HttpResponseMessage: DotNet HttpResponseMessage;
+        HttpClient: DotNet npNetHttpClient;
+        Uri: DotNet npNetUri;
+        TimeSpan: DotNet npNetTimeSpan;
+        StringContent: DotNet npNetStringContent;
+        Encoding: DotNet npNetEncoding;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
         OutStream: OutStream;
         Result: Text;
     begin
@@ -905,10 +905,10 @@ codeunit 6014611 "Tax Free PTF PI"
         OutStream.Write(Result);
     end;
 
-    local procedure HandleResponse(var TaxFreeRequest: Record "Tax Free Request";ResponseTagName: Text;var XMLDoc: DotNet XmlDocument)
+    local procedure HandleResponse(var TaxFreeRequest: Record "Tax Free Request";ResponseTagName: Text;var XMLDoc: DotNet npNetXmlDocument)
     var
         InStream: InStream;
-        MemoryStream: DotNet MemoryStream;
+        MemoryStream: DotNet npNetMemoryStream;
     begin
         TaxFreeRequest.Response.CreateInStream(InStream);
         MemoryStream := MemoryStream.MemoryStream();
@@ -925,7 +925,7 @@ codeunit 6014611 "Tax Free PTF PI"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnLookupHandler', '', false, false)]
-    local procedure OnLookupHandler(var HashSet: DotNet HashSet_Of_T)
+    local procedure OnLookupHandler(var HashSet: DotNet npNetHashSet_Of_T)
     begin
         HashSet.Add(HandlerID);
     end;

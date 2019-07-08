@@ -8,7 +8,7 @@ codeunit 6150904 "HC Audit Roll Management"
 
     trigger OnRun()
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
     begin
         if LoadXmlDoc(XmlDoc) then
           //-NPR5.44 [318391]
@@ -23,10 +23,10 @@ codeunit 6150904 "HC Audit Roll Management"
         Initialized: Boolean;
         Text001: Label 'Audit Roll %1 - %2 - %3 - %4 - %5 - %6 allready exists.';
 
-    local procedure UpdateAuditRolls(XmlDoc: DotNet XmlDocument)
+    local procedure UpdateAuditRolls(XmlDoc: DotNet npNetXmlDocument)
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         if IsNull(XmlDoc) then
@@ -64,10 +64,10 @@ codeunit 6150904 "HC Audit Roll Management"
         //+NPR5.44 [318391]
     end;
 
-    local procedure UpdateAuditRoll(XmlElement: DotNet XmlElement) DocumentNoFilter: Text
+    local procedure UpdateAuditRoll(XmlElement: DotNet npNetXmlElement) DocumentNoFilter: Text
     var
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         DirectPost: Boolean;
         DocumentNo: Text;
@@ -93,10 +93,10 @@ codeunit 6150904 "HC Audit Roll Management"
         //+NPR5.44 [318391]
     end;
 
-    local procedure UpdateAuditRollLine(ItemXmlElement: DotNet XmlElement) DocumentNo: Text
+    local procedure UpdateAuditRollLine(ItemXmlElement: DotNet npNetXmlElement) DocumentNo: Text
     var
         HCAuditRoll: Record "HC Audit Roll";
-        ChildXmlElement: DotNet XmlElement;
+        ChildXmlElement: DotNet npNetXmlElement;
     begin
         //-NPR5.44 [318391]
         // IF ISNULL(ItemXmlElement) THEN
@@ -176,7 +176,7 @@ codeunit 6150904 "HC Audit Roll Management"
     begin
     end;
 
-    local procedure InsertAuditRollLine(XmlElement: DotNet XmlElement;var HCAuditRoll: Record "HC Audit Roll")
+    local procedure InsertAuditRollLine(XmlElement: DotNet npNetXmlElement;var HCAuditRoll: Record "HC Audit Roll")
     var
         TempHCAuditRoll: Record "HC Audit Roll" temporary;
         OStream: OutStream;
@@ -290,7 +290,7 @@ codeunit 6150904 "HC Audit Roll Management"
         //+NPR5.44 [318391]
     end;
 
-    local procedure UpdateComments(var BCAuditRoll: Record "HC Audit Roll";VariantXmlElement: DotNet XmlElement)
+    local procedure UpdateComments(var BCAuditRoll: Record "HC Audit Roll";VariantXmlElement: DotNet npNetXmlElement)
     var
         ItemVariant: Record "Item Variant";
     begin

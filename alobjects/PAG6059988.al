@@ -16,11 +16,11 @@ page 6059988 "Sale Statistics Activities"
             usercontrol(SalesChart;"Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
 
-                trigger DataPointClicked(point: DotNet BusinessChartDataPoint)
+                trigger DataPointClicked(point: DotNet npNetBusinessChartDataPoint)
                 begin
                 end;
 
-                trigger DataPointDoubleClicked(point: DotNet BusinessChartDataPoint)
+                trigger DataPointDoubleClicked(point: DotNet npNetBusinessChartDataPoint)
                 begin
                 end;
 

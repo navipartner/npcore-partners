@@ -11,7 +11,7 @@ codeunit 6150672 "POS Action - View Web Depen."
     var
         Text000: Label 'View Web Client Dependency';
         [WithEvents]
-        Model: DotNet Model;
+        Model: DotNet npNetModel;
         ActiveModelID: Guid;
 
     local procedure ActionCode(): Text
@@ -83,7 +83,7 @@ codeunit 6150672 "POS Action - View Web Depen."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
     begin
@@ -120,7 +120,7 @@ codeunit 6150672 "POS Action - View Web Depen."
     local procedure InitCss(JSON: Codeunit "POS JSON Management") Css: Text
     var
         WebClientDependency: Record "Web Client Dependency";
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
         CssCode: Code[10];
     begin
@@ -137,7 +137,7 @@ codeunit 6150672 "POS Action - View Web Depen."
     local procedure InitHtml(JSON: Codeunit "POS JSON Management") Html: Text
     var
         WebClientDependency: Record "Web Client Dependency";
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
         HtmlCode: Code[10];
     begin
@@ -183,7 +183,7 @@ codeunit 6150672 "POS Action - View Web Depen."
         end;
     end;
 
-    trigger Model::OnModelControlEvent(control: DotNet Control;eventName: Text;data: DotNet Dictionary_Of_T_U)
+    trigger Model::OnModelControlEvent(control: DotNet npNetControl;eventName: Text;data: DotNet npNetDictionary_Of_T_U)
     begin
     end;
 

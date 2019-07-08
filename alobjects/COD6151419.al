@@ -25,7 +25,7 @@ codeunit 6151419 "Magento Picture Mgt."
     local procedure SendMagentoPicture(PictureName: Text;PictureType: Text;PictureDataUri: Text)
     var
         MagentoMgt: Codeunit "Magento Mgt.";
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
     begin
         MagentoSetup.Get;
         MagentoSetup.TestField("Magento Url");

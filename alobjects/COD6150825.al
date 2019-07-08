@@ -18,7 +18,7 @@ codeunit 6150825 "POS Action - MPOS Native"
         Err_EODFailed: Label 'Error running EndOfDay on the terminal';
         Err_LFRFailed: Label 'Error printing last receipt on the terminal';
         Err_ScanditFailed: Label 'Error running the Scandit Barcode Reader';
-        Model: DotNet Model;
+        Model: DotNet npNetModel;
         ProtocolError: Label 'An unexpected error ocurred in the %1 protocol:\%2';
         ERROR_SESSION: Label 'Critical Error: Session object could not be retrieved for %1. ';
         ActiveModelID: Guid;
@@ -63,7 +63,7 @@ codeunit 6150825 "POS Action - MPOS Native"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         NativeActionSetting: Option ADMISSION,EOD,PRINTLASTRECEIPT,SCANDITITEMINFO,SCANDITFINDITEM,COUNTSALESFLOOR,COUNTSTOCKROOM,ASSIGNTAG,LOCATETAG,REFILL,APPROVE;
@@ -309,7 +309,7 @@ codeunit 6150825 "POS Action - MPOS Native"
     local procedure CreateUserInterface(JsonObject: Text)
     var
         WebClientDependency: Record "Web Client Dependency";
-        Factory: DotNet ControlFactory;
+        Factory: DotNet npNetControlFactory;
     begin
         Model := Model.Model();
         Model.AddScript('function CallNativeFunction(jsonObject) {console.log(jsonObject); window.webkit.messageHandlers.invokeAction.postMessage(jsonObject);}');
@@ -367,7 +367,7 @@ codeunit 6150825 "POS Action - MPOS Native"
         Message(ErrorText);
     end;
 
-    trigger Model::OnModelControlEvent(control: DotNet Control;eventName: Text;data: DotNet Dictionary_Of_T_U)
+    trigger Model::OnModelControlEvent(control: DotNet npNetControl;eventName: Text;data: DotNet npNetDictionary_Of_T_U)
     begin
     end;
 

@@ -19,11 +19,11 @@ codeunit 6184550 TDC
     var
         IComm: Record "I-Comm";
         Result: Text;
-        Encoding: DotNet Encoding;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        Stream: DotNet Stream;
-        StreamReader: DotNet StreamReader;
+        Encoding: DotNet npNetEncoding;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
     begin
         if not IComm.Get then
           exit;
@@ -54,9 +54,9 @@ codeunit 6184550 TDC
 
     local procedure LoadToBuffer(var Stringtxt: Text;var TMPPhoneLookupBuf: Record "Phone Lookup Buffer")
     var
-        SeperatorArray: DotNet Array;
-        StringArray: DotNet Array;
-        ResponseString: DotNet String;
+        SeperatorArray: DotNet npNetArray;
+        StringArray: DotNet npNetArray;
+        ResponseString: DotNet npNetString;
         Space: Char;
         Tab: Char;
         i: Integer;

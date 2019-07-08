@@ -61,7 +61,7 @@ page 6014656 "Proxy Assemblies"
                 var
                     ManagedDepMgt: Codeunit "Managed Dependency Mgt.";
                     Rec2: Record "Proxy Assembly";
-                    JArray: DotNet JArray;
+                    JArray: DotNet npNetJArray;
                 begin
                     CurrPage.SetSelectionFilter(Rec2);
                     //-NPR5.32.10 [265454]

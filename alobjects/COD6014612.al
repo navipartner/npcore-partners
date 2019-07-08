@@ -117,7 +117,7 @@ codeunit 6014612 "Tax Free PTF Offline"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnLookupHandler', '', false, false)]
-    local procedure OnLookupHandler(var HashSet: DotNet HashSet_Of_T)
+    local procedure OnLookupHandler(var HashSet: DotNet npNetHashSet_Of_T)
     begin
         HashSet.Add(HandlerID);
     end;

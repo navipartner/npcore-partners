@@ -20,8 +20,8 @@ report 6151406 "Magento Gift Voucher"
             trigger OnAfterGetRecord()
             var
                 TempBlob: Record TempBlob temporary;
-                Convert: DotNet Convert;
-                MemoryStream: DotNet MemoryStream;
+                Convert: DotNet npNetConvert;
+                MemoryStream: DotNet npNetMemoryStream;
                 InStream: InStream;
             begin
                 GiftVoucherMgt.GiftVoucherToTempBlob("Gift Voucher",TempBlob);

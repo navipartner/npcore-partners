@@ -10,7 +10,7 @@ codeunit 6014523 "NavTable To DotNet Table Tool"
     end;
 
     var
-        DotNetDataTable: DotNet DataTable;
+        DotNetDataTable: DotNet npNetDataTable;
         GlobalRecRef: RecordRef;
         "-- Properties": Integer;
         MaxFieldCount: Integer;
@@ -32,7 +32,7 @@ codeunit 6014523 "NavTable To DotNet Table Tool"
     var
         "Fields": Record "Field";
         OverRideColHeader: Boolean;
-        DotNetDataColumn: DotNet DataColumn;
+        DotNetDataColumn: DotNet npNetDataColumn;
     begin
         OverRideColHeader := DataItemDescriptor[1] > 0;
 
@@ -59,18 +59,18 @@ codeunit 6014523 "NavTable To DotNet Table Tool"
     var
         "Fields": Record "Field";
         FieldRef: FieldRef;
-        DataRow: DotNet DataRow;
+        DataRow: DotNet npNetDataRow;
         Itt: Integer;
         Itt2: Integer;
         OverRideColHeader: Boolean;
         ExitLoop: Boolean;
-        DotNetDataColumn: DotNet DataColumn;
-        Type: DotNet Type;
+        DotNetDataColumn: DotNet npNetDataColumn;
+        Type: DotNet npNetType;
         [RunOnClient]
-        Bytes: DotNet Array;
-        Encoding: DotNet Encoding;
-        BinaryReader: DotNet BinaryReader;
-        Stream: DotNet Stream;
+        Bytes: DotNet npNetArray;
+        Encoding: DotNet npNetEncoding;
+        BinaryReader: DotNet npNetBinaryReader;
+        Stream: DotNet npNetStream;
         TempBlob: Record TempBlob temporary;
         InStream: InStream;
         BigText: BigText;
@@ -147,12 +147,12 @@ codeunit 6014523 "NavTable To DotNet Table Tool"
         GlobalRecRef.Close;
     end;
 
-    procedure GetDotNetDataTable(var DotNetDataTableOut: DotNet DataTable)
+    procedure GetDotNetDataTable(var DotNetDataTableOut: DotNet npNetDataTable)
     begin
         DotNetDataTableOut := DotNetDataTable;
     end;
 
-    procedure SetDotNetDataTable(var DotNetDataTableIn: DotNet DataTable)
+    procedure SetDotNetDataTable(var DotNetDataTableIn: DotNet npNetDataTable)
     begin
         DotNetDataTable := DotNetDataTableIn;
     end;
@@ -179,8 +179,8 @@ codeunit 6014523 "NavTable To DotNet Table Tool"
 
     procedure SetCustomColumnValue(RecordPosition: Text[250];RowIndex: Integer;ColumnName: Text[50];Value: Text[50])
     var
-        DataRow: DotNet DataRow;
-        DataField: DotNet DataColumn;
+        DataRow: DotNet npNetDataRow;
+        DataField: DotNet npNetDataColumn;
         Itt: Integer;
         ColumnIndex: Integer;
         PositionIndex: Integer;
@@ -227,47 +227,47 @@ codeunit 6014523 "NavTable To DotNet Table Tool"
         Message(Format(VarParm));
     end;
 
-    trigger DotNetDataTable::ColumnChanging(sender: Variant;e: DotNet DataColumnChangeEventArgs)
+    trigger DotNetDataTable::ColumnChanging(sender: Variant;e: DotNet npNetDataColumnChangeEventArgs)
     begin
     end;
 
-    trigger DotNetDataTable::ColumnChanged(sender: Variant;e: DotNet DataColumnChangeEventArgs)
+    trigger DotNetDataTable::ColumnChanged(sender: Variant;e: DotNet npNetDataColumnChangeEventArgs)
     begin
     end;
 
-    trigger DotNetDataTable::Initialized(sender: Variant;e: DotNet EventArgs)
+    trigger DotNetDataTable::Initialized(sender: Variant;e: DotNet npNetEventArgs)
     begin
     end;
 
-    trigger DotNetDataTable::RowChanged(sender: Variant;e: DotNet DataRowChangeEventArgs)
+    trigger DotNetDataTable::RowChanged(sender: Variant;e: DotNet npNetDataRowChangeEventArgs)
     begin
     end;
 
-    trigger DotNetDataTable::RowChanging(sender: Variant;e: DotNet DataRowChangeEventArgs)
+    trigger DotNetDataTable::RowChanging(sender: Variant;e: DotNet npNetDataRowChangeEventArgs)
     begin
     end;
 
-    trigger DotNetDataTable::RowDeleting(sender: Variant;e: DotNet DataRowChangeEventArgs)
+    trigger DotNetDataTable::RowDeleting(sender: Variant;e: DotNet npNetDataRowChangeEventArgs)
     begin
     end;
 
-    trigger DotNetDataTable::RowDeleted(sender: Variant;e: DotNet DataRowChangeEventArgs)
+    trigger DotNetDataTable::RowDeleted(sender: Variant;e: DotNet npNetDataRowChangeEventArgs)
     begin
     end;
 
-    trigger DotNetDataTable::TableClearing(sender: Variant;e: DotNet DataTableClearEventArgs)
+    trigger DotNetDataTable::TableClearing(sender: Variant;e: DotNet npNetDataTableClearEventArgs)
     begin
     end;
 
-    trigger DotNetDataTable::TableCleared(sender: Variant;e: DotNet DataTableClearEventArgs)
+    trigger DotNetDataTable::TableCleared(sender: Variant;e: DotNet npNetDataTableClearEventArgs)
     begin
     end;
 
-    trigger DotNetDataTable::TableNewRow(sender: Variant;e: DotNet DataTableNewRowEventArgs)
+    trigger DotNetDataTable::TableNewRow(sender: Variant;e: DotNet npNetDataTableNewRowEventArgs)
     begin
     end;
 
-    trigger DotNetDataTable::Disposed(sender: Variant;e: DotNet EventArgs)
+    trigger DotNetDataTable::Disposed(sender: Variant;e: DotNet npNetEventArgs)
     begin
     end;
 }

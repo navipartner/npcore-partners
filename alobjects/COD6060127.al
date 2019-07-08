@@ -488,9 +488,9 @@ codeunit 6060127 "MM Membership Management"
     procedure GetMemberImage(MemberEntryNo: Integer;var Base64StringImage: Text) Success: Boolean
     var
         Member: Record "MM Member";
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
     begin
 
@@ -540,8 +540,8 @@ codeunit 6060127 "MM Membership Management"
 
     procedure UpdateMemberImage(MemberEntryNo: Integer;Base64StringImage: Text) Success: Boolean
     var
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         OutStr: OutStream;
         Member: Record "MM Member";
     begin
@@ -4094,9 +4094,9 @@ codeunit 6060127 "MM Membership Management"
 
     local procedure GetBase64StringFromBinaryFile(Filename: Text) Value: Text
     var
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
         f: File;
     begin

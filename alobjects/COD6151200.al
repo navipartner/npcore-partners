@@ -7,8 +7,8 @@ codeunit 6151200 "NpCs Import Sales Document"
     trigger OnRun()
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
     begin
         if not Rec.LoadXmlDoc(XmlDoc) then
           Error(Text000);
@@ -28,7 +28,7 @@ codeunit 6151200 "NpCs Import Sales Document"
         Text004: Label 'Item %1 could not be mapped in line no. %2';
         Text005: Label 'Order received from Store %1';
 
-    local procedure ImportSalesDoc(XmlElement: DotNet XmlElement)
+    local procedure ImportSalesDoc(XmlElement: DotNet npNetXmlElement)
     var
         Customer: Record Customer;
         NpCsDocument: Record "NpCs Document";
@@ -36,7 +36,7 @@ codeunit 6151200 "NpCs Import Sales Document"
         SalesHeader: Record "Sales Header";
         NpCsExpirationMgt: Codeunit "NpCs Expiration Mgt.";
         NpCsWorkflowMgt: Codeunit "NpCs Workflow Mgt.";
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         LogMessage: Text;
     begin
         if FindNpCsDocument(XmlElement,NpCsDocument) then
@@ -64,7 +64,7 @@ codeunit 6151200 "NpCs Import Sales Document"
           NpCsExpirationMgt.ScheduleUpdateExpirationStatus(NpCsDocument,NpCsDocument."Processing expires at");
     end;
 
-    local procedure UpsertFromStore(XmlElement: DotNet XmlElement)
+    local procedure UpsertFromStore(XmlElement: DotNet npNetXmlElement)
     var
         NpCsStore: Record "NpCs Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
@@ -93,13 +93,13 @@ codeunit 6151200 "NpCs Import Sales Document"
           NpCsStore.Modify(true);
     end;
 
-    local procedure InsertDocumentMappings(XmlElement: DotNet XmlElement)
+    local procedure InsertDocumentMappings(XmlElement: DotNet npNetXmlElement)
     var
         Customer: Record Customer;
         ItemVariant: Record "Item Variant";
         NpCsDocumentMapping: Record "NpCs Document Mapping";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         FromStore: Code[20];
         FromNo: Code[20];
         Description: Text;
@@ -153,7 +153,7 @@ codeunit 6151200 "NpCs Import Sales Document"
           NpCsDocumentMapping.Modify(true);
     end;
 
-    local procedure UpsertCustomer(XmlElement: DotNet XmlElement;var Customer: Record Customer)
+    local procedure UpsertCustomer(XmlElement: DotNet npNetXmlElement;var Customer: Record Customer)
     var
         NpCsDocumentMapping: Record "NpCs Document Mapping";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
@@ -192,7 +192,7 @@ codeunit 6151200 "NpCs Import Sales Document"
           Customer.Modify(true);
     end;
 
-    local procedure InsertSalesHeader(XmlElement: DotNet XmlElement;Customer: Record Customer;var SalesHeader: Record "Sales Header";var NpCsDocument: Record "NpCs Document")
+    local procedure InsertSalesHeader(XmlElement: DotNet npNetXmlElement;Customer: Record Customer;var SalesHeader: Record "Sales Header";var NpCsDocument: Record "NpCs Document")
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         NpCsExpirationMgt: Codeunit "NpCs Expiration Mgt.";
@@ -270,7 +270,7 @@ codeunit 6151200 "NpCs Import Sales Document"
         SalesHeader.Modify(true);
     end;
 
-    local procedure InsertSalesLine(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header")
+    local procedure InsertSalesLine(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header")
     var
         ItemVariant: Record "Item Variant";
         SalesLine: Record "Sales Line";
@@ -326,7 +326,7 @@ codeunit 6151200 "NpCs Import Sales Document"
     begin
     end;
 
-    local procedure FindCustomer(XmlElement: DotNet XmlElement;var Customer: Record Customer): Boolean
+    local procedure FindCustomer(XmlElement: DotNet npNetXmlElement;var Customer: Record Customer): Boolean
     var
         NpCsWorkflow: Record "NpCs Workflow";
         NpCsDocumentMapping: Record "NpCs Document Mapping";
@@ -402,7 +402,7 @@ codeunit 6151200 "NpCs Import Sales Document"
         exit(false);
     end;
 
-    local procedure FindNpCsDocument(XmlElement: DotNet XmlElement;var NpCsDocument: Record "NpCs Document"): Boolean
+    local procedure FindNpCsDocument(XmlElement: DotNet npNetXmlElement;var NpCsDocument: Record "NpCs Document"): Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         DocType: Integer;
@@ -421,7 +421,7 @@ codeunit 6151200 "NpCs Import Sales Document"
         exit(NpCsDocument.FindFirst);
     end;
 
-    local procedure FindItemVariant(XmlElement: DotNet XmlElement;var ItemVariant: Record "Item Variant")
+    local procedure FindItemVariant(XmlElement: DotNet npNetXmlElement;var ItemVariant: Record "Item Variant")
     var
         Item: Record Item;
         ItemCrossRef: Record "Item Cross Reference";
@@ -494,7 +494,7 @@ codeunit 6151200 "NpCs Import Sales Document"
         exit('');
     end;
 
-    local procedure GetFromStoreCode(XmlElement: DotNet XmlElement) StoreCode: Code[20]
+    local procedure GetFromStoreCode(XmlElement: DotNet npNetXmlElement) StoreCode: Code[20]
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
     begin
@@ -505,11 +505,11 @@ codeunit 6151200 "NpCs Import Sales Document"
         exit(StoreCode);
     end;
 
-    local procedure GetCallback(XmlElement: DotNet XmlElement) Callback: Text
+    local procedure GetCallback(XmlElement: DotNet npNetXmlElement) Callback: Text
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Encoding: DotNet Encoding;
-        Convert: DotNet Convert;
+        Encoding: DotNet npNetEncoding;
+        Convert: DotNet npNetConvert;
     begin
         Callback := NpXmlDomMgt.GetElementText(XmlElement,'/*/sales_document/from_store/callback',0,false);
         if Callback = '' then

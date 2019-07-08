@@ -53,12 +53,12 @@ codeunit 6151401 "Magento Setup Mgt."
     begin
     end;
 
-    local procedure CreateStores(var XmlElement: DotNet XmlElement;MagentoWebsite: Record "Magento Website")
+    local procedure CreateStores(var XmlElement: DotNet npNetXmlElement;MagentoWebsite: Record "Magento Website")
     var
         MagentoStore: Record "Magento Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlElement2: DotNet XmlElement;
-        XmlElement3: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlElement3: DotNet npNetXmlElement;
         i: Integer;
         j: Integer;
         RootItemGroupNo: Code[20];
@@ -172,8 +172,8 @@ codeunit 6151401 "Magento Setup Mgt."
     procedure SetupClientAddIn(Name: Text[220];PublicKeyToken: Text[20];Version: Text[25];Description: Text[250])
     var
         ClientAddin: Record "Add-in";
-        MemoryStream: DotNet MemoryStream;
-        WebClient: DotNet WebClient;
+        MemoryStream: DotNet npNetMemoryStream;
+        WebClient: DotNet npNetWebClient;
         OutStream: OutStream;
     begin
         WebClient := WebClient.WebClient;
@@ -281,9 +281,9 @@ codeunit 6151401 "Magento Setup Mgt."
         MagentoSetup: Record "Magento Setup";
         MagentoMgt: Codeunit "Magento Mgt.";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        FormsAuthentication: DotNet FormsAuthentication;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
+        FormsAuthentication: DotNet npNetFormsAuthentication;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
     begin
         MagentoSetup.Get;
         if not MagentoSetup."Magento Enabled" then
@@ -315,9 +315,9 @@ codeunit 6151401 "Magento Setup Mgt."
         MagentoCustomerGroup: Record "Magento Customer Group";
         MagentoMgt: Codeunit "Magento Mgt.";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         GroupCode: Text[32];
     begin
@@ -351,9 +351,9 @@ codeunit 6151401 "Magento Setup Mgt."
         MagentoTaxClass: Record "Magento Tax Class";
         MagentoMgt: Codeunit "Magento Mgt.";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         ClassName: Text[250];
         ClassType: Integer;
@@ -388,10 +388,10 @@ codeunit 6151401 "Magento Setup Mgt."
         MagentoWebsite: Record "Magento Website";
         MagentoMgt: Codeunit "Magento Mgt.";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         MagentoSetup.Get;
@@ -430,11 +430,11 @@ codeunit 6151401 "Magento Setup Mgt."
         PaymentMapping: Record "Magento Payment Mapping";
         MagentoMgt: Codeunit "Magento Mgt.";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
-        XmlNodeList2: DotNet XmlNodeList;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
+        XmlNodeList2: DotNet npNetXmlNodeList;
         i: Integer;
         j: Integer;
         PaymentCode: Text[50];
@@ -466,11 +466,11 @@ codeunit 6151401 "Magento Setup Mgt."
         ShipmentMapping: Record "Magento Shipment Mapping";
         MagentoMgt: Codeunit "Magento Mgt.";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
-        XmlNodeList2: DotNet XmlNodeList;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
+        XmlNodeList2: DotNet npNetXmlNodeList;
         i: Integer;
         j: Integer;
         ShipmentCode: Text[50];

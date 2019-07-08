@@ -31,28 +31,28 @@ page 6014654 "POS Web Font Preview"
                     FrameworkReady();
                 end;
 
-                trigger OnScreenSize(screen: DotNet Screen)
+                trigger OnScreenSize(screen: DotNet npNetScreen)
                 begin
                 end;
 
-                trigger OnMessage(eventArgs: DotNet MessageEventArgs)
+                trigger OnMessage(eventArgs: DotNet npNetMessageEventArgs)
                 begin
                     SelectedIcon := eventArgs.ToEanCodeScanned().Ean;
                 end;
 
-                trigger OnResponse(response: DotNet ResponseInfo)
+                trigger OnResponse(response: DotNet npNetResponseInfo)
                 begin
                 end;
 
-                trigger OnJavaScriptCallback(js: DotNet JavaScript)
+                trigger OnJavaScriptCallback(js: DotNet npNetJavaScript)
                 begin
                 end;
 
-                trigger OnDialogResponse(response: DotNet Response)
+                trigger OnDialogResponse(response: DotNet npNetResponse)
                 begin
                 end;
 
-                trigger OnDataUpdated(dataSource: DotNet DataSource)
+                trigger OnDataUpdated(dataSource: DotNet npNetDataSource)
                 begin
                 end;
             }
@@ -75,8 +75,8 @@ page 6014654 "POS Web Font Preview"
 
     local procedure ShowFont()
     var
-        Font: DotNet Font;
-        Factory: DotNet MarshalEventArgsFactory;
+        Font: DotNet npNetFont;
+        Factory: DotNet npNetMarshalEventArgsFactory;
     begin
         if not IsFrameworkReady then
           exit;

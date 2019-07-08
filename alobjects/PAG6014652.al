@@ -32,29 +32,29 @@ page 6014652 "Touch Screen - Dialog (Web)"
                     EventFrameworkReady();
                 end;
 
-                trigger OnScreenSize(screen: DotNet Screen)
+                trigger OnScreenSize(screen: DotNet npNetScreen)
                 begin
                 end;
 
-                trigger OnMessage(eventArgs: DotNet MessageEventArgs)
+                trigger OnMessage(eventArgs: DotNet npNetMessageEventArgs)
                 begin
                     EventOnMessage(eventArgs);
                 end;
 
-                trigger OnResponse(response: DotNet ResponseInfo)
+                trigger OnResponse(response: DotNet npNetResponseInfo)
                 begin
                 end;
 
-                trigger OnJavaScriptCallback(js: DotNet JavaScript)
+                trigger OnJavaScriptCallback(js: DotNet npNetJavaScript)
                 begin
                 end;
 
-                trigger OnDialogResponse(response: DotNet Response)
+                trigger OnDialogResponse(response: DotNet npNetResponse)
                 begin
                     EventOnDialogResponse(response)
                 end;
 
-                trigger OnDataUpdated(dataSource: DotNet DataSource)
+                trigger OnDataUpdated(dataSource: DotNet npNetDataSource)
                 begin
                 end;
             }
@@ -77,16 +77,16 @@ page 6014652 "Touch Screen - Dialog (Web)"
         Events: Codeunit "Touch - Event Publisher";
         SessionMgt: Codeunit "POS Web Session Management";
         [WithEvents]
-        Marshaller: DotNet Marshaller;
-        Dlg: DotNet Dialog;
+        Marshaller: DotNet npNetMarshaller;
+        Dlg: DotNet npNetDialog;
         Text001: Label 'Dialog is not initialized, and there was a request to show a dialog. This is a programming bug, not a user error.';
-        Factory: DotNet MarshalEventArgsFactory;
-        RequestFactory: DotNet RequestFactory;
+        Factory: DotNet npNetMarshalEventArgsFactory;
+        RequestFactory: DotNet npNetRequestFactory;
         ConfirmResult: Boolean;
         NumPadResult: Text;
         SearchBoxResult: Text;
         CalendarGridResult: Date;
-        CalendarGridRows: DotNet Array;
+        CalendarGridRows: DotNet npNetArray;
         LookupResult: Text;
         Cancelled: Boolean;
         LookupRequestChunkSize: Integer;
@@ -97,7 +97,7 @@ page 6014652 "Touch Screen - Dialog (Web)"
         LookupShowNew: Boolean;
         IsLookup: Boolean;
 
-    procedure SetDialog(DlgIn: DotNet Dialog)
+    procedure SetDialog(DlgIn: DotNet npNetDialog)
     begin
         Dlg := DlgIn;
     end;
@@ -145,7 +145,7 @@ page 6014652 "Touch Screen - Dialog (Web)"
         SaleLinePOSTemplate: Record "Sale Line POS";
         Util: Codeunit "POS Web Utilities";
         RecRef: RecordRef;
-        IEnumerator: DotNet IEnumerator;
+        IEnumerator: DotNet npNetIEnumerator;
         KeyFields: Text;
     begin
         SaleLinePOSTemplate := SaleLinePOS;
@@ -172,9 +172,9 @@ page 6014652 "Touch Screen - Dialog (Web)"
 
     local procedure LookupRequestData()
     var
-        DGrid: DotNet DataGrid;
-        Row: DotNet Dictionary_Of_T_U;
-        LookupDlg: DotNet Lookup;
+        DGrid: DotNet npNetDataGrid;
+        Row: DotNet npNetDictionary_Of_T_U;
+        LookupDlg: DotNet npNetLookup;
     begin
         LookupDlg := Dlg;
 
@@ -201,10 +201,10 @@ page 6014652 "Touch Screen - Dialog (Web)"
 
     local procedure LookupSendSingleRow(RecRef: RecordRef)
     var
-        DGrid: DotNet DataGrid;
-        Row: DotNet Dictionary_Of_T_U;
-        LookupDlg: DotNet Lookup;
-        Params: DotNet Array;
+        DGrid: DotNet npNetDataGrid;
+        Row: DotNet npNetDictionary_Of_T_U;
+        LookupDlg: DotNet npNetLookup;
+        Params: DotNet npNetArray;
     begin
         if not RecRef.Find() then
           exit;
@@ -228,8 +228,8 @@ page 6014652 "Touch Screen - Dialog (Web)"
     local procedure EventFrameworkReady()
     var
         LookupCache: Record "Lookup Cache Log";
-        RequestFactory: DotNet RequestFactory;
-        Captions: DotNet Dictionary_Of_T_U;
+        RequestFactory: DotNet npNetRequestFactory;
+        Captions: DotNet npNetDictionary_Of_T_U;
         StartDate: DateTime;
         Timestamp: BigInteger;
     begin
@@ -263,11 +263,11 @@ page 6014652 "Touch Screen - Dialog (Web)"
         CurrPage.NPHost.ShowDialog(Dlg);
     end;
 
-    local procedure EventOnMessage(EventArgs: DotNet MessageEventArgs)
+    local procedure EventOnMessage(EventArgs: DotNet npNetMessageEventArgs)
     var
         RecRef: RecordRef;
-        EventType: DotNet EventType;
-        Dictionary: DotNet Dictionary_Of_T_U;
+        EventType: DotNet npNetEventType;
+        Dictionary: DotNet npNetDictionary_Of_T_U;
         MessageType: Integer;
     begin
         MessageType := EventArgs.Type;
@@ -300,14 +300,14 @@ page 6014652 "Touch Screen - Dialog (Web)"
         end;
     end;
 
-    local procedure EventOnDialogResponse(Response: DotNet Response)
+    local procedure EventOnDialogResponse(Response: DotNet npNetResponse)
     var
-        DialogType: DotNet DialogType;
-        NumpadResponse: DotNet NumpadResponse;
-        ConfirmResponse: DotNet ConfirmResponse;
-        SearchBoxResponse: DotNet SearchBoxResponse;
-        CalendarGridResponse: DotNet CalendarGridResponse;
-        LookupResponse: DotNet LookupResponse;
+        DialogType: DotNet npNetDialogType;
+        NumpadResponse: DotNet npNetNumpadResponse;
+        ConfirmResponse: DotNet npNetConfirmResponse;
+        SearchBoxResponse: DotNet npNetSearchBoxResponse;
+        CalendarGridResponse: DotNet npNetCalendarGridResponse;
+        LookupResponse: DotNet npNetLookupResponse;
         ResponseType: Integer;
     begin
         ResponseType := Response.DialogType;
@@ -352,9 +352,9 @@ page 6014652 "Touch Screen - Dialog (Web)"
         CurrPage.Close;
     end;
 
-    local procedure EventMarshal(EventArgs: DotNet MarshalEventArgs)
+    local procedure EventMarshal(EventArgs: DotNet npNetMarshalEventArgs)
     var
-        KnownEvent: DotNet KnownEvent;
+        KnownEvent: DotNet npNetKnownEvent;
     begin
         case EventArgs.EventType of
           KnownEvent.ClearInfoBoxContent,
@@ -376,7 +376,7 @@ page 6014652 "Touch Screen - Dialog (Web)"
         end;
     end;
 
-    trigger Marshaller::Marshal(eventArgs: DotNet MarshalEventArgs)
+    trigger Marshaller::Marshal(eventArgs: DotNet npNetMarshalEventArgs)
     begin
         EventMarshal(eventArgs);
     end;

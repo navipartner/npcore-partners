@@ -50,7 +50,7 @@ codeunit 6014502 SMS
 
     procedure SmsEclub(PhoneNo: Code[20];SMSMessage: Text[250];From: Text[20])
     var
-        HttpRequest: DotNet HttpWebRequest;
+        HttpRequest: DotNet npNetHttpWebRequest;
         Util: Codeunit Utility;
         ServiceCode: Code[20];
         ForeignPhone: Boolean;

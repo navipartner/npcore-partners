@@ -11,14 +11,14 @@ codeunit 6014524 "SSH.NET SFTP Client"
     end;
 
     var
-        SftpClient: DotNet SftpClient;
+        SftpClient: DotNet npNetSftpClient;
 
     procedure Construct(Host: Text;Username: Text;Password: Text;Port: Integer;TimeoutMs: Integer)
     var
-        ConnectionInfo: DotNet ConnectionInfo;
-        PasswordAuthenticationMethod: DotNet PasswordAuthenticationMethod;
-        AuthenticationMethodArray: DotNet Array;
-        AuthenticationMethod: DotNet AuthenticationMethod;
+        ConnectionInfo: DotNet npNetConnectionInfo;
+        PasswordAuthenticationMethod: DotNet npNetPasswordAuthenticationMethod;
+        AuthenticationMethodArray: DotNet npNetArray;
+        AuthenticationMethod: DotNet npNetAuthenticationMethod;
     begin
         PasswordAuthenticationMethod := PasswordAuthenticationMethod.PasswordAuthenticationMethod(Username, Password);
         AuthenticationMethodArray := AuthenticationMethodArray.CreateInstance(GetDotNetType(AuthenticationMethod), 1);
@@ -43,9 +43,9 @@ codeunit 6014524 "SSH.NET SFTP Client"
 
     procedure DownloadFile(LocalPath: Text;RemotePath: Text)
     var
-        File: DotNet File;
-        OutputStream: DotNet FileStream;
-        DownloadAsyncResult: DotNet SftpDownloadAsyncResult;
+        File: DotNet npNetFile;
+        OutputStream: DotNet npNetFileStream;
+        DownloadAsyncResult: DotNet npNetSftpDownloadAsyncResult;
     begin
         OutputStream := File.OpenWrite(LocalPath);
         DownloadAsyncResult := SftpClient.BeginDownloadFile(RemotePath, OutputStream);
@@ -57,9 +57,9 @@ codeunit 6014524 "SSH.NET SFTP Client"
 
     procedure UploadFile(LocalPath: Text;RemotePath: Text)
     var
-        File: DotNet File;
-        InputStream: DotNet FileStream;
-        UploadAsyncResult: DotNet SftpDownloadAsyncResult;
+        File: DotNet npNetFile;
+        InputStream: DotNet npNetFileStream;
+        UploadAsyncResult: DotNet npNetSftpDownloadAsyncResult;
     begin
         InputStream := File.OpenRead(LocalPath);
         UploadAsyncResult := SftpClient.BeginUploadFile(InputStream, RemotePath);
@@ -71,7 +71,7 @@ codeunit 6014524 "SSH.NET SFTP Client"
 
     procedure MoveFile(CurrentRemotePath: Text;NewRemotePath: Text)
     var
-        SftpFile: DotNet SftpFile;
+        SftpFile: DotNet npNetSftpFile;
     begin
         SftpFile := SftpClient.Get(CurrentRemotePath);
         SftpFile.MoveTo(NewRemotePath);
@@ -84,10 +84,10 @@ codeunit 6014524 "SSH.NET SFTP Client"
 
     procedure DownloadDirectory(LocalPath: Text;RemotePath: Text;IncludeSubFolders: Boolean)
     var
-        IEnumerable: DotNet IEnumerable;
-        SftpFile: DotNet SftpFile;
-        Directory: DotNet Directory;
-        SftpClientWrapper: DotNet SFTPClientWrapper;
+        IEnumerable: DotNet npNetIEnumerable;
+        SftpFile: DotNet npNetSftpFile;
+        Directory: DotNet npNetDirectory;
+        SftpClientWrapper: DotNet npNetSFTPClientWrapper;
     begin
         if CopyStr(LocalPath, StrLen(LocalPath), 1) <> '\' then
           LocalPath += '\';
@@ -114,11 +114,11 @@ codeunit 6014524 "SSH.NET SFTP Client"
         SftpClient.DeleteDirectory(RemotePath);
     end;
 
-    trigger SftpClient::ErrorOccurred(sender: Variant;e: DotNet ExceptionEventArgs)
+    trigger SftpClient::ErrorOccurred(sender: Variant;e: DotNet npNetExceptionEventArgs)
     begin
     end;
 
-    trigger SftpClient::HostKeyReceived(sender: Variant;e: DotNet HostKeyEventArgs)
+    trigger SftpClient::HostKeyReceived(sender: Variant;e: DotNet npNetHostKeyEventArgs)
     begin
     end;
 }

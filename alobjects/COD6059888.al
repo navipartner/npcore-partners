@@ -31,8 +31,8 @@ codeunit 6059888 "Npm Metadata Mgt."
     var
         ObjectMetadata: Record "Object Metadata";
         NpmField: Record "Npm Field";
-        XmlDoc: DotNet XmlDocument;
-        XmlNSManager: DotNet XmlNamespaceManager;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlNSManager: DotNet npNetXmlNamespaceManager;
         OutStream: OutStream;
     begin
         if not LoadPageOriginalMetadataXml(NpmPage,XmlDoc,XmlNSManager) then
@@ -52,7 +52,7 @@ codeunit 6059888 "Npm Metadata Mgt."
         ObjectMetadata.Modify(true);
     end;
 
-    local procedure ApplyPageViews(NpmPage: Record "Npm Page";var XmlDoc: DotNet XmlDocument;var XmlNSManager: DotNet XmlNamespaceManager)
+    local procedure ApplyPageViews(NpmPage: Record "Npm Page";var XmlDoc: DotNet npNetXmlDocument;var XmlNSManager: DotNet npNetXmlNamespaceManager)
     var
         NpmPageView: Record "Npm Page View";
     begin
@@ -71,8 +71,8 @@ codeunit 6059888 "Npm Metadata Mgt."
     procedure ResetNpmMetadata(var NpmPage: Record "Npm Page")
     var
         ObjectMetadata: Record "Object Metadata";
-        XmlDoc: DotNet XmlDocument;
-        XmlNSManager: DotNet XmlNamespaceManager;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlNSManager: DotNet npNetXmlNamespaceManager;
     begin
         if not LoadPageOriginalMetadataXml(NpmPage,XmlDoc,XmlNSManager) then
           exit;
@@ -90,13 +90,13 @@ codeunit 6059888 "Npm Metadata Mgt."
         ObjectMetadata.Modify(true);
     end;
 
-    local procedure AddShowMandatory(var NpmPageView: Record "Npm Page View";var XmlDoc: DotNet XmlDocument;var XmlNSManager: DotNet XmlNamespaceManager)
+    local procedure AddShowMandatory(var NpmPageView: Record "Npm Page View";var XmlDoc: DotNet npNetXmlDocument;var XmlNSManager: DotNet npNetXmlNamespaceManager)
     var
         ObjectMetadata: Record "Object Metadata";
         NpmField: Record "Npm Field";
-        XmlElement: DotNet XmlElement;
-        XmlElementField: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElementField: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         NpmPageView.CalcFields("Source Table No.");
@@ -120,13 +120,13 @@ codeunit 6059888 "Npm Metadata Mgt."
         until NpmField.Next = 0;
     end;
 
-    local procedure AddShowFieldCaption(var NpmPageView: Record "Npm Page View";var XmlDoc: DotNet XmlDocument;var XmlNSManager: DotNet XmlNamespaceManager)
+    local procedure AddShowFieldCaption(var NpmPageView: Record "Npm Page View";var XmlDoc: DotNet npNetXmlDocument;var XmlNSManager: DotNet npNetXmlNamespaceManager)
     var
         ObjectMetadata: Record "Object Metadata";
         NpmField: Record "Npm Field";
-        XmlElement: DotNet XmlElement;
-        XmlElementField: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElementField: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         CaptionStringML: Text;
     begin
@@ -154,17 +154,17 @@ codeunit 6059888 "Npm Metadata Mgt."
         until NpmField.Next = 0;
     end;
 
-    local procedure AddNpmMark(var XmlDoc: DotNet XmlDocument)
+    local procedure AddNpmMark(var XmlDoc: DotNet npNetXmlDocument)
     var
-        XmlComment: DotNet XmlComment;
+        XmlComment: DotNet npNetXmlComment;
     begin
         XmlComment := XmlDoc.CreateComment(NpmMark());
         XmlDoc.InsertBefore(XmlComment,XmlDoc.DocumentElement);
     end;
 
-    local procedure HasNpmMark(var XmlDoc: DotNet XmlDocument): Boolean
+    local procedure HasNpmMark(var XmlDoc: DotNet npNetXmlDocument): Boolean
     var
-        XmlComment: DotNet XmlComment;
+        XmlComment: DotNet npNetXmlComment;
     begin
         XmlComment := XmlDoc.DocumentElement.PreviousSibling;
         if IsNull(XmlComment) then
@@ -264,8 +264,8 @@ codeunit 6059888 "Npm Metadata Mgt."
     local procedure LoadNpmPage(ObjectMetadata: Record "Object Metadata")
     var
         NpmPage: Record "Npm Page";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
         SourceTableID: Integer;
     begin
         if ObjectMetadata."Object Type" <> ObjectMetadata."Object Type"::Page then
@@ -299,9 +299,9 @@ codeunit 6059888 "Npm Metadata Mgt."
     begin
     end;
 
-    procedure AddAttribute(var XmlNode: DotNet XmlNode;Name: Text[260];NodeValue: Text[260]) ExitStatus: Integer
+    procedure AddAttribute(var XmlNode: DotNet npNetXmlNode;Name: Text[260];NodeValue: Text[260]) ExitStatus: Integer
     var
-        NewAttributeXmlNode: DotNet XmlNode;
+        NewAttributeXmlNode: DotNet npNetXmlNode;
     begin
         NewAttributeXmlNode := XmlNode.OwnerDocument.CreateAttribute(Name);
 
@@ -317,20 +317,20 @@ codeunit 6059888 "Npm Metadata Mgt."
     end;
 
     [TryFunction]
-    procedure LoadXmlInStream(var InStream: InStream;var XmlDoc: DotNet XmlDocument)
+    procedure LoadXmlInStream(var InStream: InStream;var XmlDoc: DotNet npNetXmlDocument)
     begin
         XmlDoc := XmlDoc.XmlDocument;
         XmlDoc.Load(InStream);
     end;
 
     [TryFunction]
-    procedure LoadXmlString(XmlString: Text;var XmlDoc: DotNet XmlDocument)
+    procedure LoadXmlString(XmlString: Text;var XmlDoc: DotNet npNetXmlDocument)
     begin
         XmlDoc := XmlDoc.XmlDocument;
         XmlDoc.LoadXml(XmlString);
     end;
 
-    local procedure LoadMetadataXml(ObjectMetadata: Record "Object Metadata";var XmlDoc: DotNet XmlDocument): Boolean
+    local procedure LoadMetadataXml(ObjectMetadata: Record "Object Metadata";var XmlDoc: DotNet npNetXmlDocument): Boolean
     var
         InStream: InStream;
     begin
@@ -345,7 +345,7 @@ codeunit 6059888 "Npm Metadata Mgt."
         exit(not IsNull(XmlDoc.DocumentElement));
     end;
 
-    local procedure LoadPageOriginalMetadataXml(var NpmPage: Record "Npm Page";var XmlDoc: DotNet XmlDocument;var XmlNSManager: DotNet XmlNamespaceManager): Boolean
+    local procedure LoadPageOriginalMetadataXml(var NpmPage: Record "Npm Page";var XmlDoc: DotNet npNetXmlDocument;var XmlNSManager: DotNet npNetXmlNamespaceManager): Boolean
     var
         ObjectMetadata: Record "Object Metadata";
         InStream: InStream;
@@ -376,14 +376,14 @@ codeunit 6059888 "Npm Metadata Mgt."
         exit('Updated by Np Page Manager');
     end;
 
-    procedure RemoveNameSpaces(var XmlDoc: DotNet XmlDocument)
+    procedure RemoveNameSpaces(var XmlDoc: DotNet npNetXmlDocument)
     var
-        MemoryStream: DotNet MemoryStream;
-        MemoryStream2: DotNet MemoryStream;
-        XmlStyleSheet: DotNet XmlDocument;
-        XslCompiledTransform: DotNet XslCompiledTransform;
-        XmlReader: DotNet XmlReader;
-        XmlWriter: DotNet XmlWriter;
+        MemoryStream: DotNet npNetMemoryStream;
+        MemoryStream2: DotNet npNetMemoryStream;
+        XmlStyleSheet: DotNet npNetXmlDocument;
+        XslCompiledTransform: DotNet npNetXslCompiledTransform;
+        XmlReader: DotNet npNetXmlReader;
+        XmlWriter: DotNet npNetXmlWriter;
     begin
         if IsNull(XmlStyleSheet) then begin
           XmlStyleSheet := XmlStyleSheet.XmlDocument;

@@ -38,13 +38,13 @@ codeunit 6151198 "NpCs Update Order Status"
     var
         NpCsStore: Record "NpCs Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         ExceptionMessage: Text;
         Response: Text;
         XPath: Text;
@@ -118,7 +118,7 @@ codeunit 6151198 "NpCs Update Order Status"
           InsertLogEntry(NpCsStore,NpCsDocument,XmlElement2);
     end;
 
-    local procedure InsertLogEntry(NpCsStore: Record "NpCs Store";NpCsDocument: Record "NpCs Document";XmlElement: DotNet XmlElement)
+    local procedure InsertLogEntry(NpCsStore: Record "NpCs Store";NpCsDocument: Record "NpCs Document";XmlElement: DotNet npNetXmlElement)
     var
         NpCsDocumentLogEntry: Record "NpCs Document Log Entry";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
@@ -151,7 +151,7 @@ codeunit 6151198 "NpCs Update Order Status"
         NpCsDocumentLogEntry.Insert(true);
     end;
 
-    local procedure InitReqBody(NpCsDocument: Record "NpCs Document";var XmlDoc: DotNet XmlDocument)
+    local procedure InitReqBody(NpCsDocument: Record "NpCs Document";var XmlDoc: DotNet npNetXmlDocument)
     var
         Customer: Record Customer;
         NpCsStore: Record "NpCs Store";

@@ -198,11 +198,11 @@ report 6060065 "Sales Statistic"
 
     local procedure FTPput()
     var
-        Encoding: DotNet UTF8Encoding;
-        FtpWebRequest: DotNet FtpWebRequest;
-        Credential: DotNet NetworkCredential;
-        IoStream: DotNet Stream;
-        FtpWebResponse: DotNet FtpWebResponse;
+        Encoding: DotNet npNetUTF8Encoding;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        Credential: DotNet npNetNetworkCredential;
+        IoStream: DotNet npNetStream;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
         FileName: Text;
     begin
         if  OutputText = '' then

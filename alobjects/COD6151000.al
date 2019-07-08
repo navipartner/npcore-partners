@@ -14,7 +14,7 @@ codeunit 6151000 "POS Proxy - Raw Print"
 
     procedure Print(var FrontEnd: Codeunit "POS Front End Management";PrinterName: Text[100];TargetEncoding: Text[30];PrintBytes: Text;WaitForResult: Boolean)
     var
-        PrintRequest: DotNet PrintRequest0;
+        PrintRequest: DotNet npNetPrintRequest0;
     begin
         // If WaitForResult is false, the local stargate assembly will queue the print on the client machine asynchronously and never notify the NST of how the operation went.
         // This is recommended for everything that can be re-printed by the user manually and is legal to fail, for performance sake since
@@ -39,10 +39,10 @@ codeunit 6151000 "POS Proxy - Raw Print"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
-    local procedure Print_Response(ActionName: Text;Step: Text;Envelope: DotNet ResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure Print_Response(ActionName: Text;Step: Text;Envelope: DotNet npNetResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         Stargate: Codeunit "POS Stargate Management";
-        PrintResponse: DotNet PrintResponse0;
+        PrintResponse: DotNet npNetPrintResponse0;
         ResponseMessage: Text;
     begin
         if ActionName <> ProtocolName then

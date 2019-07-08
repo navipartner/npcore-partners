@@ -29,9 +29,9 @@ codeunit 6151389 "CS UI Transfer List"
         XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "CS Communication";
         CSMgt: Codeunit "CS Management";
-        DOMxmlin: DotNet XmlDocument;
-        RootNode: DotNet XmlNode;
-        ReturnedNode: DotNet XmlNode;
+        DOMxmlin: DotNet npNetXmlDocument;
+        RootNode: DotNet npNetXmlNode;
+        ReturnedNode: DotNet npNetXmlNode;
         RecRef: RecordRef;
         TextValue: Text[250];
         CSUserId: Text[250];
@@ -158,27 +158,27 @@ codeunit 6151389 "CS UI Transfer List"
         CSMgt.SendXMLReply(DOMxmlin);
     end;
 
-    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 }

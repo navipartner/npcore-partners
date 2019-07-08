@@ -32,9 +32,9 @@ codeunit 6151421 "Magento Lookup Return Order"
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         RecRef: RecordRef;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         ReturnOrderNo: Code[20];
         i: Integer;
     begin

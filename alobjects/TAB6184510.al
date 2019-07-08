@@ -63,8 +63,8 @@ table 6184510 "EFT BIN Range"
     [TryFunction]
     local procedure TryParseBIN(BINText: Text;var BINOut: BigInteger)
     var
-        Regex: DotNet Regex;
-        Match: DotNet Match;
+        Regex: DotNet npNetRegex;
+        Match: DotNet npNetMatch;
     begin
         Regex := Regex.Regex('^\d*');
         Match := Regex.Match(BINText);

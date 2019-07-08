@@ -8,7 +8,7 @@ codeunit 6060142 "MM Loyalty WebService Mgr"
 
     trigger OnRun()
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
         ImportType: Record "Nc Import Type";
         FunctionName: Text[100];
     begin
@@ -29,11 +29,11 @@ codeunit 6060142 "MM Loyalty WebService Mgr"
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         MEMBERSHIP_NOT_FOUND: Label 'The membership could not be found using the provided search criteria.';
 
-    local procedure GetLoyaltyPoints(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure GetLoyaltyPoints(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlElementNode: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElementNode: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -60,7 +60,7 @@ codeunit 6060142 "MM Loyalty WebService Mgr"
     begin
     end;
 
-    local procedure DecodeLoyaltyPointsQuery(XmlElement: DotNet XmlElement;DocumentID: Text[100]) Imported: Boolean
+    local procedure DecodeLoyaltyPointsQuery(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipManagement: Codeunit "MM Membership Management";
@@ -102,7 +102,7 @@ codeunit 6060142 "MM Loyalty WebService Mgr"
     begin
     end;
 
-    local procedure DeserializeMembershipQuery(XmlElement: DotNet XmlElement;var MemberInfoCapture: Record "MM Member Info Capture")
+    local procedure DeserializeMembershipQuery(XmlElement: DotNet npNetXmlElement;var MemberInfoCapture: Record "MM Member Info Capture")
     var
         CustomerNo: Code[20];
         Membership: Record "MM Membership";

@@ -64,7 +64,7 @@ page 6014659 "Web Client Dependencies"
                 var
                     ManagedDepMgt: Codeunit "Managed Dependency Mgt.";
                     Rec2: Record "Web Client Dependency";
-                    JArray: DotNet JArray;
+                    JArray: DotNet npNetJArray;
                 begin
                     CurrPage.SetSelectionFilter(Rec2);
                     //-NPR5.32.10 [265454]
@@ -97,7 +97,7 @@ page 6014659 "Web Client Dependencies"
     var
         TempBlob: Record TempBlob;
         FileManagement: Codeunit "File Management";
-        Asm: DotNet Assembly;
+        Asm: DotNet npNetAssembly;
         InStr: InStream;
         OutStr: OutStream;
         FileName: Text;
@@ -161,12 +161,12 @@ page 6014659 "Web Client Dependencies"
 
     procedure ConvertImgToDataUri(InStr: InStream;var OutStr: OutStream)
     var
-        Convert: DotNet Convert;
-        Image: DotNet Image;
-        ImageFormat: DotNet ImageFormat;
-        MemStrIn: DotNet MemoryStream;
-        MemStrOut: DotNet MemoryStream;
-        Encoding: DotNet Encoding;
+        Convert: DotNet npNetConvert;
+        Image: DotNet npNetImage;
+        ImageFormat: DotNet npNetImageFormat;
+        MemStrIn: DotNet npNetMemoryStream;
+        MemStrOut: DotNet npNetMemoryStream;
+        Encoding: DotNet npNetEncoding;
         DataUri: Text;
     begin
         DataUri := 'data:image/';
@@ -191,12 +191,12 @@ page 6014659 "Web Client Dependencies"
 
     procedure ConvertSVGToDataUri(InStr: InStream;var OutStr: OutStream)
     var
-        Convert: DotNet Convert;
-        Image: DotNet Image;
-        ImageFormat: DotNet ImageFormat;
-        MemStrIn: DotNet MemoryStream;
-        MemStrOut: DotNet MemoryStream;
-        Encoding: DotNet Encoding;
+        Convert: DotNet npNetConvert;
+        Image: DotNet npNetImage;
+        ImageFormat: DotNet npNetImageFormat;
+        MemStrIn: DotNet npNetMemoryStream;
+        MemStrOut: DotNet npNetMemoryStream;
+        Encoding: DotNet npNetEncoding;
         DataUri: Text;
         SVGText: Text;
     begin
