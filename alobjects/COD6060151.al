@@ -140,10 +140,10 @@ codeunit 6060151 "Event EWS Management"
     end;
 
     [TryFunction]
-    local procedure AutoDiscoverExchangeService(var ExchService: DotNet ExchangeService;Job: Record Job;ForceAutoDiscover: Boolean)
+    local procedure AutoDiscoverExchangeService(var ExchService: DotNet npNetExchangeService;Job: Record Job;ForceAutoDiscover: Boolean)
     var
         EmailNotDiscovered: Label 'E-mail provided %1 is not discoverable. Please verify you''re using Microsoft Exchange e-mail account and have entered proper e-mail account and password.';
-        Uri: DotNet Uri;
+        Uri: DotNet npNetUri;
         Source: Text;
     begin
         //-NPR5.38 [285194]
@@ -157,7 +157,7 @@ codeunit 6060151 "Event EWS Management"
         //+NPR5.38 [285194]
     end;
 
-    procedure AutoDiscoverExchangeServiceWithLog(RecordId: RecordID;var ExchService: DotNet ExchangeService;Job: Record Job;ForceAutoDiscover: Boolean): Boolean
+    procedure AutoDiscoverExchangeServiceWithLog(RecordId: RecordID;var ExchService: DotNet npNetExchangeService;Job: Record Job;ForceAutoDiscover: Boolean): Boolean
     var
         ActivityLog: Record "Activity Log";
         ActivityDescription: Label 'Auto Discovering...';
@@ -177,11 +177,11 @@ codeunit 6060151 "Event EWS Management"
         exit(true);
     end;
 
-    procedure InitializeExchService(RecordId: RecordID;Job: Record Job;var ExchService: DotNet ExchangeService;ExchItemType2: Option "E-Mail",Appointment,"Meeting Request"): Boolean
+    procedure InitializeExchService(RecordId: RecordID;Job: Record Job;var ExchService: DotNet npNetExchangeService;ExchItemType2: Option "E-Mail",Appointment,"Meeting Request"): Boolean
     var
-        ExchangeCredentials: DotNet ExchangeCredentials;
-        NetworkCredential: DotNet NetworkCredential;
-        Uri: DotNet Uri;
+        ExchangeCredentials: DotNet npNetExchangeCredentials;
+        NetworkCredential: DotNet npNetNetworkCredential;
+        Uri: DotNet npNetUri;
         Source: Text;
     begin
         //-NPR5.34 [275991]
@@ -529,13 +529,13 @@ codeunit 6060151 "Event EWS Management"
 
     procedure TestEmailServerConnection(var EventExchIntEmail: Record "Event Exch. Int. E-Mail")
     var
-        ExchService: DotNet ExchangeService;
+        ExchService: DotNet npNetExchangeService;
         ConnectionSuccessMsg: Label 'Connection succeeded.';
-        NameResolutionCollection: DotNet NameResolutionCollection;
-        NameResolution: DotNet NameResolution;
-        DateTimeObject: DotNet DateTime;
-        ExchangeVersion: DotNet ExchangeVersion;
-        ExchangeServerInfo: DotNet ExchangeServerInfo;
+        NameResolutionCollection: DotNet npNetNameResolutionCollection;
+        NameResolution: DotNet npNetNameResolution;
+        DateTimeObject: DotNet npNetDateTime;
+        ExchangeVersion: DotNet npNetExchangeVersion;
+        ExchangeServerInfo: DotNet npNetExchangeServerInfo;
         Job: Record Job;
     begin
         EventExchIntEmail.TestField("E-Mail");

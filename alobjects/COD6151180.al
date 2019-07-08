@@ -120,8 +120,8 @@ codeunit 6151180 "Retail Cross Ref. Mgt."
 
     procedure RegExReplace(Input: Text;PosStoreCode: Text) Output: Text
     var
-        Match: DotNet Match;
-        RegEx: DotNet Regex;
+        Match: DotNet npNetMatch;
+        RegEx: DotNet npNetRegex;
         Pattern: Text;
     begin
         Pattern := '(?<SerialNo>\[PS\])';
@@ -132,8 +132,8 @@ codeunit 6151180 "Retail Cross Ref. Mgt."
 
     procedure RegExReplacePS(Input: Text;PosStoreCode: Text) Output: Text
     var
-        Match: DotNet Match;
-        RegEx: DotNet Regex;
+        Match: DotNet npNetMatch;
+        RegEx: DotNet npNetRegex;
         Pattern: Text;
     begin
         Pattern := '(?<SerialNo>\[PS\])';
@@ -144,8 +144,8 @@ codeunit 6151180 "Retail Cross Ref. Mgt."
 
     procedure RegExReplacePU(Input: Text;PosUnitNo: Text) Output: Text
     var
-        Match: DotNet Match;
-        RegEx: DotNet Regex;
+        Match: DotNet npNetMatch;
+        RegEx: DotNet npNetRegex;
         Pattern: Text;
     begin
         Pattern := '(?<SerialNo>\[PU\])';
@@ -156,8 +156,8 @@ codeunit 6151180 "Retail Cross Ref. Mgt."
 
     procedure RegExReplaceS(Input: Text;SerialNo: Text) Output: Text
     var
-        Match: DotNet Match;
-        RegEx: DotNet Regex;
+        Match: DotNet npNetMatch;
+        RegEx: DotNet npNetRegex;
         Pattern: Text;
     begin
         Pattern := '(?<SerialNo>\[S\])';
@@ -168,8 +168,8 @@ codeunit 6151180 "Retail Cross Ref. Mgt."
 
     procedure RegExReplaceAN(Input: Text) Output: Text
     var
-        Match: DotNet Match;
-        RegEx: DotNet Regex;
+        Match: DotNet npNetMatch;
+        RegEx: DotNet npNetRegex;
         Pattern: Text;
         ReplaceString: Text;
         RandomQty: Integer;
@@ -198,8 +198,8 @@ codeunit 6151180 "Retail Cross Ref. Mgt."
 
     procedure RegExReplaceN(Input: Text) Output: Text
     var
-        Match: DotNet Match;
-        RegEx: DotNet Regex;
+        Match: DotNet npNetMatch;
+        RegEx: DotNet npNetRegex;
         Pattern: Text;
         ReplaceString: Text;
         RandomQty: Integer;
@@ -228,8 +228,8 @@ codeunit 6151180 "Retail Cross Ref. Mgt."
 
     procedure RegExReplaceL(Input: Text;LineNo: Text) Output: Text
     var
-        Match: DotNet Match;
-        RegEx: DotNet Regex;
+        Match: DotNet npNetMatch;
+        RegEx: DotNet npNetRegex;
         Pattern: Text;
     begin
         Pattern := '(?<SerialNo>\[L\])';
@@ -240,8 +240,8 @@ codeunit 6151180 "Retail Cross Ref. Mgt."
 
     procedure RegExReplaceNL(Input: Text;NaturalLineNo: Text) Output: Text
     var
-        Match: DotNet Match;
-        RegEx: DotNet Regex;
+        Match: DotNet npNetMatch;
+        RegEx: DotNet npNetRegex;
         Pattern: Text;
     begin
         Pattern := '(?<SerialNo>\[NL\])';

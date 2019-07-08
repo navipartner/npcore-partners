@@ -20,14 +20,14 @@ page 6060148 "RC Membership Burndown Chart"
             usercontrol(BusinessChart;"Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
 
-                trigger DataPointClicked(point: DotNet BusinessChartDataPoint)
+                trigger DataPointClicked(point: DotNet npNetBusinessChartDataPoint)
                 begin
 
                     SetDrillDownIndexes(point);
                     MembershipBurndownMgt.DrillDown(Rec);
                 end;
 
-                trigger DataPointDoubleClicked(point: DotNet BusinessChartDataPoint)
+                trigger DataPointDoubleClicked(point: DotNet npNetBusinessChartDataPoint)
                 begin
                 end;
 

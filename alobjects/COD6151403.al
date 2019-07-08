@@ -196,10 +196,10 @@ codeunit 6151403 "Magento Webservice"
     [Scope('Personalization')]
     procedure GetCrMemos(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
     var
-        XmlDoc: DotNet XmlDocument;
-        XmlDocElement: DotNet XmlElement;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlDocElement: DotNet npNetXmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         StartDate2: Date;
         EndDate2: Date;
@@ -251,10 +251,10 @@ codeunit 6151403 "Magento Webservice"
     [Scope('Personalization')]
     procedure ListCrMemos(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
     var
-        XmlDoc: DotNet XmlDocument;
-        XmlDocElement: DotNet XmlElement;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlDocElement: DotNet npNetXmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         StartDate2: Date;
         EndDate2: Date;
@@ -295,10 +295,10 @@ codeunit 6151403 "Magento Webservice"
     [Scope('Personalization')]
     procedure GetCrMemo(CustomerNo: Code[20];DocumentNumber: Code[20];var documents: XMLport "Magento Document Export")
     var
-        XmlDoc: DotNet XmlDocument;
-        XmlDocElement: DotNet XmlElement;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlDocElement: DotNet npNetXmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         StartDate2: Date;
         EndDate2: Date;
@@ -362,9 +362,9 @@ codeunit 6151403 "Magento Webservice"
         Item: Record Item;
         MagentoPictureLink: Record "Magento Picture Link";
         MagentoPicture: Record "Magento Picture";
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
     begin
 
@@ -468,7 +468,7 @@ codeunit 6151403 "Magento Webservice"
         MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
         MagentoMgt: Codeunit "Magento Mgt.";
         NaviConnectSetupMgt: Codeunit "Nc Setup Mgt.";
-        FormsAuthentication: DotNet FormsAuthentication;
+        FormsAuthentication: DotNet npNetFormsAuthentication;
     begin
         if LowerCase(Hash) <> LowerCase(FormsAuthentication.HashPasswordForStoringInConfigFile(MagentoUrl + 'D3W7k5pd7Pn64ctn25ng91ZkSvyDnjo2','MD5')) then
           Error(Error001);
@@ -551,9 +551,9 @@ codeunit 6151403 "Magento Webservice"
     local procedure GetBase64(Filename: Text) Value: Text
     var
         TempBlob: Record TempBlob temporary;
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         FieldRef: FieldRef;
         InStr: InStream;
         f: File;

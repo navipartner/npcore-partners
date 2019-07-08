@@ -132,7 +132,7 @@ page 6150720 "POS Stargate Package Creator"
 
     var
         [RunOnClient]
-        Package: DotNet Package;
+        Package: DotNet npNetPackage;
         AssemblyPath: Text;
         Text001: Label 'Select an assembly file';
         AssemblyName: Text;
@@ -148,9 +148,9 @@ page 6150720 "POS Stargate Package Creator"
     local procedure LoadAssembly()
     var
         FileMgt: Codeunit "File Management";
-        String: DotNet String;
+        String: DotNet npNetString;
         [RunOnClient]
-        Assembly: DotNet Assembly;
+        Assembly: DotNet npNetAssembly;
         FilePath: Text;
     begin
         FilePath := FileMgt.OpenFileDialog(Text001,AssemblyPath,'Assembly files (*.dll)|*.dll');
@@ -175,7 +175,7 @@ page 6150720 "POS Stargate Package Creator"
     local procedure DetectDependencies(Path: Text)
     var
         [RunOnClient]
-        Detector: DotNet AssemblyDetector;
+        Detector: DotNet npNetAssemblyDetector;
         Dependency: Text;
     begin
         Rec.DeleteAll();
@@ -198,10 +198,10 @@ page 6150720 "POS Stargate Package Creator"
           ]);
     end;
 
-    local procedure PopulateAssemblies(Dependencies: DotNet IEnumerable_Of_T;Status: Option)
+    local procedure PopulateAssemblies(Dependencies: DotNet npNetIEnumerable_Of_T;Status: Option)
     var
         [RunOnClient]
-        Dependency: DotNet DetectionResult;
+        Dependency: DotNet npNetDetectionResult;
     begin
         foreach Dependency in Dependencies do begin
           Rec.Init;
@@ -230,11 +230,11 @@ page 6150720 "POS Stargate Package Creator"
     local procedure MapAssembly()
     var
         FileMgt: Codeunit "File Management";
-        String: DotNet String;
+        String: DotNet npNetString;
         [RunOnClient]
-        Assembly: DotNet Assembly;
+        Assembly: DotNet npNetAssembly;
         [RunOnClient]
-        Detector: DotNet AssemblyDetector;
+        Detector: DotNet npNetAssemblyDetector;
         FilePath: Text;
     begin
         FilePath := FileMgt.OpenFileDialog(Text001,AssemblyPath,'Assembly files (*.dll)|*.dll');
@@ -257,11 +257,11 @@ page 6150720 "POS Stargate Package Creator"
     local procedure AddAssembly()
     var
         FileMgt: Codeunit "File Management";
-        String: DotNet String;
+        String: DotNet npNetString;
         [RunOnClient]
-        Assembly: DotNet Assembly;
+        Assembly: DotNet npNetAssembly;
         [RunOnClient]
-        Detector: DotNet AssemblyDetector;
+        Detector: DotNet npNetAssemblyDetector;
         FilePath: Text;
     begin
         FilePath := FileMgt.OpenFileDialog(Text001,AssemblyPath,'Assembly files (*.dll)|*.dll');
@@ -283,10 +283,10 @@ page 6150720 "POS Stargate Package Creator"
         Rec2: Record "POS Stargate Assembly Map";
         FileMgt: Codeunit "File Management";
         [RunOnClient]
-        AssemblyContent: DotNet AssemblyPackageContent;
-        String: DotNet String;
+        AssemblyContent: DotNet npNetAssemblyPackageContent;
+        String: DotNet npNetString;
         [RunOnClient]
-        IOFile: DotNet File;
+        IOFile: DotNet npNetFile;
         FilePath: Text;
     begin
         // TODO: if there are Unknown, then warn and ask for confirmation!

@@ -10,15 +10,15 @@ codeunit 6059982 "Add-In Management"
     var
         "Environment VAR library": Codeunit "NPR Environment Mgt.";
         [RunOnClient]
-        FileVersionInfo: DotNet FileVersionInfo;
+        FileVersionInfo: DotNet npNetFileVersionInfo;
         [RunOnClient]
-        Directories: DotNet Array;
+        Directories: DotNet npNetArray;
         [RunOnClient]
-        Directory: DotNet Directory;
+        Directory: DotNet npNetDirectory;
         [RunOnClient]
-        Path: DotNet Path;
+        Path: DotNet npNetPath;
         [RunOnClient]
-        Assembly: DotNet Assembly;
+        Assembly: DotNet npNetAssembly;
         Itt: Integer;
     begin
         ClientAddInDirectory := Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + '\Add-ins';
@@ -38,16 +38,16 @@ codeunit 6059982 "Add-In Management"
     procedure CheckPatchDirectory(Path: Text)
     var
         [RunOnClient]
-        Directory: DotNet Directory;
+        Directory: DotNet npNetDirectory;
         [RunOnClient]
-        DirectoryInfo: DotNet DirectoryInfo;
-        File: DotNet File;
+        DirectoryInfo: DotNet npNetDirectoryInfo;
+        File: DotNet npNetFile;
         [RunOnClient]
-        FileInfo: DotNet FileInfo;
+        FileInfo: DotNet npNetFileInfo;
         [RunOnClient]
-        FileVersionInfo: DotNet FileVersionInfo;
+        FileVersionInfo: DotNet npNetFileVersionInfo;
         [RunOnClient]
-        PatchFiles: DotNet Array;
+        PatchFiles: DotNet npNetArray;
         Itt: Integer;
         LocalFilePath: Text;
         PatchVersion: Text;
@@ -76,9 +76,9 @@ codeunit 6059982 "Add-In Management"
     procedure GetPublicKeyToken(Path: Text) StrongName: Text
     var
         [RunOnClient]
-        Assembly: DotNet Assembly;
+        Assembly: DotNet npNetAssembly;
         [RunOnClient]
-        AssemblyName: DotNet AssemblyName;
+        AssemblyName: DotNet npNetAssemblyName;
         String: Codeunit "String Library";
     begin
         AssemblyName := AssemblyName.GetAssemblyName(Path);
@@ -89,9 +89,9 @@ codeunit 6059982 "Add-In Management"
     procedure RegisterAddInByFile(Path: Text)
     var
         [RunOnClient]
-        FileInfo: DotNet FileInfo;
+        FileInfo: DotNet npNetFileInfo;
         [RunOnClient]
-        FileVersionInfo: DotNet FileVersionInfo;
+        FileVersionInfo: DotNet npNetFileVersionInfo;
         ClientAddIn: Record "Add-in";
         Extension: Text;
     begin
@@ -163,11 +163,11 @@ codeunit 6059982 "Add-In Management"
     procedure RegisterJavaScriptAddInFromBase64(Content: Text)
     var
         ClientAddIn: Record "Add-in";
-        Delimiters: DotNet Array;
-        Parts: DotNet Array;
-        String: DotNet String;
-        Convert: DotNet Convert;
-        MemoryStream: DotNet MemoryStream;
+        Delimiters: DotNet npNetArray;
+        Parts: DotNet npNetArray;
+        String: DotNet npNetString;
+        Convert: DotNet npNetConvert;
+        MemoryStream: DotNet npNetMemoryStream;
         OutStr: OutStream;
         Delimiter: Char;
     begin
@@ -201,9 +201,9 @@ codeunit 6059982 "Add-In Management"
     procedure RegisterAddIn(AddInName: Text;AddInToken: Text;AddInVersion: Text;AddInDescription: Text;Resource: Text)
     var
         ClientAddIn: Record "Add-in";
-        MemoryStream: DotNet MemoryStream;
-        WebClient: DotNet WebClient;
-        NetworkCredential: DotNet NetworkCredential;
+        MemoryStream: DotNet npNetMemoryStream;
+        WebClient: DotNet npNetWebClient;
+        NetworkCredential: DotNet npNetNetworkCredential;
         OutStream: OutStream;
     begin
         ClientAddIn.Init;

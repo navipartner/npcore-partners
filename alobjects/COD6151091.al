@@ -37,7 +37,7 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
         ServerFilename: Text;
         Response: Text;
         Success: Boolean;
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
     begin
         //-NC2.14 [320762]
         if not NcTaskMgt.GetRecRef(NcTask,RecRef) then
@@ -156,7 +156,7 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
     begin
     end;
 
-    local procedure ExportToXml(NcRapidConnectSetup: Record "Nc RapidConnect Setup";NcTask: Record "Nc Task";var XmlDoc: DotNet XmlDocument)
+    local procedure ExportToXml(NcRapidConnectSetup: Record "Nc RapidConnect Setup";NcTask: Record "Nc Task";var XmlDoc: DotNet npNetXmlDocument)
     var
         ConfigPackageTable: Record "Config. Package Table";
         ConfigPackageField: Record "Config. Package Field";
@@ -164,10 +164,10 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
         NcRapidConnectSetupMgt: Codeunit "Nc RapidConnect Setup Mgt.";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         NcTaskMgt: Codeunit "Nc Task Mgt.";
-        XmlCDATA: DotNet XmlCDataSection;
-        XmlDocElement: DotNet XmlElement;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
+        XmlCDATA: DotNet npNetXmlCDataSection;
+        XmlDocElement: DotNet npNetXmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         RecRef: RecordRef;
         FieldRef: FieldRef;
     begin
@@ -229,7 +229,7 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
         //+NC2.17 [335927]
     end;
 
-    local procedure CommitXmlToOutput(NcTask: Record "Nc Task";XmlDoc: DotNet XmlDocument;OutputName: Text;var NcTaskOutput: Record "Nc Task Output")
+    local procedure CommitXmlToOutput(NcTask: Record "Nc Task";XmlDoc: DotNet npNetXmlDocument;OutputName: Text;var NcTaskOutput: Record "Nc Task Output")
     var
         OutStr: OutStream;
     begin

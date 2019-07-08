@@ -51,10 +51,10 @@ codeunit 6150700 "POS Session"
         Setup: Codeunit "POS Setup";
         This: Codeunit "POS Session";
         Stargate: Codeunit "POS Stargate Management";
-        ActionState: DotNet Dictionary_Of_T_U;
-        DataStore: DotNet DataStore;
-        CurrentView: DotNet View0;
-        KeyboardBindings: DotNet List_Of_T;
+        ActionState: DotNet npNetDictionary_Of_T_U;
+        DataStore: DotNet npNetDataStore;
+        CurrentView: DotNet npNetView0;
+        KeyboardBindings: DotNet npNetList_Of_T;
         ActionStateRecRef: array [1024] of RecordRef;
         ActionStateCurrentActionId: Guid;
         ActionStateCurrentAction: Text;
@@ -81,7 +81,7 @@ codeunit 6150700 "POS Session"
         FRONTEND_MISSING: Label 'POS Front End object could not be retrieved. This is a programming bug, not a user error.';
         "--- Workflow 2.0 state ---": Integer;
         Workflow20State: array [1000] of Codeunit "POS Workflows 2.0 - State";
-        Workflow20StateIndex: DotNet Dictionary_Of_T_U;
+        Workflow20StateIndex: DotNet npNetDictionary_Of_T_U;
         Workflow20Map: array [1000] of Boolean;
 
     local procedure "---Initialization---"()
@@ -89,7 +89,7 @@ codeunit 6150700 "POS Session"
     end;
 
     [Scope('Personalization')]
-    procedure Constructor(FrameworkIn: DotNet IFramework0;FrontEndIn: Codeunit "POS Front End Management";SetupIn: Codeunit "POS Setup";SessionIn: Codeunit "POS Session")
+    procedure Constructor(FrameworkIn: DotNet npNetIFramework0;FrontEndIn: Codeunit "POS Front End Management";SetupIn: Codeunit "POS Setup";SessionIn: Codeunit "POS Session")
     var
         JavaScriptInterface: Codeunit "POS JavaScript Interface";
         OldPOSSession: Codeunit "POS Session";
@@ -286,7 +286,7 @@ codeunit 6150700 "POS Session"
     procedure StartPOSSession()
     var
         RetailFormCode: Codeunit "Retail Form Code";
-        CultureInfo: DotNet CultureInfo;
+        CultureInfo: DotNet npNetCultureInfo;
     begin
         InitializePOSSession();
 
@@ -388,7 +388,7 @@ codeunit 6150700 "POS Session"
     [Scope('Personalization')]
     procedure StartTransaction()
     var
-        Request: DotNet StartTransactionJsonRequest;
+        Request: DotNet npNetStartTransactionJsonRequest;
         TransactionNo: Text;
     begin
         Clear(Sale);
@@ -538,7 +538,7 @@ codeunit 6150700 "POS Session"
     end;
 
     [Scope('Personalization')]
-    procedure GetCurrentView(var ViewOut: DotNet View0)
+    procedure GetCurrentView(var ViewOut: DotNet npNetView0)
     begin
         ViewOut := CurrentView;
     end;
@@ -573,7 +573,7 @@ codeunit 6150700 "POS Session"
     end;
 
     [Scope('Personalization')]
-    procedure GetDataStore(var DataStoreOut: DotNet DataStore)
+    procedure GetDataStore(var DataStoreOut: DotNet npNetDataStore)
     begin
         DataStoreOut := DataStore;
     end;
@@ -614,7 +614,7 @@ codeunit 6150700 "POS Session"
     end;
 
     [Scope('Personalization')]
-    procedure SetView(View: DotNet View0)
+    procedure SetView(View: DotNet npNetView0)
     begin
         CurrentView := View;
         InitializeDataSources();
@@ -826,12 +826,12 @@ codeunit 6150700 "POS Session"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterSetView(View: DotNet View0)
+    local procedure OnAfterSetView(View: DotNet npNetView0)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInitializeDataSource(DataStore: DotNet DataStore)
+    local procedure OnInitializeDataSource(DataStore: DotNet npNetDataStore)
     begin
     end;
 
@@ -841,7 +841,7 @@ codeunit 6150700 "POS Session"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnDiscoverKeyboardBindings(KeyboardBindings: DotNet List_Of_T)
+    local procedure OnDiscoverKeyboardBindings(KeyboardBindings: DotNet npNetList_Of_T)
     begin
     end;
 

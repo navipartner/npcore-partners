@@ -18,8 +18,8 @@ codeunit 6014584 "Mobile Print Mgt."
     procedure PrintJobHTTP(Address: Text;Endpoint: Text;PrintBytes: Text;TargetEncoding: Text)
     var
         JSBridge: Page "JS Bridge";
-        Convert: DotNet Convert;
-        Encoding: DotNet Encoding;
+        Convert: DotNet npNetConvert;
+        Encoding: DotNet npNetEncoding;
         Base64: Text;
         JSON: Text;
     begin
@@ -44,8 +44,8 @@ codeunit 6014584 "Mobile Print Mgt."
     procedure PrintJobBluetooth(DeviceName: Text;PrintBytes: Text;TargetEncoding: Text)
     var
         JSBridge: Page "JS Bridge";
-        Convert: DotNet Convert;
-        Encoding: DotNet Encoding;
+        Convert: DotNet npNetConvert;
+        Encoding: DotNet npNetEncoding;
         Base64: Text;
         JSON: Text;
     begin

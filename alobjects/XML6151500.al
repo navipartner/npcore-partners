@@ -18,7 +18,7 @@ xmlport 6151500 "Nc Import Entry"
                     trigger OnBeforePassField()
                     var
                         InStream: InStream;
-                        StreamReader: DotNet StreamReader;
+                        StreamReader: DotNet npNetStreamReader;
                     begin
                         Clear(TempNcImportEntry."Document Source");
                         TempNcImportEntry."Document Source".CreateInStream(InStream,TEXTENCODING::UTF8);

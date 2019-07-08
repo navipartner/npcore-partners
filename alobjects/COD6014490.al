@@ -30,27 +30,27 @@ codeunit 6014490 "Pakkelabels.dk Mgnt"
         RequestString: Text;
         RequestURL: Text;
         ResponseString: Text;
-        ConvertBase64: DotNet Convert;
-        Bytes: DotNet Array;
-        MemoryStream: DotNet MemoryStream;
+        ConvertBase64: DotNet npNetConvert;
+        Bytes: DotNet npNetArray;
+        MemoryStream: DotNet npNetMemoryStream;
         TempBlob: Record TempBlob temporary;
         OStream: OutStream;
         "<--NP-->": Integer;
-        HttpWebRequest: DotNet HttpWebRequest;
-        ReqStream: DotNet Stream;
-        ReqStreamWriter: DotNet StreamWriter;
-        HttpWebResponse: DotNet HttpWebResponse;
-        ResponseStream: DotNet Stream;
-        ResponseStreamReader: DotNet StreamReader;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        ReqStream: DotNet npNetStream;
+        ReqStreamWriter: DotNet npNetStreamWriter;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        ResponseStream: DotNet npNetStream;
+        ResponseStreamReader: DotNet npNetStreamReader;
         Text0001: Label 'Login Details Missing';
         int: Decimal;
         PackageProviderSetup: Record "Pacsoft Setup";
         Counter: Integer;
         "-- Web handling": Integer;
-        WebException: DotNet WebException;
+        WebException: DotNet npNetWebException;
         DotNetExceptionHandler: Codeunit "DotNet Exception Handler";
-        WebExceptionStatus: DotNet WebExceptionStatus;
-        HttpStatusCode: DotNet HttpStatusCode;
+        WebExceptionStatus: DotNet npNetWebExceptionStatus;
+        HttpStatusCode: DotNet npNetHttpStatusCode;
         ErrorText: Text;
         Err0000: Label 'Not authenticated';
         ErrorTextFound: Text;
@@ -799,11 +799,11 @@ codeunit 6014490 "Pakkelabels.dk Mgnt"
     local procedure TryPrintAnyDocument(FullPath: Text)
     var
         [RunOnClient]
-        ProcessStartInfo: DotNet ProcessStartInfo;
+        ProcessStartInfo: DotNet npNetProcessStartInfo;
         [RunOnClient]
-        Process: DotNet Process;
+        Process: DotNet npNetProcess;
         [RunOnClient]
-        ProcessWindowsStyle: DotNet ProcessWindowStyle;
+        ProcessWindowsStyle: DotNet npNetProcessWindowStyle;
     begin
         ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(FullPath);
         with ProcessStartInfo do begin

@@ -85,7 +85,7 @@ codeunit 6151202 "NpCs POS Action Process Order"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         LocationFilter: Text;
@@ -144,7 +144,7 @@ codeunit 6151202 "NpCs POS Action Process Order"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
-    local procedure OnDiscover(DataSourceName: Text;Extensions: DotNet List_Of_T)
+    local procedure OnDiscover(DataSourceName: Text;Extensions: DotNet npNetList_Of_T)
     var
         NpCsStore: Record "NpCs Store";
     begin
@@ -157,9 +157,9 @@ codeunit 6151202 "NpCs POS Action Process Order"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
-    local procedure OnGetExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet DataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    local procedure OnGetExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
     var
-        DataType: DotNet DataType;
+        DataType: DotNet npNetDataType;
     begin
         if DataSourceName <> 'BUILTIN_SALE' then
           exit;
@@ -173,7 +173,7 @@ codeunit 6151202 "NpCs POS Action Process Order"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
-    local procedure OnReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet DataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet npNetDataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         UnprocessedOrdersExists: Boolean;
         LocationFilter: Text;

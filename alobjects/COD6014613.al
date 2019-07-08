@@ -91,14 +91,14 @@ codeunit 6014613 "Tax Free GB I2"
 
     local procedure DownloadDeskConfiguration(var TaxFreeRequest: Record "Tax Free Request")
     var
-        XMLDoc: DotNet XmlDocument;
+        XMLDoc: DotNet npNetXmlDocument;
         IsError: Boolean;
         Value: Text;
         i: Integer;
         ServiceID: Integer;
-        Services: DotNet XmlNodeList;
+        Services: DotNet npNetXmlNodeList;
         ServiceCount: Integer;
-        Service: DotNet XmlNode;
+        Service: DotNet npNetXmlNode;
         ServiceIDFilterString: Text;
     begin
         if (GlobalBlueParameters."Shop ID" = '') or (GlobalBlueParameters."Desk ID" = '') or (GlobalBlueParameters.Username = '') or (GlobalBlueParameters.Password = '') then
@@ -165,12 +165,12 @@ codeunit 6014613 "Tax Free GB I2"
 
     procedure DownloadCountries(var TaxFreeRequest: Record "Tax Free Request")
     var
-        XMLDoc: DotNet XmlDocument;
+        XMLDoc: DotNet npNetXmlDocument;
         IsError: Boolean;
-        Countries: DotNet XmlNodeList;
+        Countries: DotNet npNetXmlNodeList;
         CountryCount: Integer;
         i: Integer;
-        Country: DotNet XmlNode;
+        Country: DotNet npNetXmlNode;
         GlobalBlueCountries: Record "Tax Free GB Country";
         Value: Text;
     begin
@@ -206,12 +206,12 @@ codeunit 6014613 "Tax Free GB I2"
 
     procedure DownloadBlockedCountries(var TaxFreeRequest: Record "Tax Free Request")
     var
-        XMLDoc: DotNet XmlDocument;
+        XMLDoc: DotNet npNetXmlDocument;
         IsError: Boolean;
-        Countries: DotNet XmlNodeList;
+        Countries: DotNet npNetXmlNodeList;
         CountryCount: Integer;
         i: Integer;
-        Country: DotNet XmlNode;
+        Country: DotNet npNetXmlNode;
         GlobalBlueBlockedCountries: Record "Tax Free GB Blocked Country";
     begin
         GetBlockedCountries(TaxFreeRequest);
@@ -244,12 +244,12 @@ codeunit 6014613 "Tax Free GB I2"
 
     procedure DownloadCondensedTred(var TaxFreeRequest: Record "Tax Free Request")
     var
-        XMLDoc: DotNet XmlDocument;
+        XMLDoc: DotNet npNetXmlDocument;
         IsError: Boolean;
-        Ranges: DotNet XmlNodeList;
+        Ranges: DotNet npNetXmlNodeList;
         RangeCount: Integer;
         i: Integer;
-        Range: DotNet XmlNode;
+        Range: DotNet npNetXmlNode;
         GlobalBlueIINBlacklist: Record "Tax Free GB IIN Blacklist";
     begin
         GetCondensedTred(TaxFreeRequest);
@@ -287,7 +287,7 @@ codeunit 6014613 "Tax Free GB I2"
         CustomerXML: Text;
         PurchaseXML: Text;
         PaymentXML: Text;
-        XMLDoc: DotNet XmlDocument;
+        XMLDoc: DotNet npNetXmlDocument;
         IsError: Boolean;
         Value: Text;
         TempBlob: Record TempBlob temporary;
@@ -336,7 +336,7 @@ codeunit 6014613 "Tax Free GB I2"
     local procedure ReissueVoucher(var TaxFreeRequest: Record "Tax Free Request";TaxFreeVoucher: Record "Tax Free Voucher")
     var
         VoucherService: Record "Tax Free GB I2 Service";
-        XMLDoc: DotNet XmlDocument;
+        XMLDoc: DotNet npNetXmlDocument;
         IsError: Boolean;
         Value: Text;
         TempBlob: Record TempBlob temporary;
@@ -394,7 +394,7 @@ codeunit 6014613 "Tax Free GB I2"
     local procedure VoidVoucher(var TaxFreeRequest: Record "Tax Free Request";TaxFreeVoucher: Record "Tax Free Voucher")
     var
         VoucherService: Record "Tax Free GB I2 Service";
-        XMLDoc: DotNet XmlDocument;
+        XMLDoc: DotNet npNetXmlDocument;
         IsError: Boolean;
     begin
         if VoucherService.Get(TaxFreeVoucher."POS Unit No.", TaxFreeVoucher."Service ID") then
@@ -446,7 +446,7 @@ codeunit 6014613 "Tax Free GB I2"
     var
         TaxFreeRequest: Record "Tax Free Request";
         IsError: Boolean;
-        XMLDoc: DotNet XmlDocument;
+        XMLDoc: DotNet npNetXmlDocument;
         Value: Text;
         DateTime: DateTime;
     begin
@@ -575,8 +575,8 @@ codeunit 6014613 "Tax Free GB I2"
         TearOff: Boolean;
         ShopCopy: Boolean;
         Value: Text;
-        String: DotNet String;
-        StringUpper: DotNet String;
+        String: DotNet npNetString;
+        StringUpper: DotNet npNetString;
     begin
         String := Line;
         StringUpper := UpperCase(Line);
@@ -675,7 +675,7 @@ codeunit 6014613 "Tax Free GB I2"
 
     local procedure PrintPDF(TaxFreeRequest: Record "Tax Free Request")
     var
-        MemoryStream: DotNet MemoryStream;
+        MemoryStream: DotNet npNetMemoryStream;
         InStream: InStream;
         ObjectOutputMgt: Codeunit "Object Output Mgt.";
         Output: Text;
@@ -703,8 +703,8 @@ codeunit 6014613 "Tax Free GB I2"
     local procedure Base64ToBlob(base64: Text;var TempBlobOut: Record TempBlob temporary)
     var
         OutStream: OutStream;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
     begin
         MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(base64));
 
@@ -1002,12 +1002,12 @@ codeunit 6014613 "Tax Free GB I2"
     local procedure InvokeService(XMLRequest: Text;var TaxFreeRequest: Record "Tax Free Request"): Text
     var
         BaseAddress: Text;
-        HttpClient: DotNet HttpClient;
-        Uri: DotNet Uri;
-        TimeSpan: DotNet TimeSpan;
-        StringContent: DotNet StringContent;
-        Encoding: DotNet Encoding;
-        HttpResponseMessage: DotNet HttpResponseMessage;
+        HttpClient: DotNet npNetHttpClient;
+        Uri: DotNet npNetUri;
+        TimeSpan: DotNet npNetTimeSpan;
+        StringContent: DotNet npNetStringContent;
+        Encoding: DotNet npNetEncoding;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
         OutStream: OutStream;
         Result: Text;
     begin
@@ -1036,12 +1036,12 @@ codeunit 6014613 "Tax Free GB I2"
         OutStream.Write(Result);
     end;
 
-    local procedure HandleResponse(var TaxFreeRequest: Record "Tax Free Request";ExpectedOperation: Text;var XMLDoc: DotNet XmlDocument;var IsError: Boolean)
+    local procedure HandleResponse(var TaxFreeRequest: Record "Tax Free Request";ExpectedOperation: Text;var XMLDoc: DotNet npNetXmlDocument;var IsError: Boolean)
     var
         InStream: InStream;
         Value: Text;
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        MemoryStream: DotNet MemoryStream;
+        MemoryStream: DotNet npNetMemoryStream;
     begin
         TaxFreeRequest.Response.CreateInStream(InStream);
         MemoryStream := MemoryStream.MemoryStream();
@@ -1089,7 +1089,7 @@ codeunit 6014613 "Tax Free GB I2"
     local procedure EscapeSpecialChars(Value: Text): Text
     var
         CALText: Text;
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         String := Value;
         String := String.Replace('&', '&amp;');
@@ -1124,13 +1124,13 @@ codeunit 6014613 "Tax Free GB I2"
     end;
 
     [TryFunction]
-    local procedure TrySelectSingleNodeText(var XMLDoc: DotNet XmlDocument;XPath: Text;var Value: Text)
+    local procedure TrySelectSingleNodeText(var XMLDoc: DotNet npNetXmlDocument;XPath: Text;var Value: Text)
     begin
         Value := XMLDoc.SelectSingleNode(XPath).InnerText();
     end;
 
     [TryFunction]
-    local procedure TryGetItemInnerText(var XmlNode: DotNet XmlNode;ItemName: Text;var Value: Text)
+    local procedure TryGetItemInnerText(var XmlNode: DotNet npNetXmlNode;ItemName: Text;var Value: Text)
     begin
         Value := XmlNode.Item(ItemName).InnerText;
     end;
@@ -1729,7 +1729,7 @@ codeunit 6014613 "Tax Free GB I2"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnLookupHandler', '', false, false)]
-    local procedure OnLookupHandler(var HashSet: DotNet HashSet_Of_T)
+    local procedure OnLookupHandler(var HashSet: DotNet npNetHashSet_Of_T)
     begin
         HashSet.Add(HandlerID);
     end;

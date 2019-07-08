@@ -71,8 +71,8 @@ table 6184482 "EFT Type POS Unit BLOB Param."
     procedure LookupValue()
     var
         tmpRetailList: Record "Retail List" temporary;
-        Parts: DotNet Array;
-        "Part": DotNet String;
+        Parts: DotNet npNetArray;
+        "Part": DotNet npNetString;
         OptionStringCaption: Text;
         Handled: Boolean;
     begin

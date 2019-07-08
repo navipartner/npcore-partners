@@ -99,7 +99,7 @@ codeunit 6150725 "POS Action - Payment"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
         JSON: Codeunit "POS JSON Management";
@@ -114,8 +114,8 @@ codeunit 6150725 "POS Action - Payment"
         PaidAmount: Decimal;
         SubTotal: Decimal;
         ReturnPaymentTypePOS: Record "Payment Type POS";
-        CurrentView: DotNet View0;
-        CurrentViewType: DotNet ViewType0;
+        CurrentView: DotNet npNetView0;
+        CurrentViewType: DotNet npNetViewType0;
         NPRetailSetup: Record "NP Retail Setup";
         POSUnit: Record "POS Unit";
         POSAuditProfile: Record "POS Audit Profile";
@@ -222,7 +222,7 @@ codeunit 6150725 "POS Action - Payment"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         POSSale: Codeunit "POS Sale";
@@ -304,17 +304,17 @@ codeunit 6150725 "POS Action - Payment"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeActionWorkflow(PaymentTypePOS: Record "Payment Type POS";Parameters: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: Codeunit "POS JSON Management";SubTotal: Decimal;var Handled: Boolean)
+    local procedure OnBeforeActionWorkflow(PaymentTypePOS: Record "Payment Type POS";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: Codeunit "POS JSON Management";SubTotal: Decimal;var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeAction(WorkflowStep: Text;PaymentType: Record "Payment Type POS";Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeAction(WorkflowStep: Text;PaymentType: Record "Payment Type POS";Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterAction(WorkflowStep: Text;PaymentType: Record "Payment Type POS";Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAfterAction(WorkflowStep: Text;PaymentType: Record "Payment Type POS";Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     begin
     end;
 
@@ -385,7 +385,7 @@ codeunit 6150725 "POS Action - Payment"
     begin
     end;
 
-    local procedure CapturePayment("Action": Record "POS Action";WorkflowStep: Text;PaymentTypePOS: Record "Payment Type POS";Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure CapturePayment("Action": Record "POS Action";WorkflowStep: Text;PaymentTypePOS: Record "Payment Type POS";Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         POSPaymentLine: Codeunit "POS Payment Line";

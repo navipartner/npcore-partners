@@ -12,7 +12,7 @@ codeunit 6014690 "Stargate Dummy Request"
 
     var
         POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
-        ExpectedResponseType: DotNet Type;
+        ExpectedResponseType: DotNet npNetType;
         ExpectedResponseId: Guid;
         ProtocolManagerId: Guid;
         ProtocolStage: Integer;
@@ -21,9 +21,9 @@ codeunit 6014690 "Stargate Dummy Request"
 
     local procedure ProcessSignal(var TempBlob: Record TempBlob)
     var
-        Signal: DotNet Signal;
-        StartSignal: DotNet StartSession;
-        Response: DotNet MessageResponse;
+        Signal: DotNet npNetSignal;
+        StartSignal: DotNet npNetStartSession;
+        Response: DotNet npNetMessageResponse;
     begin
         POSDeviceProxyManager.DeserializeObject(Signal,TempBlob);
         case true of
@@ -47,7 +47,7 @@ codeunit 6014690 "Stargate Dummy Request"
         ProtocolStage1();
     end;
 
-    local procedure MessageResponse(Envelope: DotNet ResponseEnvelope)
+    local procedure MessageResponse(Envelope: DotNet npNetResponseEnvelope)
     begin
         if Envelope.MessageId <> ExpectedResponseId then
           Error('Unknown response: %1 (expected %2)',Envelope.MessageId,ExpectedResponseId);
@@ -62,8 +62,8 @@ codeunit 6014690 "Stargate Dummy Request"
 
     local procedure ProtocolStage1()
     var
-        GetAssembliesRequest: DotNet GetAssembliesRequest;
-        GetAssembliesResponse: DotNet GetAssembliesResponse;
+        GetAssembliesRequest: DotNet npNetGetAssembliesRequest;
+        GetAssembliesResponse: DotNet npNetGetAssembliesResponse;
     begin
         ProtocolStage := 1;
 
@@ -73,9 +73,9 @@ codeunit 6014690 "Stargate Dummy Request"
         ExpectedResponseId := POSDeviceProxyManager.SendMessage(ProtocolManagerId,GetAssembliesRequest);
     end;
 
-    local procedure ProtocolStage1Close(Envelope: DotNet Envelope)
+    local procedure ProtocolStage1Close(Envelope: DotNet npNetEnvelope)
     var
-        GetAssembliesResponse: DotNet GetAssembliesResponse;
+        GetAssembliesResponse: DotNet npNetGetAssembliesResponse;
     begin
         POSDeviceProxyManager.DeserializeEnvelopeFromId(GetAssembliesResponse,Envelope,ProtocolManagerId);
         POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);

@@ -445,7 +445,7 @@ codeunit 6014543 "RP Epson V Device Library"
         Int: Integer;
         n: Char;
         nByte: Text;
-        Convert: DotNet Convert;
+        Convert: DotNet npNetConvert;
     begin
         //-NPR5.40 [284505]
         // TempPattern := '0' + ESC.GetBitPatternAndPad(Width,3) + '0' + ESC.GetBitPatternAndPad(Height,3);
@@ -488,9 +488,9 @@ codeunit 6014543 "RP Epson V Device Library"
         PrintBufferInStream: InStream;
         BufferText: Text;
         Result: Text;
-        MemoryStream: DotNet MemoryStream;
-        StreamReader: DotNet StreamReader;
-        Encoding: DotNet Encoding;
+        MemoryStream: DotNet npNetMemoryStream;
+        StreamReader: DotNet npNetStreamReader;
+        Encoding: DotNet npNetEncoding;
     begin
         //-NPR5.40 [284505]
         //EXIT(PrintBuffer);
@@ -655,10 +655,10 @@ codeunit 6014543 "RP Epson V Device Library"
         RetailLogoMgt: Codeunit "Retail Logo Mgt.";
         ESCPOS: Text;
         InStream: InStream;
-        MemoryStream: DotNet MemoryStream;
-        Encoding: DotNet Encoding;
+        MemoryStream: DotNet npNetMemoryStream;
+        Encoding: DotNet npNetEncoding;
         RetailLogo: Record "Retail Logo";
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
     begin
         RetailLogo.SetAutoCalcFields(ESCPOSLogo);
 
@@ -1218,10 +1218,10 @@ codeunit 6014543 "RP Epson V Device Library"
 
     local procedure FormatJobForHTTP()
     var
-        DotNetEncoding: DotNet Encoding;
-        ByteArray: DotNet Array;
-        BitConverter: DotNet BitConverter;
-        Regex: DotNet Regex;
+        DotNetEncoding: DotNet npNetEncoding;
+        ByteArray: DotNet npNetArray;
+        BitConverter: DotNet npNetBitConverter;
+        Regex: DotNet npNetRegex;
         HexBuffer: Text;
     begin
         //formats job as per epson ePOS-Print XML specification:
@@ -1376,10 +1376,10 @@ codeunit 6014543 "RP Epson V Device Library"
         i: Integer;
         Numeric: Boolean;
         Code128: Text;
-        Char: DotNet Char;
+        Char: DotNet npNetChar;
         ConsecutiveNumbers: Integer;
         j: Integer;
-        String: DotNet String;
+        String: DotNet npNetString;
         CurrentMode: Option " ",CodeA,CodeB,CodeC;
         Buffer: Text;
         Beginning: Boolean;

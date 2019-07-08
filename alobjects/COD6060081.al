@@ -9,33 +9,33 @@ codeunit 6060081 "MCS Rec. Service API"
     end;
 
     var
-        RecServiceAPI: DotNet RecommendationServiceAPI;
+        RecServiceAPI: DotNet npNetRecommendationServiceAPI;
         ConfirmDeleteModel: Label 'Delete model %1?';
         ErrorModelExists: Label 'Model already exists in Azure';
-        ModelInfo: DotNet ModelInfo;
-        ModelInfoList: DotNet ModelInfoList;
-        CatalogImportStats: DotNet CatalogImportStats;
-        UsageImportStats: DotNet UsageImportStats;
-        BuildRequestInfo: DotNet BuildRequestInfo;
-        BuildParameters: DotNet BuildParameters;
-        RandomSplitterParameters: DotNet RandomSplitterParameters;
-        RecommendationBuildParameters: DotNet RecommendationBuildParameters;
-        SplitterStrategy: DotNet SplitterStrategy;
-        BuildType: DotNet BuildType;
+        ModelInfo: DotNet npNetModelInfo;
+        ModelInfoList: DotNet npNetModelInfoList;
+        CatalogImportStats: DotNet npNetCatalogImportStats;
+        UsageImportStats: DotNet npNetUsageImportStats;
+        BuildRequestInfo: DotNet npNetBuildRequestInfo;
+        BuildParameters: DotNet npNetBuildParameters;
+        RandomSplitterParameters: DotNet npNetRandomSplitterParameters;
+        RecommendationBuildParameters: DotNet npNetRecommendationBuildParameters;
+        SplitterStrategy: DotNet npNetSplitterStrategy;
+        BuildType: DotNet npNetBuildType;
         OperationId: Text;
-        OperationStatus: DotNet OperationStatus;
-        OperationInfo: DotNet OperationInfo;
-        RecommendedItemSetInfoList: DotNet RecommendedItemSetInfoList;
-        RecommendedItemSetInfo: DotNet RecommendedItemSetInfo;
-        RecommendedItemInfo: DotNet RecommendedItemInfo;
-        UpdateActiveBuildInfo: DotNet UpdateActiveBuildInfo;
-        DotNetString: DotNet String;
-        DotNetDateTime: DotNet DateTime;
+        OperationStatus: DotNet npNetOperationStatus;
+        OperationInfo: DotNet npNetOperationInfo;
+        RecommendedItemSetInfoList: DotNet npNetRecommendedItemSetInfoList;
+        RecommendedItemSetInfo: DotNet npNetRecommendedItemSetInfo;
+        RecommendedItemInfo: DotNet npNetRecommendedItemInfo;
+        UpdateActiveBuildInfo: DotNet npNetUpdateActiveBuildInfo;
+        DotNetString: DotNet npNetString;
+        DotNetDateTime: DotNet npNetDateTime;
         MsgCatalogUploaded: Label 'Catalog uploaded for model %1';
         MsgUsageDataUploaded: Label 'Usage data uploaded for model %1';
         MsgBuildCreated: Label 'Created build %1 for model %2';
         MsgModelDeleted: Label 'Model %1 deleted from Azure';
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
         DebugTxt: Text;
         ErrorDataImport: Label 'Error in data import. Not all records is imported.';
         MsgOperationStatus: Label 'Operation Status: #1\Operation status check: #2\\Will check again in 10 seconds.';
@@ -422,9 +422,9 @@ codeunit 6060081 "MCS Rec. Service API"
 
     procedure CreateDotNetDateTime(CurrentDate: Date): Text
     var
-        DateTimeDotNet: DotNet DateTime;
+        DateTimeDotNet: DotNet npNetDateTime;
         DateTimeTxt: Text;
-        CultureInfoDotNet: DotNet CultureInfo;
+        CultureInfoDotNet: DotNet npNetCultureInfo;
     begin
         //YYYY-MM-DDTHH:MM:SS
         DateTimeTxt := Format(CurrentDate) + ' ' + '12:00:00.00';

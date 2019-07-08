@@ -11,7 +11,7 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
     var
         CurrNpIaItemAddOn: Record "NpIa Item AddOn";
         [WithEvents]
-        Model: DotNet Model;
+        Model: DotNet npNetModel;
         ActiveModelID: Guid;
         Text000: Label 'Insert Item AddOns directly from POS Action';
 
@@ -75,7 +75,7 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
     begin
@@ -148,7 +148,7 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
     local procedure InitCss() Css: Text
     var
         WebClientDependency: Record "Web Client Dependency";
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
     begin
         if WebClientDependency.Get(WebClientDependency.Type::CSS,WebDepCode()) and WebClientDependency.BLOB.HasValue then begin
@@ -164,7 +164,7 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
     local procedure InitHtml() Html: Text
     var
         WebClientDependency: Record "Web Client Dependency";
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
     begin
         if WebClientDependency.Get(WebClientDependency.Type::HTML,WebDepCode()) and WebClientDependency.BLOB.HasValue then begin
@@ -236,7 +236,7 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
         POSSession: Codeunit "POS Session";
         NpIaItemAddOnMgt: Codeunit "NpIa Item AddOn Mgt.";
         POSJavaScriptInterface: Codeunit "POS JavaScript Interface";
-        AddOnLines: DotNet JToken;
+        AddOnLines: DotNet npNetJToken;
     begin
         AddOnLines := AddOnLines.Parse(JsonText);
         FrontEnd.GetSession(POSSession);
@@ -246,7 +246,7 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
         POSJavaScriptInterface.RefreshData(POSSession,FrontEnd);
     end;
 
-    trigger Model::OnModelControlEvent(control: DotNet Control;eventName: Text;data: DotNet Dictionary_Of_T_U)
+    trigger Model::OnModelControlEvent(control: DotNet npNetControl;eventName: Text;data: DotNet npNetDictionary_Of_T_U)
     begin
     end;
 

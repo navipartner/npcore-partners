@@ -36,7 +36,7 @@ codeunit 6150702 "POS UI Management"
         Language: Record "Windows Language";
         Caption: Record "POS Localized Caption";
         CaptionMgt: Codeunit "POS Caption Management";
-        Captions: DotNet Dictionary_Of_T_U;
+        Captions: DotNet npNetDictionary_Of_T_U;
     begin
         Language.Get(GlobalLanguage);
         Captions := Captions.Dictionary();
@@ -60,9 +60,9 @@ codeunit 6150702 "POS UI Management"
 
     procedure InitializeNumberAndDateFormat(Register: Record Register)
     var
-        CultureInfo: DotNet CultureInfo;
-        NumberFormat: DotNet NumberFormatInfo;
-        DateFormat: DotNet DateTimeFormatInfo;
+        CultureInfo: DotNet npNetCultureInfo;
+        NumberFormat: DotNet npNetNumberFormatInfo;
+        DateFormat: DotNet npNetDateTimeFormatInfo;
         POSUnit: Record "POS Unit";
         POSViewProfile: Record "POS View Profile";
     begin
@@ -109,8 +109,8 @@ codeunit 6150702 "POS UI Management"
     procedure InitializeLogo(Register: Record Register)
     var
         InStr: InStream;
-        MemStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        MemStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         POSUnit: Record "POS Unit";
         POSViewProfile: Record "POS View Profile";
     begin
@@ -138,8 +138,8 @@ codeunit 6150702 "POS UI Management"
     procedure InitializeMenus(Register: Record Register;Salesperson: Record "Salesperson/Purchaser";POSSession: Codeunit "POS Session")
     var
         Menu: Record "POS Menu";
-        Menus: DotNet List_Of_T;
-        MenuObj: DotNet Menu;
+        Menus: DotNet npNetList_Of_T;
+        MenuObj: DotNet npNetMenu;
         tmpPOSParameterValue: Record "POS Parameter Value" temporary;
     begin
         //-NPR5.42 [314128]
@@ -169,10 +169,10 @@ codeunit 6150702 "POS UI Management"
         end;
     end;
 
-    local procedure InitializeMenu(var Menu: Record "POS Menu";var MenuObj: DotNet Menu;POSSession: Codeunit "POS Session";var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
+    local procedure InitializeMenu(var Menu: Record "POS Menu";var MenuObj: DotNet npNetMenu;POSSession: Codeunit "POS Session";var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
     var
         MenuButton: Record "POS Menu Button";
-        MenuButtonObj: DotNet MenuButton;
+        MenuButtonObj: DotNet npNetMenuButton;
     begin
         //-NPR5.40 [306347]
         POSSession.DebugWithTimestamp('Initializing menu [' + Menu.Code + ']');
@@ -196,7 +196,7 @@ codeunit 6150702 "POS UI Management"
         end;
     end;
 
-    local procedure InitializeMenuObject(Menu: Record "POS Menu";var MenuObj: DotNet Menu)
+    local procedure InitializeMenuObject(Menu: Record "POS Menu";var MenuObj: DotNet npNetMenu)
     begin
         with Menu do begin
           MenuObj := MenuObj.Menu();
@@ -208,7 +208,7 @@ codeunit 6150702 "POS UI Management"
         end;
     end;
 
-    local procedure InitializeSubmenu(var MenuButton: Record "POS Menu Button";ISubMenu: DotNet ISubMenu;POSSession: Codeunit "POS Session";var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
+    local procedure InitializeSubmenu(var MenuButton: Record "POS Menu Button";ISubMenu: DotNet npNetISubMenu;POSSession: Codeunit "POS Session";var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
     var
         SubMenuButton: Record "POS Menu Button";
     begin
@@ -223,9 +223,9 @@ codeunit 6150702 "POS UI Management"
         end;
     end;
 
-    local procedure InitializeMenuButtons(var SubMenuButton: Record "POS Menu Button";ISubMenu: DotNet ISubMenu;POSSession: Codeunit "POS Session";var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
+    local procedure InitializeMenuButtons(var SubMenuButton: Record "POS Menu Button";ISubMenu: DotNet npNetISubMenu;POSSession: Codeunit "POS Session";var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
     var
-        MenuButtonObj: DotNet MenuButton;
+        MenuButtonObj: DotNet npNetMenuButton;
     begin
         with SubMenuButton do begin
           if FindSet then
@@ -244,9 +244,9 @@ codeunit 6150702 "POS UI Management"
         end;
     end;
 
-    local procedure InitializeMenuButtonObject(MenuButton: Record "POS Menu Button";var MenuButtonObj: DotNet MenuButton;POSSession: Codeunit "POS Session";var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
+    local procedure InitializeMenuButtonObject(MenuButton: Record "POS Menu Button";var MenuButtonObj: DotNet npNetMenuButton;POSSession: Codeunit "POS Session";var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
     var
-        "Action": DotNet Action;
+        "Action": DotNet npNetAction;
     begin
         with MenuButton do begin
           MenuButtonObj := MenuButtonObj.MenuButton();
@@ -284,7 +284,7 @@ codeunit 6150702 "POS UI Management"
         end;
     end;
 
-    local procedure InitializeMenuButtonObjectFilters(MenuButton: Record "POS Menu Button";var MenuButtonObj: DotNet MenuButton)
+    local procedure InitializeMenuButtonObjectFilters(MenuButton: Record "POS Menu Button";var MenuButtonObj: DotNet npNetMenuButton)
     begin
         if MenuButton."Salesperson Code" <> '' then
           MenuButtonObj.Content.Add('filterSalesPerson',MenuButton."Salesperson Code");
@@ -324,8 +324,8 @@ codeunit 6150702 "POS UI Management"
         POSTheme: Record "POS Theme";
         ThemeDep: Record "POS Theme Dependency";
         WebClientDep: Record "Web Client Dependency";
-        ThemeLine: DotNet Dictionary_Of_T_U;
-        Theme: DotNet List_Of_T;
+        ThemeLine: DotNet npNetDictionary_Of_T_U;
+        Theme: DotNet npNetList_Of_T;
         DependencyContent: Text;
         POSUnit: Record "POS Unit";
         POSViewProfile: Record "POS View Profile";
@@ -385,7 +385,7 @@ codeunit 6150702 "POS UI Management"
     procedure ConfigureFonts()
     var
         WebFont: Record "POS Web Font";
-        Font: DotNet Font0;
+        Font: DotNet npNetFont0;
     begin
         WebFont.SetFilter("Company Name",'%1|%2','',CompanyName);
         if WebFont.FindSet then
@@ -395,11 +395,11 @@ codeunit 6150702 "POS UI Management"
           until WebFont.Next = 0;
     end;
 
-    local procedure ConfigureCaptions(Captions: DotNet Dictionary_Of_T_U)
+    local procedure ConfigureCaptions(Captions: DotNet npNetDictionary_Of_T_U)
     var
         RecRef: RecordRef;
         FieldRef: FieldRef;
-        NumberFormat: DotNet NumberFormatInfo;
+        NumberFormat: DotNet npNetNumberFormatInfo;
         i: Integer;
         CaptionLabelReceiptNo: Label 'Sale';
         CaptionLabelEANHeader: Label 'Item No.';
@@ -662,7 +662,7 @@ codeunit 6150702 "POS UI Management"
     procedure ConfigureReusableWorkflow("Action": Record "POS Action";POSSession: Codeunit "POS Session";Source: Text;FieldNumber: Integer)
     var
         Button: Record "POS Menu Button";
-        WorkflowAction: DotNet WorkflowAction;
+        WorkflowAction: DotNet npNetWorkflowAction;
         POSParameterValue: Record "POS Parameter Value" temporary;
     begin
         with Button do begin
@@ -684,8 +684,8 @@ codeunit 6150702 "POS UI Management"
 
     procedure SetOptions(Setup: Codeunit "POS Setup")
     var
-        Request: DotNet SetOptionJsonRequest;
-        Options: DotNet Dictionary_Of_T_U;
+        Request: DotNet npNetSetOptionJsonRequest;
+        Options: DotNet npNetDictionary_Of_T_U;
     begin
         Options := Request.GetDictionary();
 
@@ -703,7 +703,7 @@ codeunit 6150702 "POS UI Management"
         FrontEnd.SetOptions(Options);
     end;
 
-    procedure AddActionCaption(Captions: DotNet Dictionary_Of_T_U;ActionCode: Text;CaptionId: Text;CaptionText: Text)
+    procedure AddActionCaption(Captions: DotNet npNetDictionary_Of_T_U;ActionCode: Text;CaptionId: Text;CaptionText: Text)
     begin
         if (Captions.ContainsKey (ActionCode + '.' + CaptionId)) then
           exit;

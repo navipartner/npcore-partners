@@ -112,7 +112,7 @@ codeunit 6014583 "Report Printer Interface"
 
     local procedure RunCustomReportFlow(Number: Integer;ReqWindow: Boolean;"Record": Variant;ObjectOutputSelection: Record "Object Output Selection")
     var
-        PDFStream: DotNet MemoryStream;
+        PDFStream: DotNet npNetMemoryStream;
     begin
         //-NPR5.47 [327664]
         if not (ObjectOutputSelection."Output Type" in [ObjectOutputSelection."Output Type"::"Printer Name",
@@ -152,7 +152,7 @@ codeunit 6014583 "Report Printer Interface"
     begin
     end;
 
-    local procedure CreatePDF(Number: Integer;ReqWindow: Boolean;var "Record": Variant;var OutPDFStream: DotNet MemoryStream): Boolean
+    local procedure CreatePDF(Number: Integer;ReqWindow: Boolean;var "Record": Variant;var OutPDFStream: DotNet npNetMemoryStream): Boolean
     var
         Parameters: Text;
         OutStr: OutStream;
@@ -180,7 +180,7 @@ codeunit 6014583 "Report Printer Interface"
     end;
 
     [TryFunction]
-    local procedure TryPrintPDF(OutputPath: Text;var Stream: DotNet MemoryStream;OutputType: Integer;ObjectID: Integer)
+    local procedure TryPrintPDF(OutputPath: Text;var Stream: DotNet npNetMemoryStream;OutputType: Integer;ObjectID: Integer)
     var
         ObjectOutputSelection: Record "Object Output Selection";
         PrintMethodMgt: Codeunit "Print Method Mgt.";

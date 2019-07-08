@@ -22,7 +22,7 @@ codeunit 6151450 "Magento NpXml Setup Mgt."
     begin
     end;
 
-    local procedure AddNpXmlTemplate(var XmlDoc: DotNet XmlDocument;NodePath: Text;UpdateCode: Code[20];DeleteCode: Code[20])
+    local procedure AddNpXmlTemplate(var XmlDoc: DotNet npNetXmlDocument;NodePath: Text;UpdateCode: Code[20];DeleteCode: Code[20])
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
     begin
@@ -33,7 +33,7 @@ codeunit 6151450 "Magento NpXml Setup Mgt."
     procedure InitNpXmlTemplateSetup(var TempBlob: Record TempBlob temporary)
     var
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
         OutStream: OutStream;
         NodePath: Text;
     begin

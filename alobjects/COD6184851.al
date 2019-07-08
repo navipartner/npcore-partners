@@ -46,12 +46,12 @@ codeunit 6184851 "FR Audit Archive Workshifts"
         TempBlob: Record TempBlob temporary;
         InStream: InStream;
         OutStream: OutStream;
-        HttpClient: DotNet HttpClient;
-        Uri: DotNet Uri;
-        TimeSpan: DotNet TimeSpan;
-        StringContent: DotNet StringContent;
-        Encoding: DotNet Encoding;
-        HttpResponseMessage: DotNet HttpResponseMessage;
+        HttpClient: DotNet npNetHttpClient;
+        Uri: DotNet npNetUri;
+        TimeSpan: DotNet npNetTimeSpan;
+        StringContent: DotNet npNetStringContent;
+        Encoding: DotNet npNetEncoding;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
         XmlLine: Text;
         XmlFile: Text;
         GUID: Guid;

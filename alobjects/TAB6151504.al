@@ -153,7 +153,7 @@ table 6151504 "Nc Import Entry"
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
 
-    procedure LoadXmlDoc(var XmlDoc: DotNet XmlDocument): Boolean
+    procedure LoadXmlDoc(var XmlDoc: DotNet npNetXmlDocument): Boolean
     var
         InStr: InStream;
     begin

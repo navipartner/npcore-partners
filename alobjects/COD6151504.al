@@ -134,8 +134,8 @@ codeunit 6151504 "Nc Import Mgt."
     procedure GetErrorMessage(NcImportEntry: Record "Nc Import Entry";HtmlFormat: Boolean) ErrorText: Text
     var
         InStream: InStream;
-        StreamReader: DotNet StreamReader;
-        String: DotNet String;
+        StreamReader: DotNet npNetStreamReader;
+        String: DotNet npNetString;
     begin
         //-NC2.02 [262318]
         ErrorText := '';

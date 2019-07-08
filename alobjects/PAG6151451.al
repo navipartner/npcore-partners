@@ -282,7 +282,7 @@ page 6151451 "Magento DragDropPic. Addin"
 
     procedure DisplayPicture()
     var
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         if not ControlAddInReady then
           exit;
@@ -301,10 +301,10 @@ page 6151451 "Magento DragDropPic. Addin"
 
     procedure GetDataUri() DataUri: Text
     var
-        Convert: DotNet Convert;
-        Image: DotNet Image;
-        ImageFormat: DotNet ImageFormat;
-        MemoryStream: DotNet MemoryStream;
+        Convert: DotNet npNetConvert;
+        Image: DotNet npNetImage;
+        ImageFormat: DotNet npNetImageFormat;
+        MemoryStream: DotNet npNetMemoryStream;
         InStream: InStream;
     begin
         if not Picture.HasValue then
@@ -455,10 +455,10 @@ page 6151451 "Magento DragDropPic. Addin"
 
     procedure SaveTempPicture()
     var
-        MemoryStream: DotNet MemoryStream;
-        RegEx: DotNet Regex;
-        Match: DotNet Match;
-        Convert: DotNet Convert;
+        MemoryStream: DotNet npNetMemoryStream;
+        RegEx: DotNet npNetRegex;
+        Match: DotNet npNetMatch;
+        Convert: DotNet npNetConvert;
         OutStr: OutStream;
         DataUri: Text;
     begin

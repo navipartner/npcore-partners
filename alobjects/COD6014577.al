@@ -1501,7 +1501,7 @@ codeunit 6014577 "Report - Tax Free Receipt"
 
     procedure calcChecksum(Value: Code[30]): BigInteger
     var
-        CRC32: DotNet CRC32;
+        CRC32: DotNet npNetCRC32;
         calcInt: BigInteger;
     begin
         //-NPR5.26 [243285]

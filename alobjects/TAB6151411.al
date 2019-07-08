@@ -101,7 +101,7 @@ table 6151411 "Magento Picture"
     procedure DownloadPicture(var TempMagentoPicture: Record "Magento Picture" temporary): Boolean
     var
         MagentoPicture: Record "Magento Picture";
-        MemoryStream: DotNet MemoryStream;
+        MemoryStream: DotNet npNetMemoryStream;
         OutStream: OutStream;
         PictureUrl: Text;
     begin
@@ -140,9 +140,9 @@ table 6151411 "Magento Picture"
     end;
 
     [TryFunction]
-    procedure TryDownloadPicture(PictureUrl: Text;var MemoryStream: DotNet MemoryStream)
+    procedure TryDownloadPicture(PictureUrl: Text;var MemoryStream: DotNet npNetMemoryStream)
     var
-        WebClient: DotNet WebClient;
+        WebClient: DotNet npNetWebClient;
     begin
         //-MAG2.01
         WebClient := WebClient.WebClient();
@@ -152,9 +152,9 @@ table 6151411 "Magento Picture"
 
     procedure GetBase64() Value: Text
     var
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         FieldRef: FieldRef;
         InStr: InStream;
     begin

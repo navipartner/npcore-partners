@@ -52,9 +52,9 @@ codeunit 6014531 "Retail Logo Mgt."
     procedure GetRetailLogo(KeywordIn: Code[20];RegisterNo: Code[10];var RetailLogo: Record "Retail Logo"): Boolean
     var
         InStream: InStream;
-        ByteArray: DotNet Array;
-        MemoryStream: DotNet MemoryStream;
-        Encoding: DotNet Encoding;
+        ByteArray: DotNet npNetArray;
+        MemoryStream: DotNet npNetMemoryStream;
+        Encoding: DotNet npNetEncoding;
         FromDate: Date;
         ToDate: Date;
         RetailFormCode: Codeunit "Retail Form Code";
@@ -75,7 +75,7 @@ codeunit 6014531 "Retail Logo Mgt."
         exit(RetailLogo.FindSet);
     end;
 
-    procedure GetLogoESCPOS(var Bitmap: DotNet Bitmap): Text
+    procedure GetLogoESCPOS(var Bitmap: DotNet npNetBitmap): Text
     begin
         ConvertToNonIndexed32bit(Bitmap);
 
@@ -84,7 +84,7 @@ codeunit 6014531 "Retail Logo Mgt."
 
     procedure UploadLogoFromFile(FileName: Text): Boolean
     var
-        Bitmap: DotNet Bitmap;
+        Bitmap: DotNet npNetBitmap;
         ESCPOS: Text;
     begin
         if not ImportImage(Bitmap) then
@@ -93,7 +93,7 @@ codeunit 6014531 "Retail Logo Mgt."
         exit(UploadLogoFromBitmap(Bitmap));
     end;
 
-    procedure UploadLogoFromBitmap(var Bitmap: DotNet Bitmap): Boolean
+    procedure UploadLogoFromBitmap(var Bitmap: DotNet npNetBitmap): Boolean
     var
         ESCPOS: Text;
     begin
@@ -116,10 +116,10 @@ codeunit 6014531 "Retail Logo Mgt."
         ReportSelectionRetail: Record "Report Selection Retail";
         RetailFormCode: Codeunit "Retail Form Code";
         InStream: InStream;
-        MemoryStream: DotNet MemoryStream;
+        MemoryStream: DotNet npNetMemoryStream;
         ESCPOS: Text;
-        Encoding: DotNet Encoding;
-        ByteArray: DotNet Array;
+        Encoding: DotNet npNetEncoding;
+        ByteArray: DotNet npNetArray;
         ObjectOutputSelection: Record "Object Output Selection";
         PrintMethodMgt: Codeunit "Print Method Mgt.";
         tmpDeviceSettings: Record "RP Device Settings" temporary;
@@ -162,7 +162,7 @@ codeunit 6014531 "Retail Logo Mgt."
     begin
     end;
 
-    local procedure ImportImage(var Bitmap: DotNet Bitmap): Boolean
+    local procedure ImportImage(var Bitmap: DotNet npNetBitmap): Boolean
     var
         FileMgt: Codeunit "File Management";
         FilePath: Text;
@@ -179,9 +179,9 @@ codeunit 6014531 "Retail Logo Mgt."
         exit(true);
     end;
 
-    local procedure ConvertToESCPOS(var Bitmap: DotNet Bitmap) ESCPOS: Text
+    local procedure ConvertToESCPOS(var Bitmap: DotNet npNetBitmap) ESCPOS: Text
     var
-        Color: DotNet Color;
+        Color: DotNet npNetColor;
         Threshold: Decimal;
         Luminance: Decimal;
         Index: Integer;
@@ -189,7 +189,7 @@ codeunit 6014531 "Retail Logo Mgt."
         x: Integer;
         Black: Boolean;
         Char: Char;
-        Convert: DotNet Convert;
+        Convert: DotNet npNetConvert;
         SliceBits: Text;
     begin
         Threshold := 127.0;
@@ -225,15 +225,15 @@ codeunit 6014531 "Retail Logo Mgt."
         end;
     end;
 
-    local procedure CreateRecord(var Bitmap: DotNet Bitmap;ESCPOS: Text)
+    local procedure CreateRecord(var Bitmap: DotNet npNetBitmap;ESCPOS: Text)
     var
         RetailLogo: Record "Retail Logo";
         OutStream: OutStream;
-        ImageFormat: DotNet ImageFormat;
-        MemoryStream: DotNet MemoryStream;
-        ByteArray: DotNet Array;
-        Encoding: DotNet Encoding;
-        BitConverter: DotNet BitConverter;
+        ImageFormat: DotNet npNetImageFormat;
+        MemoryStream: DotNet npNetMemoryStream;
+        ByteArray: DotNet npNetArray;
+        Encoding: DotNet npNetEncoding;
+        BitConverter: DotNet npNetBitConverter;
     begin
         RetailLogo.Init;
         RetailLogo.NewRecord;
@@ -265,14 +265,14 @@ codeunit 6014531 "Retail Logo Mgt."
         RetailLogo.Modify;
     end;
 
-    local procedure ConvertToNonIndexed32bit(var BitmapIn: DotNet Bitmap)
+    local procedure ConvertToNonIndexed32bit(var BitmapIn: DotNet npNetBitmap)
     var
-        Bitmap: DotNet Bitmap;
-        Graphics: DotNet Graphics;
-        PixelFormat: DotNet PixelFormat;
-        PixelOffsetMode: DotNet PixelOffsetMode;
-        Rectangle: DotNet Rectangle;
-        Color: DotNet Color;
+        Bitmap: DotNet npNetBitmap;
+        Graphics: DotNet npNetGraphics;
+        PixelFormat: DotNet npNetPixelFormat;
+        PixelOffsetMode: DotNet npNetPixelOffsetMode;
+        Rectangle: DotNet npNetRectangle;
+        Color: DotNet npNetColor;
         Ratio: Decimal;
         Height: Integer;
         Width: Integer;

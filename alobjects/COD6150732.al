@@ -21,7 +21,7 @@ codeunit 6150732 "POS Data Driver - Dimension"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
-    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text;Extensions: DotNet List_Of_T)
+    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text;Extensions: DotNet npNetList_Of_T)
     var
         MemberCommunity: Record "MM Member Community";
     begin
@@ -33,7 +33,7 @@ codeunit 6150732 "POS Data Driver - Dimension"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
-    local procedure OnGetDataSourceExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet DataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    local procedure OnGetDataSourceExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
@@ -55,9 +55,9 @@ codeunit 6150732 "POS Data Driver - Dimension"
         AddDimensionCode (DataSource, GeneralLedgerSetup."Shortcut Dimension 8 Code", '8');
     end;
 
-    local procedure AddDimensionCode(var DataSource: DotNet DataSource0;DimensionCode: Code[20];ShortcutNumber: Code[10])
+    local procedure AddDimensionCode(var DataSource: DotNet npNetDataSource0;DimensionCode: Code[20];ShortcutNumber: Code[10])
     var
-        DataType: DotNet DataType;
+        DataType: DotNet npNetDataType;
         Dimension: Record Dimension;
     begin
 
@@ -70,9 +70,9 @@ codeunit 6150732 "POS Data Driver - Dimension"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
-    local procedure OnDataSourceExtensionReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet DataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnDataSourceExtensionReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet npNetDataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
-        DataType: DotNet DataType;
+        DataType: DotNet npNetDataType;
         POSSale: Codeunit "POS Sale";
         Setup: Codeunit "POS Setup";
         DimensionManagement: Codeunit DimensionManagement;
@@ -104,7 +104,7 @@ codeunit 6150732 "POS Data Driver - Dimension"
         AddDimesionValue (DataRow, DimSetEntryTmp, GeneralLedgerSetup."Shortcut Dimension 8 Code", '8');
     end;
 
-    local procedure AddDimesionValue(var DataRow: DotNet DataRow0;var DimSetEntryTmp: Record "Dimension Set Entry" temporary;DimensionCode: Code[20];ShortcutNumber: Code[10])
+    local procedure AddDimesionValue(var DataRow: DotNet npNetDataRow0;var DimSetEntryTmp: Record "Dimension Set Entry" temporary;DimensionCode: Code[20];ShortcutNumber: Code[10])
     begin
 
         DimSetEntryTmp.SetFilter ("Dimension Code", '=%1', DimensionCode);

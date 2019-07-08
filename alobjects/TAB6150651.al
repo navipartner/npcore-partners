@@ -73,7 +73,7 @@ table 6150651 "POS View Profile"
 
     procedure DetectDecimalThousandsSeparator()
     var
-        CultureInfo: DotNet CultureInfo;
+        CultureInfo: DotNet npNetCultureInfo;
     begin
         if "Client Formatting Culture ID" = '' then begin
           "Client Formatting Culture ID" := CultureInfo.CurrentUICulture.Name;

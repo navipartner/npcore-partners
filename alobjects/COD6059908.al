@@ -39,8 +39,8 @@ codeunit 6059908 "Chilkat FTP/SFTP"
     var
         Text001: Label 'No Parameters found. Do you with to have empty Parameters added?';
         Text002: Label 'Empty Parameters added. Please fill in the parameters before run this task again';
-        ChilkatFtp2: DotNet Ftp2;
-        ChilkatSFTP: DotNet SFtp;
+        ChilkatFtp2: DotNet npNetFtp2;
+        ChilkatSFTP: DotNet npNetSFtp;
 
     local procedure FTP_UploadTQ(TaskLine: Record "Task Line")
     var
@@ -488,23 +488,23 @@ codeunit 6059908 "Chilkat FTP/SFTP"
         //+TQ1.20
     end;
 
-    trigger ChilkatSFTP::OnDownloadRate(sender: Variant;args: DotNet DataRateEventArgs)
+    trigger ChilkatSFTP::OnDownloadRate(sender: Variant;args: DotNet npNetDataRateEventArgs)
     begin
     end;
 
-    trigger ChilkatSFTP::OnUploadRate(sender: Variant;args: DotNet DataRateEventArgs)
+    trigger ChilkatSFTP::OnUploadRate(sender: Variant;args: DotNet npNetDataRateEventArgs)
     begin
     end;
 
-    trigger ChilkatSFTP::OnProgressInfo(sender: Variant;args: DotNet ProgressInfoEventArgs)
+    trigger ChilkatSFTP::OnProgressInfo(sender: Variant;args: DotNet npNetProgressInfoEventArgs)
     begin
     end;
 
-    trigger ChilkatSFTP::OnPercentDone(sender: Variant;args: DotNet PercentDoneEventArgs)
+    trigger ChilkatSFTP::OnPercentDone(sender: Variant;args: DotNet npNetPercentDoneEventArgs)
     begin
     end;
 
-    trigger ChilkatSFTP::OnAbortCheck(sender: Variant;args: DotNet AbortCheckEventArgs)
+    trigger ChilkatSFTP::OnAbortCheck(sender: Variant;args: DotNet npNetAbortCheckEventArgs)
     begin
     end;
 }

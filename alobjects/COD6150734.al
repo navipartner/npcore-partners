@@ -11,7 +11,7 @@ codeunit 6150734 "POS Workflows 2.0 - State"
         FrontEnd: Codeunit "POS Front End Management";
         Text003: Label 'Action %1 has attempted to store an object into action state, which failed due to following error:\\%2';
         ActionCode: Text;
-        ActionState: DotNet Dictionary_Of_T_U;
+        ActionState: DotNet npNetDictionary_Of_T_U;
         ActionStateRecRef: array [1024] of RecordRef;
         ActionStateRecRefCounter: Integer;
 

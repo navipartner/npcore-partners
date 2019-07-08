@@ -81,11 +81,11 @@ codeunit 6151402 "Magento Mgt."
     begin
     end;
 
-    procedure MagentoApiGet(MagentoApiUrl: Text;Method: Text;var XmlDoc: DotNet XmlDocument) Result: Boolean
+    procedure MagentoApiGet(MagentoApiUrl: Text;Method: Text;var XmlDoc: DotNet npNetXmlDocument) Result: Boolean
     var
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        MemoryStream: DotNet MemoryStream;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        MemoryStream: DotNet npNetMemoryStream;
     begin
         if MagentoApiUrl = '' then
           exit(false);
@@ -123,11 +123,11 @@ codeunit 6151402 "Magento Mgt."
         exit(true);
     end;
 
-    procedure MagentoApiPost(MagentoApiUrl: Text;Method: Text;var XmlDoc: DotNet XmlDocument) Result: Boolean
+    procedure MagentoApiPost(MagentoApiUrl: Text;Method: Text;var XmlDoc: DotNet npNetXmlDocument) Result: Boolean
     var
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
     begin
         if MagentoApiUrl = '' then

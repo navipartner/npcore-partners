@@ -26,8 +26,8 @@ codeunit 6151372 "CS WS"
     procedure ProcessDocument(var Document: Text)
     var
         XMLDOMManagement: Codeunit "XML DOM Management";
-        InputXmlDocument: DotNet XmlDocument;
-        OutputXmlDocument: DotNet XmlDocument;
+        InputXmlDocument: DotNet npNetXmlDocument;
+        OutputXmlDocument: DotNet npNetXmlDocument;
         CSManagement: Codeunit "CS Management";
         CSHelperFunctions: Codeunit "CS Helper Functions";
         CSCommunicationLog: Record "CS Communication Log";
@@ -53,10 +53,10 @@ codeunit 6151372 "CS WS"
         BigTextData: BigText;
         ValInt: Integer;
         ValBool: Boolean;
-        CommaString: DotNet String;
-        Separator: DotNet String;
+        CommaString: DotNet npNetString;
+        Separator: DotNet npNetString;
         Value: Text;
-        Values: DotNet Array;
+        Values: DotNet npNetArray;
     begin
         if (DeviceId = '') or (Data = '') then
           exit;
@@ -222,8 +222,8 @@ codeunit 6151372 "CS WS"
     var
         CSItemSeachHandling: Record "CS Item Seach Handling" temporary;
         Item: Record Item;
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
         Result: Text;
         MaxItems: Integer;
         ItemsCounter: Integer;
@@ -400,8 +400,8 @@ codeunit 6151372 "CS WS"
     procedure GetRfidWhseReceiptData(DocNo: Text): Text
     var
         WhseReceiptLine: Record "Warehouse Receipt Line";
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
         Item: Record Item;
         ItemVariant: Record "Item Variant";
         ItemGroup: Record "Item Group";
@@ -637,8 +637,8 @@ codeunit 6151372 "CS WS"
         TempBlob: Record TempBlob;
         MediaGuid: Guid;
         TenantMedia: Record "Tenant Media";
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
         Result: Text;
         Var01: Text;
         Var02: Text;

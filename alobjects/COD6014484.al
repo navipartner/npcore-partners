@@ -84,17 +84,17 @@ codeunit 6014484 "Pacsoft Management"
 
     local procedure SendXML(var pShipmentDocument: Record "Pacsoft Shipment Document")
     var
-        XMLDoc: DotNet XmlDocument;
-        str: DotNet Stream;
-        reader: DotNet XmlTextReader;
-        document: DotNet XmlDocument;
-        StringBuilder: DotNet StringBuilder;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        credentials: DotNet CredentialCache;
-        stream: DotNet StreamWriter;
-        ascii: DotNet Encoding;
-        Type: DotNet Encoding;
+        XMLDoc: DotNet npNetXmlDocument;
+        str: DotNet npNetStream;
+        reader: DotNet npNetXmlTextReader;
+        document: DotNet npNetXmlDocument;
+        StringBuilder: DotNet npNetStringBuilder;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        credentials: DotNet npNetCredentialCache;
+        stream: DotNet npNetStreamWriter;
+        ascii: DotNet npNetEncoding;
+        Type: DotNet npNetEncoding;
         iStream: InStream;
         iStream2: InStream;
         oStream: OutStream;
@@ -256,8 +256,8 @@ codeunit 6014484 "Pacsoft Management"
 
     procedure RemoveEmptyXmlTags(var pShipmentDocument: Record "Pacsoft Shipment Document")
     var
-        XMLDoc: DotNet XmlDocument;
-        XmlDocNode: DotNet XmlNode;
+        XMLDoc: DotNet npNetXmlDocument;
+        XmlDocNode: DotNet npNetXmlNode;
         iStream: InStream;
         oStream: OutStream;
         RBMgt: Codeunit "File Management";
@@ -297,11 +297,11 @@ codeunit 6014484 "Pacsoft Management"
         pShipmentDocument.Modify;
     end;
 
-    procedure DeleteEmptyXMLNodes(var XmlDocNode: DotNet XmlNode): Boolean
+    procedure DeleteEmptyXMLNodes(var XmlDocNode: DotNet npNetXmlNode): Boolean
     var
-        XMLChildNode: DotNet XmlNode;
-        XmlNodeList: DotNet XmlNodeList;
-        XmlNodeType: DotNet XmlNodeType;
+        XMLChildNode: DotNet npNetXmlNode;
+        XmlNodeList: DotNet npNetXmlNodeList;
+        XmlNodeType: DotNet npNetXmlNodeType;
         i: Integer;
         y: Integer;
     begin

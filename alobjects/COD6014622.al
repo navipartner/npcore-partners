@@ -35,9 +35,9 @@ codeunit 6014622 "POS Web Session Management"
         POSUnit: Record "POS Unit";
         POSViewProfile: Record "POS View Profile";
         RetailFormCode: Codeunit "Retail Form Code";
-        NumberFormat: DotNet NumberFormatInfo;
-        DateFormat: DotNet DateTimeFormatInfo;
-        LookupCache: DotNet Dictionary_Of_T_U;
+        NumberFormat: DotNet npNetNumberFormatInfo;
+        DateFormat: DotNet npNetDateTimeFormatInfo;
+        LookupCache: DotNet npNetDictionary_Of_T_U;
         SalespersonCode: Code[10];
         SessionStarted: Boolean;
         _ScreenWidth: Integer;
@@ -78,12 +78,12 @@ codeunit 6014622 "POS Web Session Management"
 
     local procedure TriggerDatabaseDeploymentOfAssemblies()
     var
-        Json: DotNet JsonSerializer;
-        Nav: DotNet Screen;
-        Device: DotNet PathHelper;
-        Service: DotNet RequestHandler;
-        PaymentGateway: DotNet PaymentGateway;
-        Print: DotNet PrintRequest;
+        Json: DotNet npNetJsonSerializer;
+        Nav: DotNet npNetScreen;
+        Device: DotNet npNetPathHelper;
+        Service: DotNet npNetRequestHandler;
+        PaymentGateway: DotNet npNetPaymentGateway;
+        Print: DotNet npNetPrintRequest;
     begin
         //-NPR5.01
         if CanLoadType(Json) then;
@@ -120,7 +120,7 @@ codeunit 6014622 "POS Web Session Management"
 
     procedure StartPOSSession()
     var
-        CultureInfo: DotNet CultureInfo;
+        CultureInfo: DotNet npNetCultureInfo;
     begin
         //-NPR5.01
         TriggerDatabaseDeploymentOfAssemblies();
@@ -231,8 +231,8 @@ codeunit 6014622 "POS Web Session Management"
     procedure GetCustomLogo() DataUri: Text
     var
         InStr: InStream;
-        MemStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        MemStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
     begin
         MakeSureSessionIsStarted();
         //-NPR5.49 [335739]
@@ -254,7 +254,7 @@ codeunit 6014622 "POS Web Session Management"
 
     procedure DecimalSeparator(): Text
     var
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         MakeSureSessionIsStarted();
         //-NPR5.49 [335739]
@@ -265,7 +265,7 @@ codeunit 6014622 "POS Web Session Management"
 
     procedure ThousandsSeparator(): Text
     var
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         MakeSureSessionIsStarted();
         //-NPR5.49 [335739]
@@ -274,13 +274,13 @@ codeunit 6014622 "POS Web Session Management"
         //+NPR5.49 [335739]
     end;
 
-    procedure GetNumberFormat(var NumberFormatOut: DotNet NumberFormatInfo)
+    procedure GetNumberFormat(var NumberFormatOut: DotNet npNetNumberFormatInfo)
     begin
         MakeSureSessionIsStarted();
         NumberFormatOut := NumberFormat;
     end;
 
-    procedure GetDateFormat(var DateFormatOut: DotNet DateTimeFormatInfo)
+    procedure GetDateFormat(var DateFormatOut: DotNet npNetDateTimeFormatInfo)
     begin
         MakeSureSessionIsStarted();
         DateFormatOut := DateFormat;
@@ -297,7 +297,7 @@ codeunit 6014622 "POS Web Session Management"
 
     procedure StoreLookupCache(RecRef: RecordRef): Boolean
     var
-        Cache: DotNet Dictionary_Of_T_U;
+        Cache: DotNet npNetDictionary_Of_T_U;
     begin
         //-NPR5.22
         if IsNull(LookupCache) then
@@ -317,7 +317,7 @@ codeunit 6014622 "POS Web Session Management"
 
     procedure InvalidateLookupCache(RecRef: RecordRef)
     var
-        Cache: DotNet Dictionary_Of_T_U;
+        Cache: DotNet npNetDictionary_Of_T_U;
     begin
         //-NPR5.22
         if IsNull(LookupCache) then

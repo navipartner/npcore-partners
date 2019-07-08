@@ -54,7 +54,7 @@ page 6151400 "Magento Generic Setup Buffer"
     trigger OnOpenPage()
     var
         [RunOnClient]
-        SendKeys: DotNet SendKeys;
+        SendKeys: DotNet npNetSendKeys;
     begin
         //-MAG2.01 [262316]
         //SendKeys.Send('+{F10}E{ENTER}');

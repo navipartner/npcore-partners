@@ -32,16 +32,16 @@ codeunit 6150701 "POS JavaScript Interface"
         Text002: Label 'An unknown method was invoked by the front end (JavaScript).\\Method: %1\Context: %2';
         Text003: Label 'No handler has responded to the RequestContext stage for action %1, or the registered handler failed to notify the framework about successful processing of the request.';
         Text004: Label 'No data driver responded to %1 event for %2 data source.';
-        LastView: DotNet View0;
+        LastView: DotNet npNetView0;
         Text005: Label 'One or more action codeunits have responded to %1 event during back-end workflow engine initialization. This is a critical condition, therefore your session cannot continue. You should immediately contact support.';
-        Stopwatches: DotNet Dictionary_Of_T_U;
+        Stopwatches: DotNet npNetDictionary_Of_T_U;
         Text006: Label 'No protocol codeunit responded to %1 method, sender ''%2'', event ''%3''. Protocol user interface %4 will now be aborted.';
         Text007: Label 'No protocol codeunit responded to Timer request. Protocol user interface %1 will now be aborted.';
 
     procedure Initialize(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         POSAction: Record "POS Action";
-        Parameters: DotNet JObject;
+        Parameters: DotNet npNetJObject;
         Handled: Boolean;
         ParametersString: Text;
     begin
@@ -64,10 +64,10 @@ codeunit 6150701 "POS JavaScript Interface"
           FrontEnd.ReportBug(StrSubstNo(Text005,'OnAction'));
     end;
 
-    procedure InvokeAction("Action": Text;WorkflowStep: Text;WorkflowId: Integer;ActionId: Integer;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    procedure InvokeAction("Action": Text;WorkflowStep: Text;WorkflowId: Integer;ActionId: Integer;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         POSAction: Record "POS Action";
-        Signal: DotNet WorkflowCallCompletedRequest;
+        Signal: DotNet npNetWorkflowCallCompletedRequest;
         Handled: Boolean;
         Executing: Boolean;
         ContextString: Text;
@@ -132,7 +132,7 @@ codeunit 6150701 "POS JavaScript Interface"
         FrontEnd.WorkflowCallCompleted(Signal);
     end;
 
-    procedure InvokeMethod(Method: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    procedure InvokeMethod(Method: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
         // A method invoked from JavaScript logic that requests C/AL to execute specific non-business-logic processing (e.g. infrastructure, etc.)
         OnBeforeInvokeMethod(Method,Context,POSSession,FrontEnd);
@@ -169,7 +169,7 @@ codeunit 6150701 "POS JavaScript Interface"
 
     end;
 
-    local procedure InvokeCustomMethod(Method: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure InvokeCustomMethod(Method: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         Handled: Boolean;
     begin
@@ -184,11 +184,11 @@ codeunit 6150701 "POS JavaScript Interface"
     procedure RefreshData(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         DataMgt: Codeunit "POS Data Management";
-        DataSets: DotNet List_Of_T;
-        DataSetList: DotNet DataSet;
-        DataSource: DotNet DataSource0;
-        DataStore: DotNet DataStore;
-        View: DotNet View0;
+        DataSets: DotNet npNetList_Of_T;
+        DataSetList: DotNet npNetDataSet;
+        DataSource: DotNet npNetDataSource0;
+        DataStore: DotNet npNetDataStore;
+        View: DotNet npNetView0;
         RefreshSource: Boolean;
     begin
         if not POSSession.IsDataRefreshNeeded() then
@@ -222,7 +222,7 @@ codeunit 6150701 "POS JavaScript Interface"
         LastView := View;
     end;
 
-    local procedure RefreshDataSet(POSSession: Codeunit "POS Session";DataSource: DotNet DataSource0;var DataSetList: DotNet DataSet;FrontEnd: Codeunit "POS Front End Management")
+    local procedure RefreshDataSet(POSSession: Codeunit "POS Session";DataSource: DotNet npNetDataSource0;var DataSetList: DotNet npNetDataSet;FrontEnd: Codeunit "POS Front End Management")
     var
         DataMgt: Codeunit "POS Data Management";
         Handled: Boolean;
@@ -239,14 +239,14 @@ codeunit 6150701 "POS JavaScript Interface"
         //+NPR5.40 [308408]
     end;
 
-    procedure ApplyDataState(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    procedure ApplyDataState(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
-        JObject: DotNet JObject;
-        JValue: DotNet JValue;
-        Pair: DotNet KeyValuePair_Of_T_U;
-        DataStore: DotNet DataStore;
-        DataSetList: DotNet DataSet;
+        JObject: DotNet npNetJObject;
+        JValue: DotNet npNetJValue;
+        Pair: DotNet npNetKeyValuePair_Of_T_U;
+        DataStore: DotNet npNetDataStore;
+        DataSetList: DotNet npNetDataSet;
         Position: Text;
     begin
         JSON.InitializeJObjectParser(Context,FrontEnd);
@@ -276,7 +276,7 @@ codeunit 6150701 "POS JavaScript Interface"
         end;
     end;
 
-    local procedure SetPosition(POSSession: Codeunit "POS Session";DataSetList: DotNet DataSet;Position: Text;FrontEnd: Codeunit "POS Front End Management")
+    local procedure SetPosition(POSSession: Codeunit "POS Session";DataSetList: DotNet npNetDataSet;Position: Text;FrontEnd: Codeunit "POS Front End Management")
     var
         Data: Codeunit "POS Data Management";
         Handled: Boolean;
@@ -291,7 +291,7 @@ codeunit 6150701 "POS JavaScript Interface"
         //+NPR5.40 [308408]
     end;
 
-    local procedure Method_AbortWorkflow(FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure Method_AbortWorkflow(FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         JSON: Codeunit "POS JSON Management";
         WorkflowID: Integer;
@@ -307,12 +307,12 @@ codeunit 6150701 "POS JavaScript Interface"
         FrontEnd.AbortWorkflows();
     end;
 
-    local procedure Method_BeforeWorkflow(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure Method_BeforeWorkflow(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         POSAction: Record "POS Action";
         JSON: Codeunit "POS JSON Management";
-        Parameters: DotNet JObject;
-        Signal: DotNet WorkflowCallCompletedRequest;
+        Parameters: DotNet npNetJObject;
+        Signal: DotNet npNetWorkflowCallCompletedRequest;
         "Action": Text;
         WorkflowId: Integer;
         Handled: Boolean;
@@ -358,7 +358,7 @@ codeunit 6150701 "POS JavaScript Interface"
         FrontEnd.WorkflowCallCompleted(Signal);
     end;
 
-    local procedure Method_Login(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure Method_Login(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         "Action": Record "POS Action";
         Setup: Codeunit "POS Setup";
@@ -370,7 +370,7 @@ codeunit 6150701 "POS JavaScript Interface"
         InvokeAction(Action.Code,'',0,0,Context,POSSession,FrontEnd);
     end;
 
-    local procedure Method_TextEnter(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure Method_TextEnter(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         "Action": Record "POS Action";
         Setup: Codeunit "POS Setup";
@@ -383,7 +383,7 @@ codeunit 6150701 "POS JavaScript Interface"
         InvokeAction(Action.Code,'',0,0,Context,POSSession,FrontEnd);
     end;
 
-    local procedure Method_InvokeDeviceResponse(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure Method_InvokeDeviceResponse(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         JSON: Codeunit "POS JSON Management";
         Stargate: Codeunit "POS Stargate Management";
@@ -407,7 +407,7 @@ codeunit 6150701 "POS JavaScript Interface"
           Stargate.DeviceError(Method,Response,POSSession,FrontEnd);
     end;
 
-    local procedure Method_Protocol(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure Method_Protocol(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         JSON: Codeunit "POS JSON Management";
         Stargate: Codeunit "POS Stargate Management";
@@ -436,7 +436,7 @@ codeunit 6150701 "POS JavaScript Interface"
         Stargate.AppGatewayProtocol(ActionName,Step,EventName,SerializedArguments,Callback,FrontEnd);
     end;
 
-    local procedure Method_FrontEndId(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure Method_FrontEndId(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         JSON: Codeunit "POS JSON Management";
         HardwareId: Text;
@@ -451,7 +451,7 @@ codeunit 6150701 "POS JavaScript Interface"
         FrontEnd.HardwareInitializationComplete();
     end;
 
-    local procedure Method_Unlock(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure Method_Unlock(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         "Action": Record "POS Action";
         Setup: Codeunit "POS Setup";
@@ -467,7 +467,7 @@ codeunit 6150701 "POS JavaScript Interface"
         //+NPR5.37 [293905]
     end;
 
-    local procedure Method_MajorTomEvent(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure Method_MajorTomEvent(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         JSON: Codeunit "POS JSON Management";
         Source: Text;
@@ -483,7 +483,7 @@ codeunit 6150701 "POS JavaScript Interface"
         //+NPR5.37 [293905]
     end;
 
-    local procedure Method_KeyPress(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure Method_KeyPress(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         JSON: Codeunit "POS JSON Management";
         KeyPressed: Text;
@@ -496,7 +496,7 @@ codeunit 6150701 "POS JavaScript Interface"
         //+NPR5.38 [295800]
     end;
 
-    local procedure Method_ProtocolUIResponse(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure Method_ProtocolUIResponse(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
     var
         JSON: Codeunit "POS JSON Management";
         ModelID: Guid;
@@ -537,7 +537,7 @@ codeunit 6150701 "POS JavaScript Interface"
 
     local procedure StopwatchStart(Id: Text)
     var
-        Stopwatch: DotNet Stopwatch;
+        Stopwatch: DotNet npNetStopwatch;
     begin
         if IsNull(Stopwatches) then
           Stopwatches := Stopwatches.Dictionary();
@@ -553,7 +553,7 @@ codeunit 6150701 "POS JavaScript Interface"
 
     local procedure StopwatchStop(Id: Text): Integer
     var
-        Stopwatch: DotNet Stopwatch;
+        Stopwatch: DotNet npNetStopwatch;
     begin
         Stopwatch := Stopwatches.Item(Id);
         Stopwatch.Stop();
@@ -562,7 +562,7 @@ codeunit 6150701 "POS JavaScript Interface"
 
     local procedure StopwatchGetDuration(Id: Text): Integer
     var
-        Stopwatch: DotNet Stopwatch;
+        Stopwatch: DotNet npNetStopwatch;
     begin
         if Stopwatches.ContainsKey(Id) then begin
           Stopwatch := Stopwatches.Item(Id);
@@ -571,7 +571,7 @@ codeunit 6150701 "POS JavaScript Interface"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     begin
     end;
 
@@ -583,32 +583,32 @@ codeunit 6150701 "POS JavaScript Interface"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInvokeAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnBeforeInvokeAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInvokeAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnAfterInvokeAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInvokeMethod(Method: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnBeforeInvokeMethod(Method: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInvokeMethod(Method: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnAfterInvokeMethod(Method: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCustomMethod(Method: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnCustomMethod(Method: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     begin
     end;
 

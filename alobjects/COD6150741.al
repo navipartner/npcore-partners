@@ -9,10 +9,10 @@ codeunit 6150741 "POS Method - Kiosk"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
-    local procedure OnUnlockKiosk(Method: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnUnlockKiosk(Method: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
-        Request: DotNet JsonRequest;
+        Request: DotNet npNetJsonRequest;
         Pin: Text;
         POSSetup: Codeunit "POS Setup";
         POSUnit: Record "POS Unit";

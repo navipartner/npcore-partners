@@ -10,7 +10,7 @@ codeunit 6151163 "MM Loyalty Points UI (Client)"
     end;
 
     var
-        Model: DotNet Model;
+        Model: DotNet npNetModel;
         ActiveModelID: Guid;
         TransactionEntryNo: Integer;
         TickAbortRequested: Integer;
@@ -225,7 +225,7 @@ codeunit 6151163 "MM Loyalty Points UI (Client)"
             POSFrontEnd.ResumeWorkflow ();
     end;
 
-    trigger Model::OnModelControlEvent(control: DotNet Control;eventName: Text;data: DotNet Dictionary_Of_T_U)
+    trigger Model::OnModelControlEvent(control: DotNet npNetControl;eventName: Text;data: DotNet npNetDictionary_Of_T_U)
     begin
     end;
 

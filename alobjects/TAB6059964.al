@@ -95,11 +95,11 @@ table 6059964 "MPOS QR Code"
     }
 
     var
-        BarCodeType: DotNet BarCodeType;
-        BarCodeSettings: DotNet BarcodeSettings;
-        BarCodeGenerator: DotNet BarCodeGenerator;
-        Image: DotNet Image;
-        ImageFormat: DotNet ImageFormat;
+        BarCodeType: DotNet npNetBarCodeType;
+        BarCodeSettings: DotNet npNetBarcodeSettings;
+        BarCodeGenerator: DotNet npNetBarCodeGenerator;
+        Image: DotNet npNetImage;
+        ImageFormat: DotNet npNetImageFormat;
 
     procedure SetDefaults(var MPOSQRCode: Record "MPOS QR Code")
     begin
@@ -191,7 +191,7 @@ table 6059964 "MPOS QR Code"
 
     procedure GenerateBarcode(BarCode: Text;var TempBlob: Record TempBlob)
     var
-        MemoryStream: DotNet MemoryStream;
+        MemoryStream: DotNet npNetMemoryStream;
         OutStream: OutStream;
     begin
         BarCodeSettings := BarCodeSettings.BarcodeSettings();

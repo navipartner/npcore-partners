@@ -32,8 +32,8 @@ codeunit 6014590 "Service Tier User Management"
     end;
 
     var
-        NodeList: DotNet XmlNodeList;
-        Node: DotNet XmlNode;
+        NodeList: DotNet npNetXmlNodeList;
+        Node: DotNet npNetXmlNode;
         ActiveSession: Record "Active Session";
         INVALIDXMLRESULT: Label 'XML is not valid';
 
@@ -115,11 +115,11 @@ codeunit 6014590 "Service Tier User Management"
     local procedure TryGetUserExpirationMessage(var ExpirationMessage: Text)
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        Uri: DotNet Uri;
-        WebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        Uri: DotNet npNetUri;
+        WebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
         ServiceMethod: Text;
     begin
         //-NPR5.49 [340731]
@@ -161,11 +161,11 @@ codeunit 6014590 "Service Tier User Management"
     local procedure TryGetUserLockedMessage(var ExpirationMessage: Text)
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        Uri: DotNet Uri;
-        WebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        Uri: DotNet npNetUri;
+        WebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
         ServiceMethod: Text;
     begin
         //-NPR5.49 [340731]
@@ -187,7 +187,7 @@ codeunit 6014590 "Service Tier User Management"
         //+NPR5.49 [340731]
     end;
 
-    local procedure InitTestRequest(ServiceMethod: Text;var XmlDoc: DotNet XmlDocument)
+    local procedure InitTestRequest(ServiceMethod: Text;var XmlDoc: DotNet npNetXmlDocument)
     var
         UsernameIn: Text;
         DatabaseNameIn: Text;
@@ -216,10 +216,10 @@ codeunit 6014590 "Service Tier User Management"
         //+NPR5.44 [322085]
     end;
 
-    local procedure GetWebResponseResult(HttpWebResponse: DotNet HttpWebResponse;ServiceMethod: Text) ResponseText: Text
+    local procedure GetWebResponseResult(HttpWebResponse: DotNet npNetHttpWebResponse;ServiceMethod: Text) ResponseText: Text
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlDocOut: DotNet XmlDocument;
+        XmlDocOut: DotNet npNetXmlDocument;
     begin
         //-NPR5.44 [322085]
         XmlDocOut := XmlDocOut.XmlDocument;

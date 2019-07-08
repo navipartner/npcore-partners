@@ -36,9 +36,9 @@ codeunit 6014610 "Tax Free Handler Mgt."
 
     procedure TryLookupHandler(var HandlerID: Text): Boolean
     var
-        HashSet: DotNet HashSet_Of_T;
+        HashSet: DotNet npNetHashSet_Of_T;
         tmpRetailList: Record "Retail List" temporary;
-        HashSetEnumerator: DotNet HashSet_Of_T_Enumerator;
+        HashSetEnumerator: DotNet npNetHashSet_Of_T_Enumerator;
     begin
         CreateDotNetHashSet(HashSet);
         OnLookupHandler(HashSet);
@@ -515,7 +515,7 @@ codeunit 6014610 "Tax Free Handler Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnLookupHandler(var HashSet: DotNet HashSet_Of_T)
+    local procedure OnLookupHandler(var HashSet: DotNet npNetHashSet_Of_T)
     begin
     end;
 
@@ -592,12 +592,12 @@ codeunit 6014610 "Tax Free Handler Mgt."
     begin
     end;
 
-    local procedure CreateDotNetHashSet(HashSet: DotNet HashSet_Of_T)
+    local procedure CreateDotNetHashSet(HashSet: DotNet npNetHashSet_Of_T)
     var
-        Type: DotNet Type;
-        Activator: DotNet Activator;
-        Arr: DotNet Array;
-        String: DotNet String;
+        Type: DotNet npNetType;
+        Activator: DotNet npNetActivator;
+        Arr: DotNet npNetArray;
+        String: DotNet npNetString;
     begin
         Arr := Arr.CreateInstance(GetDotNetType(Type),1);
         Arr.SetValue(GetDotNetType(String),0);

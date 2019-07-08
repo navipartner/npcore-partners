@@ -61,9 +61,9 @@ table 6151370 "CS User"
 
     procedure CalculatePassword(Input: Text[30]) HashedValue: Text[250]
     var
-        Convert: DotNet Convert;
-        CryptoProvider: DotNet SHA512Managed;
-        Encoding: DotNet Encoding;
+        Convert: DotNet npNetConvert;
+        CryptoProvider: DotNet npNetSHA512Managed;
+        Encoding: DotNet npNetEncoding;
     begin
         CryptoProvider := CryptoProvider.SHA512Managed;
         HashedValue := Convert.ToBase64String(CryptoProvider.ComputeHash(Encoding.Unicode.GetBytes(Input + Name)));

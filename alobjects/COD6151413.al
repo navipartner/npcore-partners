@@ -54,7 +54,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
 
     trigger OnRun()
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
     begin
         if LoadXmlDoc(XmlDoc) then
           ImportSalesOrders(XmlDoc);
@@ -72,10 +72,10 @@ codeunit 6151413 "Magento Sales Order Mgt."
         Text000: Label 'Invalid Voucher Reference No. %1';
         Text001: Label 'Voucher %1 is already in use';
 
-    local procedure ImportSalesOrders(XmlDoc: DotNet XmlDocument)
+    local procedure ImportSalesOrders(XmlDoc: DotNet npNetXmlDocument)
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         Initialize;
@@ -92,7 +92,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         end;
     end;
 
-    local procedure ImportSalesOrder(XmlElement: DotNet XmlElement) Imported: Boolean
+    local procedure ImportSalesOrder(XmlElement: DotNet npNetXmlElement) Imported: Boolean
     var
         SalesHeader: Record "Sales Header";
         ReleaseSalesDoc: Codeunit "Release Sales Document";
@@ -122,7 +122,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
     begin
     end;
 
-    local procedure InsertCollectDocument(XmlElement: DotNet XmlElement;var SalesHeader: Record "Sales Header")
+    local procedure InsertCollectDocument(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
     var
         NpCsWorkflow: Record "NpCs Workflow";
         NpCsStoreWorkflowRelation: Record "NpCs Store Workflow Relation";
@@ -158,15 +158,15 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //+MAG2.20 [352201]
     end;
 
-    local procedure InsertCommentLine(XmlElement: DotNet XmlElement;var SalesHeader: Record "Sales Header")
+    local procedure InsertCommentLine(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
     var
         RecordLink: Record "Record Link";
         CommentLine: Text;
         CommentType: Text;
         OutStream: OutStream;
         LinkID: Integer;
-        BinaryWriter: DotNet BinaryWriter;
-        Encoding: DotNet Encoding;
+        BinaryWriter: DotNet npNetBinaryWriter;
+        Encoding: DotNet npNetEncoding;
     begin
         CommentType := NpXmlDomMgt.GetXmlAttributeText(XmlElement,'type',false);
         CommentLine := NpXmlDomMgt.GetXmlText(XmlElement,'comment',0,true);
@@ -189,10 +189,10 @@ codeunit 6151413 "Magento Sales Order Mgt."
         end;
     end;
 
-    local procedure InsertComments(XmlElement: DotNet XmlElement;var SalesHeader: Record "Sales Header")
+    local procedure InsertComments(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
     var
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         NpXmlDomMgt.FindNodes(XmlElement,'comment_line',XmlNodeList);
@@ -202,7 +202,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         end;
     end;
 
-    local procedure InsertCustomer(XmlElement: DotNet XmlElement;IsContactCustomer: Boolean;var Customer: Record Customer): Boolean
+    local procedure InsertCustomer(XmlElement: DotNet npNetXmlElement;IsContactCustomer: Boolean;var Customer: Record Customer): Boolean
     var
         ConfigTemplateHeader: Record "Config. Template Header";
         CustTemplate: Record "Customer Template";
@@ -285,7 +285,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //+MAG2.13 [314625]
     end;
 
-    local procedure InsertPaymentLinePaymentMethod(XmlElement: DotNet XmlElement;var SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertPaymentLinePaymentMethod(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
         PaymentLine: Record "Magento Payment Line";
         PaymentMapping: Record "Magento Payment Mapping";
@@ -335,7 +335,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         PaymentLine.Insert(true);
     end;
 
-    local procedure InsertPaymentLineVoucher(XmlElement: DotNet XmlElement;var SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertPaymentLineVoucher(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
         CreditVoucher: Record "Credit Voucher";
         GiftVoucher: Record "Gift Voucher";
@@ -443,7 +443,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         end;
     end;
 
-    local procedure InsertRetailVoucherPayment(XmlElement: DotNet XmlElement;var SalesHeader: Record "Sales Header";var LineNo: Integer): Boolean
+    local procedure InsertRetailVoucherPayment(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header";var LineNo: Integer): Boolean
     var
         NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
         NpRvVoucher: Record "NpRv Voucher";
@@ -512,11 +512,11 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //+MAG2.17 [302179]
     end;
 
-    local procedure InsertPaymentLines(XmlElement: DotNet XmlElement;var SalesHeader: Record "Sales Header")
+    local procedure InsertPaymentLines(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
     var
-        XmlElement2: DotNet XmlElement;
-        XmlElementLines: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlElementLines: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         LineNo: Integer;
         i: Integer;
     begin
@@ -537,13 +537,13 @@ codeunit 6151413 "Magento Sales Order Mgt."
         end;
     end;
 
-    local procedure InsertSalesHeader(XmlElement: DotNet XmlElement;var SalesHeader: Record "Sales Header")
+    local procedure InsertSalesHeader(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
     var
         Customer: Record Customer;
         MagentoWebsite: Record "Magento Website";
         ShipmentMapping: Record "Magento Shipment Mapping";
         PaymentMapping: Record "Magento Payment Mapping";
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         RecRef: RecordRef;
         OrderNo: Code[20];
         WebsiteCode: Code[20];
@@ -624,12 +624,12 @@ codeunit 6151413 "Magento Sales Order Mgt."
         SalesHeader.Modify(true);
     end;
 
-    local procedure InsertSalesLines(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header")
+    local procedure InsertSalesLines(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header")
     var
         SalesLineTemp: Record "Sales Line" temporary;
-        XmlElementLine: DotNet XmlElement;
-        XmlElementLines: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElementLine: DotNet npNetXmlElement;
+        XmlElementLines: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         LineNo: Integer;
         i: Integer;
     begin
@@ -661,7 +661,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         SalesLineTemp.UpdateVATOnLines(0,SalesHeader,SalesLineTemp,VATAmountLineTemp);
     end;
 
-    local procedure InsertSalesLine(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertSalesLine(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
     begin
         Initialize;
         //-MAG2.17 [302179]
@@ -696,7 +696,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //+MAG2.17 [302179]
     end;
 
-    local procedure InsertSalesLineComment(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertSalesLineComment(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
         SalesLine: Record "Sales Line";
     begin
@@ -713,7 +713,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //+MAG2.17 [302179]
     end;
 
-    local procedure InsertSalesLineItem(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertSalesLineItem(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -781,9 +781,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //+MAG2.17 [302179]
     end;
 
-    local procedure InsertSalesLineGiftVoucher(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertSalesLineGiftVoucher(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
-        XmlElementGiftVoucher: DotNet XmlElement;
+        XmlElementGiftVoucher: DotNet npNetXmlElement;
         SalesLine: Record "Sales Line";
         LineAmount: Decimal;
         Quantity: Decimal;
@@ -820,7 +820,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //+MAG2.17 [302179]
     end;
 
-    local procedure InsertSalesLineFee(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertSalesLineFee(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
         SalesCommentLine: Record "Sales Comment Line";
         SalesLine: Record "Sales Line";
@@ -865,7 +865,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //-MAG2.17 [302179]
     end;
 
-    local procedure InsertSalesLineRetailVoucher(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertSalesLineRetailVoucher(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
         NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
         NpRvVoucher: Record "NpRv Voucher";
@@ -925,7 +925,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //+MAG2.17 [302179]
     end;
 
-    local procedure InsertSalesLinePaymentFee(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertSalesLinePaymentFee(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
         SalesLine: Record "Sales Line";
         PaymentFee: Decimal;
@@ -953,7 +953,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         SalesLine.Modify(true);
     end;
 
-    local procedure InsertSalesLineShipmentFee(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertSalesLineShipmentFee(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
         SalesLine: Record "Sales Line";
         ShipmentMapping: Record "Magento Shipment Mapping";
@@ -984,7 +984,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         SalesLine.Modify(true);
     end;
 
-    local procedure InsertGiftVoucher(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header")
+    local procedure InsertGiftVoucher(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header")
     var
         GiftVoucher: Record "Gift Voucher";
         Ostream: OutStream;
@@ -1005,7 +1005,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         GiftVoucher.Insert(true);
     end;
 
-    local procedure InsertSalesLineCustomOption(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertSalesLineCustomOption(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
         MagentoCustomOption: Record "Magento Custom Option";
         MagentoCustomOptionValue: Record "Magento Custom Option Value";
@@ -1107,7 +1107,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         exit(Customer.Get(ContBusRel."No."));
     end;
 
-    local procedure GetCustomer(ExternalCustomerNo: Code[20];XmlElement: DotNet XmlElement;var Customer: Record Customer): Boolean
+    local procedure GetCustomer(ExternalCustomerNo: Code[20];XmlElement: DotNet npNetXmlElement;var Customer: Record Customer): Boolean
     begin
         Initialize;
         Clear(Customer);
@@ -1147,7 +1147,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //+MAG2.21 [355271]
     end;
 
-    local procedure OrderExists(XmlElement: DotNet XmlElement): Boolean
+    local procedure OrderExists(XmlElement: DotNet npNetXmlElement): Boolean
     var
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
@@ -1197,7 +1197,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         end;
     end;
 
-    local procedure LoadXmlDoc(NaviConnectImportEntry: Record "Nc Import Entry";var XmlDoc: DotNet XmlDocument): Boolean
+    local procedure LoadXmlDoc(NaviConnectImportEntry: Record "Nc Import Entry";var XmlDoc: DotNet npNetXmlDocument): Boolean
     var
         InStr: InStream;
     begin

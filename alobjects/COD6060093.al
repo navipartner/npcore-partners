@@ -517,9 +517,9 @@ codeunit 6060093 "MM Admission Service WS"
     local procedure GetAvatarImage(var MMAdmissionServiceSetup: Record "MM Admission Service Setup";var Base64StringImage: Text) Success: Boolean
     var
         Member: Record "MM Member";
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
     begin
         MMAdmissionServiceSetup.CalcFields("Guest Avatar");
@@ -538,9 +538,9 @@ codeunit 6060093 "MM Admission Service WS"
     local procedure GetAvatarImageV2(var MMAdmissionServiceSetup: Record "MM Admission Service Setup";var Base64StringImage: Text;ScannerStationId: Code[10]) Success: Boolean
     var
         Member: Record "MM Member";
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
         MMAdmissionScannerStations: Record "MM Admission Scanner Stations";
     begin
@@ -577,12 +577,12 @@ codeunit 6060093 "MM Admission Service WS"
 
     local procedure GetImageContentAndExtension(InS: InStream;var Base64: Text;var Extension: Text[10])
     var
-        Convert: DotNet Convert;
-        Bytes: DotNet Array;
-        MemoryStream: DotNet MemoryStream;
-        Image: DotNet Image;
-        ImageFormat: DotNet ImageFormat;
-        Converter: DotNet ImageConverter;
+        Convert: DotNet npNetConvert;
+        Bytes: DotNet npNetArray;
+        MemoryStream: DotNet npNetMemoryStream;
+        Image: DotNet npNetImage;
+        ImageFormat: DotNet npNetImageFormat;
+        Converter: DotNet npNetImageConverter;
     begin
         MemoryStream := MemoryStream.MemoryStream();
         CopyStream(MemoryStream,InS);

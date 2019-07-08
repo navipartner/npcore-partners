@@ -18,11 +18,11 @@ codeunit 6014697 "Embedded Video Mgt."
     procedure FindEmbeddedVideos(VideoModule: Code[20];var EmbeddedVideoBuffer: Record "Embedded Video Buffer" temporary): Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
         Response: Text;
     begin
         EmbeddedVideoBuffer.DeleteAll;
@@ -63,10 +63,10 @@ codeunit 6014697 "Embedded Video Mgt."
         exit(EmbeddedVideoBuffer.FindFirst);
     end;
 
-    local procedure ParseVideoModule2Buffer(XmlElement: DotNet XmlElement;var EmbeddedVideoBuffer: Record "Embedded Video Buffer" temporary)
+    local procedure ParseVideoModule2Buffer(XmlElement: DotNet npNetXmlElement;var EmbeddedVideoBuffer: Record "Embedded Video Buffer" temporary)
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         ModuleCode: Code[20];
         ModuleName: Text[50];
         Columns: Integer;
@@ -88,7 +88,7 @@ codeunit 6014697 "Embedded Video Mgt."
         until IsNull(XmlElement2);
     end;
 
-    local procedure ParseVideo2Buffer(ModuleCode: Code[20];ModuleName: Text[50];Columns: Integer;XmlElement: DotNet XmlElement;var EmbeddedVideoBuffer: Record "Embedded Video Buffer" temporary)
+    local procedure ParseVideo2Buffer(ModuleCode: Code[20];ModuleName: Text[50];Columns: Integer;XmlElement: DotNet npNetXmlElement;var EmbeddedVideoBuffer: Record "Embedded Video Buffer" temporary)
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         LineNo: Integer;
@@ -112,9 +112,9 @@ codeunit 6014697 "Embedded Video Mgt."
         EmbeddedVideoBuffer.Insert;
     end;
 
-    local procedure InitEmbeddedVideoHttpWebRequest(SoapAction: Text;var HttpWebRequest: DotNet HttpWebRequest)
+    local procedure InitEmbeddedVideoHttpWebRequest(SoapAction: Text;var HttpWebRequest: DotNet npNetHttpWebRequest)
     var
-        Credential: DotNet NetworkCredential;
+        Credential: DotNet npNetNetworkCredential;
         Position: Text;
     begin
         HttpWebRequest := HttpWebRequest.Create('https://dev100.dynamics-retail.com:7107/NPmarketing/WS/NPmarketing/Codeunit/embedded_video_service');

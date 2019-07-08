@@ -65,9 +65,9 @@ codeunit 6151417 "Magento Pmt. Quickpay Mgt."
 
     local procedure Capture(PaymentLine: Record "Magento Payment Line")
     var
-        Dictionary: DotNet Dictionary_Of_T_U;
-        DotNetArray: DotNet Array;
-        HttpWebRequest: DotNet HttpWebRequest;
+        Dictionary: DotNet npNetDictionary_Of_T_U;
+        DotNetArray: DotNet npNetArray;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
     begin
         SetupHttpWebRequest(HttpWebRequest,"RequestMethod.Post",PaymentLine,"ServiceName.Capture");
         Dictionary := Dictionary.Dictionary;
@@ -78,9 +78,9 @@ codeunit 6151417 "Magento Pmt. Quickpay Mgt."
 
     local procedure Cancel(PaymentLine: Record "Magento Payment Line")
     var
-        HttpWebRequest: DotNet HttpWebRequest;
-        Dictionary: DotNet Dictionary_Of_T_U;
-        DotNetArray: DotNet Array;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        Dictionary: DotNet npNetDictionary_Of_T_U;
+        DotNetArray: DotNet npNetArray;
     begin
         SetupHttpWebRequest(HttpWebRequest,"RequestMethod.Post",PaymentLine,"ServiceName.Cancel");
 
@@ -91,9 +91,9 @@ codeunit 6151417 "Magento Pmt. Quickpay Mgt."
 
     local procedure Refund(PaymentLine: Record "Magento Payment Line")
     var
-        HttpWebRequest: DotNet HttpWebRequest;
-        Dictionary: DotNet Dictionary_Of_T_U;
-        DotNetArray: DotNet Array;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        Dictionary: DotNet npNetDictionary_Of_T_U;
+        DotNetArray: DotNet npNetArray;
     begin
         SetupHttpWebRequest(HttpWebRequest,"RequestMethod.Post",PaymentLine,"ServiceName.Refund");
 
@@ -107,13 +107,13 @@ codeunit 6151417 "Magento Pmt. Quickpay Mgt."
     begin
     end;
 
-    local procedure CatchErrorMessage(HttpWebRequest: DotNet HttpWebRequest)
+    local procedure CatchErrorMessage(HttpWebRequest: DotNet npNetHttpWebRequest)
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebResponse: DotNet HttpWebResponse;
-        HttpWebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
-        StreamReader: DotNet StreamReader;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        HttpWebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
+        StreamReader: DotNet npNetStreamReader;
         ErrorMessage: Text;
     begin
         XmlDoc := XmlDoc.XmlDocument;
@@ -136,8 +136,8 @@ codeunit 6151417 "Magento Pmt. Quickpay Mgt."
 
     local procedure CreateBasicAuth(ApiUsername: Text;ApiPassword: Text): Text
     var
-        Convert: DotNet Convert;
-        Encoding: DotNet Encoding;
+        Convert: DotNet npNetConvert;
+        Encoding: DotNet npNetEncoding;
     begin
         exit('Basic ' + Convert.ToBase64String(Encoding.UTF8.GetBytes(ApiUsername + ':' + ApiPassword)));
     end;
@@ -191,18 +191,18 @@ codeunit 6151417 "Magento Pmt. Quickpay Mgt."
         //+MAG2.06 [284557]
     end;
 
-    local procedure SendWebRequest(Dictionary: DotNet Dictionary_Of_T_U;DotNetArray: DotNet Array;HttpWebRequest: DotNet HttpWebRequest)
+    local procedure SendWebRequest(Dictionary: DotNet npNetDictionary_Of_T_U;DotNetArray: DotNet npNetArray;HttpWebRequest: DotNet npNetHttpWebRequest)
     begin
         SerializeObject(Dictionary,DotNetArray);
         HttpWebRequest.GetRequestStream().Write(DotNetArray,0,DotNetArray.Length);
         CatchErrorMessage(HttpWebRequest);
     end;
 
-    local procedure SerializeObject(Dictionary: DotNet Dictionary_Of_T_U;var DotNetArray: DotNet Array)
+    local procedure SerializeObject(Dictionary: DotNet npNetDictionary_Of_T_U;var DotNetArray: DotNet npNetArray)
     var
-        Encoding: DotNet Encoding;
-        JavaScriptSerializer: DotNet JavaScriptSerializer;
-        Type: DotNet Type;
+        Encoding: DotNet npNetEncoding;
+        JavaScriptSerializer: DotNet npNetJavaScriptSerializer;
+        Type: DotNet npNetType;
     begin
         JavaScriptSerializer := JavaScriptSerializer.JavaScriptSerializer;
         Type := Type.GetType('System.Byte',false);
@@ -211,7 +211,7 @@ codeunit 6151417 "Magento Pmt. Quickpay Mgt."
         DotNetArray := Encoding.GetBytes(JavaScriptSerializer.Serialize(Dictionary));
     end;
 
-    local procedure SetupHttpWebRequest(var HttpWebRequest: DotNet HttpWebRequest;RequestMethod: Code[10];PaymentLine: Record "Magento Payment Line";RequestService: Text)
+    local procedure SetupHttpWebRequest(var HttpWebRequest: DotNet npNetHttpWebRequest;RequestMethod: Code[10];PaymentLine: Record "Magento Payment Line";RequestService: Text)
     var
         PaymentGateway: Record "Magento Payment Gateway";
     begin
@@ -227,14 +227,14 @@ codeunit 6151417 "Magento Pmt. Quickpay Mgt."
 
     local procedure GetErrorMessage(JsonData: Text) ErrorMessage: Text
     var
-        DictionaryErrors: DotNet Dictionary_Of_T_U;
-        DictionaryKeys: DotNet Dictionary_Of_T_U;
-        IEnumerator: DotNet IEnumerator;
-        IEnumerator2: DotNet IEnumerator;
-        JavaScriptSerializer: DotNet JavaScriptSerializer;
-        ListOfKeys: DotNet List_Of_T;
-        ListOfValues: DotNet List_Of_T;
-        Type: DotNet Type;
+        DictionaryErrors: DotNet npNetDictionary_Of_T_U;
+        DictionaryKeys: DotNet npNetDictionary_Of_T_U;
+        IEnumerator: DotNet npNetIEnumerator;
+        IEnumerator2: DotNet npNetIEnumerator;
+        JavaScriptSerializer: DotNet npNetJavaScriptSerializer;
+        ListOfKeys: DotNet npNetList_Of_T;
+        ListOfValues: DotNet npNetList_Of_T;
+        Type: DotNet npNetType;
         Value: Text;
     begin
         DictionaryErrors := DictionaryErrors.Dictionary;

@@ -94,18 +94,18 @@ codeunit 6014588 "GCP API"
     end;
 
     [TryFunction]
-    procedure SubmitJob(PrinterID: Text;Title: Text;Ticket: Text;Content: DotNet MemoryStream;ContentType: Text;Tag: Text;FirstAttempt: Boolean)
+    procedure SubmitJob(PrinterID: Text;Title: Text;Ticket: Text;Content: DotNet npNetMemoryStream;ContentType: Text;Tag: Text;FirstAttempt: Boolean)
     var
         [SuppressDispose]
-        MultipartFormDataContent: DotNet MultipartFormDataContent;
+        MultipartFormDataContent: DotNet npNetMultipartFormDataContent;
         [SuppressDispose]
-        ByteArrayContent: DotNet ByteArrayContent;
-        AuthenticationHeader: DotNet AuthenticationHeaderValue;
-        HttpResponseMessage: DotNet HttpResponseMessage;
-        "Integer": DotNet Int32;
-        JObject: DotNet JObject;
-        Dictionary: DotNet Dictionary_Of_T_U;
-        Encoding: DotNet Encoding;
+        ByteArrayContent: DotNet npNetByteArrayContent;
+        AuthenticationHeader: DotNet npNetAuthenticationHeaderValue;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
+        "Integer": DotNet npNetInt32;
+        JObject: DotNet npNetJObject;
+        Dictionary: DotNet npNetDictionary_Of_T_U;
+        Encoding: DotNet npNetEncoding;
         Success: Boolean;
     begin
         if (StrLen(_AccessToken) = 0) or (StrLen(_RefreshToken) = 0) then
@@ -142,14 +142,14 @@ codeunit 6014588 "GCP API"
     end;
 
     [TryFunction]
-    procedure LookupPrinter(PrinterID: Text;var OutJObject: DotNet JObject;FirstAttempt: Boolean)
+    procedure LookupPrinter(PrinterID: Text;var OutJObject: DotNet npNetJObject;FirstAttempt: Boolean)
     var
         [SuppressDispose]
-        FormUrlEncodedContent: DotNet FormUrlEncodedContent;
-        AuthenticationHeader: DotNet AuthenticationHeaderValue;
-        HttpResponseMessage: DotNet HttpResponseMessage;
-        Dictionary: DotNet Dictionary_Of_T_U;
-        "Integer": DotNet Int32;
+        FormUrlEncodedContent: DotNet npNetFormUrlEncodedContent;
+        AuthenticationHeader: DotNet npNetAuthenticationHeaderValue;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
+        Dictionary: DotNet npNetDictionary_Of_T_U;
+        "Integer": DotNet npNetInt32;
     begin
         if (StrLen(_AccessToken) = 0) or (StrLen(_RefreshToken) = 0) then
           Error(Error_MissingTokens);
@@ -175,12 +175,12 @@ codeunit 6014588 "GCP API"
     end;
 
     [TryFunction]
-    procedure GetPrinters(var OutJObject: DotNet JObject;FirstAttempt: Boolean)
+    procedure GetPrinters(var OutJObject: DotNet npNetJObject;FirstAttempt: Boolean)
     var
         [SuppressDispose]
-        StringContent: DotNet StringContent;
-        AuthenticationHeader: DotNet AuthenticationHeaderValue;
-        HttpResponseMessage: DotNet HttpResponseMessage;
+        StringContent: DotNet npNetStringContent;
+        AuthenticationHeader: DotNet npNetAuthenticationHeaderValue;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
     begin
         if (StrLen(_AccessToken) = 0) or (StrLen(_RefreshToken) = 0) then
           Error(Error_MissingTokens);
@@ -207,12 +207,12 @@ codeunit 6014588 "GCP API"
     procedure AuthenticateUser(AuthCode: Text)
     var
         [SuppressDispose]
-        FormUrlEncodedContent: DotNet FormUrlEncodedContent;
+        FormUrlEncodedContent: DotNet npNetFormUrlEncodedContent;
         [SuppressDispose]
-        AuthenticationHeader: DotNet AuthenticationHeaderValue;
-        HttpResponseMessage: DotNet HttpResponseMessage;
-        JObject: DotNet JObject;
-        Dictionary: DotNet Dictionary_Of_T_U;
+        AuthenticationHeader: DotNet npNetAuthenticationHeaderValue;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
+        JObject: DotNet npNetJObject;
+        Dictionary: DotNet npNetDictionary_Of_T_U;
     begin
         Clear(_AccessToken);
         Clear(_RefreshToken);
@@ -246,11 +246,11 @@ codeunit 6014588 "GCP API"
     procedure RefreshAccessToken()
     var
         [SuppressDispose]
-        FormUrlEncodedContent: DotNet FormUrlEncodedContent;
-        AuthenticationHeader: DotNet AuthenticationHeaderValue;
-        HttpResponseMessage: DotNet HttpResponseMessage;
-        JObject: DotNet JObject;
-        Dictionary: DotNet Dictionary_Of_T_U;
+        FormUrlEncodedContent: DotNet npNetFormUrlEncodedContent;
+        AuthenticationHeader: DotNet npNetAuthenticationHeaderValue;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
+        JObject: DotNet npNetJObject;
+        Dictionary: DotNet npNetDictionary_Of_T_U;
     begin
         if StrLen(_RefreshToken) = 0 then
           Error(Error_MissingTokens);
@@ -282,11 +282,11 @@ codeunit 6014588 "GCP API"
     end;
 
     [TryFunction]
-    local procedure TryInvokeService(HttpContent: DotNet HttpContent;BaseAddress: Text;Endpoint: Text;TimeoutSeconds: Integer;AuthenticationHeader: DotNet AuthenticationHeaderValue;HttpResponseMessage: DotNet HttpResponseMessage)
+    local procedure TryInvokeService(HttpContent: DotNet npNetHttpContent;BaseAddress: Text;Endpoint: Text;TimeoutSeconds: Integer;AuthenticationHeader: DotNet npNetAuthenticationHeaderValue;HttpResponseMessage: DotNet npNetHttpResponseMessage)
     var
-        HttpClient: DotNet HttpClient;
-        Uri: DotNet Uri;
-        TimeSpan: DotNet TimeSpan;
+        HttpClient: DotNet npNetHttpClient;
+        Uri: DotNet npNetUri;
+        TimeSpan: DotNet npNetTimeSpan;
     begin
         HttpClient := HttpClient.HttpClient();
         HttpClient.BaseAddress := Uri.Uri(BaseAddress);
@@ -300,7 +300,7 @@ codeunit 6014588 "GCP API"
     end;
 
     [TryFunction]
-    local procedure TryParseJSON(HttpResponseMessage: DotNet HttpResponseMessage;JObject: DotNet JObject)
+    local procedure TryParseJSON(HttpResponseMessage: DotNet npNetHttpResponseMessage;JObject: DotNet npNetJObject)
     var
         Text: Text;
     begin
@@ -311,12 +311,12 @@ codeunit 6014588 "GCP API"
         //+NPR5.38 [294559]
     end;
 
-    local procedure CreateDotNetDictionary(Dictionary: DotNet Dictionary_Of_T_U)
+    local procedure CreateDotNetDictionary(Dictionary: DotNet npNetDictionary_Of_T_U)
     var
-        Type: DotNet Type;
-        Activator: DotNet Activator;
-        Arr: DotNet Array;
-        String: DotNet String;
+        Type: DotNet npNetType;
+        Activator: DotNet npNetActivator;
+        Arr: DotNet npNetArray;
+        String: DotNet npNetString;
     begin
         Arr := Arr.CreateInstance(GetDotNetType(Type),2);
         Arr.SetValue(GetDotNetType(String),0);
@@ -328,9 +328,9 @@ codeunit 6014588 "GCP API"
         Dictionary := Activator.CreateInstance(Type);
     end;
 
-    local procedure CheckForTokenExpiration(HttpResponseMessage: DotNet HttpResponseMessage): Boolean
+    local procedure CheckForTokenExpiration(HttpResponseMessage: DotNet npNetHttpResponseMessage): Boolean
     var
-        Convert: DotNet Convert;
+        Convert: DotNet npNetConvert;
     begin
         //403 can mean expired access token so try renewal.
         if Convert.ToInt32(HttpResponseMessage.StatusCode) = 403 then

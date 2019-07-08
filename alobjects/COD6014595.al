@@ -9,8 +9,8 @@ codeunit 6014595 "NAV Webservice Library"
         PingUrl: Codeunit "Network Test Library";
         ParameterList: Text;
         HttpStatusMsg: Text;
-        ResultNode: DotNet XmlNode;
-        ResultDocument: DotNet XmlDocument;
+        ResultNode: DotNet npNetXmlNode;
+        ResultDocument: DotNet npNetXmlDocument;
         "--": Integer;
         ServiceNamespace: Text;
         ServicePassword: Text;
@@ -26,7 +26,7 @@ codeunit 6014595 "NAV Webservice Library"
 
     procedure Invoke(var ReturnValue: Text) Succes: Boolean
     var
-        NodeList: DotNet XmlNodeList;
+        NodeList: DotNet npNetXmlNodeList;
     begin
         if PingUrl.InvokeAddres(Url,ServiceDomainName,ServiceUserName,ServicePassword) then begin
           Succes := InvokeWithResponse(ReturnValue, NodeList);
@@ -44,9 +44,9 @@ codeunit 6014595 "NAV Webservice Library"
         end;
     end;
 
-    procedure InvokeWithResponse(var ReturnValue: Text;var NodeList: DotNet XmlNodeList) Result: Boolean
+    procedure InvokeWithResponse(var ReturnValue: Text;var NodeList: DotNet npNetXmlNodeList) Result: Boolean
     var
-        XMLDocument: DotNet XmlDocument;
+        XMLDocument: DotNet npNetXmlDocument;
         StringLibrary: Codeunit "String Library";
         ReturnStatusCode: Integer;
         Company: Text[250];
@@ -74,12 +74,12 @@ codeunit 6014595 "NAV Webservice Library"
         end;
     end;
 
-    procedure InvokeWebService(Url: Text;Domain: Text;Username: Text;Password: Text;var XMLDocument: DotNet XmlDocument) ReturnStatus: Integer
+    procedure InvokeWebService(Url: Text;Domain: Text;Username: Text;Password: Text;var XMLDocument: DotNet npNetXmlDocument) ReturnStatus: Integer
     var
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        NetworkCredentials: DotNet NetworkCredential;
-        RequestStream: DotNet StreamWriter;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        NetworkCredentials: DotNet npNetNetworkCredential;
+        RequestStream: DotNet npNetStreamWriter;
     begin
         // Create XMLHTTP and SEND
         HttpWebRequest     := HttpWebRequest.Create(Url);
@@ -107,13 +107,13 @@ codeunit 6014595 "NAV Webservice Library"
         exit(HttpWebResponse.StatusCode);
     end;
 
-    procedure BuildRequestEnvelope(var XMLDocument: DotNet XmlDocument)
+    procedure BuildRequestEnvelope(var XMLDocument: DotNet npNetXmlDocument)
     var
-        Node: DotNet XmlNode;
-        SoapEnvelope: DotNet XmlElement;
-        SoapBody: DotNet XmlElement;
-        SoapMethod: DotNet XmlElement;
-        XMLDocumentParams: DotNet XmlDocument;
+        Node: DotNet npNetXmlNode;
+        SoapEnvelope: DotNet npNetXmlElement;
+        SoapBody: DotNet npNetXmlElement;
+        SoapMethod: DotNet npNetXmlElement;
+        XMLDocumentParams: DotNet npNetXmlDocument;
     begin
         SoapEnvelope := XMLDocument.CreateElement('Soap','Envelope','http://schemas.xmlsoap.org/soap/envelope/');
         SoapEnvelope.SetAttribute('xmlns:Soap','http://schemas.xmlsoap.org/soap/envelope/');
@@ -143,30 +143,30 @@ codeunit 6014595 "NAV Webservice Library"
         end;
     end;
 
-    procedure SelectNodes(Name: Text;NameSpace: Text;var XMLDocument: DotNet XmlDocument;var NodeList: DotNet XmlNodeList)
+    procedure SelectNodes(Name: Text;NameSpace: Text;var XMLDocument: DotNet npNetXmlDocument;var NodeList: DotNet npNetXmlNodeList)
     var
-        XMLNameSpaceManager: DotNet XmlNamespaceManager;
-        XMLNameTable: DotNet XmlNameTable;
+        XMLNameSpaceManager: DotNet npNetXmlNamespaceManager;
+        XMLNameTable: DotNet npNetXmlNameTable;
     begin
         XMLNameSpaceManager := XMLNameSpaceManager.XmlNamespaceManager(XMLDocument.NameTable);
         XMLNameSpaceManager.AddNamespace('tns',NameSpace);
         NodeList := XMLDocument.SelectNodes(StrSubstNo('//tns:%1',Name),XMLNameSpaceManager);
     end;
 
-    procedure SelectNode(Name: Text;NameSpace: Text;var XMLDocument: DotNet XmlDocument;var Node: DotNet XmlNode)
+    procedure SelectNode(Name: Text;NameSpace: Text;var XMLDocument: DotNet npNetXmlDocument;var Node: DotNet npNetXmlNode)
     var
-        XMLNameSpaceManager: DotNet XmlNamespaceManager;
-        XMLNameTable: DotNet XmlNameTable;
+        XMLNameSpaceManager: DotNet npNetXmlNamespaceManager;
+        XMLNameTable: DotNet npNetXmlNameTable;
     begin
         XMLNameSpaceManager := XMLNameSpaceManager.XmlNamespaceManager(XMLDocument.NameTable);
         XMLNameSpaceManager.AddNamespace('tns',NameSpace);
         Node := XMLDocument.SelectSingleNode(StrSubstNo('//tns:%1',Name),XMLNameSpaceManager);
     end;
 
-    procedure StoreXMLClientSide(var XMLDocument: DotNet XmlDocument;Path: Text)
+    procedure StoreXMLClientSide(var XMLDocument: DotNet npNetXmlDocument;Path: Text)
     var
         [RunOnClient]
-        StreamWriter: DotNet StreamWriter;
+        StreamWriter: DotNet npNetStreamWriter;
     begin
         StreamWriter := StreamWriter.StreamWriter(Path,false);
         StreamWriter.Write(XMLDocument.OuterXml);
@@ -214,7 +214,7 @@ codeunit 6014595 "NAV Webservice Library"
 
     procedure GetNodeValue(NodeName: Text): Text
     var
-        Node: DotNet XmlNode;
+        Node: DotNet npNetXmlNode;
     begin
         SelectNode(NodeName,NameSpace,ResultDocument,Node);
         exit(Node.InnerText)
@@ -278,27 +278,27 @@ codeunit 6014595 "NAV Webservice Library"
         ServiceMethod := ServiceMethodIn;
     end;
 
-    trigger ResultDocument::NodeInserting(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger ResultDocument::NodeInserting(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger ResultDocument::NodeInserted(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger ResultDocument::NodeInserted(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger ResultDocument::NodeRemoving(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger ResultDocument::NodeRemoving(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger ResultDocument::NodeRemoved(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger ResultDocument::NodeRemoved(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger ResultDocument::NodeChanging(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger ResultDocument::NodeChanging(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger ResultDocument::NodeChanged(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger ResultDocument::NodeChanged(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 }

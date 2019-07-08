@@ -29,9 +29,9 @@ codeunit 6151385 "CS UI Stock-Take WorkSheet"
         CSCommunication: Codeunit "CS Communication";
         CSManagement: Codeunit "CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet XmlDocument;
-        ReturnedNode: DotNet XmlNode;
-        RootNode: DotNet XmlNode;
+        DOMxmlin: DotNet npNetXmlDocument;
+        ReturnedNode: DotNet npNetXmlNode;
+        RootNode: DotNet npNetXmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -211,7 +211,7 @@ codeunit 6151385 "CS UI Stock-Take WorkSheet"
 
     local procedure SendForm(InputField: Integer)
     var
-        Records: DotNet XmlElement;
+        Records: DotNet npNetXmlElement;
     begin
         // Prepare Miniform
         CSCommunication.EncodeUI(MiniformHeader,StackCode,DOMxmlin,InputField,Remark,CSUserId);
@@ -226,16 +226,16 @@ codeunit 6151385 "CS UI Stock-Take WorkSheet"
         CSManagement.SendXMLReply(DOMxmlin);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet XmlNode;AttribName: Text[250];AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: DotNet npNetXmlNode;AttribName: Text[250];AttribValue: Text[250])
     begin
         if XMLDOMMgt.AddAttribute(NewChild,AttribName,AttribValue) > 0 then
           Error(Text002,AttribName);
     end;
 
-    local procedure AddSummarize(var Records: DotNet XmlElement): Boolean
+    local procedure AddSummarize(var Records: DotNet npNetXmlElement): Boolean
     var
-        "Record": DotNet XmlElement;
-        Line: DotNet XmlElement;
+        "Record": DotNet npNetXmlElement;
+        Line: DotNet npNetXmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: RecordID;
@@ -304,27 +304,27 @@ codeunit 6151385 "CS UI Stock-Take WorkSheet"
           exit(false);
     end;
 
-    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 }

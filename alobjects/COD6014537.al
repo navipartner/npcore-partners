@@ -213,8 +213,8 @@ codeunit 6014537 "RP Epson Label Device Library"
         AreaHeight: Integer;
         highP: Integer;
         lowP: Integer;
-        BitConverter: DotNet BitConverter;
-        ByteArray: DotNet Array;
+        BitConverter: DotNet npNetBitConverter;
+        ByteArray: DotNet npNetArray;
     begin
         case UpperCase(BarcodeType) of
           'UPC-A'   : BarcodeId := 0;
@@ -730,8 +730,8 @@ codeunit 6014537 "RP Epson Label Device Library"
         AreaHeight: Integer;
         highP: Integer;
         lowP: Integer;
-        BitConverter: DotNet BitConverter;
-        ByteArray: DotNet Array;
+        BitConverter: DotNet npNetBitConverter;
+        ByteArray: DotNet npNetArray;
     begin
         // Align     :   Alignment of text
         // Rotate    :   Orientation,                [0,1,2,3] -> [0�,90�,180�,270�]

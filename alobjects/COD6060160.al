@@ -48,7 +48,7 @@ codeunit 6060160 "POS Action - Get Event"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         EventNo: Code[20];
@@ -91,7 +91,7 @@ codeunit 6060160 "POS Action - Get Event"
         exit(EventNo <> '');
     end;
 
-    local procedure ImportEvent(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";EventNo: Code[20])
+    local procedure ImportEvent(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";EventNo: Code[20])
     var
         Job: Record Job;
         Customer: Record Customer;

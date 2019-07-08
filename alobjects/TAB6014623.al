@@ -58,16 +58,16 @@ table 6014623 ".NET Assembly"
     {
     }
 
-    procedure InstallAssembly(var InStr: InStream;var Asm: DotNet Assembly;Name: Text;DebugFileName: Text)
+    procedure InstallAssembly(var InStr: InStream;var Asm: DotNet npNetAssembly;Name: Text;DebugFileName: Text)
     var
         Asmbl: Record ".NET Assembly";
-        MemStream: DotNet MemoryStream;
-        MemStreamPdb: DotNet MemoryStream;
+        MemStream: DotNet npNetMemoryStream;
+        MemStreamPdb: DotNet npNetMemoryStream;
         [RunOnClient]
-        IOFile: DotNet File;
+        IOFile: DotNet npNetFile;
         OutStr: OutStream;
-        MD5: DotNet MD5;
-        Byte: DotNet Byte;
+        MD5: DotNet npNetMD5;
+        Byte: DotNet npNetByte;
     begin
         with Asmbl do begin
           MemStream := MemStream.MemoryStream();

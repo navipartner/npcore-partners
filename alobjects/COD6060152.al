@@ -210,7 +210,7 @@ codeunit 6060152 "Event Calendar Management"
         ChooseConfirm: Label 'Please choose type of calendar item keeping in mind that: %1 \ %2 \\ %3';
         AppointmentMsg: Label 'Appointments do not require atendees and single calendar item will be created for this event.';
         MeetingRequestMsg: Label 'Meeting Requests require attendees and a calendar item will be created for each resource line.';
-        ExchService: DotNet ExchangeService;
+        ExchService: DotNet npNetExchangeService;
         CalendarType: Option Appointment,MeetingRequest,Both;
         UpdateMsg: Label 'If selected calendar type is allready created it''ll be updated if required.';
         RecRef: RecordRef;
@@ -612,13 +612,13 @@ codeunit 6060152 "Event Calendar Management"
 
     procedure ProcessCalendarItem(var RecRef: RecordRef;ActionToTake: Option Send,Remove): Boolean
     var
-        ExchService: DotNet ExchangeService;
-        AppointmentItem: DotNet Appointment;
-        ItemId: DotNet ItemId;
-        MessageBody: DotNet MessageBody;
-        BodyType: DotNet BodyType;
-        TimeZoneInfo: DotNet TimeZoneInfo;
-        StringList: DotNet StringList;
+        ExchService: DotNet npNetExchangeService;
+        AppointmentItem: DotNet npNetAppointment;
+        ItemId: DotNet npNetItemId;
+        MessageBody: DotNet npNetMessageBody;
+        BodyType: DotNet npNetBodyType;
+        TimeZoneInfo: DotNet npNetTimeZoneInfo;
+        StringList: DotNet npNetStringList;
         BodyText: Text;
         Resource: Record Resource;
         EMailTemplateHeader: Record "E-mail Template Header";
@@ -630,7 +630,7 @@ codeunit 6060152 "Event Calendar Management"
         JobPlanningLine: Record "Job Planning Line";
         FileName: Text;
         FileMgt: Codeunit "File Management";
-        LegacyFreeBusyStatus: DotNet LegacyFreeBusyStatus;
+        LegacyFreeBusyStatus: DotNet npNetLegacyFreeBusyStatus;
         UseTemplate: Boolean;
         EventExchIntTemplate: Record "Event Exch. Int. Template";
         EndingDate: Date;
@@ -643,8 +643,8 @@ codeunit 6060152 "Event Calendar Management"
         ServerOffSet: Duration;
         DateTimeWithOffSet: DateTime;
         SenderOffSet: Duration;
-        DateTimeOffSet: DotNet DateTimeOffset;
-        TimeSpan: DotNet TimeSpan;
+        DateTimeOffSet: DotNet npNetDateTimeOffset;
+        TimeSpan: DotNet npNetTimeSpan;
         CustomOffSet: Duration;
     begin
         case RecRef.Number of
@@ -1025,10 +1025,10 @@ codeunit 6060152 "Event Calendar Management"
     end;
 
     [TryFunction]
-    local procedure GetCalendarItem(CalendarItemID: Text;ExchService: DotNet ExchangeService;var AppointmentItem: DotNet Appointment)
+    local procedure GetCalendarItem(CalendarItemID: Text;ExchService: DotNet npNetExchangeService;var AppointmentItem: DotNet npNetAppointment)
     var
-        ItemId: DotNet ItemId;
-        PropertySet: DotNet PropertySet;
+        ItemId: DotNet npNetItemId;
+        PropertySet: DotNet npNetPropertySet;
     begin
         Clear(ItemId);
         ItemId := ItemId.ItemId(CalendarItemID);
@@ -1075,7 +1075,7 @@ codeunit 6060152 "Event Calendar Management"
 
     procedure GetCalendarAttendeeResponseAction(var JobPlanningLine: Record "Job Planning Line")
     var
-        ExchService: DotNet ExchangeService;
+        ExchService: DotNet npNetExchangeService;
     begin
         //-NPR5.32 [275946]
         //GetCalendarAttendeeResponse(JobPlanningLine,ExchService,FALSE);
@@ -1088,7 +1088,7 @@ codeunit 6060152 "Event Calendar Management"
         Job: Record Job;
         RecRef: RecordRef;
         Response: Text;
-        ResponseType: DotNet MeetingResponseType;
+        ResponseType: DotNet npNetMeetingResponseType;
     begin
         Job.Get(JobPlanningLine."Job No.");
         EventEWSMgt.CheckStatus(Job,true);
@@ -1169,9 +1169,9 @@ codeunit 6060152 "Event Calendar Management"
     [TryFunction]
     procedure ProcessAttendeeResponse(var JobPlanningLine: Record "Job Planning Line";var Response: Text)
     var
-        ExchService: DotNet ExchangeService;
-        AppointmentItem: DotNet Appointment;
-        Attendee: DotNet Attendee;
+        ExchService: DotNet npNetExchangeService;
+        AppointmentItem: DotNet npNetAppointment;
+        Attendee: DotNet npNetAttendee;
         i: Integer;
         CantFindEmailError: Label 'No calendar requests have been sent to this e-mail %1. Please resend the request.';
         Job: Record Job;
@@ -1272,7 +1272,7 @@ codeunit 6060152 "Event Calendar Management"
         end;
     end;
 
-    local procedure RunAppointmentItemMethodWithLog(RecordId: RecordID;ExchService: DotNet ExchangeService;var AppointmentItem: DotNet Appointment;var Job: Record Job;MethodName: Text;SendMode: Integer): Boolean
+    local procedure RunAppointmentItemMethodWithLog(RecordId: RecordID;ExchService: DotNet npNetExchangeService;var AppointmentItem: DotNet npNetAppointment;var Job: Record Job;MethodName: Text;SendMode: Integer): Boolean
     var
         ActivityLog: Record "Activity Log";
         Context: Text;
@@ -1292,7 +1292,7 @@ codeunit 6060152 "Event Calendar Management"
         exit(true);
     end;
 
-    local procedure RunAppointmentItemMethod(var AppointmentItem: DotNet Appointment;MethodName: Text;SendMode: Integer;var Context: Text;var ActivityDescription: Text): Boolean
+    local procedure RunAppointmentItemMethod(var AppointmentItem: DotNet npNetAppointment;MethodName: Text;SendMode: Integer;var Context: Text;var ActivityDescription: Text): Boolean
     var
         DeleteContext: Label 'DELETE';
         DeleteDescription: Label 'Removing calendar item...';
@@ -1324,27 +1324,27 @@ codeunit 6060152 "Event Calendar Management"
     end;
 
     [TryFunction]
-    local procedure AppointmentItemDelete(var AppointmentItem: DotNet Appointment)
+    local procedure AppointmentItemDelete(var AppointmentItem: DotNet npNetAppointment)
     var
-        DeleteMode: DotNet DeleteMode;
-        SendCancellationsMode: DotNet SendCancellationsMode;
+        DeleteMode: DotNet npNetDeleteMode;
+        SendCancellationsMode: DotNet npNetSendCancellationsMode;
     begin
         AppointmentItem.Delete(DeleteMode.HardDelete,SendCancellationsMode.SendToAllAndSaveCopy);
     end;
 
     [TryFunction]
-    local procedure AppointmentItemSave(var AppointmentItem: DotNet Appointment)
+    local procedure AppointmentItemSave(var AppointmentItem: DotNet npNetAppointment)
     var
-        SendInvitationsMode: DotNet SendInvitationsMode;
+        SendInvitationsMode: DotNet npNetSendInvitationsMode;
     begin
         AppointmentItem.Save(SendInvitationsMode.SendToNone);
     end;
 
     [TryFunction]
-    local procedure AppointmentItemUpdate(var AppointmentItem: DotNet Appointment;SendMode: Option "None",AllAndSendCopy)
+    local procedure AppointmentItemUpdate(var AppointmentItem: DotNet npNetAppointment;SendMode: Option "None",AllAndSendCopy)
     var
-        ConflictResolutionMode: DotNet ConflictResolutionMode;
-        SendInviteCancelMode: DotNet SendInvitationsOrCancellationsMode;
+        ConflictResolutionMode: DotNet npNetConflictResolutionMode;
+        SendInviteCancelMode: DotNet npNetSendInvitationsOrCancellationsMode;
     begin
         case SendMode of
           SendMode::None:

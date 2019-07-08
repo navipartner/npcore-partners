@@ -47,7 +47,7 @@ codeunit 6150794 "POS Action - Tax Free"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         Setting: Option "Sale Toggle","Voucher List","Unit List","Print Last",Consolidate;
@@ -119,7 +119,7 @@ codeunit 6150794 "POS Action - Tax Free"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
-    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text;Extensions: DotNet List_Of_T)
+    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text;Extensions: DotNet npNetList_Of_T)
     var
         TaxFreeUnit: Record "Tax Free POS Unit";
     begin
@@ -133,9 +133,9 @@ codeunit 6150794 "POS Action - Tax Free"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
-    local procedure OnGetDataSourceExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet DataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    local procedure OnGetDataSourceExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
     var
-        DataType: DotNet DataType;
+        DataType: DotNet npNetDataType;
     begin
         if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
           exit;
@@ -146,9 +146,9 @@ codeunit 6150794 "POS Action - Tax Free"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
-    local procedure OnDataSourceExtensionReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet DataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnDataSourceExtensionReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet npNetDataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
-        DataType: DotNet DataType;
+        DataType: DotNet npNetDataType;
         POSSale: Codeunit "POS Sale";
         SalePOS: Record "Sale POS";
     begin

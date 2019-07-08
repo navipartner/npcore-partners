@@ -21,7 +21,7 @@ codeunit 6014626 ".NET Assembly Resolver"
 
     var
         Text001: Label 'Dynamic .NET assembly resolver was not installed because the corresponding .NET interop add-in is not configured. Please configure it, otherwise you will not be able to use NP Retail solution.';
-        Resolver: DotNet AssemblyResolver;
+        Resolver: DotNet npNetAssemblyResolver;
         AssembliesLoaded: Boolean;
 
     local procedure ResolveAssemblies()
@@ -39,9 +39,9 @@ codeunit 6014626 ".NET Assembly Resolver"
 
     local procedure ResolveAssembly(Asmbl: Record ".NET Assembly")
     var
-        Asm: DotNet Assembly;
-        Bytes: DotNet Array;
-        Pdb: DotNet Array;
+        Asm: DotNet npNetAssembly;
+        Bytes: DotNet npNetArray;
+        Pdb: DotNet npNetArray;
         Add: Boolean;
         CacheHash: Text;
     begin
@@ -57,10 +57,10 @@ codeunit 6014626 ".NET Assembly Resolver"
         end;
     end;
 
-    local procedure LoadAssemblyBytes(Asmbl: Record ".NET Assembly";var Bytes: DotNet Array;var Pdb: DotNet Array)
+    local procedure LoadAssemblyBytes(Asmbl: Record ".NET Assembly";var Bytes: DotNet npNetArray;var Pdb: DotNet npNetArray)
     var
-        MemStr: DotNet MemoryStream;
-        MemStrPdb: DotNet MemoryStream;
+        MemStr: DotNet npNetMemoryStream;
+        MemStrPdb: DotNet npNetMemoryStream;
         InStr: InStream;
         Byte: Byte;
     begin
@@ -81,10 +81,10 @@ codeunit 6014626 ".NET Assembly Resolver"
 
     local procedure InstallAssemblyResolver()
     var
-        Asm: DotNet Assembly;
+        Asm: DotNet npNetAssembly;
         [RunOnClient]
-        AsmClient: DotNet Assembly;
-        "Object": DotNet Object;
+        AsmClient: DotNet npNetAssembly;
+        "Object": DotNet npNetObject;
     begin
         if not AssemblyResolverAvailable() then begin
           Message(Text001);

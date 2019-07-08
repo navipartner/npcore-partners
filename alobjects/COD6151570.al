@@ -7,18 +7,18 @@ codeunit 6151570 "AF Management"
     begin
     end;
 
-    procedure CallRESTWebService(var Parameters: DotNet Dictionary_Of_T_U;var HttpResponseMessage: DotNet HttpResponseMessage): Boolean
+    procedure CallRESTWebService(var Parameters: DotNet npNetDictionary_Of_T_U;var HttpResponseMessage: DotNet npNetHttpResponseMessage): Boolean
     var
-        HttpContent: DotNet HttpContent;
-        HttpClient: DotNet HttpClient;
-        AuthHeaderValue: DotNet AuthenticationHeaderValue;
-        EntityTagHeaderValue: DotNet EntityTagHeaderValue;
-        Uri: DotNet Uri;
-        Bytes: DotNet Array;
-        Encoding: DotNet Encoding;
-        Convert: DotNet Convert;
-        HttpRequestMessage: DotNet HttpRequestMessage;
-        HttpMethod: DotNet HttpMethod;
+        HttpContent: DotNet npNetHttpContent;
+        HttpClient: DotNet npNetHttpClient;
+        AuthHeaderValue: DotNet npNetAuthenticationHeaderValue;
+        EntityTagHeaderValue: DotNet npNetEntityTagHeaderValue;
+        Uri: DotNet npNetUri;
+        Bytes: DotNet npNetArray;
+        Encoding: DotNet npNetEncoding;
+        Convert: DotNet npNetConvert;
+        HttpRequestMessage: DotNet npNetHttpRequestMessage;
+        HttpMethod: DotNet npNetHttpMethod;
     begin
         HttpClient := HttpClient.HttpClient();
         HttpClient.BaseAddress := Uri.Uri(Format(Parameters.Item('baseurl')));

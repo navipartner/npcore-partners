@@ -124,18 +124,18 @@ codeunit 6151085 "RIS Retail Inventory Set Mgt."
     local procedure TryRequestInventory(RetailInventorySetEntry: Record "RIS Retail Inventory Set Entry";var RetailInventoryBuffer: Record "RIS Retail Inventory Buffer" temporary;var TotalInventory: Decimal)
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        MemoryStream: DotNet MemoryStream;
-        Stream: DotNet Stream;
-        StreamReader: DotNet StreamReader;
-        WebException: DotNet WebException;
-        XmlNamespaceManager: DotNet XmlNamespaceManager;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        MemoryStream: DotNet npNetMemoryStream;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
+        WebException: DotNet npNetWebException;
+        XmlNamespaceManager: DotNet npNetXmlNamespaceManager;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         Position: Integer;
         Inventory: Decimal;

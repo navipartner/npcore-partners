@@ -19,7 +19,7 @@ codeunit 6014557 "Raw Print Proxy Protocol"
 
     var
         POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
-        ExpectedResponseType: DotNet Type;
+        ExpectedResponseType: DotNet npNetType;
         ExpectedResponseId: Guid;
         ProtocolManagerId: Guid;
         ProtocolStage: Integer;
@@ -30,9 +30,9 @@ codeunit 6014557 "Raw Print Proxy Protocol"
 
     local procedure ProcessSignal(var TempBlob: Record TempBlob)
     var
-        Signal: DotNet Signal;
-        StartSignal: DotNet StartSession;
-        Response: DotNet MessageResponse;
+        Signal: DotNet npNetSignal;
+        StartSignal: DotNet npNetStartSession;
+        Response: DotNet npNetMessageResponse;
     begin
         POSDeviceProxyManager.DeserializeObject(Signal,TempBlob);
         case true of
@@ -56,7 +56,7 @@ codeunit 6014557 "Raw Print Proxy Protocol"
         ProtocolStage1();
     end;
 
-    local procedure MessageResponse(Envelope: DotNet ResponseEnvelope)
+    local procedure MessageResponse(Envelope: DotNet npNetResponseEnvelope)
     begin
         if Envelope.MessageId <> ExpectedResponseId then
           Error('Unknown response: %1 (expected %2)',Envelope.MessageId,ExpectedResponseId);
@@ -71,8 +71,8 @@ codeunit 6014557 "Raw Print Proxy Protocol"
 
     local procedure ProtocolStage1()
     var
-        PrintRequest: DotNet PrintRequest;
-        PrintResponse: DotNet PrintResponse;
+        PrintRequest: DotNet npNetPrintRequest;
+        PrintResponse: DotNet npNetPrintResponse;
     begin
         ProtocolStage := 1;
 
@@ -93,9 +93,9 @@ codeunit 6014557 "Raw Print Proxy Protocol"
         ExpectedResponseId := POSDeviceProxyManager.SendMessage(ProtocolManagerId,PrintRequest);
     end;
 
-    local procedure ProtocolStage1Close(Envelope: DotNet Envelope)
+    local procedure ProtocolStage1Close(Envelope: DotNet npNetEnvelope)
     var
-        PrintResponse: DotNet PrintResponse;
+        PrintResponse: DotNet npNetPrintResponse;
     begin
         POSDeviceProxyManager.DeserializeEnvelopeFromId(PrintResponse,Envelope,ProtocolManagerId);
         POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
@@ -103,7 +103,7 @@ codeunit 6014557 "Raw Print Proxy Protocol"
 
     procedure PrintJob(pPrinterName: Text[100];pTargetEncoding: Text[30];pPrintBytes: Text)
     var
-        PrintRequest: DotNet PrintRequest;
+        PrintRequest: DotNet npNetPrintRequest;
         POSEventMarshaller: Codeunit "POS Event Marshaller";
     begin
         Commit ();

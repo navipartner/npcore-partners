@@ -79,7 +79,7 @@ codeunit 6150705 "POS Sale"
     [Scope('Personalization')]
     procedure InitializeNewSale(RegisterIn: Record Register;FrontEndIn: Codeunit "POS Front End Management";SetupIn: Codeunit "POS Setup";ThisIn: Codeunit "POS Sale")
     var
-        ViewType: DotNet ViewType0;
+        ViewType: DotNet npNetViewType0;
     begin
         Initialized := true;
 
@@ -182,7 +182,7 @@ codeunit 6150705 "POS Sale"
     end;
 
     [Scope('Personalization')]
-    procedure ToDataset(var CurrDataSet: DotNet DataSet;DataSource: DotNet DataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    procedure ToDataset(var CurrDataSet: DotNet npNetDataSet;DataSource: DotNet npNetDataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         TempRec: Record "Sale POS" temporary;
         DataMgt: Codeunit "POS Data Management";

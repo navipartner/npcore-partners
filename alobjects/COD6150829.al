@@ -47,7 +47,7 @@ codeunit 6150829 "POS Action - POS Info"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         Confirmed: Boolean;
@@ -67,7 +67,7 @@ codeunit 6150829 "POS Action - POS Info"
         Captions.AddActionCaption (ActionCode, 'notallowed', NotAllowed);
     end;
 
-    local procedure OpenPOSInfoPage(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OpenPOSInfoPage(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         POSSale: Codeunit "POS Sale";
@@ -76,9 +76,9 @@ codeunit 6150829 "POS Action - POS Info"
         POSInfoManagement: Codeunit "POS Info Management";
         SalePOS: Record "Sale POS";
         LinePOS: Record "Sale Line POS";
-        CurrentView: DotNet View0;
-        CurrentViewType: DotNet ViewType0;
-        ViewType: DotNet ViewType0;
+        CurrentView: DotNet npNetView0;
+        CurrentViewType: DotNet npNetViewType0;
+        ViewType: DotNet npNetViewType0;
     begin
         JSON.InitializeJObjectParser(Context,FrontEnd);
         JSON.SetScope ('parameters', true);

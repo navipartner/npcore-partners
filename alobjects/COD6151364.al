@@ -27,9 +27,9 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         CSCommunication: Codeunit "CS Communication";
         CSMgt: Codeunit "CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet XmlDocument;
-        ReturnedNode: DotNet XmlNode;
-        RootNode: DotNet XmlNode;
+        DOMxmlin: DotNet npNetXmlDocument;
+        ReturnedNode: DotNet npNetXmlNode;
+        RootNode: DotNet npNetXmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -72,9 +72,9 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         CSItemReclassHandling: Record "CS Item Reclass. Handling";
         CSItemReclassHandling2: Record "CS Item Reclass. Handling";
         CSFieldDefaults: Record "CS Field Defaults";
-        CommaString: DotNet String;
-        Values: DotNet Array;
-        Separator: DotNet String;
+        CommaString: DotNet npNetString;
+        Values: DotNet npNetArray;
+        Separator: DotNet npNetString;
         Value: Text;
         ItemJournalLine: Record "Item Journal Line";
     begin
@@ -256,7 +256,7 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
 
     local procedure SendForm(InputField: Integer)
     var
-        Records: DotNet XmlElement;
+        Records: DotNet npNetXmlElement;
         CSSetup: Record "CS Setup";
     begin
         CSCommunication.EncodeUI(CSUIHeader,StackCode,DOMxmlin,InputField,Remark,CSUserId);
@@ -441,16 +441,16 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         CSItemReclassHandling.DeleteAll(true);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet XmlNode;AttribName: Text[250];AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: DotNet npNetXmlNode;AttribName: Text[250];AttribValue: Text[250])
     begin
         if XMLDOMMgt.AddAttribute(NewChild,AttribName,AttribValue) > 0 then
           Error(Text002,AttribName);
     end;
 
-    local procedure AddSummarize(var Records: DotNet XmlElement): Boolean
+    local procedure AddSummarize(var Records: DotNet npNetXmlElement): Boolean
     var
-        "Record": DotNet XmlElement;
-        Line: DotNet XmlElement;
+        "Record": DotNet npNetXmlElement;
+        Line: DotNet npNetXmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: RecordID;
@@ -527,10 +527,10 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
           exit(false);
     end;
 
-    local procedure AddAggSummarize(var Records: DotNet XmlElement) NotEmptyResult: Boolean
+    local procedure AddAggSummarize(var Records: DotNet npNetXmlElement) NotEmptyResult: Boolean
     var
-        "Record": DotNet XmlElement;
-        Line: DotNet XmlElement;
+        "Record": DotNet npNetXmlElement;
+        Line: DotNet npNetXmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: RecordID;
@@ -700,27 +700,27 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         exit(true);
     end;
 
-    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 
-    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet XmlNodeChangedEventArgs)
+    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
     begin
     end;
 }

@@ -13,8 +13,8 @@ codeunit 6059821 "CampaignMonitor Mgt."
         ResponseTempBlob: Record TempBlob;
         HttpWebRequestMgt: Codeunit "Http Web Request Mgt.";
         ResponseInStream: InStream;
-        HttpStatusCode: DotNet HttpStatusCode;
-        ResponseHeaders: DotNet NameValueCollection;
+        HttpStatusCode: DotNet npNetHttpStatusCode;
+        ResponseHeaders: DotNet npNetNameValueCollection;
 
     procedure CheckConnection()
     begin
@@ -29,8 +29,8 @@ codeunit 6059821 "CampaignMonitor Mgt."
     procedure GetSmartEmailList(var TransactionalJSONResult: Record "Transactional JSON Result" temporary)
     var
         TransactionalEmailSetup: Record "Transactional Email Setup";
-        JObject: DotNet JObject;
-        JArray: DotNet JArray;
+        JObject: DotNet npNetJObject;
+        JArray: DotNet npNetJArray;
         I: Integer;
     begin
         TransactionalEmailSetup.Get;
@@ -59,8 +59,8 @@ codeunit 6059821 "CampaignMonitor Mgt."
     var
         TransactionalEmailVariable: Record "Smart Email Variable";
         TempVariable: Record "Smart Email Variable" temporary;
-        JObject: DotNet JObject;
-        JArray: DotNet JArray;
+        JObject: DotNet npNetJObject;
+        JArray: DotNet npNetJArray;
         I: Integer;
     begin
         TransactionalEmail.TestField("Smart Email ID");
@@ -113,7 +113,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
 
     procedure GetMessageDetails(EmailLog: Record "Transactional Email Log")
     var
-        JObject: DotNet JObject;
+        JObject: DotNet npNetJObject;
     begin
         if IsNullGuid(EmailLog."Message ID") then
           exit;
@@ -151,13 +151,13 @@ codeunit 6059821 "CampaignMonitor Mgt."
         TempBlob: Record TempBlob temporary;
         EmailLog: Record "Transactional Email Log";
         NpXmlTemplate: Record "NpXml Template";
-        StringBuilder: DotNet StringBuilder;
-        StringWriter: DotNet StringWriter;
-        Encoding: DotNet Encoding;
-        JTextWriter: DotNet JsonTextWriter;
-        Formatting: DotNet Formatting;
-        JObject: DotNet JObject;
-        JArray: DotNet JArray;
+        StringBuilder: DotNet npNetStringBuilder;
+        StringWriter: DotNet npNetStringWriter;
+        Encoding: DotNet npNetEncoding;
+        JTextWriter: DotNet npNetJsonTextWriter;
+        Formatting: DotNet npNetFormatting;
+        JObject: DotNet npNetJObject;
+        JArray: DotNet npNetJArray;
         NpXmlMgt: Codeunit "NpXml Mgt.";
         NpXmlValueMgt: Codeunit "NpXml Value Mgt.";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
@@ -165,8 +165,8 @@ codeunit 6059821 "CampaignMonitor Mgt."
         I: Integer;
         RecRef2: RecordRef;
         FileManagement: Codeunit "File Management";
-        XmlDocNode: DotNet XmlNode;
-        XmlDoc: DotNet XmlDocument;
+        XmlDocNode: DotNet npNetXmlNode;
+        XmlDoc: DotNet npNetXmlDocument;
     begin
         TransactionalEmail.TestField("Smart Email ID");
         TransactionalEmailSetup.Get;
@@ -239,13 +239,13 @@ codeunit 6059821 "CampaignMonitor Mgt."
         TransactionalEmailSetup: Record "Transactional Email Setup";
         TempBlob: Record TempBlob temporary;
         EmailLog: Record "Transactional Email Log";
-        StringBuilder: DotNet StringBuilder;
-        StringWriter: DotNet StringWriter;
-        Encoding: DotNet Encoding;
-        JTextWriter: DotNet JsonTextWriter;
-        Formatting: DotNet Formatting;
-        JObject: DotNet JObject;
-        JArray: DotNet JArray;
+        StringBuilder: DotNet npNetStringBuilder;
+        StringWriter: DotNet npNetStringWriter;
+        Encoding: DotNet npNetEncoding;
+        JTextWriter: DotNet npNetJsonTextWriter;
+        Formatting: DotNet npNetFormatting;
+        JObject: DotNet npNetJObject;
+        JArray: DotNet npNetJArray;
         OStream: OutStream;
         I: Integer;
     begin
@@ -355,8 +355,8 @@ codeunit 6059821 "CampaignMonitor Mgt."
 
     local procedure GetBasicAuthInfo(Username: Text;Password: Text): Text
     var
-        Convert: DotNet Convert;
-        Encoding: DotNet Encoding;
+        Convert: DotNet npNetConvert;
+        Encoding: DotNet npNetEncoding;
     begin
         exit(Convert.ToBase64String(Encoding.UTF8.GetBytes(Username + ':' + Password)));
     end;
@@ -441,15 +441,15 @@ codeunit 6059821 "CampaignMonitor Mgt."
     begin
     end;
 
-    local procedure GetString(JObject: DotNet JObject;Property: Text): Text
+    local procedure GetString(JObject: DotNet npNetJObject;Property: Text): Text
     var
-        JToken: DotNet JToken;
+        JToken: DotNet npNetJToken;
     begin
         if GetJToken(JObject,Property,JToken) then
           exit(JToken.ToString());
     end;
 
-    local procedure GetInt(JObject: DotNet JObject;Property: Text): Integer
+    local procedure GetInt(JObject: DotNet npNetJObject;Property: Text): Integer
     var
         Number: Integer;
     begin
@@ -457,7 +457,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
           exit(Number);
     end;
 
-    local procedure GetDateTime(JObject: DotNet JObject;Property: Text): DateTime
+    local procedure GetDateTime(JObject: DotNet npNetJObject;Property: Text): DateTime
     var
         DTVar: DateTime;
     begin
@@ -465,7 +465,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
           exit(DTVar);
     end;
 
-    local procedure GetDate(JObject: DotNet JObject;Property: Text): Date
+    local procedure GetDate(JObject: DotNet npNetJObject;Property: Text): Date
     var
         DTVar: DateTime;
     begin
@@ -473,13 +473,13 @@ codeunit 6059821 "CampaignMonitor Mgt."
           exit(DT2Date(DTVar));
     end;
 
-    local procedure GetJToken(JObject: DotNet JObject;Property: Text;var JToken: DotNet JToken): Boolean
+    local procedure GetJToken(JObject: DotNet npNetJObject;Property: Text;var JToken: DotNet npNetJToken): Boolean
     begin
         JToken := JObject.Item(Property);
         exit(not IsNull(JToken));
     end;
 
-    local procedure WriteRecipients(var JTextWriter: DotNet JsonTextWriter;Recipient: Text;Cc: Text;Bcc: Text)
+    local procedure WriteRecipients(var JTextWriter: DotNet npNetJsonTextWriter;Recipient: Text;Cc: Text;Bcc: Text)
     begin
         if Recipient <> '' then
           WriteReceiver(JTextWriter,'To',Recipient);
@@ -491,7 +491,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
           WriteReceiver(JTextWriter,'BCC',Bcc);
     end;
 
-    local procedure WriteReceiver(var JTextWriter: DotNet JsonTextWriter;Type: Text;MailAdresses: Text)
+    local procedure WriteReceiver(var JTextWriter: DotNet npNetJsonTextWriter;Type: Text;MailAdresses: Text)
     var
         Pos: Integer;
         "Part": Text;
@@ -512,11 +512,11 @@ codeunit 6059821 "CampaignMonitor Mgt."
         JTextWriter.WriteEndArray;
     end;
 
-    local procedure WriteAttachments(var JTextWriter: DotNet JsonTextWriter;var Attachment: Record "E-mail Attachment")
+    local procedure WriteAttachments(var JTextWriter: DotNet npNetJsonTextWriter;var Attachment: Record "E-mail Attachment")
     var
-        MemoryStream: DotNet MemoryStream;
-        Bytes: DotNet Array;
-        Convert: DotNet Convert;
+        MemoryStream: DotNet npNetMemoryStream;
+        Bytes: DotNet npNetArray;
+        Convert: DotNet npNetConvert;
         IStream: InStream;
         AttachmentText: Text;
     begin
@@ -544,7 +544,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
         JTextWriter.WriteEndArray;
     end;
 
-    local procedure WriteVariables(var JTextWriter: DotNet JsonTextWriter;var TransactionalEmailVariable: Record "Smart Email Variable";RecRef: RecordRef)
+    local procedure WriteVariables(var JTextWriter: DotNet npNetJsonTextWriter;var TransactionalEmailVariable: Record "Smart Email Variable";RecRef: RecordRef)
     var
         FldRef: FieldRef;
     begin
@@ -566,7 +566,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
         end;
     end;
 
-    local procedure WriteNameValuePair(var JTextWriter: DotNet JsonTextWriter;PropertyName: Text;Value: Text)
+    local procedure WriteNameValuePair(var JTextWriter: DotNet npNetJsonTextWriter;PropertyName: Text;Value: Text)
     begin
         JTextWriter.WritePropertyName(PropertyName);
         JTextWriter.WriteValue(Value);
@@ -593,7 +593,7 @@ codeunit 6059821 "CampaignMonitor Mgt."
 
     local procedure GetAttachmentType(FileName: Text): Text
     var
-        MimeMapping: DotNet MimeMapping;
+        MimeMapping: DotNet npNetMimeMapping;
     begin
         exit(MimeMapping.GetMimeMapping(FileName));
     end;

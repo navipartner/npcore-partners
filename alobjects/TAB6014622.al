@@ -65,9 +65,9 @@ table 6014622 "Proxy Assembly"
         ProxyAssembly2: Record "Proxy Assembly";
         POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
         FileManagement: Codeunit "File Management";
-        Assembly: DotNet Assembly;
-        AssemblyName: DotNet AssemblyName;
-        DotNetFile: DotNet File;
+        Assembly: DotNet npNetAssembly;
+        AssemblyName: DotNet npNetAssemblyName;
+        DotNetFile: DotNet npNetFile;
         FileName: Text;
         Version1OlderNewer: Text;
         Version2OlderNewer: Text;

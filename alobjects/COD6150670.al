@@ -13,7 +13,7 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
         Text000: Label 'Split Bill (Waiter Pad) into multiple Bills';
         CurrNPREWaiterPad: Record "NPRE Waiter Pad";
         [WithEvents]
-        Model: DotNet Model;
+        Model: DotNet npNetModel;
         ActiveModelID: Guid;
         Text001: Label 'Split Bill';
         Text002: Label 'Bill';
@@ -92,7 +92,7 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
     begin
@@ -177,7 +177,7 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
     local procedure InitCss() Css: Text
     var
         WebClientDependency: Record "Web Client Dependency";
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
     begin
         if WebClientDependency.Get(WebClientDependency.Type::CSS,ActionCode()) and WebClientDependency.BLOB.HasValue then begin
@@ -193,7 +193,7 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
     local procedure InitHtml() Html: Text
     var
         WebClientDependency: Record "Web Client Dependency";
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
     begin
         if WebClientDependency.Get(WebClientDependency.Type::HTML,ActionCode()) and WebClientDependency.BLOB.HasValue then begin
@@ -313,9 +313,9 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
         POSSession: Codeunit "POS Session";
         POSSaleLine: Codeunit "POS Sale Line";
         POSJavaScriptInterface: Codeunit "POS JavaScript Interface";
-        BillLines: DotNet JToken;
-        BillLine: DotNet JToken;
-        BillLineList: DotNet IList;
+        BillLines: DotNet npNetJToken;
+        BillLine: DotNet npNetJToken;
+        BillLineList: DotNet npNetIList;
     begin
         BillLines := BillLines.Parse(JsonText);
         BillLineList := BillLines.SelectTokens('$[?(@[''bill_id''] > 1)]');
@@ -331,7 +331,7 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
         POSJavaScriptInterface.RefreshData(POSSession,FrontEnd);
     end;
 
-    local procedure ApproveBillLine(BillLine: DotNet JToken;NPREWaiterPad: Record "NPRE Waiter Pad")
+    local procedure ApproveBillLine(BillLine: DotNet npNetJToken;NPREWaiterPad: Record "NPRE Waiter Pad")
     var
         NPREWaiterPadLine: Record "NPRE Waiter Pad Line";
         NPREWaiterPadLine2: Record "NPRE Waiter Pad Line";
@@ -373,7 +373,7 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
         exit;
     end;
 
-    local procedure FindBill(BillLine: DotNet JToken;var TempNPREWaiterPad: Record "NPRE Waiter Pad" temporary;var NPREWaiterPad: Record "NPRE Waiter Pad")
+    local procedure FindBill(BillLine: DotNet npNetJToken;var TempNPREWaiterPad: Record "NPRE Waiter Pad" temporary;var NPREWaiterPad: Record "NPRE Waiter Pad")
     var
         SeatingWaiterPadLink: Record "NPRE Seating - Waiter Pad Link";
         WaiterPadPOSManagement: Codeunit "NPRE Waiter Pad POS Management";
@@ -397,9 +397,9 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
     begin
     end;
 
-    local procedure GetValueAsString(JToken: DotNet JToken;JPath: Text): Text
+    local procedure GetValueAsString(JToken: DotNet npNetJToken;JPath: Text): Text
     var
-        JToken2: DotNet JToken;
+        JToken2: DotNet npNetJToken;
     begin
         JToken2 := JToken.SelectToken(JPath);
         if IsNull(JToken2) then
@@ -408,9 +408,9 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
         exit(Format(JToken2));
     end;
 
-    local procedure GetValueAsInt(JToken: DotNet JToken;JPath: Text) IntValue: Integer
+    local procedure GetValueAsInt(JToken: DotNet npNetJToken;JPath: Text) IntValue: Integer
     var
-        JToken2: DotNet JToken;
+        JToken2: DotNet npNetJToken;
     begin
         JToken2 := JToken.SelectToken(JPath);
         if IsNull(JToken2) then
@@ -422,9 +422,9 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
         exit(IntValue);
     end;
 
-    local procedure GetValueAsDec(JToken: DotNet JToken;JPath: Text) DecValue: Decimal
+    local procedure GetValueAsDec(JToken: DotNet npNetJToken;JPath: Text) DecValue: Decimal
     var
-        JToken2: DotNet JToken;
+        JToken2: DotNet npNetJToken;
     begin
         JToken2 := JToken.SelectToken(JPath);
         if IsNull(JToken2) then
@@ -477,7 +477,7 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
         exit(LineNo);
     end;
 
-    trigger Model::OnModelControlEvent(control: DotNet Control;eventName: Text;data: DotNet Dictionary_Of_T_U)
+    trigger Model::OnModelControlEvent(control: DotNet npNetControl;eventName: Text;data: DotNet npNetDictionary_Of_T_U)
     begin
     end;
 

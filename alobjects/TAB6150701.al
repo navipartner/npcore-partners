@@ -513,7 +513,7 @@ table 6150701 "POS Menu Button"
         //+NPR5.40 [306347]
     end;
 
-    procedure GetAction(var ActionOut: DotNet Action;POSSession: Codeunit "POS Session";Source: Text;var POSParameterValue: Record "POS Parameter Value")
+    procedure GetAction(var ActionOut: DotNet npNetAction;POSSession: Codeunit "POS Session";Source: Text;var POSParameterValue: Record "POS Parameter Value")
     var
         ActionMgt: Codeunit "POS Action Management";
         ErrorText: Text;
@@ -536,13 +536,13 @@ table 6150701 "POS Menu Button"
         end;
     end;
 
-    local procedure GetWorkflowAction(var ActionOut: DotNet Action;POSSession: Codeunit "POS Session")
+    local procedure GetWorkflowAction(var ActionOut: DotNet npNetAction;POSSession: Codeunit "POS Session")
     var
         POSAction: Record "POS Action" temporary;
-        WorkflowAction: DotNet WorkflowAction;
-        WorkflowObj: DotNet Workflow;
-        StreamReader: DotNet StreamReader;
-        "Object": DotNet Object;
+        WorkflowAction: DotNet npNetWorkflowAction;
+        WorkflowObj: DotNet npNetWorkflow;
+        StreamReader: DotNet npNetStreamReader;
+        "Object": DotNet npNetObject;
         InStr: InStream;
         Calculated: Boolean;
     begin
@@ -581,10 +581,10 @@ table 6150701 "POS Menu Button"
         end;
     end;
 
-    local procedure GetItemAction(var ActionOut: DotNet Action)
+    local procedure GetItemAction(var ActionOut: DotNet npNetAction)
     var
-        ItemAction: DotNet ItemAction;
-        Metadata: DotNet Dictionary_Of_T_U;
+        ItemAction: DotNet npNetItemAction;
+        Metadata: DotNet npNetDictionary_Of_T_U;
     begin
         ActionOut := ItemAction.ItemAction("Action Code");
         //-NPR5.50 [338666]
@@ -594,9 +594,9 @@ table 6150701 "POS Menu Button"
         //+NPR5.50 [338666]
     end;
 
-    local procedure GetMenuAction(var ActionOut: DotNet Action)
+    local procedure GetMenuAction(var ActionOut: DotNet npNetAction)
     var
-        MenuAction: DotNet MenuAction;
+        MenuAction: DotNet npNetMenuAction;
     begin
         MenuAction := MenuAction.MenuAction();
         MenuAction.OpenAsPopup := true;
@@ -604,10 +604,10 @@ table 6150701 "POS Menu Button"
         ActionOut := MenuAction;
     end;
 
-    local procedure GetPaymentAction(var ActionOut: DotNet Action)
+    local procedure GetPaymentAction(var ActionOut: DotNet npNetAction)
     var
-        PaymentAction: DotNet PaymentAction;
-        Metadata: DotNet Dictionary_Of_T_U;
+        PaymentAction: DotNet npNetPaymentAction;
+        Metadata: DotNet npNetDictionary_Of_T_U;
     begin
         ActionOut := PaymentAction.PaymentAction("Action Code");
         //-NPR5.50 [338666]
@@ -617,10 +617,10 @@ table 6150701 "POS Menu Button"
         //+NPR5.50 [338666]
     end;
 
-    local procedure GetCustomerAction(var ActionOut: DotNet Action)
+    local procedure GetCustomerAction(var ActionOut: DotNet npNetAction)
     var
-        CustomerAction: DotNet CustomerAction;
-        Metadata: DotNet Dictionary_Of_T_U;
+        CustomerAction: DotNet npNetCustomerAction;
+        Metadata: DotNet npNetDictionary_Of_T_U;
     begin
         ActionOut := CustomerAction.CustomerAction("Action Code");
         //-NPR5.50 [338666]
@@ -641,7 +641,7 @@ table 6150701 "POS Menu Button"
         end;
     end;
 
-    local procedure StoreButtonParameters(ActionIn: DotNet Action;var POSParameterValue: Record "POS Parameter Value" temporary)
+    local procedure StoreButtonParameters(ActionIn: DotNet npNetAction;var POSParameterValue: Record "POS Parameter Value" temporary)
     begin
         //-NPR5.42 [314128]
         // POSActionParameter.SETRANGE("POS Action Code", "Action Code");
@@ -672,7 +672,7 @@ table 6150701 "POS Menu Button"
         //+NPR5.42 [314128]
     end;
 
-    local procedure StoreActionOtherConfiguration(ActionIn: DotNet Action)
+    local procedure StoreActionOtherConfiguration(ActionIn: DotNet npNetAction)
     var
         TempParam: Record "POS Parameter Value" temporary;
         RecRef: RecordRef;
@@ -684,13 +684,13 @@ table 6150701 "POS Menu Button"
         //+NPR5.36 [281618]
     end;
 
-    local procedure StoreDataSource(ActionIn: DotNet Action)
+    local procedure StoreDataSource(ActionIn: DotNet npNetAction)
     begin
         if "Data Source Name" <> '' then
           ActionIn.Content.Add('dataSource',"Data Source Name");
     end;
 
-    procedure StoreButtonConfiguration(MenuButtonObj: DotNet MenuButton)
+    procedure StoreButtonConfiguration(MenuButtonObj: DotNet npNetMenuButton)
     begin
         //-NPR5.36 [291454]
         if Tooltip <> '' then
@@ -1263,9 +1263,9 @@ table 6150701 "POS Menu Button"
     local procedure LookupBackgroundColor()
     var
         TempRetailList: Record "Retail List" temporary;
-        ColorArray: DotNet Array;
-        String: DotNet String;
-        Separator: DotNet String;
+        ColorArray: DotNet npNetArray;
+        String: DotNet npNetString;
+        Separator: DotNet npNetString;
     begin
         Separator := ',';
         String := 'default,green,red,dark-red,gray,purple,indigo,yellow,orange,white';
@@ -1321,17 +1321,17 @@ table 6150701 "POS Menu Button"
     end;
 
     [IntegrationEvent(TRUE, false)]
-    local procedure OnRetrieveItemMetadata(ItemMetadata: DotNet Dictionary_Of_T_U)
+    local procedure OnRetrieveItemMetadata(ItemMetadata: DotNet npNetDictionary_Of_T_U)
     begin
     end;
 
     [IntegrationEvent(TRUE, false)]
-    local procedure OnRetrieveCustomerMetadata(CustomerMetadata: DotNet Dictionary_Of_T_U)
+    local procedure OnRetrieveCustomerMetadata(CustomerMetadata: DotNet npNetDictionary_Of_T_U)
     begin
     end;
 
     [IntegrationEvent(TRUE, false)]
-    local procedure OnRetrievePaymentMetadata(PaymentMetadata: DotNet Dictionary_Of_T_U)
+    local procedure OnRetrievePaymentMetadata(PaymentMetadata: DotNet npNetDictionary_Of_T_U)
     begin
     end;
 }

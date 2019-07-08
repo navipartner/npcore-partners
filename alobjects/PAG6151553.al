@@ -393,7 +393,7 @@ page 6151553 "NpXml Elements"
     var
         ActiveSession: Record "Active Session";
         [RunOnClient]
-        SendKeys: DotNet SendKeys;
+        SendKeys: DotNet npNetSendKeys;
     begin
         //-NC2.00
         if not ActiveSession.Get(ServiceInstanceId,SessionId) then

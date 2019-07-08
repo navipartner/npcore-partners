@@ -37,14 +37,14 @@ codeunit 6014623 "POS Event Marshaller"
         Text1001: Label 'This codeunit must be initialized before calling. This is a programming bug, not a user error.';
         SessionMgt: Codeunit "POS Web Session Management";
         UI: Codeunit "POS Web UI Management";
-        Marshaller: DotNet Marshaller;
+        Marshaller: DotNet npNetMarshaller;
         Text1002: Label 'Response was received from JavaScript, which indicates a problem.\\Response type: %1\Status: %2\Error message: %3\\This is a programming bug, not a user error.';
         Text1003: Label '%1 is not a valid number. You must enter a valid number.';
         Text1004: Label '%1 is not a valid date. You must enter a valid date.';
         [RunOnClient]
-        POS: DotNet IFramework;
+        POS: DotNet npNetIFramework;
 
-    procedure Initialize(MarshallerIn: DotNet Marshaller)
+    procedure Initialize(MarshallerIn: DotNet npNetMarshaller)
     begin
         //-NPR5.28
         // IF NOT SessionMgt.IsDotNet() THEN BEGIN
@@ -56,7 +56,7 @@ codeunit 6014623 "POS Event Marshaller"
         //+NPR5.28
     end;
 
-    procedure SetPOSReference(POSIn: DotNet IFramework)
+    procedure SetPOSReference(POSIn: DotNet npNetIFramework)
     begin
         //-NPR5.23 [242588]
         POS := POSIn;
@@ -83,9 +83,9 @@ codeunit 6014623 "POS Event Marshaller"
           Error(Text1001);
     end;
 
-    local procedure ProcessRequestResult(Result: DotNet Result)
+    local procedure ProcessRequestResult(Result: DotNet npNetResult)
     var
-        MarshalStatus: DotNet MarshalStatus;
+        MarshalStatus: DotNet npNetMarshalStatus;
         Status: Integer;
     begin
         Status := Result.Status;
@@ -105,13 +105,13 @@ codeunit 6014623 "POS Event Marshaller"
         end;
     end;
 
-    procedure ProcessResponse(Response: DotNet ResponseInfo;var TouchSalePOS: Codeunit "Touch - Sale POS (Web)")
+    procedure ProcessResponse(Response: DotNet npNetResponseInfo;var TouchSalePOS: Codeunit "Touch - Sale POS (Web)")
     var
-        Content: DotNet ResponseContent;
-        ResponseStatus: DotNet ResponseStatus;
-        MarshalStatus: DotNet MarshalStatus;
-        Result: DotNet Result;
-        KnownEvent: DotNet KnownEvent;
+        Content: DotNet npNetResponseContent;
+        ResponseStatus: DotNet npNetResponseStatus;
+        MarshalStatus: DotNet npNetMarshalStatus;
+        Result: DotNet npNetResult;
+        KnownEvent: DotNet npNetKnownEvent;
         Status: Integer;
     begin
         Content := Marshaller.ProcessResponse(Response);
@@ -188,7 +188,7 @@ codeunit 6014623 "POS Event Marshaller"
     procedure DisplayMessage(Title: Text;Caption: Text)
     var
         NPDialog: Page "Touch Screen - Dialog (Web)";
-        Dlg: DotNet Error;
+        Dlg: DotNet npNetError;
     begin
         Error(Title,Caption,false);
     end;
@@ -196,7 +196,7 @@ codeunit 6014623 "POS Event Marshaller"
     procedure DisplayError(Title: Text;Caption: Text;ThrowError: Boolean)
     var
         NPDialog: Page "Touch Screen - Dialog (Web)";
-        Dlg: DotNet Error;
+        Dlg: DotNet npNetError;
     begin
         //-NPR5.28
         // IF SessionMgt.IsDotNet() THEN BEGIN
@@ -222,7 +222,7 @@ codeunit 6014623 "POS Event Marshaller"
     procedure Error_Protocol(Title: Text;Caption: Text;ThrowError: Boolean)
     var
         NPDialog: Page "Touch Screen - Dialog (Web)";
-        Dlg: DotNet Error;
+        Dlg: DotNet npNetError;
     begin
         //-NPR5.28
         // IF SessionMgt.IsDotNet() THEN BEGIN
@@ -242,7 +242,7 @@ codeunit 6014623 "POS Event Marshaller"
     procedure Confirm(Title: Text;Caption: Text): Boolean
     var
         NPDialog: Page "Touch Screen - Dialog (Web)";
-        Dlg: DotNet Confirm;
+        Dlg: DotNet npNetConfirm;
     begin
         //-NPR5.28
         // IF SessionMgt.IsDotNet() THEN
@@ -264,7 +264,7 @@ codeunit 6014623 "POS Event Marshaller"
     procedure SearchBox(Title: Text;Caption: Text;MaxLength: Integer): Text
     var
         NPDialog: Page "Touch Screen - Dialog (Web)";
-        Dlg: DotNet SearchBox;
+        Dlg: DotNet npNetSearchBox;
     begin
         //-NPR5.28
         // IF SessionMgt.IsDotNet() THEN
@@ -291,8 +291,8 @@ codeunit 6014623 "POS Event Marshaller"
     var
         NPDialog: Page "Touch Screen - Dialog (Web)";
         Util: Codeunit "POS Web Utilities";
-        Dlg: DotNet Numpad;
-        NumpadType: DotNet NumpadType;
+        Dlg: DotNet npNetNumpad;
+        NumpadType: DotNet npNetNumpadType;
         Cancelled: Boolean;
         ResultText: Text;
     begin
@@ -340,8 +340,8 @@ codeunit 6014623 "POS Event Marshaller"
     var
         NPDialog: Page "Touch Screen - Dialog (Web)";
         Util: Codeunit "POS Web Utilities";
-        Dlg: DotNet Numpad;
-        NumpadType: DotNet NumpadType;
+        Dlg: DotNet npNetNumpad;
+        NumpadType: DotNet npNetNumpadType;
         Cancelled: Boolean;
         Date: Date;
         ResultText: Text;
@@ -387,8 +387,8 @@ codeunit 6014623 "POS Event Marshaller"
     var
         NPDialog: Page "Touch Screen - Dialog (Web)";
         Util: Codeunit "POS Web Utilities";
-        Dlg: DotNet Numpad;
-        NumpadType: DotNet NumpadType;
+        Dlg: DotNet npNetNumpad;
+        NumpadType: DotNet npNetNumpadType;
         Cancelled: Boolean;
         ResultText: Text;
     begin
@@ -430,8 +430,8 @@ codeunit 6014623 "POS Event Marshaller"
     var
         NPDialog: Page "Touch Screen - Dialog (Web)";
         Util: Codeunit "POS Web Utilities";
-        Dlg: DotNet Numpad;
-        NumpadType: DotNet NumpadType;
+        Dlg: DotNet npNetNumpad;
+        NumpadType: DotNet npNetNumpadType;
         Cancelled: Boolean;
         ResultText: Text;
     begin
@@ -469,12 +469,12 @@ codeunit 6014623 "POS Event Marshaller"
         exit(true);
     end;
 
-    procedure NumPad_Protocol(Caption: Text;Input: Decimal;NotBlank: Boolean;Masked: Boolean;Context: DotNet ProtocolContext)
+    procedure NumPad_Protocol(Caption: Text;Input: Decimal;NotBlank: Boolean;Masked: Boolean;Context: DotNet npNetProtocolContext)
     var
         NPDialog: Page "Touch Screen - Dialog (Web)";
         Util: Codeunit "POS Web Utilities";
-        Dlg: DotNet Numpad;
-        NumpadType: DotNet NumpadType;
+        Dlg: DotNet npNetNumpad;
+        NumpadType: DotNet npNetNumpadType;
         Cancelled: Boolean;
     begin
         //-NPR5.28
@@ -487,12 +487,12 @@ codeunit 6014623 "POS Event Marshaller"
             Marshaller.NumPad(Caption,UI.FormatDecimal(Input),Masked,NotBlank,NumpadType.Numeric,Context));
     end;
 
-    procedure NumPad_ProtocolCode(Caption: Text;Input: Code[10];NotBlank: Boolean;Masked: Boolean;Context: DotNet ProtocolContext)
+    procedure NumPad_ProtocolCode(Caption: Text;Input: Code[10];NotBlank: Boolean;Masked: Boolean;Context: DotNet npNetProtocolContext)
     var
         NPDialog: Page "Touch Screen - Dialog (Web)";
         Util: Codeunit "POS Web Utilities";
-        Dlg: DotNet Numpad;
-        NumpadType: DotNet NumpadType;
+        Dlg: DotNet npNetNumpad;
+        NumpadType: DotNet npNetNumpadType;
         Cancelled: Boolean;
     begin
         //-NPR5.28
@@ -511,8 +511,8 @@ codeunit 6014623 "POS Event Marshaller"
         Util: Codeunit "POS Web Utilities";
         UI: Codeunit "POS Web UI Management";
         RecRef: RecordRef;
-        PageGrid: DotNet DataGrid;
-        Dlg: DotNet CalendarGrid;
+        PageGrid: DotNet npNetDataGrid;
+        Dlg: DotNet npNetCalendarGrid;
     begin
         //-NPR5.28
         // IF SessionMgt.IsDotNet() THEN
@@ -559,10 +559,10 @@ codeunit 6014623 "POS Event Marshaller"
         exit(NPDialog.GetCalendarGridResult());
     end;
 
-    procedure Lookup(Caption: Text;Template: DotNet Template;var LookupRec: RecordRef;ShowNew: Boolean;ShowCard: Boolean;CardPageId: Integer): Text
+    procedure Lookup(Caption: Text;Template: DotNet npNetTemplate;var LookupRec: RecordRef;ShowNew: Boolean;ShowCard: Boolean;CardPageId: Integer): Text
     var
         NPDialog: Page "Touch Screen - Dialog (Web)";
-        Dlg: DotNet Lookup;
+        Dlg: DotNet npNetLookup;
     begin
         Dlg := Dlg.Lookup();
         Dlg.Template := Template;
@@ -600,13 +600,13 @@ codeunit 6014623 "POS Event Marshaller"
         ProcessRequestResult(Marshaller.CloseFunctions());
     end;
 
-    procedure SetObjectProperty(Property: Text;Value: DotNet Object)
+    procedure SetObjectProperty(Property: Text;Value: DotNet npNetObject)
     begin
         MakeSureThisIsInitialized();
         ProcessRequestResult(Marshaller.SetObjectProperty(Property,Value));
     end;
 
-    procedure ConfigureFont(Font: DotNet Font)
+    procedure ConfigureFont(Font: DotNet npNetFont)
     begin
         MakeSureThisIsInitialized();
         ProcessRequestResult(Marshaller.ConfigureFont(Font));
@@ -618,12 +618,12 @@ codeunit 6014623 "POS Event Marshaller"
         ProcessRequestResult(Marshaller.RequestRefreshSalesLineData());
     end;
 
-    procedure UpdateInfoBox(View: DotNet View)
+    procedure UpdateInfoBox(View: DotNet npNetView)
     var
-        ViewType: DotNet ViewType;
-        SaleView: DotNet SaleView;
-        PaymentView: DotNet PaymentView;
-        InfoBox: DotNet InfoBox;
+        ViewType: DotNet npNetViewType;
+        SaleView: DotNet npNetSaleView;
+        PaymentView: DotNet npNetPaymentView;
+        InfoBox: DotNet npNetInfoBox;
     begin
         MakeSureThisIsInitialized();
         case View.TypeAsInt of
@@ -647,7 +647,7 @@ codeunit 6014623 "POS Event Marshaller"
         //+NPR5.22
     end;
 
-    procedure UpdateState(StateData: DotNet Dictionary_Of_T_U)
+    procedure UpdateState(StateData: DotNet npNetDictionary_Of_T_U)
     begin
         MakeSureThisIsInitialized();
         ProcessRequestResult(Marshaller.UpdateState(StateData));
@@ -663,11 +663,11 @@ codeunit 6014623 "POS Event Marshaller"
         PAGE.RunModal(PAGE::"Touch Screen - Sale (Web)")
     end;
 
-    procedure InvokeDeviceMethod(Request: DotNet Request): Guid
+    procedure InvokeDeviceMethod(Request: DotNet npNetRequest): Guid
     var
-        Args: DotNet Array;
-        "Object": DotNet Object;
-        Envelope: DotNet RequestEnvelope;
+        Args: DotNet npNetArray;
+        "Object": DotNet npNetObject;
+        Envelope: DotNet npNetRequestEnvelope;
     begin
         //-NPR5.22
         Args := Args.CreateInstance(GetDotNetType(Object),1);
@@ -687,7 +687,7 @@ codeunit 6014623 "POS Event Marshaller"
 
     procedure ClearEanBoxText()
     var
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         //-NPR5.23
         String := '';
@@ -700,27 +700,27 @@ codeunit 6014623 "POS Event Marshaller"
     begin
     end;
 
-    trigger POS::OnScreenSize(screen: DotNet Screen)
+    trigger POS::OnScreenSize(screen: DotNet npNetScreen)
     begin
     end;
 
-    trigger POS::OnMessage(eventArgs: DotNet MessageEventArgs)
+    trigger POS::OnMessage(eventArgs: DotNet npNetMessageEventArgs)
     begin
     end;
 
-    trigger POS::OnResponse(response: DotNet ResponseInfo)
+    trigger POS::OnResponse(response: DotNet npNetResponseInfo)
     begin
     end;
 
-    trigger POS::OnJavaScriptCallback(js: DotNet JavaScript)
+    trigger POS::OnJavaScriptCallback(js: DotNet npNetJavaScript)
     begin
     end;
 
-    trigger POS::OnDialogResponse(response: DotNet Response)
+    trigger POS::OnDialogResponse(response: DotNet npNetResponse)
     begin
     end;
 
-    trigger POS::OnDataUpdated(dataSource: DotNet DataSource)
+    trigger POS::OnDataUpdated(dataSource: DotNet npNetDataSource)
     begin
     end;
 

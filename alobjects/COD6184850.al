@@ -11,8 +11,8 @@ codeunit 6184850 "FR Audit Mgt."
 
     var
         FRCertificationSetup: Record "FR Audit Setup";
-        X509Certificate2: DotNet X509Certificate2;
-        RSACryptoServiceProvider: DotNet RSACryptoServiceProvider;
+        X509Certificate2: DotNet npNetX509Certificate2;
+        RSACryptoServiceProvider: DotNet npNetRSACryptoServiceProvider;
         Initialized: Boolean;
         ERROR_MISSING_SIGNATURE: Label '%1 %2 is missing a digital signature';
         Enabled: Boolean;
@@ -54,7 +54,7 @@ codeunit 6184850 "FR Audit Mgt."
     local procedure LoadCertificate()
     var
         InStream: InStream;
-        MemoryStream: DotNet MemoryStream;
+        MemoryStream: DotNet npNetMemoryStream;
     begin
         if not CertificateLoaded then begin
           FRCertificationSetup.SetAutoCalcFields("Signing Certificate");
@@ -92,9 +92,9 @@ codeunit 6184850 "FR Audit Mgt."
 
     procedure VerifySignature(Data: Text;HashAlgo: Text;SignatureBase64: Text): Boolean
     var
-        CryptoConfig: DotNet CryptoConfig;
-        Convert: DotNet Convert;
-        Encoding: DotNet Encoding;
+        CryptoConfig: DotNet npNetCryptoConfig;
+        Convert: DotNet npNetConvert;
+        Encoding: DotNet npNetEncoding;
     begin
         LoadCertificate();
         exit(RSACryptoServiceProvider.VerifyData(Encoding.Unicode.GetBytes(Data), CryptoConfig.MapNameToOID(HashAlgo), Convert.FromBase64String(SignatureBase64)));
@@ -154,17 +154,17 @@ codeunit 6184850 "FR Audit Mgt."
 
     procedure SignHash(BaseHash: Text): Text
     var
-        CryptoConfig: DotNet CryptoConfig;
-        Convert: DotNet Convert;
+        CryptoConfig: DotNet npNetCryptoConfig;
+        Convert: DotNet npNetConvert;
     begin
         exit(Convert.ToBase64String(RSACryptoServiceProvider.SignHash(Convert.FromBase64String(BaseHash), CryptoConfig.MapNameToOID('SHA1'))));
     end;
 
     procedure CalculateHash(BaseValue: Text): Text
     var
-        SHA1CryptoServiceProvider: DotNet SHA1CryptoServiceProvider;
-        Encoding: DotNet Encoding;
-        Convert: DotNet Convert;
+        SHA1CryptoServiceProvider: DotNet npNetSHA1CryptoServiceProvider;
+        Encoding: DotNet npNetEncoding;
+        Convert: DotNet npNetConvert;
     begin
         SHA1CryptoServiceProvider := SHA1CryptoServiceProvider.SHA1CryptoServiceProvider();
         exit(Convert.ToBase64String(SHA1CryptoServiceProvider.ComputeHash(Encoding.Unicode.GetBytes(BaseValue))));
@@ -175,9 +175,9 @@ codeunit 6184850 "FR Audit Mgt."
         InStream: InStream;
         OutStream: OutStream;
         FileName: Text;
-        X509Certificate2: DotNet X509Certificate2;
-        MemoryStream: DotNet MemoryStream;
-        RSACryptoServiceProvider: DotNet RSACryptoServiceProvider;
+        X509Certificate2: DotNet npNetX509Certificate2;
+        MemoryStream: DotNet npNetMemoryStream;
+        RSACryptoServiceProvider: DotNet npNetRSACryptoServiceProvider;
     begin
         FRCertificationSetup.Get;
         if FRCertificationSetup."Signing Certificate".HasValue then begin

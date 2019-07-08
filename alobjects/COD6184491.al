@@ -10,11 +10,11 @@ codeunit 6184491 "Pepper Begin Workshift TSD"
     var
         InitializedRequest: Boolean;
         InitializedResponse: Boolean;
-        StartWorkShiftRequest: DotNet StartWorkshiftRequest0;
-        StartWorkShiftResponse: DotNet StartWorkshiftResponse0;
-        ConfigDriver: DotNet ConfigDriverParam0;
-        PepperOpen: DotNet OpenParam0;
-        Labels: DotNet ProcessLabels0;
+        StartWorkShiftRequest: DotNet npNetStartWorkshiftRequest0;
+        StartWorkShiftResponse: DotNet npNetStartWorkshiftResponse0;
+        ConfigDriver: DotNet npNetConfigDriverParam0;
+        PepperOpen: DotNet npNetOpenParam0;
+        Labels: DotNet npNetProcessLabels0;
         PepperTerminalCaptions: Codeunit "Pepper Terminal Captions TSD";
         LastRestCode: Integer;
 
@@ -284,7 +284,7 @@ codeunit 6184491 "Pepper Begin Workshift TSD"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
-    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet ResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet npNetResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
 
         if (ActionName <> 'Pepper_EFTOpen') then

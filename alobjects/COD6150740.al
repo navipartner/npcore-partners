@@ -14,10 +14,10 @@ codeunit 6150740 "POS Method - Wysiwyg"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
-    local procedure OnWysiwygMethod(Method: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnWysiwygMethod(Method: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
-        Request: DotNet JsonRequest;
+        Request: DotNet npNetJsonRequest;
         RequestMethod: Text;
         RequestId: Guid;
         Success: Boolean;
@@ -47,7 +47,7 @@ codeunit 6150740 "POS Method - Wysiwyg"
         Handled := true;
     end;
 
-    local procedure SaveConfiguration(Request: DotNet JsonRequest;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
+    local procedure SaveConfiguration(Request: DotNet npNetJsonRequest;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
     var
         TargetType: Text;
         Length: Integer;
@@ -215,7 +215,7 @@ codeunit 6150740 "POS Method - Wysiwyg"
           POSMenuButton.Modify();
     end;
 
-    local procedure LookupAction(Request: DotNet JsonRequest;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
+    local procedure LookupAction(Request: DotNet npNetJsonRequest;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
     var
         POSAction: Record "POS Action";
         POSActions: Page "POS Actions";
@@ -248,7 +248,7 @@ codeunit 6150740 "POS Method - Wysiwyg"
         end;
     end;
 
-    local procedure LookupItem(Request: DotNet JsonRequest;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
+    local procedure LookupItem(Request: DotNet npNetJsonRequest;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
     var
         Item: Record Item;
         Items: Page "Item List";
@@ -283,7 +283,7 @@ codeunit 6150740 "POS Method - Wysiwyg"
         end;
     end;
 
-    local procedure LookupCustomer(Request: DotNet JsonRequest;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
+    local procedure LookupCustomer(Request: DotNet npNetJsonRequest;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
     var
         Cust: Record Customer;
         Customers: Page "Customer List";
@@ -318,14 +318,14 @@ codeunit 6150740 "POS Method - Wysiwyg"
         end;
     end;
 
-    local procedure LookupParameters(Request: DotNet JsonRequest;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
+    local procedure LookupParameters(Request: DotNet npNetJsonRequest;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
     var
         POSAction: Record "POS Action";
         POSParam: Record "POS Action Parameter";
         TempParam: Record "POS Parameter Value" temporary;
         ParamMgt: Codeunit "POS Action Parameter Mgt.";
-        JObject: DotNet JObject;
-        JProperty: DotNet JProperty;
+        JObject: DotNet npNetJObject;
+        JProperty: DotNet npNetJProperty;
         ParamStr: Text;
     begin
         POSSession.DiscoverActionsOnce();
@@ -359,7 +359,7 @@ codeunit 6150740 "POS Method - Wysiwyg"
         exit(true);
     end;
 
-    local procedure LookupPopup(Request: DotNet JsonRequest;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
+    local procedure LookupPopup(Request: DotNet npNetJsonRequest;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
     var
         POSMenu: Record "POS Menu";
         POSMenus: Page "POS Menus";
@@ -399,7 +399,7 @@ codeunit 6150740 "POS Method - Wysiwyg"
     var
         TempParam: Record "POS Parameter Value" temporary;
         Param: Record "POS Parameter Value";
-        JToken: DotNet JObject;
+        JToken: DotNet npNetJObject;
         RecRef: RecordRef;
         FieldRef: FieldRef;
         ScopeID: Guid;

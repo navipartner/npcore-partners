@@ -2314,7 +2314,7 @@ codeunit 6014505 "Touch Screen - Functions"
     var
         POSWebUIMgt: Codeunit "POS Web UI Management";
         LookupRec: RecordRef;
-        Template: DotNet Template;
+        Template: DotNet npNetTemplate;
         VariantCode: Text;
         SaleLinePOS: Record "Sale Line POS";
     begin
@@ -2342,7 +2342,7 @@ codeunit 6014505 "Touch Screen - Functions"
         RetailSetup: Record "Retail Setup";
         TempCust: Record Customer temporary;
         TouchEventSubscribers: Codeunit "Touch - Event Subscribers";
-        Template: DotNet Template;
+        Template: DotNet npNetTemplate;
         POSWebUIMgt: Codeunit "POS Web UI Management";
         RecRef: RecordRef;
         CustNo: Text;

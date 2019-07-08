@@ -2596,7 +2596,7 @@ codeunit 6059784 "TM Ticket Management"
 
     local procedure ToMD5(ToMd5: Text) Hash: Text[250]
     var
-        FormsAuthentication: DotNet FormsAuthentication;
+        FormsAuthentication: DotNet npNetFormsAuthentication;
     begin
 
         Hash := FormsAuthentication.HashPasswordForStoringInConfigFile (ToMd5,'MD5');

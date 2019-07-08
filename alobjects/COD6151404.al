@@ -24,7 +24,7 @@ codeunit 6151404 "Magento Functions"
         TempBlob: Record TempBlob temporary;
         FileMgt: Codeunit "File Management";
         InStr: InStream;
-        MemoryStream: DotNet MemoryStream;
+        MemoryStream: DotNet npNetMemoryStream;
         Size: Integer;
     begin
         MagentoPicture.FilterGroup(2);
@@ -40,8 +40,8 @@ codeunit 6151404 "Magento Functions"
     var
         TempBlob: Record TempBlob temporary;
         TextEditorDialog: Page "Magento Text Editor Dialog";
-        Encoding: DotNet Encoding;
-        StreamReader: DotNet StreamReader;
+        Encoding: DotNet npNetEncoding;
+        StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
         OutStr: OutStream;
         HtmlText: Text;

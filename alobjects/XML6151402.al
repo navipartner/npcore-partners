@@ -675,7 +675,7 @@ xmlport 6151402 "Magento Document Export"
 
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
-        LineTypeList: DotNet Dictionary_Of_T_U;
+        LineTypeList: DotNet npNetDictionary_Of_T_U;
         CustomerNo: Code[20];
         EndDate: Date;
         StartDate: Date;

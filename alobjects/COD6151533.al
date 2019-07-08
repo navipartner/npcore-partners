@@ -7,7 +7,7 @@ codeunit 6151533 "Nc Coll. Req. WebService Mgr"
 
     trigger OnRun()
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
         ImportType: Record "Nc Import Type";
         FunctionName: Text[100];
     begin
@@ -34,10 +34,10 @@ codeunit 6151533 "Nc Coll. Req. WebService Mgr"
         MISSING_CASE: Label 'No handler for %1 [%2].';
         VENDOR_NOT_FOUND: Label 'The Vendor %1 could not be found in the database.';
 
-    local procedure CreateCollectorRequests(XmlDoc: DotNet XmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
+    local procedure CreateCollectorRequests(XmlDoc: DotNet npNetXmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         Token: Text[50];
     begin
@@ -71,9 +71,9 @@ codeunit 6151533 "Nc Coll. Req. WebService Mgr"
         Commit;
     end;
 
-    local procedure CreateCollectorRequest(XmlElement: DotNet XmlElement;Token: Text[100];DocumentID: Text[100]) Imported: Boolean
+    local procedure CreateCollectorRequest(XmlElement: DotNet npNetXmlElement;Token: Text[100];DocumentID: Text[100]) Imported: Boolean
     var
-        XmlNodeList: DotNet XmlNodeList;
+        XmlNodeList: DotNet npNetXmlNodeList;
         NcCollectorRequest: Record "Nc Collector Request";
         i: Integer;
     begin
@@ -96,7 +96,7 @@ codeunit 6151533 "Nc Coll. Req. WebService Mgr"
         exit(true);
     end;
 
-    local procedure CreateCollectorRequestFilter(XmlElement: DotNet XmlElement;Token: Text[100];DocumentID: Text[100];var NcCollectorRequest: Record "Nc Collector Request") Imported: Boolean
+    local procedure CreateCollectorRequestFilter(XmlElement: DotNet npNetXmlElement;Token: Text[100];DocumentID: Text[100];var NcCollectorRequest: Record "Nc Collector Request") Imported: Boolean
     var
         NcCollectorRequestFilter: Record "Nc Collector Request Filter";
     begin
@@ -125,7 +125,7 @@ codeunit 6151533 "Nc Coll. Req. WebService Mgr"
         NcCollectorRequest.Init ();
     end;
 
-    local procedure ReadCollectorRequest(XmlElement: DotNet XmlElement;Token: Text[100];var NcCollectorRequest: Record "Nc Collector Request")
+    local procedure ReadCollectorRequest(XmlElement: DotNet npNetXmlElement;Token: Text[100];var NcCollectorRequest: Record "Nc Collector Request")
     var
         VendorVATRegNo: Text;
         TempText: Text;
@@ -163,7 +163,7 @@ codeunit 6151533 "Nc Coll. Req. WebService Mgr"
         NcCollectorRequestFilter.Init ();
     end;
 
-    local procedure ReadCollectorRequestFilter(XmlElement: DotNet XmlElement;Token: Text[100];var NcCollectorRequestFilter: Record "Nc Collector Request Filter";var NcCollectorRequest: Record "Nc Collector Request")
+    local procedure ReadCollectorRequestFilter(XmlElement: DotNet npNetXmlElement;Token: Text[100];var NcCollectorRequestFilter: Record "Nc Collector Request Filter";var NcCollectorRequest: Record "Nc Collector Request")
     var
         TempText: Text;
         TempDec: Decimal;
@@ -184,7 +184,7 @@ codeunit 6151533 "Nc Coll. Req. WebService Mgr"
         NcCollectorRequestFilter.Insert(true);
     end;
 
-    local procedure SetImportParameters(XmlElement: DotNet XmlElement;Token: Text[100])
+    local procedure SetImportParameters(XmlElement: DotNet npNetXmlElement;Token: Text[100])
     var
         TempText: Text;
     begin

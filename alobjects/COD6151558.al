@@ -12,8 +12,8 @@ codeunit 6151558 "NpXml Wsdl Import"
     end;
 
     var
-        XmlNsManager: DotNet XmlNamespaceManager;
-        XmlNameTable: DotNet XmlNameTable;
+        XmlNsManager: DotNet npNetXmlNamespaceManager;
+        XmlNameTable: DotNet npNetXmlNameTable;
         Text000: Label 'Templatename %1 already exists. Either rename the existing template or delete it. ';
         "--": Integer;
         SchemaNameSpace: Text;
@@ -44,7 +44,7 @@ codeunit 6151558 "NpXml Wsdl Import"
 
     local procedure ImportFile(Path: Text;NpXmlTemplate: Record "NpXml Template")
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
     begin
         if not LoadFile(Path,XmlDoc) then
           exit;
@@ -53,16 +53,16 @@ codeunit 6151558 "NpXml Wsdl Import"
 
     local procedure ImportUrl(Path: Text;UserName: Text;Password: Text;NpXmlTemplate: Record "NpXml Template")
     var
-        MemoryStream: DotNet MemoryStream;
-        XmlDoc: DotNet XmlDocument;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
-        CredentialCache: DotNet CredentialCache;
-        NetworkCredential: DotNet NetworkCredential;
-        Uri: DotNet Uri;
+        MemoryStream: DotNet npNetMemoryStream;
+        XmlDoc: DotNet npNetXmlDocument;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
+        CredentialCache: DotNet npNetCredentialCache;
+        NetworkCredential: DotNet npNetNetworkCredential;
+        Uri: DotNet npNetUri;
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Env: DotNet Environment;
+        Env: DotNet npNetEnvironment;
         WsdlImportDialog: Page "NpXml Wsdl Input Dialog";
         Url: Text;
     begin
@@ -97,23 +97,23 @@ codeunit 6151558 "NpXml Wsdl Import"
         exit(false);
     end;
 
-    local procedure ParseData(XmlDoc: DotNet XmlDocument;NpXmlTemplate: Record "NpXml Template")
+    local procedure ParseData(XmlDoc: DotNet npNetXmlDocument;NpXmlTemplate: Record "NpXml Template")
     var
-        DocumentElement: DotNet XmlDocument;
-        IEnumerator: DotNet IEnumerator;
-        XmlElement: DotNet XmlElement;
+        DocumentElement: DotNet npNetXmlDocument;
+        IEnumerator: DotNet npNetIEnumerator;
+        XmlElement: DotNet npNetXmlElement;
         "--": Integer;
-        DataTypes: DotNet XmlElement;
-        Binding: DotNet XmlElement;
-        PortTypes: DotNet XmlElement;
-        Operations: DotNet XmlNodeList;
-        OperationMessage: DotNet XmlElement;
+        DataTypes: DotNet npNetXmlElement;
+        Binding: DotNet npNetXmlElement;
+        PortTypes: DotNet npNetXmlElement;
+        Operations: DotNet npNetXmlNodeList;
+        OperationMessage: DotNet npNetXmlElement;
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         CommentLine: Record "Comment Line" temporary;
         OperationName: Text;
         CurrentPrefix: Text;
         XPath: Text;
-        XmlNode: DotNet XmlNode;
+        XmlNode: DotNet npNetXmlNode;
     begin
         XmlNameTable := XmlDoc.NameTable;
         //-NC2.03 [240432]
@@ -152,13 +152,13 @@ codeunit 6151558 "NpXml Wsdl Import"
         end;
     end;
 
-    local procedure LoadFile(Path: Text;var XmlDoc: DotNet XmlDocument): Boolean
+    local procedure LoadFile(Path: Text;var XmlDoc: DotNet npNetXmlDocument): Boolean
     var
         FileName: Text;
         InStream: InStream;
         "--": Integer;
         [RunOnClient]
-        FileInfo: DotNet FileInfo;
+        FileInfo: DotNet npNetFileInfo;
         FileManagement: Codeunit "File Management";
         ClientTempFileName: Text;
         ServerFileName: Text;
@@ -175,9 +175,9 @@ codeunit 6151558 "NpXml Wsdl Import"
         exit(true);
     end;
 
-    local procedure SetupData(DocumentElement: DotNet XmlDocument;var DataTypes: DotNet XmlElement;var Binding: DotNet XmlElement;var PortTypes: DotNet XmlElement;var Operations: DotNet XmlNodeList): Boolean
+    local procedure SetupData(DocumentElement: DotNet npNetXmlDocument;var DataTypes: DotNet npNetXmlElement;var Binding: DotNet npNetXmlElement;var PortTypes: DotNet npNetXmlElement;var Operations: DotNet npNetXmlNodeList): Boolean
     var
-        IEnumerator: DotNet IEnumerator;
+        IEnumerator: DotNet npNetIEnumerator;
         CurrentNsPrefix: Text;
         NameSpaceFound: Boolean;
     begin
@@ -195,11 +195,11 @@ codeunit 6151558 "NpXml Wsdl Import"
         exit(true);
     end;
 
-    local procedure CreateNpXml(NpXmlName: Text;OperationMessage: DotNet XmlDocument;DataTypes: DotNet XmlDocument;NpXmlTemplate: Record "NpXml Template")
+    local procedure CreateNpXml(NpXmlName: Text;OperationMessage: DotNet npNetXmlDocument;DataTypes: DotNet npNetXmlDocument;NpXmlTemplate: Record "NpXml Template")
     var
         NpXmlElement: Record "NpXml Element";
-        IEnumerator: DotNet IEnumerator;
-        XmlElement: DotNet XmlElement;
+        IEnumerator: DotNet npNetIEnumerator;
+        XmlElement: DotNet npNetXmlElement;
         LineNo: Integer;
         CurrentPrefix: Text;
     begin
@@ -227,13 +227,13 @@ codeunit 6151558 "NpXml Wsdl Import"
     begin
     end;
 
-    local procedure SetNameSpaceManager(XmlDoc: DotNet XmlDocument)
+    local procedure SetNameSpaceManager(XmlDoc: DotNet npNetXmlDocument)
     var
-        XPathNavigator: DotNet XPathNavigator;
-        XPathNodeType: DotNet XPathNodeType;
-        XmlNamespaceScope: DotNet XmlNamespaceScope;
-        Dictionary: DotNet IDictionary_Of_T_U;
-        IEnumerator: DotNet IEnumerator;
+        XPathNavigator: DotNet npNetXPathNavigator;
+        XPathNodeType: DotNet npNetXPathNodeType;
+        XmlNamespaceScope: DotNet npNetXmlNamespaceScope;
+        Dictionary: DotNet npNetIDictionary_Of_T_U;
+        IEnumerator: DotNet npNetIEnumerator;
         NameSpace: Text;
         NameSpaceUrl: Text;
     begin
@@ -251,13 +251,13 @@ codeunit 6151558 "NpXml Wsdl Import"
         end;
     end;
 
-    local procedure GetNameSpaces(XmlDoc: DotNet XmlDocument;var XmlNsManager: DotNet XmlNamespaceManager)
+    local procedure GetNameSpaces(XmlDoc: DotNet npNetXmlDocument;var XmlNsManager: DotNet npNetXmlNamespaceManager)
     var
-        XPathNavigator: DotNet XPathNavigator;
-        XPathNodeType: DotNet XPathNodeType;
-        XmlNamespaceScope: DotNet XmlNamespaceScope;
-        Dictionary: DotNet IDictionary_Of_T_U;
-        IEnumerator: DotNet IEnumerator;
+        XPathNavigator: DotNet npNetXPathNavigator;
+        XPathNodeType: DotNet npNetXPathNodeType;
+        XmlNamespaceScope: DotNet npNetXmlNamespaceScope;
+        Dictionary: DotNet npNetIDictionary_Of_T_U;
+        IEnumerator: DotNet npNetIEnumerator;
         NameSpace: Text;
         NameSpaceUrl: Text;
     begin
@@ -280,9 +280,9 @@ codeunit 6151558 "NpXml Wsdl Import"
         end;
     end;
 
-    local procedure GetXmlElement(XmlDoc: DotNet XmlDocument;var XmlElement: DotNet XmlDocument;XPath: Text;Prefix: Text): Boolean
+    local procedure GetXmlElement(XmlDoc: DotNet npNetXmlDocument;var XmlElement: DotNet npNetXmlDocument;XPath: Text;Prefix: Text): Boolean
     var
-        XmlNsManager2: DotNet XmlNamespaceManager;
+        XmlNsManager2: DotNet npNetXmlNamespaceManager;
         NameSpacePrefix: Text;
         test: Text;
     begin
@@ -308,9 +308,9 @@ codeunit 6151558 "NpXml Wsdl Import"
         exit(false);
     end;
 
-    local procedure GetNodeList(var XmlNodeList: DotNet XmlNodeList;XmlElement: DotNet XmlElement;ElementName: Text;Prefix: Text): Boolean
+    local procedure GetNodeList(var XmlNodeList: DotNet npNetXmlNodeList;XmlElement: DotNet npNetXmlElement;ElementName: Text;Prefix: Text): Boolean
     var
-        XmlNsManager2: DotNet XmlNamespaceManager;
+        XmlNsManager2: DotNet npNetXmlNamespaceManager;
     begin
         if Prefix <> '' then
           XmlNodeList := XmlElement.SelectNodes(Prefix+':'+ElementName,XmlNsManager);
@@ -325,12 +325,12 @@ codeunit 6151558 "NpXml Wsdl Import"
         exit(true);
     end;
 
-    local procedure GetOperationMessage(var OperationMessage: DotNet XmlElement;DocumentElement: DotNet XmlDocument;PortTypes: DotNet XmlElement;OperationName: Text): Boolean
+    local procedure GetOperationMessage(var OperationMessage: DotNet npNetXmlElement;DocumentElement: DotNet npNetXmlDocument;PortTypes: DotNet npNetXmlElement;OperationName: Text): Boolean
     var
         Value: Text;
         XPath: Text;
-        PortTypeOperation: DotNet XmlElement;
-        Input: DotNet XmlElement;
+        PortTypeOperation: DotNet npNetXmlElement;
+        Input: DotNet npNetXmlElement;
         CurrentPrefix: Text;
     begin
         if not IsNull(OperationMessage) then
@@ -355,16 +355,16 @@ codeunit 6151558 "NpXml Wsdl Import"
     begin
     end;
 
-    local procedure ImportCustomType(ElementName: Text;NpXmlName: Text;DataTypes: DotNet XmlDocument;var LineNo: Integer)
+    local procedure ImportCustomType(ElementName: Text;NpXmlName: Text;DataTypes: DotNet npNetXmlDocument;var LineNo: Integer)
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
-        XmlNodeList2: DotNet XmlNodeList;
-        IEnumerator: DotNet IEnumerator;
-        XmlElement2: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
+        XmlNodeList2: DotNet npNetXmlNodeList;
+        IEnumerator: DotNet npNetIEnumerator;
+        XmlElement2: DotNet npNetXmlElement;
         XPath: Text;
         NameSpacePrefix: Text;
-        XmlElement3: DotNet XmlElement;
+        XmlElement3: DotNet npNetXmlElement;
     begin
         if ElementName = '' then
           exit;
@@ -398,10 +398,10 @@ codeunit 6151558 "NpXml Wsdl Import"
         end;
     end;
 
-    local procedure ImportCustomTypeChildNodes(XmlNodeList2: DotNet XmlNodeList;DataTypes: DotNet XmlDocument;NpXmlName: Text;XmlDocument: DotNet XmlElement;XmlElement: DotNet XmlElement;NameSpacePrefix: Text)
+    local procedure ImportCustomTypeChildNodes(XmlNodeList2: DotNet npNetXmlNodeList;DataTypes: DotNet npNetXmlDocument;NpXmlName: Text;XmlDocument: DotNet npNetXmlElement;XmlElement: DotNet npNetXmlElement;NameSpacePrefix: Text)
     var
-        IEnumerator2: DotNet IEnumerator;
-        XmlElement2: DotNet XmlElement;
+        IEnumerator2: DotNet npNetIEnumerator;
+        XmlElement2: DotNet npNetXmlElement;
         CurrentNameSpace: Text;
     begin
         IEnumerator2 := XmlNodeList2.GetEnumerator;
@@ -422,12 +422,12 @@ codeunit 6151558 "NpXml Wsdl Import"
         end;
     end;
 
-    local procedure ImportComplexType(ComplexType: DotNet XmlElement;NpXmlName: Text;DataTypes: DotNet XmlDocument;Prefix: Text)
+    local procedure ImportComplexType(ComplexType: DotNet npNetXmlElement;NpXmlName: Text;DataTypes: DotNet npNetXmlDocument;Prefix: Text)
     var
-        Sequence: DotNet XmlElement;
-        XmlElement: DotNet XmlElement;
-        IEnumerator: DotNet IEnumerator;
-        IEnumerator2: DotNet IEnumerator;
+        Sequence: DotNet npNetXmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        IEnumerator: DotNet npNetIEnumerator;
+        IEnumerator2: DotNet npNetIEnumerator;
     begin
         //-[CASE240432]
         //GetNameSpaces(DataTypes,XmlNsManager);
@@ -448,13 +448,13 @@ codeunit 6151558 "NpXml Wsdl Import"
         end;
     end;
 
-    local procedure ImportCustomTypeByNameSpace(XmlElement: DotNet XmlElement;DataTypes: DotNet XmlDocument;NpXmlName: Text;CurrentNameSpace: Text)
+    local procedure ImportCustomTypeByNameSpace(XmlElement: DotNet npNetXmlElement;DataTypes: DotNet npNetXmlDocument;NpXmlName: Text;CurrentNameSpace: Text)
     var
         Alias: Text;
-        "Schema": DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlNsManager: DotNet XmlNamespaceManager;
-        ComplexType: DotNet XmlElement;
+        "Schema": DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNsManager: DotNet npNetXmlNamespaceManager;
+        ComplexType: DotNet npNetXmlElement;
         XPath: Text;
     begin
         GetNameSpaces(DataTypes,XmlNsManager);
@@ -502,9 +502,9 @@ codeunit 6151558 "NpXml Wsdl Import"
         GlobalLineNo += 10000;
     end;
 
-    local procedure GetElementFromSchema(DataTypes: DotNet XmlDocument;var XmlElement: DotNet XmlElement;Attribute: Text;AttributeValue: Text): Boolean
+    local procedure GetElementFromSchema(DataTypes: DotNet npNetXmlDocument;var XmlElement: DotNet npNetXmlElement;Attribute: Text;AttributeValue: Text): Boolean
     var
-        "Schema": DotNet XmlElement;
+        "Schema": DotNet npNetXmlElement;
         XPath: Text;
     begin
         XPath := CreateXPath('schema','targetNamespace',GetSchemaNameSpace);
@@ -526,7 +526,7 @@ codeunit 6151558 "NpXml Wsdl Import"
         exit(CopyStr(Input,StrPos(Input,':')+1,StrLen(Input)-StrPos(Input,':')));
     end;
 
-    local procedure IsSimpleDataType(XmlElement: DotNet XmlElement): Boolean
+    local procedure IsSimpleDataType(XmlElement: DotNet npNetXmlElement): Boolean
     begin
         if TrimText(XmlElement.GetAttribute('element')) in ['string','decimal','int','long','double','date','dateTime'] then
           exit(true);
@@ -552,11 +552,11 @@ codeunit 6151558 "NpXml Wsdl Import"
         exit(CopyStr(Prefix,1,StrLen(Prefix)-1));
     end;
 
-    local procedure GetElementNameSpacePrefix(XmlElement: DotNet XmlElement;ElementName: Text): Text
+    local procedure GetElementNameSpacePrefix(XmlElement: DotNet npNetXmlElement;ElementName: Text): Text
     var
-        IEnumerator: DotNet IEnumerator;
+        IEnumerator: DotNet npNetIEnumerator;
         CurrentNsPrefix: Text;
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         IEnumerator := XmlNsManager.GetEnumerator;
         while IEnumerator.MoveNext do begin
@@ -593,10 +593,10 @@ codeunit 6151558 "NpXml Wsdl Import"
         NpXmlNamespaces.Insert(true);
     end;
 
-    local procedure ValidateAlias(DataTypes: DotNet XmlDocument;XmlElement: DotNet XmlElement;NpXmlName: Text;var CurrentNameSpace: Text): Text
+    local procedure ValidateAlias(DataTypes: DotNet npNetXmlDocument;XmlElement: DotNet npNetXmlElement;NpXmlName: Text;var CurrentNameSpace: Text): Text
     var
         Alias: Text;
-        ComplexType: DotNet XmlElement;
+        ComplexType: DotNet npNetXmlElement;
     begin
         Alias := GetPrefix(XmlElement.GetAttribute("XPathParameter.Type"));
 

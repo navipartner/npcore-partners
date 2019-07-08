@@ -189,9 +189,9 @@ codeunit 6014452 "E-mail Template Mgt."
     local procedure RunProcess(Filename: Text;Arguments: Text;Modal: Boolean)
     var
         [RunOnClient]
-        Process: DotNet Process;
+        Process: DotNet npNetProcess;
         [RunOnClient]
-        ProcessStartInfo: DotNet ProcessStartInfo;
+        ProcessStartInfo: DotNet npNetProcessStartInfo;
     begin
         ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename,Arguments);
         Process := Process.Start(ProcessStartInfo);

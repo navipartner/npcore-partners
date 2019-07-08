@@ -65,9 +65,9 @@ table 6014625 "Dependency Management Setup"
 
     procedure StoreManagedDependencyPassword(Pwd: Text)
     var
-        Convert: DotNet Convert;
-        Encoding: DotNet Encoding;
-        MemStream: DotNet MemoryStream;
+        Convert: DotNet npNetConvert;
+        Encoding: DotNet npNetEncoding;
+        MemStream: DotNet npNetMemoryStream;
         OutStream: OutStream;
     begin
         Password.CreateOutStream(OutStream);
@@ -77,9 +77,9 @@ table 6014625 "Dependency Management Setup"
 
     procedure GetManagedDependencyPassword() Pwd: Text
     var
-        Convert: DotNet Convert;
-        Encoding: DotNet Encoding;
-        MemStream: DotNet MemoryStream;
+        Convert: DotNet npNetConvert;
+        Encoding: DotNet npNetEncoding;
+        MemStream: DotNet npNetMemoryStream;
         InStream: InStream;
     begin
         if Password.HasValue then begin

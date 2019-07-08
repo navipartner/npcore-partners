@@ -26,8 +26,8 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
 
     local procedure PaymentTransaction(EFTTransactionRequest: Record "EFT Transaction Request")
     var
-        State: DotNet State6;
-        GatewayRequest: DotNet PaymentGatewayProcessRequest0;
+        State: DotNet npNetState6;
+        GatewayRequest: DotNet npNetPaymentGatewayProcessRequest0;
         EFTTypePaymentGenParam: Record "EFT Type Payment Gen. Param.";
         EFTFlexiitermIntegration: Codeunit "EFT Flexiiterm Integration";
         EFTSetup: Record "EFT Setup";
@@ -64,7 +64,7 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
 
     local procedure CloseForm(Data: Text)
     var
-        State: DotNet State6;
+        State: DotNet npNetState6;
         EFTTransactionRequest: Record "EFT Transaction Request";
         EFTFlexiitermIntegration: Codeunit "EFT Flexiiterm Integration";
     begin
@@ -90,7 +90,7 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         EFTTransactionRequest: Record "EFT Transaction Request";
         Register: Record Register;
         SalePOS: Record "Sale POS";
-        State: DotNet State6;
+        State: DotNet npNetState6;
         ConfirmFee: Boolean;
         EFTFlexiitermIntegration: Codeunit "EFT Flexiiterm Integration";
         EFTSetup: Record "EFT Setup";
@@ -142,7 +142,7 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         SaleLinePOS: Record "Sale Line POS";
         SaleLinePOSFee: Record "Sale Line POS";
         EFTTransactionRequest: Record "EFT Transaction Request";
-        State: DotNet State6;
+        State: DotNet npNetState6;
     begin
 
         State := State.Deserialize(Data);
@@ -176,7 +176,7 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
     var
         EFTTransactionRequest: Record "EFT Transaction Request";
         Result: Boolean;
-        State: DotNet State6;
+        State: DotNet npNetState6;
     begin
 
         State := State.Deserialize (Data);
@@ -192,7 +192,7 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         EFTTransactionRequest: Record "EFT Transaction Request";
         CreditCardHelper: Codeunit "Credit Card Protocol Helper";
         CreditCardTransaction: Record "Credit Card Transaction";
-        State: DotNet State6;
+        State: DotNet npNetState6;
     begin
 
         State := State.Deserialize (Data);
@@ -213,7 +213,7 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         EFTTransactionRequest: Record "EFT Transaction Request";
         CreditCardTransaction: Record "Credit Card Transaction";
         CreditCardHelper: Codeunit "Credit Card Protocol Helper";
-        State: DotNet State6;
+        State: DotNet npNetState6;
     begin
 
         State := State.Deserialize (Data);
@@ -231,7 +231,7 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
 
     local procedure HandleReceipt(Data: Text)
     var
-        Lines: DotNet Array;
+        Lines: DotNet npNetArray;
         EFTTransactionRequest: Record "EFT Transaction Request";
         OStream: OutStream;
         Util: Codeunit Utility;
@@ -239,7 +239,7 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         CreditCardTransaction: Record "Credit Card Transaction";
         EntryNo: Integer;
         ReceiptNo: Integer;
-        State: DotNet State6;
+        State: DotNet npNetState6;
     begin
 
         State := State.Deserialize(Data);
@@ -288,7 +288,7 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
 
     local procedure SerializeJson("Object": Variant): Text
     var
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
     begin
         exit(JsonConvert.SerializeObject(Object));
     end;

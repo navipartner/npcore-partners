@@ -9,10 +9,10 @@ codeunit 6059997 "Scanner Service Functions"
 
     procedure RemoveInvalidXmlChars(inString: Text): Text
     var
-        newString: DotNet StringBuilder;
+        newString: DotNet npNetStringBuilder;
         ch: Char;
         i: Integer;
-        XmlConvert: DotNet XmlConvert;
+        XmlConvert: DotNet npNetXmlConvert;
     begin
         if (inString = '') then
           exit(inString);
