@@ -1,0 +1,104 @@
+pageextension 70000052 pageextension70000052 extends "Posted Sales Shipment" 
+{
+    // NPR7.100.000/LS/220114  : Retail Merge
+    // 
+    // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
+    //   - Added Action Items: EmailLog and SendAsPDF.
+    //   - Added Permission for Modify.
+    //   - Added Field 6014414 "Bill-to E-mail" for defining Recipient when sending E-mail using PDF2NAV (Billing-page).
+    //   - Added Field 6014415 "Document Processing" for defining Print action on Sales Doc. Posting (Billing-page).
+    // PS1.00/LS/20140509  CASE 190533 Pacsoft Module Added field Delivery Location on Shipping tab
+    //                                 Added menu on Print -> Create Pacsoft Shipment Document
+    // NPR4.10/TS/20150602 CASE 213397 Added field "Sell-to Customer Name 2" ,"Bill-to Name 2","Ship-to Name 2"
+    // PN1.08/MHA/20151214  CASE 228859 Pdf2Nav (New Version List)
+    // PN1.10/MHA/20160314 CASE 236653 Updated Record Specific Pdf2Nav functions with general Variant functions
+    // NPR5.00/RA/20160329  CASE 237639 Added Action Action6150627
+    // NPR5.22/TJ/20160411 CASE 238601 Moved code from action Create Pacsoft Shipment Document to NPR Event Subscriber codeunit
+    // NPR5.26/BHR/20160921 CASE 248912 Added action to Generate Pakkelabels document
+    // NPR5.29/BHR/20161209 CASE 258936 Change action name 'Generate Pakkelabels document'  TO 'PrintShipmentDocument'
+    // NPR5.30/TJ /20170224 CASE 262797 Removed unused local variable from action Consignor Label
+    // NPR5.42/THRO/20180518 CASE 308179 Removed code from Action SendAsPdf and EmailLog
+    layout
+    {
+        addafter("Sell-to Customer Name")
+        {
+            field("Sell-to Customer Name 2";"Sell-to Customer Name 2")
+            {
+            }
+        }
+        addafter("Ship-to Name")
+        {
+            field("Ship-to Name 2";"Ship-to Name 2")
+            {
+            }
+        }
+        addafter("Ship-to Contact")
+        {
+            field(Kolli;Kolli)
+            {
+                Editable = false;
+                Importance = Promoted;
+            }
+        }
+        addafter("Shipment Date")
+        {
+            field("Delivery Location";"Delivery Location")
+            {
+                Editable = false;
+            }
+        }
+        addafter("Bill-to Name")
+        {
+            field("Bill-to Name 2";"Bill-to Name 2")
+            {
+            }
+        }
+        addafter("Bill-to Contact")
+        {
+            field("Bill-to E-mail";"Bill-to E-mail")
+            {
+            }
+            field("Document Processing";"Document Processing")
+            {
+                Editable = false;
+            }
+        }
+    }
+    actions
+    {
+        addafter("&Navigate")
+        {
+            action("Consignor Label")
+            {
+                Caption = 'Consignor Label';
+            }
+            group(PDF2NAV)
+            {
+                Caption = 'PDF2NAV';
+                action(EmailLog)
+                {
+                    Caption = 'E-mail Log';
+                    Image = Email;
+                }
+                action(SendAsPDF)
+                {
+                    Caption = 'Send as PDF';
+                    Image = SendEmailPDF;
+                }
+            }
+            group(Pacsoft)
+            {
+                Caption = 'Pacsoft';
+                action(CreatePacsoftDocument)
+                {
+                    Caption = 'Create Pacsoft Shipment Document';
+                }
+                action(PrintShipmentDocument)
+                {
+                    Caption = 'Print Shipment Document';
+                }
+            }
+        }
+    }
+}
+

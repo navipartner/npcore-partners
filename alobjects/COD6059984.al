@@ -1,0 +1,51 @@
+codeunit 6059984 "MPOS Helper Functions"
+{
+    // NPR5.38/CLVA/20170710 CASE 289636 MPOS Helper Functions
+
+
+    trigger OnRun()
+    begin
+    end;
+
+    var
+        SITECREATEDTEXT: Label 'Site created';
+        ActiveSession: Record "Active Session";
+
+    procedure GetUsername(): Text
+    var
+        Environment: Codeunit "NPR Environment Mgt.";
+    begin
+        FindMySession;
+        exit(ActiveSession."User ID");
+    end;
+
+    procedure GetDatabaseName(): Text
+    begin
+        FindMySession;
+        exit(ActiveSession."Database Name")
+    end;
+
+    procedure GetTenantID(): Text
+    begin
+        exit(TenantId);
+    end;
+
+    local procedure FindMySession()
+    begin
+        if (ActiveSession."Server Instance ID" = ServiceInstanceId) and
+           (ActiveSession."Session ID" = SessionId) then
+          exit;
+
+        SelectLatestVersion;
+
+        ActiveSession.SetRange("Server Instance ID",ServiceInstanceId);
+        ActiveSession.SetRange("Session ID",SessionId);
+        if not ActiveSession.FindFirst then begin
+          Sleep(500);
+          if not GuiAllowed then
+            exit;
+          ActiveSession.FindFirst;
+        end;
+    end;
+}
+

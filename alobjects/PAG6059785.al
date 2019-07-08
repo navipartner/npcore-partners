@@ -1,0 +1,371 @@
+page 6059785 "TM Ticket List"
+{
+    // TM1.00/TSA/20151217  CASE 219658-01 NaviPartner Ticket Management
+    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
+    // TM1.16/TSA/20160816  CASE 245004 Transport TM1.16 - 19 July 2016
+    // TM1.17/TSA/20160913  CASE 251883 Added SMS as Notification Method
+    // TM1.17/JLK/20161024  CASE 251883 Added Issued Ticket Print button
+    // TM1.18/TSA/20161220  CASE 261564 Added related information page ticket request, put visible false on some more fields
+    // TM1.19/TSA/20170220  CASE 266768 Added default filter to not show blocked entries
+    // TM1.20/TSA/20170222  CASE 266835 Removed the redundant print button and fixed the "Print Selected Tickets" to print the selected tickets
+    // TM1.21/TSA/20170504  CASE 274843 Added ToggleBlockUnblock() function
+    // TM1.21/TSA/20170525  CASE 278049 Fixing issues report by OMA
+    // TM1.26/TSA /20171103 CASE 285601 Added action View Ticket
+    // TM1.26/TSA /20171120 CASE 296731 Added function RevokeTicket() and the button to go with it
+    // NPR5.43/TS  20180626 CASE 317161 Promoted Action Print Selected Tickets
+    // TM1.38/TSA /20181023 CASE 332109 Added eTicket support
+    // TM1.39/NPKNAV/20190125  CASE 310057 Transport TM1.39 - 25 January 2019
+
+    Caption = 'Ticket List';
+    DeleteAllowed = false;
+    Editable = false;
+    InsertAllowed = false;
+    ModifyAllowed = false;
+    PageType = List;
+    SourceTable = "TM Ticket";
+    SourceTableView = ORDER(Descending);
+    UsageCategory = Lists;
+
+    layout
+    {
+        area(content)
+        {
+            repeater(Group)
+            {
+                field("No.";"No.")
+                {
+                }
+                field("External Ticket No.";"External Ticket No.")
+                {
+                }
+                field("Ticket Type Code";"Ticket Type Code")
+                {
+                }
+                field("Valid From Date";"Valid From Date")
+                {
+                }
+                field("Valid From Time";"Valid From Time")
+                {
+                }
+                field("Valid To Date";"Valid To Date")
+                {
+                }
+                field("Valid To Time";"Valid To Time")
+                {
+                }
+                field(Blocked;Blocked)
+                {
+                }
+                field("Blocked Date";"Blocked Date")
+                {
+                }
+                field("Printed Date";"Printed Date")
+                {
+                    Visible = false;
+                }
+                field("Salesperson Code";"Salesperson Code")
+                {
+                }
+                field("Document Date";"Document Date")
+                {
+                }
+                field("Source Code";"Source Code")
+                {
+                    Visible = false;
+                }
+                field("Customer No.";"Customer No.")
+                {
+                    Visible = false;
+                }
+                field("Sales Header Type";"Sales Header Type")
+                {
+                    Visible = false;
+                }
+                field("Sales Header No.";"Sales Header No.")
+                {
+                    Visible = false;
+                }
+                field("Sales Receipt No.";"Sales Receipt No.")
+                {
+                }
+                field("Line No.";"Line No.")
+                {
+                }
+                field("External Member Card No.";"External Member Card No.")
+                {
+                }
+                field("No. Of Access";"No. Of Access")
+                {
+                    Visible = false;
+                }
+                field("Item No.";"Item No.")
+                {
+                }
+                field("Variant Code";"Variant Code")
+                {
+                }
+                field("Last Date Modified";"Last Date Modified")
+                {
+                }
+            }
+        }
+    }
+
+    actions
+    {
+        area(processing)
+        {
+            action("Create eTicket")
+            {
+                Caption = 'Create eTicket';
+                Image = ElectronicNumber;
+                Promoted = true;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                begin
+                    CreateETicket ();
+                end;
+            }
+            separator(Separator6014403)
+            {
+            }
+            action("Block/Unblock Tickets")
+            {
+                Caption = 'Block/Unblock Tickets';
+                Image = Change;
+
+                trigger OnAction()
+                begin
+                    ToggleTicketBlock ();
+                end;
+            }
+            action("Revoke Ticket")
+            {
+                Caption = 'Revoke Ticket';
+                Ellipsis = true;
+                Image = RemoveLine;
+
+                trigger OnAction()
+                begin
+                    RevokeTicket ();
+                end;
+            }
+        }
+        area(navigation)
+        {
+            action("Access Entries")
+            {
+                Caption = 'Access Entries';
+                Ellipsis = true;
+                Image = EntriesList;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                RunObject = Page "TM Ticket Access Entry List";
+                RunPageLink = "Ticket No."=FIELD("No.");
+            }
+            action(Ticketholder)
+            {
+                Caption = 'Ticketholder';
+                Ellipsis = true;
+                Image = WIPEntries;
+                Promoted = true;
+                PromotedCategory = Process;
+
+                trigger OnAction()
+                begin
+                    ChangeTicketholder ();
+                end;
+            }
+            action("Ticket Request")
+            {
+                Caption = 'Ticket Request';
+                Ellipsis = true;
+                Image = Navigate;
+                Promoted = true;
+                PromotedCategory = Process;
+                RunObject = Page "TM Ticket Request";
+                RunPageLink = "Entry No."=FIELD("Ticket Reservation Entry No.");
+            }
+            separator(Separator6014406)
+            {
+            }
+            action("View Online Ticket")
+            {
+                Caption = 'View Online Ticket';
+                Image = Web;
+                Promoted = true;
+                PromotedCategory = Process;
+
+                trigger OnAction()
+                var
+                    DIYTicketPrint: Codeunit "TM Ticket DIY Ticket Print";
+                begin
+
+                    DIYTicketPrint.ViewOnlineSingleTicket (Rec."No.");
+                end;
+            }
+            action("View eTicket")
+            {
+                Caption = 'View eTicket';
+                Ellipsis = true;
+                Image = ElectronicNumber;
+                RunObject = Page "TM ETicket Notification Entry";
+                RunPageLink = "Ticket No."=FIELD("No.");
+            }
+            separator(Separator6014407)
+            {
+            }
+            action("Print Selected Tickets")
+            {
+                Caption = 'Print Selected Tickets';
+                Image = Print;
+                Promoted = true;
+                ShortCutKey = 'Shift+Ctrl+P';
+
+                trigger OnAction()
+                var
+                    Ticket: Record "TM Ticket";
+                    Ticket2: Record "TM Ticket";
+                begin
+
+                    CurrPage.SetSelectionFilter(Ticket);
+                    Ticket.FindSet ();
+                    repeat
+                      Ticket2.Get (Ticket."No.");
+                      Ticket2.SetRecFilter;
+                      TicketManagement.PrintSingleTicket(Ticket2);
+                    until (Ticket.Next () = 0);
+                end;
+            }
+            action("Report Issued Tickets")
+            {
+                Caption = 'Issued Tickets';
+                Image = Print;
+                RunObject = Report "Issued Tickets";
+            }
+        }
+    }
+
+    trigger OnOpenPage()
+    begin
+
+        //-+TM1.19 [266768]
+        Rec.SetFilter (Blocked, '=%1', false);
+    end;
+
+    var
+        TicketManagement: Codeunit "TM Ticket Management";
+        CONFIRM_REVOKE_TICKET: Label 'Are you sure you want to revoke %1 ticket(s)?';
+        ETICKET_SENT: Label 'eTicket sent.';
+        CONFIRM_ETICKET: Label 'Are you sure you want to create and send %1 eTickets?';
+
+    local procedure ChangeTicketholder()
+    var
+        TicketReservationRequest: Record "TM Ticket Reservation Request";
+        TicketNotifyParticipant: Codeunit "TM Ticket Notify Participant";
+        SuggestNotificationMethod: Option NA,EMAIL,SMS;
+    begin
+
+        TicketReservationRequest.Get ("Ticket Reservation Entry No.");
+
+        case TicketReservationRequest."Notification Method" of
+          TicketReservationRequest."Notification Method"::EMAIL : SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
+          TicketReservationRequest."Notification Method"::SMS : SuggestNotificationMethod := SuggestNotificationMethod::SMS;
+          else begin
+            SuggestNotificationMethod := SuggestNotificationMethod::NA;
+            TicketReservationRequest."Notification Address" := '';
+          end;
+        end;
+
+        TicketNotifyParticipant.AquireTicketParticipant (TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address");
+    end;
+
+    local procedure ToggleTicketBlock()
+    var
+        Ticket: Record "TM Ticket";
+        Ticket2: Record "TM Ticket";
+        TicketRequestManager: Codeunit "TM Ticket Request Manager";
+    begin
+
+        CurrPage.SetSelectionFilter (Ticket);
+        if (Ticket.FindSet ()) then begin
+          repeat
+            Ticket2.Get (Ticket."No.");
+
+            Ticket2.Blocked := (not Ticket.Blocked);
+            if (Ticket2.Blocked) then
+              Ticket2."Blocked Date" := Today
+            else
+              Ticket2."Blocked Date" := 0D;
+
+            Ticket2.Modify ();
+
+            //-TM1.38 [332109]
+            if (Ticket2.Blocked) then
+              TicketRequestManager.OnAfterBlockTicketPublisher (Ticket."No.");
+            if (not Ticket2.Blocked) then
+              TicketRequestManager.OnAfterUnblockTicketPublisher (Ticket."No.");
+            //+TM1.38 [332109]
+
+          until (Ticket.Next () = 0);
+        end;
+    end;
+
+    local procedure RevokeTicket()
+    var
+        Ticket: Record "TM Ticket";
+        TicketRequestManager: Codeunit "TM Ticket Request Manager";
+        TicketCount: Integer;
+        ResponseMessage: Text;
+        AmountToReverse: Decimal;
+        QtyToReverse: Integer;
+        Token: Text[100];
+    begin
+
+        //-TM1.26 [296731]
+        CurrPage.SetSelectionFilter (Ticket);
+        TicketCount := Ticket.Count ();
+
+        if (not Confirm (CONFIRM_REVOKE_TICKET, false, TicketCount)) then
+          Error ('');
+
+        if (Ticket.FindSet ()) then begin
+          Token := TicketRequestManager.GetNewToken ();
+          repeat
+            AmountToReverse := 0;
+            QtyToReverse := 0;
+            TicketRequestManager.POS_CreateRevokeRequest (Token, Ticket."No.", UserId, 0, AmountToReverse, QtyToReverse);
+          until (Ticket.Next () = 0);
+          TicketRequestManager.RevokeReservationTokenRequest (Token, false, true, ResponseMessage);
+        end;
+        //+TM1.26 [296731]
+    end;
+
+    local procedure CreateETicket()
+    var
+        TicketRequestManager: Codeunit "TM Ticket Request Manager";
+        Ticket: Record "TM Ticket";
+        ReasonText: Text;
+        TicketCount: Integer;
+    begin
+
+        CurrPage.SetSelectionFilter (Ticket);
+        TicketCount := Ticket.Count ();
+
+        if (TicketCount > 1) then
+          if (not (Confirm (CONFIRM_ETICKET, true, TicketCount))) then
+            Error ('');
+
+        if (Ticket.FindSet ()) then begin
+          repeat
+            if (not TicketRequestManager.CreateAndSendETicket (Rec."No.", ReasonText)) then
+              Error (ReasonText);
+          until (Ticket.Next () = 0);
+        end;
+
+        Message (ETICKET_SENT);
+    end;
+}
+

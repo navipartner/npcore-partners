@@ -1,0 +1,87 @@
+table 6150725 "POS Secure Method"
+{
+    // NPR5.43/VB  /20180611  CASE 314603 Implemented secure method behavior functionality.
+    // NPR5.46/TSA /20180914 CASE 314603 Added overflow protection in DiscoverSecureMethod()
+
+    Caption = 'POS Secure Method';
+    DrillDownPageID = "POS Secure Methods";
+    LookupPageID = "POS Secure Methods";
+
+    fields
+    {
+        field(1;"Code";Code[10])
+        {
+            Caption = 'Code';
+        }
+        field(2;Description;Text[30])
+        {
+            Caption = 'Description';
+        }
+        field(3;Type;Option)
+        {
+            Caption = 'Type';
+            OptionCaption = 'Custom,Password Client,Password Server';
+            OptionMembers = Custom,"Password Client","Password Server";
+        }
+    }
+
+    keys
+    {
+        key(Key1;"Code")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+
+    var
+        Text001: Label 'No subscriber responded to OnDiscoverCustomSecureMethodCode for %1 secure method.';
+
+    procedure RunDiscovery()
+    var
+        CopyRec: Record "POS Secure Method";
+    begin
+        CopyRec := Rec;
+        Rec.DeleteAll();
+        OnDiscoverSecureMethods();
+        Rec := CopyRec;
+        if not Rec.Find('=<>') then;
+    end;
+
+    procedure GetCustomMethodCode(): Text
+    var
+        Handled: Boolean;
+        CustomCode: Text;
+    begin
+        if Type <> Type::Custom then
+          exit('');
+
+        OnDiscoverCustomSecureMethodCode(Code,CustomCode,Handled);
+        if not Handled then
+          Error(Text001,Code);
+        exit(CustomCode);
+    end;
+
+    procedure DiscoverSecureMethod("Code": Code[10];Description: Text;Type: Option)
+    begin
+        Rec.Init();
+        Rec.Code := CopyStr (Code, 1, MaxStrLen (Rec.Code));
+        Rec.Description := CopyStr (Description, 1, MaxStrLen (Rec.Description));
+        Rec.Type := Type;
+        if not Rec.Insert() then
+          Rec.Modify();
+    end;
+
+    [BusinessEvent(TRUE)]
+    local procedure OnDiscoverSecureMethods()
+    begin
+    end;
+
+    [BusinessEvent(false)]
+    local procedure OnDiscoverCustomSecureMethodCode("Code": Code[10];var CustomCode: Text;var Handled: Boolean)
+    begin
+    end;
+}
+

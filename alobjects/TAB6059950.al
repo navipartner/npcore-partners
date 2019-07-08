@@ -1,0 +1,123 @@
+table 6059950 "Display Setup"
+{
+    // NPR5.29/CLVA/20170118 CASE 256153 Added field "Image Rotation Interval"
+    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
+    // NPR5.43/CLVA/20180606 CASE 300254 Added field Activate
+    // NPR5.44/CLVA/20180629 CASE 318695 Added field Prices ex. VAT
+    // NPR5.50/CLVA/20190513 CASE 352390 Added field "Custom Display Codeunit"
+
+    Caption = 'Display Setup';
+
+    fields
+    {
+        field(1;"Register No.";Code[10])
+        {
+            Caption = 'Cash Register No.';
+            TableRelation = Register;
+        }
+        field(11;"Display Content Code";Code[10])
+        {
+            Caption = 'Display Content Code';
+            TableRelation = "Display Content";
+
+            trigger OnValidate()
+            begin
+                if ("Display Content Code" <> xRec."Display Content Code") and ("Display Content Code" <> '') then
+                  "Media Downloaded" := false;
+            end;
+        }
+        field(12;"Screen No.";Integer)
+        {
+            Caption = 'Screen No.';
+        }
+        field(13;"Receipt Duration";Integer)
+        {
+            Caption = 'Receipt Duration';
+            Description = 'Milliseconds';
+            InitValue = 5000;
+        }
+        field(14;"Receipt Width Pct.";Integer)
+        {
+            Caption = 'Receipt Width Pct.';
+            InitValue = 50;
+        }
+        field(15;"Receipt Placement";Option)
+        {
+            Caption = 'Receipt Placement';
+            InitValue = Right;
+            OptionCaption = 'Left,Center,Right';
+            OptionMembers = Left,Center,Right;
+        }
+        field(16;"Media Downloaded";Boolean)
+        {
+            Caption = 'Media Downloaded';
+        }
+        field(17;"Receipt Description Padding";Integer)
+        {
+            Caption = 'Receipt Description Padding';
+            InitValue = 15;
+        }
+        field(18;"Receipt Total Padding";Integer)
+        {
+            Caption = 'Receipt Total Padding';
+            InitValue = 20;
+        }
+        field(19;"Receipt GrandTotal Padding";Integer)
+        {
+            Caption = 'Receipt GrandTotal Padding';
+            InitValue = 36;
+        }
+        field(20;"Receipt Discount Padding";Integer)
+        {
+            Caption = 'Receipt Discount Padding';
+            InitValue = 20;
+        }
+        field(21;"Image Rotation Interval";Integer)
+        {
+            Caption = 'Image Rotation Interval';
+            Description = 'Milliseconds';
+            InitValue = 3000;
+        }
+        field(22;Activate;Boolean)
+        {
+            Caption = 'Activate';
+
+            trigger OnValidate()
+            var
+                Register: Record Register;
+            begin
+                TestField("Register No.");
+                if Register.Get("Register No.") then
+                  if Register."Customer Display" then
+                    Error(TXT001,Register."Register No.");
+
+                if (xRec.Activate) and (not Activate) then
+                  "Media Downloaded" := false;
+            end;
+        }
+        field(23;"Prices ex. VAT";Boolean)
+        {
+            Caption = 'Prices ex. VAT';
+        }
+        field(24;"Custom Display Codeunit";Integer)
+        {
+            Caption = 'Custom Display Codeunit';
+            TableRelation = AllObjWithCaption."Object ID" WHERE ("Object Type"=CONST(Codeunit));
+        }
+    }
+
+    keys
+    {
+        key(Key1;"Register No.")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+
+    var
+        TXT001: Label 'Matrix Display(Customer Display) is already activated on register %1. \Deactivate Customer Display before activating 2nd Display';
+}
+

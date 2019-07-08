@@ -1,0 +1,828 @@
+table 6014405 "Sale POS"
+{
+    // NPR4.04/JDH /20150403 CASE 204978 Correct bug whereby the vat is added to all the items when previous transaction on POS had a "Vat Customer" made Var Local
+    // NPR4.16/MMV /20151028 CASE 225533 Renamed field 130 "Custom Report No." to "Custom Print Object ID"
+    //                                   Addded  field 131 "Custom Print Object Type" : Text [10]
+    // NPR4.18/MMV /20160128 CASE 224257 Added field 140 "Issue Tax Free Voucher" : Boolean
+    // NPR4.21/BHR /20160209 CASE 229736 Correct dimension
+    // NPR5.22/MMV /20160404 CASE 232067 Added field 150 "Customer Location No." : Code[20]
+    // NPR5.22/AP  /20160413 CASE 235391 Change scope-property for function UpdateAllLineDim from LOCAL to non-LOCAL.
+    // NPR5.27/JDH /20161018 CASE 255575 Removed unused functions
+    // NPR5.28/MMV /20161104 CASE 254575 Added field 60 "Send Receipt Email".
+    // NPR5.29/AP  /20170119 CASE 257938 Fixing dimension issues. Dimension Set not propagated correctly from header to line and with proper priority.
+    // NPR5.29/AP  /20170119 CASE 262628 Added field 160 POS Sale ID (Autoincerement). Future use as surrogate key of POS Sale
+    // NPR5.30/AP  /20170214 CASE 261728 Introducing POS Unit and POS Store.
+    //                                   Added field 3 "POS Store Code"
+    //                                   Added helper functions GetPOSUnit and GetPOSStore
+    //                                   Removed malicious global dimension handling.
+    // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
+    // NPR5.31/MHA /20170113 CASE 263093 Added field 45 "Customer Disc. Group"
+    // NPR5.31/TSA /20170314 CASE 269105 Removed field 5103 "Prices incl. VAT" from page since it is a duplicate of field 3.
+    // NPR5.31/AP  /20170227 CASE 248534 Re-introduced US Sales Tax
+    //                                   Added fields 74 "Gen. Bus. Posting Group", 141 "Tax Area Code", 142 "Tax Liable" and 143 "VAT Bus. Posting Group"
+    //                                   Setting up posting setup on the header for the lines to inherit from (instead of lines recalculating every time)
+    // NPR5.31/AP  /20170309 CASE 266785 Removed unused fields 103 "Customer Display Line1", 104 "Customer Display Line2", 124 "Meta Trigger Error" and 125 "Meta Trigger Error String"
+    //                                   Removed field 110 "Computer Name" and corresponding, unused key
+    // NPR5.31/AP  /20170427 CASE 269105 Reversed removal of 5103 "Prices incl. VAT".
+    // NPR5.32/AP  /20170519 CASE 248534 Apply header defaults to lines when validating customer. Some was never set, others was not set due to refactoring of HentMomsPct and HentBel�b
+    // NPR5.32/JDH /20170525 CASE 278031 Changed SalesPerson Code field from 20 to 10. renamed a couple of variables to English
+    // NPR5.32.01/AP  /20170530 CASE 248534 More issues regarding VAT refactoring. VAT % not always set correct when updating exiting lines.
+    // NPR5.36/TJ  /20170904 CASE 286283 Renamed all the danish OptionString properties to english
+    // NPR5.37/TS  /20171012 CASE 292422 Added Field Customer Name ( 485 )
+    // NPR5.45/MHA /20180803  CASE 323705 Signature changed on SaleLinePOS.FindItemSalesPrice()
+    // NPR5.45/MMV /20180828  CASE 326466 Recalculate discount once on end of customer validate
+    // NPR5.50/MHA /20190422 CASE 337539 Added field 170 "Retail ID"
+
+    Caption = 'Sale';
+
+    fields
+    {
+        field(1;"Register No.";Code[10])
+        {
+            Caption = 'Cash Register No.';
+            NotBlank = true;
+        }
+        field(2;"Sales Ticket No.";Code[20])
+        {
+            Caption = 'Sales Ticket No.';
+            NotBlank = true;
+        }
+        field(3;"POS Store Code";Code[10])
+        {
+            Caption = 'POS Store Code';
+            Description = 'NPR5.30';
+        }
+        field(4;"Salesperson Code";Code[10])
+        {
+            Caption = 'Salesperson Code';
+            NotBlank = true;
+            TableRelation = "Salesperson/Purchaser".Code;
+
+            trigger OnValidate()
+            begin
+                CreateDim(
+                  DATABASE::Register,"Register No.",
+                  DATABASE::Customer,"Customer No.",
+                  DATABASE::"Salesperson/Purchaser","Salesperson Code");
+            end;
+        }
+        field(5;Date;Date)
+        {
+            Caption = 'Date';
+        }
+        field(6;"Start Time";Time)
+        {
+            Caption = 'Start Time';
+        }
+        field(7;"Customer No.";Code[20])
+        {
+            Caption = 'Customer No.';
+            TableRelation = IF ("Customer Type"=CONST(Ord)) Customer."No."
+                            ELSE IF ("Customer Type"=CONST(Cash)) Contact."No.";
+            //This property is currently not supported
+            //TestTableRelation = false;
+            ValidateTableRelation = false;
+
+            trigger OnValidate()
+            var
+                SaleLinePOS: Record "Sale Line POS";
+                Item: Record Item;
+                Contact: Record Contact;
+                AltNo: Record "Alternative No.";
+                DoCreate: Boolean;
+                Cust: Record Customer;
+                RetailFormCode: Codeunit "Retail Form Code";
+                POSSalesDiscountCalcMgt: Codeunit "POS Sales Discount Calc. Mgt.";
+            begin
+                RetailSetup.Get();
+                Register.Get("Register No.");
+                //-NPR5.30 [261728]
+                GetPOSUnit;
+                "POS Store Code" := POSUnit."POS Store Code";
+                GetPOSStore;
+                //+NPR5.30 [261728]
+
+                "Customer Price Group" := Register."Customer Price Group";
+                //-NPR5.31 [263093]
+                "Customer Disc. Group" := Register."Customer Disc. Group";
+                //+NPR5.31 [263093]
+                //-NPR5.31 [248534]
+                "Gen. Bus. Posting Group" := POSStore."Gen. Bus. Posting Group";
+                "Tax Area Code" := POSStore."Tax Area Code";
+                "Tax Liable" := POSStore."Tax Liable";
+                "VAT Bus. Posting Group" := POSStore."VAT Bus. Posting Group";
+                //+NPR5.31 [248534]
+
+                //- Alternative Customer no.
+                AltNo.SetCurrentKey( "Alt. No.", Type );
+                AltNo.SetRange( "Alt. No.", "Customer No." );
+                AltNo.SetFilter( Type, '=%1|=%2', AltNo.Type::Customer, AltNo.Type::"CRM Customer" );
+                //-NPR5.45 [323705]
+                //IF AltNo.FIND('-') THEN BEGIN
+                if AltNo.FindFirst then begin
+                //+NPR5.45 [323705]
+                  if AltNo.Type = AltNo.Type::Customer then
+                    "Customer Type" := "Customer Type"::Ord
+                  else
+                    "Customer Type" := "Customer Type"::Cash;
+                  "Customer No." := AltNo.Code;
+                end;
+
+                if ( "Customer Type" = "Customer Type"::Cash ) and ( "Customer No." <> '' ) then begin
+                  if not Contact.Get( "Customer No." ) then begin
+                    DoCreate := false;
+                    case RetailSetup."New Customer Creation" of
+                      RetailSetup."New Customer Creation"::All :
+                        DoCreate := true;
+                      RetailSetup."New Customer Creation"::"Cash Customer" :
+                        DoCreate := true;
+                      RetailSetup."New Customer Creation"::"User Managed": begin
+                        SalesPerson.Get("Salesperson Code");
+                        case SalesPerson."Customer Creation" of
+                          SalesPerson."Customer Creation"::"Only cash" :
+                            DoCreate := true;
+                          SalesPerson."Customer Creation"::Allowed :
+                            DoCreate := true;
+                        end;
+                      end;
+                      RetailSetup."New Customer Creation"::Customer :
+                        DoCreate := false;
+                    end;
+
+                    if not DoCreate then
+                      Error(Text1060002);
+
+                    RetailFormCode.CreateContact("Customer No.");
+
+                    if "Customer No." <> '' then begin
+                      Contact.Get("Customer No.");
+                      "Customer No."    := Contact."No.";
+                      Name              := Contact.Name;
+                      Address           := Contact.Address;
+                      "Address 2"       := Contact."Address 2";
+                      Validate("Post Code", Contact."Post Code");
+                    end;
+                  end else begin
+                    Name          := Contact.Name;
+                    Address       := Contact.Address;
+                    "Address 2"   := Contact."Address 2";
+                    "Post Code"   := Contact."Post Code";
+                    City          := Contact.City;
+                    "Contact No." := Contact."No.";
+                  end;
+                end;
+
+                Modify;
+
+                if ( "Customer No." <> '' ) and ( "Customer Type" = "Customer Type"::Ord ) then begin
+                  //ohm - customer lookup
+                  if not Cust.Get("Customer No.") then begin
+                    DoCreate := false;
+                    case RetailSetup."New Customer Creation" of
+                      RetailSetup."New Customer Creation"::All :
+                        DoCreate := true;
+                      RetailSetup."New Customer Creation"::"Cash Customer" :
+                        DoCreate := false;
+                      RetailSetup."New Customer Creation"::"User Managed": begin
+                        SalesPerson.Get("Salesperson Code");
+                        case SalesPerson."Customer Creation" of
+                          SalesPerson."Customer Creation"::"Only cash" :
+                            DoCreate := true;
+                          SalesPerson."Customer Creation"::Allowed :
+                            DoCreate := true;
+                        end;
+                      end;
+                      RetailSetup."New Customer Creation"::Customer :
+                        DoCreate := true;
+                    end;
+
+                    if not DoCreate then
+                      Error(Text1060002);
+
+                    RetailFormCode.CreateCustomer("Customer No.");
+                  end;
+
+                  if "Customer No." <> '' then begin
+                    Cust.Get("Customer No.");
+                    Name         := Cust.Name;
+                    Address      := Cust.Address;
+                    "Address 2"  := Cust."Address 2";
+                    "Post Code"  := Cust."Post Code";
+                    City         := Cust.City;
+
+                    if Cust."Customer Price Group" <> '' then
+                      "Customer Price Group" := Cust."Customer Price Group";
+                    //-NPR5.31 [263093]
+                    if Cust."Customer Disc. Group" <> '' then
+                      "Customer Disc. Group" := Cust."Customer Disc. Group";
+                    //+NPR5.31 [263093]
+
+                    //-NPR5.31 [248534]
+                    if POSStore."Default POS Posting Setup" = POSStore."Default POS Posting Setup"::Customer then begin
+                      "Gen. Bus. Posting Group" := Cust."Gen. Bus. Posting Group";
+                      "Tax Area Code" := Cust."Tax Area Code";
+                      "Tax Liable" := Cust."Tax Liable";
+                      "VAT Bus. Posting Group" := Cust."VAT Bus. Posting Group";
+                    end else begin
+                      "Gen. Bus. Posting Group" := POSStore."Gen. Bus. Posting Group";
+                      "Tax Area Code" := POSStore."Tax Area Code";
+                      "Tax Liable" := POSStore."Tax Liable";
+                      "VAT Bus. Posting Group" := POSStore."VAT Bus. Posting Group";
+                    end;
+                    //+NPR5.31 [248534]
+
+                    //-NPR5.30 [261728]
+                    //IF Cust."Global Dimension 1 Code" <> '' THEN
+                    //  VALIDATE("Shortcut Dimension 1 Code",Cust."Global Dimension 1 Code");
+                    //IF Cust."Global Dimension 2 Code" <> '' THEN
+                    //  VALIDATE("Shortcut Dimension 2 Code",Cust."Global Dimension 2 Code");
+                    //+NPR5.30 [261728]
+
+                  end;
+                end;
+
+                if "Customer No." = '' then begin
+                  Name          := '';
+                  Address       := '';
+                  "Address 2"   := '';
+                  "Post Code"   := '';
+                  City          := '';
+                  "Contact No." := '';
+                end;
+
+                if Cust."No." <> '' then
+                  "Price including VAT"  := Cust."Prices Including VAT"
+                else
+                  //-NPR5.31 [269105]
+                  ////"Price including VAT" := Ops�tning."Prices incl. VAT";
+                  //"Price including VAT" := Ops�tning."Prices Include VAT";
+                  "Price including VAT" := RetailSetup."Prices incl. VAT";
+                  //+NPR5.31 [269105]
+
+                if not Modify then;
+
+                if ("Customer Type" = "Customer Type"::Ord) then begin
+                  SaleLinePOS.Reset;
+                  SaleLinePOS.SetRange( "Register No.", "Register No." );
+                  SaleLinePOS.SetRange( "Sales Ticket No.", "Sales Ticket No." );
+                  SaleLinePOS.SetRange( "Sale Type", SaleLinePOS."Sale Type"::Sale );
+                  SaleLinePOS.SetRange( Type, SaleLinePOS.Type::Item );
+                  SaleLinePOS.SetRange( Date, Date );
+                  if SaleLinePOS.FindSet(true,false) then begin
+                    repeat
+                      Item.Get(SaleLinePOS."No.");
+                      SaleLinePOS.Internal                  := Cust."Internal y/n";
+                      SaleLinePOS."Customer Price Group"    := "Customer Price Group";
+                      //-NPR5.32 [248534]
+                      SaleLinePOS."Allow Line Discount"     := "Allow Line Discount";
+                      SaleLinePOS."Price Includes VAT"      := "Price including VAT";
+                      SaleLinePOS."Gen. Bus. Posting Group" := "Gen. Bus. Posting Group";
+                      SaleLinePOS."VAT Bus. Posting Group"  := "VAT Bus. Posting Group";
+                      SaleLinePOS."Tax Area Code"           := "Tax Area Code";
+                      SaleLinePOS."Tax Liable"              := "Tax Liable";
+                      //+NPR5.32 [248534]
+                      //-NPR5.32.01 [248534]
+                      //SaleLinePOS."VAT %"                   := SaleLinePOS.HentMomsPct( SaleLinePOS."Item Group" );
+                      SaleLinePOS.UpdateVATSetup;
+                      //+NPR5.32.01 [248534]
+                      //-NPR5.45 [323705]
+                      //SaleLinePOS."Unit Price"              := SaleLinePOS.FindItemSalesPrice( SaleLinePOS );
+                      SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
+                      //+NPR5.45 [323705]
+                      SaleLinePOS.GetAmount(SaleLinePOS, Item, SaleLinePOS."Unit Price");
+                      SaleLinePOS.Modify;
+                    until SaleLinePOS.Next = 0;
+                    SaleLinePOS.Validate("Unit of Measure Code");
+                    SaleLinePOS.Modify;
+                  end;
+                end;
+
+                //-NPR5.45 [326466]
+                POSSalesDiscountCalcMgt.RecalculateAllSaleLinePOS(Rec);
+                //+NPR5.45 [326466]
+
+                //�ndring foretaget for at kunne validere p� nummer og slette rabatter p� linier, ved �ndring af kundenummer.
+                Modify;
+
+                //-NPR5.30 [261728]
+                //IF Cust.GET("Customer No.") THEN BEGIN
+                //  IF Cust."Bill-to Customer No."<>'' THEN
+                //    Custno := Cust."Bill-to Customer No."
+                //  ELSE
+                //    Custno:=Cust."No.";
+                //END;
+                //+NPR5.30 [261728]
+
+                //TempNPRDim.GetDimensions(DATABASE::"Sale POS","Register No.","Sales Ticket No.",0,0D,0,'',TempNPRDim);
+
+                //-NPR4.21
+                //CreateDim(
+                //  DATABASE::Register,"Register No.",
+                //  DATABASE::Customer,Custno,
+                //  DATABASE::"Salesperson/Purchaser","Salesperson Code");
+                CreateDim(
+                  //-NPR5.30 [261728]
+                  //DATABASE::Customer,Custno,
+                  DATABASE::Customer,"Customer No.",
+                  //+NPR5.30 [261728]
+                  DATABASE::Register,"Register No.",
+                  DATABASE::"Salesperson/Purchaser","Salesperson Code");
+                //+NPR4.21
+
+                //TempNPRDim.UpdateAllLineDim(DATABASE::"Sale POS","Register No.","Sales Ticket No.",0,0D,TempNPRDim);
+            end;
+        }
+        field(8;Name;Text[50])
+        {
+            Caption = 'Name';
+        }
+        field(9;Address;Text[50])
+        {
+            Caption = 'Address';
+        }
+        field(10;"Address 2";Text[50])
+        {
+            Caption = 'Address 2';
+        }
+        field(11;"Post Code";Code[20])
+        {
+            Caption = 'Post Code';
+        }
+        field(12;City;Text[30])
+        {
+            Caption = 'City';
+        }
+        field(15;"Contact No.";Text[30])
+        {
+            Caption = 'Contact';
+        }
+        field(16;Reference;Text[30])
+        {
+            Caption = 'Reference';
+        }
+        field(20;"Location Code";Code[10])
+        {
+            Caption = 'Location Code';
+        }
+        field(29;"Shortcut Dimension 1 Code";Code[20])
+        {
+            CaptionClass = '1,2,1';
+            Caption = 'Shortcut Dimension 1 Code';
+
+            trigger OnLookup()
+            begin
+                LookUpShortcutDimCode(1,"Shortcut Dimension 1 Code");
+                Validate("Shortcut Dimension 1 Code","Shortcut Dimension 1 Code");
+            end;
+
+            trigger OnValidate()
+            begin
+                ValidateShortcutDimCode(1,"Shortcut Dimension 1 Code");
+            end;
+        }
+        field(30;"Shortcut Dimension 2 Code";Code[20])
+        {
+            CaptionClass = '1,2,2';
+            Caption = 'Shortcut Dimension 2 Code';
+
+            trigger OnLookup()
+            begin
+                LookUpShortcutDimCode(2,"Shortcut Dimension 2 Code");
+                Validate("Shortcut Dimension 2 Code","Shortcut Dimension 2 Code");
+            end;
+
+            trigger OnValidate()
+            begin
+                ValidateShortcutDimCode(2,"Shortcut Dimension 2 Code");
+            end;
+        }
+        field(33;"Allow Line Discount";Boolean)
+        {
+            Caption = 'Allow Line Discount';
+            InitValue = true;
+        }
+        field(34;"Customer Price Group";Code[10])
+        {
+            Caption = 'Customer Price Group';
+        }
+        field(36;"Sales Document Type";Option)
+        {
+            Caption = 'Sales Document Type';
+            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
+            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
+        }
+        field(37;"Sales Document No.";Code[20])
+        {
+            Caption = 'Sales Document No.';
+        }
+        field(39;"Last Shipping No.";Code[20])
+        {
+            Caption = 'Last Shipping No.';
+        }
+        field(40;"Last Posting No.";Code[20])
+        {
+            Caption = 'Last Posting No.';
+        }
+        field(45;"Customer Disc. Group";Code[20])
+        {
+            Caption = 'Customer Disc. Group';
+            Description = 'NPR5.31';
+            TableRelation = "Customer Discount Group";
+        }
+        field(50;"Drawer Opened";Boolean)
+        {
+            Caption = 'Drawer Opened';
+        }
+        field(60;"Send Receipt Email";Boolean)
+        {
+            Caption = 'Send Receipt Email';
+        }
+        field(74;"Gen. Bus. Posting Group";Code[10])
+        {
+            Caption = 'Gen. Bus. Posting Group';
+            Description = 'NPR5.31';
+            TableRelation = "Gen. Business Posting Group";
+        }
+        field(100;"Saved Sale";Boolean)
+        {
+            Caption = 'Saved Sale';
+        }
+        field(101;"Customer Relations";Option)
+        {
+            Caption = 'Customer Relations';
+            OptionCaption = ' ,Customer,Cash Customer';
+            OptionMembers = " ",Customer,"Cash Customer";
+        }
+        field(102;"Last Sale";Boolean)
+        {
+            Caption = 'Last Sale';
+        }
+        field(105;Kontankundenr;Code[20])
+        {
+            Caption = 'Cash Customer No.';
+        }
+        field(106;"Customer Type";Option)
+        {
+            Caption = 'Customer Type';
+            OptionCaption = 'Ordinary,Cash';
+            OptionMembers = Ord,Cash;
+        }
+        field(107;"Org. Bonnr.";Code[20])
+        {
+            Caption = 'Original Ticket No.';
+        }
+        field(108;"Non-editable sale";Boolean)
+        {
+            Caption = 'Non-Editable Sale';
+        }
+        field(109;"Sale type";Option)
+        {
+            Caption = 'Sale type';
+            OptionCaption = 'Sale,Annullment';
+            OptionMembers = Sale,Annullment;
+        }
+        field(111;"Retursalg Bonnummer";Code[20])
+        {
+            Caption = 'Reversesale Ticket No.';
+            Description = 'Giver mulighed for at tilbagef�re KUN �N bon - benyttet i CU Ekspeditionsmenu';
+        }
+        field(112;Parameters;Text[250])
+        {
+            Caption = 'Parameters';
+            Description = 'Overf�r parametre fra ekspeditionen til underfunktioner. Brug f.eks.  � som separator';
+        }
+        field(113;"From Quote no.";Code[20])
+        {
+            Caption = 'From Quote no.';
+        }
+        field(115;"Service No.";Code[20])
+        {
+            Caption = 'Service No.';
+        }
+        field(116;"Stats - Customer Post Code";Code[20])
+        {
+            Caption = 'Stats - Customer Post Code';
+        }
+        field(117;"Retail Document Type";Option)
+        {
+            Caption = 'Document Type';
+            NotBlank = true;
+            OptionCaption = ' ,Selection,Retail Order,Wish,Customization,Delivery,Rental contract,Purchase contract,Qoute';
+            OptionMembers = " ","Selection Contract","Retail Order",Wish,Customization,Delivery,"Rental contract","Purchase contract",Quote;
+        }
+        field(118;"Retail Document No.";Code[20])
+        {
+            Caption = 'No.';
+        }
+        field(119;"Payment Terms Code";Code[10])
+        {
+            Caption = 'Payment Terms Code';
+        }
+        field(120;"Price including VAT";Boolean)
+        {
+            Caption = 'Price including VAT';
+        }
+        field(121;TouchScreen;Boolean)
+        {
+            Caption = 'TouchScreen';
+        }
+        field(123;Deposit;Decimal)
+        {
+            Caption = 'Deposit';
+        }
+        field(126;"Alternative Register No.";Code[20])
+        {
+            Caption = 'Alternative Cash Register No.';
+        }
+        field(127;"Country Code";Code[10])
+        {
+            Caption = 'Country Code';
+            TableRelation = "Country/Region";
+        }
+        field(128;"External Document No.";Code[20])
+        {
+            Caption = 'External Document No.';
+        }
+        field(130;"Custom Print Object ID";Integer)
+        {
+            Caption = 'Custom Print Object ID';
+        }
+        field(131;"Custom Print Object Type";Text[10])
+        {
+            Caption = 'Custom Print Object Type';
+        }
+        field(140;"Issue Tax Free Voucher";Boolean)
+        {
+            Caption = 'Issue Tax Free Voucher';
+        }
+        field(141;"Tax Area Code";Code[20])
+        {
+            Caption = 'Tax Area Code';
+            Description = 'NPR5.31';
+            TableRelation = "Tax Area";
+        }
+        field(142;"Tax Liable";Boolean)
+        {
+            Caption = 'Tax Liable';
+            Description = 'NPR5.31';
+        }
+        field(143;"VAT Bus. Posting Group";Code[10])
+        {
+            Caption = 'VAT Bus. Posting Group';
+            Description = 'NPR5.31';
+            TableRelation = "VAT Business Posting Group";
+        }
+        field(150;"Customer Location No.";Code[20])
+        {
+            Caption = 'Customer Location No.';
+        }
+        field(160;"POS Sale ID";Integer)
+        {
+            AutoIncrement = true;
+            Caption = 'POS Sale ID';
+        }
+        field(170;"Retail ID";Guid)
+        {
+            Caption = 'Retail ID';
+            Description = 'NPR5.50';
+        }
+        field(480;"Dimension Set ID";Integer)
+        {
+            Caption = 'Dimension Set ID';
+            Editable = false;
+            TableRelation = "Dimension Set Entry";
+
+            trigger OnLookup()
+            begin
+                ShowDocDim;
+            end;
+        }
+        field(485;"Customer Name";Text[50])
+        {
+            CalcFormula = Lookup(Customer.Name WHERE ("No."=FIELD("Customer No.")));
+            Caption = 'Customer Name';
+            Description = 'NPR5.37';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+    }
+
+    keys
+    {
+        key(Key1;"Register No.","Sales Ticket No.")
+        {
+        }
+        key(Key2;"Salesperson Code","Saved Sale")
+        {
+        }
+        key(Key3;"Register No.","Saved Sale")
+        {
+        }
+        key(Key4;"Retail ID")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+
+    trigger OnDelete()
+    var
+        SaleLinePOS: Record "Sale Line POS";
+    begin
+        RetailSetup.Get;
+
+        SaleLinePOS.SetRange( "Register No.", "Register No." );
+        SaleLinePOS.SetRange( "Sales Ticket No.", "Sales Ticket No." );
+        SaleLinePOS.DeleteAll(true);
+    end;
+
+    trigger OnInsert()
+    begin
+        RetailSetup.Get;
+
+        Register.Get("Register No.");
+        "Location Code" := Register."Location Code";
+        //-NPR5.30 [261728]
+        //"Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
+        //"Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+        //-NPR5.30 [261728]
+        //-NPR5.31 [263093]
+        "Customer Disc. Group" := Register."Customer Disc. Group";
+        //+NPR5.31 [263093]
+        //-NPR5.29 [262628]
+        "POS Sale ID" := 0;
+        //+NPR5.29 [262628]
+    end;
+
+    var
+        Text1060002: Label 'You are not permitted to enter customers! Contact the system administrator.';
+        RetailSetup: Record "Retail Setup";
+        SalesPerson: Record "Salesperson/Purchaser";
+        DimMgt: Codeunit DimensionManagement;
+        NPRDimMgt: Codeunit NPRDimensionManagement;
+        Register: Record Register;
+        POSUnit: Record "POS Unit";
+        POSStore: Record "POS Store";
+
+    procedure LookUpShortcutDimCode(FieldNumber: Integer;var ShortcutDimCode: Code[20])
+    begin
+        //Lookupshortcutdimcode
+        RetailSetup.Get;
+        if RetailSetup."Use Adv. dimensions" then
+           NPRDimMgt.LookupDimValueCode(FieldNumber,ShortcutDimCode);
+    end;
+
+    procedure DeleteDimOnEkspAndLines()
+    var
+        EkspeditionLinie: Record "Sale Line POS";
+    begin
+        //DeleteDimOnEkspAndLines()
+
+        RetailSetup.Get;
+        if not RetailSetup."Use Adv. dimensions" then
+          exit;
+
+        if "Register No." <> '' then
+          if "Sales Ticket No." <> '' then begin
+            NPRDimMgt.DeleteNPRDim(DATABASE::"Sale POS","Register No.","Sales Ticket No.",0D,0,0,'');
+            EkspeditionLinie.SetRange("Register No.","Register No.");
+            EkspeditionLinie.SetRange("Sales Ticket No.","Sales Ticket No.");
+            with EkspeditionLinie do begin
+              //-NPR5.45 [323705]
+              //IF FIND('-') THEN
+              if FindSet then
+              //+NPR5.45 [323705]
+                repeat
+                  NPRDimMgt.DeleteNPRDim(DATABASE::"Sale Line POS","Register No.",
+                  "Sales Ticket No.",Date,"Sale Type","Line No.",'');
+                until Next = 0;
+            end;
+          end;
+    end;
+
+    procedure CreateDim(Type1: Integer;No1: Code[20];Type2: Integer;No2: Code[20];Type3: Integer;No3: Code[20])
+    var
+        RetailConfiguration: Record "Retail Setup";
+        TableID: array [10] of Integer;
+        No: array [10] of Code[20];
+        OldDimSetID: Integer;
+    begin
+        RetailConfiguration.Get;
+        TableID[1] := Type1;
+        No[1] := No1;
+        TableID[2] := Type2;
+        No[2] := No2;
+        TableID[3] := Type3;
+        No[3] := No3;
+        "Shortcut Dimension 1 Code" := '';
+        "Shortcut Dimension 2 Code" := '';
+        OldDimSetID := "Dimension Set ID";
+        "Dimension Set ID" :=
+          DimMgt.GetDefaultDimID(TableID,No,RetailConfiguration."Posting Source Code","Shortcut Dimension 1 Code","Shortcut Dimension 2 Code",0,0);
+
+        //-NPR5.29
+        // IF (OldDimSetID <> "Dimension Set ID") AND SalesLinesExist THEN BEGIN
+        //  MODIFY;
+        //  UpdateAllLineDim("Dimension Set ID",OldDimSetID);
+        // END;
+        if (OldDimSetID <> "Dimension Set ID") then begin
+          Modify;
+          if SalesLinesExist then
+            UpdateAllLineDim("Dimension Set ID",OldDimSetID);
+        end;
+        //-NPR5.29
+    end;
+
+    procedure ValidateShortcutDimCode(FieldNumber: Integer;var ShortcutDimCode: Code[20])
+    var
+        OldDimSetID: Integer;
+    begin
+        OldDimSetID := "Dimension Set ID";
+        DimMgt.ValidateShortcutDimValues(FieldNumber,ShortcutDimCode,"Dimension Set ID");
+        if "Sales Ticket No." <> '' then
+          Modify;
+
+        if OldDimSetID <> "Dimension Set ID" then begin
+          Modify;
+          if SalesLinesExist then
+            UpdateAllLineDim("Dimension Set ID",OldDimSetID);
+        end;
+    end;
+
+    procedure ShowDocDim()
+    var
+        OldDimSetID: Integer;
+    begin
+        OldDimSetID := "Dimension Set ID";
+        "Dimension Set ID" :=
+          DimMgt.EditDimensionSet2(
+            "Dimension Set ID",StrSubstNo('%1 %2',"Register No.","Sales Ticket No."),
+            "Shortcut Dimension 1 Code","Shortcut Dimension 2 Code");
+        if OldDimSetID <> "Dimension Set ID" then begin
+          Modify;
+          if SalesLinesExist then
+            UpdateAllLineDim("Dimension Set ID",OldDimSetID);
+        end;
+    end;
+
+    procedure UpdateAllLineDim(NewParentDimSetID: Integer;OldParentDimSetID: Integer)
+    var
+        SaleLinePOS: Record "Sale Line POS";
+        NewDimSetID: Integer;
+    begin
+        // Update all lines with changed dimensions.
+        if NewParentDimSetID = OldParentDimSetID then
+          exit;
+
+        // By default always update dimensions
+        // IF NOT CONFIRM(Text064) THEN
+        //   EXIT;
+
+        SaleLinePOS.SetRange("Register No.","Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.","Sales Ticket No.");
+        SaleLinePOS.LockTable;
+        //-NPR5.45 [323705]
+        //IF SaleLinePOS.FIND('-') THEN
+        if SaleLinePOS.FindSet then
+        //+NPR5.45 [323705]
+          repeat
+            NewDimSetID := DimMgt.GetDeltaDimSetID(SaleLinePOS."Dimension Set ID",NewParentDimSetID,OldParentDimSetID);
+            if SaleLinePOS."Dimension Set ID" <> NewDimSetID then begin
+              SaleLinePOS."Dimension Set ID" := NewDimSetID;
+              DimMgt.UpdateGlobalDimFromDimSetID(
+                SaleLinePOS."Dimension Set ID",SaleLinePOS."Shortcut Dimension 1 Code",SaleLinePOS."Shortcut Dimension 2 Code");
+              SaleLinePOS.Modify;
+              // Investigate
+              // ATOLink.UpdateAsmDimFromSalesLine(SalesLine);
+            end;
+          until SaleLinePOS.Next = 0;
+    end;
+
+    procedure SalesLinesExist(): Boolean
+    var
+        SaleLinePOS: Record "Sale Line POS";
+    begin
+        SaleLinePOS.SetRange("Register No.","Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.","Sales Ticket No.");
+        exit(SaleLinePOS.FindFirst);
+    end;
+
+    local procedure GetPOSUnit()
+    begin
+        //-NPR5.30 [261728]
+        if POSUnit."No." <> "Register No." then
+          POSUnit.Get("Register No.");
+        //+NPR5.30 [261728]
+    end;
+
+    local procedure GetPOSStore()
+    begin
+        //-NPR5.30 [261728]
+        if POSStore.Code <> "POS Store Code" then
+          POSStore.Get("POS Store Code");
+        //+NPR5.30 [261728]
+    end;
+}
+
