@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+      <Fields>
+        <Field Name="MemberDate">
+          <DataField>MemberDate</DataField>
+        </Field>
+        <Field Name="QRBlob">
+          <DataField>QRBlob</DataField>
+        </Field>
+        <Field Name="RegisterPicture">
+          <DataField>RegisterPicture</DataField>
+        </Field>
+        <Field Name="MemberType">
+          <DataField>MemberType</DataField>
+        </Field>
+        <Field Name="MemberName">
+          <DataField>MemberName</DataField>
+        </Field>
+        <Field Name="MemberPicture">
+          <DataField>MemberPicture</DataField>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <ReportItems>
+          <Image Name="MemberPicture">
+            <Source>Database</Source>
+            <Value>=Fields!MemberPicture.Value</Value>
+            <MIMEType>image/bmp</MIMEType>
+            <Sizing>FitProportional</Sizing>
+            <Top>1.77836cm</Top>
+            <Left>0.20849cm</Left>
+            <Height>24mm</Height>
+            <Width>35mm</Width>
+            <DataElementOutput>NoOutput</DataElementOutput>
+            <Style />
+          </Image>
+          <Image Name="QRBlob">
+            <Source>Database</Source>
+            <Value>=Fields!QRBlob.Value</Value>
+            <MIMEType>image/bmp</MIMEType>
+            <Sizing>FitProportional</Sizing>
+            <Top>1.82cm</Top>
+            <Left>5.51778cm</Left>
+            <Height>2.7cm</Height>
+            <Width>2.7cm</Width>
+            <ZIndex>1</ZIndex>
+            <DataElementOutput>NoOutput</DataElementOutput>
+            <Style />
+          </Image>
+          <Textbox Name="CustomerName1">
+            <KeepTogether>true</KeepTogether>
+            <Paragraphs>
+              <Paragraph>
+                <TextRuns>
+                  <TextRun>
+                    <Value>=Parameters!ExpiryDate.Value+" "+First(Fields!MemberDate.Value, "DataSet_Result")</Value>
+                    <Style>
+                      <FontStyle>Italic</FontStyle>
+                      <FontSize>9pt</FontSize>
+                    </Style>
+                  </TextRun>
+                </TextRuns>
+                <Style />
+              </Paragraph>
+            </Paragraphs>
+            <rd:DefaultName>CustomerName1</rd:DefaultName>
+            <Top>1.90835in</Top>
+            <Left>0.08208in</Left>
+            <Height>0.19792in</Height>
+            <Width>1.35681in</Width>
+            <ZIndex>2</ZIndex>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+              <PaddingBottom>2pt</PaddingBottom>
+            </Style>
+          </Textbox>
+          <Line Name="Line1">
+            <Top>0.47667in</Top>
+            <Left>0.08208in</Left>
+            <Height>0in</Height>
+            <Width>3.15028in</Width>
+            <ZIndex>3</ZIndex>
+            <Style>
+              <Border>
+                <Color>Firebrick</Color>
+                <Style>Solid</Style>
+              </Border>
+            </Style>
+          </Line>
+          <Line Name="Line2">
+            <Top>1.89446in</Top>
+            <Left>0.08208in</Left>
+            <Height>0in</Height>
+            <Width>3.15028in</Width>
+            <ZIndex>4</ZIndex>
+            <Style>
+              <Border>
+                <Color>Firebrick</Color>
+                <Style>Solid</Style>
+              </Border>
+            </Style>
+          </Line>
+          <Textbox Name="CustomerName2">
+            <KeepTogether>true</KeepTogether>
+            <Paragraphs>
+              <Paragraph>
+                <TextRuns>
+                  <TextRun>
+                    <Value>=First(Fields!MemberType.Value, "DataSet_Result")</Value>
+                    <Style>
+                      <FontSize>9pt</FontSize>
+                      <FontWeight>SemiBold</FontWeight>
+                    </Style>
+                  </TextRun>
+                </TextRuns>
+                <Style />
+              </Paragraph>
+            </Paragraphs>
+            <rd:DefaultName>CustomerName1</rd:DefaultName>
+            <Top>0.48833in</Top>
+            <Left>0.08208in</Left>
+            <Height>0.19792in</Height>
+            <Width>2.02083in</Width>
+            <ZIndex>5</ZIndex>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+              <PaddingBottom>2pt</PaddingBottom>
+            </Style>
+          </Textbox>
+          <Textbox Name="CustomerName3">
+            <KeepTogether>true</KeepTogether>
+            <Paragraphs>
+              <Paragraph>
+                <TextRuns>
+                  <TextRun>
+                    <Value>=First(Fields!MemberName.Value, "DataSet_Result")</Value>
+                    <Style>
+                      <FontWeight>Medium</FontWeight>
+                    </Style>
+                  </TextRun>
+                </TextRuns>
+                <Style />
+              </Paragraph>
+            </Paragraphs>
+            <rd:DefaultName>CustomerName1</rd:DefaultName>
+            <Top>1.64502in</Top>
+            <Left>0.08209in</Left>
+            <Height>0.22525in</Height>
+            <Width>2.09291in</Width>
+            <ZIndex>6</ZIndex>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+              <PaddingBottom>2pt</PaddingBottom>
+            </Style>
+          </Textbox>
+          <Image Name="RegisterPicture">
+            <Source>Database</Source>
+            <Value>=Fields!RegisterPicture.Value</Value>
+            <MIMEType>image/bmp</MIMEType>
+            <Sizing>FitProportional</Sizing>
+            <Top>0.29104cm</Top>
+            <Left>0.49954cm</Left>
+            <Height>8.78761mm</Height>
+            <Width>56.35611mm</Width>
+            <ZIndex>7</ZIndex>
+            <DataElementOutput>NoOutput</DataElementOutput>
+            <Style />
+          </Image>
+        </ReportItems>
+        <Height>5.41cm</Height>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+          <BackgroundColor>White</BackgroundColor>
+        </Style>
+      </Body>
+      <Width>8.66cm</Width>
+      <Page>
+        <PageHeight>5.41cm</PageHeight>
+        <PageWidth>8.66cm</PageWidth>
+        <InteractiveHeight>5.41cm</InteractiveHeight>
+        <InteractiveWidth>8.66cm</InteractiveWidth>
+        <Style>
+          <BackgroundColor>White</BackgroundColor>
+        </Style>
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="ExpiryDate">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ExpiryDate</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ExpiryDate</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <ReportParametersLayout>
+    <GridLayoutDefinition>
+      <NumberOfColumns>1</NumberOfColumns>
+      <NumberOfRows>1</NumberOfRows>
+      <CellDefinitions>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>0</RowIndex>
+          <ParameterName>ExpiryDate</ParameterName>
+        </CellDefinition>
+      </CellDefinitions>
+    </GridLayoutDefinition>
+  </ReportParametersLayout>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+</Report>

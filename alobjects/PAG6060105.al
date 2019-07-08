@@ -1,0 +1,259 @@
+page 6060105 "MM Loyalty Setup"
+{
+    // MM1.17/TSA/20161214  CASE 243075 Member Point System
+    // MM1.19/TSA/20170525  CASE 278061 Handling issues reported by OMA
+    // MM1.23/TSA /20171025 CASE 257011 Added fields "Amount Factor", "Point Rate"
+    // MM1.37/TSA /20190227 CASE 343053 Expire points functionality
+    // MM1.38/TSA /20190425 CASE 338215 Added Loyalty Point Server setups
+
+    Caption = 'Loyalty Setup';
+    PageType = List;
+    SourceTable = "MM Loyalty Setup";
+
+    layout
+    {
+        area(content)
+        {
+            repeater(Group)
+            {
+                field("Code";Code)
+                {
+                }
+                field(Description;Description)
+                {
+                }
+                field("Collection Period";"Collection Period")
+                {
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.37 [343053]
+                        CurrPage.Update (true);
+                        //+MM1.37 [343053]
+                    end;
+                }
+                field("Fixed Period Start";"Fixed Period Start")
+                {
+                    Style = Attention;
+                    StyleExpr = PeriodCalculationIssue;
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.37 [343053]
+                        CurrPage.Update (true);
+                        //+MM1.37 [343053]
+                    end;
+                }
+                field("Collection Period Length";"Collection Period Length")
+                {
+                    Style = Attention;
+                    StyleExpr = PeriodCalculationIssue;
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.37 [343053]
+                        CurrPage.Update (true);
+                        //+MM1.37 [343053]
+                    end;
+                }
+                field("Expire Uncollected Points";"Expire Uncollected Points")
+                {
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.37 [343053]
+                        CurrPage.Update (true);
+                        //+MM1.37 [343053]
+                    end;
+                }
+                field("Expire Uncollected After";"Expire Uncollected After")
+                {
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.37 [343053]
+                        CurrPage.Update (true);
+                        //+MM1.37 [343053]
+                    end;
+                }
+                field(TestDate;TestDate)
+                {
+                    Caption = 'Period Test Date';
+                    Visible = false;
+
+                    trigger OnValidate()
+                    var
+                        LoyaltyPointManagement: Codeunit "MM Loyalty Point Management";
+                    begin
+                        //-MM1.37 [343053]
+                        LoyaltyPointManagement.CalcultatePointsValidPeriod (Rec, TestDate, CollectionPeriodStart, CollectionPeriodEnd);
+                        CurrPage.Update (true);
+                        //+MM1.37 [343053]
+                    end;
+                }
+                field(CollectionPeriodStart;CollectionPeriodStart)
+                {
+                    Caption = 'Earn Period Start';
+                    Editable = false;
+                }
+                field(CollectionPeriodEnd;CollectionPeriodEnd)
+                {
+                    Caption = 'Earn Period End';
+                    Editable = false;
+                }
+                field(ExpirePointsAt;ExpirePointsAt)
+                {
+                    Caption = 'Expire Points At';
+                    Editable = false;
+                }
+                field("Voucher Point Source";"Voucher Point Source")
+                {
+                }
+                field("Voucher Point Threshold";"Voucher Point Threshold")
+                {
+                }
+                field("Voucher Creation";"Voucher Creation")
+                {
+                }
+                field("Point Base";"Point Base")
+                {
+                }
+                field("Amount Base";"Amount Base")
+                {
+                }
+                field("Points On Discounted Sales";"Points On Discounted Sales")
+                {
+                }
+                field("Amount Factor";"Amount Factor")
+                {
+                }
+                field("Point Rate";"Point Rate")
+                {
+                }
+                field(ReasonText;ReasonText)
+                {
+                    Caption = 'ReasonText';
+                    Editable = false;
+                    Style = Attention;
+                    StyleExpr = PeriodCalculationIssue;
+                    Visible = false;
+                }
+            }
+        }
+    }
+
+    actions
+    {
+        area(navigation)
+        {
+            action("Points to Amount Setup")
+            {
+                Caption = 'Points to Amount Setup';
+                Ellipsis = true;
+                Image = LineDiscount;
+                Promoted = true;
+                PromotedIsBig = true;
+                RunObject = Page "MM Loyalty Points Setup";
+                RunPageLink = Code=FIELD(Code);
+            }
+            action("Item Points Setup")
+            {
+                Caption = 'Item Points Setup';
+                Ellipsis = true;
+                Image = CalculateInvoiceDiscount;
+                Promoted = true;
+                PromotedIsBig = true;
+                RunObject = Page "MM Loyalty Item Point Setup";
+                RunPageLink = Code=FIELD(Code);
+            }
+            group("Cross Company Loyalty")
+            {
+                Caption = 'Cross Company Loyalty';
+                action("(Server) Loyalty Server - Store Setup")
+                {
+                    Caption = '(Server) Loyalty Server - Store Setup';
+                    Image = Server;
+                    RunObject = Page "MM Loyalty Store Setup Server";
+                }
+                action("(Client) Loyalty Server Endpoints")
+                {
+                    Caption = '(Client) Loyalty Server Endpoints';
+                    Image = Server;
+                    RunObject = Page "MM NPR Endpoint Setup";
+                }
+                action("(Client) Loyalty Server - Store Setup")
+                {
+                    Caption = '(Client) Loyalty Server - Store Setup';
+                    Image = NumberSetup;
+                    RunObject = Page "MM Loyalty Store Setup Client";
+                }
+            }
+        }
+        area(processing)
+        {
+            action("Expire Points")
+            {
+                Caption = 'Expire Points';
+                Ellipsis = true;
+                Image = Excise;
+                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedCategory = Process;
+                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedIsBig = true;
+
+                trigger OnAction()
+                begin
+
+                    ExpirePoints ();
+                end;
+            }
+        }
+    }
+
+    trigger OnAfterGetRecord()
+    var
+        LoyaltyPointManagement: Codeunit "MM Loyalty Point Management";
+    begin
+
+        //-MM1.37 [343053]
+        CollectionPeriodEnd := 0D;
+        CollectionPeriodStart := 0D;
+        ReasonText := '';
+        if (Rec."Collection Period" = Rec."Collection Period"::FIXED) then begin
+          LoyaltyPointManagement.CalcultatePointsValidPeriod (Rec, TestDate, CollectionPeriodStart, CollectionPeriodEnd);
+
+          ExpirePointsAt := 0D;
+          if ("Expire Uncollected Points") then
+            if (Format ("Expire Uncollected After") <> '') then
+              if (CollectionPeriodEnd <> 0D) then
+                ExpirePointsAt := CalcDate ("Expire Uncollected After", CollectionPeriodEnd);
+
+          PeriodCalculationIssue := not LoyaltyPointManagement.ValidateFixedPeriodCalculation (Rec, ReasonText);
+        end;
+        //+MM1.37 [343053]
+    end;
+
+    trigger OnInit()
+    begin
+        TestDate := Today;
+    end;
+
+    var
+        CollectionPeriodStart: Date;
+        CollectionPeriodEnd: Date;
+        ExpirePointsAt: Date;
+        TestDate: Date;
+        DF_PROBLEM_PREV: Label 'Check your dateformulas - the previous period is not calculating correctly.';
+        DF_PROBLEM_NEXT: Label 'Check your dateformulas - the next period is not calculating correctly.';
+        PeriodCalculationIssue: Boolean;
+        ReasonText: Text;
+
+    local procedure ExpirePoints()
+    var
+        LoyaltyPointManagement: Codeunit "MM Loyalty Point Management";
+    begin
+
+        LoyaltyPointManagement.ExpireFixedPeriodPoints (Rec.Code);
+    end;
+}
+

@@ -1,0 +1,57 @@
+table 6014644 "Tax Free Voucher Sale Link"
+{
+    // NPR5.40/MMV /20180112 CASE 293106 Refactored tax free module
+
+    Caption = 'Tax Free Voucher Sale Link';
+    LookupPageID = "Tax Free Voucher Sale Links";
+
+    fields
+    {
+        field(1;"Voucher Entry No.";Integer)
+        {
+            Caption = 'Voucher Entry No.';
+            TableRelation = "Tax Free Voucher"."Entry No.";
+
+            trigger OnValidate()
+            var
+                TaxFreeVoucher: Record "Tax Free Voucher";
+            begin
+                TaxFreeVoucher.Get("Voucher Entry No.");
+                "Voucher External No." := TaxFreeVoucher."External Voucher No.";
+            end;
+        }
+        field(2;"Sales Ticket No.";Code[20])
+        {
+            Caption = 'Sales Ticket No.';
+        }
+        field(3;"Sales Header Type";Option)
+        {
+            Caption = 'Sales Header Type';
+            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
+            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
+        }
+        field(4;"Sales Header No.";Code[20])
+        {
+            Caption = 'Sales Header No.';
+        }
+        field(20;"Voucher External No.";Text[50])
+        {
+            Caption = 'Voucher External No.';
+        }
+    }
+
+    keys
+    {
+        key(Key1;"Voucher Entry No.","Sales Ticket No.","Sales Header No.","Sales Header Type")
+        {
+        }
+        key(Key2;"Sales Ticket No.")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+}
+

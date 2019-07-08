@@ -1,0 +1,112 @@
+table 6150650 "POS Audit Profile"
+{
+    // NPR5.48/MMV /20181025 CASE 318028 Created object
+
+    Caption = 'POS Audit Profile';
+    LookupPageID = "POS Audit Profiles";
+
+    fields
+    {
+        field(1;"Code";Code[20])
+        {
+            Caption = 'Code';
+        }
+        field(10;"Sale Fiscal No. Series";Code[10])
+        {
+            Caption = 'Sale Fiscal No. Series';
+            TableRelation = "No. Series";
+
+            trigger OnValidate()
+            var
+                NoSeries: Record "No. Series";
+            begin
+                if "Sale Fiscal No. Series" <> '' then begin
+                  NoSeries.Get("Sale Fiscal No. Series");
+                  NoSeries.TestField("Default Nos.",true);
+                end;
+            end;
+        }
+        field(20;"Credit Sale Fiscal No. Series";Code[10])
+        {
+            Caption = 'Credit Sale Fiscal No. Series';
+            TableRelation = "No. Series";
+
+            trigger OnValidate()
+            var
+                NoSeries: Record "No. Series";
+            begin
+                if "Credit Sale Fiscal No. Series" <> '' then begin
+                  NoSeries.Get("Credit Sale Fiscal No. Series");
+                  NoSeries.TestField("Default Nos.",true);
+                end;
+            end;
+        }
+        field(30;"Balancing Fiscal No. Series";Code[10])
+        {
+            Caption = 'Balancing Fiscal No. Series';
+            TableRelation = "No. Series";
+
+            trigger OnValidate()
+            var
+                NoSeries: Record "No. Series";
+            begin
+                if "Balancing Fiscal No. Series" <> '' then begin
+                  NoSeries.Get("Balancing Fiscal No. Series");
+                  NoSeries.TestField("Default Nos.",true);
+                end;
+            end;
+        }
+        field(40;"Fill Sale Fiscal No. On";Option)
+        {
+            Caption = 'Fill Sale Fiscal No. On';
+            OptionCaption = 'All Sales,Successful Sales';
+            OptionMembers = All,Successful;
+        }
+        field(50;"Audit Log Enabled";Boolean)
+        {
+            Caption = 'Audit Log Enabled';
+        }
+        field(60;"Audit Handler";Code[20])
+        {
+            Caption = 'Audit Handler';
+
+            trigger OnLookup()
+            var
+                POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
+            begin
+                POSAuditLogMgt.LookupAuditHandler(Rec);
+            end;
+        }
+        field(70;"Allow Zero Amount Sales";Boolean)
+        {
+            Caption = 'Allow Zero Amount Sales';
+        }
+    }
+
+    keys
+    {
+        key(Key1;"Code")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+
+    trigger OnInsert()
+    begin
+        TestField(Code);
+    end;
+
+    trigger OnModify()
+    begin
+        TestField(Code);
+    end;
+
+    trigger OnRename()
+    begin
+        TestField(Code);
+    end;
+}
+
