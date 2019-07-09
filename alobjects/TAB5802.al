@@ -58,23 +58,5 @@ tableextension 70000046 tableextension70000046 extends "Value Entry"
             Description = 'NPR5.43,NPR5.48';
         }
     }
-    keys
-    {
-        key(Key1;"Item No.","Posting Date","Item Ledger Entry Type","Entry Type","Item Charge No.","Location Code","Variant Code","Global Dimension 1 Code","Global Dimension 2 Code","Vendor No.")
-        {
-        }
-        key(Key2;"Item Ledger Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code","Salespers./Purch. Code","Item Group No.","Item No.","Vendor No.","Source No.","Group Sale")
-        {
-            SumIndexFields = "Invoiced Quantity","Sales Amount (Actual)","Cost Amount (Actual)";
-        }
-        key(Key3;"Group Sale","Posting Date","Salespers./Purch. Code","Item Ledger Entry Type")
-        {
-            SumIndexFields = "Sales Amount (Actual)";
-        }
-        key(Key4;"Salespers./Purch. Code","Item Group No.","Item Ledger Entry Type","Posting Date","Global Dimension 1 Code")
-        {
-            SumIndexFields = "Sales Amount (Actual)","Cost Amount (Actual)","Cost Posted to G/L","Discount Amount","Valued Quantity";
-        }
-    }
 }
 

@@ -86,11 +86,5 @@ tableextension 70000041 tableextension70000041 extends "Item Variant"
             Description = 'VRT1.00';
         }
     }
-    keys
-    {
-        key(Key1;"Item No.","Variety 1 Value","Variety 2 Value","Variety 3 Value","Variety 4 Value")
-        {
-        }
-    }
 }
 
