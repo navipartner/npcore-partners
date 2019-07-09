@@ -14,8 +14,8 @@ codeunit 6150635 "POS Page Navigation"
         POSSalesLineList: Page "POS Sales Line List";
     begin
         Clear(POSSalesLineList);
-        POSSalesLine.SetRange(Type,POSSalesLine.Type::Item);
-        POSSalesLine.SetRange("No.",Item."No.");
+        POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
+        POSSalesLine.SetRange("No.", Item."No.");
         POSSalesLineList.SetTableView(POSSalesLine);
         POSSalesLineList.Run;
     end;
@@ -26,7 +26,7 @@ codeunit 6150635 "POS Page Navigation"
         POSEntryList: Page "POS Entry List";
     begin
         Clear(POSEntryList);
-        POSEntry.SetRange("Contact No.",Contact."No.");
+        POSEntry.SetRange("Contact No.", Contact."No.");
         POSEntryList.SetTableView(POSEntry);
         POSEntryList.Run;
     end;
@@ -37,7 +37,7 @@ codeunit 6150635 "POS Page Navigation"
         POSEntryList: Page "POS Entry List";
     begin
         Clear(POSEntryList);
-        POSEntry.SetRange("Customer No.",Customer."No.");
+        POSEntry.SetRange("Customer No.", Customer."No.");
         POSEntryList.SetTableView(POSEntry);
         POSEntryList.Run;
     end;
@@ -48,10 +48,10 @@ codeunit 6150635 "POS Page Navigation"
         POSEntryList: Page "POS Entry List";
     begin
         Clear(POSEntryList);
-        POSEntry.SetRange("Sales Document Type",SalesHeader."Document Type");
-        POSEntry.SetRange("Sales Document No.",SalesHeader."No.");
+        POSEntry.SetRange("Sales Document Type", SalesHeader."Document Type");
+        POSEntry.SetRange("Sales Document No.", SalesHeader."No.");
         if POSEntry.IsEmpty then
-          exit;
+            exit;
         POSEntryList.SetTableView(POSEntry);
         POSEntryList.Run;
     end;
@@ -60,25 +60,25 @@ codeunit 6150635 "POS Page Navigation"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Page, 30, 'OnAfterActionEvent', 'Action6014400', true, true)]
+    //[EventSubscriber(ObjectType::Page, 30, 'OnAfterActionEvent', 'Action6014400', true, true)]
     local procedure Page30OnAfterActionPOSSalesLines(var Rec: Record Item)
     begin
         OpenPOSSalesLineListFromItem(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Page, 31, 'OnAfterActionEvent', 'Action6014401', true, true)]
+    //[EventSubscriber(ObjectType::Page, 31, 'OnAfterActionEvent', 'Action6014401', true, true)]
     local procedure Page31OnAfterActionPOSSalesLines(var Rec: Record Item)
     begin
         OpenPOSSalesLineListFromItem(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014425, 'OnAfterActionEvent', 'Action6014452', true, true)]
+    //[EventSubscriber(ObjectType::Page, 6014425, 'OnAfterActionEvent', 'Action6014452', true, true)]
     local procedure Page6014425OnAfterActionPOSSalesLines(var Rec: Record Item)
     begin
         OpenPOSSalesLineListFromItem(Rec);
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014511, 'OnAfterActionEvent', 'Action6014411', true, true)]
+    //[EventSubscriber(ObjectType::Page, 6014511, 'OnAfterActionEvent', 'Action6014411', true, true)]
     local procedure Page6014511OnAfterActionPOSSalesLines(var Rec: Record Item)
     begin
         OpenPOSSalesLineListFromItem(Rec);
