@@ -18,129 +18,130 @@ table 6059784 "TM Ticket Type"
 
     fields
     {
-        field(1;"Code";Code[10])
+        field(1; "Code"; Code[10])
         {
             Caption = 'Code';
             NotBlank = true;
         }
-        field(2;Description;Text[30])
+        field(2; Description; Text[30])
         {
             Caption = 'Description';
         }
-        field(15;"Related Ticket Type";Code[20])
+        field(15; "Related Ticket Type"; Code[20])
         {
             Caption = 'Related Ticket Type';
             TableRelation = "TM Ticket Type";
         }
-        field(20;"Print Ticket";Boolean)
+        field(20; "Print Ticket"; Boolean)
         {
             Caption = 'Print Ticket';
         }
-        field(21;"Print Object ID";Integer)
+        field(21; "Print Object ID"; Integer)
         {
             Caption = 'Print Object ID';
-            TableRelation = IF ("Print Object Type"=CONST(CODEUNIT)) AllObj."Object ID" WHERE ("Object Type"=CONST(Codeunit))
-                            ELSE IF ("Print Object Type"=CONST(REPORT)) AllObj."Object ID" WHERE ("Object Type"=CONST(Report));
+            TableRelation = IF ("Print Object Type" = CONST (CODEUNIT)) AllObj."Object ID" WHERE ("Object Type" = CONST (Codeunit))
+            ELSE
+            IF ("Print Object Type" = CONST (REPORT)) AllObj."Object ID" WHERE ("Object Type" = CONST (Report));
         }
-        field(22;"Print Object Type";Option)
+        field(22; "Print Object Type"; Option)
         {
             Caption = 'Print Objekt Type';
             InitValue = TEMPLATE;
             OptionCaption = 'Codeunit,Report,Template';
             OptionMembers = "CODEUNIT","REPORT",TEMPLATE;
         }
-        field(23;"Admission Registration";Option)
+        field(23; "Admission Registration"; Option)
         {
             Caption = 'Admission Registration';
             Description = 'TM1.03';
             OptionCaption = 'Individual,Group';
             OptionMembers = INDIVIDUAL,GROUP;
         }
-        field(30;"No. Series";Code[10])
+        field(30; "No. Series"; Code[10])
         {
             Caption = 'No. Series';
             TableRelation = "No. Series";
         }
-        field(31;"External Ticket Pattern";Code[30])
+        field(31; "External Ticket Pattern"; Code[30])
         {
             Caption = 'External Ticket Pattern';
         }
-        field(35;"Ticket Configuration Source";Option)
+        field(35; "Ticket Configuration Source"; Option)
         {
             Caption = 'Ticket Configuration Source';
             OptionCaption = 'Ticket Type,Ticket BOM';
             OptionMembers = TICKET_TYPE,TICKET_BOM;
         }
-        field(40;"Is Ticket";Boolean)
+        field(40; "Is Ticket"; Boolean)
         {
             Caption = 'Ticket';
             Description = 'DEPRECIATE';
             InitValue = true;
         }
-        field(41;"Is Reservation";Boolean)
+        field(41; "Is Reservation"; Boolean)
         {
             Caption = 'Reservation';
             Description = 'DEPRECIATE';
         }
-        field(45;"Duration Formula";DateFormula)
+        field(45; "Duration Formula"; DateFormula)
         {
             Caption = 'Duration Formula';
             Description = 'TM1.00';
         }
-        field(46;"Max No. Of Entries";Integer)
+        field(46; "Max No. Of Entries"; Integer)
         {
             Caption = 'Max No. Of Entries';
             Description = 'TM1.00';
         }
-        field(60;"Activation Method";Option)
+        field(60; "Activation Method"; Option)
         {
             Caption = 'Activation Method';
             Description = 'TM1.00';
             OptionCaption = 'Scan,(POS) Default Admission,Invoice,(POS) All Admissions,Not Applicable';
             OptionMembers = SCAN,POS_DEFAULT,INVOICE,POS_ALL,NA;
         }
-        field(61;"Defer Revenue";Boolean)
+        field(61; "Defer Revenue"; Boolean)
         {
             Caption = 'Defer Revenue';
             Description = 'TM1.00';
         }
-        field(62;"Ticket Entry Validation";Option)
+        field(62; "Ticket Entry Validation"; Option)
         {
             Caption = 'Ticket Entry Validation';
             Description = 'TM1.00';
             OptionCaption = 'Single,Same Day,Multiple,Not Applicable';
             OptionMembers = SINGLE,SAME_DAY,MULTIPLE,NA;
         }
-        field(70;"Membership Sales Item No.";Code[20])
+        field(70; "Membership Sales Item No."; Code[20])
         {
             Caption = 'Membership Sales Item No.';
             TableRelation = Item;
         }
-        field(80;"RP Template Code";Code[20])
+        field(80; "RP Template Code"; Code[20])
         {
             Caption = 'RP Template Code';
             TableRelation = "RP Template Header";
 
             trigger OnValidate()
             begin
-                TestField ("Print Object Type", "Print Object Type"::TEMPLATE);
+                TestField("Print Object Type", "Print Object Type"::TEMPLATE);
             end;
         }
-        field(100;"DIY Print Layout Code";Text[30])
+        field(100; "DIY Print Layout Code"; Text[30])
         {
             Caption = 'Ticket Layout Code';
         }
-        field(200;"eTicket Template";BLOB)
+        field(200; "eTicket Template"; BLOB)
         {
             Caption = 'eTicket Template';
             Description = '//-TM1.38 [332109]';
         }
-        field(210;"eTicket Type Code";Text[30])
+        field(210; "eTicket Type Code"; Text[30])
         {
             Caption = 'eTicket Type Code';
             Description = '//-TM1.38 [332109]';
         }
-        field(220;"eTicket Activated";Boolean)
+        field(220; "eTicket Activated"; Boolean)
         {
             Caption = 'eTicket Activated';
             Description = '//-TM1.38 [332109]';
@@ -151,13 +152,13 @@ table 6059784 "TM Ticket Type"
             begin
 
                 if ("eTicket Activated") then begin
-                  TicketSetup.Get ();
-                  TicketSetup.TestField ("NP-Pass Token");
+                    TicketSetup.Get();
+                    TicketSetup.TestField("NP-Pass Token");
 
-                  TestField ("eTicket Type Code");
-                  CalcFields ("eTicket Template");
-                  if (not Rec."eTicket Template".HasValue ()) then
-                    Error ('%1 is not initialized.', Rec.FieldCaption ("eTicket Template"));
+                    TestField("eTicket Type Code");
+                    CalcFields("eTicket Template");
+                    if (not Rec."eTicket Template".HasValue()) then
+                        Error('%1 is not initialized.', Rec.FieldCaption("eTicket Template"));
 
                 end;
             end;
@@ -166,7 +167,7 @@ table 6059784 "TM Ticket Type"
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
@@ -184,10 +185,10 @@ table 6059784 "TM Ticket Type"
         Path: Text[1024];
     begin
 
-        Path := ExportPassTemplate (false);
-        RunPassTemplateEditor (Path, FieldCaption ("eTicket Template"));
-        ImportPassTemplate (Path, false);
-        FileManagement.DeleteClientFile (Path);
+        Path := ExportPassTemplate(false);
+        RunPassTemplateEditor(Path, FieldCaption("eTicket Template"));
+        ImportPassTemplate(Path, false);
+        FileManagement.DeleteClientFile(Path);
     end;
 
     local procedure ExportPassTemplate(UseDialog: Boolean) Path: Text[1024]
@@ -200,76 +201,65 @@ table 6059784 "TM Ticket Type"
         IsDownloaded: Boolean;
     begin
 
-        CalcFields ("eTicket Template");
-        if (not "eTicket Template".HasValue() ) then begin
-          PassData := TicketRequestManager.GetDefaultTemplate ();
-          "eTicket Template".CreateOutStream (outstream);
-          outstream.Write (PassData);
-          Modify ();
-          CalcFields ("eTicket Template");
+        CalcFields("eTicket Template");
+        if (not "eTicket Template".HasValue()) then begin
+            PassData := TicketRequestManager.GetDefaultTemplate();
+            "eTicket Template".CreateOutStream(outstream);
+            outstream.Write(PassData);
+            Modify();
+            CalcFields("eTicket Template");
         end;
 
-        "eTicket Template".CreateInStream (instream);
+        "eTicket Template".CreateInStream(instream);
 
         if (not UseDialog) then begin
-          ToFile :=  FileManagement.ClientTempFileName ('json');
+            ToFile := FileManagement.ClientTempFileName('json');
         end else begin
-          ToFile := 'template.json';
+            ToFile := 'template.json';
         end;
 
-        IsDownloaded := DownloadFromStream (instream, 'Export', '', '', ToFile);
+        IsDownloaded := DownloadFromStream(instream, 'Export', '', '', ToFile);
         if (IsDownloaded) then
-          exit (ToFile);
+            exit(ToFile);
 
-        Error ('Export failed.');
+        Error('Export failed.');
     end;
 
-    local procedure ImportPassTemplate(Path: Text[1024];UseDialog: Boolean)
+    local procedure ImportPassTemplate(Path: Text[1024]; UseDialog: Boolean)
     var
-        AdoStream: Automation npNet;
-        AdoStream2: Automation npNet;
         TempBlob: Record TempBlob temporary;
         outstream: OutStream;
         instream: InStream;
     begin
 
         if (UseDialog) then begin
-          FileManagement.BLOBImport (TempBlob, '*.json');
+            FileManagement.BLOBImport(TempBlob, '*.json');
         end else begin
-          FileManagement.BLOBImport (TempBlob, Path);
+            FileManagement.BLOBImport(TempBlob, Path);
         end;
 
-        TempBlob.Blob.CreateInStream (instream);
-        "eTicket Template".CreateOutStream (outstream, TEXTENCODING::UTF8);
-        CopyStream (outstream, instream);
+        TempBlob.Blob.CreateInStream(instream);
+        "eTicket Template".CreateOutStream(outstream, TEXTENCODING::UTF8);
+        CopyStream(outstream, instream);
 
         Modify(true);
     end;
 
-    local procedure RunPassTemplateEditor(Path: Text[1024];desc: Text[100])
+    local procedure RunPassTemplateEditor(Path: Text[1024]; desc: Text[100])
     var
         ret: Integer;
         f: File;
         extra: Text[30];
     begin
 
-        RunCmdModal('"notepad.exe" "'+ Path + '"');
+        RunCmdModal('"notepad.exe" "' + Path + '"');
     end;
 
     procedure RunCmdModal(Command: Text[250]) int: Integer
     var
-        wsh: Automation npNet;
-        wshExec: Automation npNet;
         i: Integer;
     begin
-        Create(wsh,true,true);
-        wshExec := wsh.Exec(Command);
-        repeat
-          i := wshExec.Status;
-          Sleep(100);
-        until i <> 0;
-        Clear(wsh);
-        exit(wshExec.ExitCode);
+        Error('AL-Conversion: TODO #361414');
     end;
 }
 
