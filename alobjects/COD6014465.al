@@ -90,25 +90,25 @@ codeunit 6014465 "String Library"
         Index := 1;
         String := _String;
         while (Index > 0) and (Occurences < 100) do begin
-          Index  := StrPos(String,Sequence);
-          if Index > 0 then begin
-            Occurences += 1;
-            String := CopyStr(String,Index+StrLen(Sequence));
-          end;
+            Index := StrPos(String, Sequence);
+            if Index > 0 then begin
+                Occurences += 1;
+                String := CopyStr(String, Index + StrLen(Sequence));
+            end;
         end;
     end;
 
     procedure DeletePrefix(Text: Text[30])
     begin
         if StartsWith(Text) then begin
-          _String := CopyStr(_String,StrLen(Text)+1);
+            _String := CopyStr(_String, StrLen(Text) + 1);
         end;
     end;
 
     procedure DeleteSuffix(Text: Text[30])
     begin
         if EndsWith(Text) then begin
-          _String := CopyStr(_String,1,StrLen(_String) - StrLen(Text));
+            _String := CopyStr(_String, 1, StrLen(_String) - StrLen(Text));
         end;
     end;
 
@@ -120,28 +120,28 @@ codeunit 6014465 "String Library"
         SuffixLen := StrLen(Text);
         TextLen := StrLen(_String);
 
-        exit(CopyStr(_String,TextLen - SuffixLen + 1) = Text);
+        exit(CopyStr(_String, TextLen - SuffixLen + 1) = Text);
     end;
 
-    procedure GetPrefixBySeq(Sequence: Text[10];n: Integer) Prefix: Text[512]
+    procedure GetPrefixBySeq(Sequence: Text[10]; n: Integer) Prefix: Text[512]
     var
         Occurences: Integer;
         Suffix: Text[512];
         Index: Integer;
     begin
         if (CountOccurences(Sequence) < n) then
-          exit(_String);
+            exit(_String);
         Suffix := _String;
         Index := 1;
         while (n > 0) and (Index > 0) do begin
-          Index := StrPos(Suffix,Sequence);
-          if Index > 0 then begin
-            n -= 1;
-            Prefix += CopyStr(Suffix,1,Index);
-            Suffix := CopyStr(Suffix,Index + 1);
-           end;
+            Index := StrPos(Suffix, Sequence);
+            if Index > 0 then begin
+                n -= 1;
+                Prefix += CopyStr(Suffix, 1, Index);
+                Suffix := CopyStr(Suffix, Index + 1);
+            end;
         end;
-        Prefix := CopyStr(Prefix,1,StrLen(Prefix)-1)
+        Prefix := CopyStr(Prefix, 1, StrLen(Prefix) - 1)
     end;
 
     procedure GetSentence("Sentence Length": Integer): Text[1024]
@@ -150,31 +150,31 @@ codeunit 6014465 "String Library"
         LastSpace: Integer;
     begin
         for Index := 1 to "Sentence Length" do
-          if _String[Index] = ' ' then LastSpace := Index;
-        exit(CopyStr(_String,1,LastSpace));
+            if _String[Index] = ' ' then LastSpace := Index;
+        exit(CopyStr(_String, 1, LastSpace));
     end;
 
-    procedure GetSuffixBySeq(Sequence: Text[10];n: Integer) Suffix: Text[512]
+    procedure GetSuffixBySeq(Sequence: Text[10]; n: Integer) Suffix: Text[512]
     var
         Occurences: Integer;
         Prefix: Text[512];
         Index: Integer;
     begin
         if (CountOccurences(Sequence) < n) then
-          exit('');
+            exit('');
         Suffix := _String;
         Index := 1;
         while (n > 0) and (Index > 0) do begin
-          Index := StrPos(Suffix,Sequence);
-          if Index > 0 then begin
-            n -= 1;
-            Prefix += CopyStr(Suffix,1,Index);
-            Suffix := CopyStr(Suffix,Index + 1);
-           end;
+            Index := StrPos(Suffix, Sequence);
+            if Index > 0 then begin
+                n -= 1;
+                Prefix += CopyStr(Suffix, 1, Index);
+                Suffix := CopyStr(Suffix, Index + 1);
+            end;
         end;
     end;
 
-    procedure Replace(_What: Text[30];_With: Text[30])
+    procedure Replace(_What: Text[30]; _With: Text[30])
     var
         Index: Integer;
         Replacements: Integer;
@@ -182,15 +182,16 @@ codeunit 6014465 "String Library"
         if _What = _With then exit;
         Index := 1;
         while (Index >= 0) and (Replacements < 100) do begin
-          Replacements += 1;
-          if (StrPos(CopyStr(_String,Index),_What) > 0) then
-            Index     := StrPos(CopyStr(_String,Index),_What) + (Index-1)
-          else Index := -1;
-          if Index > 0 then begin
-            _String := DelStr(_String,Index,StrLen(_What));
-            _String := InsStr(_String,_With,Index);
-            Index   += StrLen(_With);
-          end;
+            Replacements += 1;
+            if (StrPos(CopyStr(_String, Index), _What) > 0) then
+                Index := StrPos(CopyStr(_String, Index), _What) + (Index - 1)
+            else
+                Index := -1;
+            if Index > 0 then begin
+                _String := DelStr(_String, Index, StrLen(_What));
+                _String := InsStr(_String, _With, Index);
+                Index += StrLen(_With);
+            end;
         end;
     end;
 
@@ -199,54 +200,54 @@ codeunit 6014465 "String Library"
         "String Length": Integer;
         Index: Integer;
     begin
-        "String Length" := StrLen(_String) +1;
+        "String Length" := StrLen(_String) + 1;
         Index := 1;
         while Index < "String Length" do begin
-          case true of
-            LowerCase(CopyStr(_String,Index,1)) in ['0','1','2','3','4','5','6','7','8','9',
-                                                     'a','b','c','d','e','f','g','h','i','j',
-                                                     'k','l','m','n','o','p','q','r','s','t',
-                                                     'u','v','w','x','y','z',
-                                                     '.',';',',',':','-'] :
-              begin
-                //continue to next index
-              end;
-            CopyStr(_String,Index,1) in ['�','�'] :
-              begin
-                _String := DelStr(_String,Index,1);
-                _String := InsStr(_String,'a',Index);
-              end;
-            CopyStr(_String,Index,1) in ['�','�'] :
-              begin
-                _String := DelStr(_String,Index,1);
-                _String := InsStr(_String,'A',Index);
-              end;
-            CopyStr(_String,Index,1) in ['�','�'] :
-              begin
-                _String := DelStr(_String,Index,1);
-                _String := InsStr(_String,'o',Index);
-              end;
-            CopyStr(_String,Index,1) in ['�','�'] :
-              begin
-                _String := DelStr(_String,Index,1);
-                _String := InsStr(_String,'O',Index);
-              end;
-            CopyStr(_String,Index,1) in ['�','�','�','�'] :
-              begin
-                _String := DelStr(_String,Index,1);
-                _String := InsStr(_String,'E',Index);
-              end;
-            CopyStr(_String,Index,1) in ['�','�','�','�'] :
-              begin
-                _String := DelStr(_String,Index,1);
-                _String := InsStr(_String,'e',Index);
-              end;
-            else begin
-              _String := DelStr(_String,Index,1);
-              _String := InsStr(_String,'-',Index);
-             end;
-          end;
-          Index +=1;
+            case true of
+                LowerCase(CopyStr(_String, Index, 1)) in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                                                         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+                                                         'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+                                                         'u', 'v', 'w', 'x', 'y', 'z',
+                                                         '.', ';', ',', ':', '-']:
+                    begin
+                        //continue to next index
+                    end;
+                CopyStr(_String, Index, 1) in ['æ', 'å']:
+                    begin
+                        _String := DelStr(_String, Index, 1);
+                        _String := InsStr(_String, 'a', Index);
+                    end;
+                CopyStr(_String, Index, 1) in ['Æ', 'Å']:
+                    begin
+                        _String := DelStr(_String, Index, 1);
+                        _String := InsStr(_String, 'A', Index);
+                    end;
+                CopyStr(_String, Index, 1) in ['ø', 'ö']:
+                    begin
+                        _String := DelStr(_String, Index, 1);
+                        _String := InsStr(_String, 'o', Index);
+                    end;
+                CopyStr(_String, Index, 1) in ['Ø', 'Ö']:
+                    begin
+                        _String := DelStr(_String, Index, 1);
+                        _String := InsStr(_String, 'O', Index);
+                    end;
+                CopyStr(_String, Index, 1) in ['É', 'È', 'Ë', 'Ê']:
+                    begin
+                        _String := DelStr(_String, Index, 1);
+                        _String := InsStr(_String, 'E', Index);
+                    end;
+                CopyStr(_String, Index, 1) in ['è', 'é', 'ë', 'ê']:
+                    begin
+                        _String := DelStr(_String, Index, 1);
+                        _String := InsStr(_String, 'e', Index);
+                    end;
+                else begin
+                        _String := DelStr(_String, Index, 1);
+                        _String := InsStr(_String, '-', Index);
+                    end;
+            end;
+            Index += 1;
         end;
     end;
 
@@ -255,57 +256,57 @@ codeunit 6014465 "String Library"
         "String Length": Integer;
         Index: Integer;
     begin
-        "String Length" := StrLen(_String) +1;
+        "String Length" := StrLen(_String) + 1;
         Index := 1;
         while Index < "String Length" do begin
-          case true of
-            LowerCase(CopyStr(_String,Index,1)) in ['0','1','2','3','4','5','6','7','8','9',
-                                                     'a','b','c','d','e','f','g','h','i','j',
-                                                     'k','l','m','n','o','p','q','r','s','t',
-                                                     'u','v','w','x','y','z','-'] :
-              begin
-                //continue to next index
-              end;
-            CopyStr(_String,Index,1) in ['�','�'] :
-              begin
-                _String := DelStr(_String,Index,1);
-                _String := InsStr(_String,'a',Index);
-              end;
-            CopyStr(_String,Index,1) in ['�','�'] :
-              begin
-                _String := DelStr(_String,Index,1);
-                _String := InsStr(_String,'A',Index);
-              end;
-            CopyStr(_String,Index,1) in ['�','�'] :
-              begin
-                _String := DelStr(_String,Index,1);
-                _String := InsStr(_String,'o',Index);
-              end;
-            CopyStr(_String,Index,1) in ['�','�'] :
-              begin
-                _String := DelStr(_String,Index,1);
-                _String := InsStr(_String,'O',Index);
-              end;
-            CopyStr(_String,Index,1) in ['�','�','�','�'] :
-              begin
-                _String := DelStr(_String,Index,1);
-                _String := InsStr(_String,'E',Index);
-              end;
-            CopyStr(_String,Index,1) in ['�','�','�','�'] :
-              begin
-                _String := DelStr(_String,Index,1);
-                _String := InsStr(_String,'e',Index);
-              end;
-            else begin
-              _String := DelStr(_String,Index,1);
-              _String := InsStr(_String,'-',Index);
-             end;
-          end;
-          Index +=1;
+            case true of
+                LowerCase(CopyStr(_String, Index, 1)) in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                                                         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+                                                         'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+                                                         'u', 'v', 'w', 'x', 'y', 'z', '-']:
+                    begin
+                        //continue to next index
+                    end;
+                CopyStr(_String, Index, 1) in ['æ', 'å']:
+                    begin
+                        _String := DelStr(_String, Index, 1);
+                        _String := InsStr(_String, 'a', Index);
+                    end;
+                CopyStr(_String, Index, 1) in ['Æ', 'Å']:
+                    begin
+                        _String := DelStr(_String, Index, 1);
+                        _String := InsStr(_String, 'A', Index);
+                    end;
+                CopyStr(_String, Index, 1) in ['ø', 'ö']:
+                    begin
+                        _String := DelStr(_String, Index, 1);
+                        _String := InsStr(_String, 'o', Index);
+                    end;
+                CopyStr(_String, Index, 1) in ['Ø', 'Ö']:
+                    begin
+                        _String := DelStr(_String, Index, 1);
+                        _String := InsStr(_String, 'O', Index);
+                    end;
+                CopyStr(_String, Index, 1) in ['É', 'È', 'Ë', 'Ê']:
+                    begin
+                        _String := DelStr(_String, Index, 1);
+                        _String := InsStr(_String, 'E', Index);
+                    end;
+                CopyStr(_String, Index, 1) in ['è', 'é', 'ë', 'ê']:
+                    begin
+                        _String := DelStr(_String, Index, 1);
+                        _String := InsStr(_String, 'e', Index);
+                    end;
+                else begin
+                        _String := DelStr(_String, Index, 1);
+                        _String := InsStr(_String, '-', Index);
+                    end;
+            end;
+            Index += 1;
         end;
     end;
 
-    procedure SelectStringSep(Index: Integer;Sep: Text[10]): Text[250]
+    procedure SelectStringSep(Index: Integer; Sep: Text[10]): Text[250]
     var
         Int1: Integer;
         Int2: Integer;
@@ -314,22 +315,22 @@ codeunit 6014465 "String Library"
     begin
         String := _String;
         Itt := 1;
-        Int1:= 1;
+        Int1 := 1;
         while Itt < Index do begin
-          Int1   := StrPos(String,Sep) + StrLen(Sep);
-          String := CopyStr(String,Int1);
-          Itt += 1;
+            Int1 := StrPos(String, Sep) + StrLen(Sep);
+            String := CopyStr(String, Int1);
+            Itt += 1;
         end;
-        Int2 := StrPos(String,Sep);
+        Int2 := StrPos(String, Sep);
         if Int2 > 0 then
-          exit(CopyStr(String,1,Int2-1))
+            exit(CopyStr(String, 1, Int2 - 1))
         else
-          exit(String);
+            exit(String);
     end;
 
     procedure SelectString(Index: Integer): Text[250]
     begin
-        exit(SelectStringSep(Index,','));
+        exit(SelectStringSep(Index, ','));
     end;
 
     procedure StartsWith(Text: Text[30]) IsPrefix: Boolean
@@ -337,7 +338,7 @@ codeunit 6014465 "String Library"
         SuffixLen: Integer;
     begin
         SuffixLen := StrLen(Text);
-        exit(CopyStr(_String,1,SuffixLen) = Text);
+        exit(CopyStr(_String, 1, SuffixLen) = Text);
     end;
 
     procedure Text(): Text[1024]
@@ -350,13 +351,13 @@ codeunit 6014465 "String Library"
         Index: Integer;
     begin
         while CopyStr(_String, 1, StrLen(Sequence)) = Sequence do
-          _String := CopyStr(_String,1+StrLen(Sequence));
+            _String := CopyStr(_String, 1 + StrLen(Sequence));
     end;
 
     procedure TrimEnd(Sequence: Text[10])
     begin
-        while CopyStr(_String, StrLen(_String)-StrLen(Sequence)+1) = Sequence do
-          _String := CopyStr(_String,1,StrLen(_String)-StrLen(Sequence));
+        while CopyStr(_String, StrLen(_String) - StrLen(Sequence) + 1) = Sequence do
+            _String := CopyStr(_String, 1, StrLen(_String) - StrLen(Sequence));
     end;
 
     procedure TrimWhiteSpace(StringToTrim: Text[1024]): Text[1024]
@@ -366,26 +367,27 @@ codeunit 6014465 "String Library"
         Tab: Char;
     begin
         Tab := 9;
-        Lf  := 10;
-        Cr  := 13;
+        Lf := 10;
+        Cr := 13;
         exit(DelChr(StringToTrim, '=', Format(Tab) + Format(Lf) + Format(Cr) + ' '));
     end;
 
-    procedure PadStrLeft(String: Text[60];TotalStrLen: Integer;PadChar: Text[30];After: Boolean) OutStr: Text[100]
+    procedure PadStrLeft(String: Text[60]; TotalStrLen: Integer; PadChar: Text[30]; After: Boolean) OutStr: Text[100]
     var
         i: Integer;
     begin
-        OutStr:='';
-        for i:=1 to TotalStrLen-StrLen(String) do begin
-          if PadChar <> '' then
-            OutStr:=OutStr + PadChar
-          else OutStr:=OutStr + ' ';
+        OutStr := '';
+        for i := 1 to TotalStrLen - StrLen(String) do begin
+            if PadChar <> '' then
+                OutStr := OutStr + PadChar
+            else
+                OutStr := OutStr + ' ';
         end;
 
         if After then
-          OutStr := String + OutStr
+            OutStr := String + OutStr
         else
-          OutStr := OutStr + String
+            OutStr := OutStr + String
     end;
 }
 
