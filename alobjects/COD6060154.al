@@ -764,7 +764,7 @@ codeunit 6060154 "Event Ticket Management"
 
     procedure DownloadTicket(Rec: Record "Job Planning Line") FileName: Text
     var
-        WebClient: DotNet WebClient;
+        WebClient: DotNet npNetWebClient;
         FileMgt: Codeunit "File Management";
         LocalFileName: Text;
     begin

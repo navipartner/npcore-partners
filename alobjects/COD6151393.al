@@ -30,9 +30,9 @@ codeunit 6151393 "CS UI Put Inv. List"
         XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "CS Communication";
         CSMgt: Codeunit "CS Management";
-        DOMxmlin: DotNet XmlDocument;
-        RootNode: DotNet XmlNode;
-        ReturnedNode: DotNet XmlNode;
+        DOMxmlin: DotNet npNetXmlDocument;
+        RootNode: DotNet npNetXmlNode;
+        ReturnedNode: DotNet npNetXmlNode;
         RecRef: RecordRef;
         TextValue: Text[250];
         CSUserId: Text[250];

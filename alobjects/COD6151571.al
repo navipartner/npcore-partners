@@ -13,56 +13,56 @@ codeunit 6151571 "AF Helper Functions"
     var
         TXT001: Label 'Clear the customer tag and disable notifications?';
 
-    procedure GetValueAsText(JObject: DotNet JObject;PropertyName: Text) ReturnValue: Text
+    procedure GetValueAsText(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Text
     begin
         ReturnValue := JObject.GetValue(PropertyName).ToString;
     end;
 
-    procedure GetValueAsInteger(JObject: DotNet JObject;PropertyName: Text) ReturnValue: Integer
+    procedure GetValueAsInteger(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Integer
     var
-        DotNetInteger: DotNet Int32;
+        DotNetInteger: DotNet npNetInt32;
     begin
         ReturnValue := DotNetInteger.Parse(JObject.GetValue(PropertyName).ToString);
     end;
 
-    procedure GetValueAsDecimal(JObject: DotNet JObject;PropertyName: Text) ReturnValue: Decimal
+    procedure GetValueAsDecimal(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Decimal
     var
-        DotNetDecimal: DotNet Decimal;
-        CultureInfo: DotNet CultureInfo;
+        DotNetDecimal: DotNet npNetDecimal;
+        CultureInfo: DotNet npNetCultureInfo;
     begin
         ReturnValue := DotNetDecimal.Parse(JObject.GetValue(PropertyName).ToString,CultureInfo.InvariantCulture);
     end;
 
-    procedure GetValueAsDate(JObject: DotNet JObject;PropertyName: Text) ReturnValue: Date
+    procedure GetValueAsDate(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Date
     var
-        DotNetDateTime: DotNet DateTime;
-        CultureInfo: DotNet CultureInfo;
+        DotNetDateTime: DotNet npNetDateTime;
+        CultureInfo: DotNet npNetCultureInfo;
     begin
         DotNetDateTime := JObject.GetValue(PropertyName).ToObject(GetDotNetType(DotNetDateTime));
         ReturnValue := DT2Date(DotNetDateTime);
     end;
 
-    procedure GetValueAsTime(JObject: DotNet JObject;PropertyName: Text) ReturnValue: Time
+    procedure GetValueAsTime(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Time
     var
-        DotNetDateTime: DotNet DateTime;
-        CultureInfo: DotNet CultureInfo;
+        DotNetDateTime: DotNet npNetDateTime;
+        CultureInfo: DotNet npNetCultureInfo;
     begin
         DotNetDateTime := JObject.GetValue(PropertyName).ToObject(GetDotNetType(DotNetDateTime));
         ReturnValue := DT2Time(DotNetDateTime);
     end;
 
-    procedure GetValueAsDateTime(JObject: DotNet JObject;PropertyName: Text) ReturnValue: DateTime
+    procedure GetValueAsDateTime(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: DateTime
     var
-        DotNetDateTime: DotNet DateTime;
-        CultureInfo: DotNet CultureInfo;
+        DotNetDateTime: DotNet npNetDateTime;
+        CultureInfo: DotNet npNetCultureInfo;
     begin
         DotNetDateTime := JObject.GetValue(PropertyName).ToObject(GetDotNetType(DotNetDateTime));
         ReturnValue := DotNetDateTime;
     end;
 
-    procedure GetValueAsBoolean(JObject: DotNet JObject;PropertyName: Text) ReturnValue: Boolean
+    procedure GetValueAsBoolean(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Boolean
     var
-        DotNetBoolean: DotNet Boolean;
+        DotNetBoolean: DotNet npNetBoolean;
     begin
         ReturnValue := DotNetBoolean.Parse(JObject.GetValue(PropertyName).ToString);
     end;
@@ -77,7 +77,7 @@ codeunit 6151571 "AF Helper Functions"
 
     procedure GetDateTimeAsText(DateTimeNow: DateTime): Text
     var
-        DotNetDateTime: DotNet DateTime;
+        DotNetDateTime: DotNet npNetDateTime;
     begin
         DotNetDateTime := DateTimeNow;
         exit(DotNetDateTime.ToString('yyyy-MM-dd hh:mm:ss'));
@@ -106,7 +106,7 @@ codeunit 6151571 "AF Helper Functions"
 
     procedure RemoveLastIndexOf(TextToTrim: Text;CharToTrim: Text): Text
     var
-        DotNetString: DotNet String;
+        DotNetString: DotNet npNetString;
         Index: Integer;
     begin
         if (TextToTrim = '') or (CharToTrim = '') then
@@ -121,7 +121,7 @@ codeunit 6151571 "AF Helper Functions"
     end;
 
     [TryFunction]
-    procedure TryParse(json: Text;var JToken: DotNet JToken)
+    procedure TryParse(json: Text;var JToken: DotNet npNetJToken)
     begin
         JToken := JToken.Parse(json);
     end;
@@ -130,9 +130,9 @@ codeunit 6151571 "AF Helper Functions"
     var
         RecRef: RecordRef;
         FldRef: FieldRef;
-        OptionString: DotNet String;
-        Options: DotNet Array;
-        Separator: DotNet String;
+        OptionString: DotNet npNetString;
+        Options: DotNet npNetArray;
+        Separator: DotNet npNetString;
     begin
         if not RecordVariant.IsRecord then
           exit;
@@ -151,9 +151,9 @@ codeunit 6151571 "AF Helper Functions"
         TmpMagentoPicture: Record "Magento Picture" temporary;
         MagentoPicture: Record "Magento Picture";
         MagentoPictureLink: Record "Magento Picture Link";
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
     begin
         MagentoPictureLink.SetRange("Item No.",Item."No.");
@@ -197,8 +197,8 @@ codeunit 6151571 "AF Helper Functions"
 
     procedure ConvertValueFromBase64(base64Value: Text) stringValue: Text
     var
-        Convert: DotNet Convert;
-        Encoding: DotNet Encoding;
+        Convert: DotNet npNetConvert;
+        Encoding: DotNet npNetEncoding;
     begin
         if base64Value = '' then
           exit('');
@@ -209,8 +209,8 @@ codeunit 6151571 "AF Helper Functions"
 
     procedure ConvertValueToBase64(stringValue: Text) base64Value: Text
     var
-        Convert: DotNet Convert;
-        Encoding: DotNet Encoding;
+        Convert: DotNet npNetConvert;
+        Encoding: DotNet npNetEncoding;
     begin
         if stringValue = '' then
           exit('');

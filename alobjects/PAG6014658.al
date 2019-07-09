@@ -74,7 +74,7 @@ page 6014658 ".NET Assemblies"
                 var
                     ManagedDepMgt: Codeunit "Managed Dependency Mgt.";
                     Rec2: Record ".NET Assembly";
-                    JArray: DotNet JArray;
+                    JArray: DotNet npNetJArray;
                 begin
                     CurrPage.SetSelectionFilter(Rec2);
                     //-NPR5.32.10 [265454]
@@ -104,8 +104,8 @@ page 6014658 ".NET Assemblies"
     var
         TempBlob: Record TempBlob;
         FileManagement: Codeunit "File Management";
-        Asm: DotNet Assembly;
-        Path: DotNet Path;
+        Asm: DotNet npNetAssembly;
+        Path: DotNet npNetPath;
         InStr: InStream;
         FileName: Text;
         AllFilesTxt: Label 'All Files';

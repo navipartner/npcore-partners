@@ -20,11 +20,11 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
         NpGpGlobalSalesSetup: Record "NpGp POS Sales Setup";
         NPRetailSetup: Record "NP Retail Setup";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        WebException: DotNet npNetWebException;
         OutStr: OutStream;
         ErrorMessage: Text;
         Response: Text;
@@ -74,7 +74,7 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
         NcTask.Modify;
     end;
 
-    local procedure InitReqBody(POSEntry: Record "POS Entry";ServiceName: Text;var XmlDoc: DotNet XmlDocument)
+    local procedure InitReqBody(POSEntry: Record "POS Entry";ServiceName: Text;var XmlDoc: DotNet npNetXmlDocument)
     var
         POSSalesLine: Record "POS Sales Line";
         POSInfoPOSEntry: Record "POS Info POS Entry";
@@ -226,12 +226,12 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
     procedure TryGetGlobalPosSalesService(NpGpPOSSalesSetup: Record "NpGp POS Sales Setup")
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
     begin
         NpGpPOSSalesSetup.TestField("Service Url");
@@ -260,7 +260,7 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
     end;
 
     [TryFunction]
-    local procedure TryGetWebResponse(HttpWebRequest: DotNet HttpWebRequest;var HttpWebResponse: DotNet HttpWebResponse)
+    local procedure TryGetWebResponse(HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse)
     begin
         HttpWebResponse := HttpWebRequest.GetResponse;
     end;

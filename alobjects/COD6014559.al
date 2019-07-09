@@ -706,10 +706,10 @@ codeunit 6014559 "RP Ripac Device Library"
         i: Integer;
         Numeric: Boolean;
         Code128: Text;
-        Char: DotNet Char;
+        Char: DotNet npNetChar;
         ConsecutiveNumbers: Integer;
         j: Integer;
-        String: DotNet String;
+        String: DotNet npNetString;
         CurrentMode: Option " ",CodeA,CodeB,CodeC;
         Buffer: Text;
         Beginning: Boolean;

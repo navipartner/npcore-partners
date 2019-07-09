@@ -50,7 +50,7 @@ table 6150710 "POS View"
     procedure GetMarkup() Text: Text
     var
         InStream: InStream;
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
     begin
         if not Markup.HasValue then
           exit;
@@ -65,7 +65,7 @@ table 6150710 "POS View"
     procedure SetMarkup(Text: Text)
     var
         OutStream: OutStream;
-        StreamWriter: DotNet StreamWriter;
+        StreamWriter: DotNet npNetStreamWriter;
     begin
         Clear(Markup);
         Markup.CreateOutStream(OutStream);

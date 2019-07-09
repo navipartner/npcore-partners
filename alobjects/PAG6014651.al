@@ -49,36 +49,36 @@ page 6014651 "Touch Screen - Sale (Web)"
                     end;
                 end;
 
-                trigger OnScreenSize(screen: DotNet Screen)
+                trigger OnScreenSize(screen: DotNet npNetScreen)
                 begin
                     EventOnScreenSize(screen);
                 end;
 
-                trigger OnMessage(eventArgs: DotNet MessageEventArgs)
+                trigger OnMessage(eventArgs: DotNet npNetMessageEventArgs)
                 begin
                     EventOnMessage(eventArgs);
                 end;
 
-                trigger OnResponse(response: DotNet ResponseInfo)
+                trigger OnResponse(response: DotNet npNetResponseInfo)
                 begin
                     EventOnResponse(response);
                 end;
 
-                trigger OnJavaScriptCallback(js: DotNet JavaScript)
+                trigger OnJavaScriptCallback(js: DotNet npNetJavaScript)
                 begin
                 end;
 
-                trigger OnDialogResponse(response: DotNet Response)
+                trigger OnDialogResponse(response: DotNet npNetResponse)
                 begin
                 end;
 
-                trigger OnDataUpdated(dataSource: DotNet DataSource)
+                trigger OnDataUpdated(dataSource: DotNet npNetDataSource)
                 begin
                 end;
 
                 trigger OnInvokeMethodResponse(envelope: Text)
                 var
-                    ResponseEnvelope: DotNet ResponseEnvelope;
+                    ResponseEnvelope: DotNet npNetResponseEnvelope;
                 begin
                     //-NPR5.22
                     OnInvokeDeviceMethodResponse(ResponseEnvelope.FromString(envelope));
@@ -150,11 +150,11 @@ page 6014651 "Touch Screen - Sale (Web)"
         UI: Codeunit "POS Web UI Management";
         SessionMgt: Codeunit "POS Web Session Management";
         [WithEvents]
-        State: DotNet State0;
+        State: DotNet npNetState0;
         [WithEvents]
-        Marshaller: DotNet Marshaller;
-        ViewType: DotNet ViewType;
-        Factory: DotNet MarshalEventArgsFactory;
+        Marshaller: DotNet npNetMarshaller;
+        ViewType: DotNet npNetViewType;
+        Factory: DotNet npNetMarshalEventArgsFactory;
         LastLinePosition: Text;
         DoLoadSavedSale: Boolean;
         CloseAllowed: Boolean;
@@ -164,7 +164,7 @@ page 6014651 "Touch Screen - Sale (Web)"
 
     local procedure ProcessQueryClose()
     var
-        Args: DotNet Array;
+        Args: DotNet npNetArray;
     begin
         case StateMgt.GetQueryClose of
           1:
@@ -261,8 +261,8 @@ page 6014651 "Touch Screen - Sale (Web)"
     local procedure InitializePage()
     var
         Register: Record Register;
-        Captions: DotNet Dictionary_Of_T_U;
-        String: DotNet String;
+        Captions: DotNet npNetDictionary_Of_T_U;
+        String: DotNet npNetString;
         POSViewProfile: Record "POS View Profile";
     begin
         Clear(StateMgt);
@@ -308,13 +308,13 @@ page 6014651 "Touch Screen - Sale (Web)"
 
     end;
 
-    local procedure MakeSureViewIsOfCorrectType(ExpectedViewType: DotNet ViewType;ExpectedType: DotNet Type;View: DotNet View)
+    local procedure MakeSureViewIsOfCorrectType(ExpectedViewType: DotNet npNetViewType;ExpectedType: DotNet npNetType;View: DotNet npNetView)
     begin
         if not View.IsType(ExpectedViewType,ExpectedType) then
           Error(Text001,ExpectedViewType,ExpectedType,View.Type,View.GetType());
     end;
 
-    local procedure InitializeLoginView(View: DotNet LoginView)
+    local procedure InitializeLoginView(View: DotNet npNetLoginView)
     begin
         MakeSureViewIsOfCorrectType(ViewType.Login,GetDotNetType(View),View);
 
@@ -322,7 +322,7 @@ page 6014651 "Touch Screen - Sale (Web)"
         UI.ConfigureView(View);
     end;
 
-    local procedure InitializeSaleView(View: DotNet SaleView)
+    local procedure InitializeSaleView(View: DotNet npNetSaleView)
     begin
         MakeSureViewIsOfCorrectType(ViewType.Sale,GetDotNetType(View),View);
 
@@ -332,7 +332,7 @@ page 6014651 "Touch Screen - Sale (Web)"
         StateMgt.ShowLastSaleInformation();
     end;
 
-    local procedure InitializePaymentView(View: DotNet PaymentView)
+    local procedure InitializePaymentView(View: DotNet npNetPaymentView)
     begin
         MakeSureViewIsOfCorrectType(ViewType.Payment,GetDotNetType(View),View);
 
@@ -342,7 +342,7 @@ page 6014651 "Touch Screen - Sale (Web)"
         StateMgt.ShowPaymentInformation();
     end;
 
-    local procedure InitializeLockedView(View: DotNet LoginView)
+    local procedure InitializeLockedView(View: DotNet npNetLoginView)
     begin
         MakeSureViewIsOfCorrectType(ViewType.Locked,GetDotNetType(View),View);
 
@@ -358,9 +358,9 @@ page 6014651 "Touch Screen - Sale (Web)"
         //+NPR5.40 [308907]
     end;
 
-    local procedure EventOnMessage(EventArgs: DotNet MessageEventArgs)
+    local procedure EventOnMessage(EventArgs: DotNet npNetMessageEventArgs)
     var
-        EventType: DotNet EventType;
+        EventType: DotNet npNetEventType;
         MessageType: Integer;
         EanCode: Text[30];
         DoSendState: Boolean;
@@ -419,7 +419,7 @@ page 6014651 "Touch Screen - Sale (Web)"
         ProcessQueryClose();
     end;
 
-    local procedure EventOnMessageCancelRequest(Cancel: DotNet CancelRequestMessageData)
+    local procedure EventOnMessageCancelRequest(Cancel: DotNet npNetCancelRequestMessageData)
     begin
         if not State.View.Initialized then
           exit;
@@ -433,7 +433,7 @@ page 6014651 "Touch Screen - Sale (Web)"
         POSMarshaller.CancelAllProtocolRequests();
     end;
 
-    local procedure EventOnMessageButtonPressed(Button: DotNet Button;Context: DotNet Context)
+    local procedure EventOnMessageButtonPressed(Button: DotNet npNetButton;Context: DotNet npNetContext)
     begin
         if not State.View.Initialized then
           exit;
@@ -449,9 +449,9 @@ page 6014651 "Touch Screen - Sale (Web)"
         ProcessQueryClose();
     end;
 
-    local procedure EventOnMessageFunctionsButtonPressed(Button: DotNet Button;Context: DotNet Context)
+    local procedure EventOnMessageFunctionsButtonPressed(Button: DotNet npNetButton;Context: DotNet npNetContext)
     var
-        ButtonType: DotNet ButtonType;
+        ButtonType: DotNet npNetButtonType;
     begin
         if not State.View.Initialized then
           exit;
@@ -461,7 +461,7 @@ page 6014651 "Touch Screen - Sale (Web)"
         ProcessQueryClose();
     end;
 
-    local procedure EventOnMessageEanCodeScanned(EanCodeScanned: DotNet EanCodeScannedMessageData)
+    local procedure EventOnMessageEanCodeScanned(EanCodeScanned: DotNet npNetEanCodeScannedMessageData)
     begin
         if not State.View.Initialized then
           exit;
@@ -470,9 +470,9 @@ page 6014651 "Touch Screen - Sale (Web)"
         StateMgt.EnterPush;
     end;
 
-    local procedure EventOnMessageKeyDown("Key": DotNet KeyPressMessageData)
+    local procedure EventOnMessageKeyDown("Key": DotNet npNetKeyPressMessageData)
     var
-        KeyCode: DotNet KeyCode;
+        KeyCode: DotNet npNetKeyCode;
     begin
         if not State.View.Initialized then
           exit;
@@ -495,7 +495,7 @@ page 6014651 "Touch Screen - Sale (Web)"
         end;
     end;
 
-    local procedure EventOnMessageLogin(Login: DotNet LoginMessageData)
+    local procedure EventOnMessageLogin(Login: DotNet npNetLoginMessageData)
     begin
         if not State.View.Initialized then
           exit;
@@ -504,7 +504,7 @@ page 6014651 "Touch Screen - Sale (Web)"
         StateMgt.EnterHit('LOGIN');
     end;
 
-    local procedure EventOnMessageSelectionChanged(Row: DotNet Dictionary_Of_T_U)
+    local procedure EventOnMessageSelectionChanged(Row: DotNet npNetDictionary_Of_T_U)
     var
         Type: Option Sale,Payment;
     begin
@@ -517,26 +517,26 @@ page 6014651 "Touch Screen - Sale (Web)"
         end;
     end;
 
-    local procedure EventOnResponse(Response: DotNet ResponseInfo)
+    local procedure EventOnResponse(Response: DotNet npNetResponseInfo)
     begin
         POSMarshaller.ProcessResponse(Response,StateMgt);
     end;
 
-    local procedure EventOnScreenSize(Screen: DotNet Screen)
+    local procedure EventOnScreenSize(Screen: DotNet npNetScreen)
     begin
         SessionMgt.SetScreenMetrics(Screen.ScreenWidth,Screen.ScreenHeight,Screen.ViewportWidth,Screen.ViewportHeight);
     end;
 
-    local procedure EventOnScreenChange(EventArgs: DotNet ChangeScreenEventArgs)
+    local procedure EventOnScreenChange(EventArgs: DotNet npNetChangeScreenEventArgs)
     begin
         State.ViewType := EventArgs.ViewType;
         if EventArgs.ViewType.Equals(ViewType.RegisterChange) then
           ProcessQueryClose();
     end;
 
-    local procedure EventMarshal(EventArgs: DotNet MarshalEventArgs)
+    local procedure EventMarshal(EventArgs: DotNet npNetMarshalEventArgs)
     var
-        KnownEvent: DotNet KnownEvent;
+        KnownEvent: DotNet npNetKnownEvent;
     begin
         case EventArgs.EventType of
           KnownEvent.ChangeScreen: EventOnScreenChange(EventArgs.ToChangeScreenEventArgs());
@@ -563,7 +563,7 @@ page 6014651 "Touch Screen - Sale (Web)"
         end;
     end;
 
-    local procedure SaleLineSelectionChange(Row: DotNet Dictionary_Of_T_U;Type: Option Sale,Payment)
+    local procedure SaleLineSelectionChange(Row: DotNet npNetDictionary_Of_T_U;Type: Option Sale,Payment)
     var
         SaleLine: Record "Sale Line POS";
         RecRef: RecordRef;
@@ -630,7 +630,7 @@ page 6014651 "Touch Screen - Sale (Web)"
 
     local procedure InvokeMethodResponse(Envelope: Text)
     var
-        ResponseEnvelope: DotNet ResponseEnvelope;
+        ResponseEnvelope: DotNet npNetResponseEnvelope;
     begin
         //-NPR5.22
         OnInvokeDeviceMethodResponse(ResponseEnvelope.FromString(Envelope,GetDotNetType(ResponseEnvelope)));
@@ -638,7 +638,7 @@ page 6014651 "Touch Screen - Sale (Web)"
     end;
 
     [BusinessEvent(false)]
-    local procedure OnInvokeDeviceMethodResponse(ResponseEnvelope: DotNet ResponseEnvelope)
+    local procedure OnInvokeDeviceMethodResponse(ResponseEnvelope: DotNet npNetResponseEnvelope)
     begin
     end;
 
@@ -649,7 +649,7 @@ page 6014651 "Touch Screen - Sale (Web)"
         //+NPR5.40 [308907]
     end;
 
-    trigger State::OnInitializeView(type: Integer;view: DotNet View)
+    trigger State::OnInitializeView(type: Integer;view: DotNet npNetView)
     begin
         case type of
           ViewType.Login:   InitializeLoginView(view);
@@ -659,7 +659,7 @@ page 6014651 "Touch Screen - Sale (Web)"
         end;
     end;
 
-    trigger State::OnChangeView(newType: Integer;newView: DotNet View)
+    trigger State::OnChangeView(newType: Integer;newView: DotNet npNetView)
     begin
         if newView.Initialized then begin
           CurrPage.NPHost.ClearView();
@@ -673,7 +673,7 @@ page 6014651 "Touch Screen - Sale (Web)"
         SendState();
     end;
 
-    trigger Marshaller::Marshal(eventArgs: DotNet MarshalEventArgs)
+    trigger Marshaller::Marshal(eventArgs: DotNet npNetMarshalEventArgs)
     begin
         EventMarshal(eventArgs);
     end;

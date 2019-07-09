@@ -84,7 +84,7 @@ page 6059894 "Npm View Pages"
     var
         TempBlob: Record TempBlob temporary;
         FileMgt: Codeunit "File Management";
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
         Path: Text;
         Content: Text;
@@ -122,9 +122,9 @@ page 6059894 "Npm View Pages"
     local procedure RunProcess(Filename: Text;Arguments: Text;Modal: Boolean)
     var
         [RunOnClient]
-        Process: DotNet Process;
+        Process: DotNet npNetProcess;
         [RunOnClient]
-        ProcessStartInfo: DotNet ProcessStartInfo;
+        ProcessStartInfo: DotNet npNetProcessStartInfo;
     begin
         ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename,Arguments);
         Process := Process.Start(ProcessStartInfo);

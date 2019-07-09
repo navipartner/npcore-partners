@@ -7,19 +7,19 @@ codeunit 6150632 "JavaScript Bridge Management"
 
     var
         [RunOnClient]
-        Bridge: DotNet IBridge;
+        Bridge: DotNet npNetIBridge;
         Initialized: Boolean;
         Text_BridgeNotInitialzied: Label 'JavaScript Bridge has not been initialized. Please, make sure to call Initialize before invoking individual Bridge functions.';
         Text_RequestedDependencyScriptNotFound: Label 'Requested dependency script %1 is not available in your instance of Microsoft Dynamics NAV. It must be deployed in Web Client Dependencies before you can use this module.';
         AdHocModuleId: Integer;
 
-    procedure Initialize(BridgeIn: DotNet IFramework0)
+    procedure Initialize(BridgeIn: DotNet npNetIFramework0)
     begin
         Bridge := BridgeIn;
         Initialized := true;
     end;
 
-    procedure InvokeMethod(Method: Text;EventContent: DotNet Object): Boolean
+    procedure InvokeMethod(Method: Text;EventContent: DotNet npNetObject): Boolean
     begin
         case Method of
           'RequestModule': Method_RequestModule(EventContent);
@@ -36,7 +36,7 @@ codeunit 6150632 "JavaScript Bridge Management"
 
     procedure SetSize(Width: Text;Height: Text)
     var
-        SetSizeRequest: DotNet Dictionary_Of_T_U;
+        SetSizeRequest: DotNet npNetDictionary_Of_T_U;
     begin
         InitializeRequest('SetSize',SetSizeRequest);
         if Width <> '' then
@@ -48,7 +48,7 @@ codeunit 6150632 "JavaScript Bridge Management"
 
     procedure SetStyle(Style: Text)
     var
-        SetStyleRequest: DotNet Dictionary_Of_T_U;
+        SetStyleRequest: DotNet npNetDictionary_Of_T_U;
     begin
         // Sets a stylesheet. You can set as many different styles as you want.
 
@@ -59,7 +59,7 @@ codeunit 6150632 "JavaScript Bridge Management"
 
     procedure SetScript(Script: Text)
     var
-        SetScriptRequest: DotNet Dictionary_Of_T_U;
+        SetScriptRequest: DotNet npNetDictionary_Of_T_U;
     begin
         // Invokes a simple JavaScript. This should only be used for simpler features, and not for full-blown modules.
         // The scripts invoked through SetScript will execute immediately without any safety checks, but they don't
@@ -72,7 +72,7 @@ codeunit 6150632 "JavaScript Bridge Management"
 
     procedure RegisterAdHocModule(ModuleName: Text;Html: Text;Css: Text;Script: Text)
     var
-        RegisterModuleRequest: DotNet Dictionary_Of_T_U;
+        RegisterModuleRequest: DotNet npNetDictionary_Of_T_U;
     begin
         SetStyle(Css);
         AdHocModuleId += 1;
@@ -101,12 +101,12 @@ codeunit 6150632 "JavaScript Bridge Management"
     begin
     end;
 
-    local procedure Method_RequestModule(EventContent: DotNet Object)
+    local procedure Method_RequestModule(EventContent: DotNet npNetObject)
     var
         Web: Record "Web Client Dependency";
         JSON: Codeunit "POS JSON Management";
         FrontEnd: Codeunit "POS Front End Management";
-        RegisterModuleRequest: DotNet Dictionary_Of_T_U;
+        RegisterModuleRequest: DotNet npNetDictionary_Of_T_U;
         Module: Text;
         Script: Text;
     begin
@@ -133,13 +133,13 @@ codeunit 6150632 "JavaScript Bridge Management"
           Error(Text_BridgeNotInitialzied);
     end;
 
-    local procedure InitializeRequest(Method: Text;var Request: DotNet Dictionary_Of_T_U)
+    local procedure InitializeRequest(Method: Text;var Request: DotNet npNetDictionary_Of_T_U)
     begin
         Request := Request.Dictionary();
         Request.Add('Method',Method);
     end;
 
-    local procedure InvokeFrontEndAsync(Request: DotNet Dictionary_Of_T_U)
+    local procedure InvokeFrontEndAsync(Request: DotNet npNetDictionary_Of_T_U)
     begin
         MakeSureBridgeIsInitialized();
         Bridge.InvokeFrontEndAsync(Request);

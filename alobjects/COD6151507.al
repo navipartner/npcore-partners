@@ -11,12 +11,12 @@ codeunit 6151507 "Nc Managed Nav Modules Mgt."
     var
         "Object": Record "Object";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlNsManager: DotNet XmlNamespaceManager;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNsManager: DotNet npNetXmlNamespaceManager;
         ResponseText: Text;
     begin
         if Url = '' then
@@ -81,12 +81,12 @@ codeunit 6151507 "Nc Managed Nav Modules Mgt."
     procedure GetVersionNo(VersionListId: Text;Url: Text;Username: Text;Password: Text) VersionNo: Text
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlNsManager: DotNet XmlNamespaceManager;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNsManager: DotNet npNetXmlNamespaceManager;
         ResponseText: Text;
     begin
         if Url = '' then
@@ -129,12 +129,12 @@ codeunit 6151507 "Nc Managed Nav Modules Mgt."
     begin
     end;
 
-    local procedure AppendNavObjects(VersionListId: Text;var XmlElement: DotNet XmlElement)
+    local procedure AppendNavObjects(VersionListId: Text;var XmlElement: DotNet npNetXmlElement)
     var
         "Object": Record "Object";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlElementObject: DotNet XmlElement;
-        XmlElementObjectField: DotNet XmlElement;
+        XmlElementObject: DotNet npNetXmlElement;
+        XmlElementObjectField: DotNet npNetXmlElement;
     begin
         Object.SetFilter("Company Name",'=%1','');
         Object.SetFilter("Version List",'*' + VersionListId + '*');
@@ -161,9 +161,9 @@ codeunit 6151507 "Nc Managed Nav Modules Mgt."
         until Object.Next = 0;
     end;
 
-    local procedure InitMnmWebRequest(Url: Text;Username: Text;Password: Text;SoapAction: Text;var HttpWebRequest: DotNet HttpWebRequest)
+    local procedure InitMnmWebRequest(Url: Text;Username: Text;Password: Text;SoapAction: Text;var HttpWebRequest: DotNet npNetHttpWebRequest)
     var
-        Credential: DotNet NetworkCredential;
+        Credential: DotNet npNetNetworkCredential;
     begin
         HttpWebRequest := HttpWebRequest.Create(Url);
         HttpWebRequest.Timeout := 1000 * 20;

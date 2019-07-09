@@ -46,7 +46,7 @@ codeunit 6059935 "Hotkey Management"
     procedure LaunchApplication(Hotkey: Record Hotkey)
     var
         [RunOnClient]
-        DotNetProcess: DotNet Process;
+        DotNetProcess: DotNet npNetProcess;
     begin
         if CopyStr(Hotkey."Application Path",1,4) = 'http' then begin
           DotNetProcess := DotNetProcess.Process();

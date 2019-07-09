@@ -37,13 +37,13 @@ codeunit 6014528 "Barcode Library"
     end;
 
     var
-        BarCodeType: DotNet BarCodeType;
-        BarCodeSettings: DotNet BarcodeSettings;
-        BarCodeGenerator: DotNet BarCodeGenerator;
-        Image: DotNet Image;
+        BarCodeType: DotNet npNetBarCodeType;
+        BarCodeSettings: DotNet npNetBarcodeSettings;
+        BarCodeGenerator: DotNet npNetBarCodeGenerator;
+        Image: DotNet npNetImage;
         Text007: Label 'Import';
         Text009: Label 'All Files (*.*)|*.*';
-        ImageFormat: DotNet ImageFormat;
+        ImageFormat: DotNet npNetImageFormat;
         "-- Global": Integer;
         SizeX: Decimal;
         SizeY: Decimal;
@@ -66,7 +66,7 @@ codeunit 6014528 "Barcode Library"
     [Scope('Personalization')]
     procedure GenerateBarcode(BarCode: Code[20];var TempBlob: Record TempBlob)
     var
-        MemoryStream: DotNet MemoryStream;
+        MemoryStream: DotNet npNetMemoryStream;
         OutStream: OutStream;
     begin
         Initialize(BarCode);

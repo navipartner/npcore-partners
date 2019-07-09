@@ -16,10 +16,10 @@ codeunit 6150710 "POS Data Management"
         Text002: Label 'Data Source "%1" did not bind variables.';
         Text003: Label 'Extension "%1" for data source "%2" did not respond to %3 event.';
 
-    procedure SetupDefaultDataSourcesForView(View: DotNet View0;Setup: Codeunit "POS Setup")
+    procedure SetupDefaultDataSourcesForView(View: DotNet npNetView0;Setup: Codeunit "POS Setup")
     var
-        ViewType: DotNet ViewType0;
-        DataSource: DotNet DataSource0;
+        ViewType: DotNet npNetViewType0;
+        DataSource: DotNet npNetDataSource0;
     begin
         case true of
         //-NPR5.37 [287688]
@@ -82,11 +82,11 @@ codeunit 6150710 "POS Data Management"
         //+NPR5.38 [286726]
     end;
 
-    procedure GetDataSource(Name: Text;var DataSource: DotNet DataSource0;Setup: Codeunit "POS Setup")
+    procedure GetDataSource(Name: Text;var DataSource: DotNet npNetDataSource0;Setup: Codeunit "POS Setup")
     var
-        Extensions: DotNet List_Of_T;
-        ExtensionDataSource: DotNet DataSource0;
-        Column: DotNet DataColumn1;
+        Extensions: DotNet npNetList_Of_T;
+        ExtensionDataSource: DotNet npNetDataSource0;
+        Column: DotNet npNetDataColumn1;
         ExtensionName: Text;
         Handled: Boolean;
     begin
@@ -121,10 +121,10 @@ codeunit 6150710 "POS Data Management"
         OnAfterGetDataSource(Name,DataSource,Setup);
     end;
 
-    procedure RecordToDataSet("Record": Variant;var CurrDataSet: DotNet DataSet;DataSource: DotNet DataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    procedure RecordToDataSet("Record": Variant;var CurrDataSet: DotNet npNetDataSet;DataSource: DotNet npNetDataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         RecRef: RecordRef;
-        DataRow: DotNet DataRow0;
+        DataRow: DotNet npNetDataRow0;
         CurrentPosition: Text;
     begin
         //-NPR5.38 [301053]
@@ -155,14 +155,14 @@ codeunit 6150710 "POS Data Management"
         //+NPR5.38 [301053]
     end;
 
-    local procedure NavOneRecordToDataRow(var RecRef: RecordRef;DataRow: DotNet DataRow0;DataSource: DotNet DataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure NavOneRecordToDataRow(var RecRef: RecordRef;DataRow: DotNet npNetDataRow0;DataSource: DotNet npNetDataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         "Field": FieldRef;
-        DataColumn: DotNet DataColumn1;
-        Int32: DotNet Int32;
-        Extensions: DotNet List_Of_T;
-        ExtensionDataRow: DotNet DataRow0;
-        KeyValuePair: DotNet KeyValuePair_Of_T_U;
+        DataColumn: DotNet npNetDataColumn1;
+        Int32: DotNet npNetInt32;
+        Extensions: DotNet npNetList_Of_T;
+        ExtensionDataRow: DotNet npNetDataRow0;
+        KeyValuePair: DotNet npNetKeyValuePair_Of_T_U;
         VariableValue: Variant;
         FieldIdText: Text;
         Extension: Text;
@@ -221,12 +221,12 @@ codeunit 6150710 "POS Data Management"
         //+NPR5.36 [291525]
     end;
 
-    procedure AddFieldToDataSource(DataSource: DotNet DataSource0;"Record": Variant;FieldNo: Integer;Visible: Boolean)
+    procedure AddFieldToDataSource(DataSource: DotNet npNetDataSource0;"Record": Variant;FieldNo: Integer;Visible: Boolean)
     var
         RecRef: RecordRef;
         FieldRef: FieldRef;
-        DataType: DotNet DataType;
-        DataColumn: DotNet DataColumn1;
+        DataType: DotNet npNetDataType;
+        DataColumn: DotNet npNetDataColumn1;
         Type: Text;
         Width: Integer;
     begin
@@ -279,47 +279,47 @@ codeunit 6150710 "POS Data Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGetDataSource(Name: Text;var DataSource: DotNet DataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    local procedure OnGetDataSource(Name: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterGetDataSource(Name: Text;DataSource: DotNet DataSource0;Setup: Codeunit "POS Setup")
+    local procedure OnAfterGetDataSource(Name: Text;DataSource: DotNet npNetDataSource0;Setup: Codeunit "POS Setup")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text;Extensions: DotNet List_Of_T)
+    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text;Extensions: DotNet npNetList_Of_T)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGetDataSourceExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet DataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    local procedure OnGetDataSourceExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnDataSourceExtensionReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet DataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnDataSourceExtensionReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet npNetDataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnRefreshDataSet(POSSession: Codeunit "POS Session";DataSource: DotNet DataSource0;var CurrDataSet: DotNet DataSet;FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    procedure OnRefreshDataSet(POSSession: Codeunit "POS Session";DataSource: DotNet npNetDataSource0;var CurrDataSet: DotNet npNetDataSet;FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterRefreshDataSet(POSSession: Codeunit "POS Session";DataSource: DotNet DataSource0;CurrDataSet: DotNet DataSet;FrontEnd: Codeunit "POS Front End Management")
+    procedure OnAfterRefreshDataSet(POSSession: Codeunit "POS Session";DataSource: DotNet npNetDataSource0;CurrDataSet: DotNet npNetDataSet;FrontEnd: Codeunit "POS Front End Management")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnReadDataSourceVariables(POSSession: Codeunit "POS Session";RecRef: RecordRef;DataSource: Text;DataRow: DotNet DataRow0;var Handled: Boolean)
+    local procedure OnReadDataSourceVariables(POSSession: Codeunit "POS Session";RecRef: RecordRef;DataSource: Text;DataRow: DotNet npNetDataRow0;var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterReadDataSourceVariables(POSSession: Codeunit "POS Session";RecRef: RecordRef;DataSource: Text;DataRow: DotNet DataRow0)
+    local procedure OnAfterReadDataSourceVariables(POSSession: Codeunit "POS Session";RecRef: RecordRef;DataSource: Text;DataRow: DotNet npNetDataRow0)
     begin
     end;
 
@@ -334,7 +334,7 @@ codeunit 6150710 "POS Data Management"
     end;
 
     [IntegrationEvent(FALSE, FALSE)]
-    local procedure OnSetupDataSourcesForView(View: DotNet View0;Setup: Codeunit "POS Setup")
+    local procedure OnSetupDataSourcesForView(View: DotNet npNetView0;Setup: Codeunit "POS Setup")
     begin
     end;
 

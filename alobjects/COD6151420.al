@@ -10,7 +10,7 @@ codeunit 6151420 "Magento Import Return Order"
 
     trigger OnRun()
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
     begin
         if LoadXmlDoc(XmlDoc) then
           ImportSalesReturnOrders(XmlDoc);
@@ -26,10 +26,10 @@ codeunit 6151420 "Magento Import Return Order"
         Error001: Label 'Xml Element sell_to_customer is missing';
         Error002: Label 'Item %1 does not exist in %2';
 
-    local procedure ImportSalesReturnOrders(XmlDoc: DotNet XmlDocument)
+    local procedure ImportSalesReturnOrders(XmlDoc: DotNet npNetXmlDocument)
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         Initialize;
@@ -46,7 +46,7 @@ codeunit 6151420 "Magento Import Return Order"
         end;
     end;
 
-    local procedure ImportSalesReturnOrder(XmlElement: DotNet XmlElement) Imported: Boolean
+    local procedure ImportSalesReturnOrder(XmlElement: DotNet npNetXmlElement) Imported: Boolean
     var
         SalesHeader: Record "Sales Header";
         ReleaseSalesDoc: Codeunit "Release Sales Document";
@@ -72,15 +72,15 @@ codeunit 6151420 "Magento Import Return Order"
     begin
     end;
 
-    local procedure InsertCommentLine(XmlElement: DotNet XmlElement;var SalesHeader: Record "Sales Header")
+    local procedure InsertCommentLine(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
     var
         RecordLink: Record "Record Link";
         CommentLine: Text;
         CommentType: Text;
         OutStream: OutStream;
         LinkID: Integer;
-        BinaryWriter: DotNet BinaryWriter;
-        Encoding: DotNet Encoding;
+        BinaryWriter: DotNet npNetBinaryWriter;
+        Encoding: DotNet npNetEncoding;
     begin
         CommentType := NpXmlDomMgt.GetXmlAttributeText(XmlElement,'type',false);
         CommentLine := NpXmlDomMgt.GetXmlText(XmlElement,'comment',0,true);
@@ -103,10 +103,10 @@ codeunit 6151420 "Magento Import Return Order"
         end;
     end;
 
-    local procedure InsertComments(XmlElement: DotNet XmlElement;var SalesHeader: Record "Sales Header")
+    local procedure InsertComments(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
     var
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         NpXmlDomMgt.FindNodes(XmlElement,'comment_line',XmlNodeList);
@@ -116,7 +116,7 @@ codeunit 6151420 "Magento Import Return Order"
         end;
     end;
 
-    local procedure InsertCustomer(XmlElement: DotNet XmlElement;IsContactCustomer: Boolean;var Customer: Record Customer): Boolean
+    local procedure InsertCustomer(XmlElement: DotNet npNetXmlElement;IsContactCustomer: Boolean;var Customer: Record Customer): Boolean
     var
         ConfigTemplateHeader: Record "Config. Template Header";
         CustTemplate: Record "Customer Template";
@@ -196,7 +196,7 @@ codeunit 6151420 "Magento Import Return Order"
         Customer.Modify(true);
     end;
 
-    local procedure InsertPaymentLinePaymentRefund(XmlElement: DotNet XmlElement;var SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertPaymentLinePaymentRefund(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
         PaymentLine: Record "Magento Payment Line";
         PaymentMapping: Record "Magento Payment Mapping";
@@ -238,10 +238,10 @@ codeunit 6151420 "Magento Import Return Order"
         PaymentLine.Insert(true);
     end;
 
-    local procedure InsertPaymentLines(XmlElement: DotNet XmlElement;var SalesHeader: Record "Sales Header")
+    local procedure InsertPaymentLines(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
     var
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         LineNo: Integer;
         i: Integer;
     begin
@@ -254,15 +254,15 @@ codeunit 6151420 "Magento Import Return Order"
         end;
     end;
 
-    local procedure InsertSalesHeader(XmlElement: DotNet XmlElement;var SalesHeader: Record "Sales Header")
+    local procedure InsertSalesHeader(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
     var
         Customer: Record Customer;
         MagentoWebsite: Record "Magento Website";
         ShipmentMapping: Record "Magento Shipment Mapping";
         PaymentMapping: Record "Magento Payment Mapping";
-        XmlElement2: DotNet XmlElement;
-        XmlElement3: DotNet XmlElement;
-        NodeList: DotNet XmlNodeList;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlElement3: DotNet npNetXmlElement;
+        NodeList: DotNet npNetXmlNodeList;
         RecRef: RecordRef;
         OrderNo: Code[20];
         WebsiteCode: Code[20];
@@ -342,12 +342,12 @@ codeunit 6151420 "Magento Import Return Order"
         SalesHeader.Modify(true);
     end;
 
-    local procedure InsertSalesLines(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header")
+    local procedure InsertSalesLines(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header")
     var
         SalesLineTemp: Record "Sales Line" temporary;
-        XmlElementLine: DotNet XmlElement;
-        XmlElementLines: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElementLine: DotNet npNetXmlElement;
+        XmlElementLines: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         LineNo: Integer;
         i: Integer;
     begin
@@ -373,16 +373,16 @@ codeunit 6151420 "Magento Import Return Order"
         SalesLineTemp.UpdateVATOnLines(0,SalesHeader,SalesLineTemp,VATAmountLineTemp);
     end;
 
-    local procedure InsertSalesLine(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertSalesLine(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
         SalesLine: Record "Sales Line";
         SalesCommentLine: Record "Sales Comment Line";
         ShipmentMapping: Record "Magento Shipment Mapping";
-        XmlElementGiftVoucher: DotNet XmlElement;
-        XmlElementGiftVouchers: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElementGiftVoucher: DotNet npNetXmlElement;
+        XmlElementGiftVouchers: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         ExternalItemNo: Text;
         UnitofMeasure: Code[10];
         ItemNo: Code[20];
@@ -497,7 +497,7 @@ codeunit 6151420 "Magento Import Return Order"
         end;
     end;
 
-    local procedure InsertSalesLinePaymentFeeRefund(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertSalesLinePaymentFeeRefund(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
         SalesLine: Record "Sales Line";
         PaymentFeeRefund: Decimal;
@@ -523,7 +523,7 @@ codeunit 6151420 "Magento Import Return Order"
         SalesLine.Modify(true);
     end;
 
-    local procedure InsertSalesLineShipmentFeeRefund(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
+    local procedure InsertSalesLineShipmentFeeRefund(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var LineNo: Integer)
     var
         SalesLine: Record "Sales Line";
         ShipmentMapping: Record "Magento Shipment Mapping";
@@ -573,7 +573,7 @@ codeunit 6151420 "Magento Import Return Order"
         exit(Customer.Get(ContBusRel."No."));
     end;
 
-    local procedure GetCustomer(ExternalCustomerNo: Code[20];XmlElement: DotNet XmlElement;var Customer: Record Customer): Boolean
+    local procedure GetCustomer(ExternalCustomerNo: Code[20];XmlElement: DotNet npNetXmlElement;var Customer: Record Customer): Boolean
     begin
         Initialize;
         Clear(Customer);
@@ -581,7 +581,7 @@ codeunit 6151420 "Magento Import Return Order"
         exit(Customer.FindFirst and (Customer."E-Mail" <> ''));
     end;
 
-    local procedure OrderExists(XmlElement: DotNet XmlElement): Boolean
+    local procedure OrderExists(XmlElement: DotNet npNetXmlElement): Boolean
     var
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
@@ -636,7 +636,7 @@ codeunit 6151420 "Magento Import Return Order"
         end;
     end;
 
-    local procedure LoadXmlDoc(NaviConnectImportEntry: Record "Nc Import Entry";var XmlDoc: DotNet XmlDocument): Boolean
+    local procedure LoadXmlDoc(NaviConnectImportEntry: Record "Nc Import Entry";var XmlDoc: DotNet npNetXmlDocument): Boolean
     var
         InStr: InStream;
     begin

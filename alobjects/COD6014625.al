@@ -19,10 +19,10 @@ codeunit 6014625 "POS Device Proxy Manager"
     var
         AssemblyTemp: Record "Proxy Assembly" temporary;
         SessionMgt: Codeunit "POS Web Session Management";
-        ProtocolManagers: DotNet Dictionary_Of_T_U;
-        EncryptionManager: DotNet EncryptionManager;
-        ProtocolState: DotNet ProtocolState;
-        AvailableAssemblies: DotNet List_Of_T;
+        ProtocolManagers: DotNet npNetDictionary_Of_T_U;
+        EncryptionManager: DotNet npNetEncryptionManager;
+        ProtocolState: DotNet npNetProtocolState;
+        AvailableAssemblies: DotNet npNetList_Of_T;
         LastAssembliesModifiedTime: DateTime;
         LastStableProtocolState: Integer;
         CodeunitId: Integer;
@@ -34,7 +34,7 @@ codeunit 6014625 "POS Device Proxy Manager"
         SkipStargate: Boolean;
         AssemblyCheckCompleted: Boolean;
 
-    procedure RegisterProtocolManager(Manager: DotNet ProtocolManager)
+    procedure RegisterProtocolManager(Manager: DotNet npNetProtocolManager)
     begin
         if IsNull(ProtocolManagers) then
              ProtocolManagers := ProtocolManagers.Dictionary();
@@ -43,7 +43,7 @@ codeunit 6014625 "POS Device Proxy Manager"
           ProtocolManagers.Add(Manager.Id,Manager);
     end;
 
-    local procedure GetProtocolManager(Guid: Guid;var ProtocolManager: DotNet ProtocolManager)
+    local procedure GetProtocolManager(Guid: Guid;var ProtocolManager: DotNet npNetProtocolManager)
     begin
         if ProtocolManagers.ContainsKey(Guid) then
           ProtocolManager := ProtocolManagers.Item(Guid);
@@ -54,10 +54,10 @@ codeunit 6014625 "POS Device Proxy Manager"
         AssembliesInstalled := false;
     end;
 
-    procedure SerializeSignal("Object": DotNet Object;var Signal: DotNet Signal)
+    procedure SerializeSignal("Object": DotNet npNetObject;var Signal: DotNet npNetSignal)
     var
-        Serializer: DotNet XmlSerializer;
-        MemStream: DotNet MemoryStream;
+        Serializer: DotNet npNetXmlSerializer;
+        MemStream: DotNet npNetMemoryStream;
         OutStream: OutStream;
     begin
         MemStream := MemStream.MemoryStream();
@@ -69,9 +69,9 @@ codeunit 6014625 "POS Device Proxy Manager"
         Signal.Data := MemStream.ToArray();
     end;
 
-    procedure SerializeObject("Object": DotNet Object;var TempBlob: Record TempBlob)
+    procedure SerializeObject("Object": DotNet npNetObject;var TempBlob: Record TempBlob)
     var
-        Serializer: DotNet XmlSerializer;
+        Serializer: DotNet npNetXmlSerializer;
         OutStream: OutStream;
     begin
         Serializer := Serializer.XmlSerializer(Object.GetType());
@@ -80,9 +80,9 @@ codeunit 6014625 "POS Device Proxy Manager"
         Serializer.Serialize(OutStream,Object);
     end;
 
-    procedure DeserializeObject(var "Object": DotNet Object;TempBlob: Record TempBlob)
+    procedure DeserializeObject(var "Object": DotNet npNetObject;TempBlob: Record TempBlob)
     var
-        Serializer: DotNet XmlSerializer;
+        Serializer: DotNet npNetXmlSerializer;
         InStream: InStream;
     begin
         Serializer := Serializer.XmlSerializer(GetDotNetType(Object));
@@ -91,10 +91,10 @@ codeunit 6014625 "POS Device Proxy Manager"
         Object := Serializer.Deserialize(InStream);
     end;
 
-    procedure DeserializeSignal(var "Object": DotNet Object;Signal: DotNet Signal)
+    procedure DeserializeSignal(var "Object": DotNet npNetObject;Signal: DotNet npNetSignal)
     var
-        Serializer: DotNet XmlSerializer;
-        MemStream: DotNet MemoryStream;
+        Serializer: DotNet npNetXmlSerializer;
+        MemStream: DotNet npNetMemoryStream;
     begin
         Serializer := Serializer.XmlSerializer(GetDotNetType(Object));
         MemStream := MemStream.MemoryStream(Signal.Data);
@@ -102,17 +102,17 @@ codeunit 6014625 "POS Device Proxy Manager"
         Object := Serializer.Deserialize(MemStream);
     end;
 
-    local procedure DeserializeEnvelope(var Response: DotNet Response0;Envelope: DotNet ResponseEnvelope;Manager: DotNet ProtocolManager)
+    local procedure DeserializeEnvelope(var Response: DotNet npNetResponse0;Envelope: DotNet npNetResponseEnvelope;Manager: DotNet npNetProtocolManager)
     var
-        EncryptionManager: DotNet EncryptionManager;
+        EncryptionManager: DotNet npNetEncryptionManager;
     begin
         EncryptionManager := Manager.EncryptionManager;
         Response := Envelope.Deserialize(GetDotNetType(Response),EncryptionManager,Manager.ResponseTypes);
     end;
 
-    procedure DeserializeEnvelopeFromId(var Response: DotNet Response0;Envelope: DotNet ResponseEnvelope;ProtocolManagerId: Guid)
+    procedure DeserializeEnvelopeFromId(var Response: DotNet npNetResponse0;Envelope: DotNet npNetResponseEnvelope;ProtocolManagerId: Guid)
     var
-        Manager: DotNet ProtocolManager;
+        Manager: DotNet npNetProtocolManager;
     begin
         GetProtocolManager(ProtocolManagerId,Manager);
         DeserializeEnvelope(Response,Envelope,Manager);
@@ -120,7 +120,7 @@ codeunit 6014625 "POS Device Proxy Manager"
 
     local procedure AssemblyAvailable(AssemblyName: Text): Boolean
     var
-        Enumerator: DotNet IEnumerator_Of_T;
+        Enumerator: DotNet npNetIEnumerator_Of_T;
     begin
         if IsNull(AvailableAssemblies) then
           exit(false);
@@ -145,9 +145,9 @@ codeunit 6014625 "POS Device Proxy Manager"
         exit(ProtocolState);
     end;
 
-    procedure ProcessResponse(Manager: DotNet ProtocolManager;Envelope: DotNet ResponseEnvelope)
+    procedure ProcessResponse(Manager: DotNet npNetProtocolManager;Envelope: DotNet npNetResponseEnvelope)
     var
-        ErrorResponse: DotNet ErrorResponse;
+        ErrorResponse: DotNet npNetErrorResponse;
     begin
         Manager.ReceiveResponse(Envelope);
 
@@ -166,7 +166,7 @@ codeunit 6014625 "POS Device Proxy Manager"
         end;
     end;
 
-    procedure ProtocolStateChange(Manager: DotNet ProtocolManager;PreviousState: Integer;NewState: Integer)
+    procedure ProtocolStateChange(Manager: DotNet npNetProtocolManager;PreviousState: Integer;NewState: Integer)
     begin
         case ToInt(NewState) of
           ToInt(ProtocolState.Initiated):           ProtocolStateEnteredInitiated(Manager,PreviousState);
@@ -177,7 +177,7 @@ codeunit 6014625 "POS Device Proxy Manager"
         end;
     end;
 
-    procedure ProtocolBegin(Manager: DotNet ProtocolManager)
+    procedure ProtocolBegin(Manager: DotNet npNetProtocolManager)
     begin
         SessionMgt.GetProtocolBehavior(DoEncrypt,DoSecure,DoInstallAssemblies);
 
@@ -189,7 +189,7 @@ codeunit 6014625 "POS Device Proxy Manager"
         ProtocolInitiate(Manager);
     end;
 
-    local procedure ProtocolInitiate(Manager: DotNet ProtocolManager)
+    local procedure ProtocolInitiate(Manager: DotNet npNetProtocolManager)
     begin
         Manager.State := ProtocolState.Initiating;
 
@@ -203,9 +203,9 @@ codeunit 6014625 "POS Device Proxy Manager"
         Manager.State := ProtocolState.Initiated;
     end;
 
-    local procedure ProtocolSecure(Manager: DotNet ProtocolManager;ForceSecure: Boolean)
+    local procedure ProtocolSecure(Manager: DotNet npNetProtocolManager;ForceSecure: Boolean)
     var
-        PublicKeyRequest: DotNet PublicKeyRequest;
+        PublicKeyRequest: DotNet npNetPublicKeyRequest;
     begin
         if (Manager.Secure and (not ForceSecure)) or (not DoSecure) then begin
           Manager.State := ProtocolState.Secured;
@@ -220,9 +220,9 @@ codeunit 6014625 "POS Device Proxy Manager"
         Manager.SendMessage(PublicKeyRequest);
     end;
 
-    local procedure ProtocolSecureResponse(Manager: DotNet ProtocolManager;Envelope: DotNet ResponseEnvelope)
+    local procedure ProtocolSecureResponse(Manager: DotNet npNetProtocolManager;Envelope: DotNet npNetResponseEnvelope)
     var
-        PublicKeyResponse: DotNet PublicKeyResponse;
+        PublicKeyResponse: DotNet npNetPublicKeyResponse;
     begin
         DeserializeEnvelope(PublicKeyResponse,Envelope,Manager);
         if IsNull(PublicKeyResponse) then begin
@@ -238,10 +238,10 @@ codeunit 6014625 "POS Device Proxy Manager"
         Manager.State := ProtocolState.Secured;
     end;
 
-    local procedure ProtocolGetAssemblies(Manager: DotNet ProtocolManager)
+    local procedure ProtocolGetAssemblies(Manager: DotNet npNetProtocolManager)
     var
         Assembly: Record "Proxy Assembly";
-        GetAssembliesRequest: DotNet GetAssembliesRequest;
+        GetAssembliesRequest: DotNet npNetGetAssembliesRequest;
     begin
         Assembly.SetCurrentKey("Last Modified Time");
         if Assembly.FindLast() and (Assembly."Last Modified Time" > LastAssembliesModifiedTime) then begin
@@ -259,10 +259,10 @@ codeunit 6014625 "POS Device Proxy Manager"
         Manager.SendMessage(GetAssembliesRequest.GetAssembliesRequest());
     end;
 
-    local procedure ProtocolGetAssembliesResponse(Manager: DotNet ProtocolManager;Envelope: DotNet ResponseEnvelope)
+    local procedure ProtocolGetAssembliesResponse(Manager: DotNet npNetProtocolManager;Envelope: DotNet npNetResponseEnvelope)
     var
-        GetAssembliesResponse: DotNet GetAssembliesResponse;
-        Enumerator: DotNet IEnumerator;
+        GetAssembliesResponse: DotNet npNetGetAssembliesResponse;
+        Enumerator: DotNet npNetIEnumerator;
     begin
         DeserializeEnvelope(GetAssembliesResponse,Envelope,Manager);
         AvailableAssemblies := AvailableAssemblies.List();
@@ -273,11 +273,11 @@ codeunit 6014625 "POS Device Proxy Manager"
         Manager.State := ProtocolState.CheckedAssemblies;
     end;
 
-    local procedure ProtocolInstallAssemblies(Manager: DotNet ProtocolManager)
+    local procedure ProtocolInstallAssemblies(Manager: DotNet npNetProtocolManager)
     var
         ProxyAssembly: Record "Proxy Assembly";
-        Registers: DotNet String;
-        InstallAssemblyRequest: DotNet InstallAssemblyRequest;
+        Registers: DotNet npNetString;
+        InstallAssemblyRequest: DotNet npNetInstallAssemblyRequest;
         TempFile: File;
         TempFileName: Text;
         DoInstall: Boolean;
@@ -321,11 +321,11 @@ codeunit 6014625 "POS Device Proxy Manager"
           Manager.State := ProtocolState.InstalledAssemblies;
     end;
 
-    local procedure ProtocolInstallAssemblyResponse(Manager: DotNet ProtocolManager;Envelope: DotNet ResponseEnvelope)
+    local procedure ProtocolInstallAssemblyResponse(Manager: DotNet npNetProtocolManager;Envelope: DotNet npNetResponseEnvelope)
     var
         ProxyAssembly: Record "Proxy Assembly";
-        VoidResponse: DotNet VoidResponse;
-        Writer: DotNet StreamWriter;
+        VoidResponse: DotNet npNetVoidResponse;
+        Writer: DotNet npNetStreamWriter;
         OutStream: OutStream;
         Registers: Text;
     begin
@@ -353,11 +353,11 @@ codeunit 6014625 "POS Device Proxy Manager"
           Manager.State := ProtocolState.InstalledAssemblies;
     end;
 
-    local procedure ProtocolMessagingResponse(Manager: DotNet ProtocolManager;Envelope: DotNet ResponseEnvelope)
+    local procedure ProtocolMessagingResponse(Manager: DotNet npNetProtocolManager;Envelope: DotNet npNetResponseEnvelope)
     var
         TempBlob: Record TempBlob;
-        MessageResponse: DotNet MessageResponse;
-        Signal: DotNet Signal;
+        MessageResponse: DotNet npNetMessageResponse;
+        Signal: DotNet npNetSignal;
     begin
         Manager.State := ProtocolState.Open;
 
@@ -368,12 +368,12 @@ codeunit 6014625 "POS Device Proxy Manager"
         Manager.Signal(Signal);
     end;
 
-    local procedure ProtocolStateEnteredInitiated(Manager: DotNet ProtocolManager;PreviousState: Integer)
+    local procedure ProtocolStateEnteredInitiated(Manager: DotNet npNetProtocolManager;PreviousState: Integer)
     begin
         ProtocolSecure(Manager,false);
     end;
 
-    local procedure ProtocolStateEnteredSecured(Manager: DotNet ProtocolManager;PreviousState: Integer)
+    local procedure ProtocolStateEnteredSecured(Manager: DotNet npNetProtocolManager;PreviousState: Integer)
     begin
         //+NPR5.29
         if AssemblyCheckCompleted then begin
@@ -384,12 +384,12 @@ codeunit 6014625 "POS Device Proxy Manager"
         ProtocolGetAssemblies(Manager);
     end;
 
-    local procedure ProtocolStateEnteredCheckedAssemblies(Manager: DotNet ProtocolManager;PreviousState: Integer)
+    local procedure ProtocolStateEnteredCheckedAssemblies(Manager: DotNet npNetProtocolManager;PreviousState: Integer)
     begin
         ProtocolInstallAssemblies(Manager);
     end;
 
-    local procedure ProtocolStateEnteredInstalledAssemblies(Manager: DotNet ProtocolManager;PreviousState: Integer)
+    local procedure ProtocolStateEnteredInstalledAssemblies(Manager: DotNet npNetProtocolManager;PreviousState: Integer)
     begin
         AssembliesInstalled := true;
         //+NPR5.29
@@ -398,10 +398,10 @@ codeunit 6014625 "POS Device Proxy Manager"
         Manager.State := ProtocolState.Open;
     end;
 
-    local procedure ProtocolStateEnteredOpen(Manager: DotNet ProtocolManager;PreviousState: Integer)
+    local procedure ProtocolStateEnteredOpen(Manager: DotNet npNetProtocolManager;PreviousState: Integer)
     var
-        StartSignal: DotNet StartSession;
-        Signal: DotNet Signal;
+        StartSignal: DotNet npNetStartSession;
+        Signal: DotNet npNetSignal;
     begin
         ProtocolState := PreviousState;
         if Manager.IsInitiationProtocolState(ProtocolState) then begin
@@ -414,7 +414,7 @@ codeunit 6014625 "POS Device Proxy Manager"
 
     procedure ProtocolClose(ProtocolManagerId: Guid)
     var
-        Manager: DotNet ProtocolManager;
+        Manager: DotNet npNetProtocolManager;
     begin
         GetProtocolManager(ProtocolManagerId,Manager);
         Manager.State := ProtocolState.Closed;
@@ -422,7 +422,7 @@ codeunit 6014625 "POS Device Proxy Manager"
 
     procedure ProtocolAbort(ProtocolManagerId: Guid;ErrorMsg: Text)
     var
-        Manager: DotNet ProtocolManager;
+        Manager: DotNet npNetProtocolManager;
     begin
         GetProtocolManager(ProtocolManagerId,Manager);
         Manager.Abort(ErrorMsg);
@@ -430,16 +430,16 @@ codeunit 6014625 "POS Device Proxy Manager"
 
     procedure AbortByUserRequest(ProtocolManagerId: Guid)
     var
-        Manager: DotNet ProtocolManager;
+        Manager: DotNet npNetProtocolManager;
     begin
         GetProtocolManager(ProtocolManagerId,Manager);
         Manager.State := ProtocolState.AbortedByUserRequest;
     end;
 
-    procedure QueryClosePage(Manager: DotNet ProtocolManager)
+    procedure QueryClosePage(Manager: DotNet npNetProtocolManager)
     var
-        QueryCloseSignal: DotNet QueryClosePage;
-        Signal: DotNet Signal;
+        QueryCloseSignal: DotNet npNetQueryClosePage;
+        Signal: DotNet npNetSignal;
     begin
         QueryCloseSignal := QueryCloseSignal.QueryClosePage();
         SerializeSignal(QueryCloseSignal,Signal);
@@ -455,7 +455,7 @@ codeunit 6014625 "POS Device Proxy Manager"
 
     local procedure GetRegistersWithInstalledAssembly(ProxyAssembly: Record "Proxy Assembly") Registers: Text
     var
-        Reader: DotNet StreamReader;
+        Reader: DotNet npNetStreamReader;
         InStream: InStream;
     begin
         if ProxyAssembly."Register Map".HasValue() then begin
@@ -466,9 +466,9 @@ codeunit 6014625 "POS Device Proxy Manager"
         end;
     end;
 
-    procedure SendMessage(ProtocolManagerId: Guid;Request: DotNet Request): Guid
+    procedure SendMessage(ProtocolManagerId: Guid;Request: DotNet npNetRequest): Guid
     var
-        Manager: DotNet ProtocolManager;
+        Manager: DotNet npNetProtocolManager;
     begin
         GetProtocolManager(ProtocolManagerId,Manager);
 
@@ -476,9 +476,9 @@ codeunit 6014625 "POS Device Proxy Manager"
         exit(Manager.SendMessage(Request));
     end;
 
-    procedure SetModel(ProtocolManagerId: Guid;Model: DotNet Model)
+    procedure SetModel(ProtocolManagerId: Guid;Model: DotNet npNetModel)
     var
-        Manager: DotNet ProtocolManager;
+        Manager: DotNet npNetProtocolManager;
     begin
         GetProtocolManager(ProtocolManagerId,Manager);
         Manager.Model := Model;
@@ -487,15 +487,15 @@ codeunit 6014625 "POS Device Proxy Manager"
 
     procedure UpdateModel(ProtocolManagerId: Guid)
     var
-        Manager: DotNet ProtocolManager;
+        Manager: DotNet npNetProtocolManager;
     begin
         GetProtocolManager(ProtocolManagerId,Manager);
         Manager.UpdateModel();
     end;
 
-    procedure SetExpectedResponseType(ProtocolManagerId: Guid;Type: DotNet Type)
+    procedure SetExpectedResponseType(ProtocolManagerId: Guid;Type: DotNet npNetType)
     var
-        Manager: DotNet ProtocolManager;
+        Manager: DotNet npNetProtocolManager;
     begin
         GetProtocolManager(ProtocolManagerId,Manager);
         Manager.RegisterResponseType(Type);

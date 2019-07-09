@@ -364,8 +364,8 @@ page 6151504 "Nc Import List"
     var
         TempBlob: Record TempBlob temporary;
         FileMgt: Codeunit "File Management";
-        MemoryStream: DotNet MemoryStream;
-        XmlDoc: DotNet XmlDocument;
+        MemoryStream: DotNet npNetMemoryStream;
+        XmlDoc: DotNet npNetXmlDocument;
         f: File;
         InStr: InStream;
         OutStr: OutStream;
@@ -450,7 +450,7 @@ page 6151504 "Nc Import List"
     var
         TempBlob: Record TempBlob temporary;
         FileMgt: Codeunit "File Management";
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
         Path: Text;
         Content: Text;

@@ -25,7 +25,7 @@ codeunit 6150642 "POS Payment Bin Eject - OPOS"
         POSFrontEnd: Codeunit "POS Front End Management";
         POSPaymentBinInvokeMgt: Codeunit "POS Payment Bin Eject Mgt.";
         DeviceName: Text;
-        OPOSEjectDrawerRequest: DotNet EjectDrawerRequest;
+        OPOSEjectDrawerRequest: DotNet npNetEjectDrawerRequest;
     begin
         if POSPaymentBin."Eject Method" <> InvokeMethodCode() then
           exit;
@@ -97,9 +97,9 @@ codeunit 6150642 "POS Payment Bin Eject - OPOS"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
-    local procedure OnOPOSEjectResponse(ActionName: Text;Step: Text;Envelope: DotNet ResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnOPOSEjectResponse(ActionName: Text;Step: Text;Envelope: DotNet npNetResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
-        OPOSEjectDrawerResponse: DotNet EjectDrawerResponse;
+        OPOSEjectDrawerResponse: DotNet npNetEjectDrawerResponse;
         ErrorMessage: Text;
         Stargate: Codeunit "POS Stargate Management";
     begin

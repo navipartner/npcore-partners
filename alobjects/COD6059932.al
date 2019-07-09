@@ -65,11 +65,11 @@ codeunit 6059932 "Doc. Exch. File Mgt."
 
     procedure ImportDirectory(InboxPath: Text;ArchivePath: Text;IsLocalInbox: Boolean;IsLocalArchive: Boolean;CreateDocument: Boolean) Success: Boolean
     var
-        DirectoryInfoServer: DotNet DirectoryInfo;
+        DirectoryInfoServer: DotNet npNetDirectoryInfo;
         [RunOnClient]
-        DirectoryInfoClient: DotNet DirectoryInfo;
-        FileInfo: DotNet FileInfo;
-        List: DotNet List_Of_T;
+        DirectoryInfoClient: DotNet npNetDirectoryInfo;
+        FileInfo: DotNet npNetFileInfo;
+        List: DotNet npNetList_Of_T;
     begin
         FolderStructureDelimiter := '\';
         if InboxPath = '' then
@@ -142,12 +142,12 @@ codeunit 6059932 "Doc. Exch. File Mgt."
 
     procedure ImportFTPFolder(FTPserver: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFileMask: Text;FTPArchiveFolder: Text;FTPUsePassive: Boolean;CreateDocument: Boolean) Success: Boolean
     var
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        NetworkCredential: DotNet NetworkCredential;
-        Stream: DotNet Stream;
-        StreamReader: DotNet StreamReader;
-        MemoryStream: DotNet MemoryStream;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        NetworkCredential: DotNet npNetNetworkCredential;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
+        MemoryStream: DotNet npNetMemoryStream;
         FileName: Text;
         FileNameList: array [20] of Text;
         FileCounter: Integer;
@@ -194,12 +194,12 @@ codeunit 6059932 "Doc. Exch. File Mgt."
 
     local procedure ImportFTPFile(FTPserver: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFilename: Text;FTPArchiveFolder: Text;FTPUsePassive: Boolean;CreateDocument: Boolean)
     var
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        Stream: DotNet Stream;
-        StreamReader: DotNet StreamReader;
-        MemoryStream: DotNet MemoryStream;
-        UTF8Encoding: DotNet Encoding;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        UTF8Encoding: DotNet npNetEncoding;
         FileLength: Integer;
         TempBlob: Record TempBlob;
         OStream: OutStream;
@@ -254,9 +254,9 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         //+NPR5.29 [263705]
     end;
 
-    local procedure InitFTPWebRequest(var FtpWebRequest: DotNet FtpWebRequest;FTPMethod: Text;FTPServerName: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFileNameOrMask: Text;FTPusePassive: Boolean)
+    local procedure InitFTPWebRequest(var FtpWebRequest: DotNet npNetFtpWebRequest;FTPMethod: Text;FTPServerName: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFileNameOrMask: Text;FTPusePassive: Boolean)
     var
-        NetworkCredential: DotNet NetworkCredential;
+        NetworkCredential: DotNet npNetNetworkCredential;
     begin
         //-NPR5.29 [263705]
         FtpWebRequest := FtpWebRequest.Create(GetFTPPath(FTPServerName,FTPFolder,FTPFileNameOrMask));
@@ -962,14 +962,14 @@ codeunit 6059932 "Doc. Exch. File Mgt."
           FileMgt.DeleteClientFile(ClientFilePath);
     end;
 
-    procedure ShowWithStylesheet(var XmlDoc: DotNet XmlDocument)
+    procedure ShowWithStylesheet(var XmlDoc: DotNet npNetXmlDocument)
     var
-        MemoryStream: DotNet MemoryStream;
-        MemoryStream2: DotNet MemoryStream;
-        XmlStyleSheet: DotNet XmlDocument;
-        XslCompiledTransform: DotNet XslCompiledTransform;
-        XmlReader: DotNet XmlReader;
-        XmlWriter: DotNet XmlWriter;
+        MemoryStream: DotNet npNetMemoryStream;
+        MemoryStream2: DotNet npNetMemoryStream;
+        XmlStyleSheet: DotNet npNetXmlDocument;
+        XslCompiledTransform: DotNet npNetXslCompiledTransform;
+        XmlReader: DotNet npNetXmlReader;
+        XmlWriter: DotNet npNetXmlWriter;
     begin
         if IsNull(XmlStyleSheet) then begin
           XmlStyleSheet := XmlStyleSheet.XmlDocument;
@@ -1070,12 +1070,12 @@ codeunit 6059932 "Doc. Exch. File Mgt."
 
     local procedure ExportFTPFile(FTPserver: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFilename: Text;FTPUsePassive: Boolean;ServerFilePath: Text)
     var
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        Stream: DotNet Stream;
-        StreamReader: DotNet StreamReader;
-        MemoryStream: DotNet MemoryStream;
-        UTF8Encoding: DotNet Encoding;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        UTF8Encoding: DotNet npNetEncoding;
         FileLength: Integer;
         TempBlob: Record TempBlob;
         OStream: OutStream;

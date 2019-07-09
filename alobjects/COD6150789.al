@@ -57,7 +57,7 @@ codeunit 6150789 "POS Action - Print Item"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         LineSetting: Option "All Lines","Selected Line";
@@ -118,7 +118,7 @@ codeunit 6150789 "POS Action - Print Item"
         RetailJnlLine.DeleteAll;
     end;
 
-    local procedure PrintSelectedLine(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";PrintType: Integer)
+    local procedure PrintSelectedLine(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";PrintType: Integer)
     var
         GUID: Guid;
         JSON: Codeunit "POS JSON Management";

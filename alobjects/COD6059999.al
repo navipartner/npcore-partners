@@ -30,12 +30,12 @@ codeunit 6059999 "Client Diagnostics NpCase Mgt."
     local procedure SendClientDiagnostics(ClientDiagnostics: Record "Client Diagnostics")
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        Uri: DotNet Uri;
-        WebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        Uri: DotNet npNetUri;
+        WebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
         MethodName: Text;
         ServiceName: Text;
     begin
@@ -63,12 +63,12 @@ codeunit 6059999 "Client Diagnostics NpCase Mgt."
         //+NPR5.40 [308907]
     end;
 
-    local procedure InitRequest(ClientDiagnostics: Record "Client Diagnostics";var XmlDoc: DotNet XmlDocument)
+    local procedure InitRequest(ClientDiagnostics: Record "Client Diagnostics";var XmlDoc: DotNet npNetXmlDocument)
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlElementPosInfo: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlElementPosInfo: DotNet npNetXmlElement;
         MethodName: Text;
         MethodNS: Text;
     begin
@@ -105,10 +105,10 @@ codeunit 6059999 "Client Diagnostics NpCase Mgt."
         //+NPR5.40 [308907]
     end;
 
-    local procedure AppendLoginInfo(ClientDiagnostics: Record "Client Diagnostics";MethodNS: Text;var XmlElement: DotNet XmlElement)
+    local procedure AppendLoginInfo(ClientDiagnostics: Record "Client Diagnostics";MethodNS: Text;var XmlElement: DotNet npNetXmlElement)
     var
-        XmlElementNew: DotNet XmlElement;
-        XmlElementPosInfo: DotNet XmlElement;
+        XmlElementNew: DotNet npNetXmlElement;
+        XmlElementPosInfo: DotNet npNetXmlElement;
     begin
         //-NPR5.40 [308907]
         if not ClientDiagnostics."Login Info" then
@@ -130,10 +130,10 @@ codeunit 6059999 "Client Diagnostics NpCase Mgt."
         //+NPR5.40 [308907]
     end;
 
-    local procedure AppendLicenseInfo(ClientDiagnostics: Record "Client Diagnostics";MethodNS: Text;var XmlElement: DotNet XmlElement)
+    local procedure AppendLicenseInfo(ClientDiagnostics: Record "Client Diagnostics";MethodNS: Text;var XmlElement: DotNet npNetXmlElement)
     var
-        XmlElementNew: DotNet XmlElement;
-        XmlElementPosInfo: DotNet XmlElement;
+        XmlElementNew: DotNet npNetXmlElement;
+        XmlElementPosInfo: DotNet npNetXmlElement;
     begin
         //-NPR5.40 [308907]
         if not ClientDiagnostics."License Info" then
@@ -149,10 +149,10 @@ codeunit 6059999 "Client Diagnostics NpCase Mgt."
         //+NPR5.40 [308907]
     end;
 
-    local procedure AppendComputerInfo(ClientDiagnostics: Record "Client Diagnostics";MethodNS: Text;var XmlElement: DotNet XmlElement)
+    local procedure AppendComputerInfo(ClientDiagnostics: Record "Client Diagnostics";MethodNS: Text;var XmlElement: DotNet npNetXmlElement)
     var
-        XmlElementNew: DotNet XmlElement;
-        XmlElementPosInfo: DotNet XmlElement;
+        XmlElementNew: DotNet npNetXmlElement;
+        XmlElementPosInfo: DotNet npNetXmlElement;
     begin
         //-NPR5.40 [308907]
         if not ClientDiagnostics."Computer Info" then
@@ -168,10 +168,10 @@ codeunit 6059999 "Client Diagnostics NpCase Mgt."
         //+NPR5.40 [308907]
     end;
 
-    local procedure AppendPosInfo(ClientDiagnostics: Record "Client Diagnostics";MethodNS: Text;var XmlElement: DotNet XmlElement)
+    local procedure AppendPosInfo(ClientDiagnostics: Record "Client Diagnostics";MethodNS: Text;var XmlElement: DotNet npNetXmlElement)
     var
-        XmlElementNew: DotNet XmlElement;
-        XmlElementPosInfo: DotNet XmlElement;
+        XmlElementNew: DotNet npNetXmlElement;
+        XmlElementPosInfo: DotNet npNetXmlElement;
     begin
         //-NPR5.40 [308907]
         if not ClientDiagnostics."POS Info" then
@@ -186,10 +186,10 @@ codeunit 6059999 "Client Diagnostics NpCase Mgt."
         //+NPR5.40 [308907]
     end;
 
-    local procedure AppendLogoutInfo(ClientDiagnostics: Record "Client Diagnostics";MethodNS: Text;var XmlElement: DotNet XmlElement)
+    local procedure AppendLogoutInfo(ClientDiagnostics: Record "Client Diagnostics";MethodNS: Text;var XmlElement: DotNet npNetXmlElement)
     var
-        XmlElementNew: DotNet XmlElement;
-        XmlElementPosInfo: DotNet XmlElement;
+        XmlElementNew: DotNet npNetXmlElement;
+        XmlElementPosInfo: DotNet npNetXmlElement;
     begin
         //-NPR5.40 [308907]
         if not ClientDiagnostics."Logout Info" then
@@ -202,7 +202,7 @@ codeunit 6059999 "Client Diagnostics NpCase Mgt."
         //+NPR5.40 [308907]
     end;
 
-    local procedure AddXmlElement(var XmlElement: DotNet XmlElement;ElementName: Text;Namespace: Text;InnerText: Text;var XmlElementNew: DotNet XmlElement)
+    local procedure AddXmlElement(var XmlElement: DotNet npNetXmlElement;ElementName: Text;Namespace: Text;InnerText: Text;var XmlElementNew: DotNet npNetXmlElement)
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
     begin

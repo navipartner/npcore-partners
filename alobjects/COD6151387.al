@@ -44,9 +44,9 @@ codeunit 6151387 "CS UI Warehouse Activity"
         CSCommunication: Codeunit "CS Communication";
         CSMgt: Codeunit "CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet XmlDocument;
-        ReturnedNode: DotNet XmlNode;
-        RootNode: DotNet XmlNode;
+        DOMxmlin: DotNet npNetXmlDocument;
+        ReturnedNode: DotNet npNetXmlNode;
+        RootNode: DotNet npNetXmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -267,7 +267,7 @@ codeunit 6151387 "CS UI Warehouse Activity"
 
     local procedure SendForm(InputField: Integer;CSWarehouseActivityHandling: Record "CS Warehouse Activity Handling")
     var
-        Records: DotNet XmlElement;
+        Records: DotNet npNetXmlElement;
     begin
         CSCommunication.EncodeUI(MiniformHeader,StackCode,DOMxmlin,InputField,Remark,CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
@@ -455,16 +455,16 @@ codeunit 6151387 "CS UI Warehouse Activity"
         CSWarehouseActivityHandling.DeleteAll(true);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet XmlNode;AttribName: Text[250];AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: DotNet npNetXmlNode;AttribName: Text[250];AttribValue: Text[250])
     begin
         if XMLDOMMgt.AddAttribute(NewChild,AttribName,AttribValue) > 0 then
           Error(Text002,AttribName);
     end;
 
-    local procedure AddSummarize(var Records: DotNet XmlElement): Boolean
+    local procedure AddSummarize(var Records: DotNet npNetXmlElement): Boolean
     var
-        "Record": DotNet XmlElement;
-        Line: DotNet XmlElement;
+        "Record": DotNet npNetXmlElement;
+        Line: DotNet npNetXmlElement;
         Indicator: Text;
         CSWarehouseActivityHandling: Record "CS Warehouse Activity Handling";
         WhseActivityLine: Record "Warehouse Activity Line";
@@ -827,10 +827,10 @@ codeunit 6151387 "CS UI Warehouse Activity"
           exit(false);
     end;
 
-    local procedure AddAdditionalInfo(var xmlout: DotNet XmlDocument;CSWarehouseActivityHandling: Record "CS Warehouse Activity Handling")
+    local procedure AddAdditionalInfo(var xmlout: DotNet npNetXmlDocument;CSWarehouseActivityHandling: Record "CS Warehouse Activity Handling")
     var
-        CurrentRootNode: DotNet XmlNode;
-        XMLFunctionNode: DotNet XmlNode;
+        CurrentRootNode: DotNet npNetXmlNode;
+        XMLFunctionNode: DotNet npNetXmlNode;
         StrMenuTxt: Text;
     begin
         if not (CSWarehouseActivityHandling."Activity Type" in [CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away",CSWarehouseActivityHandling."Activity Type"::"Invt. Pick"]) then

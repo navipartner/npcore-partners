@@ -28,9 +28,9 @@ codeunit 6014403 "NAS Imp. XML File to Data Exc."
         DataExchDef: Record "Data Exch. Def";
         DataExchLineDef: Record "Data Exch. Line Def";
         XMLDOMManagement: Codeunit "XML DOM Management";
-        XmlDocument: DotNet XmlDocument;
-        XmlNodeList: DotNet XmlNodeList;
-        XmlNamespaceManager: DotNet XmlNamespaceManager;
+        XmlDocument: DotNet npNetXmlDocument;
+        XmlNodeList: DotNet npNetXmlNodeList;
+        XmlNamespaceManager: DotNet npNetXmlNamespaceManager;
         XmlStream: InStream;
         CurrentLineNo: Integer;
         NodeID: Text[250];
@@ -63,13 +63,13 @@ codeunit 6014403 "NAS Imp. XML File to Data Exc."
         until DataExchLineDef.Next = 0;
     end;
 
-    local procedure ParseParentChildLine(CurrentXmlNode: DotNet XmlNode;NodeID: Text[250];ParentNodeID: Text[250];CurrentLineNo: Integer;CurrentDataExchLineDef: Record "Data Exch. Line Def";EntryNo: Integer;XmlNamespaceManager: DotNet XmlNamespaceManager)
+    local procedure ParseParentChildLine(CurrentXmlNode: DotNet npNetXmlNode;NodeID: Text[250];ParentNodeID: Text[250];CurrentLineNo: Integer;CurrentDataExchLineDef: Record "Data Exch. Line Def";EntryNo: Integer;XmlNamespaceManager: DotNet npNetXmlNamespaceManager)
     var
         DataExchColumnDef: Record "Data Exch. Column Def";
         DataExchLineDef: Record "Data Exch. Line Def";
         DataExchField: Record "Data Exch. Field";
         XMLDOMManagement: Codeunit "XML DOM Management";
-        XmlNodeList: DotNet XmlNodeList;
+        XmlNodeList: DotNet npNetXmlNodeList;
         CurrentIndex: Integer;
         CurrentNodeID: Text[250];
         LastLineNo: Integer;

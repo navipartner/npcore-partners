@@ -712,12 +712,12 @@ codeunit 6184513 "EFT MobilePay Integration"
 
     local procedure InvokeRESTHTTPRequest(var JSONRequestBody: Text[1024];ServiceName: Text[30];var JSONResponseText: Text[1024]): Boolean
     var
-        HttpWebRequest: DotNet HttpWebRequest;
-        ReqStream: DotNet Stream;
-        ReqStreamWriter: DotNet StreamWriter;
-        HttpWebResponse: DotNet HttpWebResponse;
-        ResponseStream: DotNet Stream;
-        ResponseStreamReader: DotNet StreamReader;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        ReqStream: DotNet npNetStream;
+        ReqStreamWriter: DotNet npNetStreamWriter;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        ResponseStream: DotNet npNetStream;
+        ResponseStreamReader: DotNet npNetStreamReader;
         ServiceURL: Text[100];
         AuthHeader: Text[100];
     begin
@@ -750,7 +750,7 @@ codeunit 6184513 "EFT MobilePay Integration"
 
     local procedure CalcAuthHeader(RequestUrl: Text[100];ContentBody: Text[1024]): Text[100]
     var
-        Encoding: DotNet Encoding;
+        Encoding: DotNet npNetEncoding;
         AuthString: Text[1024];
         HashValue: Text[100];
         UnixTimeStamp: Integer;
@@ -768,7 +768,7 @@ codeunit 6184513 "EFT MobilePay Integration"
 
     local procedure CalcPaymentHMAC(EftTransactionRequest: Record "EFT Transaction Request"): Text[100]
     var
-        Encoding: DotNet Encoding;
+        Encoding: DotNet npNetEncoding;
         HMACString: Text[1024];
         MerchantKey: Text[50];
         HashValue: Text[100];
@@ -864,14 +864,14 @@ codeunit 6184513 "EFT MobilePay Integration"
 
     local procedure GetUnixTime(FromDateTime: DateTime) UnixTimeStamp: Integer
     var
-        SystemDateTime: DotNet DateTime;
-        TypeOfDateTime: DotNet Type;
-        TypeOfTimeSpan: DotNet Type;
-        DotNetArray: DotNet Array;
-        SystemObject: DotNet Object;
-        Convert: DotNet Convert;
-        MethodInfo: DotNet MethodInfo;
-        DateTimeKind: DotNet DateTimeKind;
+        SystemDateTime: DotNet npNetDateTime;
+        TypeOfDateTime: DotNet npNetType;
+        TypeOfTimeSpan: DotNet npNetType;
+        DotNetArray: DotNet npNetArray;
+        SystemObject: DotNet npNetObject;
+        Convert: DotNet npNetConvert;
+        MethodInfo: DotNet npNetMethodInfo;
+        DateTimeKind: DotNet npNetDateTimeKind;
         Dur: Duration;
     begin
         TypeOfDateTime := GetDotNetType(SystemDateTime);
@@ -889,19 +889,19 @@ codeunit 6184513 "EFT MobilePay Integration"
         UnixTimeStamp := Convert.ToInt32(TypeOfTimeSpan.GetProperty('TotalSeconds').GetValue(Dur));
     end;
 
-    local procedure GetHmacSha256Hash("Key": Text;Value: Text;Encoding: DotNet Encoding): Text
+    local procedure GetHmacSha256Hash("Key": Text;Value: Text;Encoding: DotNet npNetEncoding): Text
     var
-        HmacSha256: DotNet HMACSHA256;
-        Convert: DotNet Convert;
+        HmacSha256: DotNet npNetHMACSHA256;
+        Convert: DotNet npNetConvert;
     begin
         HmacSha256 := HmacSha256.HMACSHA256(Encoding.GetBytes(Key));
         exit(Convert.ToBase64String(HmacSha256.ComputeHash(Encoding.GetBytes(Value))));
     end;
 
-    local procedure GetSha256Hash(Value: Text;Encoding: DotNet Encoding): Text
+    local procedure GetSha256Hash(Value: Text;Encoding: DotNet npNetEncoding): Text
     var
-        Sha256: DotNet SHA256Managed;
-        Convert: DotNet Convert;
+        Sha256: DotNet npNetSHA256Managed;
+        Convert: DotNet npNetConvert;
     begin
         Sha256 := Sha256.SHA256Managed();
         exit(Encoding.GetString(Sha256.ComputeHash(Encoding.GetBytes(Value))));

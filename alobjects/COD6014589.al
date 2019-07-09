@@ -41,7 +41,7 @@ codeunit 6014589 "GCP Mgt."
     begin
     end;
 
-    procedure PrintFile(PrinterID: Text;var Content: DotNet MemoryStream;ContentType: Text;TicketCJT: Text;Title: Text;Tag: Text) Success: Boolean
+    procedure PrintFile(PrinterID: Text;var Content: DotNet npNetMemoryStream;ContentType: Text;TicketCJT: Text;Title: Text;Tag: Text) Success: Boolean
     var
         AccessTokenValue: Text;
         RefreshTokenValue: Text;
@@ -111,7 +111,7 @@ codeunit 6014589 "GCP Mgt."
         RefreshTokenValue: Text;
         TempRetailList: Record "Retail List" temporary;
         RetailList: Page "Retail List";
-        JObject: DotNet JObject;
+        JObject: DotNet npNetJObject;
         i: Integer;
         API: Codeunit "GCP API";
         Token: Record "OAuth Token";
@@ -149,7 +149,7 @@ codeunit 6014589 "GCP Mgt."
         exit(Success);
     end;
 
-    procedure GetPrinterInfo(ID: Text;var JObject: DotNet JObject) Success: Boolean
+    procedure GetPrinterInfo(ID: Text;var JObject: DotNet npNetJObject) Success: Boolean
     var
         API: Codeunit "GCP API";
         AccessTokenValue: Text;
@@ -278,7 +278,7 @@ codeunit 6014589 "GCP Mgt."
 
     procedure SetTicketOptions(var GCPSetup: Record "GCP Setup")
     var
-        JObject: DotNet JObject;
+        JObject: DotNet npNetJObject;
         GCPTicketOptions: Page "GCP Ticket Options";
         OutStream: OutStream;
         TicketJson: Text;
@@ -325,7 +325,7 @@ codeunit 6014589 "GCP Mgt."
         OutStream: OutStream;
         InStream: InStream;
         FileName: Variant;
-        JObject: DotNet JObject;
+        JObject: DotNet npNetJObject;
     begin
         if not GetPrinterInfo(PrinterID, JObject) then
           exit;
@@ -341,7 +341,7 @@ codeunit 6014589 "GCP Mgt."
     end;
 
     [TryFunction]
-    procedure TryParseJSON(JSON: Text;Path: Text;var JObjectOut: DotNet JObject)
+    procedure TryParseJSON(JSON: Text;Path: Text;var JObjectOut: DotNet npNetJObject)
     begin
         Clear(JObjectOut);
         JObjectOut := JObjectOut.Parse(JSON);

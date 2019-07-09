@@ -84,7 +84,7 @@ xmlport 6059937 "Rss Reader Activity Import"
 
     var
         RssReaderActivityTemp: Record "RSS Reader Activity" temporary;
-        xmlconvert: DotNet XmlConvert;
+        xmlconvert: DotNet npNetXmlConvert;
         RssFeedCode: Code[20];
 
     procedure SetRssFeedCode(RssFeedCodeHere: Code[20])

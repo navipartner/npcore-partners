@@ -83,7 +83,7 @@ table 6060005 "GIM - Mapping Table"
         TableField: Record "Field";
         GIMImportDocument: Record "GIM - Import Document";
         DotNetNamespaceURI: Label 'urn:schemas-microsoft-com:dynamics:NAV:MetaObjects';
-        XMLNodeReturn: DotNet XmlNode;
+        XMLNodeReturn: DotNet npNetXmlNode;
         MappingTableLine: Record "GIM - Mapping Table Line";
 
     procedure InsertLine(DocNo: Code[20];ParsedText: Text[250];ColumnNo: Integer;ColumName: Text[50];NewLevel: Integer;ParentEntryNo: Integer;ElementName: Text[50];DocTypeCode: Code[10];SenderID: Code[20])
@@ -115,9 +115,9 @@ table 6060005 "GIM - Mapping Table"
     var
         InStr: InStream;
         ObjMeta: Record "Object Metadata";
-        XmlDoc: DotNet XmlDocument;
-        XMLNode: DotNet XmlNode;
-        XmlNamespaceManager: DotNet XmlNamespaceManager;
+        XmlDoc: DotNet npNetXmlDocument;
+        XMLNode: DotNet npNetXmlNode;
+        XmlNamespaceManager: DotNet npNetXmlNamespaceManager;
         FileMgt: Codeunit "File Management";
     begin
         ObjMeta.Get(ObjMeta."Object Type"::Table,TableID);
@@ -134,7 +134,7 @@ table 6060005 "GIM - Mapping Table"
 
     procedure GetAttribute(TableID: Integer;FieldID: Integer;AttributeName: Text[250]): Text[250]
     var
-        XMLNodeReturn: DotNet XmlNode;
+        XMLNodeReturn: DotNet npNetXmlNode;
     begin
         GetFieldNode(TableID,FieldID);
         exit(GetAttributeFromNode(AttributeName));
@@ -142,7 +142,7 @@ table 6060005 "GIM - Mapping Table"
 
     local procedure GetAttributeFromNode(AttributeName: Text[250]): Text[250]
     var
-        XMLAttributeNode: DotNet XmlNode;
+        XMLAttributeNode: DotNet npNetXmlNode;
     begin
         XMLAttributeNode := XMLNodeReturn.Attributes.GetNamedItem(AttributeName);
         if IsNull(XMLAttributeNode) then

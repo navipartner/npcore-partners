@@ -13,10 +13,10 @@ codeunit 6059946 "CashKeeper Proxy"
     var
         POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
         ProtocolStage: Integer;
-        ExpectedResponseType: DotNet Type;
+        ExpectedResponseType: DotNet npNetType;
         ExpectedResponseId: Guid;
-        QueuedRequests: DotNet Stack;
-        QueuedResponseTypes: DotNet Stack;
+        QueuedRequests: DotNet npNetStack;
+        QueuedResponseTypes: DotNet npNetStack;
         ProtocolManagerId: Guid;
         CashKeeperTransaction: Record "CashKeeper Transaction";
 
@@ -31,11 +31,11 @@ codeunit 6059946 "CashKeeper Proxy"
 
     local procedure ProcessSignal(var TempBlob: Record TempBlob)
     var
-        Signal: DotNet Signal;
-        StartSignal: DotNet StartSession;
-        Response: DotNet MessageResponse;
+        Signal: DotNet npNetSignal;
+        StartSignal: DotNet npNetStartSession;
+        Response: DotNet npNetMessageResponse;
         ProtocolManagerId: Guid;
-        QueryCloseSignal: DotNet QueryClosePage;
+        QueryCloseSignal: DotNet npNetQueryClosePage;
     begin
         POSDeviceProxyManager.DeserializeObject(Signal,TempBlob);
         case true of
@@ -60,10 +60,10 @@ codeunit 6059946 "CashKeeper Proxy"
 
     local procedure Start(ProtocolManagerIdIn: Guid)
     var
-        CashKeeperRequest: DotNet CashKeeperRequest;
-        VoidResponse: DotNet VoidResponse;
-        State: DotNet State1;
-        StateEnum: DotNet State_Action;
+        CashKeeperRequest: DotNet npNetCashKeeperRequest;
+        VoidResponse: DotNet npNetVoidResponse;
+        State: DotNet npNetState1;
+        StateEnum: DotNet npNetState_Action;
         CashKeeperSetup: Record "CashKeeper Setup";
     begin
         ProtocolManagerId := ProtocolManagerIdIn;
@@ -95,9 +95,9 @@ codeunit 6059946 "CashKeeper Proxy"
             ProtocolManagerId,CashKeeperRequest));
     end;
 
-    local procedure MessageResponse(Envelope: DotNet ResponseEnvelope)
+    local procedure MessageResponse(Envelope: DotNet npNetResponseEnvelope)
     var
-        CashKeeperResponse: DotNet CashKeeperResponse;
+        CashKeeperResponse: DotNet npNetCashKeeperResponse;
     begin
         if Envelope.ResponseTypeName <> Format(ExpectedResponseType) then
           Error('Unknown response type: %1 (expected %2)',Envelope.ResponseTypeName,Format(ExpectedResponseType));
@@ -113,7 +113,7 @@ codeunit 6059946 "CashKeeper Proxy"
         POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
     end;
 
-    local procedure AwaitResponse(Type: DotNet Type;Id: Guid)
+    local procedure AwaitResponse(Type: DotNet npNetType;Id: Guid)
     begin
         ExpectedResponseType := Type;
         ExpectedResponseId := Id;
@@ -125,7 +125,7 @@ codeunit 6059946 "CashKeeper Proxy"
 
     local procedure CloseForm(Data: Text)
     var
-        State: DotNet State1;
+        State: DotNet npNetState1;
         Txt001: Label 'CashKeeper error: %1 - %2';
         Txt002: Label 'Payment was cancelled';
     begin
@@ -161,16 +161,16 @@ codeunit 6059946 "CashKeeper Proxy"
     begin
     end;
 
-    local procedure DeserializeState(Data: Text;var State: DotNet State1)
+    local procedure DeserializeState(Data: Text;var State: DotNet npNetState1)
     var
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
     begin
         State := JsonConvert.DeserializeObject(Data,GetDotNetType(State));
     end;
 
     local procedure SerializeJson("Object": Variant): Text
     var
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
     begin
         exit(JsonConvert.SerializeObject(Object));
     end;

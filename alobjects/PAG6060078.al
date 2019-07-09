@@ -50,15 +50,15 @@ page 6060078 "MM Membership Kiosk"
         MembershipKiosk: Codeunit "MM Membership Kiosk";
         PageId: Option WELCOME,SCANTICKET,MEMBERINFO,TAKEPICTURE,PREVIEW,PRINT,SHOWERROR;
         StateMachinePageId: Integer;
-        MemberInfoJObject: DotNet JObject;
+        MemberInfoJObject: DotNet npNetJObject;
         INVALID_DATE: Label 'The date %1 specified for field %2 does not conform to the expected date format %3.';
         DATE_MASK_ERROR: Label 'Date format mask %1 is not supported.';
         VALUE_REQUIRED: Label 'A value is required for field %1.';
 
     procedure GotoPage(CurrentPageId: Integer; DestinationPageId: Integer; EventContents: Text): Integer
     var
-        JToken: DotNet JToken;
-        JObject: DotNet JObject;
+        JToken: DotNet npNetJToken;
+        JObject: DotNet npNetJObject;
         ScanCode: Text;
         TicketWebService: Codeunit "TM Ticket WebService";
         Status: Integer;
@@ -197,7 +197,7 @@ page 6060078 "MM Membership Kiosk"
     begin
     end;
 
-    local procedure GetJToken(JObject: DotNet JObject; "Key": Text; var JToken: DotNet JToken) KeyFound: Boolean
+    local procedure GetJToken(JObject: DotNet npNetJObject;"Key": Text;var JToken: DotNet npNetJToken) KeyFound: Boolean
     begin
 
         KeyFound := true;
@@ -210,9 +210,9 @@ page 6060078 "MM Membership Kiosk"
         exit(KeyFound);
     end;
 
-    local procedure CopyKeyValue(SourceJObject: DotNet JObject; SourceKey: Text; TargetJObject: DotNet JObject; TargetKey: Text) KeyFound: Boolean
+    local procedure CopyKeyValue(SourceJObject: DotNet npNetJObject;SourceKey: Text;TargetJObject: DotNet npNetJObject;TargetKey: Text) KeyFound: Boolean
     var
-        SourceJToken: DotNet JToken;
+        SourceJToken: DotNet npNetJToken;
     begin
 
         KeyFound := (GetStringValue(SourceJObject, SourceKey) <> '');
@@ -224,9 +224,9 @@ page 6060078 "MM Membership Kiosk"
         exit(KeyFound);
     end;
 
-    local procedure GetStringValue(JObject: DotNet JObject; "Key": Text): Text
+    local procedure GetStringValue(JObject: DotNet npNetJObject;"Key": Text): Text
     var
-        JToken: DotNet JToken;
+        JToken: DotNet npNetJToken;
     begin
 
         JToken := JObject.GetValue(Key);
@@ -236,7 +236,7 @@ page 6060078 "MM Membership Kiosk"
         exit(JToken.ToString());
     end;
 
-    local procedure GetDateValue(JObject: DotNet JObject; "Key": Text; DateMask: Code[20]; IsOptional: Boolean) ReturnDate: Date
+    local procedure GetDateValue(JObject: DotNet npNetJObject;"Key": Text;DateMask: Code[20];IsOptional: Boolean) ReturnDate: Date
     var
         ErrorMessage: Text;
     begin
@@ -281,9 +281,9 @@ page 6060078 "MM Membership Kiosk"
         exit(IsValid);
     end;
 
-    local procedure PutStringValue(var JObject: DotNet JObject; "Key": Text; Value: Text)
+    local procedure PutStringValue(var JObject: DotNet npNetJObject;"Key": Text;Value: Text)
     var
-        JToken: DotNet JToken;
+        JToken: DotNet npNetJToken;
     begin
 
         JToken := JToken.Parse(StrSubstNo('{%1: "%2"}', Key, Value));
@@ -291,7 +291,7 @@ page 6060078 "MM Membership Kiosk"
         JObject.Add(Key, JToken.Item(Key));
     end;
 
-    local procedure ShowErrorMessage(var JObject: DotNet JObject; ErrorMessage: Text): Integer
+    local procedure ShowErrorMessage(var JObject: DotNet npNetJObject;ErrorMessage: Text): Integer
     var
         "Key": Text;
     begin
@@ -304,7 +304,7 @@ page 6060078 "MM Membership Kiosk"
     begin
     end;
 
-    local procedure CreateMembership(JObject: DotNet JObject)
+    local procedure CreateMembership(JObject: DotNet npNetJObject)
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipSalesSetup: Record "MM Membership Sales Setup";

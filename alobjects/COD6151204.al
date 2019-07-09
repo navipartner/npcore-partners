@@ -52,12 +52,12 @@ codeunit 6151204 "NpCs Store Mgt."
     procedure UpdateContactInfo(var NpCsStore: Record "NpCs Store")
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
         Response: Text;
         PrevRec: Text;
@@ -123,12 +123,12 @@ codeunit 6151204 "NpCs Store Mgt."
     procedure TryGetCollectService(NpCsStore: Record "NpCs Store")
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
     begin
         NpCsStore.TestField("Service Url");
@@ -157,7 +157,7 @@ codeunit 6151204 "NpCs Store Mgt."
     end;
 
     [TryFunction]
-    local procedure TryGetWebResponse(HttpWebRequest: DotNet HttpWebRequest;var HttpWebResponse: DotNet HttpWebResponse)
+    local procedure TryGetWebResponse(HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse)
     begin
         HttpWebResponse := HttpWebRequest.GetResponse;
     end;
@@ -224,7 +224,7 @@ codeunit 6151204 "NpCs Store Mgt."
 
     procedure CalcDistance(FromNpCsStore: Record "NpCs Store";ToNpCsStore: Record "NpCs Store") Distance: Decimal
     var
-        Math: DotNet Math;
+        Math: DotNet npNetMath;
         PI: Decimal;
         Lat1: Decimal;
         Lat2: Decimal;
@@ -270,12 +270,12 @@ codeunit 6151204 "NpCs Store Mgt."
     var
         NpCsStore: Record "NpCs Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         ReqBody: Text;
         Response: Text;
     begin
@@ -368,9 +368,9 @@ codeunit 6151204 "NpCs Store Mgt."
         exit(TempNpCsStore.FindFirst);
     end;
 
-    local procedure GetElementDecimal(XmlElement: DotNet XmlElement;Path: Text) Value: Decimal
+    local procedure GetElementDecimal(XmlElement: DotNet npNetXmlElement;Path: Text) Value: Decimal
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         if IsNull(XmlElement) then
           exit(0);

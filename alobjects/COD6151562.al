@@ -12,10 +12,10 @@ codeunit 6151562 "NpXml Xml Value Subscribers"
     local procedure GetBase64(RecRef: RecordRef;NpXmlElement: Record "NpXml Element";FieldNo: Integer;var XmlValue: Text;var Handled: Boolean)
     var
         TempBlob: Record TempBlob temporary;
-        BinaryReader: DotNet BinaryReader;
-        Convert: DotNet Convert;
-        Encoding: DotNet Encoding;
-        MemoryStream: DotNet MemoryStream;
+        BinaryReader: DotNet npNetBinaryReader;
+        Convert: DotNet npNetConvert;
+        Encoding: DotNet npNetEncoding;
+        MemoryStream: DotNet npNetMemoryStream;
         FieldRef: FieldRef;
         InStr: InStream;
     begin

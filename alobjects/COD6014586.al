@@ -67,9 +67,9 @@ codeunit 6014586 "RP Template Mgt."
 
     local procedure IncrementVersionNumber(VersionIn: Text): Text
     var
-        VersionArray: DotNet Array;
-        Regex: DotNet Regex;
-        Version: DotNet String;
+        VersionArray: DotNet npNetArray;
+        Regex: DotNet npNetRegex;
+        Version: DotNet npNetString;
         NewVersion: Text;
         VersionMatch: Boolean;
         MajorVersion: Integer;

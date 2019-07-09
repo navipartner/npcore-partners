@@ -52,9 +52,9 @@ codeunit 6184512 "EFT Mock Client Protocol"
 
     local procedure PaymentTransaction(EftTransactionRequest: Record "EFT Transaction Request")
     var
-        Captions: DotNet Captions;
-        TransactionRequest: DotNet TransactionRequest1;
-        State: DotNet State5;
+        Captions: DotNet npNetCaptions;
+        TransactionRequest: DotNet npNetTransactionRequest1;
+        State: DotNet npNetState5;
     begin
         State := State.State();
         State.RequestEntryNo := EftTransactionRequest."Entry No.";
@@ -84,8 +84,8 @@ codeunit 6184512 "EFT Mock Client Protocol"
 
     local procedure OpenTerminal(EftTransactionRequest: Record "EFT Transaction Request")
     var
-        OpenRequest: DotNet OpenRequest;
-        State: DotNet State5;
+        OpenRequest: DotNet npNetOpenRequest;
+        State: DotNet npNetState5;
         EFTSetup: Record "EFT Setup";
         ConnectionMethod: Integer;
         COMPort: Integer;
@@ -107,8 +107,8 @@ codeunit 6184512 "EFT Mock Client Protocol"
 
     local procedure CloseTerminal(EftTransactionRequest: Record "EFT Transaction Request")
     var
-        CloseRequest: DotNet CloseRequest;
-        State: DotNet State5;
+        CloseRequest: DotNet npNetCloseRequest;
+        State: DotNet npNetState5;
     begin
         State := State.State();
         State.RequestEntryNo := EftTransactionRequest."Entry No.";
@@ -122,8 +122,8 @@ codeunit 6184512 "EFT Mock Client Protocol"
 
     local procedure VerifySetup(EftTransactionRequest: Record "EFT Transaction Request")
     var
-        VerifySetupRequest: DotNet VerifySetupRequest;
-        State: DotNet State5;
+        VerifySetupRequest: DotNet npNetVerifySetupRequest;
+        State: DotNet npNetState5;
         EFTSetup: Record "EFT Setup";
         EFTMockClientIntegration: Codeunit "EFT Mock Client Integration";
     begin
@@ -142,8 +142,8 @@ codeunit 6184512 "EFT Mock Client Protocol"
 
     local procedure LookupTransaction(EftTransactionRequest: Record "EFT Transaction Request")
     var
-        LookupTransactionRequest: DotNet LookupTransactionRequest;
-        State: DotNet State5;
+        LookupTransactionRequest: DotNet npNetLookupTransactionRequest;
+        State: DotNet npNetState5;
         OriginalTransactionRequest: Record "EFT Transaction Request";
     begin
         OriginalTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
@@ -165,8 +165,8 @@ codeunit 6184512 "EFT Mock Client Protocol"
     local procedure VoidTransaction(EftTransactionRequest: Record "EFT Transaction Request")
     var
         OriginalTransactionRequest: Record "EFT Transaction Request";
-        VoidTransactionRequest: DotNet VoidRequest;
-        State: DotNet State5;
+        VoidTransactionRequest: DotNet npNetVoidRequest;
+        State: DotNet npNetState5;
     begin
         OriginalTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
 
@@ -186,8 +186,8 @@ codeunit 6184512 "EFT Mock Client Protocol"
 
     local procedure BalanceEnquiry(EftTransactionRequest: Record "EFT Transaction Request")
     var
-        BalanceEnquiryRequest: DotNet BalanceEnquiryRequest;
-        State: DotNet State5;
+        BalanceEnquiryRequest: DotNet npNetBalanceEnquiryRequest;
+        State: DotNet npNetState5;
     begin
         State := State.State();
         State.RequestEntryNo := EftTransactionRequest."Entry No.";
@@ -201,8 +201,8 @@ codeunit 6184512 "EFT Mock Client Protocol"
 
     local procedure ReprintLastReceipt(EftTransactionRequest: Record "EFT Transaction Request")
     var
-        ReprintReceiptRequest: DotNet ReprintReceiptRequest;
-        State: DotNet State5;
+        ReprintReceiptRequest: DotNet npNetReprintReceiptRequest;
+        State: DotNet npNetState5;
     begin
         //Note: Usually reprint does not have to be an explicit integration operation, since we store the receipts and can reprint from NAV storage.
         //This is an example of how to implement if terminal reprint last request was required as part of an integration certification, via an auxiliary function.
@@ -221,7 +221,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
         exit('EFT_' + IntegrationType());
     end;
 
-    local procedure SendRequest(Request: DotNet GenericRequest)
+    local procedure SendRequest(Request: DotNet npNetGenericRequest)
     var
         FrontEnd: Codeunit "POS Front End Management";
     begin
@@ -237,7 +237,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
     var
         PaymentRequest: Integer;
         EftTransactionRequest: Record "EFT Transaction Request";
-        State: DotNet State5;
+        State: DotNet npNetState5;
     begin
 
         if (ActionName <> ActionCode()) then
@@ -260,16 +260,16 @@ codeunit 6184512 "EFT Mock Client Protocol"
     end;
 
     [TryFunction]
-    local procedure DeserializeResponse(Data: Text;var State: DotNet State5)
+    local procedure DeserializeResponse(Data: Text;var State: DotNet npNetState5)
     var
-        GenericResponse: DotNet GenericResponse;
+        GenericResponse: DotNet npNetGenericResponse;
     begin
         GenericResponse := GenericResponse.Deserialize(Data);
         State := GenericResponse.State;
     end;
 
     [TryFunction]
-    local procedure HandleResponse(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet State5;EventName: Text)
+    local procedure HandleResponse(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet npNetState5;EventName: Text)
     begin
         EftTransactionRequest."Result Code" := State.ResultCode;
         EftTransactionRequest."Client Assembly Version" := State.ExecutingAssemblyVersion;
@@ -286,7 +286,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
         end;
     end;
 
-    local procedure GenericErrorCheck(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet State5): Boolean
+    local procedure GenericErrorCheck(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet npNetState5): Boolean
     begin
         case EftTransactionRequest."Result Code" of
           -100 : //Closed terminal - request never started
@@ -308,7 +308,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
         Message(EftTransactionRequest."Result Display Text"); //Show the error to user
     end;
 
-    local procedure PaymentTransactionEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet State5)
+    local procedure PaymentTransactionEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet npNetState5)
     var
         OutStream: OutStream;
     begin
@@ -341,7 +341,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
         // EftTransactionRequest."Receipt 2" := ; //BLOB
     end;
 
-    local procedure OpenTerminalEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet State5)
+    local procedure OpenTerminalEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet npNetState5)
     begin
         if not GenericErrorCheck(EftTransactionRequest, State) then
           exit;
@@ -355,7 +355,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
           Message('Terminal could not be opened, error: %1', EftTransactionRequest."Result Display Text");
     end;
 
-    local procedure CloseTerminalEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet State5)
+    local procedure CloseTerminalEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet npNetState5)
     begin
         if not GenericErrorCheck(EftTransactionRequest, State) then
           exit;
@@ -369,7 +369,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
           Message('Terminal could not be closed, error: %1', EftTransactionRequest."Result Display Text");
     end;
 
-    local procedure VerifySetupEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet State5)
+    local procedure VerifySetupEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet npNetState5)
     begin
         if not GenericErrorCheck(EftTransactionRequest, State) then
           exit;
@@ -381,7 +381,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
           Message('Terminal connection and dependency test successful. No issues found.');
     end;
 
-    local procedure LookupTransactionEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet State5)
+    local procedure LookupTransactionEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet npNetState5)
     var
         OutStream: OutStream;
         OriginalTransactionRequest: Record "EFT Transaction Request";
@@ -414,7 +414,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
         end;
     end;
 
-    local procedure VoidTransactionEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet State5)
+    local procedure VoidTransactionEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet npNetState5)
     var
         OriginalTransactionRequest: Record "EFT Transaction Request";
     begin
@@ -438,7 +438,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
           Message('Void fail');
     end;
 
-    local procedure BalanceEnquiryEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet State5)
+    local procedure BalanceEnquiryEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet npNetState5)
     begin
         if not GenericErrorCheck(EftTransactionRequest, State) then
           exit;
@@ -451,7 +451,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
         Message('Balance Enquiry: %1 (%2)', EftTransactionRequest."Result Display Text", EftTransactionRequest."Amount Output");
     end;
 
-    local procedure ReprintReceiptEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet State5)
+    local procedure ReprintReceiptEnd(var EftTransactionRequest: Record "EFT Transaction Request";State: DotNet npNetState5)
     begin
         if not GenericErrorCheck(EftTransactionRequest, State) then
           exit;
@@ -465,10 +465,10 @@ codeunit 6184512 "EFT Mock Client Protocol"
     begin
     end;
 
-    local procedure SetConnectionInitState(var State: DotNet State5;EFTSetup: Record "EFT Setup")
+    local procedure SetConnectionInitState(var State: DotNet npNetState5;EFTSetup: Record "EFT Setup")
     var
         ConnectionMethod: Integer;
-        Connection: DotNet State_Connection;
+        Connection: DotNet npNetState_Connection;
         EFTMockClientIntegration: Codeunit "EFT Mock Client Integration";
     begin
         ConnectionMethod := EFTMockClientIntegration.GetConnectionMethod(EFTSetup);
@@ -489,9 +489,9 @@ codeunit 6184512 "EFT Mock Client Protocol"
         end;
     end;
 
-    local procedure SetCaptionState(var State: DotNet State5)
+    local procedure SetCaptionState(var State: DotNet npNetState5)
     var
-        Captions: DotNet Captions;
+        Captions: DotNet npNetCaptions;
     begin
         State.Captions.CloseButton := DialogCloseButton;
         State.Captions.ForceCloseButton := DialogForceCloseButton;
@@ -507,13 +507,13 @@ codeunit 6184512 "EFT Mock Client Protocol"
         State.Captions.TerminalIsClosed := DialogTerminalIsClosed;
     end;
 
-    local procedure HandleReceipt(EftTransactionRequest: Record "EFT Transaction Request";var State: DotNet State5)
+    local procedure HandleReceipt(EftTransactionRequest: Record "EFT Transaction Request";var State: DotNet npNetState5)
     var
         CreditCardTransaction: Record "Credit Card Transaction";
         EntryNo: Integer;
         ReceiptNo: Integer;
-        StringReader: DotNet StringReader;
-        Line: DotNet String;
+        StringReader: DotNet npNetStringReader;
+        Line: DotNet npNetString;
     begin
         if State.Receipt = '' then
           exit;

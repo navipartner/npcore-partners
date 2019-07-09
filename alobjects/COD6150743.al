@@ -52,7 +52,7 @@ codeunit 6150743 "POS Geolocation"
 
     local procedure RegisterGeoLocationScript(FrontEnd: Codeunit "POS Front End Management")
     var
-        RegisterModuleRequest: DotNet JsonRequest;
+        RegisterModuleRequest: DotNet npNetJsonRequest;
         ScriptString: Text;
         WebClientDependency: Record "Web Client Dependency";
     begin
@@ -80,7 +80,7 @@ codeunit 6150743 "POS Geolocation"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
-    local procedure OnCustomMethod(Method: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnCustomMethod(Method: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         ClientDiagnosticsDataMgt: Codeunit "Client Diagnostics Data Mgt.";
         JSON: Codeunit "POS JSON Management";
@@ -125,17 +125,17 @@ codeunit 6150743 "POS Geolocation"
 
     procedure IPAddress2GeoPosition(IPAddress: Text;var Latitude: Decimal;var Longitude: Decimal)
     var
-        Parameters: DotNet Dictionary_Of_T_U;
+        Parameters: DotNet npNetDictionary_Of_T_U;
         AFManagement: Codeunit "AF Management";
         AFHelperFunctions: Codeunit "AF Helper Functions";
-        HttpResponseMessage: DotNet HttpResponseMessage;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
         Path: Text;
-        JObject: DotNet JObject;
-        JToken: DotNet JToken;
-        JTokenWriter: DotNet JTokenWriter;
-        StringContent: DotNet StringContent;
+        JObject: DotNet npNetJObject;
+        JToken: DotNet npNetJToken;
+        JTokenWriter: DotNet npNetJTokenWriter;
+        StringContent: DotNet npNetStringContent;
         TextString: Text;
-        Encoding: DotNet Encoding;
+        Encoding: DotNet npNetEncoding;
         ResultVar: Boolean;
         PrevRec: Text;
     begin
@@ -177,10 +177,10 @@ codeunit 6150743 "POS Geolocation"
         //+NPR5.40 [308907]
     end;
 
-    local procedure GetJsonValueAsDecimal(JObject: DotNet JObject;PropertyName: Text) ReturnValue: Decimal
+    local procedure GetJsonValueAsDecimal(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Decimal
     var
-        DotNetDecimal: DotNet Decimal;
-        CultureInfo: DotNet CultureInfo;
+        DotNetDecimal: DotNet npNetDecimal;
+        CultureInfo: DotNet npNetCultureInfo;
     begin
         //-NPR5.40 [308907]
         ReturnValue := DotNetDecimal.Parse(JObject.GetValue(PropertyName).ToString,CultureInfo.InvariantCulture);
@@ -188,7 +188,7 @@ codeunit 6150743 "POS Geolocation"
     end;
 
     [TryFunction]
-    local procedure TryParseJson(json: Text;var JToken: DotNet JToken)
+    local procedure TryParseJson(json: Text;var JToken: DotNet npNetJToken)
     begin
         //-NPR5.40 [308907]
         JToken := JToken.Parse(json);

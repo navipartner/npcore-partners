@@ -1248,7 +1248,7 @@ codeunit 6014624 "Touch Screen - Balancing Mgt."
     begin
     end;
 
-    procedure UpdateFigures(var PeriodFigures: DotNet Dictionary_Of_T_U;var BalancingFigures: DotNet Dictionary_Of_T_U;var CountingLines: DotNet DataGrid;var Subtotal: Text)
+    procedure UpdateFigures(var PeriodFigures: DotNet npNetDictionary_Of_T_U;var BalancingFigures: DotNet npNetDictionary_Of_T_U;var CountingLines: DotNet npNetDataGrid;var Subtotal: Text)
     begin
         PeriodFigures := PeriodFigures.Dictionary();
         PeriodFigures.Add('BankLCY',UI.FormatDecimal("Bank (LCY)"));
@@ -1376,7 +1376,7 @@ codeunit 6014624 "Touch Screen - Balancing Mgt."
     begin
     end;
 
-    local procedure SetCountingLines(var CountingLines: DotNet DataGrid)
+    local procedure SetCountingLines(var CountingLines: DotNet npNetDataGrid)
     var
         RecRef: RecordRef;
         Util: Codeunit "POS Web Utilities";

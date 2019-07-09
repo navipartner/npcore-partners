@@ -130,11 +130,11 @@ codeunit 6151524 "Nc Endpoint FTP Mgt."
     local procedure SendFtp(NcEndpointFTP: Record "Nc Endpoint FTP";OutputText: Text;Filename: Text;var ResponseDescriptionText: Text;var ResponseCodeText: Text;var ConnectionString: Text): Boolean
     var
         "Field": Record "Field";
-        Credential: DotNet NetworkCredential;
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        UTF8Encoding: DotNet UTF8Encoding;
-        IoStream: DotNet Stream;
+        Credential: DotNet npNetNetworkCredential;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        UTF8Encoding: DotNet npNetUTF8Encoding;
+        IoStream: DotNet npNetStream;
     begin
         if not NcEndpointFTP.Enabled then
           exit(false);
@@ -161,11 +161,11 @@ codeunit 6151524 "Nc Endpoint FTP Mgt."
     local procedure SendDotNetFtp(NcEndpointFTP: Record "Nc Endpoint FTP";OutputText: Text;Filename: Text;var ResponseDescriptionText: Text;var ResponseCodeText: Text;var ConnectionString: Text): Boolean
     var
         "Field": Record "Field";
-        Credential: DotNet NetworkCredential;
-        Encoding: DotNet UTF8Encoding;
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        IoStream: DotNet Stream;
+        Credential: DotNet npNetNetworkCredential;
+        Encoding: DotNet npNetUTF8Encoding;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        IoStream: DotNet npNetStream;
         Servername: Text;
     begin
         Servername := BuildFTPServerName(NcEndpointFTP.Server);
@@ -209,9 +209,9 @@ codeunit 6151524 "Nc Endpoint FTP Mgt."
 
     local procedure SendSharpSFTP(NcEndpointFTP: Record "Nc Endpoint FTP";OutputText: Text;Filename: Text;var ResponseDescriptionText: Text;var ResponseCodeText: Text;var ConnectionString: Text): Boolean
     var
-        Encoding: DotNet UTF8Encoding;
-        SharpSFtp: DotNet Sftp0;
-        StreamWriter: DotNet StreamWriter;
+        Encoding: DotNet npNetUTF8Encoding;
+        SharpSFtp: DotNet npNetSftp0;
+        StreamWriter: DotNet npNetStreamWriter;
         UploadFile: File;
         LocalPath: Text;
         RemotePath: Text;
@@ -266,11 +266,11 @@ codeunit 6151524 "Nc Endpoint FTP Mgt."
     local procedure SendDotNetFtpOutput(NcTaskOutput: Record "Nc Task Output";NcEndpointFTP: Record "Nc Endpoint FTP"): Boolean
     var
         "Field": Record "Field";
-        Credential: DotNet NetworkCredential;
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        Stream: DotNet Stream;
-        Uri: DotNet Uri;
+        Credential: DotNet npNetNetworkCredential;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        Stream: DotNet npNetStream;
+        Uri: DotNet npNetUri;
         InStream: InStream;
         ServerName: Text;
         Url: Text;
@@ -325,7 +325,7 @@ codeunit 6151524 "Nc Endpoint FTP Mgt."
 
     local procedure InitEndpoint(NcEndpointFTP: Record "Nc Endpoint FTP")
     var
-        Credential: DotNet NetworkCredential;
+        Credential: DotNet npNetNetworkCredential;
         FtpFolder: Text;
         FtpFolders: Text;
         FtpPath: Text;
@@ -344,7 +344,7 @@ codeunit 6151524 "Nc Endpoint FTP Mgt."
         //+NC2.13 [318934]
     end;
 
-    local procedure CreateFtpFolders(FtpServer: Text;var Credential: DotNet NetworkCredential;FtpFolders: Text)
+    local procedure CreateFtpFolders(FtpServer: Text;var Credential: DotNet npNetNetworkCredential;FtpFolders: Text)
     var
         FtpFolder: Text;
         FtpPath: Text;
@@ -386,11 +386,11 @@ codeunit 6151524 "Nc Endpoint FTP Mgt."
     end;
 
     [TryFunction]
-    local procedure TryCreateFtpFolder(FtpPath: Text;var Credential: DotNet NetworkCredential)
+    local procedure TryCreateFtpFolder(FtpPath: Text;var Credential: DotNet npNetNetworkCredential)
     var
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        MemoryStream: DotNet MemoryStream;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        MemoryStream: DotNet npNetMemoryStream;
     begin
         //-NC2.13 [318934]
         FtpWebRequest := FtpWebRequest.Create(FtpPath);
@@ -407,12 +407,12 @@ codeunit 6151524 "Nc Endpoint FTP Mgt."
     end;
 
     [TryFunction]
-    local procedure TryListFtpDirectory(FtpPath: Text;var Credential: DotNet NetworkCredential;var List: Text)
+    local procedure TryListFtpDirectory(FtpPath: Text;var Credential: DotNet npNetNetworkCredential;var List: Text)
     var
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        MemoryStream: DotNet MemoryStream;
-        StreamReader: DotNet StreamReader;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        MemoryStream: DotNet npNetMemoryStream;
+        StreamReader: DotNet npNetStreamReader;
     begin
         //-NC2.13 [318934]
         FtpWebRequest := FtpWebRequest.Create(FtpPath);

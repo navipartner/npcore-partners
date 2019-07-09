@@ -39,8 +39,8 @@ codeunit 6059908 "Chilkat FTP/SFTP"
     var
         Text001: Label 'No Parameters found. Do you with to have empty Parameters added?';
         Text002: Label 'Empty Parameters added. Please fill in the parameters before run this task again';
-        ChilkatFtp2: DotNet Ftp2;
-        ChilkatSFTP: DotNet SFtp;
+        ChilkatFtp2: DotNet npNetFtp2;
+        ChilkatSFTP: DotNet npNetSFtp;
 
     local procedure FTP_UploadTQ(TaskLine: Record "Task Line")
     var

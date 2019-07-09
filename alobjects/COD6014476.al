@@ -573,8 +573,8 @@ codeunit 6014476 "Retail Price Log Mgt."
         PageDataPersonalization: Record "Page Data Personalization";
         XMLDOMMgt: Codeunit "XML DOM Management";
         InStream: InStream;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
     begin
         if not FindQueryPriceLogView(PageDataPersonalization) then
           exit(false);
@@ -602,10 +602,10 @@ codeunit 6014476 "Retail Price Log Mgt."
         PageDataPersonalization: Record "Page Data Personalization";
         User: Record User;
         XMLDOMMgt: Codeunit "XML DOM Management";
-        DataItemXmlNode: DotNet XmlNode;
-        DataItemsXmlNode: DotNet XmlNode;
-        XmlDoc: DotNet XmlDocument;
-        ReportParametersXmlNode: DotNet XmlNode;
+        DataItemXmlNode: DotNet npNetXmlNode;
+        DataItemsXmlNode: DotNet npNetXmlNode;
+        XmlDoc: DotNet npNetXmlDocument;
+        ReportParametersXmlNode: DotNet npNetXmlNode;
         OutStream: OutStream;
     begin
         XmlDoc := XmlDoc.XmlDocument;

@@ -86,7 +86,7 @@ table 6151199 "NpCs Document Log Entry"
 
     procedure GetErrorMessage() FullLogMessage: Text
     var
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
     begin
         FullLogMessage := '';

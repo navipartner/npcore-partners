@@ -26,10 +26,10 @@ codeunit 6151002 "POS Proxy - Display"
         ReceiptContent: Text;
         DisplaySetup: Record "Display Setup";
         DisplayContent: Record "Display Content";
-        MediaDictionary: DotNet Dictionary_Of_T_U;
-        Base64Dictionary: DotNet Dictionary_Of_T_U;
+        MediaDictionary: DotNet npNetDictionary_Of_T_U;
+        Base64Dictionary: DotNet npNetDictionary_Of_T_U;
         ContentType: Option Image,Video,Html;
-        SecondaryMonitorRequest: DotNet SecondaryMonitorRequest;
+        SecondaryMonitorRequest: DotNet npNetSecondaryMonitorRequest;
         CaptionCancelledSale: Label 'Cancelled sale';
         CaptionPaymentTotal: Label 'Total';
         CaptionChangeTotal: Label 'Total Change';
@@ -377,7 +377,7 @@ codeunit 6151002 "POS Proxy - Display"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150725, 'OnBeforeActionWorkflow', '', true, true)]
-    local procedure CU6150725OnBeforeActionWorkflow(PaymentTypePOS: Record "Payment Type POS";Parameters: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: Codeunit "POS JSON Management";SubTotal: Decimal;var Handled: Boolean)
+    local procedure CU6150725OnBeforeActionWorkflow(PaymentTypePOS: Record "Payment Type POS";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: Codeunit "POS JSON Management";SubTotal: Decimal;var Handled: Boolean)
     var
         POSSaleLine: Codeunit "POS Sale Line";
         SaleLinePOS: Record "Sale Line POS";
@@ -902,7 +902,7 @@ codeunit 6151002 "POS Proxy - Display"
         //MESSAGE(JsonConvert.SerializeObject(SecondaryMonitorRequest));
     end;
 
-    local procedure SetMediaDictionary(MediaDictionaryIn: DotNet Dictionary_Of_T_U)
+    local procedure SetMediaDictionary(MediaDictionaryIn: DotNet npNetDictionary_Of_T_U)
     begin
         MediaDictionary := MediaDictionaryIn;
     end;
@@ -1037,12 +1037,12 @@ codeunit 6151002 "POS Proxy - Display"
         exit(ContentHtml);
     end;
 
-    local procedure CreateDotNetDict(Dict: DotNet Dictionary_Of_T_U)
+    local procedure CreateDotNetDict(Dict: DotNet npNetDictionary_Of_T_U)
     var
-        Type: DotNet Type;
-        Activator: DotNet Activator;
-        Arr: DotNet Array;
-        String: DotNet String;
+        Type: DotNet npNetType;
+        Activator: DotNet npNetActivator;
+        Arr: DotNet npNetArray;
+        String: DotNet npNetString;
         Int: Integer;
     begin
         Arr := Arr.CreateInstance(GetDotNetType(Type),2);
@@ -1057,13 +1057,13 @@ codeunit 6151002 "POS Proxy - Display"
 
     local procedure GetImageContentAndExtension(DisplayContentLines: Record "Display Content Lines";var Base64: Text;var Extension: Text[10])
     var
-        Convert: DotNet Convert;
-        Bytes: DotNet Array;
+        Convert: DotNet npNetConvert;
+        Bytes: DotNet npNetArray;
         InS: InStream;
-        MemoryStream: DotNet MemoryStream;
-        Image: DotNet Image;
-        ImageFormat: DotNet ImageFormat;
-        Converter: DotNet ImageConverter;
+        MemoryStream: DotNet npNetMemoryStream;
+        Image: DotNet npNetImage;
+        ImageFormat: DotNet npNetImageFormat;
+        Converter: DotNet npNetImageConverter;
     begin
         DisplayContentLines.CalcFields(Image);
         if DisplayContentLines.Image.HasValue then begin

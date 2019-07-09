@@ -49,8 +49,8 @@ table 6014642 "Tax Free Handler Parameters"
     var
         OutStream: OutStream;
         JSON: Text;
-        JObject: DotNet JObject;
-        JProperty: DotNet JProperty;
+        JObject: DotNet npNetJObject;
+        JProperty: DotNet npNetJProperty;
     begin
         if not FindSet then
           exit;
@@ -73,8 +73,8 @@ table 6014642 "Tax Free Handler Parameters"
     var
         Buffer: Text;
         JSON: Text;
-        JObject: DotNet JObject;
-        JProperty: DotNet JProperty;
+        JObject: DotNet npNetJObject;
+        JProperty: DotNet npNetJProperty;
         InStream: InStream;
         i: Integer;
     begin

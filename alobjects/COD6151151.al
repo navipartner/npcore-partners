@@ -426,8 +426,8 @@ codeunit 6151151 "M2 Account Manager"
         Token: Text[40];
         TemplateEntryNo: Integer;
         ReasonText: Text;
-        Body: DotNet JToken;
-        Result: DotNet JToken;
+        Body: DotNet npNetJToken;
+        Result: DotNet npNetJToken;
     begin
 
         if (Email = '') then
@@ -1332,9 +1332,9 @@ codeunit 6151151 "M2 Account Manager"
     local procedure ToBase64(StringToEncode: Text) B64String: Text
     var
         TempBlob: Record TempBlob temporary;
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
         Outstr: OutStream;
     begin
@@ -1401,15 +1401,15 @@ codeunit 6151151 "M2 Account Manager"
     begin
     end;
 
-    procedure MagentoApiPost(Method: Text;var Body: DotNet JToken;var Result: DotNet JToken)
+    procedure MagentoApiPost(Method: Text;var Body: DotNet npNetJToken;var Result: DotNet npNetJToken)
     var
         MagentoSetup: Record "Magento Setup";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        StreamReader: DotNet StreamReader;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        StreamReader: DotNet npNetStreamReader;
         Response: Text;
-        ReqStream: DotNet Stream;
-        ReqStreamWriter: DotNet StreamWriter;
+        ReqStream: DotNet npNetStream;
+        ReqStreamWriter: DotNet npNetStreamWriter;
     begin
         Clear(Response);
         if Method = '' then

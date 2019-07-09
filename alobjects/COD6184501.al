@@ -62,7 +62,7 @@ codeunit 6184501 "CleanCash Communication"
     var
         CleanCashAuditRoll: Record "CleanCash Audit Roll";
         LastSalesTicketNo: Code[20];
-        ReceiptType: DotNet CommunicationReceipt;
+        ReceiptType: DotNet npNetCommunicationReceipt;
     begin
         CleanCashAuditRoll.SetRange("CleanCash Control Code",'');
         CleanCashAuditRoll.SetRange("CleanCash Copy Control Code",'');
@@ -109,7 +109,7 @@ codeunit 6184501 "CleanCash Communication"
         i: Integer;
         ReceiptCopy: Boolean;
         Start: Boolean;
-        ReceiptType: DotNet CommunicationReceipt;
+        ReceiptType: DotNet npNetCommunicationReceipt;
         ReceiptNo: Code[10];
         SerialNo: Text[100];
         ControlCode: Text[100];
@@ -290,12 +290,12 @@ codeunit 6184501 "CleanCash Communication"
     begin
     end;
 
-    local procedure SendReceiptToApplication(OrganisationNumber: Text[10];PosId: Text[16];DateTime: Text[12];ReceiptNo: Text[30];ReceiptType: DotNet CommunicationReceipt;ReceiptTotal: Text[30];NegativeTotal: Text[30];Vat: array [4] of Text[30];ConnectionString: Text[100];MultiOrganizationIDPerPOS: Boolean;ShowErrorMessage: Boolean) IsSucces: Boolean
+    local procedure SendReceiptToApplication(OrganisationNumber: Text[10];PosId: Text[16];DateTime: Text[12];ReceiptNo: Text[30];ReceiptType: DotNet npNetCommunicationReceipt;ReceiptTotal: Text[30];NegativeTotal: Text[30];Vat: array [4] of Text[30];ConnectionString: Text[100];MultiOrganizationIDPerPOS: Boolean;ShowErrorMessage: Boolean) IsSucces: Boolean
     var
         CleanCashBridge: Codeunit "CleanCash Server Bridge";
         CleanCashProxy: Codeunit "CleanCash Proxy";
         ProxyDialog: Page "Proxy Dialog";
-        CCCommResult: DotNet CommunicationResult;
+        CCCommResult: DotNet npNetCommunicationResult;
         EventResponse: Option NotSet,FailOpen,FailCheckStatusEX,FailRegisterPos,FailCheckStatus,FailStartReceipt,FailSendReceiptEX,FailSendReceipt,ReceiptSend;
     begin
           //-NPR5.31
@@ -370,7 +370,7 @@ codeunit 6184501 "CleanCash Communication"
         Vats[4] := ConvertDecimal(CleanCashAuditRoll.VatRate4) + ';' + ConvertDecimal(CleanCashAuditRoll.VatAmount4);
     end;
 
-    local procedure IsCCSucces(CCCommResult: DotNet CommunicationResult;EventResponse: Option NotSet,FailOpen,FailCheckStatusEX,FailRegisterPos,FailCheckStatus,FailStartReceipt," FailSendReceiptEX"," FailSendReceipt",ReceiptSend): Boolean
+    local procedure IsCCSucces(CCCommResult: DotNet npNetCommunicationResult;EventResponse: Option NotSet,FailOpen,FailCheckStatusEX,FailRegisterPos,FailCheckStatus,FailStartReceipt," FailSendReceiptEX"," FailSendReceipt",ReceiptSend): Boolean
     var
         CleanCashProxy: Codeunit "CleanCash Proxy";
         CCCommResultInt: Integer;
@@ -388,7 +388,7 @@ codeunit 6184501 "CleanCash Communication"
         exit(true);
     end;
 
-    local procedure CheckEnumCommResult(EventResponse: Option NotSet,FailOpen,FailCheckStatusEX,FailRegisterPos,FailCheckStatus,FailStartReceipt,FailSendReceiptEX,FailSendReceipt,ReceiptSend;EnumCommResult: DotNet CommunicationResult): Boolean
+    local procedure CheckEnumCommResult(EventResponse: Option NotSet,FailOpen,FailCheckStatusEX,FailRegisterPos,FailCheckStatus,FailStartReceipt,FailSendReceiptEX,FailSendReceipt,ReceiptSend;EnumCommResult: DotNet npNetCommunicationResult): Boolean
     var
         CleanCashProxy: Codeunit "CleanCash Proxy";
         EnumType: Text[30];
@@ -440,7 +440,7 @@ codeunit 6184501 "CleanCash Communication"
 
     local procedure CheckEnumCommStatus(EventResponse: Option NotSet,FailOpen,FailCheckStatusEX,FailRegisterPos,FailCheckStatus,FailStartReceipt,FailSendReceiptEX,FailSendReceipt,ReceiptSend): Boolean
     var
-        EnumStatus: DotNet CommunicationStatus;
+        EnumStatus: DotNet npNetCommunicationStatus;
         CleanCashProxy: Codeunit "CleanCash Proxy";
         EnumType: Text[30];
         StatusList: Text[100];
@@ -496,7 +496,7 @@ codeunit 6184501 "CleanCash Communication"
         //+NPR5.31
     end;
 
-    local procedure GetCCCommunicationStatus(var EnumStatus: DotNet CommunicationStatus)
+    local procedure GetCCCommunicationStatus(var EnumStatus: DotNet npNetCommunicationStatus)
     var
         CleanCashProxy: Codeunit "CleanCash Proxy";
     begin

@@ -26,7 +26,7 @@ page 6150700 "POS (New)"
                     Initialize();
                 end;
 
-                trigger OnInvokeMethod(method: Text;eventContext: DotNet JObject)
+                trigger OnInvokeMethod(method: Text;eventContext: DotNet npNetJObject)
                 begin
                     //-NPR5.43 [318028]
                     if POSSession.IsFinalized() then
@@ -37,7 +37,7 @@ page 6150700 "POS (New)"
                       JavaScript.InvokeMethod(method,eventContext,POSSession,FrontEnd);
                 end;
 
-                trigger OnAction("action": Text;workflowStep: Text;workflowId: Integer;actionId: Integer;Context: DotNet JObject)
+                trigger OnAction("action": Text;workflowStep: Text;workflowId: Integer;actionId: Integer;Context: DotNet npNetJObject)
                 begin
                     //-NPR5.43 [318028]
                     if POSSession.IsFinalized() then
@@ -106,7 +106,7 @@ page 6150700 "POS (New)"
     begin
     end;
 
-    local procedure PreHandleMethod(Method: Text;Context: DotNet JObject): Boolean
+    local procedure PreHandleMethod(Method: Text;Context: DotNet npNetJObject): Boolean
     begin
         case Method of
           'KeepAlive':              exit(true);

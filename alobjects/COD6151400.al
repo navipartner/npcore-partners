@@ -21,9 +21,9 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
     end;
 
-    local procedure AddElement(var XmlDoc: DotNet XmlDocument;NodePath: Text;Name: Text[250];var XmlElement: DotNet XmlElement): Boolean
+    local procedure AddElement(var XmlDoc: DotNet npNetXmlDocument;NodePath: Text;Name: Text[250];var XmlElement: DotNet npNetXmlElement): Boolean
     var
-        XmlElementParent: DotNet XmlElement;
+        XmlElementParent: DotNet npNetXmlElement;
     begin
         if IsNull(XmlDoc) then
           exit(false);
@@ -45,9 +45,9 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         exit(not IsNull(XmlElement));
     end;
 
-    procedure AddContainer(var XmlDoc: DotNet XmlDocument;NodePath: Text;Name: Text[250])
+    procedure AddContainer(var XmlDoc: DotNet npNetXmlDocument;NodePath: Text;Name: Text[250])
     var
-        XmlElement: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
     begin
         if not AddElement(XmlDoc,NodePath,Name,XmlElement) then
           exit;
@@ -55,9 +55,9 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         NpXmlDomMgt.AddAttribute(XmlElement,"AttributeName.ElementType","ElementType.Container");
     end;
 
-    procedure AddFieldInteger(var XmlDoc: DotNet XmlDocument;NodePath: Text;Name: Text[250];Value: Integer)
+    procedure AddFieldInteger(var XmlDoc: DotNet npNetXmlDocument;NodePath: Text;Name: Text[250];Value: Integer)
     var
-        XmlElement: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
     begin
         if not AddElement(XmlDoc,NodePath,Name,XmlElement) then
           exit;
@@ -67,9 +67,9 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         XmlElement.InnerText := Format(Value,0,9);
     end;
 
-    procedure AddFieldDecimal(var XmlDoc: DotNet XmlDocument;NodePath: Text;Name: Text[250];Value: Decimal)
+    procedure AddFieldDecimal(var XmlDoc: DotNet npNetXmlDocument;NodePath: Text;Name: Text[250];Value: Decimal)
     var
-        XmlElement: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
     begin
         if not AddElement(XmlDoc,NodePath,Name,XmlElement) then
           exit;
@@ -79,9 +79,9 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         XmlElement.InnerText := Format(Value,0,9);
     end;
 
-    procedure AddFieldText(var XmlDoc: DotNet XmlDocument;NodePath: Text;Name: Text[250];Value: Text[250])
+    procedure AddFieldText(var XmlDoc: DotNet npNetXmlDocument;NodePath: Text;Name: Text[250];Value: Text[250])
     var
-        XmlElement: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
     begin
         if not AddElement(XmlDoc,NodePath,Name,XmlElement) then
           exit;
@@ -113,7 +113,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
 
     local procedure InitGenericSetup(var TempBlob: Record TempBlob temporary)
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
         OutStream: OutStream;
     begin
         if TempBlob.Blob.HasValue then
@@ -130,10 +130,10 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
     end;
 
-    local procedure AddGenericBufferElement(var XmlElement: DotNet XmlElement;var LineNo: Integer;Level: Integer;ParentNodePath: Text[250];var TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary)
+    local procedure AddGenericBufferElement(var XmlElement: DotNet npNetXmlElement;var LineNo: Integer;Level: Integer;ParentNodePath: Text[250];var TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary)
     var
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         LineNo += 10000;
@@ -166,10 +166,10 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     local procedure EditGenericSetup(var TempBlob: Record TempBlob temporary;NodePath: Text)
     var
         TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         InStream: InStream;
         OutStream: OutStream;
         LineNo: Integer;
@@ -226,10 +226,10 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     var
         TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary;
         GenericSetupBuffer: Page "Magento Generic Setup Buffer";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         InStream: InStream;
         OutStream: OutStream;
         LineNo: Integer;
@@ -250,8 +250,8 @@ codeunit 6151400 "Magento Generic Setup Mgt."
 
     procedure GetValueInteger(var TempBlob: Record TempBlob temporary;NodePath: Text) Value: Integer
     var
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
         InStream: InStream;
     begin
         TempBlob.Blob.CreateInStream(InStream);
@@ -267,8 +267,8 @@ codeunit 6151400 "Magento Generic Setup Mgt."
 
     procedure GetValueDecimal(var TempBlob: Record TempBlob temporary;NodePath: Text) Value: Decimal
     var
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
         InStream: InStream;
     begin
         TempBlob.Blob.CreateInStream(InStream);
@@ -284,8 +284,8 @@ codeunit 6151400 "Magento Generic Setup Mgt."
 
     procedure GetValueText(var TempBlob: Record TempBlob temporary;NodePath: Text): Text[250]
     var
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
         InStream: InStream;
     begin
         TempBlob.Blob.CreateInStream(InStream);
@@ -302,7 +302,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
     end;
 
-    procedure LoadGenericSetup(var TempBlob: Record TempBlob temporary;var XmlDoc: DotNet XmlDocument): Boolean
+    procedure LoadGenericSetup(var TempBlob: Record TempBlob temporary;var XmlDoc: DotNet npNetXmlDocument): Boolean
     var
         InStream: InStream;
     begin
@@ -317,10 +317,10 @@ codeunit 6151400 "Magento Generic Setup Mgt."
 
     procedure LoadGenericSetupBuffer(var TempBlob: Record TempBlob temporary;RootNodePath: Text;var TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary)
     var
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         LineNo: Integer;
     begin
@@ -451,7 +451,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     var
         MagentoSetup: Record "Magento Setup";
         TempBlob: Record TempBlob temporary;
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
         OutStream: OutStream;
     begin
         //-MAG2.00
@@ -473,7 +473,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         //+MAG2.00
     end;
 
-    local procedure SetupDimensionBuffer(var XmlDoc: DotNet XmlDocument): Boolean
+    local procedure SetupDimensionBuffer(var XmlDoc: DotNet npNetXmlDocument): Boolean
     var
         TempBlob: Record TempBlob temporary;
     begin
@@ -485,7 +485,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         //+MAG2.00
     end;
 
-    local procedure SetupDimensionBufferVariety(var XmlDoc: DotNet XmlDocument): Boolean
+    local procedure SetupDimensionBufferVariety(var XmlDoc: DotNet npNetXmlDocument): Boolean
     var
         RecRef: RecordRef;
         VarietyTableNo: Integer;
@@ -518,7 +518,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
     end;
 
-    local procedure AddTextLayout(var XmlDoc: DotNet XmlDocument;NodePath: Text;FontSize: Integer;XPosition: Integer;YPosition: Integer;Caption: Text[250])
+    local procedure AddTextLayout(var XmlDoc: DotNet npNetXmlDocument;NodePath: Text;FontSize: Integer;XPosition: Integer;YPosition: Integer;Caption: Text[250])
     var
         GenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
     begin
@@ -534,7 +534,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         //+MAG2.00
     end;
 
-    local procedure AddBarcodeLayout(var XmlDoc: DotNet XmlDocument;NodePath: Text;XPosition: Integer;YPosition: Integer;Width: Integer;Height: Integer)
+    local procedure AddBarcodeLayout(var XmlDoc: DotNet npNetXmlDocument;NodePath: Text;XPosition: Integer;YPosition: Integer;Width: Integer;Height: Integer)
     var
         GenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
     begin
@@ -548,7 +548,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
 
     local procedure InitGiftVoucherLayout(var TempBlob: Record TempBlob temporary)
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
         OutStream: OutStream;
         NodePath: Text;
     begin
@@ -591,7 +591,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
 
     local procedure InitCreditVoucherLayout(var TempBlob: Record TempBlob temporary)
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
         OutStream: OutStream;
         NodePath: Text;
     begin
@@ -634,13 +634,13 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
     end;
 
-    procedure DrawText(var TempBlob: Record TempBlob temporary;var Graphics: DotNet Graphics;SetupPath: Text;Value: Text)
+    procedure DrawText(var TempBlob: Record TempBlob temporary;var Graphics: DotNet npNetGraphics;SetupPath: Text;Value: Text)
     var
-        Color: DotNet Color;
-        Font: DotNet Font1;
-        FontStyle: DotNet FontStyle;
-        SolidBrush: DotNet SolidBrush;
-        ImageFormat: DotNet ImageFormat;
+        Color: DotNet npNetColor;
+        Font: DotNet npNetFont1;
+        FontStyle: DotNet npNetFontStyle;
+        SolidBrush: DotNet npNetSolidBrush;
+        ImageFormat: DotNet npNetImageFormat;
         InStream: InStream;
         OutStream: OutStream;
         Height: Decimal;
@@ -672,7 +672,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         //+MAG2.00
     end;
 
-    procedure DrawBarcode(var Graphics: DotNet Graphics;var TempBlob: Record TempBlob temporary;SetupPath: Text;Value: Text;Bitmap: DotNet Bitmap;BitmapBarcode: DotNet Bitmap)
+    procedure DrawBarcode(var Graphics: DotNet npNetGraphics;var TempBlob: Record TempBlob temporary;SetupPath: Text;Value: Text;Bitmap: DotNet npNetBitmap;BitmapBarcode: DotNet npNetBitmap)
     var
         MagentoBarcodeLibrary: Codeunit "Magento Barcode Library";
         Height: Decimal;
@@ -699,7 +699,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         //+MAG2.00
     end;
 
-    local procedure SetFontStyle(var FontStyle: DotNet FontStyle;FontStyleValue: Text)
+    local procedure SetFontStyle(var FontStyle: DotNet npNetFontStyle;FontStyleValue: Text)
     begin
         //-MAG2.00
         case FontStyleValue of

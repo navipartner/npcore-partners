@@ -44,7 +44,7 @@ codeunit 6184485 "Pepper Terminal Captions"
         PepperEftStatus_7: Label 'Terminal busy, no active transaction';
         PepperEftStatus_8: Label '- - -';
 
-    procedure GetLabels(var ProcessLabels: DotNet ProcessLabels)
+    procedure GetLabels(var ProcessLabels: DotNet npNetProcessLabels)
     begin
         //-NPR5.38 [301053]
         // Labels := Labels.ProcessLabels ();

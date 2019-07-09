@@ -7,7 +7,7 @@ codeunit 6014673 "Endpoint Query WebService Mgr"
 
     trigger OnRun()
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
         ImportType: Record "Nc Import Type";
         FunctionName: Text[100];
     begin
@@ -40,11 +40,11 @@ codeunit 6014673 "Endpoint Query WebService Mgr"
         VENDOR_NOT_FOUND: Label 'The Vendor %1 could not be found in the database.';
         LastItemWorksheetLine: Record "Item Worksheet Line";
 
-    local procedure CreateEndpointQueries(XmlDoc: DotNet XmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
+    local procedure CreateEndpointQueries(XmlDoc: DotNet npNetXmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
     var
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         Token: Text[50];
     begin
@@ -78,9 +78,9 @@ codeunit 6014673 "Endpoint Query WebService Mgr"
         Commit;
     end;
 
-    local procedure CreateEndpointQuery(XmlElement: DotNet XmlElement;Token: Text[100];DocumentID: Text[100]) Imported: Boolean
+    local procedure CreateEndpointQuery(XmlElement: DotNet npNetXmlElement;Token: Text[100];DocumentID: Text[100]) Imported: Boolean
     var
-        XmlNodeList: DotNet XmlNodeList;
+        XmlNodeList: DotNet npNetXmlNodeList;
         EndpointQuery: Record "Endpoint Query";
         i: Integer;
     begin
@@ -103,7 +103,7 @@ codeunit 6014673 "Endpoint Query WebService Mgr"
         exit(true);
     end;
 
-    local procedure CreateEndpointQueryFilter(XmlElement: DotNet XmlElement;Token: Text[100];DocumentID: Text[100];var EndpointQuery: Record "Endpoint Query") Imported: Boolean
+    local procedure CreateEndpointQueryFilter(XmlElement: DotNet npNetXmlElement;Token: Text[100];DocumentID: Text[100];var EndpointQuery: Record "Endpoint Query") Imported: Boolean
     var
         EndpointQueryFilter: Record "Endpoint Query Filter";
     begin
@@ -134,7 +134,7 @@ codeunit 6014673 "Endpoint Query WebService Mgr"
         EndpointQuery.Init ();
     end;
 
-    local procedure ReadEndpointQuery(XmlElement: DotNet XmlElement;Token: Text[100];var EndpointQuery: Record "Endpoint Query")
+    local procedure ReadEndpointQuery(XmlElement: DotNet npNetXmlElement;Token: Text[100];var EndpointQuery: Record "Endpoint Query")
     var
         ItemWorksheetVariantLine: Record "Item Worksheet Variant Line";
         VarietyValue: Record "Variety Value";
@@ -183,7 +183,7 @@ codeunit 6014673 "Endpoint Query WebService Mgr"
         EndpointQueryFilter.Init ();
     end;
 
-    local procedure ReadEndpointQueryFilter(XmlElement: DotNet XmlElement;Token: Text[100];var EndpointQueryFilter: Record "Endpoint Query Filter";var EndpointQuery: Record "Endpoint Query")
+    local procedure ReadEndpointQueryFilter(XmlElement: DotNet npNetXmlElement;Token: Text[100];var EndpointQueryFilter: Record "Endpoint Query Filter";var EndpointQuery: Record "Endpoint Query")
     var
         ItemWorksheetVariantLine: Record "Item Worksheet Variant Line";
         VarietyValue: Record "Variety Value";
@@ -208,7 +208,7 @@ codeunit 6014673 "Endpoint Query WebService Mgr"
         EndpointQueryFilter.Insert(true);
     end;
 
-    local procedure SetImportParameters(XmlElement: DotNet XmlElement;Token: Text[100])
+    local procedure SetImportParameters(XmlElement: DotNet npNetXmlElement;Token: Text[100])
     var
         TempText: Text;
     begin

@@ -247,15 +247,15 @@ codeunit 6060153 "Event Email Management"
 
     procedure ProcessMailItem(var RecRef: RecordRef;MailFor: Option Customer,Team): Boolean
     var
-        ExchService: DotNet ExchangeService;
+        ExchService: DotNet npNetExchangeService;
         Job: Record Job;
         JobPlanningLine: Record "Job Planning Line";
-        EmailMessage: DotNet EmailMessage;
+        EmailMessage: DotNet npNetEmailMessage;
         EMailTemplateLine: Record "E-mail Template Line";
         RecRef2: RecordRef;
         BodyText: Text;
-        MessageBody: DotNet MessageBody;
-        BodyType: DotNet BodyType;
+        MessageBody: DotNet npNetMessageBody;
+        BodyType: DotNet npNetBodyType;
         MailSubjectText: Label '%1 for event %2';
         FileName: Text;
         MailBodyAddText: Label 'Attached you can find more details about the event.';
@@ -423,11 +423,11 @@ codeunit 6060153 "Event Email Management"
 
     end;
 
-    local procedure AddEMailRecipient(var EmailMessage: DotNet EmailMessage;RecipientType: Option "To",Cc,Bcc;EMail: Text)
+    local procedure AddEMailRecipient(var EmailMessage: DotNet npNetEmailMessage;RecipientType: Option "To",Cc,Bcc;EMail: Text)
     var
-        EMailAddress: DotNet EmailAddress;
-        EMailAddressCollection: DotNet EmailAddressCollection;
-        EMailEnumerator: DotNet IEnumerator_Of_T;
+        EMailAddress: DotNet npNetEmailAddress;
+        EMailAddressCollection: DotNet npNetEmailAddressCollection;
+        EMailEnumerator: DotNet npNetIEnumerator_Of_T;
         Found: Boolean;
     begin
         case RecipientType of
@@ -457,7 +457,7 @@ codeunit 6060153 "Event Email Management"
           end;
     end;
 
-    local procedure EMailMessageSendAndSaveCopyWithLog(RecordId: RecordID;ExchService: DotNet ExchangeService;EmailMessage: DotNet EmailMessage;var Job: Record Job): Boolean
+    local procedure EMailMessageSendAndSaveCopyWithLog(RecordId: RecordID;ExchService: DotNet npNetExchangeService;EmailMessage: DotNet npNetEmailMessage;var Job: Record Job): Boolean
     var
         ActivityLog: Record "Activity Log";
         SendContext: Label 'E-MAIL SEND';
@@ -480,7 +480,7 @@ codeunit 6060153 "Event Email Management"
     end;
 
     [TryFunction]
-    local procedure EMailMessageSendAndSaveCopy(EmailMessage: DotNet EmailMessage)
+    local procedure EMailMessageSendAndSaveCopy(EmailMessage: DotNet npNetEmailMessage)
     begin
         EmailMessage.SendAndSaveCopy();
     end;

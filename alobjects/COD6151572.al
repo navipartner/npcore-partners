@@ -272,8 +272,8 @@ codeunit 6151572 "AF API WebService"
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
         CodeCommaString: Text;
         Variant1CommaString: Text;
         Variant2CommaString: Text;
@@ -364,8 +364,8 @@ codeunit 6151572 "AF API WebService"
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
         CodeCommaString: Text;
         Variant1CommaString: Text;
         Variant2CommaString: Text;
@@ -464,9 +464,9 @@ codeunit 6151572 "AF API WebService"
         TempFile: File;
         Filename: Text[1024];
         Istream: InStream;
-        MemoryStream: DotNet MemoryStream;
-        Bytes: DotNet Array;
-        Convert: DotNet Convert;
+        MemoryStream: DotNet npNetMemoryStream;
+        Bytes: DotNet npNetArray;
+        Convert: DotNet npNetConvert;
         MPOSAppSetup: Record "MPOS App Setup";
         NPRetailSetup: Record "NP Retail Setup";
         POSEntry: Record "POS Entry";
@@ -553,15 +553,15 @@ codeunit 6151572 "AF API WebService"
         TempFile: File;
         Filename: Text[1024];
         Istream: InStream;
-        MemoryStream: DotNet MemoryStream;
-        Bytes: DotNet Array;
-        Convert: DotNet Convert;
+        MemoryStream: DotNet npNetMemoryStream;
+        Bytes: DotNet npNetArray;
+        Convert: DotNet npNetConvert;
         ReportID: Integer;
         RecID: RecordID;
         RecRef: RecordRef;
         VarRecRef: Variant;
-        JToken: DotNet JToken;
-        JObject: DotNet JObject;
+        JToken: DotNet npNetJToken;
+        JObject: DotNet npNetJObject;
         AFHelperFunctions: Codeunit "AF Helper Functions";
         AllObjWithCaption: Record AllObjWithCaption;
     begin
@@ -616,8 +616,8 @@ codeunit 6151572 "AF API WebService"
 
     local procedure BuildNotificationStatusResponse(AFNotificationHub: Record "AF Notification Hub";RequestStatus: Boolean;RequestMessages: Text): Text
     var
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
         AFHelperFunctions: Codeunit "AF Helper Functions";
     begin
         JTokenWriter := JTokenWriter.JTokenWriter;

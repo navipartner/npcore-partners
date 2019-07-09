@@ -6,7 +6,7 @@ codeunit 6150915 "HC POS Entry Management"
 
     trigger OnRun()
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
     begin
         if LoadXmlDoc(XmlDoc) then
           ProcessPOSTransaction(XmlDoc);
@@ -18,10 +18,10 @@ codeunit 6150915 "HC POS Entry Management"
         Initialized: Boolean;
         Text001: Label '%1 with %2: %3 and %4: %5 was already inserted.';
 
-    local procedure ProcessPOSTransaction(XmlDoc: DotNet XmlDocument)
+    local procedure ProcessPOSTransaction(XmlDoc: DotNet npNetXmlDocument)
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         if IsNull(XmlDoc) then
@@ -49,12 +49,12 @@ codeunit 6150915 "HC POS Entry Management"
         end;
     end;
 
-    local procedure ProcessPOSEntry(POSEntryXmlElement: DotNet XmlElement) Imported: Boolean
+    local procedure ProcessPOSEntry(POSEntryXmlElement: DotNet npNetXmlElement) Imported: Boolean
     var
         POSEntry: Record "POS Entry";
-        ChildXmlElement: DotNet XmlElement;
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        ChildXmlElement: DotNet npNetXmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         if IsNull(POSEntryXmlElement) then
@@ -99,14 +99,14 @@ codeunit 6150915 "HC POS Entry Management"
         exit(true);
     end;
 
-    local procedure InsertPOSEntry(XmlElement: DotNet XmlElement;var POSEntry: Record "POS Entry")
+    local procedure InsertPOSEntry(XmlElement: DotNet npNetXmlElement;var POSEntry: Record "POS Entry")
     var
         TempDimensionBuffer: Record "Dimension Buffer" temporary;
         TempPOSEntry: Record "POS Entry" temporary;
         DimensionManagement: Codeunit DimensionManagement;
         OStream: OutStream;
-        DimXmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        DimXmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         Clear(TempPOSEntry);
@@ -188,7 +188,7 @@ codeunit 6150915 "HC POS Entry Management"
         POSEntry.Insert;
     end;
 
-    local procedure UpdatePOSLedgerRegister(XmlElement: DotNet XmlElement;var POSEntry: Record "POS Entry")
+    local procedure UpdatePOSLedgerRegister(XmlElement: DotNet npNetXmlElement;var POSEntry: Record "POS Entry")
     var
         POSPeriodRegister: Record "POS Period Register";
         TempPOSPeriodRegister: Record "POS Period Register" temporary;
@@ -220,7 +220,7 @@ codeunit 6150915 "HC POS Entry Management"
         POSEntry."POS Period Register No." := POSPeriodRegister."No.";
     end;
 
-    local procedure InsertPOSSalesLine(XmlElement: DotNet XmlElement;var POSEntry: Record "POS Entry")
+    local procedure InsertPOSSalesLine(XmlElement: DotNet npNetXmlElement;var POSEntry: Record "POS Entry")
     var
         TempPOSSalesLine: Record "POS Sales Line" temporary;
         POSSalesLine: Record "POS Sales Line";
@@ -228,8 +228,8 @@ codeunit 6150915 "HC POS Entry Management"
         OStream: OutStream;
         TempDimensionBuffer: Record "Dimension Buffer" temporary;
         DimensionManagement: Codeunit DimensionManagement;
-        DimXmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        DimXmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         POSEntry.TestField("Entry No.");
@@ -345,7 +345,7 @@ codeunit 6150915 "HC POS Entry Management"
         POSSalesLine.Insert;
     end;
 
-    local procedure InsertPOSPaymentLine(XmlElement: DotNet XmlElement;var POSEntry: Record "POS Entry")
+    local procedure InsertPOSPaymentLine(XmlElement: DotNet npNetXmlElement;var POSEntry: Record "POS Entry")
     var
         TempPOSPaymentLine: Record "POS Payment Line" temporary;
         POSPaymentLine: Record "POS Payment Line";
@@ -353,8 +353,8 @@ codeunit 6150915 "HC POS Entry Management"
         OStream: OutStream;
         TempDimensionBuffer: Record "Dimension Buffer" temporary;
         DimensionManagement: Codeunit DimensionManagement;
-        DimXmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        DimXmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         POSEntry.TestField("Entry No.");
@@ -425,7 +425,7 @@ codeunit 6150915 "HC POS Entry Management"
         POSPaymentLine.Insert;
     end;
 
-    local procedure InsertPOSTaxAmountLine(XmlElement: DotNet XmlElement;var POSEntry: Record "POS Entry")
+    local procedure InsertPOSTaxAmountLine(XmlElement: DotNet npNetXmlElement;var POSEntry: Record "POS Entry")
     var
         TempPOSTaxAmountLine: Record "POS Tax Amount Line" temporary;
         POSTaxAmountLine: Record "POS Tax Amount Line";
@@ -475,15 +475,15 @@ codeunit 6150915 "HC POS Entry Management"
         POSTaxAmountLine.Insert;
     end;
 
-    local procedure InsertPOSBalancingLine(XmlElement: DotNet XmlElement;var POSEntry: Record "POS Entry")
+    local procedure InsertPOSBalancingLine(XmlElement: DotNet npNetXmlElement;var POSEntry: Record "POS Entry")
     var
         TempPOSBalancingLine: Record "POS Balancing Line" temporary;
         POSBalancingLine: Record "POS Balancing Line";
         OStream: OutStream;
         TempDimensionBuffer: Record "Dimension Buffer" temporary;
         DimensionManagement: Codeunit DimensionManagement;
-        DimXmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        DimXmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         POSEntry.TestField("Entry No.");
@@ -542,7 +542,7 @@ codeunit 6150915 "HC POS Entry Management"
         POSBalancingLine.Insert;
     end;
 
-    local procedure BuildDimensionBuffer(XmlElement: DotNet XmlElement;var DimensionBuffer: Record "Dimension Buffer")
+    local procedure BuildDimensionBuffer(XmlElement: DotNet npNetXmlElement;var DimensionBuffer: Record "Dimension Buffer")
     var
         POSPeriodRegister: Record "POS Period Register";
         TempPOSPeriodRegister: Record "POS Period Register" temporary;

@@ -295,8 +295,8 @@ table 6014564 "RP Data Item Constraint Links"
                 "Field": Record "Field";
                 TempRetailList: Record "Retail List" temporary;
                 RetailListPage: Page "Retail List";
-                StringArray: DotNet Array;
-                Regex: DotNet Regex;
+                StringArray: DotNet npNetArray;
+                Regex: DotNet npNetRegex;
                 String: Text;
                 DataItemConstraint: Record "RP Data Item Constraint";
             begin

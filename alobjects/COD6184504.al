@@ -8,16 +8,16 @@ codeunit 6184504 "CleanCash Server Bridge"
     end;
 
     var
-        CleanCashBridge: DotNet CleanCashBridge;
-        CCCommunicationResult: DotNet CommunicationResult;
-        CCCommunicationStatus: DotNet CommunicationStatus;
+        CleanCashBridge: DotNet npNetCleanCashBridge;
+        CCCommunicationResult: DotNet npNetCommunicationResult;
+        CCCommunicationStatus: DotNet npNetCommunicationStatus;
         ControlCode: Text[100];
         SerialNo: Text[100];
         LastExtendedError: Text[100];
         LastUnitStatusList: Text[100];
         EventStatus: Option NotSet,FailOpen,FailCheckStatusEX,FailRegisterPos,FailCheckStatus,FailStartReceipt,FailSendReceiptEX,FailSendReceipt,ReceiptSend;
 
-    procedure SendReceiptByBridge(var EnumCommResult: DotNet CommunicationResult;var EventResponse: Option NotSet,FailOpen,FailCheckStatusEX,FailRegisterPos,FailCheckStatus,FailStartReceipt,FailSendReceiptEX,FailSendReceipt,ReceiptSend;OrganisationNumber: Text[10];PosId: Text[16];DateTime: Text[12];ReceiptNo: Text[30];ReceiptType: DotNet CommunicationReceipt;ReceiptTotal: Text[30];NegativeTotal: Text[30];Vat: array [4] of Text[30];ConnectionString: Text[100];MultiOrganizationIDPerPOS: Boolean;ShowErrorMessage: Boolean)
+    procedure SendReceiptByBridge(var EnumCommResult: DotNet npNetCommunicationResult;var EventResponse: Option NotSet,FailOpen,FailCheckStatusEX,FailRegisterPos,FailCheckStatus,FailStartReceipt,FailSendReceiptEX,FailSendReceipt,ReceiptSend;OrganisationNumber: Text[10];PosId: Text[16];DateTime: Text[12];ReceiptNo: Text[30];ReceiptType: DotNet npNetCommunicationReceipt;ReceiptTotal: Text[30];NegativeTotal: Text[30];Vat: array [4] of Text[30];ConnectionString: Text[100];MultiOrganizationIDPerPOS: Boolean;ShowErrorMessage: Boolean)
     begin
         CleanCashBridge := CleanCashBridge.CleanCashBridge();
 
@@ -74,7 +74,7 @@ codeunit 6184504 "CleanCash Server Bridge"
         EventResponse := EventResponse::NotSet;
     end;
 
-    local procedure IsCCFailed(var EnumCommResult: DotNet CommunicationResult;var EventResponse: Option NotSet,FailOpen,FailCheckStatusEX,FailRegisterPos,FailCheckStatus,FailStartReceipt,FailSendReceiptEX,FailSendReceipt,ReceiptSend): Boolean
+    local procedure IsCCFailed(var EnumCommResult: DotNet npNetCommunicationResult;var EventResponse: Option NotSet,FailOpen,FailCheckStatusEX,FailRegisterPos,FailCheckStatus,FailStartReceipt,FailSendReceiptEX,FailSendReceipt,ReceiptSend): Boolean
     var
         EnumCommResultInt: Integer;
     begin
@@ -96,7 +96,7 @@ codeunit 6184504 "CleanCash Server Bridge"
         EventStatus := EventStatus::FailCheckStatusEX;
     end;
 
-    local procedure SendReceiptEX(OrganisationNumber: Text[10];PosId: Text[16];DateTime: Text[12];ReceiptNo: Text[30];ReceiptType: DotNet CommunicationReceipt;ReceiptTotal: Text[30];NegativeTotal: Text[30];Vat: array [4] of Text[30])
+    local procedure SendReceiptEX(OrganisationNumber: Text[10];PosId: Text[16];DateTime: Text[12];ReceiptNo: Text[30];ReceiptType: DotNet npNetCommunicationReceipt;ReceiptTotal: Text[30];NegativeTotal: Text[30];Vat: array [4] of Text[30])
     begin
         CCCommunicationResult := CleanCashBridge.SendReceiptEx(OrganisationNumber,
                                                                PosId,
@@ -130,7 +130,7 @@ codeunit 6184504 "CleanCash Server Bridge"
         EventStatus := EventStatus::FailStartReceipt;
     end;
 
-    local procedure SendReceipt(DateTime: Text[12];ReceiptNo: Text[30];ReceiptType: DotNet CommunicationReceipt;ReceiptTotal: Text[30];NegativeTotal: Text[30];Vat: array [4] of Text[30])
+    local procedure SendReceipt(DateTime: Text[12];ReceiptNo: Text[30];ReceiptType: DotNet npNetCommunicationReceipt;ReceiptTotal: Text[30];NegativeTotal: Text[30];Vat: array [4] of Text[30])
     begin
         CCCommunicationResult := CleanCashBridge.SendReceipt(DateTime,
                                                              ReceiptNo,
@@ -144,7 +144,7 @@ codeunit 6184504 "CleanCash Server Bridge"
         EventStatus := EventStatus::FailSendReceipt;
     end;
 
-    procedure GetCCCommunicationStatus(var EnumCommStatus: DotNet CommunicationStatus)
+    procedure GetCCCommunicationStatus(var EnumCommStatus: DotNet npNetCommunicationStatus)
     begin
           EnumCommStatus := CleanCashBridge.LastUnitStatus;
     end;

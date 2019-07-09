@@ -813,15 +813,15 @@ codeunit 6014553 "Touch - Payment Line POS"
         //+NPR70.00.01.01
     end;
 
-    procedure GetPaymentLines(DGrid: DotNet DataGrid;var LastLineTemp: Record "Sale Line POS" temporary)
+    procedure GetPaymentLines(DGrid: DotNet npNetDataGrid;var LastLineTemp: Record "Sale Line POS" temporary)
     var
         PaymentLinePOS: Record "Sale Line POS";
         CurrentLineTemp: Record "Sale Line POS" temporary;
         PaymentLinePOSNewTemp: Record "Sale Line POS" temporary;
         POSWebUtilities: Codeunit "POS Web Utilities";
         RecRef: RecordRef;
-        DeletedGrid: DotNet DataGrid;
-        Row: DotNet Dictionary_Of_T_U;
+        DeletedGrid: DotNet npNetDataGrid;
+        Row: DotNet npNetDictionary_Of_T_U;
     begin
         PaymentLinePOS := SaleLinePOSGlobal;
         PaymentLinePOS.CopyFilters(SaleLinePOSGlobal);

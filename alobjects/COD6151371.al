@@ -15,7 +15,7 @@ codeunit 6151371 "CS Communication"
         CSUser: Record "CS User";
         XMLDOMMgt: Codeunit "XML DOM Management";
         RecRef: RecordRef;
-        XMLDOM: DotNet XmlDocument;
+        XMLDOM: DotNet npNetXmlDocument;
         Comment: Text[250];
         TableNo: Text[250];
         RecID: Text[250];
@@ -33,14 +33,14 @@ codeunit 6151371 "CS Communication"
         Text007: Label '<%1> not used.';
         Text008: Label 'Details';
 
-    procedure EncodeUI(MiniFormHdr: Record "CS UI Header";StackCode: Code[250];var XMLDOMin: DotNet XmlDocument;ActiveInputField: Integer;cMessage: Text[250];CSUserId: Text[250])
+    procedure EncodeUI(MiniFormHdr: Record "CS UI Header";StackCode: Code[250];var XMLDOMin: DotNet npNetXmlDocument;ActiveInputField: Integer;cMessage: Text[250];CSUserId: Text[250])
     var
-        CurrNode: DotNet XmlNode;
-        NewChild: DotNet XmlNode;
-        FunctionNode: DotNet XmlNode;
-        ReturnedNode: DotNet XmlNode;
-        oAttributes: DotNet XmlNamedNodeMap;
-        AttributeNode: DotNet XmlNode;
+        CurrNode: DotNet npNetXmlNode;
+        NewChild: DotNet npNetXmlNode;
+        FunctionNode: DotNet npNetXmlNode;
+        ReturnedNode: DotNet npNetXmlNode;
+        oAttributes: DotNet npNetXmlNamedNodeMap;
+        AttributeNode: DotNet npNetXmlNode;
         iAttributeCounter: Integer;
         iCounter: Integer;
     begin
@@ -105,10 +105,10 @@ codeunit 6151371 "CS Communication"
         XMLDOMin := XMLDOM;
     end;
 
-    local procedure EncodeFunctions(MiniFormHdr: Record "CS UI Header";var CurrNode: DotNet XmlNode)
+    local procedure EncodeFunctions(MiniFormHdr: Record "CS UI Header";var CurrNode: DotNet npNetXmlNode)
     var
         FunctionLine: Record "CS UI Function";
-        NewChild: DotNet XmlNode;
+        NewChild: DotNet npNetXmlNode;
     begin
         // Add the Function List to the XML Document
         FunctionLine.Reset;
@@ -120,13 +120,13 @@ codeunit 6151371 "CS Communication"
           until FunctionLine.Next = 0;
     end;
 
-    local procedure EncodeLines(MiniFormHdr: Record "CS UI Header";var CurrNode: DotNet XmlNode)
+    local procedure EncodeLines(MiniFormHdr: Record "CS UI Header";var CurrNode: DotNet npNetXmlNode)
     var
         MiniFormLine: Record "CS UI Line";
         MiniFormLine2: Record "CS UI Line";
-        LinesNode: DotNet XmlNode;
-        AreaNode: DotNet XmlNode;
-        DataLineNode: DotNet XmlNode;
+        LinesNode: DotNet npNetXmlNode;
+        AreaNode: DotNet npNetXmlNode;
+        DataLineNode: DotNet npNetXmlNode;
         CurrentOption: Integer;
         LineCounter: Integer;
     begin
@@ -185,9 +185,9 @@ codeunit 6151371 "CS Communication"
           until MiniFormLine.Next = 0;
     end;
 
-    local procedure SendComposition(MiniFormHdr: Record "CS UI Header";MiniFormLine: Record "CS UI Line";var CurrNode: DotNet XmlNode)
+    local procedure SendComposition(MiniFormHdr: Record "CS UI Header";MiniFormLine: Record "CS UI Line";var CurrNode: DotNet npNetXmlNode)
     var
-        NewChild: DotNet XmlNode;
+        NewChild: DotNet npNetXmlNode;
         MiniformHeader: Record "CS UI Header";
         MiniformHeaderDesc: Text;
         OptionValueInt: Integer;
@@ -231,9 +231,9 @@ codeunit 6151371 "CS Communication"
         AddAttribute(NewChild,'Placeholder',MiniFormLine.Placeholder);
     end;
 
-    local procedure SendLineNo(MiniFormLine: Record "CS UI Line";var CurrNode: DotNet XmlNode;var RetNode: DotNet XmlNode;LineNo: Integer)
+    local procedure SendLineNo(MiniFormLine: Record "CS UI Line";var CurrNode: DotNet npNetXmlNode;var RetNode: DotNet npNetXmlNode;LineNo: Integer)
     var
-        NewChild: DotNet XmlNode;
+        NewChild: DotNet npNetXmlNode;
     begin
         if MiniFormLine.Area = MiniFormLine.Area::Body then
           AddElement(CurrNode,'Line','','',NewChild)
@@ -251,13 +251,13 @@ codeunit 6151371 "CS Communication"
         RetNode := NewChild;
     end;
 
-    local procedure AddElement(var CurrNode: DotNet XmlNode;ElemName: Text[30];ElemValue: Text;NameSpace: Text[30];var NewChild: DotNet XmlNode)
+    local procedure AddElement(var CurrNode: DotNet npNetXmlNode;ElemName: Text[30];ElemValue: Text;NameSpace: Text[30];var NewChild: DotNet npNetXmlNode)
     begin
         if XMLDOMMgt.AddElement(CurrNode,ElemName,ElemValue,NameSpace,NewChild) > 0 then
           Error(Text001,ElemName);
     end;
 
-    procedure AddAttribute(var NewChild: DotNet XmlNode;AttribName: Text[250];AttribValue: Text[250])
+    procedure AddAttribute(var NewChild: DotNet npNetXmlNode;AttribName: Text[250];AttribValue: Text[250])
     begin
         if XMLDOMMgt.AddAttribute(NewChild,AttribName,AttribValue) > 0 then
           Error(Text002,AttribName);
@@ -311,14 +311,14 @@ codeunit 6151371 "CS Communication"
         "Field": Record "Field";
         FldRef: FieldRef;
         TempBlob: Record TempBlob temporary;
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
-        Encoding: DotNet Encoding;
-        Bytes: DotNet Array;
+        Encoding: DotNet npNetEncoding;
+        Bytes: DotNet npNetArray;
         Base64String: Text;
-        XMLConvert: DotNet XmlConvert;
+        XMLConvert: DotNet npNetXmlConvert;
         CSFieldDefaults: Record "CS Field Defaults";
     begin
         if (MiniFormLine."Table No." = 0) or (MiniFormLine."Field No." = 0) then
@@ -509,20 +509,20 @@ codeunit 6151371 "CS Communication"
         end;
     end;
 
-    procedure SetXMLDOMS(var oXMLDOM: DotNet XmlDocument)
+    procedure SetXMLDOMS(var oXMLDOM: DotNet npNetXmlDocument)
     begin
         XMLDOM := oXMLDOM;
     end;
 
-    procedure GetReturnXML(var xmlout: DotNet XmlDocument)
+    procedure GetReturnXML(var xmlout: DotNet npNetXmlDocument)
     begin
         xmlout := XMLDOM;
     end;
 
-    procedure GetNodeAttribute(CurrNode: DotNet XmlNode;AttributeName: Text[250]) AttribValue: Text[250]
+    procedure GetNodeAttribute(CurrNode: DotNet npNetXmlNode;AttributeName: Text[250]) AttribValue: Text[250]
     var
-        oTempNode: DotNet XmlNode;
-        NodeAttributes: DotNet XmlNamedNodeMap;
+        oTempNode: DotNet npNetXmlNode;
+        NodeAttributes: DotNet npNetXmlNamedNodeMap;
     begin
         NodeAttributes := CurrNode.Attributes;
         oTempNode := NodeAttributes.GetNamedItem(AttributeName);
@@ -533,10 +533,10 @@ codeunit 6151371 "CS Communication"
           AttribValue := '';
     end;
 
-    procedure SetNodeAttribute(CurrNode: DotNet XmlNode;AttributeName: Text[250];AttribValue: Text[250])
+    procedure SetNodeAttribute(CurrNode: DotNet npNetXmlNode;AttributeName: Text[250];AttribValue: Text[250])
     var
-        oTempNode: DotNet XmlNode;
-        NodeAttributes: DotNet XmlNamedNodeMap;
+        oTempNode: DotNet npNetXmlNode;
+        NodeAttributes: DotNet npNetXmlNamedNodeMap;
     begin
         NodeAttributes := CurrNode.Attributes;
         oTempNode := NodeAttributes.GetNamedItem(AttributeName);
@@ -593,7 +593,7 @@ codeunit 6151371 "CS Communication"
         MiniformHeader2.Get(MiniformLine."Call UI");
     end;
 
-    procedure RunPreviousUI(var DOMxmlin: DotNet XmlDocument)
+    procedure RunPreviousUI(var DOMxmlin: DotNet npNetXmlDocument)
     var
         MiniformHeader2: Record "CS UI Header";
         PreviousCode: Text[20];
@@ -604,10 +604,10 @@ codeunit 6151371 "CS Communication"
         CODEUNIT.Run(MiniformHeader2."Handling Codeunit",MiniformHeader2);
     end;
 
-    procedure IncreaseStack(var DOMxmlin: DotNet XmlDocument;NextElement: Text[250])
+    procedure IncreaseStack(var DOMxmlin: DotNet npNetXmlDocument;NextElement: Text[250])
     var
-        ReturnedNode: DotNet XmlNode;
-        RootNode: DotNet XmlNode;
+        ReturnedNode: DotNet npNetXmlNode;
+        RootNode: DotNet npNetXmlNode;
         StackCode: Text[250];
     begin
         RootNode := DOMxmlin.DocumentElement;
@@ -623,10 +623,10 @@ codeunit 6151371 "CS Communication"
         SetNodeAttribute(ReturnedNode,'RunReturn','0');
     end;
 
-    procedure DecreaseStack(var DOMxmlin: DotNet XmlDocument;var PreviousElement: Text[250])
+    procedure DecreaseStack(var DOMxmlin: DotNet npNetXmlDocument;var PreviousElement: Text[250])
     var
-        ReturnedNode: DotNet XmlNode;
-        RootNode: DotNet XmlNode;
+        ReturnedNode: DotNet npNetXmlNode;
+        RootNode: DotNet npNetXmlNode;
         StackCode: Text[250];
         P: Integer;
         Pos: Integer;
@@ -658,10 +658,10 @@ codeunit 6151371 "CS Communication"
         SetNodeAttribute(ReturnedNode,'RunReturn','1');
     end;
 
-    local procedure GetPreviousCode(var DOMxmlin: DotNet XmlDocument): Text[250]
+    local procedure GetPreviousCode(var DOMxmlin: DotNet npNetXmlDocument): Text[250]
     var
-        ReturnedNode: DotNet XmlNode;
-        RootNode: DotNet XmlNode;
+        ReturnedNode: DotNet npNetXmlNode;
+        RootNode: DotNet npNetXmlNode;
         StackCode: Text[250];
         PreviousElement: Text[250];
         P: Integer;

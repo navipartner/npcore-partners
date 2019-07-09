@@ -59,7 +59,7 @@ table 6014621 "POS Web Font"
     {
     }
 
-    procedure GetFontDotNet_Obsolete(var Font: DotNet Font)
+    procedure GetFontDotNet_Obsolete(var Font: DotNet npNetFont)
     var
         WoffStream: InStream;
         CssStream: InStream;
@@ -72,7 +72,7 @@ table 6014621 "POS Web Font"
         Font.Code := Code;
     end;
 
-    procedure GetFontDotNet(var Font: DotNet Font0)
+    procedure GetFontDotNet(var Font: DotNet npNetFont0)
     var
         WoffStream: InStream;
         CssStream: InStream;

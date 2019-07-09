@@ -1350,7 +1350,7 @@ codeunit 6014438 "Scanner - Functions"
 
     local procedure Endswith(var String: Text;EndsWith: Text;AddEndsWith: Boolean): Boolean
     var
-        NetString: DotNet String;
+        NetString: DotNet npNetString;
     begin
         //-NPR5.38 [301053]
         NetString := String;
@@ -1366,12 +1366,12 @@ codeunit 6014438 "Scanner - Functions"
 
     local procedure FTPDownloadFile(ScannerSetup2: Record "Scanner - Setup"): Boolean
     var
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        NetworkCredential: DotNet NetworkCredential;
-        Stream: DotNet Stream;
-        StreamReader: DotNet StreamReader;
-        SIOFile: DotNet File;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        NetworkCredential: DotNet npNetNetworkCredential;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
+        SIOFile: DotNet npNetFile;
         ServerFile: Text;
     begin
         //-NPR5.38 [301053]
@@ -1403,9 +1403,9 @@ codeunit 6014438 "Scanner - Functions"
 
     local procedure FTPDeleteFile(ScannerSetup2: Record "Scanner - Setup")
     var
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        NetworkCredential: DotNet NetworkCredential;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        NetworkCredential: DotNet npNetNetworkCredential;
     begin
         //-NPR5.38 [301053]
         FtpWebRequest := FtpWebRequest.Create(ScannerSetup2."FTP Site address" + '/' + ScannerSetup2."FTP Filename");
@@ -1422,9 +1422,9 @@ codeunit 6014438 "Scanner - Functions"
     local procedure RunProcess(Filename: Text;Arguments: Text;Modal: Boolean)
     var
         [RunOnClient]
-        Process: DotNet Process;
+        Process: DotNet npNetProcess;
         [RunOnClient]
-        ProcessStartInfo: DotNet ProcessStartInfo;
+        ProcessStartInfo: DotNet npNetProcessStartInfo;
     begin
         //-NPR5.38 [301053]
         ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename,Arguments);

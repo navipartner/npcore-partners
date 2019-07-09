@@ -16,7 +16,7 @@ codeunit 6014629 "Managed Package Builder"
     end;
 
     var
-        GlobalJArray: DotNet JArray;
+        GlobalJArray: DotNet npNetJArray;
         GlobalTableListTmp: Record AllObjWithCaption temporary;
         Error_Parameter: Label 'Invalid parameter. Pass either Record or RecordRef';
         Error_NoData: Label 'No data has been added to the manifest';
@@ -28,9 +28,9 @@ codeunit 6014629 "Managed Package Builder"
 
     procedure AddRecord("Record": Variant)
     var
-        JObject: DotNet JObject;
-        JObjectRec: DotNet JObject;
-        JArray: DotNet JArray;
+        JObject: DotNet npNetJObject;
+        JObjectRec: DotNet npNetJObject;
+        JArray: DotNet npNetJArray;
         RecRef: RecordRef;
         Value: Variant;
         i: Integer;
@@ -94,11 +94,11 @@ codeunit 6014629 "Managed Package Builder"
 
     procedure ExportToFile(Name: Text;Version: Text;Description: Text;PrimaryPackageTable: Integer)
     var
-        JObject: DotNet JObject;
-        JArray: DotNet JArray;
+        JObject: DotNet npNetJObject;
+        JArray: DotNet npNetJArray;
         FileMgt: Codeunit "File Management";
-        MemoryStream: DotNet MemoryStream;
-        Encoding: DotNet Encoding;
+        MemoryStream: DotNet npNetMemoryStream;
+        Encoding: DotNet npNetEncoding;
         FileName: Variant;
     begin
         //-NPR5.38 [294095]
@@ -114,9 +114,9 @@ codeunit 6014629 "Managed Package Builder"
     procedure ExportToBlob(Name: Text;Version: Text;Description: Text;PrimaryPackageTable: Integer;var TempBlobOut: Record TempBlob temporary)
     var
         ManagedDependencyMgt: Codeunit "Managed Dependency Mgt.";
-        JObject: DotNet JObject;
+        JObject: DotNet npNetJObject;
         OutStream: OutStream;
-        JArray: DotNet JArray;
+        JArray: DotNet npNetJArray;
     begin
         //-NPR5.38 [294095]
         //CloseDialog();
@@ -133,8 +133,8 @@ codeunit 6014629 "Managed Package Builder"
     local procedure CreateManifest(Name: Text;Version: Text;Description: Text;PrimaryPackageTable: Integer): Text
     var
         ManagedDependencyMgt: Codeunit "Managed Dependency Mgt.";
-        JObject: DotNet JObject;
-        JArray: DotNet JArray;
+        JObject: DotNet npNetJObject;
+        JArray: DotNet npNetJArray;
     begin
         if IsNull(GlobalJArray) then
           Error(Error_NoData);

@@ -8,16 +8,16 @@ codeunit 6150853 "POS Extension: Line Formatter"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
-    local procedure OnDiscover(DataSourceName: Text;Extensions: DotNet List_Of_T)
+    local procedure OnDiscover(DataSourceName: Text;Extensions: DotNet npNetList_Of_T)
     begin
         if DataSourceName = 'BUILTIN_SALELINE' then
           Extensions.Add('LineFormat');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
-    local procedure OnGetExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet DataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    local procedure OnGetExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
     var
-        DataType: DotNet DataType;
+        DataType: DotNet npNetDataType;
     begin
         if (DataSourceName <> 'BUILTIN_SALELINE') or (ExtensionName <> 'LineFormat') then
           exit;
@@ -30,7 +30,7 @@ codeunit 6150853 "POS Extension: Line Formatter"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
-    local procedure OnReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet DataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet npNetDataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         SaleLine: Record "Sale Line POS";
         Color: Text;

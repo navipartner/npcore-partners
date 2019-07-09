@@ -132,7 +132,7 @@ page 6059932 "Doc. Exchange Activities"
     var
         [RunOnClient]
         [WithEvents]
-        CameraProvider: DotNet CameraProvider;
+        CameraProvider: DotNet npNetCameraProvider;
         HasCamera: Boolean;
         HasFailedIncoming: Boolean;
         HasRejectedIncoming: Boolean;

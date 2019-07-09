@@ -32,9 +32,9 @@ codeunit 6151386 "CS UI Stock-Take Handling"
         CSCommunication: Codeunit "CS Communication";
         CSMgt: Codeunit "CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet XmlDocument;
-        ReturnedNode: DotNet XmlNode;
-        RootNode: DotNet XmlNode;
+        DOMxmlin: DotNet npNetXmlDocument;
+        ReturnedNode: DotNet npNetXmlNode;
+        RootNode: DotNet npNetXmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -76,9 +76,9 @@ codeunit 6151386 "CS UI Stock-Take Handling"
         CSStockTakeCounting: Record "CS Stock-Take Handling";
         CSStockTakeCounting2: Record "CS Stock-Take Handling";
         CSFieldDefaults: Record "CS Field Defaults";
-        CommaString: DotNet String;
-        Values: DotNet Array;
-        Separator: DotNet String;
+        CommaString: DotNet npNetString;
+        Values: DotNet npNetArray;
+        Separator: DotNet npNetString;
         Value: Text;
     begin
         if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
@@ -258,7 +258,7 @@ codeunit 6151386 "CS UI Stock-Take Handling"
 
     local procedure SendForm(InputField: Integer)
     var
-        Records: DotNet XmlElement;
+        Records: DotNet npNetXmlElement;
         CSSetup: Record "CS Setup";
     begin
         CSCommunication.EncodeUI(CSUIHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
@@ -423,16 +423,16 @@ codeunit 6151386 "CS UI Stock-Take Handling"
         CSStockTakeCounting.DeleteAll(true);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet XmlNode; AttribName: Text[250]; AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: DotNet npNetXmlNode;AttribName: Text[250];AttribValue: Text[250])
     begin
         if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
             Error(Text002, AttribName);
     end;
 
-    local procedure AddSummarize(var Records: DotNet XmlElement): Boolean
+    local procedure AddSummarize(var Records: DotNet npNetXmlElement): Boolean
     var
-        "Record": DotNet XmlElement;
-        Line: DotNet XmlElement;
+        "Record": DotNet npNetXmlElement;
+        Line: DotNet npNetXmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: RecordID;
@@ -504,10 +504,10 @@ codeunit 6151386 "CS UI Stock-Take Handling"
             exit(false);
     end;
 
-    local procedure AddAggSummarize(var Records: DotNet XmlElement) NotEmptyResult: Boolean
+    local procedure AddAggSummarize(var Records: DotNet npNetXmlElement) NotEmptyResult: Boolean
     var
-        "Record": DotNet XmlElement;
-        Line: DotNet XmlElement;
+        "Record": DotNet npNetXmlElement;
+        Line: DotNet npNetXmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: RecordID;

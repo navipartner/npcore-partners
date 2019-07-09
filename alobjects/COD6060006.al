@@ -23,8 +23,8 @@ codeunit 6060006 "GIM - Parser"
     var
         MappingTable: Record "GIM - Mapping Table";
         FileFormatSetup: Record "GIM - Data Format";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
         FieldDelimiter: Text[30];
         FieldSeparator: Text[30];
         ParsedField: Text[250];
@@ -115,16 +115,16 @@ codeunit 6060006 "GIM - Parser"
         end;
     end;
 
-    local procedure ParseLevel(ImportDocHere: Record "GIM - Import Document";var XmlElement: DotNet XmlElement;Level: Integer;ParentEntryNo: Integer;UniqueElement: Boolean;var ColumnNo: Integer;DefineMapping: Boolean;ColumnNoOnly: Integer;TableIDHere: Integer;FieldIDHere: Integer)
+    local procedure ParseLevel(ImportDocHere: Record "GIM - Import Document";var XmlElement: DotNet npNetXmlElement;Level: Integer;ParentEntryNo: Integer;UniqueElement: Boolean;var ColumnNo: Integer;DefineMapping: Boolean;ColumnNoOnly: Integer;TableIDHere: Integer;FieldIDHere: Integer)
     var
         MappingTable: Record "GIM - Mapping Table";
         MappingTable2: Record "GIM - Mapping Table";
         MappingTableLine: Record "GIM - Mapping Table Line";
         MappingTableField: Record "GIM - Mapping Table Field";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlAttributes: DotNet XmlAttributeCollection;
-        XmlAttribute: DotNet XmlAttribute;
-        XmlElement2: DotNet XmlElement;
+        XmlAttributes: DotNet npNetXmlAttributeCollection;
+        XmlAttribute: DotNet npNetXmlAttribute;
+        XmlElement2: DotNet npNetXmlElement;
         ParsedText: Text[250];
         i: Integer;
         Continue: Boolean;

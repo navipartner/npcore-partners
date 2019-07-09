@@ -143,8 +143,8 @@ codeunit 6151505 "Nc Sync. Mgt."
     [Scope('Personalization')]
     procedure DownloadFtpType(ImportType: Record "Nc Import Type"): Boolean
     var
-        FileList: DotNet IList;
-        LsEntry: DotNet ChannelSftp_LsEntry;
+        FileList: DotNet npNetIList;
+        LsEntry: DotNet npNetChannelSftp_LsEntry;
         Filename: Text;
         ListDirectory: Text;
     begin
@@ -189,12 +189,12 @@ codeunit 6151505 "Nc Sync. Mgt."
     var
         ImportEntry: Record "Nc Import Entry";
         FileMgt: Codeunit "File Management";
-        Credential: DotNet NetworkCredential;
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        MemoryStream: DotNet MemoryStream;
-        SourceUri: DotNet Uri;
-        TargetUri: DotNet Uri;
+        Credential: DotNet npNetNetworkCredential;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        MemoryStream: DotNet npNetMemoryStream;
+        SourceUri: DotNet npNetUri;
+        TargetUri: DotNet npNetUri;
         OutStream: OutStream;
     begin
         //-NC2.06 [290633]
@@ -255,7 +255,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     procedure InsertImportEntrySftp(ImportType: Record "Nc Import Type";Filename: Text)
     var
         ImportEntry: Record "Nc Import Entry";
-        SharpSFtp: DotNet Sftp0;
+        SharpSFtp: DotNet npNetSftp0;
         OutStream: OutStream;
         RemotePath: Text;
         NewRemotePath: Text;
@@ -337,8 +337,8 @@ codeunit 6151505 "Nc Sync. Mgt."
     procedure DownloadServerFile(NcImportType: Record "Nc Import Type")
     var
         FileMgt: Codeunit "File Management";
-        ArrayHelper: DotNet Array;
-        ServerDirectoryHelper: DotNet Directory;
+        ArrayHelper: DotNet npNetArray;
+        ServerDirectoryHelper: DotNet npNetDirectory;
         i: Integer;
         Filename: Text;
     begin
@@ -655,9 +655,9 @@ codeunit 6151505 "Nc Sync. Mgt."
     begin
     end;
 
-    local procedure CreateFtpWebRequest(ImportType: Record "Nc Import Type";var FtpWebRequest: DotNet FtpWebRequest)
+    local procedure CreateFtpWebRequest(ImportType: Record "Nc Import Type";var FtpWebRequest: DotNet npNetFtpWebRequest)
     var
-        Uri: DotNet Uri;
+        Uri: DotNet npNetUri;
     begin
         //-NC2.06 [290633]
         Uri := Uri.Uri(ImportType."Ftp Host" + '/' + ImportType."Ftp Path" + '/');
@@ -762,11 +762,11 @@ codeunit 6151505 "Nc Sync. Mgt."
     [Scope('Personalization')]
     procedure DownloadFtpListDirectory(ImportType: Record "Nc Import Type";var ListDirectory: Text)
     var
-        Credential: DotNet NetworkCredential;
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        MemoryStream: DotNet MemoryStream;
-        StreamReader: DotNet StreamReader;
+        Credential: DotNet npNetNetworkCredential;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        MemoryStream: DotNet npNetMemoryStream;
+        StreamReader: DotNet npNetStreamReader;
     begin
         //-NC2.06 [290633]
         ListDirectory := '';
@@ -791,11 +791,11 @@ codeunit 6151505 "Nc Sync. Mgt."
     [Scope('Personalization')]
     procedure DownloadFtpListDirectoryDetails(ImportType: Record "Nc Import Type";var ListDirectoryDetails: Text)
     var
-        Credential: DotNet NetworkCredential;
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        MemoryStream: DotNet MemoryStream;
-        StreamReader: DotNet StreamReader;
+        Credential: DotNet npNetNetworkCredential;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        MemoryStream: DotNet npNetMemoryStream;
+        StreamReader: DotNet npNetStreamReader;
     begin
         //-NC2.06 [290633]
         ListDirectoryDetails := '';
@@ -819,10 +819,10 @@ codeunit 6151505 "Nc Sync. Mgt."
     [TryFunction]
     local procedure DownloadSftpFilenames(ImportType: Record "Nc Import Type";var ListDirectory: Text)
     var
-        SharpSFtp: DotNet Sftp0;
-        FileList: DotNet IList;
-        IEnumerator: DotNet IEnumerator;
-        LsEntry: DotNet ChannelSftp_LsEntry;
+        SharpSFtp: DotNet npNetSftp0;
+        FileList: DotNet npNetIList;
+        IEnumerator: DotNet npNetIEnumerator;
+        LsEntry: DotNet npNetChannelSftp_LsEntry;
         RemotePath: Text;
     begin
         //-NC2.16 [328432]
@@ -882,8 +882,8 @@ codeunit 6151505 "Nc Sync. Mgt."
 
     local procedure RegExMatch(Details: Text) Filename: Text
     var
-        Match: DotNet Match;
-        RegEx: DotNet Regex;
+        Match: DotNet npNetMatch;
+        RegEx: DotNet npNetRegex;
     begin
         if Details = '' then
           exit('');
@@ -907,8 +907,8 @@ codeunit 6151505 "Nc Sync. Mgt."
 
     local procedure RegExMatch2(Details: Text) Filename: Text
     var
-        Match: DotNet Match;
-        RegEx: DotNet Regex;
+        Match: DotNet npNetMatch;
+        RegEx: DotNet npNetRegex;
     begin
         if Details = '' then
           exit('');
@@ -931,8 +931,8 @@ codeunit 6151505 "Nc Sync. Mgt."
 
     local procedure RegExMatch3(Details: Text) Filename: Text
     var
-        Match: DotNet Match;
-        RegEx: DotNet Regex;
+        Match: DotNet npNetMatch;
+        RegEx: DotNet npNetRegex;
     begin
         if Details = '' then
           exit('');
@@ -954,8 +954,8 @@ codeunit 6151505 "Nc Sync. Mgt."
 
     local procedure RegExMatch4(Details: Text) Filename: Text
     var
-        Match: DotNet Match;
-        RegEx: DotNet Regex;
+        Match: DotNet npNetMatch;
+        RegEx: DotNet npNetRegex;
     begin
         if Details = '' then
           exit('');
@@ -996,10 +996,10 @@ codeunit 6151505 "Nc Sync. Mgt."
     [TryFunction]
     local procedure CheckFtpUrlExists(FtpUrl: Text;Username: Text;Password: Text)
     var
-        Credential: DotNet NetworkCredential;
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        MemoryStream: DotNet MemoryStream;
+        Credential: DotNet npNetNetworkCredential;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        MemoryStream: DotNet npNetMemoryStream;
     begin
         FtpWebRequest := FtpWebRequest.Create(FtpUrl);
         FtpWebRequest.Method := 'LIST'; //WebRequestMethods.Ftp.ListDirectory
@@ -1018,9 +1018,9 @@ codeunit 6151505 "Nc Sync. Mgt."
     [TryFunction]
     local procedure DeleteFtpFile(FtpUrl: Text;Username: Text;Password: Text)
     var
-        Credential: DotNet NetworkCredential;
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
+        Credential: DotNet npNetNetworkCredential;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
     begin
         FtpWebRequest := FtpWebRequest.Create(FtpUrl);
         if Username <> '' then
@@ -1057,10 +1057,10 @@ codeunit 6151505 "Nc Sync. Mgt."
     [TryFunction]
     local procedure MakeFtpUrl(FtpUrl: Text;Username: Text;Password: Text)
     var
-        Credential: DotNet NetworkCredential;
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
-        MemoryStream: DotNet MemoryStream;
+        Credential: DotNet npNetNetworkCredential;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+        MemoryStream: DotNet npNetMemoryStream;
     begin
         FtpWebRequest := FtpWebRequest.Create(FtpUrl);
         FtpWebRequest.Method := 'MKD'; //WebRequestMethods.Ftp.MakeDirectory
@@ -1091,9 +1091,9 @@ codeunit 6151505 "Nc Sync. Mgt."
     [TryFunction]
     local procedure RenameFtpFile(FtpUrl: Text;Username: Text;Password: Text;RenameTo: Text)
     var
-        Credential: DotNet NetworkCredential;
-        FtpWebRequest: DotNet FtpWebRequest;
-        FtpWebResponse: DotNet FtpWebResponse;
+        Credential: DotNet npNetNetworkCredential;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
     begin
         FtpWebRequest := FtpWebRequest.Create(FtpUrl);
         if Username <> '' then
@@ -1182,9 +1182,9 @@ codeunit 6151505 "Nc Sync. Mgt."
     procedure RunProcess(Filename: Text;Arguments: Text;Modal: Boolean)
     var
         [RunOnClient]
-        Process: DotNet Process;
+        Process: DotNet npNetProcess;
         [RunOnClient]
-        ProcessStartInfo: DotNet ProcessStartInfo;
+        ProcessStartInfo: DotNet npNetProcessStartInfo;
     begin
         ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename,Arguments);
         Process := Process.Start(ProcessStartInfo);

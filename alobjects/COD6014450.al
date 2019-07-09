@@ -52,7 +52,7 @@ codeunit 6014450 "E-mail Management"
         Text010: Label 'Would you like to resend the e-mail?';
         Text011: Label 'E-mail Template was not found';
         Text012: Label 'Report ID is 0 which is why PDF can not be generated';
-        SmtpMessage: DotNet SmtpMessage;
+        SmtpMessage: DotNet npNetSmtpMessage;
         UseCustomReportSelection: Boolean;
         GlobalCustomReportSelection: Record "Custom Report Selection";
         AttachmentBuffer: Record "E-mail Attachment" temporary;

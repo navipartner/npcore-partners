@@ -42,7 +42,7 @@ codeunit 6060129 "MM Member WebService Mgr"
 
     trigger OnRun()
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
         FunctionName: Text[100];
         MemberInfoCapture: Record "MM Member Info Capture";
     begin
@@ -102,10 +102,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         TEXT6060000: Label 'The %1 %2 is already in use.';
         NOT_LAST_TIMEFRAME: Label 'Document ID %1 does not specify the last non-blocked timeframe for membership.';
 
-    local procedure ImportCreateMemberships(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure ImportCreateMemberships(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -129,7 +129,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         Commit;
     end;
 
-    local procedure ImportCreateMembership(XmlElement: DotNet XmlElement;DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportCreateMembership(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipSalesSetup: Record "MM Membership Sales Setup";
@@ -177,10 +177,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportConfirmMemberships(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure ImportConfirmMemberships(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -206,7 +206,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         //+MM1.24 [290599]
     end;
 
-    local procedure ImportConfirmMembership(XmlElement: DotNet XmlElement;DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportConfirmMembership(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipEntry: Record "MM Membership Entry";
@@ -255,10 +255,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         //+MM1.24 [290599]
     end;
 
-    local procedure ImportAddMembershipMembers(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure ImportAddMembershipMembers(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -282,7 +282,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         Commit;
     end;
 
-    local procedure ImportAddMembershipMember(XmlElement: DotNet XmlElement;DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportAddMembershipMember(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipManagement: Codeunit "MM Membership Management";
@@ -335,10 +335,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportAddAnonymousMembers(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure ImportAddAnonymousMembers(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -362,7 +362,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         Commit;
     end;
 
-    local procedure ImportAddAnonymousMember(XmlElement: DotNet XmlElement;DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportAddAnonymousMember(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipManagement: Codeunit "MM Membership Management";
@@ -391,10 +391,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportGetMemberships(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure ImportGetMemberships(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -418,10 +418,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         Commit;
     end;
 
-    local procedure ImportGetMembershipTicketList(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure ImportGetMembershipTicketList(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -445,10 +445,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         Commit;
     end;
 
-    local procedure ImportGetMembershipMembers(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure ImportGetMembershipMembers(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -472,7 +472,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         Commit;
     end;
 
-    local procedure ImportGetMemberQuery(XmlElement: DotNet XmlElement;DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportGetMemberQuery(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipManagement: Codeunit "MM Membership Management";
@@ -555,10 +555,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportUpdateMembers(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure ImportUpdateMembers(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -582,7 +582,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         Commit;
     end;
 
-    local procedure ImportUpdateMember(XmlElement: DotNet XmlElement;DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportUpdateMember(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipManagement: Codeunit "MM Membership Management";
@@ -616,10 +616,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportBlockMembers(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure ImportBlockMembers(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -643,7 +643,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         Commit;
     end;
 
-    local procedure ImportBlockMember(XmlElement: DotNet XmlElement;DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportBlockMember(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipManagement: Codeunit "MM Membership Management";
@@ -685,10 +685,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportChangeMemberships(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure ImportChangeMemberships(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -712,7 +712,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         Commit;
     end;
 
-    local procedure ImportChangeMembership(XmlElement: DotNet XmlElement;DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportChangeMembership(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipManagement: Codeunit "MM Membership Management";
@@ -790,10 +790,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportGetChangeMembershipList(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure ImportGetChangeMembershipList(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -819,7 +819,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         Commit;
     end;
 
-    local procedure ImportGetChangeMembershipItems(XmlElement: DotNet XmlElement;DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportGetChangeMembershipItems(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipManagement: Codeunit "MM Membership Management";
@@ -852,10 +852,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportRegretMemberships(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure ImportRegretMemberships(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -879,7 +879,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         Commit;
     end;
 
-    local procedure ImportRegretMembership(XmlElement: DotNet XmlElement;DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportRegretMembership(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipEntry: Record "MM Membership Entry";
@@ -917,10 +917,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         exit(true);
     end;
 
-    local procedure ImportGdprApproval(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure ImportGdprApproval(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -946,7 +946,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         //+MM1.29 [313795]
     end;
 
-    local procedure ImportGdprApprovalRequest(XmlElement: DotNet XmlElement;DocumentID: Text[100]) Imported: Boolean
+    local procedure ImportGdprApprovalRequest(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipManagement: Codeunit "MM Membership Management";
@@ -996,10 +996,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         //+MM1.29 [313795]
     end;
 
-    local procedure CreateWallet(XmlDoc: DotNet XmlDocument;DocumentID: Text[100])
+    local procedure CreateWallet(XmlDoc: DotNet npNetXmlDocument;DocumentID: Text[100])
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
 
@@ -1026,7 +1026,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         //+MM1.36 [328141]
     end;
 
-    local procedure ProcessCreateWalletRequest(XmlElement: DotNet XmlElement;DocumentID: Text[100]) Imported: Boolean
+    local procedure ProcessCreateWalletRequest(XmlElement: DotNet npNetXmlElement;DocumentID: Text[100]) Imported: Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipEntry: Record "MM Membership Entry";
@@ -1083,7 +1083,7 @@ codeunit 6060129 "MM Member WebService Mgr"
     begin
     end;
 
-    local procedure InsertCreateMembership(XmlElement: DotNet XmlElement;var MemberInfoCapture: Record "MM Member Info Capture")
+    local procedure InsertCreateMembership(XmlElement: DotNet npNetXmlElement;var MemberInfoCapture: Record "MM Member Info Capture")
     begin
 
         MemberInfoCapture."Entry No." := 0;
@@ -1093,7 +1093,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         MemberInfoCapture.Insert ();
     end;
 
-    local procedure GetXmlMembershipMemberInfo(XmlElement: DotNet XmlElement;var MemberInfoCapture: Record "MM Member Info Capture")
+    local procedure GetXmlMembershipMemberInfo(XmlElement: DotNet npNetXmlElement;var MemberInfoCapture: Record "MM Member Info Capture")
     var
         GenderText: Text[30];
         CrmText: Text[30];
@@ -1216,12 +1216,12 @@ codeunit 6060129 "MM Member WebService Mgr"
         MemberInfoCapture.Insert ();
     end;
 
-    local procedure GetMemberCardNumberAttributes(var MemberInfoCapture: Record "MM Member Info Capture";XmlElement: DotNet XmlElement)
+    local procedure GetMemberCardNumberAttributes(var MemberInfoCapture: Record "MM Member Info Capture";XmlElement: DotNet npNetXmlElement)
     var
         BooleanTextField: Text;
         DateTextField: Text;
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         isPermanent: Boolean;
     begin
@@ -1248,10 +1248,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         //+MM1.22 [284560]
     end;
 
-    local procedure GetMemberEmailAttributes(var MemberInfoCapture: Record "MM Member Info Capture";XmlElement: DotNet XmlElement)
+    local procedure GetMemberEmailAttributes(var MemberInfoCapture: Record "MM Member Info Capture";XmlElement: DotNet npNetXmlElement)
     var
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         emailAddress: Text;
     begin
 
@@ -1266,7 +1266,7 @@ codeunit 6060129 "MM Member WebService Mgr"
           MemberInfoCapture."E-Mail Address" := emailAddress;
     end;
 
-    local procedure InsertGetMemberQuery(XmlElement: DotNet XmlElement;var MemberInfoCapture: Record "MM Member Info Capture")
+    local procedure InsertGetMemberQuery(XmlElement: DotNet npNetXmlElement;var MemberInfoCapture: Record "MM Member Info Capture")
     var
         CustomerNo: Code[20];
         Membership: Record "MM Membership";
@@ -1294,7 +1294,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         MemberInfoCapture.Insert ();
     end;
 
-    local procedure GetCreateWalletRequest(XmlElement: DotNet XmlElement;var MemberInfoCapture: Record "MM Member Info Capture") Synchronous: Boolean
+    local procedure GetCreateWalletRequest(XmlElement: DotNet npNetXmlElement;var MemberInfoCapture: Record "MM Member Info Capture") Synchronous: Boolean
     var
         DeliveryMethod: Text[100];
         BoolText: Text;
@@ -1333,7 +1333,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         //+MM1.36 [328141]
     end;
 
-    local procedure AppendChangeMembership(XmlElement: DotNet XmlElement;var MemberInfoCapture: Record "MM Member Info Capture")
+    local procedure AppendChangeMembership(XmlElement: DotNet npNetXmlElement;var MemberInfoCapture: Record "MM Member Info Capture")
     var
         ChangeType: Text[100];
     begin
@@ -1365,7 +1365,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         exit (ImportType."Webservice Function");
     end;
 
-    local procedure GetAnonymousMemberArgs(XmlElement: DotNet XmlElement;var MemberInfoCapture: Record "MM Member Info Capture")
+    local procedure GetAnonymousMemberArgs(XmlElement: DotNet npNetXmlElement;var MemberInfoCapture: Record "MM Member Info Capture")
     begin
 
         //-MM1.22 [287080]
@@ -1378,7 +1378,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         //+MM1.22 [287080]
     end;
 
-    local procedure GetGdprArgs(XmlElement: DotNet XmlElement;var MemberInfoCapture: Record "MM Member Info Capture";var DataSubjectId: Text[40])
+    local procedure GetGdprArgs(XmlElement: DotNet npNetXmlElement;var MemberInfoCapture: Record "MM Member Info Capture";var DataSubjectId: Text[40])
     var
         GdprText: Text;
     begin

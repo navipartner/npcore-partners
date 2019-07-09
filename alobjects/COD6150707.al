@@ -72,7 +72,7 @@ codeunit 6150707 "POS Payment Line"
     end;
 
     [Scope('Personalization')]
-    procedure ToDataset(var CurrDataSet: DotNet DataSet;DataSource: DotNet DataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    procedure ToDataset(var CurrDataSet: DotNet npNetDataSet;DataSource: DotNet npNetDataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         DataMgt: Codeunit "POS Data Management";
         SaleAmount: Decimal;

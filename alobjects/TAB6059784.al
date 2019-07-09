@@ -226,8 +226,8 @@ table 6059784 "TM Ticket Type"
 
     local procedure ImportPassTemplate(Path: Text[1024];UseDialog: Boolean)
     var
-        AdoStream: Automation ;
-        AdoStream2: Automation ;
+        AdoStream: Automation npNet;
+        AdoStream2: Automation npNet;
         TempBlob: Record TempBlob temporary;
         outstream: OutStream;
         instream: InStream;
@@ -258,8 +258,8 @@ table 6059784 "TM Ticket Type"
 
     procedure RunCmdModal(Command: Text[250]) int: Integer
     var
-        wsh: Automation ;
-        wshExec: Automation ;
+        wsh: Automation npNet;
+        wshExec: Automation npNet;
         i: Integer;
     begin
         Create(wsh,true,true);

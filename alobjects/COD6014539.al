@@ -17,10 +17,10 @@ codeunit 6014539 "RP Epson Web Print Mgt."
         HexBuffer: Text;
         XML: Text;
         i: Integer;
-        Encoding: DotNet Encoding;
-        ByteArray: DotNet Array;
-        BitConverter: DotNet BitConverter;
-        Regex: DotNet Regex;
+        Encoding: DotNet npNetEncoding;
+        ByteArray: DotNet npNetArray;
+        BitConverter: DotNet npNetBitConverter;
+        Regex: DotNet npNetRegex;
     begin
         if StrPos(PrinterName,'EpsonW') > 0 then begin
           //Convert PrintString to hex representation (without '0x') of the byte values.

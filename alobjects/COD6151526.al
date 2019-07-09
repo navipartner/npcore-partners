@@ -115,8 +115,8 @@ codeunit 6151526 "Nc Endpoint File Mgt."
     var
         NcTriggerSyncMgt: Codeunit "Nc Trigger Sync. Mgt.";
         FileMgt: Codeunit "File Management";
-        Encoding: DotNet Encoding;
-        StreamWriter: DotNet StreamWriter;
+        Encoding: DotNet npNetEncoding;
+        StreamWriter: DotNet npNetStreamWriter;
         Tempfile: File;
         ExportFile: File;
         DirectoryPathfromFile: Text;
@@ -223,9 +223,9 @@ codeunit 6151526 "Nc Endpoint File Mgt."
     var
         TempBlob: Record TempBlob temporary;
         FileMgt: Codeunit "File Management";
-        Encoding: DotNet Encoding;
-        StreamReader: DotNet StreamReader;
-        StreamWriter: DotNet StreamWriter;
+        Encoding: DotNet npNetEncoding;
+        StreamReader: DotNet npNetStreamReader;
+        StreamWriter: DotNet npNetStreamWriter;
         Tempfile: File;
         ExportFile: File;
         InStream: InStream;

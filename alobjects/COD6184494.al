@@ -9,14 +9,14 @@ codeunit 6184494 "Pepper Aux Functions TSD"
 
     var
         InitializedRequest: Boolean;
-        AuxRequest: DotNet AuxRequest0;
-        AuxResponse: DotNet AuxResponse0;
-        AuxResult: DotNet AuxResult0;
-        AuxParam: DotNet AuxParam0;
-        PepperOpCodes: DotNet PepperOpCodes0;
+        AuxRequest: DotNet npNetAuxRequest0;
+        AuxResponse: DotNet npNetAuxResponse0;
+        AuxResult: DotNet npNetAuxResult0;
+        AuxParam: DotNet npNetAuxParam0;
+        PepperOpCodes: DotNet npNetPepperOpCodes0;
         LastRestCode: Integer;
         NOT_INITIALIZED: Label 'Please invoke initialprotocol function before setting paramaters.';
-        Labels: DotNet ProcessLabels0;
+        Labels: DotNet npNetProcessLabels0;
         PepperTerminalCaptions: Codeunit "Pepper Terminal Captions TSD";
 
     local procedure "---Pepper_Set"()
@@ -242,7 +242,7 @@ codeunit 6184494 "Pepper Aux Functions TSD"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
-    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet ResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet npNetResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
 
         if (ActionName <> 'Pepper_EftAux') then

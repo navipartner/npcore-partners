@@ -187,8 +187,8 @@ table 6014562 "RP Data Item Links"
                 "Field": Record "Field";
                 TempRetailList: Record "Retail List" temporary;
                 RetailListPage: Page "Retail List";
-                StringArray: DotNet Array;
-                Regex: DotNet Regex;
+                StringArray: DotNet npNetArray;
+                Regex: DotNet npNetRegex;
                 String: Text;
             begin
                 if not Field.Get("Table ID", "Field ID") then

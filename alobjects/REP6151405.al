@@ -22,8 +22,8 @@ report 6151405 "Magento Credit Voucher"
             trigger OnAfterGetRecord()
             var
                 TempBlob: Record TempBlob temporary;
-                Convert: DotNet Convert;
-                MemoryStream: DotNet MemoryStream;
+                Convert: DotNet npNetConvert;
+                MemoryStream: DotNet npNetMemoryStream;
                 InStream: InStream;
             begin
                 //-MAG1.17

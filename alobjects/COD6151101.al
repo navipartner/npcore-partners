@@ -120,8 +120,8 @@ codeunit 6151101 "NpRi Data Collection Mgt."
     var
         XMLDOMMgt: Codeunit "XML DOM Management";
         InStream: InStream;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
     begin
         if not NpRiReimbursementTemplate."Data Collection Filters".HasValue then
           exit(false);
@@ -141,10 +141,10 @@ codeunit 6151101 "NpRi Data Collection Mgt."
     local procedure SaveTableView(RecRef: RecordRef;RecRef2: RecordRef;var NpRiReimbursementTemplate: Record "NpRi Reimbursement Template";var FilterPageBuilder: FilterPageBuilder)
     var
         XMLDOMMgt: Codeunit "XML DOM Management";
-        DataItemXmlNode: DotNet XmlNode;
-        DataItemsXmlNode: DotNet XmlNode;
-        XmlDoc: DotNet XmlDocument;
-        ReportParametersXmlNode: DotNet XmlNode;
+        DataItemXmlNode: DotNet npNetXmlNode;
+        DataItemsXmlNode: DotNet npNetXmlNode;
+        XmlDoc: DotNet npNetXmlDocument;
+        ReportParametersXmlNode: DotNet npNetXmlNode;
         OutStream: OutStream;
         TableViewName: Text;
         Summary: Text;
