@@ -16,60 +16,60 @@ page 6060142 "MM Member Notification Setup"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field(Type;Type)
+                field(Type; Type)
                 {
                 }
-                field("Days Before";"Days Before")
+                field("Days Before"; "Days Before")
                 {
                 }
-                field("Days Past";"Days Past")
+                field("Days Past"; "Days Past")
                 {
                 }
-                field("Processing Method";"Processing Method")
+                field("Processing Method"; "Processing Method")
                 {
                 }
-                field("Template Filter Value";"Template Filter Value")
+                field("Template Filter Value"; "Template Filter Value")
                 {
                 }
-                field("Community Code";"Community Code")
+                field("Community Code"; "Community Code")
                 {
                 }
-                field("Membership Code";"Membership Code")
+                field("Membership Code"; "Membership Code")
                 {
                 }
-                field("Next Notification Code";"Next Notification Code")
+                field("Next Notification Code"; "Next Notification Code")
                 {
                 }
-                field("Target Member Role";"Target Member Role")
+                field("Target Member Role"; "Target Member Role")
                 {
                 }
-                field("Include NP Pass";"Include NP Pass")
+                field("Include NP Pass"; "Include NP Pass")
                 {
                 }
-                field("NP Pass Server Base URL";"NP Pass Server Base URL")
+                field("NP Pass Server Base URL"; "NP Pass Server Base URL")
                 {
                 }
-                field("Pass Notification Method";"Pass Notification Method")
+                field("Pass Notification Method"; "Pass Notification Method")
                 {
                 }
-                field("Passes API";"Passes API")
+                field("Passes API"; "Passes API")
                 {
                 }
-                field("""PUT Passes Template"".HASVALUE()";"PUT Passes Template".HasValue())
+                field("""PUT Passes Template"".HASVALUE()"; "PUT Passes Template".HasValue())
                 {
                     Caption = 'Have Template';
                     Editable = false;
                 }
-                field("Pass Token";"Pass Token")
+                field("Pass Token"; "Pass Token")
                 {
                 }
-                field("Pass Type Code";"Pass Type Code")
+                field("Pass Type Code"; "Pass Type Code")
                 {
                 }
             }
@@ -87,7 +87,7 @@ page 6060142 "MM Member Notification Setup"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "E-mail Templates";
-                RunPageView = WHERE("Table No."=CONST(6060139));
+                RunPageView = WHERE ("Table No." = CONST (6060139));
             }
             action("SMS Template")
             {
@@ -96,7 +96,7 @@ page 6060142 "MM Member Notification Setup"
                 Promoted = true;
                 PromotedIsBig = true;
                 RunObject = Page "SMS Template List";
-                RunPageView = WHERE("Table No."=CONST(6060139));
+                RunPageView = WHERE ("Table No." = CONST (6060139));
             }
             action("Edit Pass Template")
             {
@@ -107,7 +107,7 @@ page 6060142 "MM Member Notification Setup"
 
                 trigger OnAction()
                 begin
-                    EditPassTemplate ();
+                    EditPassTemplate();
                 end;
             }
             action("Renew Notifications List")
@@ -118,7 +118,7 @@ page 6060142 "MM Member Notification Setup"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "MM Membership Notification";
-                RunPageLink = "Notification Trigger"=CONST(RENEWAL);
+                RunPageLink = "Notification Trigger" = CONST (RENEWAL);
             }
         }
         area(processing)
@@ -137,23 +137,24 @@ page 6060142 "MM Member Notification Setup"
                 begin
 
                     //-MM1.36 [331590]
-                    TestField (Type, Type::RENEWAL);
+                    TestField(Type, Type::RENEWAL);
                     if ("Membership Code" <> '') then begin
-                      if (not Confirm (REFRESH_ALL_RENEW, true, Rec.FieldCaption ("Membership Code"), "Membership Code")) then
-                        Error ('');
+                        if (not Confirm(REFRESH_ALL_RENEW, true, Rec.FieldCaption("Membership Code"), "Membership Code")) then
+                            Error('');
 
-                      MemberNotification.RefreshAllMembershipRenewalNotifications (Rec."Membership Code");
+                        MemberNotification.RefreshAllMembershipRenewalNotifications(Rec."Membership Code");
 
-                    end else if ("Community Code" <> '') then begin
-                      if (not Confirm (REFRESH_ALL_RENEW, true, Rec.FieldCaption ("Community Code"), "Community Code")) then
-                        Error ('');
+                    end else
+                        if ("Community Code" <> '') then begin
+                            if (not Confirm(REFRESH_ALL_RENEW, true, Rec.FieldCaption("Community Code"), "Community Code")) then
+                                Error('');
 
-                      MembershipSetup.SetFilter ("Community Code", '=%1', Rec."Community Code");
-                      MembershipSetup.FindSet ();
-                      repeat
-                        MemberNotification.RefreshAllMembershipRenewalNotifications (MembershipSetup.Code);
-                      until (MembershipSetup.Next () = 0);
-                    end;
+                            MembershipSetup.SetFilter("Community Code", '=%1', Rec."Community Code");
+                            MembershipSetup.FindSet();
+                            repeat
+                                MemberNotification.RefreshAllMembershipRenewalNotifications(MembershipSetup.Code);
+                            until (MembershipSetup.Next() = 0);
+                        end;
                     //+MM1.36 [331590]
                 end;
             }
@@ -169,10 +170,10 @@ page 6060142 "MM Member Notification Setup"
         Path: Text[1024];
     begin
 
-        Path := ExportPassTemplate (false);
-        RunPassTemplateEditor (Path, FieldCaption ("PUT Passes Template"));
-        ImportPassTemplate (Path, false);
-        FileManagement.DeleteClientFile (Path);
+        Path := ExportPassTemplate(false);
+        RunPassTemplateEditor(Path, FieldCaption("PUT Passes Template"));
+        ImportPassTemplate(Path, false);
+        FileManagement.DeleteClientFile(Path);
         CurrPage.Update(true);
     end;
 
@@ -185,77 +186,66 @@ page 6060142 "MM Member Notification Setup"
         IsDownloaded: Boolean;
         MemberNotification: Codeunit "MM Member Notification";
     begin
-        CalcFields ("PUT Passes Template");
-        if (not "PUT Passes Template".HasValue() ) then begin
-          //-+MM1.29.02 [317156] Create the default template for passes
-          PassData := MemberNotification.GetDefaultTemplate ();
-          "PUT Passes Template".CreateOutStream (outstream);
-          outstream.Write (PassData);
-          Modify ();
-          CalcFields ("PUT Passes Template");
+        CalcFields("PUT Passes Template");
+        if (not "PUT Passes Template".HasValue()) then begin
+            //-+MM1.29.02 [317156] Create the default template for passes
+            PassData := MemberNotification.GetDefaultTemplate();
+            "PUT Passes Template".CreateOutStream(outstream);
+            outstream.Write(PassData);
+            Modify();
+            CalcFields("PUT Passes Template");
         end;
 
-        "PUT Passes Template".CreateInStream (instream);
+        "PUT Passes Template".CreateInStream(instream);
 
         if (not UseDialog) then begin
-          ToFile :=  FileManagement.ClientTempFileName ('json');
+            ToFile := FileManagement.ClientTempFileName('json');
         end else begin
-          ToFile := 'template.json';
+            ToFile := 'template.json';
         end;
 
-        IsDownloaded := DownloadFromStream (instream, 'Export', '', '', ToFile);
+        IsDownloaded := DownloadFromStream(instream, 'Export', '', '', ToFile);
         if (IsDownloaded) then
-          exit (ToFile);
+            exit(ToFile);
 
-        Error ('Export failed.');
+        Error('Export failed.');
     end;
 
-    local procedure ImportPassTemplate(Path: Text[1024];UseDialog: Boolean)
+    local procedure ImportPassTemplate(Path: Text[1024]; UseDialog: Boolean)
     var
-        AdoStream: Automation npNet;
-        AdoStream2: Automation npNet;
         TempBlob: Record TempBlob temporary;
         outstream: OutStream;
         instream: InStream;
     begin
 
         if (UseDialog) then begin
-          FileManagement.BLOBImport (TempBlob, '*.json');
+            FileManagement.BLOBImport(TempBlob, '*.json');
         end else begin
-          FileManagement.BLOBImport (TempBlob, Path);
+            FileManagement.BLOBImport(TempBlob, Path);
         end;
 
-        TempBlob.Blob.CreateInStream (instream);
-        "PUT Passes Template".CreateOutStream (outstream, TEXTENCODING::UTF8);
-        CopyStream (outstream, instream);
+        TempBlob.Blob.CreateInStream(instream);
+        "PUT Passes Template".CreateOutStream(outstream, TEXTENCODING::UTF8);
+        CopyStream(outstream, instream);
 
         Modify(true);
     end;
 
-    local procedure RunPassTemplateEditor(Path: Text[1024];desc: Text[100])
+    local procedure RunPassTemplateEditor(Path: Text[1024]; desc: Text[100])
     var
         ret: Integer;
         f: File;
         extra: Text[30];
     begin
 
-        RunCmdModal('"notepad.exe" "'+ Path + '"');
+        RunCmdModal('"notepad.exe" "' + Path + '"');
     end;
 
     procedure RunCmdModal(Command: Text[250]) int: Integer
     var
-        wsh: Automation npNet;
-        wshExec: Automation npNet;
         i: Integer;
     begin
-        Create(wsh,true,true);
-        wshExec := wsh.Exec(Command);
-        repeat
-          i := wshExec.Status;
-          Sleep(100);
-        until i <> 0;
-        Clear(wsh);
-        exit(wshExec.ExitCode);
+        Error('AL-Conversion: TODO #361414');
     end;
 }
 
