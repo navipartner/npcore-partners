@@ -175,7 +175,7 @@ codeunit 6150725 "POS Action - Payment"
         FrontEnd.SetActionContext (ActionCode, Context);
     end;
 
-    [EventSubscriber(ObjectType::Page, 6150702, 'OnBeforeActionEvent', 'Action6014402', true, true)]
+    //[EventSubscriber(ObjectType::Page, 6150702, 'OnBeforeActionEvent', 'Action6014402', true, true)]
     local procedure OnBeforeEditPaymentParameters(var Rec: Record "POS Menu Button")
     var
         POSSetup: Record "POS Setup";

@@ -613,7 +613,7 @@ codeunit 6059970 "Variety Wrapper"
         //+VRT1.00
     end;
 
-    [EventSubscriber(ObjectType::Page, 30, 'OnAfterActionEvent', 'Action6150613', false, false)]
+    //[EventSubscriber(ObjectType::Page, 30, 'OnAfterActionEvent', 'Action6150613', false, false)]
     local procedure P30OnAfterActionEventVariety(var Rec: Record Item)
     var
         VRTWrapper: Codeunit "Variety Wrapper";
