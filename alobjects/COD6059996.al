@@ -47,8 +47,8 @@ codeunit 6059996 "Scanner Service WS"
 
     procedure Process(var Request: BigText)
     var
-        xmlrootnode: DotNet XmlNode;
-        XMLdocIn: DotNet XmlDocument;
+        xmlrootnode: DotNet npNetXmlNode;
+        XMLdocIn: DotNet npNetXmlDocument;
         txtLocalName: Text;
     begin
         ScannerServiceSetup.Get;
@@ -73,16 +73,16 @@ codeunit 6059996 "Scanner Service WS"
           ScannerServiceFunctions.UpdateLogEntry(ScannerServiceLog,xmlrootnode.LocalName,IsInternal,InternalCallId,Request);
     end;
 
-    local procedure PutStatusItem(var Request: BigText;XMLdocIn: DotNet XmlDocument)
+    local procedure PutStatusItem(var Request: BigText;XMLdocIn: DotNet npNetXmlDocument)
     var
-        XMLNodeList: DotNet XmlNodeList;
+        XMLNodeList: DotNet npNetXmlNodeList;
         i: Integer;
-        XMLNode: DotNet XmlNode;
+        XMLNode: DotNet npNetXmlNode;
         Header: Text[1000];
-        XMLCurrNode: DotNet XmlNode;
-        XMLNewChild: DotNet XmlNode;
-        XMLdocOut: DotNet XmlDocument;
-        XMLRootNode: DotNet XmlNode;
+        XMLCurrNode: DotNet npNetXmlNode;
+        XMLNewChild: DotNet npNetXmlNode;
+        XMLdocOut: DotNet npNetXmlDocument;
+        XMLRootNode: DotNet npNetXmlNode;
         StockTakeWorkSheetName: Record "Stock-Take Worksheet";
         StockTakeMgr: Codeunit "Stock-Take Manager";
         StockTakeWorksheet: Record "Stock-Take Worksheet";
@@ -208,13 +208,13 @@ codeunit 6059996 "Scanner Service WS"
         ConvertXmlToBigText(XMLdocOut,Request);
     end;
 
-    local procedure GetItem(RecUsage: Option Item,Journal;var Request: BigText;XMLdocIn: DotNet XmlDocument)
+    local procedure GetItem(RecUsage: Option Item,Journal;var Request: BigText;XMLdocIn: DotNet npNetXmlDocument)
     var
         XMLRecID: Code[50];
         Header: Text[1000];
-        XMLCurrNode: DotNet XmlNode;
-        XMLNewChild: DotNet XmlNode;
-        XMLdocOut: DotNet XmlDocument;
+        XMLCurrNode: DotNet npNetXmlNode;
+        XMLNewChild: DotNet npNetXmlNode;
+        XMLdocOut: DotNet npNetXmlDocument;
         Item: Record Item;
         StockTakeWorksheet: Record "Stock-Take Worksheet";
         BarcodeLibrary: Codeunit "Barcode Library";
@@ -309,9 +309,9 @@ codeunit 6059996 "Scanner Service WS"
     begin
     end;
 
-    local procedure Add_Element(var XMLNode: DotNet XmlDocument;NodeName: Text[250];NodeText: Text;NameSpace: Text[1000];var CreatedXMLNode: DotNet XmlNode;prefix: Text[30])
+    local procedure Add_Element(var XMLNode: DotNet npNetXmlDocument;NodeName: Text[250];NodeText: Text;NameSpace: Text[1000];var CreatedXMLNode: DotNet npNetXmlNode;prefix: Text[30])
     var
-        NewChildNode: DotNet XmlNode;
+        NewChildNode: DotNet npNetXmlNode;
     begin
         if not NormalCaseMode then
           if prefix <> '' then
@@ -329,17 +329,17 @@ codeunit 6059996 "Scanner Service WS"
         CreatedXMLNode := NewChildNode;
     end;
 
-    local procedure Add_CdataElement(var XMLNode: DotNet XmlDocument;NodeText: Text[1024])
+    local procedure Add_CdataElement(var XMLNode: DotNet npNetXmlDocument;NodeText: Text[1024])
     var
-        NewChildNode: DotNet XmlNode;
+        NewChildNode: DotNet npNetXmlNode;
     begin
         NewChildNode := XMLNode.OwnerDocument.CreateCDataSection(NodeText);
         XMLNode.AppendChild(NewChildNode);
     end;
 
-    local procedure Add_Attribute(var XMLNode: DotNet XmlNode;Name: Text[260];NodeValue: Text[260])
+    local procedure Add_Attribute(var XMLNode: DotNet npNetXmlNode;Name: Text[260];NodeValue: Text[260])
     var
-        XMLNewAttributeNode: DotNet XmlNode;
+        XMLNewAttributeNode: DotNet npNetXmlNode;
     begin
         XMLNewAttributeNode := XMLNode.OwnerDocument.CreateAttribute(Name);
 
@@ -357,9 +357,9 @@ codeunit 6059996 "Scanner Service WS"
         NormalCaseMode := true;
     end;
 
-    local procedure Add_Field(var XMLNode: DotNet XmlNode;"Field": Text[1024];Value: Text[1024])
+    local procedure Add_Field(var XMLNode: DotNet npNetXmlNode;"Field": Text[1024];Value: Text[1024])
     var
-        XmlNewChild: DotNet XmlNode;
+        XmlNewChild: DotNet npNetXmlNode;
     begin
         Add_Element(XMLNode,'column','','',XmlNewChild,'');
         Add_Attribute(XmlNewChild,'columnName',Field);
@@ -367,13 +367,13 @@ codeunit 6059996 "Scanner Service WS"
         XmlNewChild := XmlNewChild.ParentNode;
     end;
 
-    local procedure ConvertXmlToBigText(XMLdoc: DotNet XmlDocument;var bigtext: BigText)
+    local procedure ConvertXmlToBigText(XMLdoc: DotNet npNetXmlDocument;var bigtext: BigText)
     begin
         Clear(bigtext);
         bigtext.AddText(XMLdoc.InnerXml);
     end;
 
-    local procedure ConvertBigTextToXml(var XMLdoc: DotNet XmlDocument;var bigtext: BigText)
+    local procedure ConvertBigTextToXml(var XMLdoc: DotNet npNetXmlDocument;var bigtext: BigText)
     begin
         if IsNull(XMLdoc) then
          XMLdoc := XMLdoc.XmlDocument;
@@ -381,9 +381,9 @@ codeunit 6059996 "Scanner Service WS"
         XMLdoc.LoadXml(Format(bigtext));
     end;
 
-    local procedure Get_TextFromNode(XMLnode: DotNet XmlNode;xpath: Text[1024]): Text[1024]
+    local procedure Get_TextFromNode(XMLnode: DotNet npNetXmlNode;xpath: Text[1024]): Text[1024]
     var
-        SelectedXMLnode: DotNet XmlNode;
+        SelectedXMLnode: DotNet npNetXmlNode;
     begin
         SelectedXMLnode := XMLnode.SelectSingleNode(xpath);
         if not IsNull(SelectedXMLnode)  then
@@ -392,7 +392,7 @@ codeunit 6059996 "Scanner Service WS"
           exit('');
     end;
 
-    local procedure Get_DecimalFromNode(XMLnode: DotNet XmlNode;xpath: Text[1024]): Decimal
+    local procedure Get_DecimalFromNode(XMLnode: DotNet npNetXmlNode;xpath: Text[1024]): Decimal
     var
         tempdecimal: Decimal;
     begin
@@ -401,7 +401,7 @@ codeunit 6059996 "Scanner Service WS"
         exit(tempdecimal);
     end;
 
-    local procedure Get_BoolFromNode(XMLnode: DotNet XmlNode;xpath: Text[1024]): Boolean
+    local procedure Get_BoolFromNode(XMLnode: DotNet npNetXmlNode;xpath: Text[1024]): Boolean
     var
         tempbool: Boolean;
     begin
@@ -419,8 +419,8 @@ codeunit 6059996 "Scanner Service WS"
     [TryFunction]
     local procedure DateTimeTryBlock(DateTimeTxt: Text;var DateTimeOut: Date)
     var
-        CultureInfoDotNet: DotNet CultureInfo;
-        DateTimeDotNet: DotNet DateTime;
+        CultureInfoDotNet: DotNet npNetCultureInfo;
+        DateTimeDotNet: DotNet npNetDateTime;
     begin
         if DateTimeTxt = '' then begin
           DateTimeOut := DT2Date(CurrentDateTime);
@@ -436,9 +436,9 @@ codeunit 6059996 "Scanner Service WS"
 
     local procedure GetItemImage(var Item: Record Item) Base64String: Text
     var
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
     begin
         //-NPR5.38
@@ -467,33 +467,33 @@ codeunit 6059996 "Scanner Service WS"
 
     local procedure GetItemImageCropped(var Item: Record Item) Base64String: Text
     var
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
-        imgToResize: DotNet Image;
-        destinationSize: DotNet Size;
-        bitmap: DotNet Bitmap;
-        Image: DotNet Image;
+        imgToResize: DotNet npNetImage;
+        destinationSize: DotNet npNetSize;
+        bitmap: DotNet npNetBitmap;
+        Image: DotNet npNetImage;
         originalWidth: Integer;
         originalHeight: Integer;
         hRatio: Decimal;
         wRatio: Decimal;
-        Math: DotNet Math;
+        Math: DotNet npNetMath;
         ratio: Decimal;
         hScale: Integer;
         wScale: Integer;
         startX: Integer;
         startY: Integer;
-        sourceRectangle: DotNet Rectangle;
-        destinationRectangle: DotNet Rectangle;
-        g: DotNet Graphics;
-        InterpolationModeENUM: DotNet InterpolationMode;
-        GraphicsUnitENUM: DotNet GraphicsUnit;
-        Graphics: DotNet Graphics;
-        ms: DotNet MemoryStream;
-        ImageFormatENUM: DotNet ImageFormat;
-        Bytes: DotNet Array;
+        sourceRectangle: DotNet npNetRectangle;
+        destinationRectangle: DotNet npNetRectangle;
+        g: DotNet npNetGraphics;
+        InterpolationModeENUM: DotNet npNetInterpolationMode;
+        GraphicsUnitENUM: DotNet npNetGraphicsUnit;
+        Graphics: DotNet npNetGraphics;
+        ms: DotNet npNetMemoryStream;
+        ImageFormatENUM: DotNet npNetImageFormat;
+        Bytes: DotNet npNetArray;
         OutStr: OutStream;
     begin
         //-NPR5.38

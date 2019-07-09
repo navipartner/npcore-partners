@@ -106,10 +106,10 @@ codeunit 6014449 "Table Import Library"
         IStream: InStream;
         InFile: File;
         InputEncoding: Text[50];
-        DotNetStream: DotNet StreamReader;
-        DotNetEncoding: DotNet Encoding;
+        DotNetStream: DotNet npNetStreamReader;
+        DotNetEncoding: DotNet npNetEncoding;
         DotNetFilePath: Text;
-        DotNetReadArray: DotNet Array;
+        DotNetReadArray: DotNet npNetArray;
         AutoSave: Boolean;
         AutoUpdate: Boolean;
         AutoReplace: Boolean;
@@ -317,7 +317,7 @@ codeunit 6014449 "Table Import Library"
 
     procedure ReadImportInfo()
     var
-        SplitArray: DotNet Array;
+        SplitArray: DotNet npNetArray;
     begin
         //-NPR5.48 [340086]
         //String.Construct(ReadLine);
@@ -430,7 +430,7 @@ codeunit 6014449 "Table Import Library"
 
     local procedure ReadTableNo()
     var
-        SplitArray: DotNet Array;
+        SplitArray: DotNet npNetArray;
     begin
         //-NPR5.48 [340086]
         // LineVal := ReadLine;
@@ -443,7 +443,7 @@ codeunit 6014449 "Table Import Library"
 
     local procedure ReadRecordCount()
     var
-        SplitArray: DotNet Array;
+        SplitArray: DotNet npNetArray;
     begin
         //-NPR5.48 [340086]
         // String.Construct(ReadLine);
@@ -457,7 +457,7 @@ codeunit 6014449 "Table Import Library"
     var
         FieldNo: Integer;
         Value: Text;
-        SplitArray: DotNet Array;
+        SplitArray: DotNet npNetArray;
     begin
         //-NPR5.48 [340086]
         // WHILE COPYSTR(LastTokenConsumed,(Lookahead+1) - STRLEN(RecordSeparator)) <> RecordSeparator DO BEGIN
@@ -482,7 +482,7 @@ codeunit 6014449 "Table Import Library"
     var
         FieldIndex: Integer;
         Value: Text;
-        SplitArray: DotNet Array;
+        SplitArray: DotNet npNetArray;
     begin
         //-NPR5.48 [340086]
         // WHILE COPYSTR(LastTokenConsumed,(Lookahead+1) - STRLEN(RecordSeparator)) <> RecordSeparator DO BEGIN
@@ -832,7 +832,7 @@ codeunit 6014449 "Table Import Library"
         Metadata: Text;
         ObjectMetadata: Record "Object Metadata";
         InStream: InStream;
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
         IsAutoIncrement: Boolean;
         RecordRef: RecordRef;
         FieldRef: FieldRef;
@@ -870,7 +870,7 @@ codeunit 6014449 "Table Import Library"
     end;
 
     [TryFunction]
-    local procedure TryFieldObsoleteCheck(FieldNo: Integer;var XmlDoc: DotNet XmlDocument;var IsObsolete: Boolean)
+    local procedure TryFieldObsoleteCheck(FieldNo: Integer;var XmlDoc: DotNet npNetXmlDocument;var IsObsolete: Boolean)
     begin
         //-NPR5.48 [340086]
         IsObsolete := (XmlDoc.DocumentElement.SelectNodes(StrSubstNo('//*[local-name()=''Field''][@ID=''%1'' and @ObsoleteState=''Removed'']', FieldNo)).Count = 1)
@@ -878,7 +878,7 @@ codeunit 6014449 "Table Import Library"
     end;
 
     [TryFunction]
-    local procedure TryFieldAutoIncrementCheck(FieldNo: Integer;var XmlDoc: DotNet XmlDocument;var IsAutoIncrement: Boolean)
+    local procedure TryFieldAutoIncrementCheck(FieldNo: Integer;var XmlDoc: DotNet npNetXmlDocument;var IsAutoIncrement: Boolean)
     begin
         //-NPR5.42 [313693]
         IsAutoIncrement := (XmlDoc.DocumentElement.SelectNodes(StrSubstNo('//*[local-name()=''Field''][@ID=''%1'' and @AutoIncrement=''1'']', FieldNo)).Count = 1)
@@ -916,7 +916,7 @@ codeunit 6014449 "Table Import Library"
     end;
 
     [TryFunction]
-    local procedure LoadXmlInStream(var InStream: InStream;var XmlDoc: DotNet XmlDocument)
+    local procedure LoadXmlInStream(var InStream: InStream;var XmlDoc: DotNet npNetXmlDocument)
     begin
         //-NPR5.42 [313693]
         XmlDoc := XmlDoc.XmlDocument;
@@ -924,7 +924,7 @@ codeunit 6014449 "Table Import Library"
         //+NPR5.42 [313693]
     end;
 
-    local procedure LoadMetadataXml(ObjectMetadata: Record "Object Metadata";var XmlDoc: DotNet XmlDocument): Boolean
+    local procedure LoadMetadataXml(ObjectMetadata: Record "Object Metadata";var XmlDoc: DotNet npNetXmlDocument): Boolean
     var
         InStream: InStream;
     begin
@@ -1100,10 +1100,10 @@ codeunit 6014449 "Table Import Library"
 
     local procedure FileReadTextDotNet("Count": Integer) Output: Text
     var
-        String: DotNet String;
-        Char: DotNet Char;
+        String: DotNet npNetString;
+        Char: DotNet npNetChar;
         ReadChars: Integer;
-        DotNetSubArray: DotNet Array;
+        DotNetSubArray: DotNet npNetArray;
     begin
         //-NPR5.48 [340086]
         if Count = 0 then begin //Full line
@@ -1364,7 +1364,7 @@ codeunit 6014449 "Table Import Library"
 
     procedure EvaluateDecimal(var FieldRef: FieldRef;Value: Text): Text
     var
-        CultureInfo: DotNet CultureInfo;
+        CultureInfo: DotNet npNetCultureInfo;
     begin
         CultureInfo := CultureInfo.CurrentCulture;
         exit(ConvertStr(Value,'.',CultureInfo.NumberFormat().NumberDecimalSeparator));
@@ -1445,8 +1445,8 @@ codeunit 6014449 "Table Import Library"
 
     local procedure ReadBinary(var TempBlob: Record TempBlob temporary)
     var
-        Convert: DotNet Convert;
-        MemoryStream: DotNet MemoryStream;
+        Convert: DotNet npNetConvert;
+        MemoryStream: DotNet npNetMemoryStream;
         OutStream: OutStream;
         ReadLength: Integer;
         LengthText: Text;
@@ -1568,11 +1568,11 @@ codeunit 6014449 "Table Import Library"
           ToSetAndTest := Value;
     end;
 
-    local procedure SplitString(Text: Text;SplitChar: Text[1];var SplitArray: DotNet Array)
+    local procedure SplitString(Text: Text;SplitChar: Text[1];var SplitArray: DotNet npNetArray)
     var
-        String: DotNet String;
-        CharArray: DotNet Array;
-        DotNetChar: DotNet Char;
+        String: DotNet npNetString;
+        CharArray: DotNet npNetArray;
+        DotNetChar: DotNet npNetChar;
     begin
         //-NPR5.48 [340086]
         CharArray := CharArray.CreateInstance(GetDotNetType(DotNetChar), 1);

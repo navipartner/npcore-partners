@@ -1469,7 +1469,7 @@ codeunit 6184480 "Pepper Library"
     var
         KeyText: Text;
         XMLDOMManagement: Codeunit "XML DOM Management";
-        XMLRootNode: DotNet XmlNode;
+        XMLRootNode: DotNet npNetXmlNode;
     begin
         //-NPR5.29 [262269]
         if not XMLDOMManagement.LoadXMLDocumentFromText(LicenseText,XMLRootNode) then
@@ -1486,7 +1486,7 @@ codeunit 6184480 "Pepper Library"
         TerminalTypeID: Integer;
         TerminalTypeText: Text;
         XMLDOMManagement: Codeunit "XML DOM Management";
-        XMLRootNode: DotNet XmlNode;
+        XMLRootNode: DotNet npNetXmlNode;
         PepperTerminalType: Record "Pepper Terminal Type";
     begin
         //-NPR5.29 [262269]

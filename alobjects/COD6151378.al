@@ -28,9 +28,9 @@ codeunit 6151378 "CS UI Item Detail"
         CSCommunication: Codeunit "CS Communication";
         CSManagement: Codeunit "CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet XmlDocument;
-        ReturnedNode: DotNet XmlNode;
-        RootNode: DotNet XmlNode;
+        DOMxmlin: DotNet npNetXmlDocument;
+        ReturnedNode: DotNet npNetXmlNode;
+        RootNode: DotNet npNetXmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];

@@ -6,29 +6,29 @@ codeunit 6014596 "Generic Page Web Serv. Client"
     end;
 
     var
-        Assembly: DotNet Assembly;
-        ServiceType: DotNet Type;
-        EntityType: DotNet Type;
-        FilterType: DotNet Type;
-        FieldsType: DotNet Type;
-        LineType: DotNet Type;
-        Entity: DotNet Object;
-        Line: DotNet Object;
-        Entities: DotNet Array;
-        Filters: DotNet List_Of_T;
-        Lines: DotNet List_Of_T;
-        LinesProperty: DotNet PropertyInfo;
-        Activator: DotNet Activator;
-        _Read: DotNet MethodInfo;
-        _ReadByRecId: DotNet MethodInfo;
-        _ReadMultiple: DotNet MethodInfo;
-        _IsUpdated: DotNet MethodInfo;
-        _GetRecIdFromKey: DotNet MethodInfo;
-        _Create: DotNet MethodInfo;
-        _CreateMultiple: DotNet MethodInfo;
-        _Update: DotNet MethodInfo;
-        _UpdateMultiple: DotNet MethodInfo;
-        _Delete: DotNet MethodInfo;
+        Assembly: DotNet npNetAssembly;
+        ServiceType: DotNet npNetType;
+        EntityType: DotNet npNetType;
+        FilterType: DotNet npNetType;
+        FieldsType: DotNet npNetType;
+        LineType: DotNet npNetType;
+        Entity: DotNet npNetObject;
+        Line: DotNet npNetObject;
+        Entities: DotNet npNetArray;
+        Filters: DotNet npNetList_Of_T;
+        Lines: DotNet npNetList_Of_T;
+        LinesProperty: DotNet npNetPropertyInfo;
+        Activator: DotNet npNetActivator;
+        _Read: DotNet npNetMethodInfo;
+        _ReadByRecId: DotNet npNetMethodInfo;
+        _ReadMultiple: DotNet npNetMethodInfo;
+        _IsUpdated: DotNet npNetMethodInfo;
+        _GetRecIdFromKey: DotNet npNetMethodInfo;
+        _Create: DotNet npNetMethodInfo;
+        _CreateMultiple: DotNet npNetMethodInfo;
+        _Update: DotNet npNetMethodInfo;
+        _UpdateMultiple: DotNet npNetMethodInfo;
+        _Delete: DotNet npNetMethodInfo;
         Text001: Label '%1 is not allowed for the %2 web service.';
         ServiceUri: Text;
         Name: Text;
@@ -49,22 +49,22 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure CONNECT(Uri: Text)
     var
-        WebRequest: DotNet WebRequest;
-        RequestStream: DotNet Stream;
-        ServiceDescription: DotNet ServiceDescription;
-        ServiceDescriptionImporter: DotNet ServiceDescriptionImporter;
-        ServiceDescriptionImportWarnings: DotNet ServiceDescriptionImportWarnings;
-        CodeNamespace: DotNet CodeNamespace;
-        CodeCompileUnit: DotNet CodeCompileUnit;
-        CodeCompileUnitArray: DotNet Array;
-        CodeGenerationOptions: DotNet CodeGeneratorOptions;
-        CompilerParameters: DotNet CompilerParameters;
-        CompilerResults: DotNet CompilerResults;
-        StringWriter: DotNet StringWriter;
-        CultureInfo: DotNet CultureInfo;
-        CSharpCodeProvider: DotNet CSharpCodeProvider;
-        AssemblyReferences: DotNet Array;
-        String: DotNet String;
+        WebRequest: DotNet npNetWebRequest;
+        RequestStream: DotNet npNetStream;
+        ServiceDescription: DotNet npNetServiceDescription;
+        ServiceDescriptionImporter: DotNet npNetServiceDescriptionImporter;
+        ServiceDescriptionImportWarnings: DotNet npNetServiceDescriptionImportWarnings;
+        CodeNamespace: DotNet npNetCodeNamespace;
+        CodeCompileUnit: DotNet npNetCodeCompileUnit;
+        CodeCompileUnitArray: DotNet npNetArray;
+        CodeGenerationOptions: DotNet npNetCodeGeneratorOptions;
+        CompilerParameters: DotNet npNetCompilerParameters;
+        CompilerResults: DotNet npNetCompilerResults;
+        StringWriter: DotNet npNetStringWriter;
+        CultureInfo: DotNet npNetCultureInfo;
+        CSharpCodeProvider: DotNet npNetCSharpCodeProvider;
+        AssemblyReferences: DotNet npNetArray;
+        String: DotNet npNetString;
     begin
         ServiceUri := Uri;
 
@@ -112,11 +112,11 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     local procedure DetectTypes(ServiceName: Text)
     var
-        Types: DotNet Array;
-        Type: DotNet Type;
-        TypeName: DotNet String;
-        PropertyInfo: DotNet PropertyInfo;
-        Properties: DotNet Array;
+        Types: DotNet npNetArray;
+        Type: DotNet npNetType;
+        TypeName: DotNet npNetString;
+        PropertyInfo: DotNet npNetPropertyInfo;
+        Properties: DotNet npNetArray;
         IsPageService: Boolean;
         i: Integer;
     begin
@@ -222,7 +222,7 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure INIT()
     var
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         Entity := Activator.CreateInstance(EntityType);
         Lines := Lines.List;
@@ -232,7 +232,7 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure NEWLINE()
     var
-        LinesArray: DotNet Array;
+        LinesArray: DotNet npNetArray;
         i: Integer;
     begin
         AssertHasLines;
@@ -248,9 +248,9 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure CREATE()
     var
-        Service: DotNet Object;
-        "Object": DotNet Object;
-        Parameters: DotNet Array;
+        Service: DotNet npNetObject;
+        "Object": DotNet npNetObject;
+        Parameters: DotNet npNetArray;
     begin
         AssertAllowed(INSERTALLOWED);
         AssertInitialized;
@@ -267,9 +267,9 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure UPDATE()
     var
-        Service: DotNet Object;
-        "Object": DotNet Object;
-        Parameters: DotNet Array;
+        Service: DotNet npNetObject;
+        "Object": DotNet npNetObject;
+        Parameters: DotNet npNetArray;
     begin
         AssertAllowed(MODIFYALLOWED);
         AssertInitialized;
@@ -286,9 +286,9 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure UPDATEMULTIPLE()
     var
-        Service: DotNet Object;
-        "Object": DotNet Object;
-        Parameters: DotNet Array;
+        Service: DotNet npNetObject;
+        "Object": DotNet npNetObject;
+        Parameters: DotNet npNetArray;
         i: Integer;
     begin
         //this is not finished yet so don't use it
@@ -310,9 +310,9 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure DELETE()
     var
-        Service: DotNet Object;
-        "Object": DotNet Object;
-        Parameters: DotNet Array;
+        Service: DotNet npNetObject;
+        "Object": DotNet npNetObject;
+        Parameters: DotNet npNetArray;
         "Key": Text;
     begin
         AssertAllowed(DELETEALLOWED);
@@ -333,11 +333,11 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure READ(): Boolean
     var
-        Service: DotNet Object;
-        "Object": DotNet Object;
-        Parameters: DotNet Array;
-        ParameterInfo: DotNet ParameterInfo;
-        PropertyInfo: DotNet PropertyInfo;
+        Service: DotNet npNetObject;
+        "Object": DotNet npNetObject;
+        Parameters: DotNet npNetArray;
+        ParameterInfo: DotNet npNetParameterInfo;
+        PropertyInfo: DotNet npNetPropertyInfo;
         i: Integer;
     begin
         AssertInitialized;
@@ -365,12 +365,12 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure READMULTIPLE(): Boolean
     var
-        Service: DotNet Object;
-        "Object": DotNet Object;
-        Parameters: DotNet Array;
-        ParameterInfo: DotNet ParameterInfo;
-        ReadFilters: DotNet Array;
-        NullString: DotNet String;
+        Service: DotNet npNetObject;
+        "Object": DotNet npNetObject;
+        Parameters: DotNet npNetArray;
+        ParameterInfo: DotNet npNetParameterInfo;
+        ReadFilters: DotNet npNetArray;
+        NullString: DotNet npNetString;
         i: Integer;
     begin
         ReadFilters := ReadFilters.CreateInstance(FilterType,Filters.Count);
@@ -398,9 +398,9 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure READBYRECID(RecID: Text): Boolean
     var
-        Service: DotNet Object;
-        "Object": DotNet Object;
-        Parameters: DotNet Array;
+        Service: DotNet npNetObject;
+        "Object": DotNet npNetObject;
+        Parameters: DotNet npNetArray;
     begin
         AssertInitialized;
 
@@ -416,9 +416,9 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure GETRECIDFROMKEY("Key": Text): Text
     var
-        Service: DotNet Object;
-        "Object": DotNet Object;
-        Parameters: DotNet Array;
+        Service: DotNet npNetObject;
+        "Object": DotNet npNetObject;
+        Parameters: DotNet npNetArray;
     begin
         AssertInitialized;
 
@@ -448,11 +448,11 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure SETFILTER(FieldName: Text;Criteria: Text)
     var
-        EnumValues: DotNet Array;
-        "Filter": DotNet Object;
-        "Field": DotNet Object;
-        Enum: DotNet Enum;
-        PropertyInfo: DotNet PropertyInfo;
+        EnumValues: DotNet npNetArray;
+        "Filter": DotNet npNetObject;
+        "Field": DotNet npNetObject;
+        Enum: DotNet npNetEnum;
+        PropertyInfo: DotNet npNetPropertyInfo;
         i: Integer;
         FieldExists: Boolean;
     begin
@@ -474,13 +474,13 @@ codeunit 6014596 "Generic Page Web Serv. Client"
         Filters.Add(Filter);
     end;
 
-    procedure SetObjectValue("Field": Text;Value: Variant;Target: DotNet Object;"Action": Option Read,Update)
+    procedure SetObjectValue("Field": Text;Value: Variant;Target: DotNet npNetObject;"Action": Option Read,Update)
     var
-        PropertyInfo: DotNet PropertyInfo;
-        Enum: DotNet Enum;
-        "Object": DotNet Object;
-        Type: DotNet Type;
-        EnumValues: DotNet Array;
+        PropertyInfo: DotNet npNetPropertyInfo;
+        Enum: DotNet npNetEnum;
+        "Object": DotNet npNetObject;
+        Type: DotNet npNetType;
+        EnumValues: DotNet npNetArray;
         ValueBool: Boolean;
         ValueInt: Integer;
         ValueText: Text;
@@ -542,11 +542,11 @@ codeunit 6014596 "Generic Page Web Serv. Client"
           end;
     end;
 
-    procedure GetObjectValue("Field": Text;Source: DotNet Object): Text
+    procedure GetObjectValue("Field": Text;Source: DotNet npNetObject): Text
     var
-        PropertyInfo: DotNet PropertyInfo;
-        "Object": DotNet Object;
-        Type: DotNet Type;
+        PropertyInfo: DotNet npNetPropertyInfo;
+        "Object": DotNet npNetObject;
+        Type: DotNet npNetType;
     begin
         GetNull := false;
         Type := Source.GetType();
@@ -572,8 +572,8 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure GETVALUE("Field": Text): Text
     var
-        PropertyInfo: DotNet PropertyInfo;
-        "Object": DotNet Object;
+        PropertyInfo: DotNet npNetPropertyInfo;
+        "Object": DotNet npNetObject;
     begin
         exit(GetObjectValue(Field,Entity));
     end;
@@ -588,10 +588,10 @@ codeunit 6014596 "Generic Page Web Serv. Client"
         exit(GetObjectValue(Field,Line));
     end;
 
-    local procedure Authenticate(ServiceInstance: DotNet SoapHttpClientProtocol)
+    local procedure Authenticate(ServiceInstance: DotNet npNetSoapHttpClientProtocol)
     var
-        Client: DotNet WebRequest;
-        Credential: DotNet NetworkCredential;
+        Client: DotNet npNetWebRequest;
+        Credential: DotNet npNetNetworkCredential;
     begin
         if UseDefaultCredentials then
           ServiceInstance.UseDefaultCredentials := true
@@ -608,11 +608,11 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure GetEnumTypeValues("Field": Text;ArrayProperty: Option Length,Options,IndexValue;ValueText: Text) ReturnValue: Text
     var
-        EntityLocal: DotNet Object;
-        PropertyInfo: DotNet PropertyInfo;
-        Enum: DotNet Enum;
-        Type: DotNet Type;
-        EnumValues: DotNet Array;
+        EntityLocal: DotNet npNetObject;
+        PropertyInfo: DotNet npNetPropertyInfo;
+        Enum: DotNet npNetEnum;
+        Type: DotNet npNetType;
+        EnumValues: DotNet npNetArray;
         i: Integer;
         FirstIndexFound: Boolean;
     begin
@@ -648,24 +648,24 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     procedure FieldExists("Field": Text): Boolean
     var
-        PropertyInfo: DotNet PropertyInfo;
-        "Object": DotNet Object;
-        Type: DotNet Type;
+        PropertyInfo: DotNet npNetPropertyInfo;
+        "Object": DotNet npNetObject;
+        Type: DotNet npNetType;
     begin
         Type := Entity.GetType();
         PropertyInfo := Type.GetProperty(Field);
         exit(not IsNull(PropertyInfo));
     end;
 
-    local procedure CheckEntityProperties(EntityHere: DotNet Object)
+    local procedure CheckEntityProperties(EntityHere: DotNet npNetObject)
     var
-        PropertyInfo: DotNet PropertyInfo;
-        FieldPropertyInfo: DotNet PropertyInfo;
-        EnumValues: DotNet Array;
-        Enum: DotNet Enum;
+        PropertyInfo: DotNet npNetPropertyInfo;
+        FieldPropertyInfo: DotNet npNetPropertyInfo;
+        EnumValues: DotNet npNetArray;
+        Enum: DotNet npNetEnum;
         i: Integer;
         Value: Text;
-        Type: DotNet Type;
+        Type: DotNet npNetType;
         FieldPropertyValue: Text;
     begin
         //use this function to check field names, values and Specified property in EntityHere
@@ -683,12 +683,12 @@ codeunit 6014596 "Generic Page Web Serv. Client"
 
     local procedure ResetFieldSpecifiedFlag()
     var
-        PropertyInfo: DotNet PropertyInfo;
-        FieldPropertyInfo: DotNet PropertyInfo;
-        EnumValues: DotNet Array;
-        Enum: DotNet Enum;
+        PropertyInfo: DotNet npNetPropertyInfo;
+        FieldPropertyInfo: DotNet npNetPropertyInfo;
+        EnumValues: DotNet npNetArray;
+        Enum: DotNet npNetEnum;
         i: Integer;
-        Type: DotNet Type;
+        Type: DotNet npNetType;
     begin
         EnumValues := Enum.GetValues(FieldsType);
         for i := 0 to EnumValues.Length - 1 do begin

@@ -41,7 +41,7 @@ codeunit 6014620 "POS Web UI Management"
     var
         SessionMgt: Codeunit "POS Web Session Management";
         Util: Codeunit "POS Web Utilities";
-        ViewType: DotNet ViewType;
+        ViewType: DotNet npNetViewType;
         Direction: Option TopBottom,LeftRight;
         MenuPosition: Option Top,Bottom,Menu;
         CaptionLabelReceiptNo: Label 'Sale';
@@ -129,9 +129,9 @@ codeunit 6014620 "POS Web UI Management"
         CaptionTabletButtonMore: Label 'More...';
         CaptionTabletButtonPayments: Label 'Payment Methods';
 
-    procedure ConfigureView(View: DotNet SaleView)
+    procedure ConfigureView(View: DotNet npNetSaleView)
     var
-        EnumClientType: DotNet ClientType;
+        EnumClientType: DotNet npNetClientType;
     begin
         case View.TypeAsInt of
           ViewType.Sale:    ConfigureSaleScreen(View.ToSaleView());
@@ -150,7 +150,7 @@ codeunit 6014620 "POS Web UI Management"
         end;
     end;
 
-    local procedure ConfigureSaleScreen(View: DotNet SaleView)
+    local procedure ConfigureSaleScreen(View: DotNet npNetSaleView)
     var
         MenuLinesFilter: Record "Touch Screen - Menu Lines";
     begin
@@ -162,7 +162,7 @@ codeunit 6014620 "POS Web UI Management"
         View.LogKeys := true;
     end;
 
-    local procedure ConfigurePaymentScreen(View: DotNet PaymentView)
+    local procedure ConfigurePaymentScreen(View: DotNet npNetPaymentView)
     var
         MenuLinesFilter: Record "Touch Screen - Menu Lines";
     begin
@@ -174,10 +174,10 @@ codeunit 6014620 "POS Web UI Management"
         View.LogKeys := true;
     end;
 
-    local procedure ConfigureButtonGrids(View: DotNet View;var MenuLines: Record "Touch Screen - Menu Lines")
+    local procedure ConfigureButtonGrids(View: DotNet npNetView;var MenuLines: Record "Touch Screen - Menu Lines")
     var
         MenuLinesFilter: Record "Touch Screen - Menu Lines";
-        IMenuButtonView: DotNet IMenuButtonView;
+        IMenuButtonView: DotNet npNetIMenuButtonView;
     begin
         IMenuButtonView := View.ToMenuButtonView();
 
@@ -199,12 +199,12 @@ codeunit 6014620 "POS Web UI Management"
         ConfigureButtonGrid(IMenuButtonView.GetMenu().Initialize(SessionMgt.ButtonCountVertical(),SessionMgt.ButtonCountHorizontal(),SessionMgt.ButtonsEnabledByDefault),MenuLinesFilter,Direction::TopBottom,0);
     end;
 
-    procedure ConfigureButtonGrid(Menu: DotNet ButtonGrid;var MenuLines: Record "Touch Screen - Menu Lines";Direction: Option TopBottom,LeftRight;PlacementOffset: Integer)
+    procedure ConfigureButtonGrid(Menu: DotNet npNetButtonGrid;var MenuLines: Record "Touch Screen - Menu Lines";Direction: Option TopBottom,LeftRight;PlacementOffset: Integer)
     var
         MenuLinesTmp: Record "Touch Screen - Menu Lines" temporary;
         IntTmp: Record "Integer" temporary;
         Util: Codeunit "POS Web Utilities";
-        ButtonGrid: DotNet ButtonGrid;
+        ButtonGrid: DotNet npNetButtonGrid;
         PlacementID: Integer;
         Iteration: Integer;
         x: Integer;
@@ -314,7 +314,7 @@ codeunit 6014620 "POS Web UI Management"
         exit(true);
     end;
 
-    local procedure SetMenuButton(Button: DotNet Button;var MenuLine: Record "Touch Screen - Menu Lines";PlacementID: Integer)
+    local procedure SetMenuButton(Button: DotNet npNetButton;var MenuLine: Record "Touch Screen - Menu Lines";PlacementID: Integer)
     var
         Util: Codeunit "POS Web Utilities";
     begin
@@ -332,7 +332,7 @@ codeunit 6014620 "POS Web UI Management"
         Util.AssignShowBehaviorFromLine(MenuLine,Button);
     end;
 
-    procedure ConfigureSalesLinesGrid(View: DotNet SaleView)
+    procedure ConfigureSalesLinesGrid(View: DotNet npNetSaleView)
     var
         SaleLine: Record "Sale Line POS";
         "Field": Record "Field";
@@ -432,7 +432,7 @@ codeunit 6014620 "POS Web UI Management"
         exit(false);
     end;
 
-    procedure ConfigurePaymentLinesGrid(View: DotNet PaymentView)
+    procedure ConfigurePaymentLinesGrid(View: DotNet npNetPaymentView)
     var
         SaleLine: Record "Sale Line POS";
         "Field": Record "Field";
@@ -446,7 +446,7 @@ codeunit 6014620 "POS Web UI Management"
           until Field.Next = 0;
     end;
 
-    procedure ConfigureBalancingLinesGrid(PageGrid: DotNet DataGrid)
+    procedure ConfigureBalancingLinesGrid(PageGrid: DotNet npNetDataGrid)
     var
         "Field": Record "Field";
     begin
@@ -462,7 +462,7 @@ codeunit 6014620 "POS Web UI Management"
           until Field.Next = 0;
     end;
 
-    procedure ConfigurePrintExchangeLabelsGrid(PageGrid: DotNet DataGrid)
+    procedure ConfigurePrintExchangeLabelsGrid(PageGrid: DotNet npNetDataGrid)
     var
         SaleLine: Record "Sale Line POS";
         "Field": Record "Field";
@@ -490,12 +490,12 @@ codeunit 6014620 "POS Web UI Management"
         //+NPR5.40 [308408]
     end;
 
-    local procedure CreateGridColumn(PageGrid: DotNet DataGrid;"Field": Record "Field")
+    local procedure CreateGridColumn(PageGrid: DotNet npNetDataGrid;"Field": Record "Field")
     var
         SaleLine: Record "Sale Line POS";
-        DataColumn: DotNet DataColumn0;
-        TextAlign: DotNet TextAlign;
-        Format: DotNet NumberFormat;
+        DataColumn: DotNet npNetDataColumn0;
+        TextAlign: DotNet npNetTextAlign;
+        Format: DotNet npNetNumberFormat;
     begin
         with Field do begin
           DataColumn := DataColumn.DataColumn;
@@ -528,9 +528,9 @@ codeunit 6014620 "POS Web UI Management"
         end;
     end;
 
-    procedure ConfigureCalendarGridDialog(Dlg: DotNet CalendarGrid)
+    procedure ConfigureCalendarGridDialog(Dlg: DotNet npNetCalendarGrid)
     var
-        Arr: DotNet Array;
+        Arr: DotNet npNetArray;
     begin
         Dlg.CaptionNext := CaptionGlobalNext;
         Dlg.CaptionPrevious := CaptionGlobalPrevious;
@@ -540,7 +540,7 @@ codeunit 6014620 "POS Web UI Management"
         Dlg.KeyFields.SetValue(4,1);
     end;
 
-    procedure ConfigureLookupTemplate(var Template: DotNet Template;var LookupRec: RecordRef)
+    procedure ConfigureLookupTemplate(var Template: DotNet npNetTemplate;var LookupRec: RecordRef)
     var
         Vendor: Record Vendor;
         ItemGroup: Record "Item Group";
@@ -549,11 +549,11 @@ codeunit 6014620 "POS Web UI Management"
         LookupTemplateLine: Record "Lookup Template Line";
         CaptionRecRef: RecordRef;
         SortFieldRef: FieldRef;
-        Convert: DotNet Convert;
-        Row: DotNet Row;
-        Info: DotNet Info;
-        TextAlign: DotNet TextAlign;
-        NumberFormat: DotNet NumberFormat;
+        Convert: DotNet npNetConvert;
+        Row: DotNet npNetRow;
+        Info: DotNet npNetInfo;
+        TextAlign: DotNet npNetTextAlign;
+        NumberFormat: DotNet npNetNumberFormat;
         LineCaption: Text;
         LastRowNo: Integer;
         AddRow: Boolean;
@@ -679,12 +679,12 @@ codeunit 6014620 "POS Web UI Management"
         end;
     end;
 
-    procedure ConfigureCaptions(Marshaller: DotNet Marshaller)
+    procedure ConfigureCaptions(Marshaller: DotNet npNetMarshaller)
     var
         RecRef: RecordRef;
         FieldRef: FieldRef;
-        NumberFormat: DotNet NumberFormatInfo;
-        Captions: DotNet Dictionary_Of_T_U;
+        NumberFormat: DotNet npNetNumberFormatInfo;
+        Captions: DotNet npNetDictionary_Of_T_U;
         i: Integer;
     begin
         Captions := Captions.Dictionary();
@@ -785,10 +785,10 @@ codeunit 6014620 "POS Web UI Management"
         Marshaller.SetObjectProperty('NaviPartner.Retail.Localization.captions',Captions);
     end;
 
-    procedure ConfigureFonts(Marshaller: DotNet Marshaller)
+    procedure ConfigureFonts(Marshaller: DotNet npNetMarshaller)
     var
         WebFont: Record "POS Web Font";
-        Font: DotNet Font;
+        Font: DotNet npNetFont;
     begin
         WebFont.SetFilter("Company Name",'%1|%2','',CompanyName);
         if WebFont.FindSet then
@@ -798,10 +798,10 @@ codeunit 6014620 "POS Web UI Management"
           until WebFont.Next = 0;
     end;
 
-    procedure ConfigureCustomLogo(Marshaller: DotNet Marshaller)
+    procedure ConfigureCustomLogo(Marshaller: DotNet npNetMarshaller)
     var
         WebFont: Record "POS Web Font";
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         if SessionMgt.HasCustomLogo() then begin
           String := SessionMgt.GetCustomLogo();
@@ -811,10 +811,10 @@ codeunit 6014620 "POS Web UI Management"
 
     procedure FormatInteger(Int: BigInteger): Text
     var
-        NumberFormat: DotNet NumberFormatInfo;
-        Args: DotNet Array;
-        String: DotNet String;
-        "Object": DotNet Object;
+        NumberFormat: DotNet npNetNumberFormatInfo;
+        Args: DotNet npNetArray;
+        String: DotNet npNetString;
+        "Object": DotNet npNetObject;
     begin
         SessionMgt.GetNumberFormat(NumberFormat);
         Args := Args.CreateInstance(GetDotNetType(Object),1);
@@ -824,10 +824,10 @@ codeunit 6014620 "POS Web UI Management"
 
     procedure FormatDecimal(Dec: Decimal): Text
     var
-        NumberFormat: DotNet NumberFormatInfo;
-        Args: DotNet Array;
-        String: DotNet String;
-        "Object": DotNet Object;
+        NumberFormat: DotNet npNetNumberFormatInfo;
+        Args: DotNet npNetArray;
+        String: DotNet npNetString;
+        "Object": DotNet npNetObject;
     begin
         SessionMgt.GetNumberFormat(NumberFormat);
         Args := Args.CreateInstance(GetDotNetType(Object),1);
@@ -837,10 +837,10 @@ codeunit 6014620 "POS Web UI Management"
 
     procedure FormatDate(Date: Date): Text
     var
-        DateFormat: DotNet DateTimeFormatInfo;
-        Args: DotNet Array;
-        String: DotNet String;
-        "Object": DotNet Object;
+        DateFormat: DotNet npNetDateTimeFormatInfo;
+        Args: DotNet npNetArray;
+        String: DotNet npNetString;
+        "Object": DotNet npNetObject;
     begin
         SessionMgt.GetDateFormat(DateFormat);
         Args := Args.CreateInstance(GetDotNetType(Object),1);
@@ -850,9 +850,9 @@ codeunit 6014620 "POS Web UI Management"
 
     procedure ParseInteger(Text: Text): BigInteger
     var
-        NumberFormat: DotNet NumberFormatInfo;
-        Dec: DotNet Decimal;
-        Convert: DotNet Convert;
+        NumberFormat: DotNet npNetNumberFormatInfo;
+        Dec: DotNet npNetDecimal;
+        Convert: DotNet npNetConvert;
     begin
         SessionMgt.GetNumberFormat(NumberFormat);
         //-NPR5.00.03
@@ -864,8 +864,8 @@ codeunit 6014620 "POS Web UI Management"
 
     procedure ParseDecimal(Text: Text): Decimal
     var
-        NumberFormat: DotNet NumberFormatInfo;
-        Dec: DotNet Decimal;
+        NumberFormat: DotNet npNetNumberFormatInfo;
+        Dec: DotNet npNetDecimal;
     begin
         SessionMgt.GetNumberFormat(NumberFormat);
         //-NPR5.00.03
@@ -877,10 +877,10 @@ codeunit 6014620 "POS Web UI Management"
 
     local procedure PrepareDateForParsing(var String: Text)
     var
-        DateFormat: DotNet DateTimeFormatInfo;
-        DotNetDateTime: DotNet DateTime;
-        RegEx: DotNet Regex;
-        DateTimeStyles: DotNet DateTimeStyles;
+        DateFormat: DotNet npNetDateTimeFormatInfo;
+        DotNetDateTime: DotNet npNetDateTime;
+        RegEx: DotNet npNetRegex;
+        DateTimeStyles: DotNet npNetDateTimeStyles;
         NewDate: Date;
         NewDateTime: DateTime;
         FormatString: Text;
@@ -946,8 +946,8 @@ codeunit 6014620 "POS Web UI Management"
 
     procedure ParseDate(String: Text): Date
     var
-        DateFormat: DotNet DateTimeFormatInfo;
-        Date: DotNet DateTime;
+        DateFormat: DotNet npNetDateTimeFormatInfo;
+        Date: DotNet npNetDateTime;
     begin
         SessionMgt.GetDateFormat(DateFormat);
 
@@ -957,9 +957,9 @@ codeunit 6014620 "POS Web UI Management"
 
     procedure TryParseDecimal(var Dec: Decimal;String: Text) Result: Boolean
     var
-        NumberFormat: DotNet NumberFormatInfo;
-        DotNetDecimal: DotNet Decimal;
-        NumberStyles: DotNet NumberStyles;
+        NumberFormat: DotNet npNetNumberFormatInfo;
+        DotNetDecimal: DotNet npNetDecimal;
+        NumberStyles: DotNet npNetNumberStyles;
     begin
         SessionMgt.GetNumberFormat(NumberFormat);
         //-NPR5.00.03
@@ -971,9 +971,9 @@ codeunit 6014620 "POS Web UI Management"
 
     procedure TryParseDate(var Date: Date;String: Text) Result: Boolean
     var
-        DateFormat: DotNet DateTimeFormatInfo;
-        DateTimeStyles: DotNet DateTimeStyles;
-        DotNetDateTime: DotNet DateTime;
+        DateFormat: DotNet npNetDateTimeFormatInfo;
+        DateTimeStyles: DotNet npNetDateTimeStyles;
+        DotNetDateTime: DotNet npNetDateTime;
         DateTime: DateTime;
     begin
         SessionMgt.GetDateFormat(DateFormat);

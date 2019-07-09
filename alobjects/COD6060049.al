@@ -22,7 +22,7 @@ codeunit 6060049 "Item Wksht. WebService Mgr"
 
     trigger OnRun()
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
         ImportType: Record "Nc Import Type";
         FunctionName: Text[100];
     begin
@@ -56,11 +56,11 @@ codeunit 6060049 "Item Wksht. WebService Mgr"
         VENDOR_NOT_FOUND: Label 'The Vendor %1 could not be found in the database.';
         LastItemWorksheetLine: Record "Item Worksheet Line";
 
-    local procedure CreateItemWorksheetLines(XmlDoc: DotNet XmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
+    local procedure CreateItemWorksheetLines(XmlDoc: DotNet npNetXmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
     var
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         Token: Text[50];
     begin
@@ -112,7 +112,7 @@ codeunit 6060049 "Item Wksht. WebService Mgr"
         Commit;
     end;
 
-    local procedure CreateItemWorksheetLine(XmlElement: DotNet XmlElement;Token: Text[100];DocumentID: Text[100]) Imported: Boolean
+    local procedure CreateItemWorksheetLine(XmlElement: DotNet npNetXmlElement;Token: Text[100];DocumentID: Text[100]) Imported: Boolean
     var
         ItemWorksheetLine: Record "Item Worksheet Line";
     begin
@@ -143,12 +143,12 @@ codeunit 6060049 "Item Wksht. WebService Mgr"
         ItemWorksheetLine.Init ();
     end;
 
-    local procedure ReadItemWorksheetLine(XmlElement: DotNet XmlElement;Token: Text[100];var ItemWorksheetLine: Record "Item Worksheet Line")
+    local procedure ReadItemWorksheetLine(XmlElement: DotNet npNetXmlElement;Token: Text[100];var ItemWorksheetLine: Record "Item Worksheet Line")
     var
         ItemWorksheetVariantLine: Record "Item Worksheet Variant Line";
         VarietyValue: Record "Variety Value";
         ItemWkshCheckLine: Codeunit "Item Wsht.-Check Line";
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         VendorVATRegNo: Text;
         TempText: Text;
         TempDec: Decimal;
@@ -977,10 +977,10 @@ codeunit 6060049 "Item Wksht. WebService Mgr"
         //+NPR5.25 [246088]
     end;
 
-    local procedure ReadWkshLineAttributes(ItemWorksheetLine: Record "Item Worksheet Line";XmlElement: DotNet XmlElement)
+    local procedure ReadWkshLineAttributes(ItemWorksheetLine: Record "Item Worksheet Line";XmlElement: DotNet npNetXmlElement)
     var
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         //-NPR5.43 [312958]
@@ -997,7 +997,7 @@ codeunit 6060049 "Item Wksht. WebService Mgr"
         //+NPR5.43 [312958]
     end;
 
-    local procedure ReadWkshLineAttribute(ItemWorksheetLine: Record "Item Worksheet Line";XmlElement: DotNet XmlElement)
+    local procedure ReadWkshLineAttribute(ItemWorksheetLine: Record "Item Worksheet Line";XmlElement: DotNet npNetXmlElement)
     var
         AttributeKey: Record "NPR Attribute Key";
         AttributeValue: Record "NPR Attribute Value Set";
@@ -1031,7 +1031,7 @@ codeunit 6060049 "Item Wksht. WebService Mgr"
         //+NPR5.43 [312958]
     end;
 
-    local procedure SetImportParameters(XmlElement: DotNet XmlElement;Token: Text[100])
+    local procedure SetImportParameters(XmlElement: DotNet npNetXmlElement;Token: Text[100])
     var
         TempText: Text;
     begin

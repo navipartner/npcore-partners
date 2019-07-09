@@ -389,8 +389,8 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     var
         Latitude: Decimal;
         Longitude: Decimal;
-        JObject: DotNet JObject;
-        JToken: DotNet JToken;
+        JObject: DotNet npNetJObject;
+        JToken: DotNet npNetJToken;
         PrevRec: Text;
     begin
         if not ClientDiagnosticsEnabled() then
@@ -512,9 +512,9 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     local procedure GetMacAddress() MacAddress: Text
     var
         [RunOnClient]
-        NetworkInterface: DotNet NetworkInterface;
+        NetworkInterface: DotNet npNetNetworkInterface;
         [RunOnClient]
-        NetworkInterfaces: DotNet Array;
+        NetworkInterfaces: DotNet npNetArray;
         i: Integer;
     begin
         if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Desktop]) then
@@ -534,9 +534,9 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     local procedure GetPlatformVersion() PlatformVersion: Text[100]
     var
         [RunOnClient]
-        Assembly: DotNet Assembly;
+        Assembly: DotNet npNetAssembly;
         [RunOnClient]
-        FileVersionInfo: DotNet FileVersionInfo;
+        FileVersionInfo: DotNet npNetFileVersionInfo;
     begin
         if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Desktop]) then
           exit('');
@@ -573,10 +573,10 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     local procedure GetNoOfUsers(InputString: Text): Integer
     var
         Pattern: Text;
-        Regex: DotNet Regex;
+        Regex: DotNet npNetRegex;
         IntFound: Integer;
-        Match: DotNet Match;
-        MatchCollection: DotNet MatchCollection;
+        Match: DotNet npNetMatch;
+        MatchCollection: DotNet npNetMatchCollection;
     begin
         Pattern := '.*?\d+.*?(\d+)';
         Match := Regex.Match(InputString,Pattern);
@@ -617,7 +617,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     end;
 
     [TryFunction]
-    local procedure TryGetJsonValueAsText(JObject: DotNet JObject;PropertyName: Text;var ReturnValue: Text)
+    local procedure TryGetJsonValueAsText(JObject: DotNet npNetJObject;PropertyName: Text;var ReturnValue: Text)
     begin
         //-NPR5.42
         ReturnValue := JObject.GetValue(PropertyName).ToString;
@@ -625,10 +625,10 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     end;
 
     [TryFunction]
-    local procedure TryGetJsonValueAsDecimal(JObject: DotNet JObject;PropertyName: Text;var ReturnValue: Decimal)
+    local procedure TryGetJsonValueAsDecimal(JObject: DotNet npNetJObject;PropertyName: Text;var ReturnValue: Decimal)
     var
-        DotNetDecimal: DotNet Decimal;
-        CultureInfo: DotNet CultureInfo;
+        DotNetDecimal: DotNet npNetDecimal;
+        CultureInfo: DotNet npNetCultureInfo;
     begin
         //-NPR5.42
         ReturnValue := DotNetDecimal.Parse(JObject.GetValue(PropertyName).ToString,CultureInfo.InvariantCulture);
@@ -636,7 +636,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     end;
 
     [TryFunction]
-    local procedure TryParseJson(json: Text;var JToken: DotNet JToken)
+    local procedure TryParseJson(json: Text;var JToken: DotNet npNetJToken)
     begin
         //-NPR5.42
         JToken := JToken.Parse(json);

@@ -195,10 +195,10 @@ table 6150704 "POS Action Parameter"
         //+NPR5.40 [307453]
     end;
 
-    procedure GetOptionsDictionary(var OptionsDict: DotNet Dictionary_Of_T_U)
+    procedure GetOptionsDictionary(var OptionsDict: DotNet npNetDictionary_Of_T_U)
     var
         POSActionParamMgt: Codeunit "POS Action Parameter Mgt.";
-        Parts: DotNet Array;
+        Parts: DotNet npNetArray;
         "Part": Text;
         Ordinal: Integer;
     begin

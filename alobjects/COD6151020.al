@@ -429,12 +429,12 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     var
         NpRvPartner: Record "NpRv Partner";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
     begin
         //-NPR5.49 [342811]

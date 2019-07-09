@@ -21,11 +21,11 @@ page 6059818 "Retail Sales Chart by Shop"
             usercontrol(chart;"Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
 
-                trigger DataPointClicked(point: DotNet BusinessChartDataPoint)
+                trigger DataPointClicked(point: DotNet npNetBusinessChartDataPoint)
                 begin
                 end;
 
-                trigger DataPointDoubleClicked(point: DotNet BusinessChartDataPoint)
+                trigger DataPointDoubleClicked(point: DotNet npNetBusinessChartDataPoint)
                 begin
                 end;
 

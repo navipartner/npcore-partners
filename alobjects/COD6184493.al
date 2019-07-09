@@ -10,11 +10,11 @@ codeunit 6184493 "Pepper End Workshift TSD"
     var
         InitializedRequest: Boolean;
         InitializedResponse: Boolean;
-        EndWorkShiftRequest: DotNet EndWorkshiftRequest0;
-        EndWorkShiftResponse: DotNet EndWorkshiftResponse0;
+        EndWorkShiftRequest: DotNet npNetEndWorkshiftRequest0;
+        EndWorkShiftResponse: DotNet npNetEndWorkshiftResponse0;
         EndOfDayPa: Integer;
         LastRestCode: Integer;
-        Labels: DotNet ProcessLabels0;
+        Labels: DotNet npNetProcessLabels0;
         PepperTerminalCaptions: Codeunit "Pepper Terminal Captions TSD";
 
     procedure InitializeProtocol()
@@ -129,7 +129,7 @@ codeunit 6184493 "Pepper End Workshift TSD"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
-    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet ResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet npNetResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
 
         if (ActionName <> 'Pepper_EftEnd') then

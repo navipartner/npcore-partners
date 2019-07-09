@@ -64,10 +64,10 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
         SalesInvHeader: Record "Sales Invoice Header";
         PaymentGateway: Record "Magento Payment Gateway";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        JToken: DotNet JToken;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
+        JToken: DotNet npNetJToken;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
         Url: Text;
         Request: Text;
         CurrencyCode: Code[10];
@@ -132,10 +132,10 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
         SalesInvHeader: Record "Sales Invoice Header";
         PaymentGateway: Record "Magento Payment Gateway";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        JToken: DotNet JToken;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
+        JToken: DotNet npNetJToken;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
         Url: Text;
         Request: Text;
         CurrencyCode: Code[10];
@@ -187,10 +187,10 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         PaymentGateway: Record "Magento Payment Gateway";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        JToken: DotNet JToken;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
+        JToken: DotNet npNetJToken;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
         Url: Text;
         Request: Text;
         CurrencyCode: Code[10];
@@ -252,10 +252,10 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
     begin
     end;
 
-    local procedure InitWebRequest(Url: Text;Username: Text;Password: Text;var HttpWebRequest: DotNet HttpWebRequest)
+    local procedure InitWebRequest(Url: Text;Username: Text;Password: Text;var HttpWebRequest: DotNet npNetHttpWebRequest)
     var
-        Credential: DotNet NetworkCredential;
-        Uri: DotNet Uri;
+        Credential: DotNet npNetNetworkCredential;
+        Uri: DotNet npNetUri;
     begin
         HttpWebRequest := HttpWebRequest.Create(Uri.Uri(Url));
         HttpWebRequest.Method := 'POST';
@@ -302,9 +302,9 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
         exit(PaymentGateway."Refund Codeunit Id" = CurrCodeunitId());
     end;
 
-    local procedure GetJsonText(JToken: DotNet JToken;JPath: Text;MaxLen: Integer) Value: Text
+    local procedure GetJsonText(JToken: DotNet npNetJToken;JPath: Text;MaxLen: Integer) Value: Text
     var
-        JToken2: DotNet JToken;
+        JToken2: DotNet npNetJToken;
     begin
         JToken2 := JToken.SelectToken(JPath);
         if IsNull(JToken2) then
@@ -317,7 +317,7 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
     end;
 
     [TryFunction]
-    local procedure ParseJson(Json: Text;var JToken: DotNet JToken)
+    local procedure ParseJson(Json: Text;var JToken: DotNet npNetJToken)
     begin
         JToken := JToken.Parse(Json);
     end;

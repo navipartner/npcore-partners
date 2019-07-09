@@ -20,7 +20,7 @@ codeunit 6150715 "POS Data Driver - Exch. Rate"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
-    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text;Extensions: DotNet List_Of_T)
+    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text;Extensions: DotNet npNetList_Of_T)
     var
         MemberCommunity: Record "MM Member Community";
     begin
@@ -32,9 +32,9 @@ codeunit 6150715 "POS Data Driver - Exch. Rate"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', false, false)]
-    local procedure OnGetDataSourceExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet DataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    local procedure OnGetDataSourceExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
     var
-        DataType: DotNet DataType;
+        DataType: DotNet npNetDataType;
         PaymentType: Record "Payment Type POS";
     begin
 
@@ -54,9 +54,9 @@ codeunit 6150715 "POS Data Driver - Exch. Rate"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', false, false)]
-    local procedure OnDataSourceExtensionReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet DataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnDataSourceExtensionReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet npNetDataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
-        DataType: DotNet DataType;
+        DataType: DotNet npNetDataType;
         POSSale: Codeunit "POS Sale";
         POSPaymentLine: Codeunit "POS Payment Line";
         Setup: Codeunit "POS Setup";

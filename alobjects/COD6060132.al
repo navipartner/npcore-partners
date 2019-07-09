@@ -852,8 +852,8 @@ codeunit 6060132 "MM Import Members"
     var
         RecordLink: Record "Record Link";
         OutStr: OutStream;
-        BinaryWriter: DotNet BinaryWriter;
-        Encoding: DotNet Encoding;
+        BinaryWriter: DotNet npNetBinaryWriter;
+        Encoding: DotNet npNetEncoding;
     begin
 
         RecordLink.Get (Member.AddLink ('', 'Notes'));

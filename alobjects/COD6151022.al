@@ -58,12 +58,12 @@ codeunit 6151022 "NpRv Partner Mgt."
     procedure TryValidateGlobalVoucherService(NpRvPartner: Record "NpRv Partner")
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        WebException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
         LastErrorText: Text;
     begin

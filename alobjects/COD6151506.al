@@ -28,13 +28,13 @@ codeunit 6151506 "Nc Gambit Management"
     procedure InsertEntry("Code": Code[50];TableNo: Integer;FieldNo: Integer;ID: Code[100];Description: Text[1024];Critical: Boolean)
     var
         ActiveSession: Record "Active Session";
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
-        XmlDocResponse: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlNamespaceManager: DotNet XmlNamespaceManager;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlDocResponse: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNamespaceManager: DotNet npNetXmlNamespaceManager;
     begin
         if not IsNull(XmlDoc) then
           Clear(XmlDoc);
@@ -114,21 +114,21 @@ codeunit 6151506 "Nc Gambit Management"
     var
         ActiveSession: Record "Active Session";
         TempCommentLine: Record "Comment Line" temporary;
-        BinaryReader: DotNet BinaryReader;
-        Convert: DotNet Convert;
-        MemoryStream: DotNet MemoryStream;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
-        XmlDocResponse: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlElementAttachment: DotNet XmlElement;
-        XmlElementAttachmentData: DotNet XmlElement;
-        XmlElementAttachmentDataEntry: DotNet XmlElement;
-        XmlElementComment: DotNet XmlElement;
-        XmlElementCommentLine: DotNet XmlElement;
-        XmlNamespaceManager: DotNet XmlNamespaceManager;
+        BinaryReader: DotNet npNetBinaryReader;
+        Convert: DotNet npNetConvert;
+        MemoryStream: DotNet npNetMemoryStream;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlDocResponse: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlElementAttachment: DotNet npNetXmlElement;
+        XmlElementAttachmentData: DotNet npNetXmlElement;
+        XmlElementAttachmentDataEntry: DotNet npNetXmlElement;
+        XmlElementComment: DotNet npNetXmlElement;
+        XmlElementCommentLine: DotNet npNetXmlElement;
+        XmlNamespaceManager: DotNet npNetXmlNamespaceManager;
         RecRef: RecordRef;
         RecordID: RecordID;
         InStr: InStream;
@@ -452,14 +452,14 @@ codeunit 6151506 "Nc Gambit Management"
             Message(Error001);
     end;
 
-    local procedure SendAPI(var XmlDoc: DotNet XmlDocument;SoapAction: Text;var XmlDocResponse: DotNet XmlDocument) Result: Boolean
+    local procedure SendAPI(var XmlDoc: DotNet npNetXmlDocument;SoapAction: Text;var XmlDocResponse: DotNet npNetXmlDocument) Result: Boolean
     var
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        MemoryStream: DotNet MemoryStream;
-        WebException: DotNet WebException;
-        XmlException: DotNet XmlException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        MemoryStream: DotNet npNetMemoryStream;
+        WebException: DotNet npNetWebException;
+        XmlException: DotNet npNetXmlException;
     begin
         HttpWebRequest := HttpWebRequest.Create('http://nst.np-retail.dk:7047/DynamicsNAV/ws/Navi%20Partner%20K%C3%B8benhavn%20ApS/Codeunit/Gambit');
         HttpWebRequest.UseDefaultCredentials(false);
@@ -486,19 +486,19 @@ codeunit 6151506 "Nc Gambit Management"
     begin
     end;
 
-    local procedure AddElement(var XmlElement: DotNet XmlElement;ElementName: Text[250];var CreatedXmlElement: DotNet XmlElement;NameSpace: Text)
+    local procedure AddElement(var XmlElement: DotNet npNetXmlElement;ElementName: Text[250];var CreatedXmlElement: DotNet npNetXmlElement;NameSpace: Text)
     var
-        NewChildXmlElement: DotNet XmlElement;
-        XmlNodeType: DotNet XmlNodeType;
+        NewChildXmlElement: DotNet npNetXmlElement;
+        XmlNodeType: DotNet npNetXmlNodeType;
     begin
         NewChildXmlElement := XmlElement.OwnerDocument.CreateNode(XmlNodeType.Element,LowerCase(ElementName),NameSpace);
         XmlElement.AppendChild(NewChildXmlElement);
         CreatedXmlElement := NewChildXmlElement;
     end;
 
-    local procedure AddAttribute(var XmlNode: DotNet XmlNode;Name: Text[260];NodeValue: Text[260]) ExitStatus: Integer
+    local procedure AddAttribute(var XmlNode: DotNet npNetXmlNode;Name: Text[260];NodeValue: Text[260]) ExitStatus: Integer
     var
-        NewAttributeXmlNode: DotNet XmlNode;
+        NewAttributeXmlNode: DotNet npNetXmlNode;
     begin
         Name := LowerCase(Name);
         NewAttributeXmlNode := XmlNode.OwnerDocument.CreateAttribute(Name);
@@ -528,10 +528,10 @@ codeunit 6151506 "Nc Gambit Management"
 
     local procedure GetBase64(TempBlob: Record TempBlob temporary) Value: Text
     var
-        BinaryReader: DotNet BinaryReader;
-        Convert: DotNet Convert;
-        MemoryStream: DotNet MemoryStream;
-        TextEncoding: DotNet Encoding;
+        BinaryReader: DotNet npNetBinaryReader;
+        Convert: DotNet npNetConvert;
+        MemoryStream: DotNet npNetMemoryStream;
+        TextEncoding: DotNet npNetEncoding;
         InStr: InStream;
     begin
         Value := '';

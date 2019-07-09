@@ -47,15 +47,15 @@ codeunit 6059976 "MPOS Report handler"
     var
         ReportBlob: Record TempBlob;
         AllObjWithCaption: Record AllObjWithCaption;
-        MemStream: DotNet MemoryStream;
+        MemStream: DotNet npNetMemoryStream;
         RecRef: RecordRef;
         OutStr: OutStream;
         InStr: InStream;
         Result: Text;
         XmlParameters: Text;
         Filename: Text;
-        Bytes: DotNet Array;
-        Convert: DotNet Convert;
+        Bytes: DotNet npNetArray;
+        Convert: DotNet npNetConvert;
         Base64String: Text;
         JSON: Text;
         JSBridge: Page "JS Bridge";
@@ -97,10 +97,10 @@ codeunit 6059976 "MPOS Report handler"
     local procedure GetXmlParameters(RecRef: RecordRef): Text
     var
         XMLDOMMgt: Codeunit "XML DOM Management";
-        DataItemXmlNode: DotNet XmlNode;
-        DataItemsXmlNode: DotNet XmlNode;
-        XmlDoc: DotNet XmlDocument;
-        ReportParametersXmlNode: DotNet XmlNode;
+        DataItemXmlNode: DotNet npNetXmlNode;
+        DataItemsXmlNode: DotNet npNetXmlNode;
+        XmlDoc: DotNet npNetXmlDocument;
+        ReportParametersXmlNode: DotNet npNetXmlNode;
     begin
         XmlDoc := XmlDoc.XmlDocument;
 

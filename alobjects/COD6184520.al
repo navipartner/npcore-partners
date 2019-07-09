@@ -11,7 +11,7 @@ codeunit 6184520 "EFT Adyen Cloud Sign Dialog"
     end;
 
     var
-        Model: DotNet Model;
+        Model: DotNet npNetModel;
         ActiveModelID: Guid;
         ERROR_SESSION: Label 'Critical Error: Session object could not be retrieved for EFT payment. ';
         TransactionEntryNo: Integer;

@@ -27,9 +27,9 @@ codeunit 6151394 "CS UI Refill Handling"
         CSCommunication: Codeunit "CS Communication";
         CSMgt: Codeunit "CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet XmlDocument;
-        ReturnedNode: DotNet XmlNode;
-        RootNode: DotNet XmlNode;
+        DOMxmlin: DotNet npNetXmlDocument;
+        ReturnedNode: DotNet npNetXmlNode;
+        RootNode: DotNet npNetXmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -59,9 +59,9 @@ codeunit 6151394 "CS UI Refill Handling"
         FuncValue: Text;
         CSTempData: Record "CS Temp Data";
         CSFieldDefaults: Record "CS Field Defaults";
-        CommaString: DotNet String;
-        Values: DotNet Array;
-        Separator: DotNet String;
+        CommaString: DotNet npNetString;
+        Values: DotNet npNetArray;
+        Separator: DotNet npNetString;
         Value: Text;
     begin
         if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
@@ -120,7 +120,7 @@ codeunit 6151394 "CS UI Refill Handling"
 
     local procedure SendForm(InputField: Integer)
     var
-        Records: DotNet XmlElement;
+        Records: DotNet npNetXmlElement;
     begin
         CSCommunication.EncodeUI(CSUIHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);

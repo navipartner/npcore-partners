@@ -608,7 +608,7 @@ codeunit 6151590 "NpDc Coupon Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
-    local procedure OnScanCoupon("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnScanCoupon("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         SaleLineOut: Codeunit "POS Sale Line";
@@ -858,8 +858,8 @@ codeunit 6151590 "NpDc Coupon Mgt."
 
     local procedure RegExReplaceAN(Input: Text) Output: Text
     var
-        Match: DotNet Match;
-        RegEx: DotNet Regex;
+        Match: DotNet npNetMatch;
+        RegEx: DotNet npNetRegex;
         Pattern: Text;
         ReplaceString: Text;
         RandomQty: Integer;
@@ -888,8 +888,8 @@ codeunit 6151590 "NpDc Coupon Mgt."
 
     local procedure RegExReplaceS(Input: Text;SerialNo: Text) Output: Text
     var
-        Match: DotNet Match;
-        RegEx: DotNet Regex;
+        Match: DotNet npNetMatch;
+        RegEx: DotNet npNetRegex;
         Pattern: Text;
     begin
         Pattern := '(?<SerialNo>\[S\])';

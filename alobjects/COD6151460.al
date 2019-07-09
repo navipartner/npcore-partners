@@ -13,12 +13,12 @@ codeunit 6151460 "M2 Setup Mgt."
     var
         Text000: Label 'Root Categoery is missing for Website %1';
 
-    local procedure CreateStores(var XmlElement: DotNet XmlElement;MagentoWebsite: Record "Magento Website")
+    local procedure CreateStores(var XmlElement: DotNet npNetXmlElement;MagentoWebsite: Record "Magento Website")
     var
         MagentoStore: Record "Magento Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlElement2: DotNet XmlElement;
-        XmlElement3: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlElement3: DotNet npNetXmlElement;
         i: Integer;
         j: Integer;
         RootItemGroupNo: Code[20];
@@ -174,11 +174,11 @@ codeunit 6151460 "M2 Setup Mgt."
         MagentoSetup: Record "Magento Setup";
         PaymentMapping: Record "Magento Payment Mapping";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
-        XmlNodeList2: DotNet XmlNodeList;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
+        XmlNodeList2: DotNet npNetXmlNodeList;
         i: Integer;
         j: Integer;
         PaymentCode: Text[50];
@@ -209,11 +209,11 @@ codeunit 6151460 "M2 Setup Mgt."
         MagentoSetup: Record "Magento Setup";
         ShipmentMapping: Record "Magento Shipment Mapping";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
-        XmlNodeList2: DotNet XmlNodeList;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
+        XmlNodeList2: DotNet npNetXmlNodeList;
         i: Integer;
         j: Integer;
         ShipmentCode: Text[50];
@@ -240,9 +240,9 @@ codeunit 6151460 "M2 Setup Mgt."
         MagentoSetup: Record "Magento Setup";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         NpXmlMgt: Codeunit "NpXml Mgt.";
-        FormsAuthentication: DotNet FormsAuthentication;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
+        FormsAuthentication: DotNet npNetFormsAuthentication;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
         Authentication: Text;
         Hash: Text;
         Username: Text;
@@ -288,9 +288,9 @@ codeunit 6151460 "M2 Setup Mgt."
         MagentoSetup: Record "Magento Setup";
         MagentoTaxClass: Record "Magento Tax Class";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         ClassName: Text[250];
         ClassType: Integer;
@@ -324,10 +324,10 @@ codeunit 6151460 "M2 Setup Mgt."
         MagentoSetup: Record "Magento Setup";
         MagentoWebsite: Record "Magento Website";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         MagentoSetup.Get;
@@ -508,13 +508,13 @@ codeunit 6151460 "M2 Setup Mgt."
     begin
     end;
 
-    procedure MagentoApiGet(MagentoApiUrl: Text;Method: Text;var XmlDoc: DotNet XmlDocument) Result: Boolean
+    procedure MagentoApiGet(MagentoApiUrl: Text;Method: Text;var XmlDoc: DotNet npNetXmlDocument) Result: Boolean
     var
         MagentoSetup: Record "Magento Setup";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        MemoryStream: DotNet MemoryStream;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        MemoryStream: DotNet npNetMemoryStream;
     begin
         if MagentoApiUrl = '' then
           exit(false);
@@ -549,13 +549,13 @@ codeunit 6151460 "M2 Setup Mgt."
         exit(true);
     end;
 
-    procedure MagentoApiPost(MagentoApiUrl: Text;Method: Text;var XmlDoc: DotNet XmlDocument) Result: Boolean
+    procedure MagentoApiPost(MagentoApiUrl: Text;Method: Text;var XmlDoc: DotNet npNetXmlDocument) Result: Boolean
     var
         MagentoSetup: Record "Magento Setup";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
         ResponseText: Text;
     begin

@@ -30,29 +30,29 @@ page 6014653 "Touch Screen - Balancing (Web)"
                     EventFrameworkReady();
                 end;
 
-                trigger OnScreenSize(screen: DotNet Screen)
+                trigger OnScreenSize(screen: DotNet npNetScreen)
                 begin
                 end;
 
-                trigger OnMessage(eventArgs: DotNet MessageEventArgs)
+                trigger OnMessage(eventArgs: DotNet npNetMessageEventArgs)
                 begin
                     EventOnMessage(eventArgs);
                 end;
 
-                trigger OnResponse(response: DotNet ResponseInfo)
+                trigger OnResponse(response: DotNet npNetResponseInfo)
                 begin
                 end;
 
-                trigger OnJavaScriptCallback(js: DotNet JavaScript)
+                trigger OnJavaScriptCallback(js: DotNet npNetJavaScript)
                 begin
                 end;
 
-                trigger OnDialogResponse(response: DotNet Response)
+                trigger OnDialogResponse(response: DotNet npNetResponse)
                 begin
                     EventOnDialogResponse();
                 end;
 
-                trigger OnDataUpdated(dataSource: DotNet DataSource)
+                trigger OnDataUpdated(dataSource: DotNet npNetDataSource)
                 begin
                     EventOnDataUpdated(dataSource);
                 end;
@@ -90,9 +90,9 @@ page 6014653 "Touch Screen - Balancing (Web)"
         UI: Codeunit "POS Web UI Management";
         Util: Codeunit "POS Web Utilities";
         [WithEvents]
-        Marshaller: DotNet Marshaller;
-        RequestFactory: DotNet RequestFactory;
-        Dlg: DotNet RegisterBalancing;
+        Marshaller: DotNet npNetMarshaller;
+        RequestFactory: DotNet npNetRequestFactory;
+        Dlg: DotNet npNetRegisterBalancing;
         LastLinePosition: Text;
 
     procedure Initialize(RegNo: Code[20];"Sales Person": Code[10])
@@ -116,10 +116,10 @@ page 6014653 "Touch Screen - Balancing (Web)"
 
     local procedure UpdateFigures(RefreshRows: Boolean)
     var
-        PeriodFigures: DotNet Dictionary_Of_T_U;
-        BalancingFigures: DotNet Dictionary_Of_T_U;
-        CountingLines: DotNet DataGrid;
-        DataSource: DotNet Dictionary_Of_T_U;
+        PeriodFigures: DotNet npNetDictionary_Of_T_U;
+        BalancingFigures: DotNet npNetDictionary_Of_T_U;
+        CountingLines: DotNet npNetDataGrid;
+        DataSource: DotNet npNetDictionary_Of_T_U;
         Subtotal: Text;
     begin
         //-NPR5.31
@@ -138,13 +138,13 @@ page 6014653 "Touch Screen - Balancing (Web)"
         //+NPR5.31
     end;
 
-    local procedure LineSelectionChange(Row: DotNet Dictionary_Of_T_U;Type: Option Sale,Payment)
+    local procedure LineSelectionChange(Row: DotNet npNetDictionary_Of_T_U;Type: Option Sale,Payment)
     begin
     end;
 
-    local procedure EventOnMessage(EventArgs: DotNet MessageEventArgs)
+    local procedure EventOnMessage(EventArgs: DotNet npNetMessageEventArgs)
     var
-        EventType: DotNet EventType;
+        EventType: DotNet npNetEventType;
         MessageType: Integer;
         EanCode: Text[30];
         DoSendState: Boolean;
@@ -162,7 +162,7 @@ page 6014653 "Touch Screen - Balancing (Web)"
         end;
     end;
 
-    local procedure EventOnMessageButtonPressed(Button: DotNet Button)
+    local procedure EventOnMessageButtonPressed(Button: DotNet npNetButton)
     begin
         if BalancingMgt.ButtonClickedHandler(Button.Value) then
           CurrPage.Close()
@@ -170,7 +170,7 @@ page 6014653 "Touch Screen - Balancing (Web)"
           UpdateFigures(true);
     end;
 
-    local procedure EventOnMessageSelectionChanged(Row: DotNet Dictionary_Of_T_U)
+    local procedure EventOnMessageSelectionChanged(Row: DotNet npNetDictionary_Of_T_U)
     var
         Line: Record "Payment Type POS";
         RecRef: RecordRef;
@@ -193,7 +193,7 @@ page 6014653 "Touch Screen - Balancing (Web)"
         CurrPage.Close();
     end;
 
-    local procedure EventOnDataUpdated(DataSource: DotNet DataSource)
+    local procedure EventOnDataUpdated(DataSource: DotNet npNetDataSource)
     var
         UltimoLCY: Decimal;
         BankLCY: Decimal;
@@ -250,7 +250,7 @@ page 6014653 "Touch Screen - Balancing (Web)"
 
     local procedure EventFrameworkReady()
     var
-        Captions: DotNet Dictionary_Of_T_U;
+        Captions: DotNet npNetDictionary_Of_T_U;
     begin
         Marshaller := Marshaller.Marshaller();
         Marshaller.Initialize();
@@ -264,9 +264,9 @@ page 6014653 "Touch Screen - Balancing (Web)"
         UpdateFigures(true);
     end;
 
-    local procedure EventMarshal(EventArgs: DotNet MarshalEventArgs)
+    local procedure EventMarshal(EventArgs: DotNet npNetMarshalEventArgs)
     var
-        KnownEvent: DotNet KnownEvent;
+        KnownEvent: DotNet npNetKnownEvent;
     begin
         case EventArgs.EventType of
           KnownEvent.ClearInfoBoxContent,
@@ -288,7 +288,7 @@ page 6014653 "Touch Screen - Balancing (Web)"
         end;
     end;
 
-    trigger Marshaller::Marshal(eventArgs: DotNet MarshalEventArgs)
+    trigger Marshaller::Marshal(eventArgs: DotNet npNetMarshalEventArgs)
     begin
         EventMarshal(eventArgs);
     end;

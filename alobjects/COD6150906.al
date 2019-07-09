@@ -8,7 +8,7 @@ codeunit 6150906 "HC Sales Document Management"
 
     trigger OnRun()
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
     begin
         if LoadXmlDoc(XmlDoc) then
           UpdateSales(XmlDoc);
@@ -17,10 +17,10 @@ codeunit 6150906 "HC Sales Document Management"
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
 
-    local procedure UpdateSales(XmlDoc: DotNet XmlDocument)
+    local procedure UpdateSales(XmlDoc: DotNet npNetXmlDocument)
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         if IsNull(XmlDoc) then
@@ -49,11 +49,11 @@ codeunit 6150906 "HC Sales Document Management"
         end;
     end;
 
-    local procedure UpdateSalesHeader(ItemXmlElement: DotNet XmlElement) Imported: Boolean
+    local procedure UpdateSalesHeader(ItemXmlElement: DotNet npNetXmlElement) Imported: Boolean
     var
         SalesHeader: Record "Sales Header";
-        ChildXmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        ChildXmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         if IsNull(ItemXmlElement) then
@@ -73,12 +73,12 @@ codeunit 6150906 "HC Sales Document Management"
         exit(true);
     end;
 
-    local procedure UpdateSalesLine(ItemXmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header"): Boolean
+    local procedure UpdateSalesLine(ItemXmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header"): Boolean
     var
         TempSalesLine: Record "Sales Line" temporary;
         SalesLine: Record "Sales Line";
-        ChildXmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        ChildXmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
         XPath: Text;
     begin
@@ -99,7 +99,7 @@ codeunit 6150906 "HC Sales Document Management"
         //+NPR5.48 [336517]
     end;
 
-    local procedure UpdateReservationEntry(ItemXmlElement: DotNet XmlElement;SalesLine: Record "Sales Line"): Boolean
+    local procedure UpdateReservationEntry(ItemXmlElement: DotNet npNetXmlElement;SalesLine: Record "Sales Line"): Boolean
     begin
         //-NPR5.48 [336517]
         if IsNull(ItemXmlElement) then
@@ -115,7 +115,7 @@ codeunit 6150906 "HC Sales Document Management"
     begin
     end;
 
-    local procedure InsertSalesHeader(XmlElement: DotNet XmlElement;var SalesHeader: Record "Sales Header")
+    local procedure InsertSalesHeader(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
     var
         TempSalesHeader: Record "Sales Header" temporary;
         Handeld: Boolean;
@@ -298,7 +298,7 @@ codeunit 6150906 "HC Sales Document Management"
         //+NPR5.48 [336517]
     end;
 
-    local procedure InsertSalesLine(XmlElement: DotNet XmlElement;SalesHeader: Record "Sales Header";var SalesLine: Record "Sales Line";var TempSalesLine: Record "Sales Line")
+    local procedure InsertSalesLine(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var SalesLine: Record "Sales Line";var TempSalesLine: Record "Sales Line")
     var
         Handeld: Boolean;
     begin
@@ -499,7 +499,7 @@ codeunit 6150906 "HC Sales Document Management"
         //+NPR5.48 [336517]
     end;
 
-    local procedure InsertReservationEntry(XmlElement: DotNet XmlElement;SalesLine: Record "Sales Line")
+    local procedure InsertReservationEntry(XmlElement: DotNet npNetXmlElement;SalesLine: Record "Sales Line")
     var
         TempReservationEntry: Record "Reservation Entry" temporary;
         CurrentEntryStatus: Option Reservation,Tracking,Surplus,Prospect;

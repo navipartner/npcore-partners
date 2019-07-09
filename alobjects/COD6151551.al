@@ -80,8 +80,8 @@ codeunit 6151551 "NpXml Mgt."
 
     procedure CreateXml()
     var
-        XmlDocNode: DotNet XmlNode;
-        XmlDoc: DotNet XmlDocument;
+        XmlDocNode: DotNet npNetXmlNode;
+        XmlDoc: DotNet npNetXmlDocument;
         FieldRef: FieldRef;
         Counter: Integer;
         XmlEntityCount: Integer;
@@ -127,7 +127,7 @@ codeunit 6151551 "NpXml Mgt."
         //+NC1.22
     end;
 
-    procedure ParseDataToXmlDocNode(var RecRef: RecordRef;RecordSetExists: Boolean;var XmlDocNode: DotNet XmlNode) Success: Boolean
+    procedure ParseDataToXmlDocNode(var RecRef: RecordRef;RecordSetExists: Boolean;var XmlDocNode: DotNet npNetXmlNode) Success: Boolean
     var
         NpXmlElement: Record "NpXml Element";
         RecRef2: RecordRef;
@@ -172,13 +172,13 @@ codeunit 6151551 "NpXml Mgt."
     begin
     end;
 
-    local procedure AddXmlElement(var XmlNode: DotNet XmlNode;NpXmlElement: Record "NpXml Element";var RecRef: RecordRef;CurrLevel: Integer) LevelAppended: Boolean
+    local procedure AddXmlElement(var XmlNode: DotNet npNetXmlNode;NpXmlElement: Record "NpXml Element";var RecRef: RecordRef;CurrLevel: Integer) LevelAppended: Boolean
     var
-        NewXmlNode: DotNet XmlElement;
+        NewXmlNode: DotNet npNetXmlElement;
         NpXmlElementChild: Record "NpXml Element";
         RecRefFilter: RecordRef;
         RecRefChild: RecordRef;
-        XmlComment: DotNet XmlComment;
+        XmlComment: DotNet npNetXmlComment;
         Finished: Boolean;
         ElementName: Text;
         Namespace: Text;
@@ -229,10 +229,10 @@ codeunit 6151551 "NpXml Mgt."
         exit(true);
     end;
 
-    local procedure AddXmlNamespaces(NpXmlTemplate: Record "NpXml Template";var XmlDoc: DotNet XmlDocument)
+    local procedure AddXmlNamespaces(NpXmlTemplate: Record "NpXml Template";var XmlDoc: DotNet npNetXmlDocument)
     var
         NpXmlNamespaces: Record "NpXml Namespace";
-        XmlElement: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
     begin
         //-NC1.22
         if not NpXmlTemplate."Namespaces Enabled" then
@@ -249,12 +249,12 @@ codeunit 6151551 "NpXml Mgt."
         //+NC1.22
     end;
 
-    local procedure AddXmlValue(var XmlNode: DotNet XmlElement;var NPXmlElement: Record "NpXml Element";RecRef: RecordRef)
+    local procedure AddXmlValue(var XmlNode: DotNet npNetXmlElement;var NPXmlElement: Record "NpXml Element";RecRef: RecordRef)
     var
         NpXmlAttribute: Record "NpXml Attribute";
         NPXmlElement2: Record "NpXml Element";
         NpXmlNamespace: Record "NpXml Namespace";
-        XmlCDATA: DotNet XmlCDataSection;
+        XmlCDATA: DotNet npNetXmlCDataSection;
         AttributeValue: Text;
         ElementValue: Text;
     begin
@@ -407,7 +407,7 @@ codeunit 6151551 "NpXml Mgt."
     begin
     end;
 
-    local procedure ExportToFile(NPXmlTemplate: Record "NpXml Template";var XmlDoc: DotNet XmlDocument;Filename: Text[250])
+    local procedure ExportToFile(NPXmlTemplate: Record "NpXml Template";var XmlDoc: DotNet npNetXmlDocument;Filename: Text[250])
     var
         "Field": Record "Field";
         TempBlob: Record TempBlob temporary;
@@ -442,7 +442,7 @@ codeunit 6151551 "NpXml Mgt."
         FileMgt.MoveFile(TempFile,Filepath + Filename);
     end;
 
-    local procedure FinalizeDoc(var XmlDoc: DotNet XmlDocument;NPXmlTemplate: Record "NpXml Template";Filename: Text[1024])
+    local procedure FinalizeDoc(var XmlDoc: DotNet npNetXmlDocument;NPXmlTemplate: Record "NpXml Template";Filename: Text[1024])
     var
         Transfered: Boolean;
     begin
@@ -453,27 +453,27 @@ codeunit 6151551 "NpXml Mgt."
         AddXmlToOutputTempBlob(XmlDoc,'Xml Template: ' + NPXmlTemplate.Code + ' || No Transfer');
     end;
 
-    local procedure SendApi(NpXmlTemplate: Record "NpXml Template";var XmlDoc: DotNet XmlDocument)
+    local procedure SendApi(NpXmlTemplate: Record "NpXml Template";var XmlDoc: DotNet npNetXmlDocument)
     var
         "Field": Record "Field";
         NpXmlApiHeader: Record "NpXml Api Header";
         NpXmlNamespaces: Record "NpXml Namespace";
-        AuthenticationLevel: DotNet AuthenticationLevel;
-        BinaryReader: DotNet BinaryReader;
-        Credential: DotNet NetworkCredential;
-        Encoding: DotNet Encoding;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        JsonConvert: DotNet JsonConvert;
-        MemoryStream: DotNet MemoryStream;
-        Stream: DotNet Stream;
-        StreamReader: DotNet StreamReader;
-        XmlDoc2: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlException: DotNet XmlException;
-        XmlNodeList: DotNet XmlNodeList;
-        XmlElement2: DotNet XmlElement;
-        WebException: DotNet WebException;
+        AuthenticationLevel: DotNet npNetAuthenticationLevel;
+        BinaryReader: DotNet npNetBinaryReader;
+        Credential: DotNet npNetNetworkCredential;
+        Encoding: DotNet npNetEncoding;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        JsonConvert: DotNet npNetJsonConvert;
+        MemoryStream: DotNet npNetMemoryStream;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
+        XmlDoc2: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlException: DotNet npNetXmlException;
+        XmlNodeList: DotNet npNetXmlNodeList;
+        XmlElement2: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         i: Integer;
         APIUsername: Text;
         ElementName: Text;
@@ -688,7 +688,7 @@ codeunit 6151551 "NpXml Mgt."
         end;
     end;
 
-    local procedure AddApiHeader(NpXmlApiHeader: Record "NpXml Api Header";var HttpWebRequest: DotNet HttpWebRequest)
+    local procedure AddApiHeader(NpXmlApiHeader: Record "NpXml Api Header";var HttpWebRequest: DotNet npNetHttpWebRequest)
     var
         BigIntBuffer: BigInteger;
         IntBuffer: Integer;
@@ -764,12 +764,12 @@ codeunit 6151551 "NpXml Mgt."
         //+NC2.08 [286713]
     end;
 
-    local procedure SendFtp(NPXmlTemplate: Record "NpXml Template";var XmlDoc: DotNet XmlDocument;Filename: Text)
+    local procedure SendFtp(NPXmlTemplate: Record "NpXml Template";var XmlDoc: DotNet npNetXmlDocument;Filename: Text)
     var
         "Field": Record "Field";
-        Credential: DotNet NetworkCredential;
-        FtpWebRequest: DotNet FtpWebRequest;
-        MemoryStream: DotNet MemoryStream;
+        Credential: DotNet npNetNetworkCredential;
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        MemoryStream: DotNet npNetMemoryStream;
     begin
         if not NPXmlTemplate."FTP Transfer" then
           exit;
@@ -793,7 +793,7 @@ codeunit 6151551 "NpXml Mgt."
         Clear(MemoryStream);
     end;
 
-    local procedure TransferXml(NpXmlTemplate: Record "NpXml Template";var XmlDoc: DotNet XmlDocument;Filename: Text[250]) Transfered: Boolean
+    local procedure TransferXml(NpXmlTemplate: Record "NpXml Template";var XmlDoc: DotNet npNetXmlDocument;Filename: Text[250]) Transfered: Boolean
     var
         Handled: Boolean;
     begin
@@ -820,7 +820,7 @@ codeunit 6151551 "NpXml Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeTransferXml(var NpXmlTemplate: Record "NpXml Template";var RootRecRef: RecordRef;var XmlDoc: DotNet XmlDocument;var Filename: Text[250];var Handled: Boolean)
+    local procedure OnBeforeTransferXml(var NpXmlTemplate: Record "NpXml Template";var RootRecRef: RecordRef;var XmlDoc: DotNet npNetXmlDocument;var Filename: Text[250];var Handled: Boolean)
     begin
         //-NC2.03 [267094]
         //+NC2.03 [267094]
@@ -873,9 +873,9 @@ codeunit 6151551 "NpXml Mgt."
         //+NC2.05 [265609]
     end;
 
-    local procedure AddXmlToOutputTempBlob(var XmlDoc: DotNet XmlDocument;Comment: Text)
+    local procedure AddXmlToOutputTempBlob(var XmlDoc: DotNet npNetXmlDocument;Comment: Text)
     var
-        MemoryStream: DotNet MemoryStream;
+        MemoryStream: DotNet npNetMemoryStream;
         InStr: InStream;
     begin
         InitializeOutput();
@@ -1009,8 +1009,8 @@ codeunit 6151551 "NpXml Mgt."
 
     procedure GetBasicAuthInfo(Username: Text;Password: Text): Text
     var
-        Convert: DotNet Convert;
-        Encoding: DotNet Encoding;
+        Convert: DotNet npNetConvert;
+        Encoding: DotNet npNetEncoding;
     begin
         //-NC1.11
         exit(Convert.ToBase64String(Encoding.UTF8.GetBytes(Username + ':' + Password)));
@@ -1116,11 +1116,11 @@ codeunit 6151551 "NpXml Mgt."
         //+NC1.22
     end;
 
-    local procedure MarkContainersAsArray(var XmlElement: DotNet XmlElement)
+    local procedure MarkContainersAsArray(var XmlElement: DotNet npNetXmlElement)
     var
-        XmlElementNextChild: DotNet XmlElement;
-        XmlElementChild: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElementNextChild: DotNet npNetXmlElement;
+        XmlElementChild: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         //-NC2.06 [265779]
@@ -1148,17 +1148,17 @@ codeunit 6151551 "NpXml Mgt."
         //+NC2.06 [265779]
     end;
 
-    procedure Xml2Json(var XmlDoc: DotNet XmlDocument;NpXmlTemplate: Record "NpXml Template") JsonString: Text
+    procedure Xml2Json(var XmlDoc: DotNet npNetXmlDocument;NpXmlTemplate: Record "NpXml Template") JsonString: Text
     var
-        XmlDoc2: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        JsonConvert: DotNet JsonConvert;
-        JsonFormatting: DotNet Formatting;
-        XmlNodeList: DotNet XmlNodeList;
-        JToken: DotNet JToken;
-        JContainer: DotNet JContainer;
-        JArray: DotNet JArray;
-        RegEx: DotNet Regex;
+        XmlDoc2: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        JsonConvert: DotNet npNetJsonConvert;
+        JsonFormatting: DotNet npNetFormatting;
+        XmlNodeList: DotNet npNetXmlNodeList;
+        JToken: DotNet npNetJToken;
+        JContainer: DotNet npNetJContainer;
+        JArray: DotNet npNetJArray;
+        RegEx: DotNet npNetRegex;
         i: Integer;
     begin
         //-NC2.05 [265609]
@@ -1205,8 +1205,8 @@ codeunit 6151551 "NpXml Mgt."
         TempBlob: Record TempBlob temporary;
         TempBlob2: Record TempBlob temporary;
         FileMgt: Codeunit "File Management";
-        XmlDocNode: DotNet XmlNode;
-        XmlDoc: DotNet XmlDocument;
+        XmlDocNode: DotNet npNetXmlNode;
+        XmlDoc: DotNet npNetXmlDocument;
         InStream: InStream;
         OutStream: OutStream;
         Filename: Text;

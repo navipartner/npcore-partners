@@ -28,9 +28,9 @@ codeunit 6151376 "CS UI Logoff"
         XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "CS Communication";
         CSManagement: Codeunit "CS Management";
-        ReturnedNode: DotNet XmlNode;
-        RootNode: DotNet XmlNode;
-        DOMxmlin: DotNet XmlDocument;
+        ReturnedNode: DotNet npNetXmlNode;
+        RootNode: DotNet npNetXmlNode;
+        DOMxmlin: DotNet npNetXmlDocument;
         TextValue: Text[250];
         CSUserId: Text[250];
         WhseEmpId: Text[250];

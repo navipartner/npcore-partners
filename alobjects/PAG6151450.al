@@ -67,7 +67,7 @@ page 6151450 "Magento Text Editor Dialog"
     end;
 
     var
-        Options: DotNet Dictionary_Of_T_U;
+        Options: DotNet npNetDictionary_Of_T_U;
         EditorContent: Text;
         TextEditorInitialized: Boolean;
         CloseAllowed: Boolean;
@@ -75,10 +75,10 @@ page 6151450 "Magento Text Editor Dialog"
 
     local procedure InitOptions()
     var
-        Type: DotNet Type;
-        Types: DotNet Array;
-        "Object": DotNet Object;
-        Activator: DotNet Activator;
+        Type: DotNet npNetType;
+        Types: DotNet npNetArray;
+        "Object": DotNet npNetObject;
+        Activator: DotNet npNetActivator;
     begin
         Types := Types.CreateInstance(GetDotNetType(Type),2);
         Types.SetValue(GetDotNetType(''),0);
@@ -95,7 +95,7 @@ page 6151450 "Magento Text Editor Dialog"
     local procedure SendDataToTextEditor()
     var
         Stream: InStream;
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         Data: Text;
     begin
         if not TextEditorInitialized then

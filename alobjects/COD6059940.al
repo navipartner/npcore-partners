@@ -43,9 +43,9 @@ codeunit 6059940 "SMS Management"
 
     procedure SendSMS(PhoneNo: Text;Sender: Text;SMSMessage: Text)
     var
-        HttpResponseMessage: DotNet HttpResponseMessage;
-        StringContent: DotNet StringContent;
-        Encoding: DotNet Encoding;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
+        StringContent: DotNet npNetStringContent;
+        Encoding: DotNet npNetEncoding;
         IComm: Record "I-Comm";
         ServiceCalc: Codeunit "NP Service Calculation";
         SMSHandled: Boolean;
@@ -354,8 +354,8 @@ codeunit 6059940 "SMS Management"
 
     local procedure MakeSMSBody(PhoneNo: Text;Sender: Text;SMSMessage: Text): Text
     var
-        XmlDoc: DotNet XmlDocument;
-        XmlNode: DotNet XmlNode;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlNode: DotNet npNetXmlNode;
         XMLDOMManagement: Codeunit "XML DOM Management";
     begin
         XmlDoc := XmlDoc.XmlDocument;
@@ -367,10 +367,10 @@ codeunit 6059940 "SMS Management"
     end;
 
     [TryFunction]
-    local procedure CallRestWebService(BaseURL: Text;Method: Text;RestMethod: Text;var HttpContent: DotNet HttpContent;var HttpResponseMessage: DotNet HttpResponseMessage)
+    local procedure CallRestWebService(BaseURL: Text;Method: Text;RestMethod: Text;var HttpContent: DotNet npNetHttpContent;var HttpResponseMessage: DotNet npNetHttpResponseMessage)
     var
-        HttpClient: DotNet HttpClient;
-        Uri: DotNet Uri;
+        HttpClient: DotNet npNetHttpClient;
+        Uri: DotNet npNetUri;
     begin
         HttpClient := HttpClient.HttpClient;
         HttpClient.BaseAddress := Uri.Uri(BaseURL);
@@ -542,8 +542,8 @@ codeunit 6059940 "SMS Management"
 
     local procedure MergeDataFields(TextLine: Text;var RecRef: RecordRef;ReportID: Integer): Text
     var
-        RegEx: DotNet Regex;
-        Match: DotNet Match;
+        RegEx: DotNet npNetRegex;
+        Match: DotNet npNetMatch;
         FieldPos: Integer;
         ResultText: Text;
     begin
@@ -837,8 +837,8 @@ codeunit 6059940 "SMS Management"
 
     local procedure GetAFLink(RecRef: RecordRef;ReportID: Integer): Text
     var
-        RegEx: DotNet Regex;
-        Match: DotNet Match;
+        RegEx: DotNet npNetRegex;
+        Match: DotNet npNetMatch;
         AFAPIMsgService: Codeunit "AF API - Msg Service";
     begin
         //-NPR5.40 [304312]

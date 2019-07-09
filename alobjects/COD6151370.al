@@ -10,10 +10,10 @@ codeunit 6151370 "CS Management"
     end;
 
     var
-        InboundDocument: DotNet XmlDocument;
-        OutboundDocument: DotNet XmlDocument;
+        InboundDocument: DotNet npNetXmlDocument;
+        OutboundDocument: DotNet npNetXmlDocument;
 
-    procedure SendXMLReply(xmlout: DotNet XmlDocument)
+    procedure SendXMLReply(xmlout: DotNet npNetXmlDocument)
     begin
         OutboundDocument := xmlout;
     end;
@@ -21,9 +21,9 @@ codeunit 6151370 "CS Management"
     procedure SendError(ErrorString: Text[250])
     var
         XMLDOMMgt: Codeunit "XML DOM Management";
-        RootNode: DotNet XmlNode;
-        Child: DotNet XmlNode;
-        ReturnedNode: DotNet XmlNode;
+        RootNode: DotNet npNetXmlNode;
+        Child: DotNet npNetXmlNode;
+        ReturnedNode: DotNet npNetXmlNode;
     begin
         OutboundDocument := InboundDocument;
 
@@ -43,7 +43,7 @@ codeunit 6151370 "CS Management"
         Clear(Child);
     end;
 
-    procedure ProcessDocument(Document: DotNet XmlDocument)
+    procedure ProcessDocument(Document: DotNet npNetXmlDocument)
     var
         CSUIManagement: Codeunit "CS UI Management";
     begin
@@ -51,7 +51,7 @@ codeunit 6151370 "CS Management"
         CSUIManagement.ReceiveXML(InboundDocument);
     end;
 
-    procedure GetOutboundDocument(var Document: DotNet XmlDocument)
+    procedure GetOutboundDocument(var Document: DotNet npNetXmlDocument)
     begin
         Document := OutboundDocument;
     end;

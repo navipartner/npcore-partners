@@ -1047,9 +1047,9 @@ codeunit 6014417 "Call Terminal Integration"
     local procedure RunProcess(Filename: Text;Arguments: Text;Modal: Boolean)
     var
         [RunOnClient]
-        Process: DotNet Process;
+        Process: DotNet npNetProcess;
         [RunOnClient]
-        ProcessStartInfo: DotNet ProcessStartInfo;
+        ProcessStartInfo: DotNet npNetProcessStartInfo;
     begin
         //-NPR5.38 [301053]
         ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename,Arguments);

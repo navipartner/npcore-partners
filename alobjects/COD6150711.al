@@ -19,11 +19,11 @@ codeunit 6150711 "POS Data Driver - Sale"
         Caption_ContactName: Label 'Contact Name';
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSource', '', false, false)]
-    local procedure GetDataSource(Name: Text;var DataSource: DotNet DataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    local procedure GetDataSource(Name: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
     var
         Sale: Record "Sale POS";
         DataMgt: Codeunit "POS Data Management";
-        DataType: DotNet DataType;
+        DataType: DotNet npNetDataType;
     begin
         //-NPR5.36 [287688]
         //IF Name <> SourceName THEN
@@ -76,7 +76,7 @@ codeunit 6150711 "POS Data Driver - Sale"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnRefreshDataSet', '', false, false)]
-    local procedure RefreshDataSet(POSSession: Codeunit "POS Session";DataSource: DotNet DataSource0;var CurrDataSet: DotNet DataSet;FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure RefreshDataSet(POSSession: Codeunit "POS Session";DataSource: DotNet npNetDataSource0;var CurrDataSet: DotNet npNetDataSet;FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         Sale: Codeunit "POS Sale";
     begin
@@ -112,7 +112,7 @@ codeunit 6150711 "POS Data Driver - Sale"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnReadDataSourceVariables', '', false, false)]
-    local procedure ReadDataSourceVariables(POSSession: Codeunit "POS Session";RecRef: RecordRef;DataSource: Text;DataRow: DotNet DataRow0;var Handled: Boolean)
+    local procedure ReadDataSourceVariables(POSSession: Codeunit "POS Session";RecRef: RecordRef;DataSource: Text;DataRow: DotNet npNetDataRow0;var Handled: Boolean)
     var
         Sale: Codeunit "POS Sale";
         LastSaleTotal: Decimal;

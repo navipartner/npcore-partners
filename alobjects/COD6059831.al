@@ -72,7 +72,7 @@ codeunit 6059831 "RFID Mgt."
 
     local procedure IntToHex(BigInt: BigInteger): Text
     var
-        IntPtr: DotNet IntPtr;
+        IntPtr: DotNet npNetIntPtr;
     begin
         IntPtr := IntPtr.IntPtr(BigInt);
         exit(IntPtr.ToString('X'));

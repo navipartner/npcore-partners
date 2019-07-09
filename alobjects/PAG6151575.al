@@ -85,8 +85,8 @@ page 6151575 "Event Notes"
         Job: Record Job;
         JobCount: Integer;
         NoteInStream: InStream;
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
         NoteText: BigText;
         LinkID: Integer;
     begin

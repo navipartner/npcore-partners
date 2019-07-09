@@ -9,7 +9,7 @@ codeunit 6150713 "POS Data Driver - Payment Line"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSource', '', false, false)]
-    local procedure GetDataSource(Name: Text;var DataSource: DotNet DataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    local procedure GetDataSource(Name: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
     var
         SaleLine: Record "Sale Line POS";
         DataMgt: Codeunit "POS Data Management";
@@ -37,7 +37,7 @@ codeunit 6150713 "POS Data Driver - Payment Line"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnRefreshDataSet', '', false, false)]
-    local procedure RefreshDataSet(POSSession: Codeunit "POS Session";DataSource: DotNet DataSource0;var CurrDataSet: DotNet DataSet;FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure RefreshDataSet(POSSession: Codeunit "POS Session";DataSource: DotNet npNetDataSource0;var CurrDataSet: DotNet npNetDataSet;FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         PaymentLine: Codeunit "POS Payment Line";
     begin

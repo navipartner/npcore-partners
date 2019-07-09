@@ -65,7 +65,7 @@ codeunit 6151006 "POS Quote Mgt."
         POSQuoteEntry.FilterGroup(0);
     end;
 
-    procedure POSSale2Xml(SalePOS: Record "Sale POS";var XmlDoc: DotNet XmlDocument)
+    procedure POSSale2Xml(SalePOS: Record "Sale POS";var XmlDoc: DotNet npNetXmlDocument)
     var
         NpDcSaleLinePOSCoupon: Record "NpDc Sale Line POS Coupon";
         NpDcSaleLinePOSNewCoupon: Record "NpDc Sale Line POS New Coupon";
@@ -83,11 +83,11 @@ codeunit 6151006 "POS Quote Mgt."
         SalePOSFieldBuffer: Record "Field" temporary;
         SaleLinePOSFieldBuffer: Record "Field" temporary;
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlRoot: DotNet XmlElement;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlElement3: DotNet XmlElement;
-        XmlElement4: DotNet XmlElement;
+        XmlRoot: DotNet npNetXmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlElement3: DotNet npNetXmlElement;
+        XmlElement4: DotNet npNetXmlElement;
         RecRef: RecordRef;
     begin
         //-NPR5.48 [338208]
@@ -230,9 +230,9 @@ codeunit 6151006 "POS Quote Mgt."
         //+NPR5.48 [338208]
     end;
 
-    local procedure RecRef2Xml(RecRef: RecordRef;XmlElement: DotNet XmlElement;var TempField: Record "Field" temporary)
+    local procedure RecRef2Xml(RecRef: RecordRef;XmlElement: DotNet npNetXmlElement;var TempField: Record "Field" temporary)
     var
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
     begin
         //-NPR5.48 [338208]
@@ -288,11 +288,11 @@ codeunit 6151006 "POS Quote Mgt."
         //+NPR5.48 [338208]
     end;
 
-    local procedure Field2Xml(RecRef: RecordRef;"Field": Record "Field";var XmlElement: DotNet XmlElement)
+    local procedure Field2Xml(RecRef: RecordRef;"Field": Record "Field";var XmlElement: DotNet npNetXmlElement)
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlCDATA: DotNet XmlCDataSection;
-        XmlElement2: DotNet XmlElement;
+        XmlCDATA: DotNet npNetXmlCDataSection;
+        XmlElement2: DotNet npNetXmlElement;
         FieldValue: Text;
     begin
         //-NPR5.48 [338208]
@@ -336,7 +336,7 @@ codeunit 6151006 "POS Quote Mgt."
         //+NPR5.48 [338208]
     end;
 
-    procedure LoadPOSSaleData(POSQuoteEntry: Record "POS Quote Entry";var XmlDoc: DotNet XmlDocument): Boolean
+    procedure LoadPOSSaleData(POSQuoteEntry: Record "POS Quote Entry";var XmlDoc: DotNet npNetXmlDocument): Boolean
     var
         InStr: InStream;
     begin
@@ -351,7 +351,7 @@ codeunit 6151006 "POS Quote Mgt."
         //+NPR5.48 [338208]
     end;
 
-    procedure Xml2POSSale(var XmlDoc: DotNet XmlDocument;var SalePOS: Record "Sale POS")
+    procedure Xml2POSSale(var XmlDoc: DotNet npNetXmlDocument;var SalePOS: Record "Sale POS")
     var
         NpDcSaleLinePOSCoupon: Record "NpDc Sale Line POS Coupon";
         NpDcSaleLinePOSNewCoupon: Record "NpDc Sale Line POS New Coupon";
@@ -368,9 +368,9 @@ codeunit 6151006 "POS Quote Mgt."
         POSInfoTransactionFieldBuffer: Record "Field" temporary;
         SalePOSFieldBuffer: Record "Field" temporary;
         SaleLinePOSFieldBuffer: Record "Field" temporary;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        XmlRoot: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        XmlRoot: DotNet npNetXmlElement;
         RecRef: RecordRef;
         PrevRec: Text;
     begin
@@ -502,10 +502,10 @@ codeunit 6151006 "POS Quote Mgt."
         //+NPR5.48 [338208]
     end;
 
-    local procedure Xml2RecRef(XmlElement: DotNet XmlElement;var TempField: Record "Field" temporary;var RecRef: RecordRef)
+    local procedure Xml2RecRef(XmlElement: DotNet npNetXmlElement;var TempField: Record "Field" temporary;var RecRef: RecordRef)
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlElement2: DotNet XmlElement;
+        XmlElement2: DotNet npNetXmlElement;
     begin
         //-NPR5.48 [338208]
         if not TempField.FindSet then
@@ -520,7 +520,7 @@ codeunit 6151006 "POS Quote Mgt."
         //+NPR5.48 [338208]
     end;
 
-    local procedure Xml2Field(XmlElement: DotNet XmlElement;"Field": Record "Field";var RecRef: RecordRef)
+    local procedure Xml2Field(XmlElement: DotNet npNetXmlElement;"Field": Record "Field";var RecRef: RecordRef)
     var
         FieldRef: FieldRef;
         TextValue: Text;
@@ -613,7 +613,7 @@ codeunit 6151006 "POS Quote Mgt."
         TempBlob: Record TempBlob temporary;
         FileMgt: Codeunit "File Management";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         POSSalesData: Text;
         InStr: InStream;
         Path: Text;
@@ -649,25 +649,25 @@ codeunit 6151006 "POS Quote Mgt."
         //+NPR5.48 [338208]
     end;
 
-    local procedure OnPOSSale2Xml(SalePOS: Record "Sale POS";XmlRoot: DotNet XmlElement)
+    local procedure OnPOSSale2Xml(SalePOS: Record "Sale POS";XmlRoot: DotNet npNetXmlElement)
     begin
         //-NPR5.48 [338208]
         //+NPR5.48 [338208]
     end;
 
-    local procedure OnPOSSaleLine2Xml(SaleLinePOS: Record "Sale Line POS";XmlElement: DotNet XmlElement)
+    local procedure OnPOSSaleLine2Xml(SaleLinePOS: Record "Sale Line POS";XmlElement: DotNet npNetXmlElement)
     begin
         //-NPR5.48 [338208]
         //+NPR5.48 [338208]
     end;
 
-    local procedure OnXml2POSSale(XmlRoot: DotNet XmlElement;SalePOS: Record "Sale POS")
+    local procedure OnXml2POSSale(XmlRoot: DotNet npNetXmlElement;SalePOS: Record "Sale POS")
     begin
         //-NPR5.48 [338208]
         //+NPR5.48 [338208]
     end;
 
-    local procedure OnXml2POSSaleLine(XmlElement: DotNet XmlElement;SaleLinePOS: Record "Sale Line POS")
+    local procedure OnXml2POSSaleLine(XmlElement: DotNet npNetXmlElement;SaleLinePOS: Record "Sale Line POS")
     begin
         //-NPR5.48 [338208]
         //+NPR5.48 [338208]

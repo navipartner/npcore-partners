@@ -78,7 +78,7 @@ page 6014657 "Proxy Dialog"
     var
         ProxyManager: Codeunit "POS Device Proxy Manager";
         [WithEvents]
-        ProtocolManager: DotNet ProtocolManager;
+        ProtocolManager: DotNet npNetProtocolManager;
         ErrorAtClose: Text;
         CodeunitId: Integer;
         Text001: Label 'A critical error has occurred communicating with local device hardware manager. The error details are:\\Error message: %1\\Please verify that the device proxy service is running and then restart the activity. This page will now close.';
@@ -102,7 +102,7 @@ page 6014657 "Proxy Dialog"
 
     local procedure QueryClosePage()
     var
-        QueryClosePage: DotNet QueryClosePage;
+        QueryClosePage: DotNet npNetQueryClosePage;
     begin
         ProxyManager.QueryClosePage(ProtocolManager);
     end;
@@ -117,7 +117,7 @@ page 6014657 "Proxy Dialog"
 
     local procedure ProxyInvokeMethodResponse(Envelope: Text)
     var
-        ResponseEnvelope: DotNet ResponseEnvelope;
+        ResponseEnvelope: DotNet npNetResponseEnvelope;
     begin
         ResponseEnvelope := ResponseEnvelope.FromString(Envelope,GetDotNetType(ResponseEnvelope));
         ProxyManager.ProcessResponse(ProtocolManager,ResponseEnvelope);
@@ -148,15 +148,15 @@ page 6014657 "Proxy Dialog"
         CurrPage.Close();
     end;
 
-    local procedure ProtocolOnSendMessage(Request: DotNet RequestEnvelope)
+    local procedure ProtocolOnSendMessage(Request: DotNet npNetRequestEnvelope)
     begin
         CurrPage.Proxy.InvokeDeviceMethod(Request.ToString());
     end;
 
-    local procedure ProtocolOnSignal(Signal: DotNet Signal)
+    local procedure ProtocolOnSignal(Signal: DotNet npNetSignal)
     var
         TempBlob: Record TempBlob;
-        Serializer: DotNet XmlSerializer;
+        Serializer: DotNet npNetXmlSerializer;
         OutStream: OutStream;
     begin
         Clear(TempBlob.Blob);
@@ -173,7 +173,7 @@ page 6014657 "Proxy Dialog"
 
     local procedure ProtocolOnStateChange(PreviousState: Integer;NewState: Integer)
     var
-        ProtocolState: DotNet ProtocolState;
+        ProtocolState: DotNet npNetProtocolState;
     begin
         case true of
           ProtocolManager.State.Equals(ProtocolState.AbortedByUserRequest):
@@ -192,12 +192,12 @@ page 6014657 "Proxy Dialog"
         ProxyManager.ProtocolStateChange(ProtocolManager,PreviousState,NewState);
     end;
 
-    local procedure ProtocolModelUpdate(Model: DotNet Model)
+    local procedure ProtocolModelUpdate(Model: DotNet npNetModel)
     var
         Html: Text;
         Css: Text;
         Script: Text;
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         Html := Model.ToString();
         Css := Model.GetStyles();
@@ -215,9 +215,9 @@ page 6014657 "Proxy Dialog"
 
     local procedure ProcessErrorObject()
     var
-        Exc: DotNet Exception;
-        WebExc: DotNet WebException;
-        Reader: DotNet StreamReader;
+        Exc: DotNet npNetException;
+        WebExc: DotNet npNetWebException;
+        Reader: DotNet npNetStreamReader;
     begin
         Exc := GetLastErrorObject;
         if (not IsNull(Exc.InnerException)) then begin
@@ -243,12 +243,12 @@ page 6014657 "Proxy Dialog"
         //+NPR5.00.02
     end;
 
-    trigger ProtocolManager::OnSendMessage(request: DotNet RequestEnvelope)
+    trigger ProtocolManager::OnSendMessage(request: DotNet npNetRequestEnvelope)
     begin
         ProtocolOnSendMessage(request);
     end;
 
-    trigger ProtocolManager::OnSignal(signal: DotNet Signal)
+    trigger ProtocolManager::OnSignal(signal: DotNet npNetSignal)
     begin
         ProtocolOnSignal(signal);
     end;
@@ -263,7 +263,7 @@ page 6014657 "Proxy Dialog"
         ProtocolOnStateChange(previousState,newState);
     end;
 
-    trigger ProtocolManager::OnModelUpdate(model: DotNet Model)
+    trigger ProtocolManager::OnModelUpdate(model: DotNet npNetModel)
     begin
         ProtocolModelUpdate(model);
     end;

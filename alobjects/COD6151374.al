@@ -11,15 +11,15 @@ codeunit 6151374 "CS UI Management"
     var
         Text001: Label 'The Node does not exist.';
 
-    procedure ReceiveXML(xmlin: DotNet XmlDocument)
+    procedure ReceiveXML(xmlin: DotNet npNetXmlDocument)
     var
         CSUIHeader: Record "CS UI Header";
         XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "CS Communication";
         CSManagement: Codeunit "CS Management";
-        DOMxmlin: DotNet XmlDocument;
-        RootNode: DotNet XmlNode;
-        ReturnedNode: DotNet XmlNode;
+        DOMxmlin: DotNet npNetXmlDocument;
+        RootNode: DotNet npNetXmlNode;
+        ReturnedNode: DotNet npNetXmlNode;
         TextValue: Text[250];
     begin
         DOMxmlin := xmlin;
@@ -37,7 +37,7 @@ codeunit 6151374 "CS UI Management"
           Error(Text001);
     end;
 
-    procedure Initialize(var CSUIHeader: Record "CS UI Header";var Rec: Record "CS UI Header";var DOMxmlin: DotNet XmlDocument;var ReturnedNode: DotNet XmlNode;var RootNode: DotNet XmlNode;var XMLDOMMgt: Codeunit "XML DOM Management";var CSCommunication: Codeunit "CS Communication";var CSUserId: Text[250];var CurrentCode: Text[250];var StackCode: Text[250];var WhseEmpId: Text[250];var LocationFilter: Text[250];var CSSessionId: Text[250])
+    procedure Initialize(var CSUIHeader: Record "CS UI Header";var Rec: Record "CS UI Header";var DOMxmlin: DotNet npNetXmlDocument;var ReturnedNode: DotNet npNetXmlNode;var RootNode: DotNet npNetXmlNode;var XMLDOMMgt: Codeunit "XML DOM Management";var CSCommunication: Codeunit "CS Communication";var CSUserId: Text[250];var CurrentCode: Text[250];var StackCode: Text[250];var WhseEmpId: Text[250];var LocationFilter: Text[250];var CSSessionId: Text[250])
     begin
         DOMxmlin := DOMxmlin.XmlDocument;
 

@@ -28,11 +28,11 @@ codeunit 6014483 "NP Service Process"
     procedure IsUserSubscribed(SubscriptionUserId: Text[50];CustomerNo: Code[20];ServiceId: Code[20]) Result: Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        Uri: DotNet Uri;
-        WebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        Uri: DotNet npNetUri;
+        WebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
         ServiceMethod: Text;
         ReturnValue: Text;
     begin
@@ -71,11 +71,11 @@ codeunit 6014483 "NP Service Process"
     procedure IsCustomerSubscribed(CustomerNo: Code[20];ServiceId: Code[20]) Result: Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        Uri: DotNet Uri;
-        WebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        Uri: DotNet npNetUri;
+        WebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
         ServiceMethod: Text;
         ReturnValue: Text;
     begin
@@ -113,11 +113,11 @@ codeunit 6014483 "NP Service Process"
     procedure CreateUserAccount(SubscriptionUserId: Text[50];CustomerNo: Code[20];ServiceId: Code[20]) Result: Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        Uri: DotNet Uri;
-        WebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        Uri: DotNet npNetUri;
+        WebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
         ServiceMethod: Text;
         ReturnValue: Text;
     begin
@@ -156,11 +156,11 @@ codeunit 6014483 "NP Service Process"
     procedure CreateTransactionLogEntry(SubscriptionUserId: Text[50];CustomerNo: Code[20];ServiceId: Code[20]) Result: Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        Uri: DotNet Uri;
-        WebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        Uri: DotNet npNetUri;
+        WebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
         ServiceMethod: Text;
         ReturnValue: Text;
     begin
@@ -199,11 +199,11 @@ codeunit 6014483 "NP Service Process"
     procedure CreateTransactionLogEntryAmt(SubscriptionUserId: Text[50];CustomerNo: Code[20];ServiceId: Code[20];Quantity: Decimal;Description: Text[50];Amount: Decimal) Result: Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        Uri: DotNet Uri;
-        WebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        Uri: DotNet npNetUri;
+        WebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
         ServiceMethod: Text;
         ReturnValue: Text;
     begin
@@ -302,10 +302,10 @@ codeunit 6014483 "NP Service Process"
         exit(ServiceUsed);
     end;
 
-    local procedure GetReturnValue(HttpWebResponse: DotNet HttpWebResponse;ServiceMethod: Text) ResponseText: Text
+    local procedure GetReturnValue(HttpWebResponse: DotNet npNetHttpWebResponse;ServiceMethod: Text) ResponseText: Text
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
     begin
         //-NPR5.49 [341836]
         XmlDoc := XmlDoc.XmlDocument;

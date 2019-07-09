@@ -32,15 +32,15 @@ codeunit 6150704 "POS Front End Management"
         POSSession: Codeunit "POS Session";
         Stargate: Codeunit "POS Stargate Management";
         [RunOnClient]
-        Framework: DotNet IFramework0;
+        Framework: DotNet npNetIFramework0;
         Text001: Label '%1\\This is a programming bug, not a user error.';
         Text002: Label 'A function that requires a POS session to be running has been invoked outside of a POS session.';
         Text003: Label 'Unsupported view type requested: %1.';
         Text004: Label 'View has not been properly initialized. This is a critical error.\\View type: %1';
-        RegisteredWorkflows: DotNet List_Of_T;
-        WorkflowStack: DotNet Stack_Of_T;
-        ActionStack: DotNet Stack_Of_T;
-        QueuedWorkflows: DotNet List_Of_T;
+        RegisteredWorkflows: DotNet npNetList_Of_T;
+        WorkflowStack: DotNet npNetStack_Of_T;
+        ActionStack: DotNet npNetStack_Of_T;
+        QueuedWorkflows: DotNet npNetList_Of_T;
         WorkflowResponseContent: Variant;
         Initialized: Boolean;
         Text005: Label 'You attempted to retrieve a POS session instance outside of an active POS session, with no POS user interface currently running.';
@@ -60,7 +60,7 @@ codeunit 6150704 "POS Front End Management"
         Text015: Label 'A function that requires Workflow 2.0 engine to be initialized has been invoked from a Workflow 1.0 action.';
 
     [Scope('Personalization')]
-    procedure Initialize(FrameworkIn: DotNet IFramework0;SessionIn: Codeunit "POS Session")
+    procedure Initialize(FrameworkIn: DotNet npNetIFramework0;SessionIn: Codeunit "POS Session")
     begin
         Framework := FrameworkIn;
         POSSession := SessionIn;
@@ -81,7 +81,7 @@ codeunit 6150704 "POS Front End Management"
     local procedure IsActiveSession(): Boolean
     var
         [RunOnClient]
-        FrameworkCheck: DotNet IFramework0;
+        FrameworkCheck: DotNet npNetIFramework0;
         POSSessionCheck: Codeunit "POS Session";
     begin
         OnDetectFramework(FrameworkCheck,POSSessionCheck);
@@ -246,7 +246,7 @@ codeunit 6150704 "POS Front End Management"
         POSAction: Record "POS Action";
         Button: Record "POS Menu Button";
         UI: Codeunit "POS UI Management";
-        WorkflowAction: DotNet WorkflowAction;
+        WorkflowAction: DotNet npNetWorkflowAction;
         POSParameterValue: Record "POS Parameter Value";
     begin
         if RegisteredWorkflows.Contains(Name) then
@@ -274,7 +274,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure LoginView(Setup: Codeunit "POS Setup")
     var
-        ViewType: DotNet ViewType0;
+        ViewType: DotNet npNetViewType0;
     begin
         SetView(ViewType.Login,Setup);
     end;
@@ -282,7 +282,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure SaleView(Setup: Codeunit "POS Setup")
     var
-        ViewType: DotNet ViewType0;
+        ViewType: DotNet npNetViewType0;
     begin
         SetView(ViewType.Sale,Setup);
     end;
@@ -290,7 +290,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure PaymentView(Setup: Codeunit "POS Setup")
     var
-        ViewType: DotNet ViewType0;
+        ViewType: DotNet npNetViewType0;
     begin
         SetView(ViewType.Payment,Setup);
     end;
@@ -298,7 +298,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure BalancingView(Setup: Codeunit "POS Setup")
     var
-        ViewType: DotNet ViewType0;
+        ViewType: DotNet npNetViewType0;
     begin
         SetView(ViewType.BalanceRegister,Setup);
     end;
@@ -306,7 +306,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure LockedView(Setup: Codeunit "POS Setup")
     var
-        ViewType: DotNet ViewType0;
+        ViewType: DotNet npNetViewType0;
     begin
         //-NPR5.37 [293905]
         SetView(ViewType.Locked,Setup);
@@ -317,7 +317,7 @@ codeunit 6150704 "POS Front End Management"
     begin
     end;
 
-    local procedure InvokeFrontEndAsync(Request: DotNet JsonRequest)
+    local procedure InvokeFrontEndAsync(Request: DotNet npNetJsonRequest)
     var
         DebugTrace: Text;
         ServerStopwatch: Text;
@@ -345,7 +345,7 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure InvokeFrontEndMethod(Request: DotNet JsonRequest)
+    procedure InvokeFrontEndMethod(Request: DotNet npNetJsonRequest)
     begin
         //-NPR5.38 [255773]
         MakeSureFrameworkIsAvailable(true);
@@ -363,8 +363,8 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure ReportBug(ErrorText: Text)
     var
-        Request: DotNet ReportBugJsonRequest;
-        ErrorObject: DotNet Object;
+        Request: DotNet npNetReportBugJsonRequest;
+        ErrorObject: DotNet npNetObject;
     begin
         if MakeSureFrameworkIsAvailable(false) then begin
           POSSession.SetInAction(false);
@@ -387,8 +387,8 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure ReportWarning(ErrorText: Text;WithError: Boolean)
     var
-        Request: DotNet ReportBugJsonRequest;
-        ErrorObject: DotNet Object;
+        Request: DotNet npNetReportBugJsonRequest;
+        ErrorObject: DotNet npNetObject;
     begin
         if MakeSureFrameworkIsAvailable(false) then begin
           Request := Request.ReportBugJsonRequest(ErrorText);
@@ -411,8 +411,8 @@ codeunit 6150704 "POS Front End Management"
 
     procedure ReportInvalidCustomMethod(ErrorText: Text;Method: Text)
     var
-        Request: DotNet ReportBugJsonRequest;
-        ErrorObject: DotNet Object;
+        Request: DotNet npNetReportBugJsonRequest;
+        ErrorObject: DotNet npNetObject;
     begin
         //-NPR5.50 [338666]
         if MakeSureFrameworkIsAvailable(false) then begin
@@ -435,7 +435,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure AppGatewayProtocolResponse(EventName: Text;EventData: Text)
     var
-        Request: DotNet AppGatewayProtocolResponse;
+        Request: DotNet npNetAppGatewayProtocolResponse;
     begin
         MakeSureFrameworkIsAvailable(true);
         //-NPR5.40 [306347]
@@ -449,10 +449,10 @@ codeunit 6150704 "POS Front End Management"
     var
         Package: Record "POS Stargate Package";
         PackageMethod: Record "POS Stargate Package Method";
-        Request: DotNet JsonRequest;
-        Packages: DotNet List_Of_T;
-        Methods: DotNet List_Of_T;
-        PackageDefinition: DotNet Dictionary_Of_T_U;
+        Request: DotNet npNetJsonRequest;
+        Packages: DotNet npNetList_Of_T;
+        Methods: DotNet npNetList_Of_T;
+        PackageDefinition: DotNet npNetDictionary_Of_T_U;
     begin
         //-NPR5.37 [291777]
         if Package.FindSet then begin
@@ -487,9 +487,9 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure ConfigureCaptions(Captions: DotNet Dictionary_Of_T_U)
+    procedure ConfigureCaptions(Captions: DotNet npNetDictionary_Of_T_U)
     var
-        Request: DotNet SetCaptionsJsonRequest;
+        Request: DotNet npNetSetCaptionsJsonRequest;
     begin
         MakeSureFrameworkIsAvailable(true);
         //-NPR5.40 [306347]
@@ -499,9 +499,9 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure ConfigureFormat(NumberFormat: DotNet NumberFormatInfo;DateFormat: DotNet DateTimeFormatInfo)
+    procedure ConfigureFormat(NumberFormat: DotNet npNetNumberFormatInfo;DateFormat: DotNet npNetDateTimeFormatInfo)
     var
-        Request: DotNet SetFormatJsonRequest;
+        Request: DotNet npNetSetFormatJsonRequest;
     begin
         MakeSureFrameworkIsAvailable(true);
         //-NPR5.40 [306347]
@@ -513,7 +513,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure ConfigureLogo(LogoBase64: Text)
     var
-        Request: DotNet SetImageJsonRequest;
+        Request: DotNet npNetSetImageJsonRequest;
     begin
         MakeSureFrameworkIsAvailable(true);
         //-NPR5.40 [306347]
@@ -523,10 +523,10 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure ConfigureMenu(Menus: DotNet List_Of_T)
+    procedure ConfigureMenu(Menus: DotNet npNetList_Of_T)
     var
-        Request: DotNet MenuRequest;
-        Menu: DotNet Menu;
+        Request: DotNet npNetMenuRequest;
+        Menu: DotNet npNetMenu;
     begin
         MakeSureFrameworkIsAvailable(true);
         Request := Request.MenuRequest();
@@ -539,9 +539,9 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure ConfigureFont(Font: DotNet Font0)
+    procedure ConfigureFont(Font: DotNet npNetFont0)
     var
-        Request: DotNet ConfigureFontJsonRequest;
+        Request: DotNet npNetConfigureFontJsonRequest;
     begin
         MakeSureFrameworkIsAvailable(true);
         //-NPR5.40 [306347]
@@ -551,9 +551,9 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure ConfigureKeyboardBindings(KeyboardBindings: DotNet List_Of_T)
+    procedure ConfigureKeyboardBindings(KeyboardBindings: DotNet npNetList_Of_T)
     var
-        Request: DotNet JsonRequest;
+        Request: DotNet npNetJsonRequest;
     begin
         //-NPR5.38 [295800]
         Request := Request.JsonRequest();
@@ -567,9 +567,9 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure ConfigureReusableWorkflow("Action": DotNet WorkflowAction)
+    procedure ConfigureReusableWorkflow("Action": DotNet npNetWorkflowAction)
     var
-        Request: DotNet ConfigureReusableWorkflowRequest;
+        Request: DotNet npNetConfigureReusableWorkflowRequest;
     begin
         if not RegisteredWorkflows.Contains(Action.Workflow.Name) then
           RegisteredWorkflows.Add(Action.Workflow.Name);
@@ -584,7 +584,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure ConfigureWatermark(WatermarkBase64: Text;WatermarkText: Text)
     var
-        Request: DotNet SetImageJsonRequest;
+        Request: DotNet npNetSetImageJsonRequest;
     begin
         //-NPR5.32.11 [281618]
         MakeSureFrameworkIsAvailable(true);
@@ -602,9 +602,9 @@ codeunit 6150704 "POS Front End Management"
     procedure ConfigureSecureMethods()
     var
         SecureMethodTmp: Record "POS Secure Method" temporary;
-        Request: DotNet JsonRequest;
-        Method: DotNet Dictionary_Of_T_U;
-        Methods: DotNet Dictionary_Of_T_U;
+        Request: DotNet npNetJsonRequest;
+        Method: DotNet npNetDictionary_Of_T_U;
+        Methods: DotNet npNetDictionary_Of_T_U;
     begin
         //-NPR5.43 [314603]
         MakeSureFrameworkIsAvailable(true);
@@ -635,7 +635,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure ConfigureSecureMethodsClientPasswords(Method: Text;CommaDelimitedPasswords: Text)
     var
-        Request: DotNet JsonRequest;
+        Request: DotNet npNetJsonRequest;
     begin
         //-NPR5.43 [314603]
         MakeSureFrameworkIsAvailable(true);
@@ -647,9 +647,9 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.43 [314603]
     end;
 
-    procedure ConfigureTheme(Theme: DotNet List_Of_T)
+    procedure ConfigureTheme(Theme: DotNet npNetList_Of_T)
     var
-        Request: DotNet JsonRequest;
+        Request: DotNet npNetJsonRequest;
     begin
         //-NPR5.49 [335141]
         MakeSureFrameworkIsAvailable(true);
@@ -663,7 +663,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure ValidateSecureMethodPassword(RequestId: Integer;Success: Boolean;SkipUI: Boolean;Reason: Text;AuthorizedBy: Text)
     var
-        Request: DotNet JsonRequest;
+        Request: DotNet npNetJsonRequest;
     begin
         //-NPR5.43 [314603]
         MakeSureFrameworkIsAvailable(true);
@@ -686,7 +686,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure HardwareInitializationComplete()
     var
-        Request: DotNet JsonRequest;
+        Request: DotNet npNetJsonRequest;
     begin
         Request := Request.JsonRequest();
         Request.Method := 'HardwareInitializationCompleted';
@@ -697,12 +697,12 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure InvokeDevice(Request: DotNet Request0;ActionName: Text;Step: Text)
+    procedure InvokeDevice(Request: DotNet npNetRequest0;ActionName: Text;Step: Text)
     var
         Stargate: Codeunit "POS Stargate Management";
-        DeviceRequest: DotNet InvokeDeviceRequest;
-        Envelope: DotNet RequestEnvelope0;
-        Exception: DotNet Exception;
+        DeviceRequest: DotNet npNetInvokeDeviceRequest;
+        Envelope: DotNet npNetRequestEnvelope0;
+        Exception: DotNet npNetException;
     begin
         MakeSureFrameworkIsAvailable(true);
 
@@ -726,12 +726,12 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure InvokeDeviceInternal(Request: DotNet Request0;ActionName: Text;Step: Text;Repeating: Boolean)
+    procedure InvokeDeviceInternal(Request: DotNet npNetRequest0;ActionName: Text;Step: Text;Repeating: Boolean)
     var
         Stargate: Codeunit "POS Stargate Management";
-        DeviceRequest: DotNet InvokeDeviceRequest;
-        Envelope: DotNet RequestEnvelope0;
-        Exception: DotNet Exception;
+        DeviceRequest: DotNet npNetInvokeDeviceRequest;
+        Envelope: DotNet npNetRequestEnvelope0;
+        Exception: DotNet npNetException;
     begin
         // Do not invoke this function from action codeunits. This function is intended to be used only from Stargate infrastructure code.
 
@@ -758,12 +758,12 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure InvokeDeviceAsync(Request: DotNet Request0;ActionName: Text;Step: Text)
+    procedure InvokeDeviceAsync(Request: DotNet npNetRequest0;ActionName: Text;Step: Text)
     var
         Stargate: Codeunit "POS Stargate Management";
-        DeviceRequest: DotNet InvokeDeviceRequest;
-        Envelope: DotNet RequestEnvelope0;
-        Exception: DotNet Exception;
+        DeviceRequest: DotNet npNetInvokeDeviceRequest;
+        Envelope: DotNet npNetRequestEnvelope0;
+        Exception: DotNet npNetException;
     begin
         //-NPR5.39 [305029]
         MakeSureFrameworkIsAvailable(true);
@@ -792,9 +792,9 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure InvokeWorkflow(var POSAction: Record "POS Action")
     var
-        Request: DotNet WorkflowRequest;
-        WorkflowInvocationParameters: DotNet Dictionary_Of_T_U;
-        WorkflowInvocationContext: DotNet Dictionary_Of_T_U;
+        Request: DotNet npNetWorkflowRequest;
+        WorkflowInvocationParameters: DotNet npNetDictionary_Of_T_U;
+        WorkflowInvocationContext: DotNet npNetDictionary_Of_T_U;
     begin
         MakeSureFrameworkfIsInitialized();
         RegisterWorkflowIfNecessary(POSAction.Code);
@@ -819,7 +819,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure PauseWorkflow(): Integer
     var
-        Request: DotNet PauseWorkflowJsonRequest;
+        Request: DotNet npNetPauseWorkflowJsonRequest;
         ErrorText: Text;
     begin
         if CurrentWorkflowID = 0 then
@@ -844,10 +844,10 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure RefreshData(DataSets: DotNet IEnumerable_Of_T)
+    procedure RefreshData(DataSets: DotNet npNetIEnumerable_Of_T)
     var
-        Request: DotNet RefreshDataJsonRequest;
-        DataSetLine: DotNet DataSet;
+        Request: DotNet npNetRefreshDataJsonRequest;
+        DataSetLine: DotNet npNetDataSet;
     begin
         MakeSureFrameworkIsAvailable(true);
 
@@ -868,8 +868,8 @@ codeunit 6150704 "POS Front End Management"
 
     procedure RequireResponse(ID: Integer;RequiredContent: Variant)
     var
-        Request: DotNet JsonRequest;
-        "Object": DotNet Object;
+        Request: DotNet npNetJsonRequest;
+        "Object": DotNet npNetObject;
     begin
         //-NPR5.50 [338666]
         MakeSureFrameworkIsAvailable(true);
@@ -887,8 +887,8 @@ codeunit 6150704 "POS Front End Management"
 
     local procedure RequestWorkflowStep(StepId: Text)
     var
-        Request: DotNet WorkflowRequest;
-        Item: DotNet KeyValuePair_Of_T_U;
+        Request: DotNet npNetWorkflowRequest;
+        Item: DotNet npNetKeyValuePair_Of_T_U;
     begin
         MakeSureFrameworkfIsInitialized();
         //-NPR5.40 [306347]
@@ -911,7 +911,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure ResumeWorkflow()
     var
-        Request: DotNet ResumeWorkflowJsonRequest;
+        Request: DotNet npNetResumeWorkflowJsonRequest;
         ErrorText: Text;
     begin
         if PausedWorkflowID = 0 then
@@ -939,7 +939,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure SetOption(Option: Text;Value: Variant)
     var
-        Request: DotNet SetOptionJsonRequest;
+        Request: DotNet npNetSetOptionJsonRequest;
     begin
         MakeSureFrameworkIsAvailable(true);
         //-NPR5.40 [306347]
@@ -949,9 +949,9 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure SetOptions(Options: DotNet Dictionary_Of_T_U)
+    procedure SetOptions(Options: DotNet npNetDictionary_Of_T_U)
     var
-        Request: DotNet JsonRequest;
+        Request: DotNet npNetJsonRequest;
     begin
         MakeSureFrameworkIsAvailable(true);
         Request := Request.JsonRequest();
@@ -964,17 +964,17 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure SetView(ViewType: DotNet ViewType0;Setup: Codeunit "POS Setup")
+    procedure SetView(ViewType: DotNet npNetViewType0;Setup: Codeunit "POS Setup")
     var
         POSView: Record "POS View";
         DefaultView: Record "POS Default View";
         DataMgt: Codeunit "POS Data Management";
         SessionEvent: Codeunit "POS Session";
         POSViewChangeWorkflowMgt: Codeunit "POS View Change Workflow Mgt.";
-        Request: DotNet SetViewJsonRequest;
-        DataSource: DotNet DataSource0;
-        CurrView: DotNet View0;
-        CurrViewType: DotNet ViewType0;
+        Request: DotNet npNetSetViewJsonRequest;
+        DataSource: DotNet npNetDataSource0;
+        CurrView: DotNet npNetView0;
+        CurrViewType: DotNet npNetViewType0;
         Markup: Text;
         SourceId: Text;
         KnownView: Boolean;
@@ -1070,13 +1070,13 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure ShowModel(Model: DotNet Model) ModelID: Guid
+    procedure ShowModel(Model: DotNet npNetModel) ModelID: Guid
     var
-        Request: DotNet JsonRequest;
+        Request: DotNet npNetJsonRequest;
         Html: Text;
         Css: Text;
         Script: Text;
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         //-266990 [266990]
         ModelID := CreateGuid;
@@ -1100,13 +1100,13 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure UpdateModel(Model: DotNet Model;ModelID: Guid)
+    procedure UpdateModel(Model: DotNet npNetModel;ModelID: Guid)
     var
-        Request: DotNet JsonRequest;
+        Request: DotNet npNetJsonRequest;
         Html: Text;
         Css: Text;
         Script: Text;
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         //-266990 [266990]
         Html := Model.ToString();
@@ -1131,7 +1131,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure CloseModel(ModelID: Guid)
     var
-        Request: DotNet JsonRequest;
+        Request: DotNet npNetJsonRequest;
     begin
         //-266990 [266990]
         Request := Request.JsonRequest();
@@ -1147,7 +1147,7 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure StartTransaction(Sale: Record "Sale POS")
     var
-        Request: DotNet StartTransactionJsonRequest;
+        Request: DotNet npNetStartTransactionJsonRequest;
     begin
         MakeSureFrameworkIsAvailable(true);
         Request := Request.StartTransactionJsonRequest(Sale."Sales Ticket No.");
@@ -1162,8 +1162,8 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure SetActionContext("Action": Text;Context: Codeunit "POS JSON Management")
     var
-        Request: DotNet ProvideContextRequest;
-        ContextObj: DotNet Dictionary_Of_T_U;
+        Request: DotNet npNetProvideContextRequest;
+        ContextObj: DotNet npNetDictionary_Of_T_U;
     begin
         Request := Request.ProvideContextRequest(CurrentWorkflowID());
         Context.GetContextObject(ContextObj);
@@ -1179,8 +1179,8 @@ codeunit 6150704 "POS Front End Management"
     [Scope('Personalization')]
     procedure SetActionObject("Action": Text;ObjectName: Text;Context: Codeunit "POS JSON Management")
     var
-        Request: DotNet ProvideContextRequest;
-        ContextObj: DotNet Dictionary_Of_T_U;
+        Request: DotNet npNetProvideContextRequest;
+        ContextObj: DotNet npNetDictionary_Of_T_U;
     begin
         Request := Request.ProvideContextRequest(CurrentWorkflowID());
         Context.GetContextObject(ContextObj);
@@ -1194,7 +1194,7 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [Scope('Personalization')]
-    procedure WorkflowCallCompleted(Request: DotNet WorkflowCallCompletedRequest)
+    procedure WorkflowCallCompleted(Request: DotNet npNetWorkflowCallCompletedRequest)
     begin
         MakeSureFrameworkfIsInitialized();
         //-NPR5.40 [306347]
@@ -1212,8 +1212,8 @@ codeunit 6150704 "POS Front End Management"
 
     procedure WorkflowResponse(ResponseContent: Variant)
     var
-        Request: DotNet JsonRequest;
-        "Object": DotNet Object;
+        Request: DotNet npNetJsonRequest;
+        "Object": DotNet npNetObject;
     begin
         //-NPR5.50 [338666]
         MakeSureFrameworkIsAvailableIn20(true);
@@ -1233,9 +1233,9 @@ codeunit 6150704 "POS Front End Management"
     begin
     end;
 
-    local procedure MakeSureTraceExists(Request: DotNet JsonRequest)
+    local procedure MakeSureTraceExists(Request: DotNet npNetJsonRequest)
     var
-        Dict: DotNet Dictionary_Of_T_U;
+        Dict: DotNet npNetDictionary_Of_T_U;
     begin
         //-NPR5.45 [315838]
         if Request.Content.ContainsKey('_trace') then
@@ -1246,9 +1246,9 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.45 [315838]
     end;
 
-    procedure Trace(Request: DotNet JsonRequest;"Key": Text;Value: Variant)
+    procedure Trace(Request: DotNet npNetJsonRequest;"Key": Text;Value: Variant)
     var
-        TraceDict: DotNet Dictionary_Of_T_U;
+        TraceDict: DotNet npNetDictionary_Of_T_U;
     begin
         //-NPR5.45 [315838]
         MakeSureTraceExists(Request);
@@ -1266,7 +1266,7 @@ codeunit 6150704 "POS Front End Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnDetectFramework(var FrameworkOut: DotNet IFramework0;var POSSessionOut: Codeunit "POS Session")
+    local procedure OnDetectFramework(var FrameworkOut: DotNet npNetIFramework0;var POSSessionOut: Codeunit "POS Session")
     begin
     end;
 

@@ -36,8 +36,8 @@ codeunit 6060147 "MM NPR Membership"
         ForeignMembershipSetup: Record "MM Foreign Membership Setup";
         NPRRemoteEndpointSetup: Record "MM NPR Remote Endpoint Setup";
         SoapAction: Text;
-        XmlDocRequest: DotNet XmlDocument;
-        XmlDocResponse: DotNet XmlDocument;
+        XmlDocRequest: DotNet npNetXmlDocument;
+        XmlDocResponse: DotNet npNetXmlDocument;
     begin
 
         if (ManagerCode <> GetManagerCode ()) then
@@ -138,8 +138,8 @@ codeunit 6060147 "MM NPR Membership"
         ForeignMembershipSetup: Record "MM Foreign Membership Setup";
         NPRRemoteEndpointSetup: Record "MM NPR Remote Endpoint Setup";
         SoapAction: Text;
-        XmlDocRequest: DotNet XmlDocument;
-        XmlDocResponse: DotNet XmlDocument;
+        XmlDocRequest: DotNet npNetXmlDocument;
+        XmlDocResponse: DotNet npNetXmlDocument;
         CustomerNumber: Text[30];
         CardNumber: Text[30];
         CustomerName: Text[50];
@@ -248,8 +248,8 @@ codeunit 6060147 "MM NPR Membership"
     local procedure ValidateCardNumber(NPRRemoteEndpointSetup: Record "MM NPR Remote Endpoint Setup";Prefix: Code[10];ForeignMembercardNumber: Text[50];var RemoteInfoCapture: Record "MM Member Info Capture";var NotValidReason: Text) IsValid: Boolean
     var
         SoapAction: Text;
-        XmlDocRequest: DotNet XmlDocument;
-        XmlDocResponse: DotNet XmlDocument;
+        XmlDocRequest: DotNet npNetXmlDocument;
+        XmlDocResponse: DotNet npNetXmlDocument;
     begin
 
         MemberCardNumberValidationRequest (ForeignMembercardNumber, '', SoapAction, XmlDocRequest);
@@ -263,8 +263,8 @@ codeunit 6060147 "MM NPR Membership"
     local procedure GetMembership(NPRRemoteEndpointSetup: Record "MM NPR Remote Endpoint Setup";Prefix: Code[10];ForeignMembercardNumber: Text[50];var ForeignMembershipNumber: Code[20];var RemoteInfoCapture: Record "MM Member Info Capture";var NotValidReason: Text) IsValid: Boolean
     var
         SoapAction: Text;
-        XmlDocRequest: DotNet XmlDocument;
-        XmlDocResponse: DotNet XmlDocument;
+        XmlDocRequest: DotNet npNetXmlDocument;
+        XmlDocResponse: DotNet npNetXmlDocument;
     begin
 
         GetMembershipRequest (ForeignMembercardNumber, '', SoapAction, XmlDocRequest);
@@ -282,8 +282,8 @@ codeunit 6060147 "MM NPR Membership"
     local procedure GetMember(NPRRemoteEndpointSetup: Record "MM NPR Remote Endpoint Setup";Prefix: Code[10];ForeignMembercardNumber: Text[50];ForeignMembershipNumber: Code[20];var RemoteInfoCapture: Record "MM Member Info Capture";var NotValidReason: Text) IsValid: Boolean
     var
         SoapAction: Text;
-        XmlDocRequest: DotNet XmlDocument;
-        XmlDocResponse: DotNet XmlDocument;
+        XmlDocRequest: DotNet npNetXmlDocument;
+        XmlDocResponse: DotNet npNetXmlDocument;
     begin
 
         GetMembershipMemberRequest (ForeignMembershipNumber, ForeignMembercardNumber, '', SoapAction, XmlDocRequest);
@@ -317,8 +317,8 @@ codeunit 6060147 "MM NPR Membership"
     local procedure UpdateMembershipPoints(NPRRemoteEndpointSetup: Record "MM NPR Remote Endpoint Setup";MembershipEntryNo: Integer;Prefix: Code[10];ForeignMembercardNumber: Text[50];var NotValidReason: Text) IsValid: Boolean
     var
         SoapAction: Text;
-        XmlDocRequest: DotNet XmlDocument;
-        XmlDocResponse: DotNet XmlDocument;
+        XmlDocRequest: DotNet npNetXmlDocument;
+        XmlDocResponse: DotNet npNetXmlDocument;
         ForeignMembershipNumber: Code[20];
         RemoteInfoCapture: Record "MM Member Info Capture";
         LoyaltyPointManagement: Codeunit "MM Loyalty Point Management";
@@ -344,18 +344,18 @@ codeunit 6060147 "MM NPR Membership"
     begin
     end;
 
-    procedure WebServiceApi(NPRRemoteEndpointSetup: Record "MM NPR Remote Endpoint Setup";SoapAction: Text;var ReasonText: Text;var XmlDocIn: DotNet XmlDocument;var XmlDocOut: DotNet XmlDocument): Boolean
+    procedure WebServiceApi(NPRRemoteEndpointSetup: Record "MM NPR Remote Endpoint Setup";SoapAction: Text;var ReasonText: Text;var XmlDocIn: DotNet npNetXmlDocument;var XmlDocOut: DotNet npNetXmlDocument): Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Credential: DotNet NetworkCredential;
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
-        WebInnerException: DotNet WebException;
+        Credential: DotNet npNetNetworkCredential;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
+        WebInnerException: DotNet npNetWebException;
         Url: Text;
         ErrorMessage: Text;
         ResponseText: Text;
-        Exception: DotNet Exception;
+        Exception: DotNet npNetException;
         StatusCode: Code[10];
         StatusDescription: Text[50];
     begin
@@ -422,7 +422,7 @@ codeunit 6060147 "MM NPR Membership"
     begin
     end;
 
-    procedure MemberCardNumberValidationRequest(ExternalMembercardNumber: Text[100];ScannerStationId: Text;var SoapAction: Text[50];var XmlDoc: DotNet XmlDocument)
+    procedure MemberCardNumberValidationRequest(ExternalMembercardNumber: Text[100];ScannerStationId: Text;var SoapAction: Text[50];var XmlDoc: DotNet npNetXmlDocument)
     var
         XmlRequest: Text;
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
@@ -446,10 +446,10 @@ codeunit 6060147 "MM NPR Membership"
         XmlDoc.LoadXml (XmlRequest);
     end;
 
-    local procedure MemberCardNumberValidationResponse(Prefix: Code[10];ForeignMembercardNumber: Text[50];var XmlDoc: DotNet XmlDocument;var ResponseText: Text;var MemberInfoCapture: Record "MM Member Info Capture") ValidResponse: Boolean
+    local procedure MemberCardNumberValidationResponse(Prefix: Code[10];ForeignMembercardNumber: Text[50];var XmlDoc: DotNet npNetXmlDocument;var ResponseText: Text;var MemberInfoCapture: Record "MM Member Info Capture") ValidResponse: Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlElement: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
         PayloadBody: Text;
         TextOk: Text;
     begin
@@ -469,7 +469,7 @@ codeunit 6060147 "MM NPR Membership"
         exit (UpperCase (TextOk) = 'TRUE');
     end;
 
-    local procedure GetMembershipRequest(ExternalMembercardNumber: Text[50];ScannerStationId: Text;var SoapAction: Text[50];var XmlDoc: DotNet XmlDocument)
+    local procedure GetMembershipRequest(ExternalMembercardNumber: Text[50];ScannerStationId: Text;var SoapAction: Text[50];var XmlDoc: DotNet npNetXmlDocument)
     var
         XmlRequest: Text;
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
@@ -504,10 +504,10 @@ codeunit 6060147 "MM NPR Membership"
         XmlDoc.LoadXml (XmlRequest);
     end;
 
-    local procedure GetMembershipResponse(Prefix: Code[10];var ForeignMembershipNumber: Code[20];var XmlDoc: DotNet XmlDocument;var ResponseText: Text;var MemberInfoCapture: Record "MM Member Info Capture") ValidResponse: Boolean
+    local procedure GetMembershipResponse(Prefix: Code[10];var ForeignMembershipNumber: Code[20];var XmlDoc: DotNet npNetXmlDocument;var ResponseText: Text;var MemberInfoCapture: Record "MM Member Info Capture") ValidResponse: Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlElement: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
         PayloadBody: Text;
         TextOk: Text;
         ElementPath: Text;
@@ -556,7 +556,7 @@ codeunit 6060147 "MM NPR Membership"
         exit (true);
     end;
 
-    local procedure GetMembershipMemberRequest(ExternalMembershipNumber: Code[20];ExternalMembercardNumber: Text[50];ScannerStationId: Text;var SoapAction: Text[50];var XmlDoc: DotNet XmlDocument)
+    local procedure GetMembershipMemberRequest(ExternalMembershipNumber: Code[20];ExternalMembercardNumber: Text[50];ScannerStationId: Text;var SoapAction: Text[50];var XmlDoc: DotNet npNetXmlDocument)
     var
         XmlRequest: Text;
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
@@ -588,10 +588,10 @@ codeunit 6060147 "MM NPR Membership"
         XmlDoc.LoadXml (XmlRequest);
     end;
 
-    local procedure GetMembershipMemberResponse(Prefix: Code[10];var XmlDoc: DotNet XmlDocument;var ResponseText: Text;var MemberInfoCapture: Record "MM Member Info Capture"): Boolean
+    local procedure GetMembershipMemberResponse(Prefix: Code[10];var XmlDoc: DotNet npNetXmlDocument;var ResponseText: Text;var MemberInfoCapture: Record "MM Member Info Capture"): Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlElement: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
         PayloadBody: Text;
         TextOk: Text;
         ElementPath: Text;
@@ -656,7 +656,7 @@ codeunit 6060147 "MM NPR Membership"
         exit (true);
     end;
 
-    local procedure GetLoyaltyPointRequest(ExternalMembercardNumber: Text[50];ScannerStationId: Text;var SoapAction: Text[50];var XmlDoc: DotNet XmlDocument)
+    local procedure GetLoyaltyPointRequest(ExternalMembercardNumber: Text[50];ScannerStationId: Text;var SoapAction: Text[50];var XmlDoc: DotNet npNetXmlDocument)
     var
         XmlRequest: Text;
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
@@ -687,10 +687,10 @@ codeunit 6060147 "MM NPR Membership"
         XmlDoc.LoadXml (XmlRequest);
     end;
 
-    local procedure GetLoyaltyPointResponse(Prefix: Code[10];var ForeignMembershipNumber: Code[20];var XmlDoc: DotNet XmlDocument;var ResponseText: Text;var MemberInfoCapture: Record "MM Member Info Capture") ValidResponse: Boolean
+    local procedure GetLoyaltyPointResponse(Prefix: Code[10];var ForeignMembershipNumber: Code[20];var XmlDoc: DotNet npNetXmlDocument;var ResponseText: Text;var MemberInfoCapture: Record "MM Member Info Capture") ValidResponse: Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlElement: DotNet XmlElement;
+        XmlElement: DotNet npNetXmlElement;
         PayloadBody: Text;
         TextOk: Text;
         ElementPath: Text;
@@ -758,9 +758,9 @@ codeunit 6060147 "MM NPR Membership"
     end;
 
     [TryFunction]
-    local procedure TrySendWebRequest(var XmlDoc: DotNet XmlDocument;HttpWebRequest: DotNet HttpWebRequest;var HttpWebResponse: DotNet HttpWebResponse)
+    local procedure TrySendWebRequest(var XmlDoc: DotNet npNetXmlDocument;HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse)
     var
-        MemoryStream: DotNet MemoryStream;
+        MemoryStream: DotNet npNetMemoryStream;
     begin
 
         MemoryStream := HttpWebRequest.GetRequestStream;
@@ -772,10 +772,10 @@ codeunit 6060147 "MM NPR Membership"
     end;
 
     [TryFunction]
-    local procedure TryReadResponseText(var HttpWebResponse: DotNet HttpWebResponse;var ResponseText: Text)
+    local procedure TryReadResponseText(var HttpWebResponse: DotNet npNetHttpWebResponse;var ResponseText: Text)
     var
-        Stream: DotNet Stream;
-        StreamReader: DotNet StreamReader;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
     begin
 
         Stream := HttpWebResponse.GetResponseStream;
@@ -787,14 +787,14 @@ codeunit 6060147 "MM NPR Membership"
     end;
 
     [TryFunction]
-    local procedure TryReadExceptionResponseText(var WebException: DotNet WebException;var StatusCode: Code[10];var StatusDescription: Text;var ResponseXml: Text)
+    local procedure TryReadExceptionResponseText(var WebException: DotNet npNetWebException;var StatusCode: Code[10];var StatusDescription: Text;var ResponseXml: Text)
     var
-        Stream: DotNet Stream;
-        StreamReader: DotNet StreamReader;
-        WebResponse: DotNet WebResponse;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebExceptionStatus: DotNet WebExceptionStatus;
-        SystemConvert: DotNet Convert;
+        Stream: DotNet npNetStream;
+        StreamReader: DotNet npNetStreamReader;
+        WebResponse: DotNet npNetWebResponse;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebExceptionStatus: DotNet npNetWebExceptionStatus;
+        SystemConvert: DotNet npNetConvert;
         StatusCodeInt: Integer;
     begin
 
@@ -827,14 +827,14 @@ codeunit 6060147 "MM NPR Membership"
     end;
 
     [TryFunction]
-    local procedure TryGetWebExceptionResponse(var WebException: DotNet WebException;var HttpWebResponse: DotNet HttpWebResponse)
+    local procedure TryGetWebExceptionResponse(var WebException: DotNet npNetWebException;var HttpWebResponse: DotNet npNetHttpWebResponse)
     begin
 
         HttpWebResponse := WebException.Response;
     end;
 
     [TryFunction]
-    local procedure TryGetInnerWebException(var WebException: DotNet WebException;var InnerWebException: DotNet WebException)
+    local procedure TryGetInnerWebException(var WebException: DotNet npNetWebException;var InnerWebException: DotNet npNetWebException)
     begin
 
         InnerWebException := WebException.InnerException;

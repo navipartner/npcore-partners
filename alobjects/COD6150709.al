@@ -107,10 +107,10 @@ codeunit 6150709 "POS Action Parameter Mgt."
           until ActionParam.Next = 0;
     end;
 
-    procedure SplitString(Text: Text;var Parts: DotNet Array)
+    procedure SplitString(Text: Text;var Parts: DotNet npNetArray)
     var
-        String: DotNet String;
-        Char: DotNet String;
+        String: DotNet npNetString;
+        Char: DotNet npNetString;
     begin
         String := Text;
         Char := ',';

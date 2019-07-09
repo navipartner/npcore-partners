@@ -58,7 +58,7 @@ page 6150713 "POS Stargate Packages"
                 var
                     ManagedDepMgt: Codeunit "Managed Dependency Mgt.";
                     Rec2: Record "POS Stargate Package";
-                    JArray: DotNet JArray;
+                    JArray: DotNet npNetJArray;
                     StargatePackageMethods: Record "POS Stargate Package Method";
                 begin
                     //-NPR5.32.10 [265454]
@@ -102,10 +102,10 @@ page 6150713 "POS Stargate Packages"
         StargatePackage: Record "POS Stargate Package";
         PackageMethod: Record "POS Stargate Package Method";
         FileMgt: Codeunit "File Management";
-        Package: DotNet Package;
-        String: DotNet String;
+        Package: DotNet npNetPackage;
+        String: DotNet npNetString;
         [RunOnClient]
-        IOFile: DotNet File;
+        IOFile: DotNet npNetFile;
         FilePath: Text;
         Method: Text;
         WhichIs: Text;

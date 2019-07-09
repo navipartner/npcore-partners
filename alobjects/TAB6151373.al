@@ -119,7 +119,7 @@ table 6151373 "CS UI Header"
         Text001: Label '%1 must not be %2.';
         Text002: Label 'There can only be one login form.';
 
-    procedure SaveXMLin(DOMxmlin: DotNet XmlDocument)
+    procedure SaveXMLin(DOMxmlin: DotNet npNetXmlDocument)
     var
         InStrm: InStream;
     begin
@@ -127,7 +127,7 @@ table 6151373 "CS UI Header"
         DOMxmlin.Save(InStrm);
     end;
 
-    procedure LoadXMLin(var DOMxmlin: DotNet XmlDocument)
+    procedure LoadXMLin(var DOMxmlin: DotNet npNetXmlDocument)
     var
         XMLDOMManagement: Codeunit "XML DOM Management";
         OutStrm: OutStream;

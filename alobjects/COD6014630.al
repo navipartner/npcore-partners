@@ -148,9 +148,9 @@ codeunit 6014630 "Touch - Sale POS (Web)"
         Text10600212: Label 'Enter description.';
         QueriedClose: Option No,Yes,Refresh;
         HideInputDialog: Boolean;
-        State: DotNet State0;
-        ViewType: DotNet ViewType;
-        StateData: DotNet Dictionary_Of_T_U;
+        State: DotNet npNetState0;
+        ViewType: DotNet npNetViewType;
+        StateData: DotNet npNetDictionary_Of_T_U;
         LastLineTemp: Record "Sale Line POS" temporary;
         LastPmtLineTemp: Record "Sale Line POS" temporary;
         SessionMgt: Codeunit "POS Web Session Management";
@@ -179,7 +179,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
         Text10600216: Label 'Do you want to create Sales Document?';
         DepositDescription: Label 'Deposit %1';
 
-    procedure Initialize(StateIn: DotNet State0)
+    procedure Initialize(StateIn: DotNet npNetState0)
     begin
         State := StateIn;
         Initialized := true;
@@ -2761,7 +2761,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
     var
         Item: Record Item;
         TempItem: Record Item temporary;
-        Template: DotNet Template;
+        Template: DotNet npNetTemplate;
         UI: Codeunit "POS Web UI Management";
         ItemRecRef: RecordRef;
         Position: Text;
@@ -3073,7 +3073,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
         t003: Label 'Type the quantity of items in return on this line.';
         SaleLinePOS: Record "Sale Line POS";
         RetailSalesLineCode: Codeunit "Retail Sales Line Code";
-        Context: DotNet ProtocolContext;
+        Context: DotNet npNetProtocolContext;
         DialogText: Text;
     begin
         if not RetailSalesLineCode.LineExists(This) then begin
@@ -4145,8 +4145,8 @@ codeunit 6014630 "Touch - Sale POS (Web)"
     local procedure UpdateTouchScreenButtons(InputLinie: Record "Touch Screen - Menu Lines")
     var
         UI: Codeunit "POS Web UI Management";
-        IMenuButtonView: DotNet IMenuButtonView;
-        Grids: DotNet ButtonGrid;
+        IMenuButtonView: DotNet npNetIMenuButtonView;
+        Grids: DotNet npNetButtonGrid;
         Direction: Option TopBottom,LeftRight;
     begin
         if (InputLinie."No." = 0) or (not State.View.Initialized) or (not State.View.HasMenu) then
@@ -4182,7 +4182,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
     local procedure UpdateFunctionsPopupButtons(var InputLinie: Record "Touch Screen - Menu Lines")
     var
         UI: Codeunit "POS Web UI Management";
-        Grids: DotNet ButtonGrid;
+        Grids: DotNet npNetButtonGrid;
         Direction: Option TopBottom,LeftRight;
     begin
         if (InputLinie."No." = 0) then
@@ -4231,7 +4231,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
 
     local procedure UpdateSaleLinePOSObject()
     var
-        String: DotNet String;
+        String: DotNet npNetString;
         POSWebUIManagement: Codeunit "POS Web UI Management";
         SaleLinePOS: Record "Sale Line POS";
     begin
@@ -4503,7 +4503,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
 
     procedure SetScreenView(NewViewType: Integer)
     var
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         if State.IsCurrentView(NewViewType) then
           exit;
@@ -4545,7 +4545,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
     begin
     end;
 
-    procedure GetSalesLines(Grids: DotNet DataGrid)
+    procedure GetSalesLines(Grids: DotNet npNetDataGrid)
     begin
         //-NPR5.40 [308408]
         // //-NPR5.22
@@ -4564,7 +4564,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
         exit(SaleLinePOSObject.GetSubTotal());
     end;
 
-    procedure GetPaymentLines(Grids: DotNet DataGrid)
+    procedure GetPaymentLines(Grids: DotNet npNetDataGrid)
     begin
         //-NPR5.40 [308408]
         // //-NPR5.25
@@ -4667,11 +4667,11 @@ codeunit 6014630 "Touch - Sale POS (Web)"
         exit(CurrentMenuLevel);
     end;
 
-    local procedure GetInfoBoxFromView(var InfoBox: DotNet InfoBox)
+    local procedure GetInfoBoxFromView(var InfoBox: DotNet npNetInfoBox)
     var
-        ViewType: DotNet ViewType;
-        SaleView: DotNet SaleView;
-        PaymentView: DotNet PaymentView;
+        ViewType: DotNet npNetViewType;
+        SaleView: DotNet npNetSaleView;
+        PaymentView: DotNet npNetPaymentView;
     begin
         case State.View.TypeAsInt of
           ViewType.Sale:
@@ -4689,7 +4689,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
 
     local procedure ClearInfoBox()
     var
-        InfoBox: DotNet InfoBox;
+        InfoBox: DotNet npNetInfoBox;
     begin
         GetInfoBoxFromView(InfoBox);
         if IsNull(InfoBox) then
@@ -4700,7 +4700,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
 
     local procedure SetInfoBox(Index: Integer;Caption: Text;Value: Variant)
     var
-        InfoBox: DotNet InfoBox;
+        InfoBox: DotNet npNetInfoBox;
     begin
         GetInfoBoxFromView(InfoBox);
         if IsNull(InfoBox) then
@@ -4711,7 +4711,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
 
     local procedure SetInfoBoxHeader(Caption: Text;Value: Variant)
     var
-        InfoBox: DotNet InfoBox;
+        InfoBox: DotNet npNetInfoBox;
     begin
         GetInfoBoxFromView(InfoBox);
         if IsNull(InfoBox) then
@@ -4768,7 +4768,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
     local procedure PushLineDiscountPct(KeepPrev: Boolean)
     var
         t006: Label 'Type in the discount % that you want to give on the current sales line.';
-        Context: DotNet ProtocolContext;
+        Context: DotNet npNetProtocolContext;
     begin
         Context := Context.ProtocolContext(MethodName_PushLineDiscountPct);
         Context.MethodArguments.Add('__FuncStr',LastFuncStr);
@@ -4779,7 +4779,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
     local procedure PushTotalAmount()
     var
         t007: Label 'Type the total amount that you want the sale to cost.';
-        Context: DotNet ProtocolContext;
+        Context: DotNet npNetProtocolContext;
     begin
         SaleLinePOSObject.CalculateBalance;
         Context := Context.ProtocolContext(MethodName_PushTotalAmount);
@@ -4790,7 +4790,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
     local procedure PushTotalDiscount()
     var
         t004: Label 'Type in the total discount amount for the current sale.';
-        Context: DotNet ProtocolContext;
+        Context: DotNet npNetProtocolContext;
     begin
         SaleLinePOSObject.CalculateBalance;
         Context := Context.ProtocolContext(MethodName_PushTotalDiscount);
@@ -4800,7 +4800,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
 
     local procedure PushDiscountPct(KeepPrev: Boolean)
     var
-        Context: DotNet ProtocolContext;
+        Context: DotNet npNetProtocolContext;
         t005: Label 'Type in the discount % that you want to give on each of the current sales lines.';
     begin
         Context := Context.ProtocolContext(MethodName_PushDiscountPct);
@@ -4811,7 +4811,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
 
     local procedure PushLineDiscountAmount()
     var
-        Context: DotNet ProtocolContext;
+        Context: DotNet npNetProtocolContext;
         t024: Label 'Type in the discount amount that you want to give on the current sales line.';
     begin
         Context := Context.ProtocolContext(MethodName_PushLineDiscountAmount);
@@ -4821,7 +4821,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
 
     local procedure PushLineUnitPrice()
     var
-        Context: DotNet ProtocolContext;
+        Context: DotNet npNetProtocolContext;
         t015: Label 'Type in unit price.';
     begin
         Context := Context.ProtocolContext(MethodName_PushLineUnitPrice);
@@ -4831,7 +4831,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
 
     local procedure PushRegisterChange()
     var
-        Context: DotNet ProtocolContext;
+        Context: DotNet npNetProtocolContext;
         t017: Label 'Change to register number:';
     begin
         CopyValidering := Validering;
@@ -4843,7 +4843,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
 
     local procedure PushSaleReverse()
     var
-        Context: DotNet ProtocolContext;
+        Context: DotNet npNetProtocolContext;
         Salesperson: Record "Salesperson/Purchaser";
         t028: Label '%1 does not have the rights to return sales ticket. Make a return sale instead.';
     begin
@@ -4863,7 +4863,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
     var
         Salesperson: Record "Salesperson/Purchaser";
         t028: Label '%1 does not have the rights to return sales ticket. Make a return sale instead.';
-        Context: DotNet ProtocolContext;
+        Context: DotNet npNetProtocolContext;
     begin
         Context := Context.ProtocolContext(MethodName_PushSaleAnnull);
         Context.MethodArguments.Add('__FuncStr',LastFuncStr);
@@ -4878,7 +4878,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
     local procedure PushRegisterOpen()
     var
         t030: Label 'Open register drawer. This is locked by a password.';
-        Context: DotNet ProtocolContext;
+        Context: DotNet npNetProtocolContext;
     begin
         CopyValidering := Validering;
         if RetailSetup."Open Register Password" <> '' then begin
@@ -4888,7 +4888,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
           Complete_PushRegisterOpen(Validering);
     end;
 
-    procedure ProcessNumpadResponse(Content: DotNet NumPadResponseContent)
+    procedure ProcessNumpadResponse(Content: DotNet npNetNumPadResponseContent)
     begin
         case Content.Context.MethodName of
           MethodName_PushQuantity:            Complete_PushQuantity(UI.ParseDecimal(Content.Text),Content.Context.MethodArguments.Item('Factor'));
@@ -4918,7 +4918,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
         ReturnReason: Record "Return Reason";
         t001: Label 'You have typed a too big number! (%1)';
         t033: Label 'You must choose a return reason.';
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         CopyValidering := Validering;
         Validering := '';
@@ -5185,10 +5185,10 @@ codeunit 6014630 "Touch - Sale POS (Web)"
 
     local procedure PushTotalDiscountPctVar()
     var
-        Context: DotNet ProtocolContext;
+        Context: DotNet npNetProtocolContext;
         PresetDiscount: Decimal;
         MenuLines1: Record "Touch Screen - Menu Lines";
-        MarshalStatus: DotNet MarshalStatus;
+        MarshalStatus: DotNet npNetMarshalStatus;
     begin
         //-NPR5.32 [274462]
         SaleLinePOSObject.CalculateBalance;
@@ -5199,10 +5199,10 @@ codeunit 6014630 "Touch - Sale POS (Web)"
 
     local procedure PushLineDiscountPctVar()
     var
-        Context: DotNet ProtocolContext;
+        Context: DotNet npNetProtocolContext;
         PresetDiscount: Decimal;
         MenuLines1: Record "Touch Screen - Menu Lines";
-        MarshalStatus: DotNet MarshalStatus;
+        MarshalStatus: DotNet npNetMarshalStatus;
     begin
         //-NPR5.32 [274462]
         Evaluate(PresetDiscount, This.Parameters);

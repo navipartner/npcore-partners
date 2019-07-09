@@ -45,7 +45,7 @@ codeunit 6151418 "Magento Pmt. Dibs Mgt."
         SalesHeader: Record "Sales Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         PaymentGateway: Record "Magento Payment Gateway";
-        HttpWebRequest: DotNet HttpWebRequest;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
         CaptureString: Text;
         MD5Key: Text;
     begin
@@ -89,22 +89,22 @@ codeunit 6151418 "Magento Pmt. Dibs Mgt."
 
     procedure CalcMD5Key(CaptureString: Text;PaymentGateway: Record "Magento Payment Gateway"): Text
     var
-        Encoding: DotNet Encoding;
-        MD5: DotNet MD5CryptoServiceProvider;
+        Encoding: DotNet npNetEncoding;
+        MD5: DotNet npNetMD5CryptoServiceProvider;
     begin
         MD5 := MD5.MD5CryptoServiceProvider();
         exit(MD5.ComputeHash(Encoding.UTF8.GetBytes(PaymentGateway."Api Password" + MD5.ComputeHash(Encoding.UTF8.GetBytes(PaymentGateway."Api Username" + CaptureString)).ToString())).ToString());
     end;
 
-    local procedure CatchErrorMessage(HttpWebRequest: DotNet HttpWebRequest)
+    local procedure CatchErrorMessage(HttpWebRequest: DotNet npNetHttpWebRequest)
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebResponse: DotNet HttpWebResponse;
-        HttpWebException: DotNet WebException;
-        XmlDoc: DotNet XmlDocument;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        HttpWebException: DotNet npNetWebException;
+        XmlDoc: DotNet npNetXmlDocument;
         Text000: Label 'While trying to connect to DIBS an error appeared\%1';
-        StreamReader: DotNet StreamReader;
-        Stream: DotNet Stream;
+        StreamReader: DotNet npNetStreamReader;
+        Stream: DotNet npNetStream;
     begin
         XmlDoc := XmlDoc.XmlDocument;
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,HttpWebException) then begin
@@ -138,7 +138,7 @@ codeunit 6151418 "Magento Pmt. Dibs Mgt."
         //+MAG2.01 [250694]
     end;
 
-    local procedure SetupWebRequest(ApiUrl: Text;var HttpWebRequest: DotNet HttpWebRequest;PaymentLine: Record "Magento Payment Line";RequestMethod: Code[10])
+    local procedure SetupWebRequest(ApiUrl: Text;var HttpWebRequest: DotNet npNetHttpWebRequest;PaymentLine: Record "Magento Payment Line";RequestMethod: Code[10])
     begin
         HttpWebRequest := HttpWebRequest.Create(ApiUrl);
         HttpWebRequest.Timeout := 1000 * 60 * 5;
@@ -146,19 +146,19 @@ codeunit 6151418 "Magento Pmt. Dibs Mgt."
         HttpWebRequest.ContentType := 'application/x-www-form-urlencoded';
     end;
 
-    local procedure SendWebRequest(HttpWebRequest: DotNet HttpWebRequest;CaptureString: Text)
+    local procedure SendWebRequest(HttpWebRequest: DotNet npNetHttpWebRequest;CaptureString: Text)
     var
-        DotNetArray: DotNet Array;
+        DotNetArray: DotNet npNetArray;
     begin
         SerializeObject(CaptureString,DotNetArray);
         HttpWebRequest.GetRequestStream().Write(DotNetArray,0,DotNetArray.Length);
         CatchErrorMessage(HttpWebRequest);
     end;
 
-    local procedure SerializeObject(CaptureString: Text;var DotNetArray: DotNet Array)
+    local procedure SerializeObject(CaptureString: Text;var DotNetArray: DotNet npNetArray)
     var
-        Encoding: DotNet Encoding;
-        Type: DotNet Type;
+        Encoding: DotNet npNetEncoding;
+        Type: DotNet npNetType;
     begin
         Type := Type.GetType('System.Byte',false);
         DotNetArray.CreateInstance(Type,1);

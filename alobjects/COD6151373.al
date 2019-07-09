@@ -146,8 +146,8 @@ codeunit 6151373 "CS Helper Functions"
 
     procedure CreateOfflineRfidDataDelta(DeviceId: Code[20]) Result: Text
     var
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
         CSRfidItemGroups: Query "CS Rfid Item Groups";
         CSRfidItems: Query "CS Rfid Items";
         CSRfidItemTags: Query "CS Rfid Item Tags";
@@ -348,8 +348,8 @@ codeunit 6151373 "CS Helper Functions"
         ItemGroup: Record "Item Group";
         MagentoPicture: Record "Magento Picture";
         MagentoPictureLink: Record "Magento Picture Link";
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
         CSSetup: Record "CS Setup";
         StockTakeWorksheet: Record "Stock-Take Worksheet";
         StockTakeWorkSheetLine: Record "Stock-Take Worksheet Line";

@@ -18,7 +18,7 @@ codeunit 6151092 "Nc RapidConnect Import Mgt."
     var
         NcRapidConnectSetup: Record "Nc RapidConnect Setup";
         DataLogMgt: Codeunit "Data Log Management";
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
         XmlLoaded: Boolean;
         TableIdFilter: Text;
     begin
@@ -146,13 +146,13 @@ codeunit 6151092 "Nc RapidConnect Import Mgt."
     var
         XmlDomMgt: Codeunit "XML DOM Management";
         InStream: InStream;
-        CellData: DotNet CellData;
-        Enumerator: DotNet IEnumerator;
-        WrkBookReader: DotNet WorkbookReader;
-        WrkBookPart: DotNet WorkbookPart;
-        WrkBookWriter: DotNet WorkbookWriter;
-        WrkShtReader: DotNet WorksheetReader;
-        WrkShtWriter: DotNet WorksheetWriter;
+        CellData: DotNet npNetCellData;
+        Enumerator: DotNet npNetIEnumerator;
+        WrkBookReader: DotNet npNetWorkbookReader;
+        WrkBookPart: DotNet npNetWorkbookPart;
+        WrkBookWriter: DotNet npNetWorkbookWriter;
+        WrkShtReader: DotNet npNetWorksheetReader;
+        WrkShtWriter: DotNet npNetWorksheetWriter;
         SheetCount: Integer;
         WrkSheetId: Integer;
     begin
@@ -196,15 +196,15 @@ codeunit 6151092 "Nc RapidConnect Import Mgt."
     begin
     end;
 
-    local procedure ImportXmlPackage(NcRapidConnectSetup: Record "Nc RapidConnect Setup";var XmlDoc: DotNet XmlDocument)
+    local procedure ImportXmlPackage(NcRapidConnectSetup: Record "Nc RapidConnect Setup";var XmlDoc: DotNet npNetXmlDocument)
     var
         ConfigPackageTable: Record "Config. Package Table";
         ConfigPackageRecord: Record "Config. Package Record";
         ConfigPackageData: Record "Config. Package Data";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        XmlDocElement: DotNet XmlElement;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
+        XmlDocElement: DotNet npNetXmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
         PackageNo: Integer;
         TableId: Integer;
     begin
@@ -278,11 +278,11 @@ codeunit 6151092 "Nc RapidConnect Import Mgt."
         //+NC2.17 [335927]
     end;
 
-    local procedure GetTableIdFilter(var XmlDoc: DotNet XmlDocument) TableIdFilter: Text
+    local procedure GetTableIdFilter(var XmlDoc: DotNet npNetXmlDocument) TableIdFilter: Text
     var
         TempInteger: Record "Integer" temporary;
-        XmlDocElement: DotNet XmlElement;
-        XmlElement: DotNet XmlElement;
+        XmlDocElement: DotNet npNetXmlElement;
+        XmlElement: DotNet npNetXmlElement;
         TableId: Integer;
     begin
         //-NC2.17 [335927]
@@ -311,7 +311,7 @@ codeunit 6151092 "Nc RapidConnect Import Mgt."
     end;
 
     [TryFunction]
-    local procedure TryLoadXml(var NcImportEntry: Record "Nc Import Entry";var XmlDoc: DotNet XmlDocument)
+    local procedure TryLoadXml(var NcImportEntry: Record "Nc Import Entry";var XmlDoc: DotNet npNetXmlDocument)
     begin
         //-NC2.17 [335927]
         if not NcImportEntry.LoadXmlDoc(XmlDoc) then

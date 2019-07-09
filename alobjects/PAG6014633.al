@@ -94,7 +94,7 @@ page 6014633 "GCP Ticket Options"
         TempRetailList: Record "Retail List" temporary;
         ShowValue: Text;
         GCPMgt: Codeunit "GCP Mgt.";
-        JObject: DotNet JObject;
+        JObject: DotNet npNetJObject;
         i: Integer;
     begin
         case Attribute of
@@ -140,7 +140,7 @@ page 6014633 "GCP Ticket Options"
     procedure LoadExistingTicketJSON(JSON: Text)
     var
         GCPMgt: Codeunit "GCP Mgt.";
-        JObject: DotNet JObject;
+        JObject: DotNet npNetJObject;
     begin
         //Restore already existing blob values to page view. Only modifies blob again if user changes any value.
         if GCPMgt.TryParseJSON(JSON, 'print.color', JObject) then begin
@@ -164,10 +164,10 @@ page 6014633 "GCP Ticket Options"
         end;
     end;
 
-    local procedure FormatTicketAttributeJSON(Attribute: Text;var JObject: DotNet JObject) JSON: Text
+    local procedure FormatTicketAttributeJSON(Attribute: Text;var JObject: DotNet npNetJObject) JSON: Text
     var
         GCPMgt: Codeunit "GCP Mgt.";
-        AttrJProperty: DotNet JProperty;
+        AttrJProperty: DotNet npNetJProperty;
         i: Integer;
     begin
         //Elements when retrieving printer info is often a superset of elements required in CJT. This function will format correctly as per the required fields:

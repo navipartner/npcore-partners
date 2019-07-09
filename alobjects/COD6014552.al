@@ -747,7 +747,7 @@ codeunit 6014552 "Touch - Sales Line POS"
         RecRef.GetTable(SaleLinePOSGlobal);
     end;
 
-    procedure GetSalesLines(var DotNetDataTable: DotNet DataTable)
+    procedure GetSalesLines(var DotNetDataTable: DotNet npNetDataTable)
     var
         RefSalesLinePOS: RecordRef;
         DotNetTableToolkit: Codeunit "NavTable To DotNet Table Tool";
@@ -827,7 +827,7 @@ codeunit 6014552 "Touch - Sales Line POS"
         end;
     end;
 
-    procedure GetSalesLinesWeb(DGrid: DotNet DataGrid;var LastLineTemp: Record "Sale Line POS" temporary)
+    procedure GetSalesLinesWeb(DGrid: DotNet npNetDataGrid;var LastLineTemp: Record "Sale Line POS" temporary)
     var
         Register: Record Register;
         SaleLinePOS: Record "Sale Line POS";
@@ -835,8 +835,8 @@ codeunit 6014552 "Touch - Sales Line POS"
         SaleLinePOSNewTemp: Record "Sale Line POS" temporary;
         RecRef: RecordRef;
         POSWebUtilities: Codeunit "POS Web Utilities";
-        DeletedGrid: DotNet DataGrid;
-        Row: DotNet Dictionary_Of_T_U;
+        DeletedGrid: DotNet npNetDataGrid;
+        Row: DotNet npNetDictionary_Of_T_U;
         Direction: Text;
         POSViewProfile: Record "POS View Profile";
     begin

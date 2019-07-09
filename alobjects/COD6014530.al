@@ -39,11 +39,11 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
     var
         Err001: Label 'Terminal amount is 0';
         POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
-        ExpectedResponseType: DotNet Type;
+        ExpectedResponseType: DotNet npNetType;
         ExpectedResponseId: Guid;
         ProtocolManagerId: Guid;
-        QueuedRequests: DotNet Stack;
-        QueuedResponseTypes: DotNet Stack;
+        QueuedRequests: DotNet npNetStack;
+        QueuedResponseTypes: DotNet npNetStack;
         PBSGiftVoucherFunctions: Codeunit "PBS Gift Voucher Functions";
         Util: Codeunit Utility;
         ConnectionProfileMgt: Codeunit "Connection Profile Management";
@@ -88,10 +88,10 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
 
     local procedure ProcessSignal(var TempBlob: Record TempBlob)
     var
-        Signal: DotNet Signal;
-        StartSignal: DotNet StartSession;
-        QueryCloseSignal: DotNet QueryClosePage;
-        Response: DotNet MessageResponse;
+        Signal: DotNet npNetSignal;
+        StartSignal: DotNet npNetStartSession;
+        QueryCloseSignal: DotNet npNetQueryClosePage;
+        Response: DotNet npNetMessageResponse;
     begin
         POSDeviceProxyManager.DeserializeObject(Signal,TempBlob);
         case true of
@@ -116,9 +116,9 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
 
     local procedure Start(ProtocolManagerIdIn: Guid)
     var
-        State: DotNet State;
-        GatewayRequest: DotNet PaymentGatewayProcessRequest;
-        VoidResponse: DotNet VoidResponse;
+        State: DotNet npNetState;
+        GatewayRequest: DotNet npNetPaymentGatewayProcessRequest;
+        VoidResponse: DotNet npNetVoidResponse;
     begin
         ProtocolManagerId := ProtocolManagerIdIn;
 
@@ -153,7 +153,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
             ProtocolManagerId,GatewayRequest));
     end;
 
-    local procedure MessageResponse(Envelope: DotNet ResponseEnvelope)
+    local procedure MessageResponse(Envelope: DotNet npNetResponseEnvelope)
     begin
         if Envelope.ResponseTypeName <> Format(ExpectedResponseType) then
           Error('Unknown response type: %1 (expected %2)',Envelope.ResponseTypeName,Format(ExpectedResponseType));
@@ -169,7 +169,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
     end;
 
-    local procedure AwaitResponse(Type: DotNet Type;Id: Guid)
+    local procedure AwaitResponse(Type: DotNet npNetType;Id: Guid)
     begin
         ExpectedResponseType := Type;
         ExpectedResponseId := Id;
@@ -303,7 +303,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
 
     local procedure CloseForm(Data: Text)
     var
-        State: DotNet State;
+        State: DotNet npNetState;
     begin
         State := State.Deserialize(Data);
 
@@ -319,7 +319,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         SalePOS: Record "Sale POS";
         RetailSalesLineCode: Codeunit "Retail Sales Line Code";
         CreditCardHelper: Codeunit "Credit Card Protocol Helper";
-        State: DotNet State;
+        State: DotNet npNetState;
         PaymentNo: Code[10];
     begin
         State := State.Deserialize(Data);
@@ -360,7 +360,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
     local procedure InsertSaleLineFee(Data: Text)
     var
         SaleLinePOSFee: Record "Sale Line POS";
-        State: DotNet State;
+        State: DotNet npNetState;
         LastLineNo: Integer;
     begin
         State := State.Deserialize(Data);
@@ -412,7 +412,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
 
     local procedure CheckTransactionFromCheckResult(Data: Text;var ReturnData: Text)
     var
-        State: DotNet State;
+        State: DotNet npNetState;
         CreditCardTransaction: Record "Credit Card Transaction";
     begin
         with CreditCardTransaction do begin
@@ -491,8 +491,8 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
 
     local procedure ReadReceipt(Data: Text)
     var
-        State: DotNet State;
-        Lines: DotNet Array;
+        State: DotNet npNetState;
+        Lines: DotNet npNetArray;
         Ekspedition: Record "Sale POS";
         RecieptLine: Text[100];
         Register: Record Register;
@@ -587,16 +587,16 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
     begin
     end;
 
-    local procedure DeserializeState(Data: Text;var State: DotNet State)
+    local procedure DeserializeState(Data: Text;var State: DotNet npNetState)
     var
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
     begin
         State := JsonConvert.DeserializeObject(Data,GetDotNetType(State));
     end;
 
     local procedure SerializeJson("Object": Variant): Text
     var
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
     begin
         exit(JsonConvert.SerializeObject(Object));
     end;

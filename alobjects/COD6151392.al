@@ -30,9 +30,9 @@ codeunit 6151392 "CS UI Pick Inv. List"
         XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "CS Communication";
         CSMgt: Codeunit "CS Management";
-        ReturnedNode: DotNet XmlNode;
-        DOMxmlin: DotNet XmlDocument;
-        RootNode: DotNet XmlNode;
+        ReturnedNode: DotNet npNetXmlNode;
+        DOMxmlin: DotNet npNetXmlDocument;
+        RootNode: DotNet npNetXmlNode;
         TextValue: Text[250];
         CSUserId: Text[250];
         WhseEmpId: Text[250];

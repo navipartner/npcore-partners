@@ -172,7 +172,7 @@ page 6151510 "Nc Task Output List"
         Line: Text;
         LF: Char;
         CR: Char;
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
     begin
         ResponseText := '';
         if not Response.HasValue then

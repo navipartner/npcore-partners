@@ -21,10 +21,10 @@ page 6060145 "MM Member Info Capture Camera"
                 trigger SaveCompleted(HTML: Text)
                 var
                     OutS: OutStream;
-                    StreamWriter: DotNet StreamWriter;
-                    Convert: DotNet Convert;
-                    Bytes: DotNet Array;
-                    MemoryStream: DotNet MemoryStream;
+                    StreamWriter: DotNet npNetStreamWriter;
+                    Convert: DotNet npNetConvert;
+                    Bytes: DotNet npNetArray;
+                    MemoryStream: DotNet npNetMemoryStream;
                 begin
                     if HTML <> Txt then begin
                       Error(HTML);

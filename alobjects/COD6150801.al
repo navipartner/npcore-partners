@@ -69,7 +69,7 @@ codeunit 6150801 "POS Action - Customer"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         POSSale: Codeunit "POS Sale";
@@ -83,7 +83,7 @@ codeunit 6150801 "POS Action - Customer"
         ReturnAmount: Decimal;
         PaidAmount: Decimal;
         SubTotal: Decimal;
-        View: DotNet View0;
+        View: DotNet npNetView0;
         TempSalesHeader: Record "Sales Header" temporary;
     begin
         if not Action.IsThisAction(ActionCode) then
@@ -132,14 +132,14 @@ codeunit 6150801 "POS Action - Customer"
     begin
     end;
 
-    procedure SetCustomer(var SalePOS: Record "Sale POS";POSSession: Codeunit "POS Session";POSSale: Codeunit "POS Sale";View: DotNet View0;FrontEnd: Codeunit "POS Front End Management")
+    procedure SetCustomer(var SalePOS: Record "Sale POS";POSSession: Codeunit "POS Session";POSSale: Codeunit "POS Sale";View: DotNet npNetView0;FrontEnd: Codeunit "POS Front End Management")
     var
         SaleLinePOS: Record "Sale Line POS";
         FormCode: Codeunit "Retail Form Code";
         RetailSetup: Record "Retail Setup";
         TempSalesHeader: Record "Sales Header" temporary;
         Register: Record Register;
-        ViewType: DotNet ViewType;
+        ViewType: DotNet npNetViewType;
         IsCashSale: Boolean;
         Amount: Decimal;
         PaymentLinePOSObject: Codeunit "Touch - Payment Line POS";
@@ -226,10 +226,10 @@ codeunit 6150801 "POS Action - Customer"
           Error(DebitSaleChangeCancelled);
     end;
 
-    procedure SetContact(var SalePOS: Record "Sale POS";POSSession: Codeunit "POS Session";POSSale: Codeunit "POS Sale";View: DotNet View0)
+    procedure SetContact(var SalePOS: Record "Sale POS";POSSession: Codeunit "POS Session";POSSale: Codeunit "POS Sale";View: DotNet npNetView0)
     var
         Register: Record Register;
-        ViewType: DotNet ViewType;
+        ViewType: DotNet npNetViewType;
         IsCashSale: Boolean;
         Amount: Decimal;
         PaymentLinePOSObject: Codeunit "Touch - Payment Line POS";
@@ -367,7 +367,7 @@ codeunit 6150801 "POS Action - Customer"
         end;
     end;
 
-    local procedure SetSamplingGet(var SalePOS: Record "Sale POS";POSSession: Codeunit "POS Session";POSSale: Codeunit "POS Sale";View: DotNet View0;FrontEnd: Codeunit "POS Front End Management")
+    local procedure SetSamplingGet(var SalePOS: Record "Sale POS";POSSession: Codeunit "POS Session";POSSale: Codeunit "POS Sale";View: DotNet npNetView0;FrontEnd: Codeunit "POS Front End Management")
     var
         RetailDocumentHandling: Codeunit "Retail Document Handling";
         POSSaleLine: Codeunit "POS Sale Line";

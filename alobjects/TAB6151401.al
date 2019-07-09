@@ -507,7 +507,7 @@ table 6151401 "Magento Setup"
 
     local procedure UpdateApi()
     var
-        FormsAuthentication: DotNet FormsAuthentication;
+        FormsAuthentication: DotNet npNetFormsAuthentication;
     begin
         //-MAG2.20 [320423]
         case "Magento Version" of
@@ -527,8 +527,8 @@ table 6151401 "Magento Setup"
 
     procedure GetBasicAuthInfo(): Text
     var
-        Convert: DotNet Convert;
-        Encoding: DotNet Encoding;
+        Convert: DotNet npNetConvert;
+        Encoding: DotNet npNetEncoding;
     begin
         //-MAG2.00
         exit(Convert.ToBase64String(Encoding.UTF8.GetBytes(GetApiUsername() + ':' + "Api Password")));
@@ -537,7 +537,7 @@ table 6151401 "Magento Setup"
 
     procedure GetCredentialsHash(): Text
     var
-        FormsAuthentication: DotNet FormsAuthentication;
+        FormsAuthentication: DotNet npNetFormsAuthentication;
     begin
         //-MAG2.00
         exit(LowerCase(FormsAuthentication.HashPasswordForStoringInConfigFile(GetApiUsername() + "Api Password" + 'D3W7k5pd7Pn64ctn25ng91ZkSvyDnjo2','MD5')));

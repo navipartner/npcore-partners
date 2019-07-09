@@ -17,20 +17,20 @@ codeunit 6184482 "Pepper Trx Transaction"
 
     var
         POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
-        ExpectedResponseType: DotNet Type;
+        ExpectedResponseType: DotNet npNetType;
         ExpectedResponseId: Guid;
         ProtocolManagerId: Guid;
         ProtocolStage: Integer;
-        QueuedRequests: DotNet Stack;
-        QueuedResponseTypes: DotNet Stack;
+        QueuedRequests: DotNet npNetStack;
+        QueuedResponseTypes: DotNet npNetStack;
         "--RequestSpecific": Integer;
         InitializedRequest: Boolean;
-        TransactionRequest: DotNet TransactionRequest;
-        TransactionResponse: DotNet TransactionResponse;
+        TransactionRequest: DotNet npNetTransactionRequest;
+        TransactionResponse: DotNet npNetTransactionResponse;
         LastRestCode: Integer;
-        TrxResult: DotNet TrxResult;
+        TrxResult: DotNet npNetTrxResult;
         NEGATIVE_NOT_ALLOWED: Label 'Negative amount %1 is not allowed in a Pepper capture transaction.';
-        Labels: DotNet ProcessLabels;
+        Labels: DotNet npNetProcessLabels;
         PepperTerminalCaptions: Codeunit "Pepper Terminal Captions";
 
     local procedure "---Protocol functions"()
@@ -39,10 +39,10 @@ codeunit 6184482 "Pepper Trx Transaction"
 
     local procedure ProcessSignal(var TempBlob: Record TempBlob)
     var
-        Signal: DotNet Signal;
-        StartSignal: DotNet StartSession;
-        QueryCloseSignal: DotNet QueryClosePage;
-        Response: DotNet MessageResponse;
+        Signal: DotNet npNetSignal;
+        StartSignal: DotNet npNetStartSession;
+        QueryCloseSignal: DotNet npNetQueryClosePage;
+        Response: DotNet npNetMessageResponse;
     begin
 
         POSDeviceProxyManager.DeserializeObject(Signal,TempBlob);
@@ -69,7 +69,7 @@ codeunit 6184482 "Pepper Trx Transaction"
     local procedure Start(ProtocolManagerIdIn: Guid)
     var
         WebClientDependency: Record "Web Client Dependency";
-        VoidResponse: DotNet VoidResponse;
+        VoidResponse: DotNet npNetVoidResponse;
     begin
 
         ProtocolManagerId := ProtocolManagerIdIn;
@@ -80,7 +80,7 @@ codeunit 6184482 "Pepper Trx Transaction"
              ProtocolManagerId, TransactionRequest));
     end;
 
-    local procedure MessageResponse(Envelope: DotNet ResponseEnvelope)
+    local procedure MessageResponse(Envelope: DotNet npNetResponseEnvelope)
     begin
 
         if Envelope.ResponseTypeName <> Format(ExpectedResponseType) then
@@ -99,7 +99,7 @@ codeunit 6184482 "Pepper Trx Transaction"
         POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
     end;
 
-    local procedure AwaitResponse(Type: DotNet Type;Id: Guid)
+    local procedure AwaitResponse(Type: DotNet npNetType;Id: Guid)
     begin
 
         ExpectedResponseType := Type;
@@ -154,7 +154,7 @@ codeunit 6184482 "Pepper Trx Transaction"
 
     procedure SetRecovery() SuccessCode: Integer
     var
-        TrxParam: DotNet TrxParam;
+        TrxParam: DotNet npNetTrxParam;
     begin
         if not InitializedRequest then
           InitializeProtocol();
@@ -178,7 +178,7 @@ codeunit 6184482 "Pepper Trx Transaction"
 
     procedure SetPaymentOfGoods(OriginalAmountInDecimal: Decimal;PepperAmountInCents: Integer;CashBackAmountInCents: Integer;Currency: Code[10];TrackPresence: Integer;CardInformation: Text[40];TrxRefNbr: Text[12];MbxPosRefNbr: Text[20];Offline: Boolean) SuccessCode: Integer
     var
-        TrxParam: DotNet TrxParam;
+        TrxParam: DotNet npNetTrxParam;
     begin
         if not InitializedRequest then
           InitializeProtocol();
@@ -224,7 +224,7 @@ codeunit 6184482 "Pepper Trx Transaction"
 
     procedure SetVoidPaymentOfGoods(OriginalAmountInDecimal: Decimal;PepperAmountInCents: Integer;Currency: Code[10];TrxRefNbr: Text[12]) SuccessCode: Integer
     var
-        TrxParam: DotNet TrxParam;
+        TrxParam: DotNet npNetTrxParam;
     begin
         if not InitializedRequest then
           InitializeProtocol();
@@ -252,7 +252,7 @@ codeunit 6184482 "Pepper Trx Transaction"
 
     procedure SetVoidRefund(OriginalAmountInDecimal: Decimal;PepperAmountInCents: Integer;Currency: Code[10];TrxRefNbr: Text[12]) SuccessCode: Integer
     var
-        TrxParam: DotNet TrxParam;
+        TrxParam: DotNet npNetTrxParam;
     begin
         //-NPR5.34 [268698]
         if not InitializedRequest then
@@ -282,7 +282,7 @@ codeunit 6184482 "Pepper Trx Transaction"
 
     procedure SetRefund(OriginalAmountInDecimal: Decimal;PepperAmountInCents: Integer;Currency: Code[10];TrxRefNbr: Text[12]) SuccessCode: Integer
     var
-        TrxParam: DotNet TrxParam;
+        TrxParam: DotNet npNetTrxParam;
     begin
         if not InitializedRequest then
           InitializeProtocol();

@@ -1145,10 +1145,10 @@ codeunit 6014555 "NPR Attribute Management"
     var
         NPRAttributeFilter: Report "NPR Attribute Filter";
         XMLDOMMgt: Codeunit "XML DOM Management";
-        XmlAttribute: DotNet XmlAttribute;
-        XmlDoc: DotNet XmlDocument;
-        XmlNode: DotNet XmlNode;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlAttribute: DotNet npNetXmlAttribute;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlNode: DotNet npNetXmlNode;
+        XmlNodeList: DotNet npNetXmlNodeList;
         Parameters: Text;
         IsNPRAttributeValueSet: Boolean;
     begin

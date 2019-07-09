@@ -18,10 +18,10 @@ codeunit 6014591 "Network Test Library"
 
     local procedure Ping()
     var
-        Ping: DotNet Ping;
-        PingReply: DotNet PingReply;
-        IPStatus: DotNet IPStatus;
-        Uri: DotNet Uri;
+        Ping: DotNet npNetPing;
+        PingReply: DotNet npNetPingReply;
+        IPStatus: DotNet npNetIPStatus;
+        Uri: DotNet npNetUri;
         Url: Text;
     begin
         Uri  := Uri.Uri(ServerAddress);
@@ -34,9 +34,9 @@ codeunit 6014591 "Network Test Library"
 
     local procedure InvokeAddress() ReturnStatus: Integer
     var
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        RequestStream: DotNet StreamWriter;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        RequestStream: DotNet npNetStreamWriter;
     begin
         // Create XMLHTTP and SEND
         HttpWebRequest        := HttpWebRequest.Create(ServerAddress);
@@ -51,9 +51,9 @@ codeunit 6014591 "Network Test Library"
         if HttpWebResponse.StatusCode <> 200 then Error('Bad response from %1 : %2.',ServerAddress,HttpWebResponse.StatusCode);
     end;
 
-    local procedure SetCredentials(var HttpWebRequest: DotNet HttpWebRequest)
+    local procedure SetCredentials(var HttpWebRequest: DotNet npNetHttpWebRequest)
     var
-        NetworkCredentials: DotNet NetworkCredential;
+        NetworkCredentials: DotNet npNetNetworkCredential;
     begin
         if ClientUsername <> '' then begin
           NetworkCredentials := NetworkCredentials.NetworkCredential();

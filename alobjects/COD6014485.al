@@ -97,12 +97,12 @@ codeunit 6014485 "PBS Gift Voucher Functions"
     procedure GetBalance(Card: Code[19];var ExpiryDate: Text[30]) Balance: Integer
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElement2: DotNet XmlElement;
-        WebException: DotNet WebException;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
         LastErrorMessage: Text;
         Response: Text;

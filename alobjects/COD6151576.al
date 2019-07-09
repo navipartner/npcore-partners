@@ -22,8 +22,8 @@ codeunit 6151576 "AF API - Msg Service"
     procedure CreateSMSBodyBySalesTicket("Sales Ticket No.": Code[20]): Text
     var
         AFSetup: Record "AF Setup";
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
         TextString: Text;
         AFHelperFunctions: Codeunit "AF Helper Functions";
     begin
@@ -62,8 +62,8 @@ codeunit 6151576 "AF API - Msg Service"
     procedure CreateSMSBody(RecID: RecordID;ReportID: Integer;Filename: Text): Text
     var
         AFSetup: Record "AF Setup";
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
         TextString: Text;
         AFHelperFunctions: Codeunit "AF Helper Functions";
         RecRef: RecordRef;
@@ -118,20 +118,20 @@ codeunit 6151576 "AF API - Msg Service"
 
     procedure PostSiteInfo(var AFSetup: Record "AF Setup";SiteAction: Option Create,Update,Delete)
     var
-        Parameters: DotNet Dictionary_Of_T_U;
+        Parameters: DotNet npNetDictionary_Of_T_U;
         AFManagement: Codeunit "AF Management";
         AFHelperFunctions: Codeunit "AF Helper Functions";
-        HttpResponseMessage: DotNet HttpResponseMessage;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
         Path: Text;
         Window: Dialog;
         OutStr: OutStream;
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
-        StringContent: DotNet StringContent;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
+        StringContent: DotNet npNetStringContent;
         Ostream: OutStream;
         TextString: Text;
         Status: Boolean;
-        Encoding: DotNet Encoding;
+        Encoding: DotNet npNetEncoding;
         SiteUrl: Text;
         SiteActionInt: Integer;
     begin
@@ -217,9 +217,9 @@ codeunit 6151576 "AF API - Msg Service"
 
     procedure GetPDFSiteImage(var AFSetup: Record "AF Setup";Type: Option Image,Ico) Base64String: Text
     var
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
     begin
         AFSetup.CalcFields("Msg Service - Image","Msg Service - Icon");
@@ -249,16 +249,16 @@ codeunit 6151576 "AF API - Msg Service"
 
     local procedure EncryptString(toEncrypt: Text;encryptionKey: Text;useHashing: Boolean): Text
     var
-        keyArray: DotNet Array;
-        toEncryptArray: DotNet Array;
-        UTF8Encoding: DotNet UTF8Encoding;
-        tdes: DotNet TripleDESCryptoServiceProvider;
-        hashmd5: DotNet MD5CryptoServiceProvider;
-        cTransform: DotNet ICryptoTransform;
-        resultArray: DotNet Array;
-        Convert: DotNet Convert;
-        CipherModeENUM: DotNet CipherMode;
-        PaddingModeENUM: DotNet PaddingMode;
+        keyArray: DotNet npNetArray;
+        toEncryptArray: DotNet npNetArray;
+        UTF8Encoding: DotNet npNetUTF8Encoding;
+        tdes: DotNet npNetTripleDESCryptoServiceProvider;
+        hashmd5: DotNet npNetMD5CryptoServiceProvider;
+        cTransform: DotNet npNetICryptoTransform;
+        resultArray: DotNet npNetArray;
+        Convert: DotNet npNetConvert;
+        CipherModeENUM: DotNet npNetCipherMode;
+        PaddingModeENUM: DotNet npNetPaddingMode;
     begin
         if (toEncrypt = '') or (encryptionKey = '') then
           exit;
@@ -286,16 +286,16 @@ codeunit 6151576 "AF API - Msg Service"
 
     local procedure DecryptString(cipherString: Text;encryptionKey: Text;useHashing: Boolean): Text
     var
-        keyArray: DotNet Array;
-        toEncryptArray: DotNet Array;
-        UTF8Encoding: DotNet UTF8Encoding;
-        tdes: DotNet TripleDESCryptoServiceProvider;
-        hashmd5: DotNet MD5CryptoServiceProvider;
-        cTransform: DotNet ICryptoTransform;
-        resultArray: DotNet Array;
-        Convert: DotNet Convert;
-        CipherModeENUM: DotNet CipherMode;
-        PaddingModeENUM: DotNet PaddingMode;
+        keyArray: DotNet npNetArray;
+        toEncryptArray: DotNet npNetArray;
+        UTF8Encoding: DotNet npNetUTF8Encoding;
+        tdes: DotNet npNetTripleDESCryptoServiceProvider;
+        hashmd5: DotNet npNetMD5CryptoServiceProvider;
+        cTransform: DotNet npNetICryptoTransform;
+        resultArray: DotNet npNetArray;
+        Convert: DotNet npNetConvert;
+        CipherModeENUM: DotNet npNetCipherMode;
+        PaddingModeENUM: DotNet npNetPaddingMode;
     begin
         if (cipherString = '') or (encryptionKey = '') then
           exit;
@@ -323,14 +323,14 @@ codeunit 6151576 "AF API - Msg Service"
 
     local procedure UrlEncodeString(TextToEncode: Text): Text
     var
-        WebUtility: DotNet WebUtility;
+        WebUtility: DotNet npNetWebUtility;
     begin
         exit(WebUtility.UrlEncode(TextToEncode));
     end;
 
     local procedure UrlDecodeString(TextToDecode: Text): Text
     var
-        WebUtility: DotNet WebUtility;
+        WebUtility: DotNet npNetWebUtility;
     begin
         exit(WebUtility.UrlDecode(TextToDecode));
     end;
@@ -372,20 +372,20 @@ codeunit 6151576 "AF API - Msg Service"
 
     procedure CreateSite(var AFSetup: Record "AF Setup")
     var
-        Parameters: DotNet Dictionary_Of_T_U;
+        Parameters: DotNet npNetDictionary_Of_T_U;
         AFManagement: Codeunit "AF Management";
         AFHelperFunctions: Codeunit "AF Helper Functions";
-        HttpResponseMessage: DotNet HttpResponseMessage;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
         Path: Text;
         Window: Dialog;
         OutStr: OutStream;
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
-        StringContent: DotNet StringContent;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
+        StringContent: DotNet npNetStringContent;
         Ostream: OutStream;
         TextString: Text;
         Status: Boolean;
-        Encoding: DotNet Encoding;
+        Encoding: DotNet npNetEncoding;
         SiteUrl: Text;
         SiteActionInt: Integer;
     begin

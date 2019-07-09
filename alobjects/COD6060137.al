@@ -8,19 +8,19 @@ codeunit 6060137 "MM Member Camera Hook"
     end;
 
     var
-        Convert: DotNet Convert;
-        Bytes: DotNet Array;
-        Encoding: DotNet Encoding;
+        Convert: DotNet npNetConvert;
+        Bytes: DotNet npNetArray;
+        Encoding: DotNet npNetEncoding;
         Txt001: Label 'data:image/jpeg;base64,';
 
     procedure OpenCameraMMMemberInfoCapture(var MMMemberInfoCapture: Record "MM Member Info Capture")
     var
         MMMemberInfoCaptureCamera: Page "MM Member Info Capture Camera";
         InS: InStream;
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         Txt: Text;
-        StreamWriter: DotNet StreamWriter;
-        MemoryStream: DotNet MemoryStream;
+        StreamWriter: DotNet npNetStreamWriter;
+        MemoryStream: DotNet npNetMemoryStream;
     begin
         if MMMemberInfoCapture.Picture.HasValue then begin
             MMMemberInfoCapture.Picture.CreateInStream(InS);

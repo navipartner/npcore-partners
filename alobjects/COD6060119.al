@@ -1875,7 +1875,7 @@ codeunit 6060119 "TM Ticket Request Manager"
     var
         JSONResult: Text;
         FailReason: Text;
-        JObject: DotNet JObject;
+        JObject: DotNet npNetJObject;
     begin
 
         if not (NPPassServerInvokeApi ('GET', TicketNotificationEntry, ReasonMessage, '', JSONResult)) then
@@ -1892,9 +1892,9 @@ codeunit 6060119 "TM Ticket Request Manager"
         exit (true);
     end;
 
-    local procedure GetStringValue(JObject: DotNet JObject;"Key": Text): Text
+    local procedure GetStringValue(JObject: DotNet npNetJObject;"Key": Text): Text
     var
-        JToken: DotNet JToken;
+        JToken: DotNet npNetJToken;
     begin
 
         JToken := JObject.SelectToken (Key, false);
@@ -2044,12 +2044,12 @@ codeunit 6060119 "TM Ticket Request Manager"
     var
         TicketSetup: Record "TM Ticket Setup";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
         Url: Text;
         ResponseText: Text;
-        Exception: DotNet Exception;
+        Exception: DotNet npNetException;
         StatusCode: Code[10];
         StatusDescription: Text[50];
     begin
@@ -2105,11 +2105,11 @@ codeunit 6060119 "TM Ticket Request Manager"
     end;
 
     [TryFunction]
-    local procedure TrySendWebRequest(JSON: Text;HttpWebRequest: DotNet HttpWebRequest;var HttpWebResponse: DotNet HttpWebResponse)
+    local procedure TrySendWebRequest(JSON: Text;HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse)
     var
-        MemoryStreamOut: DotNet MemoryStream;
-        MemoryStreamIn: DotNet MemoryStream;
-        Encoding: DotNet Encoding;
+        MemoryStreamOut: DotNet npNetMemoryStream;
+        MemoryStreamIn: DotNet npNetMemoryStream;
+        Encoding: DotNet npNetEncoding;
     begin
 
         if (StrLen (JSON) > 0) then begin
@@ -2129,9 +2129,9 @@ codeunit 6060119 "TM Ticket Request Manager"
     end;
 
     [TryFunction]
-    local procedure TryReadResponseText(var HttpWebResponse: DotNet HttpWebResponse;var ResponseText: Text)
+    local procedure TryReadResponseText(var HttpWebResponse: DotNet npNetHttpWebResponse;var ResponseText: Text)
     var
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
     begin
 
         StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream());
@@ -2144,12 +2144,12 @@ codeunit 6060119 "TM Ticket Request Manager"
     end;
 
     [TryFunction]
-    local procedure TryReadExceptionResponseText(var WebException: DotNet WebException;var StatusCode: Code[10];var StatusDescription: Text;var ResponseXml: Text)
+    local procedure TryReadExceptionResponseText(var WebException: DotNet npNetWebException;var StatusCode: Code[10];var StatusDescription: Text;var ResponseXml: Text)
     var
-        StreamReader: DotNet StreamReader;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebExceptionStatus: DotNet WebExceptionStatus;
-        SystemConvert: DotNet Convert;
+        StreamReader: DotNet npNetStreamReader;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebExceptionStatus: DotNet npNetWebExceptionStatus;
+        SystemConvert: DotNet npNetConvert;
         StatusCodeInt: Integer;
     begin
 

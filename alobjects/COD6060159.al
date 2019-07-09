@@ -9,19 +9,19 @@ codeunit 6060159 "Event Version Specific Mgt."
 
     var
         [RunOnClient]
-        WordHelper: DotNet WordHelper;
+        WordHelper: DotNet npNetWordHelper;
         [RunOnClient]
-        WordHandler: DotNet WordHandler;
-        WordXMLMerger: DotNet WordReportManager;
-        PdfWriter: DotNet WordToPdf;
-        ExchServiceWrapper: DotNet ExchangeServiceWrapper;
+        WordHandler: DotNet npNetWordHandler;
+        WordXMLMerger: DotNet npNetWordReportManager;
+        PdfWriter: DotNet npNetWordToPdf;
+        ExchServiceWrapper: DotNet npNetExchangeServiceWrapper;
 
-    procedure WordHelperGetApplication(var WordApplication: DotNet ApplicationClass;var ErrorMessage: Text)
+    procedure WordHelperGetApplication(var WordApplication: DotNet npNetApplicationClass;var ErrorMessage: Text)
     begin
         WordApplication := WordHelper.GetApplication(ErrorMessage);
     end;
 
-    procedure WordHelperCallOpen(WordApplication: DotNet ApplicationClass;FileName: Text;ConfirmConversions: Boolean;OpenReadOnly: Boolean;var WordDocument: DotNet Document)
+    procedure WordHelperCallOpen(WordApplication: DotNet npNetApplicationClass;FileName: Text;ConfirmConversions: Boolean;OpenReadOnly: Boolean;var WordDocument: DotNet npNetDocument)
     begin
         WordDocument := WordHelper.CallOpen(WordApplication,FileName,ConfirmConversions,OpenReadOnly);
     end;
@@ -32,7 +32,7 @@ codeunit 6060159 "Event Version Specific Mgt."
         WordHandler := WordHandler.WordHandler;
     end;
 
-    procedure WordHandlerWaitForDocument(WordDocument: DotNet Document) NewFileName: Text
+    procedure WordHandlerWaitForDocument(WordDocument: DotNet npNetDocument) NewFileName: Text
     begin
         NewFileName := WordHandler.WaitForDocument(WordDocument);
         exit(NewFileName);
@@ -62,9 +62,9 @@ codeunit 6060159 "Event Version Specific Mgt."
 
     procedure ExchServiceWrapperConstructor(Username: Text;Password: Text)
     var
-        ExchangeCredentials: DotNet ExchangeCredentials;
-        NetworkCredential: DotNet NetworkCredential;
-        ExchangeVersion: DotNet ExchangeVersion;
+        ExchangeCredentials: DotNet npNetExchangeCredentials;
+        NetworkCredential: DotNet npNetNetworkCredential;
+        ExchangeVersion: DotNet npNetExchangeVersion;
     begin
         ExchServiceWrapper := ExchServiceWrapper.ExchangeServiceWrapper(
                                 ExchangeCredentials.op_Implicit(
@@ -82,7 +82,7 @@ codeunit 6060159 "Event Version Specific Mgt."
         exit(ExchServiceWrapper.AutodiscoverServiceUrl(AutodiscoverEmailAddress));
     end;
 
-    procedure ExchServiceWrapperService(var ExchService: DotNet ExchangeService)
+    procedure ExchServiceWrapperService(var ExchService: DotNet npNetExchangeService)
     begin
         ExchService := ExchServiceWrapper.Service();
     end;

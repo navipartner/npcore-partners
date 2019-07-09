@@ -27,9 +27,9 @@ codeunit 6151366 "CS UI SH To SO List"
         XMLDOMMgt: Codeunit "XML DOM Management";
         CSCommunication: Codeunit "CS Communication";
         CSManagement: Codeunit "CS Management";
-        ReturnedNode: DotNet XmlNode;
-        DOMxmlin: DotNet XmlDocument;
-        RootNode: DotNet XmlNode;
+        ReturnedNode: DotNet npNetXmlNode;
+        DOMxmlin: DotNet npNetXmlDocument;
+        RootNode: DotNet npNetXmlNode;
         TextValue: Text[250];
         CSUserId: Text[250];
         WhseEmpId: Text[250];

@@ -20,7 +20,7 @@ codeunit 6014446 "M2 Demo Picture Mgt2"
         MagentoSetup: Record "Magento Setup";
         MagentoSetupEventSub: Record "Magento Setup Event Sub.";
         MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Magento Picture Url", CurrCodeunitId(), 'GetM2DemoPictureUrl') then
             exit;

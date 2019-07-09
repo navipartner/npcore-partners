@@ -38,9 +38,9 @@ codeunit 6150719 "POS Action Management"
         //+NPR5.40 [306347]
     end;
 
-    procedure IsValidActionConfiguration(POSSession: Codeunit "POS Session";ActionObject: DotNet Action;Source: Text;var ErrorText: Text;RaiseEvent: Boolean): Boolean
+    procedure IsValidActionConfiguration(POSSession: Codeunit "POS Session";ActionObject: DotNet npNetAction;Source: Text;var ErrorText: Text;RaiseEvent: Boolean): Boolean
     var
-        WorkflowAction: DotNet WorkflowAction;
+        WorkflowAction: DotNet npNetWorkflowAction;
     begin
         case ActionObject.Type of
           WorkflowAction.WorkflowAction().Type: exit(CheckWorkflowActionConfiguration(ActionObject,Source,ErrorText,RaiseEvent,POSSession));
@@ -49,11 +49,11 @@ codeunit 6150719 "POS Action Management"
         exit(true);
     end;
 
-    local procedure CheckWorkflowActionConfiguration(ActionObject: DotNet WorkflowAction;Source: Text;var ErrorText: Text;RaiseEvent: Boolean;POSSession: Codeunit "POS Session"): Boolean
+    local procedure CheckWorkflowActionConfiguration(ActionObject: DotNet npNetWorkflowAction;Source: Text;var ErrorText: Text;RaiseEvent: Boolean;POSSession: Codeunit "POS Session"): Boolean
     var
         POSAction: Record "POS Action";
         Parameter: Record "POS Action Parameter";
-        Param: DotNet KeyValuePair_Of_T_U;
+        Param: DotNet npNetKeyValuePair_Of_T_U;
         Value: Text;
         Severity: Integer;
     begin
@@ -114,7 +114,7 @@ codeunit 6150719 "POS Action Management"
           Parameter.FieldError("Default Value");
     end;
 
-    local procedure ReportError(ActionObject: DotNet Action;Source: Text;"Action": Text;ErrorText: Text;Severity: Integer;RaiseEvent: Boolean)
+    local procedure ReportError(ActionObject: DotNet npNetAction;Source: Text;"Action": Text;ErrorText: Text;Severity: Integer;RaiseEvent: Boolean)
     begin
         ActionObject.Content.Add('error',ErrorText);
         ActionObject.Content.Add('errorSeverity',Severity);

@@ -34,9 +34,9 @@ codeunit 6151414 "Magento Lookup Sales Order"
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
         RecRef: RecordRef;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         OrderNo: Code[20];
         i: Integer;
     begin

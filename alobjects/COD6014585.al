@@ -145,7 +145,7 @@ codeunit 6014585 "RP Package Handler"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014628, 'OnLoadPackage', '', false, false)]
-    local procedure OnLoadPackage(var Handled: Boolean;PrimaryPackageTable: Integer;JObject: DotNet JObject;LoadType: Option File,Blob,Download)
+    local procedure OnLoadPackage(var Handled: Boolean;PrimaryPackageTable: Integer;JObject: DotNet npNetJObject;LoadType: Option File,Blob,Download)
     var
         tmpImportWorksheet: Record "RP Import Worksheet" temporary;
         tmpTemplateHeader: Record "RP Template Header" temporary;
@@ -193,17 +193,17 @@ codeunit 6014585 "RP Package Handler"
         //+NPR5.38 [294095]
     end;
 
-    local procedure ParsePackage(JObject: DotNet JObject;var tmpTemplateHeader: Record "RP Template Header" temporary;var tmpTemplateLine: Record "RP Template Line" temporary;var tmpDataItem: Record "RP Data Items" temporary;var tmpDataItemLinks: Record "RP Data Item Links" temporary;var tmpDataItemConstraint: Record "RP Data Item Constraint" temporary;var tmpDataItemConstraintLinks: Record "RP Data Item Constraint Links" temporary;var tmpDeviceSettings: Record "RP Device Settings" temporary;var tmpMediaInfo: Record "RP Template Media Info" temporary): Boolean
+    local procedure ParsePackage(JObject: DotNet npNetJObject;var tmpTemplateHeader: Record "RP Template Header" temporary;var tmpTemplateLine: Record "RP Template Line" temporary;var tmpDataItem: Record "RP Data Items" temporary;var tmpDataItemLinks: Record "RP Data Item Links" temporary;var tmpDataItemConstraint: Record "RP Data Item Constraint" temporary;var tmpDataItemConstraintLinks: Record "RP Data Item Constraint Links" temporary;var tmpDeviceSettings: Record "RP Device Settings" temporary;var tmpMediaInfo: Record "RP Template Media Info" temporary): Boolean
     var
         i: Integer;
         TotalRecords: Integer;
         TableNo: Integer;
         RecRef: RecordRef;
         FieldRef: FieldRef;
-        KeyValuePair: DotNet KeyValuePair_Of_T_U;
+        KeyValuePair: DotNet npNetKeyValuePair_Of_T_U;
         ManagedDependencyMgt: Codeunit "Managed Dependency Mgt.";
         ManagedPackageMgt: Codeunit "Managed Package Mgt.";
-        FieldsJObject: DotNet JObject;
+        FieldsJObject: DotNet npNetJObject;
     begin
         //-NPR5.38 [294095]
         TotalRecords := JObject.Count;

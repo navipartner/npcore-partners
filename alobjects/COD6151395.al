@@ -10,9 +10,9 @@ codeunit 6151395 "CS UI Stock-Take Handling Rfid"
         RequestData: Text;
         IStream: InStream;
         OStream: OutStream;
-        Values: DotNet Array;
-        CommaString: DotNet String;
-        Separator: DotNet String;
+        Values: DotNet npNetArray;
+        CommaString: DotNet npNetString;
+        Separator: DotNet npNetString;
         Value: Text;
         LineNo: Integer;
         ItemCrossReference: Record "Item Cross Reference";

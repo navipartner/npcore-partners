@@ -156,13 +156,13 @@ codeunit 6151556 "NpXml Template Mgt."
         //+NC1.21
     end;
 
-    procedure ExportRecRefToXml(RecRef: RecordRef;var XmlElement: DotNet XmlElement)
+    procedure ExportRecRefToXml(RecRef: RecordRef;var XmlElement: DotNet npNetXmlElement)
     var
         "Field": Record "Field";
         FieldRef: FieldRef;
-        XmlCDATA: DotNet XmlCDataSection;
-        XmlElementField: DotNet XmlElement;
-        XmlElementTable: DotNet XmlElement;
+        XmlCDATA: DotNet npNetXmlCDataSection;
+        XmlElementField: DotNet npNetXmlElement;
+        XmlElementTable: DotNet npNetXmlElement;
     begin
         FieldRef := RecRef.Field(Field."No.");
         NpXmlDomMgt.AddElement(XmlElement,'T' + Format(RecRef.Number,0,9),XmlElementTable);
@@ -189,12 +189,12 @@ codeunit 6151556 "NpXml Template Mgt."
         NpXmlTemplate: Record "NpXml Template";
         TempBlob: Record TempBlob temporary;
         FileMgt: Codeunit "File Management";
-        PathHelper: DotNet Path;
-        MemoryStream: DotNet MemoryStream;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElementTable: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        PathHelper: DotNet npNetPath;
+        MemoryStream: DotNet npNetMemoryStream;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElementTable: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         InStr: InStream;
         i: Integer;
         FilePath: Text;
@@ -237,13 +237,13 @@ codeunit 6151556 "NpXml Template Mgt."
     procedure ImportNpXmlTemplateUrl(TemplateCode: Code[20];TemplateUrl: Text): Boolean
     var
         NpXmlTemplate: Record "NpXml Template";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        MemoryStream: DotNet MemoryStream;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElementTable: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        MemoryStream: DotNet npNetMemoryStream;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElementTable: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         if (TemplateCode = '') or (TemplateUrl = '') then
@@ -280,18 +280,18 @@ codeunit 6151556 "NpXml Template Mgt."
         exit(NpXmlTemplate.Get(TemplateCode));
     end;
 
-    procedure InsertRecRefFromXml(var XmlElementTable: DotNet XmlElement)
+    procedure InsertRecRefFromXml(var XmlElementTable: DotNet npNetXmlElement)
     var
         "Field": Record "Field";
         FieldRef: FieldRef;
         RecRef: RecordRef;
-        XmlElementField: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElementField: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         FieldID: Integer;
         TableID: Integer;
         i: Integer;
         PrimaryKey: Text;
-        XmlCDATA: DotNet XmlCDataSection;
+        XmlCDATA: DotNet npNetXmlCDataSection;
     begin
         if not Evaluate(TableID,XmlElementTable.GetAttribute('table_no'),9) then
           exit;
@@ -337,8 +337,8 @@ codeunit 6151556 "NpXml Template Mgt."
         NPXmlFilter: Record "NpXml Filter";
         NPXmlTemplate: Record "NpXml Template";
         FileMgt: Codeunit "File Management";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
         ServerFile: File;
         InStr: InStream;
         ServerFilepath: Text;
@@ -371,12 +371,12 @@ codeunit 6151556 "NpXml Template Mgt."
         InsertNpXmlElement(NPXmlTemplate,XmlElement,LineNo,-1);
     end;
 
-    local procedure InsertNpXmlElement(NPXmlTemplate: Record "NpXml Template";XmlElement: DotNet XmlElement;var LineNo: Integer;Level: Integer)
+    local procedure InsertNpXmlElement(NPXmlTemplate: Record "NpXml Template";XmlElement: DotNet npNetXmlElement;var LineNo: Integer;Level: Integer)
     var
         NPXmlAttribute: Record "NpXml Attribute";
         NPXmlElement: Record "NpXml Element";
-        ChildXmlElement: DotNet XmlElement;
-        XmlAttribute: DotNet XmlElement;
+        ChildXmlElement: DotNet npNetXmlElement;
+        XmlAttribute: DotNet npNetXmlElement;
         i: Integer;
         "Field": Record "Field";
     begin
@@ -621,8 +621,8 @@ codeunit 6151556 "NpXml Template Mgt."
         NpXmlNamespaces: Record "NpXml Namespace";
         NpXmlTemplateTrigger: Record "NpXml Template Trigger";
         NpXmlTemplateTriggerLink: Record "NpXml Template Trigger Link";
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
         RecRef: RecordRef;
         OutStr: OutStream;
     begin
@@ -690,13 +690,13 @@ codeunit 6151556 "NpXml Template Mgt."
         //+NC1.21
     end;
 
-    local procedure InsertRecRefFromArchiveXml(var XmlElementTable: DotNet XmlElement)
+    local procedure InsertRecRefFromArchiveXml(var XmlElementTable: DotNet npNetXmlElement)
     var
         NpXmlTemplate: Record "NpXml Template";
         "Field": Record "Field";
-        XmlCDATA: DotNet XmlCDataSection;
-        XmlElementField: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlCDATA: DotNet npNetXmlCDataSection;
+        XmlElementField: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         RecRef: RecordRef;
         RecRefTemplate: RecordRef;
         RecordID: RecordID;
@@ -758,11 +758,11 @@ codeunit 6151556 "NpXml Template Mgt."
     procedure RestoreArchivedNpXmlTemplate(TemplateCode: Code[20];VersionCode: Code[10]): Boolean
     var
         NpXmlTemplate: Record "NpXml Template";
-        MemoryStream: DotNet MemoryStream;
-        XmlDoc: DotNet XmlDocument;
-        XmlElement: DotNet XmlElement;
-        XmlElementTable: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        MemoryStream: DotNet npNetMemoryStream;
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElementTable: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         InStr: InStream;
         i: Integer;
         NpXmlTemplateArchive: Record "NpXml Template Archive";
@@ -997,9 +997,9 @@ codeunit 6151556 "NpXml Template Mgt."
     procedure RunProcess(Filename: Text;Arguments: Text;RunModal: Boolean)
     var
         [RunOnClient]
-        Process: DotNet Process;
+        Process: DotNet npNetProcess;
         [RunOnClient]
-        ProcessStartInfo: DotNet ProcessStartInfo;
+        ProcessStartInfo: DotNet npNetProcessStartInfo;
     begin
         ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename,Arguments);
         Process := Process.Start(ProcessStartInfo);

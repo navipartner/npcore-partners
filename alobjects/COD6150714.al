@@ -12,11 +12,11 @@ codeunit 6150714 "POS Data Driver - Reg. Bal."
         Caption_CompanyName: Label 'Company Name';
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSource', '', false, false)]
-    local procedure GetDataSource(Name: Text;var DataSource: DotNet DataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    local procedure GetDataSource(Name: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
     var
         Sale: Record "Sale POS";
         DataMgt: Codeunit "POS Data Management";
-        DataType: DotNet DataType;
+        DataType: DotNet npNetDataType;
     begin
         //-NPR5.36 [287688]
         //IF Name <> SourceName THEN
@@ -75,10 +75,10 @@ codeunit 6150714 "POS Data Driver - Reg. Bal."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnRefreshDataSet', '', false, false)]
-    local procedure RefreshDataSet(POSSession: Codeunit "POS Session";DataSource: DotNet DataSource0;var CurrDataSet: DotNet DataSet;FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure RefreshDataSet(POSSession: Codeunit "POS Session";DataSource: DotNet npNetDataSource0;var CurrDataSet: DotNet npNetDataSet;FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         Sale: Codeunit "POS Sale";
-        DataRow: DotNet DataRow0;
+        DataRow: DotNet npNetDataRow0;
     begin
         //-NPR5.36 [287688]
         //IF DataSource.Id <> SourceName THEN

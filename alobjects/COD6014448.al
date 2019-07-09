@@ -120,8 +120,8 @@ codeunit 6014448 "Table Export Library"
         OStream: OutStream;
         OutFile: File;
         OutputEncoding: Text[50];
-        DotNetStream: DotNet StreamWriter;
-        DotNetEncoding: DotNet Encoding;
+        DotNetStream: DotNet npNetStreamWriter;
+        DotNetEncoding: DotNet npNetEncoding;
         DotNetFilePath: Text;
         "-- ExportVariables": Integer;
         ExportCompanyName: Text[100];
@@ -296,7 +296,7 @@ codeunit 6014448 "Table Export Library"
 
     local procedure WriteFieldValue(Value: Text)
     var
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         //-NPR5.48 [340086]
         if EscapeCharacter <> '' then begin
@@ -411,8 +411,8 @@ codeunit 6014448 "Table Export Library"
     procedure CloseDotNetStreamForExport()
     var
         [RunOnClient]
-        DotNetFile: DotNet File;
-        DotNetFileServer: DotNet File;
+        DotNetFile: DotNet npNetFile;
+        DotNetFileServer: DotNet npNetFile;
         FileManagement: Codeunit "File Management";
     begin
         DotNetStream.Close;
@@ -595,11 +595,11 @@ codeunit 6014448 "Table Export Library"
     local procedure ExportField(var FieldRef: FieldRef)
     var
         TempBlob: Record TempBlob temporary;
-        Encoding: DotNet Encoding;
-        BinaryReader: DotNet BinaryReader;
-        Stream: DotNet Stream;
-        DotNetString: DotNet String;
-        Convert: DotNet Convert;
+        Encoding: DotNet npNetEncoding;
+        BinaryReader: DotNet npNetBinaryReader;
+        Stream: DotNet npNetStream;
+        DotNetString: DotNet npNetString;
+        Convert: DotNet npNetConvert;
         InStream: InStream;
         Value: Text;
         DateVal: Date;

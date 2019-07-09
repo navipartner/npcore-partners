@@ -705,7 +705,7 @@ codeunit 6060136 "MM Member Notification"
         MemberNotificationSetup: Record "MM Member Notification Setup";
         JSONResult: Text;
         FailReason: Text;
-        JObject: DotNet JObject;
+        JObject: DotNet npNetJObject;
     begin
 
         if (not MemberNotificationSetup.Get (MemberNotificationEntry."Notification Code")) then
@@ -725,9 +725,9 @@ codeunit 6060136 "MM Member Notification"
         exit (true);
     end;
 
-    local procedure GetStringValue(JObject: DotNet JObject;"Key": Text): Text
+    local procedure GetStringValue(JObject: DotNet npNetJObject;"Key": Text): Text
     var
-        JToken: DotNet JToken;
+        JToken: DotNet npNetJToken;
     begin
 
         JToken := JObject.SelectToken (Key, false);
@@ -1023,12 +1023,12 @@ codeunit 6060136 "MM Member Notification"
     procedure NPPassServerInvokeApi(Method: Code[10];MemberNotificationSetup: Record "MM Member Notification Setup";PassID: Text;var ReasonText: Text;JSONIn: Text;var JSONOut: Text): Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
         Url: Text;
         ResponseText: Text;
-        Exception: DotNet Exception;
+        Exception: DotNet npNetException;
         StatusCode: Code[10];
         StatusDescription: Text[50];
     begin
@@ -1082,11 +1082,11 @@ codeunit 6060136 "MM Member Notification"
     end;
 
     [TryFunction]
-    local procedure TrySendWebRequest(JSON: Text;HttpWebRequest: DotNet HttpWebRequest;var HttpWebResponse: DotNet HttpWebResponse)
+    local procedure TrySendWebRequest(JSON: Text;HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse)
     var
-        MemoryStreamOut: DotNet MemoryStream;
-        MemoryStreamIn: DotNet MemoryStream;
-        Encoding: DotNet Encoding;
+        MemoryStreamOut: DotNet npNetMemoryStream;
+        MemoryStreamIn: DotNet npNetMemoryStream;
+        Encoding: DotNet npNetEncoding;
     begin
 
         if (StrLen (JSON) > 0) then begin
@@ -1106,9 +1106,9 @@ codeunit 6060136 "MM Member Notification"
     end;
 
     [TryFunction]
-    local procedure TryReadResponseText(var HttpWebResponse: DotNet HttpWebResponse;var ResponseText: Text)
+    local procedure TryReadResponseText(var HttpWebResponse: DotNet npNetHttpWebResponse;var ResponseText: Text)
     var
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
     begin
 
         StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream());
@@ -1121,12 +1121,12 @@ codeunit 6060136 "MM Member Notification"
     end;
 
     [TryFunction]
-    local procedure TryReadExceptionResponseText(var WebException: DotNet WebException;var StatusCode: Code[10];var StatusDescription: Text;var ResponseXml: Text)
+    local procedure TryReadExceptionResponseText(var WebException: DotNet npNetWebException;var StatusCode: Code[10];var StatusDescription: Text;var ResponseXml: Text)
     var
-        StreamReader: DotNet StreamReader;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebExceptionStatus: DotNet WebExceptionStatus;
-        SystemConvert: DotNet Convert;
+        StreamReader: DotNet npNetStreamReader;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebExceptionStatus: DotNet npNetWebExceptionStatus;
+        SystemConvert: DotNet npNetConvert;
         StatusCodeInt: Integer;
     begin
 
@@ -1159,14 +1159,14 @@ codeunit 6060136 "MM Member Notification"
     end;
 
     [TryFunction]
-    local procedure TryGetWebExceptionResponse(var WebException: DotNet WebException;var HttpWebResponse: DotNet HttpWebResponse)
+    local procedure TryGetWebExceptionResponse(var WebException: DotNet npNetWebException;var HttpWebResponse: DotNet npNetHttpWebResponse)
     begin
 
         HttpWebResponse := WebException.Response;
     end;
 
     [TryFunction]
-    local procedure TryGetInnerWebException(var WebException: DotNet WebException;var InnerWebException: DotNet WebException)
+    local procedure TryGetInnerWebException(var WebException: DotNet npNetWebException;var InnerWebException: DotNet npNetWebException)
     begin
 
         InnerWebException := WebException.InnerException;
@@ -1175,9 +1175,9 @@ codeunit 6060136 "MM Member Notification"
     procedure ToBase64(StringToEncode: Text) B64String: Text
     var
         TempBlob: Record TempBlob temporary;
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
         InStr: InStream;
         Outstr: OutStream;
     begin

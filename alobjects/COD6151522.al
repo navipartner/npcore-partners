@@ -118,7 +118,7 @@ codeunit 6151522 "Nc Trigger Task Mgt."
         NcEndpointFtp: Record "Nc Endpoint FTP";
         NcTaskMgt: Codeunit "Nc Task Mgt.";
         NcTriggerSyncMgt: Codeunit "Nc Trigger Sync. Mgt.";
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         InStream: InStream;
         Outstream: OutStream;
         RecRef: RecordRef;

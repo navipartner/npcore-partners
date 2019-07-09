@@ -1533,7 +1533,7 @@ codeunit 6059767 "NaviDocs Management"
         EmailSetup: Record "E-mail Setup";
         StringLibrary: Codeunit "String Library";
         Txt001: Label 'NaviDocs Error %1 - %2 %3';
-        Mail: DotNet SmtpMessage;
+        Mail: DotNet npNetSmtpMessage;
         i: Integer;
     begin
         NaviDocsSetup.Get;

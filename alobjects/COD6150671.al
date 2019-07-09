@@ -12,7 +12,7 @@ codeunit 6150671 "POS Action - Edit Web Depen."
         Text000: Label 'Edit Web Client Dependency';
         CurrWebClientDependency: Record "Web Client Dependency";
         [WithEvents]
-        Model: DotNet Model;
+        Model: DotNet npNetModel;
         ActiveModelID: Guid;
         Text001: Label 'Save';
         Text002: Label 'Cancel';
@@ -79,7 +79,7 @@ codeunit 6150671 "POS Action - Edit Web Depen."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
     begin
@@ -1099,8 +1099,8 @@ codeunit 6150671 "POS Action - Edit Web Depen."
     local procedure InitScript() Script: Text
     var
         RetailModelScriptLibrary: Codeunit "Retail Model Script Library";
-        NavContent: DotNet String;
-        StreamReader: DotNet StreamReader;
+        NavContent: DotNet npNetString;
+        StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
     begin
         Script := RetailModelScriptLibrary.InitAngular();
@@ -1150,7 +1150,7 @@ codeunit 6150671 "POS Action - Edit Web Depen."
 
     local procedure SaveNavContent(NavContentJson: Text;FrontEnd: Codeunit "POS Front End Management")
     var
-        NavContent: DotNet String;
+        NavContent: DotNet npNetString;
         OutStr: OutStream;
     begin
         NavContent := NavContentJson;
@@ -1192,7 +1192,7 @@ codeunit 6150671 "POS Action - Edit Web Depen."
         exit(CR() + LF());
     end;
 
-    trigger Model::OnModelControlEvent(control: DotNet Control;eventName: Text;data: DotNet Dictionary_Of_T_U)
+    trigger Model::OnModelControlEvent(control: DotNet npNetControl;eventName: Text;data: DotNet npNetDictionary_Of_T_U)
     begin
     end;
 

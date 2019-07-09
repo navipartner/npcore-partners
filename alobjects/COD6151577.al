@@ -9,20 +9,20 @@ codeunit 6151577 "AF API - OIO Validation"
 
     procedure ValidateInvoice()
     var
-        Parameters: DotNet Dictionary_Of_T_U;
+        Parameters: DotNet npNetDictionary_Of_T_U;
         AFManagement: Codeunit "AF Management";
         AFHelperFunctions: Codeunit "AF Helper Functions";
-        HttpResponseMessage: DotNet HttpResponseMessage;
+        HttpResponseMessage: DotNet npNetHttpResponseMessage;
         Path: Text;
         Window: Dialog;
         OutStr: OutStream;
-        JObject: DotNet JObject;
-        JTokenWriter: DotNet JTokenWriter;
-        StringContent: DotNet StringContent;
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
+        StringContent: DotNet npNetStringContent;
         Ostream: OutStream;
         TextString: Text;
         Status: Boolean;
-        Encoding: DotNet Encoding;
+        Encoding: DotNet npNetEncoding;
     begin
         JTokenWriter := JTokenWriter.JTokenWriter;
         with JTokenWriter do begin

@@ -28,9 +28,9 @@ codeunit 6151369 "CS UI Rfid Item Handling"
         CSCommunication: Codeunit "CS Communication";
         CSMgt: Codeunit "CS Management";
         RecRef: RecordRef;
-        DOMxmlin: DotNet XmlDocument;
-        ReturnedNode: DotNet XmlNode;
-        RootNode: DotNet XmlNode;
+        DOMxmlin: DotNet npNetXmlDocument;
+        ReturnedNode: DotNet npNetXmlNode;
+        RootNode: DotNet npNetXmlNode;
         CSUserId: Text[250];
         Remark: Text[250];
         WhseEmpId: Text[250];
@@ -78,9 +78,9 @@ codeunit 6151369 "CS UI Rfid Item Handling"
         FuncValue: Text;
         CSRfidItemHandling: Record "CS Rfid Item Handling";
         CSRfidItemHandling2: Record "CS Rfid Item Handling";
-        CommaString: DotNet String;
-        Values: DotNet Array;
-        Separator: DotNet String;
+        CommaString: DotNet npNetString;
+        Values: DotNet npNetArray;
+        Separator: DotNet npNetString;
         Value: Text;
         SetDefaults: Boolean;
         i: Integer;
@@ -257,7 +257,7 @@ codeunit 6151369 "CS UI Rfid Item Handling"
 
     local procedure SendForm(InputField: Integer)
     var
-        Records: DotNet XmlElement;
+        Records: DotNet npNetXmlElement;
     begin
         CSCommunication.EncodeUI(CSUIHeader,StackCode,DOMxmlin,InputField,Remark,CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
@@ -437,16 +437,16 @@ codeunit 6151369 "CS UI Rfid Item Handling"
         CSRfidItemHandling.DeleteAll(true);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet XmlNode;AttribName: Text[250];AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: DotNet npNetXmlNode;AttribName: Text[250];AttribValue: Text[250])
     begin
         if XMLDOMMgt.AddAttribute(NewChild,AttribName,AttribValue) > 0 then
           Error(Text002,AttribName);
     end;
 
-    local procedure AddSummarize(var Records: DotNet XmlElement) NotEmptyResult: Boolean
+    local procedure AddSummarize(var Records: DotNet npNetXmlElement) NotEmptyResult: Boolean
     var
-        "Record": DotNet XmlElement;
-        Line: DotNet XmlElement;
+        "Record": DotNet npNetXmlElement;
+        Line: DotNet npNetXmlElement;
         Indicator: Text;
         LineType: Option TEXT,BUTTON;
         CurrRecordID: Code[20];
@@ -504,10 +504,10 @@ codeunit 6151369 "CS UI Rfid Item Handling"
         exit(NotEmptyResult);
     end;
 
-    local procedure AddKeyObject(var Records: DotNet XmlElement) NotEmptyResult: Boolean
+    local procedure AddKeyObject(var Records: DotNet npNetXmlElement) NotEmptyResult: Boolean
     var
-        "Record": DotNet XmlElement;
-        Line: DotNet XmlElement;
+        "Record": DotNet npNetXmlElement;
+        Line: DotNet npNetXmlElement;
         ImageUrl: Text;
         MagentoPicture: Record "Magento Picture";
         MagentoPictureLink: Record "Magento Picture Link";

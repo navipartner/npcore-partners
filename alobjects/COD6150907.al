@@ -8,7 +8,7 @@ codeunit 6150907 "HC Customer Management"
 
     trigger OnRun()
     var
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
     begin
         if LoadXmlDoc(XmlDoc) then
           CustomerAction(XmlDoc);
@@ -20,10 +20,10 @@ codeunit 6150907 "HC Customer Management"
         Initialized: Boolean;
         Text001: Label 'Audit Roll %1 - %2 - %3 - %4 - %5 - %6 allready exists.';
 
-    local procedure CustomerAction(XmlDoc: DotNet XmlDocument)
+    local procedure CustomerAction(XmlDoc: DotNet npNetXmlDocument)
     var
-        XmlElement: DotNet XmlElement;
-        XmlNodeList: DotNet XmlNodeList;
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
         if IsNull(XmlDoc) then
@@ -52,10 +52,10 @@ codeunit 6150907 "HC Customer Management"
         end;
     end;
 
-    local procedure UpdateCustomer(ItemXmlElement: DotNet XmlElement) Imported: Boolean
+    local procedure UpdateCustomer(ItemXmlElement: DotNet npNetXmlElement) Imported: Boolean
     var
         Customer: Record Customer;
-        ChildXmlElement: DotNet XmlElement;
+        ChildXmlElement: DotNet npNetXmlElement;
     begin
         if IsNull(ItemXmlElement) then
           exit(false);
@@ -77,7 +77,7 @@ codeunit 6150907 "HC Customer Management"
     begin
     end;
 
-    local procedure InsertCustomer(XmlElement: DotNet XmlElement;var Customer: Record Customer)
+    local procedure InsertCustomer(XmlElement: DotNet npNetXmlElement;var Customer: Record Customer)
     var
         TempCustomer: Record Customer temporary;
         OStream: OutStream;

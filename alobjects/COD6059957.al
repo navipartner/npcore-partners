@@ -13,10 +13,10 @@ codeunit 6059957 "MCS Webcam Proxy"
     var
         POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
         ProtocolStage: Integer;
-        ExpectedResponseType: DotNet Type;
+        ExpectedResponseType: DotNet npNetType;
         ExpectedResponseId: Guid;
-        QueuedRequests: DotNet Stack;
-        QueuedResponseTypes: DotNet Stack;
+        QueuedRequests: DotNet npNetStack;
+        QueuedResponseTypes: DotNet npNetStack;
         ProtocolManagerId: Guid;
         WebcamArgumentTable: Record "MCS Webcam Argument Table";
         Base64String: Text;
@@ -34,11 +34,11 @@ codeunit 6059957 "MCS Webcam Proxy"
 
     local procedure ProcessSignal(var TempBlob: Record TempBlob)
     var
-        Signal: DotNet Signal;
-        StartSignal: DotNet StartSession;
-        Response: DotNet MessageResponse;
+        Signal: DotNet npNetSignal;
+        StartSignal: DotNet npNetStartSession;
+        Response: DotNet npNetMessageResponse;
         ProtocolManagerId: Guid;
-        QueryCloseSignal: DotNet QueryClosePage;
+        QueryCloseSignal: DotNet npNetQueryClosePage;
     begin
         POSDeviceProxyManager.DeserializeObject(Signal,TempBlob);
         case true of
@@ -63,12 +63,12 @@ codeunit 6059957 "MCS Webcam Proxy"
 
     local procedure Start(ProtocolManagerIdIn: Guid)
     var
-        VoidResponse: DotNet VoidResponse;
-        State: DotNet State2;
-        WebcamCaptureRequest: DotNet WebcamCaptureRequest;
-        ActionEnum: DotNet State_Action0;
-        PersonEntity: DotNet PersonEntity0;
-        WebcamIdentityRequest: DotNet WebcamIdentityRequest;
+        VoidResponse: DotNet npNetVoidResponse;
+        State: DotNet npNetState2;
+        WebcamCaptureRequest: DotNet npNetWebcamCaptureRequest;
+        ActionEnum: DotNet npNetState_Action0;
+        PersonEntity: DotNet npNetPersonEntity0;
+        WebcamIdentityRequest: DotNet npNetWebcamIdentityRequest;
     begin
         ProtocolManagerId := ProtocolManagerIdIn;
 
@@ -138,7 +138,7 @@ codeunit 6059957 "MCS Webcam Proxy"
         end;
     end;
 
-    local procedure MessageResponse(Envelope: DotNet ResponseEnvelope)
+    local procedure MessageResponse(Envelope: DotNet npNetResponseEnvelope)
     begin
         if Envelope.ResponseTypeName <> Format(ExpectedResponseType) then
           Error('Unknown response type: %1 (expected %2)',Envelope.ResponseTypeName,Format(ExpectedResponseType));
@@ -154,7 +154,7 @@ codeunit 6059957 "MCS Webcam Proxy"
         POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
     end;
 
-    local procedure AwaitResponse(Type: DotNet Type;Id: Guid)
+    local procedure AwaitResponse(Type: DotNet npNetType;Id: Guid)
     begin
         ExpectedResponseType := Type;
         ExpectedResponseId := Id;
@@ -166,17 +166,17 @@ codeunit 6059957 "MCS Webcam Proxy"
 
     local procedure CloseForm(Data: Text)
     var
-        State: DotNet State2;
-        JsonConvert: DotNet JsonConvert;
-        PersonEntity: DotNet PersonEntity0;
-        FaceEntity: DotNet FaceEntity0;
+        State: DotNet npNetState2;
+        JsonConvert: DotNet npNetJsonConvert;
+        PersonEntity: DotNet npNetPersonEntity0;
+        FaceEntity: DotNet npNetFaceEntity0;
         MCSPerson: Record "MCS Person";
         MCSFaces: Record "MCS Faces";
         OutS: OutStream;
-        Convert: DotNet Convert;
-        Bytes: DotNet Array;
-        MemoryStream: DotNet MemoryStream;
-        FacesEntity: DotNet FaceEntity0;
+        Convert: DotNet npNetConvert;
+        Bytes: DotNet npNetArray;
+        MemoryStream: DotNet npNetMemoryStream;
+        FacesEntity: DotNet npNetFaceEntity0;
         MCSPersonBusinessEntities: Record "MCS Person Business Entities";
     begin
         State := State.Deserialize(Data);
@@ -264,16 +264,16 @@ codeunit 6059957 "MCS Webcam Proxy"
     begin
     end;
 
-    local procedure DeserializeState(Data: Text;var State: DotNet State2)
+    local procedure DeserializeState(Data: Text;var State: DotNet npNetState2)
     var
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
     begin
         State := JsonConvert.DeserializeObject(Data,GetDotNetType(State));
     end;
 
     local procedure SerializeJson("Object": Variant): Text
     var
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
     begin
         exit(JsonConvert.SerializeObject(Object));
     end;

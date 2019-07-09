@@ -14,22 +14,22 @@ codeunit 6184484 "Pepper Aux Functions"
 
     var
         POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
-        ExpectedResponseType: DotNet Type;
+        ExpectedResponseType: DotNet npNetType;
         ExpectedResponseId: Guid;
         ProtocolManagerId: Guid;
         ProtocolStage: Integer;
-        QueuedRequests: DotNet Stack;
-        QueuedResponseTypes: DotNet Stack;
+        QueuedRequests: DotNet npNetStack;
+        QueuedResponseTypes: DotNet npNetStack;
         "--RequestSpecific": Integer;
         InitializedRequest: Boolean;
-        AuxRequest: DotNet AuxRequest;
-        AuxResponse: DotNet AuxResponse;
-        AuxResult: DotNet AuxResult;
-        AuxParam: DotNet AuxParam;
-        PepperOpCodes: DotNet PepperOpCodes;
+        AuxRequest: DotNet npNetAuxRequest;
+        AuxResponse: DotNet npNetAuxResponse;
+        AuxResult: DotNet npNetAuxResult;
+        AuxParam: DotNet npNetAuxParam;
+        PepperOpCodes: DotNet npNetPepperOpCodes;
         LastRestCode: Integer;
         NOT_INITIALIZED: Label 'Please invoke initialprotocol function before setting paramaters.';
-        Labels: DotNet ProcessLabels;
+        Labels: DotNet npNetProcessLabels;
         PepperTerminalCaptions: Codeunit "Pepper Terminal Captions";
 
     local procedure "---Protocol functions"()
@@ -38,10 +38,10 @@ codeunit 6184484 "Pepper Aux Functions"
 
     local procedure ProcessSignal(var TempBlob: Record TempBlob)
     var
-        Signal: DotNet Signal;
-        StartSignal: DotNet StartSession;
-        QueryCloseSignal: DotNet QueryClosePage;
-        Response: DotNet MessageResponse;
+        Signal: DotNet npNetSignal;
+        StartSignal: DotNet npNetStartSession;
+        QueryCloseSignal: DotNet npNetQueryClosePage;
+        Response: DotNet npNetMessageResponse;
     begin
 
         POSDeviceProxyManager.DeserializeObject(Signal,TempBlob);
@@ -68,7 +68,7 @@ codeunit 6184484 "Pepper Aux Functions"
     local procedure Start(ProtocolManagerIdIn: Guid)
     var
         WebClientDependency: Record "Web Client Dependency";
-        VoidResponse: DotNet VoidResponse;
+        VoidResponse: DotNet npNetVoidResponse;
     begin
 
         ProtocolManagerId := ProtocolManagerIdIn;
@@ -79,7 +79,7 @@ codeunit 6184484 "Pepper Aux Functions"
              ProtocolManagerId, AuxRequest));
     end;
 
-    local procedure MessageResponse(Envelope: DotNet ResponseEnvelope)
+    local procedure MessageResponse(Envelope: DotNet npNetResponseEnvelope)
     begin
 
         if Envelope.ResponseTypeName <> Format(ExpectedResponseType) then
@@ -98,7 +98,7 @@ codeunit 6184484 "Pepper Aux Functions"
         POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
     end;
 
-    local procedure AwaitResponse(Type: DotNet Type;Id: Guid)
+    local procedure AwaitResponse(Type: DotNet npNetType;Id: Guid)
     begin
 
         ExpectedResponseType := Type;

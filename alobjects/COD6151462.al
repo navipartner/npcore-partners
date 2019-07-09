@@ -26,7 +26,7 @@ codeunit 6151462 "M2 Picture Mgt."
     var
         MagentoSetup: Record "Magento Setup";
         MagentoMgt: Codeunit "Magento Mgt.";
-        XmlDoc: DotNet XmlDocument;
+        XmlDoc: DotNet npNetXmlDocument;
     begin
         MagentoSetup.Get;
         MagentoSetup.TestField("Api Url");
@@ -63,7 +63,7 @@ codeunit 6151462 "M2 Picture Mgt."
         MagentoSetup: Record "Magento Setup";
         MagentoSetupEventSub: Record "Magento Setup Event Sub.";
         MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
-        String: DotNet String;
+        String: DotNet npNetString;
     begin
         if not MagentoSetupMgt.IsMagentoSetupEventSubscriber(MagentoSetupEventSub.Type::"Magento Picture Url",CurrCodeunitId(),'GetM2PictureUrl') then
           exit;
@@ -103,13 +103,13 @@ codeunit 6151462 "M2 Picture Mgt."
     begin
     end;
 
-    procedure MagentoApiPost(MagentoApiUrl: Text;Method: Text;var XmlDoc: DotNet XmlDocument) Result: Boolean
+    procedure MagentoApiPost(MagentoApiUrl: Text;Method: Text;var XmlDoc: DotNet npNetXmlDocument) Result: Boolean
     var
         MagentoSetup: Record "Magento Setup";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        HttpWebRequest: DotNet HttpWebRequest;
-        HttpWebResponse: DotNet HttpWebResponse;
-        WebException: DotNet WebException;
+        HttpWebRequest: DotNet npNetHttpWebRequest;
+        HttpWebResponse: DotNet npNetHttpWebResponse;
+        WebException: DotNet npNetWebException;
         ErrorMessage: Text;
         Response: Text;
     begin

@@ -11,17 +11,17 @@ codeunit 6184495 "Pepper FileMgmt. Functions TSD"
     var
         InitializedRequest: Boolean;
         InitializedResponse: Boolean;
-        FileMgtRequest: DotNet FileManagementRequest0;
-        FileMgtResponse: DotNet FileManagementResponse0;
+        FileMgtRequest: DotNet npNetFileManagementRequest0;
+        FileMgtResponse: DotNet npNetFileManagementResponse0;
         NOT_INITIALIZED: Label 'Please invoke initialprotocol function before setting paramaters.';
-        Labels: DotNet ProcessLabels0;
+        Labels: DotNet npNetProcessLabels0;
         PepperTerminalCaptions: Codeunit "Pepper Terminal Captions TSD";
         PepperVersion: Record "Pepper Version";
         LastRestultCode: Integer;
         "--": Integer;
         ChunkInStr: InStream;
-        ChunkBinaryReader: DotNet BinaryReader;
-        ChunkMemoryStream: DotNet MemoryStream;
+        ChunkBinaryReader: DotNet npNetBinaryReader;
+        ChunkMemoryStream: DotNet npNetMemoryStream;
         NO_PEPPER_BLOB: Label 'No blob to install for pepper version %1.';
 
     procedure InitializeProtocol()
@@ -106,11 +106,11 @@ codeunit 6184495 "Pepper FileMgmt. Functions TSD"
 
     local procedure GetZipFileToInstall(Data: Text;var PepperB64File: Text)
     var
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
         InStr: InStream;
-        BinaryReader: DotNet BinaryReader;
-        MemoryStream: DotNet MemoryStream;
-        Convert: DotNet Convert;
+        BinaryReader: DotNet npNetBinaryReader;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
     begin
         FileMgtResponse := FileMgtResponse.Deserialize (Data);
 
@@ -127,7 +127,7 @@ codeunit 6184495 "Pepper FileMgmt. Functions TSD"
 
     local procedure GetFirstChunk(Data: Text;var B64FileChunk: Text)
     var
-        Convert: DotNet Convert;
+        Convert: DotNet npNetConvert;
     begin
 
         PepperVersion.CalcFields ("Install Zip File");
@@ -144,7 +144,7 @@ codeunit 6184495 "Pepper FileMgmt. Functions TSD"
 
     local procedure GetNextChunk(Data: Text;var B64FileChunk: Text)
     var
-        Convert: DotNet Convert;
+        Convert: DotNet npNetConvert;
     begin
 
         PepperVersion.CalcFields ("Install Zip File");
@@ -158,7 +158,7 @@ codeunit 6184495 "Pepper FileMgmt. Functions TSD"
 
     local procedure SerializeJson("Object": Variant): Text
     var
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
     begin
         exit(JsonConvert.SerializeObject(Object));
     end;
@@ -183,7 +183,7 @@ codeunit 6184495 "Pepper FileMgmt. Functions TSD"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', false, false)]
-    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet ResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet npNetResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     begin
 
         if (ActionName <> 'Pepper_EftFileMgt') then

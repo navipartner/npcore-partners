@@ -32,7 +32,7 @@ codeunit 6060135 "MM Member POS UI"
 
     procedure DoLookup(LookupCaption: Text;LookupRecRef: RecordRef) Position: Text
     var
-        Template: DotNet Template;
+        Template: DotNet npNetTemplate;
     begin
 
         ConfigureLookupTemplate (Template, LookupRecRef);
@@ -40,15 +40,15 @@ codeunit 6060135 "MM Member POS UI"
         Position := Marshaller.Lookup(LookupCaption, Template, LookupRecRef, false, false, 0);
     end;
 
-    local procedure ConfigureLookupTemplate(var Template: DotNet Template;LookupRec: RecordRef)
+    local procedure ConfigureLookupTemplate(var Template: DotNet npNetTemplate;LookupRec: RecordRef)
     var
         Vendor: Record Vendor;
         ItemGroup: Record "Item Group";
         SaleLinePOS: Record "Sale Line POS";
-        Row: DotNet Row;
-        Info: DotNet Info;
-        TextAlign: DotNet TextAlign;
-        NumberFormat: DotNet NumberFormat;
+        Row: DotNet npNetRow;
+        Info: DotNet npNetInfo;
+        TextAlign: DotNet npNetTextAlign;
+        NumberFormat: DotNet npNetNumberFormat;
     begin
         Template := Template.Template();
 

@@ -127,9 +127,9 @@ table 6014569 "RP Import Worksheet"
 
     local procedure IsSafeVersionIncrease(): Boolean
     var
-        VersionArray: DotNet Array;
-        Regex: DotNet Regex;
-        Version: DotNet String;
+        VersionArray: DotNet npNetArray;
+        Regex: DotNet npNetRegex;
+        Version: DotNet npNetString;
         TemplateHeader: Record "RP Template Header";
         VersionPos: Integer;
         EndOfString: Boolean;

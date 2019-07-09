@@ -332,7 +332,7 @@ page 6151502 "Nc Task List"
         Line: Text;
         LF: Char;
         CR: Char;
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
     begin
         //-NC2.01 [252048]
         // LF := 10;
@@ -421,7 +421,7 @@ page 6151502 "Nc Task List"
         NcTaskOutput: Record "Nc Task Output";
         TempBlob: Record TempBlob temporary;
         FileMgt: Codeunit "File Management";
-        StreamReader: DotNet StreamReader;
+        StreamReader: DotNet npNetStreamReader;
         InStr: InStream;
         Path: Text;
         Content: Text;

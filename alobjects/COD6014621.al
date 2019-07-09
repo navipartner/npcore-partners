@@ -23,9 +23,9 @@ codeunit 6014621 "POS Web Utilities"
     var
         Direction: Option TopBottom,LeftRight;
 
-    procedure AssignColorFromLine(MenuLine: Record "Touch Screen - Menu Lines";Button: DotNet Button)
+    procedure AssignColorFromLine(MenuLine: Record "Touch Screen - Menu Lines";Button: DotNet npNetButton)
     var
-        ButtonColor: DotNet ButtonColor;
+        ButtonColor: DotNet npNetButtonColor;
     begin
         case MenuLine."Button Styling" of
           MenuLine."Button Styling"::Green:       Button.Color := ButtonColor.Green;
@@ -42,9 +42,9 @@ codeunit 6014621 "POS Web Utilities"
         end;
     end;
 
-    procedure AssignShowBehaviorFromLine(MenuLine: Record "Touch Screen - Menu Lines";Button: DotNet Button)
+    procedure AssignShowBehaviorFromLine(MenuLine: Record "Touch Screen - Menu Lines";Button: DotNet npNetButton)
     var
-        ShowBehavior: DotNet ShowBehavior;
+        ShowBehavior: DotNet npNetShowBehavior;
     begin
         case MenuLine."Show Behavior" of
           MenuLine."Show Behavior"::Always:       Button.ShowBehavior := ShowBehavior.Always;
@@ -148,10 +148,10 @@ codeunit 6014621 "POS Web Utilities"
         //+NPR5.20
     end;
 
-    procedure NavRecordToRows(var RecRef: RecordRef;PageGrid: DotNet DataGrid)
+    procedure NavRecordToRows(var RecRef: RecordRef;PageGrid: DotNet npNetDataGrid)
     var
-        Row: DotNet Dictionary_Of_T_U;
-        Template: DotNet Template;
+        Row: DotNet npNetDictionary_Of_T_U;
+        Template: DotNet npNetTemplate;
         CurrRecPosition: Text;
     begin
         //-NPR5.40 [308408]
@@ -172,9 +172,9 @@ codeunit 6014621 "POS Web Utilities"
         RecRef.SetPosition(CurrRecPosition);
     end;
 
-    procedure NavRecordToRowsMarked(var RecRef: RecordRef;PageGrid: DotNet DataGrid)
+    procedure NavRecordToRowsMarked(var RecRef: RecordRef;PageGrid: DotNet npNetDataGrid)
     var
-        Row: DotNet Dictionary_Of_T_U;
+        Row: DotNet npNetDictionary_Of_T_U;
         i: Integer;
     begin
         //-NPR5.40 [308408]
@@ -236,7 +236,7 @@ codeunit 6014621 "POS Web Utilities"
         //+224334
     end;
 
-    procedure NavOneRecordToDictionary(var RecRef: RecordRef;Row: DotNet Dictionary_Of_T_U;Template: DotNet Template)
+    procedure NavOneRecordToDictionary(var RecRef: RecordRef;Row: DotNet npNetDictionary_Of_T_U;Template: DotNet npNetTemplate)
     var
         FieldRecord: Record "Field";
         UI: Codeunit "POS Web UI Management";
@@ -307,7 +307,7 @@ codeunit 6014621 "POS Web Utilities"
         end;
     end;
 
-    procedure RowToNavRecord(Row: DotNet Dictionary_Of_T_U;var RecRef: RecordRef)
+    procedure RowToNavRecord(Row: DotNet npNetDictionary_Of_T_U;var RecRef: RecordRef)
     var
         UI: Codeunit "POS Web UI Management";
         "Field": FieldRef;
@@ -368,9 +368,9 @@ codeunit 6014621 "POS Web Utilities"
 
     procedure CountOfChar(Value: Text;Separator: Char): Integer
     var
-        String: DotNet String;
+        String: DotNet npNetString;
         Char: Char;
-        ArrayOfChar: DotNet Array;
+        ArrayOfChar: DotNet npNetArray;
     begin
         String := Value;
         ArrayOfChar := ArrayOfChar.CreateInstance(GetDotNetType(Separator),1);
