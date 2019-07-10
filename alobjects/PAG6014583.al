@@ -12,23 +12,7 @@ page 6014583 "JS Bridge"
     {
         area(content)
         {
-            usercontrol(JSBridge;"NaviPartner.POS.JSBridge")
-            {
-
-                trigger ControlAddInReady()
-                begin
-                    if FunctionName <> '' then
-                      CurrPage.JSBridge.CallNativeFunction(FunctionParameter)
-                    else if JavaScript <> '' then
-                      CurrPage.JSBridge.InjectJavaScript(JavaScript);
-                end;
-
-                trigger ActionCompleted(jsonObject: Text)
-                begin
-                    //MESSAGE(jsonObject);
-                    CurrPage.Close;
-                end;
-            }
+            // AL-Conversion: TODO #361608 - AL: Problems with NaviPartner.POS.JSBridge addin.
         }
     }
 
@@ -41,7 +25,7 @@ page 6014583 "JS Bridge"
         FunctionParameter: Text;
         JavaScript: Text;
 
-    procedure SetParameters(pFunctionName: Text;pFunctionParameter: Text;pJavaScript: Text)
+    procedure SetParameters(pFunctionName: Text; pFunctionParameter: Text; pJavaScript: Text)
     begin
         FunctionName := pFunctionName;
         FunctionParameter := pFunctionParameter;
