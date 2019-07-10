@@ -1131,16 +1131,6 @@ codeunit 6151413 "Magento Sales Order Mgt."
               Customer.SetRange("Phone No.",NpXmlDomMgt.GetXmlText(XmlElement,'phone',MaxStrLen(Customer."Phone No."),false));
               exit(Customer.FindFirst and (Customer."E-Mail" <> '') and (Customer."Phone No." <> ''));
             end;
-          MagentoSetup."Customer Mapping"::"E-mail":
-            begin
-              Customer.SetRange("E-Mail",NpXmlDomMgt.GetXmlText(XmlElement,'email',MaxStrLen(Customer."E-Mail"),false));
-              if Customer.FindFirst and (Customer."E-Mail" <> '') then
-                exit(true);
-
-              Clear(Customer);
-              Customer.SetRange("Phone No.",NpXmlDomMgt.GetXmlText(XmlElement,'phone',MaxStrLen(Customer."Phone No."),false));
-              exit(Customer.FindFirst and (Customer."Phone No." <> ''));
-            end;
         end;
 
         exit(false);
