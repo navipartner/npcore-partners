@@ -22,49 +22,7 @@ page 6014653 "Touch Screen - Balancing (Web)"
     {
         area(content)
         {
-            usercontrol(NPHost;"NaviPartner.Retail.Controls.IFramework")
-            {
-
-                trigger OnFrameworkReady()
-                begin
-                    EventFrameworkReady();
-                end;
-
-                trigger OnScreenSize(screen: DotNet npNetScreen)
-                begin
-                end;
-
-                trigger OnMessage(eventArgs: DotNet npNetMessageEventArgs)
-                begin
-                    EventOnMessage(eventArgs);
-                end;
-
-                trigger OnResponse(response: DotNet npNetResponseInfo)
-                begin
-                end;
-
-                trigger OnJavaScriptCallback(js: DotNet npNetJavaScript)
-                begin
-                end;
-
-                trigger OnDialogResponse(response: DotNet npNetResponse)
-                begin
-                    EventOnDialogResponse();
-                end;
-
-                trigger OnDataUpdated(dataSource: DotNet npNetDataSource)
-                begin
-                    EventOnDataUpdated(dataSource);
-                end;
-            }
-            usercontrol(NPTweak;"NaviPartner.Retail.Controls.WindowsClientHelper")
-            {
-
-                trigger ControlReady()
-                begin
-                    EventTweakReady();
-                end;
-            }
+            // AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects'
         }
     }
 
@@ -95,10 +53,10 @@ page 6014653 "Touch Screen - Balancing (Web)"
         Dlg: DotNet npNetRegisterBalancing;
         LastLinePosition: Text;
 
-    procedure Initialize(RegNo: Code[20];"Sales Person": Code[10])
+    procedure Initialize(RegNo: Code[20]; "Sales Person": Code[10])
     begin
         BalancingMgt.Initialize();
-        BalancingMgt.initForm(RegNo,"Sales Person");
+        BalancingMgt.initForm(RegNo, "Sales Person");
 
         BalancingMgt.DoTheBalancing();
         BalancingMgt.OnAfterGetCurrRecord();
@@ -109,9 +67,9 @@ page 6014653 "Touch Screen - Balancing (Web)"
         exit(BalancingMgt.getClosingType());
     end;
 
-    procedure saveBalancedRegister(var Sale: Record "Sale POS";AfslutDato: Date;AfslutTid: Time;Afsluttet: Boolean)
+    procedure saveBalancedRegister(var Sale: Record "Sale POS"; AfslutDato: Date; AfslutTid: Time; Afsluttet: Boolean)
     begin
-        BalancingMgt.saveBalancedRegister(Sale,AfslutDato,AfslutTid,Afsluttet);
+        BalancingMgt.saveBalancedRegister(Sale, AfslutDato, AfslutTid, Afsluttet);
     end;
 
     local procedure UpdateFigures(RefreshRows: Boolean)
@@ -124,21 +82,19 @@ page 6014653 "Touch Screen - Balancing (Web)"
     begin
         //-NPR5.31
         //BalancingMgt.UpdateFigures(PeriodFigures,BalancingFigures,CountingLines);
-        BalancingMgt.UpdateFigures(PeriodFigures,BalancingFigures,CountingLines,Subtotal);
+        BalancingMgt.UpdateFigures(PeriodFigures, BalancingFigures, CountingLines, Subtotal);
         //+NPR5.31
-        CurrPage.NPHost.SendRequest(RequestFactory.SetObjectProperty('n$.State.RegisterBalancing.period',PeriodFigures));
-        CurrPage.NPHost.SendRequest(RequestFactory.SetObjectProperty('n$.State.RegisterBalancing.balancing',BalancingFigures));
+        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
         //-NPR5.31
         //IF RefreshRows THEN
         //  CurrPage.NPHost.SendRequest(RequestFactory.SetObjectProperty('n$.State.RegisterBalancing.grid',CountingLines));
         if RefreshRows then begin
-          CurrPage.NPHost.SendRequest(RequestFactory.SetObjectProperty('n$.State.RegisterBalancing.grid',CountingLines));
-          CurrPage.NPHost.SendRequest(RequestFactory.SetObjectProperty('n$.State.RegisterBalancing.subtotal',Subtotal));
+            Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
         end;
         //+NPR5.31
     end;
 
-    local procedure LineSelectionChange(Row: DotNet npNetDictionary_Of_T_U;Type: Option Sale,Payment)
+    local procedure LineSelectionChange(Row: DotNet npNetDictionary_Of_T_U; Type: Option Sale,Payment)
     begin
     end;
 
@@ -151,23 +107,23 @@ page 6014653 "Touch Screen - Balancing (Web)"
     begin
         MessageType := EventArgs.Type;
         case MessageType of
-          EventType.ButtonClicked:
-            begin
-              EventOnMessageButtonPressed(EventArgs.ToButton());
-            end;
-          EventType.SelectionChanged:
-            begin
-              EventOnMessageSelectionChanged(EventArgs.ToSelectionChanged());
-            end;
+            EventType.ButtonClicked:
+                begin
+                    EventOnMessageButtonPressed(EventArgs.ToButton());
+                end;
+            EventType.SelectionChanged:
+                begin
+                    EventOnMessageSelectionChanged(EventArgs.ToSelectionChanged());
+                end;
         end;
     end;
 
     local procedure EventOnMessageButtonPressed(Button: DotNet npNetButton)
     begin
         if BalancingMgt.ButtonClickedHandler(Button.Value) then
-          CurrPage.Close()
+            CurrPage.Close()
         else
-          UpdateFigures(true);
+            UpdateFigures(true);
     end;
 
     local procedure EventOnMessageSelectionChanged(Row: DotNet npNetDictionary_Of_T_U)
@@ -177,14 +133,14 @@ page 6014653 "Touch Screen - Balancing (Web)"
         Position: Text;
     begin
         RecRef.GetTable(Line);
-        Util.RowToNavRecord(Row,RecRef);
+        Util.RowToNavRecord(Row, RecRef);
         RecRef.SetTable(Line);
         Line.Find;
         Position := Line.GetPosition();
         if Position <> LastLinePosition then begin
-          LastLinePosition := Position;
-          BalancingMgt.SetPosition(Position);
-          UpdateFigures(false);
+            LastLinePosition := Position;
+            BalancingMgt.SetPosition(Position);
+            UpdateFigures(false);
         end;
     end;
 
@@ -211,41 +167,41 @@ page 6014653 "Touch Screen - Balancing (Web)"
         // UltimoLCY := UI.ParseDecimal(DataSource.GetValue('UltimoLCY',GETDOTNETTYPE('')));
         // BankLCY := UI.ParseDecimal(DataSource.GetValue('BankLCY',GETDOTNETTYPE('')));
         // //+NPR5.23 [243500]
-        UltimoLCYText := DataSource.GetValue('UltimoLCY',GetDotNetType(''));
-        BankLCYText := DataSource.GetValue('BankLCY',GetDotNetType(''));
+        UltimoLCYText := DataSource.GetValue('UltimoLCY', GetDotNetType(''));
+        BankLCYText := DataSource.GetValue('BankLCY', GetDotNetType(''));
         if UltimoLCYText <> '' then begin
-          UltimoLCY := UI.ParseDecimal(UltimoLCYText);
-          UltimoLCYSet := UltimoLCY <> BalancingMgt.GetUltimoLCY();
+            UltimoLCY := UI.ParseDecimal(UltimoLCYText);
+            UltimoLCYSet := UltimoLCY <> BalancingMgt.GetUltimoLCY();
         end;
         if BankLCYText <> '' then begin
-          BankLCY := UI.ParseDecimal(BankLCYText);
-          BankLCYSet := BankLCY <> BalancingMgt.GetBankLCY();
+            BankLCY := UI.ParseDecimal(BankLCYText);
+            BankLCYSet := BankLCY <> BalancingMgt.GetBankLCY();
         end;
         //+NPR5.31
-        MoneyBagNo := DataSource.GetValue('MoneyBagNo',GetDotNetType(''));
-        Comment := DataSource.GetValue('Comment',GetDotNetType(''));
+        MoneyBagNo := DataSource.GetValue('MoneyBagNo', GetDotNetType(''));
+        Comment := DataSource.GetValue('Comment', GetDotNetType(''));
 
         //-NPR5.31
         //IF UltimoLCY <> BalancingMgt.GetUltimoLCY() THEN
         if UltimoLCYSet then
-        //+NPR5.31
-          BalancingMgt.pushUltimo(UltimoLCY);
+            //+NPR5.31
+            BalancingMgt.pushUltimo(UltimoLCY);
         //-NPR5.31
         //IF BankLCY <> BalancingMgt.GetBankLCY() THEN
         if BankLCYSet then
-        //+NPR5.31
-          BalancingMgt.pushBank(BankLCY);
+            //+NPR5.31
+            BalancingMgt.pushBank(BankLCY);
         if MoneyBagNo <> BalancingMgt.GetMoneyBagNo() then
-          BalancingMgt.SetMoneyBagNo(MoneyBagNo);
+            BalancingMgt.SetMoneyBagNo(MoneyBagNo);
         if Comment <> BalancingMgt.GetComment() then
-          BalancingMgt.SetComment(Comment);
+            BalancingMgt.SetComment(Comment);
 
         UpdateFigures(false);
     end;
 
     local procedure EventTweakReady()
     begin
-        CurrPage.NPTweak.SetPageSize(Dlg.Width,Dlg.Height);
+        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
     end;
 
     local procedure EventFrameworkReady()
@@ -259,7 +215,7 @@ page 6014653 "Touch Screen - Balancing (Web)"
         UI.ConfigureCustomLogo(Marshaller);
         UI.ConfigureFonts(Marshaller);
 
-        CurrPage.NPHost.ShowDialog(Dlg);
+        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
 
         UpdateFigures(true);
     end;
@@ -269,22 +225,22 @@ page 6014653 "Touch Screen - Balancing (Web)"
         KnownEvent: DotNet npNetKnownEvent;
     begin
         case EventArgs.EventType of
-          KnownEvent.ClearInfoBoxContent,
-          KnownEvent.ConfigureFont,
-          KnownEvent.InvokeJavaScriptFunction,
-          KnownEvent.DimScreen,
-          KnownEvent.Error,
-          KnownEvent.NumPad,
-          KnownEvent.SetObjectProperty,
-          KnownEvent.Functions,
-          KnownEvent.CloseFunctions,
-          KnownEvent.UpdateInfoBox,
-          KnownEvent.UpdateState:
-            begin
-              CurrPage.NPHost.SendRequest(EventArgs.ToRequestInfo());
-            end;
-          else
-            Error('Unsupported marshalled event. This is a programming bug, not a user error. Event details:\\%1',EventArgs.ToJson());
+            KnownEvent.ClearInfoBoxContent,
+            KnownEvent.ConfigureFont,
+            KnownEvent.InvokeJavaScriptFunction,
+            KnownEvent.DimScreen,
+            KnownEvent.Error,
+            KnownEvent.NumPad,
+            KnownEvent.SetObjectProperty,
+            KnownEvent.Functions,
+            KnownEvent.CloseFunctions,
+            KnownEvent.UpdateInfoBox,
+            KnownEvent.UpdateState:
+                begin
+                    Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+                end;
+            else
+                Error('Unsupported marshalled event. This is a programming bug, not a user error. Event details:\\%1', EventArgs.ToJson());
         end;
     end;
 
