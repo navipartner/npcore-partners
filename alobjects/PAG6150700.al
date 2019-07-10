@@ -13,40 +13,7 @@ page 6150700 "POS (New)"
     {
         area(content)
         {
-            usercontrol(Framework;"NaviPartner.Retail.Controls.Framework")
-            {
-
-                trigger OnFrameworkReady()
-                begin
-                    //-NPR5.43 [318028]
-                    if POSSession.IsFinalized() then
-                      exit;
-                    //+NPR5.43 [318028]
-                    POSSession.DebugWithTimestamp('OnFrameworkReady');
-                    Initialize();
-                end;
-
-                trigger OnInvokeMethod(method: Text;eventContext: DotNet npNetJObject)
-                begin
-                    //-NPR5.43 [318028]
-                    if POSSession.IsFinalized() then
-                      exit;
-                    //+NPR5.43 [318028]
-                    POSSession.DebugWithTimestamp('Method:' + method);
-                    if not PreHandleMethod(method,eventContext) then
-                      JavaScript.InvokeMethod(method,eventContext,POSSession,FrontEnd);
-                end;
-
-                trigger OnAction("action": Text;workflowStep: Text;workflowId: Integer;actionId: Integer;Context: DotNet npNetJObject)
-                begin
-                    //-NPR5.43 [318028]
-                    if POSSession.IsFinalized() then
-                      Error(SESSION_FINALIZED_ERROR);
-                    //+NPR5.43 [318028]
-                    POSSession.DebugWithTimestamp('Action:' + action);
-                    JavaScript.InvokeAction(action,workflowStep,workflowId,actionId,Context,POSSession,FrontEnd);
-                end;
-            }
+            // AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects
         }
     }
 
@@ -86,7 +53,7 @@ page 6150700 "POS (New)"
         // FrontEndKeeper.Initialize(CurrPage.Framework,FrontEnd,POSSession);
         // BINDSUBSCRIPTION(FrontEndKeeper);
 
-        POSSession.Constructor(CurrPage.Framework,FrontEnd,Setup,POSSession);
+        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
         //+NPR5.43 [318028]
     end;
 
@@ -106,12 +73,15 @@ page 6150700 "POS (New)"
     begin
     end;
 
-    local procedure PreHandleMethod(Method: Text;Context: DotNet npNetJObject): Boolean
+    local procedure PreHandleMethod(Method: Text; Context: DotNet npNetJObject): Boolean
     begin
         case Method of
-          'KeepAlive':              exit(true);
-          'CloseRequested':         exit(CloseRequested());
-          'InitializationComplete': exit(InitializationComplete());
+            'KeepAlive':
+                exit(true);
+            'CloseRequested':
+                exit(CloseRequested());
+            'InitializationComplete':
+                exit(InitializationComplete());
         end;
     end;
 
