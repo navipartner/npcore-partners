@@ -26,7 +26,7 @@ page 6059812 "Retail Activities"
         {
             cuegroup(Control6150623)
             {
-                CueGroupLayout = Columns;
+                CueGroupLayout = Wide;
                 ShowCaption = false;
                 field("Sales Orders"; "Sales Orders")
                 {
