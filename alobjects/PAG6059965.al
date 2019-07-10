@@ -14,56 +14,7 @@ page 6059965 "MPOS Proxy"
     {
         area(content)
         {
-            usercontrol(JSBridge;"NaviPartner.POS.JSBridge")
-            {
-
-                trigger ControlAddInReady()
-                begin
-                    mPOSAdyenTransactions.CalcFields("Request Json");
-                    mPOSNetsTransactions.CalcFields("Request Json");
-
-                    case Provider of
-                      Provider::ADYEN : begin
-                                          if mPOSAdyenTransactions."Request Json".HasValue then begin
-                                            mPOSAdyenTransactions."Request Json".CreateInStream(IStream);
-                                            IStream.Read(RequestData,MaxStrLen(RequestData));
-                                          end;
-                                        end;
-                      Provider::NETS  : begin
-                                          if mPOSNetsTransactions."Request Json".HasValue then begin
-                                            mPOSNetsTransactions."Request Json".CreateInStream(IStream);
-                                            IStream.Read(RequestData,MaxStrLen(RequestData));
-                                          end;
-                                        end;
-                    end;
-
-
-                    //CurrPage.JSBridge.StartDebugger();
-                    CurrPage.JSBridge.CallAdyenFunction(RequestData);
-                end;
-
-                trigger ActionCompleted(jsonObject: Text)
-                begin
-                    BigTextVar.AddText(jsonObject);
-
-                    case Provider of
-                      Provider::ADYEN : begin
-                                          mPOSAdyenTransactions."Response Json".CreateOutStream(Ostream);
-                                          BigTextVar.Write(Ostream);
-                                          mPOSAdyenTransactions.Modify(true);
-                                          Commit;
-                                        end;
-                      Provider::NETS  : begin
-                                          mPOSNetsTransactions."Response Json".CreateOutStream(Ostream);
-                                          BigTextVar.Write(Ostream);
-                                          mPOSNetsTransactions.Modify(true);
-                                          Commit;
-                                        end;
-                    end;
-
-                    CurrPage.Close;
-                end;
-            }
+          // AL-Conversion: TODO #361608 - AL: Problems with NaviPartner.POS.JSBridge addin.
         }
     }
 
