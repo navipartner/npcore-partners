@@ -366,13 +366,5 @@ codeunit 6150825 "POS Action - MPOS Native"
 
         Message(ErrorText);
     end;
-
-    trigger Model::OnModelControlEvent(control: DotNet npNetControl;eventName: Text;data: DotNet npNetDictionary_Of_T_U)
-    begin
-    end;
-
-    trigger Model::OnTimer()
-    begin
-    end;
 }
 

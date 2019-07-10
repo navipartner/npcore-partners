@@ -13,7 +13,7 @@ codeunit 6014524 "SSH.NET SFTP Client"
     var
         SftpClient: DotNet npNetSftpClient;
 
-    procedure Construct(Host: Text;Username: Text;Password: Text;Port: Integer;TimeoutMs: Integer)
+    procedure Construct(Host: Text; Username: Text; Password: Text; Port: Integer; TimeoutMs: Integer)
     var
         ConnectionInfo: DotNet npNetConnectionInfo;
         PasswordAuthenticationMethod: DotNet npNetPasswordAuthenticationMethod;
@@ -41,7 +41,7 @@ codeunit 6014524 "SSH.NET SFTP Client"
     begin
     end;
 
-    procedure DownloadFile(LocalPath: Text;RemotePath: Text)
+    procedure DownloadFile(LocalPath: Text; RemotePath: Text)
     var
         File: DotNet npNetFile;
         OutputStream: DotNet npNetFileStream;
@@ -55,7 +55,7 @@ codeunit 6014524 "SSH.NET SFTP Client"
         OutputStream.Dispose();
     end;
 
-    procedure UploadFile(LocalPath: Text;RemotePath: Text)
+    procedure UploadFile(LocalPath: Text; RemotePath: Text)
     var
         File: DotNet npNetFile;
         InputStream: DotNet npNetFileStream;
@@ -69,7 +69,7 @@ codeunit 6014524 "SSH.NET SFTP Client"
         InputStream.Dispose();
     end;
 
-    procedure MoveFile(CurrentRemotePath: Text;NewRemotePath: Text)
+    procedure MoveFile(CurrentRemotePath: Text; NewRemotePath: Text)
     var
         SftpFile: DotNet npNetSftpFile;
     begin
@@ -82,7 +82,7 @@ codeunit 6014524 "SSH.NET SFTP Client"
         SftpClient.DeleteFile(RemotePath);
     end;
 
-    procedure DownloadDirectory(LocalPath: Text;RemotePath: Text;IncludeSubFolders: Boolean)
+    procedure DownloadDirectory(LocalPath: Text; RemotePath: Text; IncludeSubFolders: Boolean)
     var
         IEnumerable: DotNet npNetIEnumerable;
         SftpFile: DotNet npNetSftpFile;
@@ -90,36 +90,28 @@ codeunit 6014524 "SSH.NET SFTP Client"
         SftpClientWrapper: DotNet npNetSFTPClientWrapper;
     begin
         if CopyStr(LocalPath, StrLen(LocalPath), 1) <> '\' then
-          LocalPath += '\';
+            LocalPath += '\';
         if CopyStr(RemotePath, StrLen(RemotePath), 1) <> '/' then
-          RemotePath += '/';
+            RemotePath += '/';
 
         //This wrapper is only used because C/AL DotNet interop cannot pass null to the delegate parameter to the SftpClient method directly.
         IEnumerable := SftpClientWrapper.ListDirectory(SftpClient, RemotePath);
 
         foreach SftpFile in IEnumerable do begin
-          if SftpFile.IsDirectory then begin
-            if not (SftpFile.Name in ['.', '..']) then
-              if IncludeSubFolders then begin
-                Directory.CreateDirectory(LocalPath + SftpFile.Name);
-                DownloadDirectory(LocalPath + SftpFile.Name, RemotePath + SftpFile.Name, IncludeSubFolders);
-              end
-          end else
-            DownloadFile(LocalPath + SftpFile.Name, RemotePath + SftpFile.Name);
+            if SftpFile.IsDirectory then begin
+                if not (SftpFile.Name in ['.', '..']) then
+                    if IncludeSubFolders then begin
+                        Directory.CreateDirectory(LocalPath + SftpFile.Name);
+                        DownloadDirectory(LocalPath + SftpFile.Name, RemotePath + SftpFile.Name, IncludeSubFolders);
+                    end
+            end else
+                DownloadFile(LocalPath + SftpFile.Name, RemotePath + SftpFile.Name);
         end;
     end;
 
     procedure DeleteDirectory(RemotePath: Text)
     begin
         SftpClient.DeleteDirectory(RemotePath);
-    end;
-
-    trigger SftpClient::ErrorOccurred(sender: Variant;e: DotNet npNetExceptionEventArgs)
-    begin
-    end;
-
-    trigger SftpClient::HostKeyReceived(sender: Variant;e: DotNet npNetHostKeyEventArgs)
-    begin
     end;
 }
 
