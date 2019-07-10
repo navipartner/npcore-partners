@@ -78,7 +78,8 @@ table 6060151 "Event Word Layout"
         }
         field(60;"Basic Layout Description";Text[80])
         {
-            CalcFormula = Lookup("Custom Report Layout".Description WHERE (Code=FIELD("Basic Layout ID")));
+            // AL-Conversion: TODO #361677 - AL: "Basic Layout Description" calc.f. incorrect
+            //CalcFormula = Lookup("Custom Report Layout".Description WHERE (Code=FIELD("Basic Layout ID")));
             Caption = 'Basic Layout Description';
             Editable = false;
             FieldClass = FlowField;
