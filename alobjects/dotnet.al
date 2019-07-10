@@ -2538,6 +2538,14 @@ dotnet
         }
     }
 
+    assembly("Microsoft.Dynamics.Nav.Client.PingPong")
+    {
+        type("Microsoft.Dynamics.Nav.Client.PingPong.PingPongAddIn"; "Microsoft.Dynamics.Nav.Client.PingPong")
+        {
+            IsControlAddIn = true;
+        }
+    }
+
     assembly("")
     {
         type(""; "npNet")
