@@ -61,7 +61,7 @@ table 6014404 "Report Selection Retail"
         field(5;"XML Port ID";Integer)
         {
             Caption = 'XML Port ID';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST("4"));
+            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(XMLport));
 
             trigger OnValidate()
             begin
