@@ -22,7 +22,7 @@ page 6151481 "Magento Retail Activities"
             cuegroup(Orders)
             {
                 Caption = 'Orders';
-                CueGroupLayout = Columns;
+                CueGroupLayout = Wide;
 
                 actions
                 {
