@@ -274,7 +274,7 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
           exit;
 
         with EFTTransactionRequest do
-            Skip := ("Processing Type" in ["Processing Type"::Setup, "Processing Type"::Void, "Processing Type"::Lookup]);
+            Skip := ("Processing Type" in ["Processing Type"::Setup, "Processing Type"::Void, "Processing Type"::xLookup]);
 
         //These requests are synchronous - which crashes the front end if we pause/resume.
     end;
@@ -291,7 +291,7 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
           exit;
 
         with EFTTransactionRequest do
-            Skip := ("Processing Type" in ["Processing Type"::Setup, "Processing Type"::Void, "Processing Type"::Lookup]) and (not POSFrontEnd.IsPaused);
+            Skip := ("Processing Type" in ["Processing Type"::Setup, "Processing Type"::Void, "Processing Type"::xLookup]) and (not POSFrontEnd.IsPaused);
 
         //These requests are synchronous - which crashes the front end if we pause/resume.
     end;
@@ -325,7 +325,7 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::Setup) and (EftTransactionRequest.Successful) then
           Message(EftTransactionRequest."Result Display Text");
 
-        if EftTransactionRequest."Processing Type" in [EftTransactionRequest."Processing Type"::Payment, EftTransactionRequest."Processing Type"::Refund, EftTransactionRequest."Processing Type"::Lookup] then begin
+        if EftTransactionRequest."Processing Type" in [EftTransactionRequest."Processing Type"::Payment, EftTransactionRequest."Processing Type"::Refund, EftTransactionRequest."Processing Type"::xLookup] then begin
           if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, PaymentTypePOS) then begin
             EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
             EftTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen (EftTransactionRequest."Card Name"));

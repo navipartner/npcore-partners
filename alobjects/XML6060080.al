@@ -13,10 +13,10 @@ xmlport 6060080 "MCS Recommendations Catalog"
     {
         textelement(root)
         {
-            tableelement(Item;Item)
+            tableelement(Item; Item)
             {
                 XmlName = 'item';
-                fieldelement(ItemID;Item."No.")
+                fieldelement(ItemID; Item."No.")
                 {
                 }
                 textelement(itemnametext)
@@ -62,16 +62,16 @@ xmlport 6060080 "MCS Recommendations Catalog"
                 begin
                     //-NPR5.34 [275206]
                     if not MCSRecommendationsHandler.IsValidMCSNo(Item."No.") then
-                      currXMLport.Skip;
+                        currXMLport.Skip;
                     //+NPR5.34 [275206]
                 end;
 
                 trigger OnPreXmlItem()
                 begin
                     if MCSRecommendationsModel."Item View" <> '' then
-                      Item.SetView(MCSRecommendationsModel."Item View");
+                        Item.SetView(MCSRecommendationsModel."Item View");
                     if LastModifiedDate <> 0D then
-                      Item.SetFilter("Last Date Modified",'%1..',LastModifiedDate);
+                        Item.SetFilter("Last Date Modified", '%1..', LastModifiedDate);
                 end;
             }
         }
@@ -115,13 +115,13 @@ xmlport 6060080 "MCS Recommendations Catalog"
     begin
         DescrText := Item.Description;
         if Item."Description 2" <> '' then
-          DescrText := DescrText +  ' ' + Item."Description 2";
+            DescrText := DescrText + ' ' + Item."Description 2";
         if LanguageCode <> '' then begin
-          if ItemTranslation.Get(Item."No.",'',LanguageCode) then begin
-            DescrText := ItemTranslation.Description;
-            if ItemTranslation."Description 2" <> '' then
-              DescrText := DescrText +  ' ' + ItemTranslation."Description 2";
-          end;
+            if ItemTranslation.Get(Item."No.", '', LanguageCode) then begin
+                DescrText := ItemTranslation.Description;
+                if ItemTranslation."Description 2" <> '' then
+                    DescrText := DescrText + ' ' + ItemTranslation."Description 2";
+            end;
         end;
     end;
 
@@ -131,91 +131,91 @@ xmlport 6060080 "MCS Recommendations Catalog"
         ExtendedTextLine: Record "Extended Text Line";
     begin
         Clear(ExtendedText);
-        ExtendedTextHeader.SetRange("Table Name",ExtendedTextHeader."Table Name"::Item);
-        ExtendedTextHeader.SetRange("No.",ExtTextItem."No.");
-        ExtendedTextHeader.SetRange("All Language Codes",true);
+        ExtendedTextHeader.SetRange("Table Name", ExtendedTextHeader."Table Name"::Item);
+        ExtendedTextHeader.SetRange("No.", ExtTextItem."No.");
+        ExtendedTextHeader.SetRange("All Language Codes", true);
         if not ExtendedTextHeader.FindFirst then begin
-          ExtendedTextHeader.SetRange("All Language Codes");
-          ExtendedTextHeader.SetRange("Language Code",LanguageCode);
-          if not ExtendedTextHeader.FindFirst then begin
-            ExtendedTextHeader.SetRange("Language Code");
-            if not ExtendedTextHeader.FindFirst then
-              exit('');
-          end;
+            ExtendedTextHeader.SetRange("All Language Codes");
+            ExtendedTextHeader.SetRange("Language Code", LanguageCode);
+            if not ExtendedTextHeader.FindFirst then begin
+                ExtendedTextHeader.SetRange("Language Code");
+                if not ExtendedTextHeader.FindFirst then
+                    exit('');
+            end;
         end;
 
-        ExtendedTextLine.SetRange("Table Name",ExtendedTextLine."Table Name"::Item);
-        ExtendedTextLine.SetRange("No.",ExtendedTextHeader."No.");
-        ExtendedTextLine.SetRange("Language Code",ExtendedTextHeader."Language Code");
-        ExtendedTextLine.SetRange("Text No.",ExtendedTextHeader."Text No.");
-        if ExtendedTextLine.FindFirst then repeat
-          if ExtendedText <> '' then
-            ExtendedText := ExtendedText + ' ';
-          ExtendedText := ExtendedText + ExtendedTextLine.Text;
-        until ExtendedTextLine.Next = 0;
+        ExtendedTextLine.SetRange("Table Name", ExtendedTextLine."Table Name"::Item);
+        ExtendedTextLine.SetRange("No.", ExtendedTextHeader."No.");
+        ExtendedTextLine.SetRange("Language Code", ExtendedTextHeader."Language Code");
+        ExtendedTextLine.SetRange("Text No.", ExtendedTextHeader."Text No.");
+        if ExtendedTextLine.FindFirst then
+            repeat
+                if ExtendedText <> '' then
+                    ExtendedText := ExtendedText + ' ';
+                ExtendedText := ExtendedText + ExtendedTextLine.Text;
+            until ExtendedTextLine.Next = 0;
     end;
 
     local procedure GetCategory() CatText: Text
     var
         ItemGroup: Record "Item Group";
         ItemCategory: Record "Item Category";
-        ProductGroup: Record "Product Group";
     begin
         case MCSRecommendationsModel.Categories of
-          MCSRecommendationsModel.Categories::"Item Category" :
-            begin
-              if Item."Item Category Code" <> '' then
-                if ItemCategory.Get(Item."Item Category Code") then
-                  if ItemCategory.Description <> '' then
-                    exit(ItemCategory.Description)
-                  else
-                    exit(ItemCategory.Code);
-            end;
-          MCSRecommendationsModel.Categories::"Product Group" :
-            begin
-              //-NPR5.48 [340615]
-              /*
-              IF Item."Product Group Code" <> '' THEN
-                IF ProductGroup.GET(Item."Item Category Code",Item."Product Group Code") THEN
-                  IF ProductGroup.Description <> '' THEN
-                    EXIT(ProductGroup.Description)
-                  ELSE
-                    EXIT(ProductGroup.Code);
-              */
-              //+NPR5.48 [340615]
-            end;
-          MCSRecommendationsModel.Categories::"Item Category - Product Group" :
-            begin
-              //-NPR5.48 [340615]
-              /*
-              IF Item."Product Group Code" <> '' THEN BEGIN
-                IF ItemCategory.GET(Item."Item Category Code") AND ProductGroup.GET(Item."Item Category Code",Item."Product Group Code") THEN
-                  IF ProductGroup.Description <> '' THEN
-                    EXIT(ItemCategory.Description + ' - ' + ProductGroup.Description)
-                  ELSE
-                    EXIT(ItemCategory.Code + ' - ' + ProductGroup.Code);
-              END ELSE BEGIN
-              */
-              //+NPR5.48 [340615]
-                if Item."Item Category Code" <> '' then
-                  if ItemCategory.Get(Item."Item Category Code") then
-                    if ItemCategory.Description <> '' then
-                      exit(ItemCategory.Description)
-                    else
-                      exit(ItemCategory.Code);
-              //-NPR5.48 [340615]
-              //END;
-              //+NPR5.48 [340615]
-            end;
-          MCSRecommendationsModel.Categories::"Item Group" :
-            begin
-              if Item."Item Group" <> '' then
-                if ItemGroup.Get(Item."Item Group") then
-                  if ItemGroup.Description <> '' then
-                    exit(ItemGroup.Description)
-                  else
-                    exit(ItemGroup."No.");
-            end;
+            MCSRecommendationsModel.Categories::"Item Category":
+                begin
+                    if Item."Item Category Code" <> '' then
+                        if ItemCategory.Get(Item."Item Category Code") then
+                            if ItemCategory.Description <> '' then
+                                exit(ItemCategory.Description)
+                            else
+                                exit(ItemCategory.Code);
+                end;
+            MCSRecommendationsModel.Categories::"Product Group":
+                begin
+                    //-NPR5.48 [340615]
+                    /*
+                    IF Item."Product Group Code" <> '' THEN
+                      IF ProductGroup.GET(Item."Item Category Code",Item."Product Group Code") THEN
+                        IF ProductGroup.Description <> '' THEN
+                          EXIT(ProductGroup.Description)
+                        ELSE
+                          EXIT(ProductGroup.Code);
+                    */
+                    //+NPR5.48 [340615]
+                end;
+            MCSRecommendationsModel.Categories::"Item Category - Product Group":
+                begin
+                    //-NPR5.48 [340615]
+                    /*
+                    IF Item."Product Group Code" <> '' THEN BEGIN
+                      IF ItemCategory.GET(Item."Item Category Code") AND ProductGroup.GET(Item."Item Category Code",Item."Product Group Code") THEN
+                        IF ProductGroup.Description <> '' THEN
+                          EXIT(ItemCategory.Description + ' - ' + ProductGroup.Description)
+                        ELSE
+                          EXIT(ItemCategory.Code + ' - ' + ProductGroup.Code);
+                    END ELSE BEGIN
+                    */
+                    //+NPR5.48 [340615]
+                    if Item."Item Category Code" <> '' then
+                        if ItemCategory.Get(Item."Item Category Code") then
+                            if ItemCategory.Description <> '' then
+                                exit(ItemCategory.Description)
+                            else
+                                exit(ItemCategory.Code);
+                    //-NPR5.48 [340615]
+                    //END;
+                    //+NPR5.48 [340615]
+                end;
+            MCSRecommendationsModel.Categories::"Item Group":
+                begin
+                    if Item."Item Group" <> '' then
+                        if ItemGroup.Get(Item."Item Group") then
+                            if ItemGroup.Description <> '' then
+                                exit(ItemGroup.Description)
+                            else
+                                exit(ItemGroup."No.");
+                end;
         end;
 
     end;
@@ -230,22 +230,23 @@ xmlport 6060080 "MCS Recommendations Catalog"
         Clear(ListText);
 
         if MCSRecommendationsModel."Attribute View" <> '' then
-          NPRAttribute.SetView(MCSRecommendationsModel."Attribute View");
-        NPRAttribute.SetRange(Blocked,false);
-        if NPRAttribute.FindFirst then repeat
-          AttribValueText := 'UNKNOWN';
-          NPRAttributeKey.SetCurrentKey("Table ID","MDR Code PK");
-          NPRAttributeKey.SetRange("Table ID",DATABASE::Item);
-          NPRAttributeKey.SetRange("MDR Code PK",Item."No.");
-          if NPRAttributeKey.FindFirst then begin
-            if NPRAttributeValueSet.Get(NPRAttributeKey."Attribute Set ID",NPRAttribute.Code) then begin
-              AttribValueText := NPRAttributeValueSet."Text Value";
-            end;
-          end;
-          if ListText <> '' then
-            ListText := ListText + ',';
-          ListText := ListText + NPRAttribute.Code + '=' + AttribValueText;
-        until NPRAttribute.Next = 0 ;
+            NPRAttribute.SetView(MCSRecommendationsModel."Attribute View");
+        NPRAttribute.SetRange(Blocked, false);
+        if NPRAttribute.FindFirst then
+            repeat
+                AttribValueText := 'UNKNOWN';
+                NPRAttributeKey.SetCurrentKey("Table ID", "MDR Code PK");
+                NPRAttributeKey.SetRange("Table ID", DATABASE::Item);
+                NPRAttributeKey.SetRange("MDR Code PK", Item."No.");
+                if NPRAttributeKey.FindFirst then begin
+                    if NPRAttributeValueSet.Get(NPRAttributeKey."Attribute Set ID", NPRAttribute.Code) then begin
+                        AttribValueText := NPRAttributeValueSet."Text Value";
+                    end;
+                end;
+                if ListText <> '' then
+                    ListText := ListText + ',';
+                ListText := ListText + NPRAttribute.Code + '=' + AttribValueText;
+            until NPRAttribute.Next = 0;
     end;
 }
 

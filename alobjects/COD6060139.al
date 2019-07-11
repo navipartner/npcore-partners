@@ -46,7 +46,7 @@ codeunit 6060139 "MM Loyalty Point Management"
         EXPIRE_FORMULA: Label '%1  is expected to be greater than %2.';
 
     [EventSubscriber(ObjectType::Codeunit, 22, 'OnAfterInsertValueEntry', '', true, true)]
-    local procedure OnAfterInsertValueEntry(var ValueEntry: Record "Value Entry";var ItemJournalLine: Record "Item Journal Line")
+    local procedure OnAfterInsertValueEntry(var ValueEntry: Record "Value Entry";ItemJournalLine: Record "Item Journal Line")
     var
         POSSalesWorkflowStep: Record "POS Sales Workflow Step";
     begin

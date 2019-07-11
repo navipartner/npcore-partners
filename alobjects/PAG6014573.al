@@ -16,107 +16,105 @@ page 6014573 "Tax Free GB I2 Info Capture"
             group(Control6014403)
             {
                 ShowCaption = false;
-                field("Passport Number";"Passport Number")
+                field("Passport Number"; "Passport Number")
                 {
-                    BlankZero = true;
                     Editable = PassportNumberEditable;
                     ShowMandatory = PassportNumberMandatory;
-                    Visible = PassportNumberMode<>PassportNumberMode::Hide;
+                    Visible = PassportNumberMode <> PassportNumberMode::Hide;
                 }
-                field("First Name";"First Name")
+                field("First Name"; "First Name")
                 {
                     Editable = FirstNameEditable;
                     ShowMandatory = FirstNameMandatory;
-                    Visible = FirstNameMode<>FirstNameMode::Hide;
+                    Visible = FirstNameMode <> FirstNameMode::Hide;
                 }
-                field("Last Name";"Last Name")
+                field("Last Name"; "Last Name")
                 {
                     Editable = LastNameEditable;
                     ShowMandatory = LastNameMandatory;
-                    Visible = LastNameMode<>LastNameMode::Hide;
+                    Visible = LastNameMode <> LastNameMode::Hide;
                 }
-                field(Street;Street)
+                field(Street; Street)
                 {
                     Editable = StreetEditable;
                     ShowMandatory = StreetMandatory;
-                    Visible = StreetMode<>StreetMode::Hide;
+                    Visible = StreetMode <> StreetMode::Hide;
                 }
-                field("Postal Code";"Postal Code")
+                field("Postal Code"; "Postal Code")
                 {
                     Editable = PostalCodeEditable;
                     ShowMandatory = PostalCodeMandatory;
-                    Visible = PostalCodeMode<>PostalCodeMode::Hide;
+                    Visible = PostalCodeMode <> PostalCodeMode::Hide;
                 }
-                field(Town;Town)
+                field(Town; Town)
                 {
                     Editable = TownEditable;
                     ShowMandatory = TownMandatory;
-                    Visible = TownMode<>TownMode::Hide;
+                    Visible = TownMode <> TownMode::Hide;
                 }
-                field("E-mail";"E-mail")
+                field("E-mail"; "E-mail")
                 {
                     Editable = EmailEditable;
                     ShowMandatory = EmailMandatory;
-                    Visible = EmailMode<>EmailMode::Hide;
+                    Visible = EmailMode <> EmailMode::Hide;
                 }
-                field("Country Of Residence";"Country Of Residence")
+                field("Country Of Residence"; "Country Of Residence")
                 {
                     Editable = CountryCodeEditable;
                     ShowMandatory = CountryCodeMandatory;
-                    Visible = CountryCodeMode<>CountryCodeMode::Hide;
+                    Visible = CountryCodeMode <> CountryCodeMode::Hide;
                 }
-                field("Passport Country";"Passport Country")
+                field("Passport Country"; "Passport Country")
                 {
                     Editable = PassportCountryCodeEditable;
                     ShowMandatory = PassportCountryCodeMandatory;
-                    Visible = PassportCountryCodeMode<>PassportCountryCodeMode::Hide;
+                    Visible = PassportCountryCodeMode <> PassportCountryCodeMode::Hide;
                 }
-                field("Date Of Birth";"Date Of Birth")
+                field("Date Of Birth"; "Date Of Birth")
                 {
                     Editable = DateOfBirthEditable;
                     ShowMandatory = DateOfBirthMandatory;
-                    Visible = DateOfBirthMode<>DateOfBirthMode::Hide;
+                    Visible = DateOfBirthMode <> DateOfBirthMode::Hide;
                 }
-                field("Departure Date";"Departure Date")
+                field("Departure Date"; "Departure Date")
                 {
                     Editable = DepartureEditable;
                     ShowMandatory = DepartureMandatory;
-                    Visible = DepartureDateMode<>DepartureDateMode::Hide;
+                    Visible = DepartureDateMode <> DepartureDateMode::Hide;
                 }
-                field("Arrival Date";"Arrival Date")
+                field("Arrival Date"; "Arrival Date")
                 {
                     Editable = ArrivalEditable;
                     ShowMandatory = ArrivalMandatory;
-                    Visible = ArrivalDateMode<>ArrivalDateMode::Hide;
+                    Visible = ArrivalDateMode <> ArrivalDateMode::Hide;
                 }
-                field("Final Destination Country";"Final Destination Country")
+                field("Final Destination Country"; "Final Destination Country")
                 {
                     Editable = FinalDestinationCountryCodeEditable;
                     ShowMandatory = FinalDestinationCountryCodeMandatory;
-                    Visible = FinalDestinationCountryCodeMode<>FinalDestinationCountryCodeMode::Hide;
+                    Visible = FinalDestinationCountryCodeMode <> FinalDestinationCountryCodeMode::Hide;
                 }
             }
             group("Mobile Phone")
             {
                 Caption = 'Mobile Phone No.';
-                Visible = MobileNumberMode<>MobileNumberMode::Hide;
-                field("Mobile No. Country";"Mobile No. Country")
+                Visible = MobileNumberMode <> MobileNumberMode::Hide;
+                field("Mobile No. Country"; "Mobile No. Country")
                 {
                     Editable = MobileNumberEditable;
-                    Visible = MobileNumberMode<>MobileNumberMode::Hide;
+                    Visible = MobileNumberMode <> MobileNumberMode::Hide;
                 }
-                field("Mobile No. Prefix Formatted";"Mobile No. Prefix Formatted")
+                field("Mobile No. Prefix Formatted"; "Mobile No. Prefix Formatted")
                 {
                     Caption = 'Phone Prefix';
                     Editable = false;
-                    Visible = MobileNumberMode<>MobileNumberMode::Hide;
+                    Visible = MobileNumberMode <> MobileNumberMode::Hide;
                 }
-                field("Mobile No.";"Mobile No.")
+                field("Mobile No."; "Mobile No.")
                 {
-                    BlankZero = true;
                     Editable = MobileNumberEditable;
                     ShowMandatory = MobileNumberMandatory;
-                    Visible = MobileNumberMode<>MobileNumberMode::Hide;
+                    Visible = MobileNumberMode <> MobileNumberMode::Hide;
                 }
             }
         }
@@ -129,7 +127,7 @@ page 6014573 "Tax Free GB I2 Info Capture"
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
         if (CloseAction = ACTION::LookupOK) or (CloseAction = ACTION::OK) then
-          ValidateInputs();
+            ValidateInputs();
     end;
 
     var
@@ -219,66 +217,66 @@ page 6014573 "Tax Free GB I2 Info Capture"
     local procedure ValidateInputs()
     begin
         if PassportNumberMode = PassportNumberMode::Required then
-          if "Passport Number" = '' then
-            Error(Error_MissingRequiredParam, FieldCaption("Passport Number"));
+            if "Passport Number" = '' then
+                Error(Error_MissingRequiredParam, FieldCaption("Passport Number"));
 
         if FirstNameMode = FirstNameMode::Required then
-          if "First Name" = '' then
-            Error(Error_MissingRequiredParam, FieldCaption("First Name"));
+            if "First Name" = '' then
+                Error(Error_MissingRequiredParam, FieldCaption("First Name"));
 
         if LastNameMode = LastNameMode::Required then
-          if "Last Name" = '' then
-            Error(Error_MissingRequiredParam, FieldCaption("Last Name"));
+            if "Last Name" = '' then
+                Error(Error_MissingRequiredParam, FieldCaption("Last Name"));
 
         if StreetMode = StreetMode::Required then
-          if Street = '' then
-            Error(Error_MissingRequiredParam, FieldCaption(Street));
+            if Street = '' then
+                Error(Error_MissingRequiredParam, FieldCaption(Street));
 
         if PostalCodeMode = PostalCodeMode::Required then
-          if "Postal Code" = '' then
-            Error(Error_MissingRequiredParam, FieldCaption("Postal Code"));
+            if "Postal Code" = '' then
+                Error(Error_MissingRequiredParam, FieldCaption("Postal Code"));
 
         if TownMode = TownMode::Required then
-          if Town = '' then
-            Error(Error_MissingRequiredParam, FieldCaption(Town));
+            if Town = '' then
+                Error(Error_MissingRequiredParam, FieldCaption(Town));
 
         if CountryCodeMode = CountryCodeMode::Required then
-          if "Country Of Residence" = '' then
-            Error(Error_MissingRequiredParam, FieldCaption("Country Of Residence"));
+            if "Country Of Residence" = '' then
+                Error(Error_MissingRequiredParam, FieldCaption("Country Of Residence"));
 
         if EmailMode = EmailMode::Required then
-          if "E-mail" = '' then
-            Error(Error_MissingRequiredParam, FieldCaption("E-mail"));
+            if "E-mail" = '' then
+                Error(Error_MissingRequiredParam, FieldCaption("E-mail"));
 
         if MobileNumberMode = MobileNumberMode::Required then
-          if "Mobile No." = '' then
-            Error(Error_MissingRequiredParam, FieldCaption("Mobile No."));
+            if "Mobile No." = '' then
+                Error(Error_MissingRequiredParam, FieldCaption("Mobile No."));
 
         if PassportCountryCodeMode = PassportCountryCodeMode::Required then
-          if "Passport Country" = '' then
-            Error(Error_MissingRequiredParam, FieldCaption("Passport Country"));
+            if "Passport Country" = '' then
+                Error(Error_MissingRequiredParam, FieldCaption("Passport Country"));
 
         if DateOfBirthMode = DateOfBirthMode::Required then
-          if "Date Of Birth" = 0D then
-            Error(Error_MissingRequiredParam, FieldCaption("Date Of Birth"));
+            if "Date Of Birth" = 0D then
+                Error(Error_MissingRequiredParam, FieldCaption("Date Of Birth"));
 
         if DepartureDateMode = DepartureDateMode::Required then
-          if "Departure Date" = 0D then
-            Error(Error_MissingRequiredParam, FieldCaption("Departure Date"));
+            if "Departure Date" = 0D then
+                Error(Error_MissingRequiredParam, FieldCaption("Departure Date"));
 
         if ArrivalDateMode = ArrivalDateMode::Required then
-          if "Arrival Date" = 0D then
-            Error(Error_MissingRequiredParam, FieldCaption("Arrival Date"));
+            if "Arrival Date" = 0D then
+                Error(Error_MissingRequiredParam, FieldCaption("Arrival Date"));
 
         if FinalDestinationCountryCodeMode = FinalDestinationCountryCodeMode::Required then
-          if "Final Destination Country" = '' then
-            Error(Error_MissingRequiredParam, FieldCaption("Final Destination Country"));
+            if "Final Destination Country" = '' then
+                Error(Error_MissingRequiredParam, FieldCaption("Final Destination Country"));
     end;
 
     procedure SetRec(var tmpCustomerInfoCapture: Record "Tax Free GB I2 Info Capture" temporary)
     begin
         if not tmpCustomerInfoCapture.IsTemporary then
-          exit;
+            exit;
 
         Rec.Copy(tmpCustomerInfoCapture, true);
 
@@ -337,7 +335,7 @@ page 6014573 "Tax Free GB I2 Info Capture"
     procedure GetRec(var tmpCustomerInfoCapture: Record "Tax Free GB I2 Info Capture" temporary)
     begin
         if not tmpCustomerInfoCapture.IsTemporary then
-          exit;
+            exit;
 
         tmpCustomerInfoCapture.Copy(Rec, true);
     end;

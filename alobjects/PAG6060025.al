@@ -31,7 +31,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field1;MatrixData[1])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[1];
                     Style = Unfavorable;
                     StyleExpr = Emphasize1;
@@ -45,7 +44,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field2;MatrixData[2])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[2];
                     Style = Unfavorable;
                     StyleExpr = Emphasize2;
@@ -59,7 +57,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field3;MatrixData[3])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[3];
                     Style = Unfavorable;
                     StyleExpr = Emphasize3;
@@ -73,7 +70,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field4;MatrixData[4])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[4];
                     Style = Unfavorable;
                     StyleExpr = Emphasize4;
@@ -87,7 +83,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field5;MatrixData[5])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[5];
                     Style = Unfavorable;
                     StyleExpr = Emphasize5;
@@ -101,7 +96,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field6;MatrixData[6])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[6];
                     Style = Unfavorable;
                     StyleExpr = Emphasize6;
@@ -115,7 +109,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field7;MatrixData[7])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[7];
                     Style = Unfavorable;
                     StyleExpr = Emphasize7;
@@ -129,7 +122,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field8;MatrixData[8])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[8];
                     Style = Unfavorable;
                     StyleExpr = Emphasize8;
@@ -143,7 +135,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field9;MatrixData[9])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[9];
                     Style = Unfavorable;
                     StyleExpr = Emphasize9;
@@ -157,7 +148,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field10;MatrixData[10])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[10];
                     Style = Unfavorable;
                     StyleExpr = Emphasize10;
@@ -171,7 +161,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field11;MatrixData[11])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[11];
                     Style = Unfavorable;
                     StyleExpr = Emphasize11;
@@ -185,7 +174,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field12;MatrixData[12])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[12];
                     Style = Unfavorable;
                     StyleExpr = Emphasize12;
@@ -199,7 +187,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field13;MatrixData[13])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[13];
                     Style = Unfavorable;
                     StyleExpr = Emphasize13;
@@ -213,7 +200,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field14;MatrixData[14])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[14];
                     Style = Unfavorable;
                     StyleExpr = Emphasize14;
@@ -227,7 +213,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field15;MatrixData[15])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[15];
                     Style = Unfavorable;
                     StyleExpr = Emphasize15;
@@ -241,7 +226,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field16;MatrixData[16])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[16];
                     Style = Unfavorable;
                     StyleExpr = Emphasize16;
@@ -255,7 +239,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field17;MatrixData[17])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[17];
                     Style = Unfavorable;
                     StyleExpr = Emphasize17;
@@ -269,7 +252,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field18;MatrixData[18])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[18];
                     Style = Unfavorable;
                     StyleExpr = Emphasize18;
@@ -283,7 +265,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field19;MatrixData[19])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[19];
                     Style = Unfavorable;
                     StyleExpr = Emphasize19;
@@ -297,7 +278,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field20;MatrixData[20])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[20];
                     Style = Unfavorable;
                     StyleExpr = Emphasize20;
@@ -311,7 +291,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field21;MatrixData[21])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[21];
                     Style = Unfavorable;
                     StyleExpr = Emphasize21;
@@ -325,7 +304,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field22;MatrixData[22])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[22];
                     Style = Unfavorable;
                     StyleExpr = Emphasize22;
@@ -339,7 +317,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field23;MatrixData[23])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[23];
                     Style = Unfavorable;
                     StyleExpr = Emphasize23;
@@ -353,7 +330,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field24;MatrixData[24])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[24];
                     Style = Unfavorable;
                     StyleExpr = Emphasize24;
@@ -367,7 +343,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field25;MatrixData[25])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[25];
                     Style = Unfavorable;
                     StyleExpr = Emphasize25;
@@ -381,7 +356,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field26;MatrixData[26])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[26];
                     Style = Unfavorable;
                     StyleExpr = Emphasize26;
@@ -395,7 +369,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field27;MatrixData[27])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[27];
                     Style = Unfavorable;
                     StyleExpr = Emphasize27;
@@ -409,7 +382,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field28;MatrixData[28])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[28];
                     Style = Unfavorable;
                     StyleExpr = Emphasize28;
@@ -423,7 +395,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field29;MatrixData[29])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[29];
                     Style = Unfavorable;
                     StyleExpr = Emphasize29;
@@ -437,7 +408,6 @@ page 6060025 "GIM - Import Buffer Matrix"
                 }
                 field(Field30;MatrixData[30])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MatrixColumnCaptions[30];
                     Style = Unfavorable;
                     StyleExpr = Emphasize30;

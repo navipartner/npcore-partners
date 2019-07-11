@@ -16,7 +16,6 @@ table 6059788 "Ticket Access Reservation"
         field(2;"Ticket No.";Code[20])
         {
             Caption = 'Ticket No.';
-            TableRelation = Table6059776;
         }
         field(3;"Ticket Type Code";Code[10])
         {

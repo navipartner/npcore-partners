@@ -15,7 +15,7 @@ page 6150702 "POS Menu Buttons"
     PageType = List;
     PromotedActionCategories = 'New,Process,Reports,Level,Order';
     SourceTable = "POS Menu Button";
-    SourceTableView = SORTING("Menu Code",Ordinal);
+    SourceTableView = SORTING("Menu Code");
 
     layout
     {

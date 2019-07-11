@@ -28,24 +28,24 @@ codeunit 6014485 "PBS Gift Voucher Functions"
         Filter := PAN;
         Len := StrLen(Filter);
         while Len > 0 do begin
-          PaymentTypePrefix.SetRange(PaymentTypePrefix.Prefix,Filter);
-          if PaymentTypePrefix.Find('-') then
-            repeat
-              PaymentTypePOS.Reset;
-              PaymentTypePOS.SetCurrentKey("No.","Via Terminal");
-              PaymentTypePOS.SetRange("No.",PaymentTypePrefix."Payment Type");
-              PaymentTypePOS.SetRange("Via Terminal",true);
-              if PaymentTypePOS.Find('-') and PaymentTypePOS."PBS Gift Voucher" then begin
-                exit(PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::"Gift Voucher");
-              end;
-            until (PaymentTypePrefix.Next = 0);
-          Len := Len - 1;
-          Filter := CopyStr(Filter,1,Len);
+            PaymentTypePrefix.SetRange(PaymentTypePrefix.Prefix, Filter);
+            if PaymentTypePrefix.Find('-') then
+                repeat
+                    PaymentTypePOS.Reset;
+                    PaymentTypePOS.SetCurrentKey("No.", "Via Terminal");
+                    PaymentTypePOS.SetRange("No.", PaymentTypePrefix."Payment Type");
+                    PaymentTypePOS.SetRange("Via Terminal", true);
+                    if PaymentTypePOS.Find('-') and PaymentTypePOS."PBS Gift Voucher" then begin
+                        exit(PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::"Gift Voucher");
+                    end;
+                until (PaymentTypePrefix.Next = 0);
+            Len := Len - 1;
+            Filter := CopyStr(Filter, 1, Len);
         end;
         exit(false);
     end;
 
-    procedure InitiateBarcodeTransfer(Amount: Decimal;Path: Text[250];Description: Text[100];Cvm: Integer;OnOffline: Integer;Barcode: Text[19])
+    procedure InitiateBarcodeTransfer(Amount: Decimal; Path: Text[250]; Description: Text[100]; Cvm: Integer; OnOffline: Integer; Barcode: Text[19])
     var
         File: File;
     begin
@@ -53,35 +53,35 @@ codeunit 6014485 "PBS Gift Voucher Functions"
         File.TextMode(true);
         File.WriteMode(true);
         if Exists(Path + 'PPBarcode.txt') then begin
-          File.Open(Path + 'PPBarcode.txt');
-          File.Seek(File.Len);
+            File.Open(Path + 'PPBarcode.txt');
+            File.Seek(File.Len);
         end else
-          File.Create(Path+'PPBarcode.txt');
+            File.Create(Path + 'PPBarcode.txt');
 
         if Amount = 0 then  //Ved �bne lukke
-          File.Write('NULL')
+            File.Write('NULL')
         else
-          File.Write(Format(Round(Amount * 100,1),0,1) + ',' +
-                Format(Time,0,'<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>') + ',' +   //Timestamp version
-                Description + ',' + Format(Cvm) + ',' + Format(OnOffline) + ',' + Barcode);
+            File.Write(Format(Round(Amount * 100, 1), 0, 1) + ',' +
+                  Format(Time, 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>') + ',' +   //Timestamp version
+                  Description + ',' + Format(Cvm) + ',' + Format(OnOffline) + ',' + Barcode);
         File.Close;
     end;
 
-    procedure PerformGiftVoucherTransfer(var SaleLinePOS: Record "Sale Line POS";Barcode: Text[19])
+    procedure PerformGiftVoucherTransfer(var SaleLinePOS: Record "Sale Line POS"; Barcode: Text[19])
     begin
         case SaleLinePOS."Sale Type" of
-          SaleLinePOS."Sale Type"::Payment :
-            begin
-              PerformPositiveTransfer(SaleLinePOS,Barcode);
-            end;
-          SaleLinePOS."Sale Type"::Sale:
-            begin
-              PerformNegativeTransfer(SaleLinePOS);
-            end;
+            SaleLinePOS."Sale Type"::Payment:
+                begin
+                    PerformPositiveTransfer(SaleLinePOS, Barcode);
+                end;
+            SaleLinePOS."Sale Type"::Sale:
+                begin
+                    PerformNegativeTransfer(SaleLinePOS);
+                end;
         end;
     end;
 
-    procedure PerformPositiveTransfer(var SaleLinePOS: Record "Sale Line POS";Barcode: Text[19])
+    procedure PerformPositiveTransfer(var SaleLinePOS: Record "Sale Line POS"; Barcode: Text[19])
     var
         CallTerminalIntegration: Codeunit "Call Terminal Integration";
     begin
@@ -94,7 +94,7 @@ codeunit 6014485 "PBS Gift Voucher Functions"
         Error('NOT Implemented');
     end;
 
-    procedure GetBalance(Card: Code[19];var ExpiryDate: Text[30]) Balance: Integer
+    procedure GetBalance(Card: Code[19]; var ExpiryDate: Text[30]) Balance: Integer
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         HttpWebRequest: DotNet npNetHttpWebRequest;
@@ -108,7 +108,7 @@ codeunit 6014485 "PBS Gift Voucher Functions"
         Response: Text;
     begin
         if PaymentTypePOS."PBS Customer ID" = '' then
-          exit(0);
+            exit(0);
 
         //-NPR5.38 [301053]
         // IF NOT ISCLEAR(http) THEN
@@ -174,29 +174,30 @@ codeunit 6014485 "PBS Gift Voucher Functions"
         HttpWebRequest := HttpWebRequest.Create('https://gavekort.pbs.dk/atsws/ATSWS001.asmx');
         HttpWebRequest.Method := 'POST';
         HttpWebRequest.ContentType('text/xml');
-        HttpWebRequest.Headers.Add('SOAPAction','http://tempuri.org/BalanceInquiry');
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          LastErrorMessage := GetLastErrorText;
-          ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
-          if ErrorMessage = '' then
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-          if ErrorMessage = '' then
-            Error := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
-          if ErrorMessage = '' then
-            ErrorMessage := LastErrorMessage;
+        HttpWebRequest.Headers.Add('SOAPAction', 'http://tempuri.org/BalanceInquiry');
+        if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
+            LastErrorMessage := GetLastErrorText;
+            ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
+            if ErrorMessage = '' then
+                ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
+            if ErrorMessage = '' then
+                ErrorMessage := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
+            if ErrorMessage = '' then
+                ErrorMessage := LastErrorMessage;
 
-          Error(CopyStr(ErrorMessage,1,1000));
+            Error(CopyStr(ErrorMessage, 1, 1000));
         end;
 
-        Response := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);;
-        if not NpXmlDomMgt.TryLoadXml(Response,XmlDoc) then
-          Error(CopyStr(Response,1,1000));
+        Response := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
+        ;
+        if not NpXmlDomMgt.TryLoadXml(Response, XmlDoc) then
+            Error(CopyStr(Response, 1, 1000));
 
         XmlElement := XmlDoc.DocumentElement;
-        if NpXmlDomMgt.FindNode(XmlElement,'Balance',XmlElement2) then
-          Evaluate(Balance,XmlElement2.InnerText);
-        if NpXmlDomMgt.FindNode(XmlElement,'ExpiryDate',XmlElement2) then
-          ExpiryDate := XmlElement2.InnerText;
+        if NpXmlDomMgt.FindNode(XmlElement, 'Balance', XmlElement2) then
+            Evaluate(Balance, XmlElement2.InnerText);
+        if NpXmlDomMgt.FindNode(XmlElement, 'ExpiryDate', XmlElement2) then
+            ExpiryDate := XmlElement2.InnerText;
 
         exit(Balance)
         //+NPR5.38 [301053]
@@ -210,12 +211,12 @@ codeunit 6014485 "PBS Gift Voucher Functions"
         ExpireDate: Text[30];
         TxtReturn: Label 'Balance is : %1';
     begin
-        CardNo := POSEventMarshaller.SearchBox(TxtInput,'',MaxStrLen(CardNo));
+        CardNo := POSEventMarshaller.SearchBox(TxtInput, '', MaxStrLen(CardNo));
 
-        if CopyStr(CardNo,1,4) = '6075' then
-          CardNo := '9208' +  CopyStr(CardNo,1,15);
+        if CopyStr(CardNo, 1, 4) = '6075' then
+            CardNo := '9208' + CopyStr(CardNo, 1, 15);
         if IsGiftVoucher(CardNo) then begin
-          Message(StrSubstNo(TxtReturn,GetBalance(CardNo,ExpireDate) / 100));
+            Message(StrSubstNo(TxtReturn, GetBalance(CardNo, ExpireDate) / 100));
         end;
     end;
 
@@ -230,25 +231,25 @@ codeunit 6014485 "PBS Gift Voucher Functions"
         File.TextMode(true);
         File.WriteMode(false);
         if File.Open(Path + 'MSC.txt') then begin
-          for TrackNo := 1 to 3 do begin
-            case TrackNo of
-              1:
-                File.Read(Track1);
-              2:
-                File.Read(Track2);
-              3:
-                File.Read(Track3);
+            for TrackNo := 1 to 3 do begin
+                case TrackNo of
+                    1:
+                        File.Read(Track1);
+                    2:
+                        File.Read(Track2);
+                    3:
+                        File.Read(Track3);
+                end;
             end;
-          end;
-          File.Close;
-          if Erase(Path + 'MSC.txt') then;
+            File.Close;
+            if Erase(Path + 'MSC.txt') then;
         end else
-          exit('');
+            exit('');
 
-        CardNo := CopyStr(Track2,6,15) + CopyStr(Track2,35,4);
+        CardNo := CopyStr(Track2, 6, 15) + CopyStr(Track2, 35, 4);
     end;
 
-    procedure AddGiftVoucherInfo(SaleLinePOS: Record "Sale Line POS";Date2: Text[30];BalanceAmount: Decimal)
+    procedure AddGiftVoucherInfo(SaleLinePOS: Record "Sale Line POS"; Date2: Text[30]; BalanceAmount: Decimal)
     var
         CreditCardTransaction: Record "Credit Card Transaction";
         EntryNo: Integer;
@@ -258,41 +259,41 @@ codeunit 6014485 "PBS Gift Voucher Functions"
 
         SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
 
-        CreditCardTransaction.SetRange(CreditCardTransaction."Register No.",SaleLinePOS."Register No.");
-        CreditCardTransaction.SetRange(CreditCardTransaction."Sales Ticket No.",SaleLinePOS."Sales Ticket No.");
+        CreditCardTransaction.SetRange(CreditCardTransaction."Register No.", SaleLinePOS."Register No.");
+        CreditCardTransaction.SetRange(CreditCardTransaction."Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
         if CreditCardTransaction.Find('+') then begin
-          CreditCardTransaction."Entry No." += 2;
-          CreditCardTransaction.Modify;
-          EntryNo := CreditCardTransaction."Entry No." - 2;
+            CreditCardTransaction."Entry No." += 2;
+            CreditCardTransaction.Modify;
+            EntryNo := CreditCardTransaction."Entry No." - 2;
         end;
 
         with CreditCardTransaction do begin
-          LockTable;
-          Init;
-          "Entry No." := EntryNo;
-          Date := Today;
-          Type := 0;
-          "Transaction Time" := Time;
-          Text := 'Expiration Date:%1' + Date2;
-          "Register No." := SaleLinePOS."Register No.";
-          "Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-          "Line No." := SaleLinePOS."Line No.";
-          "Salesperson Code" := SalePOS."Salesperson Code";
-          EntryNo += 1;
-          Insert;
+            LockTable;
+            Init;
+            "Entry No." := EntryNo;
+            Date := Today;
+            Type := 0;
+            "Transaction Time" := Time;
+            Text := 'Expiration Date:%1' + Date2;
+            "Register No." := SaleLinePOS."Register No.";
+            "Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+            "Line No." := SaleLinePOS."Line No.";
+            "Salesperson Code" := SalePOS."Salesperson Code";
+            EntryNo += 1;
+            Insert;
 
-          Init;
-          "Entry No." := EntryNo;
-          Date := Today;
-          Type := 0;
-          "Transaction Time" := Time;
-          Text := 'Saldo : ' + Format(BalanceAmount);
-          "Register No." := SaleLinePOS."Register No.";
-          "Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-          "Line No." := SaleLinePOS."Line No.";
-          "Salesperson Code" := SalePOS."Salesperson Code";
-          EntryNo += 1;
-          Insert;
+            Init;
+            "Entry No." := EntryNo;
+            Date := Today;
+            Type := 0;
+            "Transaction Time" := Time;
+            Text := 'Saldo : ' + Format(BalanceAmount);
+            "Register No." := SaleLinePOS."Register No.";
+            "Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+            "Line No." := SaleLinePOS."Line No.";
+            "Salesperson Code" := SalePOS."Salesperson Code";
+            EntryNo += 1;
+            Insert;
         end;
     end;
 }

@@ -351,7 +351,7 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
         exit(TempExportTrigger.FindSet);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 8614, 'OnAfterApplyPackageFilter', '', true, true)]
+    //[EventSubscriber(ObjectType::Codeunit, 8614, 'OnAfterApplyPackageFilter', '', true, true)]
     local procedure OnAfterApplyPackageFilter(ConfigPackageTable: Record "Config. Package Table";var RecRef: RecordRef;var Handled: Boolean;NcTask: Record "Nc Task")
     begin
         if NcTask."Table No." = 0 then

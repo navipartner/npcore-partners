@@ -47,7 +47,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
           EftTransactionRequest."Processing Type"::Payment : StartPaymentTransaction(EftTransactionRequest); //Via async dialog & background session
           EftTransactionRequest."Processing Type"::Refund : StartRefundTransaction(EftTransactionRequest); //Via async dialog & background session
           EftTransactionRequest."Processing Type"::Void : VoidTransaction(EftTransactionRequest); //Via blocking ws invoke
-          EftTransactionRequest."Processing Type"::Lookup : LookupTransaction(EftTransactionRequest); //Via blocking ws invoke
+          EftTransactionRequest."Processing Type"::xLookup : LookupTransaction(EftTransactionRequest); //Via blocking ws invoke
           EftTransactionRequest."Processing Type"::Setup : SetupTerminal(EftTransactionRequest); //Via blocking ws invoke
           EftTransactionRequest."Processing Type"::Auxiliary :
             case EftTransactionRequest."Auxiliary Operation ID" of
@@ -1271,7 +1271,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         case EFTTransactionRequest."Processing Type" of
           EFTTransactionRequest."Processing Type"::Refund : ExpectedMessageCategory := 'Payment';
           EFTTransactionRequest."Processing Type"::Payment : ExpectedMessageCategory := 'Payment';
-          EFTTransactionRequest."Processing Type"::Lookup : ExpectedMessageCategory := 'TransactionStatus';
+          EFTTransactionRequest."Processing Type"::xLookup : ExpectedMessageCategory := 'TransactionStatus';
           EFTTransactionRequest."Processing Type"::Void : ExpectedMessageCategory := 'Reversal';
           EFTTransactionRequest."Processing Type"::Setup : ExpectedMessageCategory := 'Diagnosis';
         //-NPR5.49 [345188]

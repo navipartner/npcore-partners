@@ -93,7 +93,6 @@ report 6014545 "Acc. Statement w FIK-Card"
                 }
                 column(Customer__Last_Statement_No__;Format(Customer."Last Statement No."))
                 {
-                    DecimalPlaces = 0:0;
                 }
                 column(CustAddr_7_;CustAddr[7])
                 {

@@ -367,7 +367,7 @@ codeunit 6150846 "POS Action - EFT Operation"
         if (EftTransactionRequest."Processing Type" in [EftTransactionRequest."Processing Type"::Payment,
                                                         EftTransactionRequest."Processing Type"::Refund,
                                                         EftTransactionRequest."Processing Type"::Void,
-                                                        EftTransactionRequest."Processing Type"::Lookup]) then
+                                                        EftTransactionRequest."Processing Type"::xLookup]) then
           exit;
 
         if not POSSession.IsActiveSession(POSFrontEnd) then

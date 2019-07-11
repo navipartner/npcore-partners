@@ -77,7 +77,7 @@ page 6060016 "GIM - Import Buffer"
                 Editable = false;
                 SubPageLink = "Document No."=FIELD("Document No."),
                               "Row No."=FIELD("Row No."),
-                              "Filter Value"=FIELD("Column No."),
+                              "Column No."=FIELD("Column No."),
                               "Fail Reason"=FILTER(<>'');
             }
         }

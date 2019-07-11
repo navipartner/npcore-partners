@@ -686,7 +686,7 @@ codeunit 6150725 "POS Action - Payment"
           exit(false);
         //+NPR5.50 [354510]
 
-        if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::Lookup then
+        if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::xLookup then
           exit(true);
 
         exit(not EFTTransactionRequest.Successful);

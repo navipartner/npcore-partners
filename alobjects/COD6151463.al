@@ -23,11 +23,11 @@ codeunit 6151463 "M2 Account Lookup Mgt."
     begin
         MagentoSetup.Get;
         if MagentoSetup."Magento Version" = MagentoSetup."Magento Version"::"1" then begin
-          if MagentoDisplayGroup.Get(Customer."Magento Display Group") then;
-          if PAGE.RunModal(0,MagentoDisplayGroup) = ACTION::LookupOK then
-            Customer."Magento Display Group" := MagentoDisplayGroup.Code;
+            if MagentoDisplayGroup.Get(Customer."Magento Display Group") then;
+            if PAGE.RunModal(0, MagentoDisplayGroup) = ACTION::LookupOK then
+                Customer."Magento Display Group" := MagentoDisplayGroup.Code;
 
-          exit;
+            exit;
         end;
 
         SetupDisplayGroups(M2ValueBuffer);
@@ -42,10 +42,10 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         M2ValueBufferList.SetSourceTable(M2ValueBuffer);
         M2ValueBufferList.LookupMode(true);
         if M2ValueBufferList.RunModal <> ACTION::LookupOK then
-          exit;
+            exit;
 
         M2ValueBufferList.GetRecord(M2ValueBuffer);
-        Customer."Magento Display Group" := UpperCase(CopyStr(M2ValueBuffer.Value,1,MaxStrLen(Customer."Magento Display Group")));
+        Customer."Magento Display Group" := UpperCase(CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."Magento Display Group")));
     end;
 
     local procedure SetupDisplayGroups(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
@@ -58,16 +58,16 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
-        MagentoApiGet('display_groups',Result);
+        MagentoApiGet('display_groups', Result);
         DisplayGroups := Result.SelectTokens('$[*].[''display_group''].[*]');
         foreach DisplayGroup in DisplayGroups do begin
-          i += 1;
+            i += 1;
 
-          M2ValueBuffer.Init;
-          M2ValueBuffer.Value := UpperCase(GetJsonText(DisplayGroup,'value',MaxStrLen(M2ValueBuffer.Value)));
-          M2ValueBuffer.Label := GetJsonText(DisplayGroup,'label',MaxStrLen(M2ValueBuffer.Label));
-          M2ValueBuffer.Position := i;
-          M2ValueBuffer.Insert;
+            M2ValueBuffer.Init;
+            M2ValueBuffer.Value := UpperCase(GetJsonText(DisplayGroup, 'value', MaxStrLen(M2ValueBuffer.Value)));
+            M2ValueBuffer.Label := GetJsonText(DisplayGroup, 'label', MaxStrLen(M2ValueBuffer.Label));
+            M2ValueBuffer.Position := i;
+            M2ValueBuffer.Insert;
         end;
     end;
 
@@ -78,23 +78,23 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         M2ValueBuffer: Record "M2 Value Buffer";
     begin
         if Customer."Magento Display Group" = '' then
-          exit;
+            exit;
 
         MagentoSetup.Get;
         if MagentoSetup."Magento Version" = MagentoSetup."Magento Version"::"1" then begin
-          MagentoDisplayGroup.Get(Customer."Magento Display Group");
-          exit;
+            MagentoDisplayGroup.Get(Customer."Magento Display Group");
+            exit;
         end;
 
         SetupDisplayGroups(M2ValueBuffer);
-        M2ValueBuffer.SetFilter(Value,'@' + Customer."Magento Display Group");
+        M2ValueBuffer.SetFilter(Value, '@' + Customer."Magento Display Group");
         if not M2ValueBuffer.FindFirst then
-          M2ValueBuffer.SetFilter(Value,'@' + Customer."Magento Display Group" + '*');
+            M2ValueBuffer.SetFilter(Value, '@' + Customer."Magento Display Group" + '*');
 
         if not M2ValueBuffer.FindFirst then
-          Error(Text000,Customer.FieldCaption("Magento Display Group"),Customer."Magento Display Group");
+            Error(Text000, Customer.FieldCaption("Magento Display Group"), Customer."Magento Display Group");
 
-        Customer."Magento Display Group" := CopyStr(M2ValueBuffer.Value,1,MaxStrLen(Customer."Magento Display Group"));
+        Customer."Magento Display Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."Magento Display Group"));
     end;
 
     local procedure "--- Shipping Group"()
@@ -118,10 +118,10 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         M2ValueBufferList.SetSourceTable(M2ValueBuffer);
         M2ValueBufferList.LookupMode(true);
         if M2ValueBufferList.RunModal <> ACTION::LookupOK then
-          exit;
+            exit;
 
         M2ValueBufferList.GetRecord(M2ValueBuffer);
-        Customer."Magento Shipping Group" := CopyStr(M2ValueBuffer.Value,1,MaxStrLen(Customer."Magento Shipping Group"));
+        Customer."Magento Shipping Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."Magento Shipping Group"));
     end;
 
     local procedure SetupShippingGroups(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
@@ -134,15 +134,15 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
-        MagentoApiGet('shipping_groups',Result);
+        MagentoApiGet('shipping_groups', Result);
         ShippingGroups := Result.SelectTokens('$[*].[''shipping_group''].[*]');
         foreach ShippingGroup in ShippingGroups do begin
-          i += 1;
+            i += 1;
 
-          M2ValueBuffer.Init;
-          M2ValueBuffer.Value := GetJsonText(ShippingGroup,'',MaxStrLen(M2ValueBuffer.Value));
-          M2ValueBuffer.Position := i;
-          M2ValueBuffer.Insert;
+            M2ValueBuffer.Init;
+            M2ValueBuffer.Value := GetJsonText(ShippingGroup, '', MaxStrLen(M2ValueBuffer.Value));
+            M2ValueBuffer.Position := i;
+            M2ValueBuffer.Insert;
         end;
     end;
 
@@ -151,17 +151,17 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         M2ValueBuffer: Record "M2 Value Buffer";
     begin
         if Customer."Magento Shipping Group" = '' then
-          exit;
+            exit;
 
         SetupShippingGroups(M2ValueBuffer);
-        M2ValueBuffer.SetFilter(Value,'@' + Customer."Magento Shipping Group");
+        M2ValueBuffer.SetFilter(Value, '@' + Customer."Magento Shipping Group");
         if not M2ValueBuffer.FindFirst then
-          M2ValueBuffer.SetFilter(Value,'@' + Customer."Magento Shipping Group" + '*');
+            M2ValueBuffer.SetFilter(Value, '@' + Customer."Magento Shipping Group" + '*');
 
         if not M2ValueBuffer.FindFirst then
-          Error(Text000,Customer.FieldCaption("Magento Shipping Group"),Customer."Magento Shipping Group");
+            Error(Text000, Customer.FieldCaption("Magento Shipping Group"), Customer."Magento Shipping Group");
 
-        Customer."Magento Shipping Group" := CopyStr(M2ValueBuffer.Value,1,MaxStrLen(Customer."Magento Shipping Group"));
+        Customer."Magento Shipping Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."Magento Shipping Group"));
     end;
 
     local procedure "--- Payment Group"()
@@ -184,10 +184,10 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         M2ValueBufferList.SetSourceTable(M2ValueBuffer);
         M2ValueBufferList.LookupMode(true);
         if M2ValueBufferList.RunModal <> ACTION::LookupOK then
-          exit;
+            exit;
 
         M2ValueBufferList.GetRecord(M2ValueBuffer);
-        Customer."Magento Payment Group" := CopyStr(M2ValueBuffer.Value,1,MaxStrLen(Customer."Magento Payment Group"));
+        Customer."Magento Payment Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."Magento Payment Group"));
     end;
 
     local procedure SetupPaymentGroups(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
@@ -200,15 +200,15 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
-        MagentoApiGet('payment_groups',Result);
+        MagentoApiGet('payment_groups', Result);
         PaymentGroups := Result.SelectTokens('[*].[''payment_group''].[*]');
         foreach PaymentGroup in PaymentGroups do begin
-          i += 1;
+            i += 1;
 
-          M2ValueBuffer.Init;
-          M2ValueBuffer.Value := GetJsonText(PaymentGroup,'',MaxStrLen(M2ValueBuffer.Value));
-          M2ValueBuffer.Position := i;
-          M2ValueBuffer.Insert;
+            M2ValueBuffer.Init;
+            M2ValueBuffer.Value := GetJsonText(PaymentGroup, '', MaxStrLen(M2ValueBuffer.Value));
+            M2ValueBuffer.Position := i;
+            M2ValueBuffer.Insert;
         end;
     end;
 
@@ -217,17 +217,17 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         M2ValueBuffer: Record "M2 Value Buffer";
     begin
         if Customer."Magento Payment Group" = '' then
-          exit;
+            exit;
 
         SetupPaymentGroups(M2ValueBuffer);
-        M2ValueBuffer.SetFilter(Value,'@' + Customer."Magento Payment Group");
+        M2ValueBuffer.SetFilter(Value, '@' + Customer."Magento Payment Group");
         if not M2ValueBuffer.FindFirst then
-          M2ValueBuffer.SetFilter(Value,'@' + Customer."Magento Payment Group" + '*');
+            M2ValueBuffer.SetFilter(Value, '@' + Customer."Magento Payment Group" + '*');
 
         if not M2ValueBuffer.FindFirst then
-          Error(Text000,Customer.FieldCaption("Magento Payment Group"),Customer."Magento Payment Group");
+            Error(Text000, Customer.FieldCaption("Magento Payment Group"), Customer."Magento Payment Group");
 
-        Customer."Magento Payment Group" := CopyStr(M2ValueBuffer.Value,1,MaxStrLen(Customer."Magento Payment Group"));
+        Customer."Magento Payment Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."Magento Payment Group"));
     end;
 
     local procedure "--- Customer Group"()
@@ -243,11 +243,11 @@ codeunit 6151463 "M2 Account Lookup Mgt."
     begin
         MagentoSetup.Get;
         if MagentoSetup."Magento Version" = MagentoSetup."Magento Version"::"1" then begin
-          if MagentoCustomerGroup.Get(Contact."Magento Customer Group") then;
-          if PAGE.RunModal(0,MagentoCustomerGroup) = ACTION::LookupOK then
-            Contact."Magento Customer Group" := MagentoCustomerGroup.Code;
+            if MagentoCustomerGroup.Get(Contact."Magento Customer Group") then;
+            if PAGE.RunModal(0, MagentoCustomerGroup) = ACTION::LookupOK then
+                Contact."Magento Customer Group" := MagentoCustomerGroup.Code;
 
-          exit;
+            exit;
         end;
 
         SetupCustomerGroups(M2ValueBuffer);
@@ -262,10 +262,10 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         M2ValueBufferList.SetSourceTable(M2ValueBuffer);
         M2ValueBufferList.LookupMode(true);
         if M2ValueBufferList.RunModal <> ACTION::LookupOK then
-          exit;
+            exit;
 
         M2ValueBufferList.GetRecord(M2ValueBuffer);
-        Contact."Magento Customer Group" := UpperCase(CopyStr(M2ValueBuffer.Value,1,MaxStrLen(Contact."Magento Customer Group")));
+        Contact."Magento Customer Group" := UpperCase(CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Contact."Magento Customer Group")));
     end;
 
     local procedure SetupCustomerGroups(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
@@ -278,16 +278,16 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
-        MagentoApiGet('customer_groups',Result);
+        MagentoApiGet('customer_groups', Result);
         CustomerGroups := Result.SelectTokens('$[*].[''customer_group''].[*]');
         foreach CustomerGroup in CustomerGroups do begin
-          i += 1;
+            i += 1;
 
-          M2ValueBuffer.Init;
-          M2ValueBuffer.Value := UpperCase(GetJsonText(CustomerGroup,'customer_group_code',MaxStrLen(M2ValueBuffer.Value)));
-          M2ValueBuffer.Label := GetJsonText(CustomerGroup,'tax_class_code',MaxStrLen(M2ValueBuffer.Label));
-          M2ValueBuffer.Position := i;
-          M2ValueBuffer.Insert;
+            M2ValueBuffer.Init;
+            M2ValueBuffer.Value := UpperCase(GetJsonText(CustomerGroup, 'customer_group_code', MaxStrLen(M2ValueBuffer.Value)));
+            M2ValueBuffer.Label := GetJsonText(CustomerGroup, 'tax_class_code', MaxStrLen(M2ValueBuffer.Label));
+            M2ValueBuffer.Position := i;
+            M2ValueBuffer.Insert;
         end;
     end;
 
@@ -298,23 +298,23 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         M2ValueBuffer: Record "M2 Value Buffer";
     begin
         if Contact."Magento Customer Group" = '' then
-          exit;
+            exit;
 
         MagentoSetup.Get;
         if MagentoSetup."Magento Version" = MagentoSetup."Magento Version"::"1" then begin
-          MagentoCustomerGroup.Get(Contact."Magento Customer Group");
-          exit;
+            MagentoCustomerGroup.Get(Contact."Magento Customer Group");
+            exit;
         end;
 
         SetupCustomerGroups(M2ValueBuffer);
-        M2ValueBuffer.SetFilter(Value,'@' + Contact."Magento Customer Group");
+        M2ValueBuffer.SetFilter(Value, '@' + Contact."Magento Customer Group");
         if not M2ValueBuffer.FindFirst then
-          M2ValueBuffer.SetFilter(Value,'@' + Contact."Magento Customer Group" + '*');
+            M2ValueBuffer.SetFilter(Value, '@' + Contact."Magento Customer Group" + '*');
 
         if not M2ValueBuffer.FindFirst then
-          Error(Text000,Contact.FieldCaption("Magento Customer Group"),Contact."Magento Customer Group");
+            Error(Text000, Contact.FieldCaption("Magento Customer Group"), Contact."Magento Customer Group");
 
-        Contact."Magento Customer Group" := CopyStr(M2ValueBuffer.Value,1,MaxStrLen(Contact."Magento Customer Group"));
+        Contact."Magento Customer Group" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Contact."Magento Customer Group"));
     end;
 
     local procedure "--- Magento Store"()
@@ -330,11 +330,11 @@ codeunit 6151463 "M2 Account Lookup Mgt."
     begin
         MagentoSetup.Get;
         if MagentoSetup."Magento Version" = MagentoSetup."Magento Version"::"1" then begin
-          if MagentoStore.Get(Customer."Magento Store Code") then;
-          if PAGE.RunModal(0,MagentoStore) = ACTION::LookupOK then
-            Customer."Magento Store Code" := MagentoStore.Code;
+            if MagentoStore.Get(Customer."Magento Store Code") then;
+            if PAGE.RunModal(0, MagentoStore) = ACTION::LookupOK then
+                Customer."Magento Store Code" := MagentoStore.Code;
 
-          exit;
+            exit;
         end;
 
         SetupMagentoStores(M2ValueBuffer);
@@ -349,10 +349,10 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         M2ValueBufferList.SetSourceTable(M2ValueBuffer);
         M2ValueBufferList.LookupMode(true);
         if M2ValueBufferList.RunModal <> ACTION::LookupOK then
-          exit;
+            exit;
 
         M2ValueBufferList.GetRecord(M2ValueBuffer);
-        Customer."Magento Store Code" := CopyStr(M2ValueBuffer.Value,1,MaxStrLen(Customer."Magento Store Code"));
+        Customer."Magento Store Code" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."Magento Store Code"));
     end;
 
     local procedure SetupMagentoStores(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
@@ -367,19 +367,19 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
-        MagentoApiGet('websites',Result);
+        MagentoApiGet('websites', Result);
         MagentoWebsites := Result.SelectTokens('$[*].[''website''].[*]');
         foreach MagentoWebsite in MagentoWebsites do begin
-          MagentoStores := MagentoWebsite.SelectTokens('$[''_value''].[''store_groups''].[''store_group''].[*].[''_value''].[''stores''].[''store''].[*]');
-          foreach MagentoStore in MagentoStores do begin
-            i += 1;
+            MagentoStores := MagentoWebsite.SelectTokens('$[''_value''].[''store_groups''].[''store_group''].[*].[''_value''].[''stores''].[''store''].[*]');
+            foreach MagentoStore in MagentoStores do begin
+                i += 1;
 
-            M2ValueBuffer.Init;
-            M2ValueBuffer.Value := GetJsonText(MagentoStore,'_attribute.code',MaxStrLen(M2ValueBuffer.Value));
-            M2ValueBuffer.Label := GetJsonText(MagentoStore,'_value',MaxStrLen(M2ValueBuffer.Label));
-            M2ValueBuffer.Position := i;
-            M2ValueBuffer.Insert;
-          end;
+                M2ValueBuffer.Init;
+                M2ValueBuffer.Value := GetJsonText(MagentoStore, '_attribute.code', MaxStrLen(M2ValueBuffer.Value));
+                M2ValueBuffer.Label := GetJsonText(MagentoStore, '_value', MaxStrLen(M2ValueBuffer.Label));
+                M2ValueBuffer.Position := i;
+                M2ValueBuffer.Insert;
+            end;
         end;
     end;
 
@@ -390,30 +390,30 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         M2ValueBuffer: Record "M2 Value Buffer";
     begin
         if Customer."Magento Store Code" = '' then
-          exit;
+            exit;
 
         MagentoSetup.Get;
         if MagentoSetup."Magento Version" = MagentoSetup."Magento Version"::"1" then begin
-          MagentoStore.Get(Customer."Magento Store Code");
-          exit;
+            MagentoStore.Get(Customer."Magento Store Code");
+            exit;
         end;
 
         SetupMagentoStores(M2ValueBuffer);
-        M2ValueBuffer.SetFilter(Value,'@' + Customer."Magento Store Code");
+        M2ValueBuffer.SetFilter(Value, '@' + Customer."Magento Store Code");
         if not M2ValueBuffer.FindFirst then
-          M2ValueBuffer.SetFilter(Value,'@' + Customer."Magento Store Code" + '*');
+            M2ValueBuffer.SetFilter(Value, '@' + Customer."Magento Store Code" + '*');
 
         if not M2ValueBuffer.FindFirst then
-          Error(Text000,Customer.FieldCaption("Magento Store Code"),Customer."Magento Store Code");
+            Error(Text000, Customer.FieldCaption("Magento Store Code"), Customer."Magento Store Code");
 
-        Customer."Magento Store Code" := CopyStr(M2ValueBuffer.Value,1,MaxStrLen(Customer."Magento Store Code"));
+        Customer."Magento Store Code" := CopyStr(M2ValueBuffer.Value, 1, MaxStrLen(Customer."Magento Store Code"));
     end;
 
     local procedure "--- Aux"()
     begin
     end;
 
-    procedure MagentoApiGet(Method: Text;var Result: DotNet npNetJToken)
+    procedure MagentoApiGet(Method: Text; var Result: DotNet npNetJToken)
     var
         MagentoSetup: Record "Magento Setup";
         HttpWebRequest: DotNet npNetHttpWebRequest;
@@ -423,22 +423,22 @@ codeunit 6151463 "M2 Account Lookup Mgt."
     begin
         Clear(Response);
         if Method = '' then
-          exit;
+            exit;
 
         MagentoSetup.Get;
         MagentoSetup.TestField("Api Url");
         if MagentoSetup."Api Url"[StrLen(MagentoSetup."Api Url")] <> '/' then
-          MagentoSetup."Api Url" += '/';
+            MagentoSetup."Api Url" += '/';
 
-        HttpWebRequest := HttpWebRequest.Create(MagentoSetup."Api Url"+ Method);
+        HttpWebRequest := HttpWebRequest.Create(MagentoSetup."Api Url" + Method);
         HttpWebRequest.Timeout := 1000 * 60;
 
         HttpWebRequest.Method := 'GET';
         MagentoSetup.Get;
         if MagentoSetup."Api Authorization" <> '' then
-          HttpWebRequest.Headers.Add('Authorization',MagentoSetup."Api Authorization")
+            HttpWebRequest.Headers.Add('Authorization', MagentoSetup."Api Authorization")
         else
-          HttpWebRequest.Headers.Add('Authorization','Basic ' + MagentoSetup.GetBasicAuthInfo());
+            HttpWebRequest.Headers.Add('Authorization', 'Basic ' + MagentoSetup.GetBasicAuthInfo());
 
         HttpWebResponse := HttpWebRequest.GetResponse();
         StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream);
@@ -446,17 +446,17 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         Result := Result.Parse(Response);
     end;
 
-    local procedure GetJsonText(JToken: DotNet npNetJToken;JPath: Text;MaxLen: Integer) Value: Text
+    local procedure GetJsonText(JToken: DotNet npNetJToken; JPath: Text; MaxLen: Integer) Value: Text
     var
         JToken2: DotNet npNetJToken;
     begin
         JToken2 := JToken.SelectToken(JPath);
         if IsNull(JToken2) then
-          exit('');
+            exit('');
 
         Value := Format(JToken2);
         if MaxLen > 0 then
-          Value := CopyStr(Value,1,MaxLen);
+            Value := CopyStr(Value, 1, MaxLen);
         exit(Value);
     end;
 }

@@ -42,7 +42,6 @@ report 6060100 "Data Cleanup Fill"
             }
             column(Cust_Deleteable;Deleteable)
             {
-                OptionCaption = 'Can Be Deleted';
             }
             column(Cust_LedgerCnt;LedgerCnt)
             {

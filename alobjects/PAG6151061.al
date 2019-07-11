@@ -36,7 +36,6 @@ page 6151061 "Distribution Matrix"
                 field(Field1;MATRIX_CellData[1])
                 {
                     AutoFormatType = 10;
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[1];
                     Style = Strong;
                     Visible = true;
@@ -49,7 +48,6 @@ page 6151061 "Distribution Matrix"
                 field(Field2;MATRIX_CellData[2])
                 {
                     AutoFormatType = 10;
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[2];
                     Style = Strong;
                     Visible = true;
@@ -62,7 +60,6 @@ page 6151061 "Distribution Matrix"
                 field(Field3;MATRIX_CellData[3])
                 {
                     AutoFormatType = 10;
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[3];
                     Style = Strong;
                     Visible = true;
@@ -75,7 +72,6 @@ page 6151061 "Distribution Matrix"
                 field(Field4;MATRIX_CellData[4])
                 {
                     AutoFormatType = 10;
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[4];
                     Style = Strong;
                     Visible = true;
@@ -88,7 +84,6 @@ page 6151061 "Distribution Matrix"
                 field(Field5;MATRIX_CellData[5])
                 {
                     AutoFormatType = 10;
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[5];
                     Style = Strong;
                     Visible = true;
@@ -101,7 +96,6 @@ page 6151061 "Distribution Matrix"
                 field(Field6;MATRIX_CellData[6])
                 {
                     AutoFormatType = 10;
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[6];
                     Style = Strong;
                     Visible = true;
@@ -119,7 +113,6 @@ page 6151061 "Distribution Matrix"
                 field(Field7;MATRIX_CellData[7])
                 {
                     AutoFormatType = 10;
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[7];
                     Style = Strong;
                     Visible = true;
@@ -132,7 +125,6 @@ page 6151061 "Distribution Matrix"
                 field(Field8;MATRIX_CellData[8])
                 {
                     AutoFormatType = 10;
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[8];
                     Style = Strong;
                     Visible = true;
@@ -145,7 +137,6 @@ page 6151061 "Distribution Matrix"
                 field(Field9;MATRIX_CellData[9])
                 {
                     AutoFormatType = 10;
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[9];
                     Style = Strong;
                     Visible = true;
@@ -158,7 +149,6 @@ page 6151061 "Distribution Matrix"
                 field(Field10;MATRIX_CellData[10])
                 {
                     AutoFormatType = 10;
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[10];
                     Style = Strong;
                     Visible = true;
@@ -171,7 +161,6 @@ page 6151061 "Distribution Matrix"
                 field(Field11;MATRIX_CellData[11])
                 {
                     AutoFormatType = 10;
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[11];
                     Style = Strong;
                     Visible = true;
@@ -184,7 +173,6 @@ page 6151061 "Distribution Matrix"
                 field(Field12;MATRIX_CellData[12])
                 {
                     AutoFormatType = 10;
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSetShown[12];
                     Style = Strong;
                     Visible = true;

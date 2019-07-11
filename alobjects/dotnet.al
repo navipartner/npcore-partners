@@ -2568,4 +2568,11 @@ dotnet
         }
     }
 
+    assembly("NaviPartner.POS.Camera")
+    {
+        type("NaviPartner.POS.Camera.ICamera"; "NaviPartner.POS.Camera")
+        {
+            IsControlAddIn = true;
+        }
+    }
 }
