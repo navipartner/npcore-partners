@@ -70,7 +70,7 @@ table 6059900 "Task Template"
                     end;
                   Type::NaviPartner:
                     begin
-                      "Page ID" :=  PAGE::Page6059910;
+                      //"Page ID" :=  PAGE::Page6059910;
                       "Mail Program" := "Mail Program"::JMail;
                       case NASGroup.Count of
                         0:

@@ -15,7 +15,7 @@ page 6150628 "POS Payment Bin Checkpoint"
     // NPR5.50/TSA /20190429 CASE 353293 Handled the special scenario, when no bin checkpoint is included in manuel balancing
 
     Caption = 'POS Payment Bin Checkpoint';
-    DataCaptionFields = Type,Field2,Field3;
+    //DataCaptionFields = Type,Field2,Field3;
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;

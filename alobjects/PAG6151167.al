@@ -89,7 +89,7 @@ page 6151167 "NpGp POS Sales Entries"
                 Caption = 'POS Info';
                 Image = List;
                 RunObject = Page "NpGp POS Info POS Entry";
-                RunPageLink = "POS Entry No."=FIELD("Entry No.");
+                //RunPageLink = "POS Entry No."=FIELD("Entry No.");
             }
         }
     }

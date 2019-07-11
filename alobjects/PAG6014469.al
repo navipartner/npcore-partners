@@ -351,7 +351,7 @@ page 6014469 "Retail Document Header"
                     begin
                         RetailDocumentHeader.Copy(Rec);
                         RetailDocumentHeader.SetRecFilter;
-                        REPORT.RunModal(REPORT::Report50093,false,false,RetailDocumentHeader);    /*true=faLSE HVIS FILTER IKKE SKAL VISES*/
+                        //REPORT.RunModal(REPORT::Report50093,false,false,RetailDocumentHeader);    /*true=faLSE HVIS FILTER IKKE SKAL VISES*/
 
                     end;
                 }

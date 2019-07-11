@@ -14,7 +14,17 @@ codeunit 6150698 "Retail Data Model Upgrade"
     begin
     end;
 
-    [UpgradePerCompany]
+    trigger OnUpgradePerDatabase()
+    begin
+      UpdateUpgradeHistory();
+      UpgradePermissions();
+    end;
+
+    trigger OnUpgradePerCompany()
+    begin
+        UpgradeDateModelPerCompany();
+    end;
+
     procedure UpgradeDateModelPerCompany()
     var
         RetailDataModelUpgradeMgt: Codeunit "Retail Data Model Upgrade Mgt.";
@@ -22,7 +32,6 @@ codeunit 6150698 "Retail Data Model Upgrade"
         RetailDataModelUpgradeMgt.TestUpgradeFromDataUpgradePerCompany;
     end;
 
-    [UpgradePerDatabase]
     procedure UpdateUpgradeHistory()
     var
         NPRUpgradeHistory: Record "NPR Upgrade History";
@@ -37,7 +46,6 @@ codeunit 6150698 "Retail Data Model Upgrade"
         //+NPR5.41 [311567]
     end;
 
-    [UpgradePerDatabase]
     procedure UpgradePermissions()
     var
         SessionID: Integer;

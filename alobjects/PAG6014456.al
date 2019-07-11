@@ -117,12 +117,10 @@ page 6014456 "Table Export Wizard"
                     field(FieldStartDelimeter;FieldStartDelimeter)
                     {
                         Caption = 'Field Start Delimeter';
-                        OptionCaption = 'Field Start Delimeter';
                     }
                     field(FieldEndDelimeter;FieldEndDelimeter)
                     {
                         Caption = 'Field End Delimeter';
-                        OptionCaption = 'Field End Delimeter';
                     }
                     field(FieldSeparator;FieldSeparator)
                     {
@@ -135,7 +133,6 @@ page 6014456 "Table Export Wizard"
                     field(DataItemSeparator;DataItemSeparator)
                     {
                         Caption = 'Data Item Separator';
-                        OptionCaption = 'Data Item Separator';
                     }
                     field(EscapeCharacter;EscapeCharacter)
                     {
@@ -244,7 +241,6 @@ page 6014456 "Table Export Wizard"
             group(ExcludingTransactions)
             {
                 Caption = 'Excluding Transactions';
-                Image = Data;
                 action(RetailExclTransactions)
                 {
                     Caption = 'Add Retail Setup';
@@ -794,7 +790,6 @@ page 6014456 "Table Export Wizard"
         //AddTable(DATABASE::"NAS - Tasks");
         //AddTable(DATABASE::"DBI - Field Filters");
         //+NPR5.23
-        AddTable(DATABASE::Table6059800);
         AddTable(DATABASE::"Manufacturing Setup");
         AddTable(DATABASE::"Order Promising Setup");
         //-NPR5.25

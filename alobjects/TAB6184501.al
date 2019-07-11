@@ -16,7 +16,6 @@ table 6184501 "CleanCash Error List"
         field(2;Date;Date)
         {
             Caption = 'Date';
-            OptionCaption = 'Table,Page,Report,Codeunit, Query,XMLport';
         }
         field(3;Time;Time)
         {

@@ -3008,7 +3008,6 @@ page 6014425 "Retail Item Card"
                     Caption = 'Reparation';
                     Image = ServiceZone;
                     RunObject = Page "Customer Repair List";
-                    RunPageLink = Field50100=FIELD("No.");
                 }
             }
             group("Price Management")

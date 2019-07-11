@@ -37,8 +37,10 @@ codeunit 6151571 "AF Helper Functions"
     var
         DotNetDateTime: DotNet npNetDateTime;
         CultureInfo: DotNet npNetCultureInfo;
+        DtDataType: DotNet npNetType;
     begin
-        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(GetDotNetType(DotNetDateTime));
+        DtDataType := GetDotNetType(DotNetDateTime);
+        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(DtDataType);
         ReturnValue := DT2Date(DotNetDateTime);
     end;
 
@@ -46,8 +48,10 @@ codeunit 6151571 "AF Helper Functions"
     var
         DotNetDateTime: DotNet npNetDateTime;
         CultureInfo: DotNet npNetCultureInfo;
+        DtDataType: DotNet npNetType;
     begin
-        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(GetDotNetType(DotNetDateTime));
+        DtDataType := GetDotNetType(DotNetDateTime);
+        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(DtDataType);
         ReturnValue := DT2Time(DotNetDateTime);
     end;
 
@@ -55,8 +59,10 @@ codeunit 6151571 "AF Helper Functions"
     var
         DotNetDateTime: DotNet npNetDateTime;
         CultureInfo: DotNet npNetCultureInfo;
+        DtDataType: DotNet npNetType;
     begin
-        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(GetDotNetType(DotNetDateTime));
+        DtDataType := GetDotNetType(DotNetDateTime);
+        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(DtDataType);
         ReturnValue := DotNetDateTime;
     end;
 

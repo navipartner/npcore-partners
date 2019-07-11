@@ -28,17 +28,17 @@ page 6151413 "Magento Item Picture List"
                     Visible = HasVariants;
                     repeater(Group)
                     {
-                        field("Item No.";"Item No.")
+                        field("Item No."; "Item No.")
                         {
                             Editable = false;
                         }
-                        field(Description;Description)
+                        field(Description; Description)
                         {
                             Editable = false;
                         }
                     }
                 }
-                part(MagentoPictureLinkSubform;"Magento Picture Link Subform")
+                part(MagentoPictureLinkSubform; "Magento Picture Link Subform")
                 {
                     Caption = 'Pictures';
                     ShowFilter = false;
@@ -47,7 +47,7 @@ page 6151413 "Magento Item Picture List"
         }
         area(factboxes)
         {
-            part(MagentoPictureDragDropAddin;"Magento DragDropPic. Addin")
+            part(MagentoPictureDragDropAddin; "Magento DragDropPic. Addin")
             {
                 Caption = 'Magento Picture';
             }
@@ -118,7 +118,7 @@ page 6151413 "Magento Item Picture List"
         MagentoSetup.Get;
 
         if ItemNo = '' then
-          Error(Text000);
+            Error(Text000);
 
         HasVariants := false;
         Init;
@@ -127,17 +127,18 @@ page 6151413 "Magento Item Picture List"
         Description := Text001;
         Insert;
 
-        if not (MagentoSetup."Variant System" in [MagentoSetup."Variant System"::"1",MagentoSetup."Variant System"::Variety]) then
-          exit;
+        //if not (MagentoSetup."Variant System" in [MagentoSetup."Variant System"::"1",MagentoSetup."Variant System"::Variety]) then
+        //  exit;
 
         if MagentoSetup."Variant Picture Dimension" = '' then
-          exit;
+            exit;
 
         case MagentoSetup."Variant System" of
-          //-MAG2.02
-          //MagentoSetup."Variant System"::"1": SetupVariantVariaX();
-          //+MAG2.02
-          MagentoSetup."Variant System"::Variety: SetupVariantVariety();
+            //-MAG2.02
+            //MagentoSetup."Variant System"::"1": SetupVariantVariaX();
+            //+MAG2.02
+            MagentoSetup."Variant System"::Variety:
+                SetupVariantVariety();
         end;
 
         HasVariants := Count > 1;
@@ -207,37 +208,37 @@ page 6151413 "Magento Item Picture List"
     begin
         //-MAG1.21
         TableNoItemVariant := 5401;
-        if not GenericSetupMgt.OpenRecRef(TableNoItemVariant,RecRef) then
-          exit;
+        if not GenericSetupMgt.OpenRecRef(TableNoItemVariant, RecRef) then
+            exit;
 
         FieldNoItemNo := 2;
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoItemNo,ItemNo);
+        GenericSetupMgt.SetFieldRefFilter(RecRef, FieldNoItemNo, ItemNo);
 
         FieldNoBlocked := 6059982;
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoBlocked,'0');
+        GenericSetupMgt.SetFieldRefFilter(RecRef, FieldNoBlocked, '0');
 
-        if not SetItemVariantVarietyFieldNos(FieldNoVariety,FieldNoVarietyTable,FieldNoVarietyValue,VarietyTable) then
-          exit;
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoVariety,MagentoSetup."Variant Picture Dimension");
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoVarietyTable,'' + VarietyTable +'' );
+        if not SetItemVariantVarietyFieldNos(FieldNoVariety, FieldNoVarietyTable, FieldNoVarietyValue, VarietyTable) then
+            exit;
+        GenericSetupMgt.SetFieldRefFilter(RecRef, FieldNoVariety, MagentoSetup."Variant Picture Dimension");
+        GenericSetupMgt.SetFieldRefFilter(RecRef, FieldNoVarietyTable, '' + VarietyTable + '');
 
         //-MAG1.22
         //WHILE RecRef.FINDFIRST DO BEGIN
         if RecRef.FindSet then
-          repeat
-        //+MAG1.22
-            VariantValueCode := GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVarietyValue);
-            VariantValueDescription := GetVarietyValueDescription(MagentoSetup."Variant Picture Dimension",VarietyTable,VariantValueCode);
-            if not Get(VariantValueCode,'') then begin
-              Init;
-              "Item No." := VariantValueCode;
-              Description := VariantValueDescription;
-              Insert;
-            end;
-        //-MAG1.22
-        //  GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoVarietyValue,'>' + VariantValueCode);
-        //END;
-          until RecRef.Next = 0;
+            repeat
+                //+MAG1.22
+                VariantValueCode := GenericSetupMgt.GetFieldRefValue(RecRef, FieldNoVarietyValue);
+                VariantValueDescription := GetVarietyValueDescription(MagentoSetup."Variant Picture Dimension", VarietyTable, VariantValueCode);
+                if not Get(VariantValueCode, '') then begin
+                    Init;
+                    "Item No." := VariantValueCode;
+                    Description := VariantValueDescription;
+                    Insert;
+                end;
+                //-MAG1.22
+                //  GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoVarietyValue,'>' + VariantValueCode);
+                //END;
+            until RecRef.Next = 0;
         //+MAG1.22
         //+MAG1.21
     end;
@@ -246,7 +247,7 @@ page 6151413 "Magento Item Picture List"
     begin
     end;
 
-    procedure GetVarietyValueDescription(VarietyType: Code[10];VarietyTable: Code[20];VarietyValue: Code[20]) VarietyValueDescription: Text
+    procedure GetVarietyValueDescription(VarietyType: Code[10]; VarietyTable: Code[20]; VarietyValue: Code[20]) VarietyValueDescription: Text
     var
         RecRef: RecordRef;
         TableNoVarietyValue: Integer;
@@ -257,27 +258,27 @@ page 6151413 "Magento Item Picture List"
     begin
         //-MAG1.21
         if (VarietyType = '') or (VarietyTable = '') or (VarietyValue = '') then
-          exit('');
+            exit('');
 
         TableNoVarietyValue := 6059973;
-        if not GenericSetupMgt.OpenRecRef(TableNoVarietyValue,RecRef) then
-          exit('');
+        if not GenericSetupMgt.OpenRecRef(TableNoVarietyValue, RecRef) then
+            exit('');
 
         FieldNoVarietyType := 1;
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoVarietyType,VarietyType);
+        GenericSetupMgt.SetFieldRefFilter(RecRef, FieldNoVarietyType, VarietyType);
         FieldNoVarietyTable := 2;
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoVarietyTable,VarietyTable);
+        GenericSetupMgt.SetFieldRefFilter(RecRef, FieldNoVarietyTable, VarietyTable);
         FieldNoVarietyValue := 3;
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoVarietyValue,VarietyValue);
+        GenericSetupMgt.SetFieldRefFilter(RecRef, FieldNoVarietyValue, VarietyValue);
         if not RecRef.FindFirst then
-          exit('');
+            exit('');
 
         FieldNoVarietyDescription := 20;
-        exit(GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVarietyDescription));
+        exit(GenericSetupMgt.GetFieldRefValue(RecRef, FieldNoVarietyDescription));
         //+MAG1.21
     end;
 
-    local procedure SetItemVariantVarietyFieldNos(var FieldNoVariety: Integer;var FieldNoVarietyTable: Integer;var FieldNoVarietyValue: Integer;var VarietyTable: Code[20]): Boolean
+    local procedure SetItemVariantVarietyFieldNos(var FieldNoVariety: Integer; var FieldNoVarietyTable: Integer; var FieldNoVarietyValue: Integer; var VarietyTable: Code[20]): Boolean
     var
         RecRef: RecordRef;
         FiledNoItemNo: Integer;
@@ -289,51 +290,51 @@ page 6151413 "Magento Item Picture List"
     begin
         //-MAG1.21
         if (MagentoSetup."Variant System" <> MagentoSetup."Variant System"::Variety) or (MagentoSetup."Variant Picture Dimension" = '') then
-          exit(false);
+            exit(false);
 
         TableNoItem := 27;
-        if not GenericSetupMgt.OpenRecRef(TableNoItem,RecRef) then
-          exit(false);
+        if not GenericSetupMgt.OpenRecRef(TableNoItem, RecRef) then
+            exit(false);
 
         FiledNoItemNo := 1;
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FiledNoItemNo,ItemNo);
+        GenericSetupMgt.SetFieldRefFilter(RecRef, FiledNoItemNo, ItemNo);
         if not RecRef.FindFirst then
-          exit(false);
+            exit(false);
 
         FieldNoVariety1 := 6059970;
-        if GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVariety1) = MagentoSetup."Variant Picture Dimension" then begin
-          FieldNoVariety := 6059970;
-          FieldNoVarietyTable := 6059971;
-          FieldNoVarietyValue := 6059972;
-          VarietyTable := GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVarietyTable);
-          exit(true);
+        if GenericSetupMgt.GetFieldRefValue(RecRef, FieldNoVariety1) = MagentoSetup."Variant Picture Dimension" then begin
+            FieldNoVariety := 6059970;
+            FieldNoVarietyTable := 6059971;
+            FieldNoVarietyValue := 6059972;
+            VarietyTable := GenericSetupMgt.GetFieldRefValue(RecRef, FieldNoVarietyTable);
+            exit(true);
         end;
 
         FieldNoVariety2 := 6059973;
-        if GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVariety2) = MagentoSetup."Variant Picture Dimension" then begin
-          FieldNoVariety := 6059973;
-          FieldNoVarietyTable := 6059974;
-          FieldNoVarietyValue := 6059975;
-          VarietyTable := GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVarietyTable);
-          exit(true);
+        if GenericSetupMgt.GetFieldRefValue(RecRef, FieldNoVariety2) = MagentoSetup."Variant Picture Dimension" then begin
+            FieldNoVariety := 6059973;
+            FieldNoVarietyTable := 6059974;
+            FieldNoVarietyValue := 6059975;
+            VarietyTable := GenericSetupMgt.GetFieldRefValue(RecRef, FieldNoVarietyTable);
+            exit(true);
         end;
 
         FieldNoVariety3 := 6059976;
-        if GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVariety3) = MagentoSetup."Variant Picture Dimension" then begin
-          FieldNoVariety := 6059976;
-          FieldNoVarietyTable := 6059977;
-          FieldNoVarietyValue := 6059978;
-          VarietyTable := GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVarietyTable);
-          exit(true);
+        if GenericSetupMgt.GetFieldRefValue(RecRef, FieldNoVariety3) = MagentoSetup."Variant Picture Dimension" then begin
+            FieldNoVariety := 6059976;
+            FieldNoVarietyTable := 6059977;
+            FieldNoVarietyValue := 6059978;
+            VarietyTable := GenericSetupMgt.GetFieldRefValue(RecRef, FieldNoVarietyTable);
+            exit(true);
         end;
 
         FieldNoVariety4 := 6059979;
-        if GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVariety4) = MagentoSetup."Variant Picture Dimension" then begin
-          FieldNoVariety := 6059979;
-          FieldNoVarietyTable := 6059980;
-          FieldNoVarietyValue := 6059981;
-          VarietyTable := GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVarietyTable);
-          exit(true);
+        if GenericSetupMgt.GetFieldRefValue(RecRef, FieldNoVariety4) = MagentoSetup."Variant Picture Dimension" then begin
+            FieldNoVariety := 6059979;
+            FieldNoVarietyTable := 6059980;
+            FieldNoVarietyValue := 6059981;
+            VarietyTable := GenericSetupMgt.GetFieldRefValue(RecRef, FieldNoVarietyTable);
+            exit(true);
         end;
 
         exit(false);

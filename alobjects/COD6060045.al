@@ -52,13 +52,12 @@ codeunit 6060045 "Item Wsht.-Check Line"
         Text130: Label 'Internal Barcodes must start with 2.';
         TExt131: Label 'Vendor Barcodes must not start with 2.';
 
-    procedure RunCheck(ItemWkshtLine: Record "Item Worksheet Line";StopOnError: Boolean;CalledFromRegister: Boolean)
+    procedure RunCheck(ItemWkshtLine: Record "Item Worksheet Line"; StopOnError: Boolean; CalledFromRegister: Boolean)
     var
         RecItem: Record Item;
         NoSeries: Record "No. Series";
         DefaultNoSeries: Code[10];
         ItemCategory: Record "Item Category";
-        ProductGroup: Record "Product Group";
         AlternativeNo: Record "Alternative No.";
         ItemWkshtValidateTestRnr: Codeunit "Item Wksht. Validate Test Rnr.";
         ErrorText: Text;
@@ -67,215 +66,214 @@ codeunit 6060045 "Item Wsht.-Check Line"
         IsUpdated: Boolean;
     begin
         with ItemWkshtLine do begin
-          if IsEmpty then
-            exit;
-          if Status = Status :: Error then
-            "Status Comment" := '' ;
-          Status := Status::Unvalidated;
-          ItemWorksheetTemplate.Get("Worksheet Template Name");
-          case Action of
-            Action :: Skip:
-                ;
-            Action :: CreateNew :
-              begin
-                if "Item Group"  = '' then begin
-                  ProcessError(ItemWkshtLine,StrSubstNo(Text112,"Line No."),StopOnError);
-                end else begin
-                  if not NoSeries.Get("No. Series") then begin
-                    ProcessError(ItemWkshtLine,StrSubstNo(Text104,FieldCaption("No. Series")),StopOnError)
-                  end else begin
-                    if "Item No." = '' then begin
-                       case ItemWorksheetTemplate."Item No. Creation by" of
-                         ItemWorksheetTemplate."Item No. Creation by" :: VendorItemNo :
-                           begin
-                              ProcessError(ItemWkshtLine,Text107,StopOnError);
-                           end;
-                         ItemWorksheetTemplate."Item No. Creation by" :: NoSeriesInWorksheet :
-                           begin
-                             ProcessError(ItemWkshtLine,Text107,StopOnError);
-                           end;
-                         ItemWorksheetTemplate."Item No. Creation by" :: NoSeriesOnProcessing :
-                           begin
-                             if not NoSeries."Default Nos." then
-                               ProcessError(ItemWkshtLine,Text108,StopOnError);
-                           end;
+            if IsEmpty then
+                exit;
+            if Status = Status::Error then
+                "Status Comment" := '';
+            Status := Status::Unvalidated;
+            ItemWorksheetTemplate.Get("Worksheet Template Name");
+            case Action of
+                Action::Skip:
+                    ;
+                Action::CreateNew:
+                    begin
+                        if "Item Group" = '' then begin
+                            ProcessError(ItemWkshtLine, StrSubstNo(Text112, "Line No."), StopOnError);
+                        end else begin
+                            if not NoSeries.Get("No. Series") then begin
+                                ProcessError(ItemWkshtLine, StrSubstNo(Text104, FieldCaption("No. Series")), StopOnError)
+                            end else begin
+                                if "Item No." = '' then begin
+                                    case ItemWorksheetTemplate."Item No. Creation by" of
+                                        ItemWorksheetTemplate."Item No. Creation by"::VendorItemNo:
+                                            begin
+                                                ProcessError(ItemWkshtLine, Text107, StopOnError);
+                                            end;
+                                        ItemWorksheetTemplate."Item No. Creation by"::NoSeriesInWorksheet:
+                                            begin
+                                                ProcessError(ItemWkshtLine, Text107, StopOnError);
+                                            end;
+                                        ItemWorksheetTemplate."Item No. Creation by"::NoSeriesOnProcessing:
+                                            begin
+                                                if not NoSeries."Default Nos." then
+                                                    ProcessError(ItemWkshtLine, Text108, StopOnError);
+                                            end;
+                                    end;
+                                end else begin
+                                    if RecItem.Get("Item No.") then begin
+                                        ProcessError(ItemWkshtLine, StrSubstNo(Text105, "Item No."), StopOnError);
+                                    end else begin
+                                        case ItemWorksheetTemplate."Item No. Creation by" of
+                                            ItemWorksheetTemplate."Item No. Creation by"::VendorItemNo:
+                                                begin
+                                                    if not NoSeries."Manual Nos." then
+                                                        ProcessError(ItemWkshtLine, Text109, StopOnError);
+                                                end;
+                                            ItemWorksheetTemplate."Item No. Creation by"::NoSeriesOnProcessing:
+                                                begin
+                                                    if not NoSeries."Manual Nos." then
+                                                        ProcessError(ItemWkshtLine, Text109, StopOnError);
+                                                end;
+                                        end;
+                                    end;
+                                end;
+                            end;
+                            //-NPR5.29
+                            if Status <> Status::Error then
+                                CheckWorksheetLineBarcodes(ItemWkshtLine, StopOnError);
+                            //+NPR5.29
+                            if Status <> Status::Error then
+                                if "Item Category Code" <> '' then
+                                    if not ItemCategory.Get("Item Category Code") then
+                                        ProcessError(ItemWkshtLine, Text119, StopOnError);
+                            //-NPR4.19
+                            if Status <> Status::Error then
+                                if "Tariff No." <> '' then
+                                    if not TariffNumber.Get("Tariff No.") then
+                                        ProcessError(ItemWkshtLine, StrSubstNo(Text127, FieldCaption("Tariff No.")), StopOnError);
+                            //+NPR4.19
                         end;
-                    end else begin
-                      if RecItem.Get("Item No.") then begin
-                        ProcessError(ItemWkshtLine,StrSubstNo(Text105,"Item No."),StopOnError);
-                      end else begin
-                        case ItemWorksheetTemplate."Item No. Creation by" of
-                          ItemWorksheetTemplate."Item No. Creation by" :: VendorItemNo :
-                            begin
-                              if not NoSeries."Manual Nos." then
-                                ProcessError(ItemWkshtLine,Text109,StopOnError);
-                            end;
-                          ItemWorksheetTemplate."Item No. Creation by" :: NoSeriesOnProcessing :
-                            begin
-                              if not NoSeries."Manual Nos." then
-                                ProcessError(ItemWkshtLine,Text109,StopOnError);
-                            end;
-                         end;
-                      end;
+                        //-NPR5.23
+                        if Status <> Status::Error then begin
+                            if "Item No." <> '' then
+                                AlternativeNo.Reset;
+                            AlternativeNo.SetRange("Alt. No.", "Item No.");
+                            if AlternativeNo.FindFirst then
+                                ProcessError(ItemWkshtLine, StrSubstNo(Text128, "Item No.", AlternativeNo.Code), StopOnError);
+                        end;
+                        //-NPR5.23
+                        if Status <> Status::Error then
+                            if Description = '' then
+                                ProcessError(ItemWkshtLine, StrSubstNo(Text113), StopOnError);
+                        if Status <> Status::Error then
+                            CheckWorkSheetLinePrices(ItemWkshtLine, StopOnError);
+                        if Status <> Status::Error then
+                            CheckWorkSheetLineDirectUnitCost(ItemWkshtLine, StopOnError);
                     end;
-                  end;
-                  //-NPR5.29
-                  if Status <> Status :: Error then
-                    CheckWorksheetLineBarcodes(ItemWkshtLine,StopOnError);
-                  //+NPR5.29
-                  if Status <> Status :: Error then
-                    if "Item Category Code" <> '' then
-                      if not ItemCategory.Get("Item Category Code") then
-                        ProcessError(ItemWkshtLine,Text119,StopOnError);
-                  if Status <> Status :: Error then
-                    if "Product Group Code" <> '' then
-                      if not ProductGroup.Get("Item Category Code","Product Group Code") then
-                        ProcessError(ItemWkshtLine,Text120,StopOnError);
-                  //-NPR4.19
-                  if Status <> Status :: Error then
-                    if "Tariff No." <> '' then
-                      if not TariffNumber.Get("Tariff No.") then
-                        ProcessError(ItemWkshtLine,StrSubstNo(Text127,FieldCaption("Tariff No.")),StopOnError);
-                  //+NPR4.19
-                end;
-                //-NPR5.23
-                if Status <> Status :: Error then begin
-                   if "Item No."  <> '' then
-                     AlternativeNo.Reset;
-                     AlternativeNo.SetRange("Alt. No.","Item No.");
-                     if AlternativeNo.FindFirst then
-                        ProcessError(ItemWkshtLine,StrSubstNo(Text128,"Item No.",AlternativeNo.Code),StopOnError);
-                end;
-                //-NPR5.23
-                if Status <> Status :: Error then
-                  if Description = '' then
-                    ProcessError(ItemWkshtLine,StrSubstNo(Text113),StopOnError);
-                if Status <> Status :: Error then
-                  CheckWorkSheetLinePrices(ItemWkshtLine,StopOnError);
-                if Status <> Status :: Error then
-                  CheckWorkSheetLineDirectUnitCost(ItemWkshtLine,StopOnError);
-              end;
 
-            Action :: UpdateOnly,Action :: UpdateAndCreateVariants :
-              begin
-                //-NPR5.29
-                if Status <> Status :: Error then
-                  CheckWorksheetLineBarcodes(ItemWkshtLine,StopOnError);
-                //+NPR5.29
-                if Status <> Status :: Error then
-                  CheckWorkSheetLinePrices(ItemWkshtLine,StopOnError);
-                if Status <> Status :: Error then
-                  CheckWorkSheetLineDirectUnitCost(ItemWkshtLine,StopOnError);
-                if Status <> Status :: Error then
-                  if Description = '' then
-                    ProcessError(ItemWkshtLine,StrSubstNo(Text113),StopOnError);
-                if RecItem.Get("Existing Item No.") then begin
-                  if "Variety 1" <>  RecItem."Variety 1" then
-                    ProcessError(ItemWkshtLine,StrSubstNo(Text124,1),StopOnError);
-                  if "Variety 2" <>  RecItem."Variety 2" then
-                    ProcessError(ItemWkshtLine,StrSubstNo(Text124,1),StopOnError);
-                  if "Variety 3" <>  RecItem."Variety 3" then
-                    ProcessError(ItemWkshtLine,StrSubstNo(Text124,1),StopOnError);
-                  if "Variety 4" <>  RecItem."Variety 4" then
-                    ProcessError(ItemWkshtLine,StrSubstNo(Text124,1),StopOnError);
-                  if "Variety 1 Table (Base)" <>  RecItem."Variety 1 Table" then
-                    ProcessError(ItemWkshtLine,StrSubstNo(Text125,1),StopOnError);
-                  if "Variety 2 Table (Base)" <>  RecItem."Variety 2 Table" then
-                    ProcessError(ItemWkshtLine,StrSubstNo(Text125,1),StopOnError);
-                  if "Variety 3 Table (Base)" <>  RecItem."Variety 3 Table" then
-                    ProcessError(ItemWkshtLine,StrSubstNo(Text125,1),StopOnError);
-                  if "Variety 4 Table (Base)" <>  RecItem."Variety 4 Table" then
-                    ProcessError(ItemWkshtLine,StrSubstNo(Text125,1),StopOnError);
-                  if "Create Copy of Variety 1 Table" or
-                     "Create Copy of Variety 2 Table" or
-                     "Create Copy of Variety 3 Table" or
-                     "Create Copy of Variety 4 Table" then
-                    ProcessError(ItemWkshtLine,Text126,StopOnError);
-                  //-NPR5.22
-                  //IF "Variety 1 Table (Base)" <>  RecItem."Variety 1 Table" THEN
-                  //  ProcessError(ItemWkshtLine,STRSUBSTNO(Text125,1),StopOnError);
-                  // IF "Variety 2 Table (Base)" <>  RecItem."Variety 2 Table" THEN
-                  //   ProcessError(ItemWkshtLine,STRSUBSTNO(Text125,1),StopOnError);
-                  // IF "Variety 3 Table (Base)" <>  RecItem."Variety 3 Table" THEN
-                  //   ProcessError(ItemWkshtLine,STRSUBSTNO(Text125,1),StopOnError);
-                  // IF "Variety 4 Table (Base)" <>  RecItem."Variety 4 Table" THEN
-                  //   ProcessError(ItemWkshtLine,STRSUBSTNO(Text125,1),StopOnError);
-                  // IF "Create Copy of Variety 1 Table" OR
-                  //    "Create Copy of Variety 2 Table" OR
-                  //    "Create Copy of Variety 3 Table" OR
-                  //    "Create Copy of Variety 4 Table" THEN
-                  //  ProcessError(ItemWkshtLine,Text126,StopOnError);
-                  //+NPR5.22
-                  //-NPR4.19
-                  if Status <> Status :: Error then
-                    if "Tariff No." <> '' then
-                      if not TariffNumber.Get("Tariff No.") then
-                        ProcessError(ItemWkshtLine,StrSubstNo(Text127,FieldCaption("Tariff No.")),StopOnError);
-                  //+NPR4.19
-                end else begin
-                  ProcessError(ItemWkshtLine,StrSubstNo(Text123),StopOnError);
-                end;
-              end;
+                Action::UpdateOnly, Action::UpdateAndCreateVariants:
+                    begin
+                        //-NPR5.29
+                        if Status <> Status::Error then
+                            CheckWorksheetLineBarcodes(ItemWkshtLine, StopOnError);
+                        //+NPR5.29
+                        if Status <> Status::Error then
+                            CheckWorkSheetLinePrices(ItemWkshtLine, StopOnError);
+                        if Status <> Status::Error then
+                            CheckWorkSheetLineDirectUnitCost(ItemWkshtLine, StopOnError);
+                        if Status <> Status::Error then
+                            if Description = '' then
+                                ProcessError(ItemWkshtLine, StrSubstNo(Text113), StopOnError);
+                        if RecItem.Get("Existing Item No.") then begin
+                            if "Variety 1" <> RecItem."Variety 1" then
+                                ProcessError(ItemWkshtLine, StrSubstNo(Text124, 1), StopOnError);
+                            if "Variety 2" <> RecItem."Variety 2" then
+                                ProcessError(ItemWkshtLine, StrSubstNo(Text124, 1), StopOnError);
+                            if "Variety 3" <> RecItem."Variety 3" then
+                                ProcessError(ItemWkshtLine, StrSubstNo(Text124, 1), StopOnError);
+                            if "Variety 4" <> RecItem."Variety 4" then
+                                ProcessError(ItemWkshtLine, StrSubstNo(Text124, 1), StopOnError);
+                            if "Variety 1 Table (Base)" <> RecItem."Variety 1 Table" then
+                                ProcessError(ItemWkshtLine, StrSubstNo(Text125, 1), StopOnError);
+                            if "Variety 2 Table (Base)" <> RecItem."Variety 2 Table" then
+                                ProcessError(ItemWkshtLine, StrSubstNo(Text125, 1), StopOnError);
+                            if "Variety 3 Table (Base)" <> RecItem."Variety 3 Table" then
+                                ProcessError(ItemWkshtLine, StrSubstNo(Text125, 1), StopOnError);
+                            if "Variety 4 Table (Base)" <> RecItem."Variety 4 Table" then
+                                ProcessError(ItemWkshtLine, StrSubstNo(Text125, 1), StopOnError);
+                            if "Create Copy of Variety 1 Table" or
+                               "Create Copy of Variety 2 Table" or
+                               "Create Copy of Variety 3 Table" or
+                               "Create Copy of Variety 4 Table" then
+                                ProcessError(ItemWkshtLine, Text126, StopOnError);
+                            //-NPR5.22
+                            //IF "Variety 1 Table (Base)" <>  RecItem."Variety 1 Table" THEN
+                            //  ProcessError(ItemWkshtLine,STRSUBSTNO(Text125,1),StopOnError);
+                            // IF "Variety 2 Table (Base)" <>  RecItem."Variety 2 Table" THEN
+                            //   ProcessError(ItemWkshtLine,STRSUBSTNO(Text125,1),StopOnError);
+                            // IF "Variety 3 Table (Base)" <>  RecItem."Variety 3 Table" THEN
+                            //   ProcessError(ItemWkshtLine,STRSUBSTNO(Text125,1),StopOnError);
+                            // IF "Variety 4 Table (Base)" <>  RecItem."Variety 4 Table" THEN
+                            //   ProcessError(ItemWkshtLine,STRSUBSTNO(Text125,1),StopOnError);
+                            // IF "Create Copy of Variety 1 Table" OR
+                            //    "Create Copy of Variety 2 Table" OR
+                            //    "Create Copy of Variety 3 Table" OR
+                            //    "Create Copy of Variety 4 Table" THEN
+                            //  ProcessError(ItemWkshtLine,Text126,StopOnError);
+                            //+NPR5.22
+                            //-NPR4.19
+                            if Status <> Status::Error then
+                                if "Tariff No." <> '' then
+                                    if not TariffNumber.Get("Tariff No.") then
+                                        ProcessError(ItemWkshtLine, StrSubstNo(Text127, FieldCaption("Tariff No.")), StopOnError);
+                            //+NPR4.19
+                        end else begin
+                            ProcessError(ItemWkshtLine, StrSubstNo(Text123), StopOnError);
+                        end;
+                    end;
 
-          end;
-          //-NPR5.25 [246088]
-          if Action in [Action::UpdateAndCreateVariants,Action::UpdateOnly] then
-             ItemWshtRegisterLine.InsertChangeRecords(ItemWkshtLine);
-          if ((CalledFromRegister = false) and (ItemWorksheetTemplate."Test Validation" = ItemWorksheetTemplate."Test Validation"::"On Check"))
-            or
-             ((CalledFromRegister = true) and (ItemWorksheetTemplate."Test Validation" = ItemWorksheetTemplate."Test Validation"::"On Check and On Register")) then begin
-            ItemWkshtValidateTestRnr.SetItemWorksheetLine(ItemWkshtLine);
-            ItemWkshtValidateTestRnr.Run;
-            ErrorText := ItemWkshtValidateTestRnr.GetErrormessage;
-            if ErrorText <> '' then begin
-              ProcessError(ItemWkshtLine,ErrorText,StopOnError);
             end;
-          end;
-          //+NPR5.25 [246088]
-          ItemWorksheetVariantLine.Reset;
-          ItemWorksheetVariantLine.SetRange("Worksheet Template Name","Worksheet Template Name");
-          ItemWorksheetVariantLine.SetRange("Worksheet Name","Worksheet Name");
-          ItemWorksheetVariantLine.SetRange("Worksheet Line No.","Line No.");
-          ItemWorksheetVariantLine.SetFilter("Heading Text",'%1','');
-          if ItemWorksheetVariantLine.FindSet then repeat
-            CheckItemWorksheetVariantLine(ItemWorksheetVariantLine,ItemWkshtLine,StopOnError);
-          until ItemWorksheetVariantLine.Next = 0;
+            //-NPR5.25 [246088]
+            if Action in [Action::UpdateAndCreateVariants, Action::UpdateOnly] then
+                ItemWshtRegisterLine.InsertChangeRecords(ItemWkshtLine);
+            if ((CalledFromRegister = false) and (ItemWorksheetTemplate."Test Validation" = ItemWorksheetTemplate."Test Validation"::"On Check"))
+              or
+               ((CalledFromRegister = true) and (ItemWorksheetTemplate."Test Validation" = ItemWorksheetTemplate."Test Validation"::"On Check and On Register")) then begin
+                ItemWkshtValidateTestRnr.SetItemWorksheetLine(ItemWkshtLine);
+                ItemWkshtValidateTestRnr.Run;
+                ErrorText := ItemWkshtValidateTestRnr.GetErrormessage;
+                if ErrorText <> '' then begin
+                    ProcessError(ItemWkshtLine, ErrorText, StopOnError);
+                end;
+            end;
+            //+NPR5.25 [246088]
+            ItemWorksheetVariantLine.Reset;
+            ItemWorksheetVariantLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
+            ItemWorksheetVariantLine.SetRange("Worksheet Name", "Worksheet Name");
+            ItemWorksheetVariantLine.SetRange("Worksheet Line No.", "Line No.");
+            ItemWorksheetVariantLine.SetFilter("Heading Text", '%1', '');
+            if ItemWorksheetVariantLine.FindSet then
+                repeat
+                    CheckItemWorksheetVariantLine(ItemWorksheetVariantLine, ItemWkshtLine, StopOnError);
+                until ItemWorksheetVariantLine.Next = 0;
 
-          ItemworksheetVarietyValue.Reset;
-          ItemworksheetVarietyValue.SetRange("Worksheet Template Name","Worksheet Template Name");
-          ItemworksheetVarietyValue.SetRange("Worksheet Name","Worksheet Name");
-          ItemworksheetVarietyValue.SetRange("Worksheet Line No.","Line No.");
-          if ItemworksheetVarietyValue.FindSet then repeat
-            //-#NPR5.38 [268786]
-            //CheckItemWorksheetVarietyLine(ItemworksheetVarietyValue,ItemWkshtLine,StopOnError);
-            IsUpdated := false;
-            ItemWorksheetVariantLineToCreate.SetRange("Worksheet Template Name",ItemWkshtLine."Worksheet Template Name");
-            ItemWorksheetVariantLineToCreate.SetRange("Worksheet Name",ItemWkshtLine."Worksheet Name");
-            ItemWorksheetVariantLineToCreate.SetRange("Worksheet Line No.",ItemWkshtLine."Line No.");
-            ItemWorksheetVariantLineToCreate.SetRange(Action,ItemWorksheetVariantLineToCreate.Action::CreateNew);
-            if ItemWorksheetVariantLineToCreate.FindSet then repeat
-              if ((ItemWorksheetVariantLineToCreate."Variety 1" = ItemworksheetVarietyValue.Type) and
-                  (ItemWorksheetVariantLineToCreate."Variety 1 Value" = ItemworksheetVarietyValue.Value)) or
-                 ((ItemWorksheetVariantLineToCreate."Variety 2" = ItemworksheetVarietyValue.Type) and
-                  (ItemWorksheetVariantLineToCreate."Variety 2 Value" = ItemworksheetVarietyValue.Value)) or
-                  ((ItemWorksheetVariantLineToCreate."Variety 3" = ItemworksheetVarietyValue.Type) and
-                  (ItemWorksheetVariantLineToCreate."Variety 3 Value" = ItemworksheetVarietyValue.Value)) or
-                 ((ItemWorksheetVariantLineToCreate."Variety 4" = ItemworksheetVarietyValue.Type) and
-                  (ItemWorksheetVariantLineToCreate."Variety 4 Value" = ItemworksheetVarietyValue.Value)) then
-              IsUpdated := true;
-            until (ItemWorksheetVariantLineToCreate.Next = 0) or IsUpdated;
-            if IsUpdated then
-              CheckItemWorksheetVarietyLine(ItemworksheetVarietyValue,ItemWkshtLine,StopOnError);
-            //+NPR5.38 [268786]
-          until ItemworksheetVarietyValue.Next = 0;
+            ItemworksheetVarietyValue.Reset;
+            ItemworksheetVarietyValue.SetRange("Worksheet Template Name", "Worksheet Template Name");
+            ItemworksheetVarietyValue.SetRange("Worksheet Name", "Worksheet Name");
+            ItemworksheetVarietyValue.SetRange("Worksheet Line No.", "Line No.");
+            if ItemworksheetVarietyValue.FindSet then
+                repeat
+                    //-#NPR5.38 [268786]
+                    //CheckItemWorksheetVarietyLine(ItemworksheetVarietyValue,ItemWkshtLine,StopOnError);
+                    IsUpdated := false;
+                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Template Name", ItemWkshtLine."Worksheet Template Name");
+                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Name", ItemWkshtLine."Worksheet Name");
+                    ItemWorksheetVariantLineToCreate.SetRange("Worksheet Line No.", ItemWkshtLine."Line No.");
+                    ItemWorksheetVariantLineToCreate.SetRange(Action, ItemWorksheetVariantLineToCreate.Action::CreateNew);
+                    if ItemWorksheetVariantLineToCreate.FindSet then
+                        repeat
+                            if ((ItemWorksheetVariantLineToCreate."Variety 1" = ItemworksheetVarietyValue.Type) and
+                                (ItemWorksheetVariantLineToCreate."Variety 1 Value" = ItemworksheetVarietyValue.Value)) or
+                               ((ItemWorksheetVariantLineToCreate."Variety 2" = ItemworksheetVarietyValue.Type) and
+                                (ItemWorksheetVariantLineToCreate."Variety 2 Value" = ItemworksheetVarietyValue.Value)) or
+                                ((ItemWorksheetVariantLineToCreate."Variety 3" = ItemworksheetVarietyValue.Type) and
+                                (ItemWorksheetVariantLineToCreate."Variety 3 Value" = ItemworksheetVarietyValue.Value)) or
+                               ((ItemWorksheetVariantLineToCreate."Variety 4" = ItemworksheetVarietyValue.Type) and
+                                (ItemWorksheetVariantLineToCreate."Variety 4 Value" = ItemworksheetVarietyValue.Value)) then
+                                IsUpdated := true;
+                        until (ItemWorksheetVariantLineToCreate.Next = 0) or IsUpdated;
+                    if IsUpdated then
+                        CheckItemWorksheetVarietyLine(ItemworksheetVarietyValue, ItemWkshtLine, StopOnError);
+                    //+NPR5.38 [268786]
+                until ItemworksheetVarietyValue.Next = 0;
 
-          if Status = Status:: Unvalidated then
-            Status := Status:: Validated;
-          Modify;
+            if Status = Status::Unvalidated then
+                Status := Status::Validated;
+            Modify;
         end;
     end;
 
-    local procedure CheckItemWorksheetVariantLine(ItemWorksheetVariantLine: Record "Item Worksheet Variant Line";var ItemWkshtLine: Record "Item Worksheet Line";StopOnError: Boolean)
+    local procedure CheckItemWorksheetVariantLine(ItemWorksheetVariantLine: Record "Item Worksheet Variant Line"; var ItemWkshtLine: Record "Item Worksheet Line"; StopOnError: Boolean)
     var
         ItemWorksheetVariantLine2: Record "Item Worksheet Variant Line";
         VarietyTable: Record "Variety Table";
@@ -285,99 +283,99 @@ codeunit 6060045 "Item Wsht.-Check Line"
         VarietyCloneData: Codeunit "Variety Clone Data";
     begin
         with ItemWorksheetVariantLine do begin
-          if Action = Action::Skip then
-            exit;
-          if "Item No."  <> ItemWkshtLine."Item No." then
-             ProcessError(ItemWkshtLine,StrSubstNo(Text100,FieldCaption("Item No."),TableCaption,"Worksheet Template Name","Worksheet Name","Worksheet Line No.","Line No."),StopOnError);
+            if Action = Action::Skip then
+                exit;
+            if "Item No." <> ItemWkshtLine."Item No." then
+                ProcessError(ItemWkshtLine, StrSubstNo(Text100, FieldCaption("Item No."), TableCaption, "Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", "Line No."), StopOnError);
 
-          if Action = Action :: Update then
-            if not ItemVariant.Get("Existing Item No.","Existing Variant Code") then
-              ProcessError(ItemWkshtLine,StrSubstNo(Text101,FieldCaption("Item No."),TableCaption,"Worksheet Template Name","Worksheet Name","Worksheet Line No.","Line No."),StopOnError);
+            if Action = Action::Update then
+                if not ItemVariant.Get("Existing Item No.", "Existing Variant Code") then
+                    ProcessError(ItemWkshtLine, StrSubstNo(Text101, FieldCaption("Item No."), TableCaption, "Worksheet Template Name", "Worksheet Name", "Worksheet Line No.", "Line No."), StopOnError);
 
-          if Action = Action :: CreateNew then
-             //-NPR5.29 [263917]
-             //IF ItemVariant.GetFromVariety("Item No.", "Variety 1 Value",
-             if VarietyCloneData.GetFromVariety(ItemVariant, "Item No.", "Variety 1 Value",
-             //+263917 [263917]
+            if Action = Action::CreateNew then
+                //-NPR5.29 [263917]
+                //IF ItemVariant.GetFromVariety("Item No.", "Variety 1 Value",
+                if VarietyCloneData.GetFromVariety(ItemVariant, "Item No.", "Variety 1 Value",
+                                     //+263917 [263917]
                                      "Variety 2 Value", "Variety 3 Value",
                                      "Variety 4 Value") then
-                ProcessError(ItemWkshtLine,StrSubstNo(Text106,
-                                         ItemWkshtLine."Variety 1","Variety 1 Value",
-                                         ItemWkshtLine."Variety 2","Variety 2 Value",
-                                         ItemWkshtLine."Variety 3","Variety 3 Value",
-                                         ItemWkshtLine."Variety 4","Variety 4 Value"),StopOnError);
-          if (Action <> Action ::Skip) and (ItemWkshtLine.Status <> ItemWkshtLine.Status::Error) then  begin
-            ItemWorksheetVariantLine2.Reset;
-            ItemWorksheetVariantLine2.SetRange("Worksheet Template Name","Worksheet Template Name");
-            ItemWorksheetVariantLine2.SetRange("Worksheet Name","Worksheet Name");
-            ItemWorksheetVariantLine2.SetRange("Worksheet Line No.","Worksheet Line No.");
-            ItemWorksheetVariantLine2.SetFilter("Heading Text",'%1','');
-            ItemWorksheetVariantLine2.SetFilter(Action,'<>%1',Action::Skip);
-            ItemWorksheetVariantLine2.SetFilter("Line No.",'>%1',"Line No.");
-            ItemWorksheetVariantLine2.SetRange("Variety 1 Value","Variety 1 Value");
-            ItemWorksheetVariantLine2.SetRange("Variety 2 Value","Variety 2 Value");
-            ItemWorksheetVariantLine2.SetRange("Variety 3 Value","Variety 3 Value");
-            ItemWorksheetVariantLine2.SetRange("Variety 4 Value","Variety 4 Value");
-            if ItemWorksheetVariantLine2.FindFirst then begin
-                  ProcessError(ItemWkshtLine,StrSubstNo(Text114,
-                                           ItemWkshtLine."Variety 1","Variety 1 Value",
-                                           ItemWkshtLine."Variety 2","Variety 2 Value",
-                                           ItemWkshtLine."Variety 3","Variety 3 Value",
-                                           ItemWkshtLine."Variety 4","Variety 4 Value"),StopOnError);
-            end else begin
-              if "Vendors Bar Code" <> '' then  begin
-                ItemWorksheetVariantLine2.SetRange("Variety 1 Value");
-                ItemWorksheetVariantLine2.SetRange("Variety 2 Value");
-                ItemWorksheetVariantLine2.SetRange("Variety 3 Value");
-                ItemWorksheetVariantLine2.SetRange("Variety 4 Value");
-                ItemWorksheetVariantLine2.SetRange("Vendors Bar Code","Vendors Bar Code");
+                    ProcessError(ItemWkshtLine, StrSubstNo(Text106,
+                                             ItemWkshtLine."Variety 1", "Variety 1 Value",
+                                             ItemWkshtLine."Variety 2", "Variety 2 Value",
+                                             ItemWkshtLine."Variety 3", "Variety 3 Value",
+                                             ItemWkshtLine."Variety 4", "Variety 4 Value"), StopOnError);
+            if (Action <> Action::Skip) and (ItemWkshtLine.Status <> ItemWkshtLine.Status::Error) then begin
+                ItemWorksheetVariantLine2.Reset;
+                ItemWorksheetVariantLine2.SetRange("Worksheet Template Name", "Worksheet Template Name");
+                ItemWorksheetVariantLine2.SetRange("Worksheet Name", "Worksheet Name");
+                ItemWorksheetVariantLine2.SetRange("Worksheet Line No.", "Worksheet Line No.");
+                ItemWorksheetVariantLine2.SetFilter("Heading Text", '%1', '');
+                ItemWorksheetVariantLine2.SetFilter(Action, '<>%1', Action::Skip);
+                ItemWorksheetVariantLine2.SetFilter("Line No.", '>%1', "Line No.");
+                ItemWorksheetVariantLine2.SetRange("Variety 1 Value", "Variety 1 Value");
+                ItemWorksheetVariantLine2.SetRange("Variety 2 Value", "Variety 2 Value");
+                ItemWorksheetVariantLine2.SetRange("Variety 3 Value", "Variety 3 Value");
+                ItemWorksheetVariantLine2.SetRange("Variety 4 Value", "Variety 4 Value");
                 if ItemWorksheetVariantLine2.FindFirst then begin
-                  ProcessError(ItemWkshtLine,StrSubstNo(Text115,"Vendors Bar Code"),StopOnError);
+                    ProcessError(ItemWkshtLine, StrSubstNo(Text114,
+                                             ItemWkshtLine."Variety 1", "Variety 1 Value",
+                                             ItemWkshtLine."Variety 2", "Variety 2 Value",
+                                             ItemWkshtLine."Variety 3", "Variety 3 Value",
+                                             ItemWkshtLine."Variety 4", "Variety 4 Value"), StopOnError);
                 end else begin
-                  if "Internal Bar Code" <> '' then begin
-                    ItemWorksheetVariantLine2.SetRange("Internal Bar Code","Internal Bar Code");
-                    if ItemWorksheetVariantLine2.FindFirst then begin
-                      ProcessError(ItemWkshtLine,StrSubstNo(Text116,"Internal Bar Code"),StopOnError);
+                    if "Vendors Bar Code" <> '' then begin
+                        ItemWorksheetVariantLine2.SetRange("Variety 1 Value");
+                        ItemWorksheetVariantLine2.SetRange("Variety 2 Value");
+                        ItemWorksheetVariantLine2.SetRange("Variety 3 Value");
+                        ItemWorksheetVariantLine2.SetRange("Variety 4 Value");
+                        ItemWorksheetVariantLine2.SetRange("Vendors Bar Code", "Vendors Bar Code");
+                        if ItemWorksheetVariantLine2.FindFirst then begin
+                            ProcessError(ItemWkshtLine, StrSubstNo(Text115, "Vendors Bar Code"), StopOnError);
+                        end else begin
+                            if "Internal Bar Code" <> '' then begin
+                                ItemWorksheetVariantLine2.SetRange("Internal Bar Code", "Internal Bar Code");
+                                if ItemWorksheetVariantLine2.FindFirst then begin
+                                    ProcessError(ItemWkshtLine, StrSubstNo(Text116, "Internal Bar Code"), StopOnError);
+                                end;
+                            end;
+                        end;
                     end;
-                  end;
                 end;
-              end;
-            end;
-            CalcFields("Variety 1","Variety 2","Variety 3","Variety 4");
-            if ("Variety 1 Value" = '') and ("Variety 1" <> '') then
-              ProcessError(ItemWkshtLine,StrSubstNo(Text121,1,"Variety 1"),StopOnError);
-            if ("Variety 2 Value" = '') and ("Variety 2" <> '') then
-              ProcessError(ItemWkshtLine,StrSubstNo(Text121,2,"Variety 2"),StopOnError);
-            if ("Variety 3 Value" = '') and ("Variety 3" <> '') then
-              ProcessError(ItemWkshtLine,StrSubstNo(Text121,3,"Variety 3"),StopOnError);
-            if ("Variety 4 Value" = '') and ("Variety 4" <> '') then
-              ProcessError(ItemWkshtLine,StrSubstNo(Text121,4,"Variety 4"),StopOnError);
+                CalcFields("Variety 1", "Variety 2", "Variety 3", "Variety 4");
+                if ("Variety 1 Value" = '') and ("Variety 1" <> '') then
+                    ProcessError(ItemWkshtLine, StrSubstNo(Text121, 1, "Variety 1"), StopOnError);
+                if ("Variety 2 Value" = '') and ("Variety 2" <> '') then
+                    ProcessError(ItemWkshtLine, StrSubstNo(Text121, 2, "Variety 2"), StopOnError);
+                if ("Variety 3 Value" = '') and ("Variety 3" <> '') then
+                    ProcessError(ItemWkshtLine, StrSubstNo(Text121, 3, "Variety 3"), StopOnError);
+                if ("Variety 4 Value" = '') and ("Variety 4" <> '') then
+                    ProcessError(ItemWkshtLine, StrSubstNo(Text121, 4, "Variety 4"), StopOnError);
 
-            if ("Variety 1 Value" <> '') and ("Variety 1" = '') then
-              ProcessError(ItemWkshtLine,StrSubstNo(Text122,1,"Variety 1 Value"),StopOnError);
-            if ("Variety 2 Value" <> '') and ("Variety 2" = '') then
-              ProcessError(ItemWkshtLine,StrSubstNo(Text122,2,"Variety 2 Value"),StopOnError);
-            if ("Variety 3 Value" <> '') and ("Variety 3" = '') then
-              ProcessError(ItemWkshtLine,StrSubstNo(Text122,3,"Variety 3 Value"),StopOnError);
-            if ("Variety 4 Value" <> '') and ("Variety 4" = '') then
-              ProcessError(ItemWkshtLine,StrSubstNo(Text122,4,"Variety 4 Value"),StopOnError);
-          end;
-          //-NPR5.29 [262068]
-          //-NPR5.50 [355172]
-          //IF (ItemWkshtLine.Status <> ItemWkshtLine.Status::Error) AND ("Internal Bar Code" <> '') THEN  BEGIN
-          //  IF NOT ItemNumberManagement.IsInternalBarcode("Internal Bar Code") THEN
-          //    ProcessError(ItemWkshtLine,Text130,StopOnError);
-          //END;
-          //IF (ItemWkshtLine.Status <> ItemWkshtLine.Status::Error) AND ("Vendors Bar Code" <> '') THEN  BEGIN
-          //  IF ItemNumberManagement.IsInternalBarcode("Vendors Bar Code") THEN
-          //    ProcessError(ItemWkshtLine,TExt131,StopOnError);
-          //END;
-          //+NPR5.50 [355172]
-          //+NPR5.29 [262068]
+                if ("Variety 1 Value" <> '') and ("Variety 1" = '') then
+                    ProcessError(ItemWkshtLine, StrSubstNo(Text122, 1, "Variety 1 Value"), StopOnError);
+                if ("Variety 2 Value" <> '') and ("Variety 2" = '') then
+                    ProcessError(ItemWkshtLine, StrSubstNo(Text122, 2, "Variety 2 Value"), StopOnError);
+                if ("Variety 3 Value" <> '') and ("Variety 3" = '') then
+                    ProcessError(ItemWkshtLine, StrSubstNo(Text122, 3, "Variety 3 Value"), StopOnError);
+                if ("Variety 4 Value" <> '') and ("Variety 4" = '') then
+                    ProcessError(ItemWkshtLine, StrSubstNo(Text122, 4, "Variety 4 Value"), StopOnError);
+            end;
+            //-NPR5.29 [262068]
+            //-NPR5.50 [355172]
+            //IF (ItemWkshtLine.Status <> ItemWkshtLine.Status::Error) AND ("Internal Bar Code" <> '') THEN  BEGIN
+            //  IF NOT ItemNumberManagement.IsInternalBarcode("Internal Bar Code") THEN
+            //    ProcessError(ItemWkshtLine,Text130,StopOnError);
+            //END;
+            //IF (ItemWkshtLine.Status <> ItemWkshtLine.Status::Error) AND ("Vendors Bar Code" <> '') THEN  BEGIN
+            //  IF ItemNumberManagement.IsInternalBarcode("Vendors Bar Code") THEN
+            //    ProcessError(ItemWkshtLine,TExt131,StopOnError);
+            //END;
+            //+NPR5.50 [355172]
+            //+NPR5.29 [262068]
         end;
     end;
 
-    local procedure CheckItemWorksheetVarietyLine(ItemWorksheetVarietyLine: Record "Item Worksheet Variety Value";var ItemWkshtLine: Record "Item Worksheet Line";StopOnError: Boolean)
+    local procedure CheckItemWorksheetVarietyLine(ItemWorksheetVarietyLine: Record "Item Worksheet Variety Value"; var ItemWkshtLine: Record "Item Worksheet Line"; StopOnError: Boolean)
     var
         VarietyTable: Record "Variety Table";
         VarietyValue: Record "Variety Value";
@@ -385,88 +383,88 @@ codeunit 6060045 "Item Wsht.-Check Line"
         Item: Record Item;
     begin
         with ItemWorksheetVarietyLine do begin
-          //-NPR5.35 [268786]
-          //IF Type <>'' THEN BEGIN
-          if (Type <>'') and (Table <> '') and (Value <> '') then begin
-          //-NPR5.35 [268786]
-            if not VarietyValue.Get(Type,Table,Value) then begin
-              if not VarietyTable.Get(Type,Table) then begin
-                ProcessError(ItemWkshtLine,StrSubstNo(Text102,VarietyTable.TableCaption,Type,Value),StopOnError)
-              end else begin
-                if VarietyTable."Lock Table" then begin
-                  case VarietyTable.Type  of
-                    ItemWkshtLine."Variety 1" :
-                      begin
-                        if not ItemWkshtLine."Create Copy of Variety 1 Table" then
-                          ProcessError(ItemWkshtLine,StrSubstNo(Text103,VarietyTable.TableCaption,Type,Value),StopOnError);
-                      end;
-                    ItemWkshtLine."Variety 2" :
-                      begin
-                        if not ItemWkshtLine."Create Copy of Variety 2 Table" then
-                          ProcessError(ItemWkshtLine,StrSubstNo(Text103,VarietyTable.TableCaption,Type,Value),StopOnError);
-                      end;
-                    ItemWkshtLine."Variety 3" :
-                      begin
-                        if not ItemWkshtLine."Create Copy of Variety 3 Table" then
-                          ProcessError(ItemWkshtLine,StrSubstNo(Text103,VarietyTable.TableCaption,Type,Value),StopOnError);
-                      end;
-                    ItemWkshtLine."Variety 4" :
-                      begin
-                        if not ItemWkshtLine."Create Copy of Variety 4 Table" then
-                          ProcessError(ItemWkshtLine,StrSubstNo(Text103,VarietyTable.TableCaption,Type,Value),StopOnError);
-                      end;
-                  end;
+            //-NPR5.35 [268786]
+            //IF Type <>'' THEN BEGIN
+            if (Type <> '') and (Table <> '') and (Value <> '') then begin
+                //-NPR5.35 [268786]
+                if not VarietyValue.Get(Type, Table, Value) then begin
+                    if not VarietyTable.Get(Type, Table) then begin
+                        ProcessError(ItemWkshtLine, StrSubstNo(Text102, VarietyTable.TableCaption, Type, Value), StopOnError)
+                    end else begin
+                        if VarietyTable."Lock Table" then begin
+                            case VarietyTable.Type of
+                                ItemWkshtLine."Variety 1":
+                                    begin
+                                        if not ItemWkshtLine."Create Copy of Variety 1 Table" then
+                                            ProcessError(ItemWkshtLine, StrSubstNo(Text103, VarietyTable.TableCaption, Type, Value), StopOnError);
+                                    end;
+                                ItemWkshtLine."Variety 2":
+                                    begin
+                                        if not ItemWkshtLine."Create Copy of Variety 2 Table" then
+                                            ProcessError(ItemWkshtLine, StrSubstNo(Text103, VarietyTable.TableCaption, Type, Value), StopOnError);
+                                    end;
+                                ItemWkshtLine."Variety 3":
+                                    begin
+                                        if not ItemWkshtLine."Create Copy of Variety 3 Table" then
+                                            ProcessError(ItemWkshtLine, StrSubstNo(Text103, VarietyTable.TableCaption, Type, Value), StopOnError);
+                                    end;
+                                ItemWkshtLine."Variety 4":
+                                    begin
+                                        if not ItemWkshtLine."Create Copy of Variety 4 Table" then
+                                            ProcessError(ItemWkshtLine, StrSubstNo(Text103, VarietyTable.TableCaption, Type, Value), StopOnError);
+                                    end;
+                            end;
+                        end;
+                    end;
                 end;
-              end;
             end;
-          end;
         end;
     end;
 
-    local procedure CheckWorkSheetLinePrices(var ItemWkshtLine: Record "Item Worksheet Line";StopOnError: Boolean)
+    local procedure CheckWorkSheetLinePrices(var ItemWkshtLine: Record "Item Worksheet Line"; StopOnError: Boolean)
     var
         GLSetup: Record "General Ledger Setup";
     begin
-        if ItemWorksheetTemplate."Sales Price Handling" = ItemWorksheetTemplate."Sales Price Handling" :: Item then begin
-          if ItemWkshtLine."Sales Price Currency Code" <> '' then begin
-            if GLSetup."LCY Code" <> ItemWkshtLine."Currency Code" then begin
-               ProcessError(ItemWkshtLine,StrSubstNo(Text110,ItemWkshtLine."Currency Code"),StopOnError);
+        if ItemWorksheetTemplate."Sales Price Handling" = ItemWorksheetTemplate."Sales Price Handling"::Item then begin
+            if ItemWkshtLine."Sales Price Currency Code" <> '' then begin
+                if GLSetup."LCY Code" <> ItemWkshtLine."Currency Code" then begin
+                    ProcessError(ItemWkshtLine, StrSubstNo(Text110, ItemWkshtLine."Currency Code"), StopOnError);
+                end;
             end;
-          end;
         end;
     end;
 
-    local procedure CheckWorkSheetLineDirectUnitCost(var ItemWkshtLine: Record "Item Worksheet Line";StopOnError: Boolean)
+    local procedure CheckWorkSheetLineDirectUnitCost(var ItemWkshtLine: Record "Item Worksheet Line"; StopOnError: Boolean)
     var
         GLSetup: Record "General Ledger Setup";
     begin
-        if ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling" :: Item then begin
-          if (ItemWkshtLine."Purchase Price Currency Code" <> '') and (ItemWkshtLine."Direct Unit Cost" <> 0) then begin
-            if GLSetup."LCY Code" <> ItemWkshtLine."Purchase Price Currency Code" then begin
-               ProcessError(ItemWkshtLine,StrSubstNo(Text118,ItemWkshtLine."Line No."),StopOnError);
+        if ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::Item then begin
+            if (ItemWkshtLine."Purchase Price Currency Code" <> '') and (ItemWkshtLine."Direct Unit Cost" <> 0) then begin
+                if GLSetup."LCY Code" <> ItemWkshtLine."Purchase Price Currency Code" then begin
+                    ProcessError(ItemWkshtLine, StrSubstNo(Text118, ItemWkshtLine."Line No."), StopOnError);
+                end;
             end;
-          end;
         end;
-        if ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling" :: "Item+Variant" then begin
-          if ItemWkshtLine."Vendor No." = '' then begin
-            if ItemWkshtLine."Direct Unit Cost" <> 0 then begin
-               ProcessError(ItemWkshtLine,StrSubstNo(Text111,ItemWkshtLine."Line No."),StopOnError);
-            end else begin
-               ItemWorksheetVariantLine.Reset;
-               ItemWorksheetVariantLine.SetRange("Worksheet Template Name",ItemWkshtLine."Worksheet Template Name");
-               ItemWorksheetVariantLine.SetRange("Worksheet Name",ItemWkshtLine."Worksheet Name");
-               ItemWorksheetVariantLine.SetRange("Worksheet Line No.",ItemWkshtLine."Line No.");
-               ItemWorksheetVariantLine.SetFilter(Action,'<>%1',ItemWkshtLine.Action::Skip);
-               ItemWorksheetVariantLine.SetFilter("Direct Unit Cost",'<>0');
-               if ItemWorksheetVariantLine.FindFirst then begin
-                 ProcessError(ItemWkshtLine,StrSubstNo(Text111,ItemWkshtLine."Line No."),StopOnError);
-               end;
+        if ItemWorksheetTemplate."Purchase Price Handling" = ItemWorksheetTemplate."Purchase Price Handling"::"Item+Variant" then begin
+            if ItemWkshtLine."Vendor No." = '' then begin
+                if ItemWkshtLine."Direct Unit Cost" <> 0 then begin
+                    ProcessError(ItemWkshtLine, StrSubstNo(Text111, ItemWkshtLine."Line No."), StopOnError);
+                end else begin
+                    ItemWorksheetVariantLine.Reset;
+                    ItemWorksheetVariantLine.SetRange("Worksheet Template Name", ItemWkshtLine."Worksheet Template Name");
+                    ItemWorksheetVariantLine.SetRange("Worksheet Name", ItemWkshtLine."Worksheet Name");
+                    ItemWorksheetVariantLine.SetRange("Worksheet Line No.", ItemWkshtLine."Line No.");
+                    ItemWorksheetVariantLine.SetFilter(Action, '<>%1', ItemWkshtLine.Action::Skip);
+                    ItemWorksheetVariantLine.SetFilter("Direct Unit Cost", '<>0');
+                    if ItemWorksheetVariantLine.FindFirst then begin
+                        ProcessError(ItemWkshtLine, StrSubstNo(Text111, ItemWkshtLine."Line No."), StopOnError);
+                    end;
+                end;
             end;
-          end;
         end;
     end;
 
-    local procedure CheckWorksheetLineBarcodes(var ItemWkshtLine: Record "Item Worksheet Line";StopOnError: Boolean)
+    local procedure CheckWorksheetLineBarcodes(var ItemWkshtLine: Record "Item Worksheet Line"; StopOnError: Boolean)
     var
         ItemNumberManagement: Codeunit "Item Number Management";
     begin
@@ -484,18 +482,18 @@ codeunit 6060045 "Item Wsht.-Check Line"
         //+NPR5.29 [262068]
     end;
 
-    local procedure ProcessError(var ItemWkshtLine: Record "Item Worksheet Line";ErrorText: Text[1024];StopOnError: Boolean)
+    local procedure ProcessError(var ItemWkshtLine: Record "Item Worksheet Line"; ErrorText: Text[1024]; StopOnError: Boolean)
     begin
         if StopOnError then begin
-          Error(ErrorText)
+            Error(ErrorText)
         end else begin
-          if ItemWkshtLine.Status = ItemWkshtLine.Status::Error then begin
-            ItemWkshtLine."Status Comment" := CopyStr(ItemWkshtLine."Status Comment" + ' - ' + ErrorText,1,MaxStrLen(ItemWkshtLine."Status Comment"));
-          end else begin
-            ItemWkshtLine.Status := ItemWkshtLine.Status::Error;
-            ItemWkshtLine."Status Comment" := CopyStr(ErrorText,1,MaxStrLen(ItemWkshtLine."Status Comment"));
-          end;
-          //ItemWkshtLine.MODIFY;
+            if ItemWkshtLine.Status = ItemWkshtLine.Status::Error then begin
+                ItemWkshtLine."Status Comment" := CopyStr(ItemWkshtLine."Status Comment" + ' - ' + ErrorText, 1, MaxStrLen(ItemWkshtLine."Status Comment"));
+            end else begin
+                ItemWkshtLine.Status := ItemWkshtLine.Status::Error;
+                ItemWkshtLine."Status Comment" := CopyStr(ErrorText, 1, MaxStrLen(ItemWkshtLine."Status Comment"));
+            end;
+            //ItemWkshtLine.MODIFY;
         end;
     end;
 }

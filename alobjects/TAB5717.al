@@ -13,7 +13,6 @@ tableextension 70000042 tableextension70000042 extends "Item Cross Reference"
         field(6014441;"Time Stamp";BigInteger)
         {
             Caption = 'Time Stamp';
-            SQLTimestamp = true;
         }
     }
 }

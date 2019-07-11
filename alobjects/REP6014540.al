@@ -125,7 +125,6 @@ report 6014540 "Items With Low Sales"
             }
             column(txtPctTotalSales_;TxtPctTotalSales)
             {
-                DecimalPlaces = 1:1;
             }
             column(PageCaption;PageCaptionLbl)
             {

@@ -20,7 +20,7 @@ table 6014441 "Company All"
 
             trigger OnValidate()
             begin
-                npc_remote.ChangeCompany( Company );
+                npc_remote.ChangeCompany( Company.Name );
                 if npc_remote.Get then begin
                   npc_remote."Company No." := "npc - Company No.";
                   npc_remote.Modify;
@@ -33,7 +33,7 @@ table 6014441 "Company All"
 
             trigger OnValidate()
             begin
-                icomm_remote.ChangeCompany( Company );
+                icomm_remote.ChangeCompany( Company.Name );
                 if icomm_remote.Get then begin
                   icomm_remote."NAS - Enabled" := "icomm - NAS Enabled";
                   icomm_remote.Modify;
@@ -46,7 +46,7 @@ table 6014441 "Company All"
 
             trigger OnValidate()
             begin
-                npc_remote.ChangeCompany( Company );
+                npc_remote.ChangeCompany( Company.Name );
                 if npc_remote.Get then begin
                   npc_remote."Post Sale" := "npc - Sales posting";
                   npc_remote.Modify;

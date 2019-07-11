@@ -26,49 +26,6 @@ page 6151451 "Magento DragDropPic. Addin"
     {
         area(content)
         {
-            usercontrol(DragDropAddin;"NaviPartner.NaviConnect.DragDropPicture.1.05")
-            {
-                Visible = MagentoEnabled;
-
-                trigger EndDataStream()
-                begin
-                    EndDataStream();
-                end;
-
-                trigger EndDataTransfer()
-                begin
-                    EndDataTransfer();
-                    DisplayPicture();
-                    if IsWebClient() then
-                      CurrPage.Update(false);
-                end;
-
-                trigger InitDataStream(filename: Text;filesize: Decimal)
-                begin
-                    //-MAG2.03 [272066]
-                    //InitDataStream(filename);
-                    InitDataStream(filename,filesize);
-                    //+MAG2.03 [272066]
-                end;
-
-                trigger InitDataTransfer()
-                begin
-                    InitDataTransfer();
-                end;
-
-                trigger WriteDataStream(data: Variant;finalize: Boolean)
-                begin
-                    WriteDataStream(data,finalize);
-                end;
-
-                trigger AddInReady()
-                begin
-                    ControlAddInReady := true;
-                    CurrPage.DragDropAddin.SetCaption('drop-text',Text003);
-                    DisplayPicture();
-                    CurrPage.Update(false);
-                end;
-            }
         }
     }
 
@@ -287,16 +244,16 @@ page 6151451 "Magento DragDropPic. Addin"
         if not ControlAddInReady then
           exit;
         if HidePicture then begin
-          CurrPage.DragDropAddin.DisplayData('');
+          //CurrPage.DragDropAddin.DisplayData('');
           exit;
         end;
 
         if Picture.HasValue then begin
-          CurrPage.DragDropAddin.DisplayData(GetDataUri());
+          //CurrPage.DragDropAddin.DisplayData(GetDataUri());
           exit;
         end;
 
-        CurrPage.DragDropAddin.DisplayData(GetMagentotUrl());
+        //CurrPage.DragDropAddin.DisplayData(GetMagentotUrl());
     end;
 
     procedure GetDataUri() DataUri: Text
