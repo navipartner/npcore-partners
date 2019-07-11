@@ -93,24 +93,24 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         QueryCloseSignal: DotNet npNetQueryClosePage;
         Response: DotNet npNetMessageResponse;
     begin
-        POSDeviceProxyManager.DeserializeObject(Signal,TempBlob);
+        POSDeviceProxyManager.DeserializeObject(Signal, TempBlob);
         case true of
-          Signal.TypeName = Format(GetDotNetType(StartSignal)):
-            begin
-              QueuedRequests := QueuedRequests.Stack();
-              QueuedResponseTypes := QueuedResponseTypes.Stack();
+            Signal.TypeName = Format(GetDotNetType(StartSignal)):
+                begin
+                    QueuedRequests := QueuedRequests.Stack();
+                    QueuedResponseTypes := QueuedResponseTypes.Stack();
 
-              POSDeviceProxyManager.DeserializeSignal(StartSignal,Signal);
-              Start(StartSignal.ProtocolManagerId);
-            end;
-          Signal.TypeName = Format(GetDotNetType(Response)):
-            begin
-              POSDeviceProxyManager.DeserializeSignal(Response,Signal);
-              MessageResponse(Response.Envelope);
-            end;
-          Signal.TypeName = Format(GetDotNetType(QueryCloseSignal)):
-            if QueryClosePage() then
-              POSDeviceProxyManager.AbortByUserRequest(ProtocolManagerId);
+                    POSDeviceProxyManager.DeserializeSignal(StartSignal, Signal);
+                    Start(StartSignal.ProtocolManagerId);
+                end;
+            Signal.TypeName = Format(GetDotNetType(Response)):
+                begin
+                    POSDeviceProxyManager.DeserializeSignal(Response, Signal);
+                    MessageResponse(Response.Envelope);
+                end;
+            Signal.TypeName = Format(GetDotNetType(QueryCloseSignal)):
+                if QueryClosePage() then
+                    POSDeviceProxyManager.AbortByUserRequest(ProtocolManagerId);
         end;
     end;
 
@@ -138,9 +138,9 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         //+NPR5.38 [302551]
 
         State.AdminFunction := 0; // Normal Operation
-        if (AuxFunctionIsSet ) then begin
-          State.PerformAdminFunction := true;
-          State.AdminFunction := AuxFunction;
+        if (AuxFunctionIsSet) then begin
+            State.PerformAdminFunction := true;
+            State.AdminFunction := AuxFunction;
         end;
 
         GatewayRequest := GatewayRequest.PaymentGatewayProcessRequest();
@@ -150,13 +150,13 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         AwaitResponse(
           GetDotNetType(VoidResponse),
           POSDeviceProxyManager.SendMessage(
-            ProtocolManagerId,GatewayRequest));
+            ProtocolManagerId, GatewayRequest));
     end;
 
     local procedure MessageResponse(Envelope: DotNet npNetResponseEnvelope)
     begin
         if Envelope.ResponseTypeName <> Format(ExpectedResponseType) then
-          Error('Unknown response type: %1 (expected %2)',Envelope.ResponseTypeName,Format(ExpectedResponseType));
+            Error('Unknown response type: %1 (expected %2)', Envelope.ResponseTypeName, Format(ExpectedResponseType));
     end;
 
     local procedure QueryClosePage(): Boolean
@@ -169,7 +169,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
     end;
 
-    local procedure AwaitResponse(Type: DotNet npNetType;Id: Guid)
+    local procedure AwaitResponse(Type: DotNet npNetType; Id: Guid)
     begin
         ExpectedResponseType := Type;
         ExpectedResponseId := Id;
@@ -179,31 +179,31 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
     begin
     end;
 
-    procedure Init(pAmount: Decimal;var pEkspeditionslinie: Record "Sale Line POS";pcvm: Integer;pOnOffline: Integer;BarcodeTransfer: Boolean): Boolean
+    procedure Init(pAmount: Decimal; var pEkspeditionslinie: Record "Sale Line POS"; pcvm: Integer; pOnOffline: Integer; BarcodeTransfer: Boolean): Boolean
     var
         RetailFormCode: Codeunit "Retail Form Code";
         KasseNr: Code[20];
     begin
         if pAmount = 0 then begin
-          InitErrorText := Err001;
-          exit(false);
+            InitErrorText := Err001;
+            exit(false);
         end;
 
-        Done         := false;
-        Amount       := pAmount;
-        MessageText  := '';
-        Started      := false;
-        Afvist       := false;
-        EventTimer   := 0;
-        ForceClose   := false;
-        Vent         := false;
+        Done := false;
+        Amount := pAmount;
+        MessageText := '';
+        Started := false;
+        Afvist := false;
+        EventTimer := 0;
+        ForceClose := false;
+        Vent := false;
         Ekspeditionslinie := pEkspeditionslinie;
 
-        Cvm               := pcvm;
-        Onoffline         := pOnOffline;
-        ClearAllPressed   := 0;
+        Cvm := pcvm;
+        Onoffline := pOnOffline;
+        ClearAllPressed := 0;
         ApplicationsCount := 0;
-        WaitApplication   := false;
+        WaitApplication := false;
         IsBarcodeTransfer := BarcodeTransfer;
 
         Util.MakeVars;
@@ -251,7 +251,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         IsBarcodeTransfer := true;
     end;
 
-    procedure SetAuxFunction(CreditCardSolution: Option;AuxFunctionID: Integer;var pEkspeditionslinie: Record "Sale Line POS"): Boolean
+    procedure SetAuxFunction(CreditCardSolution: Option; AuxFunctionID: Integer; var pEkspeditionslinie: Record "Sale Line POS"): Boolean
     var
         PosSetup: Record Register;
         RetailFormCode: Codeunit "Retail Form Code";
@@ -261,25 +261,25 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         AuxFunctionIsSet := false;
 
         if (CreditCardSolution <> PosSetup."Credit Card Solution"::Steria) then
-          Error (AuxNotSupported);
+            Error(AuxNotSupported);
 
         AuxFunction := AuxFunctionID;
 
-        Done         := false;
-        Amount       := 0;
-        MessageText  := '';
-        Started      := false;
-        Afvist       := false;
-        EventTimer   := 0;
-        ForceClose   := false;
-        Vent         := false;
+        Done := false;
+        Amount := 0;
+        MessageText := '';
+        Started := false;
+        Afvist := false;
+        EventTimer := 0;
+        ForceClose := false;
+        Vent := false;
         Ekspeditionslinie := pEkspeditionslinie;
 
-        Cvm               := 0;
-        Onoffline         := 0;
-        ClearAllPressed   := 0;
+        Cvm := 0;
+        Onoffline := 0;
+        ClearAllPressed := 0;
         ApplicationsCount := 0;
-        WaitApplication   := false;
+        WaitApplication := false;
         IsBarcodeTransfer := false;
         UseFee := false;
 
@@ -294,7 +294,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         CardSwipeActivatesTerminal := true;
 
         AuxFunctionIsSet := (AuxFunction <> 0);
-        exit (AuxFunctionIsSet);
+        exit(AuxFunctionIsSet);
     end;
 
     local procedure "--- Protocol Events"()
@@ -313,7 +313,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         CloseProtocol();
     end;
 
-    local procedure FindPaymentType(Data: Text;var ReturnData: Text)
+    local procedure FindPaymentType(Data: Text; var ReturnData: Text)
     var
         PaymentTypePOS: Record "Payment Type POS";
         SalePOS: Record "Sale POS";
@@ -330,7 +330,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         // CreditCardHelper.FindPaymentType(State.CardPan,PaymentTypePOS);
         // CreditCardHelper.ResolvePrefix(State.CardPan,PaymentNo);
         // SalePOS.GET(Ekspeditionslinie."Register No.",Ekspeditionslinie."Sales Ticket No.");
-        SalePOS.Get(Ekspeditionslinie."Register No.",Ekspeditionslinie."Sales Ticket No.");
+        SalePOS.Get(Ekspeditionslinie."Register No.", Ekspeditionslinie."Sales Ticket No.");
 
         CreditCardHelper.FindPaymentType(State.CardPan, PaymentTypePOS, SalePOS."Location Code");
         //+NPR5.42 [306689]
@@ -342,18 +342,18 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         //+NPR5.42 [306689]
         State.MatchSalesAmount := PaymentTypePOS."Match Sales Amount";
         State.CardPanValidGiftVoucher := PBSGiftVoucherFunctions.IsGiftVoucher(State.CardPan);
-        State.NewFee := CreditCardHelper.CalcTransFee(PaymentTypePOS,Amount,Kasse."Confirm Fee");
+        State.NewFee := CreditCardHelper.CalcTransFee(PaymentTypePOS, Amount, Kasse."Confirm Fee");
 
         State.FeeItem := PaymentTypePOS."Fee Item No.";
 
         ReturnData := State.Serialize();
     end;
 
-    local procedure GetGiftVoucherBalance(Data: Text;var ReturnData: Text)
+    local procedure GetGiftVoucherBalance(Data: Text; var ReturnData: Text)
     var
         GiftVoucherBalance: Decimal;
     begin
-        GiftVoucherBalance := PBSGiftVoucherFunctions.GetBalance(Gavekortnr,ExpiryDate) / 100;
+        GiftVoucherBalance := PBSGiftVoucherFunctions.GetBalance(Gavekortnr, ExpiryDate) / 100;
         ReturnData := SerializeJson(GiftVoucherBalance);
     end;
 
@@ -368,7 +368,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         SaleLinePOSFee.SetRange("Register No.", Ekspeditionslinie."Register No.");
         SaleLinePOSFee.SetRange("Sales Ticket No.", Ekspeditionslinie."Sales Ticket No.");
         SaleLinePOSFee.SetRange(Date, Ekspeditionslinie.Date);
-        if SaleLinePOSFee.FindLast then ;
+        if SaleLinePOSFee.FindLast then;
         LastLineNo := SaleLinePOSFee."Line No." + 15001;
         SaleLinePOSFee.Init();
         SaleLinePOSFee."Register No." := Ekspeditionslinie."Register No.";
@@ -379,7 +379,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         SaleLinePOSFee."Sale Type" := SaleLinePOSFee."Sale Type"::Sale;
         SaleLinePOSFee.Validate(Type, SaleLinePOSFee.Type::Item);
         SaleLinePOSFee.Validate("No.", State.FeeItem);
-        SaleLinePOSFee.Validate(Quantity,1);
+        SaleLinePOSFee.Validate(Quantity, 1);
         SaleLinePOSFee.Validate("Unit Price", State.NewFee);
         SaleLinePOSFee.Insert();
     end;
@@ -389,41 +389,41 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         CreditCardTransaction: Record "Credit Card Transaction";
     begin
         CreditCardTransaction.Reset;
-        CreditCardTransaction.FilterGroup :=2;
-        CreditCardTransaction.SetCurrentKey("Register No.","Sales Ticket No.",Type);
-        CreditCardTransaction.SetRange("Register No.",Ekspeditionslinie."Register No.");
-        CreditCardTransaction.SetRange("Sales Ticket No.",Ekspeditionslinie."Sales Ticket No.");
-        CreditCardTransaction.SetRange(Type,0);
-        CreditCardTransaction.SetRange("No. Printed",0);
+        CreditCardTransaction.FilterGroup := 2;
+        CreditCardTransaction.SetCurrentKey("Register No.", "Sales Ticket No.", Type);
+        CreditCardTransaction.SetRange("Register No.", Ekspeditionslinie."Register No.");
+        CreditCardTransaction.SetRange("Sales Ticket No.", Ekspeditionslinie."Sales Ticket No.");
+        CreditCardTransaction.SetRange(Type, 0);
+        CreditCardTransaction.SetRange("No. Printed", 0);
         CreditCardTransaction.FilterGroup := 0;
 
         //-NPR5.46 [290734]
         // IF (NOT Kasse."Terminal Auto Print") AND (NOT CreditCardTransaction.ISEMPTY) THEN
         //  CreditCardTransaction.PrintTerminalReceipt(FALSE);
         if CreditCardTransaction.FindSet then
-          CreditCardTransaction.PrintTerminalReceipt();
+            CreditCardTransaction.PrintTerminalReceipt();
         //+NPR5.46 [290734]
     end;
 
-    local procedure Numpad(Caption: Text;var Result: Text)
+    local procedure Numpad(Caption: Text; var Result: Text)
     begin
-        Marshaller.NumPadText(Caption,Result,false,false);
+        Marshaller.NumPadText(Caption, Result, false, false);
     end;
 
-    local procedure CheckTransactionFromCheckResult(Data: Text;var ReturnData: Text)
+    local procedure CheckTransactionFromCheckResult(Data: Text; var ReturnData: Text)
     var
         State: DotNet npNetState;
         CreditCardTransaction: Record "Credit Card Transaction";
     begin
         with CreditCardTransaction do begin
-          SetCurrentKey("Register No.","Sales Ticket No.",Type);
-          SetRange("Register No.",Ekspeditionslinie."Register No.");
-          SetRange("Sales Ticket No.",Ekspeditionslinie."Sales Ticket No.");
-          //-NPR5.38 [299748]
-          SetRange("Line No.", Ekspeditionslinie."Line No.");
-          //+NPR5.38 [299748]
-          SetRange(Type,1);
-          ReturnData := State.Serialize(FindLast());
+            SetCurrentKey("Register No.", "Sales Ticket No.", Type);
+            SetRange("Register No.", Ekspeditionslinie."Register No.");
+            SetRange("Sales Ticket No.", Ekspeditionslinie."Sales Ticket No.");
+            //-NPR5.38 [299748]
+            SetRange("Line No.", Ekspeditionslinie."Line No.");
+            //+NPR5.38 [299748]
+            SetRange(Type, 1);
+            ReturnData := State.Serialize(FindLast());
         end;
     end;
 
@@ -434,39 +434,39 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         CreditCardTransaction2: Record "Credit Card Transaction";
     begin
         with CreditCardTransaction do begin
-          SetCurrentKey("Register No.","Sales Ticket No.",Type);
-          SetRange("Register No.",Ekspeditionslinie."Register No.");
-          SetRange("Sales Ticket No.",Ekspeditionslinie."Sales Ticket No.");
-          //-NPR5.38 [299748]
-          SetRange("Line No.", Ekspeditionslinie."Line No.");
-          //+NPR5.38 [299748]
-          SetRange(Type,1);
-          if FindLast() then begin
-            Type := 3;
-            Text := CreditCardHelper.CutCardPan(SelectStr(1,Data));
-            Modify;
-        //-NPR5.36 [283791]
-          end else begin
-            Reset;
+            SetCurrentKey("Register No.", "Sales Ticket No.", Type);
+            SetRange("Register No.", Ekspeditionslinie."Register No.");
+            SetRange("Sales Ticket No.", Ekspeditionslinie."Sales Ticket No.");
+            //-NPR5.38 [299748]
+            SetRange("Line No.", Ekspeditionslinie."Line No.");
+            //+NPR5.38 [299748]
+            SetRange(Type, 1);
+            if FindLast() then begin
+                Type := 3;
+                Text := CreditCardHelper.CutCardPan(SelectStr(1, Data));
+                Modify;
+                //-NPR5.36 [283791]
+            end else begin
+                Reset;
 
-            CreditCardTransaction2.SetRange("Register No.", Ekspeditionslinie."Register No.");
-            CreditCardTransaction2.SetRange("Sales Ticket No.", Ekspeditionslinie."Sales Ticket No.");
-            if CreditCardTransaction2.FindLast then;
+                CreditCardTransaction2.SetRange("Register No.", Ekspeditionslinie."Register No.");
+                CreditCardTransaction2.SetRange("Sales Ticket No.", Ekspeditionslinie."Sales Ticket No.");
+                if CreditCardTransaction2.FindLast then;
 
-            Init;
-            "Entry No." := CreditCardTransaction2."Entry No." + 1;
-            "Register No." := Ekspeditionslinie."Register No.";
-            "Sales Ticket No." := Ekspeditionslinie."Sales Ticket No.";
-            "Line No." := Ekspeditionslinie."Line No.";
-            Type := 3;
-            Text := CreditCardHelper.CutCardPan(SelectStr(1,Data));
-            Date := Today;
-            "Transaction Time" := Time;
-            Insert;
-          end;
-        //  END ELSE
-        //    CreditCardHelper.CreateErrorReceipt(Ekspeditionslinie,Data);
-        //+NPR5.36 [283791]
+                Init;
+                "Entry No." := CreditCardTransaction2."Entry No." + 1;
+                "Register No." := Ekspeditionslinie."Register No.";
+                "Sales Ticket No." := Ekspeditionslinie."Sales Ticket No.";
+                "Line No." := Ekspeditionslinie."Line No.";
+                Type := 3;
+                Text := CreditCardHelper.CutCardPan(SelectStr(1, Data));
+                Date := Today;
+                "Transaction Time" := Time;
+                Insert;
+            end;
+            //  END ELSE
+            //    CreditCardHelper.CreateErrorReceipt(Ekspeditionslinie,Data);
+            //+NPR5.36 [283791]
         end;
     end;
 
@@ -475,17 +475,17 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         CreditCardTransaction: Record "Credit Card Transaction";
     begin
         with CreditCardTransaction do begin
-          SetCurrentKey("Register No.","Sales Ticket No.",Type);
-          SetRange("Register No.",Ekspeditionslinie."Register No.");
-          SetRange("Sales Ticket No.",Ekspeditionslinie."Sales Ticket No.");
-          //-NPR5.38 [299748]
-          SetRange("Line No.", Ekspeditionslinie."Line No.");
-          //+NPR5.38 [299748]
-          SetRange(Type,1);
-          if FindLast() then begin
-            Text := 'Afvist!';
-            Modify;
-          end;
+            SetCurrentKey("Register No.", "Sales Ticket No.", Type);
+            SetRange("Register No.", Ekspeditionslinie."Register No.");
+            SetRange("Sales Ticket No.", Ekspeditionslinie."Sales Ticket No.");
+            //-NPR5.38 [299748]
+            SetRange("Line No.", Ekspeditionslinie."Line No.");
+            //+NPR5.38 [299748]
+            SetRange(Type, 1);
+            if FindLast() then begin
+                Text := 'Afvist!';
+                Modify;
+            end;
         end;
     end;
 
@@ -502,8 +502,8 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         CreditCardTransaction: Record "Credit Card Transaction";
         ReceiptNo: Integer;
     begin
-        Lines := Lines.CreateInstance(GetDotNetType(''),0);
-        Lines := State.DeserializeAsType(Data,Lines.GetType());
+        Lines := Lines.CreateInstance(GetDotNetType(''), 0);
+        Lines := State.DeserializeAsType(Data, Lines.GetType());
 
         Ekspedition.Get(Ekspeditionslinie."Register No.", Ekspeditionslinie."Sales Ticket No.");
 
@@ -513,10 +513,10 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         EntryNo := 1;
 
         CreditCardTransaction.SetRange("Register No.", Ekspedition."Register No.");
-        CreditCardTransaction.SetRange("Sales Ticket No.",Ekspedition."Sales Ticket No.");
+        CreditCardTransaction.SetRange("Sales Ticket No.", Ekspedition."Sales Ticket No.");
         //-NPR5.38 [299748]
         if CreditCardTransaction.FindLast() then
-          EntryNo := CreditCardTransaction."Entry No." + 1;
+            EntryNo := CreditCardTransaction."Entry No." + 1;
 
         ReceiptNo := GetLastReceiptNo() + 1;
         // IF CreditCardTransaction.FINDLAST() THEN BEGIN
@@ -526,40 +526,40 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
         //+NPR5.38 [299748]
 
         with CreditCardTransaction do begin
-          foreach RecieptLine in Lines do begin
-            Util.Ansi2Ascii(RecieptLine);
-            //-NPR5.43 [317969]
-            //RecieptLine := CONVERTSTR(RecieptLine,t001,t002);
-            RecieptLine := ConvertStr(RecieptLine,'���������','�����ԙ��');
-            //+NPR5.43 [317969]
-            Init;
-            "Entry No."         := EntryNo;
-            Date                := Today;
-            Type                := 0;
-            "Transaction Time"  := Time;
-            Text                := RecieptLine;
-            "Register No."      := Ekspedition."Register No.";
-            "Sales Ticket No."  := Ekspedition."Sales Ticket No.";
-            "Line No."          := Ekspeditionslinie."Line No.";
-            "Salesperson Code"  := Ekspedition."Salesperson Code";
-            //-NPR5.36 [283791]
-            "Receipt No." := ReceiptNo;
-            //+NPR5.36 [283791]
-            EntryNo += 1;
-            Insert;
-          end;
+            foreach RecieptLine in Lines do begin
+                Util.Ansi2Ascii(RecieptLine);
+                //-NPR5.43 [317969]
+                //RecieptLine := CONVERTSTR(RecieptLine,t001,t002);
+                RecieptLine := ConvertStr(RecieptLine, '���������', '�����ԙ��');
+                //+NPR5.43 [317969]
+                Init;
+                "Entry No." := EntryNo;
+                Date := Today;
+                Type := 0;
+                "Transaction Time" := Time;
+                Text := RecieptLine;
+                "Register No." := Ekspedition."Register No.";
+                "Sales Ticket No." := Ekspedition."Sales Ticket No.";
+                "Line No." := Ekspeditionslinie."Line No.";
+                "Salesperson Code" := Ekspedition."Salesperson Code";
+                //-NPR5.36 [283791]
+                "Receipt No." := ReceiptNo;
+                //+NPR5.36 [283791]
+                EntryNo += 1;
+                Insert;
+            end;
 
-          Init;
-          "Entry No."        := EntryNo;
-          Date               := Today;
-          Type               := 1;
-          "Transaction Time" := Time;
-          Text               := '';
-          "Register No."     := Ekspedition."Register No.";
-          "Sales Ticket No." := Ekspedition."Sales Ticket No.";
-          "Line No."         := Ekspeditionslinie."Line No.";
-          "Salesperson Code" := Ekspedition."Salesperson Code";
-          Insert;
+            Init;
+            "Entry No." := EntryNo;
+            Date := Today;
+            Type := 1;
+            "Transaction Time" := Time;
+            Text := '';
+            "Register No." := Ekspedition."Register No.";
+            "Sales Ticket No." := Ekspedition."Sales Ticket No.";
+            "Line No." := Ekspeditionslinie."Line No.";
+            "Salesperson Code" := Ekspedition."Salesperson Code";
+            Insert;
         end;
 
         Commit;
@@ -587,13 +587,6 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
     begin
     end;
 
-    local procedure DeserializeState(Data: Text;var State: DotNet npNetState)
-    var
-        JsonConvert: DotNet npNetJsonConvert;
-    begin
-        State := JsonConvert.DeserializeObject(Data,GetDotNetType(State));
-    end;
-
     local procedure SerializeJson("Object": Variant): Text
     var
         JsonConvert: DotNet npNetJsonConvert;
@@ -602,39 +595,41 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
     end;
 
     [EventSubscriber(ObjectType::Page, 6014657, 'ProtocolEvent', '', false, false)]
-    local procedure ProtocolEvent(ProtocolCodeunitID: Integer;EventName: Text;Data: Text;ResponseRequired: Boolean;var ReturnData: Text)
+    local procedure ProtocolEvent(ProtocolCodeunitID: Integer; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text)
     begin
         if (ProtocolCodeunitID <> CODEUNIT::"Credit Card Protocol C-sharp") then
-          exit;
+            exit;
 
         case EventName of
-          'CloseForm':
-            CloseForm(Data);
-          'FindPaymentType':
-            FindPaymentType(Data,ReturnData);
-          'GetGiftVoucherBalance':
-            GetGiftVoucherBalance(Data,ReturnData);
-          'InsertSaleLineFee':
-            InsertSaleLineFee(Data);
-        //-NPR5.36 [283791]
-        //  'PrintReceipts':
-        //    //-NPR5.26
-        //    PrintReceipts();
-        //    //PrintReceipts(Data);
-        //    //+NPR5.26
-        //  'NumPad':
-        //    Numpad(Data,ReturnData);
-          'PrintReceipts': ;
-          'NumPad': ;
-        //+NPR5.36 [283791]
-          'CheckTransactionFromCheckResult':
-            CheckTransactionFromCheckResult(Data,ReturnData);
-          'ModifyTransactionFromCheckResult':
-            ModifyTransactionFromCheckResult(Data);
-          'RejectTransactionIfFound':
-            RejectTransactionIfFound(Data);
-          'ReadReceipt':
-            ReadReceipt(Data);
+            'CloseForm':
+                CloseForm(Data);
+            'FindPaymentType':
+                FindPaymentType(Data, ReturnData);
+            'GetGiftVoucherBalance':
+                GetGiftVoucherBalance(Data, ReturnData);
+            'InsertSaleLineFee':
+                InsertSaleLineFee(Data);
+                //-NPR5.36 [283791]
+                //  'PrintReceipts':
+                //    //-NPR5.26
+                //    PrintReceipts();
+                //    //PrintReceipts(Data);
+                //    //+NPR5.26
+                //  'NumPad':
+                //    Numpad(Data,ReturnData);
+            'PrintReceipts':
+                ;
+            'NumPad':
+                ;
+                //+NPR5.36 [283791]
+            'CheckTransactionFromCheckResult':
+                CheckTransactionFromCheckResult(Data, ReturnData);
+            'ModifyTransactionFromCheckResult':
+                ModifyTransactionFromCheckResult(Data);
+            'RejectTransactionIfFound':
+                RejectTransactionIfFound(Data);
+            'ReadReceipt':
+                ReadReceipt(Data);
         end;
     end;
 }
