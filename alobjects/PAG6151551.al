@@ -36,21 +36,21 @@ page 6151551 "NpXml Template Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code";Code)
+                field("Code"; Code)
                 {
                 }
-                field("Xml Root Name";"Xml Root Name")
+                field("Xml Root Name"; "Xml Root Name")
                 {
                 }
                 group(Control6151403)
                 {
                     ShowCaption = false;
                     Visible = "Namespaces Enabled";
-                    field("Xml Root Namespace";"Xml Root Namespace")
+                    field("Xml Root Namespace"; "Xml Root Namespace")
                     {
                     }
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
 
                     trigger OnValidate()
@@ -64,10 +64,10 @@ page 6151551 "NpXml Template Card"
                 group(Control6150672)
                 {
                     ShowCaption = false;
-                    field(Archived;Archived)
+                    field(Archived; Archived)
                     {
                     }
-                    field("Template Version";"Template Version")
+                    field("Template Version"; "Template Version")
                     {
                         AssistEdit = true;
                         Editable = false;
@@ -79,7 +79,7 @@ page 6151551 "NpXml Template Card"
                         begin
                             //-NC1.21
                             NpXmlTemplateArchive.Reset;
-                            NpXmlTemplateArchive.SetRange(Code,Code);
+                            NpXmlTemplateArchive.SetRange(Code, Code);
                             Clear(NpXmlTemplateArchiveList);
                             NpXmlTemplateArchiveList.LookupMode(true);
                             NpXmlTemplateArchiveList.SetTableView(NpXmlTemplateArchive);
@@ -87,11 +87,11 @@ page 6151551 "NpXml Template Card"
                             //+NC1.21
                         end;
                     }
-                    field("Last Modified at";"Last Modified at")
+                    field("Last Modified at"; "Last Modified at")
                     {
                         Editable = false;
                     }
-                    field("Version Description";"Version Description")
+                    field("Version Description"; "Version Description")
                     {
 
                         trigger OnValidate()
@@ -103,12 +103,12 @@ page 6151551 "NpXml Template Card"
                 group(Control6150677)
                 {
                     ShowCaption = false;
-                    field("Namespaces Enabled";"Namespaces Enabled")
+                    field("Namespaces Enabled"; "Namespaces Enabled")
                     {
                     }
-                    part(Namespaces;"NpXml Namespaces")
+                    part(Namespaces; "NpXml Namespaces")
                     {
-                        SubPageLink = "Xml Template Code"=FIELD(Code);
+                        SubPageLink = "Xml Template Code" = FIELD (Code);
                         Visible = "Namespaces Enabled";
                     }
                 }
@@ -116,103 +116,103 @@ page 6151551 "NpXml Template Card"
             group(Transaction)
             {
                 Caption = 'Transaction';
-                field("Transaction Task";"Transaction Task")
+                field("Transaction Task"; "Transaction Task")
                 {
                     Importance = Promoted;
                 }
-                field("Task Processor Code";"Task Processor Code")
+                field("Task Processor Code"; "Task Processor Code")
                 {
                     Importance = Promoted;
                 }
-                field("Disable Auto Task Setup";"Disable Auto Task Setup")
+                field("Disable Auto Task Setup"; "Disable Auto Task Setup")
                 {
                 }
-                part(NpXmlTemplateTriggers;"NpXml Template Triggers")
+                part(NpXmlTemplateTriggers; "NpXml Template Triggers")
                 {
                     ShowFilter = false;
-                    SubPageLink = "Xml Template Code"=FIELD(Code);
+                    SubPageLink = "Xml Template Code" = FIELD (Code);
                     Visible = NpXmlTemplateTriggersVisible;
                 }
             }
             group(Batch)
             {
                 Caption = 'Batch';
-                field("Batch Task";"Batch Task")
+                field("Batch Task"; "Batch Task")
                 {
                     Importance = Promoted;
                 }
-                field("Max Records per File";"Max Records per File")
+                field("Max Records per File"; "Max Records per File")
                 {
                 }
-                part(NpXmlBatchFilters;"NpXml Batch Filters")
+                part(NpXmlBatchFilters; "NpXml Batch Filters")
                 {
                     ShowFilter = false;
-                    SubPageLink = "Xml Template Code"=FIELD(Code),
-                                  "Xml Element Line No."=CONST(-1);
+                    SubPageLink = "Xml Template Code" = FIELD (Code),
+                                  "Xml Element Line No." = CONST (-1);
                     Visible = NpXmlBatchFiltersVisible;
                 }
             }
             group(Transfer)
             {
                 Caption = 'Transfer';
-                field("Before Transfer Codeunit ID";"Before Transfer Codeunit ID")
+                field("Before Transfer Codeunit ID"; "Before Transfer Codeunit ID")
                 {
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Before Transfer Codeunit Name";"Before Transfer Codeunit Name")
+                field("Before Transfer Codeunit Name"; "Before Transfer Codeunit Name")
                 {
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Before Transfer Function";"Before Transfer Function")
+                field("Before Transfer Function"; "Before Transfer Function")
                 {
                     Importance = Additional;
                 }
                 group(File)
                 {
                     Caption = 'File';
-                    field("File Transfer";"File Transfer")
+                    field("File Transfer"; "File Transfer")
                     {
                         Importance = Promoted;
                     }
-                    field("File Path";"File Path")
+                    field("File Path"; "File Path")
                     {
                     }
                 }
                 group(FTP)
                 {
-                    field("FTP Transfer";"FTP Transfer")
+                    field("FTP Transfer"; "FTP Transfer")
                     {
                         Importance = Promoted;
                     }
-                    field("FTP Server";"FTP Server")
+                    field("FTP Server"; "FTP Server")
                     {
                         Importance = Promoted;
                     }
-                    field("FTP Username";"FTP Username")
+                    field("FTP Username"; "FTP Username")
                     {
                     }
-                    field("FTP Password";"FTP Password")
+                    field("FTP Password"; "FTP Password")
                     {
                     }
-                    field("FTP Port";"FTP Port")
+                    field("FTP Port"; "FTP Port")
                     {
                     }
-                    field("FTP Directory";"FTP Directory")
+                    field("FTP Directory"; "FTP Directory")
                     {
                     }
-                    field("FTP Passive";"FTP Passive")
+                    field("FTP Passive"; "FTP Passive")
                     {
                     }
                 }
                 group(API)
                 {
-                    field("API Transfer";"API Transfer")
+                    field("API Transfer"; "API Transfer")
                     {
                         Importance = Promoted;
                     }
-                    field("API Type";"API Type")
+                    field("API Type"; "API Type")
                     {
 
                         trigger OnValidate()
@@ -223,7 +223,7 @@ page 6151551 "NpXml Template Card"
                             //+NC2.05 [265609]
                         end;
                     }
-                    field("API Url";"API Url")
+                    field("API Url"; "API Url")
                     {
                         Importance = Promoted;
                     }
@@ -231,7 +231,7 @@ page 6151551 "NpXml Template Card"
                     {
                         ShowCaption = false;
                         Visible = "API Type" <> "API Type"::SOAP;
-                        field("API Method";"API Method")
+                        field("API Method"; "API Method")
                         {
                             Importance = Promoted;
                         }
@@ -240,12 +240,12 @@ page 6151551 "NpXml Template Card"
                     {
                         ShowCaption = false;
                         Visible = "API Type" = "API Type"::SOAP;
-                        field("API SOAP Action";"API SOAP Action")
+                        field("API SOAP Action"; "API SOAP Action")
                         {
                             ShowMandatory = true;
                         }
                     }
-                    field("API Username Type";"API Username Type")
+                    field("API Username Type"; "API Username Type")
                     {
 
                         trigger OnValidate()
@@ -255,45 +255,45 @@ page 6151551 "NpXml Template Card"
                             //+NC2.05 [265609]
                         end;
                     }
-                    field("API Username";"API Username")
+                    field("API Username"; "API Username")
                     {
                         Enabled = "API Username Type" = "API Username Type"::Custom;
                     }
-                    field("API Password";"API Password")
+                    field("API Password"; "API Password")
                     {
                     }
-                    field("API Content-Type";"API Content-Type")
-                    {
-                        Importance = Additional;
-                    }
-                    field("API Authorization";"API Authorization")
+                    field("API Content-Type"; "API Content-Type")
                     {
                         Importance = Additional;
                     }
-                    field("API Accept";"API Accept")
+                    field("API Authorization"; "API Authorization")
                     {
                         Importance = Additional;
                     }
-                    part("Api Headers";"NpXml Api Headers")
+                    field("API Accept"; "API Accept")
+                    {
+                        Importance = Additional;
+                    }
+                    part("Api Headers"; "NpXml Api Headers")
                     {
                         Caption = 'Api Headers';
                         ShowFilter = false;
-                        SubPageLink = "Xml Template Code"=FIELD(Code);
+                        SubPageLink = "Xml Template Code" = FIELD (Code);
                     }
                     group(Control6151410)
                     {
                         ShowCaption = false;
                         Visible = "API Type" <> "API Type"::"REST (Json)";
-                        field("API Response Path";"API Response Path")
+                        field("API Response Path"; "API Response Path")
                         {
                             Importance = Additional;
                         }
                     }
-                    field("API Response Success Path";"API Response Success Path")
+                    field("API Response Success Path"; "API Response Success Path")
                     {
                         Importance = Additional;
                     }
-                    field("API Response Success Value";"API Response Success Value")
+                    field("API Response Success Value"; "API Response Success Value")
                     {
                         Importance = Additional;
                     }
@@ -301,11 +301,11 @@ page 6151551 "NpXml Template Card"
                     {
                         ShowCaption = false;
                         Visible = "API Type" = "API Type"::"REST (Json)";
-                        field("JSON Root is Array";"JSON Root is Array")
+                        field("JSON Root is Array"; "JSON Root is Array")
                         {
                             Importance = Additional;
                         }
-                        field("Use JSON Numbers";"Use JSON Numbers")
+                        field("Use JSON Numbers"; "Use JSON Numbers")
                         {
                         }
                     }
@@ -327,7 +327,7 @@ page 6151551 "NpXml Template Card"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "NpXml Elements";
-                RunPageLink = "Xml Template Code"=FIELD(Code);
+                RunPageLink = "Xml Template Code" = FIELD (Code);
             }
             action("Preview Xml")
             {
@@ -354,7 +354,7 @@ page 6151551 "NpXml Template Card"
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
                 RunObject = Page "NpXml Template Change History";
-                RunPageLink = "Template Code"=FIELD(Code);
+                RunPageLink = "Template Code" = FIELD (Code);
             }
             action("Archived Versions")
             {
@@ -364,7 +364,7 @@ page 6151551 "NpXml Template Card"
                 PromotedCategory = Category5;
                 PromotedIsBig = true;
                 RunObject = Page "NpXml Template Archive List";
-                RunPageLink = Code=FIELD(Code);
+                RunPageLink = Code = FIELD (Code);
             }
         }
         area(processing)
@@ -445,25 +445,11 @@ page 6151551 "NpXml Template Card"
                 begin
                     //-NC1.21
                     if Archived then
-                      Error(Text100,"Template Version");
+                        Error(Text100, "Template Version");
 
                     NpXmlTemplateMgt.Archive(Rec);
                     CurrPage.Update(false);
                     //+NC1.21
-                end;
-            }
-            action("Setup from Wsdl")
-            {
-                Caption = 'Setup From WSDL';
-                Image = Import;
-
-                trigger OnAction()
-                var
-                    WsdlImportImport: Codeunit "NpXml Wsdl Import";
-                begin
-                    //-NC2.01
-                    WsdlImportImport.ImportWSDL(Rec);
-                    //+NC2.01
                 end;
             }
         }
