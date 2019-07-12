@@ -54,12 +54,14 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         DisplayGroups: DotNet npNetIList;
         DisplayGroup: DotNet npNetJToken;
         i: Integer;
+        NetConvHelper: Variant;
     begin
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
         MagentoApiGet('display_groups', Result);
-        DisplayGroups := Result.SelectTokens('$[*].[''display_group''].[*]');
+        NetConvHelper := Result.SelectTokens('$[*].[''display_group''].[*]');
+        DisplayGroups := NetConvHelper;
         foreach DisplayGroup in DisplayGroups do begin
             i += 1;
 
@@ -130,12 +132,14 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         ShippingGroups: DotNet npNetIList;
         ShippingGroup: DotNet npNetJToken;
         i: Integer;
+        NetConvHelper: Variant;
     begin
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
         MagentoApiGet('shipping_groups', Result);
-        ShippingGroups := Result.SelectTokens('$[*].[''shipping_group''].[*]');
+        NetConvHelper := Result.SelectTokens('$[*].[''shipping_group''].[*]');
+        ShippingGroups := NetConvHelper;
         foreach ShippingGroup in ShippingGroups do begin
             i += 1;
 
@@ -196,12 +200,14 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         PaymentGroups: DotNet npNetIList;
         PaymentGroup: DotNet npNetJToken;
         i: Integer;
+        NetConvHelper: Variant;
     begin
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
         MagentoApiGet('payment_groups', Result);
-        PaymentGroups := Result.SelectTokens('[*].[''payment_group''].[*]');
+        NetConvHelper := Result.SelectTokens('[*].[''payment_group''].[*]');
+        PaymentGroups := NetConvHelper;
         foreach PaymentGroup in PaymentGroups do begin
             i += 1;
 
@@ -274,12 +280,14 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         CustomerGroups: DotNet npNetIList;
         CustomerGroup: DotNet npNetJToken;
         i: Integer;
+        NetConvHelper: Variant;
     begin
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
         MagentoApiGet('customer_groups', Result);
-        CustomerGroups := Result.SelectTokens('$[*].[''customer_group''].[*]');
+        NetConvHelper := Result.SelectTokens('$[*].[''customer_group''].[*]');
+        CustomerGroups := NetConvHelper;
         foreach CustomerGroup in CustomerGroups do begin
             i += 1;
 
@@ -363,14 +371,18 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         MagentoStores: DotNet npNetIList;
         MagentoStore: DotNet npNetJToken;
         i: Integer;
+        NetConvHelper: Variant;
+        NetConvHelper2: Variant;
     begin
         Clear(M2ValueBuffer);
         M2ValueBuffer.DeleteAll;
 
         MagentoApiGet('websites', Result);
-        MagentoWebsites := Result.SelectTokens('$[*].[''website''].[*]');
+        NetConvHelper := Result.SelectTokens('$[*].[''website''].[*]');
+        MagentoWebsites := NetConvHelper;
         foreach MagentoWebsite in MagentoWebsites do begin
-            MagentoStores := MagentoWebsite.SelectTokens('$[''_value''].[''store_groups''].[''store_group''].[*].[''_value''].[''stores''].[''store''].[*]');
+            NetConvHelper2 := MagentoWebsite.SelectTokens('$[''_value''].[''store_groups''].[''store_group''].[*].[''_value''].[''stores''].[''store''].[*]');
+            MagentoStores := NetConvHelper2;
             foreach MagentoStore in MagentoStores do begin
                 i += 1;
 
