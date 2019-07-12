@@ -486,6 +486,7 @@ codeunit 6151551 "NpXml Mgt."
         Response: Text;
         IsJson: Boolean;
         Succes: Boolean;
+        NetConvHelper: Variant;
     begin
         if not NpXmlTemplate."API Transfer" then
             exit;
@@ -673,8 +674,8 @@ codeunit 6151551 "NpXml Mgt."
             //-NC2.05 [265609]
             //XmlDoc2.LoadXml(Response);
             if IsJson then begin
-                GetDotNetType()
-                XmlElement := JsonConvert.DeserializeXmlNode(Response);
+                NetConvHelper := JsonConvert.DeserializeXmlNode(Response);
+                XmlElement := NetConvHelper;
                 XmlDoc2.LoadXml('<?xml version="1.0" encoding="utf-8"?>' + GetChar(13) + GetChar(10) +
                                '<response />');
                 XmlDoc2.DocumentElement.AppendChild(XmlElement);
@@ -686,7 +687,8 @@ codeunit 6151551 "NpXml Mgt."
             //NpXmlDomMgt.RemoveNameSpaces(XmlDoc2);
             if NpXmlDomMgt.RemoveNameSpaces(XmlDoc2) then;
             //+NC2.19 [345261]
-            if NpXmlDomMgt.GetXmlText(XmlDoc2, NpXmlTemplate."API Response Success Path", MaxStrLen(NpXmlTemplate."API Response Success Value"), false) <> NpXmlTemplate."API Response Success Value" then
+            NetConvHelper := XmlDoc2;
+            if NpXmlDomMgt.GetXmlText(NetConvHelper, NpXmlTemplate."API Response Success Path", MaxStrLen(NpXmlTemplate."API Response Success Value"), false) <> NpXmlTemplate."API Response Success Value" then
                 Error('');
         end;
     end;

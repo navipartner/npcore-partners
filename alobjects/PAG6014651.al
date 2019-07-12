@@ -248,11 +248,14 @@ page 6014651 "Touch Screen - Sale (Web)"
     end;
 
     local procedure InitializeLoginView(View: DotNet npNetLoginView)
+    var
+        NetConvHelper: Variant;
     begin
         MakeSureViewIsOfCorrectType(ViewType.Login, GetDotNetType(View), View);
 
         View.Initialize();
-        UI.ConfigureView(View);
+        NetConvHelper := View;
+        UI.ConfigureView(NetConvHelper);
     end;
 
     local procedure InitializeSaleView(View: DotNet npNetSaleView)
@@ -266,21 +269,27 @@ page 6014651 "Touch Screen - Sale (Web)"
     end;
 
     local procedure InitializePaymentView(View: DotNet npNetPaymentView)
+    var
+        NetConvHelper: Variant;
     begin
         MakeSureViewIsOfCorrectType(ViewType.Payment, GetDotNetType(View), View);
 
         View.Initialize();
-        UI.ConfigureView(View);
+        NetConvHelper := View;
+        UI.ConfigureView(NetConvHelper);
 
         StateMgt.ShowPaymentInformation();
     end;
 
     local procedure InitializeLockedView(View: DotNet npNetLoginView)
+    var
+        NetConvHelper: Variant;
     begin
         MakeSureViewIsOfCorrectType(ViewType.Locked, GetDotNetType(View), View);
 
         View.Initialize();
-        UI.ConfigureView(View);
+        NetConvHelper := View;
+        UI.ConfigureView(NetConvHelper);
     end;
 
     local procedure EventOnFrameworkReady()
@@ -485,7 +494,7 @@ page 6014651 "Touch Screen - Sale (Web)"
             KnownEvent.RequestRefreshSalesLineData:
                 SendState();
 
-            // Start listing standard request events here
+                // Start listing standard request events here
             KnownEvent.ClearInfoBoxContent,
             KnownEvent.ConfigureFont,
             KnownEvent.InvokeJavaScriptFunction,
