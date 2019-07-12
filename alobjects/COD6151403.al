@@ -137,7 +137,7 @@ codeunit 6151403 "Magento Webservice"
         if (ReportSelections."Report ID" = 116) then begin
             // Standard statement
             CustomerStatement.SetTableView(Customer);
-            CustomerStatement.SetSettings(true, true, true, true, true, true, AgingPeriodLength, DateChoice::"Due Date", false, FromDate, UntilDate);
+            Error('AL-Conversion: TODO #361943 - AL: REP116 - "Statement" - cust. fce SetSettings()');
             CustomerStatement.SaveAsPdf(Filename);
 
         end else begin
