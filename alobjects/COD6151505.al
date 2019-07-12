@@ -63,51 +63,53 @@ codeunit 6151505 "Nc Sync. Mgt."
         SyncStartTime := CurrentDateTime;
         SyncEndTime := SyncStartTime + GetMaxSyncDuration();
         //+NC2.16 [313184]
-        TaskProcessor.Code := CopyStr(UpperCase(GetParameterText("Parameter.TaskProcessorCode")),1,MaxStrLen(TaskProcessor.Code));
+        TaskProcessor.Code := CopyStr(UpperCase(GetParameterText("Parameter.TaskProcessorCode")), 1, MaxStrLen(TaskProcessor.Code));
         if TaskProcessor.Code = '' then begin
-          TaskProcessor.Code := "Task Worker Group";
-          SetParameterText(GetParameterText("Parameter.TaskProcessorCode"),TaskProcessor.Code);
+            TaskProcessor.Code := "Task Worker Group";
+            SetParameterText(GetParameterText("Parameter.TaskProcessorCode"), TaskProcessor.Code);
         end;
         UpdateTaskProcessor(TaskProcessor);
         Commit;
         //-NC2.12 [313362]
-        ImportTypeCode := CopyStr(UpperCase(GetParameterText("Parameter.DownloadType")),1,MaxStrLen(ImportType.Code));
+        ImportTypeCode := CopyStr(UpperCase(GetParameterText("Parameter.DownloadType")), 1, MaxStrLen(ImportType.Code));
         //+NC2.12 [313362]
         if GetParameterBool("Parameter.DownloadFtp") then begin
-          //-NC2.12 [313362]
-          //ImportTypeCode := COPYSTR(UPPERCASE(GetParameterText("Parameter.DownloadFtpType")),1,MAXSTRLEN(TaskProcessor.Code));
-          //+NC2.12 [313362]
-          if ImportTypeCode = '' then
-            DownloadFtp()
-          else if ImportType.Get(ImportTypeCode) then
-            DownloadFtpType(ImportType);
+            //-NC2.12 [313362]
+            //ImportTypeCode := COPYSTR(UPPERCASE(GetParameterText("Parameter.DownloadFtpType")),1,MAXSTRLEN(TaskProcessor.Code));
+            //+NC2.12 [313362]
+            if ImportTypeCode = '' then
+                DownloadFtp()
+            else
+                if ImportType.Get(ImportTypeCode) then
+                    DownloadFtpType(ImportType);
         end;
 
         //-NC2.12 [313362]
         if GetParameterBool("Parameter.DownloadServerFile") then begin
-          if ImportTypeCode = '' then
-            DownloadServerFiles()
-          else if ImportType.Get(ImportTypeCode) then
-            DownloadServerFile(ImportType);
+            if ImportTypeCode = '' then
+                DownloadServerFiles()
+            else
+                if ImportType.Get(ImportTypeCode) then
+                    DownloadServerFile(ImportType);
         end;
         //+NC2.12 [313362]
 
         if GetParameterBool("Parameter.ProcessImport") then
-          ProcessImportEntries();
+            ProcessImportEntries();
 
         if GetParameterBool("Parameter.ImportNewTasks") then
-          NaviConnectTaskMgt.UpdateTasks(TaskProcessor);
+            NaviConnectTaskMgt.UpdateTasks(TaskProcessor);
 
         if GetParameterBool("Parameter.ProcessTasks") then begin
-          MaxRetry := GetParameterInt("Parameter.TaskRetryCount");
-          ProcessTasks(TaskProcessor,MaxRetry);
+            MaxRetry := GetParameterInt("Parameter.TaskRetryCount");
+            ProcessTasks(TaskProcessor, MaxRetry);
         end;
 
         if GetParameterBool("Parameter.ResetTaskCount") then
-          TaskResetCount();
+            TaskResetCount();
 
         if GetParameterBool("Parameter.CleanupImport") then
-          NcImportMgt.CleanupImportTypes();
+            NcImportMgt.CleanupImportTypes();
     end;
 
     var
@@ -127,17 +129,17 @@ codeunit 6151505 "Nc Sync. Mgt."
         ImportType: Record "Nc Import Type";
         LastErrorMessage: Text;
     begin
-        ImportType.SetRange("Ftp Enabled",true);
+        ImportType.SetRange("Ftp Enabled", true);
         if not ImportType.FindSet then
-          exit;
+            exit;
 
         LastErrorMessage := '';
         repeat
-          if not DownloadFtpType(ImportType) then
-            LastErrorMessage := GetLastErrorText;
+            if not DownloadFtpType(ImportType) then
+                LastErrorMessage := GetLastErrorText;
         until ImportType.Next = 0;
         if LastErrorMessage <> '' then
-          Error(CopyStr(LastErrorMessage,1,1000));
+            Error(CopyStr(LastErrorMessage, 1, 1000));
     end;
 
     [Scope('Personalization')]
@@ -151,32 +153,32 @@ codeunit 6151505 "Nc Sync. Mgt."
         //-NC2.06 [290633]
         //-NC2.08 [295322]
         if ImportType."Ftp Filename" <> '' then begin
-          InsertImportEntry(ImportType,ImportType."Ftp Filename");
-          exit(true);
+            InsertImportEntry(ImportType, ImportType."Ftp Filename");
+            exit(true);
         end;
         //+NC2.08 [295322]
         //-NC2.16 [328432]
         if ImportType.Sftp then begin
-          if DownloadSftpFilenames(ImportType,ListDirectory) then begin
-            while CutNextFilename(ListDirectory,Filename) do
-              InsertImportEntrySftp(ImportType,Filename);
-          end;
+            if DownloadSftpFilenames(ImportType, ListDirectory) then begin
+                while CutNextFilename(ListDirectory, Filename) do
+                    InsertImportEntrySftp(ImportType, Filename);
+            end;
 
-          exit(true);
+            exit(true);
         end;
         //+NC2.16 [328432]
-        if DownloadFtpListDirectory(ImportType,ListDirectory) then begin
-          while CutNextFilename(ListDirectory,Filename) do
-            InsertImportEntry(ImportType,Filename);
+        if DownloadFtpListDirectory(ImportType, ListDirectory) then begin
+            while CutNextFilename(ListDirectory, Filename) do
+                InsertImportEntry(ImportType, Filename);
 
-          exit(true);
+            exit(true);
         end;
 
-        if DownloadFtpListDirectoryDetails(ImportType,ListDirectory) then begin
-          while CutNextFilenameDetailed(ListDirectory,Filename) do
-            InsertImportEntry(ImportType,Filename);
+        if DownloadFtpListDirectoryDetails(ImportType, ListDirectory) then begin
+            while CutNextFilenameDetailed(ListDirectory, Filename) do
+                InsertImportEntry(ImportType, Filename);
 
-          exit(true);
+            exit(true);
         end;
 
         exit(false);
@@ -185,7 +187,7 @@ codeunit 6151505 "Nc Sync. Mgt."
 
     [TryFunction]
     [Scope('Personalization')]
-    procedure InsertImportEntry(ImportType: Record "Nc Import Type";Filename: Text)
+    procedure InsertImportEntry(ImportType: Record "Nc Import Type"; Filename: Text)
     var
         ImportEntry: Record "Nc Import Entry";
         FileMgt: Codeunit "File Management";
@@ -199,19 +201,19 @@ codeunit 6151505 "Nc Sync. Mgt."
     begin
         //-NC2.06 [290633]
         if not ValidFilename(Filename) then
-          exit;
+            exit;
 
         SourceUri := SourceUri.Uri(ImportType."Ftp Host" + '/' + ImportType."Ftp Path" + '/');
         FtpWebRequest := FtpWebRequest.Create(SourceUri.AbsoluteUri + Filename);
         FtpWebRequest.Method := 'RETR'; //WebRequestMethods.Ftp.DownloadFile
         //-NC2.08 [295322]
         if ImportType."Ftp Binary" then
-          FtpWebRequest.UseBinary := true;
+            FtpWebRequest.UseBinary := true;
         //+NC2.08 [295322]
         //-NC2.19 [340695]
         FtpWebRequest.KeepAlive := false;
         //-NC2.19 [340695]
-        FtpWebRequest.Credentials := Credential.NetworkCredential(ImportType."Ftp User",ImportType."Ftp Password");
+        FtpWebRequest.Credentials := Credential.NetworkCredential(ImportType."Ftp User", ImportType."Ftp Password");
         FtpWebResponse := FtpWebRequest.GetResponse;
         MemoryStream := FtpWebResponse.GetResponseStream();
 
@@ -220,13 +222,13 @@ codeunit 6151505 "Nc Sync. Mgt."
         ImportEntry.Date := CurrentDateTime;
         //-NC.2.15 [306532]
         //ImportEntry."Document Name" := Filename;
-        ImportEntry."Document Name" := GetDocName(Filename,MaxStrLen(ImportEntry."Document Name"));
+        ImportEntry."Document Name" := GetDocName(Filename, MaxStrLen(ImportEntry."Document Name"));
         //+NC.2.15 [306532]
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := false;
         ImportEntry."Document Source".CreateOutStream(OutStream);
 
-        CopyStream(OutStream,MemoryStream);
+        CopyStream(OutStream, MemoryStream);
         MemoryStream.Flush;
         MemoryStream.Close;
         Clear(MemoryStream);
@@ -234,17 +236,17 @@ codeunit 6151505 "Nc Sync. Mgt."
         ImportEntry.Insert(true);
 
         if ImportType."Ftp Backup Path" = '' then begin
-          if not DeleteFtpFile(SourceUri.AbsoluteUri + Filename,ImportType."Ftp User",ImportType."Ftp Password") then
-            Error(CopyStr(StrSubstNo(Text001,Filename,GetLastErrorText),1,1000));
+            if not DeleteFtpFile(SourceUri.AbsoluteUri + Filename, ImportType."Ftp User", ImportType."Ftp Password") then
+                Error(CopyStr(StrSubstNo(Text001, Filename, GetLastErrorText), 1, 1000));
         end else begin
-          TargetUri := TargetUri.Uri(SourceUri.AbsoluteUri + ImportType."Ftp Backup Path" + '/');
-          if not CheckFtpUrlExists(TargetUri.AbsoluteUri,ImportType."Ftp User",ImportType."Ftp Password") then begin
-            if not MakeFtpUrl(TargetUri.AbsoluteUri,ImportType."Ftp User",ImportType."Ftp Password") then
-              Error(CopyStr(StrSubstNo(Text001,Filename,GetLastErrorText),1,1000));
-          end;
+            TargetUri := TargetUri.Uri(SourceUri.AbsoluteUri + ImportType."Ftp Backup Path" + '/');
+            if not CheckFtpUrlExists(TargetUri.AbsoluteUri, ImportType."Ftp User", ImportType."Ftp Password") then begin
+                if not MakeFtpUrl(TargetUri.AbsoluteUri, ImportType."Ftp User", ImportType."Ftp Password") then
+                    Error(CopyStr(StrSubstNo(Text001, Filename, GetLastErrorText), 1, 1000));
+            end;
 
-          if not RenameFtpFile(SourceUri.AbsoluteUri + Filename,ImportType."Ftp User",ImportType."Ftp Password",ImportType."Ftp Backup Path" + '/' + Filename) then
-            Error(CopyStr(StrSubstNo(Text001,Filename,GetLastErrorText),1,1000));
+            if not RenameFtpFile(SourceUri.AbsoluteUri + Filename, ImportType."Ftp User", ImportType."Ftp Password", ImportType."Ftp Backup Path" + '/' + Filename) then
+                Error(CopyStr(StrSubstNo(Text001, Filename, GetLastErrorText), 1, 1000));
         end;
         Commit;
         //+NC2.06 [290633]
@@ -252,46 +254,48 @@ codeunit 6151505 "Nc Sync. Mgt."
 
     [TryFunction]
     [Scope('Personalization')]
-    procedure InsertImportEntrySftp(ImportType: Record "Nc Import Type";Filename: Text)
+    procedure InsertImportEntrySftp(ImportType: Record "Nc Import Type"; Filename: Text)
     var
         ImportEntry: Record "Nc Import Entry";
         SharpSFtp: DotNet npNetSftp0;
         OutStream: OutStream;
         RemotePath: Text;
         NewRemotePath: Text;
+        NetStream: DotNet npNetStream;
     begin
         //-NC2.16 [328432]
         if not ValidFilename(Filename) then
-          exit;
+            exit;
 
-        SharpSFtp := SharpSFtp.Sftp(ImportType."Ftp Host",ImportType."Ftp User",ImportType."Ftp Password");
+        SharpSFtp := SharpSFtp.Sftp(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password");
         SharpSFtp.Connect(ImportType."Ftp Port");
         RemotePath := '/';
         if ImportType."Ftp Path" <> '' then begin
-          RemotePath += ImportType."Ftp Path";
-          if CopyStr(RemotePath,StrLen(RemotePath),1) <> '/' then
-            RemotePath += '/';
+            RemotePath += ImportType."Ftp Path";
+            if CopyStr(RemotePath, StrLen(RemotePath), 1) <> '/' then
+                RemotePath += '/';
         end;
 
         ImportEntry."Entry No." := 0;
         ImportEntry."Import Type" := ImportType.Code;
         ImportEntry.Date := CurrentDateTime;
-        ImportEntry."Document Name" := GetDocName(Filename,MaxStrLen(ImportEntry."Document Name"));
+        ImportEntry."Document Name" := GetDocName(Filename, MaxStrLen(ImportEntry."Document Name"));
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := false;
         ImportEntry."Document Source".CreateOutStream(OutStream);
-        SharpSFtp.Get(RemotePath + Filename,OutStream);
+        NetStream := OutStream;
+        SharpSFtp.Get(RemotePath + Filename, NetStream);
 
         ImportEntry.Insert(true);
 
         if ImportType."Ftp Backup Path" = '' then
-          SharpSFtp.DeleteFile(RemotePath + Filename)
+            SharpSFtp.DeleteFile(RemotePath + Filename)
         else begin
-          NewRemotePath := RemotePath + ImportType."Ftp Backup Path";
-          if CopyStr(NewRemotePath,StrLen(NewRemotePath),1) <> '/' then
-            NewRemotePath += '/';
+            NewRemotePath := RemotePath + ImportType."Ftp Backup Path";
+            if CopyStr(NewRemotePath, StrLen(NewRemotePath), 1) <> '/' then
+                NewRemotePath += '/';
 
-          SharpSFtp.RenameFile(RemotePath + Filename,NewRemotePath + Filename);
+            SharpSFtp.RenameFile(RemotePath + Filename, NewRemotePath + Filename);
         end;
 
         Commit;
@@ -312,24 +316,25 @@ codeunit 6151505 "Nc Sync. Mgt."
         LastErrorText: Text;
     begin
         //-NC2.12 [313362]
-        NcImportType.SetRange("Server File Enabled",true);
+        NcImportType.SetRange("Server File Enabled", true);
         if NcImportType.IsEmpty then
-          exit;
+            exit;
 
         NcImportType.FindSet;
         repeat
-          asserterror begin
-            DownloadServerFile(NcImportType);
-            Commit;
+            asserterror
+            begin
+                DownloadServerFile(NcImportType);
+                Commit;
 
-            Error('');
-          end;
+                Error('');
+            end;
 
-          LastErrorText := GetLastErrorText + LastErrorText;
+            LastErrorText := GetLastErrorText + LastErrorText;
         until NcImportType.Next = 0;
 
         if LastErrorText <> '' then
-          Error(CopyStr(LastErrorText,1,1000));
+            Error(CopyStr(LastErrorText, 1, 1000));
         //+NC2.12 [313362]
     end;
 
@@ -358,8 +363,8 @@ codeunit 6151505 "Nc Sync. Mgt."
         // UNTIL FileSystem.NEXT = 0;
         ArrayHelper := ServerDirectoryHelper.GetFiles(NcImportType."Server File Path");
         for i := 0 to ArrayHelper.GetLength(0) - 1 do begin
-          Filename := ArrayHelper.GetValue(i);
-          InsertImportEntry2(NcImportType,Filename);
+            Filename := ArrayHelper.GetValue(i);
+            InsertImportEntry2(NcImportType, Filename);
         end;
         //+NC.2.15 [313184]
         //+NC2.12 [313362]
@@ -367,7 +372,7 @@ codeunit 6151505 "Nc Sync. Mgt."
 
     [TryFunction]
     [Scope('Personalization')]
-    procedure InsertImportEntry2(NcImportType: Record "Nc Import Type";Filename: Text)
+    procedure InsertImportEntry2(NcImportType: Record "Nc Import Type"; Filename: Text)
     var
         NcImportEntry: Record "Nc Import Entry";
         TempBlob: Record TempBlob temporary;
@@ -377,7 +382,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         //-NC.2.15 [313184]
         // Filename := FileSystem.Path + '/' + FileSystem.Name;
         // FileMgt.BLOBImportFromServerFile(TempBlob,Filename);
-        FileMgt.BLOBImportFromServerFile(TempBlob,Filename);
+        FileMgt.BLOBImportFromServerFile(TempBlob, Filename);
         //+NC.2.15 [313184]
 
         NcImportEntry.Init;
@@ -386,7 +391,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         NcImportEntry.Date := CurrentDateTime;
         //-NC.2.15 [306532]
         //NcImportEntry."Document Name" := FileSystem.Name;
-        NcImportEntry."Document Name" := GetDocName(FileMgt.GetFileName(Filename),MaxStrLen(NcImportEntry."Document Name"));
+        NcImportEntry."Document Name" := GetDocName(FileMgt.GetFileName(Filename), MaxStrLen(NcImportEntry."Document Name"));
         //+NC.2.15 [306532]
         NcImportEntry.Imported := false;
         NcImportEntry."Runtime Error" := false;
@@ -411,11 +416,11 @@ codeunit 6151505 "Nc Sync. Mgt."
         Clear(NaviConnectImportMgt);
         ImportEntryReset(ImportEntry);
         if NaviConnectImportMgt.Run(ImportEntry) then begin
-          //-NC2.12 [308107]
-          DataLogMgt.DisableDataLog(false);
-          //+NC2.12 [308107]
-          ImportEntryComplete(ImportEntry);
-          exit(true);
+            //-NC2.12 [308107]
+            DataLogMgt.DisableDataLog(false);
+            //+NC2.12 [308107]
+            ImportEntryComplete(ImportEntry);
+            exit(true);
         end;
 
         //-NC2.12 [308107]
@@ -430,16 +435,16 @@ codeunit 6151505 "Nc Sync. Mgt."
     var
         ImportEntry: Record "Nc Import Entry";
     begin
-        ImportEntry.SetRange(Imported,false);
-        ImportEntry.SetRange("Runtime Error",false);
+        ImportEntry.SetRange(Imported, false);
+        ImportEntry.SetRange("Runtime Error", false);
         if ImportEntry.FindSet then
-          repeat
-            ProcessImportEntry(ImportEntry);
-            //-NC2.16 [313184]
-            if (CurrentDateTime > SyncEndTime) and (SyncEndTime <> 0DT) then
-              exit;
-            //+NC2.16 [313184]
-          until ImportEntry.Next = 0;
+            repeat
+                ProcessImportEntry(ImportEntry);
+                //-NC2.16 [313184]
+                if (CurrentDateTime > SyncEndTime) and (SyncEndTime <> 0DT) then
+                    exit;
+                //+NC2.16 [313184]
+            until ImportEntry.Next = 0;
     end;
 
     [Scope('Personalization')]
@@ -448,39 +453,39 @@ codeunit 6151505 "Nc Sync. Mgt."
         TaskSetup: Record "Nc Task Setup";
     begin
         TaskReset(Task);
-        TaskSetup.SetRange("Task Processor Code",Task."Task Processor Code");
-        TaskSetup.SetRange("Table No.",Task."Table No.");
+        TaskSetup.SetRange("Task Processor Code", Task."Task Processor Code");
+        TaskSetup.SetRange("Table No.", Task."Table No.");
         if TaskSetup.FindSet then
-          repeat
-            if Task.Get(Task."Entry No.") then;
-            if not CODEUNIT.Run(TaskSetup."Codeunit ID",Task) then begin
-              TaskError(Task);
-              exit(false);
-            end;
-          until TaskSetup.Next = 0;
+            repeat
+                if Task.Get(Task."Entry No.") then;
+                if not CODEUNIT.Run(TaskSetup."Codeunit ID", Task) then begin
+                    TaskError(Task);
+                    exit(false);
+                end;
+            until TaskSetup.Next = 0;
         TaskComplete(Task);
         exit(true);
     end;
 
     [Scope('Personalization')]
-    procedure ProcessTasks(TaskProcessor: Record "Nc Task Processor";MaxRetry: Integer)
+    procedure ProcessTasks(TaskProcessor: Record "Nc Task Processor"; MaxRetry: Integer)
     var
         Task: Record "Nc Task";
     begin
         if MaxRetry < 1 then
-          MaxRetry := 1;
+            MaxRetry := 1;
 
-        Task.SetRange("Task Processor Code",TaskProcessor.Code);
-        Task.SetRange(Processed,false);
-        Task.SetFilter("Process Count",'<%1',MaxRetry);
+        Task.SetRange("Task Processor Code", TaskProcessor.Code);
+        Task.SetRange(Processed, false);
+        Task.SetFilter("Process Count", '<%1', MaxRetry);
         if Task.FindSet then
-          repeat
-            ProcessTask(Task);
-            //-NC2.16 [313184]
-            if (CurrentDateTime > SyncEndTime) and (SyncEndTime <> 0DT) then
-              exit;
-            //+NC2.16 [313184]
-          until Task.Next = 0;
+            repeat
+                ProcessTask(Task);
+                //-NC2.16 [313184]
+                if (CurrentDateTime > SyncEndTime) and (SyncEndTime <> 0DT) then
+                    exit;
+                //+NC2.16 [313184]
+            until Task.Next = 0;
     end;
 
     local procedure "--- Status Mgt."()
@@ -492,7 +497,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         ErrorText: Text[1024];
     begin
         if not ImportEntry.Get(ImportEntry."Entry No.") then
-          exit;
+            exit;
         ErrorText := GetLastErrorText;
         Clear(ImportEntry."Last Error Message");
         ImportEntry."Error Message" := '';
@@ -514,11 +519,11 @@ codeunit 6151505 "Nc Sync. Mgt."
         ErrorText: Text[1024];
     begin
         if not ImportEntry.Get(ImportEntry."Entry No.") then
-          exit;
+            exit;
         ErrorText := GetLastErrorText;
         Clear(ImportEntry."Last Error Message");
         if StrLen(ErrorText) > 0 then
-          ImportEntry."Error Message" := CopyStr(ErrorText,1,MaxStrLen(ImportEntry."Error Message"));
+            ImportEntry."Error Message" := CopyStr(ErrorText, 1, MaxStrLen(ImportEntry."Error Message"));
         ImportEntry."Last Error Message".CreateOutStream(OutStream);
         OutStream.Write(ErrorText);
         ImportEntry.Imported := false;
@@ -545,7 +550,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         ImportEntry.Get(ImportEntry."Entry No.");
         Clear(ImportEntry."Last Error Message");
         if StrLen(ErrorText) > 0 then
-          ImportEntry."Error Message" := CopyStr(ErrorText,1,MaxStrLen(ImportEntry."Error Message"));
+            ImportEntry."Error Message" := CopyStr(ErrorText, 1, MaxStrLen(ImportEntry."Error Message"));
         ImportEntry."Last Error Message".CreateOutStream(OutStream);
         OutStream.Write(ErrorText);
         ImportEntry.Imported := false;
@@ -564,7 +569,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     begin
         NaviConnectTask.LockTable;
         if not NaviConnectTask.Get(NaviConnectTask."Entry No.") then
-          exit;
+            exit;
         NaviConnectTask."Last Processing Completed at" := CurrentDateTime;
         NaviConnectTask."Last Processing Duration" := (NaviConnectTask."Last Processing Completed at" - NaviConnectTask."Last Processing Started at") / 1000;
         NaviConnectTask.Processed := true;
@@ -580,7 +585,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     begin
         NaviConnectTask.LockTable;
         if not NaviConnectTask.Get(NaviConnectTask."Entry No.") then
-          exit;
+            exit;
 
         //-NC2.16 [313184]
         NaviConnectTask."Last Processing Completed at" := CurrentDateTime;
@@ -590,26 +595,26 @@ codeunit 6151505 "Nc Sync. Mgt."
         ErrorText := GetLastErrorText;
 
         if ErrorText <> '' then begin
-          NaviConnectTask.Response.CreateOutStream(OutStream);
-          OutStream.Write(ErrorText);
-          //-NC2.16 [313184]
-          //NaviConnectTask.MODIFY(TRUE);
-          //+NC2.16 [313184]
-          ClearLastError;
+            NaviConnectTask.Response.CreateOutStream(OutStream);
+            OutStream.Write(ErrorText);
+            //-NC2.16 [313184]
+            //NaviConnectTask.MODIFY(TRUE);
+            //+NC2.16 [313184]
+            ClearLastError;
         end;
 
         //-NC2.16 [313184]
         NaviConnectTask.Modify(true);
         //+NC2.16 [313184]
         Commit;
-        GambitMgt.InsertEntry('MAGENTO_GENERAL_ERROR',0,0,UserId,ErrorText,true);
+        GambitMgt.InsertEntry('MAGENTO_GENERAL_ERROR', 0, 0, UserId, ErrorText, true);
     end;
 
     local procedure TaskReset(var NaviConnectTask: Record "Nc Task")
     begin
         NaviConnectTask.LockTable;
         if not NaviConnectTask.Get(NaviConnectTask."Entry No.") then
-          exit;
+            exit;
         Clear(NaviConnectTask."Data Output");
         Clear(NaviConnectTask.Response);
         NaviConnectTask."Last Processing Started at" := CurrentDateTime;
@@ -631,9 +636,9 @@ codeunit 6151505 "Nc Sync. Mgt."
         NcTaskMgt.CleanTasks();
         Commit;
         //+NC2.08 [297750]
-        NaviConnectTask.SetCurrentKey("Log Date",Processed);
-        NaviConnectTask.SetRange(Processed,false);
-        NaviConnectTask.ModifyAll("Process Count",0);
+        NaviConnectTask.SetCurrentKey("Log Date", Processed);
+        NaviConnectTask.SetRange(Processed, false);
+        NaviConnectTask.ModifyAll("Process Count", 0);
         Commit;
     end;
 
@@ -641,13 +646,13 @@ codeunit 6151505 "Nc Sync. Mgt."
     procedure UpdateTaskProcessor(TaskProcessor: Record "Nc Task Processor")
     begin
         if TaskProcessor.Find then
-          exit;
+            exit;
 
-        if TaskProcessor.Code in ['','NC'] then begin
-          TaskProcessor.Init;
-          TaskProcessor.Code := 'NC';
-          TaskProcessor.Description := Text000;
-          TaskProcessor.Insert(true);
+        if TaskProcessor.Code in ['', 'NC'] then begin
+            TaskProcessor.Init;
+            TaskProcessor.Code := 'NC';
+            TaskProcessor.Description := Text000;
+            TaskProcessor.Insert(true);
         end;
     end;
 
@@ -655,7 +660,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     begin
     end;
 
-    local procedure CreateFtpWebRequest(ImportType: Record "Nc Import Type";var FtpWebRequest: DotNet npNetFtpWebRequest)
+    local procedure CreateFtpWebRequest(ImportType: Record "Nc Import Type"; var FtpWebRequest: DotNet npNetFtpWebRequest)
     var
         Uri: DotNet npNetUri;
     begin
@@ -665,102 +670,102 @@ codeunit 6151505 "Nc Sync. Mgt."
         //+NC2.06 [290633]
         //-NC2.08 [295322]
         if ImportType."Ftp Binary" then
-          FtpWebRequest.UseBinary := true;
+            FtpWebRequest.UseBinary := true;
         //+NC2.08 [295322]
         //-NC2.19 [340695]
         FtpWebRequest.KeepAlive := false;
         //+NC2.19 [340695]
     end;
 
-    local procedure CutNextFilename(var ListDirectoryDetails: Text;var Filename: Text): Boolean
+    local procedure CutNextFilename(var ListDirectoryDetails: Text; var Filename: Text): Boolean
     var
         Details: Text;
     begin
         if ListDirectoryDetails = '' then
-          exit(false);
+            exit(false);
 
         Filename := '';
         repeat
-          CutNextLine(ListDirectoryDetails,Details);
-          //-NC2.05 [275177]
-          //Filename := ParseFilename(Details);
-          Filename := Details;
-          //+NC2.05 [275177]
+            CutNextLine(ListDirectoryDetails, Details);
+            //-NC2.05 [275177]
+            //Filename := ParseFilename(Details);
+            Filename := Details;
+            //+NC2.05 [275177]
         until (Filename <> '') or (ListDirectoryDetails = '');
 
         exit((Filename <> '') or (ListDirectoryDetails <> ''));
     end;
 
-    local procedure CutNextFilenameDetailed(var ListDirectoryDetails: Text;var Filename: Text): Boolean
+    local procedure CutNextFilenameDetailed(var ListDirectoryDetails: Text; var Filename: Text): Boolean
     var
         Details: Text;
     begin
         //-NC2.06 [290633]
         if ListDirectoryDetails = '' then
-          exit(false);
+            exit(false);
 
         Filename := '';
         repeat
-          CutNextLineDetailed(ListDirectoryDetails,Details);
-          Filename := ParseFilename(Details);
+            CutNextLineDetailed(ListDirectoryDetails, Details);
+            Filename := ParseFilename(Details);
         until (Filename <> '') or (ListDirectoryDetails = '');
 
         exit((Filename <> '') or (ListDirectoryDetails <> ''));
         //+NC2.06 [290633]
     end;
 
-    local procedure CutNextLine(var ListDirectoryDetails: Text;var Details: Text)
+    local procedure CutNextLine(var ListDirectoryDetails: Text; var Details: Text)
     var
         Position: Integer;
     begin
         if ListDirectoryDetails = '' then
-          exit;
+            exit;
 
-        Position := StrPos(ListDirectoryDetails,NewLine());
+        Position := StrPos(ListDirectoryDetails, NewLine());
         while Position = 1 do begin
-          ListDirectoryDetails := DelStr(ListDirectoryDetails,1,2);
-          Position := StrPos(ListDirectoryDetails,NewLine());
+            ListDirectoryDetails := DelStr(ListDirectoryDetails, 1, 2);
+            Position := StrPos(ListDirectoryDetails, NewLine());
         end;
 
         if Position = 0 then begin
-          Details := ListDirectoryDetails;
-          ListDirectoryDetails := '';
+            Details := ListDirectoryDetails;
+            ListDirectoryDetails := '';
         end else begin
-          Details := CopyStr(ListDirectoryDetails,1,Position - 1);
-          //-NC2.05 [275177]
-          //ListDirectoryDetails := DELSTR(ListDirectoryDetails,1,Position + 2);
-          ListDirectoryDetails := DelStr(ListDirectoryDetails,1,Position + 1);
-          //-NC2.05 [275177]
+            Details := CopyStr(ListDirectoryDetails, 1, Position - 1);
+            //-NC2.05 [275177]
+            //ListDirectoryDetails := DELSTR(ListDirectoryDetails,1,Position + 2);
+            ListDirectoryDetails := DelStr(ListDirectoryDetails, 1, Position + 1);
+            //-NC2.05 [275177]
         end;
     end;
 
-    local procedure CutNextLineDetailed(var ListDirectoryDetails: Text;var Details: Text)
+    local procedure CutNextLineDetailed(var ListDirectoryDetails: Text; var Details: Text)
     var
         Position: Integer;
     begin
         //-NC2.06 [290633]
         if ListDirectoryDetails = '' then
-          exit;
+            exit;
 
-        Position := StrPos(ListDirectoryDetails,NewLine());
+        Position := StrPos(ListDirectoryDetails, NewLine());
         while Position = 1 do begin
-          ListDirectoryDetails := DelStr(ListDirectoryDetails,1,2);
-          Position := StrPos(ListDirectoryDetails,NewLine());
+            ListDirectoryDetails := DelStr(ListDirectoryDetails, 1, 2);
+            Position := StrPos(ListDirectoryDetails, NewLine());
         end;
 
         if Position = 0 then begin
-          Details := ListDirectoryDetails;
-          ListDirectoryDetails := '';
+            Details := ListDirectoryDetails;
+            ListDirectoryDetails := '';
         end else begin
-          Details := CopyStr(ListDirectoryDetails,1,Position - 1);
-          ListDirectoryDetails := DelStr(ListDirectoryDetails,1,Position + 2);
+            Details := CopyStr(ListDirectoryDetails, 1, Position - 1);
+            ListDirectoryDetails := DelStr(ListDirectoryDetails, 1, Position + 2);
         end;
         //+NC2.06 [290633]
     end;
 
     [TryFunction]
     [Scope('Personalization')]
-    procedure DownloadFtpListDirectory(ImportType: Record "Nc Import Type";var ListDirectory: Text)
+    procedure DownloadFtpListDirectory(ImportType: Record "Nc Import Type"; var ListDirectory: Text)
     var
         Credential: DotNet npNetNetworkCredential;
         FtpWebRequest: DotNet npNetFtpWebRequest;
@@ -772,11 +777,11 @@ codeunit 6151505 "Nc Sync. Mgt."
         ListDirectory := '';
 
         if not ImportType."Ftp Enabled" then
-          exit;
+            exit;
 
-        CreateFtpWebRequest(ImportType,FtpWebRequest);
+        CreateFtpWebRequest(ImportType, FtpWebRequest);
         FtpWebRequest.Method := 'NLST'; //WebRequestMethods.Ftp.ListDirectory
-        FtpWebRequest.Credentials := Credential.NetworkCredential(ImportType."Ftp User",ImportType."Ftp Password");
+        FtpWebRequest.Credentials := Credential.NetworkCredential(ImportType."Ftp User", ImportType."Ftp Password");
         FtpWebResponse := FtpWebRequest.GetResponse;
         MemoryStream := FtpWebResponse.GetResponseStream();
         StreamReader := StreamReader.StreamReader(MemoryStream);
@@ -789,7 +794,7 @@ codeunit 6151505 "Nc Sync. Mgt."
 
     [TryFunction]
     [Scope('Personalization')]
-    procedure DownloadFtpListDirectoryDetails(ImportType: Record "Nc Import Type";var ListDirectoryDetails: Text)
+    procedure DownloadFtpListDirectoryDetails(ImportType: Record "Nc Import Type"; var ListDirectoryDetails: Text)
     var
         Credential: DotNet npNetNetworkCredential;
         FtpWebRequest: DotNet npNetFtpWebRequest;
@@ -801,11 +806,11 @@ codeunit 6151505 "Nc Sync. Mgt."
         ListDirectoryDetails := '';
 
         if not ImportType."Ftp Enabled" then
-          exit;
+            exit;
 
-        CreateFtpWebRequest(ImportType,FtpWebRequest);
+        CreateFtpWebRequest(ImportType, FtpWebRequest);
         FtpWebRequest.Method := 'LIST'; //WebRequestMethods.Ftp.ListDirectoryDetails
-        FtpWebRequest.Credentials := Credential.NetworkCredential(ImportType."Ftp User",ImportType."Ftp Password");
+        FtpWebRequest.Credentials := Credential.NetworkCredential(ImportType."Ftp User", ImportType."Ftp Password");
         FtpWebResponse := FtpWebRequest.GetResponse;
         MemoryStream := FtpWebResponse.GetResponseStream();
         StreamReader := StreamReader.StreamReader(MemoryStream);
@@ -817,27 +822,29 @@ codeunit 6151505 "Nc Sync. Mgt."
     end;
 
     [TryFunction]
-    local procedure DownloadSftpFilenames(ImportType: Record "Nc Import Type";var ListDirectory: Text)
+    local procedure DownloadSftpFilenames(ImportType: Record "Nc Import Type"; var ListDirectory: Text)
     var
         SharpSFtp: DotNet npNetSftp0;
         FileList: DotNet npNetIList;
         IEnumerator: DotNet npNetIEnumerator;
         LsEntry: DotNet npNetChannelSftp_LsEntry;
         RemotePath: Text;
+        NetConvHelper: Variant;
     begin
         //-NC2.16 [328432]
-        SharpSFtp := SharpSFtp.Sftp(ImportType."Ftp Host",ImportType."Ftp User",ImportType."Ftp Password");
+        SharpSFtp := SharpSFtp.Sftp(ImportType."Ftp Host", ImportType."Ftp User", ImportType."Ftp Password");
         SharpSFtp.Connect(ImportType."Ftp Port");
 
         RemotePath := '*';
         if ImportType."Ftp Path" <> '' then
-          RemotePath := ImportType."Ftp Path";
+            RemotePath := ImportType."Ftp Path";
 
-        FileList := SharpSFtp.GetFileList(RemotePath);
+        NetConvHelper := SharpSFtp.GetFileList(RemotePath);
+        FileList := NetConvHelper;
         foreach LsEntry in FileList do begin
-          if ListDirectory <> '' then
-            ListDirectory += NewLine();
-          ListDirectory += LsEntry.Filename;
+            if ListDirectory <> '' then
+                ListDirectory += NewLine();
+            ListDirectory += LsEntry.Filename;
         end;
         //+NC2.16 [328432]
         //-NC2.19 [340695]
@@ -850,32 +857,32 @@ codeunit 6151505 "Nc Sync. Mgt."
         Position: Integer;
     begin
         if Details = '' then
-          exit('');
+            exit('');
 
         Filename := RegExMatch(Details);
         if ValidFilename(Filename) then
-          exit(Filename);
+            exit(Filename);
 
         Filename := RegExMatch2(Details);
         if ValidFilename(Filename) then
-          exit(Filename);
+            exit(Filename);
 
         Filename := RegExMatch3(Details);
         if ValidFilename(Filename) then
-          exit(Filename);
+            exit(Filename);
 
         Filename := RegExMatch4(Details);
         if ValidFilename(Filename) then
-          exit(Filename);
+            exit(Filename);
 
         while Position > 0 do begin
-          Details := DelStr(Details,1,Position + 3);
-          Position := StrPos(Details,':');
+            Details := DelStr(Details, 1, Position + 3);
+            Position := StrPos(Details, ':');
         end;
 
         Filename := Details;
         if ValidFilename(Details) then
-          Filename := Details;
+            Filename := Details;
 
         exit('');
     end;
@@ -886,7 +893,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         RegEx: DotNet npNetRegex;
     begin
         if Details = '' then
-          exit('');
+            exit('');
 
         Match := RegEx.Match(Details, '^' +
                                       '(?<dir>[\-ld])' +
@@ -911,7 +918,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         RegEx: DotNet npNetRegex;
     begin
         if Details = '' then
-          exit('');
+            exit('');
 
         Match := RegEx.Match(Details, '^' +
                                       '(?<dir>[\-ld])' +
@@ -935,7 +942,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         RegEx: DotNet npNetRegex;
     begin
         if Details = '' then
-          exit('');
+            exit('');
 
         Match := RegEx.Match(Details, '^' +
                                       '(?<permission>([\-r][\-w][\-xs]){3})' +
@@ -958,7 +965,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         RegEx: DotNet npNetRegex;
     begin
         if Details = '' then
-          exit('');
+            exit('');
 
         Match := RegEx.Match(Details, '^' +
                                       '(?<day>\d{1,2})-(?<month>\d{1,2})-(?<year>\d{4})' +
@@ -975,16 +982,16 @@ codeunit 6151505 "Nc Sync. Mgt."
         Position: Integer;
     begin
         if Filename = '' then
-          exit(false);
+            exit(false);
 
-        Position := StrPos(Filename,'.');
+        Position := StrPos(Filename, '.');
         //-NC2.05 [275177]
         //IF Position = 1 THEN
         if (Position = 1) or (Position = 0) then
-          exit(false);
+            exit(false);
         //+NC2.05 [275177]
         if Position = StrLen(Filename) then
-          exit;
+            exit;
 
         exit(true);
     end;
@@ -994,7 +1001,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     end;
 
     [TryFunction]
-    local procedure CheckFtpUrlExists(FtpUrl: Text;Username: Text;Password: Text)
+    local procedure CheckFtpUrlExists(FtpUrl: Text; Username: Text; Password: Text)
     var
         Credential: DotNet npNetNetworkCredential;
         FtpWebRequest: DotNet npNetFtpWebRequest;
@@ -1007,7 +1014,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         FtpWebRequest.KeepAlive := false;
         //-NC2.19 [340695]
         if Username <> '' then
-          FtpWebRequest.Credentials := Credential.NetworkCredential(Username,Password);
+            FtpWebRequest.Credentials := Credential.NetworkCredential(Username, Password);
         FtpWebResponse := FtpWebRequest.GetResponse;
         MemoryStream := FtpWebResponse.GetResponseStream();
         MemoryStream.Flush;
@@ -1016,7 +1023,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     end;
 
     [TryFunction]
-    local procedure DeleteFtpFile(FtpUrl: Text;Username: Text;Password: Text)
+    local procedure DeleteFtpFile(FtpUrl: Text; Username: Text; Password: Text)
     var
         Credential: DotNet npNetNetworkCredential;
         FtpWebRequest: DotNet npNetFtpWebRequest;
@@ -1024,7 +1031,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     begin
         FtpWebRequest := FtpWebRequest.Create(FtpUrl);
         if Username <> '' then
-          FtpWebRequest.Credentials := Credential.NetworkCredential(Username,Password);
+            FtpWebRequest.Credentials := Credential.NetworkCredential(Username, Password);
         FtpWebRequest.Method := 'DELE'; //WebRequestMethods.Ftp.DeleteFile
         //-NC2.19 [340695]
         FtpWebRequest.KeepAlive := false;
@@ -1032,7 +1039,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         FtpWebResponse := FtpWebRequest.GetResponse;
     end;
 
-    local procedure GetDocName(Filename: Text;MaxLength: Integer) DocName: Text
+    local procedure GetDocName(Filename: Text; MaxLength: Integer) DocName: Text
     var
         FileMgt: Codeunit "File Management";
         DocExt: Text;
@@ -1040,14 +1047,14 @@ codeunit 6151505 "Nc Sync. Mgt."
         //-NC.2.15 [306532]
         DocName := Filename;
         if MaxLength <= 0 then
-          exit(DocName);
+            exit(DocName);
         if StrLen(DocName) <= MaxLength then
-          exit(DocName);
+            exit(DocName);
 
         DocExt := FileMgt.GetExtension(DocName);
         if DocExt <> '' then
-          DocExt := '.' + DocExt;
-        DocName := CopyStr(FileMgt.GetFileNameWithoutExtension(DocName),1,MaxLength - StrLen(DocExt));
+            DocExt := '.' + DocExt;
+        DocName := CopyStr(FileMgt.GetFileNameWithoutExtension(DocName), 1, MaxLength - StrLen(DocExt));
         DocName += DocExt;
 
         exit(DocName);
@@ -1055,7 +1062,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     end;
 
     [TryFunction]
-    local procedure MakeFtpUrl(FtpUrl: Text;Username: Text;Password: Text)
+    local procedure MakeFtpUrl(FtpUrl: Text; Username: Text; Password: Text)
     var
         Credential: DotNet npNetNetworkCredential;
         FtpWebRequest: DotNet npNetFtpWebRequest;
@@ -1068,7 +1075,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         FtpWebRequest.KeepAlive := false;
         //-NC2.19 [340695]
         if Username <> '' then
-          FtpWebRequest.Credentials := Credential.NetworkCredential(Username,Password);
+            FtpWebRequest.Credentials := Credential.NetworkCredential(Username, Password);
         FtpWebResponse := FtpWebRequest.GetResponse;
         MemoryStream := FtpWebResponse.GetResponseStream();
         MemoryStream.Flush;
@@ -1089,7 +1096,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     end;
 
     [TryFunction]
-    local procedure RenameFtpFile(FtpUrl: Text;Username: Text;Password: Text;RenameTo: Text)
+    local procedure RenameFtpFile(FtpUrl: Text; Username: Text; Password: Text; RenameTo: Text)
     var
         Credential: DotNet npNetNetworkCredential;
         FtpWebRequest: DotNet npNetFtpWebRequest;
@@ -1097,7 +1104,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     begin
         FtpWebRequest := FtpWebRequest.Create(FtpUrl);
         if Username <> '' then
-          FtpWebRequest.Credentials := Credential.NetworkCredential(Username,Password);
+            FtpWebRequest.Credentials := Credential.NetworkCredential(Username, Password);
         FtpWebRequest.Method := 'RENAME'; //WebRequestMethods.Ftp.Rename
         //-NC2.19 [340695]
         FtpWebRequest.KeepAlive := false;
@@ -1179,17 +1186,17 @@ codeunit 6151505 "Nc Sync. Mgt."
     end;
 
     [Scope('Personalization')]
-    procedure RunProcess(Filename: Text;Arguments: Text;Modal: Boolean)
+    procedure RunProcess(Filename: Text; Arguments: Text; Modal: Boolean)
     var
         [RunOnClient]
         Process: DotNet npNetProcess;
         [RunOnClient]
         ProcessStartInfo: DotNet npNetProcessStartInfo;
     begin
-        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename,Arguments);
+        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename, Arguments);
         Process := Process.Start(ProcessStartInfo);
         if Modal then
-          Process.WaitForExit();
+            Process.WaitForExit();
     end;
 
     local procedure GetMaxSyncDuration() SyncDuration: Duration
