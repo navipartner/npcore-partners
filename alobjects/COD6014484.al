@@ -25,12 +25,12 @@ codeunit 6014484 "Pacsoft Management"
         ShipmentDocument.SetCurrentKey("Export Time");
         ShipmentDocument.SetRange("Export Time", 0DT);
         if ShipmentDocument.FindSet then
-          repeat
-            SendDocument(ShipmentDocument, false);
-          until ShipmentDocument.Next = 0;
+            repeat
+                SendDocument(ShipmentDocument, false);
+            until ShipmentDocument.Next = 0;
     end;
 
-    procedure SendDocument(var pShipmentDocument: Record "Pacsoft Shipment Document";WithDialog: Boolean)
+    procedure SendDocument(var pShipmentDocument: Record "Pacsoft Shipment Document"; WithDialog: Boolean)
     var
         RecRef: RecordRef;
         TextFile: File;
@@ -48,14 +48,14 @@ codeunit 6014484 "Pacsoft Management"
         pShipmentDocument.Modify;
 
         if WithDialog then begin
-          if not Confirm(Text6014400, false) then
-            exit;
+            if not Confirm(Text6014400, false) then
+                exit;
         end else
-          if pShipmentDocument."Export Time" <> 0DT then
-            exit;
+            if pShipmentDocument."Export Time" <> 0DT then
+                exit;
 
         pShipmentDocument."Request XML Name" := 'Request ' +
-                                                Format(Today)  +
+                                                Format(Today) +
                                                 ' ' +
                                                 Format(Time, 0, '<Hours24,2>-<Minutes,2>-<Seconds,2>') +
                                                 ' ' +
@@ -79,7 +79,7 @@ codeunit 6014484 "Pacsoft Management"
         SendXML(pShipmentDocument);
 
         if WithDialog then
-          Message(TextMessage);
+            Message(TextMessage);
     end;
 
     local procedure SendXML(var pShipmentDocument: Record "Pacsoft Shipment Document")
@@ -103,27 +103,27 @@ codeunit 6014484 "Pacsoft Management"
     begin
         pShipmentDocument.CalcFields("Request XML");
         if not pShipmentDocument."Request XML".HasValue then
-          exit;
+            exit;
 
         pShipmentDocument."Request XML".CreateInStream(iStream);
 
         if IsNull(XMLDoc) then
-          Clear(XMLDoc);
+            Clear(XMLDoc);
 
         XMLDoc := XMLDoc.XmlDocument;
-        XMLDoc.CreateXmlDeclaration('1.0','UTF-8','no');
+        XMLDoc.CreateXmlDeclaration('1.0', 'UTF-8', 'no');
         XMLDoc.Load(iStream);
         StringBuilder := StringBuilder.StringBuilder;
         //StringBuilder.Append(XMLDoc.xml );
         StringBuilder.Append(XMLDoc.OuterXml);
         URI := StrSubstNo(PacsoftSetup."Send Order URI", PacsoftSetup.Session, PacsoftSetup.User, PacsoftSetup.Pin);
 
-        HttpWebRequest             := HttpWebRequest.Create(URI);
-        HttpWebRequest.Method      := 'POST';
-        HttpWebRequest.KeepAlive   := false;
+        HttpWebRequest := HttpWebRequest.Create(URI);
+        HttpWebRequest.Method := 'POST';
+        HttpWebRequest.KeepAlive := false;
         HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
         HttpWebRequest.Credentials := credentials.DefaultCredentials;
-        HttpWebRequest.Timeout     := 120000;
+        HttpWebRequest.Timeout := 120000;
 
         stream := stream.StreamWriter(HttpWebRequest.GetRequestStream(), Type.UTF8);
         stream.Write(StringBuilder.ToString);
@@ -133,10 +133,10 @@ codeunit 6014484 "Pacsoft Management"
         Clear(HttpWebRequest);
 
         if HttpWebResponse.StatusCode <> 200 then
-          Error(HttpWebResponse.StatusDescription);
+            Error(HttpWebResponse.StatusDescription);
 
         pShipmentDocument."Response XML Name" := 'Response ' +
-                                                  Format(Today)  +
+                                                  Format(Today) +
                                                   ' ' +
                                                   Format(Time, 0, '<Hours24,2>-<Minutes,2>-<Seconds,2>') +
                                                   ' ' +
@@ -158,7 +158,7 @@ codeunit 6014484 "Pacsoft Management"
         XMLResponce.GetShipmentDocument(pShipmentDocument);
 
         if pShipmentDocument.Status = '201' then
-          pShipmentDocument."Export Time" := CurrentDateTime;
+            pShipmentDocument."Export Time" := CurrentDateTime;
 
         pShipmentDocument.Modify;
 
@@ -180,74 +180,77 @@ codeunit 6014484 "Pacsoft Management"
         TextNoCustomsDocument: Label 'can not be blank.';
     begin
         with pShipmentDocument do begin
-          if "Entry No." = 0 then exit;
+            if "Entry No." = 0 then exit;
 
-          TestField("Receiver ID");
-          TestField(Name);
-          TestField(Address);
-          TestField("Post Code");
-          TestField(City);
-          TestField("Country/Region Code");
-          TestField("Shipment Date");
-          if "Shipment Date" < Today then
-            FieldError("Shipment Date", TextBeforeToday);
+            TestField("Receiver ID");
+            TestField(Name);
+            TestField(Address);
+            TestField("Post Code");
+            TestField(City);
+            TestField("Country/Region Code");
+            TestField("Shipment Date");
+            if "Shipment Date" < Today then
+                FieldError("Shipment Date", TextBeforeToday);
 
-          TestField("Shipping Agent Code");
-          ShippingAgent.Get("Shipping Agent Code");
-          ShippingAgent.TestField("Pacsoft Product");
-          case ShippingAgent."Shipping Agent Demand" of
-            ShippingAgent."Shipping Agent Demand"::" " : ;
-            ShippingAgent."Shipping Agent Demand"::"Select a Service" :
-              begin
-                Found := false;
-                Clear(ShipDocService);
-                ShipDocService.SetCurrentKey("Entry No.", "Shipping Agent Code");
-                ShipDocService.SetRange("Entry No.", "Entry No.");
-                if ShipDocService.FindSet then
-                  repeat
-                    ShippingAgentService.Get("Shipping Agent Code", ShipDocService."Shipping Agent Service Code");
-                    case ShippingAgentService."Service Demand" of
-                      ShippingAgentService."Service Demand"::"Selected E-mail" : TestField("E-Mail");
-                      ShippingAgentService."Service Demand"::"Selected Mobile No." : TestField("SMS No.");
+            TestField("Shipping Agent Code");
+            ShippingAgent.Get("Shipping Agent Code");
+            ShippingAgent.TestField("Pacsoft Product");
+            case ShippingAgent."Shipping Agent Demand" of
+                ShippingAgent."Shipping Agent Demand"::" ":
+                    ;
+                ShippingAgent."Shipping Agent Demand"::"Select a Service":
+                    begin
+                        Found := false;
+                        Clear(ShipDocService);
+                        ShipDocService.SetCurrentKey("Entry No.", "Shipping Agent Code");
+                        ShipDocService.SetRange("Entry No.", "Entry No.");
+                        if ShipDocService.FindSet then
+                            repeat
+                                ShippingAgentService.Get("Shipping Agent Code", ShipDocService."Shipping Agent Service Code");
+                                case ShippingAgentService."Service Demand" of
+                                    ShippingAgentService."Service Demand"::"Selected E-mail":
+                                        TestField("E-Mail");
+                                    ShippingAgentService."Service Demand"::"Selected Mobile No.":
+                                        TestField("SMS No.");
+                                end;
+                                if ShippingAgentService."Notification Service" then
+                                    Found := true;
+                            until (Found) or (ShipDocService.Next = 0);
+                        if not Found then
+                            Error(TextNoNotification);
                     end;
-                    if ShippingAgentService."Notification Service" then
-                      Found := true;
-                  until (Found) or (ShipDocService.Next = 0);
-                if not Found then
-                  Error(TextNoNotification);
-              end;
-            ShippingAgent."Shipping Agent Demand"::"Customs Information" :
-              begin
-                if "Customs Document" = "Customs Document"::" " then
-                  FieldError("Customs Document", TextNoCustomsDocument);
-                TestField("Customs Currency");
-                TestField("Total Weight");
-                Found := false;
-                Clear(CustomsItemRows);
-                CustomsItemRows.SetCurrentKey("Shipment Document Entry No.", "Entry No.");
-                CustomsItemRows.SetRange("Shipment Document Entry No.", "Entry No.");
-                if CustomsItemRows.FindSet then
-                  repeat
-                    Found := true;
-                    if "Customs Document" <> "Customs Document"::CN23 then
-                      CustomsItemRows.TestField("Item Code");
-                    CustomsItemRows.TestField(Copies);
-                    CustomsItemRows.TestField("Customs Value");
-                    CustomsItemRows.TestField(Content);
-                    if "Customs Document" <> "Customs Document"::CN23 then
-                      CustomsItemRows.TestField("Country of Origin");
-                  until CustomsItemRows.Next = 0;
+                ShippingAgent."Shipping Agent Demand"::"Customs Information":
+                    begin
+                        if "Customs Document" = "Customs Document"::" " then
+                            FieldError("Customs Document", TextNoCustomsDocument);
+                        TestField("Customs Currency");
+                        TestField("Total Weight");
+                        Found := false;
+                        Clear(CustomsItemRows);
+                        CustomsItemRows.SetCurrentKey("Shipment Document Entry No.", "Entry No.");
+                        CustomsItemRows.SetRange("Shipment Document Entry No.", "Entry No.");
+                        if CustomsItemRows.FindSet then
+                            repeat
+                                Found := true;
+                                if "Customs Document" <> "Customs Document"::CN23 then
+                                    CustomsItemRows.TestField("Item Code");
+                                CustomsItemRows.TestField(Copies);
+                                CustomsItemRows.TestField("Customs Value");
+                                CustomsItemRows.TestField(Content);
+                                if "Customs Document" <> "Customs Document"::CN23 then
+                                    CustomsItemRows.TestField("Country of Origin");
+                            until CustomsItemRows.Next = 0;
 
-                if not Found then
-                  Error(TextNoItemRows);
-              end;
-          end;
+                        if not Found then
+                            Error(TextNoItemRows);
+                    end;
+            end;
 
-          if "Send Link To Print" then begin
-            CompanyInfo.Get;
-            CompanyInfo.TestField("E-Mail");
-            TestField("E-Mail");
-          end;
+            if "Send Link To Print" then begin
+                CompanyInfo.Get;
+                CompanyInfo.TestField("E-Mail");
+                TestField("E-Mail");
+            end;
         end;
 
         OK := true;
@@ -265,15 +268,15 @@ codeunit 6014484 "Pacsoft Management"
         //RemoveEmptyXmlTags
         pShipmentDocument.CalcFields("Request XML");
         if not pShipmentDocument."Request XML".HasValue then
-          exit;
+            exit;
 
         pShipmentDocument."Request XML".CreateInStream(iStream);
 
         if not IsNull(XMLDoc) then
-          Clear(XMLDoc);
+            Clear(XMLDoc);
 
         XMLDoc := XMLDoc.XmlDocument;
-        XMLDoc.CreateXmlDeclaration('1.0','UTF-8','no');
+        XMLDoc.CreateXmlDeclaration('1.0', 'UTF-8', 'no');
         //XMLDoc.Save('C\Temp\Test_RAS_nu_1.xml');
         //RBMgt.DownloadToFile('C\Temp\Test_RAS_nu_1.xml', 'C\Temp\Test_RAS_nu_1.xml');
 
@@ -304,27 +307,29 @@ codeunit 6014484 "Pacsoft Management"
         XmlNodeType: DotNet npNetXmlNodeType;
         i: Integer;
         y: Integer;
+        NetConvHelper: Variant;
     begin
         //DeleteEmptyXMLNodes
         XmlNodeType := XmlDocNode.NodeType;
         if XmlNodeType.ToString = 'Element' then begin
-          if XmlDocNode.HasChildNodes = false then begin
-            if (StrPos(XmlDocNode.OuterXml, '/>') > 0) and (StrPos(XmlDocNode.OuterXml, 'addon') = 0) then begin
-              XmlNodeType := XmlDocNode.ParentNode.RemoveChild(XmlDocNode);
-              exit(true);
+            if XmlDocNode.HasChildNodes = false then begin
+                if (StrPos(XmlDocNode.OuterXml, '/>') > 0) and (StrPos(XmlDocNode.OuterXml, 'addon') = 0) then begin
+                    NetConvHelper := XmlDocNode.ParentNode.RemoveChild(XmlDocNode);
+                    XmlNodeType := NetConvHelper;
+                    exit(true);
+                end;
+            end else begin
+                XmlNodeList := XmlDocNode.ChildNodes;
+                i := XmlNodeList.Count;
+                y := 0;
+                while i > y do begin
+                    XMLChildNode := XmlNodeList.Item(y);
+                    if not DeleteEmptyXMLNodes(XMLChildNode) then
+                        y += 1
+                    else
+                        i -= 1;
+                end;
             end;
-          end else begin
-            XmlNodeList := XmlDocNode.ChildNodes;
-            i := XmlNodeList.Count;
-            y := 0;
-            while i > y do begin
-              XMLChildNode := XmlNodeList.Item(y);
-              if not DeleteEmptyXMLNodes(XMLChildNode) then
-                y += 1
-              else
-                i -= 1;
-            end;
-          end;
         end;
 
         exit(false);
@@ -337,15 +342,20 @@ codeunit 6014484 "Pacsoft Management"
         //CLEAR(ReturnText);
 
         for i := 1 to StrLen(pText) do
-          case pText[i] of
-            '&'  : ReturnText += '&amp;';
-            '<'  : ReturnText += '&lt;';
-            '>'  : ReturnText += '&gt;';
-            '''' : ReturnText += '&apos;';
-            '"'  : ReturnText += '&quot;';
-            else
-              ReturnText += Format(pText[i])
-          end;
+            case pText[i] of
+                '&':
+                    ReturnText += '&amp;';
+                '<':
+                    ReturnText += '&lt;';
+                '>':
+                    ReturnText += '&gt;';
+                '''':
+                    ReturnText += '&apos;';
+                '"':
+                    ReturnText += '&quot;';
+                else
+                    ReturnText += Format(pText[i])
+            end;
 
         //EXIT(ReturnText);
     end;

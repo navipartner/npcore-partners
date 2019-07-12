@@ -7,7 +7,7 @@ codeunit 6059937 "RSS Feed Channel Handling"
     begin
     end;
 
-    procedure ImportRss(RssFeedChannelSub: Record "RSS Feed Channel Subscription";var RssReaderActivity: Record "RSS Reader Activity" temporary)
+    procedure ImportRss(RssFeedChannelSub: Record "RSS Feed Channel Subscription"; var RssReaderActivity: Record "RSS Reader Activity" temporary)
     var
         XRss: DotNet npNetXDocument;
         SimplifiedRss: DotNet npNetXDocument;
@@ -27,6 +27,7 @@ codeunit 6059937 "RSS Feed Channel Handling"
         MemoryStream: DotNet npNetMemoryStream;
         Encoding: DotNet npNetUTF32Encoding;
         DateTimeParser: DotNet npNetDateTime;
+        NetConvHelper: Variant;
     begin
         XRss := XRss.Load(RssFeedChannelSub.Url);
         rss := XRss.Element(xName.Get('rss'));
@@ -40,18 +41,19 @@ codeunit 6059937 "RSS Feed Channel Handling"
         list := channel.Elements(xName.Get('item'));
 
         foreach item in list do begin
-          date := item.Element(xName.Get('pubDate'));
-          title := item.Element(xName.Get('title'));
-          link := item.Element(xName.Get('link'));
-          itemNew := itemNew.XElement(item.Name);
-          channelNew.Add(itemNew);
-          itemNew.SetElementValue(link.Name,link.Value);
-          itemNew.SetElementValue(title.Name,title.Value);
-          itemNew.SetElementValue(date.Name,DateTimeParser.Parse(date.Value));
+            date := item.Element(xName.Get('pubDate'));
+            title := item.Element(xName.Get('title'));
+            link := item.Element(xName.Get('link'));
+            itemNew := itemNew.XElement(item.Name);
+            channelNew.Add(itemNew);
+            itemNew.SetElementValue(link.Name, link.Value);
+            itemNew.SetElementValue(title.Name, title.Value);
+            itemNew.SetElementValue(date.Name, DateTimeParser.Parse(date.Value));
         end;
 
         RssReaderActivityImport.SetRssFeedCode(RssFeedChannelSub."Feed Code");
-        RssReaderActivityImport.SetSource(MemoryStream.MemoryStream(Encoding.UTF32Encoding.GetBytes(SimplifiedRss.ToString)));
+        NetConvHelper := MemoryStream.MemoryStream(Encoding.UTF32Encoding.GetBytes(SimplifiedRss.ToString));
+        RssReaderActivityImport.SetSource(NetConvHelper);
         RssReaderActivityImport.Import;
         RssReaderActivityImport.GetRssActivityRec(RssReaderActivity);
     end;
@@ -60,10 +62,11 @@ codeunit 6059937 "RSS Feed Channel Handling"
     var
         RSSFeedChannelSubscription: Record "RSS Feed Channel Subscription";
     begin
-        if RSSFeedChannelSubscription.FindSet then repeat
-          ChannelCodeString += ',' + RSSFeedChannelSubscription."Feed Code";
-        until RSSFeedChannelSubscription.Next = 0;
-        ChannelCodeString := CopyStr(ChannelCodeString,2);
+        if RSSFeedChannelSubscription.FindSet then
+            repeat
+                ChannelCodeString += ',' + RSSFeedChannelSubscription."Feed Code";
+            until RSSFeedChannelSubscription.Next = 0;
+        ChannelCodeString := CopyStr(ChannelCodeString, 2);
     end;
 }
 
