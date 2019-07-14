@@ -1,4 +1,4 @@
-tableextension 70000023 tableextension70000023 extends Customer 
+tableextension 50024 tableextension50024 extends Customer 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                           Added Fields : 6014400..6060150

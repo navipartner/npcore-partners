@@ -1,4 +1,4 @@
-tableextension 70000046 tableextension70000046 extends "Value Entry" 
+tableextension 50047 tableextension50047 extends "Value Entry" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields NPR7.100.000

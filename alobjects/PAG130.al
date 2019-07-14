@@ -1,4 +1,4 @@
-pageextension 70000052 pageextension70000052 extends "Posted Sales Shipment" 
+pageextension 50053 pageextension50053 extends "Posted Sales Shipment" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     // 

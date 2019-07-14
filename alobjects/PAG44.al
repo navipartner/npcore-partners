@@ -1,4 +1,4 @@
-pageextension 70000252 pageextension70000252 extends "Sales Credit Memo" 
+pageextension 50253 pageextension50253 extends "Sales Credit Memo" 
 {
     // NPR5.23/TS/20160603 CASE 2430085 Added field Posting Description
     // NPR5.29/TJ/20160113 CASE 262797 Restored standard values of property ToolTipML on some actions

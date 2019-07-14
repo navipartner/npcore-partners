@@ -1,4 +1,4 @@
-pageextension 70000083 pageextension70000083 extends "Posted Sales Invoices" 
+pageextension 50084 pageextension50084 extends "Posted Sales Invoices" 
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Action Items: EmailLog and SendAsPDF.

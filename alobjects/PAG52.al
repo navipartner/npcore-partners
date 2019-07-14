@@ -1,4 +1,4 @@
-pageextension 70000302 pageextension70000302 extends "Purchase Credit Memo" 
+pageextension 50303 pageextension50303 extends "Purchase Credit Memo" 
 {
     // NPR4.18/TS/20151109  CASE 222241 Added Action Import From Text
     // NPR5.22/TJ/20160411 CASE 238601 Moved code from action Import From Scanner File to NPR Event Subscriber codeunit

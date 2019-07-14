@@ -1,4 +1,4 @@
-pageextension 70000548 pageextension70000548 extends "Inventory Pick" 
+pageextension 50549 pageextension50549 extends "Inventory Pick" 
 {
     // NPR5.33/TJ  /20170322 CASE 268412 New action Scan
     // NPR5.48/TS  /20181214  CASE 339845 Added Field Assigned User Id
