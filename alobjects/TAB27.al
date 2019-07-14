@@ -1,4 +1,4 @@
-tableextension 70000026 tableextension70000026 extends Item 
+tableextension 50027 tableextension50027 extends Item 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields with Description starting NPR7.100.000

@@ -1,4 +1,4 @@
-tableextension 70000042 tableextension70000042 extends "Item Cross Reference" 
+tableextension 50043 tableextension50043 extends "Item Cross Reference" 
 {
     // NPR5.47/CLVA/20181019 CASE 318296 New field Rfid Tag
     // NPR5.48/CLVA/20181019 CASE 318296 New field Time Stamp
