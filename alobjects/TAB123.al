@@ -1,4 +1,4 @@
-tableextension 70000013 tableextension70000013 extends "Purch. Inv. Line" 
+tableextension 50014 tableextension50014 extends "Purch. Inv. Line" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields 6014602..6014604

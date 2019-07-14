@@ -1,4 +1,4 @@
-tableextension 70000051 tableextension70000051 extends "Config. Package Field" 
+tableextension 50052 tableextension50052 extends "Config. Package Field" 
 {
     // NC2.12/MHA /20180502  CASE 308107 Added fields 6151090 "Field Type", 6151095 "Binary BLOB"
     fields

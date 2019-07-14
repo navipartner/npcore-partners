@@ -1,4 +1,4 @@
-tableextension 70000006 tableextension70000006 extends "Sales Invoice Line" 
+tableextension 50007 tableextension50007 extends "Sales Invoice Line" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields 6014408..6014604
