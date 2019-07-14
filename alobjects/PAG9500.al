@@ -1,4 +1,4 @@
-pageextension 70000673 pageextension70000673 extends Debugger 
+pageextension 50674 pageextension50674 extends Debugger 
 {
     layout
     {

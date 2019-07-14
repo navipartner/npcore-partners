@@ -1,4 +1,4 @@
-pageextension 70000290 pageextension70000290 extends "Salesperson/Purchaser Card" 
+pageextension 50291 pageextension50291 extends "Salesperson/Purchaser Card" 
 {
     // NPR5.29/TJ  /20170123 CASE 263484 Copies tab Security and action CashCodes from page 6014428
     // NPR5.38/AE  /20180113 CASE 289390 Added filed Supervisor POS

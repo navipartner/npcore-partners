@@ -1,4 +1,4 @@
-tableextension 70000016 tableextension70000016 extends "Salesperson/Purchaser" 
+tableextension 50017 tableextension50017 extends "Salesperson/Purchaser" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                           Added fields 6014400..6014420

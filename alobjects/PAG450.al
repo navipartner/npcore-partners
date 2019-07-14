@@ -1,4 +1,4 @@
-pageextension 70000254 pageextension70000254 extends "Issued Finance Charge Memo" 
+pageextension 50255 pageextension50255 extends "Issued Finance Charge Memo" 
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Action Items: EmailLog and SendAsPDF.

@@ -1,4 +1,4 @@
-tableextension 70000028 tableextension70000028 extends "Shipping Agent" 
+tableextension 50029 tableextension50029 extends "Shipping Agent" 
 {
     // PS1.00/LS/20141021  CASE  188056 : PacSoft Module Integration
     //                                    Added fields 6014440, 6014441

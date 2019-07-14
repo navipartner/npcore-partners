@@ -1,4 +1,4 @@
-tableextension 70000003 tableextension70000003 extends "Sales Shipment Header" 
+tableextension 50004 tableextension50004 extends "Sales Shipment Header" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added fields 6014400..6014450
