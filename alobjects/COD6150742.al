@@ -87,7 +87,7 @@ codeunit 6150742 "POS Cancel Sale Key Bind"
         SaleLinePOS: Record "Sale Line POS";
         POSSale: Codeunit "POS Sale";
         POSSaleLine: Codeunit "POS Sale Line";
-        Context: DotNet npNetJObject;
+        Context: DotNet JObject;
         POSJavaScriptInterface: Codeunit "POS JavaScript Interface";
         POSAction: Record "POS Action";
     begin

@@ -74,7 +74,7 @@ page 6014658 ".NET Assemblies"
                 var
                     ManagedDepMgt: Codeunit "Managed Dependency Mgt.";
                     Rec2: Record ".NET Assembly";
-                    JArray: DotNet npNetJArray;
+                    JArray: DotNet JArray;
                 begin
                     CurrPage.SetSelectionFilter(Rec2);
                     //-NPR5.32.10 [265454]

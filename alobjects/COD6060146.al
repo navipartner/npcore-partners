@@ -83,7 +83,7 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
         JSON: Codeunit "POS JSON Management";
@@ -104,7 +104,7 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         POSSalesInfo: Record "MM POS Sales Info";
         SalePOS: Record "Sale POS";
@@ -197,7 +197,7 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
           Error ('');
     end;
 
-    local procedure RedeemPoints(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";MemberCardNumber: Text[50])
+    local procedure RedeemPoints(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";MemberCardNumber: Text[50])
     var
         POSActionMemberMgt: Codeunit "MM POS Action - Member Mgmt.";
         POSSale: Codeunit "POS Sale";
@@ -280,7 +280,7 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
         end;
     end;
 
-    local procedure SelectAvailableCoupon(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";MemberCardNumber: Text[50])
+    local procedure SelectAvailableCoupon(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";MemberCardNumber: Text[50])
     var
         CouponsPage: Page "NpDc Coupons";
         Coupon: Record "NpDc Coupon";

@@ -20,7 +20,7 @@ codeunit 6060107 "Ean Box Event Handler"
         Text000: Label 'Ambigous input, please specify.';
         Text001: Label '"%1" not found.';
 
-    procedure InvokeEanBox(EanBoxValue: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";var FrontEnd: Codeunit "POS Front End Management")
+    procedure InvokeEanBox(EanBoxValue: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";var FrontEnd: Codeunit "POS Front End Management")
     var
         EanBoxSetup: Record "Ean Box Setup";
         TempEanBoxSetupEvent: Record "Ean Box Setup Event" temporary;

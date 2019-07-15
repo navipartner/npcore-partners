@@ -326,7 +326,7 @@ codeunit 6150744 "POS Keyboard Binding Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', true, true)]
-    local procedure InvokeKeyPressMethod(Method: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure InvokeKeyPressMethod(Method: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         POSKeyboardBindingSetup: Record "POS Keyboard Binding Setup";
         JSON: Codeunit "POS JSON Management";

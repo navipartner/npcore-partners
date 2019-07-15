@@ -199,7 +199,7 @@ page 6014622 "POS Web Fonts"
                     var
                         ManagedDepMgt: Codeunit "Managed Dependency Mgt.";
                         Rec2: Record "POS Web Font";
-                        JArray: DotNet npNetJArray;
+                        JArray: DotNet JArray;
                     begin
                         CurrPage.SetSelectionFilter(Rec2);
                         //-NPR5.32.10 [265454]

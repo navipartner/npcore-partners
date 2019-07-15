@@ -466,7 +466,7 @@ codeunit 6151551 "NpXml Mgt."
         Encoding: DotNet npNetEncoding;
         HttpWebRequest: DotNet npNetHttpWebRequest;
         HttpWebResponse: DotNet npNetHttpWebResponse;
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         MemoryStream: DotNet npNetMemoryStream;
         Stream: DotNet npNetStream;
         StreamReader: DotNet npNetStreamReader;
@@ -1166,12 +1166,12 @@ codeunit 6151551 "NpXml Mgt."
     var
         XmlDoc2: DotNet npNetXmlDocument;
         XmlElement: DotNet npNetXmlElement;
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         JsonFormatting: DotNet npNetFormatting;
         XmlNodeList: DotNet npNetXmlNodeList;
-        JToken: DotNet npNetJToken;
+        JToken: DotNet JToken;
         JContainer: DotNet npNetJContainer;
-        JArray: DotNet npNetJArray;
+        JArray: DotNet JArray;
         RegEx: DotNet npNetRegex;
         i: Integer;
     begin

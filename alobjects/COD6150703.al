@@ -18,10 +18,10 @@ codeunit 6150703 "POS JSON Management"
         Scope: DotNet npNetDictionary_Of_T_U;
         Context: DotNet npNetDictionary_Of_T_U;
         Text001: Label 'Property "%1" does not exist in JSON object.\\%2.';
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         Text003: Label 'JObject parser is not initialized, and an attempt was made to parse value "%1".';
-        JObjectBefore: DotNet npNetJObject;
-        JRoot: DotNet npNetJObject;
+        JObjectBefore: DotNet JObject;
+        JRoot: DotNet JObject;
 
     local procedure "---JObject Parser functions---"()
     begin
@@ -35,7 +35,7 @@ codeunit 6150703 "POS JSON Management"
     end;
 
     [Scope('Personalization')]
-    procedure InitializeJObjectParser(JObjectIn: DotNet npNetJObject;FrontEndIn: Codeunit "POS Front End Management")
+    procedure InitializeJObjectParser(JObjectIn: DotNet JObject; FrontEndIn: Codeunit "POS Front End Management")
     begin
         JObject := JObjectIn;
         JRoot := JObject;
@@ -45,7 +45,7 @@ codeunit 6150703 "POS JSON Management"
     local procedure MakeSureJObjectParserIsInitialized("Key": Text)
     begin
         if IsNull(JObject) then
-          FrontEnd.ReportBug(StrSubstNo(Text003,Key));
+            FrontEnd.ReportBug(StrSubstNo(Text003, Key));
     end;
 
     [Scope('Personalization')]
@@ -58,9 +58,9 @@ codeunit 6150703 "POS JSON Management"
     end;
 
     [Scope('Personalization')]
-    procedure GetJToken(var JToken: DotNet npNetJToken;Property: Text;WithError: Boolean): Boolean
+    procedure GetJToken(var JToken: DotNet JToken; Property: Text; WithError: Boolean): Boolean
     var
-        JTokenTemp: DotNet npNetJToken;
+        JTokenTemp: DotNet JToken;
     begin
         MakeSureJObjectParserIsInitialized(Property);
 
@@ -70,52 +70,52 @@ codeunit 6150703 "POS JSON Management"
         //  FrontEnd.ReportBug(STRSUBSTNO(Text001,Property,JObject.ToString()));
         JTokenTemp := JObject.Item(Property);
         if IsNull(JTokenTemp) then begin
-          if WithError then
-            FrontEnd.ReportBug(StrSubstNo(Text001,Property,JObject.ToString()));
-          exit(false);
+            if WithError then
+                FrontEnd.ReportBug(StrSubstNo(Text001, Property, JObject.ToString()));
+            exit(false);
         end else
-          JToken := JTokenTemp;
+            JToken := JTokenTemp;
 
         exit(true);
         //+NPR5.39 [255773]
     end;
 
     [Scope('Personalization')]
-    procedure GetJTokenPath(var JToken: DotNet npNetJToken;Property: Text;WithError: Boolean): Boolean
+    procedure GetJTokenPath(var JToken: DotNet JToken; Property: Text; WithError: Boolean): Boolean
     var
-        JTokenTemp: DotNet npNetJToken;
+        JTokenTemp: DotNet JToken;
     begin
         //-NPR5.39 [255773]
         MakeSureJObjectParserIsInitialized(Property);
 
         JTokenTemp := JObject.SelectToken(Property);
         if IsNull(JTokenTemp) then begin
-          if WithError then
-            FrontEnd.ReportBug(StrSubstNo(Text001,Property,JObject.ToString()));
-          exit(false);
+            if WithError then
+                FrontEnd.ReportBug(StrSubstNo(Text001, Property, JObject.ToString()));
+            exit(false);
         end else
-          JToken := JTokenTemp;
+            JToken := JTokenTemp;
 
         exit(true);
         //-NPR5.39 [255773]
     end;
 
-    local procedure ObjectToVariant("Object": DotNet npNetObject;var Variant: Variant)
+    local procedure ObjectToVariant("Object": DotNet npNetObject; var Variant: Variant)
     begin
         Variant := Object;
     end;
 
     [Scope('Personalization')]
-    procedure SetScope(Name: Text;WithError: Boolean): Boolean
+    procedure SetScope(Name: Text; WithError: Boolean): Boolean
     begin
         MakeSureJObjectParserIsInitialized(Name);
-        if Name in ['','{}','/'] then
-          JObject := JRoot
+        if Name in ['', '{}', '/'] then
+            JObject := JRoot
         else
-        //-NPR5.39 [255773]
-        //  GetJToken(JObject,Name,WithError);
-          if not GetJToken(JObject,Name,WithError) then
-            exit(false);
+            //-NPR5.39 [255773]
+            //  GetJToken(JObject,Name,WithError);
+            if not GetJToken(JObject, Name, WithError) then
+                exit(false);
         //+NPR5.39 [255773]
 
         exit(not IsNull(JObject));
@@ -124,23 +124,23 @@ codeunit 6150703 "POS JSON Management"
     [Scope('Personalization')]
     procedure SetScopeRoot(WithError: Boolean): Boolean
     begin
-        exit(SetScope('/',WithError));
+        exit(SetScope('/', WithError));
     end;
 
     [Scope('Personalization')]
     procedure SetScopeParameters(WithError: Boolean): Boolean
     begin
-        exit(SetScopeRoot(WithError) and SetScope('parameters',WithError));
+        exit(SetScopeRoot(WithError) and SetScope('parameters', WithError));
     end;
 
     [Scope('Personalization')]
-    procedure SetScopePath(Name: Text;WithError: Boolean): Boolean
+    procedure SetScopePath(Name: Text; WithError: Boolean): Boolean
     begin
         //-NPR5.39 [255773]
         MakeSureJObjectParserIsInitialized(Name);
-        if CopyStr(Name,1,2) = '$.' then
-          JObject := JRoot;
-        GetJTokenPath(JObject,Name,WithError);
+        if CopyStr(Name, 1, 2) = '$.' then
+            JObject := JRoot;
+        GetJTokenPath(JObject, Name, WithError);
 
         exit(not IsNull(JObject));
         //+NPR5.39 [255773]
@@ -162,9 +162,9 @@ codeunit 6150703 "POS JSON Management"
         //-NPR5.39 [255773]
         ScopeID := CreateGuid;
         if IsNull(Scope) then
-          Scope := Scope.Dictionary;
+            Scope := Scope.Dictionary;
 
-        Scope.Add(ScopeID,JObject);
+        Scope.Add(ScopeID, JObject);
         //+NPR5.39 [255773]
     end;
 
@@ -173,10 +173,10 @@ codeunit 6150703 "POS JSON Management"
     begin
         //-NPR5.39 [255773]
         if IsNull(Scope) then
-          exit(false);
+            exit(false);
 
         if not Scope.ContainsKey(ScopeID) then
-          exit(false);
+            exit(false);
 
         JObject := Scope.Item(ScopeID);
         exit(true);
@@ -184,91 +184,93 @@ codeunit 6150703 "POS JSON Management"
     end;
 
     [Scope('Personalization')]
-    procedure GetObject(Property: Text;var "Object": DotNet npNetObject;WithError: Boolean): Boolean
+    procedure GetObject(Property: Text; var "Object": DotNet npNetObject; WithError: Boolean): Boolean
     var
-        JToken: DotNet npNetJToken;
+        JToken: DotNet JToken;
+        DotNetType: DotNet npNetType;
     begin
         Clear(Object);
-        GetJToken(JToken,Property,WithError);
+        GetJToken(JToken, Property, WithError);
         if (IsNull(JToken)) then
-          exit(false);
+            exit(false);
 
-        Object := JToken.ToObject(GetDotNetType(Object));
+        DotNetType := GetDotNetType(Object);
+        Object := JToken.ToObject(DotNetType);
         exit(true);
     end;
 
     [Scope('Personalization')]
-    procedure GetString(Property: Text;WithError: Boolean): Text
+    procedure GetString(Property: Text; WithError: Boolean): Text
     var
-        JToken: DotNet npNetJToken;
+        JToken: DotNet JToken;
     begin
-        GetJToken(JToken,Property,WithError);
+        GetJToken(JToken, Property, WithError);
 
         if not IsNull(JToken) then
-          exit(JToken.ToString());
+            exit(JToken.ToString());
     end;
 
     [Scope('Personalization')]
-    procedure GetBoolean(Property: Text;WithError: Boolean) Bool: Boolean
+    procedure GetBoolean(Property: Text; WithError: Boolean) Bool: Boolean
     var
         String: Text;
     begin
-        String := GetString(Property,WithError);
+        String := GetString(Property, WithError);
         case true of
-          String = '1':
-            exit(true);
-          String in ['0','']:
-            exit(false);
-          else
-            Evaluate(Bool,String);
+            String = '1':
+                exit(true);
+            String in ['0', '']:
+                exit(false);
+            else
+                Evaluate(Bool, String);
         end;
     end;
 
     [Scope('Personalization')]
-    procedure GetDecimal(Property: Text;WithError: Boolean) Dec: Decimal
+    procedure GetDecimal(Property: Text; WithError: Boolean) Dec: Decimal
     var
         DotNetDecimal: DotNet npNetDecimal;
         Variant: Variant;
     begin
-        if not GetObject(Property,DotNetDecimal,WithError) then
-          exit;
+        if not GetObject(Property, DotNetDecimal, WithError) then
+            exit;
 
-        ObjectToVariant(DotNetDecimal,Variant);
+        ObjectToVariant(DotNetDecimal, Variant);
         Dec := Variant;
     end;
 
     [Scope('Personalization')]
-    procedure GetInteger(Property: Text;WithError: Boolean) Int: Integer
+    procedure GetInteger(Property: Text; WithError: Boolean) Int: Integer
     var
         DotNetInt32: DotNet npNetInt32;
         Variant: Variant;
     begin
-        if not GetObject(Property,DotNetInt32,WithError) then
-          exit;
+        if not GetObject(Property, DotNetInt32, WithError) then
+            exit;
 
-        ObjectToVariant(DotNetInt32,Variant);
+        ObjectToVariant(DotNetInt32, Variant);
         Int := Variant;
     end;
 
     [Scope('Personalization')]
-    procedure GetDate(Property: Text;WithError: Boolean) Date: Date
+    procedure GetDate(Property: Text; WithError: Boolean) Date: Date
     var
         DotNetDateTime: DotNet npNetDateTime;
     begin
-        if not GetObject(Property,DotNetDateTime,WithError) then
-          exit;
+        if not GetObject(Property, DotNetDateTime, WithError) then
+            exit;
 
         Date := DT2Date(DotNetDateTime);
     end;
 
     [Scope('Personalization')]
-    procedure GetBackEndId(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session") BackEndId: Guid
+    procedure GetBackEndId(Context: DotNet JObject; POSSession: Codeunit "POS Session") BackEndId: Guid
     begin
-        Evaluate(BackEndId,GetString('backEndId',true));
+        Evaluate(BackEndId, GetString('backEndId', true));
     end;
 
     [Scope('Personalization')]
-    procedure GetJObject(var JObjectOut: DotNet npNetJObject)
+    procedure GetJObject(var JObjectOut: DotNet JObject)
     begin
         MakeSureJObjectParserIsInitialized('');
         JObjectOut := JObject;
@@ -277,80 +279,80 @@ codeunit 6150703 "POS JSON Management"
     [Scope('Personalization')]
     procedure HasProperty(Property: Text): Boolean
     var
-        JToken: DotNet npNetJToken;
+        JToken: DotNet JToken;
     begin
         //-NPR5.40
-        GetJToken(JToken,Property,false);
+        GetJToken(JToken, Property, false);
         exit(not IsNull(JToken));
         //+NPR5.40
     end;
 
     [Scope('Personalization')]
-    procedure GetStringParameter(ParameterName: Text;WithError: Boolean) Parameter: Text
+    procedure GetStringParameter(ParameterName: Text; WithError: Boolean) Parameter: Text
     begin
         StoreContext();
         if not SetScopeParameters(WithError) then begin
-          RestoreContext();
-          exit;
+            RestoreContext();
+            exit;
         end;
 
-        Parameter := GetString(ParameterName,WithError);
+        Parameter := GetString(ParameterName, WithError);
 
         RestoreContext();
     end;
 
     [Scope('Personalization')]
-    procedure GetBooleanParameter(ParameterName: Text;WithError: Boolean) Parameter: Boolean
+    procedure GetBooleanParameter(ParameterName: Text; WithError: Boolean) Parameter: Boolean
     begin
         StoreContext();
         if not SetScopeParameters(WithError) then begin
-          RestoreContext();
-          exit;
+            RestoreContext();
+            exit;
         end;
 
-        Parameter := GetBoolean(ParameterName,WithError);
+        Parameter := GetBoolean(ParameterName, WithError);
 
         RestoreContext();
     end;
 
     [Scope('Personalization')]
-    procedure GetDecimalParameter(ParameterName: Text;WithError: Boolean) Parameter: Decimal
+    procedure GetDecimalParameter(ParameterName: Text; WithError: Boolean) Parameter: Decimal
     begin
         StoreContext();
         if not SetScopeParameters(WithError) then begin
-          RestoreContext();
-          exit;
+            RestoreContext();
+            exit;
         end;
 
-        Parameter := GetDecimal(ParameterName,WithError);
+        Parameter := GetDecimal(ParameterName, WithError);
 
         RestoreContext();
     end;
 
     [Scope('Personalization')]
-    procedure GetIntegerParameter(ParameterName: Text;WithError: Boolean) Parameter: Integer
+    procedure GetIntegerParameter(ParameterName: Text; WithError: Boolean) Parameter: Integer
     begin
         StoreContext();
         if not SetScopeParameters(WithError) then begin
-          RestoreContext();
-          exit;
+            RestoreContext();
+            exit;
         end;
 
-        Parameter := GetInteger(ParameterName,WithError);
+        Parameter := GetInteger(ParameterName, WithError);
 
         RestoreContext();
     end;
 
     [Scope('Personalization')]
-    procedure GetDateParameter(ParameterName: Text;WithError: Boolean) Parameter: Date
+    procedure GetDateParameter(ParameterName: Text; WithError: Boolean) Parameter: Date
     begin
         StoreContext();
         if not SetScopeParameters(WithError) then begin
-          RestoreContext();
-          exit;
+            RestoreContext();
+            exit;
         end;
 
-        Parameter := GetDate(ParameterName,WithError);
+        Parameter := GetDate(ParameterName, WithError);
 
         RestoreContext();
     end;
@@ -367,17 +369,18 @@ codeunit 6150703 "POS JSON Management"
     end;
 
     [Scope('Personalization')]
-    procedure SetContext("Key": Text;Value: Variant)
+    procedure SetContext("Key": Text; Value: Variant)
     begin
         MakeSureContextExists();
         if Context.ContainsKey(Key) then
-          Context.Remove(Key);
+            Context.Remove(Key);
 
         //-NPR5.37 [289442]
         case true of
-          Value.IsDate : Context.Add(Key, Format(Value,0,9));
-          else
-            Context.Add(Key, Value);
+            Value.IsDate:
+                Context.Add(Key, Format(Value, 0, 9));
+            else
+                Context.Add(Key, Value);
         end;
 
         //Context.Add(Key,Value);
@@ -394,6 +397,6 @@ codeunit 6150703 "POS JSON Management"
     local procedure MakeSureContextExists()
     begin
         if IsNull(Context) then
-          Context := Context.Dictionary();
+            Context := Context.Dictionary();
     end;
 }

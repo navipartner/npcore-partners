@@ -75,7 +75,7 @@ page 6014671 "Lookup Templates"
                 var
                     ManagedDepMgt: Codeunit "Managed Dependency Mgt.";
                     Rec2: Record "Lookup Template";
-                    JArray: DotNet npNetJArray;
+                    JArray: DotNet JArray;
                 begin
                     CurrPage.SetSelectionFilter(Rec2);
                     //-NPR5.32.10 [265454]

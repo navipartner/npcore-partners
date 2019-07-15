@@ -426,8 +426,8 @@ codeunit 6151151 "M2 Account Manager"
         Token: Text[40];
         TemplateEntryNo: Integer;
         ReasonText: Text;
-        Body: DotNet npNetJToken;
-        Result: DotNet npNetJToken;
+        Body: DotNet JToken;
+        Result: DotNet JToken;
     begin
 
         if (Email = '') then
@@ -1401,7 +1401,7 @@ codeunit 6151151 "M2 Account Manager"
     begin
     end;
 
-    procedure MagentoApiPost(Method: Text;var Body: DotNet npNetJToken;var Result: DotNet npNetJToken)
+    procedure MagentoApiPost(Method: Text;var Body: DotNet JToken;var Result: DotNet JToken)
     var
         MagentoSetup: Record "Magento Setup";
         HttpWebRequest: DotNet npNetHttpWebRequest;

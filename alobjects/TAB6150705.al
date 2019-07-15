@@ -194,7 +194,7 @@ table 6150705 "POS Parameter Value"
         end;
     end;
 
-    procedure AddParameterToJObject(Target: DotNet npNetJObject)
+    procedure AddParameterToJObject(Target: DotNet JObject)
     var
         Param: Record "POS Action Parameter";
         JProperty: DotNet npNetJProperty;

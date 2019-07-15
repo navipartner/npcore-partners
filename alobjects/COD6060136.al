@@ -715,7 +715,7 @@ codeunit 6060136 "MM Member Notification"
         MemberNotificationSetup: Record "MM Member Notification Setup";
         JSONResult: Text;
         FailReason: Text;
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
     begin
 
         if (not MemberNotificationSetup.Get(MemberNotificationEntry."Notification Code")) then
@@ -735,9 +735,9 @@ codeunit 6060136 "MM Member Notification"
         exit(true);
     end;
 
-    local procedure GetStringValue(JObject: DotNet npNetJObject; "Key": Text): Text
+    local procedure GetStringValue(JObject: DotNet JObject; "Key": Text): Text
     var
-        JToken: DotNet npNetJToken;
+        JToken: DotNet JToken;
     begin
 
         JToken := JObject.SelectToken(Key, false);

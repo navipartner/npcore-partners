@@ -589,7 +589,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
 
     local procedure SerializeJson("Object": Variant): Text
     var
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
     begin
         exit(JsonConvert.SerializeObject(Object));
     end;

@@ -1878,7 +1878,7 @@ codeunit 6060119 "TM Ticket Request Manager"
     var
         JSONResult: Text;
         FailReason: Text;
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
     begin
 
         if not (NPPassServerInvokeApi('GET', TicketNotificationEntry, ReasonMessage, '', JSONResult)) then
@@ -1895,9 +1895,9 @@ codeunit 6060119 "TM Ticket Request Manager"
         exit(true);
     end;
 
-    local procedure GetStringValue(JObject: DotNet npNetJObject; "Key": Text): Text
+    local procedure GetStringValue(JObject: DotNet JObject; "Key": Text): Text
     var
-        JToken: DotNet npNetJToken;
+        JToken: DotNet JToken;
     begin
 
         JToken := JObject.SelectToken(Key, false);

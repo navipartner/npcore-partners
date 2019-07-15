@@ -59,7 +59,7 @@ codeunit 6150804 "POS Action - Switch Register"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         Confirmed: Boolean;
@@ -89,7 +89,7 @@ codeunit 6150804 "POS Action - Switch Register"
         //+NPR5.40 [306510]
     end;
 
-    local procedure OnActionList(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnActionList(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         SalePOS: Record "Sale POS";
         POSSale: Codeunit "POS Sale";
@@ -127,7 +127,7 @@ codeunit 6150804 "POS Action - Switch Register"
         //+NPR5.40 [306510]
     end;
 
-    local procedure SwitchRegister(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";NewRegisterNo: Code[10])
+    local procedure SwitchRegister(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";NewRegisterNo: Code[10])
     var
         POSUnitIdentity: Codeunit "POS Unit Identity";
         POSUnitIdentityRec: Record "POS Unit Identity";

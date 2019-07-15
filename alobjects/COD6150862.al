@@ -48,7 +48,7 @@ codeunit 6150862 "POS Action - Doc. Pay&Post"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         SalesHeader: Record "Sales Header";
         JSON: Codeunit "POS JSON Management";
@@ -106,7 +106,7 @@ codeunit 6150862 "POS Action - Doc. Pay&Post"
         exit(true);
     end;
 
-    local procedure SelectDocument(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var SalesHeader: Record "Sales Header"): Boolean
+    local procedure SelectDocument(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var SalesHeader: Record "Sales Header"): Boolean
     var
         RetailSalesDocImpMgt: Codeunit "Retail Sales Doc. Imp. Mgt.";
         POSSale: Codeunit "POS Sale";

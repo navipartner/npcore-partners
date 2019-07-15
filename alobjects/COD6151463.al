@@ -50,9 +50,9 @@ codeunit 6151463 "M2 Account Lookup Mgt."
 
     local procedure SetupDisplayGroups(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
     var
-        Result: DotNet npNetJToken;
+        Result: DotNet JToken;
         DisplayGroups: DotNet npNetIList;
-        DisplayGroup: DotNet npNetJToken;
+        DisplayGroup: DotNet JToken;
         i: Integer;
         NetConvHelper: Variant;
     begin
@@ -128,9 +128,9 @@ codeunit 6151463 "M2 Account Lookup Mgt."
 
     local procedure SetupShippingGroups(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
     var
-        Result: DotNet npNetJToken;
+        Result: DotNet JToken;
         ShippingGroups: DotNet npNetIList;
-        ShippingGroup: DotNet npNetJToken;
+        ShippingGroup: DotNet JToken;
         i: Integer;
         NetConvHelper: Variant;
     begin
@@ -196,9 +196,9 @@ codeunit 6151463 "M2 Account Lookup Mgt."
 
     local procedure SetupPaymentGroups(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
     var
-        Result: DotNet npNetJToken;
+        Result: DotNet JToken;
         PaymentGroups: DotNet npNetIList;
-        PaymentGroup: DotNet npNetJToken;
+        PaymentGroup: DotNet JToken;
         i: Integer;
         NetConvHelper: Variant;
     begin
@@ -276,9 +276,9 @@ codeunit 6151463 "M2 Account Lookup Mgt."
 
     local procedure SetupCustomerGroups(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
     var
-        Result: DotNet npNetJToken;
+        Result: DotNet JToken;
         CustomerGroups: DotNet npNetIList;
-        CustomerGroup: DotNet npNetJToken;
+        CustomerGroup: DotNet JToken;
         i: Integer;
         NetConvHelper: Variant;
     begin
@@ -365,11 +365,11 @@ codeunit 6151463 "M2 Account Lookup Mgt."
 
     local procedure SetupMagentoStores(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
     var
-        Result: DotNet npNetJToken;
+        Result: DotNet JToken;
         MagentoWebsites: DotNet npNetIList;
-        MagentoWebsite: DotNet npNetJToken;
+        MagentoWebsite: DotNet JToken;
         MagentoStores: DotNet npNetIList;
-        MagentoStore: DotNet npNetJToken;
+        MagentoStore: DotNet JToken;
         i: Integer;
         NetConvHelper: Variant;
         NetConvHelper2: Variant;
@@ -425,7 +425,7 @@ codeunit 6151463 "M2 Account Lookup Mgt."
     begin
     end;
 
-    procedure MagentoApiGet(Method: Text; var Result: DotNet npNetJToken)
+    procedure MagentoApiGet(Method: Text; var Result: DotNet JToken)
     var
         MagentoSetup: Record "Magento Setup";
         HttpWebRequest: DotNet npNetHttpWebRequest;
@@ -458,9 +458,9 @@ codeunit 6151463 "M2 Account Lookup Mgt."
         Result := Result.Parse(Response);
     end;
 
-    local procedure GetJsonText(JToken: DotNet npNetJToken; JPath: Text; MaxLen: Integer) Value: Text
+    local procedure GetJsonText(JToken: DotNet JToken; JPath: Text; MaxLen: Integer) Value: Text
     var
-        JToken2: DotNet npNetJToken;
+        JToken2: DotNet JToken;
     begin
         JToken2 := JToken.SelectToken(JPath);
         if IsNull(JToken2) then

@@ -214,7 +214,7 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
 
     local procedure FormatJson(Value: Text) JsonValue: Text
     var
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         Formatting: DotNet npNetFormatting;
     begin
         //-NPR5.50 [355080]
@@ -229,10 +229,10 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
     begin
     end;
 
-    procedure InsertPOSAddOnLines(NpIaItemAddOn: Record "NpIa Item AddOn"; AddOnLines: DotNet npNetJToken; POSSession: Codeunit "POS Session"; AppliesToLineNo: Integer)
+    procedure InsertPOSAddOnLines(NpIaItemAddOn: Record "NpIa Item AddOn"; AddOnLines: DotNet JToken; POSSession: Codeunit "POS Session"; AppliesToLineNo: Integer)
     var
         SaleLinePOS: Record "Sale Line POS";
-        AddOnLine: DotNet npNetJToken;
+        AddOnLine: DotNet JToken;
         AddOnLineList: DotNet npNetIList;
         NetConvHelper: Variant;
     begin
@@ -246,7 +246,7 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
         //+NPR5.48 [334922]
     end;
 
-    procedure InsertPOSAddOnLine(NpIaItemAddOn: Record "NpIa Item AddOn"; AddOnLine: DotNet npNetJToken; POSSession: Codeunit "POS Session"; AppliesToLineNo: Integer; var SaleLinePOS: Record "Sale Line POS"): Boolean
+    procedure InsertPOSAddOnLine(NpIaItemAddOn: Record "NpIa Item AddOn"; AddOnLine: DotNet JToken; POSSession: Codeunit "POS Session"; AppliesToLineNo: Integer; var SaleLinePOS: Record "Sale Line POS"): Boolean
     var
         NpIaItemAddOnLine: Record "NpIa Item AddOn Line";
         SaleLinePOSAddOn: Record "NpIa Sale Line POS AddOn";
@@ -331,7 +331,7 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
         //+NPR5.48 [334922]
     end;
 
-    local procedure InsertPOSAddOnLineComment(AddOnLine: DotNet npNetJToken; NpIaItemAddOn: Record "NpIa Item AddOn"; var SaleLinePOS: Record "Sale Line POS")
+    local procedure InsertPOSAddOnLineComment(AddOnLine: DotNet JToken; NpIaItemAddOn: Record "NpIa Item AddOn"; var SaleLinePOS: Record "Sale Line POS")
     var
         POSInfo: Record "POS Info";
         POSInfoTransaction: Record "POS Info Transaction";
@@ -383,10 +383,10 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
         //+NPR5.48 [334922]
     end;
 
-    local procedure ParsePOSAddOnLine(NpIaItemAddOn: Record "NpIa Item AddOn"; AddOnLine: DotNet npNetJToken; var NpIaItemAddOnLine: Record "NpIa Item AddOn Line")
+    local procedure ParsePOSAddOnLine(NpIaItemAddOn: Record "NpIa Item AddOn"; AddOnLine: DotNet JToken; var NpIaItemAddOnLine: Record "NpIa Item AddOn Line")
     var
         NpIaItemAddOnLineOption: Record "NpIa Item AddOn Line Option";
-        AddOnLineVariant: DotNet npNetJToken;
+        AddOnLineVariant: DotNet JToken;
         LineNo: Integer;
         SelectedVariant: Integer;
     begin
@@ -444,9 +444,9 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
     begin
     end;
 
-    local procedure GetValueAsString(JToken: DotNet npNetJToken; JPath: Text): Text
+    local procedure GetValueAsString(JToken: DotNet JToken; JPath: Text): Text
     var
-        JToken2: DotNet npNetJToken;
+        JToken2: DotNet JToken;
     begin
         //-NPR5.48 [334922]
         JToken2 := JToken.SelectToken(JPath);
@@ -457,9 +457,9 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
         //+NPR5.48 [334922]
     end;
 
-    local procedure GetValueAsInt(JToken: DotNet npNetJToken; JPath: Text) IntValue: Integer
+    local procedure GetValueAsInt(JToken: DotNet JToken; JPath: Text) IntValue: Integer
     var
-        JToken2: DotNet npNetJToken;
+        JToken2: DotNet JToken;
     begin
         //-NPR5.48 [334922]
         JToken2 := JToken.SelectToken(JPath);
@@ -473,9 +473,9 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
         //+NPR5.48 [334922]
     end;
 
-    local procedure GetValueAsDec(JToken: DotNet npNetJToken; JPath: Text) DecValue: Decimal
+    local procedure GetValueAsDec(JToken: DotNet JToken; JPath: Text) DecValue: Decimal
     var
-        JToken2: DotNet npNetJToken;
+        JToken2: DotNet JToken;
     begin
         //-NPR5.48 [334922]
         JToken2 := JToken.SelectToken(JPath);

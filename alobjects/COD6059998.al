@@ -389,8 +389,8 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     var
         Latitude: Decimal;
         Longitude: Decimal;
-        JObject: DotNet npNetJObject;
-        JToken: DotNet npNetJToken;
+        JObject: DotNet JObject;
+        JToken: DotNet JToken;
         PrevRec: Text;
     begin
         if not ClientDiagnosticsEnabled() then
@@ -619,7 +619,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     end;
 
     [TryFunction]
-    local procedure TryGetJsonValueAsText(JObject: DotNet npNetJObject; PropertyName: Text; var ReturnValue: Text)
+    local procedure TryGetJsonValueAsText(JObject: DotNet JObject; PropertyName: Text; var ReturnValue: Text)
     begin
         //-NPR5.42
         ReturnValue := JObject.GetValue(PropertyName).ToString;
@@ -627,7 +627,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     end;
 
     [TryFunction]
-    local procedure TryGetJsonValueAsDecimal(JObject: DotNet npNetJObject; PropertyName: Text; var ReturnValue: Decimal)
+    local procedure TryGetJsonValueAsDecimal(JObject: DotNet JObject; PropertyName: Text; var ReturnValue: Decimal)
     var
         DotNetDecimal: DotNet npNetDecimal;
         CultureInfo: DotNet npNetCultureInfo;
@@ -638,7 +638,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     end;
 
     [TryFunction]
-    local procedure TryParseJson(json: Text; var JToken: DotNet npNetJToken)
+    local procedure TryParseJson(json: Text; var JToken: DotNet JToken)
     begin
         //-NPR5.42
         JToken := JToken.Parse(json);
