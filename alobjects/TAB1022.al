@@ -1,4 +1,4 @@
-tableextension 70000002 tableextension70000002 extends "Job Planning Line Invoice" 
+tableextension 50003 tableextension50003 extends "Job Planning Line Invoice" 
 {
     // NPR5.49/TJ  /20181206 CASE 331208 Added fields "POS Unit No." and "POS Store Code"
     fields

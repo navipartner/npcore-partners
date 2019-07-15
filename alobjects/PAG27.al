@@ -1,4 +1,4 @@
-pageextension 70000202 pageextension70000202 extends "Vendor List" 
+pageextension 50203 pageextension50203 extends "Vendor List" 
 {
     // NPR4.11/TSA/20150623 CASE 209946 - Shortcut Attributes
     // NPR9   /LS/20151022  CASE 225607  Merged to 2016

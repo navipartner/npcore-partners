@@ -1,4 +1,4 @@
-tableextension 70000018 tableextension70000018 extends Location 
+tableextension 50019 tableextension50019 extends Location 
 {
     // NPR4.16/TJ/20151103 CASE 222281 Added new field Store Group Code
     fields

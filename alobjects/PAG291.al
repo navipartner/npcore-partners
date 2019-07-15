@@ -1,4 +1,4 @@
-pageextension 70000211 pageextension70000211 extends "Req. Worksheet" 
+pageextension 50212 pageextension50212 extends "Req. Worksheet" 
 {
     // NPR4.04/TS/20150218  CASE 206013 Added FUnction Read From Scanner
     // NPR5.22/TJ20160411 CASE 238601 Moved code from function Read From Scanner to NPR Event Subscriber codeunit

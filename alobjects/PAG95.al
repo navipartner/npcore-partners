@@ -1,4 +1,4 @@
-pageextension 70000671 pageextension70000671 extends "Sales Quote Subform" 
+pageextension 50672 pageextension50672 extends "Sales Quote Subform" 
 {
     //  NPR7.100.000/LS/220114  : Retail Merge
     // NPR4.04/JDH/20150427  CASE 212229  Removed references to old Variant solution "Color Size"

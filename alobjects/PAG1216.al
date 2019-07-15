@@ -1,4 +1,4 @@
-pageextension 70000040 pageextension70000040 extends "Data Exch Col Def Part" 
+pageextension 50041 pageextension50041 extends "Data Exch Col Def Part" 
 {
     // NPR5.27/BR  /20160928  CASE 252817 Added fields 6060073 Split File and 6060074 Split Value
     layout

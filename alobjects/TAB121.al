@@ -1,4 +1,4 @@
-tableextension 70000010 tableextension70000010 extends "Purch. Rcpt. Line" 
+tableextension 50011 tableextension50011 extends "Purch. Rcpt. Line" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields 6014602..6014603

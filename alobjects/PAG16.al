@@ -1,4 +1,4 @@
-pageextension 70000115 pageextension70000115 extends "Chart of Accounts" 
+pageextension 50116 pageextension50116 extends "Chart of Accounts" 
 {
     layout
     {

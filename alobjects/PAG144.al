@@ -1,4 +1,4 @@
-pageextension 70000084 pageextension70000084 extends "Posted Sales Credit Memos" 
+pageextension 50085 pageextension50085 extends "Posted Sales Credit Memos" 
 {
     // NPR5.29/JC/20161205 CASE 259025 Added PDF2NAV Action group
     // NPR5.33/BR /20170323  CASE 266527 Added Doc. Exchange Actions
