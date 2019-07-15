@@ -1,4 +1,4 @@
-pageextension 70000536 pageextension70000536 extends Bins 
+pageextension 50537 pageextension50537 extends Bins 
 {
     // NPR5.29/MMV /20161216 CASE 253966 Added label action through print buffer.
     // NPR5.30/TJ  /20170202 CASE 262533 Removed action Invert selection and code from action PrintLabel

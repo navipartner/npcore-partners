@@ -1,4 +1,4 @@
-pageextension 70000275 pageextension70000275 extends "Contact Card" 
+pageextension 50276 pageextension50276 extends "Contact Card" 
 {
     // MAG1.05/MHA /20150220  CASE 206395 Added Webshop Group
     // MAG1.07/MHA /20150309  CASE 206395 Added Field 6059825 "Webshop Display Group"

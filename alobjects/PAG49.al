@@ -1,4 +1,4 @@
-pageextension 70000264 pageextension70000264 extends "Purchase Quote" 
+pageextension 50265 pageextension50265 extends "Purchase Quote" 
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Action Items: EmailLog and SendAsPDF.

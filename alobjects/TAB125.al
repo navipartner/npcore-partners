@@ -1,4 +1,4 @@
-tableextension 70000015 tableextension70000015 extends "Purch. Cr. Memo Line" 
+tableextension 50016 tableextension50016 extends "Purch. Cr. Memo Line" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields 6014602..6014603

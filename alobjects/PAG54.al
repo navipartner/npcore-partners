@@ -1,4 +1,4 @@
-pageextension 70000328 pageextension70000328 extends "Purchase Order Subform" 
+pageextension 50329 pageextension50329 extends "Purchase Order Subform" 
 {
     // NPR4.13/MMV/20150708 CASE 214173 Changed "No." to variable to handle barcode scanning OnValidate trigger.
     // NPR4.14/???/20150804 CASE 219456 changed number assignment

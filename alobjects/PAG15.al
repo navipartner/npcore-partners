@@ -1,4 +1,4 @@
-pageextension 70000100 pageextension70000100 extends "Location List" 
+pageextension 50101 pageextension50101 extends "Location List" 
 {
     // NPR5.26/JLK /20160905  CASE 251231 Added field Store Group Code
     layout

@@ -1,4 +1,4 @@
-tableextension 70000001 tableextension70000001 extends "Job Planning Line" 
+tableextension 50002 tableextension50002 extends "Job Planning Line" 
 {
     // NPR5.29/TJ/20161013 CASE 248723 New fields 6060150..6060160
     // NPR5.31/TJ/20170315 CASE 269162 Added new option "Ready to be Invoiced" to field "Event Status"
