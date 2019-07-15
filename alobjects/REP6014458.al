@@ -5,7 +5,7 @@ report 6014458 "Audit Roll Details"
     // NPR5.38/BR  /20171207 CASE 299035 Changed Key to include Sale Type field
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Audit Roll Details.rdlc';
+    RDLCLayout = './layouts/Audit Roll Details.rdlc';
 
     Caption = 'Audit Roll Details';
     PreviewMode = PrintLayout;

@@ -10,7 +10,7 @@ report 6014505 "Delivery Note"
     // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
     // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
     DefaultLayout = RDLC;
-    RDLCLayout = './Delivery Note.rdlc';
+    RDLCLayout = './layouts/Delivery Note.rdlc';
 
     Caption = 'Delivery Note';
     PreviewMode = PrintLayout;

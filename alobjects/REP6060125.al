@@ -5,7 +5,7 @@ report 6060125 "TM Visiting Report"
     // #334163/JDH /20181109 CASE 334163 Added Caption to object
     // TM1.39/NPKNAV/20190125  CASE 343941 Transport TM1.39 - 25 January 2019
     DefaultLayout = RDLC;
-    RDLCLayout = './TM Visiting Report.rdlc';
+    RDLCLayout = './layouts/TM Visiting Report.rdlc';
 
     Caption = 'TM Visiting Report';
     PreviewMode = PrintLayout;

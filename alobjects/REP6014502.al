@@ -7,7 +7,7 @@ report 6014502 "Repair Done"
     // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
     // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
     DefaultLayout = RDLC;
-    RDLCLayout = './Repair Done.rdlc';
+    RDLCLayout = './layouts/Repair Done.rdlc';
 
     Caption = 'Repair Done';
     PreviewMode = PrintLayout;

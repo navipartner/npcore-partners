@@ -20,7 +20,7 @@ report 6060151 "Event Team Template"
     // NPR5.41/TJ  /20180409 CASE 310426 Not showing rows for attributes which don't have values for any column
     // NPR5.48/TJ  /20181217 CASE 310452 Fixed deployed under 5.41 was pointing to wrong case no. Using proper case no. now
     DefaultLayout = RDLC;
-    RDLCLayout = './Event Team Template.rdlc';
+    RDLCLayout = './layouts/Event Team Template.rdlc';
 
     Caption = 'Event Team Template';
 

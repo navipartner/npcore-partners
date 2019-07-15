@@ -6,7 +6,7 @@ report 6014542 "Item - Loss"
     // NPR5.48/TJ  /20180102  CASE 340615 Removed Product Group Code from ReqFilterFields property on dataitem Item
     // NPR5.48/BHR /20190111  CASE 341969 Removed unneeded code as per OMA
     DefaultLayout = RDLC;
-    RDLCLayout = './Item - Loss.rdlc';
+    RDLCLayout = './layouts/Item - Loss.rdlc';
 
     Caption = 'Item - Loss';
     UsageCategory = ReportsAndAnalysis;

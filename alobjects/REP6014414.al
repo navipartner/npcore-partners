@@ -3,7 +3,7 @@ report 6014414 "Item Sales Statistics NPR"
     // NPR5.43/JLK /20180503 CASE 310612 Object created
     // NPR5.44/JDH /20180726 CASE 323366 Renamed Report. This name is already used in a local NAV standard database
     DefaultLayout = RDLC;
-    RDLCLayout = './Item Sales Statistics NPR.rdlc';
+    RDLCLayout = './layouts/Item Sales Statistics NPR.rdlc';
 
     Caption = 'Item Sales Statistics';
     PreviewMode = PrintLayout;

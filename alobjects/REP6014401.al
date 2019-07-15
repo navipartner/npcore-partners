@@ -10,7 +10,7 @@ report 6014401 "Counter Report A4"
     // NPR5.41/JLK /20180413  CASE 302573 Changed all Danish Variables/Captions to English
     // NPR5.48/BHR/20181030 CASE 333898 Correct filter on "Payment Type POS"
     DefaultLayout = RDLC;
-    RDLCLayout = './Counter Report A4.rdlc';
+    RDLCLayout = './layouts/Counter Report A4.rdlc';
 
     Caption = 'Counter Report A4';
 

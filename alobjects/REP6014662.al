@@ -2,7 +2,7 @@ report 6014662 "Retail Inventory - Sales Stat."
 {
     // NPR5.29/JDH /20170206 CASE ?????? versioned for ??? dont know who created this object
     DefaultLayout = RDLC;
-    RDLCLayout = './Retail Inventory - Sales Stat..rdlc';
+    RDLCLayout = './layouts/Retail Inventory - Sales Stat..rdlc';
 
     Caption = 'Inventory - Sales Statistics';
 

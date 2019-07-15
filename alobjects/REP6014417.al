@@ -13,7 +13,7 @@ report 6014417 "Inventory per Date"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.40/TJ  /20180319  CASE 307717 Replaced hardcoded dates with DMY2DATE structure
     DefaultLayout = RDLC;
-    RDLCLayout = './Inventory per Date.rdlc';
+    RDLCLayout = './layouts/Inventory per Date.rdlc';
 
     Caption = 'Inventory per Date';
     UsageCategory = ReportsAndAnalysis;

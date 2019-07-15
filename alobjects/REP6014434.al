@@ -6,7 +6,7 @@ report 6014434 "Vendor/Debtor by date"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.40/TJ  /20180319  CASE 307717 Replaced hardcoded dates with DMY2DATE structure
     DefaultLayout = RDLC;
-    RDLCLayout = './VendorDebtor by date.rdlc';
+    RDLCLayout = './layouts/VendorDebtor by date.rdlc';
 
     Caption = 'Vendor/Customer by date';
 

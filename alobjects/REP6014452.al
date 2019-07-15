@@ -2,7 +2,7 @@ report 6014452 "Sales Ticket Statistics/Date"
 {
     // NPR5.50/BHR /20190524 CASE 348464 Alternative to Page 6014468
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales Ticket StatisticsDate.rdlc';
+    RDLCLayout = './layouts/Sales Ticket StatisticsDate.rdlc';
 
     Caption = 'Sales Ticket Statistics/Date';
     EnableHyperlinks = true;

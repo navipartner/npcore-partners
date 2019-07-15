@@ -14,7 +14,7 @@ report 6014409 "Sales Ticket Statistics"
     // NPR5.40/TSA /20180327 CASE 301544 Dereferenced cu 6014452 from OnInitReport and OnPreReport
     // NPR5.42/BHR /20180516 CASE 315147 Set datefilter to curent workdate
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales Ticket Statistics.rdlc';
+    RDLCLayout = './layouts/Sales Ticket Statistics.rdlc';
 
     Caption = 'Sale Statistics';
     UsageCategory = ReportsAndAnalysis;

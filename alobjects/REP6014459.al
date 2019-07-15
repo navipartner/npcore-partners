@@ -3,7 +3,7 @@ report 6014459 "Balancing Report -A4 - POS"
     // NPR5.42/ZESO/20180518  CASE 310459 Object Created
     // NPR5.48/JDH /20181109 CASE 334163 Added Object Caption
     DefaultLayout = RDLC;
-    RDLCLayout = './Balancing Report -A4 - POS.rdlc';
+    RDLCLayout = './layouts/Balancing Report -A4 - POS.rdlc';
 
     Caption = 'Balancing Report -A4 - POS';
 

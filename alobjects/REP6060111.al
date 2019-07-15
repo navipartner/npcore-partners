@@ -4,7 +4,7 @@ report 6060111 "Check Duplicate Customers"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     // NPR5.38/JLK /20180125  CASE 303595 Added ENU object caption
     DefaultLayout = RDLC;
-    RDLCLayout = './Check Duplicate Customers.rdlc';
+    RDLCLayout = './layouts/Check Duplicate Customers.rdlc';
 
     Caption = 'Check Duplicate Customers';
 

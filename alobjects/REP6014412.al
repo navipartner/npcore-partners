@@ -3,7 +3,7 @@ report 6014412 "Sold Items by Sales Person"
     // NPR70.00.00.00/LS Convert Report to Nav 2013
     // NPR5.38/JLK /20180124  CASE 300892 Corrected AL Error on obsolite property CurrReport_PAGENO
     DefaultLayout = RDLC;
-    RDLCLayout = './Sold Items by Sales Person.rdlc';
+    RDLCLayout = './layouts/Sold Items by Sales Person.rdlc';
 
     Caption = 'Sold Items By Sales Person';
 

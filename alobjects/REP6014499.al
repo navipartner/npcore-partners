@@ -10,7 +10,7 @@ report 6014499 "Inventory Campaign Stat."
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.41/JKL /20180423 CASE 299279  removed calc fields on starting date / ending dat, Consumption Inventory changed to show current inventory + location filter active
     DefaultLayout = RDLC;
-    RDLCLayout = './Inventory Campaign Stat..rdlc';
+    RDLCLayout = './layouts/Inventory Campaign Stat..rdlc';
 
     Caption = 'Inventory Campaign Stat.';
     UsageCategory = ReportsAndAnalysis;

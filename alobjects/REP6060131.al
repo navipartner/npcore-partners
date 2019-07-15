@@ -2,7 +2,7 @@ report 6060131 "MM Membership Points Detail"
 {
     // MM1.17/JLK /20170123  CASE 243075 Object created
     DefaultLayout = RDLC;
-    RDLCLayout = './MM Membership Points Detail.rdlc';
+    RDLCLayout = './layouts/MM Membership Points Detail.rdlc';
 
     Caption = 'Membership Points Detail';
     PreviewMode = PrintLayout;

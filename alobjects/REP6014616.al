@@ -2,7 +2,7 @@ report 6014616 "Retail Campaign Items"
 {
     // NPR5.38.01/JKL /20180126 CASE 289017 Object created - Replenishment Module
     DefaultLayout = RDLC;
-    RDLCLayout = './Retail Campaign Items.rdlc';
+    RDLCLayout = './layouts/Retail Campaign Items.rdlc';
 
     Caption = 'Retail Campaign Items';
 

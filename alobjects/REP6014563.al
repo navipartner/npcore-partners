@@ -8,7 +8,7 @@ report 6014563 "Receipt A5 - No Addr."
     // NPR5.23/JDH /20160517 CASE 240916 Removed old VariaX Solution
     // NPR5.38/JLK /20180124  CASE 300892 Corrected AL Error on Blank Text Constants
     DefaultLayout = RDLC;
-    RDLCLayout = './Receipt A5 - No Addr..rdlc';
+    RDLCLayout = './layouts/Receipt A5 - No Addr..rdlc';
 
     Caption = 'Receipt A5';
     PreviewMode = PrintLayout;

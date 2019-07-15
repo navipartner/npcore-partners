@@ -2,7 +2,7 @@ report 6014437 "Item Group Listing M/Y"
 {
     // NPR5.50/ZESO/20190417  CASE 341710 Report Created
     DefaultLayout = RDLC;
-    RDLCLayout = './Item Group Listing MY.rdlc';
+    RDLCLayout = './layouts/Item Group Listing MY.rdlc';
 
     Caption = 'Item Group Listing M/Y';
     PreviewMode = PrintLayout;

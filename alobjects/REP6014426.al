@@ -9,7 +9,7 @@ report 6014426 "Vendor Top/Sale"
     // NPR5.43/ZESO/20180607 CASE 317517 Corrected bug
     // NPR5.49/BHR /20190207 CASE 343119 Corrected report as per OMA
     DefaultLayout = RDLC;
-    RDLCLayout = './Vendor TopSale.rdlc';
+    RDLCLayout = './layouts/Vendor TopSale.rdlc';
 
     Caption = 'Vendor Top/Sale';
     UsageCategory = ReportsAndAnalysis;

@@ -4,7 +4,7 @@ report 6014403 "Cashed Gift Vouchers"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     // NPR5.38/JLK /20180125  CASE 303595 Added ENU object caption
     DefaultLayout = RDLC;
-    RDLCLayout = './Cashed Gift Vouchers.rdlc';
+    RDLCLayout = './layouts/Cashed Gift Vouchers.rdlc';
 
     Caption = 'Cashed Gift Vouchers';
     UsageCategory = ReportsAndAnalysis;

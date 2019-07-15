@@ -6,7 +6,7 @@ report 6151405 "Magento Credit Voucher"
     //                                    Handling of image data moved from Layout to Navision.
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
     DefaultLayout = RDLC;
-    RDLCLayout = './Magento Credit Voucher.rdlc';
+    RDLCLayout = './layouts/Magento Credit Voucher.rdlc';
 
     Caption = 'Magento - Credit Voucher';
     PreviewMode = PrintLayout;

@@ -7,7 +7,7 @@ report 6014422 "Issued/Admitted Ticket Stats"
     // NPR5.41/JLK /20180406  CASE 308825 Added Customer Name in Filter
     // NPR5.49/BHR /20190207  CASE 343119 Correct Report as per OMA
     DefaultLayout = RDLC;
-    RDLCLayout = './IssuedAdmitted Ticket Stats.rdlc';
+    RDLCLayout = './layouts/IssuedAdmitted Ticket Stats.rdlc';
 
     Caption = 'Issued/Admitted Ticket Statistics';
     PreviewMode = PrintLayout;

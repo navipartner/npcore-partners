@@ -5,7 +5,7 @@ report 6060112 "Check Duplicate Contacts"
     // NPR5.38/JLK /20180125  CASE 303595 Added ENU object caption
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Check Duplicate Contacts.rdlc';
+    RDLCLayout = './layouts/Check Duplicate Contacts.rdlc';
 
     Caption = 'Check Duplicate Contacts';
 

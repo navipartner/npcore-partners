@@ -9,7 +9,7 @@ report 6014405 "Salesperson/Item Group Top"
     //                                      renamed the report caption/name/displayname from "Sales code/Item group top" to "Salesperson/Item Group Top"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './SalespersonItem Group Top.rdlc';
+    RDLCLayout = './layouts/SalespersonItem Group Top.rdlc';
 
     Caption = 'Salesperson/Item Group Top';
     UsageCategory = ReportsAndAnalysis;

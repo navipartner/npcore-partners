@@ -19,7 +19,7 @@ report 6060150 "Event Customer Template"
     // NPR5.48/TJ  /20181217 CASE 310452 Fixed deployed under 5.41 was pointing to wrong case no. Using proper case no. now
     // NPR5.48/TJ  /20181217 CASE 310426 Using new field Comments for Customer
     DefaultLayout = RDLC;
-    RDLCLayout = './Event Customer Template.rdlc';
+    RDLCLayout = './layouts/Event Customer Template.rdlc';
 
     Caption = 'Event Customer Template';
 

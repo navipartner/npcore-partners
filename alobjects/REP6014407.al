@@ -12,7 +12,7 @@ report 6014407 "Sales Ticket Statistics A4"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.40/TSA /20180327 CASE 301544 Dereferenced cu 6014452 from OnInitReport and OnPreReport
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales Ticket Statistics A4.rdlc';
+    RDLCLayout = './layouts/Sales Ticket Statistics A4.rdlc';
 
     Caption = 'Sales Ticket Statistics A4';
     UsageCategory = ReportsAndAnalysis;
