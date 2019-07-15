@@ -58,7 +58,7 @@ codeunit 6150838 "POS Action - Block Discount"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         Setup: Codeunit "POS Setup";
         RetailSetup: Record "Retail Setup";
@@ -78,7 +78,7 @@ codeunit 6150838 "POS Action - Block Discount"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         Confirmed: Boolean;
     begin
@@ -105,7 +105,7 @@ codeunit 6150838 "POS Action - Block Discount"
         //+NPR5.43 [296709]
     end;
 
-    local procedure VerifyPassword(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure VerifyPassword(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         RetailSetup: Record "Retail Setup";
@@ -122,7 +122,7 @@ codeunit 6150838 "POS Action - Block Discount"
           Error ('');
     end;
 
-    local procedure ToggleBlockState(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure ToggleBlockState(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         POSSaleLine: Codeunit "POS Sale Line";
         SaleLinePOS: Record "Sale Line POS";

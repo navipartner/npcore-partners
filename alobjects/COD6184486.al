@@ -47,24 +47,24 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
         Response: DotNet npNetMessageResponse;
     begin
 
-        POSDeviceProxyManager.DeserializeObject(Signal,TempBlob);
+        POSDeviceProxyManager.DeserializeObject(Signal, TempBlob);
         case true of
-          Signal.TypeName = Format(GetDotNetType(StartSignal)):
-            begin
-              QueuedRequests := QueuedRequests.Stack();
-              QueuedResponseTypes := QueuedResponseTypes.Stack();
+            Signal.TypeName = Format(GetDotNetType(StartSignal)):
+                begin
+                    QueuedRequests := QueuedRequests.Stack();
+                    QueuedResponseTypes := QueuedResponseTypes.Stack();
 
-              POSDeviceProxyManager.DeserializeSignal(StartSignal,Signal);
-              Start(StartSignal.ProtocolManagerId);
-            end;
-          Signal.TypeName = Format(GetDotNetType(Response)):
-            begin
-              POSDeviceProxyManager.DeserializeSignal(Response,Signal);
-              MessageResponse(Response.Envelope);
-            end;
-          Signal.TypeName = Format(GetDotNetType(QueryCloseSignal)):
-            if QueryClosePage() then
-              POSDeviceProxyManager.AbortByUserRequest(ProtocolManagerId);
+                    POSDeviceProxyManager.DeserializeSignal(StartSignal, Signal);
+                    Start(StartSignal.ProtocolManagerId);
+                end;
+            Signal.TypeName = Format(GetDotNetType(Response)):
+                begin
+                    POSDeviceProxyManager.DeserializeSignal(Response, Signal);
+                    MessageResponse(Response.Envelope);
+                end;
+            Signal.TypeName = Format(GetDotNetType(QueryCloseSignal)):
+                if QueryClosePage() then
+                    POSDeviceProxyManager.AbortByUserRequest(ProtocolManagerId);
         end;
     end;
 
@@ -76,17 +76,17 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
 
         ProtocolManagerId := ProtocolManagerIdIn;
 
-         AwaitResponse(
-           GetDotNetType(VoidResponse),
-           POSDeviceProxyManager.SendMessage(
-             ProtocolManagerId, FileMgtRequest));
+        AwaitResponse(
+          GetDotNetType(VoidResponse),
+          POSDeviceProxyManager.SendMessage(
+            ProtocolManagerId, FileMgtRequest));
     end;
 
     local procedure MessageResponse(Envelope: DotNet npNetResponseEnvelope)
     begin
 
         if Envelope.ResponseTypeName <> Format(ExpectedResponseType) then
-          Error('Unknown response type: %1 (expected %2)',Envelope.ResponseTypeName,Format(ExpectedResponseType));
+            Error('Unknown response type: %1 (expected %2)', Envelope.ResponseTypeName, Format(ExpectedResponseType));
     end;
 
     local procedure QueryClosePage(): Boolean
@@ -102,7 +102,7 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
         POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
     end;
 
-    local procedure AwaitResponse(Type: DotNet npNetType;Id: Guid)
+    local procedure AwaitResponse(Type: DotNet npNetType; Id: Guid)
     begin
 
         ExpectedResponseType := Type;
@@ -121,7 +121,7 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
         FileMgtRequest := FileMgtRequest.FileManagementRequest();
         FileMgtResponse := FileMgtResponse.FileManagementResponse();
 
-        PepperTerminalCaptions.GetLabels (Labels);
+        PepperTerminalCaptions.GetLabels(Labels);
         FileMgtRequest.ProcessLabels := Labels;
 
         InitializedRequest := true;
@@ -131,10 +131,10 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         if (TimeoutMillies = 0) then
-          TimeoutMillies := 15000;
+            TimeoutMillies := 15000;
 
         FileMgtRequest.TimeoutMillies := TimeoutMillies;
     end;
@@ -142,12 +142,12 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
     procedure SetPepperVersionToInstall(VersionCode: Code[10])
     begin
 
-        PepperVersion.Get (VersionCode);
-        PepperVersion.TestField ("Install Directory");
+        PepperVersion.Get(VersionCode);
+        PepperVersion.TestField("Install Directory");
 
-        PepperVersion.CalcFields ("Install Zip File");
+        PepperVersion.CalcFields("Install Zip File");
         if (not PepperVersion."Install Zip File".HasValue()) then
-          Error (NO_PEPPER_BLOB, VersionCode);
+            Error(NO_PEPPER_BLOB, VersionCode);
 
         FileMgtRequest.UploadPepperVersion := VersionCode;
         FileMgtRequest.DllPath := PepperVersion."Install Directory";
@@ -157,115 +157,115 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
     begin
 
         if (not InitializedRequest) then
-          exit ('');
+            exit('');
 
-        exit (FileMgtResponse.NewVersion);
+        exit(FileMgtResponse.NewVersion);
     end;
 
     procedure GetPreviousVersion(): Text
     begin
 
         if (not InitializedRequest) then
-          exit ('');
+            exit('');
 
-        exit (FileMgtResponse.OldVersion);
+        exit(FileMgtResponse.OldVersion);
     end;
 
     procedure GetExceptionText(): Text
     begin
 
         if (not InitializedRequest) then
-          exit ('');
+            exit('');
 
-        exit (FileMgtResponse.ExceptionText);
+        exit(FileMgtResponse.ExceptionText);
     end;
 
     procedure GetResultCode() ResultCode: Integer
     begin
 
         if (not InitializedRequest) then
-          exit (-999999);
+            exit(-999999);
 
-        exit (LastRestultCode);
+        exit(LastRestultCode);
     end;
 
     local procedure "----"()
     begin
     end;
 
-    local procedure GetZipFileToInstall(Data: Text;var PepperB64File: Text)
+    local procedure GetZipFileToInstall(Data: Text; var PepperB64File: Text)
     var
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         InStr: InStream;
         BinaryReader: DotNet npNetBinaryReader;
         MemoryStream: DotNet npNetMemoryStream;
         Convert: DotNet npNetConvert;
     begin
-        FileMgtResponse := FileMgtResponse.Deserialize (Data);
+        FileMgtResponse := FileMgtResponse.Deserialize(Data);
 
-        PepperVersion.CalcFields ("Install Zip File");
-        if (PepperVersion."Install Zip File".HasValue ()) then begin
-          PepperVersion."Install Zip File".CreateInStream (InStr);
-          MemoryStream := InStr;
-          BinaryReader := BinaryReader.BinaryReader(InStr);
-          PepperB64File := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
-          MemoryStream.Dispose;
-          Clear(MemoryStream);
+        PepperVersion.CalcFields("Install Zip File");
+        if (PepperVersion."Install Zip File".HasValue()) then begin
+            PepperVersion."Install Zip File".CreateInStream(InStr);
+            MemoryStream := InStr;
+            BinaryReader := BinaryReader.BinaryReader(InStr);
+            PepperB64File := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
+            MemoryStream.Dispose;
+            Clear(MemoryStream);
         end;
     end;
 
-    local procedure GetFirstChunk(Data: Text;var B64FileChunk: Text)
+    local procedure GetFirstChunk(Data: Text; var B64FileChunk: Text)
     var
         Convert: DotNet npNetConvert;
     begin
         //FileMgtResponse := FileMgtResponse.Deserialize (Data);
 
-        PepperVersion.CalcFields ("Install Zip File");
-        if (PepperVersion."Install Zip File".HasValue ()) then begin
-          PepperVersion."Install Zip File".CreateInStream (ChunkInStr);
-          ChunkMemoryStream := ChunkInStr;
-          ChunkBinaryReader := ChunkBinaryReader.BinaryReader(ChunkInStr);
-          B64FileChunk := Convert.ToBase64String(ChunkBinaryReader.ReadBytes(60000));
-          //B64FileChunk := Convert.ToBase64String(ChunkBinaryReader.ReadBytes(ChunkMemoryStream.Length));
+        PepperVersion.CalcFields("Install Zip File");
+        if (PepperVersion."Install Zip File".HasValue()) then begin
+            PepperVersion."Install Zip File".CreateInStream(ChunkInStr);
+            ChunkMemoryStream := ChunkInStr;
+            ChunkBinaryReader := ChunkBinaryReader.BinaryReader(ChunkInStr);
+            B64FileChunk := Convert.ToBase64String(ChunkBinaryReader.ReadBytes(60000));
+            //B64FileChunk := Convert.ToBase64String(ChunkBinaryReader.ReadBytes(ChunkMemoryStream.Length));
         end else begin
-          B64FileChunk := '';
+            B64FileChunk := '';
         end;
     end;
 
-    local procedure GetNextChunk(Data: Text;var B64FileChunk: Text)
+    local procedure GetNextChunk(Data: Text; var B64FileChunk: Text)
     var
         Convert: DotNet npNetConvert;
     begin
         //FileMgtResponse := FileMgtResponse.Deserialize (Data);
 
-        PepperVersion.CalcFields ("Install Zip File");
-        if (PepperVersion."Install Zip File".HasValue ()) then begin
-          B64FileChunk  := Convert.ToBase64String(ChunkBinaryReader.ReadBytes (60000));
-          //B64FileChunk  := '';
+        PepperVersion.CalcFields("Install Zip File");
+        if (PepperVersion."Install Zip File".HasValue()) then begin
+            B64FileChunk := Convert.ToBase64String(ChunkBinaryReader.ReadBytes(60000));
+            //B64FileChunk  := '';
         end else begin
-          B64FileChunk := '';
+            B64FileChunk := '';
         end;
     end;
 
     [EventSubscriber(ObjectType::Page, 6014657, 'ProtocolEvent', '', false, false)]
-    local procedure ProtocolEvent(ProtocolCodeunitID: Integer;EventName: Text;Data: Text;ResponseRequired: Boolean;var ReturnData: Text)
+    local procedure ProtocolEvent(ProtocolCodeunitID: Integer; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text)
     begin
         if (ProtocolCodeunitID <> CODEUNIT::"Pepper File Mgmt. Functions") then
-          exit;
+            exit;
 
         case EventName of
-          'CloseForm':
-            CloseForm (Data);
-          'GetFirstChunk':
-            GetFirstChunk (Data, ReturnData);
-          'GetNextChunk':
-            GetNextChunk (Data, ReturnData);
+            'CloseForm':
+                CloseForm(Data);
+            'GetFirstChunk':
+                GetFirstChunk(Data, ReturnData);
+            'GetNextChunk':
+                GetNextChunk(Data, ReturnData);
         end;
     end;
 
     local procedure SerializeJson("Object": Variant): Text
     var
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
     begin
         exit(JsonConvert.SerializeObject(Object));
     end;
@@ -273,11 +273,11 @@ codeunit 6184486 "Pepper File Mgmt. Functions"
     local procedure CloseForm(Data: Text)
     begin
 
-        FileMgtResponse := FileMgtResponse.Deserialize (Data);
+        FileMgtResponse := FileMgtResponse.Deserialize(Data);
         LastRestultCode := FileMgtResponse.LastResultCode();
 
         //IF (CONFIRM ('%1 (%2 -> %3)\\%4', TRUE, LastRestultCode, FileMgtResponse.OldVersion, FileMgtResponse.NewVersion, FileMgtResponse.ExceptionText)) THEN ;
-        CloseProtocol ();
+        CloseProtocol();
     end;
 }
 

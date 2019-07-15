@@ -46,7 +46,7 @@ codeunit 6151128 "POS Action - Run Item AddOn"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode) then
           exit;
@@ -205,7 +205,7 @@ codeunit 6151128 "POS Action - Run Item AddOn"
         POSSession: Codeunit "POS Session";
         NpIaItemAddOnMgt: Codeunit "NpIa Item AddOn Mgt.";
         POSJavaScriptInterface: Codeunit "POS JavaScript Interface";
-        AddOnLines: DotNet npNetJToken;
+        AddOnLines: DotNet JToken;
         AppliesToLineNo: Integer;
     begin
         AddOnLines := AddOnLines.Parse(JsonText);

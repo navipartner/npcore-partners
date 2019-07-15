@@ -384,7 +384,7 @@ codeunit 6151002 "POS Proxy - Display"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150725, 'OnBeforeActionWorkflow', '', true, true)]
-    local procedure CU6150725OnBeforeActionWorkflow(PaymentTypePOS: Record "Payment Type POS"; Parameters: DotNet npNetJObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: Codeunit "POS JSON Management"; SubTotal: Decimal; var Handled: Boolean)
+    local procedure CU6150725OnBeforeActionWorkflow(PaymentTypePOS: Record "Payment Type POS"; Parameters: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: Codeunit "POS JSON Management"; SubTotal: Decimal; var Handled: Boolean)
     var
         POSSaleLine: Codeunit "POS Sale Line";
         SaleLinePOS: Record "Sale Line POS";

@@ -26,7 +26,7 @@ codeunit 6059966 "MPOS Payment API"
         EmptyJasonResult: Label '{}';
 
     [EventSubscriber(ObjectType::Codeunit, 6150725, 'OnBeforeAction', '', true, true)]
-    local procedure OnAction(WorkflowStep: Text;PaymentType: Record "Payment Type POS";Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction(WorkflowStep: Text;PaymentType: Record "Payment Type POS";Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         Setup: Codeunit "POS Setup";
         POSPaymentLine: Codeunit "POS Payment Line";
@@ -280,8 +280,8 @@ codeunit 6059966 "MPOS Payment API"
 
     local procedure ParseAdyenJson(var mPOSAdyenTransactions: Record "MPOS Adyen Transactions")
     var
-        JToken: DotNet npNetJToken;
-        JObject: DotNet npNetJObject;
+        JToken: DotNet JToken;
+        JObject: DotNet JObject;
         ResponsData: Text;
         IStream: InStream;
     begin
@@ -347,8 +347,8 @@ codeunit 6059966 "MPOS Payment API"
 
     local procedure ParseNetsJson(var mPOSNetsTransactions: Record "MPOS Nets Transactions")
     var
-        JToken: DotNet npNetJToken;
-        JObject: DotNet npNetJObject;
+        JToken: DotNet JToken;
+        JObject: DotNet JObject;
         ResponsData: Text;
         IStream: InStream;
         BigTextVar: BigText;
@@ -415,7 +415,7 @@ codeunit 6059966 "MPOS Payment API"
         mPOSNetsTransactions.Modify(true);
     end;
 
-    local procedure GetString(var JToken: DotNet npNetJToken;JTokenName: Text): Text
+    local procedure GetString(var JToken: DotNet JToken;JTokenName: Text): Text
     var
         JsonValue: Text;
     begin
@@ -426,7 +426,7 @@ codeunit 6059966 "MPOS Payment API"
         exit(JsonValue);
     end;
 
-    local procedure GetInt(var JToken: DotNet npNetJToken;JTokenName: Text): Integer
+    local procedure GetInt(var JToken: DotNet JToken;JTokenName: Text): Integer
     var
         JsonValue: Text;
         JsonIntValue: Integer;

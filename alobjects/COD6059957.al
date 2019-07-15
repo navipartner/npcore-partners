@@ -170,7 +170,7 @@ codeunit 6059957 "MCS Webcam Proxy"
     local procedure CloseForm(Data: Text)
     var
         State: DotNet npNetState2;
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         PersonEntity: DotNet npNetPersonEntity0;
         FaceEntity: DotNet npNetFaceEntity0;
         MCSPerson: Record "MCS Person";
@@ -269,7 +269,7 @@ codeunit 6059957 "MCS Webcam Proxy"
 
     local procedure SerializeJson("Object": Variant): Text
     var
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
     begin
         exit(JsonConvert.SerializeObject(Object));
     end;

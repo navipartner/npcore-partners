@@ -13,13 +13,13 @@ codeunit 6151572 "AF API WebService"
     begin
         Clear(WebService);
 
-        if not WebService.Get(WebService."Object Type"::Codeunit,'azurefunction_service') then begin
-          WebService.Init;
-          WebService."Object Type" := WebService."Object Type"::Codeunit;
-          WebService."Service Name" := 'azurefunction_service';
-          WebService."Object ID" := 6151572;
-          WebService.Published := true;
-          WebService.Insert;
+        if not WebService.Get(WebService."Object Type"::Codeunit, 'azurefunction_service') then begin
+            WebService.Init;
+            WebService."Object Type" := WebService."Object Type"::Codeunit;
+            WebService."Service Name" := 'azurefunction_service';
+            WebService."Object ID" := 6151572;
+            WebService.Published := true;
+            WebService.Insert;
         end;
     end;
 
@@ -32,12 +32,12 @@ codeunit 6151572 "AF API WebService"
         TaskIsCompleted: Label 'Task was completed by %1';
 
     [Scope('Personalization')]
-    procedure SendDefaultPushNotification(Title: Text[30];Body: Text[250];Location: Code[10]): Integer
+    procedure SendDefaultPushNotification(Title: Text[30]; Body: Text[250]; Location: Code[10]): Integer
     var
         AFNotificationHub: Record "AF Notification Hub";
     begin
         if Title = '' then
-          exit;
+            exit;
 
         GetCustomerTag();
 
@@ -50,12 +50,12 @@ codeunit 6151572 "AF API WebService"
     end;
 
     [Scope('Personalization')]
-    procedure SendAlertPushNotification(Title: Text[30];Body: Text[250];Location: Code[10]): Integer
+    procedure SendAlertPushNotification(Title: Text[30]; Body: Text[250]; Location: Code[10]): Integer
     var
         AFNotificationHub: Record "AF Notification Hub";
     begin
         if Title = '' then
-          exit;
+            exit;
 
         GetCustomerTag();
 
@@ -76,175 +76,175 @@ codeunit 6151572 "AF API WebService"
         AFSetup: Record "AF Setup";
     begin
         if AFSetup.Get then begin
-          if AFSetup."Customer Tag" = '' then begin
-            AFSetup."Enable Azure Functions" := true;
-            if AFSetup."Notification - API Key" = '' then begin
-              AFSetup."Notification - API Key" := '8cKroaodvzgJQwERKeULaGvyjCY9wOvvekNqfZD/DrHORgFLjj0Yhw==';
-              AFSetup."Notification - API Routing" := '/api/NotificationHubFunction';
-              AFSetup."Notification - Base Url" := 'https://navipartnerfa.azurewebsites.net';
-              AFSetup."Notification - Conn. String" := 'Endpoint=sb://npretailnotificationhublive.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=ZyuNLjqgPvXvstZdqWKeVhpbycP091CfMuUf5Z/GECQ=';
-              AFSetup."Notification - Hub Path" := 'npretailnotificationhublive';
+            if AFSetup."Customer Tag" = '' then begin
+                AFSetup."Enable Azure Functions" := true;
+                if AFSetup."Notification - API Key" = '' then begin
+                    AFSetup."Notification - API Key" := '8cKroaodvzgJQwERKeULaGvyjCY9wOvvekNqfZD/DrHORgFLjj0Yhw==';
+                    AFSetup."Notification - API Routing" := '/api/NotificationHubFunction';
+                    AFSetup."Notification - Base Url" := 'https://navipartnerfa.azurewebsites.net';
+                    AFSetup."Notification - Conn. String" := 'Endpoint=sb://npretailnotificationhublive.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=ZyuNLjqgPvXvstZdqWKeVhpbycP091CfMuUf5Z/GECQ=';
+                    AFSetup."Notification - Hub Path" := 'npretailnotificationhublive';
+                end;
+                AFSetup.Modify(true);
             end;
-            AFSetup.Modify(true);
-          end;
-          AFSetup.TestField("Customer Tag");
-          exit(AFSetup."Customer Tag");
+            AFSetup.TestField("Customer Tag");
+            exit(AFSetup."Customer Tag");
         end else begin
-          AFSetup.Init;
-          AFSetup."Enable Azure Functions" := true;
-          AFSetup."Notification - API Key" := '8cKroaodvzgJQwERKeULaGvyjCY9wOvvekNqfZD/DrHORgFLjj0Yhw==';
-          AFSetup."Notification - API Routing" := '/api/NotificationHubFunction';
-          AFSetup."Notification - Base Url" := 'https://navipartnerfa.azurewebsites.net';
-          AFSetup."Notification - Conn. String" := 'Endpoint=sb://npretailnotificationhublive.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=ZyuNLjqgPvXvstZdqWKeVhpbycP091CfMuUf5Z/GECQ=';
-          AFSetup."Notification - Hub Path" := 'npretailnotificationhublive';
-          AFSetup.Insert(true);
-          exit(AFSetup."Customer Tag");
+            AFSetup.Init;
+            AFSetup."Enable Azure Functions" := true;
+            AFSetup."Notification - API Key" := '8cKroaodvzgJQwERKeULaGvyjCY9wOvvekNqfZD/DrHORgFLjj0Yhw==';
+            AFSetup."Notification - API Routing" := '/api/NotificationHubFunction';
+            AFSetup."Notification - Base Url" := 'https://navipartnerfa.azurewebsites.net';
+            AFSetup."Notification - Conn. String" := 'Endpoint=sb://npretailnotificationhublive.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=ZyuNLjqgPvXvstZdqWKeVhpbycP091CfMuUf5Z/GECQ=';
+            AFSetup."Notification - Hub Path" := 'npretailnotificationhublive';
+            AFSetup.Insert(true);
+            exit(AFSetup."Customer Tag");
         end;
     end;
 
     [Scope('Personalization')]
-    procedure SetNotificationFlag(CurrentUser: Code[50];RegisterId: Code[10];"Key": Code[10]): Text
+    procedure SetNotificationFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
     var
         Register: Record Register;
         AFNotificationHub: Record "AF Notification Hub";
         KeyInt: Integer;
     begin
         if Key = '' then
-          exit;
+            exit;
 
         if CurrentUser = '' then
-          exit;
+            exit;
 
         if not Register.Get(RegisterId) then
-          exit;
+            exit;
 
-        if not Evaluate(KeyInt,Key) then
-          exit;
+        if not Evaluate(KeyInt, Key) then
+            exit;
 
         if not AFNotificationHub.Get(KeyInt) then
-          exit;
+            exit;
 
         if (AFNotificationHub.Handled = 0DT) and (AFNotificationHub.Cancelled = 0DT) then begin
-          AFNotificationHub.Handled := CurrentDateTime;
-          AFNotificationHub."Handled By" := CurrentUser;
-          AFNotificationHub."Handled Register" := RegisterId;
-          AFNotificationHub.Modify(true);
-          exit(StrSubstNo(TaskHandled,AFNotificationHub."Handled Register",AFNotificationHub."Handled By"));
-          //EXIT(BuildNotificationStatusResponse(AFNotificationHub,TRUE,STRSUBSTNO(TaskHandled,AFNotificationHub."Handled Register",AFNotificationHub."Handled By")));
+            AFNotificationHub.Handled := CurrentDateTime;
+            AFNotificationHub."Handled By" := CurrentUser;
+            AFNotificationHub."Handled Register" := RegisterId;
+            AFNotificationHub.Modify(true);
+            exit(StrSubstNo(TaskHandled, AFNotificationHub."Handled Register", AFNotificationHub."Handled By"));
+            //EXIT(BuildNotificationStatusResponse(AFNotificationHub,TRUE,STRSUBSTNO(TaskHandled,AFNotificationHub."Handled Register",AFNotificationHub."Handled By")));
         end else begin
-          if AFNotificationHub.Handled <> 0DT then
-            exit(StrSubstNo(TaskIsHandled,AFNotificationHub."Handled Register",AFNotificationHub."Handled By"));
+            if AFNotificationHub.Handled <> 0DT then
+                exit(StrSubstNo(TaskIsHandled, AFNotificationHub."Handled Register", AFNotificationHub."Handled By"));
             //EXIT(BuildNotificationStatusResponse(AFNotificationHub,FALSE,STRSUBSTNO(TaskIsHandled,AFNotificationHub."Handled Register",AFNotificationHub."Handled By")));
-          if AFNotificationHub.Cancelled <> 0DT then
-            exit(StrSubstNo(TaskIsCancelled,AFNotificationHub."Handled By"));
+            if AFNotificationHub.Cancelled <> 0DT then
+                exit(StrSubstNo(TaskIsCancelled, AFNotificationHub."Handled By"));
             //EXIT(BuildNotificationStatusResponse(AFNotificationHub,FALSE,STRSUBSTNO(TaskIsCancelled,AFNotificationHub."Cancelled By")));
         end;
     end;
 
     [Scope('Personalization')]
-    procedure SetNotificationHandledFlag(CurrentUser: Code[50];RegisterId: Code[10];"Key": Code[10]): Text
+    procedure SetNotificationHandledFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
     var
         Register: Record Register;
         AFNotificationHub: Record "AF Notification Hub";
         KeyInt: Integer;
     begin
         if Key = '' then
-          exit;
+            exit;
 
         if CurrentUser = '' then
-          exit;
+            exit;
 
         if not Register.Get(RegisterId) then
-          exit;
+            exit;
 
-        if not Evaluate(KeyInt,Key) then
-          exit;
+        if not Evaluate(KeyInt, Key) then
+            exit;
 
         if not AFNotificationHub.Get(KeyInt) then
-          exit;
+            exit;
 
         if (AFNotificationHub.Handled = 0DT) and (AFNotificationHub.Cancelled = 0DT) then begin
-          AFNotificationHub.Handled := CurrentDateTime;
-          AFNotificationHub."Handled By" := CurrentUser;
-          AFNotificationHub."Handled Register" := RegisterId;
-          AFNotificationHub.Modify(true);
-          exit(BuildNotificationStatusResponse(AFNotificationHub,true,StrSubstNo(TaskHandled,AFNotificationHub."Handled Register",AFNotificationHub."Handled By")));
+            AFNotificationHub.Handled := CurrentDateTime;
+            AFNotificationHub."Handled By" := CurrentUser;
+            AFNotificationHub."Handled Register" := RegisterId;
+            AFNotificationHub.Modify(true);
+            exit(BuildNotificationStatusResponse(AFNotificationHub, true, StrSubstNo(TaskHandled, AFNotificationHub."Handled Register", AFNotificationHub."Handled By")));
         end else begin
-          if AFNotificationHub.Handled <> 0DT then
-            exit(BuildNotificationStatusResponse(AFNotificationHub,false,StrSubstNo(TaskIsHandled,AFNotificationHub."Handled Register",AFNotificationHub."Handled By")));
-          if AFNotificationHub.Cancelled <> 0DT then
-            exit(BuildNotificationStatusResponse(AFNotificationHub,false,StrSubstNo(TaskIsCancelled,AFNotificationHub."Cancelled By")));
+            if AFNotificationHub.Handled <> 0DT then
+                exit(BuildNotificationStatusResponse(AFNotificationHub, false, StrSubstNo(TaskIsHandled, AFNotificationHub."Handled Register", AFNotificationHub."Handled By")));
+            if AFNotificationHub.Cancelled <> 0DT then
+                exit(BuildNotificationStatusResponse(AFNotificationHub, false, StrSubstNo(TaskIsCancelled, AFNotificationHub."Cancelled By")));
         end;
     end;
 
     [Scope('Personalization')]
-    procedure SetNotificationCancelledFlag(CurrentUser: Code[50];RegisterId: Code[10];"Key": Code[10]): Text
+    procedure SetNotificationCancelledFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
     var
         Register: Record Register;
         AFNotificationHub: Record "AF Notification Hub";
         KeyInt: Integer;
     begin
         if Key = '' then
-          exit;
+            exit;
 
         if CurrentUser = '' then
-          exit;
+            exit;
 
         if not Register.Get(RegisterId) then
-          exit;
+            exit;
 
-        if not Evaluate(KeyInt,Key) then
-          exit;
+        if not Evaluate(KeyInt, Key) then
+            exit;
 
         if not AFNotificationHub.Get(KeyInt) then
-          exit;
+            exit;
 
         if (AFNotificationHub.Cancelled = 0DT) then begin
-          AFNotificationHub.Cancelled := CurrentDateTime;
-          AFNotificationHub."Cancelled By" := CurrentUser;
-          AFNotificationHub."Cancelled Register" := RegisterId;
-          AFNotificationHub.Modify(true);
-          exit(BuildNotificationStatusResponse(AFNotificationHub,true,StrSubstNo(TaskCancelled,AFNotificationHub."Cancelled By")));
+            AFNotificationHub.Cancelled := CurrentDateTime;
+            AFNotificationHub."Cancelled By" := CurrentUser;
+            AFNotificationHub."Cancelled Register" := RegisterId;
+            AFNotificationHub.Modify(true);
+            exit(BuildNotificationStatusResponse(AFNotificationHub, true, StrSubstNo(TaskCancelled, AFNotificationHub."Cancelled By")));
         end;
 
-        exit(BuildNotificationStatusResponse(AFNotificationHub,false,StrSubstNo(TaskIsCancelled,AFNotificationHub."Cancelled By")));
+        exit(BuildNotificationStatusResponse(AFNotificationHub, false, StrSubstNo(TaskIsCancelled, AFNotificationHub."Cancelled By")));
     end;
 
     [Scope('Personalization')]
-    procedure SetNotificationCompletedFlag(CurrentUser: Code[50];RegisterId: Code[10];"Key": Code[10]): Text
+    procedure SetNotificationCompletedFlag(CurrentUser: Code[50]; RegisterId: Code[10]; "Key": Code[10]): Text
     var
         Register: Record Register;
         AFNotificationHub: Record "AF Notification Hub";
         KeyInt: Integer;
     begin
         if Key = '' then
-          exit;
+            exit;
 
         if CurrentUser = '' then
-          exit;
+            exit;
 
         if not Register.Get(RegisterId) then
-          exit;
+            exit;
 
-        if not Evaluate(KeyInt,Key) then
-          exit;
+        if not Evaluate(KeyInt, Key) then
+            exit;
 
         if not AFNotificationHub.Get(KeyInt) then
-          exit;
+            exit;
 
         if (AFNotificationHub.Cancelled = 0DT) and (AFNotificationHub.Completed = 0DT) then begin
-          AFNotificationHub.Completed := CurrentDateTime;
-          AFNotificationHub."Completed By" := CurrentUser;
-          AFNotificationHub."Completed Register" := RegisterId;
-          AFNotificationHub.Modify(true);
-          exit(BuildNotificationStatusResponse(AFNotificationHub,true,StrSubstNo(TaskCompleted,AFNotificationHub."Completed By")));
+            AFNotificationHub.Completed := CurrentDateTime;
+            AFNotificationHub."Completed By" := CurrentUser;
+            AFNotificationHub."Completed Register" := RegisterId;
+            AFNotificationHub.Modify(true);
+            exit(BuildNotificationStatusResponse(AFNotificationHub, true, StrSubstNo(TaskCompleted, AFNotificationHub."Completed By")));
         end;
 
         if (AFNotificationHub.Cancelled <> 0DT) then
-          exit(BuildNotificationStatusResponse(AFNotificationHub,false,StrSubstNo(TaskIsCancelled,AFNotificationHub."Cancelled By")));
+            exit(BuildNotificationStatusResponse(AFNotificationHub, false, StrSubstNo(TaskIsCancelled, AFNotificationHub."Cancelled By")));
 
         if (AFNotificationHub.Completed <> 0DT) then
-          exit(BuildNotificationStatusResponse(AFNotificationHub,true,StrSubstNo(TaskIsCompleted,AFNotificationHub."Completed By")));
+            exit(BuildNotificationStatusResponse(AFNotificationHub, true, StrSubstNo(TaskIsCompleted, AFNotificationHub."Completed By")));
     end;
 
     [Scope('Personalization')]
@@ -256,15 +256,15 @@ codeunit 6151572 "AF API WebService"
         JSON: Text;
     begin
         if Key = '' then
-          exit;
+            exit;
 
-        if not Evaluate(KeyInt,Key) then
-          exit;
+        if not Evaluate(KeyInt, Key) then
+            exit;
 
         if not AFNotificationHub.Get(KeyInt) then
-          exit;
+            exit;
 
-        exit(BuildNotificationStatusResponse(AFNotificationHub,true,''));
+        exit(BuildNotificationStatusResponse(AFNotificationHub, true, ''));
     end;
 
     [Scope('Personalization')]
@@ -272,7 +272,7 @@ codeunit 6151572 "AF API WebService"
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         JTokenWriter: DotNet npNetJTokenWriter;
         CodeCommaString: Text;
         Variant1CommaString: Text;
@@ -287,73 +287,73 @@ codeunit 6151572 "AF API WebService"
         ResolvingTable: Integer;
     begin
         if ItemNo = '' then
-          exit;
+            exit;
 
         if not BarcodeLibrary.TranslateBarcodeToItemVariant(ItemNo, ItemNo2, VariantCode, ResolvingTable, true) then
-          exit;
+            exit;
 
         if not Item.Get(ItemNo2) then
-          exit;
+            exit;
 
-        Base64String := AFHelperFunctions.GetMagentoItemImage(Item,PictureFilename);
+        Base64String := AFHelperFunctions.GetMagentoItemImage(Item, PictureFilename);
 
         ItemVariant.SetFilter("Item No.", Item."No.");
         ItemVariant.SetFilter(Blocked, '=%1', false);
         if ItemVariant.IsEmpty then
-          exit;
+            exit;
 
         JTokenWriter := JTokenWriter.JTokenWriter;
         with JTokenWriter do begin
-          WriteStartObject;
-          //NPR5.38 [292987]
-          WritePropertyName('Base64Image');
-          WriteValue(Base64String);
-          WritePropertyName('ImageName');
-          WriteValue(PictureFilename);
-          //NPR5.38 [292987]
-          WritePropertyName('ItemVariants');
-          WriteStartArray;
-          if ItemVariant.FindSet then begin
-            repeat
+            WriteStartObject;
+            //NPR5.38 [292987]
+            WritePropertyName('Base64Image');
+            WriteValue(Base64String);
+            WritePropertyName('ImageName');
+            WriteValue(PictureFilename);
+            //NPR5.38 [292987]
+            WritePropertyName('ItemVariants');
+            WriteStartArray;
+            if ItemVariant.FindSet then begin
+                repeat
 
-              CodeCommaString += ItemVariant.Code + ',';
-              Variant1CommaString += ItemVariant."Variety 1 Value" + ',';
+                    CodeCommaString += ItemVariant.Code + ',';
+                    Variant1CommaString += ItemVariant."Variety 1 Value" + ',';
 
-              WriteStartObject();
-              WritePropertyName('ItemNo');
-              WriteValue(ItemVariant."Item No.");
-              WritePropertyName('Code');
-              WriteValue(ItemVariant.Code);
-              WritePropertyName('Description');
-              WriteValue(ItemVariant.Description);
-              WritePropertyName('Variety1');
-              WriteValue(ItemVariant."Variety 1");
-              WritePropertyName('Variety1Value');
-              WriteValue(ItemVariant."Variety 1 Value");
-              WritePropertyName('Variety2');
-              WriteValue(ItemVariant."Variety 2");
-              WritePropertyName('Variety2Value');
-              WriteValue(ItemVariant."Variety 2 Value");
-              WritePropertyName('Variety3');
-              WriteValue(ItemVariant."Variety 3");
-              WritePropertyName('Variety3Value');
-              WriteValue(ItemVariant."Variety 3 Value");
-              //-NPR5.38 [292987]
-              WritePropertyName('Variety4');
-              WriteValue(ItemVariant."Variety 4");
-              WritePropertyName('Variety4Value');
-              WriteValue(ItemVariant."Variety 4 Value");
-              //+NPR5.38 [292987]
-              WriteEndObject();
+                    WriteStartObject();
+                    WritePropertyName('ItemNo');
+                    WriteValue(ItemVariant."Item No.");
+                    WritePropertyName('Code');
+                    WriteValue(ItemVariant.Code);
+                    WritePropertyName('Description');
+                    WriteValue(ItemVariant.Description);
+                    WritePropertyName('Variety1');
+                    WriteValue(ItemVariant."Variety 1");
+                    WritePropertyName('Variety1Value');
+                    WriteValue(ItemVariant."Variety 1 Value");
+                    WritePropertyName('Variety2');
+                    WriteValue(ItemVariant."Variety 2");
+                    WritePropertyName('Variety2Value');
+                    WriteValue(ItemVariant."Variety 2 Value");
+                    WritePropertyName('Variety3');
+                    WriteValue(ItemVariant."Variety 3");
+                    WritePropertyName('Variety3Value');
+                    WriteValue(ItemVariant."Variety 3 Value");
+                    //-NPR5.38 [292987]
+                    WritePropertyName('Variety4');
+                    WriteValue(ItemVariant."Variety 4");
+                    WritePropertyName('Variety4Value');
+                    WriteValue(ItemVariant."Variety 4 Value");
+                    //+NPR5.38 [292987]
+                    WriteEndObject();
 
-            until ItemVariant.Next = 0;
-          end;
+                until ItemVariant.Next = 0;
+            end;
 
-          WriteEndArray;
+            WriteEndArray;
 
-          WriteEndObject;
+            WriteEndObject;
 
-          JObject := Token;
+            JObject := Token;
         end;
 
         exit(JObject.ToString);
@@ -364,7 +364,7 @@ codeunit 6151572 "AF API WebService"
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         JTokenWriter: DotNet npNetJTokenWriter;
         CodeCommaString: Text;
         Variant1CommaString: Text;
@@ -379,79 +379,79 @@ codeunit 6151572 "AF API WebService"
         PictureFilename: Text;
     begin
         if Barcode = '' then
-          exit;
+            exit;
 
         if not BarcodeLibrary.TranslateBarcodeToItemVariant(Barcode, ItemNo, VariantCode, ResolvingTable, true) then
-          exit;
+            exit;
 
         if not Item.Get(ItemNo) then
-          exit;
+            exit;
 
-        Base64String := AFHelperFunctions.GetMagentoItemImage(Item,PictureFilename);
+        Base64String := AFHelperFunctions.GetMagentoItemImage(Item, PictureFilename);
 
         ItemVariant.SetFilter("Item No.", Item."No.");
         ItemVariant.SetFilter(Blocked, '=%1', false);
         if ItemVariant.IsEmpty then
-          exit;
+            exit;
 
         JTokenWriter := JTokenWriter.JTokenWriter;
         with JTokenWriter do begin
-          WriteStartObject;
-          //-NPR5.38 [292987]
-          WritePropertyName('Base64Image');
-          WriteValue(Base64String);
-          WritePropertyName('ImageName');
-          WriteValue(PictureFilename);
-          //+NPR5.38 [292987]
-          WritePropertyName('ItemVariants');
-          WriteStartArray;
-          if ItemVariant.FindSet then begin
-            repeat
+            WriteStartObject;
+            //-NPR5.38 [292987]
+            WritePropertyName('Base64Image');
+            WriteValue(Base64String);
+            WritePropertyName('ImageName');
+            WriteValue(PictureFilename);
+            //+NPR5.38 [292987]
+            WritePropertyName('ItemVariants');
+            WriteStartArray;
+            if ItemVariant.FindSet then begin
+                repeat
 
-              CodeCommaString += ItemVariant.Code + ',';
-              Variant1CommaString += ItemVariant."Variety 1 Value" + ',';
+                    CodeCommaString += ItemVariant.Code + ',';
+                    Variant1CommaString += ItemVariant."Variety 1 Value" + ',';
 
-              WriteStartObject();
-              WritePropertyName('ItemNo');
-              WriteValue(ItemVariant."Item No.");
-              WritePropertyName('Code');
-              WriteValue(ItemVariant.Code);
-              WritePropertyName('Description');
-              WriteValue(ItemVariant.Description);
-              WritePropertyName('Variety1');
-              WriteValue(ItemVariant."Variety 1");
-              WritePropertyName('Variety1Value');
-              WriteValue(ItemVariant."Variety 1 Value");
-              WritePropertyName('Variety2');
-              WriteValue(ItemVariant."Variety 2");
-              WritePropertyName('Variety2Value');
-              WriteValue(ItemVariant."Variety 2 Value");
-              WritePropertyName('Variety3');
-              WriteValue(ItemVariant."Variety 3");
-              WritePropertyName('Variety3Value');
-              WriteValue(ItemVariant."Variety 3 Value");
-              //-NPR5.38 [292987]
-              WritePropertyName('Variety4');
-              WriteValue(ItemVariant."Variety 4");
-              WritePropertyName('Variety4Value');
-              WriteValue(ItemVariant."Variety 4 Value");
-              //+NPR5.38 [292987]
+                    WriteStartObject();
+                    WritePropertyName('ItemNo');
+                    WriteValue(ItemVariant."Item No.");
+                    WritePropertyName('Code');
+                    WriteValue(ItemVariant.Code);
+                    WritePropertyName('Description');
+                    WriteValue(ItemVariant.Description);
+                    WritePropertyName('Variety1');
+                    WriteValue(ItemVariant."Variety 1");
+                    WritePropertyName('Variety1Value');
+                    WriteValue(ItemVariant."Variety 1 Value");
+                    WritePropertyName('Variety2');
+                    WriteValue(ItemVariant."Variety 2");
+                    WritePropertyName('Variety2Value');
+                    WriteValue(ItemVariant."Variety 2 Value");
+                    WritePropertyName('Variety3');
+                    WriteValue(ItemVariant."Variety 3");
+                    WritePropertyName('Variety3Value');
+                    WriteValue(ItemVariant."Variety 3 Value");
+                    //-NPR5.38 [292987]
+                    WritePropertyName('Variety4');
+                    WriteValue(ItemVariant."Variety 4");
+                    WritePropertyName('Variety4Value');
+                    WriteValue(ItemVariant."Variety 4 Value");
+                    //+NPR5.38 [292987]
 
-              WriteEndObject();
+                    WriteEndObject();
 
-            until ItemVariant.Next = 0;
-          end;
+                until ItemVariant.Next = 0;
+            end;
 
-          WriteEndArray;
+            WriteEndArray;
 
-        //  WritePropertyName('ValueKeys');
-        //  WriteValue(AFHelperFunctions.RemoveLastIndexOf(CodeCommaString,','));
-        //  WritePropertyName('ValueVariant1');
-        //  WriteValue(AFHelperFunctions.RemoveLastIndexOf(Variant1CommaString,','));
+            //  WritePropertyName('ValueKeys');
+            //  WriteValue(AFHelperFunctions.RemoveLastIndexOf(CodeCommaString,','));
+            //  WritePropertyName('ValueVariant1');
+            //  WriteValue(AFHelperFunctions.RemoveLastIndexOf(Variant1CommaString,','));
 
-          WriteEndObject;
+            WriteEndObject;
 
-          JObject := Token;
+            JObject := Token;
         end;
 
         exit(JObject.ToString);
@@ -473,44 +473,46 @@ codeunit 6151572 "AF API WebService"
         ReportBasedOn: Option "None",POSEntry,AuditRoll;
     begin
         if SalesTicketNo = '' then
-          exit;
+            exit;
 
         if not MPOSAppSetup.FindFirst then
-          exit;
+            exit;
 
         //-NPR5.39 [304312]
         ReportBasedOn := ReportBasedOn::None;
         if NPRetailSetup.Get then begin
-          if NPRetailSetup."Advanced Posting Activated" then begin
-            Clear(POSEntry);
-            POSEntry.SetRange("Document No.",SalesTicketNo);
-            if POSEntry.FindSet then begin
-              if MPOSAppSetup."POS Entry Report ID" <> 0 then begin
-                ReportBasedOn := ReportBasedOn::POSEntry;
-              end;
+            if NPRetailSetup."Advanced Posting Activated" then begin
+                Clear(POSEntry);
+                POSEntry.SetRange("Document No.", SalesTicketNo);
+                if POSEntry.FindSet then begin
+                    if MPOSAppSetup."POS Entry Report ID" <> 0 then begin
+                        ReportBasedOn := ReportBasedOn::POSEntry;
+                    end;
+                end;
             end;
-          end;
         end;
         if ReportBasedOn = ReportBasedOn::None then begin
-          Clear(AuditRoll);
-          AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::Sale);
-          AuditRoll.SetRange("Sales Ticket No.",SalesTicketNo);
-          if AuditRoll.FindSet then begin
-            if MPOSAppSetup."Audit Roll Report ID" <> 0 then begin
-              ReportBasedOn := ReportBasedOn::AuditRoll;
+            Clear(AuditRoll);
+            AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
+            AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
+            if AuditRoll.FindSet then begin
+                if MPOSAppSetup."Audit Roll Report ID" <> 0 then begin
+                    ReportBasedOn := ReportBasedOn::AuditRoll;
+                end;
             end;
-          end;
         end;
 
         if ReportBasedOn = ReportBasedOn::None then
-          exit;
+            exit;
 
         TempFile.CreateTempFile;
         Filename := TempFile.Name;
         TempFile.Close();
         case ReportBasedOn of
-          ReportBasedOn::AuditRoll: REPORT.SaveAsPdf(MPOSAppSetup."Audit Roll Report ID",Filename,AuditRoll);
-          ReportBasedOn::POSEntry : REPORT.SaveAsPdf(MPOSAppSetup."POS Entry Report ID",Filename,POSEntry);
+            ReportBasedOn::AuditRoll:
+                REPORT.SaveAsPdf(MPOSAppSetup."Audit Roll Report ID", Filename, AuditRoll);
+            ReportBasedOn::POSEntry:
+                REPORT.SaveAsPdf(MPOSAppSetup."POS Entry Report ID", Filename, POSEntry);
         end;
         // IF MPOSAppSetup."Audit Roll Report ID" = 0 THEN
         //  EXIT;
@@ -534,16 +536,16 @@ codeunit 6151572 "AF API WebService"
         //+NPR5.39 [304312]
 
         if Exists(Filename) then begin
-          TempFile.Open(Filename);
-          TempFile.CreateInStream(Istream);
-          MemoryStream := MemoryStream.MemoryStream();
-          CopyStream(MemoryStream,Istream);
-          Bytes := MemoryStream.GetBuffer();
+            TempFile.Open(Filename);
+            TempFile.CreateInStream(Istream);
+            MemoryStream := MemoryStream.MemoryStream();
+            CopyStream(MemoryStream, Istream);
+            Bytes := MemoryStream.GetBuffer();
 
-          TempFile.Close;
-          FILE.Erase(Filename);
+            TempFile.Close;
+            FILE.Erase(Filename);
 
-          exit(Convert.ToBase64String(Bytes));
+            exit(Convert.ToBase64String(Bytes));
         end;
     end;
 
@@ -560,24 +562,24 @@ codeunit 6151572 "AF API WebService"
         RecID: RecordID;
         RecRef: RecordRef;
         VarRecRef: Variant;
-        JToken: DotNet npNetJToken;
-        JObject: DotNet npNetJObject;
+        JToken: DotNet JToken;
+        JObject: DotNet JObject;
         AFHelperFunctions: Codeunit "AF Helper Functions";
         AllObjWithCaption: Record AllObjWithCaption;
     begin
         //-NPR5.40 [307195]
         if JObjectTxt = '' then
-          exit;
+            exit;
         JToken := JObject.Parse(JObjectTxt);
 
-        if not Evaluate(ReportID,AFHelperFunctions.GetValueAsText(JToken,'reportID')) then
-          exit;
+        if not Evaluate(ReportID, AFHelperFunctions.GetValueAsText(JToken, 'reportID')) then
+            exit;
 
-        if not Evaluate(RecID,AFHelperFunctions.GetValueAsText(JToken,'recordID'),9) then
-          exit;
+        if not Evaluate(RecID, AFHelperFunctions.GetValueAsText(JToken, 'recordID'), 9) then
+            exit;
 
-        if not AllObjWithCaption.Get(OBJECTTYPE::Report,ReportID) then
-          exit;
+        if not AllObjWithCaption.Get(OBJECTTYPE::Report, ReportID) then
+            exit;
 
         RecRef := RecID.GetRecord;
         RecRef.SetRecFilter;
@@ -587,19 +589,19 @@ codeunit 6151572 "AF API WebService"
         Filename := TempFile.Name;
         TempFile.Close();
 
-        REPORT.SaveAsPdf(ReportID,Filename,VarRecRef);
+        REPORT.SaveAsPdf(ReportID, Filename, VarRecRef);
 
         if Exists(Filename) then begin
-          TempFile.Open(Filename);
-          TempFile.CreateInStream(Istream);
-          MemoryStream := MemoryStream.MemoryStream();
-          CopyStream(MemoryStream,Istream);
-          Bytes := MemoryStream.GetBuffer();
+            TempFile.Open(Filename);
+            TempFile.CreateInStream(Istream);
+            MemoryStream := MemoryStream.MemoryStream();
+            CopyStream(MemoryStream, Istream);
+            Bytes := MemoryStream.GetBuffer();
 
-          TempFile.Close;
-          FILE.Erase(Filename);
+            TempFile.Close;
+            FILE.Erase(Filename);
 
-          exit(Convert.ToBase64String(Bytes));
+            exit(Convert.ToBase64String(Bytes));
         end;
         //+NPR5.40 [307195]
     end;
@@ -609,21 +611,21 @@ codeunit 6151572 "AF API WebService"
         AFSetup: Record "AF Setup";
     begin
         if AFSetup.Get() then
-          exit(AFSetup."Enable Azure Functions");
+            exit(AFSetup."Enable Azure Functions");
 
         exit(false);
     end;
 
-    local procedure BuildNotificationStatusResponse(AFNotificationHub: Record "AF Notification Hub";RequestStatus: Boolean;RequestMessages: Text): Text
+    local procedure BuildNotificationStatusResponse(AFNotificationHub: Record "AF Notification Hub"; RequestStatus: Boolean; RequestMessages: Text): Text
     var
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         JTokenWriter: DotNet npNetJTokenWriter;
         AFHelperFunctions: Codeunit "AF Helper Functions";
     begin
         JTokenWriter := JTokenWriter.JTokenWriter;
         with JTokenWriter do begin
-          WriteStartObject;
-          WritePropertyName('Status');
+            WriteStartObject;
+            WritePropertyName('Status');
             WriteStartObject();
             WritePropertyName('Key');
             WriteValue(AFNotificationHub.Id);
@@ -666,8 +668,8 @@ codeunit 6151572 "AF API WebService"
             WritePropertyName('CompletedRegister');
             WriteValue(AFNotificationHub."Completed Register");
             WriteEndObject();
-          WriteEndObject;
-          JObject := Token;
+            WriteEndObject;
+            JObject := Token;
         end;
 
         exit(JObject.ToString);

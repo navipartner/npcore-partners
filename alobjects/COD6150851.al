@@ -48,7 +48,7 @@ codeunit 6150851 "POS Action - Bin Transfer"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode()) then
           exit;
@@ -60,7 +60,7 @@ codeunit 6150851 "POS Action - Bin Transfer"
         end;
     end;
 
-    procedure TransferContentsToBin(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    procedure TransferContentsToBin(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         CheckpointEntryNo: Integer;
@@ -141,7 +141,7 @@ codeunit 6150851 "POS Action - Bin Transfer"
         //+NPR5.43 [310815]
     end;
 
-    local procedure SelectSourceBin(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure SelectSourceBin(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         FromBinNo: Code[10];
@@ -185,7 +185,7 @@ codeunit 6150851 "POS Action - Bin Transfer"
         exit (POSUnittoBinRelation."POS Payment Bin No.");
     end;
 
-    local procedure GetFixedBin(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Code[10]
+    local procedure GetFixedBin(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Code[10]
     var
         JSON: Codeunit "POS JSON Management";
     begin

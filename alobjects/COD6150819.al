@@ -47,7 +47,7 @@ codeunit 6150819 "POS Action - Reverse Cred.Sale"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         Setup: Codeunit "POS Setup";
         RetailSetup: Record "Retail Setup";
@@ -73,7 +73,7 @@ codeunit 6150819 "POS Action - Reverse Cred.Sale"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         ReturnReasonCode: Code[20];
@@ -120,7 +120,7 @@ codeunit 6150819 "POS Action - Reverse Cred.Sale"
         Captions.AddActionCaption (ActionCode, 'reasonprompt', ReasonPrompt);
     end;
 
-    local procedure VerifyReceiptForReversal(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure VerifyReceiptForReversal(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         AuditRoll: Record "Audit Roll";
@@ -138,7 +138,7 @@ codeunit 6150819 "POS Action - Reverse Cred.Sale"
         AuditRoll.FindFirst ();
     end;
 
-    local procedure CopySalesReceiptForReversal(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure CopySalesReceiptForReversal(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         POSSale: Codeunit "POS Sale";
@@ -178,7 +178,7 @@ codeunit 6150819 "POS Action - Reverse Cred.Sale"
         POSSale.RefreshCurrent ();
     end;
 
-    local procedure SelectReturnReason(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Code[20]
+    local procedure SelectReturnReason(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Code[20]
     var
         RetailSetup: Record "Retail Setup";
         ReturnReason: Record "Return Reason";

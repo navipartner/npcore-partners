@@ -73,7 +73,7 @@ page 6150700 "POS (New)"
     begin
     end;
 
-    local procedure PreHandleMethod(Method: Text; Context: DotNet npNetJObject): Boolean
+    local procedure PreHandleMethod(Method: Text; Context: DotNet JObject): Boolean
     begin
         case Method of
             'KeepAlive':

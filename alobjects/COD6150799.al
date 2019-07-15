@@ -60,7 +60,7 @@ codeunit 6150799 "POS Action - Credit Gift Vouch"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     begin
 
         if not Action.IsThisAction(ActionCode) then
@@ -76,7 +76,7 @@ codeunit 6150799 "POS Action - Credit Gift Vouch"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
         POSPaymentLine: Codeunit "POS Payment Line";
@@ -108,7 +108,7 @@ codeunit 6150799 "POS Action - Credit Gift Vouch"
         Handled := true;
     end;
 
-    local procedure OnProcessSale(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
+    local procedure OnProcessSale(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
     var
         JSON: Codeunit "POS JSON Management";
         POSPaymentLine: Codeunit "POS Payment Line";
@@ -171,7 +171,7 @@ codeunit 6150799 "POS Action - Credit Gift Vouch"
     begin
     end;
 
-    local procedure GetAmount(Context: DotNet npNetJObject;FrontEnd: Codeunit "POS Front End Management"): Decimal
+    local procedure GetAmount(Context: DotNet JObject;FrontEnd: Codeunit "POS Front End Management"): Decimal
     var
         JSON: Codeunit "POS JSON Management";
     begin

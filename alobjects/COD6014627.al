@@ -45,7 +45,7 @@ codeunit 6014627 "Managed Dependency Mgt."
 
     procedure ValidateGroundControlConfiguration(DepMgtSetup: Record "Dependency Management Setup")
     var
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
     begin
         GetJSON(
           DepMgtSetup,
@@ -55,9 +55,9 @@ codeunit 6014627 "Managed Dependency Mgt."
           false);
     end;
 
-    procedure ExportManifest("Record": Variant; var JArray: DotNet npNetJArray; PayloadVersion: Integer)
+    procedure ExportManifest("Record": Variant; var JArray: DotNet JArray; PayloadVersion: Integer)
     var
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         [RunOnClient]
         IOFile: DotNet npNetFile;
         RecRef: RecordRef;
@@ -88,11 +88,11 @@ codeunit 6014627 "Managed Dependency Mgt."
         IOFile.WriteAllText(FileName, JObject.ToString());
     end;
 
-    procedure RecordToJArray("Record": Variant; var JArray: DotNet npNetJArray)
+    procedure RecordToJArray("Record": Variant; var JArray: DotNet JArray)
     var
         RecRef: RecordRef;
-        JObject: DotNet npNetJObject;
-        JObjectRec: DotNet npNetJObject;
+        JObject: DotNet JObject;
+        JObjectRec: DotNet JObject;
         i: Integer;
         Value: Variant;
     begin
@@ -143,8 +143,8 @@ codeunit 6014627 "Managed Dependency Mgt."
     local procedure ReadDependenciesFromGroundControl() Result: Boolean
     var
         DepMgtSetup: Record "Dependency Management Setup";
-        JObject: DotNet npNetJObject;
-        Dependency: DotNet npNetJObject;
+        JObject: DotNet JObject;
+        Dependency: DotNet JObject;
         i: Integer;
         Type: Text;
     begin
@@ -196,7 +196,7 @@ codeunit 6014627 "Managed Dependency Mgt."
 
     local procedure DeployDependency(Base64: Text): Boolean
     var
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         i: Integer;
     begin
         if not Base64StringToJObject(Base64, JObject) then
@@ -209,7 +209,7 @@ codeunit 6014627 "Managed Dependency Mgt."
         exit(true);
     end;
 
-    local procedure DeployOneDependency(JObject: DotNet npNetJObject) Result: Boolean
+    local procedure DeployOneDependency(JObject: DotNet JObject) Result: Boolean
     var
         RecRef: RecordRef;
         FieldRef: FieldRef;
@@ -238,7 +238,7 @@ codeunit 6014627 "Managed Dependency Mgt."
     end;
 
     [TryFunction]
-    procedure GetJSON(DepMgtSetup: Record "Dependency Management Setup"; Entity: Text; var JObject: DotNet npNetJObject; FilterText: Text; Specific: Boolean)
+    procedure GetJSON(DepMgtSetup: Record "Dependency Management Setup"; Entity: Text; var JObject: DotNet JObject; FilterText: Text; Specific: Boolean)
     var
         WebClient: DotNet npNetWebClient;
         Credential: DotNet npNetNetworkCredential;
@@ -259,10 +259,10 @@ codeunit 6014627 "Managed Dependency Mgt."
     end;
 
     [TryFunction]
-    procedure UpdateLog(Dependency: DotNet npNetJObject)
+    procedure UpdateLog(Dependency: DotNet JObject)
     var
         DepMgtSetup: Record "Dependency Management Setup";
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         HttpWebRequest: DotNet npNetHttpWebRequest;
         Credential: DotNet npNetNetworkCredential;
         StreamWriter: DotNet npNetStreamWriter;
@@ -401,7 +401,7 @@ codeunit 6014627 "Managed Dependency Mgt."
         end;
     end;
 
-    procedure CreateDependencyJObject(var JObject: DotNet npNetJObject; Type: Text; Name: Text; Version: Text)
+    procedure CreateDependencyJObject(var JObject: DotNet JObject; Type: Text; Name: Text; Version: Text)
     begin
         JObject := JObject.JObject();
         AddToJObject(JObject, 'Type', Type);
@@ -409,18 +409,18 @@ codeunit 6014627 "Managed Dependency Mgt."
         AddToJObject(JObject, 'Version', Version);
     end;
 
-    procedure AddToJObject(JObject: DotNet npNetJObject; "Key": Text; Value: Variant)
+    procedure AddToJObject(JObject: DotNet JObject; "Key": Text; Value: Variant)
     var
-        JToken: DotNet npNetJToken;
+        JToken: DotNet JToken;
     begin
         JObject.Add(Key, JToken.FromObject(Value));
     end;
 
-    procedure AddToJArray(JArray: DotNet npNetJArray; JObject: DotNet npNetJObject)
+    procedure AddToJArray(JArray: DotNet JArray; JObject: DotNet JObject)
     var
         Type: DotNet npNetType;
         Types: DotNet npNetArray;
-        JToken: DotNet npNetJToken;
+        JToken: DotNet JToken;
         MethodInfo: DotNet npNetMethodInfo;
         Params: DotNet npNetArray;
     begin
@@ -435,9 +435,9 @@ codeunit 6014627 "Managed Dependency Mgt."
     end;
 
     [TryFunction]
-    procedure Base64StringToJObject(Base64: Text; var JObject: DotNet npNetJObject)
+    procedure Base64StringToJObject(Base64: Text; var JObject: DotNet JObject)
     var
-        JArray: DotNet npNetJArray;
+        JArray: DotNet JArray;
         MemStream: DotNet npNetMemoryStream;
         StreamReader: DotNet npNetStreamReader;
         Convert: DotNet npNetConvert;
@@ -609,7 +609,7 @@ codeunit 6014627 "Managed Dependency Mgt."
     begin
     end;
 
-    procedure ParseJSON(Text: Text; var JObject: DotNet npNetJObject)
+    procedure ParseJSON(Text: Text; var JObject: DotNet JObject)
     var
         JsonTextReader: DotNet npNetJsonTextReader;
         StringReader: DotNet npNetStringReader;
