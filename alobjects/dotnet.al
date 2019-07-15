@@ -579,6 +579,10 @@ dotnet
         type("System.Security.Cryptography.SHA512Managed"; "npNetSHA512Managed")
         {
         }
+
+        type("System.Single"; "npNetSingle")
+        {
+        }
     }
 
     assembly("Microsoft.Dynamics.Nav.SMTP")
@@ -1162,65 +1166,36 @@ dotnet
         {
         }
     }
-
     assembly("Newtonsoft.Json")
     {
-        Version = '7.0.0.0';
+        Version = '10.0.0.0';
         Culture = 'neutral';
         PublicKeyToken = '30ad4fe6b2a6aeed';
-
-        type("Newtonsoft.Json.JsonConvert"; "npNetJsonConvert")
-        {
-        }
-
-        type("Newtonsoft.Json.Linq.JObject"; "npNetJObject")
-        {
-        }
 
         type("Newtonsoft.Json.JsonSerializer"; "npNetJsonSerializer")
         {
         }
-
-        type("Newtonsoft.Json.Linq.JArray"; "npNetJArray")
-        {
-        }
-
-        type("Newtonsoft.Json.Linq.JToken"; "npNetJToken")
-        {
-        }
-
         type("Newtonsoft.Json.JsonTextReader"; "npNetJsonTextReader")
         {
         }
-
         type("Newtonsoft.Json.DateParseHandling"; "npNetDateParseHandling")
         {
         }
-
-        type("Newtonsoft.Json.JsonTextWriter"; "npNetJsonTextWriter")
-        {
-        }
-
         type("Newtonsoft.Json.Formatting"; "npNetFormatting")
         {
         }
-
         type("Newtonsoft.Json.Linq.JTokenWriter"; "npNetJTokenWriter")
         {
         }
-
         type("Newtonsoft.Json.Linq.JValue"; "npNetJValue")
         {
         }
-
         type("Newtonsoft.Json.Linq.JProperty"; "npNetJProperty")
         {
         }
-
         type("Newtonsoft.Json.Linq.JContainer"; "npNetJContainer")
         {
         }
-
         type("Newtonsoft.Json.JsonConverter"; "npNetJsonConverter")
         {
         }
@@ -1229,7 +1204,6 @@ dotnet
         {
         }
     }
-
     assembly("NaviPartner.Retail.Device.Messaging.FilePrint")
     {
         Version = '5.0.691.0';
