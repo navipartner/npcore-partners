@@ -4,7 +4,7 @@ report 6060126 "TM Admission List"
     // #334163/JDH /20181109 CASE 334163 Added Caption to object
     // TM1.39/NPKNAV/20190125  CASE 343941 Transport TM1.39 - 25 January 2019
     DefaultLayout = RDLC;
-    RDLCLayout = './TM Admission List.rdlc';
+    RDLCLayout = './layouts/TM Admission List.rdlc';
 
     Caption = 'TM Admission List';
 

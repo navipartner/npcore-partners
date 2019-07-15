@@ -1,7 +1,7 @@
 report 6014589 "Rental Contract"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Rental Contract.rdlc';
+    RDLCLayout = './layouts/Rental Contract.rdlc';
     Caption = 'Rental Contract';
 
     dataset

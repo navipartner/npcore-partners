@@ -5,7 +5,7 @@ report 6014427 "Turnover Rate"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.49/BHR /20190207  CASE 343119 Correct Report as per OMA
     DefaultLayout = RDLC;
-    RDLCLayout = './Turnover Rate.rdlc';
+    RDLCLayout = './layouts/Turnover Rate.rdlc';
 
     Caption = 'Turnover Rate';
 

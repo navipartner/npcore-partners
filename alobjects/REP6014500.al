@@ -3,7 +3,7 @@ report 6014500 "Register Used Goods"
     // NPR5.29/JLK /20161124  CASE 259090 Object created
     // NPR5.29/JLK /20170109  CASE 246761 Correcyed RDLC Header Issue
     DefaultLayout = RDLC;
-    RDLCLayout = './Register Used Goods.rdlc';
+    RDLCLayout = './layouts/Register Used Goods.rdlc';
 
     Caption = 'Registrer Used Goods';
     PreviewMode = PrintLayout;

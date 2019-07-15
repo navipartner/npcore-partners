@@ -3,7 +3,7 @@ report 6060124 "TM Ticket Batch Response"
     // TM1.22/NPKNAV/20170612  CASE 278142 Transport T0007 - 12 June 2017
     // TM1.26/TSA /20171103 CASE 285601 Added Ticket URL
     DefaultLayout = RDLC;
-    RDLCLayout = './TM Ticket Batch Response.rdlc';
+    RDLCLayout = './layouts/TM Ticket Batch Response.rdlc';
 
     Caption = 'Ticket Batch Response';
 

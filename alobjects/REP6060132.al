@@ -7,7 +7,7 @@ report 6060132 "MM Membership Status"
     // NPR5.42/JLK /20180523 CASE 316228 Seperated first name and last name, added email newsletter
     // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
     DefaultLayout = RDLC;
-    RDLCLayout = './MM Membership Status.rdlc';
+    RDLCLayout = './layouts/MM Membership Status.rdlc';
 
     Caption = 'Membership Status';
     UsageCategory = ReportsAndAnalysis;

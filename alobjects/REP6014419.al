@@ -4,7 +4,7 @@ report 6014419 "Vendor Sales Stat"
     // NPR5.33/JLK /20170619  CASE 280879 Changed SalesQty and PurchaseQty to Decimal
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     DefaultLayout = RDLC;
-    RDLCLayout = './Vendor Sales Stat.rdlc';
+    RDLCLayout = './layouts/Vendor Sales Stat.rdlc';
 
     Caption = 'Vendor Sales Statistics';
     PreviewMode = PrintLayout;

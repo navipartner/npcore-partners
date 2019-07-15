@@ -4,7 +4,7 @@ report 6014460 "Balancing Report -A4 - NEW"
     // NPR5.48/JDH /20181109 CASE 334163 Added Object Caption
     // NPR5.50/JAKUBV/20190603  CASE 345706 Transport NPR5.50 - 3 June 2019
     DefaultLayout = RDLC;
-    RDLCLayout = './Balancing Report -A4 - NEW.rdlc';
+    RDLCLayout = './layouts/Balancing Report -A4 - NEW.rdlc';
 
     Caption = 'Balancing Report -A4 - POS';
 

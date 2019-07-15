@@ -2,7 +2,7 @@ report 6014475 "Item Replenishment by Store"
 {
     // NPR4.16/TJ/20151115 CASE 222281 Report Created
     DefaultLayout = RDLC;
-    RDLCLayout = './Item Replenishment by Store.rdlc';
+    RDLCLayout = './layouts/Item Replenishment by Store.rdlc';
 
     Caption = 'Inventory - List';
     PreviewMode = PrintLayout;

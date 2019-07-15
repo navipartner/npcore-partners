@@ -7,7 +7,7 @@ report 6014601 "Update Barcodes"
     // NPR5.38/JLK /20180124   CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     // NPR5.39/JLK /20180219   CASE 300892 Renamed Page Label
     DefaultLayout = RDLC;
-    RDLCLayout = './Update Barcodes.rdlc';
+    RDLCLayout = './layouts/Update Barcodes.rdlc';
 
     Caption = 'Update Barcodes';
     PreviewMode = PrintLayout;

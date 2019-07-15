@@ -20,7 +20,7 @@ report 6014411 "Sale Time Report"
     // NPR5.46/ZESO/20181001  CASE 327839 Fix bug where Cash Register No Filter was not being applied to data.
     // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
     DefaultLayout = RDLC;
-    RDLCLayout = './Sale Time Report.rdlc';
+    RDLCLayout = './layouts/Sale Time Report.rdlc';
 
     Caption = 'Sale Time Report';
     UsageCategory = ReportsAndAnalysis;

@@ -6,7 +6,7 @@ report 6014597 "Sales Per Contact"
     //                                     Removed harcoded text with text constant NoDateFilter
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales Per Contact.rdlc';
+    RDLCLayout = './layouts/Sales Per Contact.rdlc';
 
     Caption = 'Sales Per. Contact';
 

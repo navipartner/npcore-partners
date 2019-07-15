@@ -7,7 +7,7 @@ report 6014418 "Item Group Stat M/Y"
     // NPR5.48/ZESO/20181211  CASE 336370 Added Salesperson Code filter.
     // NPR5.48/TS  /20190122  CASE 343216 Added Date Filter
     DefaultLayout = RDLC;
-    RDLCLayout = './Item Group Stat MY.rdlc';
+    RDLCLayout = './layouts/Item Group Stat MY.rdlc';
 
     Caption = 'Item Group Statistic M/Y';
     PreviewMode = PrintLayout;

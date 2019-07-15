@@ -4,7 +4,7 @@ report 6014490 "Advanced Sales Statistics"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Advanced Sales Statistics.rdlc';
+    RDLCLayout = './layouts/Advanced Sales Statistics.rdlc';
 
     Caption = 'Advanced Sales Statistics';
     UseSystemPrinter = true;

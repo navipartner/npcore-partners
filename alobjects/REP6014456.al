@@ -7,7 +7,7 @@ report 6014456 "Sales per week year/Last year"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales per week yearLast year.rdlc';
+    RDLCLayout = './layouts/Sales per week yearLast year.rdlc';
 
     Caption = 'Sales Per Week Year/Last Year';
     PreviewMode = PrintLayout;

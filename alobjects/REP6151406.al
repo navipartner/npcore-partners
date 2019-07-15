@@ -4,7 +4,7 @@ report 6151406 "Magento Gift Voucher"
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
     DefaultLayout = RDLC;
-    RDLCLayout = './Magento Gift Voucher.rdlc';
+    RDLCLayout = './layouts/Magento Gift Voucher.rdlc';
 
     Caption = 'Magento Gift Voucher';
     PreviewMode = PrintLayout;

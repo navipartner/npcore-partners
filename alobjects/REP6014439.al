@@ -11,7 +11,7 @@ report 6014439 "Item Sales Postings"
     // NPR5.49/ZESO/20181219 CASE 348784 Added New Column Sales Unit Price and Report filter
     // NPR5.50/ZESO/20190528 CASE 355450 Calculate Sales(Qty) and Sales Amount(Actual) directly from Value Entry
     DefaultLayout = RDLC;
-    RDLCLayout = './Item Sales Postings.rdlc';
+    RDLCLayout = './layouts/Item Sales Postings.rdlc';
 
     Caption = 'Item Sales Postings';
     UsageCategory = ReportsAndAnalysis;

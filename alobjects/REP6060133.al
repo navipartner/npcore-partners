@@ -3,7 +3,7 @@ report 6060133 "MM Visiting Report"
     // NPR5.31/KENU/20170424 CASE 270626 Object Created
     // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
     DefaultLayout = RDLC;
-    RDLCLayout = './MM Visiting Report.rdlc';
+    RDLCLayout = './layouts/MM Visiting Report.rdlc';
 
     Caption = 'MM Visiting Report';
 

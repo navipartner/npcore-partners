@@ -6,7 +6,7 @@ report 6014410 "Sales Ticket A4"
     // NPR5.29/JLK /20161221 CASE 261538 Removed hardcoded Item in RDLC
     // NPR5.49/BHR /20190207 CASE 343119 Correct report as per OMA
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales Ticket A4.rdlc';
+    RDLCLayout = './layouts/Sales Ticket A4.rdlc';
 
     Caption = 'Sales Ticket A4';
     PreviewMode = PrintLayout;

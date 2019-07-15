@@ -8,7 +8,7 @@ report 6014497 "Campaign Vendor List"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.40/BHR /20180301  CASE 299276 Remove closing Date from calcfields property, Change layout to A4 portrait. add field Photo
     DefaultLayout = RDLC;
-    RDLCLayout = './Campaign Vendor List.rdlc';
+    RDLCLayout = './layouts/Campaign Vendor List.rdlc';
 
     Caption = 'Inventory Campaign Stat.';
     PreviewMode = PrintLayout;

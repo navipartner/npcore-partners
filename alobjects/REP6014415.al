@@ -5,7 +5,7 @@ report 6014415 "Gift Voucher/Credit Voucher"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Gift VoucherCredit Voucher.rdlc';
+    RDLCLayout = './layouts/Gift VoucherCredit Voucher.rdlc';
 
     Caption = 'Gift Voucher/Credit Voucher';
     UsageCategory = ReportsAndAnalysis;

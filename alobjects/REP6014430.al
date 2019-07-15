@@ -15,7 +15,7 @@ report 6014430 "Item Sales Statistics/Provider"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.49/BHR /20190212  CASE 345313 Correct Report As per OMA
     DefaultLayout = RDLC;
-    RDLCLayout = './Item Sales StatisticsProvider.rdlc';
+    RDLCLayout = './layouts/Item Sales StatisticsProvider.rdlc';
 
     Caption = 'Sales Person Trn. by Item Gr.';
     UsageCategory = ReportsAndAnalysis;

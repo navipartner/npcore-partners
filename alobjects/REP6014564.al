@@ -6,7 +6,7 @@ report 6014564 "Credit Voucher A5"
     // NPR5.38/NPKNAV/20180126  CASE 300892 Transport NPR5.38 - 26 January 2018
     // NPR5.48/TS  /20190130  CASE 337257  Added Comment
     DefaultLayout = RDLC;
-    RDLCLayout = './Credit Voucher A5.rdlc';
+    RDLCLayout = './layouts/Credit Voucher A5.rdlc';
 
     Caption = 'Credit Voucher A5';
 

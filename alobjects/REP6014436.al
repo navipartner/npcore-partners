@@ -4,7 +4,7 @@ report 6014436 "Retail Rental Contract"
     // NPR4.14/TR/20150824 CASE 202874 Report footer inserted.
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Retail Rental Contract.rdlc';
+    RDLCLayout = './layouts/Retail Rental Contract.rdlc';
 
     Caption = 'Retail Rental Contract';
     PreviewMode = PrintLayout;

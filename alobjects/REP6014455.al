@@ -2,7 +2,7 @@ report 6014455 "Item Barcode Status Sheet"
 {
     // NPR5.29/MMV /20161213 CASE 252307 Created report
     DefaultLayout = RDLC;
-    RDLCLayout = './Item Barcode Status Sheet.rdlc';
+    RDLCLayout = './layouts/Item Barcode Status Sheet.rdlc';
 
     Caption = 'Item Barcode Status Sheet';
     UsageCategory = ReportsAndAnalysis;

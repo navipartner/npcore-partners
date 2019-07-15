@@ -11,7 +11,7 @@ report 6014612 "Inventory per Variant at date"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.40/TJ  /20180319  CASE 307717 Replaced hardcoded dates with DMY2DATE structure
     DefaultLayout = RDLC;
-    RDLCLayout = './Inventory per Variant at date.rdlc';
+    RDLCLayout = './layouts/Inventory per Variant at date.rdlc';
 
     Caption = 'Inventory Per Date';
     Description = 'Inventory per Variant at date';

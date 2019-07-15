@@ -5,7 +5,7 @@ report 6014443 "Period Discount Statistics"
     // NPR5.38/NPKNAV/20180126  CASE 299276 Transport NPR5.38 - 26 January 2018
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Period Discount Statistics.rdlc';
+    RDLCLayout = './layouts/Period Discount Statistics.rdlc';
 
     Caption = 'Period Discount Statistics';
     PreviewMode = PrintLayout;

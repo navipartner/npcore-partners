@@ -5,7 +5,7 @@ report 6014421 "POS Menu Buttons/Actions"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     // NPR5.40/VB  /20180301  CASE 306347 Updated report to reflect the change from BLOB-based temporary-table parameters to physical-table parameters.
     DefaultLayout = RDLC;
-    RDLCLayout = './POS Menu ButtonsActions.rdlc';
+    RDLCLayout = './layouts/POS Menu ButtonsActions.rdlc';
 
     Caption = 'NPR POS Menu Buttons/Actions';
     PreviewMode = PrintLayout;

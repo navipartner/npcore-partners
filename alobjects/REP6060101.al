@@ -3,7 +3,7 @@ report 6060101 "Data Cleanup Test"
     // NPR5.23/JC/20160331  CASE 237816 Changed report to a process report
     // NPR5.48/JDH /20181109 CASE 334163 Added Caption to object
     DefaultLayout = RDLC;
-    RDLCLayout = './Data Cleanup Test.rdlc';
+    RDLCLayout = './layouts/Data Cleanup Test.rdlc';
 
     Caption = 'Data Cleanup Test';
 
