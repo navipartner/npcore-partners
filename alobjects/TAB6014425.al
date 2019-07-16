@@ -1604,7 +1604,6 @@ table 6014425 "Retail Document Header"
 
     procedure CalcExpireDate()
     var
-        Factor: Integer;
         Months: Integer;
     begin
         Validate(Factor);
