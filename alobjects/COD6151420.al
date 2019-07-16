@@ -5,6 +5,8 @@ codeunit 6151420 "Magento Import Return Order"
     // MAG2.18/MHA /20190314  CASE 348660 Increased VATBusPostingGroup in InsertCustomer() from 10 to 20 as standard field is increased from NAV2018
     // MAG2.19/MHA /20190306  CASE 347974 Added option to Release Order on Import
     // MAG2.20/MHA /20190411  CASE 349994 Added import of <use_customer_salesperson> in InsertSalesHeader()
+    // MAG2.22/MHA /20190621  CASE 359146 Added option to use Blank Code for LCY
+    // MAG2.22/MHA /20190710  CASE 360098 Added Customer Template Mapping in InsertCustomer()
 
     TableNo = "Nc Import Entry";
 
@@ -128,6 +130,7 @@ codeunit 6151420 "Magento Import Return Order"
         VATBusPostingGroup: Code[20];
         NewCust: Boolean;
         PrevCust: Text;
+        CustTemplateCode: Code[10];
     begin
         Initialize;
         ExternalCustomerNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement,'customer_no',false);
@@ -145,12 +148,17 @@ codeunit 6151420 "Magento Import Return Order"
           Customer."No." := '';
           Customer."External Customer No." := ExternalCustomerNo;
           Customer.Insert(true);
-          if MagentoSetup."Customer Template Code" <> '' then begin
-            CustTemplate.Get(MagentoSetup."Customer Template Code");
+          //-MAG2.22 [360098]
+          CustTemplateCode := MagentoMgt.GetCustTemplate(Customer);
+          if CustTemplateCode <> '' then begin
+            CustTemplate.Get(CustTemplateCode);
+          //+MAG2.22 [360098]
             Customer."Gen. Bus. Posting Group" := CustTemplate."Gen. Bus. Posting Group";
             Customer."VAT Bus. Posting Group" := CustTemplate."VAT Bus. Posting Group";
             Customer."Customer Posting Group" := CustTemplate."Customer Posting Group";
-            Customer."Currency Code" := CustTemplate."Currency Code";
+            //-MAG2.22 [359146]
+            Customer."Currency Code" := GetCurrencyCode(CustTemplate."Currency Code");
+            //+MAG2.22 [359146]
             Customer."Customer Price Group" := CustTemplate."Customer Price Group";
             Customer."Invoice Disc. Code" := CustTemplate."Invoice Disc. Code";
             Customer."Customer Disc. Group" := CustTemplate."Customer Disc. Group";
@@ -167,7 +175,9 @@ codeunit 6151420 "Magento Import Return Order"
         end;
         PrevCust := Format(Customer);
 
-        ConfigTemplateCode := MagentoMgt.GetCustomerConfigTemplate(TaxClass);
+        //-MAG2.22 [360098]
+        ConfigTemplateCode := MagentoMgt.GetCustConfigTemplate(TaxClass,Customer);
+        //+MAG2.22 [360098]
         if (ConfigTemplateCode <> '') and ConfigTemplateHeader.Get(ConfigTemplateCode) then begin
           RecRef.GetTable(Customer);
           ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader,RecRef);
@@ -338,7 +348,9 @@ codeunit 6151420 "Magento Import Return Order"
           SalesHeader.Validate("Shortcut Dimension 2 Code",MagentoWebsite."Global Dimension 2 Code");
         end;
         SalesHeader.Validate("Location Code",MagentoWebsite."Location Code");
-        SalesHeader.Validate("Currency Code",NpXmlDomMgt.GetXmlText(XmlElement,'currency_code',MaxStrLen(SalesHeader."Currency Code"),false));
+        //-MAG2.22 [359146]
+        SalesHeader.Validate("Currency Code",GetCurrencyCode(NpXmlDomMgt.GetElementCode(XmlElement,'currency_code',MaxStrLen(SalesHeader."Currency Code"),false)));
+        //+MAG2.22 [359146]
         SalesHeader.Modify(true);
     end;
 
@@ -485,7 +497,7 @@ codeunit 6151420 "Magento Import Return Order"
                 ShipmentMapping.SetRange("External Shipment Method Code",NpXmlDomMgt.GetXmlAttributeText(XmlElement,'external_no',false));
                 ShipmentMapping.FindFirst;
                 SalesLine.Validate(Type,SalesLine.Type::"G/L Account");
-                SalesLine.Validate("No.",ShipmentMapping."Shipment Fee Account No.");
+                SalesLine.Validate("No.",ShipmentMapping."Shipment Fee No.");
                 if Quantity2 <> 0 then
                  SalesLine.Validate(Quantity,Quantity2);
                 Evaluate(UnitPrice2,NpXmlDomMgt.GetXmlText(XmlElement,'unit_price_incl_vat',0,true),9);
@@ -534,7 +546,7 @@ codeunit 6151420 "Magento Import Return Order"
 
         ShipmentMapping.SetRange("External Shipment Method Code",NpXmlDomMgt.GetXmlText(XmlElement,'shipment_method',MaxStrLen(ShipmentMapping."External Shipment Method Code"),true));
         ShipmentMapping.FindFirst;
-        ShipmentMapping.TestField("Shipment Fee Account No.");
+        ShipmentMapping.TestField("Shipment Fee No.");
 
         LineNo += 10000;
         SalesLine.Init;
@@ -544,7 +556,7 @@ codeunit 6151420 "Magento Import Return Order"
         SalesLine.Insert(true);
 
         SalesLine.Validate(Type,SalesLine.Type::"G/L Account");
-        SalesLine.Validate("No.",ShipmentMapping."Shipment Fee Account No.");
+        SalesLine.Validate("No.",ShipmentMapping."Shipment Fee No.");
         SalesLine.Validate("Unit Price",ShipmentFeeRefund);
         SalesLine.Validate(Quantity,1);
         SalesLine.Modify(true);
@@ -579,6 +591,24 @@ codeunit 6151420 "Magento Import Return Order"
         Clear(Customer);
         Customer.SetRange("E-Mail",NpXmlDomMgt.GetXmlText(XmlElement,'email',MaxStrLen(Customer."E-Mail"),false));
         exit(Customer.FindFirst and (Customer."E-Mail" <> ''));
+    end;
+
+    local procedure GetCurrencyCode(CurrencyCode: Code[10]): Code[10]
+    var
+        GLSetup: Record "General Ledger Setup";
+    begin
+        //-MAG2.22 [359146]
+        Initialize();
+
+        if not MagentoSetup."Use Blank Code for LCY" then
+            exit(CurrencyCode);
+
+        GLSetup.Get;
+        if GLSetup."LCY Code" = CurrencyCode then
+          exit('');
+
+        exit(CurrencyCode);
+        //+MAG2.22 [359146]
     end;
 
     local procedure OrderExists(XmlElement: DotNet npNetXmlElement): Boolean

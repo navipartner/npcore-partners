@@ -45,13 +45,13 @@ codeunit 6151551 "NpXml Mgt."
     // NC2.13/THRO/20180628  CASE 310042 Xml2Json made global
     // NC2.19/MHA /20190311  CASE 345261 Getting Inner Exception Message explicitly in SendApi() is redundant
     // NC2.20/MHA /20190411  CASE 342115 SOAPAction should only be added to Header if not explicitly defined in underlying Header table
+    // NC2.22/MHA /20190614  CASE 355993 NpXml Attributes with default Field Type should not have Custom Value Codeunit nor Xml Value Function
+    // NC2.22/MHA /20190627  CASE 342115 Added SetTrustedCertificateValidation() in SendApi() and removed green code before 2.19
 
 
     trigger OnRun()
     begin
-        //-NC1.22
         CreateXml();
-        //+NC1.22
     end;
 
     var
@@ -89,7 +89,6 @@ codeunit 6151551 "NpXml Mgt."
         StartTime: Time;
         RecordSetExists: Boolean;
     begin
-        //-NC1.22
         if not Initialized then
           exit;
 
@@ -124,7 +123,6 @@ codeunit 6151551 "NpXml Mgt."
 
         Clear(XmlDoc);
         CloseDialog;
-        //+NC1.22
     end;
 
     procedure ParseDataToXmlDocNode(var RecRef: RecordRef;RecordSetExists: Boolean;var XmlDocNode: DotNet npNetXmlNode) Success: Boolean
@@ -132,7 +130,6 @@ codeunit 6151551 "NpXml Mgt."
         NpXmlElement: Record "NpXml Element";
         RecRef2: RecordRef;
     begin
-        //-NC1.22
         if IsNull(XmlDocNode) then
           exit(false);
 
@@ -156,7 +153,6 @@ codeunit 6151551 "NpXml Mgt."
         until NpXmlElement.Next = 0;
 
         exit(Success);
-        //+NC1.22
     end;
 
     procedure Initialize(NewNpXmlTemplate: Record "NpXml Template";var NewRecRef: RecordRef;NewPrimaryKeyValue: Text;NewHideDialog: Boolean)
@@ -192,12 +188,9 @@ codeunit 6151551 "NpXml Mgt."
         RecRefFilter.SetRecFilter;
 
         if not NpXmlElement.Hidden then begin
-          //-NC1.22
-          //NpXmlDomMgt.AddElement(XmlNode,NpXmlElement."Element Name",NewXmlNode);
           ElementName := GetXmlElementName(NpXmlElement);
           Namespace := GetXmlNamespace(NpXmlElement);
           NpXmlDomMgt.AddElementNamespace(XmlNode,ElementName,Namespace,NewXmlNode);
-          //+NC1.22
           AddXmlValue(NewXmlNode,NpXmlElement,RecRefFilter);
         end else
           NewXmlNode := XmlNode;
@@ -234,7 +227,6 @@ codeunit 6151551 "NpXml Mgt."
         NpXmlNamespaces: Record "NpXml Namespace";
         XmlElement: DotNet npNetXmlElement;
     begin
-        //-NC1.22
         if not NpXmlTemplate."Namespaces Enabled" then
           exit;
 
@@ -246,7 +238,6 @@ codeunit 6151551 "NpXml Mgt."
         repeat
           NpXmlDomMgt.AddAttribute(XmlElement,'xmlns:' + NpXmlNamespaces.Alias,NpXmlNamespaces.Namespace);
         until NpXmlNamespaces.Next = 0;
-        //+NC1.22
     end;
 
     local procedure AddXmlValue(var XmlNode: DotNet npNetXmlElement;var NPXmlElement: Record "NpXml Element";RecRef: RecordRef)
@@ -270,31 +261,25 @@ codeunit 6151551 "NpXml Mgt."
               NPXmlElement2 := NPXmlElement;
               if NpXmlAttribute."Default Field Type" then
                 NPXmlElement2."Field Type" := NPXmlElement2."Field Type"::" ";
-              //-NC1.13
-              //AttributeValue := GetXmlValue(RecRef,NPXmlElement2,NpXmlAttribute."Attribute Field No.");
+              //-NC2.22 [355993]
+              if NpXmlAttribute."Default Field Type" then begin
+                NPXmlElement2."Custom Codeunit ID" := 0;
+                NPXmlElement2."Xml Value Codeunit ID" := 0;
+              end;
+              //+NC2.22 [355993]
               AttributeValue := NpXmlValueMgt.GetXmlValue(RecRef,NPXmlElement2,NpXmlAttribute."Attribute Field No.");
-              //+NC1.13
             if (NpXmlAttribute."Default Value" <> '') and (AttributeValue = '') then
               AttributeValue := NpXmlAttribute."Default Value";
-            //-NC1.13
-            //AddAttribute(XmlNode,NpXmlAttribute."Attribute Name",AttributeValue);
-            //-NC2.03 [267094]
-            //NpXmlDomMgt.AddAttribute(XmlNode,NpXmlAttribute."Attribute Name",AttributeValue);
             if NpXmlAttribute.Namespace = '' then
               NpXmlDomMgt.AddAttribute(XmlNode,NpXmlAttribute."Attribute Name",AttributeValue)
             else begin
               NpXmlNamespace.Get(NpXmlAttribute."Xml Template Code",NpXmlAttribute.Namespace);
               NpXmlDomMgt.AddAttributeNamespace(XmlNode,NpXmlAttribute.Namespace + ':' + NpXmlAttribute."Attribute Name",NpXmlNamespace.Namespace,AttributeValue);
             end;
-            //-NC2.03 [267094]
-            //+NC1.13
           until NpXmlAttribute.Next = 0;
 
         if NPXmlElement."Field No." <> 0 then
-          //-NC1.13
-          //ElementValue := GetXmlValue(RecRef,NPXmlElement,NPXmlElement."Field No.");
           ElementValue := NpXmlValueMgt.GetXmlValue(RecRef,NPXmlElement,NPXmlElement."Field No.");
-          //+NC1.13
         if (NPXmlElement."Default Value" <> '') and (ElementValue = '') then
           ElementValue := NPXmlElement."Default Value";
         XmlNode.IsEmpty(ElementValue = '');
@@ -315,8 +300,6 @@ codeunit 6151551 "NpXml Mgt."
     [IntegrationEvent(false, false)]
     local procedure OnSetupGenericChildTable(NpXmlElement: Record "NpXml Element";ParentRecRef: RecordRef;var ChildRecRef: RecordRef;var Handled: Boolean)
     begin
-        //-NC2.01 [242550]
-        //+NC2.01 [242550]
     end;
 
     local procedure SetRecRefXmlFilter(NpXmlElement: Record "NpXml Element";RecRef: RecordRef;var RecRef2: RecordRef)
@@ -330,12 +313,6 @@ codeunit 6151551 "NpXml Mgt."
         Handled: Boolean;
     begin
         Clear(RecRef2);
-        //-NC2.01 [242550]
-        // RecRef2.OPEN(NpXmlElement."Table No.");
-        // IF (RecRef.NUMBER = NpXmlElement."Table No.") THEN BEGIN
-        //  RecRef2 := RecRef.DUPLICATE;
-        //  RecRef2.SETRECFILTER;
-        // END;
         if NpXmlElement."Generic Child Codeunit ID" <> 0 then
           OnSetupGenericChildTable(NpXmlElement,RecRef,RecRef2,Handled);
         if (not Handled) or (NpXmlElement."Generic Child Codeunit ID" = 0) then begin
@@ -345,7 +322,6 @@ codeunit 6151551 "NpXml Mgt."
         end;
         if RecRef.Number = NpXmlElement."Table No." then
           RecRef2.SetRecFilter;
-        //+NC2.01 [242550]
 
         NpXmlFilter.SetRange("Xml Template Code",NpXmlElement."Xml Template Code");
         NpXmlFilter.SetRange("Xml Element Line No.",NpXmlElement."Line No.");
@@ -363,7 +339,6 @@ codeunit 6151551 "NpXml Mgt."
               NpXmlFilter."Filter Type"::Constant :
                 begin
                   if NpXmlFilter."Filter Value" <> '' then begin
-                    //-NC1.11
                     case LowerCase(Format(FieldRef2.Type)) of
                       'boolean': FieldRef2.SetFilter('=%1',LowerCase(NpXmlFilter."Filter Value") in ['1','yes','ja','true']);
                       'integer','option':
@@ -379,7 +354,6 @@ codeunit 6151551 "NpXml Mgt."
                       else
                         FieldRef2.SetFilter('=%1',NpXmlFilter."Filter Value");
                     end;
-                    //+NC1.11
                   end;
                 end;
               NpXmlFilter."Filter Type"::Filter:
@@ -420,9 +394,7 @@ codeunit 6151551 "NpXml Mgt."
         if not NPXmlTemplate."File Transfer" then
           exit;
 
-        //-NC1.22
         AddXmlToOutputTempBlob(XmlDoc,'Xml Template: ' + NPXmlTemplate.Code + ' || File Transfer: ' + NPXmlTemplate."File Path");
-        //+NC1.22
 
         Field.Get(DATABASE::"NpXml Template",NPXmlTemplate.FieldNo("File Transfer"));
         AddTextToResponseTempBlob('<!-- [' + NPXmlTemplate.Code + '] ' + Field."Field Caption" + ': ' + NPXmlTemplate."File Path" + ' -->' + GetChar(13) + GetChar(10));
@@ -497,19 +469,14 @@ codeunit 6151551 "NpXml Mgt."
         HttpWebRequest.Timeout := 1000 * 60 * 5;
         XmlDoc2 := XmlDoc2.XmlDocument;
         case NpXmlTemplate."API Type" of
-          //-NC2.05 [265609]
-          //NpXmlTemplate."API Type"::"REST (Xml)" :
           NpXmlTemplate."API Type"::"REST (Xml)",NpXmlTemplate."API Type"::"REST (Json)":
-          //+NC2.05 [265609]
             begin
               XmlDoc2 := XmlDoc;
-              //-NC2.03 [268788]
               AddXmlNamespaces(NpXmlTemplate,XmlDoc2);
               if (NpXmlTemplate."Xml Root Namespace" <> '') and NpXmlNamespaces.Get(NpXmlTemplate.Code,NpXmlTemplate."Xml Root Namespace") then begin
                 XmlElement := XmlDoc2.DocumentElement;
                 NpXmlDomMgt.AddAttribute(XmlElement,'xmlns',NpXmlNamespaces.Namespace);
               end;
-              //+NC2.03 [268788]
               APIUsername := NpXmlTemplate.GetApiUsername();
               if NpXmlTemplate."API Password" = '' then
                 HttpWebRequest.UseDefaultCredentials(true)
@@ -522,15 +489,10 @@ codeunit 6151551 "NpXml Mgt."
                   HttpWebRequest.Credentials(Credential);
                 end;
               end;
-              //-NC2.08 [298759]
-              //HttpWebRequest.Method := FORMAT(NpXmlTemplate."API Method");
               HttpWebRequest.Method := GetApiMethod(NpXmlTemplate);
-              //+NC2.08 [298759]
               HttpWebRequest.ContentType := 'navision/xml';
-              //-NC2.03 [268788]
               if NpXmlTemplate."API Content-Type" <> '' then
                 HttpWebRequest.ContentType := NpXmlTemplate."API Content-Type";
-              //+NC2.03 [268788]
               HttpWebRequest.Accept('application/xml');
             end;
           NpXmlTemplate."API Type"::SOAP :
@@ -568,56 +530,32 @@ codeunit 6151551 "NpXml Mgt."
                   XmlElement.AppendChild(XmlElement2);
                 end;
               end;
-              //-NC2.05 [265609]
-              //HttpWebRequest.Method := FORMAT(NpXmlTemplate."API Method");
               HttpWebRequest.Method := 'POST';
-              //+NC2.05 [265609]
               HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
               //-NC2.20 [342115]
-              //HttpWebRequest.Headers.Add('SOAPAction',NpXmlTemplate."API SOAP Action");
               if not NpXmlApiHeader.Get(NpXmlTemplate.Code,'SOAPAction') then
                 HttpWebRequest.Headers.Add('SOAPAction',NpXmlTemplate."API SOAP Action");
               //+NC2.20 [342115]
             end;
         end;
 
-        //-NC2.01 [260498]
         if NpXmlTemplate."API Content-Type" <> '' then
           HttpWebRequest.ContentType := NpXmlTemplate."API Content-Type";
         if NpXmlTemplate."API Authorization" <> '' then
           HttpWebRequest.Headers.Add('Authorization',NpXmlTemplate."API Authorization");
         if NpXmlTemplate."API Accept" <> '' then
           HttpWebRequest.Accept(NpXmlTemplate."API Accept");
-        //+NC2.01 [260498]
-        //-NC2.06 [265779]
         NpXmlApiHeader.SetRange("Xml Template Code",NpXmlTemplate.Code);
         if NpXmlApiHeader.FindSet then
           repeat
-            //-NC2.08 [286713]
-            //HttpWebRequest.Headers.Add(NpXmlApiHeader.Name,NpXmlApiHeader.Value);
             AddApiHeader(NpXmlApiHeader,HttpWebRequest);
-            //+NC2.08 [286713]
           until NpXmlApiHeader.Next = 0;
-        //-NC2.06 [265779]
-        //-NC2.05 [265609]
-        // AddXmlToOutputTempBlob(XmlDoc2,'Xml Template: ' + NpXmlTemplate.Code + ' || Api ' + FORMAT(NpXmlTemplate."API Type") + ' Transfer: ' + NpXmlTemplate."API Url");
-        //
-        // IF NOT NpXmlDomMgt.SendWebRequest(XmlDoc2,HttpWebRequest,HttpWebResponse,WebException) THEN BEGIN
-        //  Response := '';
-        //  ExceptionMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
-        //  IF ExceptionMessage <> '' THEN
-        //    Response += '<!-- Inner Exception -->' + GetChar(13) + GetChar(10) + ExceptionMessage + GetChar(13) + GetChar(10);
-        //  ExceptionMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-        //  IF ExceptionMessage <> '' THEN
-        //    Response += '<!-- Exception -->' + GetChar(13) + GetChar(10) + ExceptionMessage;
-        //  AddTextToResponseTempBlob(Response);
-        //  ERROR('');
-        // END;
+        //-NC2.22 [342115]
+        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
+        //+NC2.22 [342115]
         IsJson := NpXmlTemplate."API Type" = NpXmlTemplate."API Type"::"REST (Json)";
         if IsJson then begin
-          //-NC2.08 [297308]
           JsonRequest := Xml2Json(XmlDoc2,NpXmlTemplate);
-          //+NC2.08 [297308]
           AddTextToOutputTempBlob(JsonRequest);
           Succes := NpXmlDomMgt.SendWebRequestText(JsonRequest,HttpWebRequest,HttpWebResponse,WebException);
         end else begin
@@ -627,30 +565,18 @@ codeunit 6151551 "NpXml Mgt."
 
         if not Succes then begin
           //-NC2.19 [345261]
-          // Response := '';
-          // ExceptionMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
-          // IF ExceptionMessage <> '' THEN
-          //  Response += '<!-- Inner Exception -->' + GetChar(13) + GetChar(10) + ExceptionMessage + GetChar(13) + GetChar(10);
-          // ExceptionMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-          // IF ExceptionMessage <> '' THEN
-          //  Response += '<!-- Exception -->' + GetChar(13) + GetChar(10) + ExceptionMessage;
           ExceptionMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
           //+NC2.19 [345261]
           AddTextToResponseTempBlob(ExceptionMessage);
           Error('');
         end;
-        //+NC2.05 [265609]
 
         Response := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
 
-        //-NC2.05 [265609]
-        //IF (NpXmlTemplate."API Response Path" <> '') AND (Response <> '') THEN BEGIN
         if (NpXmlTemplate."API Response Path" <> '') and (Response <> '') and (not IsJson) then begin
-        //+NC2.05 [265609]
           XmlDoc2 := XmlDoc2.XmlDocument;
           XmlDoc2.LoadXml(Response);
           //-NC2.19 [345261]
-          //NpXmlDomMgt.RemoveNameSpaces(XmlDoc2);
           if NpXmlDomMgt.RemoveNameSpaces(XmlDoc2) then;
           //+NC2.19 [345261]
           XmlElement := XmlDoc2.SelectSingleNode(NpXmlTemplate."API Response Path");
@@ -658,18 +584,13 @@ codeunit 6151551 "NpXml Mgt."
             Response := XmlElement.InnerXml;
         end;
 
-        //-NC2.05 [265609]
-        //Response := NpXmlDomMgt.PrettyPrintXml(Response);
         if not IsJson then
           Response := NpXmlDomMgt.PrettyPrintXml(Response);
-        //+NC2.05 [265609]
 
         AddTextToResponseTempBlob(Response);
 
         if (NpXmlTemplate."API Response Success Path" <> '') and (Response <> '') then begin
           XmlDoc2 := XmlDoc2.XmlDocument;
-          //-NC2.05 [265609]
-          //XmlDoc2.LoadXml(Response);
           if IsJson then begin
             XmlElement := JsonConvert.DeserializeXmlNode(Response);
             XmlDoc2.LoadXml('<?xml version="1.0" encoding="utf-8"?>' + GetChar(13) + GetChar(10) +
@@ -677,10 +598,8 @@ codeunit 6151551 "NpXml Mgt."
             XmlDoc2.DocumentElement.AppendChild(XmlElement);
           end else
             XmlDoc2.LoadXml(Response);
-          //+NC2.05 [265609]
 
           //-NC2.19 [345261]
-          //NpXmlDomMgt.RemoveNameSpaces(XmlDoc2);
           if NpXmlDomMgt.RemoveNameSpaces(XmlDoc2) then;
           //+NC2.19 [345261]
           if NpXmlDomMgt.GetXmlText(XmlDoc2,NpXmlTemplate."API Response Success Path",MaxStrLen(NpXmlTemplate."API Response Success Value"),false) <> NpXmlTemplate."API Response Success Value" then
@@ -695,7 +614,6 @@ codeunit 6151551 "NpXml Mgt."
         DateTimeBuffer: DateTime;
         BoolBuffer: Boolean;
     begin
-        //-NC2.08 [286713]
         case LowerCase(NpXmlApiHeader.Name) of
           'timeout':
             begin
@@ -761,7 +679,6 @@ codeunit 6151551 "NpXml Mgt."
           else
             HttpWebRequest.Headers.Add(NpXmlApiHeader.Name,NpXmlApiHeader.Value);
         end;
-        //+NC2.08 [286713]
     end;
 
     local procedure SendFtp(NPXmlTemplate: Record "NpXml Template";var XmlDoc: DotNet npNetXmlDocument;Filename: Text)
@@ -776,9 +693,7 @@ codeunit 6151551 "NpXml Mgt."
         if NPXmlTemplate."FTP Server" = '' then
           exit;
 
-        //-NC1.22
         AddXmlToOutputTempBlob(XmlDoc,'Xml Template: ' + NPXmlTemplate.Code + ' || Ftp Transfer: ' + NPXmlTemplate."FTP Server");
-        //+NC1.22
 
         Field.Get(DATABASE::"NpXml Template",NPXmlTemplate.FieldNo("FTP Transfer"));
         AddTextToResponseTempBlob('<!-- [' + NPXmlTemplate.Code + '] ' + Field."Field Caption" + ': ' + NPXmlTemplate."FTP Server" + ' -->' + GetChar(13) + GetChar(10));
@@ -797,13 +712,9 @@ codeunit 6151551 "NpXml Mgt."
     var
         Handled: Boolean;
     begin
-        //-NC1.22
-        //-NC2.03 [267094]
         OnBeforeTransferXml(NpXmlTemplate,RecRef,XmlDoc,Filename,Handled);
-        //+NC2.03 [267094]
         if not (NpXmlTemplate."File Transfer" or NpXmlTemplate."FTP Transfer" or NpXmlTemplate."API Transfer") then
           exit(false);
-        //+NC1.22
 
         if NpXmlTemplate."File Transfer" then
           ExportToFile(NpXmlTemplate,XmlDoc,Filename);
@@ -814,21 +725,16 @@ codeunit 6151551 "NpXml Mgt."
         if NpXmlTemplate."API Transfer" then
           SendApi(NpXmlTemplate,XmlDoc);
 
-        //-NC1.22
         exit(true);
-        //+NC1.22
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTransferXml(var NpXmlTemplate: Record "NpXml Template";var RootRecRef: RecordRef;var XmlDoc: DotNet npNetXmlDocument;var Filename: Text[250];var Handled: Boolean)
     begin
-        //-NC2.03 [267094]
-        //+NC2.03 [267094]
     end;
 
     local procedure GetApiMethod(NpXmlTemplate: Record "NpXml Template"): Text
     begin
-        //-NC2.08 [298759]
         case NpXmlTemplate."API Method" of
           NpXmlTemplate."API Method"::DELETE:
             exit('DELETE');
@@ -841,7 +747,6 @@ codeunit 6151551 "NpXml Mgt."
           NpXmlTemplate."API Method"::PUT:
             exit('PUT');
         end;
-        //+NC2.08 [298759]
     end;
 
     procedure "--- Output"()
@@ -864,13 +769,11 @@ codeunit 6151551 "NpXml Mgt."
 
     local procedure AddTextToOutputTempBlob(var OutputText: Text)
     begin
-        //-NC2.05 [265609]
         InitializeOutput();
         if OutputTempBlob.Blob.HasValue then
           OutputOutStr.WriteText(GetChar(13) + GetChar(10) + GetChar(13) + GetChar(10));
 
         OutputOutStr.Write(OutputText);
-        //+NC2.05 [265609]
     end;
 
     local procedure AddXmlToOutputTempBlob(var XmlDoc: DotNet npNetXmlDocument;Comment: Text)
@@ -882,11 +785,8 @@ codeunit 6151551 "NpXml Mgt."
         if OutputTempBlob.Blob.HasValue then begin
           OutputOutStr.WriteText(GetChar(13) + GetChar(10) + GetChar(13) + GetChar(10));
         end;
-        //-NC1.22
-        //OutputOutStr.WRITETEXT('--- Xml Template: ' + NpXmlTemplate.Code + ' ---' + GetChar(13) + GetChar(10));
         if Comment <> '' then
           OutputOutStr.WriteText('<!--' + Comment + '-->' + GetChar(13) + GetChar(10));
-        //+NC1.22
         MemoryStream := MemoryStream.MemoryStream;
         XmlDoc.Save(MemoryStream);
         InStr := MemoryStream;
@@ -926,18 +826,12 @@ codeunit 6151551 "NpXml Mgt."
           OutputTempBlob.Init;
           OutputTempBlob.Insert;
           OutputTempBlob.CalcFields(Blob);
-          //-NC2.11 [303181]
-          //OutputTempBlob.Blob.CREATEOUTSTREAM(OutputOutStr);
           OutputTempBlob.Blob.CreateOutStream(OutputOutStr,TEXTENCODING::UTF8);
-          //+NC2.11 [303181]
 
           ResponseTempBlob.Init;
           ResponseTempBlob.Insert;
           ResponseTempBlob.CalcFields(Blob);
-          //-NC2.11 [303181]
-          //ResponseTempBlob.Blob.CREATEOUTSTREAM(ResponseOutStr);
           ResponseTempBlob.Blob.CreateOutStream(ResponseOutStr,TEXTENCODING::UTF8);
-          //-NC2.11 [303181]
         end;
 
         OutputInitialized := true;
@@ -1001,10 +895,8 @@ codeunit 6151551 "NpXml Mgt."
     var
         ActiveSession: Record "Active Session";
     begin
-        //-NC1.22
         ActiveSession.Get(ServiceInstanceId,SessionId);
         exit(LowerCase(ReplaceSpecialChar(ActiveSession."Database Name" + '_' + CompanyName)));
-        //+NC1.22
     end;
 
     procedure GetBasicAuthInfo(Username: Text;Password: Text): Text
@@ -1012,9 +904,7 @@ codeunit 6151551 "NpXml Mgt."
         Convert: DotNet npNetConvert;
         Encoding: DotNet npNetEncoding;
     begin
-        //-NC1.11
         exit(Convert.ToBase64String(Encoding.UTF8.GetBytes(Username + ':' + Password)));
-        //+NC1.11
     end;
 
     local procedure GetChar(CharInt: Integer): Text[1]
@@ -1042,7 +932,6 @@ codeunit 6151551 "NpXml Mgt."
         NpXmlNamespaces: Record "NpXml Namespace";
         NpXmlTemplate: Record "NpXml Template";
     begin
-        //-NC1.22
         if NpXmlElement.Namespace = '' then
           exit(NpXmlElement."Element Name");
 
@@ -1053,7 +942,6 @@ codeunit 6151551 "NpXml Mgt."
           exit(NpXmlElement."Element Name");
 
         exit(NpXmlElement.Namespace + ':' + NpXmlElement."Element Name");
-        //+NC1.22
     end;
 
     local procedure GetXmlNamespace(NpXmlElement: Record "NpXml Element"): Text
@@ -1061,7 +949,6 @@ codeunit 6151551 "NpXml Mgt."
         NpXmlNamespaces: Record "NpXml Namespace";
         NpXmlTemplate: Record "NpXml Template";
     begin
-        //-NC1.22
         if NpXmlElement.Namespace = '' then
           exit('');
 
@@ -1071,7 +958,6 @@ codeunit 6151551 "NpXml Mgt."
           exit('');
 
         exit(NpXmlNamespaces.Namespace);
-        //+NC1.22
     end;
 
     local procedure PadStrLeft(InputStr: Text[1024];StrLength: Integer;PadChr: Char) Output: Text[1024]
@@ -1092,7 +978,6 @@ codeunit 6151551 "NpXml Mgt."
     var
         i: Integer;
     begin
-        //-NC1.22
         Output := '';
         for i := 1 to StrLen(Input) do
           case Input[i] of
@@ -1113,7 +998,6 @@ codeunit 6151551 "NpXml Mgt."
           end;
 
         exit(Output);
-        //+NC1.22
     end;
 
     local procedure MarkContainersAsArray(var XmlElement: DotNet npNetXmlElement)
@@ -1123,15 +1007,10 @@ codeunit 6151551 "NpXml Mgt."
         XmlNodeList: DotNet npNetXmlNodeList;
         i: Integer;
     begin
-        //-NC2.06 [265779]
         if IsNull(XmlElement) then
           exit;
         if NpXmlDomMgt.IsLeafNode(XmlElement) then
           exit;
-
-        //-NC2.07 [293192]
-        //NpXmlDomMgt.AddAttributeNamespace(XmlElement,'Array','http://james.newtonking.com/projects/json','true');
-        //+NC2.07 [293192]
 
         XmlNodeList := XmlElement.ChildNodes;
         XmlElementChild := XmlElement.FirstChild;
@@ -1145,7 +1024,6 @@ codeunit 6151551 "NpXml Mgt."
 
           XmlElementChild := XmlElementNextChild;
         until IsNull(XmlElementChild);
-        //+NC2.06 [265779]
     end;
 
     procedure Xml2Json(var XmlDoc: DotNet npNetXmlDocument;NpXmlTemplate: Record "NpXml Template") JsonString: Text
@@ -1161,37 +1039,26 @@ codeunit 6151551 "NpXml Mgt."
         RegEx: DotNet npNetRegex;
         i: Integer;
     begin
-        //-NC2.05 [265609]
-        //-NC2.06 [265779]
-        //JsonString := JsonConvert.SerializeXmlNode(XmlDoc.DocumentElement,JsonFormatting.Indented,TRUE);
         XmlDoc2 := XmlDoc.Clone;
         XmlNodeList := XmlDoc2.DocumentElement.ChildNodes;
         for i := 0 to XmlNodeList.Count - 1 do begin
           XmlElement := XmlNodeList.Item(i);
           MarkContainersAsArray(XmlElement);
         end;
-        //-NC2.08 [297308]
         if NpXmlTemplate."JSON Root is Array" then begin
           JsonString := JsonConvert.SerializeXmlNode(XmlDoc2.DocumentElement,JsonFormatting.Indented,false);
           JContainer := JContainer.Parse(JsonString);
           JArray := JContainer.SelectTokens(NpXmlTemplate."Xml Root Name",true);
           JsonString := JsonConvert.SerializeObject(JArray,JsonFormatting.Indented);
         end else
-        //+NC2.08 [297308]
           JsonString := JsonConvert.SerializeXmlNode(XmlDoc2.DocumentElement,JsonFormatting.Indented,true);
-        //+NC2.06 [265779]
 
-        //-NC2.08 [265541]
         if NpXmlTemplate."Use JSON Numbers" then
           JsonString := RegEx.Replace(JsonString,'"(\d*\.?\d*)"(?!:)','$1');
-        //+NC2.08 [265541]
 
-        //-NC2.11 [303181]
         JsonString := RegEx.Replace(JsonString,'(?i)#string#','');
-        //+NC2.11 [303181]
 
         exit(JsonString);
-        //+NC2.05 [265609]
     end;
 
     procedure "--- UI"()
@@ -1247,10 +1114,7 @@ codeunit 6151551 "NpXml Mgt."
         end;
         CloseDialog();
 
-        //-NC1.13
-        //PrimaryKeyValue := GetPrimaryKeyValue(RecRef);
         PrimaryKeyValue := NpXmlValueMgt.GetPrimaryKeyValue(RecRef);
-        //+NC1.13
         Filename := GetFilename(NpXmlTemplate."Xml Root Name",PrimaryKeyValue,1);
         NpXmlDomMgt.InitDoc(XmlDoc,XmlDocNode,NpXmlTemplate."Xml Root Name");
 
@@ -1269,20 +1133,15 @@ codeunit 6151551 "NpXml Mgt."
           until NpXmlElement.Next = 0;
         RecRef.Close;
 
-        //-NC1.22
         AddXmlNamespaces(NpXmlTemplate,XmlDoc);
-        //+NC1.22
         Clear(TempBlob);
         TempBlob.Blob.CreateOutStream(OutStream);
         XmlDoc.Save(OutStream);
         if not TempBlob.Blob.HasValue then
           exit;
 
-        //-NC2.05 [265609]
         if NpXmlTemplate."API Type" = NpXmlTemplate."API Type"::"REST (Json)" then begin
-          //-NC2.08 [297308]
           JsonString := Xml2Json(XmlDoc,NpXmlTemplate);
-          //-NC2.08 [297308]
 
           TempBlob.Blob.CreateInStream(InStream);
           TempBlob2.Blob.CreateOutStream(OutStream);
@@ -1293,7 +1152,6 @@ codeunit 6151551 "NpXml Mgt."
 
           TempBlob.Blob := TempBlob2.Blob;
         end;
-        //+NC2.05 [265609]
         TempBlob.Blob.CreateInStream(InStream);
 
         Filename := FileMgt.BLOBExport(TempBlob,Filename,false);

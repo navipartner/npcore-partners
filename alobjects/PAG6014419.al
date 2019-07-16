@@ -10,6 +10,7 @@ page 6014419 "Gift Voucher"
     // NPR5.27/MMV /20161012  CASE 254299 Promoted print action.
     // MAG2.01/TR  /20161007  CASE 247244 Added action SendAsPDF
     // NPR5.29/TS  /20170117  CASE 263656 Set Promoted to Yes on Action COPY,Deleted Unused Variables
+    // MAG2.22/ZESO/20190531  CASE 353585 Display Gift Voucher Message
 
     Caption = 'Gift Voucher';
     DeleteAllowed = false;
@@ -89,6 +90,26 @@ page 6014419 "Gift Voucher"
                 }
                 field(Blocked;Blocked)
                 {
+                }
+                field("FORMAT(""Gift Voucher Message"".HASVALUE)";Format("Gift Voucher Message".HasValue))
+                {
+                    Caption = 'Message';
+
+                    trigger OnAssistEdit()
+                    var
+                        MagentoFunctions: Codeunit "Magento Functions";
+                        RecRef: RecordRef;
+                        FieldRef: FieldRef;
+                    begin
+                        //-MAG2.22 [353585]
+                        RecRef.GetTable(Rec);
+                        FieldRef := RecRef.Field(FieldNo("Gift Voucher Message"));
+                        if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
+                          RecRef.SetTable(Rec);
+                          Modify(true);
+                        end;
+                        //+MAG2.22 [353585]
+                    end;
                 }
             }
             group("Cashed In")

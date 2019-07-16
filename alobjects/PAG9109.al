@@ -1,4 +1,4 @@
-pageextension 50599 pageextension50599 extends "Item Warehouse FactBox" 
+pageextension 50598 pageextension50598 extends "Item Warehouse FactBox" 
 {
     // NPR4.15/MMV/20150904 Added field 'Inventory'.
     layout

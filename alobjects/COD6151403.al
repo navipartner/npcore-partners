@@ -22,13 +22,14 @@ codeunit 6151403 "Magento Webservice"
     // MAG2.15/MHA /20180807  CASE 322939 Added function GetItemInventorySet()
     // MAG2.17/MHA /20181012  CASE 331949 Removed GetItemInventorySet() as it is not yet ready for release
     // MAG2.18/MHA /20181122  CASE 322939 Added function GetItemInventorySet()
-    // MAG2.20/TSA /20190404 CASE 351060 Added GetItemImage()
-    // MAG2.20/TSA /20190408 CASE 345376 Refactored the document.setfilters functions, added documentnumber, and shipment
-    // MAG2.20/TSA /20190408 CASE 345376 Added GetShipments()
-    // MAG2.20/TSA /20190408 CASE 345376 Added Actions for Get<DocumentType> that take customer number, document number as argument
-    // MAG2.20/TSA /20190408 CASE 345376 Added Actions for List<DocumentType>s that take customer as argument, but suppress the lines
-    // MAG2.20/TSA /20190409 CASE 351590 Added Customer Statement as PDF
-    // MAG2.20/TSA /20190424 CASE 345376 Added Shipment Statement as PDF
+    // MAG2.20/TSA /20190404  CASE 351060 Added GetItemImage()
+    // MAG2.20/TSA /20190408  CASE 345376 Refactored the document.setfilters functions, added documentnumber, and shipment
+    // MAG2.20/TSA /20190408  CASE 345376 Added GetShipments()
+    // MAG2.20/TSA /20190408  CASE 345376 Added Actions for Get<DocumentType> that take customer number, document number as argument
+    // MAG2.20/TSA /20190408  CASE 345376 Added Actions for List<DocumentType>s that take customer as argument, but suppress the lines
+    // MAG2.20/TSA /20190409  CASE 351590 Added Customer Statement as PDF
+    // MAG2.20/TSA /20190424  CASE 345376 Added Shipment Statement as PDF
+    // MAG2.22/MHA /20190711  CASE 361706 Removed explicit set of Magento."Variant System" in InitSetup()
 
 
     trigger OnRun()
@@ -182,15 +183,9 @@ codeunit 6151403 "Magento Webservice"
     [Scope('Personalization')]
     procedure GetInvoices(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
     begin
-        //-MAG2.03
-        //documents.SetFilters(CustomerNo,StartDate,EndDate,TRUE,FALSE);
-
         //-MAG2.20 [345376]
-        //documents.SetFilters(CustomerNo,StartDate,EndDate,TRUE,FALSE,FALSE);
         documents.SetFilters (CustomerNo, '', StartDate, EndDate, false, true, false, false, false);
         //+MAG2.20 [345376]
-
-        //+MAG2.03
     end;
 
     [Scope('Personalization')]
@@ -204,28 +199,17 @@ codeunit 6151403 "Magento Webservice"
         StartDate2: Date;
         EndDate2: Date;
     begin
-        //-MAG2.03
-        //documents.SetFilters(CustomerNo,StartDate,EndDate,FALSE,TRUE);
-
         //-MAG2.20 [345376]
-        //documents.SetFilters(CustomerNo,StartDate,EndDate,FALSE,TRUE,FALSE);
         documents.SetFilters (CustomerNo, '', StartDate, EndDate, false, false, true, false, false);
         //+MAG2.20 [345376]
-
-        //-MAG2.03
     end;
 
     [Scope('Personalization')]
     procedure GetOrders(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
     begin
-        //-MAG2.03
-
         //-MAG2.20 [345376]
-        //documents.SetFilters(CustomerNo,StartDate,EndDate,FALSE,FALSE,TRUE);
         documents.SetFilters (CustomerNo, '', StartDate, EndDate, false, false, false, true, false);
         //+MAG2.20 [345376]
-
-        //+MAG2.03
     end;
 
     [Scope('Personalization')]
@@ -244,8 +228,6 @@ codeunit 6151403 "Magento Webservice"
         //-MAG2.20 [345376]
         documents.SetFilters (CustomerNo, '', StartDate, EndDate, true, true, false, false, false);
         //+MAG2.20 [345376]
-
-        //+MAG2.03
     end;
 
     [Scope('Personalization')]
@@ -479,32 +461,22 @@ codeunit 6151403 "Magento Webservice"
           Error(Error002,MagentoSetup."Magento Url");
 
         //-MAG2.00
-        // NpXmlSetupMgt.SetupNpXml();
-        // NpXmlSetupMgt.SetApiUrl(MagentoUrl + 'api/rest/naviconnect/');
-        // NpXmlSetupMgt.EnableNpXml();
         MagentoSetup."Api Username Type" := MagentoSetup."Api Username Type"::Automatic;
         //+MAG2.00
 
         MagentoSetup.Validate("Magento Url",MagentoUrl);
-        MagentoSetup."Variant System" := MagentoSetup."Variant System"::"1";
         MagentoSetup."Magento Enabled" := true;
         MagentoSetup."Brands Enabled" := true;
         MagentoSetup."Attributes Enabled" := true;
         MagentoSetup."Product Relations Enabled" := true;
         MagentoSetup."Special Prices Enabled" := true;
         //-MAG2.00
-        //MagentoSetup.MODIFY;
         MagentoSetup.Modify(true);
         //+MAG2.00
 
         NaviConnectSetupMgt.InitNaviConnectSetup();
 
         //-MAG2.00
-        // NaviConnectSetupMgt.SetupWebservices();
-        // COMMIT;
-        // NaviConnectSetupMgt.SetupClientAddIns();
-        // COMMIT;
-        // NaviConnectSetupMgt.SetupImportTypes();
         MagentoSetupMgt.SetupClientAddIns();
         Commit;
         MagentoSetupMgt.SetupImportTypes();
@@ -514,23 +486,11 @@ codeunit 6151403 "Magento Webservice"
         Commit;
 
         //-MAG2.08 [292926]
-        //MagentoSetupMgt.SetupNpXmlTemplates();
         MagentoSetupMgt.TriggerSetupNpXmlTemplates();
         //+MAG2.08 [292926]
         Commit;
         //-MAG2.07 [286943]
-        // MagentoSetupMgt.SetupVATBusinessPostingGroups();
-        // MagentoSetupMgt.SetupVATProductPostingGroups();
-        // COMMIT;
-        // MagentoSetupMgt.SetupMagentoCredentials();
-        // MagentoSetupMgt.SetupMagentoWebsites();
-        // MagentoSetupMgt.SetupMagentoTaxClasses();
-        // MagentoSetupMgt.SetupMagentoCustomerGroups();
-        // MagentoSetupMgt.SetupNaviConnectPaymentMethods();
-        // MagentoSetupMgt.SetupNaviConnectShipmentMethods();
         //-MAG2.08 [292926]
-        //MagentoSetupMgt.TriggerSetupVATBusinessPostingGroups();
-        //MagentoSetupMgt.TriggerSetupVATProductPostingGroups();
         MagentoSetupMgt.SetupVATBusinessPostingGroups();
         MagentoSetupMgt.SetupVATProductPostingGroups();
         //+MAG2.08 [292926]

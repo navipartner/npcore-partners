@@ -4,6 +4,9 @@ codeunit 6151460 "M2 Setup Mgt."
     // MAG2.09/MHA /20171108  CASE 295656 ticket_setup should also be disabled on ItemStore
     // MAG2.14/MHA /20180529  CASE 286677 Added functions SetupMagentoCredentials(), SetupM2Credentials()
     // MAG2.20/MHA /20190426  CASE 320423 Add functionality to Initiate Magento Setup Event Subscriptions
+    // MAG2.22/MHA /20190625  CASE 359285 Added Picture Variety Type in SetupNpXmlTemplates()
+    // MAG2.22/MHA /20190705  CASE 361164 Updated Exception Message parsing in MagentoApiGet() and MagentoApiPost()
+    // MAG2.22/MHA /20190708  CASE 352201 Added SetupTemplateCollectStore() to SetupNpXmlTemplates()
 
 
     trigger OnRun()
@@ -135,11 +138,12 @@ codeunit 6151460 "M2 Setup Mgt."
         M2NpXmlSetupMgt.SetupTemplateDisplayConfig(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Customers Enabled");
         M2NpXmlSetupMgt.SetupTemplateSalesPrice(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Sales Prices Enabled");
         M2NpXmlSetupMgt.SetupTemplateSalesLineDiscount(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Sales Line Discounts Enabled");
-        //-MAG2.09 [295656]
-        //M2NpXmlSetupMgt.SetupTemplateItemDiscountGroup(TempBlob,MagentoSetup."Magento Enabled" AND MagentoSetup."Item Disc. Group Enabled");
-        //+MAG2.09 [295656]
         M2NpXmlSetupMgt.SetupTemplateTicket(TempBlob,true);
         M2NpXmlSetupMgt.SetupTemplateMember(TempBlob,true);
+        //-MAG2.22 [352201]
+        M2NpXmlSetupMgt.SetupTemplateCollectStore(TempBlob,
+          MagentoSetup."Magento Enabled" and MagentoSetup."Collect in Store Enabled" and (MagentoSetup."Magento Version" = MagentoSetup."Magento Version"::"2"));
+        //+MAG2.22 [352201]
         M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/manufacturer','',MagentoSetup."Brands Enabled");
         M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/product_external_attributes','',MagentoSetup."Attributes Enabled");
         M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/related_products','',MagentoSetup."Product Relations Enabled");
@@ -158,15 +162,38 @@ codeunit 6151460 "M2 Setup Mgt."
         //+MAG2.09 [295656]
 
         M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer','',MagentoSetup."Variant System" = MagentoSetup."Variant System"::Variety);
+        //-MAG2.22 [359285]
         case MagentoSetup."Variant System" of
           MagentoSetup."Variant System"::Variety:
             begin
-              M2NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery','','variety_1_image_buffer','',6059970,MagentoSetup."Variant Picture Dimension");
-              M2NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery','','variety_2_image_buffer','',6059973,MagentoSetup."Variant Picture Dimension");
-              M2NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery','','variety_3_image_buffer','',6059976,MagentoSetup."Variant Picture Dimension");
-              M2NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery','','variety_4_image_buffer','',6059979,MagentoSetup."Variant Picture Dimension");
+              M2NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery',
+                '','fixed_variety_1_buffer','',6059970,MagentoSetup."Variant Picture Dimension");
+              M2NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery',
+                '','fixed_variety_2_buffer','',6059973,MagentoSetup."Variant Picture Dimension");
+              M2NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery',
+                '','fixed_variety_3_buffer','',6059976,MagentoSetup."Variant Picture Dimension");
+              M2NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery',
+                '','fixed_variety_4_buffer','',6059979,MagentoSetup."Variant Picture Dimension");
+
+              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_1_buffer',
+                '',MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
+              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_2_buffer',
+                '',MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
+              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_3_buffer',
+                '',MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
+              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_4_buffer',
+                '',MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
+              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_1_buffer',
+                '',MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item",MagentoSetup."Picture Variety Type"::"Variety 1"]);
+              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_2_buffer',
+                '',MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item",MagentoSetup."Picture Variety Type"::"Variety 2"]);
+              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_3_buffer',
+                '',MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item",MagentoSetup."Picture Variety Type"::"Variety 3"]);
+              M2NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_4_buffer',
+                '',MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item",MagentoSetup."Picture Variety Type"::"Variety 4"]);
             end;
         end;
+        //+MAG2.22 [359285]
     end;
 
     local procedure SetupPaymentMethodMapping()
@@ -515,6 +542,8 @@ codeunit 6151460 "M2 Setup Mgt."
         HttpWebRequest: DotNet npNetHttpWebRequest;
         HttpWebResponse: DotNet npNetHttpWebResponse;
         MemoryStream: DotNet npNetMemoryStream;
+        WebException: DotNet npNetWebException;
+        ErrorMessage: Text;
     begin
         if MagentoApiUrl = '' then
           exit(false);
@@ -530,12 +559,17 @@ codeunit 6151460 "M2 Setup Mgt."
 
         MagentoSetup.Get;
         //-MAG2.14 [286677]
-        //HttpWebRequest.Headers.Add('Authorization',MagentoSetup."Api Authorization");
         if MagentoSetup."Api Authorization" <> '' then
           HttpWebRequest.Headers.Add('Authorization',MagentoSetup."Api Authorization");
         //+MAG2.14 [286677]
 
-        HttpWebResponse := HttpWebRequest.GetResponse();
+        //-MAG2.22 [361164]
+        if not TryGetWebResponse(HttpWebRequest,HttpWebResponse) then begin
+          WebException := GetLastErrorObject;
+          ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
+          Error(CopyStr(ErrorMessage,1,1000));
+        end;
+        //+MAG2.22 [361164]
         MemoryStream := HttpWebResponse.GetResponseStream;
 
         XmlDoc := XmlDoc.XmlDocument;
@@ -582,13 +616,10 @@ codeunit 6151460 "M2 Setup Mgt."
         end;
 
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          ErrorMessage := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
-          if ErrorMessage = '' then
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
-          if ErrorMessage = '' then
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-          ErrorMessage := Text000 + ErrorMessage;
+          //-MAG2.22 [361164]
+          ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
           Error(CopyStr(ErrorMessage,1,1000));
+          //+MAG2.22 [361164]
         end;
 
         ResponseText := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
@@ -597,6 +628,16 @@ codeunit 6151460 "M2 Setup Mgt."
         NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
         exit(true);
         //+MAG2.14 [286677]
+    end;
+
+    [TryFunction]
+    local procedure TryGetWebResponse(HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse)
+    var
+        MemoryStream: DotNet npNetMemoryStream;
+    begin
+        //-MAG2.22 [361164]
+        HttpWebResponse := HttpWebRequest.GetResponse;
+        //+MAG2.22 [361164]
     end;
 
     local procedure "--- Aux"()
