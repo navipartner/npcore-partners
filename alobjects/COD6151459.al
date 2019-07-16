@@ -1,6 +1,7 @@
-codeunit 6151459 "Magento Npxml Qty Increment"
+codeunit 6151459 "Magento NpXml Qty. Increment"
 {
     // MAG2.19/ZESO/20190214 CASE 345371 Object Created
+    // MAG2.22/BHR /20190610 CASE 349129 Correct bug
 
     TableNo = "NpXml Custom Value Buffer";
 
@@ -50,12 +51,18 @@ codeunit 6151459 "Magento Npxml Qty Increment"
         if not Item.Get(ItemNo) then
           exit(0);
 
-        if not ItemUOM.Get(Item."Sales Unit of Measure",ItemNo) then
+        //-MAG2.22 [349129]
+        //IF NOT ItemUOM.GET(Item."Sales Unit of Measure",ItemNo) THEN
+        if not ItemUOM.Get(ItemNo,Item."Sales Unit of Measure") then
+        //+MAG2.22 [349129]
           exit(0);
 
         SalesUOMQty := ItemUOM."Qty. per Unit of Measure";
 
-        if not ItemUOM.Get(Item."Base Unit of Measure",ItemNo) then
+        //-MAG2.22 [349129]
+        //IF NOT ItemUOM.GET(Item."Base Unit of Measure",ItemNo) THEN
+        if not ItemUOM.Get(ItemNo,Item."Base Unit of Measure") then
+        //+MAG2.22 [349129]
           exit(0);
 
         BaseUOMQty := ItemUOM."Qty. per Unit of Measure";

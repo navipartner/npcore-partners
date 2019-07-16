@@ -4,6 +4,7 @@ xmlport 6151404 "Magento Inventory Set Api"
     // MAG2.15/JKL /20180828  CASE 322939 changed structure + namespaces to better suit mageno integration
     // MAG2.17/MHA /20181012  CASE 331949 Changed UseDefaultNamespace from No to Yes and removed Namespaces
     // MAG2.18/MHA /20181122  CASE 322939 Changed <set_code> and <sku> in <retail_inventory_request> from Element to Attribute
+    // MAG2.22/MHA /20190618  CASE 358265 Bumped version list
 
     Caption = 'Magento Avail. InventoryExport';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/inventory_set';

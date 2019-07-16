@@ -1,6 +1,6 @@
-codeunit 6151399 "Upg. Magento Customer Mapping"
+codeunit 6151399 "Nc RapidStart upg."
 {
-    // MAG2.21/MHA /20190522  CASE 355271 Upgrade codeunit for rework of MagentoSetup."Customer Mapping" [VLOBJUPG] Object may be deleted after upgrade
+    // NC2.22/MHA /201907015  CASE 361941 Object codeunit for rolling back rapidstart to standard [VLOBJUPG] Delete after upgrade
 
     Subtype = Upgrade;
 
@@ -8,19 +8,22 @@ codeunit 6151399 "Upg. Magento Customer Mapping"
     begin
     end;
 
-    [UpgradePerCompany]
-    procedure UpdateCustomerMapping()
+    [TableSyncSetup]
+    procedure SetupRapidStartSync(var TableSynchSetup: Record "Table Synch. Setup")
     var
-        MagentoSetup: Record "Magento Setup";
+        DataUpgradeMgt: Codeunit "Data Upgrade Mgt.";
     begin
-        if not MagentoSetup.Get then
-          exit;
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Config. Package Field",0,TableSynchSetup.Mode::Force);
+    end;
 
-        if MagentoSetup."Customer Mapping" = MagentoSetup."Customer Mapping"::"E-mail" then
-          exit;
-
-        MagentoSetup."Customer Mapping" := MagentoSetup."Customer Mapping"::"E-mail";
-        MagentoSetup.Modify;
+    [UpgradePerCompany]
+    procedure UpdateRapidConnectSetup()
+    var
+        NcRapidConnectSetup: Record "Nc RapidConnect Setup";
+    begin
+        NcRapidConnectSetup.SetFilter("Export File Type",'<>%1',NcRapidConnectSetup."Export File Type"::".xml");
+        if NcRapidConnectSetup.FindFirst then
+          NcRapidConnectSetup.ModifyAll("Export File Type",NcRapidConnectSetup."Export File Type"::".xml");
     end;
 }
 

@@ -49,6 +49,15 @@ codeunit 6151413 "Magento Sales Order Mgt."
     // MAG2.20/MHA /20190411  CASE 349994 Added import of <use_customer_salesperson> in InsertSalesHeader()
     // MAG2.20/MHA /20190417  CASE 352201 Added Collect in Store functionality
     // MAG2.21/MHA /20190522  CASE 355271 Reworked Customer Mapping in GetCustomer()
+    // MAG2.22/BHR /20190604  CASE 350006 Added import of requested_delivery_date
+    // MAG2.22/MHA /20190610  CASE 357763 Added Shipment Fee Type to Shipment Mapping
+    // MAG2.22/MHA /20190611  CASE 357662 Added "Customer Update Mode" in InsertCustomer()
+    // MAG2.22/MHA /20190621  CASE 359146 Added option to use Blank Code for LCY
+    // MAG2.22/MHA /20190625  CASE 359754 Added "Customer No." to "Customer Mapping" in GetCustomer()
+    // MAG2.22/MHA /20190628  CASE 359332 "Sell-to Contact" is mandatory for Ean Orders
+    // MAG2.22/ZESO/20190701  CASE 358761 Populate "Description 2" with Description from Item Variants when Variant Code is used.
+    // MAG2.22/MHA /20190711  CASE 360098 Added Customer Template Mapping in InsertCustomer() and Vat % should be set after validation of "VAT Prod. Posting Group"
+    // MAG2.22/MHA /20190711  CASE 361705 Corrected case for "E-mail OR Phone No." in GetCustomer()
 
     TableNo = "Nc Import Entry";
 
@@ -71,6 +80,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         Error002: Label 'Item %1 does not exist in %2';
         Text000: Label 'Invalid Voucher Reference No. %1';
         Text001: Label 'Voucher %1 is already in use';
+        Text002: Label 'Customer Create is not allowed when Customer Update Mode is %1';
 
     local procedure ImportSalesOrders(XmlDoc: DotNet npNetXmlDocument)
     var
@@ -215,6 +225,8 @@ codeunit 6151413 "Magento Sales Order Mgt."
         VATBusPostingGroup: Code[20];
         NewCust: Boolean;
         PrevCust: Text;
+        EanNo: Text;
+        CustTemplateCode: Code[10];
     begin
         Initialize;
         ExternalCustomerNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement,'customer_no',false);
@@ -226,17 +238,26 @@ codeunit 6151413 "Magento Sales Order Mgt."
         TaxClass := NpXmlDomMgt.GetXmlAttributeText(XmlElement,'tax_class',true);
         NewCust := not GetCustomer(ExternalCustomerNo,XmlElement,Customer);
         if NewCust then begin
+          //-MAG2.22 [357662]
+          if not (MagentoSetup."Customer Update Mode" in [MagentoSetup."Customer Update Mode"::"Create and Update",MagentoSetup."Customer Update Mode"::Create]) then
+            Error(Text002,MagentoSetup."Customer Update Mode");
+          //+MAG2.22 [357662]
           VATBusPostingGroup := MagentoMgt.GetVATBusPostingGroup(TaxClass);
           Customer.Init;
           Customer."No." := '';
           Customer."External Customer No." := ExternalCustomerNo;
           Customer.Insert(true);
-          if MagentoSetup."Customer Template Code" <> '' then begin
-            CustTemplate.Get(MagentoSetup."Customer Template Code");
+          //-MAG2.22 [360098]
+          CustTemplateCode := MagentoMgt.GetCustTemplate(Customer);
+          if CustTemplateCode <> '' then begin
+            CustTemplate.Get(CustTemplateCode);
+          //+MAG2.22 [360098]
             Customer."Gen. Bus. Posting Group" := CustTemplate."Gen. Bus. Posting Group";
             Customer."VAT Bus. Posting Group" := CustTemplate."VAT Bus. Posting Group";
             Customer."Customer Posting Group" := CustTemplate."Customer Posting Group";
-            Customer."Currency Code" := CustTemplate."Currency Code";
+            //-MAG2.22 [359146]
+            Customer."Currency Code" := GetCurrencyCode(CustTemplate."Currency Code");
+            //+MAG2.22 [359146]
             Customer."Customer Price Group" := CustTemplate."Customer Price Group";
             Customer."Invoice Disc. Code" := CustTemplate."Invoice Disc. Code";
             Customer."Customer Disc. Group" := CustTemplate."Customer Disc. Group";
@@ -251,8 +272,23 @@ codeunit 6151413 "Magento Sales Order Mgt."
             Customer.Validate("Payment Terms Code",MagentoSetup."Payment Terms Code");
           end;
         end;
+        //-MAG2.22 [357662]
+        case MagentoSetup."Customer Update Mode" of
+          MagentoSetup."Customer Update Mode"::Create:
+            begin
+              if not NewCust then
+                  exit;
+            end;
+          MagentoSetup."Customer Update Mode"::None:
+            begin
+              exit;
+            end;
+        end;
+        //+MAG2.22 [357662]
         PrevCust := Format(Customer);
-        ConfigTemplateCode := MagentoMgt.GetCustomerConfigTemplate(TaxClass);
+        //-MAG2.22 [360098]
+        ConfigTemplateCode := MagentoMgt.GetCustConfigTemplate(TaxClass,Customer);
+        //+MAG2.22 [360098]
         if (ConfigTemplateCode <> '') and ConfigTemplateHeader.Get(ConfigTemplateCode) then begin
           RecRef.GetTable(Customer);
           ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader,RecRef);
@@ -269,9 +305,19 @@ codeunit 6151413 "Magento Sales Order Mgt."
         Customer.Contact := NpXmlDomMgt.GetXmlText(XmlElement,'contact',MaxStrLen(Customer.Contact),false);
         Customer."E-Mail" := NpXmlDomMgt.GetXmlText(XmlElement,'email',MaxStrLen(Customer."E-Mail"),true);
         Customer."Phone No." := NpXmlDomMgt.GetXmlText(XmlElement,'phone',MaxStrLen(Customer."Phone No."),false);
-        RecRef.GetTable(Customer);
-        SetFieldText(RecRef,13600,NpXmlDomMgt.GetXmlText(XmlElement,'ean',13,false));
-        RecRef.SetTable(Customer);
+        //-MAG2.22 [359332]
+        Customer.GLN := NpXmlDomMgt.GetXmlText(XmlElement,'ean',MaxStrLen(Customer.GLN),false);
+        if Customer.GLN <> '' then begin
+          RecRef.GetTable(Customer);
+          SetFieldText(RecRef,13600,Customer.GLN);
+          RecRef.SetTable(Customer);
+
+          if Customer.Contact = '' then
+            Customer.Contact := 'X';
+          Customer."Document Processing" := Customer."Document Processing"::OIO;
+        end;
+        //+MAG2.22 [359332]
+
         //-MAG2.09 [299976]
         Customer."VAT Registration No." := NpXmlDomMgt.GetXmlText(XmlElement,'vat_registration_no',MaxStrLen(Customer."VAT Registration No."),false);
         //+MAG2.09 [299976]
@@ -564,6 +610,16 @@ codeunit 6151413 "Magento Sales Order Mgt."
           SalesHeader."External Document No." := SalesHeader."External Order No.";
         SalesHeader.Insert(true);
         SalesHeader.Validate("Sell-to Customer No.",Customer."No.");
+        //-MAG2.22 [357662]
+        SalesHeader."Sell-to Customer Name" := NpXmlDomMgt.GetElementText(XmlElement2,'name',MaxStrLen(SalesHeader."Sell-to Customer Name"),true);
+        SalesHeader."Sell-to Customer Name 2" := NpXmlDomMgt.GetElementText(XmlElement2,'name_2',MaxStrLen(SalesHeader."Sell-to Customer Name 2"),false);
+        SalesHeader."Sell-to Address"  := NpXmlDomMgt.GetElementText(XmlElement2,'address',MaxStrLen(SalesHeader."Sell-to Address"),true);
+        SalesHeader."Sell-to Address 2" := NpXmlDomMgt.GetElementText(XmlElement2,'address_2',MaxStrLen(SalesHeader."Sell-to Address 2"),false);
+        SalesHeader."Sell-to Post Code" := UpperCase(NpXmlDomMgt.GetElementCode(XmlElement2,'post_code',MaxStrLen(SalesHeader."Sell-to Post Code"),true));
+        SalesHeader."Sell-to City" := NpXmlDomMgt.GetElementText(XmlElement2,'city',MaxStrLen(SalesHeader."Sell-to City"),true);
+        SalesHeader."Sell-to Country/Region Code" := NpXmlDomMgt.GetElementCode(XmlElement2,'country_code',MaxStrLen(SalesHeader."Sell-to Country/Region Code"),false);
+        SalesHeader."Sell-to Contact" := NpXmlDomMgt.GetElementText(XmlElement2,'contact',MaxStrLen(SalesHeader."Sell-to Contact"),false);
+        //+MAG2.22 [357662]
         SalesHeader."Prices Including VAT" := true;
 
         if NpXmlDomMgt.FindNode(XmlElement,'ship_to_customer',XmlElement2) then begin
@@ -577,6 +633,10 @@ codeunit 6151413 "Magento Sales Order Mgt."
           SalesHeader."Ship-to Contact" := NpXmlDomMgt.GetXmlText(XmlElement2,'contact',MaxStrLen(SalesHeader."Ship-to Contact"),false);
         end;
 
+        //-MAG2.22 [359332]
+        if Customer.GLN <> '' then
+          SalesHeader."Document Processing" := SalesHeader."Document Processing"::OIO;
+        //+MAG2.22 [359332]
         SalesHeader.Validate("Salesperson Code",MagentoSetup."Salesperson Code");
         //-MAG2.20 [349994]
         if NpXmlDomMgt.GetElementBoolean(XmlElement,'use_customer_salesperson',false) and (Customer."Salesperson Code" <> '') then
@@ -620,7 +680,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
           SalesHeader.Validate("Shortcut Dimension 2 Code",MagentoWebsite."Global Dimension 2 Code");
         end;
         SalesHeader.Validate("Location Code",MagentoWebsite."Location Code");
-        SalesHeader.Validate("Currency Code",NpXmlDomMgt.GetXmlText(XmlElement,'currency_code',MaxStrLen(SalesHeader."Currency Code"),false));
+        //-MAG2.22 [359146]
+        SalesHeader.Validate("Currency Code",GetCurrencyCode(NpXmlDomMgt.GetElementCode(XmlElement,'currency_code',MaxStrLen(SalesHeader."Currency Code"),false)));
+        //+MAG2.22 [359146]
         SalesHeader.Modify(true);
     end;
 
@@ -728,6 +790,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         ItemNo: Code[20];
         UnitofMeasure: Code[10];
         VariantCode: Code[10];
+        RequestedDeliveryDate: Date;
     begin
         //-MAG2.17 [302179]
         ExternalItemNo := NpXmlDomMgt.GetXmlAttributeText(XmlElement,'external_no',true);
@@ -753,6 +816,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
         Evaluate(VatPct,NpXmlDomMgt.GetXmlText(XmlElement,'vat_percent',0,true),9);
         Evaluate(LineAmount,NpXmlDomMgt.GetXmlText(XmlElement,'line_amount_incl_vat',0,true),9);
         Evaluate(UnitofMeasure,NpXmlDomMgt.GetXmlText(XmlElement,'unit_of_measure',MaxStrLen(SalesLine."Unit of Measure Code"),false));
+        //-MAG2.22 [350006]
+        RequestedDeliveryDate:=NpXmlDomMgt.GetElementDate(XmlElement,'requested_delivery_date',false);
+        //+MAG2.22 [350006]
         LineNo += 10000;
         SalesLine.Init;
         SalesLine."Document Type" := SalesHeader."Document Type";
@@ -763,15 +829,25 @@ codeunit 6151413 "Magento Sales Order Mgt."
         SalesLine.Validate(Type,SalesLine.Type::Item);
         SalesLine.Validate("No.",ItemNo);
         SalesLine."Variant Code" := VariantCode;
+        //-MAG2.22 [358761]
+        if VariantCode <> '' then
+          SalesLine."Description 2" := ItemVariant.Description;
+        //+MAG2.22 [358761]
         SalesLine.Validate(Quantity,Quantity);
+        //-MAG2.22 [350006]
+        if RequestedDeliveryDate <> 0D then
+          SalesLine.Validate("Requested Delivery Date",RequestedDeliveryDate);
+        //+MAG2.22 [350006]
         if not (UnitofMeasure in ['','_BLANK_']) then
           SalesLine.Validate("Unit of Measure Code",UnitofMeasure);
-        SalesLine.Validate("VAT %",VatPct);
         if UnitPrice > 0 then
           SalesLine.Validate("Unit Price",UnitPrice)
         else
           SalesLine."Unit Price" := UnitPrice;
         SalesLine.Validate("VAT Prod. Posting Group");
+        //-MAG2.22 [360098]
+        SalesLine.Validate("VAT %",VatPct);
+        //+MAG2.22 [360098]
 
         if SalesLine."Unit Price" <> 0 then
           SalesLine.Validate("Line Amount",LineAmount)
@@ -853,8 +929,32 @@ codeunit 6151413 "Magento Sales Order Mgt."
           SalesLine.Insert(true);
           ShipmentMapping.SetRange("External Shipment Method Code",NpXmlDomMgt.GetXmlAttributeText(XmlElement,'external_no',false));
           ShipmentMapping.FindFirst;
-          SalesLine.Validate(Type,SalesLine.Type::"G/L Account");
-          SalesLine.Validate("No.",ShipmentMapping."Shipment Fee Account No.");
+          //-MAG2.22 [357763]
+          //SalesLine.VALIDATE(Type,SalesLine.Type::"G/L Account");
+          case ShipmentMapping."Shipment Fee Type" of
+            ShipmentMapping."Shipment Fee Type"::"G/L Account":
+              begin
+                SalesLine.Validate(Type,SalesLine.Type::"G/L Account");
+              end;
+            ShipmentMapping."Shipment Fee Type"::Item:
+              begin
+                SalesLine.Validate(Type,SalesLine.Type::Item);
+              end;
+            ShipmentMapping."Shipment Fee Type"::Resource:
+              begin
+                SalesLine.Validate(Type,SalesLine.Type::Resource);
+              end;
+            ShipmentMapping."Shipment Fee Type"::"Fixed Asset":
+              begin
+                SalesLine.Validate(Type,SalesLine.Type::"Fixed Asset");
+              end;
+            ShipmentMapping."Shipment Fee Type"::"Charge (Item)":
+              begin
+                SalesLine.Validate(Type,SalesLine.Type::"Charge (Item)");
+              end;
+          end;
+          //+MAG2.22 [357763]
+          SalesLine.Validate("No.",ShipmentMapping."Shipment Fee No.");
           if Quantity <> 0 then
             SalesLine.Validate(Quantity,Quantity);
 
@@ -968,7 +1068,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
 
         ShipmentMapping.SetRange("External Shipment Method Code",NpXmlDomMgt.GetXmlText(XmlElement,'shipment_method',MaxStrLen(ShipmentMapping."External Shipment Method Code"),true));
         ShipmentMapping.FindFirst;
-        ShipmentMapping.TestField("Shipment Fee Account No.");
+        ShipmentMapping.TestField("Shipment Fee No.");
 
         LineNo += 10000;
         SalesLine.Init;
@@ -977,8 +1077,32 @@ codeunit 6151413 "Magento Sales Order Mgt."
         SalesLine."Line No." := LineNo;
         SalesLine.Insert(true);
 
-        SalesLine.Validate(Type,SalesLine.Type::"G/L Account");
-        SalesLine.Validate("No.",ShipmentMapping."Shipment Fee Account No.");
+        //-MAG2.22 [357763]
+        //SalesLine.VALIDATE(Type,SalesLine.Type::"G/L Account");
+        case ShipmentMapping."Shipment Fee Type" of
+          ShipmentMapping."Shipment Fee Type"::"G/L Account":
+            begin
+              SalesLine.Validate(Type,SalesLine.Type::"G/L Account");
+            end;
+          ShipmentMapping."Shipment Fee Type"::Item:
+            begin
+              SalesLine.Validate(Type,SalesLine.Type::Item);
+            end;
+          ShipmentMapping."Shipment Fee Type"::Resource:
+            begin
+              SalesLine.Validate(Type,SalesLine.Type::Resource);
+            end;
+          ShipmentMapping."Shipment Fee Type"::"Fixed Asset":
+            begin
+              SalesLine.Validate(Type,SalesLine.Type::"Fixed Asset");
+            end;
+          ShipmentMapping."Shipment Fee Type"::"Charge (Item)":
+            begin
+              SalesLine.Validate(Type,SalesLine.Type::"Charge (Item)");
+            end;
+        end;
+        //+MAG2.22 [357763]
+        SalesLine.Validate("No.",ShipmentMapping."Shipment Fee No.");
         SalesLine.Validate("Unit Price",ShipmentFee);
         SalesLine.Validate(Quantity,1);
         SalesLine.Modify(true);
@@ -1068,12 +1192,14 @@ codeunit 6151413 "Magento Sales Order Mgt."
         SalesLine.Validate(Quantity,Quantity);
         if not (UnitofMeasure in ['','_BLANK_']) then
           SalesLine.Validate("Unit of Measure Code",UnitofMeasure);
-        SalesLine.Validate("VAT %",VatPct);
         if UnitPrice > 0 then
           SalesLine.Validate("Unit Price",UnitPrice)
         else
           SalesLine."Unit Price" := UnitPrice;
         SalesLine.Validate("VAT Prod. Posting Group");
+        //-MAG2.22 [360098]
+        SalesLine.Validate("VAT %",VatPct);
+        //+MAG2.22 [360098]
 
         if SalesLine."Unit Price" <> 0 then
           SalesLine.Validate("Line Amount",LineAmount)
@@ -1108,6 +1234,8 @@ codeunit 6151413 "Magento Sales Order Mgt."
     end;
 
     local procedure GetCustomer(ExternalCustomerNo: Code[20];XmlElement: DotNet npNetXmlElement;var Customer: Record Customer): Boolean
+    var
+        CustNo: Code[20];
     begin
         Initialize;
         Clear(Customer);
@@ -1131,7 +1259,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
               Customer.SetRange("Phone No.",NpXmlDomMgt.GetXmlText(XmlElement,'phone',MaxStrLen(Customer."Phone No."),false));
               exit(Customer.FindFirst and (Customer."E-Mail" <> '') and (Customer."Phone No." <> ''));
             end;
-          MagentoSetup."Customer Mapping"::"E-mail":
+          //-MAG2.22 [361705]
+          MagentoSetup."Customer Mapping"::"E-mail OR Phone No.":
+          //+MAG2.22 [361705]
             begin
               Customer.SetRange("E-Mail",NpXmlDomMgt.GetXmlText(XmlElement,'email',MaxStrLen(Customer."E-Mail"),false));
               if Customer.FindFirst and (Customer."E-Mail" <> '') then
@@ -1141,10 +1271,37 @@ codeunit 6151413 "Magento Sales Order Mgt."
               Customer.SetRange("Phone No.",NpXmlDomMgt.GetXmlText(XmlElement,'phone',MaxStrLen(Customer."Phone No."),false));
               exit(Customer.FindFirst and (Customer."Phone No." <> ''));
             end;
+          //-MAG2.22 [359754]
+          MagentoSetup."Customer Mapping"::"Customer No.":
+            begin
+              CustNo := NpXmlDomMgt.GetAttributeCode(XmlElement,'','customer_no',MaxStrLen(Customer."No."),false);
+              if CustNo = '' then
+                  exit(false);
+              exit(Customer.Get(CustNo));
+            end;
+          //+MAG2.22 [359754]
         end;
 
         exit(false);
         //+MAG2.21 [355271]
+    end;
+
+    local procedure GetCurrencyCode(CurrencyCode: Code[10]): Code[10]
+    var
+        GLSetup: Record "General Ledger Setup";
+    begin
+        //-MAG2.22 [359146]
+        Initialize();
+
+        if not MagentoSetup."Use Blank Code for LCY" then
+            exit(CurrencyCode);
+
+        GLSetup.Get;
+        if GLSetup."LCY Code" = CurrencyCode then
+          exit('');
+
+        exit(CurrencyCode);
+        //+MAG2.22 [359146]
     end;
 
     local procedure OrderExists(XmlElement: DotNet npNetXmlElement): Boolean

@@ -20,6 +20,11 @@ table 6151401 "Magento Setup"
     // MAG2.19/MHA /20190306  CASE 347974 Added field 535 "Release Order on Import"
     // MAG2.20/MHA /20190426  CASE 320423 Added field 15 "Magento Version"
     // MAG2.21/MHA /20190522  CASE 355271 Reworked OptionString for field 500 "Customer Mapping"
+    // MAG2.22/MHA /20190611  CASE 357662 Added field 490 "Customer Update Mode"
+    // MAG2.22/MHA /20190621  CASE 359146 Added field 540 "Use Blank Code for LCY"
+    // MAG2.22/MHA /20190625  CASE 359285 Added field 34 "Picture Variety Type"
+    // MAG2.22/MHA /20190625  CASE 359754 Added OptionValue "Customer No." to field 500 "Customer Mapping"
+    // MAG2.22/MHA /20190708  CASE 352201 Added field 220 "Collect in Store Enabled"
 
     Caption = 'Magento Setup';
 
@@ -80,22 +85,18 @@ table 6151401 "Magento Setup"
             OptionCaption = 'None,,Variety';
             OptionMembers = "None",,Variety;
         }
+        field(34;"Picture Variety Type";Option)
+        {
+            Caption = 'Picture Variety Type';
+            Description = 'MAG2.22';
+            OptionCaption = 'Fixed,Select on Item,Variety 1,Variety 2,Variety 3,Variety 4';
+            OptionMembers = "Fixed","Select on Item","Variety 1","Variety 2","Variety 3","Variety 4";
+        }
         field(35;"Variant Picture Dimension";Code[10])
         {
             Caption = 'Variant Picture Dimension';
-            Description = 'MAG1.21';
-
-            trigger OnLookup()
-            var
-                MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
-                VariantPictureDimension: Text;
-            begin
-                //-MAG1.21
-                VariantPictureDimension := MagentoGenericSetupMgt.LookupVariantPictureDimension();
-                if VariantPictureDimension <> '' then
-                  "Variant Picture Dimension" := UpperCase(CopyStr(VariantPictureDimension,1,MaxStrLen("Variant Picture Dimension")));
-                //+MAG1.21
-            end;
+            Description = 'MAG1.21,MAG2.22';
+            TableRelation = Variety;
         }
         field(37;"Miniature Picture";Option)
         {
@@ -273,6 +274,11 @@ table 6151401 "Magento Setup"
         {
             Caption = 'Item Disc. Group Enabled';
         }
+        field(220;"Collect in Store Enabled";Boolean)
+        {
+            Caption = 'Collect in Store Enabled';
+            Description = 'MAG2.22';
+        }
         field(300;"Gift Voucher Enabled";Boolean)
         {
             Caption = 'Gift Voucher Enabled';
@@ -360,12 +366,19 @@ table 6151401 "Magento Setup"
             OptionCaption = 'On Posting,On Insert';
             OptionMembers = OnPosting,OnInsert;
         }
+        field(490;"Customer Update Mode";Option)
+        {
+            Caption = 'Customer Update Mode';
+            Description = 'MAG2.22';
+            OptionCaption = 'Create and Update,Create,Update,None';
+            OptionMembers = "Create and Update",Create,Update,"None";
+        }
         field(500;"Customer Mapping";Option)
         {
             Caption = 'Customer Mapping';
-            Description = 'MAG2.00,MAG2.21';
-            OptionCaption = 'E-mail,Phone No.,E-mail AND Phone No.,E-mail OR Phone No.';
-            OptionMembers = "E-mail","Phone No.","E-mail AND Phone No.","E-mail OR Phone No.";
+            Description = 'MAG2.00,MAG2.21,MAG2.22';
+            OptionCaption = 'E-mail,Phone No.,E-mail AND Phone No.,E-mail OR Phone No.,Customer No.';
+            OptionMembers = "E-mail","Phone No.","E-mail AND Phone No.","E-mail OR Phone No.","Customer No.";
         }
         field(505;"Customer Posting Group";Code[10])
         {
@@ -407,6 +420,11 @@ table 6151401 "Magento Setup"
         {
             Caption = 'Release Order on Import';
             Description = 'MAG2.19';
+        }
+        field(540;"Use Blank Code for LCY";Boolean)
+        {
+            Caption = 'Use Blank Code for LCY';
+            Description = 'MAG2.22';
         }
         field(600;"Replicate to Sales Prices";Boolean)
         {

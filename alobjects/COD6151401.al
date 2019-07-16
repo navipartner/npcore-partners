@@ -34,6 +34,7 @@ codeunit 6151401 "Magento Setup Mgt."
     // MAG2.12/MHA /20180425  CASE 309647 Added function SetupImportTypeReturnOrder()
     // MAG2.13/TS  /20180504  CASE 309743 SetupTaxClasses was on Setup Credentials Function
     // MAG2.17/TS  /20181031  CASE 333862 Seo Link should be filled as well
+    // MAG2.22/MHA /20190625  CASE 359285 Added Picture Variety Type in SetupNpXmlTemplates()
 
 
     trigger OnRun()
@@ -544,17 +545,39 @@ codeunit 6151401 "Magento Setup Mgt."
         NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/bundled_options','',MagentoSetup."Bundled Products Enabled");
         NpXmlSetupMgt.SetSalesPriceEnabled(TempBlob,'product/unit_codes','',MagentoSetup."Sales Prices Enabled" or MagentoSetup."Sales Line Discounts Enabled");
         NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/ticket_setup','',MagentoSetup."Tickets Enabled");
-
         NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer','',MagentoSetup."Variant System" = MagentoSetup."Variant System"::Variety);
+        //-MAG2.22 [359285]
         case MagentoSetup."Variant System" of
           MagentoSetup."Variant System"::Variety:
             begin
-              NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery','','variety_1_image_buffer','',6059970,MagentoSetup."Variant Picture Dimension");
-              NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery','','variety_2_image_buffer','',6059973,MagentoSetup."Variant Picture Dimension");
-              NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery','','variety_3_image_buffer','',6059976,MagentoSetup."Variant Picture Dimension");
-              NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery','','variety_4_image_buffer','',6059979,MagentoSetup."Variant Picture Dimension");
+              NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery',
+                '','fixed_variety_1_buffer','',6059970,MagentoSetup."Variant Picture Dimension");
+              NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery',
+                '','fixed_variety_2_buffer','',6059973,MagentoSetup."Variant Picture Dimension");
+              NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery',
+                '','fixed_variety_3_buffer','',6059976,MagentoSetup."Variant Picture Dimension");
+              NpXmlSetupMgt.SetItemFilterValue(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery',
+                '','fixed_variety_4_buffer','',6059979,MagentoSetup."Variant Picture Dimension");
+
+              NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_1_buffer',
+                '',MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
+              NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_2_buffer',
+                '',MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
+              NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_3_buffer',
+                '',MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
+              NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/fixed_variety_4_buffer',
+                '',MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::Fixed);
+              NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_1_buffer',
+                '',MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item",MagentoSetup."Picture Variety Type"::"Variety 1"]);
+              NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_2_buffer',
+                '',MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item",MagentoSetup."Picture Variety Type"::"Variety 2"]);
+              NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_3_buffer',
+                '',MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item",MagentoSetup."Picture Variety Type"::"Variety 3"]);
+              NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/variety_buffer/variant_setup/variants/variant/media_gallery/variety_4_buffer',
+                '',MagentoSetup."Picture Variety Type" in [MagentoSetup."Picture Variety Type"::"Select on Item",MagentoSetup."Picture Variety Type"::"Variety 4"]);
             end;
         end;
+        //+MAG2.22 [359285]
         //+MAG2.00
     end;
 
@@ -960,34 +983,23 @@ codeunit 6151401 "Magento Setup Mgt."
         PAGE.Run(PAGE::"Code Coverage Object",TempObject);
     end;
 
-    local procedure MagentoVersionId(): Text
+    procedure MagentoVersionId(): Text
     begin
         exit('MAG');
     end;
 
-    procedure UpdateVersionNo(var MagentoSetup: Record "Magento Setup")
-    var
-        NcManagedNavModulesMgt: Codeunit "Nc Managed Nav Modules Mgt.";
-        VersionNo: Text;
-        VersionCoverage: Text;
-        Position: Integer;
+    procedure MagentoVersionNo(): Code[20]
     begin
-        if (not MagentoSetup.Get) or (not MagentoSetup."Managed Nav Modules Enabled") or (MagentoSetup."Managed Nav Api Url" = '') then
-          exit;
+        //-MAG2.22 [359285]
+        exit('2.22');
+        //+MAG2.22 [359285]
+    end;
 
-        VersionNo := NcManagedNavModulesMgt.GetVersionNo(MagentoVersionId(),MagentoSetup."Managed Nav Api Url",MagentoSetup."Managed Nav Api Username",MagentoSetup."Managed Nav Api Password");
-
-        Position := StrPos(VersionNo,'||');
-        if Position <> 0 then begin
-          VersionCoverage := CopyStr(VersionNo,Position + 2);
-          VersionNo := DelStr(VersionNo,Position);
-        end;
-
-        if (MagentoSetup."Version No." <> VersionNo) or (MagentoSetup."Version Coverage" <> VersionCoverage) then begin
-          MagentoSetup."Version No." := VersionNo;
-          MagentoSetup."Version Coverage" := VersionCoverage;
-          MagentoSetup.Modify(true);
-        end;
+    procedure UpdateVersionNo(var MagentoSetup: Record "Magento Setup")
+    begin
+        //-MAG2.22 [359285]
+        MagentoSetup."Version No." := MagentoVersionId() + MagentoVersionNo();
+        //+MAG2.22 [359285]
     end;
 
     local procedure "--- Aux"()

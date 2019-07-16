@@ -43,7 +43,7 @@ table 6151434 "Magento Contact Shpt. Method"
         }
         field(150;"Shipment Fee Account No.";Code[10])
         {
-            CalcFormula = Lookup("Magento Shipment Mapping"."Shipment Fee Account No." WHERE ("External Shipment Method Code"=FIELD("External Shipment Method Code")));
+            CalcFormula = Lookup("Magento Shipment Mapping"."Shipment Fee No." WHERE ("External Shipment Method Code"=FIELD("External Shipment Method Code")));
             Caption = 'Shipment Fee Account No.';
             Editable = false;
             FieldClass = FlowField;

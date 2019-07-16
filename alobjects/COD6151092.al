@@ -3,6 +3,8 @@ codeunit 6151092 "Nc RapidConnect Import Mgt."
     // NC2.12/MHA /20180418  CASE 308107 Object created - RapidStart with NaviConnect
     // NC2.16/MHA /20180906  CASE 313184 Apply Package has COMMIT in RapidStart meaning Import and Apply must be split
     // NC2.17/MHA /20181116  CASE 335927 Removed green code and added Xml Import
+    // NC2.22/MHA /20190621  CASE 358239 Added FormatValue() to format from Xml value to native format
+    // NC14.00.2.22/MHA /20190715  CASE 361941 Excel support
 
     TableNo = "Nc Import Entry";
 
@@ -35,13 +37,11 @@ codeunit 6151092 "Nc RapidConnect Import Mgt."
 
         repeat
           DataLogMgt.DisableDataLog(NcRapidConnectSetup."Disable Data Log on Import");
-          //-NC2.17 [335927]
-          //ImportExcelPackage(NcRapidConnectSetup,NcImportEntry);
+          //-NC14.00.2.22 [361941]
           if XmlLoaded then
-            ImportXmlPackage(NcRapidConnectSetup,XmlDoc)
-          else
-            ImportExcelPackage(NcRapidConnectSetup,NcImportEntry);
+            ImportXmlPackage(NcRapidConnectSetup,XmlDoc);
           //+NC2.17 [335927]
+          //+NC14.00.2.22 [361941]
 
         until NcRapidConnectSetup.Next = 0;
 
@@ -51,13 +51,10 @@ codeunit 6151092 "Nc RapidConnect Import Mgt."
           NcRapidConnectSetup.FindSet;
           repeat
             DataLogMgt.DisableDataLog(NcRapidConnectSetup."Disable Data Log on Import");
-            //-NC2.17 [335927]
-            //ApplyExcelPackage(NcRapidConnectSetup,NcImportEntry);
+            //-NC14.00.2.22 [361941]
             if XmlLoaded then
-              ApplyXmlPackage(NcRapidConnectSetup,TableIdFilter)
-            else
-              ApplyExcelPackage(NcRapidConnectSetup,NcImportEntry);
-            //+NC2.17 [335927]
+              ApplyXmlPackage(NcRapidConnectSetup,TableIdFilter);
+            //+NC14.00.2.22 [361941]
           until NcRapidConnectSetup.Next = 0;
           Commit;
           Error('');
@@ -65,124 +62,6 @@ codeunit 6151092 "Nc RapidConnect Import Mgt."
         //+NC2.16 [313184]
 
         DataLogMgt.DisableDataLog(false);
-    end;
-
-    local procedure ImportExcelPackage(NcRapidConnectSetup: Record "Nc RapidConnect Setup";var NcImportEntry: Record "Nc Import Entry")
-    var
-        ConfigPackage: Record "Config. Package";
-        TempBlob: Record TempBlob temporary;
-        TempConfigPackageTable: Record "Config. Package Table" temporary;
-        ConfigPackageTable: Record "Config. Package Table";
-        ConfigExcelExchange: Codeunit "Config. Excel Exchange";
-        ConfigPackageMgt: Codeunit "Config. Package Management";
-        TableIdFilter: Text;
-    begin
-        if NcRapidConnectSetup."Package Code" = '' then
-          exit;
-
-        LoadExcel(NcImportEntry,NcRapidConnectSetup."Package Code",TempBlob,TableIdFilter);
-
-        //-NC2.12 [313362]
-        ConfigExcelExchange.SetHideDialog(not UseDialog());
-        //+NC2.12 [313362]
-        ConfigExcelExchange.ImportExcel(TempBlob);
-
-        ConfigPackage.Get(NcRapidConnectSetup."Package Code");
-        ConfigPackageTable.SetRange("Package Code",NcRapidConnectSetup."Package Code");
-        if ConfigPackage."Exclude Config. Tables" then begin
-          ConfigPackageTable.FilterGroup(40);
-          ConfigPackageTable.SetFilter("Table ID",'<>%1&<>%2&<>%3&<>%4&<>%5&<>%6&<>%7&<>%8',
-            DATABASE::"Config. Template Header",DATABASE::"Config. Template Line",
-            DATABASE::"Config. Questionnaire",DATABASE::"Config. Question Area",DATABASE::"Config. Question",
-            DATABASE::"Config. Line",DATABASE::"Config. Package Filter",DATABASE::"Config. Field Mapping");
-        end;
-        ConfigPackageTable.FilterGroup(41);
-        ConfigPackageTable.SetFilter("Table ID",TableIdFilter);
-
-        //-NC2.12 [313362]
-        ConfigPackageMgt.SetHideDialog(not UseDialog());
-        //+NC2.12 [313362]
-        //-NC2.16 [313184]
-        if NcRapidConnectSetup."Validate Package" then
-          ConfigPackageMgt.ValidatePackageRelations(ConfigPackageTable,TempConfigPackageTable,false);
-        //+NC2.16 [313184]
-    end;
-
-    local procedure ApplyExcelPackage(NcRapidConnectSetup: Record "Nc RapidConnect Setup";var NcImportEntry: Record "Nc Import Entry")
-    var
-        ConfigPackage: Record "Config. Package";
-        TempBlob: Record TempBlob temporary;
-        TempConfigPackageTable: Record "Config. Package Table" temporary;
-        ConfigPackageTable: Record "Config. Package Table";
-        ConfigPackageMgt: Codeunit "Config. Package Management";
-        TableIdFilter: Text;
-    begin
-        //-NC2.16 [313184]
-        if NcRapidConnectSetup."Package Code" = '' then
-          exit;
-        if not NcRapidConnectSetup."Apply Package" then
-          exit;
-
-        LoadExcel(NcImportEntry,NcRapidConnectSetup."Package Code",TempBlob,TableIdFilter);
-
-        ConfigPackage.Get(NcRapidConnectSetup."Package Code");
-        ConfigPackageTable.SetRange("Package Code",NcRapidConnectSetup."Package Code");
-        if ConfigPackage."Exclude Config. Tables" then begin
-          ConfigPackageTable.FilterGroup(40);
-          ConfigPackageTable.SetFilter("Table ID",'<>%1&<>%2&<>%3&<>%4&<>%5&<>%6&<>%7&<>%8',
-            DATABASE::"Config. Template Header",DATABASE::"Config. Template Line",
-            DATABASE::"Config. Questionnaire",DATABASE::"Config. Question Area",DATABASE::"Config. Question",
-            DATABASE::"Config. Line",DATABASE::"Config. Package Filter",DATABASE::"Config. Field Mapping");
-        end;
-        ConfigPackageTable.FilterGroup(41);
-        ConfigPackageTable.SetFilter("Table ID",TableIdFilter);
-
-        ConfigPackageMgt.SetHideDialog(not UseDialog());
-        ConfigPackageMgt.ApplyPackage(ConfigPackage,ConfigPackageTable,false);
-        //+NC2.16 [313184]
-    end;
-
-    local procedure LoadExcel(var NcImportEntry: Record "Nc Import Entry";PackageCode: Code[20];var TempBlob: Record TempBlob temporary;var TableIdFilter: Text)
-    var
-        XmlDomMgt: Codeunit "XML DOM Management";
-        InStream: InStream;
-        CellData: DotNet npNetCellData;
-        Enumerator: DotNet npNetIEnumerator;
-        WrkBookReader: DotNet npNetWorkbookReader;
-        WrkBookPart: DotNet npNetWorkbookPart;
-        WrkBookWriter: DotNet npNetWorkbookWriter;
-        WrkShtReader: DotNet npNetWorksheetReader;
-        WrkShtWriter: DotNet npNetWorksheetWriter;
-        SheetCount: Integer;
-        WrkSheetId: Integer;
-    begin
-        NcImportEntry.CalcFields("Document Source");
-        TempBlob.Blob := NcImportEntry."Document Source";
-
-        TempBlob.Blob.CreateInStream(InStream);
-        WrkBookWriter := WrkBookWriter.Open(InStream);
-        WrkBookReader := WrkBookReader.Open(InStream);
-        WrkBookPart := WrkBookReader.Workbook.WorkbookPart;
-
-        WrkSheetId := WrkBookReader.FirstSheetId;
-        SheetCount := WrkBookPart.Workbook.Sheets.ChildElements.Count;
-        while WrkSheetId <= SheetCount do begin
-          WrkShtReader := WrkBookReader.GetWorksheetById(Format(WrkSheetId));
-          WrkShtWriter := WrkBookWriter.GetWorksheetByName(WrkShtReader.Name);
-          WrkShtWriter.SetCellValueText(1,'A',PackageCode,WrkShtWriter.DefaultCellDecorator);
-
-          Enumerator := WrkShtReader.GetEnumerator;
-          Enumerator.MoveNext();
-          Enumerator.MoveNext();
-          Enumerator.MoveNext();
-          CellData := Enumerator.Current;
-          TableIdFilter += '|' + CellData.Value;
-
-          WrkSheetId += 1;
-        end;
-        WrkBookWriter.Close();
-
-        TableIdFilter := DelStr(TableIdFilter,1,1);
     end;
 
     local procedure UseDialog(): Boolean
@@ -201,6 +80,7 @@ codeunit 6151092 "Nc RapidConnect Import Mgt."
         ConfigPackageTable: Record "Config. Package Table";
         ConfigPackageRecord: Record "Config. Package Record";
         ConfigPackageData: Record "Config. Package Data";
+        "Field": Record "Field";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         XmlDocElement: DotNet npNetXmlElement;
         XmlElement: DotNet npNetXmlElement;
@@ -240,10 +120,82 @@ codeunit 6151092 "Nc RapidConnect Import Mgt."
             ConfigPackageData."No." := ConfigPackageRecord."No.";
             Evaluate(ConfigPackageData."Field ID",XmlElement2.GetAttribute('field_no'),9);
             ConfigPackageData.Value := CopyStr(XmlElement2.InnerText,1,MaxStrLen(ConfigPackageData.Value));
+            //-NC2.22 [358239]
+            if Field.Get(ConfigPackageData."Table ID",ConfigPackageData."Field ID") then
+              ConfigPackageData.Value := CopyStr(FormatValue(Field,ConfigPackageData.Value),1,MaxStrLen(ConfigPackageData.Value));
+            //+NC2.22 [358239]
             ConfigPackageData.Insert(true);
           end;
         end;
         //+NC2.17 [335927]
+    end;
+
+    local procedure FormatValue("Field": Record "Field";Value: Text): Text
+    var
+        TextValue: Text[250];
+        DecimalValue: Decimal;
+        IntegerValue: Integer;
+        BooleanValue: Boolean;
+        DateValue: Date;
+        TimeValue: Time;
+        DateFormulaValue: DateFormula;
+        BigIntegerValue: BigInteger;
+        DateTimeValue: DateTime;
+    begin
+        //-NC2.22 [358239]
+        case Field.Type of
+          Field.Type::Code,Field.Type::Text:
+            begin
+              exit(Value);
+            end;
+          Field.Type::Decimal:
+            begin
+              Evaluate(DecimalValue,Value,9);
+              exit(Format(DecimalValue));
+            end;
+          Field.Type::Boolean:
+            begin
+              Evaluate(BooleanValue,Value,9);
+              exit(Format(BooleanValue));
+            end;
+          Field.Type::DateFormula:
+            begin
+              Evaluate(DateFormulaValue,Value,9);
+              exit(Format(DateFormulaValue));
+            end;
+          Field.Type::BigInteger:
+            begin
+              Evaluate(BigIntegerValue,Value,9);
+              exit(Format(BigIntegerValue));
+            end;
+          Field.Type::DateTime:
+            begin
+              Evaluate(DateTimeValue,Value,9);
+              exit(Format(DateTimeValue));
+            end;
+          Field.Type::Integer:
+            begin
+              exit(Value);
+            end;
+          Field.Type::Option:
+            begin
+              if not Evaluate(IntegerValue,Value,9) then
+                exit(Value);
+              Value := SelectStr(IntegerValue + 1,Field.OptionString);
+              exit(Value);
+            end;
+          Field.Type::Date:
+            begin
+              Evaluate(DateValue, Value,9);
+              exit(Format(DateValue));
+            end;
+          Field.Type::Time:
+            begin
+              Evaluate(TimeValue, Value,9);
+              exit(Format(TimeValue));
+            end;
+        end;
+        //+NC2.22 [358239]
     end;
 
     local procedure ApplyXmlPackage(NcRapidConnectSetup: Record "Nc RapidConnect Setup";TableIdFilter: Text)

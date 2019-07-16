@@ -26,6 +26,7 @@ xmlport 6151401 "Magento Sales Order Import"
     // MAG2.19/MMV /20190314  CASE 347687 Added handling of shopper reference
     // MAG2.20/MHA /20190411  CASE 349994 Added <use_customer_salesperson>
     // MAG2.20/MHA /20190417  CASE 352201 Added <store_code>
+    // MAG2.22/BHR /20190604  CASE 350006 Added <requested_delivery_date>
 
     Caption = 'Magento Sales Order Import';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/sales_order';
@@ -510,6 +511,10 @@ xmlport 6151401 "Magento Sales Order Import"
                                     OutStr.WriteText(GiftVoucherMessage);
                                 end;
                             }
+                        }
+                        fieldelement(requested_delivery_date;TempSalesLine."Requested Delivery Date")
+                        {
+                            MinOccurs = Zero;
                         }
 
                         trigger OnAfterInitRecord()

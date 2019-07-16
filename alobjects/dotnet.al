@@ -85,18 +85,6 @@ dotnet
         type("System.Xml.XmlException";"npNetXmlException")
         {
         }
-
-        type("System.Xml.XPath.XPathNavigator";"npNetXPathNavigator")
-        {
-        }
-
-        type("System.Xml.XPath.XPathNodeType";"npNetXPathNodeType")
-        {
-        }
-
-        type("System.Xml.XmlNamespaceScope";"npNetXmlNamespaceScope")
-        {
-        }
     }
 
     assembly("System")
@@ -525,10 +513,6 @@ dotnet
         }
 
         type("System.Security.Cryptography.HMACSHA256";"npNetHMACSHA256")
-        {
-        }
-
-        type("System.Collections.Generic.IDictionary`2";"npNetIDictionary_Of_T_U")
         {
         }
 
@@ -1065,18 +1049,6 @@ dotnet
         }
 
         type("System.Drawing.ImageConverter";"npNetImageConverter")
-        {
-        }
-
-        type("System.Drawing.Font";"npNetFont1")
-        {
-        }
-
-        type("System.Drawing.FontStyle";"npNetFontStyle")
-        {
-        }
-
-        type("System.Drawing.SolidBrush";"npNetSolidBrush")
         {
         }
     }
@@ -2159,44 +2131,6 @@ dotnet
         PublicKeyToken='5c893ded5dd60b96';
 
         type("NaviPartner.Retail.Stargate.Messaging.CustDisplay.Requests.SecondaryMonitorRequest";"npNetSecondaryMonitorRequest")
-        {
-        }
-    }
-
-    assembly("Microsoft.Dynamics.Nav.OpenXml")
-    {
-        Version='14.0.0.0';
-        Culture='neutral';
-        PublicKeyToken='31bf3856ad364e35';
-
-        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.CellData";"npNetCellData")
-        {
-        }
-
-        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.WorkbookReader";"npNetWorkbookReader")
-        {
-        }
-
-        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.WorkbookWriter";"npNetWorkbookWriter")
-        {
-        }
-
-        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.WorksheetReader";"npNetWorksheetReader")
-        {
-        }
-
-        type("Microsoft.Dynamics.Nav.OpenXml.Spreadsheet.WorksheetWriter";"npNetWorksheetWriter")
-        {
-        }
-    }
-
-    assembly("DocumentFormat.OpenXml")
-    {
-        Version='2.5.5631.0';
-        Culture='neutral';
-        PublicKeyToken='31bf3856ad364e35';
-
-        type("DocumentFormat.OpenXml.Packaging.WorkbookPart";"npNetWorkbookPart")
         {
         }
     }
