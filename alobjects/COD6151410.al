@@ -14,7 +14,8 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
     // MAG2.01/MHA /20170106  CASE 257315 Corrected TempBlob reference for DrawBarcode in GiftVoucherToTempBlob() and CreditVoucherToTempBlob()
     // MAG2.09/MHA /20171211  CASE 292576 Added "Voucher Number Format" in GiftVoucherToTempBlob() and CreditVoucherToTempBlob()
-    // MAG2.17/MHA/20181122  CASE 302179 Magento Integration
+    // MAG2.17/MHA /20181122  CASE 302179 Magento Integration
+    // MAG2.22/MHA /20190617  CASE 357825 Resolution should be preserved after resize
 
 
     trigger OnRun()
@@ -123,7 +124,6 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         if SalesHeader.FindSet then
           repeat
             //-MAG2.00
-            //GiftVoucher.SETRANGE("Order No.",SalesHeader."No.");
             GiftVoucher.SetRange("Sales Order No.",SalesHeader."No.");
             //+MAG2.00
             GiftVoucher.SetRange(Status,GiftVoucher.Status::Cancelled);
@@ -143,7 +143,6 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         if SalesInvHeader.FindSet then
           repeat
             //-MAG2.00
-            //GiftVoucher.SETRANGE("Order No.",SalesInvHeader."Order No.");
             GiftVoucher.SetRange("Sales Order No.",SalesInvHeader."Order No.");
             //+MAG2.00
             GiftVoucher.SetRange(Status,GiftVoucher.Status::Cancelled);
@@ -177,7 +176,6 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         if SalesHeader.FindSet then
           repeat
             //-MAG2.00
-            //CreditVoucher.SETRANGE("Order No.",SalesHeader."No.");
             CreditVoucher.SetRange("Sales Order No.",SalesHeader."No.");
             //+MAG2.00
             CreditVoucher.SetRange(Status,CreditVoucher.Status::Cancelled);
@@ -197,7 +195,6 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         if SalesInvHeader.FindSet then
           repeat
             //-MAG2.00
-            //CreditVoucher.SETRANGE("Order No.",SalesInvHeader."Order No.");
             CreditVoucher.SetRange("Sales Order No.",SalesInvHeader."Order No.");
             //+MAG2.00
             CreditVoucher.SetRange(Status,CreditVoucher.Status::Cancelled);
@@ -284,9 +281,6 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
 
         repeat
           //-MAG2.17 [302179]
-          // VoucherFound := CheckGiftVoucherPayment(PaymentLine);
-          // IF NOT VoucherFound THEN
-          //  VoucherFound := CheckCreditVoucherPayment(PaymentLine);
           case PaymentLine."Source Table No." of
             DATABASE::"Credit Voucher":
               VoucherFound := CheckCreditVoucherPayment(PaymentLine);
@@ -673,26 +667,25 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         Language: Integer;
         VoucherAmount: Text;
         VoucherDate: Text;
+        XDpi: Integer;
+        YDpi: Integer;
     begin
         MagentoSetup.Get;
         if not MagentoSetup."Gift Voucher Bitmap".HasValue then
           Error(Text000);
 
         //-MAG2.00
-        //MagentoSetup.CALCFIELDS("Gift Voucher Bitmap");
         MagentoSetup.CalcFields("Generic Setup","Gift Voucher Bitmap");
         TempBlob2.Blob := MagentoSetup."Generic Setup";
         //+MAG2.00
         MagentoSetup."Gift Voucher Bitmap".CreateInStream(InStream);
         Bitmap := Bitmap.Bitmap(InStream);
         Graphics := Graphics.FromImage(Bitmap);
-
         SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.CustomerName";
         MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,Format(GiftVoucher.Name));
 
         SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.Amount";
         //-MAG2.09 [292576]
-        //MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,FORMAT(GiftVoucher.Amount));
         VoucherAmount := Format(GiftVoucher.Amount);
         if MagentoSetup."Voucher Number Format" <> '' then
           VoucherAmount := Format(GiftVoucher.Amount,0,MagentoSetup."Voucher Number Format");
@@ -706,7 +699,6 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
 
         SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.ExpiryDate";
         //-MAG2.09 [292576]
-        //MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,FORMAT(GiftVoucher."Expire Date"));
         VoucherDate := Format(GiftVoucher."Expire Date");
         if MagentoSetup."Voucher Date Format" <> '' then
           VoucherDate := Format(GiftVoucher."Expire Date",0,MagentoSetup."Voucher Date Format");
@@ -723,7 +715,6 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
 
         SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.Barcode";
         //-MAG2.01 [257315]
-        //MagentoGenericSetupMgt.DrawBarcode(Graphics,TempBlob,SetupPath,FORMAT(GiftVoucher."No."),Bitmap,BitmapBarcode);
         MagentoGenericSetupMgt.DrawBarcode(Graphics,TempBlob2,SetupPath,Format(GiftVoucher."No."),Bitmap,BitmapBarcode);
         //+MAG2.01 [257315]
 
@@ -732,9 +723,16 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         if Ratio > Ratio2 then
           Ratio := Ratio2;
         if Ratio < 1 then begin
+          //-MAG2.22 [357825]
+          XDpi := Bitmap.HorizontalResolution;
+          YDpi := Bitmap.VerticalResolution;
+          //+MAG2.22 [357825]
           NewWidth := Round(Bitmap.Width * Ratio,1,'<');
           NewHeight := Round(Bitmap.Height * Ratio,1,'<');
           Bitmap := Bitmap.Bitmap(Bitmap,NewWidth,NewHeight);
+          //-MAG2.22 [357825]
+          Bitmap.SetResolution(XDpi,YDpi);
+          //+MAG2.22 [357825]
         end;
         Clear(TempBlob);
         TempBlob.Blob.CreateOutStream(OutStream);
@@ -759,6 +757,8 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         Ratio2: Decimal;
         VoucherAmount: Text;
         VoucherDate: Text;
+        XDpi: Integer;
+        YDpi: Integer;
     begin
         MagentoSetup.Get;
         if not MagentoSetup."Credit Voucher Bitmap".HasValue then
@@ -811,9 +811,16 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         if Ratio > Ratio2 then
           Ratio := Ratio2;
         if Ratio < 1 then begin
+          //-MAG2.22 [357825]
+          XDpi := Bitmap.HorizontalResolution;
+          YDpi := Bitmap.VerticalResolution;
+          //+MAG2.22 [357825]
           NewWidth := Round(Bitmap.Width * Ratio,1,'<');
           NewHeight := Round(Bitmap.Height * Ratio,1,'<');
           Bitmap := Bitmap.Bitmap(Bitmap,NewWidth,NewHeight);
+          //-MAG2.22 [357825]
+          Bitmap.SetResolution(XDpi,YDpi);
+          //+MAG2.22 [357825]
         end;
 
         TempBlob.DeleteAll;

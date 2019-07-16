@@ -2,6 +2,8 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
 {
     // MAG2.08/MHA /20171016  CASE 292926 Object created - M2 Integration
     // MAG2.09/MHA /20171108  CASE 295656 Api Method changed to REST (Json)
+    // MAG2.22/MHA /20190625  CASE 359285 Adjusted SetupTemplate() to delete existing Template if Version Id belongs to Magento
+    // MAG2.22/MHA /20190708  CASE 352201 Added function SetupTemplateCollectStore
 
 
     trigger OnRun()
@@ -121,13 +123,19 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         NpXmlElement: Record "NpXml Element";
         NpXmlTemplate: Record "NpXml Template";
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
         TemplateUrl: Text;
         NewTemplate: Boolean;
     begin
         if (TemplateCode = '') or (not MagentoSetup.Get) then
           exit;
-        if MagentoSetup."Version No." = '' then
-          MagentoSetup."Version No." := 'MAG2.00';
+
+        //-MAG2.22 [359285]
+        MagentoSetupMgt.UpdateVersionNo(MagentoSetup);
+        if NpXmlTemplate.Get(TemplateCode) and (CopyStr(NpXmlTemplate."Template Version",1,StrLen(MagentoSetupMgt.MagentoVersionId())) = MagentoSetupMgt.MagentoVersionId()) then
+          NpXmlTemplate.Delete(true);
+        //+MAG2.22 [359285]
+
         if not Enabled then begin
           if NpXmlTemplate.Get(TemplateCode) then
             NpXmlTemplate.Delete(true);
@@ -361,6 +369,18 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Membership" + '/';
         SetupTemplate(TempBlob,MagentoGenericSetupMgt.GetValueText(TempBlob,NodePath + "ElementName.Update"),Enabled);
         //+MAG2.02
+    end;
+
+    procedure SetupTemplateCollectStore(var TempBlob: Record TempBlob;Enabled: Boolean)
+    var
+        MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
+        NodePath: Text;
+    begin
+        //-MAG2.22 [352201]
+        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.CollectStore" + '/';
+        SetupTemplate(TempBlob,MagentoGenericSetupMgt.GetValueText(TempBlob,NodePath + "ElementName.Update"),Enabled);
+        SetupTemplate(TempBlob,MagentoGenericSetupMgt.GetValueText(TempBlob,NodePath + "ElementName.Delete"),Enabled);
+        //+MAG2.22 [352201]
     end;
 
     procedure "--- Template Element Setup"()
@@ -633,6 +653,13 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         //-MAG2.02
         exit('membership');
         //+MAG2.02
+    end;
+
+    procedure "ElementName.CollectStore"(): Text
+    begin
+        //-MAG2.22 [352201]
+        exit('collect_store');
+        //+MAG2.22 [352201]
     end;
 }
 

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en-US" target-language="es-ES" original="Please update this value">
+    <body>
+      <group id="body">
+        <trans-unit id="Page 2718667082 - Action 2033009233 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Attributes</source>
+          <target>Atributos</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Retail Item Card - Action Attributes - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2718667082 - Action 2033009233 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
+          <source>View or edit the item's attributes, such as color, size, or other characteristics that help to describe the item.</source>
+          <target>Permite ver o editar los atributos del producto, como el color, el tama�o u otras caracter�sticas que ayudan a describir el producto.</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Retail Item Card - Action Attributes - Property ToolTip</note>
+        </trans-unit>
+        <trans-unit id="Page 2124766380 - Action 2033009233 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Attributes</source>
+          <target>Atributos</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Retail Item List - Action Attributes - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2124766380 - Action 2033009233 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
+          <source>View or edit the item's attributes, such as color, size, or other characteristics that help to describe the item.</source>
+          <target>Permite ver o editar los atributos del producto, como el color, el tama�o u otras caracter�sticas que ayudan a describir el producto.</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Retail Item List - Action Attributes - Property ToolTip</note>
+        </trans-unit>
+      </group>
+    </body>
+  </file>
+</xliff>

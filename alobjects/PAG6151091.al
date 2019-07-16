@@ -1,6 +1,7 @@
 page 6151091 "Nc RapidConnect Setup"
 {
     // NC2.12/MHA /20180418  CASE 308107 Object created - RapidStart with NaviConnect
+    // NC14.00.2.22/MHA /20190715  CASE 361941 Removed Action "Export to Excel"
 
     Caption = 'RapidConnect Setup';
     CardPageID = "Nc RapidConnect Setup Card";
@@ -44,22 +45,6 @@ page 6151091 "Nc RapidConnect Setup"
     {
         area(processing)
         {
-            group(Export)
-            {
-                Caption = 'Export';
-                action("Export to Excel")
-                {
-                    Caption = 'Export to Excel';
-                    Image = ExportToExcel;
-
-                    trigger OnAction()
-                    var
-                        NpRcRapidConnectExportMgt: Codeunit "Nc RapidConnect Export Mgt.";
-                    begin
-                        NpRcRapidConnectExportMgt.ExportToExcel2(Rec);
-                    end;
-                }
-            }
             group(Import)
             {
                 Caption = 'Import';

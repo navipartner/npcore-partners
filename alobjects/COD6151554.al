@@ -17,6 +17,7 @@ codeunit 6151554 "NpXml Dom Mgt."
     // NC2.19/MHA /20190116  CASE 342218 Added functions to be used to calculate Authorization Header from Extension
     // NC2.19/MHA /20190311  CASE 345261 Removed implicit TryGetWebExceptionResponse() in SendWebRequest() and SendWebRequestText() and added Get functions
     // NC2.21/MHA /20190530  CASE 344264 Added functions Xml Get functions for duration
+    // NC2.22/MHA /20190705  CASE 361164 Changed scope of GetWebExceptionInnerMessage() and TryGetWebExceptionResponse() from Global to Local
 
 
     trigger OnRun()
@@ -943,8 +944,10 @@ codeunit 6151554 "NpXml Dom Mgt."
               exit(ExceptionMessage);
           end;
 
-          if InnerWebException.Message <> '' then
-            exit(InnerWebException.Message);
+          if not IsNull(InnerWebException) then begin
+            if InnerWebException.Message <> '' then
+              exit(InnerWebException.Message);
+          end;
         end;
 
         if TryGetWebExceptionResponse(WebException,HttpWebResponse) then begin
@@ -960,7 +963,7 @@ codeunit 6151554 "NpXml Dom Mgt."
         //+NC2.19 [345261]
     end;
 
-    procedure GetWebExceptionInnerMessage(var WebException: DotNet npNetWebException) ExceptionMessage: Text
+    local procedure GetWebExceptionInnerMessage(var WebException: DotNet npNetWebException) ExceptionMessage: Text
     var
         InnerWebException: DotNet npNetWebException;
     begin
@@ -1090,7 +1093,7 @@ codeunit 6151554 "NpXml Dom Mgt."
     end;
 
     [TryFunction]
-    procedure TryGetWebExceptionResponse(var WebException: DotNet npNetWebException;var HttpWebResponse: DotNet npNetHttpWebResponse)
+    local procedure TryGetWebExceptionResponse(var WebException: DotNet npNetWebException;var HttpWebResponse: DotNet npNetHttpWebResponse)
     begin
         //-NC2.01 [256392]
         HttpWebResponse := WebException.Response;
