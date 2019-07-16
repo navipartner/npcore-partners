@@ -7,7 +7,7 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
     begin
     end;
 
-    procedure WebServiceApi(LoyaltyEndpointClient: Record "MM NPR Remote Endpoint Setup";SoapAction: Text;var ReasonText: Text;var XmlDocIn: DotNet npNetXmlDocument;var XmlDocOut: DotNet npNetXmlDocument): Boolean
+    procedure WebServiceApi(LoyaltyEndpointClient: Record "MM NPR Remote Endpoint Setup"; SoapAction: Text; var ReasonText: Text; var XmlDocIn: DotNet npNetXmlDocument; var XmlDocOut: DotNet npNetXmlDocument): Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         Credential: DotNet npNetNetworkCredential;
@@ -26,46 +26,46 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
     begin
 
         ReasonText := '';
-        HttpWebRequest := HttpWebRequest.Create (LoyaltyEndpointClient."Endpoint URI");
+        HttpWebRequest := HttpWebRequest.Create(LoyaltyEndpointClient."Endpoint URI");
         HttpWebRequest.Timeout := LoyaltyEndpointClient."Connection Timeout (ms)";
-        HttpWebRequest.KeepAlive (true);
+        HttpWebRequest.KeepAlive(true);
 
 
         case LoyaltyEndpointClient."Credentials Type" of
-          LoyaltyEndpointClient."Credentials Type"::NAMED :
-            begin
-              HttpWebRequest.UseDefaultCredentials (false);
-              B64Credential := ToBase64 (StrSubstNo ('%1:%2', LoyaltyEndpointClient."User Account", LoyaltyEndpointClient."User Password"));
-              HttpWebRequest.Headers.Add ('Authorization', StrSubstNo ('Basic %1', B64Credential));
-            end;
-          else
-            HttpWebRequest.UseDefaultCredentials (true);
+            LoyaltyEndpointClient."Credentials Type"::NAMED:
+                begin
+                    HttpWebRequest.UseDefaultCredentials(false);
+                    B64Credential := ToBase64(StrSubstNo('%1:%2', LoyaltyEndpointClient."User Account", LoyaltyEndpointClient."User Password"));
+                    HttpWebRequest.Headers.Add('Authorization', StrSubstNo('Basic %1', B64Credential));
+                end;
+            else
+                HttpWebRequest.UseDefaultCredentials(true);
         end;
 
         HttpWebRequest.Method := 'POST';
         HttpWebRequest.ContentType := 'application/xml; charset=utf-8';
-        HttpWebRequest.Headers.Add ('SOAPAction', StrSubstNo ('"%1"', SoapAction));
+        HttpWebRequest.Headers.Add('SOAPAction', StrSubstNo('"%1"', SoapAction));
 
-        NpXmlDomMgt.SetTrustedCertificateValidation (HttpWebRequest);
+        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
 
-        if (TrySendWebRequest (XmlDocIn, HttpWebRequest, HttpWebResponse, SoapAction)) then begin
-          if (TryReadResponseText (HttpWebResponse, ResponseText, SoapAction)) then begin
-            if (TryParseResponseText (ResponseText)) then begin
-              XmlDocOut := XmlDocOut.XmlDocument;
-              XmlDocOut.LoadXml (ResponseText);
+        if (TrySendWebRequest(XmlDocIn, HttpWebRequest, HttpWebResponse, SoapAction)) then begin
+            if (TryReadResponseText(HttpWebResponse, ResponseText, SoapAction)) then begin
+                if (TryParseResponseText(ResponseText)) then begin
+                    XmlDocOut := XmlDocOut.XmlDocument;
+                    XmlDocOut.LoadXml(ResponseText);
 
-              exit (true);
+                    exit(true);
+                end;
             end;
-          end;
         end;
 
         XmlDocOut := XmlDocOut.XmlDocument;
-        GetExceptionDescription (XmlDocOut, SoapAction, LoyaltyEndpointClient."Endpoint URI");
+        GetExceptionDescription(XmlDocOut, SoapAction, LoyaltyEndpointClient."Endpoint URI");
 
-        exit (false);
+        exit(false);
     end;
 
-    local procedure GetExceptionDescription(var XmlDocOut: DotNet npNetXmlDocument;SoapAction: Text;Endpoint: Text)
+    local procedure GetExceptionDescription(var XmlDocOut: DotNet npNetXmlDocument; SoapAction: Text; Endpoint: Text)
     var
         ReasonText: Text;
         WebException: DotNet npNetWebException;
@@ -77,41 +77,41 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
         StatusDescription: Text[50];
     begin
 
-        ReasonText := StrSubstNo ('Error from WebServiceApi %1\\%2', GetLastErrorText, SoapAction);
+        ReasonText := StrSubstNo('Error from WebServiceApi %1\\%2', GetLastErrorText, SoapAction);
 
         Exception := GetLastErrorObject();
-        if ((Format (GetDotNetType(Exception.GetBaseException ()))) <> (Format (GetDotNetType(WebException)))) then begin
-          //ERROR (Exception.ToString ());
-          XmlDocOut.LoadXml (StrSubstNo (
-            '<Fault>'+
-              '<faultstatus>%1</faultstatus>'+
-              '<faultstring>%2 - %3</faultstring>'+
-            '</Fault>',
-            998,
-            ReasonText,
-            Endpoint));
-          exit;
+        if ((Format(GetDotNetType(Exception.GetBaseException()))) <> (Format(GetDotNetType(WebException)))) then begin
+            //ERROR (Exception.ToString ());
+            XmlDocOut.LoadXml(StrSubstNo(
+              '<Fault>' +
+                '<faultstatus>%1</faultstatus>' +
+                '<faultstring>%2 - %3</faultstring>' +
+              '</Fault>',
+              998,
+              ReasonText,
+              Endpoint));
+            exit;
         end;
 
-        WebException := Exception.GetBaseException ();
-        TryReadExceptionResponseText (WebException, StatusCode, StatusDescription, ResponseText);
+        WebException := Exception.GetBaseException();
+        TryReadExceptionResponseText(WebException, StatusCode, StatusDescription, ResponseText);
 
-        if (StrLen (ResponseText) > 0) then
-          XmlDocOut.LoadXml (ResponseText);
+        if (StrLen(ResponseText) > 0) then
+            XmlDocOut.LoadXml(ResponseText);
 
-        if (StrLen (ResponseText) = 0) then
-          XmlDocOut.LoadXml (StrSubstNo (
-            '<Fault>'+
-              '<faultstatus>%1</faultstatus>'+
-              '<faultstring>%2 - %3</faultstring>'+
-            '</Fault>',
-            StatusCode,
-            StatusDescription,
-            Endpoint));
+        if (StrLen(ResponseText) = 0) then
+            XmlDocOut.LoadXml(StrSubstNo(
+              '<Fault>' +
+                '<faultstatus>%1</faultstatus>' +
+                '<faultstring>%2 - %3</faultstring>' +
+              '</Fault>',
+              StatusCode,
+              StatusDescription,
+              Endpoint));
     end;
 
     [TryFunction]
-    local procedure TrySendWebRequest(var XmlDoc: DotNet npNetXmlDocument;HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse;SoapAction: Text)
+    local procedure TrySendWebRequest(var XmlDoc: DotNet npNetXmlDocument; HttpWebRequest: DotNet npNetHttpWebRequest; var HttpWebResponse: DotNet npNetHttpWebResponse; SoapAction: Text)
     var
         MemoryStream: DotNet npNetMemoryStream;
     begin
@@ -125,7 +125,7 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
     end;
 
     [TryFunction]
-    local procedure TryReadResponseText(var HttpWebResponse: DotNet npNetHttpWebResponse;var ResponseText: Text;SoapAction: Text)
+    local procedure TryReadResponseText(var HttpWebResponse: DotNet npNetHttpWebResponse; var ResponseText: Text; SoapAction: Text)
     var
         Stream: DotNet npNetStream;
         StreamReader: DotNet npNetStreamReader;
@@ -138,7 +138,7 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
     end;
 
     [TryFunction]
-    local procedure TryReadExceptionResponseText(var WebException: DotNet npNetWebException;var StatusCode: Code[10];var StatusDescription: Text;var ResponseXml: Text)
+    local procedure TryReadExceptionResponseText(var WebException: DotNet npNetWebException; var StatusCode: Code[10]; var StatusDescription: Text; var ResponseXml: Text)
     var
         Stream: DotNet npNetStream;
         StreamReader: DotNet npNetStreamReader;
@@ -147,45 +147,48 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
         WebExceptionStatus: DotNet npNetWebExceptionStatus;
         SystemConvert: DotNet npNetConvert;
         StatusCodeInt: Integer;
+        DotNetType: DotNet npNetType;
     begin
 
         ResponseXml := '';
 
         // No respone body on time out
-        if (WebException.Status.Equals (WebExceptionStatus.Timeout)) then  begin
-          StatusCodeInt := SystemConvert.ChangeType (WebExceptionStatus.Timeout, GetDotNetType (StatusCodeInt));
-          StatusCode := Format (StatusCodeInt);
-          StatusDescription := WebExceptionStatus.Timeout.ToString();
-          exit;
+        if (WebException.Status.Equals(WebExceptionStatus.Timeout)) then begin
+            DotNetType := GetDotNetType(StatusCodeInt);
+            StatusCodeInt := SystemConvert.ChangeType(WebExceptionStatus.Timeout, DotNetType);
+            StatusCode := Format(StatusCodeInt);
+            StatusDescription := WebExceptionStatus.Timeout.ToString();
+            exit;
         end;
 
         // This happens for unauthorized and server side faults (4xx and 5xx)
         // The response stream in unauthorized fails in XML transformation later
-        if (WebException.Status.Equals (WebExceptionStatus.ProtocolError)) then begin
-          HttpWebResponse := WebException.Response ();
-          StatusCodeInt := SystemConvert.ChangeType (HttpWebResponse.StatusCode, GetDotNetType (StatusCodeInt));
-          StatusCode := Format (StatusCodeInt);
-          StatusDescription := HttpWebResponse.StatusDescription;
-          if (StatusCode[1] = '4') then // 4xx messages
-            exit;
+        if (WebException.Status.Equals(WebExceptionStatus.ProtocolError)) then begin
+            HttpWebResponse := WebException.Response();
+            DotNetType := GetDotNetType(StatusCodeInt);
+            StatusCodeInt := SystemConvert.ChangeType(HttpWebResponse.StatusCode, DotNetType);
+            StatusCode := Format(StatusCodeInt);
+            StatusDescription := HttpWebResponse.StatusDescription;
+            if (StatusCode[1] = '4') then // 4xx messages
+                exit;
         end;
 
         StreamReader := StreamReader.StreamReader(WebException.Response().GetResponseStream());
         ResponseXml := StreamReader.ReadToEnd;
 
         StreamReader.Close;
-        Clear (StreamReader);
+        Clear(StreamReader);
     end;
 
     [TryFunction]
-    local procedure TryGetWebExceptionResponse(var WebException: DotNet npNetWebException;var HttpWebResponse: DotNet npNetHttpWebResponse)
+    local procedure TryGetWebExceptionResponse(var WebException: DotNet npNetWebException; var HttpWebResponse: DotNet npNetHttpWebResponse)
     begin
 
         HttpWebResponse := WebException.Response;
     end;
 
     [TryFunction]
-    local procedure TryGetInnerWebException(var WebException: DotNet npNetWebException;var InnerWebException: DotNet npNetWebException)
+    local procedure TryGetInnerWebException(var WebException: DotNet npNetWebException; var InnerWebException: DotNet npNetWebException)
     begin
 
         InnerWebException := WebException.InnerException;
@@ -198,7 +201,7 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
     begin
 
         XmlDocOut := XmlDocOut.XmlDocument;
-        XmlDocOut.LoadXml (XmlText);
+        XmlDocOut.LoadXml(XmlText);
     end;
 
     procedure ToBase64(StringToEncode: Text) B64String: Text
@@ -229,7 +232,7 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
     procedure XmlSafe(InText: Text): Text
     begin
 
-        exit (DelChr (InText, '<=>', DelChr (InText, '<=>', '1234567890 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-+*')));
+        exit(DelChr(InText, '<=>', DelChr(InText, '<=>', '1234567890 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-+*')));
     end;
 }
 

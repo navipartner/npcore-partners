@@ -14,8 +14,11 @@ codeunit 6150632 "JavaScript Bridge Management"
         AdHocModuleId: Integer;
 
     procedure Initialize(BridgeIn: DotNet npNetIFramework0)
+    var
+        NetConvHelper: Variant;
     begin
-        Bridge := BridgeIn;
+        NetConvHelper := BridgeIn;
+        Bridge := NetConvHelper;
         Initialized := true;
     end;
 
