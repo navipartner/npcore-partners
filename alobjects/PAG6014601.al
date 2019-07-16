@@ -14,7 +14,7 @@ page 6014601 "NPR Item Availability FactBox"
     {
         area(content)
         {
-            field("No.";"No.")
+            field("No."; "No.")
             {
                 Caption = 'Item No.';
                 Lookup = false;
@@ -24,29 +24,28 @@ page 6014601 "NPR Item Availability FactBox"
                     ShowDetails;
                 end;
             }
-            field(Availability;StrSubstNo('%1',CalcAvailability))
+            field(Availability; StrSubstNo('%1', CalcAvailability))
             {
                 Caption = 'Availability';
-                DecimalPlaces = 2:0;
                 DrillDown = true;
                 Editable = true;
 
                 trigger OnDrillDown()
                 begin
-                    ItemAvailFormsMgt.ShowItemAvailFromItem(Rec,ItemAvailFormsMgt.ByEvent);
+                    ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByEvent);
                     CurrPage.Update(true);
                 end;
             }
-            field(Inventory;Inventory)
+            field(Inventory; Inventory)
             {
             }
-            field("Qty. on Sales Order";"Qty. on Sales Order")
+            field("Qty. on Sales Order"; "Qty. on Sales Order")
             {
             }
-            field("Qty. on Purch. Order";"Qty. on Purch. Order")
+            field("Qty. on Purch. Order"; "Qty. on Purch. Order")
             {
             }
-            field("Sales (Qty.)";"Sales (Qty.)")
+            field("Sales (Qty.)"; "Sales (Qty.)")
             {
             }
         }
@@ -79,7 +78,7 @@ page 6014601 "NPR Item Availability FactBox"
     var
         Item: Record Item;
     begin
-        PAGE.Run(PAGE::"Item Card",Item);
+        PAGE.Run(PAGE::"Item Card", Item);
     end;
 
     procedure CalcAvailability(): Decimal
@@ -93,8 +92,8 @@ page 6014601 "NPR Item Availability FactBox"
     begin
         AvailabilityDate := WorkDate;
 
-        SetRange("Date Filter",0D,AvailabilityDate);
-        SetRange("Drop Shipment Filter",false);
+        SetRange("Date Filter", 0D, AvailabilityDate);
+        SetRange("Drop Shipment Filter", false);
 
         exit(
           AvailableToPromise.QtyAvailabletoPromise(
