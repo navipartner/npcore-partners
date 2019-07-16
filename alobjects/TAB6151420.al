@@ -11,6 +11,7 @@ table 6151420 "Magento Store Item"
     // MAG2.07/MHA /20170912  CASE 289369 Increased length of field 300 "Meta Title" from 50 to 70
     // MAG9.00.2.11/TS  /20180301  CASE 305585 Added field Visibility.
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Field 1025
+    // MAG2.22/MHA /20190614  CASE 358258 Extended field 300 "Meta Title" from 70 to 100
 
     Caption = 'Magento Store Item';
 
@@ -165,10 +166,10 @@ table 6151420 "Magento Store Item"
             Caption = 'Special Price To Enabled';
             Description = 'MAG1.21';
         }
-        field(300;"Meta Title";Text[70])
+        field(300;"Meta Title";Text[100])
         {
             Caption = 'Meta Title';
-            Description = 'StoreView,MAG2.07';
+            Description = 'StoreView,MAG2.07,MAG2.22';
         }
         field(301;"Meta Title Enabled";Boolean)
         {

@@ -2,11 +2,11 @@ table 6151412 "Magento Picture Link"
 {
     // MAG1.00/MH/20150113  CASE 199932 Refactored Object from Web Integration
     // MAG1.01/MH/20150115  CASE 199932 Updated Picture Lookup
-    // MAG1.09/MH/20150316  CASE 206395 Deleted Obsolete field 6059806 "Internet Number" and associated key
-    // MAG1.14/MH/20150429  CASE 212526 Changed parameters for LookupPicture() to PictureType, PictureName
-    // MAG1.16/MH/20150401  CASE 210548 Removed Type::Attribute and added Type::Customer
-    // MAG1.19/TS/20150706 CASE 214946 Edited Option caption on Type field
-    // MAG1.21/MHA/20151021  CASE 223835 Renamed field 11 from "Variax Dimension Code" to "Variant Value Code"
+    // MAG1.09/MHA /20150316  CASE 206395 Deleted Obsolete field 6059806 "Internet Number" and associated key
+    // MAG1.14/MHA /20150429  CASE 212526 Changed parameters for LookupPicture() to PictureType, PictureName
+    // MAG1.16/MHA /20150401  CASE 210548 Removed Type::Attribute and added Type::Customer
+    // MAG1.19/TS  /20150706  CASE 214946 Edited Option caption on Type field
+    // MAG1.21/MHA /20151021  CASE 223835 Renamed field 11 from "Variax Dimension Code" to "Variant Value Code"
     //                                      Deleted unused fields:
     //                                      - 1 Type
     //                                      - 4 Color
@@ -17,10 +17,11 @@ table 6151412 "Magento Picture Link"
     //                                      - 20 Code
     //                                      - 28 Exclude
     //                                      - 110 Entry No.
-    // MAG1.21/MHA/20151119 CASE 227583 Removed TESTFIELD of "Short Text"
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
-    // MAG2.01/MHA /20161128 CASE 259281 Picture Name must have a value
-    // MAG2.20/MHA /20190430 CASE 353499 Removed validation on "Picture Name"
+    // MAG1.21/MHA /20151119  CASE 227583 Removed TESTFIELD of "Short Text"
+    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
+    // MAG2.01/MHA /20161128  CASE 259281 Picture Name must have a value
+    // MAG2.20/MHA /20190430  CASE 353499 Removed validation on "Picture Name"
+    // MAG2.22/MHA /20190625  CASE 359285 Added fields 40 "Variety Type", 50 "Variety Table", 60 "Variety Value"
 
     Caption = 'Magento Picture Link';
 
@@ -110,6 +111,25 @@ table 6151412 "Magento Picture Link"
         field(30;Sorting;Integer)
         {
             Caption = 'Sorting';
+        }
+        field(40;"Variety Type";Code[10])
+        {
+            Caption = 'Variety Type';
+            Description = 'MAG2.22';
+            TableRelation = Variety;
+        }
+        field(50;"Variety Table";Code[40])
+        {
+            Caption = 'Variety Table';
+            Description = 'MAG2.22';
+            TableRelation = "Variety Table".Code WHERE (Type=FIELD("Variety Type"));
+        }
+        field(60;"Variety Value";Code[20])
+        {
+            Caption = 'Variety Value';
+            Description = 'MAG2.22';
+            TableRelation = "Variety Value".Value WHERE (Type=FIELD("Variety Type"),
+                                                         Table=FIELD("Variety Table"));
         }
         field(90;"Picture Name";Text[250])
         {

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,115 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="ReturnReason_GetFilters">
-          <DataField>ReturnReason_GetFilters</DataField>
-        </Field>
-        <Field Name="ItemLedgerEntry_GetFilters">
-          <DataField>ItemLedgerEntry_GetFilters</DataField>
-        </Field>
-        <Field Name="PostingDateCaption">
-          <DataField>PostingDateCaption</DataField>
-        </Field>
-        <Field Name="CustomerCaption">
-          <DataField>CustomerCaption</DataField>
-        </Field>
-        <Field Name="BaseUOMCaption">
-          <DataField>BaseUOMCaption</DataField>
-        </Field>
-        <Field Name="CostAmountCaption">
-          <DataField>CostAmountCaption</DataField>
-        </Field>
-        <Field Name="SalesAmountCaption">
-          <DataField>SalesAmountCaption</DataField>
-        </Field>
-        <Field Name="SalesTicketNumberCaption">
-          <DataField>SalesTicketNumberCaption</DataField>
-        </Field>
-        <Field Name="ReturnTypeCaption">
-          <DataField>ReturnTypeCaption</DataField>
-        </Field>
-        <Field Name="PageCaption">
-          <DataField>PageCaption</DataField>
-        </Field>
-        <Field Name="ReportCaption">
-          <DataField>ReportCaption</DataField>
-        </Field>
-        <Field Name="ItemDescriptionCaption">
-          <DataField>ItemDescriptionCaption</DataField>
-        </Field>
-        <Field Name="Code_ReturnReason">
-          <DataField>Code_ReturnReason</DataField>
-        </Field>
-        <Field Name="Description_ReturnReason">
-          <DataField>Description_ReturnReason</DataField>
-        </Field>
-        <Field Name="ExistItemLedgEntry">
-          <DataField>ExistItemLedgEntry</DataField>
-        </Field>
-        <Field Name="EntryNo_ItemLedgerEntry">
-          <DataField>EntryNo_ItemLedgerEntry</DataField>
-        </Field>
-        <Field Name="ItemNo_ItemLedgerEntry">
-          <DataField>ItemNo_ItemLedgerEntry</DataField>
-        </Field>
-        <Field Name="ItemDescription">
-          <DataField>ItemDescription</DataField>
-        </Field>
-        <Field Name="PostingDate_ItemLedgerEntry">
-          <DataField>PostingDate_ItemLedgerEntry</DataField>
-        </Field>
-        <Field Name="ReturnType">
-          <DataField>ReturnType</DataField>
-        </Field>
-        <Field Name="CustomerNo">
-          <DataField>CustomerNo</DataField>
-        </Field>
-        <Field Name="ExternalDocumentNo_ItemLedgerEntry">
-          <DataField>ExternalDocumentNo_ItemLedgerEntry</DataField>
-        </Field>
-        <Field Name="LocationCode_ItemLedgerEntry">
-          <DataField>LocationCode_ItemLedgerEntry</DataField>
-        </Field>
-        <Field Name="DocumentNo_ItemLedgerEntry">
-          <DataField>DocumentNo_ItemLedgerEntry</DataField>
-        </Field>
-        <Field Name="RegisterNumber_ItemLedgerEntry">
-          <DataField>RegisterNumber_ItemLedgerEntry</DataField>
-        </Field>
-        <Field Name="SalespersonCode_ItemLedgerEntry">
-          <DataField>SalespersonCode_ItemLedgerEntry</DataField>
-        </Field>
-        <Field Name="UnitofMeasureCode_ItemLedgerEntry">
-          <DataField>UnitofMeasureCode_ItemLedgerEntry</DataField>
-        </Field>
-        <Field Name="Quantity_ItemLedgerEntry">
-          <DataField>Quantity_ItemLedgerEntry</DataField>
-        </Field>
-        <Field Name="Quantity_ItemLedgerEntryFormat">
-          <DataField>Quantity_ItemLedgerEntryFormat</DataField>
-        </Field>
-        <Field Name="CostAmount">
-          <DataField>CostAmount</DataField>
-        </Field>
-        <Field Name="CostAmountFormat">
-          <DataField>CostAmountFormat</DataField>
-        </Field>
-        <Field Name="SalesAmountActual_ItemLedgerEntry">
-          <DataField>SalesAmountActual_ItemLedgerEntry</DataField>
-        </Field>
-        <Field Name="SalesAmountActual_ItemLedgerEntryFormat">
-          <DataField>SalesAmountActual_ItemLedgerEntryFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -2070,4 +1961,113 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="ReturnReason_GetFilters">
+          <DataField>ReturnReason_GetFilters</DataField>
+        </Field>
+        <Field Name="ItemLedgerEntry_GetFilters">
+          <DataField>ItemLedgerEntry_GetFilters</DataField>
+        </Field>
+        <Field Name="PostingDateCaption">
+          <DataField>PostingDateCaption</DataField>
+        </Field>
+        <Field Name="CustomerCaption">
+          <DataField>CustomerCaption</DataField>
+        </Field>
+        <Field Name="BaseUOMCaption">
+          <DataField>BaseUOMCaption</DataField>
+        </Field>
+        <Field Name="CostAmountCaption">
+          <DataField>CostAmountCaption</DataField>
+        </Field>
+        <Field Name="SalesAmountCaption">
+          <DataField>SalesAmountCaption</DataField>
+        </Field>
+        <Field Name="SalesTicketNumberCaption">
+          <DataField>SalesTicketNumberCaption</DataField>
+        </Field>
+        <Field Name="ReturnTypeCaption">
+          <DataField>ReturnTypeCaption</DataField>
+        </Field>
+        <Field Name="PageCaption">
+          <DataField>PageCaption</DataField>
+        </Field>
+        <Field Name="ReportCaption">
+          <DataField>ReportCaption</DataField>
+        </Field>
+        <Field Name="ItemDescriptionCaption">
+          <DataField>ItemDescriptionCaption</DataField>
+        </Field>
+        <Field Name="Code_ReturnReason">
+          <DataField>Code_ReturnReason</DataField>
+        </Field>
+        <Field Name="Description_ReturnReason">
+          <DataField>Description_ReturnReason</DataField>
+        </Field>
+        <Field Name="ExistItemLedgEntry">
+          <DataField>ExistItemLedgEntry</DataField>
+        </Field>
+        <Field Name="EntryNo_ItemLedgerEntry">
+          <DataField>EntryNo_ItemLedgerEntry</DataField>
+        </Field>
+        <Field Name="ItemNo_ItemLedgerEntry">
+          <DataField>ItemNo_ItemLedgerEntry</DataField>
+        </Field>
+        <Field Name="ItemDescription">
+          <DataField>ItemDescription</DataField>
+        </Field>
+        <Field Name="PostingDate_ItemLedgerEntry">
+          <DataField>PostingDate_ItemLedgerEntry</DataField>
+        </Field>
+        <Field Name="ReturnType">
+          <DataField>ReturnType</DataField>
+        </Field>
+        <Field Name="CustomerNo">
+          <DataField>CustomerNo</DataField>
+        </Field>
+        <Field Name="ExternalDocumentNo_ItemLedgerEntry">
+          <DataField>ExternalDocumentNo_ItemLedgerEntry</DataField>
+        </Field>
+        <Field Name="LocationCode_ItemLedgerEntry">
+          <DataField>LocationCode_ItemLedgerEntry</DataField>
+        </Field>
+        <Field Name="DocumentNo_ItemLedgerEntry">
+          <DataField>DocumentNo_ItemLedgerEntry</DataField>
+        </Field>
+        <Field Name="RegisterNumber_ItemLedgerEntry">
+          <DataField>RegisterNumber_ItemLedgerEntry</DataField>
+        </Field>
+        <Field Name="SalespersonCode_ItemLedgerEntry">
+          <DataField>SalespersonCode_ItemLedgerEntry</DataField>
+        </Field>
+        <Field Name="UnitofMeasureCode_ItemLedgerEntry">
+          <DataField>UnitofMeasureCode_ItemLedgerEntry</DataField>
+        </Field>
+        <Field Name="Quantity_ItemLedgerEntry">
+          <DataField>Quantity_ItemLedgerEntry</DataField>
+        </Field>
+        <Field Name="Quantity_ItemLedgerEntryFormat">
+          <DataField>Quantity_ItemLedgerEntryFormat</DataField>
+        </Field>
+        <Field Name="CostAmount">
+          <DataField>CostAmount</DataField>
+        </Field>
+        <Field Name="CostAmountFormat">
+          <DataField>CostAmountFormat</DataField>
+        </Field>
+        <Field Name="SalesAmountActual_ItemLedgerEntry">
+          <DataField>SalesAmountActual_ItemLedgerEntry</DataField>
+        </Field>
+        <Field Name="SalesAmountActual_ItemLedgerEntryFormat">
+          <DataField>SalesAmountActual_ItemLedgerEntryFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,145 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="gFilter">
-          <DataField>gFilter</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="Today">
-          <DataField>Today</DataField>
-        </Field>
-        <Field Name="USERID">
-          <DataField>USERID</DataField>
-        </Field>
-        <Field Name="CurrReport_PAGENO">
-          <DataField>CurrReport_PAGENO</DataField>
-        </Field>
-        <Field Name="Reason_Code_Code">
-          <DataField>Reason_Code_Code</DataField>
-        </Field>
-        <Field Name="Reason_Code_Description">
-          <DataField>Reason_Code_Description</DataField>
-        </Field>
-        <Field Name="Item_NoCaption">
-          <DataField>Item_NoCaption</DataField>
-        </Field>
-        <Field Name="Item_DescriptionCaption">
-          <DataField>Item_DescriptionCaption</DataField>
-        </Field>
-        <Field Name="QuantityCaption">
-          <DataField>QuantityCaption</DataField>
-        </Field>
-        <Field Name="FilterCaption">
-          <DataField>FilterCaption</DataField>
-        </Field>
-        <Field Name="Cost_AmountCaption">
-          <DataField>Cost_AmountCaption</DataField>
-        </Field>
-        <Field Name="Sales_AmountCaption">
-          <DataField>Sales_AmountCaption</DataField>
-        </Field>
-        <Field Name="Scrinkage_Reason_Code_ItemCaption">
-          <DataField>Scrinkage_Reason_Code_ItemCaption</DataField>
-        </Field>
-        <Field Name="Page_Caption">
-          <DataField>Page_Caption</DataField>
-        </Field>
-        <Field Name="gItemRec_Description">
-          <DataField>gItemRec_Description</DataField>
-        </Field>
-        <Field Name="gItemRec_No">
-          <DataField>gItemRec_No</DataField>
-        </Field>
-        <Field Name="TmpReportSorting_Quantity">
-          <DataField>TmpReportSorting_Quantity</DataField>
-        </Field>
-        <Field Name="TmpReportSorting_QuantityFormat">
-          <DataField>TmpReportSorting_QuantityFormat</DataField>
-        </Field>
-        <Field Name="TmpReportSorting_Sales_Amount">
-          <DataField>TmpReportSorting_Sales_Amount</DataField>
-        </Field>
-        <Field Name="TmpReportSorting_Sales_AmountFormat">
-          <DataField>TmpReportSorting_Sales_AmountFormat</DataField>
-        </Field>
-        <Field Name="TmpReportSorting_Cost_Amount">
-          <DataField>TmpReportSorting_Cost_Amount</DataField>
-        </Field>
-        <Field Name="TmpReportSorting_Cost_AmountFormat">
-          <DataField>TmpReportSorting_Cost_AmountFormat</DataField>
-        </Field>
-        <Field Name="TmpReportSorting_Template">
-          <DataField>TmpReportSorting_Template</DataField>
-        </Field>
-        <Field Name="TmpReportSorting_Line_No">
-          <DataField>TmpReportSorting_Line_No</DataField>
-        </Field>
-        <Field Name="ReasonCodeCount">
-          <DataField>ReasonCodeCount</DataField>
-        </Field>
-        <Field Name="gRC_Qty">
-          <DataField>gRC_Qty</DataField>
-        </Field>
-        <Field Name="gRC_QtyFormat">
-          <DataField>gRC_QtyFormat</DataField>
-        </Field>
-        <Field Name="gRC_CostAmount">
-          <DataField>gRC_CostAmount</DataField>
-        </Field>
-        <Field Name="gRC_CostAmountFormat">
-          <DataField>gRC_CostAmountFormat</DataField>
-        </Field>
-        <Field Name="gRC_SalesAmount">
-          <DataField>gRC_SalesAmount</DataField>
-        </Field>
-        <Field Name="gRC_SalesAmountFormat">
-          <DataField>gRC_SalesAmountFormat</DataField>
-        </Field>
-        <Field Name="Reason_Code_TotalCaption">
-          <DataField>Reason_Code_TotalCaption</DataField>
-        </Field>
-        <Field Name="Integer_Number">
-          <DataField>Integer_Number</DataField>
-        </Field>
-        <Field Name="gTotal_CostAmount">
-          <DataField>gTotal_CostAmount</DataField>
-        </Field>
-        <Field Name="gTotal_CostAmountFormat">
-          <DataField>gTotal_CostAmountFormat</DataField>
-        </Field>
-        <Field Name="gTotal_SalesAmount">
-          <DataField>gTotal_SalesAmount</DataField>
-        </Field>
-        <Field Name="gTotal_SalesAmountFormat">
-          <DataField>gTotal_SalesAmountFormat</DataField>
-        </Field>
-        <Field Name="gTotal_Qty">
-          <DataField>gTotal_Qty</DataField>
-        </Field>
-        <Field Name="gTotal_QtyFormat">
-          <DataField>gTotal_QtyFormat</DataField>
-        </Field>
-        <Field Name="Text002">
-          <DataField>Text002</DataField>
-        </Field>
-        <Field Name="TotalCaption">
-          <DataField>TotalCaption</DataField>
-        </Field>
-        <Field Name="Total_Number">
-          <DataField>Total_Number</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -1856,4 +1717,143 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="gFilter">
+          <DataField>gFilter</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="Today">
+          <DataField>Today</DataField>
+        </Field>
+        <Field Name="USERID">
+          <DataField>USERID</DataField>
+        </Field>
+        <Field Name="CurrReport_PAGENO">
+          <DataField>CurrReport_PAGENO</DataField>
+        </Field>
+        <Field Name="Reason_Code_Code">
+          <DataField>Reason_Code_Code</DataField>
+        </Field>
+        <Field Name="Reason_Code_Description">
+          <DataField>Reason_Code_Description</DataField>
+        </Field>
+        <Field Name="Item_NoCaption">
+          <DataField>Item_NoCaption</DataField>
+        </Field>
+        <Field Name="Item_DescriptionCaption">
+          <DataField>Item_DescriptionCaption</DataField>
+        </Field>
+        <Field Name="QuantityCaption">
+          <DataField>QuantityCaption</DataField>
+        </Field>
+        <Field Name="FilterCaption">
+          <DataField>FilterCaption</DataField>
+        </Field>
+        <Field Name="Cost_AmountCaption">
+          <DataField>Cost_AmountCaption</DataField>
+        </Field>
+        <Field Name="Sales_AmountCaption">
+          <DataField>Sales_AmountCaption</DataField>
+        </Field>
+        <Field Name="Scrinkage_Reason_Code_ItemCaption">
+          <DataField>Scrinkage_Reason_Code_ItemCaption</DataField>
+        </Field>
+        <Field Name="Page_Caption">
+          <DataField>Page_Caption</DataField>
+        </Field>
+        <Field Name="gItemRec_Description">
+          <DataField>gItemRec_Description</DataField>
+        </Field>
+        <Field Name="gItemRec_No">
+          <DataField>gItemRec_No</DataField>
+        </Field>
+        <Field Name="TmpReportSorting_Quantity">
+          <DataField>TmpReportSorting_Quantity</DataField>
+        </Field>
+        <Field Name="TmpReportSorting_QuantityFormat">
+          <DataField>TmpReportSorting_QuantityFormat</DataField>
+        </Field>
+        <Field Name="TmpReportSorting_Sales_Amount">
+          <DataField>TmpReportSorting_Sales_Amount</DataField>
+        </Field>
+        <Field Name="TmpReportSorting_Sales_AmountFormat">
+          <DataField>TmpReportSorting_Sales_AmountFormat</DataField>
+        </Field>
+        <Field Name="TmpReportSorting_Cost_Amount">
+          <DataField>TmpReportSorting_Cost_Amount</DataField>
+        </Field>
+        <Field Name="TmpReportSorting_Cost_AmountFormat">
+          <DataField>TmpReportSorting_Cost_AmountFormat</DataField>
+        </Field>
+        <Field Name="TmpReportSorting_Template">
+          <DataField>TmpReportSorting_Template</DataField>
+        </Field>
+        <Field Name="TmpReportSorting_Line_No">
+          <DataField>TmpReportSorting_Line_No</DataField>
+        </Field>
+        <Field Name="ReasonCodeCount">
+          <DataField>ReasonCodeCount</DataField>
+        </Field>
+        <Field Name="gRC_Qty">
+          <DataField>gRC_Qty</DataField>
+        </Field>
+        <Field Name="gRC_QtyFormat">
+          <DataField>gRC_QtyFormat</DataField>
+        </Field>
+        <Field Name="gRC_CostAmount">
+          <DataField>gRC_CostAmount</DataField>
+        </Field>
+        <Field Name="gRC_CostAmountFormat">
+          <DataField>gRC_CostAmountFormat</DataField>
+        </Field>
+        <Field Name="gRC_SalesAmount">
+          <DataField>gRC_SalesAmount</DataField>
+        </Field>
+        <Field Name="gRC_SalesAmountFormat">
+          <DataField>gRC_SalesAmountFormat</DataField>
+        </Field>
+        <Field Name="Reason_Code_TotalCaption">
+          <DataField>Reason_Code_TotalCaption</DataField>
+        </Field>
+        <Field Name="Integer_Number">
+          <DataField>Integer_Number</DataField>
+        </Field>
+        <Field Name="gTotal_CostAmount">
+          <DataField>gTotal_CostAmount</DataField>
+        </Field>
+        <Field Name="gTotal_CostAmountFormat">
+          <DataField>gTotal_CostAmountFormat</DataField>
+        </Field>
+        <Field Name="gTotal_SalesAmount">
+          <DataField>gTotal_SalesAmount</DataField>
+        </Field>
+        <Field Name="gTotal_SalesAmountFormat">
+          <DataField>gTotal_SalesAmountFormat</DataField>
+        </Field>
+        <Field Name="gTotal_Qty">
+          <DataField>gTotal_Qty</DataField>
+        </Field>
+        <Field Name="gTotal_QtyFormat">
+          <DataField>gTotal_QtyFormat</DataField>
+        </Field>
+        <Field Name="Text002">
+          <DataField>Text002</DataField>
+        </Field>
+        <Field Name="TotalCaption">
+          <DataField>TotalCaption</DataField>
+        </Field>
+        <Field Name="Total_Number">
+          <DataField>Total_Number</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,118 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="GetFilter">
-          <DataField>GetFilter</DataField>
-        </Field>
-        <Field Name="CompanyName">
-          <DataField>CompanyName</DataField>
-        </Field>
-        <Field Name="Today">
-          <DataField>Today</DataField>
-        </Field>
-        <Field Name="Picture_CompanyInformation">
-          <DataField>Picture_CompanyInformation</DataField>
-        </Field>
-        <Field Name="Code_PeriodDiscount">
-          <DataField>Code_PeriodDiscount</DataField>
-        </Field>
-        <Field Name="Description_PeriodDiscount">
-          <DataField>Description_PeriodDiscount</DataField>
-        </Field>
-        <Field Name="PeriodLength_PeriodDiscount">
-          <DataField>PeriodLength_PeriodDiscount</DataField>
-        </Field>
-        <Field Name="ItemNo_PeriodDiscountLine">
-          <DataField>ItemNo_PeriodDiscountLine</DataField>
-        </Field>
-        <Field Name="Description_PeriodDiscountLine">
-          <DataField>Description_PeriodDiscountLine</DataField>
-        </Field>
-        <Field Name="Unitprice_PeriodDiscountLine">
-          <DataField>Unitprice_PeriodDiscountLine</DataField>
-        </Field>
-        <Field Name="Unitprice_PeriodDiscountLineFormat">
-          <DataField>Unitprice_PeriodDiscountLineFormat</DataField>
-        </Field>
-        <Field Name="CampaignUnitprice_PeriodDiscountLine">
-          <DataField>CampaignUnitprice_PeriodDiscountLine</DataField>
-        </Field>
-        <Field Name="CampaignUnitprice_PeriodDiscountLineFormat">
-          <DataField>CampaignUnitprice_PeriodDiscountLineFormat</DataField>
-        </Field>
-        <Field Name="Turnover_PeriodDiscountLine">
-          <DataField>Turnover_PeriodDiscountLine</DataField>
-        </Field>
-        <Field Name="Turnover_PeriodDiscountLineFormat">
-          <DataField>Turnover_PeriodDiscountLineFormat</DataField>
-        </Field>
-        <Field Name="Quantitysold_PeriodDiscountLine">
-          <DataField>Quantitysold_PeriodDiscountLine</DataField>
-        </Field>
-        <Field Name="Quantitysold_PeriodDiscountLineFormat">
-          <DataField>Quantitysold_PeriodDiscountLineFormat</DataField>
-        </Field>
-        <Field Name="ProfitPerUnit">
-          <DataField>ProfitPerUnit</DataField>
-        </Field>
-        <Field Name="ProfitPerUnitFormat">
-          <DataField>ProfitPerUnitFormat</DataField>
-        </Field>
-        <Field Name="ProfitPerUnitPercent">
-          <DataField>ProfitPerUnitPercent</DataField>
-        </Field>
-        <Field Name="ProfitPerUnitPercentFormat">
-          <DataField>ProfitPerUnitPercentFormat</DataField>
-        </Field>
-        <Field Name="CampaignProfitPercent">
-          <DataField>CampaignProfitPercent</DataField>
-        </Field>
-        <Field Name="CampaignProfitPercentFormat">
-          <DataField>CampaignProfitPercentFormat</DataField>
-        </Field>
-        <Field Name="UnitCost_Item">
-          <DataField>UnitCost_Item</DataField>
-        </Field>
-        <Field Name="UnitCost_ItemFormat">
-          <DataField>UnitCost_ItemFormat</DataField>
-        </Field>
-        <Field Name="NetChange_Item">
-          <DataField>NetChange_Item</DataField>
-        </Field>
-        <Field Name="NetChange_ItemFormat">
-          <DataField>NetChange_ItemFormat</DataField>
-        </Field>
-        <Field Name="ItemVendorName">
-          <DataField>ItemVendorName</DataField>
-        </Field>
-        <Field Name="PercentDisplay">
-          <DataField>PercentDisplay</DataField>
-        </Field>
-        <Field Name="No_RetailComment">
-          <DataField>No_RetailComment</DataField>
-        </Field>
-        <Field Name="No2_RetailComment">
-          <DataField>No2_RetailComment</DataField>
-        </Field>
-        <Field Name="Comment_RetailComment">
-          <DataField>Comment_RetailComment</DataField>
-        </Field>
-        <Field Name="TotalProfitPerUnit">
-          <DataField>TotalProfitPerUnit</DataField>
-        </Field>
-        <Field Name="TotalProfitPerUnitFormat">
-          <DataField>TotalProfitPerUnitFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3611,4 +3499,116 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="GetFilter">
+          <DataField>GetFilter</DataField>
+        </Field>
+        <Field Name="CompanyName">
+          <DataField>CompanyName</DataField>
+        </Field>
+        <Field Name="Today">
+          <DataField>Today</DataField>
+        </Field>
+        <Field Name="Picture_CompanyInformation">
+          <DataField>Picture_CompanyInformation</DataField>
+        </Field>
+        <Field Name="Code_PeriodDiscount">
+          <DataField>Code_PeriodDiscount</DataField>
+        </Field>
+        <Field Name="Description_PeriodDiscount">
+          <DataField>Description_PeriodDiscount</DataField>
+        </Field>
+        <Field Name="PeriodLength_PeriodDiscount">
+          <DataField>PeriodLength_PeriodDiscount</DataField>
+        </Field>
+        <Field Name="ItemNo_PeriodDiscountLine">
+          <DataField>ItemNo_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="Description_PeriodDiscountLine">
+          <DataField>Description_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="Unitprice_PeriodDiscountLine">
+          <DataField>Unitprice_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="Unitprice_PeriodDiscountLineFormat">
+          <DataField>Unitprice_PeriodDiscountLineFormat</DataField>
+        </Field>
+        <Field Name="CampaignUnitprice_PeriodDiscountLine">
+          <DataField>CampaignUnitprice_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="CampaignUnitprice_PeriodDiscountLineFormat">
+          <DataField>CampaignUnitprice_PeriodDiscountLineFormat</DataField>
+        </Field>
+        <Field Name="Turnover_PeriodDiscountLine">
+          <DataField>Turnover_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="Turnover_PeriodDiscountLineFormat">
+          <DataField>Turnover_PeriodDiscountLineFormat</DataField>
+        </Field>
+        <Field Name="Quantitysold_PeriodDiscountLine">
+          <DataField>Quantitysold_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="Quantitysold_PeriodDiscountLineFormat">
+          <DataField>Quantitysold_PeriodDiscountLineFormat</DataField>
+        </Field>
+        <Field Name="ProfitPerUnit">
+          <DataField>ProfitPerUnit</DataField>
+        </Field>
+        <Field Name="ProfitPerUnitFormat">
+          <DataField>ProfitPerUnitFormat</DataField>
+        </Field>
+        <Field Name="ProfitPerUnitPercent">
+          <DataField>ProfitPerUnitPercent</DataField>
+        </Field>
+        <Field Name="ProfitPerUnitPercentFormat">
+          <DataField>ProfitPerUnitPercentFormat</DataField>
+        </Field>
+        <Field Name="CampaignProfitPercent">
+          <DataField>CampaignProfitPercent</DataField>
+        </Field>
+        <Field Name="CampaignProfitPercentFormat">
+          <DataField>CampaignProfitPercentFormat</DataField>
+        </Field>
+        <Field Name="UnitCost_Item">
+          <DataField>UnitCost_Item</DataField>
+        </Field>
+        <Field Name="UnitCost_ItemFormat">
+          <DataField>UnitCost_ItemFormat</DataField>
+        </Field>
+        <Field Name="NetChange_Item">
+          <DataField>NetChange_Item</DataField>
+        </Field>
+        <Field Name="NetChange_ItemFormat">
+          <DataField>NetChange_ItemFormat</DataField>
+        </Field>
+        <Field Name="ItemVendorName">
+          <DataField>ItemVendorName</DataField>
+        </Field>
+        <Field Name="PercentDisplay">
+          <DataField>PercentDisplay</DataField>
+        </Field>
+        <Field Name="No_RetailComment">
+          <DataField>No_RetailComment</DataField>
+        </Field>
+        <Field Name="No2_RetailComment">
+          <DataField>No2_RetailComment</DataField>
+        </Field>
+        <Field Name="Comment_RetailComment">
+          <DataField>Comment_RetailComment</DataField>
+        </Field>
+        <Field Name="TotalProfitPerUnit">
+          <DataField>TotalProfitPerUnit</DataField>
+        </Field>
+        <Field Name="TotalProfitPerUnitFormat">
+          <DataField>TotalProfitPerUnitFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

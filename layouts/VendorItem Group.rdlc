@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,376 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="ItemGroupFilters">
-          <DataField>ItemGroupFilters</DataField>
-        </Field>
-        <Field Name="VendorFilters">
-          <DataField>VendorFilters</DataField>
-        </Field>
-        <Field Name="No_Vendor">
-          <DataField>No_Vendor</DataField>
-        </Field>
-        <Field Name="Name_Vendor">
-          <DataField>Name_Vendor</DataField>
-        </Field>
-        <Field Name="PurchasesLCY_Vendor">
-          <DataField>PurchasesLCY_Vendor</DataField>
-        </Field>
-        <Field Name="PurchasesLCY_VendorFormat">
-          <DataField>PurchasesLCY_VendorFormat</DataField>
-        </Field>
-        <Field Name="SalesLCY_Vendor">
-          <DataField>SalesLCY_Vendor</DataField>
-        </Field>
-        <Field Name="SalesLCY_VendorFormat">
-          <DataField>SalesLCY_VendorFormat</DataField>
-        </Field>
-        <Field Name="SalesQty_Vendor">
-          <DataField>SalesQty_Vendor</DataField>
-        </Field>
-        <Field Name="SalesQty_VendorFormat">
-          <DataField>SalesQty_VendorFormat</DataField>
-        </Field>
-        <Field Name="LY_SalesLCY_Vendor">
-          <DataField>LY_SalesLCY_Vendor</DataField>
-        </Field>
-        <Field Name="LY_SalesLCY_VendorFormat">
-          <DataField>LY_SalesLCY_VendorFormat</DataField>
-        </Field>
-        <Field Name="LY_SalesQty_Vendor">
-          <DataField>LY_SalesQty_Vendor</DataField>
-        </Field>
-        <Field Name="LY_SalesQty_VendorFormat">
-          <DataField>LY_SalesQty_VendorFormat</DataField>
-        </Field>
-        <Field Name="pctaendring_Vendor">
-          <DataField>pctaendring_Vendor</DataField>
-        </Field>
-        <Field Name="pctaendring_VendorFormat">
-          <DataField>pctaendring_VendorFormat</DataField>
-        </Field>
-        <Field Name="DB_Vendor">
-          <DataField>DB_Vendor</DataField>
-        </Field>
-        <Field Name="DB_VendorFormat">
-          <DataField>DB_VendorFormat</DataField>
-        </Field>
-        <Field Name="dg_Vendor">
-          <DataField>dg_Vendor</DataField>
-        </Field>
-        <Field Name="dg_VendorFormat">
-          <DataField>dg_VendorFormat</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="CurrReport_PAGENO">
-          <DataField>CurrReport_PAGENO</DataField>
-        </Field>
-        <Field Name="viskunhovedtal">
-          <DataField>viskunhovedtal</DataField>
-        </Field>
-        <Field Name="No_ItemGroup">
-          <DataField>No_ItemGroup</DataField>
-        </Field>
-        <Field Name="Description_ItemGroup">
-          <DataField>Description_ItemGroup</DataField>
-        </Field>
-        <Field Name="SaleLCY_ItemGroup">
-          <DataField>SaleLCY_ItemGroup</DataField>
-        </Field>
-        <Field Name="SaleLCY_ItemGroupFormat">
-          <DataField>SaleLCY_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="PurchaseLCY_ItemGroup">
-          <DataField>PurchaseLCY_ItemGroup</DataField>
-        </Field>
-        <Field Name="PurchaseLCY_ItemGroupFormat">
-          <DataField>PurchaseLCY_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="PurchaseQty_ItemGroup">
-          <DataField>PurchaseQty_ItemGroup</DataField>
-        </Field>
-        <Field Name="PurchaseQty_ItemGroupFormat">
-          <DataField>PurchaseQty_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="pctoms">
-          <DataField>pctoms</DataField>
-        </Field>
-        <Field Name="pctomsFormat">
-          <DataField>pctomsFormat</DataField>
-        </Field>
-        <Field Name="SalesQty_ItemGroup">
-          <DataField>SalesQty_ItemGroup</DataField>
-        </Field>
-        <Field Name="SalesQty_ItemGroupFormat">
-          <DataField>SalesQty_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="CR_ItemGroup">
-          <DataField>CR_ItemGroup</DataField>
-        </Field>
-        <Field Name="CR_ItemGroupFormat">
-          <DataField>CR_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="dg_ItemGroup">
-          <DataField>dg_ItemGroup</DataField>
-        </Field>
-        <Field Name="dg_ItemGroupFormat">
-          <DataField>dg_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="AmtLY_ItemGroup">
-          <DataField>AmtLY_ItemGroup</DataField>
-        </Field>
-        <Field Name="AmtLY_ItemGroupFormat">
-          <DataField>AmtLY_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="TurnoverLY_ItemGroup">
-          <DataField>TurnoverLY_ItemGroup</DataField>
-        </Field>
-        <Field Name="TurnoverLY_ItemGroupFormat">
-          <DataField>TurnoverLY_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="sortervaregruppe_ItemGroup">
-          <DataField>sortervaregruppe_ItemGroup</DataField>
-        </Field>
-        <Field Name="viskunhovedtal_ItemGroup">
-          <DataField>viskunhovedtal_ItemGroup</DataField>
-        </Field>
-        <Field Name="SaleLCYLY_ItemGroup">
-          <DataField>SaleLCYLY_ItemGroup</DataField>
-        </Field>
-        <Field Name="SaleLCYLY_ItemGroupFormat">
-          <DataField>SaleLCYLY_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="PctaendringItemGroup">
-          <DataField>PctaendringItemGroup</DataField>
-        </Field>
-        <Field Name="PctaendringItemGroupFormat">
-          <DataField>PctaendringItemGroupFormat</DataField>
-        </Field>
-        <Field Name="Number_ItemGrpSum">
-          <DataField>Number_ItemGrpSum</DataField>
-        </Field>
-        <Field Name="PurchasesQtyCnt_ItemGrpSum">
-          <DataField>PurchasesQtyCnt_ItemGrpSum</DataField>
-        </Field>
-        <Field Name="PurchasesQtyCnt_ItemGrpSumFormat">
-          <DataField>PurchasesQtyCnt_ItemGrpSumFormat</DataField>
-        </Field>
-        <Field Name="SaleLCYSum_ItemGrpSum">
-          <DataField>SaleLCYSum_ItemGrpSum</DataField>
-        </Field>
-        <Field Name="SaleLCYSum_ItemGrpSumFormat">
-          <DataField>SaleLCYSum_ItemGrpSumFormat</DataField>
-        </Field>
-        <Field Name="PurchaseLCYSum_ItemGrpSum">
-          <DataField>PurchaseLCYSum_ItemGrpSum</DataField>
-        </Field>
-        <Field Name="PurchaseLCYSum_ItemGrpSumFormat">
-          <DataField>PurchaseLCYSum_ItemGrpSumFormat</DataField>
-        </Field>
-        <Field Name="pctoms_Sum_ItemGrpSum">
-          <DataField>pctoms_Sum_ItemGrpSum</DataField>
-        </Field>
-        <Field Name="pctoms_Sum_ItemGrpSumFormat">
-          <DataField>pctoms_Sum_ItemGrpSumFormat</DataField>
-        </Field>
-        <Field Name="SalesQtySum_ItemGrpSum">
-          <DataField>SalesQtySum_ItemGrpSum</DataField>
-        </Field>
-        <Field Name="SalesQtySum_ItemGrpSumFormat">
-          <DataField>SalesQtySum_ItemGrpSumFormat</DataField>
-        </Field>
-        <Field Name="CRSum_ItemGrpSum">
-          <DataField>CRSum_ItemGrpSum</DataField>
-        </Field>
-        <Field Name="CRSum_ItemGrpSumFormat">
-          <DataField>CRSum_ItemGrpSumFormat</DataField>
-        </Field>
-        <Field Name="dgSum_ItemGrpSum">
-          <DataField>dgSum_ItemGrpSum</DataField>
-        </Field>
-        <Field Name="dgSum_ItemGrpSumFormat">
-          <DataField>dgSum_ItemGrpSumFormat</DataField>
-        </Field>
-        <Field Name="AmtLYSum_ItemGrpSum">
-          <DataField>AmtLYSum_ItemGrpSum</DataField>
-        </Field>
-        <Field Name="AmtLYSum_ItemGrpSumFormat">
-          <DataField>AmtLYSum_ItemGrpSumFormat</DataField>
-        </Field>
-        <Field Name="TurnoverLYSum_ItemGrpSum">
-          <DataField>TurnoverLYSum_ItemGrpSum</DataField>
-        </Field>
-        <Field Name="TurnoverLYSum_ItemGrpSumFormat">
-          <DataField>TurnoverLYSum_ItemGrpSumFormat</DataField>
-        </Field>
-        <Field Name="SaleLCYLYSum_ItemGrpSum">
-          <DataField>SaleLCYLYSum_ItemGrpSum</DataField>
-        </Field>
-        <Field Name="SaleLCYLYSum_ItemGrpSumFormat">
-          <DataField>SaleLCYLYSum_ItemGrpSumFormat</DataField>
-        </Field>
-        <Field Name="VendorPctoms">
-          <DataField>VendorPctoms</DataField>
-        </Field>
-        <Field Name="VendorPctomsFormat">
-          <DataField>VendorPctomsFormat</DataField>
-        </Field>
-        <Field Name="SumPctaendringItemGroup">
-          <DataField>SumPctaendringItemGroup</DataField>
-        </Field>
-        <Field Name="SumPctaendringItemGroupFormat">
-          <DataField>SumPctaendringItemGroupFormat</DataField>
-        </Field>
-        <Field Name="CRSumPct">
-          <DataField>CRSumPct</DataField>
-        </Field>
-        <Field Name="CRSumPctFormat">
-          <DataField>CRSumPctFormat</DataField>
-        </Field>
-        <Field Name="Number_Integer">
-          <DataField>Number_Integer</DataField>
-        </Field>
-        <Field Name="No_ItemGroup2">
-          <DataField>No_ItemGroup2</DataField>
-        </Field>
-        <Field Name="Description_ItemGroup2">
-          <DataField>Description_ItemGroup2</DataField>
-        </Field>
-        <Field Name="SaleLCY_ItemGroup2">
-          <DataField>SaleLCY_ItemGroup2</DataField>
-        </Field>
-        <Field Name="SaleLCY_ItemGroup2Format">
-          <DataField>SaleLCY_ItemGroup2Format</DataField>
-        </Field>
-        <Field Name="PurchaseLCY_ItemGroup2">
-          <DataField>PurchaseLCY_ItemGroup2</DataField>
-        </Field>
-        <Field Name="PurchaseLCY_ItemGroup2Format">
-          <DataField>PurchaseLCY_ItemGroup2Format</DataField>
-        </Field>
-        <Field Name="SalesQty_ItemGroup2">
-          <DataField>SalesQty_ItemGroup2</DataField>
-        </Field>
-        <Field Name="SalesQty_ItemGroup2Format">
-          <DataField>SalesQty_ItemGroup2Format</DataField>
-        </Field>
-        <Field Name="CR_ItemGroup2">
-          <DataField>CR_ItemGroup2</DataField>
-        </Field>
-        <Field Name="CR_ItemGroup2Format">
-          <DataField>CR_ItemGroup2Format</DataField>
-        </Field>
-        <Field Name="PurchaseQty_ItemGroup2">
-          <DataField>PurchaseQty_ItemGroup2</DataField>
-        </Field>
-        <Field Name="PurchaseQty_ItemGroup2Format">
-          <DataField>PurchaseQty_ItemGroup2Format</DataField>
-        </Field>
-        <Field Name="dg_ItemGroup2">
-          <DataField>dg_ItemGroup2</DataField>
-        </Field>
-        <Field Name="dg_ItemGroup2Format">
-          <DataField>dg_ItemGroup2Format</DataField>
-        </Field>
-        <Field Name="TurnoverLY_ItemGroup2">
-          <DataField>TurnoverLY_ItemGroup2</DataField>
-        </Field>
-        <Field Name="TurnoverLY_ItemGroup2Format">
-          <DataField>TurnoverLY_ItemGroup2Format</DataField>
-        </Field>
-        <Field Name="pctoms2">
-          <DataField>pctoms2</DataField>
-        </Field>
-        <Field Name="pctoms2Format">
-          <DataField>pctoms2Format</DataField>
-        </Field>
-        <Field Name="AmtLY_ItemGroup2">
-          <DataField>AmtLY_ItemGroup2</DataField>
-        </Field>
-        <Field Name="AmtLY_ItemGroup2Format">
-          <DataField>AmtLY_ItemGroup2Format</DataField>
-        </Field>
-        <Field Name="PctaendringItemGroup2">
-          <DataField>PctaendringItemGroup2</DataField>
-        </Field>
-        <Field Name="PctaendringItemGroup2Format">
-          <DataField>PctaendringItemGroup2Format</DataField>
-        </Field>
-        <Field Name="Number_Summary">
-          <DataField>Number_Summary</DataField>
-        </Field>
-        <Field Name="TotalPurchases_Summary">
-          <DataField>TotalPurchases_Summary</DataField>
-        </Field>
-        <Field Name="TotalPurchases_SummaryFormat">
-          <DataField>TotalPurchases_SummaryFormat</DataField>
-        </Field>
-        <Field Name="TotalPurchasesQty_Summary">
-          <DataField>TotalPurchasesQty_Summary</DataField>
-        </Field>
-        <Field Name="TotalPurchasesQty_SummaryFormat">
-          <DataField>TotalPurchasesQty_SummaryFormat</DataField>
-        </Field>
-        <Field Name="Totaloms_Summary">
-          <DataField>Totaloms_Summary</DataField>
-        </Field>
-        <Field Name="Totaloms_SummaryFormat">
-          <DataField>Totaloms_SummaryFormat</DataField>
-        </Field>
-        <Field Name="totalantal_Summary">
-          <DataField>totalantal_Summary</DataField>
-        </Field>
-        <Field Name="totalantal_SummaryFormat">
-          <DataField>totalantal_SummaryFormat</DataField>
-        </Field>
-        <Field Name="CR_Summary">
-          <DataField>CR_Summary</DataField>
-        </Field>
-        <Field Name="CR_SummaryFormat">
-          <DataField>CR_SummaryFormat</DataField>
-        </Field>
-        <Field Name="CRPct_Summary">
-          <DataField>CRPct_Summary</DataField>
-        </Field>
-        <Field Name="CRPct_SummaryFormat">
-          <DataField>CRPct_SummaryFormat</DataField>
-        </Field>
-        <Field Name="omsaetningsidsteaar_Summary">
-          <DataField>omsaetningsidsteaar_Summary</DataField>
-        </Field>
-        <Field Name="omsaetningsidsteaar_SummaryFormat">
-          <DataField>omsaetningsidsteaar_SummaryFormat</DataField>
-        </Field>
-        <Field Name="TotalPctoms">
-          <DataField>TotalPctoms</DataField>
-        </Field>
-        <Field Name="TotalPctomsFormat">
-          <DataField>TotalPctomsFormat</DataField>
-        </Field>
-        <Field Name="TotalSaleLCYYr">
-          <DataField>TotalSaleLCYYr</DataField>
-        </Field>
-        <Field Name="TotalSaleLCYYrFormat">
-          <DataField>TotalSaleLCYYrFormat</DataField>
-        </Field>
-        <Field Name="TotalPctaendringItemGroup">
-          <DataField>TotalPctaendringItemGroup</DataField>
-        </Field>
-        <Field Name="TotalPctaendringItemGroupFormat">
-          <DataField>TotalPctaendringItemGroupFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -4547,4 +4177,374 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="ItemGroupFilters">
+          <DataField>ItemGroupFilters</DataField>
+        </Field>
+        <Field Name="VendorFilters">
+          <DataField>VendorFilters</DataField>
+        </Field>
+        <Field Name="No_Vendor">
+          <DataField>No_Vendor</DataField>
+        </Field>
+        <Field Name="Name_Vendor">
+          <DataField>Name_Vendor</DataField>
+        </Field>
+        <Field Name="PurchasesLCY_Vendor">
+          <DataField>PurchasesLCY_Vendor</DataField>
+        </Field>
+        <Field Name="PurchasesLCY_VendorFormat">
+          <DataField>PurchasesLCY_VendorFormat</DataField>
+        </Field>
+        <Field Name="SalesLCY_Vendor">
+          <DataField>SalesLCY_Vendor</DataField>
+        </Field>
+        <Field Name="SalesLCY_VendorFormat">
+          <DataField>SalesLCY_VendorFormat</DataField>
+        </Field>
+        <Field Name="SalesQty_Vendor">
+          <DataField>SalesQty_Vendor</DataField>
+        </Field>
+        <Field Name="SalesQty_VendorFormat">
+          <DataField>SalesQty_VendorFormat</DataField>
+        </Field>
+        <Field Name="LY_SalesLCY_Vendor">
+          <DataField>LY_SalesLCY_Vendor</DataField>
+        </Field>
+        <Field Name="LY_SalesLCY_VendorFormat">
+          <DataField>LY_SalesLCY_VendorFormat</DataField>
+        </Field>
+        <Field Name="LY_SalesQty_Vendor">
+          <DataField>LY_SalesQty_Vendor</DataField>
+        </Field>
+        <Field Name="LY_SalesQty_VendorFormat">
+          <DataField>LY_SalesQty_VendorFormat</DataField>
+        </Field>
+        <Field Name="pctaendring_Vendor">
+          <DataField>pctaendring_Vendor</DataField>
+        </Field>
+        <Field Name="pctaendring_VendorFormat">
+          <DataField>pctaendring_VendorFormat</DataField>
+        </Field>
+        <Field Name="DB_Vendor">
+          <DataField>DB_Vendor</DataField>
+        </Field>
+        <Field Name="DB_VendorFormat">
+          <DataField>DB_VendorFormat</DataField>
+        </Field>
+        <Field Name="dg_Vendor">
+          <DataField>dg_Vendor</DataField>
+        </Field>
+        <Field Name="dg_VendorFormat">
+          <DataField>dg_VendorFormat</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="CurrReport_PAGENO">
+          <DataField>CurrReport_PAGENO</DataField>
+        </Field>
+        <Field Name="viskunhovedtal">
+          <DataField>viskunhovedtal</DataField>
+        </Field>
+        <Field Name="No_ItemGroup">
+          <DataField>No_ItemGroup</DataField>
+        </Field>
+        <Field Name="Description_ItemGroup">
+          <DataField>Description_ItemGroup</DataField>
+        </Field>
+        <Field Name="SaleLCY_ItemGroup">
+          <DataField>SaleLCY_ItemGroup</DataField>
+        </Field>
+        <Field Name="SaleLCY_ItemGroupFormat">
+          <DataField>SaleLCY_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="PurchaseLCY_ItemGroup">
+          <DataField>PurchaseLCY_ItemGroup</DataField>
+        </Field>
+        <Field Name="PurchaseLCY_ItemGroupFormat">
+          <DataField>PurchaseLCY_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="PurchaseQty_ItemGroup">
+          <DataField>PurchaseQty_ItemGroup</DataField>
+        </Field>
+        <Field Name="PurchaseQty_ItemGroupFormat">
+          <DataField>PurchaseQty_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="pctoms">
+          <DataField>pctoms</DataField>
+        </Field>
+        <Field Name="pctomsFormat">
+          <DataField>pctomsFormat</DataField>
+        </Field>
+        <Field Name="SalesQty_ItemGroup">
+          <DataField>SalesQty_ItemGroup</DataField>
+        </Field>
+        <Field Name="SalesQty_ItemGroupFormat">
+          <DataField>SalesQty_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="CR_ItemGroup">
+          <DataField>CR_ItemGroup</DataField>
+        </Field>
+        <Field Name="CR_ItemGroupFormat">
+          <DataField>CR_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="dg_ItemGroup">
+          <DataField>dg_ItemGroup</DataField>
+        </Field>
+        <Field Name="dg_ItemGroupFormat">
+          <DataField>dg_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="AmtLY_ItemGroup">
+          <DataField>AmtLY_ItemGroup</DataField>
+        </Field>
+        <Field Name="AmtLY_ItemGroupFormat">
+          <DataField>AmtLY_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="TurnoverLY_ItemGroup">
+          <DataField>TurnoverLY_ItemGroup</DataField>
+        </Field>
+        <Field Name="TurnoverLY_ItemGroupFormat">
+          <DataField>TurnoverLY_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="sortervaregruppe_ItemGroup">
+          <DataField>sortervaregruppe_ItemGroup</DataField>
+        </Field>
+        <Field Name="viskunhovedtal_ItemGroup">
+          <DataField>viskunhovedtal_ItemGroup</DataField>
+        </Field>
+        <Field Name="SaleLCYLY_ItemGroup">
+          <DataField>SaleLCYLY_ItemGroup</DataField>
+        </Field>
+        <Field Name="SaleLCYLY_ItemGroupFormat">
+          <DataField>SaleLCYLY_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="PctaendringItemGroup">
+          <DataField>PctaendringItemGroup</DataField>
+        </Field>
+        <Field Name="PctaendringItemGroupFormat">
+          <DataField>PctaendringItemGroupFormat</DataField>
+        </Field>
+        <Field Name="Number_ItemGrpSum">
+          <DataField>Number_ItemGrpSum</DataField>
+        </Field>
+        <Field Name="PurchasesQtyCnt_ItemGrpSum">
+          <DataField>PurchasesQtyCnt_ItemGrpSum</DataField>
+        </Field>
+        <Field Name="PurchasesQtyCnt_ItemGrpSumFormat">
+          <DataField>PurchasesQtyCnt_ItemGrpSumFormat</DataField>
+        </Field>
+        <Field Name="SaleLCYSum_ItemGrpSum">
+          <DataField>SaleLCYSum_ItemGrpSum</DataField>
+        </Field>
+        <Field Name="SaleLCYSum_ItemGrpSumFormat">
+          <DataField>SaleLCYSum_ItemGrpSumFormat</DataField>
+        </Field>
+        <Field Name="PurchaseLCYSum_ItemGrpSum">
+          <DataField>PurchaseLCYSum_ItemGrpSum</DataField>
+        </Field>
+        <Field Name="PurchaseLCYSum_ItemGrpSumFormat">
+          <DataField>PurchaseLCYSum_ItemGrpSumFormat</DataField>
+        </Field>
+        <Field Name="pctoms_Sum_ItemGrpSum">
+          <DataField>pctoms_Sum_ItemGrpSum</DataField>
+        </Field>
+        <Field Name="pctoms_Sum_ItemGrpSumFormat">
+          <DataField>pctoms_Sum_ItemGrpSumFormat</DataField>
+        </Field>
+        <Field Name="SalesQtySum_ItemGrpSum">
+          <DataField>SalesQtySum_ItemGrpSum</DataField>
+        </Field>
+        <Field Name="SalesQtySum_ItemGrpSumFormat">
+          <DataField>SalesQtySum_ItemGrpSumFormat</DataField>
+        </Field>
+        <Field Name="CRSum_ItemGrpSum">
+          <DataField>CRSum_ItemGrpSum</DataField>
+        </Field>
+        <Field Name="CRSum_ItemGrpSumFormat">
+          <DataField>CRSum_ItemGrpSumFormat</DataField>
+        </Field>
+        <Field Name="dgSum_ItemGrpSum">
+          <DataField>dgSum_ItemGrpSum</DataField>
+        </Field>
+        <Field Name="dgSum_ItemGrpSumFormat">
+          <DataField>dgSum_ItemGrpSumFormat</DataField>
+        </Field>
+        <Field Name="AmtLYSum_ItemGrpSum">
+          <DataField>AmtLYSum_ItemGrpSum</DataField>
+        </Field>
+        <Field Name="AmtLYSum_ItemGrpSumFormat">
+          <DataField>AmtLYSum_ItemGrpSumFormat</DataField>
+        </Field>
+        <Field Name="TurnoverLYSum_ItemGrpSum">
+          <DataField>TurnoverLYSum_ItemGrpSum</DataField>
+        </Field>
+        <Field Name="TurnoverLYSum_ItemGrpSumFormat">
+          <DataField>TurnoverLYSum_ItemGrpSumFormat</DataField>
+        </Field>
+        <Field Name="SaleLCYLYSum_ItemGrpSum">
+          <DataField>SaleLCYLYSum_ItemGrpSum</DataField>
+        </Field>
+        <Field Name="SaleLCYLYSum_ItemGrpSumFormat">
+          <DataField>SaleLCYLYSum_ItemGrpSumFormat</DataField>
+        </Field>
+        <Field Name="VendorPctoms">
+          <DataField>VendorPctoms</DataField>
+        </Field>
+        <Field Name="VendorPctomsFormat">
+          <DataField>VendorPctomsFormat</DataField>
+        </Field>
+        <Field Name="SumPctaendringItemGroup">
+          <DataField>SumPctaendringItemGroup</DataField>
+        </Field>
+        <Field Name="SumPctaendringItemGroupFormat">
+          <DataField>SumPctaendringItemGroupFormat</DataField>
+        </Field>
+        <Field Name="CRSumPct">
+          <DataField>CRSumPct</DataField>
+        </Field>
+        <Field Name="CRSumPctFormat">
+          <DataField>CRSumPctFormat</DataField>
+        </Field>
+        <Field Name="Number_Integer">
+          <DataField>Number_Integer</DataField>
+        </Field>
+        <Field Name="No_ItemGroup2">
+          <DataField>No_ItemGroup2</DataField>
+        </Field>
+        <Field Name="Description_ItemGroup2">
+          <DataField>Description_ItemGroup2</DataField>
+        </Field>
+        <Field Name="SaleLCY_ItemGroup2">
+          <DataField>SaleLCY_ItemGroup2</DataField>
+        </Field>
+        <Field Name="SaleLCY_ItemGroup2Format">
+          <DataField>SaleLCY_ItemGroup2Format</DataField>
+        </Field>
+        <Field Name="PurchaseLCY_ItemGroup2">
+          <DataField>PurchaseLCY_ItemGroup2</DataField>
+        </Field>
+        <Field Name="PurchaseLCY_ItemGroup2Format">
+          <DataField>PurchaseLCY_ItemGroup2Format</DataField>
+        </Field>
+        <Field Name="SalesQty_ItemGroup2">
+          <DataField>SalesQty_ItemGroup2</DataField>
+        </Field>
+        <Field Name="SalesQty_ItemGroup2Format">
+          <DataField>SalesQty_ItemGroup2Format</DataField>
+        </Field>
+        <Field Name="CR_ItemGroup2">
+          <DataField>CR_ItemGroup2</DataField>
+        </Field>
+        <Field Name="CR_ItemGroup2Format">
+          <DataField>CR_ItemGroup2Format</DataField>
+        </Field>
+        <Field Name="PurchaseQty_ItemGroup2">
+          <DataField>PurchaseQty_ItemGroup2</DataField>
+        </Field>
+        <Field Name="PurchaseQty_ItemGroup2Format">
+          <DataField>PurchaseQty_ItemGroup2Format</DataField>
+        </Field>
+        <Field Name="dg_ItemGroup2">
+          <DataField>dg_ItemGroup2</DataField>
+        </Field>
+        <Field Name="dg_ItemGroup2Format">
+          <DataField>dg_ItemGroup2Format</DataField>
+        </Field>
+        <Field Name="TurnoverLY_ItemGroup2">
+          <DataField>TurnoverLY_ItemGroup2</DataField>
+        </Field>
+        <Field Name="TurnoverLY_ItemGroup2Format">
+          <DataField>TurnoverLY_ItemGroup2Format</DataField>
+        </Field>
+        <Field Name="pctoms2">
+          <DataField>pctoms2</DataField>
+        </Field>
+        <Field Name="pctoms2Format">
+          <DataField>pctoms2Format</DataField>
+        </Field>
+        <Field Name="AmtLY_ItemGroup2">
+          <DataField>AmtLY_ItemGroup2</DataField>
+        </Field>
+        <Field Name="AmtLY_ItemGroup2Format">
+          <DataField>AmtLY_ItemGroup2Format</DataField>
+        </Field>
+        <Field Name="PctaendringItemGroup2">
+          <DataField>PctaendringItemGroup2</DataField>
+        </Field>
+        <Field Name="PctaendringItemGroup2Format">
+          <DataField>PctaendringItemGroup2Format</DataField>
+        </Field>
+        <Field Name="Number_Summary">
+          <DataField>Number_Summary</DataField>
+        </Field>
+        <Field Name="TotalPurchases_Summary">
+          <DataField>TotalPurchases_Summary</DataField>
+        </Field>
+        <Field Name="TotalPurchases_SummaryFormat">
+          <DataField>TotalPurchases_SummaryFormat</DataField>
+        </Field>
+        <Field Name="TotalPurchasesQty_Summary">
+          <DataField>TotalPurchasesQty_Summary</DataField>
+        </Field>
+        <Field Name="TotalPurchasesQty_SummaryFormat">
+          <DataField>TotalPurchasesQty_SummaryFormat</DataField>
+        </Field>
+        <Field Name="Totaloms_Summary">
+          <DataField>Totaloms_Summary</DataField>
+        </Field>
+        <Field Name="Totaloms_SummaryFormat">
+          <DataField>Totaloms_SummaryFormat</DataField>
+        </Field>
+        <Field Name="totalantal_Summary">
+          <DataField>totalantal_Summary</DataField>
+        </Field>
+        <Field Name="totalantal_SummaryFormat">
+          <DataField>totalantal_SummaryFormat</DataField>
+        </Field>
+        <Field Name="CR_Summary">
+          <DataField>CR_Summary</DataField>
+        </Field>
+        <Field Name="CR_SummaryFormat">
+          <DataField>CR_SummaryFormat</DataField>
+        </Field>
+        <Field Name="CRPct_Summary">
+          <DataField>CRPct_Summary</DataField>
+        </Field>
+        <Field Name="CRPct_SummaryFormat">
+          <DataField>CRPct_SummaryFormat</DataField>
+        </Field>
+        <Field Name="omsaetningsidsteaar_Summary">
+          <DataField>omsaetningsidsteaar_Summary</DataField>
+        </Field>
+        <Field Name="omsaetningsidsteaar_SummaryFormat">
+          <DataField>omsaetningsidsteaar_SummaryFormat</DataField>
+        </Field>
+        <Field Name="TotalPctoms">
+          <DataField>TotalPctoms</DataField>
+        </Field>
+        <Field Name="TotalPctomsFormat">
+          <DataField>TotalPctomsFormat</DataField>
+        </Field>
+        <Field Name="TotalSaleLCYYr">
+          <DataField>TotalSaleLCYYr</DataField>
+        </Field>
+        <Field Name="TotalSaleLCYYrFormat">
+          <DataField>TotalSaleLCYYrFormat</DataField>
+        </Field>
+        <Field Name="TotalPctaendringItemGroup">
+          <DataField>TotalPctaendringItemGroup</DataField>
+        </Field>
+        <Field Name="TotalPctaendringItemGroupFormat">
+          <DataField>TotalPctaendringItemGroupFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

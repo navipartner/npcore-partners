@@ -90,6 +90,8 @@ page 6014425 "Retail Item Card"
     // NPR5.48/TJ  /20190102  CASE 340615 Removed field "Product Group Code"
     // NPR5.50/THRO/20190412  CASE 352040 Removed fixed key on card. Was "Primary Key Length"
     // NPR5.50/BHR /20190506  CASE 353006 Add field Season
+    // MAG2.22/MHA /20190625  CASE 359285 Added field 6151500 "Magento Picture Variety Type"
+    // #361229/ZESO/20190708 CASE 361229 Added Page Action Attributes and Factbox Item Attributes
 
     Caption = 'Item Card NP Retail';
     PageType = Card;
@@ -1968,6 +1970,14 @@ page 6014425 "Retail Item Card"
                         end;
                     end;
                 }
+                group(Control6151430)
+                {
+                    ShowCaption = false;
+                    Visible = MagentoPictureVarietyTypeVisible;
+                    field("Magento Picture Variety Type";"Magento Picture Variety Type")
+                    {
+                    }
+                }
                 part("Item Group Links";"Magento Item Group Link")
                 {
                     Caption = 'Item Group Links';
@@ -1991,6 +2001,10 @@ page 6014425 "Retail Item Card"
             systempart(Control6150613;Notes)
             {
                 Visible = true;
+            }
+            part(ItemAttributesFactbox;"Item Attributes Factbox")
+            {
+                ApplicationArea = Basic,Suite;
             }
             part(MagentoPictureDragDropAddin;"Magento DragDropPic. Addin")
             {
@@ -2037,6 +2051,25 @@ page 6014425 "Retail Item Card"
                     Image = ItemVariant;
                     RunObject = Page "Item Variants";
                     RunPageLink = "Item No."=FIELD("No.");
+                }
+                action(Attributes)
+                {
+                    AccessByPermission = TableData "Item Attribute"=R;
+                    ApplicationArea = Basic,Suite;
+                    Caption = 'Attributes';
+                    Image = Category;
+                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                    //PromotedCategory = New;
+                    ToolTip = 'View or edit the item''s attributes, such as color, size, or other characteristics that help to describe the item.';
+
+                    trigger OnAction()
+                    begin
+                        //-#361229 [361229]
+                        PAGE.RunModal(PAGE::"Item Attribute Value Editor",Rec);
+                        CurrPage.SaveRecord;
+                        CurrPage.ItemAttributesFactbox.PAGE.LoadItemAttributesData("No.");
+                        //+#361229 [361229]
+                    end;
                 }
                 group(Dimensions)
                 {
@@ -3283,6 +3316,7 @@ page 6014425 "Retail Item Card"
         MagentoEnabledMultistore: Boolean;
         MagentoEnabledProductRelations: Boolean;
         MagentoEnabledSpecialPrices: Boolean;
+        MagentoPictureVarietyTypeVisible: Boolean;
         SearchNo: Code[20];
         OriginalRec: Record Item;
 
@@ -3410,6 +3444,11 @@ page 6014425 "Retail Item Card"
         MagentoEnabledProductRelations := MagentoSetup."Product Relations Enabled";
         MagentoEnabledCustomOptions := MagentoSetup."Custom Options Enabled";
         //+MAG1.22
+        //-MAG2.22 [359285]
+        MagentoPictureVarietyTypeVisible :=
+          (MagentoSetup."Variant System" = MagentoSetup."Variant System"::Variety) and
+          (MagentoSetup."Picture Variety Type" = MagentoSetup."Picture Variety Type"::"Select on Item");
+        //+MAG2.22 [359285]
     end;
 }
 

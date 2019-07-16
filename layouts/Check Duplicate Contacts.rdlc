@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,49 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="Company_Name">
-          <DataField>Company_Name</DataField>
-        </Field>
-        <Field Name="Company_Picture">
-          <DataField>Company_Picture</DataField>
-        </Field>
-        <Field Name="SearchFilterValue">
-          <DataField>SearchFilterValue</DataField>
-        </Field>
-        <Field Name="No_Contact">
-          <DataField>No_Contact</DataField>
-        </Field>
-        <Field Name="Name_Contact">
-          <DataField>Name_Contact</DataField>
-        </Field>
-        <Field Name="Address_Contact">
-          <DataField>Address_Contact</DataField>
-        </Field>
-        <Field Name="PhoneNo_Contact">
-          <DataField>PhoneNo_Contact</DataField>
-        </Field>
-        <Field Name="Temp_Contact_No">
-          <DataField>Temp_Contact_No</DataField>
-        </Field>
-        <Field Name="Temp_Contact_Name">
-          <DataField>Temp_Contact_Name</DataField>
-        </Field>
-        <Field Name="Temp_Contact_Address">
-          <DataField>Temp_Contact_Address</DataField>
-        </Field>
-        <Field Name="Temp_Contact_Phone_No">
-          <DataField>Temp_Contact_Phone_No</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -1176,6 +1133,24 @@
     </ReportSection>
   </ReportSections>
   <ReportParameters>
+    <ReportParameter Name="Original">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Original</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Original</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Duplicate">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Duplicate</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Duplicate</Prompt>
+    </ReportParameter>
     <ReportParameter Name="No_ContactCaption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -1248,24 +1223,6 @@
       </DefaultValue>
       <Prompt>Temp_Contact_Phone_NoCaption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="Original">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Original</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Original</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Duplicate">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Duplicate</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Duplicate</Prompt>
-    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
@@ -1275,52 +1232,52 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>No_ContactCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>1</RowIndex>
-          <ParameterName>Name_ContactCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>2</RowIndex>
-          <ParameterName>Address_ContactCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>3</RowIndex>
-          <ParameterName>PhoneNo_ContactCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>4</RowIndex>
-          <ParameterName>Temp_Contact_NoCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>5</RowIndex>
-          <ParameterName>Temp_Contact_NameCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>6</RowIndex>
-          <ParameterName>Temp_Contact_AddressCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>7</RowIndex>
-          <ParameterName>Temp_Contact_Phone_NoCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>8</RowIndex>
           <ParameterName>Original</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>9</RowIndex>
+          <RowIndex>1</RowIndex>
           <ParameterName>Duplicate</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>2</RowIndex>
+          <ParameterName>No_ContactCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>3</RowIndex>
+          <ParameterName>Name_ContactCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>4</RowIndex>
+          <ParameterName>Address_ContactCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>5</RowIndex>
+          <ParameterName>PhoneNo_ContactCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>6</RowIndex>
+          <ParameterName>Temp_Contact_NoCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>7</RowIndex>
+          <ParameterName>Temp_Contact_NameCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>8</RowIndex>
+          <ParameterName>Temp_Contact_AddressCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>9</RowIndex>
+          <ParameterName>Temp_Contact_Phone_NoCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -1363,4 +1320,47 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="Company_Name">
+          <DataField>Company_Name</DataField>
+        </Field>
+        <Field Name="Company_Picture">
+          <DataField>Company_Picture</DataField>
+        </Field>
+        <Field Name="SearchFilterValue">
+          <DataField>SearchFilterValue</DataField>
+        </Field>
+        <Field Name="No_Contact">
+          <DataField>No_Contact</DataField>
+        </Field>
+        <Field Name="Name_Contact">
+          <DataField>Name_Contact</DataField>
+        </Field>
+        <Field Name="Address_Contact">
+          <DataField>Address_Contact</DataField>
+        </Field>
+        <Field Name="PhoneNo_Contact">
+          <DataField>PhoneNo_Contact</DataField>
+        </Field>
+        <Field Name="Temp_Contact_No">
+          <DataField>Temp_Contact_No</DataField>
+        </Field>
+        <Field Name="Temp_Contact_Name">
+          <DataField>Temp_Contact_Name</DataField>
+        </Field>
+        <Field Name="Temp_Contact_Address">
+          <DataField>Temp_Contact_Address</DataField>
+        </Field>
+        <Field Name="Temp_Contact_Phone_No">
+          <DataField>Temp_Contact_Phone_No</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

@@ -9,6 +9,9 @@ codeunit 6151450 "Magento NpXml Setup Mgt."
     // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
     // MAG2.02/TS  /20170208  CASE 265711 Added Template Ticket and Member
     // MAG2.05/MHA /20170714  CASE 283777 Added "Api Authorization" in SetupTemplate()
+    // MAG2.22/MHA /20190625  CASE 359285 Adjusted SetupTemplate() to delete existing Template if Version Id belongs to Magento
+    // MAG2.22/MHA /20190708  CASE 352201 Added collect stores to InitNpXmlTemplateSetup()
+    // MAG2.22/MHA /20190709  CASE 355079 Content-Type and Accept are explicitly set in SetupTemplate()
 
 
     trigger OnRun()
@@ -60,6 +63,9 @@ codeunit 6151450 "Magento NpXml Setup Mgt."
         MagentoGenericSetupMgt.AddContainer(XmlDoc,NodePath,"ElementName.OrderStatus");
         MagentoGenericSetupMgt.AddContainer(XmlDoc,NodePath,"ElementName.Ticket");
         MagentoGenericSetupMgt.AddContainer(XmlDoc,NodePath,"ElementName.Membership");
+        //-MAG2.22 [352201]
+        MagentoGenericSetupMgt.AddContainer(XmlDoc,NodePath,"ElementName.CollectStore");
+        //+MAG2.22 [352201]
 
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/ ' + "ElementName.Item";
         AddNpXmlTemplate(XmlDoc,NodePath,'UPD_ITEM','DEL_ITEM');
@@ -89,6 +95,10 @@ codeunit 6151450 "Magento NpXml Setup Mgt."
         NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.Membership";
         AddNpXmlTemplate(XmlDoc,NodePath,'UPD_MEMBERSHIP','');
         //+MAG2.02
+        //-MAG2.22 [352201]
+        NodePath := "ElementName.TemplateSetup" + '/' + "ElementName.B2C" + '/' + "ElementName.CollectStore";
+        AddNpXmlTemplate(XmlDoc,NodePath,'UPD_COLLECT_STORE','DEL_COLLECT_STORE');
+        //+MAG2.22 [352201]
         NodePath := "ElementName.TemplateSetup";
         MagentoGenericSetupMgt.AddContainer(XmlDoc,NodePath,"ElementName.B2B");
 
@@ -124,14 +134,20 @@ codeunit 6151450 "Magento NpXml Setup Mgt."
         MagentoSetup: Record "Magento Setup";
         NcSetup: Record "Nc Setup";
         NpXmlTemplate: Record "NpXml Template";
+        MagentoSetupMgt: Codeunit "Magento Setup Mgt.";
         MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         TemplateUrl: Text;
         NewTemplate: Boolean;
     begin
         if (TemplateCode = '') or (not MagentoSetup.Get) then
           exit;
-        if MagentoSetup."Version No." = '' then
-          MagentoSetup."Version No." := 'MAG2.00';
+
+        //-MAG2.22 [359285]
+        MagentoSetupMgt.UpdateVersionNo(MagentoSetup);
+        if NpXmlTemplate.Get(TemplateCode) and (CopyStr(NpXmlTemplate."Template Version",1,StrLen(MagentoSetupMgt.MagentoVersionId())) = MagentoSetupMgt.MagentoVersionId()) then
+          NpXmlTemplate.Delete(true);
+        //+MAG2.22 [359285]
+
         if not Enabled then begin
           if NpXmlTemplate.Get(TemplateCode) then
             NpXmlTemplate.Delete(true);
@@ -162,6 +178,10 @@ codeunit 6151450 "Magento NpXml Setup Mgt."
         //-MAG2.05 [283777]
         NpXmlTemplate."API Authorization" := MagentoSetup."Api Authorization";
         //+MAG2.05 [283777]
+        //-MAG2.22 [355079]
+        NpXmlTemplate."API Content-Type" := 'navision/xml';
+        NpXmlTemplate."API Accept" := 'application/xml';
+        //+MAG2.22 [355079]
         NpXmlTemplate."API Response Path" := '';
         NpXmlTemplate."API Response Success Value" := '';
         NpXmlTemplate."API Type" := NpXmlTemplate."API Type"::"REST (Xml)";
@@ -538,6 +558,13 @@ codeunit 6151450 "Magento NpXml Setup Mgt."
         //-MAG2.02
         exit('membership');
         //+MAG2.02
+    end;
+
+    procedure "ElementName.CollectStore"(): Text
+    begin
+        //-MAG2.22 [352201]
+        exit('collect_store');
+        //+MAG2.22 [352201]
     end;
 }
 

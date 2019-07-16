@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,106 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="GetFilters">
-          <DataField>GetFilters</DataField>
-        </Field>
-        <Field Name="EntryNo_MMMembership">
-          <DataField>EntryNo_MMMembership</DataField>
-        </Field>
-        <Field Name="CustomerNo_MMMembership">
-          <DataField>CustomerNo_MMMembership</DataField>
-        </Field>
-        <Field Name="MembershipCode_MMMembership">
-          <DataField>MembershipCode_MMMembership</DataField>
-        </Field>
-        <Field Name="PageCaption">
-          <DataField>PageCaption</DataField>
-        </Field>
-        <Field Name="BalanceBefore">
-          <DataField>BalanceBefore</DataField>
-        </Field>
-        <Field Name="BalanceBeforeFormat">
-          <DataField>BalanceBeforeFormat</DataField>
-        </Field>
-        <Field Name="Name_Customer">
-          <DataField>Name_Customer</DataField>
-        </Field>
-        <Field Name="Name_CustomerCaption">
-          <DataField>Name_CustomerCaption</DataField>
-        </Field>
-        <Field Name="ExtMembershipNo">
-          <DataField>ExtMembershipNo</DataField>
-        </Field>
-        <Field Name="MembershipNoCaption">
-          <DataField>MembershipNoCaption</DataField>
-        </Field>
-        <Field Name="BalanceBeforeCaption">
-          <DataField>BalanceBeforeCaption</DataField>
-        </Field>
-        <Field Name="BalanceAfterCaption">
-          <DataField>BalanceAfterCaption</DataField>
-        </Field>
-        <Field Name="MembershipEntryNo_MMMembershipPointsEntry">
-          <DataField>MembershipEntryNo_MMMembershipPointsEntry</DataField>
-        </Field>
-        <Field Name="AmountLCY_MMMembershipPointsEntry">
-          <DataField>AmountLCY_MMMembershipPointsEntry</DataField>
-        </Field>
-        <Field Name="AmountLCY_MMMembershipPointsEntryFormat">
-          <DataField>AmountLCY_MMMembershipPointsEntryFormat</DataField>
-        </Field>
-        <Field Name="AwardedAmountLCY_MMMembershipPointsEntry">
-          <DataField>AwardedAmountLCY_MMMembershipPointsEntry</DataField>
-        </Field>
-        <Field Name="AwardedAmountLCY_MMMembershipPointsEntryFormat">
-          <DataField>AwardedAmountLCY_MMMembershipPointsEntryFormat</DataField>
-        </Field>
-        <Field Name="AwardedPoints_MMMembershipPointsEntry">
-          <DataField>AwardedPoints_MMMembershipPointsEntry</DataField>
-        </Field>
-        <Field Name="RedeemedPoints_MMMembershipPointsEntry">
-          <DataField>RedeemedPoints_MMMembershipPointsEntry</DataField>
-        </Field>
-        <Field Name="Points_MMMembershipPointsEntry">
-          <DataField>Points_MMMembershipPointsEntry</DataField>
-        </Field>
-        <Field Name="ItemNo_MMMembershipPointsEntry">
-          <DataField>ItemNo_MMMembershipPointsEntry</DataField>
-        </Field>
-        <Field Name="VariantCode_MMMembershipPointsEntry">
-          <DataField>VariantCode_MMMembershipPointsEntry</DataField>
-        </Field>
-        <Field Name="Quantity_MMMembershipPointsEntry">
-          <DataField>Quantity_MMMembershipPointsEntry</DataField>
-        </Field>
-        <Field Name="Quantity_MMMembershipPointsEntryFormat">
-          <DataField>Quantity_MMMembershipPointsEntryFormat</DataField>
-        </Field>
-        <Field Name="PostingDate_MMMembershipPointsEntry">
-          <DataField>PostingDate_MMMembershipPointsEntry</DataField>
-        </Field>
-        <Field Name="DocumentNo_MMMembershipPointsEntry">
-          <DataField>DocumentNo_MMMembershipPointsEntry</DataField>
-        </Field>
-        <Field Name="PointConstraint_MMMembershipPointsEntry">
-          <DataField>PointConstraint_MMMembershipPointsEntry</DataField>
-        </Field>
-        <Field Name="EntryType_MMMembershipPointsEntry">
-          <DataField>EntryType_MMMembershipPointsEntry</DataField>
-        </Field>
-        <Field Name="PostingDateCaption">
-          <DataField>PostingDateCaption</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -2959,6 +2859,15 @@
     </ReportSection>
   </ReportSections>
   <ReportParameters>
+    <ReportParameter Name="ReportLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ReportLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ReportLbl</Prompt>
+    </ReportParameter>
     <ReportParameter Name="CustomerNo_MMMembershipCaption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -3067,15 +2976,6 @@
       </DefaultValue>
       <Prompt>EntryType_MMMembershipPointsEntryCaption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ReportLbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>ReportLbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>ReportLbl</Prompt>
-    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
@@ -3085,67 +2985,67 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>CustomerNo_MMMembershipCaption</ParameterName>
+          <ParameterName>ReportLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>1</RowIndex>
-          <ParameterName>AmountLCY_MMMembershipPointsEntryCaption</ParameterName>
+          <ParameterName>CustomerNo_MMMembershipCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>2</RowIndex>
-          <ParameterName>AwardedAmountLCY_MMMembershipPointsEntryCaption</ParameterName>
+          <ParameterName>AmountLCY_MMMembershipPointsEntryCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>3</RowIndex>
-          <ParameterName>AwardedPoints_MMMembershipPointsEntryCaption</ParameterName>
+          <ParameterName>AwardedAmountLCY_MMMembershipPointsEntryCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>4</RowIndex>
-          <ParameterName>RedeemedPoints_MMMembershipPointsEntryCaption</ParameterName>
+          <ParameterName>AwardedPoints_MMMembershipPointsEntryCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>5</RowIndex>
-          <ParameterName>Points_MMMembershipPointsEntryCaption</ParameterName>
+          <ParameterName>RedeemedPoints_MMMembershipPointsEntryCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>6</RowIndex>
-          <ParameterName>ItemNo_MMMembershipPointsEntryCaption</ParameterName>
+          <ParameterName>Points_MMMembershipPointsEntryCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>7</RowIndex>
-          <ParameterName>VariantCode_MMMembershipPointsEntryCaption</ParameterName>
+          <ParameterName>ItemNo_MMMembershipPointsEntryCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>8</RowIndex>
-          <ParameterName>Quantity_MMMembershipPointsEntryCaption</ParameterName>
+          <ParameterName>VariantCode_MMMembershipPointsEntryCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>9</RowIndex>
-          <ParameterName>DocumentNo_MMMembershipPointsEntryCaption</ParameterName>
+          <ParameterName>Quantity_MMMembershipPointsEntryCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>10</RowIndex>
-          <ParameterName>PointConstraint_MMMembershipPointsEntryCaption</ParameterName>
+          <ParameterName>DocumentNo_MMMembershipPointsEntryCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>11</RowIndex>
-          <ParameterName>EntryType_MMMembershipPointsEntryCaption</ParameterName>
+          <ParameterName>PointConstraint_MMMembershipPointsEntryCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>12</RowIndex>
-          <ParameterName>ReportLbl</ParameterName>
+          <ParameterName>EntryType_MMMembershipPointsEntryCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -3188,4 +3088,104 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="GetFilters">
+          <DataField>GetFilters</DataField>
+        </Field>
+        <Field Name="EntryNo_MMMembership">
+          <DataField>EntryNo_MMMembership</DataField>
+        </Field>
+        <Field Name="CustomerNo_MMMembership">
+          <DataField>CustomerNo_MMMembership</DataField>
+        </Field>
+        <Field Name="MembershipCode_MMMembership">
+          <DataField>MembershipCode_MMMembership</DataField>
+        </Field>
+        <Field Name="PageCaption">
+          <DataField>PageCaption</DataField>
+        </Field>
+        <Field Name="BalanceBefore">
+          <DataField>BalanceBefore</DataField>
+        </Field>
+        <Field Name="BalanceBeforeFormat">
+          <DataField>BalanceBeforeFormat</DataField>
+        </Field>
+        <Field Name="Name_Customer">
+          <DataField>Name_Customer</DataField>
+        </Field>
+        <Field Name="Name_CustomerCaption">
+          <DataField>Name_CustomerCaption</DataField>
+        </Field>
+        <Field Name="ExtMembershipNo">
+          <DataField>ExtMembershipNo</DataField>
+        </Field>
+        <Field Name="MembershipNoCaption">
+          <DataField>MembershipNoCaption</DataField>
+        </Field>
+        <Field Name="BalanceBeforeCaption">
+          <DataField>BalanceBeforeCaption</DataField>
+        </Field>
+        <Field Name="BalanceAfterCaption">
+          <DataField>BalanceAfterCaption</DataField>
+        </Field>
+        <Field Name="MembershipEntryNo_MMMembershipPointsEntry">
+          <DataField>MembershipEntryNo_MMMembershipPointsEntry</DataField>
+        </Field>
+        <Field Name="AmountLCY_MMMembershipPointsEntry">
+          <DataField>AmountLCY_MMMembershipPointsEntry</DataField>
+        </Field>
+        <Field Name="AmountLCY_MMMembershipPointsEntryFormat">
+          <DataField>AmountLCY_MMMembershipPointsEntryFormat</DataField>
+        </Field>
+        <Field Name="AwardedAmountLCY_MMMembershipPointsEntry">
+          <DataField>AwardedAmountLCY_MMMembershipPointsEntry</DataField>
+        </Field>
+        <Field Name="AwardedAmountLCY_MMMembershipPointsEntryFormat">
+          <DataField>AwardedAmountLCY_MMMembershipPointsEntryFormat</DataField>
+        </Field>
+        <Field Name="AwardedPoints_MMMembershipPointsEntry">
+          <DataField>AwardedPoints_MMMembershipPointsEntry</DataField>
+        </Field>
+        <Field Name="RedeemedPoints_MMMembershipPointsEntry">
+          <DataField>RedeemedPoints_MMMembershipPointsEntry</DataField>
+        </Field>
+        <Field Name="Points_MMMembershipPointsEntry">
+          <DataField>Points_MMMembershipPointsEntry</DataField>
+        </Field>
+        <Field Name="ItemNo_MMMembershipPointsEntry">
+          <DataField>ItemNo_MMMembershipPointsEntry</DataField>
+        </Field>
+        <Field Name="VariantCode_MMMembershipPointsEntry">
+          <DataField>VariantCode_MMMembershipPointsEntry</DataField>
+        </Field>
+        <Field Name="Quantity_MMMembershipPointsEntry">
+          <DataField>Quantity_MMMembershipPointsEntry</DataField>
+        </Field>
+        <Field Name="Quantity_MMMembershipPointsEntryFormat">
+          <DataField>Quantity_MMMembershipPointsEntryFormat</DataField>
+        </Field>
+        <Field Name="PostingDate_MMMembershipPointsEntry">
+          <DataField>PostingDate_MMMembershipPointsEntry</DataField>
+        </Field>
+        <Field Name="DocumentNo_MMMembershipPointsEntry">
+          <DataField>DocumentNo_MMMembershipPointsEntry</DataField>
+        </Field>
+        <Field Name="PointConstraint_MMMembershipPointsEntry">
+          <DataField>PointConstraint_MMMembershipPointsEntry</DataField>
+        </Field>
+        <Field Name="EntryType_MMMembershipPointsEntry">
+          <DataField>EntryType_MMMembershipPointsEntry</DataField>
+        </Field>
+        <Field Name="PostingDateCaption">
+          <DataField>PostingDateCaption</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

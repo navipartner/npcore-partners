@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,133 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="CustAddress1">
-          <DataField>CustAddress1</DataField>
-        </Field>
-        <Field Name="CustAddress2">
-          <DataField>CustAddress2</DataField>
-        </Field>
-        <Field Name="CustAddress3">
-          <DataField>CustAddress3</DataField>
-        </Field>
-        <Field Name="CustAddress4">
-          <DataField>CustAddress4</DataField>
-        </Field>
-        <Field Name="CustAddress5">
-          <DataField>CustAddress5</DataField>
-        </Field>
-        <Field Name="CustAddress6">
-          <DataField>CustAddress6</DataField>
-        </Field>
-        <Field Name="CustAddress7">
-          <DataField>CustAddress7</DataField>
-        </Field>
-        <Field Name="CustAddress8">
-          <DataField>CustAddress8</DataField>
-        </Field>
-        <Field Name="CustomerRepairNoCaption">
-          <DataField>CustomerRepairNoCaption</DataField>
-        </Field>
-        <Field Name="CustomerRepairNo">
-          <DataField>CustomerRepairNo</DataField>
-        </Field>
-        <Field Name="CustomerRepairNameCaption">
-          <DataField>CustomerRepairNameCaption</DataField>
-        </Field>
-        <Field Name="TodayDate">
-          <DataField>TodayDate</DataField>
-        </Field>
-        <Field Name="CustomerRepairName">
-          <DataField>CustomerRepairName</DataField>
-        </Field>
-        <Field Name="CustomerRepairItemCaption">
-          <DataField>CustomerRepairItemCaption</DataField>
-        </Field>
-        <Field Name="CustomerRepairItem">
-          <DataField>CustomerRepairItem</DataField>
-        </Field>
-        <Field Name="CompanyInformationCity">
-          <DataField>CompanyInformationCity</DataField>
-        </Field>
-        <Field Name="CompanyInformationName">
-          <DataField>CompanyInformationName</DataField>
-        </Field>
-        <Field Name="CompanyInformationPicture">
-          <DataField>CompanyInformationPicture</DataField>
-        </Field>
-        <Field Name="CompanyInformationPhoneNo">
-          <DataField>CompanyInformationPhoneNo</DataField>
-        </Field>
-        <Field Name="GlobalDimension1CodeCaption">
-          <DataField>GlobalDimension1CodeCaption</DataField>
-        </Field>
-        <Field Name="GlobalDimension1Code">
-          <DataField>GlobalDimension1Code</DataField>
-        </Field>
-        <Field Name="RepairPriceAmount">
-          <DataField>RepairPriceAmount</DataField>
-        </Field>
-        <Field Name="NotAcceptNotice">
-          <DataField>NotAcceptNotice</DataField>
-        </Field>
-        <Field Name="ContactText">
-          <DataField>ContactText</DataField>
-        </Field>
-        <Field Name="EstDeliveryText">
-          <DataField>EstDeliveryText</DataField>
-        </Field>
-        <Field Name="RepairEstText">
-          <DataField>RepairEstText</DataField>
-        </Field>
-        <Field Name="RepairStatusReturnText">
-          <DataField>RepairStatusReturnText</DataField>
-        </Field>
-        <Field Name="RepairEstNotice">
-          <DataField>RepairEstNotice</DataField>
-        </Field>
-        <Field Name="ConfirmText">
-          <DataField>ConfirmText</DataField>
-        </Field>
-        <Field Name="FooterText">
-          <DataField>FooterText</DataField>
-        </Field>
-        <Field Name="PSText">
-          <DataField>PSText</DataField>
-        </Field>
-        <Field Name="AddrLine">
-          <DataField>AddrLine</DataField>
-        </Field>
-        <Field Name="CustomerRepairStatus">
-          <DataField>CustomerRepairStatus</DataField>
-        </Field>
-        <Field Name="ReturnNoRepair">
-          <DataField>ReturnNoRepair</DataField>
-        </Field>
-        <Field Name="AddressFooter">
-          <DataField>AddressFooter</DataField>
-        </Field>
-        <Field Name="AddressFooter2">
-          <DataField>AddressFooter2</DataField>
-        </Field>
-        <Field Name="Text_CustomerRepairJournal">
-          <DataField>Text_CustomerRepairJournal</DataField>
-        </Field>
-        <Field Name="TextCaption_CustomerRepairJournal">
-          <DataField>TextCaption_CustomerRepairJournal</DataField>
-        </Field>
-        <Field Name="RepairCount">
-          <DataField>RepairCount</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -2087,4 +1960,131 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="CustAddress1">
+          <DataField>CustAddress1</DataField>
+        </Field>
+        <Field Name="CustAddress2">
+          <DataField>CustAddress2</DataField>
+        </Field>
+        <Field Name="CustAddress3">
+          <DataField>CustAddress3</DataField>
+        </Field>
+        <Field Name="CustAddress4">
+          <DataField>CustAddress4</DataField>
+        </Field>
+        <Field Name="CustAddress5">
+          <DataField>CustAddress5</DataField>
+        </Field>
+        <Field Name="CustAddress6">
+          <DataField>CustAddress6</DataField>
+        </Field>
+        <Field Name="CustAddress7">
+          <DataField>CustAddress7</DataField>
+        </Field>
+        <Field Name="CustAddress8">
+          <DataField>CustAddress8</DataField>
+        </Field>
+        <Field Name="CustomerRepairNoCaption">
+          <DataField>CustomerRepairNoCaption</DataField>
+        </Field>
+        <Field Name="CustomerRepairNo">
+          <DataField>CustomerRepairNo</DataField>
+        </Field>
+        <Field Name="CustomerRepairNameCaption">
+          <DataField>CustomerRepairNameCaption</DataField>
+        </Field>
+        <Field Name="TodayDate">
+          <DataField>TodayDate</DataField>
+        </Field>
+        <Field Name="CustomerRepairName">
+          <DataField>CustomerRepairName</DataField>
+        </Field>
+        <Field Name="CustomerRepairItemCaption">
+          <DataField>CustomerRepairItemCaption</DataField>
+        </Field>
+        <Field Name="CustomerRepairItem">
+          <DataField>CustomerRepairItem</DataField>
+        </Field>
+        <Field Name="CompanyInformationCity">
+          <DataField>CompanyInformationCity</DataField>
+        </Field>
+        <Field Name="CompanyInformationName">
+          <DataField>CompanyInformationName</DataField>
+        </Field>
+        <Field Name="CompanyInformationPicture">
+          <DataField>CompanyInformationPicture</DataField>
+        </Field>
+        <Field Name="CompanyInformationPhoneNo">
+          <DataField>CompanyInformationPhoneNo</DataField>
+        </Field>
+        <Field Name="GlobalDimension1CodeCaption">
+          <DataField>GlobalDimension1CodeCaption</DataField>
+        </Field>
+        <Field Name="GlobalDimension1Code">
+          <DataField>GlobalDimension1Code</DataField>
+        </Field>
+        <Field Name="RepairPriceAmount">
+          <DataField>RepairPriceAmount</DataField>
+        </Field>
+        <Field Name="NotAcceptNotice">
+          <DataField>NotAcceptNotice</DataField>
+        </Field>
+        <Field Name="ContactText">
+          <DataField>ContactText</DataField>
+        </Field>
+        <Field Name="EstDeliveryText">
+          <DataField>EstDeliveryText</DataField>
+        </Field>
+        <Field Name="RepairEstText">
+          <DataField>RepairEstText</DataField>
+        </Field>
+        <Field Name="RepairStatusReturnText">
+          <DataField>RepairStatusReturnText</DataField>
+        </Field>
+        <Field Name="RepairEstNotice">
+          <DataField>RepairEstNotice</DataField>
+        </Field>
+        <Field Name="ConfirmText">
+          <DataField>ConfirmText</DataField>
+        </Field>
+        <Field Name="FooterText">
+          <DataField>FooterText</DataField>
+        </Field>
+        <Field Name="PSText">
+          <DataField>PSText</DataField>
+        </Field>
+        <Field Name="AddrLine">
+          <DataField>AddrLine</DataField>
+        </Field>
+        <Field Name="CustomerRepairStatus">
+          <DataField>CustomerRepairStatus</DataField>
+        </Field>
+        <Field Name="ReturnNoRepair">
+          <DataField>ReturnNoRepair</DataField>
+        </Field>
+        <Field Name="AddressFooter">
+          <DataField>AddressFooter</DataField>
+        </Field>
+        <Field Name="AddressFooter2">
+          <DataField>AddressFooter2</DataField>
+        </Field>
+        <Field Name="Text_CustomerRepairJournal">
+          <DataField>Text_CustomerRepairJournal</DataField>
+        </Field>
+        <Field Name="TextCaption_CustomerRepairJournal">
+          <DataField>TextCaption_CustomerRepairJournal</DataField>
+        </Field>
+        <Field Name="RepairCount">
+          <DataField>RepairCount</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

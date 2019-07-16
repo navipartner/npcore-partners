@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,187 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="DateFilters">
-          <DataField>DateFilters</DataField>
-        </Field>
-        <Field Name="No_Filter">
-          <DataField>No_Filter</DataField>
-        </Field>
-        <Field Name="GlobalDimension1_Filter">
-          <DataField>GlobalDimension1_Filter</DataField>
-        </Field>
-        <Field Name="Vendor_Filter">
-          <DataField>Vendor_Filter</DataField>
-        </Field>
-        <Field Name="No_vg">
-          <DataField>No_vg</DataField>
-        </Field>
-        <Field Name="Description_vg">
-          <DataField>Description_vg</DataField>
-        </Field>
-        <Field Name="PurchaseLCY_vg">
-          <DataField>PurchaseLCY_vg</DataField>
-        </Field>
-        <Field Name="PurchaseLCY_vgFormat">
-          <DataField>PurchaseLCY_vgFormat</DataField>
-        </Field>
-        <Field Name="PurchaseQuantity_vg">
-          <DataField>PurchaseQuantity_vg</DataField>
-        </Field>
-        <Field Name="PurchaseQuantity_vgFormat">
-          <DataField>PurchaseQuantity_vgFormat</DataField>
-        </Field>
-        <Field Name="SaleLCY_vg">
-          <DataField>SaleLCY_vg</DataField>
-        </Field>
-        <Field Name="SaleLCY_vgFormat">
-          <DataField>SaleLCY_vgFormat</DataField>
-        </Field>
-        <Field Name="SalesQty_vg">
-          <DataField>SalesQty_vg</DataField>
-        </Field>
-        <Field Name="SalesQty_vgFormat">
-          <DataField>SalesQty_vgFormat</DataField>
-        </Field>
-        <Field Name="pctvaresalgfjor_vg">
-          <DataField>pctvaresalgfjor_vg</DataField>
-        </Field>
-        <Field Name="pctvaresalgfjor_vgFormat">
-          <DataField>pctvaresalgfjor_vgFormat</DataField>
-        </Field>
-        <Field Name="DB_vg">
-          <DataField>DB_vg</DataField>
-        </Field>
-        <Field Name="DB_vgFormat">
-          <DataField>DB_vgFormat</DataField>
-        </Field>
-        <Field Name="dgItemGrp_vg">
-          <DataField>dgItemGrp_vg</DataField>
-        </Field>
-        <Field Name="dgItemGrp_vgFormat">
-          <DataField>dgItemGrp_vgFormat</DataField>
-        </Field>
-        <Field Name="pcttot_vg">
-          <DataField>pcttot_vg</DataField>
-        </Field>
-        <Field Name="pcttot_vgFormat">
-          <DataField>pcttot_vgFormat</DataField>
-        </Field>
-        <Field Name="varekobfjor_vg">
-          <DataField>varekobfjor_vg</DataField>
-        </Field>
-        <Field Name="varekobfjor_vgFormat">
-          <DataField>varekobfjor_vgFormat</DataField>
-        </Field>
-        <Field Name="varesalgfjor_vg">
-          <DataField>varesalgfjor_vg</DataField>
-        </Field>
-        <Field Name="varesalgfjor_vgFormat">
-          <DataField>varesalgfjor_vgFormat</DataField>
-        </Field>
-        <Field Name="visudensalg">
-          <DataField>visudensalg</DataField>
-        </Field>
-        <Field Name="No_Vendor">
-          <DataField>No_Vendor</DataField>
-        </Field>
-        <Field Name="Name_Vendor">
-          <DataField>Name_Vendor</DataField>
-        </Field>
-        <Field Name="PurchaseLCY_vgvendor">
-          <DataField>PurchaseLCY_vgvendor</DataField>
-        </Field>
-        <Field Name="PurchaseLCY_vgvendorFormat">
-          <DataField>PurchaseLCY_vgvendorFormat</DataField>
-        </Field>
-        <Field Name="PurchaseQty_vgvendor">
-          <DataField>PurchaseQty_vgvendor</DataField>
-        </Field>
-        <Field Name="PurchaseQty_vgvendorFormat">
-          <DataField>PurchaseQty_vgvendorFormat</DataField>
-        </Field>
-        <Field Name="SaleLCY_vgvendor">
-          <DataField>SaleLCY_vgvendor</DataField>
-        </Field>
-        <Field Name="SaleLCY_vgvendorFormat">
-          <DataField>SaleLCY_vgvendorFormat</DataField>
-        </Field>
-        <Field Name="SaleQty_vgvendor">
-          <DataField>SaleQty_vgvendor</DataField>
-        </Field>
-        <Field Name="SaleQty_vgvendorFormat">
-          <DataField>SaleQty_vgvendorFormat</DataField>
-        </Field>
-        <Field Name="DB_vgvendor">
-          <DataField>DB_vgvendor</DataField>
-        </Field>
-        <Field Name="DB_vgvendorFormat">
-          <DataField>DB_vgvendorFormat</DataField>
-        </Field>
-        <Field Name="dg_vgvendor">
-          <DataField>dg_vgvendor</DataField>
-        </Field>
-        <Field Name="dg_vgvendorFormat">
-          <DataField>dg_vgvendorFormat</DataField>
-        </Field>
-        <Field Name="Number_Totals">
-          <DataField>Number_Totals</DataField>
-        </Field>
-        <Field Name="TotalPurchaseLCY_vg">
-          <DataField>TotalPurchaseLCY_vg</DataField>
-        </Field>
-        <Field Name="TotalPurchaseLCY_vgFormat">
-          <DataField>TotalPurchaseLCY_vgFormat</DataField>
-        </Field>
-        <Field Name="TotalPurchaseQty_vg">
-          <DataField>TotalPurchaseQty_vg</DataField>
-        </Field>
-        <Field Name="TotalPurchaseQty_vgFormat">
-          <DataField>TotalPurchaseQty_vgFormat</DataField>
-        </Field>
-        <Field Name="TotalSaleLCY_vg">
-          <DataField>TotalSaleLCY_vg</DataField>
-        </Field>
-        <Field Name="TotalSaleLCY_vgFormat">
-          <DataField>TotalSaleLCY_vgFormat</DataField>
-        </Field>
-        <Field Name="TotalSaleQty_vg">
-          <DataField>TotalSaleQty_vg</DataField>
-        </Field>
-        <Field Name="TotalSaleQty_vgFormat">
-          <DataField>TotalSaleQty_vgFormat</DataField>
-        </Field>
-        <Field Name="TotalConsumptionAmt_vg">
-          <DataField>TotalConsumptionAmt_vg</DataField>
-        </Field>
-        <Field Name="TotalConsumptionAmt_vgFormat">
-          <DataField>TotalConsumptionAmt_vgFormat</DataField>
-        </Field>
-        <Field Name="TotalProfitLCY_vg">
-          <DataField>TotalProfitLCY_vg</DataField>
-        </Field>
-        <Field Name="TotalProfitLCY_vgFormat">
-          <DataField>TotalProfitLCY_vgFormat</DataField>
-        </Field>
-        <Field Name="Totaldg_vg">
-          <DataField>Totaldg_vg</DataField>
-        </Field>
-        <Field Name="Totaldg_vgFormat">
-          <DataField>Totaldg_vgFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3328,4 +3147,185 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="DateFilters">
+          <DataField>DateFilters</DataField>
+        </Field>
+        <Field Name="No_Filter">
+          <DataField>No_Filter</DataField>
+        </Field>
+        <Field Name="GlobalDimension1_Filter">
+          <DataField>GlobalDimension1_Filter</DataField>
+        </Field>
+        <Field Name="Vendor_Filter">
+          <DataField>Vendor_Filter</DataField>
+        </Field>
+        <Field Name="No_vg">
+          <DataField>No_vg</DataField>
+        </Field>
+        <Field Name="Description_vg">
+          <DataField>Description_vg</DataField>
+        </Field>
+        <Field Name="PurchaseLCY_vg">
+          <DataField>PurchaseLCY_vg</DataField>
+        </Field>
+        <Field Name="PurchaseLCY_vgFormat">
+          <DataField>PurchaseLCY_vgFormat</DataField>
+        </Field>
+        <Field Name="PurchaseQuantity_vg">
+          <DataField>PurchaseQuantity_vg</DataField>
+        </Field>
+        <Field Name="PurchaseQuantity_vgFormat">
+          <DataField>PurchaseQuantity_vgFormat</DataField>
+        </Field>
+        <Field Name="SaleLCY_vg">
+          <DataField>SaleLCY_vg</DataField>
+        </Field>
+        <Field Name="SaleLCY_vgFormat">
+          <DataField>SaleLCY_vgFormat</DataField>
+        </Field>
+        <Field Name="SalesQty_vg">
+          <DataField>SalesQty_vg</DataField>
+        </Field>
+        <Field Name="SalesQty_vgFormat">
+          <DataField>SalesQty_vgFormat</DataField>
+        </Field>
+        <Field Name="pctvaresalgfjor_vg">
+          <DataField>pctvaresalgfjor_vg</DataField>
+        </Field>
+        <Field Name="pctvaresalgfjor_vgFormat">
+          <DataField>pctvaresalgfjor_vgFormat</DataField>
+        </Field>
+        <Field Name="DB_vg">
+          <DataField>DB_vg</DataField>
+        </Field>
+        <Field Name="DB_vgFormat">
+          <DataField>DB_vgFormat</DataField>
+        </Field>
+        <Field Name="dgItemGrp_vg">
+          <DataField>dgItemGrp_vg</DataField>
+        </Field>
+        <Field Name="dgItemGrp_vgFormat">
+          <DataField>dgItemGrp_vgFormat</DataField>
+        </Field>
+        <Field Name="pcttot_vg">
+          <DataField>pcttot_vg</DataField>
+        </Field>
+        <Field Name="pcttot_vgFormat">
+          <DataField>pcttot_vgFormat</DataField>
+        </Field>
+        <Field Name="varekobfjor_vg">
+          <DataField>varekobfjor_vg</DataField>
+        </Field>
+        <Field Name="varekobfjor_vgFormat">
+          <DataField>varekobfjor_vgFormat</DataField>
+        </Field>
+        <Field Name="varesalgfjor_vg">
+          <DataField>varesalgfjor_vg</DataField>
+        </Field>
+        <Field Name="varesalgfjor_vgFormat">
+          <DataField>varesalgfjor_vgFormat</DataField>
+        </Field>
+        <Field Name="visudensalg">
+          <DataField>visudensalg</DataField>
+        </Field>
+        <Field Name="No_Vendor">
+          <DataField>No_Vendor</DataField>
+        </Field>
+        <Field Name="Name_Vendor">
+          <DataField>Name_Vendor</DataField>
+        </Field>
+        <Field Name="PurchaseLCY_vgvendor">
+          <DataField>PurchaseLCY_vgvendor</DataField>
+        </Field>
+        <Field Name="PurchaseLCY_vgvendorFormat">
+          <DataField>PurchaseLCY_vgvendorFormat</DataField>
+        </Field>
+        <Field Name="PurchaseQty_vgvendor">
+          <DataField>PurchaseQty_vgvendor</DataField>
+        </Field>
+        <Field Name="PurchaseQty_vgvendorFormat">
+          <DataField>PurchaseQty_vgvendorFormat</DataField>
+        </Field>
+        <Field Name="SaleLCY_vgvendor">
+          <DataField>SaleLCY_vgvendor</DataField>
+        </Field>
+        <Field Name="SaleLCY_vgvendorFormat">
+          <DataField>SaleLCY_vgvendorFormat</DataField>
+        </Field>
+        <Field Name="SaleQty_vgvendor">
+          <DataField>SaleQty_vgvendor</DataField>
+        </Field>
+        <Field Name="SaleQty_vgvendorFormat">
+          <DataField>SaleQty_vgvendorFormat</DataField>
+        </Field>
+        <Field Name="DB_vgvendor">
+          <DataField>DB_vgvendor</DataField>
+        </Field>
+        <Field Name="DB_vgvendorFormat">
+          <DataField>DB_vgvendorFormat</DataField>
+        </Field>
+        <Field Name="dg_vgvendor">
+          <DataField>dg_vgvendor</DataField>
+        </Field>
+        <Field Name="dg_vgvendorFormat">
+          <DataField>dg_vgvendorFormat</DataField>
+        </Field>
+        <Field Name="Number_Totals">
+          <DataField>Number_Totals</DataField>
+        </Field>
+        <Field Name="TotalPurchaseLCY_vg">
+          <DataField>TotalPurchaseLCY_vg</DataField>
+        </Field>
+        <Field Name="TotalPurchaseLCY_vgFormat">
+          <DataField>TotalPurchaseLCY_vgFormat</DataField>
+        </Field>
+        <Field Name="TotalPurchaseQty_vg">
+          <DataField>TotalPurchaseQty_vg</DataField>
+        </Field>
+        <Field Name="TotalPurchaseQty_vgFormat">
+          <DataField>TotalPurchaseQty_vgFormat</DataField>
+        </Field>
+        <Field Name="TotalSaleLCY_vg">
+          <DataField>TotalSaleLCY_vg</DataField>
+        </Field>
+        <Field Name="TotalSaleLCY_vgFormat">
+          <DataField>TotalSaleLCY_vgFormat</DataField>
+        </Field>
+        <Field Name="TotalSaleQty_vg">
+          <DataField>TotalSaleQty_vg</DataField>
+        </Field>
+        <Field Name="TotalSaleQty_vgFormat">
+          <DataField>TotalSaleQty_vgFormat</DataField>
+        </Field>
+        <Field Name="TotalConsumptionAmt_vg">
+          <DataField>TotalConsumptionAmt_vg</DataField>
+        </Field>
+        <Field Name="TotalConsumptionAmt_vgFormat">
+          <DataField>TotalConsumptionAmt_vgFormat</DataField>
+        </Field>
+        <Field Name="TotalProfitLCY_vg">
+          <DataField>TotalProfitLCY_vg</DataField>
+        </Field>
+        <Field Name="TotalProfitLCY_vgFormat">
+          <DataField>TotalProfitLCY_vgFormat</DataField>
+        </Field>
+        <Field Name="Totaldg_vg">
+          <DataField>Totaldg_vg</DataField>
+        </Field>
+        <Field Name="Totaldg_vgFormat">
+          <DataField>Totaldg_vgFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

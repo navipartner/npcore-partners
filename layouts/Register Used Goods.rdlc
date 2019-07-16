@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,64 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="Picture_CompanyInformation">
-          <DataField>Picture_CompanyInformation</DataField>
-        </Field>
-        <Field Name="No_UsedGoodsRegistration">
-          <DataField>No_UsedGoodsRegistration</DataField>
-        </Field>
-        <Field Name="PurchaseDate_UsedGoodsRegistration">
-          <DataField>PurchaseDate_UsedGoodsRegistration</DataField>
-        </Field>
-        <Field Name="SalespersonCode_UsedGoodsRegistration">
-          <DataField>SalespersonCode_UsedGoodsRegistration</DataField>
-        </Field>
-        <Field Name="PurchasedByCustomerNo_UsedGoodsRegistration">
-          <DataField>PurchasedByCustomerNo_UsedGoodsRegistration</DataField>
-        </Field>
-        <Field Name="Name_UsedGoodsRegistration">
-          <DataField>Name_UsedGoodsRegistration</DataField>
-        </Field>
-        <Field Name="Address_UsedGoodsRegistration">
-          <DataField>Address_UsedGoodsRegistration</DataField>
-        </Field>
-        <Field Name="Address2_UsedGoodsRegistration">
-          <DataField>Address2_UsedGoodsRegistration</DataField>
-        </Field>
-        <Field Name="PostCode_UsedGoodsRegistration">
-          <DataField>PostCode_UsedGoodsRegistration</DataField>
-        </Field>
-        <Field Name="By_UsedGoodsRegistration">
-          <DataField>By_UsedGoodsRegistration</DataField>
-        </Field>
-        <Field Name="Identification_UsedGoodsRegistration">
-          <DataField>Identification_UsedGoodsRegistration</DataField>
-        </Field>
-        <Field Name="IdentificationNumber_UsedGoodsRegistration">
-          <DataField>IdentificationNumber_UsedGoodsRegistration</DataField>
-        </Field>
-        <Field Name="AddressFooter1">
-          <DataField>AddressFooter1</DataField>
-        </Field>
-        <Field Name="AddressFooter2">
-          <DataField>AddressFooter2</DataField>
-        </Field>
-        <Field Name="Subject_UsedGoodsRegistration2">
-          <DataField>Subject_UsedGoodsRegistration2</DataField>
-        </Field>
-        <Field Name="Serienummer_UsedGoodsRegistration2">
-          <DataField>Serienummer_UsedGoodsRegistration2</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -1500,6 +1442,42 @@ Cstr(Fields!AddressFooter2.Value)
     </ReportSection>
   </ReportSections>
   <ReportParameters>
+    <ReportParameter Name="ReportTitle">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ReportTitle</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ReportTitle</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PageLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PageLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PageLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SignatureLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SignatureLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SignatureLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DateLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DateLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DateLbl</Prompt>
+    </ReportParameter>
     <ReportParameter Name="No_UsedGoodsRegistrationCaption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -1617,42 +1595,6 @@ Cstr(Fields!AddressFooter2.Value)
       </DefaultValue>
       <Prompt>Serienummer_UsedGoodsRegistration2Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ReportTitle">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>ReportTitle</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>ReportTitle</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="PageLbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>PageLbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>PageLbl</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="SignatureLbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>SignatureLbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>SignatureLbl</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="DateLbl">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>DateLbl</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>DateLbl</Prompt>
-    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
@@ -1662,87 +1604,87 @@ Cstr(Fields!AddressFooter2.Value)
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>No_UsedGoodsRegistrationCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>1</RowIndex>
-          <ParameterName>PurchaseDate_UsedGoodsRegistrationCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>2</RowIndex>
-          <ParameterName>SalespersonCode_UsedGoodsRegistrationCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>3</RowIndex>
-          <ParameterName>PurchasedByCustomerNo_UsedGoodsRegistrationCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>4</RowIndex>
-          <ParameterName>Name_UsedGoodsRegistrationCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>5</RowIndex>
-          <ParameterName>Address_UsedGoodsRegistrationCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>6</RowIndex>
-          <ParameterName>Address2_UsedGoodsRegistrationCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>7</RowIndex>
-          <ParameterName>PostCode_UsedGoodsRegistrationCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>8</RowIndex>
-          <ParameterName>By_UsedGoodsRegistrationCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>9</RowIndex>
-          <ParameterName>Identification_UsedGoodsRegistrationCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>10</RowIndex>
-          <ParameterName>IdentificationNumber_UsedGoodsRegistrationCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>11</RowIndex>
-          <ParameterName>Subject_UsedGoodsRegistration2Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>12</RowIndex>
-          <ParameterName>Serienummer_UsedGoodsRegistration2Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>13</RowIndex>
           <ParameterName>ReportTitle</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>14</RowIndex>
+          <RowIndex>1</RowIndex>
           <ParameterName>PageLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>15</RowIndex>
+          <RowIndex>2</RowIndex>
           <ParameterName>SignatureLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>16</RowIndex>
+          <RowIndex>3</RowIndex>
           <ParameterName>DateLbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>4</RowIndex>
+          <ParameterName>No_UsedGoodsRegistrationCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>5</RowIndex>
+          <ParameterName>PurchaseDate_UsedGoodsRegistrationCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>6</RowIndex>
+          <ParameterName>SalespersonCode_UsedGoodsRegistrationCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>7</RowIndex>
+          <ParameterName>PurchasedByCustomerNo_UsedGoodsRegistrationCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>8</RowIndex>
+          <ParameterName>Name_UsedGoodsRegistrationCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>9</RowIndex>
+          <ParameterName>Address_UsedGoodsRegistrationCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>10</RowIndex>
+          <ParameterName>Address2_UsedGoodsRegistrationCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>11</RowIndex>
+          <ParameterName>PostCode_UsedGoodsRegistrationCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>12</RowIndex>
+          <ParameterName>By_UsedGoodsRegistrationCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>13</RowIndex>
+          <ParameterName>Identification_UsedGoodsRegistrationCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>14</RowIndex>
+          <ParameterName>IdentificationNumber_UsedGoodsRegistrationCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>15</RowIndex>
+          <ParameterName>Subject_UsedGoodsRegistration2Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>16</RowIndex>
+          <ParameterName>Serienummer_UsedGoodsRegistration2Caption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -1817,4 +1759,62 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="Picture_CompanyInformation">
+          <DataField>Picture_CompanyInformation</DataField>
+        </Field>
+        <Field Name="No_UsedGoodsRegistration">
+          <DataField>No_UsedGoodsRegistration</DataField>
+        </Field>
+        <Field Name="PurchaseDate_UsedGoodsRegistration">
+          <DataField>PurchaseDate_UsedGoodsRegistration</DataField>
+        </Field>
+        <Field Name="SalespersonCode_UsedGoodsRegistration">
+          <DataField>SalespersonCode_UsedGoodsRegistration</DataField>
+        </Field>
+        <Field Name="PurchasedByCustomerNo_UsedGoodsRegistration">
+          <DataField>PurchasedByCustomerNo_UsedGoodsRegistration</DataField>
+        </Field>
+        <Field Name="Name_UsedGoodsRegistration">
+          <DataField>Name_UsedGoodsRegistration</DataField>
+        </Field>
+        <Field Name="Address_UsedGoodsRegistration">
+          <DataField>Address_UsedGoodsRegistration</DataField>
+        </Field>
+        <Field Name="Address2_UsedGoodsRegistration">
+          <DataField>Address2_UsedGoodsRegistration</DataField>
+        </Field>
+        <Field Name="PostCode_UsedGoodsRegistration">
+          <DataField>PostCode_UsedGoodsRegistration</DataField>
+        </Field>
+        <Field Name="By_UsedGoodsRegistration">
+          <DataField>By_UsedGoodsRegistration</DataField>
+        </Field>
+        <Field Name="Identification_UsedGoodsRegistration">
+          <DataField>Identification_UsedGoodsRegistration</DataField>
+        </Field>
+        <Field Name="IdentificationNumber_UsedGoodsRegistration">
+          <DataField>IdentificationNumber_UsedGoodsRegistration</DataField>
+        </Field>
+        <Field Name="AddressFooter1">
+          <DataField>AddressFooter1</DataField>
+        </Field>
+        <Field Name="AddressFooter2">
+          <DataField>AddressFooter2</DataField>
+        </Field>
+        <Field Name="Subject_UsedGoodsRegistration2">
+          <DataField>Subject_UsedGoodsRegistration2</DataField>
+        </Field>
+        <Field Name="Serienummer_UsedGoodsRegistration2">
+          <DataField>Serienummer_UsedGoodsRegistration2</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

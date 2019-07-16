@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,52 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="ExternalOrderNo">
-          <DataField>ExternalOrderNo</DataField>
-        </Field>
-        <Field Name="Token">
-          <DataField>Token</DataField>
-        </Field>
-        <Field Name="ItemNo">
-          <DataField>ItemNo</DataField>
-        </Field>
-        <Field Name="Quantity">
-          <DataField>Quantity</DataField>
-        </Field>
-        <Field Name="EntryNo">
-          <DataField>EntryNo</DataField>
-        </Field>
-        <Field Name="ItemDescription">
-          <DataField>ItemDescription</DataField>
-        </Field>
-        <Field Name="AdmissionCode">
-          <DataField>AdmissionCode</DataField>
-        </Field>
-        <Field Name="AdmissionDescription">
-          <DataField>AdmissionDescription</DataField>
-        </Field>
-        <Field Name="TicketNo">
-          <DataField>TicketNo</DataField>
-        </Field>
-        <Field Name="ValidFromDate">
-          <DataField>ValidFromDate</DataField>
-        </Field>
-        <Field Name="ValidUntilDate">
-          <DataField>ValidUntilDate</DataField>
-        </Field>
-        <Field Name="TicketURL">
-          <DataField>TicketURL</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -2457,4 +2411,50 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="ExternalOrderNo">
+          <DataField>ExternalOrderNo</DataField>
+        </Field>
+        <Field Name="Token">
+          <DataField>Token</DataField>
+        </Field>
+        <Field Name="ItemNo">
+          <DataField>ItemNo</DataField>
+        </Field>
+        <Field Name="Quantity">
+          <DataField>Quantity</DataField>
+        </Field>
+        <Field Name="EntryNo">
+          <DataField>EntryNo</DataField>
+        </Field>
+        <Field Name="ItemDescription">
+          <DataField>ItemDescription</DataField>
+        </Field>
+        <Field Name="AdmissionCode">
+          <DataField>AdmissionCode</DataField>
+        </Field>
+        <Field Name="AdmissionDescription">
+          <DataField>AdmissionDescription</DataField>
+        </Field>
+        <Field Name="TicketNo">
+          <DataField>TicketNo</DataField>
+        </Field>
+        <Field Name="ValidFromDate">
+          <DataField>ValidFromDate</DataField>
+        </Field>
+        <Field Name="ValidUntilDate">
+          <DataField>ValidUntilDate</DataField>
+        </Field>
+        <Field Name="TicketURL">
+          <DataField>TicketURL</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

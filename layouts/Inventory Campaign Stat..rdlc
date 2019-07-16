@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,139 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="PeriodDiscountLineVendorNo">
-          <DataField>PeriodDiscountLineVendorNo</DataField>
-        </Field>
-        <Field Name="CompanyInfoName">
-          <DataField>CompanyInfoName</DataField>
-        </Field>
-        <Field Name="CompanyInfoPicture">
-          <DataField>CompanyInfoPicture</DataField>
-        </Field>
-        <Field Name="Code">
-          <DataField>Code</DataField>
-        </Field>
-        <Field Name="Description">
-          <DataField>Description</DataField>
-        </Field>
-        <Field Name="StartingDate">
-          <DataField>StartingDate</DataField>
-        </Field>
-        <Field Name="EndingDate">
-          <DataField>EndingDate</DataField>
-        </Field>
-        <Field Name="Code_PeriodDiscountLine">
-          <DataField>Code_PeriodDiscountLine</DataField>
-        </Field>
-        <Field Name="PeriodLineItemNo">
-          <DataField>PeriodLineItemNo</DataField>
-        </Field>
-        <Field Name="PeriodLineDesc">
-          <DataField>PeriodLineDesc</DataField>
-        </Field>
-        <Field Name="ItemUnitPrice">
-          <DataField>ItemUnitPrice</DataField>
-        </Field>
-        <Field Name="ItemUnitPriceFormat">
-          <DataField>ItemUnitPriceFormat</DataField>
-        </Field>
-        <Field Name="PeriodLineUnitPrice">
-          <DataField>PeriodLineUnitPrice</DataField>
-        </Field>
-        <Field Name="PeriodLineUnitPriceFormat">
-          <DataField>PeriodLineUnitPriceFormat</DataField>
-        </Field>
-        <Field Name="PeriodLineCampaignUnitPrice">
-          <DataField>PeriodLineCampaignUnitPrice</DataField>
-        </Field>
-        <Field Name="PeriodLineCampaignUnitPriceFormat">
-          <DataField>PeriodLineCampaignUnitPriceFormat</DataField>
-        </Field>
-        <Field Name="PeriodLineQuantitySold">
-          <DataField>PeriodLineQuantitySold</DataField>
-        </Field>
-        <Field Name="PeriodLineQuantitySoldFormat">
-          <DataField>PeriodLineQuantitySoldFormat</DataField>
-        </Field>
-        <Field Name="PeriodLineTurnover">
-          <DataField>PeriodLineTurnover</DataField>
-        </Field>
-        <Field Name="PeriodLineTurnoverFormat">
-          <DataField>PeriodLineTurnoverFormat</DataField>
-        </Field>
-        <Field Name="Bought">
-          <DataField>Bought</DataField>
-        </Field>
-        <Field Name="BoughtFormat">
-          <DataField>BoughtFormat</DataField>
-        </Field>
-        <Field Name="BoughtFor">
-          <DataField>BoughtFor</DataField>
-        </Field>
-        <Field Name="BoughtForFormat">
-          <DataField>BoughtForFormat</DataField>
-        </Field>
-        <Field Name="AmountLeftover">
-          <DataField>AmountLeftover</DataField>
-        </Field>
-        <Field Name="AmountLeftoverFormat">
-          <DataField>AmountLeftoverFormat</DataField>
-        </Field>
-        <Field Name="TeoreticalAv">
-          <DataField>TeoreticalAv</DataField>
-        </Field>
-        <Field Name="TeoreticalAvFormat">
-          <DataField>TeoreticalAvFormat</DataField>
-        </Field>
-        <Field Name="ConsumeOld">
-          <DataField>ConsumeOld</DataField>
-        </Field>
-        <Field Name="ConsumeOldFormat">
-          <DataField>ConsumeOldFormat</DataField>
-        </Field>
-        <Field Name="ItemNetChange">
-          <DataField>ItemNetChange</DataField>
-        </Field>
-        <Field Name="ItemNetChangeFormat">
-          <DataField>ItemNetChangeFormat</DataField>
-        </Field>
-        <Field Name="db">
-          <DataField>db</DataField>
-        </Field>
-        <Field Name="dbFormat">
-          <DataField>dbFormat</DataField>
-        </Field>
-        <Field Name="dg">
-          <DataField>dg</DataField>
-        </Field>
-        <Field Name="dgFormat">
-          <DataField>dgFormat</DataField>
-        </Field>
-        <Field Name="Pagenoinadvert_PeriodDiscountLine">
-          <DataField>Pagenoinadvert_PeriodDiscountLine</DataField>
-        </Field>
-        <Field Name="PeriodDiscountLine_VendorNo">
-          <DataField>PeriodDiscountLine_VendorNo</DataField>
-        </Field>
-        <Field Name="Caption_PeriodDiscountLine_VendorNo">
-          <DataField>Caption_PeriodDiscountLine_VendorNo</DataField>
-        </Field>
-        <Field Name="Vendor_Name">
-          <DataField>Vendor_Name</DataField>
-        </Field>
-        <Field Name="Caption_Vendor_name">
-          <DataField>Caption_Vendor_name</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -4213,4 +4080,137 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="PeriodDiscountLineVendorNo">
+          <DataField>PeriodDiscountLineVendorNo</DataField>
+        </Field>
+        <Field Name="CompanyInfoName">
+          <DataField>CompanyInfoName</DataField>
+        </Field>
+        <Field Name="CompanyInfoPicture">
+          <DataField>CompanyInfoPicture</DataField>
+        </Field>
+        <Field Name="Code">
+          <DataField>Code</DataField>
+        </Field>
+        <Field Name="Description">
+          <DataField>Description</DataField>
+        </Field>
+        <Field Name="StartingDate">
+          <DataField>StartingDate</DataField>
+        </Field>
+        <Field Name="EndingDate">
+          <DataField>EndingDate</DataField>
+        </Field>
+        <Field Name="Code_PeriodDiscountLine">
+          <DataField>Code_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="PeriodLineItemNo">
+          <DataField>PeriodLineItemNo</DataField>
+        </Field>
+        <Field Name="PeriodLineDesc">
+          <DataField>PeriodLineDesc</DataField>
+        </Field>
+        <Field Name="ItemUnitPrice">
+          <DataField>ItemUnitPrice</DataField>
+        </Field>
+        <Field Name="ItemUnitPriceFormat">
+          <DataField>ItemUnitPriceFormat</DataField>
+        </Field>
+        <Field Name="PeriodLineUnitPrice">
+          <DataField>PeriodLineUnitPrice</DataField>
+        </Field>
+        <Field Name="PeriodLineUnitPriceFormat">
+          <DataField>PeriodLineUnitPriceFormat</DataField>
+        </Field>
+        <Field Name="PeriodLineCampaignUnitPrice">
+          <DataField>PeriodLineCampaignUnitPrice</DataField>
+        </Field>
+        <Field Name="PeriodLineCampaignUnitPriceFormat">
+          <DataField>PeriodLineCampaignUnitPriceFormat</DataField>
+        </Field>
+        <Field Name="PeriodLineQuantitySold">
+          <DataField>PeriodLineQuantitySold</DataField>
+        </Field>
+        <Field Name="PeriodLineQuantitySoldFormat">
+          <DataField>PeriodLineQuantitySoldFormat</DataField>
+        </Field>
+        <Field Name="PeriodLineTurnover">
+          <DataField>PeriodLineTurnover</DataField>
+        </Field>
+        <Field Name="PeriodLineTurnoverFormat">
+          <DataField>PeriodLineTurnoverFormat</DataField>
+        </Field>
+        <Field Name="Bought">
+          <DataField>Bought</DataField>
+        </Field>
+        <Field Name="BoughtFormat">
+          <DataField>BoughtFormat</DataField>
+        </Field>
+        <Field Name="BoughtFor">
+          <DataField>BoughtFor</DataField>
+        </Field>
+        <Field Name="BoughtForFormat">
+          <DataField>BoughtForFormat</DataField>
+        </Field>
+        <Field Name="AmountLeftover">
+          <DataField>AmountLeftover</DataField>
+        </Field>
+        <Field Name="AmountLeftoverFormat">
+          <DataField>AmountLeftoverFormat</DataField>
+        </Field>
+        <Field Name="TeoreticalAv">
+          <DataField>TeoreticalAv</DataField>
+        </Field>
+        <Field Name="TeoreticalAvFormat">
+          <DataField>TeoreticalAvFormat</DataField>
+        </Field>
+        <Field Name="ConsumeOld">
+          <DataField>ConsumeOld</DataField>
+        </Field>
+        <Field Name="ConsumeOldFormat">
+          <DataField>ConsumeOldFormat</DataField>
+        </Field>
+        <Field Name="ItemNetChange">
+          <DataField>ItemNetChange</DataField>
+        </Field>
+        <Field Name="ItemNetChangeFormat">
+          <DataField>ItemNetChangeFormat</DataField>
+        </Field>
+        <Field Name="db">
+          <DataField>db</DataField>
+        </Field>
+        <Field Name="dbFormat">
+          <DataField>dbFormat</DataField>
+        </Field>
+        <Field Name="dg">
+          <DataField>dg</DataField>
+        </Field>
+        <Field Name="dgFormat">
+          <DataField>dgFormat</DataField>
+        </Field>
+        <Field Name="Pagenoinadvert_PeriodDiscountLine">
+          <DataField>Pagenoinadvert_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="PeriodDiscountLine_VendorNo">
+          <DataField>PeriodDiscountLine_VendorNo</DataField>
+        </Field>
+        <Field Name="Caption_PeriodDiscountLine_VendorNo">
+          <DataField>Caption_PeriodDiscountLine_VendorNo</DataField>
+        </Field>
+        <Field Name="Vendor_Name">
+          <DataField>Vendor_Name</DataField>
+        </Field>
+        <Field Name="Caption_Vendor_name">
+          <DataField>Caption_Vendor_name</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

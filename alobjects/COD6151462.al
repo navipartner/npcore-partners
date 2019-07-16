@@ -2,14 +2,12 @@ codeunit 6151462 "M2 Picture Mgt."
 {
     // MAG2.08/MHA /20171016  CASE 292926 Object created - M2 Integration
     // MAG2.09/TS  /20171113  CASE 296169 Magento Urls can be https
+    // MAG2.22/MHA /20190705  CASE 361164 Updated Exception Message parsing in MagentoApiPost()
 
 
     trigger OnRun()
     begin
     end;
-
-    var
-        Text000: Label 'Magento returned the following Error:\\';
 
     procedure DragDropPicture(PictureName: Text;PictureType: Text;PictureDataUri: Text)
     var
@@ -75,8 +73,6 @@ codeunit 6151462 "M2 Picture Mgt."
 
         MagentoSetup.Get;
         //-MAG2.09 [296169]
-        //String := MagentoSetup."Magento Url" + 'pub/media/catalog/' + Sender.GetMagentoType() + '/api/' + Sender.Name;
-        //MagentoUrl := String.Replace('https','http');
         MagentoUrl := MagentoSetup."Magento Url" + 'pub/media/catalog/' + Sender.GetMagentoType() + '/api/' + Sender.Name;
         //+MAG2.09 [296169]
     end;
@@ -129,13 +125,10 @@ codeunit 6151462 "M2 Picture Mgt."
         HttpWebRequest.Headers.Add('Authorization',MagentoSetup."Api Authorization");
 
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          ErrorMessage := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
-          if ErrorMessage = '' then
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
-          if ErrorMessage = '' then
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-          ErrorMessage := Text000 + ErrorMessage;
+          //-MAG2.22 [361164]
+          ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
           Error(CopyStr(ErrorMessage,1,1000));
+          //+MAG2.22 [361164]
         end;
 
         exit(NpXmlDomMgt.TryLoadXml(Response,XmlDoc));

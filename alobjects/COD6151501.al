@@ -1,40 +1,45 @@
 codeunit 6151501 "Nc Task Mgt."
 {
-    // NC1.00 /MHA /20150113  CASE 199932 Refactored Object from Web Integration
-    // NC1.01 /MHA /20150126  CASE 199932 Added Cleanup
-    // NC1.01 /MHA /20150126  CASE 199932 Added NpXml IsDuplicate function - May be ommitted if module [NX] is not installed
-    // NC1.04 /MHA /20150213  CASE 199932 Renamed functions:
+    // NC1.00/MHA /20150113  CASE 199932 Refactored Object from Web Integration
+    // NC1.01/MHA /20150126  CASE 199932 Added Cleanup
+    // NC1.01/MHA /20150126  CASE 199932 Added NpXml IsDuplicate function - May be ommitted if module [NX] is not installed
+    // NC1.04/MHA /20150213  CASE 199932 Renamed functions:
     //                                 - DeleteDuplicateTempTasks --> DeleteDuplicates
     //                                 - InsertTasksFromTempTasks --> InsertTasks
     //                                 - InsertTempTasksFromDataLogs --> InsertTempTasks
     //                                 - TaskRestoreRecord --> RestoreRecord
     //                                 - TempTaskRestoreRecord --> RestoreRecordTemp
-    // NC1.06 /MHA /20150224  CASE 206395 Updated function RestoreRecord() to restore from stored values only
-    // NC1.13 /MHA /20150414  CASE 211360 Added Primary Key Fields fields for easier record identification
-    // NC1.16 /MHA /20150519  CASE 214257 Updated DataLogMgt to DataLogSubscriberMgt [DL1.07]
-    // NC1.17 /MHA /20150622  CASE 215533 Added NpXmlSetup
-    // NC1.18 /MHA /20150710  CASE 218282 Added COMMIT to UpdateTasks()
-    // NC1.20 /MHA /20151008  CASE 224357 Reworked RestoreRecordTemp() for better performance
-    // NC1.21 /TS  /20151014 CASE 225075 Modified Code to take Max Import From Naviconnect Setup
-    // NC1.22 /MHA /20160125 CASE 232733 Task Queue Worker Group replaced by NaviConnect Task Processor
-    // NC1.22 /MHA /20160415 CASE 231214 Added multi company data log
-    // NC1.22 /TS /20160427  CASE 240229 New Value should be stored in Previous Value for Rename
-    // NC2.00 /MHA /20160525  CASE 240005 NaviConnect
-    // NC2.01 /MHA /20160901  CASE 247479 Added function IsNpXmlTask() for differentiating IsDuplicate Check
-    // NC2.01 /MHA /20160914  CASE 242551 Wrong filter removed in RestoreRecordTemp() and missing filter added in RestoreRecord()
-    // NC2.05 /MHA /20170615  CASE 280860 Refactored Cleanup() on Nc Task Field
-    // NC2.07 /MHA /20171016  CASE 293599 Removed buffering of fields in UpdateTasks() to increase performance
-    // NC2.07 /MHA /20171027  CASE 294737 RestoreRecord now restored non-existing Rec to Temporary
-    // NC2.08 /MHA /20171127  CASE 297750 Function CleanTasks() made Public and removed from UpdateTasks()
-    // NC2.08 /TS  /20171204  CASE 298597 Tasks shold be inserted only once.
-    // NC2.08 /MHA /20180110  CASE 301296 Replaced function RestoreRecordToRecRef() with RestoreRecordFromDataLog()
-    // NC2.12 /MHA /20180418  CASE 308107 Deleted functions IsDuplicate(),IsNpXmlTask() and added functions IsUniqueTask(),ReqisterUniqueTask()
+    // NC1.06/MHA /20150224  CASE 206395 Updated function RestoreRecord() to restore from stored values only
+    // NC1.13/MHA /20150414  CASE 211360 Added Primary Key Fields fields for easier record identification
+    // NC1.16/MHA /20150519  CASE 214257 Updated DataLogMgt to DataLogSubscriberMgt [DL1.07]
+    // NC1.17/MHA /20150622  CASE 215533 Added NpXmlSetup
+    // NC1.18/MHA /20150710  CASE 218282 Added COMMIT to UpdateTasks()
+    // NC1.20/MHA /20151008  CASE 224357 Reworked RestoreRecordTemp() for better performance
+    // NC1.21/TS  /20151014 CASE 225075 Modified Code to take Max Import From Naviconnect Setup
+    // NC1.22/MHA /20160125 CASE 232733 Task Queue Worker Group replaced by NaviConnect Task Processor
+    // NC1.22/MHA /20160415 CASE 231214 Added multi company data log
+    // NC1.22/TS /20160427  CASE 240229 New Value should be stored in Previous Value for Rename
+    // NC2.00/MHA /20160525  CASE 240005 NaviConnect
+    // NC2.01/MHA /20160901  CASE 247479 Added function IsNpXmlTask() for differentiating IsDuplicate Check
+    // NC2.01/MHA /20160914  CASE 242551 Wrong filter removed in RestoreRecordTemp() and missing filter added in RestoreRecord()
+    // NC2.05/MHA /20170615  CASE 280860 Refactored Cleanup() on Nc Task Field
+    // NC2.07/MHA /20171016  CASE 293599 Removed buffering of fields in UpdateTasks() to increase performance
+    // NC2.07/MHA /20171027  CASE 294737 RestoreRecord now restored non-existing Rec to Temporary
+    // NC2.08/MHA /20171127  CASE 297750 Function CleanTasks() made Public and removed from UpdateTasks()
+    // NC2.08/TS  /20171204  CASE 298597 Tasks shold be inserted only once.
+    // NC2.08/MHA /20180110  CASE 301296 Replaced function RestoreRecordToRecRef() with RestoreRecordFromDataLog()
+    // NC2.12/MHA /20180418  CASE 308107 Deleted functions IsDuplicate(),IsNpXmlTask() and added functions IsUniqueTask(),ReqisterUniqueTask()
     // NC2.14/MHA /20180629  CASE 308107 Added Task Output to CleanTasks()
     // NC2.14/MHA /20180629  CASE 320762 Added Record ID to Nc Tasks
+    // NC2.22/MHA /20190613  CASE 358499 Added function TaskComplete()
 
+    TableNo = "Nc Task";
 
     trigger OnRun()
     begin
+        //-NC2.22 [358499]
+        TaskComplete(Rec);
+        //-NC2.22 [358499]
     end;
 
     var
@@ -45,6 +50,29 @@ codeunit 6151501 "Nc Task Mgt."
         Window: Dialog;
         DataLogEntryNo: Integer;
         Text002: Label 'Company: #7#####################################\Finding new Data Log records: @1@@@@@@@@@@@@@@@@\Buffering Data Logs to Tasks: @2@@@@@@@@@@@@@@@@\    Task Quantity:            #5################\Removing Duplicate Tasks:     @3@@@@@@@@@@@@@@@@\    Removed Task Quantity:    #6################\Updating the Task List:       @4@@@@@@@@@@@@@@@@';
+
+    local procedure TaskComplete(var NcTask: Record "Nc Task")
+    var
+        OutStr: OutStream;
+        LastErrorText: Text;
+    begin
+        //-NC2.22 [358499]
+        LastErrorText := GetLastErrorText;
+        if not NcTask.Find then
+            exit;
+
+        NcTask."Last Processing Completed at" := CurrentDateTime;
+        NcTask."Last Processing Duration" := (NcTask."Last Processing Completed at" - NcTask."Last Processing Started at") / 1000;
+        NcTask.Processed := LastErrorText = '';
+        NcTask."Process Error" := LastErrorText <> '';
+        if LastErrorText <> '' then begin
+          Clear(NcTask.Response);
+          NcTask.Response.CreateOutStream(OutStr,TEXTENCODING::UTF8);
+          OutStr.Write(LastErrorText);
+        end;
+        NcTask.Modify;
+        //+NC2.22 [358499]
+    end;
 
     procedure UpdateTasks(TaskProcessor: Record "Nc Task Processor")
     var

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,70 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="Number_Integer">
-          <DataField>Number_Integer</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="Tildato">
-          <DataField>Tildato</DataField>
-        </Field>
-        <Field Name="No_Vendor">
-          <DataField>No_Vendor</DataField>
-        </Field>
-        <Field Name="Name_Vendor">
-          <DataField>Name_Vendor</DataField>
-        </Field>
-        <Field Name="NetChangeLCY_Vendor">
-          <DataField>NetChangeLCY_Vendor</DataField>
-        </Field>
-        <Field Name="NetChangeLCY_VendorFormat">
-          <DataField>NetChangeLCY_VendorFormat</DataField>
-        </Field>
-        <Field Name="PrintKreditor">
-          <DataField>PrintKreditor</DataField>
-        </Field>
-        <Field Name="Kunmedsaldo_Vendor">
-          <DataField>Kunmedsaldo_Vendor</DataField>
-        </Field>
-        <Field Name="ShowCreditor">
-          <DataField>ShowCreditor</DataField>
-        </Field>
-        <Field Name="NetChangeLCY_Customer">
-          <DataField>NetChangeLCY_Customer</DataField>
-        </Field>
-        <Field Name="NetChangeLCY_CustomerFormat">
-          <DataField>NetChangeLCY_CustomerFormat</DataField>
-        </Field>
-        <Field Name="No_Customer">
-          <DataField>No_Customer</DataField>
-        </Field>
-        <Field Name="Name_Customer">
-          <DataField>Name_Customer</DataField>
-        </Field>
-        <Field Name="PrintDebitor">
-          <DataField>PrintDebitor</DataField>
-        </Field>
-        <Field Name="Kunmedsaldo_Customer">
-          <DataField>Kunmedsaldo_Customer</DataField>
-        </Field>
-        <Field Name="ShowCustomer">
-          <DataField>ShowCustomer</DataField>
-        </Field>
-        <Field Name="Tildato_Customer">
-          <DataField>Tildato_Customer</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -2189,4 +2125,68 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="Number_Integer">
+          <DataField>Number_Integer</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="Tildato">
+          <DataField>Tildato</DataField>
+        </Field>
+        <Field Name="No_Vendor">
+          <DataField>No_Vendor</DataField>
+        </Field>
+        <Field Name="Name_Vendor">
+          <DataField>Name_Vendor</DataField>
+        </Field>
+        <Field Name="NetChangeLCY_Vendor">
+          <DataField>NetChangeLCY_Vendor</DataField>
+        </Field>
+        <Field Name="NetChangeLCY_VendorFormat">
+          <DataField>NetChangeLCY_VendorFormat</DataField>
+        </Field>
+        <Field Name="PrintKreditor">
+          <DataField>PrintKreditor</DataField>
+        </Field>
+        <Field Name="Kunmedsaldo_Vendor">
+          <DataField>Kunmedsaldo_Vendor</DataField>
+        </Field>
+        <Field Name="ShowCreditor">
+          <DataField>ShowCreditor</DataField>
+        </Field>
+        <Field Name="NetChangeLCY_Customer">
+          <DataField>NetChangeLCY_Customer</DataField>
+        </Field>
+        <Field Name="NetChangeLCY_CustomerFormat">
+          <DataField>NetChangeLCY_CustomerFormat</DataField>
+        </Field>
+        <Field Name="No_Customer">
+          <DataField>No_Customer</DataField>
+        </Field>
+        <Field Name="Name_Customer">
+          <DataField>Name_Customer</DataField>
+        </Field>
+        <Field Name="PrintDebitor">
+          <DataField>PrintDebitor</DataField>
+        </Field>
+        <Field Name="Kunmedsaldo_Customer">
+          <DataField>Kunmedsaldo_Customer</DataField>
+        </Field>
+        <Field Name="ShowCustomer">
+          <DataField>ShowCustomer</DataField>
+        </Field>
+        <Field Name="Tildato_Customer">
+          <DataField>Tildato_Customer</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

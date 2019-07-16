@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,178 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="PageCaption">
-          <DataField>PageCaption</DataField>
-        </Field>
-        <Field Name="ReportCaption">
-          <DataField>ReportCaption</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="FirmaoplysningerPicture">
-          <DataField>FirmaoplysningerPicture</DataField>
-        </Field>
-        <Field Name="SalesPerson_Header">
-          <DataField>SalesPerson_Header</DataField>
-        </Field>
-        <Field Name="DateFilter">
-          <DataField>DateFilter</DataField>
-        </Field>
-        <Field Name="WeekDay">
-          <DataField>WeekDay</DataField>
-        </Field>
-        <Field Name="Filters_AuditRoll">
-          <DataField>Filters_AuditRoll</DataField>
-        </Field>
-        <Field Name="SalespersonFilters_AuditRoll">
-          <DataField>SalespersonFilters_AuditRoll</DataField>
-        </Field>
-        <Field Name="TextTime">
-          <DataField>TextTime</DataField>
-        </Field>
-        <Field Name="TextItemExpedition">
-          <DataField>TextItemExpedition</DataField>
-        </Field>
-        <Field Name="TextExpedition">
-          <DataField>TextExpedition</DataField>
-        </Field>
-        <Field Name="TextFrom">
-          <DataField>TextFrom</DataField>
-        </Field>
-        <Field Name="TextTo">
-          <DataField>TextTo</DataField>
-        </Field>
-        <Field Name="TextQty">
-          <DataField>TextQty</DataField>
-        </Field>
-        <Field Name="TextAvgLines">
-          <DataField>TextAvgLines</DataField>
-        </Field>
-        <Field Name="TextSaleExp">
-          <DataField>TextSaleExp</DataField>
-        </Field>
-        <Field Name="TextAmount">
-          <DataField>TextAmount</DataField>
-        </Field>
-        <Field Name="TextReturn">
-          <DataField>TextReturn</DataField>
-        </Field>
-        <Field Name="TextNetSales">
-          <DataField>TextNetSales</DataField>
-        </Field>
-        <Field Name="TextDiscount">
-          <DataField>TextDiscount</DataField>
-        </Field>
-        <Field Name="TextDebit">
-          <DataField>TextDebit</DataField>
-        </Field>
-        <Field Name="TextDb">
-          <DataField>TextDb</DataField>
-        </Field>
-        <Field Name="TextDg">
-          <DataField>TextDg</DataField>
-        </Field>
-        <Field Name="TextCancelled">
-          <DataField>TextCancelled</DataField>
-        </Field>
-        <Field Name="TextOther">
-          <DataField>TextOther</DataField>
-        </Field>
-        <Field Name="EndText">
-          <DataField>EndText</DataField>
-        </Field>
-        <Field Name="Number_Integer">
-          <DataField>Number_Integer</DataField>
-        </Field>
-        <Field Name="TidNumber">
-          <DataField>TidNumber</DataField>
-        </Field>
-        <Field Name="TidNumberPlus1">
-          <DataField>TidNumberPlus1</DataField>
-        </Field>
-        <Field Name="Values_Number_1">
-          <DataField>Values_Number_1</DataField>
-        </Field>
-        <Field Name="Values_Number_1Format">
-          <DataField>Values_Number_1Format</DataField>
-        </Field>
-        <Field Name="Values_Number_2">
-          <DataField>Values_Number_2</DataField>
-        </Field>
-        <Field Name="Values_Number_2Format">
-          <DataField>Values_Number_2Format</DataField>
-        </Field>
-        <Field Name="Values_Number_3">
-          <DataField>Values_Number_3</DataField>
-        </Field>
-        <Field Name="Values_Number_3Format">
-          <DataField>Values_Number_3Format</DataField>
-        </Field>
-        <Field Name="Values_Number_4">
-          <DataField>Values_Number_4</DataField>
-        </Field>
-        <Field Name="Values_Number_4Format">
-          <DataField>Values_Number_4Format</DataField>
-        </Field>
-        <Field Name="Values_Number_5">
-          <DataField>Values_Number_5</DataField>
-        </Field>
-        <Field Name="Values_Number_5Format">
-          <DataField>Values_Number_5Format</DataField>
-        </Field>
-        <Field Name="Values_Number_6">
-          <DataField>Values_Number_6</DataField>
-        </Field>
-        <Field Name="Values_Number_6Format">
-          <DataField>Values_Number_6Format</DataField>
-        </Field>
-        <Field Name="Values_Number_7">
-          <DataField>Values_Number_7</DataField>
-        </Field>
-        <Field Name="Values_Number_7Format">
-          <DataField>Values_Number_7Format</DataField>
-        </Field>
-        <Field Name="Values_Number_8">
-          <DataField>Values_Number_8</DataField>
-        </Field>
-        <Field Name="Values_Number_8Format">
-          <DataField>Values_Number_8Format</DataField>
-        </Field>
-        <Field Name="Values_Number_9">
-          <DataField>Values_Number_9</DataField>
-        </Field>
-        <Field Name="Values_Number_9Format">
-          <DataField>Values_Number_9Format</DataField>
-        </Field>
-        <Field Name="Values_Number_10">
-          <DataField>Values_Number_10</DataField>
-        </Field>
-        <Field Name="Values_Number_10Format">
-          <DataField>Values_Number_10Format</DataField>
-        </Field>
-        <Field Name="Values_Number_11">
-          <DataField>Values_Number_11</DataField>
-        </Field>
-        <Field Name="Values_Number_11Format">
-          <DataField>Values_Number_11Format</DataField>
-        </Field>
-        <Field Name="Values_Number_12">
-          <DataField>Values_Number_12</DataField>
-        </Field>
-        <Field Name="Values_Number_12Format">
-          <DataField>Values_Number_12Format</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -2863,4 +2691,176 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="PageCaption">
+          <DataField>PageCaption</DataField>
+        </Field>
+        <Field Name="ReportCaption">
+          <DataField>ReportCaption</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="FirmaoplysningerPicture">
+          <DataField>FirmaoplysningerPicture</DataField>
+        </Field>
+        <Field Name="SalesPerson_Header">
+          <DataField>SalesPerson_Header</DataField>
+        </Field>
+        <Field Name="DateFilter">
+          <DataField>DateFilter</DataField>
+        </Field>
+        <Field Name="WeekDay">
+          <DataField>WeekDay</DataField>
+        </Field>
+        <Field Name="Filters_AuditRoll">
+          <DataField>Filters_AuditRoll</DataField>
+        </Field>
+        <Field Name="SalespersonFilters_AuditRoll">
+          <DataField>SalespersonFilters_AuditRoll</DataField>
+        </Field>
+        <Field Name="TextTime">
+          <DataField>TextTime</DataField>
+        </Field>
+        <Field Name="TextItemExpedition">
+          <DataField>TextItemExpedition</DataField>
+        </Field>
+        <Field Name="TextExpedition">
+          <DataField>TextExpedition</DataField>
+        </Field>
+        <Field Name="TextFrom">
+          <DataField>TextFrom</DataField>
+        </Field>
+        <Field Name="TextTo">
+          <DataField>TextTo</DataField>
+        </Field>
+        <Field Name="TextQty">
+          <DataField>TextQty</DataField>
+        </Field>
+        <Field Name="TextAvgLines">
+          <DataField>TextAvgLines</DataField>
+        </Field>
+        <Field Name="TextSaleExp">
+          <DataField>TextSaleExp</DataField>
+        </Field>
+        <Field Name="TextAmount">
+          <DataField>TextAmount</DataField>
+        </Field>
+        <Field Name="TextReturn">
+          <DataField>TextReturn</DataField>
+        </Field>
+        <Field Name="TextNetSales">
+          <DataField>TextNetSales</DataField>
+        </Field>
+        <Field Name="TextDiscount">
+          <DataField>TextDiscount</DataField>
+        </Field>
+        <Field Name="TextDebit">
+          <DataField>TextDebit</DataField>
+        </Field>
+        <Field Name="TextDb">
+          <DataField>TextDb</DataField>
+        </Field>
+        <Field Name="TextDg">
+          <DataField>TextDg</DataField>
+        </Field>
+        <Field Name="TextCancelled">
+          <DataField>TextCancelled</DataField>
+        </Field>
+        <Field Name="TextOther">
+          <DataField>TextOther</DataField>
+        </Field>
+        <Field Name="EndText">
+          <DataField>EndText</DataField>
+        </Field>
+        <Field Name="Number_Integer">
+          <DataField>Number_Integer</DataField>
+        </Field>
+        <Field Name="TidNumber">
+          <DataField>TidNumber</DataField>
+        </Field>
+        <Field Name="TidNumberPlus1">
+          <DataField>TidNumberPlus1</DataField>
+        </Field>
+        <Field Name="Values_Number_1">
+          <DataField>Values_Number_1</DataField>
+        </Field>
+        <Field Name="Values_Number_1Format">
+          <DataField>Values_Number_1Format</DataField>
+        </Field>
+        <Field Name="Values_Number_2">
+          <DataField>Values_Number_2</DataField>
+        </Field>
+        <Field Name="Values_Number_2Format">
+          <DataField>Values_Number_2Format</DataField>
+        </Field>
+        <Field Name="Values_Number_3">
+          <DataField>Values_Number_3</DataField>
+        </Field>
+        <Field Name="Values_Number_3Format">
+          <DataField>Values_Number_3Format</DataField>
+        </Field>
+        <Field Name="Values_Number_4">
+          <DataField>Values_Number_4</DataField>
+        </Field>
+        <Field Name="Values_Number_4Format">
+          <DataField>Values_Number_4Format</DataField>
+        </Field>
+        <Field Name="Values_Number_5">
+          <DataField>Values_Number_5</DataField>
+        </Field>
+        <Field Name="Values_Number_5Format">
+          <DataField>Values_Number_5Format</DataField>
+        </Field>
+        <Field Name="Values_Number_6">
+          <DataField>Values_Number_6</DataField>
+        </Field>
+        <Field Name="Values_Number_6Format">
+          <DataField>Values_Number_6Format</DataField>
+        </Field>
+        <Field Name="Values_Number_7">
+          <DataField>Values_Number_7</DataField>
+        </Field>
+        <Field Name="Values_Number_7Format">
+          <DataField>Values_Number_7Format</DataField>
+        </Field>
+        <Field Name="Values_Number_8">
+          <DataField>Values_Number_8</DataField>
+        </Field>
+        <Field Name="Values_Number_8Format">
+          <DataField>Values_Number_8Format</DataField>
+        </Field>
+        <Field Name="Values_Number_9">
+          <DataField>Values_Number_9</DataField>
+        </Field>
+        <Field Name="Values_Number_9Format">
+          <DataField>Values_Number_9Format</DataField>
+        </Field>
+        <Field Name="Values_Number_10">
+          <DataField>Values_Number_10</DataField>
+        </Field>
+        <Field Name="Values_Number_10Format">
+          <DataField>Values_Number_10Format</DataField>
+        </Field>
+        <Field Name="Values_Number_11">
+          <DataField>Values_Number_11</DataField>
+        </Field>
+        <Field Name="Values_Number_11Format">
+          <DataField>Values_Number_11Format</DataField>
+        </Field>
+        <Field Name="Values_Number_12">
+          <DataField>Values_Number_12</DataField>
+        </Field>
+        <Field Name="Values_Number_12Format">
+          <DataField>Values_Number_12Format</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

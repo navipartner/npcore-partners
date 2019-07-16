@@ -27,11 +27,14 @@ page 6151401 "Magento Setup"
     // MAG2.09/TS  /20180108  CASE 300893 Renamed Caption for Action Group
     // MAG2.19/MHA /20190306  CASE 347974 Added field 535 "Release Order on Import"
     // MAG2.20/MHA /20190426  CASE 320423 Added field 15 "Magento Version"
+    // MAG2.22/MHA /20190611  CASE 357662 Added field 490 "Customer Update Mode"
+    // MAG2.22/MHA /20190621  CASE 359146 Added field 540 "Use Blank Code for LCY"
+    // MAG2.22/MHA /20190625  CASE 359285 Added field 34 "Picture Variety Type"
+    // MAG2.22/MHA /20190708  CASE 352201 Added field 220 "Collect in Store Enabled"
 
     Caption = 'Magento Setup';
     PromotedActionCategories = 'New,Tasks,Reports,Display';
     SourceTable = "Magento Setup";
-    UsageCategory = Administration;
 
     layout
     {
@@ -136,10 +139,23 @@ page 6151401 "Magento Setup"
                         //+MAG1.21
                     end;
                 }
-                field("Variant Picture Dimension";"Variant Picture Dimension")
+                group(Control6151447)
                 {
-                    Enabled = ("Variant System" ="Variant System"::Variety);
-                    ToolTip = 'This setup enables differentiation of variant pictures';
+                    ShowCaption = false;
+                    Visible = ("Variant System" = 2);
+                    field("Picture Variety Type";"Picture Variety Type")
+                    {
+                        ToolTip = 'This setup enables differentiation of variant pictures';
+                    }
+                }
+                group(Control6151446)
+                {
+                    ShowCaption = false;
+                    Visible = ("Variant System" = 2) AND ("Picture Variety Type"=0);
+                    field("Variant Picture Dimension";"Variant Picture Dimension")
+                    {
+                        ToolTip = 'This setup enables differentiation of variant pictures';
+                    }
                 }
                 field("Miniature Picture";"Miniature Picture")
                 {
@@ -205,6 +221,14 @@ page 6151401 "Magento Setup"
                     }
                     field("Tickets Enabled";"Tickets Enabled")
                     {
+                    }
+                    group(Control6151449)
+                    {
+                        ShowCaption = false;
+                        Visible = ("Magento Version" = "Magento Version"::"2");
+                        field("Collect in Store Enabled";"Collect in Store Enabled")
+                        {
+                        }
                     }
                 }
                 group("B2B Modules")
@@ -355,6 +379,9 @@ page 6151401 "Magento Setup"
             }
             group(Customer)
             {
+                field("Customer Update Mode";"Customer Update Mode")
+                {
+                }
                 field("Customer Mapping";"Customer Mapping")
                 {
                 }
@@ -386,6 +413,9 @@ page 6151401 "Magento Setup"
                 {
                 }
                 field("Release Order on Import";"Release Order on Import")
+                {
+                }
+                field("Use Blank Code for LCY";"Use Blank Code for LCY")
                 {
                 }
             }
@@ -616,6 +646,9 @@ page 6151401 "Magento Setup"
                         //-MAG2.00
                         MagentoSetupMgt.UpdateVersionNo(Rec);
                         //+MAG2.00
+                        //-MAG2.22 [359285]
+                        CurrPage.Update(true);
+                        //+MAG2.22 [359285]
                     end;
                 }
             }

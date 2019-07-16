@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,106 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="CurrReport_PAGENOCaption">
-          <DataField>CurrReport_PAGENOCaption</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="ObjectDetails">
-          <DataField>ObjectDetails</DataField>
-        </Field>
-        <Field Name="Heading">
-          <DataField>Heading</DataField>
-        </Field>
-        <Field Name="Date_Time">
-          <DataField>Date_Time</DataField>
-        </Field>
-        <Field Name="RegisterNo_Sales">
-          <DataField>RegisterNo_Sales</DataField>
-        </Field>
-        <Field Name="SalesPerson">
-          <DataField>SalesPerson</DataField>
-        </Field>
-        <Field Name="Closed_Sales">
-          <DataField>Closed_Sales</DataField>
-        </Field>
-        <Field Name="nKunder_Sales">
-          <DataField>nKunder_Sales</DataField>
-        </Field>
-        <Field Name="NetTurnover_Sales">
-          <DataField>NetTurnover_Sales</DataField>
-        </Field>
-        <Field Name="NetTurnover_SalesFormat">
-          <DataField>NetTurnover_SalesFormat</DataField>
-        </Field>
-        <Field Name="GrossRevenue_Sales">
-          <DataField>GrossRevenue_Sales</DataField>
-        </Field>
-        <Field Name="GrossRevenue_SalesFormat">
-          <DataField>GrossRevenue_SalesFormat</DataField>
-        </Field>
-        <Field Name="debetsalg_Sales">
-          <DataField>debetsalg_Sales</DataField>
-        </Field>
-        <Field Name="debetsalg_SalesFormat">
-          <DataField>debetsalg_SalesFormat</DataField>
-        </Field>
-        <Field Name="gavekortsalg_Sales">
-          <DataField>gavekortsalg_Sales</DataField>
-        </Field>
-        <Field Name="gavekortsalg_SalesFormat">
-          <DataField>gavekortsalg_SalesFormat</DataField>
-        </Field>
-        <Field Name="tilgodebeviser_Sales">
-          <DataField>tilgodebeviser_Sales</DataField>
-        </Field>
-        <Field Name="tilgodebeviser_SalesFormat">
-          <DataField>tilgodebeviser_SalesFormat</DataField>
-        </Field>
-        <Field Name="indbetalinger_Sales">
-          <DataField>indbetalinger_Sales</DataField>
-        </Field>
-        <Field Name="indbetalinger_SalesFormat">
-          <DataField>indbetalinger_SalesFormat</DataField>
-        </Field>
-        <Field Name="udbetalinger_Sales">
-          <DataField>udbetalinger_Sales</DataField>
-        </Field>
-        <Field Name="udbetalinger_SalesFormat">
-          <DataField>udbetalinger_SalesFormat</DataField>
-        </Field>
-        <Field Name="returantal_Sales">
-          <DataField>returantal_Sales</DataField>
-        </Field>
-        <Field Name="ReturnAmount_Sales">
-          <DataField>ReturnAmount_Sales</DataField>
-        </Field>
-        <Field Name="ReturnAmount_SalesFormat">
-          <DataField>ReturnAmount_SalesFormat</DataField>
-        </Field>
-        <Field Name="gkdebet_Sales">
-          <DataField>gkdebet_Sales</DataField>
-        </Field>
-        <Field Name="gkdebet_SalesFormat">
-          <DataField>gkdebet_SalesFormat</DataField>
-        </Field>
-        <Field Name="sumsalg_Sales">
-          <DataField>sumsalg_Sales</DataField>
-        </Field>
-        <Field Name="sumsalg_SalesFormat">
-          <DataField>sumsalg_SalesFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -772,4 +672,104 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="CurrReport_PAGENOCaption">
+          <DataField>CurrReport_PAGENOCaption</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="ObjectDetails">
+          <DataField>ObjectDetails</DataField>
+        </Field>
+        <Field Name="Heading">
+          <DataField>Heading</DataField>
+        </Field>
+        <Field Name="Date_Time">
+          <DataField>Date_Time</DataField>
+        </Field>
+        <Field Name="RegisterNo_Sales">
+          <DataField>RegisterNo_Sales</DataField>
+        </Field>
+        <Field Name="SalesPerson">
+          <DataField>SalesPerson</DataField>
+        </Field>
+        <Field Name="Closed_Sales">
+          <DataField>Closed_Sales</DataField>
+        </Field>
+        <Field Name="nKunder_Sales">
+          <DataField>nKunder_Sales</DataField>
+        </Field>
+        <Field Name="NetTurnover_Sales">
+          <DataField>NetTurnover_Sales</DataField>
+        </Field>
+        <Field Name="NetTurnover_SalesFormat">
+          <DataField>NetTurnover_SalesFormat</DataField>
+        </Field>
+        <Field Name="GrossRevenue_Sales">
+          <DataField>GrossRevenue_Sales</DataField>
+        </Field>
+        <Field Name="GrossRevenue_SalesFormat">
+          <DataField>GrossRevenue_SalesFormat</DataField>
+        </Field>
+        <Field Name="debetsalg_Sales">
+          <DataField>debetsalg_Sales</DataField>
+        </Field>
+        <Field Name="debetsalg_SalesFormat">
+          <DataField>debetsalg_SalesFormat</DataField>
+        </Field>
+        <Field Name="gavekortsalg_Sales">
+          <DataField>gavekortsalg_Sales</DataField>
+        </Field>
+        <Field Name="gavekortsalg_SalesFormat">
+          <DataField>gavekortsalg_SalesFormat</DataField>
+        </Field>
+        <Field Name="tilgodebeviser_Sales">
+          <DataField>tilgodebeviser_Sales</DataField>
+        </Field>
+        <Field Name="tilgodebeviser_SalesFormat">
+          <DataField>tilgodebeviser_SalesFormat</DataField>
+        </Field>
+        <Field Name="indbetalinger_Sales">
+          <DataField>indbetalinger_Sales</DataField>
+        </Field>
+        <Field Name="indbetalinger_SalesFormat">
+          <DataField>indbetalinger_SalesFormat</DataField>
+        </Field>
+        <Field Name="udbetalinger_Sales">
+          <DataField>udbetalinger_Sales</DataField>
+        </Field>
+        <Field Name="udbetalinger_SalesFormat">
+          <DataField>udbetalinger_SalesFormat</DataField>
+        </Field>
+        <Field Name="returantal_Sales">
+          <DataField>returantal_Sales</DataField>
+        </Field>
+        <Field Name="ReturnAmount_Sales">
+          <DataField>ReturnAmount_Sales</DataField>
+        </Field>
+        <Field Name="ReturnAmount_SalesFormat">
+          <DataField>ReturnAmount_SalesFormat</DataField>
+        </Field>
+        <Field Name="gkdebet_Sales">
+          <DataField>gkdebet_Sales</DataField>
+        </Field>
+        <Field Name="gkdebet_SalesFormat">
+          <DataField>gkdebet_SalesFormat</DataField>
+        </Field>
+        <Field Name="sumsalg_Sales">
+          <DataField>sumsalg_Sales</DataField>
+        </Field>
+        <Field Name="sumsalg_SalesFormat">
+          <DataField>sumsalg_SalesFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

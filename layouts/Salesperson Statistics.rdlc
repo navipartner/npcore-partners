@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,223 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="CompanyInfoPicture">
-          <DataField>CompanyInfoPicture</DataField>
-        </Field>
-        <Field Name="DateFilter">
-          <DataField>DateFilter</DataField>
-        </Field>
-        <Field Name="IntegerNumber">
-          <DataField>IntegerNumber</DataField>
-        </Field>
-        <Field Name="Code">
-          <DataField>Code</DataField>
-        </Field>
-        <Field Name="Name">
-          <DataField>Name</DataField>
-        </Field>
-        <Field Name="SalesLcy">
-          <DataField>SalesLcy</DataField>
-        </Field>
-        <Field Name="SalesLcyFormat">
-          <DataField>SalesLcyFormat</DataField>
-        </Field>
-        <Field Name="SalesLcyLast">
-          <DataField>SalesLcyLast</DataField>
-        </Field>
-        <Field Name="SalesLcyLastFormat">
-          <DataField>SalesLcyLastFormat</DataField>
-        </Field>
-        <Field Name="GMargin">
-          <DataField>GMargin</DataField>
-        </Field>
-        <Field Name="GMarginFormat">
-          <DataField>GMarginFormat</DataField>
-        </Field>
-        <Field Name="GMarginLast">
-          <DataField>GMarginLast</DataField>
-        </Field>
-        <Field Name="GMarginLastFormat">
-          <DataField>GMarginLastFormat</DataField>
-        </Field>
-        <Field Name="GMarginPct">
-          <DataField>GMarginPct</DataField>
-        </Field>
-        <Field Name="GMarginPctFormat">
-          <DataField>GMarginPctFormat</DataField>
-        </Field>
-        <Field Name="GMarginPctLast">
-          <DataField>GMarginPctLast</DataField>
-        </Field>
-        <Field Name="GMarginPctLastFormat">
-          <DataField>GMarginPctLastFormat</DataField>
-        </Field>
-        <Field Name="Discount">
-          <DataField>Discount</DataField>
-        </Field>
-        <Field Name="DiscountFormat">
-          <DataField>DiscountFormat</DataField>
-        </Field>
-        <Field Name="DiscountLast">
-          <DataField>DiscountLast</DataField>
-        </Field>
-        <Field Name="DiscountLastFormat">
-          <DataField>DiscountLastFormat</DataField>
-        </Field>
-        <Field Name="AvgDisc">
-          <DataField>AvgDisc</DataField>
-        </Field>
-        <Field Name="AvgDiscFormat">
-          <DataField>AvgDiscFormat</DataField>
-        </Field>
-        <Field Name="AvgDiscLast">
-          <DataField>AvgDiscLast</DataField>
-        </Field>
-        <Field Name="AvgDiscLastFormat">
-          <DataField>AvgDiscLastFormat</DataField>
-        </Field>
-        <Field Name="SalesPct">
-          <DataField>SalesPct</DataField>
-        </Field>
-        <Field Name="SalesPctFormat">
-          <DataField>SalesPctFormat</DataField>
-        </Field>
-        <Field Name="Number_DiscountStatistics">
-          <DataField>Number_DiscountStatistics</DataField>
-        </Field>
-        <Field Name="DiscountAmt1">
-          <DataField>DiscountAmt1</DataField>
-        </Field>
-        <Field Name="DiscountAmt1Format">
-          <DataField>DiscountAmt1Format</DataField>
-        </Field>
-        <Field Name="DiscountAmt1Last">
-          <DataField>DiscountAmt1Last</DataField>
-        </Field>
-        <Field Name="DiscountAmt1LastFormat">
-          <DataField>DiscountAmt1LastFormat</DataField>
-        </Field>
-        <Field Name="DiscountAmt2">
-          <DataField>DiscountAmt2</DataField>
-        </Field>
-        <Field Name="DiscountAmt2Format">
-          <DataField>DiscountAmt2Format</DataField>
-        </Field>
-        <Field Name="DiscountAmt2Last">
-          <DataField>DiscountAmt2Last</DataField>
-        </Field>
-        <Field Name="DiscountAmt2LastFormat">
-          <DataField>DiscountAmt2LastFormat</DataField>
-        </Field>
-        <Field Name="DiscountAmt3">
-          <DataField>DiscountAmt3</DataField>
-        </Field>
-        <Field Name="DiscountAmt3Format">
-          <DataField>DiscountAmt3Format</DataField>
-        </Field>
-        <Field Name="DiscountAmt3Last">
-          <DataField>DiscountAmt3Last</DataField>
-        </Field>
-        <Field Name="DiscountAmt3LastFormat">
-          <DataField>DiscountAmt3LastFormat</DataField>
-        </Field>
-        <Field Name="DiscountAmt4">
-          <DataField>DiscountAmt4</DataField>
-        </Field>
-        <Field Name="DiscountAmt4Format">
-          <DataField>DiscountAmt4Format</DataField>
-        </Field>
-        <Field Name="DiscountAmt4Last">
-          <DataField>DiscountAmt4Last</DataField>
-        </Field>
-        <Field Name="DiscountAmt4LastFormat">
-          <DataField>DiscountAmt4LastFormat</DataField>
-        </Field>
-        <Field Name="DiscountAmt5">
-          <DataField>DiscountAmt5</DataField>
-        </Field>
-        <Field Name="DiscountAmt5Format">
-          <DataField>DiscountAmt5Format</DataField>
-        </Field>
-        <Field Name="DiscountAmt5Last">
-          <DataField>DiscountAmt5Last</DataField>
-        </Field>
-        <Field Name="DiscountAmt5LastFormat">
-          <DataField>DiscountAmt5LastFormat</DataField>
-        </Field>
-        <Field Name="DiscountAmt6">
-          <DataField>DiscountAmt6</DataField>
-        </Field>
-        <Field Name="DiscountAmt6Format">
-          <DataField>DiscountAmt6Format</DataField>
-        </Field>
-        <Field Name="DiscountAmt6Last">
-          <DataField>DiscountAmt6Last</DataField>
-        </Field>
-        <Field Name="DiscountAmt6LastFormat">
-          <DataField>DiscountAmt6LastFormat</DataField>
-        </Field>
-        <Field Name="DiscountAmt7">
-          <DataField>DiscountAmt7</DataField>
-        </Field>
-        <Field Name="DiscountAmt7Format">
-          <DataField>DiscountAmt7Format</DataField>
-        </Field>
-        <Field Name="DiscountAmt7Last">
-          <DataField>DiscountAmt7Last</DataField>
-        </Field>
-        <Field Name="DiscountAmt7LastFormat">
-          <DataField>DiscountAmt7LastFormat</DataField>
-        </Field>
-        <Field Name="DiscountAmt8">
-          <DataField>DiscountAmt8</DataField>
-        </Field>
-        <Field Name="DiscountAmt8Format">
-          <DataField>DiscountAmt8Format</DataField>
-        </Field>
-        <Field Name="DiscountAmt8Last">
-          <DataField>DiscountAmt8Last</DataField>
-        </Field>
-        <Field Name="DiscountAmt8LastFormat">
-          <DataField>DiscountAmt8LastFormat</DataField>
-        </Field>
-        <Field Name="DiscountAmt9">
-          <DataField>DiscountAmt9</DataField>
-        </Field>
-        <Field Name="DiscountAmt9Format">
-          <DataField>DiscountAmt9Format</DataField>
-        </Field>
-        <Field Name="DiscountAmt9Last">
-          <DataField>DiscountAmt9Last</DataField>
-        </Field>
-        <Field Name="DiscountAmt9LastFormat">
-          <DataField>DiscountAmt9LastFormat</DataField>
-        </Field>
-        <Field Name="DiscountAmt10">
-          <DataField>DiscountAmt10</DataField>
-        </Field>
-        <Field Name="DiscountAmt10Format">
-          <DataField>DiscountAmt10Format</DataField>
-        </Field>
-        <Field Name="DiscountAmt10Last">
-          <DataField>DiscountAmt10Last</DataField>
-        </Field>
-        <Field Name="DiscountAmt10LastFormat">
-          <DataField>DiscountAmt10LastFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -12277,15 +12060,6 @@
       </DefaultValue>
       <Prompt>Period_Lbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="NaviInfo">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>NaviInfo</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>NaviInfo</Prompt>
-    </ReportParameter>
     <ReportParameter Name="InfoExTax">
       <DataType>String</DataType>
       <DefaultValue>
@@ -12506,7 +12280,7 @@
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>28</NumberOfRows>
+      <NumberOfRows>27</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -12526,126 +12300,121 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>3</RowIndex>
-          <ParameterName>NaviInfo</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>4</RowIndex>
           <ParameterName>InfoExTax</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>5</RowIndex>
+          <RowIndex>4</RowIndex>
           <ParameterName>SalesPerson_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>6</RowIndex>
+          <RowIndex>5</RowIndex>
           <ParameterName>Name_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>7</RowIndex>
+          <RowIndex>6</RowIndex>
           <ParameterName>SalesLcy_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>8</RowIndex>
+          <RowIndex>7</RowIndex>
           <ParameterName>GMargin_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>9</RowIndex>
+          <RowIndex>8</RowIndex>
           <ParameterName>GMarginPct_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>10</RowIndex>
+          <RowIndex>9</RowIndex>
           <ParameterName>Discount_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>11</RowIndex>
+          <RowIndex>10</RowIndex>
           <ParameterName>AvgDisc_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>12</RowIndex>
+          <RowIndex>11</RowIndex>
           <ParameterName>SalesDisc_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>13</RowIndex>
+          <RowIndex>12</RowIndex>
           <ParameterName>SalesDisc2_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>14</RowIndex>
+          <RowIndex>13</RowIndex>
           <ParameterName>Rbt1_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>15</RowIndex>
+          <RowIndex>14</RowIndex>
           <ParameterName>Rbt2_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>16</RowIndex>
+          <RowIndex>15</RowIndex>
           <ParameterName>Rbt3_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>17</RowIndex>
+          <RowIndex>16</RowIndex>
           <ParameterName>Rbt4_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>18</RowIndex>
+          <RowIndex>17</RowIndex>
           <ParameterName>Rbt5_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>19</RowIndex>
+          <RowIndex>18</RowIndex>
           <ParameterName>Period2_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>20</RowIndex>
+          <RowIndex>19</RowIndex>
           <ParameterName>PeriodLast_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>21</RowIndex>
+          <RowIndex>20</RowIndex>
           <ParameterName>TotalPeriod</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>22</RowIndex>
+          <RowIndex>21</RowIndex>
           <ParameterName>TotalPeriodLYr</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>23</RowIndex>
+          <RowIndex>22</RowIndex>
           <ParameterName>Rbt6_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>24</RowIndex>
+          <RowIndex>23</RowIndex>
           <ParameterName>Rbt7_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>25</RowIndex>
+          <RowIndex>24</RowIndex>
           <ParameterName>Rbt8_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>26</RowIndex>
+          <RowIndex>25</RowIndex>
           <ParameterName>Rbt9_Lbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>27</RowIndex>
+          <RowIndex>26</RowIndex>
           <ParameterName>Rbt10_Lbl</ParameterName>
         </CellDefinition>
       </CellDefinitions>
@@ -12702,4 +12471,221 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="CompanyInfoPicture">
+          <DataField>CompanyInfoPicture</DataField>
+        </Field>
+        <Field Name="DateFilter">
+          <DataField>DateFilter</DataField>
+        </Field>
+        <Field Name="IntegerNumber">
+          <DataField>IntegerNumber</DataField>
+        </Field>
+        <Field Name="Code">
+          <DataField>Code</DataField>
+        </Field>
+        <Field Name="Name">
+          <DataField>Name</DataField>
+        </Field>
+        <Field Name="SalesLcy">
+          <DataField>SalesLcy</DataField>
+        </Field>
+        <Field Name="SalesLcyFormat">
+          <DataField>SalesLcyFormat</DataField>
+        </Field>
+        <Field Name="SalesLcyLast">
+          <DataField>SalesLcyLast</DataField>
+        </Field>
+        <Field Name="SalesLcyLastFormat">
+          <DataField>SalesLcyLastFormat</DataField>
+        </Field>
+        <Field Name="GMargin">
+          <DataField>GMargin</DataField>
+        </Field>
+        <Field Name="GMarginFormat">
+          <DataField>GMarginFormat</DataField>
+        </Field>
+        <Field Name="GMarginLast">
+          <DataField>GMarginLast</DataField>
+        </Field>
+        <Field Name="GMarginLastFormat">
+          <DataField>GMarginLastFormat</DataField>
+        </Field>
+        <Field Name="GMarginPct">
+          <DataField>GMarginPct</DataField>
+        </Field>
+        <Field Name="GMarginPctFormat">
+          <DataField>GMarginPctFormat</DataField>
+        </Field>
+        <Field Name="GMarginPctLast">
+          <DataField>GMarginPctLast</DataField>
+        </Field>
+        <Field Name="GMarginPctLastFormat">
+          <DataField>GMarginPctLastFormat</DataField>
+        </Field>
+        <Field Name="Discount">
+          <DataField>Discount</DataField>
+        </Field>
+        <Field Name="DiscountFormat">
+          <DataField>DiscountFormat</DataField>
+        </Field>
+        <Field Name="DiscountLast">
+          <DataField>DiscountLast</DataField>
+        </Field>
+        <Field Name="DiscountLastFormat">
+          <DataField>DiscountLastFormat</DataField>
+        </Field>
+        <Field Name="AvgDisc">
+          <DataField>AvgDisc</DataField>
+        </Field>
+        <Field Name="AvgDiscFormat">
+          <DataField>AvgDiscFormat</DataField>
+        </Field>
+        <Field Name="AvgDiscLast">
+          <DataField>AvgDiscLast</DataField>
+        </Field>
+        <Field Name="AvgDiscLastFormat">
+          <DataField>AvgDiscLastFormat</DataField>
+        </Field>
+        <Field Name="SalesPct">
+          <DataField>SalesPct</DataField>
+        </Field>
+        <Field Name="SalesPctFormat">
+          <DataField>SalesPctFormat</DataField>
+        </Field>
+        <Field Name="Number_DiscountStatistics">
+          <DataField>Number_DiscountStatistics</DataField>
+        </Field>
+        <Field Name="DiscountAmt1">
+          <DataField>DiscountAmt1</DataField>
+        </Field>
+        <Field Name="DiscountAmt1Format">
+          <DataField>DiscountAmt1Format</DataField>
+        </Field>
+        <Field Name="DiscountAmt1Last">
+          <DataField>DiscountAmt1Last</DataField>
+        </Field>
+        <Field Name="DiscountAmt1LastFormat">
+          <DataField>DiscountAmt1LastFormat</DataField>
+        </Field>
+        <Field Name="DiscountAmt2">
+          <DataField>DiscountAmt2</DataField>
+        </Field>
+        <Field Name="DiscountAmt2Format">
+          <DataField>DiscountAmt2Format</DataField>
+        </Field>
+        <Field Name="DiscountAmt2Last">
+          <DataField>DiscountAmt2Last</DataField>
+        </Field>
+        <Field Name="DiscountAmt2LastFormat">
+          <DataField>DiscountAmt2LastFormat</DataField>
+        </Field>
+        <Field Name="DiscountAmt3">
+          <DataField>DiscountAmt3</DataField>
+        </Field>
+        <Field Name="DiscountAmt3Format">
+          <DataField>DiscountAmt3Format</DataField>
+        </Field>
+        <Field Name="DiscountAmt3Last">
+          <DataField>DiscountAmt3Last</DataField>
+        </Field>
+        <Field Name="DiscountAmt3LastFormat">
+          <DataField>DiscountAmt3LastFormat</DataField>
+        </Field>
+        <Field Name="DiscountAmt4">
+          <DataField>DiscountAmt4</DataField>
+        </Field>
+        <Field Name="DiscountAmt4Format">
+          <DataField>DiscountAmt4Format</DataField>
+        </Field>
+        <Field Name="DiscountAmt4Last">
+          <DataField>DiscountAmt4Last</DataField>
+        </Field>
+        <Field Name="DiscountAmt4LastFormat">
+          <DataField>DiscountAmt4LastFormat</DataField>
+        </Field>
+        <Field Name="DiscountAmt5">
+          <DataField>DiscountAmt5</DataField>
+        </Field>
+        <Field Name="DiscountAmt5Format">
+          <DataField>DiscountAmt5Format</DataField>
+        </Field>
+        <Field Name="DiscountAmt5Last">
+          <DataField>DiscountAmt5Last</DataField>
+        </Field>
+        <Field Name="DiscountAmt5LastFormat">
+          <DataField>DiscountAmt5LastFormat</DataField>
+        </Field>
+        <Field Name="DiscountAmt6">
+          <DataField>DiscountAmt6</DataField>
+        </Field>
+        <Field Name="DiscountAmt6Format">
+          <DataField>DiscountAmt6Format</DataField>
+        </Field>
+        <Field Name="DiscountAmt6Last">
+          <DataField>DiscountAmt6Last</DataField>
+        </Field>
+        <Field Name="DiscountAmt6LastFormat">
+          <DataField>DiscountAmt6LastFormat</DataField>
+        </Field>
+        <Field Name="DiscountAmt7">
+          <DataField>DiscountAmt7</DataField>
+        </Field>
+        <Field Name="DiscountAmt7Format">
+          <DataField>DiscountAmt7Format</DataField>
+        </Field>
+        <Field Name="DiscountAmt7Last">
+          <DataField>DiscountAmt7Last</DataField>
+        </Field>
+        <Field Name="DiscountAmt7LastFormat">
+          <DataField>DiscountAmt7LastFormat</DataField>
+        </Field>
+        <Field Name="DiscountAmt8">
+          <DataField>DiscountAmt8</DataField>
+        </Field>
+        <Field Name="DiscountAmt8Format">
+          <DataField>DiscountAmt8Format</DataField>
+        </Field>
+        <Field Name="DiscountAmt8Last">
+          <DataField>DiscountAmt8Last</DataField>
+        </Field>
+        <Field Name="DiscountAmt8LastFormat">
+          <DataField>DiscountAmt8LastFormat</DataField>
+        </Field>
+        <Field Name="DiscountAmt9">
+          <DataField>DiscountAmt9</DataField>
+        </Field>
+        <Field Name="DiscountAmt9Format">
+          <DataField>DiscountAmt9Format</DataField>
+        </Field>
+        <Field Name="DiscountAmt9Last">
+          <DataField>DiscountAmt9Last</DataField>
+        </Field>
+        <Field Name="DiscountAmt9LastFormat">
+          <DataField>DiscountAmt9LastFormat</DataField>
+        </Field>
+        <Field Name="DiscountAmt10">
+          <DataField>DiscountAmt10</DataField>
+        </Field>
+        <Field Name="DiscountAmt10Format">
+          <DataField>DiscountAmt10Format</DataField>
+        </Field>
+        <Field Name="DiscountAmt10Last">
+          <DataField>DiscountAmt10Last</DataField>
+        </Field>
+        <Field Name="DiscountAmt10LastFormat">
+          <DataField>DiscountAmt10LastFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

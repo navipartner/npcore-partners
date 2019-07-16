@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,154 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="Name_CompanyInfo">
-          <DataField>Name_CompanyInfo</DataField>
-        </Field>
-        <Field Name="No_Vendor">
-          <DataField>No_Vendor</DataField>
-        </Field>
-        <Field Name="Name_Vendor">
-          <DataField>Name_Vendor</DataField>
-        </Field>
-        <Field Name="PurchaseQty_Vendor">
-          <DataField>PurchaseQty_Vendor</DataField>
-        </Field>
-        <Field Name="PurchasesLCY_Vendor">
-          <DataField>PurchasesLCY_Vendor</DataField>
-        </Field>
-        <Field Name="PurchasesLCY_VendorFormat">
-          <DataField>PurchasesLCY_VendorFormat</DataField>
-        </Field>
-        <Field Name="Stock_VendorAllYear">
-          <DataField>Stock_VendorAllYear</DataField>
-        </Field>
-        <Field Name="Stock_VendorAllYearFormat">
-          <DataField>Stock_VendorAllYearFormat</DataField>
-        </Field>
-        <Field Name="PurchasesLCY_VendorAllYear">
-          <DataField>PurchasesLCY_VendorAllYear</DataField>
-        </Field>
-        <Field Name="PurchasesLCY_VendorAllYearFormat">
-          <DataField>PurchasesLCY_VendorAllYearFormat</DataField>
-        </Field>
-        <Field Name="SalesLCY_VendorAllYear">
-          <DataField>SalesLCY_VendorAllYear</DataField>
-        </Field>
-        <Field Name="SalesLCY_VendorAllYearFormat">
-          <DataField>SalesLCY_VendorAllYearFormat</DataField>
-        </Field>
-        <Field Name="CoverageAllYear">
-          <DataField>CoverageAllYear</DataField>
-        </Field>
-        <Field Name="CoverageAllYearFormat">
-          <DataField>CoverageAllYearFormat</DataField>
-        </Field>
-        <Field Name="CoverRateAllYear">
-          <DataField>CoverRateAllYear</DataField>
-        </Field>
-        <Field Name="CoverRateAllYearFormat">
-          <DataField>CoverRateAllYearFormat</DataField>
-        </Field>
-        <Field Name="VendorCap">
-          <DataField>VendorCap</DataField>
-        </Field>
-        <Field Name="QtyCap">
-          <DataField>QtyCap</DataField>
-        </Field>
-        <Field Name="CostPriceCap">
-          <DataField>CostPriceCap</DataField>
-        </Field>
-        <Field Name="SalesPriceInclVatCap">
-          <DataField>SalesPriceInclVatCap</DataField>
-        </Field>
-        <Field Name="SalesPriceExVatCap">
-          <DataField>SalesPriceExVatCap</DataField>
-        </Field>
-        <Field Name="CoverageCap">
-          <DataField>CoverageCap</DataField>
-        </Field>
-        <Field Name="CoverRateCap">
-          <DataField>CoverRateCap</DataField>
-        </Field>
-        <Field Name="SalesPctCap">
-          <DataField>SalesPctCap</DataField>
-        </Field>
-        <Field Name="SalesPriceCap">
-          <DataField>SalesPriceCap</DataField>
-        </Field>
-        <Field Name="IPctCap">
-          <DataField>IPctCap</DataField>
-        </Field>
-        <Field Name="ZeroIPctCap">
-          <DataField>ZeroIPctCap</DataField>
-        </Field>
-        <Field Name="Text000">
-          <DataField>Text000</DataField>
-        </Field>
-        <Field Name="Text001">
-          <DataField>Text001</DataField>
-        </Field>
-        <Field Name="Text002">
-          <DataField>Text002</DataField>
-        </Field>
-        <Field Name="Text003">
-          <DataField>Text003</DataField>
-        </Field>
-        <Field Name="Text004">
-          <DataField>Text004</DataField>
-        </Field>
-        <Field Name="Text005">
-          <DataField>Text005</DataField>
-        </Field>
-        <Field Name="Text006">
-          <DataField>Text006</DataField>
-        </Field>
-        <Field Name="DateFilter">
-          <DataField>DateFilter</DataField>
-        </Field>
-        <Field Name="SalesQty_Vendor">
-          <DataField>SalesQty_Vendor</DataField>
-        </Field>
-        <Field Name="SalesInclVat">
-          <DataField>SalesInclVat</DataField>
-        </Field>
-        <Field Name="SalesInclVatFormat">
-          <DataField>SalesInclVatFormat</DataField>
-        </Field>
-        <Field Name="SalesExVat">
-          <DataField>SalesExVat</DataField>
-        </Field>
-        <Field Name="SalesExVatFormat">
-          <DataField>SalesExVatFormat</DataField>
-        </Field>
-        <Field Name="Coverage">
-          <DataField>Coverage</DataField>
-        </Field>
-        <Field Name="CoverageFormat">
-          <DataField>CoverageFormat</DataField>
-        </Field>
-        <Field Name="CoverRate">
-          <DataField>CoverRate</DataField>
-        </Field>
-        <Field Name="CoverRateFormat">
-          <DataField>CoverRateFormat</DataField>
-        </Field>
-        <Field Name="SalesPct">
-          <DataField>SalesPct</DataField>
-        </Field>
-        <Field Name="SalesPctFormat">
-          <DataField>SalesPctFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3358,4 +3210,158 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="Name_CompanyInfo">
+          <DataField>Name_CompanyInfo</DataField>
+        </Field>
+        <Field Name="No_Vendor">
+          <DataField>No_Vendor</DataField>
+        </Field>
+        <Field Name="Name_Vendor">
+          <DataField>Name_Vendor</DataField>
+        </Field>
+        <Field Name="PurchaseQty_Vendor">
+          <DataField>PurchaseQty_Vendor</DataField>
+        </Field>
+        <Field Name="PurchaseQty_VendorFormat">
+          <DataField>PurchaseQty_VendorFormat</DataField>
+        </Field>
+        <Field Name="PurchasesLCY_Vendor">
+          <DataField>PurchasesLCY_Vendor</DataField>
+        </Field>
+        <Field Name="PurchasesLCY_VendorFormat">
+          <DataField>PurchasesLCY_VendorFormat</DataField>
+        </Field>
+        <Field Name="Stock_VendorAllYear">
+          <DataField>Stock_VendorAllYear</DataField>
+        </Field>
+        <Field Name="Stock_VendorAllYearFormat">
+          <DataField>Stock_VendorAllYearFormat</DataField>
+        </Field>
+        <Field Name="PurchasesLCY_VendorAllYear">
+          <DataField>PurchasesLCY_VendorAllYear</DataField>
+        </Field>
+        <Field Name="PurchasesLCY_VendorAllYearFormat">
+          <DataField>PurchasesLCY_VendorAllYearFormat</DataField>
+        </Field>
+        <Field Name="SalesLCY_VendorAllYear">
+          <DataField>SalesLCY_VendorAllYear</DataField>
+        </Field>
+        <Field Name="SalesLCY_VendorAllYearFormat">
+          <DataField>SalesLCY_VendorAllYearFormat</DataField>
+        </Field>
+        <Field Name="CoverageAllYear">
+          <DataField>CoverageAllYear</DataField>
+        </Field>
+        <Field Name="CoverageAllYearFormat">
+          <DataField>CoverageAllYearFormat</DataField>
+        </Field>
+        <Field Name="CoverRateAllYear">
+          <DataField>CoverRateAllYear</DataField>
+        </Field>
+        <Field Name="CoverRateAllYearFormat">
+          <DataField>CoverRateAllYearFormat</DataField>
+        </Field>
+        <Field Name="VendorCap">
+          <DataField>VendorCap</DataField>
+        </Field>
+        <Field Name="QtyCap">
+          <DataField>QtyCap</DataField>
+        </Field>
+        <Field Name="CostPriceCap">
+          <DataField>CostPriceCap</DataField>
+        </Field>
+        <Field Name="SalesPriceInclVatCap">
+          <DataField>SalesPriceInclVatCap</DataField>
+        </Field>
+        <Field Name="SalesPriceExVatCap">
+          <DataField>SalesPriceExVatCap</DataField>
+        </Field>
+        <Field Name="CoverageCap">
+          <DataField>CoverageCap</DataField>
+        </Field>
+        <Field Name="CoverRateCap">
+          <DataField>CoverRateCap</DataField>
+        </Field>
+        <Field Name="SalesPctCap">
+          <DataField>SalesPctCap</DataField>
+        </Field>
+        <Field Name="SalesPriceCap">
+          <DataField>SalesPriceCap</DataField>
+        </Field>
+        <Field Name="IPctCap">
+          <DataField>IPctCap</DataField>
+        </Field>
+        <Field Name="ZeroIPctCap">
+          <DataField>ZeroIPctCap</DataField>
+        </Field>
+        <Field Name="Text000">
+          <DataField>Text000</DataField>
+        </Field>
+        <Field Name="Text001">
+          <DataField>Text001</DataField>
+        </Field>
+        <Field Name="Text002">
+          <DataField>Text002</DataField>
+        </Field>
+        <Field Name="Text003">
+          <DataField>Text003</DataField>
+        </Field>
+        <Field Name="Text004">
+          <DataField>Text004</DataField>
+        </Field>
+        <Field Name="Text005">
+          <DataField>Text005</DataField>
+        </Field>
+        <Field Name="Text006">
+          <DataField>Text006</DataField>
+        </Field>
+        <Field Name="DateFilter">
+          <DataField>DateFilter</DataField>
+        </Field>
+        <Field Name="SalesQty_Vendor">
+          <DataField>SalesQty_Vendor</DataField>
+        </Field>
+        <Field Name="SalesQty_VendorFormat">
+          <DataField>SalesQty_VendorFormat</DataField>
+        </Field>
+        <Field Name="SalesInclVat">
+          <DataField>SalesInclVat</DataField>
+        </Field>
+        <Field Name="SalesInclVatFormat">
+          <DataField>SalesInclVatFormat</DataField>
+        </Field>
+        <Field Name="SalesExVat">
+          <DataField>SalesExVat</DataField>
+        </Field>
+        <Field Name="SalesExVatFormat">
+          <DataField>SalesExVatFormat</DataField>
+        </Field>
+        <Field Name="Coverage">
+          <DataField>Coverage</DataField>
+        </Field>
+        <Field Name="CoverageFormat">
+          <DataField>CoverageFormat</DataField>
+        </Field>
+        <Field Name="CoverRate">
+          <DataField>CoverRate</DataField>
+        </Field>
+        <Field Name="CoverRateFormat">
+          <DataField>CoverRateFormat</DataField>
+        </Field>
+        <Field Name="SalesPct">
+          <DataField>SalesPct</DataField>
+        </Field>
+        <Field Name="SalesPctFormat">
+          <DataField>SalesPctFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,238 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="FilterList">
-          <DataField>FilterList</DataField>
-        </Field>
-        <Field Name="Code_DimensionValue">
-          <DataField>Code_DimensionValue</DataField>
-        </Field>
-        <Field Name="Name_DimensionValue">
-          <DataField>Name_DimensionValue</DataField>
-        </Field>
-        <Field Name="VELocQty_DimensionValue">
-          <DataField>VELocQty_DimensionValue</DataField>
-        </Field>
-        <Field Name="VELocQty_DimensionValueFormat">
-          <DataField>VELocQty_DimensionValueFormat</DataField>
-        </Field>
-        <Field Name="VELocCost">
-          <DataField>VELocCost</DataField>
-        </Field>
-        <Field Name="VELocCostFormat">
-          <DataField>VELocCostFormat</DataField>
-        </Field>
-        <Field Name="VELocSales">
-          <DataField>VELocSales</DataField>
-        </Field>
-        <Field Name="VELocSalesFormat">
-          <DataField>VELocSalesFormat</DataField>
-        </Field>
-        <Field Name="VETotalSalesPerc">
-          <DataField>VETotalSalesPerc</DataField>
-        </Field>
-        <Field Name="VETotalSalesPercFormat">
-          <DataField>VETotalSalesPercFormat</DataField>
-        </Field>
-        <Field Name="VELocPrevYearPerc">
-          <DataField>VELocPrevYearPerc</DataField>
-        </Field>
-        <Field Name="VELocPrevYearPercFormat">
-          <DataField>VELocPrevYearPercFormat</DataField>
-        </Field>
-        <Field Name="VETotalProfit">
-          <DataField>VETotalProfit</DataField>
-        </Field>
-        <Field Name="VETotalProfitFormat">
-          <DataField>VETotalProfitFormat</DataField>
-        </Field>
-        <Field Name="VETotalProfitSalesPerc">
-          <DataField>VETotalProfitSalesPerc</DataField>
-        </Field>
-        <Field Name="VETotalProfitSalesPercFormat">
-          <DataField>VETotalProfitSalesPercFormat</DataField>
-        </Field>
-        <Field Name="VETotalProfitPerc">
-          <DataField>VETotalProfitPerc</DataField>
-        </Field>
-        <Field Name="VETotalProfitPercFormat">
-          <DataField>VETotalProfitPercFormat</DataField>
-        </Field>
-        <Field Name="txtDim1">
-          <DataField>txtDim1</DataField>
-        </Field>
-        <Field Name="VELocLastYearTotalQty">
-          <DataField>VELocLastYearTotalQty</DataField>
-        </Field>
-        <Field Name="VELocLastYearTotalQtyFormat">
-          <DataField>VELocLastYearTotalQtyFormat</DataField>
-        </Field>
-        <Field Name="VELocLastYearTotalCost">
-          <DataField>VELocLastYearTotalCost</DataField>
-        </Field>
-        <Field Name="VELocLastYearTotalCostFormat">
-          <DataField>VELocLastYearTotalCostFormat</DataField>
-        </Field>
-        <Field Name="VELocLastYearTotalSales">
-          <DataField>VELocLastYearTotalSales</DataField>
-        </Field>
-        <Field Name="VELocLastYearTotalSalesFormat">
-          <DataField>VELocLastYearTotalSalesFormat</DataField>
-        </Field>
-        <Field Name="VELocLastYearTotalSalesPerc">
-          <DataField>VELocLastYearTotalSalesPerc</DataField>
-        </Field>
-        <Field Name="VELocLastYearTotalSalesPercFormat">
-          <DataField>VELocLastYearTotalSalesPercFormat</DataField>
-        </Field>
-        <Field Name="VELocLastYearTotalProfit">
-          <DataField>VELocLastYearTotalProfit</DataField>
-        </Field>
-        <Field Name="VELocLastYearTotalProfitFormat">
-          <DataField>VELocLastYearTotalProfitFormat</DataField>
-        </Field>
-        <Field Name="VELocLastYearTotalProfSalePerc">
-          <DataField>VELocLastYearTotalProfSalePerc</DataField>
-        </Field>
-        <Field Name="VELocLastYearTotalProfSalePercFormat">
-          <DataField>VELocLastYearTotalProfSalePercFormat</DataField>
-        </Field>
-        <Field Name="VELocLastYearTotalProfitPerc">
-          <DataField>VELocLastYearTotalProfitPerc</DataField>
-        </Field>
-        <Field Name="VELocLastYearTotalProfitPercFormat">
-          <DataField>VELocLastYearTotalProfitPercFormat</DataField>
-        </Field>
-        <Field Name="pctfjortekst">
-          <DataField>pctfjortekst</DataField>
-        </Field>
-        <Field Name="dim1Filter">
-          <DataField>dim1Filter</DataField>
-        </Field>
-        <Field Name="dateFilter">
-          <DataField>dateFilter</DataField>
-        </Field>
-        <Field Name="LastYear">
-          <DataField>LastYear</DataField>
-        </Field>
-        <Field Name="CurrentYearShow">
-          <DataField>CurrentYearShow</DataField>
-        </Field>
-        <Field Name="LastYearShow">
-          <DataField>LastYearShow</DataField>
-        </Field>
-        <Field Name="Number_FooterTotal">
-          <DataField>Number_FooterTotal</DataField>
-        </Field>
-        <Field Name="VETotalQuantity_FooterTotal">
-          <DataField>VETotalQuantity_FooterTotal</DataField>
-        </Field>
-        <Field Name="VETotalQuantity_FooterTotalFormat">
-          <DataField>VETotalQuantity_FooterTotalFormat</DataField>
-        </Field>
-        <Field Name="VETotalCost_FooterTotal">
-          <DataField>VETotalCost_FooterTotal</DataField>
-        </Field>
-        <Field Name="VETotalCost_FooterTotalFormat">
-          <DataField>VETotalCost_FooterTotalFormat</DataField>
-        </Field>
-        <Field Name="VETotalSales_FooterTotal">
-          <DataField>VETotalSales_FooterTotal</DataField>
-        </Field>
-        <Field Name="VETotalSales_FooterTotalFormat">
-          <DataField>VETotalSales_FooterTotalFormat</DataField>
-        </Field>
-        <Field Name="VETotalSalesPerc_FooterTotal">
-          <DataField>VETotalSalesPerc_FooterTotal</DataField>
-        </Field>
-        <Field Name="VETotalSalesPerc_FooterTotalFormat">
-          <DataField>VETotalSalesPerc_FooterTotalFormat</DataField>
-        </Field>
-        <Field Name="VETotalPrevYeasPerc_FooterTotal">
-          <DataField>VETotalPrevYeasPerc_FooterTotal</DataField>
-        </Field>
-        <Field Name="VETotalPrevYeasPerc_FooterTotalFormat">
-          <DataField>VETotalPrevYeasPerc_FooterTotalFormat</DataField>
-        </Field>
-        <Field Name="VETotalProfit_FooterTotal">
-          <DataField>VETotalProfit_FooterTotal</DataField>
-        </Field>
-        <Field Name="VETotalProfit_FooterTotalFormat">
-          <DataField>VETotalProfit_FooterTotalFormat</DataField>
-        </Field>
-        <Field Name="VETotalProfitSalesPerc_FooterTotal">
-          <DataField>VETotalProfitSalesPerc_FooterTotal</DataField>
-        </Field>
-        <Field Name="VETotalProfitSalesPerc_FooterTotalFormat">
-          <DataField>VETotalProfitSalesPerc_FooterTotalFormat</DataField>
-        </Field>
-        <Field Name="VETotalProfitPerc_FooterTotal">
-          <DataField>VETotalProfitPerc_FooterTotal</DataField>
-        </Field>
-        <Field Name="VETotalProfitPerc_FooterTotalFormat">
-          <DataField>VETotalProfitPerc_FooterTotalFormat</DataField>
-        </Field>
-        <Field Name="Number_FooterTotalLY">
-          <DataField>Number_FooterTotalLY</DataField>
-        </Field>
-        <Field Name="LastYearShowFooter">
-          <DataField>LastYearShowFooter</DataField>
-        </Field>
-        <Field Name="VELastYearTotalQty_FooterTotalLY">
-          <DataField>VELastYearTotalQty_FooterTotalLY</DataField>
-        </Field>
-        <Field Name="VELastYearTotalQty_FooterTotalLYFormat">
-          <DataField>VELastYearTotalQty_FooterTotalLYFormat</DataField>
-        </Field>
-        <Field Name="VELastYearTotalCost_FooterTotalLY">
-          <DataField>VELastYearTotalCost_FooterTotalLY</DataField>
-        </Field>
-        <Field Name="VELastYearTotalCost_FooterTotalLYFormat">
-          <DataField>VELastYearTotalCost_FooterTotalLYFormat</DataField>
-        </Field>
-        <Field Name="VELastYearTotalSales_FooterTotalLY">
-          <DataField>VELastYearTotalSales_FooterTotalLY</DataField>
-        </Field>
-        <Field Name="VELastYearTotalSales_FooterTotalLYFormat">
-          <DataField>VELastYearTotalSales_FooterTotalLYFormat</DataField>
-        </Field>
-        <Field Name="VELastYearTotalSalesPerc_FooterTotalLY">
-          <DataField>VELastYearTotalSalesPerc_FooterTotalLY</DataField>
-        </Field>
-        <Field Name="VELastYearTotalSalesPerc_FooterTotalLYFormat">
-          <DataField>VELastYearTotalSalesPerc_FooterTotalLYFormat</DataField>
-        </Field>
-        <Field Name="VELastYearTotalProfit_FooterTotalLY">
-          <DataField>VELastYearTotalProfit_FooterTotalLY</DataField>
-        </Field>
-        <Field Name="VELastYearTotalProfit_FooterTotalLYFormat">
-          <DataField>VELastYearTotalProfit_FooterTotalLYFormat</DataField>
-        </Field>
-        <Field Name="VELastYearTotalProfitSalesPerc_FooterTotalLY">
-          <DataField>VELastYearTotalProfitSalesPerc_FooterTotalLY</DataField>
-        </Field>
-        <Field Name="VELastYearTotalProfitSalesPerc_FooterTotalLYFormat">
-          <DataField>VELastYearTotalProfitSalesPerc_FooterTotalLYFormat</DataField>
-        </Field>
-        <Field Name="VELastYearTotalProfitPerc_FooterTotalLY">
-          <DataField>VELastYearTotalProfitPerc_FooterTotalLY</DataField>
-        </Field>
-        <Field Name="VELastYearTotalProfitPerc_FooterTotalLYFormat">
-          <DataField>VELastYearTotalProfitPerc_FooterTotalLYFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3299,4 +3067,236 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="FilterList">
+          <DataField>FilterList</DataField>
+        </Field>
+        <Field Name="Code_DimensionValue">
+          <DataField>Code_DimensionValue</DataField>
+        </Field>
+        <Field Name="Name_DimensionValue">
+          <DataField>Name_DimensionValue</DataField>
+        </Field>
+        <Field Name="VELocQty_DimensionValue">
+          <DataField>VELocQty_DimensionValue</DataField>
+        </Field>
+        <Field Name="VELocQty_DimensionValueFormat">
+          <DataField>VELocQty_DimensionValueFormat</DataField>
+        </Field>
+        <Field Name="VELocCost">
+          <DataField>VELocCost</DataField>
+        </Field>
+        <Field Name="VELocCostFormat">
+          <DataField>VELocCostFormat</DataField>
+        </Field>
+        <Field Name="VELocSales">
+          <DataField>VELocSales</DataField>
+        </Field>
+        <Field Name="VELocSalesFormat">
+          <DataField>VELocSalesFormat</DataField>
+        </Field>
+        <Field Name="VETotalSalesPerc">
+          <DataField>VETotalSalesPerc</DataField>
+        </Field>
+        <Field Name="VETotalSalesPercFormat">
+          <DataField>VETotalSalesPercFormat</DataField>
+        </Field>
+        <Field Name="VELocPrevYearPerc">
+          <DataField>VELocPrevYearPerc</DataField>
+        </Field>
+        <Field Name="VELocPrevYearPercFormat">
+          <DataField>VELocPrevYearPercFormat</DataField>
+        </Field>
+        <Field Name="VETotalProfit">
+          <DataField>VETotalProfit</DataField>
+        </Field>
+        <Field Name="VETotalProfitFormat">
+          <DataField>VETotalProfitFormat</DataField>
+        </Field>
+        <Field Name="VETotalProfitSalesPerc">
+          <DataField>VETotalProfitSalesPerc</DataField>
+        </Field>
+        <Field Name="VETotalProfitSalesPercFormat">
+          <DataField>VETotalProfitSalesPercFormat</DataField>
+        </Field>
+        <Field Name="VETotalProfitPerc">
+          <DataField>VETotalProfitPerc</DataField>
+        </Field>
+        <Field Name="VETotalProfitPercFormat">
+          <DataField>VETotalProfitPercFormat</DataField>
+        </Field>
+        <Field Name="txtDim1">
+          <DataField>txtDim1</DataField>
+        </Field>
+        <Field Name="VELocLastYearTotalQty">
+          <DataField>VELocLastYearTotalQty</DataField>
+        </Field>
+        <Field Name="VELocLastYearTotalQtyFormat">
+          <DataField>VELocLastYearTotalQtyFormat</DataField>
+        </Field>
+        <Field Name="VELocLastYearTotalCost">
+          <DataField>VELocLastYearTotalCost</DataField>
+        </Field>
+        <Field Name="VELocLastYearTotalCostFormat">
+          <DataField>VELocLastYearTotalCostFormat</DataField>
+        </Field>
+        <Field Name="VELocLastYearTotalSales">
+          <DataField>VELocLastYearTotalSales</DataField>
+        </Field>
+        <Field Name="VELocLastYearTotalSalesFormat">
+          <DataField>VELocLastYearTotalSalesFormat</DataField>
+        </Field>
+        <Field Name="VELocLastYearTotalSalesPerc">
+          <DataField>VELocLastYearTotalSalesPerc</DataField>
+        </Field>
+        <Field Name="VELocLastYearTotalSalesPercFormat">
+          <DataField>VELocLastYearTotalSalesPercFormat</DataField>
+        </Field>
+        <Field Name="VELocLastYearTotalProfit">
+          <DataField>VELocLastYearTotalProfit</DataField>
+        </Field>
+        <Field Name="VELocLastYearTotalProfitFormat">
+          <DataField>VELocLastYearTotalProfitFormat</DataField>
+        </Field>
+        <Field Name="VELocLastYearTotalProfSalePerc">
+          <DataField>VELocLastYearTotalProfSalePerc</DataField>
+        </Field>
+        <Field Name="VELocLastYearTotalProfSalePercFormat">
+          <DataField>VELocLastYearTotalProfSalePercFormat</DataField>
+        </Field>
+        <Field Name="VELocLastYearTotalProfitPerc">
+          <DataField>VELocLastYearTotalProfitPerc</DataField>
+        </Field>
+        <Field Name="VELocLastYearTotalProfitPercFormat">
+          <DataField>VELocLastYearTotalProfitPercFormat</DataField>
+        </Field>
+        <Field Name="pctfjortekst">
+          <DataField>pctfjortekst</DataField>
+        </Field>
+        <Field Name="dim1Filter">
+          <DataField>dim1Filter</DataField>
+        </Field>
+        <Field Name="dateFilter">
+          <DataField>dateFilter</DataField>
+        </Field>
+        <Field Name="LastYear">
+          <DataField>LastYear</DataField>
+        </Field>
+        <Field Name="CurrentYearShow">
+          <DataField>CurrentYearShow</DataField>
+        </Field>
+        <Field Name="LastYearShow">
+          <DataField>LastYearShow</DataField>
+        </Field>
+        <Field Name="Number_FooterTotal">
+          <DataField>Number_FooterTotal</DataField>
+        </Field>
+        <Field Name="VETotalQuantity_FooterTotal">
+          <DataField>VETotalQuantity_FooterTotal</DataField>
+        </Field>
+        <Field Name="VETotalQuantity_FooterTotalFormat">
+          <DataField>VETotalQuantity_FooterTotalFormat</DataField>
+        </Field>
+        <Field Name="VETotalCost_FooterTotal">
+          <DataField>VETotalCost_FooterTotal</DataField>
+        </Field>
+        <Field Name="VETotalCost_FooterTotalFormat">
+          <DataField>VETotalCost_FooterTotalFormat</DataField>
+        </Field>
+        <Field Name="VETotalSales_FooterTotal">
+          <DataField>VETotalSales_FooterTotal</DataField>
+        </Field>
+        <Field Name="VETotalSales_FooterTotalFormat">
+          <DataField>VETotalSales_FooterTotalFormat</DataField>
+        </Field>
+        <Field Name="VETotalSalesPerc_FooterTotal">
+          <DataField>VETotalSalesPerc_FooterTotal</DataField>
+        </Field>
+        <Field Name="VETotalSalesPerc_FooterTotalFormat">
+          <DataField>VETotalSalesPerc_FooterTotalFormat</DataField>
+        </Field>
+        <Field Name="VETotalPrevYeasPerc_FooterTotal">
+          <DataField>VETotalPrevYeasPerc_FooterTotal</DataField>
+        </Field>
+        <Field Name="VETotalPrevYeasPerc_FooterTotalFormat">
+          <DataField>VETotalPrevYeasPerc_FooterTotalFormat</DataField>
+        </Field>
+        <Field Name="VETotalProfit_FooterTotal">
+          <DataField>VETotalProfit_FooterTotal</DataField>
+        </Field>
+        <Field Name="VETotalProfit_FooterTotalFormat">
+          <DataField>VETotalProfit_FooterTotalFormat</DataField>
+        </Field>
+        <Field Name="VETotalProfitSalesPerc_FooterTotal">
+          <DataField>VETotalProfitSalesPerc_FooterTotal</DataField>
+        </Field>
+        <Field Name="VETotalProfitSalesPerc_FooterTotalFormat">
+          <DataField>VETotalProfitSalesPerc_FooterTotalFormat</DataField>
+        </Field>
+        <Field Name="VETotalProfitPerc_FooterTotal">
+          <DataField>VETotalProfitPerc_FooterTotal</DataField>
+        </Field>
+        <Field Name="VETotalProfitPerc_FooterTotalFormat">
+          <DataField>VETotalProfitPerc_FooterTotalFormat</DataField>
+        </Field>
+        <Field Name="Number_FooterTotalLY">
+          <DataField>Number_FooterTotalLY</DataField>
+        </Field>
+        <Field Name="LastYearShowFooter">
+          <DataField>LastYearShowFooter</DataField>
+        </Field>
+        <Field Name="VELastYearTotalQty_FooterTotalLY">
+          <DataField>VELastYearTotalQty_FooterTotalLY</DataField>
+        </Field>
+        <Field Name="VELastYearTotalQty_FooterTotalLYFormat">
+          <DataField>VELastYearTotalQty_FooterTotalLYFormat</DataField>
+        </Field>
+        <Field Name="VELastYearTotalCost_FooterTotalLY">
+          <DataField>VELastYearTotalCost_FooterTotalLY</DataField>
+        </Field>
+        <Field Name="VELastYearTotalCost_FooterTotalLYFormat">
+          <DataField>VELastYearTotalCost_FooterTotalLYFormat</DataField>
+        </Field>
+        <Field Name="VELastYearTotalSales_FooterTotalLY">
+          <DataField>VELastYearTotalSales_FooterTotalLY</DataField>
+        </Field>
+        <Field Name="VELastYearTotalSales_FooterTotalLYFormat">
+          <DataField>VELastYearTotalSales_FooterTotalLYFormat</DataField>
+        </Field>
+        <Field Name="VELastYearTotalSalesPerc_FooterTotalLY">
+          <DataField>VELastYearTotalSalesPerc_FooterTotalLY</DataField>
+        </Field>
+        <Field Name="VELastYearTotalSalesPerc_FooterTotalLYFormat">
+          <DataField>VELastYearTotalSalesPerc_FooterTotalLYFormat</DataField>
+        </Field>
+        <Field Name="VELastYearTotalProfit_FooterTotalLY">
+          <DataField>VELastYearTotalProfit_FooterTotalLY</DataField>
+        </Field>
+        <Field Name="VELastYearTotalProfit_FooterTotalLYFormat">
+          <DataField>VELastYearTotalProfit_FooterTotalLYFormat</DataField>
+        </Field>
+        <Field Name="VELastYearTotalProfitSalesPerc_FooterTotalLY">
+          <DataField>VELastYearTotalProfitSalesPerc_FooterTotalLY</DataField>
+        </Field>
+        <Field Name="VELastYearTotalProfitSalesPerc_FooterTotalLYFormat">
+          <DataField>VELastYearTotalProfitSalesPerc_FooterTotalLYFormat</DataField>
+        </Field>
+        <Field Name="VELastYearTotalProfitPerc_FooterTotalLY">
+          <DataField>VELastYearTotalProfitPerc_FooterTotalLY</DataField>
+        </Field>
+        <Field Name="VELastYearTotalProfitPerc_FooterTotalLYFormat">
+          <DataField>VELastYearTotalProfitPerc_FooterTotalLYFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,115 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="USERID">
-          <DataField>USERID</DataField>
-        </Field>
-        <Field Name="Text002___ItemDateFilter">
-          <DataField>Text002___ItemDateFilter</DataField>
-        </Field>
-        <Field Name="FORMAT_TODAY_0_4_">
-          <DataField>FORMAT_TODAY_0_4_</DataField>
-        </Field>
-        <Field Name="Text004">
-          <DataField>Text004</DataField>
-        </Field>
-        <Field Name="txtShowNotSold">
-          <DataField>txtShowNotSold</DataField>
-        </Field>
-        <Field Name="Item__Vendor_Item_No__">
-          <DataField>Item__Vendor_Item_No__</DataField>
-        </Field>
-        <Field Name="Item__Sales__LCY__">
-          <DataField>Item__Sales__LCY__</DataField>
-        </Field>
-        <Field Name="Item__Sales__LCY__Format">
-          <DataField>Item__Sales__LCY__Format</DataField>
-        </Field>
-        <Field Name="Item__Base_Unit_of_Measure_">
-          <DataField>Item__Base_Unit_of_Measure_</DataField>
-        </Field>
-        <Field Name="Item__Sales__Qty___">
-          <DataField>Item__Sales__Qty___</DataField>
-        </Field>
-        <Field Name="Item__Sales__Qty___Format">
-          <DataField>Item__Sales__Qty___Format</DataField>
-        </Field>
-        <Field Name="Item_Description">
-          <DataField>Item_Description</DataField>
-        </Field>
-        <Field Name="Item__No__">
-          <DataField>Item__No__</DataField>
-        </Field>
-        <Field Name="Integer_Number">
-          <DataField>Integer_Number</DataField>
-        </Field>
-        <Field Name="ItemDateFilter">
-          <DataField>ItemDateFilter</DataField>
-        </Field>
-        <Field Name="ShowNotSold">
-          <DataField>ShowNotSold</DataField>
-        </Field>
-        <Field Name="Item__Sales__LCY___Control25">
-          <DataField>Item__Sales__LCY___Control25</DataField>
-        </Field>
-        <Field Name="Item__Sales__LCY___Control25Format">
-          <DataField>Item__Sales__LCY___Control25Format</DataField>
-        </Field>
-        <Field Name="ItemSalesAmt_">
-          <DataField>ItemSalesAmt_</DataField>
-        </Field>
-        <Field Name="ItemSalesAmt_Format">
-          <DataField>ItemSalesAmt_Format</DataField>
-        </Field>
-        <Field Name="SalesAmounPct_">
-          <DataField>SalesAmounPct_</DataField>
-        </Field>
-        <Field Name="SalesAmounPct_Format">
-          <DataField>SalesAmounPct_Format</DataField>
-        </Field>
-        <Field Name="txtTotal">
-          <DataField>txtTotal</DataField>
-        </Field>
-        <Field Name="txtTotalSales_">
-          <DataField>txtTotalSales_</DataField>
-        </Field>
-        <Field Name="txtPctTotalSales_">
-          <DataField>txtPctTotalSales_</DataField>
-        </Field>
-        <Field Name="PageCaption">
-          <DataField>PageCaption</DataField>
-        </Field>
-        <Field Name="Vendors_item_no_Caption">
-          <DataField>Vendors_item_no_Caption</DataField>
-        </Field>
-        <Field Name="txtSalesLCYCaption">
-          <DataField>txtSalesLCYCaption</DataField>
-        </Field>
-        <Field Name="txtSalesQuantityCaption">
-          <DataField>txtSalesQuantityCaption</DataField>
-        </Field>
-        <Field Name="Item_descriptionCaption">
-          <DataField>Item_descriptionCaption</DataField>
-        </Field>
-        <Field Name="txtItemNoCaption">
-          <DataField>txtItemNoCaption</DataField>
-        </Field>
-        <Field Name="txtRankCaption">
-          <DataField>txtRankCaption</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3149,4 +3040,113 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="USERID">
+          <DataField>USERID</DataField>
+        </Field>
+        <Field Name="Text002___ItemDateFilter">
+          <DataField>Text002___ItemDateFilter</DataField>
+        </Field>
+        <Field Name="FORMAT_TODAY_0_4_">
+          <DataField>FORMAT_TODAY_0_4_</DataField>
+        </Field>
+        <Field Name="Text004">
+          <DataField>Text004</DataField>
+        </Field>
+        <Field Name="txtShowNotSold">
+          <DataField>txtShowNotSold</DataField>
+        </Field>
+        <Field Name="Item__Vendor_Item_No__">
+          <DataField>Item__Vendor_Item_No__</DataField>
+        </Field>
+        <Field Name="Item__Sales__LCY__">
+          <DataField>Item__Sales__LCY__</DataField>
+        </Field>
+        <Field Name="Item__Sales__LCY__Format">
+          <DataField>Item__Sales__LCY__Format</DataField>
+        </Field>
+        <Field Name="Item__Base_Unit_of_Measure_">
+          <DataField>Item__Base_Unit_of_Measure_</DataField>
+        </Field>
+        <Field Name="Item__Sales__Qty___">
+          <DataField>Item__Sales__Qty___</DataField>
+        </Field>
+        <Field Name="Item__Sales__Qty___Format">
+          <DataField>Item__Sales__Qty___Format</DataField>
+        </Field>
+        <Field Name="Item_Description">
+          <DataField>Item_Description</DataField>
+        </Field>
+        <Field Name="Item__No__">
+          <DataField>Item__No__</DataField>
+        </Field>
+        <Field Name="Integer_Number">
+          <DataField>Integer_Number</DataField>
+        </Field>
+        <Field Name="ItemDateFilter">
+          <DataField>ItemDateFilter</DataField>
+        </Field>
+        <Field Name="ShowNotSold">
+          <DataField>ShowNotSold</DataField>
+        </Field>
+        <Field Name="Item__Sales__LCY___Control25">
+          <DataField>Item__Sales__LCY___Control25</DataField>
+        </Field>
+        <Field Name="Item__Sales__LCY___Control25Format">
+          <DataField>Item__Sales__LCY___Control25Format</DataField>
+        </Field>
+        <Field Name="ItemSalesAmt_">
+          <DataField>ItemSalesAmt_</DataField>
+        </Field>
+        <Field Name="ItemSalesAmt_Format">
+          <DataField>ItemSalesAmt_Format</DataField>
+        </Field>
+        <Field Name="SalesAmounPct_">
+          <DataField>SalesAmounPct_</DataField>
+        </Field>
+        <Field Name="SalesAmounPct_Format">
+          <DataField>SalesAmounPct_Format</DataField>
+        </Field>
+        <Field Name="txtTotal">
+          <DataField>txtTotal</DataField>
+        </Field>
+        <Field Name="txtTotalSales_">
+          <DataField>txtTotalSales_</DataField>
+        </Field>
+        <Field Name="txtPctTotalSales_">
+          <DataField>txtPctTotalSales_</DataField>
+        </Field>
+        <Field Name="PageCaption">
+          <DataField>PageCaption</DataField>
+        </Field>
+        <Field Name="Vendors_item_no_Caption">
+          <DataField>Vendors_item_no_Caption</DataField>
+        </Field>
+        <Field Name="txtSalesLCYCaption">
+          <DataField>txtSalesLCYCaption</DataField>
+        </Field>
+        <Field Name="txtSalesQuantityCaption">
+          <DataField>txtSalesQuantityCaption</DataField>
+        </Field>
+        <Field Name="Item_descriptionCaption">
+          <DataField>Item_descriptionCaption</DataField>
+        </Field>
+        <Field Name="txtItemNoCaption">
+          <DataField>txtItemNoCaption</DataField>
+        </Field>
+        <Field Name="txtRankCaption">
+          <DataField>txtRankCaption</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

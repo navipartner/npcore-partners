@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,298 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="CurrReport_PAGENOCaption">
-          <DataField>CurrReport_PAGENOCaption</DataField>
-        </Field>
-        <Field Name="Report_Caption">
-          <DataField>Report_Caption</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="CurrReport_PAGENO">
-          <DataField>CurrReport_PAGENO</DataField>
-        </Field>
-        <Field Name="ObjectDetails">
-          <DataField>ObjectDetails</DataField>
-        </Field>
-        <Field Name="PeriodFilter">
-          <DataField>PeriodFilter</DataField>
-        </Field>
-        <Field Name="SequenceFilter">
-          <DataField>SequenceFilter</DataField>
-        </Field>
-        <Field Name="CustomerFilter">
-          <DataField>CustomerFilter</DataField>
-        </Field>
-        <Field Name="Number_Integer">
-          <DataField>Number_Integer</DataField>
-        </Field>
-        <Field Name="No_Customer">
-          <DataField>No_Customer</DataField>
-        </Field>
-        <Field Name="Name_Customer">
-          <DataField>Name_Customer</DataField>
-        </Field>
-        <Field Name="Sales_LCY_Customer">
-          <DataField>Sales_LCY_Customer</DataField>
-        </Field>
-        <Field Name="Sales_LCY_CustomerFormat">
-          <DataField>Sales_LCY_CustomerFormat</DataField>
-        </Field>
-        <Field Name="Balance_LCY_Customer">
-          <DataField>Balance_LCY_Customer</DataField>
-        </Field>
-        <Field Name="Balance_LCY_CustomerFormat">
-          <DataField>Balance_LCY_CustomerFormat</DataField>
-        </Field>
-        <Field Name="Profit_LCY_Customer">
-          <DataField>Profit_LCY_Customer</DataField>
-        </Field>
-        <Field Name="Profit_LCY_CustomerFormat">
-          <DataField>Profit_LCY_CustomerFormat</DataField>
-        </Field>
-        <Field Name="CustomerSalesTotal">
-          <DataField>CustomerSalesTotal</DataField>
-        </Field>
-        <Field Name="CustomerSalesTotalFormat">
-          <DataField>CustomerSalesTotalFormat</DataField>
-        </Field>
-        <Field Name="CustomerProfitTotal">
-          <DataField>CustomerProfitTotal</DataField>
-        </Field>
-        <Field Name="CustomerProfitTotalFormat">
-          <DataField>CustomerProfitTotalFormat</DataField>
-        </Field>
-        <Field Name="CustomerBalanceTotal">
-          <DataField>CustomerBalanceTotal</DataField>
-        </Field>
-        <Field Name="CustomerBalanceTotalFormat">
-          <DataField>CustomerBalanceTotalFormat</DataField>
-        </Field>
-        <Field Name="AvancePct_Value">
-          <DataField>AvancePct_Value</DataField>
-        </Field>
-        <Field Name="Share_Value">
-          <DataField>Share_Value</DataField>
-        </Field>
-        <Field Name="TotalPct_Value">
-          <DataField>TotalPct_Value</DataField>
-        </Field>
-        <Field Name="LastLocation">
-          <DataField>LastLocation</DataField>
-        </Field>
-        <Field Name="CustVarAmt">
-          <DataField>CustVarAmt</DataField>
-        </Field>
-        <Field Name="CustVarAmtFormat">
-          <DataField>CustVarAmtFormat</DataField>
-        </Field>
-        <Field Name="Index">
-          <DataField>Index</DataField>
-        </Field>
-        <Field Name="IndexFormat">
-          <DataField>IndexFormat</DataField>
-        </Field>
-        <Field Name="SequenceCaption">
-          <DataField>SequenceCaption</DataField>
-        </Field>
-        <Field Name="NoCaption">
-          <DataField>NoCaption</DataField>
-        </Field>
-        <Field Name="NameCaption">
-          <DataField>NameCaption</DataField>
-        </Field>
-        <Field Name="SaleCaption">
-          <DataField>SaleCaption</DataField>
-        </Field>
-        <Field Name="BalanceCaption">
-          <DataField>BalanceCaption</DataField>
-        </Field>
-        <Field Name="ProfitCaption">
-          <DataField>ProfitCaption</DataField>
-        </Field>
-        <Field Name="ProfitPctCaption">
-          <DataField>ProfitPctCaption</DataField>
-        </Field>
-        <Field Name="LargestPctCaption">
-          <DataField>LargestPctCaption</DataField>
-        </Field>
-        <Field Name="ShareTotalCaption">
-          <DataField>ShareTotalCaption</DataField>
-        </Field>
-        <Field Name="PlacingLastYrCaption">
-          <DataField>PlacingLastYrCaption</DataField>
-        </Field>
-        <Field Name="DebVarBelCaption">
-          <DataField>DebVarBelCaption</DataField>
-        </Field>
-        <Field Name="IndexCaption">
-          <DataField>IndexCaption</DataField>
-        </Field>
-        <Field Name="LastYearCaption">
-          <DataField>LastYearCaption</DataField>
-        </Field>
-        <Field Name="IndexSaleCaption">
-          <DataField>IndexSaleCaption</DataField>
-        </Field>
-        <Field Name="IndexProfitCaption">
-          <DataField>IndexProfitCaption</DataField>
-        </Field>
-        <Field Name="ThisYearCaption">
-          <DataField>ThisYearCaption</DataField>
-        </Field>
-        <Field Name="TotalCaption">
-          <DataField>TotalCaption</DataField>
-        </Field>
-        <Field Name="SaleTotalCaption">
-          <DataField>SaleTotalCaption</DataField>
-        </Field>
-        <Field Name="SharePctCaption">
-          <DataField>SharePctCaption</DataField>
-        </Field>
-        <Field Name="PageCaption">
-          <DataField>PageCaption</DataField>
-        </Field>
-        <Field Name="Greyed">
-          <DataField>Greyed</DataField>
-        </Field>
-        <Field Name="CustSalesDKK">
-          <DataField>CustSalesDKK</DataField>
-        </Field>
-        <Field Name="CustSalesDKKFormat">
-          <DataField>CustSalesDKKFormat</DataField>
-        </Field>
-        <Field Name="SalesPct">
-          <DataField>SalesPct</DataField>
-        </Field>
-        <Field Name="SalesPctFormat">
-          <DataField>SalesPctFormat</DataField>
-        </Field>
-        <Field Name="CustBalanceDKK">
-          <DataField>CustBalanceDKK</DataField>
-        </Field>
-        <Field Name="CustBalanceDKKFormat">
-          <DataField>CustBalanceDKKFormat</DataField>
-        </Field>
-        <Field Name="DebSaldoDKKFooter">
-          <DataField>DebSaldoDKKFooter</DataField>
-        </Field>
-        <Field Name="DebSaldoDKKFooterFormat">
-          <DataField>DebSaldoDKKFooterFormat</DataField>
-        </Field>
-        <Field Name="BalancePct">
-          <DataField>BalancePct</DataField>
-        </Field>
-        <Field Name="BalancePctFormat">
-          <DataField>BalancePctFormat</DataField>
-        </Field>
-        <Field Name="CustProfitDKK">
-          <DataField>CustProfitDKK</DataField>
-        </Field>
-        <Field Name="CustProfitDKKFormat">
-          <DataField>CustProfitDKKFormat</DataField>
-        </Field>
-        <Field Name="AvancePct">
-          <DataField>AvancePct</DataField>
-        </Field>
-        <Field Name="AvancePctFormat">
-          <DataField>AvancePctFormat</DataField>
-        </Field>
-        <Field Name="CustSalesDKK1">
-          <DataField>CustSalesDKK1</DataField>
-        </Field>
-        <Field Name="CustSalesDKK1Format">
-          <DataField>CustSalesDKK1Format</DataField>
-        </Field>
-        <Field Name="Debitor1_Sales_LCY_">
-          <DataField>Debitor1_Sales_LCY_</DataField>
-        </Field>
-        <Field Name="Debitor1_Sales_LCY_Format">
-          <DataField>Debitor1_Sales_LCY_Format</DataField>
-        </Field>
-        <Field Name="SalesPct1">
-          <DataField>SalesPct1</DataField>
-        </Field>
-        <Field Name="SalesPct1Format">
-          <DataField>SalesPct1Format</DataField>
-        </Field>
-        <Field Name="CustProfitDKK1">
-          <DataField>CustProfitDKK1</DataField>
-        </Field>
-        <Field Name="CustProfitDKK1Format">
-          <DataField>CustProfitDKK1Format</DataField>
-        </Field>
-        <Field Name="Debitor1_Profit_LCY_">
-          <DataField>Debitor1_Profit_LCY_</DataField>
-        </Field>
-        <Field Name="Debitor1_Profit_LCY_Format">
-          <DataField>Debitor1_Profit_LCY_Format</DataField>
-        </Field>
-        <Field Name="AvancePct1">
-          <DataField>AvancePct1</DataField>
-        </Field>
-        <Field Name="AvancePct1Format">
-          <DataField>AvancePct1Format</DataField>
-        </Field>
-        <Field Name="IndexSales_1_">
-          <DataField>IndexSales_1_</DataField>
-        </Field>
-        <Field Name="IndexSales_1_Format">
-          <DataField>IndexSales_1_Format</DataField>
-        </Field>
-        <Field Name="IndexSales_2_">
-          <DataField>IndexSales_2_</DataField>
-        </Field>
-        <Field Name="IndexSales_2_Format">
-          <DataField>IndexSales_2_Format</DataField>
-        </Field>
-        <Field Name="IndexDB_1_">
-          <DataField>IndexDB_1_</DataField>
-        </Field>
-        <Field Name="IndexDB_1_Format">
-          <DataField>IndexDB_1_Format</DataField>
-        </Field>
-        <Field Name="IndexDB_2_">
-          <DataField>IndexDB_2_</DataField>
-        </Field>
-        <Field Name="IndexDB_2_Format">
-          <DataField>IndexDB_2_Format</DataField>
-        </Field>
-        <Field Name="TotalPct">
-          <DataField>TotalPct</DataField>
-        </Field>
-        <Field Name="TotalPctFormat">
-          <DataField>TotalPctFormat</DataField>
-        </Field>
-        <Field Name="Customer1SalesTotal">
-          <DataField>Customer1SalesTotal</DataField>
-        </Field>
-        <Field Name="Customer1SalesTotalFormat">
-          <DataField>Customer1SalesTotalFormat</DataField>
-        </Field>
-        <Field Name="Customer1ProfitTotal">
-          <DataField>Customer1ProfitTotal</DataField>
-        </Field>
-        <Field Name="Customer1ProfitTotalFormat">
-          <DataField>Customer1ProfitTotalFormat</DataField>
-        </Field>
-        <Field Name="Customer1BalanceTotal">
-          <DataField>Customer1BalanceTotal</DataField>
-        </Field>
-        <Field Name="Customer1BalanceTotalFormat">
-          <DataField>Customer1BalanceTotalFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -5808,4 +5516,287 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="Report_Caption">
+          <DataField>Report_Caption</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="PeriodFilter">
+          <DataField>PeriodFilter</DataField>
+        </Field>
+        <Field Name="SequenceFilter">
+          <DataField>SequenceFilter</DataField>
+        </Field>
+        <Field Name="CustomerFilter">
+          <DataField>CustomerFilter</DataField>
+        </Field>
+        <Field Name="Number_Integer">
+          <DataField>Number_Integer</DataField>
+        </Field>
+        <Field Name="No_Customer">
+          <DataField>No_Customer</DataField>
+        </Field>
+        <Field Name="Name_Customer">
+          <DataField>Name_Customer</DataField>
+        </Field>
+        <Field Name="Sales_LCY_Customer">
+          <DataField>Sales_LCY_Customer</DataField>
+        </Field>
+        <Field Name="Sales_LCY_CustomerFormat">
+          <DataField>Sales_LCY_CustomerFormat</DataField>
+        </Field>
+        <Field Name="Balance_LCY_Customer">
+          <DataField>Balance_LCY_Customer</DataField>
+        </Field>
+        <Field Name="Balance_LCY_CustomerFormat">
+          <DataField>Balance_LCY_CustomerFormat</DataField>
+        </Field>
+        <Field Name="Profit_LCY_Customer">
+          <DataField>Profit_LCY_Customer</DataField>
+        </Field>
+        <Field Name="Profit_LCY_CustomerFormat">
+          <DataField>Profit_LCY_CustomerFormat</DataField>
+        </Field>
+        <Field Name="CustomerSalesTotal">
+          <DataField>CustomerSalesTotal</DataField>
+        </Field>
+        <Field Name="CustomerSalesTotalFormat">
+          <DataField>CustomerSalesTotalFormat</DataField>
+        </Field>
+        <Field Name="CustomerProfitTotal">
+          <DataField>CustomerProfitTotal</DataField>
+        </Field>
+        <Field Name="CustomerProfitTotalFormat">
+          <DataField>CustomerProfitTotalFormat</DataField>
+        </Field>
+        <Field Name="CustomerBalanceTotal">
+          <DataField>CustomerBalanceTotal</DataField>
+        </Field>
+        <Field Name="CustomerBalanceTotalFormat">
+          <DataField>CustomerBalanceTotalFormat</DataField>
+        </Field>
+        <Field Name="AvancePct_Value">
+          <DataField>AvancePct_Value</DataField>
+        </Field>
+        <Field Name="Share_Value">
+          <DataField>Share_Value</DataField>
+        </Field>
+        <Field Name="TotalPct_Value">
+          <DataField>TotalPct_Value</DataField>
+        </Field>
+        <Field Name="LastLocation">
+          <DataField>LastLocation</DataField>
+        </Field>
+        <Field Name="CustVarAmt">
+          <DataField>CustVarAmt</DataField>
+        </Field>
+        <Field Name="CustVarAmtFormat">
+          <DataField>CustVarAmtFormat</DataField>
+        </Field>
+        <Field Name="Index">
+          <DataField>Index</DataField>
+        </Field>
+        <Field Name="IndexFormat">
+          <DataField>IndexFormat</DataField>
+        </Field>
+        <Field Name="SequenceCaption">
+          <DataField>SequenceCaption</DataField>
+        </Field>
+        <Field Name="NoCaption">
+          <DataField>NoCaption</DataField>
+        </Field>
+        <Field Name="NameCaption">
+          <DataField>NameCaption</DataField>
+        </Field>
+        <Field Name="SaleCaption">
+          <DataField>SaleCaption</DataField>
+        </Field>
+        <Field Name="BalanceCaption">
+          <DataField>BalanceCaption</DataField>
+        </Field>
+        <Field Name="ProfitCaption">
+          <DataField>ProfitCaption</DataField>
+        </Field>
+        <Field Name="ProfitPctCaption">
+          <DataField>ProfitPctCaption</DataField>
+        </Field>
+        <Field Name="LargestPctCaption">
+          <DataField>LargestPctCaption</DataField>
+        </Field>
+        <Field Name="ShareTotalCaption">
+          <DataField>ShareTotalCaption</DataField>
+        </Field>
+        <Field Name="PlacingLastYrCaption">
+          <DataField>PlacingLastYrCaption</DataField>
+        </Field>
+        <Field Name="DebVarBelCaption">
+          <DataField>DebVarBelCaption</DataField>
+        </Field>
+        <Field Name="IndexCaption">
+          <DataField>IndexCaption</DataField>
+        </Field>
+        <Field Name="LastYearCaption">
+          <DataField>LastYearCaption</DataField>
+        </Field>
+        <Field Name="IndexSaleCaption">
+          <DataField>IndexSaleCaption</DataField>
+        </Field>
+        <Field Name="IndexProfitCaption">
+          <DataField>IndexProfitCaption</DataField>
+        </Field>
+        <Field Name="ThisYearCaption">
+          <DataField>ThisYearCaption</DataField>
+        </Field>
+        <Field Name="TotalCaption">
+          <DataField>TotalCaption</DataField>
+        </Field>
+        <Field Name="SaleTotalCaption">
+          <DataField>SaleTotalCaption</DataField>
+        </Field>
+        <Field Name="SharePctCaption">
+          <DataField>SharePctCaption</DataField>
+        </Field>
+        <Field Name="PageCaption">
+          <DataField>PageCaption</DataField>
+        </Field>
+        <Field Name="Greyed">
+          <DataField>Greyed</DataField>
+        </Field>
+        <Field Name="CustSalesDKK">
+          <DataField>CustSalesDKK</DataField>
+        </Field>
+        <Field Name="CustSalesDKKFormat">
+          <DataField>CustSalesDKKFormat</DataField>
+        </Field>
+        <Field Name="SalesPct">
+          <DataField>SalesPct</DataField>
+        </Field>
+        <Field Name="SalesPctFormat">
+          <DataField>SalesPctFormat</DataField>
+        </Field>
+        <Field Name="CustBalanceDKK">
+          <DataField>CustBalanceDKK</DataField>
+        </Field>
+        <Field Name="CustBalanceDKKFormat">
+          <DataField>CustBalanceDKKFormat</DataField>
+        </Field>
+        <Field Name="DebSaldoDKKFooter">
+          <DataField>DebSaldoDKKFooter</DataField>
+        </Field>
+        <Field Name="DebSaldoDKKFooterFormat">
+          <DataField>DebSaldoDKKFooterFormat</DataField>
+        </Field>
+        <Field Name="BalancePct">
+          <DataField>BalancePct</DataField>
+        </Field>
+        <Field Name="BalancePctFormat">
+          <DataField>BalancePctFormat</DataField>
+        </Field>
+        <Field Name="CustProfitDKK">
+          <DataField>CustProfitDKK</DataField>
+        </Field>
+        <Field Name="CustProfitDKKFormat">
+          <DataField>CustProfitDKKFormat</DataField>
+        </Field>
+        <Field Name="AvancePct">
+          <DataField>AvancePct</DataField>
+        </Field>
+        <Field Name="AvancePctFormat">
+          <DataField>AvancePctFormat</DataField>
+        </Field>
+        <Field Name="CustSalesDKK1">
+          <DataField>CustSalesDKK1</DataField>
+        </Field>
+        <Field Name="CustSalesDKK1Format">
+          <DataField>CustSalesDKK1Format</DataField>
+        </Field>
+        <Field Name="Debitor1_Sales_LCY_">
+          <DataField>Debitor1_Sales_LCY_</DataField>
+        </Field>
+        <Field Name="Debitor1_Sales_LCY_Format">
+          <DataField>Debitor1_Sales_LCY_Format</DataField>
+        </Field>
+        <Field Name="SalesPct1">
+          <DataField>SalesPct1</DataField>
+        </Field>
+        <Field Name="SalesPct1Format">
+          <DataField>SalesPct1Format</DataField>
+        </Field>
+        <Field Name="CustProfitDKK1">
+          <DataField>CustProfitDKK1</DataField>
+        </Field>
+        <Field Name="CustProfitDKK1Format">
+          <DataField>CustProfitDKK1Format</DataField>
+        </Field>
+        <Field Name="Debitor1_Profit_LCY_">
+          <DataField>Debitor1_Profit_LCY_</DataField>
+        </Field>
+        <Field Name="Debitor1_Profit_LCY_Format">
+          <DataField>Debitor1_Profit_LCY_Format</DataField>
+        </Field>
+        <Field Name="AvancePct1">
+          <DataField>AvancePct1</DataField>
+        </Field>
+        <Field Name="AvancePct1Format">
+          <DataField>AvancePct1Format</DataField>
+        </Field>
+        <Field Name="IndexSales_1_">
+          <DataField>IndexSales_1_</DataField>
+        </Field>
+        <Field Name="IndexSales_1_Format">
+          <DataField>IndexSales_1_Format</DataField>
+        </Field>
+        <Field Name="IndexSales_2_">
+          <DataField>IndexSales_2_</DataField>
+        </Field>
+        <Field Name="IndexSales_2_Format">
+          <DataField>IndexSales_2_Format</DataField>
+        </Field>
+        <Field Name="IndexDB_1_">
+          <DataField>IndexDB_1_</DataField>
+        </Field>
+        <Field Name="IndexDB_1_Format">
+          <DataField>IndexDB_1_Format</DataField>
+        </Field>
+        <Field Name="IndexDB_2_">
+          <DataField>IndexDB_2_</DataField>
+        </Field>
+        <Field Name="IndexDB_2_Format">
+          <DataField>IndexDB_2_Format</DataField>
+        </Field>
+        <Field Name="TotalPct">
+          <DataField>TotalPct</DataField>
+        </Field>
+        <Field Name="TotalPctFormat">
+          <DataField>TotalPctFormat</DataField>
+        </Field>
+        <Field Name="Customer1SalesTotal">
+          <DataField>Customer1SalesTotal</DataField>
+        </Field>
+        <Field Name="Customer1SalesTotalFormat">
+          <DataField>Customer1SalesTotalFormat</DataField>
+        </Field>
+        <Field Name="Customer1ProfitTotal">
+          <DataField>Customer1ProfitTotal</DataField>
+        </Field>
+        <Field Name="Customer1ProfitTotalFormat">
+          <DataField>Customer1ProfitTotalFormat</DataField>
+        </Field>
+        <Field Name="Customer1BalanceTotal">
+          <DataField>Customer1BalanceTotal</DataField>
+        </Field>
+        <Field Name="Customer1BalanceTotalFormat">
+          <DataField>Customer1BalanceTotalFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

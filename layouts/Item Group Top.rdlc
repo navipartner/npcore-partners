@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,91 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="Picture_CompanyInformation">
-          <DataField>Picture_CompanyInformation</DataField>
-        </Field>
-        <Field Name="Number_Integer">
-          <DataField>Number_Integer</DataField>
-        </Field>
-        <Field Name="Code_DimensionValue">
-          <DataField>Code_DimensionValue</DataField>
-        </Field>
-        <Field Name="Name_DimensionValue">
-          <DataField>Name_DimensionValue</DataField>
-        </Field>
-        <Field Name="No_ItemGroup">
-          <DataField>No_ItemGroup</DataField>
-        </Field>
-        <Field Name="Description_ItemGroup">
-          <DataField>Description_ItemGroup</DataField>
-        </Field>
-        <Field Name="SalesQty_ItemGroup">
-          <DataField>SalesQty_ItemGroup</DataField>
-        </Field>
-        <Field Name="SalesQty_ItemGroupFormat">
-          <DataField>SalesQty_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="SaleLCY_ItemGroup">
-          <DataField>SaleLCY_ItemGroup</DataField>
-        </Field>
-        <Field Name="SaleLCY_ItemGroupFormat">
-          <DataField>SaleLCY_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="db">
-          <DataField>db</DataField>
-        </Field>
-        <Field Name="dbFormat">
-          <DataField>dbFormat</DataField>
-        </Field>
-        <Field Name="dg">
-          <DataField>dg</DataField>
-        </Field>
-        <Field Name="dgFormat">
-          <DataField>dgFormat</DataField>
-        </Field>
-        <Field Name="QtyOutside">
-          <DataField>QtyOutside</DataField>
-        </Field>
-        <Field Name="QtyOutsideFormat">
-          <DataField>QtyOutsideFormat</DataField>
-        </Field>
-        <Field Name="SalesOutside">
-          <DataField>SalesOutside</DataField>
-        </Field>
-        <Field Name="SalesOutsideFormat">
-          <DataField>SalesOutsideFormat</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="CurrReport_PAGENO">
-          <DataField>CurrReport_PAGENO</DataField>
-        </Field>
-        <Field Name="ObjectDetails">
-          <DataField>ObjectDetails</DataField>
-        </Field>
-        <Field Name="Sorting">
-          <DataField>Sorting</DataField>
-        </Field>
-        <Field Name="SortType">
-          <DataField>SortType</DataField>
-        </Field>
-        <Field Name="decsort">
-          <DataField>decsort</DataField>
-        </Field>
-        <Field Name="decsortFormat">
-          <DataField>decsortFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3618,4 +3533,83 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="Picture_CompanyInformation">
+          <DataField>Picture_CompanyInformation</DataField>
+        </Field>
+        <Field Name="Number_Integer">
+          <DataField>Number_Integer</DataField>
+        </Field>
+        <Field Name="Code_DimensionValue">
+          <DataField>Code_DimensionValue</DataField>
+        </Field>
+        <Field Name="Name_DimensionValue">
+          <DataField>Name_DimensionValue</DataField>
+        </Field>
+        <Field Name="No_ItemGroup">
+          <DataField>No_ItemGroup</DataField>
+        </Field>
+        <Field Name="Description_ItemGroup">
+          <DataField>Description_ItemGroup</DataField>
+        </Field>
+        <Field Name="SalesQty_ItemGroup">
+          <DataField>SalesQty_ItemGroup</DataField>
+        </Field>
+        <Field Name="SalesQty_ItemGroupFormat">
+          <DataField>SalesQty_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="SaleLCY_ItemGroup">
+          <DataField>SaleLCY_ItemGroup</DataField>
+        </Field>
+        <Field Name="SaleLCY_ItemGroupFormat">
+          <DataField>SaleLCY_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="db">
+          <DataField>db</DataField>
+        </Field>
+        <Field Name="dbFormat">
+          <DataField>dbFormat</DataField>
+        </Field>
+        <Field Name="dg">
+          <DataField>dg</DataField>
+        </Field>
+        <Field Name="dgFormat">
+          <DataField>dgFormat</DataField>
+        </Field>
+        <Field Name="QtyOutside">
+          <DataField>QtyOutside</DataField>
+        </Field>
+        <Field Name="QtyOutsideFormat">
+          <DataField>QtyOutsideFormat</DataField>
+        </Field>
+        <Field Name="SalesOutside">
+          <DataField>SalesOutside</DataField>
+        </Field>
+        <Field Name="SalesOutsideFormat">
+          <DataField>SalesOutsideFormat</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="Sorting">
+          <DataField>Sorting</DataField>
+        </Field>
+        <Field Name="SortType">
+          <DataField>SortType</DataField>
+        </Field>
+        <Field Name="decsort">
+          <DataField>decsort</DataField>
+        </Field>
+        <Field Name="decsortFormat">
+          <DataField>decsortFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

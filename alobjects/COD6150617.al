@@ -8,6 +8,8 @@ codeunit 6150617 "POS-Audit Roll Integration"
     // NPR5.39/MHA /20180202  CASE 302779 Deleted deprecated function OnAfterAuditRollPostingPostItemEntries()
     // NPR5.41/JDH /20180426 CASE 312644  Added indirect permissions to table Audit roll
     // NPR5.41/JDH /20180426 CASE 312935  When Data Import is triggered, a test record is inserted, to find out if there is autoincrement in the PK. This causes an error in subscriber OnInsertPOSUnitInsertRegister
+    // #361931/ALST/20190715 CASE 361931 removed MarkAuditRollPosted, PostItemEntries, OnClosingPOSPeriodRegisterPostItemEntries, SaleIsPostedInAuditRoll, POSEntryIsPostedInAuditRoll - unused
+    // #361931/ALST/20190715 CASE 361931 removed FindPOSEntryNo, TryOpenPOSUnit - unused
 
     Permissions = TableData "Audit Roll" = rimd;
 
@@ -21,104 +23,6 @@ codeunit 6150617 "POS-Audit Roll Integration"
         TextNotOpened: Label '%1 %2 not opened because of error:\ %3';
         PrefixExistingPostingTxt: Label 'OLD-';
         TextAllReadyPosted: Label '%1 %2 has allready been posted through %3 %4.';
-
-    local procedure PostItemEntries(POSEntryNo: Integer; POSTrigger: Option FinalizeSale,CloseRegister)
-    var
-        POSEntry: Record "POS Entry";
-        POSStore: Record "POS Store";
-        POSPostEntry: Codeunit "POS Post Entries";
-    begin
-        if POSEntryNo = 0 then
-            exit;
-        if not POSEntry.Get(POSEntryNo) then
-            exit;
-        if not POSStore.Get(POSEntry."POS Store Code") then
-            exit;
-        if POSEntry."Post Item Entry Status" in [POSEntry."Post Item Entry Status"::"Error while Posting", POSEntry."Post Item Entry Status"::"Not To Be Posted"] then
-            exit;
-        case POSTrigger of
-            POSTrigger::FinalizeSale:
-                if (POSStore."Item Posting" <> POSStore."Item Posting"::"Post On Finalize Sale") then
-                    exit;
-            POSTrigger::CloseRegister:
-                if (POSStore."Item Posting" <> POSStore."Item Posting"::"Post on Close Register") then
-                    exit;
-        end;
-
-        Clear(POSPostEntry);
-        POSPostEntry.SetPostItemEntries(true);
-        if not POSPostEntry.Run(POSEntry) then
-            exit;
-        if POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::Posted then
-            MarkAuditRollPosted(POSEntry);
-    end;
-
-    local procedure SaleIsPostedInAuditRoll(SalePOS: Record "Sale POS"): Boolean
-    var
-        AuditRoll: Record "Audit Roll";
-    begin
-        with AuditRoll do begin
-            SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-            SetRange("Register No.", SalePOS."Register No.");
-            SetRange("Sale Date", SalePOS.Date);
-            SetRange(Posted, true);
-            exit(FindFirst);
-        end;
-    end;
-
-    local procedure POSEntryIsPostedInAuditRoll(POSEntry: Record "POS Entry"): Boolean
-    var
-        AuditRoll: Record "Audit Roll";
-    begin
-        with AuditRoll do begin
-            SetRange("Sales Ticket No.", POSEntry."Document No.");
-            SetRange("Register No.", POSEntry."POS Unit No.");
-            SetRange("Sale Date", POSEntry."Entry Date");
-            SetRange(Posted, true);
-            exit(FindFirst);
-        end;
-    end;
-
-    local procedure FindPOSEntryNo(SalePOS: Record "Sale POS"): Integer
-    var
-        POSEntry: Record "POS Entry";
-    begin
-        with POSEntry do begin
-            SetRange("Document No.", SalePOS."Sales Ticket No.");
-            SetRange("POS Unit No.", SalePOS."Register No.");
-            SetRange("Entry Date", SalePOS.Date);
-            if FindFirst then
-                exit("Entry No.");
-        end;
-
-        exit(0);
-    end;
-
-    local procedure MarkAuditRollPosted(var POSEntry: Record "POS Entry")
-    var
-        AuditRolltoPOSEntryLink: Record "Audit Roll to POS Entry Link";
-        POSSalesLine: Record "POS Sales Line";
-        AuditRoll: Record "Audit Roll";
-    begin
-        AuditRolltoPOSEntryLink.Reset;
-        AuditRolltoPOSEntryLink.SetRange("Audit Roll Clustered Key");
-        Error('AL-Conversion: TODO #361931 - AL: COD6150617 "POS-Audit Roll Integration"-filter');
-
-        POSSalesLine.Reset;
-        POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        if POSSalesLine.FindSet then
-            repeat
-                AuditRolltoPOSEntryLink.SetRange("Line Type", POSSalesLine."Line No.");
-                if AuditRolltoPOSEntryLink.FindFirst then begin
-                    AuditRoll.SetRange("Clustered Key", AuditRolltoPOSEntryLink."Link Entry No.");
-                    if AuditRoll.FindFirst then begin
-                        AuditRoll.TestField("Item Entry Posted", false);
-                        AuditRoll.Validate("Item Entry Posted", true);
-                        AuditRoll.Modify;
-                    end;
-                end;
-            until POSSalesLine.Next = 0;
-    end;
 
     local procedure BatchCreatePOSEntryFromSalePOS()
     var
@@ -157,15 +61,6 @@ codeunit 6150617 "POS-Audit Roll Integration"
         if not POSCreateEntry.Run(SalePOS) then
             if ShowError then
                 Message(TextNotCreated, POSEntry.TableCaption, GetLastErrorText);
-    end;
-
-    local procedure TryOpenPOSUnit(var POSUnit: Record "POS Unit"; ShowErrorMessage: Boolean)
-    var
-        POSOpenPOSUnit: Codeunit "POS Manage POS Unit";
-    begin
-        if not POSOpenPOSUnit.Run(POSUnit) then
-            if ShowErrorMessage then
-                Message(TextNotOpened, POSUnit.TableCaption, POSUnit."No.", GetLastErrorText);
     end;
 
     local procedure OpenPOSUnit(var POSUnit: Record "POS Unit")
@@ -383,29 +278,6 @@ codeunit 6150617 "POS-Audit Roll Integration"
 
     local procedure "---Subscribers"()
     begin
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6150620, 'OnAfterValidateEvent', 'Closing Entry No.', true, true)]
-    local procedure OnClosingPOSPeriodRegisterPostItemEntries(var Rec: Record "POS Period Register"; var xRec: Record "POS Period Register"; CurrFieldNo: Integer)
-    var
-        POSEntry: Record "POS Entry";
-        POSStore: Record "POS Store";
-    begin
-        //-NPR5.38 [301600] //Moved to Codeunit POS Posting Control
-        // IF Rec."Closing Entry No." = 0 THEN
-        //  EXIT;
-        // IF NOT POSStore.GET(Rec."POS Store Code") THEN
-        //  EXIT;
-        // IF (POSStore."Item Posting" <> POSStore."Item Posting"::"Post on Close Register") THEN
-        //  EXIT;
-        // POSEntry.RESET;
-        // POSEntry.SETRANGE("Entry No.",Rec."Opening Entry No.",Rec."Closing Entry No.");
-        // POSEntry.SETRANGE("POS Unit No.",Rec."POS Unit No.");
-        // IF POSEntry.FINDSET THEN REPEAT
-        //  IF NOT POSEntryIsPostedInAuditRoll(POSEntry) THEN
-        //    PostItemEntries(POSEntry."Entry No.",1);
-        // UNTIL POSEntry.NEXT = 0;
-        //+NPR5.38 [301600]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150615, 'OnAfterInsertEvent', '', true, true)]

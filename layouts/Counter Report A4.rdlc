@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,379 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="ReportCaption">
-          <DataField>ReportCaption</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="ShortcutDimension1Code_AuditRoll">
-          <DataField>ShortcutDimension1Code_AuditRoll</DataField>
-        </Field>
-        <Field Name="RegisterNo_AuditRoll">
-          <DataField>RegisterNo_AuditRoll</DataField>
-        </Field>
-        <Field Name="SalesTicketNo_AuditRoll">
-          <DataField>SalesTicketNo_AuditRoll</DataField>
-        </Field>
-        <Field Name="OpeningHours_AuditRoll">
-          <DataField>OpeningHours_AuditRoll</DataField>
-        </Field>
-        <Field Name="TicketCount">
-          <DataField>TicketCount</DataField>
-        </Field>
-        <Field Name="Sales_Ticket_No_AuditRollCalc1">
-          <DataField>Sales_Ticket_No_AuditRollCalc1</DataField>
-        </Field>
-        <Field Name="Sales_Ticket_No_AuditRoll">
-          <DataField>Sales_Ticket_No_AuditRoll</DataField>
-        </Field>
-        <Field Name="SaleDate_AuditRoll">
-          <DataField>SaleDate_AuditRoll</DataField>
-        </Field>
-        <Field Name="Description_AuditRoll">
-          <DataField>Description_AuditRoll</DataField>
-        </Field>
-        <Field Name="OpeningCash">
-          <DataField>OpeningCash</DataField>
-        </Field>
-        <Field Name="OpeningCashFormat">
-          <DataField>OpeningCashFormat</DataField>
-        </Field>
-        <Field Name="RegisterMovement">
-          <DataField>RegisterMovement</DataField>
-        </Field>
-        <Field Name="RegisterMovementFormat">
-          <DataField>RegisterMovementFormat</DataField>
-        </Field>
-        <Field Name="RegisterMovementNeg">
-          <DataField>RegisterMovementNeg</DataField>
-        </Field>
-        <Field Name="RegisterMovementNegFormat">
-          <DataField>RegisterMovementNegFormat</DataField>
-        </Field>
-        <Field Name="TerminalCardMovement">
-          <DataField>TerminalCardMovement</DataField>
-        </Field>
-        <Field Name="TerminalCardMovementFormat">
-          <DataField>TerminalCardMovementFormat</DataField>
-        </Field>
-        <Field Name="TerminalCardMovementNeg">
-          <DataField>TerminalCardMovementNeg</DataField>
-        </Field>
-        <Field Name="TerminalCardMovementNegFormat">
-          <DataField>TerminalCardMovementNegFormat</DataField>
-        </Field>
-        <Field Name="Visa_DKMovement">
-          <DataField>Visa_DKMovement</DataField>
-        </Field>
-        <Field Name="Visa_DKMovementFormat">
-          <DataField>Visa_DKMovementFormat</DataField>
-        </Field>
-        <Field Name="Visa_DKMovementNeg">
-          <DataField>Visa_DKMovementNeg</DataField>
-        </Field>
-        <Field Name="Visa_DKMovementNegFormat">
-          <DataField>Visa_DKMovementNegFormat</DataField>
-        </Field>
-        <Field Name="OtherCardNetChange">
-          <DataField>OtherCardNetChange</DataField>
-        </Field>
-        <Field Name="OtherCardNetChangeFormat">
-          <DataField>OtherCardNetChangeFormat</DataField>
-        </Field>
-        <Field Name="OtherCardNetChangeNegative">
-          <DataField>OtherCardNetChangeNegative</DataField>
-        </Field>
-        <Field Name="OtherCardNetChangeNegativeFormat">
-          <DataField>OtherCardNetChangeNegativeFormat</DataField>
-        </Field>
-        <Field Name="UnknownCCMovement">
-          <DataField>UnknownCCMovement</DataField>
-        </Field>
-        <Field Name="UnknownCCMovementFormat">
-          <DataField>UnknownCCMovementFormat</DataField>
-        </Field>
-        <Field Name="UnknownCCMovementNeg">
-          <DataField>UnknownCCMovementNeg</DataField>
-        </Field>
-        <Field Name="UnknownCCMovementNegFormat">
-          <DataField>UnknownCCMovementNegFormat</DataField>
-        </Field>
-        <Field Name="GiftVoucherMovement">
-          <DataField>GiftVoucherMovement</DataField>
-        </Field>
-        <Field Name="GiftVoucherMovementFormat">
-          <DataField>GiftVoucherMovementFormat</DataField>
-        </Field>
-        <Field Name="GiftVoucherMovementNeg">
-          <DataField>GiftVoucherMovementNeg</DataField>
-        </Field>
-        <Field Name="GiftVoucherMovementNegFormat">
-          <DataField>GiftVoucherMovementNegFormat</DataField>
-        </Field>
-        <Field Name="CreditVoucherIn">
-          <DataField>CreditVoucherIn</DataField>
-        </Field>
-        <Field Name="CreditVoucherInFormat">
-          <DataField>CreditVoucherInFormat</DataField>
-        </Field>
-        <Field Name="CreditVoucherOut">
-          <DataField>CreditVoucherOut</DataField>
-        </Field>
-        <Field Name="CreditVoucherOutFormat">
-          <DataField>CreditVoucherOutFormat</DataField>
-        </Field>
-        <Field Name="MovementPos">
-          <DataField>MovementPos</DataField>
-        </Field>
-        <Field Name="MovementPosFormat">
-          <DataField>MovementPosFormat</DataField>
-        </Field>
-        <Field Name="MovementNeg">
-          <DataField>MovementNeg</DataField>
-        </Field>
-        <Field Name="MovementNegFormat">
-          <DataField>MovementNegFormat</DataField>
-        </Field>
-        <Field Name="TransferToBank">
-          <DataField>TransferToBank</DataField>
-        </Field>
-        <Field Name="TransferToBankFormat">
-          <DataField>TransferToBankFormat</DataField>
-        </Field>
-        <Field Name="NegCreditCardBalance">
-          <DataField>NegCreditCardBalance</DataField>
-        </Field>
-        <Field Name="NegCreditCardBalanceFormat">
-          <DataField>NegCreditCardBalanceFormat</DataField>
-        </Field>
-        <Field Name="CreditCardBalance">
-          <DataField>CreditCardBalance</DataField>
-        </Field>
-        <Field Name="CreditCardBalanceFormat">
-          <DataField>CreditCardBalanceFormat</DataField>
-        </Field>
-        <Field Name="CashDifference">
-          <DataField>CashDifference</DataField>
-        </Field>
-        <Field Name="CashDifferenceFormat">
-          <DataField>CashDifferenceFormat</DataField>
-        </Field>
-        <Field Name="ClosingCash_AuditRoll">
-          <DataField>ClosingCash_AuditRoll</DataField>
-        </Field>
-        <Field Name="ClosingCash_AuditRollFormat">
-          <DataField>ClosingCash_AuditRollFormat</DataField>
-        </Field>
-        <Field Name="BalancePos">
-          <DataField>BalancePos</DataField>
-        </Field>
-        <Field Name="BalancePosFormat">
-          <DataField>BalancePosFormat</DataField>
-        </Field>
-        <Field Name="BalanceNeg">
-          <DataField>BalanceNeg</DataField>
-        </Field>
-        <Field Name="BalanceNegFormat">
-          <DataField>BalanceNegFormat</DataField>
-        </Field>
-        <Field Name="GrossTurnover">
-          <DataField>GrossTurnover</DataField>
-        </Field>
-        <Field Name="GrossTurnoverFormat">
-          <DataField>GrossTurnoverFormat</DataField>
-        </Field>
-        <Field Name="DebitSaleCaption">
-          <DataField>DebitSaleCaption</DataField>
-        </Field>
-        <Field Name="DebitSale">
-          <DataField>DebitSale</DataField>
-        </Field>
-        <Field Name="DebitSaleFormat">
-          <DataField>DebitSaleFormat</DataField>
-        </Field>
-        <Field Name="PaymentsCaption">
-          <DataField>PaymentsCaption</DataField>
-        </Field>
-        <Field Name="CustomerDeposits">
-          <DataField>CustomerDeposits</DataField>
-        </Field>
-        <Field Name="CustomerDepositsFormat">
-          <DataField>CustomerDepositsFormat</DataField>
-        </Field>
-        <Field Name="WithdrawalsCaption">
-          <DataField>WithdrawalsCaption</DataField>
-        </Field>
-        <Field Name="PayOut_GlobalPeriod">
-          <DataField>PayOut_GlobalPeriod</DataField>
-        </Field>
-        <Field Name="PayOut_GlobalPeriodFormat">
-          <DataField>PayOut_GlobalPeriodFormat</DataField>
-        </Field>
-        <Field Name="NetTurnover">
-          <DataField>NetTurnover</DataField>
-        </Field>
-        <Field Name="NetTurnoverFormat">
-          <DataField>NetTurnoverFormat</DataField>
-        </Field>
-        <Field Name="ItemCost">
-          <DataField>ItemCost</DataField>
-        </Field>
-        <Field Name="ItemCostFormat">
-          <DataField>ItemCostFormat</DataField>
-        </Field>
-        <Field Name="Profit_LCY">
-          <DataField>Profit_LCY</DataField>
-        </Field>
-        <Field Name="Profit_LCYFormat">
-          <DataField>Profit_LCYFormat</DataField>
-        </Field>
-        <Field Name="CoverageAmt">
-          <DataField>CoverageAmt</DataField>
-        </Field>
-        <Field Name="CoverageAmtFormat">
-          <DataField>CoverageAmtFormat</DataField>
-        </Field>
-        <Field Name="CampaignDiscount">
-          <DataField>CampaignDiscount</DataField>
-        </Field>
-        <Field Name="CampaignDiscountFormat">
-          <DataField>CampaignDiscountFormat</DataField>
-        </Field>
-        <Field Name="CampaignDiscountPct">
-          <DataField>CampaignDiscountPct</DataField>
-        </Field>
-        <Field Name="CampaignDiscountPctFormat">
-          <DataField>CampaignDiscountPctFormat</DataField>
-        </Field>
-        <Field Name="QuantityDiscount">
-          <DataField>QuantityDiscount</DataField>
-        </Field>
-        <Field Name="QuantityDiscountFormat">
-          <DataField>QuantityDiscountFormat</DataField>
-        </Field>
-        <Field Name="QuantityDiscountPct">
-          <DataField>QuantityDiscountPct</DataField>
-        </Field>
-        <Field Name="QuantityDiscountPctFormat">
-          <DataField>QuantityDiscountPctFormat</DataField>
-        </Field>
-        <Field Name="MixDiscount">
-          <DataField>MixDiscount</DataField>
-        </Field>
-        <Field Name="MixDiscountFormat">
-          <DataField>MixDiscountFormat</DataField>
-        </Field>
-        <Field Name="MixDiscountPct">
-          <DataField>MixDiscountPct</DataField>
-        </Field>
-        <Field Name="MixDiscountPctFormat">
-          <DataField>MixDiscountPctFormat</DataField>
-        </Field>
-        <Field Name="ManualDiscount">
-          <DataField>ManualDiscount</DataField>
-        </Field>
-        <Field Name="ManualDiscountFormat">
-          <DataField>ManualDiscountFormat</DataField>
-        </Field>
-        <Field Name="ManualDiscountPct">
-          <DataField>ManualDiscountPct</DataField>
-        </Field>
-        <Field Name="ManualDiscountPctFormat">
-          <DataField>ManualDiscountPctFormat</DataField>
-        </Field>
-        <Field Name="TotalDiscount">
-          <DataField>TotalDiscount</DataField>
-        </Field>
-        <Field Name="TotalDiscountFormat">
-          <DataField>TotalDiscountFormat</DataField>
-        </Field>
-        <Field Name="TotalDiscountPct">
-          <DataField>TotalDiscountPct</DataField>
-        </Field>
-        <Field Name="TotalDiscountPctFormat">
-          <DataField>TotalDiscountPctFormat</DataField>
-        </Field>
-        <Field Name="No_PaymentTypePOS">
-          <DataField>No_PaymentTypePOS</DataField>
-        </Field>
-        <Field Name="RegisterNo_PaymentTypePOS">
-          <DataField>RegisterNo_PaymentTypePOS</DataField>
-        </Field>
-        <Field Name="RegisterFilterText">
-          <DataField>RegisterFilterText</DataField>
-        </Field>
-        <Field Name="Description_PaymentTypePOS">
-          <DataField>Description_PaymentTypePOS</DataField>
-        </Field>
-        <Field Name="Amountinauditroll_PaymentTypePOS">
-          <DataField>Amountinauditroll_PaymentTypePOS</DataField>
-        </Field>
-        <Field Name="Amountinauditroll_PaymentTypePOSFormat">
-          <DataField>Amountinauditroll_PaymentTypePOSFormat</DataField>
-        </Field>
-        <Field Name="No_GLAccount">
-          <DataField>No_GLAccount</DataField>
-        </Field>
-        <Field Name="Name_GLAccount">
-          <DataField>Name_GLAccount</DataField>
-        </Field>
-        <Field Name="GLEntryInAuditRoll_GLAccount">
-          <DataField>GLEntryInAuditRoll_GLAccount</DataField>
-        </Field>
-        <Field Name="GLEntryInAuditRoll_GLAccountFormat">
-          <DataField>GLEntryInAuditRoll_GLAccountFormat</DataField>
-        </Field>
-        <Field Name="NameNo_PaymentTypePOS">
-          <DataField>NameNo_PaymentTypePOS</DataField>
-        </Field>
-        <Field Name="SalesTicketNo_AuditRollReturnSale">
-          <DataField>SalesTicketNo_AuditRollReturnSale</DataField>
-        </Field>
-        <Field Name="ReturnTicketTotal">
-          <DataField>ReturnTicketTotal</DataField>
-        </Field>
-        <Field Name="AmountIncludingVAT_AuditRollReturnSale">
-          <DataField>AmountIncludingVAT_AuditRollReturnSale</DataField>
-        </Field>
-        <Field Name="AmountIncludingVAT_AuditRollReturnSaleFormat">
-          <DataField>AmountIncludingVAT_AuditRollReturnSaleFormat</DataField>
-        </Field>
-        <Field Name="No_PaymenTypeCounting">
-          <DataField>No_PaymenTypeCounting</DataField>
-        </Field>
-        <Field Name="Description_PaymentTypeCounting">
-          <DataField>Description_PaymentTypeCounting</DataField>
-        </Field>
-        <Field Name="SalesTicketNo_PeriodLine">
-          <DataField>SalesTicketNo_PeriodLine</DataField>
-        </Field>
-        <Field Name="Weight_PeriodLine">
-          <DataField>Weight_PeriodLine</DataField>
-        </Field>
-        <Field Name="Weight_PeriodLineFormat">
-          <DataField>Weight_PeriodLineFormat</DataField>
-        </Field>
-        <Field Name="Qty_PeriodLine">
-          <DataField>Qty_PeriodLine</DataField>
-        </Field>
-        <Field Name="Amount_PeriodLine">
-          <DataField>Amount_PeriodLine</DataField>
-        </Field>
-        <Field Name="Amount_PeriodLineFormat">
-          <DataField>Amount_PeriodLineFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -13459,4 +13086,377 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="ReportCaption">
+          <DataField>ReportCaption</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="ShortcutDimension1Code_AuditRoll">
+          <DataField>ShortcutDimension1Code_AuditRoll</DataField>
+        </Field>
+        <Field Name="RegisterNo_AuditRoll">
+          <DataField>RegisterNo_AuditRoll</DataField>
+        </Field>
+        <Field Name="SalesTicketNo_AuditRoll">
+          <DataField>SalesTicketNo_AuditRoll</DataField>
+        </Field>
+        <Field Name="OpeningHours_AuditRoll">
+          <DataField>OpeningHours_AuditRoll</DataField>
+        </Field>
+        <Field Name="TicketCount">
+          <DataField>TicketCount</DataField>
+        </Field>
+        <Field Name="Sales_Ticket_No_AuditRollCalc1">
+          <DataField>Sales_Ticket_No_AuditRollCalc1</DataField>
+        </Field>
+        <Field Name="Sales_Ticket_No_AuditRoll">
+          <DataField>Sales_Ticket_No_AuditRoll</DataField>
+        </Field>
+        <Field Name="SaleDate_AuditRoll">
+          <DataField>SaleDate_AuditRoll</DataField>
+        </Field>
+        <Field Name="Description_AuditRoll">
+          <DataField>Description_AuditRoll</DataField>
+        </Field>
+        <Field Name="OpeningCash">
+          <DataField>OpeningCash</DataField>
+        </Field>
+        <Field Name="OpeningCashFormat">
+          <DataField>OpeningCashFormat</DataField>
+        </Field>
+        <Field Name="RegisterMovement">
+          <DataField>RegisterMovement</DataField>
+        </Field>
+        <Field Name="RegisterMovementFormat">
+          <DataField>RegisterMovementFormat</DataField>
+        </Field>
+        <Field Name="RegisterMovementNeg">
+          <DataField>RegisterMovementNeg</DataField>
+        </Field>
+        <Field Name="RegisterMovementNegFormat">
+          <DataField>RegisterMovementNegFormat</DataField>
+        </Field>
+        <Field Name="TerminalCardMovement">
+          <DataField>TerminalCardMovement</DataField>
+        </Field>
+        <Field Name="TerminalCardMovementFormat">
+          <DataField>TerminalCardMovementFormat</DataField>
+        </Field>
+        <Field Name="TerminalCardMovementNeg">
+          <DataField>TerminalCardMovementNeg</DataField>
+        </Field>
+        <Field Name="TerminalCardMovementNegFormat">
+          <DataField>TerminalCardMovementNegFormat</DataField>
+        </Field>
+        <Field Name="Visa_DKMovement">
+          <DataField>Visa_DKMovement</DataField>
+        </Field>
+        <Field Name="Visa_DKMovementFormat">
+          <DataField>Visa_DKMovementFormat</DataField>
+        </Field>
+        <Field Name="Visa_DKMovementNeg">
+          <DataField>Visa_DKMovementNeg</DataField>
+        </Field>
+        <Field Name="Visa_DKMovementNegFormat">
+          <DataField>Visa_DKMovementNegFormat</DataField>
+        </Field>
+        <Field Name="OtherCardNetChange">
+          <DataField>OtherCardNetChange</DataField>
+        </Field>
+        <Field Name="OtherCardNetChangeFormat">
+          <DataField>OtherCardNetChangeFormat</DataField>
+        </Field>
+        <Field Name="OtherCardNetChangeNegative">
+          <DataField>OtherCardNetChangeNegative</DataField>
+        </Field>
+        <Field Name="OtherCardNetChangeNegativeFormat">
+          <DataField>OtherCardNetChangeNegativeFormat</DataField>
+        </Field>
+        <Field Name="UnknownCCMovement">
+          <DataField>UnknownCCMovement</DataField>
+        </Field>
+        <Field Name="UnknownCCMovementFormat">
+          <DataField>UnknownCCMovementFormat</DataField>
+        </Field>
+        <Field Name="UnknownCCMovementNeg">
+          <DataField>UnknownCCMovementNeg</DataField>
+        </Field>
+        <Field Name="UnknownCCMovementNegFormat">
+          <DataField>UnknownCCMovementNegFormat</DataField>
+        </Field>
+        <Field Name="GiftVoucherMovement">
+          <DataField>GiftVoucherMovement</DataField>
+        </Field>
+        <Field Name="GiftVoucherMovementFormat">
+          <DataField>GiftVoucherMovementFormat</DataField>
+        </Field>
+        <Field Name="GiftVoucherMovementNeg">
+          <DataField>GiftVoucherMovementNeg</DataField>
+        </Field>
+        <Field Name="GiftVoucherMovementNegFormat">
+          <DataField>GiftVoucherMovementNegFormat</DataField>
+        </Field>
+        <Field Name="CreditVoucherIn">
+          <DataField>CreditVoucherIn</DataField>
+        </Field>
+        <Field Name="CreditVoucherInFormat">
+          <DataField>CreditVoucherInFormat</DataField>
+        </Field>
+        <Field Name="CreditVoucherOut">
+          <DataField>CreditVoucherOut</DataField>
+        </Field>
+        <Field Name="CreditVoucherOutFormat">
+          <DataField>CreditVoucherOutFormat</DataField>
+        </Field>
+        <Field Name="MovementPos">
+          <DataField>MovementPos</DataField>
+        </Field>
+        <Field Name="MovementPosFormat">
+          <DataField>MovementPosFormat</DataField>
+        </Field>
+        <Field Name="MovementNeg">
+          <DataField>MovementNeg</DataField>
+        </Field>
+        <Field Name="MovementNegFormat">
+          <DataField>MovementNegFormat</DataField>
+        </Field>
+        <Field Name="TransferToBank">
+          <DataField>TransferToBank</DataField>
+        </Field>
+        <Field Name="TransferToBankFormat">
+          <DataField>TransferToBankFormat</DataField>
+        </Field>
+        <Field Name="NegCreditCardBalance">
+          <DataField>NegCreditCardBalance</DataField>
+        </Field>
+        <Field Name="NegCreditCardBalanceFormat">
+          <DataField>NegCreditCardBalanceFormat</DataField>
+        </Field>
+        <Field Name="CreditCardBalance">
+          <DataField>CreditCardBalance</DataField>
+        </Field>
+        <Field Name="CreditCardBalanceFormat">
+          <DataField>CreditCardBalanceFormat</DataField>
+        </Field>
+        <Field Name="CashDifference">
+          <DataField>CashDifference</DataField>
+        </Field>
+        <Field Name="CashDifferenceFormat">
+          <DataField>CashDifferenceFormat</DataField>
+        </Field>
+        <Field Name="ClosingCash_AuditRoll">
+          <DataField>ClosingCash_AuditRoll</DataField>
+        </Field>
+        <Field Name="ClosingCash_AuditRollFormat">
+          <DataField>ClosingCash_AuditRollFormat</DataField>
+        </Field>
+        <Field Name="BalancePos">
+          <DataField>BalancePos</DataField>
+        </Field>
+        <Field Name="BalancePosFormat">
+          <DataField>BalancePosFormat</DataField>
+        </Field>
+        <Field Name="BalanceNeg">
+          <DataField>BalanceNeg</DataField>
+        </Field>
+        <Field Name="BalanceNegFormat">
+          <DataField>BalanceNegFormat</DataField>
+        </Field>
+        <Field Name="GrossTurnover">
+          <DataField>GrossTurnover</DataField>
+        </Field>
+        <Field Name="GrossTurnoverFormat">
+          <DataField>GrossTurnoverFormat</DataField>
+        </Field>
+        <Field Name="DebitSaleCaption">
+          <DataField>DebitSaleCaption</DataField>
+        </Field>
+        <Field Name="DebitSale">
+          <DataField>DebitSale</DataField>
+        </Field>
+        <Field Name="DebitSaleFormat">
+          <DataField>DebitSaleFormat</DataField>
+        </Field>
+        <Field Name="PaymentsCaption">
+          <DataField>PaymentsCaption</DataField>
+        </Field>
+        <Field Name="CustomerDeposits">
+          <DataField>CustomerDeposits</DataField>
+        </Field>
+        <Field Name="CustomerDepositsFormat">
+          <DataField>CustomerDepositsFormat</DataField>
+        </Field>
+        <Field Name="WithdrawalsCaption">
+          <DataField>WithdrawalsCaption</DataField>
+        </Field>
+        <Field Name="PayOut_GlobalPeriod">
+          <DataField>PayOut_GlobalPeriod</DataField>
+        </Field>
+        <Field Name="PayOut_GlobalPeriodFormat">
+          <DataField>PayOut_GlobalPeriodFormat</DataField>
+        </Field>
+        <Field Name="NetTurnover">
+          <DataField>NetTurnover</DataField>
+        </Field>
+        <Field Name="NetTurnoverFormat">
+          <DataField>NetTurnoverFormat</DataField>
+        </Field>
+        <Field Name="ItemCost">
+          <DataField>ItemCost</DataField>
+        </Field>
+        <Field Name="ItemCostFormat">
+          <DataField>ItemCostFormat</DataField>
+        </Field>
+        <Field Name="Profit_LCY">
+          <DataField>Profit_LCY</DataField>
+        </Field>
+        <Field Name="Profit_LCYFormat">
+          <DataField>Profit_LCYFormat</DataField>
+        </Field>
+        <Field Name="CoverageAmt">
+          <DataField>CoverageAmt</DataField>
+        </Field>
+        <Field Name="CoverageAmtFormat">
+          <DataField>CoverageAmtFormat</DataField>
+        </Field>
+        <Field Name="CampaignDiscount">
+          <DataField>CampaignDiscount</DataField>
+        </Field>
+        <Field Name="CampaignDiscountFormat">
+          <DataField>CampaignDiscountFormat</DataField>
+        </Field>
+        <Field Name="CampaignDiscountPct">
+          <DataField>CampaignDiscountPct</DataField>
+        </Field>
+        <Field Name="CampaignDiscountPctFormat">
+          <DataField>CampaignDiscountPctFormat</DataField>
+        </Field>
+        <Field Name="QuantityDiscount">
+          <DataField>QuantityDiscount</DataField>
+        </Field>
+        <Field Name="QuantityDiscountFormat">
+          <DataField>QuantityDiscountFormat</DataField>
+        </Field>
+        <Field Name="QuantityDiscountPct">
+          <DataField>QuantityDiscountPct</DataField>
+        </Field>
+        <Field Name="QuantityDiscountPctFormat">
+          <DataField>QuantityDiscountPctFormat</DataField>
+        </Field>
+        <Field Name="MixDiscount">
+          <DataField>MixDiscount</DataField>
+        </Field>
+        <Field Name="MixDiscountFormat">
+          <DataField>MixDiscountFormat</DataField>
+        </Field>
+        <Field Name="MixDiscountPct">
+          <DataField>MixDiscountPct</DataField>
+        </Field>
+        <Field Name="MixDiscountPctFormat">
+          <DataField>MixDiscountPctFormat</DataField>
+        </Field>
+        <Field Name="ManualDiscount">
+          <DataField>ManualDiscount</DataField>
+        </Field>
+        <Field Name="ManualDiscountFormat">
+          <DataField>ManualDiscountFormat</DataField>
+        </Field>
+        <Field Name="ManualDiscountPct">
+          <DataField>ManualDiscountPct</DataField>
+        </Field>
+        <Field Name="ManualDiscountPctFormat">
+          <DataField>ManualDiscountPctFormat</DataField>
+        </Field>
+        <Field Name="TotalDiscount">
+          <DataField>TotalDiscount</DataField>
+        </Field>
+        <Field Name="TotalDiscountFormat">
+          <DataField>TotalDiscountFormat</DataField>
+        </Field>
+        <Field Name="TotalDiscountPct">
+          <DataField>TotalDiscountPct</DataField>
+        </Field>
+        <Field Name="TotalDiscountPctFormat">
+          <DataField>TotalDiscountPctFormat</DataField>
+        </Field>
+        <Field Name="No_PaymentTypePOS">
+          <DataField>No_PaymentTypePOS</DataField>
+        </Field>
+        <Field Name="RegisterNo_PaymentTypePOS">
+          <DataField>RegisterNo_PaymentTypePOS</DataField>
+        </Field>
+        <Field Name="RegisterFilterText">
+          <DataField>RegisterFilterText</DataField>
+        </Field>
+        <Field Name="Description_PaymentTypePOS">
+          <DataField>Description_PaymentTypePOS</DataField>
+        </Field>
+        <Field Name="Amountinauditroll_PaymentTypePOS">
+          <DataField>Amountinauditroll_PaymentTypePOS</DataField>
+        </Field>
+        <Field Name="Amountinauditroll_PaymentTypePOSFormat">
+          <DataField>Amountinauditroll_PaymentTypePOSFormat</DataField>
+        </Field>
+        <Field Name="No_GLAccount">
+          <DataField>No_GLAccount</DataField>
+        </Field>
+        <Field Name="Name_GLAccount">
+          <DataField>Name_GLAccount</DataField>
+        </Field>
+        <Field Name="GLEntryInAuditRoll_GLAccount">
+          <DataField>GLEntryInAuditRoll_GLAccount</DataField>
+        </Field>
+        <Field Name="GLEntryInAuditRoll_GLAccountFormat">
+          <DataField>GLEntryInAuditRoll_GLAccountFormat</DataField>
+        </Field>
+        <Field Name="NameNo_PaymentTypePOS">
+          <DataField>NameNo_PaymentTypePOS</DataField>
+        </Field>
+        <Field Name="SalesTicketNo_AuditRollReturnSale">
+          <DataField>SalesTicketNo_AuditRollReturnSale</DataField>
+        </Field>
+        <Field Name="ReturnTicketTotal">
+          <DataField>ReturnTicketTotal</DataField>
+        </Field>
+        <Field Name="AmountIncludingVAT_AuditRollReturnSale">
+          <DataField>AmountIncludingVAT_AuditRollReturnSale</DataField>
+        </Field>
+        <Field Name="AmountIncludingVAT_AuditRollReturnSaleFormat">
+          <DataField>AmountIncludingVAT_AuditRollReturnSaleFormat</DataField>
+        </Field>
+        <Field Name="No_PaymenTypeCounting">
+          <DataField>No_PaymenTypeCounting</DataField>
+        </Field>
+        <Field Name="Description_PaymentTypeCounting">
+          <DataField>Description_PaymentTypeCounting</DataField>
+        </Field>
+        <Field Name="SalesTicketNo_PeriodLine">
+          <DataField>SalesTicketNo_PeriodLine</DataField>
+        </Field>
+        <Field Name="Weight_PeriodLine">
+          <DataField>Weight_PeriodLine</DataField>
+        </Field>
+        <Field Name="Weight_PeriodLineFormat">
+          <DataField>Weight_PeriodLineFormat</DataField>
+        </Field>
+        <Field Name="Qty_PeriodLine">
+          <DataField>Qty_PeriodLine</DataField>
+        </Field>
+        <Field Name="Amount_PeriodLine">
+          <DataField>Amount_PeriodLine</DataField>
+        </Field>
+        <Field Name="Amount_PeriodLineFormat">
+          <DataField>Amount_PeriodLineFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>
