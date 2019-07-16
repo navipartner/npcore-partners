@@ -1,4 +1,4 @@
-pageextension 50213 pageextension50213 extends "Item Card" 
+pageextension 50213 pageextension50213 extends "Item Card"
 {
     // VRT1.00/JDH /20150304 CASE 201022 Variety Page Added + Fields + shortcut to Matrix under button Item
     // NPR4.10/TSA /20150422 CASE 209946 - Shortcut Attributes
@@ -18,50 +18,50 @@ pageextension 50213 pageextension50213 extends "Item Card"
     {
         addafter(Description)
         {
-            field("Description 2";"Description 2")
+            field("Description 2"; "Description 2")
             {
             }
         }
-        addafter(Control1907509201)
+        addafter("Prices & Sales")
         {
             group(Variety)
             {
                 Caption = 'Variety';
-                field("Variety Group";"Variety Group")
+                field("Variety Group"; "Variety Group")
                 {
                 }
-                field("Variety 1";"Variety 1")
+                field("Variety 1"; "Variety 1")
                 {
                 }
-                field("Variety 1 Table";"Variety 1 Table")
+                field("Variety 1 Table"; "Variety 1 Table")
                 {
                 }
-                field("Variety 2";"Variety 2")
+                field("Variety 2"; "Variety 2")
                 {
                 }
-                field("Variety 2 Table";"Variety 2 Table")
+                field("Variety 2 Table"; "Variety 2 Table")
                 {
                 }
-                field("Variety 3";"Variety 3")
+                field("Variety 3"; "Variety 3")
                 {
                 }
-                field("Variety 3 Table";"Variety 3 Table")
+                field("Variety 3 Table"; "Variety 3 Table")
                 {
                 }
-                field("Variety 4";"Variety 4")
+                field("Variety 4"; "Variety 4")
                 {
                 }
-                field("Variety 4 Table";"Variety 4 Table")
+                field("Variety 4 Table"; "Variety 4 Table")
                 {
                 }
-                field("Cross Variety No.";"Cross Variety No.")
+                field("Cross Variety No."; "Cross Variety No.")
                 {
                 }
             }
             group("Extra Fields")
             {
                 Caption = 'Extra Fields';
-                field(NPRAttrTextArray_01;NPRAttrTextArray[1])
+                field(NPRAttrTextArray_01; NPRAttrTextArray[1])
                 {
                     CaptionClass = '6014555,27,1,2';
                     Editable = NPRAttrEditable;
@@ -69,10 +69,10 @@ pageextension 50213 pageextension50213 extends "Item Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 1, "No.", NPRAttrTextArray[1]);
                     end;
                 }
-                field(NPRAttrTextArray_02;NPRAttrTextArray[2])
+                field(NPRAttrTextArray_02; NPRAttrTextArray[2])
                 {
                     CaptionClass = '6014555,27,2,2';
                     Editable = NPRAttrEditable;
@@ -80,10 +80,10 @@ pageextension 50213 pageextension50213 extends "Item Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 2, "No.", NPRAttrTextArray[2]);
                     end;
                 }
-                field(NPRAttrTextArray_03;NPRAttrTextArray[3])
+                field(NPRAttrTextArray_03; NPRAttrTextArray[3])
                 {
                     CaptionClass = '6014555,27,3,2';
                     Editable = NPRAttrEditable;
@@ -91,10 +91,10 @@ pageextension 50213 pageextension50213 extends "Item Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 3, "No.", NPRAttrTextArray[3]);
                     end;
                 }
-                field(NPRAttrTextArray_04;NPRAttrTextArray[4])
+                field(NPRAttrTextArray_04; NPRAttrTextArray[4])
                 {
                     CaptionClass = '6014555,27,4,2';
                     Editable = NPRAttrEditable;
@@ -102,10 +102,10 @@ pageextension 50213 pageextension50213 extends "Item Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 4, "No.", NPRAttrTextArray[4]);
                     end;
                 }
-                field(NPRAttrTextArray_05;NPRAttrTextArray[5])
+                field(NPRAttrTextArray_05; NPRAttrTextArray[5])
                 {
                     CaptionClass = '6014555,27,5,2';
                     Editable = NPRAttrEditable;
@@ -113,10 +113,10 @@ pageextension 50213 pageextension50213 extends "Item Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 5, "No.", NPRAttrTextArray[5]);
                     end;
                 }
-                field(NPRAttrTextArray_06;NPRAttrTextArray[6])
+                field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
                     CaptionClass = '6014555,27,6,2';
                     Editable = NPRAttrEditable;
@@ -124,10 +124,10 @@ pageextension 50213 pageextension50213 extends "Item Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 6, "No.", NPRAttrTextArray[6]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 6, "No.", NPRAttrTextArray[6]);
                     end;
                 }
-                field(NPRAttrTextArray_07;NPRAttrTextArray[7])
+                field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
                     CaptionClass = '6014555,27,7,2';
                     Editable = NPRAttrEditable;
@@ -135,10 +135,10 @@ pageextension 50213 pageextension50213 extends "Item Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 7, "No.", NPRAttrTextArray[7]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 7, "No.", NPRAttrTextArray[7]);
                     end;
                 }
-                field(NPRAttrTextArray_08;NPRAttrTextArray[8])
+                field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
                     CaptionClass = '6014555,27,8,2';
                     Editable = NPRAttrEditable;
@@ -146,10 +146,10 @@ pageextension 50213 pageextension50213 extends "Item Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 8, "No.", NPRAttrTextArray[8]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 8, "No.", NPRAttrTextArray[8]);
                     end;
                 }
-                field(NPRAttrTextArray_09;NPRAttrTextArray[9])
+                field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
                     CaptionClass = '6014555,27,9,2';
                     Editable = NPRAttrEditable;
@@ -157,10 +157,10 @@ pageextension 50213 pageextension50213 extends "Item Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 9, "No.", NPRAttrTextArray[9]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 9, "No.", NPRAttrTextArray[9]);
                     end;
                 }
-                field(NPRAttrTextArray_10;NPRAttrTextArray[10])
+                field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
                     CaptionClass = '6014555,27,10,2';
                     Editable = NPRAttrEditable;
@@ -168,7 +168,7 @@ pageextension 50213 pageextension50213 extends "Item Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Item, 10, "No.", NPRAttrTextArray[10]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Item, 10, "No.", NPRAttrTextArray[10]);
                     end;
                 }
             }
@@ -205,10 +205,10 @@ pageextension 50213 pageextension50213 extends "Item Card"
     }
 
     var
-        NPRAttrTextArray: array [40] of Text;
+        NPRAttrTextArray: array[40] of Text;
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
-        NPRAttrVisibleArray: array [40] of Boolean;
+        NPRAttrVisibleArray: array[40] of Boolean;
         NPRAttrVisible01: Boolean;
         NPRAttrVisible02: Boolean;
         NPRAttrVisible03: Boolean;
@@ -221,33 +221,33 @@ pageextension 50213 pageextension50213 extends "Item Card"
         NPRAttrVisible10: Boolean;
 
 
-    //Unsupported feature: Code Insertion on "OnAfterGetRecord".
+        //Unsupported feature: Code Insertion on "OnAfterGetRecord".
 
-    //trigger OnAfterGetRecord()
-    //begin
+        //trigger OnAfterGetRecord()
+        //begin
         /*
         //-NPR4.11
         NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Item, "No.");
         NPRAttrEditable := CurrPage.Editable ();
         //+NPR4.11
         */
-    //end;
+        //end;
 
 
-    //Unsupported feature: Code Modification on "OnOpenPage".
+        //Unsupported feature: Code Modification on "OnOpenPage".
 
-    //trigger OnOpenPage()
-    //>>>> ORIGINAL CODE:
-    //begin
+        //trigger OnOpenPage()
+        //>>>> ORIGINAL CODE:
+        //begin
         /*
         IsFoundationEnabled := ApplicationAreaMgmtFacade.IsFoundationEnabled;
         EnableControls;
         SetNoFieldVisible;
         IsSaaS := PermissionManager.SoftwareAsAService;
         */
-    //end;
-    //>>>> MODIFIED CODE:
-    //begin
+        //end;
+        //>>>> MODIFIED CODE:
+        //begin
         /*
         //-NPR4.11
         NPRAttrManagement.GetAttributeVisibility (DATABASE::Item, NPRAttrVisibleArray);
@@ -267,6 +267,6 @@ pageextension 50213 pageextension50213 extends "Item Card"
 
         #1..4
         */
-    //end;
+        //end;
 }
 
