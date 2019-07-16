@@ -46,6 +46,7 @@ page 6014511 "Retail Item List"
     // NPR5.48/TJ  /20190102 CASE 340615 Removed field "Product Group Code"
     // NPR5.48/TS  /20180104 CASE 338609 Added Shortcut Ctrl+Alt+L to Price Label
     // NPR5.50/JAVA/20190429 CASE 353381 BC14: Implement changes done in page 542 (use generic SetMultiRecord() function instead of specific functions).
+    // #361229/ZESO/20190708 CASE 361229 Added Page Action Attributes and Factbox Item Attributes
 
     Caption = 'Item List';
     CardPageID = "Retail Item Card";
@@ -427,6 +428,10 @@ page 6014511 "Retail Item List"
                 Caption = 'Discounts';
                 SubPageLink = "No."=FIELD("No.");
             }
+            part(ItemAttributesFactBox;"Item Attributes Factbox")
+            {
+                ApplicationArea = Basic,Suite;
+            }
             systempart(Control1900383207;Links)
             {
                 Visible = true;
@@ -566,6 +571,26 @@ page 6014511 "Retail Item List"
                     Image = UnitOfMeasure;
                     RunObject = Page "Item Units of Measure";
                     RunPageLink = "Item No."=FIELD("No.");
+                }
+                action(Attributes)
+                {
+                    AccessByPermission = TableData "Item Attribute"=R;
+                    ApplicationArea = Advanced;
+                    Caption = 'Attributes';
+                    Image = Category;
+                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                    //PromotedCategory = Category4;
+                    Scope = Repeater;
+                    ToolTip = 'View or edit the item''s attributes, such as color, size, or other characteristics that help to describe the item.';
+
+                    trigger OnAction()
+                    begin
+                        //-#361229 [361229]
+                        PAGE.RunModal(PAGE::"Item Attribute Value Editor",Rec);
+                        CurrPage.SaveRecord;
+                        CurrPage.ItemAttributesFactBox.PAGE.LoadItemAttributesData("No.");
+                        //+#361229 [361229]
+                    end;
                 }
                 action("Va&riants")
                 {

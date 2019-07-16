@@ -14,6 +14,7 @@ table 6151414 "Magento Item Group"
     // MAG2.17/TS  /20181017  CASE 324862 Added Field Icon
     // MAG2.17/TS  /20181031  CASE 333862 Seo Link should be filled as well
     // MAG2.20/BHR /20190409  CASE 346352 Field 130 "Short Description"
+    // MAG2.22/MHA /20190614  CASE 358258 Extended field 6060021 "Meta Title" from 70 to 100
 
     Caption = 'Magento Item Group';
     DrillDownPageID = "Magento Item Group List";
@@ -175,10 +176,10 @@ table 6151414 "Magento Item Group"
                 "Seo Link" := NaviConnectFunctions.SeoFormat("Seo Link");
             end;
         }
-        field(6060021;"Meta Title";Text[70])
+        field(6060021;"Meta Title";Text[100])
         {
             Caption = 'Meta Title';
-            Description = 'MAG2.07';
+            Description = 'MAG2.07,MAG2.22';
         }
         field(6060022;"Meta Keywords";Text[250])
         {

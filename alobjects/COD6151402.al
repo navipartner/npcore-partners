@@ -30,6 +30,8 @@ codeunit 6151402 "Magento Mgt."
     // MAG2.03/MHA /20170411  CASE 272066 Exception handling added to MagentoApiPost()
     // MAG2.05/MHA /20170714  CASE 283777 Moved Picture functionality to cu 6151419 and added "Api Authorization" in MagentoApiGet() and MagentoApiPost()
     // MAG2.18/MHA /20190314  CASE 348660 Increased return value of GetVATBusPostingGroup() from 10 to 20 as standard field is increased from NAV2018
+    // MAG2.22/MHA /20190705  CASE 361164 Updated Exception Message parsing in MagentoApiGet() and MagentoApiPost()
+    // MAG2.22/MHA /20190710  CASE 360098 Added functions GetCustTemplate(), GetCustConfigTemplate()
 
 
     trigger OnRun()
@@ -39,10 +41,58 @@ codeunit 6151402 "Magento Mgt."
     var
         MagentoSetup: Record "Magento Setup";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        Text000: Label 'Magento returned the following Error:\\';
 
     procedure "--- Webservice Import"()
     begin
+    end;
+
+    procedure GetCustTemplate(Customer: Record Customer) TemplateCode: Code[10]
+    var
+        MagentoSetup: Record "Magento Setup";
+        MagentoCustomerMapping: Record "Magento Customer Mapping";
+    begin
+        //-MAG2.22 [360098]
+        if MagentoCustomerMapping.Get(Customer."Country/Region Code",Customer."Post Code") then
+          exit(MagentoCustomerMapping."Customer Template Code");
+
+        if MagentoCustomerMapping.Get(Customer."Country/Region Code",'') then
+          exit(MagentoCustomerMapping."Customer Template Code");
+
+        if MagentoCustomerMapping.Get('','') then
+          exit(MagentoCustomerMapping."Customer Template Code");
+
+        if MagentoSetup.Get then
+          exit(MagentoSetup."Customer Template Code");
+
+        exit('');
+        //+MAG2.22 [360098]
+    end;
+
+    procedure GetCustConfigTemplate(TaxClass: Text;Customer: Record Customer) ConfigTemplateCode: Code[10]
+    var
+        MagentoSetup: Record "Magento Setup";
+        MagentoTaxClass: Record "Magento Tax Class";
+        MagentoCustomerMapping: Record "Magento Customer Mapping";
+    begin
+        //-MAG2.22 [360098]
+        if MagentoCustomerMapping.Get(Customer."Country/Region Code",Customer."Post Code") then
+          exit(MagentoCustomerMapping."Config. Template Code");
+
+        if MagentoCustomerMapping.Get(Customer."Country/Region Code",'') then
+          exit(MagentoCustomerMapping."Config. Template Code");
+
+        if MagentoCustomerMapping.Get('','') then
+          exit(MagentoCustomerMapping."Config. Template Code");
+
+        if not MagentoSetup.Get then
+          exit('');
+
+        ConfigTemplateCode := MagentoSetup."Customer Config. Template Code";
+        if MagentoTaxClass.Get(TaxClass,MagentoTaxClass.Type::Customer) and (MagentoTaxClass."Customer Config. Template Code" <> '') then
+          ConfigTemplateCode := MagentoTaxClass."Customer Config. Template Code";
+
+        exit(ConfigTemplateCode);
+        //+MAG2.22 [360098]
     end;
 
     procedure GetCustomerConfigTemplate(TaxClass: Text) ConfigTemplateCode: Code[10]
@@ -86,6 +136,8 @@ codeunit 6151402 "Magento Mgt."
         HttpWebRequest: DotNet npNetHttpWebRequest;
         HttpWebResponse: DotNet npNetHttpWebResponse;
         MemoryStream: DotNet npNetMemoryStream;
+        WebException: DotNet npNetWebException;
+        ErrorMessage: Text;
     begin
         if MagentoApiUrl = '' then
           exit(false);
@@ -109,7 +161,13 @@ codeunit 6151402 "Magento Mgt."
         end;
         //+MAG2.05 [283777]
 
-        HttpWebResponse := HttpWebRequest.GetResponse();
+        //-MAG2.22 [361164]
+        if not TryGetWebResponse(HttpWebRequest,HttpWebResponse) then begin
+          WebException := GetLastErrorObject;
+          ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
+          Error(CopyStr(ErrorMessage,1,1000));
+        end;
+        //+MAG2.22 [361164]
         MemoryStream := HttpWebResponse.GetResponseStream;
 
         XmlDoc := XmlDoc.XmlDocument;
@@ -153,33 +211,25 @@ codeunit 6151402 "Magento Mgt."
         //+MAG2.05 [283777]
 
         //-MAG2.03 [272066]
-        // MemoryStream := HttpWebRequest.GetRequestStream;
-        // XmlDoc.Save(MemoryStream);
-        // MemoryStream.Flush;
-        // MemoryStream.Close;
-        // CLEAR(MemoryStream);
-        //
-        // HttpWebResponse := HttpWebRequest.GetResponse();
-        // MemoryStream := HttpWebResponse.GetResponseStream;
-        //
-        // XmlDoc := XmlDoc.XmlDocument;
-        // XmlDoc.Load(MemoryStream);
-        //
-        // MemoryStream.Flush;
-        // MemoryStream.Close;
-        // CLEAR(MemoryStream);
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          ErrorMessage := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
-          if ErrorMessage = '' then
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
-          if ErrorMessage = '' then
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-          ErrorMessage := Text000 + ErrorMessage;
+          //-MAG2.22 [361164]
+          ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
           Error(CopyStr(ErrorMessage,1,1000));
+          //+MAG2.22 [361164]
         end;
         //+MAG2.03 [272066]
         NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
         exit(true);
+    end;
+
+    [TryFunction]
+    local procedure TryGetWebResponse(HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse)
+    var
+        MemoryStream: DotNet npNetMemoryStream;
+    begin
+        //-MAG2.22 [361164]
+        HttpWebResponse := HttpWebRequest.GetResponse;
+        //+MAG2.22 [361164]
     end;
 
     procedure "--- Sync"()

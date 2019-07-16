@@ -7,6 +7,7 @@ page 6151413 "Magento Item Picture List"
     // MAG1.22/MHA /20160426  CASE 239773 Change iteration on Item Variant during Setup of Variety Source Table
     // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
     // MAG2.02/TS  /20170125  CASE 262261 Removed all reference to Variax
+    // MAG2.22/MHA /20190625  CASE 359285 Added Variant Systems; Variety (Select on Item),Variety 1,Variety 2,Variety 3,Variety 4
 
     Caption = 'Item Pictures';
     DeleteAllowed = false;
@@ -60,20 +61,65 @@ page 6151413 "Magento Item Picture List"
 
     trigger OnAfterGetCurrRecord()
     begin
-        //-MAG1.21
-        ////-MAG1.09
-        //CurrPage.MagentoPictureLinkSubform.PAGE.SetColorCode("Dim. Value Code");
-        ////+MAG1.09
-        CurrPage.MagentoPictureLinkSubform.PAGE.SetVariantValueCode("Item No.");
-        CurrPage.MagentoPictureDragDropAddin.PAGE.SetVariantValueCode("Item No.");
-        //+MAG1.21
+        //-MAG2.22 [359285]
+        case MagentoSetup."Picture Variety Type" of
+          MagentoSetup."Picture Variety Type"::Fixed:
+            begin
+              CurrPage.MagentoPictureLinkSubform.PAGE.SetVariantValueCode("Item No.");
+              CurrPage.MagentoPictureDragDropAddin.PAGE.SetVariantValueCode("Item No.");
+            end;
+          MagentoSetup."Picture Variety Type"::"Select on Item":
+            begin
+              case Item."Magento Picture Variety Type" of
+                Item."Magento Picture Variety Type"::"Variety 1":
+                  begin
+                    CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters("Variety 1","Variety 1 Table","Variety 1 Value");
+                    CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters("Variety 1","Variety 1 Table","Variety 1 Value");
+                  end;
+                Item."Magento Picture Variety Type"::"Variety 2":
+                  begin
+                    CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters("Variety 2","Variety 2 Table","Variety 2 Value");
+                    CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters("Variety 2","Variety 2 Table","Variety 2 Value");
+                  end;
+                Item."Magento Picture Variety Type"::"Variety 3":
+                  begin
+                    CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters("Variety 3","Variety 3 Table","Variety 3 Value");
+                    CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters("Variety 3","Variety 3 Table","Variety 3 Value");
+                  end;
+                Item."Magento Picture Variety Type"::"Variety 4":
+                  begin
+                    CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters("Variety 4","Variety 4 Table","Variety 4 Value");
+                    CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters("Variety 4","Variety 4 Table","Variety 4 Value");
+                  end;
+              end;
+            end;
+          MagentoSetup."Picture Variety Type"::"Variety 1":
+            begin
+              CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters("Variety 1","Variety 1 Table","Variety 1 Value");
+              CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters("Variety 1","Variety 1 Table","Variety 1 Value");
+            end;
+          MagentoSetup."Picture Variety Type"::"Variety 2":
+            begin
+              CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters("Variety 2","Variety 2 Table","Variety 2 Value");
+              CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters("Variety 2","Variety 2 Table","Variety 2 Value");
+            end;
+          MagentoSetup."Picture Variety Type"::"Variety 3":
+            begin
+              CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters("Variety 3","Variety 3 Table","Variety 3 Value");
+              CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters("Variety 3","Variety 3 Table","Variety 3 Value");
+            end;
+          MagentoSetup."Picture Variety Type"::"Variety 4":
+            begin
+              CurrPage.MagentoPictureLinkSubform.PAGE.SetVarietyFilters("Variety 4","Variety 4 Table","Variety 4 Value");
+              CurrPage.MagentoPictureDragDropAddin.PAGE.SetVarietyFilters("Variety 4","Variety 4 Table","Variety 4 Value");
+            end;
+        end;
+        //+MAG2.22 [359285]
     end;
 
     trigger OnOpenPage()
     begin
         //-MAG1.21
-        //SetupItemColors();
-        //CurrPage.MagentoPictureLinkSubform.PAGE.SetColorVisible(FALSE);
         CurrPage.MagentoPictureLinkSubform.PAGE.SetItemNoFilter(ItemNo);
         CurrPage.MagentoPictureDragDropAddin.PAGE.SetItemNo(ItemNo);
         CurrPage.MagentoPictureDragDropAddin.PAGE.SetHidePicture(true);
@@ -82,8 +128,8 @@ page 6151413 "Magento Item Picture List"
     end;
 
     var
+        Item: Record Item;
         MagentoSetup: Record "Magento Setup";
-        GenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
         ItemNo: Code[20];
         Text000: Label 'Item No. must not be blank';
         HasVariants: Boolean;
@@ -97,25 +143,10 @@ page 6151413 "Magento Item Picture List"
     local procedure SetupSourceTable()
     begin
         //-MAG1.21
-        //VariaXConfiguration.GET;
-        //Item.GET(ItemNo);
-        //
-        //DELETEALL;
-        //CLEAR(VariaXDimCom);
-        //VariaXDimCom.SETRANGE("Dim No.",VariaXConfiguration."Color Dimension");
-        //VariaXDimCom.SETRANGE("Item No.",ItemNo);
-        //VariaXDimCom.SETRANGE(Disabled,FALSE);
-        //IF VariaXDimCom.FINDSET THEN
-        //  REPEAT
-        //    IF NOT GET(VariaXDimCom."Dim No.",VariaXDimCom."Dim Value",ItemNo) THEN BEGIN
-        //      VariaXDimValues.GET(VariaXDimCom."Dim No.",VariaXDimCom."Dim Value",VariaXDimCom."Dim Group");
-        //      INIT;
-        //      Rec := VariaXDimValues;
-        //      "Parent Dim. Value Filter" := ItemNo;
-        //      INSERT;
-        //    END;
-        //  UNTIL VariaXDimCom.NEXT = 0;
         MagentoSetup.Get;
+        //-MAG2.22 [359285]
+        if Item.Get(ItemNo) then;
+        //+MAG2.22 [359285]
 
         if ItemNo = '' then
           Error(Text000);
@@ -127,217 +158,201 @@ page 6151413 "Magento Item Picture List"
         Description := Text001;
         Insert;
 
-        if not (MagentoSetup."Variant System" in [MagentoSetup."Variant System"::"1",MagentoSetup."Variant System"::Variety]) then
-          exit;
-
-        if MagentoSetup."Variant Picture Dimension" = '' then
-          exit;
-
+        //-MAG2.22 [359285]
         case MagentoSetup."Variant System" of
-          //-MAG2.02
-          //MagentoSetup."Variant System"::"1": SetupVariantVariaX();
-          //+MAG2.02
-          MagentoSetup."Variant System"::Variety: SetupVariantVariety();
+          MagentoSetup."Variant System"::Variety:
+            begin
+              case MagentoSetup."Picture Variety Type" of
+                MagentoSetup."Picture Variety Type"::Fixed:
+                  begin
+                    SetupVarietyFixed();
+                  end;
+                MagentoSetup."Picture Variety Type"::"Select on Item":
+                  begin
+                    SetupVarietySelectOnItem();
+                  end;
+                MagentoSetup."Picture Variety Type"::"Variety 1":
+                  begin
+                    SetupVariety1();
+                  end;
+                MagentoSetup."Picture Variety Type"::"Variety 2":
+                  begin
+                    SetupVariety2();
+                  end;
+                MagentoSetup."Picture Variety Type"::"Variety 3":
+                  begin
+                    SetupVariety3()
+                  end;
+                MagentoSetup."Picture Variety Type"::"Variety 4":
+                  begin
+                    SetupVariety4();
+                  end;
+              end;
+            end;
         end;
+        //+MAG2.22 [359285]
 
         HasVariants := Count > 1;
         //+MAG1.21
     end;
 
-    local procedure SetupVariantVariaX()
-    var
-        RecRef: RecordRef;
-        FieldRef: FieldRef;
-        TableNoVariaXDimCom: Integer;
-        FieldNoDimNo: Integer;
-        FieldNoDimValueCode: Integer;
-        FieldNoDimValueDescription: Integer;
-        FieldNoDisabled: Integer;
-        FieldNoItemNo: Integer;
-        VariantValueCode: Code[20];
-        VariantValueDescription: Text[50];
+    local procedure SetupVarietyFixed()
     begin
-        //-MAG2.02
-        // //-MAG1.21
-        // TableNoVariaXDimCom := 6014609;
-        // IF NOT GenericSetupMgt.OpenRecRef(TableNoVariaXDimCom,RecRef) THEN
-        //  EXIT;
-        //
-        // RecRef.CURRENTKEYINDEX(4);
-        // FieldNoItemNo := 2;
-        // GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoItemNo,ItemNo);
-        // FieldNoDimNo := 3;
-        // GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoDimNo,MagentoSetup."Variant Picture Dimension");
-        // FieldNoDisabled := 5;
-        // GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoDisabled,'0');
-        //
-        // IF NOT RecRef.FINDSET THEN
-        //  EXIT;
-        //
-        // FieldNoDimValueCode := 4;
-        // FieldNoDimValueDescription := 7;
-        // WHILE RecRef.FINDFIRST DO BEGIN
-        //  VariantValueCode := GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoDimValueCode);
-        //  VariantValueDescription := GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoDimValueDescription);
-        //  IF NOT GET(VariantValueCode,'') THEN BEGIN
-        //    INIT;
-        //    "Item No." := VariantValueCode;
-        //    Description := VariantValueDescription;
-        //    INSERT;
-        //  END;
-        //  GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoDimValueCode,'>' + VariantValueCode);
-        // END;
-        // //+MAG1.21
-        //+MAG2.02
-    end;
-
-    local procedure SetupVariantVariety()
-    var
-        RecRef: RecordRef;
-        FieldRef: FieldRef;
-        FieldNoItemNo: Integer;
-        FieldNoVariety: Integer;
-        FieldNoVarietyTable: Integer;
-        FieldNoVarietyValue: Integer;
-        FieldNoBlocked: Integer;
-        TableNoItemVariant: Integer;
-        VariantValueDescription: Text[50];
-        VariantValueCode: Code[20];
-        VarietyTable: Code[20];
-    begin
-        //-MAG1.21
-        TableNoItemVariant := 5401;
-        if not GenericSetupMgt.OpenRecRef(TableNoItemVariant,RecRef) then
+        //-MAG2.22 [359285]
+        if MagentoSetup."Variant Picture Dimension" = '' then
           exit;
 
-        FieldNoItemNo := 2;
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoItemNo,ItemNo);
-
-        FieldNoBlocked := 6059982;
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoBlocked,'0');
-
-        if not SetItemVariantVarietyFieldNos(FieldNoVariety,FieldNoVarietyTable,FieldNoVarietyValue,VarietyTable) then
-          exit;
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoVariety,MagentoSetup."Variant Picture Dimension");
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoVarietyTable,'' + VarietyTable +'' );
-
-        //-MAG1.22
-        //WHILE RecRef.FINDFIRST DO BEGIN
-        if RecRef.FindSet then
-          repeat
-        //+MAG1.22
-            VariantValueCode := GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVarietyValue);
-            VariantValueDescription := GetVarietyValueDescription(MagentoSetup."Variant Picture Dimension",VarietyTable,VariantValueCode);
-            if not Get(VariantValueCode,'') then begin
-              Init;
-              "Item No." := VariantValueCode;
-              Description := VariantValueDescription;
-              Insert;
+        case MagentoSetup."Variant Picture Dimension" of
+          Item."Variety 1":
+            begin
+              SetupVariety1();
             end;
-        //-MAG1.22
-        //  GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoVarietyValue,'>' + VariantValueCode);
-        //END;
-          until RecRef.Next = 0;
-        //+MAG1.22
-        //+MAG1.21
+          Item."Variety 2":
+            begin
+              SetupVariety2();
+            end;
+          Item."Variety 3":
+            begin
+              SetupVariety3();
+            end;
+          Item."Variety 4":
+            begin
+              SetupVariety4();
+            end;
+        end;
+        //+MAG2.22 [359285]
     end;
 
-    local procedure "--- Aux"()
+    local procedure SetupVarietySelectOnItem()
     begin
+        //-MAG2.22 [359285]
+        case Item."Magento Picture Variety Type" of
+        Item."Magento Picture Variety Type"::"Variety 1":
+          begin
+            SetupVariety1();
+          end;
+        Item."Magento Picture Variety Type"::"Variety 2":
+          begin
+            SetupVariety2();
+          end;
+        Item."Magento Picture Variety Type"::"Variety 3":
+          begin
+            SetupVariety3();
+          end;
+        Item."Magento Picture Variety Type"::"Variety 4":
+          begin
+            SetupVariety4();
+          end;
+        end;
+        //+MAG2.22 [359285]
     end;
 
-    procedure GetVarietyValueDescription(VarietyType: Code[10];VarietyTable: Code[20];VarietyValue: Code[20]) VarietyValueDescription: Text
+    local procedure SetupVariety1()
     var
-        RecRef: RecordRef;
-        TableNoVarietyValue: Integer;
-        FieldNoVarietyDescription: Integer;
-        FieldNoVarietyTable: Integer;
-        FieldNoVarietyType: Integer;
-        FieldNoVarietyValue: Integer;
+        VarietyValue: Record "Variety Value";
     begin
-        //-MAG1.21
-        if (VarietyType = '') or (VarietyTable = '') or (VarietyValue = '') then
-          exit('');
+        //-MAG2.22 [359285]
+        if Item."Variety 1" = '' then
+          exit;
+        if Item."Variety 1 Table" = '' then
+          exit;
 
-        TableNoVarietyValue := 6059973;
-        if not GenericSetupMgt.OpenRecRef(TableNoVarietyValue,RecRef) then
-          exit('');
+        VarietyValue.SetRange(Type,Item."Variety 1");
+        VarietyValue.SetRange(Table,Item."Variety 1 Table");
+        if not VarietyValue.FindSet then
+          exit;
 
-        FieldNoVarietyType := 1;
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoVarietyType,VarietyType);
-        FieldNoVarietyTable := 2;
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoVarietyTable,VarietyTable);
-        FieldNoVarietyValue := 3;
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FieldNoVarietyValue,VarietyValue);
-        if not RecRef.FindFirst then
-          exit('');
-
-        FieldNoVarietyDescription := 20;
-        exit(GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVarietyDescription));
-        //+MAG1.21
+        repeat
+          Init;
+          "Item No." := VarietyValue.Value;
+          Description := VarietyValue.Description;
+          "Variety 1" := VarietyValue.Type;
+          "Variety 1 Table" := VarietyValue.Table;
+          "Variety 1 Value" := VarietyValue.Value;
+          Insert;
+        until VarietyValue.Next = 0;
+        //+MAG2.22 [359285]
     end;
 
-    local procedure SetItemVariantVarietyFieldNos(var FieldNoVariety: Integer;var FieldNoVarietyTable: Integer;var FieldNoVarietyValue: Integer;var VarietyTable: Code[20]): Boolean
+    local procedure SetupVariety2()
     var
-        RecRef: RecordRef;
-        FiledNoItemNo: Integer;
-        FieldNoVariety1: Integer;
-        FieldNoVariety2: Integer;
-        FieldNoVariety3: Integer;
-        FieldNoVariety4: Integer;
-        TableNoItem: Integer;
+        VarietyValue: Record "Variety Value";
     begin
-        //-MAG1.21
-        if (MagentoSetup."Variant System" <> MagentoSetup."Variant System"::Variety) or (MagentoSetup."Variant Picture Dimension" = '') then
-          exit(false);
+        //-MAG2.22 [359285]
+        if Item."Variety 2" = '' then
+          exit;
+        if Item."Variety 2 Table" = '' then
+          exit;
 
-        TableNoItem := 27;
-        if not GenericSetupMgt.OpenRecRef(TableNoItem,RecRef) then
-          exit(false);
+        VarietyValue.SetRange(Type,Item."Variety 2");
+        VarietyValue.SetRange(Table,Item."Variety 2 Table");
+        if not VarietyValue.FindSet then
+          exit;
 
-        FiledNoItemNo := 1;
-        GenericSetupMgt.SetFieldRefFilter(RecRef,FiledNoItemNo,ItemNo);
-        if not RecRef.FindFirst then
-          exit(false);
+        repeat
+          Init;
+          "Item No." := VarietyValue.Value;
+          Description := VarietyValue.Description;
+          "Variety 2" := VarietyValue.Type;
+          "Variety 2 Table" := VarietyValue.Table;
+          "Variety 2 Value" := VarietyValue.Value;
+          Insert;
+        until VarietyValue.Next = 0;
+        //+MAG2.22 [359285]
+    end;
 
-        FieldNoVariety1 := 6059970;
-        if GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVariety1) = MagentoSetup."Variant Picture Dimension" then begin
-          FieldNoVariety := 6059970;
-          FieldNoVarietyTable := 6059971;
-          FieldNoVarietyValue := 6059972;
-          VarietyTable := GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVarietyTable);
-          exit(true);
-        end;
+    local procedure SetupVariety3()
+    var
+        VarietyValue: Record "Variety Value";
+    begin
+        //-MAG2.22 [359285]
+        if Item."Variety 3" = '' then
+          exit;
+        if Item."Variety 3 Table" = '' then
+          exit;
 
-        FieldNoVariety2 := 6059973;
-        if GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVariety2) = MagentoSetup."Variant Picture Dimension" then begin
-          FieldNoVariety := 6059973;
-          FieldNoVarietyTable := 6059974;
-          FieldNoVarietyValue := 6059975;
-          VarietyTable := GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVarietyTable);
-          exit(true);
-        end;
+        VarietyValue.SetRange(Type,Item."Variety 3");
+        VarietyValue.SetRange(Table,Item."Variety 3 Table");
+        if not VarietyValue.FindSet then
+          exit;
 
-        FieldNoVariety3 := 6059976;
-        if GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVariety3) = MagentoSetup."Variant Picture Dimension" then begin
-          FieldNoVariety := 6059976;
-          FieldNoVarietyTable := 6059977;
-          FieldNoVarietyValue := 6059978;
-          VarietyTable := GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVarietyTable);
-          exit(true);
-        end;
+        repeat
+          Init;
+          "Item No." := VarietyValue.Value;
+          Description := VarietyValue.Description;
+          "Variety 3" := VarietyValue.Type;
+          "Variety 3 Table" := VarietyValue.Table;
+          "Variety 3 Value" := VarietyValue.Value;
+          Insert;
+        until VarietyValue.Next = 0;
+        //+MAG2.22 [359285]
+    end;
 
-        FieldNoVariety4 := 6059979;
-        if GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVariety4) = MagentoSetup."Variant Picture Dimension" then begin
-          FieldNoVariety := 6059979;
-          FieldNoVarietyTable := 6059980;
-          FieldNoVarietyValue := 6059981;
-          VarietyTable := GenericSetupMgt.GetFieldRefValue(RecRef,FieldNoVarietyTable);
-          exit(true);
-        end;
+    local procedure SetupVariety4()
+    var
+        VarietyValue: Record "Variety Value";
+    begin
+        //-MAG2.22 [359285]
+        if Item."Variety 4" = '' then
+          exit;
+        if Item."Variety 4 Table" = '' then
+          exit;
 
-        exit(false);
-        //+MAG1.21
+        VarietyValue.SetRange(Type,Item."Variety 4");
+        VarietyValue.SetRange(Table,Item."Variety 4 Table");
+        if not VarietyValue.FindSet then
+          exit;
+
+        repeat
+          Init;
+          "Item No." := VarietyValue.Value;
+          Description := VarietyValue.Description;
+          "Variety 4" := VarietyValue.Type;
+          "Variety 4 Table" := VarietyValue.Table;
+          "Variety 4 Value" := VarietyValue.Value;
+          Insert;
+        until VarietyValue.Next = 0;
+        //+MAG2.22 [359285]
     end;
 }
 

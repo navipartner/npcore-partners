@@ -45,6 +45,8 @@ tableextension 50027 tableextension50027 extends Item
     // NPR5.47/JDH /20180913  CASE 327541 Changed field length of "Variety 1 Table" (and 2+3+4) to 40 characters
     // NPR5.48/MHA /20181105  CASE 334212 Added fields 6014435 "Last Changed at", 6014440 "Last Changed by"
     // NPR5.48/MHA /20181109  CASE 334922 Added field 6151125 "Item AddOn No."
+    // MAG2.22/MHA /20190614  CASE 358258 Extended field 6151440 "Meta Title" from 70 to 100
+    // MAG2.22/MHA /20190625  CASE 359285 Added field 6151500 "Magento Picture Variety Type"
     LookupPageID = "Retail Item List";
     DrillDownPageID = "Retail Item List";
     fields
@@ -324,10 +326,10 @@ tableextension 50027 tableextension50027 extends Item
             Caption = 'Seo Link';
             Description = 'MAG2.00';
         }
-        field(6151440;"Meta Title";Text[70])
+        field(6151440;"Meta Title";Text[100])
         {
             Caption = 'Meta Title';
-            Description = 'MAG2.00,MAG2.07';
+            Description = 'MAG2.00,MAG2.07,MAG2.22';
         }
         field(6151445;"Meta Description";Text[250])
         {
@@ -387,6 +389,13 @@ tableextension 50027 tableextension50027 extends Item
             Description = 'MAG2.00';
             Editable = false;
             FieldClass = FlowField;
+        }
+        field(6151500;"Magento Picture Variety Type";Option)
+        {
+            Caption = 'Magento Picture Variety Type';
+            Description = 'MAG2.22';
+            OptionCaption = 'None,Variety 1,Variety 2,Variety 3,Variety 4';
+            OptionMembers = "None","Variety 1","Variety 2","Variety 3","Variety 4";
         }
     }
     keys

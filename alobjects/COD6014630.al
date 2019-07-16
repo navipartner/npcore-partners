@@ -99,6 +99,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
     // NPR5.40/BHR /20180322 CASE 308408 Rename variable Grid to Grids
     // NPR5.46/CLVA/20180920 CASE 328581 Removed relation to CU 6014532 Customer Display Mgt.
     // NPR5.48/MHA /20181115 CASE 334633 Removed reference to deleted function CheckSavedSales() in Codeunit 6014435
+    // #361926/JAVA/20190715 CASE 361926 Removed unused references (everything related ref. to REPORT::Report50068).
 
 
     trigger OnRun()
@@ -926,9 +927,6 @@ codeunit 6014630 "Touch - Sale POS (Web)"
                                           //+NPR4.21
                                           IsTaxFreeEnabled := true;
                                         end;
-               'SHOP_IN_SHOP'         : begin
-                                          ExportSale(This);
-                                         end;
         
                'AUDIT_ROLL_VIEW'      : begin
                                           Clear(AuditRollForm);
@@ -2184,13 +2182,6 @@ codeunit 6014630 "Touch - Sale POS (Web)"
         //IF NOT BarcodeParser.ProcessBarcode(Validering) THEN
         //+NPR5.32 [264202]
           ButtonDefault;
-    end;
-
-    procedure ExportSale("Sale POS": Record "Sale POS")
-    begin
-        "Sale POS".SetRecFilter;
-        REPORT.RunModal(REPORT::Report50068, false, false, "Sale POS");
-        SaveSale();
     end;
 
     procedure FindElement()

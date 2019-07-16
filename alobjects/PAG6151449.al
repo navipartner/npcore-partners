@@ -4,11 +4,11 @@ page 6151449 "Magento Shipment Mapping"
     // MAG1.17/MH/20150622  CASE 216851 Magento Setup functions moved to new codeunit
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
     // MAG2.07/MHA /20170830  CASE 286943 Updated Magento Setup Actions to support Setup Event Subscription
+    // MAG2.22/MHA /20190610  CASE 357763 Added field 140 "Shipment Fee Type" and changed table relation of field 150
 
     Caption = 'Shipment Method Mapping';
     PageType = List;
     SourceTable = "Magento Shipment Mapping";
-    UsageCategory = Administration;
 
     layout
     {
@@ -28,7 +28,10 @@ page 6151449 "Magento Shipment Mapping"
                 field("Shipping Agent Service Code";"Shipping Agent Service Code")
                 {
                 }
-                field("Shipment Fee Account No.";"Shipment Fee Account No.")
+                field("Shipment Fee Type";"Shipment Fee Type")
+                {
+                }
+                field("Shipment Fee No.";"Shipment Fee No.")
                 {
                 }
             }

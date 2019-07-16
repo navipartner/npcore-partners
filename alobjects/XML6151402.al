@@ -10,6 +10,8 @@ xmlport 6151402 "Magento Document Export"
     // MAG2.20/TSA /20190408 CASE 345376 Added single document find
     // MAG2.20/TSA /20190408 CASE 345376 Added hidelines
     // MAG2.20/TSA /20190424 CASE 345376 Added currency_code element
+    // MAG2.22/TSA /20190531 CASE 345376 Added more information to the shipment section
+    // MAG2.22/TSA /20190531 CASE 345376 Added shipment method code on the related document section
 
     Caption = 'Magento Document Export';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/naviconnect/documents';
@@ -126,6 +128,7 @@ xmlport 6151402 "Magento Document Export"
                     {
                         MinOccurs = Zero;
                         XmlName = 'document';
+                        SourceTableView = WHERE("Doc. Type"=FILTER(<100));
                         UseTemporary = true;
                         textattribute(relatedtypeinvoice)
                         {
@@ -142,6 +145,20 @@ xmlport 6151402 "Magento Document Export"
                         fieldattribute(package_tracking_no;TmpDocumentSearchResultInvoice.Description)
                         {
                             Occurrence = Optional;
+                        }
+                        textattribute(invoice_shipmentmethod)
+                        {
+                            Occurrence = Optional;
+                            XmlName = 'shipment_method_code';
+
+                            trigger OnBeforePassVariable()
+                            begin
+                                //-MAG2.22 [345376]
+                                Invoice_ShipmentMethod := '';
+                                if (TmpDocumentSearchResultInvoice.Get (120, TmpDocumentSearchResultInvoice."Doc. No.", 0)) then
+                                  Invoice_ShipmentMethod := TmpDocumentSearchResultInvoice.Description;
+                                //+MAG2.22 [345376]
+                            end;
                         }
                     }
                 }
@@ -276,6 +293,7 @@ xmlport 6151402 "Magento Document Export"
                     {
                         MinOccurs = Zero;
                         XmlName = 'document';
+                        SourceTableView = WHERE("Doc. Type"=FILTER(<100));
                         UseTemporary = true;
                         textattribute(relatedtypecrmemo)
                         {
@@ -292,6 +310,20 @@ xmlport 6151402 "Magento Document Export"
                         fieldattribute(package_tracking_no;TmpDocumentSearchResultCrMemo.Description)
                         {
                             Occurrence = Optional;
+                        }
+                        textattribute(crmemo_shipmentmethod)
+                        {
+                            Occurrence = Optional;
+                            XmlName = 'shipment_method_code';
+
+                            trigger OnBeforePassVariable()
+                            begin
+                                //-MAG2.22 [345376]
+                                CrMemo_ShipmentMethod := '';
+                                if (TmpDocumentSearchResultCrMemo.Get (120, TmpDocumentSearchResultCrMemo."Doc. No.", 0)) then
+                                  CrMemo_ShipmentMethod := TmpDocumentSearchResultCrMemo.Description;
+                                //+MAG2.22 [345376]
+                            end;
                         }
                     }
                 }
@@ -459,6 +491,7 @@ xmlport 6151402 "Magento Document Export"
                     {
                         MinOccurs = Zero;
                         XmlName = 'document';
+                        SourceTableView = WHERE("Doc. Type"=FILTER(<100));
                         UseTemporary = true;
                         textattribute(relatedtypeorder)
                         {
@@ -478,6 +511,20 @@ xmlport 6151402 "Magento Document Export"
                         fieldattribute(package_tracking_no;TmpDocumentSearchResultOrder.Description)
                         {
                             Occurrence = Optional;
+                        }
+                        textattribute(order_shipmentmethod)
+                        {
+                            Occurrence = Optional;
+                            XmlName = 'shipment_method_code';
+
+                            trigger OnBeforePassVariable()
+                            begin
+                                //-MAG2.22 [345376]
+                                Order_ShipmentMethod := '';
+                                if (TmpDocumentSearchResultOrder.Get (120, TmpDocumentSearchResultOrder."Doc. No.", 0)) then
+                                  Order_ShipmentMethod := TmpDocumentSearchResultOrder.Description;
+                                //+MAG2.22 [345376]
+                            end;
                         }
                     }
                 }
@@ -526,17 +573,65 @@ xmlport 6151402 "Magento Document Export"
                 fieldelement(order_date;SalesShipmentHeader."Order Date")
                 {
                 }
-                fieldelement(shipment_date;SalesShipmentHeader."Shipment Date")
-                {
-                }
-                fieldelement(package_tracking_no;SalesShipmentHeader."Package Tracking No.")
-                {
-                }
                 fieldelement(currency_code;SalesShipmentHeader."Currency Code")
                 {
                 }
+                textelement(shipment_address)
+                {
+                    MaxOccurs = Once;
+                    XmlName = 'address';
+                    fieldattribute(no;SalesShipmentHeader."Ship-to Code")
+                    {
+                    }
+                    fieldelement(name;SalesShipmentHeader."Ship-to Name")
+                    {
+                    }
+                    fieldelement(name2;SalesShipmentHeader."Ship-to Name 2")
+                    {
+                    }
+                    fieldelement(address;SalesShipmentHeader."Ship-to Address")
+                    {
+                    }
+                    fieldelement(address2;SalesShipmentHeader."Ship-to Address 2")
+                    {
+                    }
+                    fieldelement(postcode;SalesShipmentHeader."Ship-to Post Code")
+                    {
+                    }
+                    fieldelement(city;SalesShipmentHeader."Ship-to City")
+                    {
+                    }
+                    fieldelement(contact;SalesShipmentHeader."Ship-to Contact")
+                    {
+                    }
+                }
+                textelement(shipment_details)
+                {
+                    MaxOccurs = Once;
+                    XmlName = 'details';
+                    fieldelement(shipment_date;SalesShipmentHeader."Shipment Date")
+                    {
+                    }
+                    fieldelement(shipment_method_code;SalesShipmentHeader."Shipment Method Code")
+                    {
+                    }
+                    fieldelement(shipping_agent_code;SalesShipmentHeader."Shipping Agent Code")
+                    {
+                    }
+                    fieldelement(shipping_agent_service_code;SalesShipmentHeader."Shipping Agent Service Code")
+                    {
+                    }
+                    fieldelement(package_tracking_no;SalesShipmentHeader."Package Tracking No.")
+                    {
+                    }
+                    fieldelement(number_of_packages;SalesShipmentHeader.Kolli)
+                    {
+                    }
+                }
                 textelement(shipmentlines)
                 {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
                     XmlName = 'lines';
                     tableelement(salesshipmentline;"Sales Shipment Line")
                     {
@@ -592,6 +687,7 @@ xmlport 6151402 "Magento Document Export"
                     tableelement(tmpdocsearchresultshipment;"Document Search Result")
                     {
                         XmlName = 'document';
+                        SourceTableView = WHERE("Doc. Type"=FILTER(<100));
                         UseTemporary = true;
                         textattribute(relatedtypeshipment)
                         {
@@ -610,6 +706,20 @@ xmlport 6151402 "Magento Document Export"
                         fieldattribute(package_tracking_no;TmpDocSearchResultShipment.Description)
                         {
                             Occurrence = Optional;
+                        }
+                        textattribute(shipment_shipmentmethod)
+                        {
+                            Occurrence = Optional;
+                            XmlName = 'shipment_method_code';
+
+                            trigger OnBeforePassVariable()
+                            begin
+                                //-MAG2.22 [345376]
+                                Shipment_ShipmentMethod := '';
+                                if (TmpDocSearchResultShipment.Get (120, TmpDocSearchResultShipment."Doc. No.", 0)) then
+                                  Shipment_ShipmentMethod := TmpDocSearchResultShipment.Description;
+                                //+MAG2.22 [345376]
+                            end;
                         }
                     }
                 }
@@ -765,6 +875,16 @@ xmlport 6151402 "Magento Document Export"
             TmpDocumentSearchResult.Description := CopyStr (LocalSalesShipmentHeader."Package Tracking No.", 1, MaxStrLen (TmpDocumentSearchResult.Description));
             if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
               if (TmpDocumentSearchResult.Insert ()) then ;
+
+            //-MAG2.22 [345376]
+            TmpDocumentSearchResult.Init;
+            TmpDocumentSearchResult."Doc. Type" := 120;
+            TmpDocumentSearchResult."Doc. No." := LocalSalesShipmentHeader."No.";
+            TmpDocumentSearchResult.Description := CopyStr (LocalSalesShipmentHeader."Shipment Method Code", 1, MaxStrLen (TmpDocumentSearchResult.Description));
+            if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
+              if (TmpDocumentSearchResult.Insert ()) then ;
+            //+MAG2.22 [345376]
+
           until (LocalSalesShipmentHeader.Next () = 0);
         end;
 

@@ -8,6 +8,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     // MAG2.01/TR  /20161102  CASE 257315 Removed ':' in the DrawText Function
     // MAG2.02/TS  /20170125  CASE 262261 Fitlers was not appplied correctly when having & in value
     // MAG2.16/BHR /20180824  CASE 322752 Replace record Object to Allobj
+    // MAG14.00.2.22/MHA/20190715  CASE 361942 Removed DotNet Graphics functionality
 
 
     trigger OnRun()
@@ -635,86 +636,17 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     end;
 
     procedure DrawText(var TempBlob: Record TempBlob temporary;var Graphics: DotNet npNetGraphics;SetupPath: Text;Value: Text)
-    var
-        Color: DotNet npNetColor;
-        Font: DotNet npNetFont1;
-        FontStyle: DotNet npNetFontStyle;
-        SolidBrush: DotNet npNetSolidBrush;
-        ImageFormat: DotNet npNetImageFormat;
-        InStream: InStream;
-        OutStream: OutStream;
-        Height: Decimal;
-        Width: Decimal;
-        XPosition: Decimal;
-        YPosition: Decimal;
-        FontName: Text;
-        FontSize: Integer;
-        Caption: Text;
     begin
-        //-MAG2.00
-        if SetupPath <> '' then
-          if SetupPath[StrLen(SetupPath)] <> '/' then
-            SetupPath += '/';
-        FontName := GetValueText(TempBlob,SetupPath + "ElementName.FontName");
-        FontSize := GetValueInteger(TempBlob,SetupPath + "ElementName.FontSize");
-        XPosition := GetValueDecimal(TempBlob,SetupPath + "ElementName.XPosition");
-        YPosition := GetValueDecimal(TempBlob,SetupPath + "ElementName.YPosition");
-        Caption := GetValueText(TempBlob,SetupPath + "ElementName.Caption");
-        //-MAG2.01 [MAG2.01]
-        //IF Caption <> '' THEN
-        //  Caption += ': ';
-        //+MAG2.01 [MAG2.01]
-        SolidBrush := SolidBrush.SolidBrush(Color.FromArgb(GetValueInteger(TempBlob,SetupPath + "ElementName.FontOpacity"),Color.FromName(GetValueText(TempBlob,SetupPath + "ElementName.FontColor"))));
-
-        SetFontStyle(FontStyle,GetValueText(TempBlob,SetupPath + "ElementName.FontStyle"));
-        Font := Font.Font(FontName,FontSize,FontStyle);
-        Graphics.DrawString(Caption + Value,Font,SolidBrush,XPosition,YPosition);
-        //+MAG2.00
+        //-MAG14.00.2.22 [361942]
+        Error('Deprecated');
+        //+MAG14.00.2.22 [361942]
     end;
 
     procedure DrawBarcode(var Graphics: DotNet npNetGraphics;var TempBlob: Record TempBlob temporary;SetupPath: Text;Value: Text;Bitmap: DotNet npNetBitmap;BitmapBarcode: DotNet npNetBitmap)
-    var
-        MagentoBarcodeLibrary: Codeunit "Magento Barcode Library";
-        Height: Decimal;
-        Width: Decimal;
-        XPosition: Decimal;
-        YPosition: Decimal;
-        InStream: InStream;
     begin
-        //-MAG2.00
-        if SetupPath <> '' then
-          if SetupPath[StrLen(SetupPath)] <> '/' then
-            SetupPath += '/';
-
-        XPosition := GetValueDecimal(TempBlob,SetupPath + "ElementName.XPosition");
-        YPosition := GetValueDecimal(TempBlob,SetupPath + "ElementName.YPosition");
-        Width := GetValueDecimal(TempBlob,SetupPath + "ElementName.Width");
-        Height := GetValueDecimal(TempBlob,SetupPath + "ElementName.Height");
-        MagentoBarcodeLibrary.SetDpiX(Bitmap.HorizontalResolution);
-        MagentoBarcodeLibrary.SetDpiY(Bitmap.VerticalResolution);
-        MagentoBarcodeLibrary.GenerateBarcode(Value,TempBlob);
-        TempBlob.Blob.CreateInStream(InStream);
-        BitmapBarcode := BitmapBarcode.Bitmap(InStream);
-        Graphics.DrawImage(BitmapBarcode,XPosition,YPosition,Width,Height);
-        //+MAG2.00
-    end;
-
-    local procedure SetFontStyle(var FontStyle: DotNet npNetFontStyle;FontStyleValue: Text)
-    begin
-        //-MAG2.00
-        case FontStyleValue of
-          'Bold' :
-            FontStyle := FontStyle.Bold;
-          'Italic' :
-            FontStyle := FontStyle.Italic;
-          'Underline' :
-            FontStyle := FontStyle.Underline;
-          'Strikeout' :
-            FontStyle := FontStyle.Strikeout;
-          else
-            FontStyle := FontStyle.Regular;
-        end;
-        //+MAG2.00
+        //-MAG14.00.2.22 [361942]
+        Error('Deprecated');
+        //+MAG14.00.2.22 [361942]
     end;
 
     local procedure "--- Enum"()
