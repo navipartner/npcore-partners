@@ -1,6 +1,7 @@
 codeunit 6151463 "M2 Account Lookup Mgt."
 {
     // MAG2.20/MHA /20190425  CASE 320423 Object created - Buffer used with M2 GET Apis
+    // MAG2.22/MHA /20190712  CASE 361786 Updated DotNet Type of System.Collections.IList to System.Collections.IEnumerable
 
 
     trigger OnRun()
@@ -51,7 +52,7 @@ codeunit 6151463 "M2 Account Lookup Mgt."
     local procedure SetupDisplayGroups(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
     var
         Result: DotNet JToken;
-        DisplayGroups: DotNet npNetIList;
+        DisplayGroups: DotNet npNetIEnumerable;
         DisplayGroup: DotNet JToken;
         i: Integer;
         NetConvHelper: Variant;
@@ -129,7 +130,7 @@ codeunit 6151463 "M2 Account Lookup Mgt."
     local procedure SetupShippingGroups(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
     var
         Result: DotNet JToken;
-        ShippingGroups: DotNet npNetIList;
+        ShippingGroups: DotNet npNetIEnumerable;
         ShippingGroup: DotNet JToken;
         i: Integer;
         NetConvHelper: Variant;
@@ -197,7 +198,7 @@ codeunit 6151463 "M2 Account Lookup Mgt."
     local procedure SetupPaymentGroups(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
     var
         Result: DotNet JToken;
-        PaymentGroups: DotNet npNetIList;
+        PaymentGroups: DotNet npNetIEnumerable;
         PaymentGroup: DotNet JToken;
         i: Integer;
         NetConvHelper: Variant;
@@ -277,7 +278,7 @@ codeunit 6151463 "M2 Account Lookup Mgt."
     local procedure SetupCustomerGroups(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
     var
         Result: DotNet JToken;
-        CustomerGroups: DotNet npNetIList;
+        CustomerGroups: DotNet npNetIEnumerable;
         CustomerGroup: DotNet JToken;
         i: Integer;
         NetConvHelper: Variant;
@@ -366,9 +367,9 @@ codeunit 6151463 "M2 Account Lookup Mgt."
     local procedure SetupMagentoStores(var M2ValueBuffer: Record "M2 Value Buffer" temporary)
     var
         Result: DotNet JToken;
-        MagentoWebsites: DotNet npNetIList;
+        MagentoWebsites: DotNet npNetIEnumerable;
         MagentoWebsite: DotNet JToken;
-        MagentoStores: DotNet npNetIList;
+        MagentoStores: DotNet npNetIEnumerable;
         MagentoStore: DotNet JToken;
         i: Integer;
         NetConvHelper: Variant;

@@ -4,6 +4,7 @@ table 6151421 "Magento Store Item Group"
     // MAG1.17/TR/20150522 CASE 210548 Object modified for use
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
     // MAG2.07/MHA /20170912  CASE 289369 Increased length of field 6060022 "Meta Title" from 50 to 70
+    // MAG2.22/MHA /20190614  CASE 358258 Extended field 6060022 "Meta Title" from 70 to 100
 
     Caption = 'Magento Store Item Group';
     LookupPageID = "Magento Item Groups";
@@ -91,10 +92,10 @@ table 6151421 "Magento Store Item Group"
                 "Seo Link" :=  NaviConnectFunctions.SeoFormat("Seo Link");
             end;
         }
-        field(6060022;"Meta Title";Text[70])
+        field(6060022;"Meta Title";Text[100])
         {
             Caption = 'Meta Title';
-            Description = 'MAG2.07';
+            Description = 'MAG2.07,MAG2.22';
         }
         field(6060024;"Meta Keywords";Text[250])
         {

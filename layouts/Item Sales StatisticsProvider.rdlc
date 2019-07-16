@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,157 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="CompanyInfoPicture">
-          <DataField>CompanyInfoPicture</DataField>
-        </Field>
-        <Field Name="GlobalLanguage">
-          <DataField>GlobalLanguage</DataField>
-        </Field>
-        <Field Name="ShowItem">
-          <DataField>ShowItem</DataField>
-        </Field>
-        <Field Name="ShowItemWithSales">
-          <DataField>ShowItemWithSales</DataField>
-        </Field>
-        <Field Name="ShowItemGroup">
-          <DataField>ShowItemGroup</DataField>
-        </Field>
-        <Field Name="DateFilter">
-          <DataField>DateFilter</DataField>
-        </Field>
-        <Field Name="FilterDesc">
-          <DataField>FilterDesc</DataField>
-        </Field>
-        <Field Name="InventoryValueDesc">
-          <DataField>InventoryValueDesc</DataField>
-        </Field>
-        <Field Name="VendorNo">
-          <DataField>VendorNo</DataField>
-        </Field>
-        <Field Name="VendorName">
-          <DataField>VendorName</DataField>
-        </Field>
-        <Field Name="VisVarer_Vendor">
-          <DataField>VisVarer_Vendor</DataField>
-        </Field>
-        <Field Name="ShowItemWithSales_Vendor">
-          <DataField>ShowItemWithSales_Vendor</DataField>
-        </Field>
-        <Field Name="ShowItemGroup_Vendor">
-          <DataField>ShowItemGroup_Vendor</DataField>
-        </Field>
-        <Field Name="ItemGroupDesc">
-          <DataField>ItemGroupDesc</DataField>
-        </Field>
-        <Field Name="ItemGroupNo">
-          <DataField>ItemGroupNo</DataField>
-        </Field>
-        <Field Name="ItemGroupFooterDesc">
-          <DataField>ItemGroupFooterDesc</DataField>
-        </Field>
-        <Field Name="ItemDesc">
-          <DataField>ItemDesc</DataField>
-        </Field>
-        <Field Name="ItemVendorItemNo">
-          <DataField>ItemVendorItemNo</DataField>
-        </Field>
-        <Field Name="ItemNo">
-          <DataField>ItemNo</DataField>
-        </Field>
-        <Field Name="ItemItemGroup">
-          <DataField>ItemItemGroup</DataField>
-        </Field>
-        <Field Name="ItemPurchasesQty">
-          <DataField>ItemPurchasesQty</DataField>
-        </Field>
-        <Field Name="ItemPurchasesQtyFormat">
-          <DataField>ItemPurchasesQtyFormat</DataField>
-        </Field>
-        <Field Name="ItemSalesQty">
-          <DataField>ItemSalesQty</DataField>
-        </Field>
-        <Field Name="ItemSalesQtyFormat">
-          <DataField>ItemSalesQtyFormat</DataField>
-        </Field>
-        <Field Name="ItemSalesLCY">
-          <DataField>ItemSalesLCY</DataField>
-        </Field>
-        <Field Name="ItemSalesLCYFormat">
-          <DataField>ItemSalesLCYFormat</DataField>
-        </Field>
-        <Field Name="db">
-          <DataField>db</DataField>
-        </Field>
-        <Field Name="dbFormat">
-          <DataField>dbFormat</DataField>
-        </Field>
-        <Field Name="dg">
-          <DataField>dg</DataField>
-        </Field>
-        <Field Name="dgFormat">
-          <DataField>dgFormat</DataField>
-        </Field>
-        <Field Name="Item2NetChange">
-          <DataField>Item2NetChange</DataField>
-        </Field>
-        <Field Name="Item2NetChangeFormat">
-          <DataField>Item2NetChangeFormat</DataField>
-        </Field>
-        <Field Name="StockValue">
-          <DataField>StockValue</DataField>
-        </Field>
-        <Field Name="StockValueFormat">
-          <DataField>StockValueFormat</DataField>
-        </Field>
-        <Field Name="ItemQtyonPurchOrder">
-          <DataField>ItemQtyonPurchOrder</DataField>
-        </Field>
-        <Field Name="ItemQtyonPurchOrderFormat">
-          <DataField>ItemQtyonPurchOrderFormat</DataField>
-        </Field>
-        <Field Name="TurnoverRate">
-          <DataField>TurnoverRate</DataField>
-        </Field>
-        <Field Name="TurnoverRateFormat">
-          <DataField>TurnoverRateFormat</DataField>
-        </Field>
-        <Field Name="forpct">
-          <DataField>forpct</DataField>
-        </Field>
-        <Field Name="forpctFormat">
-          <DataField>forpctFormat</DataField>
-        </Field>
-        <Field Name="ItemFooterDesc">
-          <DataField>ItemFooterDesc</DataField>
-        </Field>
-        <Field Name="GnsBeholdningKpris">
-          <DataField>GnsBeholdningKpris</DataField>
-        </Field>
-        <Field Name="GnsBeholdningKprisFormat">
-          <DataField>GnsBeholdningKprisFormat</DataField>
-        </Field>
-        <Field Name="antalmdr">
-          <DataField>antalmdr</DataField>
-        </Field>
-        <Field Name="SalesCost">
-          <DataField>SalesCost</DataField>
-        </Field>
-        <Field Name="SalesCostFormat">
-          <DataField>SalesCostFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -6401,4 +6250,155 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="CompanyInfoPicture">
+          <DataField>CompanyInfoPicture</DataField>
+        </Field>
+        <Field Name="GlobalLanguage">
+          <DataField>GlobalLanguage</DataField>
+        </Field>
+        <Field Name="ShowItem">
+          <DataField>ShowItem</DataField>
+        </Field>
+        <Field Name="ShowItemWithSales">
+          <DataField>ShowItemWithSales</DataField>
+        </Field>
+        <Field Name="ShowItemGroup">
+          <DataField>ShowItemGroup</DataField>
+        </Field>
+        <Field Name="DateFilter">
+          <DataField>DateFilter</DataField>
+        </Field>
+        <Field Name="FilterDesc">
+          <DataField>FilterDesc</DataField>
+        </Field>
+        <Field Name="InventoryValueDesc">
+          <DataField>InventoryValueDesc</DataField>
+        </Field>
+        <Field Name="VendorNo">
+          <DataField>VendorNo</DataField>
+        </Field>
+        <Field Name="VendorName">
+          <DataField>VendorName</DataField>
+        </Field>
+        <Field Name="VisVarer_Vendor">
+          <DataField>VisVarer_Vendor</DataField>
+        </Field>
+        <Field Name="ShowItemWithSales_Vendor">
+          <DataField>ShowItemWithSales_Vendor</DataField>
+        </Field>
+        <Field Name="ShowItemGroup_Vendor">
+          <DataField>ShowItemGroup_Vendor</DataField>
+        </Field>
+        <Field Name="ItemGroupDesc">
+          <DataField>ItemGroupDesc</DataField>
+        </Field>
+        <Field Name="ItemGroupNo">
+          <DataField>ItemGroupNo</DataField>
+        </Field>
+        <Field Name="ItemGroupFooterDesc">
+          <DataField>ItemGroupFooterDesc</DataField>
+        </Field>
+        <Field Name="ItemDesc">
+          <DataField>ItemDesc</DataField>
+        </Field>
+        <Field Name="ItemVendorItemNo">
+          <DataField>ItemVendorItemNo</DataField>
+        </Field>
+        <Field Name="ItemNo">
+          <DataField>ItemNo</DataField>
+        </Field>
+        <Field Name="ItemItemGroup">
+          <DataField>ItemItemGroup</DataField>
+        </Field>
+        <Field Name="ItemPurchasesQty">
+          <DataField>ItemPurchasesQty</DataField>
+        </Field>
+        <Field Name="ItemPurchasesQtyFormat">
+          <DataField>ItemPurchasesQtyFormat</DataField>
+        </Field>
+        <Field Name="ItemSalesQty">
+          <DataField>ItemSalesQty</DataField>
+        </Field>
+        <Field Name="ItemSalesQtyFormat">
+          <DataField>ItemSalesQtyFormat</DataField>
+        </Field>
+        <Field Name="ItemSalesLCY">
+          <DataField>ItemSalesLCY</DataField>
+        </Field>
+        <Field Name="ItemSalesLCYFormat">
+          <DataField>ItemSalesLCYFormat</DataField>
+        </Field>
+        <Field Name="db">
+          <DataField>db</DataField>
+        </Field>
+        <Field Name="dbFormat">
+          <DataField>dbFormat</DataField>
+        </Field>
+        <Field Name="dg">
+          <DataField>dg</DataField>
+        </Field>
+        <Field Name="dgFormat">
+          <DataField>dgFormat</DataField>
+        </Field>
+        <Field Name="Item2NetChange">
+          <DataField>Item2NetChange</DataField>
+        </Field>
+        <Field Name="Item2NetChangeFormat">
+          <DataField>Item2NetChangeFormat</DataField>
+        </Field>
+        <Field Name="StockValue">
+          <DataField>StockValue</DataField>
+        </Field>
+        <Field Name="StockValueFormat">
+          <DataField>StockValueFormat</DataField>
+        </Field>
+        <Field Name="ItemQtyonPurchOrder">
+          <DataField>ItemQtyonPurchOrder</DataField>
+        </Field>
+        <Field Name="ItemQtyonPurchOrderFormat">
+          <DataField>ItemQtyonPurchOrderFormat</DataField>
+        </Field>
+        <Field Name="TurnoverRate">
+          <DataField>TurnoverRate</DataField>
+        </Field>
+        <Field Name="TurnoverRateFormat">
+          <DataField>TurnoverRateFormat</DataField>
+        </Field>
+        <Field Name="forpct">
+          <DataField>forpct</DataField>
+        </Field>
+        <Field Name="forpctFormat">
+          <DataField>forpctFormat</DataField>
+        </Field>
+        <Field Name="ItemFooterDesc">
+          <DataField>ItemFooterDesc</DataField>
+        </Field>
+        <Field Name="GnsBeholdningKpris">
+          <DataField>GnsBeholdningKpris</DataField>
+        </Field>
+        <Field Name="GnsBeholdningKprisFormat">
+          <DataField>GnsBeholdningKprisFormat</DataField>
+        </Field>
+        <Field Name="antalmdr">
+          <DataField>antalmdr</DataField>
+        </Field>
+        <Field Name="SalesCost">
+          <DataField>SalesCost</DataField>
+        </Field>
+        <Field Name="SalesCostFormat">
+          <DataField>SalesCostFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

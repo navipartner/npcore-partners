@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,157 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="PrintTotal_">
-          <DataField>PrintTotal_</DataField>
-        </Field>
-        <Field Name="No_Item">
-          <DataField>No_Item</DataField>
-        </Field>
-        <Field Name="No2_Item">
-          <DataField>No2_Item</DataField>
-        </Field>
-        <Field Name="Description_Item">
-          <DataField>Description_Item</DataField>
-        </Field>
-        <Field Name="VendorNo_Item">
-          <DataField>VendorNo_Item</DataField>
-        </Field>
-        <Field Name="VendorItemNo_Item">
-          <DataField>VendorItemNo_Item</DataField>
-        </Field>
-        <Field Name="InventoryPostingGroup_Item">
-          <DataField>InventoryPostingGroup_Item</DataField>
-        </Field>
-        <Field Name="DateFilters">
-          <DataField>DateFilters</DataField>
-        </Field>
-        <Field Name="ItemFilters">
-          <DataField>ItemFilters</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="PrintAlsoWithoutSale">
-          <DataField>PrintAlsoWithoutSale</DataField>
-        </Field>
-        <Field Name="ObjectDetails">
-          <DataField>ObjectDetails</DataField>
-        </Field>
-        <Field Name="Code_ItemVariant">
-          <DataField>Code_ItemVariant</DataField>
-        </Field>
-        <Field Name="ItemNo_ItemVariant">
-          <DataField>ItemNo_ItemVariant</DataField>
-        </Field>
-        <Field Name="Description_ItemVariant">
-          <DataField>Description_ItemVariant</DataField>
-        </Field>
-        <Field Name="Description2_ItemVariant">
-          <DataField>Description2_ItemVariant</DataField>
-        </Field>
-        <Field Name="VariantUnitPrice">
-          <DataField>VariantUnitPrice</DataField>
-        </Field>
-        <Field Name="VariantUnitPriceFormat">
-          <DataField>VariantUnitPriceFormat</DataField>
-        </Field>
-        <Field Name="VariantUnitCost">
-          <DataField>VariantUnitCost</DataField>
-        </Field>
-        <Field Name="VariantUnitCostFormat">
-          <DataField>VariantUnitCostFormat</DataField>
-        </Field>
-        <Field Name="SalesQty">
-          <DataField>SalesQty</DataField>
-        </Field>
-        <Field Name="SalesQtyFormat">
-          <DataField>SalesQtyFormat</DataField>
-        </Field>
-        <Field Name="SalesAmount">
-          <DataField>SalesAmount</DataField>
-        </Field>
-        <Field Name="SalesAmountFormat">
-          <DataField>SalesAmountFormat</DataField>
-        </Field>
-        <Field Name="ItemProfit">
-          <DataField>ItemProfit</DataField>
-        </Field>
-        <Field Name="ItemProfitFormat">
-          <DataField>ItemProfitFormat</DataField>
-        </Field>
-        <Field Name="ItemProfitPct">
-          <DataField>ItemProfitPct</DataField>
-        </Field>
-        <Field Name="ItemProfitPctFormat">
-          <DataField>ItemProfitPctFormat</DataField>
-        </Field>
-        <Field Name="ItemInventory">
-          <DataField>ItemInventory</DataField>
-        </Field>
-        <Field Name="ItemInventoryFormat">
-          <DataField>ItemInventoryFormat</DataField>
-        </Field>
-        <Field Name="COGSAmount">
-          <DataField>COGSAmount</DataField>
-        </Field>
-        <Field Name="COGSAmountFormat">
-          <DataField>COGSAmountFormat</DataField>
-        </Field>
-        <Field Name="TotalSalesQty_">
-          <DataField>TotalSalesQty_</DataField>
-        </Field>
-        <Field Name="TotalSalesQty_Format">
-          <DataField>TotalSalesQty_Format</DataField>
-        </Field>
-        <Field Name="TotalCOG_">
-          <DataField>TotalCOG_</DataField>
-        </Field>
-        <Field Name="TotalCOG_Format">
-          <DataField>TotalCOG_Format</DataField>
-        </Field>
-        <Field Name="TotalSaleCLY_">
-          <DataField>TotalSaleCLY_</DataField>
-        </Field>
-        <Field Name="TotalSaleCLY_Format">
-          <DataField>TotalSaleCLY_Format</DataField>
-        </Field>
-        <Field Name="AverageProfit_">
-          <DataField>AverageProfit_</DataField>
-        </Field>
-        <Field Name="AverageProfit_Format">
-          <DataField>AverageProfit_Format</DataField>
-        </Field>
-        <Field Name="AverageProfitPerc_">
-          <DataField>AverageProfitPerc_</DataField>
-        </Field>
-        <Field Name="AverageProfitPerc_Format">
-          <DataField>AverageProfitPerc_Format</DataField>
-        </Field>
-        <Field Name="TotalCount_">
-          <DataField>TotalCount_</DataField>
-        </Field>
-        <Field Name="TotalProfit_">
-          <DataField>TotalProfit_</DataField>
-        </Field>
-        <Field Name="TotalProfit_Format">
-          <DataField>TotalProfit_Format</DataField>
-        </Field>
-        <Field Name="TotalProfitPerc_">
-          <DataField>TotalProfitPerc_</DataField>
-        </Field>
-        <Field Name="TotalProfitPerc_Format">
-          <DataField>TotalProfitPerc_Format</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3251,4 +3100,155 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="PrintTotal_">
+          <DataField>PrintTotal_</DataField>
+        </Field>
+        <Field Name="No_Item">
+          <DataField>No_Item</DataField>
+        </Field>
+        <Field Name="No2_Item">
+          <DataField>No2_Item</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="VendorNo_Item">
+          <DataField>VendorNo_Item</DataField>
+        </Field>
+        <Field Name="VendorItemNo_Item">
+          <DataField>VendorItemNo_Item</DataField>
+        </Field>
+        <Field Name="InventoryPostingGroup_Item">
+          <DataField>InventoryPostingGroup_Item</DataField>
+        </Field>
+        <Field Name="DateFilters">
+          <DataField>DateFilters</DataField>
+        </Field>
+        <Field Name="ItemFilters">
+          <DataField>ItemFilters</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="PrintAlsoWithoutSale">
+          <DataField>PrintAlsoWithoutSale</DataField>
+        </Field>
+        <Field Name="ObjectDetails">
+          <DataField>ObjectDetails</DataField>
+        </Field>
+        <Field Name="Code_ItemVariant">
+          <DataField>Code_ItemVariant</DataField>
+        </Field>
+        <Field Name="ItemNo_ItemVariant">
+          <DataField>ItemNo_ItemVariant</DataField>
+        </Field>
+        <Field Name="Description_ItemVariant">
+          <DataField>Description_ItemVariant</DataField>
+        </Field>
+        <Field Name="Description2_ItemVariant">
+          <DataField>Description2_ItemVariant</DataField>
+        </Field>
+        <Field Name="VariantUnitPrice">
+          <DataField>VariantUnitPrice</DataField>
+        </Field>
+        <Field Name="VariantUnitPriceFormat">
+          <DataField>VariantUnitPriceFormat</DataField>
+        </Field>
+        <Field Name="VariantUnitCost">
+          <DataField>VariantUnitCost</DataField>
+        </Field>
+        <Field Name="VariantUnitCostFormat">
+          <DataField>VariantUnitCostFormat</DataField>
+        </Field>
+        <Field Name="SalesQty">
+          <DataField>SalesQty</DataField>
+        </Field>
+        <Field Name="SalesQtyFormat">
+          <DataField>SalesQtyFormat</DataField>
+        </Field>
+        <Field Name="SalesAmount">
+          <DataField>SalesAmount</DataField>
+        </Field>
+        <Field Name="SalesAmountFormat">
+          <DataField>SalesAmountFormat</DataField>
+        </Field>
+        <Field Name="ItemProfit">
+          <DataField>ItemProfit</DataField>
+        </Field>
+        <Field Name="ItemProfitFormat">
+          <DataField>ItemProfitFormat</DataField>
+        </Field>
+        <Field Name="ItemProfitPct">
+          <DataField>ItemProfitPct</DataField>
+        </Field>
+        <Field Name="ItemProfitPctFormat">
+          <DataField>ItemProfitPctFormat</DataField>
+        </Field>
+        <Field Name="ItemInventory">
+          <DataField>ItemInventory</DataField>
+        </Field>
+        <Field Name="ItemInventoryFormat">
+          <DataField>ItemInventoryFormat</DataField>
+        </Field>
+        <Field Name="COGSAmount">
+          <DataField>COGSAmount</DataField>
+        </Field>
+        <Field Name="COGSAmountFormat">
+          <DataField>COGSAmountFormat</DataField>
+        </Field>
+        <Field Name="TotalSalesQty_">
+          <DataField>TotalSalesQty_</DataField>
+        </Field>
+        <Field Name="TotalSalesQty_Format">
+          <DataField>TotalSalesQty_Format</DataField>
+        </Field>
+        <Field Name="TotalCOG_">
+          <DataField>TotalCOG_</DataField>
+        </Field>
+        <Field Name="TotalCOG_Format">
+          <DataField>TotalCOG_Format</DataField>
+        </Field>
+        <Field Name="TotalSaleCLY_">
+          <DataField>TotalSaleCLY_</DataField>
+        </Field>
+        <Field Name="TotalSaleCLY_Format">
+          <DataField>TotalSaleCLY_Format</DataField>
+        </Field>
+        <Field Name="AverageProfit_">
+          <DataField>AverageProfit_</DataField>
+        </Field>
+        <Field Name="AverageProfit_Format">
+          <DataField>AverageProfit_Format</DataField>
+        </Field>
+        <Field Name="AverageProfitPerc_">
+          <DataField>AverageProfitPerc_</DataField>
+        </Field>
+        <Field Name="AverageProfitPerc_Format">
+          <DataField>AverageProfitPerc_Format</DataField>
+        </Field>
+        <Field Name="TotalCount_">
+          <DataField>TotalCount_</DataField>
+        </Field>
+        <Field Name="TotalProfit_">
+          <DataField>TotalProfit_</DataField>
+        </Field>
+        <Field Name="TotalProfit_Format">
+          <DataField>TotalProfit_Format</DataField>
+        </Field>
+        <Field Name="TotalProfitPerc_">
+          <DataField>TotalProfitPerc_</DataField>
+        </Field>
+        <Field Name="TotalProfitPerc_Format">
+          <DataField>TotalProfitPerc_Format</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

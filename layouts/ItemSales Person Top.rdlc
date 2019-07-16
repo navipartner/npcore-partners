@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,82 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="SortHeading_Item">
-          <DataField>SortHeading_Item</DataField>
-        </Field>
-        <Field Name="SalesQty_Item">
-          <DataField>SalesQty_Item</DataField>
-        </Field>
-        <Field Name="SalesQty_ItemFormat">
-          <DataField>SalesQty_ItemFormat</DataField>
-        </Field>
-        <Field Name="SalesLCY_Item">
-          <DataField>SalesLCY_Item</DataField>
-        </Field>
-        <Field Name="SalesLCY_ItemFormat">
-          <DataField>SalesLCY_ItemFormat</DataField>
-        </Field>
-        <Field Name="No_Item">
-          <DataField>No_Item</DataField>
-        </Field>
-        <Field Name="Description_Item">
-          <DataField>Description_Item</DataField>
-        </Field>
-        <Field Name="Sorting_Item">
-          <DataField>Sorting_Item</DataField>
-        </Field>
-        <Field Name="SortBy_Item">
-          <DataField>SortBy_Item</DataField>
-        </Field>
-        <Field Name="Code_SalespersonPurchaser">
-          <DataField>Code_SalespersonPurchaser</DataField>
-        </Field>
-        <Field Name="Name_SalespersonPurchaser">
-          <DataField>Name_SalespersonPurchaser</DataField>
-        </Field>
-        <Field Name="SalesLCY_SalespersonPurchaser">
-          <DataField>SalesLCY_SalespersonPurchaser</DataField>
-        </Field>
-        <Field Name="SalesLCY_SalespersonPurchaserFormat">
-          <DataField>SalesLCY_SalespersonPurchaserFormat</DataField>
-        </Field>
-        <Field Name="SalesQty_SalespersonPurchaser">
-          <DataField>SalesQty_SalespersonPurchaser</DataField>
-        </Field>
-        <Field Name="SalesQty_SalespersonPurchaserFormat">
-          <DataField>SalesQty_SalespersonPurchaserFormat</DataField>
-        </Field>
-        <Field Name="Number_Integer">
-          <DataField>Number_Integer</DataField>
-        </Field>
-        <Field Name="SalespersonName_Integer">
-          <DataField>SalespersonName_Integer</DataField>
-        </Field>
-        <Field Name="Qty2_Integer">
-          <DataField>Qty2_Integer</DataField>
-        </Field>
-        <Field Name="Qty2_IntegerFormat">
-          <DataField>Qty2_IntegerFormat</DataField>
-        </Field>
-        <Field Name="CalcAmt_Integer">
-          <DataField>CalcAmt_Integer</DataField>
-        </Field>
-        <Field Name="CalcAmt_IntegerFormat">
-          <DataField>CalcAmt_IntegerFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -1557,4 +1481,80 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="SortHeading_Item">
+          <DataField>SortHeading_Item</DataField>
+        </Field>
+        <Field Name="SalesQty_Item">
+          <DataField>SalesQty_Item</DataField>
+        </Field>
+        <Field Name="SalesQty_ItemFormat">
+          <DataField>SalesQty_ItemFormat</DataField>
+        </Field>
+        <Field Name="SalesLCY_Item">
+          <DataField>SalesLCY_Item</DataField>
+        </Field>
+        <Field Name="SalesLCY_ItemFormat">
+          <DataField>SalesLCY_ItemFormat</DataField>
+        </Field>
+        <Field Name="No_Item">
+          <DataField>No_Item</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="Sorting_Item">
+          <DataField>Sorting_Item</DataField>
+        </Field>
+        <Field Name="SortBy_Item">
+          <DataField>SortBy_Item</DataField>
+        </Field>
+        <Field Name="Code_SalespersonPurchaser">
+          <DataField>Code_SalespersonPurchaser</DataField>
+        </Field>
+        <Field Name="Name_SalespersonPurchaser">
+          <DataField>Name_SalespersonPurchaser</DataField>
+        </Field>
+        <Field Name="SalesLCY_SalespersonPurchaser">
+          <DataField>SalesLCY_SalespersonPurchaser</DataField>
+        </Field>
+        <Field Name="SalesLCY_SalespersonPurchaserFormat">
+          <DataField>SalesLCY_SalespersonPurchaserFormat</DataField>
+        </Field>
+        <Field Name="SalesQty_SalespersonPurchaser">
+          <DataField>SalesQty_SalespersonPurchaser</DataField>
+        </Field>
+        <Field Name="SalesQty_SalespersonPurchaserFormat">
+          <DataField>SalesQty_SalespersonPurchaserFormat</DataField>
+        </Field>
+        <Field Name="Number_Integer">
+          <DataField>Number_Integer</DataField>
+        </Field>
+        <Field Name="SalespersonName_Integer">
+          <DataField>SalespersonName_Integer</DataField>
+        </Field>
+        <Field Name="Qty2_Integer">
+          <DataField>Qty2_Integer</DataField>
+        </Field>
+        <Field Name="Qty2_IntegerFormat">
+          <DataField>Qty2_IntegerFormat</DataField>
+        </Field>
+        <Field Name="CalcAmt_Integer">
+          <DataField>CalcAmt_Integer</DataField>
+        </Field>
+        <Field Name="CalcAmt_IntegerFormat">
+          <DataField>CalcAmt_IntegerFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

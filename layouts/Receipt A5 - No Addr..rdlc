@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,232 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="SalesTicketNoTxt_AuditRoll">
-          <DataField>SalesTicketNoTxt_AuditRoll</DataField>
-        </Field>
-        <Field Name="SalesPersonText">
-          <DataField>SalesPersonText</DataField>
-        </Field>
-        <Field Name="SaleDate_AuditRoll">
-          <DataField>SaleDate_AuditRoll</DataField>
-        </Field>
-        <Field Name="AmountInclVat_AuditRoll">
-          <DataField>AmountInclVat_AuditRoll</DataField>
-        </Field>
-        <Field Name="AmountInclVat_AuditRollFormat">
-          <DataField>AmountInclVat_AuditRollFormat</DataField>
-        </Field>
-        <Field Name="Reference_AuditRoll">
-          <DataField>Reference_AuditRoll</DataField>
-        </Field>
-        <Field Name="GuideNo">
-          <DataField>GuideNo</DataField>
-        </Field>
-        <Field Name="ShowGuideNo">
-          <DataField>ShowGuideNo</DataField>
-        </Field>
-        <Field Name="Amount_AuditRoll">
-          <DataField>Amount_AuditRoll</DataField>
-        </Field>
-        <Field Name="Amount_AuditRollFormat">
-          <DataField>Amount_AuditRollFormat</DataField>
-        </Field>
-        <Field Name="ReceiptInfoText">
-          <DataField>ReceiptInfoText</DataField>
-        </Field>
-        <Field Name="EuroExchangeRate_NPRetailConfig">
-          <DataField>EuroExchangeRate_NPRetailConfig</DataField>
-        </Field>
-        <Field Name="EuroExchangeRate_NPRetailConfigFormat">
-          <DataField>EuroExchangeRate_NPRetailConfigFormat</DataField>
-        </Field>
-        <Field Name="EuroOnSalesTicket_NPRetailConfig">
-          <DataField>EuroOnSalesTicket_NPRetailConfig</DataField>
-        </Field>
-        <Field Name="BarcodeOnReceipt_NPRetailConfig">
-          <DataField>BarcodeOnReceipt_NPRetailConfig</DataField>
-        </Field>
-        <Field Name="ItemUnitOnExpeditions_NPRetailConfig">
-          <DataField>ItemUnitOnExpeditions_NPRetailConfig</DataField>
-        </Field>
-        <Field Name="Desc2OnReceipt_NPRetailConfig">
-          <DataField>Desc2OnReceipt_NPRetailConfig</DataField>
-        </Field>
-        <Field Name="RecommendedPrice_NPRetailConfig">
-          <DataField>RecommendedPrice_NPRetailConfig</DataField>
-        </Field>
-        <Field Name="ShowVendorItemNo_NPRetailConfig">
-          <DataField>ShowVendorItemNo_NPRetailConfig</DataField>
-        </Field>
-        <Field Name="Barcode">
-          <DataField>Barcode</DataField>
-        </Field>
-        <Field Name="RetailComments">
-          <DataField>RetailComments</DataField>
-        </Field>
-        <Field Name="LoopValue">
-          <DataField>LoopValue</DataField>
-        </Field>
-        <Field Name="TypeAuditRolSale">
-          <DataField>TypeAuditRolSale</DataField>
-        </Field>
-        <Field Name="SaleTypeAuditRolSale">
-          <DataField>SaleTypeAuditRolSale</DataField>
-        </Field>
-        <Field Name="Description_AuditRollSale">
-          <DataField>Description_AuditRollSale</DataField>
-        </Field>
-        <Field Name="SalesTicketNo_AuditrollSale">
-          <DataField>SalesTicketNo_AuditrollSale</DataField>
-        </Field>
-        <Field Name="Description2_AuditRollSale">
-          <DataField>Description2_AuditRollSale</DataField>
-        </Field>
-        <Field Name="No_AuditRollSale">
-          <DataField>No_AuditRollSale</DataField>
-        </Field>
-        <Field Name="Quantity_AuditRollSale">
-          <DataField>Quantity_AuditRollSale</DataField>
-        </Field>
-        <Field Name="Quantity_AuditRollSaleFormat">
-          <DataField>Quantity_AuditRollSaleFormat</DataField>
-        </Field>
-        <Field Name="Type_AuditRollSale">
-          <DataField>Type_AuditRollSale</DataField>
-        </Field>
-        <Field Name="SaleType_AuditRollSale">
-          <DataField>SaleType_AuditRollSale</DataField>
-        </Field>
-        <Field Name="LineDiscAmount_AuditRollSale">
-          <DataField>LineDiscAmount_AuditRollSale</DataField>
-        </Field>
-        <Field Name="LineDiscAmount_AuditRollSaleFormat">
-          <DataField>LineDiscAmount_AuditRollSaleFormat</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_AuditRollSale">
-          <DataField>AmountInclVAT_AuditRollSale</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_AuditRollSaleFormat">
-          <DataField>AmountInclVAT_AuditRollSaleFormat</DataField>
-        </Field>
-        <Field Name="Amount_AuditRollSale">
-          <DataField>Amount_AuditRollSale</DataField>
-        </Field>
-        <Field Name="Amount_AuditRollSaleFormat">
-          <DataField>Amount_AuditRollSaleFormat</DataField>
-        </Field>
-        <Field Name="Unit_AuditRollSale">
-          <DataField>Unit_AuditRollSale</DataField>
-        </Field>
-        <Field Name="SerialNo_AudtiRollSale">
-          <DataField>SerialNo_AudtiRollSale</DataField>
-        </Field>
-        <Field Name="TotalVatAmount">
-          <DataField>TotalVatAmount</DataField>
-        </Field>
-        <Field Name="TotalVatAmountFormat">
-          <DataField>TotalVatAmountFormat</DataField>
-        </Field>
-        <Field Name="TotalAmountInclVat">
-          <DataField>TotalAmountInclVat</DataField>
-        </Field>
-        <Field Name="TotalAmountInclVatFormat">
-          <DataField>TotalAmountInclVatFormat</DataField>
-        </Field>
-        <Field Name="LineNo_AuditRollPayment">
-          <DataField>LineNo_AuditRollPayment</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_AuditRollPayment">
-          <DataField>AmountInclVAT_AuditRollPayment</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_AuditRollPaymentFormat">
-          <DataField>AmountInclVAT_AuditRollPaymentFormat</DataField>
-        </Field>
-        <Field Name="Amount_AuditRollPayment">
-          <DataField>Amount_AuditRollPayment</DataField>
-        </Field>
-        <Field Name="Amount_AuditRollPaymentFormat">
-          <DataField>Amount_AuditRollPaymentFormat</DataField>
-        </Field>
-        <Field Name="Description_AuditRollPayment">
-          <DataField>Description_AuditRollPayment</DataField>
-        </Field>
-        <Field Name="CreditVoucherRef_AuditRollPayment">
-          <DataField>CreditVoucherRef_AuditRollPayment</DataField>
-        </Field>
-        <Field Name="No_Item">
-          <DataField>No_Item</DataField>
-        </Field>
-        <Field Name="UnitListPrice_Item">
-          <DataField>UnitListPrice_Item</DataField>
-        </Field>
-        <Field Name="UnitListPrice_ItemFormat">
-          <DataField>UnitListPrice_ItemFormat</DataField>
-        </Field>
-        <Field Name="VendorItemNo_Item">
-          <DataField>VendorItemNo_Item</DataField>
-        </Field>
-        <Field Name="flgGavekort">
-          <DataField>flgGavekort</DataField>
-        </Field>
-        <Field Name="SalesTicketNo_AuditRollSaleDetails">
-          <DataField>SalesTicketNo_AuditRollSaleDetails</DataField>
-        </Field>
-        <Field Name="LineNo_AuditrollSaleDetails">
-          <DataField>LineNo_AuditrollSaleDetails</DataField>
-        </Field>
-        <Field Name="LineDiscountAmount_AuditRollSaleDetails">
-          <DataField>LineDiscountAmount_AuditRollSaleDetails</DataField>
-        </Field>
-        <Field Name="LineDiscountAmount_AuditRollSaleDetailsFormat">
-          <DataField>LineDiscountAmount_AuditRollSaleDetailsFormat</DataField>
-        </Field>
-        <Field Name="UnitPriceOnSales_NPRetailConfig">
-          <DataField>UnitPriceOnSales_NPRetailConfig</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_AuditRollSaleDetails">
-          <DataField>AmountInclVAT_AuditRollSaleDetails</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_AuditRollSaleDetailsFormat">
-          <DataField>AmountInclVAT_AuditRollSaleDetailsFormat</DataField>
-        </Field>
-        <Field Name="Quantity_AuditRollSaleDetails">
-          <DataField>Quantity_AuditRollSaleDetails</DataField>
-        </Field>
-        <Field Name="Quantity_AuditRollSaleDetailsFormat">
-          <DataField>Quantity_AuditRollSaleDetailsFormat</DataField>
-        </Field>
-        <Field Name="ShowDiscountPct_NPRetailConfig">
-          <DataField>ShowDiscountPct_NPRetailConfig</DataField>
-        </Field>
-        <Field Name="ShowVariantCode_NPRetailConfig">
-          <DataField>ShowVariantCode_NPRetailConfig</DataField>
-        </Field>
-        <Field Name="UnitPrice_AuditRollSalesDetails">
-          <DataField>UnitPrice_AuditRollSalesDetails</DataField>
-        </Field>
-        <Field Name="UnitPrice_AuditRollSalesDetailsFormat">
-          <DataField>UnitPrice_AuditRollSalesDetailsFormat</DataField>
-        </Field>
-        <Field Name="No_CustomerDetails">
-          <DataField>No_CustomerDetails</DataField>
-        </Field>
-        <Field Name="Addr_CustomerDetails">
-          <DataField>Addr_CustomerDetails</DataField>
-        </Field>
-        <Field Name="PostCodeCity_CustomerDetails">
-          <DataField>PostCodeCity_CustomerDetails</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -2765,33 +2539,6 @@
     </ReportSection>
   </ReportSections>
   <ReportParameters>
-    <ReportParameter Name="Amount_AuditRollCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Amount_AuditRollCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Amount_AuditRollCaption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Description_AuditRollSaleCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Description_AuditRollSaleCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Description_AuditRollSaleCaption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Quantity_AuditRollSaleCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Quantity_AuditRollSaleCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Quantity_AuditRollSaleCaption</Prompt>
-    </ReportParameter>
     <ReportParameter Name="PriceWDiscLbl">
       <DataType>String</DataType>
       <DefaultValue>
@@ -2855,75 +2602,88 @@
       </DefaultValue>
       <Prompt>SettlementLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="TotalEuroLbl">
+    <ReportParameter Name="Amount_AuditRollCaption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>TotalEuroLbl</Value>
+          <Value>Amount_AuditRollCaption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>TotalEuroLbl</Prompt>
+      <Prompt>Amount_AuditRollCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Description_AuditRollSaleCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Description_AuditRollSaleCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Description_AuditRollSaleCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Quantity_AuditRollSaleCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Quantity_AuditRollSaleCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Quantity_AuditRollSaleCaption</Prompt>
     </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>11</NumberOfRows>
+      <NumberOfRows>10</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>Amount_AuditRollCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>1</RowIndex>
-          <ParameterName>Description_AuditRollSaleCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>2</RowIndex>
-          <ParameterName>Quantity_AuditRollSaleCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>3</RowIndex>
           <ParameterName>PriceWDiscLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>4</RowIndex>
+          <RowIndex>1</RowIndex>
           <ParameterName>SerialNoLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>5</RowIndex>
+          <RowIndex>2</RowIndex>
           <ParameterName>DisciountLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>6</RowIndex>
+          <RowIndex>3</RowIndex>
           <ParameterName>UnitPriceLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>7</RowIndex>
+          <RowIndex>4</RowIndex>
           <ParameterName>TotalLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>8</RowIndex>
+          <RowIndex>5</RowIndex>
           <ParameterName>VatLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>9</RowIndex>
+          <RowIndex>6</RowIndex>
           <ParameterName>SettlementLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>10</RowIndex>
-          <ParameterName>TotalEuroLbl</ParameterName>
+          <RowIndex>7</RowIndex>
+          <ParameterName>Amount_AuditRollCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>8</RowIndex>
+          <ParameterName>Description_AuditRollSaleCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>9</RowIndex>
+          <ParameterName>Quantity_AuditRollSaleCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -2966,4 +2726,230 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="SalesTicketNoTxt_AuditRoll">
+          <DataField>SalesTicketNoTxt_AuditRoll</DataField>
+        </Field>
+        <Field Name="SalesPersonText">
+          <DataField>SalesPersonText</DataField>
+        </Field>
+        <Field Name="SaleDate_AuditRoll">
+          <DataField>SaleDate_AuditRoll</DataField>
+        </Field>
+        <Field Name="AmountInclVat_AuditRoll">
+          <DataField>AmountInclVat_AuditRoll</DataField>
+        </Field>
+        <Field Name="AmountInclVat_AuditRollFormat">
+          <DataField>AmountInclVat_AuditRollFormat</DataField>
+        </Field>
+        <Field Name="Reference_AuditRoll">
+          <DataField>Reference_AuditRoll</DataField>
+        </Field>
+        <Field Name="GuideNo">
+          <DataField>GuideNo</DataField>
+        </Field>
+        <Field Name="ShowGuideNo">
+          <DataField>ShowGuideNo</DataField>
+        </Field>
+        <Field Name="Amount_AuditRoll">
+          <DataField>Amount_AuditRoll</DataField>
+        </Field>
+        <Field Name="Amount_AuditRollFormat">
+          <DataField>Amount_AuditRollFormat</DataField>
+        </Field>
+        <Field Name="ReceiptInfoText">
+          <DataField>ReceiptInfoText</DataField>
+        </Field>
+        <Field Name="EuroExchangeRate_NPRetailConfig">
+          <DataField>EuroExchangeRate_NPRetailConfig</DataField>
+        </Field>
+        <Field Name="EuroExchangeRate_NPRetailConfigFormat">
+          <DataField>EuroExchangeRate_NPRetailConfigFormat</DataField>
+        </Field>
+        <Field Name="EuroOnSalesTicket_NPRetailConfig">
+          <DataField>EuroOnSalesTicket_NPRetailConfig</DataField>
+        </Field>
+        <Field Name="BarcodeOnReceipt_NPRetailConfig">
+          <DataField>BarcodeOnReceipt_NPRetailConfig</DataField>
+        </Field>
+        <Field Name="ItemUnitOnExpeditions_NPRetailConfig">
+          <DataField>ItemUnitOnExpeditions_NPRetailConfig</DataField>
+        </Field>
+        <Field Name="Desc2OnReceipt_NPRetailConfig">
+          <DataField>Desc2OnReceipt_NPRetailConfig</DataField>
+        </Field>
+        <Field Name="RecommendedPrice_NPRetailConfig">
+          <DataField>RecommendedPrice_NPRetailConfig</DataField>
+        </Field>
+        <Field Name="ShowVendorItemNo_NPRetailConfig">
+          <DataField>ShowVendorItemNo_NPRetailConfig</DataField>
+        </Field>
+        <Field Name="Barcode">
+          <DataField>Barcode</DataField>
+        </Field>
+        <Field Name="RetailComments">
+          <DataField>RetailComments</DataField>
+        </Field>
+        <Field Name="LoopValue">
+          <DataField>LoopValue</DataField>
+        </Field>
+        <Field Name="TypeAuditRolSale">
+          <DataField>TypeAuditRolSale</DataField>
+        </Field>
+        <Field Name="SaleTypeAuditRolSale">
+          <DataField>SaleTypeAuditRolSale</DataField>
+        </Field>
+        <Field Name="Description_AuditRollSale">
+          <DataField>Description_AuditRollSale</DataField>
+        </Field>
+        <Field Name="SalesTicketNo_AuditrollSale">
+          <DataField>SalesTicketNo_AuditrollSale</DataField>
+        </Field>
+        <Field Name="Description2_AuditRollSale">
+          <DataField>Description2_AuditRollSale</DataField>
+        </Field>
+        <Field Name="No_AuditRollSale">
+          <DataField>No_AuditRollSale</DataField>
+        </Field>
+        <Field Name="Quantity_AuditRollSale">
+          <DataField>Quantity_AuditRollSale</DataField>
+        </Field>
+        <Field Name="Quantity_AuditRollSaleFormat">
+          <DataField>Quantity_AuditRollSaleFormat</DataField>
+        </Field>
+        <Field Name="Type_AuditRollSale">
+          <DataField>Type_AuditRollSale</DataField>
+        </Field>
+        <Field Name="SaleType_AuditRollSale">
+          <DataField>SaleType_AuditRollSale</DataField>
+        </Field>
+        <Field Name="LineDiscAmount_AuditRollSale">
+          <DataField>LineDiscAmount_AuditRollSale</DataField>
+        </Field>
+        <Field Name="LineDiscAmount_AuditRollSaleFormat">
+          <DataField>LineDiscAmount_AuditRollSaleFormat</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_AuditRollSale">
+          <DataField>AmountInclVAT_AuditRollSale</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_AuditRollSaleFormat">
+          <DataField>AmountInclVAT_AuditRollSaleFormat</DataField>
+        </Field>
+        <Field Name="Amount_AuditRollSale">
+          <DataField>Amount_AuditRollSale</DataField>
+        </Field>
+        <Field Name="Amount_AuditRollSaleFormat">
+          <DataField>Amount_AuditRollSaleFormat</DataField>
+        </Field>
+        <Field Name="Unit_AuditRollSale">
+          <DataField>Unit_AuditRollSale</DataField>
+        </Field>
+        <Field Name="SerialNo_AudtiRollSale">
+          <DataField>SerialNo_AudtiRollSale</DataField>
+        </Field>
+        <Field Name="TotalVatAmount">
+          <DataField>TotalVatAmount</DataField>
+        </Field>
+        <Field Name="TotalVatAmountFormat">
+          <DataField>TotalVatAmountFormat</DataField>
+        </Field>
+        <Field Name="TotalAmountInclVat">
+          <DataField>TotalAmountInclVat</DataField>
+        </Field>
+        <Field Name="TotalAmountInclVatFormat">
+          <DataField>TotalAmountInclVatFormat</DataField>
+        </Field>
+        <Field Name="LineNo_AuditRollPayment">
+          <DataField>LineNo_AuditRollPayment</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_AuditRollPayment">
+          <DataField>AmountInclVAT_AuditRollPayment</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_AuditRollPaymentFormat">
+          <DataField>AmountInclVAT_AuditRollPaymentFormat</DataField>
+        </Field>
+        <Field Name="Amount_AuditRollPayment">
+          <DataField>Amount_AuditRollPayment</DataField>
+        </Field>
+        <Field Name="Amount_AuditRollPaymentFormat">
+          <DataField>Amount_AuditRollPaymentFormat</DataField>
+        </Field>
+        <Field Name="Description_AuditRollPayment">
+          <DataField>Description_AuditRollPayment</DataField>
+        </Field>
+        <Field Name="CreditVoucherRef_AuditRollPayment">
+          <DataField>CreditVoucherRef_AuditRollPayment</DataField>
+        </Field>
+        <Field Name="No_Item">
+          <DataField>No_Item</DataField>
+        </Field>
+        <Field Name="UnitListPrice_Item">
+          <DataField>UnitListPrice_Item</DataField>
+        </Field>
+        <Field Name="UnitListPrice_ItemFormat">
+          <DataField>UnitListPrice_ItemFormat</DataField>
+        </Field>
+        <Field Name="VendorItemNo_Item">
+          <DataField>VendorItemNo_Item</DataField>
+        </Field>
+        <Field Name="flgGavekort">
+          <DataField>flgGavekort</DataField>
+        </Field>
+        <Field Name="SalesTicketNo_AuditRollSaleDetails">
+          <DataField>SalesTicketNo_AuditRollSaleDetails</DataField>
+        </Field>
+        <Field Name="LineNo_AuditrollSaleDetails">
+          <DataField>LineNo_AuditrollSaleDetails</DataField>
+        </Field>
+        <Field Name="LineDiscountAmount_AuditRollSaleDetails">
+          <DataField>LineDiscountAmount_AuditRollSaleDetails</DataField>
+        </Field>
+        <Field Name="LineDiscountAmount_AuditRollSaleDetailsFormat">
+          <DataField>LineDiscountAmount_AuditRollSaleDetailsFormat</DataField>
+        </Field>
+        <Field Name="UnitPriceOnSales_NPRetailConfig">
+          <DataField>UnitPriceOnSales_NPRetailConfig</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_AuditRollSaleDetails">
+          <DataField>AmountInclVAT_AuditRollSaleDetails</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_AuditRollSaleDetailsFormat">
+          <DataField>AmountInclVAT_AuditRollSaleDetailsFormat</DataField>
+        </Field>
+        <Field Name="Quantity_AuditRollSaleDetails">
+          <DataField>Quantity_AuditRollSaleDetails</DataField>
+        </Field>
+        <Field Name="Quantity_AuditRollSaleDetailsFormat">
+          <DataField>Quantity_AuditRollSaleDetailsFormat</DataField>
+        </Field>
+        <Field Name="ShowDiscountPct_NPRetailConfig">
+          <DataField>ShowDiscountPct_NPRetailConfig</DataField>
+        </Field>
+        <Field Name="ShowVariantCode_NPRetailConfig">
+          <DataField>ShowVariantCode_NPRetailConfig</DataField>
+        </Field>
+        <Field Name="UnitPrice_AuditRollSalesDetails">
+          <DataField>UnitPrice_AuditRollSalesDetails</DataField>
+        </Field>
+        <Field Name="UnitPrice_AuditRollSalesDetailsFormat">
+          <DataField>UnitPrice_AuditRollSalesDetailsFormat</DataField>
+        </Field>
+        <Field Name="No_CustomerDetails">
+          <DataField>No_CustomerDetails</DataField>
+        </Field>
+        <Field Name="Addr_CustomerDetails">
+          <DataField>Addr_CustomerDetails</DataField>
+        </Field>
+        <Field Name="PostCodeCity_CustomerDetails">
+          <DataField>PostCodeCity_CustomerDetails</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

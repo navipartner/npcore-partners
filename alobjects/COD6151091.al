@@ -8,6 +8,8 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
     // NC2.15/MHA /20180801  CASE 306532 Added Max length to Outputname in ProcessTask()
     // NC2.15/MHA /20180829  CASE 326704 Replaced FIND with GET in CommitResponse() to ignore filters
     // NC2.17/MHA /20181116  CASE 335927 Removed green code and added Export File Type
+    // NC2.22/MHA /20190621  CASE 358239 GetFieldValue() should use Xml format
+    // NC14.00.2.22/MHA /20190715  CASE 361941 Excel support
 
     TableNo = "Nc Task";
 
@@ -76,15 +78,6 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
                         ExportToXml(NcRapidConnectSetup, NcTask, XmlDoc);
                         CommitXmlToOutput(NcTask, XmlDoc, OutputName, NcTaskOutput);
                     end;
-                NcRapidConnectSetup."Export File Type"::".xlsx":
-                    begin
-                        OutputName := CopyStr(OutputName, 1, 100 - StrLen('.xlsx'));
-                        OutputName += '.xlsx';
-                        ServerFilename := TemporaryPath + OutputName;
-
-                        ExportToExcel(NcRapidConnectSetup, NcTask, ServerFilename);
-                        CommitFileToOutput(NcTask, ServerFilename, OutputName, NcTaskOutput);
-                    end;
             end;
             //+NC2.17 [335927]
 
@@ -94,62 +87,6 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
 
         if not Success then
             Error(GetLastErrorText);
-    end;
-
-    local procedure "--- Export to Excel"()
-    begin
-    end;
-
-    local procedure ExportToExcel(NcRapidConnectSetup: Record "Nc RapidConnect Setup"; NcTask: Record "Nc Task"; var ServerFilename: Text)
-    var
-        ConfigPackageTable: Record "Config. Package Table";
-        ConfigExcelExchange: Codeunit "Config. Excel Exchange";
-        FileMgt: Codeunit "File Management";
-        NcRapidConnectSetupMgt: Codeunit "Nc RapidConnect Setup Mgt.";
-        ClientFilename: Text;
-    begin
-        NcRapidConnectSetupMgt.SetConfigPackageTableFilter(NcRapidConnectSetup, ConfigPackageTable);
-        ConfigPackageTable.FilterGroup(40);
-        ConfigPackageTable.SetRange("Table ID", NcTask."Table No.");
-        //-NC2.12 [313362]
-        ConfigExcelExchange.SetHideDialog(DialogEnabled());
-        //+NC2.12 [313362]
-        Error('AL-Conversion: TODO #361941 - AL: Changes in COD8618-"Config. Excel Exchange"');
-
-        ClientFilename := ServerFilename;
-        ConfigExcelExchange.ExportExcel(ClientFilename, ConfigPackageTable, false, false); //NAV 2017
-
-        if not GuiAllowed then begin
-            ServerFilename := ClientFilename;
-            exit;
-        end;
-
-        ServerFilename := FileMgt.UploadFileSilent(ClientFilename);
-        FileMgt.DeleteClientFile(ClientFilename);
-    end;
-
-    local procedure CommitFileToOutput(NcTask: Record "Nc Task"; Filename: Text; OutputName: Text; var NcTaskOutput: Record "Nc Task Output")
-    var
-        TempBlob: Record TempBlob temporary;
-        FileMgt: Codeunit "File Management";
-    begin
-        //-NC2.12 [313362]
-        FileMgt.BLOBImportFromServerFile(TempBlob, Filename);
-        //+NC2.12 [313362]
-
-        NcTaskOutput.Init;
-        NcTaskOutput."Entry No." := 0;
-        NcTaskOutput."Task Entry No." := NcTask."Entry No.";
-        NcTaskOutput.Data := TempBlob.Blob;
-        NcTaskOutput.Name := OutputName;
-        NcTaskOutput.Insert(true);
-
-        if not GuiAllowed then begin
-            if FILE.Erase(Filename) then;
-            exit;
-        end;
-
-        FileMgt.DeleteClientFile(Filename);
     end;
 
     local procedure "--- Export to Xml"()
@@ -224,7 +161,9 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
     local procedure GetFieldValue(var FieldRef: FieldRef) FieldValue: Text
     begin
         //-NC2.17 [335927]
-        FieldValue := Format(FieldRef.Value);
+        //-NC2.22 [358239]
+        FieldValue := Format(FieldRef.Value,0,9);
+        //+NC2.22 [358239]
         exit(FieldValue);
         //+NC2.17 [335927]
     end;
@@ -370,29 +309,6 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
     begin
     end;
 
-    procedure ExportToExcel2(NpRcRapidConnectSetup: Record "Nc RapidConnect Setup")
-    var
-        ConfigPackageTable: Record "Config. Package Table";
-        ConfigExcelExchange: Codeunit "Config. Excel Exchange";
-    begin
-        NpRcRapidConnectSetup.TestField("Package Code");
-
-        ConfigPackageTable.SetRange("Package Code", NpRcRapidConnectSetup."Package Code");
-        if not QueryExportToExcel(NpRcRapidConnectSetup."Package Code", ConfigPackageTable.Count) then
-            exit;
-
-        ConfigExcelExchange.ExportExcelFromTables(ConfigPackageTable);
-    end;
-
-    local procedure QueryExportToExcel(PackageCode: Code[20]; RecordCount: Integer) Confirmed: Boolean
-    begin
-        if not DialogEnabled() then
-            exit(true);
-
-        Confirmed := Confirm(Text000, true, PackageCode, RecordCount);
-        exit(Confirmed);
-    end;
-
     local procedure DialogEnabled(): Boolean
     begin
         if not GuiAllowed then
@@ -513,8 +429,9 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
         end;
         //+NC2.14 [322308]
         RecRef2 := RecRef.Duplicate;
-        Error('AL-Conversion: TODO #361941 - AL: Changes in COD8618-"Config. Excel Exchange"');
-        Error('AL-Conversion: TODO #361941 - AL: Changes in COD8618-"Config. Excel Exchange"');
+        //-NC14.00.2.22 [361941]
+        ConfigXMLExchange.ApplyPackageFilter(ConfigPackageTable,RecRef2);
+        //+NC14.00.2.22 [361941]
         exit(RecRef2.FindFirst);
     end;
 

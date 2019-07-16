@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,133 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="CompanyInfoName">
-          <DataField>CompanyInfoName</DataField>
-        </Field>
-        <Field Name="CompanyInfoPicture">
-          <DataField>CompanyInfoPicture</DataField>
-        </Field>
-        <Field Name="VendorNo">
-          <DataField>VendorNo</DataField>
-        </Field>
-        <Field Name="VendorName">
-          <DataField>VendorName</DataField>
-        </Field>
-        <Field Name="Inventory">
-          <DataField>Inventory</DataField>
-        </Field>
-        <Field Name="InventoryFormat">
-          <DataField>InventoryFormat</DataField>
-        </Field>
-        <Field Name="Inventory_caption">
-          <DataField>Inventory_caption</DataField>
-        </Field>
-        <Field Name="QuantitySold">
-          <DataField>QuantitySold</DataField>
-        </Field>
-        <Field Name="QuantitySoldFormat">
-          <DataField>QuantitySoldFormat</DataField>
-        </Field>
-        <Field Name="QuantitySold_caption">
-          <DataField>QuantitySold_caption</DataField>
-        </Field>
-        <Field Name="PeriodLineItemNo">
-          <DataField>PeriodLineItemNo</DataField>
-        </Field>
-        <Field Name="Code_PeriodDiscountLine">
-          <DataField>Code_PeriodDiscountLine</DataField>
-        </Field>
-        <Field Name="PeriodLineDesc">
-          <DataField>PeriodLineDesc</DataField>
-        </Field>
-        <Field Name="UnitCostPurchase_PeriodDiscountLine">
-          <DataField>UnitCostPurchase_PeriodDiscountLine</DataField>
-        </Field>
-        <Field Name="UnitCostPurchase_PeriodDiscountLineFormat">
-          <DataField>UnitCostPurchase_PeriodDiscountLineFormat</DataField>
-        </Field>
-        <Field Name="VariantCode_PeriodDiscountLine">
-          <DataField>VariantCode_PeriodDiscountLine</DataField>
-        </Field>
-        <Field Name="PeriodLineUnitPrice">
-          <DataField>PeriodLineUnitPrice</DataField>
-        </Field>
-        <Field Name="PeriodLineUnitPriceFormat">
-          <DataField>PeriodLineUnitPriceFormat</DataField>
-        </Field>
-        <Field Name="PeriodLineCampaignUnitPrice">
-          <DataField>PeriodLineCampaignUnitPrice</DataField>
-        </Field>
-        <Field Name="PeriodLineCampaignUnitPriceFormat">
-          <DataField>PeriodLineCampaignUnitPriceFormat</DataField>
-        </Field>
-        <Field Name="QuantitySold_PeriodDiscountLine">
-          <DataField>QuantitySold_PeriodDiscountLine</DataField>
-        </Field>
-        <Field Name="QuantitySold_PeriodDiscountLineFormat">
-          <DataField>QuantitySold_PeriodDiscountLineFormat</DataField>
-        </Field>
-        <Field Name="QuantitySold_PeriodDiscountLine_caption">
-          <DataField>QuantitySold_PeriodDiscountLine_caption</DataField>
-        </Field>
-        <Field Name="Photo_PeriodDiscountLine">
-          <DataField>Photo_PeriodDiscountLine</DataField>
-        </Field>
-        <Field Name="Photo_PeriodDiscountLine_Caption">
-          <DataField>Photo_PeriodDiscountLine_Caption</DataField>
-        </Field>
-        <Field Name="TableID_RetailComment">
-          <DataField>TableID_RetailComment</DataField>
-        </Field>
-        <Field Name="No_RetailComment">
-          <DataField>No_RetailComment</DataField>
-        </Field>
-        <Field Name="No2_RetailComment">
-          <DataField>No2_RetailComment</DataField>
-        </Field>
-        <Field Name="Comment_RetailComment">
-          <DataField>Comment_RetailComment</DataField>
-        </Field>
-        <Field Name="Date_RetailComment">
-          <DataField>Date_RetailComment</DataField>
-        </Field>
-        <Field Name="No_MixedDiscountLine">
-          <DataField>No_MixedDiscountLine</DataField>
-        </Field>
-        <Field Name="Code_MixedDiscountLine">
-          <DataField>Code_MixedDiscountLine</DataField>
-        </Field>
-        <Field Name="Unitcost_MixedDiscountLine">
-          <DataField>Unitcost_MixedDiscountLine</DataField>
-        </Field>
-        <Field Name="Unitcost_MixedDiscountLineFormat">
-          <DataField>Unitcost_MixedDiscountLineFormat</DataField>
-        </Field>
-        <Field Name="Unitprice_MixedDiscountLine">
-          <DataField>Unitprice_MixedDiscountLine</DataField>
-        </Field>
-        <Field Name="Unitprice_MixedDiscountLineFormat">
-          <DataField>Unitprice_MixedDiscountLineFormat</DataField>
-        </Field>
-        <Field Name="UnitpriceinclVAT_MixedDiscountLine">
-          <DataField>UnitpriceinclVAT_MixedDiscountLine</DataField>
-        </Field>
-        <Field Name="VariantCode_MixedDiscountLine">
-          <DataField>VariantCode_MixedDiscountLine</DataField>
-        </Field>
-        <Field Name="Description_MixedDiscountLine">
-          <DataField>Description_MixedDiscountLine</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3091,4 +2964,131 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="CompanyInfoName">
+          <DataField>CompanyInfoName</DataField>
+        </Field>
+        <Field Name="CompanyInfoPicture">
+          <DataField>CompanyInfoPicture</DataField>
+        </Field>
+        <Field Name="VendorNo">
+          <DataField>VendorNo</DataField>
+        </Field>
+        <Field Name="VendorName">
+          <DataField>VendorName</DataField>
+        </Field>
+        <Field Name="Inventory">
+          <DataField>Inventory</DataField>
+        </Field>
+        <Field Name="InventoryFormat">
+          <DataField>InventoryFormat</DataField>
+        </Field>
+        <Field Name="Inventory_caption">
+          <DataField>Inventory_caption</DataField>
+        </Field>
+        <Field Name="QuantitySold">
+          <DataField>QuantitySold</DataField>
+        </Field>
+        <Field Name="QuantitySoldFormat">
+          <DataField>QuantitySoldFormat</DataField>
+        </Field>
+        <Field Name="QuantitySold_caption">
+          <DataField>QuantitySold_caption</DataField>
+        </Field>
+        <Field Name="PeriodLineItemNo">
+          <DataField>PeriodLineItemNo</DataField>
+        </Field>
+        <Field Name="Code_PeriodDiscountLine">
+          <DataField>Code_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="PeriodLineDesc">
+          <DataField>PeriodLineDesc</DataField>
+        </Field>
+        <Field Name="UnitCostPurchase_PeriodDiscountLine">
+          <DataField>UnitCostPurchase_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="UnitCostPurchase_PeriodDiscountLineFormat">
+          <DataField>UnitCostPurchase_PeriodDiscountLineFormat</DataField>
+        </Field>
+        <Field Name="VariantCode_PeriodDiscountLine">
+          <DataField>VariantCode_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="PeriodLineUnitPrice">
+          <DataField>PeriodLineUnitPrice</DataField>
+        </Field>
+        <Field Name="PeriodLineUnitPriceFormat">
+          <DataField>PeriodLineUnitPriceFormat</DataField>
+        </Field>
+        <Field Name="PeriodLineCampaignUnitPrice">
+          <DataField>PeriodLineCampaignUnitPrice</DataField>
+        </Field>
+        <Field Name="PeriodLineCampaignUnitPriceFormat">
+          <DataField>PeriodLineCampaignUnitPriceFormat</DataField>
+        </Field>
+        <Field Name="QuantitySold_PeriodDiscountLine">
+          <DataField>QuantitySold_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="QuantitySold_PeriodDiscountLineFormat">
+          <DataField>QuantitySold_PeriodDiscountLineFormat</DataField>
+        </Field>
+        <Field Name="QuantitySold_PeriodDiscountLine_caption">
+          <DataField>QuantitySold_PeriodDiscountLine_caption</DataField>
+        </Field>
+        <Field Name="Photo_PeriodDiscountLine">
+          <DataField>Photo_PeriodDiscountLine</DataField>
+        </Field>
+        <Field Name="Photo_PeriodDiscountLine_Caption">
+          <DataField>Photo_PeriodDiscountLine_Caption</DataField>
+        </Field>
+        <Field Name="TableID_RetailComment">
+          <DataField>TableID_RetailComment</DataField>
+        </Field>
+        <Field Name="No_RetailComment">
+          <DataField>No_RetailComment</DataField>
+        </Field>
+        <Field Name="No2_RetailComment">
+          <DataField>No2_RetailComment</DataField>
+        </Field>
+        <Field Name="Comment_RetailComment">
+          <DataField>Comment_RetailComment</DataField>
+        </Field>
+        <Field Name="Date_RetailComment">
+          <DataField>Date_RetailComment</DataField>
+        </Field>
+        <Field Name="No_MixedDiscountLine">
+          <DataField>No_MixedDiscountLine</DataField>
+        </Field>
+        <Field Name="Code_MixedDiscountLine">
+          <DataField>Code_MixedDiscountLine</DataField>
+        </Field>
+        <Field Name="Unitcost_MixedDiscountLine">
+          <DataField>Unitcost_MixedDiscountLine</DataField>
+        </Field>
+        <Field Name="Unitcost_MixedDiscountLineFormat">
+          <DataField>Unitcost_MixedDiscountLineFormat</DataField>
+        </Field>
+        <Field Name="Unitprice_MixedDiscountLine">
+          <DataField>Unitprice_MixedDiscountLine</DataField>
+        </Field>
+        <Field Name="Unitprice_MixedDiscountLineFormat">
+          <DataField>Unitprice_MixedDiscountLineFormat</DataField>
+        </Field>
+        <Field Name="UnitpriceinclVAT_MixedDiscountLine">
+          <DataField>UnitpriceinclVAT_MixedDiscountLine</DataField>
+        </Field>
+        <Field Name="VariantCode_MixedDiscountLine">
+          <DataField>VariantCode_MixedDiscountLine</DataField>
+        </Field>
+        <Field Name="Description_MixedDiscountLine">
+          <DataField>Description_MixedDiscountLine</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

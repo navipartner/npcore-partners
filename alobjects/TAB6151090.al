@@ -2,6 +2,7 @@ table 6151090 "Nc RapidConnect Setup"
 {
     // NC2.12/MHA /20180418  CASE 308107 Object created - RapidStart with NaviConnect
     // NC2.17/MHA /20181122  CASE 335927 Added field 110 "Export File Type"
+    // NC14.00.2.22/MHA /20190715  CASE 361941 Removed Option value ".xlsx" from field 110 "Export File Type"
 
     Caption = 'Nc RapidConnect Setup';
     DrillDownPageID = "Nc RapidConnect Setup";
@@ -35,9 +36,9 @@ table 6151090 "Nc RapidConnect Setup"
         field(110;"Export File Type";Option)
         {
             Caption = 'Export File Type';
-            Description = 'NC2.17';
-            OptionCaption = '.xml,.xlsx';
-            OptionMembers = ".xml",".xlsx";
+            Description = 'NC2.17,NC2.22';
+            OptionCaption = '.xml';
+            OptionMembers = ".xml";
         }
         field(200;"Import Enabled";Boolean)
         {

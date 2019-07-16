@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,172 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="CompanyName">
-          <DataField>CompanyName</DataField>
-        </Field>
-        <Field Name="ItemFilter">
-          <DataField>ItemFilter</DataField>
-        </Field>
-        <Field Name="Temp_ItemNo">
-          <DataField>Temp_ItemNo</DataField>
-        </Field>
-        <Field Name="ItemNoCaption">
-          <DataField>ItemNoCaption</DataField>
-        </Field>
-        <Field Name="Item_Description">
-          <DataField>Item_Description</DataField>
-        </Field>
-        <Field Name="ItemDescCaption">
-          <DataField>ItemDescCaption</DataField>
-        </Field>
-        <Field Name="Temp_VariantCode">
-          <DataField>Temp_VariantCode</DataField>
-        </Field>
-        <Field Name="VariantCodeCaption">
-          <DataField>VariantCodeCaption</DataField>
-        </Field>
-        <Field Name="ItemVariant_Description">
-          <DataField>ItemVariant_Description</DataField>
-        </Field>
-        <Field Name="VariantDescCaption">
-          <DataField>VariantDescCaption</DataField>
-        </Field>
-        <Field Name="Temp_LocationCode">
-          <DataField>Temp_LocationCode</DataField>
-        </Field>
-        <Field Name="LocationCodeCaption">
-          <DataField>LocationCodeCaption</DataField>
-        </Field>
-        <Field Name="Temp_Inventory">
-          <DataField>Temp_Inventory</DataField>
-        </Field>
-        <Field Name="Temp_InventoryFormat">
-          <DataField>Temp_InventoryFormat</DataField>
-        </Field>
-        <Field Name="InvCaption">
-          <DataField>InvCaption</DataField>
-        </Field>
-        <Field Name="FirstColCaption">
-          <DataField>FirstColCaption</DataField>
-        </Field>
-        <Field Name="Temp_QtyOnPurchOrders">
-          <DataField>Temp_QtyOnPurchOrders</DataField>
-        </Field>
-        <Field Name="Temp_QtyOnPurchOrdersFormat">
-          <DataField>Temp_QtyOnPurchOrdersFormat</DataField>
-        </Field>
-        <Field Name="QtyOnPurchOrderCaption">
-          <DataField>QtyOnPurchOrderCaption</DataField>
-        </Field>
-        <Field Name="SecondColCaption">
-          <DataField>SecondColCaption</DataField>
-        </Field>
-        <Field Name="Temp_QtyOnSaleOrders">
-          <DataField>Temp_QtyOnSaleOrders</DataField>
-        </Field>
-        <Field Name="Temp_QtyOnSaleOrdersFormat">
-          <DataField>Temp_QtyOnSaleOrdersFormat</DataField>
-        </Field>
-        <Field Name="QtyOnSalesOrderCaption">
-          <DataField>QtyOnSalesOrderCaption</DataField>
-        </Field>
-        <Field Name="ThirdColCaption">
-          <DataField>ThirdColCaption</DataField>
-        </Field>
-        <Field Name="Temp_ProjectedInv">
-          <DataField>Temp_ProjectedInv</DataField>
-        </Field>
-        <Field Name="Temp_ProjectedInvFormat">
-          <DataField>Temp_ProjectedInvFormat</DataField>
-        </Field>
-        <Field Name="ProjectedInvCaption">
-          <DataField>ProjectedInvCaption</DataField>
-        </Field>
-        <Field Name="FourthColCaption">
-          <DataField>FourthColCaption</DataField>
-        </Field>
-        <Field Name="Temp_ReorderPoint">
-          <DataField>Temp_ReorderPoint</DataField>
-        </Field>
-        <Field Name="Temp_ReorderPointFormat">
-          <DataField>Temp_ReorderPointFormat</DataField>
-        </Field>
-        <Field Name="Temp_ReorderPointText">
-          <DataField>Temp_ReorderPointText</DataField>
-        </Field>
-        <Field Name="ReorderPointCaption">
-          <DataField>ReorderPointCaption</DataField>
-        </Field>
-        <Field Name="Temp_ReorderQty">
-          <DataField>Temp_ReorderQty</DataField>
-        </Field>
-        <Field Name="Temp_ReorderQtyFormat">
-          <DataField>Temp_ReorderQtyFormat</DataField>
-        </Field>
-        <Field Name="ReorderQtyCaption">
-          <DataField>ReorderQtyCaption</DataField>
-        </Field>
-        <Field Name="FifthColCaption">
-          <DataField>FifthColCaption</DataField>
-        </Field>
-        <Field Name="Temp_MaxInv">
-          <DataField>Temp_MaxInv</DataField>
-        </Field>
-        <Field Name="Temp_MaxInvFormat">
-          <DataField>Temp_MaxInvFormat</DataField>
-        </Field>
-        <Field Name="Temp_MaxInvText">
-          <DataField>Temp_MaxInvText</DataField>
-        </Field>
-        <Field Name="MaxiInvCaption">
-          <DataField>MaxiInvCaption</DataField>
-        </Field>
-        <Field Name="Temp_NewProjectedInv">
-          <DataField>Temp_NewProjectedInv</DataField>
-        </Field>
-        <Field Name="Temp_NewProjectedInvFormat">
-          <DataField>Temp_NewProjectedInvFormat</DataField>
-        </Field>
-        <Field Name="NewProjectedInvCaption">
-          <DataField>NewProjectedInvCaption</DataField>
-        </Field>
-        <Field Name="SixthColCaption">
-          <DataField>SixthColCaption</DataField>
-        </Field>
-        <Field Name="Temp_DiffCalcReason">
-          <DataField>Temp_DiffCalcReason</DataField>
-        </Field>
-        <Field Name="Temp_OrderQty">
-          <DataField>Temp_OrderQty</DataField>
-        </Field>
-        <Field Name="Temp_OrderQtyFormat">
-          <DataField>Temp_OrderQtyFormat</DataField>
-        </Field>
-        <Field Name="OrderQtyCaption">
-          <DataField>OrderQtyCaption</DataField>
-        </Field>
-        <Field Name="ItemReplenByStoreCaption">
-          <DataField>ItemReplenByStoreCaption</DataField>
-        </Field>
-        <Field Name="CurrReportPageNoCaption">
-          <DataField>CurrReportPageNoCaption</DataField>
-        </Field>
-        <Field Name="NotBelowReorderPointCaption">
-          <DataField>NotBelowReorderPointCaption</DataField>
-        </Field>
-        <Field Name="InvOverMaxCaption">
-          <DataField>InvOverMaxCaption</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -2791,4 +2625,170 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="CompanyName">
+          <DataField>CompanyName</DataField>
+        </Field>
+        <Field Name="ItemFilter">
+          <DataField>ItemFilter</DataField>
+        </Field>
+        <Field Name="Temp_ItemNo">
+          <DataField>Temp_ItemNo</DataField>
+        </Field>
+        <Field Name="ItemNoCaption">
+          <DataField>ItemNoCaption</DataField>
+        </Field>
+        <Field Name="Item_Description">
+          <DataField>Item_Description</DataField>
+        </Field>
+        <Field Name="ItemDescCaption">
+          <DataField>ItemDescCaption</DataField>
+        </Field>
+        <Field Name="Temp_VariantCode">
+          <DataField>Temp_VariantCode</DataField>
+        </Field>
+        <Field Name="VariantCodeCaption">
+          <DataField>VariantCodeCaption</DataField>
+        </Field>
+        <Field Name="ItemVariant_Description">
+          <DataField>ItemVariant_Description</DataField>
+        </Field>
+        <Field Name="VariantDescCaption">
+          <DataField>VariantDescCaption</DataField>
+        </Field>
+        <Field Name="Temp_LocationCode">
+          <DataField>Temp_LocationCode</DataField>
+        </Field>
+        <Field Name="LocationCodeCaption">
+          <DataField>LocationCodeCaption</DataField>
+        </Field>
+        <Field Name="Temp_Inventory">
+          <DataField>Temp_Inventory</DataField>
+        </Field>
+        <Field Name="Temp_InventoryFormat">
+          <DataField>Temp_InventoryFormat</DataField>
+        </Field>
+        <Field Name="InvCaption">
+          <DataField>InvCaption</DataField>
+        </Field>
+        <Field Name="FirstColCaption">
+          <DataField>FirstColCaption</DataField>
+        </Field>
+        <Field Name="Temp_QtyOnPurchOrders">
+          <DataField>Temp_QtyOnPurchOrders</DataField>
+        </Field>
+        <Field Name="Temp_QtyOnPurchOrdersFormat">
+          <DataField>Temp_QtyOnPurchOrdersFormat</DataField>
+        </Field>
+        <Field Name="QtyOnPurchOrderCaption">
+          <DataField>QtyOnPurchOrderCaption</DataField>
+        </Field>
+        <Field Name="SecondColCaption">
+          <DataField>SecondColCaption</DataField>
+        </Field>
+        <Field Name="Temp_QtyOnSaleOrders">
+          <DataField>Temp_QtyOnSaleOrders</DataField>
+        </Field>
+        <Field Name="Temp_QtyOnSaleOrdersFormat">
+          <DataField>Temp_QtyOnSaleOrdersFormat</DataField>
+        </Field>
+        <Field Name="QtyOnSalesOrderCaption">
+          <DataField>QtyOnSalesOrderCaption</DataField>
+        </Field>
+        <Field Name="ThirdColCaption">
+          <DataField>ThirdColCaption</DataField>
+        </Field>
+        <Field Name="Temp_ProjectedInv">
+          <DataField>Temp_ProjectedInv</DataField>
+        </Field>
+        <Field Name="Temp_ProjectedInvFormat">
+          <DataField>Temp_ProjectedInvFormat</DataField>
+        </Field>
+        <Field Name="ProjectedInvCaption">
+          <DataField>ProjectedInvCaption</DataField>
+        </Field>
+        <Field Name="FourthColCaption">
+          <DataField>FourthColCaption</DataField>
+        </Field>
+        <Field Name="Temp_ReorderPoint">
+          <DataField>Temp_ReorderPoint</DataField>
+        </Field>
+        <Field Name="Temp_ReorderPointFormat">
+          <DataField>Temp_ReorderPointFormat</DataField>
+        </Field>
+        <Field Name="Temp_ReorderPointText">
+          <DataField>Temp_ReorderPointText</DataField>
+        </Field>
+        <Field Name="ReorderPointCaption">
+          <DataField>ReorderPointCaption</DataField>
+        </Field>
+        <Field Name="Temp_ReorderQty">
+          <DataField>Temp_ReorderQty</DataField>
+        </Field>
+        <Field Name="Temp_ReorderQtyFormat">
+          <DataField>Temp_ReorderQtyFormat</DataField>
+        </Field>
+        <Field Name="ReorderQtyCaption">
+          <DataField>ReorderQtyCaption</DataField>
+        </Field>
+        <Field Name="FifthColCaption">
+          <DataField>FifthColCaption</DataField>
+        </Field>
+        <Field Name="Temp_MaxInv">
+          <DataField>Temp_MaxInv</DataField>
+        </Field>
+        <Field Name="Temp_MaxInvFormat">
+          <DataField>Temp_MaxInvFormat</DataField>
+        </Field>
+        <Field Name="Temp_MaxInvText">
+          <DataField>Temp_MaxInvText</DataField>
+        </Field>
+        <Field Name="MaxiInvCaption">
+          <DataField>MaxiInvCaption</DataField>
+        </Field>
+        <Field Name="Temp_NewProjectedInv">
+          <DataField>Temp_NewProjectedInv</DataField>
+        </Field>
+        <Field Name="Temp_NewProjectedInvFormat">
+          <DataField>Temp_NewProjectedInvFormat</DataField>
+        </Field>
+        <Field Name="NewProjectedInvCaption">
+          <DataField>NewProjectedInvCaption</DataField>
+        </Field>
+        <Field Name="SixthColCaption">
+          <DataField>SixthColCaption</DataField>
+        </Field>
+        <Field Name="Temp_DiffCalcReason">
+          <DataField>Temp_DiffCalcReason</DataField>
+        </Field>
+        <Field Name="Temp_OrderQty">
+          <DataField>Temp_OrderQty</DataField>
+        </Field>
+        <Field Name="Temp_OrderQtyFormat">
+          <DataField>Temp_OrderQtyFormat</DataField>
+        </Field>
+        <Field Name="OrderQtyCaption">
+          <DataField>OrderQtyCaption</DataField>
+        </Field>
+        <Field Name="ItemReplenByStoreCaption">
+          <DataField>ItemReplenByStoreCaption</DataField>
+        </Field>
+        <Field Name="CurrReportPageNoCaption">
+          <DataField>CurrReportPageNoCaption</DataField>
+        </Field>
+        <Field Name="NotBelowReorderPointCaption">
+          <DataField>NotBelowReorderPointCaption</DataField>
+        </Field>
+        <Field Name="InvOverMaxCaption">
+          <DataField>InvOverMaxCaption</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

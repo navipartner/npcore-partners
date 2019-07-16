@@ -8,6 +8,7 @@ table 6151416 "Magento Brand"
     // MAG1.20/TS/20151005 CASE 224193  Added field 105 Sorting
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
+    // MAG2.22/MHA /20190614  CASE 358258 Extended field 110 "Meta Title" from 50 to 100
 
     Caption = 'Magento Brand';
     DrillDownPageID = "Magento Brands";
@@ -87,10 +88,10 @@ table 6151416 "Magento Brand"
             Caption = 'Sorting';
             Description = 'MAG1.20';
         }
-        field(110;"Meta Title";Text[50])
+        field(110;"Meta Title";Text[100])
         {
             Caption = 'Meta Title';
-            Description = 'MAG2.00';
+            Description = 'MAG2.00,MAG2.22';
         }
         field(115;"Meta Description";Text[250])
         {

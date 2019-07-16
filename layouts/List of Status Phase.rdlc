@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,151 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="StockTakeConfigCode_StockTakeWorksheet">
-          <DataField>StockTakeConfigCode_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="Name_StockTakeWorksheet">
-          <DataField>Name_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="Description_StockTakeWorksheet">
-          <DataField>Description_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="Status_StockTakeWorksheet">
-          <DataField>Status_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="ItemGroupFilter_StockTakeWorksheet">
-          <DataField>ItemGroupFilter_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="VendorCodeFilter_StockTakeWorksheet">
-          <DataField>VendorCodeFilter_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="GlobalDimension1CodeFilter_StockTakeWorksheet">
-          <DataField>GlobalDimension1CodeFilter_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="GlobalDimension2CodeFilter_StockTakeWorksheet">
-          <DataField>GlobalDimension2CodeFilter_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="AllowUserModification_StockTakeWorksheet">
-          <DataField>AllowUserModification_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="ConfCalcDate_StockTakeWorksheet">
-          <DataField>ConfCalcDate_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="ConfLocationCode_StockTakeWorksheet">
-          <DataField>ConfLocationCode_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="ConfItemGroupFilter_StockTakeWorksheet">
-          <DataField>ConfItemGroupFilter_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="ConfVendorCodeFilter_StockTakeWorksheet">
-          <DataField>ConfVendorCodeFilter_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="ConfGlobalDim1CodeFilter_StockTakeWorksheet">
-          <DataField>ConfGlobalDim1CodeFilter_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="ConfGlobalDim2CodeFilter_StockTakeWorksheet">
-          <DataField>ConfGlobalDim2CodeFilter_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="ConfStockTakeMethod_StockTakeWorksheet">
-          <DataField>ConfStockTakeMethod_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="ConfAdjustmentMethod_StockTakeWorksheet">
-          <DataField>ConfAdjustmentMethod_StockTakeWorksheet</DataField>
-        </Field>
-        <Field Name="StockTakeConfigCode_StockTakeWorksheetLine">
-          <DataField>StockTakeConfigCode_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="WorksheetName_StockTakeWorksheetLine">
-          <DataField>WorksheetName_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="LineNo_StockTakeWorksheetLine">
-          <DataField>LineNo_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="Barcode_StockTakeWorksheetLine">
-          <DataField>Barcode_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="ItemNo_StockTakeWorksheetLine">
-          <DataField>ItemNo_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="VariantCode_StockTakeWorksheetLine">
-          <DataField>VariantCode_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="QtyCounted_StockTakeWorksheetLine">
-          <DataField>QtyCounted_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="QtyCounted_StockTakeWorksheetLineFormat">
-          <DataField>QtyCounted_StockTakeWorksheetLineFormat</DataField>
-        </Field>
-        <Field Name="UnitCost_StockTakeWorksheetLine">
-          <DataField>UnitCost_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="UnitCost_StockTakeWorksheetLineFormat">
-          <DataField>UnitCost_StockTakeWorksheetLineFormat</DataField>
-        </Field>
-        <Field Name="DateofInventory_StockTakeWorksheetLine">
-          <DataField>DateofInventory_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="Blocked_StockTakeWorksheetLine">
-          <DataField>Blocked_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="RequireVariantCode_StockTakeWorksheetLine">
-          <DataField>RequireVariantCode_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="ShelfNo_StockTakeWorksheetLine">
-          <DataField>ShelfNo_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="ShortcutDimension1Code_StockTakeWorksheetLine">
-          <DataField>ShortcutDimension1Code_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="ShortcutDimension2Code_StockTakeWorksheetLine">
-          <DataField>ShortcutDimension2Code_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="ItemTranslationSource_StockTakeWorksheetLine">
-          <DataField>ItemTranslationSource_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="SessionID_StockTakeWorksheetLine">
-          <DataField>SessionID_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="SessionName_StockTakeWorksheetLine">
-          <DataField>SessionName_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="SessionDateTime_StockTakeWorksheetLine">
-          <DataField>SessionDateTime_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="TransferState_StockTakeWorksheetLine">
-          <DataField>TransferState_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="ItemDescription_StockTakeWorksheetLine">
-          <DataField>ItemDescription_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="VariantDescription_StockTakeWorksheetLine">
-          <DataField>VariantDescription_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="ItemTransSourceDesc_StockTakeWorksheetLine">
-          <DataField>ItemTransSourceDesc_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="QtyTotalCounted_StockTakeWorksheetLine">
-          <DataField>QtyTotalCounted_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="QtyTotalCounted_StockTakeWorksheetLineFormat">
-          <DataField>QtyTotalCounted_StockTakeWorksheetLineFormat</DataField>
-        </Field>
-        <Field Name="PhysInvBatchNameFilter_StockTakeWorksheetLine">
-          <DataField>PhysInvBatchNameFilter_StockTakeWorksheetLine</DataField>
-        </Field>
-        <Field Name="DimensionSetID_StockTakeWorksheetLine">
-          <DataField>DimensionSetID_StockTakeWorksheetLine</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -1783,6 +1638,24 @@ Cstr(Fields!ConfAdjustmentMethod_StockTakeWorksheet.Value),1)</Hidden>
     </ReportSection>
   </ReportSections>
   <ReportParameters>
+    <ReportParameter Name="ReportTitleLabel">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ReportTitleLabel</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ReportTitleLabel</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ControlLabel">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ControlLabel</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ControlLabel</Prompt>
+    </ReportParameter>
     <ReportParameter Name="StockTakeConfigCode_StockTakeWorksheetCaption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -2161,24 +2034,6 @@ Cstr(Fields!ConfAdjustmentMethod_StockTakeWorksheet.Value),1)</Hidden>
       </DefaultValue>
       <Prompt>DimensionSetID_StockTakeWorksheetLineCaption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ReportTitleLabel">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>ReportTitleLabel</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>ReportTitleLabel</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="ControlLabel">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>ControlLabel</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>ControlLabel</Prompt>
-    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
@@ -2188,222 +2043,222 @@ Cstr(Fields!ConfAdjustmentMethod_StockTakeWorksheet.Value),1)</Hidden>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>StockTakeConfigCode_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>1</RowIndex>
-          <ParameterName>Name_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>2</RowIndex>
-          <ParameterName>Description_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>3</RowIndex>
-          <ParameterName>Status_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>4</RowIndex>
-          <ParameterName>ItemGroupFilter_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>5</RowIndex>
-          <ParameterName>VendorCodeFilter_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>6</RowIndex>
-          <ParameterName>GlobalDimension1CodeFilter_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>7</RowIndex>
-          <ParameterName>GlobalDimension2CodeFilter_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>8</RowIndex>
-          <ParameterName>AllowUserModification_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>9</RowIndex>
-          <ParameterName>ConfCalcDate_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>10</RowIndex>
-          <ParameterName>ConfLocationCode_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>11</RowIndex>
-          <ParameterName>ConfItemGroupFilter_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>12</RowIndex>
-          <ParameterName>ConfVendorCodeFilter_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>13</RowIndex>
-          <ParameterName>ConfGlobalDim1CodeFilter_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>14</RowIndex>
-          <ParameterName>ConfGlobalDim2CodeFilter_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>15</RowIndex>
-          <ParameterName>ConfStockTakeMethod_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>16</RowIndex>
-          <ParameterName>ConfAdjustmentMethod_StockTakeWorksheetCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>17</RowIndex>
-          <ParameterName>StockTakeConfigCode_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>18</RowIndex>
-          <ParameterName>WorksheetName_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>19</RowIndex>
-          <ParameterName>LineNo_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>20</RowIndex>
-          <ParameterName>Barcode_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>21</RowIndex>
-          <ParameterName>ItemNo_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>22</RowIndex>
-          <ParameterName>VariantCode_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>23</RowIndex>
-          <ParameterName>QtyCounted_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>24</RowIndex>
-          <ParameterName>UnitCost_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>25</RowIndex>
-          <ParameterName>DateofInventory_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>26</RowIndex>
-          <ParameterName>Blocked_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>27</RowIndex>
-          <ParameterName>RequireVariantCode_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>28</RowIndex>
-          <ParameterName>ShelfNo_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>29</RowIndex>
-          <ParameterName>ShortcutDimension1Code_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>30</RowIndex>
-          <ParameterName>ShortcutDimension2Code_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>31</RowIndex>
-          <ParameterName>ItemTranslationSource_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>32</RowIndex>
-          <ParameterName>SessionID_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>33</RowIndex>
-          <ParameterName>SessionName_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>34</RowIndex>
-          <ParameterName>SessionDateTime_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>35</RowIndex>
-          <ParameterName>TransferState_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>36</RowIndex>
-          <ParameterName>ItemDescription_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>37</RowIndex>
-          <ParameterName>VariantDescription_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>38</RowIndex>
-          <ParameterName>ItemTransSourceDesc_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>39</RowIndex>
-          <ParameterName>QtyTotalCounted_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>40</RowIndex>
-          <ParameterName>PhysInvBatchNameFilter_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>41</RowIndex>
-          <ParameterName>DimensionSetID_StockTakeWorksheetLineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>42</RowIndex>
           <ParameterName>ReportTitleLabel</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>43</RowIndex>
+          <RowIndex>1</RowIndex>
           <ParameterName>ControlLabel</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>2</RowIndex>
+          <ParameterName>StockTakeConfigCode_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>3</RowIndex>
+          <ParameterName>Name_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>4</RowIndex>
+          <ParameterName>Description_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>5</RowIndex>
+          <ParameterName>Status_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>6</RowIndex>
+          <ParameterName>ItemGroupFilter_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>7</RowIndex>
+          <ParameterName>VendorCodeFilter_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>8</RowIndex>
+          <ParameterName>GlobalDimension1CodeFilter_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>9</RowIndex>
+          <ParameterName>GlobalDimension2CodeFilter_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>10</RowIndex>
+          <ParameterName>AllowUserModification_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>11</RowIndex>
+          <ParameterName>ConfCalcDate_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>12</RowIndex>
+          <ParameterName>ConfLocationCode_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>13</RowIndex>
+          <ParameterName>ConfItemGroupFilter_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>14</RowIndex>
+          <ParameterName>ConfVendorCodeFilter_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>15</RowIndex>
+          <ParameterName>ConfGlobalDim1CodeFilter_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>16</RowIndex>
+          <ParameterName>ConfGlobalDim2CodeFilter_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>17</RowIndex>
+          <ParameterName>ConfStockTakeMethod_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>18</RowIndex>
+          <ParameterName>ConfAdjustmentMethod_StockTakeWorksheetCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>19</RowIndex>
+          <ParameterName>StockTakeConfigCode_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>20</RowIndex>
+          <ParameterName>WorksheetName_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>21</RowIndex>
+          <ParameterName>LineNo_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>22</RowIndex>
+          <ParameterName>Barcode_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>23</RowIndex>
+          <ParameterName>ItemNo_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>24</RowIndex>
+          <ParameterName>VariantCode_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>25</RowIndex>
+          <ParameterName>QtyCounted_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>26</RowIndex>
+          <ParameterName>UnitCost_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>27</RowIndex>
+          <ParameterName>DateofInventory_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>28</RowIndex>
+          <ParameterName>Blocked_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>29</RowIndex>
+          <ParameterName>RequireVariantCode_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>30</RowIndex>
+          <ParameterName>ShelfNo_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>31</RowIndex>
+          <ParameterName>ShortcutDimension1Code_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>32</RowIndex>
+          <ParameterName>ShortcutDimension2Code_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>33</RowIndex>
+          <ParameterName>ItemTranslationSource_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>34</RowIndex>
+          <ParameterName>SessionID_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>35</RowIndex>
+          <ParameterName>SessionName_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>36</RowIndex>
+          <ParameterName>SessionDateTime_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>37</RowIndex>
+          <ParameterName>TransferState_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>38</RowIndex>
+          <ParameterName>ItemDescription_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>39</RowIndex>
+          <ParameterName>VariantDescription_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>40</RowIndex>
+          <ParameterName>ItemTransSourceDesc_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>41</RowIndex>
+          <ParameterName>QtyTotalCounted_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>42</RowIndex>
+          <ParameterName>PhysInvBatchNameFilter_StockTakeWorksheetLineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>43</RowIndex>
+          <ParameterName>DimensionSetID_StockTakeWorksheetLineCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -2511,4 +2366,149 @@ Public Function GetGroupPageNumber(NewPage as Boolean, pagenumber as Integer) as
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="StockTakeConfigCode_StockTakeWorksheet">
+          <DataField>StockTakeConfigCode_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="Name_StockTakeWorksheet">
+          <DataField>Name_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="Description_StockTakeWorksheet">
+          <DataField>Description_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="Status_StockTakeWorksheet">
+          <DataField>Status_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="ItemGroupFilter_StockTakeWorksheet">
+          <DataField>ItemGroupFilter_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="VendorCodeFilter_StockTakeWorksheet">
+          <DataField>VendorCodeFilter_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="GlobalDimension1CodeFilter_StockTakeWorksheet">
+          <DataField>GlobalDimension1CodeFilter_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="GlobalDimension2CodeFilter_StockTakeWorksheet">
+          <DataField>GlobalDimension2CodeFilter_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="AllowUserModification_StockTakeWorksheet">
+          <DataField>AllowUserModification_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="ConfCalcDate_StockTakeWorksheet">
+          <DataField>ConfCalcDate_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="ConfLocationCode_StockTakeWorksheet">
+          <DataField>ConfLocationCode_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="ConfItemGroupFilter_StockTakeWorksheet">
+          <DataField>ConfItemGroupFilter_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="ConfVendorCodeFilter_StockTakeWorksheet">
+          <DataField>ConfVendorCodeFilter_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="ConfGlobalDim1CodeFilter_StockTakeWorksheet">
+          <DataField>ConfGlobalDim1CodeFilter_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="ConfGlobalDim2CodeFilter_StockTakeWorksheet">
+          <DataField>ConfGlobalDim2CodeFilter_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="ConfStockTakeMethod_StockTakeWorksheet">
+          <DataField>ConfStockTakeMethod_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="ConfAdjustmentMethod_StockTakeWorksheet">
+          <DataField>ConfAdjustmentMethod_StockTakeWorksheet</DataField>
+        </Field>
+        <Field Name="StockTakeConfigCode_StockTakeWorksheetLine">
+          <DataField>StockTakeConfigCode_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="WorksheetName_StockTakeWorksheetLine">
+          <DataField>WorksheetName_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="LineNo_StockTakeWorksheetLine">
+          <DataField>LineNo_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="Barcode_StockTakeWorksheetLine">
+          <DataField>Barcode_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="ItemNo_StockTakeWorksheetLine">
+          <DataField>ItemNo_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="VariantCode_StockTakeWorksheetLine">
+          <DataField>VariantCode_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="QtyCounted_StockTakeWorksheetLine">
+          <DataField>QtyCounted_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="QtyCounted_StockTakeWorksheetLineFormat">
+          <DataField>QtyCounted_StockTakeWorksheetLineFormat</DataField>
+        </Field>
+        <Field Name="UnitCost_StockTakeWorksheetLine">
+          <DataField>UnitCost_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="UnitCost_StockTakeWorksheetLineFormat">
+          <DataField>UnitCost_StockTakeWorksheetLineFormat</DataField>
+        </Field>
+        <Field Name="DateofInventory_StockTakeWorksheetLine">
+          <DataField>DateofInventory_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="Blocked_StockTakeWorksheetLine">
+          <DataField>Blocked_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="RequireVariantCode_StockTakeWorksheetLine">
+          <DataField>RequireVariantCode_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="ShelfNo_StockTakeWorksheetLine">
+          <DataField>ShelfNo_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="ShortcutDimension1Code_StockTakeWorksheetLine">
+          <DataField>ShortcutDimension1Code_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="ShortcutDimension2Code_StockTakeWorksheetLine">
+          <DataField>ShortcutDimension2Code_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="ItemTranslationSource_StockTakeWorksheetLine">
+          <DataField>ItemTranslationSource_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="SessionID_StockTakeWorksheetLine">
+          <DataField>SessionID_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="SessionName_StockTakeWorksheetLine">
+          <DataField>SessionName_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="SessionDateTime_StockTakeWorksheetLine">
+          <DataField>SessionDateTime_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="TransferState_StockTakeWorksheetLine">
+          <DataField>TransferState_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="ItemDescription_StockTakeWorksheetLine">
+          <DataField>ItemDescription_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="VariantDescription_StockTakeWorksheetLine">
+          <DataField>VariantDescription_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="ItemTransSourceDesc_StockTakeWorksheetLine">
+          <DataField>ItemTransSourceDesc_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="QtyTotalCounted_StockTakeWorksheetLine">
+          <DataField>QtyTotalCounted_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="QtyTotalCounted_StockTakeWorksheetLineFormat">
+          <DataField>QtyTotalCounted_StockTakeWorksheetLineFormat</DataField>
+        </Field>
+        <Field Name="PhysInvBatchNameFilter_StockTakeWorksheetLine">
+          <DataField>PhysInvBatchNameFilter_StockTakeWorksheetLine</DataField>
+        </Field>
+        <Field Name="DimensionSetID_StockTakeWorksheetLine">
+          <DataField>DimensionSetID_StockTakeWorksheetLine</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

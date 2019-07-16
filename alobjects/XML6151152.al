@@ -5,6 +5,7 @@ xmlport 6151152 "M2 Get Account"
     // MAG2.20/TSA /20190411 CASE 320424 City returned TmpContactResponse::Address 2 - fixed TmpContactResponse::City
     // MAG2.20/TSA /20190423 CASE 345373 Adding Balance LCY and Credit Limit
     // MAG2.20/MHA /20190501  CASE 320423 Mapped <CustomerGroup>
+    // MAG2.22/TSA /20190531 CASE 349994 Added Terms subsection for sell-to and bill-to
 
     Caption = 'Get Account';
     Encoding = UTF8;
@@ -147,15 +148,6 @@ xmlport 6151152 "M2 Get Account"
                         fieldelement(VatId;TmpSellToCustomer."VAT Registration No.")
                         {
                         }
-                        textelement(selltoean)
-                        {
-                            XmlName = 'Ean';
-
-                            trigger OnBeforePassVariable()
-                            begin
-                                TryGetEanNo (TmpSellToCustomer, SellToEan);
-                            end;
-                        }
                         fieldelement(CurrencyCode;TmpSellToCustomer."Currency Code")
                         {
                         }
@@ -205,6 +197,17 @@ xmlport 6151152 "M2 Get Account"
                             {
                             }
                         }
+                        textelement(selltoterms)
+                        {
+                            MaxOccurs = Once;
+                            XmlName = 'Terms';
+                            fieldelement(PriceGroup;TmpSellToCustomer."Customer Price Group")
+                            {
+                            }
+                            fieldelement(DiscountGroup;TmpSellToCustomer."Customer Disc. Group")
+                            {
+                            }
+                        }
                     }
                     textelement(BillTo)
                     {
@@ -233,15 +236,6 @@ xmlport 6151152 "M2 Get Account"
                             }
                             fieldelement(CompanyName;TmpBillToCustomer.Name)
                             {
-                            }
-                            textelement(billtoean)
-                            {
-                                XmlName = 'Ean';
-
-                                trigger OnBeforePassVariable()
-                                begin
-                                    TryGetEanNo (TmpBillToCustomer, BillToEan);
-                                end;
                             }
                             fieldelement(BalanceLCY;TmpBillToCustomer."Balance (LCY)")
                             {
@@ -289,6 +283,14 @@ xmlport 6151152 "M2 Get Account"
                                 {
                                 }
                                 fieldelement(Telephone;TmpBillToCustomer."Phone No.")
+                                {
+                                }
+                            }
+                            textelement(billtoterms)
+                            {
+                                MaxOccurs = Once;
+                                XmlName = 'Terms';
+                                fieldelement(PaymentTerms;TmpBillToCustomer."Payment Terms Code")
                                 {
                                 }
                             }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,79 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="AdmissionCode_TMAdmissionScheduleEntry">
-          <DataField>AdmissionCode_TMAdmissionScheduleEntry</DataField>
-        </Field>
-        <Field Name="AdmissionStartDate_TMAdmissionScheduleEntry">
-          <DataField>AdmissionStartDate_TMAdmissionScheduleEntry</DataField>
-        </Field>
-        <Field Name="AdmissionStartTime_TMAdmissionScheduleEntry">
-          <DataField>AdmissionStartTime_TMAdmissionScheduleEntry</DataField>
-        </Field>
-        <Field Name="OpenReservations_TMAdmissionScheduleEntry">
-          <DataField>OpenReservations_TMAdmissionScheduleEntry</DataField>
-        </Field>
-        <Field Name="OpenReservations_TMAdmissionScheduleEntryFormat">
-          <DataField>OpenReservations_TMAdmissionScheduleEntryFormat</DataField>
-        </Field>
-        <Field Name="OpenAdmitted_TMAdmissionScheduleEntry">
-          <DataField>OpenAdmitted_TMAdmissionScheduleEntry</DataField>
-        </Field>
-        <Field Name="OpenAdmitted_TMAdmissionScheduleEntryFormat">
-          <DataField>OpenAdmitted_TMAdmissionScheduleEntryFormat</DataField>
-        </Field>
-        <Field Name="ReportFilters">
-          <DataField>ReportFilters</DataField>
-        </Field>
-        <Field Name="TheCompanyName">
-          <DataField>TheCompanyName</DataField>
-        </Field>
-        <Field Name="EntryNo_TMDetTicketAccessEntry">
-          <DataField>EntryNo_TMDetTicketAccessEntry</DataField>
-        </Field>
-        <Field Name="Quantity_TMDetTicketAccessEntry">
-          <DataField>Quantity_TMDetTicketAccessEntry</DataField>
-        </Field>
-        <Field Name="Quantity_TMDetTicketAccessEntryFormat">
-          <DataField>Quantity_TMDetTicketAccessEntryFormat</DataField>
-        </Field>
-        <Field Name="TicketReservationEntryNo_TMTicket">
-          <DataField>TicketReservationEntryNo_TMTicket</DataField>
-        </Field>
-        <Field Name="ExternalOrderNo_TMTicketReservationRequest">
-          <DataField>ExternalOrderNo_TMTicketReservationRequest</DataField>
-        </Field>
-        <Field Name="BilltoName_SalesInvoiceHeader">
-          <DataField>BilltoName_SalesInvoiceHeader</DataField>
-        </Field>
-        <Field Name="SalesInvoiceHeader_SelltoCustomerName">
-          <DataField>SalesInvoiceHeader_SelltoCustomerName</DataField>
-        </Field>
-        <Field Name="CompanyName">
-          <DataField>CompanyName</DataField>
-        </Field>
-        <Field Name="BilltoCustomerNo_SalesInvoiceHeader">
-          <DataField>BilltoCustomerNo_SalesInvoiceHeader</DataField>
-        </Field>
-        <Field Name="SelltoAddress_SalesInvoiceHeader">
-          <DataField>SelltoAddress_SalesInvoiceHeader</DataField>
-        </Field>
-        <Field Name="PostCode_SalesInvoiceHeader">
-          <DataField>PostCode_SalesInvoiceHeader</DataField>
-        </Field>
-        <Field Name="City_SalesInvoiceHeader">
-          <DataField>City_SalesInvoiceHeader</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -2574,60 +2501,6 @@
     </ReportSection>
   </ReportSections>
   <ReportParameters>
-    <ReportParameter Name="AdmissionCode_TMAdmissionScheduleEntryCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>AdmissionCode_TMAdmissionScheduleEntryCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>AdmissionCode_TMAdmissionScheduleEntryCaption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="OpenReservations_TMAdmissionScheduleEntryCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>OpenReservations_TMAdmissionScheduleEntryCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>OpenReservations_TMAdmissionScheduleEntryCaption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="OpenAdmitted_TMAdmissionScheduleEntryCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>OpenAdmitted_TMAdmissionScheduleEntryCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>OpenAdmitted_TMAdmissionScheduleEntryCaption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="SalesInvoiceHeader_SelltoCustomerNameCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>SalesInvoiceHeader_SelltoCustomerNameCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>SalesInvoiceHeader_SelltoCustomerNameCaption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="BilltoCustomerNo_SalesInvoiceHeaderCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>BilltoCustomerNo_SalesInvoiceHeaderCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>BilltoCustomerNo_SalesInvoiceHeaderCaption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="SelltoAddress_SalesInvoiceHeaderCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>SelltoAddress_SalesInvoiceHeaderCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>SelltoAddress_SalesInvoiceHeaderCaption</Prompt>
-    </ReportParameter>
     <ReportParameter Name="ReportName">
       <DataType>String</DataType>
       <DefaultValue>
@@ -2691,6 +2564,60 @@
       </DefaultValue>
       <Prompt>CustomerCity</Prompt>
     </ReportParameter>
+    <ReportParameter Name="AdmissionCode_TMAdmissionScheduleEntryCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AdmissionCode_TMAdmissionScheduleEntryCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AdmissionCode_TMAdmissionScheduleEntryCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="OpenReservations_TMAdmissionScheduleEntryCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>OpenReservations_TMAdmissionScheduleEntryCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>OpenReservations_TMAdmissionScheduleEntryCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="OpenAdmitted_TMAdmissionScheduleEntryCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>OpenAdmitted_TMAdmissionScheduleEntryCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>OpenAdmitted_TMAdmissionScheduleEntryCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SalesInvoiceHeader_SelltoCustomerNameCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SalesInvoiceHeader_SelltoCustomerNameCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SalesInvoiceHeader_SelltoCustomerNameCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="BilltoCustomerNo_SalesInvoiceHeaderCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>BilltoCustomerNo_SalesInvoiceHeaderCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>BilltoCustomerNo_SalesInvoiceHeaderCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SelltoAddress_SalesInvoiceHeaderCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SelltoAddress_SalesInvoiceHeaderCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SelltoAddress_SalesInvoiceHeaderCaption</Prompt>
+    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
@@ -2700,67 +2627,67 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>AdmissionCode_TMAdmissionScheduleEntryCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>1</RowIndex>
-          <ParameterName>OpenReservations_TMAdmissionScheduleEntryCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>2</RowIndex>
-          <ParameterName>OpenAdmitted_TMAdmissionScheduleEntryCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>3</RowIndex>
-          <ParameterName>SalesInvoiceHeader_SelltoCustomerNameCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>4</RowIndex>
-          <ParameterName>BilltoCustomerNo_SalesInvoiceHeaderCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>5</RowIndex>
-          <ParameterName>SelltoAddress_SalesInvoiceHeaderCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>6</RowIndex>
           <ParameterName>ReportName</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>7</RowIndex>
+          <RowIndex>1</RowIndex>
           <ParameterName>AdmStartDate</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>8</RowIndex>
+          <RowIndex>2</RowIndex>
           <ParameterName>AdmEndDate</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>9</RowIndex>
+          <RowIndex>3</RowIndex>
           <ParameterName>CustomerName</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>10</RowIndex>
+          <RowIndex>4</RowIndex>
           <ParameterName>CustomerAddress</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>11</RowIndex>
+          <RowIndex>5</RowIndex>
           <ParameterName>CustomerPostCode</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>12</RowIndex>
+          <RowIndex>6</RowIndex>
           <ParameterName>CustomerCity</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>7</RowIndex>
+          <ParameterName>AdmissionCode_TMAdmissionScheduleEntryCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>8</RowIndex>
+          <ParameterName>OpenReservations_TMAdmissionScheduleEntryCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>9</RowIndex>
+          <ParameterName>OpenAdmitted_TMAdmissionScheduleEntryCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>10</RowIndex>
+          <ParameterName>SalesInvoiceHeader_SelltoCustomerNameCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>11</RowIndex>
+          <ParameterName>BilltoCustomerNo_SalesInvoiceHeaderCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>12</RowIndex>
+          <ParameterName>SelltoAddress_SalesInvoiceHeaderCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -2803,4 +2730,77 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="AdmissionCode_TMAdmissionScheduleEntry">
+          <DataField>AdmissionCode_TMAdmissionScheduleEntry</DataField>
+        </Field>
+        <Field Name="AdmissionStartDate_TMAdmissionScheduleEntry">
+          <DataField>AdmissionStartDate_TMAdmissionScheduleEntry</DataField>
+        </Field>
+        <Field Name="AdmissionStartTime_TMAdmissionScheduleEntry">
+          <DataField>AdmissionStartTime_TMAdmissionScheduleEntry</DataField>
+        </Field>
+        <Field Name="OpenReservations_TMAdmissionScheduleEntry">
+          <DataField>OpenReservations_TMAdmissionScheduleEntry</DataField>
+        </Field>
+        <Field Name="OpenReservations_TMAdmissionScheduleEntryFormat">
+          <DataField>OpenReservations_TMAdmissionScheduleEntryFormat</DataField>
+        </Field>
+        <Field Name="OpenAdmitted_TMAdmissionScheduleEntry">
+          <DataField>OpenAdmitted_TMAdmissionScheduleEntry</DataField>
+        </Field>
+        <Field Name="OpenAdmitted_TMAdmissionScheduleEntryFormat">
+          <DataField>OpenAdmitted_TMAdmissionScheduleEntryFormat</DataField>
+        </Field>
+        <Field Name="ReportFilters">
+          <DataField>ReportFilters</DataField>
+        </Field>
+        <Field Name="TheCompanyName">
+          <DataField>TheCompanyName</DataField>
+        </Field>
+        <Field Name="EntryNo_TMDetTicketAccessEntry">
+          <DataField>EntryNo_TMDetTicketAccessEntry</DataField>
+        </Field>
+        <Field Name="Quantity_TMDetTicketAccessEntry">
+          <DataField>Quantity_TMDetTicketAccessEntry</DataField>
+        </Field>
+        <Field Name="Quantity_TMDetTicketAccessEntryFormat">
+          <DataField>Quantity_TMDetTicketAccessEntryFormat</DataField>
+        </Field>
+        <Field Name="TicketReservationEntryNo_TMTicket">
+          <DataField>TicketReservationEntryNo_TMTicket</DataField>
+        </Field>
+        <Field Name="ExternalOrderNo_TMTicketReservationRequest">
+          <DataField>ExternalOrderNo_TMTicketReservationRequest</DataField>
+        </Field>
+        <Field Name="BilltoName_SalesInvoiceHeader">
+          <DataField>BilltoName_SalesInvoiceHeader</DataField>
+        </Field>
+        <Field Name="SalesInvoiceHeader_SelltoCustomerName">
+          <DataField>SalesInvoiceHeader_SelltoCustomerName</DataField>
+        </Field>
+        <Field Name="CompanyName">
+          <DataField>CompanyName</DataField>
+        </Field>
+        <Field Name="BilltoCustomerNo_SalesInvoiceHeader">
+          <DataField>BilltoCustomerNo_SalesInvoiceHeader</DataField>
+        </Field>
+        <Field Name="SelltoAddress_SalesInvoiceHeader">
+          <DataField>SelltoAddress_SalesInvoiceHeader</DataField>
+        </Field>
+        <Field Name="PostCode_SalesInvoiceHeader">
+          <DataField>PostCode_SalesInvoiceHeader</DataField>
+        </Field>
+        <Field Name="City_SalesInvoiceHeader">
+          <DataField>City_SalesInvoiceHeader</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

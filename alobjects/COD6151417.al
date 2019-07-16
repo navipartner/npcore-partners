@@ -7,17 +7,11 @@ codeunit 6151417 "Magento Pmt. Quickpay Mgt."
     // MAG2.03/MHA /20170406  CASE 271773 Extended Error Handling to include Inner WebException- and WebException Message
     // MAG2.06/MHA /20170801  CASE 284557 Added Refund functions RefundPaymentSalesCrMemo() and IsQuickpayRefundLine()
     // MAG2.14/MHA /20180607  CASE 317235 Added Xml Format to ConvertToQuickPayAmount()
+    // MAG2.22/MHA /20190624  CASE 359514 Updated parsing of exception message in CatchErrorMessage()
 
 
     trigger OnRun()
     begin
-        //-MAG2.01 [250694]
-        //CASE "Document Table No." OF
-        //  DATABASE::"Sales Invoice Header": Capture(Rec);
-        //  DATABASE::"Sales Cr.Memo Header": Refund(Rec);
-        //  DATABASE::"Sales Header": Cancel(Rec);
-        //END;
-        //+MAG2.01 [250694]
     end;
 
     var
@@ -118,18 +112,12 @@ codeunit 6151417 "Magento Pmt. Quickpay Mgt."
     begin
         XmlDoc := XmlDoc.XmlDocument;
         //-MAG2.03 [271773]
-        // IF NOT NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,HttpWebException) THEN BEGIN
-        //  StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream);
-        //  ERROR(STRSUBSTNO(Text000,GetErrorMessage(StreamReader.ReadToEnd)));
-        // END;
         if NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, HttpWebException) then
             exit;
 
-        ErrorMessage := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
-        if ErrorMessage = '' then
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(HttpWebException);
-        if ErrorMessage = '' then
+        //-MAG2.22 [359514]
             ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(HttpWebException);
+        //+MAG2.22 [359514]
         Error(StrSubstNo(Text000, CopyStr(ErrorMessage, 1, 900)));
         //+MAG2.03 [271773]
     end;
@@ -145,7 +133,6 @@ codeunit 6151417 "Magento Pmt. Quickpay Mgt."
     local procedure ConvertToQuickPayAmount(Amount: Decimal) QuickpayAmount: Text
     begin
         //-MAG2.14 [317235]
-        //EXIT(Amount * 100);
         QuickpayAmount := DelChr(Format(Amount * 100, 0, 9), '=', '.');
         exit(QuickpayAmount);
         //+MAG2.14 [317235]
@@ -170,7 +157,6 @@ codeunit 6151417 "Magento Pmt. Quickpay Mgt."
             exit(false);
 
         //-MAG2.06 [284557]
-        //EXIT(PaymentGateway."Capture Codeunit Id" = CODEUNIT::"Magento Pmt. Quickpay Mgt.");
         exit(PaymentGateway."Capture Codeunit Id" = CurrCodeunitId());
         //+MAG2.06 [284557]
         //+MAG2.01 [250694]
@@ -256,10 +242,6 @@ codeunit 6151417 "Magento Pmt. Quickpay Mgt."
             end;
         end;
         //-MAG1.22
-        //IF DictionaryErrors.TryGetValue('error',Value) THEN BEGIN
-        //IF DictionaryErrors.TryGetValue('error',Value) THEN
-        //  EXIT(Value);
-        //END;
         if DictionaryErrors.TryGetValue('error', Value) then
             exit(Value);
         if DictionaryErrors.TryGetValue('message', Value) then

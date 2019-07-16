@@ -14,6 +14,7 @@ page 6151451 "Magento DragDropPic. Addin"
     // MAG2.06/MHA /20170817  CASE 286203 Added function SetAutoOverwrite()
     // MAG2.10/MHA /20180206  CASE 302910 DragDropPicture 1.05 update - Resize() functionality completely removed as it cleared compression
     // MAG2.17/TS  /20181017  CASE 324862 Added Icon Picture
+    // MAG2.22/MHA /20190625  CASE 359285 Added Variety variables
 
     Caption = ' ';
     InsertAllowed = false;
@@ -76,6 +77,9 @@ page 6151451 "Magento DragDropPic. Addin"
         Text004: Label '&Item,&Brand,Item &Group,&Customer';
         PictureSize: Decimal;
         IsIconPicture: Boolean;
+        VarietyTypeCode: Code[10];
+        VarietyTableCode: Code[40];
+        VarietyValueCode: Code[20];
 
     local procedure "--- Database"()
     begin
@@ -212,6 +216,11 @@ page 6151451 "Magento DragDropPic. Addin"
         //-MAG1.21
         MagentoPictureLink.SetRange("Variant Value Code",PictureLinkVariantValueCode);
         //+MAG1.21
+        //-MAG2.22 [359285]
+        MagentoPictureLink.SetRange("Variety Type",VarietyTypeCode);
+        MagentoPictureLink.SetRange("Variety Table",VarietyTableCode);
+        MagentoPictureLink.SetRange("Variety Value",VarietyValueCode);
+        //+MAG2.22 [359285]
 
         MagentoPictureLink.SetRange("Picture Name",TempMagentoPicture2.Name);
         if not MagentoPictureLink.FindFirst then begin
@@ -222,6 +231,11 @@ page 6151451 "Magento DragDropPic. Addin"
           //MagentoPictureLink."Item No." := PictureLinkNo;
           MagentoPictureLink."Item No." := PictureLinkNo;
           MagentoPictureLink."Variant Value Code" := PictureLinkVariantValueCode;
+          //-MAG2.22 [359285]
+          MagentoPictureLink."Variety Type" := VarietyTypeCode;
+          MagentoPictureLink."Variety Table" := VarietyTableCode;
+          MagentoPictureLink."Variety Value" := VarietyValueCode;
+          //+MAG2.22 [359285]
           //+MAG1.21
           MagentoPictureLink."Line No." := LineNo;
           MagentoPictureLink."Picture Name" := TempMagentoPicture2.Name;
@@ -364,6 +378,15 @@ page 6151451 "Magento DragDropPic. Addin"
         //-MAG1.21
         PictureLinkVariantValueCode := NewVariantValueCode;
         //+MAG1.21
+    end;
+
+    procedure SetVarietyFilters(NewVarietyTypeCode: Code[10];NewVarietyTableCode: Code[40];NewVarietyValueCode: Code[20])
+    begin
+        //-MAG2.22 [359285]
+        VarietyTypeCode := NewVarietyTypeCode;
+        VarietyTableCode := NewVarietyTableCode;
+        VarietyValueCode := NewVarietyValueCode;
+        //+MAG2.22 [359285]
     end;
 
     local procedure "--- Data Transfer"()

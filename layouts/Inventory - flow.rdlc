@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,133 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="No_Vendor">
-          <DataField>No_Vendor</DataField>
-        </Field>
-        <Field Name="Name_Vendor">
-          <DataField>Name_Vendor</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="ShowVendorSection_Vendor">
-          <DataField>ShowVendorSection_Vendor</DataField>
-        </Field>
-        <Field Name="Filters_Vendor">
-          <DataField>Filters_Vendor</DataField>
-        </Field>
-        <Field Name="CompanyInfoPicture">
-          <DataField>CompanyInfoPicture</DataField>
-        </Field>
-        <Field Name="No_Item">
-          <DataField>No_Item</DataField>
-        </Field>
-        <Field Name="Description_Item">
-          <DataField>Description_Item</DataField>
-        </Field>
-        <Field Name="ItemGroup_Item">
-          <DataField>ItemGroup_Item</DataField>
-        </Field>
-        <Field Name="StockInventoryStart_Item">
-          <DataField>StockInventoryStart_Item</DataField>
-        </Field>
-        <Field Name="StockInventoryStart_ItemFormat">
-          <DataField>StockInventoryStart_ItemFormat</DataField>
-        </Field>
-        <Field Name="Regulatory_Item">
-          <DataField>Regulatory_Item</DataField>
-        </Field>
-        <Field Name="Regulatory_ItemFormat">
-          <DataField>Regulatory_ItemFormat</DataField>
-        </Field>
-        <Field Name="StockInventoryEnd_Item">
-          <DataField>StockInventoryEnd_Item</DataField>
-        </Field>
-        <Field Name="StockInventoryEnd_ItemFormat">
-          <DataField>StockInventoryEnd_ItemFormat</DataField>
-        </Field>
-        <Field Name="PurchasesQty_Item">
-          <DataField>PurchasesQty_Item</DataField>
-        </Field>
-        <Field Name="PurchasesQty_ItemFormat">
-          <DataField>PurchasesQty_ItemFormat</DataField>
-        </Field>
-        <Field Name="SalesQty_Item">
-          <DataField>SalesQty_Item</DataField>
-        </Field>
-        <Field Name="SalesQty_ItemFormat">
-          <DataField>SalesQty_ItemFormat</DataField>
-        </Field>
-        <Field Name="SalesFlowQty_Item">
-          <DataField>SalesFlowQty_Item</DataField>
-        </Field>
-        <Field Name="SalesFlowQty_ItemFormat">
-          <DataField>SalesFlowQty_ItemFormat</DataField>
-        </Field>
-        <Field Name="PurchasesLCY_Item">
-          <DataField>PurchasesLCY_Item</DataField>
-        </Field>
-        <Field Name="PurchasesLCY_ItemFormat">
-          <DataField>PurchasesLCY_ItemFormat</DataField>
-        </Field>
-        <Field Name="SalesLCY_Item">
-          <DataField>SalesLCY_Item</DataField>
-        </Field>
-        <Field Name="SalesLCY_ItemFormat">
-          <DataField>SalesLCY_ItemFormat</DataField>
-        </Field>
-        <Field Name="COGSLCY_Item">
-          <DataField>COGSLCY_Item</DataField>
-        </Field>
-        <Field Name="COGSLCY_ItemFormat">
-          <DataField>COGSLCY_ItemFormat</DataField>
-        </Field>
-        <Field Name="Profit_Item">
-          <DataField>Profit_Item</DataField>
-        </Field>
-        <Field Name="Profit_ItemFormat">
-          <DataField>Profit_ItemFormat</DataField>
-        </Field>
-        <Field Name="dg_Item">
-          <DataField>dg_Item</DataField>
-        </Field>
-        <Field Name="dg_ItemFormat">
-          <DataField>dg_ItemFormat</DataField>
-        </Field>
-        <Field Name="SalesFlowAmt_Item">
-          <DataField>SalesFlowAmt_Item</DataField>
-        </Field>
-        <Field Name="SalesFlowAmt_ItemFormat">
-          <DataField>SalesFlowAmt_ItemFormat</DataField>
-        </Field>
-        <Field Name="ShowItemSection_Item">
-          <DataField>ShowItemSection_Item</DataField>
-        </Field>
-        <Field Name="No_ItemGroup">
-          <DataField>No_ItemGroup</DataField>
-        </Field>
-        <Field Name="Description_ItemGroup">
-          <DataField>Description_ItemGroup</DataField>
-        </Field>
-        <Field Name="StockInventoryStart2">
-          <DataField>StockInventoryStart2</DataField>
-        </Field>
-        <Field Name="StockInventoryStart2Format">
-          <DataField>StockInventoryStart2Format</DataField>
-        </Field>
-        <Field Name="ShowItemGroupSection_ItemGroup">
-          <DataField>ShowItemGroupSection_ItemGroup</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -6175,4 +6048,131 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="No_Vendor">
+          <DataField>No_Vendor</DataField>
+        </Field>
+        <Field Name="Name_Vendor">
+          <DataField>Name_Vendor</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="ShowVendorSection_Vendor">
+          <DataField>ShowVendorSection_Vendor</DataField>
+        </Field>
+        <Field Name="Filters_Vendor">
+          <DataField>Filters_Vendor</DataField>
+        </Field>
+        <Field Name="CompanyInfoPicture">
+          <DataField>CompanyInfoPicture</DataField>
+        </Field>
+        <Field Name="No_Item">
+          <DataField>No_Item</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="ItemGroup_Item">
+          <DataField>ItemGroup_Item</DataField>
+        </Field>
+        <Field Name="StockInventoryStart_Item">
+          <DataField>StockInventoryStart_Item</DataField>
+        </Field>
+        <Field Name="StockInventoryStart_ItemFormat">
+          <DataField>StockInventoryStart_ItemFormat</DataField>
+        </Field>
+        <Field Name="Regulatory_Item">
+          <DataField>Regulatory_Item</DataField>
+        </Field>
+        <Field Name="Regulatory_ItemFormat">
+          <DataField>Regulatory_ItemFormat</DataField>
+        </Field>
+        <Field Name="StockInventoryEnd_Item">
+          <DataField>StockInventoryEnd_Item</DataField>
+        </Field>
+        <Field Name="StockInventoryEnd_ItemFormat">
+          <DataField>StockInventoryEnd_ItemFormat</DataField>
+        </Field>
+        <Field Name="PurchasesQty_Item">
+          <DataField>PurchasesQty_Item</DataField>
+        </Field>
+        <Field Name="PurchasesQty_ItemFormat">
+          <DataField>PurchasesQty_ItemFormat</DataField>
+        </Field>
+        <Field Name="SalesQty_Item">
+          <DataField>SalesQty_Item</DataField>
+        </Field>
+        <Field Name="SalesQty_ItemFormat">
+          <DataField>SalesQty_ItemFormat</DataField>
+        </Field>
+        <Field Name="SalesFlowQty_Item">
+          <DataField>SalesFlowQty_Item</DataField>
+        </Field>
+        <Field Name="SalesFlowQty_ItemFormat">
+          <DataField>SalesFlowQty_ItemFormat</DataField>
+        </Field>
+        <Field Name="PurchasesLCY_Item">
+          <DataField>PurchasesLCY_Item</DataField>
+        </Field>
+        <Field Name="PurchasesLCY_ItemFormat">
+          <DataField>PurchasesLCY_ItemFormat</DataField>
+        </Field>
+        <Field Name="SalesLCY_Item">
+          <DataField>SalesLCY_Item</DataField>
+        </Field>
+        <Field Name="SalesLCY_ItemFormat">
+          <DataField>SalesLCY_ItemFormat</DataField>
+        </Field>
+        <Field Name="COGSLCY_Item">
+          <DataField>COGSLCY_Item</DataField>
+        </Field>
+        <Field Name="COGSLCY_ItemFormat">
+          <DataField>COGSLCY_ItemFormat</DataField>
+        </Field>
+        <Field Name="Profit_Item">
+          <DataField>Profit_Item</DataField>
+        </Field>
+        <Field Name="Profit_ItemFormat">
+          <DataField>Profit_ItemFormat</DataField>
+        </Field>
+        <Field Name="dg_Item">
+          <DataField>dg_Item</DataField>
+        </Field>
+        <Field Name="dg_ItemFormat">
+          <DataField>dg_ItemFormat</DataField>
+        </Field>
+        <Field Name="SalesFlowAmt_Item">
+          <DataField>SalesFlowAmt_Item</DataField>
+        </Field>
+        <Field Name="SalesFlowAmt_ItemFormat">
+          <DataField>SalesFlowAmt_ItemFormat</DataField>
+        </Field>
+        <Field Name="ShowItemSection_Item">
+          <DataField>ShowItemSection_Item</DataField>
+        </Field>
+        <Field Name="No_ItemGroup">
+          <DataField>No_ItemGroup</DataField>
+        </Field>
+        <Field Name="Description_ItemGroup">
+          <DataField>Description_ItemGroup</DataField>
+        </Field>
+        <Field Name="StockInventoryStart2">
+          <DataField>StockInventoryStart2</DataField>
+        </Field>
+        <Field Name="StockInventoryStart2Format">
+          <DataField>StockInventoryStart2Format</DataField>
+        </Field>
+        <Field Name="ShowItemGroupSection_ItemGroup">
+          <DataField>ShowItemGroupSection_ItemGroup</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

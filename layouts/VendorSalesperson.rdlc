@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,139 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="PageNoCaptionLbl">
-          <DataField>PageNoCaptionLbl</DataField>
-        </Field>
-        <Field Name="Report_Caption">
-          <DataField>Report_Caption</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="Salespersonfilter">
-          <DataField>Salespersonfilter</DataField>
-        </Field>
-        <Field Name="VendorFilter">
-          <DataField>VendorFilter</DataField>
-        </Field>
-        <Field Name="No_Vendor">
-          <DataField>No_Vendor</DataField>
-        </Field>
-        <Field Name="Vendor_Caption">
-          <DataField>Vendor_Caption</DataField>
-        </Field>
-        <Field Name="Name_Vendor">
-          <DataField>Name_Vendor</DataField>
-        </Field>
-        <Field Name="No_Caption">
-          <DataField>No_Caption</DataField>
-        </Field>
-        <Field Name="Salesperson_Caption">
-          <DataField>Salesperson_Caption</DataField>
-        </Field>
-        <Field Name="Turnover_Caption">
-          <DataField>Turnover_Caption</DataField>
-        </Field>
-        <Field Name="Cost_Caption">
-          <DataField>Cost_Caption</DataField>
-        </Field>
-        <Field Name="DbCaption">
-          <DataField>DbCaption</DataField>
-        </Field>
-        <Field Name="CRPct_Caption">
-          <DataField>CRPct_Caption</DataField>
-        </Field>
-        <Field Name="Item_No_Varegruppetemp">
-          <DataField>Item_No_Varegruppetemp</DataField>
-        </Field>
-        <Field Name="Name_SalesPerson">
-          <DataField>Name_SalesPerson</DataField>
-        </Field>
-        <Field Name="Amount_Varegruppetemp">
-          <DataField>Amount_Varegruppetemp</DataField>
-        </Field>
-        <Field Name="Amount_VaregruppetempFormat">
-          <DataField>Amount_VaregruppetempFormat</DataField>
-        </Field>
-        <Field Name="Amount2_Varegruppetemp">
-          <DataField>Amount2_Varegruppetemp</DataField>
-        </Field>
-        <Field Name="Amount2_VaregruppetempFormat">
-          <DataField>Amount2_VaregruppetempFormat</DataField>
-        </Field>
-        <Field Name="db">
-          <DataField>db</DataField>
-        </Field>
-        <Field Name="dbFormat">
-          <DataField>dbFormat</DataField>
-        </Field>
-        <Field Name="dg">
-          <DataField>dg</DataField>
-        </Field>
-        <Field Name="dgFormat">
-          <DataField>dgFormat</DataField>
-        </Field>
-        <Field Name="Total_Caption">
-          <DataField>Total_Caption</DataField>
-        </Field>
-        <Field Name="turnovertotal">
-          <DataField>turnovertotal</DataField>
-        </Field>
-        <Field Name="turnovertotalFormat">
-          <DataField>turnovertotalFormat</DataField>
-        </Field>
-        <Field Name="forbrugtotal">
-          <DataField>forbrugtotal</DataField>
-        </Field>
-        <Field Name="forbrugtotalFormat">
-          <DataField>forbrugtotalFormat</DataField>
-        </Field>
-        <Field Name="dbtotal">
-          <DataField>dbtotal</DataField>
-        </Field>
-        <Field Name="dbtotalFormat">
-          <DataField>dbtotalFormat</DataField>
-        </Field>
-        <Field Name="dgtotal">
-          <DataField>dgtotal</DataField>
-        </Field>
-        <Field Name="dgtotalFormat">
-          <DataField>dgtotalFormat</DataField>
-        </Field>
-        <Field Name="turnoveralt">
-          <DataField>turnoveralt</DataField>
-        </Field>
-        <Field Name="turnoveraltFormat">
-          <DataField>turnoveraltFormat</DataField>
-        </Field>
-        <Field Name="forbrugalt">
-          <DataField>forbrugalt</DataField>
-        </Field>
-        <Field Name="forbrugaltFormat">
-          <DataField>forbrugaltFormat</DataField>
-        </Field>
-        <Field Name="dbalt">
-          <DataField>dbalt</DataField>
-        </Field>
-        <Field Name="dbaltFormat">
-          <DataField>dbaltFormat</DataField>
-        </Field>
-        <Field Name="dgalt">
-          <DataField>dgalt</DataField>
-        </Field>
-        <Field Name="dgaltFormat">
-          <DataField>dgaltFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3081,4 +2948,137 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="PageNoCaptionLbl">
+          <DataField>PageNoCaptionLbl</DataField>
+        </Field>
+        <Field Name="Report_Caption">
+          <DataField>Report_Caption</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="Salespersonfilter">
+          <DataField>Salespersonfilter</DataField>
+        </Field>
+        <Field Name="VendorFilter">
+          <DataField>VendorFilter</DataField>
+        </Field>
+        <Field Name="No_Vendor">
+          <DataField>No_Vendor</DataField>
+        </Field>
+        <Field Name="Vendor_Caption">
+          <DataField>Vendor_Caption</DataField>
+        </Field>
+        <Field Name="Name_Vendor">
+          <DataField>Name_Vendor</DataField>
+        </Field>
+        <Field Name="No_Caption">
+          <DataField>No_Caption</DataField>
+        </Field>
+        <Field Name="Salesperson_Caption">
+          <DataField>Salesperson_Caption</DataField>
+        </Field>
+        <Field Name="Turnover_Caption">
+          <DataField>Turnover_Caption</DataField>
+        </Field>
+        <Field Name="Cost_Caption">
+          <DataField>Cost_Caption</DataField>
+        </Field>
+        <Field Name="DbCaption">
+          <DataField>DbCaption</DataField>
+        </Field>
+        <Field Name="CRPct_Caption">
+          <DataField>CRPct_Caption</DataField>
+        </Field>
+        <Field Name="Item_No_Varegruppetemp">
+          <DataField>Item_No_Varegruppetemp</DataField>
+        </Field>
+        <Field Name="Name_SalesPerson">
+          <DataField>Name_SalesPerson</DataField>
+        </Field>
+        <Field Name="Amount_Varegruppetemp">
+          <DataField>Amount_Varegruppetemp</DataField>
+        </Field>
+        <Field Name="Amount_VaregruppetempFormat">
+          <DataField>Amount_VaregruppetempFormat</DataField>
+        </Field>
+        <Field Name="Amount2_Varegruppetemp">
+          <DataField>Amount2_Varegruppetemp</DataField>
+        </Field>
+        <Field Name="Amount2_VaregruppetempFormat">
+          <DataField>Amount2_VaregruppetempFormat</DataField>
+        </Field>
+        <Field Name="db">
+          <DataField>db</DataField>
+        </Field>
+        <Field Name="dbFormat">
+          <DataField>dbFormat</DataField>
+        </Field>
+        <Field Name="dg">
+          <DataField>dg</DataField>
+        </Field>
+        <Field Name="dgFormat">
+          <DataField>dgFormat</DataField>
+        </Field>
+        <Field Name="Total_Caption">
+          <DataField>Total_Caption</DataField>
+        </Field>
+        <Field Name="turnovertotal">
+          <DataField>turnovertotal</DataField>
+        </Field>
+        <Field Name="turnovertotalFormat">
+          <DataField>turnovertotalFormat</DataField>
+        </Field>
+        <Field Name="forbrugtotal">
+          <DataField>forbrugtotal</DataField>
+        </Field>
+        <Field Name="forbrugtotalFormat">
+          <DataField>forbrugtotalFormat</DataField>
+        </Field>
+        <Field Name="dbtotal">
+          <DataField>dbtotal</DataField>
+        </Field>
+        <Field Name="dbtotalFormat">
+          <DataField>dbtotalFormat</DataField>
+        </Field>
+        <Field Name="dgtotal">
+          <DataField>dgtotal</DataField>
+        </Field>
+        <Field Name="dgtotalFormat">
+          <DataField>dgtotalFormat</DataField>
+        </Field>
+        <Field Name="turnoveralt">
+          <DataField>turnoveralt</DataField>
+        </Field>
+        <Field Name="turnoveraltFormat">
+          <DataField>turnoveraltFormat</DataField>
+        </Field>
+        <Field Name="forbrugalt">
+          <DataField>forbrugalt</DataField>
+        </Field>
+        <Field Name="forbrugaltFormat">
+          <DataField>forbrugaltFormat</DataField>
+        </Field>
+        <Field Name="dbalt">
+          <DataField>dbalt</DataField>
+        </Field>
+        <Field Name="dbaltFormat">
+          <DataField>dbaltFormat</DataField>
+        </Field>
+        <Field Name="dgalt">
+          <DataField>dgalt</DataField>
+        </Field>
+        <Field Name="dgaltFormat">
+          <DataField>dgaltFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

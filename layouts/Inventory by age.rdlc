@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,574 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="PageNoCaptionLbl">
-          <DataField>PageNoCaptionLbl</DataField>
-        </Field>
-        <Field Name="Report_Caption">
-          <DataField>Report_Caption</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="No_Caption">
-          <DataField>No_Caption</DataField>
-        </Field>
-        <Field Name="Description_Caption">
-          <DataField>Description_Caption</DataField>
-        </Field>
-        <Field Name="Before_Caption">
-          <DataField>Before_Caption</DataField>
-        </Field>
-        <Field Name="PeriodStartDato_2">
-          <DataField>PeriodStartDato_2</DataField>
-        </Field>
-        <Field Name="PeriodStartDato_3">
-          <DataField>PeriodStartDato_3</DataField>
-        </Field>
-        <Field Name="PeriodStartDato_4">
-          <DataField>PeriodStartDato_4</DataField>
-        </Field>
-        <Field Name="PeriodStartDato_5">
-          <DataField>PeriodStartDato_5</DataField>
-        </Field>
-        <Field Name="After_Caption">
-          <DataField>After_Caption</DataField>
-        </Field>
-        <Field Name="Total_Caption">
-          <DataField>Total_Caption</DataField>
-        </Field>
-        <Field Name="No_ItemGroupHeader">
-          <DataField>No_ItemGroupHeader</DataField>
-        </Field>
-        <Field Name="Description_ItemGroupHeader">
-          <DataField>Description_ItemGroupHeader</DataField>
-        </Field>
-        <Field Name="ShowItem">
-          <DataField>ShowItem</DataField>
-        </Field>
-        <Field Name="Main_Item_Group_ItemGroupHeader">
-          <DataField>Main_Item_Group_ItemGroupHeader</DataField>
-        </Field>
-        <Field Name="PeriodLength">
-          <DataField>PeriodLength</DataField>
-        </Field>
-        <Field Name="n">
-          <DataField>n</DataField>
-        </Field>
-        <Field Name="RequestPageFilters">
-          <DataField>RequestPageFilters</DataField>
-        </Field>
-        <Field Name="ItemGrpNoLvl0">
-          <DataField>ItemGrpNoLvl0</DataField>
-        </Field>
-        <Field Name="ItemFound1">
-          <DataField>ItemFound1</DataField>
-        </Field>
-        <Field Name="ExistItemGrpSub1">
-          <DataField>ExistItemGrpSub1</DataField>
-        </Field>
-        <Field Name="PeriodRange1">
-          <DataField>PeriodRange1</DataField>
-        </Field>
-        <Field Name="PeriodRange2">
-          <DataField>PeriodRange2</DataField>
-        </Field>
-        <Field Name="PeriodRange3">
-          <DataField>PeriodRange3</DataField>
-        </Field>
-        <Field Name="PeriodRange4">
-          <DataField>PeriodRange4</DataField>
-        </Field>
-        <Field Name="No_Item">
-          <DataField>No_Item</DataField>
-        </Field>
-        <Field Name="Description_Item">
-          <DataField>Description_Item</DataField>
-        </Field>
-        <Field Name="RemainingAmt_1_1">
-          <DataField>RemainingAmt_1_1</DataField>
-        </Field>
-        <Field Name="RemainingAmt_1_1Format">
-          <DataField>RemainingAmt_1_1Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_1_2">
-          <DataField>RemainingAmt_1_2</DataField>
-        </Field>
-        <Field Name="RemainingAmt_1_2Format">
-          <DataField>RemainingAmt_1_2Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_1_3">
-          <DataField>RemainingAmt_1_3</DataField>
-        </Field>
-        <Field Name="RemainingAmt_1_3Format">
-          <DataField>RemainingAmt_1_3Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_1_4">
-          <DataField>RemainingAmt_1_4</DataField>
-        </Field>
-        <Field Name="RemainingAmt_1_4Format">
-          <DataField>RemainingAmt_1_4Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_1_5">
-          <DataField>RemainingAmt_1_5</DataField>
-        </Field>
-        <Field Name="RemainingAmt_1_5Format">
-          <DataField>RemainingAmt_1_5Format</DataField>
-        </Field>
-        <Field Name="Total_RemainingAmt_1">
-          <DataField>Total_RemainingAmt_1</DataField>
-        </Field>
-        <Field Name="Total_RemainingAmt_1Format">
-          <DataField>Total_RemainingAmt_1Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_1_1">
-          <DataField>AmountCalc_1_1</DataField>
-        </Field>
-        <Field Name="AmountCalc_1_1Format">
-          <DataField>AmountCalc_1_1Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_1_2">
-          <DataField>AmountCalc_1_2</DataField>
-        </Field>
-        <Field Name="AmountCalc_1_2Format">
-          <DataField>AmountCalc_1_2Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_1_3">
-          <DataField>AmountCalc_1_3</DataField>
-        </Field>
-        <Field Name="AmountCalc_1_3Format">
-          <DataField>AmountCalc_1_3Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_1_4">
-          <DataField>AmountCalc_1_4</DataField>
-        </Field>
-        <Field Name="AmountCalc_1_4Format">
-          <DataField>AmountCalc_1_4Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_1_5">
-          <DataField>AmountCalc_1_5</DataField>
-        </Field>
-        <Field Name="AmountCalc_1_5Format">
-          <DataField>AmountCalc_1_5Format</DataField>
-        </Field>
-        <Field Name="Total_AmountCalc_1">
-          <DataField>Total_AmountCalc_1</DataField>
-        </Field>
-        <Field Name="Total_AmountCalc_1Format">
-          <DataField>Total_AmountCalc_1Format</DataField>
-        </Field>
-        <Field Name="ItemSection1">
-          <DataField>ItemSection1</DataField>
-        </Field>
-        <Field Name="ExistNonZeroItemRecords1">
-          <DataField>ExistNonZeroItemRecords1</DataField>
-        </Field>
-        <Field Name="No_ItemGroupSub1">
-          <DataField>No_ItemGroupSub1</DataField>
-        </Field>
-        <Field Name="Description_ItemGroupSub1">
-          <DataField>Description_ItemGroupSub1</DataField>
-        </Field>
-        <Field Name="ItemGrpNoLvl1">
-          <DataField>ItemGrpNoLvl1</DataField>
-        </Field>
-        <Field Name="ItemFound2">
-          <DataField>ItemFound2</DataField>
-        </Field>
-        <Field Name="ExistItemGrpSub2">
-          <DataField>ExistItemGrpSub2</DataField>
-        </Field>
-        <Field Name="No_Item1">
-          <DataField>No_Item1</DataField>
-        </Field>
-        <Field Name="Description_Item1">
-          <DataField>Description_Item1</DataField>
-        </Field>
-        <Field Name="RemainingAmt_2_1">
-          <DataField>RemainingAmt_2_1</DataField>
-        </Field>
-        <Field Name="RemainingAmt_2_1Format">
-          <DataField>RemainingAmt_2_1Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_2_2">
-          <DataField>RemainingAmt_2_2</DataField>
-        </Field>
-        <Field Name="RemainingAmt_2_2Format">
-          <DataField>RemainingAmt_2_2Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_2_3">
-          <DataField>RemainingAmt_2_3</DataField>
-        </Field>
-        <Field Name="RemainingAmt_2_3Format">
-          <DataField>RemainingAmt_2_3Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_2_4">
-          <DataField>RemainingAmt_2_4</DataField>
-        </Field>
-        <Field Name="RemainingAmt_2_4Format">
-          <DataField>RemainingAmt_2_4Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_2_5">
-          <DataField>RemainingAmt_2_5</DataField>
-        </Field>
-        <Field Name="RemainingAmt_2_5Format">
-          <DataField>RemainingAmt_2_5Format</DataField>
-        </Field>
-        <Field Name="Total_RemainingAmt_2">
-          <DataField>Total_RemainingAmt_2</DataField>
-        </Field>
-        <Field Name="Total_RemainingAmt_2Format">
-          <DataField>Total_RemainingAmt_2Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_2_1">
-          <DataField>AmountCalc_2_1</DataField>
-        </Field>
-        <Field Name="AmountCalc_2_1Format">
-          <DataField>AmountCalc_2_1Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_2_2">
-          <DataField>AmountCalc_2_2</DataField>
-        </Field>
-        <Field Name="AmountCalc_2_2Format">
-          <DataField>AmountCalc_2_2Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_2_3">
-          <DataField>AmountCalc_2_3</DataField>
-        </Field>
-        <Field Name="AmountCalc_2_3Format">
-          <DataField>AmountCalc_2_3Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_2_4">
-          <DataField>AmountCalc_2_4</DataField>
-        </Field>
-        <Field Name="AmountCalc_2_4Format">
-          <DataField>AmountCalc_2_4Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_2_5">
-          <DataField>AmountCalc_2_5</DataField>
-        </Field>
-        <Field Name="AmountCalc_2_5Format">
-          <DataField>AmountCalc_2_5Format</DataField>
-        </Field>
-        <Field Name="Total_AmountCalc_2">
-          <DataField>Total_AmountCalc_2</DataField>
-        </Field>
-        <Field Name="Total_AmountCalc_2Format">
-          <DataField>Total_AmountCalc_2Format</DataField>
-        </Field>
-        <Field Name="ItemSection2">
-          <DataField>ItemSection2</DataField>
-        </Field>
-        <Field Name="ExistNonZeroItemRecords2">
-          <DataField>ExistNonZeroItemRecords2</DataField>
-        </Field>
-        <Field Name="No_ItemGroupSub2">
-          <DataField>No_ItemGroupSub2</DataField>
-        </Field>
-        <Field Name="Description_ItemGroupSub2">
-          <DataField>Description_ItemGroupSub2</DataField>
-        </Field>
-        <Field Name="ItemGrpNoLvl2">
-          <DataField>ItemGrpNoLvl2</DataField>
-        </Field>
-        <Field Name="ItemFound3">
-          <DataField>ItemFound3</DataField>
-        </Field>
-        <Field Name="ExistItemGrpSub3">
-          <DataField>ExistItemGrpSub3</DataField>
-        </Field>
-        <Field Name="No_Item2">
-          <DataField>No_Item2</DataField>
-        </Field>
-        <Field Name="Description_Item2">
-          <DataField>Description_Item2</DataField>
-        </Field>
-        <Field Name="RemainingAmt_3_1">
-          <DataField>RemainingAmt_3_1</DataField>
-        </Field>
-        <Field Name="RemainingAmt_3_1Format">
-          <DataField>RemainingAmt_3_1Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_3_2">
-          <DataField>RemainingAmt_3_2</DataField>
-        </Field>
-        <Field Name="RemainingAmt_3_2Format">
-          <DataField>RemainingAmt_3_2Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_3_3">
-          <DataField>RemainingAmt_3_3</DataField>
-        </Field>
-        <Field Name="RemainingAmt_3_3Format">
-          <DataField>RemainingAmt_3_3Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_3_4">
-          <DataField>RemainingAmt_3_4</DataField>
-        </Field>
-        <Field Name="RemainingAmt_3_4Format">
-          <DataField>RemainingAmt_3_4Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_3_5">
-          <DataField>RemainingAmt_3_5</DataField>
-        </Field>
-        <Field Name="RemainingAmt_3_5Format">
-          <DataField>RemainingAmt_3_5Format</DataField>
-        </Field>
-        <Field Name="Total_RemainingAmt_3">
-          <DataField>Total_RemainingAmt_3</DataField>
-        </Field>
-        <Field Name="Total_RemainingAmt_3Format">
-          <DataField>Total_RemainingAmt_3Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_3_1">
-          <DataField>AmountCalc_3_1</DataField>
-        </Field>
-        <Field Name="AmountCalc_3_1Format">
-          <DataField>AmountCalc_3_1Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_3_2">
-          <DataField>AmountCalc_3_2</DataField>
-        </Field>
-        <Field Name="AmountCalc_3_2Format">
-          <DataField>AmountCalc_3_2Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_3_3">
-          <DataField>AmountCalc_3_3</DataField>
-        </Field>
-        <Field Name="AmountCalc_3_3Format">
-          <DataField>AmountCalc_3_3Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_3_4">
-          <DataField>AmountCalc_3_4</DataField>
-        </Field>
-        <Field Name="AmountCalc_3_4Format">
-          <DataField>AmountCalc_3_4Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_3_5">
-          <DataField>AmountCalc_3_5</DataField>
-        </Field>
-        <Field Name="AmountCalc_3_5Format">
-          <DataField>AmountCalc_3_5Format</DataField>
-        </Field>
-        <Field Name="Total_AmountCalc_3">
-          <DataField>Total_AmountCalc_3</DataField>
-        </Field>
-        <Field Name="Total_AmountCalc_3Format">
-          <DataField>Total_AmountCalc_3Format</DataField>
-        </Field>
-        <Field Name="ItemSection3">
-          <DataField>ItemSection3</DataField>
-        </Field>
-        <Field Name="ExistNonZeroItemRecords3">
-          <DataField>ExistNonZeroItemRecords3</DataField>
-        </Field>
-        <Field Name="No_ItemGroupSub3">
-          <DataField>No_ItemGroupSub3</DataField>
-        </Field>
-        <Field Name="Description_ItemGroupSub3">
-          <DataField>Description_ItemGroupSub3</DataField>
-        </Field>
-        <Field Name="ItemGrpNoLvl3">
-          <DataField>ItemGrpNoLvl3</DataField>
-        </Field>
-        <Field Name="ItemFound4">
-          <DataField>ItemFound4</DataField>
-        </Field>
-        <Field Name="ExistItemGrpSub4">
-          <DataField>ExistItemGrpSub4</DataField>
-        </Field>
-        <Field Name="No_Item3">
-          <DataField>No_Item3</DataField>
-        </Field>
-        <Field Name="Description_Item3">
-          <DataField>Description_Item3</DataField>
-        </Field>
-        <Field Name="RemainingAmt_4_1">
-          <DataField>RemainingAmt_4_1</DataField>
-        </Field>
-        <Field Name="RemainingAmt_4_1Format">
-          <DataField>RemainingAmt_4_1Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_4_2">
-          <DataField>RemainingAmt_4_2</DataField>
-        </Field>
-        <Field Name="RemainingAmt_4_2Format">
-          <DataField>RemainingAmt_4_2Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_4_3">
-          <DataField>RemainingAmt_4_3</DataField>
-        </Field>
-        <Field Name="RemainingAmt_4_3Format">
-          <DataField>RemainingAmt_4_3Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_4_4">
-          <DataField>RemainingAmt_4_4</DataField>
-        </Field>
-        <Field Name="RemainingAmt_4_4Format">
-          <DataField>RemainingAmt_4_4Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_4_5">
-          <DataField>RemainingAmt_4_5</DataField>
-        </Field>
-        <Field Name="RemainingAmt_4_5Format">
-          <DataField>RemainingAmt_4_5Format</DataField>
-        </Field>
-        <Field Name="Total_RemainingAmt_4">
-          <DataField>Total_RemainingAmt_4</DataField>
-        </Field>
-        <Field Name="Total_RemainingAmt_4Format">
-          <DataField>Total_RemainingAmt_4Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_4_1">
-          <DataField>AmountCalc_4_1</DataField>
-        </Field>
-        <Field Name="AmountCalc_4_1Format">
-          <DataField>AmountCalc_4_1Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_4_2">
-          <DataField>AmountCalc_4_2</DataField>
-        </Field>
-        <Field Name="AmountCalc_4_2Format">
-          <DataField>AmountCalc_4_2Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_4_3">
-          <DataField>AmountCalc_4_3</DataField>
-        </Field>
-        <Field Name="AmountCalc_4_3Format">
-          <DataField>AmountCalc_4_3Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_4_4">
-          <DataField>AmountCalc_4_4</DataField>
-        </Field>
-        <Field Name="AmountCalc_4_4Format">
-          <DataField>AmountCalc_4_4Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_4_5">
-          <DataField>AmountCalc_4_5</DataField>
-        </Field>
-        <Field Name="AmountCalc_4_5Format">
-          <DataField>AmountCalc_4_5Format</DataField>
-        </Field>
-        <Field Name="Total_AmountCalc_4">
-          <DataField>Total_AmountCalc_4</DataField>
-        </Field>
-        <Field Name="Total_AmountCalc_4Format">
-          <DataField>Total_AmountCalc_4Format</DataField>
-        </Field>
-        <Field Name="ItemSection4">
-          <DataField>ItemSection4</DataField>
-        </Field>
-        <Field Name="ExistNonZeroItemRecords4">
-          <DataField>ExistNonZeroItemRecords4</DataField>
-        </Field>
-        <Field Name="No_ItemGroupSub4">
-          <DataField>No_ItemGroupSub4</DataField>
-        </Field>
-        <Field Name="Description_ItemGroupSub4">
-          <DataField>Description_ItemGroupSub4</DataField>
-        </Field>
-        <Field Name="ItemGrpNoLvl4">
-          <DataField>ItemGrpNoLvl4</DataField>
-        </Field>
-        <Field Name="ItemFound5">
-          <DataField>ItemFound5</DataField>
-        </Field>
-        <Field Name="ExistItemGrpSub5">
-          <DataField>ExistItemGrpSub5</DataField>
-        </Field>
-        <Field Name="No_Item4">
-          <DataField>No_Item4</DataField>
-        </Field>
-        <Field Name="Description_Item4">
-          <DataField>Description_Item4</DataField>
-        </Field>
-        <Field Name="RemainingAmt_5_1">
-          <DataField>RemainingAmt_5_1</DataField>
-        </Field>
-        <Field Name="RemainingAmt_5_1Format">
-          <DataField>RemainingAmt_5_1Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_5_2">
-          <DataField>RemainingAmt_5_2</DataField>
-        </Field>
-        <Field Name="RemainingAmt_5_2Format">
-          <DataField>RemainingAmt_5_2Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_5_3">
-          <DataField>RemainingAmt_5_3</DataField>
-        </Field>
-        <Field Name="RemainingAmt_5_3Format">
-          <DataField>RemainingAmt_5_3Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_5_4">
-          <DataField>RemainingAmt_5_4</DataField>
-        </Field>
-        <Field Name="RemainingAmt_5_4Format">
-          <DataField>RemainingAmt_5_4Format</DataField>
-        </Field>
-        <Field Name="RemainingAmt_5_5">
-          <DataField>RemainingAmt_5_5</DataField>
-        </Field>
-        <Field Name="RemainingAmt_5_5Format">
-          <DataField>RemainingAmt_5_5Format</DataField>
-        </Field>
-        <Field Name="Total_RemainingAmt_5">
-          <DataField>Total_RemainingAmt_5</DataField>
-        </Field>
-        <Field Name="Total_RemainingAmt_5Format">
-          <DataField>Total_RemainingAmt_5Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_5_1">
-          <DataField>AmountCalc_5_1</DataField>
-        </Field>
-        <Field Name="AmountCalc_5_1Format">
-          <DataField>AmountCalc_5_1Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_5_2">
-          <DataField>AmountCalc_5_2</DataField>
-        </Field>
-        <Field Name="AmountCalc_5_2Format">
-          <DataField>AmountCalc_5_2Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_5_3">
-          <DataField>AmountCalc_5_3</DataField>
-        </Field>
-        <Field Name="AmountCalc_5_3Format">
-          <DataField>AmountCalc_5_3Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_5_4">
-          <DataField>AmountCalc_5_4</DataField>
-        </Field>
-        <Field Name="AmountCalc_5_4Format">
-          <DataField>AmountCalc_5_4Format</DataField>
-        </Field>
-        <Field Name="AmountCalc_5_5">
-          <DataField>AmountCalc_5_5</DataField>
-        </Field>
-        <Field Name="AmountCalc_5_5Format">
-          <DataField>AmountCalc_5_5Format</DataField>
-        </Field>
-        <Field Name="Total_AmountCalc_5">
-          <DataField>Total_AmountCalc_5</DataField>
-        </Field>
-        <Field Name="Total_AmountCalc_5Format">
-          <DataField>Total_AmountCalc_5Format</DataField>
-        </Field>
-        <Field Name="ItemSection5">
-          <DataField>ItemSection5</DataField>
-        </Field>
-        <Field Name="ExistNonZeroItemRecords5">
-          <DataField>ExistNonZeroItemRecords5</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -15676,4 +15108,572 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="PageNoCaptionLbl">
+          <DataField>PageNoCaptionLbl</DataField>
+        </Field>
+        <Field Name="Report_Caption">
+          <DataField>Report_Caption</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="No_Caption">
+          <DataField>No_Caption</DataField>
+        </Field>
+        <Field Name="Description_Caption">
+          <DataField>Description_Caption</DataField>
+        </Field>
+        <Field Name="Before_Caption">
+          <DataField>Before_Caption</DataField>
+        </Field>
+        <Field Name="PeriodStartDato_2">
+          <DataField>PeriodStartDato_2</DataField>
+        </Field>
+        <Field Name="PeriodStartDato_3">
+          <DataField>PeriodStartDato_3</DataField>
+        </Field>
+        <Field Name="PeriodStartDato_4">
+          <DataField>PeriodStartDato_4</DataField>
+        </Field>
+        <Field Name="PeriodStartDato_5">
+          <DataField>PeriodStartDato_5</DataField>
+        </Field>
+        <Field Name="After_Caption">
+          <DataField>After_Caption</DataField>
+        </Field>
+        <Field Name="Total_Caption">
+          <DataField>Total_Caption</DataField>
+        </Field>
+        <Field Name="No_ItemGroupHeader">
+          <DataField>No_ItemGroupHeader</DataField>
+        </Field>
+        <Field Name="Description_ItemGroupHeader">
+          <DataField>Description_ItemGroupHeader</DataField>
+        </Field>
+        <Field Name="ShowItem">
+          <DataField>ShowItem</DataField>
+        </Field>
+        <Field Name="Main_Item_Group_ItemGroupHeader">
+          <DataField>Main_Item_Group_ItemGroupHeader</DataField>
+        </Field>
+        <Field Name="PeriodLength">
+          <DataField>PeriodLength</DataField>
+        </Field>
+        <Field Name="n">
+          <DataField>n</DataField>
+        </Field>
+        <Field Name="RequestPageFilters">
+          <DataField>RequestPageFilters</DataField>
+        </Field>
+        <Field Name="ItemGrpNoLvl0">
+          <DataField>ItemGrpNoLvl0</DataField>
+        </Field>
+        <Field Name="ItemFound1">
+          <DataField>ItemFound1</DataField>
+        </Field>
+        <Field Name="ExistItemGrpSub1">
+          <DataField>ExistItemGrpSub1</DataField>
+        </Field>
+        <Field Name="PeriodRange1">
+          <DataField>PeriodRange1</DataField>
+        </Field>
+        <Field Name="PeriodRange2">
+          <DataField>PeriodRange2</DataField>
+        </Field>
+        <Field Name="PeriodRange3">
+          <DataField>PeriodRange3</DataField>
+        </Field>
+        <Field Name="PeriodRange4">
+          <DataField>PeriodRange4</DataField>
+        </Field>
+        <Field Name="No_Item">
+          <DataField>No_Item</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="RemainingAmt_1_1">
+          <DataField>RemainingAmt_1_1</DataField>
+        </Field>
+        <Field Name="RemainingAmt_1_1Format">
+          <DataField>RemainingAmt_1_1Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_1_2">
+          <DataField>RemainingAmt_1_2</DataField>
+        </Field>
+        <Field Name="RemainingAmt_1_2Format">
+          <DataField>RemainingAmt_1_2Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_1_3">
+          <DataField>RemainingAmt_1_3</DataField>
+        </Field>
+        <Field Name="RemainingAmt_1_3Format">
+          <DataField>RemainingAmt_1_3Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_1_4">
+          <DataField>RemainingAmt_1_4</DataField>
+        </Field>
+        <Field Name="RemainingAmt_1_4Format">
+          <DataField>RemainingAmt_1_4Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_1_5">
+          <DataField>RemainingAmt_1_5</DataField>
+        </Field>
+        <Field Name="RemainingAmt_1_5Format">
+          <DataField>RemainingAmt_1_5Format</DataField>
+        </Field>
+        <Field Name="Total_RemainingAmt_1">
+          <DataField>Total_RemainingAmt_1</DataField>
+        </Field>
+        <Field Name="Total_RemainingAmt_1Format">
+          <DataField>Total_RemainingAmt_1Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_1_1">
+          <DataField>AmountCalc_1_1</DataField>
+        </Field>
+        <Field Name="AmountCalc_1_1Format">
+          <DataField>AmountCalc_1_1Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_1_2">
+          <DataField>AmountCalc_1_2</DataField>
+        </Field>
+        <Field Name="AmountCalc_1_2Format">
+          <DataField>AmountCalc_1_2Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_1_3">
+          <DataField>AmountCalc_1_3</DataField>
+        </Field>
+        <Field Name="AmountCalc_1_3Format">
+          <DataField>AmountCalc_1_3Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_1_4">
+          <DataField>AmountCalc_1_4</DataField>
+        </Field>
+        <Field Name="AmountCalc_1_4Format">
+          <DataField>AmountCalc_1_4Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_1_5">
+          <DataField>AmountCalc_1_5</DataField>
+        </Field>
+        <Field Name="AmountCalc_1_5Format">
+          <DataField>AmountCalc_1_5Format</DataField>
+        </Field>
+        <Field Name="Total_AmountCalc_1">
+          <DataField>Total_AmountCalc_1</DataField>
+        </Field>
+        <Field Name="Total_AmountCalc_1Format">
+          <DataField>Total_AmountCalc_1Format</DataField>
+        </Field>
+        <Field Name="ItemSection1">
+          <DataField>ItemSection1</DataField>
+        </Field>
+        <Field Name="ExistNonZeroItemRecords1">
+          <DataField>ExistNonZeroItemRecords1</DataField>
+        </Field>
+        <Field Name="No_ItemGroupSub1">
+          <DataField>No_ItemGroupSub1</DataField>
+        </Field>
+        <Field Name="Description_ItemGroupSub1">
+          <DataField>Description_ItemGroupSub1</DataField>
+        </Field>
+        <Field Name="ItemGrpNoLvl1">
+          <DataField>ItemGrpNoLvl1</DataField>
+        </Field>
+        <Field Name="ItemFound2">
+          <DataField>ItemFound2</DataField>
+        </Field>
+        <Field Name="ExistItemGrpSub2">
+          <DataField>ExistItemGrpSub2</DataField>
+        </Field>
+        <Field Name="No_Item1">
+          <DataField>No_Item1</DataField>
+        </Field>
+        <Field Name="Description_Item1">
+          <DataField>Description_Item1</DataField>
+        </Field>
+        <Field Name="RemainingAmt_2_1">
+          <DataField>RemainingAmt_2_1</DataField>
+        </Field>
+        <Field Name="RemainingAmt_2_1Format">
+          <DataField>RemainingAmt_2_1Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_2_2">
+          <DataField>RemainingAmt_2_2</DataField>
+        </Field>
+        <Field Name="RemainingAmt_2_2Format">
+          <DataField>RemainingAmt_2_2Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_2_3">
+          <DataField>RemainingAmt_2_3</DataField>
+        </Field>
+        <Field Name="RemainingAmt_2_3Format">
+          <DataField>RemainingAmt_2_3Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_2_4">
+          <DataField>RemainingAmt_2_4</DataField>
+        </Field>
+        <Field Name="RemainingAmt_2_4Format">
+          <DataField>RemainingAmt_2_4Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_2_5">
+          <DataField>RemainingAmt_2_5</DataField>
+        </Field>
+        <Field Name="RemainingAmt_2_5Format">
+          <DataField>RemainingAmt_2_5Format</DataField>
+        </Field>
+        <Field Name="Total_RemainingAmt_2">
+          <DataField>Total_RemainingAmt_2</DataField>
+        </Field>
+        <Field Name="Total_RemainingAmt_2Format">
+          <DataField>Total_RemainingAmt_2Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_2_1">
+          <DataField>AmountCalc_2_1</DataField>
+        </Field>
+        <Field Name="AmountCalc_2_1Format">
+          <DataField>AmountCalc_2_1Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_2_2">
+          <DataField>AmountCalc_2_2</DataField>
+        </Field>
+        <Field Name="AmountCalc_2_2Format">
+          <DataField>AmountCalc_2_2Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_2_3">
+          <DataField>AmountCalc_2_3</DataField>
+        </Field>
+        <Field Name="AmountCalc_2_3Format">
+          <DataField>AmountCalc_2_3Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_2_4">
+          <DataField>AmountCalc_2_4</DataField>
+        </Field>
+        <Field Name="AmountCalc_2_4Format">
+          <DataField>AmountCalc_2_4Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_2_5">
+          <DataField>AmountCalc_2_5</DataField>
+        </Field>
+        <Field Name="AmountCalc_2_5Format">
+          <DataField>AmountCalc_2_5Format</DataField>
+        </Field>
+        <Field Name="Total_AmountCalc_2">
+          <DataField>Total_AmountCalc_2</DataField>
+        </Field>
+        <Field Name="Total_AmountCalc_2Format">
+          <DataField>Total_AmountCalc_2Format</DataField>
+        </Field>
+        <Field Name="ItemSection2">
+          <DataField>ItemSection2</DataField>
+        </Field>
+        <Field Name="ExistNonZeroItemRecords2">
+          <DataField>ExistNonZeroItemRecords2</DataField>
+        </Field>
+        <Field Name="No_ItemGroupSub2">
+          <DataField>No_ItemGroupSub2</DataField>
+        </Field>
+        <Field Name="Description_ItemGroupSub2">
+          <DataField>Description_ItemGroupSub2</DataField>
+        </Field>
+        <Field Name="ItemGrpNoLvl2">
+          <DataField>ItemGrpNoLvl2</DataField>
+        </Field>
+        <Field Name="ItemFound3">
+          <DataField>ItemFound3</DataField>
+        </Field>
+        <Field Name="ExistItemGrpSub3">
+          <DataField>ExistItemGrpSub3</DataField>
+        </Field>
+        <Field Name="No_Item2">
+          <DataField>No_Item2</DataField>
+        </Field>
+        <Field Name="Description_Item2">
+          <DataField>Description_Item2</DataField>
+        </Field>
+        <Field Name="RemainingAmt_3_1">
+          <DataField>RemainingAmt_3_1</DataField>
+        </Field>
+        <Field Name="RemainingAmt_3_1Format">
+          <DataField>RemainingAmt_3_1Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_3_2">
+          <DataField>RemainingAmt_3_2</DataField>
+        </Field>
+        <Field Name="RemainingAmt_3_2Format">
+          <DataField>RemainingAmt_3_2Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_3_3">
+          <DataField>RemainingAmt_3_3</DataField>
+        </Field>
+        <Field Name="RemainingAmt_3_3Format">
+          <DataField>RemainingAmt_3_3Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_3_4">
+          <DataField>RemainingAmt_3_4</DataField>
+        </Field>
+        <Field Name="RemainingAmt_3_4Format">
+          <DataField>RemainingAmt_3_4Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_3_5">
+          <DataField>RemainingAmt_3_5</DataField>
+        </Field>
+        <Field Name="RemainingAmt_3_5Format">
+          <DataField>RemainingAmt_3_5Format</DataField>
+        </Field>
+        <Field Name="Total_RemainingAmt_3">
+          <DataField>Total_RemainingAmt_3</DataField>
+        </Field>
+        <Field Name="Total_RemainingAmt_3Format">
+          <DataField>Total_RemainingAmt_3Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_3_1">
+          <DataField>AmountCalc_3_1</DataField>
+        </Field>
+        <Field Name="AmountCalc_3_1Format">
+          <DataField>AmountCalc_3_1Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_3_2">
+          <DataField>AmountCalc_3_2</DataField>
+        </Field>
+        <Field Name="AmountCalc_3_2Format">
+          <DataField>AmountCalc_3_2Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_3_3">
+          <DataField>AmountCalc_3_3</DataField>
+        </Field>
+        <Field Name="AmountCalc_3_3Format">
+          <DataField>AmountCalc_3_3Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_3_4">
+          <DataField>AmountCalc_3_4</DataField>
+        </Field>
+        <Field Name="AmountCalc_3_4Format">
+          <DataField>AmountCalc_3_4Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_3_5">
+          <DataField>AmountCalc_3_5</DataField>
+        </Field>
+        <Field Name="AmountCalc_3_5Format">
+          <DataField>AmountCalc_3_5Format</DataField>
+        </Field>
+        <Field Name="Total_AmountCalc_3">
+          <DataField>Total_AmountCalc_3</DataField>
+        </Field>
+        <Field Name="Total_AmountCalc_3Format">
+          <DataField>Total_AmountCalc_3Format</DataField>
+        </Field>
+        <Field Name="ItemSection3">
+          <DataField>ItemSection3</DataField>
+        </Field>
+        <Field Name="ExistNonZeroItemRecords3">
+          <DataField>ExistNonZeroItemRecords3</DataField>
+        </Field>
+        <Field Name="No_ItemGroupSub3">
+          <DataField>No_ItemGroupSub3</DataField>
+        </Field>
+        <Field Name="Description_ItemGroupSub3">
+          <DataField>Description_ItemGroupSub3</DataField>
+        </Field>
+        <Field Name="ItemGrpNoLvl3">
+          <DataField>ItemGrpNoLvl3</DataField>
+        </Field>
+        <Field Name="ItemFound4">
+          <DataField>ItemFound4</DataField>
+        </Field>
+        <Field Name="ExistItemGrpSub4">
+          <DataField>ExistItemGrpSub4</DataField>
+        </Field>
+        <Field Name="No_Item3">
+          <DataField>No_Item3</DataField>
+        </Field>
+        <Field Name="Description_Item3">
+          <DataField>Description_Item3</DataField>
+        </Field>
+        <Field Name="RemainingAmt_4_1">
+          <DataField>RemainingAmt_4_1</DataField>
+        </Field>
+        <Field Name="RemainingAmt_4_1Format">
+          <DataField>RemainingAmt_4_1Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_4_2">
+          <DataField>RemainingAmt_4_2</DataField>
+        </Field>
+        <Field Name="RemainingAmt_4_2Format">
+          <DataField>RemainingAmt_4_2Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_4_3">
+          <DataField>RemainingAmt_4_3</DataField>
+        </Field>
+        <Field Name="RemainingAmt_4_3Format">
+          <DataField>RemainingAmt_4_3Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_4_4">
+          <DataField>RemainingAmt_4_4</DataField>
+        </Field>
+        <Field Name="RemainingAmt_4_4Format">
+          <DataField>RemainingAmt_4_4Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_4_5">
+          <DataField>RemainingAmt_4_5</DataField>
+        </Field>
+        <Field Name="RemainingAmt_4_5Format">
+          <DataField>RemainingAmt_4_5Format</DataField>
+        </Field>
+        <Field Name="Total_RemainingAmt_4">
+          <DataField>Total_RemainingAmt_4</DataField>
+        </Field>
+        <Field Name="Total_RemainingAmt_4Format">
+          <DataField>Total_RemainingAmt_4Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_4_1">
+          <DataField>AmountCalc_4_1</DataField>
+        </Field>
+        <Field Name="AmountCalc_4_1Format">
+          <DataField>AmountCalc_4_1Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_4_2">
+          <DataField>AmountCalc_4_2</DataField>
+        </Field>
+        <Field Name="AmountCalc_4_2Format">
+          <DataField>AmountCalc_4_2Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_4_3">
+          <DataField>AmountCalc_4_3</DataField>
+        </Field>
+        <Field Name="AmountCalc_4_3Format">
+          <DataField>AmountCalc_4_3Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_4_4">
+          <DataField>AmountCalc_4_4</DataField>
+        </Field>
+        <Field Name="AmountCalc_4_4Format">
+          <DataField>AmountCalc_4_4Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_4_5">
+          <DataField>AmountCalc_4_5</DataField>
+        </Field>
+        <Field Name="AmountCalc_4_5Format">
+          <DataField>AmountCalc_4_5Format</DataField>
+        </Field>
+        <Field Name="Total_AmountCalc_4">
+          <DataField>Total_AmountCalc_4</DataField>
+        </Field>
+        <Field Name="Total_AmountCalc_4Format">
+          <DataField>Total_AmountCalc_4Format</DataField>
+        </Field>
+        <Field Name="ItemSection4">
+          <DataField>ItemSection4</DataField>
+        </Field>
+        <Field Name="ExistNonZeroItemRecords4">
+          <DataField>ExistNonZeroItemRecords4</DataField>
+        </Field>
+        <Field Name="No_ItemGroupSub4">
+          <DataField>No_ItemGroupSub4</DataField>
+        </Field>
+        <Field Name="Description_ItemGroupSub4">
+          <DataField>Description_ItemGroupSub4</DataField>
+        </Field>
+        <Field Name="ItemGrpNoLvl4">
+          <DataField>ItemGrpNoLvl4</DataField>
+        </Field>
+        <Field Name="ItemFound5">
+          <DataField>ItemFound5</DataField>
+        </Field>
+        <Field Name="ExistItemGrpSub5">
+          <DataField>ExistItemGrpSub5</DataField>
+        </Field>
+        <Field Name="No_Item4">
+          <DataField>No_Item4</DataField>
+        </Field>
+        <Field Name="Description_Item4">
+          <DataField>Description_Item4</DataField>
+        </Field>
+        <Field Name="RemainingAmt_5_1">
+          <DataField>RemainingAmt_5_1</DataField>
+        </Field>
+        <Field Name="RemainingAmt_5_1Format">
+          <DataField>RemainingAmt_5_1Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_5_2">
+          <DataField>RemainingAmt_5_2</DataField>
+        </Field>
+        <Field Name="RemainingAmt_5_2Format">
+          <DataField>RemainingAmt_5_2Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_5_3">
+          <DataField>RemainingAmt_5_3</DataField>
+        </Field>
+        <Field Name="RemainingAmt_5_3Format">
+          <DataField>RemainingAmt_5_3Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_5_4">
+          <DataField>RemainingAmt_5_4</DataField>
+        </Field>
+        <Field Name="RemainingAmt_5_4Format">
+          <DataField>RemainingAmt_5_4Format</DataField>
+        </Field>
+        <Field Name="RemainingAmt_5_5">
+          <DataField>RemainingAmt_5_5</DataField>
+        </Field>
+        <Field Name="RemainingAmt_5_5Format">
+          <DataField>RemainingAmt_5_5Format</DataField>
+        </Field>
+        <Field Name="Total_RemainingAmt_5">
+          <DataField>Total_RemainingAmt_5</DataField>
+        </Field>
+        <Field Name="Total_RemainingAmt_5Format">
+          <DataField>Total_RemainingAmt_5Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_5_1">
+          <DataField>AmountCalc_5_1</DataField>
+        </Field>
+        <Field Name="AmountCalc_5_1Format">
+          <DataField>AmountCalc_5_1Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_5_2">
+          <DataField>AmountCalc_5_2</DataField>
+        </Field>
+        <Field Name="AmountCalc_5_2Format">
+          <DataField>AmountCalc_5_2Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_5_3">
+          <DataField>AmountCalc_5_3</DataField>
+        </Field>
+        <Field Name="AmountCalc_5_3Format">
+          <DataField>AmountCalc_5_3Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_5_4">
+          <DataField>AmountCalc_5_4</DataField>
+        </Field>
+        <Field Name="AmountCalc_5_4Format">
+          <DataField>AmountCalc_5_4Format</DataField>
+        </Field>
+        <Field Name="AmountCalc_5_5">
+          <DataField>AmountCalc_5_5</DataField>
+        </Field>
+        <Field Name="AmountCalc_5_5Format">
+          <DataField>AmountCalc_5_5Format</DataField>
+        </Field>
+        <Field Name="Total_AmountCalc_5">
+          <DataField>Total_AmountCalc_5</DataField>
+        </Field>
+        <Field Name="Total_AmountCalc_5Format">
+          <DataField>Total_AmountCalc_5Format</DataField>
+        </Field>
+        <Field Name="ItemSection5">
+          <DataField>ItemSection5</DataField>
+        </Field>
+        <Field Name="ExistNonZeroItemRecords5">
+          <DataField>ExistNonZeroItemRecords5</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

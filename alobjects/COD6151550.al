@@ -11,6 +11,7 @@ codeunit 6151550 "NpXml Task Mgt."
     // NC2.07/MHA /20171027  CASE 294737 PrevRecRef is now a Temporary Rec and can be filtered, thus function added: RecExists()
     // NC2.12/MHA /20180418  CASE 308107 Adjusted Duplicate Check to use UniqueTaskBuffer
     // NC2.14/MHA /20180629  CASE 320762 GetRecRef() moved from NpXmlTriggerMgt to NcTaskMgt
+    // NC2.22/MHA /20190626  CASE 355993 Delete should trigger even if record exists and cleared out green code
 
     TableNo = "Nc Task";
 
@@ -27,10 +28,6 @@ codeunit 6151550 "NpXml Task Mgt."
     begin
         TaskProcessor.Get("Task Processor Code");
         NpXmlTriggerMgt.ResetOutput();
-        //-NC2.12 [308107]
-        //TempDataLogRecord.DELETEALL;
-        //DataLogEntryNo := 0;
-        //+NC2.12 [308107]
         Clear(RecRef);
         Clear(PrevRecRef);
         NcTaskMgt.RestoreRecord("Entry No.",PrevRecRef);
@@ -38,65 +35,41 @@ codeunit 6151550 "NpXml Task Mgt."
         case Type of
           Type::Insert:
             begin
-              //-NC2.14 [320762]
-              //IF NpXmlTriggerMgt.GetRecRef("Company Name","Table No.","Record Position",RecRef) THEN BEGIN
               if NcTaskMgt.GetRecRef(Rec,RecRef) then begin
-              //+NC2.14 [320762]
-                //-NC2.12 [308107]
-                //NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef,Rec,TRUE,FALSE,FALSE,DataLogEntryNo,TempDataLogRecord);
                 NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef,Rec,true,false,false,UniqueTaskBuffer);
-                //+NC2.12 [308107]
                 ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
               end;
             end;
           Type::Modify:
             begin
-              //-NC2.14 [320762]
-              //IF NpXmlTriggerMgt.GetRecRef("Company Name","Table No.","Record Position",RecRef) THEN BEGIN
               if NcTaskMgt.GetRecRef(Rec,RecRef) then begin
-              //+NC2.14 [320762]
-                //-NC2.12 [308107]
-                //NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef,Rec,FALSE,TRUE,FALSE,DataLogEntryNo,TempDataLogRecord);
                 NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef,Rec,false,true,false,UniqueTaskBuffer);
-                //+NC2.12 [308107]
                 ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
               end;
             end;
           Type::Delete:
             begin
               RecRef2 := PrevRecRef.Duplicate;
-              //-NC2.07 [294737]
-              //IF NOT RecRef2.FIND THEN BEGIN
-              if not NcTaskMgt.RecExists(RecRef2,"Company Name") then begin
-              //+NC2.07 [294737]
-                //-NC2.12 [308107]
-                //NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef2,Rec,FALSE,FALSE,TRUE,DataLogEntryNo,TempDataLogRecord);
-                NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef2,Rec,false,false,true,UniqueTaskBuffer);
-                //+NC2.12 [308107]
-                ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
-              end;
+              //-NC2.22 [355993]
+              if NcTaskMgt.RecExists(RecRef2,"Company Name") then
+                RecRef2.Find;
+              //+NC2.22 [355993]
+
+              NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef2,Rec,false,false,true,UniqueTaskBuffer);
+              ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
             end;
           Type::Rename:
             begin
               RecRef2 := PrevRecRef.Duplicate;
-              //-NC2.07 [294737]
-              //IF NOT RecRef2.FIND THEN BEGIN
-              if not NcTaskMgt.RecExists(RecRef2,"Company Name") then begin
-              //+NC2.07 [294737]
-                //-NC2.12 [308107]
-                //NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef2,Rec,FALSE,FALSE,TRUE,DataLogEntryNo,TempDataLogRecord);
-                NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef2,Rec,false,false,true,UniqueTaskBuffer);
-                //+NC2.12 [308107]
-                ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
-              end;
-              //-NC2.14 [320762]
-              //IF NpXmlTriggerMgt.GetRecRef("Company Name","Table No.","Record Position",RecRef) THEN BEGIN
+              //-NC2.22 [355993]
+              if NcTaskMgt.RecExists(RecRef2,"Company Name") then
+                RecRef2.Find;
+              //+NC2.22 [355993]
+
+              NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef2,Rec,false,false,true,UniqueTaskBuffer);
+              ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
               if NcTaskMgt.GetRecRef(Rec,RecRef) then begin
-              //+NC2.14 [320762]
-                //-NC2.12 [308107]
-                //NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef,Rec,TRUE,TRUE,FALSE,DataLogEntryNo,TempDataLogRecord);
                 NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef,Rec,true,true,false,UniqueTaskBuffer);
-                //+NC2.12 [308107]
                 ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
               end;
             end;
@@ -180,7 +153,6 @@ codeunit 6151550 "NpXml Task Mgt."
         PrevRecRef: RecordRef;
         RecRef: RecordRef;
     begin
-        //-NC2.12 [308107]
         if not TempTask.IsTemporary then
           exit;
         if not IsNpXmlTask(TaskProcessor,TempTask) then
@@ -191,10 +163,7 @@ codeunit 6151550 "NpXml Task Mgt."
         if not NcTaskMgt.RestoreRecordFromDataLog(TempTask."Entry No.",TempTask."Company Name",PrevRecRef) then
           exit;
 
-        //-NC2.14 [320762]
-        //IF NOT NpXmlTriggerMgt.GetRecRef(TempTask."Company Name",TempTask."Table No.",TempTask."Record Position",RecRef) THEN
         if not NcTaskMgt.GetRecRef(TempTask,RecRef) then
-        //+NC2.14 [320762]
           RecRef := PrevRecRef.Duplicate;
 
         if NpXmlTriggerMgt.IsUniqueTask(TaskProcessor,
@@ -206,7 +175,6 @@ codeunit 6151550 "NpXml Task Mgt."
           UniqueTaskBuffer)
         then
           IsUnique:= true;
-        //+NC2.12 [308107]
     end;
 
     local procedure IsNpXmlTask(TaskProcessor: Record "Nc Task Processor";Task: Record "Nc Task"): Boolean
@@ -214,7 +182,6 @@ codeunit 6151550 "NpXml Task Mgt."
         NcTaskSetup: Record "Nc Task Setup";
         NpXmlSetup: Record "NpXml Setup";
     begin
-        //-NC2.12 [308107]
         if not (NpXmlSetup.Get and NpXmlSetup."NpXml Enabled") then
           exit(false);
 
@@ -222,7 +189,6 @@ codeunit 6151550 "NpXml Task Mgt."
         NcTaskSetup.SetRange("Table No.",Task."Table No.");
         NcTaskSetup.SetRange("Codeunit ID",CODEUNIT::"NpXml Task Mgt.");
         exit(NcTaskSetup.FindFirst);
-        //+NC2.12 [308107]
     end;
 }
 

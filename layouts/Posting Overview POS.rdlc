@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,217 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="EntryNo_POS_Entry">
-          <DataField>EntryNo_POS_Entry</DataField>
-        </Field>
-        <Field Name="EntryDate_POS_Entry">
-          <DataField>EntryDate_POS_Entry</DataField>
-        </Field>
-        <Field Name="DocumentNo_POS_Entry">
-          <DataField>DocumentNo_POS_Entry</DataField>
-        </Field>
-        <Field Name="POSUnitNo_POS_Entry">
-          <DataField>POSUnitNo_POS_Entry</DataField>
-        </Field>
-        <Field Name="EndingTime_POS_Entry">
-          <DataField>EndingTime_POS_Entry</DataField>
-        </Field>
-        <Field Name="DiscountAmount_POS_Entry">
-          <DataField>DiscountAmount_POS_Entry</DataField>
-        </Field>
-        <Field Name="DiscountAmount_POS_EntryFormat">
-          <DataField>DiscountAmount_POS_EntryFormat</DataField>
-        </Field>
-        <Field Name="TotalAmount_POS_Entry">
-          <DataField>TotalAmount_POS_Entry</DataField>
-        </Field>
-        <Field Name="TotalAmount_POS_EntryFormat">
-          <DataField>TotalAmount_POS_EntryFormat</DataField>
-        </Field>
-        <Field Name="TotalTaxAmount_POS_Entry">
-          <DataField>TotalTaxAmount_POS_Entry</DataField>
-        </Field>
-        <Field Name="TotalTaxAmount_POS_EntryFormat">
-          <DataField>TotalTaxAmount_POS_EntryFormat</DataField>
-        </Field>
-        <Field Name="TotalAmountInclTax_POS_Entry">
-          <DataField>TotalAmountInclTax_POS_Entry</DataField>
-        </Field>
-        <Field Name="TotalAmountInclTax_POS_EntryFormat">
-          <DataField>TotalAmountInclTax_POS_EntryFormat</DataField>
-        </Field>
-        <Field Name="POSStoreCode_POS_Entry">
-          <DataField>POSStoreCode_POS_Entry</DataField>
-        </Field>
-        <Field Name="ShortcutDimension1Code_POS_Entry">
-          <DataField>ShortcutDimension1Code_POS_Entry</DataField>
-        </Field>
-        <Field Name="SalespersonCode_POS_Entry">
-          <DataField>SalespersonCode_POS_Entry</DataField>
-        </Field>
-        <Field Name="TotalAmountInclTax">
-          <DataField>TotalAmountInclTax</DataField>
-        </Field>
-        <Field Name="TotalAmountInclTaxFormat">
-          <DataField>TotalAmountInclTaxFormat</DataField>
-        </Field>
-        <Field Name="POSStoreFilter">
-          <DataField>POSStoreFilter</DataField>
-        </Field>
-        <Field Name="DateFilter">
-          <DataField>DateFilter</DataField>
-        </Field>
-        <Field Name="NoFilter">
-          <DataField>NoFilter</DataField>
-        </Field>
-        <Field Name="POSEntryNo_POS_Sales_Line">
-          <DataField>POSEntryNo_POS_Sales_Line</DataField>
-        </Field>
-        <Field Name="LineNo_POS_Sales_Line">
-          <DataField>LineNo_POS_Sales_Line</DataField>
-        </Field>
-        <Field Name="Type_POS_Sales_Item_Line">
-          <DataField>Type_POS_Sales_Item_Line</DataField>
-        </Field>
-        <Field Name="No_POS_Sales_Item_Line">
-          <DataField>No_POS_Sales_Item_Line</DataField>
-        </Field>
-        <Field Name="Description_POS_Sales_Item_Line">
-          <DataField>Description_POS_Sales_Item_Line</DataField>
-        </Field>
-        <Field Name="Quantity_POS_Sales_Item_Line">
-          <DataField>Quantity_POS_Sales_Item_Line</DataField>
-        </Field>
-        <Field Name="Quantity_POS_Sales_Item_LineFormat">
-          <DataField>Quantity_POS_Sales_Item_LineFormat</DataField>
-        </Field>
-        <Field Name="UnitPrice_POS_Sales_Item_Line">
-          <DataField>UnitPrice_POS_Sales_Item_Line</DataField>
-        </Field>
-        <Field Name="UnitPrice_POS_Sales_Item_LineFormat">
-          <DataField>UnitPrice_POS_Sales_Item_LineFormat</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_POS_Sales_Item_Line">
-          <DataField>AmountInclVAT_POS_Sales_Item_Line</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_POS_Sales_Item_LineFormat">
-          <DataField>AmountInclVAT_POS_Sales_Item_LineFormat</DataField>
-        </Field>
-        <Field Name="LineDiscount_POS_Sales_Item_Line">
-          <DataField>LineDiscount_POS_Sales_Item_Line</DataField>
-        </Field>
-        <Field Name="LineDiscount_POS_Sales_Item_LineFormat">
-          <DataField>LineDiscount_POS_Sales_Item_LineFormat</DataField>
-        </Field>
-        <Field Name="Description_Item_Variant">
-          <DataField>Description_Item_Variant</DataField>
-        </Field>
-        <Field Name="Type_POS_Sales_GLAccount_Line">
-          <DataField>Type_POS_Sales_GLAccount_Line</DataField>
-        </Field>
-        <Field Name="No_POS_Sales_GLAccount_Line">
-          <DataField>No_POS_Sales_GLAccount_Line</DataField>
-        </Field>
-        <Field Name="Description_POS_Sales_GLAccount_Line">
-          <DataField>Description_POS_Sales_GLAccount_Line</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_POS_Sales_GLAccount_Line">
-          <DataField>AmountInclVAT_POS_Sales_GLAccount_Line</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_POS_Sales_GLAccount_LineFormat">
-          <DataField>AmountInclVAT_POS_Sales_GLAccount_LineFormat</DataField>
-        </Field>
-        <Field Name="Type_POS_Sales_Comment_Line">
-          <DataField>Type_POS_Sales_Comment_Line</DataField>
-        </Field>
-        <Field Name="No_POS_Sales_Comment_Line">
-          <DataField>No_POS_Sales_Comment_Line</DataField>
-        </Field>
-        <Field Name="Description_POS_Sales_Comment_Line">
-          <DataField>Description_POS_Sales_Comment_Line</DataField>
-        </Field>
-        <Field Name="Type_POS_Sales_Customer_Line">
-          <DataField>Type_POS_Sales_Customer_Line</DataField>
-        </Field>
-        <Field Name="No_POS_Sales_Customer_Line">
-          <DataField>No_POS_Sales_Customer_Line</DataField>
-        </Field>
-        <Field Name="Description_POS_Sales_Customer_Line">
-          <DataField>Description_POS_Sales_Customer_Line</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_POS_Sales_Customer_Line">
-          <DataField>AmountInclVAT_POS_Sales_Customer_Line</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_POS_Sales_Customer_LineFormat">
-          <DataField>AmountInclVAT_POS_Sales_Customer_LineFormat</DataField>
-        </Field>
-        <Field Name="Type_POS_Sales_Voucher_Line">
-          <DataField>Type_POS_Sales_Voucher_Line</DataField>
-        </Field>
-        <Field Name="No_POS_Sales_Voucher_Line">
-          <DataField>No_POS_Sales_Voucher_Line</DataField>
-        </Field>
-        <Field Name="Description_POS_Sales_Voucher_Line">
-          <DataField>Description_POS_Sales_Voucher_Line</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_POS_Sales_Voucher_Line">
-          <DataField>AmountInclVAT_POS_Sales_Voucher_Line</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_POS_Sales_Voucher_LineFormat">
-          <DataField>AmountInclVAT_POS_Sales_Voucher_LineFormat</DataField>
-        </Field>
-        <Field Name="Type_POS_Sales_Payout_Line">
-          <DataField>Type_POS_Sales_Payout_Line</DataField>
-        </Field>
-        <Field Name="No_POS_Sales_Payout_Line">
-          <DataField>No_POS_Sales_Payout_Line</DataField>
-        </Field>
-        <Field Name="Description_POS_Sales_Payout_Line">
-          <DataField>Description_POS_Sales_Payout_Line</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_POS_Sales_Payout_Line">
-          <DataField>AmountInclVAT_POS_Sales_Payout_Line</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_POS_Sales_Payout_LineFormat">
-          <DataField>AmountInclVAT_POS_Sales_Payout_LineFormat</DataField>
-        </Field>
-        <Field Name="Type_POS_Sales_Rounding_Line">
-          <DataField>Type_POS_Sales_Rounding_Line</DataField>
-        </Field>
-        <Field Name="No_POS_Sales_Rounding_Line">
-          <DataField>No_POS_Sales_Rounding_Line</DataField>
-        </Field>
-        <Field Name="Description_POS_Sales_Rounding_Line">
-          <DataField>Description_POS_Sales_Rounding_Line</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_POS_Sales_Rounding_Line">
-          <DataField>AmountInclVAT_POS_Sales_Rounding_Line</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_POS_Sales_Rounding_LineFormat">
-          <DataField>AmountInclVAT_POS_Sales_Rounding_LineFormat</DataField>
-        </Field>
-        <Field Name="TransactionTime_CreditCardTransaction">
-          <DataField>TransactionTime_CreditCardTransaction</DataField>
-        </Field>
-        <Field Name="EntryNo_CreditCardTransaction">
-          <DataField>EntryNo_CreditCardTransaction</DataField>
-        </Field>
-        <Field Name="Type_CreditCardTransaction">
-          <DataField>Type_CreditCardTransaction</DataField>
-        </Field>
-        <Field Name="Text_CreditCardTransaction">
-          <DataField>Text_CreditCardTransaction</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3827,6 +3616,42 @@
     </ReportSection>
   </ReportSections>
   <ReportParameters>
+    <ReportParameter Name="StoreCodeLabel">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>StoreCodeLabel</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>StoreCodeLabel</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TotalLabel">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TotalLabel</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TotalLabel</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="EntryOverviewLabel">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>EntryOverviewLabel</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>EntryOverviewLabel</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PageLabel">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PageLabel</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PageLabel</Prompt>
+    </ReportParameter>
     <ReportParameter Name="EntryDate_POS_EntryCaption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -3899,42 +3724,6 @@
       </DefaultValue>
       <Prompt>No_POS_Sales_GLAccount_LineCaption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="StoreCodeLabel">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>StoreCodeLabel</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>StoreCodeLabel</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="TotalLabel">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>TotalLabel</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>TotalLabel</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="EntryOverviewLabel">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>EntryOverviewLabel</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>EntryOverviewLabel</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="PageLabel">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>PageLabel</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>PageLabel</Prompt>
-    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
@@ -3944,62 +3733,62 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>EntryDate_POS_EntryCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>1</RowIndex>
-          <ParameterName>DocumentNo_POS_EntryCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>2</RowIndex>
-          <ParameterName>POSStoreCode_POS_EntryCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>3</RowIndex>
-          <ParameterName>ShortcutDimension1Code_POS_EntryCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>4</RowIndex>
-          <ParameterName>SalespersonCode_POS_EntryCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>5</RowIndex>
-          <ParameterName>Description_POS_Sales_Item_LineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>6</RowIndex>
-          <ParameterName>AmountInclVAT_POS_Sales_Item_LineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>7</RowIndex>
-          <ParameterName>No_POS_Sales_GLAccount_LineCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>8</RowIndex>
           <ParameterName>StoreCodeLabel</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>9</RowIndex>
+          <RowIndex>1</RowIndex>
           <ParameterName>TotalLabel</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>10</RowIndex>
+          <RowIndex>2</RowIndex>
           <ParameterName>EntryOverviewLabel</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>11</RowIndex>
+          <RowIndex>3</RowIndex>
           <ParameterName>PageLabel</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>4</RowIndex>
+          <ParameterName>EntryDate_POS_EntryCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>5</RowIndex>
+          <ParameterName>DocumentNo_POS_EntryCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>6</RowIndex>
+          <ParameterName>POSStoreCode_POS_EntryCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>7</RowIndex>
+          <ParameterName>ShortcutDimension1Code_POS_EntryCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>8</RowIndex>
+          <ParameterName>SalespersonCode_POS_EntryCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>9</RowIndex>
+          <ParameterName>Description_POS_Sales_Item_LineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>10</RowIndex>
+          <ParameterName>AmountInclVAT_POS_Sales_Item_LineCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>11</RowIndex>
+          <ParameterName>No_POS_Sales_GLAccount_LineCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -4117,4 +3906,215 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="EntryNo_POS_Entry">
+          <DataField>EntryNo_POS_Entry</DataField>
+        </Field>
+        <Field Name="EntryDate_POS_Entry">
+          <DataField>EntryDate_POS_Entry</DataField>
+        </Field>
+        <Field Name="DocumentNo_POS_Entry">
+          <DataField>DocumentNo_POS_Entry</DataField>
+        </Field>
+        <Field Name="POSUnitNo_POS_Entry">
+          <DataField>POSUnitNo_POS_Entry</DataField>
+        </Field>
+        <Field Name="EndingTime_POS_Entry">
+          <DataField>EndingTime_POS_Entry</DataField>
+        </Field>
+        <Field Name="DiscountAmount_POS_Entry">
+          <DataField>DiscountAmount_POS_Entry</DataField>
+        </Field>
+        <Field Name="DiscountAmount_POS_EntryFormat">
+          <DataField>DiscountAmount_POS_EntryFormat</DataField>
+        </Field>
+        <Field Name="TotalAmount_POS_Entry">
+          <DataField>TotalAmount_POS_Entry</DataField>
+        </Field>
+        <Field Name="TotalAmount_POS_EntryFormat">
+          <DataField>TotalAmount_POS_EntryFormat</DataField>
+        </Field>
+        <Field Name="TotalTaxAmount_POS_Entry">
+          <DataField>TotalTaxAmount_POS_Entry</DataField>
+        </Field>
+        <Field Name="TotalTaxAmount_POS_EntryFormat">
+          <DataField>TotalTaxAmount_POS_EntryFormat</DataField>
+        </Field>
+        <Field Name="TotalAmountInclTax_POS_Entry">
+          <DataField>TotalAmountInclTax_POS_Entry</DataField>
+        </Field>
+        <Field Name="TotalAmountInclTax_POS_EntryFormat">
+          <DataField>TotalAmountInclTax_POS_EntryFormat</DataField>
+        </Field>
+        <Field Name="POSStoreCode_POS_Entry">
+          <DataField>POSStoreCode_POS_Entry</DataField>
+        </Field>
+        <Field Name="ShortcutDimension1Code_POS_Entry">
+          <DataField>ShortcutDimension1Code_POS_Entry</DataField>
+        </Field>
+        <Field Name="SalespersonCode_POS_Entry">
+          <DataField>SalespersonCode_POS_Entry</DataField>
+        </Field>
+        <Field Name="TotalAmountInclTax">
+          <DataField>TotalAmountInclTax</DataField>
+        </Field>
+        <Field Name="TotalAmountInclTaxFormat">
+          <DataField>TotalAmountInclTaxFormat</DataField>
+        </Field>
+        <Field Name="POSStoreFilter">
+          <DataField>POSStoreFilter</DataField>
+        </Field>
+        <Field Name="DateFilter">
+          <DataField>DateFilter</DataField>
+        </Field>
+        <Field Name="NoFilter">
+          <DataField>NoFilter</DataField>
+        </Field>
+        <Field Name="POSEntryNo_POS_Sales_Line">
+          <DataField>POSEntryNo_POS_Sales_Line</DataField>
+        </Field>
+        <Field Name="LineNo_POS_Sales_Line">
+          <DataField>LineNo_POS_Sales_Line</DataField>
+        </Field>
+        <Field Name="Type_POS_Sales_Item_Line">
+          <DataField>Type_POS_Sales_Item_Line</DataField>
+        </Field>
+        <Field Name="No_POS_Sales_Item_Line">
+          <DataField>No_POS_Sales_Item_Line</DataField>
+        </Field>
+        <Field Name="Description_POS_Sales_Item_Line">
+          <DataField>Description_POS_Sales_Item_Line</DataField>
+        </Field>
+        <Field Name="Quantity_POS_Sales_Item_Line">
+          <DataField>Quantity_POS_Sales_Item_Line</DataField>
+        </Field>
+        <Field Name="Quantity_POS_Sales_Item_LineFormat">
+          <DataField>Quantity_POS_Sales_Item_LineFormat</DataField>
+        </Field>
+        <Field Name="UnitPrice_POS_Sales_Item_Line">
+          <DataField>UnitPrice_POS_Sales_Item_Line</DataField>
+        </Field>
+        <Field Name="UnitPrice_POS_Sales_Item_LineFormat">
+          <DataField>UnitPrice_POS_Sales_Item_LineFormat</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_POS_Sales_Item_Line">
+          <DataField>AmountInclVAT_POS_Sales_Item_Line</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_POS_Sales_Item_LineFormat">
+          <DataField>AmountInclVAT_POS_Sales_Item_LineFormat</DataField>
+        </Field>
+        <Field Name="LineDiscount_POS_Sales_Item_Line">
+          <DataField>LineDiscount_POS_Sales_Item_Line</DataField>
+        </Field>
+        <Field Name="LineDiscount_POS_Sales_Item_LineFormat">
+          <DataField>LineDiscount_POS_Sales_Item_LineFormat</DataField>
+        </Field>
+        <Field Name="Description_Item_Variant">
+          <DataField>Description_Item_Variant</DataField>
+        </Field>
+        <Field Name="Type_POS_Sales_GLAccount_Line">
+          <DataField>Type_POS_Sales_GLAccount_Line</DataField>
+        </Field>
+        <Field Name="No_POS_Sales_GLAccount_Line">
+          <DataField>No_POS_Sales_GLAccount_Line</DataField>
+        </Field>
+        <Field Name="Description_POS_Sales_GLAccount_Line">
+          <DataField>Description_POS_Sales_GLAccount_Line</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_POS_Sales_GLAccount_Line">
+          <DataField>AmountInclVAT_POS_Sales_GLAccount_Line</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_POS_Sales_GLAccount_LineFormat">
+          <DataField>AmountInclVAT_POS_Sales_GLAccount_LineFormat</DataField>
+        </Field>
+        <Field Name="Type_POS_Sales_Comment_Line">
+          <DataField>Type_POS_Sales_Comment_Line</DataField>
+        </Field>
+        <Field Name="No_POS_Sales_Comment_Line">
+          <DataField>No_POS_Sales_Comment_Line</DataField>
+        </Field>
+        <Field Name="Description_POS_Sales_Comment_Line">
+          <DataField>Description_POS_Sales_Comment_Line</DataField>
+        </Field>
+        <Field Name="Type_POS_Sales_Customer_Line">
+          <DataField>Type_POS_Sales_Customer_Line</DataField>
+        </Field>
+        <Field Name="No_POS_Sales_Customer_Line">
+          <DataField>No_POS_Sales_Customer_Line</DataField>
+        </Field>
+        <Field Name="Description_POS_Sales_Customer_Line">
+          <DataField>Description_POS_Sales_Customer_Line</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_POS_Sales_Customer_Line">
+          <DataField>AmountInclVAT_POS_Sales_Customer_Line</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_POS_Sales_Customer_LineFormat">
+          <DataField>AmountInclVAT_POS_Sales_Customer_LineFormat</DataField>
+        </Field>
+        <Field Name="Type_POS_Sales_Voucher_Line">
+          <DataField>Type_POS_Sales_Voucher_Line</DataField>
+        </Field>
+        <Field Name="No_POS_Sales_Voucher_Line">
+          <DataField>No_POS_Sales_Voucher_Line</DataField>
+        </Field>
+        <Field Name="Description_POS_Sales_Voucher_Line">
+          <DataField>Description_POS_Sales_Voucher_Line</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_POS_Sales_Voucher_Line">
+          <DataField>AmountInclVAT_POS_Sales_Voucher_Line</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_POS_Sales_Voucher_LineFormat">
+          <DataField>AmountInclVAT_POS_Sales_Voucher_LineFormat</DataField>
+        </Field>
+        <Field Name="Type_POS_Sales_Payout_Line">
+          <DataField>Type_POS_Sales_Payout_Line</DataField>
+        </Field>
+        <Field Name="No_POS_Sales_Payout_Line">
+          <DataField>No_POS_Sales_Payout_Line</DataField>
+        </Field>
+        <Field Name="Description_POS_Sales_Payout_Line">
+          <DataField>Description_POS_Sales_Payout_Line</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_POS_Sales_Payout_Line">
+          <DataField>AmountInclVAT_POS_Sales_Payout_Line</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_POS_Sales_Payout_LineFormat">
+          <DataField>AmountInclVAT_POS_Sales_Payout_LineFormat</DataField>
+        </Field>
+        <Field Name="Type_POS_Sales_Rounding_Line">
+          <DataField>Type_POS_Sales_Rounding_Line</DataField>
+        </Field>
+        <Field Name="No_POS_Sales_Rounding_Line">
+          <DataField>No_POS_Sales_Rounding_Line</DataField>
+        </Field>
+        <Field Name="Description_POS_Sales_Rounding_Line">
+          <DataField>Description_POS_Sales_Rounding_Line</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_POS_Sales_Rounding_Line">
+          <DataField>AmountInclVAT_POS_Sales_Rounding_Line</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_POS_Sales_Rounding_LineFormat">
+          <DataField>AmountInclVAT_POS_Sales_Rounding_LineFormat</DataField>
+        </Field>
+        <Field Name="TransactionTime_CreditCardTransaction">
+          <DataField>TransactionTime_CreditCardTransaction</DataField>
+        </Field>
+        <Field Name="EntryNo_CreditCardTransaction">
+          <DataField>EntryNo_CreditCardTransaction</DataField>
+        </Field>
+        <Field Name="Type_CreditCardTransaction">
+          <DataField>Type_CreditCardTransaction</DataField>
+        </Field>
+        <Field Name="Text_CreditCardTransaction">
+          <DataField>Text_CreditCardTransaction</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

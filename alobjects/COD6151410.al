@@ -14,7 +14,8 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
     // MAG2.01/MHA /20170106  CASE 257315 Corrected TempBlob reference for DrawBarcode in GiftVoucherToTempBlob() and CreditVoucherToTempBlob()
     // MAG2.09/MHA /20171211  CASE 292576 Added "Voucher Number Format" in GiftVoucherToTempBlob() and CreditVoucherToTempBlob()
-    // MAG2.17/MHA/20181122  CASE 302179 Magento Integration
+    // MAG2.17/MHA /20181122  CASE 302179 Magento Integration
+    // MAG2.22/MHA /20190617  CASE 357825 Resolution should be preserved after resize
 
 
     trigger OnRun()
@@ -40,7 +41,7 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         MagentoSetup: Record "Magento Setup";
     begin
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
-          exit;
+            exit;
 
         GiftVoucher.Status := GiftVoucher.Status::Open;
         GiftVoucher.Modify(true);
@@ -51,30 +52,30 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         MagentoSetup: Record "Magento Setup";
     begin
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
-          exit;
+            exit;
         CreditVoucher.Status := CreditVoucher.Status::Open;
         CreditVoucher.Modify(true);
     end;
 
-    procedure DeactivateVouchers(ExternalReferenceNo: Code[30];ExternalVoucherNo: Code[10])
+    procedure DeactivateVouchers(ExternalReferenceNo: Code[30]; ExternalVoucherNo: Code[10])
     var
         MagentoSetup: Record "Magento Setup";
         GiftVoucher: Record "Gift Voucher";
     begin
         //-MAG2.00
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
-          exit;
+            exit;
 
-        GiftVoucher.SetRange("External Reference No.",ExternalReferenceNo);
-        GiftVoucher.SetRange("External Gift Voucher No.",ExternalVoucherNo);
+        GiftVoucher.SetRange("External Reference No.", ExternalReferenceNo);
+        GiftVoucher.SetRange("External Gift Voucher No.", ExternalVoucherNo);
         if GiftVoucher.FindFirst then begin
-          GiftVoucher.Status := GiftVoucher.Status::Cashed ;
-          GiftVoucher.Modify(true);
+            GiftVoucher.Status := GiftVoucher.Status::Cashed;
+            GiftVoucher.Modify(true);
         end;
         //+MAG2.00
     end;
 
-    procedure ActivateAndMailGiftVouchers(ExternalOrderNo: Code[20];EMail: Text[250])
+    procedure ActivateAndMailGiftVouchers(ExternalOrderNo: Code[20]; EMail: Text[250])
     var
         CreditVoucher: Record "Credit Voucher";
         GiftVoucher: Record "Gift Voucher";
@@ -83,30 +84,30 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         TempGiftVoucher: Record "Gift Voucher" temporary;
     begin
         if ExternalOrderNo = '' then
-          exit;
+            exit;
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
-          exit;
+            exit;
 
-        if FindGiftVouchers(ExternalOrderNo,TempGiftVoucher) then
-          repeat
-            GiftVoucher.Get(TempGiftVoucher."No.");
-            ActivateGiftVoucher(GiftVoucher);
-            Commit;
-            EmailGiftVoucher(GiftVoucher,EMail);
-            Commit;
-          until TempGiftVoucher.Next = 0;
+        if FindGiftVouchers(ExternalOrderNo, TempGiftVoucher) then
+            repeat
+                GiftVoucher.Get(TempGiftVoucher."No.");
+                ActivateGiftVoucher(GiftVoucher);
+                Commit;
+                EmailGiftVoucher(GiftVoucher, EMail);
+                Commit;
+            until TempGiftVoucher.Next = 0;
 
-        if FindCreditVouchers(ExternalOrderNo,TempCreditVoucher) then
-          repeat
-            CreditVoucher.Get(TempCreditVoucher."No.");
-            ActivateCreditVoucher(CreditVoucher);
-            Commit;
-            EmailCreditVoucher(CreditVoucher,EMail);
-            Commit;
-          until TempCreditVoucher.Next = 0;
+        if FindCreditVouchers(ExternalOrderNo, TempCreditVoucher) then
+            repeat
+                CreditVoucher.Get(TempCreditVoucher."No.");
+                ActivateCreditVoucher(CreditVoucher);
+                Commit;
+                EmailCreditVoucher(CreditVoucher, EMail);
+                Commit;
+            until TempCreditVoucher.Next = 0;
     end;
 
-    local procedure FindGiftVouchers(ExternalOrderNo: Code[50];var TempGiftVoucher: Record "Gift Voucher" temporary): Boolean
+    local procedure FindGiftVouchers(ExternalOrderNo: Code[50]; var TempGiftVoucher: Record "Gift Voucher" temporary): Boolean
     var
         GiftVoucher: Record "Gift Voucher";
         SalesHeader: Record "Sales Header";
@@ -115,52 +116,50 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     begin
         RecRef.GetTable(TempGiftVoucher);
         if not RecRef.IsTemporary then
-          exit(false);
+            exit(false);
         TempGiftVoucher.DeleteAll;
 
-        SalesHeader.SetRange("Document Type",SalesHeader."Document Type"::Order);
-        SalesHeader.SetRange("External Order No.",ExternalOrderNo);
+        SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
+        SalesHeader.SetRange("External Order No.", ExternalOrderNo);
         if SalesHeader.FindSet then
-          repeat
-            //-MAG2.00
-            //GiftVoucher.SETRANGE("Order No.",SalesHeader."No.");
-            GiftVoucher.SetRange("Sales Order No.",SalesHeader."No.");
-            //+MAG2.00
-            GiftVoucher.SetRange(Status,GiftVoucher.Status::Cancelled);
-            GiftVoucher.SetFilter(Amount,'>%1',0);
-            if GiftVoucher.FindSet then
-              repeat
-                if not TempGiftVoucher.Get(GiftVoucher."No.") then begin
-                  TempGiftVoucher.Init;
-                  TempGiftVoucher := GiftVoucher;
-                  TempGiftVoucher.Insert;
-                end;
-              until GiftVoucher.Next = 0;
-          until SalesHeader.Next = 0;
+            repeat
+                //-MAG2.00
+                GiftVoucher.SetRange("Sales Order No.", SalesHeader."No.");
+                //+MAG2.00
+                GiftVoucher.SetRange(Status, GiftVoucher.Status::Cancelled);
+                GiftVoucher.SetFilter(Amount, '>%1', 0);
+                if GiftVoucher.FindSet then
+                    repeat
+                        if not TempGiftVoucher.Get(GiftVoucher."No.") then begin
+                            TempGiftVoucher.Init;
+                            TempGiftVoucher := GiftVoucher;
+                            TempGiftVoucher.Insert;
+                        end;
+                    until GiftVoucher.Next = 0;
+            until SalesHeader.Next = 0;
 
-        SalesInvHeader.SetRange("External Order No.",ExternalOrderNo);
-        SalesInvHeader.SetFilter("Order No.",'<>%1','');
+        SalesInvHeader.SetRange("External Order No.", ExternalOrderNo);
+        SalesInvHeader.SetFilter("Order No.", '<>%1', '');
         if SalesInvHeader.FindSet then
-          repeat
-            //-MAG2.00
-            //GiftVoucher.SETRANGE("Order No.",SalesInvHeader."Order No.");
-            GiftVoucher.SetRange("Sales Order No.",SalesInvHeader."Order No.");
-            //+MAG2.00
-            GiftVoucher.SetRange(Status,GiftVoucher.Status::Cancelled);
-            GiftVoucher.SetFilter(Amount,'>%1',0);
-            if GiftVoucher.FindSet then
-              repeat
-                if not TempGiftVoucher.Get(GiftVoucher."No.") then begin
-                  TempGiftVoucher.Init;
-                  TempGiftVoucher := GiftVoucher;
-                  TempGiftVoucher.Insert;
-                end;
-              until GiftVoucher.Next = 0;
-          until SalesInvHeader.Next = 0;
+            repeat
+                //-MAG2.00
+                GiftVoucher.SetRange("Sales Order No.", SalesInvHeader."Order No.");
+                //+MAG2.00
+                GiftVoucher.SetRange(Status, GiftVoucher.Status::Cancelled);
+                GiftVoucher.SetFilter(Amount, '>%1', 0);
+                if GiftVoucher.FindSet then
+                    repeat
+                        if not TempGiftVoucher.Get(GiftVoucher."No.") then begin
+                            TempGiftVoucher.Init;
+                            TempGiftVoucher := GiftVoucher;
+                            TempGiftVoucher.Insert;
+                        end;
+                    until GiftVoucher.Next = 0;
+            until SalesInvHeader.Next = 0;
         exit(TempGiftVoucher.FindSet);
     end;
 
-    local procedure FindCreditVouchers(ExternalOrderNo: Code[50];var TempCreditVoucher: Record "Credit Voucher" temporary): Boolean
+    local procedure FindCreditVouchers(ExternalOrderNo: Code[50]; var TempCreditVoucher: Record "Credit Voucher" temporary): Boolean
     var
         CreditVoucher: Record "Credit Voucher";
         SalesHeader: Record "Sales Header";
@@ -169,48 +168,46 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     begin
         RecRef.GetTable(TempCreditVoucher);
         if not RecRef.IsTemporary then
-          exit(false);
+            exit(false);
         TempCreditVoucher.DeleteAll;
 
-        SalesHeader.SetRange("Document Type",SalesHeader."Document Type"::Order);
-        SalesHeader.SetRange("External Order No.",ExternalOrderNo);
+        SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
+        SalesHeader.SetRange("External Order No.", ExternalOrderNo);
         if SalesHeader.FindSet then
-          repeat
-            //-MAG2.00
-            //CreditVoucher.SETRANGE("Order No.",SalesHeader."No.");
-            CreditVoucher.SetRange("Sales Order No.",SalesHeader."No.");
-            //+MAG2.00
-            CreditVoucher.SetRange(Status,CreditVoucher.Status::Cancelled);
-            CreditVoucher.SetFilter(Amount,'>%1',0);
-            if CreditVoucher.FindSet then
-              repeat
-                if not TempCreditVoucher.Get(CreditVoucher."No.") then begin
-                  TempCreditVoucher.Init;
-                  TempCreditVoucher := CreditVoucher;
-                  TempCreditVoucher.Insert;
-                end;
-              until CreditVoucher.Next = 0;
-          until SalesHeader.Next = 0;
+            repeat
+                //-MAG2.00
+                CreditVoucher.SetRange("Sales Order No.", SalesHeader."No.");
+                //+MAG2.00
+                CreditVoucher.SetRange(Status, CreditVoucher.Status::Cancelled);
+                CreditVoucher.SetFilter(Amount, '>%1', 0);
+                if CreditVoucher.FindSet then
+                    repeat
+                        if not TempCreditVoucher.Get(CreditVoucher."No.") then begin
+                            TempCreditVoucher.Init;
+                            TempCreditVoucher := CreditVoucher;
+                            TempCreditVoucher.Insert;
+                        end;
+                    until CreditVoucher.Next = 0;
+            until SalesHeader.Next = 0;
 
-        SalesInvHeader.SetRange("External Order No.",ExternalOrderNo);
-        SalesInvHeader.SetFilter("Order No.",'<>%1','');
+        SalesInvHeader.SetRange("External Order No.", ExternalOrderNo);
+        SalesInvHeader.SetFilter("Order No.", '<>%1', '');
         if SalesInvHeader.FindSet then
-          repeat
-            //-MAG2.00
-            //CreditVoucher.SETRANGE("Order No.",SalesInvHeader."Order No.");
-            CreditVoucher.SetRange("Sales Order No.",SalesInvHeader."Order No.");
-            //+MAG2.00
-            CreditVoucher.SetRange(Status,CreditVoucher.Status::Cancelled);
-            CreditVoucher.SetFilter(Amount,'>%1',0);
-            if CreditVoucher.FindSet then
-              repeat
-                if not TempCreditVoucher.Get(CreditVoucher."No.") then begin
-                  TempCreditVoucher.Init;
-                  TempCreditVoucher := CreditVoucher;
-                  TempCreditVoucher.Insert;
-                end;
-              until CreditVoucher.Next = 0;
-          until SalesInvHeader.Next = 0;
+            repeat
+                //-MAG2.00
+                CreditVoucher.SetRange("Sales Order No.", SalesInvHeader."Order No.");
+                //+MAG2.00
+                CreditVoucher.SetRange(Status, CreditVoucher.Status::Cancelled);
+                CreditVoucher.SetFilter(Amount, '>%1', 0);
+                if CreditVoucher.FindSet then
+                    repeat
+                        if not TempCreditVoucher.Get(CreditVoucher."No.") then begin
+                            TempCreditVoucher.Init;
+                            TempCreditVoucher := CreditVoucher;
+                            TempCreditVoucher.Insert;
+                        end;
+                    until CreditVoucher.Next = 0;
+            until SalesInvHeader.Next = 0;
         exit(TempCreditVoucher.FindSet);
     end;
 
@@ -223,7 +220,7 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     begin
         //-MAG2.17 [302179]
         if SalesHeader.IsTemporary then
-          exit;
+            exit;
 
         CheckVoucherPayment(SalesHeader);
         //+MAG2.17 [302179]
@@ -233,14 +230,14 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     var
         CreditVoucher: Record "Credit Voucher";
     begin
-        CreditVoucher.SetRange("External Reference No.",PaymentLine."No.");
+        CreditVoucher.SetRange("External Reference No.", PaymentLine."No.");
         if not CreditVoucher.FindFirst then
-          exit(false);
+            exit(false);
         if CreditVoucher.Status = CreditVoucher.Status::Cashed then
-          Error(Text004,CreditVoucher."No.",CreditVoucher."Cashed Date");
+            Error(Text004, CreditVoucher."No.", CreditVoucher."Cashed Date");
 
         if CreditVoucher.Amount < PaymentLine.Amount then
-          Error(Text005,CreditVoucher."No.",CreditVoucher.Amount,PaymentLine.Amount);
+            Error(Text005, CreditVoucher."No.", CreditVoucher.Amount, PaymentLine.Amount);
 
         exit(true);
     end;
@@ -249,15 +246,15 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     var
         GiftVoucher: Record "Gift Voucher";
     begin
-        GiftVoucher.SetRange("External Reference No.",PaymentLine."No.");
+        GiftVoucher.SetRange("External Reference No.", PaymentLine."No.");
         if not GiftVoucher.FindFirst then
-          exit(false);
+            exit(false);
 
         if GiftVoucher.Status = GiftVoucher.Status::Cashed then
-              Error(Text002,GiftVoucher."No.",GiftVoucher."Cashed Date");
+            Error(Text002, GiftVoucher."No.", GiftVoucher."Cashed Date");
 
-            if GiftVoucher.Amount < PaymentLine.Amount then
-              Error(Text003,GiftVoucher."No.",GiftVoucher.Amount,PaymentLine.Amount);
+        if GiftVoucher.Amount < PaymentLine.Amount then
+            Error(Text003, GiftVoucher."No.", GiftVoucher.Amount, PaymentLine.Amount);
 
         exit(true);
     end;
@@ -269,46 +266,43 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         VoucherFound: Boolean;
     begin
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
-          exit;
+            exit;
 
-        PaymentLine.SetRange("Document Table No.",DATABASE::"Sales Header");
-        PaymentLine.SetRange("Document Type",SalesHeader."Document Type");
-        PaymentLine.SetRange("Document No.",SalesHeader."No.");
-        PaymentLine.SetRange("Payment Type",PaymentLine."Payment Type"::Voucher);
+        PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
+        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        PaymentLine.SetRange("Payment Type", PaymentLine."Payment Type"::Voucher);
         //-MAG2.17 [302179]
-        PaymentLine.SetFilter("Source Table No.",'%1|%2',DATABASE::"Credit Voucher",DATABASE::"Gift Voucher");
+        PaymentLine.SetFilter("Source Table No.", '%1|%2', DATABASE::"Credit Voucher", DATABASE::"Gift Voucher");
         //+MAG2.17 [302179]
-        PaymentLine.SetFilter(Amount,'>%1',0);
+        PaymentLine.SetFilter(Amount, '>%1', 0);
         if not PaymentLine.FindSet then
-          exit;
+            exit;
 
         repeat
-          //-MAG2.17 [302179]
-          // VoucherFound := CheckGiftVoucherPayment(PaymentLine);
-          // IF NOT VoucherFound THEN
-          //  VoucherFound := CheckCreditVoucherPayment(PaymentLine);
-          case PaymentLine."Source Table No." of
-            DATABASE::"Credit Voucher":
-              VoucherFound := CheckCreditVoucherPayment(PaymentLine);
-            DATABASE::"Gift Voucher":
-              VoucherFound := CheckGiftVoucherPayment(PaymentLine);
-            else
-              VoucherFound := false;
-          end;
-          //+MAG2.17 [302179]
-          if not VoucherFound then
-            Error(StrSubstNo(Text006,PaymentLine."No."));
+            //-MAG2.17 [302179]
+            case PaymentLine."Source Table No." of
+                DATABASE::"Credit Voucher":
+                    VoucherFound := CheckCreditVoucherPayment(PaymentLine);
+                DATABASE::"Gift Voucher":
+                    VoucherFound := CheckGiftVoucherPayment(PaymentLine);
+                else
+                    VoucherFound := false;
+            end;
+            //+MAG2.17 [302179]
+            if not VoucherFound then
+                Error(StrSubstNo(Text006, PaymentLine."No."));
         until PaymentLine.Next = 0;
 
         //-MAG2.17 [302179]
         PaymentLine.Reset;
-        PaymentLine.SetRange("Document Type",SalesHeader."Document Type");
-        PaymentLine.SetRange("Document No.",SalesHeader."No.");
-        PaymentLine.SetFilter("Account No.",'<>%1','');
-        PaymentLine.SetFilter(Amount,'<>%1',0);
-        PaymentLine.SetRange("Payment Type",PaymentLine."Payment Type"::Voucher);
+        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        PaymentLine.SetFilter("Account No.", '<>%1', '');
+        PaymentLine.SetFilter(Amount, '<>%1', 0);
+        PaymentLine.SetRange("Payment Type", PaymentLine."Payment Type"::Voucher);
         if PaymentLine.FindFirst and (SalesHeader."Magento Payment Amount" <> GetTotalAmountInclVat(SalesHeader)) then
-          Error(Text007);
+            Error(Text007);
         //+MAG2.17 [302179]
     end;
 
@@ -323,9 +317,9 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         Clear(SalesPost);
         TempVATAmountLine.DeleteAll;
         TempSalesLine.DeleteAll;
-        SalesPost.GetSalesLines(SalesHeader,TempSalesLine,1);
-        TempSalesLine.CalcVATAmountLines(1,SalesHeader,TempSalesLine,TempVATAmountLine);
-        TempSalesLine.UpdateVATOnLines(1,SalesHeader,TempSalesLine,TempVATAmountLine);
+        SalesPost.GetSalesLines(SalesHeader, TempSalesLine, 1);
+        TempSalesLine.CalcVATAmountLines(1, SalesHeader, TempSalesLine, TempVATAmountLine);
+        TempSalesLine.UpdateVATOnLines(1, SalesHeader, TempSalesLine, TempVATAmountLine);
         TotalAmountInclVAT := TempVATAmountLine.GetTotalAmountInclVAT();
         exit(TotalAmountInclVAT);
         //+MAG2.17 [302179]
@@ -338,20 +332,20 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     begin
         //-MAG2.17 [302179]
         if PaymentLine.IsTemporary then
-          exit;
+            exit;
 
         if PaymentLine."Document Table No." <> DATABASE::"Sales Invoice Header" then
-          exit;
+            exit;
         if PaymentLine."Payment Type" <> PaymentLine."Payment Type"::Voucher then
-          exit;
+            exit;
         if not SalesInvHeader.Get(PaymentLine."Document No.") then
-          exit;
+            exit;
 
-        PostVoucherPayment(PaymentLine,SalesInvHeader);
+        PostVoucherPayment(PaymentLine, SalesInvHeader);
         //+MAG2.17 [302179]
     end;
 
-    procedure PostVoucherPayment(PaymentLine: Record "Magento Payment Line";SalesInvoiceHeader: Record "Sales Invoice Header")
+    procedure PostVoucherPayment(PaymentLine: Record "Magento Payment Line"; SalesInvoiceHeader: Record "Sales Invoice Header")
     var
         CreditVoucher: Record "Credit Voucher";
         GiftVoucher: Record "Gift Voucher";
@@ -359,46 +353,46 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         VoucherAmount: Decimal;
     begin
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
-          exit;
+            exit;
 
         if not (PaymentLine.Find and SalesInvoiceHeader.Find and (PaymentLine."Document Table No." = DATABASE::"Sales Invoice Header") and (PaymentLine."Payment Type" = PaymentLine."Payment Type"::Voucher)
                 and (PaymentLine."Document No." = SalesInvoiceHeader."No."))
                  then
-          exit;
+            exit;
 
         if PaymentLine.Amount <= 0 then
-          exit;
+            exit;
 
         GiftVoucher.LockTable;
-        GiftVoucher.SetRange("External Reference No.",PaymentLine."No.");
+        GiftVoucher.SetRange("External Reference No.", PaymentLine."No.");
         if GiftVoucher.FindFirst then begin
-          VoucherAmount := GiftVoucher.Amount;
-          GiftVoucher.Amount := 0;
-          GiftVoucher.Status := GiftVoucher.Status::Cashed;
-          GiftVoucher."Cashed Date" := SalesInvoiceHeader."Posting Date";
-          GiftVoucher."Cashed Salesperson" := SalesInvoiceHeader."Salesperson Code";
-          GiftVoucher."Cashed in Global Dim 1 Code" := SalesInvoiceHeader."Shortcut Dimension 1 Code";
-          GiftVoucher."Cashed in Location Code" := SalesInvoiceHeader."Location Code";
-          GiftVoucher."Cashed Date" := SalesInvoiceHeader."Posting Date";
-          GiftVoucher."Last Date Modified" := Today;
-          GiftVoucher.Modify;
-          exit;
+            VoucherAmount := GiftVoucher.Amount;
+            GiftVoucher.Amount := 0;
+            GiftVoucher.Status := GiftVoucher.Status::Cashed;
+            GiftVoucher."Cashed Date" := SalesInvoiceHeader."Posting Date";
+            GiftVoucher."Cashed Salesperson" := SalesInvoiceHeader."Salesperson Code";
+            GiftVoucher."Cashed in Global Dim 1 Code" := SalesInvoiceHeader."Shortcut Dimension 1 Code";
+            GiftVoucher."Cashed in Location Code" := SalesInvoiceHeader."Location Code";
+            GiftVoucher."Cashed Date" := SalesInvoiceHeader."Posting Date";
+            GiftVoucher."Last Date Modified" := Today;
+            GiftVoucher.Modify;
+            exit;
         end;
 
         CreditVoucher.LockTable;
-        CreditVoucher.SetRange("External Reference No.",PaymentLine."No.");
+        CreditVoucher.SetRange("External Reference No.", PaymentLine."No.");
         if CreditVoucher.FindFirst then begin
-          VoucherAmount := CreditVoucher.Amount;
-          CreditVoucher.Amount := 0;
-          CreditVoucher.Status := CreditVoucher.Status::Cashed;
-          CreditVoucher."Cashed Date" := SalesInvoiceHeader."Posting Date";
-          CreditVoucher."Cashed Salesperson" := SalesInvoiceHeader."Salesperson Code";
-          CreditVoucher."Cashed in Global Dim 1 Code" := SalesInvoiceHeader."Shortcut Dimension 1 Code";
-          CreditVoucher."Cashed in Location Code" := SalesInvoiceHeader."Location Code";
-          CreditVoucher."Cashed Date" := SalesInvoiceHeader."Posting Date";
-          CreditVoucher."Last Date Modified" := Today;
-          CreditVoucher.Modify;
-          exit;
+            VoucherAmount := CreditVoucher.Amount;
+            CreditVoucher.Amount := 0;
+            CreditVoucher.Status := CreditVoucher.Status::Cashed;
+            CreditVoucher."Cashed Date" := SalesInvoiceHeader."Posting Date";
+            CreditVoucher."Cashed Salesperson" := SalesInvoiceHeader."Salesperson Code";
+            CreditVoucher."Cashed in Global Dim 1 Code" := SalesInvoiceHeader."Shortcut Dimension 1 Code";
+            CreditVoucher."Cashed in Location Code" := SalesInvoiceHeader."Location Code";
+            CreditVoucher."Cashed Date" := SalesInvoiceHeader."Posting Date";
+            CreditVoucher."Last Date Modified" := Today;
+            CreditVoucher.Modify;
+            exit;
         end;
     end;
 
@@ -411,18 +405,18 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     begin
         //-MAG2.17 [302179]
         if SalesInvHeader.IsTemporary then
-          exit;
-        if SalesInvHeader."External Order No."  = '' then
-          exit;
+            exit;
+        if SalesInvHeader."External Order No." = '' then
+            exit;
         if not (MagentoSetup.Get and MagentoSetup."Magento Enabled") then
-          exit;
+            exit;
         if not MagentoSetup."Gift Voucher Enabled" then
-          exit;
+            exit;
         if MagentoSetup."Gift Voucher Activation" <> MagentoSetup."Gift Voucher Activation"::OnPosting then
-          exit;
+            exit;
 
         if Customer.Get(SalesInvHeader."Sell-to Customer No.") then;
-        ActivateAndMailGiftVouchers(SalesInvHeader."External Order No.",Customer."E-Mail");
+        ActivateAndMailGiftVouchers(SalesInvHeader."External Order No.", Customer."E-Mail");
         //+MAG2.17 [302179]
     end;
 
@@ -430,7 +424,7 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     begin
     end;
 
-    procedure GenerateExternalReferenceNo(GeneratePattern: Text[30];VoucherNo: Code[20]) ExternalReferenceNo: Code[30]
+    procedure GenerateExternalReferenceNo(GeneratePattern: Text[30]; VoucherNo: Code[20]) ExternalReferenceNo: Code[30]
     var
         MagentoSetup: Record "Magento Setup";
         CodePattern: Text[1024];
@@ -439,46 +433,46 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         CodeCount: Integer;
     begin
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
-          exit;
+            exit;
         if GeneratePattern = '' then
-          exit;
+            exit;
 
         repeat
-          ExternalReferenceNo := '';
-          Sleep(1);
-          Randomize;
-          Pattern := GeneratePattern;
-          while Pattern <> '' do begin
-            Position := StrPos(Pattern,'[');
-            if Position = 0 then begin
-              ExternalReferenceNo := ExternalReferenceNo + Pattern;
-              Pattern := '';
-            end else begin
-              if Position > 1 then
-                ExternalReferenceNo := ExternalReferenceNo + CopyStr(Pattern,1,Position - 1);
-              Pattern := DelStr(Pattern,1,Position);
+            ExternalReferenceNo := '';
+            Sleep(1);
+            Randomize;
+            Pattern := GeneratePattern;
+            while Pattern <> '' do begin
+                Position := StrPos(Pattern, '[');
+                if Position = 0 then begin
+                    ExternalReferenceNo := ExternalReferenceNo + Pattern;
+                    Pattern := '';
+                end else begin
+                    if Position > 1 then
+                        ExternalReferenceNo := ExternalReferenceNo + CopyStr(Pattern, 1, Position - 1);
+                    Pattern := DelStr(Pattern, 1, Position);
 
-              Position := StrPos(Pattern,']');
-              if Position <= 1 then
-                Error(Text000,Pattern);
-              CodePattern := CopyStr(Pattern,1,Position - 1);
-              Pattern := DelStr(Pattern,1,Position);
+                    Position := StrPos(Pattern, ']');
+                    if Position <= 1 then
+                        Error(Text000, Pattern);
+                    CodePattern := CopyStr(Pattern, 1, Position - 1);
+                    Pattern := DelStr(Pattern, 1, Position);
 
-              CodeCount := 1;
-              Position := StrPos(CodePattern,'*');
-              if (Position > 1) and (Position < StrLen(CodePattern)) then begin
-                if not Evaluate(CodeCount,CopyStr(CodePattern,Position + 1)) then
-                  Error(Text000,CodePattern);
-                CodePattern := CopyStr(CodePattern,1,Position - 1);
-              end;
-              for Position := 1 to CodeCount do begin
-                if CodePattern = 'S' then
-                  ExternalReferenceNo := ExternalReferenceNo + VoucherNo
-                else
-                  ExternalReferenceNo := ExternalReferenceNo + GenerateRandom(CodePattern);
-              end;
+                    CodeCount := 1;
+                    Position := StrPos(CodePattern, '*');
+                    if (Position > 1) and (Position < StrLen(CodePattern)) then begin
+                        if not Evaluate(CodeCount, CopyStr(CodePattern, Position + 1)) then
+                            Error(Text000, CodePattern);
+                        CodePattern := CopyStr(CodePattern, 1, Position - 1);
+                    end;
+                    for Position := 1 to CodeCount do begin
+                        if CodePattern = 'S' then
+                            ExternalReferenceNo := ExternalReferenceNo + VoucherNo
+                        else
+                            ExternalReferenceNo := ExternalReferenceNo + GenerateRandom(CodePattern);
+                    end;
+                end;
             end;
-          end;
         until TestExternalReferenceNo(ExternalReferenceNo);
     end;
 
@@ -488,12 +482,12 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         GiftVoucher: Record "Gift Voucher";
     begin
         if ExternalReferenceNo = '' then
-          exit(false);
+            exit(false);
 
         GiftVoucher.SetCurrentKey("External Reference No.");
-        GiftVoucher.SetRange("External Reference No.",ExternalReferenceNo);
+        GiftVoucher.SetRange("External Reference No.", ExternalReferenceNo);
         CreditVoucher.SetCurrentKey("External Reference No.");
-        CreditVoucher.SetRange("External Reference No.",ExternalReferenceNo);
+        CreditVoucher.SetRange("External Reference No.", ExternalReferenceNo);
         exit(not (CreditVoucher.FindFirst or GiftVoucher.FindFirst));
     end;
 
@@ -504,17 +498,19 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     begin
         Number := GetRandom;
         case Pattern of
-         'N' : Random := Format(Number mod 10);
-         'A' : Char := (Number mod 25) + 65;
-         'AN' :
-             if (GetRandom mod 35) < 10 then
-               Random := Format(Number mod 10)
-             else
-               Char := (Number mod 25) + 65;
+            'N':
+                Random := Format(Number mod 10);
+            'A':
+                Char := (Number mod 25) + 65;
+            'AN':
+                if (GetRandom mod 35) < 10 then
+                    Random := Format(Number mod 10)
+                else
+                    Char := (Number mod 25) + 65;
         end;
 
         if Random = '' then
-          exit(UpperCase(Format(Char)));
+            exit(UpperCase(Format(Char)));
     end;
 
     local procedure GetRandom(): Integer
@@ -526,29 +522,29 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     begin
     end;
 
-    procedure EmailGiftVoucher(var GiftVoucher: Record "Gift Voucher";EMail: Text[250])
+    procedure EmailGiftVoucher(var GiftVoucher: Record "Gift Voucher"; EMail: Text[250])
     var
         MagentoSetup: Record "Magento Setup";
         EmailManagement: Codeunit "E-mail Management";
         RecRef: RecordRef;
     begin
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
-          exit;
+            exit;
 
         RecRef.GetTable(GiftVoucher);
-        EmailManagement.SendReport(MagentoSetup."Gift Voucher Report",RecRef,EMail,true);
+        EmailManagement.SendReport(MagentoSetup."Gift Voucher Report", RecRef, EMail, true);
     end;
 
-    procedure EmailCreditVoucher(var CreditVoucher: Record "Credit Voucher";EMail: Text[250])
+    procedure EmailCreditVoucher(var CreditVoucher: Record "Credit Voucher"; EMail: Text[250])
     var
         MagentoSetup: Record "Magento Setup";
         EmailManagement: Codeunit "E-mail Management";
         RecRef: RecordRef;
     begin
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
-          exit;
+            exit;
         RecRef.GetTable(CreditVoucher);
-        EmailManagement.SendReport(MagentoSetup."Credit Voucher Report",RecRef,EMail,true);
+        EmailManagement.SendReport(MagentoSetup."Credit Voucher Report", RecRef, EMail, true);
     end;
 
     local procedure "--- Event Subscribers"()
@@ -556,86 +552,86 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     end;
 
     [EventSubscriber(ObjectType::Table, 6014408, 'OnBeforeInsertEvent', '', true, true)]
-    local procedure CreditVoucherOnInsert(var Rec: Record "Credit Voucher";RunTrigger: Boolean)
+    local procedure CreditVoucherOnInsert(var Rec: Record "Credit Voucher"; RunTrigger: Boolean)
     var
         MagentoSetup: Record "Magento Setup";
     begin
         //-MAG2.00
         if not RunTrigger then
-          exit;
+            exit;
         if IsTemporary(Rec) then
-          exit;
+            exit;
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
-          exit;
+            exit;
 
         if Rec."Expire Date" = 0D then
-          Rec."Expire Date" := CalcDate(MagentoSetup."Credit Voucher Valid Period",Today);
+            Rec."Expire Date" := CalcDate(MagentoSetup."Credit Voucher Valid Period", Today);
         if (Rec."External Reference No." = '') and (MagentoSetup.Get) and (MagentoSetup."Credit Voucher Code Pattern" <> '') then
-          Rec."External Reference No." := GenerateExternalReferenceNo(MagentoSetup."Credit Voucher Code Pattern",Rec."Voucher No.");
+            Rec."External Reference No." := GenerateExternalReferenceNo(MagentoSetup."Credit Voucher Code Pattern", Rec."Voucher No.");
         //+MAG2.00
     end;
 
     [EventSubscriber(ObjectType::Table, 6014408, 'OnBeforeModifyEvent', '', true, true)]
-    local procedure CreditVoucherOnModify(var Rec: Record "Credit Voucher";var xRec: Record "Credit Voucher";RunTrigger: Boolean)
+    local procedure CreditVoucherOnModify(var Rec: Record "Credit Voucher"; var xRec: Record "Credit Voucher"; RunTrigger: Boolean)
     var
         MagentoSetup: Record "Magento Setup";
     begin
         //-MAG2.00
         if not RunTrigger then
-          exit;
+            exit;
         if IsTemporary(Rec) then
-          exit;
+            exit;
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
-          exit;
+            exit;
 
         if (Rec."Expire Date" = 0D) and (xRec."Expire Date" <> Rec."Expire Date") then
-          Rec."Expire Date" := CalcDate(MagentoSetup."Credit Voucher Valid Period",Today);
+            Rec."Expire Date" := CalcDate(MagentoSetup."Credit Voucher Valid Period", Today);
         if (Rec."External Reference No." = '') and (MagentoSetup.Get) and (MagentoSetup."Credit Voucher Code Pattern" <> '') then
-          Rec."External Reference No." := GenerateExternalReferenceNo(MagentoSetup."Credit Voucher Code Pattern",Rec."Voucher No.");
+            Rec."External Reference No." := GenerateExternalReferenceNo(MagentoSetup."Credit Voucher Code Pattern", Rec."Voucher No.");
         //+MAG2.00
     end;
 
     [EventSubscriber(ObjectType::Table, 6014409, 'OnBeforeInsertEvent', '', true, true)]
-    local procedure GiftVoucherOnInsert(var Rec: Record "Gift Voucher";RunTrigger: Boolean)
+    local procedure GiftVoucherOnInsert(var Rec: Record "Gift Voucher"; RunTrigger: Boolean)
     var
         MagentoSetup: Record "Magento Setup";
     begin
         //-MAG2.00
         if not RunTrigger then
-          exit;
+            exit;
         if IsTemporary(Rec) then
-          exit;
+            exit;
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
-          exit;
+            exit;
 
         if Rec."Expire Date" = 0D then begin
-          MagentoSetup.TestField("Gift Voucher Valid Period");
-          Rec."Expire Date" := CalcDate(MagentoSetup."Gift Voucher Valid Period",Today);
+            MagentoSetup.TestField("Gift Voucher Valid Period");
+            Rec."Expire Date" := CalcDate(MagentoSetup."Gift Voucher Valid Period", Today);
         end;
         if (Rec."External Reference No." = '') and (MagentoSetup.Get) and (MagentoSetup."Gift Voucher Code Pattern" <> '') then
-          Rec."External Reference No." := GenerateExternalReferenceNo(MagentoSetup."Gift Voucher Code Pattern",Rec."Voucher No.");
+            Rec."External Reference No." := GenerateExternalReferenceNo(MagentoSetup."Gift Voucher Code Pattern", Rec."Voucher No.");
         //+MAG2.00
     end;
 
     [EventSubscriber(ObjectType::Table, 6014409, 'OnBeforeModifyEvent', '', true, true)]
-    local procedure GiftVoucherOnModify(var Rec: Record "Gift Voucher";var xRec: Record "Gift Voucher";RunTrigger: Boolean)
+    local procedure GiftVoucherOnModify(var Rec: Record "Gift Voucher"; var xRec: Record "Gift Voucher"; RunTrigger: Boolean)
     var
         MagentoSetup: Record "Magento Setup";
     begin
         //-MAG2.00
         if not RunTrigger then
-          exit;
+            exit;
         if IsTemporary(Rec) then
-          exit;
+            exit;
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
-          exit;
+            exit;
 
         if (Rec."Expire Date" = 0D) and (xRec."Expire Date" <> Rec."Expire Date") then begin
-           MagentoSetup.TestField("Gift Voucher Valid Period");
-           Rec."Expire Date" := CalcDate(MagentoSetup."Gift Voucher Valid Period",Today);
+            MagentoSetup.TestField("Gift Voucher Valid Period");
+            Rec."Expire Date" := CalcDate(MagentoSetup."Gift Voucher Valid Period", Today);
         end;
         if (Rec."External Reference No." = '') and (MagentoSetup.Get) and (MagentoSetup."Gift Voucher Code Pattern" <> '') then
-           Rec."External Reference No." := GenerateExternalReferenceNo(MagentoSetup."Gift Voucher Code Pattern",Rec."Voucher No.");
+            Rec."External Reference No." := GenerateExternalReferenceNo(MagentoSetup."Gift Voucher Code Pattern", Rec."Voucher No.");
         //+MAG2.00
     end;
 
@@ -653,7 +649,7 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     begin
     end;
 
-    procedure GiftVoucherToTempBlob(var GiftVoucher: Record "Gift Voucher";var TempBlob: Record TempBlob temporary)
+    procedure GiftVoucherToTempBlob(var GiftVoucher: Record "Gift Voucher"; var TempBlob: Record TempBlob temporary)
     var
         MagentoSetup: Record "Magento Setup";
         TempBlob2: Record TempBlob temporary;
@@ -673,75 +669,79 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         Language: Integer;
         VoucherAmount: Text;
         VoucherDate: Text;
+        XDpi: Integer;
+        YDpi: Integer;
     begin
         MagentoSetup.Get;
         if not MagentoSetup."Gift Voucher Bitmap".HasValue then
-          Error(Text000);
+            Error(Text000);
 
         //-MAG2.00
-        //MagentoSetup.CALCFIELDS("Gift Voucher Bitmap");
-        MagentoSetup.CalcFields("Generic Setup","Gift Voucher Bitmap");
+        MagentoSetup.CalcFields("Generic Setup", "Gift Voucher Bitmap");
         TempBlob2.Blob := MagentoSetup."Generic Setup";
         //+MAG2.00
         MagentoSetup."Gift Voucher Bitmap".CreateInStream(InStream);
         Bitmap := Bitmap.Bitmap(InStream);
         Graphics := Graphics.FromImage(Bitmap);
-
         SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.CustomerName";
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,Format(GiftVoucher.Name));
+        MagentoGenericSetupMgt.DrawText(TempBlob2, Graphics, SetupPath, Format(GiftVoucher.Name));
 
         SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.Amount";
         //-MAG2.09 [292576]
-        //MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,FORMAT(GiftVoucher.Amount));
         VoucherAmount := Format(GiftVoucher.Amount);
         if MagentoSetup."Voucher Number Format" <> '' then
-          VoucherAmount := Format(GiftVoucher.Amount,0,MagentoSetup."Voucher Number Format");
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,VoucherAmount);
+            VoucherAmount := Format(GiftVoucher.Amount, 0, MagentoSetup."Voucher Number Format");
+        MagentoGenericSetupMgt.DrawText(TempBlob2, Graphics, SetupPath, VoucherAmount);
         //+MAG2.09 [292576]
         SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.CurrencyCode";
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,Format(GiftVoucher."Currency Code"));
+        MagentoGenericSetupMgt.DrawText(TempBlob2, Graphics, SetupPath, Format(GiftVoucher."Currency Code"));
 
         SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.WebCode";
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,GiftVoucher."External Reference No.");
+        MagentoGenericSetupMgt.DrawText(TempBlob2, Graphics, SetupPath, GiftVoucher."External Reference No.");
 
         SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.ExpiryDate";
         //-MAG2.09 [292576]
-        //MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,FORMAT(GiftVoucher."Expire Date"));
         VoucherDate := Format(GiftVoucher."Expire Date");
         if MagentoSetup."Voucher Date Format" <> '' then
-          VoucherDate := Format(GiftVoucher."Expire Date",0,MagentoSetup."Voucher Date Format");
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,VoucherDate);
+            VoucherDate := Format(GiftVoucher."Expire Date", 0, MagentoSetup."Voucher Date Format");
+        MagentoGenericSetupMgt.DrawText(TempBlob2, Graphics, SetupPath, VoucherDate);
         //+MAG2.09 [292576]
 
         if GiftVoucher."Gift Voucher Message".HasValue then begin
-          GiftVoucher.CalcFields("Gift Voucher Message");
-          GiftVoucher."Gift Voucher Message".CreateInStream(InStream);
-          InStream.ReadText(GiftVoucherMessage);
-          SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.Message";
-          MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,GiftVoucherMessage);
+            GiftVoucher.CalcFields("Gift Voucher Message");
+            GiftVoucher."Gift Voucher Message".CreateInStream(InStream);
+            InStream.ReadText(GiftVoucherMessage);
+            SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.Message";
+            MagentoGenericSetupMgt.DrawText(TempBlob2, Graphics, SetupPath, GiftVoucherMessage);
         end;
 
         SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.Barcode";
         //-MAG2.01 [257315]
-        //MagentoGenericSetupMgt.DrawBarcode(Graphics,TempBlob,SetupPath,FORMAT(GiftVoucher."No."),Bitmap,BitmapBarcode);
-        MagentoGenericSetupMgt.DrawBarcode(Graphics,TempBlob2,SetupPath,Format(GiftVoucher."No."),Bitmap,BitmapBarcode);
+        MagentoGenericSetupMgt.DrawBarcode(Graphics, TempBlob2, SetupPath, Format(GiftVoucher."No."), Bitmap, BitmapBarcode);
         //+MAG2.01 [257315]
 
         Ratio := 794 / Bitmap.Width;
         Ratio2 := 1122 / Bitmap.Height;
         if Ratio > Ratio2 then
-          Ratio := Ratio2;
+            Ratio := Ratio2;
         if Ratio < 1 then begin
-          NewWidth := Round(Bitmap.Width * Ratio,1,'<');
-          NewHeight := Round(Bitmap.Height * Ratio,1,'<');
-          Bitmap := Bitmap.Bitmap(Bitmap,NewWidth,NewHeight);
+            //-MAG2.22 [357825]
+            XDpi := Bitmap.HorizontalResolution;
+            YDpi := Bitmap.VerticalResolution;
+            //+MAG2.22 [357825]
+            NewWidth := Round(Bitmap.Width * Ratio, 1, '<');
+            NewHeight := Round(Bitmap.Height * Ratio, 1, '<');
+            Bitmap := Bitmap.Bitmap(Bitmap, NewWidth, NewHeight);
+            //-MAG2.22 [357825]
+            Bitmap.SetResolution(XDpi, YDpi);
+            //+MAG2.22 [357825]
         end;
         Clear(TempBlob);
         TempBlob.Blob.CreateOutStream(OutStream);
-        Bitmap.Save(OutStream,ImageFormat.Png);
+        Bitmap.Save(OutStream, ImageFormat.Png);
     end;
 
-    procedure CreditVoucherToTempBlob(var CreditVoucher: Record "Credit Voucher";var TempBlob: Record TempBlob temporary)
+    procedure CreditVoucherToTempBlob(var CreditVoucher: Record "Credit Voucher"; var TempBlob: Record TempBlob temporary)
     var
         MagentoSetup: Record "Magento Setup";
         TempBlob2: Record TempBlob temporary;
@@ -759,14 +759,16 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         Ratio2: Decimal;
         VoucherAmount: Text;
         VoucherDate: Text;
+        XDpi: Integer;
+        YDpi: Integer;
     begin
         MagentoSetup.Get;
         if not MagentoSetup."Credit Voucher Bitmap".HasValue then
-          Error(Text000);
+            Error(Text000);
 
         //-MAG2.00
         //MagentoSetup.CALCFIELDS("Credit Voucher Bitmap");
-        MagentoSetup.CalcFields("Generic Setup","Credit Voucher Bitmap");
+        MagentoSetup.CalcFields("Generic Setup", "Credit Voucher Bitmap");
         TempBlob2.Blob := MagentoSetup."Generic Setup";
         //+MAG2.00
         MagentoSetup."Credit Voucher Bitmap".CreateInStream(InStream);
@@ -774,52 +776,59 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         Graphics := Graphics.FromImage(Bitmap);
 
         SetupPath := MagentoGenericSetupMgt."ElementName.CreditVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.CustomerName";
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,Format(CreditVoucher.Name));
+        MagentoGenericSetupMgt.DrawText(TempBlob2, Graphics, SetupPath, Format(CreditVoucher.Name));
 
         SetupPath := MagentoGenericSetupMgt."ElementName.CreditVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.Amount";
         //-MAG2.09 [292576]
         //MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,FORMAT(CreditVoucher.Amount));
         VoucherAmount := Format(CreditVoucher.Amount);
         if MagentoSetup."Voucher Number Format" <> '' then
-          VoucherAmount := Format(CreditVoucher.Amount,0,MagentoSetup."Voucher Number Format");
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,VoucherAmount);
+            VoucherAmount := Format(CreditVoucher.Amount, 0, MagentoSetup."Voucher Number Format");
+        MagentoGenericSetupMgt.DrawText(TempBlob2, Graphics, SetupPath, VoucherAmount);
         //+MAG2.09 [292576]
 
         SetupPath := MagentoGenericSetupMgt."ElementName.CreditVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.CurrencyCode";
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,Format(CreditVoucher."Currency Code"));
+        MagentoGenericSetupMgt.DrawText(TempBlob2, Graphics, SetupPath, Format(CreditVoucher."Currency Code"));
 
         SetupPath := MagentoGenericSetupMgt."ElementName.CreditVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.WebCode";
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,CreditVoucher."External Reference No.");
+        MagentoGenericSetupMgt.DrawText(TempBlob2, Graphics, SetupPath, CreditVoucher."External Reference No.");
 
         SetupPath := MagentoGenericSetupMgt."ElementName.CreditVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.ExpiryDate";
         //-MAG2.09 [292576]
         //MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,FORMAT(CreditVoucher."Expire Date"));
         VoucherDate := Format(CreditVoucher."Expire Date");
         if MagentoSetup."Voucher Date Format" <> '' then
-          VoucherDate := Format(CreditVoucher."Expire Date",0,MagentoSetup."Voucher Date Format");
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,VoucherDate);
+            VoucherDate := Format(CreditVoucher."Expire Date", 0, MagentoSetup."Voucher Date Format");
+        MagentoGenericSetupMgt.DrawText(TempBlob2, Graphics, SetupPath, VoucherDate);
         //+MAG2.09 [292576]
 
         SetupPath := MagentoGenericSetupMgt."ElementName.CreditVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.Barcode";
         //-MAG2.01 [257315]
         //MagentoGenericSetupMgt.DrawBarcode(Graphics,TempBlob,SetupPath,FORMAT(CreditVoucher."No."),Bitmap,BitmapBarcode);
-        MagentoGenericSetupMgt.DrawBarcode(Graphics,TempBlob2,SetupPath,Format(CreditVoucher."No."),Bitmap,BitmapBarcode);
+        MagentoGenericSetupMgt.DrawBarcode(Graphics, TempBlob2, SetupPath, Format(CreditVoucher."No."), Bitmap, BitmapBarcode);
         //+MAG2.01 [257315]
 
         Ratio := 794 / Bitmap.Width;
         Ratio2 := 1122 / Bitmap.Height;
         if Ratio > Ratio2 then
-          Ratio := Ratio2;
+            Ratio := Ratio2;
         if Ratio < 1 then begin
-          NewWidth := Round(Bitmap.Width * Ratio,1,'<');
-          NewHeight := Round(Bitmap.Height * Ratio,1,'<');
-          Bitmap := Bitmap.Bitmap(Bitmap,NewWidth,NewHeight);
+            //-MAG2.22 [357825]
+            XDpi := Bitmap.HorizontalResolution;
+            YDpi := Bitmap.VerticalResolution;
+            //+MAG2.22 [357825]
+            NewWidth := Round(Bitmap.Width * Ratio, 1, '<');
+            NewHeight := Round(Bitmap.Height * Ratio, 1, '<');
+            Bitmap := Bitmap.Bitmap(Bitmap, NewWidth, NewHeight);
+            //-MAG2.22 [357825]
+            Bitmap.SetResolution(XDpi, YDpi);
+            //+MAG2.22 [357825]
         end;
 
         TempBlob.DeleteAll;
         TempBlob.Init;
         TempBlob.Blob.CreateOutStream(OutStream);
-        Bitmap.Save(OutStream,ImageFormat.Png);
+        Bitmap.Save(OutStream, ImageFormat.Png);
     end;
 }
 

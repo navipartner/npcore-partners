@@ -47,6 +47,9 @@ codeunit 6151505 "Nc Sync. Mgt."
     // NC2.16/MHA /20180917  CASE 328432 Added Sftp Download functionality
     // NC2.17/MHA /20181126  CASE 334216 Changed all functions to be External
     // NC2.19/MHA /20180107  CASE 340695 Removed KeepAlive from FtpWebRequest and invoked SFTP.Close to clean up connections
+    // NC2.22/MHA /20190605  CASE 334216 Adjusted ImportEntryError() to only overwrite Error Message if Last Error Text has value
+    // NC2.22/MHA /20190613  CASE 358499 Added ClearLastErrorText before Task- and Import Processing
+    // NC2.22/MHA /20190715  CASE 361919 Parsed OutStream to IOStream in InsertImportEntrySftp() for AL Compatability
 
     TableNo = "Task Line";
 
@@ -258,6 +261,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     var
         ImportEntry: Record "Nc Import Entry";
         SharpSFtp: DotNet npNetSftp0;
+        IOStream: DotNet npNetStream;
         OutStream: OutStream;
         RemotePath: Text;
         NewRemotePath: Text;
@@ -283,8 +287,10 @@ codeunit 6151505 "Nc Sync. Mgt."
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := false;
         ImportEntry."Document Source".CreateOutStream(OutStream);
-        NetStream := OutStream;
-        SharpSFtp.Get(RemotePath + Filename, NetStream);
+        //-NC2.22 [361919]
+        IOStream := OutStream;
+        SharpSFtp.Get(RemotePath + Filename,IOStream);
+        //+NC2.22 [361919]
 
         ImportEntry.Insert(true);
 
@@ -415,6 +421,9 @@ codeunit 6151505 "Nc Sync. Mgt."
     begin
         Clear(NaviConnectImportMgt);
         ImportEntryReset(ImportEntry);
+        //-NC2.22 [358499]
+        ClearLastError;
+        //+NC2.22 [358499]
         if NaviConnectImportMgt.Run(ImportEntry) then begin
             //-NC2.12 [308107]
             DataLogMgt.DisableDataLog(false);
@@ -458,6 +467,9 @@ codeunit 6151505 "Nc Sync. Mgt."
         if TaskSetup.FindSet then
             repeat
                 if Task.Get(Task."Entry No.") then;
+            //-NC2.22 [358499]
+            ClearLastError;
+            //+NC2.22 [358499]
                 if not CODEUNIT.Run(TaskSetup."Codeunit ID", Task) then begin
                     TaskError(Task);
                     exit(false);
@@ -521,11 +533,19 @@ codeunit 6151505 "Nc Sync. Mgt."
         if not ImportEntry.Get(ImportEntry."Entry No.") then
             exit;
         ErrorText := GetLastErrorText;
-        Clear(ImportEntry."Last Error Message");
-        if StrLen(ErrorText) > 0 then
+        //-NC2.22 [334216]
+        // CLEAR(ImportEntry."Last Error Message");
+        // IF STRLEN(ErrorText) > 0 THEN
+        //  ImportEntry."Error Message" := COPYSTR(ErrorText,1,MAXSTRLEN(ImportEntry."Error Message"));
+        // ImportEntry."Last Error Message".CREATEOUTSTREAM(OutStream);
+        // OutStream.WRITE(ErrorText);
+        if ErrorText <> '' then begin
+          Clear(ImportEntry."Last Error Message");
             ImportEntry."Error Message" := CopyStr(ErrorText, 1, MaxStrLen(ImportEntry."Error Message"));
-        ImportEntry."Last Error Message".CreateOutStream(OutStream);
-        OutStream.Write(ErrorText);
+          ImportEntry."Last Error Message".CreateOutStream(OutStream);
+          OutStream.Write(ErrorText);
+        end;
+        //+NC2.22 [334216]
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
         //-NC2.16 [313184]
@@ -546,13 +566,17 @@ codeunit 6151505 "Nc Sync. Mgt."
         OutStream: OutStream;
         ErrorText: Text[1024];
     begin
-        ErrorText := GetLastErrorText;
-        ImportEntry.Get(ImportEntry."Entry No.");
+        //-NC2.22 [358499]
+        // ErrorText := GETLASTERRORTEXT;
+        // ImportEntry.GET(ImportEntry."Entry No.");
+        //+NC2.22 [358499]
         Clear(ImportEntry."Last Error Message");
-        if StrLen(ErrorText) > 0 then
-            ImportEntry."Error Message" := CopyStr(ErrorText, 1, MaxStrLen(ImportEntry."Error Message"));
-        ImportEntry."Last Error Message".CreateOutStream(OutStream);
-        OutStream.Write(ErrorText);
+        //-NC2.22 [358499]
+        // IF STRLEN(ErrorText) > 0 THEN
+        //  ImportEntry."Error Message" := COPYSTR(ErrorText,1,MAXSTRLEN(ImportEntry."Error Message"));
+        // ImportEntry."Last Error Message".CREATEOUTSTREAM(OutStream);
+        // OutStream.WRITE(ErrorText);
+        //+NC2.22 [358499]
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
         //-NC2.16 [313184]
@@ -561,7 +585,9 @@ codeunit 6151505 "Nc Sync. Mgt."
         ImportEntry."Import Completed at" := 0DT;
         //+NC2.16 [313184]
         ImportEntry.Modify(true);
-        ClearLastError;
+        //-NC2.22 [358499]
+        // CLEARLASTERROR;
+        //+NC2.22 [358499]
         Commit;
     end;
 

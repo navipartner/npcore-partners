@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,121 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="CompanyInfoPicture">
-          <DataField>CompanyInfoPicture</DataField>
-        </Field>
-        <Field Name="AdresseLinieCaption">
-          <DataField>AdresseLinieCaption</DataField>
-        </Field>
-        <Field Name="DebAddress1">
-          <DataField>DebAddress1</DataField>
-        </Field>
-        <Field Name="DebAddress2">
-          <DataField>DebAddress2</DataField>
-        </Field>
-        <Field Name="DebAddress3">
-          <DataField>DebAddress3</DataField>
-        </Field>
-        <Field Name="DebAddress4">
-          <DataField>DebAddress4</DataField>
-        </Field>
-        <Field Name="DebAddress5">
-          <DataField>DebAddress5</DataField>
-        </Field>
-        <Field Name="DebAddress6">
-          <DataField>DebAddress6</DataField>
-        </Field>
-        <Field Name="DebAddress7">
-          <DataField>DebAddress7</DataField>
-        </Field>
-        <Field Name="DebAddress8">
-          <DataField>DebAddress8</DataField>
-        </Field>
-        <Field Name="RepairNo">
-          <DataField>RepairNo</DataField>
-        </Field>
-        <Field Name="CompanyInformation">
-          <DataField>CompanyInformation</DataField>
-        </Field>
-        <Field Name="GlobalDimension">
-          <DataField>GlobalDimension</DataField>
-        </Field>
-        <Field Name="Repair">
-          <DataField>Repair</DataField>
-        </Field>
-        <Field Name="Name">
-          <DataField>Name</DataField>
-        </Field>
-        <Field Name="RepairDescription">
-          <DataField>RepairDescription</DataField>
-        </Field>
-        <Field Name="PriceIncludingVAT">
-          <DataField>PriceIncludingVAT</DataField>
-        </Field>
-        <Field Name="ThanksCompanyName">
-          <DataField>ThanksCompanyName</DataField>
-        </Field>
-        <Field Name="AddressFooter">
-          <DataField>AddressFooter</DataField>
-        </Field>
-        <Field Name="AddressFooter2">
-          <DataField>AddressFooter2</DataField>
-        </Field>
-        <Field Name="RepairNotice2">
-          <DataField>RepairNotice2</DataField>
-        </Field>
-        <Field Name="Thanks">
-          <DataField>Thanks</DataField>
-        </Field>
-        <Field Name="RepairNotice1">
-          <DataField>RepairNotice1</DataField>
-        </Field>
-        <Field Name="RepairLbl">
-          <DataField>RepairLbl</DataField>
-        </Field>
-        <Field Name="DefectLbl">
-          <DataField>DefectLbl</DataField>
-        </Field>
-        <Field Name="CustomerRepairlNo_ErrorCustomerRepairJournal">
-          <DataField>CustomerRepairlNo_ErrorCustomerRepairJournal</DataField>
-        </Field>
-        <Field Name="Text_ErrorCustomerRepairJournal">
-          <DataField>Text_ErrorCustomerRepairJournal</DataField>
-        </Field>
-        <Field Name="LineNo_ErrorCustomerRepairJournal">
-          <DataField>LineNo_ErrorCustomerRepairJournal</DataField>
-        </Field>
-        <Field Name="DefectFound">
-          <DataField>DefectFound</DataField>
-        </Field>
-        <Field Name="CustomerRepairNo_RepairCustomerRepairJournal">
-          <DataField>CustomerRepairNo_RepairCustomerRepairJournal</DataField>
-        </Field>
-        <Field Name="LineNo_RepairCustomerRepairJournal">
-          <DataField>LineNo_RepairCustomerRepairJournal</DataField>
-        </Field>
-        <Field Name="Text_RepairCustomerRepairJournal">
-          <DataField>Text_RepairCustomerRepairJournal</DataField>
-        </Field>
-        <Field Name="ItemPartNo_RepairCustomerRepairJournal">
-          <DataField>ItemPartNo_RepairCustomerRepairJournal</DataField>
-        </Field>
-        <Field Name="Description_Item">
-          <DataField>Description_Item</DataField>
-        </Field>
-        <Field Name="RepairFound">
-          <DataField>RepairFound</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -1610,4 +1495,119 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="CompanyInfoPicture">
+          <DataField>CompanyInfoPicture</DataField>
+        </Field>
+        <Field Name="AdresseLinieCaption">
+          <DataField>AdresseLinieCaption</DataField>
+        </Field>
+        <Field Name="DebAddress1">
+          <DataField>DebAddress1</DataField>
+        </Field>
+        <Field Name="DebAddress2">
+          <DataField>DebAddress2</DataField>
+        </Field>
+        <Field Name="DebAddress3">
+          <DataField>DebAddress3</DataField>
+        </Field>
+        <Field Name="DebAddress4">
+          <DataField>DebAddress4</DataField>
+        </Field>
+        <Field Name="DebAddress5">
+          <DataField>DebAddress5</DataField>
+        </Field>
+        <Field Name="DebAddress6">
+          <DataField>DebAddress6</DataField>
+        </Field>
+        <Field Name="DebAddress7">
+          <DataField>DebAddress7</DataField>
+        </Field>
+        <Field Name="DebAddress8">
+          <DataField>DebAddress8</DataField>
+        </Field>
+        <Field Name="RepairNo">
+          <DataField>RepairNo</DataField>
+        </Field>
+        <Field Name="CompanyInformation">
+          <DataField>CompanyInformation</DataField>
+        </Field>
+        <Field Name="GlobalDimension">
+          <DataField>GlobalDimension</DataField>
+        </Field>
+        <Field Name="Repair">
+          <DataField>Repair</DataField>
+        </Field>
+        <Field Name="Name">
+          <DataField>Name</DataField>
+        </Field>
+        <Field Name="RepairDescription">
+          <DataField>RepairDescription</DataField>
+        </Field>
+        <Field Name="PriceIncludingVAT">
+          <DataField>PriceIncludingVAT</DataField>
+        </Field>
+        <Field Name="ThanksCompanyName">
+          <DataField>ThanksCompanyName</DataField>
+        </Field>
+        <Field Name="AddressFooter">
+          <DataField>AddressFooter</DataField>
+        </Field>
+        <Field Name="AddressFooter2">
+          <DataField>AddressFooter2</DataField>
+        </Field>
+        <Field Name="RepairNotice2">
+          <DataField>RepairNotice2</DataField>
+        </Field>
+        <Field Name="Thanks">
+          <DataField>Thanks</DataField>
+        </Field>
+        <Field Name="RepairNotice1">
+          <DataField>RepairNotice1</DataField>
+        </Field>
+        <Field Name="RepairLbl">
+          <DataField>RepairLbl</DataField>
+        </Field>
+        <Field Name="DefectLbl">
+          <DataField>DefectLbl</DataField>
+        </Field>
+        <Field Name="CustomerRepairlNo_ErrorCustomerRepairJournal">
+          <DataField>CustomerRepairlNo_ErrorCustomerRepairJournal</DataField>
+        </Field>
+        <Field Name="Text_ErrorCustomerRepairJournal">
+          <DataField>Text_ErrorCustomerRepairJournal</DataField>
+        </Field>
+        <Field Name="LineNo_ErrorCustomerRepairJournal">
+          <DataField>LineNo_ErrorCustomerRepairJournal</DataField>
+        </Field>
+        <Field Name="DefectFound">
+          <DataField>DefectFound</DataField>
+        </Field>
+        <Field Name="CustomerRepairNo_RepairCustomerRepairJournal">
+          <DataField>CustomerRepairNo_RepairCustomerRepairJournal</DataField>
+        </Field>
+        <Field Name="LineNo_RepairCustomerRepairJournal">
+          <DataField>LineNo_RepairCustomerRepairJournal</DataField>
+        </Field>
+        <Field Name="Text_RepairCustomerRepairJournal">
+          <DataField>Text_RepairCustomerRepairJournal</DataField>
+        </Field>
+        <Field Name="ItemPartNo_RepairCustomerRepairJournal">
+          <DataField>ItemPartNo_RepairCustomerRepairJournal</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="RepairFound">
+          <DataField>RepairFound</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,238 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="CompanyInfoPicture">
-          <DataField>CompanyInfoPicture</DataField>
-        </Field>
-        <Field Name="Report_Caption">
-          <DataField>Report_Caption</DataField>
-        </Field>
-        <Field Name="Date_Caption">
-          <DataField>Date_Caption</DataField>
-        </Field>
-        <Field Name="Itemfilter">
-          <DataField>Itemfilter</DataField>
-        </Field>
-        <Field Name="tildato">
-          <DataField>tildato</DataField>
-        </Field>
-        <Field Name="No_Caption">
-          <DataField>No_Caption</DataField>
-        </Field>
-        <Field Name="Desc_Caption">
-          <DataField>Desc_Caption</DataField>
-        </Field>
-        <Field Name="NetChange_Caption">
-          <DataField>NetChange_Caption</DataField>
-        </Field>
-        <Field Name="ItemVendorItemNo_Caption">
-          <DataField>ItemVendorItemNo_Caption</DataField>
-        </Field>
-        <Field Name="UnitPrice_Caption">
-          <DataField>UnitPrice_Caption</DataField>
-        </Field>
-        <Field Name="DirCost_Caption">
-          <DataField>DirCost_Caption</DataField>
-        </Field>
-        <Field Name="InvValue_Caption">
-          <DataField>InvValue_Caption</DataField>
-        </Field>
-        <Field Name="brutto_Caption">
-          <DataField>brutto_Caption</DataField>
-        </Field>
-        <Field Name="SalesDate_Caption">
-          <DataField>SalesDate_Caption</DataField>
-        </Field>
-        <Field Name="TotalTxt">
-          <DataField>TotalTxt</DataField>
-        </Field>
-        <Field Name="NaviPartTxt">
-          <DataField>NaviPartTxt</DataField>
-        </Field>
-        <Field Name="ViewSalesPrice">
-          <DataField>ViewSalesPrice</DataField>
-        </Field>
-        <Field Name="ShowNoInventory">
-          <DataField>ShowNoInventory</DataField>
-        </Field>
-        <Field Name="ShowLocation">
-          <DataField>ShowLocation</DataField>
-        </Field>
-        <Field Name="ItemNo">
-          <DataField>ItemNo</DataField>
-        </Field>
-        <Field Name="ItemDesc">
-          <DataField>ItemDesc</DataField>
-        </Field>
-        <Field Name="ItemNetChange">
-          <DataField>ItemNetChange</DataField>
-        </Field>
-        <Field Name="ItemNetChangeFormat">
-          <DataField>ItemNetChangeFormat</DataField>
-        </Field>
-        <Field Name="ItemVendorItemNo">
-          <DataField>ItemVendorItemNo</DataField>
-        </Field>
-        <Field Name="ItemUnitPrice">
-          <DataField>ItemUnitPrice</DataField>
-        </Field>
-        <Field Name="ItemUnitPriceFormat">
-          <DataField>ItemUnitPriceFormat</DataField>
-        </Field>
-        <Field Name="ItemLastDirCost">
-          <DataField>ItemLastDirCost</DataField>
-        </Field>
-        <Field Name="ItemLastDirCostFormat">
-          <DataField>ItemLastDirCostFormat</DataField>
-        </Field>
-        <Field Name="bruttoavialt">
-          <DataField>bruttoavialt</DataField>
-        </Field>
-        <Field Name="bruttoavialtFormat">
-          <DataField>bruttoavialtFormat</DataField>
-        </Field>
-        <Field Name="CostValue">
-          <DataField>CostValue</DataField>
-        </Field>
-        <Field Name="CostValueFormat">
-          <DataField>CostValueFormat</DataField>
-        </Field>
-        <Field Name="GrossValue">
-          <DataField>GrossValue</DataField>
-        </Field>
-        <Field Name="GrossValueFormat">
-          <DataField>GrossValueFormat</DataField>
-        </Field>
-        <Field Name="SaleDate">
-          <DataField>SaleDate</DataField>
-        </Field>
-        <Field Name="ItemTotalNetChange">
-          <DataField>ItemTotalNetChange</DataField>
-        </Field>
-        <Field Name="ItemTotalNetChangeFormat">
-          <DataField>ItemTotalNetChangeFormat</DataField>
-        </Field>
-        <Field Name="ItemTotalCostValue">
-          <DataField>ItemTotalCostValue</DataField>
-        </Field>
-        <Field Name="ItemTotalCostValueFormat">
-          <DataField>ItemTotalCostValueFormat</DataField>
-        </Field>
-        <Field Name="ItemSalesValue">
-          <DataField>ItemSalesValue</DataField>
-        </Field>
-        <Field Name="ItemSalesValueFormat">
-          <DataField>ItemSalesValueFormat</DataField>
-        </Field>
-        <Field Name="ItemVarItemNo">
-          <DataField>ItemVarItemNo</DataField>
-        </Field>
-        <Field Name="ItemVarCode">
-          <DataField>ItemVarCode</DataField>
-        </Field>
-        <Field Name="ItemVarDescription">
-          <DataField>ItemVarDescription</DataField>
-        </Field>
-        <Field Name="Item1NetChange">
-          <DataField>Item1NetChange</DataField>
-        </Field>
-        <Field Name="Item1NetChangeFormat">
-          <DataField>Item1NetChangeFormat</DataField>
-        </Field>
-        <Field Name="InventoryLocation1">
-          <DataField>InventoryLocation1</DataField>
-        </Field>
-        <Field Name="InventoryQty1">
-          <DataField>InventoryQty1</DataField>
-        </Field>
-        <Field Name="InventoryQty1Format">
-          <DataField>InventoryQty1Format</DataField>
-        </Field>
-        <Field Name="InventoryLocation2">
-          <DataField>InventoryLocation2</DataField>
-        </Field>
-        <Field Name="InventoryQty2">
-          <DataField>InventoryQty2</DataField>
-        </Field>
-        <Field Name="InventoryQty2Format">
-          <DataField>InventoryQty2Format</DataField>
-        </Field>
-        <Field Name="InventoryLocation3">
-          <DataField>InventoryLocation3</DataField>
-        </Field>
-        <Field Name="InventoryQty3">
-          <DataField>InventoryQty3</DataField>
-        </Field>
-        <Field Name="InventoryQty3Format">
-          <DataField>InventoryQty3Format</DataField>
-        </Field>
-        <Field Name="InventoryLocation4">
-          <DataField>InventoryLocation4</DataField>
-        </Field>
-        <Field Name="InventoryQty4">
-          <DataField>InventoryQty4</DataField>
-        </Field>
-        <Field Name="InventoryQty4Format">
-          <DataField>InventoryQty4Format</DataField>
-        </Field>
-        <Field Name="InventoryLocation5">
-          <DataField>InventoryLocation5</DataField>
-        </Field>
-        <Field Name="InventoryQty5">
-          <DataField>InventoryQty5</DataField>
-        </Field>
-        <Field Name="InventoryQty5Format">
-          <DataField>InventoryQty5Format</DataField>
-        </Field>
-        <Field Name="InventoryLocation6">
-          <DataField>InventoryLocation6</DataField>
-        </Field>
-        <Field Name="InventoryQty6">
-          <DataField>InventoryQty6</DataField>
-        </Field>
-        <Field Name="InventoryQty6Format">
-          <DataField>InventoryQty6Format</DataField>
-        </Field>
-        <Field Name="InventoryLocation7">
-          <DataField>InventoryLocation7</DataField>
-        </Field>
-        <Field Name="InventoryQty7">
-          <DataField>InventoryQty7</DataField>
-        </Field>
-        <Field Name="InventoryQty7Format">
-          <DataField>InventoryQty7Format</DataField>
-        </Field>
-        <Field Name="CostValueVariant">
-          <DataField>CostValueVariant</DataField>
-        </Field>
-        <Field Name="CostValueVariantFormat">
-          <DataField>CostValueVariantFormat</DataField>
-        </Field>
-        <Field Name="ItemVarGross">
-          <DataField>ItemVarGross</DataField>
-        </Field>
-        <Field Name="ItemVarGrossFormat">
-          <DataField>ItemVarGrossFormat</DataField>
-        </Field>
-        <Field Name="ItemVarSaleDate">
-          <DataField>ItemVarSaleDate</DataField>
-        </Field>
-        <Field Name="LocationCaption">
-          <DataField>LocationCaption</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3682,4 +3450,236 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="CompanyInfoPicture">
+          <DataField>CompanyInfoPicture</DataField>
+        </Field>
+        <Field Name="Report_Caption">
+          <DataField>Report_Caption</DataField>
+        </Field>
+        <Field Name="Date_Caption">
+          <DataField>Date_Caption</DataField>
+        </Field>
+        <Field Name="Itemfilter">
+          <DataField>Itemfilter</DataField>
+        </Field>
+        <Field Name="tildato">
+          <DataField>tildato</DataField>
+        </Field>
+        <Field Name="No_Caption">
+          <DataField>No_Caption</DataField>
+        </Field>
+        <Field Name="Desc_Caption">
+          <DataField>Desc_Caption</DataField>
+        </Field>
+        <Field Name="NetChange_Caption">
+          <DataField>NetChange_Caption</DataField>
+        </Field>
+        <Field Name="ItemVendorItemNo_Caption">
+          <DataField>ItemVendorItemNo_Caption</DataField>
+        </Field>
+        <Field Name="UnitPrice_Caption">
+          <DataField>UnitPrice_Caption</DataField>
+        </Field>
+        <Field Name="DirCost_Caption">
+          <DataField>DirCost_Caption</DataField>
+        </Field>
+        <Field Name="InvValue_Caption">
+          <DataField>InvValue_Caption</DataField>
+        </Field>
+        <Field Name="brutto_Caption">
+          <DataField>brutto_Caption</DataField>
+        </Field>
+        <Field Name="SalesDate_Caption">
+          <DataField>SalesDate_Caption</DataField>
+        </Field>
+        <Field Name="TotalTxt">
+          <DataField>TotalTxt</DataField>
+        </Field>
+        <Field Name="NaviPartTxt">
+          <DataField>NaviPartTxt</DataField>
+        </Field>
+        <Field Name="ViewSalesPrice">
+          <DataField>ViewSalesPrice</DataField>
+        </Field>
+        <Field Name="ShowNoInventory">
+          <DataField>ShowNoInventory</DataField>
+        </Field>
+        <Field Name="ShowLocation">
+          <DataField>ShowLocation</DataField>
+        </Field>
+        <Field Name="ItemNo">
+          <DataField>ItemNo</DataField>
+        </Field>
+        <Field Name="ItemDesc">
+          <DataField>ItemDesc</DataField>
+        </Field>
+        <Field Name="ItemNetChange">
+          <DataField>ItemNetChange</DataField>
+        </Field>
+        <Field Name="ItemNetChangeFormat">
+          <DataField>ItemNetChangeFormat</DataField>
+        </Field>
+        <Field Name="ItemVendorItemNo">
+          <DataField>ItemVendorItemNo</DataField>
+        </Field>
+        <Field Name="ItemUnitPrice">
+          <DataField>ItemUnitPrice</DataField>
+        </Field>
+        <Field Name="ItemUnitPriceFormat">
+          <DataField>ItemUnitPriceFormat</DataField>
+        </Field>
+        <Field Name="ItemLastDirCost">
+          <DataField>ItemLastDirCost</DataField>
+        </Field>
+        <Field Name="ItemLastDirCostFormat">
+          <DataField>ItemLastDirCostFormat</DataField>
+        </Field>
+        <Field Name="bruttoavialt">
+          <DataField>bruttoavialt</DataField>
+        </Field>
+        <Field Name="bruttoavialtFormat">
+          <DataField>bruttoavialtFormat</DataField>
+        </Field>
+        <Field Name="CostValue">
+          <DataField>CostValue</DataField>
+        </Field>
+        <Field Name="CostValueFormat">
+          <DataField>CostValueFormat</DataField>
+        </Field>
+        <Field Name="GrossValue">
+          <DataField>GrossValue</DataField>
+        </Field>
+        <Field Name="GrossValueFormat">
+          <DataField>GrossValueFormat</DataField>
+        </Field>
+        <Field Name="SaleDate">
+          <DataField>SaleDate</DataField>
+        </Field>
+        <Field Name="ItemTotalNetChange">
+          <DataField>ItemTotalNetChange</DataField>
+        </Field>
+        <Field Name="ItemTotalNetChangeFormat">
+          <DataField>ItemTotalNetChangeFormat</DataField>
+        </Field>
+        <Field Name="ItemTotalCostValue">
+          <DataField>ItemTotalCostValue</DataField>
+        </Field>
+        <Field Name="ItemTotalCostValueFormat">
+          <DataField>ItemTotalCostValueFormat</DataField>
+        </Field>
+        <Field Name="ItemSalesValue">
+          <DataField>ItemSalesValue</DataField>
+        </Field>
+        <Field Name="ItemSalesValueFormat">
+          <DataField>ItemSalesValueFormat</DataField>
+        </Field>
+        <Field Name="ItemVarItemNo">
+          <DataField>ItemVarItemNo</DataField>
+        </Field>
+        <Field Name="ItemVarCode">
+          <DataField>ItemVarCode</DataField>
+        </Field>
+        <Field Name="ItemVarDescription">
+          <DataField>ItemVarDescription</DataField>
+        </Field>
+        <Field Name="Item1NetChange">
+          <DataField>Item1NetChange</DataField>
+        </Field>
+        <Field Name="Item1NetChangeFormat">
+          <DataField>Item1NetChangeFormat</DataField>
+        </Field>
+        <Field Name="InventoryLocation1">
+          <DataField>InventoryLocation1</DataField>
+        </Field>
+        <Field Name="InventoryQty1">
+          <DataField>InventoryQty1</DataField>
+        </Field>
+        <Field Name="InventoryQty1Format">
+          <DataField>InventoryQty1Format</DataField>
+        </Field>
+        <Field Name="InventoryLocation2">
+          <DataField>InventoryLocation2</DataField>
+        </Field>
+        <Field Name="InventoryQty2">
+          <DataField>InventoryQty2</DataField>
+        </Field>
+        <Field Name="InventoryQty2Format">
+          <DataField>InventoryQty2Format</DataField>
+        </Field>
+        <Field Name="InventoryLocation3">
+          <DataField>InventoryLocation3</DataField>
+        </Field>
+        <Field Name="InventoryQty3">
+          <DataField>InventoryQty3</DataField>
+        </Field>
+        <Field Name="InventoryQty3Format">
+          <DataField>InventoryQty3Format</DataField>
+        </Field>
+        <Field Name="InventoryLocation4">
+          <DataField>InventoryLocation4</DataField>
+        </Field>
+        <Field Name="InventoryQty4">
+          <DataField>InventoryQty4</DataField>
+        </Field>
+        <Field Name="InventoryQty4Format">
+          <DataField>InventoryQty4Format</DataField>
+        </Field>
+        <Field Name="InventoryLocation5">
+          <DataField>InventoryLocation5</DataField>
+        </Field>
+        <Field Name="InventoryQty5">
+          <DataField>InventoryQty5</DataField>
+        </Field>
+        <Field Name="InventoryQty5Format">
+          <DataField>InventoryQty5Format</DataField>
+        </Field>
+        <Field Name="InventoryLocation6">
+          <DataField>InventoryLocation6</DataField>
+        </Field>
+        <Field Name="InventoryQty6">
+          <DataField>InventoryQty6</DataField>
+        </Field>
+        <Field Name="InventoryQty6Format">
+          <DataField>InventoryQty6Format</DataField>
+        </Field>
+        <Field Name="InventoryLocation7">
+          <DataField>InventoryLocation7</DataField>
+        </Field>
+        <Field Name="InventoryQty7">
+          <DataField>InventoryQty7</DataField>
+        </Field>
+        <Field Name="InventoryQty7Format">
+          <DataField>InventoryQty7Format</DataField>
+        </Field>
+        <Field Name="CostValueVariant">
+          <DataField>CostValueVariant</DataField>
+        </Field>
+        <Field Name="CostValueVariantFormat">
+          <DataField>CostValueVariantFormat</DataField>
+        </Field>
+        <Field Name="ItemVarGross">
+          <DataField>ItemVarGross</DataField>
+        </Field>
+        <Field Name="ItemVarGrossFormat">
+          <DataField>ItemVarGrossFormat</DataField>
+        </Field>
+        <Field Name="ItemVarSaleDate">
+          <DataField>ItemVarSaleDate</DataField>
+        </Field>
+        <Field Name="LocationCaption">
+          <DataField>LocationCaption</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

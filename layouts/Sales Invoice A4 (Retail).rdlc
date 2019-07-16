@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,232 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="No_SalesInvoiceHeader">
-          <DataField>No_SalesInvoiceHeader</DataField>
-        </Field>
-        <Field Name="Number_KopiLoekke">
-          <DataField>Number_KopiLoekke</DataField>
-        </Field>
-        <Field Name="Number_SideLoekke">
-          <DataField>Number_SideLoekke</DataField>
-        </Field>
-        <Field Name="TitleText">
-          <DataField>TitleText</DataField>
-        </Field>
-        <Field Name="OutputNo">
-          <DataField>OutputNo</DataField>
-        </Field>
-        <Field Name="companyaddr_1">
-          <DataField>companyaddr_1</DataField>
-        </Field>
-        <Field Name="companyaddr_2">
-          <DataField>companyaddr_2</DataField>
-        </Field>
-        <Field Name="companyaddr_3">
-          <DataField>companyaddr_3</DataField>
-        </Field>
-        <Field Name="companyaddr_4">
-          <DataField>companyaddr_4</DataField>
-        </Field>
-        <Field Name="companyaddr_5">
-          <DataField>companyaddr_5</DataField>
-        </Field>
-        <Field Name="companyaddr_6">
-          <DataField>companyaddr_6</DataField>
-        </Field>
-        <Field Name="banknavn">
-          <DataField>banknavn</DataField>
-        </Field>
-        <Field Name="bankbranch">
-          <DataField>bankbranch</DataField>
-        </Field>
-        <Field Name="bankkontonr">
-          <DataField>bankkontonr</DataField>
-        </Field>
-        <Field Name="vatNo">
-          <DataField>vatNo</DataField>
-        </Field>
-        <Field Name="giroNo">
-          <DataField>giroNo</DataField>
-        </Field>
-        <Field Name="DebAdr_1">
-          <DataField>DebAdr_1</DataField>
-        </Field>
-        <Field Name="DebAdr_2">
-          <DataField>DebAdr_2</DataField>
-        </Field>
-        <Field Name="DebAdr_3">
-          <DataField>DebAdr_3</DataField>
-        </Field>
-        <Field Name="DebAdr_4">
-          <DataField>DebAdr_4</DataField>
-        </Field>
-        <Field Name="DebAdr_5">
-          <DataField>DebAdr_5</DataField>
-        </Field>
-        <Field Name="DebAdr_6">
-          <DataField>DebAdr_6</DataField>
-        </Field>
-        <Field Name="EANText">
-          <DataField>EANText</DataField>
-        </Field>
-        <Field Name="Reftext">
-          <DataField>Reftext</DataField>
-        </Field>
-        <Field Name="SelltoCustomerNo_SalesInvoiceHeader">
-          <DataField>SelltoCustomerNo_SalesInvoiceHeader</DataField>
-        </Field>
-        <Field Name="No_SalesInvoiceHeader2">
-          <DataField>No_SalesInvoiceHeader2</DataField>
-        </Field>
-        <Field Name="Reftext2">
-          <DataField>Reftext2</DataField>
-        </Field>
-        <Field Name="SaelgerIndkoeber_Name">
-          <DataField>SaelgerIndkoeber_Name</DataField>
-        </Field>
-        <Field Name="PostingDate_SalesInvoiceHeader">
-          <DataField>PostingDate_SalesInvoiceHeader</DataField>
-        </Field>
-        <Field Name="PAGENO">
-          <DataField>PAGENO</DataField>
-        </Field>
-        <Field Name="LevAdresse_1_SideLoekke">
-          <DataField>LevAdresse_1_SideLoekke</DataField>
-        </Field>
-        <Field Name="LevAdresse_2_SideLoekke">
-          <DataField>LevAdresse_2_SideLoekke</DataField>
-        </Field>
-        <Field Name="LevAdresse_3_SideLoekke">
-          <DataField>LevAdresse_3_SideLoekke</DataField>
-        </Field>
-        <Field Name="LevAdresse_4_SideLoekke">
-          <DataField>LevAdresse_4_SideLoekke</DataField>
-        </Field>
-        <Field Name="LevAdresse_5_SideLoekke">
-          <DataField>LevAdresse_5_SideLoekke</DataField>
-        </Field>
-        <Field Name="txtWoy">
-          <DataField>txtWoy</DataField>
-        </Field>
-        <Field Name="dow">
-          <DataField>dow</DataField>
-        </Field>
-        <Field Name="Delivery_date_retaildoc">
-          <DataField>Delivery_date_retaildoc</DataField>
-        </Field>
-        <Field Name="Delivery_time_retaildoc">
-          <DataField>Delivery_time_retaildoc</DataField>
-        </Field>
-        <Field Name="Delivery_time_2_retaildoc">
-          <DataField>Delivery_time_2_retaildoc</DataField>
-        </Field>
-        <Field Name="Comment1_1_">
-          <DataField>Comment1_1_</DataField>
-        </Field>
-        <Field Name="Comment1_2_">
-          <DataField>Comment1_2_</DataField>
-        </Field>
-        <Field Name="DueDate_SalesInvoiceHeader">
-          <DataField>DueDate_SalesInvoiceHeader</DataField>
-        </Field>
-        <Field Name="CurrencyCode_SalesInvoiceHeader">
-          <DataField>CurrencyCode_SalesInvoiceHeader</DataField>
-        </Field>
-        <Field Name="No_SalesInvoiceLine">
-          <DataField>No_SalesInvoiceLine</DataField>
-        </Field>
-        <Field Name="LineNo_SalesInvoiceLine">
-          <DataField>LineNo_SalesInvoiceLine</DataField>
-        </Field>
-        <Field Name="Description_SalesInvoiceLine">
-          <DataField>Description_SalesInvoiceLine</DataField>
-        </Field>
-        <Field Name="Quantity_SalesInvoiceLine">
-          <DataField>Quantity_SalesInvoiceLine</DataField>
-        </Field>
-        <Field Name="Quantity_SalesInvoiceLineFormat">
-          <DataField>Quantity_SalesInvoiceLineFormat</DataField>
-        </Field>
-        <Field Name="UnitofMeasure_SalesInvoiceLine">
-          <DataField>UnitofMeasure_SalesInvoiceLine</DataField>
-        </Field>
-        <Field Name="UnitPrice_SalesInvoiceLine">
-          <DataField>UnitPrice_SalesInvoiceLine</DataField>
-        </Field>
-        <Field Name="UnitPrice_SalesInvoiceLineFormat">
-          <DataField>UnitPrice_SalesInvoiceLineFormat</DataField>
-        </Field>
-        <Field Name="LineDiscount_SalesInvoiceLine">
-          <DataField>LineDiscount_SalesInvoiceLine</DataField>
-        </Field>
-        <Field Name="LineDiscount_SalesInvoiceLineFormat">
-          <DataField>LineDiscount_SalesInvoiceLineFormat</DataField>
-        </Field>
-        <Field Name="Amt_SalesInvoiceLine">
-          <DataField>Amt_SalesInvoiceLine</DataField>
-        </Field>
-        <Field Name="Amt_SalesInvoiceLineFormat">
-          <DataField>Amt_SalesInvoiceLineFormat</DataField>
-        </Field>
-        <Field Name="SerialNotCreated">
-          <DataField>SerialNotCreated</DataField>
-        </Field>
-        <Field Name="Amount_SalesInvoiceLine">
-          <DataField>Amount_SalesInvoiceLine</DataField>
-        </Field>
-        <Field Name="Amount_SalesInvoiceLineFormat">
-          <DataField>Amount_SalesInvoiceLineFormat</DataField>
-        </Field>
-        <Field Name="InclVAT_SalesInvoiceLine">
-          <DataField>InclVAT_SalesInvoiceLine</DataField>
-        </Field>
-        <Field Name="InclVAT_SalesInvoiceLineFormat">
-          <DataField>InclVAT_SalesInvoiceLineFormat</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_SalesInvoiceLine">
-          <DataField>AmountInclVAT_SalesInvoiceLine</DataField>
-        </Field>
-        <Field Name="AmountInclVAT_SalesInvoiceLineFormat">
-          <DataField>AmountInclVAT_SalesInvoiceLineFormat</DataField>
-        </Field>
-        <Field Name="paidDeposit">
-          <DataField>paidDeposit</DataField>
-        </Field>
-        <Field Name="paidDepositFormat">
-          <DataField>paidDepositFormat</DataField>
-        </Field>
-        <Field Name="AmtPayable_SalesInvoiceLine">
-          <DataField>AmtPayable_SalesInvoiceLine</DataField>
-        </Field>
-        <Field Name="AmtPayable_SalesInvoiceLineFormat">
-          <DataField>AmtPayable_SalesInvoiceLineFormat</DataField>
-        </Field>
-        <Field Name="Description_BetalingBetingelse">
-          <DataField>Description_BetalingBetingelse</DataField>
-        </Field>
-        <Field Name="SalesInvLineType">
-          <DataField>SalesInvLineType</DataField>
-        </Field>
-        <Field Name="SerialNonotCreated_SalesInvoiceLine">
-          <DataField>SerialNonotCreated_SalesInvoiceLine</DataField>
-        </Field>
-        <Field Name="DiscountAmt_SalesInvoiceLine">
-          <DataField>DiscountAmt_SalesInvoiceLine</DataField>
-        </Field>
-        <Field Name="DiscountAmt_SalesInvoiceLineFormat">
-          <DataField>DiscountAmt_SalesInvoiceLineFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -8798,4 +8572,230 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="No_SalesInvoiceHeader">
+          <DataField>No_SalesInvoiceHeader</DataField>
+        </Field>
+        <Field Name="Number_KopiLoekke">
+          <DataField>Number_KopiLoekke</DataField>
+        </Field>
+        <Field Name="Number_SideLoekke">
+          <DataField>Number_SideLoekke</DataField>
+        </Field>
+        <Field Name="TitleText">
+          <DataField>TitleText</DataField>
+        </Field>
+        <Field Name="OutputNo">
+          <DataField>OutputNo</DataField>
+        </Field>
+        <Field Name="companyaddr_1">
+          <DataField>companyaddr_1</DataField>
+        </Field>
+        <Field Name="companyaddr_2">
+          <DataField>companyaddr_2</DataField>
+        </Field>
+        <Field Name="companyaddr_3">
+          <DataField>companyaddr_3</DataField>
+        </Field>
+        <Field Name="companyaddr_4">
+          <DataField>companyaddr_4</DataField>
+        </Field>
+        <Field Name="companyaddr_5">
+          <DataField>companyaddr_5</DataField>
+        </Field>
+        <Field Name="companyaddr_6">
+          <DataField>companyaddr_6</DataField>
+        </Field>
+        <Field Name="banknavn">
+          <DataField>banknavn</DataField>
+        </Field>
+        <Field Name="bankbranch">
+          <DataField>bankbranch</DataField>
+        </Field>
+        <Field Name="bankkontonr">
+          <DataField>bankkontonr</DataField>
+        </Field>
+        <Field Name="vatNo">
+          <DataField>vatNo</DataField>
+        </Field>
+        <Field Name="giroNo">
+          <DataField>giroNo</DataField>
+        </Field>
+        <Field Name="DebAdr_1">
+          <DataField>DebAdr_1</DataField>
+        </Field>
+        <Field Name="DebAdr_2">
+          <DataField>DebAdr_2</DataField>
+        </Field>
+        <Field Name="DebAdr_3">
+          <DataField>DebAdr_3</DataField>
+        </Field>
+        <Field Name="DebAdr_4">
+          <DataField>DebAdr_4</DataField>
+        </Field>
+        <Field Name="DebAdr_5">
+          <DataField>DebAdr_5</DataField>
+        </Field>
+        <Field Name="DebAdr_6">
+          <DataField>DebAdr_6</DataField>
+        </Field>
+        <Field Name="EANText">
+          <DataField>EANText</DataField>
+        </Field>
+        <Field Name="Reftext">
+          <DataField>Reftext</DataField>
+        </Field>
+        <Field Name="SelltoCustomerNo_SalesInvoiceHeader">
+          <DataField>SelltoCustomerNo_SalesInvoiceHeader</DataField>
+        </Field>
+        <Field Name="No_SalesInvoiceHeader2">
+          <DataField>No_SalesInvoiceHeader2</DataField>
+        </Field>
+        <Field Name="Reftext2">
+          <DataField>Reftext2</DataField>
+        </Field>
+        <Field Name="SaelgerIndkoeber_Name">
+          <DataField>SaelgerIndkoeber_Name</DataField>
+        </Field>
+        <Field Name="PostingDate_SalesInvoiceHeader">
+          <DataField>PostingDate_SalesInvoiceHeader</DataField>
+        </Field>
+        <Field Name="PAGENO">
+          <DataField>PAGENO</DataField>
+        </Field>
+        <Field Name="LevAdresse_1_SideLoekke">
+          <DataField>LevAdresse_1_SideLoekke</DataField>
+        </Field>
+        <Field Name="LevAdresse_2_SideLoekke">
+          <DataField>LevAdresse_2_SideLoekke</DataField>
+        </Field>
+        <Field Name="LevAdresse_3_SideLoekke">
+          <DataField>LevAdresse_3_SideLoekke</DataField>
+        </Field>
+        <Field Name="LevAdresse_4_SideLoekke">
+          <DataField>LevAdresse_4_SideLoekke</DataField>
+        </Field>
+        <Field Name="LevAdresse_5_SideLoekke">
+          <DataField>LevAdresse_5_SideLoekke</DataField>
+        </Field>
+        <Field Name="txtWoy">
+          <DataField>txtWoy</DataField>
+        </Field>
+        <Field Name="dow">
+          <DataField>dow</DataField>
+        </Field>
+        <Field Name="Delivery_date_retaildoc">
+          <DataField>Delivery_date_retaildoc</DataField>
+        </Field>
+        <Field Name="Delivery_time_retaildoc">
+          <DataField>Delivery_time_retaildoc</DataField>
+        </Field>
+        <Field Name="Delivery_time_2_retaildoc">
+          <DataField>Delivery_time_2_retaildoc</DataField>
+        </Field>
+        <Field Name="Comment1_1_">
+          <DataField>Comment1_1_</DataField>
+        </Field>
+        <Field Name="Comment1_2_">
+          <DataField>Comment1_2_</DataField>
+        </Field>
+        <Field Name="DueDate_SalesInvoiceHeader">
+          <DataField>DueDate_SalesInvoiceHeader</DataField>
+        </Field>
+        <Field Name="CurrencyCode_SalesInvoiceHeader">
+          <DataField>CurrencyCode_SalesInvoiceHeader</DataField>
+        </Field>
+        <Field Name="No_SalesInvoiceLine">
+          <DataField>No_SalesInvoiceLine</DataField>
+        </Field>
+        <Field Name="LineNo_SalesInvoiceLine">
+          <DataField>LineNo_SalesInvoiceLine</DataField>
+        </Field>
+        <Field Name="Description_SalesInvoiceLine">
+          <DataField>Description_SalesInvoiceLine</DataField>
+        </Field>
+        <Field Name="Quantity_SalesInvoiceLine">
+          <DataField>Quantity_SalesInvoiceLine</DataField>
+        </Field>
+        <Field Name="Quantity_SalesInvoiceLineFormat">
+          <DataField>Quantity_SalesInvoiceLineFormat</DataField>
+        </Field>
+        <Field Name="UnitofMeasure_SalesInvoiceLine">
+          <DataField>UnitofMeasure_SalesInvoiceLine</DataField>
+        </Field>
+        <Field Name="UnitPrice_SalesInvoiceLine">
+          <DataField>UnitPrice_SalesInvoiceLine</DataField>
+        </Field>
+        <Field Name="UnitPrice_SalesInvoiceLineFormat">
+          <DataField>UnitPrice_SalesInvoiceLineFormat</DataField>
+        </Field>
+        <Field Name="LineDiscount_SalesInvoiceLine">
+          <DataField>LineDiscount_SalesInvoiceLine</DataField>
+        </Field>
+        <Field Name="LineDiscount_SalesInvoiceLineFormat">
+          <DataField>LineDiscount_SalesInvoiceLineFormat</DataField>
+        </Field>
+        <Field Name="Amt_SalesInvoiceLine">
+          <DataField>Amt_SalesInvoiceLine</DataField>
+        </Field>
+        <Field Name="Amt_SalesInvoiceLineFormat">
+          <DataField>Amt_SalesInvoiceLineFormat</DataField>
+        </Field>
+        <Field Name="SerialNotCreated">
+          <DataField>SerialNotCreated</DataField>
+        </Field>
+        <Field Name="Amount_SalesInvoiceLine">
+          <DataField>Amount_SalesInvoiceLine</DataField>
+        </Field>
+        <Field Name="Amount_SalesInvoiceLineFormat">
+          <DataField>Amount_SalesInvoiceLineFormat</DataField>
+        </Field>
+        <Field Name="InclVAT_SalesInvoiceLine">
+          <DataField>InclVAT_SalesInvoiceLine</DataField>
+        </Field>
+        <Field Name="InclVAT_SalesInvoiceLineFormat">
+          <DataField>InclVAT_SalesInvoiceLineFormat</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_SalesInvoiceLine">
+          <DataField>AmountInclVAT_SalesInvoiceLine</DataField>
+        </Field>
+        <Field Name="AmountInclVAT_SalesInvoiceLineFormat">
+          <DataField>AmountInclVAT_SalesInvoiceLineFormat</DataField>
+        </Field>
+        <Field Name="paidDeposit">
+          <DataField>paidDeposit</DataField>
+        </Field>
+        <Field Name="paidDepositFormat">
+          <DataField>paidDepositFormat</DataField>
+        </Field>
+        <Field Name="AmtPayable_SalesInvoiceLine">
+          <DataField>AmtPayable_SalesInvoiceLine</DataField>
+        </Field>
+        <Field Name="AmtPayable_SalesInvoiceLineFormat">
+          <DataField>AmtPayable_SalesInvoiceLineFormat</DataField>
+        </Field>
+        <Field Name="Description_BetalingBetingelse">
+          <DataField>Description_BetalingBetingelse</DataField>
+        </Field>
+        <Field Name="SalesInvLineType">
+          <DataField>SalesInvLineType</DataField>
+        </Field>
+        <Field Name="SerialNonotCreated_SalesInvoiceLine">
+          <DataField>SerialNonotCreated_SalesInvoiceLine</DataField>
+        </Field>
+        <Field Name="DiscountAmt_SalesInvoiceLine">
+          <DataField>DiscountAmt_SalesInvoiceLine</DataField>
+        </Field>
+        <Field Name="DiscountAmt_SalesInvoiceLineFormat">
+          <DataField>DiscountAmt_SalesInvoiceLineFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

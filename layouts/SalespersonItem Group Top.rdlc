@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,172 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="PageCaptionLbl">
-          <DataField>PageCaptionLbl</DataField>
-        </Field>
-        <Field Name="CompanyInfoPicture">
-          <DataField>CompanyInfoPicture</DataField>
-        </Field>
-        <Field Name="ReportCaption">
-          <DataField>ReportCaption</DataField>
-        </Field>
-        <Field Name="SalesPersonFilters">
-          <DataField>SalesPersonFilters</DataField>
-        </Field>
-        <Field Name="ItemGroupFilters">
-          <DataField>ItemGroupFilters</DataField>
-        </Field>
-        <Field Name="sorteringstext">
-          <DataField>sorteringstext</DataField>
-        </Field>
-        <Field Name="NoCaption">
-          <DataField>NoCaption</DataField>
-        </Field>
-        <Field Name="NameCaption">
-          <DataField>NameCaption</DataField>
-        </Field>
-        <Field Name="TurnoverCaption">
-          <DataField>TurnoverCaption</DataField>
-        </Field>
-        <Field Name="ProfitCaption">
-          <DataField>ProfitCaption</DataField>
-        </Field>
-        <Field Name="CRPctCaption">
-          <DataField>CRPctCaption</DataField>
-        </Field>
-        <Field Name="DBCaption">
-          <DataField>DBCaption</DataField>
-        </Field>
-        <Field Name="ItemGroupCaption">
-          <DataField>ItemGroupCaption</DataField>
-        </Field>
-        <Field Name="DescriptionCaption">
-          <DataField>DescriptionCaption</DataField>
-        </Field>
-        <Field Name="SalesLCYCaption">
-          <DataField>SalesLCYCaption</DataField>
-        </Field>
-        <Field Name="PctCaption">
-          <DataField>PctCaption</DataField>
-        </Field>
-        <Field Name="CBCaption">
-          <DataField>CBCaption</DataField>
-        </Field>
-        <Field Name="Code_SalespersonPurchaser">
-          <DataField>Code_SalespersonPurchaser</DataField>
-        </Field>
-        <Field Name="Name_SalespersonPurchaser">
-          <DataField>Name_SalespersonPurchaser</DataField>
-        </Field>
-        <Field Name="SalesLCY_SalespersonPurchaser">
-          <DataField>SalesLCY_SalespersonPurchaser</DataField>
-        </Field>
-        <Field Name="SalesLCY_SalespersonPurchaserFormat">
-          <DataField>SalesLCY_SalespersonPurchaserFormat</DataField>
-        </Field>
-        <Field Name="ProfitLCY_SalespersonPurchaser">
-          <DataField>ProfitLCY_SalespersonPurchaser</DataField>
-        </Field>
-        <Field Name="ProfitLCY_SalespersonPurchaserFormat">
-          <DataField>ProfitLCY_SalespersonPurchaserFormat</DataField>
-        </Field>
-        <Field Name="ProfitPctSalesperson">
-          <DataField>ProfitPctSalesperson</DataField>
-        </Field>
-        <Field Name="ProfitPctSalespersonFormat">
-          <DataField>ProfitPctSalespersonFormat</DataField>
-        </Field>
-        <Field Name="db">
-          <DataField>db</DataField>
-        </Field>
-        <Field Name="dbFormat">
-          <DataField>dbFormat</DataField>
-        </Field>
-        <Field Name="ShowMainTotal">
-          <DataField>ShowMainTotal</DataField>
-        </Field>
-        <Field Name="sortSalesPerson">
-          <DataField>sortSalesPerson</DataField>
-        </Field>
-        <Field Name="ShowQty">
-          <DataField>ShowQty</DataField>
-        </Field>
-        <Field Name="No_ItemGroup">
-          <DataField>No_ItemGroup</DataField>
-        </Field>
-        <Field Name="Description_ItemGroup">
-          <DataField>Description_ItemGroup</DataField>
-        </Field>
-        <Field Name="SaleLCY_ItemGroup">
-          <DataField>SaleLCY_ItemGroup</DataField>
-        </Field>
-        <Field Name="SaleLCY_ItemGroupFormat">
-          <DataField>SaleLCY_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="SalesPct">
-          <DataField>SalesPct</DataField>
-        </Field>
-        <Field Name="SalesPctFormat">
-          <DataField>SalesPctFormat</DataField>
-        </Field>
-        <Field Name="CB_ItemGroup">
-          <DataField>CB_ItemGroup</DataField>
-        </Field>
-        <Field Name="CB_ItemGroupFormat">
-          <DataField>CB_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="dg_ItemGroup">
-          <DataField>dg_ItemGroup</DataField>
-        </Field>
-        <Field Name="dg_ItemGroupFormat">
-          <DataField>dg_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="Number_Integer">
-          <DataField>Number_Integer</DataField>
-        </Field>
-        <Field Name="No1_ItemGroup">
-          <DataField>No1_ItemGroup</DataField>
-        </Field>
-        <Field Name="Description1_ItemGroup">
-          <DataField>Description1_ItemGroup</DataField>
-        </Field>
-        <Field Name="SaleLCY1_ItemGroup">
-          <DataField>SaleLCY1_ItemGroup</DataField>
-        </Field>
-        <Field Name="SaleLCY1_ItemGroupFormat">
-          <DataField>SaleLCY1_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="SalesPct1">
-          <DataField>SalesPct1</DataField>
-        </Field>
-        <Field Name="SalesPct1Format">
-          <DataField>SalesPct1Format</DataField>
-        </Field>
-        <Field Name="CB1_ItemGroup">
-          <DataField>CB1_ItemGroup</DataField>
-        </Field>
-        <Field Name="CB1_ItemGroupFormat">
-          <DataField>CB1_ItemGroupFormat</DataField>
-        </Field>
-        <Field Name="dg1_ItemGroup">
-          <DataField>dg1_ItemGroup</DataField>
-        </Field>
-        <Field Name="dg1_ItemGroupFormat">
-          <DataField>dg1_ItemGroupFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -2359,4 +2193,170 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="PageCaptionLbl">
+          <DataField>PageCaptionLbl</DataField>
+        </Field>
+        <Field Name="CompanyInfoPicture">
+          <DataField>CompanyInfoPicture</DataField>
+        </Field>
+        <Field Name="ReportCaption">
+          <DataField>ReportCaption</DataField>
+        </Field>
+        <Field Name="SalesPersonFilters">
+          <DataField>SalesPersonFilters</DataField>
+        </Field>
+        <Field Name="ItemGroupFilters">
+          <DataField>ItemGroupFilters</DataField>
+        </Field>
+        <Field Name="sorteringstext">
+          <DataField>sorteringstext</DataField>
+        </Field>
+        <Field Name="NoCaption">
+          <DataField>NoCaption</DataField>
+        </Field>
+        <Field Name="NameCaption">
+          <DataField>NameCaption</DataField>
+        </Field>
+        <Field Name="TurnoverCaption">
+          <DataField>TurnoverCaption</DataField>
+        </Field>
+        <Field Name="ProfitCaption">
+          <DataField>ProfitCaption</DataField>
+        </Field>
+        <Field Name="CRPctCaption">
+          <DataField>CRPctCaption</DataField>
+        </Field>
+        <Field Name="DBCaption">
+          <DataField>DBCaption</DataField>
+        </Field>
+        <Field Name="ItemGroupCaption">
+          <DataField>ItemGroupCaption</DataField>
+        </Field>
+        <Field Name="DescriptionCaption">
+          <DataField>DescriptionCaption</DataField>
+        </Field>
+        <Field Name="SalesLCYCaption">
+          <DataField>SalesLCYCaption</DataField>
+        </Field>
+        <Field Name="PctCaption">
+          <DataField>PctCaption</DataField>
+        </Field>
+        <Field Name="CBCaption">
+          <DataField>CBCaption</DataField>
+        </Field>
+        <Field Name="Code_SalespersonPurchaser">
+          <DataField>Code_SalespersonPurchaser</DataField>
+        </Field>
+        <Field Name="Name_SalespersonPurchaser">
+          <DataField>Name_SalespersonPurchaser</DataField>
+        </Field>
+        <Field Name="SalesLCY_SalespersonPurchaser">
+          <DataField>SalesLCY_SalespersonPurchaser</DataField>
+        </Field>
+        <Field Name="SalesLCY_SalespersonPurchaserFormat">
+          <DataField>SalesLCY_SalespersonPurchaserFormat</DataField>
+        </Field>
+        <Field Name="ProfitLCY_SalespersonPurchaser">
+          <DataField>ProfitLCY_SalespersonPurchaser</DataField>
+        </Field>
+        <Field Name="ProfitLCY_SalespersonPurchaserFormat">
+          <DataField>ProfitLCY_SalespersonPurchaserFormat</DataField>
+        </Field>
+        <Field Name="ProfitPctSalesperson">
+          <DataField>ProfitPctSalesperson</DataField>
+        </Field>
+        <Field Name="ProfitPctSalespersonFormat">
+          <DataField>ProfitPctSalespersonFormat</DataField>
+        </Field>
+        <Field Name="db">
+          <DataField>db</DataField>
+        </Field>
+        <Field Name="dbFormat">
+          <DataField>dbFormat</DataField>
+        </Field>
+        <Field Name="ShowMainTotal">
+          <DataField>ShowMainTotal</DataField>
+        </Field>
+        <Field Name="sortSalesPerson">
+          <DataField>sortSalesPerson</DataField>
+        </Field>
+        <Field Name="ShowQty">
+          <DataField>ShowQty</DataField>
+        </Field>
+        <Field Name="No_ItemGroup">
+          <DataField>No_ItemGroup</DataField>
+        </Field>
+        <Field Name="Description_ItemGroup">
+          <DataField>Description_ItemGroup</DataField>
+        </Field>
+        <Field Name="SaleLCY_ItemGroup">
+          <DataField>SaleLCY_ItemGroup</DataField>
+        </Field>
+        <Field Name="SaleLCY_ItemGroupFormat">
+          <DataField>SaleLCY_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="SalesPct">
+          <DataField>SalesPct</DataField>
+        </Field>
+        <Field Name="SalesPctFormat">
+          <DataField>SalesPctFormat</DataField>
+        </Field>
+        <Field Name="CB_ItemGroup">
+          <DataField>CB_ItemGroup</DataField>
+        </Field>
+        <Field Name="CB_ItemGroupFormat">
+          <DataField>CB_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="dg_ItemGroup">
+          <DataField>dg_ItemGroup</DataField>
+        </Field>
+        <Field Name="dg_ItemGroupFormat">
+          <DataField>dg_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="Number_Integer">
+          <DataField>Number_Integer</DataField>
+        </Field>
+        <Field Name="No1_ItemGroup">
+          <DataField>No1_ItemGroup</DataField>
+        </Field>
+        <Field Name="Description1_ItemGroup">
+          <DataField>Description1_ItemGroup</DataField>
+        </Field>
+        <Field Name="SaleLCY1_ItemGroup">
+          <DataField>SaleLCY1_ItemGroup</DataField>
+        </Field>
+        <Field Name="SaleLCY1_ItemGroupFormat">
+          <DataField>SaleLCY1_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="SalesPct1">
+          <DataField>SalesPct1</DataField>
+        </Field>
+        <Field Name="SalesPct1Format">
+          <DataField>SalesPct1Format</DataField>
+        </Field>
+        <Field Name="CB1_ItemGroup">
+          <DataField>CB1_ItemGroup</DataField>
+        </Field>
+        <Field Name="CB1_ItemGroupFormat">
+          <DataField>CB1_ItemGroupFormat</DataField>
+        </Field>
+        <Field Name="dg1_ItemGroup">
+          <DataField>dg1_ItemGroup</DataField>
+        </Field>
+        <Field Name="dg1_ItemGroupFormat">
+          <DataField>dg1_ItemGroupFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

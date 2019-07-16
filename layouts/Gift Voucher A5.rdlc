@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,76 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="CopyText">
-          <DataField>CopyText</DataField>
-        </Field>
-        <Field Name="No_GiftVoucher">
-          <DataField>No_GiftVoucher</DataField>
-        </Field>
-        <Field Name="Amount_GiftVoucher">
-          <DataField>Amount_GiftVoucher</DataField>
-        </Field>
-        <Field Name="Amount_GiftVoucherFormat">
-          <DataField>Amount_GiftVoucherFormat</DataField>
-        </Field>
-        <Field Name="Name_GiftVoucher">
-          <DataField>Name_GiftVoucher</DataField>
-        </Field>
-        <Field Name="Address_GiftVoucher">
-          <DataField>Address_GiftVoucher</DataField>
-        </Field>
-        <Field Name="IssueDate_GiftVoucher">
-          <DataField>IssueDate_GiftVoucher</DataField>
-        </Field>
-        <Field Name="RegisterNo_GiftVoucher">
-          <DataField>RegisterNo_GiftVoucher</DataField>
-        </Field>
-        <Field Name="SalesTicketNo_GiftVoucher">
-          <DataField>SalesTicketNo_GiftVoucher</DataField>
-        </Field>
-        <Field Name="ZipCodeCityText">
-          <DataField>ZipCodeCityText</DataField>
-        </Field>
-        <Field Name="DetailsText">
-          <DataField>DetailsText</DataField>
-        </Field>
-        <Field Name="Barcode">
-          <DataField>Barcode</DataField>
-        </Field>
-        <Field Name="SalesPersonText">
-          <DataField>SalesPersonText</DataField>
-        </Field>
-        <Field Name="Name_Register">
-          <DataField>Name_Register</DataField>
-        </Field>
-        <Field Name="Address_Register">
-          <DataField>Address_Register</DataField>
-        </Field>
-        <Field Name="Email_Register">
-          <DataField>Email_Register</DataField>
-        </Field>
-        <Field Name="WebAddress_Register">
-          <DataField>WebAddress_Register</DataField>
-        </Field>
-        <Field Name="RegisterPhoneText">
-          <DataField>RegisterPhoneText</DataField>
-        </Field>
-        <Field Name="RegisterPostCodeAndCityText">
-          <DataField>RegisterPostCodeAndCityText</DataField>
-        </Field>
-        <Field Name="RegisterVatNoText">
-          <DataField>RegisterVatNoText</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -1011,15 +941,6 @@
     </ReportSection>
   </ReportSections>
   <ReportParameters>
-    <ReportParameter Name="Amount_GiftVoucherCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Amount_GiftVoucherCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Amount_GiftVoucherCaption</Prompt>
-    </ReportParameter>
     <ReportParameter Name="Lbl000">
       <DataType>String</DataType>
       <DefaultValue>
@@ -1065,97 +986,50 @@
       </DefaultValue>
       <Prompt>Lbl004</Prompt>
     </ReportParameter>
-    <ReportParameter Name="Lbl005">
+    <ReportParameter Name="Amount_GiftVoucherCaption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>Lbl005</Value>
+          <Value>Amount_GiftVoucherCaption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>Lbl005</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Lbl006">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Lbl006</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Lbl006</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Lbl007">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Lbl007</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Lbl007</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="Lbl008">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>Lbl008</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>Lbl008</Prompt>
+      <Prompt>Amount_GiftVoucherCaption</Prompt>
     </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>10</NumberOfRows>
+      <NumberOfRows>6</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>Amount_GiftVoucherCaption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>1</RowIndex>
           <ParameterName>Lbl000</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>2</RowIndex>
+          <RowIndex>1</RowIndex>
           <ParameterName>Lbl001</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>3</RowIndex>
+          <RowIndex>2</RowIndex>
           <ParameterName>Lbl002</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>4</RowIndex>
+          <RowIndex>3</RowIndex>
           <ParameterName>Lbl003</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>5</RowIndex>
+          <RowIndex>4</RowIndex>
           <ParameterName>Lbl004</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>6</RowIndex>
-          <ParameterName>Lbl005</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>7</RowIndex>
-          <ParameterName>Lbl006</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>8</RowIndex>
-          <ParameterName>Lbl007</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>9</RowIndex>
-          <ParameterName>Lbl008</ParameterName>
+          <RowIndex>5</RowIndex>
+          <ParameterName>Amount_GiftVoucherCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -1198,4 +1072,74 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="CopyText">
+          <DataField>CopyText</DataField>
+        </Field>
+        <Field Name="No_GiftVoucher">
+          <DataField>No_GiftVoucher</DataField>
+        </Field>
+        <Field Name="Amount_GiftVoucher">
+          <DataField>Amount_GiftVoucher</DataField>
+        </Field>
+        <Field Name="Amount_GiftVoucherFormat">
+          <DataField>Amount_GiftVoucherFormat</DataField>
+        </Field>
+        <Field Name="Name_GiftVoucher">
+          <DataField>Name_GiftVoucher</DataField>
+        </Field>
+        <Field Name="Address_GiftVoucher">
+          <DataField>Address_GiftVoucher</DataField>
+        </Field>
+        <Field Name="IssueDate_GiftVoucher">
+          <DataField>IssueDate_GiftVoucher</DataField>
+        </Field>
+        <Field Name="RegisterNo_GiftVoucher">
+          <DataField>RegisterNo_GiftVoucher</DataField>
+        </Field>
+        <Field Name="SalesTicketNo_GiftVoucher">
+          <DataField>SalesTicketNo_GiftVoucher</DataField>
+        </Field>
+        <Field Name="ZipCodeCityText">
+          <DataField>ZipCodeCityText</DataField>
+        </Field>
+        <Field Name="DetailsText">
+          <DataField>DetailsText</DataField>
+        </Field>
+        <Field Name="Barcode">
+          <DataField>Barcode</DataField>
+        </Field>
+        <Field Name="SalesPersonText">
+          <DataField>SalesPersonText</DataField>
+        </Field>
+        <Field Name="Name_Register">
+          <DataField>Name_Register</DataField>
+        </Field>
+        <Field Name="Address_Register">
+          <DataField>Address_Register</DataField>
+        </Field>
+        <Field Name="Email_Register">
+          <DataField>Email_Register</DataField>
+        </Field>
+        <Field Name="WebAddress_Register">
+          <DataField>WebAddress_Register</DataField>
+        </Field>
+        <Field Name="RegisterPhoneText">
+          <DataField>RegisterPhoneText</DataField>
+        </Field>
+        <Field Name="RegisterPostCodeAndCityText">
+          <DataField>RegisterPostCodeAndCityText</DataField>
+        </Field>
+        <Field Name="RegisterVatNoText">
+          <DataField>RegisterVatNoText</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

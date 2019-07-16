@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,253 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="Picture_CompanyInformation">
-          <DataField>Picture_CompanyInformation</DataField>
-        </Field>
-        <Field Name="RegisterNo_AuditRoll">
-          <DataField>RegisterNo_AuditRoll</DataField>
-        </Field>
-        <Field Name="SalesTicketNo_AuditRoll">
-          <DataField>SalesTicketNo_AuditRoll</DataField>
-        </Field>
-        <Field Name="SaleDate_AuditRoll">
-          <DataField>SaleDate_AuditRoll</DataField>
-        </Field>
-        <Field Name="CopyNo_AuditRoll">
-          <DataField>CopyNo_AuditRoll</DataField>
-        </Field>
-        <Field Name="Name_SalespersonPurchaser">
-          <DataField>Name_SalespersonPurchaser</DataField>
-        </Field>
-        <Field Name="RegisterNo_Register">
-          <DataField>RegisterNo_Register</DataField>
-        </Field>
-        <Field Name="Name_Register">
-          <DataField>Name_Register</DataField>
-        </Field>
-        <Field Name="Addres_Register">
-          <DataField>Addres_Register</DataField>
-        </Field>
-        <Field Name="City_Register">
-          <DataField>City_Register</DataField>
-        </Field>
-        <Field Name="PostCode_Register">
-          <DataField>PostCode_Register</DataField>
-        </Field>
-        <Field Name="Telephone_Register">
-          <DataField>Telephone_Register</DataField>
-        </Field>
-        <Field Name="Email_Register">
-          <DataField>Email_Register</DataField>
-        </Field>
-        <Field Name="Website_Register">
-          <DataField>Website_Register</DataField>
-        </Field>
-        <Field Name="VATNo_Register">
-          <DataField>VATNo_Register</DataField>
-        </Field>
-        <Field Name="ContactNo">
-          <DataField>ContactNo</DataField>
-        </Field>
-        <Field Name="ContactName">
-          <DataField>ContactName</DataField>
-        </Field>
-        <Field Name="ContactAddress">
-          <DataField>ContactAddress</DataField>
-        </Field>
-        <Field Name="ContactCity">
-          <DataField>ContactCity</DataField>
-        </Field>
-        <Field Name="ContactPostCode">
-          <DataField>ContactPostCode</DataField>
-        </Field>
-        <Field Name="LineNo_AuditRollSale">
-          <DataField>LineNo_AuditRollSale</DataField>
-        </Field>
-        <Field Name="Type_AuditRollSale">
-          <DataField>Type_AuditRollSale</DataField>
-        </Field>
-        <Field Name="AmountLine">
-          <DataField>AmountLine</DataField>
-        </Field>
-        <Field Name="AmountLineFormat">
-          <DataField>AmountLineFormat</DataField>
-        </Field>
-        <Field Name="DescriptionLine">
-          <DataField>DescriptionLine</DataField>
-        </Field>
-        <Field Name="DescriptionLine2">
-          <DataField>DescriptionLine2</DataField>
-        </Field>
-        <Field Name="ItemInfo">
-          <DataField>ItemInfo</DataField>
-        </Field>
-        <Field Name="ItemNo">
-          <DataField>ItemNo</DataField>
-        </Field>
-        <Field Name="LineDiscountPct">
-          <DataField>LineDiscountPct</DataField>
-        </Field>
-        <Field Name="LineDiscountPctFormat">
-          <DataField>LineDiscountPctFormat</DataField>
-        </Field>
-        <Field Name="QuantityAmountLine">
-          <DataField>QuantityAmountLine</DataField>
-        </Field>
-        <Field Name="QuantityLine">
-          <DataField>QuantityLine</DataField>
-        </Field>
-        <Field Name="SerialNo_AuditrollSale">
-          <DataField>SerialNo_AuditrollSale</DataField>
-        </Field>
-        <Field Name="SerialNoNotCreate_AuditRollSale">
-          <DataField>SerialNoNotCreate_AuditRollSale</DataField>
-        </Field>
-        <Field Name="SeriealNoTxt">
-          <DataField>SeriealNoTxt</DataField>
-        </Field>
-        <Field Name="ShowOutPayment">
-          <DataField>ShowOutPayment</DataField>
-        </Field>
-        <Field Name="ShowDeposit">
-          <DataField>ShowDeposit</DataField>
-        </Field>
-        <Field Name="VariantDesc">
-          <DataField>VariantDesc</DataField>
-        </Field>
-        <Field Name="UnitPriceInlcDiscountLine">
-          <DataField>UnitPriceInlcDiscountLine</DataField>
-        </Field>
-        <Field Name="UnitPriceInlcDiscountLineFormat">
-          <DataField>UnitPriceInlcDiscountLineFormat</DataField>
-        </Field>
-        <Field Name="IsItem">
-          <DataField>IsItem</DataField>
-        </Field>
-        <Field Name="LineNo_AuditRollFinance">
-          <DataField>LineNo_AuditRollFinance</DataField>
-        </Field>
-        <Field Name="FinansDescriptionLine">
-          <DataField>FinansDescriptionLine</DataField>
-        </Field>
-        <Field Name="AmountIncludingVAT_AuditRollFinance">
-          <DataField>AmountIncludingVAT_AuditRollFinance</DataField>
-        </Field>
-        <Field Name="AmountIncludingVAT_AuditRollFinanceFormat">
-          <DataField>AmountIncludingVAT_AuditRollFinanceFormat</DataField>
-        </Field>
-        <Field Name="LineNo_AuditRollPayment">
-          <DataField>LineNo_AuditRollPayment</DataField>
-        </Field>
-        <Field Name="AmountPaymentLine">
-          <DataField>AmountPaymentLine</DataField>
-        </Field>
-        <Field Name="AmountPaymentLineFormat">
-          <DataField>AmountPaymentLineFormat</DataField>
-        </Field>
-        <Field Name="DescriptionPaymentLine">
-          <DataField>DescriptionPaymentLine</DataField>
-        </Field>
-        <Field Name="Number_Integer">
-          <DataField>Number_Integer</DataField>
-        </Field>
-        <Field Name="LCYCode_GeneralLedgerSetup">
-          <DataField>LCYCode_GeneralLedgerSetup</DataField>
-        </Field>
-        <Field Name="AmountIncludingVAT_AuditRollTotals">
-          <DataField>AmountIncludingVAT_AuditRollTotals</DataField>
-        </Field>
-        <Field Name="AmountIncludingVAT_AuditRollTotalsFormat">
-          <DataField>AmountIncludingVAT_AuditRollTotalsFormat</DataField>
-        </Field>
-        <Field Name="TotalDiscount">
-          <DataField>TotalDiscount</DataField>
-        </Field>
-        <Field Name="SamletBonRabat_RetailSetup">
-          <DataField>SamletBonRabat_RetailSetup</DataField>
-        </Field>
-        <Field Name="ShowDiscountPercent_RetailSetup">
-          <DataField>ShowDiscountPercent_RetailSetup</DataField>
-        </Field>
-        <Field Name="TotalDiscountPct">
-          <DataField>TotalDiscountPct</DataField>
-        </Field>
-        <Field Name="LineDiscountAmount_AuditRollTotals">
-          <DataField>LineDiscountAmount_AuditRollTotals</DataField>
-        </Field>
-        <Field Name="LineDiscountAmount_AuditRollTotalsFormat">
-          <DataField>LineDiscountAmount_AuditRollTotalsFormat</DataField>
-        </Field>
-        <Field Name="Amount_AuditRollTotals">
-          <DataField>Amount_AuditRollTotals</DataField>
-        </Field>
-        <Field Name="Amount_AuditRollTotalsFormat">
-          <DataField>Amount_AuditRollTotalsFormat</DataField>
-        </Field>
-        <Field Name="TotalVAT">
-          <DataField>TotalVAT</DataField>
-        </Field>
-        <Field Name="TotalVATAmount">
-          <DataField>TotalVATAmount</DataField>
-        </Field>
-        <Field Name="TotalVATAmountFormat">
-          <DataField>TotalVATAmountFormat</DataField>
-        </Field>
-        <Field Name="EuroOnSalesTicket_RetailSetup">
-          <DataField>EuroOnSalesTicket_RetailSetup</DataField>
-        </Field>
-        <Field Name="TotalEuro">
-          <DataField>TotalEuro</DataField>
-        </Field>
-        <Field Name="TotalEuroAmount">
-          <DataField>TotalEuroAmount</DataField>
-        </Field>
-        <Field Name="TotalEuroAmountFormat">
-          <DataField>TotalEuroAmountFormat</DataField>
-        </Field>
-        <Field Name="SubCurrencyGL">
-          <DataField>SubCurrencyGL</DataField>
-        </Field>
-        <Field Name="SubCurrencyGLFormat">
-          <DataField>SubCurrencyGLFormat</DataField>
-        </Field>
-        <Field Name="Reference_AuditRoll">
-          <DataField>Reference_AuditRoll</DataField>
-        </Field>
-        <Field Name="AmountIncludingVAT_AuditRollPayment">
-          <DataField>AmountIncludingVAT_AuditRollPayment</DataField>
-        </Field>
-        <Field Name="AmountIncludingVAT_AuditRollPaymentFormat">
-          <DataField>AmountIncludingVAT_AuditRollPaymentFormat</DataField>
-        </Field>
-        <Field Name="Balance_Customer">
-          <DataField>Balance_Customer</DataField>
-        </Field>
-        <Field Name="Balance_CustomerFormat">
-          <DataField>Balance_CustomerFormat</DataField>
-        </Field>
-        <Field Name="BalanceBefore_Customer">
-          <DataField>BalanceBefore_Customer</DataField>
-        </Field>
-        <Field Name="BalanceBefore_CustomerFormat">
-          <DataField>BalanceBefore_CustomerFormat</DataField>
-        </Field>
-        <Field Name="ShowAmountInclVatPayment">
-          <DataField>ShowAmountInclVatPayment</DataField>
-        </Field>
-        <Field Name="ShowAdditionalInfo">
-          <DataField>ShowAdditionalInfo</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -8771,4 +8524,251 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="Picture_CompanyInformation">
+          <DataField>Picture_CompanyInformation</DataField>
+        </Field>
+        <Field Name="RegisterNo_AuditRoll">
+          <DataField>RegisterNo_AuditRoll</DataField>
+        </Field>
+        <Field Name="SalesTicketNo_AuditRoll">
+          <DataField>SalesTicketNo_AuditRoll</DataField>
+        </Field>
+        <Field Name="SaleDate_AuditRoll">
+          <DataField>SaleDate_AuditRoll</DataField>
+        </Field>
+        <Field Name="CopyNo_AuditRoll">
+          <DataField>CopyNo_AuditRoll</DataField>
+        </Field>
+        <Field Name="Name_SalespersonPurchaser">
+          <DataField>Name_SalespersonPurchaser</DataField>
+        </Field>
+        <Field Name="RegisterNo_Register">
+          <DataField>RegisterNo_Register</DataField>
+        </Field>
+        <Field Name="Name_Register">
+          <DataField>Name_Register</DataField>
+        </Field>
+        <Field Name="Addres_Register">
+          <DataField>Addres_Register</DataField>
+        </Field>
+        <Field Name="City_Register">
+          <DataField>City_Register</DataField>
+        </Field>
+        <Field Name="PostCode_Register">
+          <DataField>PostCode_Register</DataField>
+        </Field>
+        <Field Name="Telephone_Register">
+          <DataField>Telephone_Register</DataField>
+        </Field>
+        <Field Name="Email_Register">
+          <DataField>Email_Register</DataField>
+        </Field>
+        <Field Name="Website_Register">
+          <DataField>Website_Register</DataField>
+        </Field>
+        <Field Name="VATNo_Register">
+          <DataField>VATNo_Register</DataField>
+        </Field>
+        <Field Name="ContactNo">
+          <DataField>ContactNo</DataField>
+        </Field>
+        <Field Name="ContactName">
+          <DataField>ContactName</DataField>
+        </Field>
+        <Field Name="ContactAddress">
+          <DataField>ContactAddress</DataField>
+        </Field>
+        <Field Name="ContactCity">
+          <DataField>ContactCity</DataField>
+        </Field>
+        <Field Name="ContactPostCode">
+          <DataField>ContactPostCode</DataField>
+        </Field>
+        <Field Name="LineNo_AuditRollSale">
+          <DataField>LineNo_AuditRollSale</DataField>
+        </Field>
+        <Field Name="Type_AuditRollSale">
+          <DataField>Type_AuditRollSale</DataField>
+        </Field>
+        <Field Name="AmountLine">
+          <DataField>AmountLine</DataField>
+        </Field>
+        <Field Name="AmountLineFormat">
+          <DataField>AmountLineFormat</DataField>
+        </Field>
+        <Field Name="DescriptionLine">
+          <DataField>DescriptionLine</DataField>
+        </Field>
+        <Field Name="DescriptionLine2">
+          <DataField>DescriptionLine2</DataField>
+        </Field>
+        <Field Name="ItemInfo">
+          <DataField>ItemInfo</DataField>
+        </Field>
+        <Field Name="ItemNo">
+          <DataField>ItemNo</DataField>
+        </Field>
+        <Field Name="LineDiscountPct">
+          <DataField>LineDiscountPct</DataField>
+        </Field>
+        <Field Name="LineDiscountPctFormat">
+          <DataField>LineDiscountPctFormat</DataField>
+        </Field>
+        <Field Name="QuantityAmountLine">
+          <DataField>QuantityAmountLine</DataField>
+        </Field>
+        <Field Name="QuantityLine">
+          <DataField>QuantityLine</DataField>
+        </Field>
+        <Field Name="SerialNo_AuditrollSale">
+          <DataField>SerialNo_AuditrollSale</DataField>
+        </Field>
+        <Field Name="SerialNoNotCreate_AuditRollSale">
+          <DataField>SerialNoNotCreate_AuditRollSale</DataField>
+        </Field>
+        <Field Name="SeriealNoTxt">
+          <DataField>SeriealNoTxt</DataField>
+        </Field>
+        <Field Name="ShowOutPayment">
+          <DataField>ShowOutPayment</DataField>
+        </Field>
+        <Field Name="ShowDeposit">
+          <DataField>ShowDeposit</DataField>
+        </Field>
+        <Field Name="VariantDesc">
+          <DataField>VariantDesc</DataField>
+        </Field>
+        <Field Name="UnitPriceInlcDiscountLine">
+          <DataField>UnitPriceInlcDiscountLine</DataField>
+        </Field>
+        <Field Name="UnitPriceInlcDiscountLineFormat">
+          <DataField>UnitPriceInlcDiscountLineFormat</DataField>
+        </Field>
+        <Field Name="IsItem">
+          <DataField>IsItem</DataField>
+        </Field>
+        <Field Name="LineNo_AuditRollFinance">
+          <DataField>LineNo_AuditRollFinance</DataField>
+        </Field>
+        <Field Name="FinansDescriptionLine">
+          <DataField>FinansDescriptionLine</DataField>
+        </Field>
+        <Field Name="AmountIncludingVAT_AuditRollFinance">
+          <DataField>AmountIncludingVAT_AuditRollFinance</DataField>
+        </Field>
+        <Field Name="AmountIncludingVAT_AuditRollFinanceFormat">
+          <DataField>AmountIncludingVAT_AuditRollFinanceFormat</DataField>
+        </Field>
+        <Field Name="LineNo_AuditRollPayment">
+          <DataField>LineNo_AuditRollPayment</DataField>
+        </Field>
+        <Field Name="AmountPaymentLine">
+          <DataField>AmountPaymentLine</DataField>
+        </Field>
+        <Field Name="AmountPaymentLineFormat">
+          <DataField>AmountPaymentLineFormat</DataField>
+        </Field>
+        <Field Name="DescriptionPaymentLine">
+          <DataField>DescriptionPaymentLine</DataField>
+        </Field>
+        <Field Name="Number_Integer">
+          <DataField>Number_Integer</DataField>
+        </Field>
+        <Field Name="LCYCode_GeneralLedgerSetup">
+          <DataField>LCYCode_GeneralLedgerSetup</DataField>
+        </Field>
+        <Field Name="AmountIncludingVAT_AuditRollTotals">
+          <DataField>AmountIncludingVAT_AuditRollTotals</DataField>
+        </Field>
+        <Field Name="AmountIncludingVAT_AuditRollTotalsFormat">
+          <DataField>AmountIncludingVAT_AuditRollTotalsFormat</DataField>
+        </Field>
+        <Field Name="TotalDiscount">
+          <DataField>TotalDiscount</DataField>
+        </Field>
+        <Field Name="SamletBonRabat_RetailSetup">
+          <DataField>SamletBonRabat_RetailSetup</DataField>
+        </Field>
+        <Field Name="ShowDiscountPercent_RetailSetup">
+          <DataField>ShowDiscountPercent_RetailSetup</DataField>
+        </Field>
+        <Field Name="TotalDiscountPct">
+          <DataField>TotalDiscountPct</DataField>
+        </Field>
+        <Field Name="LineDiscountAmount_AuditRollTotals">
+          <DataField>LineDiscountAmount_AuditRollTotals</DataField>
+        </Field>
+        <Field Name="LineDiscountAmount_AuditRollTotalsFormat">
+          <DataField>LineDiscountAmount_AuditRollTotalsFormat</DataField>
+        </Field>
+        <Field Name="Amount_AuditRollTotals">
+          <DataField>Amount_AuditRollTotals</DataField>
+        </Field>
+        <Field Name="Amount_AuditRollTotalsFormat">
+          <DataField>Amount_AuditRollTotalsFormat</DataField>
+        </Field>
+        <Field Name="TotalVAT">
+          <DataField>TotalVAT</DataField>
+        </Field>
+        <Field Name="TotalVATAmount">
+          <DataField>TotalVATAmount</DataField>
+        </Field>
+        <Field Name="TotalVATAmountFormat">
+          <DataField>TotalVATAmountFormat</DataField>
+        </Field>
+        <Field Name="EuroOnSalesTicket_RetailSetup">
+          <DataField>EuroOnSalesTicket_RetailSetup</DataField>
+        </Field>
+        <Field Name="TotalEuro">
+          <DataField>TotalEuro</DataField>
+        </Field>
+        <Field Name="TotalEuroAmount">
+          <DataField>TotalEuroAmount</DataField>
+        </Field>
+        <Field Name="TotalEuroAmountFormat">
+          <DataField>TotalEuroAmountFormat</DataField>
+        </Field>
+        <Field Name="SubCurrencyGL">
+          <DataField>SubCurrencyGL</DataField>
+        </Field>
+        <Field Name="SubCurrencyGLFormat">
+          <DataField>SubCurrencyGLFormat</DataField>
+        </Field>
+        <Field Name="Reference_AuditRoll">
+          <DataField>Reference_AuditRoll</DataField>
+        </Field>
+        <Field Name="AmountIncludingVAT_AuditRollPayment">
+          <DataField>AmountIncludingVAT_AuditRollPayment</DataField>
+        </Field>
+        <Field Name="AmountIncludingVAT_AuditRollPaymentFormat">
+          <DataField>AmountIncludingVAT_AuditRollPaymentFormat</DataField>
+        </Field>
+        <Field Name="Balance_Customer">
+          <DataField>Balance_Customer</DataField>
+        </Field>
+        <Field Name="Balance_CustomerFormat">
+          <DataField>Balance_CustomerFormat</DataField>
+        </Field>
+        <Field Name="BalanceBefore_Customer">
+          <DataField>BalanceBefore_Customer</DataField>
+        </Field>
+        <Field Name="BalanceBefore_CustomerFormat">
+          <DataField>BalanceBefore_CustomerFormat</DataField>
+        </Field>
+        <Field Name="ShowAmountInclVatPayment">
+          <DataField>ShowAmountInclVatPayment</DataField>
+        </Field>
+        <Field Name="ShowAdditionalInfo">
+          <DataField>ShowAdditionalInfo</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

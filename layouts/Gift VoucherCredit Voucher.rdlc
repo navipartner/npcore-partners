@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,358 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="PageNoCaptionLbl">
-          <DataField>PageNoCaptionLbl</DataField>
-        </Field>
-        <Field Name="Report_Caption">
-          <DataField>Report_Caption</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="Gift_Voucher_Caption">
-          <DataField>Gift_Voucher_Caption</DataField>
-        </Field>
-        <Field Name="No_Caption">
-          <DataField>No_Caption</DataField>
-        </Field>
-        <Field Name="Sales_Ticket_No_Caption">
-          <DataField>Sales_Ticket_No_Caption</DataField>
-        </Field>
-        <Field Name="Issue_Date_Caption">
-          <DataField>Issue_Date_Caption</DataField>
-        </Field>
-        <Field Name="Cashed_Date_Caption">
-          <DataField>Cashed_Date_Caption</DataField>
-        </Field>
-        <Field Name="Status_Caption">
-          <DataField>Status_Caption</DataField>
-        </Field>
-        <Field Name="Amount_Caption">
-          <DataField>Amount_Caption</DataField>
-        </Field>
-        <Field Name="Gift_Voucher_Total_Caption">
-          <DataField>Gift_Voucher_Total_Caption</DataField>
-        </Field>
-        <Field Name="Credit_Voucher_Caption">
-          <DataField>Credit_Voucher_Caption</DataField>
-        </Field>
-        <Field Name="Credit_Voucher_Total_Caption">
-          <DataField>Credit_Voucher_Total_Caption</DataField>
-        </Field>
-        <Field Name="Total_Caption">
-          <DataField>Total_Caption</DataField>
-        </Field>
-        <Field Name="Pct_Caption">
-          <DataField>Pct_Caption</DataField>
-        </Field>
-        <Field Name="Cashed_Caption">
-          <DataField>Cashed_Caption</DataField>
-        </Field>
-        <Field Name="Open_Caption">
-          <DataField>Open_Caption</DataField>
-        </Field>
-        <Field Name="Cancelled_Caption">
-          <DataField>Cancelled_Caption</DataField>
-        </Field>
-        <Field Name="Key_Figures_Caption">
-          <DataField>Key_Figures_Caption</DataField>
-        </Field>
-        <Field Name="Total_GL_Accounts_Caption">
-          <DataField>Total_GL_Accounts_Caption</DataField>
-        </Field>
-        <Field Name="Gift_Vouchers_Caption">
-          <DataField>Gift_Vouchers_Caption</DataField>
-        </Field>
-        <Field Name="Credit_Vouchers_Caption">
-          <DataField>Credit_Vouchers_Caption</DataField>
-        </Field>
-        <Field Name="Gift_Credit_Total_Caption">
-          <DataField>Gift_Credit_Total_Caption</DataField>
-        </Field>
-        <Field Name="ShowGiftOnly">
-          <DataField>ShowGiftOnly</DataField>
-        </Field>
-        <Field Name="ShowCreditOnly">
-          <DataField>ShowCreditOnly</DataField>
-        </Field>
-        <Field Name="ShowPosting">
-          <DataField>ShowPosting</DataField>
-        </Field>
-        <Field Name="Number_Integer">
-          <DataField>Number_Integer</DataField>
-        </Field>
-        <Field Name="GV_Filters">
-          <DataField>GV_Filters</DataField>
-        </Field>
-        <Field Name="AddFilters">
-          <DataField>AddFilters</DataField>
-        </Field>
-        <Field Name="No_Gift_Voucher">
-          <DataField>No_Gift_Voucher</DataField>
-        </Field>
-        <Field Name="Sales_Ticket_No_Gift_Voucher">
-          <DataField>Sales_Ticket_No_Gift_Voucher</DataField>
-        </Field>
-        <Field Name="Issue_Date_Gift_Voucher">
-          <DataField>Issue_Date_Gift_Voucher</DataField>
-        </Field>
-        <Field Name="Cashed_Date_Gift_Voucher">
-          <DataField>Cashed_Date_Gift_Voucher</DataField>
-        </Field>
-        <Field Name="Status_Gift_Voucher">
-          <DataField>Status_Gift_Voucher</DataField>
-        </Field>
-        <Field Name="Amount_Gift_Voucher">
-          <DataField>Amount_Gift_Voucher</DataField>
-        </Field>
-        <Field Name="Amount_Gift_VoucherFormat">
-          <DataField>Amount_Gift_VoucherFormat</DataField>
-        </Field>
-        <Field Name="Gift_Voucher_Filters">
-          <DataField>Gift_Voucher_Filters</DataField>
-        </Field>
-        <Field Name="No_Credit_Voucher">
-          <DataField>No_Credit_Voucher</DataField>
-        </Field>
-        <Field Name="Sales_Ticket_No_Credit_Voucher">
-          <DataField>Sales_Ticket_No_Credit_Voucher</DataField>
-        </Field>
-        <Field Name="Issue_Date_Credit_Voucher">
-          <DataField>Issue_Date_Credit_Voucher</DataField>
-        </Field>
-        <Field Name="Cashed_Date_Credit_Voucher">
-          <DataField>Cashed_Date_Credit_Voucher</DataField>
-        </Field>
-        <Field Name="Status_Credit_Voucher">
-          <DataField>Status_Credit_Voucher</DataField>
-        </Field>
-        <Field Name="Amount_Credit_Voucher">
-          <DataField>Amount_Credit_Voucher</DataField>
-        </Field>
-        <Field Name="Amount_Credit_VoucherFormat">
-          <DataField>Amount_Credit_VoucherFormat</DataField>
-        </Field>
-        <Field Name="Credit_Voucher_FILTERS">
-          <DataField>Credit_Voucher_FILTERS</DataField>
-        </Field>
-        <Field Name="No_GiftVoucherCashed">
-          <DataField>No_GiftVoucherCashed</DataField>
-        </Field>
-        <Field Name="Sales_Ticket_No_GiftVoucherCashed">
-          <DataField>Sales_Ticket_No_GiftVoucherCashed</DataField>
-        </Field>
-        <Field Name="Issue_Date_GiftVoucherCashed">
-          <DataField>Issue_Date_GiftVoucherCashed</DataField>
-        </Field>
-        <Field Name="Cashed_Date_GiftVoucherCashed">
-          <DataField>Cashed_Date_GiftVoucherCashed</DataField>
-        </Field>
-        <Field Name="Status_GiftVoucherCashed">
-          <DataField>Status_GiftVoucherCashed</DataField>
-        </Field>
-        <Field Name="Amount_GiftVoucherCashed">
-          <DataField>Amount_GiftVoucherCashed</DataField>
-        </Field>
-        <Field Name="Amount_GiftVoucherCashedFormat">
-          <DataField>Amount_GiftVoucherCashedFormat</DataField>
-        </Field>
-        <Field Name="GiftVoucherCashed_FILTERS">
-          <DataField>GiftVoucherCashed_FILTERS</DataField>
-        </Field>
-        <Field Name="Number_Integer_GiftVoucher">
-          <DataField>Number_Integer_GiftVoucher</DataField>
-        </Field>
-        <Field Name="TestVar">
-          <DataField>TestVar</DataField>
-        </Field>
-        <Field Name="TestVarFormat">
-          <DataField>TestVarFormat</DataField>
-        </Field>
-        <Field Name="TotalAmtGV">
-          <DataField>TotalAmtGV</DataField>
-        </Field>
-        <Field Name="TotalAmtGVFormat">
-          <DataField>TotalAmtGVFormat</DataField>
-        </Field>
-        <Field Name="TotalCancelledGV">
-          <DataField>TotalCancelledGV</DataField>
-        </Field>
-        <Field Name="TotalCancelledGVFormat">
-          <DataField>TotalCancelledGVFormat</DataField>
-        </Field>
-        <Field Name="TotalRedeemedGV">
-          <DataField>TotalRedeemedGV</DataField>
-        </Field>
-        <Field Name="TotalRedeemedGVFormat">
-          <DataField>TotalRedeemedGVFormat</DataField>
-        </Field>
-        <Field Name="TotalOpenGV">
-          <DataField>TotalOpenGV</DataField>
-        </Field>
-        <Field Name="TotalOpenGVFormat">
-          <DataField>TotalOpenGVFormat</DataField>
-        </Field>
-        <Field Name="PercentGV">
-          <DataField>PercentGV</DataField>
-        </Field>
-        <Field Name="PercentGVFormat">
-          <DataField>PercentGVFormat</DataField>
-        </Field>
-        <Field Name="PercentGVDiff">
-          <DataField>PercentGVDiff</DataField>
-        </Field>
-        <Field Name="PercentGVDiffFormat">
-          <DataField>PercentGVDiffFormat</DataField>
-        </Field>
-        <Field Name="No_CreditVoucherCashed">
-          <DataField>No_CreditVoucherCashed</DataField>
-        </Field>
-        <Field Name="Sales_Ticket_No_CreditVoucherCashed">
-          <DataField>Sales_Ticket_No_CreditVoucherCashed</DataField>
-        </Field>
-        <Field Name="Issue_Date_CreditVoucherCashed">
-          <DataField>Issue_Date_CreditVoucherCashed</DataField>
-        </Field>
-        <Field Name="Cashed_Date_CreditVoucherCashed">
-          <DataField>Cashed_Date_CreditVoucherCashed</DataField>
-        </Field>
-        <Field Name="Status_Credit_CreditVoucherCashed">
-          <DataField>Status_Credit_CreditVoucherCashed</DataField>
-        </Field>
-        <Field Name="Amount_Credit_CreditVoucherCashed">
-          <DataField>Amount_Credit_CreditVoucherCashed</DataField>
-        </Field>
-        <Field Name="Amount_Credit_CreditVoucherCashedFormat">
-          <DataField>Amount_Credit_CreditVoucherCashedFormat</DataField>
-        </Field>
-        <Field Name="CreditVoucherCashed_FILTERS">
-          <DataField>CreditVoucherCashed_FILTERS</DataField>
-        </Field>
-        <Field Name="Number_Integer_CreditVoucher">
-          <DataField>Number_Integer_CreditVoucher</DataField>
-        </Field>
-        <Field Name="TotalAmtCV">
-          <DataField>TotalAmtCV</DataField>
-        </Field>
-        <Field Name="TotalAmtCVFormat">
-          <DataField>TotalAmtCVFormat</DataField>
-        </Field>
-        <Field Name="TotalCancelledCV">
-          <DataField>TotalCancelledCV</DataField>
-        </Field>
-        <Field Name="TotalCancelledCVFormat">
-          <DataField>TotalCancelledCVFormat</DataField>
-        </Field>
-        <Field Name="TotalRedeemedCV">
-          <DataField>TotalRedeemedCV</DataField>
-        </Field>
-        <Field Name="TotalRedeemedCVFormat">
-          <DataField>TotalRedeemedCVFormat</DataField>
-        </Field>
-        <Field Name="TotalOpenCV">
-          <DataField>TotalOpenCV</DataField>
-        </Field>
-        <Field Name="TotalOpenCVFormat">
-          <DataField>TotalOpenCVFormat</DataField>
-        </Field>
-        <Field Name="PercentCV">
-          <DataField>PercentCV</DataField>
-        </Field>
-        <Field Name="PercentCVFormat">
-          <DataField>PercentCVFormat</DataField>
-        </Field>
-        <Field Name="PercentCVDiff">
-          <DataField>PercentCVDiff</DataField>
-        </Field>
-        <Field Name="PercentCVDiffFormat">
-          <DataField>PercentCVDiffFormat</DataField>
-        </Field>
-        <Field Name="Number_Integer2_CreditVoucher">
-          <DataField>Number_Integer2_CreditVoucher</DataField>
-        </Field>
-        <Field Name="TotalAmount">
-          <DataField>TotalAmount</DataField>
-        </Field>
-        <Field Name="TotalAmountFormat">
-          <DataField>TotalAmountFormat</DataField>
-        </Field>
-        <Field Name="TotalCancelled">
-          <DataField>TotalCancelled</DataField>
-        </Field>
-        <Field Name="TotalCancelledFormat">
-          <DataField>TotalCancelledFormat</DataField>
-        </Field>
-        <Field Name="TotalRedeemedAmt">
-          <DataField>TotalRedeemedAmt</DataField>
-        </Field>
-        <Field Name="TotalRedeemedAmtFormat">
-          <DataField>TotalRedeemedAmtFormat</DataField>
-        </Field>
-        <Field Name="TotalOpenAmt">
-          <DataField>TotalOpenAmt</DataField>
-        </Field>
-        <Field Name="TotalOpenAmtFormat">
-          <DataField>TotalOpenAmtFormat</DataField>
-        </Field>
-        <Field Name="PercentRedeemed">
-          <DataField>PercentRedeemed</DataField>
-        </Field>
-        <Field Name="PercentRedeemedFormat">
-          <DataField>PercentRedeemedFormat</DataField>
-        </Field>
-        <Field Name="PercentOpen">
-          <DataField>PercentOpen</DataField>
-        </Field>
-        <Field Name="PercentOpenFormat">
-          <DataField>PercentOpenFormat</DataField>
-        </Field>
-        <Field Name="TotalRedeemedPctGV">
-          <DataField>TotalRedeemedPctGV</DataField>
-        </Field>
-        <Field Name="TotalRedeemedPctGVFormat">
-          <DataField>TotalRedeemedPctGVFormat</DataField>
-        </Field>
-        <Field Name="TotalRedeemedPctCV">
-          <DataField>TotalRedeemedPctCV</DataField>
-        </Field>
-        <Field Name="TotalRedeemedPctCVFormat">
-          <DataField>TotalRedeemedPctCVFormat</DataField>
-        </Field>
-        <Field Name="No_G_L_Account">
-          <DataField>No_G_L_Account</DataField>
-        </Field>
-        <Field Name="G_L_Account_FILTERS">
-          <DataField>G_L_Account_FILTERS</DataField>
-        </Field>
-        <Field Name="SalesGV">
-          <DataField>SalesGV</DataField>
-        </Field>
-        <Field Name="SalesGVFormat">
-          <DataField>SalesGVFormat</DataField>
-        </Field>
-        <Field Name="SalesCV">
-          <DataField>SalesCV</DataField>
-        </Field>
-        <Field Name="SalesCVFormat">
-          <DataField>SalesCVFormat</DataField>
-        </Field>
-        <Field Name="GVAccountNo">
-          <DataField>GVAccountNo</DataField>
-        </Field>
-        <Field Name="CVAccountNo">
-          <DataField>CVAccountNo</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -13761,4 +13409,356 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="PageNoCaptionLbl">
+          <DataField>PageNoCaptionLbl</DataField>
+        </Field>
+        <Field Name="Report_Caption">
+          <DataField>Report_Caption</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="Gift_Voucher_Caption">
+          <DataField>Gift_Voucher_Caption</DataField>
+        </Field>
+        <Field Name="No_Caption">
+          <DataField>No_Caption</DataField>
+        </Field>
+        <Field Name="Sales_Ticket_No_Caption">
+          <DataField>Sales_Ticket_No_Caption</DataField>
+        </Field>
+        <Field Name="Issue_Date_Caption">
+          <DataField>Issue_Date_Caption</DataField>
+        </Field>
+        <Field Name="Cashed_Date_Caption">
+          <DataField>Cashed_Date_Caption</DataField>
+        </Field>
+        <Field Name="Status_Caption">
+          <DataField>Status_Caption</DataField>
+        </Field>
+        <Field Name="Amount_Caption">
+          <DataField>Amount_Caption</DataField>
+        </Field>
+        <Field Name="Gift_Voucher_Total_Caption">
+          <DataField>Gift_Voucher_Total_Caption</DataField>
+        </Field>
+        <Field Name="Credit_Voucher_Caption">
+          <DataField>Credit_Voucher_Caption</DataField>
+        </Field>
+        <Field Name="Credit_Voucher_Total_Caption">
+          <DataField>Credit_Voucher_Total_Caption</DataField>
+        </Field>
+        <Field Name="Total_Caption">
+          <DataField>Total_Caption</DataField>
+        </Field>
+        <Field Name="Pct_Caption">
+          <DataField>Pct_Caption</DataField>
+        </Field>
+        <Field Name="Cashed_Caption">
+          <DataField>Cashed_Caption</DataField>
+        </Field>
+        <Field Name="Open_Caption">
+          <DataField>Open_Caption</DataField>
+        </Field>
+        <Field Name="Cancelled_Caption">
+          <DataField>Cancelled_Caption</DataField>
+        </Field>
+        <Field Name="Key_Figures_Caption">
+          <DataField>Key_Figures_Caption</DataField>
+        </Field>
+        <Field Name="Total_GL_Accounts_Caption">
+          <DataField>Total_GL_Accounts_Caption</DataField>
+        </Field>
+        <Field Name="Gift_Vouchers_Caption">
+          <DataField>Gift_Vouchers_Caption</DataField>
+        </Field>
+        <Field Name="Credit_Vouchers_Caption">
+          <DataField>Credit_Vouchers_Caption</DataField>
+        </Field>
+        <Field Name="Gift_Credit_Total_Caption">
+          <DataField>Gift_Credit_Total_Caption</DataField>
+        </Field>
+        <Field Name="ShowGiftOnly">
+          <DataField>ShowGiftOnly</DataField>
+        </Field>
+        <Field Name="ShowCreditOnly">
+          <DataField>ShowCreditOnly</DataField>
+        </Field>
+        <Field Name="ShowPosting">
+          <DataField>ShowPosting</DataField>
+        </Field>
+        <Field Name="Number_Integer">
+          <DataField>Number_Integer</DataField>
+        </Field>
+        <Field Name="GV_Filters">
+          <DataField>GV_Filters</DataField>
+        </Field>
+        <Field Name="AddFilters">
+          <DataField>AddFilters</DataField>
+        </Field>
+        <Field Name="No_Gift_Voucher">
+          <DataField>No_Gift_Voucher</DataField>
+        </Field>
+        <Field Name="Sales_Ticket_No_Gift_Voucher">
+          <DataField>Sales_Ticket_No_Gift_Voucher</DataField>
+        </Field>
+        <Field Name="Issue_Date_Gift_Voucher">
+          <DataField>Issue_Date_Gift_Voucher</DataField>
+        </Field>
+        <Field Name="Cashed_Date_Gift_Voucher">
+          <DataField>Cashed_Date_Gift_Voucher</DataField>
+        </Field>
+        <Field Name="Status_Gift_Voucher">
+          <DataField>Status_Gift_Voucher</DataField>
+        </Field>
+        <Field Name="Amount_Gift_Voucher">
+          <DataField>Amount_Gift_Voucher</DataField>
+        </Field>
+        <Field Name="Amount_Gift_VoucherFormat">
+          <DataField>Amount_Gift_VoucherFormat</DataField>
+        </Field>
+        <Field Name="Gift_Voucher_Filters">
+          <DataField>Gift_Voucher_Filters</DataField>
+        </Field>
+        <Field Name="No_Credit_Voucher">
+          <DataField>No_Credit_Voucher</DataField>
+        </Field>
+        <Field Name="Sales_Ticket_No_Credit_Voucher">
+          <DataField>Sales_Ticket_No_Credit_Voucher</DataField>
+        </Field>
+        <Field Name="Issue_Date_Credit_Voucher">
+          <DataField>Issue_Date_Credit_Voucher</DataField>
+        </Field>
+        <Field Name="Cashed_Date_Credit_Voucher">
+          <DataField>Cashed_Date_Credit_Voucher</DataField>
+        </Field>
+        <Field Name="Status_Credit_Voucher">
+          <DataField>Status_Credit_Voucher</DataField>
+        </Field>
+        <Field Name="Amount_Credit_Voucher">
+          <DataField>Amount_Credit_Voucher</DataField>
+        </Field>
+        <Field Name="Amount_Credit_VoucherFormat">
+          <DataField>Amount_Credit_VoucherFormat</DataField>
+        </Field>
+        <Field Name="Credit_Voucher_FILTERS">
+          <DataField>Credit_Voucher_FILTERS</DataField>
+        </Field>
+        <Field Name="No_GiftVoucherCashed">
+          <DataField>No_GiftVoucherCashed</DataField>
+        </Field>
+        <Field Name="Sales_Ticket_No_GiftVoucherCashed">
+          <DataField>Sales_Ticket_No_GiftVoucherCashed</DataField>
+        </Field>
+        <Field Name="Issue_Date_GiftVoucherCashed">
+          <DataField>Issue_Date_GiftVoucherCashed</DataField>
+        </Field>
+        <Field Name="Cashed_Date_GiftVoucherCashed">
+          <DataField>Cashed_Date_GiftVoucherCashed</DataField>
+        </Field>
+        <Field Name="Status_GiftVoucherCashed">
+          <DataField>Status_GiftVoucherCashed</DataField>
+        </Field>
+        <Field Name="Amount_GiftVoucherCashed">
+          <DataField>Amount_GiftVoucherCashed</DataField>
+        </Field>
+        <Field Name="Amount_GiftVoucherCashedFormat">
+          <DataField>Amount_GiftVoucherCashedFormat</DataField>
+        </Field>
+        <Field Name="GiftVoucherCashed_FILTERS">
+          <DataField>GiftVoucherCashed_FILTERS</DataField>
+        </Field>
+        <Field Name="Number_Integer_GiftVoucher">
+          <DataField>Number_Integer_GiftVoucher</DataField>
+        </Field>
+        <Field Name="TestVar">
+          <DataField>TestVar</DataField>
+        </Field>
+        <Field Name="TestVarFormat">
+          <DataField>TestVarFormat</DataField>
+        </Field>
+        <Field Name="TotalAmtGV">
+          <DataField>TotalAmtGV</DataField>
+        </Field>
+        <Field Name="TotalAmtGVFormat">
+          <DataField>TotalAmtGVFormat</DataField>
+        </Field>
+        <Field Name="TotalCancelledGV">
+          <DataField>TotalCancelledGV</DataField>
+        </Field>
+        <Field Name="TotalCancelledGVFormat">
+          <DataField>TotalCancelledGVFormat</DataField>
+        </Field>
+        <Field Name="TotalRedeemedGV">
+          <DataField>TotalRedeemedGV</DataField>
+        </Field>
+        <Field Name="TotalRedeemedGVFormat">
+          <DataField>TotalRedeemedGVFormat</DataField>
+        </Field>
+        <Field Name="TotalOpenGV">
+          <DataField>TotalOpenGV</DataField>
+        </Field>
+        <Field Name="TotalOpenGVFormat">
+          <DataField>TotalOpenGVFormat</DataField>
+        </Field>
+        <Field Name="PercentGV">
+          <DataField>PercentGV</DataField>
+        </Field>
+        <Field Name="PercentGVFormat">
+          <DataField>PercentGVFormat</DataField>
+        </Field>
+        <Field Name="PercentGVDiff">
+          <DataField>PercentGVDiff</DataField>
+        </Field>
+        <Field Name="PercentGVDiffFormat">
+          <DataField>PercentGVDiffFormat</DataField>
+        </Field>
+        <Field Name="No_CreditVoucherCashed">
+          <DataField>No_CreditVoucherCashed</DataField>
+        </Field>
+        <Field Name="Sales_Ticket_No_CreditVoucherCashed">
+          <DataField>Sales_Ticket_No_CreditVoucherCashed</DataField>
+        </Field>
+        <Field Name="Issue_Date_CreditVoucherCashed">
+          <DataField>Issue_Date_CreditVoucherCashed</DataField>
+        </Field>
+        <Field Name="Cashed_Date_CreditVoucherCashed">
+          <DataField>Cashed_Date_CreditVoucherCashed</DataField>
+        </Field>
+        <Field Name="Status_Credit_CreditVoucherCashed">
+          <DataField>Status_Credit_CreditVoucherCashed</DataField>
+        </Field>
+        <Field Name="Amount_Credit_CreditVoucherCashed">
+          <DataField>Amount_Credit_CreditVoucherCashed</DataField>
+        </Field>
+        <Field Name="Amount_Credit_CreditVoucherCashedFormat">
+          <DataField>Amount_Credit_CreditVoucherCashedFormat</DataField>
+        </Field>
+        <Field Name="CreditVoucherCashed_FILTERS">
+          <DataField>CreditVoucherCashed_FILTERS</DataField>
+        </Field>
+        <Field Name="Number_Integer_CreditVoucher">
+          <DataField>Number_Integer_CreditVoucher</DataField>
+        </Field>
+        <Field Name="TotalAmtCV">
+          <DataField>TotalAmtCV</DataField>
+        </Field>
+        <Field Name="TotalAmtCVFormat">
+          <DataField>TotalAmtCVFormat</DataField>
+        </Field>
+        <Field Name="TotalCancelledCV">
+          <DataField>TotalCancelledCV</DataField>
+        </Field>
+        <Field Name="TotalCancelledCVFormat">
+          <DataField>TotalCancelledCVFormat</DataField>
+        </Field>
+        <Field Name="TotalRedeemedCV">
+          <DataField>TotalRedeemedCV</DataField>
+        </Field>
+        <Field Name="TotalRedeemedCVFormat">
+          <DataField>TotalRedeemedCVFormat</DataField>
+        </Field>
+        <Field Name="TotalOpenCV">
+          <DataField>TotalOpenCV</DataField>
+        </Field>
+        <Field Name="TotalOpenCVFormat">
+          <DataField>TotalOpenCVFormat</DataField>
+        </Field>
+        <Field Name="PercentCV">
+          <DataField>PercentCV</DataField>
+        </Field>
+        <Field Name="PercentCVFormat">
+          <DataField>PercentCVFormat</DataField>
+        </Field>
+        <Field Name="PercentCVDiff">
+          <DataField>PercentCVDiff</DataField>
+        </Field>
+        <Field Name="PercentCVDiffFormat">
+          <DataField>PercentCVDiffFormat</DataField>
+        </Field>
+        <Field Name="Number_Integer2_CreditVoucher">
+          <DataField>Number_Integer2_CreditVoucher</DataField>
+        </Field>
+        <Field Name="TotalAmount">
+          <DataField>TotalAmount</DataField>
+        </Field>
+        <Field Name="TotalAmountFormat">
+          <DataField>TotalAmountFormat</DataField>
+        </Field>
+        <Field Name="TotalCancelled">
+          <DataField>TotalCancelled</DataField>
+        </Field>
+        <Field Name="TotalCancelledFormat">
+          <DataField>TotalCancelledFormat</DataField>
+        </Field>
+        <Field Name="TotalRedeemedAmt">
+          <DataField>TotalRedeemedAmt</DataField>
+        </Field>
+        <Field Name="TotalRedeemedAmtFormat">
+          <DataField>TotalRedeemedAmtFormat</DataField>
+        </Field>
+        <Field Name="TotalOpenAmt">
+          <DataField>TotalOpenAmt</DataField>
+        </Field>
+        <Field Name="TotalOpenAmtFormat">
+          <DataField>TotalOpenAmtFormat</DataField>
+        </Field>
+        <Field Name="PercentRedeemed">
+          <DataField>PercentRedeemed</DataField>
+        </Field>
+        <Field Name="PercentRedeemedFormat">
+          <DataField>PercentRedeemedFormat</DataField>
+        </Field>
+        <Field Name="PercentOpen">
+          <DataField>PercentOpen</DataField>
+        </Field>
+        <Field Name="PercentOpenFormat">
+          <DataField>PercentOpenFormat</DataField>
+        </Field>
+        <Field Name="TotalRedeemedPctGV">
+          <DataField>TotalRedeemedPctGV</DataField>
+        </Field>
+        <Field Name="TotalRedeemedPctGVFormat">
+          <DataField>TotalRedeemedPctGVFormat</DataField>
+        </Field>
+        <Field Name="TotalRedeemedPctCV">
+          <DataField>TotalRedeemedPctCV</DataField>
+        </Field>
+        <Field Name="TotalRedeemedPctCVFormat">
+          <DataField>TotalRedeemedPctCVFormat</DataField>
+        </Field>
+        <Field Name="No_G_L_Account">
+          <DataField>No_G_L_Account</DataField>
+        </Field>
+        <Field Name="G_L_Account_FILTERS">
+          <DataField>G_L_Account_FILTERS</DataField>
+        </Field>
+        <Field Name="SalesGV">
+          <DataField>SalesGV</DataField>
+        </Field>
+        <Field Name="SalesGVFormat">
+          <DataField>SalesGVFormat</DataField>
+        </Field>
+        <Field Name="SalesCV">
+          <DataField>SalesCV</DataField>
+        </Field>
+        <Field Name="SalesCVFormat">
+          <DataField>SalesCVFormat</DataField>
+        </Field>
+        <Field Name="GVAccountNo">
+          <DataField>GVAccountNo</DataField>
+        </Field>
+        <Field Name="CVAccountNo">
+          <DataField>CVAccountNo</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

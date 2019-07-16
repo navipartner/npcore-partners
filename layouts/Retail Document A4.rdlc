@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,250 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="DocumentType_RetailDocumentHeader">
-          <DataField>DocumentType_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="No_RetailDocumentHeader">
-          <DataField>No_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="CurrReport_PAGENO">
-          <DataField>CurrReport_PAGENO</DataField>
-        </Field>
-        <Field Name="ObjectDetails">
-          <DataField>ObjectDetails</DataField>
-        </Field>
-        <Field Name="invoiceCustomer_1_RetailDocumentHeader">
-          <DataField>invoiceCustomer_1_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="invoiceCustomer_2_RetailDocumentHeader">
-          <DataField>invoiceCustomer_2_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="invoiceCustomer_3_RetailDocumentHeader">
-          <DataField>invoiceCustomer_3_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="invoiceCustomer_4_RetailDocumentHeader">
-          <DataField>invoiceCustomer_4_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="invoiceCustomer_5_RetailDocumentHeader">
-          <DataField>invoiceCustomer_5_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="invoiceCustomer_6_RetailDocumentHeader">
-          <DataField>invoiceCustomer_6_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="invoiceCustomer_7_RetailDocumentHeader">
-          <DataField>invoiceCustomer_7_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="docType_RetailDocumentHeader">
-          <DataField>docType_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="firmanavn_1_RetailDocumentHeader">
-          <DataField>firmanavn_1_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="firmanavn_2_RetailDocumentHeader">
-          <DataField>firmanavn_2_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="firmanavn_3_RetailDocumentHeader">
-          <DataField>firmanavn_3_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="firmanavn_4_RetailDocumentHeader">
-          <DataField>firmanavn_4_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="firmanavn_5_RetailDocumentHeader">
-          <DataField>firmanavn_5_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="firmanavn_6_RetailDocumentHeader">
-          <DataField>firmanavn_6_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="firmanavn_7_RetailDocumentHeader">
-          <DataField>firmanavn_7_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="firmanavn_8_RetailDocumentHeader">
-          <DataField>firmanavn_8_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="CustomerNo_RetailDocumentHeader">
-          <DataField>CustomerNo_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="Phone_RetailDocumentHeader">
-          <DataField>Phone_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="Mobile_RetailDocumentHeader">
-          <DataField>Mobile_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="ShiptoAttention_RetailDocumentHeader">
-          <DataField>ShiptoAttention_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="salesperson_Name_RetailDocumentHeader">
-          <DataField>salesperson_Name_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="DocumentDate_RetailDocumentHeader">
-          <DataField>DocumentDate_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="Timeofday_RetailDocumentHeader">
-          <DataField>Timeofday_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="debadr_1_RetailDocumentHeader">
-          <DataField>debadr_1_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="debadr_2_RetailDocumentHeader">
-          <DataField>debadr_2_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="debadr_3_RetailDocumentHeader">
-          <DataField>debadr_3_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="debadr_4_RetailDocumentHeader">
-          <DataField>debadr_4_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="debadr_5_RetailDocumentHeader">
-          <DataField>debadr_5_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="txtWoy_RetailDocumentHeader">
-          <DataField>txtWoy_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="dow_RetailDocumentHeader">
-          <DataField>dow_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="Deliverydate_RetailDocumentHeader">
-          <DataField>Deliverydate_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="Deliverytime1_RetailDocumentHeader">
-          <DataField>Deliverytime1_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="Deliverytime2_RetailDocumentHeader">
-          <DataField>Deliverytime2_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="ResourceShipbynpersons_RetailDocumentHeader">
-          <DataField>ResourceShipbynpersons_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="bem_1_RetailDocumentHeader">
-          <DataField>bem_1_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="bem_2_RetailDocumentHeader">
-          <DataField>bem_2_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="bem_3_RetailDocumentHeader">
-          <DataField>bem_3_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="totalAmount">
-          <DataField>totalAmount</DataField>
-        </Field>
-        <Field Name="totalAmountFormat">
-          <DataField>totalAmountFormat</DataField>
-        </Field>
-        <Field Name="totalVAT">
-          <DataField>totalVAT</DataField>
-        </Field>
-        <Field Name="totalVATFormat">
-          <DataField>totalVATFormat</DataField>
-        </Field>
-        <Field Name="totalAmountVAT">
-          <DataField>totalAmountVAT</DataField>
-        </Field>
-        <Field Name="totalAmountVATFormat">
-          <DataField>totalAmountVATFormat</DataField>
-        </Field>
-        <Field Name="Deposit_actual">
-          <DataField>Deposit_actual</DataField>
-        </Field>
-        <Field Name="Deposit_actualFormat">
-          <DataField>Deposit_actualFormat</DataField>
-        </Field>
-        <Field Name="DueAmt">
-          <DataField>DueAmt</DataField>
-        </Field>
-        <Field Name="DueAmtFormat">
-          <DataField>DueAmtFormat</DataField>
-        </Field>
-        <Field Name="PaymentTerms_Description">
-          <DataField>PaymentTerms_Description</DataField>
-        </Field>
-        <Field Name="DueDate">
-          <DataField>DueDate</DataField>
-        </Field>
-        <Field Name="CurrencyCode_RetailDocumentHeader">
-          <DataField>CurrencyCode_RetailDocumentHeader</DataField>
-        </Field>
-        <Field Name="txtCashed">
-          <DataField>txtCashed</DataField>
-        </Field>
-        <Field Name="No_RetailDocumentLines">
-          <DataField>No_RetailDocumentLines</DataField>
-        </Field>
-        <Field Name="LineNo_RetailDocumentLines">
-          <DataField>LineNo_RetailDocumentLines</DataField>
-        </Field>
-        <Field Name="Description_RetailDocumentLines">
-          <DataField>Description_RetailDocumentLines</DataField>
-        </Field>
-        <Field Name="Quantity_RetailDocumentLines">
-          <DataField>Quantity_RetailDocumentLines</DataField>
-        </Field>
-        <Field Name="Quantity_RetailDocumentLinesFormat">
-          <DataField>Quantity_RetailDocumentLinesFormat</DataField>
-        </Field>
-        <Field Name="Unitprice_RetailDocumentLines">
-          <DataField>Unitprice_RetailDocumentLines</DataField>
-        </Field>
-        <Field Name="Unitprice_RetailDocumentLinesFormat">
-          <DataField>Unitprice_RetailDocumentLinesFormat</DataField>
-        </Field>
-        <Field Name="txtDiscountPct_RetailDocumentLines">
-          <DataField>txtDiscountPct_RetailDocumentLines</DataField>
-        </Field>
-        <Field Name="txtDiscountPct_RetailDocumentLinesFormat">
-          <DataField>txtDiscountPct_RetailDocumentLinesFormat</DataField>
-        </Field>
-        <Field Name="Amount_RetailDocumentLines">
-          <DataField>Amount_RetailDocumentLines</DataField>
-        </Field>
-        <Field Name="Amount_RetailDocumentLinesFormat">
-          <DataField>Amount_RetailDocumentLinesFormat</DataField>
-        </Field>
-        <Field Name="Linediscountamount_RetailDocumentLines">
-          <DataField>Linediscountamount_RetailDocumentLines</DataField>
-        </Field>
-        <Field Name="Linediscountamount_RetailDocumentLinesFormat">
-          <DataField>Linediscountamount_RetailDocumentLinesFormat</DataField>
-        </Field>
-        <Field Name="ReturnReasonCode_RetailDocumentLines">
-          <DataField>ReturnReasonCode_RetailDocumentLines</DataField>
-        </Field>
-        <Field Name="ReasonCode_RetailDocumentLines">
-          <DataField>ReasonCode_RetailDocumentLines</DataField>
-        </Field>
-        <Field Name="DeliveryTotal_RetailDocumentLines">
-          <DataField>DeliveryTotal_RetailDocumentLines</DataField>
-        </Field>
-        <Field Name="DeliveryTotal_RetailDocumentLinesFormat">
-          <DataField>DeliveryTotal_RetailDocumentLinesFormat</DataField>
-        </Field>
-        <Field Name="Accessory_RetailDocumentLines">
-          <DataField>Accessory_RetailDocumentLines</DataField>
-        </Field>
-        <Field Name="DeliveryItem_RetailDocumentLines">
-          <DataField>DeliveryItem_RetailDocumentLines</DataField>
-        </Field>
-        <Field Name="ShowBody2">
-          <DataField>ShowBody2</DataField>
-        </Field>
-        <Field Name="No_NPRComment">
-          <DataField>No_NPRComment</DataField>
-        </Field>
-        <Field Name="Comment_NPRComment">
-          <DataField>Comment_NPRComment</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -7514,4 +7270,242 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="DocumentType_RetailDocumentHeader">
+          <DataField>DocumentType_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="No_RetailDocumentHeader">
+          <DataField>No_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="invoiceCustomer_1_RetailDocumentHeader">
+          <DataField>invoiceCustomer_1_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="invoiceCustomer_2_RetailDocumentHeader">
+          <DataField>invoiceCustomer_2_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="invoiceCustomer_3_RetailDocumentHeader">
+          <DataField>invoiceCustomer_3_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="invoiceCustomer_4_RetailDocumentHeader">
+          <DataField>invoiceCustomer_4_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="invoiceCustomer_5_RetailDocumentHeader">
+          <DataField>invoiceCustomer_5_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="invoiceCustomer_6_RetailDocumentHeader">
+          <DataField>invoiceCustomer_6_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="invoiceCustomer_7_RetailDocumentHeader">
+          <DataField>invoiceCustomer_7_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="docType_RetailDocumentHeader">
+          <DataField>docType_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="firmanavn_1_RetailDocumentHeader">
+          <DataField>firmanavn_1_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="firmanavn_2_RetailDocumentHeader">
+          <DataField>firmanavn_2_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="firmanavn_3_RetailDocumentHeader">
+          <DataField>firmanavn_3_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="firmanavn_4_RetailDocumentHeader">
+          <DataField>firmanavn_4_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="firmanavn_5_RetailDocumentHeader">
+          <DataField>firmanavn_5_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="firmanavn_6_RetailDocumentHeader">
+          <DataField>firmanavn_6_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="firmanavn_7_RetailDocumentHeader">
+          <DataField>firmanavn_7_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="firmanavn_8_RetailDocumentHeader">
+          <DataField>firmanavn_8_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="CustomerNo_RetailDocumentHeader">
+          <DataField>CustomerNo_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="Phone_RetailDocumentHeader">
+          <DataField>Phone_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="Mobile_RetailDocumentHeader">
+          <DataField>Mobile_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="ShiptoAttention_RetailDocumentHeader">
+          <DataField>ShiptoAttention_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="salesperson_Name_RetailDocumentHeader">
+          <DataField>salesperson_Name_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="DocumentDate_RetailDocumentHeader">
+          <DataField>DocumentDate_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="Timeofday_RetailDocumentHeader">
+          <DataField>Timeofday_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="debadr_1_RetailDocumentHeader">
+          <DataField>debadr_1_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="debadr_2_RetailDocumentHeader">
+          <DataField>debadr_2_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="debadr_3_RetailDocumentHeader">
+          <DataField>debadr_3_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="debadr_4_RetailDocumentHeader">
+          <DataField>debadr_4_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="debadr_5_RetailDocumentHeader">
+          <DataField>debadr_5_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="txtWoy_RetailDocumentHeader">
+          <DataField>txtWoy_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="dow_RetailDocumentHeader">
+          <DataField>dow_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="Deliverydate_RetailDocumentHeader">
+          <DataField>Deliverydate_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="Deliverytime1_RetailDocumentHeader">
+          <DataField>Deliverytime1_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="Deliverytime2_RetailDocumentHeader">
+          <DataField>Deliverytime2_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="ResourceShipbynpersons_RetailDocumentHeader">
+          <DataField>ResourceShipbynpersons_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="bem_1_RetailDocumentHeader">
+          <DataField>bem_1_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="bem_2_RetailDocumentHeader">
+          <DataField>bem_2_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="bem_3_RetailDocumentHeader">
+          <DataField>bem_3_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="totalAmount">
+          <DataField>totalAmount</DataField>
+        </Field>
+        <Field Name="totalAmountFormat">
+          <DataField>totalAmountFormat</DataField>
+        </Field>
+        <Field Name="totalVAT">
+          <DataField>totalVAT</DataField>
+        </Field>
+        <Field Name="totalVATFormat">
+          <DataField>totalVATFormat</DataField>
+        </Field>
+        <Field Name="totalAmountVAT">
+          <DataField>totalAmountVAT</DataField>
+        </Field>
+        <Field Name="totalAmountVATFormat">
+          <DataField>totalAmountVATFormat</DataField>
+        </Field>
+        <Field Name="Deposit_actual">
+          <DataField>Deposit_actual</DataField>
+        </Field>
+        <Field Name="Deposit_actualFormat">
+          <DataField>Deposit_actualFormat</DataField>
+        </Field>
+        <Field Name="DueAmt">
+          <DataField>DueAmt</DataField>
+        </Field>
+        <Field Name="DueAmtFormat">
+          <DataField>DueAmtFormat</DataField>
+        </Field>
+        <Field Name="PaymentTerms_Description">
+          <DataField>PaymentTerms_Description</DataField>
+        </Field>
+        <Field Name="DueDate">
+          <DataField>DueDate</DataField>
+        </Field>
+        <Field Name="CurrencyCode_RetailDocumentHeader">
+          <DataField>CurrencyCode_RetailDocumentHeader</DataField>
+        </Field>
+        <Field Name="txtCashed">
+          <DataField>txtCashed</DataField>
+        </Field>
+        <Field Name="No_RetailDocumentLines">
+          <DataField>No_RetailDocumentLines</DataField>
+        </Field>
+        <Field Name="LineNo_RetailDocumentLines">
+          <DataField>LineNo_RetailDocumentLines</DataField>
+        </Field>
+        <Field Name="Description_RetailDocumentLines">
+          <DataField>Description_RetailDocumentLines</DataField>
+        </Field>
+        <Field Name="Quantity_RetailDocumentLines">
+          <DataField>Quantity_RetailDocumentLines</DataField>
+        </Field>
+        <Field Name="Quantity_RetailDocumentLinesFormat">
+          <DataField>Quantity_RetailDocumentLinesFormat</DataField>
+        </Field>
+        <Field Name="Unitprice_RetailDocumentLines">
+          <DataField>Unitprice_RetailDocumentLines</DataField>
+        </Field>
+        <Field Name="Unitprice_RetailDocumentLinesFormat">
+          <DataField>Unitprice_RetailDocumentLinesFormat</DataField>
+        </Field>
+        <Field Name="txtDiscountPct_RetailDocumentLines">
+          <DataField>txtDiscountPct_RetailDocumentLines</DataField>
+        </Field>
+        <Field Name="txtDiscountPct_RetailDocumentLinesFormat">
+          <DataField>txtDiscountPct_RetailDocumentLinesFormat</DataField>
+        </Field>
+        <Field Name="Amount_RetailDocumentLines">
+          <DataField>Amount_RetailDocumentLines</DataField>
+        </Field>
+        <Field Name="Amount_RetailDocumentLinesFormat">
+          <DataField>Amount_RetailDocumentLinesFormat</DataField>
+        </Field>
+        <Field Name="Linediscountamount_RetailDocumentLines">
+          <DataField>Linediscountamount_RetailDocumentLines</DataField>
+        </Field>
+        <Field Name="Linediscountamount_RetailDocumentLinesFormat">
+          <DataField>Linediscountamount_RetailDocumentLinesFormat</DataField>
+        </Field>
+        <Field Name="ReturnReasonCode_RetailDocumentLines">
+          <DataField>ReturnReasonCode_RetailDocumentLines</DataField>
+        </Field>
+        <Field Name="ReasonCode_RetailDocumentLines">
+          <DataField>ReasonCode_RetailDocumentLines</DataField>
+        </Field>
+        <Field Name="DeliveryTotal_RetailDocumentLines">
+          <DataField>DeliveryTotal_RetailDocumentLines</DataField>
+        </Field>
+        <Field Name="DeliveryTotal_RetailDocumentLinesFormat">
+          <DataField>DeliveryTotal_RetailDocumentLinesFormat</DataField>
+        </Field>
+        <Field Name="Accessory_RetailDocumentLines">
+          <DataField>Accessory_RetailDocumentLines</DataField>
+        </Field>
+        <Field Name="DeliveryItem_RetailDocumentLines">
+          <DataField>DeliveryItem_RetailDocumentLines</DataField>
+        </Field>
+        <Field Name="ShowBody2">
+          <DataField>ShowBody2</DataField>
+        </Field>
+        <Field Name="No_NPRComment">
+          <DataField>No_NPRComment</DataField>
+        </Field>
+        <Field Name="Comment_NPRComment">
+          <DataField>Comment_NPRComment</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

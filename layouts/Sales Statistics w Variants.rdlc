@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,190 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="USERID">
-          <DataField>USERID</DataField>
-        </Field>
-        <Field Name="ItemVendorNo">
-          <DataField>ItemVendorNo</DataField>
-        </Field>
-        <Field Name="No_Item">
-          <DataField>No_Item</DataField>
-        </Field>
-        <Field Name="Description_Item">
-          <DataField>Description_Item</DataField>
-        </Field>
-        <Field Name="VendorItemNo_Item">
-          <DataField>VendorItemNo_Item</DataField>
-        </Field>
-        <Field Name="InvPostGroup_Item">
-          <DataField>InvPostGroup_Item</DataField>
-        </Field>
-        <Field Name="SalesQty_Item">
-          <DataField>SalesQty_Item</DataField>
-        </Field>
-        <Field Name="SalesQty_ItemFormat">
-          <DataField>SalesQty_ItemFormat</DataField>
-        </Field>
-        <Field Name="SalesAmount_Item">
-          <DataField>SalesAmount_Item</DataField>
-        </Field>
-        <Field Name="SalesAmount_ItemFormat">
-          <DataField>SalesAmount_ItemFormat</DataField>
-        </Field>
-        <Field Name="ItemProfit_Item">
-          <DataField>ItemProfit_Item</DataField>
-        </Field>
-        <Field Name="ItemProfit_ItemFormat">
-          <DataField>ItemProfit_ItemFormat</DataField>
-        </Field>
-        <Field Name="ItemProfitPct_Item">
-          <DataField>ItemProfitPct_Item</DataField>
-        </Field>
-        <Field Name="ItemProfitPct_ItemFormat">
-          <DataField>ItemProfitPct_ItemFormat</DataField>
-        </Field>
-        <Field Name="ItemInventory_Item">
-          <DataField>ItemInventory_Item</DataField>
-        </Field>
-        <Field Name="ItemInventory_ItemFormat">
-          <DataField>ItemInventory_ItemFormat</DataField>
-        </Field>
-        <Field Name="SalesQtyTotal">
-          <DataField>SalesQtyTotal</DataField>
-        </Field>
-        <Field Name="SalesQtyTotalFormat">
-          <DataField>SalesQtyTotalFormat</DataField>
-        </Field>
-        <Field Name="SalesAmountTotal">
-          <DataField>SalesAmountTotal</DataField>
-        </Field>
-        <Field Name="SalesAmountTotalFormat">
-          <DataField>SalesAmountTotalFormat</DataField>
-        </Field>
-        <Field Name="ItemProfitTotal">
-          <DataField>ItemProfitTotal</DataField>
-        </Field>
-        <Field Name="ItemProfitTotalFormat">
-          <DataField>ItemProfitTotalFormat</DataField>
-        </Field>
-        <Field Name="ItemProfitPctTotal">
-          <DataField>ItemProfitPctTotal</DataField>
-        </Field>
-        <Field Name="ItemProfitPctTotalFormat">
-          <DataField>ItemProfitPctTotalFormat</DataField>
-        </Field>
-        <Field Name="TotalQty">
-          <DataField>TotalQty</DataField>
-        </Field>
-        <Field Name="TotalQtyFormat">
-          <DataField>TotalQtyFormat</DataField>
-        </Field>
-        <Field Name="PrintAlsoWithoutSale">
-          <DataField>PrintAlsoWithoutSale</DataField>
-        </Field>
-        <Field Name="ItemFilterTxt">
-          <DataField>ItemFilterTxt</DataField>
-        </Field>
-        <Field Name="Report_Caption">
-          <DataField>Report_Caption</DataField>
-        </Field>
-        <Field Name="ItemsNotSoldTxt">
-          <DataField>ItemsNotSoldTxt</DataField>
-        </Field>
-        <Field Name="ItemNo_Caption">
-          <DataField>ItemNo_Caption</DataField>
-        </Field>
-        <Field Name="ItemDescription_Caption">
-          <DataField>ItemDescription_Caption</DataField>
-        </Field>
-        <Field Name="ItemVendorNo_Caption">
-          <DataField>ItemVendorNo_Caption</DataField>
-        </Field>
-        <Field Name="ItemUnitCost_Caption">
-          <DataField>ItemUnitCost_Caption</DataField>
-        </Field>
-        <Field Name="ItemUnitPrice_Caption">
-          <DataField>ItemUnitPrice_Caption</DataField>
-        </Field>
-        <Field Name="SalesQty_Caption">
-          <DataField>SalesQty_Caption</DataField>
-        </Field>
-        <Field Name="SalesAmount_Caption">
-          <DataField>SalesAmount_Caption</DataField>
-        </Field>
-        <Field Name="ItemProfit_Caption">
-          <DataField>ItemProfit_Caption</DataField>
-        </Field>
-        <Field Name="ItemProfitPct_Caption">
-          <DataField>ItemProfitPct_Caption</DataField>
-        </Field>
-        <Field Name="ItemInventory_Caption">
-          <DataField>ItemInventory_Caption</DataField>
-        </Field>
-        <Field Name="ItemVariantInfo_Caption">
-          <DataField>ItemVariantInfo_Caption</DataField>
-        </Field>
-        <Field Name="Code_ItemVariant">
-          <DataField>Code_ItemVariant</DataField>
-        </Field>
-        <Field Name="Description_ItemVariant">
-          <DataField>Description_ItemVariant</DataField>
-        </Field>
-        <Field Name="UnitCost">
-          <DataField>UnitCost</DataField>
-        </Field>
-        <Field Name="UnitCostFormat">
-          <DataField>UnitCostFormat</DataField>
-        </Field>
-        <Field Name="UnitPrice">
-          <DataField>UnitPrice</DataField>
-        </Field>
-        <Field Name="UnitPriceFormat">
-          <DataField>UnitPriceFormat</DataField>
-        </Field>
-        <Field Name="SalesQty">
-          <DataField>SalesQty</DataField>
-        </Field>
-        <Field Name="SalesQtyFormat">
-          <DataField>SalesQtyFormat</DataField>
-        </Field>
-        <Field Name="SalesAmount">
-          <DataField>SalesAmount</DataField>
-        </Field>
-        <Field Name="SalesAmountFormat">
-          <DataField>SalesAmountFormat</DataField>
-        </Field>
-        <Field Name="ItemProfit">
-          <DataField>ItemProfit</DataField>
-        </Field>
-        <Field Name="ItemProfitFormat">
-          <DataField>ItemProfitFormat</DataField>
-        </Field>
-        <Field Name="ItemProfitPct">
-          <DataField>ItemProfitPct</DataField>
-        </Field>
-        <Field Name="ItemProfitPctFormat">
-          <DataField>ItemProfitPctFormat</DataField>
-        </Field>
-        <Field Name="ItemInventory">
-          <DataField>ItemInventory</DataField>
-        </Field>
-        <Field Name="ItemInventoryFormat">
-          <DataField>ItemInventoryFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -2623,4 +2439,188 @@ Shared Data4 as Object
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="USERID">
+          <DataField>USERID</DataField>
+        </Field>
+        <Field Name="ItemVendorNo">
+          <DataField>ItemVendorNo</DataField>
+        </Field>
+        <Field Name="No_Item">
+          <DataField>No_Item</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="VendorItemNo_Item">
+          <DataField>VendorItemNo_Item</DataField>
+        </Field>
+        <Field Name="InvPostGroup_Item">
+          <DataField>InvPostGroup_Item</DataField>
+        </Field>
+        <Field Name="SalesQty_Item">
+          <DataField>SalesQty_Item</DataField>
+        </Field>
+        <Field Name="SalesQty_ItemFormat">
+          <DataField>SalesQty_ItemFormat</DataField>
+        </Field>
+        <Field Name="SalesAmount_Item">
+          <DataField>SalesAmount_Item</DataField>
+        </Field>
+        <Field Name="SalesAmount_ItemFormat">
+          <DataField>SalesAmount_ItemFormat</DataField>
+        </Field>
+        <Field Name="ItemProfit_Item">
+          <DataField>ItemProfit_Item</DataField>
+        </Field>
+        <Field Name="ItemProfit_ItemFormat">
+          <DataField>ItemProfit_ItemFormat</DataField>
+        </Field>
+        <Field Name="ItemProfitPct_Item">
+          <DataField>ItemProfitPct_Item</DataField>
+        </Field>
+        <Field Name="ItemProfitPct_ItemFormat">
+          <DataField>ItemProfitPct_ItemFormat</DataField>
+        </Field>
+        <Field Name="ItemInventory_Item">
+          <DataField>ItemInventory_Item</DataField>
+        </Field>
+        <Field Name="ItemInventory_ItemFormat">
+          <DataField>ItemInventory_ItemFormat</DataField>
+        </Field>
+        <Field Name="SalesQtyTotal">
+          <DataField>SalesQtyTotal</DataField>
+        </Field>
+        <Field Name="SalesQtyTotalFormat">
+          <DataField>SalesQtyTotalFormat</DataField>
+        </Field>
+        <Field Name="SalesAmountTotal">
+          <DataField>SalesAmountTotal</DataField>
+        </Field>
+        <Field Name="SalesAmountTotalFormat">
+          <DataField>SalesAmountTotalFormat</DataField>
+        </Field>
+        <Field Name="ItemProfitTotal">
+          <DataField>ItemProfitTotal</DataField>
+        </Field>
+        <Field Name="ItemProfitTotalFormat">
+          <DataField>ItemProfitTotalFormat</DataField>
+        </Field>
+        <Field Name="ItemProfitPctTotal">
+          <DataField>ItemProfitPctTotal</DataField>
+        </Field>
+        <Field Name="ItemProfitPctTotalFormat">
+          <DataField>ItemProfitPctTotalFormat</DataField>
+        </Field>
+        <Field Name="TotalQty">
+          <DataField>TotalQty</DataField>
+        </Field>
+        <Field Name="TotalQtyFormat">
+          <DataField>TotalQtyFormat</DataField>
+        </Field>
+        <Field Name="PrintAlsoWithoutSale">
+          <DataField>PrintAlsoWithoutSale</DataField>
+        </Field>
+        <Field Name="ItemFilterTxt">
+          <DataField>ItemFilterTxt</DataField>
+        </Field>
+        <Field Name="Report_Caption">
+          <DataField>Report_Caption</DataField>
+        </Field>
+        <Field Name="ItemsNotSoldTxt">
+          <DataField>ItemsNotSoldTxt</DataField>
+        </Field>
+        <Field Name="ItemNo_Caption">
+          <DataField>ItemNo_Caption</DataField>
+        </Field>
+        <Field Name="ItemDescription_Caption">
+          <DataField>ItemDescription_Caption</DataField>
+        </Field>
+        <Field Name="ItemVendorNo_Caption">
+          <DataField>ItemVendorNo_Caption</DataField>
+        </Field>
+        <Field Name="ItemUnitCost_Caption">
+          <DataField>ItemUnitCost_Caption</DataField>
+        </Field>
+        <Field Name="ItemUnitPrice_Caption">
+          <DataField>ItemUnitPrice_Caption</DataField>
+        </Field>
+        <Field Name="SalesQty_Caption">
+          <DataField>SalesQty_Caption</DataField>
+        </Field>
+        <Field Name="SalesAmount_Caption">
+          <DataField>SalesAmount_Caption</DataField>
+        </Field>
+        <Field Name="ItemProfit_Caption">
+          <DataField>ItemProfit_Caption</DataField>
+        </Field>
+        <Field Name="ItemProfitPct_Caption">
+          <DataField>ItemProfitPct_Caption</DataField>
+        </Field>
+        <Field Name="ItemInventory_Caption">
+          <DataField>ItemInventory_Caption</DataField>
+        </Field>
+        <Field Name="ItemVariantInfo_Caption">
+          <DataField>ItemVariantInfo_Caption</DataField>
+        </Field>
+        <Field Name="Code_ItemVariant">
+          <DataField>Code_ItemVariant</DataField>
+        </Field>
+        <Field Name="Description_ItemVariant">
+          <DataField>Description_ItemVariant</DataField>
+        </Field>
+        <Field Name="UnitCost">
+          <DataField>UnitCost</DataField>
+        </Field>
+        <Field Name="UnitCostFormat">
+          <DataField>UnitCostFormat</DataField>
+        </Field>
+        <Field Name="UnitPrice">
+          <DataField>UnitPrice</DataField>
+        </Field>
+        <Field Name="UnitPriceFormat">
+          <DataField>UnitPriceFormat</DataField>
+        </Field>
+        <Field Name="SalesQty">
+          <DataField>SalesQty</DataField>
+        </Field>
+        <Field Name="SalesQtyFormat">
+          <DataField>SalesQtyFormat</DataField>
+        </Field>
+        <Field Name="SalesAmount">
+          <DataField>SalesAmount</DataField>
+        </Field>
+        <Field Name="SalesAmountFormat">
+          <DataField>SalesAmountFormat</DataField>
+        </Field>
+        <Field Name="ItemProfit">
+          <DataField>ItemProfit</DataField>
+        </Field>
+        <Field Name="ItemProfitFormat">
+          <DataField>ItemProfitFormat</DataField>
+        </Field>
+        <Field Name="ItemProfitPct">
+          <DataField>ItemProfitPct</DataField>
+        </Field>
+        <Field Name="ItemProfitPctFormat">
+          <DataField>ItemProfitPctFormat</DataField>
+        </Field>
+        <Field Name="ItemInventory">
+          <DataField>ItemInventory</DataField>
+        </Field>
+        <Field Name="ItemInventoryFormat">
+          <DataField>ItemInventoryFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,115 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="PeriodTextCaption">
-          <DataField>PeriodTextCaption</DataField>
-        </Field>
-        <Field Name="CompanyName">
-          <DataField>CompanyName</DataField>
-        </Field>
-        <Field Name="PrintAlsoWithoutSale">
-          <DataField>PrintAlsoWithoutSale</DataField>
-        </Field>
-        <Field Name="ItemFilterCaption">
-          <DataField>ItemFilterCaption</DataField>
-        </Field>
-        <Field Name="ItemFilter">
-          <DataField>ItemFilter</DataField>
-        </Field>
-        <Field Name="InventoryPostingGrp_Item">
-          <DataField>InventoryPostingGrp_Item</DataField>
-        </Field>
-        <Field Name="No_Item">
-          <DataField>No_Item</DataField>
-        </Field>
-        <Field Name="Description_Item">
-          <DataField>Description_Item</DataField>
-        </Field>
-        <Field Name="AssemblyBOM_Item">
-          <DataField>AssemblyBOM_Item</DataField>
-        </Field>
-        <Field Name="BaseUnitofMeasure_Item">
-          <DataField>BaseUnitofMeasure_Item</DataField>
-        </Field>
-        <Field Name="UnitCost">
-          <DataField>UnitCost</DataField>
-        </Field>
-        <Field Name="UnitCostFormat">
-          <DataField>UnitCostFormat</DataField>
-        </Field>
-        <Field Name="UnitPrice">
-          <DataField>UnitPrice</DataField>
-        </Field>
-        <Field Name="UnitPriceFormat">
-          <DataField>UnitPriceFormat</DataField>
-        </Field>
-        <Field Name="SalesQty">
-          <DataField>SalesQty</DataField>
-        </Field>
-        <Field Name="SalesQtyFormat">
-          <DataField>SalesQtyFormat</DataField>
-        </Field>
-        <Field Name="SalesAmount">
-          <DataField>SalesAmount</DataField>
-        </Field>
-        <Field Name="SalesAmountFormat">
-          <DataField>SalesAmountFormat</DataField>
-        </Field>
-        <Field Name="ItemProfit">
-          <DataField>ItemProfit</DataField>
-        </Field>
-        <Field Name="ItemProfitFormat">
-          <DataField>ItemProfitFormat</DataField>
-        </Field>
-        <Field Name="ItemProfitPct">
-          <DataField>ItemProfitPct</DataField>
-        </Field>
-        <Field Name="ItemProfitPctFormat">
-          <DataField>ItemProfitPctFormat</DataField>
-        </Field>
-        <Field Name="InvSalesStatisticsCapt">
-          <DataField>InvSalesStatisticsCapt</DataField>
-        </Field>
-        <Field Name="PageCaption">
-          <DataField>PageCaption</DataField>
-        </Field>
-        <Field Name="IncludeNotSoldItemsCaption">
-          <DataField>IncludeNotSoldItemsCaption</DataField>
-        </Field>
-        <Field Name="ItemAssemblyBOMCaption">
-          <DataField>ItemAssemblyBOMCaption</DataField>
-        </Field>
-        <Field Name="UnitCostCaption">
-          <DataField>UnitCostCaption</DataField>
-        </Field>
-        <Field Name="UnitPriceCaption">
-          <DataField>UnitPriceCaption</DataField>
-        </Field>
-        <Field Name="SalesQtyCaption">
-          <DataField>SalesQtyCaption</DataField>
-        </Field>
-        <Field Name="SalesAmountCaption">
-          <DataField>SalesAmountCaption</DataField>
-        </Field>
-        <Field Name="ItemProfitCaption">
-          <DataField>ItemProfitCaption</DataField>
-        </Field>
-        <Field Name="ItemProfitPctCaption">
-          <DataField>ItemProfitPctCaption</DataField>
-        </Field>
-        <Field Name="TotalCaption">
-          <DataField>TotalCaption</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3054,4 +2945,113 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="PeriodTextCaption">
+          <DataField>PeriodTextCaption</DataField>
+        </Field>
+        <Field Name="CompanyName">
+          <DataField>CompanyName</DataField>
+        </Field>
+        <Field Name="PrintAlsoWithoutSale">
+          <DataField>PrintAlsoWithoutSale</DataField>
+        </Field>
+        <Field Name="ItemFilterCaption">
+          <DataField>ItemFilterCaption</DataField>
+        </Field>
+        <Field Name="ItemFilter">
+          <DataField>ItemFilter</DataField>
+        </Field>
+        <Field Name="InventoryPostingGrp_Item">
+          <DataField>InventoryPostingGrp_Item</DataField>
+        </Field>
+        <Field Name="No_Item">
+          <DataField>No_Item</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="AssemblyBOM_Item">
+          <DataField>AssemblyBOM_Item</DataField>
+        </Field>
+        <Field Name="BaseUnitofMeasure_Item">
+          <DataField>BaseUnitofMeasure_Item</DataField>
+        </Field>
+        <Field Name="UnitCost">
+          <DataField>UnitCost</DataField>
+        </Field>
+        <Field Name="UnitCostFormat">
+          <DataField>UnitCostFormat</DataField>
+        </Field>
+        <Field Name="UnitPrice">
+          <DataField>UnitPrice</DataField>
+        </Field>
+        <Field Name="UnitPriceFormat">
+          <DataField>UnitPriceFormat</DataField>
+        </Field>
+        <Field Name="SalesQty">
+          <DataField>SalesQty</DataField>
+        </Field>
+        <Field Name="SalesQtyFormat">
+          <DataField>SalesQtyFormat</DataField>
+        </Field>
+        <Field Name="SalesAmount">
+          <DataField>SalesAmount</DataField>
+        </Field>
+        <Field Name="SalesAmountFormat">
+          <DataField>SalesAmountFormat</DataField>
+        </Field>
+        <Field Name="ItemProfit">
+          <DataField>ItemProfit</DataField>
+        </Field>
+        <Field Name="ItemProfitFormat">
+          <DataField>ItemProfitFormat</DataField>
+        </Field>
+        <Field Name="ItemProfitPct">
+          <DataField>ItemProfitPct</DataField>
+        </Field>
+        <Field Name="ItemProfitPctFormat">
+          <DataField>ItemProfitPctFormat</DataField>
+        </Field>
+        <Field Name="InvSalesStatisticsCapt">
+          <DataField>InvSalesStatisticsCapt</DataField>
+        </Field>
+        <Field Name="PageCaption">
+          <DataField>PageCaption</DataField>
+        </Field>
+        <Field Name="IncludeNotSoldItemsCaption">
+          <DataField>IncludeNotSoldItemsCaption</DataField>
+        </Field>
+        <Field Name="ItemAssemblyBOMCaption">
+          <DataField>ItemAssemblyBOMCaption</DataField>
+        </Field>
+        <Field Name="UnitCostCaption">
+          <DataField>UnitCostCaption</DataField>
+        </Field>
+        <Field Name="UnitPriceCaption">
+          <DataField>UnitPriceCaption</DataField>
+        </Field>
+        <Field Name="SalesQtyCaption">
+          <DataField>SalesQtyCaption</DataField>
+        </Field>
+        <Field Name="SalesAmountCaption">
+          <DataField>SalesAmountCaption</DataField>
+        </Field>
+        <Field Name="ItemProfitCaption">
+          <DataField>ItemProfitCaption</DataField>
+        </Field>
+        <Field Name="ItemProfitPctCaption">
+          <DataField>ItemProfitPctCaption</DataField>
+        </Field>
+        <Field Name="TotalCaption">
+          <DataField>TotalCaption</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

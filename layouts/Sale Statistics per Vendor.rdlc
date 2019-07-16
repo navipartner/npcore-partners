@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,259 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="PageNoCaptionLbl">
-          <DataField>PageNoCaptionLbl</DataField>
-        </Field>
-        <Field Name="Report_Caption">
-          <DataField>Report_Caption</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="Date_Filters_Caption">
-          <DataField>Date_Filters_Caption</DataField>
-        </Field>
-        <Field Name="Creditor_Filter_Caption">
-          <DataField>Creditor_Filter_Caption</DataField>
-        </Field>
-        <Field Name="Name_Caption">
-          <DataField>Name_Caption</DataField>
-        </Field>
-        <Field Name="Inventory_Caption">
-          <DataField>Inventory_Caption</DataField>
-        </Field>
-        <Field Name="InventoryValue_Caption">
-          <DataField>InventoryValue_Caption</DataField>
-        </Field>
-        <Field Name="Unit_Value_Caption">
-          <DataField>Unit_Value_Caption</DataField>
-        </Field>
-        <Field Name="Profit_LCY_Caption">
-          <DataField>Profit_LCY_Caption</DataField>
-        </Field>
-        <Field Name="Profit_Pct_Caption">
-          <DataField>Profit_Pct_Caption</DataField>
-        </Field>
-        <Field Name="Purchases_LCY_Caption">
-          <DataField>Purchases_LCY_Caption</DataField>
-        </Field>
-        <Field Name="Sales_Qty_Caption">
-          <DataField>Sales_Qty_Caption</DataField>
-        </Field>
-        <Field Name="Cost_Caption">
-          <DataField>Cost_Caption</DataField>
-        </Field>
-        <Field Name="Sale_Caption">
-          <DataField>Sale_Caption</DataField>
-        </Field>
-        <Field Name="Speed_Caption">
-          <DataField>Speed_Caption</DataField>
-        </Field>
-        <Field Name="Avg_Inventory_Caption">
-          <DataField>Avg_Inventory_Caption</DataField>
-        </Field>
-        <Field Name="OnlyTotal">
-          <DataField>OnlyTotal</DataField>
-        </Field>
-        <Field Name="DateFilter_Vendor">
-          <DataField>DateFilter_Vendor</DataField>
-        </Field>
-        <Field Name="No_Vendor">
-          <DataField>No_Vendor</DataField>
-        </Field>
-        <Field Name="Name_Vendor">
-          <DataField>Name_Vendor</DataField>
-        </Field>
-        <Field Name="InventoryDate">
-          <DataField>InventoryDate</DataField>
-        </Field>
-        <Field Name="NextPageGroupNo">
-          <DataField>NextPageGroupNo</DataField>
-        </Field>
-        <Field Name="No_Item">
-          <DataField>No_Item</DataField>
-        </Field>
-        <Field Name="Description_Item">
-          <DataField>Description_Item</DataField>
-        </Field>
-        <Field Name="Net_Change_Item">
-          <DataField>Net_Change_Item</DataField>
-        </Field>
-        <Field Name="Net_Change_ItemFormat">
-          <DataField>Net_Change_ItemFormat</DataField>
-        </Field>
-        <Field Name="InventoryValuation">
-          <DataField>InventoryValuation</DataField>
-        </Field>
-        <Field Name="InventoryValuationFormat">
-          <DataField>InventoryValuationFormat</DataField>
-        </Field>
-        <Field Name="ActualSales">
-          <DataField>ActualSales</DataField>
-        </Field>
-        <Field Name="ActualSalesFormat">
-          <DataField>ActualSalesFormat</DataField>
-        </Field>
-        <Field Name="db">
-          <DataField>db</DataField>
-        </Field>
-        <Field Name="dbFormat">
-          <DataField>dbFormat</DataField>
-        </Field>
-        <Field Name="dg">
-          <DataField>dg</DataField>
-        </Field>
-        <Field Name="dgFormat">
-          <DataField>dgFormat</DataField>
-        </Field>
-        <Field Name="PurchasesLCY_Item">
-          <DataField>PurchasesLCY_Item</DataField>
-        </Field>
-        <Field Name="PurchasesLCY_ItemFormat">
-          <DataField>PurchasesLCY_ItemFormat</DataField>
-        </Field>
-        <Field Name="SalesQty_Item">
-          <DataField>SalesQty_Item</DataField>
-        </Field>
-        <Field Name="SalesQty_ItemFormat">
-          <DataField>SalesQty_ItemFormat</DataField>
-        </Field>
-        <Field Name="COGSLCY_Item">
-          <DataField>COGSLCY_Item</DataField>
-        </Field>
-        <Field Name="COGSLCY_ItemFormat">
-          <DataField>COGSLCY_ItemFormat</DataField>
-        </Field>
-        <Field Name="SalesLCY_Item">
-          <DataField>SalesLCY_Item</DataField>
-        </Field>
-        <Field Name="SalesLCY_ItemFormat">
-          <DataField>SalesLCY_ItemFormat</DataField>
-        </Field>
-        <Field Name="SalesDb">
-          <DataField>SalesDb</DataField>
-        </Field>
-        <Field Name="SalesDbFormat">
-          <DataField>SalesDbFormat</DataField>
-        </Field>
-        <Field Name="SalesDg">
-          <DataField>SalesDg</DataField>
-        </Field>
-        <Field Name="SalesDgFormat">
-          <DataField>SalesDgFormat</DataField>
-        </Field>
-        <Field Name="Speed">
-          <DataField>Speed</DataField>
-        </Field>
-        <Field Name="SpeedFormat">
-          <DataField>SpeedFormat</DataField>
-        </Field>
-        <Field Name="AvgInventory">
-          <DataField>AvgInventory</DataField>
-        </Field>
-        <Field Name="AvgInventoryFormat">
-          <DataField>AvgInventoryFormat</DataField>
-        </Field>
-        <Field Name="Name_Footer2">
-          <DataField>Name_Footer2</DataField>
-        </Field>
-        <Field Name="TextNetChangeDate">
-          <DataField>TextNetChangeDate</DataField>
-        </Field>
-        <Field Name="Number_Integer">
-          <DataField>Number_Integer</DataField>
-        </Field>
-        <Field Name="InventoryValVendor">
-          <DataField>InventoryValVendor</DataField>
-        </Field>
-        <Field Name="InventoryValVendorFormat">
-          <DataField>InventoryValVendorFormat</DataField>
-        </Field>
-        <Field Name="SalesValVendor">
-          <DataField>SalesValVendor</DataField>
-        </Field>
-        <Field Name="SalesValVendorFormat">
-          <DataField>SalesValVendorFormat</DataField>
-        </Field>
-        <Field Name="dbVendor">
-          <DataField>dbVendor</DataField>
-        </Field>
-        <Field Name="dbVendorFormat">
-          <DataField>dbVendorFormat</DataField>
-        </Field>
-        <Field Name="NetChangeVendor">
-          <DataField>NetChangeVendor</DataField>
-        </Field>
-        <Field Name="NetChangeVendorFormat">
-          <DataField>NetChangeVendorFormat</DataField>
-        </Field>
-        <Field Name="SalesQtyVendor">
-          <DataField>SalesQtyVendor</DataField>
-        </Field>
-        <Field Name="SalesQtyVendorFormat">
-          <DataField>SalesQtyVendorFormat</DataField>
-        </Field>
-        <Field Name="COGS_LCY_Vendor">
-          <DataField>COGS_LCY_Vendor</DataField>
-        </Field>
-        <Field Name="COGS_LCY_VendorFormat">
-          <DataField>COGS_LCY_VendorFormat</DataField>
-        </Field>
-        <Field Name="Sales_LCY_Vendor">
-          <DataField>Sales_LCY_Vendor</DataField>
-        </Field>
-        <Field Name="Sales_LCY_VendorFormat">
-          <DataField>Sales_LCY_VendorFormat</DataField>
-        </Field>
-        <Field Name="Purchases_LCY_Vendor">
-          <DataField>Purchases_LCY_Vendor</DataField>
-        </Field>
-        <Field Name="Purchases_LCY_VendorFormat">
-          <DataField>Purchases_LCY_VendorFormat</DataField>
-        </Field>
-        <Field Name="SpeedVendor">
-          <DataField>SpeedVendor</DataField>
-        </Field>
-        <Field Name="SpeedVendorFormat">
-          <DataField>SpeedVendorFormat</DataField>
-        </Field>
-        <Field Name="AvgInventory_Vendor">
-          <DataField>AvgInventory_Vendor</DataField>
-        </Field>
-        <Field Name="AvgInventory_VendorFormat">
-          <DataField>AvgInventory_VendorFormat</DataField>
-        </Field>
-        <Field Name="Total_Caption">
-          <DataField>Total_Caption</DataField>
-        </Field>
-        <Field Name="DgVendor">
-          <DataField>DgVendor</DataField>
-        </Field>
-        <Field Name="DgVendorFormat">
-          <DataField>DgVendorFormat</DataField>
-        </Field>
-        <Field Name="SalesDbVendor">
-          <DataField>SalesDbVendor</DataField>
-        </Field>
-        <Field Name="SalesDbVendorFormat">
-          <DataField>SalesDbVendorFormat</DataField>
-        </Field>
-        <Field Name="SalesDgVendor">
-          <DataField>SalesDgVendor</DataField>
-        </Field>
-        <Field Name="SalesDgVendorFormat">
-          <DataField>SalesDgVendorFormat</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3794,4 +3541,257 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="PageNoCaptionLbl">
+          <DataField>PageNoCaptionLbl</DataField>
+        </Field>
+        <Field Name="Report_Caption">
+          <DataField>Report_Caption</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="Date_Filters_Caption">
+          <DataField>Date_Filters_Caption</DataField>
+        </Field>
+        <Field Name="Creditor_Filter_Caption">
+          <DataField>Creditor_Filter_Caption</DataField>
+        </Field>
+        <Field Name="Name_Caption">
+          <DataField>Name_Caption</DataField>
+        </Field>
+        <Field Name="Inventory_Caption">
+          <DataField>Inventory_Caption</DataField>
+        </Field>
+        <Field Name="InventoryValue_Caption">
+          <DataField>InventoryValue_Caption</DataField>
+        </Field>
+        <Field Name="Unit_Value_Caption">
+          <DataField>Unit_Value_Caption</DataField>
+        </Field>
+        <Field Name="Profit_LCY_Caption">
+          <DataField>Profit_LCY_Caption</DataField>
+        </Field>
+        <Field Name="Profit_Pct_Caption">
+          <DataField>Profit_Pct_Caption</DataField>
+        </Field>
+        <Field Name="Purchases_LCY_Caption">
+          <DataField>Purchases_LCY_Caption</DataField>
+        </Field>
+        <Field Name="Sales_Qty_Caption">
+          <DataField>Sales_Qty_Caption</DataField>
+        </Field>
+        <Field Name="Cost_Caption">
+          <DataField>Cost_Caption</DataField>
+        </Field>
+        <Field Name="Sale_Caption">
+          <DataField>Sale_Caption</DataField>
+        </Field>
+        <Field Name="Speed_Caption">
+          <DataField>Speed_Caption</DataField>
+        </Field>
+        <Field Name="Avg_Inventory_Caption">
+          <DataField>Avg_Inventory_Caption</DataField>
+        </Field>
+        <Field Name="OnlyTotal">
+          <DataField>OnlyTotal</DataField>
+        </Field>
+        <Field Name="DateFilter_Vendor">
+          <DataField>DateFilter_Vendor</DataField>
+        </Field>
+        <Field Name="No_Vendor">
+          <DataField>No_Vendor</DataField>
+        </Field>
+        <Field Name="Name_Vendor">
+          <DataField>Name_Vendor</DataField>
+        </Field>
+        <Field Name="InventoryDate">
+          <DataField>InventoryDate</DataField>
+        </Field>
+        <Field Name="NextPageGroupNo">
+          <DataField>NextPageGroupNo</DataField>
+        </Field>
+        <Field Name="No_Item">
+          <DataField>No_Item</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="Net_Change_Item">
+          <DataField>Net_Change_Item</DataField>
+        </Field>
+        <Field Name="Net_Change_ItemFormat">
+          <DataField>Net_Change_ItemFormat</DataField>
+        </Field>
+        <Field Name="InventoryValuation">
+          <DataField>InventoryValuation</DataField>
+        </Field>
+        <Field Name="InventoryValuationFormat">
+          <DataField>InventoryValuationFormat</DataField>
+        </Field>
+        <Field Name="ActualSales">
+          <DataField>ActualSales</DataField>
+        </Field>
+        <Field Name="ActualSalesFormat">
+          <DataField>ActualSalesFormat</DataField>
+        </Field>
+        <Field Name="db">
+          <DataField>db</DataField>
+        </Field>
+        <Field Name="dbFormat">
+          <DataField>dbFormat</DataField>
+        </Field>
+        <Field Name="dg">
+          <DataField>dg</DataField>
+        </Field>
+        <Field Name="dgFormat">
+          <DataField>dgFormat</DataField>
+        </Field>
+        <Field Name="PurchasesLCY_Item">
+          <DataField>PurchasesLCY_Item</DataField>
+        </Field>
+        <Field Name="PurchasesLCY_ItemFormat">
+          <DataField>PurchasesLCY_ItemFormat</DataField>
+        </Field>
+        <Field Name="SalesQty_Item">
+          <DataField>SalesQty_Item</DataField>
+        </Field>
+        <Field Name="SalesQty_ItemFormat">
+          <DataField>SalesQty_ItemFormat</DataField>
+        </Field>
+        <Field Name="COGSLCY_Item">
+          <DataField>COGSLCY_Item</DataField>
+        </Field>
+        <Field Name="COGSLCY_ItemFormat">
+          <DataField>COGSLCY_ItemFormat</DataField>
+        </Field>
+        <Field Name="SalesLCY_Item">
+          <DataField>SalesLCY_Item</DataField>
+        </Field>
+        <Field Name="SalesLCY_ItemFormat">
+          <DataField>SalesLCY_ItemFormat</DataField>
+        </Field>
+        <Field Name="SalesDb">
+          <DataField>SalesDb</DataField>
+        </Field>
+        <Field Name="SalesDbFormat">
+          <DataField>SalesDbFormat</DataField>
+        </Field>
+        <Field Name="SalesDg">
+          <DataField>SalesDg</DataField>
+        </Field>
+        <Field Name="SalesDgFormat">
+          <DataField>SalesDgFormat</DataField>
+        </Field>
+        <Field Name="Speed">
+          <DataField>Speed</DataField>
+        </Field>
+        <Field Name="SpeedFormat">
+          <DataField>SpeedFormat</DataField>
+        </Field>
+        <Field Name="AvgInventory">
+          <DataField>AvgInventory</DataField>
+        </Field>
+        <Field Name="AvgInventoryFormat">
+          <DataField>AvgInventoryFormat</DataField>
+        </Field>
+        <Field Name="Name_Footer2">
+          <DataField>Name_Footer2</DataField>
+        </Field>
+        <Field Name="TextNetChangeDate">
+          <DataField>TextNetChangeDate</DataField>
+        </Field>
+        <Field Name="Number_Integer">
+          <DataField>Number_Integer</DataField>
+        </Field>
+        <Field Name="InventoryValVendor">
+          <DataField>InventoryValVendor</DataField>
+        </Field>
+        <Field Name="InventoryValVendorFormat">
+          <DataField>InventoryValVendorFormat</DataField>
+        </Field>
+        <Field Name="SalesValVendor">
+          <DataField>SalesValVendor</DataField>
+        </Field>
+        <Field Name="SalesValVendorFormat">
+          <DataField>SalesValVendorFormat</DataField>
+        </Field>
+        <Field Name="dbVendor">
+          <DataField>dbVendor</DataField>
+        </Field>
+        <Field Name="dbVendorFormat">
+          <DataField>dbVendorFormat</DataField>
+        </Field>
+        <Field Name="NetChangeVendor">
+          <DataField>NetChangeVendor</DataField>
+        </Field>
+        <Field Name="NetChangeVendorFormat">
+          <DataField>NetChangeVendorFormat</DataField>
+        </Field>
+        <Field Name="SalesQtyVendor">
+          <DataField>SalesQtyVendor</DataField>
+        </Field>
+        <Field Name="SalesQtyVendorFormat">
+          <DataField>SalesQtyVendorFormat</DataField>
+        </Field>
+        <Field Name="COGS_LCY_Vendor">
+          <DataField>COGS_LCY_Vendor</DataField>
+        </Field>
+        <Field Name="COGS_LCY_VendorFormat">
+          <DataField>COGS_LCY_VendorFormat</DataField>
+        </Field>
+        <Field Name="Sales_LCY_Vendor">
+          <DataField>Sales_LCY_Vendor</DataField>
+        </Field>
+        <Field Name="Sales_LCY_VendorFormat">
+          <DataField>Sales_LCY_VendorFormat</DataField>
+        </Field>
+        <Field Name="Purchases_LCY_Vendor">
+          <DataField>Purchases_LCY_Vendor</DataField>
+        </Field>
+        <Field Name="Purchases_LCY_VendorFormat">
+          <DataField>Purchases_LCY_VendorFormat</DataField>
+        </Field>
+        <Field Name="SpeedVendor">
+          <DataField>SpeedVendor</DataField>
+        </Field>
+        <Field Name="SpeedVendorFormat">
+          <DataField>SpeedVendorFormat</DataField>
+        </Field>
+        <Field Name="AvgInventory_Vendor">
+          <DataField>AvgInventory_Vendor</DataField>
+        </Field>
+        <Field Name="AvgInventory_VendorFormat">
+          <DataField>AvgInventory_VendorFormat</DataField>
+        </Field>
+        <Field Name="Total_Caption">
+          <DataField>Total_Caption</DataField>
+        </Field>
+        <Field Name="DgVendor">
+          <DataField>DgVendor</DataField>
+        </Field>
+        <Field Name="DgVendorFormat">
+          <DataField>DgVendorFormat</DataField>
+        </Field>
+        <Field Name="SalesDbVendor">
+          <DataField>SalesDbVendor</DataField>
+        </Field>
+        <Field Name="SalesDbVendorFormat">
+          <DataField>SalesDbVendorFormat</DataField>
+        </Field>
+        <Field Name="SalesDgVendor">
+          <DataField>SalesDgVendor</DataField>
+        </Field>
+        <Field Name="SalesDgVendorFormat">
+          <DataField>SalesDgVendorFormat</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,184 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="Picture_CompanyInfo">
-          <DataField>Picture_CompanyInfo</DataField>
-        </Field>
-        <Field Name="VendorDateFilter">
-          <DataField>VendorDateFilter</DataField>
-        </Field>
-        <Field Name="ShowTypeFilter">
-          <DataField>ShowTypeFilter</DataField>
-        </Field>
-        <Field Name="Getfilters">
-          <DataField>Getfilters</DataField>
-        </Field>
-        <Field Name="Number_Integer">
-          <DataField>Number_Integer</DataField>
-        </Field>
-        <Field Name="Greyed">
-          <DataField>Greyed</DataField>
-        </Field>
-        <Field Name="No_Vendor">
-          <DataField>No_Vendor</DataField>
-        </Field>
-        <Field Name="Name_Vendor">
-          <DataField>Name_Vendor</DataField>
-        </Field>
-        <Field Name="SalesLCY_Vendor">
-          <DataField>SalesLCY_Vendor</DataField>
-        </Field>
-        <Field Name="SalesLCY_VendorFormat">
-          <DataField>SalesLCY_VendorFormat</DataField>
-        </Field>
-        <Field Name="COGSLCY_Vendor">
-          <DataField>COGSLCY_Vendor</DataField>
-        </Field>
-        <Field Name="COGSLCY_VendorFormat">
-          <DataField>COGSLCY_VendorFormat</DataField>
-        </Field>
-        <Field Name="ProfitPct">
-          <DataField>ProfitPct</DataField>
-        </Field>
-        <Field Name="ProfitPctFormat">
-          <DataField>ProfitPctFormat</DataField>
-        </Field>
-        <Field Name="Share">
-          <DataField>Share</DataField>
-        </Field>
-        <Field Name="PctOfTotal">
-          <DataField>PctOfTotal</DataField>
-        </Field>
-        <Field Name="Stock_Vendor">
-          <DataField>Stock_Vendor</DataField>
-        </Field>
-        <Field Name="Stock_VendorFormat">
-          <DataField>Stock_VendorFormat</DataField>
-        </Field>
-        <Field Name="PctOfTotalInventory">
-          <DataField>PctOfTotalInventory</DataField>
-        </Field>
-        <Field Name="RankingLastYear">
-          <DataField>RankingLastYear</DataField>
-        </Field>
-        <Field Name="RankingLastYearFormat">
-          <DataField>RankingLastYearFormat</DataField>
-        </Field>
-        <Field Name="AmountLastYear">
-          <DataField>AmountLastYear</DataField>
-        </Field>
-        <Field Name="AmountLastYearFormat">
-          <DataField>AmountLastYearFormat</DataField>
-        </Field>
-        <Field Name="DgLastYear">
-          <DataField>DgLastYear</DataField>
-        </Field>
-        <Field Name="Index">
-          <DataField>Index</DataField>
-        </Field>
-        <Field Name="IndexFormat">
-          <DataField>IndexFormat</DataField>
-        </Field>
-        <Field Name="ShowType">
-          <DataField>ShowType</DataField>
-        </Field>
-        <Field Name="Sales_LCY_Vendor2">
-          <DataField>Sales_LCY_Vendor2</DataField>
-        </Field>
-        <Field Name="Sales_LCY_Vendor2Format">
-          <DataField>Sales_LCY_Vendor2Format</DataField>
-        </Field>
-        <Field Name="Profit_Vendor2">
-          <DataField>Profit_Vendor2</DataField>
-        </Field>
-        <Field Name="Profit_Vendor2Format">
-          <DataField>Profit_Vendor2Format</DataField>
-        </Field>
-        <Field Name="VendorSales">
-          <DataField>VendorSales</DataField>
-        </Field>
-        <Field Name="VendorSalesFormat">
-          <DataField>VendorSalesFormat</DataField>
-        </Field>
-        <Field Name="CostAmtFooter">
-          <DataField>CostAmtFooter</DataField>
-        </Field>
-        <Field Name="CostAmtFooterFormat">
-          <DataField>CostAmtFooterFormat</DataField>
-        </Field>
-        <Field Name="VendorProfit">
-          <DataField>VendorProfit</DataField>
-        </Field>
-        <Field Name="VendorProfitFormat">
-          <DataField>VendorProfitFormat</DataField>
-        </Field>
-        <Field Name="SalesPct">
-          <DataField>SalesPct</DataField>
-        </Field>
-        <Field Name="SalesPctFormat">
-          <DataField>SalesPctFormat</DataField>
-        </Field>
-        <Field Name="SalesLastYear">
-          <DataField>SalesLastYear</DataField>
-        </Field>
-        <Field Name="SalesLastYearFormat">
-          <DataField>SalesLastYearFormat</DataField>
-        </Field>
-        <Field Name="DbLastYear">
-          <DataField>DbLastYear</DataField>
-        </Field>
-        <Field Name="DbLastYearFormat">
-          <DataField>DbLastYearFormat</DataField>
-        </Field>
-        <Field Name="SalesPct2">
-          <DataField>SalesPct2</DataField>
-        </Field>
-        <Field Name="SalesPct2Format">
-          <DataField>SalesPct2Format</DataField>
-        </Field>
-        <Field Name="ProfitPct2">
-          <DataField>ProfitPct2</DataField>
-        </Field>
-        <Field Name="ProfitPct2Format">
-          <DataField>ProfitPct2Format</DataField>
-        </Field>
-        <Field Name="IndexSales_1">
-          <DataField>IndexSales_1</DataField>
-        </Field>
-        <Field Name="IndexSales_1Format">
-          <DataField>IndexSales_1Format</DataField>
-        </Field>
-        <Field Name="IndexSales_2">
-          <DataField>IndexSales_2</DataField>
-        </Field>
-        <Field Name="IndexSales_2Format">
-          <DataField>IndexSales_2Format</DataField>
-        </Field>
-        <Field Name="IndexDb_1">
-          <DataField>IndexDb_1</DataField>
-        </Field>
-        <Field Name="IndexDb_1Format">
-          <DataField>IndexDb_1Format</DataField>
-        </Field>
-        <Field Name="IndexDb_2">
-          <DataField>IndexDb_2</DataField>
-        </Field>
-        <Field Name="IndexDb_2Format">
-          <DataField>IndexDb_2Format</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -9155,4 +8977,182 @@ End Function</Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="Picture_CompanyInfo">
+          <DataField>Picture_CompanyInfo</DataField>
+        </Field>
+        <Field Name="VendorDateFilter">
+          <DataField>VendorDateFilter</DataField>
+        </Field>
+        <Field Name="ShowTypeFilter">
+          <DataField>ShowTypeFilter</DataField>
+        </Field>
+        <Field Name="Getfilters">
+          <DataField>Getfilters</DataField>
+        </Field>
+        <Field Name="Number_Integer">
+          <DataField>Number_Integer</DataField>
+        </Field>
+        <Field Name="Greyed">
+          <DataField>Greyed</DataField>
+        </Field>
+        <Field Name="No_Vendor">
+          <DataField>No_Vendor</DataField>
+        </Field>
+        <Field Name="Name_Vendor">
+          <DataField>Name_Vendor</DataField>
+        </Field>
+        <Field Name="SalesLCY_Vendor">
+          <DataField>SalesLCY_Vendor</DataField>
+        </Field>
+        <Field Name="SalesLCY_VendorFormat">
+          <DataField>SalesLCY_VendorFormat</DataField>
+        </Field>
+        <Field Name="COGSLCY_Vendor">
+          <DataField>COGSLCY_Vendor</DataField>
+        </Field>
+        <Field Name="COGSLCY_VendorFormat">
+          <DataField>COGSLCY_VendorFormat</DataField>
+        </Field>
+        <Field Name="ProfitPct">
+          <DataField>ProfitPct</DataField>
+        </Field>
+        <Field Name="ProfitPctFormat">
+          <DataField>ProfitPctFormat</DataField>
+        </Field>
+        <Field Name="Share">
+          <DataField>Share</DataField>
+        </Field>
+        <Field Name="PctOfTotal">
+          <DataField>PctOfTotal</DataField>
+        </Field>
+        <Field Name="Stock_Vendor">
+          <DataField>Stock_Vendor</DataField>
+        </Field>
+        <Field Name="Stock_VendorFormat">
+          <DataField>Stock_VendorFormat</DataField>
+        </Field>
+        <Field Name="PctOfTotalInventory">
+          <DataField>PctOfTotalInventory</DataField>
+        </Field>
+        <Field Name="RankingLastYear">
+          <DataField>RankingLastYear</DataField>
+        </Field>
+        <Field Name="RankingLastYearFormat">
+          <DataField>RankingLastYearFormat</DataField>
+        </Field>
+        <Field Name="AmountLastYear">
+          <DataField>AmountLastYear</DataField>
+        </Field>
+        <Field Name="AmountLastYearFormat">
+          <DataField>AmountLastYearFormat</DataField>
+        </Field>
+        <Field Name="DgLastYear">
+          <DataField>DgLastYear</DataField>
+        </Field>
+        <Field Name="Index">
+          <DataField>Index</DataField>
+        </Field>
+        <Field Name="IndexFormat">
+          <DataField>IndexFormat</DataField>
+        </Field>
+        <Field Name="ShowType">
+          <DataField>ShowType</DataField>
+        </Field>
+        <Field Name="Sales_LCY_Vendor2">
+          <DataField>Sales_LCY_Vendor2</DataField>
+        </Field>
+        <Field Name="Sales_LCY_Vendor2Format">
+          <DataField>Sales_LCY_Vendor2Format</DataField>
+        </Field>
+        <Field Name="Profit_Vendor2">
+          <DataField>Profit_Vendor2</DataField>
+        </Field>
+        <Field Name="Profit_Vendor2Format">
+          <DataField>Profit_Vendor2Format</DataField>
+        </Field>
+        <Field Name="VendorSales">
+          <DataField>VendorSales</DataField>
+        </Field>
+        <Field Name="VendorSalesFormat">
+          <DataField>VendorSalesFormat</DataField>
+        </Field>
+        <Field Name="CostAmtFooter">
+          <DataField>CostAmtFooter</DataField>
+        </Field>
+        <Field Name="CostAmtFooterFormat">
+          <DataField>CostAmtFooterFormat</DataField>
+        </Field>
+        <Field Name="VendorProfit">
+          <DataField>VendorProfit</DataField>
+        </Field>
+        <Field Name="VendorProfitFormat">
+          <DataField>VendorProfitFormat</DataField>
+        </Field>
+        <Field Name="SalesPct">
+          <DataField>SalesPct</DataField>
+        </Field>
+        <Field Name="SalesPctFormat">
+          <DataField>SalesPctFormat</DataField>
+        </Field>
+        <Field Name="SalesLastYear">
+          <DataField>SalesLastYear</DataField>
+        </Field>
+        <Field Name="SalesLastYearFormat">
+          <DataField>SalesLastYearFormat</DataField>
+        </Field>
+        <Field Name="DbLastYear">
+          <DataField>DbLastYear</DataField>
+        </Field>
+        <Field Name="DbLastYearFormat">
+          <DataField>DbLastYearFormat</DataField>
+        </Field>
+        <Field Name="SalesPct2">
+          <DataField>SalesPct2</DataField>
+        </Field>
+        <Field Name="SalesPct2Format">
+          <DataField>SalesPct2Format</DataField>
+        </Field>
+        <Field Name="ProfitPct2">
+          <DataField>ProfitPct2</DataField>
+        </Field>
+        <Field Name="ProfitPct2Format">
+          <DataField>ProfitPct2Format</DataField>
+        </Field>
+        <Field Name="IndexSales_1">
+          <DataField>IndexSales_1</DataField>
+        </Field>
+        <Field Name="IndexSales_1Format">
+          <DataField>IndexSales_1Format</DataField>
+        </Field>
+        <Field Name="IndexSales_2">
+          <DataField>IndexSales_2</DataField>
+        </Field>
+        <Field Name="IndexSales_2Format">
+          <DataField>IndexSales_2Format</DataField>
+        </Field>
+        <Field Name="IndexDb_1">
+          <DataField>IndexDb_1</DataField>
+        </Field>
+        <Field Name="IndexDb_1Format">
+          <DataField>IndexDb_1Format</DataField>
+        </Field>
+        <Field Name="IndexDb_2">
+          <DataField>IndexDb_2</DataField>
+        </Field>
+        <Field Name="IndexDb_2Format">
+          <DataField>IndexDb_2Format</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,85 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="USERID">
-          <DataField>USERID</DataField>
-        </Field>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="gFilter">
-          <DataField>gFilter</DataField>
-        </Field>
-        <Field Name="CurrReport_PAGENO">
-          <DataField>CurrReport_PAGENO</DataField>
-        </Field>
-        <Field Name="FORMAT_TODAY_0_4_">
-          <DataField>FORMAT_TODAY_0_4_</DataField>
-        </Field>
-        <Field Name="txtAmount">
-          <DataField>txtAmount</DataField>
-        </Field>
-        <Field Name="txtQty">
-          <DataField>txtQty</DataField>
-        </Field>
-        <Field Name="txtDescription">
-          <DataField>txtDescription</DataField>
-        </Field>
-        <Field Name="txtItemNo">
-          <DataField>txtItemNo</DataField>
-        </Field>
-        <Field Name="Item_Item__No__">
-          <DataField>Item_Item__No__</DataField>
-        </Field>
-        <Field Name="gShrinkageQty">
-          <DataField>gShrinkageQty</DataField>
-        </Field>
-        <Field Name="gShrinkageQtyFormat">
-          <DataField>gShrinkageQtyFormat</DataField>
-        </Field>
-        <Field Name="gShrinkageAmount">
-          <DataField>gShrinkageAmount</DataField>
-        </Field>
-        <Field Name="gShrinkageAmountFormat">
-          <DataField>gShrinkageAmountFormat</DataField>
-        </Field>
-        <Field Name="Item_Item_Description">
-          <DataField>Item_Item_Description</DataField>
-        </Field>
-        <Field Name="txtReportName">
-          <DataField>txtReportName</DataField>
-        </Field>
-        <Field Name="gShrinkageQtyTotal">
-          <DataField>gShrinkageQtyTotal</DataField>
-        </Field>
-        <Field Name="gShrinkageQtyTotalFormat">
-          <DataField>gShrinkageQtyTotalFormat</DataField>
-        </Field>
-        <Field Name="gShrinkageAmountTotal">
-          <DataField>gShrinkageAmountTotal</DataField>
-        </Field>
-        <Field Name="gShrinkageAmountTotalFormat">
-          <DataField>gShrinkageAmountTotalFormat</DataField>
-        </Field>
-        <Field Name="Page_Caption">
-          <DataField>Page_Caption</DataField>
-        </Field>
-        <Field Name="Shrinkage___ItemCaption">
-          <DataField>Shrinkage___ItemCaption</DataField>
-        </Field>
-        <Field Name="TotalCaption">
-          <DataField>TotalCaption</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -1376,4 +1297,80 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Invalid</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="USERID">
+          <DataField>USERID</DataField>
+        </Field>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="gFilter">
+          <DataField>gFilter</DataField>
+        </Field>
+        <Field Name="FORMAT_TODAY_0_4_">
+          <DataField>FORMAT_TODAY_0_4_</DataField>
+        </Field>
+        <Field Name="txtAmount">
+          <DataField>txtAmount</DataField>
+        </Field>
+        <Field Name="txtQty">
+          <DataField>txtQty</DataField>
+        </Field>
+        <Field Name="txtDescription">
+          <DataField>txtDescription</DataField>
+        </Field>
+        <Field Name="txtItemNo">
+          <DataField>txtItemNo</DataField>
+        </Field>
+        <Field Name="Item_Item__No__">
+          <DataField>Item_Item__No__</DataField>
+        </Field>
+        <Field Name="gShrinkageQty">
+          <DataField>gShrinkageQty</DataField>
+        </Field>
+        <Field Name="gShrinkageQtyFormat">
+          <DataField>gShrinkageQtyFormat</DataField>
+        </Field>
+        <Field Name="gShrinkageAmount">
+          <DataField>gShrinkageAmount</DataField>
+        </Field>
+        <Field Name="gShrinkageAmountFormat">
+          <DataField>gShrinkageAmountFormat</DataField>
+        </Field>
+        <Field Name="Item_Item_Description">
+          <DataField>Item_Item_Description</DataField>
+        </Field>
+        <Field Name="txtReportName">
+          <DataField>txtReportName</DataField>
+        </Field>
+        <Field Name="gShrinkageQtyTotal">
+          <DataField>gShrinkageQtyTotal</DataField>
+        </Field>
+        <Field Name="gShrinkageQtyTotalFormat">
+          <DataField>gShrinkageQtyTotalFormat</DataField>
+        </Field>
+        <Field Name="gShrinkageAmountTotal">
+          <DataField>gShrinkageAmountTotal</DataField>
+        </Field>
+        <Field Name="gShrinkageAmountTotalFormat">
+          <DataField>gShrinkageAmountTotalFormat</DataField>
+        </Field>
+        <Field Name="Page_Caption">
+          <DataField>Page_Caption</DataField>
+        </Field>
+        <Field Name="Shrinkage___ItemCaption">
+          <DataField>Shrinkage___ItemCaption</DataField>
+        </Field>
+        <Field Name="TotalCaption">
+          <DataField>TotalCaption</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

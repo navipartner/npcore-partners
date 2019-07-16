@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,181 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="CustAddress1">
-          <DataField>CustAddress1</DataField>
-        </Field>
-        <Field Name="CustAddress2">
-          <DataField>CustAddress2</DataField>
-        </Field>
-        <Field Name="CustAddress3">
-          <DataField>CustAddress3</DataField>
-        </Field>
-        <Field Name="CustAddress4">
-          <DataField>CustAddress4</DataField>
-        </Field>
-        <Field Name="CustAddress5">
-          <DataField>CustAddress5</DataField>
-        </Field>
-        <Field Name="CustAddress6">
-          <DataField>CustAddress6</DataField>
-        </Field>
-        <Field Name="CustAddress7">
-          <DataField>CustAddress7</DataField>
-        </Field>
-        <Field Name="CustAddress8">
-          <DataField>CustAddress8</DataField>
-        </Field>
-        <Field Name="CompanyInformationCity">
-          <DataField>CompanyInformationCity</DataField>
-        </Field>
-        <Field Name="CompanyInformationName">
-          <DataField>CompanyInformationName</DataField>
-        </Field>
-        <Field Name="CompanyInformationPicture">
-          <DataField>CompanyInformationPicture</DataField>
-        </Field>
-        <Field Name="CompanyInformationPhoneNo">
-          <DataField>CompanyInformationPhoneNo</DataField>
-        </Field>
-        <Field Name="CustRepairGlobalDim1">
-          <DataField>CustRepairGlobalDim1</DataField>
-        </Field>
-        <Field Name="AddrLine">
-          <DataField>AddrLine</DataField>
-        </Field>
-        <Field Name="CustomerRepairStatus">
-          <DataField>CustomerRepairStatus</DataField>
-        </Field>
-        <Field Name="AddressFooter">
-          <DataField>AddressFooter</DataField>
-        </Field>
-        <Field Name="AddressFooter2">
-          <DataField>AddressFooter2</DataField>
-        </Field>
-        <Field Name="RepairNo">
-          <DataField>RepairNo</DataField>
-        </Field>
-        <Field Name="Today">
-          <DataField>Today</DataField>
-        </Field>
-        <Field Name="NameCaption">
-          <DataField>NameCaption</DataField>
-        </Field>
-        <Field Name="Name">
-          <DataField>Name</DataField>
-        </Field>
-        <Field Name="HandedInCaption">
-          <DataField>HandedInCaption</DataField>
-        </Field>
-        <Field Name="HandedIn">
-          <DataField>HandedIn</DataField>
-        </Field>
-        <Field Name="GuaranteeCaption">
-          <DataField>GuaranteeCaption</DataField>
-        </Field>
-        <Field Name="Guarantee">
-          <DataField>Guarantee</DataField>
-        </Field>
-        <Field Name="EquipmentCaption">
-          <DataField>EquipmentCaption</DataField>
-        </Field>
-        <Field Name="ItemDescription">
-          <DataField>ItemDescription</DataField>
-        </Field>
-        <Field Name="SerialNoCaption">
-          <DataField>SerialNoCaption</DataField>
-        </Field>
-        <Field Name="SerialNo">
-          <DataField>SerialNo</DataField>
-        </Field>
-        <Field Name="AccessoriesCaption">
-          <DataField>AccessoriesCaption</DataField>
-        </Field>
-        <Field Name="Accessories">
-          <DataField>Accessories</DataField>
-        </Field>
-        <Field Name="Accessories1">
-          <DataField>Accessories1</DataField>
-        </Field>
-        <Field Name="DefectDescCaption">
-          <DataField>DefectDescCaption</DataField>
-        </Field>
-        <Field Name="RepairDescription">
-          <DataField>RepairDescription</DataField>
-        </Field>
-        <Field Name="Thanks">
-          <DataField>Thanks</DataField>
-        </Field>
-        <Field Name="PictureDocumentation1">
-          <DataField>PictureDocumentation1</DataField>
-        </Field>
-        <Field Name="PictureDocumentation2">
-          <DataField>PictureDocumentation2</DataField>
-        </Field>
-        <Field Name="Table_Cap">
-          <DataField>Table_Cap</DataField>
-        </Field>
-        <Field Name="LetterText1">
-          <DataField>LetterText1</DataField>
-        </Field>
-        <Field Name="LetterText2">
-          <DataField>LetterText2</DataField>
-        </Field>
-        <Field Name="LetterText3">
-          <DataField>LetterText3</DataField>
-        </Field>
-        <Field Name="LetterText4">
-          <DataField>LetterText4</DataField>
-        </Field>
-        <Field Name="LetterText5">
-          <DataField>LetterText5</DataField>
-        </Field>
-        <Field Name="CompanyAddr1">
-          <DataField>CompanyAddr1</DataField>
-        </Field>
-        <Field Name="CompanyAddr2">
-          <DataField>CompanyAddr2</DataField>
-        </Field>
-        <Field Name="CompanyAddr3">
-          <DataField>CompanyAddr3</DataField>
-        </Field>
-        <Field Name="CompanyAddr4">
-          <DataField>CompanyAddr4</DataField>
-        </Field>
-        <Field Name="CompanyAddr5">
-          <DataField>CompanyAddr5</DataField>
-        </Field>
-        <Field Name="CompanyAddr6">
-          <DataField>CompanyAddr6</DataField>
-        </Field>
-        <Field Name="CompanyAddr7">
-          <DataField>CompanyAddr7</DataField>
-        </Field>
-        <Field Name="CompanyAddr8">
-          <DataField>CompanyAddr8</DataField>
-        </Field>
-        <Field Name="DefectLineNo">
-          <DataField>DefectLineNo</DataField>
-        </Field>
-        <Field Name="DefectText">
-          <DataField>DefectText</DataField>
-        </Field>
-        <Field Name="DefectFound">
-          <DataField>DefectFound</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -1943,4 +1768,179 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="CustAddress1">
+          <DataField>CustAddress1</DataField>
+        </Field>
+        <Field Name="CustAddress2">
+          <DataField>CustAddress2</DataField>
+        </Field>
+        <Field Name="CustAddress3">
+          <DataField>CustAddress3</DataField>
+        </Field>
+        <Field Name="CustAddress4">
+          <DataField>CustAddress4</DataField>
+        </Field>
+        <Field Name="CustAddress5">
+          <DataField>CustAddress5</DataField>
+        </Field>
+        <Field Name="CustAddress6">
+          <DataField>CustAddress6</DataField>
+        </Field>
+        <Field Name="CustAddress7">
+          <DataField>CustAddress7</DataField>
+        </Field>
+        <Field Name="CustAddress8">
+          <DataField>CustAddress8</DataField>
+        </Field>
+        <Field Name="CompanyInformationCity">
+          <DataField>CompanyInformationCity</DataField>
+        </Field>
+        <Field Name="CompanyInformationName">
+          <DataField>CompanyInformationName</DataField>
+        </Field>
+        <Field Name="CompanyInformationPicture">
+          <DataField>CompanyInformationPicture</DataField>
+        </Field>
+        <Field Name="CompanyInformationPhoneNo">
+          <DataField>CompanyInformationPhoneNo</DataField>
+        </Field>
+        <Field Name="CustRepairGlobalDim1">
+          <DataField>CustRepairGlobalDim1</DataField>
+        </Field>
+        <Field Name="AddrLine">
+          <DataField>AddrLine</DataField>
+        </Field>
+        <Field Name="CustomerRepairStatus">
+          <DataField>CustomerRepairStatus</DataField>
+        </Field>
+        <Field Name="AddressFooter">
+          <DataField>AddressFooter</DataField>
+        </Field>
+        <Field Name="AddressFooter2">
+          <DataField>AddressFooter2</DataField>
+        </Field>
+        <Field Name="RepairNo">
+          <DataField>RepairNo</DataField>
+        </Field>
+        <Field Name="Today">
+          <DataField>Today</DataField>
+        </Field>
+        <Field Name="NameCaption">
+          <DataField>NameCaption</DataField>
+        </Field>
+        <Field Name="Name">
+          <DataField>Name</DataField>
+        </Field>
+        <Field Name="HandedInCaption">
+          <DataField>HandedInCaption</DataField>
+        </Field>
+        <Field Name="HandedIn">
+          <DataField>HandedIn</DataField>
+        </Field>
+        <Field Name="GuaranteeCaption">
+          <DataField>GuaranteeCaption</DataField>
+        </Field>
+        <Field Name="Guarantee">
+          <DataField>Guarantee</DataField>
+        </Field>
+        <Field Name="EquipmentCaption">
+          <DataField>EquipmentCaption</DataField>
+        </Field>
+        <Field Name="ItemDescription">
+          <DataField>ItemDescription</DataField>
+        </Field>
+        <Field Name="SerialNoCaption">
+          <DataField>SerialNoCaption</DataField>
+        </Field>
+        <Field Name="SerialNo">
+          <DataField>SerialNo</DataField>
+        </Field>
+        <Field Name="AccessoriesCaption">
+          <DataField>AccessoriesCaption</DataField>
+        </Field>
+        <Field Name="Accessories">
+          <DataField>Accessories</DataField>
+        </Field>
+        <Field Name="Accessories1">
+          <DataField>Accessories1</DataField>
+        </Field>
+        <Field Name="DefectDescCaption">
+          <DataField>DefectDescCaption</DataField>
+        </Field>
+        <Field Name="RepairDescription">
+          <DataField>RepairDescription</DataField>
+        </Field>
+        <Field Name="Thanks">
+          <DataField>Thanks</DataField>
+        </Field>
+        <Field Name="PictureDocumentation1">
+          <DataField>PictureDocumentation1</DataField>
+        </Field>
+        <Field Name="PictureDocumentation2">
+          <DataField>PictureDocumentation2</DataField>
+        </Field>
+        <Field Name="Table_Cap">
+          <DataField>Table_Cap</DataField>
+        </Field>
+        <Field Name="LetterText1">
+          <DataField>LetterText1</DataField>
+        </Field>
+        <Field Name="LetterText2">
+          <DataField>LetterText2</DataField>
+        </Field>
+        <Field Name="LetterText3">
+          <DataField>LetterText3</DataField>
+        </Field>
+        <Field Name="LetterText4">
+          <DataField>LetterText4</DataField>
+        </Field>
+        <Field Name="LetterText5">
+          <DataField>LetterText5</DataField>
+        </Field>
+        <Field Name="CompanyAddr1">
+          <DataField>CompanyAddr1</DataField>
+        </Field>
+        <Field Name="CompanyAddr2">
+          <DataField>CompanyAddr2</DataField>
+        </Field>
+        <Field Name="CompanyAddr3">
+          <DataField>CompanyAddr3</DataField>
+        </Field>
+        <Field Name="CompanyAddr4">
+          <DataField>CompanyAddr4</DataField>
+        </Field>
+        <Field Name="CompanyAddr5">
+          <DataField>CompanyAddr5</DataField>
+        </Field>
+        <Field Name="CompanyAddr6">
+          <DataField>CompanyAddr6</DataField>
+        </Field>
+        <Field Name="CompanyAddr7">
+          <DataField>CompanyAddr7</DataField>
+        </Field>
+        <Field Name="CompanyAddr8">
+          <DataField>CompanyAddr8</DataField>
+        </Field>
+        <Field Name="DefectLineNo">
+          <DataField>DefectLineNo</DataField>
+        </Field>
+        <Field Name="DefectText">
+          <DataField>DefectText</DataField>
+        </Field>
+        <Field Name="DefectFound">
+          <DataField>DefectFound</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>
