@@ -114,7 +114,7 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
         //-NC2.12 [313362]
         ConfigExcelExchange.SetHideDialog(DialogEnabled());
         //+NC2.12 [313362]
-        Error('AL-Conversion: TODO #361941 - AL: COD6151091 "Nc RapidConnect Export Mgt."');
+        Error('AL-Conversion: TODO #361941 - AL: Changes in COD8618-"Config. Excel Exchange"');
 
         ClientFilename := ServerFilename;
         ConfigExcelExchange.ExportExcel(ClientFilename, ConfigPackageTable, false, false); //NAV 2017
@@ -513,8 +513,8 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
         end;
         //+NC2.14 [322308]
         RecRef2 := RecRef.Duplicate;
-        ConfigXMLExchange.SetNcTask(TempTask);
-        ConfigXMLExchange.ApplyPackageFilter2(ConfigPackageTable, RecRef2);
+        Error('AL-Conversion: TODO #361941 - AL: Changes in COD8618-"Config. Excel Exchange"');
+        Error('AL-Conversion: TODO #361941 - AL: Changes in COD8618-"Config. Excel Exchange"');
         exit(RecRef2.FindFirst);
     end;
 
