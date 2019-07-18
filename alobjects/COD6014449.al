@@ -70,6 +70,7 @@ codeunit 6014449 "Table Import Library"
     // NPR5.48/MMV /20190130 CASE 342396 Added delete all before import option
     //                                   Added MediaSet & Media handlers via events, so NAV2017+ can handle it.
     // NPR5.50/MMV /20190403 CASE 351021 Better delimiter handling and re-added support for unknown record count.
+    // #362054/MMV /20190717 CASE 362054 Added support for tables inside extensions.
     // 
     // KNOWN BUG: IF DELIMITER VALUES ARE ALSO INSIDE THE FIELD VALUES IN NON-ESCAPED FORM, THERE WILL NOT BE ANY FANCY ATTEMPTS AT NARROWING DOWN WHAT IS A VALUE AND WHAT IS A DELIMITER!
 
@@ -147,6 +148,7 @@ codeunit 6014449 "Table Import Library"
         ErrFormat: Label 'Invalid input file. Expected line start %1 in mode %2';
         FieldStartDelimiterSet: Boolean;
         FieldEndDelimiterSet: Boolean;
+        ERROR_TABLE_NO: Label 'Unknown Table No. %1';
 
     procedure ImportTableBatch()
     begin
@@ -838,22 +840,9 @@ codeunit 6014449 "Table Import Library"
         FieldRef: FieldRef;
         IsObsolete: Boolean;
     begin
-        //-NPR5.48 [340086]
-        ObjectMetadata.SetAutoCalcFields(Metadata);
-        //+NPR5.48 [340086]
-        ObjectMetadata.Get(ObjectMetadata."Object Type"::Table, TableNo);
-        if not LoadMetadataXml(ObjectMetadata, XmlDoc) then
-          exit;
-
-        //-NPR5.48 [340086]
-        // TempFieldsToImport.SETRANGE(TableNo,TableNo);
-        // TempFieldsToImport.SETFILTER(Type,'%1|%2',TempFieldsToImport.Type::Integer,TempFieldsToImport.Type::BigInteger);
-        // IF TempFieldsToImport.FINDSET THEN REPEAT
-        //  IF TryFieldAutoIncrementCheck(TempFieldsToImport."No.", XmlDoc, IsAutoIncrement) THEN
-        //    IF IsAutoIncrement THEN
-        //      TempFieldsToImport.MARK(TRUE);
-        // UNTIL TempFieldsToImport.NEXT = 0;
-        // TempFieldsToImport.SETRANGE(Type);
+        //-#362054 [362054]
+        LoadMetadataXml(TableNo, XmlDoc);
+        //-#362054 [362054]
 
         if TempFieldsToImport.FindSet then repeat
           if TempFieldsToImport.Type in [TempFieldsToImport.Type::Integer, TempFieldsToImport.Type::BigInteger] then
@@ -866,7 +855,6 @@ codeunit 6014449 "Table Import Library"
           if FieldIsObsolete(TempFieldsToImport.TableNo, TempFieldsToImport."No.") then
             TempFieldsToImport.Mark(true);
         until TempFieldsToImport.Next = 0;
-        //+NPR5.48 [340086]
     end;
 
     [TryFunction]
@@ -924,23 +912,59 @@ codeunit 6014449 "Table Import Library"
         //+NPR5.42 [313693]
     end;
 
-    local procedure LoadMetadataXml(ObjectMetadata: Record "Object Metadata";var XmlDoc: DotNet npNetXmlDocument): Boolean
+    local procedure LoadMetadataXml(TableNo: Integer;var XmlDoc: DotNet npNetXmlDocument)
     var
         InStream: InStream;
+        ObjectMetadata: Record "Object Metadata";
+        RecRef: RecordRef;
+        FieldRef: FieldRef;
+        AllObj: Record AllObj;
+        InstalledPackageIDFilter: Text;
+        TempBlob: Record TempBlob temporary;
     begin
-        //-NPR5.42 [313693]
-        if not ObjectMetadata.Metadata.HasValue then
-          exit(false);
+        //-#362054 [362054]
+        ObjectMetadata.SetAutoCalcFields(Metadata);
+        if ObjectMetadata.Get(ObjectMetadata."Object Type"::Table, TableNo) then begin
+          if not ObjectMetadata.Metadata.HasValue then
+            Error(ERROR_TABLE_NO, TableNo);
 
-        //-NPR5.48 [340086]
-        //ObjectMetadata.CALCFIELDS(Metadata);
-        //+NPR5.48 [340086]
-        ObjectMetadata.Metadata.CreateInStream(InStream);
-        if not LoadXmlInStream(InStream,XmlDoc) then
-          exit(false);
+          ObjectMetadata.Metadata.CreateInStream(InStream);
+        end else begin
+          //Check if table is inside an extension in NAV2018+
+          if not (AllObj.Get(AllObj."Object Type"::Table, 2000000150) and AllObj.Get(AllObj."Object Type"::Table, 2000000153)) then //NAV App Object Metadata & NAV App Installed App
+            Error(ERROR_TABLE_NO, TableNo);
 
-        exit(not IsNull(XmlDoc.DocumentElement));
-        //+NPR5.42 [313693]
+          RecRef.Open(2000000153); //NAV App Installed App
+          if RecRef.FindSet then repeat
+            if InstalledPackageIDFilter <> '' then
+              InstalledPackageIDFilter += '|';
+            InstalledPackageIDFilter += ('''' + Format(RecRef.Field(2).Value) + '''');
+          until RecRef.Next = 0;
+          RecRef.Close();
+
+          RecRef.Open(2000000150); //NAV App Object Metadata
+          FieldRef := RecRef.Field(1); //App Package ID
+          FieldRef.SetFilter(InstalledPackageIDFilter);
+          FieldRef := RecRef.Field(2); //Object Type
+          FieldRef.SetFilter('=%1', 1); //Table
+          FieldRef := RecRef.Field(3); //Object ID
+          FieldRef.SetFilter('=%1', TableNo);
+
+          if not RecRef.FindFirst then
+            Error(ERROR_TABLE_NO, TableNo);
+
+          FieldRef := RecRef.Field(5); //Metadata
+          FieldRef.CalcField;
+          TempBlob.Blob := FieldRef.Value;
+          TempBlob.Blob.CreateInStream(InStream);
+        end;
+
+        if LoadXmlInStream(InStream,XmlDoc) then
+          if not IsNull(XmlDoc.DocumentElement) then
+            exit;
+
+        Error(ERROR_TABLE_NO, TableNo);
+        //-#362054 [362054]
     end;
 
     local procedure CheckTableExpected(TableID: Integer)

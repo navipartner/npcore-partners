@@ -30,6 +30,7 @@ codeunit 6151403 "Magento Webservice"
     // MAG2.20/TSA /20190409  CASE 351590 Added Customer Statement as PDF
     // MAG2.20/TSA /20190424  CASE 345376 Added Shipment Statement as PDF
     // MAG2.22/MHA /20190711  CASE 361706 Removed explicit set of Magento."Variant System" in InitSetup()
+    // MAG14.00.2.22/ALST/20190714 CASE 361943 removed call to standard object customization in GeneratePdfCustomerStatement()
 
 
     trigger OnRun()
@@ -120,9 +121,6 @@ codeunit 6151403 "Magento Webservice"
         ReportSelections: Record "Report Selections";
         Filename: Text;
         Customer: Record Customer;
-        CustomerStatement: Report Statement;
-        AgingPeriodLength: DateFormula;
-        DateChoice: Option "Due Date","Posting Date";
     begin
 
         //-MAG2.20 [351590]
@@ -135,16 +133,7 @@ codeunit 6151403 "Magento Webservice"
 
         Filename := TemporaryPath + 'customerstatement-' + CustomerNo + '.pdf';
 
-        if (ReportSelections."Report ID" = 116) then begin
-          // Standard statement
-          CustomerStatement.SetTableView (Customer);
-          CustomerStatement.SetSettings (true, true, true, true, true, true, AgingPeriodLength, DateChoice::"Due Date", false, FromDate, UntilDate);
-          CustomerStatement.SaveAsPdf (Filename);
-
-        end else begin
-          REPORT.SaveAsPdf (ReportSelections."Report ID", Filename, Customer);
-
-        end;
+        REPORT.SaveAsPdf (ReportSelections."Report ID", Filename, Customer);
 
         PdfCustomerStatement := GetBase64(Filename);
         if Erase(Filename) then;

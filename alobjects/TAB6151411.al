@@ -13,6 +13,7 @@ table 6151411 "Magento Picture"
     // MAG2.01/TS  /20161005  CASE 253978 Exit Manufacture instead of Brand
     // MAG2.08/MHA /20171016  CASE 292926 Added Publisher OnGetMagentoUrl()
     // MAG2.09/TS  /20171113  CASE 296169 Magento Urls can be https
+    // MAG2.22/MHA /20190716  CASE 361234 Added function TryCheckPicture()
 
     Caption = 'Magento Picture';
     DrillDownPageID = "Magento Pictures";
@@ -73,6 +74,41 @@ table 6151411 "Magento Picture"
     {
     }
 
+    trigger OnDelete()
+    var
+        MagentoBrand: Record "Magento Brand";
+        MagentoItemGroup: Record "Magento Item Group";
+        MagentoPictureLink: Record "Magento Picture Link";
+    begin
+        //-MAG2.22 [361234]
+        case Type of
+          Type::Item:
+            begin
+              MagentoPictureLink.SetRange("Picture Name",Name);
+              if MagentoPictureLink.FindFirst then
+                MagentoPictureLink.DeleteAll;
+            end;
+          Type::Brand:
+            begin
+              MagentoBrand.SetRange(Picture,Name);
+              if MagentoBrand.FindFirst then
+                MagentoBrand.ModifyAll(Picture,'');
+
+              Clear(MagentoBrand);
+              MagentoBrand.SetRange("Logo Picture",Name);
+              if MagentoBrand.FindFirst then
+                MagentoBrand.ModifyAll("Logo Picture",'');
+            end;
+          Type::"Item Group":
+            begin
+              MagentoItemGroup.SetRange(Picture,Name);
+              if MagentoItemGroup.FindFirst then
+                MagentoItemGroup.ModifyAll(Picture,'');
+            end;
+        end;
+        //+MAG2.22 [361234]
+    end;
+
     trigger OnInsert()
     begin
         //-MAG1.22
@@ -107,33 +143,23 @@ table 6151411 "Magento Picture"
     begin
         //-MAG1.21
         //-MAG10.00.2.00 [258544]
-        //CLEAR(TempItem.Picture);
         Clear(TempMagentoPicture.Picture);
         //+MAG10.00.2.00 [258544]
         PictureUrl := GetMagentotUrl();
         if PictureUrl = '' then
           exit;
         //-MAG2.01
-        // WebClient := WebClient.WebClient();
-        // ASSERTERROR BEGIN
-        //  MemoryStream := MemoryStream.MemoryStream(WebClient.DownloadData(PictureUrl));
-        //  ERROR('');
-        // END;
-        // IF GETLASTERRORTEXT <> '' THEN
-        //  EXIT;
         if not TryDownloadPicture(PictureUrl,MemoryStream) then
           exit;
         //+MAG2.01
         if MemoryStream.Length = 0 then
           exit;
         //-MAG10.00.2.00 [258544]
-        //TempItem.Picture.CREATEOUTSTREAM(OutStream);
         TempMagentoPicture.Picture.CreateOutStream(OutStream);
         //+MAG10.00.2.00 [258544]
         MemoryStream.WriteTo(OutStream);
 
         //-MAG10.00.2.00 [258544]
-        //EXIT(TempItem.Picture.HASVALUE);
         exit(TempMagentoPicture.Picture.HasValue);
         //+MAG10.00.2.00 [258544]
         //+MAG1.21
@@ -148,6 +174,19 @@ table 6151411 "Magento Picture"
         WebClient := WebClient.WebClient();
         MemoryStream := MemoryStream.MemoryStream(WebClient.DownloadData(PictureUrl));
         //+MAG2.01
+    end;
+
+    [TryFunction]
+    procedure TryCheckPicture()
+    var
+        WebRequest: DotNet npNetWebRequest;
+        WebResponse: DotNet npNetWebResponse;
+    begin
+        //-MAG2.22 [361234]
+        WebRequest := WebRequest.CreateHttp(GetMagentotUrl());
+        WebRequest.Method := 'HEAD';
+        WebResponse := WebRequest.GetResponse();
+        //+MAG2.22 [361234]
     end;
 
     procedure GetBase64() Value: Text
@@ -177,7 +216,6 @@ table 6151411 "Magento Picture"
         case Type of
           Type::Item: exit('product');
           //-MAG2.01
-          //Type::Brand: EXIT('brand');
           Type::Brand: exit('manufacturer');
           //+MAG2.01
           Type::"Item Group": exit('category');
@@ -204,8 +242,6 @@ table 6151411 "Magento Picture"
         if MagentoSetup."Magento Url" = '' then
           MagentoSetup.Get;
         //-MAG2.09 [296169]
-        //String := MagentoSetup."Magento Url" + 'media/catalog/' + GetMagentoType() + '/api/' + Name;
-        //EXIT(String.Replace('https','http'));
         MagentoUrl := MagentoSetup."Magento Url" + 'media/catalog/' + GetMagentoType() + '/api/' + Name;
         exit(MagentoUrl);
         //+MAG2.09 [296169]
