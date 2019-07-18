@@ -7,6 +7,7 @@ pageextension 50216 pageextension50216 extends "Item List"
     // NPR5.29/LS  /20161108 CASE 257874 Changed length from 100 to 250 for Global Var "NPRAttrTextArray"
     // NPR5.33/ANEN/20170427 CASE 273989 Extending to 40 attributes
     // NPR5.38/BR  /20171116 CASE 295255 Added Action POS Sales Entries
+    // #361514/THRO/20190716 CASE 361514 Action POS Sales Entries named POSSalesEntries (for AL Conversion)
     layout
     {
         addafter("VAT Prod. Posting Group")
@@ -131,9 +132,9 @@ pageextension 50216 pageextension50216 extends "Item List"
     }
     actions
     {
-        addafter(Action24)
+        addafter("&Warehouse Entries")
         {
-            action("POS Sales Entries")
+            action(POSSalesEntries)
             {
                 Caption = 'POS Sales Entries';
                 Image = Entries;

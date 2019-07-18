@@ -8,6 +8,7 @@ codeunit 6150629 "POS Entry Management"
     // NPR5.40/MMV /20180228  CASE 300660 Added lookup function
     // NPR5.40/MMV /20180328  CASE 276562 Adjusted totals for debit sale
     // NPR5.48/MMV /20181120  CASE 318028 French audit
+    // #362329/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
 
 
     trigger OnRun()
@@ -53,6 +54,9 @@ codeunit 6150629 "POS Entry Management"
           //-NPR5.48 [318028]
           POSSalesLine.SetFilter(Type, '<>%1', POSSalesLine.Type::Rounding);
           //+NPR5.48 [318028]
+          //-#362329 [362329]
+          POSSalesLine.SetRange("Exclude from Posting",false);
+          //+#362329 [362329]
           if POSSalesLine.FindSet then repeat
             CalcSalesAmount := POSSalesLine."Amount Excl. VAT";
             CalcTotalAmountInclVATLCY := CalcTotalAmountInclVATLCY + POSSalesLine."Amount Incl. VAT (LCY)";

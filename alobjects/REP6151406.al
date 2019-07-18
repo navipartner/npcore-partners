@@ -4,8 +4,7 @@ report 6151406 "Magento Gift Voucher"
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
     // MAG2.22/MHA /20190619  CASE 357825 Added Data Items to be used with Word Layout
-    DefaultLayout = RDLC;
-    RDLCLayout = './Magento Gift Voucher.rdlc';
+    // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print functionality
 
     Caption = 'Magento Gift Voucher';
     PreviewMode = PrintLayout;
@@ -14,9 +13,6 @@ report 6151406 "Magento Gift Voucher"
     {
         dataitem("Gift Voucher";"Gift Voucher")
         {
-            column(GiftVoucher;GiftVoucher)
-            {
-            }
             column(No_GiftVoucher;"Gift Voucher"."No.")
             {
             }
@@ -221,20 +217,11 @@ report 6151406 "Magento Gift Voucher"
 
             trigger OnAfterGetRecord()
             var
-                TempBlob: Record TempBlob temporary;
-                Convert: DotNet npNetConvert;
-                MemoryStream: DotNet npNetMemoryStream;
                 InStream: InStream;
                 StreamReader: DotNet npNetStreamReader;
                 MagentoBarcodeLibrary: Codeunit "Magento Barcode Library";
                 NulChr: Char;
             begin
-                GiftVoucherMgt.GiftVoucherToTempBlob("Gift Voucher",TempBlob);
-                TempBlob.Blob.CreateInStream(InStream);
-                MemoryStream := MemoryStream.MemoryStream;
-                CopyStream(MemoryStream,InStream);
-                GiftVoucher := Convert.ToBase64String(MemoryStream.ToArray);
-
                 //-MAG2.22 [357825]
                 GiftVoucherMessage := '';
                 if "Gift Voucher Message".HasValue then begin
@@ -246,7 +233,6 @@ report 6151406 "Magento Gift Voucher"
                   GiftVoucherMessage := DelChr(GiftVoucherMessage,'=',Format(NulChr));
                 end;
 
-                TempBlob.DeleteAll;
                 MagentoBarcodeLibrary.SetDpiX(600);
                 MagentoBarcodeLibrary.SetDpiY(600);
                 MagentoBarcodeLibrary.GenerateBarcode("No.",TempBlobBarcode);
@@ -279,8 +265,6 @@ report 6151406 "Magento Gift Voucher"
 
     var
         TempBlobBarcode: Record TempBlob temporary;
-        GiftVoucherMgt: Codeunit "Magento Gift Voucher Mgt.";
-        GiftVoucher: Text;
         GiftVoucherMessage: Text;
 }
 

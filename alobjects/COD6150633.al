@@ -9,9 +9,10 @@ codeunit 6150633 "POS Tax Calculation"
     //                                     Removed OnRun trigger.
     //                                     NA specific functionality handled via recref & fieldref.
     // NPR5.45/MHA /20180817  CASE 321875 DistTaxOverSaleLinePOS() should not trigger new discount calculation
-    // NPR5.48/JDH /20181206 CASE 335967  Changed Tax calculation
-    // NPR5.48/MMV /20190207 CASE 345317 Skip rounding line in new tax check
-    // NPR5.50/TJ  /20190508 CASE 354322 Testing voucher without 0% check
+    // NPR5.48/JDH /20181206  CASE 335967  Changed Tax calculation
+    // NPR5.48/MMV /20190207  CASE 345317 Skip rounding line in new tax check
+    // NPR5.50/TJ  /20190508  CASE 354322 Testing voucher without 0% check
+    // #362329/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
 
 
     trigger OnRun()
@@ -127,6 +128,9 @@ codeunit 6150633 "POS Tax Calculation"
           SetFilter(Type, '<>%1', Type::Rounding);
           SetRange("VAT Calculation Type", "VAT Calculation Type"::"Sales Tax");
           //+NPR5.41 [311309]
+          //-#362329 [362329]
+          SetRange("Exclude from Posting",false);
+          //+#362329 [362329]
           if FindSet then
             repeat
               AddPOSSalesLine(POSSalesLine);
@@ -145,6 +149,10 @@ codeunit 6150633 "POS Tax Calculation"
     var
         RecRef: RecordRef;
     begin
+        //-#362329 [362329]
+        if POSSalesLine."Exclude from Posting" then
+          exit;
+        //+#362329 [362329]
         if not GetSalesTaxCountry(POSSalesLine."Tax Area Code") then
           exit;
 
@@ -377,6 +385,9 @@ codeunit 6150633 "POS Tax Calculation"
     begin
         //-NPR5.41 [311309]
         POSSalesLine.SetRange("POS Entry No.",POSEntryIn."Entry No.");
+        //-#362329 [362329]
+        POSSalesLine.SetRange("Exclude from Posting",false);
+        //+#362329 [362329]
         if POSSalesLine.FindSet then repeat
           if POSSalesLine.Type = POSSalesLine.Type::Voucher then begin
             VATPostingSetup.Get(POSSalesLine."VAT Bus. Posting Group", POSSalesLine."VAT Prod. Posting Group");
@@ -460,6 +471,9 @@ codeunit 6150633 "POS Tax Calculation"
 
         with GlobalPOSSalesLine do begin
           SetRange("POS Entry No.",POSEntry."Entry No.");
+          //-#362329 [362329]
+          SetRange("Exclude from Posting",false);
+          //+#362329 [362329]
           LockTable;
           if FindSet then
             repeat
@@ -581,7 +595,9 @@ codeunit 6150633 "POS Tax Calculation"
             POSSalesLine.SetFilter("Amount Excl. VAT", '>=%1', 0)
           else
             POSSalesLine.SetFilter("Amount Excl. VAT", '<%1', 0);
-
+          //-#362329 [362329]
+          POSSalesLine.SetRange("Exclude from Posting",false);
+          //+#362329 [362329]
           POSSalesLine.CalcSums("Line Amount", "Amount Excl. VAT" ,"Amount Incl. VAT");
 
           VATAmountLine.TestField("VAT Base", POSSalesLine."Amount Excl. VAT");
@@ -617,6 +633,9 @@ codeunit 6150633 "POS Tax Calculation"
           //-NPR5.41 [311309]
           SetFilter(Type, '<>%1', Type::Rounding);
           //+NPR5.41 [311309]
+          //-#362329 [362329]
+          SetRange("Exclude from Posting",false);
+          //+#362329 [362329]
           if FindSet then
             repeat
               if (("Unit Price" <> 0) and (Quantity <> 0)) or ("Amount Excl. VAT" <> 0) then begin
@@ -957,8 +976,13 @@ codeunit 6150633 "POS Tax Calculation"
 
     local procedure AddSaleLinePOS(SaleLinePOS: Record "Sale Line POS")
     var
+        POSCreateEntry: Codeunit "POS Create Entry";
         RecRef: RecordRef;
     begin
+        //-#362329 [362329]
+        if POSCreateEntry.ExcludeFromPosting(SaleLinePOS) then
+          exit;
+        //+#362329 [362329]
         //-NPR5.41 [311309]
         if not GetSalesTaxCountry(SaleLinePOS."Tax Area Code") then
           exit;

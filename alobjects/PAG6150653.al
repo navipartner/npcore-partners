@@ -7,7 +7,8 @@ page 6150653 "POS Sale Line Subpage"
     // NPR5.44/MHA /20180705  CASE 321231 Addied fields "Discount Authorised by","Reason Code"
     // NPR5.46/TS  /20180918  CASE 302819 Added Fields Bin Code,Lot No.,Return Reason Code,Discount Type and Discount Code
     // NPR5.48/TJ  /20190122  CASE 335967 Added field "Unit of Measure Code"
-    // NPR5.50/MMV /20190328 CASE 300557 Refactored sales doc. handling
+    // NPR5.50/MMV /20190328  CASE 300557 Refactored sales doc. handling
+    // #362329/MHA /20190718  CASE 362329 Added field 500 "Exclude from Posting"
 
     Caption = 'POS Sale Line Subpage';
     Editable = false;
@@ -104,6 +105,9 @@ page 6150653 "POS Sale Line Subpage"
                         end;
                         //+NPR5.50 [300557]
                     end;
+                }
+                field("Exclude from Posting";"Exclude from Posting")
+                {
                 }
             }
         }

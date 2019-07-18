@@ -3,6 +3,7 @@ codeunit 6151462 "M2 Picture Mgt."
     // MAG2.08/MHA /20171016  CASE 292926 Object created - M2 Integration
     // MAG2.09/TS  /20171113  CASE 296169 Magento Urls can be https
     // MAG2.22/MHA /20190705  CASE 361164 Updated Exception Message parsing in MagentoApiPost()
+    // MAG2.22/MHA /20190716  CASE 361234 Added function GetMagentoType()
 
 
     trigger OnRun()
@@ -72,9 +73,35 @@ codeunit 6151462 "M2 Picture Mgt."
           exit;
 
         MagentoSetup.Get;
-        //-MAG2.09 [296169]
-        MagentoUrl := MagentoSetup."Magento Url" + 'pub/media/catalog/' + Sender.GetMagentoType() + '/api/' + Sender.Name;
-        //+MAG2.09 [296169]
+        //-MAG2.22 [361234]
+        MagentoUrl := MagentoSetup."Magento Url" + 'pub/media/catalog/' + GetMagentoType(Sender) + '/api/' + Sender.Name;
+        //+MAG2.22 [361234]
+    end;
+
+    local procedure GetMagentoType(MagentoPicture: Record "Magento Picture"): Text
+    begin
+        //-MAG2.22 [361234]
+        case MagentoPicture.Type of
+          MagentoPicture.Type::Item:
+            begin
+              exit('product');
+            end;
+          MagentoPicture.Type::Brand:
+            begin
+              exit('brand');
+            end;
+          MagentoPicture.Type::"Item Group":
+            begin
+              exit('category');
+            end;
+          MagentoPicture.Type::Customer:
+            begin
+              exit('customer');
+            end;
+        end;
+
+        exit('');
+        //+MAG2.22 [361234]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151419, 'OnDragDropPicture', '', true, true)]

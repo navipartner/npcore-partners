@@ -4,6 +4,7 @@ codeunit 6059999 "Client Diagnostics NpCase Mgt."
     // NPR5.40/MHA /20180328 CASE 308907 Data Collection functions moved to Cu 6059998 "Client Diagnostics Data Mgt."
     // NPR5.49/MHA /20190206  CASE 340731 Changed WS endpoint to Azure Api Management
     // NPR5.50/MMV /20190529 CASE 356506 Skip message on success.
+    // #361164/MHA /20190705  CASE 361164 Updated Exception Message parsing in SendClientDiagnostics()
 
     TableNo = "Client Diagnostics";
 
@@ -38,6 +39,7 @@ codeunit 6059999 "Client Diagnostics NpCase Mgt."
         XmlDoc: DotNet npNetXmlDocument;
         MethodName: Text;
         ServiceName: Text;
+        ErrorMessage: Text;
     begin
         //-NPR5.40 [308907]
         //-NPR5.49 [340731]
@@ -52,14 +54,12 @@ codeunit 6059999 "Client Diagnostics NpCase Mgt."
         InitRequest(ClientDiagnostics,XmlDoc);
         //+NPR5.49 [340731]
 
-        //-NPR5.50 [356506]
-        // IF NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) THEN
-        //  MESSAGE('%1',NpXmlDomMgt.GetWebResponseText(HttpWebResponse))
-        // ELSE
-        //  ERROR('%1\\%2',NpXmlDomMgt.GetWebExceptionInnerMessage(WebException),NpXmlDomMgt.GetWebExceptionMessage(WebException));
-        if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then
-          Error('%1\\%2',NpXmlDomMgt.GetWebExceptionInnerMessage(WebException),NpXmlDomMgt.GetWebExceptionMessage(WebException));
-        //+NPR5.50 [356506]
+        //-#361164 [361164]
+        if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
+          ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
+          Error(CopyStr(ErrorMessage,1,1000));
+        end;
+        //+#361164 [361164]
         //+NPR5.40 [308907]
     end;
 

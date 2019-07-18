@@ -274,7 +274,7 @@ xmlport 6151196 "NpCs Collect Documents"
         NpCsDocument."Delivery Document Type" := NpCsArchDocument."Delivery Document Type";
         NpCsDocument."Delivery Document No." := NpCsArchDocument."Delivery Document No.";
         NpCsDocument."Archive on Delivery" := NpCsArchDocument."Archive on Delivery";
-        NpCsDocument."Delivery Only (Non stock)" := NpCsArchDocument."Delivery Only (Non stock)";
+        NpCsDocument."Store Stock" := NpCsArchDocument."Store Stock";
         NpCsDocument."Location Code" := NpCsArchDocument."Location Code";
     end;
 

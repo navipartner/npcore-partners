@@ -25,6 +25,7 @@ table 6151401 "Magento Setup"
     // MAG2.22/MHA /20190625  CASE 359285 Added field 34 "Picture Variety Type"
     // MAG2.22/MHA /20190625  CASE 359754 Added OptionValue "Customer No." to field 500 "Customer Mapping"
     // MAG2.22/MHA /20190708  CASE 352201 Added field 220 "Collect in Store Enabled"
+    // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print fields 340 "Gift Voucher Bitmap", 345 "Voucher Number Format", 350 "Voucher Date Format", 425 "Credit Voucher Bitmap"
 
     Caption = 'Magento Setup';
 
@@ -311,23 +312,6 @@ table 6151401 "Magento Setup"
         {
             Caption = 'Gift Voucher Validity';
         }
-        field(340;"Gift Voucher Bitmap";BLOB)
-        {
-            Caption = 'Gift Voucher Bitmap';
-            SubType = Bitmap;
-        }
-        field(345;"Voucher Number Format";Text[100])
-        {
-            Caption = 'Voucher Number Format';
-            Description = 'MAG2.09';
-            InitValue = '<Sign><Integer Thousand><1000Character,.><Decimals><Comma,,>';
-        }
-        field(350;"Voucher Date Format";Text[100])
-        {
-            Caption = 'Voucher Date Format';
-            Description = 'MAG2.09';
-            InitValue = '<Day,2>-<Month,2>-<Year4>';
-        }
         field(400;"Credit Voucher Language Code";Code[10])
         {
             Caption = 'Credit Voucher Language Code';
@@ -349,11 +333,6 @@ table 6151401 "Magento Setup"
         field(420;"Credit Voucher Code Pattern";Code[20])
         {
             Caption = 'Credit Voucher Code Pattern';
-        }
-        field(425;"Credit Voucher Bitmap";BLOB)
-        {
-            Caption = 'Credit Voucher Bitmap';
-            SubType = Bitmap;
         }
         field(430;"Exchange Web Code Pattern";Code[20])
         {

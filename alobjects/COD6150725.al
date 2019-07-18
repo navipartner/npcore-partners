@@ -34,6 +34,7 @@ codeunit 6150725 "POS Action - Payment"
     // NPR5.49/MHA /20190404 CASE 351069 Zero payment should simply be skipped in CapturePayment()
     // NPR5.50/MMV /20190503 CASE 353807 Fixed #351069. Broke cashback as the zero check is not on user input.
     // NPR5.50/MMV /20190508 CASE 354510 Fixed #341237. Line No. in filter could be re-used and cause invalid decision to skip.
+    // #361514/THRO/20190718 CASE 361514 EventPublisherElement changed in OnBeforeEditPaymentParameters. Action renamed on Page 6150702
 
 
     trigger OnRun()
@@ -175,7 +176,7 @@ codeunit 6150725 "POS Action - Payment"
         FrontEnd.SetActionContext (ActionCode, Context);
     end;
 
-    //[EventSubscriber(ObjectType::Page, 6150702, 'OnBeforeActionEvent', 'Action6014402', true, true)]
+    [EventSubscriber(ObjectType::Page, 6150702, 'OnBeforeActionEvent', 'RefreshActionCodeParameters', true, true)]
     local procedure OnBeforeEditPaymentParameters(var Rec: Record "POS Menu Button")
     var
         POSSetup: Record "POS Setup";

@@ -1,6 +1,8 @@
 codeunit 6151203 "NpCs POS Action Deliver Order"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #344264/MHA /20190717  CASE 344264 "Delivery Only (non stock)" changed to "From Store Stock"
+    // #362329/MHA /20190718  CASE 362329 Updated StrSubStNo on DeliveryText in InsertDocumentReference()
 
 
     trigger OnRun()
@@ -191,7 +193,9 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
         if NpCsSaleLinePOSReference.FindFirst then
           Error(Text009,NpCsDocument."Document Type",NpCsDocument."Document No.");
 
-        DeliveryText := StrSubstNo(JSON.GetStringParameter('Delivery Text',false),NpCsDocument."Reference No.");
+        //-#362329 [362329]
+        DeliveryText := StrSubstNo(JSON.GetStringParameter('Delivery Text',false),NpCsDocument."Document Type",NpCsDocument."Reference No.");
+        //+#362329 [362329]
         if DeliveryText = '' then
           DeliveryText := StrSubstNo(Text006,NpCsDocument."Document Type",NpCsDocument."Reference No.");
         SaleLinePOS.Init;
@@ -220,8 +224,10 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
         NpCsSaleLinePOSReference2: Record "NpCs Sale Line POS Reference";
         SaleLinePOS: Record "Sale Line POS";
     begin
-        if NpCsDocument."Delivery Only (Non stock)" then
+        //-#344264 [344264]
+        if not NpCsDocument."Store Stock" then
           exit;
+        //+#344264 [344264]
         if NpCsDocument."Bill via" <> NpCsDocument."Bill via"::POS then
           exit;
 
@@ -301,8 +307,10 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
     local procedure DeliverSalesLineGLAccount(NpCsDocument: Record "NpCs Document";SalesLine: Record "Sales Line";POSSaleLine: Codeunit "POS Sale Line";var SaleLinePOS: Record "Sale Line POS")
     begin
         SaleLinePOS.Init;
-        if NpCsDocument."Delivery Only (Non stock)" then
+        //-#344264 [344264]
+        if not NpCsDocument."Store Stock" then
           SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
+        //+#344264 [344264]
         if NpCsDocument."Bill via" <> NpCsDocument."Bill via"::POS then
           SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
 
@@ -320,8 +328,10 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
     local procedure DeliverSalesLineItem(NpCsDocument: Record "NpCs Document";SalesLine: Record "Sales Line";POSSaleLine: Codeunit "POS Sale Line";var SaleLinePOS: Record "Sale Line POS")
     begin
         SaleLinePOS.Init;
-        if NpCsDocument."Delivery Only (Non stock)" then
+        //-#344264 [344264]
+        if not NpCsDocument."Store Stock" then
           SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
+        //+#344264 [344264]
         if NpCsDocument."Bill via" <> NpCsDocument."Bill via"::POS then
           SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
         SaleLinePOS.Type := SaleLinePOS.Type::Item;

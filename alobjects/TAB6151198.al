@@ -1,6 +1,7 @@
 table 6151198 "NpCs Document"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #344264/MHA /20190717  CASE 344264 Added functions for return Last Log Entry texts and changed name and logic for field 240
 
     Caption = 'Collect Document';
     DataCaptionFields = "Document Type","Reference No.","Sell-to Customer Name";
@@ -152,6 +153,11 @@ table 6151198 "NpCs Document"
         {
             Caption = 'Processing expires at';
         }
+        field(114;"Customer No.";Code[20])
+        {
+            Caption = 'Customer No.';
+            Description = '#344264';
+        }
         field(115;"Customer E-mail";Text[80])
         {
             Caption = 'Customer E-mail';
@@ -279,9 +285,11 @@ table 6151198 "NpCs Document"
         {
             Caption = 'Archive on Delivery';
         }
-        field(240;"Delivery Only (Non stock)";Boolean)
+        field(240;"Store Stock";Boolean)
         {
-            Caption = 'Delivery Only (Non stock)';
+            Caption = 'Store Stock';
+            Description = '#344264';
+            InitValue = true;
         }
         field(300;"Bill via";Option)
         {
@@ -298,6 +306,12 @@ table 6151198 "NpCs Document"
         {
             Caption = 'Delivery Template (Sales Document)';
             TableRelation = "RP Template Header" WHERE ("Table ID"=CONST(6151198));
+        }
+        field(315;"Salesperson Code";Code[10])
+        {
+            Caption = 'Salesperson Code';
+            Description = '#344264';
+            TableRelation = "Salesperson/Purchaser";
         }
         field(1000;"Send Order Module";Code[20])
         {
@@ -434,6 +448,28 @@ table 6151198 "NpCs Document"
 
         NpCsDocumentLogEntry.SetRange("Document Entry No.","Entry No.");
         NpCsDocumentLogEntry.DeleteAll;
+    end;
+
+    procedure GetLastLogMessage(): Text
+    var
+        NpCsDocumentLogEntry: Record "NpCs Document Log Entry";
+    begin
+        //-#344264 [344264]
+        NpCsDocumentLogEntry.SetRange("Document Entry No.","Entry No.");
+        if NpCsDocumentLogEntry.FindLast then
+          exit(NpCsDocumentLogEntry."Log Message");
+        //+#344264 [344264]
+    end;
+
+    procedure GetLastLogErrorMessage(): Text
+    var
+        NpCsDocumentLogEntry: Record "NpCs Document Log Entry";
+    begin
+        //-#344264 [344264]
+        NpCsDocumentLogEntry.SetRange("Document Entry No.","Entry No.");
+        if NpCsDocumentLogEntry.FindLast then
+          exit(NpCsDocumentLogEntry.GetErrorMessage());
+        //+#344264 [344264]
     end;
 }
 
