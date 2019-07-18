@@ -15,6 +15,7 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
     // NPR5.48/LS  /20181121 CASE 334335 When Upgrading Audit Roll, added migration of Setups
     // NPR5.48/TSA /20181126 CASE 336921 Adding on code on ActivatePoseidonPosting() and DeActivatePoseidonPosting(). Removing commented code
     // NPR5.48/TJ  /20190102 CASE 340615 Commented out usage of field Item."Product Group Code"
+    // #362329/MHA /20190718 CASE 362329 Added "Exclude from Posting" on POS Sales Lines in InsertPOSSaleLine()
 
     Permissions = TableData "Audit Roll"=rimd;
 
@@ -328,6 +329,9 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
             else
               Error('Sales Line Type %1 not implemented in migration (%2 %3 %4)',AuditRoll.Type,AuditRoll.TableName,AuditRoll.FieldName("Clustered Key"),AuditRoll."Clustered Key");
           end;
+          //-#362329 [362329]
+          "Exclude from Posting" := ExcludeFromPosting(AuditRoll);
+          //+#362329 [362329]
           "No." := AuditRoll."No.";
           "Variant Code" := AuditRoll."Variant Code";
           "Location Code" := AuditRoll.Lokationskode;
@@ -910,6 +914,16 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
           until Register.Next = 0;
         end;
         //+NPR5.48 [334335]
+    end;
+
+    procedure ExcludeFromPosting(AuditRoll: Record "Audit Roll"): Boolean
+    begin
+        //-#362329 [362329]
+        if AuditRoll.Type in [AuditRoll.Type::Comment] then
+          exit(true);
+
+        exit(AuditRoll."Sale Type" in [AuditRoll."Sale Type"::Comment,AuditRoll."Sale Type"::"Debit Sale",AuditRoll."Sale Type"::"Open/Close"]);
+        //+#362329 [362329]
     end;
 }
 

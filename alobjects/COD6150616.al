@@ -9,6 +9,7 @@ codeunit 6150616 "POS Post Item Entries"
     // NPR5.48/TJ  /20190111  CASE 340615 Removed usage of Product Group Code in standard objects
     // NPR5.50/TSA /20190412 CASE 351655 Creating Service Items when setup CheckAndCreateServiceItemPos()
     // NPR5.50/TSA /20190531 CASE 355186 Added link in table "POS Entry Sales Doc. Link" when a service item is created
+    // #362329/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
 
     TableNo = "POS Entry";
 
@@ -53,6 +54,9 @@ codeunit 6150616 "POS Post Item Entries"
           POSSalesLine.SetRange("POS Entry No.","Entry No.");
           POSSalesLine.SetRange(Type,POSSalesLine.Type::Item);
           POSSalesLine.SetFilter(Quantity,'<>0');
+          //-#362329 [362329]
+          POSSalesLine.SetRange("Exclude from Posting",false);
+          //+#362329 [362329]
           if POSSalesLine.FindSet then repeat
             POSSalesLine."Item Entry No." := PostItemJnlLine(POSEntry,POSSalesLine);
             POSSalesLine.Modify;

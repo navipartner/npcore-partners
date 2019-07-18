@@ -1,6 +1,7 @@
 table 6151202 "NpCs Arch. Document"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #344264/MHA /20190717  CASE 344264 Added fields 300, 305, 310 and changed name and logic for field 240
 
     Caption = 'Collect Document';
     DrillDownPageID = "NpCs Arch. Document List";
@@ -98,6 +99,11 @@ table 6151202 "NpCs Arch. Document"
         field(113;"Processing expires at";DateTime)
         {
             Caption = 'Processing expires at';
+        }
+        field(114;"Customer No.";Code[20])
+        {
+            Caption = 'Customer No.';
+            Description = '#344264';
         }
         field(115;"Customer E-mail";Text[80])
         {
@@ -213,9 +219,36 @@ table 6151202 "NpCs Arch. Document"
         {
             Caption = 'Archive on Delivery';
         }
-        field(240;"Delivery Only (Non stock)";Boolean)
+        field(240;"Store Stock";Boolean)
         {
-            Caption = 'Delivery Only (Non stock)';
+            Caption = 'Store Stock';
+            Description = '#344264';
+            InitValue = true;
+        }
+        field(300;"Bill via";Option)
+        {
+            Caption = 'Bill via';
+            Description = '#344264';
+            OptionCaption = 'POS,Sales Document';
+            OptionMembers = POS,"Sales Document";
+        }
+        field(305;"Delivery Print Template (POS)";Code[20])
+        {
+            Caption = 'Delivery Print Template (POS)';
+            Description = '#344264';
+            TableRelation = "RP Template Header" WHERE ("Table ID"=CONST(6151198));
+        }
+        field(310;"Delivery Print Template (S.)";Code[20])
+        {
+            Caption = 'Delivery Template (Sales Document)';
+            Description = '#344264';
+            TableRelation = "RP Template Header" WHERE ("Table ID"=CONST(6151198));
+        }
+        field(315;"Salesperson Code";Code[10])
+        {
+            Caption = 'Salesperson Code';
+            Description = '#344264';
+            TableRelation = "Salesperson/Purchaser";
         }
         field(2005;"Location Code";Code[10])
         {

@@ -1,6 +1,7 @@
 codeunit 6151196 "NpCs Workflow Mgt."
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #344264/MHA /20190717  CASE 344264 Bumped version list for update to TaskScheduler in ScheduleRunWorkflow() from NAV10.* and newer
 
     TableNo = "NpCs Document";
 
@@ -33,7 +34,9 @@ codeunit 6151196 "NpCs Workflow Mgt."
     var
         NewSessionId: Integer;
     begin
-        SESSION.StartSession(NewSessionId,CurrCodeunitId(),CompanyName,NpCsDocument);
+        //-NPR10.00.00.5.51 [344264]
+        TASKSCHEDULER.CreateTask(CurrCodeunitId(),0,true,CompanyName,CurrentDateTime,NpCsDocument.RecordId);
+        //+NPR10.00.00.5.51 [344264]
     end;
 
     local procedure RunWorkflow(var NpCsDocument: Record "NpCs Document")

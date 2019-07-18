@@ -1,6 +1,7 @@
 codeunit 6151200 "NpCs Import Sales Document"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #344264/MHA /20190717  CASE 344264 Added import of <config_template> in UpsertCustomer() and changed <delivery_only> to <pick_from_warehouse>
 
     TableNo = "Nc Import Entry";
 
@@ -49,7 +50,10 @@ codeunit 6151200 "NpCs Import Sales Document"
         Commit;
 
         UpsertCustomer(XmlElement,Customer);
-        InsertSalesHeader(XmlElement,Customer,SalesHeader,NpCsDocument);
+        //-#344264 [#344264]
+        InsertSalesHeader(XmlElement,Customer,SalesHeader);
+        InsertCollectDocument(XmlElement,SalesHeader,NpCsDocument);
+        //+#344264 [#344264]
 
         foreach XmlElement2 in XmlElement.SelectNodes('sales_lines/sales_line') do
           InsertSalesLine(XmlElement2,SalesHeader);
@@ -155,10 +159,14 @@ codeunit 6151200 "NpCs Import Sales Document"
 
     local procedure UpsertCustomer(XmlElement: DotNet npNetXmlElement;var Customer: Record Customer)
     var
+        ConfigTemplateHeader: Record "Config. Template Header";
         NpCsDocumentMapping: Record "NpCs Document Mapping";
+        ConfigTemplateMgt: Codeunit "Config. Template Management";
+        RecRef: RecordRef;
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         StoreCode: Code[20];
         CustNo: Code[20];
+        ConfigTemplateCode: Code[10];
         PrevRec: Text;
     begin
         if not FindCustomer(XmlElement,Customer) then begin
@@ -177,6 +185,15 @@ codeunit 6151200 "NpCs Import Sales Document"
 
         PrevRec := Format(Customer);
 
+        //-#344264 [344264]
+        ConfigTemplateCode := NpXmlDomMgt.GetElementCode(XmlElement,'sell_to_customer/config_template',MaxStrLen(ConfigTemplateHeader.Code),false);
+        if (ConfigTemplateCode <> '') and ConfigTemplateHeader.Get(ConfigTemplateCode) then begin
+          RecRef.GetTable(Customer);
+          ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader,RecRef);
+          RecRef.SetTable(Customer);
+        end;
+        //+#344264 [344264]
+
         Customer.Validate(Name,NpXmlDomMgt.GetElementText(XmlElement,'sell_to_customer/name',MaxStrLen(Customer.Name),true));
         Customer."Name 2" := NpXmlDomMgt.GetElementText(XmlElement,'sell_to_customer/name_2',MaxStrLen(Customer."Name 2"),true);
         Customer.Address := NpXmlDomMgt.GetElementText(XmlElement,'sell_to_customer/address',MaxStrLen(Customer.Address),true);
@@ -192,20 +209,13 @@ codeunit 6151200 "NpCs Import Sales Document"
           Customer.Modify(true);
     end;
 
-    local procedure InsertSalesHeader(XmlElement: DotNet npNetXmlElement;Customer: Record Customer;var SalesHeader: Record "Sales Header";var NpCsDocument: Record "NpCs Document")
+    local procedure InsertSalesHeader(XmlElement: DotNet npNetXmlElement;Customer: Record Customer;var SalesHeader: Record "Sales Header")
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        NpCsExpirationMgt: Codeunit "NpCs Expiration Mgt.";
-        DocType: Integer;
         DocNo: Text;
-        StoreCode: Code[20];
         BillToCustNo: Code[20];
-        Callback: Text;
-        OutStr: OutStream;
     begin
-        DocType := NpXmlDomMgt.GetAttributeInt(XmlElement,'','document_type',true);
         DocNo := NpXmlDomMgt.GetAttributeCode(XmlElement,'','document_no',MaxStrLen(SalesHeader."No."),true);
-        StoreCode := GetFromStoreCode(XmlElement);
 
         SalesHeader.SetHideValidationDialog(true);
         SalesHeader.Init;
@@ -214,6 +224,36 @@ codeunit 6151200 "NpCs Import Sales Document"
         SalesHeader."External Order No." := CopyStr(DocNo,1,MaxStrLen(SalesHeader."External Order No."));
         SalesHeader."External Document No." := CopyStr(DocNo,1,MaxStrLen(SalesHeader."External Document No."));
         SalesHeader.Insert(true);
+
+        SalesHeader.Validate("Sell-to Customer No.",Customer."No.");
+        SalesHeader.Validate("Posting Date",NpXmlDomMgt.GetElementDate(XmlElement,'posting_date',true));
+        SalesHeader.Validate("Order Date",NpXmlDomMgt.GetElementDate(XmlElement,'posting_date',true));
+        SalesHeader.Validate("Due Date",NpXmlDomMgt.GetElementDate(XmlElement,'due_date',true));
+        BillToCustNo := NpXmlDomMgt.GetElementCode(XmlElement,'bill_to_customer_no',MaxStrLen(SalesHeader."Bill-to Customer No."),false);
+        if BillToCustNo <> '' then
+          SalesHeader.Validate("Bill-to Customer No.",BillToCustNo);
+        SalesHeader.Validate("Location Code",NpXmlDomMgt.GetElementCode(XmlElement,'location_code',MaxStrLen(SalesHeader."Location Code"),true));
+        SalesHeader.Validate("Salesperson Code",NpXmlDomMgt.GetElementCode(XmlElement,'salesperson_code',MaxStrLen(SalesHeader."Salesperson Code"),true));
+        SalesHeader.Validate("Payment Method Code",NpXmlDomMgt.GetElementCode(XmlElement,'payment_method_code',MaxStrLen(SalesHeader."Payment Method Code"),true));
+        SalesHeader.Validate("Shipment Method Code",NpXmlDomMgt.GetElementCode(XmlElement,'shipment_method_code',MaxStrLen(SalesHeader."Shipment Method Code"),true));
+        SalesHeader.Modify(true);
+    end;
+
+    local procedure InsertCollectDocument(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header";var NpCsDocument: Record "NpCs Document")
+    var
+        NpCsExpirationMgt: Codeunit "NpCs Expiration Mgt.";
+        NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
+        Callback: Text;
+        DocType: Integer;
+        DocNo: Text;
+        StoreCode: Code[20];
+        BillToCustNo: Code[20];
+        OutStr: OutStream;
+    begin
+        //-#344264 [#344264]
+        DocType := NpXmlDomMgt.GetAttributeInt(XmlElement,'','document_type',true);
+        DocNo := NpXmlDomMgt.GetAttributeCode(XmlElement,'','document_no',MaxStrLen(SalesHeader."No."),true);
+        StoreCode := GetFromStoreCode(XmlElement);
 
         Callback := GetCallback(XmlElement);
         NpCsDocument.Init;
@@ -227,6 +267,7 @@ codeunit 6151200 "NpCs Import Sales Document"
         NpCsDocument."Next Workflow Step" := NpCsDocument."Next Workflow Step"::"Order Status";
         NpCsDocument."Processing Status" := NpCsDocument."Processing Status"::Pending;
         NpCsDocument."Processing updated at" := CurrentDateTime;
+        NpCsDocument."Customer No." := NpXmlDomMgt.GetAttributeCode(XmlElement,'sell_to_customer','customer_no',MaxStrLen(NpCsDocument."Customer No."),false);
         NpCsDocument."Customer E-mail" := NpXmlDomMgt.GetElementText(XmlElement,'sell_to_customer/email',MaxStrLen(NpCsDocument."Customer E-mail"),false);
         NpCsDocument."Customer Phone No." := NpXmlDomMgt.GetElementText(XmlElement,'sell_to_customer/phone_no',MaxStrLen(NpCsDocument."Customer Phone No."),false);
         NpCsDocument."Send Notification from Store" := NpXmlDomMgt.GetElementBoolean(XmlElement,'notification/send_notification_from_store',false);
@@ -243,10 +284,11 @@ codeunit 6151200 "NpCs Import Sales Document"
         NpCsDocument."Processing Expiry Duration" := NpXmlDomMgt.GetElementDuration(XmlElement,'notification/processing_expiry_duration',false);
         NpCsDocument."Delivery Expiry Days (Qty.)" := NpXmlDomMgt.GetElementInt(XmlElement,'notification/delivery_expiry_days_qty',false);
         NpCsDocument."Archive on Delivery" := NpXmlDomMgt.GetElementBoolean(XmlElement,'archive_on_delivery',false);
-        NpCsDocument."Delivery Only (Non stock)" := NpXmlDomMgt.GetElementBoolean(XmlElement,'delivery_only',false);
+        NpCsDocument."Store Stock" := NpXmlDomMgt.GetElementBoolean(XmlElement,'store_stock',false);
         NpCsDocument."Bill via" := NpXmlDomMgt.GetElementInt(XmlElement,'bill_via',false);
         NpCsDocument."Delivery Print Template (POS)" := NpXmlDomMgt.GetElementCode(XmlElement,'delivery_print_template_pos',MaxStrLen(NpCsDocument."Delivery Print Template (POS)"),false);
         NpCsDocument."Delivery Print Template (S.)" := NpXmlDomMgt.GetElementCode(XmlElement,'delivery_print_template_sales_doc',MaxStrLen(NpCsDocument."Delivery Print Template (S.)"),false);
+        NpCsDocument."Salesperson Code" := NpXmlDomMgt.GetElementCode(XmlElement,'salesperson_code',MaxStrLen(NpCsDocument."Salesperson Code"),false);
         NpCsDocument."Prepaid Amount" := NpXmlDomMgt.GetElementDec(XmlElement,'prepaid_amount',false);
         NpCsDocument."Prepayment Account No." := NpXmlDomMgt.GetElementCode(XmlElement,'prepayment_account_no',MaxStrLen(NpCsDocument."Prepayment Account No."),NpCsDocument."Prepaid Amount" <> 0);
         if Callback <> '' then begin
@@ -255,19 +297,7 @@ codeunit 6151200 "NpCs Import Sales Document"
         end;
         NpCsExpirationMgt.SetExpiresAt(NpCsDocument);
         NpCsDocument.Insert(true);
-
-        SalesHeader.Validate("Sell-to Customer No.",Customer."No.");
-        SalesHeader.Validate("Posting Date",NpXmlDomMgt.GetElementDate(XmlElement,'posting_date',true));
-        SalesHeader.Validate("Order Date",NpXmlDomMgt.GetElementDate(XmlElement,'posting_date',true));
-        SalesHeader.Validate("Due Date",NpXmlDomMgt.GetElementDate(XmlElement,'due_date',true));
-        BillToCustNo := NpXmlDomMgt.GetElementCode(XmlElement,'bill_to_customer_no',MaxStrLen(SalesHeader."Bill-to Customer No."),false);
-        if BillToCustNo <> '' then
-          SalesHeader.Validate("Bill-to Customer No.",BillToCustNo);
-        SalesHeader.Validate("Location Code",NpXmlDomMgt.GetElementCode(XmlElement,'location_code',MaxStrLen(SalesHeader."Location Code"),true));
-        SalesHeader.Validate("Salesperson Code",NpXmlDomMgt.GetElementCode(XmlElement,'salesperson_code',MaxStrLen(SalesHeader."Salesperson Code"),true));
-        SalesHeader.Validate("Payment Method Code",NpXmlDomMgt.GetElementCode(XmlElement,'payment_method_code',MaxStrLen(SalesHeader."Payment Method Code"),true));
-        SalesHeader.Validate("Shipment Method Code",NpXmlDomMgt.GetElementCode(XmlElement,'shipment_method_code',MaxStrLen(SalesHeader."Shipment Method Code"),true));
-        SalesHeader.Modify(true);
+        //+#344264 [#344264]
     end;
 
     local procedure InsertSalesLine(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header")

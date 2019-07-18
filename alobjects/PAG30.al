@@ -14,6 +14,8 @@ pageextension 50213 pageextension50213 extends "Item Card"
     // NPR5.34/JLK /20170630 CASE 279958 Added field Description 2
     // NPR5.38/BR  /20171116 CASE 295255 Added Action POS Sales Entries
     // NPR5.40/JLK /20180316 CASE 308393 Renamed Action Variety to Variety Matrix
+    // #361514/THRO/20190716 CASE 361514 Action Variety Matrix named VarietyMatrix (for AL Conversion)
+    //                                   Action POS Sales Entries named POSSalesEntries (for AL Conversion)
     layout
     {
         addafter(Description)
@@ -183,9 +185,10 @@ pageextension 50213 pageextension50213 extends "Item Card"
         }
         addafter("Va&riants")
         {
-            action("Variety Matrix")
+            action(VarietyMatrix)
             {
                 Caption = 'Variety Matrix';
+                Image = ItemAvailability;
                 ShortCutKey = 'Ctrl+Alt+v';
             }
             action(NPR_AttributeValues)
@@ -196,7 +199,7 @@ pageextension 50213 pageextension50213 extends "Item Card"
         }
         addafter("Application Worksheet")
         {
-            action("POS Sales Entries")
+            action(POSSalesEntries)
             {
                 Caption = 'POS Sales Entries';
                 Image = Entries;
