@@ -3,6 +3,7 @@ codeunit 6151019 "NpRv Module Validate - Global"
     // NPR5.42/MHA /20180525  CASE 307022 Object created - Global Retail Voucher
     // NPR5.48/MHA /20180921  CASE 302179 Replaced direct check on Voucher."In-Use Quantity" with CalcInUseQty
     // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner functionality used with Cross Company Vouchers
+    // #361164/MHA /20190705  CASE 361164 Updated Exception Message parsing
 
 
     trigger OnRun()
@@ -62,7 +63,6 @@ codeunit 6151019 "NpRv Module Validate - Global"
         XmlElement: DotNet npNetXmlElement;
         WebException: DotNet npNetWebException;
         ErrorMessage: Text;
-        LastErrorText: Text;
     begin
         //-NPR5.49 [342811]
         NpRvVoucherType.Get(NpRvGlobalVoucherSetup."Voucher Type");
@@ -105,19 +105,21 @@ codeunit 6151019 "NpRv Module Validate - Global"
         if NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then
           exit;
 
-        LastErrorText := GetLastErrorText;
-        ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
+        //-#361164 [361164]
+        ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
+        //+#361164 [361164]
         if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
           NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
           if NpXmlDomMgt.FindNode(XmlDoc.DocumentElement,'//faultstring',XmlElement) then begin
             ErrorMessage := XmlElement.InnerText;
-            Error(ErrorMessage);
+            //-#361164 [361164]
+            Error(CopyStr(ErrorMessage,1,1000));
+            //+#361164 [361164]
           end;
         end;
-        if ErrorMessage = '' then
-          ErrorMessage := LastErrorText;
-
-        Error(ErrorMessage);
+        //-#361164 [361164]
+        Error(CopyStr(ErrorMessage,1,1000));
+        //+#361164 [361164]
         //+NPR5.49 [342811]
     end;
 
@@ -220,7 +222,6 @@ codeunit 6151019 "NpRv Module Validate - Global"
         XmlElement: DotNet npNetXmlElement;
         WebException: DotNet npNetWebException;
         ErrorMessage: Text;
-        LastErrorText: Text;
     begin
         //-NPR5.49 [342811]
         if not NpRvVoucherType.Get(NpRvSaleLinePOSVoucher."Voucher Type") then
@@ -260,16 +261,13 @@ codeunit 6151019 "NpRv Module Validate - Global"
         NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
 
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          LastErrorText := GetLastErrorText;
-
-          ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
+          //-#361164 [361164]
+          ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
+          //+#361164 [361164]
           if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
             NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
             ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement,'Body/Fault/faultstring',1000,false);
           end;
-
-          if ErrorMessage = '' then
-            ErrorMessage := LastErrorText;
 
           Error(CopyStr(ErrorMessage,1,1000));
         end;
@@ -331,7 +329,6 @@ codeunit 6151019 "NpRv Module Validate - Global"
         XmlDoc: DotNet npNetXmlDocument;
         WebException: DotNet npNetWebException;
         ErrorMessage: Text;
-        LastErrorText: Text;
     begin
         Voucher.CalcFields("Validate Voucher Module");
         if Voucher."Validate Voucher Module" <> ModuleCode() then
@@ -392,23 +389,16 @@ codeunit 6151019 "NpRv Module Validate - Global"
         HttpWebRequest.Headers.Add('SOAPAction','CreateVouchers');
         NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
 
-        // IF NOT NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) THEN BEGIN
-        //  ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
-        //  ERROR(COPYSTR(ErrorMessage,1,1000));
-        // END;
         if NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then
           exit;
 
-        LastErrorText := GetLastErrorText;
-
-        ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
+        //-#361164 [361164]
+        ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
+        //+#361164 [361164]
         if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
           NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
           ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement,'Body/Fault/faultstring',1000,false);
         end;
-
-        if ErrorMessage = '' then
-          ErrorMessage := LastErrorText;
 
         Error(CopyStr(ErrorMessage,1,1000));
         //+NPR5.49 [342811]
@@ -429,7 +419,6 @@ codeunit 6151019 "NpRv Module Validate - Global"
         XmlElement: DotNet npNetXmlElement;
         WebException: DotNet npNetWebException;
         ErrorMessage: Text;
-        LastErrorText: Text;
         ReferenceNo: Text;
         Response: Text;
         i: Integer;
@@ -498,18 +487,13 @@ codeunit 6151019 "NpRv Module Validate - Global"
         NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
 
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          //-NPR5.49 [342811]
-          LastErrorText := GetLastErrorText;
-          //+NPR5.49 [342811]
-          ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
+          //-#361164 [361164]
+          ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
+          //+#361164 [361164]
           if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
             NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
             ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement,'Body/Fault/faultstring',1000,false);
           end;
-          //-NPR5.49 [342811]
-          if ErrorMessage = '' then
-            ErrorMessage := LastErrorText;
-          //-NPR5.49 [342811]
           Error(CopyStr(ErrorMessage,1,1000));
         end;
 
@@ -590,7 +574,6 @@ codeunit 6151019 "NpRv Module Validate - Global"
         XmlElement: DotNet npNetXmlElement;
         WebException: DotNet npNetWebException;
         ErrorMessage: Text;
-        LastErrorText: Text;
     begin
         if VoucherEntry."Entry Type" <> VoucherEntry."Entry Type"::Payment then
           exit;
@@ -634,18 +617,13 @@ codeunit 6151019 "NpRv Module Validate - Global"
         NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
 
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          //-NPR5.49 [342811]
-          LastErrorText := GetLastErrorText;
-          //+NPR5.49 [342811]
-          ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
+          //-#361164 [361164]
+          ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
+          //+#361164 [361164]
           if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
             NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
             ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement,'Body/Fault/faultstring',1000,false);
           end;
-          //-NPR5.49 [342811]
-          if ErrorMessage = '' then
-            ErrorMessage := LastErrorText;
-          //+NPR5.49 [342811]
           Error(CopyStr(ErrorMessage,1,1000));
         end;
     end;
@@ -666,7 +644,6 @@ codeunit 6151019 "NpRv Module Validate - Global"
         XmlElement: DotNet npNetXmlElement;
         WebException: DotNet npNetWebException;
         ErrorMessage: Text;
-        LastErrorText: Text;
     begin
         //-NPR5.49 [342811]
         if not (NpRvVoucherEntry."Entry Type" in [NpRvVoucherEntry."Entry Type"::Payment,NpRvVoucherEntry."Entry Type"::"Partner Payment"]) then
@@ -718,14 +695,13 @@ codeunit 6151019 "NpRv Module Validate - Global"
         NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
 
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          LastErrorText := GetLastErrorText;
-          ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
+          //-#361164 [361164]
+          ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
+          //+#361164 [361164]
           if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
             NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
             ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement,'Body/Fault/faultstring',1000,false);
           end;
-          if ErrorMessage = '' then
-            ErrorMessage := LastErrorText;
           Error(CopyStr(ErrorMessage,1,1000));
         end;
         //+NPR5.49 [342811]

@@ -14,6 +14,7 @@ codeunit 6151002 "POS Proxy - Display"
     // NPR5.45/CLVA/20180727  CASE 323345 Added error if Bixolon setup is missing
     // NPR5.45/CLVA/20180727  CASE 318695 Added CU6150725OnBeforeActionWorkflow
     // NPR5.50/CLVA/20190513  CASE 352390 Added support for custom display content. Changed CloseReceipt, Closed, EndSale and Payments to local = No
+    // #361939/TILA/20190716  CASE 361939 Commented out non existing option
 
 
     trigger OnRun()
@@ -436,7 +437,10 @@ codeunit 6151002 "POS Proxy - Display"
           if "No." = '' then
             exit;
 
-          if (Type = Type::Item) and ("Discount Type" in ["Discount Type"::"BOM List", "Discount Type"::"6"]) then
+          //-#361939 [361939]
+          //IF (Type = Type::Item) AND ("Discount Type" IN ["Discount Type"::"BOM List", "Discount Type"::"6"]) THEN
+          if (Type = Type::Item) and ("Discount Type" = "Discount Type"::"BOM List") then
+          //+#361939 [361939]
             exit;
 
           Line1 := PadStr(Description, 20);
