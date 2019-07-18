@@ -26,6 +26,7 @@ codeunit 6150615 "POS Post Entries"
     // NPR5.50/MMV /20190321 CASE 300557 Apply customer deposits
     //                                   Post customer refunds with refund type instead of payment.
     // NPR5.50/TSA /20190520 CASE 354832 Reversal of preliminary VAT when paying with vouchers that included VAT on sales
+    // #362329/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
 
     TableNo = "POS Entry";
 
@@ -282,6 +283,9 @@ codeunit 6150615 "POS Post Entries"
 
             POSSalesLine.Reset;
             POSSalesLine.SetRange("POS Entry No.",POSEntry."Entry No.");
+            //-#362329 [362329]
+            POSSalesLine.SetRange("Exclude from Posting",false);
+            //+#362329 [362329]
             if POSSalesLine.FindSet then repeat
               POSSalesLineToPost := POSSalesLine;
               POSSalesLineToPost.Insert;
@@ -864,6 +868,9 @@ codeunit 6150615 "POS Post Entries"
         //+NPR5.41 [306394]
         
         //+NPR5.38 [302803]
+        //-#362329 [362329]
+        POSSalesLine.SetRange("Exclude from Posting",false);
+        //+#362329 [362329]
         if POSSalesLine.FindSet then repeat
           if POSSalesLine."VAT Calculation Type" = POSSalesLine."VAT Calculation Type"::"Sales Tax" then begin
             TaxAmountSalesLines := TaxAmountSalesLines + (POSSalesLine."Amount Incl. VAT" -POSSalesLine."Amount Excl. VAT");

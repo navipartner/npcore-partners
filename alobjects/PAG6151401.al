@@ -31,6 +31,7 @@ page 6151401 "Magento Setup"
     // MAG2.22/MHA /20190621  CASE 359146 Added field 540 "Use Blank Code for LCY"
     // MAG2.22/MHA /20190625  CASE 359285 Added field 34 "Picture Variety Type"
     // MAG2.22/MHA /20190708  CASE 352201 Added field 220 "Collect in Store Enabled"
+    // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print functionality
 
     Caption = 'Magento Setup';
     PromotedActionCategories = 'New,Tasks,Reports,Display';
@@ -273,28 +274,6 @@ page 6151401 "Magento Setup"
                 field("Gift Voucher Code Pattern";"Gift Voucher Code Pattern")
                 {
                 }
-                field("Gift Voucher Generic Setup";Format("Generic Setup".HasValue))
-                {
-                    Caption = 'Gift Voucher Generic Setup';
-
-                    trigger OnAssistEdit()
-                    var
-                        MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
-                    begin
-                        MagentoGenericSetupMgt.EditGenericMagentoSetup(MagentoGenericSetupMgt."ElementName.GiftVoucherReport");
-                        CurrPage.Update(false);
-                    end;
-                }
-                field("Voucher Number Format";"Voucher Number Format")
-                {
-                }
-                field("Voucher Date Format";"Voucher Date Format")
-                {
-                }
-                field("Gift Voucher Bitmap";"Gift Voucher Bitmap")
-                {
-                    AssistEdit = false;
-                }
             }
             group(CreditVoucher)
             {
@@ -313,21 +292,6 @@ page 6151401 "Magento Setup"
                 {
                 }
                 field("Credit Voucher Code Pattern";"Credit Voucher Code Pattern")
-                {
-                }
-                field("Credit Voucher Generic Setup";Format("Generic Setup".HasValue))
-                {
-                    Caption = 'Credit Voucher Generic Setup';
-
-                    trigger OnAssistEdit()
-                    var
-                        MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
-                    begin
-                        MagentoGenericSetupMgt.EditGenericMagentoSetup(MagentoGenericSetupMgt."ElementName.CreditVoucherReport");
-                        CurrPage.Update(false);
-                    end;
-                }
-                field("Credit Voucher Bitmap";"Credit Voucher Bitmap")
                 {
                 }
             }
@@ -687,28 +651,6 @@ page 6151401 "Magento Setup"
                     //+MAG2.00
                 end;
             }
-            action("Gift Voucher")
-            {
-                Caption = 'Gift Voucher';
-                Image = Voucher;
-                Visible = "Gift Voucher Enabled";
-
-                trigger OnAction()
-                begin
-                    PreviewGiftVoucherBitmap();
-                end;
-            }
-            action("Credit Voucher")
-            {
-                Caption = 'Credit Voucher';
-                Image = PostedReceivableVoucher;
-                Visible = "Gift Voucher Enabled";
-
-                trigger OnAction()
-                begin
-                    PreviewCreditVoucherBitmap();
-                end;
-            }
             group(Resync)
             {
                 Caption = 'Resync';
@@ -775,79 +717,5 @@ page 6151401 "Magento Setup"
         Text00205: Label 'Gift Vouchers';
         Text00206: Label 'Customers';
         Text00207: Label 'Sales Prices';
-
-    local procedure CreateEAN(NewEAN: Code[10]) EAN: Code[13]
-    begin
-        EAN := '29' + PadStr('',10 - StrLen(NewEAN),'0') + NewEAN;
-        EAN := EAN + Format(StrCheckSum(EAN,'131313131313'));
-        exit(EAN);
-    end;
-
-    procedure PreviewGiftVoucherBitmap()
-    var
-        TempBlob: Record TempBlob temporary;
-        TempGiftVoucher: Record "Gift Voucher" temporary;
-        TempMagentoPicture: Record "Magento Picture" temporary;
-        GiftVoucherMgt: Codeunit "Magento Gift Voucher Mgt.";
-        NaviConnectDragDropPicAddin: Page "Magento DragDropPic. Addin";
-        OutStream: OutStream;
-        TempNo: Code[20];
-    begin
-        if "Gift Voucher Bitmap".HasValue then begin
-          TempNo := '1010';
-          TempGiftVoucher.Init;
-          TempGiftVoucher."No." := CreateEAN(TempNo);
-          TempGiftVoucher.Name := 'Customer Name';
-          TempGiftVoucher.Amount := 1500.95;
-          TempGiftVoucher."Currency Code" := 'DKK';
-          //-MAG2.00
-          //TempGiftVoucher."Certificate Number" := GiftVoucherMgt.GenerateCertificateNumber("Gift Voucher Code Pattern",TempNo);
-          TempGiftVoucher."External Reference No." := GiftVoucherMgt.GenerateExternalReferenceNo("Gift Voucher Code Pattern",TempNo);
-          //+MAG2.00
-          TempGiftVoucher."Expire Date" := CalcDate("Gift Voucher Valid Period",Today);
-          TempGiftVoucher."Gift Voucher Message".CreateOutStream(OutStream);
-          OutStream.WriteText('This an example of a Gift Voucher message');
-          TempGiftVoucher.Insert;
-          GiftVoucherMgt.GiftVoucherToTempBlob(TempGiftVoucher,TempBlob);
-          TempGiftVoucher.DeleteAll;
-          TempMagentoPicture.DeleteAll;
-          TempMagentoPicture.Init;
-          TempMagentoPicture.Name := Text000 + ' ' + TempGiftVoucher."No.";
-          TempMagentoPicture.Picture := TempBlob.Blob;
-          TempMagentoPicture.Insert;
-          PAGE.Run(PAGE::"Magento DragDropPic. Addin",TempMagentoPicture);
-        end;
-    end;
-
-    procedure PreviewCreditVoucherBitmap()
-    var
-        TempBlob: Record TempBlob temporary;
-        TempCreditVoucher: Record "Credit Voucher" temporary;
-        TempMagentoPicture: Record "Magento Picture" temporary;
-        GiftVoucherMgt: Codeunit "Magento Gift Voucher Mgt.";
-        NaviConnectDragDropPicAddin: Page "Magento DragDropPic. Addin";
-        TempNo: Code[20];
-    begin
-        if "Credit Voucher Bitmap".HasValue then begin
-          TempNo := '1010';
-          TempCreditVoucher.Init;
-          TempCreditVoucher."No." := CreateEAN(TempNo);
-          TempCreditVoucher.Name := 'Customer Name';
-          TempCreditVoucher.Amount := 1500.95;
-          TempCreditVoucher."Currency Code" := 'DKK';
-          //-MAG2.00
-          //TempCreditVoucher."Certificate Number" := GiftVoucherMgt.GenerateCertificateNumber("Credit Voucher Code Pattern",TempNo);
-          TempCreditVoucher."External Reference No." := GiftVoucherMgt.GenerateExternalReferenceNo("Credit Voucher Code Pattern",TempNo);
-          //+MAG2.00
-          TempCreditVoucher."Expire Date" := CalcDate("Credit Voucher Valid Period",Today);
-          GiftVoucherMgt.CreditVoucherToTempBlob(TempCreditVoucher,TempBlob);
-          TempMagentoPicture.DeleteAll;
-          TempMagentoPicture.Init;
-          TempMagentoPicture.Name := Text000 + ' ' + TempCreditVoucher."No.";
-          TempMagentoPicture.Picture := TempBlob.Blob;
-          TempMagentoPicture.Insert;
-          PAGE.Run(PAGE::"Magento DragDropPic. Addin",TempMagentoPicture);
-        end;
-    end;
 }
 

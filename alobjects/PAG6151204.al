@@ -1,6 +1,7 @@
 page 6151204 "NpCs Send to Store Orders"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #344264/MHA /20190717  CASE 344264 Added Last Log fields
 
     Caption = 'Send to Store Orders';
     InsertAllowed = false;
@@ -9,7 +10,6 @@ page 6151204 "NpCs Send to Store Orders"
     SourceTableView = SORTING("Entry No.")
                       WHERE(Type=CONST("Send to Store"),
                             "Document Type"=CONST(Order));
-    UsageCategory = Lists;
 
     layout
     {
@@ -44,7 +44,7 @@ page 6151204 "NpCs Send to Store Orders"
                 field("To Store Code";"To Store Code")
                 {
                 }
-                field("Delivery Only (Non stock)";"Delivery Only (Non stock)")
+                field("Store Stock";"Store Stock")
                 {
                 }
                 field("Prepaid Amount";"Prepaid Amount")
@@ -52,6 +52,16 @@ page 6151204 "NpCs Send to Store Orders"
                 }
                 field("Prepayment Account No.";"Prepayment Account No.")
                 {
+                }
+                field(LastLogMessage;GetLastLogMessage())
+                {
+                    Caption = 'Last Log Message';
+                }
+                field(LastLogErrorMessage;GetLastLogErrorMessage())
+                {
+                    Caption = 'Last Log Error Message';
+                    Style = Attention;
+                    StyleExpr = TRUE;
                 }
                 field("Processing Status";"Processing Status")
                 {

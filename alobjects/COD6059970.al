@@ -16,6 +16,7 @@ codeunit 6059970 "Variety Wrapper"
     // NPR5.37/JDH /20171018 CASE 293486 Changed function ItemIsVariety to global
     // NPR5.37/JDH /20171023 CASE 293486 A new function "ShowVarietyMatrix" has been added, that is not used here, but rather to "copy paste" to pages where you want the Variety Matrix to popup
     // NPR5.47/JDH /20180918 CASE 327541 several filters transferred from the source to the matrix, so they can be used for calculation later
+    // #361514/THRO/20190716 CASE 361514 EventPublisherElement changed in P30OnAfterActionEventVariety. Action renamed on Page 30
 
 
     trigger OnRun()
@@ -613,7 +614,7 @@ codeunit 6059970 "Variety Wrapper"
         //+VRT1.00
     end;
 
-    [EventSubscriber(ObjectType::Page, 30, 'OnAfterActionEvent', 'Action6150613', false, false)]
+    [EventSubscriber(ObjectType::Page, 30, 'OnAfterActionEvent', 'VarietyMatrix', false, false)]
     local procedure P30OnAfterActionEventVariety(var Rec: Record Item)
     var
         VRTWrapper: Codeunit "Variety Wrapper";

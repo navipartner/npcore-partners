@@ -47,6 +47,7 @@ page 6014511 "Retail Item List"
     // NPR5.48/TS  /20180104 CASE 338609 Added Shortcut Ctrl+Alt+L to Price Label
     // NPR5.50/JAVA/20190429 CASE 353381 BC14: Implement changes done in page 542 (use generic SetMultiRecord() function instead of specific functions).
     // #361229/ZESO/20190708 CASE 361229 Added Page Action Attributes and Factbox Item Attributes
+    // #361514/THRO/20190717 CASE 361514 Action POS Sales Entries named POSSalesEntries (for AL Conversion)
 
     Caption = 'Item List';
     CardPageID = "Retail Item Card";
@@ -859,7 +860,7 @@ page 6014511 "Retail Item List"
                         RunPageLink = "Item No."=FIELD("No.");
                         RunPageView = SORTING("Item No.","Bin Code","Location Code","Variant Code","Unit of Measure Code","Lot No.","Serial No.","Entry Type",Dedicated);
                     }
-                    action("POS Sales Entries")
+                    action(POSSalesEntries)
                     {
                         Caption = 'POS Sales Entries';
                         Image = Entries;

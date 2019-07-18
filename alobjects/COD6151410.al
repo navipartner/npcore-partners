@@ -16,6 +16,8 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     // MAG2.09/MHA /20171211  CASE 292576 Added "Voucher Number Format" in GiftVoucherToTempBlob() and CreditVoucherToTempBlob()
     // MAG2.17/MHA /20181122  CASE 302179 Magento Integration
     // MAG2.22/MHA /20190617  CASE 357825 Resolution should be preserved after resize
+    // MAG2.22/MHA /20190716  CASE 361598 Added function OnCancelMagentoOrder()
+    // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print functions GiftVoucherToTempBlob(), CreditvoucherToTempBlob()
 
 
     trigger OnRun()
@@ -420,6 +422,69 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         //+MAG2.17 [302179]
     end;
 
+    [EventSubscriber(ObjectType::Table, 36, 'OnBeforeDeleteEvent', '', true, true)]
+    local procedure OnCancelMagentoOrder(var Rec: Record "Sales Header";RunTrigger: Boolean)
+    var
+        CreditVoucher: Record "Credit Voucher";
+        GiftVoucher: Record "Gift Voucher";
+        PaymentLine: Record "Magento Payment Line";
+        DataLogMgt: Codeunit "Data Log Management";
+        RecRef: RecordRef;
+    begin
+        //-MAG2.22 [361598]
+        if not RunTrigger then
+          exit;
+        if Rec.IsTemporary then
+          exit;
+
+        if Rec."External Order No." = '' then
+          exit;
+        if Rec."Document Type" <> Rec."Document Type"::Order then
+          exit;
+
+        CreditVoucher.SetRange("Sales Order No.",Rec."No.");
+        CreditVoucher.SetRange(Status,CreditVoucher.Status::Open);
+        CreditVoucher.SetFilter(Amount,'>%1',0);
+        if CreditVoucher.FindFirst then
+          CreditVoucher.ModifyAll(Status,CreditVoucher.Status::Cancelled,true);
+
+        GiftVoucher.SetRange("Sales Order No.",Rec."No.");
+        GiftVoucher.SetRange(Status,GiftVoucher.Status::Open);
+        GiftVoucher.SetFilter(Amount,'>%1',0);
+        if GiftVoucher.FindFirst then
+          GiftVoucher.ModifyAll(Status,GiftVoucher.Status::Cancelled,true);
+
+        PaymentLine.SetRange("Document Table No.",DATABASE::"Sales Header");
+        PaymentLine.SetRange("Document Type",Rec."Document Type");
+        PaymentLine.SetRange("Document No.",Rec."No.");
+        PaymentLine.SetRange("Payment Type",PaymentLine."Payment Type"::Voucher);
+        PaymentLine.SetFilter("Source Table No.",'%1|%2',DATABASE::"Credit Voucher",DATABASE::"Gift Voucher");
+        if PaymentLine.FindSet then
+          repeat
+            case PaymentLine."Source Table No." of
+              DATABASE::"Credit Voucher":
+                begin
+                  Clear(CreditVoucher);
+                  CreditVoucher.SetRange("External Reference No.",PaymentLine."No.");
+                  if CreditVoucher.FindFirst then begin
+                    RecRef.GetTable(CreditVoucher);
+                    DataLogMgt.OnDatabaseModify(RecRef);
+                  end;
+                end;
+              DATABASE::"Gift Voucher":
+                begin
+                  Clear(GiftVoucher);
+                  GiftVoucher.SetRange("External Reference No.",PaymentLine."No.");
+                  if GiftVoucher.FindFirst then begin
+                    RecRef.GetTable(GiftVoucher);
+                    DataLogMgt.OnDatabaseModify(RecRef);
+                  end;
+                end;
+            end;
+          until PaymentLine.Next = 0;
+        //+MAG2.22 [361598]
+    end;
+
     procedure "--- ExternalReferenceNo"()
     begin
     end;
@@ -641,192 +706,6 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         RecRef.GetTable(VariantRec);
         exit(RecRef.IsTemporary);
         //+MAG2.00
-    end;
-
-    procedure "--- Print"()
-    begin
-    end;
-
-    procedure GiftVoucherToTempBlob(var GiftVoucher: Record "Gift Voucher";var TempBlob: Record TempBlob temporary)
-    var
-        MagentoSetup: Record "Magento Setup";
-        TempBlob2: Record TempBlob temporary;
-        MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
-        Bitmap: DotNet npNetBitmap;
-        BitmapBarcode: DotNet npNetBitmap;
-        Graphics: DotNet npNetGraphics;
-        ImageFormat: DotNet npNetImageFormat;
-        InStream: InStream;
-        OutStream: OutStream;
-        GiftVoucherMessage: Text;
-        SetupPath: Text;
-        NewHeight: Integer;
-        NewWidth: Integer;
-        Ratio: Decimal;
-        Ratio2: Decimal;
-        Language: Integer;
-        VoucherAmount: Text;
-        VoucherDate: Text;
-        XDpi: Integer;
-        YDpi: Integer;
-    begin
-        MagentoSetup.Get;
-        if not MagentoSetup."Gift Voucher Bitmap".HasValue then
-          Error(Text000);
-
-        //-MAG2.00
-        MagentoSetup.CalcFields("Generic Setup","Gift Voucher Bitmap");
-        TempBlob2.Blob := MagentoSetup."Generic Setup";
-        //+MAG2.00
-        MagentoSetup."Gift Voucher Bitmap".CreateInStream(InStream);
-        Bitmap := Bitmap.Bitmap(InStream);
-        Graphics := Graphics.FromImage(Bitmap);
-        SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.CustomerName";
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,Format(GiftVoucher.Name));
-
-        SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.Amount";
-        //-MAG2.09 [292576]
-        VoucherAmount := Format(GiftVoucher.Amount);
-        if MagentoSetup."Voucher Number Format" <> '' then
-          VoucherAmount := Format(GiftVoucher.Amount,0,MagentoSetup."Voucher Number Format");
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,VoucherAmount);
-        //+MAG2.09 [292576]
-        SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.CurrencyCode";
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,Format(GiftVoucher."Currency Code"));
-
-        SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.WebCode";
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,GiftVoucher."External Reference No.");
-
-        SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.ExpiryDate";
-        //-MAG2.09 [292576]
-        VoucherDate := Format(GiftVoucher."Expire Date");
-        if MagentoSetup."Voucher Date Format" <> '' then
-          VoucherDate := Format(GiftVoucher."Expire Date",0,MagentoSetup."Voucher Date Format");
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,VoucherDate);
-        //+MAG2.09 [292576]
-
-        if GiftVoucher."Gift Voucher Message".HasValue then begin
-          GiftVoucher.CalcFields("Gift Voucher Message");
-          GiftVoucher."Gift Voucher Message".CreateInStream(InStream);
-          InStream.ReadText(GiftVoucherMessage);
-          SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.Message";
-          MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,GiftVoucherMessage);
-        end;
-
-        SetupPath := MagentoGenericSetupMgt."ElementName.GiftVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.Barcode";
-        //-MAG2.01 [257315]
-        MagentoGenericSetupMgt.DrawBarcode(Graphics,TempBlob2,SetupPath,Format(GiftVoucher."No."),Bitmap,BitmapBarcode);
-        //+MAG2.01 [257315]
-
-        Ratio := 794 / Bitmap.Width;
-        Ratio2 := 1122 / Bitmap.Height;
-        if Ratio > Ratio2 then
-          Ratio := Ratio2;
-        if Ratio < 1 then begin
-          //-MAG2.22 [357825]
-          XDpi := Bitmap.HorizontalResolution;
-          YDpi := Bitmap.VerticalResolution;
-          //+MAG2.22 [357825]
-          NewWidth := Round(Bitmap.Width * Ratio,1,'<');
-          NewHeight := Round(Bitmap.Height * Ratio,1,'<');
-          Bitmap := Bitmap.Bitmap(Bitmap,NewWidth,NewHeight);
-          //-MAG2.22 [357825]
-          Bitmap.SetResolution(XDpi,YDpi);
-          //+MAG2.22 [357825]
-        end;
-        Clear(TempBlob);
-        TempBlob.Blob.CreateOutStream(OutStream);
-        Bitmap.Save(OutStream,ImageFormat.Png);
-    end;
-
-    procedure CreditVoucherToTempBlob(var CreditVoucher: Record "Credit Voucher";var TempBlob: Record TempBlob temporary)
-    var
-        MagentoSetup: Record "Magento Setup";
-        TempBlob2: Record TempBlob temporary;
-        MagentoGenericSetupMgt: Codeunit "Magento Generic Setup Mgt.";
-        Bitmap: DotNet npNetBitmap;
-        BitmapBarcode: DotNet npNetBitmap;
-        Graphics: DotNet npNetGraphics;
-        ImageFormat: DotNet npNetImageFormat;
-        InStream: InStream;
-        OutStream: OutStream;
-        SetupPath: Text;
-        NewHeight: Integer;
-        NewWidth: Integer;
-        Ratio: Decimal;
-        Ratio2: Decimal;
-        VoucherAmount: Text;
-        VoucherDate: Text;
-        XDpi: Integer;
-        YDpi: Integer;
-    begin
-        MagentoSetup.Get;
-        if not MagentoSetup."Credit Voucher Bitmap".HasValue then
-          Error(Text000);
-
-        //-MAG2.00
-        //MagentoSetup.CALCFIELDS("Credit Voucher Bitmap");
-        MagentoSetup.CalcFields("Generic Setup","Credit Voucher Bitmap");
-        TempBlob2.Blob := MagentoSetup."Generic Setup";
-        //+MAG2.00
-        MagentoSetup."Credit Voucher Bitmap".CreateInStream(InStream);
-        Bitmap := Bitmap.Bitmap(InStream);
-        Graphics := Graphics.FromImage(Bitmap);
-
-        SetupPath := MagentoGenericSetupMgt."ElementName.CreditVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.CustomerName";
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,Format(CreditVoucher.Name));
-
-        SetupPath := MagentoGenericSetupMgt."ElementName.CreditVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.Amount";
-        //-MAG2.09 [292576]
-        //MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,FORMAT(CreditVoucher.Amount));
-        VoucherAmount := Format(CreditVoucher.Amount);
-        if MagentoSetup."Voucher Number Format" <> '' then
-          VoucherAmount := Format(CreditVoucher.Amount,0,MagentoSetup."Voucher Number Format");
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,VoucherAmount);
-        //+MAG2.09 [292576]
-
-        SetupPath := MagentoGenericSetupMgt."ElementName.CreditVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.CurrencyCode";
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,Format(CreditVoucher."Currency Code"));
-
-        SetupPath := MagentoGenericSetupMgt."ElementName.CreditVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.WebCode";
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,CreditVoucher."External Reference No.");
-
-        SetupPath := MagentoGenericSetupMgt."ElementName.CreditVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.ExpiryDate";
-        //-MAG2.09 [292576]
-        //MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,FORMAT(CreditVoucher."Expire Date"));
-        VoucherDate := Format(CreditVoucher."Expire Date");
-        if MagentoSetup."Voucher Date Format" <> '' then
-          VoucherDate := Format(CreditVoucher."Expire Date",0,MagentoSetup."Voucher Date Format");
-        MagentoGenericSetupMgt.DrawText(TempBlob2,Graphics,SetupPath,VoucherDate);
-        //+MAG2.09 [292576]
-
-        SetupPath := MagentoGenericSetupMgt."ElementName.CreditVoucherReport" + '/' + MagentoGenericSetupMgt."ElementName.Barcode";
-        //-MAG2.01 [257315]
-        //MagentoGenericSetupMgt.DrawBarcode(Graphics,TempBlob,SetupPath,FORMAT(CreditVoucher."No."),Bitmap,BitmapBarcode);
-        MagentoGenericSetupMgt.DrawBarcode(Graphics,TempBlob2,SetupPath,Format(CreditVoucher."No."),Bitmap,BitmapBarcode);
-        //+MAG2.01 [257315]
-
-        Ratio := 794 / Bitmap.Width;
-        Ratio2 := 1122 / Bitmap.Height;
-        if Ratio > Ratio2 then
-          Ratio := Ratio2;
-        if Ratio < 1 then begin
-          //-MAG2.22 [357825]
-          XDpi := Bitmap.HorizontalResolution;
-          YDpi := Bitmap.VerticalResolution;
-          //+MAG2.22 [357825]
-          NewWidth := Round(Bitmap.Width * Ratio,1,'<');
-          NewHeight := Round(Bitmap.Height * Ratio,1,'<');
-          Bitmap := Bitmap.Bitmap(Bitmap,NewWidth,NewHeight);
-          //-MAG2.22 [357825]
-          Bitmap.SetResolution(XDpi,YDpi);
-          //+MAG2.22 [357825]
-        end;
-
-        TempBlob.DeleteAll;
-        TempBlob.Init;
-        TempBlob.Blob.CreateOutStream(OutStream);
-        Bitmap.Save(OutStream,ImageFormat.Png);
     end;
 }
 

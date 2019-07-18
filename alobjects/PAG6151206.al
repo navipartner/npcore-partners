@@ -1,6 +1,7 @@
 page 6151206 "NpCs Collect Store Order Card"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #344264/MHA /20190717  CASE 344264 Changed name and logic for field 240 from "Delivery Only (Non Stock)" to "From Store Stock"
 
     Caption = 'Collect in Store Order Card';
     SourceTable = "NpCs Document";
@@ -48,6 +49,14 @@ page 6151206 "NpCs Collect Store Order Card"
                         Editable = false;
                         Importance = Promoted;
                     }
+                    field("Processing Expiry Duration";"Processing Expiry Duration")
+                    {
+                        Importance = Additional;
+                    }
+                    field("Processing expires at";"Processing expires at")
+                    {
+                        Importance = Additional;
+                    }
                     field("Processing updated at";"Processing updated at")
                     {
                         Editable = false;
@@ -66,6 +75,14 @@ page 6151206 "NpCs Collect Store Order Card"
                         Editable = false;
                         Importance = Promoted;
                     }
+                    field("Delivery Expiry Days (Qty.)";"Delivery Expiry Days (Qty.)")
+                    {
+                        Importance = Additional;
+                    }
+                    field("Delivery expires at";"Delivery expires at")
+                    {
+                        Importance = Additional;
+                    }
                     field("Delivery updated at";"Delivery updated at")
                     {
                         Editable = false;
@@ -83,6 +100,10 @@ page 6151206 "NpCs Collect Store Order Card"
                     {
                         Importance = Additional;
                     }
+                    field("Archive on Delivery";"Archive on Delivery")
+                    {
+                        Importance = Additional;
+                    }
                     field("Prepaid Amount";"Prepaid Amount")
                     {
                         Editable = false;
@@ -96,16 +117,34 @@ page 6151206 "NpCs Collect Store Order Card"
                     {
                         Importance = Additional;
                     }
-                    field("Delivery Only (Non stock)";"Delivery Only (Non stock)")
+                    field("Store Stock";"Store Stock")
                     {
                         Style = Unfavorable;
                         StyleExpr = TRUE;
                     }
+                    group(Control6014458)
+                    {
+                        ShowCaption = false;
+                        Visible = "Bill via"="Bill via"::POS;
+                        field("Delivery Print Template (POS)";"Delivery Print Template (POS)")
+                        {
+                            Importance = Additional;
+                        }
+                    }
+                    group(Control6014459)
+                    {
+                        ShowCaption = false;
+                        Visible = "Bill via"="Bill via"::"Sales Document";
+                        field("Delivery Print Template (S.)";"Delivery Print Template (S.)")
+                        {
+                            Importance = Additional;
+                        }
+                    }
                     group(Control6014447)
                     {
                         ShowCaption = false;
-                        Visible = "Delivery Only (Non stock)";
-                        field("UPPERCASE(FIELDCAPTION(""Delivery Only (Non stock)""))";UpperCase(FieldCaption("Delivery Only (Non stock)")))
+                        Visible = NOT "Store Stock";
+                        field("UPPERCASE(Text002)";UpperCase(Text002))
                         {
                             ShowCaption = false;
                             Style = Unfavorable;
@@ -219,7 +258,7 @@ page 6151206 "NpCs Collect Store Order Card"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = ("Processing Status" = 1) AND ("Delivery Status" = 0) AND (NOT "Delivery Only (Non stock)");
+                    Visible = ("Processing Status" = 1) AND ("Delivery Status" = 0) AND ("Store Stock");
 
                     trigger OnAction()
                     var
@@ -309,5 +348,6 @@ page 6151206 "NpCs Collect Store Order Card"
     var
         Text000: Label 'Confirm Order %1?';
         Text001: Label 'Reject Order %1?';
+        Text002: Label 'Do not pick from Store Stock';
 }
 

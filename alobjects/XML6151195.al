@@ -1,6 +1,7 @@
 xmlport 6151195 "NpCs Sales Document"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #344264/MHA /20190717  CASE 344264 Added <config_template> under <sell_to_customer> and changed <delivery_only> to <from_store_stock>
 
     Caption = 'Collect Sales Document';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/collect_in_store_sales_document';
@@ -128,6 +129,10 @@ xmlport 6151195 "NpCs Sales Document"
                     {
                         MinOccurs = Zero;
                     }
+                    fieldelement(config_template;TempSalesHeader."Customer Posting Group")
+                    {
+                        MinOccurs = Zero;
+                    }
                 }
                 textelement(customernotification)
                 {
@@ -210,10 +215,10 @@ xmlport 6151195 "NpCs Sales Document"
                     MaxOccurs = Once;
                     MinOccurs = Zero;
                 }
-                textelement(delivery_only)
+                textelement(store_stock)
                 {
                     MaxOccurs = Once;
-                    MinOccurs = Zero;
+                    MinOccurs = Once;
                 }
                 textelement(bill_via)
                 {
