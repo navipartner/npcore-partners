@@ -1,12 +1,18 @@
 codeunit 6151207 "NpCs Expiration Mgt."
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #344264/MHA /20190717  CASE 344264 Adjusted OnRun() to check expiration on all documents if not run with specific rec
 
     TableNo = "NpCs Document";
 
     trigger OnRun()
     begin
-        UpdateExpirationStatus(Rec,false);
+        //-#344264 [344264]
+        if Rec."Entry No." = 0 then
+          UpdateExpirationStatusAll(Rec.Type::"Collect in Store",false)
+        else if Rec.Find then
+          UpdateExpirationStatus(Rec,false);
+        //+#344264 [344264]
     end;
 
     var
@@ -51,6 +57,9 @@ codeunit 6151207 "NpCs Expiration Mgt."
           NpCsDocument."Processing updated at" := CurrentDateTime;
 
         ExpiresAt := NpCsStoreOpeningHoursMgt.CalcNextOpeningDTDuration(NpCsDocument."Processing updated at",NpCsDocument."Processing Expiry Duration");
+        //-#344264 [344264]
+        exit(ExpiresAt);
+        //+#344264 [344264]
     end;
 
     local procedure CalcDeliveryExpiresAt(NpCsDocument: Record "NpCs Document") ExpiresAt: DateTime
@@ -62,11 +71,44 @@ codeunit 6151207 "NpCs Expiration Mgt."
         if NpCsDocument."Processing updated at" = 0DT then
           NpCsDocument."Processing updated at" := CurrentDateTime;
 
-        NpCsDocument."Delivery expires at" := NpCsStoreOpeningHoursMgt.CalcNextClosingDTDaysQty(NpCsDocument."Processing updated at",NpCsDocument."Delivery Expiry Days (Qty.)");
+        //-#344264 [344264]
+        ExpiresAt := NpCsStoreOpeningHoursMgt.CalcNextClosingDTDaysQty(NpCsDocument."Processing updated at",NpCsDocument."Delivery Expiry Days (Qty.)");
+        exit(ExpiresAt);
+        //+#344264 [344264]
+    end;
+
+    local procedure UpdateExpirationStatusAll(Type: Integer;SkipWorkflow: Boolean)
+    var
+        NpCsDocument: Record "NpCs Document";
+    begin
+        //-#344264 [344264]
+        if Type in [NpCsDocument.Type::"Send to Store",NpCsDocument.Type::"Collect in Store"] then
+          NpCsDocument.SetRange(Type,Type);
+        NpCsDocument.SetFilter("Processing expires at",'<=%1&<>%2',CurrentDateTime,0DT);
+        NpCsDocument.SetFilter("Processing Status",'=%1|=%2',NpCsDocument."Processing Status"::" ",NpCsDocument."Processing Status"::Pending);
+        NpCsDocument.SetFilter("Delivery Status",'<>%1&<>%2',NpCsDocument."Delivery Status"::Delivered,NpCsDocument."Delivery Status"::Expired);
+        if NpCsDocument.FindSet then
+          repeat
+            UpdateExpirationStatus(NpCsDocument,SkipWorkflow);
+          until NpCsDocument.Next = 0;
+
+        NpCsDocument.SetRange("Processing expires at");
+        NpCsDocument.SetFilter("Processing Status",'<>%1&<>%2',NpCsDocument."Processing Status"::Rejected,NpCsDocument."Processing Status"::Expired);
+        NpCsDocument.SetFilter("Delivery expires at",'<=%1&<>%2',CurrentDateTime,0DT);
+        NpCsDocument.SetFilter("Delivery Status",'=%1|=%2',NpCsDocument."Delivery Status"::" ",NpCsDocument."Delivery Status"::Ready);
+        if NpCsDocument.FindSet then
+          repeat
+            UpdateExpirationStatus(NpCsDocument,SkipWorkflow);
+          until NpCsDocument.Next = 0;
+        //+#344264 [344264]
     end;
 
     procedure UpdateExpirationStatus(var NpCsDocument: Record "NpCs Document";SkipWorkflow: Boolean)
     begin
+        //-#344264 [344264]
+        if NpCsDocument."Delivery Status" in [NpCsDocument."Delivery Status"::Delivered,NpCsDocument."Delivery Status"::Expired] then
+          exit;
+        //+#344264 [344264]
         if NpCsDocument."Processing Status" in [NpCsDocument."Processing Status"::" ",NpCsDocument."Processing Status"::Pending] then begin
           UpdateExpirationStatusProcessing(NpCsDocument,SkipWorkflow);
           exit;
@@ -100,12 +142,14 @@ codeunit 6151207 "NpCs Expiration Mgt."
 
     procedure ScheduleUpdateExpirationStatus(NpCsDocument: Record "NpCs Document";NotBefore: DateTime)
     begin
-        //TASKSCHEDULER.CREATETASK(CurrCodeunitId(),0,TRUE,COMPANYNAME,NotBefore,NpCsDocument.RECORDID);
+        TASKSCHEDULER.CreateTask(CurrCodeunitId(),0,true,CompanyName,NotBefore,NpCsDocument.RecordId);
     end;
 
     local procedure CurrCodeunitId(): Integer
     begin
+        //-NPR10.00.00.5.51 [344264]
         exit(CODEUNIT::"NpCs Expiration Mgt.");
+        //+NPR10.00.00.5.51 [344264]
     end;
 }
 

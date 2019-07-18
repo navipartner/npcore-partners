@@ -1,6 +1,7 @@
 page 6151205 "NpCs Collect Store Orders"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #344264/MHA /20190717  CASE 344264 Added Last Log fields and changed name and logic for field 240 to "From Store Stock"
 
     Caption = 'Collect in Store Orders';
     CardPageID = "NpCs Collect Store Order Card";
@@ -11,7 +12,6 @@ page 6151205 "NpCs Collect Store Orders"
     SourceTableView = SORTING("Entry No.")
                       WHERE(Type=CONST("Collect in Store"),
                             "Document Type"=CONST(Order));
-    UsageCategory = Lists;
 
     layout
     {
@@ -45,6 +45,9 @@ page 6151205 "NpCs Collect Store Orders"
                         RunCard();
                     end;
                 }
+                field("Salesperson Code";"Salesperson Code")
+                {
+                }
                 field("From Document Type";"From Document Type")
                 {
                     Visible = false;
@@ -76,6 +79,9 @@ page 6151205 "NpCs Collect Store Orders"
                         RunCard();
                     end;
                 }
+                field("Customer No.";"Customer No.")
+                {
+                }
                 field("Customer E-mail";"Customer E-mail")
                 {
                 }
@@ -94,7 +100,7 @@ page 6151205 "NpCs Collect Store Orders"
                 {
                     Visible = false;
                 }
-                field("Delivery Only (Non stock)";"Delivery Only (Non stock)")
+                field("Store Stock";"Store Stock")
                 {
                 }
                 field("Delivery Status";"Delivery Status")
@@ -127,6 +133,16 @@ page 6151205 "NpCs Collect Store Orders"
                 field("Archive on Delivery";"Archive on Delivery")
                 {
                     Visible = false;
+                }
+                field(LastLogMessage;GetLastLogMessage())
+                {
+                    Caption = 'Last Log Message';
+                }
+                field(LastLogErrorMessage;GetLastLogErrorMessage())
+                {
+                    Caption = 'Last Log Error Message';
+                    Style = Attention;
+                    StyleExpr = TRUE;
                 }
             }
         }
@@ -165,7 +181,7 @@ page 6151205 "NpCs Collect Store Orders"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = ("Processing Status" = 1) AND ("Delivery Status" = 0) AND (NOT "Delivery Only (Non stock)");
+                    Visible = ("Processing Status" = 1) AND ("Delivery Status" = 0) AND ("Store Stock");
 
                     trigger OnAction()
                     var
@@ -197,7 +213,7 @@ page 6151205 "NpCs Collect Store Orders"
 
                     trigger OnAction()
                     var
-                        NpCsCollectMgt: Codeunit "NpCs Collect Mgt.";
+                        NpCsArchCollectMgt: Codeunit "NpCs Arch. Collect Mgt.";
                     begin
                         if ("Processing Status" in ["Processing Status"::" ","Processing Status"::Pending,"Processing Status"::Confirmed]) and
                           ("Delivery Status" in ["Delivery Status"::" ","Delivery Status"::Ready])
@@ -205,7 +221,9 @@ page 6151205 "NpCs Collect Store Orders"
                           if not Confirm(Text002,false,"Document Type","Document No.") then
                             exit;
                         end;
-                        if NpCsCollectMgt.ArchiveCollectDocument(Rec) then
+                        //-#344264 [344264]
+                        if NpCsArchCollectMgt.ArchiveCollectDocument(Rec) then
+                        //+#344264 [344264]
                           Message(Text003,"Document Type","Reference No.")
                         else
                           Message(Text004,"Document Type","Reference No.",GetLastErrorText);

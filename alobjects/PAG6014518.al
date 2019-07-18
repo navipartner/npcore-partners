@@ -5,6 +5,7 @@ page 6014518 "Sales Order Pick"
     // NPR5.36/THRO/20170908 CASE 285645 Added action PostAndSendPdf2Nav
     // NPR5.41/TS  /20180105 CASE 300893 Chabged Post to Post Order as function Post already exist.
     // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
+    // #361514/THRO/20190718 CASE 361514 Named actions "Post and Print" and "Post and Email" (for AL Conversion)
 
     Caption = 'Sales Order';
     PageType = Card;
@@ -472,7 +473,7 @@ page 6014518 "Sales Order Pick"
                         Post(CODEUNIT::"Sales-Post (Yes/No)");
                     end;
                 }
-                action("Post and &Print")
+                action(PostAndPrint)
                 {
                     Caption = 'Post and &Print';
                     Ellipsis = true;
@@ -487,7 +488,7 @@ page 6014518 "Sales Order Pick"
                         Post(CODEUNIT::"Sales-Post + Print");
                     end;
                 }
-                action("Post and Email")
+                action(PostAndEmail)
                 {
                     Caption = 'Post and Email';
                     Ellipsis = true;

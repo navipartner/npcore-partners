@@ -11,13 +11,13 @@ page 6151411 "Magento Pictures"
     // MAG1.22/MHA/20160421 CASE 230240 Changed "Size (kb)" to Non Visible
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
     // MAG10.00.2.00/MHA/20161118  CASE 258544 Changed Miniature to use Picture instead of TempItem.Picture
+    // MAG2.22/MHA /20190716  CASE 361234 Added Action "Check Invalid Pictures"
 
     Caption = 'Magento Pictures';
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Magento Picture";
-    UsageCategory = Administration;
 
     layout
     {
@@ -79,6 +79,39 @@ page 6151411 "Magento Pictures"
     {
         area(processing)
         {
+            action("Show Invalid Pictures")
+            {
+                Caption = 'Show Invalid Pictures';
+                Image = TestFile;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    MagentoPicture: Record "Magento Picture";
+                    Window: Dialog;
+                    Counter: Integer;
+                    Total: Integer;
+                begin
+                    //-MAG2.22 [361234]
+                    Clear(Rec);
+                    Total := Count;
+                    Window.Open(Text000);
+                    if FindSet then
+                      repeat
+                        Counter += 1;
+                        Window.Update(1,Round((Counter / Total) * 10000,1));
+
+                        Mark(not TryCheckPicture());
+                      until Next = 0;
+                    Window.Close;
+
+                    MarkedOnly(true);
+                    if FindFirst then;
+                    //+MAG2.22 [361234]
+                end;
+            }
         }
     }
 
@@ -88,11 +121,6 @@ page 6151411 "Magento Pictures"
     begin
         CountRelations();
         //-MAG10.00.2.00 [258544]
-        // //-MAG1.21
-        // CLEAR(TempItemPicture);
-        // IF MiniatureLinePicture THEN
-        //  DownloadPicture(TempItemPicture);
-        // //+MAG1.21
         if TempMagentoPicture.Get(Type,Name) then begin
           TempMagentoPicture.CalcFields(Picture);
           exit;
@@ -122,6 +150,7 @@ page 6151411 "Magento Pictures"
         Counter: Integer;
         MiniatureLinePicture: Boolean;
         MiniatureSinglePicture: Boolean;
+        Text000: Label 'Checking Pictures: @1@@@@@@@@@@@@@@@';
 
     procedure CountRelations()
     var
@@ -134,9 +163,6 @@ page 6151411 "Magento Pictures"
         case Type of
           Type::Item:
             begin
-              //-MAG1.21
-              //MagentoPictureLink.SETRANGE(Type,Type::Item);
-              //+MAG1.21
               MagentoPictureLink.SetRange("Picture Name",Name);
               Counter := MagentoPictureLink.Count;
             end;
@@ -172,17 +198,21 @@ page 6151411 "Magento Pictures"
               begin
                 TempItem.DeleteAll;
                 Clear(MagentoPictureLink);
-                //-MAG1.21
-                //MagentoPictureLink.SETRANGE(Type,Type::Item);
-                //+MAG1.21
                 MagentoPictureLink.SetRange("Picture Name",Name);
                 if MagentoPictureLink.FindSet then
                   repeat
                     if not TempItem.Get(MagentoPictureLink."Item No.") then begin
-                      Item.Get(MagentoPictureLink."Item No.");
-                      TempItem.Init;
-                      TempItem := Item;
-                      TempItem.Insert;
+                      //-MAG2.22 [361234]
+                      if Item.Get(MagentoPictureLink."Item No.") then begin
+                        TempItem.Init;
+                        TempItem := Item;
+                        TempItem.Insert;
+                      end else begin
+                        TempItem.Init;
+                        TempItem."No." := MagentoPictureLink."Item No.";
+                        TempItem.Insert;
+                      end;
+                      //+MAG2.22 [361234]
                     end;
                   until MagentoPictureLink.Next = 0;
                 PAGE.Run(PAGE::"Retail Item List",TempItem);
@@ -215,6 +245,19 @@ page 6151411 "Magento Pictures"
         MiniatureSinglePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::SinglePicutre,MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
         MiniatureLinePicture := MagentoSetup."Miniature Picture" in [MagentoSetup."Miniature Picture"::LinePicture,MagentoSetup."Miniature Picture"::"SinglePicture+LinePicture"];
         //+MAG1.21
+    end;
+
+    [TryFunction]
+    procedure TryCheckPicture()
+    var
+        WebRequest: DotNet npNetWebRequest;
+        WebResponse: DotNet npNetWebResponse;
+    begin
+        //-MAG2.22 [361234]
+        WebRequest := WebRequest.CreateHttp(GetMagentotUrl());
+        WebRequest.Method := 'HEAD';
+        WebResponse := WebRequest.GetResponse();
+        //+MAG2.22 [361234]
     end;
 }
 

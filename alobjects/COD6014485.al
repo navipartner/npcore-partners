@@ -6,6 +6,7 @@ codeunit 6014485 "PBS Gift Voucher Functions"
     // NPR5.36/TJ  /20170914 CASE 286283 Renamed variables/function into english and into proper naming terminology
     //                                   Removed unused variables
     // NPR5.38/MHA /20180105  CASE 301053 Reworked GetBalance() to use dotnet instead of automation
+    // #361164/MHA /20190705  CASE 361164 Updated Exception Message parsing in GetBalance()
 
 
     trigger OnRun()
@@ -176,15 +177,9 @@ codeunit 6014485 "PBS Gift Voucher Functions"
         HttpWebRequest.ContentType('text/xml');
         HttpWebRequest.Headers.Add('SOAPAction', 'http://tempuri.org/BalanceInquiry');
         if not NpXmlDomMgt.SendWebRequest(XmlDoc, HttpWebRequest, HttpWebResponse, WebException) then begin
-            LastErrorMessage := GetLastErrorText;
-            ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
-            if ErrorMessage = '' then
-                ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-            if ErrorMessage = '' then
-                ErrorMessage := NpXmlDomMgt.GetWebResponseText(HttpWebResponse);
-            if ErrorMessage = '' then
-                ErrorMessage := LastErrorMessage;
-
+          //-#361164 [361164]
+          ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
+          //+#361164 [361164]
             Error(CopyStr(ErrorMessage, 1, 1000));
         end;
 

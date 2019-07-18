@@ -3,6 +3,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     // NPR5.42/MHA /20180525  CASE 307022 Object created - Global Retail Voucher
     // NPR5.48/MHA /20180921  CASE 302179 Replaced direct check on Voucher."In-Use Quantity" with CalcInUseQty
     // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner functionality used with Cross Company Vouchers
+    // #361164/MHA /20190705  CASE 361164 Updated Exception Message parsing in InvokeRedeemPartnerVouchers()
 
 
     trigger OnRun()
@@ -21,7 +22,6 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
     procedure UpsertPartners(var retail_voucher_partners: XMLport "NpRv Partners")
     var
         TempNpRvPartner: Record "NpRv Partner" temporary;
@@ -75,7 +75,6 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
     procedure CreateVouchers(var vouchers: XMLport "NpRv Global Vouchers")
     var
         NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary;
@@ -161,7 +160,6 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
     procedure ReserveVouchers(var vouchers: XMLport "NpRv Global Vouchers")
     var
         NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary;
@@ -255,7 +253,6 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
     procedure CancelReserveVouchers(var vouchers: XMLport "NpRv Global Vouchers")
     var
         NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary;
@@ -310,7 +307,6 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
     procedure RedeemVouchers(var vouchers: XMLport "NpRv Global Vouchers")
     var
         NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary;
@@ -424,7 +420,6 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
     procedure InvokeRedeemPartnerVouchers(var NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary)
     var
         NpRvPartner: Record "NpRv Partner";
@@ -438,8 +433,6 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
         ErrorMessage: Text;
     begin
         //-NPR5.49 [342811]
-        exit;
-
         if NpRvVoucherBuffer."Issue Partner Code" = NpRvVoucherBuffer."Redeem Partner Code" then
           exit;
         if not NpRvPartner.Get(NpRvVoucherBuffer."Issue Partner Code") then
@@ -478,18 +471,19 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
         NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
 
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
+          //-#361164 [361164]
+          ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
           if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
             NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-            ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement,'Body/Fault/faultstring',1000,false);
+            if NpXmlDomMgt.FindNode(XmlDoc.DocumentElement,'//faultstring',XmlElement) then
+              ErrorMessage := XmlElement.InnerText;
           end;
-
           Error(CopyStr(ErrorMessage,1,1000));
+          //+#361164 [361164]
         end;
         //+NPR5.49 [342811]
     end;
 
-    [Scope('Personalization')]
     procedure RedeemPartnerVouchers(var vouchers: XMLport "NpRv Global Vouchers")
     var
         NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary;
@@ -573,7 +567,6 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     begin
     end;
 
-    [Scope('Personalization')]
     procedure FindVoucher(VoucherTypeFilter: Text;ReferenceNo: Text[30];var Voucher: Record "NpRv Voucher"): Boolean
     var
         VoucherType: Record "NpRv Voucher Type";

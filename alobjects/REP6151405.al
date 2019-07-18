@@ -6,6 +6,8 @@ report 6151405 "Magento Credit Voucher"
     //                                    Handling of image data moved from Layout to Navision.
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
     // MAG2.22/MHA /20190619  CASE 357825 Added Data Items to be used with Word Layout
+    // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print functionality
+
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Magento Credit Voucher.rdlc';
 
@@ -16,9 +18,6 @@ report 6151405 "Magento Credit Voucher"
     {
         dataitem("Credit Voucher";"Credit Voucher")
         {
-            column(CreditVoucher;CreditVoucher)
-            {
-            }
             column(No_CreditVoucher;"Credit Voucher"."No.")
             {
             }
@@ -217,22 +216,9 @@ report 6151405 "Magento Credit Voucher"
 
             trigger OnAfterGetRecord()
             var
-                TempBlob: Record TempBlob temporary;
-                Convert: DotNet npNetConvert;
-                MemoryStream: DotNet npNetMemoryStream;
-                InStream: InStream;
                 MagentoBarcodeLibrary: Codeunit "Magento Barcode Library";
             begin
-                //-MAG1.17
-                MagentoGiftVoucherMgt.CreditVoucherToTempBlob("Credit Voucher",TempBlob);
-                TempBlob.Blob.CreateInStream(InStream);
-                MemoryStream := MemoryStream.MemoryStream;
-                CopyStream(MemoryStream,InStream);
-                CreditVoucher := Convert.ToBase64String(MemoryStream.ToArray);
-                //+MAG1.17
-
                 //-MAG2.22 [357825]
-                TempBlob.DeleteAll;
                 MagentoBarcodeLibrary.SetDpiX(600);
                 MagentoBarcodeLibrary.SetDpiY(600);
                 MagentoBarcodeLibrary.GenerateBarcode("No.",TempBlobBarcode);
@@ -265,7 +251,5 @@ report 6151405 "Magento Credit Voucher"
 
     var
         TempBlobBarcode: Record TempBlob temporary;
-        MagentoGiftVoucherMgt: Codeunit "Magento Gift Voucher Mgt.";
-        CreditVoucher: Text;
 }
 

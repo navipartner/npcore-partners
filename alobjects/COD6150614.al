@@ -52,6 +52,7 @@ codeunit 6150614 "POS Create Entry"
     // NPR5.50/MHA /20190622 CASE 337539 Added "Retail ID" in InsertPOSEntry() and InsertPOSSaleLine()
     // NPR5.50/MMV /20190320 CASE 300557 Improved sales doc. references.
     // NPR5.50/TSA /20190520 CASE 354832 Added reversal of preliminary VAT
+    // #362329/MHA /20190718 CASE 362329 Added "Exclude from Posting" on POS Sales Lines in InsertPOSSaleLine()
 
     TableNo = "Sale POS";
 
@@ -371,6 +372,9 @@ codeunit 6150614 "POS Create Entry"
             //+NPR5.38 [294719]
 
           end;
+          //-#362329 [362329]
+          "Exclude from Posting" := ExcludeFromPosting(SaleLinePOS);
+          //+#362329 [362329]
 
           "No." := SaleLinePOS."No.";
           "Variant Code" := SaleLinePOS."Variant Code";
@@ -1615,6 +1619,16 @@ codeunit 6150614 "POS Create Entry"
         if POSEntry.Description = '' then
           POSEntry.Description := StrSubstNo('%1 %2', POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
         //+NPR5.50 [300557]
+    end;
+
+    procedure ExcludeFromPosting(SaleLinePOS: Record "Sale Line POS"): Boolean
+    begin
+        //-#362329 [362329]
+        if SaleLinePOS.Type in [SaleLinePOS.Type::Comment] then
+          exit(true);
+
+        exit(SaleLinePOS."Sale Type" in [SaleLinePOS."Sale Type"::Comment,SaleLinePOS."Sale Type"::"Debit Sale",SaleLinePOS."Sale Type"::"Open/Close"]);
+        //+#362329 [362329]
     end;
 
     local procedure "--"()

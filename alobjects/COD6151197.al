@@ -1,6 +1,7 @@
 codeunit 6151197 "NpCs Send Order"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #344264/MHA /20190717  CASE 344264 Added <store_stock> to InitReqBody()
 
 
     trigger OnRun()
@@ -126,7 +127,9 @@ codeunit 6151197 "NpCs Send Order"
                     '</notification>' +
                     '<bill_to_customer_no>' + NpCsStore."Bill-to Customer No." + '</bill_to_customer_no>' +
                     '<archive_on_delivery>' + Format(NpCsDocument."Archive on Delivery",0,9) + '</archive_on_delivery>' +
-                    '<delivery_only>' + Format(NpCsDocument."Delivery Only (Non stock)",0,9) + '</delivery_only>' +
+                    //-#344264 [#344264]
+                    '<store_stock>' + Format(NpCsDocument."Store Stock",0,9) + '</store_stock>' +
+                    //+#344264 [#344264]
                     '<bill_via>' + Format(NpCsDocument."Bill via",0,2) + '</bill_via>' +
                     '<delivery_print_template_pos>' + NpCsDocument."Delivery Print Template (POS)" + '</delivery_print_template_pos>' +
                     '<delivery_print_template_sales_doc>' + NpCsDocument."Delivery Print Template (S.)" + '</delivery_print_template_sales_doc>' +

@@ -91,7 +91,8 @@ page 6014425 "Retail Item Card"
     // NPR5.50/THRO/20190412  CASE 352040 Removed fixed key on card. Was "Primary Key Length"
     // NPR5.50/BHR /20190506  CASE 353006 Add field Season
     // MAG2.22/MHA /20190625  CASE 359285 Added field 6151500 "Magento Picture Variety Type"
-    // #361229/ZESO/20190708 CASE 361229 Added Page Action Attributes and Factbox Item Attributes
+    // #361229/ZESO/20190708  CASE 361229 Added Page Action Attributes and Factbox Item Attributes
+    // #361514/THRO/20190717  CASE 361514 Action POS Sales Entries named POSSalesEntries (for AL Conversion)
 
     Caption = 'Item Card NP Retail';
     PageType = Card;
@@ -2302,7 +2303,7 @@ page 6014425 "Retail Item Card"
                         RunObject = Page "Application Worksheet";
                         RunPageLink = "Item No."=FIELD("No.");
                     }
-                    action("POS Sales Entries")
+                    action(POSSalesEntries)
                     {
                         Caption = 'POS Sales Entries';
                         Image = Entries;

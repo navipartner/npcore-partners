@@ -1,12 +1,12 @@
 page 6151211 "NpCs Arch. Document List"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #344264/MHA /20190717  CASE 344264 Added RunPageView to Action "Log Entries"
 
     Caption = 'Archived Collect Document List';
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NpCs Arch. Document";
-    UsageCategory = History;
 
     layout
     {
@@ -77,7 +77,7 @@ page 6151211 "NpCs Arch. Document List"
                 field("Delivery updated by";"Delivery updated by")
                 {
                 }
-                field("Delivery Only (Non stock)";"Delivery Only (Non stock)")
+                field("Store Stock";"Store Stock")
                 {
                 }
                 field("Prepaid Amount";"Prepaid Amount")
@@ -112,6 +112,8 @@ page 6151211 "NpCs Arch. Document List"
                 Image = Log;
                 RunObject = Page "NpCs Arch. Doc. Log Entries";
                 RunPageLink = "Document Entry No."=FIELD("Entry No.");
+                RunPageView = SORTING("Entry No.")
+                              ORDER(Descending);
                 ShortCutKey = 'Ctrl+F7';
             }
         }

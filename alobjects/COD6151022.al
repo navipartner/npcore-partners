@@ -1,6 +1,7 @@
 codeunit 6151022 "NpRv Partner Mgt."
 {
     // NPR5.49/MHA /20190228  CASE 342811 Object created - Retail Voucher Partner used with Cross Company Vouchers
+    // #361164/MHA /20190705  CASE 361164 Updated Exception Message parsing in TryValidateGlobalVoucherService()
 
 
     trigger OnRun()
@@ -14,7 +15,6 @@ codeunit 6151022 "NpRv Partner Mgt."
     begin
     end;
 
-    [Scope('Personalization')]
     procedure InitLocalPartner(var NpRvPartner: Record "NpRv Partner")
     begin
         if NpRvPartner.Name = '' then
@@ -54,7 +54,6 @@ codeunit 6151022 "NpRv Partner Mgt."
     end;
 
     [TryFunction]
-    [Scope('Personalization')]
     procedure TryValidateGlobalVoucherService(NpRvPartner: Record "NpRv Partner")
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
@@ -65,7 +64,6 @@ codeunit 6151022 "NpRv Partner Mgt."
         XmlElement: DotNet npNetXmlElement;
         WebException: DotNet npNetWebException;
         ErrorMessage: Text;
-        LastErrorText: Text;
     begin
         //-NPR5.49 [342811]
         NpRvPartner.TestField("Service Url");
@@ -93,19 +91,15 @@ codeunit 6151022 "NpRv Partner Mgt."
         if NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then
           exit;
 
-        LastErrorText := GetLastErrorText;
-        ErrorMessage := NpXmlDomMgt.GetWebExceptionInnerMessage(WebException);
+        //-#361164 [361164]
+        ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
         if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
           NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
-          if NpXmlDomMgt.FindNode(XmlDoc.DocumentElement,'//faultstring',XmlElement) then begin
+          if NpXmlDomMgt.FindNode(XmlDoc.DocumentElement,'//faultstring',XmlElement) then
             ErrorMessage := XmlElement.InnerText;
-            Error(ErrorMessage);
-          end;
         end;
-        if ErrorMessage = '' then
-          ErrorMessage := LastErrorText;
-
-        Error(ErrorMessage);
+        Error(CopyStr(ErrorMessage,1,1000));
+        //+#361164 [361164]
         //+NPR5.49 [342811]
     end;
 
@@ -113,13 +107,11 @@ codeunit 6151022 "NpRv Partner Mgt."
     begin
     end;
 
-    [Scope('Personalization')]
     procedure GetGlobalVoucherWSUrl(ServiceCompanyName: Text) Url: Text
     begin
         exit(GetUrl(CLIENTTYPE::SOAP,ServiceCompanyName,OBJECTTYPE::Codeunit,GlobalVoucherWsCodeunitId()));
     end;
 
-    [Scope('Personalization')]
     procedure GetServiceName(NpRvPartner: Record "NpRv Partner") ServiceName: Text
     var
         Position: Integer;
