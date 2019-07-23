@@ -31,5 +31,6 @@
   "contextSensitiveHelpUrl": "https://ALProject14.com/help/",
   "showMyCode": true,
   "runtime": "3.0",
-  "target": "Internal"
+  "target": "Internal",
+  "features": [ "TranslationFile" ]
 }
