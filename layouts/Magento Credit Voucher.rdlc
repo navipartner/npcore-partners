@@ -80,9 +80,6 @@ End Function
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
-        <Field Name="CreditVoucher">
-          <DataField>CreditVoucher</DataField>
-        </Field>
         <Field Name="No_CreditVoucher">
           <DataField>No_CreditVoucher</DataField>
         </Field>
