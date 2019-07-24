@@ -2,6 +2,7 @@ codeunit 6151207 "NpCs Expiration Mgt."
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #344264/MHA /20190717  CASE 344264 Adjusted OnRun() to check expiration on all documents if not run with specific rec
+    // #362443/MHA /20190719  CASE 362443 Introduced Opening Hour Set
 
     TableNo = "NpCs Document";
 
@@ -56,7 +57,9 @@ codeunit 6151207 "NpCs Expiration Mgt."
         if NpCsDocument."Processing updated at" = 0DT then
           NpCsDocument."Processing updated at" := CurrentDateTime;
 
-        ExpiresAt := NpCsStoreOpeningHoursMgt.CalcNextOpeningDTDuration(NpCsDocument."Processing updated at",NpCsDocument."Processing Expiry Duration");
+        //-#362443 [362443]
+        ExpiresAt := NpCsStoreOpeningHoursMgt.CalcNextOpeningDTDuration(NpCsDocument."Opening Hour Set",NpCsDocument."Processing updated at",NpCsDocument."Processing Expiry Duration");
+        //+#362443 [362443]
         //-#344264 [344264]
         exit(ExpiresAt);
         //+#344264 [344264]
@@ -71,8 +74,10 @@ codeunit 6151207 "NpCs Expiration Mgt."
         if NpCsDocument."Processing updated at" = 0DT then
           NpCsDocument."Processing updated at" := CurrentDateTime;
 
+        //-#362443 [362443]
+        ExpiresAt := NpCsStoreOpeningHoursMgt.CalcNextClosingDTDaysQty(NpCsDocument."Opening Hour Set",NpCsDocument."Processing updated at",NpCsDocument."Delivery Expiry Days (Qty.)");
+        //+#362443 [362443]
         //-#344264 [344264]
-        ExpiresAt := NpCsStoreOpeningHoursMgt.CalcNextClosingDTDaysQty(NpCsDocument."Processing updated at",NpCsDocument."Delivery Expiry Days (Qty.)");
         exit(ExpiresAt);
         //+#344264 [344264]
     end;
@@ -142,14 +147,14 @@ codeunit 6151207 "NpCs Expiration Mgt."
 
     procedure ScheduleUpdateExpirationStatus(NpCsDocument: Record "NpCs Document";NotBefore: DateTime)
     begin
+        //-NPR10.00.00.5.51 [344264]
         TASKSCHEDULER.CreateTask(CurrCodeunitId(),0,true,CompanyName,NotBefore,NpCsDocument.RecordId);
+        //+NPR10.00.00.5.51 [344264]
     end;
 
     local procedure CurrCodeunitId(): Integer
     begin
-        //-NPR10.00.00.5.51 [344264]
         exit(CODEUNIT::"NpCs Expiration Mgt.");
-        //+NPR10.00.00.5.51 [344264]
     end;
 }
 

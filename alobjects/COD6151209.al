@@ -1,6 +1,7 @@
 codeunit 6151209 "NpCs Arch. Collect Mgt."
 {
     // #344264/MHA /20190717  CASE 344264 Object created - Archive Collect in Store Documents
+    // #362443/MHA /20190719  CASE 344264 Added "Opening Hour Set"
 
 
     trigger OnRun()
@@ -82,6 +83,10 @@ codeunit 6151209 "NpCs Arch. Collect Mgt."
         NpCsArchDocument."Document Type" := NpCsDocument."Document Type";
         NpCsArchDocument."Document No." := NpCsDocument."Document No.";
         NpCsArchDocument."Reference No." := NpCsDocument."Reference No.";
+        //-#362443 [362443]
+        NpCsArchDocument."Inserted at" := NpCsDocument."Inserted at";
+        NpCsArchDocument."Archived at" := CurrentDateTime;
+        //+#362443 [362443]
         NpCsArchDocument."Workflow Code" := NpCsDocument."Workflow Code";
         NpCsArchDocument."Next Workflow Step" := NpCsDocument."Next Workflow Step";
         NpCsArchDocument."From Document Type" := NpCsDocument."From Document Type";
@@ -93,6 +98,9 @@ codeunit 6151209 "NpCs Arch. Collect Mgt."
         NpCsArchDocument."To Document Type" := NpCsDocument."To Document Type";
         NpCsArchDocument."To Document No." := NpCsDocument."To Document No.";
         NpCsArchDocument."To Store Code" := NpCsDocument."To Store Code";
+        //-#362443 [362443]
+        NpCsArchDocument."Opening Hour Set" := NpCsDocument."Opening Hour Set";
+        //+#362443 [362443]
         NpCsArchDocument."Processing Expiry Duration" := NpCsDocument."Processing Expiry Duration";
         NpCsArchDocument."Processing Status" := NpCsDocument."Processing Status";
         NpCsArchDocument."Processing updated at" := NpCsDocument."Processing updated at";
