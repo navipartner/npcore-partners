@@ -1,6 +1,7 @@
 codeunit 6151208 "NpCs Store Opening Hours Mgt."
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #362443/MHA /20190719  CASE 362443 Introduced Opening Hour Set
 
 
     trigger OnRun()
@@ -8,7 +9,7 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
     end;
 
     var
-        TempNpCsStoreOpeningHourEntry: Record "NpCs Store Opening Hours Entry" temporary;
+        TempNpCsOpenHourCalendarEntry: Record "NpCs Open. Hour Calendar Entry" temporary;
         Initialized: Boolean;
         StartDate: Date;
         EndDate: Date;
@@ -17,7 +18,7 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
     begin
     end;
 
-    procedure CalcNextClosingDTDaysQty(StartDT: DateTime;DaysQty: Integer) ClosingDT: DateTime
+    procedure CalcNextClosingDTDaysQty(SetCode: Code[20];StartDT: DateTime;DaysQty: Integer) ClosingDT: DateTime
     var
         EndDT: DateTime;
         PrevStartDT: DateTime;
@@ -29,9 +30,9 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
         if DaysQty <= 0 then
           exit(StartDT);
 
-        if not IsOpeningHours(StartDT) then begin
+        if not IsOpeningHours(SetCode,StartDT) then begin
           EndDT := StartDT;
-          StartDT := FindNextOpeningHours(StartDT);
+          StartDT := FindNextOpeningHours(SetCode,StartDT);
           if StartDT = 0DT then
             exit(0DT);
 
@@ -40,14 +41,14 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
         end;
 
         while DaysQty > 0 do begin
-          EndDT := FindNextClosingHours(StartDT);
+          EndDT := FindNextClosingHours(SetCode,StartDT);
           if EndDT = 0DT then
             exit(0DT);
           if EndDT <= StartDT then
             exit(ClosingDT);
 
           ClosingDT := EndDT;
-          StartDT := FindNextOpeningHours(EndDT + 1);
+          StartDT := FindNextOpeningHours(SetCode,EndDT + 1);
           if StartDT = 0DT then
               exit(0DT);
           if DT2Date(StartDT) > DT2Date(EndDT) then
@@ -55,11 +56,11 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
         end;
 
         repeat
-          ClosingDT := FindNextClosingHours(StartDT);
+          ClosingDT := FindNextClosingHours(SetCode,StartDT);
           if ClosingDT = 0DT then
             exit(0DT);
 
-          StartDT := FindNextOpeningHours(ClosingDT + 1);
+          StartDT := FindNextOpeningHours(SetCode,ClosingDT + 1);
           if StartDT = 0DT then
             exit(0DT);
         until DT2Date(ClosingDT) <> DT2Date(StartDT);
@@ -67,7 +68,7 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
         exit(ClosingDT);
     end;
 
-    procedure CalcNextOpeningDTDuration(StartDT: DateTime;Duration: Duration) OpeningDT: DateTime
+    procedure CalcNextOpeningDTDuration(SetCode: Code[20];StartDT: DateTime;Duration: Duration) OpeningDT: DateTime
     var
         EndDT: DateTime;
         OpeningDuration: Duration;
@@ -78,14 +79,14 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
         if Duration <= 0 then
           exit(StartDT);
 
-        if not IsOpeningHours(StartDT) then begin
-          StartDT := FindNextOpeningHours(StartDT);
+        if not IsOpeningHours(SetCode,StartDT) then begin
+          StartDT := FindNextOpeningHours(SetCode,StartDT);
           if StartDT = 0DT then
             exit(0DT);
         end;
 
         while Duration > 0 do begin
-          EndDT := FindNextClosingHours(StartDT);
+          EndDT := FindNextClosingHours(SetCode,StartDT);
           if EndDT = 0DT then
             exit(0DT);
           if EndDT <= StartDT then
@@ -99,7 +100,7 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
 
           OpeningDT := StartDT + OpeningDuration;
           Duration -= OpeningDuration;
-          StartDT := FindNextOpeningHours(EndDT + 1);
+          StartDT := FindNextOpeningHours(SetCode,EndDT + 1);
           if StartDT = 0DT then
               exit(0DT);
         end;
@@ -111,7 +112,7 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
     begin
     end;
 
-    local procedure IsOpeningHours(CheckDT: DateTime): Boolean
+    local procedure IsOpeningHours(SetCode: Code[20];CheckDT: DateTime): Boolean
     var
         CheckDate: Date;
         CheckTime: Time;
@@ -121,18 +122,18 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
 
         CheckDate := DT2Date(CheckDT);
         CheckTime := DT2Time(CheckDT);
-        Initialize(CheckDate,CheckDate);
+        Initialize(SetCode,CheckDate,CheckDate);
 
-        TempNpCsStoreOpeningHourEntry.SetRange("Calendar Date",CheckDate);
-        if TempNpCsStoreOpeningHourEntry.IsEmpty then
+        TempNpCsOpenHourCalendarEntry.SetRange("Calendar Date",CheckDate);
+        if TempNpCsOpenHourCalendarEntry.IsEmpty then
           exit(false);
 
-        TempNpCsStoreOpeningHourEntry.SetFilter("Start Time",'<=%1',CheckTime);
-        TempNpCsStoreOpeningHourEntry.SetFilter("End Time",'>=%1|=%2',CheckTime,0T);
-        exit(TempNpCsStoreOpeningHourEntry.FindFirst);
+        TempNpCsOpenHourCalendarEntry.SetFilter("Start Time",'<=%1',CheckTime);
+        TempNpCsOpenHourCalendarEntry.SetFilter("End Time",'>=%1|=%2',CheckTime,0T);
+        exit(TempNpCsOpenHourCalendarEntry.FindFirst);
     end;
 
-    local procedure FindNextOpeningHours(CheckDT: DateTime) OpeningHours: DateTime
+    local procedure FindNextOpeningHours(SetCode: Code[20];CheckDT: DateTime) OpeningHours: DateTime
     var
         CheckDate: Date;
         CheckTime: Time;
@@ -142,28 +143,28 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
 
         CheckDate := DT2Date(CheckDT);
         CheckTime := DT2Time(CheckDT);
-        Initialize(CheckDate,CalcDate('<1Y>',CheckDate));
+        Initialize(SetCode,CheckDate,CalcDate('<1Y>',CheckDate));
 
-        TempNpCsStoreOpeningHourEntry.SetRange("Calendar Date",CheckDate);
-        TempNpCsStoreOpeningHourEntry.SetFilter("End Time",'>%1|=%2',CheckTime,0T);
-        if TempNpCsStoreOpeningHourEntry.FindSet then begin
+        TempNpCsOpenHourCalendarEntry.SetRange("Calendar Date",CheckDate);
+        TempNpCsOpenHourCalendarEntry.SetFilter("End Time",'>%1|=%2',CheckTime,0T);
+        if TempNpCsOpenHourCalendarEntry.FindSet then begin
           repeat
-            if TempNpCsStoreOpeningHourEntry."Start Time" <= CheckTime then
+            if TempNpCsOpenHourCalendarEntry."Start Time" <= CheckTime then
               exit(CheckDT);
 
-            exit(CreateDateTime(TempNpCsStoreOpeningHourEntry."Calendar Date",TempNpCsStoreOpeningHourEntry."Start Time"));
-          until TempNpCsStoreOpeningHourEntry.Next = 0;
+            exit(CreateDateTime(TempNpCsOpenHourCalendarEntry."Calendar Date",TempNpCsOpenHourCalendarEntry."Start Time"));
+          until TempNpCsOpenHourCalendarEntry.Next = 0;
         end;
 
-        Clear(TempNpCsStoreOpeningHourEntry);
-        TempNpCsStoreOpeningHourEntry.SetFilter("Calendar Date",'>%1',CheckDate);
-        if TempNpCsStoreOpeningHourEntry.FindFirst then
-          exit(CreateDateTime(TempNpCsStoreOpeningHourEntry."Calendar Date",TempNpCsStoreOpeningHourEntry."Start Time"));
+        Clear(TempNpCsOpenHourCalendarEntry);
+        TempNpCsOpenHourCalendarEntry.SetFilter("Calendar Date",'>%1',CheckDate);
+        if TempNpCsOpenHourCalendarEntry.FindFirst then
+          exit(CreateDateTime(TempNpCsOpenHourCalendarEntry."Calendar Date",TempNpCsOpenHourCalendarEntry."Start Time"));
 
         exit(0DT);
     end;
 
-    local procedure FindNextClosingHours(CheckDT: DateTime) ClosingHours: DateTime
+    local procedure FindNextClosingHours(SetCode: Code[20];CheckDT: DateTime) ClosingHours: DateTime
     var
         CheckDate: Date;
         CheckTime: Time;
@@ -173,82 +174,90 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
 
         CheckDate := DT2Date(CheckDT);
         CheckTime := DT2Time(CheckDT);
-        Initialize(CheckDate,CalcDate('<1Y>',CheckDate));
+        Initialize(SetCode,CheckDate,CalcDate('<1Y>',CheckDate));
 
-        TempNpCsStoreOpeningHourEntry.SetRange("Calendar Date",CheckDate);
-        TempNpCsStoreOpeningHourEntry.SetFilter("End Time",'>=%1|=%2',CheckTime,0T);
-        if TempNpCsStoreOpeningHourEntry.FindSet then begin
+        TempNpCsOpenHourCalendarEntry.SetRange("Calendar Date",CheckDate);
+        TempNpCsOpenHourCalendarEntry.SetFilter("End Time",'>=%1|=%2',CheckTime,0T);
+        if TempNpCsOpenHourCalendarEntry.FindSet then begin
           repeat
-            if TempNpCsStoreOpeningHourEntry."End Time" = 0T then
-              exit(CreateDateTime(CalcDate('<1D>',TempNpCsStoreOpeningHourEntry."Calendar Date"),TempNpCsStoreOpeningHourEntry."End Time"));
+            if TempNpCsOpenHourCalendarEntry."End Time" = 0T then
+              exit(CreateDateTime(CalcDate('<1D>',TempNpCsOpenHourCalendarEntry."Calendar Date"),TempNpCsOpenHourCalendarEntry."End Time"));
 
-            exit(CreateDateTime(TempNpCsStoreOpeningHourEntry."Calendar Date",TempNpCsStoreOpeningHourEntry."End Time"));
-          until TempNpCsStoreOpeningHourEntry.Next = 0;
+            exit(CreateDateTime(TempNpCsOpenHourCalendarEntry."Calendar Date",TempNpCsOpenHourCalendarEntry."End Time"));
+          until TempNpCsOpenHourCalendarEntry.Next = 0;
         end;
 
-        Clear(TempNpCsStoreOpeningHourEntry);
-        TempNpCsStoreOpeningHourEntry.SetFilter("Calendar Date",'>%1',CheckDate);
-        if not TempNpCsStoreOpeningHourEntry.FindFirst then
+        Clear(TempNpCsOpenHourCalendarEntry);
+        TempNpCsOpenHourCalendarEntry.SetFilter("Calendar Date",'>%1',CheckDate);
+        if not TempNpCsOpenHourCalendarEntry.FindFirst then
           exit(0DT);
 
-        exit(CreateDateTime(TempNpCsStoreOpeningHourEntry."Calendar Date",TempNpCsStoreOpeningHourEntry."End Time"));
+        exit(CreateDateTime(TempNpCsOpenHourCalendarEntry."Calendar Date",TempNpCsOpenHourCalendarEntry."End Time"));
     end;
 
     local procedure "--- GUI"()
     begin
     end;
 
-    procedure ShowOpeningHours()
+    procedure ShowOpeningHours(SetCode: Code[20])
     begin
-        Initialize(0D,0D);
-        PAGE.Run(0,TempNpCsStoreOpeningHourEntry);
+        Initialize(SetCode,0D,0D);
+        PAGE.Run(0,TempNpCsOpenHourCalendarEntry);
     end;
 
     local procedure "--- Setup"()
     begin
     end;
 
-    procedure SetupOpeningHourEntries(var TempNpCsStoreOpeningHourEntry: Record "NpCs Store Opening Hours Entry" temporary)
+    local procedure SetupOpeningHourEntries(SetCode: Code[20])
     var
-        NpCsStoreOpeningHourSetup: Record "NpCs Store Opening Hours Setup";
+        NpCsOpenHourSet: Record "NpCs Open. Hour Set";
+        NpCsOpenHourEntry: Record "NpCs Open. Hour Entry";
     begin
+        if SetCode = '' then begin
+          if not NpCsOpenHourSet.FindFirst then
+            exit;
+          SetCode := NpCsOpenHourSet.Code;
+        end;
+
         if StartDate = 0D then
           StartDate := Today;
         if EndDate = 0D then
           EndDate := CalcDate('<5Y>',Today);
 
-        if not NpCsStoreOpeningHourSetup.FindSet then
+        NpCsOpenHourEntry.SetRange("Set Code",SetCode);
+        if not NpCsOpenHourEntry.FindSet then
           exit;
 
         repeat
-          ApplyOpeningHourSetup(NpCsStoreOpeningHourSetup,TempNpCsStoreOpeningHourEntry);
-          Clear(TempNpCsStoreOpeningHourEntry);
-        until NpCsStoreOpeningHourSetup.Next = 0;
+          ApplyOpeningHourEntry(NpCsOpenHourEntry);
+          Clear(TempNpCsOpenHourCalendarEntry);
+        until NpCsOpenHourEntry.Next = 0;
     end;
 
-    local procedure ApplyOpeningHourSetup(NpCsStoreOpeningHourSetup: Record "NpCs Store Opening Hours Setup";var TempNpCsStoreOpeningHourEntry: Record "NpCs Store Opening Hours Entry" temporary)
+    local procedure ApplyOpeningHourEntry(NpCsOpenHourEntry: Record "NpCs Open. Hour Entry")
     begin
-        case NpCsStoreOpeningHourSetup."Period Type" of
-          NpCsStoreOpeningHourSetup."Period Type"::"Every Day":
+        case NpCsOpenHourEntry."Period Type" of
+          NpCsOpenHourEntry."Period Type"::"Every Day":
             begin
-              ApplyOpeningHourSetupEveryDay(NpCsStoreOpeningHourSetup,TempNpCsStoreOpeningHourEntry);
+              ApplyOpeningHourEntryEveryDay(NpCsOpenHourEntry);
             end;
-          NpCsStoreOpeningHourSetup."Period Type"::Weekly:
+          NpCsOpenHourEntry."Period Type"::Weekly:
             begin
-              ApplyOpeningHourSetupWeekly(NpCsStoreOpeningHourSetup,TempNpCsStoreOpeningHourEntry);
+              ApplyOpeningHourEntryWeekly(NpCsOpenHourEntry);
             end;
-          NpCsStoreOpeningHourSetup."Period Type"::Yearly:
+          NpCsOpenHourEntry."Period Type"::Yearly:
             begin
-              ApplyOpeningHourSetupYearly(NpCsStoreOpeningHourSetup,TempNpCsStoreOpeningHourEntry);
+              ApplyOpeningHourEntryYearly(NpCsOpenHourEntry);
             end;
-          NpCsStoreOpeningHourSetup."Period Type"::Date:
+          NpCsOpenHourEntry."Period Type"::Date:
             begin
-              ApplyOpeningHourSetupDate(NpCsStoreOpeningHourSetup,TempNpCsStoreOpeningHourEntry);
+              ApplyOpeningHourEntryDate(NpCsOpenHourEntry);
             end;
         end;
     end;
 
-    local procedure ApplyOpeningHourSetupEveryDay(NpCsStoreOpeningHourSetup: Record "NpCs Store Opening Hours Setup";var TempNpCsStoreOpeningHourEntry: Record "NpCs Store Opening Hours Entry" temporary)
+    local procedure ApplyOpeningHourEntryEveryDay(NpCsOpenHourEntry: Record "NpCs Open. Hour Entry")
     var
         Date: Record Date;
     begin
@@ -256,58 +265,58 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
         Date.SetFilter("Period Start",'%1..%2',StartDate,EndDate);
         if Date.FindSet then
           repeat
-            case NpCsStoreOpeningHourSetup."Entry Type" of
-              NpCsStoreOpeningHourSetup."Entry Type"::"Store Closed":
+            case NpCsOpenHourEntry."Entry Type" of
+              NpCsOpenHourEntry."Entry Type"::"Store Closed":
                 begin
-                  TempNpCsStoreOpeningHourEntry.SetRange("Calendar Date",Date."Period Start");
-                  if TempNpCsStoreOpeningHourEntry.FindFirst then
-                    TempNpCsStoreOpeningHourEntry.DeleteAll;
+                  TempNpCsOpenHourCalendarEntry.SetRange("Calendar Date",Date."Period Start");
+                  if TempNpCsOpenHourCalendarEntry.FindFirst then
+                    TempNpCsOpenHourCalendarEntry.DeleteAll;
                 end;
-              NpCsStoreOpeningHourSetup."Entry Type"::"Store Open":
+              NpCsOpenHourEntry."Entry Type"::"Store Open":
                 begin
-                  if not TempNpCsStoreOpeningHourEntry.Get(Date."Period Start",NpCsStoreOpeningHourSetup."Start Time",NpCsStoreOpeningHourSetup."End Time") then begin
-                    TempNpCsStoreOpeningHourEntry.Init;
-                    TempNpCsStoreOpeningHourEntry."Calendar Date" := Date."Period Start";
-                    TempNpCsStoreOpeningHourEntry."Start Time" := NpCsStoreOpeningHourSetup."Start Time";
-                    TempNpCsStoreOpeningHourEntry."End Time" := NpCsStoreOpeningHourSetup."End Time";
-                    TempNpCsStoreOpeningHourEntry.Insert;
+                  if not TempNpCsOpenHourCalendarEntry.Get(Date."Period Start",NpCsOpenHourEntry."Start Time",NpCsOpenHourEntry."End Time") then begin
+                    TempNpCsOpenHourCalendarEntry.Init;
+                    TempNpCsOpenHourCalendarEntry."Calendar Date" := Date."Period Start";
+                    TempNpCsOpenHourCalendarEntry."Start Time" := NpCsOpenHourEntry."Start Time";
+                    TempNpCsOpenHourCalendarEntry."End Time" := NpCsOpenHourEntry."End Time";
+                    TempNpCsOpenHourCalendarEntry.Insert;
                   end;
                 end;
             end;
           until Date.Next = 0;
     end;
 
-    local procedure ApplyOpeningHourSetupWeekly(NpCsStoreOpeningHourSetup: Record "NpCs Store Opening Hours Setup";var TempNpCsStoreOpeningHourEntry: Record "NpCs Store Opening Hours Entry" temporary)
+    local procedure ApplyOpeningHourEntryWeekly(NpCsOpenHourEntry: Record "NpCs Open. Hour Entry")
     var
         Date: Record Date;
     begin
         Date.SetRange("Period Type",Date."Period Type"::Date);
         Date.SetFilter("Period Start",'%1..%2',StartDate,EndDate);
-        Date.SetFilter("Period No.",GetPeriodNoFilter(NpCsStoreOpeningHourSetup));
+        Date.SetFilter("Period No.",GetPeriodNoFilter(NpCsOpenHourEntry));
         if Date.FindSet then
           repeat
-            case NpCsStoreOpeningHourSetup."Entry Type" of
-              NpCsStoreOpeningHourSetup."Entry Type"::"Store Closed":
+            case NpCsOpenHourEntry."Entry Type" of
+              NpCsOpenHourEntry."Entry Type"::"Store Closed":
                 begin
-                  TempNpCsStoreOpeningHourEntry.SetRange("Calendar Date",Date."Period Start");
-                  if TempNpCsStoreOpeningHourEntry.FindFirst then
-                    TempNpCsStoreOpeningHourEntry.DeleteAll;
+                  TempNpCsOpenHourCalendarEntry.SetRange("Calendar Date",Date."Period Start");
+                  if TempNpCsOpenHourCalendarEntry.FindFirst then
+                    TempNpCsOpenHourCalendarEntry.DeleteAll;
                 end;
-              NpCsStoreOpeningHourSetup."Entry Type"::"Store Open":
+              NpCsOpenHourEntry."Entry Type"::"Store Open":
                 begin
-                  if not TempNpCsStoreOpeningHourEntry.Get(Date."Period Start",NpCsStoreOpeningHourSetup."Start Time",NpCsStoreOpeningHourSetup."End Time") then begin
-                    TempNpCsStoreOpeningHourEntry.Init;
-                    TempNpCsStoreOpeningHourEntry."Calendar Date" := Date."Period Start";
-                    TempNpCsStoreOpeningHourEntry."Start Time" := NpCsStoreOpeningHourSetup."Start Time";
-                    TempNpCsStoreOpeningHourEntry."End Time" := NpCsStoreOpeningHourSetup."End Time";
-                    TempNpCsStoreOpeningHourEntry.Insert;
+                  if not TempNpCsOpenHourCalendarEntry.Get(Date."Period Start",NpCsOpenHourEntry."Start Time",NpCsOpenHourEntry."End Time") then begin
+                    TempNpCsOpenHourCalendarEntry.Init;
+                    TempNpCsOpenHourCalendarEntry."Calendar Date" := Date."Period Start";
+                    TempNpCsOpenHourCalendarEntry."Start Time" := NpCsOpenHourEntry."Start Time";
+                    TempNpCsOpenHourCalendarEntry."End Time" := NpCsOpenHourEntry."End Time";
+                    TempNpCsOpenHourCalendarEntry.Insert;
                   end;
                 end;
             end;
           until Date.Next = 0;
     end;
 
-    local procedure ApplyOpeningHourSetupYearly(NpCsStoreOpeningHourSetup: Record "NpCs Store Opening Hours Setup";var TempNpCsStoreOpeningHourEntry: Record "NpCs Store Opening Hours Entry" temporary)
+    local procedure ApplyOpeningHourEntryYearly(NpCsOpenHourEntry: Record "NpCs Open. Hour Entry")
     var
         Day: Integer;
         Month: Integer;
@@ -316,12 +325,12 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
         EndYear: Integer;
         CalendarDate: Date;
     begin
-        if NpCsStoreOpeningHourSetup."Entry Date" = 0D then
+        if NpCsOpenHourEntry."Entry Date" = 0D then
           exit;
 
-        Day := Date2DMY(NpCsStoreOpeningHourSetup."Entry Date",1);
-        Month := Date2DMY(NpCsStoreOpeningHourSetup."Entry Date",2);
-        Year := Date2DMY(NpCsStoreOpeningHourSetup."Entry Date",3);
+        Day := Date2DMY(NpCsOpenHourEntry."Entry Date",1);
+        Month := Date2DMY(NpCsOpenHourEntry."Entry Date",2);
+        Year := Date2DMY(NpCsOpenHourEntry."Entry Date",3);
         StartYear := Date2DMY(Today,3);
         EndYear := StartYear + 5;
 
@@ -333,77 +342,77 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
           if CalendarDate > EndDate then
             exit;
           if CalendarDate >= StartDate then
-            case NpCsStoreOpeningHourSetup."Entry Type" of
-              NpCsStoreOpeningHourSetup."Entry Type"::"Store Closed":
+            case NpCsOpenHourEntry."Entry Type" of
+              NpCsOpenHourEntry."Entry Type"::"Store Closed":
                 begin
-                  TempNpCsStoreOpeningHourEntry.SetRange("Calendar Date",CalendarDate);
-                  if TempNpCsStoreOpeningHourEntry.FindFirst then
-                    TempNpCsStoreOpeningHourEntry.DeleteAll;
+                  TempNpCsOpenHourCalendarEntry.SetRange("Calendar Date",CalendarDate);
+                  if TempNpCsOpenHourCalendarEntry.FindFirst then
+                    TempNpCsOpenHourCalendarEntry.DeleteAll;
                 end;
-              NpCsStoreOpeningHourSetup."Entry Type"::"Store Open":
+              NpCsOpenHourEntry."Entry Type"::"Store Open":
                 begin
-                  if not TempNpCsStoreOpeningHourEntry.Get(CalendarDate,NpCsStoreOpeningHourSetup."Start Time",NpCsStoreOpeningHourSetup."End Time") then begin
-                    TempNpCsStoreOpeningHourEntry.Init;
-                    TempNpCsStoreOpeningHourEntry."Calendar Date" := CalendarDate;
-                    TempNpCsStoreOpeningHourEntry."Start Time" := NpCsStoreOpeningHourSetup."Start Time";
-                    TempNpCsStoreOpeningHourEntry."End Time" := NpCsStoreOpeningHourSetup."End Time";
-                    TempNpCsStoreOpeningHourEntry.Insert;
+                  if not TempNpCsOpenHourCalendarEntry.Get(CalendarDate,NpCsOpenHourEntry."Start Time",NpCsOpenHourEntry."End Time") then begin
+                    TempNpCsOpenHourCalendarEntry.Init;
+                    TempNpCsOpenHourCalendarEntry."Calendar Date" := CalendarDate;
+                    TempNpCsOpenHourCalendarEntry."Start Time" := NpCsOpenHourEntry."Start Time";
+                    TempNpCsOpenHourCalendarEntry."End Time" := NpCsOpenHourEntry."End Time";
+                    TempNpCsOpenHourCalendarEntry.Insert;
                   end;
                 end;
             end;
         end;
     end;
 
-    local procedure ApplyOpeningHourSetupDate(NpCsStoreOpeningHourSetup: Record "NpCs Store Opening Hours Setup";var TempNpCsStoreOpeningHourEntry: Record "NpCs Store Opening Hours Entry" temporary)
+    local procedure ApplyOpeningHourEntryDate(NpCsOpenHourEntry: Record "NpCs Open. Hour Entry")
     begin
-        if NpCsStoreOpeningHourSetup."Entry Date" = 0D then
+        if NpCsOpenHourEntry."Entry Date" = 0D then
           exit;
-        if NpCsStoreOpeningHourSetup."Entry Date" > EndDate then
+        if NpCsOpenHourEntry."Entry Date" > EndDate then
           exit;
-        if NpCsStoreOpeningHourSetup."Entry Date" < StartDate then
+        if NpCsOpenHourEntry."Entry Date" < StartDate then
           exit;
 
-        case NpCsStoreOpeningHourSetup."Entry Type" of
-          NpCsStoreOpeningHourSetup."Entry Type"::"Store Closed":
+        case NpCsOpenHourEntry."Entry Type" of
+          NpCsOpenHourEntry."Entry Type"::"Store Closed":
             begin
-              TempNpCsStoreOpeningHourEntry.SetRange("Calendar Date",NpCsStoreOpeningHourSetup."Entry Date");
-              if TempNpCsStoreOpeningHourEntry.FindFirst then
-                TempNpCsStoreOpeningHourEntry.DeleteAll;
+              TempNpCsOpenHourCalendarEntry.SetRange("Calendar Date",NpCsOpenHourEntry."Entry Date");
+              if TempNpCsOpenHourCalendarEntry.FindFirst then
+                TempNpCsOpenHourCalendarEntry.DeleteAll;
             end;
-          NpCsStoreOpeningHourSetup."Entry Type"::"Store Open":
+          NpCsOpenHourEntry."Entry Type"::"Store Open":
             begin
-              if not TempNpCsStoreOpeningHourEntry.Get(NpCsStoreOpeningHourSetup."Entry Date",NpCsStoreOpeningHourSetup."Start Time",NpCsStoreOpeningHourSetup."End Time") then begin
-                TempNpCsStoreOpeningHourEntry.Init;
-                TempNpCsStoreOpeningHourEntry."Calendar Date" := NpCsStoreOpeningHourSetup."Entry Date";
-                TempNpCsStoreOpeningHourEntry."Start Time" := NpCsStoreOpeningHourSetup."Start Time";
-                TempNpCsStoreOpeningHourEntry."End Time" := NpCsStoreOpeningHourSetup."End Time";
-                TempNpCsStoreOpeningHourEntry.Insert;
+              if not TempNpCsOpenHourCalendarEntry.Get(NpCsOpenHourEntry."Entry Date",NpCsOpenHourEntry."Start Time",NpCsOpenHourEntry."End Time") then begin
+                TempNpCsOpenHourCalendarEntry.Init;
+                TempNpCsOpenHourCalendarEntry."Calendar Date" := NpCsOpenHourEntry."Entry Date";
+                TempNpCsOpenHourCalendarEntry."Start Time" := NpCsOpenHourEntry."Start Time";
+                TempNpCsOpenHourCalendarEntry."End Time" := NpCsOpenHourEntry."End Time";
+                TempNpCsOpenHourCalendarEntry.Insert;
               end;
             end;
         end;
     end;
 
-    local procedure GetPeriodNoFilter(NpCsStoreOpeningHourSetup: Record "NpCs Store Opening Hours Setup") PeriodNoFilter: Text
+    local procedure GetPeriodNoFilter(NpCsOpenHourEntry: Record "NpCs Open. Hour Entry") PeriodNoFilter: Text
     begin
-        if NpCsStoreOpeningHourSetup.Monday then
+        if NpCsOpenHourEntry.Monday then
           PeriodNoFilter += '1|';
 
-        if NpCsStoreOpeningHourSetup.Tuesday then
+        if NpCsOpenHourEntry.Tuesday then
           PeriodNoFilter += '2|';
 
-        if NpCsStoreOpeningHourSetup.Wednesday then
+        if NpCsOpenHourEntry.Wednesday then
           PeriodNoFilter += '3|';
 
-        if NpCsStoreOpeningHourSetup.Thursday then
+        if NpCsOpenHourEntry.Thursday then
           PeriodNoFilter += '4|';
 
-        if NpCsStoreOpeningHourSetup.Friday then
+        if NpCsOpenHourEntry.Friday then
           PeriodNoFilter += '5|';
 
-        if NpCsStoreOpeningHourSetup.Saturday then
+        if NpCsOpenHourEntry.Saturday then
           PeriodNoFilter += '6|';
 
-        if NpCsStoreOpeningHourSetup.Sunday then
+        if NpCsOpenHourEntry.Sunday then
           PeriodNoFilter += '7|';
 
         if PeriodNoFilter <> '' then
@@ -415,17 +424,17 @@ codeunit 6151208 "NpCs Store Opening Hours Mgt."
         exit(PeriodNoFilter);
     end;
 
-    local procedure Initialize(NewStartDate: Date;NewEndDate: Date)
+    local procedure Initialize(SetCode: Code[20];NewStartDate: Date;NewEndDate: Date)
     begin
         if Initialized and (NewStartDate = StartDate) and (NewEndDate = EndDate) then
           exit;
 
-        Clear(TempNpCsStoreOpeningHourEntry);
-        TempNpCsStoreOpeningHourEntry.DeleteAll;
+        Clear(TempNpCsOpenHourCalendarEntry);
+        TempNpCsOpenHourCalendarEntry.DeleteAll;
         Initialized := true;
         StartDate := NewStartDate;
         EndDate := NewEndDate;
-        SetupOpeningHourEntries(TempNpCsStoreOpeningHourEntry);
+        SetupOpeningHourEntries(SetCode);
     end;
 }
 

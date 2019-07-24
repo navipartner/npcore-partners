@@ -1,4 +1,4 @@
-pageextension 50272 pageextension50272 extends "Purchase Order" 
+pageextension 50046 pageextension50046 extends "Purchase Order" 
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Action Items: EmailLog and SendAsPDF.

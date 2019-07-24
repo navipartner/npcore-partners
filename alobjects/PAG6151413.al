@@ -8,6 +8,7 @@ page 6151413 "Magento Item Picture List"
     // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
     // MAG2.02/TS  /20170125  CASE 262261 Removed all reference to Variax
     // MAG2.22/MHA /20190625  CASE 359285 Added Variant Systems; Variety (Select on Item),Variety 1,Variety 2,Variety 3,Variety 4
+    // MAG2.22/MHA /20190722  CASE 361003 Only variety values with active variants should be included
 
     Caption = 'Item Pictures';
     DeleteAllowed = false;
@@ -227,28 +228,29 @@ page 6151413 "Magento Item Picture List"
     begin
         //-MAG2.22 [359285]
         case Item."Magento Picture Variety Type" of
-        Item."Magento Picture Variety Type"::"Variety 1":
-          begin
-            SetupVariety1();
-          end;
-        Item."Magento Picture Variety Type"::"Variety 2":
-          begin
-            SetupVariety2();
-          end;
-        Item."Magento Picture Variety Type"::"Variety 3":
-          begin
-            SetupVariety3();
-          end;
-        Item."Magento Picture Variety Type"::"Variety 4":
-          begin
-            SetupVariety4();
-          end;
+          Item."Magento Picture Variety Type"::"Variety 1":
+            begin
+              SetupVariety1();
+            end;
+          Item."Magento Picture Variety Type"::"Variety 2":
+            begin
+              SetupVariety2();
+            end;
+          Item."Magento Picture Variety Type"::"Variety 3":
+            begin
+              SetupVariety3();
+            end;
+          Item."Magento Picture Variety Type"::"Variety 4":
+            begin
+              SetupVariety4();
+            end;
         end;
         //+MAG2.22 [359285]
     end;
 
     local procedure SetupVariety1()
     var
+        ItemVariant: Record "Item Variant";
         VarietyValue: Record "Variety Value";
     begin
         //-MAG2.22 [359285]
@@ -263,19 +265,29 @@ page 6151413 "Magento Item Picture List"
           exit;
 
         repeat
-          Init;
-          "Item No." := VarietyValue.Value;
-          Description := VarietyValue.Description;
-          "Variety 1" := VarietyValue.Type;
-          "Variety 1 Table" := VarietyValue.Table;
-          "Variety 1 Value" := VarietyValue.Value;
-          Insert;
+          //-MAG2.22 [361003]
+          ItemVariant.SetRange("Item No.",Item."No.");
+          ItemVariant.SetRange("Variety 1",VarietyValue.Type);
+          ItemVariant.SetRange("Variety 1 Table",VarietyValue.Table);
+          ItemVariant.SetRange("Variety 1 Value",VarietyValue.Value);
+          ItemVariant.SetRange(Blocked,false);
+          //+MAG2.22 [361003]
+          if ItemVariant.FindFirst then begin
+            Init;
+            "Item No." := VarietyValue.Value;
+            Description := VarietyValue.Description;
+            "Variety 1" := VarietyValue.Type;
+            "Variety 1 Table" := VarietyValue.Table;
+            "Variety 1 Value" := VarietyValue.Value;
+            Insert;
+          end;
         until VarietyValue.Next = 0;
         //+MAG2.22 [359285]
     end;
 
     local procedure SetupVariety2()
     var
+        ItemVariant: Record "Item Variant";
         VarietyValue: Record "Variety Value";
     begin
         //-MAG2.22 [359285]
@@ -290,19 +302,29 @@ page 6151413 "Magento Item Picture List"
           exit;
 
         repeat
-          Init;
-          "Item No." := VarietyValue.Value;
-          Description := VarietyValue.Description;
-          "Variety 2" := VarietyValue.Type;
-          "Variety 2 Table" := VarietyValue.Table;
-          "Variety 2 Value" := VarietyValue.Value;
-          Insert;
+          //-MAG2.22 [361003]
+          ItemVariant.SetRange("Item No.",Item."No.");
+          ItemVariant.SetRange("Variety 2",VarietyValue.Type);
+          ItemVariant.SetRange("Variety 2 Table",VarietyValue.Table);
+          ItemVariant.SetRange("Variety 2 Value",VarietyValue.Value);
+          ItemVariant.SetRange(Blocked,false);
+          //+MAG2.22 [361003]
+          if ItemVariant.FindFirst then begin
+            Init;
+            "Item No." := VarietyValue.Value;
+            Description := VarietyValue.Description;
+            "Variety 2" := VarietyValue.Type;
+            "Variety 2 Table" := VarietyValue.Table;
+            "Variety 2 Value" := VarietyValue.Value;
+            Insert;
+          end;
         until VarietyValue.Next = 0;
         //+MAG2.22 [359285]
     end;
 
     local procedure SetupVariety3()
     var
+        ItemVariant: Record "Item Variant";
         VarietyValue: Record "Variety Value";
     begin
         //-MAG2.22 [359285]
@@ -317,19 +339,29 @@ page 6151413 "Magento Item Picture List"
           exit;
 
         repeat
-          Init;
-          "Item No." := VarietyValue.Value;
-          Description := VarietyValue.Description;
-          "Variety 3" := VarietyValue.Type;
-          "Variety 3 Table" := VarietyValue.Table;
-          "Variety 3 Value" := VarietyValue.Value;
-          Insert;
+          //-MAG2.22 [361003]
+          ItemVariant.SetRange("Item No.",Item."No.");
+          ItemVariant.SetRange("Variety 3",VarietyValue.Type);
+          ItemVariant.SetRange("Variety 3 Table",VarietyValue.Table);
+          ItemVariant.SetRange("Variety 3 Value",VarietyValue.Value);
+          ItemVariant.SetRange(Blocked,false);
+          //+MAG2.22 [361003]
+          if ItemVariant.FindFirst then begin
+            Init;
+            "Item No." := VarietyValue.Value;
+            Description := VarietyValue.Description;
+            "Variety 3" := VarietyValue.Type;
+            "Variety 3 Table" := VarietyValue.Table;
+            "Variety 3 Value" := VarietyValue.Value;
+            Insert;
+          end;
         until VarietyValue.Next = 0;
         //+MAG2.22 [359285]
     end;
 
     local procedure SetupVariety4()
     var
+        ItemVariant: Record "Item Variant";
         VarietyValue: Record "Variety Value";
     begin
         //-MAG2.22 [359285]
@@ -344,13 +376,22 @@ page 6151413 "Magento Item Picture List"
           exit;
 
         repeat
-          Init;
-          "Item No." := VarietyValue.Value;
-          Description := VarietyValue.Description;
-          "Variety 4" := VarietyValue.Type;
-          "Variety 4 Table" := VarietyValue.Table;
-          "Variety 4 Value" := VarietyValue.Value;
-          Insert;
+          //-MAG2.22 [361003]
+          ItemVariant.SetRange("Item No.",Item."No.");
+          ItemVariant.SetRange("Variety 4",VarietyValue.Type);
+          ItemVariant.SetRange("Variety 4 Table",VarietyValue.Table);
+          ItemVariant.SetRange("Variety 4 Value",VarietyValue.Value);
+          ItemVariant.SetRange(Blocked,false);
+          //-MAG2.22 [361003]
+          if ItemVariant.FindFirst then begin
+            Init;
+            "Item No." := VarietyValue.Value;
+            Description := VarietyValue.Description;
+            "Variety 4" := VarietyValue.Type;
+            "Variety 4 Table" := VarietyValue.Table;
+            "Variety 4 Value" := VarietyValue.Value;
+            Insert;
+          end;
         until VarietyValue.Next = 0;
         //+MAG2.22 [359285]
     end;

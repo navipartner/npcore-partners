@@ -1,4 +1,4 @@
-pageextension 50072 pageextension50072 extends "Posted Purchase Rcpt. Subform" 
+pageextension 50011 pageextension50011 extends "Posted Purchase Rcpt. Subform" 
 {
     // VRT1.20/JDH /20150304 CASE 201022 Variety Action Added to raise Event
     actions

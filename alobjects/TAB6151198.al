@@ -2,6 +2,7 @@ table 6151198 "NpCs Document"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #344264/MHA /20190717  CASE 344264 Added functions for return Last Log Entry texts and changed name and logic for field 240
+    // #362443/MHA /20190719  CASE 362443 "To Store Code" may now refer to Local Store and added field 13 "Inserted at"
 
     Caption = 'Collect Document';
     DataCaptionFields = "Document Type","Reference No.","Sell-to Customer Name";
@@ -41,6 +42,11 @@ table 6151198 "NpCs Document"
         field(10;"Reference No.";Code[50])
         {
             Caption = 'Reference No.';
+        }
+        field(13;"Inserted at";DateTime)
+        {
+            Caption = 'Inserted at';
+            Description = '#362443';
         }
         field(15;"Workflow Code";Code[20])
         {
@@ -115,7 +121,8 @@ table 6151198 "NpCs Document"
         field(60;"To Store Code";Code[20])
         {
             Caption = 'To Store Code';
-            TableRelation = "NpCs Store" WHERE ("Local Store"=CONST(false));
+            Description = '#362443';
+            TableRelation = "NpCs Store";
 
             trigger OnValidate()
             var
@@ -123,7 +130,16 @@ table 6151198 "NpCs Document"
             begin
                 NpCsStore.Get("To Store Code");
                 "Prepayment Account No." := NpCsStore."Prepayment Account No.";
+                //-#362443 [362443]
+                "Opening Hour Set" := NpCsStore."Opening Hour Set";
+                //+#362443 [362443]
             end;
+        }
+        field(65;"Opening Hour Set";Code[20])
+        {
+            Caption = 'Opening Hour Set';
+            Description = '#362443';
+            TableRelation = "NpCs Open. Hour Set";
         }
         field(95;"Processing Expiry Duration";Duration)
         {
@@ -448,6 +464,13 @@ table 6151198 "NpCs Document"
 
         NpCsDocumentLogEntry.SetRange("Document Entry No.","Entry No.");
         NpCsDocumentLogEntry.DeleteAll;
+    end;
+
+    trigger OnInsert()
+    begin
+        //-#362443 [362443]
+        "Inserted at" := CurrentDateTime;
+        //+#362443 [362443]
     end;
 
     procedure GetLastLogMessage(): Text
