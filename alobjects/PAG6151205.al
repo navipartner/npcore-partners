@@ -2,6 +2,7 @@ page 6151205 "NpCs Collect Store Orders"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #344264/MHA /20190717  CASE 344264 Added Last Log fields and changed name and logic for field 240 to "From Store Stock"
+    // #362443/MHA /20190719  CASE 362443 Added "Inserted at" changed Visible on some fields
 
     Caption = 'Collect in Store Orders';
     CardPageID = "NpCs Collect Store Order Card";
@@ -36,9 +37,19 @@ page 6151205 "NpCs Collect Store Orders"
                         RunCard();
                     end;
                 }
+                field("Sell-to Customer Name";"Sell-to Customer Name")
+                {
+
+                    trigger OnDrillDown()
+                    begin
+                        RunCard();
+                    end;
+                }
+                field("Inserted at";"Inserted at")
+                {
+                }
                 field("Location Code";"Location Code")
                 {
-                    Visible = false;
 
                     trigger OnDrillDown()
                     begin
@@ -65,19 +76,10 @@ page 6151205 "NpCs Collect Store Orders"
                 }
                 field("Processing updated at";"Processing updated at")
                 {
-                    Visible = false;
                 }
                 field("Processing updated by";"Processing updated by")
                 {
                     Visible = false;
-                }
-                field("Sell-to Customer Name";"Sell-to Customer Name")
-                {
-
-                    trigger OnDrillDown()
-                    begin
-                        RunCard();
-                    end;
                 }
                 field("Customer No.";"Customer No.")
                 {

@@ -2,6 +2,7 @@ table 6151202 "NpCs Arch. Document"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #344264/MHA /20190717  CASE 344264 Added fields 300, 305, 310 and changed name and logic for field 240
+    // #362443/MHA /20190719  CASE 362443 "To Store Code" may now refer to Local Store and added fields 13 "Inserted at", 5000 "Archived at"
 
     Caption = 'Collect Document';
     DrillDownPageID = "NpCs Arch. Document List";
@@ -33,6 +34,11 @@ table 6151202 "NpCs Arch. Document"
         field(10;"Reference No.";Code[50])
         {
             Caption = 'Reference No.';
+        }
+        field(13;"Inserted at";DateTime)
+        {
+            Caption = 'Inserted at';
+            Description = '#362443';
         }
         field(15;"Workflow Code";Code[20])
         {
@@ -76,7 +82,14 @@ table 6151202 "NpCs Arch. Document"
         field(60;"To Store Code";Code[20])
         {
             Caption = 'To Store Code';
-            TableRelation = "NpCs Store" WHERE ("Local Store"=CONST(false));
+            Description = '#362443';
+            TableRelation = "NpCs Store";
+        }
+        field(65;"Opening Hour Set";Code[20])
+        {
+            Caption = 'Opening Hour Set';
+            Description = '#362443';
+            TableRelation = "NpCs Open. Hour Set";
         }
         field(95;"Processing Expiry Duration";Duration)
         {
@@ -253,6 +266,11 @@ table 6151202 "NpCs Arch. Document"
         field(2005;"Location Code";Code[10])
         {
             Caption = 'Location Code';
+        }
+        field(5000;"Archived at";DateTime)
+        {
+            Caption = 'Archived at';
+            Description = '#362443';
         }
     }
 

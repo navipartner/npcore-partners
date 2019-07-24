@@ -2,6 +2,8 @@ codeunit 6151200 "NpCs Import Sales Document"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #344264/MHA /20190717  CASE 344264 Added import of <config_template> in UpsertCustomer() and changed <delivery_only> to <pick_from_warehouse>
+    // #362443/MHA /20190719  CASE 342443 Added <opening_hour_set>
+    // #362197/MHA /20190719  CASE 362197 Added functions InsertToStore(), GetToStoreCode()
 
     TableNo = "Nc Import Entry";
 
@@ -46,6 +48,9 @@ codeunit 6151200 "NpCs Import Sales Document"
         InitPOSSalesWorkflow();
 
         UpsertFromStore(XmlElement);
+        //-#362197 [362197]
+        InsertToStore(XmlElement);
+        //+#362197 [362197]
         InsertDocumentMappings(XmlElement);
         Commit;
 
@@ -95,6 +100,26 @@ codeunit 6151200 "NpCs Import Sales Document"
 
         if PrevRec <> Format(NpCsStore) then
           NpCsStore.Modify(true);
+    end;
+
+    local procedure InsertToStore(XmlElement: DotNet npNetXmlElement)
+    var
+        NpCsStore: Record "NpCs Store";
+        StoreCode: Code[20];
+    begin
+        //-#362197 [362197]
+        StoreCode := GetToStoreCode(XmlElement);
+        if StoreCode = '' then
+          exit;
+
+        if not NpCsStore.Get(StoreCode) then begin
+          NpCsStore.Init;
+          NpCsStore.Code := StoreCode;
+          NpCsStore."Local Store" := true;
+          NpCsStore.Validate("Company Name",CompanyName);
+          NpCsStore.Insert(true);
+        end;
+        //+#362197 [362197]
     end;
 
     local procedure InsertDocumentMappings(XmlElement: DotNet npNetXmlElement)
@@ -264,6 +289,9 @@ codeunit 6151200 "NpCs Import Sales Document"
         NpCsDocument."From Document Type" := DocType;
         NpCsDocument."From Document No." := CopyStr(DocNo,1,MaxStrLen(NpCsDocument."From Document No."));
         NpCsDocument."From Store Code" := StoreCode;
+        //-#362197 [362197]
+        NpCsDocument."To Store Code" := GetToStoreCode(XmlElement);
+        //+#362197 [362197]
         NpCsDocument."Next Workflow Step" := NpCsDocument."Next Workflow Step"::"Order Status";
         NpCsDocument."Processing Status" := NpCsDocument."Processing Status"::Pending;
         NpCsDocument."Processing updated at" := CurrentDateTime;
@@ -281,6 +309,9 @@ codeunit 6151200 "NpCs Import Sales Document"
         NpCsDocument."Sms Template (Confirmed)" := NpXmlDomMgt.GetElementCode(XmlElement,'notification/sms_template_confirmed',MaxStrLen(NpCsDocument."Sms Template (Confirmed)"),false);
         NpCsDocument."Sms Template (Rejected)" := NpXmlDomMgt.GetElementCode(XmlElement,'notification/sms_template_rejected',MaxStrLen(NpCsDocument."Sms Template (Rejected)"),false);
         NpCsDocument."Sms Template (Expired)" := NpXmlDomMgt.GetElementCode(XmlElement,'notification/sms_template_expired',MaxStrLen(NpCsDocument."Sms Template (Expired)"),false);
+        //-#362443 [362443]
+        NpCsDocument."Opening Hour Set" := NpXmlDomMgt.GetElementCode(XmlElement,'notification/opening_hour_set',MaxStrLen(NpCsDocument."Opening Hour Set"),false);
+        //+#362443 [362443]
         NpCsDocument."Processing Expiry Duration" := NpXmlDomMgt.GetElementDuration(XmlElement,'notification/processing_expiry_duration',false);
         NpCsDocument."Delivery Expiry Days (Qty.)" := NpXmlDomMgt.GetElementInt(XmlElement,'notification/delivery_expiry_days_qty',false);
         NpCsDocument."Archive on Delivery" := NpXmlDomMgt.GetElementBoolean(XmlElement,'archive_on_delivery',false);
@@ -533,6 +564,19 @@ codeunit 6151200 "NpCs Import Sales Document"
 
         StoreCode := NpXmlDomMgt.GetAttributeCode(XmlElement,'/*/sales_document/from_store','store_code',MaxStrLen(StoreCode),true);
         exit(StoreCode);
+    end;
+
+    local procedure GetToStoreCode(XmlElement: DotNet npNetXmlElement) StoreCode: Code[20]
+    var
+        NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
+    begin
+        //-#362197 [362197]
+        if IsNull(XmlElement) then
+          exit('');
+
+        StoreCode := NpXmlDomMgt.GetAttributeCode(XmlElement,'/*/sales_document/to_store','store_code',MaxStrLen(StoreCode),false);
+        exit(StoreCode);
+        //+#362197 [362197]
     end;
 
     local procedure GetCallback(XmlElement: DotNet npNetXmlElement) Callback: Text

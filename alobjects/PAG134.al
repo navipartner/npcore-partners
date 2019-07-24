@@ -1,4 +1,4 @@
-pageextension 50062 pageextension50062 extends "Posted Sales Credit Memo" 
+pageextension 50008 pageextension50008 extends "Posted Sales Credit Memo" 
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Action Items: EmailLog and SendAsPDF.
