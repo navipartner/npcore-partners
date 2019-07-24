@@ -1,4 +1,4 @@
-pageextension 50239 pageextension50239 extends "Item Journal" 
+pageextension 50034 pageextension50034 extends "Item Journal" 
 {
     // NPR5.43/TS  /20180625 CASE 317852  Added Function PriceLabel
     actions

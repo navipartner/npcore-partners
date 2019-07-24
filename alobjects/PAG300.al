@@ -1,4 +1,4 @@
-pageextension 50214 pageextension50214 extends "Ship-to Address" 
+pageextension 50028 pageextension50028 extends "Ship-to Address" 
 {
     // NPR5.34/TR  /20170721  CASE 282454 Added "Name 2" to the list.
     layout

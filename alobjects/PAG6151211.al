@@ -2,6 +2,7 @@ page 6151211 "NpCs Arch. Document List"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #344264/MHA /20190717  CASE 344264 Added RunPageView to Action "Log Entries"
+    // #362443/MHA /20190719  CASE 362443 Added fields 13 "Inserted at", 5000 "Archived at"
 
     Caption = 'Archived Collect Document List';
     InsertAllowed = false;
@@ -18,6 +19,12 @@ page 6151211 "NpCs Arch. Document List"
                 {
                 }
                 field("Reference No.";"Reference No.")
+                {
+                }
+                field("Inserted at";"Inserted at")
+                {
+                }
+                field("Archived at";"Archived at")
                 {
                 }
                 field(Type;Type)

@@ -3,23 +3,23 @@
   <file datatype="xml" source-language="en-US" target-language="da-DK" original="Please update this value">
     <body>
       <group id="body">
-        <trans-unit id="PageExtension 3875571379 - Change 3434943428 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+        <trans-unit id="PageExtension 1300699397 - Change 3434943428 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Shipping Agents</source>
           <target>Spedit�rer</target>
           <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension50248 - Change "Shipping Agents" - Property Caption</note>
+          <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension50037 - Change "Shipping Agents" - Property Caption</note>
         </trans-unit>
-        <trans-unit id="PageExtension 3875571379 - Change 931134756 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+        <trans-unit id="PageExtension 1300699397 - Change 931134756 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>&amp;Line</source>
           <target>&amp;Linje</target>
           <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension50248 - Change "&amp;Line" - Property Caption</note>
+          <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension50037 - Change "&amp;Line" - Property Caption</note>
         </trans-unit>
-        <trans-unit id="PageExtension 3875571379 - Change 3605739711 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+        <trans-unit id="PageExtension 1300699397 - Change 3605739711 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Shipping A&amp;gent Services</source>
           <target>Spe&amp;dit�rservice</target>
           <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension50248 - Change ShippingAgentServices - Property Caption</note>
+          <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension50037 - Change ShippingAgentServices - Property Caption</note>
         </trans-unit>
         <trans-unit id="Page 2811417786 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Global Voucher Setup</source>
@@ -1226,6 +1226,30 @@
           <target>Ugedag</target>
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Table NpCs Store Opening Hours Entry - Field Weekday - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2528636246 - Field 4206022538 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Date</source>
+          <target>Dato</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table NpCs Open. Hour Calendar Entry - Field Calendar Date - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2528636246 - Field 2169532623 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Start Time</source>
+          <target>Starttid</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table NpCs Open. Hour Calendar Entry - Field Start Time - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2528636246 - Field 4240670190 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>End Time</source>
+          <target>Sluttid</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table NpCs Open. Hour Calendar Entry - Field End Time - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2528636246 - Field 2668337108 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Weekday</source>
+          <target>Ugedag</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table NpCs Open. Hour Calendar Entry - Field Weekday - Property Caption</note>
         </trans-unit>
       </group>
     </body>

@@ -1,4 +1,4 @@
-pageextension 50666 pageextension50666 extends "Sales Return Order List" 
+pageextension 50078 pageextension50078 extends "Sales Return Order List" 
 {
     // NPR5.36/THRO/20170908 CASE 285645 Added action PostAndSendPdf2Nav
     actions

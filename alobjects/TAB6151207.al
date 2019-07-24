@@ -1,6 +1,7 @@
 table 6151207 "NpCs Store Opening Hours Setup"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #362443/MHA /20190719  CASE 362443 [VLOBJDEL] Object marked for deletion
 
     Caption = 'Collect Store Opening Hours Setup';
     DrillDownPageID = "NpCs Store Opening Hours Setup";

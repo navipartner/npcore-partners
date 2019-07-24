@@ -1,4 +1,4 @@
-pageextension 50277 pageextension50277 extends "Contact List" 
+pageextension 50048 pageextension50048 extends "Contact List" 
 {
     // NPR5.23/BHR/20160329 CASE 222711 Added PhoneLookup Action.
     // NPR5.29/TJ /20170125 CASE 263507 Moved code from PhoneLookup action to a subscriber and also renamed that action from default to PhoneLookup
