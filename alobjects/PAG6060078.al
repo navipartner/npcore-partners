@@ -13,7 +13,25 @@ page 6060078 "MM Membership Kiosk"
     {
         area(content)
         {
-            // AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects
+            usercontrol(Bridge; "NaviPartner.Retail.Controls.Bridge")
+            {
+
+                trigger OnFrameworkReady()
+                begin
+
+                    BridgeMgt.Initialize(CurrPage.Bridge);
+                    BridgeMgt.SetSize('100%', '600px');
+                    PageNavigation('StartPage', '');
+                end;
+
+                trigger OnInvokeMethod(method: Text; eventContent: Variant)
+                var
+                    NextPage: Integer;
+                begin
+
+                    PageNavigation(method, Format(eventContent));
+                end;
+            }
         }
     }
 

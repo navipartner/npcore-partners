@@ -23,6 +23,39 @@ page 6014654 "POS Web Font Preview"
             {
                 ShowCaption = false;
             }
+            usercontrol(Host;"NaviPartner.Retail.Controls.IFramework")
+            {
+
+                trigger OnFrameworkReady()
+                begin
+                    FrameworkReady();
+                end;
+
+                trigger OnScreenSize(screen: DotNet npNetScreen)
+                begin
+                end;
+
+                trigger OnMessage(eventArgs: DotNet npNetMessageEventArgs)
+                begin
+                    SelectedIcon := eventArgs.ToEanCodeScanned().Ean;
+                end;
+
+                trigger OnResponse(response: DotNet npNetResponseInfo)
+                begin
+                end;
+
+                trigger OnJavaScriptCallback(js: DotNet npNetJavaScript)
+                begin
+                end;
+
+                trigger OnDialogResponse(response: DotNet npNetResponse)
+                begin
+                end;
+
+                trigger OnDataUpdated(dataSource: DotNet npNetDataSource)
+                begin
+                end;
+            }
         }
     }
 
@@ -54,7 +87,8 @@ page 6014654 "POS Web Font Preview"
         LastCode := Code;
 
         GetFontDotNet_Obsolete(Font);
-        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+        CurrPage.Host.SendRequest(Factory.ConfigureFont(Font).ToRequestInfo());
+        CurrPage.Host.Execute(StrSubstNo('n$.Framework.PreviewFont && typeof n$.Framework.PreviewFont === "function" && n$.Framework.PreviewFont("%1");',Font.Code));
     end;
 
     local procedure FrameworkReady()

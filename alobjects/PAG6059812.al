@@ -28,15 +28,15 @@ page 6059812 "Retail Activities"
             {
                 CueGroupLayout = Wide;
                 ShowCaption = false;
-                field("Sales Orders"; "Sales Orders")
+                field("Sales Orders";"Sales Orders")
                 {
                     DrillDownPageID = "Sales Order List";
                 }
-                field("Daily Sales Orders"; "Daily Sales Orders")
+                field("Daily Sales Orders";"Daily Sales Orders")
                 {
                     DrillDownPageID = "Sales Order List";
                 }
-                field("Import Pending"; "Import Pending")
+                field("Import Pending";"Import Pending")
                 {
                     DrillDownPageID = "Nc Import List";
                 }
@@ -60,14 +60,14 @@ page 6059812 "Retail Activities"
             cuegroup(Control6150622)
             {
                 ShowCaption = false;
-                field("Pending Inc. Documents"; "Pending Inc. Documents")
+                field("Pending Inc. Documents";"Pending Inc. Documents")
                 {
                 }
-                field("Processed Error Tasks"; "Processed Error Tasks")
+                field("Processed Error Tasks";"Processed Error Tasks")
                 {
                     DrillDownPageID = "Nc Task List";
                 }
-                field("Failed Webshop Payments"; "Failed Webshop Payments")
+                field("Failed Webshop Payments";"Failed Webshop Payments")
                 {
                     DrillDownPageID = "Magento Payment Line List";
                 }
@@ -76,34 +76,50 @@ page 6059812 "Retail Activities"
             {
                 Caption = 'Depreciated';
                 Visible = false;
-                field("Sales Quotes"; "Sales Quotes")
+                field("Sales Quotes";"Sales Quotes")
                 {
                     DrillDownPageID = "Sales Quotes";
                     Visible = false;
                 }
-                field("Sales Return Orders"; "Sales Return Orders")
+                field("Sales Return Orders";"Sales Return Orders")
                 {
                     DrillDownPageID = "Sales Return Order List";
                     Visible = false;
                 }
-                field("Magento Orders"; "Magento Orders")
+                field("Magento Orders";"Magento Orders")
                 {
                     DrillDownPageID = "Sales Order List";
                     Visible = false;
                 }
-                field("Daily Sales Invoices"; "Daily Sales Invoices")
+                field("Daily Sales Invoices";"Daily Sales Invoices")
                 {
                     Caption = 'Daily Sales Invoices';
                     DrillDownPageID = "Posted Sales Invoices";
                     Visible = false;
                 }
-                field("Tasks Unprocessed"; "Tasks Unprocessed")
+                field("Tasks Unprocessed";"Tasks Unprocessed")
                 {
                     DrillDownPageID = "Nc Task List";
                     Visible = false;
                 }
             }
-            // AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects
+            usercontrol(Bridge;"NaviPartner.Retail.Controls.Bridge")
+            {
+
+                trigger OnFrameworkReady()
+                begin
+                    //-NPR5.40 [308907]
+                    Initialize();
+                    //+NPR5.40 [308907]
+                end;
+
+                trigger OnInvokeMethod(method: Text;eventContent: Variant)
+                begin
+                    //-NPR5.40 [308907]
+                    InvokeMethod(method,eventContent);
+                    //+NPR5.40 [308907]
+                end;
+            }
         }
     }
 
@@ -122,10 +138,10 @@ page 6059812 "Retail Activities"
     begin
         Reset;
         if not Get then begin
-            Init;
-            Insert;
+          Init;
+          Insert;
         end;
-        SetFilter("Date Filter", '=%1', WorkDate);
+        SetFilter("Date Filter",'=%1',WorkDate);
     end;
 
     var
@@ -138,39 +154,39 @@ page 6059812 "Retail Activities"
     begin
         //-NPR5.40 [308907]
         if POSGeolocation.SkipGeolocationTracking() then
-            exit;
+          exit;
 
-        SetSize('0px', '0px');
+        SetSize('0px','0px');
         RegisterGeoLocationScript();
         //+NPR5.40 [308907]
     end;
 
-    local procedure SetSize(Width: Text; Height: Text)
+    local procedure SetSize(Width: Text;Height: Text)
     var
         SetSizeRequest: DotNet npNetDictionary_Of_T_U;
     begin
         //-NPR5.40 [308907]
-        InitializeRequest('SetSize', SetSizeRequest);
+        InitializeRequest('SetSize',SetSizeRequest);
         if Width <> '' then
-            SetSizeRequest.Add('width', Width);
+          SetSizeRequest.Add('width',Width);
         if Height <> '' then
-            SetSizeRequest.Add('height', Height);
+          SetSizeRequest.Add('height',Height);
         InvokeFrontEndAsync(SetSizeRequest);
         //+NPR5.40 [308907]
     end;
 
-    local procedure InitializeRequest(Method: Text; var Request: DotNet npNetDictionary_Of_T_U)
+    local procedure InitializeRequest(Method: Text;var Request: DotNet npNetDictionary_Of_T_U)
     begin
         //-NPR5.40 [308907]
         Request := Request.Dictionary();
-        Request.Add('Method', Method);
+        Request.Add('Method',Method);
         //-NPR5.40 [308907]
     end;
 
     local procedure InvokeFrontEndAsync(Request: DotNet npNetDictionary_Of_T_U)
     begin
         //-NPR5.40 [308907]
-        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+        CurrPage.Bridge.InvokeFrontEndAsync(Request);
         //+NPR5.40 [308907]
     end;
 
@@ -180,9 +196,9 @@ page 6059812 "Retail Activities"
         ScriptString: Text;
     begin
         //-NPR5.40 [308907]
-        InitializeRequest('RegisterModule', RegisterModuleRequest);
+        InitializeRequest('RegisterModule',RegisterModuleRequest);
 
-        RegisterModuleRequest.Add('Name', 'GeoLocationByIP');
+        RegisterModuleRequest.Add('Name','GeoLocationByIP');
 
         ScriptString := '(function() {' +
         '$("#controlAddIn").append("' +
@@ -204,19 +220,17 @@ page 6059812 "Retail Activities"
 
         RegisterModuleRequest.Add('Script', ScriptString);
 
-        RegisterModuleRequest.Add('Requires', 'jQuery');
+        RegisterModuleRequest.Add('Requires','jQuery');
         InvokeFrontEndAsync(RegisterModuleRequest);
         //+NPR5.40 [308907]
     end;
 
-    local procedure InvokeMethod(Method: Text; EventContent: DotNet npNetObject)
+    local procedure InvokeMethod(Method: Text;EventContent: DotNet npNetObject)
     begin
         //-NPR5.40 [308907]
         case Method of
-            'RequestModule':
-                Method_RequestModule(EventContent);
-            'GeoLocationMethod':
-                Method_GeoLocationMethod(EventContent);
+          'RequestModule': Method_RequestModule(EventContent);
+          'GeoLocationMethod': Method_GeoLocationMethod(EventContent);
         end;
         //+NPR5.40 [308907]
     end;
@@ -231,16 +245,16 @@ page 6059812 "Retail Activities"
         Script: Text;
     begin
         //-NPR5.40 [308907]
-        JSON.InitializeJObjectParser(EventContent, FrontEnd);
-        Module := JSON.GetString('module', true);
+        JSON.InitializeJObjectParser(EventContent,FrontEnd);
+        Module := JSON.GetString('module',true);
 
         Script := Web.GetJavaScript(Module);
         if Script = '' then
-            Error('');
+          Error('');
 
-        InitializeRequest('RegisterModule', RegisterModuleRequest);
-        RegisterModuleRequest.Add('Name', Module);
-        RegisterModuleRequest.Add('Script', Script);
+        InitializeRequest('RegisterModule',RegisterModuleRequest);
+        RegisterModuleRequest.Add('Name',Module);
+        RegisterModuleRequest.Add('Script',Script);
         InvokeFrontEndAsync(RegisterModuleRequest);
         //+NPR5.40 [308907]
     end;

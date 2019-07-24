@@ -33,7 +33,78 @@ page 6014651 "Touch Screen - Sale (Web)"
     {
         area(content)
         {
-            // AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects
+            usercontrol(NPHost;"NaviPartner.Retail.Controls.IFramework")
+            {
+
+                trigger OnFrameworkReady()
+                var
+                    ObjectTrue: Variant;
+                begin
+                    EventOnFrameworkReady;
+                    ObjectTrue := true;
+
+                    case CurrentClientType of
+                      CLIENTTYPE::Web:
+                        SetFrontEndProperty('n$.UI.IsFullScreen',ObjectTrue);
+                    end;
+                end;
+
+                trigger OnScreenSize(screen: DotNet npNetScreen)
+                begin
+                    EventOnScreenSize(screen);
+                end;
+
+                trigger OnMessage(eventArgs: DotNet npNetMessageEventArgs)
+                begin
+                    EventOnMessage(eventArgs);
+                end;
+
+                trigger OnResponse(response: DotNet npNetResponseInfo)
+                begin
+                    EventOnResponse(response);
+                end;
+
+                trigger OnJavaScriptCallback(js: DotNet npNetJavaScript)
+                begin
+                end;
+
+                trigger OnDialogResponse(response: DotNet npNetResponse)
+                begin
+                end;
+
+                trigger OnDataUpdated(dataSource: DotNet npNetDataSource)
+                begin
+                end;
+
+                trigger OnInvokeMethodResponse(envelope: Text)
+                var
+                    ResponseEnvelope: DotNet npNetResponseEnvelope;
+                begin
+                    //-NPR5.22
+                    OnInvokeDeviceMethodResponse(ResponseEnvelope.FromString(envelope));
+                    //+NPR5.22
+                end;
+
+                trigger OnServiceCallError(message: Text)
+                begin
+                end;
+
+                trigger OnObjectModel(id: Text;eventName: Text;jsonData: Text)
+                begin
+                end;
+
+                trigger OnProtocol(eventName: Text;serializedData: Text;doCallback: Boolean)
+                begin
+                end;
+            }
+            usercontrol(Tweak;"NaviPartner.Retail.Controls.WindowsClientHelper")
+            {
+
+                trigger ControlReady()
+                begin
+                    CurrPage.Tweak.TweakMainScreen();
+                end;
+            }
         }
     }
 
@@ -62,11 +133,11 @@ page 6014651 "Touch Screen - Sale (Web)"
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
         if not Initialized then
-            exit(true);
+          exit(true);
 
         if not StateMgt.OnQueryCloseForm then begin
-            SendState();
-            exit(false);
+          SendState();
+          exit(false);
         end;
         exit(true);
     end;
@@ -96,64 +167,64 @@ page 6014651 "Touch Screen - Sale (Web)"
         Args: DotNet npNetArray;
     begin
         case StateMgt.GetQueryClose of
-            1:
-                begin
-                    CloseAllowed := true;
-                    CurrPage.Close;
-                end;
-            2:
-                begin
-                    Args := Args.CreateInstance(GetDotNetType(''), 0);
-                    Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
-                end;
+          1:
+            begin
+              CloseAllowed := true;
+              CurrPage.Close;
+            end;
+          2:
+            begin
+              Args := Args.CreateInstance(GetDotNetType(''),0);
+              CurrPage.NPHost.SendRequest(Factory.InvokeJavaScriptFunction('n$.Framework.Refresh()',Args).ToRequestInfo());
+            end;
         end;
     end;
 
     procedure SendState()
     begin
         if (not State.View.Initialized) then
-            exit;
+          exit;
 
         Commit;
 
         case State.ViewType of
-            ViewType.Login:
-                if (not IsNull(State.View)) then begin
-                    //-NPR5.22
-                    //StateMgt.GetLastSaleInfo(LastSaleDateText,Total,Payed,ReturnAmount,LastReceiptNo);
-                    //StateMgt.SetStateData('LastSalePayment',UI.FormatDecimal(Payed));
-                    //StateMgt.SetStateData('LastSaleReturnAmount',UI.FormatDecimal(ReturnAmount));
-                    //StateMgt.SetStateData('LastSaleText',LastSaleDateText);
-                    //StateMgt.SetStateData('LastReceiptNo',LastReceiptNo);
-                    //StateMgt.SetStateData('LastSaleTotal',UI.FormatDecimal(Total));
-                    PrepareLastSaleState();
-                    //+NPR5.22
-                end;
-            ViewType.Sale:
-                if (not IsNull(State.View)) then begin
-                    if (not IsNull(State.View.ToSaleView().DataGrid)) then
-                        StateMgt.GetSalesLines(State.View.ToSaleView().DataGrid);
-                    //-NPR5.22
-                    PrepareLastSaleState();
-                    //+NPR5.22
-                    //-NPR5.27 [255864]
-                    StateMgt.SetStateData('CustomerName', StateMgt.GetContactName);
-                    if StateMgt.GetContactName = '' then
-                        //-NPR5.27 [255864]
-                        StateMgt.SetStateData('CustomerName', StateMgt.GetCustomerName);
-                    SetFrontEndProperty('n$.State.Context.View.dataGrid.subtotal', UI.FormatDecimal(StateMgt.GetSalesTotal()));
-                end;
-            ViewType.Payment:
-                if (not IsNull(State.View)) then begin
-                    if (not IsNull(State.View.ToPaymentView().DataGrid)) then
-                        StateMgt.GetPaymentLines(State.View.ToPaymentView().DataGrid);
-                    //-NPR5.27 [255864]
-                    StateMgt.SetStateData('Customer', StateMgt.GetContactName);
-                    if StateMgt.GetContactName = '' then
-                        //-NPR5.27 [255864]
-                        StateMgt.SetStateData('CustomerName', StateMgt.GetCustomerName);
-                    SetFrontEndProperty('n$.State.Context.View.dataGrid.subtotal', UI.FormatDecimal(StateMgt.GetPaymentTotal()));
-                end;
+          ViewType.Login:
+            if (not IsNull(State.View)) then begin
+              //-NPR5.22
+              //StateMgt.GetLastSaleInfo(LastSaleDateText,Total,Payed,ReturnAmount,LastReceiptNo);
+              //StateMgt.SetStateData('LastSalePayment',UI.FormatDecimal(Payed));
+              //StateMgt.SetStateData('LastSaleReturnAmount',UI.FormatDecimal(ReturnAmount));
+              //StateMgt.SetStateData('LastSaleText',LastSaleDateText);
+              //StateMgt.SetStateData('LastReceiptNo',LastReceiptNo);
+              //StateMgt.SetStateData('LastSaleTotal',UI.FormatDecimal(Total));
+              PrepareLastSaleState();
+              //+NPR5.22
+            end;
+          ViewType.Sale:
+            if (not IsNull(State.View)) then begin
+              if (not IsNull(State.View.ToSaleView().DataGrid)) then
+                StateMgt.GetSalesLines(State.View.ToSaleView().DataGrid);
+              //-NPR5.22
+              PrepareLastSaleState();
+              //+NPR5.22
+              //-NPR5.27 [255864]
+              StateMgt.SetStateData('CustomerName',StateMgt.GetContactName);
+              if StateMgt.GetContactName = '' then
+              //-NPR5.27 [255864]
+              StateMgt.SetStateData('CustomerName',StateMgt.GetCustomerName);
+              SetFrontEndProperty('n$.State.Context.View.dataGrid.subtotal',UI.FormatDecimal(StateMgt.GetSalesTotal()));
+            end;
+          ViewType.Payment:
+            if (not IsNull(State.View)) then begin
+              if (not IsNull(State.View.ToPaymentView().DataGrid)) then
+                StateMgt.GetPaymentLines(State.View.ToPaymentView().DataGrid);
+              //-NPR5.27 [255864]
+              StateMgt.SetStateData('Customer',StateMgt.GetContactName);
+              if StateMgt.GetContactName = '' then
+              //-NPR5.27 [255864]
+              StateMgt.SetStateData('CustomerName',StateMgt.GetCustomerName);
+              SetFrontEndProperty('n$.State.Context.View.dataGrid.subtotal',UI.FormatDecimal(StateMgt.GetPaymentTotal()));
+            end;
         end;
         StateMgt.UpdateStateData();
     end;
@@ -161,22 +232,18 @@ page 6014651 "Touch Screen - Sale (Web)"
     procedure MenuButtonPressed(ButtonCode: Code[20])
     begin
         if not State.View.Initialized then
-            exit;
+          exit;
 
         case State.ViewType of
-            ViewType.Login:
-                begin
-                    case ButtonCode of
-                        'MAIN_MENU':
-                            CurrPage.Close;
-                        'FUNCTIONS':
-                            StateMgt.ExecFunction('FUNCTIONS_SALE');
-                    end;
-                end;
-            ViewType.Sale:
-                ;
-            ViewType.Payment:
-                ;
+          ViewType.Login:
+            begin
+              case ButtonCode of
+                'MAIN_MENU' : CurrPage.Close;
+                'FUNCTIONS' : StateMgt.ExecFunction('FUNCTIONS_SALE');
+              end;
+            end;
+          ViewType.Sale: ;
+          ViewType.Payment: ;
         end;
     end;
 
@@ -199,59 +266,59 @@ page 6014651 "Touch Screen - Sale (Web)"
         POSViewProfile: Record "POS View Profile";
     begin
         Clear(StateMgt);
-
+        
         Marshaller := Marshaller.Marshaller;
         State := State.State(Marshaller);
-
+        
         POSMarshaller.Initialize(Marshaller);
         //-NPR5.23 [242588]
-        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+        POSMarshaller.SetPOSReference(CurrPage.NPHost);
         //+NPR5.23 [242588]
-
+        
         UI.ConfigureCaptions(Marshaller);
         UI.ConfigureCustomLogo(Marshaller);
         UI.ConfigureFonts(Marshaller);
-
-        String := StrSubstNo('%1|%2|%3', PAGE::"Touch Screen - Sale (Web)", PAGE::"Touch Screen - Dialog (Web)", PAGE::"Touch Screen - Balancing (Web)");
-        SetFrontEndProperty('n$.Window.CaptureDialogIDs', String);
+        
+        String := StrSubstNo('%1|%2|%3',PAGE::"Touch Screen - Sale (Web)",PAGE::"Touch Screen - Dialog (Web)",PAGE::"Touch Screen - Balancing (Web)");
+        SetFrontEndProperty('n$.Window.CaptureDialogIDs',String);
         //-NPR5.49 [335739]
         /*
         //-NPR5.22
         SetFrontEndProperty('n$.Controls.Grid.options.ReverseOrder',SessionMgt.LineOrderOnScreen = Register."Line Order on Screen"::"1");
         //+NPR5.22
         */
-        SetFrontEndProperty('n$.Controls.Grid.options.ReverseOrder', SessionMgt.LineOrderOnScreen = POSViewProfile."Line Order on Screen"::Reverse);
+        SetFrontEndProperty('n$.Controls.Grid.options.ReverseOrder',SessionMgt.LineOrderOnScreen = POSViewProfile."Line Order on Screen"::Reverse);
         //+NPR5.49 [335739]
-
+        
         if CurrentClientType = CLIENTTYPE::Windows then begin
-            Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+          CurrPage.NPHost.SendRequest(Factory.UpdateCss('@media only screen and (min-width : 320px) and (max-width : 768px){body,input,textarea,keygen,select,button{font-size:16px !important;}}').ToRequestInfo());
         end;
-
+        
         StateMgt.Initialize(State);
-
+        
         if DoLoadSavedSale then begin
-            StateMgt.LoadSavedSale(SavedSale);
-            StateMgt.SetSaleScreenVisible();
-            DoLoadSavedSale := false;
+          StateMgt.LoadSavedSale(SavedSale);
+          StateMgt.SetSaleScreenVisible();
+          DoLoadSavedSale := false;
         end;
-
+        
         StateMgt.EnterPush;
-
+        
         Initialized := true;
 
     end;
 
-    local procedure MakeSureViewIsOfCorrectType(ExpectedViewType: DotNet npNetViewType; ExpectedType: DotNet npNetType; View: DotNet npNetView)
+    local procedure MakeSureViewIsOfCorrectType(ExpectedViewType: DotNet npNetViewType;ExpectedType: DotNet npNetType;View: DotNet npNetView)
     begin
-        if not View.IsType(ExpectedViewType, ExpectedType) then
-            Error(Text001, ExpectedViewType, ExpectedType, View.Type, View.GetType());
+        if not View.IsType(ExpectedViewType,ExpectedType) then
+          Error(Text001,ExpectedViewType,ExpectedType,View.Type,View.GetType());
     end;
 
     local procedure InitializeLoginView(View: DotNet npNetLoginView)
     var
         NetConvHelper: Variant;
     begin
-        MakeSureViewIsOfCorrectType(ViewType.Login, GetDotNetType(View), View);
+        MakeSureViewIsOfCorrectType(ViewType.Login,GetDotNetType(View),View);
 
         View.Initialize();
         NetConvHelper := View;
@@ -260,7 +327,7 @@ page 6014651 "Touch Screen - Sale (Web)"
 
     local procedure InitializeSaleView(View: DotNet npNetSaleView)
     begin
-        MakeSureViewIsOfCorrectType(ViewType.Sale, GetDotNetType(View), View);
+        MakeSureViewIsOfCorrectType(ViewType.Sale,GetDotNetType(View),View);
 
         View.Initialize();
         UI.ConfigureView(View);
@@ -272,7 +339,7 @@ page 6014651 "Touch Screen - Sale (Web)"
     var
         NetConvHelper: Variant;
     begin
-        MakeSureViewIsOfCorrectType(ViewType.Payment, GetDotNetType(View), View);
+        MakeSureViewIsOfCorrectType(ViewType.Payment,GetDotNetType(View),View);
 
         View.Initialize();
         NetConvHelper := View;
@@ -285,7 +352,7 @@ page 6014651 "Touch Screen - Sale (Web)"
     var
         NetConvHelper: Variant;
     begin
-        MakeSureViewIsOfCorrectType(ViewType.Locked, GetDotNetType(View), View);
+        MakeSureViewIsOfCorrectType(ViewType.Locked,GetDotNetType(View),View);
 
         View.Initialize();
         NetConvHelper := View;
@@ -308,56 +375,55 @@ page 6014651 "Touch Screen - Sale (Web)"
         DoSendState: Boolean;
     begin
         if not State.View.Initialized then
-            exit;
+          exit;
 
         MessageType := EventArgs.Type;
         case MessageType of
-            EventType.CancelRequest:
-                begin
-                    EventOnMessageCancelRequest(EventArgs.ToCancelRequest());
-                    DoSendState := false;
-                end;
-            EventType.CancelAllProtocolRequests:
-                begin
-                    EventOnMessageCancelAllProtocolRequests();
-                    DoSendState := true;
-                end;
+          EventType.CancelRequest:
+            begin
+              EventOnMessageCancelRequest(EventArgs.ToCancelRequest());
+              DoSendState := false;
+            end;
+          EventType.CancelAllProtocolRequests:
+            begin
+              EventOnMessageCancelAllProtocolRequests();
+              DoSendState := true;
+            end;
 
-            EventType.Refresh:
-                ;
-            EventType.ButtonClicked:
-                begin
-                    EventOnMessageButtonPressed(EventArgs.ToButton(), EventArgs.Context);
-                    DoSendState := true;
-                end;
-            EventType.FunctionsButtonClicked:
-                begin
-                    EventOnMessageFunctionsButtonPressed(EventArgs.ToButton(), EventArgs.Context);
-                    DoSendState := false;
-                end;
-            EventType.KeyDown:
-                begin
-                    EventOnMessageKeyDown(EventArgs.ToKeyPress());
-                    DoSendState := true;
-                end;
-            EventType.EanCodeScanned:
-                begin
-                    EventOnMessageEanCodeScanned(EventArgs.ToEanCodeScanned());
-                    DoSendState := true;
-                end;
-            EventType.SelectionChanged:
-                begin
-                    EventOnMessageSelectionChanged(EventArgs.ToSelectionChanged());
-                    DoSendState := false;
-                end;
-            EventType.Login:
-                begin
-                    EventOnMessageLogin(EventArgs.ToLogin());
-                    DoSendState := false;
-                end;
+          EventType.Refresh: ;
+          EventType.ButtonClicked:
+            begin
+              EventOnMessageButtonPressed(EventArgs.ToButton(),EventArgs.Context);
+              DoSendState := true;
+            end;
+          EventType.FunctionsButtonClicked:
+            begin
+              EventOnMessageFunctionsButtonPressed(EventArgs.ToButton(),EventArgs.Context);
+              DoSendState := false;
+            end;
+          EventType.KeyDown:
+            begin
+              EventOnMessageKeyDown(EventArgs.ToKeyPress());
+              DoSendState := true;
+            end;
+          EventType.EanCodeScanned:
+            begin
+              EventOnMessageEanCodeScanned(EventArgs.ToEanCodeScanned());
+              DoSendState := true;
+            end;
+          EventType.SelectionChanged:
+            begin
+              EventOnMessageSelectionChanged(EventArgs.ToSelectionChanged());
+              DoSendState := false;
+            end;
+          EventType.Login:
+            begin
+              EventOnMessageLogin(EventArgs.ToLogin());
+              DoSendState := false;
+            end;
         end;
         if DoSendState then
-            SendState();
+          SendState();
 
         ProcessQueryClose();
     end;
@@ -365,41 +431,41 @@ page 6014651 "Touch Screen - Sale (Web)"
     local procedure EventOnMessageCancelRequest(Cancel: DotNet npNetCancelRequestMessageData)
     begin
         if not State.View.Initialized then
-            exit;
-        POSMarshaller.CancelRequest(Cancel.RequestType, Cancel.Id, Cancel.RequestKnownEventId);
+          exit;
+        POSMarshaller.CancelRequest(Cancel.RequestType,Cancel.Id,Cancel.RequestKnownEventId);
     end;
 
     local procedure EventOnMessageCancelAllProtocolRequests()
     begin
         if not State.View.Initialized then
-            exit;
+          exit;
         POSMarshaller.CancelAllProtocolRequests();
     end;
 
-    local procedure EventOnMessageButtonPressed(Button: DotNet npNetButton; Context: DotNet npNetContext)
+    local procedure EventOnMessageButtonPressed(Button: DotNet npNetButton;Context: DotNet npNetContext)
     begin
         if not State.View.Initialized then
-            exit;
+          exit;
 
         StateMgt.SetValidation(Context.EanBoxText);
         if Button.MenuLineNo <> 0 then begin
-            StateMgt.PressedFunction(Button.MenuLineNo);
-            if StateMgt.GetUpdatePosition() then
-                LastLinePosition := StateMgt.GetLinePosition();
+          StateMgt.PressedFunction(Button.MenuLineNo);
+          if StateMgt.GetUpdatePosition() then
+            LastLinePosition := StateMgt.GetLinePosition();
         end else
-            MenuButtonPressed(Button.Value);
+          MenuButtonPressed(Button.Value);
 
         ProcessQueryClose();
     end;
 
-    local procedure EventOnMessageFunctionsButtonPressed(Button: DotNet npNetButton; Context: DotNet npNetContext)
+    local procedure EventOnMessageFunctionsButtonPressed(Button: DotNet npNetButton;Context: DotNet npNetContext)
     var
         ButtonType: DotNet npNetButtonType;
     begin
         if not State.View.Initialized then
-            exit;
+          exit;
 
-        StateMgt.PressedPopupFunction(Button.MenuLineNo, Button.Type.Equals(ButtonType.Back));
+        StateMgt.PressedPopupFunction(Button.MenuLineNo,Button.Type.Equals(ButtonType.Back));
 
         ProcessQueryClose();
     end;
@@ -407,7 +473,7 @@ page 6014651 "Touch Screen - Sale (Web)"
     local procedure EventOnMessageEanCodeScanned(EanCodeScanned: DotNet npNetEanCodeScannedMessageData)
     begin
         if not State.View.Initialized then
-            exit;
+          exit;
 
         StateMgt.SetValidation(EanCodeScanned.Ean);
         StateMgt.EnterPush;
@@ -418,35 +484,30 @@ page 6014651 "Touch Screen - Sale (Web)"
         KeyCode: DotNet npNetKeyCode;
     begin
         if not State.View.Initialized then
-            exit;
+          exit;
 
         case State.ViewType of
-            ViewType.Login:
-                begin
-                end;
-            ViewType.Sale:
-                case Key.KeyCode of
-                    KeyCode.F6:
-                        StateMgt.Lookup;
-                    KeyCode.F11:
-                        StateMgt.ExecFunction('GOTO_PAYMENT');
-                    KeyCode.Esc:
-                        StateMgt.ExecFunction('CANCEL_SALE');
-                end;
-            ViewType.Payment:
-                case Key.KeyCode of
-                    KeyCode.F11:
-                        StateMgt.ButtonDefault();
-                    KeyCode.Esc:
-                        StateMgt.ExecFunction('GOTO_SALE');
-                end;
+          ViewType.Login:
+            begin
+            end;
+          ViewType.Sale:
+            case Key.KeyCode of
+              KeyCode.F6:   StateMgt.Lookup;
+              KeyCode.F11:  StateMgt.ExecFunction('GOTO_PAYMENT');
+              KeyCode.Esc:  StateMgt.ExecFunction('CANCEL_SALE');
+            end;
+          ViewType.Payment:
+            case Key.KeyCode of
+              KeyCode.F11:  StateMgt.ButtonDefault();
+              KeyCode.Esc:  StateMgt.ExecFunction('GOTO_SALE');
+            end;
         end;
     end;
 
     local procedure EventOnMessageLogin(Login: DotNet npNetLoginMessageData)
     begin
         if not State.View.Initialized then
-            exit;
+          exit;
 
         StateMgt.SetValidation(Login.SalespersonCode);
         StateMgt.EnterHit('LOGIN');
@@ -457,31 +518,29 @@ page 6014651 "Touch Screen - Sale (Web)"
         Type: Option Sale,Payment;
     begin
         if not State.View.Initialized then
-            exit;
+          exit;
 
         case State.ViewType of
-            ViewType.Sale:
-                SaleLineSelectionChange(Row, Type::Sale);
-            ViewType.Payment:
-                SaleLineSelectionChange(Row, Type::Payment);
+          ViewType.Sale:    SaleLineSelectionChange(Row,Type::Sale);
+          ViewType.Payment: SaleLineSelectionChange(Row,Type::Payment);
         end;
     end;
 
     local procedure EventOnResponse(Response: DotNet npNetResponseInfo)
     begin
-        POSMarshaller.ProcessResponse(Response, StateMgt);
+        POSMarshaller.ProcessResponse(Response,StateMgt);
     end;
 
     local procedure EventOnScreenSize(Screen: DotNet npNetScreen)
     begin
-        SessionMgt.SetScreenMetrics(Screen.ScreenWidth, Screen.ScreenHeight, Screen.ViewportWidth, Screen.ViewportHeight);
+        SessionMgt.SetScreenMetrics(Screen.ScreenWidth,Screen.ScreenHeight,Screen.ViewportWidth,Screen.ViewportHeight);
     end;
 
     local procedure EventOnScreenChange(EventArgs: DotNet npNetChangeScreenEventArgs)
     begin
         State.ViewType := EventArgs.ViewType;
         if EventArgs.ViewType.Equals(ViewType.RegisterChange) then
-            ProcessQueryClose();
+          ProcessQueryClose();
     end;
 
     local procedure EventMarshal(EventArgs: DotNet npNetMarshalEventArgs)
@@ -489,77 +548,75 @@ page 6014651 "Touch Screen - Sale (Web)"
         KnownEvent: DotNet npNetKnownEvent;
     begin
         case EventArgs.EventType of
-            KnownEvent.ChangeScreen:
-                EventOnScreenChange(EventArgs.ToChangeScreenEventArgs());
-            KnownEvent.RequestRefreshSalesLineData:
-                SendState();
+          KnownEvent.ChangeScreen: EventOnScreenChange(EventArgs.ToChangeScreenEventArgs());
+          KnownEvent.RequestRefreshSalesLineData: SendState();
 
-                // Start listing standard request events here
-            KnownEvent.ClearInfoBoxContent,
-            KnownEvent.ConfigureFont,
-            KnownEvent.InvokeJavaScriptFunction,
-            KnownEvent.DimScreen,
-            KnownEvent.Error,
-            KnownEvent.NumPad,
-            KnownEvent.SetObjectProperty,
-            KnownEvent.Functions,
-            KnownEvent.CloseFunctions,
-            KnownEvent.UpdateInfoBox,
-            KnownEvent.UpdateState,
-            KnownEvent.SetSalesLineData:
-                begin
-                    Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
-                end;
-            else
-                Error('Unsupported marshalled event. This is a programming bug, not a user error. Event details:\\%1', EventArgs.ToJson());
+          // Start listing standard request events here
+          KnownEvent.ClearInfoBoxContent,
+          KnownEvent.ConfigureFont,
+          KnownEvent.InvokeJavaScriptFunction,
+          KnownEvent.DimScreen,
+          KnownEvent.Error,
+          KnownEvent.NumPad,
+          KnownEvent.SetObjectProperty,
+          KnownEvent.Functions,
+          KnownEvent.CloseFunctions,
+          KnownEvent.UpdateInfoBox,
+          KnownEvent.UpdateState,
+          KnownEvent.SetSalesLineData:
+            begin
+              CurrPage.NPHost.SendRequest(EventArgs.ToRequestInfo());
+            end;
+          else
+            Error('Unsupported marshalled event. This is a programming bug, not a user error. Event details:\\%1',EventArgs.ToJson());
         end;
     end;
 
-    local procedure SaleLineSelectionChange(Row: DotNet npNetDictionary_Of_T_U; Type: Option Sale,Payment)
+    local procedure SaleLineSelectionChange(Row: DotNet npNetDictionary_Of_T_U;Type: Option Sale,Payment)
     var
         SaleLine: Record "Sale Line POS";
         RecRef: RecordRef;
         Position: Text;
     begin
         RecRef.GetTable(SaleLine);
-        Util.RowToNavRecord(Row, RecRef);
+        Util.RowToNavRecord(Row,RecRef);
         RecRef.SetTable(SaleLine);
         if SaleLine.Find then begin
-            Position := SaleLine.GetPosition();
-            if Position <> LastLinePosition then begin
-                case Type of
-                    //-NPR5.25 [245816]
-                    //      Type::Sale:    StateMgt.SetSalesLinePosition(SaleLine.GETPOSITION);
-                    //      Type::Payment: StateMgt.SetPaymentLinePosition(SaleLine.GETPOSITION);
-                    Type::Sale:
-                        begin
-                            if SaleLine."Sale Type" = SaleLine."Sale Type"::Payment then
-                                exit;
-                            StateMgt.SetSalesLinePosition(SaleLine.GetPosition);
-                        end;
-                    Type::Payment:
-                        begin
-                            if SaleLine."Sale Type" <> SaleLine."Sale Type"::Payment then
-                                exit;
-                            StateMgt.SetPaymentLinePosition(SaleLine.GetPosition);
-                        end;
-                        //+NPR5.25 [245816]
+          Position := SaleLine.GetPosition();
+          if Position <> LastLinePosition then begin
+            case Type of
+              //-NPR5.25 [245816]
+        //      Type::Sale:    StateMgt.SetSalesLinePosition(SaleLine.GETPOSITION);
+        //      Type::Payment: StateMgt.SetPaymentLinePosition(SaleLine.GETPOSITION);
+              Type::Sale:
+                begin
+                  if SaleLine."Sale Type" = SaleLine."Sale Type"::Payment then
+                    exit;
+                  StateMgt.SetSalesLinePosition(SaleLine.GetPosition);
                 end;
-                //-231160
-                //StateMgt.OnAfterAfterGetCurrentRecord;
-                //+231160
+              Type::Payment:
+                begin
+                  if SaleLine."Sale Type" <> SaleLine."Sale Type"::Payment then
+                    exit;
+                  StateMgt.SetPaymentLinePosition(SaleLine.GetPosition);
+                end;
+              //+NPR5.25 [245816]
             end;
             //-231160
-            StateMgt.OnAfterAfterGetCurrentRecord;
+            //StateMgt.OnAfterAfterGetCurrentRecord;
             //+231160
+          end;
+          //-231160
+          StateMgt.OnAfterAfterGetCurrentRecord;
+          //+231160
 
-            LastLinePosition := Position;
+          LastLinePosition := Position;
         end;
     end;
 
-    local procedure SetFrontEndProperty(Property: Text; Value: Variant)
+    local procedure SetFrontEndProperty(Property: Text;Value: Variant)
     begin
-        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+        CurrPage.NPHost.SendRequest(Factory.SetObjectProperty(Property,Value).ToRequestInfo());
     end;
 
     local procedure PrepareLastSaleState()
@@ -571,12 +628,12 @@ page 6014651 "Touch Screen - Sale (Web)"
         ReturnAmount: Decimal;
     begin
         //-NPR5.22
-        StateMgt.GetLastSaleInfo(LastSaleDateText, Total, Payed, ReturnAmount, LastReceiptNo);
-        StateMgt.SetStateData('LastSalePayment', UI.FormatDecimal(Payed));
-        StateMgt.SetStateData('LastSaleReturnAmount', UI.FormatDecimal(ReturnAmount));
-        StateMgt.SetStateData('LastSaleText', LastSaleDateText);
-        StateMgt.SetStateData('LastReceiptNo', LastReceiptNo);
-        StateMgt.SetStateData('LastSaleTotal', UI.FormatDecimal(Total));
+        StateMgt.GetLastSaleInfo(LastSaleDateText,Total,Payed,ReturnAmount,LastReceiptNo);
+        StateMgt.SetStateData('LastSalePayment',UI.FormatDecimal(Payed));
+        StateMgt.SetStateData('LastSaleReturnAmount',UI.FormatDecimal(ReturnAmount));
+        StateMgt.SetStateData('LastSaleText',LastSaleDateText);
+        StateMgt.SetStateData('LastReceiptNo',LastReceiptNo);
+        StateMgt.SetStateData('LastSaleTotal',UI.FormatDecimal(Total));
         //+NPR5.22
     end;
 
@@ -585,7 +642,7 @@ page 6014651 "Touch Screen - Sale (Web)"
         ResponseEnvelope: DotNet npNetResponseEnvelope;
     begin
         //-NPR5.22
-        OnInvokeDeviceMethodResponse(ResponseEnvelope.FromString(Envelope, GetDotNetType(ResponseEnvelope)));
+        OnInvokeDeviceMethodResponse(ResponseEnvelope.FromString(Envelope,GetDotNetType(ResponseEnvelope)));
         //+NPR5.22
     end;
 
@@ -601,31 +658,26 @@ page 6014651 "Touch Screen - Sale (Web)"
         //+NPR5.40 [308907]
     end;
 
-    trigger State::OnInitializeView(type: Integer; view: DotNet npNetView)
+    trigger State::OnInitializeView(type: Integer;view: DotNet npNetView)
     begin
         case type of
-            ViewType.Login:
-                InitializeLoginView(view);
-            ViewType.Sale:
-                InitializeSaleView(view);
-            ViewType.Payment:
-                InitializePaymentView(view);
-            ViewType.Locked:
-                InitializeLockedView(view);
+          ViewType.Login:   InitializeLoginView(view);
+          ViewType.Sale:    InitializeSaleView(view);
+          ViewType.Payment: InitializePaymentView(view);
+          ViewType.Locked:  InitializeLockedView(view);
         end;
     end;
 
-    trigger State::OnChangeView(newType: Integer; newView: DotNet npNetView)
+    trigger State::OnChangeView(newType: Integer;newView: DotNet npNetView)
     begin
         if newView.Initialized then begin
-            Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+          CurrPage.NPHost.ClearView();
+          CurrPage.NPHost.SetView(newView);
 
-            case newType of
-                ViewType.Sale:
-                    StateMgt.ShowLastSaleInformation();
-                ViewType.Payment:
-                    StateMgt.ShowPaymentInformation();
-            end;
+          case newType of
+            ViewType.Sale:    StateMgt.ShowLastSaleInformation();
+            ViewType.Payment: StateMgt.ShowPaymentInformation();
+          end;
         end;
         SendState();
     end;
