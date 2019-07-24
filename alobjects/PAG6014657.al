@@ -20,7 +20,34 @@ page 6014657 "Proxy Dialog"
     {
         area(content)
         {
-            // AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects
+            usercontrol(Proxy;"NaviPartner.Retail.Controls.IProxyFramework")
+            {
+
+                trigger OnFrameworkReady()
+                begin
+                    ProxyAddInReady();
+                end;
+
+                trigger OnInvokeMethodResponse(envelope: Text)
+                begin
+                    ProxyInvokeMethodResponse(envelope);
+                end;
+
+                trigger OnServiceCallError(message: Text)
+                begin
+                    ProxyServiceCallError(message);
+                end;
+
+                trigger OnObjectModel(id: Text;eventName: Text;jsonData: Text)
+                begin
+                    ProtocolManager.Model.RaiseEvent(id,eventName,jsonData);
+                end;
+
+                trigger OnProtocol(eventName: Text;serializedData: Text;doCallback: Boolean)
+                begin
+                    ProxyProtocol(eventName,serializedData,doCallback);
+                end;
+            }
         }
     }
 
@@ -31,7 +58,7 @@ page 6014657 "Proxy Dialog"
     trigger OnClosePage()
     begin
         if ErrorAtClose <> '' then
-            Message(ErrorAtClose);
+          Message(ErrorAtClose);
     end;
 
     trigger OnOpenPage()
@@ -43,7 +70,7 @@ page 6014657 "Proxy Dialog"
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
         if not ProtocolClosing then
-            QueryClosePage();
+          QueryClosePage();
 
         exit(ProtocolClosing);
     end;
@@ -69,7 +96,7 @@ page 6014657 "Proxy Dialog"
     procedure ClosePage()
     begin
         //-NPR4.17
-        CurrPage.Close();
+        CurrPage.Close ();
         //+NPR4.17
     end;
 
@@ -92,26 +119,26 @@ page 6014657 "Proxy Dialog"
     var
         ResponseEnvelope: DotNet npNetResponseEnvelope;
     begin
-        ResponseEnvelope := ResponseEnvelope.FromString(Envelope, GetDotNetType(ResponseEnvelope));
-        ProxyManager.ProcessResponse(ProtocolManager, ResponseEnvelope);
+        ResponseEnvelope := ResponseEnvelope.FromString(Envelope,GetDotNetType(ResponseEnvelope));
+        ProxyManager.ProcessResponse(ProtocolManager,ResponseEnvelope);
     end;
 
     local procedure ProxyServiceCallError(Msg: Text)
     begin
-        ErrorAtClose := StrSubstNo(Text001, Msg);
+        ErrorAtClose := StrSubstNo(Text001,Msg);
         ProtocolClosing := true;
         CurrPage.Close();
     end;
 
-    local procedure ProxyProtocol(EventName: Text; SerializedData: Text; DoCallback: Boolean)
+    local procedure ProxyProtocol(EventName: Text;SerializedData: Text;DoCallback: Boolean)
     var
         ResponseData: Text;
     begin
         ResponseData := SerializedData;
-        ProtocolEvent(CodeunitId, EventName, SerializedData, DoCallback, ResponseData);
+        ProtocolEvent(CodeunitId,EventName,SerializedData,DoCallback,ResponseData);
 
         if DoCallback then
-            Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+          CurrPage.Proxy.ProtocolResponse(EventName, ResponseData);
     end;
 
     local procedure ProtocolOnAbort(errorMessage: Text)
@@ -123,7 +150,7 @@ page 6014657 "Proxy Dialog"
 
     local procedure ProtocolOnSendMessage(Request: DotNet npNetRequestEnvelope)
     begin
-        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+        CurrPage.Proxy.InvokeDeviceMethod(Request.ToString());
     end;
 
     local procedure ProtocolOnSignal(Signal: DotNet npNetSignal)
@@ -135,34 +162,34 @@ page 6014657 "Proxy Dialog"
         Clear(TempBlob.Blob);
         TempBlob.Blob.CreateOutStream(OutStream);
         Serializer := Serializer.XmlSerializer(Signal.GetType());
-        Serializer.Serialize(OutStream, Signal);
+        Serializer.Serialize(OutStream,Signal);
 
-        if not CODEUNIT.Run(CodeunitId, TempBlob) then begin
-            ErrorAtClose := GetLastErrorText;
-            ProcessErrorObject();
-            CurrPage.Close();
+        if not CODEUNIT.Run(CodeunitId,TempBlob) then begin
+          ErrorAtClose := GetLastErrorText;
+          ProcessErrorObject();
+          CurrPage.Close();
         end;
     end;
 
-    local procedure ProtocolOnStateChange(PreviousState: Integer; NewState: Integer)
+    local procedure ProtocolOnStateChange(PreviousState: Integer;NewState: Integer)
     var
         ProtocolState: DotNet npNetProtocolState;
     begin
         case true of
-            ProtocolManager.State.Equals(ProtocolState.AbortedByUserRequest):
-                begin
-                    ProtocolClosing := true;
-                    CurrPage.Close();
-                end;
-            ProtocolManager.State.Equals(ProtocolState.Closed):
-                begin
-                    ProtocolClosing := true;
-                    ErrorAtClose := '';
-                    CurrPage.Close();
-                end;
+          ProtocolManager.State.Equals(ProtocolState.AbortedByUserRequest):
+            begin
+              ProtocolClosing := true;
+              CurrPage.Close();
+            end;
+          ProtocolManager.State.Equals(ProtocolState.Closed):
+            begin
+              ProtocolClosing := true;
+              ErrorAtClose := '';
+              CurrPage.Close();
+            end;
         end;
 
-        ProxyManager.ProtocolStateChange(ProtocolManager, PreviousState, NewState);
+        ProxyManager.ProtocolStateChange(ProtocolManager,PreviousState,NewState);
     end;
 
     local procedure ProtocolModelUpdate(Model: DotNet npNetModel)
@@ -176,12 +203,12 @@ page 6014657 "Proxy Dialog"
         Css := Model.GetStyles();
         Script := Model.GetScripts();
         if (String.IsNullOrWhiteSpace(Html) and String.IsNullOrWhiteSpace(Css) and String.IsNullOrWhiteSpace(Script)) then
-            exit;
-        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+          exit;
+        CurrPage.Proxy.SetContent(Html,Css,Script);
     end;
 
     [BusinessEvent(false)]
-    local procedure ProtocolEvent(ProtocolCodeunitID: Integer; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text)
+    local procedure ProtocolEvent(ProtocolCodeunitID: Integer;EventName: Text;Data: Text;ResponseRequired: Boolean;var ReturnData: Text)
     begin
         //NPR5.20 Changed signature on the ProtocolEvent to include CodeunitID
     end;
@@ -194,18 +221,18 @@ page 6014657 "Proxy Dialog"
     begin
         Exc := GetLastErrorObject;
         if (not IsNull(Exc.InnerException)) then begin
-            if (Exc.InnerException.GetType().Equals(GetDotNetType(WebExc))) then begin
-                WebExc := Exc.InnerException;
-                //-NPR5.41 [311404]
-                //Reader := Reader.StreamReader(WebExc.Response.GetResponseStream());
-                //ErrorAtClose := 'Web exception: ' + Reader.ReadToEnd();
-                if not IsNull(WebExc.Response) then begin
-                    Reader := Reader.StreamReader(WebExc.Response.GetResponseStream());
-                    ErrorAtClose := 'Web exception: ' + Reader.ReadToEnd();
-                end else
-                    ErrorAtClose := 'Exception: ' + Exc.Message;
-                //+NPR5.41 [311404]
-            end;
+          if (Exc.InnerException.GetType().Equals(GetDotNetType(WebExc))) then begin
+            WebExc := Exc.InnerException;
+            //-NPR5.41 [311404]
+            //Reader := Reader.StreamReader(WebExc.Response.GetResponseStream());
+            //ErrorAtClose := 'Web exception: ' + Reader.ReadToEnd();
+            if not IsNull(WebExc.Response) then begin
+              Reader := Reader.StreamReader(WebExc.Response.GetResponseStream());
+              ErrorAtClose := 'Web exception: ' + Reader.ReadToEnd();
+            end else
+              ErrorAtClose := 'Exception: ' + Exc.Message;
+            //+NPR5.41 [311404]
+          end;
         end;
     end;
 
@@ -231,9 +258,9 @@ page 6014657 "Proxy Dialog"
         ProtocolOnAbort(errorMessage);
     end;
 
-    trigger ProtocolManager::OnProtocolStateChange(previousState: Integer; newState: Integer)
+    trigger ProtocolManager::OnProtocolStateChange(previousState: Integer;newState: Integer)
     begin
-        ProtocolOnStateChange(previousState, newState);
+        ProtocolOnStateChange(previousState,newState);
     end;
 
     trigger ProtocolManager::OnModelUpdate(model: DotNet npNetModel)

@@ -9,7 +9,35 @@ page 6014548 "POS Accessory AddOn Selection"
     {
         area(content)
         {
-            // AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects
+            usercontrol(Bridge;"NaviPartner.Retail.Controls.Bridge")
+            {
+
+                trigger OnFrameworkReady()
+                var
+                    Html: Text;
+                    Css: Text;
+                    Script: Text;
+                begin
+                    Css := InitCss();
+                    Html := InitHtml();
+                    Script := InitScript();
+                    BridgeMgt.Initialize(CurrPage.Bridge);
+                    BridgeMgt.RegisterAdHocModule('AccessoryAddOn',Html,Css,Script);
+                    BridgeMgt.SetSize('100%','600px');
+                end;
+
+                trigger OnInvokeMethod(method: Text;eventContent: Variant)
+                var
+                    JObjectIn: DotNet npNetJObject;
+                begin
+                    case method of
+                      'ApproveItemAddOns':
+                        ApproveItemAddOns(Format(eventContent));
+                      'CancelItemAddOns':
+                        CancelItemAddOns();
+                    end;
+                end;
+            }
         }
     }
 

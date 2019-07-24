@@ -24,7 +24,40 @@ page 6014652 "Touch Screen - Dialog (Web)"
     {
         area(content)
         {
-            // AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects'
+            usercontrol(NPHost;"NaviPartner.Retail.Controls.IFramework")
+            {
+
+                trigger OnFrameworkReady()
+                begin
+                    EventFrameworkReady();
+                end;
+
+                trigger OnScreenSize(screen: DotNet npNetScreen)
+                begin
+                end;
+
+                trigger OnMessage(eventArgs: DotNet npNetMessageEventArgs)
+                begin
+                    EventOnMessage(eventArgs);
+                end;
+
+                trigger OnResponse(response: DotNet npNetResponseInfo)
+                begin
+                end;
+
+                trigger OnJavaScriptCallback(js: DotNet npNetJavaScript)
+                begin
+                end;
+
+                trigger OnDialogResponse(response: DotNet npNetResponse)
+                begin
+                    EventOnDialogResponse(response)
+                end;
+
+                trigger OnDataUpdated(dataSource: DotNet npNetDataSource)
+                begin
+                end;
+            }
         }
     }
 
@@ -69,7 +102,7 @@ page 6014652 "Touch Screen - Dialog (Web)"
         Dlg := DlgIn;
     end;
 
-    procedure ConfigureLookup(var LookupRecIn: RecordRef; LookupShowNewIn: Boolean; LookupShowCardIn: Boolean; LookupCardPageIdIn: Integer)
+    procedure ConfigureLookup(var LookupRecIn: RecordRef;LookupShowNewIn: Boolean;LookupShowCardIn: Boolean;LookupCardPageIdIn: Integer)
     begin
         LookupRec := LookupRecIn;
         LookupHasMoreData := LookupRec.FindSet();
@@ -120,13 +153,13 @@ page 6014652 "Touch Screen - Dialog (Web)"
 
         IEnumerator := CalendarGridRows.GetEnumerator();
         while IEnumerator.MoveNext do begin
-            KeyFields := IEnumerator.Current;
+          KeyFields := IEnumerator.Current;
 
-            SaleLinePOS := SaleLinePOSTemplate;
-            Evaluate(SaleLinePOS."Sale Type", CopyStr(KeyFields, 1, StrPos(KeyFields, ';') - 1));
-            Evaluate(SaleLinePOS."Line No.", CopyStr(KeyFields, StrPos(KeyFields, ';') + 1));
-            SaleLinePOS.Find;
-            SaleLinePOS.Mark(true);
+          SaleLinePOS := SaleLinePOSTemplate;
+          Evaluate(SaleLinePOS."Sale Type",CopyStr(KeyFields,1,StrPos(KeyFields,';') - 1));
+          Evaluate(SaleLinePOS."Line No.",CopyStr(KeyFields,StrPos(KeyFields,';') + 1));
+          SaleLinePOS.Find;
+          SaleLinePOS.Mark(true);
         end;
 
         SaleLinePOS.MarkedOnly(true);
@@ -147,23 +180,23 @@ page 6014652 "Touch Screen - Dialog (Web)"
 
         DGrid := DGrid.DataGrid();
         if LookupHasMoreData then
-            repeat
-                //-NPR5.22
-                //Row := Grid.NewRow();
-                //Util.NavOneRecordToDictionary(LookupRec,Row,LookupDlg.Template);
-                //-NPR5.23
-                //IF SessionMgt.StoreLookupCache(LookupRec) THEN BEGIN
-                //  Row := Grid.NewRow();
-                //  Util.NavOneRecordToDictionary(LookupRec,Row,LookupDlg.Template);
-                //END;
-                Row := DGrid.NewRow();
-                Util.NavOneRecordToDictionary(LookupRec, Row, LookupDlg.Template);
-                //+NPR5.23
-                //+NPR5.22
-                LookupHasMoreData := LookupRec.Next() > 0;
-            until (not LookupHasMoreData) or (DGrid.Rows.Count >= LookupRequestChunkSize);
+          repeat
+            //-NPR5.22
+            //Row := Grid.NewRow();
+            //Util.NavOneRecordToDictionary(LookupRec,Row,LookupDlg.Template);
+            //-NPR5.23
+            //IF SessionMgt.StoreLookupCache(LookupRec) THEN BEGIN
+            //  Row := Grid.NewRow();
+            //  Util.NavOneRecordToDictionary(LookupRec,Row,LookupDlg.Template);
+            //END;
+            Row := DGrid.NewRow();
+            Util.NavOneRecordToDictionary(LookupRec,Row,LookupDlg.Template);
+            //+NPR5.23
+            //+NPR5.22
+            LookupHasMoreData := LookupRec.Next() > 0;
+          until (not LookupHasMoreData) or (DGrid.Rows.Count >= LookupRequestChunkSize);
 
-        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+        CurrPage.NPHost.SendRequest(RequestFactory.LookupSendData(DGrid,LookupHasMoreData));
     end;
 
     local procedure LookupSendSingleRow(RecRef: RecordRef)
@@ -174,17 +207,17 @@ page 6014652 "Touch Screen - Dialog (Web)"
         Params: DotNet npNetArray;
     begin
         if not RecRef.Find() then
-            exit;
+          exit;
 
         LookupDlg := Dlg;
         DGrid := DGrid.DataGrid();
         Row := DGrid.NewRow();
-        Util.NavOneRecordToDictionary(RecRef, Row, LookupDlg.Template);
-        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+        Util.NavOneRecordToDictionary(RecRef,Row,LookupDlg.Template);
+        CurrPage.NPHost.SendRequest(RequestFactory.LookupSendData(DGrid,false));
 
-        Params := Params.CreateInstance(GetDotNetType(''), 1);
-        Params.SetValue(RecRef.GetPosition(), 0);
-        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+        Params := Params.CreateInstance(GetDotNetType(''),1);
+        Params.SetValue(RecRef.GetPosition(),0);
+        CurrPage.NPHost.SendRequest(RequestFactory.InvokeJavaScriptFunction('n$.Popup.LookupDialog.selectRecord',Params));
     end;
 
     local procedure EventTweakReady()
@@ -206,27 +239,28 @@ page 6014652 "Touch Screen - Dialog (Web)"
         UI.ConfigureCaptions(Marshaller);
 
         if CurrentClientType = CLIENTTYPE::Windows then begin
-            Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+          CurrPage.NPHost.SendRequest(Factory.UpdateCss('@media only screen and (min-width : 320px) and (max-width : 768px){body,input,textarea,keygen,select,button{font-size:16px !important;}}').ToRequestInfo());
         end;
 
         //-NPR5.20
         if IsLookup then begin
-            Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
-            //-NPR5.22
-            //-NPR5.23
-            //IF LookupCache.GET(LookupRec.NUMBER) THEN;
-            //StartDate := CREATEDATETIME(DMY2DATE(1,1,2000),0T);
-            //IF LookupCache."Last Change" = 0DT THEN
-            //  LookupCache."Last Change":= StartDate;
-            //Timestamp := LookupCache."Last Change" - StartDate;
-            //CurrPage.NPHost.SendRequest(Factory.SetObjectProperty('n$.Popup.LookupDialog.Options.LastUpdate',Timestamp).ToRequestInfo());
-            //CurrPage.NPHost.SendRequest(Factory.SetObjectProperty('n$.Popup.LookupDialog.Options.LookupRec',LookupRec.NUMBER).ToRequestInfo());
-            //+NPR5.23
-            //+NPR5.22
+          CurrPage.NPHost.SendRequest(Factory.SetObjectProperty('n$.Popup.LookupDialog.Options.ShowCard',LookupShowCard).ToRequestInfo());
+          CurrPage.NPHost.SendRequest(Factory.SetObjectProperty('n$.Popup.LookupDialog.Options.ShowNew',LookupShowNew).ToRequestInfo());
+        //-NPR5.22
+          //-NPR5.23
+          //IF LookupCache.GET(LookupRec.NUMBER) THEN;
+          //StartDate := CREATEDATETIME(DMY2DATE(1,1,2000),0T);
+          //IF LookupCache."Last Change" = 0DT THEN
+          //  LookupCache."Last Change":= StartDate;
+          //Timestamp := LookupCache."Last Change" - StartDate;
+          //CurrPage.NPHost.SendRequest(Factory.SetObjectProperty('n$.Popup.LookupDialog.Options.LastUpdate',Timestamp).ToRequestInfo());
+          //CurrPage.NPHost.SendRequest(Factory.SetObjectProperty('n$.Popup.LookupDialog.Options.LookupRec',LookupRec.NUMBER).ToRequestInfo());
+          //+NPR5.23
+        //+NPR5.22
         end;
         //+NPR5.20
 
-        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+        CurrPage.NPHost.ShowDialog(Dlg);
     end;
 
     local procedure EventOnMessage(EventArgs: DotNet npNetMessageEventArgs)
@@ -239,30 +273,30 @@ page 6014652 "Touch Screen - Dialog (Web)"
         MessageType := EventArgs.Type;
 
         case MessageType of
-            EventType.LookupRequestData:
-                begin
-                    LookupRequestData();
-                end;
-            //-NPR5.20
-            EventType.Insert:
-                begin
-                    if IsLookup then begin
-                        RecRef.Open(LookupRec.Number);
-                        Events.OnLookupNew(LookupCardPageId, RecRef);
-                        if RecRef.Find() then
-                            LookupSendSingleRow(RecRef);
-                    end;
-                end;
-            EventType.SelectionChanged:
-                begin
-                    if IsLookup then begin
-                        Dictionary := EventArgs.ToSelectionChanged();
-                        RecRef.Open(LookupRec.Number);
-                        RecRef.SetPosition(Dictionary.Item('position'));
-                        Events.OnLookupShowCard(LookupCardPageId, RecRef);
-                    end;
-                end;
-                //+NPR5.20
+          EventType.LookupRequestData:
+            begin
+              LookupRequestData();
+            end;
+        //-NPR5.20
+          EventType.Insert:
+            begin
+              if IsLookup then begin
+                RecRef.Open(LookupRec.Number);
+                Events.OnLookupNew(LookupCardPageId,RecRef);
+                if RecRef.Find() then
+                  LookupSendSingleRow(RecRef);
+              end;
+            end;
+          EventType.SelectionChanged:
+            begin
+              if IsLookup then begin
+                Dictionary := EventArgs.ToSelectionChanged();
+                RecRef.Open(LookupRec.Number);
+                RecRef.SetPosition(Dictionary.Item('position'));
+                Events.OnLookupShowCard(LookupCardPageId,RecRef);
+              end;
+            end;
+        //+NPR5.20
         end;
     end;
 
@@ -278,42 +312,42 @@ page 6014652 "Touch Screen - Dialog (Web)"
     begin
         ResponseType := Response.DialogType;
         case ResponseType of
-            DialogType.NumPad:
-                begin
-                    NumPadResult := '';
-                    NumpadResponse := Response.AsNumpad();
-                    Cancelled := NumpadResponse.Cancelled;
-                    if not NumpadResponse.Cancelled then
-                        NumPadResult := NumpadResponse.Text
-                end;
-            DialogType.Confirm:
-                begin
-                    ConfirmResponse := Response.AsConfirm();
-                    ConfirmResult := ConfirmResponse.Reply;
-                end;
-            DialogType.SearchBox:
-                begin
-                    SearchBoxResponse := Response.AsSearchBox();
-                    Cancelled := SearchBoxResponse.Cancelled;
-                    if not SearchBoxResponse.Cancelled then
-                        SearchBoxResult := SearchBoxResponse.Text;
-                end;
-            DialogType.CalendarGrid:
-                begin
-                    CalendarGridResponse := Response.AsCalendarGrid();
-                    Cancelled := CalendarGridResponse.Cancelled;
-                    if not Cancelled then begin
-                        CalendarGridResult := DT2Date(CalendarGridResponse.Date);
-                        CalendarGridRows := CalendarGridResponse.GetRows();
-                    end;
-                end;
-            DialogType.Lookup:
-                begin
-                    LookupResponse := Response.AsLookup();
-                    Cancelled := LookupResponse.Cancelled;
-                    if not Cancelled then
-                        LookupResult := LookupResponse.Position;
-                end;
+          DialogType.NumPad:
+            begin
+              NumPadResult := '';
+              NumpadResponse := Response.AsNumpad();
+              Cancelled := NumpadResponse.Cancelled;
+              if not NumpadResponse.Cancelled then
+                NumPadResult := NumpadResponse.Text
+            end;
+          DialogType.Confirm:
+            begin
+              ConfirmResponse := Response.AsConfirm();
+              ConfirmResult := ConfirmResponse.Reply;
+            end;
+          DialogType.SearchBox:
+            begin
+              SearchBoxResponse := Response.AsSearchBox();
+              Cancelled := SearchBoxResponse.Cancelled;
+              if not SearchBoxResponse.Cancelled then
+                SearchBoxResult := SearchBoxResponse.Text;
+            end;
+          DialogType.CalendarGrid:
+            begin
+              CalendarGridResponse := Response.AsCalendarGrid();
+              Cancelled := CalendarGridResponse.Cancelled;
+              if not Cancelled then begin
+                CalendarGridResult := DT2Date(CalendarGridResponse.Date);
+                CalendarGridRows := CalendarGridResponse.GetRows();
+              end;
+            end;
+          DialogType.Lookup:
+            begin
+              LookupResponse := Response.AsLookup();
+              Cancelled := LookupResponse.Cancelled;
+              if not Cancelled then
+                LookupResult := LookupResponse.Position;
+            end;
         end;
         CurrPage.Close;
     end;
@@ -323,22 +357,22 @@ page 6014652 "Touch Screen - Dialog (Web)"
         KnownEvent: DotNet npNetKnownEvent;
     begin
         case EventArgs.EventType of
-            KnownEvent.ClearInfoBoxContent,
-            KnownEvent.ConfigureFont,
-            KnownEvent.InvokeJavaScriptFunction,
-            KnownEvent.DimScreen,
-            KnownEvent.Error,
-            KnownEvent.NumPad,
-            KnownEvent.SetObjectProperty,
-            KnownEvent.Functions,
-            KnownEvent.CloseFunctions,
-            KnownEvent.UpdateInfoBox,
-            KnownEvent.UpdateState:
-                begin
-                    Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
-                end;
-            else
-                Error('Unsupported marshalled event. This is a programming bug, not a user error. Event details:\\%1', EventArgs.ToJson());
+          KnownEvent.ClearInfoBoxContent,
+          KnownEvent.ConfigureFont,
+          KnownEvent.InvokeJavaScriptFunction,
+          KnownEvent.DimScreen,
+          KnownEvent.Error,
+          KnownEvent.NumPad,
+          KnownEvent.SetObjectProperty,
+          KnownEvent.Functions,
+          KnownEvent.CloseFunctions,
+          KnownEvent.UpdateInfoBox,
+          KnownEvent.UpdateState:
+            begin
+              CurrPage.NPHost.SendRequest(EventArgs.ToRequestInfo());
+            end;
+          else
+            Error('Unsupported marshalled event. This is a programming bug, not a user error. Event details:\\%1',EventArgs.ToJson());
         end;
     end;
 
