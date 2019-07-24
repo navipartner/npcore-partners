@@ -1,4 +1,4 @@
-pageextension 50073 pageextension50073 extends "Posted Purchase Invoice" 
+pageextension 50012 pageextension50012 extends "Posted Purchase Invoice" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     // 

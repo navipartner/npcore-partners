@@ -1,6 +1,7 @@
 page 6151196 "NpCs Store Card"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #362443/MHA /20190719  CASE 362443 It should be possible to define workflows for local stores and added "Opening Hours"
 
     Caption = 'Collect Store Card';
     PageType = Card;
@@ -33,6 +34,9 @@ page 6151196 "NpCs Store Card"
                         begin
                             CurrPage.Update(true);
                         end;
+                    }
+                    field("Opening Hour Set";"Opening Hour Set")
+                    {
                     }
                 }
                 group(Control6014405)
@@ -119,7 +123,6 @@ page 6151196 "NpCs Store Card"
             {
                 Caption = 'Workflows';
                 SubPageLink = "Store Code"=FIELD(Code);
-                Visible = (NOT "Local Store");
             }
             part("POS Relations";"NpCs Store Card POS Relations")
             {

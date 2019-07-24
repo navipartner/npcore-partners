@@ -1,4 +1,4 @@
-pageextension 50125 pageextension50125 extends "G/L Account Card" 
+pageextension 50020 pageextension50020 extends "G/L Account Card" 
 {
     layout
     {

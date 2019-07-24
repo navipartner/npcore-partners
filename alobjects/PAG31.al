@@ -1,4 +1,4 @@
-pageextension 50216 pageextension50216 extends "Item List" 
+pageextension 50030 pageextension50030 extends "Item List" 
 {
     // NPR4.11/TSA/20150623 CASE 209946 - Shortcut Attributes
     // NPR4.18/JLK/20151105 CASE 226296 - Field "Item Group" Added
