@@ -1,6 +1,7 @@
 page 6151198 "NpCs Workflow Card"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #362443/MHA /20190723  CASE 362443 Removed "Auto Post Order on" and added "Archive on Delivery"
 
     Caption = 'Collect Workflow Card';
     PageType = Card;
@@ -67,16 +68,15 @@ page 6151198 "NpCs Workflow Card"
                 field("Delivery Expiry Days (Qty.)";"Delivery Expiry Days (Qty.)")
                 {
                 }
+                field("Archive on Delivery";"Archive on Delivery")
+                {
+                }
             }
             group("Order Status")
             {
                 Caption = 'Order Status';
                 field("Order Status Module";"Order Status Module")
                 {
-                }
-                field("Auto Post Order on";"Auto Post Order on")
-                {
-                    ToolTip = 'Automatically Post Sales Order on Processing Order Status,Update';
                 }
                 field("Send Notification from Store";"Send Notification from Store")
                 {

@@ -1,4 +1,4 @@
-pageextension 50517 pageextension50517 extends "Purchase Prices" 
+pageextension 50069 pageextension50069 extends "Purchase Prices" 
 {
     // VRT1.00/JDH/20150304 CASE 271133 Show Variety Matrix
     // NPR5.31/NPKNAV/20170502  CASE 271133 Transport NPR5.31 - 2 May 2017

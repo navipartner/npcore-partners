@@ -1,21 +1,24 @@
-table 6151207 "NpCs Store Opening Hours Setup"
+table 6151210 "NpCs Open. Hour Entry"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #362443/MHA /20190719  CASE 362443 [VLOBJDEL] Object marked for deletion
+    // #362443/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
 
-    Caption = 'Collect Store Opening Hours Setup';
-    DrillDownPageID = "NpCs Store Opening Hours Setup";
-    LookupPageID = "NpCs Store Opening Hours Setup";
+    Caption = 'Collect Store Opening Hour Entry';
 
     fields
     {
-        field(1;"Line No.";Integer)
+        field(1;"Set Code";Code[20])
+        {
+            Caption = 'Set Code';
+            NotBlank = true;
+            TableRelation = "NpCs Open. Hour Set";
+        }
+        field(3;"Line No.";Integer)
         {
             Caption = 'Line No.';
         }
         field(5;"Entry Type";Option)
         {
-            Caption = 'Opening Type';
+            Caption = 'Entry Type';
             OptionCaption = 'Store Open,Store Closed';
             OptionMembers = "Store Open","Store Closed";
 
@@ -126,7 +129,7 @@ table 6151207 "NpCs Store Opening Hours Setup"
 
     keys
     {
-        key(Key1;"Line No.")
+        key(Key1;"Set Code","Line No.")
         {
         }
     }

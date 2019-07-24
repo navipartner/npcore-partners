@@ -1,6 +1,7 @@
 codeunit 6151206 "NpCs POS Action Create Order"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #362443/MHA /20190719  CASE 362443 It should be possible to send to another local store
 
 
     trigger OnRun()
@@ -304,7 +305,9 @@ codeunit 6151206 "NpCs POS Action Create Order"
         POSSale.GetCurrentSale(SalePOS);
         FindItemPosLines(SalePOS,TempSaleLinePOS);
 
-        ToNpCsStore.SetRange("Local Store",false);
+        //-#362443 [362443]
+        ToNpCsStore.SetFilter(Code,'<>%1',FromNpCsStore.Code);
+        //+#362443 [362443]
         ToNpCsStore.FindSet;
         repeat
           TempNpCsStore.Init;

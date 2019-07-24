@@ -1,4 +1,4 @@
-pageextension 50369 pageextension50369 extends "Posted Transfer Shipment" 
+pageextension 50058 pageextension50058 extends "Posted Transfer Shipment" 
 {
     // NPR5.46/EMGO/20180910 CASE 324737 Added Page Actions RetailPrint and PriceLabel
     // NPR5.46/JDH /20181002 CASE 294354 Removed code on RetailPrint and PriceLabel. Made them publishers so its the same functionality all around our solution

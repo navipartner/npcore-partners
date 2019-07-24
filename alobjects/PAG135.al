@@ -1,4 +1,4 @@
-pageextension 50070 pageextension50070 extends "Posted Sales Cr. Memo Subform" 
+pageextension 50009 pageextension50009 extends "Posted Sales Cr. Memo Subform" 
 {
     // VRT1.20/JDH /20150304 CASE 201022 Variety Action Added to raise Event
     actions

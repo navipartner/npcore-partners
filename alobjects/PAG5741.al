@@ -1,4 +1,4 @@
-pageextension 50368 pageextension50368 extends "Transfer Order Subform" 
+pageextension 50057 pageextension50057 extends "Transfer Order Subform" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     // NPR4.13/MMV/20150708 CASE 214173 Changed "Item No." to variable to handle barcode scanning OnValidate trigger.
