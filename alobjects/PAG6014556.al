@@ -12,14 +12,14 @@ page 6014556 "Retail Admin Role Center"
             group(Control1900724808)
             {
                 ShowCaption = false;
-                part(Control1904484608;"IT Operations Activities")
+                part(Control1904484608; "IT Operations Activities")
                 {
                 }
-                part(Control58;"CRM Synch. Job Status Part")
+                part(Control58; "CRM Synch. Job Status Part")
                 {
                     Visible = false;
                 }
-                part(Control52;"Service Connections Part")
+                part(Control52; "Service Connections Part")
                 {
                     Visible = false;
                 }
@@ -27,17 +27,14 @@ page 6014556 "Retail Admin Role Center"
             group(Control1900724708)
             {
                 ShowCaption = false;
-                part(Control36;"Report Inbox Part")
+                part(Control36; "Report Inbox Part")
                 {
                 }
-                part(Control32;"My Job Queue")
+                part(Control32; "My Job Queue")
                 {
                     Visible = false;
                 }
-                part(Control1903012608;9175)
-                {
-                }
-                systempart(Control1901377608;MyNotes)
+                systempart(Control1901377608; MyNotes)
                 {
                 }
             }
@@ -727,16 +724,16 @@ page 6014556 "Retail Admin Role Center"
                     Caption = 'Sales Analysis &Line Templates';
                     Image = SetupLines;
                     RunObject = Page "Analysis Line Templates";
-                    RunPageView = SORTING("Analysis Area",Name)
-                                  WHERE("Analysis Area"=CONST(Sales));
+                    RunPageView = SORTING ("Analysis Area", Name)
+                                  WHERE ("Analysis Area" = CONST (Sales));
                 }
                 action(SalesAnalysisColumnTmpl)
                 {
                     Caption = 'Sales Analysis &Column Templates';
                     Image = SetupColumns;
                     RunObject = Page "Analysis Column Templates";
-                    RunPageView = SORTING("Analysis Area",Name)
-                                  WHERE("Analysis Area"=CONST(Sales));
+                    RunPageView = SORTING ("Analysis Area", Name)
+                                  WHERE ("Analysis Area" = CONST (Sales));
                 }
             }
             group("P&urchase Analysis")
@@ -748,16 +745,16 @@ page 6014556 "Retail Admin Role Center"
                     Caption = 'Purchase &Analysis Line Templates';
                     Image = SetupLines;
                     RunObject = Page "Analysis Line Templates";
-                    RunPageView = SORTING("Analysis Area",Name)
-                                  WHERE("Analysis Area"=CONST(Purchase));
+                    RunPageView = SORTING ("Analysis Area", Name)
+                                  WHERE ("Analysis Area" = CONST (Purchase));
                 }
                 action(PurchaseAnalysisColumnTmpl)
                 {
                     Caption = 'Purchase Analysis &Column Templates';
                     Image = SetupColumns;
                     RunObject = Page "Analysis Column Templates";
-                    RunPageView = SORTING("Analysis Area",Name)
-                                  WHERE("Analysis Area"=CONST(Purchase));
+                    RunPageView = SORTING ("Analysis Area", Name)
+                                  WHERE ("Analysis Area" = CONST (Purchase));
                 }
             }
         }
