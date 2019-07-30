@@ -26,9 +26,7 @@ page 6014548 "POS Accessory AddOn Selection"
                     BridgeMgt.SetSize('100%', '600px');
                 end;
 
-                trigger OnInvokeMethod(method: Text; eventContent: Variant)
-                var
-                    JObjectIn: DotNet npNetJObject;
+                trigger OnInvokeMethod(method: Text; eventContent: JsonObject)
                 begin
                     case method of
                         'ApproveItemAddOns':

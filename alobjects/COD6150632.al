@@ -136,9 +136,66 @@ codeunit 6150632 "JavaScript Bridge Management"
     end;
 
     local procedure InvokeFrontEndAsync(Request: DotNet npNetDictionary_Of_T_U)
+    var
+        JsonRequest: JsonObject;
+        DictKey: Text;
+        DictVar: Variant;
+        DictText: Text;
+        DictInteger: Integer;
+        DictDecimal: Decimal;
+        DictBigInteger: BigInteger;
+        DictGuid: Guid;
+        DictBoolean: Boolean;
+        DictDate: Date;
+        DictDateTime: DateTime;
     begin
         MakeSureBridgeIsInitialized();
-        Bridge.InvokeFrontEndAsync(Request);
+        foreach DictKey in Request.Keys do begin
+            DictVar := Request.Item(DictKey);
+            case true of
+                DictVar.IsText:
+                    begin
+                        DictText := DictVar;
+                        JsonRequest.Add(DictKey, DictText);
+                    end;
+                DictVar.IsInteger:
+                    begin
+                        DictInteger := DictVar;
+                        JsonRequest.Add(DictKey, DictInteger);
+                    end;
+                DictVar.IsBigInteger:
+                    begin
+                        DictBigInteger := DictVar;
+                        JsonRequest.Add(DictKey, DictBigInteger);
+                    end;
+                DictVar.IsDecimal:
+                    begin
+                        DictDecimal := DictVar;
+                        JsonRequest.Add(DictKey, DictDecimal);
+                    end;
+                DictVar.IsGuid:
+                    begin
+                        DictGuid := DictVar;
+                        JsonRequest.Add(DictKey, DictGuid);
+                    end;
+                DictVar.IsBoolean:
+                    begin
+                        DictBoolean := DictVar;
+                        JsonRequest.Add(DictKey, DictBoolean);
+                    end;
+                DictVar.IsDate:
+                    begin
+                        DictDate := DictVar;
+                        JsonRequest.Add(DictKey, DictDate);
+                    end;
+                DictVar.IsDateTime:
+                    begin
+                        DictDateTime := DictVar;
+                        JsonRequest.Add(DictKey, DictDateTime);
+                    end;
+            end;
+        end;
+        Bridge.InvokeFrontEndAsync(JsonRequest);
     end;
 }
 

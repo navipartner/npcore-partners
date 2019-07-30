@@ -152,6 +152,10 @@ codeunit 6150788 "POS Action - Print Exch Label"
                     //-NPR5.43 [305061]
                     //EXIT;
                     JSON.GetJsonObject('value', CalendarObject, true);
+
+                    // TODO: CTRLUPGRADE - For MMV - refactor this to use JsonObject that CalendarObject now is
+                    Error('CTRLUPRADE - TODO FOR MMV');
+                    /*
                     Evaluate(Count, CalendarObject.Item('Rows').Item('count').ToString);
                     if Count < 1 then
                         exit;
@@ -162,6 +166,7 @@ codeunit 6150788 "POS Action - Print Exch Label"
                         PrintLines.SetPosition(Position);
                         PrintLines.Mark(true);
                     end;
+                    */
                     PrintLines.MarkedOnly(true);
                     //+NPR5.43 [305061]
                 end;

@@ -94,7 +94,7 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         VoucherNo: Code[20];
@@ -124,7 +124,7 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action"; Parameters: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action"; Parameters: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
         JSON: Codeunit "POS JSON Management";
@@ -179,7 +179,7 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
         Handled := true;
     end;
 
-    local procedure OnProcessSale(POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: DotNet JObject)
+    local procedure OnProcessSale(POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: JsonObject)
     var
         JSON: Codeunit "POS JSON Management";
         POSPaymentLine: Codeunit "POS Payment Line";
@@ -266,7 +266,7 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
     begin
     end;
 
-    local procedure GetAmount(Context: DotNet JObject; FrontEnd: Codeunit "POS Front End Management"): Decimal
+    local procedure GetAmount(Context: JsonObject; FrontEnd: Codeunit "POS Front End Management"): Decimal
     var
         JSON: Codeunit "POS JSON Management";
     begin
@@ -276,7 +276,7 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
         exit(JSON.GetDecimal('numpad', true));
     end;
 
-    local procedure GetQuantity(Context: DotNet JObject; FrontEnd: Codeunit "POS Front End Management"): Decimal
+    local procedure GetQuantity(Context: JsonObject; FrontEnd: Codeunit "POS Front End Management"): Decimal
     var
         JSON: Codeunit "POS JSON Management";
     begin
@@ -288,7 +288,7 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
         exit(1);
     end;
 
-    local procedure GetDiscount(Context: DotNet JObject; FrontEnd: Codeunit "POS Front End Management"): Decimal
+    local procedure GetDiscount(Context: JsonObject; FrontEnd: Codeunit "POS Front End Management"): Decimal
     var
         JSON: Codeunit "POS JSON Management";
     begin
@@ -303,7 +303,7 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
         exit(0);
     end;
 
-    local procedure GetDiscountType(Context: DotNet JObject; FrontEnd: Codeunit "POS Front End Management"): Integer
+    local procedure GetDiscountType(Context: JsonObject; FrontEnd: Codeunit "POS Front End Management"): Integer
     var
         JSON: Codeunit "POS JSON Management";
     begin

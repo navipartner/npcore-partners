@@ -24,10 +24,6 @@ codeunit 6150704 "POS Front End Management"
     // NPR5.50/VB  /20181223 CASE 338666 Supporting Workflows 2.0
 
 
-    trigger OnRun()
-    begin
-    end;
-
     var
         POSSession: Codeunit "POS Session";
         Stargate: Codeunit "POS Stargate Management";
@@ -202,11 +198,11 @@ codeunit 6150704 "POS Front End Management"
 
     local procedure MakeSureFrameworkIsAvailable(WithError: Boolean): Boolean
     begin
-        if IsNull(Transcendence) then
+        if not Initialized then
             if IsActiveSession() then
                 exit(true);
 
-        if not IsNull(Transcendence) then
+        if Initialized then
             exit(true);
 
         if WithError then
@@ -231,7 +227,7 @@ codeunit 6150704 "POS Front End Management"
 
     local procedure MakeSureFrameworkfIsInitialized()
     begin
-        if IsNull(Transcendence) or (not Initialized) then
+        if (not Initialized) then
             ReportBug(Text013);
     end;
 
@@ -320,6 +316,7 @@ codeunit 6150704 "POS Front End Management"
     var
         DebugTrace: Text;
         ServerStopwatch: Text;
+        JRequest: JsonObject;
     begin
         //-NPR5.40 [306347]
         //-NPR5.43 [315838]
@@ -339,7 +336,8 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.45 [315838]
         //+NPR5.43 [315838]
 
-        Transcendence.InvokeFrontEndAsync(Request);
+        JRequest.ReadFrom(Request.ToJsonString());
+        Transcendence.InvokeFrontEndAsync(JRequest);
         //+NPR5.40 [306347]
     end;
 
@@ -1019,8 +1017,8 @@ codeunit 6150704 "POS Front End Management"
         case true of
             ViewType.Equals(ViewType.Login):
                 OnBeforeChangeToLoginView(POSSession);
-            //-NPR5.49 [343617]
-            //ViewType.Equals(ViewType.Sale)           : OnBeforeChangeToSaleView (POSSession);
+                //-NPR5.49 [343617]
+                //ViewType.Equals(ViewType.Sale)           : OnBeforeChangeToSaleView (POSSession);
             ViewType.Equals(ViewType.Sale):
                 begin
                     if CurrView.Type.Equals(CurrViewType.Login) then

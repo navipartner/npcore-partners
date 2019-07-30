@@ -13,12 +13,12 @@ codeunit 6150855 "POS Action - Ret. Amt. Dialog"
 
     local procedure ActionCode(): Text
     begin
-        exit ('SHOW_RET_AMT_DIALOG');
+        exit('SHOW_RET_AMT_DIALOG');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -31,19 +31,19 @@ codeunit 6150855 "POS Action - Ret. Amt. Dialog"
           Sender.Type::Generic,
           Sender."Subscriber Instances Allowed"::Multiple)
         then begin
-          Sender.RegisterWorkflowStep ('ConfirmReturnAmount', 'message ({title: labels.confirm_title, caption: context.confirm_message});');
-          Sender.RegisterWorkflow (true);
+            Sender.RegisterWorkflowStep('ConfirmReturnAmount', 'message ({title: labels.confirm_title, caption: context.confirm_message});');
+            Sender.RegisterWorkflow(true);
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "POS Caption Management")
     begin
-        Captions.AddActionCaption (ActionCode(), 'confirm_title', ConfirmEndOfSaleTitle);
+        Captions.AddActionCaption(ActionCode(), 'confirm_title', ConfirmEndOfSaleTitle);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action"; Parameters: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         POSSale: Codeunit "POS Sale";
         SalesAmount: Decimal;
@@ -55,11 +55,11 @@ codeunit 6150855 "POS Action - Ret. Amt. Dialog"
         JSON: Codeunit "POS JSON Management";
     begin
         if not Action.IsThisAction(ActionCode()) then
-          exit;
+            exit;
 
         Handled := true;
 
-        JSON.InitializeJObjectParser(Parameters,FrontEnd);
+        JSON.InitializeJObjectParser(Parameters, FrontEnd);
         POSSession.GetSale(POSSale);
         POSSale.GetLastSaleInfo(SalesAmount, PaidAmount, SalesDateText, ReturnAmount, ReceiptNo);
         ReturnAmount := Abs(ReturnAmount);
@@ -67,23 +67,23 @@ codeunit 6150855 "POS Action - Ret. Amt. Dialog"
         HTML :=
         StrSubstNo('<center>' +
         '<table border="0" cellspacing="0">' +
-        '<tr><td align="left">Receipt No.</td><td align="right">%1</td></tr>'+
-        '<tr><td align="left">Sales Amount</td><td align="right">%2</td></tr>'+
-        '<tr><td align="left">Paid Amount</td><td align="right">%3</td></tr>'+
-        '<tr><td>&nbsp;</td></tr><tr><td align="left"><h2>Amount to Return&nbsp;&nbsp;</h2></td>'+
+        '<tr><td align="left">Receipt No.</td><td align="right">%1</td></tr>' +
+        '<tr><td align="left">Sales Amount</td><td align="right">%2</td></tr>' +
+        '<tr><td align="left">Paid Amount</td><td align="right">%3</td></tr>' +
+        '<tr><td>&nbsp;</td></tr><tr><td align="left"><h2>Amount to Return&nbsp;&nbsp;</h2></td>' +
         '<td align="right"><h2>%4</h2></td></tr>' +
         '</table>',
           ReceiptNo,
-          Format (SalesAmount, 0, '<Precision,2:2><Standard Format,0>'),
-          Format (PaidAmount, 0, '<Precision,2:2><Standard Format,0>'),
-          Format (ReturnAmount, 0, '<Precision,2:2><Standard Format,0>'));
+          Format(SalesAmount, 0, '<Precision,2:2><Standard Format,0>'),
+          Format(PaidAmount, 0, '<Precision,2:2><Standard Format,0>'),
+          Format(ReturnAmount, 0, '<Precision,2:2><Standard Format,0>'));
 
-        JSON.SetContext ('confirm_message', HTML);
-        FrontEnd.SetActionContext (ActionCode(), JSON);
+        JSON.SetContext('confirm_message', HTML);
+        FrontEnd.SetActionContext(ActionCode(), JSON);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         OperationType: Option VoidLast,ReprintLast,LookupLast,OpenConn,CloseConn,VerifySetup,ShowTransactions,AuxOperation;
         EftType: Text;
@@ -94,7 +94,7 @@ codeunit 6150855 "POS Action - Ret. Amt. Dialog"
         EFTTransactionRequest: Record "EFT Transaction Request";
     begin
         if not Action.IsThisAction(ActionCode()) then
-          exit;
+            exit;
 
         Handled := true;
     end;
@@ -104,12 +104,12 @@ codeunit 6150855 "POS Action - Ret. Amt. Dialog"
     end;
 
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
-    local procedure OnBeforeInsertWorkflowStep(var Rec: Record "POS Sales Workflow Step";RunTrigger: Boolean)
+    local procedure OnBeforeInsertWorkflowStep(var Rec: Record "POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
-          exit;
-        if Rec."Subscriber Function" <>  'ShowReturnAmountDialog' then
-          exit;
+            exit;
+        if Rec."Subscriber Function" <> 'ShowReturnAmountDialog' then
+            exit;
 
         Rec.Description := ActionDescription;
         Rec."Sequence No." := 80;
@@ -122,7 +122,7 @@ codeunit 6150855 "POS Action - Ret. Amt. Dialog"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
-    local procedure ShowReturnAmountDialog(POSSalesWorkflowStep: Record "POS Sales Workflow Step";SalePOS: Record "Sale POS")
+    local procedure ShowReturnAmountDialog(POSSalesWorkflowStep: Record "POS Sales Workflow Step"; SalePOS: Record "Sale POS")
     var
         MPOSAppSetup: Record "MPOS App Setup";
         POSSession: Codeunit "POS Session";
@@ -130,13 +130,13 @@ codeunit 6150855 "POS Action - Ret. Amt. Dialog"
         POSAction: Record "POS Action";
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-          exit;
+            exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'ShowReturnAmountDialog' then
-          exit;
-        if not MPOSAppSetup.IsMPOSEnabled (SalePOS."Register No.") then
-          exit;
+            exit;
+        if not MPOSAppSetup.IsMPOSEnabled(SalePOS."Register No.") then
+            exit;
         if not POSSession.IsActiveSession(POSFrontEnd) then
-          exit;
+            exit;
 
         POSFrontEnd.GetSession(POSSession);
         POSSession.RetrieveSessionAction(ActionCode, POSAction);
