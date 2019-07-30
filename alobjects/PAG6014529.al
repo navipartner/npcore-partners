@@ -1,3 +1,4 @@
+// TODO: CTRLUPGRADE - uses old Standard code; must be removed or refactored
 page 6014529 "Touch Screen - Balancing Line"
 {
     // NPR4.10/VB/20150602 CASE 213003 Support for Web Client (JavaScript) client

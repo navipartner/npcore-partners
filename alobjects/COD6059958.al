@@ -10,13 +10,6 @@ codeunit 6059958 "MCS Webcam Proxy TSD"
     end;
 
     var
-        POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
-        ProtocolStage: Integer;
-        ExpectedResponseType: DotNet npNetType;
-        ExpectedResponseId: Guid;
-        QueuedRequests: DotNet npNetStack;
-        QueuedResponseTypes: DotNet npNetStack;
-        ProtocolManagerId: Guid;
         WebcamArgumentTable: Record "MCS Webcam Argument Table";
         Base64String: Text;
         IdentifyButtonText: Label 'Identify';

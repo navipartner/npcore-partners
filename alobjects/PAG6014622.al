@@ -100,16 +100,6 @@ page 6014622 "POS Web Fonts"
                         RemoveFont();
                     end;
                 }
-                action("Preview Font")
-                {
-                    Caption = 'Preview Font';
-                    Image = ViewDescription;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
-                    RunObject = Page "POS Web Font Preview";
-                    RunPageLink = Code=FIELD(Code);
-                }
             }
             group("Stylesheet (Css)")
             {

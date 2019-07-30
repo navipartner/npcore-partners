@@ -42,26 +42,26 @@ codeunit 6150821 "POS Action - Sale Annullation"
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
-            RegisterWorkflowStep ('ReceiptNumber', 'input(labels.title, labels.receiptprompt).respond().cancel(abort);');
-            RegisterWorkflow (true);
-            RegisterOptionParameter('DocumentType', 'CreditMemo,ReturnOrder', 'ReturnOrder');
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
+                RegisterWorkflowStep('ReceiptNumber', 'input(labels.title, labels.receiptprompt).respond().cancel(abort);');
+                RegisterWorkflow(true);
+                RegisterOptionParameter('DocumentType', 'CreditMemo,ReturnOrder', 'ReturnOrder');
 
-            //-NPR5.49 [342244]
-            RegisterOptionParameter ('ObfucationMethod', 'None,MI', 'None');
-            //+NPR5.49 [342244]
+                //-NPR5.49 [342244]
+                RegisterOptionParameter('ObfucationMethod', 'None,MI', 'None');
+                //+NPR5.49 [342244]
 
-          end;
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action"; Parameters: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Setup: Codeunit "POS Setup";
         RetailSetup: Record "Retail Setup";
@@ -69,41 +69,42 @@ codeunit 6150821 "POS Action - Sale Annullation"
         Context: Codeunit "POS JSON Management";
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         //Check if user is allowed to do return
-        POSSession.GetSetup (Setup);
-        SalespersonPurchaser.Get (Setup.Salesperson);
-        RetailSetup.Get ();
+        POSSession.GetSetup(Setup);
+        SalespersonPurchaser.Get(Setup.Salesperson);
+        RetailSetup.Get();
         case SalespersonPurchaser."Reverse Sales Ticket" of
-          SalespersonPurchaser."Reverse Sales Ticket"::No : Error (NotAllowed, SalespersonPurchaser.Name);
+            SalespersonPurchaser."Reverse Sales Ticket"::No:
+                Error(NotAllowed, SalespersonPurchaser.Name);
         end;
 
-        FrontEnd.SetActionContext (ActionCode, Context);
+        FrontEnd.SetActionContext(ActionCode, Context);
         Handled := true;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         ReturnReasonCode: Code[20];
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
 
 
         case WorkflowStep of
-          'ReceiptNumber' :
-            begin
-              VerifyReceiptNumber(Context, POSSession, FrontEnd);
-            end;
+            'ReceiptNumber':
+                begin
+                    VerifyReceiptNumber(Context, POSSession, FrontEnd);
+                end;
         end;
 
-        POSSession.ChangeViewSale ();
-        POSSession.RequestRefreshData ();
+        POSSession.ChangeViewSale();
+        POSSession.RequestRefreshData();
 
         Handled := true;
     end;
@@ -111,16 +112,15 @@ codeunit 6150821 "POS Action - Sale Annullation"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "POS Caption Management")
     begin
-        Captions.AddActionCaption (ActionCode, 'title', Title);
-        Captions.AddActionCaption (ActionCode, 'receiptprompt', ReceiptPrompt);
+        Captions.AddActionCaption(ActionCode, 'title', Title);
+        Captions.AddActionCaption(ActionCode, 'receiptprompt', ReceiptPrompt);
     end;
 
-    local procedure VerifyReceiptNumber(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure VerifyReceiptNumber(Context: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         AuditRoll: Record "Audit Roll";
         SalesTicketNo: Code[20];
-        TouchSalePOSWeb: Codeunit "Touch - Sale POS (Web)";
         RetailSalesCode: Codeunit "Retail Sales Code";
         ReturnReason: Record "Return Reason";
         SaleLinePOS: Record "Sale Line POS";
@@ -143,25 +143,27 @@ codeunit 6150821 "POS Action - Sale Annullation"
         RetailSalesDocMgt: Codeunit "Retail Sales Doc. Mgt.";
         POSCreateEntry: Codeunit "POS Create Entry";
     begin
-        POSSession.GetSetup (POSSetup);
+        POSSession.GetSetup(POSSetup);
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
 
         //Get ticket
-        JSON.SetScope ('/', true);
-        JSON.SetScope ('$ReceiptNumber', true);
-        SalesTicketNo := JSON.GetString ('input', true);
+        JSON.SetScope('/', true);
+        JSON.SetScope('$ReceiptNumber', true);
+        SalesTicketNo := JSON.GetString('input', true);
         if (SalesTicketNo = '') then
-          Error (NotValid);
+            Error(NotValid);
 
         //Get document type
-        JSON.SetScope ('/', true);
-        JSON.SetScope ('parameters', true);
-        case JSON.GetString ('DocumentType', true) of
-         '0' : DocumentType := DocumentType::"Credit Memo";
-         '1' : DocumentType := DocumentType::"Return Order";
-          else
-            Error('Document Type value %1 is not valid.', JSON.GetString ('DocumentType', true));
+        JSON.SetScope('/', true);
+        JSON.SetScope('parameters', true);
+        case JSON.GetString('DocumentType', true) of
+            '0':
+                DocumentType := DocumentType::"Credit Memo";
+            '1':
+                DocumentType := DocumentType::"Return Order";
+            else
+                Error('Document Type value %1 is not valid.', JSON.GetString('DocumentType', true));
         end;
 
         //Check ticket
@@ -170,12 +172,12 @@ codeunit 6150821 "POS Action - Sale Annullation"
         //-NPR5.49 [342244]
         // AuditRoll.SETRANGE ("Sales Ticket No.", SalesTicketNo);
         // AuditRoll.FINDFIRST ();
-        DeObfuscateTicketNo (JSON.GetIntegerParameter ('ObfucationMethod', false), SalesTicketNo);
-        AuditRoll.SetRange ("Sales Ticket No.", SalesTicketNo);
-        if (not AuditRoll.FindFirst ()) then begin
-          JSON.SetScope ('/', true);
-          JSON.SetScope ('$ReceiptNumber', true);
-          Error (NotFound, JSON.GetString ('input', true));
+        DeObfuscateTicketNo(JSON.GetIntegerParameter('ObfucationMethod', false), SalesTicketNo);
+        AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
+        if (not AuditRoll.FindFirst()) then begin
+            JSON.SetScope('/', true);
+            JSON.SetScope('$ReceiptNumber', true);
+            Error(NotFound, JSON.GetString('input', true));
         end;
         //+NPR5.49 [342244]
 
@@ -193,26 +195,26 @@ codeunit 6150821 "POS Action - Sale Annullation"
         Clear(PostedSalesInvoicePage);
         PostedSalesInvoicePage.SetRecord(PostedSalesInvoice);
         PostedSalesInvoicePage.LookupMode(true);
-        if not( PostedSalesInvoicePage.RunModal = ACTION::LookupOK ) then
-          exit;
+        if not (PostedSalesInvoicePage.RunModal = ACTION::LookupOK) then
+            exit;
 
         //Create return document and add lines
         SalesDocNo := CreateReturnDocument(DocumentType, Customer."No.", PostedSalesInvoice."No.", POSSetup.Salesperson);
         if SalesDocNo = '' then
-          Error(ERR_DocNotCreated);
+            Error(ERR_DocNotCreated);
         SalesHeader.Get(DocumentType, SalesDocNo);
 
         //Post documenty
         case DocumentType of
-          DocumentType::"Credit Memo" :
-            begin
-              SalesHeader.Invoice := true;
-            end;
-          DocumentType::"Return Order" :
-            begin
-              SalesHeader.Receive := true;
-              SalesHeader.Invoice := true;
-            end;
+            DocumentType::"Credit Memo":
+                begin
+                    SalesHeader.Invoice := true;
+                end;
+            DocumentType::"Return Order":
+                begin
+                    SalesHeader.Receive := true;
+                    SalesHeader.Invoice := true;
+                end;
         end;
 
         //Now we have a sales doc to post lets just do the POS lines too
@@ -224,43 +226,43 @@ codeunit 6150821 "POS Action - Sale Annullation"
         SalePOS.Modify;
 
         if not RetailSalesCode.ReverseSalesTicket(SalePOS) then begin //Has commit in it so let i be before we actually post and stuff
-          //Back it all
-          SalePOS."Retursalg Bonnummer" := '';
-          SalePOS.Modify;
-          SalesHeader.Delete(true);
+                                                                      //Back it all
+            SalePOS."Retursalg Bonnummer" := '';
+            SalePOS.Modify;
+            SalesHeader.Delete(true);
 
-          SaleLinePOS.Reset;
-          SaleLinePOS.SetFilter("Register No.", '=%1', SalePOS."Register No.");
-          SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
-          if SaleLinePOS.FindSet then
-            SaleLinePOS.DeleteAll(true);
+            SaleLinePOS.Reset;
+            SaleLinePOS.SetFilter("Register No.", '=%1', SalePOS."Register No.");
+            SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
+            if SaleLinePOS.FindSet then
+                SaleLinePOS.DeleteAll(true);
 
         end else begin
 
-          SalesPost.Run(SalesHeader);
-          RetailSalesDocMgt.CreateDocumentPostingAudit(SalesHeader,SalePOS,true);
+            SalesPost.Run(SalesHeader);
+            RetailSalesDocMgt.CreateDocumentPostingAudit(SalesHeader, SalePOS, true);
 
-          //-NPR5.48 [343578]
-          SaleLinePOS.Reset;
-          SaleLinePOS.SetFilter ("Register No.", '=%1', SalePOS."Register No.");
-          SaleLinePOS.SetFilter ("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
-          if (SaleLinePOS.FindSet ()) then begin
-            repeat
-              SaleLinePOS.UpdateAmounts (SaleLinePOS);
-              SaleLinePOS.Modify ();
-            until (SaleLinePOS.Next () = 0);
-          end;
+            //-NPR5.48 [343578]
+            SaleLinePOS.Reset;
+            SaleLinePOS.SetFilter("Register No.", '=%1', SalePOS."Register No.");
+            SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
+            if (SaleLinePOS.FindSet()) then begin
+                repeat
+                    SaleLinePOS.UpdateAmounts(SaleLinePOS);
+                    SaleLinePOS.Modify();
+                until (SaleLinePOS.Next() = 0);
+            end;
 
-          POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, true);
+            POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, true);
 
-          SaleLinePOS.Reset;
-          SaleLinePOS.SetFilter ("Register No.", '=%1', SalePOS."Register No.");
-          SaleLinePOS.SetFilter ("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
-          if (SaleLinePOS.FindSet ()) then
-            SaleLinePOS.DeleteAll (true);
-          //+NPR5.48 [343578]
+            SaleLinePOS.Reset;
+            SaleLinePOS.SetFilter("Register No.", '=%1', SalePOS."Register No.");
+            SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
+            if (SaleLinePOS.FindSet()) then
+                SaleLinePOS.DeleteAll(true);
+            //+NPR5.48 [343578]
 
-          Message(TDOCPOST);
+            Message(TDOCPOST);
         end;
 
         //-NPR5.43 [321334]
@@ -276,7 +278,7 @@ codeunit 6150821 "POS Action - Sale Annullation"
         POSSale.SelectViewForEndOfSale(POSSession);
     end;
 
-    local procedure CreateReturnDocument(DocumentType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";SellToCustomerNo: Code[20];PostedInvoiceNo: Code[20];SalecPersonCode: Code[10]) DocumentNo: Code[20]
+    local procedure CreateReturnDocument(DocumentType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order"; SellToCustomerNo: Code[20]; PostedInvoiceNo: Code[20]; SalecPersonCode: Code[10]) DocumentNo: Code[20]
     var
         SalesHeader: Record "Sales Header";
         Customer: Record Customer;
@@ -294,7 +296,7 @@ codeunit 6150821 "POS Action - Sale Annullation"
         SalesInvoiceLine.Reset;
         SalesInvoiceLine.SetFilter("Document No.", SalesInvoiceHeader."No.");
         SalesInvoiceLine.FindSet;
-        SalespersonPurchaser.Get (SalecPersonCode);
+        SalespersonPurchaser.Get(SalecPersonCode);
 
         //Create return doc
         SalesHeader.Init;
@@ -306,26 +308,26 @@ codeunit 6150821 "POS Action - Sale Annullation"
 
         //Lines to return
         Clear(CopyDocMgt);
-        CopyDocMgt.SetProperties(false,false,false,false,true,true,true);
+        CopyDocMgt.SetProperties(false, false, false, false, true, true, true);
         CopyDocMgt.CopySalesInvLinesToDoc(
-                SalesHeader,SalesInvoiceLine,LinesNotCopied,MissingExCostRevLink);
+                SalesHeader, SalesInvoiceLine, LinesNotCopied, MissingExCostRevLink);
 
         Clear(CopyDocMgt);
 
         if LinesNotCopied <> 0 then
-          Error(ERR_Lines, SalesInvoiceHeader."No.");
+            Error(ERR_Lines, SalesInvoiceHeader."No.");
 
         //Line copied or else roolback
         SalesLine.Reset;
-        SalesLine.SetFilter("Document Type", '=%1',SalesHeader."Document Type");
-        SalesLine.SetFilter("Document No.", '=%1',SalesHeader."No.");
+        SalesLine.SetFilter("Document Type", '=%1', SalesHeader."Document Type");
+        SalesLine.SetFilter("Document No.", '=%1', SalesHeader."No.");
         if SalesLine.IsEmpty then
-          Error(ERR_NotApplied, PostedInvoiceNo);
+            Error(ERR_NotApplied, PostedInvoiceNo);
 
         exit(SalesHeader."No.");
     end;
 
-    local procedure DeObfuscateTicketNo(ObfucationMethod: Integer;var SalesTicketNo: Code[20])
+    local procedure DeObfuscateTicketNo(ObfucationMethod: Integer; var SalesTicketNo: Code[20])
     var
         MyBigInt: BigInteger;
         RPAuxMiscLibrary: Codeunit "RP Aux - Misc. Library";
@@ -333,15 +335,15 @@ codeunit 6150821 "POS Action - Sale Annullation"
 
         //-NPR5.49 [342244]
         case ObfucationMethod of
-          1: // Multiplicative Inverse
-          begin
-            if (StrLen (SalesTicketNo) > 2) then
-              if (CopyStr (SalesTicketNo, 1,2) = 'MI') then
-                SalesTicketNo := CopyStr (SalesTicketNo, 3);
+            1: // Multiplicative Inverse
+                begin
+                    if (StrLen(SalesTicketNo) > 2) then
+                        if (CopyStr(SalesTicketNo, 1, 2) = 'MI') then
+                            SalesTicketNo := CopyStr(SalesTicketNo, 3);
 
-            if (Evaluate (MyBigInt, SalesTicketNo)) then
-              SalesTicketNo := Format (RPAuxMiscLibrary.MultiplicativeInverseDecode (MyBigInt), 0, 9);
-          end;
+                    if (Evaluate(MyBigInt, SalesTicketNo)) then
+                        SalesTicketNo := Format(RPAuxMiscLibrary.MultiplicativeInverseDecode(MyBigInt), 0, 9);
+                end;
         end;
 
         //+NPR5.49 [342244]

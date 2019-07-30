@@ -19,10 +19,6 @@ page 6014697 "Embedded Videos"
                     JavaScriptBridgeMgt.Initialize(CurrPage.Bridge);
                     EmbedHtml();
                 end;
-
-                trigger OnInvokeMethod(method: Text;eventContent: Variant)
-                begin
-                end;
             }
         }
     }
