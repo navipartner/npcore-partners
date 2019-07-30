@@ -248,14 +248,6 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         UpdatePOSClientType(ClientDiagnostics."POS Client Type"::Transcendence);
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014651, 'OnInitializePageCompleted', '', true, true)]
-    local procedure OnInitializePageCompletedPOSSTD()
-    var
-        ClientDiagnostics: Record "Client Diagnostics";
-    begin
-        UpdatePOSClientType(ClientDiagnostics."POS Client Type"::Standard);
-    end;
-
     local procedure "--- Current User"()
     begin
     end;

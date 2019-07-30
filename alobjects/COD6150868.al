@@ -32,37 +32,36 @@ codeunit 6150868 "POS Action - Layaway Create"
 
     local procedure ActionCode(): Text
     begin
-        exit ('LAYAWAY_CREATE');
+        exit('LAYAWAY_CREATE');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do begin
-          if DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple) then
-          begin
-            RegisterWorkflowStep('DownpaymentPrompt', 'param.PromptDownpayment && numpad(labels.DownpaymentPctTitle, labels.DownpaymentPctLead, param.DownpaymentPercent).cancel (abort);');
-            RegisterWorkflowStep('CreateLayaway','respond();');
-            RegisterWorkflow(false);
+            if DiscoverAction(
+              ActionCode(),
+              ActionDescription,
+              ActionVersion(),
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple) then begin
+                RegisterWorkflowStep('DownpaymentPrompt', 'param.PromptDownpayment && numpad(labels.DownpaymentPctTitle, labels.DownpaymentPctLead, param.DownpaymentPercent).cancel (abort);');
+                RegisterWorkflowStep('CreateLayaway', 'respond();');
+                RegisterWorkflow(false);
 
-            RegisterBooleanParameter('PromptDownpayment', false);
-            RegisterDecimalParameter('DownpaymentPercent', 0);
-            RegisterTextParameter('CreationFeeItemNo', '');
-            RegisterBooleanParameter('ReserveItems', true);
-            RegisterIntegerParameter('Instalments', 0);
-            RegisterTextParameter('OrderPaymentTerms', '');
-            RegisterTextParameter('PrepaymentPaymentTerms', '');
-          end;
+                RegisterBooleanParameter('PromptDownpayment', false);
+                RegisterDecimalParameter('DownpaymentPercent', 0);
+                RegisterTextParameter('CreationFeeItemNo', '');
+                RegisterBooleanParameter('ReserveItems', true);
+                RegisterIntegerParameter('Instalments', 0);
+                RegisterTextParameter('OrderPaymentTerms', '');
+                RegisterTextParameter('PrepaymentPaymentTerms', '');
+            end;
         end;
     end;
 
@@ -71,12 +70,12 @@ codeunit 6150868 "POS Action - Layaway Create"
     var
         UI: Codeunit "POS UI Management";
     begin
-        Captions.AddActionCaption (ActionCode, 'DownpaymentPctTitle', TextDownpaymentPctTitle);
-        Captions.AddActionCaption (ActionCode, 'DownpaymentPctLead', TextDownpaymentPctLead);
+        Captions.AddActionCaption(ActionCode, 'DownpaymentPctTitle', TextDownpaymentPctTitle);
+        Captions.AddActionCaption(ActionCode, 'DownpaymentPctLead', TextDownpaymentPctLead);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         DownpaymentPct: Decimal;
@@ -94,12 +93,12 @@ codeunit 6150868 "POS Action - Layaway Create"
         Success: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
         Handled := true;
 
         POSSession.RequestRefreshData();
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
         DownpaymentPct := GetDownpaymentPct(JSON);
         CreationFeeItemNo := JSON.GetStringParameter('CreationFeeItemNo', true);
         ReserveItems := JSON.GetBooleanParameter('ReserveItems', true);
@@ -108,11 +107,11 @@ codeunit 6150868 "POS Action - Layaway Create"
         PrepaymentPaymentTerms := JSON.GetStringParameter('PrepaymentPaymentTerms', true);
 
         if Instalments < 1 then
-          Error(ErrorNoInstalments);
+            Error(ErrorNoInstalments);
 
         POSSession.GetSaleLine(POSSaleLine);
         if POSSaleLine.IsEmpty() then
-          Error(ErrorNoSaleLines);
+            Error(ErrorNoSaleLines);
 
         PaymentTerms.Get(PrepaymentPaymentTerms);
         PaymentTerms.TestField("Due Date Calculation");
@@ -120,37 +119,38 @@ codeunit 6150868 "POS Action - Layaway Create"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         if not SelectCustomer(SalePOS) then
-          SalePOS.TestField("Customer No.");
+            SalePOS.TestField("Customer No.");
         POSSale.RefreshCurrent();
 
         InsertCreationFeeItem(POSSession, CreationFeeItemNo);
         ExportToOrderAndEndSale(SalesHeader, POSSession, ReserveItems, OrderPaymentTerms);
 
         Commit;
-        asserterror begin
-          DownpaymentInvoiceNo := CreateAndPostDownpaymentInvoice(SalesHeader, DownpaymentPct, PrepaymentPaymentTerms);
-          CreateAndPostLayawayInvoices(SalesHeader, Instalments, PrepaymentPaymentTerms, DownpaymentPct);
+        asserterror
+        begin
+            DownpaymentInvoiceNo := CreateAndPostDownpaymentInvoice(SalesHeader, DownpaymentPct, PrepaymentPaymentTerms);
+            CreateAndPostLayawayInvoices(SalesHeader, Instalments, PrepaymentPaymentTerms, DownpaymentPct);
 
-          Commit;
-          Success := true;
-          Error('');
+            Commit;
+            Success := true;
+            Error('');
         end;
         if not Success then
-          Message(ErrorLayaway, GetLastErrorText);
+            Message(ErrorLayaway, GetLastErrorText);
 
         StartNewSale(POSSession, DownpaymentInvoiceNo);
 
         POSSession.RequestRefreshData();
     end;
 
-    local procedure InsertCreationFeeItem(var POSSession: Codeunit "POS Session";CreationFeeItemNo: Text)
+    local procedure InsertCreationFeeItem(var POSSession: Codeunit "POS Session"; CreationFeeItemNo: Text)
     var
         Item: Record Item;
         POSSaleLine: Codeunit "POS Sale Line";
         SaleLinePOS: Record "Sale Line POS";
     begin
         if CreationFeeItemNo = '' then
-          exit;
+            exit;
 
         Item.Get(CreationFeeItemNo);
         Item.TestField(Type, Item.Type::Service);
@@ -163,7 +163,7 @@ codeunit 6150868 "POS Action - Layaway Create"
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
     end;
 
-    local procedure ExportToOrderAndEndSale(var SalesHeaderOut: Record "Sales Header";POSSession: Codeunit "POS Session";ReserveItems: Boolean;OrderPaymentTerms: Text)
+    local procedure ExportToOrderAndEndSale(var SalesHeaderOut: Record "Sales Header"; POSSession: Codeunit "POS Session"; ReserveItems: Boolean; OrderPaymentTerms: Text)
     var
         RetailSalesDocMgt: Codeunit "Retail Sales Doc. Mgt.";
         POSSale: Codeunit "POS Sale";
@@ -196,11 +196,15 @@ codeunit 6150868 "POS Action - Layaway Create"
         RetailSalesDocMgt.SetOpenSalesDocAfterExport(false);
         RetailSalesDocMgt.SetWriteInAuditRoll(true);
 
+        // TODO: CTRLUPGRADE - Invokes function that involves Event Marshaller
+        Error('CTRLUPGRADE');
+        /*
         RetailSalesDocMgt.ProcessPOSSale(SalePOS);
+        */
         RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeaderOut);
     end;
 
-    local procedure CreateAndPostDownpaymentInvoice(var SalesHeader: Record "Sales Header";DownpaymentPct: Decimal;PrepaymentPaymentTerms: Text): Text
+    local procedure CreateAndPostDownpaymentInvoice(var SalesHeader: Record "Sales Header"; DownpaymentPct: Decimal; PrepaymentPaymentTerms: Text): Text
     var
         SalesLine: Record "Sales Line";
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
@@ -211,7 +215,7 @@ codeunit 6150868 "POS Action - Layaway Create"
         SalesHeader.Modify(true);
 
         if DownpaymentPct <= 0 then
-          exit('');
+            exit('');
 
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
@@ -219,11 +223,11 @@ codeunit 6150868 "POS Action - Layaway Create"
         SalesLine.SetFilter("No.", '<>%1', '');
 
         if not SalesLine.FindSet(true) then
-          exit('');
+            exit('');
 
         repeat
-          SalesLine.Validate("Prepayment %", DownpaymentPct);
-          SalesLine.Modify(true);
+            SalesLine.Validate("Prepayment %", DownpaymentPct);
+            SalesLine.Modify(true);
         until SalesLine.Next = 0;
 
         SalesPostPrepayments.Invoice(SalesHeader);
@@ -232,7 +236,7 @@ codeunit 6150868 "POS Action - Layaway Create"
         exit(SalesHeader."Last Prepayment No.");
     end;
 
-    local procedure CreateAndPostLayawayInvoices(var SalesHeader: Record "Sales Header";Instalments: Integer;PrepaymentPaymentTerms: Text;DownpaymentPct: Decimal)
+    local procedure CreateAndPostLayawayInvoices(var SalesHeader: Record "Sales Header"; Instalments: Integer; PrepaymentPaymentTerms: Text; DownpaymentPct: Decimal)
     var
         InstalmentPct: Decimal;
         SalesLine: Record "Sales Line";
@@ -244,75 +248,77 @@ codeunit 6150868 "POS Action - Layaway Create"
         SalesHeader.Validate("Prepmt. Payment Terms Code", PrepaymentPaymentTerms);
         SalesHeader.Modify(true);
 
-        InstalmentPct := (100-DownpaymentPct) / Instalments;
+        InstalmentPct := (100 - DownpaymentPct) / Instalments;
         PaymentTerms.Get(PrepaymentPaymentTerms);
 
         for i := 1 to Instalments do begin
-          if i > 1 then begin
-            SalesHeader.Validate("Prepayment Due Date", CalcDate(PaymentTerms."Due Date Calculation",SalesHeader."Prepayment Due Date"));
-            SalesHeader.Modify(true);
-          end;
-          AppendPrepaymentPctAndPostPrepaymentInvoice(SalesHeader, InstalmentPct, (i=Instalments));
+            if i > 1 then begin
+                SalesHeader.Validate("Prepayment Due Date", CalcDate(PaymentTerms."Due Date Calculation", SalesHeader."Prepayment Due Date"));
+                SalesHeader.Modify(true);
+            end;
+            AppendPrepaymentPctAndPostPrepaymentInvoice(SalesHeader, InstalmentPct, (i = Instalments));
         end;
     end;
 
-    local procedure StartNewSale(POSSession: Codeunit "POS Session";DownpaymentInvoiceNo: Text)
+    local procedure StartNewSale(POSSession: Codeunit "POS Session"; DownpaymentInvoiceNo: Text)
     var
         POSSale: Codeunit "POS Sale";
     begin
         POSSession.GetSale(POSSale);
 
         if DownpaymentInvoiceNo <> '' then begin
-          //End sale, auto start new sale and insert downpayment line.
-          POSSession.StartTransaction();
-          POSSession.ChangeViewSale();
-          HandleDownpayment(POSSession, DownpaymentInvoiceNo);
+            //End sale, auto start new sale and insert downpayment line.
+            POSSession.StartTransaction();
+            POSSession.ChangeViewSale();
+            HandleDownpayment(POSSession, DownpaymentInvoiceNo);
         end else
-          //End sale
-          POSSale.SelectViewForEndOfSale(POSSession)
+            //End sale
+            POSSale.SelectViewForEndOfSale(POSSession)
     end;
 
-    local procedure HandleDownpayment(var POSSession: Codeunit "POS Session";DownpaymentInvoiceNo: Text)
+    local procedure HandleDownpayment(var POSSession: Codeunit "POS Session"; DownpaymentInvoiceNo: Text)
     var
         POSApplyCustomerEntries: Codeunit "POS Apply Customer Entries";
         Success: Boolean;
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
         Commit;
-        asserterror begin
-          POSApplyCustomerEntries.BalanceDocument(POSSession, CustLedgerEntry."Document Type"::Invoice, DownpaymentInvoiceNo, true);
-          Commit;
-          Success := true;
-          Error('');
+        asserterror
+        begin
+            POSApplyCustomerEntries.BalanceDocument(POSSession, CustLedgerEntry."Document Type"::Invoice, DownpaymentInvoiceNo, true);
+            Commit;
+            Success := true;
+            Error('');
         end;
 
         if not Success then
-          Message(ErrorDownpayment,GetLastErrorText);
+            Message(ErrorDownpayment, GetLastErrorText);
     end;
 
-    local procedure AppendPrepaymentPctAndPostPrepaymentInvoice(SalesHeader: Record "Sales Header";PrepaymentPct: Decimal;FullPrepayment: Boolean): Text
+    local procedure AppendPrepaymentPctAndPostPrepaymentInvoice(SalesHeader: Record "Sales Header"; PrepaymentPct: Decimal; FullPrepayment: Boolean): Text
     var
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
         RetailSalesDocMgt: Codeunit "Retail Sales Doc. Mgt.";
         SalesLine: Record "Sales Line";
     begin
         if FullPrepayment then begin
-          SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-          SalesLine.SetRange("Document No.", SalesHeader."No.");
-          SalesLine.SetRange(Type, SalesLine.Type::Item);
-          SalesLine.SetFilter("No.", '<>%1', '');
-          if SalesLine.FindSet(true) then repeat
-            SalesLine.Validate("Prepayment %", 100);
-            SalesLine.Modify(true);
-          until SalesLine.Next = 0;
+            SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+            SalesLine.SetRange("Document No.", SalesHeader."No.");
+            SalesLine.SetRange(Type, SalesLine.Type::Item);
+            SalesLine.SetFilter("No.", '<>%1', '');
+            if SalesLine.FindSet(true) then
+                repeat
+                    SalesLine.Validate("Prepayment %", 100);
+                    SalesLine.Modify(true);
+                until SalesLine.Next = 0;
         end else
-          RetailSalesDocMgt.ApplyPrepaymentPercentageToAllLines(SalesHeader, PrepaymentPct, true);
+            RetailSalesDocMgt.ApplyPrepaymentPercentageToAllLines(SalesHeader, PrepaymentPct, true);
 
         SalesPostPrepayments.Invoice(SalesHeader);
 
         if not FullPrepayment then begin
-          SalesHeader.Validate(Status, SalesHeader.Status::Open);
-          SalesHeader.Modify(true);
+            SalesHeader.Validate(Status, SalesHeader.Status::Open);
+            SalesHeader.Modify(true);
         end;
 
         exit(SalesHeader."Last Prepayment No.");
@@ -323,14 +329,14 @@ codeunit 6150868 "POS Action - Layaway Create"
         Customer: Record Customer;
     begin
         if SalePOS."Customer No." <> '' then begin
-          SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
-          Customer.Get(SalePOS."Customer No.");
-          Customer.TestField("Application Method", Customer."Application Method"::Manual);
-          exit(true);
+            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
+            Customer.Get(SalePOS."Customer No.");
+            Customer.TestField("Application Method", Customer."Application Method"::Manual);
+            exit(true);
         end;
 
         if PAGE.RunModal(0, Customer) <> ACTION::LookupOK then
-          exit(false);
+            exit(false);
 
         SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", Customer."No.");
@@ -344,90 +350,104 @@ codeunit 6150868 "POS Action - Layaway Create"
     local procedure GetDownpaymentPct(var JSON: Codeunit "POS JSON Management"): Decimal
     begin
         if JSON.GetBooleanParameter('PromptDownpayment', true) then
-          exit(GetNumpad(JSON, 'DownpaymentPrompt'))
+            exit(GetNumpad(JSON, 'DownpaymentPrompt'))
         else
-          exit(JSON.GetDecimalParameter('DownpaymentPercent', true));
+            exit(JSON.GetDecimalParameter('DownpaymentPercent', true));
     end;
 
-    local procedure GetNumpad(JSON: Codeunit "POS JSON Management";Path: Text): Decimal
+    local procedure GetNumpad(JSON: Codeunit "POS JSON Management"; Path: Text): Decimal
     begin
-        JSON.SetScope ('/', true);
-        if (not JSON.SetScope ('$'+Path, false)) then
-          exit (0);
+        JSON.SetScope('/', true);
+        if (not JSON.SetScope('$' + Path, false)) then
+            exit(0);
 
-        exit (JSON.GetDecimal ('numpad', true));
+        exit(JSON.GetDecimal('numpad', true));
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
-    procedure OnGetParameterNameCaption(POSParameterValue: Record "POS Parameter Value";var Caption: Text)
+    procedure OnGetParameterNameCaption(POSParameterValue: Record "POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode then
-          exit;
+            exit;
 
         case POSParameterValue.Name of
-          'PromptDownpayment' : Caption := CaptionPromptDownpayment;
-          'DownpaymentPercent' : Caption := CaptionDownpayPct;
-          'CreationFeeItemNo' : Caption := CaptionCreationFeeItem;
-          'ReserveItems' : Caption := CaptionReserveItems;
-          'Instalments' : Caption := CaptionInstalments;
-          'OrderPaymentTerms' : Caption := CaptionOrderPaymentTerms;
-          'PrepaymentPaymentTerms' : Caption := CaptionPrepaymentPayTerms;
+            'PromptDownpayment':
+                Caption := CaptionPromptDownpayment;
+            'DownpaymentPercent':
+                Caption := CaptionDownpayPct;
+            'CreationFeeItemNo':
+                Caption := CaptionCreationFeeItem;
+            'ReserveItems':
+                Caption := CaptionReserveItems;
+            'Instalments':
+                Caption := CaptionInstalments;
+            'OrderPaymentTerms':
+                Caption := CaptionOrderPaymentTerms;
+            'PrepaymentPaymentTerms':
+                Caption := CaptionPrepaymentPayTerms;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
-    procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "POS Parameter Value";var Caption: Text)
+    procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode then
-          exit;
+            exit;
 
         case POSParameterValue.Name of
-          'PromptDownpayment' : Caption := DescPromptDownpayment;
-          'DownpaymentPercent' : Caption := DescDownpayPct;
-          'CreationFeeItemNo' : Caption := DescCreationFeeItem;
-          'ReserveItems' : Caption := DescReserveItems;
-          'Instalments' : Caption := DescInstalments;
-          'OrderPaymentTerms' : Caption := DescOrderPaymentTerms;
-          'PrepaymentPaymentTerms' : Caption := DescPrepayPaymentTerms;
+            'PromptDownpayment':
+                Caption := DescPromptDownpayment;
+            'DownpaymentPercent':
+                Caption := DescDownpayPct;
+            'CreationFeeItemNo':
+                Caption := DescCreationFeeItem;
+            'ReserveItems':
+                Caption := DescReserveItems;
+            'Instalments':
+                Caption := DescInstalments;
+            'OrderPaymentTerms':
+                Caption := DescOrderPaymentTerms;
+            'PrepaymentPaymentTerms':
+                Caption := DescPrepayPaymentTerms;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
-    procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "POS Parameter Value";var Caption: Text)
+    procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode then
-          exit;
+            exit;
 
         case POSParameterValue.Name of
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', false, false)]
-    local procedure OnLookupParameter(var POSParameterValue: Record "POS Parameter Value";Handled: Boolean)
+    local procedure OnLookupParameter(var POSParameterValue: Record "POS Parameter Value"; Handled: Boolean)
     var
         Item: Record Item;
         PaymentTerms: Record "Payment Terms";
     begin
         if POSParameterValue."Action Code" <> ActionCode then
-          exit;
+            exit;
 
         case POSParameterValue.Name of
-          'CreationFeeItemNo' :
-            begin
-              Item.SetRange(Type, Item.Type::Service);
-              if PAGE.RunModal(0, Item) = ACTION::LookupOK then
-                POSParameterValue.Value := Item."No.";
-            end;
-          'OrderPaymentTerms' :
-            begin
-              if PAGE.RunModal(0, PaymentTerms) = ACTION::LookupOK then
-                POSParameterValue.Value := PaymentTerms.Code;
-            end;
-          'PrepaymentPaymentTerms' :
-            begin
-              if PAGE.RunModal(0, PaymentTerms) = ACTION::LookupOK then
-                POSParameterValue.Value := PaymentTerms.Code;
-            end;
+            'CreationFeeItemNo':
+                begin
+                    Item.SetRange(Type, Item.Type::Service);
+                    if PAGE.RunModal(0, Item) = ACTION::LookupOK then
+                        POSParameterValue.Value := Item."No.";
+                end;
+            'OrderPaymentTerms':
+                begin
+                    if PAGE.RunModal(0, PaymentTerms) = ACTION::LookupOK then
+                        POSParameterValue.Value := PaymentTerms.Code;
+                end;
+            'PrepaymentPaymentTerms':
+                begin
+                    if PAGE.RunModal(0, PaymentTerms) = ACTION::LookupOK then
+                        POSParameterValue.Value := PaymentTerms.Code;
+                end;
         end;
     end;
 
@@ -438,28 +458,28 @@ codeunit 6150868 "POS Action - Layaway Create"
         PaymentTerms: Record "Payment Terms";
     begin
         if POSParameterValue."Action Code" <> ActionCode then
-          exit;
+            exit;
 
         case POSParameterValue.Name of
-          'CreationFeeItemNo' :
-            begin
-              if POSParameterValue.Value = '' then
-                exit;
-              Item.Get(POSParameterValue.Value);
-              Item.TestField(Type, Item.Type::Service);
-            end;
-          'OrderPaymentTerms' :
-            begin
-              if POSParameterValue.Value = '' then
-                exit;
-              PaymentTerms.Get(POSParameterValue.Value);
-            end;
-          'PrepaymentPaymentTerms' :
-            begin
-              if POSParameterValue.Value = '' then
-                exit;
-              PaymentTerms.Get(POSParameterValue.Value);
-            end;
+            'CreationFeeItemNo':
+                begin
+                    if POSParameterValue.Value = '' then
+                        exit;
+                    Item.Get(POSParameterValue.Value);
+                    Item.TestField(Type, Item.Type::Service);
+                end;
+            'OrderPaymentTerms':
+                begin
+                    if POSParameterValue.Value = '' then
+                        exit;
+                    PaymentTerms.Get(POSParameterValue.Value);
+                end;
+            'PrepaymentPaymentTerms':
+                begin
+                    if POSParameterValue.Value = '' then
+                        exit;
+                    PaymentTerms.Get(POSParameterValue.Value);
+                end;
         end;
     end;
 }

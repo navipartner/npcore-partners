@@ -163,7 +163,7 @@ page 6059812 "Retail Activities"
 
     local procedure SetSize(Width: Text; Height: Text)
     var
-        SetSizeRequest: DotNet npNetDictionary_Of_T_U;
+        SetSizeRequest: JsonObject;
     begin
         //-NPR5.40 [308907]
         InitializeRequest('SetSize', SetSizeRequest);
@@ -175,15 +175,14 @@ page 6059812 "Retail Activities"
         //+NPR5.40 [308907]
     end;
 
-    local procedure InitializeRequest(Method: Text; var Request: DotNet npNetDictionary_Of_T_U)
+    local procedure InitializeRequest(Method: Text; var Request: JsonObject)
     begin
         //-NPR5.40 [308907]
-        Request := Request.Dictionary();
         Request.Add('Method', Method);
         //-NPR5.40 [308907]
     end;
 
-    local procedure InvokeFrontEndAsync(Request: DotNet npNetDictionary_Of_T_U)
+    local procedure InvokeFrontEndAsync(Request: JsonObject)
     begin
         //-NPR5.40 [308907]
         CurrPage.Bridge.InvokeFrontEndAsync(Request);
@@ -192,7 +191,7 @@ page 6059812 "Retail Activities"
 
     local procedure RegisterGeoLocationScript()
     var
-        RegisterModuleRequest: DotNet npNetDictionary_Of_T_U;
+        RegisterModuleRequest: JsonObject;
         ScriptString: Text;
     begin
         //-NPR5.40 [308907]
@@ -225,7 +224,7 @@ page 6059812 "Retail Activities"
         //+NPR5.40 [308907]
     end;
 
-    local procedure InvokeMethod(Method: Text; EventContent: DotNet npNetObject)
+    local procedure InvokeMethod(Method: Text; EventContent: JsonObject)
     begin
         //-NPR5.40 [308907]
         case Method of
@@ -237,12 +236,12 @@ page 6059812 "Retail Activities"
         //+NPR5.40 [308907]
     end;
 
-    local procedure Method_RequestModule(EventContent: DotNet npNetObject)
+    local procedure Method_RequestModule(EventContent: JsonObject)
     var
         Web: Record "Web Client Dependency";
         JSON: Codeunit "POS JSON Management";
         FrontEnd: Codeunit "POS Front End Management";
-        RegisterModuleRequest: DotNet npNetDictionary_Of_T_U;
+        RegisterModuleRequest: JsonObject;
         Module: Text;
         Script: Text;
     begin
@@ -261,12 +260,14 @@ page 6059812 "Retail Activities"
         //+NPR5.40 [308907]
     end;
 
-    local procedure Method_GeoLocationMethod(EventContent: DotNet npNetObject)
+    local procedure Method_GeoLocationMethod(EventContent: JsonObject)
     var
         POSGeolocation: Codeunit "POS Geolocation";
+        JsonText: Text;
     begin
         //-NPR5.40 [308907]
-        POSGeolocation.TrackGeoLocationByIP(EventContent.ToString());
+        EventContent.WriteTo(JsonText);
+        POSGeolocation.TrackGeoLocationByIP(JsonText);
         //+NPR5.40 [308907]
     end;
 }

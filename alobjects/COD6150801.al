@@ -69,7 +69,7 @@ codeunit 6150801 "POS Action - Customer"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         POSSale: Codeunit "POS Sale";
@@ -482,8 +482,12 @@ codeunit 6150801 "POS Action - Customer"
     var
         RetailSalesDocMgt: Codeunit "Retail Sales Doc. Mgt.";
     begin
+        // TODO: CTRLUPGRADE - invokes an obsolete function that involves Event Marshaller
+        Error('CTRLUPGRADE');
+        /*
         if not RetailSalesDocMgt.ProcessPOSSale(SalePOS) then
             exit(false);
+        */
         exit(true);
     end;
 }

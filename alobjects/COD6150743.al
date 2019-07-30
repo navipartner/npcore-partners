@@ -80,7 +80,7 @@ codeunit 6150743 "POS Geolocation"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
-    local procedure OnCustomMethod(Method: Text; Context: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
+    local procedure OnCustomMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         ClientDiagnosticsDataMgt: Codeunit "Client Diagnostics Data Mgt.";
         JSON: Codeunit "POS JSON Management";
@@ -130,7 +130,7 @@ codeunit 6150743 "POS Geolocation"
         AFHelperFunctions: Codeunit "AF Helper Functions";
         HttpResponseMessage: DotNet npNetHttpResponseMessage;
         Path: Text;
-        JObject: DotNet JObject;
+        JObject: JsonObject;
         JToken: DotNet JToken;
         JTokenWriter: DotNet npNetJTokenWriter;
         StringContent: DotNet npNetStringContent;
@@ -177,7 +177,7 @@ codeunit 6150743 "POS Geolocation"
         //+NPR5.40 [308907]
     end;
 
-    local procedure GetJsonValueAsDecimal(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Decimal
+    local procedure GetJsonValueAsDecimal(JObject: JsonObject; PropertyName: Text) ReturnValue: Decimal
     var
         DotNetDecimal: DotNet npNetDecimal;
         CultureInfo: DotNet npNetCultureInfo;

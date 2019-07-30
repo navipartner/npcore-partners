@@ -530,6 +530,8 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         Success: Boolean;
     */
     begin
+        // TODO: CTRLUPGRADE - invokes a function that involves Event Marshaller
+        ERROR('CTRLUPGRADE');
         /*
           if not Customer.Get(SalePOS."Customer No.") then
               exit;

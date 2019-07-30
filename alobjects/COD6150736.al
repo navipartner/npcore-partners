@@ -21,7 +21,7 @@ codeunit 6150736 "POS Secure Method Server-side"
         Text008: Label 'Retail Setup Admin Password.';
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
-    local procedure OnCustomMethod_SecureMethod(Method: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnCustomMethod_SecureMethod(Method: Text;Context: JsonObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         SecureMethod: Text;

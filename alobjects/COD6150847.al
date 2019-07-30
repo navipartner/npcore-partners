@@ -28,29 +28,29 @@ codeunit 6150847 "POS Action - Run Page (Item)"
         SaleLinePOS: Record "Sale Line POS";
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Type::Generic,
-            "Subscriber Instances Allowed"::Multiple)
-          then begin
-            RegisterWorkflowStep('run_page_item','respond();');
-            RegisterWorkflow(false);
-            RegisterDataSourceBinding('BUILTIN_SALELINE');
-            RegisterCustomJavaScriptLogic('enable','return row.getField(' + Format(SaleLinePOS.FieldNo(Type)) + ').rawValue == 1;');
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Type::Generic,
+              "Subscriber Instances Allowed"::Multiple)
+            then begin
+                RegisterWorkflowStep('run_page_item', 'respond();');
+                RegisterWorkflow(false);
+                RegisterDataSourceBinding('BUILTIN_SALELINE');
+                RegisterCustomJavaScriptLogic('enable', 'return row.getField(' + Format(SaleLinePOS.FieldNo(Type)) + ').rawValue == 1;');
 
-            RegisterIntegerParameter ('PageId',PAGE::"Item Availability by Location");
-          end;
+                RegisterIntegerParameter('PageId', PAGE::"Item Availability by Location");
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action"; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         Handled := true;
     end;
@@ -61,77 +61,77 @@ codeunit 6150847 "POS Action - Run Page (Item)"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        JSON.SetScope('parameters',true);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        JSON.SetScope('parameters', true);
 
         case WorkflowStep of
-          'run_page_item':
-            begin
-              Handled := true;
-              OnActionRunPageItem(POSSession,JSON);
-            end;
+            'run_page_item':
+                begin
+                    Handled := true;
+                    OnActionRunPageItem(POSSession, JSON);
+                end;
         end;
     end;
 
-    local procedure OnActionRunPageItem(POSSession: Codeunit "POS Session";JSON: Codeunit "POS JSON Management")
+    local procedure OnActionRunPageItem(POSSession: Codeunit "POS Session"; JSON: Codeunit "POS JSON Management")
     var
         Item: Record Item;
         SaleLinePOS: Record "Sale Line POS";
         POSSaleLine: Codeunit "POS Sale Line";
         PageId: Integer;
     begin
-        PageId := JSON.GetInteger('PageId',true);
+        PageId := JSON.GetInteger('PageId', true);
         if PageId = 0 then
-          exit;
+            exit;
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        SaleLinePOS.TestField(Type,SaleLinePOS.Type::Item);
+        SaleLinePOS.TestField(Type, SaleLinePOS.Type::Item);
         Item.Get(SaleLinePOS."No.");
-        Item.SetFilter("Variant Filter",Item."Variant Filter");
+        Item.SetFilter("Variant Filter", Item."Variant Filter");
 
-        RunPage(Item,PageId);
+        RunPage(Item, PageId);
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', true, true)]
-    local procedure OnLookupPageId(var POSParameterValue: Record "POS Parameter Value";Handled: Boolean)
+    local procedure OnLookupPageId(var POSParameterValue: Record "POS Parameter Value"; Handled: Boolean)
     var
         NpmPage: Record "Npm Page";
         NpmMetadataMgt: Codeunit "Npm Metadata Mgt.";
     begin
         if POSParameterValue."Action Code" <> ActionCode() then
-          exit;
+            exit;
         if POSParameterValue.Name <> 'PageId' then
-          exit;
+            exit;
         if POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Integer then
-          exit;
+            exit;
 
         Handled := true;
 
         if NpmPage.IsEmpty then
-          NpmMetadataMgt.LoadNpmPages();
-        NpmPage.SetRange("Source Table No.",DATABASE::Item);
-        if PAGE.RunModal(0,NpmPage) = ACTION::LookupOK then
-          POSParameterValue.Value := Format(NpmPage."Page ID");
+            NpmMetadataMgt.LoadNpmPages();
+        NpmPage.SetRange("Source Table No.", DATABASE::Item);
+        if PAGE.RunModal(0, NpmPage) = ACTION::LookupOK then
+            POSParameterValue.Value := Format(NpmPage."Page ID");
     end;
 
     local procedure "-- Locals --"()
     begin
     end;
 
-    local procedure RunPage(var Item: Record Item;PageId: Integer)
+    local procedure RunPage(var Item: Record Item; PageId: Integer)
     begin
         if PageId = 0 then
-          exit;
+            exit;
 
-        PAGE.RunModal(PageId,Item);
+        PAGE.RunModal(PageId, Item);
     end;
 }
 
