@@ -13,7 +13,7 @@ page 6060078 "MM Membership Kiosk"
     {
         area(content)
         {
-            usercontrol(Bridge; "NaviPartner.Retail.Controls.Bridge")
+            usercontrol(Bridge; Bridge)
             {
 
                 trigger OnFrameworkReady()
@@ -197,7 +197,7 @@ page 6060078 "MM Membership Kiosk"
     begin
     end;
 
-    local procedure GetJToken(JObject: DotNet JObject;"Key": Text;var JToken: DotNet JToken) KeyFound: Boolean
+    local procedure GetJToken(JObject: DotNet JObject; "Key": Text; var JToken: DotNet JToken) KeyFound: Boolean
     begin
 
         KeyFound := true;
@@ -210,7 +210,7 @@ page 6060078 "MM Membership Kiosk"
         exit(KeyFound);
     end;
 
-    local procedure CopyKeyValue(SourceJObject: DotNet JObject;SourceKey: Text;TargetJObject: DotNet JObject;TargetKey: Text) KeyFound: Boolean
+    local procedure CopyKeyValue(SourceJObject: DotNet JObject; SourceKey: Text; TargetJObject: DotNet JObject; TargetKey: Text) KeyFound: Boolean
     var
         SourceJToken: DotNet JToken;
     begin
@@ -224,7 +224,7 @@ page 6060078 "MM Membership Kiosk"
         exit(KeyFound);
     end;
 
-    local procedure GetStringValue(JObject: DotNet JObject;"Key": Text): Text
+    local procedure GetStringValue(JObject: DotNet JObject; "Key": Text): Text
     var
         JToken: DotNet JToken;
     begin
@@ -236,7 +236,7 @@ page 6060078 "MM Membership Kiosk"
         exit(JToken.ToString());
     end;
 
-    local procedure GetDateValue(JObject: DotNet JObject;"Key": Text;DateMask: Code[20];IsOptional: Boolean) ReturnDate: Date
+    local procedure GetDateValue(JObject: DotNet JObject; "Key": Text; DateMask: Code[20]; IsOptional: Boolean) ReturnDate: Date
     var
         ErrorMessage: Text;
     begin
@@ -281,7 +281,7 @@ page 6060078 "MM Membership Kiosk"
         exit(IsValid);
     end;
 
-    local procedure PutStringValue(var JObject: DotNet JObject;"Key": Text;Value: Text)
+    local procedure PutStringValue(var JObject: DotNet JObject; "Key": Text; Value: Text)
     var
         JToken: DotNet JToken;
     begin
@@ -291,7 +291,7 @@ page 6060078 "MM Membership Kiosk"
         JObject.Add(Key, JToken.Item(Key));
     end;
 
-    local procedure ShowErrorMessage(var JObject: DotNet JObject;ErrorMessage: Text): Integer
+    local procedure ShowErrorMessage(var JObject: DotNet JObject; ErrorMessage: Text): Integer
     var
         "Key": Text;
     begin

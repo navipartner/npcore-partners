@@ -9,7 +9,7 @@ page 6014548 "POS Accessory AddOn Selection"
     {
         area(content)
         {
-            usercontrol(Bridge;"NaviPartner.Retail.Controls.Bridge")
+            usercontrol(Bridge; Bridge)
             {
 
                 trigger OnFrameworkReady()
@@ -22,19 +22,19 @@ page 6014548 "POS Accessory AddOn Selection"
                     Html := InitHtml();
                     Script := InitScript();
                     BridgeMgt.Initialize(CurrPage.Bridge);
-                    BridgeMgt.RegisterAdHocModule('AccessoryAddOn',Html,Css,Script);
-                    BridgeMgt.SetSize('100%','600px');
+                    BridgeMgt.RegisterAdHocModule('AccessoryAddOn', Html, Css, Script);
+                    BridgeMgt.SetSize('100%', '600px');
                 end;
 
-                trigger OnInvokeMethod(method: Text;eventContent: Variant)
+                trigger OnInvokeMethod(method: Text; eventContent: Variant)
                 var
                     JObjectIn: DotNet npNetJObject;
                 begin
                     case method of
-                      'ApproveItemAddOns':
-                        ApproveItemAddOns(Format(eventContent));
-                      'CancelItemAddOns':
-                        CancelItemAddOns();
+                        'ApproveItemAddOns':
+                            ApproveItemAddOns(Format(eventContent));
+                        'CancelItemAddOns':
+                            CancelItemAddOns();
                     end;
                 end;
             }
@@ -159,12 +159,12 @@ page 6014548 "POS Accessory AddOn Selection"
             '<div id="itemAddOns">' +
               '<h2>Burger Menu</h2>' +
               '<ul id="options">' +
-                InitHtmlOption('10000','Ekstra Bof (10kr)') +
-                InitHtmlOption('20000','Ost (5kr)') +
-                InitHtmlOption('30000','Bacon (5kr)') +
-                InitHtmlOption('40000','Ingen tomat') +
-                InitHtmlOption('50000','Ingen agurk') +
-               InitHtmlOption('60000','Test') +
+                InitHtmlOption('10000', 'Ekstra Bof (10kr)') +
+                InitHtmlOption('20000', 'Ost (5kr)') +
+                InitHtmlOption('30000', 'Bacon (5kr)') +
+                InitHtmlOption('40000', 'Ingen tomat') +
+                InitHtmlOption('50000', 'Ingen agurk') +
+               InitHtmlOption('60000', 'Test') +
               '</ul>' +
               '<div id="buttons-set">' +
                 '<button onclick="cancelItemAddOn()">' +
@@ -180,7 +180,7 @@ page 6014548 "POS Accessory AddOn Selection"
         exit(Html);
     end;
 
-    local procedure InitHtmlOption(AddOnId: Text;AddOnName: Text) Html: Text
+    local procedure InitHtmlOption(AddOnId: Text; AddOnName: Text) Html: Text
     begin
         Html :=
         '<li id="' + AddOnId + '">' +
