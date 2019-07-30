@@ -25,7 +25,7 @@ codeunit 6150837 "POS Action - Boarding Pass"
 
     local procedure ActionCode(): Text
     begin
-        exit ('BOARDINGPASS');
+        exit('BOARDINGPASS');
     end;
 
     local procedure ActionVersion(): Text
@@ -33,68 +33,68 @@ codeunit 6150837 "POS Action - Boarding Pass"
         //-NPR5.49 [344084]
         exit('1.1');
         //+NPR5.49 [344084]
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
-            //-NPR5.49 [344084]
-            Sender.RegisterWorkflowStep(
-              'boardingpass_input',
-                'if(!param.BoardingPassString) {' +
-                '  input({title: labels.BoardingPass,caption: labels.BoardingPass,value: param.BoardingPassString,notBlank: true}).cancel(abort);' +
-                '} else {' +
-                '  context.$boardingpass_input = {"input": param.BoardingPassString};' +
-                '};');
-            //+NPR5.49 [344084]
-            RegisterWorkflowStep('process', 'respond()');
+            if DiscoverAction(
+              ActionCode(),
+              ActionDescription,
+              ActionVersion(),
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
+                //-NPR5.49 [344084]
+                Sender.RegisterWorkflowStep(
+                  'boardingpass_input',
+                    'if(!param.BoardingPassString) {' +
+                    '  input({title: labels.BoardingPass,caption: labels.BoardingPass,value: param.BoardingPassString,notBlank: true}).cancel(abort);' +
+                    '} else {' +
+                    '  context.$boardingpass_input = {"input": param.BoardingPassString};' +
+                    '};');
+                //+NPR5.49 [344084]
+                RegisterWorkflowStep('process', 'respond()');
 
-            RegisterWorkflow(false);
-            //-NPR5.49 [344084]
-            //RegisterDataBinding();
-            //+NPR5.49 [344084]
-            RegisterTextParameter('BoardingPassString', '');
-            RegisterBooleanParameter('RequiredTravelToday', true);
-            RegisterTextParameter('RequiredLegAirPortCode', '');
-            RegisterBooleanParameter('ShowTripMessage', true);
-            RegisterTextParameter('InfoCode', '');
-          end;
+                RegisterWorkflow(false);
+                //-NPR5.49 [344084]
+                //RegisterDataBinding();
+                //+NPR5.49 [344084]
+                RegisterTextParameter('BoardingPassString', '');
+                RegisterBooleanParameter('RequiredTravelToday', true);
+                RegisterTextParameter('RequiredLegAirPortCode', '');
+                RegisterBooleanParameter('ShowTripMessage', true);
+                RegisterTextParameter('InfoCode', '');
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "POS Caption Management")
     begin
         //-NPR5.49 [344084]
-        Captions.AddActionCaption(ActionCode(),'BoardingPass',Text001);
+        Captions.AddActionCaption(ActionCode(), 'BoardingPass', Text001);
         //+NPR5.49 [344084]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', true, true)]
-    local procedure OnLookupParameterPosInfo(var POSParameterValue: Record "POS Parameter Value";Handled: Boolean)
+    local procedure OnLookupParameterPosInfo(var POSParameterValue: Record "POS Parameter Value"; Handled: Boolean)
     var
         POSInfo: Record "POS Info";
     begin
         //-NPR5.49 [344084]
         if POSParameterValue."Action Code" <> ActionCode() then
-          exit;
+            exit;
         if POSParameterValue.Name <> 'InfoCode' then
-          exit;
+            exit;
         if POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text then
-          exit;
+            exit;
 
-        POSInfo.SetRange("Input Type",POSInfo."Input Type"::Text);
-        POSInfo.SetRange(Type,POSInfo.Type::"Request Data");
-        if PAGE.RunModal(0,POSInfo) = ACTION::LookupOK then
-          POSParameterValue.Value := POSInfo.Code;
+        POSInfo.SetRange("Input Type", POSInfo."Input Type"::Text);
+        POSInfo.SetRange(Type, POSInfo.Type::"Request Data");
+        if PAGE.RunModal(0, POSInfo) = ACTION::LookupOK then
+            POSParameterValue.Value := POSInfo.Code;
         //+NPR5.49 [344084]
     end;
 
@@ -105,21 +105,21 @@ codeunit 6150837 "POS Action - Boarding Pass"
     begin
         //-NPR5.49 [344084]
         if POSParameterValue."Action Code" <> ActionCode() then
-          exit;
+            exit;
         if POSParameterValue.Name <> 'InfoCode' then
-          exit;
+            exit;
         if POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text then
-          exit;
+            exit;
         if POSParameterValue.Value = '' then
-          exit;
+            exit;
 
         POSParameterValue.Value := UpperCase(POSParameterValue.Value);
         if not POSInfo.Get(POSParameterValue.Value) then begin
-          POSInfo.SetFilter(Code,'%1',POSParameterValue.Value + '*');
-          POSInfo.SetRange("Input Type",POSInfo."Input Type"::Text);
-          POSInfo.SetRange(Type,POSInfo.Type::"Request Data");
-          if POSInfo.FindFirst then
-            POSParameterValue.Value := POSInfo.Code;
+            POSInfo.SetFilter(Code, '%1', POSParameterValue.Value + '*');
+            POSInfo.SetRange("Input Type", POSInfo."Input Type"::Text);
+            POSInfo.SetRange(Type, POSInfo.Type::"Request Data");
+            if POSInfo.FindFirst then
+                POSParameterValue.Value := POSInfo.Code;
         end;
         POSInfo.Get(POSParameterValue.Value);
         POSInfo.TestField("Input Type", POSInfo."Input Type"::Text);
@@ -128,7 +128,7 @@ codeunit 6150837 "POS Action - Boarding Pass"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         SaleLine: Codeunit "POS Sale Line";
@@ -148,71 +148,70 @@ codeunit 6150837 "POS Action - Boarding Pass"
         POSInfoManagement: Codeunit "POS Info Management";
         POSSale: Codeunit "POS Sale";
         SalePOS: Record "Sale POS";
-        POSEventMarshaller: Codeunit "POS Event Marshaller";
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         //-NPR5.49 [344084]
         Handled := true;
         //+NPR5.49 [344084]
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
         //-NPR5.49 [344084]
         //BoardingPassString := JSON.GetStringParameter('BoardingPassString',TRUE);
-        JSON.SetScope('$boardingpass_input',true);
-        BoardingPassString := JSON.GetString('input',true);
-        JSON.SetScope ('/', true);
+        JSON.SetScope('$boardingpass_input', true);
+        BoardingPassString := JSON.GetString('input', true);
+        JSON.SetScope('/', true);
         //+NPR5.49 [344084]
-        RequiredTravelToday := JSON.GetBooleanParameter('RequiredTravelToday',true);
-        RequiredLegAirPortCode := JSON.GetStringParameter('RequiredLegAirPortCode',true);
-        ShowTripMessage := JSON.GetBooleanParameter('ShowTripMessage',true);
-        InfoCode := JSON.GetStringParameter('InfoCode',true);
+        RequiredTravelToday := JSON.GetBooleanParameter('RequiredTravelToday', true);
+        RequiredLegAirPortCode := JSON.GetStringParameter('RequiredLegAirPortCode', true);
+        ShowTripMessage := JSON.GetBooleanParameter('ShowTripMessage', true);
+        InfoCode := JSON.GetStringParameter('InfoCode', true);
 
         DecodeBoardingPassString(BoardingPassString, RequiredLegAirPortCode, RequiredLegAirPortCodeInTrip, RequiredLegAirPortFlightDate, TravelStartDate, TravelEndDate, TravelDescription, TravelSaveString);
 
         if (RequiredLegAirPortCode <> '') and (not RequiredLegAirPortCodeInTrip) then begin
-          //-NPR5.49 [344084]
-          //POSEventMarshaller.DisplayError(ERR, STRSUBSTNO(ERRAPCODE, RequiredLegAirPortCode, TravelDescription), FALSE);
-          //Handled := TRUE;
-          //EXIT;
-          Error(ERRAPCODE,RequiredLegAirPortCode,TravelDescription);
-          //+NPR5.49 [344084]
+            //-NPR5.49 [344084]
+            //POSEventMarshaller.DisplayError(ERR, STRSUBSTNO(ERRAPCODE, RequiredLegAirPortCode, TravelDescription), FALSE);
+            //Handled := TRUE;
+            //EXIT;
+            Error(ERRAPCODE, RequiredLegAirPortCode, TravelDescription);
+            //+NPR5.49 [344084]
         end;
 
         if (RequiredLegAirPortCode <> '') and (RequiredLegAirPortCodeInTrip) and (RequiredTravelToday) and (RequiredLegAirPortFlightDate <> WorkDate) then begin
-          //+NPR5.49 [344084]
-          //POSEventMarshaller.DisplayError(ERR,STRSUBSTNO(ERRTRAVELDATE, WORKDATE, TravelDescription), FALSE);
-          //Handled := TRUE;
-          //EXIT;
-          Error(ERRTRAVELDATE,WorkDate,TravelDescription);
-          //+NPR5.49 [344084]
+            //+NPR5.49 [344084]
+            //POSEventMarshaller.DisplayError(ERR,STRSUBSTNO(ERRTRAVELDATE, WORKDATE, TravelDescription), FALSE);
+            //Handled := TRUE;
+            //EXIT;
+            Error(ERRTRAVELDATE, WorkDate, TravelDescription);
+            //+NPR5.49 [344084]
         end;
 
-        if RequiredTravelToday and ( (WorkDate < TravelStartDate) or (WorkDate > TravelEndDate) ) then begin
-          //-NPR5.49 [344084]
-          //POSEventMarshaller.DisplayError(ERR,STRSUBSTNO(ERRTRAVELDATE, WORKDATE, TravelDescription), FALSE);
-          //Handled := TRUE;
-          //EXIT;
-          Error(ERRTRAVELDATE,WorkDate,TravelDescription);
-          //+NPR5.49 [344084]
+        if RequiredTravelToday and ((WorkDate < TravelStartDate) or (WorkDate > TravelEndDate)) then begin
+            //-NPR5.49 [344084]
+            //POSEventMarshaller.DisplayError(ERR,STRSUBSTNO(ERRTRAVELDATE, WORKDATE, TravelDescription), FALSE);
+            //Handled := TRUE;
+            //EXIT;
+            Error(ERRTRAVELDATE, WorkDate, TravelDescription);
+            //+NPR5.49 [344084]
         end;
 
 
         if ShowTripMessage then begin
-          //-NPR5.49 [344084]
-          //POSEventMarshaller.DisplayError(TXTBPASS, TravelDescription, FALSE);
-          Message(TravelDescription);
-          //+NPR5.49 [344084]
+            //-NPR5.49 [344084]
+            //POSEventMarshaller.DisplayError(TXTBPASS, TravelDescription, FALSE);
+            Message(TravelDescription);
+            //+NPR5.49 [344084]
         end;
 
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         POSSession.GetSaleLine(SaleLine);
-        SaleLine.GetCurrentSaleLine (SaleLinePOS);
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         if InfoCode <> '' then begin
-          POSInfoManagement.ProcessPOSInfoText(SaleLinePOS, SalePOS, InfoCode, TravelSaveString);
+            POSInfoManagement.ProcessPOSInfoText(SaleLinePOS, SalePOS, InfoCode, TravelSaveString);
         end;
 
         POSSession.RequestRefreshData();
@@ -224,14 +223,14 @@ codeunit 6150837 "POS Action - Boarding Pass"
     begin
     end;
 
-    local procedure DecodeBoardingPassString(iBoardingPassString: Text;iRequiredFromAirPortCode: Text;var oRequiredFromAirPortCodeInTrip: Boolean;var oRequiredFromAirPortFlightDate: Date;var oTravelStartDate: Date;var oTravelEndDate: Date;var oTravelDescription: Text;var oTravelSaveString: Text)
+    local procedure DecodeBoardingPassString(iBoardingPassString: Text; iRequiredFromAirPortCode: Text; var oRequiredFromAirPortCodeInTrip: Boolean; var oRequiredFromAirPortFlightDate: Date; var oTravelStartDate: Date; var oTravelEndDate: Date; var oTravelDescription: Text; var oTravelSaveString: Text)
     var
         NoOfLegs: Integer;
         PassengerName: Text;
         LegString: Text;
         HexLengthOfFreeSection: Text[2];
         IntLengthOfFreeSection: Integer;
-        LegStringArray: array [10] of Text;
+        LegStringArray: array[10] of Text;
         NewStartRead: Integer;
         CurrentLeg: Integer;
         "--1": Integer;
@@ -247,7 +246,7 @@ codeunit 6150837 "POS Action - Boarding Pass"
         if NoOfLegs = 0 then Error(ERRNOTVALID);
 
         oRequiredFromAirPortCodeInTrip := false;
-        if (iBoardingPassString = '') then  oRequiredFromAirPortCodeInTrip := true;
+        if (iBoardingPassString = '') then oRequiredFromAirPortCodeInTrip := true;
 
         PassengerName := CopyStr(iBoardingPassString, 3, 20);
 
@@ -257,12 +256,12 @@ codeunit 6150837 "POS Action - Boarding Pass"
         LegStringArray[CurrentLeg] := LegString;
 
         while NoOfLegs > CurrentLeg do begin
-          CurrentLeg := CurrentLeg + 1;
-          HexLengthOfFreeSection := CopyStr(LegString, 36, 2);
-          IntLengthOfFreeSection := HexToInt(HexLengthOfFreeSection);
-          NewStartRead := NewStartRead + IntLengthOfFreeSection;
-          LegString := CopyStr(iBoardingPassString, NewStartRead, 37);
-          LegStringArray[CurrentLeg] := LegString;
+            CurrentLeg := CurrentLeg + 1;
+            HexLengthOfFreeSection := CopyStr(LegString, 36, 2);
+            IntLengthOfFreeSection := HexToInt(HexLengthOfFreeSection);
+            NewStartRead := NewStartRead + IntLengthOfFreeSection;
+            LegString := CopyStr(iBoardingPassString, NewStartRead, 37);
+            LegStringArray[CurrentLeg] := LegString;
         end;
 
         oTravelDescription := StrSubstNo('%1\', PassengerName);
@@ -271,30 +270,30 @@ codeunit 6150837 "POS Action - Boarding Pass"
         oTravelEndDate := 0D;
         CurrentLeg := 1;
         repeat
-          FromAirportCode := '';
-          ToAirportCode := '';
-          OperatorFlightNo := '';
-          FlightDate := 0D;
-          DecodeTravelLeg(LegStringArray[CurrentLeg], FromAirportCode, ToAirportCode, OperatorFlightNo, FlightDate);
+            FromAirportCode := '';
+            ToAirportCode := '';
+            OperatorFlightNo := '';
+            FlightDate := 0D;
+            DecodeTravelLeg(LegStringArray[CurrentLeg], FromAirportCode, ToAirportCode, OperatorFlightNo, FlightDate);
 
-          if (iRequiredFromAirPortCode <> '') and (FromAirportCode = iRequiredFromAirPortCode) then begin
-            oRequiredFromAirPortCodeInTrip := true;
-            oRequiredFromAirPortFlightDate := FlightDate;
-          end;
+            if (iRequiredFromAirPortCode <> '') and (FromAirportCode = iRequiredFromAirPortCode) then begin
+                oRequiredFromAirPortCodeInTrip := true;
+                oRequiredFromAirPortFlightDate := FlightDate;
+            end;
 
-          if (FlightDate <> 0D) and (oTravelStartDate = 0D) then oTravelStartDate := FlightDate;
-          if (FlightDate <> 0D) and (oTravelEndDate = 0D) then oTravelEndDate := FlightDate;
+            if (FlightDate <> 0D) and (oTravelStartDate = 0D) then oTravelStartDate := FlightDate;
+            if (FlightDate <> 0D) and (oTravelEndDate = 0D) then oTravelEndDate := FlightDate;
 
-          if (FlightDate < oTravelStartDate) then oTravelStartDate := FlightDate;
-          if (FlightDate > oTravelEndDate) then oTravelEndDate := FlightDate;
+            if (FlightDate < oTravelStartDate) then oTravelStartDate := FlightDate;
+            if (FlightDate > oTravelEndDate) then oTravelEndDate := FlightDate;
 
-          oTravelDescription := oTravelDescription + StrSubstNo('\%1 > %2 (%3) %4', FromAirportCode, ToAirportCode, OperatorFlightNo, FlightDate);
-          oTravelSaveString := oTravelSaveString + StrSubstNo('%1>%2(%3 %4) | ', FromAirportCode, ToAirportCode, OperatorFlightNo, FlightDate);
-          CurrentLeg := CurrentLeg + 1;
+            oTravelDescription := oTravelDescription + StrSubstNo('\%1 > %2 (%3) %4', FromAirportCode, ToAirportCode, OperatorFlightNo, FlightDate);
+            oTravelSaveString := oTravelSaveString + StrSubstNo('%1>%2(%3 %4) | ', FromAirportCode, ToAirportCode, OperatorFlightNo, FlightDate);
+            CurrentLeg := CurrentLeg + 1;
         until (CurrentLeg > NoOfLegs);
     end;
 
-    local procedure DecodeTravelLeg(iLegString: Text;var oFromAirportCode: Code[3];var oToAirportCode: Code[3];var oOperatorFlightNo: Code[8];var oFlightDate: Date)
+    local procedure DecodeTravelLeg(iLegString: Text; var oFromAirportCode: Code[3]; var oToAirportCode: Code[3]; var oOperatorFlightNo: Code[8]; var oFlightDate: Date)
     var
         JulianFlightDateText: Text;
         JulianFlightDateInteger: Integer;
@@ -305,7 +304,7 @@ codeunit 6150837 "POS Action - Boarding Pass"
         oOperatorFlightNo := CopyStr(iLegString, 14, 8);
         JulianFlightDateText := CopyStr(iLegString, 22, 3);
         if Evaluate(JulianFlightDateInteger, JulianFlightDateText) then begin
-          oFlightDate := JulianDateToDate(JulianFlightDateInteger);
+            oFlightDate := JulianDateToDate(JulianFlightDateInteger);
         end;
     end;
 
@@ -322,7 +321,7 @@ codeunit 6150837 "POS Action - Boarding Pass"
     begin
         //Takes julian day part and makes date
         oDate := CalcDate('<-CY>', WorkDate);
-        CalcDateFormula := StrSubstNo('<+%1D>', iJulianDate-1);
+        CalcDateFormula := StrSubstNo('<+%1D>', iJulianDate - 1);
         oDate := CalcDate(CalcDateFormula, oDate);
     end;
 
@@ -335,40 +334,40 @@ codeunit 6150837 "POS Action - Boarding Pass"
     begin
         //-NPR5.49 [344084]
         if not EanBoxEvent.Get(EventCodeBoardingPass()) then begin
-          EanBoxEvent.Init;
-          EanBoxEvent.Code := EventCodeBoardingPass();
-          EanBoxEvent."Module Name" := CopyStr(Text000,1,MaxStrLen(EanBoxEvent."Module Name"));
-          EanBoxEvent.Description := CopyStr(Text001,1,MaxStrLen(EanBoxEvent.Description));
-          EanBoxEvent."Action Code" := ActionCode();
-          EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
-          EanBoxEvent."Event Codeunit" := CurrCodeunitId();
-          EanBoxEvent.Insert(true);
+            EanBoxEvent.Init;
+            EanBoxEvent.Code := EventCodeBoardingPass();
+            EanBoxEvent."Module Name" := CopyStr(Text000, 1, MaxStrLen(EanBoxEvent."Module Name"));
+            EanBoxEvent.Description := CopyStr(Text001, 1, MaxStrLen(EanBoxEvent.Description));
+            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
+            EanBoxEvent."Event Codeunit" := CurrCodeunitId();
+            EanBoxEvent.Insert(true);
         end;
         //+NPR5.49 [344084]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
-    local procedure OnInitEanBoxParameters(var Sender: Codeunit "Ean Box Setup Mgt.";EanBoxEvent: Record "Ean Box Event")
+    local procedure OnInitEanBoxParameters(var Sender: Codeunit "Ean Box Setup Mgt."; EanBoxEvent: Record "Ean Box Event")
     begin
         //-NPR5.49 [344084]
         case EanBoxEvent.Code of
-          EventCodeBoardingPass():
-            begin
-              Sender.SetNonEditableParameterValues(EanBoxEvent,'BoardingPassString',true,'');
-            end;
+            EventCodeBoardingPass():
+                begin
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'BoardingPassString', true, '');
+                end;
         end;
         //+NPR5.49 [344084]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
-    local procedure SetEanBoxEventInScopeBoardingPass(EanBoxSetupEvent: Record "Ean Box Setup Event";EanBoxValue: Text;var InScope: Boolean)
+    local procedure SetEanBoxEventInScopeBoardingPass(EanBoxSetupEvent: Record "Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     begin
         //-NPR5.49 [344084]
         if EanBoxSetupEvent."Event Code" <> EventCodeBoardingPass() then
-          exit;
+            exit;
 
         if BarCodeIsBoardingPass(EanBoxValue) then
-          InScope := true;
+            InScope := true;
         //+NPR5.49 [344084]
     end;
 
@@ -392,13 +391,13 @@ codeunit 6150837 "POS Action - Boarding Pass"
     begin
         //-NPR5.49 [344084]
         if StrLen(Barcode) < 60 then
-          exit(false);
+            exit(false);
 
-        if UpperCase(CopyStr(Barcode,1,1)) <> 'M' then
-          exit(false);
+        if UpperCase(CopyStr(Barcode, 1, 1)) <> 'M' then
+            exit(false);
 
-        if not Evaluate(IntBuffer,CopyStr(Barcode,2,1)) then
-          exit(false);
+        if not Evaluate(IntBuffer, CopyStr(Barcode, 2, 1)) then
+            exit(false);
 
         exit(true);
         //+NPR5.49 [344084]

@@ -1,3 +1,4 @@
+// TODO: CTRLUPGRADE - uses old Standard code; must be removed or refactored
 codeunit 6014498 "Exchange Label Management"
 {
     // NPR4.10/VB/20150602 CASE 213003 Support for Web Client (JavaScript) client
@@ -384,10 +385,6 @@ codeunit 6014498 "Exchange Label Management"
             until ExchangeLabel.Next = 0;
           end;
         end;
-    end;
-
-    local procedure "-- Aux"()
-    begin
     end;
 
     local procedure GetFieldNo(var RecRef: RecordRef;Name: Text[50]) FieldNo: Integer

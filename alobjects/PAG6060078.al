@@ -24,12 +24,13 @@ page 6060078 "MM Membership Kiosk"
                     PageNavigation('StartPage', '');
                 end;
 
-                trigger OnInvokeMethod(method: Text; eventContent: Variant)
+                trigger OnInvokeMethod(method: Text; eventContent: JsonObject)
                 var
                     NextPage: Integer;
+                    Content: Text;
                 begin
-
-                    PageNavigation(method, Format(eventContent));
+                    eventContent.WriteTo(Content);
+                    PageNavigation(method, Content);
                 end;
             }
         }
@@ -126,7 +127,6 @@ page 6060078 "MM Membership Kiosk"
         end;
 
         BridgeMgt.RegisterAdHocModule('MembershipSelfService', MembershipKiosk.GetHtml(DestinationPageId, MemberInfoJObject), MembershipKiosk.GetCss(DestinationPageId), MembershipKiosk.GetScript(DestinationPageId));
-        //BridgeMgt.EmbedHtml (MembershipKiosk.GetHtml(DestinationPageId, MemberInfoJObject));
 
         case DestinationPageId of
             PageId::PRINT:
