@@ -34,9 +34,6 @@ page 6014556 "Retail Admin Role Center"
                 {
                     Visible = false;
                 }
-                part(Control1903012608;9175)
-                {
-                }
                 systempart(Control1901377608;MyNotes)
                 {
                 }
