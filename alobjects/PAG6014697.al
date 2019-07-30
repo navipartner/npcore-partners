@@ -10,7 +10,7 @@ page 6014697 "Embedded Videos"
     {
         area(content)
         {
-            usercontrol(Bridge;"NaviPartner.Retail.Controls.Bridge")
+            usercontrol(Bridge;Bridge)
             {
 
                 trigger OnFrameworkReady()

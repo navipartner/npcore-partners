@@ -6,19 +6,15 @@ codeunit 6150632 "JavaScript Bridge Management"
     end;
 
     var
-        [RunOnClient]
-        Bridge: DotNet npNetIBridge;
+        Bridge: ControlAddIn Bridge;
         Initialized: Boolean;
         Text_BridgeNotInitialzied: Label 'JavaScript Bridge has not been initialized. Please, make sure to call Initialize before invoking individual Bridge functions.';
         Text_RequestedDependencyScriptNotFound: Label 'Requested dependency script %1 is not available in your instance of Microsoft Dynamics NAV. It must be deployed in Web Client Dependencies before you can use this module.';
         AdHocModuleId: Integer;
 
-    procedure Initialize(BridgeIn: DotNet npNetIFramework0)
-    var
-        NetConvHelper: Variant;
+    procedure Initialize(BridgeIn: ControlAddIn Bridge)
     begin
-        NetConvHelper := BridgeIn;
-        Bridge := NetConvHelper;
+        Bridge := BridgeIn;
         Initialized := true;
     end;
 
@@ -127,13 +123,9 @@ codeunit 6150632 "JavaScript Bridge Management"
         InvokeFrontEndAsync(RegisterModuleRequest);
     end;
 
-    local procedure "--- Internal, local methods ---"()
-    begin
-    end;
-
     local procedure MakeSureBridgeIsInitialized()
     begin
-        if IsNull(Bridge) or (not Initialized) then
+        if not Initialized then
             Error(Text_BridgeNotInitialzied);
     end;
 

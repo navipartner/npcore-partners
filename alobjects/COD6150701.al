@@ -64,7 +64,7 @@ codeunit 6150701 "POS JavaScript Interface"
             FrontEnd.ReportBug(StrSubstNo(Text005, 'OnAction'));
     end;
 
-    procedure InvokeAction("Action": Text; WorkflowStep: Text; WorkflowId: Integer; ActionId: Integer; Context: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
+    procedure InvokeAction("Action": Text; WorkflowStep: Text; WorkflowId: Integer; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         POSAction: Record "POS Action";
         Signal: DotNet npNetWorkflowCallCompletedRequest;
@@ -133,7 +133,7 @@ codeunit 6150701 "POS JavaScript Interface"
         FrontEnd.WorkflowCallCompleted(Signal);
     end;
 
-    procedure InvokeMethod(Method: Text; Context: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
+    procedure InvokeMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     begin
         // A method invoked from JavaScript logic that requests C/AL to execute specific non-business-logic processing (e.g. infrastructure, etc.)
         OnBeforeInvokeMethod(Method, Context, POSSession, FrontEnd);
