@@ -1,4 +1,4 @@
-﻿html {
+html {
     touch-action: none;
 }
 
@@ -160,7 +160,8 @@ div.np-image > img {
     width: auto;
     height: auto;
 }
-﻿.dummy {}
+
+.dummy {}
 
 div.np-page {
     margin: 0;
@@ -204,7 +205,8 @@ div.np-page, div.np-view, div.np-layout {
   margin: 0;
   margin-top: 1.5em;
 }
-﻿body
+
+body
 {
 }
 
@@ -245,7 +247,8 @@ div.np-page, div.np-view, div.np-layout {
     font-size: 2em;
 }
 
-﻿.d {}
+
+.d {}
 
 .np-watermark {
 	position: fixed;
@@ -299,7 +302,8 @@ div#oldControlAddIn {
 	height: 100vh;
 	z-index: 2;
 }
-﻿.dummy {}
+
+.dummy {}
 
 .np-icon:before {
     font: normal normal normal 14px/1 Segoe;
@@ -336,7 +340,8 @@ div#oldControlAddIn {
 .np-icon-size-128:before {
     font-size: 128px;
 }
-﻿.dummy {}
+
+.dummy {}
 
 .np-button {
     color: #fff;
@@ -656,7 +661,8 @@ div#oldControlAddIn {
 
 .np-button .warning:hover {
     opacity: 1;
-}﻿.dummy {}
+}
+.dummy {}
 
 .np-buttongrid {
     display: -webkit-box;
@@ -706,7 +712,8 @@ div#oldControlAddIn {
     width: auto !important;
 }
 
-﻿.dummy {}
+
+.dummy {}
 
 .np-grid {
     flex: 1 1 100%;
@@ -794,7 +801,7 @@ div#oldControlAddIn {
 
 .np-grid-table table tbody td:last-child {
     border-right: none;
-}
+} 
 
 .np-grid .subtotal {
     color: #1b3050;
@@ -818,7 +825,11 @@ div#oldControlAddIn {
 .np-grid .subtotal.negative {
     color: firebrick;
 }
-﻿.dummy{}
+
+#salesLines .np-grid-table-body,
+#paymentLines .np-grid-table-body
+{ flex-basis: 0; }
+.dummy{}
 
 div.np-input-with-caption {
     display: block;
@@ -850,14 +861,16 @@ div.np-input-with-caption > div.np-inputholder > .np-erase {
     margin-left: 0.3em;
 }
 
-﻿.dummy {}
+
+.dummy {}
 
 .np-numpadsimple {
     display: flex;
     flex: 1 1 100%;
     width: 100%;
     height: 100%;
-}﻿.dummy {}
+}
+.dummy {}
 
 div.np-loginpad {
     display: flex;
@@ -888,7 +901,8 @@ div.np-loginpad > .np-loginpad-inputholder > .np-textbox {
 div.np-loginpad > .np-numpadsimple {
     flex: 1 1 100%;
     display: flex;
-}﻿.dummy
+}
+.dummy
 {
 }
 
@@ -1024,7 +1038,8 @@ div.np-loginpad > .np-numpadsimple {
     font-size: 1.5em;
 }
 
-﻿.dummy
+
+.dummy
 {
 }
 
@@ -1066,7 +1081,8 @@ div.np-loginpad > .np-numpadsimple {
 .statusbar .right {
     float: right;
 }
-﻿.dummy {} /* Always start the file with this */
+
+.dummy {} /* Always start the file with this */
 
 .np-popup {
     display: none;
@@ -1185,7 +1201,8 @@ div.np-loginpad > .np-numpadsimple {
 .np-popup.dialog .np-container.body {
 	padding: 24px;
 }
-﻿.dummy {} /* Always start the file with this */
+
+.dummy {} /* Always start the file with this */
 
 .np-popup.numpad .np-container.body {
     padding: 0 24px 16px;
@@ -1258,7 +1275,8 @@ div.np-loginpad > .np-numpadsimple {
     width: 100%;
 }
 
-﻿.dummy {} /* Always start the file with this */
+
+.dummy {} /* Always start the file with this */
 
 .np-popup.searchbox .np-container.body {
     padding: 24px;
@@ -1275,7 +1293,8 @@ div.np-loginpad > .np-numpadsimple {
     -ms-flex-flow: column nowrap;
     flex-flow: column nowrap;
 }
-﻿.dummy {} /* Always start the file with this */
+
+.dummy {} /* Always start the file with this */
 
 .np-popup.functionspopup {
     width: 60%;
@@ -1298,7 +1317,8 @@ div.np-loginpad > .np-numpadsimple {
     padding: 0 0 4px 0;
     font-size: 20px;
     margin-bottom: 8px;
-}﻿body
+}
+body
 {}
 
 .toast {
@@ -1332,7 +1352,8 @@ div.np-loginpad > .np-numpadsimple {
 .toast.visible > .caption {
     color: white;
 }
-﻿.dummy { }
+
+.dummy { }
 
 .np-inputfilterpanel {
     background-color: #457db5;
@@ -1384,7 +1405,8 @@ div.np-loginpad > .np-numpadsimple {
 .np-inputfilterpanel > .commands > .command > .description {
     color: #6792bc;
     font-size: 1em;
-}﻿.dummy {} /* Always start the file with this */
+}
+.dummy {} /* Always start the file with this */
 
 .np-popup.calendargrid {
     display: flex;
@@ -1475,7 +1497,8 @@ div.np-loginpad > .np-numpadsimple {
 .ui-widget-header {
     border: 0;
 }
-﻿.dummy {} /* Always start the file with this */
+
+.dummy {} /* Always start the file with this */
 
 @media only screen and (min-width:600px) {
     body, input, textarea, keygen, select, button, table, div {
@@ -1985,7 +2008,8 @@ div.np-loginpad > .np-numpadsimple {
     .np-popup.calendargrid .np-container.body {
         padding: 8px 0;
     }
-}﻿.dummy {} /* Always start the file with this */
+}
+.dummy {} /* Always start the file with this */
 
 /* Fix for mobile devices, case 306520 */
 @media only screen and (max-width: 768px) and (min-width: 320px) {
@@ -2091,7 +2115,8 @@ and (-webkit-min-device-pixel-ratio: 2) {
 }
 
 /* iPhone 6 Plus */
-﻿.dummy { }
+
+.dummy { }
 
 .wysiwyg {
     flex-basis: 0px;
@@ -2257,7 +2282,8 @@ and (-webkit-min-device-pixel-ratio: 2) {
 .wysiwyg table td table.group td input[type=checkbox] {
     width: auto;
 }
-﻿.dummy { }
+
+.dummy { }
 
 /* Comment out the content below after development is completed, or uncomment it when you want to resume development */
 

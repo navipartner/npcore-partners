@@ -199,12 +199,7 @@ codeunit 6150859 "POS Action - Doc. Export"
         PrintPrepayment := JSON.GetBooleanParameter('PrintPrepaymentDocument', true);
         PayAndPost := JSON.GetBooleanParameter('PayAndPostInNextSale', true);
         PrintPayAndPost := JSON.GetBooleanParameter('PrintPayAndPostInvoice', true);
-
-        // TODO: CTRLUPGRADE - Invokes function that involves Event Marshaller
-        Error('CTRLUPGRADE');
-        /*
         RetailSalesDocMgt.ProcessPOSSale(SalePOS);
-        */
 
         if PrepaymentPct > 0 then begin
             //End sale, auto start new sale, and insert prepayment line.

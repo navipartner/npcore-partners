@@ -482,12 +482,8 @@ codeunit 6150801 "POS Action - Customer"
     var
         RetailSalesDocMgt: Codeunit "Retail Sales Doc. Mgt.";
     begin
-        // TODO: CTRLUPGRADE - invokes an obsolete function that involves Event Marshaller
-        Error('CTRLUPGRADE');
-        /*
         if not RetailSalesDocMgt.ProcessPOSSale(SalePOS) then
             exit(false);
-        */
         exit(true);
     end;
 }

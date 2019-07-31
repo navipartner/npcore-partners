@@ -8,16 +8,19 @@ codeunit 6060135 "MM Member POS UI"
 
 
     var
-        Marshaller: Codeunit "POS Event Marshaller";
+        // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
+        //Marshaller: Codeunit "POS Event Marshaller";
         ILLEGAL_VALUE: Label 'Value %1 is not a valid %2.';
         POINTS_TO_DEDUCT: Label 'Points to Deduct';
         DISCOUNT_AMOUNT: Label 'Discount';
 
     procedure SearchBox(Title: Text; Caption: Text; MaxStringLength: Integer) ScannedValue: Text
     begin
-
-        //ScannedValue := Marshaller.SearchBox (Title, Caption);
+        // TODO: CTRLUPGRADE - the block below must be refactored without Marshaller
+        Error('CTRLUPGRADE');
+        /*
         ScannedValue := Marshaller.SearchBox(Title, Caption, MaxStringLength);
+        */
         if (ScannedValue = '<CANCEL>') then
             Error('');
 
@@ -31,9 +34,12 @@ codeunit 6060135 "MM Member POS UI"
     var
         Template: DotNet npNetTemplate;
     begin
-
         ConfigureLookupTemplate(Template, LookupRecRef);
+        // TODO: CTRLUPGRADE - Transcendence doesn't support template based lookups yet, this must be refactored to use standard NAV lookup
+        Error('CTRLUPGRADE');
+        /*
         Position := Marshaller.Lookup(LookupCaption, Template, LookupRecRef, false, false, 0);
+        */
     end;
 
     local procedure ConfigureLookupTemplate(var Template: DotNet npNetTemplate; LookupRec: RecordRef)

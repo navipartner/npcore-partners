@@ -204,14 +204,8 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
                 SetShowDepositDialog;
             StrPos(Parameters, 'SALESDOC_TEST_SALE') > 0:
                 TestSalePOS(Rec);
-
-            // TODO: CTRLUPGRADE - invokes an obsolete function; must be either removed or refactored
             StrPos(Parameters, 'SALESDOC_PROCESS') > 0:
-                ERROR('CTRLUPGRADE');
-            /*
-            ProcessPOSSale(Rec);
-            */
-
+                ProcessPOSSale(Rec);
             StrPos(Parameters, 'SALESDOC_OPEN_PAGE') > 0:
                 OpenSalesDoc(Rec);
             StrPos(Parameters, 'SALESDOC_ORD_TYPE') > 0:
@@ -503,9 +497,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
     begin
     end;
 
-    // TODO: CTRLUPGRADE - Invokes old Standard functionality, therefore must either be refactored or removed itself; _obsolete parameter added
-    procedure ProcessPOSSale(var SalePOS: Record "Sale POS"; _obsolete: Boolean): Boolean
-    /*
+    procedure ProcessPOSSale(var SalePOS: Record "Sale POS"): Boolean
     var
         AuditRoll: Record "Audit Roll";
         Customer: Record Customer;
@@ -528,201 +520,196 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         NPRetailSetup: Record "NP Retail Setup";
         POSCreateEntry: Codeunit "POS Create Entry";
         Success: Boolean;
-    */
     begin
-        // TODO: CTRLUPGRADE - invokes a function that involves Event Marshaller
-        ERROR('CTRLUPGRADE');
-        /*
-          if not Customer.Get(SalePOS."Customer No.") then
-              exit;
+        if not Customer.Get(SalePOS."Customer No.") then
+            exit;
 
-          if not Register.Get(SalePOS."Register No.") then
-              exit;
+        if not Register.Get(SalePOS."Register No.") then
+            exit;
 
-          RetailSetup.Get;
-          NPRetailSetup.Get;
+        RetailSetup.Get;
+        NPRetailSetup.Get;
 
-          if SalePOS."Sales Document No." <> '' then
-              SalesHeader.Get(SalePOS."Sales Document Type", SalePOS."Sales Document No.");
+        if SalePOS."Sales Document No." <> '' then
+            SalesHeader.Get(SalePOS."Sales Document Type", SalePOS."Sales Document No.");
 
-          GetSetupValues(SalesHeader, RetailSalesLineCode.GetSalesAmountInclVAT(SalePOS));
+        GetSetupValues(SalesHeader, RetailSalesLineCode.GetSalesAmountInclVAT(SalePOS));
 
-          // Delete the Qoute if we are posting the sale
-          if SalesHeaderQoute.Get(SalePOS."Sales Document Type", SalePOS."Sales Document No.") and
-            (SalePOS."Sales Document Type" = SalesHeaderQoute."Document Type"::Quote) and Post then begin
-              SalesHeader."No." := '';
-              SalesHeaderQoute.Delete(true);
-          end;
+        // Delete the Qoute if we are posting the sale
+        if SalesHeaderQoute.Get(SalePOS."Sales Document Type", SalePOS."Sales Document No.") and
+          (SalePOS."Sales Document Type" = SalesHeaderQoute."Document Type"::Quote) and Post then begin
+            SalesHeader."No." := '';
+            SalesHeaderQoute.Delete(true);
+        end;
 
-          if (SalePOS."Sales Document No." <> '') then begin
-              SalesHeader.Ship := Ship;
-              SalesHeader.Invoice := Invoice;
-              SalesHeader.Receive := Receive;
+        if (SalePOS."Sales Document No." <> '') then begin
+            SalesHeader.Ship := Ship;
+            SalesHeader.Invoice := Invoice;
+            SalesHeader.Receive := Receive;
 
-              if SalesHeader."Salesperson Code" = '' then
-                  SalesHeader."Salesperson Code" := SalePOS."Salesperson Code";
+            if SalesHeader."Salesperson Code" = '' then
+                SalesHeader."Salesperson Code" := SalePOS."Salesperson Code";
 
-              SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-              SalesLine.SetRange("Document No.", SalesHeader."No.");
-              SalesLine.DeleteAll(true);
-          end else
-              CreateSalesHeader(SalePOS, SalesHeader);
+            SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+            SalesLine.SetRange("Document No.", SalesHeader."No.");
+            SalesLine.DeleteAll(true);
+        end else
+            CreateSalesHeader(SalePOS, SalesHeader);
 
-          with SalePOS do begin
-              Clear(SaleLinePOS);
-              SaleLinePOS.SetRange("Register No.", "Register No.");
-              SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-              SaleLinePOS.ModifyAll(Silent, true);
-              SaleLinePOS.SetFilter("No.", '<>%1', '');
+        with SalePOS do begin
+            Clear(SaleLinePOS);
+            SaleLinePOS.SetRange("Register No.", "Register No.");
+            SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
+            SaleLinePOS.ModifyAll(Silent, true);
+            SaleLinePOS.SetFilter("No.", '<>%1', '');
 
-              if SaleLinePOS.FindSet then begin
-                  CopySaleCommentLines(SalePOS, SalesHeader);
-                  CopySalesLines(SaleLinePOS, SalesHeader);
-              end else
-                  //-NPR5.50 [300557]
-                  //    MESSAGE(Text000004);
-                  Error(Text000004);
-              //+NPR5.50 [300557]
+            if SaleLinePOS.FindSet then begin
+                CopySaleCommentLines(SalePOS, SalesHeader);
+                CopySalesLines(SaleLinePOS, SalesHeader);
+            end else
+                //-NPR5.50 [300557]
+                //    MESSAGE(Text000004);
+                Error(Text000004);
+            //+NPR5.50 [300557]
 
-              //-NPR5.50 [300557]
-              if AutoReserveSalesLines then
-                  ReserveSalesLines(SalesHeader, true);
-              //+NPR5.50 [300557]
+            //-NPR5.50 [300557]
+            if AutoReserveSalesLines then
+                ReserveSalesLines(SalesHeader, true);
+            //+NPR5.50 [300557]
 
-              Commit;
+            Commit;
 
-              //-NPR5.50 [300557]
-              if OpenSalesDocAfterExport then
-                  PAGE.RunModal(SalesHeader.GetCardpageID(), SalesHeader);
-              //+NPR5.50 [300557]
+            //-NPR5.50 [300557]
+            if OpenSalesDocAfterExport then
+                PAGE.RunModal(SalesHeader.GetCardpageID(), SalesHeader);
+            //+NPR5.50 [300557]
 
-              CreatedSalesHeader := SalesHeader;
+            CreatedSalesHeader := SalesHeader;
 
-              //-NPR5.50 [300557]
-              //  IF AutoReserveSalesLines THEN
-              //    ReserveSalesLines(SalesHeader);
-              //+NPR5.50 [300557]
+            //-NPR5.50 [300557]
+            //  IF AutoReserveSalesLines THEN
+            //    ReserveSalesLines(SalesHeader);
+            //+NPR5.50 [300557]
 
-              //-NPR5.50 [352473]
-              ClearLastError();
-              //+NPR5.50 [352473]
+            //-NPR5.50 [352473]
+            ClearLastError();
+            //+NPR5.50 [352473]
 
-              if Post then
-                  if Ask then
-                      Posted := SalesPostYesNo.Run(SalesHeader)
-                  else
-                      Posted := SalesPost.Run(SalesHeader);
+            if Post then
+                if Ask then
+                    Posted := SalesPostYesNo.Run(SalesHeader)
+                else
+                    Posted := SalesPost.Run(SalesHeader);
 
-              //-NPR5.50 [352473]
-              if Post and (not Posted) then
-                  Message(POSTING_ERROR, SalesHeader."Document Type", SalesHeader."No.", GetLastErrorText);
-              //+NPR5.50 [352473]
+            //-NPR5.50 [352473]
+            if Post and (not Posted) then
+                Message(POSTING_ERROR, SalesHeader."Document Type", SalesHeader."No.", GetLastErrorText);
+            //+NPR5.50 [352473]
 
-              if WriteInAuditRoll then begin
-                  CreateDocumentPostingAudit(SalesHeader, SalePOS, Posted);
-                  if NPRetailSetup."Advanced POS Entries Activated" then begin
-                      POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, Posted);
-                  end;
-                  SaleLinePOS.DeleteAll;
-              end else
-                  ConvertSaleLinePOSToComments(SalesHeader, SalePOS);
+            if WriteInAuditRoll then begin
+                CreateDocumentPostingAudit(SalesHeader, SalePOS, Posted);
+                if NPRetailSetup."Advanced POS Entries Activated" then begin
+                    POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, Posted);
+                end;
+                SaleLinePOS.DeleteAll;
+            end else
+                ConvertSaleLinePOSToComments(SalesHeader, SalePOS);
 
-              Commit;
+            Commit;
 
-              if Post and Posted then begin
-                  if Print then begin
-                      ClearLastError;
-                      asserterror
-                      begin
-                          Success := false;
-                          //-NPR5.50 [300557]
-                          //        SalesPostAndPrint.GetReport(SalesHeader);
-                          PrintStandardReport(SalesHeader);
-                          //+NPR5.50 [300557]
-                          Success := true;
-                          Commit;
-                          Error('');
-                      end;
-                      if not Success then
-                          Message(PrintingErrorTxt, GetLastErrorText);
-                  end;
-                  if SendPostedPdf2Nav then begin
-                      ClearLastError;
-                      asserterror
-                      begin
-                          Success := false;
-                          SalesPostAndPdf2Nav.DontHandlePrint;
-                          SalesPostAndPdf2Nav.GetReport(SalesHeader);
-                          Success := true;
-                          Commit;
-                          Error('');
-                      end;
-                      if not Success then
-                          Message(SendingErrorTxt, GetLastErrorText);
-                  end;
-              end;
+            if Post and Posted then begin
+                if Print then begin
+                    ClearLastError;
+                    asserterror
+                    begin
+                        Success := false;
+                        //-NPR5.50 [300557]
+                        //        SalesPostAndPrint.GetReport(SalesHeader);
+                        PrintStandardReport(SalesHeader);
+                        //+NPR5.50 [300557]
+                        Success := true;
+                        Commit;
+                        Error('');
+                    end;
+                    if not Success then
+                        Message(PrintingErrorTxt, GetLastErrorText);
+                end;
+                if SendPostedPdf2Nav then begin
+                    ClearLastError;
+                    asserterror
+                    begin
+                        Success := false;
+                        SalesPostAndPdf2Nav.DontHandlePrint;
+                        SalesPostAndPdf2Nav.GetReport(SalesHeader);
+                        Success := true;
+                        Commit;
+                        Error('');
+                    end;
+                    if not Success then
+                        Message(SendingErrorTxt, GetLastErrorText);
+                end;
+            end;
 
-              if ShowCreationMessage then
-                  //-NPR5.50 [300557]
-                  //MESSAGE(Text000008,SalesHeader."No.");
-                  Message(Text000008, SalesHeader."Document Type", SalesHeader."No.");
-              //+NPR5.50 [300557]
+            if ShowCreationMessage then
+                //-NPR5.50 [300557]
+                //MESSAGE(Text000008,SalesHeader."No.");
+                Message(Text000008, SalesHeader."Document Type", SalesHeader."No.");
+            //+NPR5.50 [300557]
 
-              if ReturnAmount then
-                  CreatePrepaymentLineLegacy(SalePOS, SalesHeader, ReturnAmountPercentage);
+            if ReturnAmount then
+                CreatePrepaymentLineLegacy(SalePOS, SalesHeader, ReturnAmountPercentage);
 
-              //-NPR5.50 [352473]
-              //  IF NOT Posted AND Post THEN
-              //    MESSAGE(Text000001 ,SalesHeader."Document Type",SalesHeader."No.")
-              //  ELSE BEGIN
-              //    SalePOS."Last Posting No."  := SalesHeader."Last Posting No.";
-              //    SalePOS."Last Shipping No." := SalesHeader."Last Shipping No."
-              //  END;
+            //-NPR5.50 [352473]
+            //  IF NOT Posted AND Post THEN
+            //    MESSAGE(Text000001 ,SalesHeader."Document Type",SalesHeader."No.")
+            //  ELSE BEGIN
+            //    SalePOS."Last Posting No."  := SalesHeader."Last Posting No.";
+            //    SalePOS."Last Shipping No." := SalesHeader."Last Shipping No."
+            //  END;
 
-              if Posted then begin
-                  SalePOS."Last Posting No." := SalesHeader."Last Posting No.";
-                  SalePOS."Last Shipping No." := SalesHeader."Last Shipping No."
-              end;
-              //+NPR5.50 [352473]
+            if Posted then begin
+                SalePOS."Last Posting No." := SalesHeader."Last Posting No.";
+                SalePOS."Last Shipping No." := SalesHeader."Last Shipping No."
+            end;
+            //+NPR5.50 [352473]
 
-              if OutputDocument and (OutputCodeunit <> 0) then
-                  CODEUNIT.Run(OutputCodeunit, SalesHeader);
+            if OutputDocument and (OutputCodeunit <> 0) then
+                CODEUNIT.Run(OutputCodeunit, SalesHeader);
 
-              //-NPR5.50 [300557]
-              //  AuditRoll.RESET;
-              //  AuditRoll.SETRANGE("Register No.","Register No.");
-              //  AuditRoll.SETRANGE("Sales Ticket No.","Sales Ticket No.");
-              //  AuditRoll.SETRANGE("Sale Date",TODAY);
-              //  AuditRoll.SETRANGE(Type, AuditRoll.Type::"G/L");
-              //  AuditRoll.SETRANGE("Sale Type", AuditRoll."Sale Type"::"Debit Sale");
-              //  IF AuditRoll.FINDSET() THEN REPEAT
-              //    IF GiftVoucher.GET(AuditRoll."Gift voucher ref.") THEN BEGIN
-              //      GiftVoucher.SETRECFILTER();
-              //      IF NOT RetailTableCode.RUN(GiftVoucher) THEN
-              //        MESSAGE(Text000002,GiftVoucher.TABLECAPTION,GiftVoucher.FIELDCAPTION("No."),GiftVoucher."No.");
-              //    END;
-              //  UNTIL AuditRoll.NEXT = 0;
-              PrintGiftVoucher(SalePOS);
-              //+NPR5.50 [300557]
+            //-NPR5.50 [300557]
+            //  AuditRoll.RESET;
+            //  AuditRoll.SETRANGE("Register No.","Register No.");
+            //  AuditRoll.SETRANGE("Sales Ticket No.","Sales Ticket No.");
+            //  AuditRoll.SETRANGE("Sale Date",TODAY);
+            //  AuditRoll.SETRANGE(Type, AuditRoll.Type::"G/L");
+            //  AuditRoll.SETRANGE("Sale Type", AuditRoll."Sale Type"::"Debit Sale");
+            //  IF AuditRoll.FINDSET() THEN REPEAT
+            //    IF GiftVoucher.GET(AuditRoll."Gift voucher ref.") THEN BEGIN
+            //      GiftVoucher.SETRECFILTER();
+            //      IF NOT RetailTableCode.RUN(GiftVoucher) THEN
+            //        MESSAGE(Text000002,GiftVoucher.TABLECAPTION,GiftVoucher.FIELDCAPTION("No."),GiftVoucher."No.");
+            //    END;
+            //  UNTIL AuditRoll.NEXT = 0;
+            PrintGiftVoucher(SalePOS);
+            //+NPR5.50 [300557]
 
-              // Prints Access Tickets
-              TicketManagement.PrintTicketFromSalesTicketNo("Sales Ticket No.");
+            // Prints Access Tickets
+            TicketManagement.PrintTicketFromSalesTicketNo("Sales Ticket No.");
 
-              // Print Reservation Tickets
-              TicketAccessRsvMgt.PrintRsvFromSalesTicketNo("Sales Ticket No.");
+            // Print Reservation Tickets
+            TicketAccessRsvMgt.PrintRsvFromSalesTicketNo("Sales Ticket No.");
 
-              Commit;
+            Commit;
 
-              PrintRetailReceipt(SalePOS);
+            PrintRetailReceipt(SalePOS);
 
-              OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted, WriteInAuditRoll);
+            OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted, WriteInAuditRoll);
 
-              //-NPR5.47 [333671]
-              Commit;
-              //+NPR5.47 [333671]
-          end;
-          exit(true);
-          */
+            //-NPR5.47 [333671]
+            Commit;
+            //+NPR5.47 [333671]
+        end;
+        exit(true);
     end;
 
     procedure CreateSalesHeader(var SalePOS: Record "Sale POS"; var SalesHeader: Record "Sales Header")
@@ -1248,58 +1235,58 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         exit(FullyReservedLine);
     end;
 
-    // TODO: CTRLUPGRADE - Do not invoke, old standard function, _obsolete parameter appended
-    local procedure CreatePrepaymentLineLegacy(SalePOS: Record "Sale POS"; var SalesHeader: Record "Sales Header"; DepositPercentage: Decimal; _obsolete: Boolean)
-    /*
+    local procedure CreatePrepaymentLineLegacy(SalePOS: Record "Sale POS"; var SalesHeader: Record "Sales Header"; DepositPercentage: Decimal)
     var
-        Marshaller: Codeunit "POS Event Marshaller";
+        // TODO: CTRLUPGRADE - Marshaller is obsolete and must not be used
+        //Marshaller: Codeunit "POS Event Marshaller";
         SaleLinePOS: Record "Sale Line POS";
         LineNo: Integer;
-    */
     begin
-        /*
-          SalesHeader.CalcFields("Amount Including VAT");
-          if SalesHeader."Amount Including VAT"<>0 then begin
-            if SalesHeader."Prepayment %"<>0 then
-              SuggestedDepositAmount := SalesHeader."Amount Including VAT"*(SalesHeader."Prepayment %"/100)
+        SalesHeader.CalcFields("Amount Including VAT");
+        if SalesHeader."Amount Including VAT" <> 0 then begin
+            if SalesHeader."Prepayment %" <> 0 then
+                SuggestedDepositAmount := SalesHeader."Amount Including VAT" * (SalesHeader."Prepayment %" / 100)
             else
-              SuggestedDepositAmount := SalesHeader."Amount Including VAT"*(DepositPercentage/100);
+                SuggestedDepositAmount := SalesHeader."Amount Including VAT" * (DepositPercentage / 100);
             if ShowDepositDialog then begin
-              if not Marshaller.NumPad(Text000011,SuggestedDepositAmount,false,false) then
-                SuggestedDepositAmount := 0;
+                // TODO: CTRLUPGRADE - Must refactor without Marshaller
+                Error('CTRLUPGRADE');
+                /*
+                if not Marshaller.NumPad(Text000011, SuggestedDepositAmount, false, false) then
+                    SuggestedDepositAmount := 0;
+                */
             end;
-            if SuggestedDepositAmount<>0 then begin
-              SaleLinePOS.Reset;
-              SaleLinePOS.SetCurrentKey("Register No.","Sales Ticket No.","Line No.");
-              SaleLinePOS.SetRange("Register No.",SalePOS."Register No.");
-              SaleLinePOS.SetRange("Sales Ticket No.",SalePOS."Sales Ticket No.");
-              if SaleLinePOS.FindLast then;
-              LineNo := SaleLinePOS."Line No.";
+            if SuggestedDepositAmount <> 0 then begin
+                SaleLinePOS.Reset;
+                SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", "Line No.");
+                SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+                SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+                if SaleLinePOS.FindLast then;
+                LineNo := SaleLinePOS."Line No.";
 
-              SaleLinePOS.SetCurrentKey("Register No.","Sales Ticket No.",Date,"Sale Type","Line No.");
-              SaleLinePOS.Init;
-              SaleLinePOS."Register No."     := SalePOS."Register No.";
-              SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
-              SaleLinePOS.Date               := SalePOS.Date;
-              SaleLinePOS."Sale Type"        := SaleLinePOS."Sale Type"::Deposit;
-              SaleLinePOS."Line No."         := LineNo + 1;
-              SaleLinePOS.Type               := SaleLinePOS.Type::Customer;
-              SaleLinePOS.Date               := SalePOS.Date;
-              SaleLinePOS.Insert(true);
-              SalePOS.Validate("Customer No.",SalesHeader."Bill-to Customer No.");
-              SaleLinePOS.Validate(Quantity,1);
-              SaleLinePOS.Validate( "No.",SalesHeader."Bill-to Customer No.");
-              SaleLinePOS."Sales Document Type" := SalesHeader."Document Type";
-              SaleLinePOS."Sales Document No." := SalesHeader."No.";
-              SaleLinePOS."Sales Document Prepayment" := true;
-              SaleLinePOS."Sales Doc. Prepayment %" := (SuggestedDepositAmount/SalesHeader."Amount Including VAT")*100;
-              SaleLinePOS.Validate("Unit Price",SuggestedDepositAmount);
-              SaleLinePOS.Description := StrSubstNo(Text000009,SalesHeader."Document Type",SalesHeader."No.");
-              SaleLinePOS.Modify(true);
-              Commit;
+                SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", Date, "Sale Type", "Line No.");
+                SaleLinePOS.Init;
+                SaleLinePOS."Register No." := SalePOS."Register No.";
+                SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
+                SaleLinePOS.Date := SalePOS.Date;
+                SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
+                SaleLinePOS."Line No." := LineNo + 1;
+                SaleLinePOS.Type := SaleLinePOS.Type::Customer;
+                SaleLinePOS.Date := SalePOS.Date;
+                SaleLinePOS.Insert(true);
+                SalePOS.Validate("Customer No.", SalesHeader."Bill-to Customer No.");
+                SaleLinePOS.Validate(Quantity, 1);
+                SaleLinePOS.Validate("No.", SalesHeader."Bill-to Customer No.");
+                SaleLinePOS."Sales Document Type" := SalesHeader."Document Type";
+                SaleLinePOS."Sales Document No." := SalesHeader."No.";
+                SaleLinePOS."Sales Document Prepayment" := true;
+                SaleLinePOS."Sales Doc. Prepayment %" := (SuggestedDepositAmount / SalesHeader."Amount Including VAT") * 100;
+                SaleLinePOS.Validate("Unit Price", SuggestedDepositAmount);
+                SaleLinePOS.Description := StrSubstNo(Text000009, SalesHeader."Document Type", SalesHeader."No.");
+                SaleLinePOS.Modify(true);
+                Commit;
             end;
-          end;
-        */
+        end;
     end;
 
     local procedure PrintRetailReceipt(SalePOS: Record "Sale POS")

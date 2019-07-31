@@ -39,7 +39,8 @@ codeunit 6150640 "POS Info Management"
     var
         POSInfoLinkTable: Record "POS Info Link Table";
         POSInfo: Record "POS Info";
-        POSEventMarshaller: Codeunit "POS Event Marshaller";
+        // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
+        //POSEventMarshaller: Codeunit "POS Event Marshaller";
         Info: Text;
         POSInfoTransaction: Record "POS Info Transaction";
         TempPOSInfoTransaction: Record "POS Info Transaction" temporary;
@@ -73,7 +74,11 @@ codeunit 6150640 "POS Info Management"
                                     POSInfo."Input Type"::Text:
                                         begin
                                             //+NPR5.48 [336882]
+                                            // TODO: CTRLUPGRADE - Must be refactored without Marshaller
+                                            Error('CTRLUPGRADE');
+                                            /*
                                             Info := POSEventMarshaller.SearchBox(POSInfo.Message, '', 30);
+                                            */
 
                                             if Info = '' then
                                                 if POSInfo."Input Mandatory" then
@@ -143,7 +148,8 @@ codeunit 6150640 "POS Info Management"
     var
         POSInfoLinkTable: Record "POS Info Link Table";
         POSInfo: Record "POS Info";
-        POSEventMarshaller: Codeunit "POS Event Marshaller";
+        // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
+        //POSEventMarshaller: Codeunit "POS Event Marshaller";
         Info: Text;
         POSInfoTransaction: Record "POS Info Transaction";
         TempPOSInfoTransaction: Record "POS Info Transaction" temporary;
@@ -162,7 +168,11 @@ codeunit 6150640 "POS Info Management"
                 POSInfoTransaction.SetRange("POS Info Code", POSInfoLinkTable."POS Info Code");
                 if not POSInfoTransaction.FindFirst then begin
                     if POSInfo.Type = POSInfo.Type::"Request Data" then begin
+                        // TODO: CTRLUPGRADE - Refactor without Marshaller
+                        Error('CTRLUPGRADE');
+                        /*
                         Info := POSEventMarshaller.SearchBox(POSInfo.Message, POSInfo.Description, MaxStrLen(POSInfoTransaction."POS Info"));
+                        */
 
                         if Info = '' then
                             if POSInfo."Input Mandatory" then
@@ -309,7 +319,8 @@ codeunit 6150640 "POS Info Management"
     procedure ProcessPOSInfoMenuFunction(pSaleLinePos: Record "Sale Line POS"; pPOSInfoCode: Code[20])
     var
         POSInfo: Record "POS Info";
-        POSEventMarshaller: Codeunit "POS Event Marshaller";
+        // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
+        //POSEventMarshaller: Codeunit "POS Event Marshaller";
         Info: Text;
         POSInfoTransaction: Record "POS Info Transaction";
         POSInfoLookupPage: Page "POS Info Lookup";
@@ -332,7 +343,11 @@ codeunit 6150640 "POS Info Management"
                         case POSInfo."Input Type" of
                             POSInfo."Input Type"::Text:
                                 begin
+                                    // TODO: CTRLUPGRADE - Refactor without Marshaller
+                                    Error('CTRLUPGRADE');
+                                    /*
                                     Info := POSEventMarshaller.SearchBox(POSInfo.Message, '', 30);
+                                    */
                                     if Info = '' then
                                         if POSInfo."Input Mandatory" then
                                             Error('Error');
@@ -373,7 +388,11 @@ codeunit 6150640 "POS Info Management"
                     case POSInfo."Input Type" of
                         POSInfo."Input Type"::Text:
                             begin
+                                // TODO: CTRLUPGRADE - Refactor without Marshaller
+                                ERROR('CTRLUPGRADE');
+                                /*
                                 Info := POSEventMarshaller.SearchBox(POSInfo.Message, '', 30);
+                                */
                                 if Info = '' then
                                     if POSInfo."Input Mandatory" then
                                         Error('Error');

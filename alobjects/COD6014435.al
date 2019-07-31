@@ -1,4 +1,3 @@
-// TODO: CTRLUPGRADE - This codeunit must not be invoked directly by anyone! It must be removed and all dependent code refactored
 codeunit 6014435 "Retail Form Code"
 {
     // //-NPR3.08a d.14-09-05 v.Simon
@@ -1714,156 +1713,6 @@ codeunit 6014435 "Retail Form Code"
         Reg.Modify;
     end;
 
-    procedure SaleStat(var Sale: Record "Sale POS")
-    var
-        DimTSForm: Page "Touch Screen - Dim. Value List";
-        DimValue: Record "Dimension Value";
-        DimLine: Record "NPR Line Dimension";
-        Register: Record Register;
-        Marshaller: Codeunit "POS Event Marshaller";
-        t002: Label 'Statistics';
-        t003: Label 'Customer zip code';
-        t004: Label 'ERROR';
-        dlgInput: Code[20];
-        DimMgt: Codeunit DimensionManagement;
-        TempDimSetEntry: Record "Dimension Set Entry" temporary;
-        DimSetEntry: Record "Dimension Set Entry";
-        Dim: Record Dimension;
-        WrongDimValueErr: Label 'This %1 does not exist. Leave field blank to skip.';
-    begin
-        RetailSetupGlobal.Get;
-        if (RetailSetupGlobal."Stat. Dimension" = '') then
-            exit;
-
-        if RetailSetupGlobal."No. of Sales pr. Stat" = 0 then
-            exit;
-
-        Randomize;
-        if Random(RetailSetupGlobal."No. of Sales pr. Stat") > 1 then
-            exit;
-
-        Register.Get(Sale."Register No.");
-        if not Register."Use Sales Statistics" then
-            exit;
-
-        DimValue.SetRange("Dimension Code", RetailSetupGlobal."Stat. Dimension");
-        case RetailSetupGlobal."Dim Stat Method" of
-            RetailSetupGlobal."Dim Stat Method"::"Global Dim List":
-                begin
-                    DimTSForm.LookupMode(true);
-                    DimTSForm.SetTableView(DimValue);
-                    if DimTSForm.RunModal <> ACTION::LookupOK then
-                        exit;
-                    DimTSForm.GetRecord(DimValue);
-                end;
-            RetailSetupGlobal."Dim Stat Method"::"Global Dim Dialog":
-                begin
-                    repeat
-                        dlgInput := '';
-                        //-NPR5.26
-                        //        IF Marshaller.NumPadCode(t002 + '\' + t003,dlgInput,FALSE,FALSE) THEN BEGIN
-                        Dim.Get(RetailSetupGlobal."Stat. Dimension");
-                        if Marshaller.NumPadCode(t002 + '\' + Dim.Name, dlgInput, false, false) then begin
-                            //+NPR5.26
-                            case RetailSetupGlobal."Dim Stat Value" of
-                                RetailSetupGlobal."Dim Stat Value"::Check:
-                                    begin
-                                        //-NPR5.26
-                                        /*
-                                                        IF NOT DimValue.GET(NPC.DimStat, dlgInput) THEN
-                                                          Marshaller.Error(t004,t005,FALSE);
-                                        */
-                                        if not DimValue.Get(RetailSetupGlobal."Stat. Dimension", dlgInput) and (dlgInput <> '') then
-                                            Error(WrongDimValueErr, Dim.Name);
-                                        //+NPR5.26
-                                    end;
-                                RetailSetupGlobal."Dim Stat Value"::Create:
-                                    begin
-                                        if not DimValue.Get(RetailSetupGlobal."Stat. Dimension", dlgInput) then begin
-                                            DimValue.Init;
-                                            DimValue."Dimension Code" := RetailSetupGlobal."Stat. Dimension";
-                                            DimValue.Code := dlgInput;
-                                            //DimValue.Name             := dlgInput;
-                                            DimValue."Dimension Value Type" := DimValue."Dimension Value Type"::Standard;
-                                            DimValue.Insert(true);
-                                        end;
-                                    end;
-                            end;
-                        end;
-                    until DimValue.Get(RetailSetupGlobal."Stat. Dimension", dlgInput) or (dlgInput = '');
-                end;
-            RetailSetupGlobal."Dim Stat Method"::"Post Code":
-                begin
-                    if (Sale."Post Code" = '') then begin
-                        if Marshaller.NumPadCode(t002 + '\' + t003, dlgInput, false, false) then begin
-                            Sale."Stats - Customer Post Code" := dlgInput;
-                            Sale.Modify(true);
-                        end;
-                    end;
-                    exit;
-                end;
-        end;
-
-        if RetailSetupGlobal."Use Adv. dimensions" then begin
-            if DimValue.Code = '' then
-                exit;
-            DimLine."Table ID" := 6014405;
-            DimLine."Register No." := Sale."Register No.";
-            DimLine."Sales Ticket No." := Sale."Sales Ticket No.";
-            DimLine."Sale Type" := DimLine."Sale Type"::Sale;
-            DimLine."Dimension Code" := DimValue."Dimension Code";
-            DimLine."Dimension Value Code" := DimValue.Code;
-
-            //-NPR5.26
-            /*
-            //in the INSERT/MODIFY there is a code that updates global dimensions on Sale POS and Sale Line POS tables and therefor causing
-            //an error regarding different versions of the same record when calling MODIFY again in this function (or if we comment this new code out completelly)
-            //it happens in codeunit 6014630 in EndSale function
-            //I don't see a reason why to keep TRUE parameter as with the fix we're handling dimensions completelly on Sale POS and Sale Line POS tables.
-              IF NOT DimLine.INSERT( TRUE ) THEN
-                DimLine.MODIFY(TRUE);
-            */
-            if not DimLine.Insert then
-                DimLine.Modify;
-
-            if not DimSetEntry.Get(Sale."Dimension Set ID", DimLine."Dimension Code") or
-              (DimSetEntry."Dimension Value Code" <> DimLine."Dimension Value Code") then begin
-                DimSetEntry.SetRange("Dimension Set ID", Sale."Dimension Set ID");
-                if DimSetEntry.FindSet then
-                    repeat
-                        TempDimSetEntry := DimSetEntry;
-                        if DimSetEntry."Dimension Code" = DimLine."Dimension Code" then
-                            TempDimSetEntry.Validate("Dimension Value Code", DimLine."Dimension Value Code");
-                        TempDimSetEntry.Insert;
-                    until DimSetEntry.Next = 0;
-                if not TempDimSetEntry.Get(Sale."Dimension Set ID", DimLine."Dimension Code") then begin
-                    TempDimSetEntry.Init;
-                    TempDimSetEntry."Dimension Set ID" := Sale."Dimension Set ID";
-                    TempDimSetEntry.Validate("Dimension Code", DimLine."Dimension Code");
-                    TempDimSetEntry.Validate("Dimension Value Code", DimLine."Dimension Value Code");
-                    TempDimSetEntry.Insert;
-                end;
-                Sale.Validate("Dimension Set ID", DimMgt.GetDimensionSetID(TempDimSetEntry));
-                DimMgt.UpdateGlobalDimFromDimSetID(Sale."Dimension Set ID", Sale."Shortcut Dimension 1 Code", Sale."Shortcut Dimension 2 Code");
-                Sale.Modify(true);
-                //-NPR5.38 [294623]
-                //Sale.UpdateAllLineDim(Sale."Dimension Set ID",TempDimSetEntry."Dimension Set ID");
-                UpdateLineDimExcludePayment(Sale."Register No.", Sale."Sales Ticket No.", Sale."Dimension Set ID", TempDimSetEntry."Dimension Set ID");
-                //+NPR5.38 [294623]
-
-            end;
-            //+NPR5.26
-
-        end else begin
-            if DimValue."Global Dimension No." = 1 then
-                Sale.Validate("Shortcut Dimension 1 Code", DimValue.Code);
-            if DimValue."Global Dimension No." = 2 then
-                Sale.Validate("Shortcut Dimension 2 Code", DimValue.Code);
-            Sale.Modify(true);
-        end;
-
-    end;
-
     procedure UpdateLineDimExcludePayment(RegisterNo: Code[10]; ReceiptNo: Code[20]; NewParentDimSetID: Integer; OldParentDimSetID: Integer)
     var
         SaleLinePOS: Record "Sale Line POS";
@@ -1895,140 +1744,6 @@ codeunit 6014435 "Retail Form Code"
         //+NPR5.38 [294623]
     end;
 
-    procedure CreateGiftVoucher(var SaleLinePOS: Record "Sale Line POS"; var Name: Text[250]): Boolean
-    var
-        RetailSetup: Record "Retail Setup";
-        GiftVoucher: Record "Gift Voucher";
-        SalePOS: Record "Sale POS";
-        Customer: Record Customer;
-        Contact: Record Contact;
-        ActionTaken: Action;
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-        Utility: Codeunit Utility;
-        Text10600007: Label 'cancelled by sales person';
-        TempNo: Code[20];
-        NewTempNo: Code[20];
-        POSEventMarshaller: Codeunit "POS Event Marshaller";
-        GLSetup: Record "General Ledger Setup";
-    begin
-        //CreateGiftVoucher
-        GiftVoucher.Init;
-
-        if RetailSetup.Get then begin
-            RetailSetup.TestField("Gift Voucher No. Management");
-
-            //-NPR5.23[242341]
-            // Nrseriestyring.InitSeries(Ops�tning."Gift Voucher No. Management",
-            //    Ops�tning."Gift Voucher No. Management",0D,Gavekort."No.",Ops�tning."Gift Voucher No. Management");
-            //
-            //  IF Ops�tning."EAN Mgt. Gift voucher" <> '' THEN
-            //    Gavekort."No." := Utility.CreateEAN( Gavekort."No.", FORMAT(Ops�tning."EAN Mgt. Gift voucher") );
-
-            TempNo := NoSeriesMgt.GetNextNo(RetailSetup."Gift Voucher No. Management", Today, false);
-            if RetailSetup."EAN Mgt. Gift voucher" <> '' then
-                TempNo := Utility.CreateEAN(TempNo, Format(RetailSetup."EAN Mgt. Gift voucher"));
-
-            //NewTempNo := TouchScreen.PopupNumpad(Text0001,TempNo,FALSE,FALSE);
-            NewTempNo := TempNo;
-            Commit;
-            POSEventMarshaller.NumPadCode(Text0001, NewTempNo, true, false);
-
-            if GiftVoucher.Get(NewTempNo) then begin
-                if GiftVoucher.Amount > 0 then begin
-                    if Confirm(StrSubstNo(Text0002, NewTempNo, GiftVoucher.Amount), false) then
-                        GiftVoucher.Delete(true)
-                    else
-                        exit;
-                end else
-                    GiftVoucher.Delete(true);
-            end;
-
-            if NewTempNo = TempNo then begin
-                NoSeriesMgt.InitSeries(RetailSetup."Gift Voucher No. Management", RetailSetup."Gift Voucher No. Management", 0D, GiftVoucher."No.", RetailSetup."Gift Voucher No. Management");
-                if RetailSetup."EAN Mgt. Gift voucher" <> '' then
-                    GiftVoucher."No." := Utility.CreateEAN(GiftVoucher."No.", Format(RetailSetup."EAN Mgt. Gift voucher"));
-            end else
-                GiftVoucher."No." := NewTempNo;
-            //+NPR5.23[242341]
-
-            if GiftVoucher.Amount < 0 then
-                GiftVoucher.Amount := Abs(GiftVoucher.Amount)
-            else
-                GiftVoucher.Amount := SaleLinePOS.Amount;
-
-            GiftVoucher."Register No." := SaleLinePOS."Register No.";
-            GiftVoucher."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-            GiftVoucher."Issue Date" := SaleLinePOS.Date;
-            GiftVoucher."Shortcut Dimension 1 Code" := SaleLinePOS."Shortcut Dimension 1 Code";
-            GiftVoucher."Shortcut Dimension 2 Code" := SaleLinePOS."Shortcut Dimension 2 Code";
-            GiftVoucher."Location Code" := SaleLinePOS."Location Code";
-            GiftVoucher.Status := GiftVoucher.Status::Cancelled;
-            GiftVoucher.Name := Name;
-            GiftVoucher."Created in Company" := Format(RetailSetup."Company No.");
-            if SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.") then begin
-                GiftVoucher.Salesperson := SalePOS."Salesperson Code";
-                GiftVoucher."Customer No." := SalePOS."Customer No.";
-            end;
-            //-NPR5.38 [266220]
-            GiftVoucher."Currency Code" := SaleLinePOS."Currency Code";
-            if GiftVoucher."Currency Code" = '' then begin
-                GLSetup.Get;
-                GiftVoucher."Currency Code" := GLSetup."LCY Code";
-            end;
-            //+NPR5.38 [266220]
-            GiftVoucher.Insert(true);
-
-            Commit;
-            if RetailSetup."Show Create Giftcertificat" then begin
-                GiftVoucher.SetRecFilter;
-                // Fetch customer information
-                if (SalePOS."Customer Type" = SalePOS."Customer Type"::Ord) and
-                   Customer.Get(GiftVoucher."Customer No.") then begin
-                    GiftVoucher.Name := Customer.Name;
-                    GiftVoucher.Address := Customer.Address;
-                    GiftVoucher."ZIP Code" := Customer."Post Code";
-                    GiftVoucher.City := Customer.City;
-                    ActionTaken := ACTION::LookupOK;
-                    GiftVoucher.Modify;
-                end
-                // Fetch contact information
-                else
-                    if (SalePOS."Customer Type" = SalePOS."Customer Type"::Cash) and
-                 Contact.Get(GiftVoucher."Customer No.") then begin
-                        GiftVoucher.Name := Contact.Name;
-                        GiftVoucher.Address := Contact.Address;
-                        GiftVoucher."ZIP Code" := Contact."Post Code";
-                        GiftVoucher.City := Contact.City;
-                        ActionTaken := ACTION::LookupOK;
-                        GiftVoucher.Modify;
-                    end else
-                        // Type in manually
-                        ActionTaken := PAGE.RunModal(PAGE::"Create Gift Voucher", GiftVoucher);
-            end;
-
-            Name := GiftVoucher.Name;
-            if (ActionTaken = ACTION::LookupOK) or not RetailSetup."Show Create Giftcertificat" then begin
-                SaleLinePOS.Quantity := 1;
-                SaleLinePOS."Unit Price" := GiftVoucher.Amount;
-                SaleLinePOS."Amount Including VAT" := GiftVoucher.Amount;
-                SaleLinePOS."Gift Voucher Ref." := GiftVoucher."No.";
-            end else begin
-                if GiftVoucher.Get(GiftVoucher."No.") then begin
-                    GiftVoucher.Name := Text10600007 + SalePOS."Salesperson Code";
-                    GiftVoucher.Address := '';
-                    GiftVoucher."ZIP Code" := '';
-                    GiftVoucher.City := '';
-                    GiftVoucher.Status := GiftVoucher.Status::Cancelled;
-                    GiftVoucher.Amount := 0;
-                    GiftVoucher.Modify;
-                end;
-                exit(false);
-            end;
-        end;
-
-        exit(true);
-    end;
-
     procedure CreditVoucherLookup(var EkspLinie: Record "Sale Line POS"; var CommStr1: Text[100]): Boolean
     var
         Kasse: Record Register;
@@ -2039,7 +1754,8 @@ codeunit 6014435 "Retail Form Code"
         Err002: Label 'The credit voucher does not exist!';
         "I-Comm": Record "I-Comm";
         validering: Code[50];
-        Marshaller: Codeunit "POS Event Marshaller";
+        // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
+        //Marshaller: Codeunit "POS Event Marshaller";
         t001: Label 'Type/Scan credit voucher number.';
         cvFound: Boolean;
         common_cv: Record "Credit Voucher";
@@ -2060,8 +1776,12 @@ codeunit 6014435 "Retail Form Code"
             /* Touch Screen sales forms */
             if UsingTS then begin
                 if CommStr1 = '' then begin
+                    // TODO: CTRLUPGRADE - Refactor without Marshaller
+                    Error('CTRLUPGRADE');
+                    /*
                     if not Marshaller.NumPadCode(t001, validering, false, false) then
                         validering := '<CANCEL>';
+                    */
                 end else
                     validering := CommStr1;
 
@@ -2286,7 +2006,8 @@ codeunit 6014435 "Retail Form Code"
         TempSaldo: Decimal;
         "I-Comm": Record "I-Comm";
         Err002: Label 'The gift voucher does not exist!';
-        Marshaller: Codeunit "POS Event Marshaller";
+        // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
+        //Marshaller: Codeunit "POS Event Marshaller";
         Validering: Code[20];
         t001: Label 'Type/Scan gift voucher number';
         common_gv: Record "Gift Voucher";
@@ -2310,8 +2031,12 @@ codeunit 6014435 "Retail Form Code"
             /* Touch Screen sales forms */
             if UsingTS then begin
                 if CommStr1 = '' then begin
+                    // TODO: CTRLUPGRADE - Refactor without Marshaller
+                    Error('CTRLUPGRADE');
+                    /*
                     if not Marshaller.NumPadCode(t001, Validering, false, false) then
                         Validering := '<CANCEL>';
+                    */
                 end else
                     Validering := CommStr1;
 

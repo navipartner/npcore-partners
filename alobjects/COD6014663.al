@@ -3,11 +3,6 @@ codeunit 6014663 "Check POS Balancing"
     // NPR5.36/BR  /20170915  CASE 290506 Created object to ensure sequenciality of Sales Tickets in Balancing
     // NPR5.38/BR  /20171212  CASE 292275 Fix for case that the same ticket is used for balancing as for sales ticket
 
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         TextRegisterNotOpen: Label 'Register %1 is not open for sales. Please open the Register and try again.';
         TextRegisterOpen: Label 'Register %1 was opened in another session since this Sales Ticket was created. Please create a new sale or restart the application. If there are sales lines on the ticket, you can save the sale first and retrieve it to the new ticket.';

@@ -524,12 +524,7 @@ codeunit 6151206 "NpCs POS Action Create Order"
 
         SetParameters(POSSaleLine, RetailSalesDocMgt);
         RetailSalesDocMgt.TestSalePOS(SalePOS);
-
-        // TODO: CTRLUPGRADE - Invokes a function that involves Event Marshaller
-        Error('CTRLUPGRADE');
-        /*
         RetailSalesDocMgt.ProcessPOSSale(SalePOS);
-        */
     end;
 
     local procedure CheckCustCredit(SalePOS: Record "Sale POS")

@@ -2178,63 +2178,6 @@ table 6014406 "Sale Line POS"
         //+NPR5.40 [306257]
     end;
 
-    // TODO: CTRLUPGRADE - declares a dependency on the removed POS Event Marshaller codeunit; must be refactored or removed; _obsolete parameter added
-    procedure PrintWarrantyCertificate(var SaleLinePOS: Record "Sale Line POS"; FormatedDate: Text[250]; IsTouch: Boolean; _obsolete: Boolean) Succes: Boolean
-    var
-        RetailSetup2: Record "Retail Setup";
-        ReportSelectionRetail: Record "Report Selection Retail";
-        Txt002: Label 'What date is the return garantie valid from?';
-        Register: Record Register;
-        DateTable: Record Date;
-        // TODO: CTRLUPGRADE - references removed codeunit
-        //POSEventMarshaller: Codeunit "POS Event Marshaller";
-        Date1: Date;
-        RequestDate: Boolean;
-        RetailReportSelectionMgt: Codeunit "Retail Report Selection Mgt.";
-        RecRef: RecordRef;
-    begin
-        //PrintWarrantyCertificate
-        RetailSetup2.Get;
-        Register.Get(SaleLinePOS."Register No.");
-        case Register."Sales Ticket Print Output" of
-            Register."Sales Ticket Print Output"::NEVER,
-          Register."Sales Ticket Print Output"::DEVELOPMENT,
-          Register."Sales Ticket Print Output"::CUSTOMER:
-                exit;
-        end;
-
-        SaleLinePOS.SetRecFilter;
-
-        RequestDate := true;
-
-        if (RetailSetup2."Skip Warranty Voucher Dialog" <> '') and (FormatedDate = 'AUTO') then begin
-            DateTable.SetFilter("Period Start", RetailSetup2."Skip Warranty Voucher Dialog");
-            if (Today >= DateTable.GetRangeMin("Period Start")) and
-               (Today <= DateTable.GetRangeMin("Period Start")) then begin
-                RequestDate := false;
-                FormatedDate := Format(RetailSetup2."Warranty Standard Date");
-                RequestDate := false;
-            end else
-                FormatedDate := Format(Today);
-        end;
-
-        Date1 := Today;
-        // TODO: CTRLUPGRADE - references a removed variable; must be refactored
-        ERROR('CTRLUPGRADE');
-        /*
-        if RequestDate then
-          if not POSEventMarshaller.NumPadDate(Txt002,Date1,false,false) then
-            exit(false);
-        */
-
-        SaleLinePOS.Validate("Label Date", Date1);
-        SaleLinePOS.Modify;
-
-        RecRef.GetTable(SaleLinePOS);
-        RetailReportSelectionMgt.SetRegisterNo("Register No.");
-        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Warranty Certificate");
-    end;
-
     procedure CheckSerialNoApplication(ItemNo: Code[20]; SerialNo: Code[20])
     var
         ItemLedgerEntry: Record "Item Ledger Entry";

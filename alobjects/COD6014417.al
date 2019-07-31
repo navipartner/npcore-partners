@@ -47,7 +47,7 @@ codeunit 6014417 "Call Terminal Integration"
         PaymentTypePOS: Record "Payment Type POS";
         Register: Record Register;
         ConnectionProfileMgt: Codeunit "Connection Profile Management";
-        // TODO: CTRLUPGRADE - this variable must not be used, the page is removed
+        // TODO: CTRLUPGRADE - this variable must not be used, the codeunit is removed
         //DankortProtocol: Codeunit "Credit Card Protocol C-sharp";
         PepperProtocol: Codeunit "Pepper Protocol";
         // TODO: CTRLUPGRADE - this variable must not be used, the page is removed
@@ -220,10 +220,14 @@ codeunit 6014417 "Call Terminal Integration"
                         if MinLengthAuthNo > MaxLengthAuthNo then
                             MinLengthAuthNo := MaxLengthAuthNo;
                         repeat
+                            // TODO: CTRLUPGRADE - The block below must be refactored to not use Marshaller
+                            ERROR('CTRLUPGRADE');
+                            /*
                             if MinLengthAuthNo = MaxLengthAuthNo then
                                 Marshaller.NumPadText(StrSubstNo(PepperText001, MinLengthAuthNo), AuthorisationNo, false, false)
                             else
                                 Marshaller.NumPadText(StrSubstNo(PepperText002, MinLengthAuthNo, MaxLengthAuthNo), AuthorisationNo, false, false);
+                            */
                             if StrLen(AuthorisationNo) > MaxLengthAuthNo then
                                 Error(PepperText003, MaxLengthAuthNo);
                             if PepperProtocol.AuthNoRequired and (StrLen(AuthorisationNo) < MinLengthAuthNo) then begin
@@ -950,7 +954,7 @@ codeunit 6014417 "Call Terminal Integration"
         Betalingsvalg: Record "Payment Type POS";
         RetailSetup: Record "Retail Setup";
         // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
-        Marshaller: Codeunit "POS Event Marshaller";
+        //Marshaller: Codeunit "POS Event Marshaller";
         Filnavn: Text[80];
         Len: Integer;
         "Filter": Code[30];

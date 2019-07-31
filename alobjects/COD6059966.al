@@ -284,7 +284,6 @@ codeunit 6059966 "MPOS Payment API"
 
     local procedure ParseAdyenJson(var mPOSAdyenTransactions: Record "MPOS Adyen Transactions")
     var
-        JToken: DotNet JToken;
         JObject: JsonObject;
         ResponsData: Text;
         IStream: InStream;
@@ -298,54 +297,54 @@ codeunit 6059966 "MPOS Payment API"
             IStream.Read(ResponsData, MaxStrLen(ResponsData));
         end;
 
-        JToken := JObject.Parse(ResponsData);
+        JObject.ReadFrom(ResponsData);
 
-        mPOSAdyenTransactions."Callback Result" := GetString(JToken, 'result');
-        mPOSAdyenTransactions."Callback CS" := GetString(JToken, 'cs');
-        mPOSAdyenTransactions."Callback Merchant Account" := GetString(JToken, 'merchantAccount');
-        mPOSAdyenTransactions."Callback Merchant Reference" := GetString(JToken, 'merchantReference');
+        mPOSAdyenTransactions."Callback Result" := GetString(JObject, 'result');
+        mPOSAdyenTransactions."Callback CS" := GetString(JObject, 'cs');
+        mPOSAdyenTransactions."Callback Merchant Account" := GetString(JObject, 'merchantAccount');
+        mPOSAdyenTransactions."Callback Merchant Reference" := GetString(JObject, 'merchantReference');
 
         case mPOSAdyenTransactions."Callback Result" of
             'ERROR':
                 begin
-                    mPOSAdyenTransactions."Callback Code" := GetString(JToken, 'errorCode');
-                    mPOSAdyenTransactions."Callback Message" := GetString(JToken, 'errorMessage');
+                    mPOSAdyenTransactions."Callback Code" := GetString(JObject, 'errorCode');
+                    mPOSAdyenTransactions."Callback Message" := GetString(JObject, 'errorMessage');
                 end;
             'CANCELLED':
                 begin
-                    mPOSAdyenTransactions."Callback Code" := GetString(JToken, 'cancelCode');
-                    mPOSAdyenTransactions."Callback Message" := GetString(JToken, 'cancelMessage');
+                    mPOSAdyenTransactions."Callback Code" := GetString(JObject, 'cancelCode');
+                    mPOSAdyenTransactions."Callback Message" := GetString(JObject, 'cancelMessage');
                 end;
             'APPROVED':
                 begin
-                    mPOSAdyenTransactions."Callback Panseq" := GetString(JToken, 'panseq');
-                    mPOSAdyenTransactions."Callback POS Entry Mode" := GetString(JToken, 'posEntryMode');
-                    mPOSAdyenTransactions."Callback Card Summary" := GetString(JToken, 'cardSummary');
-                    mPOSAdyenTransactions."Callback PSP Auth Code" := GetString(JToken, 'pspAuthCode');
-                    mPOSAdyenTransactions."Callback Amount Value" := GetInt(JToken, 'amountValue');
-                    mPOSAdyenTransactions."Callback Issuer Country" := GetString(JToken, 'issuerCountry');
-                    mPOSAdyenTransactions."Callback Expiry Month" := GetString(JToken, 'expiryMonth');
-                    mPOSAdyenTransactions."Callback Card Holder Verificat" := GetString(JToken, 'cardHolderVerificationMethodResults');
-                    mPOSAdyenTransactions."Callback Card Scheme" := GetString(JToken, 'cardScheme');
-                    mPOSAdyenTransactions."Callback Card Bin" := GetString(JToken, 'cardBin');
-                    mPOSAdyenTransactions."Callback Application Label" := GetString(JToken, 'applicationLabel');
-                    mPOSAdyenTransactions."Callback Payment Meth Variant" := GetString(JToken, 'paymentMethodVariant');
-                    mPOSAdyenTransactions."Callback Tender Reference" := GetString(JToken, 'tenderReference');
-                    mPOSAdyenTransactions."Callback App Preferred Name" := GetString(JToken, 'applicationPreferredName');
-                    mPOSAdyenTransactions."Callback Aid Code" := GetString(JToken, 'aidCode');
-                    mPOSAdyenTransactions."Callback Org Amount Value" := GetInt(JToken, 'originalAmountValue');
-                    mPOSAdyenTransactions."Callback Tx Time" := GetString(JToken, 'txtime');
-                    mPOSAdyenTransactions."Callback Tx Date" := GetString(JToken, 'txdate');
-                    mPOSAdyenTransactions."Callback Terminal Id" := GetString(JToken, 'terminalId');
-                    mPOSAdyenTransactions."Callback Payment Method" := GetString(JToken, 'paymentMethod');
-                    mPOSAdyenTransactions."Callback PSP Reference" := GetString(JToken, 'pspReference');
-                    mPOSAdyenTransactions."Callback Mid" := GetInt(JToken, 'mid');
-                    mPOSAdyenTransactions."Callback Expiry Year" := GetInt(JToken, 'expiryYear');
-                    mPOSAdyenTransactions."Callback Card Type" := GetString(JToken, 'cardType');
-                    mPOSAdyenTransactions."Callback Org Amount Currency" := GetString(JToken, 'originalAmountCurrency');
-                    mPOSAdyenTransactions."Callback Card Holder Name" := GetString(JToken, 'cardHolderName');
-                    mPOSAdyenTransactions."Callback Amount Currency" := GetString(JToken, 'amountCurrency');
-                    mPOSAdyenTransactions."Callback Transaction Type" := GetString(JToken, 'transactionType');
+                    mPOSAdyenTransactions."Callback Panseq" := GetString(JObject, 'panseq');
+                    mPOSAdyenTransactions."Callback POS Entry Mode" := GetString(JObject, 'posEntryMode');
+                    mPOSAdyenTransactions."Callback Card Summary" := GetString(JObject, 'cardSummary');
+                    mPOSAdyenTransactions."Callback PSP Auth Code" := GetString(JObject, 'pspAuthCode');
+                    mPOSAdyenTransactions."Callback Amount Value" := GetInt(JObject, 'amountValue');
+                    mPOSAdyenTransactions."Callback Issuer Country" := GetString(JObject, 'issuerCountry');
+                    mPOSAdyenTransactions."Callback Expiry Month" := GetString(JObject, 'expiryMonth');
+                    mPOSAdyenTransactions."Callback Card Holder Verificat" := GetString(JObject, 'cardHolderVerificationMethodResults');
+                    mPOSAdyenTransactions."Callback Card Scheme" := GetString(JObject, 'cardScheme');
+                    mPOSAdyenTransactions."Callback Card Bin" := GetString(JObject, 'cardBin');
+                    mPOSAdyenTransactions."Callback Application Label" := GetString(JObject, 'applicationLabel');
+                    mPOSAdyenTransactions."Callback Payment Meth Variant" := GetString(JObject, 'paymentMethodVariant');
+                    mPOSAdyenTransactions."Callback Tender Reference" := GetString(JObject, 'tenderReference');
+                    mPOSAdyenTransactions."Callback App Preferred Name" := GetString(JObject, 'applicationPreferredName');
+                    mPOSAdyenTransactions."Callback Aid Code" := GetString(JObject, 'aidCode');
+                    mPOSAdyenTransactions."Callback Org Amount Value" := GetInt(JObject, 'originalAmountValue');
+                    mPOSAdyenTransactions."Callback Tx Time" := GetString(JObject, 'txtime');
+                    mPOSAdyenTransactions."Callback Tx Date" := GetString(JObject, 'txdate');
+                    mPOSAdyenTransactions."Callback Terminal Id" := GetString(JObject, 'terminalId');
+                    mPOSAdyenTransactions."Callback Payment Method" := GetString(JObject, 'paymentMethod');
+                    mPOSAdyenTransactions."Callback PSP Reference" := GetString(JObject, 'pspReference');
+                    mPOSAdyenTransactions."Callback Mid" := GetInt(JObject, 'mid');
+                    mPOSAdyenTransactions."Callback Expiry Year" := GetInt(JObject, 'expiryYear');
+                    mPOSAdyenTransactions."Callback Card Type" := GetString(JObject, 'cardType');
+                    mPOSAdyenTransactions."Callback Org Amount Currency" := GetString(JObject, 'originalAmountCurrency');
+                    mPOSAdyenTransactions."Callback Card Holder Name" := GetString(JObject, 'cardHolderName');
+                    mPOSAdyenTransactions."Callback Amount Currency" := GetString(JObject, 'amountCurrency');
+                    mPOSAdyenTransactions."Callback Transaction Type" := GetString(JObject, 'transactionType');
                     mPOSAdyenTransactions.Handled := true;
                 end;
         end;
@@ -354,7 +353,6 @@ codeunit 6059966 "MPOS Payment API"
 
     local procedure ParseNetsJson(var mPOSNetsTransactions: Record "MPOS Nets Transactions")
     var
-        JToken: DotNet JToken;
         JObject: JsonObject;
         ResponsData: Text;
         IStream: InStream;
@@ -373,79 +371,82 @@ codeunit 6059966 "MPOS Payment API"
         if ResponsData = EmptyJasonResult then
             exit;
 
-        JToken := JObject.Parse(ResponsData);
+        JObject.ReadFrom(ResponsData);
 
-        mPOSNetsTransactions."Callback Result" := GetInt(JToken, 'result');
-        mPOSNetsTransactions."Callback AccumulatorUpdate" := GetInt(JToken, 'accumulatorUpdate');
-        mPOSNetsTransactions."Callback IssuerId" := GetInt(JToken, 'issuerId');
-        mPOSNetsTransactions."Callback TruncatedPan" := GetString(JToken, 'truncatedPan');
-        mPOSNetsTransactions."Callback EncryptedPan" := GetString(JToken, 'encryptedPan');
-        mPOSNetsTransactions."Callback Timestamp" := GetString(JToken, 'timestamp');
-        mPOSNetsTransactions."Callback VerificationMethod" := GetInt(JToken, 'verificationMethod');
-        mPOSNetsTransactions."Callback SessionNumber" := GetString(JToken, 'sessionNumber');
-        mPOSNetsTransactions."Callback StanAuth" := GetString(JToken, 'stanAuth');
-        mPOSNetsTransactions."Callback SequenceNumber" := GetString(JToken, 'sequenceNumber');
-        mPOSNetsTransactions."Callback TotalAmount" := GetInt(JToken, 'totalAmount');
-        mPOSNetsTransactions."Callback TipAmount" := GetInt(JToken, 'tipAmount');
-        mPOSNetsTransactions."Callback SurchargeAmount" := GetInt(JToken, 'surchargeAmount');
-        mPOSNetsTransactions."Callback AcquiereMerchantID" := GetString(JToken, 'acquiereMerchantID');
-        mPOSNetsTransactions."Callback CardIssuerName" := GetString(JToken, 'cardIssuerName');
-        mPOSNetsTransactions."Callback TCC" := GetString(JToken, 'TCC');
-        mPOSNetsTransactions."Callback AID" := GetString(JToken, 'AID');
-        mPOSNetsTransactions."Callback TVR" := GetString(JToken, 'TVR');
-        mPOSNetsTransactions."Callback TSI" := GetString(JToken, 'TSI');
-        mPOSNetsTransactions."Callback ATC" := GetString(JToken, 'ATC');
-        mPOSNetsTransactions."Callback AED" := GetString(JToken, 'AED');
-        mPOSNetsTransactions."Callback IAC" := GetString(JToken, 'IAC');
+        mPOSNetsTransactions."Callback Result" := GetInt(JObject, 'result');
+        mPOSNetsTransactions."Callback AccumulatorUpdate" := GetInt(JObject, 'accumulatorUpdate');
+        mPOSNetsTransactions."Callback IssuerId" := GetInt(JObject, 'issuerId');
+        mPOSNetsTransactions."Callback TruncatedPan" := GetString(JObject, 'truncatedPan');
+        mPOSNetsTransactions."Callback EncryptedPan" := GetString(JObject, 'encryptedPan');
+        mPOSNetsTransactions."Callback Timestamp" := GetString(JObject, 'timestamp');
+        mPOSNetsTransactions."Callback VerificationMethod" := GetInt(JObject, 'verificationMethod');
+        mPOSNetsTransactions."Callback SessionNumber" := GetString(JObject, 'sessionNumber');
+        mPOSNetsTransactions."Callback StanAuth" := GetString(JObject, 'stanAuth');
+        mPOSNetsTransactions."Callback SequenceNumber" := GetString(JObject, 'sequenceNumber');
+        mPOSNetsTransactions."Callback TotalAmount" := GetInt(JObject, 'totalAmount');
+        mPOSNetsTransactions."Callback TipAmount" := GetInt(JObject, 'tipAmount');
+        mPOSNetsTransactions."Callback SurchargeAmount" := GetInt(JObject, 'surchargeAmount');
+        mPOSNetsTransactions."Callback AcquiereMerchantID" := GetString(JObject, 'acquiereMerchantID');
+        mPOSNetsTransactions."Callback CardIssuerName" := GetString(JObject, 'cardIssuerName');
+        mPOSNetsTransactions."Callback TCC" := GetString(JObject, 'TCC');
+        mPOSNetsTransactions."Callback AID" := GetString(JObject, 'AID');
+        mPOSNetsTransactions."Callback TVR" := GetString(JObject, 'TVR');
+        mPOSNetsTransactions."Callback TSI" := GetString(JObject, 'TSI');
+        mPOSNetsTransactions."Callback ATC" := GetString(JObject, 'ATC');
+        mPOSNetsTransactions."Callback AED" := GetString(JObject, 'AED');
+        mPOSNetsTransactions."Callback IAC" := GetString(JObject, 'IAC');
 
-        mPOSNetsTransactions."Callback OrganisationNumber" := GetString(JToken, 'organisationNumber');
-        mPOSNetsTransactions."Callback BankAgent" := GetString(JToken, 'bankAgent');
-        mPOSNetsTransactions."Callback AccountType" := GetString(JToken, 'accountType');
-        mPOSNetsTransactions."Callback OptionalData" := GetString(JToken, 'optionalData');
-        mPOSNetsTransactions."Callback ResponseCode" := GetString(JToken, 'responseCode');
-        mPOSNetsTransactions."Callback RejectionSource" := GetInt(JToken, 'rejectionSource');
-        mPOSNetsTransactions."Callback RejectionReason" := GetString(JToken, 'rejectionReason');
-        mPOSNetsTransactions."Callback MerchantReference" := GetString(JToken, 'merchantReference');
-        mPOSNetsTransactions."Callback StatusDescription" := GetString(JToken, 'statusDescription');
+        mPOSNetsTransactions."Callback OrganisationNumber" := GetString(JObject, 'organisationNumber');
+        mPOSNetsTransactions."Callback BankAgent" := GetString(JObject, 'bankAgent');
+        mPOSNetsTransactions."Callback AccountType" := GetString(JObject, 'accountType');
+        mPOSNetsTransactions."Callback OptionalData" := GetString(JObject, 'optionalData');
+        mPOSNetsTransactions."Callback ResponseCode" := GetString(JObject, 'responseCode');
+        mPOSNetsTransactions."Callback RejectionSource" := GetInt(JObject, 'rejectionSource');
+        mPOSNetsTransactions."Callback RejectionReason" := GetString(JObject, 'rejectionReason');
+        mPOSNetsTransactions."Callback MerchantReference" := GetString(JObject, 'merchantReference');
+        mPOSNetsTransactions."Callback StatusDescription" := GetString(JObject, 'statusDescription');
 
         mPOSNetsTransactions.Handled := true;
 
-        BigTextVar.AddText(GetString(JToken, 'receipt1'));
+        BigTextVar.AddText(GetString(JObject, 'receipt1'));
         mPOSNetsTransactions."Callback Receipt 1".CreateOutStream(Ostream);
         BigTextVar.Write(Ostream);
 
         Clear(BigTextVar);
-        BigTextVar.AddText(GetString(JToken, 'receipt2'));
+        BigTextVar.AddText(GetString(JObject, 'receipt2'));
         mPOSNetsTransactions."Callback Receipt 2".CreateOutStream(Ostream);
         BigTextVar.Write(Ostream);
 
         mPOSNetsTransactions.Modify(true);
     end;
 
-    local procedure GetString(var JToken: DotNet JToken; JTokenName: Text): Text
+    local procedure GetString(var JObject: JsonObject; JTokenName: Text): Text
     var
-        JsonValue: Text;
+        JToken: JsonToken;
+        JValue: JsonValue;
     begin
-        JsonValue := Format(JToken.SelectToken(JTokenName));
-        if UpperCase(JsonValue) = 'NULL' then
+        if not JObject.Get(JTokenName, JToken) then
             exit('');
 
-        exit(JsonValue);
+        JValue := JToken.AsValue();
+        if (JValue.IsNull) then
+            exit('');
+
+        exit(JValue.AsText());
     end;
 
-    local procedure GetInt(var JToken: DotNet JToken; JTokenName: Text): Integer
+    local procedure GetInt(var JObject: JsonObject; JTokenName: Text): Integer
     var
-        JsonValue: Text;
-        JsonIntValue: Integer;
+        JToken: JsonToken;
+        JValue: JsonValue;
     begin
-        JsonValue := Format(JToken.SelectToken(JTokenName));
-        if UpperCase(JsonValue) = 'NULL' then
+        if not JObject.Get(JTokenName, JToken) then
             exit(0);
 
-        if Evaluate(JsonIntValue, JsonValue) then
-            exit(JsonIntValue)
-        else
+        JValue := JToken.AsValue();
+        if (JValue.IsNull) then
             exit(0);
+        exit(JValue.AsInteger());
     end;
 
     local procedure GetCurrencyCode(SalesLineCurrencyCode: Code[10]): Code[10]

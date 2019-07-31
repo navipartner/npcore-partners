@@ -6,10 +6,6 @@ codeunit 6150788 "POS Action - Print Exch Label"
     // NPR5.45/JC  /20180820 CASE 323894 Validate if qty is negative to proceed or not
 
 
-    trigger OnRun()
-    begin
-    end;
-
     var
         ActionDescription: Label 'This is a built-in action for printing exchange labels.';
         Title: Label 'Print Exchange Label';
@@ -153,8 +149,8 @@ codeunit 6150788 "POS Action - Print Exch Label"
                     //EXIT;
                     JSON.GetJsonObject('value', CalendarObject, true);
 
-                    // TODO: CTRLUPGRADE - For MMV - refactor this to use JsonObject that CalendarObject now is
-                    Error('CTRLUPRADE - TODO FOR MMV');
+                    // TODO: CTRLUPGRADE refactor this to use JsonObject that CalendarObject now is
+                    Error('CTRLUPRADE');
                     /*
                     Evaluate(Count, CalendarObject.Item('Rows').Item('count').ToString);
                     if Count < 1 then

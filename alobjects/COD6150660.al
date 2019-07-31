@@ -345,13 +345,19 @@ codeunit 6150660 "NPRE Waiter Pad POS Management"
 
     procedure GetQtyUI(OrgQty: Decimal; Description: Text; var ioChosenQty: Decimal) OK: Boolean
     var
-        Marshaller: Codeunit "POS Event Marshaller";
+        // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
+        //Marshaller: Codeunit "POS Event Marshaller";
     begin
         //Used by page [Tmp POS Waiter Pad Lines] to chose a qty from a total qty
         //Shall show numpad
         ioChosenQty := OrgQty;
+
+        // TODO: CTRLUPGRADE - Must be refactored to not use Marshaller
+        Error('CTRLUPGRADE');
+        /*
         if not Marshaller.NumPad((StrSubstNo(TXTQtyToMove, Description, OrgQty)), ioChosenQty, false, false) then
             exit(false);
+        */
 
         exit(true);
     end;

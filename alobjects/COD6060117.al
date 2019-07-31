@@ -1,4 +1,3 @@
-// TODO: CTRLUPGRADE - uses old Standard code; must be removed or refactored
 codeunit 6060117 "TM Ticket Retail Management"
 {
     // TM1.00/TSA/20151217  CASE 228982 NaviPartner Ticket Management
