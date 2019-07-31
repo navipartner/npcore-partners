@@ -1,0 +1,573 @@
+﻿.np-animate {
+    -ms-transition: all 300ms ease-out;
+    -o-transition: all 300ms ease-out;
+    -webkit-transition: all 300ms ease-out;
+    transition: all 300ms ease-out;
+}
+
+.np-fadein.prepare, .np-fadeout.complete {
+    -ms-opacity: 0;
+    opacity: 0;
+}
+
+.np-fadein.complete {
+    -ms-opacity: 1 !important;
+    opacity: 1 !important;
+}
+
+.np-inflate.prepare, .np-deflate.complete {
+    -ms-transform: scale(0.3, 0.3);
+    -webkit-transform: scale(0.3, 0.3);
+    transform: scale(0.3, 0.3);
+}
+
+.np-subtle-fadein.prepare, .np-subtle-fadeout.complete {
+    -ms-transform: scale(0.98, 0.98);
+    -webkit-transform: scale(0.98, 0.98);
+    transform: scale(0.98, 0.98);
+}
+
+.np-slide.complete {
+    -ms-transform: translate(0, 0) !important;
+    -webkit-transform: translate(0, 0) !important;
+    transform: translate(0, 0) !important;
+}
+
+.np-viewslide-out.complete, .np-viewslide-in.prepare {
+    -ms-transform: scale(0.983, 0.983) translate(0, 0.6em);
+    -webkit-transform: scale(0.983, 0.983) translate(0, 0.6em);
+    transform: scale(0.983, 0.983) translate(0, 0.6em);
+}
+
+.np-viewslide-out.np-animate {
+    -ms-transition-timing-function: ease-in;
+    -o-transition-timing-function: ease-in;
+    transition-timing-function: ease-in;
+}
+
+.np-viewslide-in.np-animate {
+    -ms-transition-timing-function: ease-out;
+    -o-transition-timing-function: ease-out;
+    transition-timing-function: ease-out;
+}
+
+.np-userguide {
+    font-family: Segoe UI;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: transparent;
+    pointer-events: none;
+    z-index: 199;
+}
+.np-userguide-highlight {
+    -webkit-box-shadow: 0px 0px 20px 8px rgba(255,255,94,0.75);
+    -moz-box-shadow: 0px 0px 20px 8px rgba(255,255,94,0.75);
+    box-shadow: 0px 0px 20px 8px rgba(255,255,94,0.75);
+    background-color: transparent;
+    z-index: 205;
+    pointer-events: none;
+}
+.np-userguide-dim {
+    background-color: rgba(76, 90, 114, 0.7);
+    position: absolute;
+    z-index: 200;
+    pointer-events: all;
+}
+.np-userguide-dim.left {
+    top: 0;
+    left: 0;
+    height: 100vh;
+}
+.np-userguide-dim.right {
+    top: 0;
+    height: 100vh;
+}
+.np-userguide-dim.top {
+    top: 0;
+}
+.np-userguide-dim.full {
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+}
+
+.np-userguide-message {
+    font-family: Segoe UI;
+    font-size: 1.2em;
+    padding: 2em;
+    background-color: #fafafa;
+    border: 0;
+    -webkit-box-shadow: 0 0 30px 0 rgba(0,0,0,0.4);
+    -ms-box-shadow: 0 0 30px 0 rgba(0,0,0,0.4);
+    box-shadow: 0 0 30px 0 rgba(0,0,0,0.4);
+    position: absolute;
+    pointer-events: all;
+    max-width: 50vw;
+}
+
+.np-userguide-message input[type=button] {
+    font-size: 1em;
+}
+
+.np-userguide-message > h1, .np-userguide-message > h2
+{
+    text-align: center;
+    font-weight: 200;
+    margin: 1em;
+}
+
+.np-userguide input[type=button], div.np-userguide-walkthroughs input[type=button], input[type=button].guide {
+    background-color: #6388ae;
+    color: white;
+    font-family: Segoe UI;
+    border: 0;
+    border-radius: 6px;
+    padding: 1em;
+    -webkit-box-shadow: 0 0 13px 0 rgba(0,0,0,0.3);
+    -ms-box-shadow: 0 0 13px 0 rgba(0,0,0,0.3);
+    box-shadow: 0 0 13px 0 rgba(0,0,0,0.3);
+    cursor: pointer;
+    -webkit-transition: background-color 300ms ease-out, transform 40ms ease-out;
+    -moz-transition: background-color 300ms ease-out, transform 40ms ease-out;
+    -ms-transition: background-color 300ms ease-out, transform 40ms ease-out;
+    -o-transition: background-color 300ms ease-out, transform 40ms ease-out;
+    transition: background-color 300ms ease-out, transform 40ms ease-out;
+    -ms-touch-action: none;
+    text-decoration: none;
+    position: relative;
+    min-width: 8em;
+}
+.np-userguide input[type=button]:not(:last-child), div.np-userguide-walkthroughs input[type=button]:not(:last-child), input[type=button].guide:not(:last-child) {
+    margin-right: 1em;
+}
+.np-userguide input[type=button]:hover, div.np-userguide-walkthroughs input[type=button]:hover, input[type=button].guide:hover {
+    background-color: #29578d;
+}
+.np-userguide input[type=button]:active, div.np-userguide-walkthroughs input[type=button]:active, input[type=button].guide:active {
+    -webkit-transform: scale(0.95, 0.95);
+    transform: scale(0.95, 0.95);
+    -webkit-box-shadow: 0 0 7px 0 rgba(0,0,0,0.4);
+    -ms-box-shadow: 0 0 7px 0 rgba(0,0,0,0.4);
+    box-shadow: 0 0 7px 0 rgba(0,0,0,0.4);
+}
+
+.np-userguide-message > p input[type=button] {
+    padding: 0.3em 0.5em;
+    margin: 0 0.3em;
+    font-size: 0.9em;
+    border-radius: 3px;
+    -webkit-box-shadow: 0 0 8px 0 rgba(0,0,0,0.4);
+    -ms-box-shadow: 0 0 8px 0 rgba(0,0,0,0.4);
+    box-shadow: 0 0 8px 0 rgba(0,0,0,0.4);
+}
+
+.statusbar > span#walkthrough {
+    width: 32px;
+    text-align: right;
+    padding-top: 4px;
+}
+
+.np-userguide > .close {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: transparent;
+    pointer-events: none;
+    z-index: 210;
+    white-space: nowrap;
+}
+.np-userguide > .close > div.button {
+    background-color: rgba(0,0,0,0.85);
+    color: rgba(224,224,224,0.85);
+    padding: 0.8em 1.6em;
+    font-size: 0.9em;
+    margin: 2em;
+    border-radius: 6px;
+    pointer-events: all;
+    position: fixed;
+    cursor: default;
+}
+.np-userguide > .close > div.button:hover {
+    background-color: black;
+    color: #eee;
+}
+.np-userguide > .close > div.button:active {
+    -webkit-transform: scale(0.95, 0.95);
+    transform: scale(0.95, 0.95);
+}
+.np-userguide div.buttonrow {
+    text-align: right;
+}
+.np-userguide-message > div.buttonrow {
+    text-align: center;
+    margin-top: 3em;
+}
+.np-userguide-tooltip {
+    pointer-events: all;
+}
+.np-userguide-tooltip p {
+    margin: 0.5em;
+}
+.np-userguide-tooltip.tooltiptext {
+    font-size: 1.2em;
+    background-color: rgba(0,0,0,0.85);
+    color: #eee;
+    border-radius: 6px;
+    padding: 1.5em;
+    position: absolute;
+    z-index: 207;
+    max-width: 35%;
+    -webkit-box-shadow: 0 0 30px 0 rgba(0,0,0,0.47);
+    -ms-box-shadow: 0 0 30px 0 rgba(0,0,0,0.47);
+    box-shadow: 0 0 30px 0 rgba(0,0,0,0.47);
+}
+.np-userguide-tooltip input[type=button] {
+    margin-top: 1.5em;
+    padding: 0.8em;
+    font-size: 0.8em;
+    font-family: Segoe UI;
+    color: #777;
+    border-radius: 6px;
+    border: 1px solid #777;
+    background-color: rgba(0,0,0,0.35);
+}
+.np-userguide-tooltip input[type=button]:hover {
+    background-color: black;
+    color: #eee;
+    border-color: #aaa;
+}
+.np-userguide-tooltip input[type=button]:active {
+    -webkit-transform: scale(0.95, 0.95);
+    transform: scale(0.95, 0.95);
+    -webkit-transition: none;
+    -moz-transition: none;
+    -ms-transition: none;
+    -o-transition: none;
+    transition: none;
+}
+.np-userguide-tooltip > p input[type=button] {
+    padding: 0.2em 0.4em;
+    margin: 0 0.2em;
+    border-radius: 3px;
+}
+
+.np-userguide-tooltip.tooltiptext.over::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: black transparent transparent transparent;
+}
+
+.np-userguide-tooltip.tooltiptext.under::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent black transparent;
+}
+
+.np-userguide-tooltip.tooltiptext.right::after {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent black transparent transparent;
+}
+
+.np-userguide-tooltip.tooltiptext.left::after {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent transparent black;
+}
+
+div.np-userguide-walkthroughsbottom {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 399;
+    background-color: rgba(224, 224, 224, 0.2);
+}
+
+div.np-userguide-walkthroughs {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    position: fixed;
+    z-index: 400;
+    top: 0;
+    left: 0;
+    background-color: rgba(224, 224, 224, 0.97);
+    -webkit-box-shadow: 0 0 30px 0 rgba(0,0,0,0.4);
+    -ms-box-shadow: 0 0 30px 0 rgba(0,0,0,0.4);
+    box-shadow: 0 0 30px 0 rgba(0,0,0,0.4);
+
+    padding: 40px;
+}
+
+.np-animate-400 {
+    -webkit-transition: all 400ms ease-out;
+    -moz-transition: all 400ms ease-out;
+    -ms-transition: all 400ms ease-out;
+    -o-transition: all 400ms ease-out;
+    transition: all 400ms ease-out;	
+}
+
+.np-fadedout {
+    opacity: 0;
+}
+.np-fadein {
+    opacity: 1;
+}
+.np-slide.left {
+    -ms-transform: translate(48px, 0) scale(0.95, 1);
+    -webkit-transform: translate(48px, 0) scale(0.95, 1);
+    transform: translate(48px, 0) scale(0.95, 1);
+}
+.np-slide.done {
+    -ms-transform: translate(0, 0) scale(1, 1) !important;
+    -webkit-transform: translate(0, 0) scale(1, 1) !important;
+    transform: translate(0, 0) scale(1, 1) !important;
+}
+
+div.np-userguide-walkthroughs .titlebox {
+    font-weight: 200;
+    flex: 0 0 4em;
+    margin-bottom: 1em;
+}
+div.np-userguide-walkthroughs .titlebox .title {
+    font-size: 2.5em;
+}
+
+div.np-userguide-walkthroughs .container {
+    margin-bottom: 1em;
+    flex: 1 1 1em;
+    display: flex;
+    flex-flow: column wrap;
+    align-content: flex-start;
+}
+
+div.np-userguide-walkthroughs .container .item {
+    background-color: ghostwhite;
+    -webkit-box-shadow: 0 0 30px 0 rgba(0,0,0,0.4);
+    -ms-box-shadow: 0 0 30px 0 rgba(0,0,0,0.4);
+    box-shadow: 0 0 30px 0 rgba(0,0,0,0.4);
+    border-radius: 6px;
+    cursor: default;
+
+    flex: 0 0 5.5em;
+    margin-bottom: 1em;
+    margin-right: 2em;
+    width: 30em;
+    display: flex;
+    flex-flow: row nowrap;
+    padding-left: 1em;
+
+    -webkit-transition: all 200ms ease-out;
+    -moz-transition: all 200ms ease-out;
+    -ms-transition: all 200ms ease-out;
+    -o-transition: all 200ms ease-out;
+    transition: all 200ms ease-out;
+    transform: translateY(-24px);
+    opacity: 0;
+    text-decoration: none;
+}
+
+div.np-userguide-walkthroughs .container .item.active:hover {
+    box-shadow: 0 0 30px 0 rgba(0,192,24,0.4);
+    -ms-transform: scale(1.02, 1.02);
+    -webkit-transform: scale(1.02, 1.02);
+    transform: scale(1.02, 1.02);
+}
+
+div.np-userguide-walkthroughs .container .item.active:active {
+    box-shadow: 0 0 20px 0 rgba(0,208,12,0.6);
+    transform: scale(0.97, 0.97);
+}
+
+div.np-userguide-walkthroughs .container .item.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+div.np-userguide-walkthroughs .container .item.disabled {
+    opacity: 0.3;
+}
+
+div.np-userguide-walkthroughs > .container > .item > .object {
+    display: block;
+    flex: 1 0 10em;
+    padding: 0.5em;
+}
+
+div.np-userguide-walkthroughs > .container > .item > .object > .name {
+    font-size: 1.2em;
+    display: block;
+    margin-bottom: 0.3em;
+    color: #333;
+}
+
+div.np-userguide-walkthroughs > .container > .item > .object > .name > span.fa {
+    font-size: 0.85em;
+    color: #777;
+}
+
+div.np-userguide-walkthroughs > .container > .item > .object > .description {
+    display: block;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.np-walkthrough-done {
+    flex: 0 0 5.5em;
+    background-color: gray;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+.np-walkthrough-done.completed {
+    background-color: forestgreen;
+    -webkit-transition: all 200ms ease-out;
+    -moz-transition: all 200ms ease-out;
+    -ms-transition: all 200ms ease-out;
+    -o-transition: all 200ms ease-out;
+    transition: all 200ms ease-out;
+}
+
+.np-walkthrough-done.waiting {
+    background-color: #0f68c6;
+}
+
+.np-walkthrough-done.available {
+    background-color: goldenrod;
+}
+
+.np-walkthrough-done.running {
+    background-color: darkred;
+}
+
+.np-walkthrough-done.running > .icon {
+    -webkit-animation: spin 4s linear infinite;
+    -moz-animation: spin 4s linear infinite;
+    animation: spin 4s linear infinite;
+}
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
+.np-walkthrough-done > .icon {
+    font-size: 3em;
+    font-weight: 100;
+    color: white;
+    text-align: center;
+    -webkit-transition: all 200ms ease-out;
+    -moz-transition: all 200ms ease-out;
+    -ms-transition: all 200ms ease-out;
+    -o-transition: all 200ms ease-out;
+    transition: all 200ms ease-out;
+}
+
+.np-walkthrough-done.completed:hover {
+    background-color: #20b220;
+}
+.np-walkthrough-done.completed > .icon:hover {
+    -ms-transform: scale(1.1, 1.1);
+    -webkit-transform: scale(1.1, 1.1);
+    transform: scale(1.1, 1.1);
+}
+.np-transition.prepare {
+    -ms-transition: all 350ms ease-in !important;
+    -o-transition: all 350ms ease-in !important;
+    -webkit-transition: all 350ms ease-in !important;
+    transition: all 350ms ease-in !important;
+}
+.np-transition.prepare-out {
+    -ms-transition: all 350ms ease-out !important;
+    -o-transition: all 350ms ease-out !important;
+    -webkit-transition: all 350ms ease-out !important;
+    transition: all 350ms ease-out !important;
+}
+
+.np-transition.fadezoom {
+    opacity: 0 !important;
+    -ms-transform: scale(2, 2) !important;
+    -webkit-transform: scale(2, 2) !important;
+    transform: scale(2, 2) !important;
+    -webkit-transform: translateZ(0);
+}
+.np-transition.fadezoom.small {
+    transform: scale(1.1, 1.1) !important;	
+}
+
+div.np-userguide-walkthroughs .buttons {
+    flex: 0 0 4em;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-end;
+}
+
+@media only screen and (min-width : 320px) and (max-width : 768px) {
+    .np-userguide-message {
+        max-width: 100vw;
+        font-size: 1.5em;
+    }
+
+    .np-userguide input[type=button], div.np-userguide-walkthroughs input[type=button] {
+        width: 100%;
+    }
+
+    .np-userguide input[type=button], div.np-userguide-walkthroughs input[type=button]:not(:last-child) {
+        margin-bottom: 1em
+    }
+
+    .np-userguide-tooltip.tooltiptext {
+        font-size: 1.4em;
+        max-width: 80%;
+    }
+
+    .np-userguide > .close > div.button {
+        margin: 1em;
+        font-size: 1.1em;
+    }
+
+    .np-userguide-tooltip.tooltiptext.over::after, .np-userguide-tooltip.tooltiptext.over::after, .np-userguide-tooltip.tooltiptext.over::after, .np-userguide-tooltip.tooltiptext.over::after {
+        font-size: 0;
+        border: 0 solid transparent !important;
+    }
+}
+
+
+@media only screen and (min-width : 320px) and (max-width : 768px) {
+    .np-userguide {
+        font-size: 0.5em;
+    }¨ 
+}

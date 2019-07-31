@@ -12,13 +12,13 @@ codeunit 6150733 "POS Workflows 2.0"
         Stopwatches: DotNet npNetDictionary_Of_T_U;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
-    local procedure OnAction20(Method: Text; Context: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
+    local procedure OnAction20(Method: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         ActionCode: Text;
         WorkflowId: Integer;
         Workflowstep: Text;
         ActionId: Integer;
-        ActionContext: DotNet JObject;
+        ActionContext: JsonObject;
     begin
         if Method <> 'OnAction20' then
             exit;
@@ -29,36 +29,37 @@ codeunit 6150733 "POS Workflows 2.0"
         InvokeAction20(ActionCode, WorkflowId, Workflowstep, ActionId, ActionContext, POSSession, FrontEnd);
     end;
 
-    local procedure RetrieveActionContext(Context: DotNet JObject; var ActionCode: Text; var WorkflowId: Integer; var WorkflowStep: Text; var ActionId: Integer; var ActionContext: DotNet JObject)
+    local procedure RetrieveActionContext(Context: JsonObject; var ActionCode: Text; var WorkflowId: Integer; var WorkflowStep: Text; var ActionId: Integer; var ActionContext: JsonObject)
     var
-        ContextArray: DotNet JArray;
-        JToken: DotNet JToken;
+        ContextArray: JsonArray;
+        JToken: JsonToken;
+        JValue: JsonValue;
         NetConvHelper: Variant;
-        DotNetType: DotNet npNetType;
     begin
         NetConvHelper := Context;
         ContextArray := NetConvHelper;
 
-        JToken := ContextArray.Item(0);
-        ActionCode := JToken.ToString();
+        ContextArray.Get(0, JToken);
+        JValue := JToken.AsValue();
+        ActionCode := JValue.AsText();
 
-        JToken := ContextArray.Item(1);
-        WorkflowStep := JToken.ToString();
+        ContextArray.Get(1, JToken);
+        JValue := JToken.AsValue();
+        WorkflowStep := JValue.AsText();
 
-        JToken := ContextArray.Item(2);
+        ContextArray.Get(2, JToken);
+        JValue := JToken.AsValue();
+        WorkflowId := JValue.AsInteger();
 
-        DotNetType := GetDotNetType(WorkflowId);
-        WorkflowId := JToken.ToObject(DotNetType);
+        ContextArray.Get(3, JToken);
+        JValue := JToken.AsValue();
+        ActionId := JValue.AsInteger();
 
-        JToken := ContextArray.Item(3);
-        DotNetType := GetDotNetType(WorkflowId);
-        ActionId := JToken.ToObject(DotNetType);
-
-        JToken := ContextArray.Item(4);
-        ActionContext := JToken;
+        ContextArray.Get(4, JToken);
+        ActionContext := JToken.AsObject();
     end;
 
-    local procedure InvokeAction20("Action": Text; WorkflowId: Integer; WorkflowStep: Text; ActionId: Integer; Context: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
+    local procedure InvokeAction20("Action": Text; WorkflowId: Integer; WorkflowStep: Text; ActionId: Integer; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         POSAction: Record "POS Action";
         JavaScriptInterface: Codeunit "POS JavaScript Interface";
@@ -167,12 +168,12 @@ codeunit 6150733 "POS Workflows 2.0"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInvokeAction("Action": Record "POS Action"; WorkflowStep: Text; Context: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnBeforeInvokeAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInvokeAction("Action": Record "POS Action"; WorkflowStep: Text; Context: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnAfterInvokeAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     begin
     end;
 }

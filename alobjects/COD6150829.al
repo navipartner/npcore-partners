@@ -17,45 +17,45 @@ codeunit 6150829 "POS Action - POS Info"
 
     local procedure ActionCode(): Text
     begin
-        exit ('POSINFO');
+        exit('POSINFO');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.4');
+        exit('1.4');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
-            RegisterTextParameter ('POSInfoCode', '');
-            RegisterWorkflow(false);
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
+                RegisterTextParameter('POSInfoCode', '');
+                RegisterWorkflow(false);
 
-            //-NPR5.45 [319879]
-            //RegisterDataBinding();
-            //+NPR5.45 [319879]
+                //-NPR5.45 [319879]
+                //RegisterDataBinding();
+                //+NPR5.45 [319879]
 
-          end;
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         Confirmed: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        OpenPOSInfoPage (Context, POSSession, FrontEnd);
+        OpenPOSInfoPage(Context, POSSession, FrontEnd);
 
         Handled := true;
     end;
@@ -63,11 +63,11 @@ codeunit 6150829 "POS Action - POS Info"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "POS Caption Management")
     begin
-        Captions.AddActionCaption (ActionCode, 'title', Title);
-        Captions.AddActionCaption (ActionCode, 'notallowed', NotAllowed);
+        Captions.AddActionCaption(ActionCode, 'title', Title);
+        Captions.AddActionCaption(ActionCode, 'notallowed', NotAllowed);
     end;
 
-    local procedure OpenPOSInfoPage(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OpenPOSInfoPage(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         POSSale: Codeunit "POS Sale";
@@ -80,8 +80,8 @@ codeunit 6150829 "POS Action - POS Info"
         CurrentViewType: DotNet npNetViewType0;
         ViewType: DotNet npNetViewType0;
     begin
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        JSON.SetScope ('parameters', true);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        JSON.SetScope('parameters', true);
 
         //-NPR5.45 [319879]
         // POSSession.GetCurrentView (CurrentView);
@@ -91,29 +91,29 @@ codeunit 6150829 "POS Action - POS Info"
         //  POSInfoManagement.ProcessPOSInfoMenuFunction(LinePOS,JSON.GetString ('POSInfoCode', TRUE));
         // END;
 
-        POSSession.GetSale (POSSale);
-        POSSale.GetCurrentSale (SalePOS);
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
 
-        POSSession.GetCurrentView (CurrentView);
-        if (CurrentView.Type.Equals (ViewType.Sale)) then begin
-          POSSession.GetSaleLine(POSSaleLine);
-          POSSaleLine.GetCurrentSaleLine(LinePOS);
+        POSSession.GetCurrentView(CurrentView);
+        if (CurrentView.Type.Equals(ViewType.Sale)) then begin
+            POSSession.GetSaleLine(POSSaleLine);
+            POSSaleLine.GetCurrentSaleLine(LinePOS);
         end;
 
-        if (CurrentView.Type.Equals (ViewType.Payment)) then begin
-          POSSession.GetPaymentLine(POSPaymentLine);
-          POSPaymentLine.GetCurrentPaymentLine(LinePOS);
+        if (CurrentView.Type.Equals(ViewType.Payment)) then begin
+            POSSession.GetPaymentLine(POSPaymentLine);
+            POSPaymentLine.GetCurrentPaymentLine(LinePOS);
         end;
 
         if (LinePOS."Sales Ticket No." = '') then begin
-          // No lines in current view
-          LinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
-          LinePOS."Register No." := SalePOS."Register No.";
-          LinePOS.Date := SalePOS.Date;
-          LinePOS.Type := LinePOS.Type::Item;
+            // No lines in current view
+            LinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
+            LinePOS."Register No." := SalePOS."Register No.";
+            LinePOS.Date := SalePOS.Date;
+            LinePOS.Type := LinePOS.Type::Item;
         end;
 
-        POSInfoManagement.ProcessPOSInfoMenuFunction(LinePOS,JSON.GetString ('POSInfoCode', true));
+        POSInfoManagement.ProcessPOSInfoMenuFunction(LinePOS, JSON.GetString('POSInfoCode', true));
 
         //+NPR5.45 [319879]
     end;

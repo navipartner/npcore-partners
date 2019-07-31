@@ -385,7 +385,7 @@ codeunit 6151002 "POS Proxy - Display"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150725, 'OnBeforeActionWorkflow', '', true, true)]
-    local procedure CU6150725OnBeforeActionWorkflow(PaymentTypePOS: Record "Payment Type POS"; Parameters: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: Codeunit "POS JSON Management"; SubTotal: Decimal; var Handled: Boolean)
+    local procedure CU6150725OnBeforeActionWorkflow(PaymentTypePOS: Record "Payment Type POS"; Parameters: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: Codeunit "POS JSON Management"; SubTotal: Decimal; var Handled: Boolean)
     var
         POSSaleLine: Codeunit "POS Sale Line";
         SaleLinePOS: Record "Sale Line POS";
@@ -444,11 +444,11 @@ codeunit 6151002 "POS Proxy - Display"
             if "No." = '' then
                 exit;
 
-          //-#361939 [361939]
-          //IF (Type = Type::Item) AND ("Discount Type" IN ["Discount Type"::"BOM List", "Discount Type"::"6"]) THEN
-          if (Type = Type::Item) and ("Discount Type" = "Discount Type"::"BOM List") then
-          //+#361939 [361939]
-            exit;
+            //-#361939 [361939]
+            //IF (Type = Type::Item) AND ("Discount Type" IN ["Discount Type"::"BOM List", "Discount Type"::"6"]) THEN
+            if (Type = Type::Item) and ("Discount Type" = "Discount Type"::"BOM List") then
+                //+#361939 [361939]
+                exit;
 
             Line1 := PadStr(Description, 20);
             Total := ' = ' + Format("Amount Including VAT", 0, '<Precision,0:2><Standard Format,0>');

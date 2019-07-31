@@ -21,12 +21,12 @@ codeunit 6150854 "POS Action - CK Management"
 
     local procedure ActionCode(): Text
     begin
-        exit ('CK_MANAGEMENT');
+        exit('CK_MANAGEMENT');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -40,19 +40,19 @@ codeunit 6150854 "POS Action - CK Management"
           Sender."Subscriber Instances Allowed"::Multiple)
         then begin
 
-          Sender.RegisterWorkflowStep('1','respond();');
-          Sender.RegisterWorkflow(false);
+            Sender.RegisterWorkflowStep('1', 'respond();');
+            Sender.RegisterWorkflow(false);
 
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action"; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         Handled := true;
     end;
@@ -63,7 +63,7 @@ codeunit 6150854 "POS Action - CK Management"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         ObjectId: Integer;
@@ -71,7 +71,7 @@ codeunit 6150854 "POS Action - CK Management"
         MenuFilterCode: Code[20];
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         OnInvokeDevice(POSSession);
 
@@ -92,21 +92,21 @@ codeunit 6150854 "POS Action - CK Management"
         StepTxt: Text;
         Register: Record Register;
     begin
-        POSSession.GetSetup (Setup);
+        POSSession.GetSetup(Setup);
         Setup.GetRegisterRecord(Register);
 
         if not CashKeeperSetup.Get(Register."Register No.") then
-          Error(CashkeeperNotFound,Register."Register No.");
+            Error(CashkeeperNotFound, Register."Register No.");
 
         State := State.State();
         State.ActionType := StateEnum.Setup;
         StepTxt := 'Setup';
 
         if not CashKeeperSetup."Debug Mode" then begin
-          CashKeeperSetup.TestField("CashKeeper IP");
-          State.IP := CashKeeperSetup."CashKeeper IP";
+            CashKeeperSetup.TestField("CashKeeper IP");
+            State.IP := CashKeeperSetup."CashKeeper IP";
         end else
-          State.IP := 'localhost';
+            State.IP := 'localhost';
 
         CashKeeperRequest := CashKeeperRequest.CashKeeperRequest();
         CashKeeperRequest.State := State;
@@ -115,24 +115,25 @@ codeunit 6150854 "POS Action - CK Management"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnDeviceResponse', '', true, true)]
-    local procedure OnDeviceResponse(ActionName: Text;Step: Text;Envelope: DotNet npNetResponseEnvelope0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnDeviceResponse(ActionName: Text; Step: Text; Envelope: DotNet npNetResponseEnvelope0; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     begin
         if (ActionName <> 'CK_MANAGEMENT') then
-          exit;
+            exit;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', true, true)]
-    local procedure OnDeviceEvent(ActionName: Text;EventName: Text;Data: Text;ResponseRequired: Boolean;var ReturnData: Text;var Handled: Boolean)
+    local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
     var
         FrontEnd: Codeunit "POS Front End Management";
     begin
         if (ActionName <> 'CK_MANAGEMENT') then
-          exit;
+            exit;
 
         Handled := true;
         //-NPR5.43 [319764]
         case EventName of
-          'CloseForm': CloseForm(Data);
+            'CloseForm':
+                CloseForm(Data);
         end;
         //+NPR5.43 [319764]
     end;
@@ -160,18 +161,18 @@ codeunit 6150854 "POS Action - CK Management"
         POSSale.GetCurrentSale(SalePOS);
 
         if (State.MessageText = 'CKOVERVIEW') then begin
-          if Evaluate(OverviewAmout,State.StatusText) then begin
-            CashKeeperOverview.Init;
-            CashKeeperOverview."CashKeeper IP" := State.IP;
-            CashKeeperOverview."Lookup Timestamp" := CurrentDateTime;
-            CashKeeperOverview."Register No." := Register."Register No.";
-            CashKeeperOverview.Salesperson := SalePOS."Salesperson Code";
-            CashKeeperOverview."Value In Cents" := OverviewAmout;
-            if CashKeeperOverview."Value In Cents" > 0 then
-              CashKeeperOverview."Total Amount" := CashKeeperOverview."Value In Cents" / 100;
-            CashKeeperOverview."User Id" := UserId;
-            CashKeeperOverview.Insert(true);
-          end;
+            if Evaluate(OverviewAmout, State.StatusText) then begin
+                CashKeeperOverview.Init;
+                CashKeeperOverview."CashKeeper IP" := State.IP;
+                CashKeeperOverview."Lookup Timestamp" := CurrentDateTime;
+                CashKeeperOverview."Register No." := Register."Register No.";
+                CashKeeperOverview.Salesperson := SalePOS."Salesperson Code";
+                CashKeeperOverview."Value In Cents" := OverviewAmout;
+                if CashKeeperOverview."Value In Cents" > 0 then
+                    CashKeeperOverview."Total Amount" := CashKeeperOverview."Value In Cents" / 100;
+                CashKeeperOverview."User Id" := UserId;
+                CashKeeperOverview.Insert(true);
+            end;
         end;
     end;
 }

@@ -1,0 +1,2317 @@
+html {
+    touch-action: none;
+}
+
+body
+{
+    margin: 0;
+    padding: 0;
+    height: 100vh !important;
+    width: 100vw !important;
+    background-color: white;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    cursor: default;
+}
+
+body, input, textarea, keygen, select, button {
+    font-family: Gill Sans, Segoe UI, Apple SD Gothic Neo, Verdana, Geneva, sans-serif;
+    font-size: 16px;
+}
+
+
+.np-html, .np-head, th, thead, table, tbody, tr, div.subtotal {
+    font-family: Gill Sans, Segoe UI, Apple SD Gothic Neo, Verdana, Geneva, sans-serif;
+}
+
+th, thead, table, tbody, tr, div.subtotal {
+    font-family: Gill Sans, Segoe UI, Apple SD Gothic Neo, Verdana, Geneva, sans-serif !important;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body > div#controlAddIn {
+    height: 100vh !important;
+    width: 100vw !important;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+}
+
+table {
+    font-size: 1em;
+}
+
+thead, th, tbody, tr, td {
+    padding: 0;
+    margin: 0;
+}
+
+img {
+    max-width: 100%;
+}
+
+.np-container {
+    display: block;
+}
+
+.np-textbox {
+    border: 2px solid #b5cfe7;
+    padding: 5px 10px;
+}
+
+.np-textbox.np-error {
+    border-color: #e00000;
+    background-color: #ffede8;
+}
+
+.np-textbox.np-filteredinputactive {
+    color: #7ba1c4;
+}
+
+.np-fontsize-x-small {
+    font-size: 0.6em;
+}
+.np-fontsize-small {
+    font-size: 0.8em;
+}
+.np-fontsize-normal {
+    font-size: 1em;
+}
+.np-fontsize-medium {
+    font-size: 1.2em;
+}
+.np-fontsize-semilarge {
+    font-size: 1.4em;
+}
+.np-fontsize-large {
+    font-size: 1.6em;
+}
+.np-fontsize-x-large {
+    font-size: 2em;
+}
+.np-fontstyle-regular {
+    font-weight: normal;
+}
+.np-fontstyle-semibold {
+    font-weight: 600;
+    font-family: Gill Sans, Segoe UI Semibold, Verdana;
+}
+.np-fontstyle-bold {
+    font-weight: bold;
+}
+.np-fontstyle-uppercase {
+    text-transform: uppercase;
+}
+
+.np-overlay {
+    background: #999;
+    height: 100vh;    
+    width: 100vw;
+    position: fixed;
+    z-index: 29;
+    -ms-opacity: 0.4;
+    opacity: 0.4;
+}
+
+.np-text-align-none {
+    text-align: initial;
+}
+
+.np-text-align-left {
+    text-align: left;
+}
+
+.np-text-align-right {
+    text-align: right;
+}
+
+.np-text-align-center {
+    text-align: center;
+}
+
+.np-text-align-justify {
+    text-align: justify;
+}
+
+.np-underline:hover {
+    text-decoration: underline;
+}
+
+tr.negative-row {
+    color: firebrick;
+}
+
+div.np-image {
+    width: 100%;
+}
+
+div.np-image > img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+}
+
+.dummy {}
+
+div.np-page {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+div.np-page, div.np-view, div.np-layout {
+    display: flex;
+    align-items: stretch;
+}
+
+.np-view {
+    padding: 1.5em;
+    height: 100%;
+}
+
+.np-view.with-statusbar {
+    height: calc(100% - 2em);
+}
+
+.flow-horizontal {
+    flex-flow: row nowrap;
+}
+
+.flow-vertical {
+    flex-flow: column nowrap;
+}
+
+.np-layout {
+    flex: 100000 100000;
+}
+
+.np-layout > .np-layout:not(:first-child),
+.np-layout.flow-horizontal > .np-layout:not(:first-child) {
+  margin: 0;
+  margin-left: 1.5em;
+}
+
+.np-layout.flow-vertical > .np-layout:not(:first-child) {
+  margin: 0;
+  margin-top: 1.5em;
+}
+
+body
+{
+}
+
+.np-dont-panic {
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    top: 0;
+    left: 0;
+    position: fixed;
+    background-color: #1a793e;
+    color: white;
+    font-family: Gill Sans, Segoe UI Light, Apple SD Gothic Neo Thin, Verdana, Geneva, sans-serif;
+    font-weight: 300;
+    text-align: center;
+}
+
+.np-dont-panic.red {
+    background-color: #781919;
+}
+
+.np-dont-panic .box {
+    position: relative;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.np-dont-panic .box .title {
+    font-size: 3em;
+    padding: 1em;
+}
+
+.np-dont-panic .box .message {
+    font-size: 2em;
+}
+
+
+.d {}
+
+.np-watermark {
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	width: 100vw;
+	height: 100vh;
+	z-index: 99999;
+	-ms-opacity: 0.05;
+	opacity: 0.05;
+	color: black;
+	pointer-events: none;
+	font-family: Gill Sans, Segoe UI, Verdana;
+	font-weight: 900;
+	display: flex;
+	-moz-align-content: flex-end;
+	-o-align-content: flex-end;
+	-webkit-align-content: flex-end;
+	align-content: flex-end;
+}
+
+.np-watermark > .content {
+	-webkit-flex: 1 1 auto;
+	-ms-flex: 1 1 auto;
+	-o-flex: 1 1 auto;
+	flex: 1 1 auto;
+	-webkit-align-self: center;
+	-o-align-self: center;
+	align-self: center;
+	text-align: center;
+	-ms-transform: rotateZ(-45deg);
+	-webkit-transform: rotateZ(-45deg);
+	transform: rotateZ(-45deg);
+	font-size: 10em !important;
+}
+
+div#controlAddIn {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 1;
+}
+
+div#oldControlAddIn {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 2;
+}
+
+.dummy {}
+
+.np-icon:before {
+    font: normal normal normal 14px/1 Segoe;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translate(0, 0);
+  display: block;
+  padding-bottom: 0;
+}
+
+.np-icon-size-16:before {
+    font-size: 1em;
+}
+.np-icon-size-24:before {
+    font-size: 1.5em;
+}
+.np-icon-size-32:before {
+    font-size: 2em;
+}
+.np-icon-size-48:before {
+    font-size: 48px;
+}
+.np-icon-size-64:before {
+    font-size: 64px;
+}
+.np-icon-size-80:before {
+    font-size: 80px;
+}
+.np-icon-size-96:before {
+    font-size: 96px;
+}
+.np-icon-size-128:before {
+    font-size: 128px;
+}
+
+.dummy {}
+
+.np-button {
+    color: #fff;
+    background-color: #6388ae;
+    -ms-background-clip: padding-box !important;
+    -moz-background-clip: padding-box !important;
+    -webkit-background-clip: padding-box !important;
+    background-clip: padding-box !important;
+    cursor: pointer;
+    margin-right: 0.3em;
+    -webkit-transition: background-color 300ms ease-out;
+    -moz-transition: background-color 300ms ease-out;
+    -ms-transition: background-color 300ms ease-out;
+    -o-transition: background-color 300ms ease-out;
+    transition: background-color 300ms ease-out;
+    -ms-touch-action: none;
+    text-decoration: none;
+    position: relative;
+}
+
+.np-button {
+    text-align: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 100%;
+    -ms-flex: 1 1 100%;
+    flex: 1 1 100%;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: column wrap;
+    flex-flow: column wrap;
+    min-width: 0;
+}
+
+.np-button span {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-flow: column wrap;
+    -ms-flex-flow: column wrap;
+    flex-flow: column wrap;
+    width: 100%;
+}
+
+.np-button .np-icon {
+    height: 50%;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 50%;
+    flex: 1 1 50%;
+}
+
+.np-button .np-caption {
+    height: 100%;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 100%;
+    flex: 1 1 100%;
+
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    width: 100%;
+}
+
+.np-button .np-caption small {
+    display: block;
+    text-overflow: ellipsis;
+    width: 100%;
+    overflow: hidden;
+}
+
+.np-button.has-icon .np-caption {
+    height: 50%;
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 50%;
+    flex: 1 1 50%;
+}
+
+.np-button .np-caption .inner-content {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: block;
+    width: 100%;
+}
+
+.np-button.multiline .np-caption .inner-content {
+    white-space: normal;
+}
+
+.np-button.singleline .np-caption .inner-content {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.np-button.image-below, 
+.np-button.image-above {
+    background-size: cover;
+    background-position: center 0;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.np-button.image-below .np-caption,
+.np-button.image-above .np-caption {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+    padding: 3px 3px 5px;
+    position: absolute;
+    top: 0;
+    height: auto;
+}
+
+.np-button.image-above .np-caption {
+    bottom: 0;
+    top: auto;
+}
+
+/* on last element remove border-right */
+.np-button:last-child {
+    margin-right: 0;
+}
+.np-button:hover {
+    background-color: #29578d;
+}
+
+.np-button:active, .np-button.active {
+    -webkit-transform: scale(0.95, 0.95);
+    transform: scale(0.95, 0.95);
+    -webkit-transition: none;
+    -moz-transition: none;
+    -ms-transition: none;
+    -o-transition: none;
+    transition: none;
+}
+
+.np-style-disabled {
+    background-color: #c1cddd !important;
+    cursor: default !important;
+}
+
+.np-style-disabled:active {
+    -webkit-transform: scale(1, 1);
+    transform: scale(1, 1);
+}
+
+.np-style-disabled:hover, .np-style-disabled:focus {
+    background-color: #c1cddd !important;
+}
+
+.np-button-color-default,
+.np-button.image-below.np-button-color-default .np-caption,
+.np-button.image-above.np-button-color-default .np-caption {
+    background-color: #6388ae;
+}
+
+.np-button-color-default:hover,
+.np-button.image-below.np-button-color-default:hover .np-caption,
+.np-button.image-above.np-button-color-default:hover .np-caption {
+    background-color: #29578d;
+}
+
+.np-button-color-green,
+.np-button.image-below.np-button-color-green .np-caption,
+.np-button.image-above.np-button-color-green .np-caption {
+    background-color: #5eb267;
+}
+
+.np-button-color-green:hover,
+.np-button.image-below.np-button-color-green:hover .np-caption,
+.np-button.image-above.np-button-color-green:hover .np-caption {
+    background-color: #34803c;
+}
+
+.np-button-color-red,
+.np-button.image-below.np-button-color-red .np-caption,
+.np-button.image-above.np-button-color-red .np-caption {
+    background-color: #db3439;
+}
+
+.np-button-color-red:hover,
+.np-button.image-below.np-button-color-red:hover .np-caption,
+.np-button.image-above.np-button-color-red:hover .np-caption {
+    background-color: #b30d13;
+}
+
+.np-button-color-dark-red,
+.np-button.image-below.np-button-color-dark-red .np-caption,
+.np-button.image-above.np-button-color-dark-red .np-caption {
+    background-color: #982420;
+}
+
+.np-button-color-dark-red:hover,
+.np-button.image-below.np-button-color-dark-red:hover .np-caption,
+.np-button.image-above.np-button-color-dark-red:hover .np-caption {
+    background-color: #6c1714;
+}
+
+.np-button-color-gray,
+.np-button.image-below.np-button-color-gray .np-caption,
+.np-button.image-above.np-button-color-gray .np-caption {
+    background-color: #a4b4c8;
+}
+
+.np-button-color-gray:hover,
+.np-button.image-below.np-button-color-gray:hover .np-caption,
+.np-button.image-above.np-button-color-gray:hover .np-caption {
+    background-color: #76889c;
+}
+
+.np-button-color-purple,
+.np-button.image-below.np-button-color-purple .np-caption,
+.np-button.image-above.np-button-color-purple .np-caption {
+    background-color: #80588c;
+}
+
+.np-button-color-purple:hover,
+.np-button.image-below.np-button-color-purple:hover .np-caption,
+.np-button.image-above.np-button-color-purple:hover .np-caption {
+    background-color: #5e3b69;
+}
+
+.np-button-color-indigo,
+.np-button.image-below.np-button-color-indigo .np-caption,
+.np-button.image-above.np-button-color-indigo .np-caption {
+    background-color: #655093;
+}
+
+.np-button-color-indigo:hover,
+.np-button.image-below.np-button-color-indigo:hover .np-caption,
+.np-button.image-above.np-button-color-indigo:hover .np-caption {
+    background-color: #45346a;
+}
+
+.np-button-color-yellow,
+.np-button.image-below.np-button-color-yellow .np-caption,
+.np-button.image-above.np-button-color-yellow .np-caption {
+    background-color: #e5d736;
+}
+
+.np-button-color-yellow:hover,
+.np-button.image-below.np-button-color-yellow:hover .np-caption,
+.np-button.image-above.np-button-color-yellow:hover .np-caption {
+    background-color: #aea115;
+}
+
+.np-button-color-orange,
+.np-button.image-below.np-button-color-orange .np-caption,
+.np-button.image-above.np-button-color-orange .np-caption {
+    background-color: #f0aa35;
+}
+
+.np-button-color-orange:hover,
+.np-button.image-below.np-button-color-orange:hover .np-caption,
+.np-button.image-above.np-button-color-orange:hover .np-caption {
+    background-color: #a76b07;
+}
+
+.np-button-color-white,
+.np-button.image-below.np-button-color-white .np-caption,
+.np-button.image-above.np-button-color-white .np-caption {
+    background-color: #D8D8D8;
+}
+
+.np-button-color-white:hover,
+.np-button.image-below.np-button-color-white:hover .np-caption,
+.np-button.image-above.np-button-color-white:hover .np-caption {
+    background-color: #9c9c9c;
+}
+
+.np-button.image-below > .np-caption, .np-button.image-above > .np-caption {
+    left: 0;
+}
+
+.np-button.has-text-overlay > .np-caption {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.np-erase {
+    float: right;
+    width: 32%;
+    height: 40px;   
+    margin: 0;
+    border: 0 solid #bcc0ce;
+}
+
+.np-button .warning {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 5;
+    opacity: 0.5;
+    transition: opacity 300ms ease-out;
+}
+
+.np-button .warning:hover {
+    opacity: 1;
+}
+.dummy {}
+
+.np-buttongrid {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-flow: column nowrap;
+    -ms-flex-flow: column nowrap;
+    flex-flow: column nowrap;
+    flex: 1 1 100%;
+    height: auto;
+    width: 100%;
+}
+
+.np-buttongridrow {
+    padding-bottom: 0.3em;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 100%;
+    -ms-flex: 1 1 100%;
+    flex: 1 1 100%;
+    width: 100%;
+}
+
+.np-buttongridrow:last-child {
+    padding-bottom: 0;
+}
+
+.np-buttongrid.one-row .np-buttongridrow {
+    -webkit-flex-flow: column wrap;
+    -ms-flex-flow: column wrap;
+    flex-flow: column wrap;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+    width: calc(100% + 0.3em);
+}
+
+.np-buttongrid.one-row .np-buttongridrow .np-button {
+    margin-bottom: 0.3em;
+    -webkit-flex: 0 0 auto;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    width: auto !important;
+}
+
+
+.dummy {}
+
+.np-grid {
+    flex: 1 1 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.np-grid .np-grid-table.np-grid-table-head {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 auto;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    height: 2em;
+    overflow: hidden;
+}
+
+.np-grid .np-grid-table {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+}
+
+.np-grid-table {
+    width: 100%;
+    overflow-y: auto;
+    background: #fff;
+}
+
+.np-grid-table-head {
+    height: auto;
+}
+
+.np-grid-table table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.np-grid-table.np-grid-table-body {
+    border-left: 1px solid #c1c4ca;
+    border-right: 1px solid #c1c4ca;
+    border-bottom: 1px solid #c1c4ca;
+}
+
+.np-grid-table table thead {
+    background-color: #457db5;
+    color: #eeeeee;
+}
+
+.np-grid-table table thead th {
+    padding: 0.2em;
+    height: 2em;
+    overflow: hidden;
+    -moz-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    float: left;
+    font-family: Gill Sans, Segoe UI Semibold, Verdana;
+    font-weight: 600;
+    vertical-align: middle;
+    line-height: 1.6em;
+}
+
+.np-grid-table table tbody tr {
+    border-bottom: 1px solid #f1f4fa;
+    cursor: default;
+}
+
+.np-grid-table table tr.np-tr-highlight {
+    background-color: #cee5f9;
+}
+
+.np-grid-table table tbody td {
+    border-right: 1px solid #c1c4ca;
+    line-height: 1.6em;
+    padding: 0.5% 1%;
+    overflow: hidden;
+    -moz-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    float: left;
+}
+
+.np-grid-table table tbody td:last-child {
+    border-right: none;
+} 
+
+.np-grid .subtotal {
+    color: #1b3050;
+    font-family: Gill Sans, Segoe UI Semibold, Verdana;
+    font-weight: 600;
+    vertical-align: bottom;
+    margin-right: 5px;
+    margin-top: 5px;
+    height: 1.5em;
+    text-align: right;
+    text-transform: uppercase;
+    margin:5px 5px 5px 0;
+    flex: 0 0 auto;
+}
+
+.np-grid .subtotal span {
+    margin-left: 4%;
+    font-weight: normal;
+}
+
+.np-grid .subtotal.negative {
+    color: firebrick;
+}
+
+#salesLines .np-grid-table-body,
+#paymentLines .np-grid-table-body
+{ flex-basis: 0; }
+.dummy{}
+
+div.np-input-with-caption {
+    display: block;
+    margin-bottom: 0.5em;
+    width: 100%;
+}
+
+div.np-input-with-caption .np-label {
+    width: 100%;
+    background-color: #457db5;
+    color: #eeeeee;
+    padding: 5px 10px;
+    color: #fff;
+    margin: 0 auto 8px;
+}
+
+div.np-input-with-caption > div.np-inputholder {
+    width: 100%;
+    display: flex;
+}
+
+div.np-input-with-caption > div.np-inputholder > input {
+    flex: 1 1 66%;
+    margin-right: 0.4em;
+}
+
+div.np-input-with-caption > div.np-inputholder > .np-erase {
+    flex: 1 1 34%;
+    margin-left: 0.3em;
+}
+
+
+.dummy {}
+
+.np-numpadsimple {
+    display: flex;
+    flex: 1 1 100%;
+    width: 100%;
+    height: 100%;
+}
+.dummy {}
+
+div.np-loginpad {
+    display: flex;
+    flex-flow: column nowrap;
+    flex: 1 1 100%;
+}
+
+div.np-loginpad > .np-buttongridheader {
+    flex: 0 0 1.5em;
+    background-color: #457db5;
+    color: #eeeeee;
+    padding: 5px 10px;
+    color: #fff;
+    margin: 0 auto 8px;
+}
+
+div.np-loginpad > .np-loginpad-inputholder {
+    flex: 0 0 2.5em;
+	margin: 0 0 8px;
+}
+
+div.np-loginpad > .np-loginpad-inputholder > .np-textbox {
+    flex: 1 0 60%;
+    height: 1.4em;
+    margin-right:0.2em;
+}
+
+div.np-loginpad > .np-numpadsimple {
+    flex: 1 1 100%;
+    display: flex;
+}
+.dummy
+{
+}
+
+/* Data caption box */
+
+.np-datacaptionbox {
+    background: #e9e9e9;
+    clear: both;
+    overflow: hidden;
+    width: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: column nowrap;
+    flex-flow: column nowrap;
+    -ms-flex-pack: distribute;
+    justify-content: space-around;
+}
+
+.np-datacaptionbox .left-right {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+}
+
+.np-datacaptionbox .left-right .left {
+    flex: 1 1 70%;
+}
+
+.np-datacaptionbox .left-right .left .value {
+    text-align: left;
+}
+
+.np-datacaptionbox .left-right .right {
+    flex: 1 1 30%;
+}
+
+/* New rules */
+.np-datacaptionbox .np-datacaption .caption {
+    font-family: Gill Sans, Segoe UI, Verdana;
+    font-weight: 600;
+}
+
+.np-datacaptionbox .np-label.caption {
+    text-align: left;
+    font-weight: 600;
+    font-family: Gill Sans, Segoe UI, Verdana;
+}
+
+.np-datacaption .np-label.caption.non-translated {
+    color: #919191;
+}
+
+.np-datacaption .np-label.caption.non-translated span {
+    border-bottom: 1px dotted #acacac;
+}
+
+.np-datacaptionbox .np-label.value {
+    text-align: right;
+}
+
+.np-datacaptionbox .np-datacaption {
+    font-family: Gill Sans, Segoe UI, Verdana;
+    height: 1.7em;
+    clear: both;
+    overflow: hidden;
+    padding: 0 0.5em;
+
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+
+    flex: 1 1 auto;
+}
+
+.np-datacaptionbox .np-label {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+}
+
+.np-datacaptionbox .np-datacaption .np-label > span {
+    flex: 1 1 auto;
+}
+
+.np-datacaptionbox .lastline {
+    background: #4b4b4b;
+    color: #eeeeee;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    flex: 1 1 auto;
+}
+
+.lastline .np-datacaption {
+    border: none;
+    align-self: center;
+}
+
+.np-datacaptionbox-title {
+    border-bottom: 1px solid #c7c7c7 !important;
+    font-weight: 100;
+    font-size: 1.2em;
+    text-align: center;
+    height: 2.25em;
+}
+
+.np-datacaptionbox .np-datacaptionbox-title .np-label.caption {
+    float: none;
+}
+
+.np-datacaptionbox .np-datacaptionbox-title .np-label.caption > span {
+    overflow: hidden;
+    width: 100%;
+    display: inline-block;
+}
+
+.np-datacaptionbox.np-fontsize-medium .np-datacaption .np-label > span {
+    font-size: 1.125em;
+}
+
+.np-datacaptionbox.np-fontsize-semilarge .np-datacaption .np-label > span {
+    font-size: 1.25em;
+}
+
+.np-datacaptionbox.np-fontsize-large .np-datacaption .np-label > span {
+    font-size: 1.375em;
+}
+
+.np-datacaptionbox.np-fontsize-x-large .np-datacaption .np-label > span {
+    font-size: 1.5em;
+}
+
+
+.dummy
+{
+}
+
+.statusbar {
+    overflow: hidden;
+    background: #457db5;
+    color: #eee;
+    padding: 0;
+    width: 100%;
+    display: table;
+    font-size: 0.8em;
+    height: 2em;
+}
+
+.statusbar span {
+    padding: 0 8px;
+    height: 100%;
+    display: table-cell;
+    vertical-align: middle;
+    white-space: nowrap;
+    font-family: Gill Sans, Segoe UI Light, Verdana;
+    font-weight: 300;
+}
+
+.statusbar span:first-child {
+    padding-left: 20px;
+}
+
+.statusbar .group {
+    padding: 0 12px;
+    display: table;
+}
+
+.statusbar .strong {
+    font-weight: 600;
+    font-family: Gill Sans, Segoe UI Semibold, Verdana;
+}
+
+.statusbar .right {
+    float: right;
+}
+
+.dummy {} /* Always start the file with this */
+
+.np-popup {
+    display: none;
+}
+
+.np-popup .np-label.titlebar {
+    height: 40px;
+    background-color: #309ce6;
+    color: #f3f8fb;
+    margin-bottom: 8px;
+    font-weight: 400;
+    border: 0;
+    padding: 0;
+    text-align: left;
+}
+
+.np-popup .titlebar span {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-flow: column nowrap;
+    -ms-flex-flow: column nowrap;
+    flex-flow: column nowrap;
+    font-size: 20px;
+    font-weight: 400;
+    height: 40px;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    padding-left: 8px;
+}
+
+.np-popup.np-container {
+    background-color: white;
+    padding: 0;
+    -webkit-box-shadow: 0 0 30px 0 rgba(0,0,0,0.47);
+    -ms-box-shadow: 0 0 30px 0 rgba(0,0,0,0.47);
+    box-shadow: 0 0 30px 0 rgba(0,0,0,0.47);
+}
+
+.np-popup .np-label {
+    color: #555555;
+    width: 100%;
+    text-align: center;
+}
+
+.np-popup .np-label.caption span {
+    display: table-cell;
+    width: 100%;
+    text-align: left;
+}
+
+.np-popup .np-container.body {
+    height: calc(100% - 128px);
+    overflow: hidden;
+    padding: 24px 0;
+    min-width: 30vw;
+    min-height: 20vh;
+}
+
+.np-popup .np-container.body .np-container.content {
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    height: 100%;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.np-popup .np-container.actions {
+    width: 100%;
+    background: #e9edef;
+}
+
+.np-popup .np-container.actions .buttons {
+    padding: 15px;
+    height: 80px;
+    width: 100%;
+    display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;		
+    -webkit-box-pack: end;
+    -webkit-justify-content: flex-end;
+    -ms-flex-pack: end;
+    justify-content: flex-end;		
+}
+
+.np-popup .np-container.actions .np-button {
+	-webkit-box-flex: 0;
+	-webkit-flex: 0 0 115px;
+	-ms-flex: 0 0 115px;
+	flex: 0 0 115px;
+}
+
+
+.np-popup .actions .np-button.ok, .np-popup .actions .np-button.yes {
+    background: #5eb267;
+}
+
+.np-popup .actions .np-button.ok:hover, .np-popup .actions .np-button.yes:hover, .np-popup .actions .np-button.ok:focus, .np-popup .actions .np-button.yes:focus {
+    background: #34803c;
+}
+
+
+.np-popup.dialog .np-container.body {
+	padding: 24px;
+}
+
+.dummy {} /* Always start the file with this */
+
+.np-popup.numpad .np-container.body {
+    padding: 0 24px 16px;
+}
+
+.np-popup.numpad .np-container.body .np-container.content {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    -ms-flex-flow: row wrap;
+    flex-flow: row wrap;
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+}
+
+.np-popup.numpad .np-container.body .np-container.content .np-container {
+    width: 100%;
+}
+
+.np-popup.numpad .entry-data {
+    overflow: hidden;
+    height: 40px;
+    margin-bottom: 8px;
+}
+
+.np-popup.numpad .entry-data input {
+    float: left;
+    width: calc((100% - 25px) * 0.75 + 16px);
+    height: 100%;
+}
+
+.np-popup.numpad .entry-data .np-button {
+    float: right;
+    width: calc((100% - 25px) / 4);
+    margin-right: 1px;
+    border-top: none;
+    border-bottom: none;
+    height: 40px;
+}
+
+.np-popup.numpad .entry-label {
+    margin-bottom: 6px;
+    margin-top: 6px;
+    text-align: left;
+}
+
+.np-popup.numpad .np-container.entry-label .np-label {
+    text-align: left;
+}
+
+.np-popup.numpad .body .np-buttongrid {
+    height: 100%;
+}
+
+.np-popup.numpad .np-container.numpadbox {
+    height: calc(100% - 110px);
+    padding: 25px;
+}
+
+.np-popup.numpad .np-numpadfull {
+    height: calc(100% - 40px);
+}
+
+.np-popup.numpad .np-dataentrypad {
+    height: 475px;
+    width: 100%;
+}
+
+
+.dummy {} /* Always start the file with this */
+
+.np-popup.searchbox .np-container.body {
+    padding: 24px;
+}
+
+.np-popup.searchbox .content .input {
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.np-popup.searchbox .np-container.body .np-container.content {
+    text-align: left;
+    -webkit-flex-flow: column nowrap;
+    -ms-flex-flow: column nowrap;
+    flex-flow: column nowrap;
+}
+
+.dummy {} /* Always start the file with this */
+
+.np-popup.functionspopup {
+    width: 60%;
+}
+
+.np-popup.functionspopup .np-container.content {
+    padding: 0 32px;
+}
+
+.np-popup.functionspopup .np-container.buttongrid {
+    height: 100%;
+    width: 100%;
+}
+
+.np-popup.functionspopup .np-buttongrid {
+    height: 100%;
+}
+
+.np-popup.functionspopup .caption {
+    padding: 0 0 4px 0;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+body
+{}
+
+.toast {
+    width: 300px;
+    height: 80px;
+    background-color: transparent;
+    position: absolute;
+    z-index: 1;
+    right: 40px;
+    bottom: 0;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    color: transparent;
+}
+
+.toast.visible {
+    background-color: rgba(32,32,32,0.667);
+    box-shadow: 0 0 23px rgba(0,0,0,0.3);
+    color: white;
+    transform: translateY(-40px);
+}
+
+.toast.visible:hover {
+    background-color: rgba(32,32,32,0.925);
+    box-shadow: 0 0 23px rgba(0,0,0,0.6);
+}
+
+.toast.visible > .caption {
+    color: white;
+}
+
+.dummy { }
+
+.np-inputfilterpanel {
+    background-color: #457db5;
+    -webkit-box-shadow: 0 0 30px 0 rgba(0,0,0,0.4);
+    -ms-box-shadow: 0 0 30px 0 rgba(0,0,0,0.4);
+    box-shadow: 0 0 30px 0 rgba(0,0,0,0.4);
+    color: #eeeeee;
+}
+
+.np-inputfilterpanel > .commands {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.np-inputfilterpanel > .commands > .command {
+    flex: 0 0 auto;
+    padding: 0.5em;
+    color: #ccd8e5;
+    background-color: #396a9b;
+    font-size: 0.8em;
+    transition: all 0.3s;
+}
+
+.np-inputfilterpanel > .commands > .command.active {
+    background-color: #20476d;
+    -webkit-box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.4);
+    -ms-box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.4);
+    box-shadow: 0px 0px 30px 0px rgba(0,0,0,0.4);
+}
+
+.np-inputfilterpanel > .commands > .command.active {
+    background-color: #20476d;
+    -webkit-box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.4);
+    -ms-box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.4);
+    box-shadow: 0px 0px 30px 0px rgba(0,0,0,0.4);
+}
+
+.np-inputfilterpanel > .commands > .command span.match {
+    color: #47a4ff;
+    font-weight: bold;
+}
+
+.np-inputfilterpanel > .commands > .command:not(:last-child) {
+    margin-bottom: 0.5em;
+}
+
+.np-inputfilterpanel > .commands > .command > .description {
+    color: #6792bc;
+    font-size: 1em;
+}
+.dummy {} /* Always start the file with this */
+
+.np-popup.calendargrid {
+    display: flex;
+}
+
+.np-popup.calendargrid .content {
+    display: block !important;
+    height: 100%;
+    width: 100%;
+}
+
+.np-popup.calendargrid .all {
+    display: flex;
+    flex-flow: column nowrap;
+    height: 100%;
+}
+
+.np-popup.calendargrid .all .caption {
+    flex: 0 1 auto;
+    text-align: left;
+    padding: 0 16px;
+}
+
+.np-popup.calendargrid .all .controlcontent {
+    display: flex;
+    flex: 1 0 auto;
+}
+
+.np-popup.calendargrid .left {
+    flex: 0 0 35%;
+    height: 100%;
+}
+
+.np-popup.calendargrid .right {
+    flex: 0 0 65%;
+    height: 100%;
+}
+
+.np-popup.calendargrid .right .np-grid {
+    height: 100%;
+    padding: 12px;
+}
+
+.np-popup.calendargrid .np-datepicker {
+    padding: 12px;
+}
+
+.np-popup.calendargrid .np-datepicker .ui-datepicker-calendar td a {
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.np-popup.calendargrid .body .np-label {
+    text-align: left;
+}
+
+
+/* Changes from IE development - to fix DPI issues */
+
+.ui-datepicker {
+    width: 100%;
+    padding: 0;
+}
+
+.ui-datepicker .ui-datepicker-header {
+    padding: 8px;
+    font-size: 20px;
+}
+
+.ui-datepicker .ui-datepicker-title {
+    font-size: 14px;
+}
+
+.ui-datepicker table {
+    font-size: 16px;
+}
+
+.ui-datepicker td span, .ui-datepicker td a {
+    padding: 10px;
+}
+
+.ui-widget-content {
+    border: 0;
+}
+
+.ui-widget-header {
+    border: 0;
+}
+
+.dummy {} /* Always start the file with this */
+
+@media only screen and (min-width:600px) {
+    body, input, textarea, keygen, select, button, table, div {
+        font-size: 8px;
+    }
+}
+
+@media only screen and (min-width:700px) {
+    body, input, textarea, keygen, select, button, table, div {
+        font-size: 9px;
+    }
+}
+
+@media only screen and (min-width:800px) {
+    body, input, textarea, keygen, select, button, table, div {
+        font-size: 10px;
+    }
+}
+
+@media only screen and (min-width:1000px) {
+    body, input, textarea, keygen, select, button, table, div {
+        font-size: 11px;
+    }
+}
+
+@media only screen and (min-width:1200px) {
+    body, input, textarea, keygen, select, button, table, div {
+        font-size: 13px;
+    }
+}
+
+@media only screen and (min-width:1400px) {
+    body, input, textarea, keygen, select, button, table, div {
+        font-size: 14px;
+    }
+}
+
+
+@media only screen and (min-width:1600px) {
+    body, input, textarea, keygen, select, button, table, div {
+        font-size: 15px;
+    }
+}
+
+@media only screen and (min-width:1900px) {
+    body, input, textarea, keygen, select, button, table, div {
+        font-size: 16px;
+    }
+}
+
+@media only screen and (min-width:2200px) {
+    body, input, textarea, keygen, select, button, table, div {
+        font-size: 19px;
+    }
+}
+
+@media only screen and (min-width:2600px) {
+    body, input, textarea, keygen, select, button, table, div {
+        font-size: 22px;
+    }
+}
+
+@media only screen and (min-width:3000px) {
+    body, input, textarea, keygen, select, button, table, div {
+        font-size: 24px;
+    }
+}
+
+/* Non-mobile styles */
+
+@media not screen and (min-width : 320px) and (max-width : 768px) {
+    .np-showbehavior-app {
+        display: none;
+    }
+}
+
+/* Mobile styles */
+
+@media only screen and (min-width : 320px) and (max-width : 768px) {
+
+    body {
+        font-size: 12px !important;
+    }
+
+    /*============================= */
+    /*        Buttons style         */
+    /* ============================ */
+
+    .np-buttongrid.one-row .np-buttongridrow .np-button {
+        -webkit-transition: none 0s ease 0s;
+        -moz-transition: none 0s ease 0s;
+        -ms-transition: none 0s ease 0s;
+        -o-transition: none 0s ease 0s;
+        transition: none 0s ease 0s;
+        margin: 0 0.3em 0.3em 0;
+        -webkit-flex: 0 0 auto;
+        -ms-flex: 0 0 auto;
+        flex: 0 0 auto;
+    }
+
+    .np-buttongrid.one-row .np-buttongridrow .np-button:last-child {
+        margin-right: 0.3em;
+    }
+
+    .np-buttongrid.one-row .np-buttongridrow .np-button.np-style-disabled {
+        display: none;
+    }
+
+    /*============================= */
+    /*         Login page           */
+    /* ============================ */
+
+    .np-view-login {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .np-view-login > .logo {
+        align-items: center;
+        justify-content: center;
+        flex-grow: 0 !important;
+        flex-shrink: 1 !important;
+        flex-basis: 20vh !important;
+        overflow: hidden;
+    }
+    
+    .np-view-login > .loginpad {
+        flex-grow: 1 !important;
+        flex-shrink: 1 !important;
+        flex-basis: 80vh !important;
+    }
+
+    .np-view-login > .menu {
+        flex-grow: 0 !important;
+        flex-shrink: 1 !important;
+        flex-basis: 3em !important;
+    }
+
+    .np-view-login > .menu .np-buttongrid {
+        height: 40px !important;
+    }
+
+    .np-view-login > .info {
+        flex-grow: 0 !important;
+        flex-shrink: 0 !important;
+        flex-basis: 2em !important;
+    }
+
+    .np-view-login > .info .np-datacaptionbox .np-datacaption {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    .np-buttongrid {
+        height: initial;
+        flex: 1 1 100% !important;
+    }
+    
+    /* TRANSITIONS */
+
+    #controlAddIn, #oldControlAddIn {
+        position: absolute;
+        top: 0px;
+        width: 100vw !important;
+        height: 100vh !important;
+    }
+
+    .np_slide {
+	    -ms-transition: transform 0.6s;
+	    -o-transition: transform 0.6s;
+	    -webkit-transition: transform 0.6s;
+	    transition: transform 0.6s;
+    }
+
+	#oldControlAddIn {
+        left: 100vw;
+    }
+
+    /*==================================== */
+    /*         Sale/Payment page           */
+    /* =================================== */
+
+    .np-view-sale, .np-view-payment {
+        padding: 0.5em;
+        overflow: visible;
+        height: 100vh;
+    }
+
+    .sale-right-bottom, .payment-right-bottom {
+        position: absolute;
+        width: calc(100% - 1em);
+        height: calc(40vh - 5.5em);
+        z-index: 999;
+    }
+
+    .sale-right-bottom.tablet-full, .payment-right-bottom.tablet-full {
+        background: #E8EAEC;
+        top: 0.5em;       
+        height: calc(90vh - 1em);
+    }
+
+    .sale-right #buttongrid-functions-top, .payment-right #buttongrid-functions-top {
+        height: auto;
+    }
+
+    .sale-right .tablet-full #buttongrid-functions-top, .payment-right .tablet-full #buttongrid-functions-top {
+        height: 30vh;
+    }
+
+    .np-grid .np-grid-table.np-grid-table-head {
+        height: 2em;
+    }
+
+    .np-datacaptionbox {
+        padding-top: 0;
+    }
+
+    .sale-left .np-buttongrid, .payment-left .np-buttongrid {
+        display: none;
+        height: auto;        
+        position: absolute;
+        top: 0.5em;
+        background: #E6E8EA;
+        width: calc(100% - 1em);
+        z-index: 1000;
+    }
+
+    .sale-left .np-buttongrid.tablet-active, .payment-left .np-buttongrid.tablet-active {
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        height: calc(90vh - 0.7em);
+    }
+
+    .sale-right, .payment-right {
+        width: 100%;
+        clear: both;
+        height: 40vh;
+        position: static;
+    }
+
+    .np-textbox, .np-erase {
+        height: 30px;
+    }
+
+    .np-view-sale .np-layout.more-menu, .np-view-sale .np-layout.items-menu, .np-view-payment .np-layout.more-menu, .np-view-payment .np-layout.items-menu {
+        flex: 0 0 0em;
+        overflow-y: hidden;
+        transition: 0.4s all;
+        margin-top: 0 !important;
+    }
+
+    .np-layout.more-menu.more-margin, .np-layout.items-menu.more-margin {
+        margin-top: 1em !important;
+    }
+
+    .np-view-sale .np-layout.togglable, .np-view-payment .np-layout.togglable {
+        flex: 0 0 11.4em;
+        transition: 0.4s all;
+        overflow: hidden;
+    }
+
+    .np-view-sale .np-layout.bottom-menu, .np-view-payment .np-layout.bottom-menu {
+        margin-top: 1em !important;
+        background-color: white;
+    }
+
+    .np-view-sale #buttongrid-functions-items-menu {
+        height: 55vh;
+    }
+
+    .np-view-sale #buttongrid-functions-more-menu {
+        height: 40vh;
+    }
+
+    .np-view-payment #buttongrid-functions-items-menu {
+        height: 55vh;
+    }
+
+    .np-view-payment #buttongrid-functions-more-menu {
+        height: 25vh;
+    }
+
+    .tablet-full #buttongrid-functions-bottom {
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        height: calc(60vh - 1em);
+    }
+
+    .tablet-full .np-buttongridrow:last-child {
+        padding-bottom: 0.3em;
+    }
+
+    .tablet-full #buttongrid-functions-bottom .np-buttongridrow:last-child {
+        padding-bottom: 0;
+    }
+
+    .statusbar {
+        display: none;
+    }
+
+    /* tablet menu */
+    .np-tablet, .np-tabletbutton {
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        height: 9vh;
+    }
+
+    .np-tablet {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 10vh;
+        left: 0;
+        padding: 0.5em;
+        background: #c4cdd6;
+    }
+
+    .np-tabletbutton {
+        height: auto;
+    }
+
+    .np-showbehavior-desktop {
+        display: none;
+    }
+
+    /*============================= */
+    /*           Popups             */
+    /* ============================ */
+
+    .np-popup {
+        width: 100% !important;
+        height: 100% !important;
+        top: 0 !important;
+        left: 0 !important;
+    }
+
+    .np-popup .np-container.body, .np-popup.searchbox .np-container.body {
+        padding: 15px 0;
+    }
+
+    .np-popup .np-container.content, .np-popup.functionspopup .np-container.content {
+        padding: 0 15px;
+    }
+
+    .np-popup .np-buttongrid {
+        height: 100%;
+    }
+
+    .np-popup .np-container.actions .buttons {
+        -webkit-justify-content: space-around;
+        -ms-flex-pack: distribute;
+        justify-content: space-around;
+    }
+
+    .np-popup.numpad .np-container.body {
+        padding: 0 0 15px;
+    }
+
+    .np-popup.numpad .np-dataentrypad {
+        height: 100%;
+        display: table-row;
+    }
+
+    .np-popup.numpad .np-container.body .np-container.content {
+        display: table;
+    }
+
+    .np-popup.numpad .entry-data .np-button, .np-popup.numpad .entry-data {
+        height: 30px;
+    }
+
+    .np-popup.numpad .np-numpadfull {
+        height: calc(100% - 40px);
+    }
+
+    .np-popup.lookup .np-container.body {
+        height: calc(100vh - 128px);
+        padding-top: 10px;
+    }
+
+    .np-popup.lookup .np-container.np-lookup {
+        padding: 0;
+        margin: 15px 0 0;
+        height: calc(100vh - 200px);
+    }
+
+    .np-lookup .object {
+        margin: 8px 0;
+    }
+
+    .np-lookup .object .info:before {
+        display: none;
+    }
+
+    .np-lookup .object:first-child {
+        margin-top: 0;
+    }
+
+    .np-popup.lookup .np-container.body .np-container.content {
+        -webkit-align-content: flex-start;
+        -ms-flex-line-pack: start;
+        align-content: flex-start;
+    }
+
+    .np-popup.lookup .np-container.body .np-container.content .np-textbox {
+        width: 80%;
+    }
+
+    .np-lookup .object .row .info {
+        font-size: 16px;
+    }
+
+    /*============================= */
+    /*     Popup animation          */
+    /* ============================ */
+
+    .ui-popup-container {
+        height: calc(90vh - 1em);
+        left: 0;
+        top: 0.5em !important;
+        width: calc(100% - 1em);
+        max-width: 100% !important;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+    }
+
+    .ui-popup.ui-body-inherit {
+        height: 100%;
+        width: 100%;
+        border-radius: 0;
+    }
+
+    .ui-overlay-a, .ui-page-theme-a, .ui-page-theme-a .ui-panel-wrapper, .ui-body-a, .ui-page-theme-a .ui-body-inherit, .ui-bar-a .ui-body-inherit, .ui-body-a .ui-body-inherit, .ui-group-theme-a .ui-body-inherit, .ui-panel-page-container-a {
+        text-shadow: none !important;
+        border: none !important;
+    }
+
+    .ui-overlay-shadow {
+        box-shadow: none !important;
+    }
+
+    #buttongrid-menu-popup .np-buttongridrow .np-button {
+        margin-right: 0;
+    }
+
+    #controlAddIn > #model {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+
+/*================================================================ */
+/*         Defining number of buttons to show in one line          */
+/* =============================================================== */
+
+@media only screen and (min-width : 320px) and (max-width : 479px) {
+    .np-buttongrid.one-row .np-buttongridrow .np-button {        
+        width: calc(50% - 0.3em);
+    }
+}
+
+@media only screen and (min-width : 480px) and (max-width : 567px) {
+    .np-buttongrid.one-row .np-buttongridrow .np-button {
+        width: calc(33.3333% - 0.3em);
+    }   
+}
+
+@media only screen and (min-width : 568px) and (max-width : 736px) {
+    .np-buttongrid.one-row .np-buttongridrow .np-button {
+        width: calc(25% - 0.3em);
+    }   
+}
+
+@media not all and (min-resolution:.001dpcm) { @media {
+    .np-button.has-icon span.np-caption, .np-button span.np-icon { 
+        padding: 7% 0 0;
+    }
+}}
+
+@media screen and (max-width: 767px) {
+    _::-webkit-full-page-media, _:future, :root .np-button.has-icon span.np-caption {
+        padding: 8px 0 0;
+    }
+
+    _::-webkit-full-page-media, _:future, :root .np-button span.np-icon {
+        padding: 10px 0 0;
+    }
+}
+
+@media screen and (max-width: 1280px) {
+    div.datepicker {
+        width: 180px;
+        font-size: 10px;
+    }
+
+    .np-popup.calendargrid .np-container.body {
+        padding: 8px 0;
+    }
+}
+.dummy {} /* Always start the file with this */
+
+/* Fix for mobile devices, case 306520 */
+@media only screen and (max-width: 768px) and (min-width: 320px) {
+   .np-layout {
+     flex: 10000 10000;
+   }
+}
+
+/* iPad 2 */
+@media only screen 
+and (min-device-width : 768px) 
+and (max-device-width : 1024px)
+and (-webkit-min-device-pixel-ratio: 2) {
+    body, input, textarea, keygen, select, button, table, div {
+        font-size: 13px;
+    }
+
+    .np-popup .titlebar span {
+        font-size: 18px;
+    }
+
+    .np-fontsize-semilarge {
+        font-size: 18px;
+    }
+
+    .np-icon-size-16:before {
+        font-size: 14px;
+    }
+
+    .np-icon-size-24:before {
+        font-size: 20px;
+    }
+
+    .np-icon-size-32:before {
+        font-size: 20px;
+    }
+
+    .np-icon-size-48:before {
+        font-size: 32px;
+    }
+
+    .np-icon-size-64:before {
+        font-size: 48px;
+    }
+
+    .np-button.np-fontsize-normal {
+        font-size: 12px;
+    }
+
+    .np-popup .np-fontsize-normal {
+        font-size: 16px;
+    }
+}
+
+
+/* iPhone 4, iPhone 5*/
+@media only screen and (width : 320px) {
+    .np-popup .titlebar span {
+        font-size: 18px;
+    }
+
+    .np-fontsize-semilarge {
+        font-size: 18px;
+    }
+
+    .np-icon-size-16:before {
+        font-size: 10px;
+    }
+
+    .np-icon-size-24:before {
+        font-size: 14px;
+    }
+
+    .np-icon-size-32:before {
+        font-size: 18px;
+    }
+
+    .np-icon-size-48:before {
+        font-size: 24px;
+    }
+
+    .np-icon-size-64:before {
+        font-size: 32px;
+    }
+
+    .np-button.np-fontsize-normal {
+        font-size: 11px;
+    }
+
+    .np-popup .np-fontsize-normal {
+        font-size: 14px;
+    }
+}
+
+/* iPhone 5 */
+@media only screen and (width : 320px) and (height: 568px) {
+    .np-button.np-fontsize-normal {
+        font-size: 12px;
+    }
+    .np-icon-size-32:before {
+        font-size: 21px;
+    }
+}
+
+/* iPhone 6 Plus */
+
+.dummy { }
+
+.wysiwyg {
+    flex-basis: 0px;
+    background-color: #457db5;
+    transition: flex-basis 0.666s ease-in-out;
+    flex-grow: 0;
+    flex-shrink: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    color: white;
+    padding: 16px;
+    z-index: 99999;
+}
+
+.wysiwyg h1 {
+    font-weight: lighter;
+}
+
+.wysiwyg .properties {
+    flex: 1 1 100%;
+}
+
+.wysiwyg .properties table {
+    width: 100%;
+    background-color: gainsboro;
+    padding: 0;
+    border-spacing: 0;
+    margin-bottom: 0.5em;
+}
+
+.wysiwyg .properties table thead {
+    background-color: #8c8c8c;
+}
+
+.wysiwyg .properties table thead tr.group {
+    background-color: #6a6a6a;
+}
+
+.wysiwyg .properties table tbody input, .wysiwyg .properties table tbody select { 
+    border: 0;
+    width: 100%;
+}
+
+.wysiwyg .properties table thead td {
+    padding: 2px;
+    text-align: center;
+}
+
+.wysiwyg .properties table td:first-of-type {
+    width: 32%;
+}
+
+.wysiwyg .properties table tbody td {
+    padding: 2px;
+    border: 1px solid #6a6a6a;
+    padding: 2px;
+    color: #333333;
+    vertical-align: top;
+}
+
+.wysiwyg .properties table tbody td.value {
+    background-color: white;
+    color: black;
+}
+
+.wysiwyg .properties table tbody td.value.custom-lookup {
+    display: flex;
+}
+
+.wysiwyg .properties table tbody td.value.custom-lookup input {
+    width: auto !important;
+    flex: 1 1 100%;
+    margin-right: 4px;
+}
+
+.wysiwyg .properties table tbody td.value.custom-lookup div.lookup {
+    background-color: #6a6a6a;
+    width: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 300ms ease-out;
+}
+
+.wysiwyg .properties table tbody td.value.custom-lookup div.lookup:hover {
+    background-color: #242424;
+}
+
+.wysiwyg .properties table tbody td.value.custom-lookup div.lookup:active {
+    background-color: #242424;
+    transform: scale(0.95, 0.95);
+}
+
+.wysiwyg .properties table tbody td.value.custom-lookup div.lookup img {
+    width: 16px;
+    height: 16px;
+}
+
+.wysiwyg .buttons {
+    flex: 0 0 60px;    
+}
+
+.wysiwyg table tfoot {
+    background-color: #a2beda;
+    text-align: center;
+}
+
+.wysiwyg table tfoot td {
+    padding: 8px;
+}
+
+.wysiwyg table tfoot td input[type="button"] {
+    margin: 0 4px;
+}
+
+.wysiwyg-active {
+    box-shadow: 0 0 8px 3px #ff2256;
+    position: relative;
+}
+
+.wysiwyg-active::before {
+    content: " ";
+    z-index: 10;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #ff2256;
+    pointer-events: none;
+    opacity: 0.085;
+}
+
+.wysiwyg-active-drop {
+    box-shadow: 0 0 8px 3px #21ffa6;
+    position: relative;
+}
+
+.wysiwyg-active-drop::before {
+    content: " ";
+    z-index: 10;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #21ffa6;
+    pointer-events: none;
+    opacity: 0.085;
+}
+
+.wysiwyg table td table.group {
+    border: 0;
+    margin: 0;
+}
+
+.wysiwyg table td table.group td {
+    background-color: white;
+    border: 0;
+    text-align: left;
+}
+
+.wysiwyg table td table.group td input[type=checkbox] {
+    width: auto;
+}
+
+.dummy { }
+
+/* Comment out the content below after development is completed, or uncomment it when you want to resume development */
+
+/*
+#controlAddIn {
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAApSURBVChTYzxz58F/BjRgoqLACGXCAROUJggGUCGGo0EAmwcHv2cYGADpRAeaOLAKqgAAAABJRU5ErkJggg==);
+}
+
+.np-page
+{
+    background-color: rgba(256, 256, 240, 0.97) !important;
+    width: 95% !important;
+    height: 95% !important;
+    margin: auto !important;
+    border: 4px solid rgba(120, 120, 120, 0.6);
+}
+
+.np-layout {
+    background-color: rgba(160, 160, 160, 0.1) !important;
+    border: 1px solid rgba(120, 120, 120, 0.2) !important;
+}
+
+.np-view {
+    background-color: rgba(0, 224, 0, 0.06) !important;
+}
+*/
+
+.np-view-locked .np-label.caption .np-caption {
+    font-size: 2em;
+    font-weight: 100;
+}

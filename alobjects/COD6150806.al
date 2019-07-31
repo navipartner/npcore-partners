@@ -48,49 +48,49 @@ codeunit 6150806 "POS Action - Receivables"
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
 
-            RegisterWorkflowStep ('SelectCustomer', 'respond();');
-            RegisterWorkflowStep('ExtDocNo', '(!context.skipReference) && (param.AskExtDocNo) && input(labels.ExtDocNo);');
-            RegisterWorkflowStep('Attention','(!context.skipReference) && (param.AskAttention) && input(labels.Attention);');
-            //-NPR5.48 [330780]
-            //RegisterWorkflowStep('SetReference','respond();if ((context.extdocno) || (context.attention)) { alert("1"); respond(); }');
-            RegisterWorkflowStep('SetReference','if (!context.skipReference) { respond(); }');
-            //-NPR5.48 [330780]
-            RegisterWorkflowStep ('InvoiceNo',
-              'if (param.Type == 4) {' +
-              '  if (param.InvoiceLookup == 0) {' +
-              '    input(labels.InvoiceNo).respond("InvoiceNo");' +
-              '  } else {' +
-              '    respond();' +
-              '  }' +
-              '}');
-            RegisterWorkflowStep('Deposit','(param.Type == 5) && numpad(labels.Amount).cancel(abort);');
-            RegisterWorkflowStep('ProcessSalesDoc','respond();');
+                RegisterWorkflowStep('SelectCustomer', 'respond();');
+                RegisterWorkflowStep('ExtDocNo', '(!context.skipReference) && (param.AskExtDocNo) && input(labels.ExtDocNo);');
+                RegisterWorkflowStep('Attention', '(!context.skipReference) && (param.AskAttention) && input(labels.Attention);');
+                //-NPR5.48 [330780]
+                //RegisterWorkflowStep('SetReference','respond();if ((context.extdocno) || (context.attention)) { alert("1"); respond(); }');
+                RegisterWorkflowStep('SetReference', 'if (!context.skipReference) { respond(); }');
+                //-NPR5.48 [330780]
+                RegisterWorkflowStep('InvoiceNo',
+                  'if (param.Type == 4) {' +
+                  '  if (param.InvoiceLookup == 0) {' +
+                  '    input(labels.InvoiceNo).respond("InvoiceNo");' +
+                  '  } else {' +
+                  '    respond();' +
+                  '  }' +
+                  '}');
+                RegisterWorkflowStep('Deposit', '(param.Type == 5) && numpad(labels.Amount).cancel(abort);');
+                RegisterWorkflowStep('ProcessSalesDoc', 'respond();');
 
-            RegisterWorkflow(false);
-            //-NPR5.42 [312836]
-            RegisterOptionParameter('Security','None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword','None');
-            //+NPR5.42 [312836]
-            RegisterOptionParameter ('Type', 'SelectCustomer,ClearCustomer,InvoiceCustomer,ApplyPaymentToInvoices,BalanceInvoice,DepositAmount,DepositCurrentSubtotal,SearchCustomerName', 'SelectCustomer');
-            RegisterTextParameter('customerNo', '');
+                RegisterWorkflow(false);
+                //-NPR5.42 [312836]
+                RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
+                //+NPR5.42 [312836]
+                RegisterOptionParameter('Type', 'SelectCustomer,ClearCustomer,InvoiceCustomer,ApplyPaymentToInvoices,BalanceInvoice,DepositAmount,DepositCurrentSubtotal,SearchCustomerName', 'SelectCustomer');
+                RegisterTextParameter('customerNo', '');
 
-            RegisterIntegerParameter('customerlookuppageno', 0);
-            RegisterTextParameter('customerview', '');
-            RegisterTextParameter('CustLedgerEntryView','');
+                RegisterIntegerParameter('customerlookuppageno', 0);
+                RegisterTextParameter('customerview', '');
+                RegisterTextParameter('CustLedgerEntryView', '');
 
-            RegisterBooleanParameter ('AskExtDocNo', true);
-            RegisterBooleanParameter ('AskAttention', true);
+                RegisterBooleanParameter('AskExtDocNo', true);
+                RegisterBooleanParameter('AskAttention', true);
 
-            RegisterOptionParameter('InvoiceLookup','Text,List','Text');
+                RegisterOptionParameter('InvoiceLookup', 'Text,List', 'Text');
 
-          end;
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
@@ -98,50 +98,50 @@ codeunit 6150806 "POS Action - Receivables"
     var
         UI: Codeunit "POS UI Management";
     begin
-        Captions.AddActionCaption (ActionCode, 'ExtDocNo', TextExtDocNoLabel);
-        Captions.AddActionCaption (ActionCode, 'Attention', TextAttentionLabel);
-        Captions.AddActionCaption (ActionCode, 'InvoiceNo', TextInvoiceNoLabel);
-        Captions.AddActionCaption (ActionCode, 'Amount', TextAmountLabel);
+        Captions.AddActionCaption(ActionCode, 'ExtDocNo', TextExtDocNoLabel);
+        Captions.AddActionCaption(ActionCode, 'Attention', TextAttentionLabel);
+        Captions.AddActionCaption(ActionCode, 'InvoiceNo', TextInvoiceNoLabel);
+        Captions.AddActionCaption(ActionCode, 'Amount', TextAmountLabel);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
 
         case WorkflowStep of
-          //-NPR5.45 [326055]
-          'SelectCustomer':
-            begin
-              Handled := true;
-              OnActionSelectCustomer(JSON,POSSession,FrontEnd);
-              exit;
-            end;
-          'SetReference':
-            begin
-              Handled := true;
-              OnActionSetReference(JSON,POSSession);
-              exit;
-            end;
-          'InvoiceNo':
-            begin
-              Handled := true;
-              OnActionInvoiceNo(JSON,POSSession,FrontEnd);
-              exit;
-            end;
-          'ProcessSalesDoc':
-            begin
-              Handled := true;
-              OnActionProcessSalesDoc(JSON,POSSession);
-              POSSession.RequestRefreshData();
-              exit;
-            end;
-          //+NPR5.45 [326055]
+            //-NPR5.45 [326055]
+            'SelectCustomer':
+                begin
+                    Handled := true;
+                    OnActionSelectCustomer(JSON, POSSession, FrontEnd);
+                    exit;
+                end;
+            'SetReference':
+                begin
+                    Handled := true;
+                    OnActionSetReference(JSON, POSSession);
+                    exit;
+                end;
+            'InvoiceNo':
+                begin
+                    Handled := true;
+                    OnActionInvoiceNo(JSON, POSSession, FrontEnd);
+                    exit;
+                end;
+            'ProcessSalesDoc':
+                begin
+                    Handled := true;
+                    OnActionProcessSalesDoc(JSON, POSSession);
+                    POSSession.RequestRefreshData();
+                    exit;
+                end;
+                //+NPR5.45 [326055]
         end;
         //  ERROR (UNKNOWN_TYPE, Type);
         // END;
@@ -152,108 +152,109 @@ codeunit 6150806 "POS Action - Receivables"
 
     local procedure ActionCode(): Text
     begin
-        exit ('RECEIVABLES');
+        exit('RECEIVABLES');
     end;
 
     local procedure ActionVersion(): Text
     begin
 
-        exit ('1.9'); //-+NPR5.46 [314603]
+        exit('1.9'); //-+NPR5.46 [314603]
     end;
 
-    local procedure SelectCustomerUI(var CustomerNo: Code[20];CustomerLookupPageNo: Integer;CustomerView: Text): Boolean
+    local procedure SelectCustomerUI(var CustomerNo: Code[20]; CustomerLookupPageNo: Integer; CustomerView: Text): Boolean
     var
         Customer: Record Customer;
     begin
 
         if CustomerView <> '' then
-          Customer.SetView(CustomerView);
+            Customer.SetView(CustomerView);
 
-        if (ACTION::LookupOK <> PAGE.RunModal (CustomerLookupPageNo, Customer)) then
-          exit (false);
+        if (ACTION::LookupOK <> PAGE.RunModal(CustomerLookupPageNo, Customer)) then
+            exit(false);
 
         CustomerNo := Customer."No.";
-        exit (CustomerNo <> '');
+        exit(CustomerNo <> '');
     end;
 
-    local procedure AssignCustomer(var SalePOS: Record "Sale POS";CustomerNo: Code[20];CustomerLookupPageNo: Integer;CustomerView: Text): Boolean
+    local procedure AssignCustomer(var SalePOS: Record "Sale POS"; CustomerNo: Code[20]; CustomerLookupPageNo: Integer; CustomerView: Text): Boolean
     begin
         if (CustomerNo = '') then
-          if (not SelectCustomerUI (CustomerNo,CustomerLookupPageNo,CustomerView)) then
-            exit (false);
+            if (not SelectCustomerUI(CustomerNo, CustomerLookupPageNo, CustomerView)) then
+                exit(false);
 
         SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS."Customer No." := '';
-        SalePOS.Validate ("Customer No.", CustomerNo);
-        exit (true);
+        SalePOS.Validate("Customer No.", CustomerNo);
+        exit(true);
     end;
 
-    local procedure GetInput(JSON: Codeunit "POS JSON Management";Path: Text): Text
+    local procedure GetInput(JSON: Codeunit "POS JSON Management"; Path: Text): Text
     begin
-        JSON.SetScope ('/', true);
-        if (not JSON.SetScope ('$'+Path, false)) then
-          exit ('');
+        JSON.SetScope('/', true);
+        if (not JSON.SetScope('$' + Path, false)) then
+            exit('');
 
-        exit (JSON.GetString ('input', true));
+        exit(JSON.GetString('input', true));
     end;
 
-    local procedure GetDecimal(JSON: Codeunit "POS JSON Management";Path: Text): Decimal
+    local procedure GetDecimal(JSON: Codeunit "POS JSON Management"; Path: Text): Decimal
     begin
-        JSON.SetScope ('/', true);
-        if (not JSON.SetScope ('$'+Path, false)) then
-          exit (0);
+        JSON.SetScope('/', true);
+        if (not JSON.SetScope('$' + Path, false)) then
+            exit(0);
 
-        exit (JSON.GetDecimal ('numpad', true));
+        exit(JSON.GetDecimal('numpad', true));
     end;
 
-    local procedure SelectFromOpenEntries(var SalePOS: Record "Sale POS";POSSession: Codeunit "POS Session";CustLedgerEntryView: Text)
+    local procedure SelectFromOpenEntries(var SalePOS: Record "Sale POS"; POSSession: Codeunit "POS Session"; CustLedgerEntryView: Text)
     var
         POSSalesLine: Codeunit "POS Sale Line";
         LinePOS: Record "Sale Line POS";
         ApplyCustomerEntries: Codeunit "POS Apply Customer Entries";
     begin
-        POSSession.GetSaleLine (POSSalesLine);
+        POSSession.GetSaleLine(POSSalesLine);
 
-        Clear (LinePOS);
+        Clear(LinePOS);
 
         LinePOS.Type := LinePOS.Type::Customer;
 
         LinePOS."No." := SalePOS."Customer No.";
-        LinePOS.Validate("Buffer ID",LinePOS."Register No." + '-' + LinePOS."Sales Ticket No.");
+        LinePOS.Validate("Buffer ID", LinePOS."Register No." + '-' + LinePOS."Sales Ticket No.");
 
-        POSSalesLine.InsertDepositLine(LinePOS,0);
+        POSSalesLine.InsertDepositLine(LinePOS, 0);
 
         ApplyCustomerEntries.SetCustLedgerEntryView(CustLedgerEntryView);
         ApplyCustomerEntries.Run(LinePOS);
     end;
 
-    local procedure BalanceInvoice(var SalePOS: Record "Sale POS";POSSession: Codeunit "POS Session";InvoiceNo: Code[20])
+    local procedure BalanceInvoice(var SalePOS: Record "Sale POS"; POSSession: Codeunit "POS Session"; InvoiceNo: Code[20])
     var
         POSSalesLine: Codeunit "POS Sale Line";
         LinePOS: Record "Sale Line POS";
         TouchScreenFunctions: Codeunit "Touch Screen - Functions";
     begin
         if (InvoiceNo = '') then
-          Error (InvoiceNotSpecified);
+            Error(InvoiceNotSpecified);
 
-        POSSession.GetSaleLine (POSSalesLine);
+        POSSession.GetSaleLine(POSSalesLine);
 
-        Clear (LinePOS);
-        POSSalesLine.InsertDepositLine (LinePOS, 0);
+        Clear(LinePOS);
+        POSSalesLine.InsertDepositLine(LinePOS, 0);
         LinePOS.Type := LinePOS.Type::Customer;
 
-        InvoiceNo := TouchScreenFunctions.BalanceInvoice (SalePOS, LinePOS, InvoiceNo);
+        InvoiceNo := TouchScreenFunctions.BalanceInvoice(SalePOS, LinePOS, InvoiceNo);
         if (InvoiceNo = '') then begin
-          POSSalesLine.DeleteLine ();
-          exit;
+            POSSalesLine.DeleteLine();
+            exit;
         end;
 
         LinePOS."No." := SalePOS."Customer No.";
         //-NPR5.48 [344901]
-        LinePOS.UpdateAmounts (LinePOS);
+        LinePOS.UpdateAmounts(LinePOS);
         //+NPR5.48 [344901]
-        LinePOS.Modify ();
-        SalePOS.Modify();;
+        LinePOS.Modify();
+        SalePOS.Modify();
+        ;
     end;
 
     local procedure CreateAndPostInvoice(var SalePOS: Record "Sale POS")
@@ -262,33 +263,33 @@ codeunit 6150806 "POS Action - Receivables"
         RetailSalesDocMgt: Codeunit "Retail Sales Doc. Mgt.";
     begin
         with SalePOS do begin
-          SaleLinePOS.SetRange("Register No.", "Register No.");
-          SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
-          SaleLinePOS.SetRange(Date, Today);
-          SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Deposit);
-          SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Customer);
-          SaleLinePOS.DeleteAll(true);
+            SaleLinePOS.SetRange("Register No.", "Register No.");
+            SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
+            SaleLinePOS.SetRange(Date, Today);
+            SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Deposit);
+            SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Customer);
+            SaleLinePOS.DeleteAll(true);
 
-          CheckCustCredit (SalePOS);
-          RetailSalesDocMgt.ProcessPOSSale (SalePOS);
+            CheckCustCredit(SalePOS);
+            RetailSalesDocMgt.ProcessPOSSale(SalePOS);
         end;
     end;
 
-    local procedure DepositAmount(var SalePOS: Record "Sale POS";POSSession: Codeunit "POS Session";AmountToDeposit: Decimal)
+    local procedure DepositAmount(var SalePOS: Record "Sale POS"; POSSession: Codeunit "POS Session"; AmountToDeposit: Decimal)
     var
         POSSalesLine: Codeunit "POS Sale Line";
         LinePOS: Record "Sale Line POS";
     begin
-        POSSession.GetSaleLine (POSSalesLine);
+        POSSession.GetSaleLine(POSSalesLine);
 
-        POSSalesLine.GetDepositLine (LinePOS);
+        POSSalesLine.GetDepositLine(LinePOS);
         LinePOS.Type := LinePOS.Type::Customer;
         LinePOS."No." := SalePOS."Customer No.";
         LinePOS.Amount := AmountToDeposit;
         LinePOS."Amount Including VAT" := AmountToDeposit;
         LinePOS."Unit Price" := AmountToDeposit;
-        LinePOS.Description := StrSubstNo(TextDeposit,SalePOS.Name);
-        POSSalesLine.InsertDepositLine (LinePOS, 0);
+        LinePOS.Description := StrSubstNo(TextDeposit, SalePOS.Name);
+        POSSalesLine.InsertDepositLine(LinePOS, 0);
     end;
 
     local procedure CheckCustCredit(SalePos: Record "Sale POS")
@@ -300,13 +301,13 @@ codeunit 6150806 "POS Action - Receivables"
     begin
         RetailSetup.Get();
 
-        FormCode.CreateSalesHeader(SalePos,TempSalesHeader);
+        FormCode.CreateSalesHeader(SalePos, TempSalesHeader);
         if RetailSetup."Customer Credit Level Warning" then
-          if not POSCheckCrLimit.SalesHeaderPOSCheck(TempSalesHeader) then
-            Error('');
+            if not POSCheckCrLimit.SalesHeaderPOSCheck(TempSalesHeader) then
+                Error('');
     end;
 
-    local procedure OnActionSelectCustomer(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnActionSelectCustomer(JSON: Codeunit "POS JSON Management"; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         Customer: Record Customer;
         SalePOS: Record "Sale POS";
@@ -323,71 +324,71 @@ codeunit 6150806 "POS Action - Receivables"
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find;
 
-        JSON.SetScope('parameters',true);
-        CustomerSearchString := JSON.GetString('customerNo',false);
-        CustomerNo := CopyStr(CustomerSearchString,1,MaxStrLen(CustomerNo));
-        CustomerLookupPageNo := JSON.GetInteger('customerlookuppageno',false);
-        CustomerView := JSON.GetString('customerview',false);
+        JSON.SetScope('parameters', true);
+        CustomerSearchString := JSON.GetString('customerNo', false);
+        CustomerNo := CopyStr(CustomerSearchString, 1, MaxStrLen(CustomerNo));
+        CustomerLookupPageNo := JSON.GetInteger('customerlookuppageno', false);
+        CustomerView := JSON.GetString('customerview', false);
 
-        Type := JSON.GetInteger('Type',true);
+        Type := JSON.GetInteger('Type', true);
         case Type of
-          0:  //SelectCustomer
-            begin
-              PrevRec := Format(SalePOS);
+            0:  //SelectCustomer
+                begin
+                    PrevRec := Format(SalePOS);
 
-              AssignCustomer(SalePOS,CustomerNo,CustomerLookupPageNo,CustomerView);
+                    AssignCustomer(SalePOS, CustomerNo, CustomerLookupPageNo, CustomerView);
 
-              if PrevRec <> Format(SalePOS) then begin
-                POSSale.Refresh(SalePOS);
-                POSSale.Modify(false,false);
-              end;
-            end;
-          1:  //ClearCustomer
-            begin
-              PrevRec := Format(SalePOS);
-              SalePOS.Validate("Customer No.",'');
-              SalePOS."Customer Type" := SalePOS."Customer Type"::Cash;
-              SalePOS.Reference := '';
-              SalePOS."Contact No." := '';
-              if PrevRec <> Format(SalePOS) then begin
-                POSSale.Refresh(SalePOS);
-                POSSale.Modify(false,false);
-              end;
+                    if PrevRec <> Format(SalePOS) then begin
+                        POSSale.Refresh(SalePOS);
+                        POSSale.Modify(false, false);
+                    end;
+                end;
+            1:  //ClearCustomer
+                begin
+                    PrevRec := Format(SalePOS);
+                    SalePOS.Validate("Customer No.", '');
+                    SalePOS."Customer Type" := SalePOS."Customer Type"::Cash;
+                    SalePOS.Reference := '';
+                    SalePOS."Contact No." := '';
+                    if PrevRec <> Format(SalePOS) then begin
+                        POSSale.Refresh(SalePOS);
+                        POSSale.Modify(false, false);
+                    end;
 
-              SetSkipReference(JSON,FrontEnd);
-            end;
-          2,3,5,6:  //InvoiceCustomer,ApplyPaymentToInvoices,DepositAmount,DepositCurrentSubtotal
-            begin
-              if (SalePOS."Customer Type" = SalePOS."Customer Type"::Ord) and (SalePOS."Customer No." <> '') then begin
-                //-NPR5.48 [330780]
-                if (SalePOS.Reference <> '') and (SalePOS."Contact No." <> '') then
-                //+NPR5.48 [330780]
-                  SetSkipReference(JSON,FrontEnd);
-                exit;
-              end;
+                    SetSkipReference(JSON, FrontEnd);
+                end;
+            2, 3, 5, 6:  //InvoiceCustomer,ApplyPaymentToInvoices,DepositAmount,DepositCurrentSubtotal
+                begin
+                    if (SalePOS."Customer Type" = SalePOS."Customer Type"::Ord) and (SalePOS."Customer No." <> '') then begin
+                        //-NPR5.48 [330780]
+                        if (SalePOS.Reference <> '') and (SalePOS."Contact No." <> '') then
+                            //+NPR5.48 [330780]
+                            SetSkipReference(JSON, FrontEnd);
+                        exit;
+                    end;
 
-              AssignCustomer(SalePOS,CustomerNo,CustomerLookupPageNo,CustomerView);
-            end;
-          4:  //BalanceInvoice
-            begin
-              SetSkipReference(JSON,FrontEnd);
-              exit;
-            end;
-          7:  //SearchCustomerName
-            begin
-              if not GetCustomerFromCustomerSearch(CustomerSearchString) then
-                Error('');
+                    AssignCustomer(SalePOS, CustomerNo, CustomerLookupPageNo, CustomerView);
+                end;
+            4:  //BalanceInvoice
+                begin
+                    SetSkipReference(JSON, FrontEnd);
+                    exit;
+                end;
+            7:  //SearchCustomerName
+                begin
+                    if not GetCustomerFromCustomerSearch(CustomerSearchString) then
+                        Error('');
 
-              CustomerNo := CustomerSearchString;
-              AssignCustomer(SalePOS, CustomerNo, CustomerLookupPageNo, CustomerView);
-              POSSale.Refresh(SalePOS);
-              POSSale.Modify(false,false);
-            end;
+                    CustomerNo := CustomerSearchString;
+                    AssignCustomer(SalePOS, CustomerNo, CustomerLookupPageNo, CustomerView);
+                    POSSale.Refresh(SalePOS);
+                    POSSale.Modify(false, false);
+                end;
         end;
         //+NPR5.45 [326055]
     end;
 
-    local procedure OnActionSetReference(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session")
+    local procedure OnActionSetReference(JSON: Codeunit "POS JSON Management"; POSSession: Codeunit "POS Session")
     var
         SalePOS: Record "Sale POS";
         POSSale: Codeunit "POS Sale";
@@ -406,24 +407,24 @@ codeunit 6150806 "POS Action - Receivables"
         //Attention := GetInput(JSON,'Attention');
         //SalePOS.VALIDATE(Reference,COPYSTR (ExtDocNo,1,MAXSTRLEN (SalePOS.Reference)));
         //SalePOS.VALIDATE("Contact No.",COPYSTR (Attention,1,MAXSTRLEN (SalePOS."Contact No.")));
-        if JSON.GetBooleanParameter('AskExtDocNo',true) then begin
-          ExtDocNo := GetInput(JSON,'ExtDocNo');
-          SalePOS.Validate(Reference,CopyStr (ExtDocNo,1,MaxStrLen (SalePOS.Reference)));
+        if JSON.GetBooleanParameter('AskExtDocNo', true) then begin
+            ExtDocNo := GetInput(JSON, 'ExtDocNo');
+            SalePOS.Validate(Reference, CopyStr(ExtDocNo, 1, MaxStrLen(SalePOS.Reference)));
         end;
-        if JSON.GetBooleanParameter('AskAttention',true) then begin
-          Attention := GetInput(JSON,'Attention');
-          SalePOS.Validate("Contact No.",CopyStr (Attention,1,MaxStrLen (SalePOS."Contact No.")));
+        if JSON.GetBooleanParameter('AskAttention', true) then begin
+            Attention := GetInput(JSON, 'Attention');
+            SalePOS.Validate("Contact No.", CopyStr(Attention, 1, MaxStrLen(SalePOS."Contact No.")));
         end;
         //+NPR5.48 [330780]
 
         if PrevRec <> Format(SalePOS) then begin
-          POSSale.Refresh(SalePOS);
-          POSSale.Modify(false,false);
+            POSSale.Refresh(SalePOS);
+            POSSale.Modify(false, false);
         end;
         //+NPR5.45 [326055]
     end;
 
-    local procedure OnActionInvoiceNo(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnActionInvoiceNo(JSON: Codeunit "POS JSON Management"; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
         SalePOS: Record "Sale POS";
@@ -438,37 +439,37 @@ codeunit 6150806 "POS Action - Receivables"
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find;
 
-        JSON.SetScope('parameters',true);
-        InvoiceLookup := JSON.GetInteger('InvoiceLookup',true);
+        JSON.SetScope('parameters', true);
+        InvoiceLookup := JSON.GetInteger('InvoiceLookup', true);
         case InvoiceLookup of
-          0:  //Text
-            begin
-              JSON.SetScope('/',true);
-              InvoiceNo := CopyStr(UpperCase(JSON.GetString('InvoiceNo',true)),1,MaxStrLen(InvoiceNo));
-            end;
-          1:  //List
-            begin
-              CustLedgerEntry.SetRange(Open,true);
-              CustLedgerEntry.SetRange("Document Type",CustLedgerEntry."Document Type"::Invoice);
-              CustLedgerEntry.SetFilter("Document No.",'<>%1','');
-              if SalePOS."Customer Type" = SalePOS."Customer Type"::Ord then
-                CustLedgerEntry.SetFilter("Customer No.",SalePOS."Customer No.");
-              if PAGE.RunModal(0,CustLedgerEntry) = ACTION::LookupOK then
-                InvoiceNo := CustLedgerEntry."Document No.";
-            end;
+            0:  //Text
+                begin
+                    JSON.SetScope('/', true);
+                    InvoiceNo := CopyStr(UpperCase(JSON.GetString('InvoiceNo', true)), 1, MaxStrLen(InvoiceNo));
+                end;
+            1:  //List
+                begin
+                    CustLedgerEntry.SetRange(Open, true);
+                    CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Invoice);
+                    CustLedgerEntry.SetFilter("Document No.", '<>%1', '');
+                    if SalePOS."Customer Type" = SalePOS."Customer Type"::Ord then
+                        CustLedgerEntry.SetFilter("Customer No.", SalePOS."Customer No.");
+                    if PAGE.RunModal(0, CustLedgerEntry) = ACTION::LookupOK then
+                        InvoiceNo := CustLedgerEntry."Document No.";
+                end;
         end;
 
         if InvoiceNo = '' then
-          exit;
+            exit;
 
         SalesInvHeader.Get(InvoiceNo);
-        JSON.SetScope('/',true);
-        JSON.SetContext('InvoiceNo',InvoiceNo);
-        FrontEnd.SetActionContext(ActionCode(),JSON);
+        JSON.SetScope('/', true);
+        JSON.SetContext('InvoiceNo', InvoiceNo);
+        FrontEnd.SetActionContext(ActionCode(), JSON);
         //+NPR5.45 [326055]
     end;
 
-    local procedure OnActionProcessSalesDoc(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session")
+    local procedure OnActionProcessSalesDoc(JSON: Codeunit "POS JSON Management"; POSSession: Codeunit "POS Session")
     var
         Customer: Record Customer;
         SalePOS: Record "Sale POS";
@@ -484,70 +485,70 @@ codeunit 6150806 "POS Action - Receivables"
         InvoiceNo: Code[20];
     begin
         //-NPR5.45 [326055]
-        JSON.SetScope('parameters',true);
-        Type := JSON.GetInteger ('Type',true);
+        JSON.SetScope('parameters', true);
+        Type := JSON.GetInteger('Type', true);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find;
 
         case Type of
-          0,1,7:  //SelectCustomer,ClearCustomer,SearchCustomerName
-            begin
-              exit;
-            end;
-          2:  //InvoiceCustomer
-            begin
-              POSSession.GetPaymentLine(POSPaymentLine);
-              POSPaymentLine.CalculateBalance(SalesAmount,PaidAmount,ReturnAmount,SubTotal);
-              if SubTotal <= 0 then
-                Error(NothingToInvoice);
-              CreateAndPostInvoice(SalePOS);
-              POSSale.SelectViewForEndOfSale(POSSession);
-            end;
-          3:  //ApplyPaymentToInvoices
-            begin
-              CustLedgerEntryView := JSON.GetStringParameter('CustLedgerEntryView',true);
-              SelectFromOpenEntries(SalePOS,POSSession,CustLedgerEntryView);
-              POSSession.ChangeViewSale();
-            end;
-          4:  //BalanceInvoice
-            begin
-              JSON.SetScope('/',true);
-              InvoiceNo := JSON.GetString('InvoiceNo',false);
-              BalanceInvoice(SalePOS,POSSession,InvoiceNo);
+            0, 1, 7:  //SelectCustomer,ClearCustomer,SearchCustomerName
+                begin
+                    exit;
+                end;
+            2:  //InvoiceCustomer
+                begin
+                    POSSession.GetPaymentLine(POSPaymentLine);
+                    POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+                    if SubTotal <= 0 then
+                        Error(NothingToInvoice);
+                    CreateAndPostInvoice(SalePOS);
+                    POSSale.SelectViewForEndOfSale(POSSession);
+                end;
+            3:  //ApplyPaymentToInvoices
+                begin
+                    CustLedgerEntryView := JSON.GetStringParameter('CustLedgerEntryView', true);
+                    SelectFromOpenEntries(SalePOS, POSSession, CustLedgerEntryView);
+                    POSSession.ChangeViewSale();
+                end;
+            4:  //BalanceInvoice
+                begin
+                    JSON.SetScope('/', true);
+                    InvoiceNo := JSON.GetString('InvoiceNo', false);
+                    BalanceInvoice(SalePOS, POSSession, InvoiceNo);
 
-              POSSale.Refresh(SalePOS);
-              POSSale.Modify(false,false);
-              POSSession.ChangeViewSale();
-            end;
-          5:  //DepositAmount
-            begin
-              JSON.SetScope('/',true);
-              JSON.SetScope('$Deposit',true);
-              Deposit := JSON.GetDecimal('numpad',true);
-              DepositAmount(SalePOS,POSSession,Deposit)
-            end;
-          6:  //DepositCurrentSubtotal
-            begin
-              Customer.Get (SalePOS."Customer No.");
-              Customer.CalcFields ("Balance (LCY)");
-              if Customer."Balance (LCY)" = 0 then
-                Error(BalanceIsZero);
-              DepositAmount (SalePOS, POSSession, Customer."Balance (LCY)");
-            end;
+                    POSSale.Refresh(SalePOS);
+                    POSSale.Modify(false, false);
+                    POSSession.ChangeViewSale();
+                end;
+            5:  //DepositAmount
+                begin
+                    JSON.SetScope('/', true);
+                    JSON.SetScope('$Deposit', true);
+                    Deposit := JSON.GetDecimal('numpad', true);
+                    DepositAmount(SalePOS, POSSession, Deposit)
+                end;
+            6:  //DepositCurrentSubtotal
+                begin
+                    Customer.Get(SalePOS."Customer No.");
+                    Customer.CalcFields("Balance (LCY)");
+                    if Customer."Balance (LCY)" = 0 then
+                        Error(BalanceIsZero);
+                    DepositAmount(SalePOS, POSSession, Customer."Balance (LCY)");
+                end;
         end;
         POSSession.RequestRefreshData();
         //+NPR5.45 [326055]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', true, true)]
-    local procedure OnLookupCustomerView(var POSParameterValue: Record "POS Parameter Value";Handled: Boolean)
+    local procedure OnLookupCustomerView(var POSParameterValue: Record "POS Parameter Value"; Handled: Boolean)
     begin
         //-NPR5.43 [318038]
         if (POSParameterValue."Action Code" <> ActionCode) or (POSParameterValue.Name <> 'customerview') or (POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text) then
-          exit;
-        POSParameterValue.Value := POSParameterValue.GetTableViewString(18,POSParameterValue.Value);
+            exit;
+        POSParameterValue.Value := POSParameterValue.GetTableViewString(18, POSParameterValue.Value);
         Handled := true;
         //+NPR5.43 [318038]
     end;
@@ -559,11 +560,11 @@ codeunit 6150806 "POS Action - Receivables"
     begin
         //-NPR5.43 [318038]
         if (POSParameterValue."Action Code" <> ActionCode) or (POSParameterValue.Name <> 'customerview') or (POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text) then
-          exit;
+            exit;
         if POSParameterValue.Value <> '' then begin
-          RecRef.Open(18);
-          RecRef.SetView(POSParameterValue.Value);
-          POSParameterValue.Value := RecRef.GetView(false);
+            RecRef.Open(18);
+            RecRef.SetView(POSParameterValue.Value);
+            POSParameterValue.Value := RecRef.GetView(false);
         end;
         //+NPR5.43 [318038]
     end;
@@ -576,21 +577,21 @@ codeunit 6150806 "POS Action - Receivables"
     begin
         //-NPR5.43 [318038]
         if (POSParameterValue."Action Code" <> ActionCode) or (POSParameterValue.Name <> 'CustLedgerEntryView') or (POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Text) then
-          exit;
+            exit;
         if POSParameterValue.Value <> '' then begin
-          RecRef.Open(21);
-          RecRef.SetView(POSParameterValue.Value);
-          POSParameterValue.Value := RecRef.GetView(false);
+            RecRef.Open(21);
+            RecRef.SetView(POSParameterValue.Value);
+            POSParameterValue.Value := RecRef.GetView(false);
         end;
         //+NPR5.43 [318038]
     end;
 
-    local procedure SetSkipReference(JSON: Codeunit "POS JSON Management";FrontEnd: Codeunit "POS Front End Management")
+    local procedure SetSkipReference(JSON: Codeunit "POS JSON Management"; FrontEnd: Codeunit "POS Front End Management")
     begin
         //-NPR5.45 [326055]
-        JSON.SetScope('/',true);
-        JSON.SetContext('skipReference',true);
-        FrontEnd.SetActionContext(ActionCode(),JSON);
+        JSON.SetScope('/', true);
+        JSON.SetContext('skipReference', true);
+        FrontEnd.SetActionContext(ActionCode(), JSON);
         //+NPR5.45 [326055]
     end;
 
@@ -598,13 +599,13 @@ codeunit 6150806 "POS Action - Receivables"
     begin
     end;
 
-    procedure SelectCustomerWorkFlow(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    procedure SelectCustomerWorkFlow(Context: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         POSAction: Record "POS Action";
     begin
 
-        if not POSSession.RetrieveSessionAction(ActionCode,POSAction) then
-          POSAction.Get(ActionCode);
+        if not POSSession.RetrieveSessionAction(ActionCode, POSAction) then
+            POSAction.Get(ActionCode);
 
         POSAction.SetWorkflowInvocationParameter('Type', 0, FrontEnd);
         FrontEnd.InvokeWorkflow(POSAction);
@@ -622,84 +623,84 @@ codeunit 6150806 "POS Action - Receivables"
     begin
         //-NPR5.45 [319706]
         if not EanBoxEvent.Get(EventCodeCustNo()) then begin
-          EanBoxEvent.Init;
-          EanBoxEvent.Code := EventCodeCustNo();
-          EanBoxEvent."Module Name" := Customer.TableCaption;
-          //-NPR5.49 [350374]
-          //EanBoxEvent.Description := CustLedgerEntry.FIELDCAPTION("Customer No.");
-          EanBoxEvent.Description := CopyStr(CustLedgerEntry.FieldCaption("Customer No."),1,MaxStrLen(EanBoxEvent.Description));
-          //+NPR5.49 [350374]
-          EanBoxEvent."Action Code" := ActionCode();
-          EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
-          EanBoxEvent."Event Codeunit" := CurrCodeunitId();
-          EanBoxEvent.Insert(true);
+            EanBoxEvent.Init;
+            EanBoxEvent.Code := EventCodeCustNo();
+            EanBoxEvent."Module Name" := Customer.TableCaption;
+            //-NPR5.49 [350374]
+            //EanBoxEvent.Description := CustLedgerEntry.FIELDCAPTION("Customer No.");
+            EanBoxEvent.Description := CopyStr(CustLedgerEntry.FieldCaption("Customer No."), 1, MaxStrLen(EanBoxEvent.Description));
+            //+NPR5.49 [350374]
+            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
+            EanBoxEvent."Event Codeunit" := CurrCodeunitId();
+            EanBoxEvent.Insert(true);
         end;
 
         if not EanBoxEvent.Get(EventCodeCustSearch()) then begin
-          EanBoxEvent.Init;
-          EanBoxEvent.Code := EventCodeCustSearch();
-          EanBoxEvent."Module Name" := Customer.TableCaption;
-          //-NPR5.49 [350374]
-          //EanBoxEvent.Description := Customer.FIELDCAPTION("Search Name");
-          EanBoxEvent.Description := CopyStr(Customer.FieldCaption("Search Name"),1,MaxStrLen(EanBoxEvent.Description));
-          //+NPR5.49 [350374]
-          EanBoxEvent."Action Code" := ActionCode();
-          EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
-          EanBoxEvent."Event Codeunit" := CurrCodeunitId();
-          EanBoxEvent.Insert(true);
+            EanBoxEvent.Init;
+            EanBoxEvent.Code := EventCodeCustSearch();
+            EanBoxEvent."Module Name" := Customer.TableCaption;
+            //-NPR5.49 [350374]
+            //EanBoxEvent.Description := Customer.FIELDCAPTION("Search Name");
+            EanBoxEvent.Description := CopyStr(Customer.FieldCaption("Search Name"), 1, MaxStrLen(EanBoxEvent.Description));
+            //+NPR5.49 [350374]
+            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
+            EanBoxEvent."Event Codeunit" := CurrCodeunitId();
+            EanBoxEvent.Insert(true);
         end;
         //+NPR5.45 [319706]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060105, 'OnInitEanBoxParameters', '', true, true)]
-    local procedure OnInitEanBoxParameters(var Sender: Codeunit "Ean Box Setup Mgt.";EanBoxEvent: Record "Ean Box Event")
+    local procedure OnInitEanBoxParameters(var Sender: Codeunit "Ean Box Setup Mgt."; EanBoxEvent: Record "Ean Box Event")
     begin
         //-NPR5.45 [319706]
         case EanBoxEvent.Code of
-          EventCodeCustNo():
-            begin
-              Sender.SetNonEditableParameterValues(EanBoxEvent,'customerNo',true,'');
-              Sender.SetNonEditableParameterValues(EanBoxEvent,'Type',false,'SelectCustomer');
-            end;
-          EventCodeCustSearch():
-            begin
-              Sender.SetNonEditableParameterValues(EanBoxEvent,'customerNo',true,'');
-              Sender.SetNonEditableParameterValues(EanBoxEvent,'Type',false,'SearchCustomerName');
-            end;
+            EventCodeCustNo():
+                begin
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'customerNo', true, '');
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'Type', false, 'SelectCustomer');
+                end;
+            EventCodeCustSearch():
+                begin
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'customerNo', true, '');
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'Type', false, 'SearchCustomerName');
+                end;
         end;
         //+NPR5.45 [319706]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
-    local procedure SetEanBoxEventInScopeCustNo(EanBoxSetupEvent: Record "Ean Box Setup Event";EanBoxValue: Text;var InScope: Boolean)
+    local procedure SetEanBoxEventInScopeCustNo(EanBoxSetupEvent: Record "Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         Customer: Record Customer;
     begin
         //-NPR5.45 [319706]
         if EanBoxSetupEvent."Event Code" <> EventCodeCustNo() then
-          exit;
+            exit;
         if StrLen(EanBoxValue) > MaxStrLen(Customer."No.") then
-          exit;
+            exit;
 
         if Customer.Get(UpperCase(EanBoxValue)) then
-          InScope := true;
+            InScope := true;
         //+NPR5.45 [319706]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
-    local procedure SetEanBoxEventInScopeCustSearch(EanBoxSetupEvent: Record "Ean Box Setup Event";EanBoxValue: Text;var InScope: Boolean)
+    local procedure SetEanBoxEventInScopeCustSearch(EanBoxSetupEvent: Record "Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         Customer: Record Customer;
     begin
         //-NPR5.45 [319706]
         if EanBoxSetupEvent."Event Code" <> EventCodeCustSearch() then
-          exit;
+            exit;
         if StrLen(EanBoxValue) > MaxStrLen(Customer."Search Name") then
-          exit;
+            exit;
 
-        SetCustomerSearchFilter(EanBoxValue,Customer);
+        SetCustomerSearchFilter(EanBoxValue, Customer);
         if Customer.FindFirst then
-          InScope := true;
+            InScope := true;
         //+NPR5.45 [319706]
     end;
 
@@ -754,32 +755,32 @@ codeunit 6150806 "POS Action - Receivables"
         //  CustomerIdentifyerString := Customer."No.";
         //  EXIT(TRUE);
         // END;
-        SetCustomerSearchFilter(CustomerIdentifyerString,Customer);
+        SetCustomerSearchFilter(CustomerIdentifyerString, Customer);
         if not Customer.FindFirst then
-          exit(false);
+            exit(false);
 
         CustomerIdentifyerString := Customer."No.";
         Customer.FindLast;
         if CustomerIdentifyerString = Customer."No." then
-          //-NPR5.48 [345847]
-          //EXIT;
-          exit(true);
-          //+NPR5.48 [345847]
+            //-NPR5.48 [345847]
+            //EXIT;
+            exit(true);
+        //+NPR5.48 [345847]
         //+NPR5.45 [319706]
 
         CustomerList.Editable(false);
         CustomerList.LookupMode(true);
         CustomerList.SetTableView(Customer);
         if CustomerList.RunModal = ACTION::LookupOK then begin
-          CustomerList.GetRecord(Customer);
-          CustomerIdentifyerString := Customer."No.";
-          exit(true);
+            CustomerList.GetRecord(Customer);
+            CustomerIdentifyerString := Customer."No.";
+            exit(true);
         end else begin
-          exit(false);
+            exit(false);
         end;
     end;
 
-    local procedure SetCustomerSearchFilter(CustomerIdentifierString: Text;var Customer: Record Customer)
+    local procedure SetCustomerSearchFilter(CustomerIdentifierString: Text; var Customer: Record Customer)
     var
         SearchFilter: Text;
         SearchString: Text;
@@ -787,15 +788,15 @@ codeunit 6150806 "POS Action - Receivables"
         //-NPR5.45 [319706]
         Clear(Customer);
 
-        SearchString := CopyStr (CustomerIdentifierString, 1, MaxStrLen (Customer."Search Name"));
+        SearchString := CopyStr(CustomerIdentifierString, 1, MaxStrLen(Customer."Search Name"));
         SearchString := UpperCase(SearchString);
         SearchFilter := '*' + SearchString + '*';
         if CustomerIdentifierString = '' then
-          SearchFilter := StrSubstNo('=%1','');
+            SearchFilter := StrSubstNo('=%1', '');
 
         Customer.SetCurrentKey("Search Name");
-        Customer.SetFilter("Search Name",SearchFilter);
-        Customer.SetRange(Blocked,Customer.Blocked::" ");
+        Customer.SetFilter("Search Name", SearchFilter);
+        Customer.SetRange(Blocked, Customer.Blocked::" ");
         //+NPR5.45 [319706]
     end;
 }

@@ -121,7 +121,7 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: JsonObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         MembershipManagement: Codeunit "MM Membership Management";

@@ -25,7 +25,6 @@ codeunit 6014627 "Managed Dependency Mgt."
     // TM1.39/THRO/20181126 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
 
     Permissions = TableData "POS Web Font" = rimd,
-                  TableData "Proxy Assembly" = rimd,
                   TableData ".NET Assembly" = rimd,
                   TableData "Web Client Dependency" = rimd,
                   TableData "Add-in" = rimd;
@@ -345,7 +344,6 @@ codeunit 6014627 "Managed Dependency Mgt."
     var
         AddIn: Record "Add-in";
         DotNetAssembly: Record ".NET Assembly";
-        ProxyAssembly: Record "Proxy Assembly";
         WebClientDependency: Record "Web Client Dependency";
         WebFont: Record "POS Web Font";
         StargatePackage: Record "POS Stargate Package";
@@ -364,13 +362,6 @@ codeunit 6014627 "Managed Dependency Mgt."
                     Type := '.NET Assembly';
                     Name := DotNetAssembly."Assembly Name";
                     Version := '1.0';
-                end;
-            DATABASE::"Proxy Assembly":
-                begin
-                    RecRef.SetTable(ProxyAssembly);
-                    Type := 'Stargate Assembly';
-                    Name := ProxyAssembly.Name;
-                    Version := ProxyAssembly.Version;
                 end;
             DATABASE::"Web Client Dependency":
                 begin

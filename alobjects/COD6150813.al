@@ -20,69 +20,70 @@ codeunit 6150813 "POS Action - Item Lookup"
 
     local procedure ActionCode(): Text
     begin
-        exit ('LOOKUP');
+        exit('LOOKUP');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.3');
+        exit('1.3');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do begin
-          if DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple) then
-          begin
-            //No UI yet to support lookup, so no trancendance UI worksteps
+            if DiscoverAction(
+              ActionCode(),
+              ActionDescription,
+              ActionVersion(),
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple) then begin
+                //No UI yet to support lookup, so no trancendance UI worksteps
 
-            RegisterWorkflowStep('do_lookup','respond();');
-            //-NPR5.41 [311104]
-            RegisterWorkflowStep('complete_lookup','respond();');
-            //+NPR5.41 [311104]
+                RegisterWorkflowStep('do_lookup', 'respond();');
+                //-NPR5.41 [311104]
+                RegisterWorkflowStep('complete_lookup', 'respond();');
+                //+NPR5.41 [311104]
 
-            RegisterWorkflow(false);
-            RegisterOptionParameter('LookupType',CreateOptionString,'');
-            RegisterTextParameter('View','');
+                RegisterWorkflow(false);
+                RegisterOptionParameter('LookupType', CreateOptionString, '');
+                RegisterTextParameter('View', '');
 
-            //-NPR5.41 [308522]
-            RegisterOptionParameter('LocationFilter', 'POS Store,Cash Register,Use View', 'POS Store');
-            //+NPR5.41 [308522]
+                //-NPR5.41 [308522]
+                RegisterOptionParameter('LocationFilter', 'POS Store,Cash Register,Use View', 'POS Store');
+                //+NPR5.41 [308522]
 
-          end;
+            end;
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
 
         case WorkflowStep of
-          'do_lookup': OnLookup(POSSession,FrontEnd,Context);
-          //-NPR5.41 [311104]
-          'complete_lookup': CompleteLookup(POSSession,FrontEnd,Context);
-          //+NPR5.41 [311104]
+            'do_lookup':
+                OnLookup(POSSession, FrontEnd, Context);
+                //-NPR5.41 [311104]
+            'complete_lookup':
+                CompleteLookup(POSSession, FrontEnd, Context);
+                //+NPR5.41 [311104]
         end;
 
         Handled := true;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action"; Parameters: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
         JSON: Codeunit "POS JSON Management";
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         //No UI yet to support lookup
         Handled := true;
@@ -92,41 +93,40 @@ codeunit 6150813 "POS Action - Item Lookup"
     begin
     end;
 
-    local procedure OnLookup(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure OnLookup(POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: JsonObject)
     var
         JSON: Codeunit "POS JSON Management";
     begin
         //xx FrontEnd.PauseWorkflow; //This function does a NAV page lookup and need input before next workstep
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        JSON.SetScope('parameters',true);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        JSON.SetScope('parameters', true);
 
-        LookupType := JSON.GetInteger('LookupType',true);
+        LookupType := JSON.GetInteger('LookupType', true);
 
         case LookupType of
-          LookupType::Item :
-            begin
-              OnLookupItem(POSSession, FrontEnd, Context);
-            end;
+            LookupType::Item:
+                begin
+                    OnLookupItem(POSSession, FrontEnd, Context);
+                end;
 
-          LookupType::Customer :
-            begin
-              //Not yet implementet
-            end;
+            LookupType::Customer:
+                begin
+                    //Not yet implementet
+                end;
 
-          //-NPR5.34 [283668]
-          LookupType::SKU :
-            begin
-              OnLookupSKU(POSSession, FrontEnd, Context);
-            end;
-          //+NPR5.34 [283668]
+                //-NPR5.34 [283668]
+            LookupType::SKU:
+                begin
+                    OnLookupSKU(POSSession, FrontEnd, Context);
+                end;
+            //+NPR5.34 [283668]
 
-        else
-          begin
-            Error('LookUp type %1 is not supported.', Format(LookupType));
-          end;
+            else begin
+                    Error('LookUp type %1 is not supported.', Format(LookupType));
+                end;
         end;
 
         //xx FrontEnd.ResumeWorkflow;
@@ -134,7 +134,7 @@ codeunit 6150813 "POS Action - Item Lookup"
         exit; //debug
     end;
 
-    local procedure OnLookupItem(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure OnLookupItem(POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: JsonObject)
     var
         JSON: Codeunit "POS JSON Management";
         POSSaleLine: Codeunit "POS Sale Line";
@@ -144,18 +144,20 @@ codeunit 6150813 "POS Action - Item Lookup"
         ItemView: Text;
         LocationFilterOption: Integer;
     begin
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        JSON.SetScope('parameters',true);
-        ItemView := JSON.GetString('View',false);
+        JSON.SetScope('parameters', true);
+        ItemView := JSON.GetString('View', false);
         if ItemView <> '' then
-          Item.SetView(ItemView);
+            Item.SetView(ItemView);
 
         //-NPR5.41 [308522]
-        LocationFilterOption := JSON.GetInteger ('LocationFilter', false);
+        LocationFilterOption := JSON.GetInteger('LocationFilter', false);
         case LocationFilterOption of
-          -1, 0 : Item.SetFilter ("Location Filter", '=%1', GetStoreLocation (POSSession));
-          1 : Item.SetFilter ("Location Filter", '=%1', GetRegisterLocation (POSSession));
+            -1, 0:
+                Item.SetFilter("Location Filter", '=%1', GetStoreLocation(POSSession));
+            1:
+                Item.SetFilter("Location Filter", '=%1', GetRegisterLocation(POSSession));
         end;
         //+NPR5.41 [308522]
 
@@ -175,15 +177,15 @@ codeunit 6150813 "POS Action - Item Lookup"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         if SaleLinePOS.Type = SaleLinePOS.Type::Item then
-          if Item.Get(SaleLinePOS."No.") then;
+            if Item.Get(SaleLinePOS."No.") then;
 
-        if PAGE.RunModal(PAGE::"Retail Item List",Item) = ACTION::LookupOK then
-          ItemNo := Item."No.";
+        if PAGE.RunModal(PAGE::"Retail Item List", Item) = ACTION::LookupOK then
+            ItemNo := Item."No.";
         //+NPR5.46 [329616]
 
         //-NPR5.41 [311104]
-        JSON.SetContext ('selected_itemno', ItemNo);
-        FrontEnd.SetActionContext (ActionCode(), JSON);
+        JSON.SetContext('selected_itemno', ItemNo);
+        FrontEnd.SetActionContext(ActionCode(), JSON);
         // IF ItemNo = '' THEN BEGIN
         //  EXIT;
         // END ELSE BEGIN
@@ -192,7 +194,7 @@ codeunit 6150813 "POS Action - Item Lookup"
         //+NPR5.41 [311104]
     end;
 
-    local procedure CompleteLookup(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure CompleteLookup(POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: JsonObject)
     var
         JSON: Codeunit "POS JSON Management";
         ItemList: Page "Retail Item List";
@@ -202,17 +204,17 @@ codeunit 6150813 "POS Action - Item Lookup"
     begin
 
         //-NPR5.41 [311104]
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        ItemNo := JSON.GetString ('selected_itemno', true);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        ItemNo := JSON.GetString('selected_itemno', true);
         if ItemNo = '' then begin
-          exit;
+            exit;
         end else begin
-          AddItemToSale(ItemNo, POSSession, FrontEnd, Context);
+            AddItemToSale(ItemNo, POSSession, FrontEnd, Context);
         end;
         //+NPR5.41 [311104]
     end;
 
-    local procedure OnLookupSKU(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure OnLookupSKU(POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: JsonObject)
     var
         JSON: Codeunit "POS JSON Management";
         POSSetup: Codeunit "POS Setup";
@@ -224,20 +226,22 @@ codeunit 6150813 "POS Action - Item Lookup"
         LocationFilterOption: Integer;
     begin
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSStore(POSStore);
 
-        JSON.SetScope('parameters',true);
-        SKUView := JSON.GetString('View',false);
+        JSON.SetScope('parameters', true);
+        SKUView := JSON.GetString('View', false);
         if SKUView <> '' then
-          StockkeepingUnit.SetView(SKUView);
+            StockkeepingUnit.SetView(SKUView);
 
         //-NPR5.41 [308522]
-        LocationFilterOption := JSON.GetInteger ('LocationFilter', false);
+        LocationFilterOption := JSON.GetInteger('LocationFilter', false);
         case LocationFilterOption of
-          -1, 0 : StockkeepingUnit.SetFilter ("Location Code", '=%1', GetStoreLocation (POSSession));
-          1 : StockkeepingUnit.SetFilter ("Location Code", '=%1', GetRegisterLocation (POSSession));
+            -1, 0:
+                StockkeepingUnit.SetFilter("Location Code", '=%1', GetStoreLocation(POSSession));
+            1:
+                StockkeepingUnit.SetFilter("Location Code", '=%1', GetRegisterLocation(POSSession));
         end;
         //StockkeepingUnit.SETFILTER("Location Code", '=%1',POSStore."Location Code");
         //+NPR5.41 [308522]
@@ -246,15 +250,15 @@ codeunit 6150813 "POS Action - Item Lookup"
         StockkeepingUnitList.LookupMode(true);
         StockkeepingUnitList.SetTableView(StockkeepingUnit);
         if StockkeepingUnitList.RunModal = ACTION::LookupOK then begin
-          StockkeepingUnitList.GetRecord(StockkeepingUnit);
-          ItemNo := StockkeepingUnit."Item No.";
+            StockkeepingUnitList.GetRecord(StockkeepingUnit);
+            ItemNo := StockkeepingUnit."Item No.";
         end else begin
-          ItemNo := '';
+            ItemNo := '';
         end;
 
         //-NPR5.41 [311104]
-        JSON.SetContext ('selected_itemno', ItemNo);
-        FrontEnd.SetActionContext (ActionCode(), JSON);
+        JSON.SetContext('selected_itemno', ItemNo);
+        FrontEnd.SetActionContext(ActionCode(), JSON);
         // IF ItemNo = '' THEN BEGIN
         //  EXIT;
         // END ELSE BEGIN
@@ -263,7 +267,7 @@ codeunit 6150813 "POS Action - Item Lookup"
         //+NPR5.41 [311104]
     end;
 
-    local procedure AddItemToSale(ItemNo: Code[20];POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet JObject)
+    local procedure AddItemToSale(ItemNo: Code[20]; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: JsonObject)
     var
         POSSaleLine: Codeunit "POS Sale Line";
         NewSaleLinePOS: Record "Sale Line POS";
@@ -274,16 +278,16 @@ codeunit 6150813 "POS Action - Item Lookup"
         if ItemNo = '' then exit;
 
         //-NPR5.36 [292281]
-        POSSetup.Get ();
+        POSSetup.Get();
         //-NPR5.40 [306347]
         //POSAction.GET (POSSetup."Item Insert Action Code");
-        if not POSSession.RetrieveSessionAction(POSSetup."Item Insert Action Code",POSAction) then
-          POSAction.Get (POSSetup."Item Insert Action Code");
+        if not POSSession.RetrieveSessionAction(POSSetup."Item Insert Action Code", POSAction) then
+            POSAction.Get(POSSetup."Item Insert Action Code");
         //+NPR5.40 [306347]
-        POSAction.SetWorkflowInvocationParameter ('itemNo', ItemNo, FrontEnd);
-        POSAction.SetWorkflowInvocationParameter ('itemQuantity', 1, FrontEnd);
-        POSAction.SetWorkflowInvocationParameter ('itemIdentifyerType', 0, FrontEnd); //0 = ItemNumber
-        FrontEnd.InvokeWorkflow (POSAction);
+        POSAction.SetWorkflowInvocationParameter('itemNo', ItemNo, FrontEnd);
+        POSAction.SetWorkflowInvocationParameter('itemQuantity', 1, FrontEnd);
+        POSAction.SetWorkflowInvocationParameter('itemIdentifyerType', 0, FrontEnd); //0 = ItemNumber
+        FrontEnd.InvokeWorkflow(POSAction);
 
         // POSSession.GetSaleLine(POSSaleLine);
         // POSSaleLine.GetNewSaleLine(NewSaleLinePOS);
@@ -310,15 +314,15 @@ codeunit 6150813 "POS Action - Item Lookup"
 
         OptionInteger := 0;
         repeat
-          LookupType := OptionInteger;
-          CurrentOptionString := Format(LookupType);
-          if Format(OptionInteger) = CurrentOptionString then begin
-             OptionString := CopyStr(OptionString, 1, StrLen(OptionString)-1);
-             StopRepeat := true;
-          end else begin
-            OptionString := OptionString + CurrentOptionString + ',';
-          end;
-          OptionInteger += 1;
+            LookupType := OptionInteger;
+            CurrentOptionString := Format(LookupType);
+            if Format(OptionInteger) = CurrentOptionString then begin
+                OptionString := CopyStr(OptionString, 1, StrLen(OptionString) - 1);
+                StopRepeat := true;
+            end else begin
+                OptionString := OptionString + CurrentOptionString + ',';
+            end;
+            OptionInteger += 1;
         until (StopRepeat);
     end;
 
@@ -329,10 +333,10 @@ codeunit 6150813 "POS Action - Item Lookup"
     begin
 
         //-NPR5.41 [308522]
-        POSSession.GetSetup (POSSetup);
-        POSSetup.GetPOSStore (POSStore);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSStore(POSStore);
 
-        exit (POSStore."Location Code");
+        exit(POSStore."Location Code");
         //+NPR5.41 [308522]
     end;
 
@@ -343,10 +347,10 @@ codeunit 6150813 "POS Action - Item Lookup"
     begin
 
         //-NPR5.41 [308522]
-        POSSession.GetSetup (POSSetup);
-        POSSetup.GetRegisterRecord (Register);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetRegisterRecord(Register);
 
-        exit (Register."Location Code");
+        exit(Register."Location Code");
         //+NPR5.41 [308522]
     end;
 }

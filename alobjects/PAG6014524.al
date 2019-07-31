@@ -18,25 +18,25 @@ page 6014524 "Touch Screen - CRM Contacts"
             repeater(Control6150621)
             {
                 ShowCaption = false;
-                field(Name;Name)
+                field(Name; Name)
                 {
                 }
-                field("Phone No.";"Phone No.")
+                field("Phone No."; "Phone No.")
                 {
                 }
-                field("Mobile Phone No.";"Mobile Phone No.")
+                field("Mobile Phone No."; "Mobile Phone No.")
                 {
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
                 }
-                field(Address;Address)
+                field(Address; Address)
                 {
                 }
-                field("Post Code";"Post Code")
+                field("Post Code"; "Post Code")
                 {
                 }
-                field(City;City)
+                field(City; City)
                 {
                 }
             }
@@ -56,17 +56,22 @@ page 6014524 "Touch Screen - CRM Contacts"
 
                 trigger OnAction()
                 var
-                    Marshaller: Codeunit "POS Event Marshaller";
+                    // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
+                    //Marshaller: Codeunit "POS Event Marshaller";
                     newPhoneNo: Text;
                     formCard: Page "Customer Card";
                     contact: Record Contact;
                 begin
                     //-NPR5.30 [267123]
-                    if (not Marshaller.NumPadText(Text00001,newPhoneNo,false,false))  then
-                      exit;
+                    // TODO: CTRLUPGRADE - Must be refactored without Marshaller
+                    Error('CTRLUPGRADE');
+                    /*
+                    if (not Marshaller.NumPadText(Text00001, newPhoneNo, false, false)) then
+                        exit;
+                    */
                     contact.Init;
                     if newPhoneNo <> '' then
-                      contact.Validate("No.", newPhoneNo);
+                        contact.Validate("No.", newPhoneNo);
                     contact.Insert(true);
                     Commit;
                     Get(contact."No.");
@@ -94,51 +99,14 @@ page 6014524 "Touch Screen - CRM Contacts"
         formCard.LookupMode(true);
         formCard.SetRecord(Rec);
         if formCard.RunModal = ACTION::OK then begin
-          formCard.GetRecord(Rec);
-          CurrPage.Update(false);
-          bLookupOk := true;
-          CurrPage.Close;
+            formCard.GetRecord(Rec);
+            CurrPage.Update(false);
+            bLookupOk := true;
+            CurrPage.Close;
         end;
         formCard.GetRecord(Rec);
         CurrPage.Update(false);
         Get(Rec."No.");
-    end;
-
-    procedure searchFor()
-    var
-        Vare: Record Item;
-        tekst30: Text[30];
-        tekst250: Text[250];
-        Marshaller: Codeunit "POS Event Marshaller";
-        t001: Label 'Searching "Search Name" is limited to maximum 30 chars';
-        t002: Label 'Search form';
-        t003: Label 'Searching "No." is limited to maximum 20 chars';
-        t004: Label 'Searching "Phone" is limited to maximum 20 chars';
-    begin
-        //searchfor
-
-        case searchType of
-          searchType::Name :
-            begin
-              tekst30 := CopyStr(Marshaller.SearchBox(t002,t001,MaxStrLen(tekst30)),1,30);
-              if tekst30 <> '<CANCEL>' then begin
-                SetCurrentKey("Search Name");
-                tekst250 := '*@'+ tekst30 + '*';
-                SetFilter("Search Name", '%1', tekst250);
-              end else begin
-                SetRange("Search Name");
-              end;
-            end;
-          searchType::Number :
-            begin
-              if Marshaller.NumPadText(t003,tekst30,false,false) then begin
-                SetCurrentKey("No.");
-                tekst250 := '*@'+ tekst30 + '*';
-                SetFilter("No.",'%1',tekst250);
-              end else
-                SetRange("No.");
-            end;
-        end;
     end;
 
     procedure LookupOk(): Boolean

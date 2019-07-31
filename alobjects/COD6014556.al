@@ -1,3 +1,4 @@
+// TODO: CTRLUPGRADE - uses old Standard code; must be removed or refactored; remnants of old protocol codeunit
 codeunit 6014556 "File Print Proxy Protocol"
 {
     // NPR5.29/MMV /20161114 CASE 256521 Renamed object from 'NAV 2013 Reservation 6' to 'File Print Proxy Protocol'.
@@ -6,138 +7,64 @@ codeunit 6014556 "File Print Proxy Protocol"
     // Support for amyuni or gdpicture pdf libraries have been prepared but not implemented yet.
 
     SingleInstance = true;
-    TableNo = TempBlob;
-
-    trigger OnRun()
-    begin
-        ProcessSignal(Rec);
-    end;
 
     var
-        POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
-        ExpectedResponseType: DotNet npNetType;
-        ExpectedResponseId: Guid;
-        ProtocolManagerId: Guid;
-        ProtocolStage: Integer;
-        Proxy: Page "Proxy Dialog";
+        // TODO: CTRLUPGRADE - old obsolete standard code
+        //Proxy: Page "Proxy Dialog";
         MemStream: DotNet npNetMemoryStream;
         FileExtension: Text;
         PrinterName: Text;
         UsePrinterDialog: Boolean;
         PrintMethod: Integer;
 
-    local procedure ProcessSignal(var TempBlob: Record TempBlob)
-    var
-        Signal: DotNet npNetSignal;
-        StartSignal: DotNet npNetStartSession;
-        Response: DotNet npNetMessageResponse;
-    begin
-        POSDeviceProxyManager.DeserializeObject(Signal,TempBlob);
-        case true of
-          Signal.TypeName = Format(GetDotNetType(StartSignal)):
-            begin
-              POSDeviceProxyManager.DeserializeSignal(StartSignal,Signal);
-              Start(StartSignal.ProtocolManagerId);
-            end;
-          Signal.TypeName = Format(GetDotNetType(Response)):
-            begin
-              POSDeviceProxyManager.DeserializeSignal(Response,Signal);
-              MessageResponse(Response.Envelope);
-            end;
-        end;
-    end;
-
-    local procedure Start(ProtocolManagerIdIn: Guid)
-    begin
-        ProtocolManagerId := ProtocolManagerIdIn;
-
-        ProtocolStage1();
-    end;
-
-    local procedure MessageResponse(Envelope: DotNet npNetResponseEnvelope)
-    begin
-        if Envelope.MessageId <> ExpectedResponseId then
-          Error('Unknown response: %1 (expected %2)',Envelope.MessageId,ExpectedResponseId);
-
-        if Envelope.ResponseTypeName <> Format(ExpectedResponseType) then
-          Error('Unknown response type: %1 (expected %2)',Envelope.ResponseTypeName,Format(ExpectedResponseType));
-
-        case ProtocolStage of
-          1: ProtocolStage1Close(Envelope);
-        end;
-    end;
-
-    local procedure ProtocolStage1()
+    procedure PrintJob(pPrinterName: Text; var pMemStream: DotNet npNetMemoryStream; pFileExtension: Text; pUsePrinterDialog: Boolean)
     var
         PrintRequest: DotNet npNetFilePrintRequest;
-        PrintResponse: DotNet npNetFilePrintResponse;
-    begin
-        ProtocolStage := 1;
-
-        PrintRequest := PrintRequest.FilePrintRequest();
-
-        PrintRequest.ExternalLibLicenseKey := GetSpirePDFLicenseKey();
-        PrintRequest.FileData := MemStream.ToArray();
-        PrintRequest.FileExtension := FileExtension;
-        PrintRequest.PrinterName := PrinterName;
-        PrintRequest.UsePrinterDialog := UsePrinterDialog;
-        PrintRequest.SelectedPrintMethod := PrintMethod;
-
-        ExpectedResponseType := GetDotNetType(PrintResponse);
-        ExpectedResponseId := POSDeviceProxyManager.SendMessage(ProtocolManagerId,PrintRequest);
-    end;
-
-    local procedure ProtocolStage1Close(Envelope: DotNet npNetEnvelope)
-    var
-        PrintResponse: DotNet npNetPrintResponse;
-    begin
-        POSDeviceProxyManager.DeserializeEnvelopeFromId(PrintResponse,Envelope,ProtocolManagerId);
-        POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
-    end;
-
-    procedure PrintJob(pPrinterName: Text;var pMemStream: DotNet npNetMemoryStream;pFileExtension: Text;pUsePrinterDialog: Boolean)
-    var
-        PrintRequest: DotNet npNetFilePrintRequest;
-        POSEventMarshaller: Codeunit "POS Event Marshaller";
+        // TODO: CTRLUPGRADE - event marshaller is removed, refactor!
+        //POSEventMarshaller: Codeunit "POS Event Marshaller";
         IntBuffer: Integer;
         PrintMethodOption: Option OSFileHandler,Spire;
     begin
-        Commit ();
+        Commit();
 
         if pFileExtension[1] = '.' then
-          pFileExtension := CopyStr(pFileExtension, 2);
+            pFileExtension := CopyStr(pFileExtension, 2);
 
         if UpperCase(pFileExtension) = 'PDF' then
-          PrintMethodOption := PrintMethodOption::Spire
+            PrintMethodOption := PrintMethodOption::Spire
         else
-          PrintMethodOption := PrintMethodOption::OSFileHandler;
+            PrintMethodOption := PrintMethodOption::OSFileHandler;
 
-
+        // TODO: CTRLUPGRADE - THIS FUNCTION HAS TWO PATHS, BOTH OF THEM INVOKING OBSOLETE STUFF - INVESTIGATE
+        /*
         if POSEventMarshaller.IsInitialized then begin
-          //Call async via POS page add-in. In this case we don't subscribe to the callback that eventually happens.
-          PrintRequest := PrintRequest.FilePrintRequest ();
+            //Call async via POS page add-in. In this case we don't subscribe to the callback that eventually happens.
+            PrintRequest := PrintRequest.FilePrintRequest();
 
-          PrintRequest.ExternalLibLicenseKey := GetSpirePDFLicenseKey();
-          PrintRequest.FileData := pMemStream.ToArray();
-          PrintRequest.FileExtension := pFileExtension;
-          PrintRequest.PrinterName := pPrinterName;
-          PrintRequest.UsePrinterDialog := pUsePrinterDialog;
-          PrintRequest.WaitForResult := false; //Since we don't subscribe to callback in C/AL at the moment, don't wait until printing is done on the local machine before return to NST.
-          IntBuffer := PrintMethodOption;
-          PrintRequest.SelectedPrintMethod := IntBuffer;
+            PrintRequest.ExternalLibLicenseKey := GetSpirePDFLicenseKey();
+            PrintRequest.FileData := pMemStream.ToArray();
+            PrintRequest.FileExtension := pFileExtension;
+            PrintRequest.PrinterName := pPrinterName;
+            PrintRequest.UsePrinterDialog := pUsePrinterDialog;
+            PrintRequest.WaitForResult := false; //Since we don't subscribe to callback in C/AL at the moment, don't wait until printing is done on the local machine before return to NST.
+            IntBuffer := PrintMethodOption;
+            PrintRequest.SelectedPrintMethod := IntBuffer;
 
-          POSEventMarshaller.InvokeDeviceMethod(PrintRequest);
+            POSEventMarshaller.InvokeDeviceMethod(PrintRequest);
         end else begin
-          //Open new page modally that works outside the POS as well.
-          MemStream := pMemStream;
-          FileExtension := pFileExtension;
-          PrinterName := pPrinterName;
-          UsePrinterDialog := pUsePrinterDialog;
-          PrintMethod := PrintMethodOption;
+            //Open new page modally that works outside the POS as well.
+            MemStream := pMemStream;
+            FileExtension := pFileExtension;
+            PrinterName := pPrinterName;
+            UsePrinterDialog := pUsePrinterDialog;
+            PrintMethod := PrintMethodOption;
 
-          Clear (Proxy);
-          Proxy.RunProtocolModal(6014556);
+            // TODO: CTRLUPGRADE - old Proxy Manager protocol
+            ERROR('CTRLUPGRADE');
+            //Clear(Proxy);
+            //Proxy.RunProtocolModal(6014556);
         end;
+        */
     end;
 
     local procedure GetSpirePDFLicenseKey(): Text
