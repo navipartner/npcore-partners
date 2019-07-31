@@ -49,7 +49,8 @@ codeunit 6014480 "Retail Document Handling"
         Txt001: Label 'No lines to transfer!';
         Txt003: Label 'Deposit';
         RetailSalesLineCode: Codeunit "Retail Sales Line Code";
-        POSEventMarshaller: Codeunit "POS Event Marshaller";
+        // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
+        //POSEventMarshaller: Codeunit "POS Event Marshaller";
         LastDocumentNo: Code[20];
         CustomerNo: Code[20];
         NextSalesLine: Integer;
@@ -109,7 +110,9 @@ codeunit 6014480 "Retail Document Handling"
                                   RetailSetup."Use deposit in Retail Doc"
                                   then begin
             if Confirm(Txt011, false, Txt018) then
-                POSEventMarshaller.NumPad(Txt011, SalePOS.Deposit, false, false);
+                // TODO: CTRLUPGRADE - must be refactored to not use Marshaller
+                ERROR('CTRLUPGRADE');
+            //  POSEventMarshaller.NumPad(Txt011, SalePOS.Deposit, false, false);
         end;
 
         if (SalePOS.Parameters <> '') and

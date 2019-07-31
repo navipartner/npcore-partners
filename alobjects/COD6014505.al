@@ -70,7 +70,8 @@ codeunit 6014505 "Touch Screen - Functions"
         RetailSetupGlobal: Record "Retail Setup";
         RetailSalesCode: Codeunit "Retail Sales Code";
         RetailFormCodeGlobal: Codeunit "Retail Form Code";
-        POSEventMarshaller: Codeunit "POS Event Marshaller";
+        // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
+        //POSEventMarshaller: Codeunit "POS Event Marshaller";
         LastInteger: Integer;
 
     procedure AskRefAtt(var SalePOS: Record "Sale POS"; ForceContactNo: Boolean): Boolean
@@ -94,18 +95,26 @@ codeunit 6014505 "Touch Screen - Functions"
         Commit;
 
         if (SalePOS."Customer Type" = SalePOS."Customer Type"::Ord) and ForceContactNo then begin
+            // TODO: CTRLUPGRADE - The block below must be refactored to not use Marshaller
+            Error('CTRLUPGRADE');
+            /*
             if RetailSetupGlobal."Ask for Reference" then begin
                 SalePOS.Reference := CopyStr(POSEventMarshaller.SearchBox(ReferenceTxt, Txt001, 50), 1, 20);
             end;
             if RetailSetupGlobal."Ask for Attention Name" then begin
                 SalePOS."Contact No." := CopyStr(POSEventMarshaller.SearchBox(AttentionTxt, Txt002, 50), 1, 30);
             end;
+            */
         end;
 
         if not ForceContactNo then begin
+            // TODO: CTRLUPGRADE - The block below must be refactored to not use Marshaller
+            Error('CTRLUPGRADE');
+            /*
             SalePOS.Reference := CopyStr(POSEventMarshaller.SearchBox(ReferenceTxt, Txt001, 50), 1, 30);
             SalePOS."Contact No." := CopyStr(POSEventMarshaller.SearchBox(AttentionTxt, Txt002, 50), 1, 30);
             SalePOS.Modify;
+            */
         end;
 
         exit(true);
@@ -132,8 +141,12 @@ codeunit 6014505 "Touch Screen - Functions"
         Commit;
 
         if InvoiceIn = '' then begin
+            // TODO: CTRLUPGRADE - The block below must be refactored to not use Marshaller
+            Error('CTRLUPGRADE');
+            /*
             if not POSEventMarshaller.NumPadCode(InputInvoice, InvoiceNo, false, false) then
                 exit('');
+            */
         end else
             InvoiceNo := InvoiceIn;
 
@@ -326,11 +339,16 @@ codeunit 6014505 "Touch Screen - Functions"
         SaleLinePOS: Record "Sale Line POS";
         LineNo: Integer;
     begin
-        if ValidationCode = '' then
+        if ValidationCode = '' then begin
+            // TODO: CTRLUPGRADE - The block below must be refactored to not use Marshaller
+            Error('CTRLUPGRADE');
+            /*
             if not POSEventMarshaller.NumPadCode(Text001, ValidationCode, true, false) then begin
                 ValidationCode := '';
                 Error('');
             end;
+            */
+        end;
         if ValidationCode = '' then begin
             Error(Text003);
         end;
@@ -956,8 +974,11 @@ codeunit 6014505 "Touch Screen - Functions"
         CustNo: Text;
     begin
         RetailSetup.Get;
+        // TODO: CTRLUPGRADE - The block below cannot be done that way in Transcendence. You must invoke FrontEnd.SetOption request, and set the "EanBox" option to "".
+        /*
         if Filter <> '' then
             POSEventMarshaller.ClearEanBoxText();
+        */
 
         if Internal then begin
             SetupTempCustomerStaff(TempCust);
@@ -998,6 +1019,7 @@ codeunit 6014505 "Touch Screen - Functions"
         TouchEventSubscribers.ConfigureCustomer();
         BindSubscription(TouchEventSubscribers);
         CustNo := POSEventMarshaller.Lookup(Cust.TableCaption, Template, RecRef, true, true, PAGE::"Customer Card");
+        */
 
         if CustNo = '' then
             exit(false);
@@ -1008,6 +1030,5 @@ codeunit 6014505 "Touch Screen - Functions"
 
         Cust := Cust2;
         exit(true);
-        */
     end;
 }

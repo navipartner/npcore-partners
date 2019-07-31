@@ -195,12 +195,7 @@ codeunit 6150868 "POS Action - Layaway Create"
         RetailSalesDocMgt.SetRetailPrint(true);
         RetailSalesDocMgt.SetOpenSalesDocAfterExport(false);
         RetailSalesDocMgt.SetWriteInAuditRoll(true);
-
-        // TODO: CTRLUPGRADE - Invokes function that involves Event Marshaller
-        Error('CTRLUPGRADE');
-        /*
         RetailSalesDocMgt.ProcessPOSSale(SalePOS);
-        */
         RetailSalesDocMgt.GetCreatedSalesHeader(SalesHeaderOut);
     end;
 

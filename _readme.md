@@ -35,6 +35,7 @@ Also, the following objects were deleted
 * table 6014434 "Touch Screen - Menu Lines" - obsolete Standard setup table
 * codeunit 6150822 "POS Action - Conv Touch2Trans"
 * page 6014520 "Touch Screen - Setup"
+* codeunit 6014630 "Touch - Sale POS (Web)"
 
 
 # To-dos
@@ -62,3 +63,12 @@ A number of errors (and TODOs) are related to the POS Event Marshaller codeunit 
 All functionality depending on POS Event Marshaller is old Standard code that must not be used in any Transcendence scenario. Therefore, all code that invokes it must be either removed or refactored.
 
 Since Transcendence has been live for more than two years and Standard won't be upgraded to BC, it is assumed that any code that still uses Standard functionality is purely standard. An upgrade attempt must be made to remove all objects utilizing POS Event Marshaller and then cascade the removal of pieces of code that use them, to see if that way all old Standard code can be removed (or to pinpoint to Transcendence features that are still using them)
+
+# General notes
+
+As a first step in refactoring away the Standard functionality, the old POS page was taken away, then all of other "Touch - *" pages that had no remaining references. Then, the old "Touch - *" and "* Web *" codeunits were removed where no references remained.
+
+After this was done, the Event Marshaller was removed and all resulting errors fixed by either replacing code with Error or Confirm (where possible) or by simply making a comment that the code must be refactored. On every place where Event Marshaller couldn't simply be replaced, I put the Error('CTRLUPGRADE') to indicate that there is a problem. In essence, the compiler will not complain anymore about those places, but the runtime will fail. Somebody *must* go through all `TODO: CTRLUPGRADE` places to refactor them; until there are any of these to-dos left, the code is not production-ready.
+
+After Event Marshaller was removed, all touched objects (primarily codeunits, but also pages and tables) were refactored so that all old Standard functions without any references (or any remaining objects without any references) were removed.
+

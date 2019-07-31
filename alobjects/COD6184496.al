@@ -5,10 +5,6 @@ codeunit 6184496 "Pepper Event Subscribers"
     // NPR5.46/MM /20180924 CASE 290734 EFT Framework refactored
 
 
-    trigger OnRun()
-    begin
-    end;
-
     // TODO: CTRLUPGRADE - Event subscriber subscribes to a removed event publisher - INVESTIGATE
     /*
     [EventSubscriber(ObjectType::Codeunit, 6014435, 'OnBeforeBalancingEvent', '', true, true)]

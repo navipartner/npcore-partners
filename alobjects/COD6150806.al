@@ -271,11 +271,7 @@ codeunit 6150806 "POS Action - Receivables"
             SaleLinePOS.DeleteAll(true);
 
             CheckCustCredit(SalePOS);
-            // TODO: CTRLUPGRADE - Invokes a function that involves Marshaller
-            Error('CTRLUPGRADE');
-            /*
-            RetailSalesDocMgt.ProcessPOSSale (SalePOS);
-            */
+            RetailSalesDocMgt.ProcessPOSSale(SalePOS);
         end;
     end;
 

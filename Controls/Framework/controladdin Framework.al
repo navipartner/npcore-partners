@@ -11,6 +11,7 @@ controladdin Transcendence
         'Controls/Framework/Scripts/datepicker.nl.js',
         'Controls/Framework/Scripts/numeral.min.js',
         'Controls/Framework/Scripts/moment.min.js',
+        'Controls/Framework/Scripts/no-ie.js',
         'Controls/Framework/Scripts/NaviPartner.min.js';
 
     StyleSheets =

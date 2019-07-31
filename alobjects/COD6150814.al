@@ -294,13 +294,7 @@ codeunit 6150814 "POS Action - Cust.Sal.Doc.Exp."
 
         //DO
         if JSON.GetBoolean('TestSalePOS', true) then RetailSalesDocMgt.TestSaleLinePOS(SaleLinePOS);
-        if JSON.GetBoolean('ProcessPOSSale', true) then begin
-            // TODO: CTRLUPGRADE - Invokes a function that involves Event Marshaller
-            Error('CTRLUPGRADE');
-            /*
-            ResultProcessPOSSale := RetailSalesDocMgt.ProcessPOSSale(SalePOS);
-            */
-        end;
+        if JSON.GetBoolean('ProcessPOSSale', true) then ResultProcessPOSSale := RetailSalesDocMgt.ProcessPOSSale(SalePOS);
         if JSON.GetBoolean('OpenSalesDoc', true) then RetailSalesDocMgt.OpenSalesDoc(SalePOS);
 
         //Re-initialize sales after all done
