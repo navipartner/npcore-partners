@@ -247,6 +247,8 @@ codeunit 6150702 "POS UI Management"
     local procedure InitializeMenuButtonObject(MenuButton: Record "POS Menu Button"; var MenuButtonObj: DotNet npNetMenuButton; POSSession: Codeunit "POS Session"; var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
     var
         "Action": DotNet npNetAction;
+        DotNetHelper: Variant;
+        DotNetEnum: DotNet npNetEnum;
     begin
         with MenuButton do begin
             MenuButtonObj := MenuButtonObj.MenuButton();
@@ -260,10 +262,10 @@ codeunit 6150702 "POS UI Management"
             MenuButtonObj.IconClass := "Icon Class";
             MenuButtonObj.Class := "Custom Class Attribute";
             MenuButtonObj.Bold := Bold;
-            MenuButtonObj.FontSize := "Font Size";
+            MenuButtonObj.FontSize := DotNetEnum.Parse(MenuButtonObj.FontSize.GetType(), Format("Font Size"));
             MenuButtonObj.Row := "Position Y";
             MenuButtonObj.Column := "Position X";
-            MenuButtonObj.Enabled := Enabled;
+            MenuButtonObj.Enabled := DotNetEnum.Parse(MenuButtonObj.Enabled.GetType(), Format(Enabled));
 
             //-NPR5.38 [255773]
             MenuButtonObj.Content.Add('keyMenu', "Menu Code");
