@@ -11,20 +11,6 @@ page 6059986 "Sale POS Activities"
     {
         area(content)
         {
-            cuegroup(ControlActions)
-            {
-                Caption = ' ';
-
-                actions
-                {
-                    action("New Sale")
-                    {
-                        Caption = 'New Sale';
-                        RunObject = Codeunit "POS Web UI Management";
-                        RunPageMode = Edit;
-                    }
-                }
-            }
             cuegroup(Cues)
             {
                 Caption = ' ';

@@ -14,28 +14,28 @@ page 6150701 "POS Menus"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
                 }
-                field(Caption;Caption)
+                field(Caption; Caption)
                 {
                 }
-                field(Blocked;Blocked)
+                field(Blocked; Blocked)
                 {
                 }
-                field("Register Type";"Register Type")
+                field("Register Type"; "Register Type")
                 {
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
                 }
-                field("Salesperson Code";"Salesperson Code")
+                field("Salesperson Code"; "Salesperson Code")
                 {
                 }
-                field("Available on Desktop";"Available on Desktop")
+                field("Available on Desktop"; "Available on Desktop")
                 {
                 }
-                field("Available in App";"Available in App")
+                field("Available in App"; "Available in App")
                 {
                 }
             }
@@ -54,7 +54,7 @@ page 6150701 "POS Menus"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "POS Menu Buttons";
-                RunPageLink = "Menu Code"=FIELD(Code);
+                RunPageLink = "Menu Code" = FIELD (Code);
             }
             action(ExportPackageSelected)
             {
@@ -106,16 +106,6 @@ page 6150701 "POS Menus"
                 begin
                     POSPackageHandler.DeployPOSMenuPackageFromGroundControl();
                 end;
-            }
-            group(Convert)
-            {
-                Caption = 'Convert';
-                action("Convert To Transcendence")
-                {
-                    Caption = 'Convert To Transcendence';
-                    Image = Change;
-                    RunObject = Codeunit "POS Action - Conv Touch2Trans";
-                }
             }
         }
     }

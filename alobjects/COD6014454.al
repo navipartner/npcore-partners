@@ -12,9 +12,9 @@ codeunit 6014454 "Permission Set Mgt."
     begin
         //-NPR5.41 [312644]
         if not Permission.WritePermission then begin
-          if GuiAllowed then
-            Message('You dont have permission to update the permissions in this database');
-          exit;
+            if GuiAllowed then
+                Message('You dont have permission to update the permissions in this database');
+            exit;
         end;
 
         Permission.LockTable;
@@ -27,7 +27,7 @@ codeunit 6014454 "Permission Set Mgt."
         OnAfterSetupRetailRights();
 
         if GuiAllowed then
-          Message('Permissions given!')
+            Message('Permissions given!')
         //+NPR5.41 [312644]
     end;
 
@@ -41,35 +41,39 @@ codeunit 6014454 "Permission Set Mgt."
         //+NPR5.38 [299296]
         //Changed Hardcoded Value to Variable RoleID (Undocumented
         CreatePermissionSet(RoleID);
-        GivePermission(RoleID,AllObj."Object Type"::TableData,0,1,1,1,1,1);
-        GiveExecutePermission(RoleID,AllObj."Object Type"::Table,0);
-        GiveExecutePermission(RoleID,AllObj."Object Type"::Codeunit,0);
-        GiveExecutePermission(RoleID,AllObj."Object Type"::Report,0);
-        GiveExecutePermission(RoleID,AllObj."Object Type"::XMLport,0);
-        GiveExecutePermission(RoleID,AllObj."Object Type"::MenuSuite,0);
-        GiveExecutePermission(RoleID,AllObj."Object Type"::System,0);
-        GiveExecutePermission(RoleID,AllObj."Object Type"::Query,0);
+        GivePermission(RoleID, AllObj."Object Type"::TableData, 0, 1, 1, 1, 1, 1);
+        GiveExecutePermission(RoleID, AllObj."Object Type"::Table, 0);
+        GiveExecutePermission(RoleID, AllObj."Object Type"::Codeunit, 0);
+        GiveExecutePermission(RoleID, AllObj."Object Type"::Report, 0);
+        GiveExecutePermission(RoleID, AllObj."Object Type"::XMLport, 0);
+        GiveExecutePermission(RoleID, AllObj."Object Type"::MenuSuite, 0);
+        GiveExecutePermission(RoleID, AllObj."Object Type"::System, 0);
+        GiveExecutePermission(RoleID, AllObj."Object Type"::Query, 0);
 
-        AllObj.SetRange("Object Type",AllObj."Object Type"::Page);
-        AllObj.SetRange("Object ID",1,9799);
-        if AllObj.FindSet then repeat
-          GiveExecutePermission(RoleID,AllObj."Object Type",AllObj."Object ID")
-        until AllObj.Next = 0;
+        AllObj.SetRange("Object Type", AllObj."Object Type"::Page);
+        AllObj.SetRange("Object ID", 1, 9799);
+        if AllObj.FindSet then
+            repeat
+                GiveExecutePermission(RoleID, AllObj."Object Type", AllObj."Object ID")
+until AllObj.Next = 0;
 
-        AllObj.SetRange("Object ID",9805,9807);
-        if AllObj.FindSet then repeat
-          GiveExecutePermission(RoleID,AllObj."Object Type",AllObj."Object ID")
-        until AllObj.Next = 0;
+        AllObj.SetRange("Object ID", 9805, 9807);
+        if AllObj.FindSet then
+            repeat
+                GiveExecutePermission(RoleID, AllObj."Object Type", AllObj."Object ID")
+until AllObj.Next = 0;
 
-        AllObj.SetRange("Object ID",9809,9814);
-        if AllObj.FindSet then repeat
-          GiveExecutePermission(RoleID,AllObj."Object Type",AllObj."Object ID")
-        until AllObj.Next = 0;
+        AllObj.SetRange("Object ID", 9809, 9814);
+        if AllObj.FindSet then
+            repeat
+                GiveExecutePermission(RoleID, AllObj."Object Type", AllObj."Object ID")
+until AllObj.Next = 0;
 
-        AllObj.SetFilter("Object ID",'%1..',50000);
-        if AllObj.FindSet then repeat
-          GiveExecutePermission(RoleID,AllObj."Object Type",AllObj."Object ID")
-        until AllObj.Next = 0;
+        AllObj.SetFilter("Object ID", '%1..', 50000);
+        if AllObj.FindSet then
+            repeat
+                GiveExecutePermission(RoleID, AllObj."Object Type", AllObj."Object ID")
+until AllObj.Next = 0;
 
         //-NPR5.41 [312644]
         //MESSAGE('Persmissions given!')
@@ -82,28 +86,28 @@ codeunit 6014454 "Permission Set Mgt."
     begin
         //-NPR5.38 [299296]
         if PermissionSet.Get(Name) then
-          exit;
+            exit;
         //+NPR5.38 [299296]
 
         PermissionSet."Role ID" := Name;
-        PermissionSet.Name      := Name;
+        PermissionSet.Name := Name;
         //-NPR5.38 [299296]
         //IF PermissionSet.INSERT THEN;
         PermissionSet.Insert;
         //+NPR5.38 [299296]
     end;
 
-    procedure GiveExecutePermission(RoleID: Code[20];ObjectType: Integer;ObjectID: Integer)
+    procedure GiveExecutePermission(RoleID: Code[20]; ObjectType: Integer; ObjectID: Integer)
     var
         AllObj: Record AllObj;
     begin
         //-NPR5.37 [293886]
         if (ObjectType <> AllObj."Object Type"::Page) or (not SkipPage(ObjectID)) then
-        //+NPR5.37 [293886]
-          GivePermission(RoleID,ObjectType,ObjectID,0,0,0,0,1);
+            //+NPR5.37 [293886]
+            GivePermission(RoleID, ObjectType, ObjectID, 0, 0, 0, 0, 1);
     end;
 
-    procedure GivePermission(RoleID: Code[20];ObjectType: Integer;ObjectID: Integer;ReadPermission: Integer;InsertPermission: Integer;ModifyPermission: Integer;DeletePermission: Integer;ExecutePermision: Integer)
+    procedure GivePermission(RoleID: Code[20]; ObjectType: Integer; ObjectID: Integer; ReadPermission: Integer; InsertPermission: Integer; ModifyPermission: Integer; DeletePermission: Integer; ExecutePermision: Integer)
     var
         Permission: Record Permission;
     begin
@@ -119,15 +123,15 @@ codeunit 6014454 "Permission Set Mgt."
         // IF Permission.INSERT THEN;
 
         if not Permission.Get(RoleID, ObjectType, ObjectID) then begin
-          Permission."Role ID"            := RoleID;
-          Permission."Object Type"        := ObjectType;
-          Permission."Object ID"          := ObjectID;
-          Permission.Insert;
+            Permission."Role ID" := RoleID;
+            Permission."Object Type" := ObjectType;
+            Permission."Object ID" := ObjectID;
+            Permission.Insert;
         end;
-        Permission."Read Permission"    := ReadPermission;
-        Permission."Insert Permission"  := InsertPermission;
-        Permission."Modify Permission"  := ModifyPermission;
-        Permission."Delete Permission"  := DeletePermission;
+        Permission."Read Permission" := ReadPermission;
+        Permission."Insert Permission" := InsertPermission;
+        Permission."Modify Permission" := ModifyPermission;
+        Permission."Delete Permission" := DeletePermission;
         Permission."Execute Permission" := ExecutePermision;
         Permission.Modify;
         //+NPR5.38 [299296]
@@ -149,32 +153,31 @@ codeunit 6014454 "Permission Set Mgt."
           PAGE::Users,
           PAGE::Devices,
           PAGE::"POS Web Fonts",
-          PAGE::"Proxy Assemblies",
           PAGE::".NET Assemblies",
           PAGE::"Dependency Management Setup",
           PAGE::"POS Stargate Packages"
           ] then
             exit(true)
         else
-          exit(false);
+            exit(false);
         //+NPR5.37 [293886]
     end;
 
-    local procedure GivePermissionWithCheck(RoleID: Code[20];ObjectType: Integer;ObjectID: Integer)
+    local procedure GivePermissionWithCheck(RoleID: Code[20]; ObjectType: Integer; ObjectID: Integer)
     var
         AllObj: Record AllObj;
     begin
         //-NPR5.41 [312644]
         case ObjectType of
-          AllObj."Object Type"::Page:
-            if SkipPage(ObjectID) then
-              exit;
-          AllObj."Object Type"::TableData :
-            if SkipTableData(ObjectID) then
-              exit;
+            AllObj."Object Type"::Page:
+                if SkipPage(ObjectID) then
+                    exit;
+            AllObj."Object Type"::TableData:
+                if SkipTableData(ObjectID) then
+                    exit;
         end;
 
-        GivePermission(RoleID,ObjectType,ObjectID,1,1,1,1,1);
+        GivePermission(RoleID, ObjectType, ObjectID, 1, 1, 1, 1, 1);
         //+NPR5.41 [312644]
     end;
 
@@ -186,7 +189,7 @@ codeunit 6014454 "Permission Set Mgt."
           ] then
             exit(true)
         else
-          exit(false);
+            exit(false);
         //+NPR5.41 [312644]
     end;
 
@@ -210,11 +213,12 @@ codeunit 6014454 "Permission Set Mgt."
         RoleID := 'RETAIL-SUPER';
         CreatePermissionSet(RoleID);
 
-        AllObj.SetRange("Object Type",AllObj."Object Type"::TableData );
-        AllObj.SetFilter("Object ID",'%1..%2|%3..%4|%5..%6|%7..%8',6014400,6014699,6059767,6060166,6150613,6151612,6184471,6185470);
-        if AllObj.FindSet then repeat
-          GivePermission(RoleID, AllObj."Object Type", AllObj."Object ID",1,1,1,1,1);
-        until AllObj.Next = 0;
+        AllObj.SetRange("Object Type", AllObj."Object Type"::TableData);
+        AllObj.SetFilter("Object ID", '%1..%2|%3..%4|%5..%6|%7..%8', 6014400, 6014699, 6059767, 6060166, 6150613, 6151612, 6184471, 6185470);
+        if AllObj.FindSet then
+            repeat
+                GivePermission(RoleID, AllObj."Object Type", AllObj."Object ID", 1, 1, 1, 1, 1);
+            until AllObj.Next = 0;
         //+NPR5.41 [312644]
     end;
 
@@ -227,12 +231,13 @@ codeunit 6014454 "Permission Set Mgt."
         RoleID := 'RETAIL-ALL';
         CreatePermissionSet(RoleID);
 
-        AllObj.SetRange("Object Type",AllObj."Object Type"::TableData );
-        AllObj.SetFilter("Object ID",'%1..%2|%3..%4|%5..%6|%7..%8',6014400,6014699,6059767,6060166,6150613,6151612,6184471,6185470);
-        if AllObj.FindSet then repeat
-          GivePermissionWithCheck(RoleID, AllObj."Object Type", AllObj."Object ID");
-        until AllObj.Next = 0;
-        GivePermission(RoleID, AllObj."Object Type"::TableData, DATABASE::"Audit Roll",1,2,2,2,1);
+        AllObj.SetRange("Object Type", AllObj."Object Type"::TableData);
+        AllObj.SetFilter("Object ID", '%1..%2|%3..%4|%5..%6|%7..%8', 6014400, 6014699, 6059767, 6060166, 6150613, 6151612, 6184471, 6185470);
+        if AllObj.FindSet then
+            repeat
+                GivePermissionWithCheck(RoleID, AllObj."Object Type", AllObj."Object ID");
+            until AllObj.Next = 0;
+        GivePermission(RoleID, AllObj."Object Type"::TableData, DATABASE::"Audit Roll", 1, 2, 2, 2, 1);
         //+NPR5.41 [312644]
     end;
 

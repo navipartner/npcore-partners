@@ -26,7 +26,7 @@ codeunit 6059966 "MPOS Payment API"
         EmptyJasonResult: Label '{}';
 
     [EventSubscriber(ObjectType::Codeunit, 6150725, 'OnBeforeAction', '', true, true)]
-    local procedure OnAction(WorkflowStep: Text;PaymentType: Record "Payment Type POS";Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction(WorkflowStep: Text; PaymentType: Record "Payment Type POS"; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Setup: Codeunit "POS Setup";
         POSPaymentLine: Codeunit "POS Payment Line";
@@ -40,47 +40,47 @@ codeunit 6059966 "MPOS Payment API"
     begin
         //-NPR5.34
         if (WorkflowStep <> 'capture_payment') then
-          exit;
+            exit;
 
-        POSSession.GetSetup (Setup);
-        Register.Get (Setup.Register());
+        POSSession.GetSetup(Setup);
+        Register.Get(Setup.Register());
         if (PaymentType."No." <> Register."mPos Payment Type") then
-          exit;
+            exit;
 
-        POSSession.GetPaymentLine (POSPaymentLine);
-        POSPaymentLine.CalculateBalance (SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
-        Clear (POSLine);
+        Clear(POSLine);
         POSLine."No." := PaymentType."No.";
 
-        JSON.InitializeJObjectParser (Context, FrontEnd);
-        JSON.SetScope ('/', true);
-        JSON.SetScope ('$amount', true);
-        POSLine."Amount Including VAT" := JSON.GetDecimal ('numpad', true);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        JSON.SetScope('/', true);
+        JSON.SetScope('$amount', true);
+        POSLine."Amount Including VAT" := JSON.GetDecimal('numpad', true);
 
         //-NPR5.38
         //IF (POSLine."Amount Including VAT" < 0) THEN
         if (POSLine."Amount Including VAT" < 0) and (POSLine.Quantity > 0) then
-        //+NPR5.38
-          Error(MPOSNoCashBackErr);
+            //+NPR5.38
+            Error(MPOSNoCashBackErr);
 
-        if (POSLine."Amount Including VAT" > Abs (SubTotal)) then
-          Error(MPOSNoCashBackErr);
+        if (POSLine."Amount Including VAT" > Abs(SubTotal)) then
+            Error(MPOSNoCashBackErr);
 
-        POSPaymentLine.InsertPaymentLine (POSLine, 0);
-        POSPaymentLine.GetCurrentPaymentLine (POSLine);
+        POSPaymentLine.InsertPaymentLine(POSLine, 0);
+        POSPaymentLine.GetCurrentPaymentLine(POSLine);
 
         CallPaymentStart(POSLine);
 
         if (not POSLine."Cash Terminal Approved") then begin
-          POSLine.Description := MPOSTransCancelErr;
-          POSLine."Amount Including VAT" := 0;
-          POSLine.Modify ();
+            POSLine.Description := MPOSTransCancelErr;
+            POSLine."Amount Including VAT" := 0;
+            POSLine.Modify();
 
-          //-NPR5.45 [324506]
-          //ERROR(MPOSTransCancelErr);
-          Message(MPOSTransCancelErr);
-          //-NPR5.45 [324506]
+            //-NPR5.45 [324506]
+            //ERROR(MPOSTransCancelErr);
+            Message(MPOSTransCancelErr);
+            //-NPR5.45 [324506]
         end;
 
         Handled := true;
@@ -114,16 +114,16 @@ codeunit 6059966 "MPOS Payment API"
         mPosAppSetup.Get(SaleLinePOS."Register No.");
 
         if not mPosAppSetup.Enable then
-          exit;
+            exit;
 
         //-NPR5.46 [323996]
         if mPosAppSetup."Handle EFT Print in NAV" then
-          InAppPrinting := 0
+            InAppPrinting := 0
         else
-          InAppPrinting := 1;
+            InAppPrinting := 1;
         //+NPR5.46 [323996]
 
-        mPosAppSetup.TestField(Enable,true);
+        mPosAppSetup.TestField(Enable, true);
         mPosAppSetup.TestField("Payment Gateway");
         mPOSPaymentGateway.Get(mPosAppSetup."Payment Gateway");
         mPOSPaymentGateway.TestField("Merchant Id");
@@ -132,223 +132,228 @@ codeunit 6059966 "MPOS Payment API"
         CurrSessionId := Format(DateTimeTick.Ticks);
 
         case mPOSPaymentGateway.Provider of
-          mPOSPaymentGateway.Provider::ADYEN : begin
-              mPOSAdyenTransactions.Init;
-              mPOSAdyenTransactions."Register No." := SaleLinePOS."Register No.";
-              mPOSAdyenTransactions."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-              mPOSAdyenTransactions."Sales Line No." := SaleLinePOS."Line No.";
-              mPOSAdyenTransactions.Amount := SaleLinePOS."Amount Including VAT";
-              mPOSAdyenTransactions."Session Id" := CurrSessionId;
-              mPOSAdyenTransactions."Created Date" := CurrentDateTime;
-              mPOSAdyenTransactions."Currency Code" := GetCurrencyCode(SaleLinePOS."Currency Code");
-              mPOSAdyenTransactions."Merchant Reference" := CurrSessionId;
-              mPOSAdyenTransactions."Payment Amount In Cents" := mPOSAdyenTransactions.Amount * 100;
-              mPOSAdyenTransactions."Payment Gateway" := mPosAppSetup."Payment Gateway";
-              mPOSAdyenTransactions."Merchant Id" := mPOSPaymentGateway."Merchant Id";
+            mPOSPaymentGateway.Provider::ADYEN:
+                begin
+                    mPOSAdyenTransactions.Init;
+                    mPOSAdyenTransactions."Register No." := SaleLinePOS."Register No.";
+                    mPOSAdyenTransactions."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+                    mPOSAdyenTransactions."Sales Line No." := SaleLinePOS."Line No.";
+                    mPOSAdyenTransactions.Amount := SaleLinePOS."Amount Including VAT";
+                    mPOSAdyenTransactions."Session Id" := CurrSessionId;
+                    mPOSAdyenTransactions."Created Date" := CurrentDateTime;
+                    mPOSAdyenTransactions."Currency Code" := GetCurrencyCode(SaleLinePOS."Currency Code");
+                    mPOSAdyenTransactions."Merchant Reference" := CurrSessionId;
+                    mPOSAdyenTransactions."Payment Amount In Cents" := mPOSAdyenTransactions.Amount * 100;
+                    mPOSAdyenTransactions."Payment Gateway" := mPosAppSetup."Payment Gateway";
+                    mPOSAdyenTransactions."Merchant Id" := mPOSPaymentGateway."Merchant Id";
 
-              JSON := '{ "mPosRequest" : [{ "debug":"false" , "amount":"'+Format(mPOSAdyenTransactions."Payment Amount In Cents")
-                +'", "currency":"'+mPOSAdyenTransactions."Currency Code"
-                +'", "reference":"'+mPOSAdyenTransactions."Session Id"
-                //-NPR5.46 [323996]
-                +'", "inappprinting":"'+Format(InAppPrinting)
-                //+NPR5.46 [323996]
-                +'", "transactionType":"", "paymentGateWay":"'+mPOSAdyenTransactions."Payment Gateway"
-                +'", "merchantId":"'+mPOSAdyenTransactions."Merchant Id"+'" }]}';
-
-              BigTextVar.AddText(JSON);
-              mPOSAdyenTransactions."Request Json".CreateOutStream(Ostream);
-              BigTextVar.Write(Ostream);
-              mPOSAdyenTransactions.Insert;
-              Commit;
-          end;
-          mPOSPaymentGateway.Provider::NETS  : begin
-              mPOSNetsTransactions.Init;
-              mPOSNetsTransactions."Register No." := SaleLinePOS."Register No.";
-              mPOSNetsTransactions."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-              mPOSNetsTransactions."Sales Line No." := SaleLinePOS."Line No.";
-              mPOSNetsTransactions."Session Id" := CurrSessionId;
-              mPOSNetsTransactions."Created Date" := CurrentDateTime;
-              mPOSNetsTransactions."Currency Code" := GetCurrencyCode(SaleLinePOS."Currency Code");
-              mPOSNetsTransactions."Merchant Reference" := CurrSessionId;
-
-              if SaleLinePOS."Amount Including VAT" < 0 then begin
-                mPOSNetsTransactions."Transaction Type" := mPOSNetsTransactions."Transaction Type"::REFUND;
-                mPOSNetsTransactions."Transaction Type Id" := 49;
-                mPOSNetsTransactions.Amount := SaleLinePOS."Amount Including VAT" * -1;
-                //-NPR5.36
-                //mPOSNetsTransactions."Payment Amount In Cents" := (mPOSNetsTransactions.Amount * 100) * -1;
-                mPOSNetsTransactions."Payment Amount In Cents" := (mPOSNetsTransactions.Amount * 100);
-                //+NPR5.36
-              end else begin
-                mPOSNetsTransactions."Transaction Type" := mPOSNetsTransactions."Transaction Type"::PAY;
-                mPOSNetsTransactions."Transaction Type Id" := 48;
-                mPOSNetsTransactions.Amount := SaleLinePOS."Amount Including VAT";
-                mPOSNetsTransactions."Payment Amount In Cents" := mPOSNetsTransactions.Amount * 100;
-              end;
-
-              mPOSNetsTransactions."Payment Gateway" := mPosAppSetup."Payment Gateway";
-              mPOSNetsTransactions."Merchant Id" := mPOSPaymentGateway."Merchant Id";
-
-              JSON := '{ "mPosRequest" : [{ "debug":"false" , "amount":"'
-                      +Format(mPOSNetsTransactions."Payment Amount In Cents")
-                      +'", "currency":"'+mPOSNetsTransactions."Currency Code"
-                      +'", "reference":"'+mPOSNetsTransactions."Session Id"
+                    JSON := '{ "mPosRequest" : [{ "debug":"false" , "amount":"' + Format(mPOSAdyenTransactions."Payment Amount In Cents")
+                      + '", "currency":"' + mPOSAdyenTransactions."Currency Code"
+                      + '", "reference":"' + mPOSAdyenTransactions."Session Id"
                       //-NPR5.46 [323996]
-                      +'", "inappprinting":"'+Format(InAppPrinting)
+                      + '", "inappprinting":"' + Format(InAppPrinting)
                       //+NPR5.46 [323996]
-                      +'", "transactionType":"'+Format(mPOSNetsTransactions."Transaction Type Id")
-                      +'", "paymentGateWay":"'+mPOSNetsTransactions."Payment Gateway"
-                      +'","merchantId":"'+mPOSNetsTransactions."Merchant Id"+'" }]}';
+                      + '", "transactionType":"", "paymentGateWay":"' + mPOSAdyenTransactions."Payment Gateway"
+                      + '", "merchantId":"' + mPOSAdyenTransactions."Merchant Id" + '" }]}';
 
-              BigTextVar.AddText(JSON);
-              mPOSNetsTransactions."Request Json".CreateOutStream(Ostream);
-              BigTextVar.Write(Ostream);
-              mPOSNetsTransactions.Insert;
-              Commit;
+                    BigTextVar.AddText(JSON);
+                    mPOSAdyenTransactions."Request Json".CreateOutStream(Ostream);
+                    BigTextVar.Write(Ostream);
+                    mPOSAdyenTransactions.Insert;
+                    Commit;
+                end;
+            mPOSPaymentGateway.Provider::NETS:
+                begin
+                    mPOSNetsTransactions.Init;
+                    mPOSNetsTransactions."Register No." := SaleLinePOS."Register No.";
+                    mPOSNetsTransactions."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+                    mPOSNetsTransactions."Sales Line No." := SaleLinePOS."Line No.";
+                    mPOSNetsTransactions."Session Id" := CurrSessionId;
+                    mPOSNetsTransactions."Created Date" := CurrentDateTime;
+                    mPOSNetsTransactions."Currency Code" := GetCurrencyCode(SaleLinePOS."Currency Code");
+                    mPOSNetsTransactions."Merchant Reference" := CurrSessionId;
 
-          end;
+                    if SaleLinePOS."Amount Including VAT" < 0 then begin
+                        mPOSNetsTransactions."Transaction Type" := mPOSNetsTransactions."Transaction Type"::REFUND;
+                        mPOSNetsTransactions."Transaction Type Id" := 49;
+                        mPOSNetsTransactions.Amount := SaleLinePOS."Amount Including VAT" * -1;
+                        //-NPR5.36
+                        //mPOSNetsTransactions."Payment Amount In Cents" := (mPOSNetsTransactions.Amount * 100) * -1;
+                        mPOSNetsTransactions."Payment Amount In Cents" := (mPOSNetsTransactions.Amount * 100);
+                        //+NPR5.36
+                    end else begin
+                        mPOSNetsTransactions."Transaction Type" := mPOSNetsTransactions."Transaction Type"::PAY;
+                        mPOSNetsTransactions."Transaction Type Id" := 48;
+                        mPOSNetsTransactions.Amount := SaleLinePOS."Amount Including VAT";
+                        mPOSNetsTransactions."Payment Amount In Cents" := mPOSNetsTransactions.Amount * 100;
+                    end;
+
+                    mPOSNetsTransactions."Payment Gateway" := mPosAppSetup."Payment Gateway";
+                    mPOSNetsTransactions."Merchant Id" := mPOSPaymentGateway."Merchant Id";
+
+                    JSON := '{ "mPosRequest" : [{ "debug":"false" , "amount":"'
+                            + Format(mPOSNetsTransactions."Payment Amount In Cents")
+                            + '", "currency":"' + mPOSNetsTransactions."Currency Code"
+                            + '", "reference":"' + mPOSNetsTransactions."Session Id"
+                            //-NPR5.46 [323996]
+                            + '", "inappprinting":"' + Format(InAppPrinting)
+                            //+NPR5.46 [323996]
+                            + '", "transactionType":"' + Format(mPOSNetsTransactions."Transaction Type Id")
+                            + '", "paymentGateWay":"' + mPOSNetsTransactions."Payment Gateway"
+                            + '","merchantId":"' + mPOSNetsTransactions."Merchant Id" + '" }]}';
+
+                    BigTextVar.AddText(JSON);
+                    mPOSNetsTransactions."Request Json".CreateOutStream(Ostream);
+                    BigTextVar.Write(Ostream);
+                    mPOSNetsTransactions.Insert;
+                    Commit;
+
+                end;
         end;
 
         mPOSProxy.SetProvider(mPOSPaymentGateway.Provider);
-        mPOSProxy.SetState(mPOSAdyenTransactions,mPOSNetsTransactions);
+        mPOSProxy.SetState(mPOSAdyenTransactions, mPOSNetsTransactions);
         mPOSProxy.RunModal;
 
         case mPOSPaymentGateway.Provider of
-          mPOSPaymentGateway.Provider::ADYEN : begin
-            mPOSAdyenTransactionsResponse.Get(mPOSAdyenTransactions."Transaction No.");
+            mPOSPaymentGateway.Provider::ADYEN:
+                begin
+                    mPOSAdyenTransactionsResponse.Get(mPOSAdyenTransactions."Transaction No.");
 
-            ParseAdyenJson(mPOSAdyenTransactionsResponse);
+                    ParseAdyenJson(mPOSAdyenTransactionsResponse);
 
-            if (mPOSAdyenTransactionsResponse."Callback Result" = 'APPROVED') and (mPOSAdyenTransactionsResponse.Handled) then begin
-              SaleLinePOS."Cash Terminal Approved" := true;
-              SaleLinePOS.Description := SaleLinePOS.Description + ' ' + Format(mPOSAdyenTransactionsResponse."Transaction No.");
-            end else
-              SaleLinePOS."Cash Terminal Approved" := false;
-            SaleLinePOS.Modify;
-            Commit;
-          end;
-          mPOSPaymentGateway.Provider::NETS  : begin
-            mPOSNetsTransactionsResponse.Get(mPOSNetsTransactions."Transaction No.");
-
-            ParseNetsJson(mPOSNetsTransactionsResponse);
-
-            //-NPR5.36 [291652]
-            HandlePrint(mPOSNetsTransactionsResponse);
-            //+NPR5.36 [291652]
-
-            if (mPOSNetsTransactionsResponse."Callback Result" = 0) and (mPOSNetsTransactionsResponse.Handled) then begin
-
-              //-NPR5.42 [306689]
-              //PaymentTypeFounded := CreditCardProtocolHelper.FindPaymentType(mPOSNetsTransactionsResponse."Callback TruncatedPan",PaymentTypePOS);
-              SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
-              PaymentTypeFounded := CreditCardProtocolHelper.FindPaymentType(mPOSNetsTransactionsResponse."Callback TruncatedPan",PaymentTypePOS,SalePOS."Location Code");
-              //+NPR5.42 [306689]
-
-              if mPOSNetsTransactionsResponse."Callback Receipt 2".HasValue then begin
-                if Confirm(ValidateSignature, true) then begin
-                  SaleLinePOS."Cash Terminal Approved" := true;
-                  //-NPR5.38
-                  if PaymentTypeFounded then begin
-                    SaleLinePOS."No." := PaymentTypePOS."No.";
-                    SaleLinePOS.Description := PaymentTypePOS.Description;
-                  end else begin
-                    SaleLinePOS.Description := SaleLinePOS.Description + ' ' + Format(mPOSNetsTransactionsResponse."Transaction No.");
-                  end;
-                  //+NPR5.38
-                end else begin
-                  Cancelled := CallCancelStart(SaleLinePOS);
-                  SaleLinePOS."Cash Terminal Approved" := false;
+                    if (mPOSAdyenTransactionsResponse."Callback Result" = 'APPROVED') and (mPOSAdyenTransactionsResponse.Handled) then begin
+                        SaleLinePOS."Cash Terminal Approved" := true;
+                        SaleLinePOS.Description := SaleLinePOS.Description + ' ' + Format(mPOSAdyenTransactionsResponse."Transaction No.");
+                    end else
+                        SaleLinePOS."Cash Terminal Approved" := false;
+                    SaleLinePOS.Modify;
+                    Commit;
                 end;
-              end else begin
-                SaleLinePOS."Cash Terminal Approved" := true;
-                //-NPR5.38
-                if PaymentTypeFounded then begin
-                  SaleLinePOS."No." := PaymentTypePOS."No.";
-                  SaleLinePOS.Description := PaymentTypePOS.Description;
-                end else begin
-                  SaleLinePOS.Description := SaleLinePOS.Description + ' ' + Format(mPOSNetsTransactionsResponse."Transaction No.");
+            mPOSPaymentGateway.Provider::NETS:
+                begin
+                    mPOSNetsTransactionsResponse.Get(mPOSNetsTransactions."Transaction No.");
+
+                    ParseNetsJson(mPOSNetsTransactionsResponse);
+
+                    //-NPR5.36 [291652]
+                    HandlePrint(mPOSNetsTransactionsResponse);
+                    //+NPR5.36 [291652]
+
+                    if (mPOSNetsTransactionsResponse."Callback Result" = 0) and (mPOSNetsTransactionsResponse.Handled) then begin
+
+                        //-NPR5.42 [306689]
+                        //PaymentTypeFounded := CreditCardProtocolHelper.FindPaymentType(mPOSNetsTransactionsResponse."Callback TruncatedPan",PaymentTypePOS);
+                        SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
+                        PaymentTypeFounded := CreditCardProtocolHelper.FindPaymentType(mPOSNetsTransactionsResponse."Callback TruncatedPan", PaymentTypePOS, SalePOS."Location Code");
+                        //+NPR5.42 [306689]
+
+                        if mPOSNetsTransactionsResponse."Callback Receipt 2".HasValue then begin
+                            if Confirm(ValidateSignature, true) then begin
+                                SaleLinePOS."Cash Terminal Approved" := true;
+                                //-NPR5.38
+                                if PaymentTypeFounded then begin
+                                    SaleLinePOS."No." := PaymentTypePOS."No.";
+                                    SaleLinePOS.Description := PaymentTypePOS.Description;
+                                end else begin
+                                    SaleLinePOS.Description := SaleLinePOS.Description + ' ' + Format(mPOSNetsTransactionsResponse."Transaction No.");
+                                end;
+                                //+NPR5.38
+                            end else begin
+                                Cancelled := CallCancelStart(SaleLinePOS);
+                                SaleLinePOS."Cash Terminal Approved" := false;
+                            end;
+                        end else begin
+                            SaleLinePOS."Cash Terminal Approved" := true;
+                            //-NPR5.38
+                            if PaymentTypeFounded then begin
+                                SaleLinePOS."No." := PaymentTypePOS."No.";
+                                SaleLinePOS.Description := PaymentTypePOS.Description;
+                            end else begin
+                                SaleLinePOS.Description := SaleLinePOS.Description + ' ' + Format(mPOSNetsTransactionsResponse."Transaction No.");
+                            end;
+                            //+NPR5.38
+                        end;
+                    end else
+                        SaleLinePOS."Cash Terminal Approved" := false;
+                    SaleLinePOS.Modify;
+                    Commit;
                 end;
-                //+NPR5.38
-              end;
-            end else
-              SaleLinePOS."Cash Terminal Approved" := false;
-            SaleLinePOS.Modify;
-            Commit;
-          end;
         end;
     end;
 
     local procedure ParseAdyenJson(var mPOSAdyenTransactions: Record "MPOS Adyen Transactions")
     var
-        JToken: DotNet JToken;
-        JObject: DotNet JObject;
+        JObject: JsonObject;
         ResponsData: Text;
         IStream: InStream;
     begin
         mPOSAdyenTransactions.CalcFields("Response Json");
 
         if not mPOSAdyenTransactions."Response Json".HasValue then
-          exit
+            exit
         else begin
-          mPOSAdyenTransactions."Response Json".CreateInStream(IStream);
-          IStream.Read(ResponsData,MaxStrLen(ResponsData));
+            mPOSAdyenTransactions."Response Json".CreateInStream(IStream);
+            IStream.Read(ResponsData, MaxStrLen(ResponsData));
         end;
 
-        JToken := JObject.Parse(ResponsData);
+        JObject.ReadFrom(ResponsData);
 
-        mPOSAdyenTransactions."Callback Result" := GetString(JToken,'result');
-        mPOSAdyenTransactions."Callback CS" := GetString(JToken,'cs');
-        mPOSAdyenTransactions."Callback Merchant Account" := GetString(JToken,'merchantAccount');
-        mPOSAdyenTransactions."Callback Merchant Reference" := GetString(JToken,'merchantReference');
+        mPOSAdyenTransactions."Callback Result" := GetString(JObject, 'result');
+        mPOSAdyenTransactions."Callback CS" := GetString(JObject, 'cs');
+        mPOSAdyenTransactions."Callback Merchant Account" := GetString(JObject, 'merchantAccount');
+        mPOSAdyenTransactions."Callback Merchant Reference" := GetString(JObject, 'merchantReference');
 
-          case  mPOSAdyenTransactions."Callback Result" of
-            'ERROR'     : begin
-                            mPOSAdyenTransactions."Callback Code" := GetString(JToken,'errorCode');
-                            mPOSAdyenTransactions."Callback Message" := GetString(JToken,'errorMessage');
-                          end;
-            'CANCELLED' : begin
-                            mPOSAdyenTransactions."Callback Code" := GetString(JToken,'cancelCode');
-                            mPOSAdyenTransactions."Callback Message" := GetString(JToken,'cancelMessage');
-                          end;
-            'APPROVED'  : begin
-                            mPOSAdyenTransactions."Callback Panseq" := GetString(JToken,'panseq');
-                            mPOSAdyenTransactions."Callback POS Entry Mode" := GetString(JToken,'posEntryMode');
-                            mPOSAdyenTransactions."Callback Card Summary" := GetString(JToken,'cardSummary');
-                            mPOSAdyenTransactions."Callback PSP Auth Code" := GetString(JToken,'pspAuthCode');
-                            mPOSAdyenTransactions."Callback Amount Value" := GetInt(JToken,'amountValue');
-                            mPOSAdyenTransactions."Callback Issuer Country" := GetString(JToken,'issuerCountry');
-                            mPOSAdyenTransactions."Callback Expiry Month" := GetString(JToken,'expiryMonth');
-                            mPOSAdyenTransactions."Callback Card Holder Verificat" := GetString(JToken,'cardHolderVerificationMethodResults');
-                            mPOSAdyenTransactions."Callback Card Scheme" := GetString(JToken,'cardScheme');
-                            mPOSAdyenTransactions."Callback Card Bin" := GetString(JToken,'cardBin');
-                            mPOSAdyenTransactions."Callback Application Label" := GetString(JToken,'applicationLabel');
-                            mPOSAdyenTransactions."Callback Payment Meth Variant" := GetString(JToken,'paymentMethodVariant');
-                            mPOSAdyenTransactions."Callback Tender Reference" := GetString(JToken,'tenderReference');
-                            mPOSAdyenTransactions."Callback App Preferred Name" := GetString(JToken,'applicationPreferredName');
-                            mPOSAdyenTransactions."Callback Aid Code" := GetString(JToken,'aidCode');
-                            mPOSAdyenTransactions."Callback Org Amount Value" := GetInt(JToken,'originalAmountValue');
-                            mPOSAdyenTransactions."Callback Tx Time" := GetString(JToken,'txtime');
-                            mPOSAdyenTransactions."Callback Tx Date" := GetString(JToken,'txdate');
-                            mPOSAdyenTransactions."Callback Terminal Id" := GetString(JToken,'terminalId');
-                            mPOSAdyenTransactions."Callback Payment Method" := GetString(JToken,'paymentMethod');
-                            mPOSAdyenTransactions."Callback PSP Reference" := GetString(JToken,'pspReference');
-                            mPOSAdyenTransactions."Callback Mid" := GetInt(JToken,'mid');
-                            mPOSAdyenTransactions."Callback Expiry Year" := GetInt(JToken,'expiryYear');
-                            mPOSAdyenTransactions."Callback Card Type" := GetString(JToken,'cardType');
-                            mPOSAdyenTransactions."Callback Org Amount Currency" := GetString(JToken,'originalAmountCurrency');
-                            mPOSAdyenTransactions."Callback Card Holder Name" := GetString(JToken,'cardHolderName');
-                            mPOSAdyenTransactions."Callback Amount Currency" := GetString(JToken,'amountCurrency');
-                            mPOSAdyenTransactions."Callback Transaction Type" := GetString(JToken,'transactionType');
-                            mPOSAdyenTransactions.Handled := true;
-                          end;
-          end;
+        case mPOSAdyenTransactions."Callback Result" of
+            'ERROR':
+                begin
+                    mPOSAdyenTransactions."Callback Code" := GetString(JObject, 'errorCode');
+                    mPOSAdyenTransactions."Callback Message" := GetString(JObject, 'errorMessage');
+                end;
+            'CANCELLED':
+                begin
+                    mPOSAdyenTransactions."Callback Code" := GetString(JObject, 'cancelCode');
+                    mPOSAdyenTransactions."Callback Message" := GetString(JObject, 'cancelMessage');
+                end;
+            'APPROVED':
+                begin
+                    mPOSAdyenTransactions."Callback Panseq" := GetString(JObject, 'panseq');
+                    mPOSAdyenTransactions."Callback POS Entry Mode" := GetString(JObject, 'posEntryMode');
+                    mPOSAdyenTransactions."Callback Card Summary" := GetString(JObject, 'cardSummary');
+                    mPOSAdyenTransactions."Callback PSP Auth Code" := GetString(JObject, 'pspAuthCode');
+                    mPOSAdyenTransactions."Callback Amount Value" := GetInt(JObject, 'amountValue');
+                    mPOSAdyenTransactions."Callback Issuer Country" := GetString(JObject, 'issuerCountry');
+                    mPOSAdyenTransactions."Callback Expiry Month" := GetString(JObject, 'expiryMonth');
+                    mPOSAdyenTransactions."Callback Card Holder Verificat" := GetString(JObject, 'cardHolderVerificationMethodResults');
+                    mPOSAdyenTransactions."Callback Card Scheme" := GetString(JObject, 'cardScheme');
+                    mPOSAdyenTransactions."Callback Card Bin" := GetString(JObject, 'cardBin');
+                    mPOSAdyenTransactions."Callback Application Label" := GetString(JObject, 'applicationLabel');
+                    mPOSAdyenTransactions."Callback Payment Meth Variant" := GetString(JObject, 'paymentMethodVariant');
+                    mPOSAdyenTransactions."Callback Tender Reference" := GetString(JObject, 'tenderReference');
+                    mPOSAdyenTransactions."Callback App Preferred Name" := GetString(JObject, 'applicationPreferredName');
+                    mPOSAdyenTransactions."Callback Aid Code" := GetString(JObject, 'aidCode');
+                    mPOSAdyenTransactions."Callback Org Amount Value" := GetInt(JObject, 'originalAmountValue');
+                    mPOSAdyenTransactions."Callback Tx Time" := GetString(JObject, 'txtime');
+                    mPOSAdyenTransactions."Callback Tx Date" := GetString(JObject, 'txdate');
+                    mPOSAdyenTransactions."Callback Terminal Id" := GetString(JObject, 'terminalId');
+                    mPOSAdyenTransactions."Callback Payment Method" := GetString(JObject, 'paymentMethod');
+                    mPOSAdyenTransactions."Callback PSP Reference" := GetString(JObject, 'pspReference');
+                    mPOSAdyenTransactions."Callback Mid" := GetInt(JObject, 'mid');
+                    mPOSAdyenTransactions."Callback Expiry Year" := GetInt(JObject, 'expiryYear');
+                    mPOSAdyenTransactions."Callback Card Type" := GetString(JObject, 'cardType');
+                    mPOSAdyenTransactions."Callback Org Amount Currency" := GetString(JObject, 'originalAmountCurrency');
+                    mPOSAdyenTransactions."Callback Card Holder Name" := GetString(JObject, 'cardHolderName');
+                    mPOSAdyenTransactions."Callback Amount Currency" := GetString(JObject, 'amountCurrency');
+                    mPOSAdyenTransactions."Callback Transaction Type" := GetString(JObject, 'transactionType');
+                    mPOSAdyenTransactions.Handled := true;
+                end;
+        end;
         mPOSAdyenTransactions.Modify(true);
     end;
 
     local procedure ParseNetsJson(var mPOSNetsTransactions: Record "MPOS Nets Transactions")
     var
-        JToken: DotNet JToken;
-        JObject: DotNet JObject;
+        JObject: JsonObject;
         ResponsData: Text;
         IStream: InStream;
         BigTextVar: BigText;
@@ -357,88 +362,91 @@ codeunit 6059966 "MPOS Payment API"
         mPOSNetsTransactions.CalcFields("Response Json");
 
         if not mPOSNetsTransactions."Response Json".HasValue then
-          exit
+            exit
         else begin
-          mPOSNetsTransactions."Response Json".CreateInStream(IStream);
-          IStream.Read(ResponsData,MaxStrLen(ResponsData));
+            mPOSNetsTransactions."Response Json".CreateInStream(IStream);
+            IStream.Read(ResponsData, MaxStrLen(ResponsData));
         end;
 
         if ResponsData = EmptyJasonResult then
-          exit;
+            exit;
 
-        JToken := JObject.Parse(ResponsData);
+        JObject.ReadFrom(ResponsData);
 
-        mPOSNetsTransactions."Callback Result" := GetInt(JToken,'result');
-        mPOSNetsTransactions."Callback AccumulatorUpdate" := GetInt(JToken,'accumulatorUpdate');
-        mPOSNetsTransactions."Callback IssuerId" := GetInt(JToken,'issuerId');
-        mPOSNetsTransactions."Callback TruncatedPan" := GetString(JToken,'truncatedPan');
-        mPOSNetsTransactions."Callback EncryptedPan" := GetString(JToken,'encryptedPan');
-        mPOSNetsTransactions."Callback Timestamp" := GetString(JToken,'timestamp');
-        mPOSNetsTransactions."Callback VerificationMethod" := GetInt(JToken,'verificationMethod');
-        mPOSNetsTransactions."Callback SessionNumber" := GetString(JToken,'sessionNumber');
-        mPOSNetsTransactions."Callback StanAuth" := GetString(JToken,'stanAuth');
-        mPOSNetsTransactions."Callback SequenceNumber" := GetString(JToken,'sequenceNumber');
-        mPOSNetsTransactions."Callback TotalAmount" := GetInt(JToken,'totalAmount');
-        mPOSNetsTransactions."Callback TipAmount" := GetInt(JToken,'tipAmount');
-        mPOSNetsTransactions."Callback SurchargeAmount" := GetInt(JToken,'surchargeAmount');
-        mPOSNetsTransactions."Callback AcquiereMerchantID" := GetString(JToken,'acquiereMerchantID');
-        mPOSNetsTransactions."Callback CardIssuerName" := GetString(JToken,'cardIssuerName');
-        mPOSNetsTransactions."Callback TCC" := GetString(JToken,'TCC');
-        mPOSNetsTransactions."Callback AID" := GetString(JToken,'AID');
-        mPOSNetsTransactions."Callback TVR" := GetString(JToken,'TVR');
-        mPOSNetsTransactions."Callback TSI" := GetString(JToken,'TSI');
-        mPOSNetsTransactions."Callback ATC" := GetString(JToken,'ATC');
-        mPOSNetsTransactions."Callback AED" := GetString(JToken,'AED');
-        mPOSNetsTransactions."Callback IAC" := GetString(JToken,'IAC');
+        mPOSNetsTransactions."Callback Result" := GetInt(JObject, 'result');
+        mPOSNetsTransactions."Callback AccumulatorUpdate" := GetInt(JObject, 'accumulatorUpdate');
+        mPOSNetsTransactions."Callback IssuerId" := GetInt(JObject, 'issuerId');
+        mPOSNetsTransactions."Callback TruncatedPan" := GetString(JObject, 'truncatedPan');
+        mPOSNetsTransactions."Callback EncryptedPan" := GetString(JObject, 'encryptedPan');
+        mPOSNetsTransactions."Callback Timestamp" := GetString(JObject, 'timestamp');
+        mPOSNetsTransactions."Callback VerificationMethod" := GetInt(JObject, 'verificationMethod');
+        mPOSNetsTransactions."Callback SessionNumber" := GetString(JObject, 'sessionNumber');
+        mPOSNetsTransactions."Callback StanAuth" := GetString(JObject, 'stanAuth');
+        mPOSNetsTransactions."Callback SequenceNumber" := GetString(JObject, 'sequenceNumber');
+        mPOSNetsTransactions."Callback TotalAmount" := GetInt(JObject, 'totalAmount');
+        mPOSNetsTransactions."Callback TipAmount" := GetInt(JObject, 'tipAmount');
+        mPOSNetsTransactions."Callback SurchargeAmount" := GetInt(JObject, 'surchargeAmount');
+        mPOSNetsTransactions."Callback AcquiereMerchantID" := GetString(JObject, 'acquiereMerchantID');
+        mPOSNetsTransactions."Callback CardIssuerName" := GetString(JObject, 'cardIssuerName');
+        mPOSNetsTransactions."Callback TCC" := GetString(JObject, 'TCC');
+        mPOSNetsTransactions."Callback AID" := GetString(JObject, 'AID');
+        mPOSNetsTransactions."Callback TVR" := GetString(JObject, 'TVR');
+        mPOSNetsTransactions."Callback TSI" := GetString(JObject, 'TSI');
+        mPOSNetsTransactions."Callback ATC" := GetString(JObject, 'ATC');
+        mPOSNetsTransactions."Callback AED" := GetString(JObject, 'AED');
+        mPOSNetsTransactions."Callback IAC" := GetString(JObject, 'IAC');
 
-        mPOSNetsTransactions."Callback OrganisationNumber" := GetString(JToken,'organisationNumber');
-        mPOSNetsTransactions."Callback BankAgent" := GetString(JToken,'bankAgent');
-        mPOSNetsTransactions."Callback AccountType" := GetString(JToken,'accountType');
-        mPOSNetsTransactions."Callback OptionalData" := GetString(JToken,'optionalData');
-        mPOSNetsTransactions."Callback ResponseCode" := GetString(JToken,'responseCode');
-        mPOSNetsTransactions."Callback RejectionSource" := GetInt(JToken,'rejectionSource');
-        mPOSNetsTransactions."Callback RejectionReason" := GetString(JToken,'rejectionReason');
-        mPOSNetsTransactions."Callback MerchantReference" := GetString(JToken,'merchantReference');
-        mPOSNetsTransactions."Callback StatusDescription" := GetString(JToken,'statusDescription');
+        mPOSNetsTransactions."Callback OrganisationNumber" := GetString(JObject, 'organisationNumber');
+        mPOSNetsTransactions."Callback BankAgent" := GetString(JObject, 'bankAgent');
+        mPOSNetsTransactions."Callback AccountType" := GetString(JObject, 'accountType');
+        mPOSNetsTransactions."Callback OptionalData" := GetString(JObject, 'optionalData');
+        mPOSNetsTransactions."Callback ResponseCode" := GetString(JObject, 'responseCode');
+        mPOSNetsTransactions."Callback RejectionSource" := GetInt(JObject, 'rejectionSource');
+        mPOSNetsTransactions."Callback RejectionReason" := GetString(JObject, 'rejectionReason');
+        mPOSNetsTransactions."Callback MerchantReference" := GetString(JObject, 'merchantReference');
+        mPOSNetsTransactions."Callback StatusDescription" := GetString(JObject, 'statusDescription');
 
         mPOSNetsTransactions.Handled := true;
 
-        BigTextVar.AddText(GetString(JToken,'receipt1'));
+        BigTextVar.AddText(GetString(JObject, 'receipt1'));
         mPOSNetsTransactions."Callback Receipt 1".CreateOutStream(Ostream);
         BigTextVar.Write(Ostream);
 
         Clear(BigTextVar);
-        BigTextVar.AddText(GetString(JToken,'receipt2'));
+        BigTextVar.AddText(GetString(JObject, 'receipt2'));
         mPOSNetsTransactions."Callback Receipt 2".CreateOutStream(Ostream);
         BigTextVar.Write(Ostream);
 
         mPOSNetsTransactions.Modify(true);
     end;
 
-    local procedure GetString(var JToken: DotNet JToken;JTokenName: Text): Text
+    local procedure GetString(var JObject: JsonObject; JTokenName: Text): Text
     var
-        JsonValue: Text;
+        JToken: JsonToken;
+        JValue: JsonValue;
     begin
-        JsonValue := Format(JToken.SelectToken(JTokenName));
-        if UpperCase(JsonValue) = 'NULL' then
-          exit('');
+        if not JObject.Get(JTokenName, JToken) then
+            exit('');
 
-        exit(JsonValue);
+        JValue := JToken.AsValue();
+        if (JValue.IsNull) then
+            exit('');
+
+        exit(JValue.AsText());
     end;
 
-    local procedure GetInt(var JToken: DotNet JToken;JTokenName: Text): Integer
+    local procedure GetInt(var JObject: JsonObject; JTokenName: Text): Integer
     var
-        JsonValue: Text;
-        JsonIntValue: Integer;
+        JToken: JsonToken;
+        JValue: JsonValue;
     begin
-        JsonValue := Format(JToken.SelectToken(JTokenName));
-        if UpperCase(JsonValue) = 'NULL' then
-          exit(0);
+        if not JObject.Get(JTokenName, JToken) then
+            exit(0);
 
-        if Evaluate(JsonIntValue,JsonValue) then
-          exit(JsonIntValue)
-        else
-          exit(0);
+        JValue := JToken.AsValue();
+        if (JValue.IsNull) then
+            exit(0);
+        exit(JValue.AsInteger());
     end;
 
     local procedure GetCurrencyCode(SalesLineCurrencyCode: Code[10]): Code[10]
@@ -446,11 +454,11 @@ codeunit 6059966 "MPOS Payment API"
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
         if SalesLineCurrencyCode <> '' then
-          exit(SalesLineCurrencyCode);
+            exit(SalesLineCurrencyCode);
 
         GeneralLedgerSetup.Get;
         if GeneralLedgerSetup."LCY Code" <> '' then
-          exit(GeneralLedgerSetup."LCY Code");
+            exit(GeneralLedgerSetup."LCY Code");
 
         Error(ErrorCurrencyIsNotDefined);
     end;
@@ -474,9 +482,9 @@ codeunit 6059966 "MPOS Payment API"
         mPosAppSetup.Get(SaleLinePOS."Register No.");
 
         if not mPosAppSetup.Enable then
-          exit;
+            exit;
 
-        mPosAppSetup.TestField(Enable,true);
+        mPosAppSetup.TestField(Enable, true);
         mPosAppSetup.TestField("Payment Gateway");
         mPOSPaymentGateway.Get(mPosAppSetup."Payment Gateway");
         mPOSPaymentGateway.TestField("Merchant Id");
@@ -485,93 +493,97 @@ codeunit 6059966 "MPOS Payment API"
         CurrSessionId := Format(DateTimeTick.Ticks);
 
         case mPOSPaymentGateway.Provider of
-          mPOSPaymentGateway.Provider::ADYEN : begin
-              mPOSAdyenTransactions.Init;
-              mPOSAdyenTransactions."Register No." := SaleLinePOS."Register No.";
-              mPOSAdyenTransactions."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-              mPOSAdyenTransactions."Sales Line No." := SaleLinePOS."Line No.";
-              mPOSAdyenTransactions.Amount := SaleLinePOS."Amount Including VAT";
-              mPOSAdyenTransactions."Session Id" := CurrSessionId;
-              mPOSAdyenTransactions."Created Date" := CurrentDateTime;
-              mPOSAdyenTransactions."Currency Code" := GetCurrencyCode(SaleLinePOS."Currency Code");
-              mPOSAdyenTransactions."Merchant Reference" := CurrSessionId;
-              mPOSAdyenTransactions."Payment Amount In Cents" := mPOSAdyenTransactions.Amount * 100;
-              mPOSAdyenTransactions."Payment Gateway" := mPosAppSetup."Payment Gateway";
-              mPOSAdyenTransactions."Merchant Id" := mPOSPaymentGateway."Merchant Id";
+            mPOSPaymentGateway.Provider::ADYEN:
+                begin
+                    mPOSAdyenTransactions.Init;
+                    mPOSAdyenTransactions."Register No." := SaleLinePOS."Register No.";
+                    mPOSAdyenTransactions."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+                    mPOSAdyenTransactions."Sales Line No." := SaleLinePOS."Line No.";
+                    mPOSAdyenTransactions.Amount := SaleLinePOS."Amount Including VAT";
+                    mPOSAdyenTransactions."Session Id" := CurrSessionId;
+                    mPOSAdyenTransactions."Created Date" := CurrentDateTime;
+                    mPOSAdyenTransactions."Currency Code" := GetCurrencyCode(SaleLinePOS."Currency Code");
+                    mPOSAdyenTransactions."Merchant Reference" := CurrSessionId;
+                    mPOSAdyenTransactions."Payment Amount In Cents" := mPOSAdyenTransactions.Amount * 100;
+                    mPOSAdyenTransactions."Payment Gateway" := mPosAppSetup."Payment Gateway";
+                    mPOSAdyenTransactions."Merchant Id" := mPOSPaymentGateway."Merchant Id";
 
-              JSON := '{ "mPosRequest" : [{ "debug":"false" , "amount":"'
-                +Format(mPOSAdyenTransactions."Payment Amount In Cents")+'", "currency":"'
-                +mPOSAdyenTransactions."Currency Code"+'", "reference":"'
-                +mPOSAdyenTransactions."Session Id"+'", "transactionType":"", "paymentGateWay":"'+mPOSAdyenTransactions."Payment Gateway"+'","merchantId":"'+mPOSAdyenTransactions."Merchant Id"+'" }]}';
+                    JSON := '{ "mPosRequest" : [{ "debug":"false" , "amount":"'
+                      + Format(mPOSAdyenTransactions."Payment Amount In Cents") + '", "currency":"'
+                      + mPOSAdyenTransactions."Currency Code" + '", "reference":"'
+                      + mPOSAdyenTransactions."Session Id" + '", "transactionType":"", "paymentGateWay":"' + mPOSAdyenTransactions."Payment Gateway" + '","merchantId":"' + mPOSAdyenTransactions."Merchant Id" + '" }]}';
 
-              BigTextVar.AddText(JSON);
-              mPOSAdyenTransactions."Request Json".CreateOutStream(Ostream);
-              BigTextVar.Write(Ostream);
-              mPOSAdyenTransactions.Insert;
-              Commit;
-          end;
-          mPOSPaymentGateway.Provider::NETS  : begin
-              mPOSNetsTransactions.Init;
-              mPOSNetsTransactions."Register No." := SaleLinePOS."Register No.";
-              mPOSNetsTransactions."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-              mPOSNetsTransactions."Sales Line No." := SaleLinePOS."Line No.";
-              mPOSNetsTransactions.Amount := SaleLinePOS."Amount Including VAT";
-              mPOSNetsTransactions."Session Id" := CurrSessionId;
-              mPOSNetsTransactions."Created Date" := CurrentDateTime;
-              mPOSNetsTransactions."Currency Code" := GetCurrencyCode(SaleLinePOS."Currency Code");
-              mPOSNetsTransactions."Merchant Reference" := CurrSessionId;
-              mPOSNetsTransactions."Payment Amount In Cents" := mPOSNetsTransactions.Amount * 100;
-              mPOSNetsTransactions."Payment Gateway" := mPosAppSetup."Payment Gateway";
-              mPOSNetsTransactions."Merchant Id" := mPOSPaymentGateway."Merchant Id";
-              mPOSNetsTransactions."Transaction Type" := mPOSNetsTransactions."Transaction Type"::CANCEL;
-              mPOSNetsTransactions."Transaction Type Id" := 50;
+                    BigTextVar.AddText(JSON);
+                    mPOSAdyenTransactions."Request Json".CreateOutStream(Ostream);
+                    BigTextVar.Write(Ostream);
+                    mPOSAdyenTransactions.Insert;
+                    Commit;
+                end;
+            mPOSPaymentGateway.Provider::NETS:
+                begin
+                    mPOSNetsTransactions.Init;
+                    mPOSNetsTransactions."Register No." := SaleLinePOS."Register No.";
+                    mPOSNetsTransactions."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+                    mPOSNetsTransactions."Sales Line No." := SaleLinePOS."Line No.";
+                    mPOSNetsTransactions.Amount := SaleLinePOS."Amount Including VAT";
+                    mPOSNetsTransactions."Session Id" := CurrSessionId;
+                    mPOSNetsTransactions."Created Date" := CurrentDateTime;
+                    mPOSNetsTransactions."Currency Code" := GetCurrencyCode(SaleLinePOS."Currency Code");
+                    mPOSNetsTransactions."Merchant Reference" := CurrSessionId;
+                    mPOSNetsTransactions."Payment Amount In Cents" := mPOSNetsTransactions.Amount * 100;
+                    mPOSNetsTransactions."Payment Gateway" := mPosAppSetup."Payment Gateway";
+                    mPOSNetsTransactions."Merchant Id" := mPOSPaymentGateway."Merchant Id";
+                    mPOSNetsTransactions."Transaction Type" := mPOSNetsTransactions."Transaction Type"::CANCEL;
+                    mPOSNetsTransactions."Transaction Type Id" := 50;
 
-              JSON := '{ "mPosRequest" : [{ "debug":"false" , "amount":"'
-                +Format(mPOSNetsTransactions."Payment Amount In Cents")+'", "currency":"'
-                +mPOSNetsTransactions."Currency Code"+'", "reference":"'
-                +mPOSNetsTransactions."Session Id"+'", "transactionType":"'+Format(mPOSNetsTransactions."Transaction Type Id")+'", "paymentGateWay":"'+mPOSNetsTransactions."Payment Gateway"+'","merchantId":"'+mPOSNetsTransactions."Merchant Id"+'" }]}';
+                    JSON := '{ "mPosRequest" : [{ "debug":"false" , "amount":"'
+                      + Format(mPOSNetsTransactions."Payment Amount In Cents") + '", "currency":"'
+                      + mPOSNetsTransactions."Currency Code" + '", "reference":"'
+                      + mPOSNetsTransactions."Session Id" + '", "transactionType":"' + Format(mPOSNetsTransactions."Transaction Type Id") + '", "paymentGateWay":"' + mPOSNetsTransactions."Payment Gateway" + '","merchantId":"' + mPOSNetsTransactions."Merchant Id" + '" }]}';
 
-              BigTextVar.AddText(JSON);
-              mPOSNetsTransactions."Request Json".CreateOutStream(Ostream);
-              BigTextVar.Write(Ostream);
-              mPOSNetsTransactions.Insert;
-              Commit;
+                    BigTextVar.AddText(JSON);
+                    mPOSNetsTransactions."Request Json".CreateOutStream(Ostream);
+                    BigTextVar.Write(Ostream);
+                    mPOSNetsTransactions.Insert;
+                    Commit;
 
-          end;
+                end;
         end;
 
         mPOSProxy.SetProvider(mPOSPaymentGateway.Provider);
-        mPOSProxy.SetState(mPOSAdyenTransactions,mPOSNetsTransactions);
+        mPOSProxy.SetState(mPOSAdyenTransactions, mPOSNetsTransactions);
         mPOSProxy.RunModal;
 
         case mPOSPaymentGateway.Provider of
-          mPOSPaymentGateway.Provider::ADYEN : begin
-            mPOSAdyenTransactionsResponse.Get(mPOSAdyenTransactions."Transaction No.");
+            mPOSPaymentGateway.Provider::ADYEN:
+                begin
+                    mPOSAdyenTransactionsResponse.Get(mPOSAdyenTransactions."Transaction No.");
 
-            ParseAdyenJson(mPOSAdyenTransactionsResponse);
+                    ParseAdyenJson(mPOSAdyenTransactionsResponse);
 
-            if mPOSAdyenTransactionsResponse."Callback Result" = 'APPROVED' then begin
-              SaleLinePOS."Cash Terminal Approved" := true;
-              SaleLinePOS.Description := SaleLinePOS.Description + ' ' + Format(mPOSAdyenTransactionsResponse."Transaction No.");
-            end else
-              SaleLinePOS."Cash Terminal Approved" := false;
-            SaleLinePOS.Modify;
-            Commit;
-          end;
-          mPOSPaymentGateway.Provider::NETS  : begin
-            mPOSNetsTransactionsResponse.Get(mPOSNetsTransactions."Transaction No.");
+                    if mPOSAdyenTransactionsResponse."Callback Result" = 'APPROVED' then begin
+                        SaleLinePOS."Cash Terminal Approved" := true;
+                        SaleLinePOS.Description := SaleLinePOS.Description + ' ' + Format(mPOSAdyenTransactionsResponse."Transaction No.");
+                    end else
+                        SaleLinePOS."Cash Terminal Approved" := false;
+                    SaleLinePOS.Modify;
+                    Commit;
+                end;
+            mPOSPaymentGateway.Provider::NETS:
+                begin
+                    mPOSNetsTransactionsResponse.Get(mPOSNetsTransactions."Transaction No.");
 
-            ParseNetsJson(mPOSNetsTransactionsResponse);
-            //-NPR5.36 [291652]
-            HandlePrint(mPOSNetsTransactionsResponse);
-            //+NPR5.36 [291652]
+                    ParseNetsJson(mPOSNetsTransactionsResponse);
+                    //-NPR5.36 [291652]
+                    HandlePrint(mPOSNetsTransactionsResponse);
+                    //+NPR5.36 [291652]
 
-            Commit;
-            if mPOSNetsTransactionsResponse."Callback Result" = 0 then
-              exit(true)
-            else
-              exit(false);
-          end;
+                    Commit;
+                    if mPOSNetsTransactionsResponse."Callback Result" = 0 then
+                        exit(true)
+                    else
+                        exit(false);
+                end;
         end;
     end;
 
@@ -584,35 +596,35 @@ codeunit 6059966 "MPOS Payment API"
         //-NPR5.36 [291652]
         //Quick fix for getting terminal print data into print table before full EFT hook implementation:
         if mPOSNetsTransactionsResponse."Callback Receipt 1".HasValue then begin
-          TempBlob.Init;
-          TempBlob.Blob := mPOSNetsTransactionsResponse."Callback Receipt 1";
-          CreateReceiptData(mPOSNetsTransactionsResponse."Register No.", mPOSNetsTransactionsResponse."Sales Ticket No.", mPOSNetsTransactionsResponse."Sales Line No.", TempBlob);
-          TempBlob.Reset;
+            TempBlob.Init;
+            TempBlob.Blob := mPOSNetsTransactionsResponse."Callback Receipt 1";
+            CreateReceiptData(mPOSNetsTransactionsResponse."Register No.", mPOSNetsTransactionsResponse."Sales Ticket No.", mPOSNetsTransactionsResponse."Sales Line No.", TempBlob);
+            TempBlob.Reset;
         end;
 
         if mPOSNetsTransactionsResponse."Callback Receipt 2".HasValue then begin
-          TempBlob.Init;
-          TempBlob.Blob := mPOSNetsTransactionsResponse."Callback Receipt 2";
-          CreateReceiptData(mPOSNetsTransactionsResponse."Register No.", mPOSNetsTransactionsResponse."Sales Ticket No.", mPOSNetsTransactionsResponse."Sales Line No.", TempBlob);
-          TempBlob.Reset;
+            TempBlob.Init;
+            TempBlob.Blob := mPOSNetsTransactionsResponse."Callback Receipt 2";
+            CreateReceiptData(mPOSNetsTransactionsResponse."Register No.", mPOSNetsTransactionsResponse."Sales Ticket No.", mPOSNetsTransactionsResponse."Sales Line No.", TempBlob);
+            TempBlob.Reset;
         end;
 
         if MPOSAppSetup.Get(mPOSNetsTransactionsResponse."Register No.") then
-          if MPOSAppSetup."Handle EFT Print in NAV" then begin
-            CreditCardTransaction.SetRange("Register No.", mPOSNetsTransactionsResponse."Register No.");
-            CreditCardTransaction.SetRange("Sales Ticket No.", mPOSNetsTransactionsResponse."Sales Ticket No.");
-            //-NPR5.37 [291652]
-            CreditCardTransaction.SetRange("No. Printed", 0);
-            //+NPR5.37 [291652]
-            //-NPR5.46 [290734]
-            //CreditCardTransaction.PrintTerminalReceipt(FALSE);
-            CreditCardTransaction.PrintTerminalReceipt();
-            //+NPR5.46 [290734]
-          end;
+            if MPOSAppSetup."Handle EFT Print in NAV" then begin
+                CreditCardTransaction.SetRange("Register No.", mPOSNetsTransactionsResponse."Register No.");
+                CreditCardTransaction.SetRange("Sales Ticket No.", mPOSNetsTransactionsResponse."Sales Ticket No.");
+                //-NPR5.37 [291652]
+                CreditCardTransaction.SetRange("No. Printed", 0);
+                //+NPR5.37 [291652]
+                //-NPR5.46 [290734]
+                //CreditCardTransaction.PrintTerminalReceipt(FALSE);
+                CreditCardTransaction.PrintTerminalReceipt();
+                //+NPR5.46 [290734]
+            end;
         //+NPR5.36 [291652]
     end;
 
-    local procedure CreateReceiptData(RegisterNo: Code[10];SalesTicketNo: Code[20];LineNo: Integer;var TempBlob: Record TempBlob temporary)
+    local procedure CreateReceiptData(RegisterNo: Code[10]; SalesTicketNo: Code[20]; LineNo: Integer; var TempBlob: Record TempBlob temporary)
     var
         CreditCardTransaction: Record "Credit Card Transaction";
         ReceiptNo: Integer;
@@ -639,13 +651,13 @@ codeunit 6059966 "MPOS Payment API"
 
         TempBlob.Blob.CreateInStream(InStream);
         while (not InStream.EOS) do begin
-          InStream.ReadText(Line);
+            InStream.ReadText(Line);
 
-          CreditCardTransaction.Text := Line;
-          CreditCardTransaction."Entry No." := EntryNo;
-          CreditCardTransaction.Insert;
+            CreditCardTransaction.Text := Line;
+            CreditCardTransaction."Entry No." := EntryNo;
+            CreditCardTransaction.Insert;
 
-          EntryNo += 1;
+            EntryNo += 1;
         end;
         //+NPR5.36 [291652]
     end;

@@ -666,10 +666,6 @@ dotnet
         {
         }
 
-        type("NaviPartner.Retail.Nav.Classes.Eventing.Marshaller"; "npNetMarshaller")
-        {
-        }
-
         type("NaviPartner.Retail.Nav.Classes.Json.Font"; "npNetFont")
         {
         }
@@ -1867,21 +1863,6 @@ dotnet
         PublicKeyToken = '31bf3856ad364e35';
 
         type("Microsoft.Dynamics.Nav.Exchange.ExchangeServiceWrapper"; "npNetExchangeServiceWrapper")
-        {
-        }
-    }
-
-    assembly("NaviPartner.Retail.Controls")
-    {
-        Version = '5.3.817.2';
-        Culture = 'neutral';
-        PublicKeyToken = '909fa1bba7619e33';
-
-        type("NaviPartner.Retail.Controls.IBridge"; "npNetIBridge")
-        {
-        }
-
-        type("NaviPartner.Retail.Controls.IFramework"; "npNetIFramework0")
         {
         }
     }

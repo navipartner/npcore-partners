@@ -16,13 +16,13 @@ codeunit 6150838 "POS Action - Block Discount"
     local procedure ActionCode(): Code[20]
     begin
 
-        exit ('BLOCK_DISCOUNT');
+        exit('BLOCK_DISCOUNT');
     end;
 
     local procedure ActionVersion(): Code[10]
     begin
 
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -30,21 +30,21 @@ codeunit 6150838 "POS Action - Block Discount"
     begin
 
         with Sender do
-          if DiscoverAction(
-            ActionCode (),
-            ActionDescription,
-            ActionVersion (),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
+            if DiscoverAction(
+              ActionCode(),
+              ActionDescription,
+              ActionVersion(),
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
 
-            RegisterWorkflowStep ('PasswordPrompt', 'context.ShowPasswordPrompt && input({title: labels.title, caption: labels.password}).respond().cancel(abort);');
-            RegisterWorkflowStep ('ToggleBlockState', 'respond();');
+                RegisterWorkflowStep('PasswordPrompt', 'context.ShowPasswordPrompt && input({title: labels.title, caption: labels.password}).respond().cancel(abort);');
+                RegisterWorkflowStep('ToggleBlockState', 'respond();');
 
-            RegisterWorkflow(true);
-            RegisterDataBinding();
+                RegisterWorkflow(true);
+                RegisterDataBinding();
 
-          end;
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
@@ -53,12 +53,12 @@ codeunit 6150838 "POS Action - Block Discount"
         RetailSetup: Record "Retail Setup";
     begin
 
-        Captions.AddActionCaption (ActionCode, 'title', Title);
-        Captions.AddActionCaption (ActionCode, 'password', StrSubstNo (PasswordPrompt, RetailSetup.FieldCaption ("Password on unblock discount")));
+        Captions.AddActionCaption(ActionCode, 'title', Title);
+        Captions.AddActionCaption(ActionCode, 'password', StrSubstNo(PasswordPrompt, RetailSetup.FieldCaption("Password on unblock discount")));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action"; Parameters: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Setup: Codeunit "POS Setup";
         RetailSetup: Record "Retail Setup";
@@ -67,75 +67,77 @@ codeunit 6150838 "POS Action - Block Discount"
     begin
 
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         Handled := true;
 
-        RetailSetup.Get ();
-        Context.SetContext ('ShowPasswordPrompt', RetailSetup."Password on unblock discount" <> '');
+        RetailSetup.Get();
+        Context.SetContext('ShowPasswordPrompt', RetailSetup."Password on unblock discount" <> '');
 
-        FrontEnd.SetActionContext (ActionCode, Context);
+        FrontEnd.SetActionContext(ActionCode, Context);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Confirmed: Boolean;
     begin
 
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         Handled := true;
 
         case WorkflowStep of
-          'PasswordPrompt' : VerifyPassword (Context, POSSession, FrontEnd);
-          'ToggleBlockState' : ToggleBlockState (Context, POSSession, FrontEnd);
+            'PasswordPrompt':
+                VerifyPassword(Context, POSSession, FrontEnd);
+            'ToggleBlockState':
+                ToggleBlockState(Context, POSSession, FrontEnd);
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150853, 'OnGetLineStyle', '', false, false)]
-    local procedure OnGetStyle(var Color: Text;var Weight: Text;var Style: Text;SaleLinePOS: Record "Sale Line POS";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnGetStyle(var Color: Text; var Weight: Text; var Style: Text; SaleLinePOS: Record "Sale Line POS"; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     begin
 
         //-NPR5.43 [296709]
         if (SaleLinePOS."Custom Disc Blocked") then begin
-          Color := 'blue';
+            Color := 'blue';
         end;
         //+NPR5.43 [296709]
     end;
 
-    local procedure VerifyPassword(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure VerifyPassword(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         RetailSetup: Record "Retail Setup";
         Password: Text;
     begin
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        JSON.SetScope ('/', true);
-        JSON.SetScope ('$PasswordPrompt', true);
-        Password := JSON.GetString ('input', true);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        JSON.SetScope('/', true);
+        JSON.SetScope('$PasswordPrompt', true);
+        Password := JSON.GetString('input', true);
 
-        RetailSetup.Get ();
+        RetailSetup.Get();
         if (RetailSetup."Password on unblock discount" <> Password) then
-          Error ('');
+            Error('');
     end;
 
-    local procedure ToggleBlockState(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure ToggleBlockState(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         POSSaleLine: Codeunit "POS Sale Line";
         SaleLinePOS: Record "Sale Line POS";
     begin
 
-        POSSession.GetSaleLine (POSSaleLine);
-        POSSaleLine.GetCurrentSaleLine (SaleLinePOS);
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         SaleLinePOS."Custom Disc Blocked" := not SaleLinePOS."Custom Disc Blocked";
         SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
         if (not SaleLinePOS."Custom Disc Blocked") then
-          SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::" ";
+            SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::" ";
 
-        SaleLinePOS.Modify ();
+        SaleLinePOS.Modify();
 
         //-NPR5.43 [296709]
         POSSaleLine.RefreshCurrent();

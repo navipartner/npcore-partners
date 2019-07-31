@@ -15,52 +15,52 @@ codeunit 6150795 "POS Action - Insert Comment"
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
-            //-NPR5.36 [288574]
-            //RegisterWorkflowStep('', 'input(labels.prompt).respond();');
-            RegisterWorkflowStep ('', 'if (param.EditDescription == param.EditDescription["Yes"]) {input({caption: labels.prompt, value: param.DefaultDescription}).respond();} else {context.value=param.DefaultDescription; respond();}');
-            RegisterTextParameter ('DefaultDescription', '');
-            RegisterOptionParameter ('EditDescription','Yes,No','Yes');
-            RegisterWorkflow(false);
-          end;
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
+                //-NPR5.36 [288574]
+                //RegisterWorkflowStep('', 'input(labels.prompt).respond();');
+                RegisterWorkflowStep('', 'if (param.EditDescription == param.EditDescription["Yes"]) {input({caption: labels.prompt, value: param.DefaultDescription}).respond();} else {context.value=param.DefaultDescription; respond();}');
+                RegisterTextParameter('DefaultDescription', '');
+                RegisterOptionParameter('EditDescription', 'Yes,No', 'Yes');
+                RegisterWorkflow(false);
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         Confirmed: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        InputPosCommentLine (Context, POSSession, FrontEnd);
+        InputPosCommentLine(Context, POSSession, FrontEnd);
         Handled := true;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "POS Caption Management")
     begin
-        Captions.AddActionCaption (ActionCode, 'prompt', Prompt_EnterComment);
+        Captions.AddActionCaption(ActionCode, 'prompt', Prompt_EnterComment);
     end;
 
-    local procedure InputPosCommentLine(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure InputPosCommentLine(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         Line: Record "Sale Line POS";
         SaleLine: Codeunit "POS Sale Line";
     begin
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
 
         with Line do begin
-          Type := Type::Comment;
-          Description := JSON.GetString ('value', true);
+            Type := Type::Comment;
+            Description := JSON.GetString('value', true);
         end;
 
         POSSession.GetSaleLine(SaleLine);
@@ -71,12 +71,12 @@ codeunit 6150795 "POS Action - Insert Comment"
 
     local procedure ActionCode(): Text
     begin
-        exit ('INSERT_COMMENT');
+        exit('INSERT_COMMENT');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.1');
+        exit('1.1');
     end;
 }
 

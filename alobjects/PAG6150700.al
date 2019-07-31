@@ -13,7 +13,40 @@ page 6150700 "POS (New)"
     {
         area(content)
         {
-            // AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects
+            usercontrol(Framework; Transcendence)
+            {
+
+                trigger OnFrameworkReady()
+                begin
+                    //-NPR5.43 [318028]
+                    if POSSession.IsFinalized() then
+                        exit;
+                    //+NPR5.43 [318028]
+                    POSSession.DebugWithTimestamp('OnFrameworkReady');
+                    Initialize();
+                end;
+
+                trigger OnInvokeMethod(method: Text; eventContext: JsonObject)
+                begin
+                    //-NPR5.43 [318028]
+                    if POSSession.IsFinalized() then
+                        exit;
+                    //+NPR5.43 [318028]
+                    POSSession.DebugWithTimestamp('Method:' + method);
+                    if not PreHandleMethod(method, eventContext) then
+                        JavaScript.InvokeMethod(method, eventContext, POSSession, FrontEnd);
+                end;
+
+                trigger OnAction("action": Text; workflowStep: Text; workflowId: Integer; actionId: Integer; Context: JsonObject)
+                begin
+                    //-NPR5.43 [318028]
+                    if POSSession.IsFinalized() then
+                        Error(SESSION_FINALIZED_ERROR);
+                    //+NPR5.43 [318028]
+                    POSSession.DebugWithTimestamp('Action:' + action);
+                    JavaScript.InvokeAction(action, workflowStep, workflowId, actionId, Context, POSSession, FrontEnd);
+                end;
+            }
         }
     }
 
@@ -53,7 +86,7 @@ page 6150700 "POS (New)"
         // FrontEndKeeper.Initialize(CurrPage.Framework,FrontEnd,POSSession);
         // BINDSUBSCRIPTION(FrontEndKeeper);
 
-        Error('AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects');
+        POSSession.Constructor(CurrPage.Framework, FrontEnd, Setup, POSSession);
         //+NPR5.43 [318028]
     end;
 
@@ -73,7 +106,7 @@ page 6150700 "POS (New)"
     begin
     end;
 
-    local procedure PreHandleMethod(Method: Text; Context: DotNet JObject): Boolean
+    local procedure PreHandleMethod(Method: Text; Context: JsonObject): Boolean
     begin
         case Method of
             'KeepAlive':

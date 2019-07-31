@@ -9,12 +9,8 @@ codeunit 6150740 "POS Method - Wysiwyg"
     // IF YOU CHANGE ANYTHING IN HERE, IT WILL BE LOST AT MY NEXT DEPLOYMENT, AS I AM NOT MERGING THIS CODEUNIT; I AM MERELY IMPORTING THE FOB.
 
 
-    trigger OnRun()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
-    local procedure OnWysiwygMethod(Method: Text; Context: DotNet JObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
+    local procedure OnWysiwygMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         Request: DotNet npNetJsonRequest;
@@ -331,10 +327,10 @@ codeunit 6150740 "POS Method - Wysiwyg"
         POSParam: Record "POS Action Parameter";
         TempParam: Record "POS Parameter Value" temporary;
         ParamMgt: Codeunit "POS Action Parameter Mgt.";
-        JObject: DotNet JObject;
-        JProperty: DotNet npNetJProperty;
+        JObject: JsonObject;
+        JToken: JsonToken;
         ParamStr: Text;
-        NetConvHelper: Variant;
+        JsonText: Text;
     begin
         POSSession.DiscoverActionsOnce();
         POSAction.Get(JSON.GetString('action', true));
@@ -343,14 +339,13 @@ codeunit 6150740 "POS Method - Wysiwyg"
         ParamStr := JSON.GetString('parameters', false);
         if ParamStr = '' then
             ParamStr := '{}';
-        JObject := JObject.Parse(ParamStr);
+        JObject.ReadFrom(ParamStr);
 
         if TempParam.FindSet then
             repeat
                 if POSParam.Get(POSAction.Code, TempParam.Name) then begin
-                    NetConvHelper := JProperty;
-                    if JObject.TryGetValue(TempParam.Name, NetConvHelper) then begin
-                        POSParam.Validate("Default Value", JProperty.Value.ToString());
+                    if (JObject.Get(TempParam.Name, JToken)) then begin
+                        POSParam.Validate("Default Value", JToken.AsValue().AsText());
                         TempParam.Value := POSParam."Default Value";
                         TempParam.Modify(false);
                     end;
@@ -358,13 +353,14 @@ codeunit 6150740 "POS Method - Wysiwyg"
             until TempParam.Next = 0;
 
         EditParametersDirect(TempParam);
-        JObject := JObject.JObject();
+        Clear(JObject);
         if TempParam.FindSet then
             repeat
                 TempParam.AddParameterToJObject(JObject);
             until TempParam.Next = 0;
 
-        Request.Content.Add('parameters', JObject.ToString());
+        JObject.WriteTo(JsonText);
+        Request.Content.Add('parameters', JsonText);
         exit(true);
     end;
 
@@ -408,7 +404,7 @@ codeunit 6150740 "POS Method - Wysiwyg"
     var
         TempParam: Record "POS Parameter Value" temporary;
         Param: Record "POS Parameter Value";
-        JToken: DotNet JObject;
+        JToken: JsonObject;
         RecRef: RecordRef;
         FieldRef: FieldRef;
         ScopeID: Guid;

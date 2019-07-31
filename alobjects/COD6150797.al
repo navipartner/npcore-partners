@@ -22,46 +22,46 @@ codeunit 6150797 "POS Action - Cancel Sale"
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
 
-            RegisterWorkflowStep ('', 'confirm(labels.title, labels.prompt).respond();');
-            RegisterDataBinding ();
-            //-NPR5.42 [313914]
-            RegisterOptionParameter('Security','None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword','None');
-            //+NPR5.42 [313914]
-            RegisterWorkflow(true);
-          end;
+                RegisterWorkflowStep('', 'confirm(labels.title, labels.prompt).respond();');
+                RegisterDataBinding();
+                //-NPR5.42 [313914]
+                RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
+                //+NPR5.42 [313914]
+                RegisterWorkflow(true);
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         Confirmed: Boolean;
     begin
 
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        CancelSale (Context, POSSession, FrontEnd);
+        CancelSale(Context, POSSession, FrontEnd);
         Handled := true;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "POS Caption Management")
     begin
-        Captions.AddActionCaption (ActionCode, 'title', Title);
-        Captions.AddActionCaption (ActionCode, 'prompt', Prompt);
+        Captions.AddActionCaption(ActionCode, 'title', Title);
+        Captions.AddActionCaption(ActionCode, 'prompt', Prompt);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action"; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
         POSPaymentLine: Codeunit "POS Payment Line";
@@ -72,29 +72,29 @@ codeunit 6150797 "POS Action - Cancel Sale"
     begin
 
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        POSSession.GetPaymentLine (POSPaymentLine);
-        POSPaymentLine.CalculateBalance (SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
         if (PaidAmount <> 0) then
-          Error (PartlyPaid);
+            Error(PartlyPaid);
 
-        FrontEnd.SetActionContext (ActionCode, Context);
+        FrontEnd.SetActionContext(ActionCode, Context);
         Handled := true;
     end;
 
     local procedure ActionCode(): Text
     begin
-        exit ('CANCEL_POS_SALE');
+        exit('CANCEL_POS_SALE');
     end;
 
     local procedure ActionVersion(): Text
     begin
 
-        exit ('1.2'); //-+NPR5.46 [314603]
+        exit('1.2'); //-+NPR5.46 [314603]
     end;
 
-    local procedure CancelSale(Context: DotNet JObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure CancelSale(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         POSSaleLine: Codeunit "POS Sale Line";
@@ -102,21 +102,21 @@ codeunit 6150797 "POS Action - Cancel Sale"
         Line: Record "Sale Line POS";
     begin
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        POSSession.GetSaleLine (POSSaleLine);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        POSSession.GetSaleLine(POSSaleLine);
 
         POSSaleLine.DeleteAll();
 
         with Line do begin
-          Type := Type::Comment;
-          Description := StrSubstNo (CANCEL_SALE, CurrentDateTime);
-          "Sale Type" := "Sale Type"::Cancelled;
+            Type := Type::Comment;
+            Description := StrSubstNo(CANCEL_SALE, CurrentDateTime);
+            "Sale Type" := "Sale Type"::Cancelled;
         end;
 
         POSSaleLine.InsertLine(Line);
 
         POSSession.GetSale(POSSale);
-        POSSale.TryEndSale (POSSession);
+        POSSale.TryEndSale(POSSession);
     end;
 }
 
