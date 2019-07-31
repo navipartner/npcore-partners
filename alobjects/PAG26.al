@@ -1,4 +1,4 @@
-pageextension 50202 pageextension50202 extends "Vendor Card" 
+pageextension 50024 pageextension50024 extends "Vendor Card" 
 {
     // PN1.00/MH/20140725  NAV-AddOn: PDF2NAV
     //   - Added Field 6014415 "Document Processing" for defining Print action on Sales Doc. Posting (Billing-page).

@@ -2,6 +2,8 @@ xmlport 6151195 "NpCs Sales Document"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #344264/MHA /20190717  CASE 344264 Added <config_template> under <sell_to_customer> and changed <delivery_only> to <from_store_stock>
+    // #362443/MHA /20190719  CASE 342443 Added <opening_hour_set>
+    // #362197/MHA /20190719  CASE 362197 Added <to_store>
 
     Caption = 'Collect Sales Document';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/collect_in_store_sales_document';
@@ -37,45 +39,65 @@ xmlport 6151195 "NpCs Sales Document"
                 textelement(from_store)
                 {
                     MaxOccurs = Once;
-                    textattribute(store_code)
+                    textattribute(from_store_code)
                     {
+                        XmlName = 'store_code';
                     }
-                    textelement(company_name)
-                    {
-                        MaxOccurs = Once;
-                    }
-                    textelement(name)
+                    textelement(from_company_name)
                     {
                         MaxOccurs = Once;
+                        XmlName = 'company_name';
                     }
-                    textelement(service_url)
+                    textelement(from_name)
                     {
                         MaxOccurs = Once;
+                        XmlName = 'name';
                     }
-                    textelement(service_username)
+                    textelement(from_service_url)
                     {
                         MaxOccurs = Once;
+                        XmlName = 'service_url';
                     }
-                    textelement(service_password)
+                    textelement(from_service_username)
                     {
                         MaxOccurs = Once;
+                        XmlName = 'service_username';
                     }
-                    textelement(email)
+                    textelement(from_service_password)
                     {
                         MaxOccurs = Once;
+                        XmlName = 'service_password';
                     }
-                    textelement(mobile_phone_no)
+                    textelement(from_email)
                     {
                         MaxOccurs = Once;
+                        XmlName = 'email';
                     }
-                    textelement(callback)
+                    textelement(from_mobile_phone_no)
+                    {
+                        MaxOccurs = Once;
+                        XmlName = 'mobile_phone_no';
+                    }
+                    textelement(from_callback)
                     {
                         MaxOccurs = Once;
                         MinOccurs = Zero;
-                        textattribute(encoding)
+                        XmlName = 'callback';
+                        textattribute(from_encoding)
                         {
                             Occurrence = Optional;
+                            XmlName = 'encoding';
                         }
+                    }
+                }
+                textelement("<to_store>")
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                    XmlName = 'to_store';
+                    textattribute(to_store_code)
+                    {
+                        XmlName = 'store_code';
                     }
                 }
                 fieldelement(order_date;TempSalesHeader."Order Date")
@@ -190,6 +212,11 @@ xmlport 6151195 "NpCs Sales Document"
                         MinOccurs = Zero;
                     }
                     textelement(sms_template_expired)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                    }
+                    textelement(opening_hour_set)
                     {
                         MaxOccurs = Once;
                         MinOccurs = Zero;

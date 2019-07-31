@@ -2,6 +2,7 @@ page 6151206 "NpCs Collect Store Order Card"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #344264/MHA /20190717  CASE 344264 Changed name and logic for field 240 from "Delivery Only (Non Stock)" to "From Store Stock"
+    // #362443/MHA /20190719  CASE 362443 Added "Opening Hour Set"
 
     Caption = 'Collect in Store Order Card';
     SourceTable = "NpCs Document";
@@ -30,6 +31,10 @@ page 6151206 "NpCs Collect Store Order Card"
                         Importance = Promoted;
                     }
                     field("Location Code";"Location Code")
+                    {
+                        Importance = Additional;
+                    }
+                    field("Opening Hour Set";"Opening Hour Set")
                     {
                         Importance = Additional;
                     }

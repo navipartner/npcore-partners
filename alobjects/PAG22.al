@@ -1,4 +1,4 @@
-pageextension 50184 pageextension50184 extends "Customer List" 
+pageextension 50023 pageextension50023 extends "Customer List" 
 {
     // NPR4.11/TSA/20150623 CASE 209946 - Shortcut Attributes
     // PN1.08/TTH/10122015 CASE 229069 Added Customer Statement Sending

@@ -1,7 +1,7 @@
 codeunit 6151195 "NpCs Collect Mgt."
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #344264/MHA /20190717  CASE 344264 Moved Archivation functionality to separate codeunit and added Expiration to Status Update
+    // #344264/MHA /20190627  CASE 344264 Moved Archivation functionality to separate codeunit and added Expiration to Status Update
 
 
     trigger OnRun()
@@ -140,17 +140,14 @@ codeunit 6151195 "NpCs Collect Mgt."
         NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
         Commit;
 
-        //-#344264 [344264]
-        if not SkipWorkflow then begin
-          NpCsWorkflowMgt.Run(NpCsDocument);
-          Commit;
-        end;
-
-        if NpCsDocument."Archive on Delivery" then begin
+        if NpCsDocument."Archive on Delivery" then
+          //-#344264 [344264]
           NpCsArchCollectMgt.ArchiveCollectDocument(NpCsDocument);
-          Commit;
-        end;
-        //+#344264 [344264]
+          //+#344264 [344264]
+        Commit;
+
+        if not SkipWorkflow then
+          NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
     end;
 
     local procedure "--- Deliver"()
@@ -209,6 +206,19 @@ codeunit 6151195 "NpCs Collect Mgt."
             end;
           NpCsDocument."Bill via"::"Sales Document":
             begin
+              //-#344264 [344264]
+              if NpCsDocument."Delivery Print Template (S.)" <> '' then begin
+                asserterror begin
+                  PrintDelivery(NpCsDocument);
+                  Commit;
+                  Error('');
+                end;
+                ErrorText := GetLastErrorText;
+                LogMessage := StrSubstNo(Text005,NpCsDocument."Delivery Print Template (S.)");
+                NpCsWorkflowMgt.InsertLogEntry(NpCsDocument,NpCsWorkflowModule,LogMessage,ErrorText <> '',ErrorText);
+                Commit;
+              end;
+              //+#344264 [344264]
               SalesHeader.Get(NpCsDocument."Document Type",NpCsDocument."Document No.");
               if NpCsDocument."Delivery Document Type" = NpCsDocument."Delivery Document Type"::"POS Entry" then begin
                 SalesHeader."Sales Ticket No." := NpCsDocument."Delivery Document No.";
@@ -235,20 +245,6 @@ codeunit 6151195 "NpCs Collect Mgt."
                 NpCsDocument."Delivery Document No." := SalesHeader."Last Posting No.";
                 NpCsDocument.Modify(true);
               end;
-              Commit;
-
-              if NpCsDocument."Delivery Print Template (S.)" <> '' then begin
-                asserterror begin
-                  PrintDelivery(NpCsDocument);
-                  Commit;
-                  Error('');
-                end;
-                ErrorText := GetLastErrorText;
-                //-#344264 [344264]
-                LogMessage := StrSubstNo(Text005,NpCsDocument."Delivery Print Template (S.)");
-                //+#344264 [344264]
-                NpCsWorkflowMgt.InsertLogEntry(NpCsDocument,NpCsWorkflowModule,LogMessage,ErrorText <> '',ErrorText);
-              end;
             end;
         end;
         Commit;
@@ -270,17 +266,14 @@ codeunit 6151195 "NpCs Collect Mgt."
         UpdateDeliveryStatus(NpCsDocument,NpCsDocument."Delivery Status"::Expired,0,'');
         Commit;
 
-        //-#344264 [344264]
-        if not SkipWorkflow then begin
-          NpCsWorkflowMgt.Run(NpCsDocument);
-          Commit;
-        end;
-
-        if NpCsDocument."Archive on Delivery" then begin
+        if NpCsDocument."Archive on Delivery" then
+          //-#344264 [344264]
           NpCsArchCollectMgt.ArchiveCollectDocument(NpCsDocument);
-          Commit;
-        end;
-        //+#344264 [344264]
+          //+#344264 [344264]
+        Commit;
+
+        if not SkipWorkflow then
+          NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
     end;
 
     local procedure "--- UI"()

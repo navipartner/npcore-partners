@@ -1,6 +1,7 @@
 table 6151195 "NpCs Store"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #362443/MHA /20190719  CASE 362443 Added field 15 "Opening Hour Set"
 
     Caption = 'Collect Store';
     DrillDownPageID = "NpCs Stores";
@@ -44,6 +45,26 @@ table 6151195 "NpCs Store"
         field(10;"Local Store";Boolean)
         {
             Caption = 'Local Store';
+        }
+        field(15;"Opening Hour Set";Code[20])
+        {
+            Caption = 'Opening Hour Set';
+            Description = '#362443';
+            TableRelation = "NpCs Open. Hour Set";
+            //This property is currently not supported
+            //TestTableRelation = false;
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                NpCsOpenHourSet: Record "NpCs Open. Hour Set";
+            begin
+                //-#362443 [362443]
+                if NpCsOpenHourSet.ChangeCompany("Company Name") then;
+                if PAGE.RunModal(0,NpCsOpenHourSet) = ACTION::LookupOK then
+                  Validate("Opening Hour Set",NpCsOpenHourSet.Code);
+                //+#362443 [362443]
+            end;
         }
         field(105;"Service Url";Text[250])
         {
