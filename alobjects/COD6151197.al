@@ -2,6 +2,8 @@ codeunit 6151197 "NpCs Send Order"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #344264/MHA /20190717  CASE 344264 Added <store_stock> to InitReqBody()
+    // #362443/MHA /20190719  CASE 342443 Added <opening_hour_set>
+    // #362197/MHA /20190719  CASE 362197 Added <to_store>
 
 
     trigger OnRun()
@@ -95,6 +97,10 @@ codeunit 6151197 "NpCs Send Order"
                       '<mobile_phone_no>' + NpCsStoreLocal."Mobile Phone No." + '</mobile_phone_no>' +
                       '<callback encoding="base64">' + InitCallback(NpCsDocument) + '</callback>' +
                     '</from_store>' +
+                    //-#362197 [362197]
+                    '<to_store store_code="' + NpCsDocument."To Store Code" + '">' +
+                    '</to_store>' +
+                    //+#362197 [362197]
                     '<order_date>' + Format(SalesHeader."Order Date",0,9) + '</order_date>' +
                     '<posting_date>' + Format(SalesHeader."Posting Date",0,9) + '</posting_date>' +
                     '<due_date>' + Format(SalesHeader."Due Date",0,9)  + '</due_date>' +
@@ -122,6 +128,9 @@ codeunit 6151197 "NpCs Send Order"
                       '<sms_template_confirmed>' + NpCsDocument."Sms Template (Confirmed)" + '</sms_template_confirmed>' +
                       '<sms_template_rejected>' + NpCsDocument."Sms Template (Rejected)" + '</sms_template_rejected>' +
                       '<sms_template_expired>' + NpCsDocument."Sms Template (Expired)" + '</sms_template_expired>' +
+                      //-#362443 [362443]
+                      '<opening_hour_set>' + NpCsDocument."Opening Hour Set" + '</opening_hour_set>' +
+                      //+#362443 [362443]
                       '<processing_expiry_duration>' + Format(NpCsDocument."Processing Expiry Duration",0,9) + '</processing_expiry_duration>' +
                       '<delivery_expiry_days_qty>' + Format(NpCsDocument."Delivery Expiry Days (Qty.)",0,9) + '</delivery_expiry_days_qty>' +
                     '</notification>' +

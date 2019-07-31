@@ -1,11 +1,10 @@
-table 6151208 "NpCs Store Opening Hours Entry"
+table 6151211 "NpCs Open. Hour Calendar Entry"
 {
-    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #362443/MHA /20190719  CASE 362443 [VLOBJDEL] Object marked for deletion
+    // #362443/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
 
-    Caption = 'Collect Store Opening Hours Entry';
-    DrillDownPageID = "NpCs Store Opening Hours";
-    LookupPageID = "NpCs Store Opening Hours";
+    Caption = 'Collect Store Opening Hour Date';
+    DrillDownPageID = "NpCs Open. Hour Calendar";
+    LookupPageID = "NpCs Open. Hour Calendar";
 
     fields
     {

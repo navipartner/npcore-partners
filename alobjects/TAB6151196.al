@@ -1,6 +1,7 @@
 table 6151196 "NpCs Workflow"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // #362443/MHA /20190723  CASE 362443 Removed unused field 205 "Auto Post Order on"
 
     Caption = 'Collect Workflow';
     DrillDownPageID = "NpCs Workflows";
@@ -75,12 +76,6 @@ table 6151196 "NpCs Workflow"
             Caption = 'Order Status Module';
             TableRelation = "NpCs Workflow Module".Code WHERE (Type = CONST ("Order Status"));
         }
-        field(205; "Auto Post Order on"; Option)
-        {
-            Caption = 'Auto Post Order';
-            OptionCaption = ' ,Pending,Confirmed,Delivery';
-            OptionMembers = " ",Pending,Confirmed,Delivery;
-        }
         field(207; "Send Notification from Store"; Boolean)
         {
             Caption = 'Send Notification from Store';
@@ -141,6 +136,7 @@ table 6151196 "NpCs Workflow"
         field(305; "Archive on Delivery"; Boolean)
         {
             Caption = 'Archive on Delivery';
+            InitValue = true;
         }
     }
 
