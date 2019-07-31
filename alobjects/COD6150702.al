@@ -393,7 +393,7 @@ codeunit 6150702 "POS UI Management"
         WebFont.SetFilter("Company Name", '%1|%2', '', CompanyName);
         if WebFont.FindSet then
             repeat
-                Error('AL-Conversion: TODO #361932 - AL: COD6150702 "POS UI Management"-.net data types');
+                WebFont.GetFontDotNet(Font);
                 FrontEnd.ConfigureFont(Font);
             until WebFont.Next = 0;
     end;
