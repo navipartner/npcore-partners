@@ -265,7 +265,6 @@ codeunit 6151505 "Nc Sync. Mgt."
         OutStream: OutStream;
         RemotePath: Text;
         NewRemotePath: Text;
-        NetStream: DotNet npNetStream;
     begin
         //-NC2.16 [328432]
         if not ValidFilename(Filename) then
@@ -289,7 +288,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         ImportEntry."Document Source".CreateOutStream(OutStream);
         //-NC2.22 [361919]
         IOStream := OutStream;
-        SharpSFtp.Get(RemotePath + Filename,IOStream);
+        SharpSFtp.Get(RemotePath + Filename, IOStream);
         //+NC2.22 [361919]
 
         ImportEntry.Insert(true);
@@ -467,9 +466,9 @@ codeunit 6151505 "Nc Sync. Mgt."
         if TaskSetup.FindSet then
             repeat
                 if Task.Get(Task."Entry No.") then;
-            //-NC2.22 [358499]
-            ClearLastError;
-            //+NC2.22 [358499]
+                //-NC2.22 [358499]
+                ClearLastError;
+                //+NC2.22 [358499]
                 if not CODEUNIT.Run(TaskSetup."Codeunit ID", Task) then begin
                     TaskError(Task);
                     exit(false);
@@ -540,10 +539,10 @@ codeunit 6151505 "Nc Sync. Mgt."
         // ImportEntry."Last Error Message".CREATEOUTSTREAM(OutStream);
         // OutStream.WRITE(ErrorText);
         if ErrorText <> '' then begin
-          Clear(ImportEntry."Last Error Message");
+            Clear(ImportEntry."Last Error Message");
             ImportEntry."Error Message" := CopyStr(ErrorText, 1, MaxStrLen(ImportEntry."Error Message"));
-          ImportEntry."Last Error Message".CreateOutStream(OutStream);
-          OutStream.Write(ErrorText);
+            ImportEntry."Last Error Message".CreateOutStream(OutStream);
+            OutStream.Write(ErrorText);
         end;
         //+NC2.22 [334216]
         ImportEntry.Imported := false;
