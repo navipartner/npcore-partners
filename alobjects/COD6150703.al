@@ -189,6 +189,8 @@ codeunit 6150703 "POS JSON Management"
         if (not JToken.IsValue) then
             exit;
 
+        JValue := JToken.AsValue();
+
         if (not JValue.IsNull()) and (not JValue.IsUndefined()) then
             exit(JValue.AsText());
     end;
