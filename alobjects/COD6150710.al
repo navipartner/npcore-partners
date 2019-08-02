@@ -16,73 +16,73 @@ codeunit 6150710 "POS Data Management"
         Text002: Label 'Data Source "%1" did not bind variables.';
         Text003: Label 'Extension "%1" for data source "%2" did not respond to %3 event.';
 
-    procedure SetupDefaultDataSourcesForView(View: DotNet npNetView0;Setup: Codeunit "POS Setup")
+    procedure SetupDefaultDataSourcesForView(View: DotNet npNetView0; Setup: Codeunit "POS Setup")
     var
         ViewType: DotNet npNetViewType0;
         DataSource: DotNet npNetDataSource0;
     begin
         case true of
-        //-NPR5.37 [287688]
-          View.Type.Equals(View.Type.Login):
-            begin
-              GetDataSource(BuiltInSale,DataSource,Setup);
-              View.DataSources.Add(DataSource.Id,DataSource);
-            end;
-          View.Type.Equals(ViewType.Sale):
-            begin
-              GetDataSource(BuiltInSaleLine,DataSource,Setup);
-              View.DataSources.Add(DataSource.Id,DataSource);
-              GetDataSource(BuiltInSale,DataSource,Setup);
-              View.DataSources.Add(DataSource.Id,DataSource);
-            end;
-          View.Type.Equals(ViewType.Payment):
-            begin
-              GetDataSource(BuiltInPaymentLine,DataSource,Setup);
-              View.AddDataSource(DataSource);
-              GetDataSource(BuiltInSale,DataSource,Setup);
-              View.DataSources.Add(DataSource.Id,DataSource);
-            end;
-          View.Type.Equals(ViewType.BalanceRegister):
-            begin
-              GetDataSource(BuiltInBalancing,DataSource,Setup);
-              View.AddDataSource(DataSource);
-            end;
+            //-NPR5.37 [287688]
+            View.Type.Equals(View.Type.Login):
+                begin
+                    GetDataSource(BuiltInSale, DataSource, Setup);
+                    View.DataSources.Add(DataSource.Id, DataSource);
+                end;
+            View.Type.Equals(ViewType.Sale):
+                begin
+                    GetDataSource(BuiltInSaleLine, DataSource, Setup);
+                    View.DataSources.Add(DataSource.Id, DataSource);
+                    GetDataSource(BuiltInSale, DataSource, Setup);
+                    View.DataSources.Add(DataSource.Id, DataSource);
+                end;
+            View.Type.Equals(ViewType.Payment):
+                begin
+                    GetDataSource(BuiltInPaymentLine, DataSource, Setup);
+                    View.AddDataSource(DataSource);
+                    GetDataSource(BuiltInSale, DataSource, Setup);
+                    View.DataSources.Add(DataSource.Id, DataSource);
+                end;
+            View.Type.Equals(ViewType.BalanceRegister):
+                begin
+                    GetDataSource(BuiltInBalancing, DataSource, Setup);
+                    View.AddDataSource(DataSource);
+                end;
 
-        //  View.Type.Equals(View.Type.Login):
-        //    BEGIN
-        //      //GetDataSource(DefaultDataSource_SaleLine,DataSource,Setup);
-        //      //View.DataSources.Add(DataSource.Id,DataSource);
-        //      GetDataSource(DefaultDataSource_Sale,DataSource,Setup);
-        //      View.DataSources.Add(DataSource.Id,DataSource);
-        //    END;
-        //  View.Type.Equals(ViewType.Sale):
-        //    BEGIN
-        //      GetDataSource(DefaultDataSource_SaleLine,DataSource,Setup);
-        //      View.DataSources.Add(DataSource.Id,DataSource);
-        //      GetDataSource(DefaultDataSource_Sale,DataSource,Setup);
-        //      View.DataSources.Add(DataSource.Id,DataSource);
-        //    END;
-        //  View.Type.Equals(ViewType.Payment):
-        //    BEGIN
-        //      GetDataSource(DefaultDataSource_PaymentLine,DataSource,Setup);
-        //      View.AddDataSource(DataSource);
-        //      GetDataSource(DefaultDataSource_Sale,DataSource,Setup);
-        //      View.DataSources.Add(DataSource.Id,DataSource);
-        //    END;
-        //  View.Type.Equals(ViewType.BalanceRegister):
-        //    BEGIN
-        //      GetDataSource(DefaultDataSource_Register,DataSource,Setup);
-        //      View.AddDataSource(DataSource);
-        //    END;
-        //+NPR5.37 [287688]
+                //  View.Type.Equals(View.Type.Login):
+                //    BEGIN
+                //      //GetDataSource(DefaultDataSource_SaleLine,DataSource,Setup);
+                //      //View.DataSources.Add(DataSource.Id,DataSource);
+                //      GetDataSource(DefaultDataSource_Sale,DataSource,Setup);
+                //      View.DataSources.Add(DataSource.Id,DataSource);
+                //    END;
+                //  View.Type.Equals(ViewType.Sale):
+                //    BEGIN
+                //      GetDataSource(DefaultDataSource_SaleLine,DataSource,Setup);
+                //      View.DataSources.Add(DataSource.Id,DataSource);
+                //      GetDataSource(DefaultDataSource_Sale,DataSource,Setup);
+                //      View.DataSources.Add(DataSource.Id,DataSource);
+                //    END;
+                //  View.Type.Equals(ViewType.Payment):
+                //    BEGIN
+                //      GetDataSource(DefaultDataSource_PaymentLine,DataSource,Setup);
+                //      View.AddDataSource(DataSource);
+                //      GetDataSource(DefaultDataSource_Sale,DataSource,Setup);
+                //      View.DataSources.Add(DataSource.Id,DataSource);
+                //    END;
+                //  View.Type.Equals(ViewType.BalanceRegister):
+                //    BEGIN
+                //      GetDataSource(DefaultDataSource_Register,DataSource,Setup);
+                //      View.AddDataSource(DataSource);
+                //    END;
+                //+NPR5.37 [287688]
         end;
 
         //-NPR5.38 [286726]
-        OnSetupDataSourcesForView (View, Setup);
+        OnSetupDataSourcesForView(View, Setup);
         //+NPR5.38 [286726]
     end;
 
-    procedure GetDataSource(Name: Text;var DataSource: DotNet npNetDataSource0;Setup: Codeunit "POS Setup")
+    procedure GetDataSource(Name: Text; var DataSource: DotNet npNetDataSource0; Setup: Codeunit "POS Setup")
     var
         Extensions: DotNet npNetList_Of_T;
         ExtensionDataSource: DotNet npNetDataSource0;
@@ -90,38 +90,38 @@ codeunit 6150710 "POS Data Management"
         ExtensionName: Text;
         Handled: Boolean;
     begin
-        OnGetDataSource(Name,DataSource,Handled,Setup);
+        OnGetDataSource(Name, DataSource, Handled, Setup);
         if (not Handled) or (IsNull(DataSource)) then
-          Error(Text001,Name);
+            Error(Text001, Name);
 
         //-NPR5.36 [291525]
         Extensions := Extensions.List();
-        OnDiscoverDataSourceExtensions(Name,Extensions);
+        OnDiscoverDataSourceExtensions(Name, Extensions);
         if Extensions.Count > 0 then begin
-          DataSource.Content.Add('_extensions',Extensions);
+            DataSource.Content.Add('_extensions', Extensions);
 
-          foreach ExtensionName in Extensions do begin
-            Handled := false;
-            ExtensionDataSource := ExtensionDataSource.DataSource();
-            ExtensionDataSource.Id := ExtensionName;
-            OnGetDataSourceExtension(Name,ExtensionName,ExtensionDataSource,Handled,Setup);
-            if not Handled then
-              Error(Text003,ExtensionName,Name,'OnGetDataSourceExtension');
+            foreach ExtensionName in Extensions do begin
+                Handled := false;
+                ExtensionDataSource := ExtensionDataSource.DataSource();
+                ExtensionDataSource.Id := ExtensionName;
+                OnGetDataSourceExtension(Name, ExtensionName, ExtensionDataSource, Handled, Setup);
+                if not Handled then
+                    Error(Text003, ExtensionName, Name, 'OnGetDataSourceExtension');
 
-            foreach Column in ExtensionDataSource.Columns do
-              DataSource.AddColumn(
-                ExtensionName + '.' + Column.FieldId,
-                Column.Caption,
-                Column.DataType,
-                Column.Visible);
-          end;
+                foreach Column in ExtensionDataSource.Columns do
+                    DataSource.AddColumn(
+                      ExtensionName + '.' + Column.FieldId,
+                      Column.Caption,
+                      Column.DataType,
+                      Column.Visible);
+            end;
         end;
         //+NPR5.36 [291525]
 
-        OnAfterGetDataSource(Name,DataSource,Setup);
+        OnAfterGetDataSource(Name, DataSource, Setup);
     end;
 
-    procedure RecordToDataSet("Record": Variant;var CurrDataSet: DotNet npNetDataSet;DataSource: DotNet npNetDataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    procedure RecordToDataSet("Record": Variant; var CurrDataSet: DotNet npNetDataSet; DataSource: DotNet npNetDataSource0; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         RecRef: RecordRef;
         DataRow: DotNet npNetDataRow0;
@@ -145,17 +145,17 @@ codeunit 6150710 "POS Data Management"
         RecRef.GetTable(Record);
         CurrentPosition := RecRef.GetPosition();
         if RecRef.Find then
-          CurrDataSet.CurrentPosition := CurrentPosition;
+            CurrDataSet.CurrentPosition := CurrentPosition;
 
         if RecRef.FindSet then
-          repeat
-            DataRow := CurrDataSet.NewRow(RecRef.GetPosition());
-            NavOneRecordToDataRow(RecRef,DataRow,DataSource,POSSession,FrontEnd);
-          until RecRef.Next = 0;
+            repeat
+                DataRow := CurrDataSet.NewRow(RecRef.GetPosition());
+                NavOneRecordToDataRow(RecRef, DataRow, DataSource, POSSession, FrontEnd);
+            until RecRef.Next = 0;
         //+NPR5.38 [301053]
     end;
 
-    local procedure NavOneRecordToDataRow(var RecRef: RecordRef;DataRow: DotNet npNetDataRow0;DataSource: DotNet npNetDataSource0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure NavOneRecordToDataRow(var RecRef: RecordRef; DataRow: DotNet npNetDataRow0; DataSource: DotNet npNetDataSource0; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         "Field": FieldRef;
         DataColumn: DotNet npNetDataColumn1;
@@ -171,57 +171,59 @@ codeunit 6150710 "POS Data Management"
         Handled: Boolean;
         HasVariables: Boolean;
         IsExtensionField: Boolean;
+        FieldValueVariant: Variant;
     begin
         foreach DataColumn in DataSource.Columns do begin
-        //-NPR5.40 [294655]
-        //  IF Int32.TryParse(DataColumn.FieldId,FieldId) THEN BEGIN
-          if Evaluate(FieldId,DataColumn.FieldId) then begin
-        //+NPR5.40 [294655]
-            Field := RecRef.Field(FieldId);
-            DataRow.Add(DataColumn.FieldId,Field.Value);
-          end else
-        //-NPR5.36 [291525]
-        //    HasVariables := TRUE;
-            begin
-              if DataSource.Content.ContainsKey('_extensions') then begin
-                Extensions := DataSource.Content.Item('_extensions');
-                IsExtensionField := false;
-                foreach Extension in Extensions do
-                  if CopyStr(DataColumn.FieldId,1,StrLen(Extension) + 1) = Extension + '.' then
-                    IsExtensionField := true;
-                if not IsExtensionField then
-                  HasVariables := true;
-              end else
-                HasVariables := true;
+            //-NPR5.40 [294655]
+            //  IF Int32.TryParse(DataColumn.FieldId,FieldId) THEN BEGIN
+            if Evaluate(FieldId, DataColumn.FieldId) then begin
+                //+NPR5.40 [294655]
+                Field := RecRef.Field(FieldId);
+                FieldValueVariant := Field.Value;
+                DataRow.Add(DataColumn.FieldId, FieldValueVariant);
+            end else
+              //-NPR5.36 [291525]
+              //    HasVariables := TRUE;
+              begin
+                if DataSource.Content.ContainsKey('_extensions') then begin
+                    Extensions := DataSource.Content.Item('_extensions');
+                    IsExtensionField := false;
+                    foreach Extension in Extensions do
+                        if CopyStr(DataColumn.FieldId, 1, StrLen(Extension) + 1) = Extension + '.' then
+                            IsExtensionField := true;
+                    if not IsExtensionField then
+                        HasVariables := true;
+                end else
+                    HasVariables := true;
             end;
-        //+NPR5.36 [291525]
+            //+NPR5.36 [291525]
         end;
 
         if HasVariables then begin
-          OnReadDataSourceVariables(POSSession,RecRef,DataSource.Id,DataRow,Handled);
-          if not Handled then
-            FrontEnd.ReportBug(StrSubstNo(Text002,DataSource.Id));
+            OnReadDataSourceVariables(POSSession, RecRef, DataSource.Id, DataRow, Handled);
+            if not Handled then
+                FrontEnd.ReportBug(StrSubstNo(Text002, DataSource.Id));
 
-          OnAfterReadDataSourceVariables(POSSession,RecRef,DataSource.Id,DataRow);
+            OnAfterReadDataSourceVariables(POSSession, RecRef, DataSource.Id, DataRow);
         end;
 
         //-NPR5.36 [291525]
         if DataSource.Content.ContainsKey('_extensions') then begin
-          Extensions := DataSource.Content.Item('_extensions');
-          foreach Extension in Extensions do begin
-            ExtensionDataRow := ExtensionDataRow.DataRow(DataRow.Position);
-            Handled := false;
-            OnDataSourceExtensionReadData(DataSource.Id,Extension,RecRef,ExtensionDataRow,POSSession,FrontEnd,Handled);
-            if not Handled then
-              FrontEnd.ReportBug(StrSubstNo(Text003,Extension,DataSource.Id,'OnDataSourceExtensionReadData'));
-            foreach KeyValuePair in ExtensionDataRow.Fields do
-              DataRow.Add(StrSubstNo('%1.%2',Extension,KeyValuePair.Key),KeyValuePair.Value);
-          end;
+            Extensions := DataSource.Content.Item('_extensions');
+            foreach Extension in Extensions do begin
+                ExtensionDataRow := ExtensionDataRow.DataRow(DataRow.Position);
+                Handled := false;
+                OnDataSourceExtensionReadData(DataSource.Id, Extension, RecRef, ExtensionDataRow, POSSession, FrontEnd, Handled);
+                if not Handled then
+                    FrontEnd.ReportBug(StrSubstNo(Text003, Extension, DataSource.Id, 'OnDataSourceExtensionReadData'));
+                foreach KeyValuePair in ExtensionDataRow.Fields do
+                    DataRow.Add(StrSubstNo('%1.%2', Extension, KeyValuePair.Key), KeyValuePair.Value);
+            end;
         end;
         //+NPR5.36 [291525]
     end;
 
-    procedure AddFieldToDataSource(DataSource: DotNet npNetDataSource0;"Record": Variant;FieldNo: Integer;Visible: Boolean)
+    procedure AddFieldToDataSource(DataSource: DotNet npNetDataSource0; "Record": Variant; FieldNo: Integer; Visible: Boolean)
     var
         RecRef: RecordRef;
         FieldRef: FieldRef;
@@ -235,42 +237,45 @@ codeunit 6150710 "POS Data Management"
 
         Type := UpperCase(Format(FieldRef.Type));
         case Type of
-          'BOOLEAN':
-            begin
-              DataType := DataType.Boolean;
-              Width := 2;
-            end;
-          'DATE','DATETIME','TIME':
-            begin
-              DataType := DataType.DateTime;
-              Width := 4;
-            end;
-          'DECIMAL':
-            begin
-              DataType := DataType.Decimal;
-              Width := 5;
-            end;
-          'INTEGER','BIGINTEGER':
-            begin
-              DataType := DataType.Integer;
-              Width := 4;
-            end;
-          'OPTION','TEXT','CODE':
-            begin
-              DataType := DataType.String;
-              case true of
-                FieldRef.Length <= 10: Width := 10;
-                FieldRef.Length <= 20: Width := 13;
-                FieldRef.Length <= 30: Width := 16;
-                else
-                  Width := 20;
-              end;
-            end;
-          else
-            exit;
+            'BOOLEAN':
+                begin
+                    DataType := DataType.Boolean;
+                    Width := 2;
+                end;
+            'DATE', 'DATETIME', 'TIME':
+                begin
+                    DataType := DataType.DateTime;
+                    Width := 4;
+                end;
+            'DECIMAL':
+                begin
+                    DataType := DataType.Decimal;
+                    Width := 5;
+                end;
+            'INTEGER', 'BIGINTEGER':
+                begin
+                    DataType := DataType.Integer;
+                    Width := 4;
+                end;
+            'OPTION', 'TEXT', 'CODE':
+                begin
+                    DataType := DataType.String;
+                    case true of
+                        FieldRef.Length <= 10:
+                            Width := 10;
+                        FieldRef.Length <= 20:
+                            Width := 13;
+                        FieldRef.Length <= 30:
+                            Width := 16;
+                        else
+                            Width := 20;
+                    end;
+                end;
+            else
+                exit;
         end;
 
-        DataColumn := DataSource.AddColumn(Format(FieldRef.Number),FieldRef.Caption,DataType,Visible);
+        DataColumn := DataSource.AddColumn(Format(FieldRef.Number), FieldRef.Caption, DataType, Visible);
         DataColumn.Width := Width;
     end;
 
@@ -279,62 +284,62 @@ codeunit 6150710 "POS Data Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGetDataSource(Name: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    local procedure OnGetDataSource(Name: Text; var DataSource: DotNet npNetDataSource0; var Handled: Boolean; Setup: Codeunit "POS Setup")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterGetDataSource(Name: Text;DataSource: DotNet npNetDataSource0;Setup: Codeunit "POS Setup")
+    local procedure OnAfterGetDataSource(Name: Text; DataSource: DotNet npNetDataSource0; Setup: Codeunit "POS Setup")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text;Extensions: DotNet npNetList_Of_T)
+    local procedure OnDiscoverDataSourceExtensions(DataSourceName: Text; Extensions: DotNet npNetList_Of_T)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGetDataSourceExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    local procedure OnGetDataSourceExtension(DataSourceName: Text; ExtensionName: Text; var DataSource: DotNet npNetDataSource0; var Handled: Boolean; Setup: Codeunit "POS Setup")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnDataSourceExtensionReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet npNetDataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnDataSourceExtensionReadData(DataSourceName: Text; ExtensionName: Text; var RecRef: RecordRef; DataRow: DotNet npNetDataRow0; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnRefreshDataSet(POSSession: Codeunit "POS Session";DataSource: DotNet npNetDataSource0;var CurrDataSet: DotNet npNetDataSet;FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    procedure OnRefreshDataSet(POSSession: Codeunit "POS Session"; DataSource: DotNet npNetDataSource0; var CurrDataSet: DotNet npNetDataSet; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterRefreshDataSet(POSSession: Codeunit "POS Session";DataSource: DotNet npNetDataSource0;CurrDataSet: DotNet npNetDataSet;FrontEnd: Codeunit "POS Front End Management")
+    procedure OnAfterRefreshDataSet(POSSession: Codeunit "POS Session"; DataSource: DotNet npNetDataSource0; CurrDataSet: DotNet npNetDataSet; FrontEnd: Codeunit "POS Front End Management")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnReadDataSourceVariables(POSSession: Codeunit "POS Session";RecRef: RecordRef;DataSource: Text;DataRow: DotNet npNetDataRow0;var Handled: Boolean)
+    local procedure OnReadDataSourceVariables(POSSession: Codeunit "POS Session"; RecRef: RecordRef; DataSource: Text; DataRow: DotNet npNetDataRow0; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterReadDataSourceVariables(POSSession: Codeunit "POS Session";RecRef: RecordRef;DataSource: Text;DataRow: DotNet npNetDataRow0)
+    local procedure OnAfterReadDataSourceVariables(POSSession: Codeunit "POS Session"; RecRef: RecordRef; DataSource: Text; DataRow: DotNet npNetDataRow0)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnSetPosition(DataSource: Text;Position: Text;POSSession: Codeunit "POS Session";var Handled: Boolean)
+    procedure OnSetPosition(DataSource: Text; Position: Text; POSSession: Codeunit "POS Session"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnIsDataSourceModified(POSSession: Codeunit "POS Session";DataSource: Text;var Modified: Boolean)
+    procedure OnIsDataSourceModified(POSSession: Codeunit "POS Session"; DataSource: Text; var Modified: Boolean)
     begin
     end;
 
     [IntegrationEvent(FALSE, FALSE)]
-    local procedure OnSetupDataSourcesForView(View: DotNet npNetView0;Setup: Codeunit "POS Setup")
+    local procedure OnSetupDataSourcesForView(View: DotNet npNetView0; Setup: Codeunit "POS Setup")
     begin
     end;
 
