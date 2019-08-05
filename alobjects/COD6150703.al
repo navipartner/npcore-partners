@@ -91,17 +91,17 @@ codeunit 6150703 "POS JSON Management"
         JToken: JsonToken;
     begin
         MakeSureJObjectParserIsInitialized(Name);
-        if Name in ['', '{}', '/'] then
-            JObject := JRoot
-        else
+
+        if Name in ['', '{}', '/'] then begin
+            JObject := JRoot;
+        end else begin
             if not GetJToken(JToken, Name, WithError) then
                 exit(false);
 
-        IF JToken.IsObject() then begin
             JObject := JToken.AsObject();
-            exit(true);
         end;
-        exit(false);
+
+        exit(true);
     end;
 
     procedure SetScopeRoot(WithError: Boolean): Boolean
