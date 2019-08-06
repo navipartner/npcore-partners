@@ -12,6 +12,7 @@ table 6059784 "TM Ticket Type"
     // TM1.26/TSA /20171103 CASE 285601 Added DIY Ticket Layout Code for specifying ticket layou on ticket server
     // TM1.27/TSA /20171211 CASE 269456 Added print template support fields
     // TM1.38/TSA /20181012 CASE 332109 Adding NP-Pass for tickets
+    // #362783/TSA /20190722 CASE 362783 Removed RunCmdModal(), added RunProcess() to use interop
 
     Caption = 'Ticket Type';
     LookupPageID = "TM Ticket Type";
@@ -226,8 +227,6 @@ table 6059784 "TM Ticket Type"
 
     local procedure ImportPassTemplate(Path: Text[1024];UseDialog: Boolean)
     var
-        AdoStream: Automation npNet;
-        AdoStream2: Automation npNet;
         TempBlob: Record TempBlob temporary;
         outstream: OutStream;
         instream: InStream;
@@ -253,23 +252,27 @@ table 6059784 "TM Ticket Type"
         extra: Text[30];
     begin
 
-        RunCmdModal('"notepad.exe" "'+ Path + '"');
+        //-#362783 [362783]
+        // RunCmdModal('"notepad.exe" "'+ Path + '"');
+        RunProcess (Path, '', true);
+        //+#362783 [362783]
     end;
 
-    procedure RunCmdModal(Command: Text[250]) int: Integer
+    procedure RunProcess(Filename: Text;Arguments: Text;Modal: Boolean)
     var
-        wsh: Automation npNet;
-        wshExec: Automation npNet;
-        i: Integer;
+        [RunOnClient]
+        Process: DotNet npNetProcess;
+        [RunOnClient]
+        ProcessStartInfo: DotNet npNetProcessStartInfo;
     begin
-        Create(wsh,true,true);
-        wshExec := wsh.Exec(Command);
-        repeat
-          i := wshExec.Status;
-          Sleep(100);
-        until i <> 0;
-        Clear(wsh);
-        exit(wshExec.ExitCode);
+
+        //-#362783 [362783]
+        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename,Arguments);
+        Process := Process.Start(ProcessStartInfo);
+        if Modal then
+          Process.WaitForExit();
+
+        //+#362783 [362783]
     end;
 }
 

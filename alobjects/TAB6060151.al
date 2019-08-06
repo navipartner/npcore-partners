@@ -2,6 +2,7 @@ table 6060151 "Event Word Layout"
 {
     // NPR5.29/NPKNAV/20170127  CASE 248723 Transport NPR5.29 - 27 januar 2017
     // NPR5.31/TJ  /20170504 CASE 269162 Added code to function CopyRecord
+    // #361677/TJ  /20190717 CASE 361677 Field 10 renamed from "Basic Layout ID" to "Basic Layout Code" and data type changed from Integer to Code 20
 
     Caption = 'Event Word Layout';
     LookupPageID = "Event Word Layouts";
@@ -31,22 +32,25 @@ table 6060151 "Event Word Layout"
         {
             Caption = 'Report ID';
         }
-        field(10;"Basic Layout ID";Integer)
+        field(10;"Basic Layout Code";Code[20])
         {
             Caption = 'Basic Layout ID';
             TableRelation = "Custom Report Layout".Code WHERE ("Report ID"=FIELD("Report ID"));
 
             trigger OnValidate()
             begin
-                if ("Basic Layout ID" <> xRec."Basic Layout ID") and Layout.HasValue then
-                  if not Confirm(StrSubstNo(ConfirmLayoutChange,FieldCaption("Basic Layout ID"))) then
+                if ("Basic Layout Code" <> xRec."Basic Layout Code") and Layout.HasValue then
+                  if not Confirm(StrSubstNo(ConfirmLayoutChange,FieldCaption("Basic Layout Code"))) then
                     Error('');
 
-                if "Basic Layout ID" = 0 then begin
+                //-#361677 [361677]
+                //IF "Basic Layout ID" = 0 THEN BEGIN
+                if "Basic Layout Code" = '' then begin
+                //+#361677 [361677]
                   Clear(Layout);
                   Clear("XML Part");
                 end else begin
-                  CustomReportLayout.Get("Basic Layout ID");
+                  CustomReportLayout.Get("Basic Layout Code");
                   if CustomReportLayout.Layout.HasValue then begin
                     CustomReportLayout.CalcFields(Layout);
                     Layout := CustomReportLayout.Layout;
@@ -78,7 +82,7 @@ table 6060151 "Event Word Layout"
         }
         field(60;"Basic Layout Description";Text[80])
         {
-            CalcFormula = Lookup("Custom Report Layout".Description WHERE (Code=FIELD("Basic Layout ID")));
+            CalcFormula = Lookup("Custom Report Layout".Description WHERE (Code=FIELD("Basic Layout Code")));
             Caption = 'Basic Layout Description';
             Editable = false;
             FieldClass = FlowField;
