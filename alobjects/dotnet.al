@@ -2480,13 +2480,6 @@ dotnet
         }
     }
 
-    assembly("")
-    {
-        type(""; "npNet")
-        {
-        }
-    }
-
     assembly("NaviPartner.Retail.Stargate.Packager")
     {
         Version = '5.3.756.0';

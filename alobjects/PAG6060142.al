@@ -5,6 +5,7 @@ page 6060142 "MM Member Notification Setup"
     // MM1.29.02/TSA /20180528 CASE 317156 Refactored Default template, Added SMS Template action
     // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
     // MM1.36/TSA /20181120 CASE 331590 Added Action "Refresh Renew Notification"
+    // #362794/TSA /20190722 CASE 362794 Removed RunCmdModal(), added RunProcess() to use interop
 
     Caption = 'Member Notification Setup';
     PageType = List;
@@ -238,14 +239,27 @@ page 6060142 "MM Member Notification Setup"
         extra: Text[30];
     begin
 
-        RunCmdModal('"notepad.exe" "' + Path + '"');
+        //-#362794 [362794]
+        // RunCmdModal('"notepad.exe" "'+ Path + '"');
+        RunProcess (Path, '', true);
+        //+#362794 [362794]
     end;
 
-    procedure RunCmdModal(Command: Text[250]) int: Integer
+    procedure RunProcess(Filename: Text;Arguments: Text;Modal: Boolean)
     var
-        i: Integer;
+        [RunOnClient]
+        Process: DotNet npNetProcess;
+        [RunOnClient]
+        ProcessStartInfo: DotNet npNetProcessStartInfo;
     begin
-        Error('AL-Conversion: TODO #361414');
+
+        //-#362783 [362783]
+        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename,Arguments);
+        Process := Process.Start(ProcessStartInfo);
+        if Modal then
+          Process.WaitForExit();
+
+        //+#362783 [362783]
     end;
 }
 
