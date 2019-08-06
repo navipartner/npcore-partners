@@ -18,7 +18,7 @@ page 6060157 "Event Word Layouts"
                 field(Description;Description)
                 {
                 }
-                field("Basic Layout ID";"Basic Layout ID")
+                field("Basic Layout ID";"Basic Layout Code")
                 {
                 }
                 field("Basic Layout Description";"Basic Layout Description")

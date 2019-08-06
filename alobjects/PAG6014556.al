@@ -1,6 +1,7 @@
 page 6014556 "Retail Admin Role Center"
 {
     // #343621/ZESO/20190725  CASE 343621 New Role Centre Page
+    // #363739/ZESO/20190805  CASE 363739 Added Pages 6014485 - Table Import Wizard and 6014480 - Object List
 
     Caption = 'Role Center';
     PageType = RoleCenter;
@@ -112,6 +113,18 @@ page 6014556 "Retail Admin Role Center"
             {
                 Caption = 'Extended Text';
                 RunObject = Page "Extended Text List";
+            }
+            action("Table Import Wizard")
+            {
+                Caption = 'Table Import Wizard';
+                Image = ImportDatabase;
+                RunObject = Page "Table Import Wizard";
+            }
+            action("Object List")
+            {
+                Caption = 'Object List';
+                Image = Ranges;
+                RunObject = Page "Object List";
             }
         }
         area(sections)
