@@ -5,6 +5,7 @@ codeunit 6150710 "POS Data Management"
     // NPR5.38/TSA /20170811  CASE 286726 added publisher OnSetupDataSourcesForView
     // NPR5.38/MHA /20180105  CASE 301053 Changed Parameter name from DataSet to CurrDataset as DataSet is a reserved word in RecordToDataSet(),OnAfterRefreshDataSet(),OnRefreshDataSet()
     // NPR5.40/MMV /20180214  CASE 294655 Small blip on performance trace: EVALUATE performing better than DotNet interop Int32.Parse
+    // #363746/TSA /20190802 CASE 363746 AL can't cast NAV data type directly to System.Object.
 
 
     trigger OnRun()
@@ -178,7 +179,13 @@ codeunit 6150710 "POS Data Management"
           if Evaluate(FieldId,DataColumn.FieldId) then begin
         //+NPR5.40 [294655]
             Field := RecRef.Field(FieldId);
-            DataRow.Add(DataColumn.FieldId,Field.Value);
+
+            //-#363746 [363746]
+            // DataRow.Add(DataColumn.FieldId,Field.VALUE);
+            VariableValue := Field.Value;
+            DataRow.Add (DataColumn.FieldId, VariableValue);
+            //+#363746 [363746]
+
           end else
         //-NPR5.36 [291525]
         //    HasVariables := TRUE;
