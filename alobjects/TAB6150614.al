@@ -9,6 +9,7 @@ table 6150614 "POS Store"
     // NPR5.36/BR/20170914 CASE 289641 Added field VAT Customer No., Delete related POSPostingSetup records
     // NPR5.38/BR/20180125 CASE 302803 Added field Posting Compression, renamed field POS Ledger No. Series to POS Period Register No. Series
     // NPR5.48/MMV /20180615 CASE 318028 Added field 28 for countries with location specific registration no.
+    // #361917/TSA /20190722 CASE 361917 Removed unreferenced functions SendToJournal(), PostToEntries(), PostOnFinaliseSale(), PostOnClosePOS()
 
     Caption = 'POS Store';
     DataCaptionFields = "Code", Name;
@@ -302,50 +303,6 @@ table 6150614 "POS Store"
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::"POS Store", Code, FieldNumber, ShortcutDimCode);
         Modify;
-    end;
-
-    procedure SendToJournal(): Boolean
-    var
-        POSStore: Record "POS Store";
-    begin
-        //-NPR5.32.10 [279551]
-        if "Item Posting" in ["Item Posting"::"No Posting"] then
-            exit(true);
-        exit(false);
-        //+NPR5.32.10 [279551]
-    end;
-
-    procedure PostToEntries(): Boolean
-    var
-        POSStore: Record "POS Store";
-    begin
-        //-NPR5.32.10 [279551]
-        if "Item Posting" in ["Item Posting"::"Post on Close Register", "Item Posting"::"Post On Finalize Sale"] then
-            exit(true);
-        exit(false);
-        //+NPR5.32.10 [279551]
-    end;
-
-    procedure PostOnFinaliseSale(): Boolean
-    var
-        POSStore: Record "POS Store";
-    begin
-        //-NPR5.32.10 [279551]
-        if "Item Posting" in ["Item Posting"::"Post on Close Register", "Item Posting"::"Post On Finalize Sale"] then
-            exit(true);
-        exit(false);
-        //+NPR5.32.10 [279551]
-    end;
-
-    procedure PostOnClosePOS(): Boolean
-    var
-        POSStore: Record "POS Store";
-    begin
-        //-NPR5.32.10 [279551]
-        if "Item Posting" in ["Item Posting"::"Post on Close Register", "Item Posting"::"Post On Finalize Sale"] then
-            exit(true);
-        exit(false);
-        //+NPR5.32.10 [279551]
     end;
 }
 
