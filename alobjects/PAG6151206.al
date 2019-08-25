@@ -3,6 +3,7 @@ page 6151206 "NpCs Collect Store Order Card"
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #344264/MHA /20190717  CASE 344264 Changed name and logic for field 240 from "Delivery Only (Non Stock)" to "From Store Stock"
     // #362443/MHA /20190719  CASE 362443 Added "Opening Hour Set"
+    // #364557/MHA /20190819  CASE 364557 Added Posting fields 250 "Post on", 255 "Posting Document Type", 260 "Posting Document No."
 
     Caption = 'Collect in Store Order Card';
     SourceTable = "NpCs Document";
@@ -18,6 +19,10 @@ page 6151206 "NpCs Collect Store Order Card"
                 group(Control6014443)
                 {
                     ShowCaption = false;
+                    field("Document Type";"Document Type")
+                    {
+                        Importance = Additional;
+                    }
                     field("Document No.";"Document No.")
                     {
                         Importance = Additional;
@@ -71,6 +76,10 @@ page 6151206 "NpCs Collect Store Order Card"
                         Editable = false;
                         Importance = Additional;
                     }
+                    field("Processing Print Template";"Processing Print Template")
+                    {
+                        Importance = Additional;
+                    }
                 }
                 group(Control6014445)
                 {
@@ -121,6 +130,9 @@ page 6151206 "NpCs Collect Store Order Card"
                     field("Bill via";"Bill via")
                     {
                         Importance = Additional;
+                    }
+                    field("Post on";"Post on")
+                    {
                     }
                     field("Store Stock";"Store Stock")
                     {
@@ -226,6 +238,12 @@ page 6151206 "NpCs Collect Store Order Card"
             {
                 SubPageLink = "Document Type"=FIELD("Document Type"),
                               "Document No."=FIELD("Document No.");
+                Visible = "Document Type" = "Document Type"::Order;
+            }
+            part(Control6014464;"NpCs Collect Store Inv. Lines")
+            {
+                SubPageLink = "Document No."=FIELD("Document No.");
+                Visible = "Document Type" = "Document Type"::"Posted Invoice";
             }
         }
     }
@@ -234,6 +252,45 @@ page 6151206 "NpCs Collect Store Order Card"
     {
         area(processing)
         {
+            group("&Print")
+            {
+                Caption = '&Print';
+                Image = Print;
+                action("Print Order")
+                {
+                    Caption = 'Print Order';
+                    Image = ConfirmAndPrint;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    Visible = "Processing Print Template" <> '';
+
+                    trigger OnAction()
+                    var
+                        NpCsCollectMgt: Codeunit "NpCs Collect Mgt.";
+                    begin
+                        //-#364557 [364557]
+                        NpCsCollectMgt.PrintOrder(Rec);
+                        //+#364557 [364557]
+                    end;
+                }
+                action("Print Delivery")
+                {
+                    Caption = 'Print Delivery';
+                    Image = Print;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    Visible = ("Delivery Status" = "Delivery Status"::Delivered) AND ((("Bill via" = "Bill via"::POS) AND ("Delivery Print Template (POS)" <>'')) OR (("Bill via" = "Bill via"::"Sales Document") AND ("Delivery Print Template (S.)" <>'')));
+
+                    trigger OnAction()
+                    var
+                        NpCsCollectMgt: Codeunit "NpCs Collect Mgt.";
+                    begin
+                        NpCsCollectMgt.PrintDelivery(Rec);
+                    end;
+                }
+            }
             group("Order Processing")
             {
                 Caption = 'Order Processing';
@@ -286,26 +343,6 @@ page 6151206 "NpCs Collect Store Order Card"
                         NpCsWorkflowMgt: Codeunit "NpCs Workflow Mgt.";
                     begin
                         NpCsWorkflowMgt.SendNotificationToCustomer(Rec);
-                    end;
-                }
-            }
-            group("&Print")
-            {
-                Caption = '&Print';
-                Image = Print;
-                action(Print)
-                {
-                    Caption = 'Print';
-                    Image = Print;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
-
-                    trigger OnAction()
-                    var
-                        NpCsCollectMgt: Codeunit "NpCs Collect Mgt.";
-                    begin
-                        NpCsCollectMgt.PrintDelivery(Rec);
                     end;
                 }
             }

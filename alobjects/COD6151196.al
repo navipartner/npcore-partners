@@ -2,6 +2,7 @@ codeunit 6151196 "NpCs Workflow Mgt."
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #344264/MHA /20190717  CASE 344264 Bumped version list for update to TaskScheduler in ScheduleRunWorkflow() from NAV10.* and newer
+    // #364557/MHA /20190822  CASE 364557 Removed Calcfields of "Sell-to Customer Name"
 
     TableNo = "NpCs Document";
 
@@ -373,7 +374,6 @@ codeunit 6151196 "NpCs Workflow Mgt."
         if not NpCsDocument."Notify Customer via E-mail" then
           exit(false);
 
-        NpCsDocument.CalcFields("Sell-to Customer Name");
         LogMessage := StrSubstNo(Text004,NpCsDocument."Sell-to Customer Name",NpCsDocument."Customer E-mail",NpCsDocument."Processing Status");
         NpCsDocument.TestField("Customer E-mail");
 
@@ -435,7 +435,6 @@ codeunit 6151196 "NpCs Workflow Mgt."
         if not NpCsDocument."Notify Customer via Sms" then
           exit(false);
 
-        NpCsDocument.CalcFields("Sell-to Customer Name");
         LogMessage := StrSubstNo(Text005,NpCsDocument."Sell-to Customer Name",NpCsDocument."Customer Phone No.",NpCsDocument."Processing Status");
         NpCsDocument.TestField("Customer Phone No.");
 
