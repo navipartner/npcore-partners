@@ -4,6 +4,7 @@ xmlport 6151195 "NpCs Sales Document"
     // #344264/MHA /20190717  CASE 344264 Added <config_template> under <sell_to_customer> and changed <delivery_only> to <from_store_stock>
     // #362443/MHA /20190719  CASE 342443 Added <opening_hour_set>
     // #362197/MHA /20190719  CASE 362197 Added <to_store>
+    // #364557/MHA /20190821  CASE 364557 Added <post_on>
 
     Caption = 'Collect Sales Document';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/collect_in_store_sales_document';
@@ -247,7 +248,17 @@ xmlport 6151195 "NpCs Sales Document"
                     MaxOccurs = Once;
                     MinOccurs = Once;
                 }
+                textelement(post_on)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                }
                 textelement(bill_via)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                }
+                textelement(processing_print_template)
                 {
                     MaxOccurs = Once;
                     MinOccurs = Zero;
