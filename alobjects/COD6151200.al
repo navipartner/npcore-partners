@@ -4,6 +4,7 @@ codeunit 6151200 "NpCs Import Sales Document"
     // #344264/MHA /20190717  CASE 344264 Added import of <config_template> in UpsertCustomer() and changed <delivery_only> to <pick_from_warehouse>
     // #362443/MHA /20190719  CASE 342443 Added <opening_hour_set>
     // #362197/MHA /20190719  CASE 362197 Added functions InsertToStore(), GetToStoreCode()
+    // #364557/MHA /20190821  CASE 364557 Added <post_on>
 
     TableNo = "Nc Import Entry";
 
@@ -285,6 +286,9 @@ codeunit 6151200 "NpCs Import Sales Document"
         NpCsDocument.Type := NpCsDocument.Type::"Collect in Store";
         NpCsDocument."Document Type" := SalesHeader."Document Type";
         NpCsDocument."Document No." := SalesHeader."No.";
+        //-#364557 [364557]
+        NpCsDocument.Validate("Document No.");
+        //+#364557 [364557]
         NpCsDocument."Reference No." := NpXmlDomMgt.GetElementCode(XmlElement,'reference_no',MaxStrLen(NpCsDocument."Reference No."),true);
         NpCsDocument."From Document Type" := DocType;
         NpCsDocument."From Document No." := CopyStr(DocNo,1,MaxStrLen(NpCsDocument."From Document No."));
@@ -316,7 +320,13 @@ codeunit 6151200 "NpCs Import Sales Document"
         NpCsDocument."Delivery Expiry Days (Qty.)" := NpXmlDomMgt.GetElementInt(XmlElement,'notification/delivery_expiry_days_qty',false);
         NpCsDocument."Archive on Delivery" := NpXmlDomMgt.GetElementBoolean(XmlElement,'archive_on_delivery',false);
         NpCsDocument."Store Stock" := NpXmlDomMgt.GetElementBoolean(XmlElement,'store_stock',false);
+        //-#364557 [364557]
+        NpCsDocument."Post on" := NpXmlDomMgt.GetElementInt(XmlElement,'post_on',false);
+        //+#364557 [364557]
         NpCsDocument."Bill via" := NpXmlDomMgt.GetElementInt(XmlElement,'bill_via',false);
+        //-#364557 [364557]
+        NpCsDocument."Processing Print Template" := NpXmlDomMgt.GetElementCode(XmlElement,'processing_print_template',MaxStrLen(NpCsDocument."Processing Print Template"),false);
+        //+#364557 [364557]
         NpCsDocument."Delivery Print Template (POS)" := NpXmlDomMgt.GetElementCode(XmlElement,'delivery_print_template_pos',MaxStrLen(NpCsDocument."Delivery Print Template (POS)"),false);
         NpCsDocument."Delivery Print Template (S.)" := NpXmlDomMgt.GetElementCode(XmlElement,'delivery_print_template_sales_doc',MaxStrLen(NpCsDocument."Delivery Print Template (S.)"),false);
         NpCsDocument."Salesperson Code" := NpXmlDomMgt.GetElementCode(XmlElement,'salesperson_code',MaxStrLen(NpCsDocument."Salesperson Code"),false);

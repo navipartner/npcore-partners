@@ -2,6 +2,7 @@ codeunit 6151209 "NpCs Arch. Collect Mgt."
 {
     // #344264/MHA /20190717  CASE 344264 Object created - Archive Collect in Store Documents
     // #362443/MHA /20190719  CASE 344264 Added "Opening Hour Set"
+    // #364557/MHA /20190821  CASE 364557 Added "Post on", "Sell-to Customer Name", "Location Code"
 
 
     trigger OnRun()
@@ -132,7 +133,14 @@ codeunit 6151209 "NpCs Arch. Collect Mgt."
         NpCsArchDocument."Delivery Document No." := NpCsDocument."Delivery Document No.";
         NpCsArchDocument."Archive on Delivery" := NpCsDocument."Archive on Delivery";
         NpCsArchDocument."Location Code" := NpCsDocument."Location Code";
+        //-#364557 [364557]
+        NpCsArchDocument."Sell-to Customer Name" := NpCsDocument."Sell-to Customer Name";
+        NpCsArchDocument."Post on" := NpCsDocument."Post on";
+        //+#364557 [364557]
         NpCsArchDocument."Bill via" := NpCsDocument."Bill via";
+        //-#364557 [364557]
+        NpCsArchDocument."Processing Print Template" := NpCsDocument."Processing Print Template";
+        //+#364557 [364557]
         NpCsArchDocument."Delivery Print Template (POS)" := NpCsDocument."Delivery Print Template (POS)";
         NpCsArchDocument."Delivery Print Template (S.)" := NpCsDocument."Delivery Print Template (S.)";
         NpCsArchDocument."Salesperson Code" := NpCsDocument."Salesperson Code";

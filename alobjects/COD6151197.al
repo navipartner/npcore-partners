@@ -4,6 +4,7 @@ codeunit 6151197 "NpCs Send Order"
     // #344264/MHA /20190717  CASE 344264 Added <store_stock> to InitReqBody()
     // #362443/MHA /20190719  CASE 342443 Added <opening_hour_set>
     // #362197/MHA /20190719  CASE 362197 Added <to_store>
+    // #364557/MHA /20190821  CASE 364557 Added <post_on>
 
 
     trigger OnRun()
@@ -139,7 +140,13 @@ codeunit 6151197 "NpCs Send Order"
                     //-#344264 [#344264]
                     '<store_stock>' + Format(NpCsDocument."Store Stock",0,9) + '</store_stock>' +
                     //+#344264 [#344264]
+                    //-#364557 [364557]
+                    '<post_on>' + Format(NpCsDocument."Post on",0,2) + '</post_on>' +
+                    //+#364557 [364557]
                     '<bill_via>' + Format(NpCsDocument."Bill via",0,2) + '</bill_via>' +
+                    //-#364557 [364557]
+                    '<processing_print_template>' + NpCsDocument."Processing Print Template" + '</processing_print_template>' +
+                    //+#364557 [364557]
                     '<delivery_print_template_pos>' + NpCsDocument."Delivery Print Template (POS)" + '</delivery_print_template_pos>' +
                     '<delivery_print_template_sales_doc>' + NpCsDocument."Delivery Print Template (S.)" + '</delivery_print_template_sales_doc>' +
                     '<prepaid_amount>' + Format(NpCsDocument."Prepaid Amount",0,9) + '</prepaid_amount>' +
