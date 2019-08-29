@@ -2,6 +2,7 @@ page 6151198 "NpCs Workflow Card"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #362443/MHA /20190723  CASE 362443 Removed "Auto Post Order on" and added "Archive on Delivery"
+    // #364557/MHA /20190819  CASE 364557 Added fields 350 "Store Stock", 360 "Post on", 380 "Bill via"
 
     Caption = 'Collect Workflow Card';
     PageType = Card;
@@ -71,6 +72,18 @@ page 6151198 "NpCs Workflow Card"
                 field("Archive on Delivery";"Archive on Delivery")
                 {
                 }
+                field("Store Stock";"Store Stock")
+                {
+                }
+                field("Processing Print Template";"Processing Print Template")
+                {
+                }
+                field("Delivery Print Template (POS)";"Delivery Print Template (POS)")
+                {
+                }
+                field("Delivery Print Template (S.)";"Delivery Print Template (S.)")
+                {
+                }
             }
             group("Order Status")
             {
@@ -124,6 +137,12 @@ page 6151198 "NpCs Workflow Card"
             {
                 Caption = 'IC Clearing';
                 field("Post Processing Module";"Post Processing Module")
+                {
+                }
+                field("Post on";"Post on")
+                {
+                }
+                field("Bill via";"Bill via")
                 {
                 }
             }
