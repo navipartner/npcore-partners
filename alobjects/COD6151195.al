@@ -2,6 +2,7 @@ codeunit 6151195 "NpCs Collect Mgt."
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #344264/MHA /20190627  CASE 344264 Moved Archivation functionality to separate codeunit and added Expiration to Status Update
+    // #364557/MHA /20190819  CASE 364557 It should be possible to create collect order from one local store to another local store and added posting functions
 
 
     trigger OnRun()
@@ -11,10 +12,10 @@ codeunit 6151195 "NpCs Collect Mgt."
     var
         Text001: Label 'Processing Status updated to %1';
         Text002: Label 'Delivery Status updated to %1';
-        Text003: Label 'Document Archived';
         Text004: Label 'Sales %1 %2 posted';
         Text005: Label 'Delivery printed: %1';
         Text006: Label 'Sales %1 %2 must be posted when %3 = %4';
+        Text007: Label 'Sales %1 %2 posted to %3 %4';
 
     local procedure "--- Init"()
     begin
@@ -102,6 +103,10 @@ codeunit 6151195 "NpCs Collect Mgt."
     begin
         UpdateProcessingStatus(NpCsDocument,NpCsDocument."Processing Status"::Confirmed);
         UpdateDeliveryStatus(NpCsDocument,NpCsDocument."Delivery Status"::Ready,0,'');
+        //-#364557 [364557]
+        if NpCsDocument."Post on" = NpCsDocument."Post on"::Processing then
+          PostDocument(NpCsDocument);
+        //+#364557 [364557]
         NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
         Commit;
 
@@ -219,32 +224,37 @@ codeunit 6151195 "NpCs Collect Mgt."
                 Commit;
               end;
               //+#344264 [344264]
-              SalesHeader.Get(NpCsDocument."Document Type",NpCsDocument."Document No.");
-              if NpCsDocument."Delivery Document Type" = NpCsDocument."Delivery Document Type"::"POS Entry" then begin
-                SalesHeader."Sales Ticket No." := NpCsDocument."Delivery Document No.";
-                SalesHeader.Modify;
-                Commit;
-              end;
-              SalesHeader.Ship := true;
-              SalesHeader.Invoice := true;
-              asserterror begin
-                CODEUNIT.Run(CODEUNIT::"Sales-Post",SalesHeader);
-                Commit;
-                Error('');
-              end;
-              ErrorText := GetLastErrorText;
+              //-#364557 [364557]
+              case NpCsDocument."Document Type" of
+                NpCsDocument."Document Type"::Order,NpCsDocument."Document Type"::Invoice:
+                  begin
+                    SalesHeader.Get(NpCsDocument."Document Type",NpCsDocument."Document No.");
+                    if NpCsDocument."Delivery Document Type" = NpCsDocument."Delivery Document Type"::"POS Entry" then begin
+                      SalesHeader."Sales Ticket No." := NpCsDocument."Delivery Document No.";
+                      SalesHeader.Modify;
+                      Commit;
+                    end;
+                    SalesHeader.Ship := true;
+                    SalesHeader.Invoice := true;
+                    asserterror begin
+                      CODEUNIT.Run(CODEUNIT::"Sales-Post",SalesHeader);
+                      Commit;
+                      Error('');
+                    end;
+                    ErrorText := GetLastErrorText;
 
-              NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Post Processing";
-              LogMessage := StrSubstNo(Text004,NpCsDocument."Document Type",NpCsDocument."Document No.");
-              NpCsWorkflowMgt.InsertLogEntry(NpCsDocument,NpCsWorkflowModule,LogMessage,ErrorText <> '',ErrorText);
+                    NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Post Processing";
+                    LogMessage := StrSubstNo(Text004,NpCsDocument."Document Type",NpCsDocument."Document No.");
+                    NpCsWorkflowMgt.InsertLogEntry(NpCsDocument,NpCsWorkflowModule,LogMessage,ErrorText <> '',ErrorText);
 
-              if ErrorText = '' then begin
-                NpCsDocument."Delivery Document Type" := NpCsDocument."Delivery Document Type"::"Sales Invoice";
-                if SalesHeader."Document Type" in [SalesHeader."Document Type"::"Return Order",SalesHeader."Document Type"::"Credit Memo"] then
-                  NpCsDocument."Delivery Document Type" := NpCsDocument."Delivery Document Type"::"Sales Credit Memo";
-                NpCsDocument."Delivery Document No." := SalesHeader."Last Posting No.";
-                NpCsDocument.Modify(true);
+                    if ErrorText = '' then begin
+                      NpCsDocument."Document Type" := NpCsDocument."Document Type"::"Posted Invoice";
+                      NpCsDocument."Document No." := SalesHeader."Last Posting No.";
+                      NpCsDocument.Modify(true);
+                    end;
+                  end;
               end;
+              //+#364557 [364557]
             end;
         end;
         Commit;
@@ -276,6 +286,68 @@ codeunit 6151195 "NpCs Collect Mgt."
           NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
     end;
 
+    local procedure "--- Posting"()
+    begin
+    end;
+
+    local procedure PostDocument(var NpCsDocument: Record "NpCs Document")
+    var
+        NpCsWorkflowModule: Record "NpCs Workflow Module";
+        SalesHeader: Record "Sales Header";
+        NpCsWorkflowMgt: Codeunit "NpCs Workflow Mgt.";
+        LogMessage: Text;
+    begin
+        //-#364557 [364557]
+        if SkipPosting(NpCsDocument) then
+          exit;
+
+        SalesHeader.Get(NpCsDocument."Document Type",NpCsDocument."Document No.");
+
+        SalesHeader.Ship := true;
+        SalesHeader.Invoice := true;
+        CODEUNIT.Run(CODEUNIT::"Sales-Post",SalesHeader);
+
+        case SalesHeader."Document Type" of
+          SalesHeader."Document Type"::Order,SalesHeader."Document Type"::Invoice:
+            begin
+              NpCsDocument."Document Type" := NpCsDocument."Document Type"::"Posted Invoice";
+            end;
+          SalesHeader."Document Type"::"Return Order",SalesHeader."Document Type"::"Credit Memo":
+            begin
+              NpCsDocument."Document Type" := NpCsDocument."Document Type"::"Posted Credit Memo";
+            end;
+        end;
+        NpCsDocument."Document No." := SalesHeader."Last Posting No.";
+        NpCsDocument.Modify(true);
+
+        LogMessage := StrSubstNo(Text007,SalesHeader."Document Type",SalesHeader."No.",NpCsDocument."Document Type",NpCsDocument."Document No.");
+        NpCsWorkflowModule.Type := NpCsWorkflowModule.Type::"Order Status";
+        NpCsWorkflowMgt.InsertLogEntry(NpCsDocument,NpCsWorkflowModule,LogMessage,false,'');
+        //+#364557 [364557]
+    end;
+
+    local procedure SkipPosting(NpCsDocument: Record "NpCs Document"): Boolean
+    begin
+        //-#364557 [364557]
+        if not NpCsDocument."Store Stock" then
+          exit(true);
+
+        if NpCsDocument."Document Type" = NpCsDocument."Document Type"::Quote then
+          exit(true);
+
+        if NpCsDocument."Document Type" = NpCsDocument."Document Type"::"Blanket Order" then
+          exit(true);
+
+        if NpCsDocument."Document Type" = NpCsDocument."Document Type"::"Posted Invoice" then
+          exit(true);
+
+        if NpCsDocument."Document Type" = NpCsDocument."Document Type"::"Posted Credit Memo" then
+          exit(true);
+
+        exit(false);
+        //+#364557 [364557]
+    end;
+
     local procedure "--- UI"()
     begin
     end;
@@ -289,9 +361,16 @@ codeunit 6151195 "NpCs Collect Mgt."
         SalesHeader: Record "Sales Header";
         NpCsStoreMgt: Codeunit "NpCs Store Mgt.";
     begin
+        //-#364557 [364557]
+        NpCsStoreMgt.FindLocalStore(NpCsStoreLocal);
+        SalesHeader.SetRange("Location Code",NpCsStore."Location Code");
+        //+#364557 [364557]
         if not SelectSalesOrder(SalesHeader) then
           exit;
 
+        //-#364557 [364557]
+        NpCsStore.SetFilter(Code,'<>%1',NpCsStoreLocal.Code);
+        //+#364557 [364557]
         if not SelectStore(NpCsStore) then
           exit;
 
@@ -299,7 +378,6 @@ codeunit 6151195 "NpCs Collect Mgt."
           exit;
 
         InitSendToStoreDocument(SalesHeader,NpCsStore,NpCsWorkflow,NpCsDocument);
-        NpCsStoreMgt.FindLocalStore(NpCsStoreLocal);
         NpCsDocument."From Store Code" := NpCsStoreLocal.Code;
         NpCsDocument."To Document Type" := NpCsDocument."To Document Type"::Order;
         NpCsDocument.Modify(true);
@@ -320,7 +398,6 @@ codeunit 6151195 "NpCs Collect Mgt."
         if not GuiAllowed then
           exit(false);
 
-        NpCsStore.SetRange("Local Store",false);
         Selected := PAGE.RunModal(0,NpCsStore) = ACTION::LookupOK;
         exit(Selected);
     end;
@@ -407,6 +484,27 @@ codeunit 6151195 "NpCs Collect Mgt."
           end;
         end;
 
+        //-#364557 [364557]
+        case NpCsDocument."Document Type" of
+          NpCsDocument."Document Type"::"Posted Invoice":
+            begin
+              SalesInvoiceHeader.Get(NpCsDocument."Document No.");
+              RecRef.GetTable(SalesInvoiceHeader);
+              CardPageId := PageManagement.GetDefaultCardPageID(RecRef.Number);
+              PAGE.Run(CardPageId,SalesInvoiceHeader);
+              exit;
+            end;
+          NpCsDocument."Document Type"::"Posted Credit Memo":
+            begin
+              SalesCrMemoHeader.Get(NpCsDocument."Document No.");
+              RecRef.GetTable(SalesCrMemoHeader);
+              CardPageId := PageManagement.GetDefaultCardPageID(RecRef.Number);
+              PAGE.Run(CardPageId,SalesCrMemoHeader);
+              exit;
+            end;
+        end;
+        //+#364557 [364557]
+
         SalesHeader.Get(NpCsDocument."Document Type",NpCsDocument."Document No.");
         RecRef.GetTable(SalesHeader);
         CardPageId := PageManagement.GetConditionalCardPageID(RecRef);
@@ -452,6 +550,23 @@ codeunit 6151195 "NpCs Collect Mgt."
           PageId := GetNpSsDocumentListPageId(NpCsDocument);
 
         PAGE.Run(PageId,NpCsDocument);
+    end;
+
+    local procedure "--- Print"()
+    begin
+    end;
+
+    procedure PrintOrder(var NpCsDocument: Record "NpCs Document")
+    var
+        NpCsDocument2: Record "NpCs Document";
+        RPTemplateMgt: Codeunit "RP Template Mgt.";
+    begin
+        //-#364557 [364557]
+        NpCsDocument2.Copy(NpCsDocument);
+        NpCsDocument2.SetRecFilter;
+        NpCsDocument2.TestField("Processing Print Template");
+        RPTemplateMgt.PrintTemplate(NpCsDocument2."Processing Print Template",NpCsDocument2,0);
+        //+#364557 [364557]
     end;
 
     procedure PrintDelivery(var NpCsDocument: Record "NpCs Document")

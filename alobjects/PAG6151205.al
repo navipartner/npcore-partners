@@ -3,16 +3,18 @@ page 6151205 "NpCs Collect Store Orders"
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #344264/MHA /20190717  CASE 344264 Added Last Log fields and changed name and logic for field 240 to "From Store Stock"
     // #362443/MHA /20190719  CASE 362443 Added "Inserted at" changed Visible on some fields
+    // #364557/MHA /20190819  CASE 364557 Removed InsertAllowed
 
     Caption = 'Collect in Store Orders';
     CardPageID = "NpCs Collect Store Order Card";
     Editable = false;
+    InsertAllowed = false;
     PageType = List;
     RefreshOnActivate = true;
     SourceTable = "NpCs Document";
     SourceTableView = SORTING("Entry No.")
                       WHERE(Type=CONST("Collect in Store"),
-                            "Document Type"=CONST(Order));
+                            "Document Type"=FILTER(Order|"Posted Invoice"));
 
     layout
     {
@@ -154,6 +156,45 @@ page 6151205 "NpCs Collect Store Orders"
     {
         area(processing)
         {
+            group("&Print")
+            {
+                Caption = '&Print';
+                Image = Print;
+                action("Print Order")
+                {
+                    Caption = 'Print Order';
+                    Image = ConfirmAndPrint;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    Visible = "Processing Print Template" <> '';
+
+                    trigger OnAction()
+                    var
+                        NpCsCollectMgt: Codeunit "NpCs Collect Mgt.";
+                    begin
+                        //-#364557 [364557]
+                        NpCsCollectMgt.PrintOrder(Rec);
+                        //+#364557 [364557]
+                    end;
+                }
+                action("Print Delivery")
+                {
+                    Caption = 'Print Delivery';
+                    Image = Print;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    Visible = ("Delivery Status" = "Delivery Status"::Delivered) AND ((("Bill via" = "Bill via"::POS) AND ("Delivery Print Template (POS)" <>'')) OR (("Bill via" = "Bill via"::"Sales Document") AND ("Delivery Print Template (S.)" <>'')));
+
+                    trigger OnAction()
+                    var
+                        NpCsCollectMgt: Codeunit "NpCs Collect Mgt.";
+                    begin
+                        NpCsCollectMgt.PrintDelivery(Rec);
+                    end;
+                }
+            }
             group("Order Processing")
             {
                 Caption = 'Order Processing';
@@ -248,26 +289,6 @@ page 6151205 "NpCs Collect Store Orders"
                         NpCsWorkflowMgt: Codeunit "NpCs Workflow Mgt.";
                     begin
                         NpCsWorkflowMgt.RunCallback(Rec);
-                    end;
-                }
-            }
-            group("&Print")
-            {
-                Caption = '&Print';
-                Image = Print;
-                action(Print)
-                {
-                    Caption = 'Print';
-                    Image = Print;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
-
-                    trigger OnAction()
-                    var
-                        NpCsCollectMgt: Codeunit "NpCs Collect Mgt.";
-                    begin
-                        NpCsCollectMgt.PrintDelivery(Rec);
                     end;
                 }
             }
