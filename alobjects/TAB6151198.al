@@ -3,6 +3,7 @@ table 6151198 "NpCs Document"
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // #344264/MHA /20190717  CASE 344264 Added functions for return Last Log Entry texts and changed name and logic for field 240
     // #362443/MHA /20190719  CASE 362443 "To Store Code" may now refer to Local Store and added field 13 "Inserted at"
+    // #364557/MHA /20190819  CASE 364557 Added options "Posted Invoice", "Posted Credit Memo" to field 5 "Document Type"
 
     Caption = 'Collect Document';
     DataCaptionFields = "Document Type","Reference No.","Sell-to Customer Name";
@@ -25,16 +26,30 @@ table 6151198 "NpCs Document"
         field(5;"Document Type";Option)
         {
             Caption = 'Document Type';
-            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
-            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
+            Description = '#364557';
+            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order,Posted Invoice,Posted Credit Memo';
+            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order","Posted Invoice","Posted Credit Memo";
+
+            trigger OnValidate()
+            begin
+                //-#364557 [364557]
+                UpdateDocumentInfo();
+                //+#364557 [364557]
+            end;
         }
         field(7;"Document No.";Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = "Sales Header"."No." WHERE ("Document Type"=FIELD("Document Type"));
+            Description = '#364557';
+            TableRelation = IF ("Document Type"=FILTER(Quote|Order|Invoice|"Credit Memo"|"Blanket Order"|"Return Order")) "Sales Header"."No." WHERE ("Document Type"=FIELD("Document Type"))
+                            ELSE IF ("Document Type"=CONST("Posted Invoice")) "Sales Invoice Header"
+                            ELSE IF ("Document Type"=CONST("Posted Credit Memo")) "Sales Cr.Memo Header";
 
             trigger OnValidate()
             begin
+                //-#364557 [364557]
+                UpdateDocumentInfo();
+                //+#364557 [364557]
                 if "Reference No." = '' then
                   "Reference No." := "Document No.";
             end;
@@ -75,6 +90,9 @@ table 6151198 "NpCs Document"
                 "Sms Template (Confirmed)" := NpCsStoreWorkflowRelation."Sms Template (Confirmed)";
                 "Sms Template (Rejected)" := NpCsStoreWorkflowRelation."Sms Template (Rejected)";
                 "Sms Template (Expired)" := NpCsStoreWorkflowRelation."Sms Template (Expired)";
+                //-#364557 [364557]
+                "Processing Print Template" := NpCsStoreWorkflowRelation."Processing Print Template";
+                //+#364557 [364557]
                 "Delivery Print Template (POS)" := NpCsStoreWorkflowRelation."Delivery Print Template (POS)";
                 "Delivery Print Template (S.)" := NpCsStoreWorkflowRelation."Delivery Print Template (S.)";
 
@@ -82,6 +100,11 @@ table 6151198 "NpCs Document"
                 "Processing Expiry Duration" := NpCsWorkflow."Processing Expiry Duration";
                 "Delivery Expiry Days (Qty.)" := NpCsWorkflow."Delivery Expiry Days (Qty.)";
                 "Archive on Delivery" := NpCsWorkflow."Archive on Delivery";
+                //-#364557 [364557]
+                "Store Stock" := NpCsWorkflow."Store Stock";
+                "Post on" := NpCsWorkflow."Post on";
+                "Bill via" := NpCsWorkflow."Bill via";
+                //+#364557 [364557]
             end;
         }
         field(20;"Next Workflow Step";Option)
@@ -307,6 +330,19 @@ table 6151198 "NpCs Document"
             Description = '#344264';
             InitValue = true;
         }
+        field(250;"Post on";Option)
+        {
+            Caption = 'Post on';
+            Description = '#364557';
+            OptionCaption = 'Delivery,Processing';
+            OptionMembers = Delivery,Processing;
+        }
+        field(290;"Processing Print Template";Code[20])
+        {
+            Caption = 'Processing Print Template';
+            Description = '#364557';
+            TableRelation = "RP Template Header" WHERE ("Table ID"=CONST(6151198));
+        }
         field(300;"Bill via";Option)
         {
             Caption = 'Bill via';
@@ -352,19 +388,13 @@ table 6151198 "NpCs Document"
         }
         field(2000;"Sell-to Customer Name";Text[50])
         {
-            CalcFormula = Lookup("Sales Header"."Sell-to Customer Name" WHERE ("Document Type"=CONST(Order),
-                                                                               "No."=FIELD("Document No.")));
             Caption = 'Sell-to Customer Name';
-            Editable = false;
-            FieldClass = FlowField;
+            Description = '#364557';
         }
         field(2005;"Location Code";Code[10])
         {
-            CalcFormula = Lookup("Sales Header"."Location Code" WHERE ("Document Type"=CONST(Order),
-                                                                       "No."=FIELD("Document No.")));
             Caption = 'Location Code';
-            Editable = false;
-            FieldClass = FlowField;
+            Description = '#364557';
         }
         field(2010;"To Store Contact Name";Text[50])
         {
@@ -457,10 +487,14 @@ table 6151198 "NpCs Document"
         SalesHeader: Record "Sales Header";
         NpCsDocumentLogEntry: Record "NpCs Document Log Entry";
     begin
-        if Type = Type::"Collect in Store" then begin
+        //-#364557 [364557]
+        if (Type = Type::"Collect in Store") and
+          ("Document Type" in ["Document Type"::Quote,"Document Type"::Order,"Document Type"::Invoice,"Document Type"::"Credit Memo","Document Type"::"Blanket Order","Document Type"::"Return Order"])
+        then begin
           if SalesHeader.Get("Document Type","Document No.") then
             SalesHeader.Delete(true);
         end;
+        //+#364557 [364557]
 
         NpCsDocumentLogEntry.SetRange("Document Entry No.","Entry No.");
         NpCsDocumentLogEntry.DeleteAll;
@@ -493,6 +527,18 @@ table 6151198 "NpCs Document"
         if NpCsDocumentLogEntry.FindLast then
           exit(NpCsDocumentLogEntry.GetErrorMessage());
         //+#344264 [344264]
+    end;
+
+    local procedure UpdateDocumentInfo()
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        //-#364557 [364557]
+        if SalesHeader.Get("Document Type","Document No.") then begin
+          "Sell-to Customer Name" := SalesHeader."Sell-to Customer Name";
+          "Location Code" := SalesHeader."Location Code";
+        end;
+        //+#364557 [364557]
     end;
 }
 
