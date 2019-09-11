@@ -2,6 +2,7 @@ page 6151600 "NpDc Arch. Coupon Card"
 {
     // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
     // NPR5.37/MHA /20171012  CASE 293232 Object renamed from "NpDc Posted Coupon Card" to "NpDc Arch. Coupon Card"
+    // NPR5.51/MHA /20190724  CASE 343352 Removed field 80 "In-use Quantity"
 
     Caption = 'Archived Coupon Card';
     DeleteAllowed = false;
@@ -63,9 +64,6 @@ page 6151600 "NpDc Arch. Coupon Card"
                     {
                     }
                     field("Remaining Quantity";"Remaining Quantity")
-                    {
-                    }
-                    field("In-use Quantity";"In-use Quantity")
                     {
                     }
                 }

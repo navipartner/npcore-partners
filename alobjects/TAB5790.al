@@ -1,4 +1,4 @@
-tableextension 50046 tableextension50046 extends "Shipping Agent Services" 
+tableextension 50047 tableextension50047 extends "Shipping Agent Services" 
 {
     // PS1.00/LS/20140509  CASE 190533 Versioned Fields 6014440..6014442 as part of Pacsoft module
     // NPR5.29/BHR/20161024 CASE 248684 Fields for Pakkelabels 6014451.. 6014452

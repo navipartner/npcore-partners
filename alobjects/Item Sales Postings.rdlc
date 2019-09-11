@@ -101,6 +101,12 @@
         <Field Name="Report_Filters">
           <DataField>Report_Filters</DataField>
         </Field>
+        <Field Name="ShowVendorNo_">
+          <DataField>ShowVendorNo_</DataField>
+        </Field>
+        <Field Name="VendorNo_">
+          <DataField>VendorNo_</DataField>
+        </Field>
       </Fields>
     </DataSet>
   </DataSets>
@@ -119,6 +125,9 @@
                 </TablixColumn>
                 <TablixColumn>
                   <Width>3.32251cm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>2.5cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>2.23629cm</Width>
@@ -259,6 +268,39 @@
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox81</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox22">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto">=iif(Fields!ShowVendorNo_.Value,Parameters!VendorNo_Caption.Value,"")</Value>
+                                  <Style>
+                                    <FontSize>7pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox22</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -932,6 +974,37 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox26">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto" />
+                                  <Style>
+                                    <FontSize>7pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox26</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox3">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -1557,9 +1630,10 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
-                        <ColSpan>2</ColSpan>
+                        <ColSpan>3</ColSpan>
                       </CellContents>
                     </TablixCell>
+                    <TablixCell />
                     <TablixCell />
                     <TablixCell>
                       <CellContents>
@@ -2197,6 +2271,39 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox72">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto">=iif(Fields!ShowVendorNo_.Value,Fields!VendorNo_.Value,"")</Value>
+                                  <Style>
+                                    <FontSize>7pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox72</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="VendorItemNo2">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -2803,6 +2910,37 @@
                     <TablixCell />
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox86">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto" />
+                                  <Style>
+                                    <FontSize>7pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox86</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox5">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -3382,6 +3520,7 @@
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
+                <TablixMember />
               </TablixMembers>
             </TablixColumnHierarchy>
             <TablixRowHierarchy>
@@ -3410,13 +3549,13 @@
                     </TablixMember>
                     <TablixMember>
                       <Visibility>
-                        <Hidden>=iif(Fields!ShowVendorItemNo.Value,TRUE, FALSE)</Hidden>
+                        <Hidden>=iif((Fields!ShowVendorItemNo.Value) OR (Fields!ShowVendorNo_.Value),TRUE, FALSE)</Hidden>
                       </Visibility>
                       <KeepWithGroup>Before</KeepWithGroup>
                     </TablixMember>
                     <TablixMember>
                       <Visibility>
-                        <Hidden>=iif(Fields!ShowVendorItemNo.Value,FALSE,TRUE)</Hidden>
+                        <Hidden>=iif((Fields!ShowVendorItemNo.Value) OR (Fields!ShowVendorNo_.Value),FALSE, TRUE)</Hidden>
                       </Visibility>
                       <KeepWithGroup>Before</KeepWithGroup>
                     </TablixMember>
@@ -3433,7 +3572,7 @@
             <Top>0.10936cm</Top>
             <Left>0.0635cm</Left>
             <Height>1.71791cm</Height>
-            <Width>24.57cm</Width>
+            <Width>27.07cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -3441,10 +3580,10 @@
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>1.82997cm</Height>
+        <Height>2.42727cm</Height>
         <Style />
       </Body>
-      <Width>24.79224cm</Width>
+      <Width>27.1335cm</Width>
       <Page>
         <PageHeader>
           <Height>3.54719cm</Height>
@@ -3502,7 +3641,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>1.0051cm</Top>
-              <Left>18.29974cm</Left>
+              <Left>20.69585cm</Left>
               <Height>0.423cm</Height>
               <Width>6.30791cm</Width>
               <ZIndex>1</ZIndex>
@@ -3529,7 +3668,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.5821cm</Top>
-              <Left>23.80836cm</Left>
+              <Left>26.20447cm</Left>
               <Height>0.423cm</Height>
               <Width>0.77812cm</Width>
               <ZIndex>2</ZIndex>
@@ -3556,7 +3695,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.5821cm</Top>
-              <Left>22.6704cm</Left>
+              <Left>25.06651cm</Left>
               <Height>0.423cm</Height>
               <Width>1.01625cm</Width>
               <ZIndex>3</ZIndex>
@@ -3584,7 +3723,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.12383cm</Top>
-              <Left>21.92332cm</Left>
+              <Left>24.31943cm</Left>
               <Height>0.423cm</Height>
               <Width>2.67375cm</Width>
               <ZIndex>4</ZIndex>
@@ -3710,8 +3849,8 @@
         </PageHeader>
         <PageHeight>21cm</PageHeight>
         <PageWidth>29.7cm</PageWidth>
-        <LeftMargin>1.5cm</LeftMargin>
-        <RightMargin>1cm</RightMargin>
+        <LeftMargin>1cm</LeftMargin>
+        <RightMargin>0.5cm</RightMargin>
         <TopMargin>1.2cm</TopMargin>
         <BottomMargin>0.4cm</BottomMargin>
         <ColumnSpacing>1.27cm</ColumnSpacing>
@@ -3846,11 +3985,20 @@
       </DefaultValue>
       <Prompt>SalesUnitPrice_Caption</Prompt>
     </ReportParameter>
+    <ReportParameter Name="VendorNo_Caption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>VendorNo_Caption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>VendorNo_Caption</Prompt>
+    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>14</NumberOfRows>
+      <NumberOfRows>15</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -3921,6 +4069,11 @@
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>13</RowIndex>
           <ParameterName>SalesUnitPrice_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>14</RowIndex>
+          <ParameterName>VendorNo_Caption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>

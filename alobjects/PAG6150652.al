@@ -37,6 +37,8 @@ page 6150652 "POS Entry List"
     // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
     // NPR5.50/MMV /20190328 CASE 300557 Refactored sales doc. handling
     // NPR5.50/TSA /20190424 CASE 352319 Added navigation to workshifts
+    // NPR5.51/TSA /20190623 CASE 359403 Refactored Post Range action
+    // NPR5.51/TSA /20190624 CASE 359508 Changed navigate to consider the period document no
 
     Caption = 'POS Entry List';
     Editable = false;
@@ -170,13 +172,13 @@ page 6150652 "POS Entry List"
                 field("Post Entry Status";"Post Entry Status")
                 {
                 }
-                field("Total Amount";"Total Amount")
+                field("Amount Excl. Tax";"Amount Excl. Tax")
                 {
                 }
-                field("Total Tax Amount";"Total Tax Amount")
+                field("Tax Amount";"Tax Amount")
                 {
                 }
-                field("Total Amount Incl. Tax";"Total Amount Incl. Tax")
+                field("Amount Incl. Tax";"Amount Incl. Tax")
                 {
                 }
                 field("Currency Code";"Currency Code")
@@ -659,17 +661,70 @@ page 6150652 "POS Entry List"
                 var
                     POSEntryToPost: Record "POS Entry";
                     POSPostEntries: Codeunit "POS Post Entries";
+                    ErrorDuringPosting: Boolean;
+                    ItemPosting: Boolean;
+                    POSPosting: Boolean;
                 begin
-                    POSEntryToPost.CopyFilters(Rec);
-                    //-NPR5.38 [285957]
-                    //POSPostEntries.SetPostItemEntries(TRUE);
-                    //POSPostEntries.SetPostPOSEntries(TRUE);
-                    POSPostEntries.SetPostItemEntries(Confirm(TextPostItemEntries));
-                    POSPostEntries.SetPostPOSEntries(Confirm(TextPostPosEntries));
-                    //+NPR5.38 [285957]
-                    POSPostEntries.SetStopOnError(true);
+
+                    //-NPR5.51 [359403]
+                    // POSEntryToPost.COPYFILTERS(Rec);
+                    // //-NPR5.38 [285957]
+                    // //POSPostEntries.SetPostItemEntries(TRUE);
+                    // //POSPostEntries.SetPostPOSEntries(TRUE);
+                    // POSPostEntries.SetPostItemEntries(CONFIRM(TextPostItemEntries));
+                    // POSPostEntries.SetPostPOSEntries(CONFIRM(TextPostPosEntries));
+                    // //+NPR5.38 [285957]
+                    // POSPostEntries.SetStopOnError(TRUE);
+                    // POSPostEntries.SetPostCompressed(CONFIRM(TextPostCompressed));
+                    // POSPostEntries.RUN(POSEntryToPost);
+
+                    ItemPosting := Confirm (TextPostItemEntries);
+                    POSPosting := Confirm (TextPostPosEntries);
+
                     POSPostEntries.SetPostCompressed(Confirm(TextPostCompressed));
-                    POSPostEntries.Run(POSEntryToPost);
+                    POSPostEntries.SetStopOnError(true);
+
+                    if (ItemPosting) then begin
+                      POSEntryToPost.Reset;
+                      POSEntryToPost.CopyFilters(Rec);
+                      POSEntryToPost.SetFilter("Post Item Entry Status",'<2');
+                      POSPostEntries.SetPostItemEntries (true);
+                      POSPostEntries.SetPostPOSEntries (false);
+                      repeat
+
+                        if (POSEntryToPost.FindLast ()) then
+                          POSEntryToPost.SetFilter ("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
+
+                        POSPostEntries.Run (POSEntryToPost);
+                        Commit;
+
+                        ErrorDuringPosting := not POSEntryToPost.IsEmpty ();
+                        POSEntryToPost.SetFilter ("POS Period Register No.", GetFilter ("POS Period Register No."));
+
+                      until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
+                    end;
+
+                    if (POSPosting) then begin
+                      POSEntryToPost.Reset;
+                      POSEntryToPost.CopyFilters(Rec);
+                      POSEntryToPost.SetFilter("Post Entry Status",'<2');
+                      POSPostEntries.SetPostItemEntries (false);
+                      POSPostEntries.SetPostPOSEntries (true);
+                      repeat
+
+                        if (POSEntryToPost.FindLast ()) then
+                          POSEntryToPost.SetFilter ("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
+
+                        POSPostEntries.Run (POSEntryToPost);
+                        Commit;
+
+                        ErrorDuringPosting := not POSEntryToPost.IsEmpty ();
+                        POSEntryToPost.SetFilter ("POS Period Register No.", GetFilter ("POS Period Register No."));
+
+                      until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
+                    end;
+                    //+NPR5.51 [359403]
+
                     CurrPage.Update(false);
                 end;
             }
@@ -749,10 +804,21 @@ page 6150652 "POS Entry List"
 
                 trigger OnAction()
                 var
+                    POSPeriodRegister: Record "POS Period Register";
                     Navigate: Page Navigate;
                 begin
+                    //-NPR5.51 [359508]
+                    // Navigate.SetDoc("Posting Date","Document No.");
+                    // Navigate.RUN;
+
                     Navigate.SetDoc("Posting Date","Document No.");
+                    if ("Entry Type" <> "Entry Type"::Balancing) then
+                      if (POSPeriodRegister.Get ("POS Period Register No.")) then
+                        if (POSPeriodRegister."Document No." <> '') then
+                          Navigate.SetDoc ("Posting Date", POSPeriodRegister."Document No.");
+
                     Navigate.Run;
+                    //+NPR5.51 [359508]
                 end;
             }
         }

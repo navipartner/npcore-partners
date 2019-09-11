@@ -23,6 +23,8 @@ codeunit 6060139 "MM Loyalty Point Management"
     // MM1.36/TSA /20181128 CASE 337873 Refactored CreatePointEntryFromValueEntry() to due to duplicate points assigment when having multiple memberships on same sales order
     // MM1.37/TSA /20190226 CASE 343053 Expire loyalty points, some restructuring
     // MM1.37/TSA /20190227 CASE 343053 Cleaned / Removed green code
+    // MM1.40/TSA /20190731 CASE 361664 Added Loyalty point based upgrade functionality
+    // MM1.40/TSA /20190813 CASE 343352 Points on web. Refactored GetCouponToRedeem() -> GetCouponToRedeemPOS() added GetCouponToRedeemWS(), GetEligibleCouponsToRedeemWorker()
 
 
     trigger OnRun()
@@ -44,6 +46,8 @@ codeunit 6060139 "MM Loyalty Point Management"
         EXPIRE_CALC_NEXT: Label 'When testing %1, next period start %2 must be the day after previous period end %3.';
         MISSING_VALUE: Label 'Missing value in field %1.';
         EXPIRE_FORMULA: Label '%1  is expected to be greater than %2.';
+        PointsCalculationOption: Option PREVIOUS_PERIOD,UNCOLLECTED;
+        SUBTOTAL_ZERO: Label 'The SubTotal parameter must not be zero when discount type is based on "discount %" for %1 %2.';
 
     [EventSubscriber(ObjectType::Codeunit, 22, 'OnAfterInsertValueEntry', '', true, true)]
     local procedure OnAfterInsertValueEntry(var ValueEntry: Record "Value Entry";var ItemJournalLine: Record "Item Journal Line")
@@ -225,6 +229,16 @@ codeunit 6060139 "MM Loyalty Point Management"
     begin
     end;
 
+    local procedure ErrorExit(var ReasonText: Text;ReasonMessage: Text): Boolean
+    begin
+
+        //-MM1.40 [343352]
+        ReasonText := ReasonMessage;
+        exit (false);
+
+        //+MM1.40 [343352]
+    end;
+
     local procedure SimulateValueEntry(PostingDate: Date;PosUnitNo: Code[10];ItemNo: Code[20];Quantity: Decimal;CustomerNo: Code[20];DocumentNo: Code[20];Amount: Decimal;DiscountAmount: Decimal;DataSource: Option)
     var
         ValueEntry: Record "Value Entry";
@@ -272,9 +286,13 @@ codeunit 6060139 "MM Loyalty Point Management"
         MembershipAlterationSetup: Record "MM Membership Alteration Setup";
         MembershipEntry: Record "MM Membership Entry";
         POSUnit: Record "POS Unit";
+        UpgradeAlteration: Record "MM Loyalty Alter Membership";
+        DowngradeAlteration: Record "MM Loyalty Alter Membership";
         MembershipManagement: Codeunit "MM Membership Management";
         AwardPoints: Boolean;
         MemberNotification: Codeunit "MM Member Notification";
+        UpgradeAvailable: Boolean;
+        DowngradeAvailable: Boolean;
     begin
 
         if (ValueEntry."Item Ledger Entry Type" <> ValueEntry."Item Ledger Entry Type"::Sale) then
@@ -376,6 +394,19 @@ codeunit 6060139 "MM Loyalty Point Management"
         CalcultatePointsValidPeriod (LoyaltySetup, MembershipPointsEntry."Posting Date", MembershipPointsEntry."Period Start", MembershipPointsEntry."Period End");
 
         if (MembershipPointsEntry.Insert()) then ;
+
+        //-MM1.40 [361664]
+        // Check for upgrade
+        UpgradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", true, UpgradeAlteration);
+        DowngradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", false, DowngradeAlteration);
+
+        if (UpgradeAvailable and not DowngradeAvailable) then
+          AlterMembership (Membership."Entry No.", UpgradeAlteration);
+
+        if (DowngradeAvailable and not UpgradeAvailable) then
+          AlterMembership (Membership."Entry No.", DowngradeAlteration);
+
+        //+MM1.40 [361664]
 
         if (MembershipSetup."Enable NP Pass Integration") then begin
 
@@ -755,6 +786,35 @@ codeunit 6060139 "MM Loyalty Point Management"
     begin
     end;
 
+    procedure IssueOneCoupon(MembershipEntryNo: Integer;var TmpLoyaltyPointsSetup: Record "MM Loyalty Points Setup" temporary;SubTotal: Decimal) CouponNo: Code[20]
+    var
+        Membership: Record "MM Membership";
+        LoyaltyCouponMgr: Codeunit "MM Loyalty Coupon Mgr";
+        PointsToRedeem: Integer;
+        CouponAmount: Decimal;
+    begin
+
+        //-MM1.40 [343352]
+        if (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_COUPON) then
+          CouponNo := LoyaltyCouponMgr.IssueOneCoupon (TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, TmpLoyaltyPointsSetup."Points Threshold", 0);
+
+        if (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_LOYALTY) then begin
+          Membership.Get (MembershipEntryNo);
+          Membership.CalcFields ("Remaining Points");
+
+          CouponAmount := SubTotal;
+          if (Membership."Remaining Points" * TmpLoyaltyPointsSetup."Point Rate" < SubTotal) then
+            CouponAmount := Membership."Remaining Points" * TmpLoyaltyPointsSetup."Point Rate";
+
+          PointsToRedeem := Round (CouponAmount / TmpLoyaltyPointsSetup."Point Rate", 1);
+
+          if (CouponAmount >= TmpLoyaltyPointsSetup."Minimum Coupon Amount") then
+            CouponNo := LoyaltyCouponMgr.IssueOneCoupon (TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, PointsToRedeem, CouponAmount);
+
+        end;
+        //+MM1.40 [343352]
+    end;
+
     procedure RedeemPointsCoupon(MembershipEntryNo: Integer;DocumentNo: Code[20];DocumentDate: Date;CouponNo: Code[20];PointsToDeduct: Integer)
     var
         Membership: Record "MM Membership";
@@ -786,7 +846,67 @@ codeunit 6060139 "MM Loyalty Point Management"
         MembershipPointsEntry.Insert;
     end;
 
-    procedure GetCouponToRedeem(MembershipEntryNo: Integer;var TmpLoyaltyPointsSetup: Record "MM Loyalty Points Setup" temporary;SubTotal: Decimal): Boolean
+    procedure GetCouponToRedeemPOS(MembershipEntryNo: Integer;var TmpLoyaltyPointsSetup: Record "MM Loyalty Points Setup" temporary;SubTotal: Decimal): Boolean
+    var
+        Membership: Record "MM Membership";
+        MembershipSetup: Record "MM Membership Setup";
+        LoyaltySetup: Record "MM Loyalty Setup";
+        LoyaltyPointsSetup: Record "MM Loyalty Points Setup";
+        LineNo: Integer;
+        AvailablePoints: Integer;
+        ReasonText: Text;
+    begin
+
+        //-MM1.40 [343352] Refactored from GetCouponToRedeem ()
+        Membership.Get (MembershipEntryNo);
+        MembershipSetup.Get (Membership."Membership Code");
+        MembershipSetup.TestField ("Loyalty Code");
+        LoyaltySetup.Get (MembershipSetup."Loyalty Code");
+
+        if (not GetEligibleCouponsToRedeemWorker (MembershipEntryNo, TmpLoyaltyPointsSetup, SubTotal, AvailablePoints, ReasonText)) then
+          Error (ReasonText);
+
+        if (LoyaltySetup."Voucher Creation" = LoyaltySetup."Voucher Creation"::PROMPT) then begin
+
+          LineNo := DoLookupCoupon (SELECT_COUPON, TmpLoyaltyPointsSetup);
+          TmpLoyaltyPointsSetup.DeleteAll;
+          if (LoyaltyPointsSetup.Get (LoyaltySetup.Code, LineNo)) then begin
+            TmpLoyaltyPointsSetup.TransferFields (LoyaltyPointsSetup, true);
+
+            if (LoyaltyPointsSetup."Consume Available Points") then
+              TmpLoyaltyPointsSetup."Points Threshold" := AvailablePoints;
+
+            TmpLoyaltyPointsSetup.Insert ();
+          end;
+        end;
+
+        exit (not TmpLoyaltyPointsSetup.IsEmpty());
+        //+MM1.40 [343352]
+    end;
+
+    procedure GetCouponToRedeemWS(MembershipEntryNo: Integer;var TmpLoyaltyPointsSetup: Record "MM Loyalty Points Setup" temporary;SubTotal: Decimal;var ReasonText: Text): Boolean
+    var
+        Membership: Record "MM Membership";
+        MembershipSetup: Record "MM Membership Setup";
+        LoyaltySetup: Record "MM Loyalty Setup";
+        LoyaltyPointsSetup: Record "MM Loyalty Points Setup";
+        AvailablePoints: Integer;
+    begin
+
+        //-MM1.40 [343352]
+        Membership.Get (MembershipEntryNo);
+        MembershipSetup.Get (Membership."Membership Code");
+        MembershipSetup.TestField ("Loyalty Code");
+        LoyaltySetup.Get (MembershipSetup."Loyalty Code");
+
+        if (not GetEligibleCouponsToRedeemWorker (MembershipEntryNo, TmpLoyaltyPointsSetup, SubTotal, AvailablePoints, ReasonText)) then
+          exit (false);
+
+        exit (not TmpLoyaltyPointsSetup.IsEmpty());
+        //+MM1.40 [343352]
+    end;
+
+    local procedure GetEligibleCouponsToRedeemWorker(MembershipEntryNo: Integer;var TmpLoyaltyPointsSetup: Record "MM Loyalty Points Setup" temporary;SubTotal: Decimal;var AvailablePoints: Integer;var ReasonText: Text): Boolean
     var
         Membership: Record "MM Membership";
         MembershipSetup: Record "MM Membership Setup";
@@ -794,76 +914,35 @@ codeunit 6060139 "MM Loyalty Point Management"
         LoyaltyPointsSetup: Record "MM Loyalty Points Setup";
         ApplyCouponsInOrder: Integer;
         RemainingPoints: Integer;
-        LineNo: Integer;
         PeriodStart: Date;
         PeriodEnd: Date;
         ExpirePointsBefore: Date;
         ExpiredPoints: Integer;
         RedeemedPoints: Integer;
-        ReasonText: Text;
-        AvailablePoints: Integer;
     begin
 
+        //-MM1.40 [343352] Refactored from GetCouponToRedeem ()
         Clear (TmpLoyaltyPointsSetup);
 
         Membership.Get (MembershipEntryNo);
-
-        //-MM1.37 [343053]
-        // Membership.CALCFIELDS ("Remaining Points");
-        //
-        // MembershipSetup.GET (Membership."Membership Code");
-        // MembershipSetup.TESTFIELD ("Loyalty Code");
-        //
-        // LoyaltySetup.GET (MembershipSetup."Loyalty Code");
-
         MembershipSetup.Get (Membership."Membership Code");
-        MembershipSetup.TestField ("Loyalty Code");
         LoyaltySetup.Get (MembershipSetup."Loyalty Code");
 
-        if (LoyaltySetup."Voucher Point Source" = LoyaltySetup."Voucher Point Source"::PREVIOUS_PERIOD) then begin
-
-          CalcultatePointsValidPeriod (LoyaltySetup, Today, PeriodStart, PeriodEnd);
-
-          if (LoyaltySetup."Expire Uncollected Points") then begin
-            Membership.SetFilter ("Date Filter", '..%1', Today);
-            Membership.CalcFields ("Expired Points");
-            ExpiredPoints := Membership."Expired Points";
-
-            if (CalculateCurrentExpiryDate (LoyaltySetup, ExpirePointsBefore, ReasonText)) then
-              PeriodEnd := ExpirePointsBefore;
+        with LoyaltySetup do
+          case ("Voucher Point Source") of
+            "Voucher Point Source"::PREVIOUS_PERIOD : AvailablePoints := CalculateAvailablePoints (MembershipEntryNo, PointsCalculationOption::PREVIOUS_PERIOD);
+            "Voucher Point Source"::UNCOLLECTED     : AvailablePoints := CalculateAvailablePoints (MembershipEntryNo, PointsCalculationOption::UNCOLLECTED);
           end;
 
-          // The spend period is current period (unless expire calculation made it smaller)
-          Membership.SetFilter ("Date Filter", '..%1', Today);
-          Membership.CalcFields ("Redeemed Points (Withdrawl)");
-          RedeemedPoints := Membership."Redeemed Points (Withdrawl)";
-
-          // Total available points collected in the earn period (previous period)
-          CalcultatePointsValidPeriod (LoyaltySetup, CalcDate ('<-1D>', PeriodStart), PeriodStart, PeriodEnd);
-          //Membership.SETFILTER ("Date Filter", '..%1', TODAY);
-          Membership.SetFilter ("Date Filter", '%1..%2', PeriodStart, PeriodEnd);
-        end;
-
-        if (LoyaltySetup."Voucher Point Source" = LoyaltySetup."Voucher Point Source"::UNCOLLECTED) then begin
-          ExpiredPoints := 0;
-          RedeemedPoints := 0;
-          Membership.SetFilter ("Date Filter", '..%1', Today);
-        end;
-
-        Membership.CalcFields ("Remaining Points");
-
-        AvailablePoints := Membership."Remaining Points" + ExpiredPoints + RedeemedPoints;
-        if (UserId = 'TSA') then Message ('Available points %1, redeemed %2, expired %3', AvailablePoints, RedeemedPoints, ExpiredPoints);
-        //+MM1.37 [343053]
-
-        //-MM1.37 [343053] Changed direct use of Membership."Remaining Points" to AvailablePoints
         if (AvailablePoints < LoyaltySetup."Voucher Point Threshold") then
-          Error (NO_COUPON_AVAILABLE, AvailablePoints, LoyaltySetup."Voucher Point Threshold");
+          // ERROR (NO_COUPON_AVAILABLE, AvailablePoints, LoyaltySetup."Voucher Point Threshold");
+          exit (ErrorExit (ReasonText, StrSubstNo (NO_COUPON_AVAILABLE, AvailablePoints, LoyaltySetup."Voucher Point Threshold")));
 
         LoyaltyPointsSetup.SetFilter (Code, '=%1', LoyaltySetup.Code);
         LoyaltyPointsSetup.SetFilter ("Points Threshold", '%1..%2', 0, Abs(AvailablePoints));
         if (LoyaltyPointsSetup.IsEmpty ()) then
-          Error (NO_COUPON_AVAILABLE, AvailablePoints, LoyaltySetup."Voucher Point Threshold");
+          // ERROR (NO_COUPON_AVAILABLE, AvailablePoints, LoyaltySetup."Voucher Point Threshold");
+          exit (ErrorExit (ReasonText, StrSubstNo (NO_COUPON_AVAILABLE, AvailablePoints, LoyaltySetup."Voucher Point Threshold")));
 
         LoyaltyPointsSetup.Reset ();
         LoyaltyPointsSetup.SetFilter (Code, '=%1', LoyaltySetup.Code);
@@ -875,10 +954,8 @@ codeunit 6060139 "MM Loyalty Point Management"
               LoyaltyPointsSetup.FindLast ();
               TmpLoyaltyPointsSetup.TransferFields (LoyaltyPointsSetup, true);
 
-              //-MM1.37 [343053]
               if (LoyaltyPointsSetup."Consume Available Points") then
                 TmpLoyaltyPointsSetup."Points Threshold" := AvailablePoints;
-              //+MM1.37 [343053]
 
               TmpLoyaltyPointsSetup.Insert ();
             end;
@@ -889,10 +966,8 @@ codeunit 6060139 "MM Loyalty Point Management"
               LoyaltyPointsSetup.FindFirst ();
               TmpLoyaltyPointsSetup.TransferFields (LoyaltyPointsSetup, true);
 
-              //-MM1.37 [343053]
               if (LoyaltyPointsSetup."Consume Available Points") then
                 TmpLoyaltyPointsSetup."Points Threshold" := AvailablePoints;
-              //+MM1.37 [343053]
 
               TmpLoyaltyPointsSetup.Insert ();
             end;
@@ -904,10 +979,8 @@ codeunit 6060139 "MM Loyalty Point Management"
               LoyaltyPointsSetup.FindLast ();
               TmpLoyaltyPointsSetup.TransferFields (LoyaltyPointsSetup, true);
 
-              //-MM1.37 [343053]
               if (LoyaltyPointsSetup."Consume Available Points") then
                 TmpLoyaltyPointsSetup."Points Threshold" := AvailablePoints;
-              //+MM1.37 [343053]
 
               TmpLoyaltyPointsSetup.Insert ();
             end;
@@ -943,8 +1016,12 @@ codeunit 6060139 "MM Loyalty Point Management"
                     if (TmpLoyaltyPointsSetup."Discount Type" = TmpLoyaltyPointsSetup."Discount Type"::"Discount Amount") then
                       TmpLoyaltyPointsSetup."Amount LCY" := TmpLoyaltyPointsSetup."Discount Amount";
 
-                    if (TmpLoyaltyPointsSetup."Discount Type" = TmpLoyaltyPointsSetup."Discount Type"::"Discount %") then
+                    if (TmpLoyaltyPointsSetup."Discount Type" = TmpLoyaltyPointsSetup."Discount Type"::"Discount %") then begin
+                      if (SubTotal = 0) then
+                        exit (ErrorExit (ReasonText, StrSubstNo (SUBTOTAL_ZERO, SubTotal, TmpLoyaltyPointsSetup.FieldName ("Coupon Type Code"), TmpLoyaltyPointsSetup."Coupon Type Code")));
+
                       TmpLoyaltyPointsSetup."Amount LCY" := SubTotal * TmpLoyaltyPointsSetup."Discount %" / 100;
+                    end;
 
                     TmpLoyaltyPointsSetup.Insert ();
                   end;
@@ -964,26 +1041,13 @@ codeunit 6060139 "MM Loyalty Point Management"
 
                 until (LoyaltyPointsSetup.Next () = 0);
 
-                LineNo := DoLookupCoupon (SELECT_COUPON, TmpLoyaltyPointsSetup);
-                TmpLoyaltyPointsSetup.DeleteAll;
-                if (LoyaltyPointsSetup.Get (LoyaltySetup.Code, LineNo)) then begin
-                  TmpLoyaltyPointsSetup.TransferFields (LoyaltyPointsSetup, true);
-
-                  //-MM1.37 [343053]
-                  if (LoyaltyPointsSetup."Consume Available Points") then
-                    TmpLoyaltyPointsSetup."Points Threshold" := AvailablePoints;
-                  //+MM1.37 [343053]
-
-                  TmpLoyaltyPointsSetup.Insert ();
-                end;
-
               end;
             end;
 
         end;
-        //+MM1.37 [343053]
 
         exit (not TmpLoyaltyPointsSetup.IsEmpty());
+        //+MM1.40 [343352]
     end;
 
     local procedure DoLookupCoupon(LookupCaption: Text;var TmpLoyaltyPointsSetup: Record "MM Loyalty Points Setup" temporary) LineNo: Integer
@@ -1034,6 +1098,12 @@ codeunit 6060139 "MM Loyalty Point Management"
         MembershipSetup: Record "MM Membership Setup";
         MembershipPointsEntry: Record "MM Membership Points Entry";
         LoyaltySetup: Record "MM Loyalty Setup";
+        UpgradeAlteration: Record "MM Loyalty Alter Membership";
+        DowngradeAlteration: Record "MM Loyalty Alter Membership";
+        MembershipRole: Record "MM Membership Role";
+        MemberNotification: Codeunit "MM Member Notification";
+        UpgradeAvailable: Boolean;
+        DowngradeAvailable: Boolean;
     begin
 
         Membership.Get (MembershipEntryNo);
@@ -1068,6 +1138,26 @@ codeunit 6060139 "MM Loyalty Point Management"
 
         MembershipPointsEntry.Quantity := 1;
         MembershipPointsEntry.Insert;
+
+        //-MM1.40 [361664]
+        // Check for upgrade
+        UpgradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", true, UpgradeAlteration);
+        DowngradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", false, DowngradeAlteration);
+
+        if (UpgradeAvailable and not DowngradeAvailable) then
+          AlterMembership (Membership."Entry No.", UpgradeAlteration);
+
+        if (DowngradeAvailable and not UpgradeAvailable) then
+          AlterMembership (Membership."Entry No.", DowngradeAlteration);
+
+        if (MembershipSetup."Enable NP Pass Integration") then begin
+          MembershipRole.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
+          MembershipRole.SetFilter (Blocked, '=%1', false);
+          MembershipRole.SetFilter ("Wallet Pass Id", '<>%1', '');
+          if (not MembershipRole.IsEmpty ()) then
+            MemberNotification.CreateUpdateWalletNotification (Membership."Entry No.", 0, 0);
+        end;
+        //+MM1.40 [361664]
 
         exit (MembershipPointsEntry."Entry No.");
     end;
@@ -1224,6 +1314,161 @@ codeunit 6060139 "MM Loyalty Point Management"
         end;
 
         //+MM1.37 [343053]
+    end;
+
+    local procedure "--Membership Elegibility and Upgrade"()
+    begin
+    end;
+
+    local procedure EligibleForMembershipAlteration(MembershipEntryNo: Integer;Upgrade: Boolean;var LoyaltyAlterMembership: Record "MM Loyalty Alter Membership"): Boolean
+    var
+        Membership: Record "MM Membership";
+        MembershipSetup: Record "MM Membership Setup";
+        LoyaltySetup: Record "MM Loyalty Setup";
+        MembershipEntry: Record "MM Membership Entry";
+        AvailablePoints: Integer;
+    begin
+
+        //-MM1.40 [361664]
+        if (not Membership.Get (MembershipEntryNo)) then
+          exit (false);
+
+        if (not MembershipSetup.Get (Membership."Membership Code")) then
+          exit (false);
+
+        if (MembershipSetup."Loyalty Code" = '') then
+          exit (false);
+
+        if (not LoyaltySetup.Get (MembershipSetup."Loyalty Code")) then
+          exit (false);
+
+        MembershipEntry.SetCurrentKey ("Entry No.");
+        MembershipEntry.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipEntry.SetFilter (Blocked, '=%1', false);
+        MembershipEntry.SetFilter (Context, '<>%1', MembershipEntry.Context::REGRET);
+        if (not MembershipEntry.FindLast ()) then
+          exit (false);
+
+        case LoyaltySetup."Auto Upgrade Point Source" of
+          LoyaltySetup."Auto Upgrade Point Source"::PREVIOUS_PERIOD : AvailablePoints := CalculateAvailablePoints (MembershipEntryNo, PointsCalculationOption::PREVIOUS_PERIOD);
+          LoyaltySetup."Auto Upgrade Point Source"::UNCOLLECTED     : AvailablePoints := CalculateAvailablePoints (MembershipEntryNo, PointsCalculationOption::UNCOLLECTED);
+          else
+            exit (false);
+        end;
+
+        LoyaltyAlterMembership.SetCurrentKey ("Loyalty Code","From Membership Code","Change Direction","Points Threshold");
+        LoyaltyAlterMembership.SetFilter ("Loyalty Code", '=%1', MembershipSetup."Loyalty Code");
+        LoyaltyAlterMembership.SetFilter ("From Membership Code", '=%1', Membership."Membership Code");
+        LoyaltyAlterMembership.SetFilter (Blocked, '=%1', false);
+
+        case Upgrade of
+          true : begin
+            LoyaltyAlterMembership.SetFilter ("Change Direction", '=%1', LoyaltyAlterMembership."Change Direction"::UPGRADE);
+            LoyaltyAlterMembership.SetFilter ("Points Threshold", '..%1', AvailablePoints);
+            if (not LoyaltyAlterMembership.FindLast ()) then
+              exit (false);
+          end;
+
+          false: begin
+            LoyaltyAlterMembership.SetFilter ("Change Direction", '=%1', LoyaltyAlterMembership."Change Direction"::DOWNGRADE);
+            LoyaltyAlterMembership.SetFilter ("Points Threshold", '%1..', AvailablePoints);
+            if (not LoyaltyAlterMembership.FindFirst ()) then
+              exit (false);
+          end;
+        end;
+
+
+
+        exit (true);
+        //+MM1.40 [361664]
+    end;
+
+    local procedure AlterMembership(MembershipEntryNo: Integer;LoyaltyAlterMembership: Record "MM Loyalty Alter Membership"): Boolean
+    var
+        Membership: Record "MM Membership";
+        MemberInfoCapture: Record "MM Member Info Capture";
+        MembershipEntry: Record "MM Membership Entry";
+        MembershipManagement: Codeunit "MM Membership Management";
+        MembershipStartDate: Date;
+        MembershipUntilDate: Date;
+    begin
+
+        //-MM1.40 [361664]
+
+        MemberInfoCapture.Init ();
+        MemberInfoCapture."Entry No." := 0;
+
+
+        MemberInfoCapture."Membership Entry No." := MembershipEntryNo;
+        MemberInfoCapture."Membership Code" := LoyaltyAlterMembership."From Membership Code";
+        MemberInfoCapture."Item No." := LoyaltyAlterMembership."Sales Item No.";
+        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::UPGRADE;
+        MemberInfoCapture."Document Date" := Today;
+        if (Format (LoyaltyAlterMembership."Defer Change Until") <> '') then
+          MemberInfoCapture."Document Date" := CalcDate (LoyaltyAlterMembership."Defer Change Until", Today);
+
+        MemberInfoCapture.Description :=
+          CopyStr (
+            StrSubstNo ('Membership Change %1->%2 (%3)', LoyaltyAlterMembership."From Membership Code", LoyaltyAlterMembership."To Membership Code", LoyaltyAlterMembership."Points Threshold"),
+            1, MaxStrLen (MemberInfoCapture.Description));
+
+        exit (MembershipManagement.UpgradeMembership (MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price"));
+
+        //+MM1.40 [361664]
+    end;
+
+    local procedure CalculateAvailablePoints(MembershipEntryNo: Integer;CalculationOption: Option) AvailablePoints: Integer
+    var
+        Membership: Record "MM Membership";
+        MembershipSetup: Record "MM Membership Setup";
+        LoyaltySetup: Record "MM Loyalty Setup";
+        ExpiredPoints: Integer;
+        RedeemedPoints: Integer;
+        PeriodStart: Date;
+        PeriodEnd: Date;
+        ExpirePointsBefore: Date;
+        ReasonText: Text;
+    begin
+
+        //-MM1.40 [361664]
+        Membership.Get (MembershipEntryNo);
+        MembershipSetup.Get (Membership."Membership Code");
+        LoyaltySetup.Get (MembershipSetup."Loyalty Code");
+
+        if (CalculationOption = PointsCalculationOption::PREVIOUS_PERIOD) then begin
+
+          CalcultatePointsValidPeriod (LoyaltySetup, Today, PeriodStart, PeriodEnd);
+
+          if (LoyaltySetup."Expire Uncollected Points") then begin
+            Membership.SetFilter ("Date Filter", '..%1', Today);
+            Membership.CalcFields ("Expired Points");
+            ExpiredPoints := Membership."Expired Points";
+
+            if (CalculateCurrentExpiryDate (LoyaltySetup, ExpirePointsBefore, ReasonText)) then
+              PeriodEnd := ExpirePointsBefore;
+          end;
+
+          // The spend period is current period (unless expire calculation made it smaller)
+          Membership.SetFilter ("Date Filter", '..%1', Today);
+          Membership.CalcFields ("Redeemed Points (Withdrawl)");
+          RedeemedPoints := Membership."Redeemed Points (Withdrawl)";
+
+          // Total available points collected in the earn period (previous period)
+          CalcultatePointsValidPeriod (LoyaltySetup, CalcDate ('<-1D>', PeriodStart), PeriodStart, PeriodEnd);
+          Membership.SetFilter ("Date Filter", '%1..%2', PeriodStart, PeriodEnd);
+        end;
+
+        if (CalculationOption = PointsCalculationOption::UNCOLLECTED) then begin
+          ExpiredPoints := 0;
+          RedeemedPoints := 0;
+          Membership.SetFilter ("Date Filter", '..%1', Today);
+        end;
+
+        Membership.CalcFields ("Remaining Points");
+        AvailablePoints := Membership."Remaining Points" + ExpiredPoints + RedeemedPoints;
+
+        if (UserId = 'TSA') then Message ('Available points %1, redeemed %2, expired %3', AvailablePoints, RedeemedPoints, ExpiredPoints);
+        //+MM1.40 [361664]
     end;
 }
 

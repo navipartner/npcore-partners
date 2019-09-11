@@ -1,4 +1,4 @@
-tableextension 50049 tableextension50049 extends "Sales Price" 
+tableextension 50050 tableextension50050 extends "Sales Price" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields 6059800, 6060000

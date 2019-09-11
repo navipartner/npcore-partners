@@ -5,6 +5,8 @@ codeunit 6151151 "M2 Account Manager"
     // NPR5.49/TSA /20190221 CASE 346698 - Signature change from 2016, 2017
     // MAG2.21.01/TSA /20190502 CASE 320424 Reset password request forwarded to Magento
     // MAG2.21.01/TSA /20190506 CASE 353964 Try functions cant have DML statements, refactored the try functions to .run instead
+    // NPR5.51/TSA /20190726 CASE 356090 Addded Member functionality to the account functions
+    // NPR5.51/TSA /20190812 CASE 364644  Added First Name, Last Name to Contact Type=Company, removed primary contact creation and miss-use of the Company contact for first "person"
 
 
     trigger OnRun()
@@ -158,8 +160,11 @@ codeunit 6151151 "M2 Account Manager"
 
           if (TmpAccountResponse.FindFirst()) then begin
             if (not TryResetPassword (LowerCase (TmpAccount."E-Mail 2"))) then begin
-              ReasonText := GetLastErrorText ();
-              exit (false);
+              //-NPR5.51 [356090]
+              // New Account has been commit, exit false will signal that the whole process failed.
+              // ReasonText := GETLASTERRORTEXT ();
+              // EXIT (FALSE);
+              //+NPR5.51 [356090]
             end;
 
             exit (true);
@@ -759,7 +764,12 @@ codeunit 6151151 "M2 Account Manager"
         TmpCustomer.FindFirst ();
 
         Customer."No." := '';
-        Customer.Insert (true);
+
+        //-NPR5.51 [356090]
+        //Customer.INSERT (TRUE);
+        if (not CreateMembership (TmpContact, TmpCustomer, Customer)) then
+          Customer.Insert (true);
+        //+NPR5.51 [356090]
 
         if (MagentoSetup.Get ()) then begin
           if (MagentoSetup."Customer Config. Template Code" <> '') then begin
@@ -769,6 +779,11 @@ codeunit 6151151 "M2 Account Manager"
             RecRef.SetTable(Customer);
           end;
         end;
+
+        //-NPR5.51 [364644]
+        if (TmpContact."Company Name" = '') then
+          TmpContact."Company Name" := CalculatedName(TmpContact."First Name", TmpContact."Middle Name", TmpContact.Surname);
+        //+NPR5.51 [364644]
 
         Customer.Validate (Name, TmpContact."Company Name");
         Customer.Validate ("Name 2", TmpContact."Name 2");
@@ -795,15 +810,16 @@ codeunit 6151151 "M2 Account Manager"
         if (TmpContact."Phone No." <> '') then
           Customer.Validate ("Phone No.", TmpContact."Phone No.");
 
-
-        if (TmpContact.Surname = '') and (TmpContact."First Name" <> '') then
-          Customer.Validate (Contact, TmpContact."First Name");
-
-        if (TmpContact.Surname <> '') and (TmpContact."First Name" = '') then
-          Customer.Validate (Contact, TmpContact.Surname);
-
-        if (TmpContact.Surname <> '') and (TmpContact."First Name" <> '') then
-          Customer.Validate (Contact, StrSubstNo ('%1 %2', TmpContact."First Name", TmpContact.Surname));
+        //-NPR5.51 [364644]
+        // IF (TmpContact.Surname = '') AND (TmpContact."First Name" <> '') THEN
+        //  Customer.VALIDATE (Contact, TmpContact."First Name");
+        //
+        // IF (TmpContact.Surname <> '') AND (TmpContact."First Name" = '') THEN
+        //  Customer.VALIDATE (Contact, TmpContact.Surname);
+        //
+        // IF (TmpContact.Surname <> '') AND (TmpContact."First Name" <> '') THEN
+        //  Customer.VALIDATE (Contact, STRSUBSTNO ('%1 %2', TmpContact."First Name", TmpContact.Surname));
+        //+NPR5.51 [364644]
 
         Customer."Magento Display Group" := TmpCustomer."Magento Display Group";
         Customer."Magento Payment Group" := TmpCustomer."Magento Payment Group";
@@ -826,6 +842,11 @@ codeunit 6151151 "M2 Account Manager"
           Contact."Magento Contact" := (Contact."E-Mail" <> '');
           Contact."Magento Password (Md5)" := TmpContact."Magento Password (Md5)";
 
+          //-NPR5.51 [364644]
+          Contact."First Name" := TmpContact."First Name";
+          Contact.Surname := TmpContact.Surname;
+          //+NPR5.51 [364644]
+
           Contact.Modify ();
 
           // Company Result
@@ -840,6 +861,7 @@ codeunit 6151151 "M2 Account Manager"
             Contact."Magento Customer Group" := TmpContact."Magento Customer Group";
             Contact."Magento Contact" := (Contact."E-Mail" <> '');
             Contact."Magento Password (Md5)" := TmpContact."Magento Password (Md5)";
+
             Contact.Modify ();
 
             // Person Result
@@ -869,6 +891,11 @@ codeunit 6151151 "M2 Account Manager"
         if (not Account."Magento Contact") then
           Error ('Not a valid Magento contact.');
 
+        //-NPR5.51 [356090]
+        if (UpdateMember (TmpAccount)) then
+          Account.Get (TmpAccount."No.");
+        //+NPR5.51 [356090]
+
         if (Account.Type = Account.Type::Company) then begin
           ContactXrec.Get (Account."No.");
           Contact.TransferFields (Account, true);
@@ -888,6 +915,12 @@ codeunit 6151151 "M2 Account Manager"
           Account.Validate (Name, TmpAccount."Company Name");
           Account.Validate ("VAT Registration No.", TmpAccount."VAT Registration No.");
           Account.Validate ("Currency Code", TmpAccount."Currency Code");
+
+          //-NPR5.51 [364644]
+          Account."First Name" := TmpAccount."First Name";
+          Account.Surname := TmpAccount.Surname;
+          //+NPR5.51 [364644]
+
         end;
 
         if (Account.Type = Account.Type::Person) then begin
@@ -1013,10 +1046,17 @@ codeunit 6151151 "M2 Account Manager"
         if (not tmpCorporateAccount.FindFirst ()) then
           Error ('Invalid corporate id %1 for account, password combination.', TmpAccount."Company No.");
 
+
+
         Contact."No." := '';
         Contact.Type := Contact.Type::Person;
         Contact."Company No." := tmpCorporateAccount."No.";
-        Contact.Insert (true);
+
+        //-NPR5.51 [356090]
+        // Contact.INSERT (TRUE);
+        if (not AddMembershipMember (TmpAccount, Contact, tmpCorporateAccount."No.")) then
+          Contact.Insert (true);
+        //+NPR5.51 [356090]
 
         //-NPR5.49 [346698]
         //Contact.InheritCompanyToPersonData (tmpCorporateAccount, TRUE);
@@ -1082,6 +1122,10 @@ codeunit 6151151 "M2 Account Manager"
           Account."Magento Contact" := false;
           Account.Modify ();
         end;
+
+        //-NPR5.51 [356090]
+        BlockMember (Account);
+        //+NPR5.51 [356090]
     end;
 
     local procedure CreateShiptoAddressWorker(var TmpAccount: Record Contact temporary;var TmpShiptoAddressRequest: Record "Ship-to Address" temporary;var TmpShiptoAddressResponse: Record "Ship-to Address" temporary)
@@ -1262,6 +1306,136 @@ codeunit 6151151 "M2 Account Manager"
         until (TmpShiptoAddressRequest.Next () = 0);
     end;
 
+    local procedure "---Member Management"()
+    begin
+    end;
+
+    local procedure CreateMembership(var TmpContact: Record Contact temporary;var TmpCustomer: Record Customer temporary;var Customer: Record Customer): Boolean
+    var
+        MembershipSalesSetup: Record "MM Membership Sales Setup";
+        MemberInfoCapture: Record "MM Member Info Capture";
+        MembershipManagement: Codeunit "MM Membership Management";
+        Membership: Record "MM Membership";
+    begin
+
+        //-NPR5.51 [356090]
+        MembershipSalesSetup.SetFilter ("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
+        MembershipSalesSetup.SetFilter ("Magento M2 Membership Sign-up", '=%1', true);
+        if (not MembershipSalesSetup.FindFirst ()) then
+          exit (false);
+
+        TransferToInfoCapture (TmpContact, MemberInfoCapture);
+        if (not MemberInfoCapture.Insert ()) then
+          exit (false);
+
+        // These functions will blow-up when failing and the error message will propregate back to caller
+        Membership.Get (MembershipManagement.CreateMembershipAll (MembershipSalesSetup, MemberInfoCapture, true));
+        Customer.Get (Membership."Customer No.");
+        MemberInfoCapture.Delete();
+
+        exit (true);
+        //+NPR5.51 [356090]
+    end;
+
+    local procedure AddMembershipMember(var TmpContact: Record Contact temporary;var Contact: Record Contact;CorporateContactNo: Code[20]): Boolean
+    var
+        MemberInfoCapture: Record "MM Member Info Capture";
+        MembershipManagement: Codeunit "MM Membership Management";
+        MembershipRole: Record "MM Membership Role";
+        MemberEntryNo: Integer;
+        ReasonText: Text;
+    begin
+
+        //-NPR5.51 [356090]
+        MembershipRole.SetFilter ("Contact No.", '=%1', CorporateContactNo);
+        if (not MembershipRole.FindFirst ()) then
+          exit (false);
+
+        TransferToInfoCapture (TmpContact, MemberInfoCapture);
+
+        if (not MemberInfoCapture.Insert ()) then
+          exit (false);
+
+        // These functions will blow-up when failing and the error message will propregate back to caller
+        MembershipManagement.AddMemberAndCard (true, MembershipRole."Membership Entry No.", MemberInfoCapture, true, MemberEntryNo, ReasonText);
+
+        MembershipRole.Get (MembershipRole."Membership Entry No.", MemberEntryNo);
+        Contact.Get (MembershipRole."Contact No.");
+
+        MemberInfoCapture.Delete();
+
+        exit (true);
+        //+NPR5.51 [356090]
+    end;
+
+    local procedure UpdateMember(var TmpContact: Record Contact temporary): Boolean
+    var
+        MembershipRole: Record "MM Membership Role";
+        MembershipManagement: Codeunit "MM Membership Management";
+        MemberInfoCapture: Record "MM Member Info Capture";
+    begin
+
+        //-NPR5.51 [356090]
+        MembershipRole.SetFilter ("Contact No.", '=%1', TmpContact."No.");
+        if (not MembershipRole.FindFirst ()) then
+          exit (false);
+
+        TransferToInfoCapture (TmpContact, MemberInfoCapture);
+        if (not MemberInfoCapture.Insert ()) then
+          exit (false);
+
+        exit (MembershipManagement.UpdateMember (MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", MemberInfoCapture));
+        //+NPR5.51 [356090]
+    end;
+
+    local procedure BlockMember(Contact: Record Contact): Boolean
+    var
+        MembershipRole: Record "MM Membership Role";
+        Member: Record "MM Member";
+        Membership: Record "MM Membership";
+        MembershipManagement: Codeunit "MM Membership Management";
+    begin
+
+        //-NPR5.51 [356090]
+        MembershipRole.SetFilter ("Contact No.", '=%1', Contact."No.");
+        if (not MembershipRole.FindFirst ()) then
+          exit (false);
+
+        case Contact.Type of
+          Contact.Type::Company : MembershipManagement.BlockMembership (MembershipRole."Membership Entry No.", true);
+          Contact.Type::Person  : MembershipManagement.BlockMember (MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", true)
+        end;
+
+        exit (true);
+        //+NPR5.51 [356090]
+    end;
+
+    local procedure TransferToInfoCapture(var TmpContact: Record Contact temporary;var MemberInfoCapture: Record "MM Member Info Capture")
+    begin
+
+        //-NPR5.51 [356090]
+        with MemberInfoCapture do begin
+          Init;
+          "Entry No." := 0;
+          "Information Context" := MemberInfoCapture."Information Context"::NEW;
+          "Company Name" := CopyStr (TmpContact."Company Name", 1, MaxStrLen ("Company Name"));
+          "First Name" := CopyStr (TmpContact."First Name", 1, MaxStrLen ("First Name"));
+          "Middle Name" := CopyStr (TmpContact."Middle Name", 1, MaxStrLen ("Middle Name"));
+          "Last Name" := CopyStr (TmpContact.Surname, 1, MaxStrLen ("Last Name"));
+          Address := CopyStr (TmpContact.Address, 1, MaxStrLen (Address));
+          "Post Code Code" := CopyStr (TmpContact."Post Code", 1, MaxStrLen ("Post Code Code"));
+          City := CopyStr (TmpContact.City, 1, MaxStrLen (City));
+          "Country Code" := CopyStr (TmpContact."Country/Region Code", 1, MaxStrLen ("Country Code"));
+
+          "Phone No." := CopyStr (TmpContact."Phone No.", 1, MaxStrLen ("Phone No."));
+          "E-Mail Address" := CopyStr (TmpContact."E-Mail", 1, MaxStrLen ("E-Mail Address"));
+
+          if (TmpContact."E-Mail 2" <> '') then
+            "E-Mail Address" := CopyStr (TmpContact."E-Mail 2", 1, MaxStrLen ("E-Mail Address"));
+        end;
+        //+NPR5.51 [356090]
+    end;
+
     local procedure "---"()
     begin
     end;
@@ -1395,6 +1569,25 @@ codeunit 6151151 "M2 Account Manager"
         end;
 
         exit (NoSerieCode);
+    end;
+
+    local procedure CalculatedName(FirstName: Text[30];MiddleName: Text[30];LastName: Text[30]) NewName: Text[50]
+    var
+        NewName92: Text[92];
+    begin
+
+        //-NPR5.51 [364644]
+        NewName92 := FirstName;
+
+        if (MiddleName <> '') then
+          NewName92 += ' ' + MiddleName;
+
+        if (LastName <> '') then
+          NewName92 += ' ' + LastName;
+
+        NewName92 := DelChr (NewName92,'<',' ');
+        NewName := CopyStr (NewName92, 1, MaxStrLen(NewName));
+        //-NPR5.51 [364644]
     end;
 
     local procedure "--"()

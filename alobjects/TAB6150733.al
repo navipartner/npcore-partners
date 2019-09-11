@@ -1,0 +1,85 @@
+table 6150733 "POS Administrative Template"
+{
+    // NPR5.51/JAKUBV/20190903  CASE 352582 Transport NPR5.51 - 3 September 2019
+
+    Caption = 'POS Administrative Template';
+    DrillDownPageID = "POS Admin. Template List";
+    LookupPageID = "POS Admin. Template List";
+
+    fields
+    {
+        field(1;Id;Guid)
+        {
+            Caption = 'Id';
+            Editable = false;
+        }
+        field(2;Name;Text[100])
+        {
+            Caption = 'Name';
+        }
+        field(3;Version;Text[10])
+        {
+            Caption = 'Version';
+            Editable = false;
+            InitValue = '1.0';
+        }
+        field(4;Status;Option)
+        {
+            Caption = 'Status';
+            OptionCaption = 'Draft,Active,Retired';
+            OptionMembers = Draft,Active,Retired;
+        }
+        field(5;"Persist on Client";Boolean)
+        {
+            Caption = 'Persist on Client';
+        }
+        field(10;"Role Center";Option)
+        {
+            Caption = 'Role Center';
+            OptionCaption = 'Not Defined,Visible,Disabled,Hidden,Password';
+            OptionMembers = "Not Defined",Visible,Disabled,Hidden,Password;
+        }
+        field(11;"Role Center Password";Text[30])
+        {
+            Caption = 'Role Center Password';
+            ExtendedDatatype = Masked;
+        }
+        field(12;Configuration;Option)
+        {
+            Caption = 'Configuration';
+            OptionCaption = 'Not Defined,Visible,Disabled,Hidden,Password';
+            OptionMembers = "Not Defined",Visible,Disabled,Hidden,Password;
+        }
+        field(13;"Configuration Password";Text[30])
+        {
+            Caption = 'Configuration Password';
+            ExtendedDatatype = Masked;
+        }
+    }
+
+    keys
+    {
+        key(Key1;Id)
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+
+    trigger OnDelete()
+    var
+        Scope: Record "POS Admin. Template Scope";
+    begin
+        Scope.SetRange("POS Admin. Template Id",Id);
+        Scope.DeleteAll();
+    end;
+
+    trigger OnInsert()
+    begin
+        if IsNullGuid(Id) then
+          Id := CreateGuid;
+    end;
+}
+

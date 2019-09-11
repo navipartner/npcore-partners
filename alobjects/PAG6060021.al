@@ -1,5 +1,7 @@
 page 6060021 "GIM - Mail List"
 {
+    // NPR5.51/MHA /20190819  CASE 365377 Generic Import Module is deprecated [VLOBJDEL] Object marked for deletion
+
     Caption = 'GIM - Mail List';
     CardPageID = "GIM - Mail";
     Editable = false;
@@ -9,27 +11,6 @@ page 6060021 "GIM - Mail List"
 
     layout
     {
-        area(content)
-        {
-            repeater(Group)
-            {
-                field("Sender ID";"Sender ID")
-                {
-                }
-                field("Process Code";"Process Code")
-                {
-                }
-                field(Description;Description)
-                {
-                }
-                field(Status;Status)
-                {
-                }
-                field("To";"To")
-                {
-                }
-            }
-        }
     }
 
     actions

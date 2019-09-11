@@ -1,6 +1,7 @@
 page 6151172 "NpGp POS Sales Setup Card"
 {
     // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
+    // NPR5.51/ALST/20190711  CASE 337539 obscured password
 
     Caption = 'Global POS Sales Setup Card';
     PageType = Card;
@@ -31,8 +32,17 @@ page 6151172 "NpGp POS Sales Setup Card"
                     field("Service Username";"Service Username")
                     {
                     }
-                    field("Service Password";"Service Password")
+                    field(Password;Password)
                     {
+                        Caption = 'Service Password';
+                        ExtendedDatatype = Masked;
+
+                        trigger OnValidate()
+                        begin
+                            //-NPR5.51 [337539]
+                            HandlePassword(Password);
+                            //+NPR5.51 [337539]
+                        end;
                     }
                     field("Sync POS Sales Immediately";"Sync POS Sales Immediately")
                     {
@@ -67,6 +77,20 @@ page 6151172 "NpGp POS Sales Setup Card"
         }
     }
 
+    trigger OnAfterGetRecord()
+    var
+        ServicePassword: Record "Service Password";
+    begin
+        //-NPR5.51 [337539]
+        if IsNullGuid("Service Password") then
+          exit;
+
+        ServicePassword.SetRange(Key,"Service Password");
+        ServicePassword.FindFirst;
+        Password := ServicePassword.GetPassword;
+        //+NPR5.51 [337539]
+    end;
+
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     var
         NpGpPOSSalesSyncMgt: Codeunit "NpGp POS Sales Sync Mgt.";
@@ -78,5 +102,6 @@ page 6151172 "NpGp POS Sales Setup Card"
     var
         Text000: Label 'Error in Global POS Sales Setup\\Close anway?';
         Text001: Label 'Global POS Sales Setup validated successfully';
+        Password: Text;
 }
 

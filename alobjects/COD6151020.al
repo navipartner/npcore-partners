@@ -3,7 +3,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     // NPR5.42/MHA /20180525  CASE 307022 Object created - Global Retail Voucher
     // NPR5.48/MHA /20180921  CASE 302179 Replaced direct check on Voucher."In-Use Quantity" with CalcInUseQty
     // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner functionality used with Cross Company Vouchers
-    // #361164/MHA /20190705  CASE 361164 Updated Exception Message parsing in InvokeRedeemPartnerVouchers()
+    // NPR5.51/MHA /20190705  CASE 361164 Updated Exception Message parsing in InvokeRedeemPartnerVouchers()
 
 
     trigger OnRun()
@@ -471,7 +471,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
         NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
 
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          //-#361164 [361164]
+          //-NPR5.51 [361164]
           ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
           if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
             NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
@@ -479,7 +479,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
               ErrorMessage := XmlElement.InnerText;
           end;
           Error(CopyStr(ErrorMessage,1,1000));
-          //+#361164 [361164]
+          //+NPR5.51 [361164]
         end;
         //+NPR5.49 [342811]
     end;

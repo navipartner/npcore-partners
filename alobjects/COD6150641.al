@@ -4,6 +4,7 @@ codeunit 6150641 "POS Payment Bin Eject Mgt."
     // NPR5.40.02/MMV /20180418 CASE 311900 Fallback if missing setup
     // NPR5.41/MMV /20180425 CASE 312990 Proper fallback.
     // NPR5.43/MMV /20180627 CASE 320714 Filter on payment amount
+    // NPR5.51/TJ  /20190628 CASE 357069 Drawer opening requirement is now checked based on Open Drawer field
 
 
     trigger OnRun()
@@ -117,7 +118,10 @@ codeunit 6150641 "POS Payment Bin Eject Mgt."
         FilterString: Text;
     begin
         PaymentTypePOS.SetCurrentKey("Processing Type");
-        PaymentTypePOS.SetFilter("Processing Type", '%1|%2', PaymentTypePOS."Processing Type"::Cash, PaymentTypePOS."Processing Type"::"Foreign Currency");
+        //-NPR5.51 [357069]
+        //PaymentTypePOS.SETFILTER("Processing Type", '%1|%2', PaymentTypePOS."Processing Type"::Cash, PaymentTypePOS."Processing Type"::"Foreign Currency");
+        PaymentTypePOS.SetRange("Open Drawer",true);
+        //+NPR5.51 [357069]
         if not PaymentTypePOS.FindSet then
           exit;
 
@@ -147,7 +151,10 @@ codeunit 6150641 "POS Payment Bin Eject Mgt."
         FilterString: Text;
     begin
         PaymentTypePOS.SetCurrentKey("Processing Type");
-        PaymentTypePOS.SetFilter("Processing Type", '%1|%2', PaymentTypePOS."Processing Type"::Cash, PaymentTypePOS."Processing Type"::"Foreign Currency");
+        //-NPR5.51 [357069]
+        //PaymentTypePOS.SETFILTER("Processing Type", '%1|%2', PaymentTypePOS."Processing Type"::Cash, PaymentTypePOS."Processing Type"::"Foreign Currency");
+        PaymentTypePOS.SetRange("Open Drawer",true);
+        //+NPR5.51 [357069]
         if not PaymentTypePOS.FindSet then
           exit;
 

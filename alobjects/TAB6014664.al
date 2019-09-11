@@ -6,6 +6,8 @@ table 6014664 "Stock-Take Worksheet Line"
     // NPR4.21/TSA/20160107 CASE 231081 - Stock Take duplicate items in inv jnl, flowfield "Qty. (Total Counted)" to exclude "Worksheet Name"
     // NPR5.30/TS  /20170207 CASE 265349 Corrected CalcFormula for Variant Description
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 82
+    // /RA  /20190617 CASE 355055 Added field 500
+    // NPR5.51/JAKUBV/20190903  CASE 355055 Transport NPR5.51 - 3 September 2019
 
     Caption = 'Statement Line';
     DrillDownPageID = "Stock-Take Worksheet Line";
@@ -43,9 +45,17 @@ table 6014664 "Stock-Take Worksheet Line"
             TableRelation = Item."No.";
 
             trigger OnValidate()
+            var
+                Item: Record Item;
             begin
                 Validate ("Variant Code", '');
                 Validate ("Item Translation Source", 0);
+
+                //-NPR5.51
+                if Item.Get("Item No.") then begin
+                  "Item Tracking Code" := Item."Item Tracking Code";
+                end;
+                //+NPR5.51
 
                 StockTakeMgr.AssignItemCost (Rec);
             end;
@@ -189,6 +199,12 @@ table 6014664 "Stock-Take Worksheet Line"
             begin
                 ShowDimensions;
             end;
+        }
+        field(500;"Item Tracking Code";Code[10])
+        {
+            Caption = 'Item Tracking Code';
+            Editable = false;
+            TableRelation = "Item Tracking Code";
         }
     }
 

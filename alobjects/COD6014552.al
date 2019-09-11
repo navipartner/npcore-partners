@@ -261,7 +261,7 @@ codeunit 6014552 "Touch - Sales Line POS"
         Text001: Label 'You can not delete a Terminal Accepted payment type! Finish the current sale with/without sales linies.';
     begin
         with SaleLinePOSGlobal do begin
-          if "Cash Terminal Approved" then
+          if "EFT Approved" then
             POSEventMarshaller.DisplayError(Text10600021,Text001,true);
 
           if "Customer No. Line" then

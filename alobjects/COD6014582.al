@@ -18,6 +18,7 @@ codeunit 6014582 "Print Method Mgt."
     // NPR5.30/MMV /20170209 CASE 261964 Updated google print function.
     // NPR5.30/MMV /20170209 CASE 261964 Updated google print function.
     // NPR5.32/MMV /20170313 CASE 253590 Added support for bluetooth print.
+    // NPR5.51/MMV /20190801 CASE 360975 Invoke hardware connector when attempting to print raw outside the POS.
 
 
     trigger OnRun()
@@ -33,21 +34,22 @@ codeunit 6014582 "Print Method Mgt."
 
     procedure PrintBytesLocal(PrinterName: Text;PrintBytes: Text;TargetEncoding: Text)
     var
-        RawPrintProxyProtocol: Codeunit "Raw Print Proxy Protocol";
         POSFrontEnd: Codeunit "POS Front End Management";
         POSProxyRawPrint: Codeunit "POS Proxy - Raw Print";
         POSSession: Codeunit "POS Session";
+        HardwareConnectorMgt: Codeunit "Hardware Connector Mgt.";
     begin
         case CurrentClientType of
           CLIENTTYPE::Windows : PrintBytesViaClientAddin(PrinterName, PrintBytes, TargetEncoding);
           CLIENTTYPE::Web,
           CLIENTTYPE::Tablet,
           CLIENTTYPE::Phone :
-            //IF POSFrontEnd.IsActiveSession() THEN
             if (POSSession.IsActiveSession (POSFrontEnd)) then
               POSProxyRawPrint.Print(POSFrontEnd, PrinterName, TargetEncoding, PrintBytes, false)
             else
-              RawPrintProxyProtocol.PrintJob(PrinterName, TargetEncoding, PrintBytes);
+        //-NPR5.51 [360975]
+              HardwareConnectorMgt.SendRawPrintRequest(PrinterName, PrintBytes, TargetEncoding);
+        //+NPR5.51 [360975]
         end;
     end;
 
@@ -69,7 +71,6 @@ codeunit 6014582 "Print Method Mgt."
           CLIENTTYPE::Web,
           CLIENTTYPE::Tablet,
           CLIENTTYPE::Phone   :
-            //IF POSFrontEnd.IsActiveSession() THEN
             if (POSSession.IsActiveSession (POSFrontEnd)) then
               POSProxyFilePrint.Print(POSFrontEnd, PrinterName, Stream, FileExtension, false, false)
             else

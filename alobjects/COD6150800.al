@@ -457,11 +457,11 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
           "Amount Including VAT" := -1 * pAmount;
           CallTerminalIntegration.Run (PaymentLine);
 
-          if ("Cash Terminal Approved") then begin
+          if ("EFT Approved") then begin
             SaleLine."Unit Price"           := -"Amount Including VAT";
             SaleLine."Amount Including VAT" := -"Amount Including VAT";
             SaleLine.Validate ("No.");
-            SaleLine."Cash Terminal Approved" := true;
+            SaleLine."EFT Approved" := true;
 
             //-NPR5.48 [345292]
             SaleLine.UpdateAmounts (SaleLine);
@@ -475,7 +475,7 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
 
         end;
 
-        exit (PaymentLine."Cash Terminal Approved");
+        exit (PaymentLine."EFT Approved");
     end;
 
     procedure CreateGiftVoucher(var SaleLinePOS: Record "Sale Line POS";VoucherNo: Code[20];GeneratedVoucherNo: Code[20]): Boolean

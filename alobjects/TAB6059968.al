@@ -2,6 +2,7 @@ table 6059968 "MPOS Nets Transactions"
 {
     // NPR5.33/NPKNAV/20170630  CASE 267203 Transport NPR5.33 - 30 June 2017
     // NPR5.34/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
+    // NPR5.51/CLVA/20190808 CASE 364011 Added field "EFT Transaction Entry No."
 
     Caption = 'MPOS Nets Transactions';
     DrillDownPageID = "MPOS Nets Transactions List";
@@ -221,6 +222,11 @@ table 6059968 "MPOS Nets Transactions"
         field(201;"Response Json";BLOB)
         {
             Caption = 'Response Json';
+        }
+        field(300;"EFT Transaction Entry No.";Integer)
+        {
+            Caption = 'EFT Transaction Entry No.';
+            TableRelation = "EFT Transaction Request";
         }
     }
 

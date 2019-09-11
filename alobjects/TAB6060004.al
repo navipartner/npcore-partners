@@ -1,33 +1,20 @@
 table 6060004 "GIM - Setup"
 {
+    // NPR5.51/MHA /20190819  CASE 365377 Generic Import Module is deprecated [VLOBJDEL] Object marked for deletion
+
     Caption = 'GIM - Setup';
 
     fields
     {
-        field(1;"Primary Key";Code[10])
+        field(1;"Entry No.";Integer)
         {
-            Caption = 'Primary Key';
-        }
-        field(10;"Import Document Nos.";Code[10])
-        {
-            Caption = 'Import Document Nos.';
-            TableRelation = "No. Series";
-        }
-        field(20;"Sender E-mail";Text[250])
-        {
-            Caption = 'Sender E-mail';
-        }
-        field(30;"Mailing Templates";Option)
-        {
-            Caption = 'Mailing Templates';
-            OptionCaption = 'GIM,NAVI';
-            OptionMembers = GIM,NAVI;
+            Caption = 'Entry No.';
         }
     }
 
     keys
     {
-        key(Key1;"Primary Key")
+        key(Key1;"Entry No.")
         {
         }
     }

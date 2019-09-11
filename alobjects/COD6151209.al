@@ -1,8 +1,8 @@
 codeunit 6151209 "NpCs Arch. Collect Mgt."
 {
-    // #344264/MHA /20190717  CASE 344264 Object created - Archive Collect in Store Documents
-    // #362443/MHA /20190719  CASE 344264 Added "Opening Hour Set"
-    // #364557/MHA /20190821  CASE 364557 Added "Post on", "Sell-to Customer Name", "Location Code"
+    // NPR5.51/MHA /20190717  CASE 344264 Object created - Archive Collect in Store Documents
+    // NPR5.51/MHA /20190719  CASE 344264 Added "Opening Hour Set"
+    // NPR5.51/MHA /20190821  CASE 364557 Added "Post on", "Sell-to Customer Name", "Location Code"
 
 
     trigger OnRun()
@@ -84,10 +84,10 @@ codeunit 6151209 "NpCs Arch. Collect Mgt."
         NpCsArchDocument."Document Type" := NpCsDocument."Document Type";
         NpCsArchDocument."Document No." := NpCsDocument."Document No.";
         NpCsArchDocument."Reference No." := NpCsDocument."Reference No.";
-        //-#362443 [362443]
+        //-NPR5.51 [362443]
         NpCsArchDocument."Inserted at" := NpCsDocument."Inserted at";
         NpCsArchDocument."Archived at" := CurrentDateTime;
-        //+#362443 [362443]
+        //+NPR5.51 [362443]
         NpCsArchDocument."Workflow Code" := NpCsDocument."Workflow Code";
         NpCsArchDocument."Next Workflow Step" := NpCsDocument."Next Workflow Step";
         NpCsArchDocument."From Document Type" := NpCsDocument."From Document Type";
@@ -99,9 +99,9 @@ codeunit 6151209 "NpCs Arch. Collect Mgt."
         NpCsArchDocument."To Document Type" := NpCsDocument."To Document Type";
         NpCsArchDocument."To Document No." := NpCsDocument."To Document No.";
         NpCsArchDocument."To Store Code" := NpCsDocument."To Store Code";
-        //-#362443 [362443]
+        //-NPR5.51 [362443]
         NpCsArchDocument."Opening Hour Set" := NpCsDocument."Opening Hour Set";
-        //+#362443 [362443]
+        //+NPR5.51 [362443]
         NpCsArchDocument."Processing Expiry Duration" := NpCsDocument."Processing Expiry Duration";
         NpCsArchDocument."Processing Status" := NpCsDocument."Processing Status";
         NpCsArchDocument."Processing updated at" := NpCsDocument."Processing updated at";
@@ -133,14 +133,14 @@ codeunit 6151209 "NpCs Arch. Collect Mgt."
         NpCsArchDocument."Delivery Document No." := NpCsDocument."Delivery Document No.";
         NpCsArchDocument."Archive on Delivery" := NpCsDocument."Archive on Delivery";
         NpCsArchDocument."Location Code" := NpCsDocument."Location Code";
-        //-#364557 [364557]
+        //-NPR5.51 [364557]
         NpCsArchDocument."Sell-to Customer Name" := NpCsDocument."Sell-to Customer Name";
         NpCsArchDocument."Post on" := NpCsDocument."Post on";
-        //+#364557 [364557]
+        //+NPR5.51 [364557]
         NpCsArchDocument."Bill via" := NpCsDocument."Bill via";
-        //-#364557 [364557]
+        //-NPR5.51 [364557]
         NpCsArchDocument."Processing Print Template" := NpCsDocument."Processing Print Template";
-        //+#364557 [364557]
+        //+NPR5.51 [364557]
         NpCsArchDocument."Delivery Print Template (POS)" := NpCsDocument."Delivery Print Template (POS)";
         NpCsArchDocument."Delivery Print Template (S.)" := NpCsDocument."Delivery Print Template (S.)";
         NpCsArchDocument."Salesperson Code" := NpCsDocument."Salesperson Code";

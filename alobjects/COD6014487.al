@@ -2,6 +2,7 @@ codeunit 6014487 "Report Usage Mgt."
 {
     // NPR5.48/TJ  /20181108 CASE 324444 New object
     // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
+    // NPR5.51/ZESO/20190816 CASE 365191 All log Entry only for Reports which fall in 50000..99999
 
 
     trigger OnRun()
@@ -22,6 +23,10 @@ codeunit 6014487 "Report Usage Mgt."
           exit;
         if not ReportUsageSetup.Enabled then
           exit;
+
+        //-NPR5.51 [365191]
+        if ReportID in [50000..99999] then
+        //-NPR5.51 [365191]
         AddToLog(ReportID);
     end;
 

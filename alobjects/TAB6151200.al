@@ -1,7 +1,7 @@
 table 6151200 "NpCs Store Workflow Relation"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #364557/MHA /20190822  CASE 364557 Added field 300 "Processing Print Template"
+    // NPR5.51/MHA /20190822  CASE 364557 Added field 300 "Processing Print Template"
 
     Caption = 'Collect Workflow Relation';
 
@@ -238,7 +238,7 @@ table 6151200 "NpCs Store Workflow Relation"
         field(300;"Processing Print Template";Code[20])
         {
             Caption = 'Processing Print Template';
-            Description = '#364557';
+            Description = 'NPR5.51';
             TableRelation = "RP Template Header" WHERE ("Table ID"=CONST(6151198));
             //This property is currently not supported
             //TestTableRelation = false;
@@ -249,7 +249,7 @@ table 6151200 "NpCs Store Workflow Relation"
                 NpCsStore: Record "NpCs Store";
                 RPTemplateHeader: Record "RP Template Header";
             begin
-                //-#364557 [364557]
+                //-NPR5.51 [364557]
                 NpCsStore.Get("Store Code");
                 if RPTemplateHeader.ChangeCompany(NpCsStore."Company Name") then;
 
@@ -257,7 +257,7 @@ table 6151200 "NpCs Store Workflow Relation"
                 RPTemplateHeader.SetRange("Table ID",DATABASE::"NpCs Document");
                 if PAGE.RunModal(0,RPTemplateHeader) = ACTION::LookupOK then
                   Validate("Processing Print Template",RPTemplateHeader.Code);
-                //+#364557 [364557]
+                //+NPR5.51 [364557]
             end;
         }
         field(305;"Delivery Print Template (POS)";Code[20])

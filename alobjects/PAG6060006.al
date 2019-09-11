@@ -1,5 +1,7 @@
 page 6060006 "GIM - Mapping Columns"
 {
+    // NPR5.51/MHA /20190819  CASE 365377 Generic Import Module is deprecated [VLOBJDEL] Object marked for deletion
+
     Caption = 'GIM - Mapping Columns';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -8,26 +10,6 @@ page 6060006 "GIM - Mapping Columns"
 
     layout
     {
-        area(content)
-        {
-            repeater(Group)
-            {
-                IndentationColumn = Level;
-                IndentationControls = "Column Name";
-                ShowAsTree = true;
-                field("Column Name";"Column Name")
-                {
-                }
-                field("Column No.";"Column No.")
-                {
-                    Editable = false;
-                }
-                field("Parsed Text";"Parsed Text")
-                {
-                    Editable = false;
-                }
-            }
-        }
     }
 
     actions

@@ -19,8 +19,13 @@ table 6150627 "POS Workshift Checkpoint"
     // NPR5.49/TSA /20190312 CASE 347324 Changed "Credit Item Quantity Sum" from Integer To Decimal
     // NPR5.49/TSA /20190312 CASE 348458 Added type Type::WORKSHIFT_CLOSE
     // NPR5.49/TSA /20190315 CASE 348458 Added field "Consolidated With Entry No."
+    // NPR5.51/MMV /20190611 CASE 356076 Added field 11. Blanked option "YREPORT" on field 8.
+    //                                   Renamed a bunch of fields to better signal intent and align with POS entry totalling fields.
+    // NPR5.51/SARA/20190807 CASE 363578 Added page 'POS Workshift Checkpoints' as LookupPageID and DrillDownPageID
 
     Caption = 'POS Workshift Checkpoint';
+    DrillDownPageID = "POS Workshift Checkpoints";
+    LookupPageID = "POS Workshift Checkpoints";
 
     fields
     {
@@ -49,8 +54,8 @@ table 6150627 "POS Workshift Checkpoint"
         field(8;Type;Option)
         {
             Caption = 'Type';
-            OptionCaption = ' ,X-Report,Z-Report,Transfer,Period Report,Annual Report,Workshift Close';
-            OptionMembers = NA,XREPORT,ZREPORT,TRANSFER,PREPORT,YREPORT,WORKSHIFT_CLOSE;
+            OptionCaption = ' ,X-Report,Z-Report,Transfer,Period Report,,Workshift Close';
+            OptionMembers = NA,XREPORT,ZREPORT,TRANSFER,PREPORT,,WORKSHIFT_CLOSE;
         }
         field(9;"Consolidated With Entry No.";Integer)
         {
@@ -59,6 +64,10 @@ table 6150627 "POS Workshift Checkpoint"
         field(10;"Debtor Payment (LCY)";Decimal)
         {
             Caption = 'Debtor Payment (LCY)';
+        }
+        field(11;"Period Type";Code[20])
+        {
+            Caption = 'Period Type';
         }
         field(20;"GL Payment (LCY)";Decimal)
         {
@@ -134,17 +143,21 @@ table 6150627 "POS Workshift Checkpoint"
             Caption = 'Created Credit Voucher (LCY)';
             Description = 'TO BE REMOVE';
         }
-        field(120;"Direct Sales (LCY)";Decimal)
+        field(120;"Direct Item Sales (LCY)";Decimal)
         {
-            Caption = 'Direct Sales (LCY)';
+            Caption = 'Direct Item Sales (LCY)';
         }
         field(121;"Direct Sales - Staff (LCY)";Decimal)
         {
             Caption = 'Direct Sales - Staff (LCY)';
         }
-        field(122;"Direct Net Sales (LCY)";Decimal)
+        field(122;"Direct Item Net Sales (LCY)";Decimal)
         {
-            Caption = 'Direct Net Sales (LCY)';
+            Caption = 'Direct Item Net Sales (LCY)';
+        }
+        field(123;"Direct Item Sales Quantity";Decimal)
+        {
+            Caption = 'Direct Item Sales Quantity';
         }
         field(125;"Direct Sales Count";Integer)
         {
@@ -166,9 +179,9 @@ table 6150627 "POS Workshift Checkpoint"
         {
             Caption = 'Direct Turnover (LCY)';
         }
-        field(133;"Direct Negative Amounts (LCY)";Decimal)
+        field(133;"Direct Negative Turnover (LCY)";Decimal)
         {
-            Caption = 'Direct Negative Amounts (LCY)';
+            Caption = 'Direct Negative Turnover (LCY)';
         }
         field(134;"Direct Net Turnover (LCY)";Decimal)
         {
@@ -186,13 +199,17 @@ table 6150627 "POS Workshift Checkpoint"
         {
             Caption = 'Profit %';
         }
-        field(160;"Direct Return Sales (LCY)";Decimal)
+        field(160;"Direct Item Returns (LCY)";Decimal)
         {
-            Caption = 'Direct Return Sales (LCY)';
+            Caption = 'Direct Item Returns (LCY)';
         }
-        field(165;"Direct Return Sales Line Count";Integer)
+        field(165;"Direct Item Returns Line Count";Integer)
         {
-            Caption = 'Direct Return Sales Line Count';
+            Caption = 'Direct Item Returns Line Count';
+        }
+        field(166;"Direct Item Returns Quantity";Decimal)
+        {
+            Caption = 'Direct Item Returns Quantity';
         }
         field(170;"Credit Real. Sale Amt. (LCY)";Decimal)
         {
@@ -290,13 +307,13 @@ table 6150627 "POS Workshift Checkpoint"
         {
             Caption = 'Calculated Diff (LCY)';
         }
-        field(400;"Item Quantity Sum";Decimal)
+        field(400;"Direct Item Quantity Sum";Decimal)
         {
-            Caption = 'Item Quantity Sum';
+            Caption = 'Direct Item Quantity Sum';
         }
-        field(401;"Item Sales Line Count";Integer)
+        field(401;"Direct Item Sales Line Count";Integer)
         {
-            Caption = 'Item Sales Count';
+            Caption = 'Direct Item Sales Line Count';
         }
         field(405;"Receipts Count";Integer)
         {
@@ -326,21 +343,21 @@ table 6150627 "POS Workshift Checkpoint"
         {
             Caption = 'Opening Cash (LCY)';
         }
-        field(2120;"Perpetual Sales (LCY)";Decimal)
+        field(2120;"Perpetual Dir. Item Sales(LCY)";Decimal)
         {
-            Caption = 'Perpetual Sales (LCY)';
+            Caption = 'Perpetual Dir. Item Sales(LCY)';
         }
-        field(2160;"Perpetual Return Sales (LCY)";Decimal)
+        field(2160;"Perpetual Dir. Item Ret. (LCY)";Decimal)
         {
-            Caption = 'Perpetual Return Sales (LCY)';
+            Caption = 'Perpetual Dir. Item Ret. (LCY)';
         }
         field(2170;"Perpetual Dir. Turnover (LCY)";Decimal)
         {
             Caption = 'Perpetual Dir. Turnover (LCY)';
         }
-        field(2180;"Perpetual Dir. Neg. Amt. (LCY)";Decimal)
+        field(2180;"Perpetual Dir. Neg. Turn (LCY)";Decimal)
         {
-            Caption = 'Perpetual Dir. Neg. Amt (LCY)';
+            Caption = 'Perpetual Dir. Neg. Turn (LCY)';
         }
         field(2190;"Perpetual Rounding Amt. (LCY)";Decimal)
         {
@@ -369,22 +386,22 @@ table 6150627 "POS Workshift Checkpoint"
             OptionCaption = ' ,X-Report,Z-Report,Transfer,Period Report,Annual Report';
             OptionMembers = NA,XREPORT,ZREPORT,TRANSFER,PREPORT,YREPORT;
         }
-        field(3120;"FF Total Sales (LCY)";Decimal)
+        field(3120;"FF Total Dir. Item Sales (LCY)";Decimal)
         {
-            CalcFormula = Sum("POS Workshift Checkpoint"."Direct Sales (LCY)" WHERE ("POS Unit No."=FIELD("POS Unit No. Filter"),
-                                                                                     Type=FIELD("Type Filter"),
-                                                                                     "POS Entry No."=FIELD("POS Entry No. Filter"),
-                                                                                     Open=FIELD("Open Filter")));
-            Caption = 'FF Total Sales (LCY)';
+            CalcFormula = Sum("POS Workshift Checkpoint"."Direct Item Sales (LCY)" WHERE ("POS Unit No."=FIELD("POS Unit No. Filter"),
+                                                                                          Type=FIELD("Type Filter"),
+                                                                                          "POS Entry No."=FIELD("POS Entry No. Filter"),
+                                                                                          Open=FIELD("Open Filter")));
+            Caption = 'FF Total Dir. Item Sales (LCY)';
             FieldClass = FlowField;
         }
-        field(3160;"FF Total Return Sale (LCY)";Decimal)
+        field(3160;"FF Total Dir. Item Return(LCY)";Decimal)
         {
-            CalcFormula = Sum("POS Workshift Checkpoint"."Direct Return Sales (LCY)" WHERE ("POS Unit No."=FIELD("POS Unit No. Filter"),
+            CalcFormula = Sum("POS Workshift Checkpoint"."Direct Item Returns (LCY)" WHERE ("POS Unit No."=FIELD("POS Unit No. Filter"),
                                                                                             Type=FIELD("Type Filter"),
                                                                                             "POS Entry No."=FIELD("POS Entry No. Filter"),
                                                                                             Open=FIELD("Open Filter")));
-            Caption = 'FF Total Return Sales (LCY)';
+            Caption = 'FF Total Dir. Item Return (LCY)';
             FieldClass = FlowField;
         }
         field(3170;"FF Total Dir. Turnover (LCY)";Decimal)
@@ -396,13 +413,13 @@ table 6150627 "POS Workshift Checkpoint"
             Caption = 'FF Total Dir. Turnover (LCY)';
             FieldClass = FlowField;
         }
-        field(3180;"FF Total Dir. Neg. Amt. (LCY)";Decimal)
+        field(3180;"FF Total Dir. Neg. Turn. (LCY)";Decimal)
         {
-            CalcFormula = Sum("POS Workshift Checkpoint"."Direct Negative Amounts (LCY)" WHERE ("POS Unit No."=FIELD("POS Unit No. Filter"),
-                                                                                                Type=FIELD("Type Filter"),
-                                                                                                "POS Entry No."=FIELD("POS Entry No. Filter"),
-                                                                                                Open=FIELD("Open Filter")));
-            Caption = 'FF Total Dir. Neg. Amt (LCY)';
+            CalcFormula = Sum("POS Workshift Checkpoint"."Direct Negative Turnover (LCY)" WHERE ("POS Unit No."=FIELD("POS Unit No. Filter"),
+                                                                                                 Type=FIELD("Type Filter"),
+                                                                                                 "POS Entry No."=FIELD("POS Entry No. Filter"),
+                                                                                                 Open=FIELD("Open Filter")));
+            Caption = 'FF Total Dir. Neg. Turn. (LCY)';
             FieldClass = FlowField;
         }
         field(3190;"FF Total Rounding Amt. (LCY)";Decimal)

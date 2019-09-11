@@ -5,6 +5,7 @@ table 6014582 "OAuth Token"
     // NPR5.29/MMV /20161207 CASE 260366 Changed field 2 type from text to BLOB. Data upgrade is handled by CU 6059991.
     // NPR5.30/MMV /20170208 CASE 261964 Added field "Expires In (Seconds)"
     //                                   Added functions GetValue() & IsExpired().
+    // NPR5.51/MMV /20190617 CASE 358889 Removed non sensical locks.
 
     Caption = 'OAuth Token';
 
@@ -44,9 +45,9 @@ table 6014582 "OAuth Token"
         TempBlob: Record TempBlob temporary;
         OutStream: OutStream;
     begin
-        //-NPR5.30 [261964]
-        LockTable;
-        //+NPR5.30 [261964]
+        //-NPR5.51 [358889]
+        //LOCKTABLE;
+        //+NPR5.51 [358889]
 
         TempBlob.Blob.CreateOutStream(OutStream, TEXTENCODING::UTF8);
         OutStream.WriteText(TokenValue);
@@ -76,9 +77,9 @@ table 6014582 "OAuth Token"
           Result := Insert;
         end;
 
-        //-NPR5.30 [261964]
-        Commit;
-        //+NPR5.30 [261964]
+        //-NPR5.51 [358889]
+        //COMMIT;
+        //+NPR5.51 [358889]
     end;
 
     procedure GetValue(): Text

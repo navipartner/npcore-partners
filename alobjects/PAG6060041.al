@@ -1,9 +1,10 @@
 page 6060041 "Item Worksheets"
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-    // NPR5.23\BR\20160602  CASE 240330 Added field Item No. Prefix and Prefix Code
-    // NPR5.25\BR \20160707 CASE 246088 Added Action Field Setup
-    // NPR5.48/JDH /20181109 CASE 334163 Added Caption to Action
+    // NPR4.18/BR  /20160209  CASE 182391 Object Created
+    // NPR5.23/BR  /20160602  CASE 240330 Added field Item No. Prefix and Prefix Code
+    // NPR5.25/BR  /20160707  CASE 246088 Added Action Field Setup
+    // NPR5.48/JDH /20181109  CASE 334163 Added Caption to Action
+    // NPR5.51/MHA /20190819  CASE 365377 Removed field 160 "GIM Import Document No."
 
     Caption = 'Item Worksheets';
     PageType = List;
@@ -35,9 +36,6 @@ page 6060041 "Item Worksheets"
                 {
                 }
                 field("Item Group";"Item Group")
-                {
-                }
-                field("GIM Import Document No.";"GIM Import Document No.")
                 {
                 }
             }

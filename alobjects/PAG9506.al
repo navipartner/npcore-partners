@@ -1,4 +1,4 @@
-pageextension 50082 pageextension50082 extends "Session List" 
+pageextension 50083 pageextension50083 extends "Session List" 
 {
     // NPR70.00.00.00/TS/20150126 CASE 205355  Added Kill Session
     // NPR5.48/JDH /20181109 CASE 334163 Removed Space from Caption Kill session

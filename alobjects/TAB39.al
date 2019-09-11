@@ -1,4 +1,4 @@
-tableextension 50035 tableextension50035 extends "Purchase Line" 
+tableextension 50036 tableextension50036 extends "Purchase Line" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields : 6014400..6014609

@@ -3,6 +3,7 @@ report 6014460 "Balancing Report -A4 - NEW"
     // NPR5.42/ZESO/20180518  CASE 310459 Object Created
     // NPR5.48/JDH /20181109 CASE 334163 Added Object Caption
     // NPR5.50/JAKUBV/20190603  CASE 345706 Transport NPR5.50 - 3 June 2019
+    // NPR5.51/ZESO/20190717 CASE 360693 Corrected visibility property of EFT, Set All Print Options to Yes on running report
     DefaultLayout = RDLC;
     RDLCLayout = './Balancing Report -A4 - NEW.rdlc';
 
@@ -75,7 +76,7 @@ report 6014460 "Balancing Report -A4 - NEW"
             column(NetTurnoverLCY_;"POS Workshift Checkpoint"."Net Turnover (LCY)")
             {
             }
-            column(DirectReturnSalesLCY_;"POS Workshift Checkpoint"."Direct Return Sales (LCY)")
+            column(DirectReturnSalesLCY_;"POS Workshift Checkpoint"."Direct Item Returns (LCY)")
             {
             }
             column(TotalDiscountLCY_;"POS Workshift Checkpoint"."Total Discount (LCY)")
@@ -114,7 +115,7 @@ report 6014460 "Balancing Report -A4 - NEW"
             column(ReceiptsCount_;"POS Workshift Checkpoint"."Receipts Count")
             {
             }
-            column(ReturnSalesCount_;"POS Workshift Checkpoint"."Direct Return Sales Line Count")
+            column(ReturnSalesCount_;"POS Workshift Checkpoint"."Direct Item Returns Line Count")
             {
             }
             column(ReceiptCopiesCount_;"POS Workshift Checkpoint"."Receipt Copies Count")
@@ -129,7 +130,7 @@ report 6014460 "Balancing Report -A4 - NEW"
             column(DebitsalesCount_;"POS Workshift Checkpoint"."Credit Item Quantity Sum")
             {
             }
-            column(DirectSalesLCY_;"POS Workshift Checkpoint"."Direct Sales (LCY)")
+            column(DirectSalesLCY_;"POS Workshift Checkpoint"."Direct Item Sales (LCY)")
             {
             }
             column(SalesStaffLCY_;"POS Workshift Checkpoint"."Direct Sales - Staff (LCY)")
@@ -243,7 +244,7 @@ report 6014460 "Balancing Report -A4 - NEW"
             column(NetTurnoverLCYlbl_;"POS Workshift Checkpoint".FieldCaption("Net Turnover (LCY)"))
             {
             }
-            column(DirectReturnSalesLCYlbl_;"POS Workshift Checkpoint".FieldCaption("Direct Return Sales (LCY)"))
+            column(DirectReturnSalesLCYlbl_;"POS Workshift Checkpoint".FieldCaption("Direct Item Returns (LCY)"))
             {
             }
             column(TotalDiscountLClbl_;"POS Workshift Checkpoint".FieldCaption("Total Discount (LCY)"))
@@ -282,7 +283,7 @@ report 6014460 "Balancing Report -A4 - NEW"
             column(ReceiptsCountlbl_;"POS Workshift Checkpoint".FieldCaption("Receipts Count"))
             {
             }
-            column(ReturnSalesCountlbl_;"POS Workshift Checkpoint".FieldCaption("Direct Return Sales Line Count"))
+            column(ReturnSalesCountlbl_;"POS Workshift Checkpoint".FieldCaption("Direct Item Returns Line Count"))
             {
             }
             column(ReceiptCopiesCountlbl_;"POS Workshift Checkpoint".FieldCaption("Receipt Copies Count"))
@@ -297,7 +298,7 @@ report 6014460 "Balancing Report -A4 - NEW"
             column(DebitSalesCountlbl_;"POS Workshift Checkpoint".FieldCaption("Credit Item Quantity Sum"))
             {
             }
-            column(DirectSalesLCYlbl_;"POS Workshift Checkpoint".FieldCaption("Direct Sales (LCY)"))
+            column(DirectSalesLCYlbl_;"POS Workshift Checkpoint".FieldCaption("Direct Item Sales (LCY)"))
             {
             }
             column(SalesStaffLCYlbl_;"POS Workshift Checkpoint".FieldCaption("Direct Sales - Staff (LCY)"))
@@ -837,6 +838,21 @@ report 6014460 "Balancing Report -A4 - NEW"
         actions
         {
         }
+
+        trigger OnOpenPage()
+        begin
+            //-NPR5.51 [360693]
+            PrintTurnOver := true;
+            PrintDiscount := true;
+            PrintVAT := true;
+            PrintEFT := true;
+            PrintVouchers := true;
+            PrintCounting := true;
+            PrintCountedAmtInclFloat := true;
+            PrintClosing := true;
+            PrintAttachedBins := true;
+            //+NPR5.51 [360693]
+        end;
     }
 
     labels

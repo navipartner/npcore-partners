@@ -151,7 +151,7 @@ xmlport 6150901 "HC POS Entry"
                     {
                         MinOccurs = Zero;
                     }
-                    fieldelement(salesamount;POSEntry."Sales Amount")
+                    fieldelement(salesamount;POSEntry."Item Sales (LCY)")
                     {
                         MinOccurs = Zero;
                     }
@@ -167,15 +167,15 @@ xmlport 6150901 "HC POS Entry"
                     {
                         MinOccurs = Zero;
                     }
-                    fieldelement(totalamount;POSEntry."Total Amount")
+                    fieldelement(totalamount;POSEntry."Amount Excl. Tax")
                     {
                         MinOccurs = Zero;
                     }
-                    fieldelement(totaltaxamount;POSEntry."Total Tax Amount")
+                    fieldelement(totaltaxamount;POSEntry."Tax Amount")
                     {
                         MinOccurs = Zero;
                     }
-                    fieldelement(totalamountincltax;POSEntry."Total Amount Incl. Tax")
+                    fieldelement(totalamountincltax;POSEntry."Amount Incl. Tax")
                     {
                         MinOccurs = Zero;
                     }

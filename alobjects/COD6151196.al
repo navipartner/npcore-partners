@@ -1,8 +1,8 @@
 codeunit 6151196 "NpCs Workflow Mgt."
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #344264/MHA /20190717  CASE 344264 Bumped version list for update to TaskScheduler in ScheduleRunWorkflow() from NAV10.* and newer
-    // #364557/MHA /20190822  CASE 364557 Removed Calcfields of "Sell-to Customer Name"
+    // NPR5.51/MHA /20190627  CASE 344264 Bumped version list for update to TaskScheduler in ScheduleRunWorkflow() from NAV10.* and newer
+    // NPR5.51/MHA /20190822  CASE 364557 Removed Calcfields of "Sell-to Customer Name"
 
     TableNo = "NpCs Document";
 

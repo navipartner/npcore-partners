@@ -1,7 +1,9 @@
 page 6151387 "CS Stock-Takes Data List"
 {
     // NPR5.50/CLVA/20190304  CASE 332844 Object created
+    // NPR5.51/CLVA/20190902  CASE 365659 Added captions
 
+    Caption = 'CS Stock-Takes Data List';
     DelayedInsert = false;
     DeleteAllowed = false;
     Editable = false;

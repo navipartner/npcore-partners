@@ -2,7 +2,7 @@ table 6060151 "Event Word Layout"
 {
     // NPR5.29/NPKNAV/20170127  CASE 248723 Transport NPR5.29 - 27 januar 2017
     // NPR5.31/TJ  /20170504 CASE 269162 Added code to function CopyRecord
-    // #361677/TJ  /20190717 CASE 361677 Field 10 renamed from "Basic Layout ID" to "Basic Layout Code" and data type changed from Integer to Code 20
+    // NPR5.51/TJ  /20190717 CASE 361677 Field 10 renamed from "Basic Layout ID" to "Basic Layout Code" and data type changed from Integer to Code 20
 
     Caption = 'Event Word Layout';
     LookupPageID = "Event Word Layouts";
@@ -43,10 +43,10 @@ table 6060151 "Event Word Layout"
                   if not Confirm(StrSubstNo(ConfirmLayoutChange,FieldCaption("Basic Layout Code"))) then
                     Error('');
 
-                //-#361677 [361677]
+                //-NPR5.51 [361677]
                 //IF "Basic Layout ID" = 0 THEN BEGIN
                 if "Basic Layout Code" = '' then begin
-                //+#361677 [361677]
+                //+NPR5.51 [361677]
                   Clear(Layout);
                   Clear("XML Part");
                 end else begin

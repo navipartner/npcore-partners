@@ -1,6 +1,8 @@
 codeunit 6151364 "CS UI Item Reclass. Handling"
 {
     // NPR5.50/CLVA/20190527  CASE 355694 Object created
+    // NPR5.51/CLVA/20190527  CASE 355694 Added bin content code by barcode
+    // NPR5.51/CLVA/20190527  CASE 360382 Added option list
 
     TableNo = "CS UI Header";
 
@@ -55,6 +57,11 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         Text016: Label '%1 : %2';
         Text020: Label 'Location Code is blank';
         Text021: Label 'Bin Code is not valid';
+        Text022: Label 'Bin Content do not exist in filter: %1';
+        Text023: Label 'Qty. exceeds Bin Content Quantity';
+        Text024: Label 'New Bin Code is equal existent Bin Code';
+        StrMenuTxt: Text;
+        Text025: Label 'Please select bin';
 
     local procedure ProcessInput()
     var
@@ -98,6 +105,9 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         FuncGroup.KeyDef := CSCommunication.GetFunctionKey(CSUIHeader.Code, TextValue);
 
         ActiveInputField := 1;
+        //-NPR5.51 [360382]
+        StrMenuTxt := '';
+        //+NPR5.51 [360382]
 
         case FuncGroup.KeyDef of
             FuncGroup.KeyDef::Esc:
@@ -258,9 +268,13 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
     var
         Records: DotNet npNetXmlElement;
         CSSetup: Record "CS Setup";
+        Options: DotNet npNetXmlElement;
     begin
         CSCommunication.EncodeUI(CSUIHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
+
+        if AddOptions(Options) then
+          DOMxmlin.DocumentElement.AppendChild(Options);
 
         if AddSummarize(Records) then
             DOMxmlin.DocumentElement.AppendChild(Records);
@@ -275,6 +289,7 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         VariantCode: Code[10];
         ResolvingTable: Integer;
         Item: Record Item;
+        BinContent: Record "Bin Content";
     begin
         if InputValue = '' then begin
             Remark := Text005;
@@ -300,6 +315,31 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
             exit;
         end;
 
+        //-NPR5.51 [355694]
+        Clear(BinContent);
+        BinContent.SetRange("Location Code",CSItemReclassHandling."Location Code");
+        BinContent.SetRange("Item No.",ItemNo);
+        BinContent.SetRange("Variant Code",VariantCode);
+        BinContent.SetFilter(Quantity,'>%1',0);
+        if not BinContent.FindFirst then begin
+          Remark := StrSubstNo(Text022,BinContent.GetFilters());
+          exit;
+        //-NPR5.51 [360382]
+        end else begin
+        //+NPR5.51 [360382]
+          BinContent.CalcFields(Quantity);
+          CSItemReclassHandling."Bin Code" := BinContent."Bin Code";
+          CSItemReclassHandling.Qty := BinContent.Quantity;
+          //-NPR5.51 [360382]
+          repeat
+            BinContent.CalcFields(Quantity);
+            StrMenuTxt := StrMenuTxt + BinContent."Bin Code" + ' | ' + Format(BinContent.Quantity) + ' ' + BinContent."Unit of Measure Code" + ',';
+          until BinContent.Next = 0;
+          StrMenuTxt := CopyStr(StrMenuTxt,1,(StrLen(StrMenuTxt) - 1));
+          //+NPR5.51 [360382]
+        end;
+        //+NPR5.51 [355694]
+
         CSItemReclassHandling.Barcode := InputValue;
     end;
 
@@ -322,16 +362,22 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         BinContent.SetRange("Location Code", CSItemReclassHandlingPlaceholder."Location Code");
         BinContent.SetRange("Item No.", CSItemReclassHandlingPlaceholder."Item No.");
         BinContent.SetRange("Variant Code", CSItemReclassHandlingPlaceholder."Variant Code");
+        BinContent.SetRange("Bin Code",InputValue);
         if not BinContent.FindSet then
             Remark := Text021;
 
         CSItemReclassHandlingPlaceholder."Bin Code" := InputValue;
+        //-NPR5.51 [355694]
+        BinContent.CalcFields(Quantity);
+        CSItemReclassHandlingPlaceholder.Qty := BinContent.Quantity;
+        //+NPR5.51 [355694]
     end;
 
     local procedure CheckNewBinCode(var CSItemReclassHandlingPlaceholder: Record "CS Item Reclass. Handling"; InputValue: Text)
     var
         QtyToHandle: Decimal;
         BinContent: Record "Bin Content";
+        Bin: Record Bin;
     begin
         if InputValue = '' then begin
             Remark := Text009;
@@ -343,12 +389,25 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
             exit;
         end;
 
-        Clear(BinContent);
-        BinContent.SetRange("Location Code", CSItemReclassHandlingPlaceholder."Location Code");
-        BinContent.SetRange("Item No.", CSItemReclassHandlingPlaceholder."Item No.");
-        BinContent.SetRange("Variant Code", CSItemReclassHandlingPlaceholder."Variant Code");
-        if not BinContent.FindSet then
+        //-NPR5.51 [355694]
+        if InputValue = CSItemReclassHandlingPlaceholder."Bin Code" then begin
+          Remark := Text024;
+          exit;
+        end;
+
+        // CLEAR(BinContent);
+        // BinContent.SETRANGE("Location Code",CSItemReclassHandlingPlaceholder."Location Code");
+        // BinContent.SETRANGE("Item No.",CSItemReclassHandlingPlaceholder."Item No.");
+        // BinContent.SETRANGE("Variant Code",CSItemReclassHandlingPlaceholder."Variant Code");
+        // IF NOT BinContent.FINDSET THEN
+        //  Remark := Text021;
+
+        Clear(Bin);
+        Bin.SetRange("Location Code",CSItemReclassHandlingPlaceholder."Location Code");
+        Bin.SetRange(Code,InputValue);
+        if not Bin.FindSet then
             Remark := Text021;
+        //+NPR5.51 [355694]
 
         CSItemReclassHandlingPlaceholder."New Bin Code" := InputValue;
     end;
@@ -356,6 +415,7 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
     local procedure CheckQty(var CSItemReclassHandlingPlaceholder: Record "CS Item Reclass. Handling"; InputValue: Text)
     var
         Qty: Decimal;
+        BinContent: Record "Bin Content";
     begin
         if InputValue = '' then begin
             Remark := Text011;
@@ -366,6 +426,27 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
             Remark := Text013;
             exit;
         end;
+
+        //-NPR5.51 [355694]
+        Clear(BinContent);
+        BinContent.SetRange("Location Code",CSItemReclassHandlingPlaceholder."Location Code");
+        BinContent.SetRange("Item No.",CSItemReclassHandlingPlaceholder."Item No.");
+        BinContent.SetRange("Variant Code",CSItemReclassHandlingPlaceholder."Variant Code");
+        BinContent.SetRange("Bin Code",CSItemReclassHandlingPlaceholder."Bin Code");
+        BinContent.SetFilter(Quantity,'>%1',0);
+        if not BinContent.FindFirst then begin
+          Remark := StrSubstNo(Text022,BinContent.GetFilters());
+          exit;
+        end;
+
+        //-NPR5.51 [355694]
+        BinContent.CalcFields(Quantity);
+        //+NPR5.51 [355694]
+        if Qty > BinContent.Quantity then begin
+          Remark := Text023;
+          exit;
+        end;
+        //+NPR5.51 [355694]
 
         CSItemReclassHandlingPlaceholder.Qty := Qty;
     end;
@@ -601,6 +682,20 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         exit(NotEmptyResult);
     end;
 
+    local procedure AddOptions(var Options: DotNet npNetXmlElement) NotEmptyResult: Boolean
+    begin
+        NotEmptyResult := StrMenuTxt <> '';
+
+        if not NotEmptyResult then
+          exit(NotEmptyResult);
+
+        Options := DOMxmlin.CreateElement('Options');
+        AddAttribute(Options,'Descrip',Text025);
+        Options.InnerText := StrMenuTxt;
+
+        exit(NotEmptyResult);
+    end;
+
     local procedure Reset(var CurrCSItemReclassHandling: Record "CS Item Reclass. Handling")
     var
         CSItemReclassHandling: Record "CS Item Reclass. Handling";
@@ -658,6 +753,7 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         ItemJnlTemplate: Record "Item Journal Template";
         ItemJnlBatch: Record "Item Journal Batch";
         NoSeriesMgt: Codeunit NoSeriesManagement;
+        ItemJnlPostBatch: Codeunit "Item Jnl.-Post Batch";
     begin
         Clear(NewItemJournalLine);
         NewItemJournalLine.SetRange("Journal Template Name", CSSetup."Item Reclass. Jour Temp Name");
@@ -695,6 +791,10 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         ItemJournalLine."Posting No. Series" := ItemJnlBatch."Posting No. Series";
         ItemJournalLine."External Document No." := CSSessionId;
         ItemJournalLine.Modify(true);
+
+        //-NPR5.51 [355694]
+        ItemJnlPostBatch.Run(ItemJournalLine);
+        //+NPR5.51 [355694]
 
         exit(true);
     end;

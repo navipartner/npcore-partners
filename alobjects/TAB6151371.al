@@ -9,6 +9,8 @@ table 6151371 "CS Setup"
     // NPR5.49/TJ  /20190218 CASE 346066 Added field "Zero Def. Qty. to Handle"
     // NPR5.50/CLVA/20190304 CASE 332844 Added field "Stock-Take Template"
     // NPR5.50/CLVA/20190527 CASE 355694 Added field "Item Reclass. Jour Temp Name" and "Item Reclass. Jour Batch Name"
+    // NPR5.51/CLVA/20190627 CASE 359375 Added field Create Worksheet after Trans. for re-creation of worksheet after Stock-Take transfer
+    // NPR5.51/CLVA/20190812 CASE 362173 Added field "Phys. Inv Jour Temp Name" and "Phys. Inv Jour No. Series"
 
     Caption = 'CS Setup';
 
@@ -104,6 +106,20 @@ table 6151371 "CS Setup"
         {
             Caption = 'Item Reclass. Jour Batch Name';
             TableRelation = "Item Journal Batch".Name WHERE ("Journal Template Name"=FIELD("Item Reclass. Jour Temp Name"));
+        }
+        field(26;"Create Worksheet after Trans.";Boolean)
+        {
+            Caption = 'Create Worksheet after Trans.';
+        }
+        field(27;"Phys. Inv Jour Temp Name";Code[10])
+        {
+            Caption = 'Phys. Inv Jour Temp Name';
+            TableRelation = "Item Journal Template";
+        }
+        field(28;"Phys. Inv Jour No. Series";Code[10])
+        {
+            Caption = 'Phys. Inv Jour No. Series';
+            TableRelation = "No. Series";
         }
     }
 

@@ -1,7 +1,7 @@
 codeunit 6151204 "NpCs Store Mgt."
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #364557/MHA /20190821  CASE 364557 FindLocalStore() now considers more than one local store
+    // NPR5.51/MHA /20190821  CASE 364557 FindLocalStore() now considers more than one local store
 
 
     trigger OnRun()
@@ -216,10 +216,10 @@ codeunit 6151204 "NpCs Store Mgt."
     var
         LastCode: Text;
     begin
-        //-#364557 [364557]
+        //-NPR5.51 [364557]
         Clear(NpCsStore);
         NpCsStore.SetRange("Local Store",true);
-        //-#364557 [364557]
+        //-NPR5.51 [364557]
         NpCsStore.FindLast;
         LastCode := NpCsStore.Code;
         NpCsStore.FindFirst;
@@ -231,7 +231,7 @@ codeunit 6151204 "NpCs Store Mgt."
           exit(true);
 
         exit(false);
-        //+#364557 [364557]
+        //+NPR5.51 [364557]
     end;
 
     local procedure "--- Store Inventory"()

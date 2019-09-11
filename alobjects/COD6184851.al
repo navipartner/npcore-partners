@@ -1,7 +1,8 @@
 codeunit 6184851 "FR Audit Archive Workshifts"
 {
     // NPR5.48/MMV /20181025 CASE 318028 Created object
-    // Finds new P workshifts, refreshes all audit entries created within the workshift and archives them.
+    // Finds new P monthly workshifts, refreshes all audit entries created within the workshift and archives them.
+    // NPR5.51/MMV /20190704 CASE 356076 Added filter
 
 
     trigger OnRun()
@@ -15,6 +16,9 @@ codeunit 6184851 "FR Audit Archive Workshifts"
 
         POSWorkshiftCheckpoint.SetFilter("Entry No.", '>%1', FRCertificationSetup."Last Auto Archived Workshift");
         POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::PREPORT);
+        //-NPR5.51 [356076]
+        POSWorkshiftCheckpoint.SetRange("Period Type", 'FR_NF525_MONTH');
+        //+NPR5.51 [356076]
         if POSWorkshiftCheckpoint.FindSet then
           repeat
             FRCertificationSetup."Last Auto Archived Workshift" := POSWorkshiftCheckpoint."Entry No.";

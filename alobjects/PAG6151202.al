@@ -1,7 +1,7 @@
 page 6151202 "NpCs Store Card Workflows"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #364557/MHA /20190822  CASE 364557 Added field 300 "Processing Print Template"
+    // NPR5.51/MHA /20190822  CASE 364557 Added field 300 "Processing Print Template"
 
     Caption = 'Store Workflow Relations';
     DelayedInsert = true;

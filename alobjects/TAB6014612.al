@@ -3,6 +3,7 @@ table 6014612 "Retail Campaign Items"
     // NPR5.38.01/JKL/20180206 CASE table created
     // NPR5.41/JKL /20180419 CASE 299278  added campaign profit calc + vendor item no from item + units pr. parcel + unit purchase price
     // NPR5.42/JKL /20180523 CASE 299272  changed calc for profit + current purchprice
+    // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup() and removed redundant VAT calculation
 
     Caption = 'Period Discount Items';
 
@@ -545,6 +546,8 @@ table 6014612 "Retail Campaign Items"
         Item: Record Item;
         ItemGroup: Record "Item Group";
         VATPostingSetup: Record "VAT Posting Setup";
+        POSTaxCalculation: Codeunit "POS Tax Calculation";
+        Handled: Boolean;
         VATPct: Decimal;
     begin
         //-NPR5.41 [299278]
@@ -553,10 +556,12 @@ table 6014612 "Retail Campaign Items"
 
         if Item.Get("Item No.") then begin
           VATPct := 0;
-          VATPostingSetup.SetRange(VATPostingSetup."VAT Bus. Posting Group",Item."VAT Bus. Posting Gr. (Price)");
-          VATPostingSetup.SetRange(VATPostingSetup."VAT Prod. Posting Group",Item."VAT Prod. Posting Group");
-          if VATPostingSetup.Find('-') then
+          //-NPR5.51 [358985]
+          if VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)",Item."VAT Prod. Posting Group") then begin
+            POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
             VATPct := VATPostingSetup."VAT %";
+          end;
+          //+NPR5.51 [358985]
           if ((VATPct > 0) and (Item."Price Includes VAT")) then begin
             if (("Campaign Unit Price" > 0) and ("Campaign Unit Cost" > 0)) then begin
               Profit := Round(((("Campaign Unit Price"/(1 + VATPct / 100)) / "Campaign Unit Cost") * 100) - 100,0.001);

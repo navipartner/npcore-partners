@@ -3,6 +3,7 @@ table 6184508 "EFT Adyen Payment Type Setup"
     // NPR5.49/MMV /20190401 CASE 345188 Created object
     // NPR5.49/MMV /20190410 CASE 347476 Added field 7
     // NPR5.50/MMV /20190430 CASE 352465 Added field 8
+    // NPR5.51/MMV /20190520 CASE 355433 Added field 9, 10
 
     Caption = 'EFT Adyen Payment Type Setup';
 
@@ -49,6 +50,15 @@ table 6184508 "EFT Adyen Payment Type Setup"
         field(8;"Silent Discount Allowed";Boolean)
         {
             Caption = 'Silent Discount Allowed';
+        }
+        field(9;"Capture Delay Hours";Integer)
+        {
+            BlankZero = true;
+            Caption = 'Capture Delay Hours';
+        }
+        field(10;"Cashback Allowed";Boolean)
+        {
+            Caption = 'Cashback Allowed';
         }
     }
 

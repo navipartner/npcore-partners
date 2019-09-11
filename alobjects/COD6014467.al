@@ -11,6 +11,8 @@ codeunit 6014467 "Retail Journal Code"
     // NPR5.49/MMV /20190314 CASE 347537 Marking object without modification to trigger re-release of 5.46.04
     // NPR5.49/ZESO/20190214 CASE 334538 Reworked Function for Sales Return
     // NPR5.50/ZESO/20190513 CASE 353996 Read Unit Price from Purchase Line instead of from Item Card.
+    // NPR5.51/BHR /20190614 CASE 358287  Add retail print and Price label for Posted Purchase Invoice
+    // NPR5.51/BHR /20190722 CASE 348731  Add selection for Purchase lines Quantity
 
 
     trigger OnRun()
@@ -22,6 +24,8 @@ codeunit 6014467 "Retail Journal Code"
         RetailJnlHeader: Record "Retail Journal Header";
         LineNo: Integer;
         Text003: Label 'Filters - %1', Comment='%1 = Table Name';
+        Selection: Integer;
+        Text004: Label '&Quantity,Quantity &to Receive,Quantity &Received';
 
     procedure ExportToRetailJournal(var RetailJournalLine: Record "Retail Journal Line")
     var
@@ -527,7 +531,11 @@ codeunit 6014467 "Retail Journal Code"
         //-NPR5.46 [294354]
         if not SetRetailJnl(RetailJnlCode) then
           exit;
-
+        //-NPR5.51 [348731]
+        Selection := StrMenu(Text004,1);
+        if Selection = 0 then
+          exit;
+        //+NPR5.51 [348731]
         with PurchaseLine do begin
           SetRange(Type, Type::Item);
           RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
@@ -540,7 +548,14 @@ codeunit 6014467 "Retail Journal Code"
               RetailJnlLine.SetItem("No.", "Variant Code", "Cross-Reference No.")
             else
               RetailJnlLine.SetItem("No.", "Variant Code", '');
-            RetailJnlLine."Quantity to Print" := Quantity;
+            //-NPR5.51 [348731]
+            //RetailJnlLine."Quantity to Print" := Quantity;
+              case Selection of
+                1: RetailJnlLine."Quantity to Print" := Quantity;
+                2: RetailJnlLine."Quantity to Print" := "Qty. to Receive";
+                3: RetailJnlLine."Quantity to Print" := "Quantity Received";
+              end;
+            //+NPR5.51 [348731]
             //+NPR5.46.04 [334681]
 
 
@@ -554,6 +569,53 @@ codeunit 6014467 "Retail Journal Code"
         end;
         RetailJnlLine.CloseGUI;
         //+NPR5.46 [294354]
+    end;
+
+    procedure PostedPurchaseInvoice2RetailJnl(PurchaseInvoiceNo: Code[20];RetailJnlCode: Code[40])
+    var
+        PurchInvHeader: Record "Purch. Inv. Header";
+        PurchInvLine: Record "Purch. Inv. Line";
+    begin
+        //-NPR5.51 [358287]
+        if PurchaseInvoiceNo= '' then begin
+          if not (PAGE.RunModal(0, PurchInvHeader) = ACTION::LookupOK) then
+            exit;
+        end else
+          PurchInvHeader.Get( PurchaseInvoiceNo);
+
+        PurchInvLine.SetRange("Document No.",PurchInvHeader."No.");
+        CopyPostedPurchaseInv2RetailJnlLines(PurchInvLine,RetailJnlCode);
+        //+NPR5.51 [358287]
+    end;
+
+    procedure CopyPostedPurchaseInv2RetailJnlLines(var PurchInvLine: Record "Purch. Inv. Line";RetailJnlCode: Code[40])
+    var
+        RetailJnlLine: Record "Retail Journal Line";
+    begin
+        //-NPR5.51 [358287]
+        if not SetRetailJnl(RetailJnlCode) then
+          exit;
+
+        with PurchInvLine do begin
+          SetRange(Type, Type::Item);
+          RetailJnlLine.SelectRetailJournal(RetailJnlHeader."No.");
+          RetailJnlLine.UseGUI(Count);
+          if FindSet then repeat
+            RetailJnlLine.InitLine;
+
+            if "Cross-Reference Type" = "Cross-Reference Type"::"Bar Code" then
+              RetailJnlLine.SetItem("No.", "Variant Code", "Cross-Reference No.")
+            else
+              RetailJnlLine.SetItem("No.", "Variant Code", '');
+            RetailJnlLine."Quantity to Print" := Quantity;
+
+            RetailJnlLine."Unit Price" := PurchInvLine."Unit Price (LCY)";
+            RetailJnlLine."Last Direct Cost" := PurchInvLine."Direct Unit Cost";
+            RetailJnlLine.Insert();
+          until Next = 0;
+        end;
+        RetailJnlLine.CloseGUI;
+        //+NPR5.51 [358287]
     end;
 
     procedure SetRetailJnl(var RetailJnlCode: Code[40]) Selected: Boolean

@@ -1,8 +1,8 @@
 xmlport 6151157 "M2 Add Account"
 {
-    // 
     // NPR5.49/TSA /20190307 CASE 347894 Changed PasswordMD5 to PasswordHash
     // NPR5.49/JAKUBV/20190402  CASE 320424-01 Transport NPR5.49 - 1 April 2019
+    // NPR5.51/TSA /20190812 CASE 364644 Added Person section
 
     Caption = 'Add Account';
     Encoding = UTF8;
@@ -128,6 +128,27 @@ xmlport 6151157 "M2 Add Account"
                     }
                     fieldelement(Name;TmpContactResponse.Name)
                     {
+                    }
+                    textelement(personresponse)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                        XmlName = 'Person';
+                        fieldelement(FirstName;TmpContactResponse."First Name")
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(LastName;TmpContactResponse.Surname)
+                        {
+                            MinOccurs = Zero;
+                        }
+
+                        trigger OnBeforePassVariable()
+                        begin
+
+                            if (TmpContactResponse."First Name" = '') and (TmpContactResponse.Surname = '') then
+                              currXMLport.Skip;
+                        end;
                     }
                     fieldelement(CompanyName;TmpContactResponse."Company Name")
                     {

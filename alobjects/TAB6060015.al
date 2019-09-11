@@ -1,47 +1,21 @@
 table 6060015 "GIM - Mail Header"
 {
+    // NPR5.51/MHA /20190819  CASE 365377 Generic Import Module is deprecated [VLOBJDEL] Object marked for deletion
+
     Caption = 'GIM - Mail Header';
     LookupPageID = "GIM - Mail List";
 
     fields
     {
-        field(1;"Sender ID";Code[20])
+        field(1;"Entry No.";Integer)
         {
-            Caption = 'Sender ID';
-            TableRelation = "GIM - Document Type"."Sender ID";
-        }
-        field(2;"Process Code";Code[10])
-        {
-            Caption = 'Process Code';
-            TableRelation = "GIM - Process Flow".Code;
-        }
-        field(10;Description;Text[30])
-        {
-            Caption = 'Description';
-        }
-        field(20;"To";Text[250])
-        {
-            Caption = 'To';
-        }
-        field(30;Cc;Text[250])
-        {
-            Caption = 'Cc';
-        }
-        field(40;Subject;Text[30])
-        {
-            Caption = 'Subject';
-        }
-        field(50;Status;Option)
-        {
-            Caption = 'Status';
-            OptionCaption = ' ,Ready';
-            OptionMembers = " ",Ready;
+            Caption = 'Entry No.';
         }
     }
 
     keys
     {
-        key(Key1;"Sender ID","Process Code")
+        key(Key1;"Entry No.")
         {
         }
     }
@@ -49,26 +23,5 @@ table 6060015 "GIM - Mail Header"
     fieldgroups
     {
     }
-
-    trigger OnDelete()
-    begin
-        TestStatusOpen();
-    end;
-
-    trigger OnModify()
-    begin
-        TestStatusOpen();
-    end;
-
-    procedure TestStatusOpen()
-    begin
-        TestField(Status,Status::" ");
-    end;
-
-    procedure StatusChanger(NewStatus: Integer)
-    begin
-        Status := NewStatus;
-        Modify;
-    end;
 }
 

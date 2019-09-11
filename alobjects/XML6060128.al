@@ -10,6 +10,7 @@ xmlport 6060128 "MM Add Member"
     // MM1.24/TSA /20171031 CASE 276832 - Added optional element guardianmembernumber
     // MM1.24/TSA /20171031 CASE 276832 - Refactored membercard section to elements instead of attributes
     // MM1.29/TSA /20180516 CASE 313795 - Added GDPR Approval status
+    // MM1.40/TSA /20190827 CASE 360242 - Added Attributes
 
     Caption = 'Add Member';
     FormatEvaluate = Xml;
@@ -103,6 +104,29 @@ xmlport 6060128 "MM Add Member"
                     {
                         MinOccurs = Zero;
                     }
+                    textelement(attributes)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                        tableelement(tmpattributevalueset;"NPR Attribute Value Set")
+                        {
+                            MinOccurs = Zero;
+                            XmlName = 'attribute';
+                            UseTemporary = true;
+                            fieldattribute(code;TmpAttributeValueSet."Attribute Code")
+                            {
+                            }
+                            fieldattribute(value;TmpAttributeValueSet."Text Value")
+                            {
+                            }
+
+                            trigger OnBeforeInsertRecord()
+                            begin
+                                EntryNo += 1;
+                                TmpAttributeValueSet."Attribute Set ID" := EntryNo;
+                            end;
+                        }
+                    }
                 }
                 tableelement(tmpmember;"MM Member")
                 {
@@ -162,6 +186,7 @@ xmlport 6060128 "MM Add Member"
 
     var
         OutStr: OutStream;
+        EntryNo: Integer;
 
     procedure ClearResponse()
     begin

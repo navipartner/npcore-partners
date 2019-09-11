@@ -6,6 +6,8 @@ codeunit 6150793 "POS Action - Open Cash Drawer"
     // NPR5.40.02/MMV /20180418 CASE 311900 Fallback if missing setup
     // NPR5.41/MMV /20180425 CASE 312990 Proper fallback.
     // NPR5.46/TSA /20180925 CASE 314603 Implementing Secure Methods as security model, removing old security model (refactoring) & removing all comments (cleanup)
+    // NPR5.51/MHA /20190613 CASE 358392 Added find before modify in OnAction() in case POSSale is not current
+    // NPR5.51/ALST/20190614 CASE 353516 changed action to allow for cash drawer opening before sale is started
 
 
     trigger OnRun()
@@ -24,7 +26,7 @@ codeunit 6150793 "POS Action - Open Cash Drawer"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.3');
+        exit('1.4');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -54,6 +56,7 @@ codeunit 6150793 "POS Action - Open Cash Drawer"
         SalePOS: Record "Sale POS";
         POSSetup: Codeunit "POS Setup";
         POSUnit: Record "POS Unit";
+        RecID: RecordID;
     begin
         if not Action.IsThisAction(ActionCode) then
           exit;
@@ -64,6 +67,9 @@ codeunit 6150793 "POS Action - Open Cash Drawer"
 
         POSSession.GetSetup (POSSetup);
         POSSession.GetSale (POSSale);
+        //-NPR5.51
+        RecID := SalePOS.RecordId;
+        //+NPR5.51
         POSSale.GetCurrentSale (SalePOS);
 
         if (CashDrawerNo = '') then begin
@@ -73,9 +79,16 @@ codeunit 6150793 "POS Action - Open Cash Drawer"
 
         OpenDrawer(CashDrawerNo, SalePOS);
 
-        SalePOS."Drawer Opened" := true;
-        SalePOS.Modify;
-        POSSale.Refresh(SalePOS);
+        //-NPR5.51
+        if SalePOS.RecordId <> RecID then begin
+        //+NPR5.51
+          //-NPR5.51 [358392]
+          SalePOS.Find;
+          //+NPR5.51 [358392]
+          SalePOS."Drawer Opened" := true;
+          SalePOS.Modify;
+          POSSale.Refresh(SalePOS);
+        end;
 
         Handled := true;
     end;

@@ -7,6 +7,7 @@ codeunit 6014502 SMS
     // NPR4.21/KN/20160218 CASE 213605 Added functionality to distinguish between danish and foreign phone numbers.
     // NPR5.38/MHA /20180105  CASE 301053 Added ConstValue to empty Text Constant ErrEmpty and deleted unused function SendSMSMultiple()
     // NPR5.40/JDH /20180320 CASE 308647 cleaned up code and variables
+    // NPR5.51/THRO/20190710 CASE 360944 Added option to send sms to Nc Endpoint
 
 
     trigger OnRun()
@@ -18,13 +19,22 @@ codeunit 6014502 SMS
         IComm: Record "I-Comm";
         ErrEmpty: Label 'Sms message and/or Phone No. is blank';
         Envfunc: Codeunit "NPR Environment Mgt.";
+        SendFailedErr: Label 'Upload to Endpoint %1 failed.';
 
     procedure SendSMS(Tlf: Code[20];SMSMessage: Text[250])
     var
+        NcEndpoint: Record "Nc Endpoint";
+        NcTaskOutput: Record "Nc Task Output" temporary;
         SMSFile: File;
         BSlash: Label '\';
         ErrNotSend: Label 'The mail could not be sent.';
         Utility: Codeunit Utility;
+        NcEndpointMgt: Codeunit "Nc Endpoint Mgt.";
+        OStream: OutStream;
+        FileContent: Text;
+        FileName: Text[250];
+        CRLF: Text;
+        Response: Text;
     begin
         IComm.Get;
         if (Tlf = '') or (SMSMessage = '') then
@@ -45,6 +55,30 @@ codeunit 6014502 SMS
               SMSFile.Close;
             end;
           IComm."SMS Type"::Eclub : SmsEclub(Tlf,SMSMessage,IComm."E-Club Sender");
+          //-NPR5.51 [360944]
+          IComm."SMS Type"::Endpoint:
+            begin
+              IComm.TestField("SMS Endpoint");
+              NcEndpoint.Get(IComm."SMS Endpoint");
+              NcEndpoint.TestField(Enabled);
+              CRLF[1] := 13;
+              CRLF[2] := 10;
+              OnBeforeGenerateEndpointOutputFile(NcEndpoint.Code,IComm."Local E-Mail Address",Tlf,SMSMessage,FileContent,FileName);
+              if FileContent = '' then begin
+                FileContent := 'from: ' + IComm."Local E-Mail Address" + CRLF;
+                FileContent += 'to: ' + Tlf + IComm."SMS-Address Postfix" + CRLF;
+                FileContent += 'subject: ' + SMSMessage;
+              end;
+              if FileName = '' then
+                FileName := IComm."Local SMTP Pickup Library" + BSlash + Tlf + '.txt';
+              NcTaskOutput.Data.CreateOutStream(OStream, TEXTENCODING::Windows);
+              OStream.WriteText(FileContent);
+              NcTaskOutput.Insert(false);
+              NcTaskOutput.Name := FileName;
+              if not NcEndpointMgt.RunEndpoint(NcTaskOutput,NcEndpoint, Response) then
+                Error(SendFailedErr,NcEndpoint.Code);
+            end;
+          //-NPR5.51 [360944]
         end;
     end;
 
@@ -129,6 +163,11 @@ codeunit 6014502 SMS
         if not InteractionLogEntry.FindLast then
           exit(1);
         exit(InteractionLogEntry."Entry No."+1);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGenerateEndpointOutputFile(NcEndpointCode: Code[20];Sender: Text[40];ToPhone: Code[20];SmsMessage: Text[250];var FileContent: Text;var Filename: Text[250])
+    begin
     end;
 }
 

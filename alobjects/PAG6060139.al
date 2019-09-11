@@ -2,6 +2,7 @@ page 6060139 "MM Create Membership"
 {
     // MM1.00/TSA/20151217  CASE 229684 NaviPartner Member Management Module
     // MM1.10/TSA/20160331  CASE 234591 CreateMembershipAll changed signature
+    // MM1.40/TSA /20190808 CASE 363147 CreateMembership was stale, invokes a maintained functions on 6060125 instead of duplicating functionality
 
     Caption = 'Create Membership';
     DeleteAllowed = false;
@@ -102,33 +103,31 @@ page 6060139 "MM Create Membership"
 
     local procedure CreateMembership()
     var
-        MemberInfoCapture: Record "MM Member Info Capture";
-        MemberInfoCapturePage: Page "MM Member Info Capture";
-        MembershipPage: Page "MM Membership Card";
-        PageAction: Action;
-        MembershipManagement: Codeunit "MM Membership Management";
-        MembershipEntryNo: Integer;
-        Membership: Record "MM Membership";
+        MembershipSalesSetup: Page "MM Membership Sales Setup";
     begin
 
-        MemberInfoCapture.Init ();
-        MemberInfoCapture.Insert ();
+        //-MM1.40 [363147]
+        // MemberInfoCapture.INIT ();
+        // MemberInfoCapture.INSERT ();
+        //
+        // MemberInfoCapturePage.SETRECORD (MemberInfoCapture);
+        // MemberInfoCapture.SETFILTER ("Entry No.", '=%1', MemberInfoCapture."Entry No.");
+        // MemberInfoCapturePage.SETTABLEVIEW (MemberInfoCapture);
+        // COMMIT ();
+        //
+        // MemberInfoCapturePage.LOOKUPMODE (TRUE);
+        // PageAction := MemberInfoCapturePage.RUNMODAL ();
+        //
+        // IF (PageAction = ACTION::LookupOK) THEN BEGIN
+        //  MemberInfoCapturePage.GETRECORD (MemberInfoCapture);
+        //  MembershipEntryNo := MembershipManagement.CreateMembershipAll (Rec, MemberInfoCapture, TRUE);
+        //  Membership.GET (MembershipEntryNo);
+        //  MembershipPage.SETRECORD (Membership);
+        //  MembershipPage.RUN ();
+        // END;
 
-        MemberInfoCapturePage.SetRecord (MemberInfoCapture);
-        MemberInfoCapture.SetFilter ("Entry No.", '=%1', MemberInfoCapture."Entry No.");
-        MemberInfoCapturePage.SetTableView (MemberInfoCapture);
-        Commit ();
-
-        MemberInfoCapturePage.LookupMode (true);
-        PageAction := MemberInfoCapturePage.RunModal ();
-
-        if (PageAction = ACTION::LookupOK) then begin
-          MemberInfoCapturePage.GetRecord (MemberInfoCapture);
-          MembershipEntryNo := MembershipManagement.CreateMembershipAll (Rec, MemberInfoCapture, true);
-          Membership.Get (MembershipEntryNo);
-          MembershipPage.SetRecord (Membership);
-          MembershipPage.Run ();
-        end;
+        MembershipSalesSetup.CreateMembership (Rec);
+        //+MM1.40 [363147]
     end;
 }
 

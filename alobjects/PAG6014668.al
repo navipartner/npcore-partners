@@ -1,6 +1,7 @@
 page 6014668 "Stock-Take Configuration Card"
 {
     // NPR4.16/TS/20150527 CASE213313  Page Created
+    // NPR5.51/TSA /20190722 CASE 359375 Added field "Keep Worksheets"
 
     Caption = 'Stock-Take Configuration Card';
     PageType = Card;
@@ -45,8 +46,15 @@ page 6014668 "Stock-Take Configuration Card"
                 field("Session Based Transfer";"Session Based Transfer")
                 {
                 }
-                field("Data Release";"Data Release")
+                group(Control6014401)
                 {
+                    ShowCaption = false;
+                    field("Data Release";"Data Release")
+                    {
+                    }
+                    field("Keep Worksheets";"Keep Worksheets")
+                    {
+                    }
                 }
                 field("Allow User Modification";"Allow User Modification")
                 {

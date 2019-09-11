@@ -35,6 +35,7 @@ codeunit 6150700 "POS Session"
     // NPR5.48/TJ  /20180806  CASE 323835 New discovery pattern for keybinds
     // NPR5.49/MMV /20190312 CASE 345188 Added helper function to minimize confusion & boilerplate.
     // NPR5.50/VB  /20181224  CASE 338666 Supporting Workflows 2.0 functionality
+    // NPR5.51/VB  /20190719  CASE 352582 POS Administrative Templates feature
 
     EventSubscriberInstance = Manual;
 
@@ -207,7 +208,10 @@ codeunit 6150700 "POS Session"
         DebugWithTimestamp('InitializeTheme');
         UI.InitializeTheme(Register);
         //+NPR5.49 [335141]
-
+        //-NPR5.51 [352582]
+        DebugWithTimestamp('InitializeAdminTemplates');
+        UI.InitializeAdministrativeTemplates(Register);
+        //+NPR5.51 [352582]
         InitializedUI := true;
 
         //-NPR5.41 [307453]
@@ -429,6 +433,7 @@ codeunit 6150700 "POS Session"
     [Scope('Personalization')]
     procedure RetrieveActionStateSafe("Key": Text;var "Object": Variant): Boolean
     begin
+
         if ActionState.ContainsKey(Key) then begin
           RetrieveActionState(Key,Object);
           exit(true);
