@@ -1,7 +1,7 @@
 codeunit 6151022 "NpRv Partner Mgt."
 {
     // NPR5.49/MHA /20190228  CASE 342811 Object created - Retail Voucher Partner used with Cross Company Vouchers
-    // #361164/MHA /20190705  CASE 361164 Updated Exception Message parsing in TryValidateGlobalVoucherService()
+    // NPR5.51/MHA /20190705  CASE 361164 Updated Exception Message parsing in TryValidateGlobalVoucherService()
 
 
     trigger OnRun()
@@ -91,7 +91,7 @@ codeunit 6151022 "NpRv Partner Mgt."
         if NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then
           exit;
 
-        //-#361164 [361164]
+        //-NPR5.51 [361164]
         ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
         if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
           NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
@@ -99,7 +99,7 @@ codeunit 6151022 "NpRv Partner Mgt."
             ErrorMessage := XmlElement.InnerText;
         end;
         Error(CopyStr(ErrorMessage,1,1000));
-        //+#361164 [361164]
+        //+NPR5.51 [361164]
         //+NPR5.49 [342811]
     end;
 

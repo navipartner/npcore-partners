@@ -36,7 +36,8 @@ codeunit 6060129 "MM Member WebService Mgr"
     // MM1.32/TSA /20180711 CASE 318132 Added "Member Card Type"::None on AddMembershipMember, selected notifiction type based on supplied data
     // MM1.35/TSA /20181023 CASE 333592 Added GetMembershipRoles
     // MM1.36/TSA /20190110 CASE 328141 Added CreateWalletMemberPass support, CreateWallet(), ProcessCreateWalletRequest(), GetCreateWalletRequest()
-    // MM1.39/TSA /20190529 CASE 350968 Adde GetSetAutoRenewOption service
+    // MM1.39/TSA /20190529 CASE 350968 Added GetSetAutoRenewOption service
+    // MM1.40/TSA /20190827 CASE 360242 Added Support to attributes
 
     TableNo = "Nc Import Entry";
 
@@ -146,6 +147,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         MemberInfoCapture.Init ();
         MemberInfoCapture."Import Entry Document ID" := DocumentID;
         InsertCreateMembership (XmlElement, MemberInfoCapture);
+
+        //-MM1.40 [360242]
+        TransferAttributes (XmlElement, MemberInfoCapture);
+        //+MM1.40 [360242]
 
         MembershipSalesSetup.Get (MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
 
@@ -311,6 +316,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         MembershipEntryNo := MembershipManagement.GetMembershipFromExtMembershipNo (MemberInfoCapture."External Membership No.");
         if (MembershipEntryNo = 0) then
           Error (INVALID_MEMBERSHIP_NO, MemberInfoCapture."External Membership No.");
+
+        //-MM1.40 [360242]
+        TransferAttributes (XmlElement, MemberInfoCapture);
+        //+MM1.40 [360242]
 
         if (not (MembershipManagement.AddMemberAndCard (true, MembershipEntryNo, MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then
           Error (ResponseMessage);
@@ -605,6 +614,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         MemberInfoCapture."Membership Entry No." := MembershipManagement.GetMembershipFromExtMemberNo (MemberInfoCapture."External Member No");
         if (MemberInfoCapture."Membership Entry No." = 0) then
           Error (INVALID_MEMBERSHIP_NO, MemberInfoCapture."External Member No");
+
+        //-MM1.40 [360242]
+        TransferAttributes (XmlElement, MemberInfoCapture);
+        //+MM1.40 [360242]
 
         MembershipManagement.UpdateMember (MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture);
         MemberInfoCapture.Modify ();
@@ -1400,6 +1413,60 @@ codeunit 6060129 "MM Member WebService Mgr"
         MemberInfoCapture.Insert ();
 
         //+MM1.29 [313795]
+    end;
+
+    local procedure TransferAttributes(var XmlElementIn: DotNet npNetXmlElement;MemberInfoCapture: Record "MM Member Info Capture")
+    var
+        AttributeCode: Code[20];
+        AttributeValue: Text[250];
+        XmlElement: DotNet npNetXmlElement;
+        XmlNodeList: DotNet npNetXmlNodeList;
+        i: Integer;
+    begin
+
+        //-MM1.40 [360242]
+        if not NpXmlDomMgt.FindNodes (XmlElementIn, 'request/attributes/attribute', XmlNodeList) then
+          exit;
+
+        if (XmlNodeList.Count = 0) then
+          exit;
+
+        for i := 0 to XmlNodeList.Count - 1 do begin
+          XmlElement := XmlNodeList.ItemOf(i);
+
+          AttributeCode := CopyStr (NpXmlDomMgt.GetXmlAttributeText (XmlElement, 'code', true), 1, MaxStrLen (AttributeCode));
+          AttributeValue := CopyStr (NpXmlDomMgt.GetXmlAttributeText (XmlElement, 'value', true), 1, MaxStrLen (AttributeValue));
+
+          ApplyAttributesToMemberInfoCapture (MemberInfoCapture."Entry No.", AttributeCode, AttributeValue);
+        end;
+        //+MM1.40 [360242]
+    end;
+
+    local procedure ApplyAttributesToMemberInfoCapture(MemberInfoCaptureEntryNo: Integer;AttributeCode: Code[20];AttributeValue: Text)
+    var
+        NPRAttribute: Record "NPR Attribute";
+        NPRAttributeID: Record "NPR Attribute ID";
+        MemberInfoCapture: Record "MM Member Info Capture";
+        TableId: Integer;
+        NPRAttributeManagement: Codeunit "NPR Attribute Management";
+    begin
+
+        //-MM1.40 [360242]
+        TableId := DATABASE::"MM Member Info Capture";
+
+        if (not NPRAttribute.Get (AttributeCode)) then
+          Error ('Attribute %1 is not valid.', AttributeCode);
+
+        if (not NPRAttributeID.Get (TableId, AttributeCode)) then
+          Error ('Attribute %1 is not defined for table with id %2.', AttributeCode, TableId);
+
+        if (not MemberInfoCapture.Get (MemberInfoCaptureEntryNo)) then
+            Error ('The MemberInfoCapture EntryNo %1 is not valid.', MemberInfoCaptureEntryNo);
+
+        // update the request
+        NPRAttributeManagement.SetEntryAttributeValue (TableId, NPRAttributeID."Shortcut Attribute ID", MemberInfoCaptureEntryNo, AttributeValue);
+
+        //+MM1.40 [360242]
     end;
 }
 

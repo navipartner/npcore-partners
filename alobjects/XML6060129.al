@@ -8,6 +8,7 @@ xmlport 6060129 "MM Get Membership"
     // MM1.18/TSA/20170216  CASE 265729 - Added membercardinality and membercount
     // MM1.22/TSA /20170818 CASE 287080 - Added details to member count attribute named and anonymous
     // MM1.29/TSA /20180502 CASE 306121 - Added membership entry details to output
+    // MM1.40/TSA /20190827 CASE 360242 - Added support for Attributes
 
     Caption = 'Get Membership';
     FormatEvaluate = Xml;
@@ -107,6 +108,23 @@ xmlport 6060129 "MM Get Membership"
                                 XmlName = 'anonymous';
                             }
                         }
+                        textelement(attributes)
+                        {
+                            MaxOccurs = Once;
+                            MinOccurs = Zero;
+                            tableelement(tmpattributevalueset;"NPR Attribute Value Set")
+                            {
+                                MinOccurs = Zero;
+                                XmlName = 'attribute';
+                                UseTemporary = true;
+                                fieldattribute(code;TmpAttributeValueSet."Attribute Code")
+                                {
+                                }
+                                fieldattribute(value;TmpAttributeValueSet."Text Value")
+                                {
+                                }
+                            }
+                        }
                         tableelement(tmpmembershipentry;"MM Membership Entry")
                         {
                             MinOccurs = Zero;
@@ -183,6 +201,8 @@ xmlport 6060129 "MM Get Membership"
         Member: Record "MM Member";
         MembershipRole: Record "MM Membership Role";
         MembershipEntry: Record "MM Membership Entry";
+        NPRAttributeKey: Record "NPR Attribute Key";
+        NPRAttributeValueSet: Record "NPR Attribute Value Set";
         MembershipManagement: Codeunit "MM Membership Management";
         AdminMemberCount: Integer;
         NamedMemberCount: Integer;
@@ -222,6 +242,21 @@ xmlport 6060129 "MM Get Membership"
           until (MembershipEntry.Next () = 0);
         end;
         //+MM1.29 [306121]
+
+        //-MM1.40 [360242]
+        TmpAttributeValueSet.DeleteAll ();
+        NPRAttributeKey.SetFilter ("Table ID", '=%1', DATABASE::"MM Membership");
+        NPRAttributeKey.SetFilter ("MDR Code PK", '=%1', Format (MembershipEntryNo, 0, '<integer>'));
+        if (NPRAttributeKey.FindFirst ()) then begin
+          NPRAttributeValueSet.SetFilter ("Attribute Set ID", '=%1', NPRAttributeKey."Attribute Set ID");
+          if (NPRAttributeValueSet.FindSet ()) then begin
+            repeat
+              TmpAttributeValueSet.TransferFields (NPRAttributeValueSet, true);
+              TmpAttributeValueSet.Insert ();
+            until (NPRAttributeValueSet.Next () = 0);
+          end;
+        end;
+        //+MM1.40 [360242]
     end;
 
     procedure AddErrorResponse(ErrorMessage: Text)

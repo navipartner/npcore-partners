@@ -15,6 +15,7 @@ codeunit 6014415 "Period Discount Management"
     // NPR5.45/MHA /20180803  CASE 323705 Signature changed on SaleLinePOS.FindItemSalesPrice()
     // NPR5.46/JDH /20181009 CASE 294354  Changed how the POS Header is used - working on the parameter that is included in the subscriber instead of a GET (allow Temp POS header usage)
     // NPR5.48/JDH /20181206 CASE 338339  Possible to use temp Sale pos header
+    // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup() in ApplyPeriodDiscountOnLine()
 
 
     trigger OnRun()
@@ -129,10 +130,12 @@ codeunit 6014415 "Period Discount Management"
         PeriodDiscountLine: Record "Period Discount Line";
         VATPostingSetup: Record "VAT Posting Setup";
         VATPostingSetup2: Record "VAT Posting Setup";
+        POSTaxCalculation: Codeunit "POS Tax Calculation";
         Price: Decimal;
         UnitPrice: Decimal;
         BestCode: Code[20];
         BestVariant: Code[10];
+        Handled: Boolean;
     begin
         //SetPeriodeRabat()
         with TempSaleLinePOS do begin
@@ -183,12 +186,12 @@ codeunit 6014415 "Period Discount Management"
             //IF Customer.GET( SalePOS."Customer No." ) AND PeriodDiscountLine."Unit Price Incl. VAT" THEN BEGIN
             if Customer.Get( TempSalePOS."Customer No." ) and PeriodDiscountLine."Unit Price Incl. VAT" then begin
             //+NPR5.46 [294354]
-              VATPostingSetup.SetRange( "VAT Bus. Posting Group", Item."VAT Bus. Posting Gr. (Price)" );
-              VATPostingSetup.SetRange( "VAT Prod. Posting Group", Item."VAT Prod. Posting Group" );
-              VATPostingSetup2.SetRange( "VAT Bus. Posting Group", Customer."VAT Bus. Posting Group" );
-              VATPostingSetup2.SetRange( "VAT Prod. Posting Group", "VAT Prod. Posting Group" );
-              if VATPostingSetup.FindFirst then;
-              if VATPostingSetup2.FindFirst then;
+              //-NPR5.51 [358985]
+              if VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)",Item."VAT Prod. Posting Group") then
+                POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
+              if VATPostingSetup2.Get(Customer."VAT Bus. Posting Group","VAT Prod. Posting Group" ) then
+                POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup2,Handled);
+              //+NPR5.51 [358985]
               PeriodDiscountLine."Campaign Unit Price" := PeriodDiscountLine."Campaign Unit Price" /
                                                           ( 100 + VATPostingSetup."VAT %" ) *
                                                           ( 100 + VATPostingSetup2."VAT %" );

@@ -1,6 +1,6 @@
 codeunit 6151212 "NpCs Document upg."
 {
-    // #364557/MHA /20190821  CASE 364557 Object created - Object Codeunit for Collect Documents [VLOBJUPG] object may be deleted at any time
+    // NPR5.51/MHA /20190821  CASE 364557 Object created - Object Codeunit for Collect Documents [VLOBJUPG] object may be deleted at any time
 
     Subtype = Upgrade;
 

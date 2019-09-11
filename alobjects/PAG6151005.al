@@ -2,6 +2,7 @@ page 6151005 "POS Quote Lines"
 {
     // NPR5.47/MHA /20181011  CASE 302636 Object created - POS Quote (Saved POS Sale)
     // NPR5.48/MHA /20181129  CASE 336498 Added Customer info fields
+    // NPR5.51/MMV /20190820  CASE 364694 Handle EFT approvals
 
     Caption = 'POS Quote Lines';
     Editable = false;
@@ -130,6 +131,9 @@ page 6151005 "POS Quote Lines"
                 {
                 }
                 field("Customer Price Group";"Customer Price Group")
+                {
+                }
+                field("EFT Approved";"EFT Approved")
                 {
                 }
             }

@@ -58,6 +58,8 @@ codeunit 6151413 "Magento Sales Order Mgt."
     // MAG2.22/ZESO/20190701  CASE 358761 Populate "Description 2" with Description from Item Variants when Variant Code is used.
     // MAG2.22/MHA /20190711  CASE 360098 Added Customer Template Mapping in InsertCustomer() and Vat % should be set after validation of "VAT Prod. Posting Group"
     // MAG2.22/MHA /20190711  CASE 361705 Corrected case for "E-mail OR Phone No." in GetCustomer()
+    // MAG2.22/BHR /20190711  CASE 360098 Correction to filter on customer template Mapping
+    // MAG2.22/MHA /20190724  CASE 343352 Added function UpdateExtCouponReservations()
 
     TableNo = "Nc Import Entry";
 
@@ -116,6 +118,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
         InsertSalesLines(XmlElement,SalesHeader);
         InsertPaymentLines(XmlElement,SalesHeader);
         InsertComments(XmlElement,SalesHeader);
+        //-MAG2.22 [343352]
+        UpdateExtCouponReservations(SalesHeader);
+        //-MAG2.22 [343352]
         //-MAG2.19 [347974]
         if MagentoSetup."Release Order on Import" then
           ReleaseSalesDoc.PerformManualRelease(SalesHeader);
@@ -248,6 +253,10 @@ codeunit 6151413 "Magento Sales Order Mgt."
           Customer."External Customer No." := ExternalCustomerNo;
           Customer.Insert(true);
           //-MAG2.22 [360098]
+          //-MAG2.22 [360098]
+          Customer."Post Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement,'post_code',MaxStrLen(Customer."Post Code"),true));
+          Customer."Country/Region Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement,'country_code',MaxStrLen(Customer."Country/Region Code"),false));
+          //+MAG2.22 [360098]
           CustTemplateCode := MagentoMgt.GetCustTemplate(Customer);
           if CustTemplateCode <> '' then begin
             CustTemplate.Get(CustTemplateCode);
@@ -1207,6 +1216,20 @@ codeunit 6151413 "Magento Sales Order Mgt."
           SalesLine."Line Amount" := LineAmount;
         SalesLine.Modify(true);
         //+MAG2.17 [324190]
+    end;
+
+    local procedure UpdateExtCouponReservations(SalesHeader: Record "Sales Header")
+    var
+        NpDcExtCouponReservation: Record "NpDc Ext. Coupon Reservation";
+    begin
+        //-MAG2.22 [343352]
+        NpDcExtCouponReservation.SetRange("External Document No.",SalesHeader."External Order No.");
+        NpDcExtCouponReservation.SetFilter("Document No.",'=%1','');
+        if NpDcExtCouponReservation.FindFirst then begin
+          NpDcExtCouponReservation.ModifyAll("Document Type",SalesHeader."Document Type");
+          NpDcExtCouponReservation.ModifyAll("Document No.",SalesHeader."No.");
+        end;
+        //+MAG2.22 [343352]
     end;
 
     local procedure "--- Get/Check"()

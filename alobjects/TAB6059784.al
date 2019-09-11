@@ -12,7 +12,7 @@ table 6059784 "TM Ticket Type"
     // TM1.26/TSA /20171103 CASE 285601 Added DIY Ticket Layout Code for specifying ticket layou on ticket server
     // TM1.27/TSA /20171211 CASE 269456 Added print template support fields
     // TM1.38/TSA /20181012 CASE 332109 Adding NP-Pass for tickets
-    // #362783/TSA /20190722 CASE 362783 Removed RunCmdModal(), added RunProcess() to use interop
+    // TM1.42/TSA /20190722 CASE 362783 Removed RunCmdModal(), added RunProcess() to use interop
 
     Caption = 'Ticket Type';
     LookupPageID = "TM Ticket Type";
@@ -252,10 +252,10 @@ table 6059784 "TM Ticket Type"
         extra: Text[30];
     begin
 
-        //-#362783 [362783]
+        //-TM1.42 [362783]
         // RunCmdModal('"notepad.exe" "'+ Path + '"');
         RunProcess (Path, '', true);
-        //+#362783 [362783]
+        //+TM1.42 [362783]
     end;
 
     procedure RunProcess(Filename: Text;Arguments: Text;Modal: Boolean)
@@ -266,13 +266,13 @@ table 6059784 "TM Ticket Type"
         ProcessStartInfo: DotNet npNetProcessStartInfo;
     begin
 
-        //-#362783 [362783]
+        //-TM1.42 [362783]
         ProcessStartInfo := ProcessStartInfo.ProcessStartInfo(Filename,Arguments);
         Process := Process.Start(ProcessStartInfo);
         if Modal then
           Process.WaitForExit();
 
-        //+#362783 [362783]
+        //+TM1.42 [362783]
     end;
 }
 

@@ -10,6 +10,8 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     // NPR5.49/MMV /20190410 CASE 347476 Added request/response logging support
     // NPR5.50/MMV /20190429 CASE 353340 Removed modify within TryFunction when logging.
     // NPR5.50/MMV /20190516 CASE 355433 Increased abort request timeout
+    // NPR5.51/MMV /20190702 CASE 355433 Added amount to AcquireCard
+    //                                   Added capture delay parameter support.
 
     SingleInstance = true;
     TableNo = "EFT Transaction Request";
@@ -26,6 +28,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         ERROR_WS_SESSION: Label 'Error: Could not start background session for Adyen webservice invoke';
         ERROR_RECEIPT: Label 'Error: Could not create terminal receipt data';
         ERROR_HEADER_CATEGORY: Label 'Error: Header category %1, expected %2';
+        ERROR_UNKNOWN_EVENT: Label 'Unknown event json';
         VOID_SUCCESS: Label 'Transaction %1 was successfully voided';
         VOID_FAILURE: Label 'Transaction %1 could not be voided: %2\%3';
         DIAGNOSE: Label 'Terminal Status: %1\Terminal Connection: %2\Host Connection: %3';
@@ -44,12 +47,12 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         // The reason is that Adyens transaction API requires concurrent requests which a single user session does not support in pure C/AL.
 
         case EftTransactionRequest."Processing Type" of
-          EftTransactionRequest."Processing Type"::Payment : StartPaymentTransaction(EftTransactionRequest); //Via async dialog & background session
-          EftTransactionRequest."Processing Type"::Refund : StartRefundTransaction(EftTransactionRequest); //Via async dialog & background session
-          EftTransactionRequest."Processing Type"::Void : VoidTransaction(EftTransactionRequest); //Via blocking ws invoke
-          EftTransactionRequest."Processing Type"::Lookup : LookupTransaction(EftTransactionRequest); //Via blocking ws invoke
-          EftTransactionRequest."Processing Type"::Setup : SetupTerminal(EftTransactionRequest); //Via blocking ws invoke
-          EftTransactionRequest."Processing Type"::Auxiliary :
+          EftTransactionRequest."Processing Type"::PAYMENT : StartPaymentTransaction(EftTransactionRequest); //Via async dialog & background session
+          EftTransactionRequest."Processing Type"::REFUND : StartRefundTransaction(EftTransactionRequest); //Via async dialog & background session
+          EftTransactionRequest."Processing Type"::VOID : VoidTransaction(EftTransactionRequest); //Via blocking ws invoke
+          EftTransactionRequest."Processing Type"::LOOK_UP : LookupTransaction(EftTransactionRequest); //Via blocking ws invoke
+          EftTransactionRequest."Processing Type"::SETUP : SetupTerminal(EftTransactionRequest); //Via blocking ws invoke
+          EftTransactionRequest."Processing Type"::AUXILIARY :
             case EftTransactionRequest."Auxiliary Operation ID" of
               1 : AbortTransaction(EftTransactionRequest); //via blocking ws invoke
         //-NPR5.49 [345188]
@@ -82,7 +85,9 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
 
         //-NPR5.49 [345188]
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
-        if EFTAdyenCloudIntegration.GetAcquireCardFirst(EFTSetup) then
+        //-NPR5.51 [355433]
+        if (EFTAdyenCloudIntegration.GetAcquireCardFirst(EFTSetup) or (EFTAdyenCloudIntegration.GetCreateRecurringContract(EFTSetup) <> 0)) then
+        //+NPR5.51 [355433]
           if GetLinkedCardAcquisition(EftTransactionRequest, AcquireCardRequest) then
             exit; //Dialog already open
         //+NPR5.49 [345188]
@@ -280,6 +285,10 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         ClearLogAfterResult(EFTTransactionRequest);
         //+NPR5.49 [347476]
         EFTTransactionRequest.Modify;
+
+        //-NPR5.51 [355433]
+        OnAfterProtocolResponse(EFTTransactionRequest);
+        //+NPR5.51 [355433]
     end;
 
     procedure ForceCloseTransaction(EFTTransactionRequest: Record "EFT Transaction Request")
@@ -325,6 +334,10 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         //+NPR5.49 [347476]
         EftTransactionRequest.Modify;
 
+        //-NPR5.51 [355433]
+        OnAfterProtocolResponse(EftTransactionRequest);
+        //+NPR5.51 [355433]
+
         if not EftTransactionRequest.Successful then begin
           OriginalEFTTransactionRequest.Get(EftTransactionRequest."Initiated from Entry No.");
           OriginalEFTTransactionRequest.Recoverable := false; //Since AcquireCard failed we know the primary transaction "failed correctly" since we never started it.
@@ -358,6 +371,10 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         //+NPR5.49 [347476]
         EftTransactionRequest.Modify;
         //+NPR5.49 [345188]
+
+        //-NPR5.51 [355433]
+        OnAfterProtocolResponse(EftTransactionRequest);
+        //+NPR5.51 [355433]
     end;
 
     local procedure "// API"()
@@ -417,7 +434,10 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         //         '}' +
                  '},' +
                  '"PaymentData":{' +
-                    GetCardAcquisitionJSON(EftTransactionRequest) +
+        //-NPR5.51 [355433]
+        //            GetCardAcquisitionJSON(EftTransactionRequest) +
+                    GetCardAcquisitionJSON(EftTransactionRequest, false) +
+        //+NPR5.51 [355433]
                  '}' +
         //+NPR5.49 [345188]
               '}' +
@@ -465,11 +485,12 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
                     '}' +
                  '},' +
                  '"PaymentData":{' +
-        //-NPR5.49 [345188]
-        //            '"PaymentType":"Refund"' +
-                    '"PaymentType":"Refund",' +
-                    GetCardAcquisitionJSON(EftTransactionRequest) +
-        //+NPR5.49 [345188]
+        //-NPR5.51 [355433]
+        //            '"PaymentType":"Refund",' +
+        //            GetCardAcquisitionJSON(EftTransactionRequest) +
+                    '"PaymentType":"Refund"' +
+                    GetCardAcquisitionJSON(EftTransactionRequest, true) +
+        //+NPR5.51 [355433]
                  '}' +
               '}' +
            '}' +
@@ -580,7 +601,12 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
                        '"TransactionID":' + JsonConvert.ToString(EftTransactionRequest."Sales Ticket No.") +
                     '}' +
                  '},' +
-                 '"CardAcquisitionTransaction":{}' +
+        //-NPR5.51 [355433]
+        //         '"CardAcquisitionTransaction":{}' +
+                 '"CardAcquisitionTransaction":{' +
+                    '"TotalAmount":' + GetAmount(EftTransactionRequest) +
+                  '}' +
+        //+NPR5.51 [355433]
               '}' +
            '}' +
         '}';
@@ -617,11 +643,10 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
            '}' +
         '}';
 
-        //-NPR5.49 [347476]
-        //Response := Invoke(Body, GetAPIKey(EFTSetup), GetServiceURL(EftTransactionRequest), 5 * 1000);
-        Response := Invoke(Body, GetAPIKey(EFTSetup), GetServiceURL(EftTransactionRequest), 5 * 1000, EftTransactionRequest);
-        //+NPR5.49 [347476]
-        //+NPR5.49 [345188]
+        //-NPR5.51 [355433]
+        //Response := Invoke(Body, GetAPIKey(EFTSetup), GetServiceURL(EftTransactionRequest), 5 * 1000, EftTransactionRequest);
+        Response := Invoke(Body, GetAPIKey(EFTSetup), GetServiceURL(EftTransactionRequest), 10 * 1000, EftTransactionRequest);
+        //+NPR5.51 [355433]
     end;
 
     [TryFunction]
@@ -790,10 +815,10 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         //+NPR5.49 [351678]
 
           case EFTTransactionRequest."Processing Type" of
-            EFTTransactionRequest."Processing Type"::Payment : EndPaymentTransaction(EFTTransactionRequest, Response);
-            EFTTransactionRequest."Processing Type"::Refund : EndRefundTransaction(EFTTransactionRequest, Response);
+            EFTTransactionRequest."Processing Type"::PAYMENT : EndPaymentTransaction(EFTTransactionRequest, Response);
+            EFTTransactionRequest."Processing Type"::REFUND : EndRefundTransaction(EFTTransactionRequest, Response);
         //-NPR5.49 [345188]
-            EFTTransactionRequest."Processing Type"::Auxiliary :
+            EFTTransactionRequest."Processing Type"::AUXILIARY :
               case EFTTransactionRequest."Auxiliary Operation ID" of
                 2 : EndAcquireCard(EFTTransactionRequest, Response);
               end;
@@ -820,11 +845,14 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         JObject: DotNet npNetJObject;
         JToken: DotNet npNetJObject;
     begin
-        //-NPR5.49 [345188]
-        //JObject := JObject.Parse(Response).Item('SaleToPOIResponse');
         ParseJSON(Response, JObject);
         JObject := JObject.Item('SaleToPOIResponse');
-        //+NPR5.49 [345188]
+
+        //-NPR5.51 [355433]
+        if IsNull(JObject) then
+          if ParseRejectNotification(Response, EFTTransactionRequest) then
+            exit;
+        //+NPR5.51 [355433]
 
         TrySelectToken(JObject, 'MessageHeader', JToken, true);
         ValidateHeader(JToken, EFTTransactionRequest);
@@ -839,11 +867,14 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         JObject: DotNet npNetJObject;
         JToken: DotNet npNetJObject;
     begin
-        //-NPR5.49 [345188]
-        //JObject := JObject.Parse(Response).Item('SaleToPOIResponse');
         ParseJSON(Response, JObject);
         JObject := JObject.Item('SaleToPOIResponse');
-        //+NPR5.49 [345188]
+
+        //-NPR5.51 [355433]
+        if IsNull(JObject) then
+          if ParseRejectNotification(Response, EFTTransactionRequest) then
+            exit;
+        //+NPR5.51 [355433]
 
         TrySelectToken(JObject, 'MessageHeader', JToken, true);
         ValidateHeader(JToken, EFTTransactionRequest);
@@ -858,11 +889,14 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         JObject: DotNet npNetJObject;
         JToken: DotNet npNetJObject;
     begin
-        //-NPR5.49 [345188]
-        //JObject := JObject.Parse(Response).Item('SaleToPOIResponse');
         ParseJSON(Response, JObject);
         JObject := JObject.Item('SaleToPOIResponse');
-        //+NPR5.49 [345188]
+
+        //-NPR5.51 [355433]
+        if IsNull(JObject) then
+          if ParseRejectNotification(Response, EFTTransactionRequest) then
+            exit;
+        //+NPR5.51 [355433]
 
         TrySelectToken(JObject, 'MessageHeader', JToken, true);
         ValidateHeader(JToken, EFTTransactionRequest);
@@ -877,11 +911,14 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         JObject: DotNet npNetJObject;
         JToken: DotNet npNetJObject;
     begin
-        //-NPR5.49 [345188]
-        //JObject := JObject.Parse(Response).Item('SaleToPOIResponse');
         ParseJSON(Response, JObject);
         JObject := JObject.Item('SaleToPOIResponse');
-        //+NPR5.49 [345188]
+
+        //-NPR5.51 [355433]
+        if IsNull(JObject) then
+          if ParseRejectNotification(Response, EFTTransactionRequest) then
+            exit;
+        //+NPR5.51 [355433]
 
         TrySelectToken(JObject, 'MessageHeader', JToken, true);
         ValidateHeader(JToken,EFTTransactionRequest);
@@ -896,16 +933,20 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         JObject: DotNet npNetJObject;
         JToken: DotNet npNetJObject;
     begin
-        //-NPR5.49 [345188]
         ParseJSON(Response, JObject);
         JObject := JObject.Item('SaleToPOIResponse');
+
+        //-NPR5.51 [355433]
+        if IsNull(JObject) then
+          if ParseRejectNotification(Response, EFTTransactionRequest) then
+            exit;
+        //+NPR5.51 [355433]
 
         TrySelectToken(JObject, 'MessageHeader', JToken, true);
         ValidateHeader(JToken,EFTTransactionRequest);
 
         JObject := JObject.Item('CardAcquisitionResponse');
         ParseCardAcquisitionResponse(JObject, EFTTransactionRequest);
-        //+NPR5.49 [345188]
     end;
 
     [TryFunction]
@@ -914,16 +955,20 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         JObject: DotNet npNetJObject;
         JToken: DotNet npNetJObject;
     begin
-        //-NPR5.49 [345188]
         ParseJSON(Response, JObject);
         JObject := JObject.Item('SaleToPOIResponse');
+
+        //-NPR5.51 [355433]
+        if IsNull(JObject) then
+          if ParseRejectNotification(Response, EFTTransactionRequest) then
+            exit;
+        //+NPR5.51 [355433]
 
         TrySelectToken(JObject, 'MessageHeader', JToken, true);
         ValidateHeader(JToken,EFTTransactionRequest);
 
         TrySelectToken(JObject, 'EnableServiceResponse.Response', JToken, true);
         ParseResponse(JToken, EFTTransactionRequest);
-        //+NPR5.49 [345188]
     end;
 
     local procedure ParsePaymentResponse(JObject: DotNet npNetJObject;var EFTTransactionRequest: Record "EFT Transaction Request";var tmpCreditCardTransaction: Record "Credit Card Transaction" temporary)
@@ -1011,11 +1056,11 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
           ValidateHeader(JObject.Item('MessageHeader'), OriginalEFTTransactionRequest);
 
           case OriginalEFTTransactionRequest."Processing Type" of
-            OriginalEFTTransactionRequest."Processing Type"::Payment,
-            OriginalEFTTransactionRequest."Processing Type"::Refund :
+            OriginalEFTTransactionRequest."Processing Type"::PAYMENT,
+            OriginalEFTTransactionRequest."Processing Type"::REFUND :
               ParsePaymentResponse(JObject.Item('RepeatedResponseMessageBody').Item('PaymentResponse'), EFTTransactionRequest, tmpCreditCardTransaction);
 
-            OriginalEFTTransactionRequest."Processing Type"::Void :
+            OriginalEFTTransactionRequest."Processing Type"::VOID :
               begin
                 ParseReversalResponse(JObject.Item('RepeatedResponseMessageBody').Item('ReversalResponse'), EFTTransactionRequest);
         //-NPR5.49 [345188]
@@ -1042,8 +1087,14 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         if TrySelectToken(JObject, 'POIStatus.CommunicationOKFlag', JToken, false) then
           TerminalCommunication := JToken.ToString();
 
-        TrySelectToken(JObject, 'POIStatus.GlobalStatus', JToken, true);
-        TerminalStatus := JToken.ToString();
+        //-NPR5.51 [355433]
+        // TrySelectToken(JObject, 'POIStatus.GlobalStatus', JToken, TRUE);
+        // TerminalStatus := JToken.ToString();
+
+        TerminalStatus := UNKNOWN;
+        if TrySelectToken(JObject, 'POIStatus.GlobalStatus', JToken, false) then
+          TerminalStatus := JToken.ToString();
+        //+NPR5.51 [355433]
 
         HostStatus := UNKNOWN;
         if TrySelectToken(JObject, 'HostStatus[0].IsReachableFlag', JToken, false) then
@@ -1095,9 +1146,11 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         if TrySelectToken(JObject, 'CardData.MaskedPan', JToken, false) then
           EFTTransactionRequest."Card Number" := JToken.ToString();
 
-        if TrySelectToken(JObject, 'CardData.PaymentToken', JToken, false) then
-          if JToken.Item('TokenRequestedType').ToString() = 'Customer' then
-            EFTTransactionRequest."External Customer ID" := JToken.Item('TokenValue').ToString();
+        //-NPR5.51 [355433]
+        // IF TrySelectToken(JObject, 'CardData.PaymentToken', JToken, FALSE) THEN
+        //  IF JToken.Item('TokenRequestedType').ToString() = 'Customer' THEN
+        //    EFTTransactionRequest."External Customer ID" := JToken.Item('TokenValue').ToString();
+        //+NPR5.51 [355433]
 
         if TrySelectToken(JObject, 'StoredValueAccountID', JToken, false) then begin
           EFTTransactionRequest."Stored Value Account Type" := JToken.Item('StoredValueAccountType').ToString();
@@ -1234,10 +1287,10 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
           case Key of
             'AID' : EFTTransactionRequest."Card Application ID" := NameValueCollection.Get(Key);
             'applicationPreferredName' : EFTTransactionRequest."Card Name" := NameValueCollection.Get(Key);
-            'shopperReference' : EFTTransactionRequest."Internal Customer ID" := NameValueCollection.Get(Key);
-        //-NPR5.49 [345188]
-        //    'alias' : EFTTransactionRequest."External Payment Token" := NameValueCollection.Get(Key); //TODO: Spelling?
-        //+NPR5.49 [345188]
+        //-NPR5.51 [355433]
+        //    'shopperReference' : EFTTransactionRequest."Internal Customer ID" := NameValueCollection.Get(Key);
+                'shopperReference' : EFTTransactionRequest."External Customer ID" := NameValueCollection.Get(Key);
+        //+NPR5.51 [355433]
             'message' : EFTTransactionRequest."Result Display Text" := CopyStr(NameValueCollection.Get(Key), 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
           end;
         end;
@@ -1248,6 +1301,31 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         HttpUtility: DotNet npNetHttpUtility;
     begin
         NameValueCollection := HttpUtility.ParseQueryString(QueryString);
+    end;
+
+    [TryFunction]
+    local procedure ParseRejectNotification(Response: Text;var EFTTransactionRequest: Record "EFT Transaction Request")
+    var
+        JObject: DotNet npNetJObject;
+        JToken: DotNet npNetJObject;
+    begin
+        //-NPR5.51 [355433]
+        ParseJSON(Response, JObject);
+
+        TrySelectToken(JObject, 'SaleToPOIRequest.MessageHeader.ServiceID', JToken, true);
+        EFTTransactionRequest.TestField("Reference Number Input", Format(JToken.ToString()));
+
+        TrySelectToken(JObject, 'SaleToPOIRequest.MessageHeader.MessageType', JToken, true);
+        if Format(JToken.ToString()) <> 'Notification' then
+          Error(ERROR_UNKNOWN_EVENT);
+
+        TrySelectToken(JObject, 'SaleToPOIRequest.EventNotification.EventToNotify', JToken, true);
+        if Format(JToken.ToString()) <> 'Reject' then
+          Error(ERROR_UNKNOWN_EVENT);
+
+        if TrySelectToken(JObject, 'SaleToPOIRequest.EventNotification.EventDetails', JToken, false) then
+          ParseAdditionalDataString(JToken, EFTTransactionRequest);
+        //+NPR5.51 [355433]
     end;
 
     local procedure TrySelectToken(JObject: DotNet npNetJObject;Path: Text;var JToken: DotNet npNetJToken;WithError: Boolean): Boolean
@@ -1269,13 +1347,13 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         EFTTransactionRequest.TestField("Entry No.", ServiceID);
 
         case EFTTransactionRequest."Processing Type" of
-          EFTTransactionRequest."Processing Type"::Refund : ExpectedMessageCategory := 'Payment';
-          EFTTransactionRequest."Processing Type"::Payment : ExpectedMessageCategory := 'Payment';
-          EFTTransactionRequest."Processing Type"::Lookup : ExpectedMessageCategory := 'TransactionStatus';
-          EFTTransactionRequest."Processing Type"::Void : ExpectedMessageCategory := 'Reversal';
-          EFTTransactionRequest."Processing Type"::Setup : ExpectedMessageCategory := 'Diagnosis';
+          EFTTransactionRequest."Processing Type"::REFUND : ExpectedMessageCategory := 'Payment';
+          EFTTransactionRequest."Processing Type"::PAYMENT : ExpectedMessageCategory := 'Payment';
+          EFTTransactionRequest."Processing Type"::LOOK_UP : ExpectedMessageCategory := 'TransactionStatus';
+          EFTTransactionRequest."Processing Type"::VOID : ExpectedMessageCategory := 'Reversal';
+          EFTTransactionRequest."Processing Type"::SETUP : ExpectedMessageCategory := 'Diagnosis';
         //-NPR5.49 [345188]
-          EFTTransactionRequest."Processing Type"::Auxiliary :
+          EFTTransactionRequest."Processing Type"::AUXILIARY :
             case EFTTransactionRequest."Auxiliary Operation ID" of
               2 : ExpectedMessageCategory := 'CardAcquisition';
               3 : ExpectedMessageCategory := 'EnableService';
@@ -1392,6 +1470,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         EFTAdyenCloudIntegration: Codeunit "EFT Adyen Cloud Integration";
         Value: Text;
         EFTAdyenPaymentTypeSetup: Record "EFT Adyen Payment Type Setup";
+        CaptureDelayHours: Integer;
     begin
         Value := 'tenderOption=ReceiptHandler&tenderOption=GetAdditionalData';
 
@@ -1406,6 +1485,12 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
           EFTAdyenPaymentTypeSetup."Create Recurring Contract"::RECURRING_ONECLICK : Value += '&recurringContract=ONECLICK,RECURRING&shopperReference=' + EFTTransactionRequest."Internal Customer ID";
         end;
         //+NPR5.49 [345188]
+
+        //-NPR5.51 [355433]
+        CaptureDelayHours := EFTAdyenCloudIntegration.GetCaptureDelayHours(EFTSetup);
+        if CaptureDelayHours >= 0 then
+          Value += '&captureDelayHours=' + Format(CaptureDelayHours);
+        //+NPR5.51 [355433]
 
         exit(Value);
     end;
@@ -1434,7 +1519,24 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
 
     local procedure GetAmount(EFTTransactionRequest: Record "EFT Transaction Request"): Text
     begin
-        exit(Format(EFTTransactionRequest."Amount Input",0,9));
+        //-NPR5.51 [355433]
+        //EXIT(FORMAT(EFTTransactionRequest."Amount Input",0,9));
+
+        case EFTTransactionRequest."Processing Type" of
+          EFTTransactionRequest."Processing Type"::PAYMENT,
+          EFTTransactionRequest."Processing Type"::REFUND :
+            exit(Format(EFTTransactionRequest."Amount Input",0,9));
+
+          EFTTransactionRequest."Processing Type"::AUXILIARY :
+            begin
+              EFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
+              exit(Format(EFTTransactionRequest."Amount Input",0,9));
+            end;
+
+          else
+            EFTTransactionRequest.FieldError("Processing Type");
+        end;
+        //+NPR5.51 [355433]
     end;
 
     local procedure GetCashbackAmount(EFTTransactionRequest: Record "EFT Transaction Request"): Text
@@ -1445,10 +1547,10 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     local procedure GetLookupCategory(EFTTransactionRequest: Record "EFT Transaction Request"): Text
     begin
         case EFTTransactionRequest."Processing Type" of
-          EFTTransactionRequest."Processing Type"::Payment,
-          EFTTransactionRequest."Processing Type"::Refund :
+          EFTTransactionRequest."Processing Type"::PAYMENT,
+          EFTTransactionRequest."Processing Type"::REFUND :
             exit('Payment');
-          EFTTransactionRequest."Processing Type"::Void :
+          EFTTransactionRequest."Processing Type"::VOID :
             exit('Reversal');
           else
             Error('Unsupported lookup of %1 %2', EFTTransactionRequest.FieldCaption("Processing Type"), EFTTransactionRequest."Processing Type");
@@ -1460,9 +1562,9 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         //-NPR5.49 [345188]
         EFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
 
-        if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::Payment) then
+        if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::PAYMENT) then
           exit('Payment');
-        if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::Auxiliary) and (EFTTransactionRequest."Auxiliary Operation ID" = 2) then
+        if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::AUXILIARY) and (EFTTransactionRequest."Auxiliary Operation ID" = 2) then
           exit('CardAcquisition');
         //+NPR5.49 [345188]
     end;
@@ -1471,32 +1573,43 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     begin
         //-NPR5.49 [345188]
         AcquireCardRequestOut.SetRange("Initiated from Entry No.", EFTTransactionRequest."Entry No.");
-        AcquireCardRequestOut.SetRange("Processing Type", AcquireCardRequestOut."Processing Type"::Auxiliary);
+        AcquireCardRequestOut.SetRange("Processing Type", AcquireCardRequestOut."Processing Type"::AUXILIARY);
         AcquireCardRequestOut.SetRange("Auxiliary Operation ID", 2);
         AcquireCardRequestOut.SetRange(Successful, true);
         exit(AcquireCardRequestOut.FindFirst);
         //+NPR5.49 [345188]
     end;
 
-    local procedure GetCardAcquisitionJSON(EFTTransactionRequest: Record "EFT Transaction Request"): Text
+    local procedure GetCardAcquisitionJSON(EFTTransactionRequest: Record "EFT Transaction Request";PrefixComma: Boolean): Text
     var
         AcquireCardRequest: Record "EFT Transaction Request";
         JsonConvert: DotNet npNetJsonConvert;
         AcquireDateTime: DateTime;
+        Output: Text;
     begin
-        //-NPR5.49 [345188]
         if not GetLinkedCardAcquisition(EFTTransactionRequest, AcquireCardRequest) then
           exit('');
 
         AcquireDateTime := CreateDateTime(AcquireCardRequest."Transaction Date", AcquireCardRequest."Transaction Time");
 
-        exit(
+        //-NPR5.51 [355433]
+        // EXIT(
+        // '"CardAcquisitionReference":{' +
+        //  '"TransactionID":' + JsonConvert.ToString(AcquireCardRequest."Reference Number Output") + ',' +
+        //  '"TimeStamp":"' + FORMAT(AcquireDateTime,0,9) + '"' +
+        // '}'
+        // );
+        if PrefixComma then
+          Output += ',';
+
+        Output +=
         '"CardAcquisitionReference":{' +
           '"TransactionID":' + JsonConvert.ToString(AcquireCardRequest."Reference Number Output") + ',' +
           '"TimeStamp":"' + Format(AcquireDateTime,0,9) + '"' +
-        '}'
-        );
-        //+NPR5.49 [345188]
+        '}';
+
+        exit(Output);
+        //+NPR5.51 [355433]
     end;
 
     local procedure AppendToLogStream(var OutStream: OutStream;Text: Text;Header: Text;var EFTTransactionRequest: Record "EFT Transaction Request")

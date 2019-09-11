@@ -247,7 +247,7 @@ codeunit 6014553 "Touch - Payment Line POS"
           Register.Get("Register No.");
 
           if SaleLinePOSNo = '' then begin
-             if "Cash Terminal Approved" then
+             if "EFT Approved" then
                POSEventMarshaller.DisplayError(Text10600003,Txt001,true);
              Delete(true);
              exit;
@@ -259,7 +259,7 @@ codeunit 6014553 "Touch - Payment Line POS"
             Register."Touch Screen Credit Card",
             Register."Touch Screen Terminal Offline":
               begin
-                SetRange("Cash Terminal Approved",false);
+                SetRange("EFT Approved",false);
               end;
           end;
 
@@ -267,7 +267,7 @@ codeunit 6014553 "Touch - Payment Line POS"
             Delete(true);
 
           SetRange("No.");
-          SetRange("Cash Terminal Approved");
+          SetRange("EFT Approved");
 
         end;
     end;
@@ -353,13 +353,13 @@ codeunit 6014553 "Touch - Payment Line POS"
     begin
         //existsTerminalGodkendt
         with SaleLinePOSGlobal do begin
-          SetRange("Cash Terminal Approved",true);
+          SetRange("EFT Approved",true);
           if Find('-') then
             Exists := true
           else
             Exists := false;
 
-          SetRange("Cash Terminal Approved");
+          SetRange("EFT Approved");
           exit(Exists);
         end;
     end;
@@ -480,7 +480,7 @@ codeunit 6014553 "Touch - Payment Line POS"
                 PaymentTypePOSGlobal."Processing Type"::"Terminal Card",PaymentTypePOSGlobal."Processing Type"::EFT,
                 PaymentTypePOSGlobal."Processing Type"::DIBS:
                   begin
-                    if SaleLinePOS."Cash Terminal Approved" then
+                    if SaleLinePOS."EFT Approved" then
                       POSEventMarshaller.DisplayError(Text10600003,Txt013,true);
                     FormattedDecimal := FormattedDecimal2;
                     //-NPR5.23 [244655]
@@ -656,17 +656,17 @@ codeunit 6014553 "Touch - Payment Line POS"
             end;
             Commit;
             CODEUNIT.Run(CODEUNIT::"Call Terminal Integration",SaleLinePOS);
-            if not SaleLinePOS."Cash Terminal Approved" then
+            if not SaleLinePOS."EFT Approved" then
               ErrorStr := Txt004;
-            exit(SaleLinePOS."Cash Terminal Approved");
+            exit(SaleLinePOS."EFT Approved");
           end;
         
           if PaymentTypePOSGlobal."Processing Type" = PaymentTypePOSGlobal."Processing Type"::DIBS then begin
             Commit;
             Commit;
-            if not SaleLinePOS."Cash Terminal Approved" then
+            if not SaleLinePOS."EFT Approved" then
               ErrorStr := Txt004;
-            exit(SaleLinePOS."Cash Terminal Approved");
+            exit(SaleLinePOS."EFT Approved");
           end;
         
           //-NPR5.46 [290734]
@@ -693,9 +693,9 @@ codeunit 6014553 "Touch - Payment Line POS"
               exit(false);
             end;
             MPOSPaymentAPI.CallPaymentStart(SaleLinePOS);
-            if not SaleLinePOS."Cash Terminal Approved" then
+            if not SaleLinePOS."EFT Approved" then
               ErrorStr := mPOSTransCancelErr;
-            exit(SaleLinePOS."Cash Terminal Approved");
+            exit(SaleLinePOS."EFT Approved");
           end;
           //+NPR5.31
         

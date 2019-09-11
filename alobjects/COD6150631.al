@@ -1,6 +1,7 @@
 codeunit 6150631 "POS Post with Task Queue"
 {
     // NPR5.38/BR  /20180105  CASE 294723 Object Created
+    // NPR5.51/TSA /20190605 CASE 310113 Only one POS Period may be posted at one time, corrected a parameter name
 
     TableNo = "Task Line";
 
@@ -11,6 +12,7 @@ codeunit 6150631 "POS Post with Task Queue"
         POSEntry: Record "POS Entry";
         POSEntryNoFilter: Text;
         POSPeriodRegisterNoFilter: Text;
+        ErrorDuringPosting: Boolean;
     begin
         CheckForParameters(Rec);
         POSPostEntries.SetPostCompressed(Rec.GetParameterBool('COMPRESSED'));
@@ -39,13 +41,35 @@ codeunit 6150631 "POS Post with Task Queue"
         end;
 
         POSEntryNoFilter := Rec.GetParameterText('POSENTRYNOFILTER');
-        POSPeriodRegisterNoFilter := Rec.GetParameterText('POSENTRYNOFILTER');
+
+        //-NPR5.51 [310113]
+        //POSPeriodRegisterNoFilter := Rec.GetParameterText('POSENTRYNOFILTER');
+        POSPeriodRegisterNoFilter := Rec.GetParameterText('PERIODREGNOFILTER');
+        //+NPR5.51 [310113]
+
         if POSEntryNoFilter <> '' then
           POSEntry.SetFilter("Entry No.",POSEntryNoFilter);
         if POSPeriodRegisterNoFilter <> '' then
           POSEntry.SetFilter("POS Period Register No.",POSPeriodRegisterNoFilter);
 
-        POSPostEntries.Run(POSEntry);
+        //-NPR5.51 [310113] -- only one POS period can be posted at a time
+        // POSPostEntries.RUN(POSEntry);
+        repeat
+
+          if (POSEntry.FindLast ()) then
+            POSEntry.SetFilter ("POS Period Register No.", '=%1', POSEntry."POS Period Register No.");
+
+          POSPostEntries.Run(POSEntry);
+          ErrorDuringPosting := not POSEntry.IsEmpty ();
+
+          POSEntry.SetFilter ("POS Period Register No.", '0..');
+          if (POSPeriodRegisterNoFilter <> '') then
+            POSEntry.SetFilter ("POS Period Register No.", POSPeriodRegisterNoFilter);
+
+          Commit;
+
+        until (ErrorDuringPosting or POSEntry.IsEmpty());
+        //+NPR5.51 [310113]
     end;
 
     var

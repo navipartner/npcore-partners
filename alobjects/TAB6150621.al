@@ -24,6 +24,8 @@ table 6150621 "POS Entry"
     // NPR5.42/TSA /20180511 CASE 314834 Dimensions are editable when entry is unposted
     // NPR5.48/MMV /20180606 CASE 318028 Added fields 107, 108, 240. Renamed field 230. Added "Entry Type" option: Cancelled.
     // NPR5.50/MHA /20190422 CASE 337539 Added field 170 "Retail ID"
+    // NPR5.51/MMV /20190624 CASE 356076 Added field 109,111 and renamed the other totalling fields to align more with workshift total field naming.
+    //                            Removed 107 that ended up being useless.
 
     Caption = 'POS Entry';
     DrillDownPageID = "POS Entries";
@@ -53,18 +55,15 @@ table 6150621 "POS Entry"
         field(6;"Fiscal No.";Code[20])
         {
             Caption = 'Fiscal No.';
-            Description = 'NPR5.39';
         }
         field(7;"POS Period Register No.";Integer)
         {
             Caption = 'POS Period Register No.';
-            Description = 'NPR5.36';
             TableRelation = "POS Period Register";
         }
         field(9;"Entry Type";Option)
         {
             Caption = 'Entry Type';
-            Description = 'NPR5.36';
             OptionCaption = 'Comment,Direct Sale,Other,Credit Sale,Balancing,Cancelled Sale';
             OptionMembers = Comment,"Direct Sale",Other,"Credit Sale",Balancing,"Cancelled Sale";
         }
@@ -83,7 +82,6 @@ table 6150621 "POS Entry"
         field(14;Description;Text[80])
         {
             Caption = 'Description';
-            Description = 'NPR5.36';
         }
         field(20;"Customer No.";Code[20])
         {
@@ -119,51 +117,44 @@ table 6150621 "POS Entry"
         field(52;"Post Item Entry Status";Option)
         {
             Caption = 'Post Item Entry Status';
-            Description = 'NPR5.36';
             OptionCaption = 'Unposted,Error while Posting,Posted,Not To Be Posted';
             OptionMembers = Unposted,"Error while Posting",Posted,"Not To Be Posted";
         }
         field(53;"Post Entry Status";Option)
         {
             Caption = 'Post Entry Status';
-            Description = 'NPR5.36';
             OptionCaption = 'Unposted,Error while Posting,Posted,Not To Be Posted';
             OptionMembers = Unposted,"Error while Posting",Posted,"Not To Be Posted";
         }
         field(54;"POS Posting Log Entry No.";Integer)
         {
             Caption = 'POS Posting Log Entry No.';
-            Description = 'NPR5.36';
             TableRelation = "POS Posting Log";
         }
         field(60;"Posting Date";Date)
         {
             Caption = 'Posting Date';
-            Description = 'NPR5.36';
         }
         field(61;"Document Date";Date)
         {
             Caption = 'Document Date';
-            Description = 'NPR5.36';
         }
         field(70;"Currency Code";Code[10])
         {
             Caption = 'Currency Code';
-            Description = 'NPR5.36';
             TableRelation = Currency;
         }
         field(71;"Currency Factor";Decimal)
         {
             Caption = 'Currency Factor';
             DecimalPlaces = 0:15;
-            Description = 'NPR5.36';
             Editable = false;
             InitValue = 1;
             MinValue = 1;
         }
-        field(100;"Sales Amount";Decimal)
+        field(100;"Item Sales (LCY)";Decimal)
         {
-            Caption = 'Sales Amount';
+            Caption = 'Item Sales (LCY)';
         }
         field(101;"Discount Amount";Decimal)
         {
@@ -177,36 +168,37 @@ table 6150621 "POS Entry"
         {
             Caption = 'Return Sales Quantity';
         }
-        field(104;"Total Amount";Decimal)
+        field(104;"Amount Excl. Tax";Decimal)
         {
-            Caption = 'Total Amount';
+            Caption = 'Amount Excl. Tax';
         }
-        field(105;"Total Tax Amount";Decimal)
+        field(105;"Tax Amount";Decimal)
         {
-            Caption = 'Total Tax Amount';
+            Caption = 'Tax Amount';
         }
-        field(106;"Total Amount Incl. Tax";Decimal)
+        field(106;"Amount Incl. Tax";Decimal)
         {
-            Caption = 'Total Amount Incl. Tax';
-            Description = 'NPR5.36';
-        }
-        field(107;"Total Neg. Amount Incl. Tax";Decimal)
-        {
-            Caption = 'Total Negative Amount Incl. Tax';
+            Caption = 'Amount Incl. Tax';
         }
         field(108;"No. of Sales Lines";Integer)
         {
             Caption = 'No. of Sales Lines';
         }
+        field(109;"Item Returns (LCY)";Decimal)
+        {
+            Caption = 'Item Returns (LCY)';
+        }
         field(110;"Rounding Amount (LCY)";Decimal)
         {
             Caption = 'Rounding Amount (LCY)';
-            Description = 'NPR5.36';
+        }
+        field(111;"Amount Incl. Tax & Round";Decimal)
+        {
+            Caption = 'Amount Incl. Tax & Round';
         }
         field(114;"Tax Area Code";Code[20])
         {
             Caption = 'Tax Area Code';
-            Description = 'NPR5.36';
             TableRelation = "Tax Area";
         }
         field(160;"POS Sale ID";Integer)
@@ -216,55 +208,46 @@ table 6150621 "POS Entry"
         field(170;"Retail ID";Guid)
         {
             Caption = 'Retail ID';
-            Description = 'NPR5.50';
         }
         field(200;"Customer Posting Group";Code[10])
         {
             Caption = 'Customer Posting Group';
-            Description = 'NPR5.36';
             Editable = false;
             TableRelation = "Customer Posting Group";
         }
         field(201;"Country/Region Code";Code[10])
         {
             Caption = 'Country/Region Code';
-            Description = 'NPR5.36';
             TableRelation = "Country/Region";
         }
         field(202;"Transaction Type";Code[10])
         {
             Caption = 'Transaction Type';
-            Description = 'NPR5.36';
             TableRelation = "Transaction Type";
         }
         field(203;"Transport Method";Code[10])
         {
             Caption = 'Transport Method';
-            Description = 'NPR5.36';
             TableRelation = "Transport Method";
         }
         field(204;"Exit Point";Code[10])
         {
             Caption = 'Exit Point';
-            Description = 'NPR5.36';
             TableRelation = "Entry/Exit Point";
         }
         field(205;"Area";Code[10])
         {
             Caption = 'Area';
-            Description = 'NPR5.36';
             TableRelation = Area;
         }
         field(206;"Transaction Specification";Code[10])
         {
             Caption = 'Transaction Specification';
-            Description = 'NPR5.36';
             TableRelation = "Transaction Specification";
         }
         field(207;"Prices Including VAT";Boolean)
         {
             Caption = 'Prices Including VAT';
-            Description = 'NPR5.36';
 
             trigger OnValidate()
             var
@@ -277,30 +260,25 @@ table 6150621 "POS Entry"
         field(208;"Reason Code";Code[10])
         {
             Caption = 'Reason Code';
-            Description = 'NPR5.36';
             TableRelation = "Reason Code";
         }
         field(210;"From External Source";Boolean)
         {
             Caption = 'From External Source';
-            Description = 'NPR5.38';
         }
         field(211;"External Source Name";Text[50])
         {
             Caption = 'External Source Name';
-            Description = 'NPR5.38';
         }
         field(212;"External Source Entry No.";Integer)
         {
             Caption = 'External Source Entry No.';
-            Description = 'NPR5.38';
         }
         field(230;"No. of Print Output Entries";Integer)
         {
             CalcFormula = Count("POS Entry Output Log" WHERE ("POS Entry No."=FIELD("Entry No."),
                                                               "Output Method"=CONST(Print)));
             Caption = 'No. of Print Output Entries';
-            Description = 'NPR5.39';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -324,14 +302,12 @@ table 6150621 "POS Entry"
         field(500;"Sales Document Type";Option)
         {
             Caption = 'Sales Document Type';
-            Description = 'NPR5.37';
             OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
             OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
         }
         field(501;"Sales Document No.";Code[20])
         {
             Caption = 'Sales Document No.';
-            Description = 'NPR5.37';
             TableRelation = "Sales Header"."No." WHERE ("Document Type"=FIELD("Sales Document Type"));
         }
         field(5052;"Contact No.";Code[20])

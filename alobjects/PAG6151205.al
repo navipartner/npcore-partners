@@ -1,9 +1,9 @@
 page 6151205 "NpCs Collect Store Orders"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #344264/MHA /20190717  CASE 344264 Added Last Log fields and changed name and logic for field 240 to "From Store Stock"
-    // #362443/MHA /20190719  CASE 362443 Added "Inserted at" changed Visible on some fields
-    // #364557/MHA /20190819  CASE 364557 Removed InsertAllowed
+    // NPR5.51/MHA /20190717  CASE 344264 Added Last Log fields and changed name and logic for field 240 to "From Store Stock"
+    // NPR5.51/MHA /20190719  CASE 362443 Added "Inserted at" changed Visible on some fields
+    // NPR5.51/MHA /20190819  CASE 364557 Removed InsertAllowed
 
     Caption = 'Collect in Store Orders';
     CardPageID = "NpCs Collect Store Order Card";
@@ -173,9 +173,9 @@ page 6151205 "NpCs Collect Store Orders"
                     var
                         NpCsCollectMgt: Codeunit "NpCs Collect Mgt.";
                     begin
-                        //-#364557 [364557]
+                        //-NPR5.51 [364557]
                         NpCsCollectMgt.PrintOrder(Rec);
-                        //+#364557 [364557]
+                        //+NPR5.51 [364557]
                     end;
                 }
                 action("Print Delivery")
@@ -264,9 +264,9 @@ page 6151205 "NpCs Collect Store Orders"
                           if not Confirm(Text002,false,"Document Type","Document No.") then
                             exit;
                         end;
-                        //-#344264 [344264]
+                        //-NPR5.51 [344264]
                         if NpCsArchCollectMgt.ArchiveCollectDocument(Rec) then
-                        //+#344264 [344264]
+                        //+NPR5.51 [344264]
                           Message(Text003,"Document Type","Reference No.")
                         else
                           Message(Text004,"Document Type","Reference No.",GetLastErrorText);

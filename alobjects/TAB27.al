@@ -1,4 +1,4 @@
-tableextension 50027 tableextension50027 extends Item 
+tableextension 50028 tableextension50028 extends Item 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields with Description starting NPR7.100.000
@@ -45,12 +45,20 @@ tableextension 50027 tableextension50027 extends Item
     // NPR5.47/JDH /20180913  CASE 327541 Changed field length of "Variety 1 Table" (and 2+3+4) to 40 characters
     // NPR5.48/MHA /20181105  CASE 334212 Added fields 6014435 "Last Changed at", 6014440 "Last Changed by"
     // NPR5.48/MHA /20181109  CASE 334922 Added field 6151125 "Item AddOn No."
+    // NPR5.49/ZESO/20190318  CASE 349061 Changed ObsoleteState of Product Group Code Property back to Pending.
     // MAG2.22/MHA /20190614  CASE 358258 Extended field 6151440 "Meta Title" from 70 to 100
     // MAG2.22/MHA /20190625  CASE 359285 Added field 6151500 "Magento Picture Variety Type"
+    // NPR5.51/BHR /20190730  CASE 361929 Increase size of fiels season from 3 to 10
+    // NPR5.51/BHR /20190801  CASE 363493 Set property Width of Field Description to 50
+    // NPR5.51/ZESO/20190828  CASE 365796 Added field 6014642 Shelf Label Type
     LookupPageID = "Retail Item List";
     DrillDownPageID = "Retail Item List";
     fields
     {
+        modify(Description)
+        {
+            Width = 50;
+        }
         field(6014400;"Item Group";Code[10])
         {
             Caption = 'Item Group';
@@ -62,7 +70,7 @@ tableextension 50027 tableextension50027 extends Item
             Caption = 'Various item sales';
             Description = 'NPR7.100.000';
         }
-        field(6014408;Season;Code[3])
+        field(6014408;Season;Code[10])
         {
             Caption = 'Season';
             Description = 'NPR7.100.000';
@@ -200,6 +208,11 @@ tableextension 50027 tableextension50027 extends Item
         {
             Caption = 'Custom Discount Blocked';
             Description = 'NPR5.42 [297569]';
+        }
+        field(6014642;"Shelf Label Type";Code[50])
+        {
+            Caption = 'Shelf Label Type';
+            Description = 'NPR5.51';
         }
         field(6059784;"Ticket Type";Code[10])
         {

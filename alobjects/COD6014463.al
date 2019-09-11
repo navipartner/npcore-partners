@@ -4,6 +4,8 @@ codeunit 6014463 "Sales-Post and Pdf2Nav"
     // NPR5.39/THRO/20171222 CASE 299380 Option to skip handling of Print (Used from POS). Removed the "Download queston"-popup if not printing
     // NPR5.39/TS  /20180221 CASE 294224 Global Variable SalesHeader is not initialised.
     // NPR5.49/BHR /20190118 CASE 341617 Correction to print report based on setup
+    // NPR5.51/BHR /20190513 CASE 353687 Reverted changes to case 341617
+    // NPR5.51/THRO/20190818 CASE 365016 Commit before sending email - to allow popup with email confirmation
 
     TableNo = "Sales Header";
 
@@ -172,11 +174,16 @@ codeunit 6014463 "Sales-Post and Pdf2Nav"
           EmailReport(ReportUsage);
 
         if (SalesHeader."Document Processing" in
-           [SalesHeader."Document Processing"::Print,SalesHeader."Document Processing"::PrintAndEmail]) then begin
-        // -NPR5.49 [341617]
-        // DoPrint := TRUE;
-        //IF (NOT DoPrint) THEN BEGIN
-        // +NPR5.49 [341617]
+        //-NPR5.51 [353687]
+        //[SalesHeader."Document Processing"::Print,SalesHeader."Document Processing"::PrintAndEmail]) THEN BEGIN
+        //// -NPR5.49 [341617]
+        ////DoPrint := TRUE;
+        ////IF (NOT DoPrint) THEN BEGIN
+        //// +NPR5.49 [341617]
+        [SalesHeader."Document Processing"::Print,SalesHeader."Document Processing"::PrintAndEmail]) then
+        DoPrint := true;
+        if (not DoPrint) then begin
+        //-NPR5.51 [353687]
           if not SalesPostandPdf2NavSetup.Get then
             SalesPostandPdf2NavSetup.Init;
           if (ReportUsage = ReportSelection.Usage::"S.Shipment") and SalesPostandPdf2NavSetup."Always Print Ship" then
@@ -230,6 +237,9 @@ codeunit 6014463 "Sales-Post and Pdf2Nav"
     var
         EmailDocMgt: Codeunit "E-mail Document Management";
     begin
+        //-NPR5.51 [365016]
+        Commit;
+        //+NPR5.51 [365016]
         case ReportUsage of
           ReportSelection.Usage::"S.Cr.Memo" :
             begin

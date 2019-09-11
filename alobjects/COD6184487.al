@@ -6,6 +6,8 @@ codeunit 6184487 "Pepper Library Transcendence"
     // NPR5.48/MMV /20181031 CASE 331551 Fill "Receipt No." for cut between merchant & customer receipt.
     // NPR5.48/TSA /20181015 CASE 332248 Bad date handling when date does not conform the documented date format
     // NPR5.48/MMV /20190124 CASE 341237 Renamed event parameter
+    // NPR5.51/TSA /20190617 CASE 358968 Reinstated the "Cancel at Wrong Signature" setting on "Pepper Terminal"
+    // NPR5.51/TSA /20190619 CASE 359229 Amount output to be set only on successful eft request
 
 
     trigger OnRun()
@@ -68,11 +70,11 @@ codeunit 6184487 "Pepper Library Transcendence"
               exit (true);
 
           case "Processing Type" of
-            "Processing Type"::Open    : BeginWorkshift (EFTTransactionRequest, true);
+            "Processing Type"::OPEN    : BeginWorkshift (EFTTransactionRequest, true);
 
-            "Processing Type"::Payment,
-            "Processing Type"::Refund,
-            "Processing Type"::Other :
+            "Processing Type"::PAYMENT,
+            "Processing Type"::REFUND,
+            "Processing Type"::OTHER :
               case "Pepper Trans. Subtype Code" of
                  '0' : TrxRecoverTransaction (EFTTransactionRequest);
                 '10' : TrxPaymentOfGoods (EFTTransactionRequest, '');
@@ -82,7 +84,7 @@ codeunit 6184487 "Pepper Library Transcendence"
                   exit (false);
               end;
 
-            "Processing Type"::Auxiliary :
+            "Processing Type"::AUXILIARY :
               case EFTTransactionRequest."Pepper Transaction Type Code" of
                 PepperConfiguration."Transaction Type Auxilary Code" : AuxFunctionRequest (EFTTransactionRequest);
                 PepperConfiguration."Transaction Type Install Code"  : InstallPepperRequest (EFTTransactionRequest);
@@ -90,7 +92,7 @@ codeunit 6184487 "Pepper Library Transcendence"
                   exit (false);
               end;
 
-            "Processing Type"::Close :  EndWorkshift (EFTTransactionRequest);
+            "Processing Type"::CLOSE :  EndWorkshift (EFTTransactionRequest);
 
             else
               exit (false);
@@ -111,7 +113,7 @@ codeunit 6184487 "Pepper Library Transcendence"
 
         InitializePepperSetup (EFTTransactionRequest."Register No.");
 
-        if (EFTTransactionRequest."Processing Type" <> EFTTransactionRequest."Processing Type"::Open) then  begin
+        if (EFTTransactionRequest."Processing Type" <> EFTTransactionRequest."Processing Type"::OPEN) then  begin
           if (not (PepperTerminal.Status in [PepperTerminal.Status::Open, PepperTerminal.Status::ActiveOffline]))  then begin
 
             CreateBeginWorkshiftRequest (EFTTransactionRequest."Register No.", EftBeginWorkshiftRequest);
@@ -558,12 +560,14 @@ codeunit 6184487 "Pepper Library Transcendence"
           "Result Code" := PepperTrxTransaction.GetTrx_ResultCode ();
           "Result Description" := GetResultCodeDescription ("Pepper Transaction Type Code", "Pepper Trans. Subtype Code", "Result Code");
           Successful := IsSuccessfulResultCode ("Pepper Transaction Type Code", "Pepper Trans. Subtype Code", "Result Code");
-          "Amount Output" := CalcAmountInCurrency (PepperTrxTransaction.GetTrx_Amount (), "Currency Code");
+          if (Successful) then //-+NPR5.51 [359229]
+            "Amount Output" := CalcAmountInCurrency (PepperTrxTransaction.GetTrx_Amount (), "Currency Code");
+
         //-NPR5.46 [290734]
-          if ("Processing Type" = "Processing Type"::Payment) then
+          if ("Processing Type" = "Processing Type"::PAYMENT) then
             "Result Amount" := Abs ("Amount Output");
 
-          if ("Processing Type" = "Processing Type"::Refund) then
+          if ("Processing Type" = "Processing Type"::REFUND) then
             "Result Amount" := Abs ("Amount Output") * -1;
         //+NPR5.46 [290734]
 
@@ -683,10 +687,10 @@ codeunit 6184487 "Pepper Library Transcendence"
 
           "Amount Output" := "Amount Input";
         //-NPR5.46 [290734]
-          if ("Processing Type" = "Processing Type"::Payment) then
+          if ("Processing Type" = "Processing Type"::PAYMENT) then
             "Result Amount" := Abs ("Amount Output");
 
-          if ("Processing Type" = "Processing Type"::Refund) then
+          if ("Processing Type" = "Processing Type"::REFUND) then
             "Result Amount" := Abs ("Amount Output") * -1;
         //+NPR5.46 [290734]
           Finished := CurrentDateTime;
@@ -908,7 +912,7 @@ codeunit 6184487 "Pepper Library Transcendence"
 
         with EFTTransactionRequest do begin
           "Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Open Code";
-          "Processing Type" := EFTTransactionRequest."Processing Type"::Open;
+          "Processing Type" := EFTTransactionRequest."Processing Type"::OPEN;
         end;
         exit (EFTTransactionRequest.Insert ());
     end;
@@ -927,7 +931,7 @@ codeunit 6184487 "Pepper Library Transcendence"
           "Reference Number Input" := SalesReceiptNo;
 
           "Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Close Code";
-          "Processing Type" := EFTTransactionRequest."Processing Type"::Close;
+          "Processing Type" := EFTTransactionRequest."Processing Type"::CLOSE;
         end;
         exit (EFTTransactionRequest.Insert ());
     end;
@@ -1070,7 +1074,7 @@ codeunit 6184487 "Pepper Library Transcendence"
 
         with EFTTransactionRequest do begin
 
-          "Processing Type" := EFTTransactionRequest."Processing Type"::Auxiliary;
+          "Processing Type" := EFTTransactionRequest."Processing Type"::AUXILIARY;
           "Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Auxilary Code";
 
           "Pepper Trans. Subtype Code" := Format (AuxFunction);
@@ -1090,7 +1094,7 @@ codeunit 6184487 "Pepper Library Transcendence"
 
         with EFTTransactionRequest do begin
 
-          "Processing Type" := EFTTransactionRequest."Processing Type"::Auxiliary;
+          "Processing Type" := EFTTransactionRequest."Processing Type"::AUXILIARY;
           "Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Install Code";
 
           "Pepper Trans. Subtype Code" := PepperVersion.Code;
@@ -1135,23 +1139,23 @@ codeunit 6184487 "Pepper Library Transcendence"
 
         with EFTTransactionRequest do begin
           "Pepper Trans. Subtype Code" := TransactionSubtypeCode;
-          "Processing Type" := "Processing Type"::Other;
+          "Processing Type" := "Processing Type"::OTHER;
           "Pepper Transaction Type Code" := '';
 
           case TransactionSubtypeCode of
             '0' :
               begin
-                "Processing Type" := EFTTransactionRequest."Processing Type"::Other;
+                "Processing Type" := EFTTransactionRequest."Processing Type"::OTHER;
                 "Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Recover Code";
               end;
             '10' :
               begin
-                "Processing Type" := EFTTransactionRequest."Processing Type"::Payment;
+                "Processing Type" := EFTTransactionRequest."Processing Type"::PAYMENT;
                 "Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Payment Code";
               end;
             '20','60' :
               begin
-                "Processing Type" := EFTTransactionRequest."Processing Type"::Refund;
+                "Processing Type" := EFTTransactionRequest."Processing Type"::REFUND;
                 "Pepper Transaction Type Code" := PepperConfiguration."Transaction Type Refund Code";
               end;
             else
@@ -1937,7 +1941,7 @@ codeunit 6184487 "Pepper Library Transcendence"
           exit;
 
         OriginalTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
-        if OriginalTransactionRequest."Processing Type" <> OriginalTransactionRequest."Processing Type"::Payment then
+        if OriginalTransactionRequest."Processing Type" <> OriginalTransactionRequest."Processing Type"::PAYMENT then
           exit;
 
         with OriginalTransactionRequest do
@@ -2022,18 +2026,23 @@ codeunit 6184487 "Pepper Library Transcendence"
         if not (EftTransactionRequest."Authentication Method" = EftTransactionRequest."Authentication Method"::Signature) then
           exit;
 
-        if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::Payment) then
-          if (not Confirm ('Customer must sign the receipt.\\Confirm signature.')) then begin
-        //-NPR5.48 [341237]
-        //    Annul := TRUE;
-            DoNotResume := true;
-        //+NPR5.48 [341237]
-            InitializePepperSetup(EftTransactionRequest."Register No.");
-            EFTFrameworkMgt.CreateVoidRequest(VoidEFTTransactionRequest, EFTSetup, EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", EftTransactionRequest."Entry No.", false);
-            EFTFrameworkMgt.SendRequest(VoidEFTTransactionRequest);
-          end;
+        //-NPR5.51 [358968]
+        InitializePepperSetup (EftTransactionRequest."Register No.");
+        //+NPR5.51 [358968]
 
-        if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::Refund) then
+        if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::PAYMENT) then
+          if (PepperTerminal."Cancel at Wrong Signature") then //-+NPR5.51 [358968]
+            if (not Confirm ('Customer must sign the receipt.\\Confirm signature.')) then begin
+              //-NPR5.48 [341237]
+              // Annul := TRUE;
+              DoNotResume := true;
+              //+NPR5.48 [341237]
+              InitializePepperSetup(EftTransactionRequest."Register No.");
+              EFTFrameworkMgt.CreateVoidRequest(VoidEFTTransactionRequest, EFTSetup, EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.", EftTransactionRequest."Entry No.", false);
+              EFTFrameworkMgt.SendRequest(VoidEFTTransactionRequest);
+            end;
+
+        if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::REFUND) then
           Message ('Customer must sign the receipt.');
         //+NPR5.46 [290734]
     end;

@@ -2,6 +2,7 @@ codeunit 6150729 "POS Sales Print Mgt."
 {
     // NPR5.39/MHA /20180202  CASE 302779 Object created - Implements POS Sales Workflow and overloads AuditRoll.PrintSalesReceipt()
     // NPR5.39/MMV /20180207  CASE 302687 Added support for POS Entry sales receipt.
+    // NPR5.51/MMV /20190617  CASE 356076 Added support for cancelled sale receipt skip.
 
 
     trigger OnRun()
@@ -56,14 +57,13 @@ codeunit 6150729 "POS Sales Print Mgt."
         if POSSalesWorkflowStep."Subscriber Function" <> 'PrintReceiptOnSale' then
           exit;
 
-        //-NPR5.39 [302687]
         if NPRetailSetup.Get then
           if NPRetailSetup."Advanced Posting Activated" then begin
             PrintPOSEntrySalesReceipt(SalePOS);
             exit;
           end;
-        //+NPR5.39 [302687]
-        //Legacy print:
+
+        //Legacy (Audit Roll) print:
 
         if not Register.Get(SalePOS."Register No.") then
           exit;
@@ -124,10 +124,31 @@ codeunit 6150729 "POS Sales Print Mgt."
         if not POSEntry.FindFirst then
           exit;
 
+        //-NPR5.51 [356076]
+        if SkipCancelledReceipt(POSEntry) then
+          exit;
+        //+NPR5.51 [356076]
+
         RecRef.GetTable(POSEntry);
         RetailReportSelectionMgt.SetRegisterNo(POSEntry."POS Unit No.");
         RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)");
         //+NPR5.39 [302687]
+    end;
+
+    local procedure SkipCancelledReceipt(POSEntry: Record "POS Entry"): Boolean
+    var
+        POSAuditProfile: Record "POS Audit Profile";
+        POSUnit: Record "POS Unit";
+    begin
+        //-NPR5.51 [356076]
+        if POSEntry."Entry Type" <> POSEntry."Entry Type"::"Cancelled Sale" then
+          exit(false);
+
+        POSUnit.Get(POSEntry."POS Unit No.");
+        if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then
+          exit(false);
+        exit(not POSAuditProfile."Print Receipt On Sale Cancel");
+        //+NPR5.51 [356076]
     end;
 }
 

@@ -1,6 +1,7 @@
 codeunit 6151167 "NpGp POS Sales Init Mgt."
 {
     // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
+    // NPR5.51/MHA /20190711  CASE 361618 Added Explicit DataLogMgt.OnDatabaseInsert() in InsertPosSalesEntry() to catch log of Autoincrement integer
 
 
     trigger OnRun()
@@ -34,6 +35,8 @@ codeunit 6151167 "NpGp POS Sales Init Mgt."
         NpGpPOSSalesEntry: Record "NpGp POS Sales Entry";
         TempNpGpPOSSalesLine2: Record "NpGp POS Sales Line" temporary;
         TempNpGpPOSInfoPOSEntry2: Record "NpGp POS Info POS Entry" temporary;
+        DataLogMgt: Codeunit "Data Log Management";
+        RecRef: RecordRef;
     begin
         if TempNpGpPOSSalesEntry."POS Store Code" = '' then
           exit;
@@ -55,7 +58,15 @@ codeunit 6151167 "NpGp POS Sales Init Mgt."
         NpGpPOSSalesEntry.Init;
         NpGpPOSSalesEntry := TempNpGpPOSSalesEntry;
         NpGpPOSSalesEntry."Entry No." := 0;
+        //-NPR5.51 [361618]
+        DataLogMgt.DisableDataLog(true);
+        //+NPR5.51 [361618]
         NpGpPOSSalesEntry.Insert(true);
+        //-NPR5.51 [361618]
+        DataLogMgt.DisableDataLog(false);
+        RecRef.GetTable(NpGpPOSSalesEntry);
+        DataLogMgt.OnDatabaseInsert(RecRef);
+        //+NPR5.51 [361618]
 
         TempNpGpPOSSalesLine2.Copy(TempNpGpPOSSalesLine,true);
         Clear(TempNpGpPOSSalesLine2);

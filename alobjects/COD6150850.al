@@ -366,7 +366,7 @@ codeunit 6150850 "POS Action - CK Payment"
         POSSaleLine.GetCurrentSaleLine(POSLine);
 
         POSLine."No." := PaymentTypePOS."No.";
-        POSLine."Cash Terminal Approved" := (CashKeeperTransaction.Status = CashKeeperTransaction.Status::Ok);
+        POSLine."EFT Approved" := (CashKeeperTransaction.Status = CashKeeperTransaction.Status::Ok);
 
         if (CashKeeperTransaction.Action = CashKeeperTransaction.Action::Capture) then
           POSLine."Amount Including VAT" := Abs(CashKeeperTransaction.Amount);

@@ -3,6 +3,7 @@ table 6151002 "POS Quote Entry"
     // NPR5.47/MHA /20181011  CASE 302636 Object created - POS Quote (Saved POS Sale)
     // NPR5.48/MHA /20181129  CASE 336498 Added Customer fields 25, 30, 35, 40, 45, 50
     // NPR5.48/MHA /20181130  CASE 338208 Added 200 "POS Sales Data"
+    // NPR5.51/MMV /20190820  CASE 364694 Added field 1010
 
     Caption = 'POS Quote Entry';
     DrillDownPageID = "POS Quotes";
@@ -91,6 +92,13 @@ table 6151002 "POS Quote Entry"
             Editable = false;
             FieldClass = FlowField;
         }
+        field(1010;"Contains EFT Approval";Boolean)
+        {
+            CalcFormula = Exist("POS Quote Line" WHERE ("Quote Entry No."=FIELD("Entry No."),
+                                                        "EFT Approved"=CONST(true)));
+            Caption = 'Contains EFT Approval';
+            FieldClass = FlowField;
+        }
     }
 
     keys
@@ -109,8 +117,19 @@ table 6151002 "POS Quote Entry"
         POSQuoteLine: Record "POS Quote Line";
     begin
         POSQuoteLine.SetRange("Quote Entry No.","Entry No.");
-        if POSQuoteLine.FindFirst then
-          POSQuoteLine.DeleteAll;
+        //-NPR5.51 [364694]
+        POSQuoteLine.DeleteAll(not SkipLineDeleteTriggerValue);
+        //+NPR5.51 [364694]
+    end;
+
+    var
+        SkipLineDeleteTriggerValue: Boolean;
+
+    procedure SkipLineDeleteTrigger(Value: Boolean)
+    begin
+        //-NPR5.51 [364694]
+        SkipLineDeleteTriggerValue := Value;
+        //+NPR5.51 [364694]
     end;
 }
 

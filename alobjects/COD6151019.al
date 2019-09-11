@@ -3,7 +3,7 @@ codeunit 6151019 "NpRv Module Validate - Global"
     // NPR5.42/MHA /20180525  CASE 307022 Object created - Global Retail Voucher
     // NPR5.48/MHA /20180921  CASE 302179 Replaced direct check on Voucher."In-Use Quantity" with CalcInUseQty
     // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner functionality used with Cross Company Vouchers
-    // #361164/MHA /20190705  CASE 361164 Updated Exception Message parsing
+    // NPR5.51/MHA /20190705  CASE 361164 Updated Exception Message parsing
 
 
     trigger OnRun()
@@ -105,21 +105,21 @@ codeunit 6151019 "NpRv Module Validate - Global"
         if NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then
           exit;
 
-        //-#361164 [361164]
+        //-NPR5.51 [361164]
         ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-        //+#361164 [361164]
+        //+NPR5.51 [361164]
         if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
           NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
           if NpXmlDomMgt.FindNode(XmlDoc.DocumentElement,'//faultstring',XmlElement) then begin
             ErrorMessage := XmlElement.InnerText;
-            //-#361164 [361164]
+            //-NPR5.51 [361164]
             Error(CopyStr(ErrorMessage,1,1000));
-            //+#361164 [361164]
+            //+NPR5.51 [361164]
           end;
         end;
-        //-#361164 [361164]
+        //-NPR5.51 [361164]
         Error(CopyStr(ErrorMessage,1,1000));
-        //+#361164 [361164]
+        //+NPR5.51 [361164]
         //+NPR5.49 [342811]
     end;
 
@@ -261,9 +261,9 @@ codeunit 6151019 "NpRv Module Validate - Global"
         NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
 
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          //-#361164 [361164]
+          //-NPR5.51 [361164]
           ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-          //+#361164 [361164]
+          //+NPR5.51 [361164]
           if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
             NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
             ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement,'Body/Fault/faultstring',1000,false);
@@ -392,9 +392,9 @@ codeunit 6151019 "NpRv Module Validate - Global"
         if NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then
           exit;
 
-        //-#361164 [361164]
+        //-NPR5.51 [361164]
         ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-        //+#361164 [361164]
+        //+NPR5.51 [361164]
         if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
           NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
           ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement,'Body/Fault/faultstring',1000,false);
@@ -487,9 +487,9 @@ codeunit 6151019 "NpRv Module Validate - Global"
         NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
 
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          //-#361164 [361164]
+          //-NPR5.51 [361164]
           ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-          //+#361164 [361164]
+          //+NPR5.51 [361164]
           if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
             NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
             ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement,'Body/Fault/faultstring',1000,false);
@@ -617,9 +617,9 @@ codeunit 6151019 "NpRv Module Validate - Global"
         NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
 
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          //-#361164 [361164]
+          //-NPR5.51 [361164]
           ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-          //+#361164 [361164]
+          //+NPR5.51 [361164]
           if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
             NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
             ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement,'Body/Fault/faultstring',1000,false);
@@ -695,9 +695,9 @@ codeunit 6151019 "NpRv Module Validate - Global"
         NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
 
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          //-#361164 [361164]
+          //-NPR5.51 [361164]
           ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
-          //+#361164 [361164]
+          //+NPR5.51 [361164]
           if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
             NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
             ErrorMessage := NpXmlDomMgt.GetXmlText(XmlDoc.DocumentElement,'Body/Fault/faultstring',1000,false);

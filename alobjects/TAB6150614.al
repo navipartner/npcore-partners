@@ -9,7 +9,7 @@ table 6150614 "POS Store"
     // NPR5.36/BR/20170914 CASE 289641 Added field VAT Customer No., Delete related POSPostingSetup records
     // NPR5.38/BR/20180125 CASE 302803 Added field Posting Compression, renamed field POS Ledger No. Series to POS Period Register No. Series
     // NPR5.48/MMV /20180615 CASE 318028 Added field 28 for countries with location specific registration no.
-    // #361917/TSA /20190722 CASE 361917 Removed unreferenced functions SendToJournal(), PostToEntries(), PostOnFinaliseSale(), PostOnClosePOS()
+    // NPR5.51/TSA /20190722 CASE 361917 Removed unreferenced functions SendToJournal(), PostToEntries(), PostOnFinaliseSale(), PostOnClosePOS()
 
     Caption = 'POS Store';
     DataCaptionFields = "Code",Name;

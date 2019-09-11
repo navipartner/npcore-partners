@@ -4,7 +4,8 @@ xmlport 6060131 "MM Update Member"
     // MM1.03/TSA/20160104  CASE 230647 - Added NewsLetter CRM option
     // MM1.06/TSA/20160127  CASE 232910 - Enchanced error handling when there is a runtime error processing the request
     // MM1.18/NPKNAV/20170309  CASE 265562 Transport MM1.18 - 8 March 2017
-    // MM1.24/TSA /20171120 CASE 276832 Added guardian section
+    // MM1.24/TSA /20171120 CASE 276832 - Added guardian section
+    // MM1.40/TSA /20190827 CASE 360242 - Added Attributes
 
     Caption = 'Update Member';
     FormatEvaluate = Xml;
@@ -74,6 +75,23 @@ xmlport 6060131 "MM Update Member"
                             XmlName = 'email';
                         }
                     }
+                    textelement(attributes)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                        tableelement(tmpattributevalueset;"NPR Attribute Value Set")
+                        {
+                            MinOccurs = Zero;
+                            XmlName = 'attribute';
+                            UseTemporary = true;
+                            fieldattribute(code;TmpAttributeValueSet."Attribute Code")
+                            {
+                            }
+                            fieldattribute(value;TmpAttributeValueSet."Text Value")
+                            {
+                            }
+                        }
+                    }
                 }
                 tableelement(tmpmember;"MM Member")
                 {
@@ -120,6 +138,7 @@ xmlport 6060131 "MM Update Member"
 
     var
         OutStr: OutStream;
+        EntryNo: Integer;
 
     procedure ClearResponse()
     begin

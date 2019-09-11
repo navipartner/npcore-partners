@@ -30,6 +30,7 @@ table 6014414 "Period Discount Line"
     // NPR5.38/TS  /20171213  CASE 299274 Added fields Priority and Page Number
     // NPR5.40/MMV /20180213  CASE 294655 Performance optimization. Made several fields true fields instead of flowfields and added a key using all of them.
     // NPR5.50/THRO/20190528  CASE 299278 Corect Campaign Profit Calculation annd campaign price calculated based on profit
+    // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup()
 
     Caption = 'Period Discount Line';
 
@@ -51,15 +52,6 @@ table 6014414 "Period Discount Line"
             trigger OnValidate()
             begin
                 CalcFields(Description,"Unit Price");
-
-                //-NPR5.23 [240916]
-                // Variation.SETCURRENTKEY("EAN Code");
-                // Variation.SETRANGE("EAN Code","Item No.");
-                // IF Variation.FIND('-') THEN BEGIN
-                //  "Item No."      :=Variation."Item Code";
-                //  "Variant Code"  :=Variation."Variant Code";
-                // END;
-                //+NPR5.23 [240916]
 
                 Item.Get("Item No.");
                 "Vendor No.":=Item."Vendor No.";
@@ -96,15 +88,8 @@ table 6014414 "Period Discount Line"
             trigger OnValidate()
             begin
                 CalcFields("Unit Price");
-                //-NPR5.40 [294655]
-                //CALCFIELDS(Status);
-                //+NPR5.40 [294655]
-                //IF Status = Status::Aktiv THEN ERROR(Text1060004);
                 "Discount Amount" := Round("Unit Price" - "Campaign Unit Price");
                 "Discount %" := Round(("Unit Price" - "Campaign Unit Price") / "Unit Price" * 100);
-                //-NPR4.14
-                //calcPriceWithoutTax();
-                //+NPR4.14
                 Validate("Campaign Unit Cost");
             end;
         }
@@ -138,9 +123,6 @@ table 6014414 "Period Discount Line"
                 "Campaign Unit Price" := Round("Unit Price" * ((100-"Discount %") / 100));
                 if "Unit Price" < "Campaign Unit Price" then Error(Text1060003);
                 "Discount Amount" := Round("Unit Price" - "Campaign Unit Price");
-                //-NPR4.14
-                //calcPriceWithoutTax();
-                //+NPR4.14
             end;
         }
         field(11;"Discount Amount";Decimal)
@@ -155,9 +137,6 @@ table 6014414 "Period Discount Line"
                 "Campaign Unit Price" := Round("Unit Price" - "Discount Amount");
                 if "Unit Price" < "Campaign Unit Price" then Error(Text1060003);
                 "Discount %" := Round(("Unit Price" - "Campaign Unit Price") / "Unit Price" * 100);
-                //-NPR4.14
-                //calcPriceWithoutTax();
-                //+NPR4.14
             end;
         }
         field(12;"Unit Price Incl. VAT";Boolean)
@@ -174,6 +153,8 @@ table 6014414 "Period Discount Line"
             trigger OnValidate()
             var
                 ItemGroup: Record "Item Group";
+                POSTaxCalculation: Codeunit "POS Tax Calculation";
+                Handled: Boolean;
                 UnitCost: Decimal;
             begin
 
@@ -182,28 +163,16 @@ table 6014414 "Period Discount Line"
                   //-NPR5.50 [299278]
                   if Item."Price Includes VAT" then begin
                   //+NPR5.50 [299278]
-                    VATPostingSetup.SetRange(VATPostingSetup."VAT Bus. Posting Group",ItemGroup."VAT Bus. Posting Group");
-                    VATPostingSetup.SetRange(VATPostingSetup."VAT Prod. Posting Group",ItemGroup."VAT Prod. Posting Group");
-                    if VATPostingSetup.Find('-') then
+                    //-NPR5.51 [358985]
+                    if VATPostingSetup.Get(ItemGroup."VAT Bus. Posting Group",ItemGroup."VAT Prod. Posting Group") then begin
+                      POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
                       VATPct := VATPostingSetup."VAT %";
+                    end;
+                    //+NPR5.51 [358985]
                   //-NPR5.50 [299278]
                   end else
                     VATPct := 0;
 
-                  //IF Item."Price Includes VAT" THEN BEGIN
-                  //  IF "Campaign Unit Cost" <> 0 THEN
-                  //    Profit := ROUND(("Campaign Unit Price"/(1 + VATPct / 100) - "Campaign Unit Cost"),0.001)
-                  //  ELSE Profit:=ROUND(("Campaign Unit Price"/(1 + VATPct / 100) - Item."Unit Cost"),0.001) ;
-                  //    IF ("Campaign Unit Price"/(1 + VATPct / 100)) <> 0 THEN
-                  //    "Campaign Profit" := ROUND(Profit/("Campaign Unit Price"/(1 + VATPct / 100))*100,0.01)
-                  //  ELSE
-                  //    DG := 0;
-                  //END ELSE BEGIN
-                  //  IF "Campaign Unit Cost" <> 0 THEN Profit := ROUND ("Campaign Unit Price"-"Campaign Unit Cost")
-                  //    ELSE
-                  //  Profit:= "Campaign Unit Price"-Item."Unit Cost";
-                  //  "Campaign Profit" := ROUND((Profit / "Campaign Unit Price" * 100),0.01);
-                  //END;
                   if "Campaign Unit Cost" <> 0 then
                     UnitCost := "Campaign Unit Cost" * (1 + (VATPct/100))
                   else
@@ -352,6 +321,8 @@ table 6014414 "Period Discount Line"
             var
                 GLSetup: Record "General Ledger Setup";
                 ItemGroup: Record "Item Group";
+                POSTaxCalculation: Codeunit "POS Tax Calculation";
+                Handled: Boolean;
                 UnitCost: Decimal;
             begin
                 //-NPR5.50 [299278]
@@ -359,10 +330,12 @@ table 6014414 "Period Discount Line"
                   GLSetup.Get();
                   ItemGroup.Get(Item."Item Group");
                   if Item."Price Includes VAT" then begin
-                    VATPostingSetup.SetRange(VATPostingSetup."VAT Bus. Posting Group",ItemGroup."VAT Bus. Posting Group");
-                    VATPostingSetup.SetRange(VATPostingSetup."VAT Prod. Posting Group",ItemGroup."VAT Prod. Posting Group");
-                    if VATPostingSetup.Find('-') then
+                    //-NPR5.51 [358985]
+                    if VATPostingSetup.Get(ItemGroup."VAT Bus. Posting Group",ItemGroup."VAT Prod. Posting Group") then begin
+                      POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
                       VATPct := VATPostingSetup."VAT %";
+                    end;
+                    //+NPR5.51 [358985]
                   end else
                     VATPct := 0;
 
@@ -525,12 +498,7 @@ table 6014414 "Period Discount Line"
           if "Item No." <> '' then begin
             RetailComment.SetRange("No.",Code);
             RetailComment.SetRange("No. 2","Item No.");
-            /*FORMREF
-            NPRBem�rkningslinjeFrm.SETTABLEVIEW(NPRBem�rkningslinjeRec);
-            NPRBem�rkningslinjeFrm.RUNMODAL;
-            */
           end;
-
     end;
 
     local procedure UpdateLine()

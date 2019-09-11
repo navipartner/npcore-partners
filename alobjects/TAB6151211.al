@@ -1,6 +1,6 @@
 table 6151211 "NpCs Open. Hour Calendar Entry"
 {
-    // #362443/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
+    // NPR5.51/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
 
     Caption = 'Collect Store Opening Hour Date';
     DrillDownPageID = "NpCs Open. Hour Calendar";

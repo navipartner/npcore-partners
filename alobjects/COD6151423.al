@@ -1,6 +1,6 @@
-codeunit 6151423 "Magento Setup upg."
+codeunit 6151423 "Npm Upg. (Remove)"
 {
-    // MAG2.22/MHA /201907017  CASE 362262 Object codeunit for rolling back rapidstart to standard [VLOBJUPG] Delete after upgrade
+    // NPR5.51/MHA /20190816  CASE 365332 Upgrade codeunit for removal of Npm - NaviPartner Page Manager [VLOBJUPG] Object may be deleted after upgrade
 
     Subtype = Upgrade;
 
@@ -9,11 +9,16 @@ codeunit 6151423 "Magento Setup upg."
     end;
 
     [TableSyncSetup]
-    procedure SetupMagentoSetupSync(var TableSynchSetup: Record "Table Synch. Setup")
+    procedure SetupTableSyncSetup(var TableSynchSetup: Record "Table Synch. Setup")
     var
         DataUpgradeMgt: Codeunit "Data Upgrade Mgt.";
     begin
-        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Magento Setup",0,TableSynchSetup.Mode::Force);
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Npm Page",0,TableSynchSetup.Mode::Force);
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Npm View",0,TableSynchSetup.Mode::Force);
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Npm Field",0,TableSynchSetup.Mode::Force);
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Npm View Condition",0,TableSynchSetup.Mode::Force);
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Npm Page View",0,TableSynchSetup.Mode::Force);
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Npm Field Caption",0,TableSynchSetup.Mode::Force);
     end;
 }
 

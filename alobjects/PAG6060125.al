@@ -11,6 +11,9 @@ page 6060125 "MM Membership Sales Setup"
     // MM1.22/TSA /20170829 CASE 286922 Added field "Auto-Renew To"
     // MM1.29.02/TSA /20180530 CASE 316450 Added field "Auto-Admitt Member On Sale"
     // MM1.32/TSA /20180711 CASE 318132 Member Card Type
+    // MM1.40/TSA /20190612 CASE 357360 Disallowing foreign membership management from this page;
+    // MM1.40/TSA /20190726 CASE 356090 Adding field "Magento M2 Membership Sign-up"
+    // MM1.40/TSA /20190808 CASE 363147 Made CreateMembership function public and changed signature, refactored to use parameter record instance instead of Rec; previous comments /  versions removed
 
     Caption = 'Membership Sales Setup';
     PageType = List;
@@ -65,13 +68,16 @@ page 6060125 "MM Membership Sales Setup"
                 field("Auto-Renew To";"Auto-Renew To")
                 {
                 }
-                field("Auto-Admitt Member On Sale";"Auto-Admitt Member On Sale")
+                field("Auto-Admit Member On Sale";"Auto-Admit Member On Sale")
                 {
                 }
                 field("Member Card Type Selection";"Member Card Type Selection")
                 {
                 }
                 field("Member Card Type";"Member Card Type")
+                {
+                }
+                field("Magento M2 Membership Sign-up";"Magento M2 Membership Sign-up")
                 {
                 }
             }
@@ -92,7 +98,7 @@ page 6060125 "MM Membership Sales Setup"
 
                 trigger OnAction()
                 begin
-                    CreateMembership ();
+                    CreateMembership (Rec);
                 end;
             }
             separator(Separator6150632)
@@ -159,9 +165,11 @@ page 6060125 "MM Membership Sales Setup"
         Rec.SetFilter (Blocked, '=%1', false);
     end;
 
-    local procedure CreateMembership()
+    procedure CreateMembership(MembershipSalesSetup: Record "MM Membership Sales Setup")
     var
         MemberInfoCapture: Record "MM Member Info Capture";
+        MemberCommunity: Record "MM Member Community";
+        MembershipSetup: Record "MM Membership Setup";
         MemberInfoCapturePage: Page "MM Member Info Capture";
         MembershipPage: Page "MM Membership Card";
         PageAction: Action;
@@ -169,11 +177,18 @@ page 6060125 "MM Membership Sales Setup"
         MembershipEntryNo: Integer;
         Membership: Record "MM Membership";
         ResponseMessage: Text;
+        Rec: Record Item;
     begin
 
+        //-MM1.40 [363147] Function refactored to use parameter record instance instead of Rec; previous comments /  versions removed
+        MembershipSetup.Get (MembershipSalesSetup."Membership Code");
+
+        MemberCommunity.Get (MembershipSetup."Community Code");
+        MemberCommunity.CalcFields ("Foreign Membership");
+        MemberCommunity.TestField ("Foreign Membership", false);
+
         MemberInfoCapture.Init ();
-        //-+MM1.18 [255459]
-        MemberInfoCapture."Item No." := "No.";
+        MemberInfoCapture."Item No." := MembershipSalesSetup."No.";
         MemberInfoCapture.Insert ();
 
         MemberInfoCapturePage.SetRecord (MemberInfoCapture);
@@ -187,36 +202,33 @@ page 6060125 "MM Membership Sales Setup"
         if (PageAction = ACTION::LookupOK) then begin
           MemberInfoCapturePage.GetRecord (MemberInfoCapture);
 
-          //-MM1.22 [287080]
-          //MembershipEntryNo := MembershipManagement.CreateMembershipAll (Rec, MemberInfoCapture, TRUE);
-          case Rec."Business Flow Type" of
+          case MembershipSalesSetup."Business Flow Type" of
 
-            Rec."Business Flow Type"::MEMBERSHIP :
+            MembershipSalesSetup."Business Flow Type"::MEMBERSHIP :
               begin
-                MembershipEntryNo := MembershipManagement.CreateMembershipAll (Rec, MemberInfoCapture, true);
+                MembershipEntryNo := MembershipManagement.CreateMembershipAll (MembershipSalesSetup, MemberInfoCapture, true);
                 Membership.Get (MembershipEntryNo);
                 MembershipPage.SetRecord (Membership);
                 MembershipPage.Run ();
               end;
 
-            Rec."Business Flow Type"::ADD_NAMED_MEMBER :
+            MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER :
               MembershipManagement.AddMemberAndCard (true, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
 
-            Rec."Business Flow Type"::ADD_ANONYMOUS_MEMBER :
+            MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER :
               MembershipManagement.AddAnonymousMember (MemberInfoCapture, MemberInfoCapture.Quantity);
 
-            Rec."Business Flow Type"::REPLACE_CARD :
+            MembershipSalesSetup."Business Flow Type"::REPLACE_CARD :
               begin
                 MembershipManagement.BlockMemberCard (MembershipManagement.GetCardEntryNoFromExtCardNo (MemberInfoCapture."Replace External Card No."), true);
                 MembershipManagement.IssueMemberCard (true, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
               end;
 
-            Rec."Business Flow Type"::ADD_CARD :
+            MembershipSalesSetup."Business Flow Type"::ADD_CARD :
               MembershipManagement.IssueMemberCard (true, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
           end;
-          //+MM1.22 [287080]
-
         end;
+        //+MM1.40 [363147]
     end;
 }
 

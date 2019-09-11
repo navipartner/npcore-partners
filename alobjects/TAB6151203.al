@@ -1,7 +1,7 @@
 table 6151203 "NpCs Arch. Document Log Entry"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #344264/MHA /20190717  CASE 344264 Removed Set of "Log Date" from OnInsert()
+    // NPR5.51/MHA /20190717  CASE 344264 Removed Set of "Log Date" from OnInsert()
 
     Caption = 'Collect Document Log Entry';
     DrillDownPageID = "NpCs Arch. Doc. Log Entries";

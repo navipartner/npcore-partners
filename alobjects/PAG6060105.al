@@ -5,6 +5,7 @@ page 6060105 "MM Loyalty Setup"
     // MM1.23/TSA /20171025 CASE 257011 Added fields "Amount Factor", "Point Rate"
     // MM1.37/TSA /20190227 CASE 343053 Expire points functionality
     // MM1.38/TSA /20190425 CASE 338215 Added Loyalty Point Server setups
+    // MM1.40/TSA /20190816 CASE 361664 Added field "Auto Upgrade Point Source" and Action to "Auto Upgrade Point Threshold" page
 
     Caption = 'Loyalty Setup';
     PageType = List;
@@ -130,6 +131,9 @@ page 6060105 "MM Loyalty Setup"
                 field("Point Rate";"Point Rate")
                 {
                 }
+                field("Auto Upgrade Point Source";"Auto Upgrade Point Source")
+                {
+                }
                 field(ReasonText;ReasonText)
                 {
                     Caption = 'ReasonText';
@@ -165,6 +169,18 @@ page 6060105 "MM Loyalty Setup"
                 PromotedIsBig = true;
                 RunObject = Page "MM Loyalty Item Point Setup";
                 RunPageLink = Code=FIELD(Code);
+            }
+            separator(Separator6014432)
+            {
+            }
+            action("Auto Upgrade Thresholds")
+            {
+                Caption = 'Auto Upgrade Threshold';
+                Image = UserCertificate;
+                Promoted = true;
+                PromotedIsBig = true;
+                RunObject = Page "MM Loyalty Alter Membership";
+                RunPageLink = "Loyalty Code"=FIELD(Code);
             }
             group("Cross Company Loyalty")
             {

@@ -1,6 +1,7 @@
 page 6184851 "FR Audit No. Series"
 {
     // NPR5.48/MMV /20181025 CASE 318028 Created object
+    // NPR5.51/MMV /20190614 CASE 356076 Added field 6
 
     Caption = 'FR Audit No. Series';
     DelayedInsert = true;
@@ -26,6 +27,9 @@ page 6184851 "FR Audit No. Series"
                 {
                 }
                 field("Grand Period No. Series";"Grand Period No. Series")
+                {
+                }
+                field("Yearly Period No. Series";"Yearly Period No. Series")
                 {
                 }
             }

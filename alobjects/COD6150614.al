@@ -52,7 +52,10 @@ codeunit 6150614 "POS Create Entry"
     // NPR5.50/MHA /20190622 CASE 337539 Added "Retail ID" in InsertPOSEntry() and InsertPOSSaleLine()
     // NPR5.50/MMV /20190320 CASE 300557 Improved sales doc. references.
     // NPR5.50/TSA /20190520 CASE 354832 Added reversal of preliminary VAT
-    // #362329/MHA /20190718 CASE 362329 Added "Exclude from Posting" on POS Sales Lines in InsertPOSSaleLine()
+    // NPR5.51/MMV /20190617 CASE 356076 Set cancelled sale posting to not be posted for better clarity.
+    //                                   Write to POS Audit Log for additional system events.
+    //                                   Removed undocumented code in CreatePOSSystemEntry()
+    // NPR5.51/MHA /20190718 CASE 362329 Added "Exclude from Posting" on POS Sales Lines in InsertPOSSaleLine()
 
     TableNo = "Sale POS";
 
@@ -67,19 +70,6 @@ codeunit 6150614 "POS Create Entry"
         POSAuditLog: Record "POS Audit Log";
         SaleCancelled: Boolean;
     begin
-        //-NPR5.48 [318028]
-        // OnBeforeCreatePOSEntry(Rec);
-        //
-        // IF NOT GetPOSPeriodRegister(Rec,POSPeriodRegister,TRUE) THEN
-        //  ERROR(ERR_NO_OPEN_PERIOD,POSPeriodRegister.TABLECAPTION,POSPeriodRegister.FIELDCAPTION("POS Unit No."),Rec."Register No.");
-        //
-        // CASE Rec."Sale type" OF
-        //  Rec."Sale type"::Sale:
-        //    InsertPOSEntry(POSPeriodRegister, Rec, POSEntry, POSEntry."Entry Type"::"Direct Sale");
-        //  Rec."Sale type"::Annullment:
-        //    InsertPOSEntry(POSPeriodRegister, Rec, POSEntry, POSEntry."Entry Type"::Comment);
-        // END;
-
         ValidateSaleHeader(Rec);
 
         OnBeforeCreatePOSEntry(Rec);
@@ -88,23 +78,29 @@ codeunit 6150614 "POS Create Entry"
           Error(ERR_NO_OPEN_UNIT,POSPeriodRegister.TableCaption,POSPeriodRegister.FieldCaption("POS Unit No."),Rec."Register No.");
 
         SaleCancelled := IsCancelledSale(Rec);
-        if SaleCancelled then
-          InsertPOSEntry(POSPeriodRegister, Rec, POSEntry, POSEntry."Entry Type"::"Cancelled Sale")
-        else
+        if SaleCancelled then begin
+          InsertPOSEntry(POSPeriodRegister, Rec, POSEntry, POSEntry."Entry Type"::"Cancelled Sale");
+        //-NPR5.51 [356076]
+          POSEntry."Post Entry Status" := POSEntry."Post Entry Status"::"Not To Be Posted";
+          POSEntry."Post Item Entry Status" := POSEntry."Post Item Entry Status"::"Not To Be Posted";
+        //+NPR5.51 [356076]
+        end else begin
           InsertPOSEntry(POSPeriodRegister, Rec, POSEntry, POSEntry."Entry Type"::"Direct Sale");
-        //+NPR5.48 [318028]
+        end;
 
         CreateLines(POSEntry,Rec);
 
         POSEntryManagement.RecalculatePOSEntry(POSEntry,WasModified);
         POSEntry.Modify;
 
-        //-NPR5.48 [318028]
-        if SaleCancelled then
+        if SaleCancelled then begin
           POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::CANCEL_SALE_END, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", TXT_CANCEL_SALE_END, '')
-        else
+        end else begin
+        //-NPR5.51 [356076]
+          POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::GRANDTOTAL, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
+        //+NPR5.51 [356076]
           POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::DIRECT_SALE_END, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", TXT_DIRECT_SALE_END, '');
-        //+NPR5.48 [318028]
+        end;
 
         OnAfterInsertPOSEntry(Rec,POSEntry);
     end;
@@ -127,12 +123,6 @@ codeunit 6150614 "POS Create Entry"
         SaleLinePOS.SetRange("Register No.",SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.",SalePOS."Sales Ticket No.");
         if SaleLinePOS.FindSet then begin
-        //-NPR5.48 [318028]
-        //  //-NPR5.37 [294362]
-        //  IF POSEntry."Entry Type" <> POSEntry."Entry Type"::"Credit Sale" THEN
-        //  //+NPR5.37 [294362]
-        //    POSEntry."Entry Type" := POSEntry."Entry Type"::"Direct Sale";
-        //+NPR5.48 [318028]
           repeat
             case SaleLinePOS."Sale Type" of
               SaleLinePOS."Sale Type"::Sale,
@@ -210,39 +200,16 @@ codeunit 6150614 "POS Create Entry"
         POSAuditRollIntegration: Codeunit "POS-Audit Roll Integration";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
     begin
-        //-NPR5.48 [318028]
-        //NPRetailSetup.GET;
-        //+NPR5.48 [318028]
-
         POSEntry.Init;
         POSEntry."Entry No." := 0; //Autoincrement;
         POSEntry."POS Period Register No." := POSPeriodRegister."No.";
         POSEntry."POS Store Code" := SalePOS."POS Store Code";
         POSEntry."POS Unit No." := SalePOS."Register No.";
         POSEntry."Document No." := SalePOS."Sales Ticket No.";
-        //-NPR5.48 [318028]
-        // CASE EntryType OF
-        //  POSEntry."Entry Type"::"Direct Sale" :
-        //    IF (NPRetailSetup."Fill Sale Fiscal No. On" = NPRetailSetup."Fill Sale Fiscal No. On"::All) THEN
-        //      FillFiscalNo(POSEntry, NPRetailSetup."Sale Fiscal No. Series", SalePOS.Date)
-        //    ELSE IF (NOT IsCancelledSale(SalePOS)) THEN
-        //      FillFiscalNo(POSEntry, NPRetailSetup."Sale Fiscal No. Series", SalePOS.Date);
-        //
-        //  POSEntry."Entry Type"::"Credit Sale" :
-        //    IF (NPRetailSetup."Fill Sale Fiscal No. On" = NPRetailSetup."Fill Sale Fiscal No. On"::All) THEN
-        //      FillFiscalNo(POSEntry, NPRetailSetup."Sale Fiscal No. Series", SalePOS.Date);
-        //
-        //  POSEntry."Entry Type"::Balancing :
-        //    FillFiscalNo(POSEntry, NPRetailSetup."Balancing Fiscal No. Series", SalePOS.Date);
-        // END;
-        //+NPR5.48 [318028]
-
         POSEntry."Entry Date" := SalePOS.Date;
         POSEntry."Entry Type" := EntryType;
 
-        //-NPR5.48 [318028]
         FiscalNoCheck(POSEntry, SalePOS);
-        //+NPR5.48 [318028]
 
         POSEntry."Salesperson Code" := SalePOS."Salesperson Code";
         if SalePOS."Customer Type" = SalePOS."Customer Type"::Ord then
@@ -372,9 +339,9 @@ codeunit 6150614 "POS Create Entry"
             //+NPR5.38 [294719]
 
           end;
-          //-#362329 [362329]
+          //-NPR5.51 [362329]
           "Exclude from Posting" := ExcludeFromPosting(SaleLinePOS);
-          //+#362329 [362329]
+          //+NPR5.51 [362329]
 
           "No." := SaleLinePOS."No.";
           "Variant Code" := SaleLinePOS."Variant Code";
@@ -610,7 +577,7 @@ codeunit 6150614 "POS Create Entry"
 
           "Orig. POS Sale ID" := SaleLinePOS."Orig. POS Sale ID";
           "Orig. POS Line No." := SaleLinePOS."Orig. POS Line No.";
-          EFT := SaleLinePOS."Cash Terminal Approved";
+          EFT := SaleLinePOS."EFT Approved";
 
           "Shortcut Dimension 1 Code" := SaleLinePOS."Shortcut Dimension 1 Code";
           "Shortcut Dimension 2 Code" := SaleLinePOS."Shortcut Dimension 2 Code";
@@ -912,79 +879,110 @@ codeunit 6150614 "POS Create Entry"
     var
         POSEntry: Record "POS Entry";
         POSLedgerRegister: Record "POS Period Register";
+        POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
+        POSAuditLog: Record "POS Audit Log";
     begin
-
-        //-NPR5.48 [336921]
-        //-NPR5.38 [297087]
-        // IF IsActivated THEN
-        //   CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Login (With Open)');
         if (not IsActivated) then
           exit (0);
 
         EntryNo := CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Login (With Open)');
-        //+NPR5.48 [336921]
+        //-NPR5.51 [356076]
+        POSEntry.Get(EntryNo);
+        POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::UNIT_OPEN, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
+        POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::SIGN_IN, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
+        //+NPR5.51 [356076]
     end;
 
-    procedure InsertUnitLoginEntry(POSUnitNo: Code[10];SalespersonCode: Code[10])
+    procedure InsertUnitLoginEntry(POSUnitNo: Code[10];SalespersonCode: Code[10]) EntryNo: Integer
+    var
+        POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
+        POSAuditLog: Record "POS Audit Log";
+        POSEntry: Record "POS Entry";
     begin
+        //-NPR5.51 [356076]
+        // IF IsActivated THEN
+        //  CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Login');
 
-        //-NPR5.38 [297087]
-        if IsActivated then
-          CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Login');
+        if (not IsActivated) then
+          exit (0);
+
+        EntryNo := CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Login');
+        POSEntry.Get(EntryNo);
+        POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::SIGN_IN, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
+        //+NPR5.51 [356076]
     end;
 
     procedure InsertUnitCloseBeginEntry(POSUnitNo: Code[10];SalespersonCode: Code[10]) EntryNo: Integer
     begin
-
-        //-NPR5.48 [336921]
-        //-NPR5.38 [297087]
-        // IF IsActivated THEN
-        //  CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Close (Balancing Begin)');
-
         if (not IsActivated) then
           exit (0);
 
         EntryNo := CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Close (Balancing Begin)');
-        //+NPR5.48 [336921]
     end;
 
     procedure InsertUnitCloseEndEntry(POSUnitNo: Code[10];SalespersonCode: Code[10]) EntryNo: Integer
     begin
-
-        //-NPR5.48 [336921]
-        //-NPR5.38 [297087]
-        // IF IsActivated THEN
-        //   CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Close (Balancing End)');
-
         if (not IsActivated) then
           exit (0);
 
         EntryNo := CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Close (Balancing End)');
-        //+NPR5.48 [336921]
     end;
 
-    procedure InsertUnitLogoutEntry(POSUnitNo: Code[10];SalespersonCode: Code[10])
+    procedure InsertUnitLogoutEntry(POSUnitNo: Code[10];SalespersonCode: Code[10]) EntryNo: Integer
+    var
+        POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
+        POSAuditLog: Record "POS Audit Log";
+        POSEntry: Record "POS Entry";
     begin
+        //-NPR5.51 [356076]
+        // IF IsActivated THEN
+        //  CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Logout');
 
-        //-NPR5.38 [297087]
-        if IsActivated then
-          CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Logout');
+        if (not IsActivated) then
+          exit (0);
+
+        EntryNo := CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Logout');
+        POSEntry.Get(EntryNo);
+        POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::SIGN_OUT, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
+        //+NPR5.51 [356076]
     end;
 
-    procedure InsertUnitLockEntry(POSUnitNo: Code[10];SalespersonCode: Code[10])
+    procedure InsertUnitLockEntry(POSUnitNo: Code[10];SalespersonCode: Code[10]) EntryNo: Integer
+    var
+        POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
+        POSAuditLog: Record "POS Audit Log";
+        POSEntry: Record "POS Entry";
     begin
+        //-NPR5.51 [356076]
+        // IF IsActivated THEN
+        //  CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Lock');
 
-        //-NPR5.38 [297087]
-        if IsActivated then
-          CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Lock');
+        if (not IsActivated) then
+          exit (0);
+
+        EntryNo := CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Lock');
+        POSEntry.Get(EntryNo);
+        POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::UNIT_LOCK, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
+        //+NPR5.51 [356076]
     end;
 
-    procedure InsertUnitUnlockEntry(POSUnitNo: Code[10];SalespersonCode: Code[10])
+    procedure InsertUnitUnlockEntry(POSUnitNo: Code[10];SalespersonCode: Code[10]) EntryNo: Integer
+    var
+        POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
+        POSAuditLog: Record "POS Audit Log";
+        POSEntry: Record "POS Entry";
     begin
+        //-NPR5.51 [356076]
+        // IF IsActivated THEN
+        //  CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Unlock');
 
-        //-NPR5.38 [297087]
-        if IsActivated then
-          CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Unlock');
+        if (not IsActivated) then
+          exit (0);
+
+        EntryNo := CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Unlock');
+        POSEntry.Get(EntryNo);
+        POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::UNIT_UNLOCK, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
+        //+NPR5.51 [356076]
     end;
 
     procedure InsertBinOpenEntry(POSUnitNo: Code[10];SalespersonCode: Code[10])
@@ -995,12 +993,23 @@ codeunit 6150614 "POS Create Entry"
           CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Bin Open');
     end;
 
-    procedure InsertParkSaleEntry(POSUnitNo: Code[10];SalespersonCode: Code[10])
+    procedure InsertParkSaleEntry(POSUnitNo: Code[10];SalespersonCode: Code[10]) EntryNo: Integer
+    var
+        POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
+        POSAuditLog: Record "POS Audit Log";
+        POSEntry: Record "POS Entry";
     begin
+        //-NPR5.51 [356076]
+        // IF IsActivated THEN
+        //  CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Park Sale');
 
-        //-NPR5.38 [297087]
-        if IsActivated then
-          CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Park Sale');
+        if (not IsActivated) then
+          exit (0);
+
+        EntryNo := CreatePOSSystemEntry (POSUnitNo, SalespersonCode, '[System Event] Unit Park Sale');
+        POSEntry.Get(EntryNo);
+        POSAuditLogMgt.CreateEntry(POSEntry.RecordId, POSAuditLog."Action Type"::SALE_PARK, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
+        //+NPR5.51 [356076]
     end;
 
     procedure InsertTransferLocation(POSUnitNo: Code[10];SalespersonCode: Code[10];OldDocumentNo: Code[20];NewDocumentNo: Code[20])
@@ -1020,15 +1029,6 @@ codeunit 6150614 "POS Create Entry"
         POSPeriodRegister: Record "POS Period Register";
     begin
 
-        //-NPR5.38 [297087]
-        ////////////////////////////alst 397
-        if POSUnitNo > '' then
-        ////////////////////////////alst 397
-
-
-
-
-
         if (not GetPOSPeriodRegisterForPOSUnit (POSUnitNo, POSPeriodRegister, false)) then
           Error (ERR_NO_OPEN_UNIT, POSPeriodRegister.TableCaption, POSPeriodRegister.FieldCaption("POS Unit No."), POSUnitNo);
 
@@ -1047,15 +1047,12 @@ codeunit 6150614 "POS Create Entry"
         POSEntry."Salesperson Code" := SalespersonCode;
 
         POSEntry.Description := Description;
-        //-NPR5.38 [301600]
         POSEntry."Post Item Entry Status" := POSEntry."Post Item Entry Status"::"Not To Be Posted";
         POSEntry."Post Entry Status" := POSEntry."Post Entry Status"::"Not To Be Posted";
-        //+NPR5.38 [301600]
 
         POSEntry.Insert ();
 
         exit (POSEntry."Entry No.");
-        //+NPR5.38 [297087]
     end;
 
     local procedure CreatePaymentLineBinEntry(POSPaymentLine: Record "POS Payment Line")
@@ -1403,6 +1400,8 @@ codeunit 6150614 "POS Create Entry"
     local procedure CreateRMAEntry(POSEntry: Record "POS Entry";SalePOS: Record "Sale POS";SaleLinePOS: Record "Sale Line POS")
     var
         PosRmaLine: Record "POS RMA Line";
+        POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
+        POSAuditLog: Record "POS Audit Log";
     begin
 
         //-NPR5.49 [342090]
@@ -1432,6 +1431,11 @@ codeunit 6150614 "POS Create Entry"
         PosRmaLine."Return Reason Code" := SaleLinePOS."Return Reason Code";
         PosRmaLine.Insert ();
         //+NPR5.49 [342090]
+
+        //-NPR5.51 [356076]
+        POSAuditLogMgt.CreateEntryExtended(POSEntry.RecordId, POSAuditLog."Action Type"::ITEM_RMA, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", '',
+          StrSubstNo('%1|%2|%3', PosRmaLine."Return Line No.", PosRmaLine."Sales Ticket No.", PosRmaLine."Return Reason Code"));
+        //+NPR5.51 [356076]
     end;
 
     local procedure GetStoreNoForUnitNo(POSUnitNo: Code[10]): Code[10]
@@ -1623,12 +1627,12 @@ codeunit 6150614 "POS Create Entry"
 
     procedure ExcludeFromPosting(SaleLinePOS: Record "Sale Line POS"): Boolean
     begin
-        //-#362329 [362329]
+        //-NPR5.51 [362329]
         if SaleLinePOS.Type in [SaleLinePOS.Type::Comment] then
           exit(true);
 
         exit(SaleLinePOS."Sale Type" in [SaleLinePOS."Sale Type"::Comment,SaleLinePOS."Sale Type"::"Debit Sale",SaleLinePOS."Sale Type"::"Open/Close"]);
-        //+#362329 [362329]
+        //+NPR5.51 [362329]
     end;
 
     local procedure "--"()

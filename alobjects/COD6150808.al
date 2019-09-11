@@ -10,6 +10,7 @@ codeunit 6150808 "POS Action - Quantity"
     // NPR5.46/TSA /20180914 CASE 314603 Refactored the security functionality to use secure methods
     // NPR5.46/TSA /20180914 CASE 314603 Removed green code
     // NPR5.49/MHA /20190328  CASE 350374 Added MaxStrLen to EanBox.Description in DiscoverEanBoxEvents()
+    // NPR5.51/ALPO/20190802 CASE 362928 Fix: POS Action 'QUANTITY', parameter Constraint was applied to incorrect quantity variable
 
 
     trigger OnRun()
@@ -165,7 +166,10 @@ codeunit 6150808 "POS Action - Quantity"
             begin
               if (Quantity = 0) then
                 Error (WRONG_QUANTITY);
-              if (SaleLinePOS.Quantity < 0) then
+              //-NPR5.51 [362928]
+              //IF (SaleLinePOS.Quantity < 0) THEN
+              if (Quantity < 0) then
+              //+NPR5.51 [362928]
                 Error (SALE_MUST_BE_POSITIVE);
             end;
 
@@ -173,7 +177,10 @@ codeunit 6150808 "POS Action - Quantity"
             begin
               if (Quantity = 0) then
                 Error (WRONG_QUANTITY);
-              if (SaleLinePOS.Quantity > 0) then
+              //-NPR5.51 [362928]
+              //IF (SaleLinePOS.Quantity > 0) THEN
+              if (Quantity > 0) then
+              //+NPR5.51 [362928]
                 Error (SALE_MUST_BE_NEGATIVE);
             end;
         end;

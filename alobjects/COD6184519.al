@@ -4,6 +4,7 @@ codeunit 6184519 "EFT Adyen Cloud Trx Dialog"
     // NPR5.49/MMV /20190305 CASE 345188 Added support for AcquireCard
     // NPR5.49/MMV /20190409 CASE 351678 Check response via codeunit.run instead of tryfunction
     // NPR5.50/MMV /20190430 CASE 352465 Added support for silent price reduction after customer recognition.
+    // NPR5.51/MMV /20190827 CASE 357279 Changed timings on dialog
 
     SingleInstance = true;
 
@@ -74,12 +75,8 @@ codeunit 6184519 "EFT Adyen Cloud Trx Dialog"
           exit; //Event is late - we have already acted on a result.
 
         case Sender of
-        //-NPR5.50 [352465]
-        //  'TransactionCheckResponse' : CheckResponse(POSSession, FrontEnd);
-        //  'TransactionRequestAbort' : RequestAbort(FrontEnd);
           'adyen-timer' : CheckResponse(POSSession, FrontEnd);
           'adyen-abort' : RequestAbort(FrontEnd);
-        //+NPR5.50 [352465]
         end;
     end;
 
@@ -126,13 +123,17 @@ codeunit 6184519 "EFT Adyen Cloud Trx Dialog"
         EFTAdyenCloudProtocol: Codeunit "EFT Adyen Cloud Protocol";
         EFTAdyenCloudIntegration: Codeunit "EFT Adyen Cloud Integration";
     begin
-        if (Ticks < 6) then
+        //-NPR5.51 [357279]
+        if (Ticks < 2) then
+        //+NPR5.51 [357279]
           exit; //Adyens test API seems to have problems if salesperson aborts too fast (before the trx has properly started), so we ignore too quick attempts
 
         EFTTransactionRequest.Get(TransactionEntryNo);
 
-        if (((Ticks - TickAbortRequested) > 80) and (AbortAttempts > 3)) then begin
-          //Allow force abort if 80 tickets (20 seconds) has passed since first abort attempt and we are above 3 attempts.
+        //-NPR5.51 [357279]
+        if (((Ticks - TickAbortRequested) > 10) and (AbortAttempts > 1)) then begin
+        //+NPR5.51 [357279]
+          //Allow force abort if 10 ticks (10 seconds) has passed since first abort attempt and we are above 1 attempt.
           //We assume an unhandled exception occurred in the invoke session so we allow force closing. This should be rare exceptions as it will trigger a lookup warning later, as we
           //don't have final result confirmation from adyens backend.
           EFTAdyenCloudProtocol.ForceCloseTransaction(EFTTransactionRequest);
@@ -288,23 +289,16 @@ codeunit 6184519 "EFT Adyen Cloud Trx Dialog"
 
     local procedure Javascript(): Text
     begin
-        //-NPR5.50 [352465]
-        // EXIT(
-        // 'function adyenAbort() {' +
-        //  'n$.respondExplicit("TransactionRequestAbort",{});' +
-        // '}' +
-        //
-        // 'setInterval(function() { n$.respondExplicit("TransactionCheckResponse",{}); }, 250);');
-
-        exit('setInterval(function() { $("#adyen-timer").click(); }, 250);');
-        //+NPR5.50 [352465]
+        //-NPR5.51 [357279]
+        exit('setInterval(function() { $("#adyen-timer").click(); }, 1000);');
+        //+NPR5.51 [357279]
     end;
 
     local procedure GetCaption(EFTTransactionRequest: Record "EFT Transaction Request"): Text
     var
         OriginalEFTTransactionRequest: Record "EFT Transaction Request";
     begin
-        if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::Auxiliary then
+        if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::AUXILIARY then
           if EFTTransactionRequest."Auxiliary Operation ID" = 2 then begin
             OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
             exit(Format(OriginalEFTTransactionRequest."Processing Type"));
@@ -317,7 +311,7 @@ codeunit 6184519 "EFT Adyen Cloud Trx Dialog"
     var
         OriginalEFTTransactionRequest: Record "EFT Transaction Request";
     begin
-        if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::Auxiliary then
+        if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::AUXILIARY then
           if EFTTransactionRequest."Auxiliary Operation ID" = 2 then begin
             OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
         //-NPR5.50 [352465]

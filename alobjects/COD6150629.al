@@ -8,7 +8,12 @@ codeunit 6150629 "POS Entry Management"
     // NPR5.40/MMV /20180228  CASE 300660 Added lookup function
     // NPR5.40/MMV /20180328  CASE 276562 Adjusted totals for debit sale
     // NPR5.48/MMV /20181120  CASE 318028 French audit
-    // #362329/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
+    // NPR5.51/MMV /20190624  CASE 356076 Added support for new total fields.
+    //                                    Fixed header "Sales Amount" containing amount excl. VAT of only the last sale line.
+    //                                    Now called "Direct Item Sales (LCY)" based on what audit roll -> pos entry upgrade does.
+    // NPR5.51/ZESO/20190701  CASE 360453 Set Request Page to True
+    // NPR5.51/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
+    // NPR5.51/ALPO/20190802  CASE 362747 Handle check of allowed number of receipt reprints
 
 
     trigger OnRun()
@@ -17,6 +22,7 @@ codeunit 6150629 "POS Entry Management"
 
     var
         TextInconsistent: Label '%1 is set to %2 on %3 and to %4 on %4. %5 is inconsistent.';
+        ReprintNotAllowedErrMsg: Label 'Additional reprints are not allowed for current sale (%1 %2).';
 
     procedure RecalculatePOSEntry(var POSEntry: Record "POS Entry";var EntryModified: Boolean)
     var
@@ -24,59 +30,57 @@ codeunit 6150629 "POS Entry Management"
         POSTaxAmountLine: Record "POS Tax Amount Line";
         POSPaymentLine: Record "POS Payment Line";
         POSTaxCalculation: Codeunit "POS Tax Calculation";
-        CalcSalesAmount: Decimal;
+        CalcItemSalesAmount: Decimal;
         CalcDiscountAmount: Decimal;
         CalcSalesQty: Decimal;
         CalcReturnSalesQty: Decimal;
         CalcTotalAmount: Decimal;
         CalcTotalVATAmount: Decimal;
         CalcTotalAmountInclVAT: Decimal;
-        CalcTotalAmountInclVATLCY: Decimal;
         CalcTotalPaymentAmountLCY: Decimal;
         DifferenceAmount: Decimal;
-        CalcTotalNegAmountInclVAT: Decimal;
         NoOfSalesLines: Integer;
+        CalcTotalAmountInclVATInclRounding: Decimal;
+        CalcItemReturnsAmount: Decimal;
     begin
         if POSEntry."Post Entry Status" >= POSEntry."Post Entry Status"::Posted then
           exit;
         POSTaxCalculation.RefreshPOSTaxLines(POSEntry);
 
         with POSEntry do begin
-          CalcSalesAmount := 0;
-          CalcDiscountAmount := 0;
-          CalcSalesQty := 0;
-          CalcReturnSalesQty := 0;
-          CalcTotalAmount := 0;
-          CalcTotalAmountInclVAT := 0;
-
-          POSSalesLine.Reset;
           POSSalesLine.SetRange("POS Entry No.","Entry No.");
-          //-NPR5.48 [318028]
-          POSSalesLine.SetFilter(Type, '<>%1', POSSalesLine.Type::Rounding);
-          //+NPR5.48 [318028]
+          //-NPR5.51 [362329]
+          POSSalesLine.SetRange("Exclude from Posting",false);
+          //+NPR5.51 [362329]
           //-#362329 [362329]
           POSSalesLine.SetRange("Exclude from Posting",false);
           //+#362329 [362329]
           if POSSalesLine.FindSet then repeat
-            CalcSalesAmount := POSSalesLine."Amount Excl. VAT";
-            CalcTotalAmountInclVATLCY := CalcTotalAmountInclVATLCY + POSSalesLine."Amount Incl. VAT (LCY)";
+        //-NPR5.51 [356076]
+            CalcTotalAmountInclVATInclRounding += POSSalesLine."Amount Incl. VAT";
 
-            if POSSalesLine.Type in [POSSalesLine.Type::Item,POSSalesLine.Type::"G/L Account"] then begin
-              if POSSalesLine.Quantity > 0 then
-                CalcSalesQty += POSSalesLine.Quantity
-              else
-        //-NPR5.48 [318028]
-        //        CalcReturnSalesQty :=  "Return Sales Quantity" + POSSalesLine.Quantity;
-                CalcReturnSalesQty += POSSalesLine.Quantity;
-        //+NPR5.48 [318028]
+            if POSSalesLine.Type <> POSSalesLine.Type::Rounding then begin
+        //+NPR5.51 [356076]
+              CalcTotalAmount += POSSalesLine."Amount Excl. VAT";
+              CalcTotalAmountInclVAT += POSSalesLine."Amount Incl. VAT";
+              NoOfSalesLines += 1;
+
+        //-NPR5.51 [356076]
+              if POSSalesLine.Type = POSSalesLine.Type::Item then begin
+                if POSSalesLine.Quantity > 0 then
+                  CalcItemSalesAmount += POSSalesLine."Amount Incl. VAT (LCY)";
+                if POSSalesLine.Quantity < 0 then
+                  CalcItemReturnsAmount += POSSalesLine."Amount Incl. VAT (LCY)";
+              end;
+        //+NPR5.51 [356076]
+
+              if POSSalesLine.Type in [POSSalesLine.Type::Item,POSSalesLine.Type::"G/L Account"] then begin
+                if POSSalesLine.Quantity > 0 then
+                  CalcSalesQty += POSSalesLine.Quantity
+                else
+                  CalcReturnSalesQty += POSSalesLine.Quantity;
+              end;
             end;
-            CalcTotalAmount += POSSalesLine."Amount Excl. VAT";
-            CalcTotalAmountInclVAT += POSSalesLine."Amount Incl. VAT";
-            //-NPR5.48 [318028]
-            NoOfSalesLines += 1;
-            if POSSalesLine."Amount Incl. VAT" < 0 then
-              CalcTotalNegAmountInclVAT += POSSalesLine."Amount Incl. VAT"
-            //+NPR5.48 [318028]
           until POSSalesLine.Next = 0;
 
           POSTaxAmountLine.Reset;
@@ -91,8 +95,8 @@ codeunit 6150629 "POS Entry Management"
             CalcTotalPaymentAmountLCY := CalcTotalPaymentAmountLCY + POSPaymentLine."Amount (LCY)";
           until POSPaymentLine.Next = 0;
 
-          if (CalcSalesAmount <> "Sales Amount") then begin
-            Validate("Sales Amount",CalcSalesAmount);
+          if (CalcItemSalesAmount <> "Item Sales (LCY)") then begin
+            Validate("Item Sales (LCY)", CalcItemSalesAmount);
             EntryModified := true;
           end;
           if (CalcDiscountAmount <> "Discount Amount") then begin
@@ -107,16 +111,16 @@ codeunit 6150629 "POS Entry Management"
             Validate("Return Sales Quantity",CalcReturnSalesQty);
             EntryModified := true;
           end;
-          if (CalcTotalAmount <> "Total Amount") then begin
-            Validate("Total Amount",CalcTotalAmount);
+          if (CalcTotalAmount <> "Amount Excl. Tax") then begin
+            Validate("Amount Excl. Tax",CalcTotalAmount);
             EntryModified := true;
           end;
-          if (CalcTotalVATAmount <> "Total Tax Amount") then begin
-            Validate("Total Tax Amount",CalcTotalVATAmount);
+          if (CalcTotalVATAmount <> "Tax Amount") then begin
+            Validate("Tax Amount",CalcTotalVATAmount);
             EntryModified := true;
           end;
-          if (CalcTotalAmountInclVAT <> "Total Amount Incl. Tax") then begin
-            Validate("Total Amount Incl. Tax",CalcTotalAmountInclVAT);
+          if (CalcTotalAmountInclVAT <> "Amount Incl. Tax") then begin
+            Validate("Amount Incl. Tax",CalcTotalAmountInclVAT);
             EntryModified := true;
           end;
           if "Entry Type" <> "Entry Type"::"Credit Sale" then begin
@@ -126,16 +130,20 @@ codeunit 6150629 "POS Entry Management"
               EntryModified := true;
             end;
           end;
-          //-NPR5.48 [318028]
-          if CalcTotalNegAmountInclVAT <> "Total Neg. Amount Incl. Tax" then begin
-            Validate("Total Neg. Amount Incl. Tax", CalcTotalNegAmountInclVAT);
-            EntryModified := true;
-          end;
           if NoOfSalesLines <> "No. of Sales Lines" then begin
             Validate("No. of Sales Lines", NoOfSalesLines);
             EntryModified := true;
           end;
-          //+NPR5.48 [318028]
+        //-NPR5.51 [356076]
+          if CalcTotalAmountInclVATInclRounding <> "Amount Incl. Tax & Round" then begin
+            Validate("Amount Incl. Tax & Round", CalcTotalAmountInclVATInclRounding);
+            EntryModified := true;
+          end;
+          if CalcItemReturnsAmount <> "Item Returns (LCY)" then begin
+            Validate("Item Returns (LCY)", CalcItemReturnsAmount);
+            EntryModified := true;
+          end;
+        //+NPR5.51 [356076]
         end;
     end;
 
@@ -358,6 +366,8 @@ codeunit 6150629 "POS Entry Management"
         POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";
         ReportSelectionRetail: Record "Report Selection Retail";
         POSEntryOutputLog: Record "POS Entry Output Log";
+        POSAuditProfile: Record "POS Audit Profile";
+        POSUnit: Record "POS Unit";
         IsReprint: Boolean;
     begin
         //-NPR5.48 [318028]
@@ -365,6 +375,20 @@ codeunit 6150629 "POS Entry Management"
         POSEntryOutputLog.SetRange("Output Method", POSEntryOutputLog."Output Method"::Print);
         POSEntryOutputLog.SetFilter("Output Type", '=%1|=%2', POSEntryOutputLog."Output Type"::SalesReceipt, POSEntryOutputLog."Output Type"::LargeSalesReceipt);
         IsReprint := not POSEntryOutputLog.IsEmpty;
+
+        //-NPR5.51 [362747]
+        if IsReprint then begin
+          POSEntry.TestField("POS Unit No.");
+          POSUnit.Get(POSEntry."POS Unit No.");
+          if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then
+            POSAuditProfile.Init;
+          if (POSAuditProfile."Allow Printing Receipt Copy" = POSAuditProfile."Allow Printing Receipt Copy"::Never)
+             or
+             ((POSAuditProfile."Allow Printing Receipt Copy" = POSAuditProfile."Allow Printing Receipt Copy"::"Only Once") and (POSEntryOutputLog.Count > 1))
+          then
+            Error(ReprintNotAllowedErrMsg,POSEntryOutputLog.FieldCaption("POS Entry No."),POSEntry."Entry No.");
+        end;
+        //+NPR5.51 [362747]
 
         OnBeforePrintEntry(POSEntry, IsReprint);
 
@@ -387,9 +411,12 @@ codeunit 6150629 "POS Entry Management"
               POSWorkshiftCheckpoint.SetRange (Type, POSWorkshiftCheckpoint.Type::ZREPORT);
               POSWorkshiftCheckpoint.FindFirst ();
               RecRef.GetTable(POSWorkshiftCheckpoint);
-              if Large then
+              if Large then begin
+                //-NPR5.51 [360453]
+                RetailReportSelectionMgt.SetRequestWindow(true);
+                //-NPR5.51 [360453]
                 RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Large Balancing (POS Entry)")
-              else
+              end else
                 RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
             end;
         end;

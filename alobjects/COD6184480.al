@@ -277,7 +277,7 @@ codeunit 6184480 "Pepper Library"
                     AddCommentText(Text102);
                 end;
                 //+NPR5.28 [259563]
-                RecoveredEFTTransactionRequest.SetRange("Processing Type",RecoveredEFTTransactionRequest."Processing Type"::Payment);
+                RecoveredEFTTransactionRequest.SetRange("Processing Type",RecoveredEFTTransactionRequest."Processing Type"::PAYMENT);
                 RecoveredEFTTransactionRequest.SetRange("Pepper Terminal Code",PepperTerminal.Code);
                 if RecoveredEFTTransactionRequest.FindLast then begin
                   if RecoveredEFTTransactionRequest.Finished = 0DT then begin
@@ -743,7 +743,7 @@ codeunit 6184480 "Pepper Library"
     begin
         if not EFTTransactionRequestToReverse.Get(ParTransactionEntryNoToReverse) then
           exit(false);
-        if not (EFTTransactionRequestToReverse."Processing Type" = EFTTransactionRequestToReverse."Processing Type"::Payment) then
+        if not (EFTTransactionRequestToReverse."Processing Type" = EFTTransactionRequestToReverse."Processing Type"::PAYMENT) then
           exit(false);
         if not EFTTransactionRequestToReverse.Successful then
           exit(false);
@@ -1332,7 +1332,7 @@ codeunit 6184480 "Pepper Library"
     var
         LocPepperTransactionRequest: Record "EFT Transaction Request";
     begin
-        LocPepperTransactionRequest.SetRange("Processing Type",LocPepperTransactionRequest."Processing Type"::Payment);
+        LocPepperTransactionRequest.SetRange("Processing Type",LocPepperTransactionRequest."Processing Type"::PAYMENT);
         LocPepperTransactionRequest.SetRange("Pepper Terminal Code",ParPepperTerminalCode);
         if LocPepperTransactionRequest.FindLast then
           exit(LocPepperTransactionRequest."Reference Number Output");

@@ -220,9 +220,9 @@ codeunit 6184497 "Pepper Protocol"
             //Success := PepperLibrary.EftRefund(SaleLinePOS."Sales Ticket No.",RequestedAmount,1,EFTTransactionRequest."Currency Code",EFTTransactionRequest."Reference Number Output");
             Sleep(5000); //wait for terminal to be ready for voiding transaction
             case EFTTransactionRequest."Processing Type" of
-              EFTTransactionRequest."Processing Type"::Payment :
+              EFTTransactionRequest."Processing Type"::PAYMENT :
                 Success := PepperLibrary.EftRefund(SaleLinePOS."Sales Ticket No.",RequestedAmount,1,EFTTransactionRequest."Currency Code",EFTTransactionRequest."Reference Number Output");
-              EFTTransactionRequest."Processing Type"::Refund :
+              EFTTransactionRequest."Processing Type"::REFUND :
                 Success := PepperLibrary.EftRefund(SaleLinePOS."Sales Ticket No.",RequestedAmount,2,EFTTransactionRequest."Currency Code",EFTTransactionRequest."Reference Number Output");
               else
                 Error(TextInvalidVoid);

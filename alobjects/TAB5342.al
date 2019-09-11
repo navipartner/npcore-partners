@@ -1,4 +1,4 @@
-tableextension 50040 tableextension50040 extends "CRM Contact" 
+tableextension 50041 tableextension50041 extends "CRM Contact" 
 {
     // Dynamics CRM Version: 7.1.0.2040
     // NPR5.36/TS  /20170912  CASE 277715  Adding new fields for CRM Integration

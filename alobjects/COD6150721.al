@@ -7,6 +7,8 @@ codeunit 6150721 "POS Action - Login"
     // NPR5.40/VB  /20180307 CASE 306347 Refactored retrieval of POS Action
     // NPR5.46/TSA /20180913 CASE 328338 Handling POS Unit status when balancing V3 is used
     // NPR5.49/TSA /20190314 CASE 348458 Added state check for POS Open when end-of-day is managed by a different POS.
+    // NPR5.51/TSA /20190622 CASE 359508 Adding a new pos period when the period is status closed (or missing) and the unit is open
+    // NPR5.51/MMV /20190628 CASE 356076 Added system entry for login without balancing
 
 
     trigger OnRun()
@@ -131,6 +133,8 @@ codeunit 6150721 "POS Action - Login"
         IsManagedPOS: Boolean;
         ManagedByPOSUnit: Record "POS Unit";
         POSEndofDayProfile: Record "POS End of Day Profile";
+        POSPeriodRegister: Record "POS Period Register";
+        MissingPeriodRegister: Boolean;
     begin
 
         //-NPR5.46 [328338]
@@ -191,6 +195,15 @@ codeunit 6150721 "POS Action - Login"
                 exit;
               end;
 
+              //-NPR5.51 [359508]
+              POSPeriodRegister.SetFilter ("POS Unit No.", '=%1', POSUnit."No.");
+              MissingPeriodRegister := not POSPeriodRegister.FindLast ();
+              if (MissingPeriodRegister) or ((not MissingPeriodRegister) and (POSPeriodRegister.Status <> POSPeriodRegister.Status::OPEN)) then begin
+                StartWorkflow (FrontEnd, POSSession, 'START_POS');
+                exit;
+              end;
+              //+NPR5.51 [359508]
+
               StartPOS (POSSession);
             end;
 
@@ -239,7 +252,12 @@ codeunit 6150721 "POS Action - Login"
         POSAction: Record "POS Action";
         POSSale: Codeunit "POS Sale";
         POSCreateEntry: Codeunit "POS Create Entry";
+        POSSetup: Codeunit "POS Setup";
     begin
+        //-NPR5.51 [356076]
+        POSSession.GetSetup(POSSetup);
+        POSCreateEntry.InsertUnitLoginEntry(POSSetup.Register, POSSetup.Salesperson);
+        //+NPR5.51 [356076]
 
         POSSession.StartTransaction ();
         POSSession.GetSale (POSSale);

@@ -18,6 +18,7 @@ codeunit 6150707 "POS Payment Line"
     // NPR5.49/MHA /20190212 CASE 345354 Description should be set from Parameter in InsertPaymentLine()
     // NPR5.50/MMV /20190403 CASE 300557 Added init handling
     // NPR5.50/TSA /20190530 CASE 354832 Added ReverseUnrealizedSalesVAT()
+    // NPR5.51/ALPO/20190820 CASE 365161 Lines with Type=Comment excluded from CalculateBalance()
 
 
     trigger OnRun()
@@ -214,6 +215,7 @@ codeunit 6150707 "POS Payment Line"
         with SaleLinePOS do begin
           SetRange("Register No.", RegisterNo);
           SetRange("Sales Ticket No.", SalesTicketNo);
+          SetFilter(Type,'<>%1',Type::Comment);  //-+NPR5.51 [365161]
           if FindSet then
             repeat
               case true of
@@ -350,7 +352,7 @@ codeunit 6150707 "POS Payment Line"
         //+NPR5.37 [293979]
 
         //-NPR5.37 [288119]
-        if (Rec."Cash Terminal Approved") then
+        if (Rec."EFT Approved") then
           Error (DeleteNotAllowed);
         //+NPR5.37 [288119]
 

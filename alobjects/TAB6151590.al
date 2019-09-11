@@ -4,6 +4,7 @@ table 6151590 "NpDc Coupon Type"
     // NPR5.37/MHA /20171012  CASE 293232 Deleted field 1010 "Coupon Qty. (Closed)" and renamed field 1020 "Posted Coupon Qty." to "Arch. Coupon Qty."
     // NPR5.39/MHA /20180214  CASE 305146 Added field 70 "Enabled"
     // NPR5.42/MHA /20180521  CASE 305859 Added field 67 Print on Issue
+    // NPR5.51/MHA /20190724  CASE 343352 Added cleanup of External Coupon Sales Lines in OnDelete()
 
     Caption = 'Coupon Type';
     DataCaptionFields = "Code",Description;
@@ -149,6 +150,7 @@ table 6151590 "NpDc Coupon Type"
         CouponEntry: Record "NpDc Coupon Entry";
         CouponItem: Record "NpDc Extra Coupon Item";
         SaleLinePOSCoupon: Record "NpDc Sale Line POS Coupon";
+        NpDcExtCouponSalesLine: Record "NpDc Ext. Coupon Reservation";
     begin
         Coupon.SetRange("Coupon Type",Code);
         Coupon.DeleteAll;
@@ -161,6 +163,12 @@ table 6151590 "NpDc Coupon Type"
 
         SaleLinePOSCoupon.SetRange("Coupon Type",Code);
         SaleLinePOSCoupon.DeleteAll;
+
+        //-NPR5.51 [343352]
+        NpDcExtCouponSalesLine.SetRange("Coupon Type",Code);
+        if NpDcExtCouponSalesLine.FindFirst then
+          NpDcExtCouponSalesLine.DeleteAll;
+        //+NPR5.51 [343352]
     end;
 
     trigger OnInsert()

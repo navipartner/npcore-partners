@@ -1,6 +1,7 @@
 codeunit 6150868 "POS Action - Layaway Create"
 {
     // NPR5.50/MMV /20181105 CASE 300557 Created object
+    // NPR5.51/ALST/20190705 CASE 357848 function prototype changed
 
 
     trigger OnRun()
@@ -306,7 +307,10 @@ codeunit 6150868 "POS Action - Layaway Create"
             SalesLine.Modify(true);
           until SalesLine.Next = 0;
         end else
-          RetailSalesDocMgt.ApplyPrepaymentPercentageToAllLines(SalesHeader, PrepaymentPct, true);
+          //-NPR5.51
+          // RetailSalesDocMgt.ApplyPrepaymentValueToAllLines(SalesHeader, PrepaymentPct, TRUE);
+          RetailSalesDocMgt.ApplyPrepaymentValueToAllLines(SalesHeader,PrepaymentPct,true,false);
+          //+NPR5.51
 
         SalesPostPrepayments.Invoice(SalesHeader);
 

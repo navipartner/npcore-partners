@@ -32,6 +32,7 @@ codeunit 6014450 "E-mail Management"
     // NPR5.43/THRO/20180626  CASE 318935 Custom fieldnumber Start and End tags in ParseEmailText
     // NPR5.48/THRO/20181119  CASE 336330 Publisher to allow Changing sender Email
     // NPR5.48/MHA /20190123  CASE 341711 Replaced function ParseEmailText() with MergeMailContent() and removed green code
+    // NPR5.51/THRO/20190703  CASE 358470 Use Email address from Custom Report Selection
 
 
     trigger OnRun()
@@ -588,11 +589,34 @@ codeunit 6014450 "E-mail Management"
         ReportID := 0;
         GetReportIDEvent(RecRef,ReportID);
 
-        if ReportID > 0 then
-          exit(ReportID);
+        //-NPR5.51 [358470]
+        if ReportID = 0 then
+          if GetEmailTemplateHeader(RecRef,EmailTemplateHeader) and (EmailTemplateHeader."Report ID" <> 0) then
+            ReportID := EmailTemplateHeader."Report ID";
 
-        if GetEmailTemplateHeader(RecRef,EmailTemplateHeader) and (EmailTemplateHeader."Report ID" <> 0) then
-          exit(EmailTemplateHeader."Report ID");
+        if ReportID > 0 then begin
+          case RecRef.Number of
+            DATABASE::"Sales Cr.Memo Header":
+              GetCustomEmailForReportID(DATABASE::Customer,Format(RecRef.Field(4).Value),ReportSelections.Usage::"S.Cr.Memo",EmailTemplateHeader."Report ID");
+            DATABASE::"Sales Header":
+              begin
+                RecRef.SetTable(SalesHeader);
+                case SalesHeader."Document Type" of
+                  SalesHeader."Document Type"::Quote:
+                    GetCustomEmailForReportID(DATABASE::Customer,SalesHeader."Bill-to Customer No.",ReportSelections.Usage::"S.Quote",EmailTemplateHeader."Report ID");
+                  SalesHeader."Document Type"::Order:
+                    GetCustomEmailForReportID(DATABASE::Customer,SalesHeader."Bill-to Customer No.",ReportSelections.Usage::"S.Order",EmailTemplateHeader."Report ID");
+                  SalesHeader."Document Type"::"Return Order":
+                    GetCustomEmailForReportID(DATABASE::Customer,SalesHeader."Bill-to Customer No.",ReportSelections.Usage::"S.Return",EmailTemplateHeader."Report ID");
+                end;
+              end;
+            DATABASE::"Sales Invoice Header":
+              GetCustomEmailForReportID(DATABASE::Customer,Format(RecRef.Field(4).Value),ReportSelections.Usage::"S.Invoice",EmailTemplateHeader."Report ID");
+          end;
+          exit(ReportID);
+        end;
+        //+NPR5.51 [358470]
+
 
         Clear(ReportSelections);
         ReportSelections.SetFilter("Report ID",'<>%1',0);
@@ -814,6 +838,30 @@ codeunit 6014450 "E-mail Management"
           end;
         end;
         exit(ReportID);
+    end;
+
+    local procedure GetCustomEmailForReportID(SourceType: Integer;BillToCustomer: Code[20];NewUsage: Option "S.Quote","S.Order","S.Invoice","S.Cr.Memo","S.Test","P.Quote","P.Order","P.Invoice","P.Cr.Memo","P.Receipt","P.Ret.Shpt.","P.Test","B.Stmt","B.Recon.Test","B.Check",Reminder,"Fin.Charge","Rem.Test","F.C.Test","Prod. Order","S.Blanket","P.Blanket",M1,M2,M3,M4,Inv1,Inv2,Inv3,"SM.Quote","SM.Order","SM.Invoice","SM.Credit Memo","SM.Contract Quote","SM.Contract","SM.Test","S.Return","P.Return","S.Shipment","S.Ret.Rcpt.","S.Work Order","Invt. Period Test","SM.Shipment","S.Test Prepmt.","P.Test Prepmt.","S.Arch. Quote","S.Arch. Order","P.Arch. Quote","P.Arch. Order","S. Arch. Return Order","P. Arch. Return Order","Asm. Order","P.Assembly Order","S.Order Pick Instruction",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,"C.Statement","V.Remittance";ReportID: Integer)
+    var
+        CustomReportSelection: Record "Custom Report Selection";
+        EmailNaviDocsMgtWrapper: Codeunit "E-mail NaviDocs Mgt. Wrapper";
+    begin
+        //-NPR5.51 [358470]
+        if UseCustomReportSelection then
+          exit;
+        CustomReportSelection.SetRange("Source Type",SourceType);
+        CustomReportSelection.SetRange("Source No.",BillToCustomer);
+        CustomReportSelection.SetRange(Usage,NewUsage);
+        CustomReportSelection.SetRange("Report ID",ReportID);
+        if not CustomReportSelection.FindFirst then begin
+          CustomReportSelection.SetRange("Report ID",0);
+          if not CustomReportSelection.FindFirst then
+            exit;
+        end;
+        if CustomReportSelection."Send To Email" <> '' then begin
+          UseCustomReportSelection := true;
+          GlobalCustomReportSelection := CustomReportSelection;
+        end;
+        //+NPR5.51 [358470]
     end;
 
     procedure GetCustomReportEmailAddress(): Text

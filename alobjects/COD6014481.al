@@ -1,9 +1,13 @@
 codeunit 6014481 "Sales Price Maintenance Event"
 {
-    // NPR5.25/CLVA/20160628 CASE 244461 : Sales Price Maintenance
-    // NPR5.33/BHR/20161013 CASE 254736 initialisation of Salesprices for staff.
-    // NPR5.33/CLVA/20170607 CASE 272906 : Added support for item group exclusions
-    // NPR5.38/BR  /20171011 CASE 288383  Restructured to also trigger on other updates of relevant fields
+    // NPR5.25/CLVA/20160628 CASE 244461 Sales Price Maintenance
+    // NPR5.33/BHR /20161013 CASE 254736 Initialisation of Salesprices for staff.
+    // NPR5.33/CLVA/20170607 CASE 272906 Added support for item group exclusions
+    // NPR5.38/BR  /20171011 CASE 288383 Restructured to also trigger on other updates of relevant fields
+    // NPR5.49/TJ  /20190225 CASE 345782 Function UpdateSalesPricesForStaff set as global
+    // NPR5.51/CLVA/20190704 CASE 360328 Added recursive item group validation
+    // NPR5.51/CLVA/20180710 CASE 361213 Added item check
+    // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup() in UpdateSalesPricesForStaff()
 
 
     trigger OnRun()
@@ -84,8 +88,8 @@ codeunit 6014481 "Sales Price Maintenance Event"
         //  Item.MODIFY(TRUE)
         // ELSE
         //  Item.MODIFY(FALSE);
-        //Item.SETRANGE("No.",'0010343861275','0018208074679');
 
+        Item.SetRange("No.",'0000050536191');
         if Item.FindSet then
          repeat
           if Item."No." <> '' then
@@ -94,7 +98,7 @@ codeunit 6014481 "Sales Price Maintenance Event"
         //-NPR5.33 [254736]
     end;
 
-    local procedure UpdateSalesPricesForStaff(var Item: Record Item)
+    procedure UpdateSalesPricesForStaff(var Item: Record Item)
     var
         SalesPriceMaintenanceSetup: Record "Sales Price Maintenance Setup";
         "Sales Price": Record "Sales Price";
@@ -116,11 +120,19 @@ codeunit 6014481 "Sales Price Maintenance Event"
         RecRef: RecordRef;
         BreakLoop: Boolean;
         SalesPriceMaintenanceGroups: Record "Sales Price Maintenance Groups";
+        TmpItem: Record Item;
+        POSTaxCalculation: Codeunit "POS Tax Calculation";
+        Handled: Boolean;
     begin
         //-NPR5.38 [288383] Moved from Subscriber function to it's own
         RecRef.GetTable(Item);
         if RecRef.IsTemporary then
           exit;
+
+        //-NPR5.51 [361213]
+        if not TmpItem.Get(Item."No.") then
+          exit;
+        //+NPR5.51 [361213]
 
         if SalesPriceMaintenanceSetup.FindFirst then begin
 
@@ -133,9 +145,21 @@ codeunit 6014481 "Sales Price Maintenance Event"
             BreakLoop := SalesPriceMaintenanceSetup."Exclude All Item Groups";
             if not BreakLoop then begin
               if Item."Item Group" <> '' then
-                if SalesPriceMaintenanceSetup."Exclude Item Groups" > 0 then
-                  if SalesPriceMaintenanceGroups.Get(SalesPriceMaintenanceSetup.Id,Item."Item Group") then
-                    BreakLoop := true;
+                //-NPR5.51
+                //IF SalesPriceMaintenanceSetup."Exclude Item Groups" > 0 THEN
+                  //IF SalesPriceMaintenanceGroups.GET(SalesPriceMaintenanceSetup.Id,Item."Item Group") THEN
+                  //  BreakLoop := TRUE;
+                if SalesPriceMaintenanceSetup."Exclude Item Groups" > 0 then begin
+                  Clear(SalesPriceMaintenanceGroups);
+                  SalesPriceMaintenanceGroups.SetRange(Id,SalesPriceMaintenanceSetup.Id);
+                  if SalesPriceMaintenanceGroups.FindSet then begin
+                    repeat
+                      if not BreakLoop then
+                        BreakLoop := ExcludeItemGroup(Item."Item Group", SalesPriceMaintenanceGroups."Item Group");
+                    until SalesPriceMaintenanceGroups.Next = 0;
+                  end;
+                end;
+                //+NPR5.51
             end;
 
             if not BreakLoop then begin
@@ -164,9 +188,12 @@ codeunit 6014481 "Sales Price Maintenance Event"
                 SalesPriceMaintenanceSetup."Sales Type"::"All Customers":
                   begin
                     if VATPostingSetup.Get(SalesPriceMaintenanceSetup."VAT Bus. Posting Gr. (Price)",Item."VAT Prod. Posting Group") then begin
-                        VATPct := VATPostingSetup."VAT %";
-                        VATBusPostingGrp := VATPostingSetup."VAT Bus. Posting Group";
-                      end;
+                      //-NPR5.51 [358985]
+                      POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
+                      //+NPR5.51 [358985]
+                      VATPct := VATPostingSetup."VAT %";
+                      VATBusPostingGrp := VATPostingSetup."VAT Bus. Posting Group";
+                    end;
                   end;
                 SalesPriceMaintenanceSetup."Sales Type"::Campaign:
                   begin
@@ -177,6 +204,9 @@ codeunit 6014481 "Sales Price Maintenance Event"
                     Customer.Get(SalesPriceMaintenanceSetup."Sales Code");
                     if Customer."VAT Bus. Posting Group" <> '' then
                       if VATPostingSetup.Get(Customer."VAT Bus. Posting Group",Item."VAT Prod. Posting Group") then begin
+                        //-NPR5.51 [358985]
+                        POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
+                        //+NPR5.51 [358985]
                         VATPct := VATPostingSetup."VAT %";
                         VATBusPostingGrp := VATPostingSetup."VAT Bus. Posting Group";
                       end;
@@ -186,6 +216,9 @@ codeunit 6014481 "Sales Price Maintenance Event"
                     CustomerPriceGroup.Get(SalesPriceMaintenanceSetup."Sales Code");
                     if CustomerPriceGroup."Price Includes VAT" and (CustomerPriceGroup."VAT Bus. Posting Gr. (Price)" <> '') then
                       if VATPostingSetup.Get(CustomerPriceGroup."VAT Bus. Posting Gr. (Price)",Item."VAT Prod. Posting Group") then begin
+                        //-NPR5.51 [358985]
+                        POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
+                        //+NPR5.51 [358985]
                         VATPct := VATPostingSetup."VAT %";
                         VATBusPostingGrp := VATPostingSetup."VAT Bus. Posting Group";
                       end;
@@ -253,6 +286,26 @@ codeunit 6014481 "Sales Price Maintenance Event"
           until SalesPriceMaintenanceSetup.Next = 0;
         end;
         //+NPR5.38 [288383]
+    end;
+
+    local procedure ExcludeItemGroup(Current_ItemGroup: Code[10];ItemGroup_To_Exclude: Code[10]): Boolean
+    var
+        Item: Record Item;
+        ItemGroup: Record "Item Group";
+    begin
+        //-NPR5.51
+        ItemGroup.Get(ItemGroup_To_Exclude);
+        ItemGroup.Get(Current_ItemGroup);
+
+        if ItemGroup."Parent Item Group No." = '' then
+          exit(false);
+
+        if (ItemGroup."Parent Item Group No." = ItemGroup_To_Exclude) or (ItemGroup."Belongs In Main Item Group" = ItemGroup_To_Exclude) then
+          exit(true);
+
+        if ExcludeItemGroup(ItemGroup."Parent Item Group No.", ItemGroup_To_Exclude) then
+          exit(true);
+        //+NPR5.51
     end;
 }
 

@@ -4,6 +4,7 @@ page 6014664 "Stock-Take Worksheet Line"
     // NPR4.16/TSA20150715 CASE 213313 Adopted dimensions
     // NPR5.46/TSA /20181001 CASE 329899 Added Retail Print
     // TM1.39/TSA /20181102 CASE 334585 A control of type 'FlowFilter' is not allowed in a parent control of type 'Repeater'
+    // NPR5.51/RA  /20190617 CASE 355055 Added field "Item Tracking Code"
 
     AutoSplitKey = true;
     Caption = 'Stock-Take Worksheet Line';
@@ -110,6 +111,10 @@ page 6014664 "Stock-Take Worksheet Line"
                 }
                 field("Require Variant Code";"Require Variant Code")
                 {
+                }
+                field("Item Tracking Code";"Item Tracking Code")
+                {
+                    Visible = false;
                 }
             }
         }

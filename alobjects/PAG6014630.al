@@ -2,6 +2,7 @@ page 6014630 "RP Template Line Designer"
 {
     // NPR5.32/MMV /20170424 CASE 241995 Retail Print 2.0
     // NPR5.34/MMV /20170724 CASE 284505 Indent multiple lines at once.
+    // NPR5.51/MMV /20190712 CASE 360972 Added field 70
 
     AutoSplitKey = true;
     Caption = 'Template Line Designer';
@@ -155,6 +156,9 @@ page 6014630 "RP Template Line Designer"
                 {
                 }
                 field("Processing Function ID";"Processing Function ID")
+                {
+                }
+                field("Processing Function Parameter";"Processing Function Parameter")
                 {
                 }
             }
