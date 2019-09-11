@@ -1,6 +1,7 @@
 codeunit 6150733 "POS Workflows 2.0"
 {
     // NPR5.50/JAKUBV/20190603  CASE 338666 Transport NPR5.50 - 3 June 2019
+    // NPR5.51/MMV /20190731  CASE 363458 Added log of callstack when errors happen.
 
 
     trigger OnRun()
@@ -97,8 +98,12 @@ codeunit 6150733 "POS Workflows 2.0"
           JavaScriptInterface.RefreshData(POSSession,FrontEnd20);
           StopwatchStop('Data');
           Signal := Signal.SignalSuccess(WorkflowId,ActionId);
-        end else
+        end else begin
           Signal := Signal.SignalFailreAndThrowError(WorkflowId,ActionId,GetLastErrorText);
+        //-NPR5.51 [363458]
+          FrontEnd20.Trace(Signal, 'ErrorCallStack', GetLastErrorCallstack);
+        //+NPR5.51 [363458]
+        end;
 
         StopwatchStop('All');
         FrontEnd20.Trace(Signal,'durationAll',StopwatchGetDuration('All'));

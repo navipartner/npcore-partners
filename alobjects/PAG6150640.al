@@ -2,6 +2,7 @@ page 6150640 "POS Info Card"
 {
     // NPR5.26/OSFI/20160810 CASE 246167 Object Created
     // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
+    // NPR5.51/ALPO/20190826 CASE 364558 Define inheritable pos info codes (will be copied from Sales POS header to new lines)
 
     Caption = 'POS Info Card';
     PageType = Card;
@@ -24,6 +25,12 @@ page 6150640 "POS Info Card"
                 {
                 }
                 field("Once per Transaction";"Once per Transaction")
+                {
+                }
+                field("Copy from Header";"Copy from Header")
+                {
+                }
+                field("Available in Front-End";"Available in Front-End")
                 {
                 }
                 field(Type;Type)

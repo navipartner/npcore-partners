@@ -14,6 +14,7 @@ pageextension 50023 pageextension50023 extends "Customer List"
     // NPR5.35/JDH /20170823 CASE 286307 Added fields to the list - Name 2, address fields and Global Dimension fields - all added as Visible = False
     // NPR5.38/BR  /20171117 CASE 295255 Added Action POS Entries
     // NPR5.42/THRO/20180516 CASE 308179 Removed code from Action SendAsPdf and EmailLog
+    // NPR5.51/MAOT/20190717 CASE 359891 Added column 'E-Mail'
     layout
     {
         addafter(Name)
@@ -21,6 +22,9 @@ pageextension 50023 pageextension50023 extends "Customer List"
             field("Name 2";"Name 2")
             {
                 Visible = false;
+            }
+            field("E-Mail";"E-Mail")
+            {
             }
             field(Address;Address)
             {

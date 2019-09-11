@@ -1,6 +1,6 @@
 codeunit 6151211 "NpCs Opening Hours upg."
 {
-    // #362443/MHA /20190719  CASE 362443 Object created - Object Codeunit for Collect Store Opening Hours [VLOBJUPG] object may be deleted at any time
+    // NPR5.51/MHA /20190719  CASE 362443 Object created - Object Codeunit for Collect Store Opening Hours [VLOBJUPG] object may be deleted at any time
 
     Subtype = Upgrade;
 

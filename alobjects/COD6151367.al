@@ -1,6 +1,8 @@
 codeunit 6151367 "CS UI Warehouse Shipment"
 {
     // NPR5.50/CLVA/20190425 CASE 352719 Object created - NP Capture Service
+    // NPR5.51/CLVA/20190805 CASE 363088 Retaining source doc. no. filter
+    // NPR5.51/CLVA/20190819 CASE 345567 Added field "Vendor Item No."
 
     TableNo = "CS UI Header";
 
@@ -287,6 +289,9 @@ codeunit 6151367 "CS UI Warehouse Shipment"
 
           CSWarehouseShipmentHandling."Item No." := ItemNo;
           CSWarehouseShipmentHandling."Variant Code" := VariantCode;
+          //-NPR5.51
+          CSWarehouseShipmentHandling."Vendor Item No." := Item."Vendor Item No.";
+          //+NPR5.51
 
           if (ResolvingTable = DATABASE::"Item Cross Reference") then begin
             with ItemCrossReference do begin
@@ -373,6 +378,11 @@ codeunit 6151367 "CS UI Warehouse Shipment"
 
         if MiniformHeader."Set defaults from last record" then
           CSWarehouseShipmentHandling.Qty := NewCSWarehouseShipmentHandling.Qty;
+
+        //-NPR5.51 [363088]
+        if (NewCSWarehouseShipmentHandling."Source Doc. No." <> '') and (NewCSWarehouseShipmentHandling."Source Doc. No." <> NewCSWarehouseShipmentHandling."No.") then
+          CSWarehouseShipmentHandling."Source Doc. No." := NewCSWarehouseShipmentHandling."Source Doc. No.";
+        //+NPR5.51 [363088]
 
         RecRefByVariant.GetTable(RecordVariant);
 

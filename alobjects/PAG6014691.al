@@ -1,7 +1,8 @@
 page 6014691 "Retail Admin Activities - Memb"
 {
-    // #343621/ZESO/20190725  CASE 343621 Object created.
+    // NPR5.51/ZESO/20190725  CASE 343621 Object created.
 
+    Caption = 'Retail Admin Activities - Memb';
     PageType = CardPart;
     RefreshOnActivate = true;
     SourceTable = "Retail Admin Cue";

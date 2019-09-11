@@ -2,6 +2,7 @@ table 6151597 "NpDc Arch. Coupon"
 {
     // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
     // NPR5.37/MHA /20171012  CASE 293232 Object renamed from "NpDc Posted Coupon" to "NpDc Arch. Coupon"
+    // NPR5.51/MHA /20190724  CASE 343352 Removed field 80 "In-use Quantity"
 
     Caption = 'Archived Coupon';
     DataCaptionFields = "No.","Coupon Type",Description;
@@ -91,14 +92,6 @@ table 6151597 "NpDc Arch. Coupon"
             CalcFormula = Sum("NpDc Arch. Coupon Entry"."Remaining Quantity" WHERE ("Arch. Coupon No."=FIELD("No.")));
             Caption = 'Remaining Quantity';
             DecimalPlaces = 0:5;
-            Editable = false;
-            FieldClass = FlowField;
-        }
-        field(80;"In-use Quantity";Integer)
-        {
-            CalcFormula = Count("NpDc Sale Line POS Coupon" WHERE (Type=CONST(Coupon),
-                                                                   "Coupon No."=FIELD("No.")));
-            Caption = 'In-use Quantity';
             Editable = false;
             FieldClass = FlowField;
         }

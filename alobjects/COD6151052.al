@@ -5,7 +5,7 @@ codeunit 6151052 "Retail Replenishment Mgmt"
     // NPR5.40/JKL /20180327 CASE 299436 refactored function CreateCampaignPurchOrdersDirectFromDemand
     // NPR5.42/JKL /20180524 CASE 301379  added dates to purchase order
     // NPR5.46/JKL /20180918 CASE 3134287  added ordre date + expected receipt date to orders
-    // #361940/TILA/20190718 CASE 361940   Removed a piece of code that contained non existing option
+    // NPR5.51/TILA/20190718 CASE 361940   Removed a piece of code that contained non existing option
 
 
     trigger OnRun()
@@ -34,11 +34,11 @@ codeunit 6151052 "Retail Replenishment Mgmt"
         DistributionSetup.Get(DistributionGroup,ItemHierachyID);
         RetailReplenishmentSetup.Get;
 
-        //-#361940 [361940]
+        //-NPR5.51 [361940]
         //IF DistributionSetup."Distribution Type" = DistributionSetup."Distribution Type"::"2" THEN
           //block items for purchase / set replenisment points to zero ?
           //ERROR(BlockedError);
-        //+#361940 [361940]
+        //+NPR5.51 [361940]
 
         if ReplenishmentDemandLine.FindLast then
           LineNo := ReplenishmentDemandLine."Entry No."

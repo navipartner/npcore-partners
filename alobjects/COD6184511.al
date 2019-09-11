@@ -2,6 +2,7 @@ codeunit 6184511 "EFT Mock Client Integration"
 {
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.49/MMV /20190312 CASE 345188 Renamed object
+    // NPR5.51/MMV /20190626 CASE 359385 Added gift card load support.
 
 
     trigger OnRun()
@@ -206,6 +207,23 @@ codeunit 6184511 "EFT Mock Client Integration"
 
         //Fill any type specific information onto the request record before the request is fired.
         EftTransactionRequest.Insert(true);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateGiftCardLoadRequest', '', false, false)]
+    local procedure OnCreateGiftCardLoadRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    begin
+        //-NPR5.51 [359385]
+        if not EftTransactionRequest.IsType(IntegrationType()) then
+          exit;
+        Handled := true;
+
+        //Fill any type specific information onto the request record before the request is fired.
+        EftTransactionRequest."Reference Number Input" := EftTransactionRequest.Token;
+        EftTransactionRequest.Recoverable := true;
+        EftTransactionRequest."Auto Voidable" := true;
+        EftTransactionRequest."Manual Voidable" := true;
+        EftTransactionRequest.Insert(true);
+        //+NPR5.51 [359385]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnAfterFinancialCommit', '', false, false)]

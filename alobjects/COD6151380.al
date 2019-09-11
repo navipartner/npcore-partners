@@ -2,6 +2,7 @@ codeunit 6151380 "CS UI Whse. Rcpt. Line"
 {
     // NPR5.41/CLVA/20180313 CASE 306407 Object created - NP Capture Service
     // NPR5.43/NPKNAV/20180629  CASE 304872 Transport NPR5.43 - 29 June 2018
+    // NPR5.51/CLVA/20190612 CASE 357577 Added posting date functionality
 
     TableNo = "CS UI Header";
 
@@ -158,6 +159,14 @@ codeunit 6151380 "CS UI Whse. Rcpt. Line"
         Remark := '';
         WhseReceiptLine.SetRange("No.",WhseReceiptHeader."No.");
         if WhseReceiptLine.FindSet then begin
+
+          //-NPR5.51 [357577]
+          if MiniformHeader."Update Posting Date" then begin
+            WhseReceiptHeader.Validate("Posting Date",Today);
+            WhseReceiptHeader.Modify(true);
+          end;
+          //+NPR5.51 [357577]
+
           repeat
             WhsePostReceipt.Run(WhseReceiptLine);
             WhsePostReceipt.GetResultMessage;

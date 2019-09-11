@@ -3,6 +3,7 @@ page 6150629 "POS Workshift Checkpoints"
     // NPR5.41/TSA /20180417 CASE 311540 Added Entry No field visible false
     // NPR5.48/MMV /20180606 CASE 318028 Added field 'Type' and action 'Archive'
     // NPR5.50/TSA /20190424 CASE 352319 Made all fields visible
+    // NPR5.51/MMV /20190611 CASE 356076 Added field 11.
 
     Caption = 'Workshift Summary';
     DeleteAllowed = false;
@@ -36,6 +37,9 @@ page 6150629 "POS Workshift Checkpoints"
                 {
                 }
                 field(Type;Type)
+                {
+                }
+                field("Period Type";"Period Type")
                 {
                 }
                 field("Consolidated With Entry No.";"Consolidated With Entry No.")
@@ -95,13 +99,13 @@ page 6150629 "POS Workshift Checkpoints"
                 field("Created Credit Voucher (LCY)";"Created Credit Voucher (LCY)")
                 {
                 }
-                field("Direct Sales (LCY)";"Direct Sales (LCY)")
+                field("Direct Item Sales (LCY)";"Direct Item Sales (LCY)")
                 {
                 }
                 field("Direct Sales - Staff (LCY)";"Direct Sales - Staff (LCY)")
                 {
                 }
-                field("Direct Net Sales (LCY)";"Direct Net Sales (LCY)")
+                field("Direct Item Net Sales (LCY)";"Direct Item Net Sales (LCY)")
                 {
                 }
                 field("Direct Sales Count";"Direct Sales Count")
@@ -119,7 +123,7 @@ page 6150629 "POS Workshift Checkpoints"
                 field("Direct Turnover (LCY)";"Direct Turnover (LCY)")
                 {
                 }
-                field("Direct Negative Amounts (LCY)";"Direct Negative Amounts (LCY)")
+                field("Direct Negative Turnover (LCY)";"Direct Negative Turnover (LCY)")
                 {
                 }
                 field("Direct Net Turnover (LCY)";"Direct Net Turnover (LCY)")
@@ -134,10 +138,10 @@ page 6150629 "POS Workshift Checkpoints"
                 field("Profit %";"Profit %")
                 {
                 }
-                field("Direct Return Sales (LCY)";"Direct Return Sales (LCY)")
+                field("Direct Item Returns (LCY)";"Direct Item Returns (LCY)")
                 {
                 }
-                field("Direct Return Sales Line Count";"Direct Return Sales Line Count")
+                field("Direct Item Returns Line Count";"Direct Item Returns Line Count")
                 {
                 }
                 field("Credit Real. Sale Amt. (LCY)";"Credit Real. Sale Amt. (LCY)")
@@ -212,10 +216,10 @@ page 6150629 "POS Workshift Checkpoints"
                 field("Calculated Diff (LCY)";"Calculated Diff (LCY)")
                 {
                 }
-                field("Item Quantity Sum";"Item Quantity Sum")
+                field("Direct Item Quantity Sum";"Direct Item Quantity Sum")
                 {
                 }
-                field("Item Sales Line Count";"Item Sales Line Count")
+                field("Direct Item Sales Line Count";"Direct Item Sales Line Count")
                 {
                 }
                 field("Receipts Count";"Receipts Count")
@@ -239,16 +243,16 @@ page 6150629 "POS Workshift Checkpoints"
                 field("Opening Cash (LCY)";"Opening Cash (LCY)")
                 {
                 }
-                field("Perpetual Sales (LCY)";"Perpetual Sales (LCY)")
+                field("Perpetual Dir. Item Sales(LCY)";"Perpetual Dir. Item Sales(LCY)")
                 {
                 }
-                field("Perpetual Return Sales (LCY)";"Perpetual Return Sales (LCY)")
+                field("Perpetual Dir. Item Ret. (LCY)";"Perpetual Dir. Item Ret. (LCY)")
                 {
                 }
                 field("Perpetual Dir. Turnover (LCY)";"Perpetual Dir. Turnover (LCY)")
                 {
                 }
-                field("Perpetual Dir. Neg. Amt. (LCY)";"Perpetual Dir. Neg. Amt. (LCY)")
+                field("Perpetual Dir. Neg. Turn (LCY)";"Perpetual Dir. Neg. Turn (LCY)")
                 {
                 }
                 field("Perpetual Rounding Amt. (LCY)";"Perpetual Rounding Amt. (LCY)")
@@ -266,16 +270,16 @@ page 6150629 "POS Workshift Checkpoints"
                 field("Type Filter";"Type Filter")
                 {
                 }
-                field("FF Total Sales (LCY)";"FF Total Sales (LCY)")
+                field("FF Total Dir. Item Sales (LCY)";"FF Total Dir. Item Sales (LCY)")
                 {
                 }
-                field("FF Total Return Sale (LCY)";"FF Total Return Sale (LCY)")
+                field("FF Total Dir. Item Return(LCY)";"FF Total Dir. Item Return(LCY)")
                 {
                 }
                 field("FF Total Dir. Turnover (LCY)";"FF Total Dir. Turnover (LCY)")
                 {
                 }
-                field("FF Total Dir. Neg. Amt. (LCY)";"FF Total Dir. Neg. Amt. (LCY)")
+                field("FF Total Dir. Neg. Turn. (LCY)";"FF Total Dir. Neg. Turn. (LCY)")
                 {
                 }
                 field("FF Total Rounding Amt. (LCY)";"FF Total Rounding Amt. (LCY)")

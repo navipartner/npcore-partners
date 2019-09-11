@@ -12,6 +12,7 @@ table 6060121 "TM Ticket Admission BOM"
     // TM1.28/TSA /20180219 CASE 305707 Ticket Base Calendar functionality
     // TM1.36/TSA /20180801 CASE 316463 Added field "Allow Rescan Within (Sec.)"
     // TM1.38/TSA /20181012 CASE 332109 New field "publish as eTicket"
+    // TM1.42/TSA /20190411 CASE 351050 Added field "Revisit Condition (Statistics)"
 
     Caption = 'Ticket Admission BOM';
 
@@ -83,6 +84,13 @@ table 6060121 "TM Ticket Admission BOM"
             Caption = 'Admission Entry Validation';
             OptionCaption = ' ,Single,Same Day,Multiple';
             OptionMembers = NA,SINGLE,SAME_DAY,MULTIPLE;
+        }
+        field(65;"Revisit Condition (Statistics)";Option)
+        {
+            Caption = 'Revisit Condition (Statistics)';
+            InitValue = NONINITIAL;
+            OptionCaption = ' ,Non-Initial,Daily Non-Initial,Never';
+            OptionMembers = NA,NONINITIAL,DAILY_NONINITIAL,NEVER;
         }
         field(70;"Revoke Policy";Option)
         {

@@ -1,6 +1,9 @@
 codeunit 6151365 "CS UI Location List"
 {
     // NPR5.50/CLVA  /20190524  CASE 352719 Object created - NP Capture Service
+    // NPR5.51/CLVA  /20190628  CASE 359093 Changed location filter
+    // NPR5.51/LS  /20190709  CASE 361352 Changed text constant Text011
+    // NPR5.51/CLVA  /20190813  CASE 362173 Added loop back functionality
 
     TableNo = "CS UI Header";
 
@@ -45,7 +48,7 @@ codeunit 6151365 "CS UI Location List"
         Text009: Label 'No Documents found.';
         CSSessionId: Text;
         Text010: Label 'There are no locations for warehouse employee %1';
-        Text011: Label 'Barcode length is exciting Location Code max length';
+        Text011: Label 'Barcode length is exceeding Location Code max length';
         Text012: Label 'Documents not found in filter\\ %1.';
 
     local procedure ProcessSelection()
@@ -59,6 +62,7 @@ codeunit 6151365 "CS UI Location List"
         WhseEmployee: Record "Warehouse Employee";
         Location: Record Location;
         Barcode: Text;
+        Bin: Record Bin;
     begin
         if XMLDOMMgt.FindNode(RootNode,'Header/Input',ReturnedNode) then
           TextValue := ReturnedNode.InnerText
@@ -68,6 +72,20 @@ codeunit 6151365 "CS UI Location List"
         Evaluate(TableNo,CSCommunication.GetNodeAttribute(ReturnedNode,'TableNo'));
         RecRef.Open(TableNo);
         Evaluate(RecId,CSCommunication.GetNodeAttribute(ReturnedNode,'RecordID'));
+
+        //-NPR5.51 [362173]
+        if TableNo = 7354 then begin
+          RecRef.Get(RecId);
+          RecRef.SetTable(Bin);
+          RecRef.GetTable(Bin);
+          Location.Get(Bin."Location Code");
+          RecRef.Close;
+          RecId := Location.RecordId;
+          TableNo := RecId.TableNo;
+          RecRef.Open(TableNo);
+        end;
+        //-NPR5.51 [362173]
+
         if RecRef.Get(RecId) then begin
           RecRef.SetTable(Location);
           RecRef.GetTable(Location);
@@ -122,12 +140,16 @@ codeunit 6151365 "CS UI Location List"
         with Location do begin
           Reset;
           if WhseEmpId <> '' then begin
-                if LocationFilter <> '' then
-                  LocationFilter := CopyStr(LocationFilter,1,(StrLen(LocationFilter) - 1))
-                else
-                  Error(Text010,WhseEmployee."User ID");
 
-                SetFilter(Code,LocationFilter);
+              //-NPR5.51 [359093]
+              //IF LocationFilter <> '' THEN
+              //  LocationFilter := COPYSTR(LocationFilter,1,(STRLEN(LocationFilter) - 1))
+              //ELSE
+              if LocationFilter = '' then
+                Error(Text010,WhseEmployee."User ID");
+              //+NPR5.51 [359093]
+
+              SetFilter(Code,LocationFilter);
 
           end;
           if not FindFirst then begin

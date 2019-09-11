@@ -2,6 +2,9 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
 {
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.49/MMV /20190312 CASE 345188 Renamed object
+    // NPR5.51/MMV /20190626 CASE 359385 Removed gift card balance handling (Is now only supported via explicit action).
+    //                                   Added gift card load support.
+    // NPR5.51/MMV /20190718 CASE 331463 Match card prefix again after result if it switched during trx. (This final match is too late for any surcharge).
 
 
     trigger OnRun()
@@ -18,8 +21,11 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         KasseNr: Code[20];
     begin
         case EFTTransactionRequest."Processing Type" of
-          EFTTransactionRequest."Processing Type"::Payment,
-          EFTTransactionRequest."Processing Type"::Refund :
+        //-NPR5.51 [359385]
+          EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD,
+        //+NPR5.51 [359385]
+          EFTTransactionRequest."Processing Type"::PAYMENT,
+          EFTTransactionRequest."Processing Type"::REFUND :
             PaymentTransaction(EFTTransactionRequest);
         end;
     end;
@@ -67,12 +73,25 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         State: DotNet npNetState6;
         EFTTransactionRequest: Record "EFT Transaction Request";
         EFTFlexiitermIntegration: Codeunit "EFT Flexiiterm Integration";
+        CreditCardHelper: Codeunit "Credit Card Protocol Helper";
+        PaymentTypePOS: Record "Payment Type POS";
+        SalePOS: Record "Sale POS";
     begin
 
         State := State.Deserialize(Data);
 
         EFTTransactionRequest.Get (State.RequestEntryNo);
-        EFTTransactionRequest."Card Number" := State.CardPan;
+        //-NPR5.51 [331463]
+        if EFTTransactionRequest."Card Number" <> State.CardPan then begin //Card was switched around during transaction
+          SalePOS.Get(EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
+          if CreditCardHelper.FindPaymentType(EFTTransactionRequest."Card Number", PaymentTypePOS, SalePOS."Location Code") then begin
+            EFTTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
+            EFTTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EFTTransactionRequest."Card Name"));
+          end;
+          EFTTransactionRequest."Card Number" := State.CardPan;
+        end;
+        //+NPR5.51 [331463]
+
         EFTTransactionRequest."Amount Output" := State.CapturedAmount;
         EFTTransactionRequest."Result Amount" := State.CapturedAmount;
         EFTTransactionRequest."POS Description" := EFTFlexiitermIntegration.GetPOSDescription(EFTTransactionRequest);
@@ -110,7 +129,10 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
           State.PaymentNo := PaymentTypePOS."No.";
 
           State.MatchSalesAmount := PaymentTypePOS."Match Sales Amount";
-          State.CardPanValidGiftVoucher := ((PaymentTypePOS."PBS Gift Voucher" and (PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::"Gift Voucher")));
+
+        //-NPR5.51 [359385]
+        //  State.CardPanValidGiftVoucher := ((PaymentTypePOS."PBS Gift Voucher" AND (PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::"Gift Voucher")));
+        //+NPR5.51 [359385]
 
           EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
           ConfirmFee := EFTFlexiitermIntegration.GetSurchargeDialogStatus(EFTSetup);
@@ -124,17 +146,6 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         end;
 
         ReturnData := State.Serialize();
-    end;
-
-    local procedure GetGiftVoucherBalance(GiftVoucherNo: Text;var ReturnData: Text)
-    var
-        GiftVoucherBalance: Decimal;
-        ExpiryDate: Text;
-        PBSGiftVoucherFunctions: Codeunit "PBS Gift Voucher Functions";
-    begin
-
-        GiftVoucherBalance := PBSGiftVoucherFunctions.GetBalance (GiftVoucherNo, ExpiryDate) / 100;
-        ReturnData := SerializeJson (GiftVoucherBalance);
     end;
 
     local procedure InsertSaleLineFee(Data: Text)
@@ -308,7 +319,9 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         case EventName of
           'CloseForm':                         CloseForm(Data);
           'FindPaymentType':                   FindPaymentType(Data,ReturnData);
-          'GetGiftVoucherBalance':             GetGiftVoucherBalance(Data,ReturnData);
+        //-NPR5.51 [359385]
+        //  'GetGiftVoucherBalance':             GetGiftVoucherBalance(Data,ReturnData);
+        //+NPR5.51 [359385]
           'InsertSaleLineFee':                 InsertSaleLineFee(Data);
           'CheckTransactionFromCheckResult':   CheckTransactionFromCheckResult(Data,ReturnData);
           'ModifyTransactionFromCheckResult':  ModifyTransactionFromCheckResult(Data);
@@ -316,6 +329,9 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
           'ReadReceipt':                       HandleReceipt(Data);
           'PrintReceipts' : ; //Delete when event is completely gone from stargate assembly.
           'NumPad' : ; //Delete when event is completely gone from stargate assembly.
+        //-NPR5.51 [359385]
+          'GetGiftVoucherBalance' : ; //Delete when event is completely gone from stargate assembly.
+        //+NPR5.51 [359385]
           else
             Error ('Unhandled event sent from PaymentGateway %1', EventName);
         end;

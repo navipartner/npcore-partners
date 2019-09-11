@@ -26,7 +26,10 @@ codeunit 6150615 "POS Post Entries"
     // NPR5.50/MMV /20190321 CASE 300557 Apply customer deposits
     //                                   Post customer refunds with refund type instead of payment.
     // NPR5.50/TSA /20190520 CASE 354832 Reversal of preliminary VAT when paying with vouchers that included VAT on sales
-    // #362329/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
+    // NPR5.51/TSA /20190620 CASE 359403 Corrected a bug in the selection of compression method in GetCompressionMethod();
+    // NPR5.51/TSA /20190620 CASE 359403 Added filter to prevent balancing entries to double posted when using the post range function
+    // NPR5.51/TSA /20190626 CASE 347057 Include lines of type PAYOUT in tax calculation check sum, since it was only half included
+    // NPR5.51/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
 
     TableNo = "POS Entry";
 
@@ -283,9 +286,9 @@ codeunit 6150615 "POS Post Entries"
 
             POSSalesLine.Reset;
             POSSalesLine.SetRange("POS Entry No.",POSEntry."Entry No.");
-            //-#362329 [362329]
+            //-NPR5.51 [362329]
             POSSalesLine.SetRange("Exclude from Posting",false);
-            //+#362329 [362329]
+            //+NPR5.51 [362329]
             if POSSalesLine.FindSet then repeat
               POSSalesLineToPost := POSSalesLine;
               POSSalesLineToPost.Insert;
@@ -509,6 +512,11 @@ codeunit 6150615 "POS Post Entries"
         //POSEntry.SETRANGE("Entry Type",POSEntry."Entry Type"::Other);
         POSEntry.SetRange("Entry Type",POSEntry."Entry Type"::Balancing);
         //+NPR5.38 [302777]
+
+        //-NPR5.51 [359403]
+        POSEntry.SetFilter (POSEntry."Post Entry Status", '<2');
+        //+NPR5.51 [359403]
+
         if POSEntry.FindSet then repeat
           POSBalancingLine.SetRange("POS Entry No.",POSEntry."Entry No.");
           if POSBalancingLine.FindSet then repeat
@@ -862,15 +870,18 @@ codeunit 6150615 "POS Post Entries"
         POSSalesLine.SetRange("POS Entry No.",POSEntry."Entry No.");
         //-NPR5.38 [302803]
         
-        //-NPR5.41 [306394]
-        // POSSalesLine.SETFILTER(Type,'<>%1',POSSalesLine.Type::Payout);
-        POSSalesLine.SetFilter(Type,'<>%1&<>%2',POSSalesLine.Type::Payout, POSSalesLine.Type::Rounding);
-        //+NPR5.41 [306394]
+        //-NPR5.51 [347057]
+        // //-NPR5.41 [306394]
+        // // POSSalesLine.SETFILTER(Type,'<>%1',POSSalesLine.Type::Payout);
+        // POSSalesLine.SETFILTER(Type,'<>%1&<>%2',POSSalesLine.Type::Payout, POSSalesLine.Type::Rounding);
+        // //+NPR5.41 [306394]
+        POSSalesLine.SetFilter(Type,'<>%1', POSSalesLine.Type::Rounding);
+        //+NPR5.51 [347057]
         
         //+NPR5.38 [302803]
-        //-#362329 [362329]
+        //-NPR5.51 [362329]
         POSSalesLine.SetRange("Exclude from Posting",false);
-        //+#362329 [362329]
+        //+NPR5.51 [362329]
         if POSSalesLine.FindSet then repeat
           if POSSalesLine."VAT Calculation Type" = POSSalesLine."VAT Calculation Type"::"Sales Tax" then begin
             TaxAmountSalesLines := TaxAmountSalesLines + (POSSalesLine."Amount Incl. VAT" -POSSalesLine."Amount Excl. VAT");
@@ -880,6 +891,7 @@ codeunit 6150615 "POS Post Entries"
             TempPOSSalesLine."Amount Excl. VAT" += POSSalesLine."Amount Excl. VAT";
           end;
         until POSSalesLine.Next = 0;
+        
         //-NPR5.41 [311309]
         // TempPOSSalesLine."Amount Incl. VAT" := ROUND(TempPOSSalesLine."Amount Incl. VAT",Currency."Amount Rounding Precision");
         // TempPOSSalesLine."Amount Excl. VAT" := ROUND(TempPOSSalesLine."Amount Excl. VAT",Currency."Amount Rounding Precision");
@@ -920,6 +932,7 @@ codeunit 6150615 "POS Post Entries"
         POSEntry: Record "POS Entry";
         PostingDescription: Text;
         Compressionmethod: Option Uncompressed,"Per POS Entry","Per POS Period Register";
+        cnt: Integer;
     begin
         if POSSalesLineToBeCompressed.FindSet then repeat
 
@@ -932,8 +945,10 @@ codeunit 6150615 "POS Post Entries"
           //+NPR5.39 [304901]
             if POSSalesLineToBeCompressed."VAT Calculation Type" = POSSalesLineToBeCompressed."VAT Calculation Type"::"Sales Tax" then
               Error(TextErrorSalesTaxCompressed,POSEntry.TableCaption,POSSalesLineToBeCompressed."POS Entry No.");
+
           Clear(POSPostingBuffer);
           POSPostingBuffer.Init;
+
           POSPostingBuffer."Posting Date" := POSEntry."Posting Date";
           POSPostingBuffer."Line Type" := POSPostingBuffer."Line Type"::Sales;
           POSPostingBuffer.Type := POSSalesLineToBeCompressed.Type;
@@ -1094,7 +1109,11 @@ codeunit 6150615 "POS Post Entries"
               //-NPR5.38 [294720]
               POSPostingBuffer."External Document No." := POSPaymentLineToBeCompressed."External Document No.";
               //+NPR5.38 [294720]
-              PostingDescription := POSPaymentLineToBeCompressed.Description;
+
+              //-NPR5.51 [359403]
+              // PostingDescription := POSPaymentLineToBeCompressed.Description;
+              //+NPR5.51 [359403]
+
             end else begin
               //-NPR5.38 [294722]
               if POSPaymentMethod."Condensed Posting Description" <> '' then
@@ -1121,7 +1140,8 @@ codeunit 6150615 "POS Post Entries"
                   POSPostingBuffer."Document No." := POSPaymentLineToBeCompressed."Document No."
                 else
                   POSPostingBuffer."Document No."  := POSPeriodRegister."Document No.";
-                PostingDescription := POSPaymentLineToBeCompressed.Description;
+                if (PostingDescription = '') then //-+NPR5.51 [359403]
+                  PostingDescription := POSPaymentLineToBeCompressed.Description;
               end;
             Compressionmethod::"Per POS Entry":
               begin
@@ -1130,13 +1150,15 @@ codeunit 6150615 "POS Post Entries"
                   POSPostingBuffer."Document No." := POSPaymentLineToBeCompressed."Document No."
                 else
                   POSPostingBuffer."Document No."  := POSPeriodRegister."Document No.";
-                PostingDescription := StrSubstNo(TextDesc,POSEntry.TableCaption,POSPaymentLineToBeCompressed."POS Entry No.");
+                if (PostingDescription = '') then //-+NPR5.51 [359403]
+                  PostingDescription := StrSubstNo(TextDesc,POSEntry.TableCaption,POSPaymentLineToBeCompressed."POS Entry No.");
               end;
             Compressionmethod::"Per POS Period Register":
               begin
                 POSPeriodRegister.TestField("Document No.");
                 POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
-                PostingDescription := StrSubstNo(TextDesc,POSPeriodRegister.TableCaption,POSPaymentLineToBeCompressed."POS Period Register No.");
+                if (PostingDescription = '') then //-+NPR5.51 [359403]
+                  PostingDescription := StrSubstNo(TextDesc,POSPeriodRegister.TableCaption,POSPaymentLineToBeCompressed."POS Period Register No.");
               end;
           end;
 
@@ -1224,11 +1246,19 @@ codeunit 6150615 "POS Post Entries"
 
     local procedure GetCompressionMethod(POSPeriodRegister: Record "POS Period Register";PostCompressed: Boolean): Integer
     begin
-          if not PostCompressed then
-            if POSPeriodRegister."Posting Compression" = POSPeriodRegister."Posting Compression"::"Per POS Period" then
-              exit(POSPeriodRegister."Posting Compression"::"Per POS Entry")
-          else
-            exit(POSPeriodRegister."Posting Compression");
+        //-NPR5.51 [359403]
+        //  IF NOT PostCompressed THEN
+        //    IF POSPeriodRegister."Posting Compression" = POSPeriodRegister."Posting Compression"::"Per POS Period" THEN
+        //      EXIT(POSPeriodRegister."Posting Compression"::"Per POS Entry")
+        //  ELSE
+        //    EXIT(POSPeriodRegister."Posting Compression");
+
+        if (not PostCompressed) then
+          if (POSPeriodRegister."Posting Compression" = POSPeriodRegister."Posting Compression"::"Per POS Period") then
+            exit(POSPeriodRegister."Posting Compression"::"Per POS Entry");
+
+        exit (POSPeriodRegister."Posting Compression");
+        //+NPR5.51 [359403]
     end;
 
     local procedure GetPostingSetupFromBufferLine(POSPostingBuffer: Record "POS Posting Buffer";var POSPostingSetup: Record "POS Posting Setup")

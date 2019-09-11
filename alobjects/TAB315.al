@@ -1,4 +1,4 @@
-tableextension 50030 tableextension50030 extends "Jobs Setup" 
+tableextension 50031 tableextension50031 extends "Jobs Setup" 
 {
     // NPR5.29/TJ/20161014 CASE 248723 New fields 6060150..6060163
     // NPR5.32/TJ/20170515 CASE 275946 New field "Organizer Exchange Url"

@@ -12,6 +12,7 @@ page 6060140 "MM POS Member Card"
     // MM1.29/TSA /20180511 CASE 314687 Added Contact Profile Questionnair
     // MM1.29/TSA /20180511 CASE 313795 Added GDPR option for guardian
     // MM1.34/TSA /20180907 CASE 327605 Open / Due Amount field
+    // MM1.40/TSA /20190823 CASE 360242 Cleaned Green Code
 
     Caption = 'Member Details';
     DataCaptionExpression = "External Member No." + ' - ' + "Display Name";
@@ -114,6 +115,12 @@ page 6060140 "MM POS Member Card"
                     }
                 }
             }
+            part(MemberCardsSubpage;"MM Member Cards ListPart")
+            {
+                SubPageLink = "Member Entry No."=FIELD("Entry No.");
+                SubPageView = SORTING("Entry No.")
+                              ORDER(Descending);
+            }
         }
         area(factboxes)
         {
@@ -179,6 +186,28 @@ page 6060140 "MM POS Member Card"
                     ContactQuestionnaire ();
                 end;
             }
+            action(PrintCard)
+            {
+                Caption = 'Print Member Card';
+                Ellipsis = true;
+                Image = PrintVoucher;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    MembershipManagement: Codeunit "MM Membership Management";
+                    MemberCardEntryNo: Integer;
+                begin
+                    //-MM1.22 [289434]
+                    if (Confirm (CONFIRM_PRINT, true, StrSubstNo (CONFIRM_PRINT_FMT, "External Member No.", "Display Name"))) then begin
+                      //MemberRetailIntegration.PrintMemberCard ("Entry No.", MembershipManagement.GetMemberCardEntryNo ("Entry No.", TODAY));
+                      MemberCardEntryNo := CurrPage.MemberCardsSubpage.PAGE.GetCurrentEntryNo ();
+                      MemberRetailIntegration.PrintMemberCard ("Entry No.", MemberCardEntryNo);
+                    end;
+                end;
+            }
         }
     }
 
@@ -207,15 +236,11 @@ page 6060140 "MM POS Member Card"
         if (MembershipRole.FindFirst ()) then begin
           Membership.Get (MembershipRole."Membership Entry No.");
 
-          //-#308756 [308756]
           Membership.CalcFields ("Remaining Points");
           RemainingPoints := Membership."Remaining Points";
-          //+#308756 [308756]
 
-          //-MM1.29 [313795]
           MembershipRoleDisplay.Get (MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.");
           MembershipRoleDisplay.CalcFields ("GDPR Approval");
-          //+MM1.29 [313795]
 
           MembershipManagement.GetMembershipMaxValidUntilDate (MembershipRole."Membership Entry No.", ValidUntilDate);
 
@@ -238,7 +263,6 @@ page 6060140 "MM POS Member Card"
           if (IsAboutToExpire) then
             UntilDateAttentionAccent := true;
 
-          //-MM1.34 [327605]
           OrigAmt := 0;
           RemainAmt := 0;
           MembershipEntry.SetFilter ("Membership Entry No.", '=%1', MembershipRole."Membership Entry No.");
@@ -254,7 +278,6 @@ page 6060140 "MM POS Member Card"
           end;
           AccentuateDueAmount := (DueAmount > 0);
           RemainingAmountText := StrSubstNo ('%1 / %2', Format (RemainingAmount,0, '<Precision,2:2><Integer><Decimals>'), Format (DueAmount, 0, '<Precision,2:2><Integer><Decimals>'));
-          //+MM1.34 [327605]
 
         end;
 
@@ -279,14 +302,15 @@ page 6060140 "MM POS Member Card"
         MembershipRoleDisplay: Record "MM Membership Role";
         RemainingAmountText: Text[50];
         AccentuateDueAmount: Boolean;
+        CONFIRM_PRINT: Label 'Do you want to print a member account card for %1?';
+        CONFIRM_PRINT_FMT: Label '[%1] - %2';
+        MemberRetailIntegration: Codeunit "MM Member Retail Integration";
 
     procedure SetMembershipEntryNo(MembershipEntryNo: Integer)
     begin
-        GMembershipEntryNo := MembershipEntryNo;
 
-        //-MM1.29 [314687]
+        GMembershipEntryNo := MembershipEntryNo;
         Membership.Get (MembershipEntryNo);
-        //+MM1.29 [314687]
     end;
 
     local procedure AddMembershipGuardian()
@@ -313,10 +337,7 @@ page 6060140 "MM POS Member Card"
         PageAction := MemberInfoCapturePage.RunModal ();
         if (PageAction = ACTION::LookupOK) then begin
           MemberInfoCapturePage.GetRecord (MemberInfoCapture);
-          //-MM1.29 [313795]
-          // MembershipManagement.AddGuardianMember (Membership."Entry No.", MemberInfoCapture."Guardian External Member No.");
           MembershipManagement.AddGuardianMember (Membership."Entry No.", MemberInfoCapture."Guardian External Member No.", MemberInfoCapture."GDPR Approval");
-          //+MM1.29 [313795]
 
         end;
     end;
@@ -329,7 +350,6 @@ page 6060140 "MM POS Member Card"
         MemberInfoCapture: Record "MM Member Info Capture";
     begin
 
-        //-MM1.25 [302302]
         MembershipEntry.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
         if (MembershipEntry.IsEmpty ()) then begin
           MembershipSalesSetup.SetFilter ("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
@@ -343,7 +363,6 @@ page 6060140 "MM POS Member Card"
           MembershipManagement.AddMembershipLedgerEntry_NEW (Membership."Entry No.", Membership."Issued Date", MembershipSalesSetup, MemberInfoCapture);
 
         end;
-        //+MM1.25 [302302]
 
         MembershipManagement.ActivateMembershipLedgerEntry (Membership."Entry No.", Today);
     end;

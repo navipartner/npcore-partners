@@ -2,6 +2,7 @@ codeunit 6184850 "FR Audit Mgt."
 {
     // NPR5.48/MMV /20181025 CASE 318028 Created object
     // NPR5.49/MMV /20190306 CASE 348167 Skip footer if no POS entry
+    // NPR5.51/MMV /20190611 CASE 356076 French regulation, 2nd audit.
 
     SingleInstance = true;
 
@@ -17,11 +18,12 @@ codeunit 6184850 "FR Audit Mgt."
         ERROR_MISSING_SIGNATURE: Label '%1 %2 is missing a digital signature';
         Enabled: Boolean;
         CertificateLoaded: Boolean;
-        ERROR_JET_DATA: Label 'JET for %1 %2 already contains data';
-        ERROR_MOD_DESC: Label 'A description of the modification is required';
         ERROR_MISSING_KEY: Label 'The selected certificate does not contain the private key';
         ERROR_SIGNATURE_CHAIN: Label 'Broken signature chain for %1 entry %2';
         ERROR_SIGNATURE_VALUE: Label 'Invalid signature for %1 entry %2';
+        ERROR_JET_INIT: Label 'JET has not been initialized for %1 %2. This must be done to comply with french NF525 regulations.';
+        ERROR_VALIDATE_VERSION: Label 'Can only validate entries created for implementation %1';
+        ERROR_VALIDATE_CERT: Label 'Can only validate entries signed with certificate thumbprint %1';
         CAPTION_JET: Label 'Initialize JET for %1 %2 ?';
         CAPTION_PARTNER_MOD: Label 'Modification description';
         CAPTION_OVERWRITE_CERT: Label 'Are you sure you want to overwrite the existing certificate?';
@@ -39,13 +41,18 @@ codeunit 6184850 "FR Audit Mgt."
         POSAuditProfile: Record "POS Audit Profile";
     begin
         if not Initialized then begin
-          Initialized := true;
+        //-NPR5.51 [356076]
+        //  Initialized := TRUE;
+        //+NPR5.51 [356076]
           if not POSAuditProfile.Get(POSAuditProfileCode) then
             exit(false);
           if POSAuditProfile."Audit Handler" <> HandlerCode() then
             exit(false);
           FRCertificationSetup.SetAutoCalcFields("Signing Certificate");
           FRCertificationSetup.Get;
+        //-NPR5.51 [356076]
+          Initialized := true;
+        //+NPR5.51 [356076]
           Enabled := true;
         end;
         exit(Enabled);
@@ -71,25 +78,6 @@ codeunit 6184850 "FR Audit Mgt."
         end;
     end;
 
-    procedure InitializeJET()
-    var
-        POSUnit: Record "POS Unit";
-        POSAuditLog: Record "POS Audit Log";
-        POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
-    begin
-        if PAGE.RunModal(0, POSUnit) <> ACTION::LookupOK then
-          exit;
-
-        POSAuditLog.SetRange("Active POS Unit No.", POSUnit."No.");
-        if not POSAuditLog.IsEmpty then
-          Error(ERROR_JET_DATA, POSUnit.TableCaption, POSUnit."No.");
-
-        if not Confirm(CAPTION_JET, false, POSUnit.TableCaption, POSUnit."No.") then
-          exit;
-
-        POSAuditLogMgt.CreateEntry(POSUnit.RecordId, POSAuditLog."Action Type"::LOG_INIT, 0, '', POSUnit."No.");
-    end;
-
     procedure VerifySignature(Data: Text;HashAlgo: Text;SignatureBase64: Text): Boolean
     var
         CryptoConfig: DotNet npNetCryptoConfig;
@@ -109,7 +97,7 @@ codeunit 6184850 "FR Audit Mgt."
         exit(POSAuditLogOut.FindLast);
     end;
 
-    local procedure GetNextEventNoSeries(EventType: Option JET,Reprint,Period,GrandPeriod;POSUnitNo: Code[10]): Text
+    local procedure GetNextEventNoSeries(EventType: Option JET,Reprint,Period,MonthPeriod,YearPeriod;POSUnitNo: Code[10]): Text
     var
         FRCertificationNoSeries: Record "FR Audit No. Series";
         NoSeriesManagement: Codeunit NoSeriesManagement;
@@ -119,37 +107,11 @@ codeunit 6184850 "FR Audit Mgt."
           EventType::JET : exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."JET No. Series",Today,true));
           EventType::Reprint : exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Reprint No. Series",Today,true));
           EventType::Period : exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Period No. Series",Today,true));
-          EventType::GrandPeriod : exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Grand Period No. Series",Today,true));
+          EventType::MonthPeriod : exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Grand Period No. Series",Today,true));
+        //-NPR5.51 [356076]
+          EventType::YearPeriod : exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Yearly Period No. Series",Today,true));
+        //+NPR5.51 [356076]
         end;
-    end;
-
-    procedure LogPartnerModification()
-    var
-        POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
-        RecordID: RecordID;
-        POSAuditLog: Record "POS Audit Log";
-        DescriptionOut: Text[250];
-        InputDialog: Page "Input Dialog";
-        ID: Integer;
-        POSUnit: Record "POS Unit";
-    begin
-        if PAGE.RunModal(0, POSUnit) <> ACTION::LookupOK then
-          exit;
-
-        repeat
-          Clear(InputDialog);
-          InputDialog.LookupMode := true;
-          InputDialog.SetInput(1, DescriptionOut, CAPTION_PARTNER_MOD);
-          if InputDialog.RunModal = ACTION::LookupOK then
-            ID := InputDialog.InputText(1, DescriptionOut);
-        until (DescriptionOut <> '') or (ID = 0);
-        if (ID = 0) then
-          exit;
-
-        if DescriptionOut = '' then
-          Error(ERROR_MOD_DESC);
-
-        POSAuditLogMgt.CreateEntryExtended(RecordID, POSAuditLog."Action Type"::PARTNER_MODIFICATION, 0, '' , POSUnit."No.", '', DescriptionOut);
     end;
 
     procedure SignHash(BaseHash: Text): Text
@@ -208,6 +170,31 @@ codeunit 6184850 "FR Audit Mgt."
         Message(CAPTION_CERT_SUCCESS, FRCertificationSetup."Signing Certificate Thumbprint");
     end;
 
+    local procedure TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";PeriodType: Code[20];PeriodDateCalcFormula: DateFormula;PeriodDate: Date;var FromWorkshiftEntryOut: Integer): Boolean
+    var
+        POSWorkshifts: Record "POS Workshift Checkpoint";
+        POSAuditLog: Record "POS Audit Log";
+    begin
+        //-NPR5.51 [356076]
+        POSWorkshifts.SetRange("POS Unit No.", POSWorkshiftCheckpoint."POS Unit No.");
+        POSWorkshifts.SetRange(Type, POSWorkshifts.Type::PREPORT);
+        POSWorkshifts.SetRange("Period Type", PeriodType);
+        if not POSWorkshifts.FindLast then begin
+          //Find the first workshift created after JET was initialized in-case we have old workshifts that should not be handled.
+          GetJETInitRecord(POSAuditLog, POSWorkshiftCheckpoint."POS Unit No.", true);
+
+          POSWorkshifts.SetRange("Period Type");
+          POSWorkshifts.SetRange(Type, POSWorkshifts.Type::ZREPORT);
+          POSWorkshifts.SetFilter("POS Entry No.", '>=%1', POSAuditLog."Acted on POS Entry No.");
+          if not POSWorkshifts.FindFirst then
+            exit(false);
+        end;
+        FromWorkshiftEntryOut := POSWorkshifts."Entry No.";
+
+        exit(CalcDate(PeriodDateCalcFormula, PeriodDate) <= Today);
+        //+NPR5.51 [356076]
+    end;
+
     local procedure "---Fill Base Values"()
     begin
     end;
@@ -224,11 +211,21 @@ codeunit 6184850 "FR Audit Mgt."
         if IsInitialHandling then begin
           if GetLastUnitEventSignature(POSAuditLog."Active POS Unit No.", PreviousEventLogRecord, POSAuditLog."External Type") then
             POSAuditLog."Previous Electronic Signature" := PreviousEventLogRecord."Electronic Signature";
-          POSAuditLog."External Implementation" := HandlerCode();
+        //-NPR5.51 [356076]
+          POSAuditLog."External Implementation" := ImplementationCode();
+        //+NPR5.51 [356076]
           POSAuditLog."Certificate Implementation" := 'RSA_2048_SHA1';
           POSAuditLog."Certificate Thumbprint" := FRCertificationSetup."Signing Certificate Thumbprint";
           POSAuditLog."Handled by External Impl." := true;
         end;
+
+        //-NPR5.51 [356076]
+        if POSAuditLog."External Implementation" <> ImplementationCode() then //Can only validate the current version of the implementation as the rules & fields might have changed over time.
+          Error(ERROR_VALIDATE_VERSION, ImplementationCode);
+
+        if POSAuditLog."Certificate Thumbprint" <> FRCertificationSetup."Signing Certificate Thumbprint" then
+          Error(ERROR_VALIDATE_CERT, FRCertificationSetup."Signing Certificate Thumbprint");
+        //+NPR5.51 [356076]
 
         POSAuditLog."Previous Electronic Signature".CreateInStream(InStream);
         while (not InStream.EOS) do
@@ -255,31 +252,21 @@ codeunit 6184850 "FR Audit Mgt."
     local procedure FillJETBase(var POSAuditLog: Record "POS Audit Log";PreviousSignature: Text): Text
     begin
         with POSAuditLog do
-          exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7,%8,%9',
+        //-NPR5.51 [356076]
+        //  EXIT(STRSUBSTNO('%1,%2,%3,%4,%5,%6,%7,%8,%9',
+          exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7,%8',
+        //+NPR5.51 [356076]
             FormatAlphanumeric("External ID"),
             "External Code",
             FormatAlphanumeric("Additional Information"),
             FormatDatetime("Log Timestamp"),
             FormatAlphanumeric("Active Salesperson Code"),
             FormatAlphanumeric("Active POS Unit No."),
-            '',
+        //-NPR5.51 [356076]
+        //    '',
+        //+NPR5.51 [356076]
             Format((PreviousSignature <> ''),0,2),
             FormatText(PreviousSignature)));
-        
-        /*
-        1� JET�ID� TAG-JET-NID� Alpha�numeric� Cf.�5.
-        2� Event�code� TAG-JET-COD� Numeric� Cf.�5.
-        3� Event�label/description� TAG-JET-LIB� Alpha�numeric� Cf.�5.
-        4� Operation�TimeStamp� TAG-JET-HOR-GDH� Datetime� Cf.�5.
-        5� Operator�code� TAG-JET-OPS-NID� Alpha�numeric� Cf.�5.
-        6� Terminal/POS�code� TAG-JET-CAI-NID� Alpha�numeric� Cf.�5.
-        8� Is�there�a�previous�signature�?�Y/N� TAG-JET-OEN� Alpha�numeric
-        �O��/��N�
-        ou�
-        �0��/��1��
-        9� Electronic�signature� TAG-JET-SIG� Text� Cf.�5.
-        */
-
     end;
 
     local procedure FillTicketBase(var POSAuditLog: Record "POS Audit Log";PreviousSignature: Text): Text
@@ -287,39 +274,26 @@ codeunit 6184850 "FR Audit Mgt."
         TaxBreakdown: Text;
         TaxTotal: Decimal;
         POSEntry: Record "POS Entry";
-        RecRef: RecordRef;
         Licenceinformation: Codeunit "Licence information";
     begin
-        RecRef.Get(POSAuditLog."Record ID");
-        RecRef.SetTable(POSEntry);
-        POSEntry.Find;
-        
-        TaxBreakdown := GetSaleTaxBreakdownString(POSEntry);
-        TaxTotal := GetSaleTaxTotal(POSEntry);
-        
+        POSEntry.Get(POSAuditLog."Record ID");
+
+        //-NPR5.51 [356076]
+        TaxBreakdown := GetSaleTaxBreakdownString(POSEntry, false);
+        TaxTotal := GetSaleTotalInclTax(POSEntry, false);
+        //+NPR5.51 [356076]
+
         with POSAuditLog do
           exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7',
             FormatAlphanumeric(TaxBreakdown),
             FormatNumeric(TaxTotal),
             FormatDatetime("Log Timestamp"),
             FormatAlphanumeric("Acted on POS Entry Fiscal No."),
-            'Sale',
+        //-NPR5.51 [356076]
+            POSAuditLog."External Description",
+        //+NPR5.51 [356076]
             Format((PreviousSignature <> ''),0,2),
             FormatText(PreviousSignature)));
-        
-        /*
-        1� Tax.�Incl�amounts�brokedown�per�VAT�rate� TAG-TIK-TOT-TTC-TVA� Alpha�numeric� Cf.�5.
-        2� Total�Tax.�Incl�amount�of�the�ticket� TAG-TIK-TOT-TTC� Alpha�numeric� Cf.�5.
-        3� Operation�Timestamp� TAG-TIK-HOR-GDH� Datetime� Cf.�5.
-        4� Document�number�(unique)� TAG-TIK-NUM� Alpha�numeric� Cf.�5.
-        5� Operation�type� TAG-TIK-OPE-TYP� Alpha�numeric� Cf.�5.
-        6� Is�there�a�previous�signature�?�Y/N� TAG-TIK-OEN� Alpha�numeric
-        �O��/��N�
-        ou�
-        �0��/��1�
-        7� Electronic�signature� TAG-TIK-SIG� Text� Cf.�5
-        */
-
     end;
 
     local procedure FillGrandTotalBase(var POSAuditLog: Record "POS Audit Log";PreviousSignature: Text): Text
@@ -329,6 +303,7 @@ codeunit 6184850 "FR Audit Mgt."
         POSEntry: Record "POS Entry";
         TaxBreakdown: Text;
         TaxTotal: Decimal;
+        PerpetualAmount: Decimal;
     begin
         RecRef.Get(POSAuditLog."Record ID");
         case RecRef.Number of
@@ -336,25 +311,44 @@ codeunit 6184850 "FR Audit Mgt."
             begin
               RecRef.SetTable(POSWorkshiftCheckpoint);
               POSWorkshiftCheckpoint.Find;
+              //-NPR5.51 [356076]
               TaxBreakdown := GetWorkshiftTaxBreakdownString(POSWorkshiftCheckpoint);
-              TaxTotal := GetWorkshiftTaxTotal(POSWorkshiftCheckpoint);
+              TaxTotal := GetWorkshiftTotalInclTax(POSWorkshiftCheckpoint);
+              //+NPR5.51 [356076]
               POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
-              POSAuditLog."Additional Information" := Format(GetWorkshiftPerpetualAmount(POSWorkshiftCheckpoint),0,'<Precision,2:2><Standard Format,9>');
+              //-NPR5.51 [356076]
+              PerpetualAmount := GetWorkshiftPerpetualAmount(POSWorkshiftCheckpoint);
+              POSAuditLog."Additional Information" := StrSubstNo('%1|%2|%3',
+                  Format(TaxTotal,0,'<Precision,2:2><Standard Format,9>'),
+                  Format(GetWorkshiftPerpetualAbsoluteAmount(POSWorkshiftCheckpoint),0,'<Precision,2:2><Standard Format,9>'),
+                  Format(PerpetualAmount,0,'<Precision,2:2><Standard Format,9>'));
+              //+NPR5.51 [356076]
             end;
           DATABASE::"POS Entry" :
             begin
               RecRef.SetTable(POSEntry);
               POSEntry.Find;
-              TaxBreakdown := GetSaleTaxBreakdownString(POSEntry);
-              TaxTotal := GetSaleTaxTotal(POSEntry);
-              POSAuditLog."Additional Information" := Format(GetSalePerpetualAmount(POSEntry),0,'<Precision,2:2><Standard Format,9>');
+              //-NPR5.51 [356076]
+              TaxBreakdown := GetSaleTaxBreakdownString(POSEntry, true);
+              TaxTotal := GetSaleTotalInclTax(POSEntry, true);
+              PerpetualAmount := GetSalePerpetualAmount(POSEntry);
+              POSAuditLog."Additional Information" := StrSubstNo('%1|%2|%3',
+                  Format(TaxTotal,0,'<Precision,2:2><Standard Format,9>'),
+                  Format(GetSalePerpetualAbsoluteAmount(POSEntry),0,'<Precision,2:2><Standard Format,9>'),
+                  Format(PerpetualAmount,0,'<Precision,2:2><Standard Format,9>'));
+              //+NPR5.51 [356076]
             end;
         end;
 
         with POSAuditLog do
-          exit(StrSubstNo('%1,%2,%3,%4,%5,%6',
+        //-NPR5.51 [356076]
+          exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7',
+        //+NPR5.51 [356076]
             FormatAlphanumeric(TaxBreakdown),
             FormatNumeric(TaxTotal),
+        //-NPR5.51 [356076]
+            FormatNumeric(PerpetualAmount),
+        //+NPR5.51 [356076]
             FormatDatetime("Log Timestamp"),
             FormatAlphanumeric(POSEntry."Fiscal No."),
             Format((PreviousSignature <> ''),0,2),
@@ -366,11 +360,8 @@ codeunit 6184850 "FR Audit Mgt."
         ReprintNo: Integer;
         POSEntryOutputLog: Record "POS Entry Output Log";
         POSEntryOutputLog2: Record "POS Entry Output Log";
-        RecRef: RecordRef;
     begin
-        RecRef.Get(POSAuditLog."Record ID");
-        RecRef.SetTable(POSEntryOutputLog);
-        RecRef.Find;
+        POSEntryOutputLog.Get(POSAuditLog."Record ID");
 
         POSEntryOutputLog2.SetRange("POS Entry No.",POSAuditLog."Acted on POS Entry No.");
         POSEntryOutputLog2.SetRange("Output Method", POSEntryOutputLog2."Output Method"::Print);
@@ -401,12 +392,12 @@ codeunit 6184850 "FR Audit Mgt."
         TaxBreakdown: Text;
         TaxTotal: Decimal;
     begin
-        RecRef.Get(POSAuditLog."Record ID");
-        RecRef.SetTable(POSWorkshiftCheckpoint);
-        POSWorkshiftCheckpoint.Find;
+        POSWorkshiftCheckpoint.Get(POSAuditLog."Record ID");
 
+        //-NPR5.51 [356076]
         TaxBreakdown := GetWorkshiftTaxBreakdownString(POSWorkshiftCheckpoint);
-        TaxTotal := GetWorkshiftTaxTotal(POSWorkshiftCheckpoint);
+        TaxTotal := GetWorkshiftTotalInclTax(POSWorkshiftCheckpoint);
+        //+NPR5.51 [356076]
 
         with POSAuditLog do
           exit(StrSubstNo('%1,%2,%3,%4,%5,%6,%7',
@@ -509,11 +500,18 @@ codeunit 6184850 "FR Audit Mgt."
         HasPreviousSignature: Boolean;
         PreviousSignature: Text;
         InStream: InStream;
+        POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";
+        POSEntry: Record "POS Entry";
     begin
         POSAuditLog."External Code" := '170';
         POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
         POSAuditLog."External Type" := 'JET';
         POSAuditLog."External Description" := 'Cash Drawer Counting';
+        //-NPR5.51 [356076]
+        POSWorkshiftCheckpoint.Get(POSAuditLog."Record ID");
+        POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
+        POSAuditLog."Additional Information" := Format(POSEntry."Fiscal No.");
+        //+NPR5.51 [356076]
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
@@ -611,11 +609,28 @@ codeunit 6184850 "FR Audit Mgt."
         HasPreviousSignature: Boolean;
         InStream: InStream;
         PreviousSignature: Text;
+        POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";
+        POSEntry: Record "POS Entry";
     begin
-        POSAuditLog."External Code" := '20';
-        POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
-        POSAuditLog."External Type" := 'JET';
-        POSAuditLog."External Description" := 'Period Archive';
+        //-NPR5.51 [356076]
+        POSWorkshiftCheckpoint.Get(POSAuditLog."Record ID");
+        if POSWorkshiftCheckpoint."Period Type" = YearlyPeriodType() then begin
+          POSAuditLog."External Code" := '30';
+          POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
+          POSAuditLog."External Type" := 'JET';
+          POSAuditLog."External Description" := 'Yearly Archive';
+        end else begin
+        //+NPR5.51 [356076]
+          POSAuditLog."External Code" := '20';
+          POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
+          POSAuditLog."External Type" := 'JET';
+          POSAuditLog."External Description" := 'Period Archive';
+        end;
+
+        //-NPR5.51 [356076]
+        POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
+        POSAuditLog."Additional Information" := Format(POSEntry."Fiscal No.");
+        //+NPR5.51 [356076]
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
@@ -634,6 +649,9 @@ codeunit 6184850 "FR Audit Mgt."
         POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
         POSAuditLog."External Type" := 'JET';
         POSAuditLog."External Description" := 'Log In';
+        //-NPR5.51 [356076]
+        POSAuditLog."Additional Information" := Format(POSAuditLog."Active Salesperson Code");
+        //+NPR5.51 [356076]
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
@@ -651,9 +669,25 @@ codeunit 6184850 "FR Audit Mgt."
         POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
         POSAuditLog."External Type" := 'JET';
         POSAuditLog."External Description" := 'Log Out';
+        //-NPR5.51 [356076]
+        POSAuditLog."Additional Information" := Format(POSAuditLog."Active Salesperson Code");
+        //+NPR5.51 [356076]
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
+    end;
+
+    local procedure SignItemRMA(var POSAuditLog: Record "POS Audit Log")
+    begin
+        //-NPR5.51 [356076]
+        POSAuditLog."External Code" := '190';
+        POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
+        POSAuditLog."External Type" := 'JET';
+        POSAuditLog."External Description" := 'Ticket Voided/Item Returned';
+
+        FillSignatureBaseValues(POSAuditLog, true);
+        SignRecord(POSAuditLog);
+        //+NPR5.51 [356076]
     end;
 
     local procedure SignWorkshift(var POSAuditLog: Record "POS Audit Log")
@@ -668,27 +702,38 @@ codeunit 6184850 "FR Audit Mgt."
         InStream: InStream;
         PreviousSignature: Text;
     begin
-        //WORKSHIFT_END triggers both a JET drawer count event and a period/monthly grand total event as well - for the same workshift record.
-
-        RecRef.Get(POSAuditLog."Record ID");
-        RecRef.SetTable(POSWorkshiftCheckpoint);
-        POSWorkshiftCheckpoint.Find;
+        POSWorkshiftCheckpoint.Get(POSAuditLog."Record ID");
         POSWorkshiftCheckpoint.TestField("POS Entry No.");
         POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
         POSEntry.TestField("Salesperson Code");
 
-        //JET drawer count:
-        if POSWorkshiftCheckpoint.Type <> POSWorkshiftCheckpoint.Type::PREPORT then
-          POSAuditLogMgt.CreateEntry(POSWorkshiftCheckpoint.RecordId,POSAuditLog."Action Type"::DRAWER_COUNT,POSEntry."Entry No.",POSEntry."Fiscal No.",POSEntry."POS Unit No.");
+        //-NPR5.51 [356076]
+        if not (POSWorkshiftCheckpoint.Type in [POSWorkshiftCheckpoint.Type::ZREPORT, POSWorkshiftCheckpoint.Type::PREPORT]) then
+          exit;
+        //+NPR5.51 [356076]
 
-        //Grand Total:
-        POSAuditLogMgt.CreateEntry(POSWorkshiftCheckpoint.RecordId,POSAuditLog."Action Type"::GRANDTOTAL,POSEntry."Entry No.",POSEntry."Fiscal No.",POSEntry."POS Unit No.");
+        //-NPR5.51 [356076]
+        if (POSWorkshiftCheckpoint.Type = POSWorkshiftCheckpoint.Type::PREPORT) and (POSWorkshiftCheckpoint."Period Type" = YearlyPeriodType()) then begin
+          POSAuditLog."External Code" := '60';
+          POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
+          POSAuditLog."External Type" := 'JET';
+          POSAuditLog."External Description" := 'Year Closing';
+        end else begin
+        //+NPR5.51 [356076]
+          POSAuditLog."External Code" := '50';
+          POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
+          POSAuditLog."External Type" := 'JET';
+        //-NPR5.51 [356076]
+          if POSWorkshiftCheckpoint.Type = POSWorkshiftCheckpoint.Type::ZREPORT then
+            POSAuditLog."External Description" := 'Period Closing (Z-Report)'
+          else
+            POSAuditLog."External Description" := 'Period Closing (Month Report)';
+        //+NPR5.51 [356076]
+        end;
 
-        //JET period close (this event):
-        POSAuditLog."External Code" := '50';
-        POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
-        POSAuditLog."External Type" := 'JET';
-        POSAuditLog."External Description" := 'Period Closing';
+        //-NPR5.51 [356076]
+        POSAuditLog."Additional Information" := Format(POSEntry."Fiscal No.");
+        //+NPR5.51 [356076]
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
@@ -705,18 +750,24 @@ codeunit 6184850 "FR Audit Mgt."
         InStream: InStream;
         POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
     begin
-        RecRef.Get(POSAuditLog."Record ID");
-        RecRef.SetTable(POSEntry);
-        POSEntry.Find;
+        POSEntry.Get(POSAuditLog."Record ID");
 
-        //TICKET event also triggers a Ticket Grand Total event:
-        POSAuditLogMgt.CreateEntry(POSEntry.RecordId,POSAuditLog."Action Type"::GRANDTOTAL,POSEntry."Entry No.",POSEntry."Fiscal No.",POSEntry."POS Unit No.");
+        //-NPR5.51 [356076]
+        //TICKET event might also trigger a "Non-item amount" custom JET event depending on sale contents:
+        LogNonItemAmounts(POSEntry);
+        //+NPR5.51 [356076]
 
-        //Continue with TICKET event:
         POSAuditLog."External ID" := POSEntry."Fiscal No.";
         POSAuditLog."External Code" := '';
         POSAuditLog."External Type" := 'TICKET';
-        POSAuditLog."External Description" := 'Sale (Ticket)';
+
+        //-NPR5.51 [356076]
+        if IsFullRMA(POSEntry) then begin
+          POSAuditLog."External Description" := 'Cancellation (Ticket)'
+        end else begin
+          POSAuditLog."External Description" := 'Sale (Ticket)'
+        end;
+        //+NPR5.51 [356076]
 
         CreatePOSEntryRelatedInfoRecord(POSEntry); //Store/company data needs to be persistent.
 
@@ -747,8 +798,15 @@ codeunit 6184850 "FR Audit Mgt."
                 POSAuditLog."External Description" := 'Period Grand Total';
                 POSAuditLog."External ID" := GetNextEventNoSeries(2, POSWorkshiftCheckpoint."POS Unit No.");
               end else if POSWorkshiftCheckpoint.Type = POSWorkshiftCheckpoint.Type::PREPORT then begin
-                POSAuditLog."External Description" := 'Monthly Grand Total';
-                POSAuditLog."External ID" := GetNextEventNoSeries(3, POSWorkshiftCheckpoint."POS Unit No.");
+                //-NPR5.51 [356076]
+                if POSWorkshiftCheckpoint."Period Type" = YearlyPeriodType then begin
+                  POSAuditLog."External Description" := 'Yearly Grand Total';
+                  POSAuditLog."External ID" := GetNextEventNoSeries(4, POSWorkshiftCheckpoint."POS Unit No.");
+                end else if POSWorkshiftCheckpoint."Period Type" = MonthlyPeriodType() then begin
+                //+NPR5.51 [356076]
+                  POSAuditLog."External Description" := 'Monthly Grand Total';
+                  POSAuditLog."External ID" := GetNextEventNoSeries(3, POSWorkshiftCheckpoint."POS Unit No.");
+                end;
               end;
               POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
             end;
@@ -784,9 +842,7 @@ codeunit 6184850 "FR Audit Mgt."
         POSAuditLog."External Type" := 'DUPLICATE';
         POSAuditLog."External Description" := 'Ticket Reprint';
 
-        RecRef.Get(POSAuditLog."Record ID");
-        RecRef.SetTable(POSEntryOutputLog);
-        POSEntryOutputLog.Find;
+        POSEntryOutputLog.Get(POSAuditLog."Record ID");
 
         FillSignatureBaseValues(POSAuditLog, true);
         SignRecord(POSAuditLog);
@@ -813,73 +869,205 @@ codeunit 6184850 "FR Audit Mgt."
         SignRecord(POSAuditLog);
     end;
 
+    local procedure SignCancelSale(var POSAuditLog: Record "POS Audit Log")
+    begin
+        //-NPR5.51 [356076]
+        POSAuditLog."External Code" := '320';
+        POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
+        POSAuditLog."External Type" := 'JET';
+        POSAuditLog."External Description" := 'Cancel Sale';
+        //-NPR5.51 [356076]
+        POSAuditLog."Additional Information" := Format(POSAuditLog."Active Salesperson Code");
+        //+NPR5.51 [356076]
+
+        FillSignatureBaseValues(POSAuditLog, true);
+        SignRecord(POSAuditLog);
+        //+NPR5.51 [356076]
+    end;
+
+    local procedure SignNonItemAmount(var POSAuditLog: Record "POS Audit Log")
+    begin
+        //-NPR5.51 [356076]
+        POSAuditLog."External Code" := '910';
+        POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
+        POSAuditLog."External Type" := 'JET';
+        POSAuditLog."External Description" := 'Non-item ticket sales amount';
+
+        FillSignatureBaseValues(POSAuditLog, true);
+        SignRecord(POSAuditLog);
+        //+NPR5.51 [356076]
+    end;
+
     local procedure "---Amount Calculation"()
     begin
     end;
 
-    local procedure GetSaleTaxBreakdownString(POSEntry: Record "POS Entry") TaxBreakdown: Text
+    local procedure GetSaleTaxBreakdownString(POSEntry: Record "POS Entry";OnlyIncludeItems: Boolean) TaxBreakdown: Text
     var
         POSTaxAmountLine: Record "POS Tax Amount Line";
+        POSTaxAmountLine2: Record "POS Tax Amount Line";
+        tmpPOSTaxAmountLine: Record "POS Tax Amount Line" temporary;
     begin
+        //-NPR5.51 [356076]
         POSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        if OnlyIncludeItems then begin
+          POSTaxAmountLine.SetFilter("VAT Identifier", FRCertificationSetup."Item VAT Identifier Filter");
+        end;
+
         if POSTaxAmountLine.FindSet then
           repeat
-            if TaxBreakdown <> '' then
-              TaxBreakdown += '|';
-            TaxBreakdown += PadLeft(FormatNumeric(POSTaxAmountLine."Tax %"),4,'0') + ':' + PadLeft(FormatNumeric(POSTaxAmountLine."Amount Including Tax"),4,'0');
+            //Select distinct tax % total
+
+            tmpPOSTaxAmountLine.SetRange("Tax %", POSTaxAmountLine."Tax %");
+            if tmpPOSTaxAmountLine.IsEmpty then begin
+              tmpPOSTaxAmountLine."POS Entry No." += 1;
+              tmpPOSTaxAmountLine."Tax %" := POSTaxAmountLine."Tax %";
+              tmpPOSTaxAmountLine.Insert;
+
+              POSTaxAmountLine2.SetRange("POS Entry No.", POSEntry."Entry No.");
+              POSTaxAmountLine2.SetRange("Tax %", POSTaxAmountLine."Tax %");
+              if OnlyIncludeItems then begin
+                POSTaxAmountLine2.SetFilter("VAT Identifier", FRCertificationSetup."Item VAT Identifier Filter");
+              end;
+              POSTaxAmountLine2.CalcSums("Amount Including Tax");
+
+              if TaxBreakdown <> '' then
+                TaxBreakdown += '|';
+              TaxBreakdown += PadLeft(FormatNumeric(POSTaxAmountLine."Tax %"),4,'0') + ':' + PadLeft(FormatNumeric(POSTaxAmountLine2."Amount Including Tax"),4,'0');
+            end;
           until POSTaxAmountLine.Next = 0;
+        //+NPR5.51 [356076]
     end;
 
-    local procedure GetSaleTaxTotal(POSEntry: Record "POS Entry"): Decimal
+    local procedure GetSaleTotalInclTax(POSEntry: Record "POS Entry";OnlyIncludeItems: Boolean): Decimal
     begin
-        exit(POSEntry."Total Amount Incl. Tax");
+        //-NPR5.51 [356076]
+        if OnlyIncludeItems then begin
+          exit(POSEntry."Item Sales (LCY)" + POSEntry."Item Returns (LCY)")
+        end else begin
+          exit(POSEntry."Amount Incl. Tax");
+        end;
+        //+NPR5.51 [356076]
     end;
 
-    local procedure GetSalePerpetualAmount(POSEntry: Record "POS Entry"): Decimal
+    local procedure GetSalePerpetualAbsoluteAmount(POSEntryIn: Record "POS Entry"): Decimal
     var
         POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";
         Perpetual: Decimal;
-        POSEntry2: Record "POS Entry";
+        POSEntry: Record "POS Entry";
     begin
-        POSWorkshiftCheckpoint.SetRange("POS Unit No.", POSEntry."POS Unit No.");
+        //Implied only include item amounts as per audit requirements.
+
+        //-NPR5.51 [356076]
+        POSWorkshiftCheckpoint.SetRange("POS Unit No.", POSEntryIn."POS Unit No.");
         POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::ZREPORT);
+        POSWorkshiftCheckpoint.SetRange(Open, false);
+        POSWorkshiftCheckpoint.SetFilter("POS Entry No.", '<%1', POSEntryIn."Entry No.");
+
         if POSWorkshiftCheckpoint.FindLast then begin
-          Perpetual += (POSWorkshiftCheckpoint."Perpetual Dir. Turnover (LCY)" + (2 * Abs(POSWorkshiftCheckpoint."Perpetual Dir. Neg. Amt. (LCY)")));
-          POSEntry2.SetFilter("Entry No.", '>%1', POSWorkshiftCheckpoint."POS Entry No.");
+          Perpetual := GetWorkshiftPerpetualAbsoluteAmount(POSWorkshiftCheckpoint);
+          POSEntry.SetFilter("Entry No.", '>%1&<=%2', POSWorkshiftCheckpoint."POS Entry No.", POSEntryIn."Entry No.");
+        end else begin
+          POSEntry.SetFilter("Entry No.", '<=%1', POSEntryIn."Entry No.");
         end;
 
-        POSEntry2.SetRange("POS Unit No.", POSEntry."POS Unit No.");
-        POSEntry2.SetRange("Entry Type", POSEntry2."Entry Type"::"Direct Sale");
-        POSEntry2.CalcSums("Total Amount Incl. Tax", "Total Neg. Amount Incl. Tax");
-        Perpetual += (POSEntry2."Total Amount Incl. Tax" + (2 * Abs(POSEntry2."Total Neg. Amount Incl. Tax")));
+        POSEntry.SetRange("POS Unit No.", POSEntryIn."POS Unit No.");
+        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
+        POSEntry.CalcSums("Item Sales (LCY)", "Item Returns (LCY)");
+        Perpetual += (POSEntry."Item Sales (LCY)" + Abs(POSEntry."Item Returns (LCY)"));
 
         exit(Perpetual);
+        //+NPR5.51 [356076]
+    end;
+
+    local procedure GetSalePerpetualAmount(POSEntryIn: Record "POS Entry"): Decimal
+    var
+        POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";
+        Perpetual: Decimal;
+        POSEntry: Record "POS Entry";
+    begin
+        //Implied only include item amounts as per audit requirements.
+
+        //-NPR5.51 [356076]
+        POSWorkshiftCheckpoint.SetRange("POS Unit No.", POSEntryIn."POS Unit No.");
+        POSWorkshiftCheckpoint.SetRange(Type, POSWorkshiftCheckpoint.Type::ZREPORT);
+        POSWorkshiftCheckpoint.SetRange(Open, false);
+        POSWorkshiftCheckpoint.SetFilter("POS Entry No.", '<%1', POSEntryIn."Entry No.");
+        if POSWorkshiftCheckpoint.FindLast then begin
+          Perpetual := GetWorkshiftPerpetualAmount(POSWorkshiftCheckpoint);
+          POSEntry.SetFilter("Entry No.", '>%1&<=%2', POSWorkshiftCheckpoint."POS Entry No.", POSEntryIn."Entry No.");
+        end else begin
+          POSEntry.SetFilter("Entry No.", '<=%1', POSEntryIn."Entry No.");
+        end;
+
+        POSEntry.SetRange("POS Unit No.", POSEntryIn."POS Unit No.");
+        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
+        POSEntry.CalcSums("Item Sales (LCY)", "Item Returns (LCY)");
+        Perpetual += (POSEntry."Item Sales (LCY)" + POSEntry."Item Returns (LCY)");
+
+        exit(Perpetual);
+        //+NPR5.51 [356076]
     end;
 
     local procedure GetWorkshiftTaxBreakdownString(POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint") TaxBreakdown: Text
     var
         POSWorkshiftTaxCheckpoint: Record "POS Workshift Tax Checkpoint";
+        POSWorkshiftTaxCheckpoint2: Record "POS Workshift Tax Checkpoint";
+        tmpPOSWorkshiftTaxCheckpoint: Record "POS Workshift Tax Checkpoint" temporary;
     begin
+        //Implied only include item amounts as per audit requirements.
+
+        //-NPR5.51 [356076]
         POSWorkshiftTaxCheckpoint.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpoint."Entry No.");
+        POSWorkshiftTaxCheckpoint.SetFilter("VAT Identifier", FRCertificationSetup."Item VAT Identifier Filter");
         if POSWorkshiftTaxCheckpoint.FindSet then
           repeat
-            if TaxBreakdown <> '' then
-              TaxBreakdown += '|';
-            TaxBreakdown += PadLeft(FormatNumeric(POSWorkshiftTaxCheckpoint."Tax %"),4,'0') + ':' + FormatNumeric(POSWorkshiftTaxCheckpoint."Amount Including Tax");
+            //Select distinct tax % total
+
+            tmpPOSWorkshiftTaxCheckpoint.SetRange("Tax %", POSWorkshiftTaxCheckpoint."Tax %");
+            if tmpPOSWorkshiftTaxCheckpoint.IsEmpty then begin
+              tmpPOSWorkshiftTaxCheckpoint."Entry No." += 1;
+              tmpPOSWorkshiftTaxCheckpoint."Tax %" := POSWorkshiftTaxCheckpoint."Tax %";
+              tmpPOSWorkshiftTaxCheckpoint.Insert;
+
+              POSWorkshiftTaxCheckpoint2.SetRange("Workshift Checkpoint Entry No.", POSWorkshiftCheckpoint."Entry No.");
+              POSWorkshiftTaxCheckpoint2.SetRange("Tax %", POSWorkshiftTaxCheckpoint."Tax %");
+              POSWorkshiftTaxCheckpoint2.SetFilter("VAT Identifier", FRCertificationSetup."Item VAT Identifier Filter");
+              POSWorkshiftTaxCheckpoint2.CalcSums("Amount Including Tax");
+
+              if TaxBreakdown <> '' then
+                TaxBreakdown += '|';
+              TaxBreakdown += PadLeft(FormatNumeric(POSWorkshiftTaxCheckpoint."Tax %"),4,'0') + ':' + FormatNumeric(POSWorkshiftTaxCheckpoint2."Amount Including Tax");
+            end;
           until POSWorkshiftTaxCheckpoint.Next = 0;
+        //+NPR5.51 [356076]
     end;
 
-    local procedure GetWorkshiftTaxTotal(POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint"): Decimal
+    local procedure GetWorkshiftTotalInclTax(POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint"): Decimal
     begin
-        exit(POSWorkshiftCheckpoint."Direct Turnover (LCY)" - POSWorkshiftCheckpoint."Rounding (LCY)");
+        //-NPR5.51 [356076]
+        //Implied only include item amounts as per audit requirements.
+
+        exit(POSWorkshiftCheckpoint."Direct Item Sales (LCY)" + POSWorkshiftCheckpoint."Direct Item Returns (LCY)");
+        //+NPR5.51 [356076]
+    end;
+
+    local procedure GetWorkshiftPerpetualAbsoluteAmount(POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint"): Decimal
+    begin
+        //-NPR5.51 [356076]
+        //Implied only include item amounts as per audit requirements.
+
+        exit(POSWorkshiftCheckpoint."Perpetual Dir. Item Sales(LCY)" + Abs(POSWorkshiftCheckpoint."Perpetual Dir. Item Ret. (LCY)"));
+        //+NPR5.51 [356076]
     end;
 
     local procedure GetWorkshiftPerpetualAmount(POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint"): Decimal
     begin
-        if POSWorkshiftCheckpoint."Perpetual Rounding Amt. (LCY)" <= 0 then
-          exit(POSWorkshiftCheckpoint."Perpetual Dir. Turnover (LCY)" + (2 * Abs(POSWorkshiftCheckpoint."Perpetual Dir. Neg. Amt. (LCY)" - POSWorkshiftCheckpoint."Perpetual Rounding Amt. (LCY)")))
-        else
-          exit(POSWorkshiftCheckpoint."Perpetual Dir. Turnover (LCY)" - POSWorkshiftCheckpoint."Perpetual Rounding Amt. (LCY)" + (2 * Abs(POSWorkshiftCheckpoint."Perpetual Dir. Neg. Amt. (LCY)")));
+        //-NPR5.51 [356076]
+        //Implied only include item amounts as per audit requirements.
+
+        exit(POSWorkshiftCheckpoint."Perpetual Dir. Item Sales(LCY)" + POSWorkshiftCheckpoint."Perpetual Dir. Item Ret. (LCY)");
+        //+NPR5.51 [356076]
     end;
 
     local procedure "---Aux"()
@@ -912,7 +1100,10 @@ codeunit 6184850 "FR Audit Mgt."
           "Store Siret" := POSStore."Registration No.";
           "Store Country/Region Code" := POSStore."Country/Region Code";
           RecRef.GetTable(CompanyInformation);
-          //APE := RecRef.FIELD(10802).VALUE;
+        //-NPR5.51 [356076]
+          if RecRef.FieldExist(10802) then
+            APE := RecRef.Field(10802).Value;
+        //+NPR5.51 [356076]
           "Intra-comm. VAT ID" := CompanyInformation."VAT Registration No.";
           "Salesperson Name" := SalespersonPurchaser.Name;
           Insert;
@@ -965,6 +1156,106 @@ codeunit 6184850 "FR Audit Mgt."
         exit(PadStr('', Length-InputLength, PadChar) + Text);
     end;
 
+    local procedure MonthlyPeriodType(): Text
+    begin
+        //-NPR5.51 [356076]
+        exit('FR_NF525_MONTH');
+        //+NPR5.51 [356076]
+    end;
+
+    local procedure YearlyPeriodType(): Text
+    begin
+        //-NPR5.51 [356076]
+        exit('FR_NF525_YEAR');
+        //+NPR5.51 [356076]
+    end;
+
+    local procedure ImplementationCode(): Text
+    begin
+        //-NPR5.51 [356076]
+        exit(HandlerCode + '_V3');
+        //+NPR5.51 [356076]
+    end;
+
+    procedure GetJETInitRecord(var POSAuditLog: Record "POS Audit Log";POSUnitNo: Code[10];WithError: Boolean): Boolean
+    begin
+        //-NPR5.51 [356076]
+        POSAuditLog.SetRange("Acted on POS Unit No.", POSUnitNo);
+        POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::LOG_INIT);
+        POSAuditLog.SetRange("Handled by External Impl.", true);
+        POSAuditLog.SetRange("External Type", 'JET');
+        if WithError then begin
+          POSAuditLog.FindFirst();
+          exit(true);
+        end else
+          exit(POSAuditLog.FindFirst());
+        //+NPR5.51 [356076]
+    end;
+
+    local procedure LogNonItemAmounts(POSEntry: Record "POS Entry")
+    var
+        POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
+        POSAuditLog: Record "POS Audit Log";
+        POSSalesLine: Record "POS Sales Line";
+        AddInfo: Text;
+        Amount: Decimal;
+    begin
+        //-NPR5.51 [356076]
+        POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSSalesLine.SetFilter(Type, '<>%1&<>%2&<>%3', POSSalesLine.Type::Item, POSSalesLine.Type::Rounding, POSSalesLine.Type::Comment);
+        if POSSalesLine.IsEmpty then
+          exit;
+
+        Amount := GetSaleTotalInclTax(POSEntry, false) - GetSaleTotalInclTax(POSEntry, true);
+        AddInfo := StrSubstNo('%1|%2', POSEntry."Fiscal No.", Format(Amount,0,'<Precision,2:2><Standard Format,9>'));
+
+        POSAuditLogMgt.CreateEntryCustom(POSEntry.RecordId, 'NON_ITEM_AMOUNT', POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.", 'Sale amount not from items', AddInfo);
+        //+NPR5.51 [356076]
+    end;
+
+    local procedure IsFullRMA(POSEntry: Record "POS Entry"): Boolean
+    var
+        POSSalesLine: Record "POS Sales Line";
+        POSRMALine: Record "POS RMA Line";
+    begin
+        //-NPR5.51 [356076]
+        POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
+        if not POSSalesLine.FindSet then
+          exit(false);
+
+        repeat
+          POSRMALine.SetRange("POS Entry No.", POSEntry."Entry No.");
+          POSRMALine.SetRange("Return Line No.", POSSalesLine."Line No.");
+          if POSRMALine.IsEmpty then
+            exit(false);
+        until POSSalesLine.Next = 0;
+
+        exit(true);
+        //+NPR5.51 [356076]
+    end;
+
+    procedure GetItemVATIdentifierFilter(CurrentValue: Text) NewValue: Text
+    var
+        FilterPageBuilder: FilterPageBuilder;
+        VATPostingSetup: Record "VAT Posting Setup";
+    begin
+        //-NPR5.51 [356076]
+        FilterPageBuilder.AddRecord(VATPostingSetup.TableCaption, VATPostingSetup);
+
+        if CurrentValue <> '' then begin
+          VATPostingSetup.SetFilter("VAT Identifier", CurrentValue);
+          FilterPageBuilder.SetView(VATPostingSetup.TableCaption, VATPostingSetup.GetView(false));
+        end;
+
+        if FilterPageBuilder.RunModal() then begin
+          VATPostingSetup.Reset;
+          VATPostingSetup.SetView(FilterPageBuilder.GetView(VATPostingSetup.TableCaption, false));
+          exit(VATPostingSetup.GetFilter("VAT Identifier"));
+        end;
+        //+NPR5.51 [356076]
+    end;
+
     local procedure "---Subscribers"()
     begin
     end;
@@ -995,12 +1286,9 @@ codeunit 6184850 "FR Audit Mgt."
         if not IsEnabled(POSUnit."POS Audit Profile") then
           exit;
 
-        if not (POSWorkshiftCheckpoint.Type in [POSWorkshiftCheckpoint.Type::PREPORT]) then
-          exit;
-
-        // Sign Archive
-        POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
-        POSAuditLogMgt.CreateEntry(POSWorkshiftCheckpoint.RecordId,POSAuditLog."Action Type"::ARCHIVE_CREATE,POSEntry."Entry No.",POSEntry."Fiscal No.",POSWorkshiftCheckpoint."POS Unit No.");
+        //-NPR5.51 [356076]
+        POSWorkshiftCheckpoint.TestField(Type, POSWorkshiftCheckpoint.Type::PREPORT);
+        //+NPR5.51 [356076]
 
         //Export Archive
         POSWorkshiftCheckpoint.SetRecFilter;
@@ -1018,6 +1306,7 @@ codeunit 6184850 "FR Audit Mgt."
     local procedure OnHandleAuditLogBeforeInsert(var POSAuditLog: Record "POS Audit Log")
     var
         POSUnit: Record "POS Unit";
+        POSAuditLogInit: Record "POS Audit Log";
     begin
         if (POSAuditLog."Active POS Unit No." = '') then
           POSAuditLog."Active POS Unit No." := POSAuditLog."Acted on POS Unit No."; //Performing POS operation like JET init from backend, acting as the POS.
@@ -1027,8 +1316,13 @@ codeunit 6184850 "FR Audit Mgt."
           exit;
         LoadCertificate();
 
+        //-NPR5.51 [356076]
+        if POSAuditLog."Action Type" <> POSAuditLog."Action Type"::LOG_INIT then
+          GetJETInitRecord(POSAuditLogInit, POSUnit."No.", true); //Failsafe - first record MUST be JET INIT.
+        //+NPR5.51 [356076]
+
         case POSAuditLog."Action Type" of
-          POSAuditLog."Action Type"::DIRECT_SALE_END : SignTicket(POSAuditLog);
+          POSAuditLog."Action Type"::DIRECT_SALE_END : SignTicket(POSAuditLog); //Full sale amount is signed - but amounts other than Item & Rounding are diff'ed into custom JET event 910
           POSAuditLog."Action Type"::ARCHIVE_ATTEMPT : SignArchiveAttempt(POSAuditLog);
           POSAuditLog."Action Type"::RECEIPT_COPY : SignReprintTicket(POSAuditLog);
           POSAuditLog."Action Type"::SIGN_IN : SignLogIn(POSAuditLog);
@@ -1037,12 +1331,21 @@ codeunit 6184850 "FR Audit Mgt."
           POSAuditLog."Action Type"::PARTNER_MODIFICATION : SignPartnerModification(POSAuditLog);
           POSAuditLog."Action Type"::LOG_INIT : SignLogInit(POSAuditLog);
           POSAuditLog."Action Type"::AUDIT_VERIFY : SignAuditVerify(POSAuditLog);
-          POSAuditLog."Action Type"::GRANDTOTAL : SignGrandTotal(POSAuditLog);
+          POSAuditLog."Action Type"::GRANDTOTAL : SignGrandTotal(POSAuditLog); //Only item amount & item VAT amounts are stored and signed.
           POSAuditLog."Action Type"::ARCHIVE_CREATE : SignArchiveFile(POSAuditLog);
+        //-NPR5.51 [356076]
+          POSAuditLog."Action Type"::CANCEL_SALE_END : SignCancelSale(POSAuditLog);
+          POSAuditLog."Action Type"::SIGN_OUT : SignLogOut(POSAuditLog); //Will not fire unless explicit logout, so not 100% reliable in a browser world.
+          POSAuditLog."Action Type"::ITEM_RMA : SignItemRMA(POSAuditLog); //Fired for each RMA line with reference to original sale for full traceability.
+          POSAuditLog."Action Type"::CUSTOM :
+            begin
+              case POSAuditLog."Action Custom Subtype" of
+                'NON_ITEM_AMOUNT' : SignNonItemAmount(POSAuditLog); //Diff between item amounts and everything else in a sale (prepayment, deposit, outpayment, vouchers)
+              end;
+            end;
+        //+NPR5.51 [356076]
 
-          //POSAuditLog."Action Type"::SIGN_OUT : SignLogOut(POSAuditLog); //We do not track logouts straight away - the NAV session might stay open until timeout.
-
-          //Events below are not performed directly on the POS so they are not handled for the certification.
+          //Events below are not performed directly on the POS so they are not handled for compliance.
 
           //POSAuditLog.Type::DATA_EXPORT : SignDataExport(POSAuditLog);
           //POSAuditLog.Type::DATA_IMPORT : SignDataImport(POSAuditLog);
@@ -1133,7 +1436,9 @@ codeunit 6184850 "FR Audit Mgt."
             POSAuditLog.Modify;
           until POSAuditLog.Next = 0;
 
-        Commit;
+        //-NPR5.51 [356076]
+        //COMMIT;
+        //+NPR5.51 [356076]
 
         //Check signatures against fresh data strings/hash
         if POSAuditLog.FindSet then begin
@@ -1169,33 +1474,139 @@ codeunit 6184850 "FR Audit Mgt."
         end;
 
         Message(CAPTION_SIGNATURES_VALID, POSAuditLog.Count());
+        //-NPR5.51 [356076]
+        Error(''); //Rollback modifications to entries done while recalculating & verifying signature.
+        //+NPR5.51 [356076]
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150627, 'OnCheckTriggerAutoPeriodCheckpoint', '', true, true)]
-    local procedure OnCheckTriggerAutoPeriodCheckpoint(POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";var AutoCreatePeriod: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, 6150627, 'OnBeforePostWorkshift', '', false, false)]
+    local procedure OnBeforePostWorkshift(POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint")
     var
-        POSWorkshifts: Record "POS Workshift Checkpoint";
         POSEntry: Record "POS Entry";
         POSUnit: Record "POS Unit";
+        POSWorkshiftCheckpointMgt: Codeunit "POS Workshift Checkpoint";
+        FromWorkshiftEntry: Integer;
     begin
+        //-NPR5.51 [356076]
         if POSWorkshiftCheckpoint."POS Unit No." = '' then
+          exit;
+        if POSWorkshiftCheckpoint.Type <> POSWorkshiftCheckpoint.Type::ZREPORT then
           exit;
         if not POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.") then
           exit;
         if not IsEnabled(POSUnit."POS Audit Profile") then
           exit;
 
-        POSWorkshifts.SetRange("POS Unit No.", POSWorkshiftCheckpoint."POS Unit No.");
-        POSWorkshifts.SetRange(Type, POSWorkshifts.Type::PREPORT);
-        if not POSWorkshifts.FindLast then begin
-          POSWorkshifts.SetRange(Type, POSWorkshifts.Type::ZREPORT);
-          if not POSWorkshifts.FindLast then
-            exit;
+        POSEntry.Get(POSWorkshiftCheckpoint."POS Entry No.");
+
+        if TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint, MonthlyPeriodType(), FRCertificationSetup."Monthly Workshift Duration", POSEntry."Document Date", FromWorkshiftEntry) then
+          POSWorkshiftCheckpointMgt.CreatePeriodCheckpoint(POSWorkshiftCheckpoint."POS Entry No.", POSUnit."No.", FromWorkshiftEntry, POSWorkshiftCheckpoint."Entry No.", MonthlyPeriodType());
+
+        if TriggerWorkshiftCheckpoint(POSWorkshiftCheckpoint, YearlyPeriodType(), FRCertificationSetup."Yearly Workshift Duration", POSEntry."Document Date", FromWorkshiftEntry) then
+          POSWorkshiftCheckpointMgt.CreatePeriodCheckpoint(POSWorkshiftCheckpoint."POS Entry No.", POSUnit."No.", FromWorkshiftEntry, POSWorkshiftCheckpoint."Entry No.", YearlyPeriodType());
+        //+NPR5.51 [356076]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnBeforeInitSale', '', false, false)]
+    local procedure OnBeforeLogin(SaleHeader: Record "Sale POS";FrontEnd: Codeunit "POS Front End Management")
+    var
+        POSUnit: Record "POS Unit";
+        POSAuditLog: Record "POS Audit Log";
+        POSSession: Codeunit "POS Session";
+        POSSetup: Codeunit "POS Setup";
+        FRAuditSetup: Record "FR Audit Setup";
+        FRAuditNoSeries: Record "FR Audit No. Series";
+        POSEndofDayProfile: Record "POS End of Day Profile";
+        POSAuditProfile: Record "POS Audit Profile";
+        Register: Record Register;
+        FRAuditNoSeries2: Record "FR Audit No. Series";
+        POSStore: Record "POS Store";
+        CompanyInformation: Record "Company Information";
+        RecRef: RecordRef;
+        FieldRef: FieldRef;
+    begin
+        //-NPR5.51 [356076]
+        //Error upon POS login if any configuration is missing or clearly not set according to compliance
+
+        FrontEnd.GetSession(POSSession);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
+        POSSetup.GetRegisterRecord(Register);
+        if not IsEnabled(POSUnit."POS Audit Profile") then
+          exit;
+
+        if not GetJETInitRecord(POSAuditLog, POSUnit."No.", false) then
+          Error(ERROR_JET_INIT, POSUnit.TableCaption, POSUnit."No.");
+
+        FRAuditSetup.Get;
+        FRAuditSetup.TestField("Monthly Workshift Duration");
+        FRAuditSetup.TestField("Yearly Workshift Duration");
+        FRAuditSetup.TestField("Certification Category");
+        FRAuditSetup.TestField("Certification No.");
+        FRAuditSetup.TestField("Signing Certificate Thumbprint");
+        FRAuditSetup.TestField("Auto Archive URL");
+        FRAuditSetup.TestField("Auto Archive API Key");
+        FRAuditSetup.TestField("Item VAT Identifier Filter");
+
+        FRAuditNoSeries.Get(POSUnit."No.");
+        FRAuditNoSeries.TestField("Reprint No. Series");
+        FRAuditNoSeries.TestField("JET No. Series");
+        FRAuditNoSeries.TestField("Period No. Series");
+        FRAuditNoSeries.TestField("Grand Period No. Series");
+        FRAuditNoSeries.TestField("Yearly Period No. Series");
+
+        FRAuditNoSeries2.SetFilter("POS Unit No.", '<>%1', POSUnit."No.");
+
+        FRAuditNoSeries2.SetRange("Reprint No. Series", FRAuditNoSeries."Reprint No. Series");
+        if not FRAuditNoSeries2.IsEmpty then
+          FRAuditNoSeries.FieldError("Reprint No. Series");
+        FRAuditNoSeries2.SetRange("Reprint No. Series");
+
+        FRAuditNoSeries2.SetRange("JET No. Series", FRAuditNoSeries."JET No. Series");
+        if not FRAuditNoSeries2.IsEmpty then
+          FRAuditNoSeries.FieldError("JET No. Series");
+        FRAuditNoSeries2.SetRange("JET No. Series");
+
+        FRAuditNoSeries2.SetRange("Period No. Series", FRAuditNoSeries."Period No. Series");
+        if not FRAuditNoSeries2.IsEmpty then
+          FRAuditNoSeries.FieldError("Period No. Series");
+        FRAuditNoSeries2.SetRange("Period No. Series");
+
+        FRAuditNoSeries2.SetRange("Grand Period No. Series", FRAuditNoSeries."Grand Period No. Series");
+        if not FRAuditNoSeries2.IsEmpty then
+          FRAuditNoSeries.FieldError("Grand Period No. Series");
+        FRAuditNoSeries2.SetRange("Grand Period No. Series");
+
+        FRAuditNoSeries2.SetRange("Yearly Period No. Series", FRAuditNoSeries."Yearly Period No. Series");
+        if not FRAuditNoSeries2.IsEmpty then
+          FRAuditNoSeries.FieldError("Yearly Period No. Series");
+        FRAuditNoSeries2.SetRange("Yearly Period No. Series");
+
+        POSAuditProfile.Get(POSUnit."POS Audit Profile");
+        POSAuditProfile.TestField("Sale Fiscal No. Series");
+        POSAuditProfile.TestField("Credit Sale Fiscal No. Series");
+        POSAuditProfile.TestField("Balancing Fiscal No. Series");
+        POSAuditProfile.TestField("Fill Sale Fiscal No. On", POSAuditProfile."Fill Sale Fiscal No. On"::Successful);
+        POSAuditProfile.TestField("Print Receipt On Sale Cancel", false);
+
+        Register.TestField("Balancing every", Register."Balancing every"::Day);
+
+        if POSEndofDayProfile.Get(POSUnit."POS End of Day Profile") then begin
+          POSEndofDayProfile.TestField(POSEndofDayProfile."End of Day Type", POSEndofDayProfile."End of Day Type"::INDIVIDUAL);
         end;
 
-        POSEntry.Get(POSWorkshifts."POS Entry No.");
+        POSStore.Get(POSUnit."POS Store Code");
+        POSStore.TestField("Registration No.");
+        POSStore.TestField("Country/Region Code");
 
-        AutoCreatePeriod := CalcDate(FRCertificationSetup."Workshift Period Duration", POSEntry."Document Date") <= Today;
+        CompanyInformation.Get();
+        CompanyInformation.TestField("VAT Registration No.");
+        RecRef.GetTable(CompanyInformation);
+        if RecRef.FieldExist(10802) then begin
+          FieldRef := RecRef.Field(10802);
+          FieldRef.TestField();
+        end;
+        //+NPR5.51 [356076]
     end;
 }
 

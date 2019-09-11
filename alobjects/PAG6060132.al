@@ -11,6 +11,7 @@ page 6060132 "MM Member Community"
     // MM1.23/TSA/20170614  CASE 257011 Navigate to Foreign Card Validation Setup
     // MM1.23/TSA /20170831 CASE 286922 Added Navigation to Auto Renew Process List
     // MM1.30/TSA /20180614 CASE 319296 Added "Customer No. Series"
+    // MM1.40/TSA /20190612 CASE 357360 Added "Foreign Membership" field, and made the "Activate Loyalty Program" default visible
 
     Caption = 'Member Community';
     PageType = List;
@@ -58,7 +59,10 @@ page 6060132 "MM Member Community"
                 }
                 field("Activate Loyalty Program";"Activate Loyalty Program")
                 {
-                    Visible = false;
+                }
+                field("Foreign Membership";"Foreign Membership")
+                {
+                    Editable = false;
                 }
             }
         }

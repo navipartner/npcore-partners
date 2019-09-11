@@ -1,6 +1,7 @@
 codeunit 6151160 "MM Loyalty Points Mgr (Client)"
 {
     // MM1.38/TSA /20190204 CASE 338215 Initial Version
+    // MM1.40/TSA /20190823 CASE 357360 Fixed a problem with short card numbers
 
 
     trigger OnRun()
@@ -90,9 +91,9 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
 
         with EFTTransactionRequest do
           case "Processing Type" of
-            "Processing Type"::Payment : TransformOk := TransformToReservePoints (EFTTransactionRequest, SoapAction, XmlText, ResponseText);
-            "Processing Type"::Refund : TransformOk := TransformToReservePoints (EFTTransactionRequest, SoapAction, XmlText, ResponseText);
-            "Processing Type"::Auxiliary :
+            "Processing Type"::PAYMENT : TransformOk := TransformToReservePoints (EFTTransactionRequest, SoapAction, XmlText, ResponseText);
+            "Processing Type"::REFUND : TransformOk := TransformToReservePoints (EFTTransactionRequest, SoapAction, XmlText, ResponseText);
+            "Processing Type"::AUXILIARY :
                 case "Auxiliary Operation ID" of
                   1 :
                     begin
@@ -140,9 +141,9 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
 
         with EFTTransactionRequest do
           case "Processing Type" of
-            "Processing Type"::Payment : HandleReservePointsResult (EFTTransactionRequest, XmlResponseDoc);
-            "Processing Type"::Refund : HandleReservePointsResult (EFTTransactionRequest, XmlResponseDoc);
-            "Processing Type"::Auxiliary :
+            "Processing Type"::PAYMENT : HandleReservePointsResult (EFTTransactionRequest, XmlResponseDoc);
+            "Processing Type"::REFUND : HandleReservePointsResult (EFTTransactionRequest, XmlResponseDoc);
+            "Processing Type"::AUXILIARY :
               case "Auxiliary Operation ID" of
                 1 : HandleRegisterSalesResult (EFTTransactionRequest, XmlResponseDoc);
               end;
@@ -253,15 +254,15 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
 
         EFTTransactionRequest2.SetFilter ("Sales Ticket No.", '=%1', EFTTransactionRequest."Sales Ticket No.");
         EFTTransactionRequest2.SetFilter ("Integration Type", '=%1', LoyaltyPointsPSPClient.IntegrationName ());
-        EFTTransactionRequest2.SetFilter ("Processing Type", '=%1|%2', EFTTransactionRequest2."Processing Type"::Payment, EFTTransactionRequest2."Processing Type"::Refund);
+        EFTTransactionRequest2.SetFilter ("Processing Type", '=%1|%2', EFTTransactionRequest2."Processing Type"::PAYMENT, EFTTransactionRequest2."Processing Type"::REFUND);
         if (EFTTransactionRequest2.FindSet ()) then begin
           repeat
             with TmpRegisterPaymentLines do begin
               Init ();
               "Entry No." := Count() +1;
               case (EFTTransactionRequest2."Processing Type") of
-                EFTTransactionRequest2."Processing Type"::Payment : Type := Type::PAYMENT;
-                EFTTransactionRequest2."Processing Type"::Refund  : Type := Type::REFUND;
+                EFTTransactionRequest2."Processing Type"::PAYMENT : Type := Type::PAYMENT;
+                EFTTransactionRequest2."Processing Type"::REFUND  : Type := Type::REFUND;
               end;
               Description := EFTTransactionRequest2."POS Description";
               "Authorization Code" := EFTTransactionRequest2."Authorisation Number";
@@ -295,8 +296,8 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
         with TmpRegisterPaymentLines do begin
           "Entry No." := 1;
           case EFTTransactionRequest."Processing Type" of
-            EFTTransactionRequest."Processing Type"::Payment : Type := Type::PAYMENT;
-            EFTTransactionRequest."Processing Type"::Refund : Type := Type::REFUND;
+            EFTTransactionRequest."Processing Type"::PAYMENT : Type := Type::PAYMENT;
+            EFTTransactionRequest."Processing Type"::REFUND : Type := Type::REFUND;
             else
               Type := Type::NA;
           end;
@@ -363,7 +364,7 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
         EFTTransactionRequest."Receipt 1".CreateOutStream (OStream);
         OStream.Write (ReceiptText);
 
-        if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::Refund) then
+        if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::REFUND) then
           if (EFTTransactionRequest.Successful) then
             ReceiptText := CreateReservePointsSlip (EFTTransactionRequest, 1);
 
@@ -484,6 +485,7 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
         POSUnit: Record "POS Unit";
         TicketWidth: Integer;
         Separator: Text;
+        LastNChars: Integer;
     begin
 
         TicketWidth := 28;
@@ -513,9 +515,23 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
 
         ReceiptText += WriteSlipLine (CreditCardTransaction, '');
 
-        ReceiptText += WriteSlipLine (CreditCardTransaction, LeftRightText (TicketWidth,
-            EFTTransactionRequest.FieldCaption ("Card Number") +' :',
-            CopyStr (EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number")-7)));
+        //-MM1.40 [357360]
+        // ReceiptText += WriteSlipLine (CreditCardTransaction, LeftRightText (TicketWidth,
+        //    EFTTransactionRequest.FIELDCAPTION ("Card Number") +' :',
+        //    COPYSTR (EFTTransactionRequest."Card Number", STRLEN(EFTTransactionRequest."Card Number")-7)));
+
+        case StrLen (EFTTransactionRequest."Card Number") of
+          1..4 : LastNChars := 1;
+          5..7 : LastNChars := 3;
+          8..9 : LastNChars := 5;
+          else LastNChars := StrLen(EFTTransactionRequest."Card Number")-7;
+        end;
+
+        if (StrLen (EFTTransactionRequest."Card Number") > 0) then
+          ReceiptText += WriteSlipLine (CreditCardTransaction, LeftRightText (TicketWidth,
+              EFTTransactionRequest.FieldCaption ("Card Number") +' :',
+              CopyStr (EFTTransactionRequest."Card Number", LastNChars)));
+        //+MM1.40 [357360]
 
         ReceiptText += WriteSlipLine (CreditCardTransaction, '');
 
@@ -570,6 +586,7 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
         POSUnit: Record "POS Unit";
         TicketWidth: Integer;
         Separator: Text;
+        LastNChars: Integer;
     begin
 
         TicketWidth := 28;
@@ -605,9 +622,23 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
             StrSubstNo ('(%1)', EFTTransactionRequest."Result Code")));
         end;
 
-        ReceiptText += WriteSlipLine (CreditCardTransaction, LeftRightText (TicketWidth,
-            EFTTransactionRequest.FieldCaption ("Card Number") +' :',
-            CopyStr (EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number")-7)));
+        //-MM1.40 [357360]
+        // ReceiptText += WriteSlipLine (CreditCardTransaction, LeftRightText (TicketWidth,
+        //    EFTTransactionRequest.FIELDCAPTION ("Card Number") +' :',
+        //    COPYSTR (EFTTransactionRequest."Card Number", STRLEN(EFTTransactionRequest."Card Number")-7)));
+
+        case StrLen (EFTTransactionRequest."Card Number") of
+          1..4 : LastNChars := 1;
+          5..7 : LastNChars := 3;
+          8..9 : LastNChars := 5;
+          else LastNChars := StrLen(EFTTransactionRequest."Card Number")-7;
+        end;
+
+        if (StrLen (EFTTransactionRequest."Card Number") > 0) then
+          ReceiptText += WriteSlipLine (CreditCardTransaction, LeftRightText (TicketWidth,
+              EFTTransactionRequest.FieldCaption ("Card Number") +' :',
+              CopyStr (EFTTransactionRequest."Card Number", LastNChars)));
+        //+MM1.40 [357360]
 
         ReceiptText += WriteSlipLine (CreditCardTransaction, '');
 
@@ -811,7 +842,7 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
 
           Token := CreateGuid ();
           "User ID" := UserId();
-          "Processing Type" := "Processing Type"::Auxiliary;
+          "Processing Type" := "Processing Type"::AUXILIARY;
           "Auxiliary Operation ID" := 1;
           "Auxiliary Operation Desc." := 'Register Receipt';
 

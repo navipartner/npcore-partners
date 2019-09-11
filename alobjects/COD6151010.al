@@ -9,6 +9,8 @@ codeunit 6151010 "NpRv Voucher Mgt."
     // NPR5.50/MMV /20190527  CASE 356003 Added event publishers in between posting steps and set new "Posted" field before deleting buffer lines, for better extensibility.
     //                                    Added event for handling buffered partner issued vouchers, for better extensibility.
     //                                    Changed archiving handling.
+    // NPR5.51/MHA /20190617  CASE 358582 Added function OnAfterDebitSalePostEvent()
+    // NPR5.51/MHA /20190823  CASE 364542 Return Vouchers are now issued via Payment Lines where Unit Price and Quantity is 0
 
 
     trigger OnRun()
@@ -137,6 +139,27 @@ codeunit 6151010 "NpRv Voucher Mgt."
           if Voucher.Get(VoucherEntry."Voucher No.") then
             SendVoucher(Voucher);
         until VoucherEntry.Next = 0;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6014407, 'OnAfterDebitSalePostEvent', '', true, true)]
+    local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "Retail Sales Doc. Mgt.";SalePOS: Record "Sale POS";SalesHeader: Record "Sales Header";Posted: Boolean;WriteInAuditRoll: Boolean)
+    var
+        Voucher: Record "NpRv Voucher";
+        VoucherEntry: Record "NpRv Voucher Entry";
+    begin
+        //-NPR5.51 [358582]
+        VoucherEntry.SetRange("Entry Type",VoucherEntry."Entry Type"::"Issue Voucher");
+        VoucherEntry.SetRange("Register No.",SalePOS."Register No.");
+        VoucherEntry.SetRange("Document No.",SalePOS."Sales Ticket No.");
+        if VoucherEntry.IsEmpty then
+          exit;
+
+        VoucherEntry.FindSet;
+        repeat
+          if Voucher.Get(VoucherEntry."Voucher No.") then
+            SendVoucher(Voucher);
+        until VoucherEntry.Next = 0;
+        //+NPR5.51 [358582]
     end;
 
     local procedure "--- Sales Doc Subscribers"()
@@ -315,6 +338,12 @@ codeunit 6151010 "NpRv Voucher Mgt."
         if not SaleLinePOS.Get(SaleLinePOSVoucher."Register No.",SaleLinePOSVoucher."Sales Ticket No.",SaleLinePOSVoucher."Sale Date",
                                SaleLinePOSVoucher."Sale Type",SaleLinePOSVoucher."Sale Line No.") then
           exit;
+        //-NPR5.51 [364542]
+        if SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::Payment then begin
+          SaleLinePOS."Unit Price" := Abs(SaleLinePOS."Amount Including VAT");
+          SaleLinePOS.Quantity := 1;
+        end;
+        //+NPR5.51 [364542]
         if SaleLinePOS."Unit Price" <= 0 then
           exit;
         if SaleLinePOS.Quantity <= 0 then

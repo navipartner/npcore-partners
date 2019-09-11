@@ -7,6 +7,7 @@ table 6151373 "CS UI Header"
     // NPR5.49/CLVA/20190327 CASE 349554 Added field "Expand Summary Items"
     // NPR5.50/CLVA/20190327 CASE 247747 Added field "Hid Fulfilled Lines"
     // NPR5.50/CLVA/20190327 CASE 347971 Added field "Add Posting Options"
+    // NPR5.51/CLVA/20190612 CASE 357577 Added field "Update Posting Date"
 
     Caption = 'CS UI Header';
     LookupPageID = "CS UIs";
@@ -57,6 +58,10 @@ table 6151373 "CS UI Header"
         field(17;"Add Posting Options";Boolean)
         {
             Caption = 'Add Posting Options';
+        }
+        field(18;"Update Posting Date";Boolean)
+        {
+            Caption = 'Update Posting Date';
         }
         field(19;"Warehouse Type";Option)
         {

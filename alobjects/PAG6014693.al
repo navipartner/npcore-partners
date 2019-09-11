@@ -1,7 +1,8 @@
 page 6014693 "Retail Admin Activities - WFs"
 {
-    // #343621/ZESO/20190725  CASE 343621 Object created.
+    // NPR5.51/ZESO/20190725  CASE 343621 Object created.
 
+    Caption = 'Retail Admin Activities - WFs';
     PageType = CardPart;
     RefreshOnActivate = true;
     SourceTable = "Retail Admin Cue";

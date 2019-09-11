@@ -2,6 +2,7 @@ codeunit 6184479 "EFT Interface"
 {
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.48/MMV /20190123 CASE 341237 Added new events for skipping pause/unpause of front end.
+    // NPR5.51/MMV /20190626 CASE 359385 Added gift card event
 
 
     trigger OnRun()
@@ -77,6 +78,11 @@ codeunit 6184479 "EFT Interface"
 
     [IntegrationEvent(false, false)]
     procedure OnCreateAuxRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnCreateGiftCardLoadRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
     begin
     end;
 

@@ -19,6 +19,7 @@ codeunit 6014438 "Scanner - Functions"
     // NPR5.38/MHA /20180105 CASE 301053 Removed references to Utility
     // NPR5.44/TS  /20180723 CASE 321232 Check for Item in Cross Reference in GetItems, restructured getitem function to use barcode library
     // NPR5.50/BHR /20190508 CASE 348372 Validate Barcode
+    // NPR5.51/THRO/20190822 CASE 366006 Check string lenght before padding in GoSend(). Remove leading Zeroes if string longer than Lenght for Padding::"Pre Zeroes"
 
 
     trigger OnRun()
@@ -1128,13 +1129,30 @@ codeunit 6014438 "Scanner - Functions"
                       Str := ScannerSetupFields.Prefix + ScannerSetupFields.Postfix;
                   end;
 
-                  case ScannerSetupFields.Padding of
-                    ScannerSetupFields.Padding::" " :;
-                    ScannerSetupFields.Padding::"Pre Zeroes" : Str := PadStr('', ScannerSetupFields.Length-StrLen(Str), '0') + Str;
-                    ScannerSetupFields.Padding::"Leading Spaces" : Str := Str + PadStr('', ScannerSetupFields.Length-StrLen(Str), ' ');
-                  end;
+                  //-NPR5.51 [366006]
+                  if ScannerSetupFields.Length > 0 then begin
+                  //+NPR5.51 [366006]
+                    case ScannerSetupFields.Padding of
+                      ScannerSetupFields.Padding::" " :;
+                      ScannerSetupFields.Padding::"Pre Zeroes" :
+                        //-NPR5.51 [366006]
+                        begin
+                          Str := DelChr(Str,'<','0');
+                          if StrLen(Str) < ScannerSetupFields.Length then
+                            Str := PadStr('', ScannerSetupFields.Length-StrLen(Str), '0') + Str;
+                        end;
+                        //-NPR5.51 [366006]
+                      ScannerSetupFields.Padding::"Leading Spaces" :
+                        //-NPR5.51 [366006]
+                        if StrLen(Str) < ScannerSetupFields.Length then
+                          Str := Str + PadStr('', ScannerSetupFields.Length-StrLen(Str), ' ');
+                        //+NPR5.51 [366006]
+                    end;
 
-                  Str := CopyStr(Str, 1, ScannerSetupFields.Length);
+                    Str := CopyStr(Str, 1, ScannerSetupFields.Length);
+                  //-NPR5.51 [366006]
+                  end;
+                  //+NPR5.51 [366006]
                   case ScannerSetup."Field Type" of
                     ScannerSetup."Field Type"::Fixed :
                       begin

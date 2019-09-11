@@ -1,4 +1,4 @@
-tableextension 50042 tableextension50042 extends "Item Variant" 
+tableextension 50043 tableextension50043 extends "Item Variant" 
 {
     // NPR5.29/TJ  /20170119 CASE 263917 Moved function GetFromVariety to codeunit 6059972
     // NPR5.47/NPKNAV/20181026  CASE 327541-01 Transport NPR5.47 - 26 October 2018

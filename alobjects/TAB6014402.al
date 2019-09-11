@@ -20,6 +20,7 @@ table 6014402 "Payment Type POS"
     // NPR5.47/TS  /20181022 CASE 309123 Deactivated Key 5  and removed unused fields
     // NPR5.48/TS  /20181128 CASE 337806 Decreased Length of Location Code to 10
     // NPR5.50/TSA /20190530 CASE 354832 Added field 100 - "Reverse Unrealized VAT"
+    // NPR5.51/TJ  /20190628 CASE 357069 Added field 110 "Open Drawer"
 
     Caption = 'Payment Type';
     LookupPageID = "Payment Type - Register";
@@ -639,6 +640,11 @@ table 6014402 "Payment Type POS"
         field(100;"Reverse Unrealized VAT";Boolean)
         {
             Caption = 'Reverse Unrealized VAT';
+        }
+        field(110;"Open Drawer";Boolean)
+        {
+            Caption = 'Open Drawer';
+            Description = 'NPR5.51';
         }
         field(200;"PBS Gift Voucher";Boolean)
         {

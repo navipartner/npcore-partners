@@ -1,6 +1,7 @@
 table 6151170 "NpGp POS Sales Setup"
 {
     // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
+    // NPR5.51/ALST/20190904  CASE 337539 obscured password
 
     Caption = 'Global POS Sales Setup';
     DrillDownPageID = "NpGp Global POS Sales Setups";
@@ -42,7 +43,7 @@ table 6151170 "NpGp POS Sales Setup"
         {
             Caption = 'Service Username';
         }
-        field(20;"Service Password";Text[250])
+        field(20;"Service Password";Guid)
         {
             Caption = 'Service Password';
         }
@@ -62,5 +63,29 @@ table 6151170 "NpGp POS Sales Setup"
     fieldgroups
     {
     }
+
+    procedure HandlePassword(Password: Text): Text
+    var
+        ServicePassword: Record "Service Password";
+    begin
+        //-NPR5.51 [337539]
+        ServicePassword.SetRange(Key,"Service Password");
+        if Password = '' then begin
+          if ServicePassword.FindFirst then
+            ServicePassword.Delete;
+          exit;
+        end;
+
+        if not ServicePassword.FindFirst then begin
+          "Service Password" := CreateGuid;
+          Modify;
+          ServicePassword.Key := "Service Password";
+          ServicePassword.Insert;
+        end;
+
+        ServicePassword.SavePassword(Password);
+        ServicePassword.Modify;
+        //+NPR5.51 [337539]
+    end;
 }
 

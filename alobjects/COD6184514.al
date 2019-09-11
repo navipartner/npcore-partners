@@ -30,7 +30,7 @@ codeunit 6184514 "EFT MobilePay Protocol"
         InitState();
 
         case EftTransactionRequest."Processing Type" of
-          EftTransactionRequest."Processing Type"::Payment : PaymentTransaction(EftTransactionRequest);
+          EftTransactionRequest."Processing Type"::PAYMENT : PaymentTransaction(EftTransactionRequest);
         end;
     end;
 

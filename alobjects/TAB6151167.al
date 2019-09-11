@@ -1,6 +1,7 @@
 table 6151167 "NpGp POS Sales Entry"
 {
     // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
+    // NPR5.51/ALST/20190904  CASE 337539 added field Original Company
 
     Caption = 'Global POS Sales Entry';
     DrillDownPageID = "NpGp POS Sales Entries";
@@ -42,6 +43,11 @@ table 6151167 "NpGp POS Sales Entry"
             //This property is currently not supported
             //TestTableRelation = false;
             ValidateTableRelation = false;
+        }
+        field(107;"Original Company";Text[30])
+        {
+            Caption = 'Original Company Name';
+            Description = 'NPR5.51';
         }
         field(110;"Document No.";Code[20])
         {

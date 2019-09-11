@@ -16,6 +16,7 @@ codeunit 6014498 "Exchange Label Management"
     // NPR5.45/MHA /20180814  CASE 319706 Deleted functions BarCodeIsExchangeLabel(),IdExchangeLabelSubscriber()
     // NPR5.48/JDH /20181206 CASE 335967 Validating Unit of Measure Code
     // NPR5.49/MHA /20190211 CASE 345209 Amount Including Vat should be changed so that Discount is reflected
+    // NPR5.51/ALST/20190624 CASE 337539 "Retail Cross Reference No." gets a value if global exchange is set up
 
 
     trigger OnRun()
@@ -87,6 +88,10 @@ codeunit 6014498 "Exchange Label Management"
           ExchangeLabel.Quantity := 1;
         //AssignDecimalFieldValue(ExchangeLabel.Quantity,                 RecRef, 'Quantity');
         //+NPR5.37 [292701]
+
+        //-NPR5.51
+        ExchangeLabel."Retail Cross Reference No." := InitRetailReference(RecRef);
+        //+NPR5.51
 
         ExchangeLabel.Insert(true);
         exit(ExchangeLabel."No.");
@@ -535,6 +540,20 @@ codeunit 6014498 "Exchange Label Management"
         FieldNo    := GetFieldNo(RecordRef,FieldName);
         FieldRef   := RecordRef.Field(FieldNo);
         DecimalVal := FieldRef.Value;
+    end;
+
+    local procedure InitRetailReference(var LineRef: RecordRef) ReferenceNo: Code[50]
+    var
+        SaleLinePOS: Record "Sale Line POS";
+        NpGpPOSSalesInitMgt: Codeunit "NpGp POS Sales Init Mgt.";
+    begin
+        //-NPR5.51
+        if LineRef.Number <> DATABASE::"Sale Line POS" then
+          exit;
+
+        LineRef.SetTable(SaleLinePOS);
+        ReferenceNo := NpGpPOSSalesInitMgt.InitReferenceNoSaleLinePOS(SaleLinePOS);
+        //+NPR5.51
     end;
 
     procedure "-- Enums"()

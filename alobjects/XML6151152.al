@@ -6,6 +6,8 @@ xmlport 6151152 "M2 Get Account"
     // MAG2.20/TSA /20190423 CASE 345373 Adding Balance LCY and Credit Limit
     // MAG2.20/MHA /20190501  CASE 320423 Mapped <CustomerGroup>
     // MAG2.22/TSA /20190531 CASE 349994 Added Terms subsection for sell-to and bill-to
+    // NPR5.51/TSA /20190812 CASE 364644 Added Person section
+    // NPR5.51/JAKUBV/20190904  CASE 364282 Transport NPR5.51 - 3 September 2019
 
     Caption = 'Get Account';
     Encoding = UTF8;
@@ -67,6 +69,19 @@ xmlport 6151152 "M2 Get Account"
                     }
                     fieldattribute(Id;TmpContactResponse."No.")
                     {
+                    }
+                    textelement(Person)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                        fieldelement(FirstName;TmpContactResponse."First Name")
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(LastName;TmpContactResponse.Surname)
+                        {
+                            MinOccurs = Zero;
+                        }
                     }
                     textelement(accountaddress)
                     {

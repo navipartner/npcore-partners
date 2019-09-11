@@ -23,6 +23,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
     // TM1.40/MHA /20190328  CASE 350434 Added MaxStrLen to EanBox.Description in DiscoverEanBoxEvents()
     // TM1.41/TSA /20190509 CASE 353981 Schedule based pricing
     // TM1.41/TSA /20190527 CASE 356057 Revoke Ticket also sets the original sales ticket as a reference in return sales fields
+    // TM1.42/TSA /20190826 CASE 357359 Seating UI
 
 
     trigger OnRun()
@@ -466,6 +467,8 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         Token: Text[100];
         ExternalMemberNo: Code[20];
         TicketUnitPrice: Decimal;
+        POSSession: Codeunit "POS Session";
+        FrontEnd: Codeunit "POS Front End Management";
     begin
 
         //-TM1.23 [284248]
@@ -508,6 +511,14 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
 
             Commit;
 
+
+        //    IF (USERID = 'TSA') THEN BEGIN
+        //      IF (SaleLinePOS."No." = '32010') THEN BEGIN
+        //        IF (POSSession.IsActiveSession (FrontEnd)) THEN
+        //          SeatingUI.ShowUI (FrontEnd);
+        //      END;
+        //    END;
+
             exit (1); // nothing to confirm;
           end;
         end;
@@ -534,6 +545,13 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
           //+TM1.41 [353981]
 
           Commit;
+
+        //      IF (USERID = 'TSA') THEN BEGIN
+        //      IF (SaleLinePOS."No." = '32010') THEN BEGIN
+        //        IF (POSSession.IsActiveSession (FrontEnd)) THEN
+        //          SeatingUI.ShowUI (FrontEnd);
+        //      END;
+        //    END;
 
           exit (1);
         end;

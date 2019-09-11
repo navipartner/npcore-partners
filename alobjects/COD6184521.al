@@ -21,10 +21,10 @@ codeunit 6184521 "EFT Adyen Cloud Backgnd. Req."
         EFTSetup.FindSetup("Register No.", "Original POS Payment Type Code");
 
         case "Processing Type" of
-          "Processing Type"::Payment : Success := EFTAdyenCloudProtocol.InvokePayment(Rec, EFTSetup, Response);
-          "Processing Type"::Refund : Success := EFTAdyenCloudProtocol.InvokeRefund(Rec, EFTSetup, Response);
+          "Processing Type"::PAYMENT : Success := EFTAdyenCloudProtocol.InvokePayment(Rec, EFTSetup, Response);
+          "Processing Type"::REFUND : Success := EFTAdyenCloudProtocol.InvokeRefund(Rec, EFTSetup, Response);
         //-NPR5.49 [345188]
-          "Processing Type"::Auxiliary :
+          "Processing Type"::AUXILIARY :
             case "Auxiliary Operation ID" of
               2 : Success := EFTAdyenCloudProtocol.InvokeAcquireCard(Rec, EFTSetup, Response);
             end;

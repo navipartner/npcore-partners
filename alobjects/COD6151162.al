@@ -53,7 +53,7 @@ codeunit 6151162 "MM Loyalty Points PSP (Client)"
         EftTransactionRequest.Recoverable := false;
         EftTransactionRequest."Auto Voidable" := false;
         EftTransactionRequest."Manual Voidable" := false;
-        EftTransactionRequest."Processing Type" := EftTransactionRequest."Processing Type"::Payment;
+        EftTransactionRequest."Processing Type" := EftTransactionRequest."Processing Type"::PAYMENT;
         EftTransactionRequest.Insert(true);
 
         EftTransactionRequest."Reference Number Input" := Format(EftTransactionRequest."Entry No.");
@@ -82,7 +82,7 @@ codeunit 6151162 "MM Loyalty Points PSP (Client)"
         EftTransactionRequest.Recoverable := false;
         EftTransactionRequest."Auto Voidable" := false;
         EftTransactionRequest."Manual Voidable" := false;
-        EftTransactionRequest."Processing Type" := EftTransactionRequest."Processing Type"::Refund;
+        EftTransactionRequest."Processing Type" := EftTransactionRequest."Processing Type"::REFUND;
         EftTransactionRequest.Insert(true);
 
         EftTransactionRequest."Reference Number Input" := Format(EftTransactionRequest."Entry No.");
@@ -230,7 +230,7 @@ codeunit 6151162 "MM Loyalty Points PSP (Client)"
 
         EFTTransactionRequest.SetFilter ("Integration Type", '=%1', IntegrationName ());
         EFTTransactionRequest.SetFilter ("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
-        EFTTransactionRequest.SetFilter ("Processing Type", '=%1', EFTTransactionRequest."Processing Type"::Auxiliary);
+        EFTTransactionRequest.SetFilter ("Processing Type", '=%1', EFTTransactionRequest."Processing Type"::AUXILIARY);
         EFTTransactionRequest.SetFilter ("Auxiliary Operation ID", '=%1', 1);
         EFTTransactionRequest.SetFilter ("Result Code", '=%1', 119);
         if (EFTTransactionRequest.FindFirst ()) then begin

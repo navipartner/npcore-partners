@@ -70,7 +70,7 @@ codeunit 6014449 "Table Import Library"
     // NPR5.48/MMV /20190130 CASE 342396 Added delete all before import option
     //                                   Added MediaSet & Media handlers via events, so NAV2017+ can handle it.
     // NPR5.50/MMV /20190403 CASE 351021 Better delimiter handling and re-added support for unknown record count.
-    // #362054/MMV /20190717 CASE 362054 Added support for tables inside extensions.
+    // NPR5.51/MMV /20190717 CASE 362054 Added support for tables inside extensions.
     // 
     // KNOWN BUG: IF DELIMITER VALUES ARE ALSO INSIDE THE FIELD VALUES IN NON-ESCAPED FORM, THERE WILL NOT BE ANY FANCY ATTEMPTS AT NARROWING DOWN WHAT IS A VALUE AND WHAT IS A DELIMITER!
 
@@ -840,9 +840,9 @@ codeunit 6014449 "Table Import Library"
         FieldRef: FieldRef;
         IsObsolete: Boolean;
     begin
-        //-#362054 [362054]
+        //-NPR5.51 [362054]
         LoadMetadataXml(TableNo, XmlDoc);
-        //-#362054 [362054]
+        //-NPR5.51 [362054]
 
         if TempFieldsToImport.FindSet then repeat
           if TempFieldsToImport.Type in [TempFieldsToImport.Type::Integer, TempFieldsToImport.Type::BigInteger] then
@@ -922,7 +922,7 @@ codeunit 6014449 "Table Import Library"
         InstalledPackageIDFilter: Text;
         TempBlob: Record TempBlob temporary;
     begin
-        //-#362054 [362054]
+        //-NPR5.51 [362054]
         ObjectMetadata.SetAutoCalcFields(Metadata);
         if ObjectMetadata.Get(ObjectMetadata."Object Type"::Table, TableNo) then begin
           if not ObjectMetadata.Metadata.HasValue then
@@ -964,7 +964,7 @@ codeunit 6014449 "Table Import Library"
             exit;
 
         Error(ERROR_TABLE_NO, TableNo);
-        //-#362054 [362054]
+        //-NPR5.51 [362054]
     end;
 
     local procedure CheckTableExpected(TableID: Integer)

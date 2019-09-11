@@ -1,27 +1,21 @@
 table 6060008 "GIM - Data Type Property"
 {
+    // NPR5.51/MHA /20190819  CASE 365377 Generic Import Module is deprecated [VLOBJDEL] Object marked for deletion
+
     Caption = 'GIM - Data Type Property';
     LookupPageID = "GIM - Data Type Properties";
 
     fields
     {
-        field(1;"Data Type";Code[20])
+        field(1;"Entry No.";Integer)
         {
-            Caption = 'Data Type';
-        }
-        field(2;Property;Text[30])
-        {
-            Caption = 'Property';
-        }
-        field(10;Description;Text[250])
-        {
-            Caption = 'Description';
+            Caption = 'Entry No.';
         }
     }
 
     keys
     {
-        key(Key1;"Data Type",Property)
+        key(Key1;"Entry No.")
         {
         }
     }

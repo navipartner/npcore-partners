@@ -22,6 +22,7 @@ codeunit 6150704 "POS Front End Management"
     // NPR5.49/VB  /20181106 CASE 335141 Introducing the POS Theme functionality
     // NPR5.50/MHA /20190206 CASE 343617 Added OnAfterLogin Workflow
     // NPR5.50/VB  /20181223 CASE 338666 Supporting Workflows 2.0
+    // NPR5.51/VB  /20190719  CASE 352582 POS Administrative Templates feature
 
 
     trigger OnRun()
@@ -484,6 +485,20 @@ codeunit 6150704 "POS Front End Management"
         //+NPR5.40 [306347]
         end;
         //+NPR5.37 [291777]
+    end;
+
+    procedure ApplyAdministrativeTemplates(Templates: DotNet npNetList_Of_T)
+    var
+        Request: DotNet npNetJsonRequest;
+    begin
+        //-NPR5.51 [352582]
+        MakeSureFrameworkIsAvailable(true);
+        Request := Request.JsonRequest();
+        Request.Method := 'ApplyAdministrativeTemplates';
+        Request.Content.Add('version','1.0');
+        Request.Content.Add('templates',Templates);
+        InvokeFrontEndAsync(Request);
+        //+NPR5.51 [352582]
     end;
 
     [Scope('Personalization')]

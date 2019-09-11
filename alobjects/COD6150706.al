@@ -38,6 +38,9 @@ codeunit 6150706 "POS Sale Line"
     // NPR5.50/MMV /20190403 CASE 300557 Added init handling and IsEmpty function
     // NPR5.50/TSA /20190424 CASE 342090 Readjustment of tax calculation when a line is deleted.
     // NPR5.50/TSA /20190507 CASE 345348 Made OnBeforeDeletePOSSaleLine, OnAfterDeletePOSSaleLine, OnBeforeSetQuantity public
+    // NPR5.51/ANPA/20190723 CASE 350674 Added UpdateLine, and the event OnUpdateLine
+    // NPR5.51/ALPO/20190802 CASE 363243 Fix for POS Action ITEM_UNIT_PRICE: recalculate retrieved from barcode unit price to respect VAT rate
+    // NPR5.51/ALPO/20190820 CASE 365161 Lines with Type=Comment excluded from CalculateBalance()
 
 
     trigger OnRun()
@@ -58,6 +61,7 @@ codeunit 6150706 "POS Sale Line"
         Text000: Label 'Before Sale Line POS is inserted';
         Text001: Label 'After Sale Line POS is inserted';
         Initialized: Boolean;
+        CannotCalcPriceInclVATErr: Label 'Prices including VAT cannot be calculated when %1 is %2.';
 
     [Scope('Personalization')]
     procedure Init(RegisterNo: Code[20];SalesTicketNo: Code[20];SaleIn: Codeunit "POS Sale";SetupIn: Codeunit "POS Setup";FrontEndIn: Codeunit "POS Front End Management")
@@ -216,6 +220,7 @@ codeunit 6150706 "POS Sale Line"
         GL: Record "G/L Account";
         t002: Label 'G/L Account\ "%1 - %2"\ is not prepared for outpayment on register';
         tmpStr: Text[250];
+        Item: Record Item;
         ItemVariant: Record "Item Variant";
         PrefilledUnitPrice: Decimal;
     begin
@@ -281,6 +286,16 @@ codeunit 6150706 "POS Sale Line"
 
           Validate("Allow Invoice Discount",Line."Allow Invoice Discount");
           Validate("Invoice Discount Amount", Line."Invoice Discount Amount");
+          //-NPR5.51 [363243]
+          if (Type = Type::Item) and ("No." <> '') and (Line."Unit Price" <> 0) then begin
+            Item.Get("No.");
+            if Item."Price Includes VAT" then begin
+              Item.TestField("VAT Bus. Posting Gr. (Price)");
+              Item.TestField("VAT Prod. Posting Group");
+            end;
+            ConvertPriceToVAT(Item."Price Includes VAT",Item."VAT Bus. Posting Gr. (Price)",Item."VAT Prod. Posting Group",Rec,Line."Unit Price");
+          end;
+          //+NPR5.51 [363243]
           //-NPR5.40 [294655]
           if Line."Unit Price" <> 0 then
             Validate("Unit Price", Line."Unit Price");
@@ -310,7 +325,6 @@ codeunit 6150706 "POS Sale Line"
         POSSalesDiscountCalcMgt: Codeunit "POS Sales Discount Calc. Mgt.";
         RecalcSaleLinePOS: Record "Sale Line POS";
     begin
-
         if (not RefreshCurrent ()) then
           exit;
 
@@ -344,7 +358,6 @@ codeunit 6150706 "POS Sale Line"
     var
         xRec: Record "Sale Line POS";
     begin
-
         //-NPR5.38 [296802]
         //-NPR5.42 [315838]
         //IF Rec.FINDSET THEN REPEAT
@@ -362,6 +375,13 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.46 [329523]
     end;
 
+    procedure UpdateLine()
+    begin
+        //-NPR5.51 [350674]
+        OnUpdateLine(Rec);
+        //+NPR5.51 [350674]
+    end;
+
     [Scope('Personalization')]
     procedure IsEmpty(): Boolean
     begin
@@ -377,7 +397,6 @@ codeunit 6150706 "POS Sale Line"
         xRec: Record "Sale Line POS";
         POSSalesDiscountCalcMgt: Codeunit "POS Sales Discount Calc. Mgt.";
     begin
-
         RefreshCurrent ();
         OnBeforeSetQuantity (Rec, Quantity);
 
@@ -407,7 +426,6 @@ codeunit 6150706 "POS Sale Line"
     [Scope('Personalization')]
     procedure SetUnitPrice(UnitPriceLCY: Decimal)
     begin
-
         RefreshCurrent ();
 
         Rec.Validate ("Unit Price", UnitPriceLCY);
@@ -416,7 +434,6 @@ codeunit 6150706 "POS Sale Line"
           Rec."Initial Group Sale Price" := UnitPriceLCY;
 
         Rec.Modify(true);
-
         //-NPR5.46 [329523]
         POSSale.RefreshCurrent();
         //+NPR5.46 [329523]
@@ -458,14 +475,16 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.42 [315838]
             SaleLine.SetRange("Register No.", "Register No.");
             SaleLine.SetRange("Sales Ticket No.", "Sales Ticket No.");
+            SaleLine.SetFilter(Type,'<>%1',Type::Comment);  //-+NPR5.51 [365161]
             if SaleLine.FindSet then begin
               repeat
                 if SaleLine."Sale Type" in [SaleLine."Sale Type"::Sale, SaleLine."Sale Type"::Deposit] then begin
                   AmountExclVAT += SaleLine.Amount;
                   TotalAmount += SaleLine."Amount Including VAT";
                 end else if SaleLine."Sale Type" = SaleLine."Sale Type"::"Out payment" then
-                  if SaleLine."Discount Type" <> SaleLine."Discount Type"::Rounding then
+                  if SaleLine."Discount Type" <> SaleLine."Discount Type"::Rounding then begin
                     OutPaymentAmount += SaleLine."Amount Including VAT";
+                    end;
               until SaleLine.Next = 0;
               VATAmount := TotalAmount - AmountExclVAT;
               TotalAmount -= OutPaymentAmount;
@@ -490,6 +509,7 @@ codeunit 6150706 "POS Sale Line"
         // DataSet.Totals.Add('VATAmount',VATAmount);
         // DataSet.Totals.Add('TotalAmount',TotalAmount);
         DataMgt.RecordToDataSet(Rec,CurrDataSet,DataSource,POSSession,FrontEnd);
+
 
         CalculateBalance(AmountExclVAT,VATAmount,TotalAmount);
         CurrDataSet.Totals.Add('AmountExclVAT',AmountExclVAT);
@@ -559,7 +579,6 @@ codeunit 6150706 "POS Sale Line"
         SaleLinePOS: Record "Sale Line POS";
         POSSalesDiscountCalcMgt: Codeunit "POS Sales Discount Calc. Mgt.";
     begin
-
         SaleLinePOS.CopyFilters (Rec);
         if (SaleLinePOS.FindSet ()) then
           repeat
@@ -675,6 +694,13 @@ codeunit 6150706 "POS Sale Line"
     begin
         //-NPR5.36 [286812]
         //+NPR5.36 [286812]
+    end;
+
+    [IntegrationEvent(TRUE, false)]
+    procedure OnUpdateLine(var SaleLinePOS: Record "Sale Line POS")
+    begin
+        //-NPR5.51 [350674]
+        //+NPR5.51 [350674]
     end;
 
     [IntegrationEvent(TRUE, false)]
@@ -798,6 +824,63 @@ codeunit 6150706 "POS Sale Line"
     begin
         //-NPR5.43 [319425]
         //+NPR5.43 [319425]
+    end;
+
+    local procedure ConvertPriceToVAT(FromPricesInclVAT: Boolean;FromVATBusPostingGr: Code[10];FromVATProdPostingGr: Code[10];SaleLinePOS: Record "Sale Line POS";var UnitPrice: Decimal)
+    var
+        Currency: Record Currency;
+        VATPostingSetup: Record "VAT Posting Setup";
+        PriceRecalculated: Boolean;
+    begin
+        //-NPR5.51 [363243]
+        PriceRecalculated := false;
+        if FromPricesInclVAT then begin
+          VATPostingSetup.Get(FromVATBusPostingGr,FromVATProdPostingGr);
+
+          case VATPostingSetup."VAT Calculation Type" of
+            VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT":
+              VATPostingSetup."VAT %" := 0;
+            VATPostingSetup."VAT Calculation Type"::"Sales Tax":
+              Error(
+                CannotCalcPriceInclVATErr,
+                VATPostingSetup.FieldCaption("VAT Calculation Type"),
+                VATPostingSetup."VAT Calculation Type");
+          end;
+
+          if SaleLinePOS."Price Includes VAT" then
+            if (VATPostingSetup."VAT %" = SaleLinePOS."VAT %") and
+               (VATPostingSetup."VAT Calculation Type" = SaleLinePOS."VAT Calculation Type")
+            then
+              exit;
+
+          case SaleLinePOS."VAT Calculation Type" of
+            SaleLinePOS."VAT Calculation Type"::"Normal VAT",
+            SaleLinePOS."VAT Calculation Type"::"Full VAT",
+            SaleLinePOS."VAT Calculation Type"::"Sales Tax":
+              begin
+                if SaleLinePOS."Price Includes VAT" then
+                  UnitPrice := UnitPrice * (100 + SaleLinePOS."VAT %") / (100 + VATPostingSetup."VAT %")
+                else
+                  UnitPrice := UnitPrice / (1 + VATPostingSetup."VAT %" / 100);
+              end;
+            SaleLinePOS."VAT Calculation Type"::"Reverse Charge VAT":
+              UnitPrice := UnitPrice / (1 + VATPostingSetup."VAT %" / 100);
+          end;
+          PriceRecalculated := true;
+        end else
+          if SaleLinePOS."Price Includes VAT" then begin
+            UnitPrice := UnitPrice * (1 + SaleLinePOS."VAT %" / 100);
+            PriceRecalculated := true;
+          end;
+
+        if PriceRecalculated then begin
+          if SaleLinePOS."Currency Code" <> '' then
+            Currency.Get(SaleLinePOS."Currency Code")
+          else
+            Currency.InitRoundingPrecision;
+          UnitPrice := Round(UnitPrice,Currency."Unit-Amount Rounding Precision");
+        end;
+        //+NPR5.51 [363243]
     end;
 }
 

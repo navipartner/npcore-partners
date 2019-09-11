@@ -65,6 +65,8 @@ codeunit 6014547 "RP Matrix Print Mgt."
     // NPR5.46/MMV /20180911 CASE 314067 Added support for only printing default value when data is found.
     // NPR5.48/MMV /20181205 CASE 327107 Added new event publishers.
     // NPR5.50/MMV /20190510 CASE 354821 Iterate buffer without upperbound to support several root data elements.
+    // NPR5.51/MMV /20190627 CASE 359771 Rolled back 354821 change.
+    // NPR5.51/MMV /20190801 CASE 360975 Buffer all template print data into one job.
 
 
     trigger OnRun()
@@ -77,7 +79,7 @@ codeunit 6014547 "RP Matrix Print Mgt."
     end;
 
     var
-        Buffer: Record "RP Print Buffer" temporary;
+        GlobalBuffer: Record "RP Print Buffer" temporary;
         CurrentLineNo: Integer;
         CurrentFont: Text[30];
         CurrentBold: Boolean;
@@ -89,6 +91,7 @@ codeunit 6014547 "RP Matrix Print Mgt."
         Error_MissingDevice: Label 'Missing printer device type for: (template %1, codeunit %2, report %3)';
         Error_InvalidTableAttribute: Label 'Cannot print attributes from table %1';
         DecimalRounding: Option "2","3","4","5";
+        Error_BoundsCheck: Label 'Number of prints too high: %1. Split into several requests';
 
     procedure AddTextField(X: Integer;Y: Integer;Align: Integer;Text: Text)
     begin
@@ -194,13 +197,13 @@ codeunit 6014547 "RP Matrix Print Mgt."
     procedure ProcessBufferForCodeunit(CodeunitID: Integer;NoOfPrints: Integer)
     begin
         PrintBuffer('', CodeunitID, 0, NoOfPrints);
-        Buffer.DeleteAll;
+        GlobalBuffer.DeleteAll;
     end;
 
     procedure ProcessBufferForReport(ReportID: Integer;NoOfPrints: Integer)
     begin
         PrintBuffer('', 0, ReportID, NoOfPrints);
-        Buffer.DeleteAll;
+        GlobalBuffer.DeleteAll;
     end;
 
     procedure SetPrintIterationFieldNo(FieldNo: Integer)
@@ -239,50 +242,79 @@ codeunit 6014547 "RP Matrix Print Mgt."
         PrinterName: Text;
         CurrentRecNo: Integer;
         Next: Boolean;
+        UpperBound: Integer;
+        MatrixPrinter: Codeunit "RP Matrix Printer Interface";
+        DeviceType: Text;
+        DeviceSettings: Record "RP Device Settings";
     begin
-        if DataJoinBuffer.FindBufferSet(DataItems.Name, CurrentRecNo) then begin
-          repeat
-            Buffer.DeleteAll;
+        //-NPR5.51 [360975]
+        DeviceType := GetDeviceType(TemplateHeader.Code, CODEUNIT::"RP Matrix Print Mgt.", 0);
+        DeviceSettings.SetRange(Template, TemplateHeader.Code);
 
-        //-NPR5.50 [354821]
-        //    UpperBound := DataJoinBuffer.FindSubset(CurrentRecNo, 0);
-        //    DataJoinBuffer.SetBounds(CurrentRecNo, UpperBound);
-            DataJoinBuffer.FindSubset(CurrentRecNo, 0);
-        //+NPR5.50 [354821]
+        MatrixPrinter.Construct(DeviceType);
+        //+NPR5.51 [360975]
 
-            TemplateLine.SetRange("Template Code", TemplateHeader.Code);
-            TemplateLine.SetRange(Type, TemplateLine.Type::Data);
-            TemplateLine.SetRange(Level, 0);
-            if TemplateLine.FindSet then repeat
-              MergeField(TemplateLine, DataJoinBuffer);
-            until TemplateLine.Next = 0;
+        if not DataJoinBuffer.FindBufferSet(DataItems.Name, CurrentRecNo) then
+          exit;
 
-            Itt := 1;
-            if PrintIterationFieldNo > 0 then begin
-              if Evaluate(Integer, DataJoinBuffer.GetField(PrintIterationFieldNo, DataItems.Name), 9) then
-                Itt := Integer;
-            end;
+        repeat
+          GlobalBuffer.DeleteAll;
 
-            if Itt > 0 then
-              PrintBuffer(TemplateHeader.Code, CODEUNIT::"RP Matrix Print Mgt.", 0, Itt);
+        //-NPR5.51 [359771]
+          UpperBound := DataJoinBuffer.FindSubset(CurrentRecNo, 0);
+          DataJoinBuffer.SetBounds(CurrentRecNo, UpperBound);
+        //    DataJoinBuffer.FindSubset(CurrentRecNo, 0);
+        //+NPR5.51 [359771]
 
-            if HighestRootRecNo > 0 then begin
-              //Delete the roots we passed over in the join buffer.
-              Clear(i);
-              repeat
-                Next := DataJoinBuffer.NextRecord(DataItems.Name, CurrentRecNo, 0);
-                i += 1;
-              until (not Next) or (i = HighestRootRecNo);
-              if Next then begin
-                DataJoinBuffer.SetBounds(0, CurrentRecNo-1);
-                DataJoinBuffer.DeleteSet();
-                DataJoinBuffer.SetBounds(0, 0);
-              end;
-            end else
+          TemplateLine.SetRange("Template Code", TemplateHeader.Code);
+          TemplateLine.SetRange(Type, TemplateLine.Type::Data);
+          TemplateLine.SetRange(Level, 0);
+          if TemplateLine.FindSet then repeat
+            MergeField(TemplateLine, DataJoinBuffer);
+          until TemplateLine.Next = 0;
+
+          Itt := 1;
+          if PrintIterationFieldNo > 0 then begin
+            if Evaluate(Integer, DataJoinBuffer.GetField(PrintIterationFieldNo, DataItems.Name), 9) then
+              Itt := Integer;
+          end;
+
+        //-NPR5.51 [360975]
+        //    IF Itt > 0 THEN
+        //      PrintBuffer(TemplateHeader.Code, CODEUNIT::"RP Matrix Print Mgt.", 0, Itt);
+          if Itt > 2000 then
+            Error(Error_BoundsCheck, Itt);
+
+          for i := 1 to Itt do begin
+            MatrixPrinter.OnInitJob(DeviceSettings);
+            if GlobalBuffer.FindSet then repeat
+              MatrixPrinter.OnPrintData(GlobalBuffer);
+            until GlobalBuffer.Next = 0;
+            MatrixPrinter.OnEndJob();
+          end;
+        //+NPR5.51 [360975]
+
+          if HighestRootRecNo > 0 then begin
+            //Delete the roots we passed over in the join buffer.
+            Clear(i);
+            repeat
               Next := DataJoinBuffer.NextRecord(DataItems.Name, CurrentRecNo, 0);
+              i += 1;
+            until (not Next) or (i = HighestRootRecNo);
+            if Next then begin
+              DataJoinBuffer.SetBounds(0, CurrentRecNo-1);
+              DataJoinBuffer.DeleteSet();
+              DataJoinBuffer.SetBounds(0, 0);
+            end;
+          end else
+            Next := DataJoinBuffer.NextRecord(DataItems.Name, CurrentRecNo, 0);
 
-          until not Next;
-        end;
+        until not Next;
+
+        //-NPR5.51 [360975]
+        OnSendPrintJob(TemplateHeader.Code, CODEUNIT::"RP Matrix Print Mgt.", 0, MatrixPrinter, 1);
+        MatrixPrinter.Dispose();
+        //+NPR5.51 [360975]
     end;
 
     local procedure RunPrintEngine(TemplateHeader: Record "RP Template Header";var RecRef: RecordRef)
@@ -290,7 +322,7 @@ codeunit 6014547 "RP Matrix Print Mgt."
         DataItems: Record "RP Data Items";
         DataJoinBuffer: Codeunit "RP Data Join Buffer Mgt.";
     begin
-        Buffer.DeleteAll;
+        GlobalBuffer.DeleteAll;
         SetDecimalRounding(TemplateHeader."Default Decimal Rounding");
 
         DataItems.SetRange(Code, TemplateHeader.Code);
@@ -321,10 +353,10 @@ codeunit 6014547 "RP Matrix Print Mgt."
         MatrixPrinter.Construct(DeviceType);
         MatrixPrinter.OnInitJob(DeviceSettings);
 
-        if Buffer.FindSet then
+        if GlobalBuffer.FindSet then
           repeat
-            MatrixPrinter.OnPrintData(Buffer);
-          until Buffer.Next = 0;
+            MatrixPrinter.OnPrintData(GlobalBuffer);
+          until GlobalBuffer.Next = 0;
 
         MatrixPrinter.OnEndJob();
         OnSendPrintJob(TemplateCode, CodeunitId, ReportId, MatrixPrinter, NoOfPrints);
@@ -469,26 +501,26 @@ codeunit 6014547 "RP Matrix Print Mgt."
 
     local procedure UpdateField(X: Integer;Y: Integer;Align: Integer;Width: Integer;Rotation: Integer;Height: Integer;Font: Text[30];Text: Text[100])
     begin
-        Buffer."Line No."   := CurrentLineNo;
-        Buffer.Text         := Text;
+        GlobalBuffer."Line No."   := CurrentLineNo;
+        GlobalBuffer.Text         := Text;
 
         if Font = '' then
-          Buffer.Font       := CurrentFont
+          GlobalBuffer.Font       := CurrentFont
         else
-          Buffer.Font       := Font;
+          GlobalBuffer.Font       := Font;
 
-        Buffer.Width := Width;
-        Buffer.X            := X;
-        Buffer.Y            := Y;
-        Buffer.Height       := Height;
-        Buffer.Bold         := CurrentBold;
-        Buffer.Underline    := CurrentUnderLine;
-        Buffer.DoubleStrike := CurrentDoubleStrike;
-        Buffer.Rotation     := Rotation;
-        Buffer.Align        := Align;
+        GlobalBuffer.Width := Width;
+        GlobalBuffer.X            := X;
+        GlobalBuffer.Y            := Y;
+        GlobalBuffer.Height       := Height;
+        GlobalBuffer.Bold         := CurrentBold;
+        GlobalBuffer.Underline    := CurrentUnderLine;
+        GlobalBuffer.DoubleStrike := CurrentDoubleStrike;
+        GlobalBuffer.Rotation     := Rotation;
+        GlobalBuffer.Align        := Align;
 
-        if not Buffer.Insert then
-          Buffer.Modify;
+        if not GlobalBuffer.Insert then
+          GlobalBuffer.Modify;
 
         CurrentLineNo += 1;
     end;

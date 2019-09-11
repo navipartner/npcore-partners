@@ -5,6 +5,7 @@ table 6014505 "Customer Repair Journal"
     // NPR70.00.02.00/MH/20150216  CASE 204110 Removed NaviShop References (WS).
     // NPR5.26/TS/20160913  CASE 251086 Added Field Qty Posted
     // NPR5.30/BHR /20170213  CASE 262923 ReWork Repair Funtionality
+    // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup() and removed redundant VAT calculation
 
     Caption = 'Customer Repair Journal';
 
@@ -184,10 +185,15 @@ table 6014505 "Customer Repair Journal"
             TableRelation = "VAT Product Posting Group";
 
             trigger OnValidate()
+            var
+                POSTaxCalculation: Codeunit "POS Tax Calculation";
+                Handled: Boolean;
             begin
                 //-NPR5.30 [262923]
                 VATPostingSetup.Get("VAT Bus. Posting Group","VAT Prod. Posting Group");
-
+                //-NPR5.51 [358985]
+                POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
+                //+NPR5.51 [358985]
                 "VAT %" := VATPostingSetup."VAT %";
                 "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
                 "VAT Identifier" := VATPostingSetup."VAT Identifier";

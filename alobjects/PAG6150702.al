@@ -10,7 +10,7 @@ page 6150702 "POS Menu Buttons"
     // NPR5.40/VB  /20180228 CASE 306347 Replacing BLOB-based parameters with physical-table parameters
     // NPR5.42.01/MMV /20180627  CASE 320622 Filter parameters correctly.
     // NPR5.43/VB  /20180611  CASE 314603 Implemented secure method behavior functionality.
-    // #361514/THRO/20190718 CASE 361514 Action "Refresh Action Code Parameters" named RefreshActionCodeParameters (for AL Conversion)
+    // NPR5.51/THRO/20190718 CASE 361514 Action "Refresh Action Code Parameters" named RefreshActionCodeParameters (for AL Conversion)
 
     Caption = 'POS Menu Buttons';
     PageType = List;

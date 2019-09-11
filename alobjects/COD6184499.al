@@ -3,6 +3,9 @@ codeunit 6184499 "EFT Framework Mgt."
     // NPR5.36/TSA /20170927 CASE 282251 Changed the implementation for OnBeforeBalanceRegisterEvent
     // NPR5.46/MMV /20180831 CASE 290734 Refactored
     // NPR5.49/MMV /20190410 CASE 347476 Removed hardcoded .zip from download logs function
+    // NPR5.51/MMV /20190603 CASE 355433 Moved implicit behaviour from events to function invocations
+    // NPR5.51/MMV /20190626 CASE 359385 Added support for gift cards
+    // NPR5.51/MMV /20190716 CASE 355433 Limit cashback amount logged to 100% of trx amount.
 
 
     trigger OnRun()
@@ -22,9 +25,9 @@ codeunit 6184499 "EFT Framework Mgt."
         Handled: Boolean;
     begin
         InitGenericRequest(EFTTransactionRequest, EFTSetup, POSUnitNo, SalesReceiptNo);
-        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::Open;
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::OPEN;
         EFTInterface.OnCreateBeginWorkshiftRequest(EFTTransactionRequest, Handled);
-        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::Open), Handled);
+        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::OPEN), Handled);
     end;
 
     procedure CreateEndWorkshiftRequest(var EFTTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";POSUnitNo: Code[10];SalesReceiptNo: Code[20])
@@ -33,9 +36,9 @@ codeunit 6184499 "EFT Framework Mgt."
         Handled: Boolean;
     begin
         InitGenericRequest(EFTTransactionRequest, EFTSetup, POSUnitNo, SalesReceiptNo);
-        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::Close;
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::CLOSE;
         EFTInterface.OnCreateEndWorkshiftRequest(EFTTransactionRequest, Handled);
-        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::Close), Handled);
+        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::CLOSE), Handled);
     end;
 
     procedure CreatePaymentOfGoodsRequest(var EFTTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";POSUnitNo: Code[10];SalesReceiptNo: Code[20];CurrencyCode: Code[10];AmountToCapture: Decimal)
@@ -45,11 +48,11 @@ codeunit 6184499 "EFT Framework Mgt."
         Handled: Boolean;
     begin
         if AmountToCapture < 0 then
-          Error(ERROR_AMOUNT, Format(EFTTransactionRequest."Processing Type"::Payment));
+          Error(ERROR_AMOUNT, Format(EFTTransactionRequest."Processing Type"::PAYMENT));
 
         InitGenericRequest(EFTTransactionRequest, EFTSetup, POSUnitNo, SalesReceiptNo);
 
-        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::Payment;
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::PAYMENT;
         EFTTransactionRequest."Amount Input" := AmountToCapture;
         EFTTransactionRequest."Currency Code" := CurrencyCode;
         if EFTTransactionRequest."Currency Code" = '' then begin
@@ -59,7 +62,7 @@ codeunit 6184499 "EFT Framework Mgt."
         EFTTransactionRequest."Cashback Amount" := CalculateCashback(EFTTransactionRequest);
 
         EFTInterface.OnCreatePaymentOfGoodsRequest(EFTTransactionRequest, Handled);
-        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::Payment), Handled);
+        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::PAYMENT), Handled);
     end;
 
     procedure CreateRefundRequest(var EFTTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";POSUnitNo: Code[10];SalesReceiptNo: Code[20];CurrencyCode: Code[10];AmountToRefund: Decimal;OriginalRequestEntryNo: Integer)
@@ -70,14 +73,14 @@ codeunit 6184499 "EFT Framework Mgt."
         OriginalEftTransactionRequest: Record "EFT Transaction Request";
     begin
         if AmountToRefund < 0 then
-          Error(ERROR_AMOUNT, Format(EFTTransactionRequest."Processing Type"::Refund));
+          Error(ERROR_AMOUNT, Format(EFTTransactionRequest."Processing Type"::REFUND));
 
         InitGenericRequest(EFTTransactionRequest, EFTSetup, POSUnitNo, SalesReceiptNo);
 
         if OriginalRequestEntryNo <> 0 then begin
           OriginalEftTransactionRequest.Get(OriginalRequestEntryNo);
           OriginalEftTransactionRequest.TestField("Integration Type", EFTTransactionRequest."Integration Type");
-          OriginalEftTransactionRequest.TestField("Processing Type", OriginalEftTransactionRequest."Processing Type"::Payment);
+          OriginalEftTransactionRequest.TestField("Processing Type", OriginalEftTransactionRequest."Processing Type"::PAYMENT);
           OriginalEftTransactionRequest.TestField(Reversed, false);
           if (not OriginalEftTransactionRequest.Successful) and (OriginalEftTransactionRequest.Recovered) then
             OriginalEftTransactionRequest.Get(OriginalEftTransactionRequest."Recovered by Entry No.");
@@ -88,7 +91,7 @@ codeunit 6184499 "EFT Framework Mgt."
           end;
         end;
 
-        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::Refund;
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::REFUND;
         EFTTransactionRequest."Processed Entry No." := OriginalRequestEntryNo;
         EFTTransactionRequest."Amount Input" := AmountToRefund * -1;
         EFTTransactionRequest."Currency Code" := CurrencyCode;
@@ -98,7 +101,7 @@ codeunit 6184499 "EFT Framework Mgt."
         end;
 
         EFTInterface.OnCreateRefundRequest(EFTTransactionRequest, Handled);
-        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::Refund), Handled);
+        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::REFUND), Handled);
     end;
 
     procedure CreateVoidRequest(var EFTTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";POSUnitNo: Code[10];SalesReceiptNo: Code[20];RequestEntryNoToVoid: Integer;IsManualVoid: Boolean)
@@ -116,16 +119,21 @@ codeunit 6184499 "EFT Framework Mgt."
         else
           OriginalTransactionRequest.TestField("Auto Voidable", true);
         OriginalTransactionRequest.TestField(Reversed, false);
-        if not (OriginalTransactionRequest."Processing Type" in [OriginalTransactionRequest."Processing Type"::Payment,
-                                                                 OriginalTransactionRequest."Processing Type"::Refund]) then
+        //-NPR5.51 [359385]
+        // IF NOT (OriginalTransactionRequest."Processing Type" IN [OriginalTransactionRequest."Processing Type"::Payment,
+        //                                                         OriginalTransactionRequest."Processing Type"::Refund]) THEN
+        if not (OriginalTransactionRequest."Processing Type" in [OriginalTransactionRequest."Processing Type"::PAYMENT,
+                                                                 OriginalTransactionRequest."Processing Type"::REFUND,
+                                                                 OriginalTransactionRequest."Processing Type"::GIFTCARD_LOAD]) then
+        //+NPR5.51 [359385]
           OriginalTransactionRequest.FieldError("Processing Type");
 
         EFTTransactionRequest."Currency Code" := OriginalTransactionRequest."Currency Code";
         EFTTransactionRequest."Amount Input" := OriginalTransactionRequest."Amount Input" * -1;
-        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::Void;
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::VOID;
         EFTTransactionRequest."Processed Entry No." := RequestEntryNoToVoid;
         EFTInterface.OnCreateVoidRequest(EFTTransactionRequest, Handled);
-        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::Void), Handled);
+        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::VOID), Handled);
     end;
 
     procedure CreateVerifySetupRequest(var EFTTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";POSUnitNo: Code[10];SalesReceiptNo: Code[20])
@@ -134,9 +142,9 @@ codeunit 6184499 "EFT Framework Mgt."
         Handled: Boolean;
     begin
         InitGenericRequest(EFTTransactionRequest, EFTSetup, POSUnitNo, SalesReceiptNo);
-        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::Setup;
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::SETUP;
         EFTInterface.OnCreateVerifySetupRequest(EFTTransactionRequest, Handled);
-        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::Setup), Handled);
+        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::SETUP), Handled);
     end;
 
     procedure CreateLookupTransactionRequest(var EFTTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";POSUnitNo: Code[10];SalesReceiptNo: Code[20];RequestEntryNoToLookup: Integer)
@@ -151,9 +159,9 @@ codeunit 6184499 "EFT Framework Mgt."
         OriginalTransactionRequest.TestField(Recoverable, true);
         OriginalTransactionRequest.TestField(Reversed, false);
         EFTTransactionRequest."Processed Entry No." := RequestEntryNoToLookup;
-        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::Lookup;
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::LOOK_UP;
         EFTInterface.OnCreateLookupTransactionRequest(EFTTransactionRequest, Handled);
-        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::Lookup), Handled);
+        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::LOOK_UP), Handled);
     end;
 
     procedure CreateAuxRequest(var EFTTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";AuxFunction: Integer;POSUnitNo: Code[10];SalesReceiptNo: Code[20])
@@ -169,11 +177,36 @@ codeunit 6184499 "EFT Framework Mgt."
         tmpEFTAuxOperation.SetRange("Auxiliary ID", AuxFunction);
         tmpEFTAuxOperation.FindFirst;
 
-        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::Auxiliary;
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::AUXILIARY;
         EFTTransactionRequest."Auxiliary Operation ID" := AuxFunction;
         EFTTransactionRequest."Auxiliary Operation Desc." := tmpEFTAuxOperation.Description;
         EFTInterface.OnCreateAuxRequest(EFTTransactionRequest, Handled);
-        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::Auxiliary), Handled);
+        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::AUXILIARY), Handled);
+    end;
+
+    procedure CreateGiftcardLoadRequest(var EFTTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";POSUnitNo: Code[10];SalesReceiptNo: Code[20];CurrencyCode: Code[10];AmountToLoad: Decimal)
+    var
+        GLSetup: Record "General Ledger Setup";
+        EFTInterface: Codeunit "EFT Interface";
+        Handled: Boolean;
+    begin
+        //-NPR5.51 [359385]
+        if AmountToLoad < 0 then
+          Error(ERROR_AMOUNT, Format(EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD));
+
+        InitGenericRequest(EFTTransactionRequest, EFTSetup, POSUnitNo, SalesReceiptNo);
+
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD;
+        EFTTransactionRequest."Amount Input" := AmountToLoad * -1;
+        EFTTransactionRequest."Currency Code" := CurrencyCode;
+        if EFTTransactionRequest."Currency Code" = '' then begin
+          GLSetup.Get;
+          EFTTransactionRequest."Currency Code" := GLSetup."LCY Code";
+        end;
+
+        EFTInterface.OnCreateGiftCardLoadRequest(EFTTransactionRequest, Handled);
+        CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD), Handled);
+        //+NPR5.51 [359385]
     end;
 
     procedure SendRequest(var EFTTransactionRequest: Record "EFT Transaction Request")
@@ -195,9 +228,63 @@ codeunit 6184499 "EFT Framework Mgt."
     end;
 
     procedure EftIntegrationResponseReceived(var EftTransactionRequest: Record "EFT Transaction Request")
+    var
+        EFTPaymentMgt: Codeunit "EFT Payment Mgt.";
+        EFTGiftCardMgt: Codeunit "EFT Gift Card Mgt.";
+        OriginalEFTTransactionRequest: Record "EFT Transaction Request";
+        ProcessingType: Integer;
     begin
         EndGenericRequest(EftTransactionRequest);
+
+        //-NPR5.51 [355433]
+        with EftTransactionRequest do begin
+          if ("Processing Type" in ["Processing Type"::VOID, "Processing Type"::LOOK_UP]) then begin
+            OriginalEFTTransactionRequest.Get("Processed Entry No.");
+            if (OriginalEFTTransactionRequest."Processing Type" = "Processing Type"::VOID) then
+              OriginalEFTTransactionRequest.Get(OriginalEFTTransactionRequest."Processed Entry No.");
+            ProcessingType := OriginalEFTTransactionRequest."Processing Type";
+          end else begin
+            ProcessingType := EftTransactionRequest."Processing Type";
+          end;
+
+          case ProcessingType of
+            "Processing Type"::PAYMENT,
+            "Processing Type"::REFUND :
+              EFTPaymentMgt.HandleIntegrationResponse(EftTransactionRequest);
+
+            "Processing Type"::GIFTCARD_LOAD :
+              EFTGiftCardMgt.HandleIntegrationResponse(EftTransactionRequest);
+
+            else
+              HandleOtherIntegrationResponse(EftTransactionRequest);
+          end;
+        end;
+        //+NPR5.51 [355433]
+
         OnAfterEftIntegrationResponseReceived(EftTransactionRequest);
+    end;
+
+    local procedure HandleOtherIntegrationResponse(EftTransactionRequest: Record "EFT Transaction Request")
+    var
+        POSFrontEnd: Codeunit "POS Front End Management";
+        POSSession: Codeunit "POS Session";
+        EFTInterface: Codeunit "EFT Interface";
+        Skip: Boolean;
+    begin
+        //-NPR5.51 [355433]
+        with EftTransactionRequest do begin
+          if not ("Processing Type" in ["Processing Type"::AUXILIARY, "Processing Type"::OPEN, "Processing Type"::CLOSE, "Processing Type"::OTHER, "Processing Type"::SETUP]) then
+            FieldError("Processing Type");
+        end;
+
+        POSSession.GetSession(POSSession, true);
+        POSSession.GetFrontEnd(POSFrontEnd, true);
+        POSSession.RequestRefreshData();
+
+        EFTInterface.OnBeforeResumeFrontEnd(EftTransactionRequest, Skip);
+        if not Skip then
+          POSFrontEnd.ResumeWorkflow();
+        //+NPR5.51 [355433]
     end;
 
     procedure LookupTransaction(EFTTransactionRequest: Record "EFT Transaction Request")
@@ -209,12 +296,12 @@ codeunit 6184499 "EFT Framework Mgt."
         SalePOS: Record "Sale POS";
     begin
         if not POSSession.IsActiveSession(POSFrontEnd) then
-          Error(ERROR_OUTSIDE_POS, Format(EFTTransactionRequest."Processing Type"::Lookup));
+          Error(ERROR_OUTSIDE_POS, Format(EFTTransactionRequest."Processing Type"::LOOK_UP));
         POSFrontEnd.GetSession(POSSession);
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         if SalePOS."Register No." <> EFTTransactionRequest."Register No." then
-          Error(ERROR_SAME_POS, Format(EFTTransactionRequest."Processing Type"::Lookup));
+          Error(ERROR_SAME_POS, Format(EFTTransactionRequest."Processing Type"::LOOK_UP));
 
         if not POSSession.RetrieveSessionAction('EFT_OPERATION',POSAction) then
           POSAction.Get('EFT_OPERATION');
@@ -236,12 +323,12 @@ codeunit 6184499 "EFT Framework Mgt."
         SalePOS: Record "Sale POS";
     begin
         if not POSSession.IsActiveSession(POSFrontEnd) then
-          Error(ERROR_OUTSIDE_POS, Format(EFTTransactionRequest."Processing Type"::Void));
+          Error(ERROR_OUTSIDE_POS, Format(EFTTransactionRequest."Processing Type"::VOID));
         POSFrontEnd.GetSession(POSSession);
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         if SalePOS."Register No." <> EFTTransactionRequest."Register No." then
-          Error(ERROR_SAME_POS, Format(EFTTransactionRequest."Processing Type"::Void));
+          Error(ERROR_SAME_POS, Format(EFTTransactionRequest."Processing Type"::VOID));
 
         if not POSSession.RetrieveSessionAction('EFT_OPERATION',POSAction) then
           POSAction.Get('EFT_OPERATION');
@@ -263,12 +350,12 @@ codeunit 6184499 "EFT Framework Mgt."
         SalePOS: Record "Sale POS";
     begin
         if not POSSession.IsActiveSession(POSFrontEnd) then
-          Error(ERROR_OUTSIDE_POS, Format(EFTTransactionRequest."Processing Type"::Refund));
+          Error(ERROR_OUTSIDE_POS, Format(EFTTransactionRequest."Processing Type"::REFUND));
         POSFrontEnd.GetSession(POSSession);
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         if SalePOS."Register No." <> EFTTransactionRequest."Register No." then
-          Error(ERROR_SAME_POS, Format(EFTTransactionRequest."Processing Type"::Refund));
+          Error(ERROR_SAME_POS, Format(EFTTransactionRequest."Processing Type"::REFUND));
 
         if not POSSession.RetrieveSessionAction('EFT_OPERATION',POSAction) then
           POSAction.Get('EFT_OPERATION');
@@ -384,6 +471,7 @@ codeunit 6184499 "EFT Framework Mgt."
         SubTotal: Decimal;
         RoundedBalance: Decimal;
         ReturnPaymentTypePOS: Record "Payment Type POS";
+        Cashback: Decimal;
     begin
         if not POSSession.IsActiveSession(POSFrontEnd) then
           Error(ERROR_SESSION);
@@ -400,7 +488,12 @@ codeunit 6184499 "EFT Framework Mgt."
 
         POSPaymentLine.GetPaymentType(ReturnPaymentTypePOS, Register."Return Payment Type", Register."Register No.");
         RoundedBalance := POSPaymentLine.RoundAmount(ReturnPaymentTypePOS, PaidAmount - SaleAmount);
-        exit(RoundedBalance + POSPaymentLine.RoundAmount(ReturnPaymentTypePOS, PaidAmount - SaleAmount - RoundedBalance));
+        //-NPR5.51 [355433]
+        Cashback := RoundedBalance + POSPaymentLine.RoundAmount(ReturnPaymentTypePOS, PaidAmount - SaleAmount - RoundedBalance);
+        if Cashback > EFTTransactionRequest."Amount Input" then
+          Cashback := EFTTransactionRequest."Amount Input";
+        exit(Cashback);
+        //+NPR5.51 [355433]
     end;
 
     local procedure "// Event Publishers"()

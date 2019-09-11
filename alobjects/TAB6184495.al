@@ -16,6 +16,7 @@ table 6184495 "EFT Transaction Request"
     // NPR5.48/MMV /20190110  CASE 341237 Added new fields.
     //                                    Removed deprecated mobilepay fields.
     // NPR5.49/MMV /20190410  CASE 347476 Renamed field 420
+    // NPR5.51/MMV /20190626  CASE 359385 Added giftcard types in field 450 and renamed all options for AL compatibility.
 
     Caption = 'EFT Transaction Request';
     DrillDownPageID = "EFT Transaction Requests";
@@ -265,8 +266,8 @@ table 6184495 "EFT Transaction Request"
         field(450;"Processing Type";Option)
         {
             Caption = 'Processing Type';
-            OptionCaption = ',Payment,Refund,Open,Close,Auxiliary,Other,Void,Lookup,Setup';
-            OptionMembers = ,Payment,Refund,Open,Close,Auxiliary,Other,Void,Lookup,Setup;
+            OptionCaption = ',Payment,Refund,Open,Close,Auxiliary,Other,Void,Lookup,Setup,Gift Card Load';
+            OptionMembers = ,PAYMENT,REFUND,OPEN,CLOSE,AUXILIARY,OTHER,VOID,LOOK_UP,SETUP,GIFTCARD_LOAD;
         }
         field(460;"Processed Entry No.";Integer)
         {

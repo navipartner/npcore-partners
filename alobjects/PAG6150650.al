@@ -88,7 +88,7 @@ page 6150650 "POS Entries"
                 field("Salesperson Code";"Salesperson Code")
                 {
                 }
-                field("Sales Amount";"Sales Amount")
+                field("Item Sales (LCY)";"Item Sales (LCY)")
                 {
                 }
                 field("Discount Amount";"Discount Amount")

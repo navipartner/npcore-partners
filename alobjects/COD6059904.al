@@ -22,6 +22,7 @@ codeunit 6059904 "Task Queue NAS Login"
     // NPR5.45/MHA /20180829  CASE 326707 Replaced outer LOCKTABLE with inner to reduce the number of locked records in CheckHeartBeatForWorkers()
     // TQ1.34/JDH /20181011 CASE 326930  Restructured code, and made several new support functions for better readability
     // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
+    // TQ1.35/MHA /20190613  CASE 358261 Adjusted Loop in StartTaskWorkers() as first Task would be skipped for all companies after first company
 
 
     trigger OnRun()
@@ -162,15 +163,16 @@ codeunit 6059904 "Task Queue NAS Login"
           exit;
 
         TempTaskQueue.SetCurrentKey("Next Run time");
-        if TempTaskQueue.FindSet then repeat
+        //-TQ1.35 [358261]
+        while TempTaskQueue.FindFirst and (AvailableWorkers >= 1) do begin
           if StartTaskWorker(TempTaskQueue) then
             AvailableWorkers -= 1;
 
           TempTaskQueue.SetRange(Company,TempTaskQueue.Company);
           TempTaskQueue.DeleteAll;
           TempTaskQueue.SetRange(Company);
-          if TempTaskQueue.FindSet then;
-        until (TempTaskQueue.Next = 0) or (AvailableWorkers <= 0);
+        end;
+        //+TQ1.35 [358261]
     end;
 
     procedure StartTaskWorker(TaskQueue: Record "Task Queue"): Boolean

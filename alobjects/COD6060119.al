@@ -47,8 +47,9 @@ codeunit 6060119 "TM Ticket Request Manager"
     // TM1.39/TSA /20190107 CASE 310057 Allowing external source to notify eTicket recipent
     // TM1.39/TSA /20190124 CASE 343585 Revoke for tickets with policy always did not consider multiple admissons codes
     // #335889/TSA /20190124 CASE 335889 Refactored ticket request re-validation RevalidateRequestForTicketReuse();
-    // TM1.40/TSA /20190327 CASE 350287 Changed signarute and ilter in RevalidateRequestForTicketReuse()
+    // TM1.40/TSA /20190327 CASE 350287 Changed signature and filter in RevalidateRequestForTicketReuse()
     // TM1.41/TSA /20190501 CASE 352873 External Item number is same as item number unless variant code is defined
+    // TM1.42/TSA /20190826 CASE 364739 Selection of notification address, Signature change on POS_AppendToReservationRequest2
 
 
     trigger OnRun()
@@ -800,10 +801,13 @@ codeunit 6060119 "TM Ticket Request Manager"
     begin
 
         //-TM1.31 [307230] change signature use overload 2
-        POS_AppendToReservationRequest2 (Token, SalesReceiptNo, SalesLineNo, ItemNo, VariantCode, AdmissionCode, Quantity, ExternalAdmissionScheduleEntryNo, ExternalMemberNo, '', '');
+        //-TM1.42 [364739]
+        //POS_AppendToReservationRequest2 (Token, SalesReceiptNo, SalesLineNo, ItemNo, VariantCode, AdmissionCode, Quantity, ExternalAdmissionScheduleEntryNo, ExternalMemberNo, '', '');
+        POS_AppendToReservationRequest2 (Token, SalesReceiptNo, SalesLineNo, ItemNo, VariantCode, AdmissionCode, Quantity, ExternalAdmissionScheduleEntryNo, ExternalMemberNo, '', '', '');
+        //+TM1.42 [364739]
     end;
 
-    procedure POS_AppendToReservationRequest2(Token: Text[100];SalesReceiptNo: Code[20];SalesLineNo: Integer;ItemNo: Code[20];VariantCode: Code[10];AdmissionCode: Code[20];Quantity: Integer;ExternalAdmissionScheduleEntryNo: Integer;ExternalMemberNo: Code[20];ExternalOrderNo: Code[20];CustomerNo: Code[20])
+    procedure POS_AppendToReservationRequest2(Token: Text[100];SalesReceiptNo: Code[20];SalesLineNo: Integer;ItemNo: Code[20];VariantCode: Code[10];AdmissionCode: Code[20];Quantity: Integer;ExternalAdmissionScheduleEntryNo: Integer;ExternalMemberNo: Code[20];ExternalOrderNo: Code[20];CustomerNo: Code[20];NotificationAddress: Text[80])
     var
         ReservationRequest: Record "TM Ticket Reservation Request";
         Admission: Record "TM Admission";
@@ -832,6 +836,16 @@ codeunit 6060119 "TM Ticket Request Manager"
         ReservationRequest."External Order No." := ExternalOrderNo;
         ReservationRequest."Customer No." := CustomerNo;
         //+TM1.31 [307230]
+
+        //-TM1.42 [364739]
+        ReservationRequest."Notification Method" := ReservationRequest."Notification Method"::NA;
+        if (NotificationAddress <> '') then begin
+          ReservationRequest."Notification Address" := NotificationAddress;
+          ReservationRequest."Notification Method" := ReservationRequest."Notification Method"::SMS;
+          if (StrPos (ReservationRequest."Notification Address", '@') > 1) then
+            ReservationRequest."Notification Method" := ReservationRequest."Notification Method"::EMAIL;
+        end;
+        //+TM1.42 [364739]
 
         if (ExternalAdmissionScheduleEntryNo = 0) then begin
           case Admission."Default Schedule" of

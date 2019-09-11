@@ -1,6 +1,6 @@
 codeunit 6060161 "Event Word Layout Upg."
 {
-    // #361677/TJ  /20190717 CASE 361677 Upgrade object
+    // NPR5.51/TJ  /20190717 CASE 361677 Upgrade object
 
     Subtype = Upgrade;
 

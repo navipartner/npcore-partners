@@ -59,6 +59,10 @@ codeunit 6060131 "MM Member Retail Integration"
     // MM1.36/TSA /20181112 CASE 335828 Adding a worker function on POS_ValidateMemberCardNo, to have different behaviours from different invokers
     // MM1.36/TSA /20190125 CASE 307440 Refactored functions
     // MM1.36.01/TSA /20190130 CASE 344400 A multi-member membersship sales only printed first member card
+    // MM1.40/TSA /20190611 CASE 357360 Adding remote create of memberships: RemoteCreateMembership(), RemoteAddMember(), IsForeignMembership()
+    // MM1.40/TSA /20190614 CASE 358685 Changed subscriber for membership activation that are invoiced to customer
+    // MM1.40/TSA /20190730 CASE 360275 Added AdmitMembersOnEndOfSalesWorker(), removed AdmittMembersOnCreateMembership(), corrected spelling of "admit"
+    // MM1.40/TSA /20190830 CASE 360242 Added a confirm when printing membercard that is blocked
 
 
     trigger OnRun()
@@ -99,7 +103,9 @@ codeunit 6060131 "MM Member Retail Integration"
         MEMBERGUEST_TICKET: Label 'Setup for %1 has an invalid entry for membership code %2, admission code %3, item %4. Setup does not match setup in %5.';
         Text000: Label 'Print Membership';
         INVALID_TICKET_ITEM: Label 'Ticket Item specified on %1 %2, is not valid. ';
-        ADMITT_MEMBERS: Label 'Do you want to admitt the members automatically?';
+        ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
+        NOT_SUPPORTED_FOR_REMOTE: Label 'This membership action is not supported for a remote membership';
+        CONFIRM_CARD_BLOCKED: Label 'This membercard is blocked, do you want to continue anyway?';
 
     local procedure SetPOSMemberForSales()
     begin
@@ -535,6 +541,12 @@ codeunit 6060131 "MM Member Retail Integration"
         MemberCard.SetFilter ("Entry No.", '=%1', MemberCard."Entry No.");
         MemberCard.FindFirst ();
 
+        //-MM1.40 [360242]
+        if ((MemberCard.Blocked) or (Membership.Blocked)) then
+          if (not Confirm (CONFIRM_CARD_BLOCKED, true)) then
+            Error ('');
+        //+MM1.40 [360242]
+
         case MembershipSetup."POS Print Action" of
           MembershipSetup."POS Print Action"::DIRECT : PrintMemberCardWorker (MemberCard, MembershipSetup);
           MembershipSetup."POS Print Action"::OFFLINE : MemberManagement.PrintOffline (MemberInfoCapture."Information Context"::PRINT_CARD, MemberCard."Entry No.");
@@ -746,7 +758,17 @@ codeunit 6060131 "MM Member Retail Integration"
           MemberInfoCapture.SetFilter ("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
           MemberInfoCapture.SetFilter ("Line No.", '=%1', SaleLinePOS."Line No.");
 
+          //-MM1.40 [360275]
+          if (MemberInfoCapture."Information Context" = MemberInfoCapture."Information Context"::NEW) then begin
+            if (MembershipSalesSetup."Auto-Admit Member On Sale" = MembershipSalesSetup."Auto-Admit Member On Sale"::ASK) then
+              if (Confirm (ADMIT_MEMBERS, true)) then
+                MemberInfoCapture.ModifyAll ("Auto-Admit Member", true);
 
+            if (MembershipSalesSetup."Auto-Admit Member On Sale" = MembershipSalesSetup."Auto-Admit Member On Sale"::YES) then
+              MemberInfoCapture.ModifyAll ("Auto-Admit Member", true);
+          end;
+          Commit;
+          //+MM1.40 [360275]
 
           //-MM1.30 [316450]
           //IF (CreateMemberships (FALSE, MemberInfoCapture, ReasonMessage)) THEN
@@ -760,18 +782,20 @@ codeunit 6060131 "MM Member Retail Integration"
             end;
             //+MM1.32 [320446]
 
-            Commit;
-
-            if (MembershipSalesSetup."Auto-Admitt Member On Sale" = MembershipSalesSetup."Auto-Admitt Member On Sale"::ASK) then
-              if (not Confirm (ADMITT_MEMBERS, true)) then
-                exit (1);
-
-            if (MembershipSalesSetup."Auto-Admitt Member On Sale" <> MembershipSalesSetup."Auto-Admitt Member On Sale"::NO) then begin
-              if (not AdmittMembersOnCreateMembership (MemberInfoCapture, MembershipSalesSetup, MembershipSetup, ReasonMessage)) then begin
-                gLastMessage := ReasonMessage;
-                exit (-1100);
-              end;
-            end;
+            //-MM1.40 [360275]
+            //    COMMIT;
+            //
+            //    IF (MembershipSalesSetup."Auto-Admit Member On Sale" = MembershipSalesSetup."Auto-Admit Member On Sale"::ASK) THEN
+            //      IF (NOT CONFIRM (ADMITT_MEMBERS, TRUE)) THEN
+            //        EXIT (1);
+            //
+            //    IF (MembershipSalesSetup."Auto-Admit Member On Sale" <> MembershipSalesSetup."Auto-Admit Member On Sale"::NO) THEN BEGIN
+            //      IF (NOT AdmittMembersOnCreateMembership (MemberInfoCapture, MembershipSalesSetup, MembershipSetup, ReasonMessage)) THEN BEGIN
+            //        gLastMessage := ReasonMessage;
+            //        EXIT (-1100);
+            //      END;
+            //    END;
+            //+MM1.40 [360275]
 
             Commit;
             exit (1);
@@ -873,6 +897,7 @@ codeunit 6060131 "MM Member Retail Integration"
 
     local procedure IssueMembershipFromEndOfSaleWorker(ReceiptNo: Code[20];ReceiptLine: Integer;SalesDate: Date;UnitPrice: Decimal;Amount_LCY: Decimal;AmountInclVat_LCY: Decimal;Description: Text;Quantity: Decimal)
     var
+        Membership: Record "MM Membership";
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipSalesSetup: Record "MM Membership Sales Setup";
         MemberManagement: Codeunit "MM Membership Management";
@@ -915,12 +940,35 @@ codeunit 6060131 "MM Member Retail Integration"
             end;
 
             if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::MEMBERSHIP) then begin
-              MemberManagement.AddMembershipLedgerEntry_NEW (MemberInfoCapture."Membership Entry No.", SalesDate, MembershipSalesSetup, MemberInfoCapture);
+
+              //-MM1.40 [357360]
+              //MemberManagement.AddMembershipLedgerEntry_NEW (MemberInfoCapture."Membership Entry No.", SalesDate, MembershipSalesSetup, MemberInfoCapture);
+              if (IsForeignMembership (MembershipSalesSetup."Membership Code")) then begin
+                RemoteCreateMembership (MemberInfoCapture, MembershipSalesSetup);
+                repeat
+                  RemoteAddMember (MemberInfoCapture, MembershipSalesSetup);
+                until (MemberInfoCapture.Next() = 0);
+                //RemoteActivateMembership (MemberInfoCapture, MembershipSalesSetup);
+
+              end else begin
+                MemberManagement.AddMembershipLedgerEntry_NEW (MemberInfoCapture."Membership Entry No.", SalesDate, MembershipSalesSetup, MemberInfoCapture);
+              end;
+              //+MM1.40 [357360]
+
             end;
 
             if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER) then begin
               repeat
-                MemberManagement.AddMemberAndCard (false, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
+
+                //-MM1.40 [357360]
+                // MemberManagement.AddMemberAndCard (FALSE, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, TRUE, MemberInfoCapture."Member Entry No", ResponseMessage);
+                if (IsForeignMembership (MembershipSalesSetup."Membership Code")) then begin
+                  RemoteAddMember (MemberInfoCapture, MembershipSalesSetup);
+                end else begin
+                  MemberManagement.AddMemberAndCard (false, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage);
+                end;
+                //+MM1.40 [357360]
+
               until (MemberInfoCapture.Next() = 0);
 
             end;
@@ -977,7 +1025,12 @@ codeunit 6060131 "MM Member Retail Integration"
             MemberManagement.CancelMembership (MemberInfoCapture, false, true, MembershipStartDate, MembershipUntilDate, UnitPrice);
           end;
 
-        end;
+        end; // END CASE
+
+        //-MM1.40 [360275]
+        if (MemberInfoCapture."Auto-Admit Member") then
+          AdmitMembersOnEndOfSalesWorker (MemberInfoCapture, ResponseMessage);
+        //+MM1.40 [360275]
 
         MemberInfoCapture.DeleteAll();
     end;
@@ -994,6 +1047,12 @@ codeunit 6060131 "MM Member Retail Integration"
 
         if (MemberInfoCapture.FindSet ()) then begin
           MembershipSalesSetup.Get (MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
+
+          //-MM1.40 [357360]
+          if (IsForeignMembership (MembershipSalesSetup."Membership Code")) then begin
+            exit (true);
+          end;
+          //+MM1.40 [357360]
 
           //-MM1.17 [262040]
           case MembershipSalesSetup."Business Flow Type" of
@@ -1020,9 +1079,10 @@ codeunit 6060131 "MM Member Retail Integration"
             MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER :
               begin
                 repeat
-                  if (not (MemberManagement.AddMemberAndCard (FailWithError, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then begin
-                    exit (false);
-                  end;
+                  if (not IsForeignMembership (MembershipSalesSetup."Membership Code")) then //-+MM1.40 [357360]
+                    if (not (MemberManagement.AddMemberAndCard (FailWithError, MemberInfoCapture."Membership Entry No.", MemberInfoCapture, true, MemberInfoCapture."Member Entry No", ResponseMessage))) then begin
+                      exit (false);
+                    end;
                   MemberInfoCapture.Modify ();
                 until (MemberInfoCapture.Next() = 0);
                 asserterror Error (''); // force a rollback, membercreation will be redone at checkout
@@ -1031,6 +1091,11 @@ codeunit 6060131 "MM Member Retail Integration"
             //-MM1.22 [287080]
             MembershipSalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER :
               begin
+                //-MM1.40 [357360]
+                if (IsForeignMembership (MembershipSalesSetup."Membership Code")) then
+                  Error (NOT_SUPPORTED_FOR_REMOTE);
+                //+MM1.40 [357360]
+
                 MemberManagement.AddAnonymousMember (MemberInfoCapture, MemberInfoCapture.Quantity);
                 asserterror Error (''); // force a rollback, membercreation will be redone at checkout
               end;
@@ -1038,6 +1103,11 @@ codeunit 6060131 "MM Member Retail Integration"
 
             MembershipSalesSetup."Business Flow Type"::ADD_CARD :
               begin
+                //-MM1.40 [357360]
+                if (IsForeignMembership (MembershipSalesSetup."Membership Code")) then
+                  Error (NOT_SUPPORTED_FOR_REMOTE);
+                //+MM1.40 [357360]
+
                 if (not MemberManagement.IssueMemberCard (false, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage)) then
                   exit (false);
                 asserterror Error (''); // force a rollback, membercreation will be redone at checkout
@@ -1045,6 +1115,11 @@ codeunit 6060131 "MM Member Retail Integration"
 
             MembershipSalesSetup."Business Flow Type"::REPLACE_CARD :
               begin
+                //-MM1.40 [357360]
+                if (IsForeignMembership (MembershipSalesSetup."Membership Code")) then
+                  Error (NOT_SUPPORTED_FOR_REMOTE);
+                //+MM1.40 [357360]
+
                 if (MemberInfoCapture."Replace External Card No." <> '') then
                   MemberManagement.BlockMemberCard (MemberManagement.GetCardEntryNoFromExtCardNo (MemberInfoCapture."Replace External Card No."), true);
                 if (not MemberManagement.IssueMemberCard (false, MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage)) then
@@ -1059,22 +1134,30 @@ codeunit 6060131 "MM Member Retail Integration"
         exit (true);
     end;
 
-    local procedure AdmittMembersOnCreateMembership(var MemberInfoCapture: Record "MM Member Info Capture";MembershipSalesSetup: Record "MM Membership Sales Setup";MembershipSetup: Record "MM Membership Setup";ReasonText: Text): Boolean
+    local procedure AdmitMembersOnEndOfSalesWorker(var MemberInfoCapture: Record "MM Member Info Capture";ReasonText: Text): Boolean
     var
+        MembershipSetup: Record "MM Membership Setup";
+        Member: Record "MM Member";
+        MemberCard: Record "MM Member Card";
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
         MemberLimitationMgr: Codeunit "MM Member Limitation Mgr.";
         TicketItemNo: Code[20];
         TicketVariantCode: Code[10];
         ResolvingTable: Integer;
         Token: Text[100];
-        Member: Record "MM Member";
         ReasonCode: Integer;
-        MemberCard: Record "MM Member Card";
     begin
 
-        if (MembershipSalesSetup."Business Flow Type" <> MembershipSalesSetup."Business Flow Type"::MEMBERSHIP) then
-          exit (false);
+        //-MM1.40 [360275]
+        with MemberInfoCapture do
+          if (not ("Information Context" in ["Information Context"::NEW,
+                                            "Information Context"::RENEW,
+                                            "Information Context"::UPGRADE,
+                                            "Information Context"::EXTEND])) then begin
+            exit (false);
+          end;
 
+        MembershipSetup.Get (MemberInfoCapture."Membership Code");
         MembershipSetup.TestField ("Ticket Item Barcode");
         if (not TranslateBarcodeToItemVariant (MembershipSetup."Ticket Item Barcode", TicketItemNo, TicketVariantCode, ResolvingTable)) then
           Error (INVALID_TICKET_ITEM, MembershipSetup.TableCaption, MembershipSetup.Code);
@@ -1087,23 +1170,29 @@ codeunit 6060131 "MM Member Retail Integration"
             if (Member.Get (MemberInfoCapture."Member Entry No")) then
               MemberInfoCapture."External Member No" := Member."External Member No.";
 
-            Token := TicketRequestManager.POS_CreateReservationRequest (MemberInfoCapture."Receipt No.", MemberInfoCapture."Line No.", TicketItemNo, TicketVariantCode, 1, MemberInfoCapture."External Member No");
-            if  (0 <> TicketRequestManager.IssueTicketFromReservationToken (Token, false, ReasonText)) then
-              exit (false);
-
             MemberCard.SetFilter ("Membership Entry No.", '=%1', MemberInfoCapture."Membership Entry No.");
             MemberCard.SetFilter ("Member Entry No.", '=%1', MemberInfoCapture."Member Entry No");
             if (MemberCard.FindFirst ()) then begin
               if (MemberCard."External Card No." <> '') then
                 MemberLimitationMgr.POS_CheckLimitMemberCardArrival (MemberCard."External Card No.", '', '<auto>', ReasonText, ReasonCode);
               if (ReasonCode <> 0) then
-                exit (false);
+                Error (ReasonText);
             end;
+
+            Token := TicketRequestManager.POS_CreateReservationRequest (MemberInfoCapture."Receipt No.", MemberInfoCapture."Line No.", TicketItemNo, TicketVariantCode, 1, MemberInfoCapture."External Member No");
+            if  (0 <> TicketRequestManager.IssueTicketFromReservationToken (Token, false, ReasonText)) then
+              Error (ReasonText);
+
+            if (not TicketRequestManager.ConfirmReservationRequest (Token, ReasonText)) then
+              Error (ReasonText);
+
+            TicketRequestManager.RegisterArrivalRequest (Token);
 
           until (MemberInfoCapture.Next () = 0);
         end;
 
         exit (true);
+        //+MM1.40 [360275]
     end;
 
     local procedure UpdateMemberships(var MemberInfoCapture: Record "MM Member Info Capture")
@@ -1186,6 +1275,50 @@ codeunit 6060131 "MM Member Retail Integration"
           MemberInfoCapture.DeleteAll ();
           Commit;
         end;
+    end;
+
+    local procedure "--Helpers for remote memberships"()
+    begin
+    end;
+
+    local procedure IsForeignMembership(MembershipCode: Code[20]): Boolean
+    var
+        NPRMembership: Codeunit "MM NPR Membership";
+    begin
+
+        //-MM1.40 [357360]
+        exit (NPRMembership.IsForeignMembershipCommunity (MembershipCode));
+        //+MM1.40 [357360]
+    end;
+
+    local procedure RemoteCreateMembership(var MemberInfoCapture: Record "MM Member Info Capture";MembershipSalesSetup: Record "MM Membership Sales Setup")
+    var
+        NPRMembership: Codeunit "MM NPR Membership";
+        MembershipSetup: Record "MM Membership Setup";
+        NotValidReason: Text;
+    begin
+
+        //-MM1.40 [357360]
+        MembershipSetup.Get (MembershipSalesSetup."Membership Code");
+
+        if (not NPRMembership.CreateRemoteMembership (MembershipSetup."Community Code", MemberInfoCapture, NotValidReason)) then
+          Error (NotValidReason);
+        //+MM1.40 [357360]
+    end;
+
+    local procedure RemoteAddMember(var MemberInfoCapture: Record "MM Member Info Capture";MembershipSalesSetup: Record "MM Membership Sales Setup")
+    var
+        MembershipSetup: Record "MM Membership Setup";
+        NPRMembership: Codeunit "MM NPR Membership";
+        NotValidReason: Text;
+    begin
+
+        //-MM1.40 [357360]
+        MembershipSetup.Get (MembershipSalesSetup."Membership Code");
+
+        if (not NPRMembership.CreateRemoteMember (MembershipSetup."Community Code", MemberInfoCapture, NotValidReason)) then
+          Error (NotValidReason);
+        //+MM1.40 [357360]
     end;
 
     local procedure "--Notifications"()
@@ -1920,18 +2053,17 @@ codeunit 6060131 "MM Member Retail Integration"
         //-MM1.32 [318132]
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014407, 'OnBeforeAuditRollDebitSaleLineInsertEvent', '', true, true)]
-    local procedure OnBeforeAuditRollDebitSaleLineInsertSubscriber(var Sender: Codeunit "Retail Sales Doc. Mgt.";var SalePOS: Record "Sale POS";var SaleLinePos: Record "Sale Line POS";var AuditRoll: Record "Audit Roll")
+    [EventSubscriber(ObjectType::Codeunit, 6014435, 'OnBeforeAuditRoleLineInsertEvent', '', true, true)]
+    local procedure OnBeforeAuditRollDebitSaleLineInsertSubscriber(var Sender: Codeunit "Retail Form Code";var SalePOS: Record "Sale POS";var SaleLinePos: Record "Sale Line POS";var AuditRole: Record "Audit Roll")
     begin
 
-        // Publisher Standard
-        // CU 6014407 "Retail Sales Doc. Mgt.".OnBeforeAuditRollDebitSaleLineInsertEvent ()
-        //
+        //-MM1.40 [358685]
+        if AuditRole."Sale Type" <> AuditRole."Sale Type"::"Debit Sale" then
+          exit;
+        //+MM1.40 [358685]
 
-        //-MM1.19 [274890]
-        if (AuditRoll.Type = AuditRoll.Type::Item) then
-          IssueMembershipFromAuditRolePosting (AuditRoll);
-        //+MM1.19 [274890]
+        if (AuditRole.Type = AuditRole.Type::Item) then
+          IssueMembershipFromAuditRolePosting (AuditRole);
     end;
 }
 

@@ -15,6 +15,7 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
     //                                   Added RFID support
     //                                   Added utf-8 support (not default to guarantee backwards comp. with older zebra printers).
     // NPR5.50/MMV /20190417 CASE 351975 Barcode parameter parse fix.
+    // NPR5.51/MMV /20190801 CASE 360975 Buffer all template print data into one job.
 
     EventSubscriberInstance = Manual;
 
@@ -161,7 +162,9 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
     var
         CustomEncoding: Text;
     begin
-        PrintBuffer := '';
+        //-NPR5.51 [360975]
+        //PrintBuffer := '';
+        //+NPR5.51 [360975]
 
         if HashTable.IsEmpty then
           ConstructHashTable;

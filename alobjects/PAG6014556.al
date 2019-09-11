@@ -1,6 +1,6 @@
 page 6014556 "Retail Admin Role Center"
 {
-    // #343621/ZESO/20190725  CASE 343621 New Role Centre Page
+    // NPR5.51/ZESO/20190725  CASE 343621 New Role Centre Page
 
     Caption = 'Role Center';
     PageType = RoleCenter;
@@ -9,37 +9,37 @@ page 6014556 "Retail Admin Role Center"
     {
         area(rolecenter)
         {
-            group(Control1900724808)
+            group(Control6014448)
             {
                 ShowCaption = false;
-                part(Control1904484608;"Retail Admin Activities - POS")
+                part(Control6014447;"Retail Admin Activities - POS")
                 {
                 }
-                part(Control14;"Retail Admin Activities - Tick")
+                part(Control6014446;"Retail Admin Activities - Tick")
                 {
                 }
             }
-            group(Control5)
+            group(Control6014445)
             {
                 ShowCaption = false;
-                part(Control12;"Retail Admin Activities - Memb")
+                part(Control6014444;"Retail Admin Activities - Memb")
                 {
                 }
-                part(Control4;"Retail Admin Activities - Tick")
+                part(Control6014443;"Retail Admin Activities - Tick")
                 {
                 }
-                part(Control13;"Retail Admin Activities - Tick")
+                part(Control6014442;"Retail Admin Activities - Tick")
                 {
                 }
             }
-            group(Control15)
+            group(Control6014429)
             {
                 ShowCaption = false;
-                part(Control58;"CRM Synch. Job Status Part")
+                part(Control6014412;"CRM Synch. Job Status Part")
                 {
                     Visible = false;
                 }
-                part(Control52;"Service Connections Part")
+                part(Control6014411;"Service Connections Part")
                 {
                     Visible = false;
                 }
@@ -127,7 +127,7 @@ page 6014556 "Retail Admin Role Center"
                     Caption = 'Display Setup';
                     RunObject = Page "Display Setup";
                 }
-                action(Action6014418)
+                action(Action6014434)
                 {
                     Caption = 'POS Sales Workflows';
                     RunObject = Page "POS Sales Workflows";
@@ -158,7 +158,7 @@ page 6014556 "Retail Admin Role Center"
             {
                 Caption = 'Ean Box Events';
                 Image = LotInfo;
-                action(Action6014403)
+                action(Action6014427)
                 {
                     Caption = 'Ean Box Events';
                     Image = List;

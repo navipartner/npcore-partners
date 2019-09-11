@@ -99,7 +99,8 @@ codeunit 6014630 "Touch - Sale POS (Web)"
     // NPR5.40/BHR /20180322 CASE 308408 Rename variable Grid to Grids
     // NPR5.46/CLVA/20180920 CASE 328581 Removed relation to CU 6014532 Customer Display Mgt.
     // NPR5.48/MHA /20181115 CASE 334633 Removed reference to deleted function CheckSavedSales() in Codeunit 6014435
-    // #361926/JAVA/20190715 CASE 361926 Removed unused references (everything related ref. to REPORT::Report50068).
+    // NPR5.51/JAVA/20190715 CASE 361926 Removed unused references (everything related ref. to REPORT::Report50068).
+    // NPR5.51/ALPO/20190826 CASE 364558 Added new call parameters in accordance with function's POSInfoManagement.ProcessPOSInfoMenuFunction new signature
 
 
     trigger OnRun()
@@ -979,7 +980,8 @@ codeunit 6014630 "Touch - Sale POS (Web)"
                                                LoadSavedSale(POSCustLocReceipt);
               //+NPR5.31 [264112]
               //-NPR5.26 OSFI
-              'POS_INFO'                : POSInfoManagement.ProcessPOSInfoMenuFunction(LastLineTemp,MenuLines1.Parametre);
+              //'POS_INFO'                : POSInfoManagement.ProcessPOSInfoMenuFunction(LastLineTemp,MenuLines1.Parametre);  //NPR5.51 [364558]-revoked
+              'POS_INFO'                : POSInfoManagement.ProcessPOSInfoMenuFunction(LastLineTemp,MenuLines1.Parametre,0,false);  //NPR5.51 [364558]
               //+NPR5.26 OSFI
               else begin
                 //-NPR5.20
@@ -2035,11 +2037,11 @@ codeunit 6014630 "Touch - Sale POS (Web)"
               PaymentTypePOS.TestField("G/L Account No.");
             PaymentTypePOS.TestField(Status,PaymentTypePOS.Status::Active);
             if (PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::EFT) and
-               (Testlinie."Amount Including VAT" <> 0) and (not Testlinie."Cash Terminal Approved") then begin
+               (Testlinie."Amount Including VAT" <> 0) and (not Testlinie."EFT Approved") then begin
                 Commit;
                 CODEUNIT.Run(CODEUNIT::"Call Terminal Integration",Testlinie);
                 Commit;
-                if not Testlinie."Cash Terminal Approved" then
+                if not Testlinie."EFT Approved" then
                   Error(Text10600027);
             end;
             //-NPR5.26
@@ -2059,10 +2061,10 @@ codeunit 6014630 "Touch - Sale POS (Web)"
             //TEmp+
             //+NPR5.26
             if (PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::DIBS) and
-               (Testlinie."Amount Including VAT" <> 0) and (not Testlinie."Cash Terminal Approved") then begin
-                if (not Testlinie."Cash Terminal Approved") then begin
+               (Testlinie."Amount Including VAT" <> 0) and (not Testlinie."EFT Approved") then begin
+                if (not Testlinie."EFT Approved") then begin
                   Commit;
-                  if not Testlinie."Cash Terminal Approved" then
+                  if not Testlinie."EFT Approved" then
                     Error(Text10600027);
                 end;
               end;

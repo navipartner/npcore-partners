@@ -1,7 +1,8 @@
 page 6014692 "Retail Admin Activities - Tick"
 {
-    // #343621/ZESO/20190725  CASE 343621 Object created.
+    // NPR5.51/ZESO/20190725  CASE 343621 Object created.
 
+    Caption = 'Retail Admin Activities - Tick';
     PageType = CardPart;
     RefreshOnActivate = true;
     SourceTable = "Retail Admin Cue";
