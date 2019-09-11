@@ -1,6 +1,8 @@
 xmlport 6184850 "FR Audit Archive"
 {
     // NPR5.48/MMV /20181025 CASE 318028 Created object
+    // NPR5.51/MMV /20190614 CASE 356076 French audit 2nd iteration
+    // NPR5.51/MHA /20190724 CASE 343352 Added filter on "Document Type" to Data Items IssuedCoupon and AppliedCoupon
 
     Caption = 'FR Audit Archive';
     Direction = Export;
@@ -12,6 +14,10 @@ xmlport 6184850 "FR Audit Archive"
         tableelement(pcheckpoint;"POS Workshift Checkpoint")
         {
             XmlName = 'GrandPeriod';
+            textelement(archivesignature)
+            {
+                XmlName = 'ArchiveFileSignature';
+            }
             fieldelement(SystemEntryKey;PCheckpoint."Entry No.")
             {
             }
@@ -25,6 +31,10 @@ xmlport 6184850 "FR Audit Archive"
             textelement(pgrandtotal)
             {
                 XmlName = 'GrandTotal';
+            }
+            textelement(pperpetualabsolutegrandtotal)
+            {
+                XmlName = 'PerpetualAbsoluteGrandTotal';
             }
             textelement(pperpetualgrandtotal)
             {
@@ -74,6 +84,10 @@ xmlport 6184850 "FR Audit Archive"
                 textelement(zgrandtotal)
                 {
                     XmlName = 'GrandTotal';
+                }
+                textelement(zperpetualabsolutegrandtotal)
+                {
+                    XmlName = 'PerpetualAbsoluteGrandTotal';
                 }
                 textelement(zperpetualgrandtotal)
                 {
@@ -196,6 +210,9 @@ xmlport 6184850 "FR Audit Archive"
                             fieldelement(LineNo;"POS Sales Line"."Line No.")
                             {
                             }
+                            fieldelement(Type;"POS Sales Line".Type)
+                            {
+                            }
                             fieldelement(ProductCode;"POS Sales Line"."No.")
                             {
                             }
@@ -269,14 +286,23 @@ xmlport 6184850 "FR Audit Archive"
                         MaxOccurs = Once;
                         XmlName = 'TicketTotals';
                         SourceTableView = WHERE("External Type"=CONST('GRANDTOTAL'));
-                        fieldelement(TotalInclTax;"POS Entry"."Total Amount Incl. Tax")
+                        fieldelement(TotalInclTax;"POS Entry"."Amount Incl. Tax")
                         {
                         }
-                        fieldelement(TotalExclTax;"POS Entry"."Total Amount")
+                        fieldelement(TotalExclTax;"POS Entry"."Amount Excl. Tax")
                         {
                         }
-                        fieldelement(PerpetualGrandTotal;TicketGrandTotal."Additional Information")
+                        textelement(tgrandtotal)
                         {
+                            XmlName = 'GrandTotal';
+                        }
+                        textelement(tperpetualabsolutegrandtotal)
+                        {
+                            XmlName = 'PerpetualAbsoluteGrandTotal';
+                        }
+                        textelement(tperpetualgrandtotal)
+                        {
+                            XmlName = 'PerpetualGrandTotal';
                         }
                         textelement(ttsignature)
                         {
@@ -290,6 +316,11 @@ xmlport 6184850 "FR Audit Archive"
                             POSAuditLog.SetRange("Record ID", "POS Entry".RecordId);
                             POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::GRANDTOTAL);
                             TTSignature := GetAuditSignature(POSAuditLog);
+                            //-NPR5.51 [356076]
+                            TGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 1);
+                            TPerpetualAbsoluteGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 2);
+                            TPerpetualGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 3);
+                            //+NPR5.51 [356076]
                         end;
                     }
                     textelement(PaymentLines)
@@ -477,11 +508,11 @@ xmlport 6184850 "FR Audit Archive"
                         }
                         tableelement(issuedcoupon;"NpDc Coupon Entry")
                         {
-                            LinkFields = "Register No."=FIELD("POS Unit No."),"Sales Ticket No."=FIELD("Document No.");
+                            LinkFields = "Register No."=FIELD("POS Unit No."),"Document No."=FIELD("Document No.");
                             LinkTable = "POS Entry";
                             MinOccurs = Zero;
                             XmlName = 'IssuedCoupon';
-                            SourceTableView = WHERE("Entry Type"=CONST("Issue Coupon"));
+                            SourceTableView = WHERE("Entry Type"=CONST("Issue Coupon"),"Document Type"=CONST("POS Entry"));
                             fieldelement(CouponNo;IssuedCoupon."Coupon No.")
                             {
                             }
@@ -497,11 +528,11 @@ xmlport 6184850 "FR Audit Archive"
                         }
                         tableelement(appliedcoupon;"NpDc Coupon Entry")
                         {
-                            LinkFields = "Register No."=FIELD("POS Unit No."),"Sales Ticket No."=FIELD("Document No.");
+                            LinkFields = "Register No."=FIELD("POS Unit No."),"Document No."=FIELD("Document No.");
                             LinkTable = "POS Entry";
                             MinOccurs = Zero;
                             XmlName = 'AppliedCoupon';
-                            SourceTableView = WHERE("Entry Type"=CONST("Discount Application"));
+                            SourceTableView = WHERE("Entry Type"=CONST("Discount Application"),"Document Type"=CONST("POS Entry"));
                             fieldelement(CouponNo;AppliedCoupon."Coupon No.")
                             {
                             }
@@ -525,9 +556,6 @@ xmlport 6184850 "FR Audit Archive"
                         POSAuditLog: Record "POS Audit Log";
                         InStream: InStream;
                     begin
-                        if IsCancelledSale("POS Entry") then
-                          currXMLport.Skip;
-
                         POSAuditLog.SetRange("Record ID", "POS Entry".RecordId);
                         POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::DIRECT_SALE_END);
                         POSAuditLog.FindFirst;
@@ -545,29 +573,29 @@ xmlport 6184850 "FR Audit Archive"
 
                 trigger OnAfterGetRecord()
                 var
-                    LookaheadZReport: Record "POS Workshift Checkpoint";
                     POSAuditLog: Record "POS Audit Log";
                     InStream: InStream;
+                    LastZReport: Record "POS Workshift Checkpoint";
                 begin
-                    if not FirstZReport then
-                      FromPOSEntry := ZCheckpoint."POS Entry No.";
-
-                    LookaheadZReport.SetRange("POS Unit No.", UnitNo);
-                    LookaheadZReport.SetFilter(Type, '=%1|=%2', LookaheadZReport.Type::PREPORT, LookaheadZReport.Type::ZREPORT);
-                    LookaheadZReport.SetFilter("Entry No.", '>%1', ZCheckpoint."Entry No.");
-                    LookaheadZReport.SetRange(Open, false);
-                    LookaheadZReport.FindFirst;
-                    ToPOSEntry := LookaheadZReport."POS Entry No.";
+                    //-NPR5.51 [356076]
+                    if LastZReportEntryNo <> 0 then begin
+                      LastZReport.Get(LastZReportEntryNo);
+                      FromPOSEntry := LastZReport."POS Entry No.";
+                    end;
+                    ToPOSEntry := ZCheckpoint."POS Entry No.";
 
                     POSAuditLog.SetRange("Record ID", ZCheckpoint.RecordId);
                     POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::GRANDTOTAL);
                     POSAuditLog.FindFirst;
                     ZExternalID := POSAuditLog."External ID";
-                    ZPerpetualGrandTotal := POSAuditLog."Additional Information"; //Contains perpetual for daily period.
                     ZSignature := GetAuditSignature(POSAuditLog);
-                    ZGrandTotal := Format(ZCheckpoint."Direct Turnover (LCY)" - ZCheckpoint."Rounding (LCY)",0,'<Precision,2:2><Standard Format,9>');
+                    ZGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 1);
+                    ZPerpetualAbsoluteGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 2);
+                    ZPerpetualGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 3);
 
-                    FirstZReport := false;
+
+                    LastZReportEntryNo := ZCheckpoint."Entry No.";
+                    //+NPR5.51 [356076]
                 end;
 
                 trigger OnPreXmlItem()
@@ -630,7 +658,10 @@ xmlport 6184850 "FR Audit Archive"
                 POSAuditLog2: Record "POS Audit Log";
                 FromJETEntry: Integer;
                 ToJETEntry: Integer;
+                FRAuditMgt: Codeunit "FR Audit Mgt.";
             begin
+                //Find last checkpoint to set interval filter correctly for both JET entries, POS entries and Z report entries.
+
                 PCheckpoint.TestField(Type, PCheckpoint.Type::PREPORT);
                 PCheckpoint.TestField(Open, false);
                 PCheckpoint.SetRecFilter; //Only one workshift being archived
@@ -639,6 +670,7 @@ xmlport 6184850 "FR Audit Archive"
 
                 POSAuditLog2.SetRange("Record ID", PCheckpoint.RecordId);
                 POSAuditLog2.SetRange("Action Type", POSAuditLog2."Action Type"::WORKSHIFT_END);
+                POSAuditLog2.SetRange("Acted on POS Unit No.", PCheckpoint."POS Unit No.");
                 POSAuditLog2.FindLast;
                 ToJETEntry := POSAuditLog2."Entry No.";
 
@@ -647,18 +679,43 @@ xmlport 6184850 "FR Audit Archive"
 
                 LastWorkshiftCheckpoint.SetRange("POS Unit No.", PCheckpoint."POS Unit No.");
                 LastWorkshiftCheckpoint.SetRange(Type, PCheckpoint.Type);
+                //-NPR5.51 [356076]
+                LastWorkshiftCheckpoint.SetRange("Period Type", PCheckpoint."Period Type");
+                LastWorkshiftCheckpoint.SetRange(Open, false);
                 LastWorkshiftCheckpoint.SetFilter("Entry No.", '<%1', PCheckpoint."Entry No.");
                 if LastWorkshiftCheckpoint.FindLast then begin
-                  FromZReportEntry := LastWorkshiftCheckpoint."Entry No.";
-                  FromPOSEntry := LastWorkshiftCheckpoint."POS Entry No.";
-
                   POSAuditLog2.SetRange("Record ID", LastWorkshiftCheckpoint.RecordId);
                   POSAuditLog2.SetRange("Action Type", POSAuditLog2."Action Type"::WORKSHIFT_END);
-                  POSAuditLog2.FindLast;
-                  FromJETEntry := POSAuditLog2."Entry No.";
-                  JETEntry.SetFilter("Entry No.", '>%1&<=%2', FromJETEntry, ToJETEntry);
-                end else
+                  if POSAuditLog2.FindLast then begin
+                    FromZReportEntry := LastWorkshiftCheckpoint."Entry No.";
+                    FromPOSEntry := LastWorkshiftCheckpoint."POS Entry No.";
+
+                    FromJETEntry := POSAuditLog2."Entry No.";
+                    JETEntry.SetFilter("Entry No.", '>%1&<=%2', FromJETEntry, ToJETEntry);
+                  end;
+                end;
+
+                if FromJETEntry = 0 then begin
+                  //Set filters to oldest entries after JET init
+
+                  POSAuditLog2.Reset;
+                  FRAuditMgt.GetJETInitRecord(POSAuditLog2, UnitNo, true);
+                  POSAuditLog2.Reset;
+                  POSAuditLog2.SetFilter("Entry No.", '>%1', POSAuditLog2."Entry No.");
+                  POSAuditLog2.SetRange("Acted on POS Unit No.", PCheckpoint."POS Unit No.");
+
+                  POSAuditLog2.SetRange("Action Type", POSAuditLog2."Action Type"::DIRECT_SALE_END);
+                  POSAuditLog2.FindFirst;
+                  FromPOSEntry := POSAuditLog2."Acted on POS Entry No.";
+
+                  POSAuditLog2.SetRange("Action Type", POSAuditLog2."Action Type"::DRAWER_COUNT);
+                  POSAuditLog2.FindFirst;
+                  LastWorkshiftCheckpoint.Reset;
+                  LastWorkshiftCheckpoint.Get(POSAuditLog2."Record ID");
+                  FromZReportEntry := LastWorkshiftCheckpoint."Entry No.";
+                //+NPR5.51 [356076]
                   JETEntry.SetFilter("Entry No.", '<=%1', ToJETEntry);
+                end;
 
                 JETFilter := JETEntry.GetView(false);
 
@@ -666,9 +723,15 @@ xmlport 6184850 "FR Audit Archive"
                 POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::GRANDTOTAL);
                 POSAuditLog.FindFirst;
                 PExternalID := POSAuditLog."External ID";
-                PPerpetualGrandTotal := POSAuditLog."Additional Information"; //Contains Perpetual for monthly period.
                 PSignature := GetAuditSignature(POSAuditLog);
-                PGrandTotal := Format(PCheckpoint."Direct Turnover (LCY)" - PCheckpoint."Rounding (LCY)",0,'<Precision,2:2><Standard Format,9>');
+                //-NPR5.51 [356076]
+                PGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 1);
+                PPerpetualAbsoluteGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 2);
+                PPerpetualGrandTotal := GetSplitStringValue(POSAuditLog."Additional Information", '|', 3);
+
+                POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::ARCHIVE_CREATE);
+                ArchiveSignature := GetAuditSignature(POSAuditLog);
+                //+NPR5.51 [356076]
             end;
         }
     }
@@ -685,18 +748,11 @@ xmlport 6184850 "FR Audit Archive"
         }
     }
 
-    trigger OnPreXmlPort()
-    begin
-        FirstPOSEntry := true;
-        FirstZReport := true;
-    end;
-
     var
+        LastZReportEntryNo: Integer;
         FromPOSEntry: Integer;
         ToPOSEntry: Integer;
         UnitNo: Code[10];
-        FirstPOSEntry: Boolean;
-        FirstZReport: Boolean;
         FromZReportEntry: Integer;
         ToZReportEntry: Integer;
         JETFilter: Text;
@@ -714,14 +770,21 @@ xmlport 6184850 "FR Audit Archive"
         exit(Signature);
     end;
 
-    local procedure IsCancelledSale(POSEntry: Record "POS Entry"): Boolean
+    local procedure GetSplitStringValue(Value: Text;Separator: Char;Index: Integer): Text
     var
-        SaleLinePOS: Record "Sale Line POS";
-        POSAuditLog: Record "POS Audit Log";
+        String: DotNet npNetString;
+        SplitArray: DotNet npNetArray;
+        CharArray: DotNet npNetArray;
+        Char: Char;
     begin
-        POSAuditLog.SetRange("Action Type", POSAuditLog."Action Type"::DIRECT_SALE_END);
-        POSAuditLog.SetRange("Record ID", POSEntry.RecordId);
-        exit((POSEntry."Fiscal No." = '') and (POSEntry."No. of Sales Lines" = 0) and (POSEntry."Total Amount Incl. Tax" = 0) and POSAuditLog.IsEmpty);
+        //-NPR5.51 [356076]
+        CharArray := CharArray.CreateInstance(GetDotNetType(Char),1);
+        CharArray.SetValue(Separator, 0);
+
+        String := Value;
+        SplitArray := String.Split(CharArray);
+        exit(SplitArray.GetValue(Index-1));
+        //+NPR5.51 [356076]
     end;
 }
 

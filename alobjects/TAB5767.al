@@ -1,4 +1,4 @@
-tableextension 50045 tableextension50045 extends "Warehouse Activity Line" 
+tableextension 50046 tableextension50046 extends "Warehouse Activity Line" 
 {
     // NPR5.33/TJ  /20170505 CASE 268412 New field Rem. Qty. to Pick (Base)
     fields

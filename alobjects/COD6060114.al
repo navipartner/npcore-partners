@@ -18,6 +18,7 @@ codeunit 6060114 "TM Ticket Access Statistics"
     // TM1.39/TSA /20181120 CASE 336823 Fixed a concurrency issue when 2 people update statistics at the exact same time.
     // TM1.39/TSA /20190103 CASE 341289 Hide lines that have zero count
     // TM1.39/TSA /20190122 CASE 341335 Expose adhoc statistics to 3rd party.
+    // TM1.42/TSA /20190411 CASE 351050 Supporting different types of revisitor statistics
 
 
     trigger OnRun()
@@ -551,8 +552,10 @@ codeunit 6060114 "TM Ticket Access Statistics"
         TmpRecBuf: Record "Record Buffer" temporary;
         PreviousAdmissionDate: Date;
         Ticket: Record "TM Ticket";
+        TicketAdmissionBOM: Record "TM Ticket Admission BOM";
         IsReEntry: Boolean;
         DoneAggregating: Boolean;
+        ValidEntry: Boolean;
     begin
 
         //-TM1.39 [341335]
@@ -574,9 +577,18 @@ codeunit 6060114 "TM Ticket Access Statistics"
           if ((DetailAccessEntry.Type = DetailAccessEntry.Type::ADMITTED) or
               (DetailAccessEntry.Type = DetailAccessEntry.Type::CANCELED) or
               (DetailAccessEntry.Type = DetailAccessEntry.Type::INITIAL_ENTRY)) then begin
-            if (TicketAccessEntry.Get (DetailAccessEntry."Ticket Access Entry No.")) then begin
 
-              IsReEntry := CheckForReEntry (DetailAccessEntry);
+            //-TM1.42 [351050]
+            // IF (TicketAccessEntry.GET (DetailAccessEntry."Ticket Access Entry No.")) THEN BEGIN
+              //IsReEntry := CheckForReEntry (DetailAccessEntry);
+
+            ValidEntry := TicketAccessEntry.Get (DetailAccessEntry."Ticket Access Entry No.");
+            ValidEntry := ValidEntry and Ticket.Get (TicketAccessEntry."Ticket No.");
+            ValidEntry := ValidEntry and TicketAdmissionBOM.Get (Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code");
+            if (ValidEntry) then begin
+              IsReEntry := CheckForReEntry (DetailAccessEntry, TicketAdmissionBOM."Revisit Condition (Statistics)");
+              //+TM1.42 [351050]
+
               TicketAccessEntry."Access Date" := DT2Date (DetailAccessEntry."Created Datetime");
               TicketAccessEntry."Access Time" := DT2Time (DetailAccessEntry."Created Datetime");
               TicketAccessEntry.Quantity := DetailAccessEntry.Quantity;
@@ -584,7 +596,6 @@ codeunit 6060114 "TM Ticket Access Statistics"
               //-TM1.39 [341335] No need for fact in adhoc mode
               // AddAccessFact (TicketAccessEntry);
               // AddAccessStatistic (TmpTicketStatistics, TicketAccessEntry, DetailAccessEntry."Entry No.", DetailAccessEntry.Type, IsReEntry);
-
               if (not AdHoc) then
                 AddAccessFact (TicketAccessEntry);
               //+TM1.39 [341335]
@@ -621,7 +632,10 @@ codeunit 6060114 "TM Ticket Access Statistics"
               end;
 
               //-TM1.39 [341335]
-              AddAccessStatistic (TmpTicketStatistics, TicketAccessEntry, DetailAccessEntry."Entry No.", DetailAccessEntry.Type, IsReEntry);
+              //-TM1.42 [351050]
+              //AddAccessStatistic (TmpTicketStatistics, TicketAccessEntry, DetailAccessEntry."Entry No.", DetailAccessEntry.Type, IsReEntry);
+              AddAccessStatistic (TmpTicketStatistics, TicketAccessEntry, Ticket, DetailAccessEntry."Entry No.", DetailAccessEntry.Type, IsReEntry);
+              //+TM1.42 [351050]
               //+TM1.39 [341335]
 
               PreviousAdmissionDate := DT2Date (DetailAccessEntry."Created Datetime");
@@ -741,13 +755,12 @@ codeunit 6060114 "TM Ticket Access Statistics"
         end;
     end;
 
-    local procedure AddAccessStatistic(var tmpTicketStatistics: Record "TM Ticket Access Statistics";TicketAccessEntry: Record "TM Ticket Access Entry";AdmissionEntryNo: BigInteger;AdmissionType: Option;IsReEntry: Boolean)
+    local procedure AddAccessStatistic(var tmpTicketStatistics: Record "TM Ticket Access Statistics";TicketAccessEntry: Record "TM Ticket Access Entry";Ticket: Record "TM Ticket";AdmissionEntryNo: BigInteger;AdmissionType: Option;IsReEntry: Boolean)
     var
         ItemFactCode: Code[20];
         TicketTypeFactCode: Code[20];
         VariantFactCode: Code[10];
         AdmissionHour: Integer;
-        Ticket: Record "TM Ticket";
         DetailAccessEntry: Record "TM Det. Ticket Access Entry";
     begin
 
@@ -762,16 +775,24 @@ codeunit 6060114 "TM Ticket Access Statistics"
         end;
         //+TM1.33 [316468]
 
-
         // Item No.,Ticket Type,Admission Date,Admission Hour
-        ItemFactCode := ''; //TicketAccessEntry."Item No.";
-        if (ItemFactCode = '') then
-          if (Ticket.Get (TicketAccessEntry."Ticket No.")) then begin
-            ItemFactCode := Ticket."Item No.";
-            //-TM1.36 [323024]
-            VariantFactCode := Ticket."Variant Code";
-            //+TM1.36 [323024]
-          end;
+
+        //-TM1.42 [351050]
+        // ItemFactCode := ''; //TicketAccessEntry."Item No.";
+        // IF (ItemFactCode = '') THEN
+        //  IF (Ticket.GET (TicketAccessEntry."Ticket No.")) THEN BEGIN
+        //    ItemFactCode := Ticket."Item No.";
+        //    //-TM1.36 [323024]
+        //    VariantFactCode := Ticket."Variant Code";
+        //    //+TM1.36 [323024]
+        //  END;
+
+        ItemFactCode := '';
+        if (ItemFactCode = '') then begin
+          ItemFactCode := Ticket."Item No.";
+          VariantFactCode := Ticket."Variant Code";
+        end;
+        //+TM1.42 [351050]
 
         if (ItemFactCode = '') then
           ItemFactCode := '<BLANK>';
@@ -905,15 +926,26 @@ codeunit 6060114 "TM Ticket Access Statistics"
         Page.Run ();
     end;
 
-    local procedure CheckForReEntry(DetTicketAccessEntry: Record "TM Det. Ticket Access Entry"): Boolean
+    local procedure CheckForReEntry(DetTicketAccessEntry: Record "TM Det. Ticket Access Entry";ReEntryOption: Option): Boolean
     var
         DetTicketAccessEntry2: Record "TM Det. Ticket Access Entry";
+        TicketAdmissionBOM: Record "TM Ticket Admission BOM";
     begin
+
+        //-TM1.42 [351050]
+        if (ReEntryOption = TicketAdmissionBOM."Revisit Condition (Statistics)"::NEVER) then
+          exit (false);
+        //+TM1.42 [351050]
 
         DetTicketAccessEntry2.SetCurrentKey ("Ticket Access Entry No.",Type);
         DetTicketAccessEntry2.SetFilter ("Ticket Access Entry No.", '=%1', DetTicketAccessEntry."Ticket Access Entry No.");
         DetTicketAccessEntry2.SetFilter (Type, '=%1', DetTicketAccessEntry.Type);
         DetTicketAccessEntry2.SetFilter ("Entry No.", '<%1', DetTicketAccessEntry."Entry No.");
+
+        //-TM1.42 [351050]
+        if (ReEntryOption = TicketAdmissionBOM."Revisit Condition (Statistics)"::DAILY_NONINITIAL) then
+          DetTicketAccessEntry2.SetFilter ("Created Datetime", '>=%1', CreateDateTime (DT2Date(DetTicketAccessEntry."Created Datetime"),0T));
+        //+TM1.42 [351050]
 
         exit (not DetTicketAccessEntry2.IsEmpty ());
     end;

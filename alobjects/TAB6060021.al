@@ -1,46 +1,20 @@
 table 6060021 "GIM - WS Received File"
 {
+    // NPR5.51/MHA /20190819  CASE 365377 Generic Import Module is deprecated [VLOBJDEL] Object marked for deletion
+
     Caption = 'GIM - WS Received File';
 
     fields
     {
-        field(1;"Entry No.";Integer)
+        field(1;"Code";Code[10])
         {
-            Caption = 'Entry No.';
-        }
-        field(10;"Doc. Type Code";Code[10])
-        {
-            Caption = 'Doc. Type Code';
-        }
-        field(20;"Sender ID";Code[20])
-        {
-            Caption = 'Sender ID';
-        }
-        field(30;"File Container";BLOB)
-        {
-            Caption = 'File Container';
-        }
-        field(31;"File Extension";Text[30])
-        {
-            Caption = 'File Extension';
-        }
-        field(32;"File Name";Text[250])
-        {
-            Caption = 'File Name';
-        }
-        field(40;"File Processed";Boolean)
-        {
-            Caption = 'File Processed';
-        }
-        field(50;"Received At";DateTime)
-        {
-            Caption = 'Received At';
+            Caption = 'Code';
         }
     }
 
     keys
     {
-        key(Key1;"Entry No.")
+        key(Key1;"Code")
         {
         }
     }
@@ -48,14 +22,5 @@ table 6060021 "GIM - WS Received File"
     fieldgroups
     {
     }
-
-    procedure ProcessFile()
-    var
-        FileFetch: Codeunit "GIM - File Fetch";
-    begin
-        FileFetch.SetDataSource(2);
-        FileFetch.SetWebServiceFile(Rec);
-        FileFetch.Run;
-    end;
 }
 

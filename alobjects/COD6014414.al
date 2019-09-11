@@ -34,6 +34,7 @@ codeunit 6014414 "Post Temp Audit Roll"
     // NPR5.41/JDH /20180426 CASE 312644  Added indirect permissions to table Audit roll
     // NPR5.42/JC  /20180515 CASE 315194 Fix issue with getting register no. for Payment Type POS
     // NPR5.49/TJ  /20181210 CASE 331208 Publisher added OnAfterRunPostItemLedger
+    // NPR5.51/LS  /20190709  CASE 351736  Changed function MovementEntries, length of "Global Dimension 1" from 10 to 20 as per standard Dim code
 
     Permissions = TableData "Audit Roll"=rimd;
 
@@ -254,7 +255,7 @@ codeunit 6014414 "Post Temp Audit Roll"
         end;
     end;
 
-    procedure MovementEntries(Kontonummer: Code[20];Amount2: Decimal;Kassenr: Code[10];Kontotype: Integer;"Global Dimension 1": Code[10];ForceDesc: Text[50];"Posting Date": Date;var TempPost: Record "Audit Roll Posting" temporary)
+    procedure MovementEntries(Kontonummer: Code[20];Amount2: Decimal;Kassenr: Code[10];Kontotype: Integer;"Global Dimension 1": Code[20];ForceDesc: Text[50];"Posting Date": Date;var TempPost: Record "Audit Roll Posting" temporary)
     var
         Bogf1: Label 'Todays changes %1 Register %2';
         Bogf2: Label 'Paind on %1 Register %2';

@@ -1,4 +1,4 @@
-tableextension 50044 tableextension50044 extends "Transfer Line" 
+tableextension 50045 tableextension50045 extends "Transfer Line" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields  6014400..6014403

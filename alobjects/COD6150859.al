@@ -1,6 +1,9 @@
 codeunit 6150859 "POS Action - Doc. Export"
 {
     // NPR5.50/MMV /20180319 CASE 300557 New action, based on CU 6150814
+    // NPR5.51/MMV /20190605  CASE 357277 Added support for skipping line transfer to POS entry.
+    // NPR5.51/ALST/20190705  CASE 357848 function prototype changed
+    // NPR5.51/ALST/20190717  CASE 361811 added possibility to restrict amount sign for the action
 
 
     trigger OnRun()
@@ -9,8 +12,6 @@ codeunit 6150859 "POS Action - Doc. Export"
 
     var
         ActionDescription: Label 'Export current sale to a standard NAV sales document';
-        ERRDOCTYPE: Label 'Wrong Document Type. Document Type is set to %1. It must be one of %2, %3, %4, %5 or %6';
-        ERRORDERTYPE: Label 'Wrong Order Type. Order Type is set to %1. It must be one of %2, %3, %4.';
         ERRCUSTNOTSET: Label 'Customer must be set before working with Sales Document.';
         ERRNOSALELINES: Label 'There are no sale lines to export';
         ERR_PREPAY: Label 'Sale was exported correctly but prepayment in new sale failed: %1';
@@ -73,7 +74,8 @@ codeunit 6150859 "POS Action - Doc. Export"
         DescRetailPrint: Label 'Print receipt confirming exported document';
         DescOpenDoc: Label 'Open sales document page after export is done';
         DescCheckCustCredit: Label 'Check the customer credit before export is done';
-        OptionDocType: Label 'Order,Invoice,Return Order,Credit Memo';
+        OptionDocTypePozitive: Label 'Order,Invoice,Quote,Restrict';
+        OptionDocTypeNegative: Label 'Return Order,Credit Memo,Restrict';
         OptionOrderType: Label 'Not Set,Order,Lending';
         CaptionPrintPrepaymentDoc: Label 'Print Prepayment Document';
         DescPrintPrepaymentDoc: Label 'Print standard prepayment document after posting.';
@@ -81,6 +83,10 @@ codeunit 6150859 "POS Action - Doc. Export"
         CaptionPrintPayAndPost: Label 'Pay&Post Print';
         DescPayAndPostNext: Label 'Insert a full payment line for the exported document in the next sale.';
         DescPrintPayAndPost: Label 'Print the standard document of the Pay&Post operation in next sale.';
+        DescSaveLinesOnPOSEntry: Label 'Save exported sale lines on POS Entry';
+        CaptionSaveLinesOnPOSEntry: Label 'Save POS Entry Lines';
+        WrongNegativeSignErr: Label 'Amount must be pozitive for: %1';
+        WrongPozitiveSignErr: Label 'Amount must be negative for: %1';
 
     local procedure ActionCode(): Text
     begin
@@ -89,7 +95,7 @@ codeunit 6150859 "POS Action - Doc. Export"
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.1');
+        exit ('1.3');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -115,8 +121,12 @@ codeunit 6150859 "POS Action - Doc. Export"
             RegisterBooleanParameter('SetInvoice', false);
             RegisterBooleanParameter('SetReceive', false);
             RegisterBooleanParameter('SetShip', false);
-            RegisterOptionParameter('SetDocumentType', 'Order,Invoice,ReturnOrder,CreditMemo,Quote', 'Order');
-            RegisterOptionParameter('SetNegBalDocumentType', 'Order,Invoice,ReturnOrder,CreditMemo,Quote', 'ReturnOrder');
+            //-NPR5.51 [361811]
+            // RegisterOptionParameter('SetDocumentType', 'Order,Invoice,ReturnOrder,CreditMemo,Quote', 'Order');
+            // RegisterOptionParameter('SetNegBalDocumentType', 'Order,Invoice,ReturnOrder,CreditMemo,Quote', 'ReturnOrder');
+            RegisterOptionParameter('SetDocumentType', 'Order,Invoice,Quote,Restrict', 'Order');
+            RegisterOptionParameter('SetNegBalDocumentType', 'ReturnOrder,CreditMemo,Restrict', 'ReturnOrder');
+            //+NPR5.51 [361811]
             RegisterBooleanParameter('SetShowCreationMessage', false);
             RegisterBooleanParameter('SetTransferPostingSetup', true);
             RegisterBooleanParameter('SetAutoReserveSalesLine', false);
@@ -136,6 +146,9 @@ codeunit 6150859 "POS Action - Doc. Export"
             RegisterBooleanParameter('OpenDocumentAfterExport', false);
             RegisterBooleanParameter('PayAndPostInNextSale', false);
             RegisterBooleanParameter('PrintPayAndPostInvoice', false);
+        //-NPR5.51 [357277]
+            RegisterBooleanParameter('SaveLinesOnPOSEntry', true);
+        //+NPR5.51 [357277]
           end;
         end;
     end;
@@ -187,6 +200,11 @@ codeunit 6150859 "POS Action - Doc. Export"
         POSSale.GetCurrentSale(SalePOS);
 
         JSON.InitializeJObjectParser(Context,FrontEnd);
+
+        //-NPR5.51 [361811]
+        //SelectCustomer ends tranzaction
+        SalePOS.FindFirst;
+        //+NPR5.51 [361811]
 
         if not SelectCustomer(SalePOS) then
           SalePOS.TestField("Customer No.");
@@ -250,7 +268,8 @@ codeunit 6150859 "POS Action - Doc. Export"
         AmountExclVAT: Decimal;
         VATAmount: Decimal;
         AmountInclVAT: Decimal;
-        DocumentType: Option "Order",Invoice,ReturnOrder,CreditMemo,Quote;
+        DocumentTypePozitive: Option "Order",Invoice,Quote,Restrict;
+        DocumentTypeNegative: Option ReturnOrder,CreditMemo,Restrict;
     begin
         RetailSalesDocMgt.SetAsk( JSON.GetBooleanParameter('SetAsk', true) );
         RetailSalesDocMgt.SetPrint( JSON.GetBooleanParameter('SetPrint', true) );
@@ -266,31 +285,60 @@ codeunit 6150859 "POS Action - Doc. Export"
         RetailSalesDocMgt.SetTransferPaymentMethod( JSON.GetBooleanParameter('SetTransferPaymentMethod', true) );
         RetailSalesDocMgt.SetTransferTaxSetup( JSON.GetBooleanParameter('SetTransferTaxSetup', true) );
         RetailSalesDocMgt.SetOpenSalesDocAfterExport( JSON.GetBooleanParameter('OpenDocumentAfterExport', true) );
+        //-NPR5.51 [357277]
+        RetailSalesDocMgt.SetDeleteSaleLinesAfterExport( not JSON.GetBooleanParameter('SaveLinesOnPOSEntry', true) );
+        //+NPR5.51 [357277]
         RetailSalesDocMgt.SetWriteInAuditRoll(true);
 
         if JSON.GetBooleanParameter('SetShowCreationMessage', true) then
           RetailSalesDocMgt.SetShowCreationMessage();
 
         POSSaleLine.CalculateBalance(AmountExclVAT, VATAmount, AmountInclVAT);
-        if AmountInclVAT >= 0 then
-          DocumentType := JSON.GetIntegerParameter('SetDocumentType', true)
-        else
-          DocumentType := JSON.GetIntegerParameter('SetNegBalDocumentType', true);
+        //-NPR5.51 [361811]
+        // IF AmountInclVAT >= 0 THEN
+        //  DocumentType := JSON.GetIntegerParameter('SetDocumentType', TRUE)
+        // ELSE
+        //  DocumentType := JSON.GetIntegerParameter('SetNegBalDocumentType', TRUE);
 
-        case DocumentType of
-          DocumentType::Order :
-              RetailSalesDocMgt.SetDocumentTypeOrder();
-          DocumentType::Invoice :
-              RetailSalesDocMgt.SetDocumentTypeInvoice();
-          DocumentType::CreditMemo :
-              RetailSalesDocMgt.SetDocumentTypeCreditMemo();
-          DocumentType::ReturnOrder :
-              RetailSalesDocMgt.SetDocumentTypeReturnOrder();
-          DocumentType::Quote :
-              RetailSalesDocMgt.SetDocumentTypeQuote();
-          else
-            Error(ERRDOCTYPE, Format(DocumentType), Format(DocumentType::Order), Format(DocumentType::Invoice), Format(DocumentType::CreditMemo), Format(DocumentType::ReturnOrder), Format(DocumentType::Quote) );
-        end;
+        // CASE DocumentType OF
+        //  DocumentType::Order :
+        //      RetailSalesDocMgt.SetDocumentTypeOrder();
+        //  DocumentType::Invoice :
+        //      RetailSalesDocMgt.SetDocumentTypeInvoice();
+        //  DocumentType::CreditMemo :
+        //      RetailSalesDocMgt.SetDocumentTypeCreditMemo();
+        //  DocumentType::ReturnOrder :
+        //      RetailSalesDocMgt.SetDocumentTypeReturnOrder();
+        //  DocumentType::Quote :
+        //      RetailSalesDocMgt.SetDocumentTypeQuote();
+        //  ELSE
+        //    ERROR(ERRDOCTYPE, FORMAT(DocumentType), FORMAT(DocumentType::Order), FORMAT(DocumentType::Invoice), FORMAT(DocumentType::CreditMemo), FORMAT(DocumentType::ReturnOrder), FORMAT(DocumentType::Quote) );
+        // END;
+
+        DocumentTypePozitive := JSON.GetIntegerParameter('SetDocumentType',true);
+        DocumentTypeNegative := JSON.GetIntegerParameter('SetNegBalDocumentType',true);
+
+        if AmountInclVAT >= 0 then
+          case DocumentTypePozitive of
+            DocumentTypePozitive::Order :
+                RetailSalesDocMgt.SetDocumentTypeOrder();
+            DocumentTypePozitive::Invoice :
+                RetailSalesDocMgt.SetDocumentTypeInvoice();
+            DocumentTypePozitive::Quote :
+                RetailSalesDocMgt.SetDocumentTypeQuote();
+            DocumentTypePozitive::Restrict:
+              Error(WrongPozitiveSignErr,DocumentTypeNegative);
+          end
+        else
+          case DocumentTypeNegative of
+            DocumentTypeNegative::CreditMemo :
+                RetailSalesDocMgt.SetDocumentTypeCreditMemo();
+            DocumentTypeNegative::ReturnOrder :
+                RetailSalesDocMgt.SetDocumentTypeReturnOrder();
+            DocumentTypeNegative::Restrict:
+              Error(WrongNegativeSignErr,DocumentTypePozitive);
+          end;
+        //+NPR5.51 [361811]
     end;
 
     local procedure GetPrepaymentPct(var JSON: Codeunit "POS JSON Management"): Decimal
@@ -322,7 +370,10 @@ codeunit 6150859 "POS Action - Doc. Export"
           SalePOS.Modify(true);
           POSSale.RefreshCurrent();
 
-          RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentPct, PrintPrepaymentInvoice, true);
+          //-NPR5.51
+          // RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentPct, PrintPrepaymentInvoice, TRUE);
+          RetailSalesDocMgt.CreatePrepaymentLine(POSSession,SalesHeader,PrepaymentPct,PrintPrepaymentInvoice,true,false);
+          //+NPR5.51
 
           POSSession.RequestRefreshData();
           Commit;
@@ -458,6 +509,9 @@ codeunit 6150859 "POS Action - Doc. Export"
           'OpenDocumentAfterExport' : Caption := CaptionOpenDoc;
           'PayAndPostInNextSale' : Caption := CaptionPayAndPostNext;
           'PrintPayAndPostInvoice' : Caption := CaptionPrintPayAndPost;
+        //-NPR5.51 [357277]
+          'SaveLinesOnPOSEntry' : Caption := CaptionSaveLinesOnPOSEntry;
+        //+NPR5.51 [357277]
         end;
     end;
 
@@ -494,6 +548,9 @@ codeunit 6150859 "POS Action - Doc. Export"
           'OpenDocumentAfterExport' : Caption := DescOpenDoc;
           'PayAndPostInNextSale' : Caption := DescPayAndPostNext;
           'PrintPayAndPostInvoice' : Caption := DescPrintPayAndPost;
+        //-NPR5.51 [357277]
+          'SaveLinesOnPOSEntry' : Caption := DescSaveLinesOnPOSEntry;
+        //+NPR5.51 [357277]
         end;
     end;
 
@@ -504,8 +561,12 @@ codeunit 6150859 "POS Action - Doc. Export"
           exit;
 
         case POSParameterValue.Name of
-          'SetDocumentType' : Caption := OptionDocType;
-          'SetNegBalDocumentType' : Caption := OptionDocType;
+          //-NPR5.51 [361811]
+          // 'SetDocumentType' : Caption := OptionDocType;
+          // 'SetNegBalDocumentType' : Caption := OptionDocType;
+          'SetDocumentType' : Caption := OptionDocTypePozitive;
+          'SetNegBalDocumentType' : Caption := OptionDocTypeNegative;
+          //+NPR5.51 [361811]
         end;
     end;
 }

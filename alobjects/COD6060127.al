@@ -106,6 +106,10 @@ codeunit 6060127 "MM Membership Management"
     // MM1.36/TSA /20181204 CASE 338771 Renew compares wrong date when having dateformula as start options
     // MM1.37/TSA /20181219 CASE 319900 ReasonMessage not declared as VAR in IssueMemberCardWorker()
     // MM1.39/TSA /20190527 CASE 350968 Change datatype on field Auto-Renew
+    // MM1.40/TSA /20190612 CASE 357360 Added function DeleteMember()
+    // MM1.40/TSA /20190731 CASE 361664 Changed Cancel function to work with defaults when performing a system cancel. Corrected invalid return status
+    // MM1.40/TSA /20190814 CASE 343352 Added function to get membership by customer number
+    // #360242/TSA /20190822 CASE 360242 Added NPR Attributes
 
 
     trigger OnRun()
@@ -388,6 +392,11 @@ codeunit 6060127 "MM Membership Management"
         ValidateMemberFields (Membership."Entry No.", Member, true, ErrorText);
 
         DuplicateMcsPersonIdReference (MembershipInfoCapture, Member, true);
+
+        //-#360242 [360242]
+        TransferInfoCaptureAttributes (MembershipInfoCapture."Entry No.", DATABASE::"MM Member",  Member."Entry No.");
+        //-#360242 [360242]
+
         OnAfterMemberCreateEvent (Membership, Member);
 
         if (MembershipSetup."Create Welcome Notification") then
@@ -395,6 +404,45 @@ codeunit 6060127 "MM Membership Management"
 
         MemberEntryNo := Member."Entry No.";
         exit (MemberEntryNo <> 0);
+    end;
+
+    procedure DeleteMember(MemberEntryNo: Integer;ForceMemberDelete: Boolean)
+    var
+        Member: Record "MM Member";
+        MembershipRole: Record "MM Membership Role";
+        MemberCard: Record "MM Member Card";
+        MemberNotificationEntry: Record "MM Member Notification Entry";
+        Contact: Record Contact;
+    begin
+
+        //-MM1.40 [357360]
+        if (not Member.Get (MemberEntryNo)) then
+          exit;
+
+        MembershipRole.SetCurrentKey ("Member Entry No.");
+        MembershipRole.SetFilter ("Member Entry No.", '=%1', MemberEntryNo);
+        if (MembershipRole.FindSet ()) then begin
+          repeat
+            if (Contact.Get (MembershipRole."Contact No.")) then begin
+              Contact."Magento Contact" := false;
+              Contact.Modify (true);
+            end;
+          until (MembershipRole.Next () = 0);
+        end;
+
+        MembershipRole.DeleteAll ();
+
+        if (MemberCard.SetCurrentKey ("Member Entry No.")) then ;
+        MemberCard.SetFilter ("Member Entry No.", '=%1', MemberEntryNo);
+        MemberCard.DeleteAll ();
+
+        if (MemberNotificationEntry.SetCurrentKey ("Member Entry No.")) then ;
+        MemberNotificationEntry.SetFilter ("Member Entry No.", '=%1', MemberEntryNo);
+        MemberNotificationEntry.DeleteAll ();
+
+        if (ForceMemberDelete) then
+          Member.Delete ();
+        //+MM1.40 [357360]
     end;
 
     procedure AddGuardianMember(MembershipEntryNo: Integer;GuardianExternalMemberNo: Code[20];GdprApproval: Option): Boolean
@@ -535,7 +583,15 @@ codeunit 6060127 "MM Membership Management"
           AddGuardianMember (MembershipEntryNo, MembershipInfoCapture."Guardian External Member No.", MembershipInfoCapture."GDPR Approval");
         //+MM1.26 [303154]
 
+        //-#360242 [360242]
+        TransferInfoCaptureAttributes (MembershipInfoCapture."Entry No.", DATABASE::"MM Member",  Member."Entry No.");
+        //-#360242 [360242]
+
         SynchronizeCustomerAndContact (MembershipEntryNo);
+
+        //-MM1.40 [361664]
+        exit (true);
+        //+MM1.40 [361664]
     end;
 
     procedure UpdateMemberImage(MemberEntryNo: Integer;Base64StringImage: Text) Success: Boolean
@@ -1235,6 +1291,7 @@ codeunit 6060127 "MM Membership Management"
         EndDateNew: Date;
         CancelledFraction: Decimal;
         NewFraction: Decimal;
+        HaveAlterationRule: Boolean;
     begin
 
         //-MM1.25 [299783] Refactoring the membership alteration function to be able to be verbose
@@ -1255,7 +1312,17 @@ codeunit 6060127 "MM Membership Management"
           exit (false);
         end;
 
-        MembershipAlterationSetup.Get (MembershipAlterationSetup."Alteration Type"::CANCEL, Membership."Membership Code", MemberInfoCapture."Item No.");
+        //-MM1.40 [361664]
+        //MembershipAlterationSetup.GET (MembershipAlterationSetup."Alteration Type"::CANCEL, Membership."Membership Code", MemberInfoCapture."Item No.");
+        if (WithUpdate) and (MemberInfoCapture."Item No." = '') then begin
+          MembershipAlterationSetup."Alteration Activate From" := MembershipAlterationSetup."Alteration Activate From"::ASAP;
+          MembershipAlterationSetup."Price Calculation" := MembershipAlterationSetup."Price Calculation"::TIME_DIFFERENCE;
+        end else begin
+          if (not MembershipAlterationSetup.Get (MembershipAlterationSetup."Alteration Type"::CANCEL, Membership."Membership Code", MemberInfoCapture."Item No.")) then
+            exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+        end;
+        //-MM1.40 [361664]
+
         if (not ValidAlterationGracePeriod (MembershipAlterationSetup, MembershipEntry, MemberInfoCapture."Document Date")) then begin
           ReasonText := StrSubstNo (GRACE_PERIOD, MembershipAlterationSetup."Alteration Type");
           exit (false);
@@ -2529,6 +2596,27 @@ codeunit 6060127 "MM Membership Management"
     begin
     end;
 
+    local procedure TransferInfoCaptureAttributes(MemberInfoCaptureEntryNo: Integer;DestinationTableID: Integer;DestinationEntryNo: Integer)
+    var
+        NPRAttributeID: Record "NPR Attribute ID";
+        NPRAttributeManagement: Codeunit "NPR Attribute Management";
+        TextArray40: array [40] of Text[250];
+        N: Integer;
+    begin
+
+        //-#360242 [360242]
+        if (DestinationEntryNo = 0) then
+          exit;
+
+        NPRAttributeManagement.GetEntryAttributeValue (TextArray40, DATABASE::"MM Member Info Capture", MemberInfoCaptureEntryNo);
+        for N := 1 to (ArrayLen (TextArray40)) do
+          if (TextArray40[N] <> '') then
+            if (NPRAttributeManagement.GetAttributeShortcut (DATABASE::"MM Member Info Capture", N, NPRAttributeID)) then
+              if (NPRAttributeID.Get (DestinationTableID, NPRAttributeID."Attribute Code")) then
+                NPRAttributeManagement.SetEntryAttributeValue (DestinationTableID, NPRAttributeID."Shortcut Attribute ID", DestinationEntryNo, TextArray40[N])
+        //+#360242 [360242]
+    end;
+
     local procedure DuplicateMcsPersonIdReference(MemberInfoCapture: Record "MM Member Info Capture";Member: Record "MM Member";DeleteSourceRecord: Boolean): Boolean
     var
         RecRefCapture: RecordRef;
@@ -3083,6 +3171,10 @@ codeunit 6060127 "MM Membership Management"
           end;
         end;
 
+        //-#360242 [360242]
+        TransferInfoCaptureAttributes (MemberInfoCapture."Entry No.", DATABASE::"MM Membership", Membership."Entry No.");
+        //-#360242 [360242]
+
         //-MM1.22 [286922]
         if (MembershipCreated) then
           OnAfterMembershipCreateEvent (Membership);
@@ -3240,7 +3332,6 @@ codeunit 6060127 "MM Membership Management"
               MembershipRole.Modify ();
             end;
             //+MM1.33 [324065]
-
 
             UpdateContactFromMember (MembershipEntryNo, Member);
           end;
@@ -4376,6 +4467,22 @@ codeunit 6060127 "MM Membership Management"
           exit (0);
 
         exit (Membership."Entry No.");
+    end;
+
+    procedure GetMembershipFromCustomerNo(CustomerNo: Code[20]) MembershipEntryNo: Integer
+    var
+        Membership: Record "MM Membership";
+    begin
+
+        //-MM1.40 [343352]
+        Membership.SetCurrentKey ("Customer No.");
+        Membership.SetFilter ("Customer No.", '=%1', CustomerNo);
+        Membership.SetFilter (Blocked, '=%1', false);
+        if (not Membership.FindFirst ()) then
+          exit (0);
+
+        exit (Membership."Entry No.");
+        //+MM1.40 [343352]
     end;
 
     procedure GetMemberFromExtMemberNo(ExternalMemberNo: Code[20]) MemberEntryNo: Integer

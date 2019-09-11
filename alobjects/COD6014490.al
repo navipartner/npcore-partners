@@ -14,6 +14,8 @@ codeunit 6014490 "Pakkelabels.dk Mgnt"
     // NPR5.43/BHR /20180612  CASE 314692 Agreement option
     // NPR5.45/BHR /20180817  CASE 318441 Move code for delivery_instruction
     // NPR5.45/BHR /20180830  CASE 326205 Skip Entries that are not for Pakkelabels
+    // NPR5.51/MHA /20190704  CASE 360780 Wrapped C80OnAfterPostSalesDoc() with ASSERTERROR to avoid hard errors
+    // NPR5.51/BHR /20190919  CASE 362106 Update correct sales order with Correspondin foreign shipment details
 
 
     trigger OnRun()
@@ -857,20 +859,30 @@ codeunit 6014490 "Pakkelabels.dk Mgnt"
         SalesSetup: Record "Sales & Receivables Setup";
         ShipmentDocument: Record "Pacsoft Shipment Document";
         RecRefShipment: RecordRef;
+        LastErrorText: Text;
     begin
         if not InitPackageProvider then
           exit;
-        if SalesHeader.Ship then
-          if (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) or
-              ((SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) and SalesSetup."Shipment on Invoice") then
-            if SalesShptHeader.Get(SalesShptHdrNo) then begin
-                RecRefShipment.GetTable(SalesShptHeader);
-                AddEntry(RecRefShipment,false,true);
-                //-NPR5.34 [283061]
-                if ErrorTextFound <> '' then
-                  Message(Err0001,ErrorTextFound);
-                //+NPR5.34 [283061]
+        //-NPR5.51 [360780]
+        asserterror begin
+          if SalesHeader.Ship then
+            if (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) or
+                ((SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) and SalesSetup."Shipment on Invoice") then
+              if SalesShptHeader.Get(SalesShptHdrNo) then begin
+                  RecRefShipment.GetTable(SalesShptHeader);
+                  AddEntry(RecRefShipment,false,true);
+                  //-NPR5.34 [283061]
+                  if ErrorTextFound <> '' then
+                    Message(Err0001,ErrorTextFound);
+                  //+NPR5.34 [283061]
+          end;
+          Commit;
+          Error('');
         end;
+        LastErrorText := GetLastErrorText;
+        if LastErrorText <> '' then
+          Message(LastErrorText);
+        //+NPR5.51 [360780]
     end;
 
     local procedure InitPackageProvider(): Boolean
@@ -1385,6 +1397,29 @@ codeunit 6014490 "Pakkelabels.dk Mgnt"
         //-NPR5.36 [290780]
         GetBalance(false);
         //-NPR5.36 [290780]
+    end;
+
+    [EventSubscriber(ObjectType::Table, 36, 'OnAfterModifyEvent', '', true, true)]
+    local procedure T36OnAfterModifyEvent(var Rec: Record "Sales Header";var xRec: Record "Sales Header";RunTrigger: Boolean)
+    var
+        ForeignShipmentMapping: Record "Pakke Foreign Shipment Mapping";
+    begin
+        //-NPR5.51 [362106]
+        if not RunTrigger then
+          exit;
+        if not InitPackageProvider then
+          exit;
+        if (Rec."Shipment Method Code" = '') or (Rec."Shipping Agent Code" = '') then
+          exit;
+        ForeignShipmentMapping.SetRange("Shipment Method Code",Rec."Shipment Method Code");
+        ForeignShipmentMapping.SetRange("Base Shipping Agent Code",Rec."Shipping Agent Code");
+        ForeignShipmentMapping.SetRange("Country/Region Code",Rec."Ship-to Country/Region Code");
+        if ForeignShipmentMapping.FindFirst then begin
+          Rec."Shipping Agent Code" := ForeignShipmentMapping."Shipping Agent Code";
+          Rec."Shipping Agent Service Code" := ForeignShipmentMapping."Shipping Agent Service Code";
+          Rec.Modify(true);
+        end;
+        //+NPR5.51 [362106]
     end;
 }
 

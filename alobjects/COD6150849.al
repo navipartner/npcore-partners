@@ -16,6 +16,7 @@ codeunit 6150849 "POS Action - End-of-Day V3"
     // NPR5.48/MHA /20181115 CASE 334633 Replaced reference to function CheckSavedSales() with CleanupPOSQuotes() in ValidateRequirements()
     // NPR5.48/TSA /20181127 CASE 336921 Changed POS Unit Status Management, cleaned up code
     // NPR5.49/TSA /20190311 CASE 348458 Added CloseWorkshift function, cleaned commented code
+    // NPR5.51/TSA /20190622 CASE 359508 Adding support posting GL after balancing
     // 
     // TODO Units and Bins must get correct status
 
@@ -162,6 +163,9 @@ codeunit 6150849 "POS Action - End-of-Day V3"
                     if (FinalEndOfDay (Register."Register No.", SalePOS."Dimension Set ID")) then begin
                       ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry (Register."Register No.", SalespersonPurchaser.Code);
                       POSManagePOSUnit.ClosePOSUnitNo (POSUnit."No.", ClosingEntryNo);
+                      //-NPR5.51 [359508]
+                      CheckAndPostAfterBalancing  (ClosingEntryNo);
+                      //+NPR5.51 [359508]
                     end else begin
                       POSManagePOSUnit.ReOpenLastPeriodRegister (POSUnit."No.");
                     end;
@@ -173,6 +177,11 @@ codeunit 6150849 "POS Action - End-of-Day V3"
                     CloseWorkshift (Register."Register No.", SalePOS."Dimension Set ID");
                     ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry (Register."Register No.", SalespersonPurchaser.Code);
                     POSManagePOSUnit.ClosePOSUnitNo (POSUnit."No.", ClosingEntryNo);
+
+                    //-NPR5.51 [359508]
+                    CheckAndPostAfterBalancing  (ClosingEntryNo);
+                    //+NPR5.51 [359508]
+
                   end;
                 //+NPR5.49 [348458]
 
@@ -237,7 +246,7 @@ codeunit 6150849 "POS Action - End-of-Day V3"
         //-NPR5.48 [334633]
         // IF (NOT RetailFormCode.CheckSavedSales (SalePOS)) THEN
         //  ERROR ('');
-        if not POSQuoteMgt.CleanupPOSQuotes(SalePOS) then
+        if not POSQuoteMgt.CleanupPOSQuotesBeforeBalancing(SalePOS) then
           Error('');
         //+NPR5.48 [334633]
 
@@ -434,6 +443,189 @@ codeunit 6150849 "POS Action - End-of-Day V3"
     [IntegrationEvent(false, false)]
     local procedure OnBeforeBalancing(SalePOS: Record "Sale POS";Register: Record Register)
     begin
+    end;
+
+    procedure CheckAndPostAfterBalancing(POSEntryno: Integer)
+    var
+        POSPeriodRegister: Record "POS Period Register";
+        POSPeriodRegisterPostingFilter: Record "POS Period Register";
+        POSEntry: Record "POS Entry";
+    begin
+
+        //-NPR5.51 [359508]
+        if (not POSEntry.Get (POSEntryno)) then
+          exit;
+
+        if (not POSPeriodRegister.Get (POSEntry."POS Period Register No.")) then
+          exit;
+
+        ItemPosting (POSPeriodRegister);
+        POSPosting (POSPeriodRegister);
+        //+NPR5.51 [359508]
+    end;
+
+    local procedure POSPosting(POSPeriodRegister: Record "POS Period Register")
+    var
+        POSPeriodRegisterPostingFilter: Record "POS Period Register";
+        NPRetailSetup: Record "NP Retail Setup";
+    begin
+
+        //-NPR5.51 [359508]
+        if (not NPRetailSetup.Get ()) then
+          exit;
+
+        with NPRetailSetup do
+          case ("Automatic POS Posting") of
+            "Automatic POS Posting"::No : exit;
+            "Automatic POS Posting"::AfterSale : exit;
+            "Automatic POS Posting"::AfterEndOfDay :  POSPeriodRegisterPostingFilter.SetFilter ("POS Unit No.", '=%1', POSPeriodRegister."POS Unit No.");
+            "Automatic POS Posting"::AfterLastEndofDayStore :
+              begin
+                POSPeriodRegisterPostingFilter.SetFilter ("POS Store Code", '=%1', POSPeriodRegister."POS Store Code");
+                POSPeriodRegisterPostingFilter.SetFilter (Status, '<>%1', POSPeriodRegisterPostingFilter.Status::CLOSED);
+                if (POSPeriodRegisterPostingFilter.FindFirst ()) then begin
+                  Message ('All periods are not closed for %1 %2 - POS Entries have not been posted.', POSPeriodRegister.FieldCaption ("POS Store Code"), POSPeriodRegister."POS Store Code");
+                  exit;
+                end;
+                POSPeriodRegisterPostingFilter.Reset ();
+                POSPeriodRegisterPostingFilter.SetFilter ("POS Store Code", '=%1', POSPeriodRegister."POS Store Code");
+              end;
+            "Automatic POS Posting"::AfterLastEndofDayCompany :
+              begin
+                POSPeriodRegisterPostingFilter.SetFilter (Status, '<>%1', POSPeriodRegisterPostingFilter.Status::CLOSED);
+                if (POSPeriodRegisterPostingFilter.FindFirst ()) then begin
+                  Message ('All periods are not closed - POS Entries have not been posted.');
+                  exit;
+                end;
+                POSPeriodRegisterPostingFilter.Reset ();
+                POSPeriodRegisterPostingFilter.SetFilter ("POS Store Code", '=%1', POSPeriodRegister."POS Store Code");
+              end;
+            else begin
+              Message ('The settting %1 is not yet supported.', NPRetailSetup."Automatic POS Posting");
+              exit;
+            end;
+          end;
+
+        PostPeriodEntries (POSPeriodRegisterPostingFilter, true, false);
+        //+NPR5.51 [359508]
+    end;
+
+    local procedure ItemPosting(POSPeriodRegister: Record "POS Period Register")
+    var
+        POSPeriodRegisterPostingFilter: Record "POS Period Register";
+        NPRetailSetup: Record "NP Retail Setup";
+        POSUnit: Record "POS Unit";
+    begin
+
+        //-NPR5.51 [359508]
+        if (not NPRetailSetup.Get ()) then
+          exit;
+
+        with NPRetailSetup do
+          case ("Automatic Item Posting") of
+            "Automatic Item Posting"::No : exit;
+            "Automatic Item Posting"::AfterSale : exit;
+            "Automatic Item Posting"::AfterEndOfDay :
+              begin
+                POSPeriodRegisterPostingFilter.SetFilter ("POS Unit No.", '=%1', POSPeriodRegister."POS Unit No.");
+              end;
+            "Automatic Item Posting"::AfterLastEndofDayStore :
+              begin
+                POSPeriodRegisterPostingFilter.SetFilter ("POS Store Code", '=%1', POSPeriodRegister."POS Store Code");
+                POSPeriodRegisterPostingFilter.SetFilter (Status, '<>%1', POSPeriodRegisterPostingFilter.Status::CLOSED);
+                if (POSPeriodRegisterPostingFilter.FindFirst ()) then begin
+                  Message ('All periods are not closed for %1 %2 - Item Entries have not been posted.', POSPeriodRegister.FieldCaption ("POS Store Code"), POSPeriodRegister."POS Store Code");
+                  exit;
+                end;
+                POSPeriodRegisterPostingFilter.Reset ();
+                POSPeriodRegisterPostingFilter.SetFilter ("POS Store Code", '=%1', POSPeriodRegister."POS Store Code");
+              end;
+            "Automatic Item Posting"::AfterLastEndofDayCompany :
+              begin
+                POSPeriodRegisterPostingFilter.SetFilter (Status, '<>%1', POSPeriodRegisterPostingFilter.Status::CLOSED);
+                if (POSPeriodRegisterPostingFilter.FindFirst ()) then begin
+                  Message ('All periods are not closed - Item Entries have not been posted.');
+                  exit;
+                end;
+                POSPeriodRegisterPostingFilter.Reset ();
+                POSPeriodRegisterPostingFilter.SetFilter ("POS Store Code", '=%1', POSPeriodRegister."POS Store Code");
+              end;
+            else begin
+              Message ('The settting %1 %2 is not yet supported.', FieldCaption ("Automatic Item Posting"), "Automatic Item Posting");
+              exit;
+            end;
+          end;
+
+        PostPeriodEntries (POSPeriodRegisterPostingFilter, false, true);
+        //+NPR5.51 [359508]
+    end;
+
+    local procedure PostPeriodEntries(var POSPeriodRegisterPostingFilter: Record "POS Period Register";pPostPOSEntries: Boolean;pPostItemEntries: Boolean)
+    var
+        POSEntry: Record "POS Entry";
+        HaveUnpostedEntries: Boolean;
+        PostingError: Boolean;
+    begin
+
+        //-NPR5.51 [359508]
+        POSPeriodRegisterPostingFilter.SetFilter ("Opened Date", '%1..', CreateDateTime (CalcDate ('<-7D>', Today), 0T));
+        POSPeriodRegisterPostingFilter.Ascending (false);
+        if (POSPeriodRegisterPostingFilter.FindSet ()) then begin
+          repeat
+            POSEntry.SetFilter ("POS Period Register No.", '=%1', POSPeriodRegisterPostingFilter."No.");
+
+            if (pPostPOSEntries) then
+              POSEntry.SetFilter ("Post Entry Status", '<2');
+
+            if (pPostItemEntries) then
+              POSEntry.SetFilter ("Post Item Entry Status", '<2');
+
+            HaveUnpostedEntries :=  not POSEntry.IsEmpty ();
+            PostingError := false;
+
+            if (HaveUnpostedEntries) then begin
+              PostPeriodEntriesWorker (POSPeriodRegisterPostingFilter."No.", pPostPOSEntries , pPostItemEntries);
+              PostingError := not POSEntry.IsEmpty ();
+            end;
+
+            if (PostingError) then
+              Error ('There was an error during posting of entries for POS Period Register %1.\\%2', POSPeriodRegisterPostingFilter."No.", GetLastErrorText);
+
+          until ((POSPeriodRegisterPostingFilter.Next() = 0) or (PostingError));
+        end;
+        //+NPR5.51 [359508]
+    end;
+
+    local procedure PostPeriodEntriesWorker(PosPeriodEntryNo: Integer;pPostPOSEntries: Boolean;pPostItemEntries: Boolean)
+    var
+        POSPeriodRegister: Record "POS Period Register";
+        POSPostEntries: Codeunit "POS Post Entries";
+        POSEntry: Record "POS Entry";
+    begin
+
+        //-NPR5.51 [359508]
+        if (not POSPeriodRegister.Get (PosPeriodEntryNo)) then
+          exit;
+
+        if (POSPeriodRegister.Status <> POSPeriodRegister.Status::CLOSED) then
+          exit;
+
+        if (POSPeriodRegister."End of Day Date" <> 0DT) then
+          if (POSPeriodRegister."Posting Compression" = POSPeriodRegister."Posting Compression"::"Per POS Period") then
+            POSPostEntries.SetPostingDate (true, false, DT2Date (POSPeriodRegister."End of Day Date"));
+
+        POSPostEntries.SetPostCompressed (true);
+        POSPostEntries.SetPostPOSEntries (pPostPOSEntries);
+        POSPostEntries.SetPostItemEntries (pPostItemEntries);
+
+        POSEntry.SetFilter ("POS Period Register No.", '=%1', POSPeriodRegister."No.");
+
+        if (not POSEntry.IsEmpty ()) then begin
+          Commit;
+          POSPostEntries.Run (POSEntry);
+          Commit;
+        end;
+        //+NPR5.51 [359508]
     end;
 }
 

@@ -1,26 +1,20 @@
 table 6060009 "GIM - Supported Data Format"
 {
+    // NPR5.51/MHA /20190819  CASE 365377 Generic Import Module is deprecated [VLOBJDEL] Object marked for deletion
+
     Caption = 'GIM - Supported Data Format';
 
     fields
     {
-        field(1;Extension;Code[10])
+        field(1;"Entry No.";Integer)
         {
-            Caption = 'Extension';
-        }
-        field(10;Description;Text[30])
-        {
-            Caption = 'Description';
-        }
-        field(20;"Value Lookup Editable";Boolean)
-        {
-            Caption = 'Value Lookup Editable';
+            Caption = 'Entry No.';
         }
     }
 
     keys
     {
-        key(Key1;Extension)
+        key(Key1;"Entry No.")
         {
         }
     }

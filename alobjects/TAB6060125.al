@@ -9,6 +9,8 @@ table 6060125 "MM Membership Sales Setup"
     // MM1.22/TSA /20170829 CASE 286922 Added field Auto-Renew To
     // MM1.29.02/TSA /20180530 CASE 316450 Added field Auto-Admitt Member On Sale
     // MM1.32/TSA /20180711 CASE 318132 Added Member Card Type and Member Card Type Selection
+    // MM1.40/TSA /20190726 CASE 356090 New field "Magento M2 Membership Sign-up"
+    // MM1.40/TSA /20190730 CASE 360275 Corrected spelling on field and caption for field 80
 
     Caption = 'Membership Sales Setup';
     DrillDownPageID = "MM Membership Sales Setup";
@@ -88,9 +90,9 @@ table 6060125 "MM Membership Sales Setup"
             Caption = 'Auto-Renew To';
             TableRelation = "MM Membership Alteration Setup"."Sales Item No." WHERE ("Alteration Type"=CONST(AUTORENEW));
         }
-        field(80;"Auto-Admitt Member On Sale";Option)
+        field(80;"Auto-Admit Member On Sale";Option)
         {
-            Caption = 'Auto-Admitt Member On Sale';
+            Caption = 'Auto-Admit Member On Sale';
             OptionCaption = 'No,Yes,Ask';
             OptionMembers = NO,YES,ASK;
         }
@@ -105,6 +107,10 @@ table 6060125 "MM Membership Sales Setup"
             Caption = 'Member Card Type';
             OptionCaption = 'Physical Card,Wallet,Card+Wallet,None';
             OptionMembers = CARD,PASSSERVER,CARD_PASSSERVER,"NONE";
+        }
+        field(100;"Magento M2 Membership Sign-up";Boolean)
+        {
+            Caption = 'Magento M2 Membership Sign-up';
         }
     }
 

@@ -2,6 +2,7 @@ table 6151591 "NpDc Coupon"
 {
     // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
     // NPR5.37/MHA /20171023  CASE 293232 Renamed field 43 "Posting No." to "Arch. No."
+    // NPR5.51/MHA /20190724 CASE 343352 Added field 85 "In-use Quantity (External)" and function CalcInUseQty()
 
     Caption = 'Coupon';
     DataCaptionFields = "No.","Coupon Type",Description;
@@ -124,6 +125,14 @@ table 6151591 "NpDc Coupon"
             Editable = false;
             FieldClass = FlowField;
         }
+        field(85;"In-use Quantity (External)";Integer)
+        {
+            CalcFormula = Count("NpDc Ext. Coupon Reservation" WHERE ("Coupon No."=FIELD("No.")));
+            Caption = 'In-use Quantity (External)';
+            Description = 'NPR5.51';
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(100;"Issue Coupon Module";Code[20])
         {
             CalcFormula = Lookup("NpDc Coupon Type"."Issue Coupon Module" WHERE (Code=FIELD("Coupon Type")));
@@ -170,9 +179,21 @@ table 6151591 "NpDc Coupon"
     trigger OnDelete()
     var
         CouponEntry: Record "NpDc Coupon Entry";
+        SaleLinePOSCoupon: Record "NpDc Sale Line POS Coupon";
+        NpDcExtCouponSalesLine: Record "NpDc Ext. Coupon Reservation";
     begin
         CouponEntry.SetRange("Coupon No.","No.");
         CouponEntry.DeleteAll;
+
+        //-NPR5.51 [343352]
+        SaleLinePOSCoupon.SetRange("Coupon No.","No.");
+        if SaleLinePOSCoupon.FindFirst then
+          SaleLinePOSCoupon.DeleteAll;
+
+        NpDcExtCouponSalesLine.SetRange("Coupon No.","No.");
+        if NpDcExtCouponSalesLine.FindFirst then
+          NpDcExtCouponSalesLine.DeleteAll;
+        //+NPR5.51 [343352]
     end;
 
     trigger OnInsert()
@@ -218,6 +239,14 @@ table 6151591 "NpDc Coupon"
         Coupon.SetRange("Reference No.","Reference No.");
         if Coupon.FindFirst then
           Error(Text000,"Reference No.");
+    end;
+
+    procedure CalcInUseQty() InUseQty: Integer
+    begin
+        //-NPR5.51 [343352]
+        CalcFields("In-use Quantity","In-use Quantity (External)");
+        exit("In-use Quantity" + "In-use Quantity (External)");
+        //+NPR5.51 [343352]
     end;
 }
 

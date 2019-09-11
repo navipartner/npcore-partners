@@ -67,7 +67,7 @@ codeunit 6014417 "Call Terminal Integration"
         RetailSetup.Get;
         
         if Betalingsvalg."Dev Term" then begin
-          "Cash Terminal Approved" := true;
+          "EFT Approved" := true;
           Description := 'Dev Term';
           exit;
         end;
@@ -117,7 +117,7 @@ codeunit 6014417 "Call Terminal Integration"
               Filter := Dankorttransaktion.Text;
               MaskedCardNo := Dankorttransaktion.Text;
               Len := StrLen(Filter);
-              while (Len > 0) and not ("Cash Terminal Approved") do begin
+              while (Len > 0) and not ("EFT Approved") do begin
                 PaymentTypePrefix.SetRange( Prefix, Filter );
                 if PaymentTypePrefix.Find('-') then repeat
                   Betalingsvalg.Reset;
@@ -134,25 +134,25 @@ codeunit 6014417 "Call Terminal Integration"
         
                   if Betalingsvalg.FindFirst then begin
                     if (Betalingsvalg."Location Code" = Register."Location Code") or
-                       not ("Cash Terminal Approved")
+                       not ("EFT Approved")
                     then begin
                       "No."                    := Betalingsvalg."No.";
                       Description              := Betalingsvalg.Description;
                       Quantity                 := 0;
-                      "Cash Terminal Approved" := true;
+                      "EFT Approved" := true;
                     end;
                   end;
                 until PaymentTypePrefix.Next = 0;
                 Len := Len - 1;
                 Filter := CopyStr(Filter,1,Len);
               end;
-              if (not "Cash Terminal Approved") then begin
+              if (not "EFT Approved") then begin
                 Description := StrSubstNo('%1/%2',Description,Dankorttransaktion.Text);
-                "Cash Terminal Approved" := true;
+                "EFT Approved" := true;
               end;
         
             end else
-              "Cash Terminal Approved" := false;
+              "EFT Approved" := false;
         
             Modify;
             Commit;
@@ -171,7 +171,7 @@ codeunit 6014417 "Call Terminal Integration"
         //      DkTrans.PrintTerminalReceipt(FALSE);
         //+NPR5.46 [290734]
         
-            if "Cash Terminal Approved" then
+            if "EFT Approved" then
               if TaxFreeUnit.Get("Register No.") then
                 if TaxFreeUnit."Check POS Terminal IIN" then
         //-NPR5.40 [293106]
@@ -258,9 +258,9 @@ codeunit 6014417 "Call Terminal Integration"
               PepperProtocol.SetBarcode(Barcode);
             Commit;
             PepperProtocol.SetTransaction(0);
-            "Cash Terminal Approved" := PepperProtocol.SendTransaction;
+            "EFT Approved" := PepperProtocol.SendTransaction;
             //-NPR5.28 [259563]
-            if (not "Cash Terminal Approved") then begin
+            if (not "EFT Approved") then begin
               if PepperProtocol.GetRetrytransaction then begin
                 PepperProtocol.SetTerminalToUnknown;
                 PepperProtocol.InitializeProtocol;
@@ -279,13 +279,13 @@ codeunit 6014417 "Call Terminal Integration"
                   PepperProtocol.SetBarcode(Barcode);
                 Commit;
                 PepperProtocol.SetTransaction(0);
-                "Cash Terminal Approved" := PepperProtocol.SendTransaction;
+                "EFT Approved" := PepperProtocol.SendTransaction;
               end;
             end;
             //+NPR5.28 [259563]
             Validate("Amount Including VAT",PepperProtocol.GetCapturedAmount);
             Validate("Currency Amount","Amount Including VAT");
-            if "Cash Terminal Approved" then begin
+            if "EFT Approved" then begin
               Clear(Betalingsvalg);
               if PepperProtocol.GetPaymentTypePOS <> '' then begin
                 if Betalingsvalg.Get(PepperProtocol.GetPaymentTypePOS,Register."Register No.") then begin
@@ -351,7 +351,7 @@ codeunit 6014417 "Call Terminal Integration"
         //      DkTrans.PrintTerminalReceipt(FALSE);
         //+NPR5.46 [290734]
         
-            if "Cash Terminal Approved" then
+            if "EFT Approved" then
               if TaxFreeUnit.Get("Register No.") then
                 if TaxFreeUnit."Check POS Terminal IIN" then
         //-NPR5.40 [293106]

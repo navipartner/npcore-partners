@@ -1,8 +1,8 @@
 page 6151198 "NpCs Workflow Card"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #362443/MHA /20190723  CASE 362443 Removed "Auto Post Order on" and added "Archive on Delivery"
-    // #364557/MHA /20190819  CASE 364557 Added fields 350 "Store Stock", 360 "Post on", 380 "Bill via"
+    // NPR5.51/MHA /20190723  CASE 362443 Removed "Auto Post Order on" and added "Archive on Delivery"
+    // NPR5.51/MHA /20190819  CASE 364557 Added fields 350 "Store Stock", 360 "Post on", 380 "Bill via"
 
     Caption = 'Collect Workflow Card';
     PageType = Card;

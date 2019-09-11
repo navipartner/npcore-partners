@@ -1,6 +1,7 @@
 table 6151168 "NpGp POS Sales Line"
 {
     // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
+    // NPR5.51/ALST/20190904  CASE 337539 added field "Global reference"
 
     Caption = 'Global Pos Sales Line';
     DrillDownPageID = "NpGp POS Sales Lines";
@@ -169,6 +170,11 @@ table 6151168 "NpGp POS Sales Line"
         field(460;"Amount Incl. VAT (LCY)";Decimal)
         {
             Caption = 'Amount Incl. VAT (LCY)';
+        }
+        field(465;"Global Reference";Code[50])
+        {
+            Caption = 'Global Reference Number';
+            Description = 'NPR5.51';
         }
     }
 

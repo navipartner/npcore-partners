@@ -6,6 +6,7 @@ report 6014615 "Sales Statistics Per Variety"
     // NPR5.29/TS  /20170119  CASE 261428 Correted Inventory Calculation
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj
     // NPR5.46/ZESO/20180919  CASE 327284 Added Totals for Sales(Qty), Cost of Goods(LCY),Sale(LCY) and average of columns Profit and Profit %. and Option to print the totals or not.
+    // NPR5.51/ANPA/20190607  CASE 356180 Corrected Inventory Calculation
     DefaultLayout = RDLC;
     RDLCLayout = './Sales Statistics Per Variety.rdlc';
 
@@ -331,25 +332,36 @@ report 6014615 "Sales Statistics Per Variety"
         //-NPR5.25
         //ItemInventory := TempItemLedgEntry.Quantity;
         //-NPR5.29
-         Location.SetFilter(Code,ItemLedgEntry."Location Code");
-         //Location.SETFILTER(Code,Item2.GETFILTER("Location Filter"));
-         Location.SetRange("Use As In-Transit",false);
-         if Location.FindSet then begin
-          repeat
-            if Item3.Get(Item2."No.") then;
-            Item3.CopyFilters(Item2);
-            Item3.SetFilter("Location Filter",Location.Code);
-            Item3.SetFilter("Variant Filter",ItemVariant.Code);
-            Item3.CalcFields(Inventory);
-            ItemInventory := Item3.Inventory;
-          until Location.Next = 0;
-         end;
+
+        //-NPR5.51 [356180]
+        if Item3.Get(Item2."No.") then;
+        Item3.CopyFilters(Item2);
+        Item3.SetFilter("Variant Filter",ItemVariant.Code);
+        Item3.CalcFields(Inventory);
+        ItemInventory :=  Item3.Inventory;
+
+        // Location.SETFILTER(Code,ItemLedgEntry."Location Code");
+        // //Location.SETFILTER(Code,Item2.GETFILTER("Location Filter"));
+        // Location.SETRANGE("Use As In-Transit",FALSE);
+        // IF Location.FINDSET THEN BEGIN
+        //  REPEAT
+        //    IF Item3.GET(Item2."No.") THEN;
+        //    Item3.COPYFILTERS(Item2);
+        //    Item3.SETFILTER("Location Filter",Location.Code);
+        //    Item3.SETFILTER("Variant Filter",ItemVariant.Code);
+        //    Item3.CALCFIELDS(Inventory);
+        //    ItemInventory :=  Item3.Inventory;
+        //  UNTIL Location.NEXT = 0;
+        // END;
+
+        //+NPR5.51 [356180]
         //+NPR5.29
         //+NPR5.25
         SalesQty := -TempItemLedgEntry."Invoiced Quantity";
         SalesAmount := TempItemLedgEntry."Sales Amount (Actual)";
         COGSAmount := TempItemLedgEntry."Cost Amount (Actual)" + TempItemLedgEntry."Cost Amount (Non-Invtbl.)";
         ItemProfit := SalesAmount + COGSAmount;
+
 
         if SalesAmount <> 0 then
           ItemProfitPct := Round(100 * ItemProfit / SalesAmount,0.1)

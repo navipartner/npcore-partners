@@ -18,6 +18,7 @@ table 6014510 "I-Comm"
     // NPR5.30/TJ  /20170202 CASE 264793 Removed unused fields
     // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
     // NPR5.47/TS  /20181022 CASE 307097 Removed field  4,7,11,24,74,75,83,85. Fields names are referenced in case
+    // NPR5.51/THRO/20190710 CASE 360944 Added option to send SMS file to Nc Endpoint
 
     Caption = 'I-Comm';
 
@@ -83,8 +84,13 @@ table 6014510 "I-Comm"
         {
             Caption = 'Sms type';
             Description = 'NAS1.1o: om der sendes ved hj�lp af mail(turbosms), dll(smsdriver) eller http(Eclub)';
-            OptionCaption = 'Mail,Dll,Eclub';
-            OptionMembers = Mail,Dll,Eclub;
+            OptionCaption = 'Mail,Dll,Eclub,Endpoint';
+            OptionMembers = Mail,Dll,Eclub,Endpoint;
+        }
+        field(57;"SMS Endpoint";Code[20])
+        {
+            Caption = 'SMS Endpoint';
+            TableRelation = "Nc Endpoint";
         }
         field(60;"Turnover - Email Addresses";Text[50])
         {

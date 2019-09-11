@@ -39,10 +39,10 @@ codeunit 6059945 "CashKeeper API"
         ProxyDialog.RunProtocolModal(CODEUNIT::"CashKeeper Proxy");
         //DEBUG: MESSAGE(FORMAT(CashKeeperProxy.GetStatus));
         if CashKeeperProxy.GetStatus = 1 then begin
-          SaleLinePOS."Cash Terminal Approved" := true;
+          SaleLinePOS."EFT Approved" := true;
           SaleLinePOS.Description := SaleLinePOS.Description + ' ' + Format(CashKeeperTransaction."Transaction No.");
         end else begin
-          SaleLinePOS."Cash Terminal Approved" := false;
+          SaleLinePOS."EFT Approved" := false;
           SaleLinePOS."Amount Including VAT" := 0;
         end;
         SaleLinePOS.Modify;

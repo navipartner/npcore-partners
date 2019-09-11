@@ -1,23 +1,24 @@
 page 6060042 "Item Worksheet Page"
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-    // NPR4.19\BR\20160216  CASE 182391 Added Export to Excel Action, added field Tariff No.,Changed Functions Caption, added NPR Attribute support
-    // NPR5.22\BR\20160316  CASE 182391 added fields 500,510,520
-    // NPR5.22\BR\20160321  CASE 182391 Added support for mapping an Excel file
-    // NPR5.22\BR\20160323  CASE 182391 Added field Recommended Retail Price, Actions Set Sales Price to RRP
-    // NPR5.22\BR\20160420  CASE 182391 Added more actions for all lines in Worksheet
-    // NPR5.23\BR\20160525  CASE 242498 Added field Net Weight and Gross Weight
-    // NPR5.25\BR \20160708 CASE 246088 Added fields No. of Changes and No. of Warnings
-    // NPR5.25\BR \20160708 CASE 246088 Added Action Field Setup
-    // NPR5.25\BR \20160803 CASE 234602 Added Action Request Extra Item Information
-    // NPR5.31\JLK \20170331  CASE 268274 Changed ENU Caption
-    // NPR5.32\BR  \20170504  CASE 274473 Added function OpenFilteredView
-    // NPR5.33/ANEN/20170427 CASE 273989 Extending to 40 attributes
-    // NPR5.37/BR  /20170910 CASE 268786 Added Action Vendor Variety Mapping
-    // NPR5.38\BR  \20171124  CASE 297587 Added fields Sales Price Start Date and Purchase Price Start Date
-    // NPR5.41/JKL /20180424 CASE 310223  changed visibility parameter on client attributtte 1 to NPRAttrVisible01 + added field units pr. parcel
-    // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
-    // NPR5.50/THRO/20190526 CASE 356260 Removed FieldsVisible and ShowAllInfo variables - Let user deside which fields to see. Field hidden by the variables set to visible=false
+    // NPR4.18/BR  /20160209  CASE 182391 Object Created
+    // NPR4.19/BR  /20160216  CASE 182391 Added Export to Excel Action, added field Tariff No.,Changed Functions Caption, added NPR Attribute support
+    // NPR5.22/BR  /20160316  CASE 182391 added fields 500,510,520
+    // NPR5.22/BR  /20160321  CASE 182391 Added support for mapping an Excel file
+    // NPR5.22/BR  /20160323  CASE 182391 Added field Recommended Retail Price, Actions Set Sales Price to RRP
+    // NPR5.22/BR  /20160420  CASE 182391 Added more actions for all lines in Worksheet
+    // NPR5.23/BR  /20160525  CASE 242498 Added field Net Weight and Gross Weight
+    // NPR5.25/BR  /20160708  CASE 246088 Added fields No. of Changes and No. of Warnings
+    // NPR5.25/BR  /20160708  CASE 246088 Added Action Field Setup
+    // NPR5.25/BR  /20160803  CASE 234602 Added Action Request Extra Item Information
+    // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
+    // NPR5.32/BR  /20170504  CASE 274473 Added function OpenFilteredView
+    // NPR5.33/ANEN/20170427  CASE 273989 Extending to 40 attributes
+    // NPR5.37/BR  /20170910  CASE 268786 Added Action Vendor Variety Mapping
+    // NPR5.38/BR  /20171124  CASE 297587 Added fields Sales Price Start Date and Purchase Price Start Date
+    // NPR5.41/JKL /20180424  CASE 310223  changed visibility parameter on client attributtte 1 to NPRAttrVisible01 + added field units pr. parcel
+    // NPR5.48/TS  /20181206  CASE 338656 Added Missing Picture to Action
+    // NPR5.50/THRO/20190526  CASE 356260 Removed FieldsVisible and ShowAllInfo variables - Let user deside which fields to see. Field hidden by the variables set to visible=false
+    // NPR5.51/MHA /20190819  CASE 365377 Removed action "GIM import document"
 
     AutoSplitKey = true;
     Caption = 'Item Worksheet Page';
@@ -858,20 +859,6 @@ page 6060042 "Item Worksheet Page"
                         ItemWshtImpExpMgt.Export(Rec);
                     end;
                 }
-                action("GIM import document")
-                {
-                    Caption = 'GIM Import Document';
-                    Image = ImportChartOfAccounts;
-
-                    trigger OnAction()
-                    begin
-                        GetCurrentWorksheet;
-                        ItemWorksheet.TestField("GIM Import Document No.");
-                        GIMImportDocument.SetRange("No.",ItemWorksheet."GIM Import Document No.");
-                        GIMImportDocumentPage.SetTableView(GIMImportDocument);
-                        GIMImportDocumentPage.Run;
-                    end;
-                }
             }
         }
     }
@@ -967,8 +954,6 @@ page 6060042 "Item Worksheet Page"
         ShowExpanded: Option "Variety 1","Variety 1+2","Variety 1+2+3","Variety 1+2+3+4";
         SuggestItemWorksheetLines: Report "Suggest Item Worksheet Lines";
         ItemWshtImpExpMgt: Codeunit "Item Wsht. Imp. Exp. Mgt.";
-        GIMImportDocumentPage: Page "GIM - Import Document";
-        GIMImportDocument: Record "GIM - Import Document";
         NPRAttrTextArray: array [40] of Text;
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         [InDataSet]

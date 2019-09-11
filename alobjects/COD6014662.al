@@ -23,6 +23,7 @@ codeunit 6014662 "Stock-Take Manager"
     // NPR5.46/TSA /20181001 CASE 329899 Added RetailPrint() and FillRetailJournalLine()
     // NPR5.48/TSA /20181022 CASE 332846 Added AreaTopUp()
     // NPR5.48/CLVA/20181024 CASE 332846 Added added value
+    // NPR5.51/JAKUBV/20190903  CASE 359375 Transport NPR5.51 - 3 September 2019
 
     TableNo = "Gift Voucher";
 
@@ -1203,17 +1204,40 @@ codeunit 6014662 "Stock-Take Manager"
 
           StockTakeConfig."Data Release"::ON_FINAL_TRANSFER :
             if (StockTakeWorksheet.Status = StockTakeWorksheet.Status::COMPLETE) then begin
-              if (StockTakeConfig."Session Based Transfer" = StockTakeConfig."Session Based Transfer"::WORKSHEET) then
-                StockTakeWorksheet.Delete (true);
+              //-NPR5.51 [359375]
+              //IF (StockTakeConfig."Session Based Transfer" = StockTakeConfig."Session Based Transfer"::WORKSHEET) THEN
+              //  StockTakeWorksheet.DELETE (TRUE);
+              if (StockTakeConfig."Session Based Transfer" = StockTakeConfig."Session Based Transfer"::WORKSHEET) then begin
+                if (StockTakeConfig."Keep Worksheets") then begin
+                  WorksheetLine.Reset ();
+                  WorksheetLine.SetRange ("Stock-Take Config Code", StockTakeWorksheet."Stock-Take Config Code");
+                  WorksheetLine.SetRange ("Worksheet Name", StockTakeWorksheet.Name);
+                  WorksheetLine.DeleteAll (true);
+                end else begin
+                  StockTakeWorksheet.Delete (true);
+                end;
+              end;
+              //+NPR5.51 [359375]
 
               if (StockTakeConfig."Session Based Transfer" = StockTakeConfig."Session Based Transfer"::ALL_WORKSHEETS) then begin
                 StockTakeWorksheet.Reset ();
                 StockTakeWorksheet.SetFilter ("Stock-Take Config Code", '=%1', StockTakeConfig.Code);
                 StockTakeWorksheet.SetFilter (Status, '<>%1', StockTakeWorksheet.Status::COMPLETE);
                 if (StockTakeWorksheet.IsEmpty ()) then begin
-                  StockTakeWorksheet.Reset ();
-                  StockTakeWorksheet.SetFilter ("Stock-Take Config Code", '=%1', StockTakeConfig.Code);
-                  StockTakeWorksheet.DeleteAll (true);
+                  //-NPR5.51 [359375]
+                  // StockTakeWorksheet.RESET ();
+                  // StockTakeWorksheet.SETFILTER ("Stock-Take Config Code", '=%1', StockTakeConfig.Code);
+                  // StockTakeWorksheet.DELETEALL (TRUE);
+                  if (StockTakeConfig."Keep Worksheets") then begin
+                    WorksheetLine.Reset ();
+                    WorksheetLine.SetRange ("Stock-Take Config Code", StockTakeWorksheet."Stock-Take Config Code");
+                    WorksheetLine.DeleteAll (true);
+                  end else begin
+                    StockTakeWorksheet.Reset ();
+                    StockTakeWorksheet.SetFilter ("Stock-Take Config Code", '=%1', StockTakeConfig.Code);
+                    StockTakeWorksheet.DeleteAll (true);
+                  end;
+                  //+NPR5.51 [359375]
                 end;
               end;
             end;

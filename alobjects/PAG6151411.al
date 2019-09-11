@@ -1,15 +1,15 @@
 page 6151411 "Magento Pictures"
 {
-    // MAG1.01/HSK/20150129 CASE 205438 Added functions:
-    //                                 - CountRelations() - Counts the number of picture links.
-    //                                 - DrillDownCounter() - Page.RUN of picture links data.
-    // MAG1.04/MH/20150209  CASE 199932 Updated PictureViewer Addin
-    // MAG1.09/MH/20150316  CASE 206395 Updated Layout with Repeater-Picture-Blob
-    // MAG1.12/MH/20150403  CASE 210709 Removed Picture field due to performance
-    // MAG1.14/MH/20150508  CASE 211881 Updated PictureViewer Addin to JavaScript version
-    // MAG1.21/MHA/20151118 CASE 223835 Type deleted from Picture Link and Added Miniature
-    // MAG1.22/MHA/20160421 CASE 230240 Changed "Size (kb)" to Non Visible
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
+    // MAG1.01/HSK /20150129 CASE 205438 Added functions:
+    //                                   - CountRelations() - Counts the number of picture links.
+    //                                   - DrillDownCounter() - Page.RUN of picture links data.
+    // MAG1.04/MHA /20150209  CASE 199932 Updated PictureViewer Addin
+    // MAG1.09/MHA /20150316  CASE 206395 Updated Layout with Repeater-Picture-Blob
+    // MAG1.12/MHA /20150403  CASE 210709 Removed Picture field due to performance
+    // MAG1.14/MHA /20150508  CASE 211881 Updated PictureViewer Addin to JavaScript version
+    // MAG1.21/MHA /20151118  CASE 223835 Type deleted from Picture Link and Added Miniature
+    // MAG1.22/MHA /20160421  CASE 230240 Changed "Size (kb)" to Non Visible
+    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
     // MAG10.00.2.00/MHA/20161118  CASE 258544 Changed Miniature to use Picture instead of TempItem.Picture
     // MAG2.22/MHA /20190716  CASE 361234 Added Action "Check Invalid Pictures"
 
@@ -191,12 +191,12 @@ page 6151411 "Magento Pictures"
         MagentoItemGroup: Record "Magento Item Group";
         MagentoBrand: Record "Magento Brand";
         TempItem: Record Item temporary;
+        TempItem2: Record Item temporary;
     begin
         if Counter <> 0 then begin
           case Type of
             Type::Item:
               begin
-                TempItem.DeleteAll;
                 Clear(MagentoPictureLink);
                 MagentoPictureLink.SetRange("Picture Name",Name);
                 if MagentoPictureLink.FindSet then

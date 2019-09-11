@@ -1,6 +1,7 @@
 codeunit 6150727 "POS Action - Hyperlink"
 {
     // NPR5.36/VB/20170901  CASE 289035 Supporting hyperlink actions.
+    // NPR5.51/ALST/20190626 CASE 353218 open url in iframe, removed back end running
 
 
     trigger OnRun()
@@ -27,7 +28,7 @@ codeunit 6150727 "POS Action - Hyperlink"
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit ('1.1');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -43,10 +44,44 @@ codeunit 6150727 "POS Action - Hyperlink"
           Sender."Subscriber Instances Allowed"::Single)
         then begin
           with Sender do begin
-            RegisterWorkflowStep('','param["back-end"] ? respond() : window.open(param.url, "_blank");');
+            //-NPR5.51
+            //RegisterWorkflowStep('','param["back-end"] ? respond() : window.open(param.url, "_blank");');
+            RegisterWorkflowStep('',
+                                        'var ifrm = document.createElement("iframe");' +
+                                        'ifrm.src = param.url;' +
+                                        'ifrm.id = "checkin";' +
+                                        'ifrm.style.position = "absolute";' +
+                                        'ifrm.style.top="17%";' +
+                                        'ifrm.style.left="17%";' +
+                                        'ifrm.style.height="65%";' +
+                                        'ifrm.style.width="65%";' +
+                                        'ifrm.style.overflow="hidden";' +
+                                        'ifrm.style.zIndex= "101";' +
+                                        'document.body.appendChild(ifrm);' +
+
+                                        'document.getElementById("np-textbox2").addEventListener(''input'', closeIframe);' +
+                                        'function closeIframe()' +
+                                        '{' +
+                                            'var element = document.getElementById("checkin");' +
+                                            'element.parentNode.removeChild(element);' +
+                                        '};' +
+
+                                        '$(document).add(parent.document).click(function(e)' +
+                                        '{' +
+                                            'var iframe = $("iframe");' +
+                                            'if (!iframe.is(e.target) && iframe.has(e.target).length === 0)' +
+                                            '{' +
+                                                'var element = document.getElementById("checkin");' +
+                                                'element.parentNode.removeChild(element);' +
+                                            '}' +
+                                        '});'
+                                    );
+            //+NPR5.51
             RegisterWorkflow(false);
             RegisterTextParameter('url','about:blank');
-            RegisterBooleanParameter('back-end',false);
+            //-NPR5.51
+            //RegisterBooleanParameter('back-end',FALSE);
+            //+NPR5.51
           end;
         end;
     end;
@@ -59,11 +94,13 @@ codeunit 6150727 "POS Action - Hyperlink"
         if not Action.IsThisAction(ActionCode) then
           exit;
 
-        with JSON do begin
-          InitializeJObjectParser(Context,FrontEnd);
-          if GetBooleanParameter('back-end',true) then
-            HyperLink(GetStringParameter('url',true));
-        end;
+        //-NPR5.51
+        // WITH JSON DO BEGIN
+        //  InitializeJObjectParser(Context,FrontEnd);
+        //  IF GetBooleanParameter('back-end',TRUE) THEN
+        //    HYPERLINK(GetStringParameter('url',TRUE));
+        // END;
+        //+NPR5.51
 
         Handled := true;
     end;

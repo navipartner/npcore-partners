@@ -9,6 +9,7 @@ page 6060141 "MM Membership Alteration"
     // MM1.24/TSA /20171205 CASE 297852 Added field "Assign Loyalty Points On Sale"
     // MM1.25/NPKNAV/20180122  CASE 300256 Transport MM1.25 - 22 January 2018
     // MM1.30/TSA/20180615  CASE 317428 Transport MM1.30 - 15 June 2018
+    // MM1.40/TSA /20190730 CASE 360275 Added field "Auto-Admit Member On Sale"
 
     Caption = 'Membership Alteration';
     PageType = List;
@@ -88,6 +89,9 @@ page 6060141 "MM Membership Alteration"
                     Visible = false;
                 }
                 field("Card Expired Action";"Card Expired Action")
+                {
+                }
+                field("Auto-Admit Member On Sale";"Auto-Admit Member On Sale")
                 {
                 }
             }

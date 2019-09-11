@@ -5,6 +5,7 @@ codeunit 6151004 "POS Action - Save POS Quote"
     // NPR5.48/MHA /20181130  CASE 338208 Added POS Sales Data (.xml) functionality to fully back/restore POS Sale
     // NPR5.48/MHA /20181206  CASE 338537 Added Publisher OnBeforeSaveAsQuote() in OnActionSaveAsQuote()
     // NPR5.50/MHA /20190520  CASE 354507 Some Sale Line POS fields should be reset before delete is possible
+    // NPR5.51/MMV /20190820  CASE 364694 Handle EFT approvals
 
 
     trigger OnRun()
@@ -129,8 +130,8 @@ codeunit 6151004 "POS Action - Save POS Quote"
           repeat
             InsertPOSQuoteLine(SaleLinePOS,POSQuoteEntry,LineNo);
             //-NPR5.50 [354507]
-            if SaleLinePOS."Cash Terminal Approved" or SaleLinePOS."From Selection" then begin
-              SaleLinePOS."Cash Terminal Approved" := false;
+            if SaleLinePOS."EFT Approved" or SaleLinePOS."From Selection" then begin
+              SaleLinePOS."EFT Approved" := false;
               SaleLinePOS."From Selection" := false;
               SaleLinePOS.Modify;
             end;
@@ -219,6 +220,9 @@ codeunit 6151004 "POS Action - Save POS Quote"
         POSQuoteLine."Discount Amount" := SaleLinePOS."Discount Amount";
         POSQuoteLine."Discount Code" := SaleLinePOS."Discount Code";
         POSQuoteLine."Discount Authorised by" := SaleLinePOS."Discount Authorised by";
+        //-NPR5.51 [364694]
+        POSQuoteLine."EFT Approved" := SaleLinePOS."EFT Approved";
+        //+NPR5.51 [364694]
         POSQuoteLine.Insert(true);
     end;
 

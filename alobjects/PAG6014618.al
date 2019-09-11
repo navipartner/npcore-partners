@@ -3,6 +3,7 @@ page 6014618 "My Reports"
     // #6014618/JC/20160110  CASE 258075 Created Object My Reports
     // NPR5.29/NPKNAV/20170127  CASE 258075 Transport NPR5.29 - 27 januar 2017
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj
+    // NPR5.51/ZESO/20190705 CASE 358284 Use AllObjWithCaption instead to have report captions translated as per language being used.
 
     Caption = 'My Reports';
     PageType = ListPart;
@@ -28,7 +29,7 @@ page 6014618 "My Reports"
                         GetReport;
                     end;
                 }
-                field(ReportName;AllObj."Object Name")
+                field(ReportName;AllObjwithCap."Object Caption")
                 {
                     AssistEdit = true;
                     Caption = 'Name';
@@ -77,6 +78,7 @@ page 6014618 "My Reports"
     var
         ReportObj: Record "Object";
         AllObj: Record AllObj;
+        AllObjwithCap: Record AllObjWithCaption;
 
     local procedure GetReport()
     begin
@@ -86,10 +88,10 @@ page 6014618 "My Reports"
         // ReportObj.SETRANGE(ID, "Report No.");
         // IF ReportObj.FINDFIRST THEN;
 
-        Clear(AllObj);
-        AllObj.SetRange("Object Type", AllObj."Object Type"::Report);
-        AllObj.SetRange("Object ID", "Report No.");
-        if AllObj.FindFirst then;
+        Clear(AllObjwithCap);
+        AllObjwithCap.SetRange("Object Type", AllObjwithCap."Object Type"::Report);
+        AllObjwithCap.SetRange("Object ID", "Report No.");
+        if AllObjwithCap.FindFirst then;
         //+NPR5.46 [322752]
     end;
 
@@ -100,10 +102,10 @@ page 6014618 "My Reports"
         // ReportObj.SETRANGE(ID, "Report No.");
         // IF ReportObj.FINDFIRST THEN
         //  REPORT.RUN("Report No.");
-        Clear(AllObj);
-        AllObj.SetRange("Object Type", AllObj."Object Type"::Report);
-        AllObj.SetRange("Object ID", "Report No.");
-        if AllObj.FindFirst then
+        Clear(AllObjwithCap);
+        AllObjwithCap.SetRange("Object Type", AllObjwithCap."Object Type"::Report);
+        AllObjwithCap.SetRange("Object ID", "Report No.");
+        if AllObjwithCap.FindFirst then
           REPORT.Run("Report No.");
     end;
 }

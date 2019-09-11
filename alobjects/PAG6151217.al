@@ -1,6 +1,6 @@
 page 6151217 "NpCs Open. Hour Set Subpage"
 {
-    // #362443/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
+    // NPR5.51/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
 
     AutoSplitKey = true;
     Caption = 'Opening Hours';

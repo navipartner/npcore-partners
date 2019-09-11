@@ -30,6 +30,7 @@ table 6060134 "MM Member Info Capture"
     // MM1.29/TSA /20180511 CASE 313795 GDPR Approval Option field
     // MM1.29.02/TSA /20180528 CASE 317156 Added SMS as notification option
     // MM1.32/TSA /20180710 CASE 318132 Added field "Member Card Type" option
+    // MM1.40/TSA /20190730 CASE 360275 Added field "Auto-Admit Member"
 
     Caption = 'Member Info Capture';
 
@@ -256,6 +257,10 @@ table 6060134 "MM Member Info Capture"
             Caption = 'Member Card Type';
             OptionCaption = 'Physical Card,Wallet,Card+Wallet,None';
             OptionMembers = CARD,PASSSERVER,CARD_PASSSERVER,"NONE";
+        }
+        field(350;"Auto-Admit Member";Boolean)
+        {
+            Caption = 'Auto-Admit Member';
         }
         field(1000;"Receipt No.";Code[20])
         {

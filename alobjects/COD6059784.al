@@ -63,6 +63,7 @@ codeunit 6059784 "TM Ticket Management"
     // TM1.39/TSA /20190122 CASE 340984 Sort on date due to unexpected order of schedule entries
     // TM1.40/TSA /20190327 CASE 350287 Revoking ticket marks admission as closed (and thus restores capacity)
     // TM1.41/TSA /20190501 CASE 352873 Handling of external number correctly in postpaid tickets
+    // TM1.42/TSA /20190826 CASE 340984 Changed sort order for next_available
 
 
     trigger OnRun()
@@ -1741,9 +1742,14 @@ codeunit 6059784 "TM Ticket Management"
         //-NPR5.31 [235795]
         if (Admission."Default Schedule" = Admission."Default Schedule"::NEXT_AVAILABLE) then begin
           AdmissionScheduleEntry.Reset ();
+
           //-TM1.39 [340984]
-          AdmissionScheduleEntry.SetCurrentKey ("Admission Code","Schedule Code","Admission Start Date");
+          //-TM1.42 [340984]
+          //AdmissionScheduleEntry.SETCURRENTKEY ("Admission Code","Schedule Code","Admission Start Date");
+          AdmissionScheduleEntry.SetCurrentKey ("Admission Start Date","Admission Start Time");
+          //+TM1.42 [340984]
           //+TM1.39 [340984]
+
           AdmissionScheduleEntry.SetFilter ("Admission Code", '=%1', AdmissionCode);
           AdmissionScheduleEntry.SetFilter ("Admission Start Date", '>%1', Today);
           AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);

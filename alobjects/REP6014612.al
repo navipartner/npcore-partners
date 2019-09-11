@@ -10,6 +10,7 @@ report 6014612 "Inventory per Variant at date"
     // NPR5.39/TJ  /20180208 CASE 302634 Removed unused variables
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.40/TJ  /20180319  CASE 307717 Replaced hardcoded dates with DMY2DATE structure
+    // NPR5.51/ZESO/20190827  CASE 360802 Option Show Blank Location Code added + Changed Orientation to Landscape.
     DefaultLayout = RDLC;
     RDLCLayout = './Inventory per Variant at date.rdlc';
 
@@ -212,6 +213,10 @@ report 6014612 "Inventory per Variant at date"
                     Item1.Get(Item."No.");
                     Item1.CopyFilters(Item);
                     Item1.SetRange("Variant Filter", Code);
+                    //-NPR5.51 [360802]
+                    if not ShowBlankLocation then
+                      Item1.SetFilter("Location Filter",'<>%1','');
+                    //-NPR5.51 [360802]
                     Item1.CalcFields("Has Variants","Net Change");
 
                     if Varermedbeholdning then begin
@@ -231,17 +236,22 @@ report 6014612 "Inventory per Variant at date"
                     //-NPR5.32
                     ItemLedgEntry.SetFilter("Posting Date", Item1.GetFilter("Date Filter"));
                     //+NPR5.32
-                    ItemLedgEntry.SetRange("Location Code",'');
-                    if ItemLedgEntry.FindSet then repeat
-                     TempQuantity += ItemLedgEntry.Quantity;
-                    until ItemLedgEntry.Next = 0;
 
-                    if TempQuantity <> 0 then begin
-                     InventoryLocation[i] := '';
-                     InventoryQty[i] := TempQuantity;
-                     i += 1;
-                     TempQuantity := 0;
+                    //-NPR5.51 [360802]
+                    if ShowBlankLocation then begin
+                      ItemLedgEntry.SetRange("Location Code",'');
+                      if ItemLedgEntry.FindSet then repeat
+                       TempQuantity += ItemLedgEntry.Quantity;
+                      until ItemLedgEntry.Next = 0;
+
+                      if TempQuantity <> 0 then begin
+                       InventoryLocation[i] := '';
+                       InventoryQty[i] := TempQuantity;
+                       i += 1;
+                       TempQuantity := 0;
+                      end;
                     end;
+                    //+NPR5.51 [360802]
 
                     if Location.FindSet then repeat
                       ItemLedgEntry.SetRange("Location Code");
@@ -365,6 +375,11 @@ report 6014612 "Inventory per Variant at date"
                 //-NPR5.39
                 //CurrReport.CREATETOTALS("Net Change","Unit Price","Last Direct Cost",CostValue, SalesValue);
                 //+NPR5.39
+
+                //-NPR5.51 [360802]
+                if not ShowBlankLocation then
+                  Item.SetFilter("Location Filter",'<>%1','');
+                //-NPR5.51 [360802]
             end;
         }
     }
@@ -399,6 +414,10 @@ report 6014612 "Inventory per Variant at date"
                 field(ShowLocation;ShowLocation)
                 {
                     Caption = 'Show Location';
+                }
+                field(ShowBlankLocation;ShowBlankLocation)
+                {
+                    Caption = 'Show Blank Location';
                 }
             }
         }
@@ -498,6 +517,7 @@ report 6014612 "Inventory per Variant at date"
         NetChangeItem: Decimal;
         NetChangeItemVariant: Decimal;
         ItemSalesValue: Decimal;
+        ShowBlankLocation: Boolean;
 
     procedure CheckInventory(var localItem: Record Item): Boolean
     var

@@ -2,6 +2,7 @@ table 6151592 "NpDc Coupon Entry"
 {
     // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
     // NPR5.37/MHA /20171012  CASE 293232 Updated OptionString of Field 10 "Entry Type"
+    // NPR5.51/MHA /20190724  CASE 343352 Added field 70 "Document Type" and changed field 55 "Sales Ticket No." to "Document No."
 
     Caption = 'Coupon Entry';
     DrillDownPageID = "NpDc Coupon Entries";
@@ -68,9 +69,17 @@ table 6151592 "NpDc Coupon Entry"
             Caption = 'Register No.';
             TableRelation = Register."Register No.";
         }
-        field(55;"Sales Ticket No.";Code[20])
+        field(55;"Document No.";Code[20])
         {
-            Caption = 'Sales Ticket No.';
+            Caption = 'Document No.';
+            Description = 'NPR5.51';
+            TableRelation = IF ("Document Type"=CONST("POS Entry")) "POS Entry"."Document No." WHERE ("POS Unit No."=FIELD("Register No."))
+                            ELSE IF ("Document Type"=CONST("Sales Order")) "Sales Header"."No." WHERE ("Document Type"=CONST(Order))
+                            ELSE IF ("Document Type"=CONST("Sales Invoice")) "Sales Header"."No." WHERE ("Document Type"=CONST(Invoice))
+                            ELSE IF ("Document Type"=CONST("Posted Sales Invoice")) "Sales Invoice Header"
+                            ELSE IF ("Document Type"=CONST("Sales Return Order")) "Sales Header"."No." WHERE ("Document Type"=CONST("Return Order"))
+                            ELSE IF ("Document Type"=CONST("Sales Credit Memo")) "Sales Header"."No." WHERE ("Document Type"=CONST("Credit Memo"))
+                            ELSE IF ("Document Type"=CONST("Posted Sales Credit Memo")) "Sales Cr.Memo Header";
         }
         field(65;"User ID";Code[50])
         {
@@ -84,6 +93,13 @@ table 6151592 "NpDc Coupon Entry"
             BlankZero = true;
             Caption = 'Closed by Entry No.';
         }
+        field(75;"Document Type";Option)
+        {
+            Caption = 'Document Type';
+            Description = 'NPR5.51';
+            OptionCaption = ' ,POS Entry,Sales Order,Sales Invoice,Posted Sales Invoice,Sales Return Order,Sales Credit Memo,Posted Sales Credit Memo';
+            OptionMembers = " ","POS Entry","Sales Order","Sales Invoice","Posted Sales Invoice","Sales Return Order","Sales Credit Memo","Posted Sales Credit Memo";
+        }
     }
 
     keys
@@ -94,6 +110,9 @@ table 6151592 "NpDc Coupon Entry"
         key(Key2;"Coupon No.")
         {
             SumIndexFields = Amount,Quantity;
+        }
+        key(Key3;"Document Type","Document No.")
+        {
         }
     }
 

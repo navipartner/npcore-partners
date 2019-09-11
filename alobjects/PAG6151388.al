@@ -1,7 +1,9 @@
 page 6151388 "CS Stock-Takes Approval"
 {
     // NPR5.50/JAKUBV/20190603  CASE 332844 Transport NPR5.50 - 3 June 2019
+    // NPR5.51/CLVA/20190902 CASE 365659 Added captions
 
+    Caption = 'CS Stock-Takes Approval';
     SourceTable = "Integer";
 
     layout

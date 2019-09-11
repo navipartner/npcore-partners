@@ -1,6 +1,7 @@
 page 6059895 "Npm Caption Subform"
 {
     // NPR5.33/MHA /20170126  CASE 264348 Object created - Module: Np Page Manager
+    // NPR5.51/MHA /20190816  CASE 365332 Np Page Manager is deprecated [VLOBJDEL] Object marked for deletion
 
     Caption = 'Npm Caption Subform';
     DelayedInsert = true;
@@ -11,24 +12,6 @@ page 6059895 "Npm Caption Subform"
 
     layout
     {
-        area(content)
-        {
-            repeater(Group)
-            {
-                field("Language Id";"Language Id")
-                {
-                }
-                field("Language Name";"Language Name")
-                {
-                }
-                field("Language Code";"Language Code")
-                {
-                }
-                field(Caption;Caption)
-                {
-                }
-            }
-        }
     }
 
     actions

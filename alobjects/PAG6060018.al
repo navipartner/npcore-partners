@@ -1,59 +1,23 @@
 page 6060018 "GIM - Import Entities"
 {
+    // NPR5.51/MHA /20190819  CASE 365377 Generic Import Module is deprecated [VLOBJDEL] Object marked for deletion
+
     Caption = 'GIM - Import Entities';
-    DataCaptionFields = "Row No.";
+    DataCaptionFields = Field20;
     DeleteAllowed = false;
     Editable = false;
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "GIM - Import Entity";
-    SourceTableView = SORTING("Row No.","Table ID","Column No.","Field ID");
+    SourceTableView = SORTING(Field20,Field40,Field30,Field50);
 
     layout
     {
-        area(content)
-        {
-            repeater(Group)
-            {
-                field("Table ID";"Table ID")
-                {
-                }
-                field("Table Caption";"Table Caption")
-                {
-                }
-                field("Field ID";"Field ID")
-                {
-                }
-                field("Field Caption";"Field Caption")
-                {
-                }
-                field("Current Value";"Current Value")
-                {
-                }
-                field("New Value";"New Value")
-                {
-                    Style = StrongAccent;
-                    StyleExpr = UseStyle;
-                }
-                field("Entity Action";"Entity Action")
-                {
-                }
-            }
-        }
     }
 
     actions
     {
     }
-
-    trigger OnAfterGetRecord()
-    begin
-        UseStyle := ("Entity Action" = "Entity Action"::Modify) and ("Current Value" <> "New Value");
-    end;
-
-    var
-        [InDataSet]
-        UseStyle: Boolean;
 }
 

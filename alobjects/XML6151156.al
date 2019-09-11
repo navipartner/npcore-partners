@@ -1,6 +1,7 @@
 xmlport 6151156 "M2 Update Account"
 {
     // NPR5.49/TSA /20190328 CASE 320424 Initial Version
+    // NPR5.51/TSA /20190812 CASE 364644 Added Person section
 
     Caption = 'Update Account';
     Encoding = UTF8;
@@ -161,6 +162,27 @@ xmlport 6151156 "M2 Update Account"
                     }
                     fieldelement(Name;TmpContactResponse.Name)
                     {
+                    }
+                    textelement(personresponse)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                        XmlName = 'Person';
+                        fieldelement(FirstName;TmpContactResponse."First Name")
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(LastName;TmpContactResponse.Surname)
+                        {
+                            MinOccurs = Zero;
+                        }
+
+                        trigger OnBeforePassVariable()
+                        begin
+
+                            if (TmpContactResponse."First Name" = '') and (TmpContactResponse.Surname = '') then
+                              currXMLport.Skip;
+                        end;
                     }
                     fieldelement(CompanyName;TmpContactResponse."Company Name")
                     {

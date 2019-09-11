@@ -9,7 +9,8 @@ codeunit 6150616 "POS Post Item Entries"
     // NPR5.48/TJ  /20190111  CASE 340615 Removed usage of Product Group Code in standard objects
     // NPR5.50/TSA /20190412 CASE 351655 Creating Service Items when setup CheckAndCreateServiceItemPos()
     // NPR5.50/TSA /20190531 CASE 355186 Added link in table "POS Entry Sales Doc. Link" when a service item is created
-    // #362329/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
+    // NPR5.51/TSA /20190624 CASE 359508 Added assignment of document no. from "POS Period Register."Document No.", when set
+    // NPR5.51/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
 
     TableNo = "POS Entry";
 
@@ -54,9 +55,9 @@ codeunit 6150616 "POS Post Item Entries"
           POSSalesLine.SetRange("POS Entry No.","Entry No.");
           POSSalesLine.SetRange(Type,POSSalesLine.Type::Item);
           POSSalesLine.SetFilter(Quantity,'<>0');
-          //-#362329 [362329]
+          //-NPR5.51 [362329]
           POSSalesLine.SetRange("Exclude from Posting",false);
-          //+#362329 [362329]
+          //+NPR5.51 [362329]
           if POSSalesLine.FindSet then repeat
             POSSalesLine."Item Entry No." := PostItemJnlLine(POSEntry,POSSalesLine);
             POSSalesLine.Modify;
@@ -134,6 +135,7 @@ codeunit 6150616 "POS Post Item Entries"
         ItemJnlLine: Record "Item Journal Line";
         MoveToLocation: Record Location;
         Item: Record Item;
+        POSPeriodRegister: Record "POS Period Register";
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
         VendorReturnReason: Codeunit "Vendor Return Reason";
         WMSManagement: Codeunit "WMS Management";
@@ -143,13 +145,24 @@ codeunit 6150616 "POS Post Item Entries"
         if POSSalesLine."Withhold Item" and (POSSalesLine."Move to Location" = '') then
           exit;
 
+        //-NPR5.51 [359508]
+        POSPeriodRegister.Get(POSEntry."POS Period Register No.");
+        //+NPR5.51 [359508]
+
         NPRetailSetup.Get;
         with POSSalesLine do begin
 
           ItemJnlLine.Init;
           ItemJnlLine."Posting Date" := POSEntry."Posting Date";
           ItemJnlLine."Document Date" := POSEntry."Document Date";
-          ItemJnlLine."Document No." := POSEntry."Document No.";
+
+          //-NPR5.51 [359508]
+          // ItemJnlLine."Document No." := POSEntry."Document No.";
+          ItemJnlLine."Document No." := POSPeriodRegister."Document No.";
+          if (ItemJnlLine."Document No." = '') then
+            ItemJnlLine."Document No." := POSEntry."Document No.";
+          //+NPR5.51 [359508]
+
           ItemJnlLine."Source Posting Group" := POSEntry."Customer Posting Group";
           ItemJnlLine."Salespers./Purch. Code" := POSEntry."Salesperson Code";
           ItemJnlLine."Country/Region Code" := POSEntry."Country/Region Code";

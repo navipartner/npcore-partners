@@ -13,6 +13,7 @@ table 6014498 "Exchange Label"
     //                                   Renamed field 2 from "Label No." to "No."
     // NPR5.48/JDH /20181109 CASE 334163 Added caption to missing fields
     // NPR5.49/MHA /20190211 CASE 345209 Added field 35 "Unit Price"
+    // NPR5.51/ALST/20190624 CASE 337539 Added field "Retail Cross Reference No."
 
     Caption = 'Exchange Label';
 
@@ -116,6 +117,12 @@ table 6014498 "Exchange Label"
         field(60;"Printed Date";DateTime)
         {
             Caption = 'Printed Date';
+        }
+        field(70;"Retail Cross Reference No.";Code[50])
+        {
+            Caption = 'Retail Cross Reference No.';
+            Description = 'NPR5.51';
+            TableRelation = "Retail Cross Reference"."Reference No.";
         }
     }
 

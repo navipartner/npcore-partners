@@ -6,6 +6,7 @@ codeunit 6060130 "MM Member Ticket Manager"
     // MM1.36/TSA /20181119 CASE 335889 Fixed casting between external and internal item nos
     // MM1.36/TSA /20181119 CASE 335889 Reactored, relocated PromptForMemberGuestArrival() and MemberFastCheckIn()
     // MM1.37/TSA /20190327 CASE 350288 Signature Change
+    // MM1.40/TSA /20190812 CASE 364741 Signature Change
 
 
     trigger OnRun()
@@ -231,10 +232,18 @@ codeunit 6060130 "MM Member Ticket Manager"
 
           if (TicketAdmissionBOM.FindSet ()) then begin
             repeat
+              //-MM1.40 [364741]
+              // TicketRequestManager.POS_AppendToReservationRequest2 (Token,
+              //   '', 0,
+              //   ItemNo, VariantCode, TicketAdmissionBOM."Admission Code",
+              //  TmpTicketReservationRequest.Quantity, -1, Member."External Member No.", Member."External Member No.", '');
+
               TicketRequestManager.POS_AppendToReservationRequest2 (Token,
                 '', 0,
                 ItemNo, VariantCode, TicketAdmissionBOM."Admission Code",
-                TmpTicketReservationRequest.Quantity, -1, Member."External Member No.", Member."External Member No.", '');
+                TmpTicketReservationRequest.Quantity, -1, Member."External Member No.", Member."External Member No.", '', TmpTicketReservationRequest."Notification Address");
+              //+MM1.40 [364741]
+
             until (TicketAdmissionBOM.Next () = 0);
 
           end else begin

@@ -14,6 +14,9 @@ page 6014433 "Payment Type - Card"
     // NPR5.46/MMV /20180919 CASE Removed deprecated fields
     // NPR5.47/TS  /20181022 CASE 309123 Removed unused fields
     // NPR5.50/TSA /20190530 CASE 354832 Added field 100 - "Reverse Unrealized VAT"
+    // NPR5.51/MMV /20190628 CASE 359385 Removed PBS & Kvittering.dk fields from page.
+    // NPR5.51/TJ  /20190628 CASE 359385 Added field 110 "Open Drawer"
+    // NPR5.51/JAKUBV/20190903  CASE 357069 Transport NPR5.51 - 3 September 2019
 
     Caption = 'Payment Type Card';
     PromotedActionCategories = 'New,Process,Prints,Master Data,Test5,Test6,Test7,Test8';
@@ -142,6 +145,9 @@ page 6014433 "Payment Type - Card"
                     {
                         ShowCaption = false;
                     }
+                    field("Open Drawer";"Open Drawer")
+                    {
+                    }
                 }
             }
             group(Options)
@@ -212,38 +218,10 @@ page 6014433 "Payment Type - Card"
             group(Integration)
             {
                 Caption = 'Integration';
-                group("PBS Gift Voucher")
-                {
-                    Caption = 'PBS Gift Voucher';
-                    field("<PBS Giift Voucher>";"PBS Gift Voucher")
-                    {
-
-                        trigger OnValidate()
-                        begin
-                            if "PBS Gift Voucher" then
-                              if ("Processing Type" <> "Processing Type"::"Gift Voucher") or (not ("Via Terminal")) then
-                                Error(ErrPBSGiftEnable);
-
-                            //CurrForm."Balance Inquiry URL".EDITABLE("PBS Gift Voucher");
-                            PBSCustomerIDEditable := "PBS Gift Voucher";
-                        end;
-                    }
-                    field("PBS Customer ID";"PBS Customer ID")
-                    {
-                        Editable = PBSCustomerIDEditable;
-                    }
-                }
                 group("Member Card")
                 {
                     Caption = 'Member Card';
                     field("Loyalty Card Type";"Loyalty Card Type")
-                    {
-                    }
-                }
-                group("Kvittering.dk")
-                {
-                    Caption = 'Kvittering.dk';
-                    field("Payment Card Type";"Payment Card Type")
                     {
                     }
                 }

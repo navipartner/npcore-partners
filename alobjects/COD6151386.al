@@ -6,6 +6,7 @@ codeunit 6151386 "CS UI Stock-Take Handling"
     // NPR5.44/CLVA/20180719 CASE 315503 Added functionality to support defaults from last record
     // NPR5.47/CLVA/20181026 CASE 307282 Added support for Rfid tags
     // NPR5.48/CLVA/20181109 CASE 335606 Handling data transfer
+    // NPR5.51/CLVA/20190625 CASE 359375 Added Stock-Take transfer handling
 
     TableNo = "CS UI Header";
 
@@ -595,6 +596,8 @@ codeunit 6151386 "CS UI Stock-Take Handling"
     var
         CSStockTakeCounting: Record "CS Stock-Take Handling";
         StockTakeWorksheet: Record "Stock-Take Worksheet";
+        OK: Boolean;
+        SessionID: Integer;
     begin
         CSStockTakeCounting.SetRange(Id, CSSessionId);
         CSStockTakeCounting.SetRange("Stock-Take Config Code", CurrCSStockTakeHandling."Stock-Take Config Code");
@@ -611,6 +614,13 @@ codeunit 6151386 "CS UI Stock-Take Handling"
                 end;
             until CSStockTakeCounting.Next = 0;
             StockTakeMgr.ImportPostHandler(StockTakeWorksheet);
+          //-NPR5.51 [359375]
+          StockTakeWorksheet.Validate(Status,StockTakeWorksheet.Status::READY_TO_TRANSFER);
+          StockTakeWorksheet.Modify(true);
+          OK := StartSession(SessionID, CODEUNIT::"CS UI WH Counting Handling", CompanyName, StockTakeWorksheet);
+          if not OK then
+            Remark :=  GetLastErrorText;
+          //+NPR5.51 [359375]
         end;
     end;
 

@@ -3,6 +3,8 @@ page 6059939 "Sales Price Maintenance Setup"
     // NPR5.25/CLVA/20160628 CASE 244461 : Sales Price Maintenance
     // NPR5.33/NPKNAV/20170630  CASE 272906 Transport NPR5.33 - 30 June 2017
     // NPR5.43/TS  /20180607 CASE 318039 Update Items that are defined on the Sales Price
+    // NPK1.00/TJ  /20190225 CASE 345782 Update price is using codeunit 6014481
+    // NPR5.51/CLVA/20190704 CASE 360328 Removed Sales Price check
 
     AutoSplitKey = true;
     Caption = 'Sales Price Maintenance Setup';
@@ -136,24 +138,37 @@ page 6059939 "Sales Price Maintenance Setup"
     var
         SalesPrice: Record "Sales Price";
         Item: Record Item;
+        SalesPriceMaintenance: Codeunit "Sales Price Maintenance Event";
     begin
+        //-NPK1.00 [345782]
+        /*
         //-NPR5.43 [318039]
-        SalesPrice.SetRange("Sales Type","Sales Type");
-        SalesPrice.SetRange("Sales Code","Sales Code");
-        if SalesPrice.FindSet then
-          repeat
-            if Item.Get(SalesPrice."Item No.") then begin
-              case "Internal Unit Price" of
+        SalesPrice.SETRANGE("Sales Type","Sales Type");
+        SalesPrice.SETRANGE("Sales Code","Sales Code");
+        IF SalesPrice.FINDSET THEN
+          REPEAT
+            IF Item.GET(SalesPrice."Item No.") THEN BEGIN
+              CASE "Internal Unit Price" OF
                 "Internal Unit Price"::"Unit Cost": SalesPrice."Unit Price" := Item."Unit Cost" * Factor;
                 "Internal Unit Price"::"Unit Price": SalesPrice."Unit Price" := Item."Unit Price" * Factor;
                 "Internal Unit Price"::"Last Direct Cost": SalesPrice."Unit Price" := Item."Last Direct Cost" * Factor;
                 "Internal Unit Price"::"Standard Cost": SalesPrice."Unit Price" := Item."Standard Cost" * Factor;
-              end;
-              SalesPrice.Modify(true);
-            end;
-          until SalesPrice.Next = 0;
+              END;
+              SalesPrice.MODIFY(TRUE);
+            END;
+          UNTIL SalesPrice.NEXT = 0;
+        */
+        if Item.FindSet then
+          repeat
+            //-NPR5.51 [360328]
+            //IF FindSalesPrices(Item) THEN
+              SalesPriceMaintenance.UpdateSalesPricesForStaff(Item);
+            //+NPR5.51 [360328]
+          until Item.Next = 0;
+        //+NPK1.00 [345782]
         Message(Text00003);
         //+NPR5.43 [318039]
+
     end;
 
     local procedure FindSalesPrices(Item: Record Item): Boolean

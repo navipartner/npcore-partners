@@ -5,6 +5,7 @@ codeunit 6150822 "POS Action - Conv Touch2Trans"
     // NPR5.39/MMV /20180209  CASE 299114 Added call to publish any auto updated actions
     // NPR5.40/MHA /20180305  CASE 306461 Added function GetItemIdentifyerType() and adjusted SetActionParameter() for case 306347
     // NPR5.40/VB  /20180307 CASE 306347 Invoking physical action discovery when needed.
+    // NPR5.51/ALST/20190714 CASE 361935 removed doubled case statement values: TERMINAL_INSTALL, CREDITVOUCHER_CREATE
 
 
     trigger OnRun()
@@ -430,7 +431,6 @@ codeunit 6150822 "POS Action - Conv Touch2Trans"
           'BALANCE_REGISTER':     SetSimpleLineAction(POSMenuButton, 'BALANCE_V1');
           'SALE_REVERSE':         SetSimpleLineAction(POSMenuButton, 'REVERSE_SALE');
           'CREDITVOUCHER_CREATE': SetSimpleLineAction(POSMenuButton, 'CREDIT_GIFTVOUCHER');
-          'CREDITVOUCHER_CREATE': SetSimpleLineAction(POSMenuButton, 'QUANTITY');
           'REGISTER_OPEN' :       SetSimpleLineAction(POSMenuButton, 'OPEN_CASH_DRAWER');
 
 
@@ -478,7 +478,6 @@ codeunit 6150822 "POS Action - Conv Touch2Trans"
           'TERMINAL_OFFLINE' :          SetComplexLineAction(POSMenuButton, 'XXX_TERMINAL','auxCommand','StrMenu', false);
           'TAX_FREE' :                  SetComplexLineAction(POSMenuButton, 'TAX_FREE','Setting','Toggle', false);
           'Audit Roll View' :           SetComplexLineAction(POSMenuButton, '','PageId','6014432', false);
-          'TERMINAL_INSTALL' :          SetComplexLineAction(POSMenuButton, 'XXX_TERMINAL','auxCommand','Ticket Reprint', false);
           'GOTO_SALE' :                 SetComplexLineAction(POSMenuButton, 'CHANGE_VIEW','ViewType','Sale', false);
           'QUANTITY_POS' :              SetComplexLineAction(POSMenuButton, 'Quantity', 'Constraint', 'Positive Quantity Only', false);
           'QUANTITY_NEG' :              SetComplexLineAction(POSMenuButton, 'Quantity', 'Constraint', 'No Constraint', false); //JDH

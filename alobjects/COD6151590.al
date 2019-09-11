@@ -16,6 +16,8 @@ codeunit 6151590 "NpDc Coupon Mgt."
     // NPR5.46/MHA /20180928  CASE 329523 Added POSSale.RefreshCurrent() in ScanCoupon()
     // NPR5.47/MHA /20181026  CASE 332655 Moved Discount Application from OnBeforeDelete to OnAfterDelete
     // NPR5.49/MHA /20190328  CASE 350374 Added MaxStrLen to EanBox.Description in DiscoverEanBoxEvents()
+    // NPR5.51/MHA /20190626  CASE 355406 Coupon Events are now triggered for posting and cancel
+    // NPR5.51/MHA /20190724  CASE 343352 Introduced "In-use Quantity (External)" on Coupons
 
 
     trigger OnRun()
@@ -31,13 +33,27 @@ codeunit 6151590 "NpDc Coupon Mgt."
 
     procedure ResetInUseQty(Coupon: Record "NpDc Coupon")
     var
+        NpDcExtCouponSalesLine: Record "NpDc Ext. Coupon Reservation";
         SaleLinePOSCoupon: Record "NpDc Sale Line POS Coupon";
+        NpDcCouponModuleMgt: Codeunit "NpDc Coupon Module Mgt.";
     begin
         SaleLinePOSCoupon.SetRange("Coupon No.",Coupon."No.");
-        if SaleLinePOSCoupon.IsEmpty then
-          exit;
+        //-NPR5.51 [355406]
+        if SaleLinePOSCoupon.FindSet then begin
+          Coupon.CalcFields("Issue Coupon Module","Validate Coupon Module","Apply Discount Module");
+          repeat
+            if SaleLinePOSCoupon.Type = SaleLinePOSCoupon.Type::Coupon then
+              NpDcCouponModuleMgt.OnCancelDiscountApplication(Coupon,SaleLinePOSCoupon);
+            SaleLinePOSCoupon.Delete;
+          until SaleLinePOSCoupon.Next = 0;
+        end;
+        //+NPR5.51 [355406]
 
-        SaleLinePOSCoupon.DeleteAll;
+        //-NPR5.51 [343352]
+        NpDcExtCouponSalesLine.SetRange("Coupon No.",Coupon."No.");
+        if NpDcExtCouponSalesLine.FindFirst then
+          NpDcExtCouponSalesLine.DeleteAll;
+        //+NPR5.51 [343352]
     end;
 
     local procedure "--- Issue Coupon"()
@@ -94,6 +110,9 @@ codeunit 6151590 "NpDc Coupon Mgt."
         //+NPR5.39 [305146]
         POSSession.GetSale(SaleOut);
         SaleOut.GetCurrentSale(SalePOS);
+        //-NPR5.51 [355406]
+        Coupon.CalcFields("Issue Coupon Module","Validate Coupon Module","Apply Discount Module");
+        //+NPR5.51 [355406]
         NpDcCouponModuleMgt.OnRunValidateCoupon(SalePOS,Coupon,Handled);
         if Handled then
           exit;
@@ -109,6 +128,7 @@ codeunit 6151590 "NpDc Coupon Mgt."
     var
         SaleLinePOS: Record "Sale Line POS";
         SaleLinePOSCoupon: Record "NpDc Sale Line POS Coupon";
+        SaleLinePOSCoupon2: Record "NpDc Sale Line POS Coupon";
         NpDcModuleApplyDefault: Codeunit "NpDc Module Apply - Default";
         NpDcCouponModuleMgt: Codeunit "NpDc Coupon Module Mgt.";
         Handled: Boolean;
@@ -126,7 +146,6 @@ codeunit 6151590 "NpDc Coupon Mgt."
           SaleLinePOSCoupon.SetRange(Type,SaleLinePOSCoupon.Type::Discount);
           if not SaleLinePOSCoupon.IsEmpty then begin
             //-NPR5.36 [288641]
-            //SaleLinePOSCoupon.DELETEALL;
             SaleLinePOSCoupon.SetSkipCalcDiscount(true);
             SaleLinePOSCoupon.FindSet;
             repeat
@@ -143,6 +162,18 @@ codeunit 6151590 "NpDc Coupon Mgt."
           NpDcCouponModuleMgt.OnRunApplyDiscount(SaleLinePOSCoupon,Handled);
           if not Handled then
             NpDcModuleApplyDefault.ApplyDiscount(SaleLinePOSCoupon);
+
+          //-NPR5.51 [355406]
+          SaleLinePOSCoupon2.SetRange("Register No.",SaleLinePOSCoupon."Register No.");
+          SaleLinePOSCoupon2.SetRange("Sales Ticket No.",SaleLinePOSCoupon."Sales Ticket No.");
+          SaleLinePOSCoupon2.SetRange(Type,SaleLinePOSCoupon2.Type::Discount);
+          SaleLinePOSCoupon2.SetRange("Coupon No.",SaleLinePOSCoupon."Coupon No.");
+          SaleLinePOSCoupon2.CalcSums("Discount Amount");
+          if SaleLinePOSCoupon."Discount Amount" <> SaleLinePOSCoupon2."Discount Amount" then begin
+            SaleLinePOSCoupon."Discount Amount" := SaleLinePOSCoupon2."Discount Amount";
+            SaleLinePOSCoupon.Modify;
+          end;
+          //+NPR5.51 [355406]
         until SaleLinePOSCoupon.Next = 0;
 
         SaleLinePOS.SetSkipCalcDiscount(true);
@@ -159,21 +190,16 @@ codeunit 6151590 "NpDc Coupon Mgt."
         repeat
           DiscountType := SaleLinePOS."Discount Type";
 
-        //-NPR5.42 [313062]
-        //  CLEAR(Item);
-        //  IF Item.GET(SaleLinePOS."No.") THEN;
-        //+NPR5.42 [313062]
           SaleLinePOS.CalcFields("Coupon Discount Amount");
 
           SaleLinePOS."Discount %" := 0;
           SaleLinePOS."Discount Amount" += SaleLinePOS."Coupon Discount Amount";
           if SaleLinePOS."Discount Amount" > (SaleLinePOS."Unit Price" * SaleLinePOS.Quantity) then
             SaleLinePOS."Discount %" := 100;
-        //-NPR5.42 [313062]
-        //  SaleLinePOS.GetAmount(SaleLinePOS,Item,SaleLinePOS."Unit Price");
+          //-NPR5.42 [313062]
           SaleLinePOS.UpdateAmounts(SaleLinePOS);
           SaleLinePOS."Coupon Applied" := true;
-        //+NPR5.42 [313062]
+          //+NPR5.42 [313062]
           SaleLinePOS."Discount Type" := DiscountType;
           SaleLinePOS.Modify;
         until SaleLinePOS.Next = 0;
@@ -223,25 +249,30 @@ codeunit 6151590 "NpDc Coupon Mgt."
         repeat
           DiscountType := SaleLinePOS."Discount Type";
 
-        //-NPR5.42 [313062]
-        //  CLEAR(Item);
-        //  IF Item.GET(SaleLinePOS."No.") THEN;
-        //+NPR5.42 [313062]
           SaleLinePOS.CalcFields("Coupon Discount Amount");
 
           SaleLinePOS."Discount %" := 0;
           SaleLinePOS."Discount Amount" -= SaleLinePOS."Coupon Discount Amount";
           if SaleLinePOS."Discount Amount" > (SaleLinePOS."Unit Price" * SaleLinePOS.Quantity) then
             SaleLinePOS."Discount %" := 100;
-        //-NPR5.42 [313062]
-        //  SaleLinePOS.GetAmount(SaleLinePOS,Item,SaleLinePOS."Unit Price");
+          //-NPR5.42 [313062]
           SaleLinePOS.UpdateAmounts(SaleLinePOS);
           SaleLinePOS."Coupon Applied" := false;
-        //+NPR5.42 [313062]
+          //+NPR5.42 [313062]
           SaleLinePOS."Discount Type" := DiscountType;
           SaleLinePOS.Modify;
         until SaleLinePOS.Next = 0;
         //+NPR5.41 [313062]
+
+        //-NPR5.51 [355406]
+        Clear(SaleLinePOSCoupon);
+        SaleLinePOSCoupon.SetRange("Register No.",SalePOS."Register No.");
+        SaleLinePOSCoupon.SetRange("Sales Ticket No.",SalePOS."Sales Ticket No.");
+        SaleLinePOSCoupon.SetRange("Sale Type",SalePOS."Sale type");
+        SaleLinePOSCoupon.SetRange("Sale Date",SalePOS.Date);
+        SaleLinePOSCoupon.SetRange(Type,SaleLinePOSCoupon.Type::Coupon);
+        SaleLinePOSCoupon.ModifyAll("Discount Amount",0);
+        //+NPR5.51 [355406]
     end;
 
     local procedure "--- Archivation"()
@@ -267,7 +298,6 @@ codeunit 6151590 "NpDc Coupon Mgt."
 
         repeat
           //-NPR5.37 [292741]
-          //IF CouponEntryApply."Remaining Quantity" >= CouponEntry."Remaining Quantity" THEN BEGIN
           if Abs(CouponEntryApply."Remaining Quantity") >= Abs(CouponEntry."Remaining Quantity") then begin
           //+NPR5.37 [292741]
             CouponEntryApply."Remaining Quantity" += CouponEntry."Remaining Quantity";
@@ -309,7 +339,6 @@ codeunit 6151590 "NpDc Coupon Mgt."
 
         repeat
           //-NPR5.37 [293232]
-          //ManualPostCoupon(Coupon);
           ArchiveCoupon(Coupon);
           //+NPR5.37 [293232]
         until Coupon.Next = 0;
@@ -334,7 +363,10 @@ codeunit 6151590 "NpDc Coupon Mgt."
           CouponEntry."Posting Date" := Today;
           CouponEntry.Open := true;
           CouponEntry."Register No." := '';
-          CouponEntry."Sales Ticket No." := '';
+          //-NPR5.51 [343352]
+          CouponEntry."Document Type" := CouponEntry."Document Type"::" ";
+          CouponEntry."Document No." := '';
+          //+NPR5.51 [343352]
           CouponEntry."User ID" := UserId;
           CouponEntry."Closed by Entry No." := 0;
           CouponEntry.Insert;
@@ -343,7 +375,6 @@ codeunit 6151590 "NpDc Coupon Mgt."
         end;
 
         //-NPR5.37 [293232]
-        //PostClosedCoupon(Coupon);
         ArchiveClosedCoupon(Coupon);
         //+NPR5.37 [293232]
     end;
@@ -373,7 +404,10 @@ codeunit 6151590 "NpDc Coupon Mgt."
         CouponEntry."Posting Date" := Today;
         CouponEntry.Open := true;
         CouponEntry."Register No." := '';
-        CouponEntry."Sales Ticket No." := '';
+        //-NPR5.51 [343352]
+        CouponEntry."Document Type" := CouponEntry."Document Type"::" ";
+        CouponEntry."Document No." := '';
+        //+NPR5.51 [343352]
         CouponEntry."User ID" := UserId;
         CouponEntry."Closed by Entry No." := 0;
         CouponEntry.Insert;
@@ -400,7 +434,10 @@ codeunit 6151590 "NpDc Coupon Mgt."
         CouponEntry."Posting Date" := Today;
         CouponEntry.Open := true;
         CouponEntry."Register No." := '';
-        CouponEntry."Sales Ticket No." := '';
+        //-NPR5.51 [343352]
+        CouponEntry."Document Type" := CouponEntry."Document Type"::" ";
+        CouponEntry."Document No." := '';
+        //+NPR5.51 [343352]
         CouponEntry."User ID" := UserId;
         CouponEntry."Closed by Entry No." := 0;
         CouponEntry.Insert;
@@ -411,6 +448,7 @@ codeunit 6151590 "NpDc Coupon Mgt."
     var
         Coupon: Record "NpDc Coupon";
         CouponEntry: Record "NpDc Coupon Entry";
+        NpDcCouponModuleMgt: Codeunit "NpDc Coupon Module Mgt.";
     begin
         if not Coupon.Get(SaleLinePOSCoupon."Coupon No.") then
           exit;
@@ -428,14 +466,20 @@ codeunit 6151590 "NpDc Coupon Mgt."
         CouponEntry."Posting Date" := SaleLinePOSCoupon."Sale Date";
         CouponEntry.Open := true;
         CouponEntry."Register No." := SaleLinePOSCoupon."Register No.";
-        CouponEntry."Sales Ticket No." := SaleLinePOSCoupon."Sales Ticket No.";
+        //-NPR5.51 [343352]
+        CouponEntry."Document Type" := CouponEntry."Document Type"::"POS Entry";
+        CouponEntry."Document No." := SaleLinePOSCoupon."Sales Ticket No.";
+        //+NPR5.51 [343352]
         CouponEntry."User ID" := UserId;
         CouponEntry."Closed by Entry No." := 0;
         CouponEntry.Insert;
 
         ApplyEntry(CouponEntry);
+        //-NPR5.51 [355406]
+        Coupon.CalcFields("Issue Coupon Module","Validate Coupon Module","Apply Discount Module");
+        NpDcCouponModuleMgt.OnPostDiscountApplication(SaleLinePOSCoupon,Coupon,CouponEntry);
+        //+NPR5.51 [355406]
         //-NPR5.37 [293232]
-        //PostClosedCoupon(Coupon);
         ArchiveClosedCoupon(Coupon);
         //+NPR5.37 [293232]
     end;
@@ -463,9 +507,171 @@ codeunit 6151590 "NpDc Coupon Mgt."
           SaleLinePOSCoupon.Delete;
           //+NPR5.36 [288641]
         until SaleLinePOSCoupon.Next = 0;
-        //-NPR5.36 [288641]
-        //SaleLinePOSCoupon.DELETEALL;
-        //+NPR5.36 [288641]
+    end;
+
+    local procedure PostExtCouponReservations(SalesHeader: Record "Sales Header")
+    var
+        NpDcExtCouponReservation: Record "NpDc Ext. Coupon Reservation";
+    begin
+        //-NPR5.51 [343352]
+        NpDcExtCouponReservation.SetRange("Document Type",SalesHeader."Document Type");
+        NpDcExtCouponReservation.SetRange("Document No.",SalesHeader."No.");
+        if NpDcExtCouponReservation.IsEmpty then
+          exit;
+
+        NpDcExtCouponReservation.FindSet;
+        repeat
+          PostExtCouponReservation(SalesHeader,NpDcExtCouponReservation);
+          NpDcExtCouponReservation.Delete;
+        until NpDcExtCouponReservation.Next = 0;
+        //+NPR5.51 [343352]
+    end;
+
+    procedure PostExtCouponReservation(SalesHeader: Record "Sales Header";NpDcExtCouponReservation: Record "NpDc Ext. Coupon Reservation")
+    var
+        Coupon: Record "NpDc Coupon";
+        CouponEntry: Record "NpDc Coupon Entry";
+        NpDcCouponModuleMgt: Codeunit "NpDc Coupon Module Mgt.";
+    begin
+        //-NPR5.51 [343352]
+        if not Coupon.Get(NpDcExtCouponReservation."Coupon No.") then
+          exit;
+
+        CouponEntry.Init;
+        CouponEntry."Entry No." := 0;
+        CouponEntry."Coupon No." := Coupon."No.";
+        CouponEntry."Entry Type" := CouponEntry."Entry Type"::"Discount Application";
+        CouponEntry."Coupon Type" := Coupon."Coupon Type";
+        CouponEntry.Quantity := -1;
+        CouponEntry."Remaining Quantity" := -1;
+        CouponEntry."Amount per Qty." := 0;
+        CouponEntry.Amount := 0;
+        CouponEntry.Positive := CouponEntry.Quantity > 0;
+        CouponEntry."Posting Date" := SalesHeader."Posting Date";
+        CouponEntry.Open := true;
+        CouponEntry."Register No." := '';
+        case SalesHeader."Document Type" of
+          SalesHeader."Document Type"::Order:
+            begin
+              CouponEntry."Document Type" := CouponEntry."Document Type"::"Sales Order";
+            end;
+          SalesHeader."Document Type"::Invoice:
+            begin
+              CouponEntry."Document Type" := CouponEntry."Document Type"::"Sales Invoice";
+            end;
+          SalesHeader."Document Type"::"Return Order":
+            begin
+              CouponEntry."Document Type" := CouponEntry."Document Type"::"Sales Return Order";
+            end;
+          SalesHeader."Document Type"::"Credit Memo":
+            begin
+              CouponEntry."Document Type" := CouponEntry."Document Type"::"Sales Credit Memo";
+            end;
+        end;
+        CouponEntry."Document No." := SalesHeader."No.";
+        CouponEntry."User ID" := UserId;
+        CouponEntry."Closed by Entry No." := 0;
+        CouponEntry.Insert;
+
+        ApplyEntry(CouponEntry);
+
+        Coupon.CalcFields("Issue Coupon Module","Validate Coupon Module","Apply Discount Module");
+
+        ArchiveClosedCoupon(Coupon);
+        //+NPR5.51 [343352]
+    end;
+
+    local procedure UpdatePostedDocInfo(SalesHeader: Record "Sales Header";SalesInvHdrNo: Code[20];SalesCrMemoHdrNo: Code[20])
+    var
+        NpDcCouponEntry: Record "NpDc Coupon Entry";
+        NpDcArchCouponEntry: Record "NpDc Arch. Coupon Entry";
+    begin
+        //-NPR5.51 [343352]
+        case SalesHeader."Document Type" of
+          SalesHeader."Document Type"::Order:
+            begin
+              NpDcCouponEntry.SetRange("Document Type",NpDcCouponEntry."Document Type"::"Sales Order");
+              NpDcCouponEntry.SetRange("Document No.",SalesHeader."No.");
+              if NpDcCouponEntry.FindSet then
+                repeat
+                  NpDcCouponEntry."Document Type" := NpDcCouponEntry."Document Type"::"Posted Sales Invoice";
+                  NpDcCouponEntry."Document No." := SalesInvHdrNo;
+                  NpDcCouponEntry.Modify;
+                until NpDcCouponEntry.Next = 0;
+
+              NpDcArchCouponEntry.SetRange("Document Type",NpDcArchCouponEntry."Document Type"::"Sales Order");
+              NpDcArchCouponEntry.SetRange("Document No.",SalesHeader."No.");
+              if NpDcArchCouponEntry.FindSet then
+                repeat
+                  NpDcArchCouponEntry."Document Type" := NpDcArchCouponEntry."Document Type"::"Posted Sales Invoice";
+                  NpDcArchCouponEntry."Document No." := SalesInvHdrNo;
+                  NpDcArchCouponEntry.Modify;
+                until NpDcArchCouponEntry.Next = 0;
+            end;
+          SalesHeader."Document Type"::Invoice:
+            begin
+              NpDcCouponEntry.SetRange("Document Type",NpDcCouponEntry."Document Type"::"Sales Invoice");
+              NpDcCouponEntry.SetRange("Document No.",SalesHeader."No.");
+              if NpDcCouponEntry.FindSet then
+                repeat
+                  NpDcCouponEntry."Document Type" := NpDcCouponEntry."Document Type"::"Posted Sales Invoice";
+                  NpDcCouponEntry."Document No." := SalesInvHdrNo;
+                  NpDcCouponEntry.Modify;
+                until NpDcCouponEntry.Next = 0;
+
+              NpDcArchCouponEntry.SetRange("Document Type",NpDcArchCouponEntry."Document Type"::"Sales Invoice");
+              NpDcArchCouponEntry.SetRange("Document No.",SalesHeader."No.");
+              if NpDcArchCouponEntry.FindSet then
+                repeat
+                  NpDcArchCouponEntry."Document Type" := NpDcArchCouponEntry."Document Type"::"Posted Sales Invoice";
+                  NpDcArchCouponEntry."Document No." := SalesInvHdrNo;
+                  NpDcArchCouponEntry.Modify;
+                until NpDcArchCouponEntry.Next = 0;
+            end;
+          SalesHeader."Document Type"::"Return Order":
+            begin
+              NpDcCouponEntry.SetRange("Document Type",NpDcCouponEntry."Document Type"::"Sales Return Order");
+              NpDcCouponEntry.SetRange("Document No.",SalesHeader."No.");
+              if NpDcCouponEntry.FindSet then
+                repeat
+                  NpDcCouponEntry."Document Type" := NpDcCouponEntry."Document Type"::"Posted Sales Credit Memo";
+                  NpDcCouponEntry."Document No." := SalesCrMemoHdrNo;
+                  NpDcCouponEntry.Modify;
+                until NpDcCouponEntry.Next = 0;
+
+              NpDcArchCouponEntry.SetRange("Document Type",NpDcArchCouponEntry."Document Type"::"Sales Return Order");
+              NpDcArchCouponEntry.SetRange("Document No.",SalesHeader."No.");
+              if NpDcArchCouponEntry.FindSet then
+                repeat
+                  NpDcArchCouponEntry."Document Type" := NpDcArchCouponEntry."Document Type"::"Posted Sales Credit Memo";
+                  NpDcArchCouponEntry."Document No." := SalesCrMemoHdrNo;
+                  NpDcArchCouponEntry.Modify;
+                until NpDcArchCouponEntry.Next = 0;
+            end;
+          SalesHeader."Document Type"::"Credit Memo":
+            begin
+              NpDcCouponEntry.SetRange("Document Type",NpDcCouponEntry."Document Type"::"Sales Credit Memo");
+              NpDcCouponEntry.SetRange("Document No.",SalesHeader."No.");
+              if NpDcCouponEntry.FindSet then
+                repeat
+                  NpDcCouponEntry."Document Type" := NpDcCouponEntry."Document Type"::"Posted Sales Credit Memo";
+                  NpDcCouponEntry."Document No." := SalesCrMemoHdrNo;
+                  NpDcCouponEntry.Modify;
+                until NpDcCouponEntry.Next = 0;
+
+              NpDcArchCouponEntry.SetRange("Document Type",NpDcArchCouponEntry."Document Type"::"Sales Credit Memo");
+              NpDcArchCouponEntry.SetRange("Document No.",SalesHeader."No.");
+              if NpDcArchCouponEntry.FindSet then
+                repeat
+                  NpDcArchCouponEntry."Document Type" := NpDcArchCouponEntry."Document Type"::"Posted Sales Credit Memo";
+                  NpDcArchCouponEntry."Document No." := SalesCrMemoHdrNo;
+                  NpDcArchCouponEntry.Modify;
+                until NpDcArchCouponEntry.Next = 0;
+            end;
+          else
+            exit;
+        end;
+        //+NPR5.51 [343352]
     end;
 
     local procedure ArchiveClosedCoupon(var Coupon: Record "NpDc Coupon")
@@ -485,7 +691,6 @@ codeunit 6151590 "NpDc Coupon Mgt."
           Coupon."Arch. No." := NoSeriesMgt.GetNextNo(CouponSetup."Arch. Coupon No. Series",Today,true);
 
         //-NPR5.37 [293232]
-        //InsertArchCoupon(Coupon);
         InsertArchivedCoupon(Coupon);
         //+NPR5.37 [293232]
         CouponEntry.SetRange("Coupon No.",Coupon."No.");
@@ -493,7 +698,6 @@ codeunit 6151590 "NpDc Coupon Mgt."
           CouponEntry.FindSet;
           repeat
             //-NPR5.37 [293232]
-            //InsertArchCouponEntry(Coupon,CouponEntry);
             InsertArchivedCouponEntry(Coupon,CouponEntry);
             //+NPR5.37 [293232]
           until CouponEntry.Next = 0;
@@ -525,7 +729,6 @@ codeunit 6151590 "NpDc Coupon Mgt."
         ArchCoupon."Print Template Code" := Coupon."Print Template Code";
         ArchCoupon.Open := Coupon.Open;
         ArchCoupon."Remaining Quantity" := Coupon."Remaining Quantity";
-        ArchCoupon."In-use Quantity" := Coupon."In-use Quantity";
         ArchCoupon."Issue Coupon Module" := Coupon."Issue Coupon Module";
         ArchCoupon."Validate Coupon Module" := Coupon."Validate Coupon Module";
         ArchCoupon."Apply Discount Module" := Coupon."Apply Discount Module";
@@ -551,7 +754,10 @@ codeunit 6151590 "NpDc Coupon Mgt."
         ArchCouponEntry."Remaining Quantity" := CouponEntry."Remaining Quantity";
         ArchCouponEntry."Amount per Qty." := CouponEntry."Amount per Qty.";
         ArchCouponEntry."Register No." := CouponEntry."Register No.";
-        ArchCouponEntry."Sales Ticket No." := CouponEntry."Sales Ticket No.";
+        //-NPR5.51 [343352]
+        ArchCouponEntry."Document Type" := CouponEntry."Document Type";
+        ArchCouponEntry."Document No." := CouponEntry."Document No.";
+        //+NPR5.51 [343352]
         ArchCouponEntry."User ID" := CouponEntry."User ID";
         ArchCouponEntry."Closed by Entry No." := CouponEntry."Closed by Entry No.";
         ArchCouponEntry.Insert;
@@ -626,8 +832,10 @@ codeunit 6151590 "NpDc Coupon Mgt."
     [EventSubscriber(ObjectType::Table, 6014406, 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeletePOSSaleLine(var Rec: Record "Sale Line POS";RunTrigger: Boolean)
     var
+        Coupon: Record "NpDc Coupon";
         SalePOS: Record "Sale POS";
         SaleLinePOSCoupon: Record "NpDc Sale Line POS Coupon";
+        NpDcCouponModuleMgt: Codeunit "NpDc Coupon Module Mgt.";
     begin
         if Rec.IsTemporary then
           exit;
@@ -644,6 +852,7 @@ codeunit 6151590 "NpDc Coupon Mgt."
         SaleLinePOSCoupon.SetRange("Applies-to Sale Line No.",Rec."Line No.");
         if not SaleLinePOSCoupon.IsEmpty then
           SaleLinePOSCoupon.DeleteAll;
+        //+NPR5.51 [355406]
 
         SaleLinePOSCoupon.Reset;
         SaleLinePOSCoupon.SetRange("Register No.",Rec."Register No.");
@@ -651,20 +860,21 @@ codeunit 6151590 "NpDc Coupon Mgt."
         SaleLinePOSCoupon.SetRange("Sale Type",Rec."Sale Type");
         SaleLinePOSCoupon.SetRange("Sale Date",Rec.Date);
         SaleLinePOSCoupon.SetRange("Sale Line No.",Rec."Line No.");
-        if not SaleLinePOSCoupon.IsEmpty then
-          SaleLinePOSCoupon.DeleteAll;
-
-        //-NPR5.41 [313062]
-        //-NPR5.47 [332655]
-        // ApplyDiscount(SalePOS);
-        //+NPR5.47 [332655]
+        //-NPR5.51 [355406]
+        if SaleLinePOSCoupon.FindSet then
+          repeat
+            if SaleLinePOSCoupon.Type = SaleLinePOSCoupon.Type::Coupon then begin
+              if Coupon.Get(SaleLinePOSCoupon."Coupon No.") then
+                  Coupon.CalcFields("Issue Coupon Module","Validate Coupon Module","Apply Discount Module");
+              NpDcCouponModuleMgt.OnCancelDiscountApplication(Coupon,SaleLinePOSCoupon);
+            end;
+            SaleLinePOSCoupon.Delete;
+          until SaleLinePOSCoupon.Next = 0;
+        //+NPR5.51 [355406]
 
         //-NPR5.42 [313644]
-        //Rec.FIND;
         if (Rec.Find ()) then ;
         //+NPR5.42 [313644]
-
-        //+NPR5.41 [313062]
     end;
 
     [EventSubscriber(ObjectType::Table, 6014406, 'OnAfterDeleteEvent', '', true, true)]
@@ -712,9 +922,6 @@ codeunit 6151590 "NpDc Coupon Mgt."
         SaleLinePOS.Description := Coupon.Description;
         SaleLineOut.InsertLine(SaleLinePOS);
         POSSession.RequestRefreshData();
-        //-NPR5.46 [329523]
-        //SaleLineOut.GetCurrentSaleLine(SaleLinePOS);
-        //+NPR5.46 [329523]
 
         SaleLinePOSCoupon.Init;
         SaleLinePOSCoupon."Register No." := SaleLinePOS."Register No.";
@@ -741,6 +948,56 @@ codeunit 6151590 "NpDc Coupon Mgt."
         //+NPR5.46 [329523]
     end;
 
+    local procedure "--- Sale Document Functionality"()
+    begin
+    end;
+
+    [EventSubscriber(ObjectType::Table, 36, 'OnBeforeDeleteEvent', '', true, true)]
+    local procedure OnBeforeDeleteSalesHeader(var Rec: Record "Sales Header";RunTrigger: Boolean)
+    var
+        Coupon: Record "NpDc Coupon";
+        NpDcExtCouponSalesLine: Record "NpDc Ext. Coupon Reservation";
+    begin
+        //-NPR5.51 [343352]
+        if Rec.IsTemporary then
+          exit;
+        if not RunTrigger then
+          exit;
+
+        NpDcExtCouponSalesLine.SetRange("Document Type",Rec."Document Type");
+        NpDcExtCouponSalesLine.SetRange("Document No.",Rec."No.");
+        if NpDcExtCouponSalesLine.IsEmpty then
+          exit;
+
+        NpDcExtCouponSalesLine.DeleteAll;
+        //+NPR5.51 [343352]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 80, 'OnBeforePostCommitSalesDoc', '', true, true)]
+    local procedure OnBeforePostCommitSalesDoc(var SalesHeader: Record "Sales Header";PreviewMode: Boolean)
+    begin
+        //-NPR5.51 [343352]
+        if PreviewMode then
+          exit;
+
+        if not SalesHeader.Invoice then
+          exit;
+
+        PostExtCouponReservations(SalesHeader);
+        //+NPR5.51 [343352]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', true, true)]
+    local procedure OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header";SalesInvHdrNo: Code[20];SalesCrMemoHdrNo: Code[20])
+    begin
+        //-NPR5.51 [343352]
+        if not SalesHeader.Invoice then
+          exit;
+
+        UpdatePostedDocInfo(SalesHeader,SalesInvHdrNo,SalesCrMemoHdrNo);
+        //+NPR5.51 [343352]
+    end;
+
     local procedure "--- Ean Box Event Handling"()
     begin
     end;
@@ -756,7 +1013,6 @@ codeunit 6151590 "NpDc Coupon Mgt."
           EanBoxEvent.Code := EventCodeRefNo();
           EanBoxEvent."Module Name" := Text002;
           //-NPR5.49 [350374]
-          //EanBoxEvent.Description := NpDcCoupon.FIELDCAPTION("Reference No.");
           EanBoxEvent.Description := CopyStr(NpDcCoupon.FieldCaption("Reference No."),1,MaxStrLen(EanBoxEvent.Description));
           //+NPR5.49 [350374]
           EanBoxEvent."Action Code" := ActionCode();

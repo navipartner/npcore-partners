@@ -1,9 +1,9 @@
 codeunit 6151203 "NpCs POS Action Deliver Order"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #344264/MHA /20190717  CASE 344264 "Delivery Only (non stock)" changed to "From Store Stock"
-    // #362329/MHA /20190718  CASE 362329 Updated StrSubStNo on DeliveryText in InsertDocumentReference()
-    // #364557/MHA /20190821  CASE 364557 Delivery should also be possible from Posted Invoice
+    // NPR5.51/MHA /20190717  CASE 344264 "Delivery Only (non stock)" changed to "From Store Stock"
+    // NPR5.51/MHA /20190718  CASE 362329 Updated StrSubStNo on DeliveryText in InsertDocumentReference()
+    // NPR5.51/MHA /20190821  CASE 364557 Delivery should also be possible from Posted Invoice
 
 
     trigger OnRun()
@@ -155,7 +155,7 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
           exit;
 
         NpCsDocument.Get(EntryNo);
-        //-#364557 [364557]
+        //-NPR5.51 [364557]
         case NpCsDocument."Document Type" of
           NpCsDocument."Document Type"::Order:
             begin
@@ -166,7 +166,7 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
               DeliverPostedInvoice(JSON,POSSession,NpCsDocument);
             end;
         end;
-        //+#364557 [364557]
+        //+NPR5.51 [364557]
     end;
 
     local procedure DeliverOrder(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";NpCsDocument: Record "NpCs Document")
@@ -177,7 +177,7 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
         POSSaleLine: Codeunit "POS Sale Line";
         PrepaidText: Text;
     begin
-        //-#364557 [364557]
+        //-NPR5.51 [364557]
         SalesHeader.Get(SalesHeader."Document Type"::Order,NpCsDocument."Document No.");
         POSSession.GetSaleLine(POSSaleLine);
         SalesLine.SetRange("Document Type",SalesHeader."Document Type");
@@ -197,7 +197,7 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
             PrepaidText := Text008;
           DeliverPrepaymentLine(NpCsDocument,NpCsSaleLinePOSReference,PrepaidText,POSSaleLine);
         end;
-        //+#364557 [364557]
+        //+NPR5.51 [364557]
     end;
 
     local procedure DeliverPostedInvoice(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";NpCsDocument: Record "NpCs Document")
@@ -208,7 +208,7 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
         POSSaleLine: Codeunit "POS Sale Line";
         PrepaidText: Text;
     begin
-        //-#364557 [364557]
+        //-NPR5.51 [364557]
         SalesInvHeader.Get(NpCsDocument."Document No.");
         POSSession.GetSaleLine(POSSaleLine);
         SalesInvLine.SetRange("Document No.",SalesInvHeader."No.");
@@ -227,7 +227,7 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
             PrepaidText := Text008;
           DeliverPrepaymentLine(NpCsDocument,NpCsSaleLinePOSReference,PrepaidText,POSSaleLine);
         end;
-        //+#364557 [364557]
+        //+NPR5.51 [364557]
     end;
 
     local procedure InsertDocumentReference(JSON: Codeunit "POS JSON Management";NpCsDocument: Record "NpCs Document";POSSaleLine: Codeunit "POS Sale Line";var NpCsSaleLinePOSReference: Record "NpCs Sale Line POS Reference")
@@ -243,9 +243,9 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
         if NpCsSaleLinePOSReference.FindFirst then
           Error(Text009,NpCsDocument."Document Type",NpCsDocument."Document No.");
 
-        //-#362329 [362329]
+        //-NPR5.51 [362329]
         DeliveryText := StrSubstNo(JSON.GetStringParameter('Delivery Text',false),NpCsDocument."Document Type",NpCsDocument."Reference No.");
-        //+#362329 [362329]
+        //+NPR5.51 [362329]
         if DeliveryText = '' then
           DeliveryText := StrSubstNo(Text006,NpCsDocument."Document Type",NpCsDocument."Reference No.");
         SaleLinePOS.Init;
@@ -274,10 +274,10 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
         NpCsSaleLinePOSReference2: Record "NpCs Sale Line POS Reference";
         SaleLinePOS: Record "Sale Line POS";
     begin
-        //-#344264 [344264]
+        //-NPR5.51 [344264]
         if not NpCsDocument."Store Stock" then
           exit;
-        //+#344264 [344264]
+        //+NPR5.51 [344264]
         if NpCsDocument."Bill via" <> NpCsDocument."Bill via"::POS then
           exit;
 
@@ -357,10 +357,10 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
     local procedure DeliverSalesLineGLAccount(NpCsDocument: Record "NpCs Document";SalesLine: Record "Sales Line";POSSaleLine: Codeunit "POS Sale Line";var SaleLinePOS: Record "Sale Line POS")
     begin
         SaleLinePOS.Init;
-        //-#344264 [344264]
+        //-NPR5.51 [344264]
         if not NpCsDocument."Store Stock" then
           SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
-        //+#344264 [344264]
+        //+NPR5.51 [344264]
         if NpCsDocument."Bill via" <> NpCsDocument."Bill via"::POS then
           SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
 
@@ -378,10 +378,10 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
     local procedure DeliverSalesLineItem(NpCsDocument: Record "NpCs Document";SalesLine: Record "Sales Line";POSSaleLine: Codeunit "POS Sale Line";var SaleLinePOS: Record "Sale Line POS")
     begin
         SaleLinePOS.Init;
-        //-#344264 [344264]
+        //-NPR5.51 [344264]
         if not NpCsDocument."Store Stock" then
           SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
-        //+#344264 [344264]
+        //+NPR5.51 [344264]
         if NpCsDocument."Bill via" <> NpCsDocument."Bill via"::POS then
           SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
         SaleLinePOS.Type := SaleLinePOS.Type::Item;
@@ -401,7 +401,7 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
         NpCsSaleLinePOSReference2: Record "NpCs Sale Line POS Reference";
         SaleLinePOS: Record "Sale Line POS";
     begin
-        //-#364557 [364557]
+        //-NPR5.51 [364557]
         case SalesInvLine.Type of
           SalesInvLine.Type::" ":
             begin
@@ -431,24 +431,24 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
         NpCsSaleLinePOSReference2."Document Type" := NpCsSaleLinePOSReference."Document Type";
         NpCsSaleLinePOSReference2."Document Line No." := SalesInvLine."Line No.";
         NpCsSaleLinePOSReference2.Insert;
-        //+#364557 [364557]
+        //+NPR5.51 [364557]
     end;
 
     local procedure DeliverSalesInvLineComment(SalesInvLine: Record "Sales Invoice Line";POSSaleLine: Codeunit "POS Sale Line";var SaleLinePOS: Record "Sale Line POS")
     begin
-        //-#364557 [364557]
+        //-NPR5.51 [364557]
         SaleLinePOS.Init;
         SaleLinePOS.Type := SaleLinePOS.Type::Comment;
         SaleLinePOS."No." := '*';
         SaleLinePOS.Description := SalesInvLine.Description;
         SaleLinePOS."Description 2" := SalesInvLine."Description 2";
         POSSaleLine.InsertLine(SaleLinePOS);
-        //+#364557 [364557]
+        //+NPR5.51 [364557]
     end;
 
     local procedure DeliverSalesInvLineGLAccount(NpCsDocument: Record "NpCs Document";SalesInvLine: Record "Sales Invoice Line";POSSaleLine: Codeunit "POS Sale Line";var SaleLinePOS: Record "Sale Line POS")
     begin
-        //-#364557 [364557]
+        //-NPR5.51 [364557]
         SaleLinePOS.Init;
         if not NpCsDocument."Store Stock" then
           SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
@@ -464,12 +464,12 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
         SaleLinePOS."Unit of Measure Code" := SalesInvLine."Unit of Measure Code";
         SaleLinePOS."Discount %" := SalesInvLine."Line Discount %";
         POSSaleLine.InsertLine(SaleLinePOS);
-        //+#364557 [364557]
+        //+NPR5.51 [364557]
     end;
 
     local procedure DeliverSalesInvLineItem(NpCsDocument: Record "NpCs Document";SalesInvLine: Record "Sales Invoice Line";POSSaleLine: Codeunit "POS Sale Line";var SaleLinePOS: Record "Sale Line POS")
     begin
-        //-#364557 [364557]
+        //-NPR5.51 [364557]
         SaleLinePOS.Init;
         if not NpCsDocument."Store Stock" then
           SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::"Debit Sale";
@@ -485,7 +485,7 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
         SaleLinePOS."Unit of Measure Code" := SalesInvLine."Unit of Measure Code";
         SaleLinePOS."Discount %" := SalesInvLine."Line Discount %";
         POSSaleLine.InsertLine(SaleLinePOS);
-        //+#364557 [364557]
+        //+NPR5.51 [364557]
     end;
 
     local procedure FindDocument(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";var NpCsDocument: Record "NpCs Document"): Boolean
@@ -526,9 +526,9 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
           exit(false);
 
         NpCsDocument.SetRange("Reference No.",ReferenceNo);
-        //-#364557 [364557]
+        //-NPR5.51 [364557]
         NpCsDocument.SetRange(Type,NpCsDocument.Type::"Collect in Store");
-        //+#364557 [364557]
+        //+NPR5.51 [364557]
         exit(NpCsDocument.FindFirst);
     end;
 

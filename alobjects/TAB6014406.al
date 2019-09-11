@@ -96,6 +96,11 @@ table 6014406 "Sale Line POS"
     // NPR5.50/MMV /20190320 CASE 300557 Added fields 147, 148, 151, 152, 155, 156, 157, 158
     //                                   Removed old prepayment % handling
     // NPR5.50/TSA /20190514 CASE 354832 Added VAT settings for payment lines (specifically for vouchers)
+    // NPR5.51/THRO/20190624 CASE 359293 Make sure lastest version of Item is read in TestItem().
+    // NPR5.51/MMV /20190627 CASE 359385 Changed EFT delete error wording and renamed field
+    // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup() in UpdateVATSetup()
+    // NPR5.51/MHA /20190812 CASE 358490 Removed test on RegisterGlobal."Credit Voucher Account" in Quantity - OnValidate()
+    // NPR5.51/TSA /20190821 CASE 365487 Corner case when discount is 100% and VAT amount is rounded in different directions.
 
     Caption = 'Sale Line';
     PasteIsValid = false;
@@ -260,7 +265,6 @@ table 6014406 "Sale Line POS"
                 SaleLinePOS: Record "Sale Line POS";
                 Txt001: Label 'Quantity can not be changes on a repair sale';
                 Err001: Label 'Quantity at %2 %1 can only be 1 or -1';
-                Err002: Label 'The number %1 is identical to the registers creditvoucher account';
                 Err003: Label 'A quantity must be specified on the line';
                 OldUnitPrice: Decimal;
             begin
@@ -288,9 +292,6 @@ table 6014406 "Sale Line POS"
                     Type::"G/L Entry":
                         begin
                             if not Silent then begin
-                                if RegisterGlobal.Get("Register No.") then
-                                    if RegisterGlobal."Credit Voucher Account" = "No." then
-                                        Error(Err002, "No.");
                                 if Quantity = 0 then
                                     Error(Err003);
                             end;
@@ -1325,7 +1326,7 @@ table 6014406 "Sale Line POS"
         {
             Caption = 'Dimension Set ID';
         }
-        field(500;"Cash Terminal Approved";Boolean)
+        field(500;"EFT Approved";Boolean)
         {
             Caption = 'Cash Terminal Approved';
         }
@@ -1336,7 +1337,7 @@ table 6014406 "Sale Line POS"
 
             trigger OnValidate()
             begin
-                TestField("Cash Terminal Approved");
+                TestField("EFT Approved");
             end;
         }
         field(550;"Drawer Opened";Boolean)
@@ -1728,8 +1729,12 @@ table 6014406 "Sale Line POS"
         Err002: Label 'A financial account has not been selected for the purchase %1';
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
     begin
-        if "Cash Terminal Approved" then
-          Error(ErrTerm,"No.");
+        //-NPR5.51 [359385]
+        // IF "Cash Terminal Approved" THEN
+        //  ERROR(ErrTerm,"No.");
+        if "EFT Approved" then
+          Error(ERR_EFT_DELETE);
+        //+NPR5.51 [359385]
 
         RetailSetup.Get;
         Deleting := true;
@@ -1920,7 +1925,6 @@ table 6014406 "Sale Line POS"
         TotalItemLedgerEntryQuantity: Decimal;
         TotalAuditRollQuantity: Decimal;
         PreDefQty: Decimal;
-        ErrTerm: Label 'Payment type %1 can not changes when terminal confirm';
         VariationSelected: Boolean;
         ErrMaxExceeded: Label 'The amount on payment option %1 must not surpass %2';
         ErrMinExceeded: Label 'The amount on payment option %1 must not be below %2';
@@ -1931,6 +1935,7 @@ table 6014406 "Sale Line POS"
         Text002: Label '%1 %2 is used more than once.';
         Text003: Label 'Adjust the inventory first, and then continue the transaction';
         Text004: Label '%1 %2 is already used.';
+        ERR_EFT_DELETE: Label 'Cannot delete externally approved electronic funds transfer. Please attempt refund or void of the original transaction instead.';
 
     local procedure GetPOSHeader()
     var
@@ -2455,12 +2460,17 @@ table 6014406 "Sale Line POS"
     procedure UpdateVATSetup()
     var
         VATPostingSetup: Record "VAT Posting Setup";
+        POSTaxCalculation: Codeunit "POS Tax Calculation";
+        Handled: Boolean;
     begin
         if (Type = Type::"G/L Entry") and ("Gen. Posting Type" = "Gen. Posting Type"::" ") then begin
           "VAT %" := 0;
           "VAT Calculation Type" := "VAT Calculation Type"::"Normal VAT";
         end else begin
           VATPostingSetup.Get("VAT Bus. Posting Group","VAT Prod. Posting Group");
+          //-NPR5.51 [358985]
+          POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
+          //+NPR5.51 [358985]
           //-NPR5.41 [311309]
           "VAT Identifier" := VATPostingSetup."VAT Identifier";
           //+NPR5.41 [311309]
@@ -2557,6 +2567,12 @@ table 6014406 "Sale Line POS"
                                    Currency."Amount Rounding Precision") - TotalAmount;
                   //+NPR5.48 [335967]
                   "Amount Including VAT" := Round("Amount Including VAT");
+
+                  //-NPR5.51 [365487]
+                  if ("Amount Including VAT" = 0) then
+                    Amount := 0;
+                  //+NPR5.51 [365487]
+
                   "VAT Base Amount" := Amount;
                 end;
               "VAT Calculation Type"::"Sales Tax":
@@ -2617,6 +2633,12 @@ table 6014406 "Sale Line POS"
                       Currency."Amount Rounding Precision",Currency.VATRoundingDirection) -
                     TotalAmountInclVAT;
                   //+NPR5.48 [335967]
+
+                  //-NPR5.51 [365487]
+                  if (Amount  = 0) then
+                    "Amount Including VAT" := 0;
+                  //+NPR5.51 [365487]
+
                 end;
               "VAT Calculation Type"::"Sales Tax":
                 begin
@@ -2827,8 +2849,9 @@ table 6014406 "Sale Line POS"
           exit;
 
         //-NPR5.48 [335967]
-        //Item.GET("No.");
-        GetItem;
+        //-NPR5.51 [359293]
+        Item.Get("No.");
+        //-NPR5.51 [359293]
         //+NPR5.48 [335967]
 
         Item.TestField(Blocked,false);

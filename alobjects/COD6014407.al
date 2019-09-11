@@ -151,6 +151,9 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
     // NPR5.48/THRO/20181221  CASE 339049 Assign Line No. to Sales Line before validating data into Sales Line in CopySalesLines
     // NPR5.50/MMV /20190320  CASE 300557 Refactored prepayment & posting flows.
     // NPR5.50/MMV /20190606  CASE 352473 Improved error message when posting fails. Only transfer posted document fields when posted.
+    // NPR5.51/MMV /20190605  CASE 357277 Added support for skipping line transfer to POS entry.
+    // NPR5.51/MHA /20190614  CASE 358582 Removed function OnBeforeAuditRollDebitSaleLineInsertEvent() and added corresponding invokes to codeunit 6014435
+    // NPR5.51/ALST/20190705  CASE 357848 added possibility to prepay by amount not just percentage
 
     Permissions = TableData "Audit Roll"=rimd;
     TableNo = "Sale POS";
@@ -249,6 +252,8 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         RESERVE_FAIL_MESSAGE: Label 'Full automatic reservation is not possible for all lines in %1 %2.\Reserve manually.';
         RESERVE_FAIL_ERROR: Label 'Full  automatic reservation failed for line with:\%1: %2\%3: %4';
         POSTING_ERROR: Label 'A problem occured during posting of %1 %2.\Document was left in unposted state.\%3';
+        DeleteSaleLinesAfterExport: Boolean;
+        AmountExceedsSaleErr: Label 'The prepaid amount exceeds the total amount of the sale';
 
     procedure SetAsk(AskIn: Boolean)
     begin
@@ -427,6 +432,13 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         //+NPR5.50 [300557]
     end;
 
+    procedure SetDeleteSaleLinesAfterExport(DeleteSaleLinesAfterExportIn: Boolean)
+    begin
+        //-NPR5.51 [357277]
+        DeleteSaleLinesAfterExport := DeleteSaleLinesAfterExportIn;
+        //+NPR5.51 [357277]
+    end;
+
     procedure Reset()
     begin
         Ask                    := false;
@@ -574,6 +586,11 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         //+NPR5.50 [352473]
 
           if WriteInAuditRoll then begin
+        //-NPR5.51 [357277]
+            if DeleteSaleLinesAfterExport then
+              SaleLinePOS.DeleteAll;
+        //+NPR5.51 [357277]
+
             CreateDocumentPostingAudit(SalesHeader,SalePOS,Posted);
             if NPRetailSetup."Advanced POS Entries Activated" then begin
               POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS,SalesHeader,Posted);
@@ -1414,7 +1431,10 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         //-NPR5.50 [300557]
         with SaleLinePOS do begin
           SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
-          ApplyPrepaymentPercentageToAllLines(SalesHeader, "Sales Doc. Prepayment %", true);
+          //-NPR5.51
+          // ApplyPrepaymentPercentageToAllLines(SalesHeader, "Sales Doc. Prepayment %", TRUE);
+          ApplyPrepaymentValueToAllLines(SalesHeader,"Sales Doc. Prepayment %",true,false);
+          //+NPR5.51
           Print := "Sales Document Print";
           "Sales Document Prepayment" := false;
           "Sales Document Print" := false;
@@ -1605,7 +1625,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         //+NPR5.50 [300557]
     end;
 
-    procedure CreatePrepaymentLine(var POSSession: Codeunit "POS Session";var SalesHeader: Record "Sales Header";PrepaymentPct: Decimal;PrintPrepaymentInvoice: Boolean;SyncPosting: Boolean)
+    procedure CreatePrepaymentLine(var POSSession: Codeunit "POS Session";var SalesHeader: Record "Sales Header";PrepaymentVal: Decimal;PrintPrepaymentInvoice: Boolean;SyncPosting: Boolean;PayByAmount: Boolean)
     var
         PrepaymentAmount: Decimal;
         POSSale: Codeunit "POS Sale";
@@ -1614,10 +1634,16 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         SaleLinePOS: Record "Sale Line POS";
     begin
         //-NPR5.50 [300557]
-        if (PrepaymentPct <= 0) or (PrepaymentPct > 100) then
-          exit;
+        //-NPR5.51
+        if not PayByAmount then
+        //+NPR5.51
+          if (PrepaymentVal <= 0) or (PrepaymentVal > 100) then
+              exit;
 
-        PrepaymentAmount := ApplyPrepaymentPercentageToAllLines(SalesHeader, PrepaymentPct, false);
+        //-NPR5.51
+        // PrepaymentAmount := ApplyPrepaymentPercentageToAllLines(SalesHeader, PrepaymentPrc, FALSE);
+        PrepaymentAmount := ApplyPrepaymentValueToAllLines(SalesHeader,PrepaymentVal,false,PayByAmount);
+        //+NPR5.51
 
         if PrepaymentAmount = 0 then
           exit;
@@ -1644,7 +1670,10 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         SaleLinePOS."Sales Document Type" := SalesHeader."Document Type";
         SaleLinePOS."Sales Document No." := SalesHeader."No.";
         SaleLinePOS."Sales Document Prepayment" := true;
-        SaleLinePOS."Sales Doc. Prepayment %" := PrepaymentPct;
+        //-NPR5.51
+        //SaleLinePOS."Sales Doc. Prepayment %" := PrepaymentPrc;
+        SaleLinePOS."Sales Doc. Prepayment %" := PrepaymentVal;
+        //+NPR5.51
         SaleLinePOS."Sales Document Print" := PrintPrepaymentInvoice;
         SaleLinePOS."Sales Document Sync. Posting" := SyncPosting;
         SaleLinePOS.Validate("Unit Price", PrepaymentAmount);
@@ -1687,10 +1716,14 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         //+NPR5.50 [300557]
     end;
 
-    procedure ApplyPrepaymentPercentageToAllLines(SalesHeader: Record "Sales Header";PrepaymentPercentage: Decimal;Persist: Boolean): Decimal
+    procedure ApplyPrepaymentValueToAllLines(SalesHeader: Record "Sales Header";PrepaymentValue: Decimal;Persist: Boolean;PayByAmount: Boolean): Decimal
     var
         SalesLine: Record "Sales Line";
+        Lines: Integer;
         PrepaymentAmountDiff: Decimal;
+        TotalPrepayerAmnt: Decimal;
+        AmountPrepaied: Decimal;
+        LeftOver: Decimal;
     begin
         //-NPR5.50 [300557]
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -1701,16 +1734,62 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         if not SalesLine.FindSet(Persist) then
           exit(0);
 
+        //-NPR5.51
+        if PayByAmount then begin
+          Lines := SalesLine.Count;
+          TotalPrepayerAmnt := TotalPrepayedAmount(SalesLine);
+          if PrepaymentValue > TotalPrepayerAmnt then
+            Error(AmountExceedsSaleErr);
+
+          AmountPrepaied := PrepaymentValue;
+          LeftOver := PrepaymentValue;
+          PrepaymentAmountDiff := PrepaymentValue;
+          PrepaymentValue := Round((100 * PrepaymentValue) / TotalPrepayerAmnt,0.00001);
+        end;
+        //+NPR5.51
+
         repeat
           SalesLine.Validate("Prepmt. Line Amount", SalesLine."Prepmt. Amt. Inv."); //Set prepayment amount back to invoiced, in case someone modified it without posting.
-          SalesLine.Validate("Prepayment %", SalesLine."Prepayment %" + PrepaymentPercentage);
-          PrepaymentAmountDiff += (SalesLine."Prepmt. Line Amount" -  SalesLine."Prepmt. Amt. Inv.");
+          //-NPR5.51
+          if PayByAmount then begin
+            Lines -= 1;
+            if Lines > 0 then begin
+              SalesLine.Validate(SalesLine."Prepmt. Line Amount",(SalesLine."Unit Price" * SalesLine.Quantity * AmountPrepaied) / TotalPrepayerAmnt);
+              LeftOver -= SalesLine."Prepmt. Line Amount";
+            end else
+              SalesLine.Validate(SalesLine."Prepmt. Line Amount",LeftOver);
+          end else begin
+          //+NPR5.51
+            SalesLine.Validate("Prepayment %", SalesLine."Prepayment %" + PrepaymentValue);
+            PrepaymentAmountDiff += (SalesLine."Prepmt. Line Amount" -  SalesLine."Prepmt. Amt. Inv.");
+          end;
+
           if Persist then
             SalesLine.Modify(true);
         until SalesLine.Next = 0;
 
         exit(PrepaymentAmountDiff);
         //+NPR5.50 [300557]
+    end;
+
+    local procedure TotalPrepayedAmount(SalesLine: Record "Sales Line") TotalAmount: Decimal
+    var
+        Currency: Record Currency;
+    begin
+        //-NPR5.51
+        SalesLine.SetRecFilter;
+        SalesLine.SetRange("Line No.");
+        SalesLine.SetFilter("No.",'<>%1','');
+        if SalesLine.FindSet then repeat
+          if SalesLine."Currency Code" > '' then
+            if Currency.Get(SalesLine."Currency Code") then;
+
+          if Currency."Amount Rounding Precision" > 0 then
+            TotalAmount += Round(SalesLine.Quantity * SalesLine."Unit Price",Currency."Amount Rounding Precision")
+          else
+            TotalAmount += Round(SalesLine.Quantity * SalesLine."Unit Price");
+        until SalesLine.Next = 0;
+        //+NPR5.51
     end;
 
     procedure GetTotalPrepaidAmountNotDeducted(SalesHeader: Record "Sales Header"): Decimal
@@ -1872,6 +1951,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         TicketManagement: Codeunit "TM Ticket Management";
         DimMgt: Codeunit NPRDimensionManagement;
         Register: Record Register;
+        RetailFormCode: Codeunit "Retail Form Code";
     begin
         Register.Get( Sale."Register No." );
         SaleLinePOS.SetCurrentKey(SaleLinePOS."Register No.",SaleLinePOS."Sales Ticket No.",SaleLinePOS."Line No.");
@@ -1912,7 +1992,9 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
           if (AuditRoll.Type = AuditRoll.Type::Item) then
             TicketManagement.IssueTicketsFromAuditRoll(AuditRoll);
 
-          OnBeforeAuditRollDebitSaleLineInsertEvent(Sale,SaleLinePOS,AuditRoll);
+          //-NPR5.51 [358582]
+          RetailFormCode.OnBeforeAuditRoleLineInsertEvent(Sale,SaleLinePOS,AuditRoll);
+          //+NPR5.51 [358582]
 
           AuditRoll.Insert(true);
           DimMgt.CopySaleLineDimToAuditDim( SaleLinePOS, AuditRoll );
@@ -1952,7 +2034,9 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
             if AuditRoll.Offline then
               AuditRoll.Posted := false;
 
-            OnBeforeAuditRollDebitSaleLineInsertEvent(Sale,SaleLinePOS,AuditRoll);
+            //-NPR5.51 [358582]
+            RetailFormCode.OnBeforeAuditRoleLineInsertEvent(Sale,SaleLinePOS,AuditRoll);
+            //+NPR5.51 [358582]
 
             AuditRoll.Insert(true);
           end;
@@ -1987,7 +2071,9 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
             if AuditRoll.Offline then
               AuditRoll.Posted := false;
 
-            OnBeforeAuditRollDebitSaleLineInsertEvent(Sale,SaleLinePOS,AuditRoll);
+            //-NPR5.51 [358582]
+            RetailFormCode.OnBeforeAuditRoleLineInsertEvent(Sale,SaleLinePOS,AuditRoll);
+            //+NPR5.51 [358582]
 
             AuditRoll.Insert(true);
           end;
@@ -2101,11 +2187,6 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
     end;
 
     local procedure "--- Event Publishers"()
-    begin
-    end;
-
-    [IntegrationEvent(TRUE, TRUE)]
-    local procedure OnBeforeAuditRollDebitSaleLineInsertEvent(var SalePOS: Record "Sale POS";var SaleLinePos: Record "Sale Line POS";var AuditRoll: Record "Audit Roll")
     begin
     end;
 

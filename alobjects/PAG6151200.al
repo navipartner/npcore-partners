@@ -79,7 +79,7 @@ page 6151200 "NpCs Document List"
                 field("Delivery updated by";"Delivery updated by")
                 {
                 }
-                field("Delivery Only (Non stock)";"Store Stock")
+                field("Store Stock";"Store Stock")
                 {
                 }
                 field("Bill via";"Bill via")

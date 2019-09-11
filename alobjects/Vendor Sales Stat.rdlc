@@ -29,6 +29,9 @@
         <Field Name="PurchaseQty_Vendor">
           <DataField>PurchaseQty_Vendor</DataField>
         </Field>
+        <Field Name="PurchaseQty_VendorFormat">
+          <DataField>PurchaseQty_VendorFormat</DataField>
+        </Field>
         <Field Name="PurchasesLCY_Vendor">
           <DataField>PurchasesLCY_Vendor</DataField>
         </Field>
@@ -124,6 +127,9 @@
         </Field>
         <Field Name="SalesQty_Vendor">
           <DataField>SalesQty_Vendor</DataField>
+        </Field>
+        <Field Name="SalesQty_VendorFormat">
+          <DataField>SalesQty_VendorFormat</DataField>
         </Field>
         <Field Name="SalesInclVat">
           <DataField>SalesInclVat</DataField>
@@ -3296,6 +3302,15 @@
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
+            <Filters>
+              <Filter>
+                <FilterExpression>=IIF(IsNothing(Fields!SalesQty_Vendor.Value),True,False)</FilterExpression>
+                <Operator>Equal</Operator>
+                <FilterValues>
+                  <FilterValue DataType="Boolean">false</FilterValue>
+                </FilterValues>
+              </Filter>
+            </Filters>
             <Height>2.39918cm</Height>
             <Width>27.14221cm</Width>
             <Style>

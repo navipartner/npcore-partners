@@ -1,9 +1,9 @@
 table 6151202 "NpCs Arch. Document"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #344264/MHA /20190717  CASE 344264 Added fields 300, 305, 310 and changed name and logic for field 240
-    // #362443/MHA /20190719  CASE 362443 "To Store Code" may now refer to Local Store and added fields 13 "Inserted at", 5000 "Archived at"
-    // #364557/MHA /20190819  CASE 364557 Added options "Posted Invoice", "Posted Credit Memo" to field 5 "Document Type"
+    // NPR5.51/MHA /20190717  CASE 344264 Added fields 300, 305, 310 and changed name and logic for field 240
+    // NPR5.51/MHA /20190719  CASE 362443 "To Store Code" may now refer to Local Store and added fields 13 "Inserted at", 5000 "Archived at"
+    // NPR5.51/MHA /20190819  CASE 364557 Added options "Posted Invoice", "Posted Credit Memo" to field 5 "Document Type"
 
     Caption = 'Collect Document';
     DrillDownPageID = "NpCs Arch. Document List";
@@ -25,14 +25,14 @@ table 6151202 "NpCs Arch. Document"
         field(5;"Document Type";Option)
         {
             Caption = 'Document Type';
-            Description = '#364557';
+            Description = 'NPR5.51';
             OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order,Posted Invoice,Posted Credit Memo';
             OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order","Posted Invoice","Posted Credit Memo";
         }
         field(7;"Document No.";Code[20])
         {
             Caption = 'Document No.';
-            Description = '#364557';
+            Description = 'NPR5.51';
             TableRelation = IF ("Document Type"=FILTER(Quote|Order|Invoice|"Credit Memo"|"Blanket Order"|"Return Order")) "Sales Header"."No." WHERE ("Document Type"=FIELD("Document Type"))
                             ELSE IF ("Document Type"=CONST("Posted Invoice")) "Sales Invoice Header"
                             ELSE IF ("Document Type"=CONST("Posted Credit Memo")) "Sales Cr.Memo Header";
@@ -44,7 +44,7 @@ table 6151202 "NpCs Arch. Document"
         field(13;"Inserted at";DateTime)
         {
             Caption = 'Inserted at';
-            Description = '#362443';
+            Description = 'NPR5.51';
         }
         field(15;"Workflow Code";Code[20])
         {
@@ -88,13 +88,13 @@ table 6151202 "NpCs Arch. Document"
         field(60;"To Store Code";Code[20])
         {
             Caption = 'To Store Code';
-            Description = '#362443';
+            Description = 'NPR5.51';
             TableRelation = "NpCs Store";
         }
         field(65;"Opening Hour Set";Code[20])
         {
             Caption = 'Opening Hour Set';
-            Description = '#362443';
+            Description = 'NPR5.51';
             TableRelation = "NpCs Open. Hour Set";
         }
         field(95;"Processing Expiry Duration";Duration)
@@ -122,7 +122,7 @@ table 6151202 "NpCs Arch. Document"
         field(114;"Customer No.";Code[20])
         {
             Caption = 'Customer No.';
-            Description = '#344264';
+            Description = 'NPR5.51';
         }
         field(115;"Customer E-mail";Text[80])
         {
@@ -241,51 +241,51 @@ table 6151202 "NpCs Arch. Document"
         field(240;"Store Stock";Boolean)
         {
             Caption = 'Store Stock';
-            Description = '#344264';
+            Description = 'NPR5.51';
             InitValue = true;
         }
         field(250;"Post on";Option)
         {
             Caption = 'Post on';
-            Description = '#364557';
+            Description = 'NPR5.51';
             OptionCaption = 'Delivery,Processing';
             OptionMembers = Delivery,Processing;
         }
         field(290;"Processing Print Template";Code[20])
         {
             Caption = 'Processing Print Template';
-            Description = '#364557';
+            Description = 'NPR5.51';
             TableRelation = "RP Template Header" WHERE ("Table ID"=CONST(6151198));
         }
         field(300;"Bill via";Option)
         {
             Caption = 'Bill via';
-            Description = '#344264';
+            Description = 'NPR5.51';
             OptionCaption = 'POS,Sales Document';
             OptionMembers = POS,"Sales Document";
         }
         field(305;"Delivery Print Template (POS)";Code[20])
         {
             Caption = 'Delivery Print Template (POS)';
-            Description = '#344264';
+            Description = 'NPR5.51';
             TableRelation = "RP Template Header" WHERE ("Table ID"=CONST(6151198));
         }
         field(310;"Delivery Print Template (S.)";Code[20])
         {
             Caption = 'Delivery Template (Sales Document)';
-            Description = '#344264';
+            Description = 'NPR5.51';
             TableRelation = "RP Template Header" WHERE ("Table ID"=CONST(6151198));
         }
         field(315;"Salesperson Code";Code[10])
         {
             Caption = 'Salesperson Code';
-            Description = '#344264';
+            Description = 'NPR5.51';
             TableRelation = "Salesperson/Purchaser";
         }
         field(2000;"Sell-to Customer Name";Text[50])
         {
             Caption = 'Sell-to Customer Name';
-            Description = '#364557';
+            Description = 'NPR5.51';
         }
         field(2005;"Location Code";Code[10])
         {
@@ -294,7 +294,7 @@ table 6151202 "NpCs Arch. Document"
         field(5000;"Archived at";DateTime)
         {
             Caption = 'Archived at';
-            Description = '#362443';
+            Description = 'NPR5.51';
         }
     }
 

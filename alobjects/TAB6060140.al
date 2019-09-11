@@ -4,6 +4,7 @@ table 6060140 "MM Loyalty Setup"
     // MM1.23/TSA /20171006 CASE 257011 Added Amount Factor and Point Rate, both these were implictly 1
     // MM1.23/TSA /20171006 CASE 257011 Extended Description to 50
     // MM1.32/TSA /20180712 CASE 321176 Voucher Creation, new option "Prompt"
+    // MM1.40/TSA /20190816 CASE 361664 Added field 80
 
     Caption = 'Loyalty Setup';
 
@@ -87,6 +88,12 @@ table 6060140 "MM Loyalty Setup"
             Caption = 'Point Rate';
             DecimalPlaces = 2:5;
             InitValue = 1;
+        }
+        field(80;"Auto Upgrade Point Source";Option)
+        {
+            Caption = 'Auto Upgrade Point Source';
+            OptionCaption = ' ,Uncollected,Previous Period';
+            OptionMembers = NA,UNCOLLECTED,PREVIOUS_PERIOD;
         }
     }
 

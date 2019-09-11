@@ -17,6 +17,7 @@ table 6014452 "Pacsoft Shipment Document"
     // NPR5.36/BHR/20170926 CASE 290780 Add field "delivery Instructions", "External Document No.", "Your reference"
     // NPR5.43/BHR/20180805 CASE 304453 Add field "Print Return Label"
     // NPR5.45/BHR /20180831 CASE 326205 Add field Change caption For return Labels
+    // NPR5.51/BHR /20190716 CASE 361583 Add Track and Trace functionality for packkelabels
 
     Caption = 'Pacsoft Shipment Document';
     DrillDownPageID = "Pacsoft Shipment Documents";
@@ -866,6 +867,7 @@ table 6014452 "Pacsoft Shipment Document"
         TrackingInternetAddr: Text[250];
         PacsoftSetup: Record "Pacsoft Setup";
     begin
+
         if pShipmentDocument."Entry No." = 0 then exit;
 
         PacsoftSetup.Get;
@@ -874,6 +876,11 @@ table 6014452 "Pacsoft Shipment Document"
           TestField("Shipping Agent Code");
           ShippingAgent.Get("Shipping Agent Code");
           ShippingAgent.TestField("Internet Address");
+          //-NPR5.51 [361583]
+          if pShipmentDocument."Response Package No." <> '' then
+            TrackingInternetAddr := StrSubstNo(ShippingAgent."Internet Address",pShipmentDocument."Response Package No.")
+          else
+          //+NPR5.51 [361583]
           TrackingInternetAddr := StrSubstNo(ShippingAgent."Internet Address", PacsoftSetup.User, "Entry No.");
           HyperLink(TrackingInternetAddr);
         end;

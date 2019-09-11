@@ -6,6 +6,7 @@ codeunit 6151150 "M2 Account WebService"
     // MAG2.21/JAKUBV/20190402  CASE 320424-01 Transport NPR5.49 - 1 April 2019
     // MAG2.21.01/TSA /20190426 CASE 350001 Added GetExtendedAccountDetails
     // MAG2.21.01/TSA /20190506 CASE 353964 Refactored to not use try functions
+    // NPR5.51/TSA /20190724 CASE 362020 Adding actions for contact / mail group management
 
 
     trigger OnRun()
@@ -260,7 +261,7 @@ codeunit 6151150 "M2 Account WebService"
         TmpShipToAddress: Record "Ship-to Address" temporary;
     begin
 
-        //-#350001 [350001]
+        //-NPR5.51 [350001]
         SelectLatestVersion;
 
         GetExtendedAccount.Import;
@@ -273,7 +274,64 @@ codeunit 6151150 "M2 Account WebService"
           GetExtendedAccount.SetErrorResponse (GetLastErrorText ());
 
         end;
-        //+#350001 [350001]
+        //+NPR5.51 [350001]
+    end;
+
+    procedure ListAllMailGroups(var ListMailingGroups: XMLport "M2 List Mailing Groups")
+    begin
+
+        //-NPR5.51 [362020]
+        // Implicit export
+        //+NPR5.51 [362020]
+    end;
+
+    procedure ListMailGroupsForAccount(ContactNo: Code[20];var ListMailingGroups: XMLport "M2 List Mailing Groups")
+    begin
+
+        //-NPR5.51 [362020]
+        SelectLatestVersion;
+        ListMailingGroups.CreateListForContact (ContactNo);
+        // Implicit export
+
+        //+NPR5.51 [362020]
+    end;
+
+    procedure AddAccountToMailGroup(ContactNo: Code[20];MailGroupCode: Code[10];var ListMailingGroups: XMLport "M2 List Mailing Groups")
+    var
+        ContactMailingGroup: Record "Contact Mailing Group";
+    begin
+
+        //-NPR5.51 [362020]
+        SelectLatestVersion;
+
+        if (not ContactMailingGroup.Get (ContactNo, MailGroupCode)) then begin
+          ContactMailingGroup.Validate ("Contact No.", ContactNo);
+          ContactMailingGroup.Validate ("Mailing Group Code", MailGroupCode);
+          ContactMailingGroup.Insert (true);
+        end;
+
+        ListMailingGroups.CreateListForContact (ContactNo);
+        // Implicit export
+
+        //+NPR5.51 [362020]
+    end;
+
+    procedure RemoveAccountFromMailGroup(ContactNo: Code[20];MailGroupCode: Code[10];var ListMailingGroups: XMLport "M2 List Mailing Groups")
+    var
+        ContactMailingGroup: Record "Contact Mailing Group";
+    begin
+
+        //-NPR5.51 [362020]
+        SelectLatestVersion;
+
+        if (ContactMailingGroup.Get (ContactNo, MailGroupCode)) then begin
+          ContactMailingGroup.Delete (true);
+        end;
+
+        ListMailingGroups.CreateListForContact (ContactNo);
+        // Implicit export
+
+        //+NPR5.51 [362020]
     end;
 
     local procedure "--"()

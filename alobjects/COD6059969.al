@@ -6,6 +6,7 @@ codeunit 6059969 "Description Control"
     // NPR5.36/KENU/20170912 CASE 289660 Added EventSubscriber: T39OnAfterValidateEventCrossReferenceNo, T37OnAfterValidateEventCrossReferenceNo, T5741OnAfterValidateEventCrossReferenceNo
     // NPR5.47/MMV /20181019 CASE 332824 Fixed case 284550 approach
     // NPR5.48/JDH /20181214 CASE 338542 Created a function to get the description for Item Cross references, and 2 subscribers to update description on ICR table
+    // NPR5.51/ALST/20190731 CASE 351999 POS will now try to find a description in the current user's language, when creating the sales line, and using it
 
 
     trigger OnRun()
@@ -15,6 +16,7 @@ codeunit 6059969 "Description Control"
     procedure GetDescriptionPOS(var Rec: Record "Sale Line POS";XRec: Record "Sale Line POS";Item: Record Item)
     var
         RetailSetup: Record "Retail Setup";
+        Language: Record Language;
     begin
         with Rec do begin
           if "Custom Descr" then
@@ -33,7 +35,12 @@ codeunit 6059969 "Description Control"
             GetDescriptionPOS_OLD(Rec, XRec, Item);
           end else begin
             //this is the new way
-            GetDescription(Description, "Description 2", "No.", "Variant Code", '', RetailSetup."POS Line Description Code");
+            //-NPR5.51 [351999]
+            Language.SetRange("Windows Language ID", GlobalLanguage);
+            if Language.FindFirst then;
+            GetDescription(Description, "Description 2", "No.", "Variant Code", Language.Code, RetailSetup."POS Line Description Code");
+            // GetDescription(Description, "Description 2", "No.", "Variant Code", '', RetailSetup."POS Line Description Code");
+            //+NPR5.51 [351999]
           end;
         end;
     end;

@@ -1,5 +1,7 @@
 page 6060037 "GIM - WS Received Files"
 {
+    // NPR5.51/MHA /20190819  CASE 365377 Generic Import Module is deprecated [VLOBJDEL] Object marked for deletion
+
     Caption = 'GIM - WS Received Files';
     Editable = false;
     PageType = List;
@@ -8,50 +10,10 @@ page 6060037 "GIM - WS Received Files"
 
     layout
     {
-        area(content)
-        {
-            repeater(Group)
-            {
-                field("Doc. Type Code";"Doc. Type Code")
-                {
-                }
-                field("Sender ID";"Sender ID")
-                {
-                }
-                field("File Name";"File Name")
-                {
-                }
-                field("File Extension";"File Extension")
-                {
-                }
-                field("File Processed";"File Processed")
-                {
-                }
-                field("Received At";"Received At")
-                {
-                }
-            }
-        }
     }
 
     actions
     {
-        area(processing)
-        {
-            action("Process File")
-            {
-                Caption = 'Process File';
-                Image = Process;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-
-                trigger OnAction()
-                begin
-                    ProcessFile();
-                end;
-            }
-        }
     }
 }
 

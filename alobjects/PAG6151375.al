@@ -7,6 +7,7 @@ page 6151375 "CS UI"
     // NPR5.49/CLVA/20190327 CASE 349554 Added field "Expand Summary Items"
     // NPR5.50/CLVA/20190327 CASE 247747 Added field "Hid Fulfilled Lines"
     // NPR5.50/CLVA/20190327 CASE 347971 Added field "Add Posting Options"
+    // NPR5.51/CLVA/20190612 CASE 357577 Added field "Update Posting Date"
 
     Caption = 'CS UI';
     DataCaptionFields = "Code";
@@ -39,6 +40,9 @@ page 6151375 "CS UI"
                 {
                 }
                 field("Add Posting Options";"Add Posting Options")
+                {
+                }
+                field("Update Posting Date";"Update Posting Date")
                 {
                 }
                 field("No. of Records in List";"No. of Records in List")

@@ -5,6 +5,7 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
     // NPR5.48/MHA /20190215  CASE 342920 EndSale is now performed with balancing
     // NPR5.49/MHA /20190228  CASE 342811 Added functions OnLookupVoucherTypeCode(), OnValidateVoucherTypeCode() and implemented new Voucher Validation interface
     // NPR5.50/MHA /20190426  CASE 353079 Removed wrong quotation marks in workflow step voucher_input
+    // NPR5.51/MHA /20190823  CASE 364542 VoucherType in EndSale() should depend on the Scanned Voucher in VoucherPayment()
 
 
     trigger OnRun()
@@ -134,7 +135,6 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
             VoucherPayment(FrontEnd,JSON,POSSession);
           'end_sale':
             //-NPR5.48 [342920]
-            //EndSale(POSSession);
             EndSale(JSON,POSSession);
             //+NPR5.48 [342920]
         end;
@@ -165,14 +165,6 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
           exit;
 
         //-NPR5.49 [342811]
-        // //-NPR5.42 [307022]
-        // //NpRvVoucherMgt.FindVoucher(VoucherTypeCode,ReferenceNo,POSSession,Voucher);
-        // OnScanVoucher(VoucherTypeCode,ReferenceNo,POSSession,Voucher,Handled);
-        // IF NOT Handled THEN
-        //  NpRvVoucherMgt.FindVoucher(VoucherTypeCode,ReferenceNo,POSSession,Voucher);
-        // //-NPR5.42 [307022]
-        //
-        // VoucherType.GET(Voucher."Voucher Type");
         if VoucherType.Get(VoucherTypeCode) then;
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -198,7 +190,6 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
         SaleLinePOS.Validate(Type,SaleLinePOS.Type::Payment);
         SaleLinePOS.Validate("No.",VoucherType."Payment Type");
         //-NPR5.49 [342811]
-        // SaleLinePOS.Description := Voucher.Description;
         SaleLinePOS.Description := NpRvVoucherBuffer.Description;
         //+NPR5.49 [342811]
 
@@ -206,8 +197,6 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         //-NPR5.49 [342811]
-        // SaleLinePOS."Currency Amount" := Voucher.Amount;
-        // SaleLinePOS."Amount Including VAT" := Voucher.Amount;
         SaleLinePOS."Currency Amount" := NpRvVoucherBuffer.Amount;
         SaleLinePOS."Amount Including VAT" := NpRvVoucherBuffer.Amount;
         //+NPR5.49 [342811]
@@ -223,7 +212,6 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
         SaleLinePOSVoucher."Line No." := 10000;
         SaleLinePOSVoucher.Type := SaleLinePOSVoucher.Type::Payment;
         //-NPR5.49 [342811]
-        // SaleLinePOSVoucher."Voucher No." := Voucher."No.";
         SaleLinePOSVoucher."Voucher No." := NpRvVoucherBuffer."No.";
         SaleLinePOSVoucher."Reference No." := NpRvVoucherBuffer."Reference No.";
         //+NPR5.49 [342811]
@@ -232,6 +220,11 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
         SaleLinePOSVoucher.Insert;
 
         NpRvVoucherMgt.ApplyPayment(FrontEnd,POSSession,SaleLinePOSVoucher);
+
+        //-NPR5.51 [364542]
+        JSON.SetContext('VoucherType',NpRvVoucherBuffer."Voucher Type");
+        FrontEnd.SetActionContext(VoucherPaymentActionCode(),JSON);
+        //+NPR5.51 [364542]
     end;
 
     local procedure EndSale(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session")
@@ -251,28 +244,25 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SaleAmount,PaidAmount,ReturnAmount,Subtotal);
-        if SaleAmount > PaidAmount then
-          exit;
 
         //-NPR5.48 [342920]
-        // IF Subtotal <> 0 THEN
-        //  EXIT;
-        //
-        // POSSession.GetSale(POSSale);
-        // IF NOT POSSale.TryEndSale(POSSession) THEN
-        //   EXIT;
         POSSession.GetSetup(POSSetup);
         POSSetup.GetRegisterRecord(Register);
         if Abs(Subtotal) > Abs(POSSetup.AmountRoundingPrecision) then
           exit;
 
-        JSON.SetScope('parameters',true);
-        VoucherTypeCode := UpperCase(JSON.GetString('VoucherTypeCode',true));
+        //-NPR5.51 [364542]
+        VoucherTypeCode := UpperCase(JSON.GetString('VoucherType',true));
+        //+NPR5.51 [364542]
         NpRvVoucherType.Get(VoucherTypeCode);
         if not POSPaymentLine.GetPaymentType(PaymentTypePOS,NpRvVoucherType."Payment Type",Register."Register No.") then
           exit;
         if not POSPaymentLine.GetPaymentType(ReturnPaymentTypePOS,Register."Return Payment Type",Register."Register No.") then
           exit;
+        //-NPR5.51 [364542]
+        if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount,PaidAmount,PaymentTypePOS,ReturnPaymentTypePOS) <> 0 then
+          exit;
+        //+NPR5.51 [364542]
 
         POSSession.GetSale(POSSale);
         if not POSSale.TryEndSaleWithBalancing(POSSession,PaymentTypePOS,ReturnPaymentTypePOS) then

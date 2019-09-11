@@ -4,6 +4,7 @@ table 6151393 "CS Warehouse Shipment Handling"
     // NPR5.43/CLVA/20180605 CASE 304872 Added user info OnInsert
     // NPR5.48/CLVA/20181109 CASE 335606 Added "Unit of Measure"
     // NPR5.50/JAKUBV/20190603  CASE 345567 Transport NPR5.50 - 3 June 2019
+    // NPR5.51/CLVA/20190819 CASE 345567 Added field "Vendor Item No."
 
     Caption = 'CS Warehouse Shipment Handling';
 
@@ -77,6 +78,10 @@ table 6151393 "CS Warehouse Shipment Handling"
         {
             Caption = 'Assignment Date';
             Editable = false;
+        }
+        field(32;"Vendor Item No.";Text[20])
+        {
+            Caption = 'Vendor Item No.';
         }
         field(50;"Item No.";Code[20])
         {

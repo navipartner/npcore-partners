@@ -19,6 +19,7 @@ codeunit 6014544 "RP Citizen CLP Device Library"
     //  "N:\UDV\POS Devices\Tutorials\CLP programming reference\clp-cmrf.pdf"
     // 
     // NPR5.32/MMV /20170410 CASE 241995 Retail Print 2.0
+    // NPR5.51/MMV /20190801 CASE 360975 Buffer all template print data into one job.
 
     EventSubscriberInstance = Manual;
 
@@ -102,7 +103,9 @@ codeunit 6014544 "RP Citizen CLP Device Library"
     var
         STX: Text[10];
     begin
-        PrintBuffer := '';
+        //-NPR5.51 [360975]
+        //PrintBuffer := '';
+        //+NPR5.51 [360975]
 
         if HashTable.IsEmpty then
           ConstructHashTable;
