@@ -8,8 +8,8 @@ codeunit 6150617 "POS-Audit Roll Integration"
     // NPR5.39/MHA /20180202  CASE 302779 Deleted deprecated function OnAfterAuditRollPostingPostItemEntries()
     // NPR5.41/JDH /20180426 CASE 312644  Added indirect permissions to table Audit roll
     // NPR5.41/JDH /20180426 CASE 312935  When Data Import is triggered, a test record is inserted, to find out if there is autoincrement in the PK. This causes an error in subscriber OnInsertPOSUnitInsertRegister
-    // #361931/ALST/20190715 CASE 361931 removed MarkAuditRollPosted, PostItemEntries, OnClosingPOSPeriodRegisterPostItemEntries, SaleIsPostedInAuditRoll, POSEntryIsPostedInAuditRoll - unused
-    // #361931/ALST/20190715 CASE 361931 removed FindPOSEntryNo, TryOpenPOSUnit - unused
+    // NPR5.51/ALST/20190715 CASE 361931 removed MarkAuditRollPosted, PostItemEntries, OnClosingPOSPeriodRegisterPostItemEntries, SaleIsPostedInAuditRoll, POSEntryIsPostedInAuditRoll - unused
+    // NPR5.51/ALST/20190715 CASE 361931 removed FindPOSEntryNo, TryOpenPOSUnit - unused
 
     Permissions = TableData "Audit Roll" = rimd;
 

@@ -14,7 +14,7 @@ pageextension 50027 pageextension50027 extends "Item Card"
     // NPR5.34/JLK /20170630 CASE 279958 Added field Description 2
     // NPR5.38/BR  /20171116 CASE 295255 Added Action POS Sales Entries
     // NPR5.40/JLK /20180316 CASE 308393 Renamed Action Variety to Variety Matrix
-    // #361514/THRO/20190716 CASE 361514 Action Variety Matrix named VarietyMatrix (for AL Conversion)
+    // NPR5.51/THRO/20190717 CASE 361514 Action Variety Matrix named VarietyMatrix (for AL Conversion)
     //                                   Action POS Sales Entries named POSSalesEntries (for AL Conversion)
     layout
     {

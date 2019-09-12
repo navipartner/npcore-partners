@@ -1,6 +1,7 @@
 page 6151164 "MM NPR Loyalty Wizard"
 {
     // MM1.38/TSA /20190221 CASE 338215 Initial Version
+    // MM1.40/TSA /20190613 CASE 358460 Added support for tenants on URL to server
 
     Caption = 'NPR Loyalty Wizard';
     SourceTable = "Integer";
@@ -21,10 +22,6 @@ page 6151164 "MM NPR Loyalty Wizard"
                 {
                     Caption = 'System Prefix';
                     Editable = IsEditable;
-                }
-                field(MembershipCode;MembershipCode)
-                {
-                    Caption = 'Membership Code';
                 }
                 field(PaymentMethodCode;PaymentMethodCode)
                 {
@@ -53,6 +50,29 @@ page 6151164 "MM NPR Loyalty Wizard"
                 field(ServiceBaseURL;ServiceBaseURL)
                 {
                     Caption = 'Base URL';
+
+                    trigger OnValidate()
+                    begin
+
+                        //-MM1.40 [358460]
+                        if (StrLen (ServiceBaseURL) < StrLen ('/Codeunit/')) then
+                          Error ('Invalid URL.');
+
+                        if (LowerCase (CopyStr (ServiceBaseURL, 1, 4)) <> 'http') then
+                          Error ('Invalid URL.');
+
+                        if (CopyStr (ServiceBaseURL, StrLen(ServiceBaseURL) - StrLen ('Codeunit/')) <> '/Codeunit/') then
+                          Error ('Invalid URL. URL must end with "Codeunit/" (without the quotes).');
+                        //+MM1.40 [358460]
+                    end;
+                }
+                field(TenentName;TenentName)
+                {
+                    Caption = 'Tenant';
+                }
+                field(MembershipCode;MembershipCode)
+                {
+                    Caption = 'Membership Code';
                 }
             }
             group(Setup)
@@ -92,11 +112,26 @@ page 6151164 "MM NPR Loyalty Wizard"
         InitializeDefaults ();
     end;
 
+    trigger OnQueryClosePage(CloseAction: Action): Boolean
+    begin
+
+        //-MM1.40 [358460]
+        if (CloseAction <> ACTION::LookupOK) then
+          exit (true);
+
+        if (MembershipCode = '') then
+          Error ('The server side Membership code must be specified.');
+
+        exit (true);
+        //+MM1.40 [358460]
+    end;
+
     var
         PaymentMethodCode: Code[10];
         CommunityCode: Code[10];
         FS_Prefix: Code[10];
         ServiceBaseURL: Text;
+        TenentName: Text;
         ServiceUser: Text;
         ServicePassword: Text;
         GLAccount: Code[10];
@@ -137,7 +172,7 @@ page 6151164 "MM NPR Loyalty Wizard"
         IsEditable := false;
     end;
 
-    procedure GetUserSetup(var vCommunityCode: Code[10];var vMembershipCode: Code[10];var vSystemPrefix: Code[10];var vPaymentTypeCode: Code[10];var vPaymentGLAccount: Code[10];var vBaseUrl: Text;var vUsername: Text;var vPassword: Text;var vDescription: Text;var vAuthCode: Text;var vLoyaltyServerCompanyName: Text;var vEarnFactor: Decimal;var vBurnFactor: Decimal)
+    procedure GetUserSetup(var vCommunityCode: Code[10];var vMembershipCode: Code[10];var vSystemPrefix: Code[10];var vPaymentTypeCode: Code[10];var vPaymentGLAccount: Code[10];var vBaseUrl: Text;var vUsername: Text;var vPassword: Text;var vDescription: Text;var vAuthCode: Text;var vLoyaltyServerCompanyName: Text;var vEarnFactor: Decimal;var vBurnFactor: Decimal;var vTenant: Text)
     begin
 
         vCommunityCode := CommunityCode;
@@ -147,6 +182,7 @@ page 6151164 "MM NPR Loyalty Wizard"
         vPaymentGLAccount := GLAccount;
 
         vBaseUrl := ServiceBaseURL;
+        vTenant := TenentName;
         vUsername := ServiceUser;
         vPassword := ServicePassword;
 

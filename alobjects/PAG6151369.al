@@ -1,7 +1,9 @@
 page 6151369 "CS Stock-Takes Data"
 {
     // NPR5.50/CLVA/20190515 CASE 350696 Object created - NP Capture Service
+    // NPR5.51/CLVA/20190902 CASE 365659 Added captions
 
+    Caption = 'CS Stock-Takes Data';
     DelayedInsert = false;
     DeleteAllowed = false;
     Editable = false;

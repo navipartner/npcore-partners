@@ -1,6 +1,6 @@
 table 6151210 "NpCs Open. Hour Entry"
 {
-    // #362443/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
+    // NPR5.51/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
 
     Caption = 'Collect Store Opening Hour Entry';
 
@@ -18,7 +18,7 @@ table 6151210 "NpCs Open. Hour Entry"
         }
         field(5;"Entry Type";Option)
         {
-            Caption = 'Entry Type';
+            Caption = 'Opening Type';
             OptionCaption = 'Store Open,Store Closed';
             OptionMembers = "Store Open","Store Closed";
 

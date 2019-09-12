@@ -2,6 +2,7 @@ codeunit 6151593 "NpDc Module Validate - Default"
 {
     // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
     // NPR5.47/MHA /20181022  CASE 333113 Max Use per Sale should only consider within same POS Sale
+    // NPR5.51/MHA /20190724  CASE 343352 Added CalcInUseQty() to include "In-Use Quantity (External)"
 
 
     trigger OnRun()
@@ -18,6 +19,7 @@ codeunit 6151593 "NpDc Module Validate - Default"
     procedure ValidateCoupon(SalePOS: Record "Sale POS";Coupon: Record "NpDc Coupon")
     var
         SaleLinePOSCoupon: Record "NpDc Sale Line POS Coupon";
+        NpDcExtCouponSalesLine: Record "NpDc Ext. Coupon Reservation";
         Timestamp: DateTime;
         CurrSaleCouponCount: Integer;
     begin
@@ -33,21 +35,28 @@ codeunit 6151593 "NpDc Module Validate - Default"
 
         Coupon.CalcFields("Remaining Quantity");
 
-        SaleLinePOSCoupon.SetRange(Type,SaleLinePOSCoupon.Type::Coupon);
-        SaleLinePOSCoupon.SetRange("Coupon No.",Coupon."No.");
-        CurrSaleCouponCount := SaleLinePOSCoupon.Count;
-        if CurrSaleCouponCount >= Coupon."Remaining Quantity" then
+        //-NPR5.51 [343352]
+        if Coupon.CalcInUseQty() >= Coupon."Remaining Quantity" then
           Error(Text001);
 
-        //-NPR5.47 [333113]
-        SaleLinePOSCoupon.SetRange("Register No.",SalePOS."Register No.");
-        SaleLinePOSCoupon.SetRange("Sales Ticket No.",SalePOS."Sales Ticket No.");
-        CurrSaleCouponCount := SaleLinePOSCoupon.Count;
-        //+NPR5.47 [333113]
+        if SalePOS."Register No." <> '' then begin
+          SaleLinePOSCoupon.SetRange(Type,SaleLinePOSCoupon.Type::Coupon);
+          SaleLinePOSCoupon.SetRange("Coupon No.",Coupon."No.");
+          SaleLinePOSCoupon.SetRange("Register No.",SalePOS."Register No.");
+          SaleLinePOSCoupon.SetRange("Sales Ticket No.",SalePOS."Sales Ticket No.");
+          CurrSaleCouponCount := SaleLinePOSCoupon.Count;
+
+        end else begin
+          NpDcExtCouponSalesLine.SetRange("External Document No.",SalePOS."Sales Ticket No.");
+          NpDcExtCouponSalesLine.SetRange("Coupon No.",Coupon."No.");
+          CurrSaleCouponCount := NpDcExtCouponSalesLine.Count;
+        end;
+
         if Coupon."Max Use per Sale" < 1 then
           Coupon."Max Use per Sale" := 1;
         if CurrSaleCouponCount >= Coupon."Max Use per Sale" then
           Error(Text002,Coupon."Max Use per Sale");
+        //+NPR5.51 [343352]
     end;
 
     local procedure "--- Coupon Interface"()

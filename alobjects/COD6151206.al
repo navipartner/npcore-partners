@@ -1,7 +1,8 @@
 codeunit 6151206 "NpCs POS Action Create Order"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #362443/MHA /20190719  CASE 362443 It should be possible to send to another local store
+    // NPR5.51/ALST/20190705  CASE 357848 function prototype changed
+    // NPR5.51/MHA /20190719  CASE 362443 It should be possible to send to another local store
 
 
     trigger OnRun()
@@ -305,9 +306,9 @@ codeunit 6151206 "NpCs POS Action Create Order"
         POSSale.GetCurrentSale(SalePOS);
         FindItemPosLines(SalePOS, TempSaleLinePOS);
 
-        //-#362443 [362443]
+        //-NPR5.51 [362443]
         ToNpCsStore.SetFilter(Code,'<>%1',FromNpCsStore.Code);
-        //+#362443 [362443]
+        //+NPR5.51 [362443]
         ToNpCsStore.FindSet;
         repeat
             TempNpCsStore.Init;
@@ -589,7 +590,10 @@ codeunit 6151206 "NpCs POS Action Create Order"
             SalePOS.Modify(true);
             POSSale.RefreshCurrent();
 
-            RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentPct, PrintPrepaymentInvoice, true);
+          //-NPR5.51
+          // RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentPct, PrintPrepaymentInvoice, TRUE);
+          RetailSalesDocMgt.CreatePrepaymentLine(POSSession,SalesHeader,PrepaymentPct,PrintPrepaymentInvoice,true,false);
+          //+NPR5.51
 
             POSSession.RequestRefreshData();
             Commit;

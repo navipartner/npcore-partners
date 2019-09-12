@@ -18,6 +18,9 @@ codeunit 6151387 "CS UI Warehouse Activity"
     //                                   Changed default posting for "Invt. Pick" and "Invt. Put-away" to "Ship & Invoice"
     // NPR5.50/TJ  /20190417 CASE 351937 Blank InnerText is causing app to crash so have commented it out
     // NPR5.50/CLVA/20190515 CASE 351937 Case 351937 is not an error but TJ using a old app version. Code uncomment again.
+    // NPR5.51/CLVA/20190612 CASE 357577 Added posting date functionality
+    // NPR5.51/CLVA/20190628 CASE 360425 Summarizing qty
+    // NPR5.51/CLVA/20190619 CASE 359268 Added receive posting.
 
     TableNo = "CS UI Header";
 
@@ -293,6 +296,9 @@ codeunit 6151387 "CS UI Warehouse Activity"
         ResolvingTable: Integer;
         Item: Record Item;
         ItemCrossReference: Record "Item Cross Reference";
+        WhseActivityLine: Record "Warehouse Activity Line";
+        QtytoHandle: Decimal;
+        QtyOutstanding: Decimal;
     begin
         if InputValue = '' then begin
           Remark := Text005;
@@ -331,6 +337,26 @@ codeunit 6151387 "CS UI Warehouse Activity"
           Remark := StrSubstNo(Text010,InputValue);
           exit;
         end;
+
+        //-NPR5.51 [360425]
+        QtytoHandle := 0;
+        QtyOutstanding := 0;
+
+        WhseActivityLine.SetCurrentKey("Activity Type","No.","Sorting Sequence No.");
+        WhseActivityLine.SetRange("Activity Type",CSWarehouseActivityHandling."Activity Type");
+        WhseActivityLine.SetRange("No.",CSWarehouseActivityHandling."No.");
+        WhseActivityLine.SetRange("Item No.",CSWarehouseActivityHandling."Item No.");
+        WhseActivityLine.SetRange("Variant Code",CSWarehouseActivityHandling."Variant Code");
+        if WhseActivityLine.FindSet then begin
+          repeat
+            QtytoHandle := QtytoHandle + WhseActivityLine."Qty. to Handle";
+            QtyOutstanding := QtyOutstanding + WhseActivityLine."Qty. Outstanding";
+          until WhseActivityLine.Next = 0;
+
+          CSWarehouseActivityHandling.Qty := QtyOutstanding - QtytoHandle;
+
+        end;
+        //+NPR5.51 [360425]
 
         CSWarehouseActivityHandling.Barcode := InputValue;
     end;
@@ -838,7 +864,10 @@ codeunit 6151387 "CS UI Warehouse Activity"
 
         case CSWarehouseActivityHandling."Activity Type" of
           CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away" : StrMenuTxt := 'Receive,Receive and Invoice';
-          CSWarehouseActivityHandling."Activity Type"::"Invt. Pick" : StrMenuTxt := 'Ship,Ship and Invoice';
+          //-NPR5.51
+          //CSWarehouseActivityHandling."Activity Type"::"Invt. Pick" : StrMenuTxt := 'Ship,Ship and Invoice';
+          CSWarehouseActivityHandling."Activity Type"::"Invt. Pick" : StrMenuTxt := 'Ship,Ship and Receive';
+          //+NPR5.51
         end;
 
         CurrentRootNode := xmlout.DocumentElement;
@@ -901,12 +930,22 @@ codeunit 6151387 "CS UI Warehouse Activity"
         WhseActivityLine: Record "Warehouse Activity Line";
         WhseActivityRegister: Codeunit "Whse.-Activity-Register";
         WhseActivityPost: Codeunit "Whse.-Activity-Post";
+        WarehouseActivityHeader: Record "Warehouse Activity Header";
     begin
         Remark := '';
 
         WhseActivityLine.SetRange("No.",CSWarehouseActivityHandling."No.");
 
         if WhseActivityLine.FindSet then begin
+
+          //-NPR5.51 [357577]
+          if MiniformHeader."Update Posting Date" then begin
+            WarehouseActivityHeader.Get(CSWarehouseActivityHandling."Activity Type",CSWarehouseActivityHandling."No.");
+            WarehouseActivityHeader.Validate("Posting Date",Today);
+            WarehouseActivityHeader.Modify(true);
+          end;
+          //+NPR5.51 [357577]
+
           repeat
             case CSWarehouseActivityHandling."Activity Type" of
               CSWarehouseActivityHandling."Activity Type"::Pick,CSWarehouseActivityHandling."Activity Type"::"Put-away" : begin
@@ -916,9 +955,15 @@ codeunit 6151387 "CS UI Warehouse Activity"
                   end;
                 end;
               CSWarehouseActivityHandling."Activity Type"::"Invt. Pick",CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away" : begin
-                  WhseActivityPost.SetInvoiceSourceDoc(Index = 2);
-                  WhseActivityPost.Run(WhseActivityLine);
-                  Clear(WhseActivityPost);
+                  //-NPR5.51 [359268]
+                  if WhseActivityLine."Qty. to Handle" <> 0 then begin
+                  //+NPR5.51 [359268]
+                    WhseActivityPost.SetInvoiceSourceDoc(Index = 2);
+                    WhseActivityPost.Run(WhseActivityLine);
+                    Clear(WhseActivityPost);
+                  //-NPR5.51 [359268]
+                  end;
+                  //+NPR5.51 [359268]
                 end;
             end;
           until WhseActivityLine.Next = 0;

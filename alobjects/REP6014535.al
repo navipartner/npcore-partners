@@ -14,6 +14,7 @@ report 6014535 "Sales Statistics By Department"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
     // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
+    // NPR5.51/BHR /20190708 CASE 361268  Add filter on blank dimension
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Sales Statistics By Department.rdlc';
 
@@ -278,7 +279,9 @@ report 6014535 "Sales Statistics By Department"
                 ValueEntryRec.SetCurrentKey("Item Ledger Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
                 "Salespers./Purch. Code","Item Group No.","Item No.","Vendor No.","Source No.","Group Sale");
                 ValueEntryRec.SetRange("Item Ledger Entry Type", ValueEntryRec."Item Ledger Entry Type"::Sale);
-
+                //-NPR5.51 [361268]
+                ValueEntryRec.SetFilter("Global Dimension 1 Code",'<>%1','');
+                //+NPR5.51 [361268]
                 if dateFilter <> '' then
                   ValueEntryRec.SetFilter("Posting Date", dateFilter);
                 if dim1Filter <> '' then
@@ -293,11 +296,14 @@ report 6014535 "Sales Statistics By Department"
                 ValueEntryRec.CalcSums("Sales Amount (Actual)","Cost Amount (Actual)","Purchase Amount (Actual)");
                 //+NPR5.30
 
+
                 Clear(ItemLedgerEntryRec);
                 ItemLedgerEntryRec.SetCurrentKey("Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
                 "Item Group No.","Vendor No.","Salesperson Code","Item No.","Source No.");
                 ItemLedgerEntryRec.SetRange("Entry Type", ItemLedgerEntryRec."Entry Type"::Sale);
-
+                //-NPR5.51 [361268]
+                ItemLedgerEntryRec.SetFilter("Global Dimension 1 Code",'<>%1','');
+                //+NPR5.51 [361268]
                 if dateFilter <> '' then
                   ItemLedgerEntryRec.SetFilter("Posting Date", dateFilter);
                 if dim1Filter <> '' then
@@ -362,6 +368,9 @@ report 6014535 "Sales Statistics By Department"
                   "Item Ledger Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
                   "Salespers./Purch. Code","Item Group No.","Item No.","Vendor No.","Source No.","Group Sale");
                   ValueEntryLastYearRec.SetRange("Item Ledger Entry Type", ValueEntryRec."Item Ledger Entry Type"::Sale);
+                  //-NPR5.51 [361268]
+                  ValueEntryLastYearRec.SetFilter("Global Dimension 1 Code",'<>%1','');
+                  //+NPR5.51 [361268]
 
                   if dateFilter <> '' then
                     ValueEntryLastYearRec.SetFilter("Posting Date", dateFilter);
@@ -387,6 +396,9 @@ report 6014535 "Sales Statistics By Department"
                   ItemLedgerEntryLastYearRec.SetCurrentKey("Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
                   "Item Group No.","Vendor No.","Salesperson Code","Item No.","Source No.");
                   ItemLedgerEntryLastYearRec.SetRange("Entry Type", ItemLedgerEntryRec."Entry Type"::Sale);
+                  //-NPR5.51 [361268]
+                  ItemLedgerEntryLastYearRec.SetFilter("Global Dimension 1 Code",'<>%1','');
+                  //+NPR5.51 [361268]
 
                   if dateFilter <> '' then
                     ItemLedgerEntryLastYearRec.SetFilter("Posting Date", dateFilter);
@@ -527,6 +539,9 @@ report 6014535 "Sales Statistics By Department"
         ValueEntryRec.SetCurrentKey("Item Ledger Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
         "Salespers./Purch. Code","Item Group No.","Item No.","Vendor No.","Source No.","Group Sale");
         ValueEntryRec.SetRange("Item Ledger Entry Type", ValueEntryRec."Item Ledger Entry Type"::Sale);
+        //-NPR5.51 [361268]
+        ValueEntryRec.SetFilter("Global Dimension 1 Code",'<>%1','');
+        //+NPR5.51 [361268]
         
         if dateFilter <> '' then
           ValueEntryRec.SetFilter("Posting Date", dateFilter);
@@ -546,6 +561,9 @@ report 6014535 "Sales Statistics By Department"
         ItemLedgerEntryRec.SetCurrentKey("Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
         "Item Group No.","Vendor No.","Salesperson Code","Item No.","Source No.");
         ItemLedgerEntryRec.SetRange("Entry Type", ItemLedgerEntryRec."Entry Type"::Sale);
+        //-NPR5.51 [361268]
+        ItemLedgerEntryRec.SetFilter("Global Dimension 1 Code",'<>%1','');
+        //+NPR5.51 [361268]
         
         if dateFilter <> '' then
           ItemLedgerEntryRec.SetFilter("Posting Date", dateFilter);
@@ -575,6 +593,9 @@ report 6014535 "Sales Statistics By Department"
         "Salespers./Purch. Code","Item Group No.","Item No.","Vendor No.","Source No.","Group Sale"
         );
         ValueEntryLastYearRec.SetRange("Item Ledger Entry Type", ValueEntryRec."Item Ledger Entry Type"::Sale);
+        //-NPR5.51 [361268]
+        ValueEntryLastYearRec.SetFilter("Global Dimension 1 Code",'<>%1','');
+        //+NPR5.51 [361268]
         
         if dateFilter <> '' then
           ValueEntryLastYearRec.SetFilter("Posting Date", dateFilter);
@@ -600,7 +621,9 @@ report 6014535 "Sales Statistics By Department"
         ItemLedgerEntryLastYearRec.SetCurrentKey("Entry Type","Posting Date","Global Dimension 1 Code","Global Dimension 2 Code",
         "Item Group No.","Vendor No.","Salesperson Code","Item No.","Source No.");
         ItemLedgerEntryLastYearRec.SetRange("Entry Type", ItemLedgerEntryRec."Entry Type"::Sale);
-        
+        //-NPR5.51 [361268]
+        ItemLedgerEntryLastYearRec.SetFilter("Global Dimension 1 Code",'<>%1','');
+        //+NPR5.51 [361268]
         if dateFilter <> '' then
           ItemLedgerEntryLastYearRec.SetFilter("Posting Date", dateFilter);
         if dim1Filter <> '' then

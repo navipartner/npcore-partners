@@ -4,6 +4,7 @@ codeunit 6150829 "POS Action - POS Info"
     // NPR5.34/NPKNAV/20170801  CASE 282748 Transport NPR5.34 - 1 August 2017
     // NPR5.37.02/MMV /20171114  CASE 296478 Moved text constant to in-line constant
     // NPR5.45/TSA /20180810 CASE 319879 Added support for info codes in the payment view and refactored
+    // NPR5.51/ALPO/20190826 CASE 364558 Define application scope for POSInfo action
 
 
     trigger OnRun()
@@ -22,7 +23,8 @@ codeunit 6150829 "POS Action - POS Info"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.4');
+        //EXIT ('1.4');  //NPR5.51 [364558]-revoked
+        exit ('1.5');  //NPR5.51 [364558]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -37,6 +39,10 @@ codeunit 6150829 "POS Action - POS Info"
               Sender."Subscriber Instances Allowed"::Multiple)
             then begin
                 RegisterTextParameter('POSInfoCode', '');
+            //-NPR5.51 [364558]
+            RegisterOptionParameter('ApplicationScope',' ,Current Line,All Lines,New Lines,Ask',' ');
+            RegisterBooleanParameter('ClearPOSInfo',false);
+            //+NPR5.51 [364558]
                 RegisterWorkflow(false);
 
                 //-NPR5.45 [319879]
@@ -113,8 +119,11 @@ codeunit 6150829 "POS Action - POS Info"
             LinePOS.Type := LinePOS.Type::Item;
         end;
 
-        POSInfoManagement.ProcessPOSInfoMenuFunction(LinePOS, JSON.GetString('POSInfoCode', true));
-
+        //POSInfoManagement.ProcessPOSInfoMenuFunction(LinePOS,JSON.GetString ('POSInfoCode', TRUE));  //NPR5.51 [364558]-revoked
+        //-NPR5.51 [364558]
+        POSInfoManagement.ProcessPOSInfoMenuFunction(
+          LinePOS,JSON.GetString('POSInfoCode',true),JSON.GetInteger('ApplicationScope',false),JSON.GetBoolean('ClearPOSInfo',false));
+        //+NPR5.51 [364558]
         //+NPR5.45 [319879]
     end;
 }

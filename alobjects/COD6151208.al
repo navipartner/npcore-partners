@@ -1,7 +1,7 @@
 codeunit 6151208 "NpCs Store Opening Hours Mgt."
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #362443/MHA /20190719  CASE 362443 Introduced Opening Hour Set
+    // NPR5.51/MHA /20190719  CASE 362443 Introduced Opening Hour Set
 
 
     trigger OnRun()

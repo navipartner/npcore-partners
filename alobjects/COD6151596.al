@@ -4,6 +4,7 @@ codeunit 6151596 "NpDc Module Apply - Item List"
     // NPR5.38/MHA /20180105  CASE 301053 Corrected CASE for "Item Disc. Group" in FindSaleLinePOSItems()
     // NPR5.41/MHA /20180426  CASE 313062 Discount Type "Discount %" should distribute Discount evenly on all lines
     // NPR5.45/MHA /20180820  CASE 312991 Added "Max Quantity" functionality
+    // NPR5.51/MHA /20190725  CASE 355406 Applied Discount Amount cannot be more than 100%
 
 
     trigger OnRun()
@@ -49,7 +50,6 @@ codeunit 6151596 "NpDc Module Apply - Item List"
         if Coupon."Discount Type" = Coupon."Discount Type"::"Discount %" then begin
           repeat
             //-NPR5.45 [312991]
-            //ApplyDiscountListItemPct(SaleLinePOSCoupon,Coupon."Discount %",TotalAmt,NpDcCouponListItem,RemainingDiscountAmt);
             ApplyDiscountListItemPct(SaleLinePOSCoupon,Coupon."Discount %",TotalAmt,NpDcCouponListItem,RemainingDiscountAmt,RemainingQty);
             //+NPR5.45 [312991]
           until NpDcCouponListItem.Next = 0;
@@ -58,7 +58,6 @@ codeunit 6151596 "NpDc Module Apply - Item List"
         //+NPR5.41 [313062]
         repeat
           //-NPR5.45 [312991]
-          //ApplyDiscountListItem(SaleLinePOSCoupon,DiscountAmt,TotalAmt,NpDcCouponListItem,RemainingDiscountAmt);
           ApplyDiscountListItem(SaleLinePOSCoupon,DiscountAmt,TotalAmt,NpDcCouponListItem,RemainingDiscountAmt,RemainingQty);
           //+NPR5.45 [312991]
         until (NpDcCouponListItem.Next = 0) or (DiscountAmt <= 0);
@@ -79,11 +78,10 @@ codeunit 6151596 "NpDc Module Apply - Item List"
         AppliedListItemDiscAmt := 0;
         SaleLinePOS.FindSet;
         //-NPR5.45 [312991]
-        // REPEAT
-        //  ApplyDiscountSaleLinePOS(SaleLinePOSCoupon,DiscountAmt,TotalAmt,NpDcCouponListItem,SaleLinePOS,AppliedListItemDiscAmt,RemainingDiscountAmt);
-        // UNTIL (SaleLinePOS.NEXT = 0) OR (RemainingDiscountAmt <= 0);
         repeat
+          //-NPR5.51 [355406]
           ApplyDiscountSaleLinePOS(SaleLinePOSCoupon,DiscountAmt,TotalAmt,NpDcCouponListItem,SaleLinePOS,AppliedListItemDiscAmt,RemainingDiscountAmt,AppliedQty,RemainingQty);
+          //+NPR5.51 [355406]
         until (SaleLinePOS.Next = 0) or (RemainingDiscountAmt <= 0) or (RemainingQty = 0);
         //+NPR5.45 [312991]
     end;
@@ -102,6 +100,11 @@ codeunit 6151596 "NpDc Module Apply - Item List"
         //-NPR5.41 [313062]
         if not FindSaleLinePOSItems(SaleLinePOSCoupon,NpDcCouponListItem,SaleLinePOS) then
           exit;
+
+        //-NPR5.51 [355406]
+        if DiscountPct > 100 then
+          DiscountPct := 100;
+        //+NPR5.51 [355406]
 
         AppliedListItemDiscAmt := 0;
         SaleLinePOS.FindSet;
@@ -177,6 +180,10 @@ codeunit 6151596 "NpDc Module Apply - Item List"
           LineDiscountAmt := RemainingDiscountAmt;
         if (NpDcCouponListItem."Max. Discount Amount" > 0) and (LineDiscountAmt + AppliedListItemDiscAmt > NpDcCouponListItem."Max. Discount Amount") then
           LineDiscountAmt := NpDcCouponListItem."Max. Discount Amount" - AppliedListItemDiscAmt;
+        //-NPR5.51 [355406]
+        if LineDiscountAmt > SaleLinePOS."Amount Including VAT" then
+          LineDiscountAmt := SaleLinePOS."Amount Including VAT";
+        //+NPR5.51 [355406]
         if LineDiscountAmt <= 0 then
           exit;
 

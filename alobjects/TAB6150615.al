@@ -13,6 +13,7 @@ table 6150615 "POS Unit"
     // NPR5.48/MMV /20181026 CASE 318028 French certification
     // NPR5.49/TJ  /20181115 CASE 335739 New field "POS View Profile"
     // NPR5.49/TSA /20190311 CASE 348458 New field "EOD Managed by POS Unit"
+    // NPR5.51/SARA/20190823 CASE 363578 New field 'SMS Profile'
 
     Caption = 'POS Unit';
     DataCaptionFields = "No.",Name;
@@ -208,6 +209,12 @@ table 6150615 "POS Unit"
         {
             Caption = 'POS End of Day Profile';
             TableRelation = "POS End of Day Profile";
+        }
+        field(511;"SMS Profile";Code[20])
+        {
+            Caption = 'SMS Profile';
+            Description = 'NPR5.51';
+            TableRelation = "SMS Template Header";
         }
     }
 

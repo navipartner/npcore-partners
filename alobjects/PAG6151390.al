@@ -1,0 +1,96 @@
+page 6151390 "CS Whse. Receipt List"
+{
+    // NPR5.51/CLVA/20190610  CASE 356107 Object created
+
+    Caption = 'CS Whse. Receipt List';
+    Editable = false;
+    PageType = List;
+    SourceTable = "Warehouse Receipt Header";
+
+    layout
+    {
+        area(content)
+        {
+            repeater(Group)
+            {
+                field("No.";"No.")
+                {
+                }
+                field("Location Code";"Location Code")
+                {
+                }
+                field("Assigned User ID";"Assigned User ID")
+                {
+                }
+                field("Assignment Date";"Assignment Date")
+                {
+                }
+                field("Assignment Time";"Assignment Time")
+                {
+                }
+                field("Document Status";"Document Status")
+                {
+                }
+                field("Tags Scanned";TagsScanned)
+                {
+                    Caption = 'Scanned Tags';
+                }
+            }
+        }
+    }
+
+    actions
+    {
+        area(processing)
+        {
+            action("Tags Scanned")
+            {
+                Caption = 'Tags Scanned';
+                Image = DataEntry;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                RunObject = Page "CS Whse. Receipt Data";
+                RunPageLink = "Doc. No."=FIELD("No.");
+            }
+            action("Transfer Data")
+            {
+                Caption = 'Transfer Data';
+                Image = TransferToGeneralJournal;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    CSWS: Codeunit "CS WS";
+                    Result: Text;
+                    WarehouseReceiptHeader: Record "Warehouse Receipt Header";
+                begin
+                    if not Confirm(Txt001,true) then
+                      exit;
+
+                    Result := CSWS.SaveRfidWhseReceiptData("No.");
+                    if Result = '' then begin
+                      WarehouseReceiptHeader.Get("No.");
+                      PAGE.Run(5768,WarehouseReceiptHeader);
+                    end else
+                      Error(Result);
+                end;
+            }
+        }
+    }
+
+    trigger OnAfterGetRecord()
+    begin
+        Clear(CSWhseReceiptData);
+        CSWhseReceiptData.SetRange("Doc. No.","No.");
+        TagsScanned := CSWhseReceiptData.Count();
+    end;
+
+    var
+        TagsScanned: Integer;
+        CSWhseReceiptData: Record "CS Whse. Receipt Data";
+        Txt001: Label 'Transfer Tags Scanned';
+}
+

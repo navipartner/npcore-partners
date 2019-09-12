@@ -1,6 +1,7 @@
 codeunit 6150863 "POS Action - Doc. Prepay"
 {
     // NPR5.50/MMV /20181105 CASE 300557 Created object
+    // NPR5.51/ALST/20190705 CASE 357848 added possibility to choose amount instead of percentage
 
 
     trigger OnRun()
@@ -25,6 +26,13 @@ codeunit 6150863 "POS Action - Doc. Prepay"
         OptionOrderType: Label 'Not Set,Order,Lending';
         CaptionSelectCustomer: Label 'Select Customer';
         DescSelectCustomer: Label 'Prompt for customer selection if none on sale';
+        "-NPR5.51": ;
+        PrepaymentAmountCaption: Label 'Prompt Prepayment Amount';
+        FixedPrepaymentAmountCaption: Label 'Fixed Prepayment Amount';
+        DescPrepaymentAmountCaption: Label 'Ask user for prepayment amount';
+        DescFixedPrepaymentAmountCaption: Label 'Prepayment amount to use either silently or as dialog default value';
+        "+NPR5.51": ;
+        BooleanValue: Boolean;
 
     local procedure ActionCode(): Text
     begin
@@ -47,10 +55,24 @@ codeunit 6150863 "POS Action - Doc. Prepay"
             Sender.Type::Generic,
             Sender."Subscriber Instances Allowed"::Multiple) then
           begin
-            RegisterWorkflowStep('prepaymentPct', 'param.PrepaymentPctDialog && numpad(labels.prepaymentPctTitle, labels.prepaymentPctLead, param.FixedPrepaymentPct).cancel (abort);');
+            //-NPR5.51
+            // RegisterWorkflowStep('prepaymentPct','param.PrepaymentPctDialog && numpad(labels.prepaymentPctTitle, labels.prepaymentPctLead, param.FixedPrepaymentPct).cancel (abort);');
+            RegisterWorkflowStep('prepaymentPct', 'if(!param.AmountPayment)' +
+                                                  '{' +
+                                                      'param.PrepaymentPctDialog && numpad(labels.prepaymentPctTitle, labels.prepaymentPctLead, param.FixedPrepaymentPct).cancel(abort);' +
+                                                  '}' +
+                                                  'else' +
+                                                  '{' +
+                                                      'param.PrepaymentPctDialog && numpad(labels.prepaymentAmtTitle, labels.prepaymentAmtLead, param.FixedPrepaymentPct).cancel(abort);' +
+                                                  '};');
+            //+NPR5.51
             RegisterWorkflowStep('PrepayDocument','respond();');
             RegisterWorkflow(false);
 
+            //-NPR5.51
+            //this parameter should be second to none (try to leave on top of stack)
+            RegisterBooleanParameter('AmountPayment', false);
+            //+NPR5.51
             RegisterBooleanParameter('PrepaymentPctDialog', true);
             RegisterDecimalParameter('FixedPrepaymentPct', 0);
             RegisterBooleanParameter('PrintPrepaymentDocument', false);
@@ -66,6 +88,10 @@ codeunit 6150863 "POS Action - Doc. Prepay"
     begin
         Captions.AddActionCaption (ActionCode, 'prepaymentPctTitle', TextPrepaymentPctTitle);
         Captions.AddActionCaption (ActionCode, 'prepaymentPctLead', TextPrepaymentPctLead);
+        //-NPR5.51
+        Captions.AddActionCaption(ActionCode,'prepaymentAmtTitle',PrepaymentAmountCaption);
+        Captions.AddActionCaption(ActionCode,'prepaymentAmtLead',FixedPrepaymentAmountCaption);
+        //+NPR5.51
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -74,7 +100,7 @@ codeunit 6150863 "POS Action - Doc. Prepay"
         SalesHeader: Record "Sales Header";
         JSON: Codeunit "POS JSON Management";
         PrintPrepaymentDocument: Boolean;
-        PrepaymentPct: Decimal;
+        PrepaymentVal: Decimal;
         SelectCustomer: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
@@ -84,7 +110,10 @@ codeunit 6150863 "POS Action - Doc. Prepay"
         JSON.InitializeJObjectParser(Context,FrontEnd);
         PrintPrepaymentDocument := JSON.GetBooleanParameter('PrintPrepaymentDocument', true);
         SelectCustomer := JSON.GetBooleanParameter('SelectCustomer', true);
-        PrepaymentPct := GetPrepaymentPct(JSON);
+        //-NPR5.51
+        // PrepaymentPct := GetPrepaymentPct(JSON);
+        PrepaymentVal := GetPrepaymentVal(JSON);
+        //+NPR5.51
 
         if not CheckCustomer(POSSession, SelectCustomer) then
           exit;
@@ -92,7 +121,10 @@ codeunit 6150863 "POS Action - Doc. Prepay"
         if not SelectDocument(POSSession, SalesHeader) then
           exit;
 
-        CreatePrepaymentLine(POSSession, SalesHeader, PrintPrepaymentDocument, PrepaymentPct);
+        //-NPR5.51
+        // CreatePrepaymentLine(POSSession, SalesHeader, PrintPrepaymentDocument, PrepaymentPrc);
+        CreatePrepaymentLine(POSSession,SalesHeader,PrintPrepaymentDocument,PrepaymentVal,JSON.GetBooleanParameter('AmountPayment', true));
+        //+NPR5.51
 
         POSSession.RequestRefreshData();
     end;
@@ -139,14 +171,17 @@ codeunit 6150863 "POS Action - Doc. Prepay"
         exit(RetailSalesDocImpMgt.SelectSalesDocument(SalesHeader.GetView(false), SalesHeader));
     end;
 
-    local procedure CreatePrepaymentLine(POSSession: Codeunit "POS Session";SalesHeader: Record "Sales Header";PrintPrepaymentDocument: Boolean;PrepaymentPct: Decimal)
+    local procedure CreatePrepaymentLine(POSSession: Codeunit "POS Session";SalesHeader: Record "Sales Header";PrintPrepaymentDocument: Boolean;PrepaymentVal: Decimal;PayByAmount: Boolean)
     var
         RetailSalesDocMgt: Codeunit "Retail Sales Doc. Mgt.";
     begin
-        RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentPct, PrintPrepaymentDocument, true);
+        //-NPR5.51
+        // RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentPct, PrintPrepaymentDocument, TRUE);
+        RetailSalesDocMgt.CreatePrepaymentLine(POSSession,SalesHeader,PrepaymentVal,PrintPrepaymentDocument,true,PayByAmount);
+        //+NPR5.51
     end;
 
-    local procedure GetPrepaymentPct(var JSON: Codeunit "POS JSON Management"): Decimal
+    local procedure GetPrepaymentVal(var JSON: Codeunit "POS JSON Management"): Decimal
     begin
         if JSON.GetBooleanParameter('PrepaymentPctDialog', true) then
           exit(GetNumpad(JSON, 'prepaymentPct'))
@@ -169,9 +204,30 @@ codeunit 6150863 "POS Action - Doc. Prepay"
         if POSParameterValue."Action Code" <> ActionCode then
           exit;
 
+        //-NPR5.51
+        if POSParameterValue.Name = 'AmountPayment' then
+          if Evaluate(BooleanValue,POSParameterValue.Value) then;
+        //+NPR5.51
+
         case POSParameterValue.Name of
-          'PrepaymentPctDialog' : Caption := CaptionPrepaymentDlg;
-          'FixedPrepaymentPct' : Caption := CaptionFixedPrepaymentPct;
+          //-NPR5.51
+          // 'PrepaymentPctDialog' : Caption := CaptionPrepaymentDlg;
+          // 'FixedPrepaymentPct' : Caption := CaptionFixedPrepaymentPct;
+          'PrepaymentPctDialog' :
+            begin
+              if BooleanValue then
+                Caption := PrepaymentAmountCaption
+              else
+                Caption := CaptionPrepaymentDlg;
+            end;
+          'FixedPrepaymentPct' :
+            begin
+              if BooleanValue then
+                Caption := FixedPrepaymentAmountCaption
+              else
+                Caption := CaptionFixedPrepaymentPct;
+            end;
+          //+NPR5.51
           'PrintPrepaymentDocument' : Caption := CaptionPrintDoc;
           'SelectCustomer' : Caption := CaptionSelectCustomer;
         end;
@@ -183,9 +239,30 @@ codeunit 6150863 "POS Action - Doc. Prepay"
         if POSParameterValue."Action Code" <> ActionCode then
           exit;
 
+        //-NPR5.51
+        if POSParameterValue.Name = 'AmountPayment' then
+          if Evaluate(BooleanValue,POSParameterValue.Value) then;
+        //+NPR5.51
+
         case POSParameterValue.Name of
-          'PrepaymentPctDialog' : Caption := DescPrepaymentDlg;
-          'FixedPrepaymentPct' : Caption := DescFixedPrepaymentPct;
+          //-NPR5.51
+          // 'PrepaymentPctDialog' : Caption := DescPrepaymentDlg;
+          // 'FixedPrepaymentPct' : Caption := DescFixedPrepaymentPct;
+          'PrepaymentPctDialog' :
+            begin
+              if BooleanValue then
+                Caption := DescPrepaymentAmountCaption
+              else
+                Caption := DescPrepaymentDlg;
+            end;
+          'FixedPrepaymentPct' :
+            begin
+              if BooleanValue then
+                Caption := DescFixedPrepaymentAmountCaption
+              else
+                Caption := DescPrepaymentDlg;
+            end;
+          //+NPR5.51
           'PrintPrepaymentDocument' : Caption := DescPrintDoc;
           'SelectCustomer' : Caption := DescSelectCustomer;
         end;

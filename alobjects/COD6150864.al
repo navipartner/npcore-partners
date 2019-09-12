@@ -1,6 +1,7 @@
 codeunit 6150864 "POS Action - Customer Deposit"
 {
     // NPR5.50/MMV /20181105 CASE 300557 New action, based on CU 6150806
+    // NPR5.51/MMV /20190617 CASE 352473 Added missing VAT recalculation.
 
 
     trigger OnRun()
@@ -167,10 +168,16 @@ codeunit 6150864 "POS Action - Customer Deposit"
         SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
         SaleLinePOS.Type := SaleLinePOS.Type::Customer;
         SaleLinePOS.Validate("No.", SalePOS."Customer No.");
+        //-NPR5.51 [352473]
+        SaleLinePOS.Quantity := 1;
+        //+NPR5.51 [352473]
         SaleLinePOS.Amount := Amount;
         SaleLinePOS."Amount Including VAT" := Amount;
         SaleLinePOS."Unit Price" := Amount;
         SaleLinePOS.Description := StrSubstNo(TextDeposit, SalePOS.Name);
+        //-NPR5.51 [352473]
+        SaleLinePOS.UpdateAmounts(SaleLinePOS);
+        //+NPR5.51 [352473]
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
     end;
 

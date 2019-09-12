@@ -2,6 +2,7 @@ codeunit 6151161 "MM Loyalty Points Mgr (Server)"
 {
     // MM1.37/TSA /20190204 CASE 338215 Initial Version
     // MM1.38/TSA /20190523 CASE 338215 Added GetLoyaltyConfiguration
+    // MM1.40/TSA /20190819 CASE 365517 Fixing version difference for how deleteall() starts a transaction when table is empty.
 
 
     trigger OnRun()
@@ -721,18 +722,33 @@ codeunit 6151161 "MM Loyalty Points Mgr (Server)"
         GenJournalBatch.SetFilter (Recurring, '=%1', false);
         GenJournalBatch.FindFirst ();
 
+        //-MM1.40 [365517]
+        // GenJournalLine.SETFILTER ("Journal Template Name", '=%1', GenJournalBatch."Journal Template Name");
+        // GenJournalLine.SETFILTER ("Journal Batch Name", '=%1', GenJournalBatch.Name);
+        // IF (NOT GenJournalLine.ISEMPTY ()) THEN
+        //  IF (NOT CONFIRM (JNL_NOT_EMPTY, FALSE, GenJournalBatch."Journal Template Name", GenJournalBatch.Name)) THEN
+        //    ERROR ('');
+        //
+        // GenJournalLine.DELETEALL ();
+        //
+        // IF (GenJournalBatch."No. Series" <> '') THEN BEGIN
+        //  DocumentNo := NoSeriesManagement.TryGetNextNo (GenJournalBatch."No. Series", WORKDATE);
+        //  COMMIT;
+        // END;
+
+        if (GenJournalBatch."No. Series" <> '') then
+          DocumentNo := NoSeriesManagement.TryGetNextNo (GenJournalBatch."No. Series", WorkDate);
+
         GenJournalLine.SetFilter ("Journal Template Name", '=%1', GenJournalBatch."Journal Template Name");
         GenJournalLine.SetFilter ("Journal Batch Name", '=%1', GenJournalBatch.Name);
-        if (not GenJournalLine.IsEmpty ()) then
-          if (not Confirm (JNL_NOT_EMPTY, false, GenJournalBatch."Journal Template Name", GenJournalBatch.Name)) then
-            Error ('');
 
-        GenJournalLine.DeleteAll ();
+        if (not GenJournalLine.IsEmpty ()) then begin
+         if (not Confirm (JNL_NOT_EMPTY, false, GenJournalBatch."Journal Template Name", GenJournalBatch.Name)) then
+           Error ('');
 
-        if (GenJournalBatch."No. Series" <> '') then begin
-          DocumentNo := NoSeriesManagement.TryGetNextNo (GenJournalBatch."No. Series", WorkDate);
-          Commit;
+          GenJournalLine.DeleteAll ();
         end;
+        //+MM1.40 [365517]
 
         LoyaltyStoreSetup.FindSet ();
         repeat
@@ -756,18 +772,33 @@ codeunit 6151161 "MM Loyalty Points Mgr (Server)"
         GenJournalBatch.SetFilter (Recurring, '=%1', false);
         GenJournalBatch.FindFirst ();
 
+        //-MM1.40 [365517]
+        // GenJournalLine.SETFILTER ("Journal Template Name", '=%1', GenJournalBatch."Journal Template Name");
+        // GenJournalLine.SETFILTER ("Journal Batch Name", '=%1', GenJournalBatch.Name);
+        // IF (NOT GenJournalLine.ISEMPTY ()) THEN
+        //  IF (NOT CONFIRM (JNL_NOT_EMPTY, FALSE, GenJournalBatch."Journal Template Name", GenJournalBatch.Name)) THEN
+        //    ERROR ('');
+        //
+        // GenJournalLine.DELETEALL ();
+        //
+        // IF (GenJournalBatch."No. Series" <> '') THEN BEGIN
+        //  DocumentNo := NoSeriesManagement.TryGetNextNo (GenJournalBatch."No. Series", WORKDATE);
+        //  COMMIT;
+        // END;
+
+        if (GenJournalBatch."No. Series" <> '') then
+          DocumentNo := NoSeriesManagement.TryGetNextNo (GenJournalBatch."No. Series", WorkDate);
+
         GenJournalLine.SetFilter ("Journal Template Name", '=%1', GenJournalBatch."Journal Template Name");
         GenJournalLine.SetFilter ("Journal Batch Name", '=%1', GenJournalBatch.Name);
-        if (not GenJournalLine.IsEmpty ()) then
-          if (not Confirm (JNL_NOT_EMPTY, false, GenJournalBatch."Journal Template Name", GenJournalBatch.Name)) then
-            Error ('');
 
-        GenJournalLine.DeleteAll ();
+        if (not GenJournalLine.IsEmpty ()) then begin
+         if (not Confirm (JNL_NOT_EMPTY, false, GenJournalBatch."Journal Template Name", GenJournalBatch.Name)) then
+           Error ('');
 
-        if (GenJournalBatch."No. Series" <> '') then begin
-          DocumentNo := NoSeriesManagement.TryGetNextNo (GenJournalBatch."No. Series", WorkDate);
-          Commit;
+          GenJournalLine.DeleteAll ();
         end;
+        //+MM1.40 [365517]
 
         InvoiceStoreWorker (GenJournalBatch."Journal Template Name", GenJournalBatch.Name, DocumentNo, LoyaltyStoreSetup);
 

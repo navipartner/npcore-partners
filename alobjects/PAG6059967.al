@@ -3,6 +3,7 @@ page 6059967 "MPOS Nets Transactions Card"
     // NPR5.33/NPKNAV/20170630  CASE 267203 Transport NPR5.33 - 30 June 2017
     // NPR5.34/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
     // NPR5.45/CLVA/20180828 CASE 324506 Added receipt data to page
+    // NPR5.51/CLVA/20190819 CASE 364011 Added field "EFT Transaction Entry No."
 
     Caption = 'MPOS Nets Transactions Card';
     SourceTable = "MPOS Nets Transactions";
@@ -56,6 +57,9 @@ page 6059967 "MPOS Nets Transactions Card"
                 {
                 }
                 field("Merchant Id";"Merchant Id")
+                {
+                }
+                field("EFT Transaction Entry No.";"EFT Transaction Entry No.")
                 {
                 }
             }

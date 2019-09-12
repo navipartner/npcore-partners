@@ -1,8 +1,8 @@
 table 6151196 "NpCs Workflow"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #362443/MHA /20190723  CASE 362443 Removed unused field 205 "Auto Post Order on"
-    // #364557/MHA /20190819  CASE 364557 Added fields 350 "Store Stock", 360 "Post on", 380 "Bill via"
+    // NPR5.51/MHA /20190723  CASE 362443 Removed unused field 205 "Auto Post Order on"
+    // NPR5.51/MHA /20190819  CASE 364557 Added fields 350 "Store Stock", 360 "Post on", 380 "Bill via"
 
     Caption = 'Collect Workflow';
     DrillDownPageID = "NpCs Workflows";
@@ -142,58 +142,58 @@ table 6151196 "NpCs Workflow"
         field(350;"Store Stock";Boolean)
         {
             Caption = 'Store Stock';
-            Description = '#364557';
+            Description = 'NPR5.51';
             InitValue = true;
         }
         field(360;"Post on";Option)
         {
             Caption = 'Post on';
-            Description = '#364557';
+            Description = 'NPR5.51';
             OptionCaption = 'Delivery,Processing';
             OptionMembers = Delivery,Processing;
 
             trigger OnValidate()
             begin
-                //-#364557 [364557]
+                //-NPR5.51 [364557]
                 "Bill via" := "Bill via"::"Sales Document";
-                //+#364557 [364557]
+                //+NPR5.51 [364557]
             end;
         }
         field(380;"Bill via";Option)
         {
             Caption = 'Bill via';
-            Description = '#364557';
+            Description = 'NPR5.51';
             OptionCaption = 'POS,Sales Document';
             OptionMembers = POS,"Sales Document";
 
             trigger OnValidate()
             begin
-                //-#364557 [364557]
+                //-NPR5.51 [364557]
                 case "Bill via" of
                   "Bill via"::POS:
                     begin
                       TestField("Post on","Post on"::Delivery);
                     end;
                 end;
-                //+#364557 [364557]
+                //+NPR5.51 [364557]
             end;
         }
         field(400;"Processing Print Template";Code[20])
         {
             Caption = 'Processing Print Template';
-            Description = '#364557';
+            Description = 'NPR5.51';
             TableRelation = "RP Template Header" WHERE ("Table ID"=CONST(6151198));
         }
         field(410;"Delivery Print Template (POS)";Code[20])
         {
             Caption = 'Delivery Print Template (POS)';
-            Description = '#364557';
+            Description = 'NPR5.51';
             TableRelation = "RP Template Header" WHERE ("Table ID"=CONST(6151198));
         }
         field(420;"Delivery Print Template (S.)";Code[20])
         {
             Caption = 'Delivery Template (Sales Document)';
-            Description = '#364557';
+            Description = 'NPR5.51';
             TableRelation = "RP Template Header" WHERE ("Table ID"=CONST(6151198));
         }
     }

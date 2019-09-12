@@ -192,7 +192,7 @@ codeunit 6150794 "POS Action - Tax Free"
         EFTTransactionRequest.SetCurrentKey("Sales Ticket No.");
         EFTTransactionRequest.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         EFTTransactionRequest.SetRange(Successful, true);
-        EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::Payment);
+        EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::PAYMENT);
         if EFTTransactionRequest.FindSet then
           repeat
             Valid := TaxFreeMgt.IsValidTerminalIIN(TaxFreeUnit, PadStr(CopyStr(EFTTransactionRequest."Card Number", 1, 6), StrLen(EFTTransactionRequest."Card Number"), 'X'));

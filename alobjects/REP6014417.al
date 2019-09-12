@@ -12,6 +12,7 @@ report 6014417 "Inventory per Date"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.40/TJ  /20180319  CASE 307717 Replaced hardcoded dates with DMY2DATE structure
+    // NPR5.51/ANPA/20190712  CASE 361236 The headlines have been changed so that they carry on to the next page
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Inventory per Date.rdlc';
 

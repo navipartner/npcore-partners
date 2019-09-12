@@ -18,6 +18,7 @@ report 6060150 "Event Customer Template"
     // NPR5.41/TJ  /20180409 CASE 310426 Not showing rows for attributes which don't have values for any column
     // NPR5.48/TJ  /20181217 CASE 310452 Fixed deployed under 5.41 was pointing to wrong case no. Using proper case no. now
     // NPR5.48/TJ  /20181217 CASE 310426 Using new field Comments for Customer
+    // NPR5.51/TJ  /20190611 CASE 357701 Field Picture_Job removed from dataset
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Event Customer Template.rdlc';
 
@@ -53,9 +54,6 @@ report 6060150 "Event Customer Template"
             {
             }
             column(LastDateModified_Job;FormatDate(Job."Last Date Modified"))
-            {
-            }
-            column(Picture_Job;Job.Picture)
             {
             }
             column(BilltoName_Job;Job."Bill-to Name")

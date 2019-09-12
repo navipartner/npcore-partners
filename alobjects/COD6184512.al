@@ -3,6 +3,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.48/MMV /20181220 CASE 339930 Moved receipt write outside tryfunction for 2017+ support
     // NPR5.49/MMV /20190312 CASE 345188 Renamed object
+    // NPR5.51/MMV /20190626 CASE 359385 Added gift card load support.
 
 
     trigger OnRun()
@@ -35,20 +36,17 @@ codeunit 6184512 "EFT Mock Client Protocol"
     procedure SendEftDeviceRequest(EftTransactionRequest: Record "EFT Transaction Request")
     begin
         case EftTransactionRequest."Processing Type" of
-            EftTransactionRequest."Processing Type"::Open:
-                OpenTerminal(EftTransactionRequest);
-            EftTransactionRequest."Processing Type"::Close:
-                CloseTerminal(EftTransactionRequest);
-            EftTransactionRequest."Processing Type"::xLookup:
-                LookupTransaction(EftTransactionRequest);
-            EftTransactionRequest."Processing Type"::Setup:
-                VerifySetup(EftTransactionRequest);
-            EftTransactionRequest."Processing Type"::Refund,
-          EftTransactionRequest."Processing Type"::Payment:
-                PaymentTransaction(EftTransactionRequest);
-            EftTransactionRequest."Processing Type"::Void:
-                VoidTransaction(EftTransactionRequest);
-            EftTransactionRequest."Processing Type"::Auxiliary:
+          EftTransactionRequest."Processing Type"::OPEN : OpenTerminal(EftTransactionRequest);
+          EftTransactionRequest."Processing Type"::CLOSE : CloseTerminal(EftTransactionRequest);
+          EftTransactionRequest."Processing Type"::LOOK_UP: LookupTransaction(EftTransactionRequest);
+          EftTransactionRequest."Processing Type"::SETUP : VerifySetup(EftTransactionRequest);
+        //-NPR5.51 [359385]
+          EftTransactionRequest."Processing Type"::GIFTCARD_LOAD,
+        //+NPR5.51 [359385]
+          EftTransactionRequest."Processing Type"::REFUND,
+          EftTransactionRequest."Processing Type"::PAYMENT : PaymentTransaction(EftTransactionRequest);
+          EftTransactionRequest."Processing Type"::VOID : VoidTransaction(EftTransactionRequest);
+          EftTransactionRequest."Processing Type"::AUXILIARY :
                 case EftTransactionRequest."Auxiliary Operation ID" of
                     1:
                         BalanceEnquiry(EftTransactionRequest);
@@ -71,11 +69,11 @@ codeunit 6184512 "EFT Mock Client Protocol"
         State.Captions := Captions.Captions();
         State.Captions.Amount := Format(EftTransactionRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>');
         case EftTransactionRequest."Processing Type" of
-            EftTransactionRequest."Processing Type"::Payment:
+          EftTransactionRequest."Processing Type"::PAYMENT :
                 begin
                     State.Captions.TransactionType := 'Payment';
                 end;
-            EftTransactionRequest."Processing Type"::Refund:
+          EftTransactionRequest."Processing Type"::REFUND :
                 begin
                     State.Captions.TransactionType := 'Refund';
                 end;
@@ -328,7 +326,10 @@ codeunit 6184512 "EFT Mock Client Protocol"
     var
         OutStream: OutStream;
     begin
-        if State.AmountOut = 700 then
+        //-NPR5.51 [359385]
+        //IF State.AmountOut = 700 THEN
+        if Abs(State.AmountOut) = 700 then
+        //+NPR5.51 [359385]
             Error('Simulating Crash at NST side');
 
         EftTransactionRequest.Successful := State.Success;
@@ -420,7 +421,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
         //+NPR5.48 [339930]
 
         if State.OriginalSuccess then begin
-            if OriginalTransactionRequest."Processing Type" = OriginalTransactionRequest."Processing Type"::Void then
+          if OriginalTransactionRequest."Processing Type" = OriginalTransactionRequest."Processing Type"::VOID then
                 EftTransactionRequest."Amount Output" := OriginalTransactionRequest."Amount Input" //Voids don't have an amount in the external mock terminal syntax
             else
                 EftTransactionRequest."Amount Output" := State.AmountOut;

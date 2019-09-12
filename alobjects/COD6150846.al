@@ -3,6 +3,8 @@ codeunit 6150846 "POS Action - EFT Operation"
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.48/MMV /20181221 CASE 340754 Added new list operation types for refund, void, lookup.
     // NPR5.48/MMV /20190123 CASE 341237 Added support for new pause/resume skip events.
+    // NPR5.51/MMV /20190603 CASE 355433 Moved UnpauseWorkflowAfterResponse away from this codeunit
+    // NPR5.51/MMV /20190628 CASE 359385 Added support for giftcard load
 
 
     trigger OnRun()
@@ -36,18 +38,12 @@ codeunit 6150846 "POS Action - EFT Operation"
           Sender."Subscriber Instances Allowed"::Multiple)
         then begin
           Sender.RegisterWorkflowStep ('SendRequest', 'respond();');
-        //-NPR5.48 [340754]
-        //  Sender.RegisterWorkflowStep ('EndOfWorkflow', '');
           Sender.RegisterWorkflowStep ('EndOfWorkflow', 'respond();'); //Undim & refresh potential new lines.
-        //+NPR5.48 [340754]
           Sender.RegisterWorkflow (false);
 
           Sender.RegisterTextParameter('EftType','');
           Sender.RegisterTextParameter('PaymentType','');
-        //-NPR5.48 [340754]
-        //  Sender.RegisterOptionParameter('OperationType', 'VoidLast,ReprintLast,LookupLast,OpenConn,CloseConn,VerifySetup,ShowTransactions,AuxOperation,LookupSpecific,VoidSpecific,RefundSpecific', 'ShowTransactions');
           Sender.RegisterOptionParameter('OperationType', 'VoidLast,ReprintLast,LookupLast,OpenConn,CloseConn,VerifySetup,ShowTransactions,AuxOperation,LookupSpecific,VoidSpecific,RefundSpecific,LookupList,VoidList,RefundList', 'ShowTransactions');
-        //+NPR5.48 [340754]
           Sender.RegisterIntegerParameter('AuxId', 0);
           Sender.RegisterIntegerParameter('EntryNo', 0);
         end;
@@ -72,10 +68,8 @@ codeunit 6150846 "POS Action - EFT Operation"
 
         Handled := true;
 
-        //-NPR5.48 [340754]
         if WorkflowStep = 'EndOfWorkflow' then
           exit;
-        //+NPR5.48 [340754]
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -89,10 +83,6 @@ codeunit 6150846 "POS Action - EFT Operation"
         if PaymentType = '' then
           Error(ERROR_MISSING_PARAM, 'PaymentType');
         EFTSetup.FindSetup(SalePOS."Register No.", PaymentType);
-
-        //-NPR5.48 [341237]
-        //PauseWorkflow(OperationType, FrontEnd);
-        //+NPR5.48 [341237]
 
         case OperationType of
           OperationType::VoidLast : VoidLastTransaction(EFTSetup, SalePOS, FrontEnd);
@@ -123,7 +113,6 @@ codeunit 6150846 "POS Action - EFT Operation"
               EntryNo := JSON.GetIntegerParameter('EntryNo', true);
               RefundTransaction(EFTSetup, SalePOS, EntryNo, FrontEnd);
             end;
-        //-NPR5.48 [340754]
           OperationType::LookupList :
             begin
               if not SelectTransaction(EFTTransactionRequest) then
@@ -144,7 +133,6 @@ codeunit 6150846 "POS Action - EFT Operation"
                 exit;
               RefundTransaction(EFTSetup, SalePOS, EFTTransactionRequest."Entry No.", FrontEnd);
             end;
-        //+NPR5.48 [340754]
         end;
     end;
 
@@ -161,26 +149,9 @@ codeunit 6150846 "POS Action - EFT Operation"
         Continue: Boolean;
     begin
         GetLastFinancialTransaction(LastEFTTransactionRequest, EFTSetup, SalePOS);
-        //-NPR5.48 [340754]
         if not VoidConfirm(LastEFTTransactionRequest) then
           Error('');
         VoidTransaction(EFTSetup, SalePOS, LastEFTTransactionRequest."Entry No.", FrontEnd);
-
-        // IF LastEFTTransactionRequest.Recovered THEN BEGIN
-        //  RecoveredEFTTransactionRequest.GET(LastEFTTransactionRequest."Recovered by Entry No.");
-        //  WITH RecoveredEFTTransactionRequest DO
-        //    Continue := CONFIRM(CAPTION_VOID_CONFIRM, FALSE, LastEFTTransactionRequest."Sales Ticket No.", FORMAT(LastEFTTransactionRequest."Processing Type"), "Result Amount", "Currency Code", "External Transaction ID");
-        // END ELSE
-        //  WITH LastEFTTransactionRequest DO
-        //    Continue := CONFIRM(CAPTION_VOID_CONFIRM, FALSE, "Sales Ticket No.", FORMAT("Processing Type"), "Result Amount", "Currency Code", "External Transaction ID");
-        //
-        // IF NOT Continue THEN
-        //  ERROR('');
-
-        // EFTIntegration.CreateVoidRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", LastEFTTransactionRequest."Entry No.", TRUE);
-        // COMMIT;
-        // EFTIntegration.SendRequest(EFTTransactionRequest);
-        //+NPR5.48 [340754]
     end;
 
     local procedure VoidTransaction(EFTSetup: Record "EFT Setup";SalePOS: Record "Sale POS";EntryNo: Integer;FrontEnd: Codeunit "POS Front End Management")
@@ -192,9 +163,7 @@ codeunit 6150846 "POS Action - EFT Operation"
         EFTTransactionRequestToVoid.Get(EntryNo);
         EFTFramework.CreateVoidRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", EntryNo, true);
         Commit;
-        //-NPR5.48 [341237]
         PauseWorkflow(EFTTransactionRequest, FrontEnd);
-        //+NPR5.48 [341237]
         EFTFramework.SendRequest(EFTTransactionRequest);
     end;
 
@@ -213,9 +182,7 @@ codeunit 6150846 "POS Action - EFT Operation"
                                            EFTTransactionRequestToRefund."Result Amount",
                                            EFTTransactionRequestToRefund."Entry No.");
         Commit;
-        //-NPR5.48 [341237]
         PauseWorkflow(EFTTransactionRequest, FrontEnd);
-        //+NPR5.48 [341237]
         EFTIntegration.SendRequest(EFTTransactionRequest);
     end;
 
@@ -236,12 +203,7 @@ codeunit 6150846 "POS Action - EFT Operation"
         LastEFTTransactionRequest: Record "EFT Transaction Request";
     begin
         GetLastFinancialTransaction(LastEFTTransactionRequest, EFTSetup, SalePOS);
-        //-NPR5.48 [341237]
         LookupTransaction(EFTSetup, SalePOS, LastEFTTransactionRequest."Entry No.", FrontEnd);
-        // EFTIntegration.CreateLookupTransactionRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", LastEFTTransactionRequest."Entry No.");
-        // COMMIT;
-        // EFTIntegration.SendRequest(EFTTransactionRequest);
-        //+NPR5.48 [341237]
     end;
 
     local procedure LookupTransaction(EFTSetup: Record "EFT Setup";SalePOS: Record "Sale POS";EntryNo: Integer;FrontEnd: Codeunit "POS Front End Management")
@@ -253,9 +215,7 @@ codeunit 6150846 "POS Action - EFT Operation"
         EFTTransactionRequestToLookup.Get(EntryNo);
         EFTIntegration.CreateLookupTransactionRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.", EntryNo);
         Commit;
-        //-NPR5.48 [341237]
         PauseWorkflow(EFTTransactionRequest, FrontEnd);
-        //+NPR5.48 [341237]
         EFTIntegration.SendRequest(EFTTransactionRequest);
     end;
 
@@ -266,9 +226,7 @@ codeunit 6150846 "POS Action - EFT Operation"
     begin
         EFTIntegration.CreateBeginWorkshiftRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.");
         Commit;
-        //-NPR5.48 [341237]
         PauseWorkflow(EFTTransactionRequest, FrontEnd);
-        //+NPR5.48 [341237]
         EFTIntegration.SendRequest(EFTTransactionRequest);
     end;
 
@@ -279,9 +237,7 @@ codeunit 6150846 "POS Action - EFT Operation"
     begin
         EFTIntegration.CreateEndWorkshiftRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.");
         Commit;
-        //-NPR5.48 [341237]
         PauseWorkflow(EFTTransactionRequest, FrontEnd);
-        //+NPR5.48 [341237]
         EFTIntegration.SendRequest(EFTTransactionRequest);
     end;
 
@@ -292,9 +248,7 @@ codeunit 6150846 "POS Action - EFT Operation"
     begin
         EFTIntegration.CreateVerifySetupRequest(EFTTransactionRequest, EFTSetup, SalePOS."Register No.", SalePOS."Sales Ticket No.");
         Commit;
-        //-NPR5.48 [341237]
         PauseWorkflow(EFTTransactionRequest, FrontEnd);
-        //+NPR5.48 [341237]
         EFTIntegration.SendRequest(EFTTransactionRequest);
     end;
 
@@ -315,9 +269,7 @@ codeunit 6150846 "POS Action - EFT Operation"
     begin
         EFTIntegration.CreateAuxRequest(EFTTransactionRequest, EFTSetup, AuxID, SalePOS."Register No.", SalePOS."Sales Ticket No.");
         Commit;
-        //-NPR5.48 [341237]
         PauseWorkflow(EFTTransactionRequest, FrontEnd);
-        //+NPR5.48 [341237]
         EFTIntegration.SendRequest(EFTTransactionRequest);
     end;
 
@@ -325,12 +277,15 @@ codeunit 6150846 "POS Action - EFT Operation"
     begin
         EFTTransactionRequest.SetRange("Register No.", SalePOS."Register No.");
         EFTTransactionRequest.SetRange("Integration Type", EFTSetup."EFT Integration Type");
-        EFTTransactionRequest.SetFilter("Processing Type", '%1|%2|%3', EFTTransactionRequest."Processing Type"::Payment, EFTTransactionRequest."Processing Type"::Refund, EFTTransactionRequest."Processing Type"::Void);
-        //-NPR5.48 [341237]
+        //-NPR5.51 [359385]
+        //EFTTransactionRequest.SETFILTER("Processing Type", '%1|%2|%3', EFTTransactionRequest."Processing Type"::Payment, EFTTransactionRequest."Processing Type"::Refund, EFTTransactionRequest."Processing Type"::Void);
+        EFTTransactionRequest.SetFilter("Processing Type", '%1|%2|%3|%4',
+            EFTTransactionRequest."Processing Type"::PAYMENT,
+            EFTTransactionRequest."Processing Type"::REFUND,
+            EFTTransactionRequest."Processing Type"::VOID,
+            EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD);
+        //+NPR5.51 [359385]
         EFTTransactionRequest.FindLast;
-        // IF NOT EFTTransactionRequest.FINDLAST THEN
-        //  ERROR(ERROR_NO_FINANCIAL_TRX, EFTSetup."EFT Integration Type", SalePOS."Register No.");
-        //+NPR5.48 [341237]
     end;
 
     local procedure PauseWorkflow(EFTTransactionRequest: Record "EFT Transaction Request";FrontEnd: Codeunit "POS Front End Management")
@@ -338,50 +293,9 @@ codeunit 6150846 "POS Action - EFT Operation"
         EFTInterface: Codeunit "EFT Interface";
         Skip: Boolean;
     begin
-        //-NPR5.48 [341237]
-        // IF Type IN [OperationType::AuxOperation,
-        //            OperationType::CloseConn,
-        //            OperationType::OpenConn,
-        //            OperationType::VerifySetup,
-        //            OperationType::LookupLast,
-        //            OperationType::LookupSpecific,
-        //            OperationType::VoidLast,
-        //            OperationType::VoidSpecific,
-        //            OperationType::RefundSpecific] THEN
-        //    POSFrontEnd.PauseWorkflow();
-
         EFTInterface.OnBeforePauseFrontEnd(EFTTransactionRequest, Skip);
         if not Skip then
           FrontEnd.PauseWorkflow();
-        //+NPR5.48 [341237]
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6184499, 'OnAfterEftIntegrationResponseReceived', '', false, false)]
-    local procedure UnpauseWorkflowAfterResponse(EftTransactionRequest: Record "EFT Transaction Request")
-    var
-        POSFrontEnd: Codeunit "POS Front End Management";
-        POSSession: Codeunit "POS Session";
-        EFTInterface: Codeunit "EFT Interface";
-        Skip: Boolean;
-    begin
-        if (EftTransactionRequest."Processing Type" in [EftTransactionRequest."Processing Type"::Payment,
-                                                        EftTransactionRequest."Processing Type"::Refund,
-                                                        EftTransactionRequest."Processing Type"::Void,
-                                                        EftTransactionRequest."Processing Type"::xLookup]) then
-          exit;
-
-        if not POSSession.IsActiveSession(POSFrontEnd) then
-          Error(ERROR_SESSION);
-        //-NPR5.48 [340754]
-        POSFrontEnd.GetSession(POSSession);
-        POSSession.RequestRefreshData();
-        //+NPR5.48 [340754]
-
-        //-NPR5.48 [341237]
-        EFTInterface.OnBeforeResumeFrontEnd(EftTransactionRequest, Skip);
-        if not Skip then
-        //+NPR5.48 [341237]
-          POSFrontEnd.ResumeWorkflow();
     end;
 
     local procedure VoidConfirm(EFTTransactionRequest: Record "EFT Transaction Request"): Boolean
@@ -399,9 +313,7 @@ codeunit 6150846 "POS Action - EFT Operation"
 
     local procedure SelectTransaction(var EftTransactionRequestOut: Record "EFT Transaction Request"): Boolean
     begin
-        //-NPR5.48 [340754]
         exit(PAGE.RunModal(0, EftTransactionRequestOut) = ACTION::LookupOK);
-        //+NPR5.48 [340754]
     end;
 
     local procedure "// Parameter Handling"()

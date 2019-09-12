@@ -36,6 +36,7 @@ table 6014422 "Retail Journal Line"
     // NPR5.49/BHR /20190220 CASE 344000 Added fields 36,37,38,76,77,78
     // NPR5.49/TJ  /20190307 CASE 347533 New field 100
     // NPR5.50/ALST/20190408 CASE 350435 modified logic to allow for multiple line inserts on items from the same batch
+    // NPR5.51/MHA /20190822 CASE 365886 Discount Pct. is set to 0 when Unit Price is 0 in CalcDiscountPrice()
 
     Caption = 'Retail Journal Line';
 
@@ -861,6 +862,12 @@ table 6014422 "Retail Journal Line"
             end;
           FieldNo("Unit Price"),FieldNo("Discount Price Incl. Vat"):
             begin
+              //-NPR5.51 [365886]
+              if ("Quantity for Discount Calc" = 0) or ("Unit Price" = 0) then begin
+                "Discount Pct." := 0;
+                exit;
+              end;
+              //+NPR5.51 [365886]
               "Discount Pct." := (1 - ( "Discount Price Incl. Vat" / "Quantity for Discount Calc" / "Unit Price")) * 100;
             end;
         end;

@@ -46,8 +46,10 @@ page 6014511 "Retail Item List"
     // NPR5.48/TJ  /20190102 CASE 340615 Removed field "Product Group Code"
     // NPR5.48/TS  /20180104 CASE 338609 Added Shortcut Ctrl+Alt+L to Price Label
     // NPR5.50/JAVA/20190429 CASE 353381 BC14: Implement changes done in page 542 (use generic SetMultiRecord() function instead of specific functions).
-    // #361229/ZESO/20190708 CASE 361229 Added Page Action Attributes and Factbox Item Attributes
-    // #361514/THRO/20190717 CASE 361514 Action POS Sales Entries named POSSalesEntries (for AL Conversion)
+    // NPR5.51/THRO/20190717 CASE 361514 Action POS Sales Entries named POSSalesEntries (for AL Conversion)
+    // NPR5.51/ZESO/20190814 CASE 363460 Added Item Status
+    // NPR5.51/ZESO/20190708 CASE 361229 Added Page Action Attributes and Factbox Item Attributes
+    // NPR5.51/SARA/20190904 CASE 366962 Added Page Action 'Shelf Labels'
 
     Caption = 'Item List';
     CardPageID = "Retail Item Card";
@@ -119,6 +121,9 @@ page 6014511 "Retail Item List"
                     Visible = false;
                 }
                 field("Magento Item";"Magento Item")
+                {
+                }
+                field("Item Status";"Item Status")
                 {
                 }
                 field("Unit Price";"Unit Price")
@@ -1252,6 +1257,27 @@ page 6014511 "Retail Item List"
                         ItemRec := Rec;
                         ItemRec.SetRecFilter;
                         LabelLibrary.ResolveVariantAndPrintItem(ItemRec, ReportSelectionRetail."Report Type"::"Price Label");
+                    end;
+                }
+                action("Shelf Label")
+                {
+                    Caption = 'Shelf Label';
+                    Image = BinLedger;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    ShortCutKey = 'Ctrl+Alt+L';
+
+                    trigger OnAction()
+                    var
+                        ItemRec: Record Item;
+                        LabelLibrary: Codeunit "Label Library";
+                        ReportSelectionRetail: Record "Report Selection Retail";
+                    begin
+                        //-NPR5.51 [366962]
+                        ItemRec := Rec;
+                        ItemRec.SetRecFilter;
+                        LabelLibrary.ResolveVariantAndPrintItem(ItemRec, ReportSelectionRetail."Report Type"::"Shelf Label");
+                        //+NPR5.51 [366962]
                     end;
                 }
             }

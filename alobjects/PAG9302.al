@@ -1,4 +1,4 @@
-pageextension 50077 pageextension50077 extends "Sales Credit Memos" 
+pageextension 50078 pageextension50078 extends "Sales Credit Memos" 
 {
     // NPR5.36/THRO/20170908 CASE 285645 Added action PostAndSendPdf2Nav
     actions

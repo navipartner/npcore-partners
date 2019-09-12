@@ -1,6 +1,7 @@
 page 6014448 "Mixed Discount Time Intervals"
 {
     // NPR5.45/MHA /20180820  CASE 323568 Object created
+    // NPR5.51/MAOT/20190614 CASE 352650 Fixed scaling error by changing grid layout to standard list
 
     AutoSplitKey = true;
     Caption = 'Active Time Intervals';
@@ -12,58 +13,38 @@ page 6014448 "Mixed Discount Time Intervals"
     {
         area(content)
         {
-            grid(Control6014404)
+            repeater(Group)
             {
-                ShowCaption = false;
-                group(Control6014416)
+                field("Start Time";"Start Time")
                 {
-                    ShowCaption = false;
-                    repeater(Group)
-                    {
-                        field("Start Time";"Start Time")
-                        {
-                        }
-                        field("End Time";"End Time")
-                        {
-                        }
-                        field("Period Type";"Period Type")
-                        {
-                        }
-                        field("Period Description";"Period Description")
-                        {
-                            Editable = false;
-                        }
-                    }
                 }
-                group(Period)
+                field("End Time";"End Time")
                 {
-                    Caption = 'Period';
-                    group(Control6014409)
-                    {
-                        ShowCaption = false;
-                        Visible = ("Period Type" = 1);
-                        field(Monday;Monday)
-                        {
-                        }
-                        field(Tuesday;Tuesday)
-                        {
-                        }
-                        field(Wednesday;Wednesday)
-                        {
-                        }
-                        field(Thursday;Thursday)
-                        {
-                        }
-                        field(Friday;Friday)
-                        {
-                        }
-                        field(Saturday;Saturday)
-                        {
-                        }
-                        field(Sunday;Sunday)
-                        {
-                        }
-                    }
+                }
+                field("Period Type";"Period Type")
+                {
+                }
+                field(Monday;Monday)
+                {
+                    Editable = "Period Type"=1;
+                }
+                field(Tuesday;Tuesday)
+                {
+                }
+                field(Wednesday;Wednesday)
+                {
+                }
+                field(Thursday;Thursday)
+                {
+                }
+                field(Friday;Friday)
+                {
+                }
+                field(Saturday;Saturday)
+                {
+                }
+                field(Sunday;Sunday)
+                {
                 }
             }
         }

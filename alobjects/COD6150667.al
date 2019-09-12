@@ -2,6 +2,7 @@ codeunit 6150667 "NPRE POS Action - Get Wa."
 {
     // NPR5.45/MHA /20180827  CASE 318369 Object created
     // NPR5.50/TJ  /20190528  CASE 346384 New parameter added
+    // NPR5.51/ALST/20190704  CASE 359352 added change to ask confirmation before table retrieval and parameter to activate it
 
 
     trigger OnRun()
@@ -10,6 +11,7 @@ codeunit 6150667 "NPRE POS Action - Get Wa."
 
     var
         Text000: Label 'Transfer Waiter Pad to POS Sale';
+        ConfirmTableCaption: Label 'Are you sure you want to retrieve from %1?';
 
     local procedure ActionCode(): Text
     begin
@@ -20,7 +22,7 @@ codeunit 6150667 "NPRE POS Action - Get Wa."
     begin
         //-NPR5.50 [346384]
         //EXIT ('1.0');
-        exit ('1.1');
+        exit ('1.2');
         //+NPR5.50 [346384]
     end;
 
@@ -72,6 +74,9 @@ codeunit 6150667 "NPRE POS Action - Get Wa."
             //-NPR5.50 [346384]
             RegisterBooleanParameter('ShowOnlyActiveWaiPad',false);
             //+NPR5.50 [346384]
+            //-NPR5.51
+            RegisterBooleanParameter('WarnBeforeTableRetrieval',false)
+            //+NPR5.51
           end;
         end;
     end;
@@ -111,6 +116,12 @@ codeunit 6150667 "NPRE POS Action - Get Wa."
         NPREWaiterPadPOSMgt: Codeunit "NPRE Waiter Pad POS Management";
     begin
         NPREWaiterPadPOSMgt.FindSeating(JSON,NPRESeating);
+
+        //-NPR5.51
+        if JSON.GetBooleanParameter('WarnBeforeTableRetrieval',false) then
+          if not Confirm(ConfirmTableCaption,true,NPRESeating.Description) then
+            Error('');
+        //+NPR5.51
 
         JSON.SetContext('seatingCode',NPRESeating.Code);
 

@@ -15,7 +15,8 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
     // NPR5.48/LS  /20181121 CASE 334335 When Upgrading Audit Roll, added migration of Setups
     // NPR5.48/TSA /20181126 CASE 336921 Adding on code on ActivatePoseidonPosting() and DeActivatePoseidonPosting(). Removing commented code
     // NPR5.48/TJ  /20190102 CASE 340615 Commented out usage of field Item."Product Group Code"
-    // #362329/MHA /20190718 CASE 362329 Added "Exclude from Posting" on POS Sales Lines in InsertPOSSaleLine()
+    // NPR5.51/MHA /20190718 CASE 362329 Added "Exclude from Posting" on POS Sales Lines in InsertPOSSaleLine()
+    // NPR5.51/LS  /20190826 CASE 334335 Modified function UpgradeSetupsBalancingV3()
 
     Permissions = TableData "Audit Roll"=rimd;
 
@@ -329,9 +330,9 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
             else
               Error('Sales Line Type %1 not implemented in migration (%2 %3 %4)',AuditRoll.Type,AuditRoll.TableName,AuditRoll.FieldName("Clustered Key"),AuditRoll."Clustered Key");
           end;
-          //-#362329 [362329]
+          //-NPR5.51 [362329]
           "Exclude from Posting" := ExcludeFromPosting(AuditRoll);
-          //+#362329 [362329]
+          //+NPR5.51 [362329]
           "No." := AuditRoll."No.";
           "Variant Code" := AuditRoll."Variant Code";
           "Location Code" := AuditRoll.Lokationskode;
@@ -439,16 +440,16 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
             POSEntry."Prices Including VAT" := true;
           //Update measures
           if Type = Type::Item then begin
-            POSEntry."Sales Amount" += "Amount Incl. VAT";
+            POSEntry."Item Sales (LCY)" += "Amount Incl. VAT";
             POSEntry."Discount Amount" += "Line Discount Amount Incl. VAT";
             if Quantity < 0 then
               POSEntry."Return Sales Quantity" -= Quantity
             else
               POSEntry."Sales Quantity" += Quantity;
           end;
-          POSEntry."Total Amount" += "Amount Excl. VAT";
-          POSEntry."Total Tax Amount" += "Amount Incl. VAT";
-          POSEntry."Total Amount Incl. Tax" += "Amount Incl. VAT"-"Amount Excl. VAT";
+          POSEntry."Amount Excl. Tax" += "Amount Excl. VAT";
+          POSEntry."Tax Amount" += "Amount Incl. VAT";
+          POSEntry."Amount Incl. Tax" += "Amount Incl. VAT"-"Amount Excl. VAT";
         end;
     end;
 
@@ -793,6 +794,13 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
         BlankPosStoreCode: Integer;
     begin
         //-NPR5.48 [334335]
+        //-NPR5.51 [334335]
+        if GuiAllowed then
+          ProgressDialog.Open('Upgrade Setups for BalancingV3 \'+
+                               'Estimated Payment Type @1@@@@@@@@\'+
+                               'Populate POS Payment Bin #2########\' +
+                               'Set POS Posting Setup #3########');
+        //+NPR5.51 [334335]
 
         //1. Populate POS Payment Method
         POSPaymentMethod.Reset;  // Target
@@ -800,9 +808,13 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
         PaymentTypePOS.Reset;   //  Source
 
         if PaymentTypePOS.FindSet then repeat
+          //-NPR5.51 [334335]
+          if GuiAllowed then
+            ProgressDialog.Update(1,PaymentTypePOS.Count);
+          //+NPR5.51 [334335]
           POSPaymentMethodCheck.Reset;
           POSPaymentMethod.Reset;
-          if not POSPaymentMethodCheck.Get(POSPaymentMethod.Code) then begin
+          if not POSPaymentMethodCheck.Get(PaymentTypePOS."No.") then begin
             POSPaymentMethod.Init;
             POSPaymentMethod.Code := PaymentTypePOS."No.";
             case PaymentTypePOS."Processing Type" of
@@ -833,33 +845,36 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
 
               PaymentTypePOS."Processing Type"::"Credit Voucher" :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::VOUCHER;
-        //below to be defined
-        //      PaymentTypePOS."Processing Type"::"Terminal Card" :
-        //        POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::CASH;
-        //
-        //      PaymentTypePOS."Processing Type"::"Manual Card" :
-        //        POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::CASH;
-        //
-        //      PaymentTypePOS."Processing Type"::"Other Credit Cards" :
-        //        POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::CASH;
-        //
-        //      PaymentTypePOS."Processing Type"::"Debit sale" :
-        //        POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::CASH;
-        //
-        //      PaymentTypePOS."Processing Type"::Invoice :
-        //        POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::CASH;
-        //
-        //      PaymentTypePOS."Processing Type"::DIBS :
-        //        POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::CASH;
-        //
-        //      PaymentTypePOS."Processing Type"::"Point Card" :
-        //        POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::CASH;
+
+              //-NPR5.51 [334335]
+              PaymentTypePOS."Processing Type"::"Terminal Card" :
+                POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::EFT;
+
+              PaymentTypePOS."Processing Type"::"Manual Card" :
+                POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::EFT;
+
+              PaymentTypePOS."Processing Type"::"Other Credit Cards" :
+                POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::EFT;
+
+              PaymentTypePOS."Processing Type"::"Debit sale" :
+                POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::CUSTOMER;
+
+              PaymentTypePOS."Processing Type"::Invoice :
+                POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::CUSTOMER;
+
+              PaymentTypePOS."Processing Type"::DIBS :
+                POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::EFT;
+
+              PaymentTypePOS."Processing Type"::"Point Card" :
+                POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::EFT;
+              //+NPR5.51 [334335]
 
             end;
             if PaymentTypePOS."To be Balanced" then
               POSPaymentMethod."Include In Counting" := POSPaymentMethod."Include In Counting"::YES
             else
               POSPaymentMethod."Include In Counting" := POSPaymentMethod."Include In Counting"::NO;
+
             POSPaymentMethod."Post Condensed" := (PaymentTypePOS.Posting = PaymentTypePOS.Posting::Condensed);
             POSPaymentMethod."Rounding Type" := POSPaymentMethod."Rounding Type"::Nearest;
             POSPaymentMethod."Rounding Precision" := PaymentTypePOS."Rounding Precision";
@@ -872,6 +887,10 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
         POSPaymentBinCheck.Reset;
         POSUnit.Reset;
         if POSUnit.FindSet then repeat
+          //-NPR5.51 [334335]
+          if GuiAllowed then
+            ProgressDialog.Update(2,POSUnit.Count);
+          //+NPR5.51 [334335]
           POSPaymentBinCheck.Reset;
           POSPaymentBin.Reset;
           if not POSPaymentBinCheck.Get(POSUnit."No.") then begin
@@ -896,6 +915,10 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
             BlankPosStoreCode := 1;
             PaymentTypePOS.Reset;
             if PaymentTypePOS.FindSet then repeat
+              //-NPR5.51 [334335]
+              if GuiAllowed then
+                ProgressDialog.Update(3,PaymentTypePOS.Count);
+              //+NPR5.51 [334335]
               POSPostingSetup.Reset;
               POSPostingSetup.Init;
               POSPostingSetup."POS Store Code" := Register."Register No.";
@@ -913,17 +936,22 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
             until PaymentTypePOS.Next = 0;
           until Register.Next = 0;
         end;
+        //-NPR5.51 [334335]
+        if GuiAllowed then
+          ProgressDialog.Close;
+        //+NPR5.51 [334335]
+
         //+NPR5.48 [334335]
     end;
 
     procedure ExcludeFromPosting(AuditRoll: Record "Audit Roll"): Boolean
     begin
-        //-#362329 [362329]
+        //-NPR5.51 [362329]
         if AuditRoll.Type in [AuditRoll.Type::Comment] then
           exit(true);
 
         exit(AuditRoll."Sale Type" in [AuditRoll."Sale Type"::Comment,AuditRoll."Sale Type"::"Debit Sale",AuditRoll."Sale Type"::"Open/Close"]);
-        //+#362329 [362329]
+        //+NPR5.51 [362329]
     end;
 }
 

@@ -1,4 +1,4 @@
-pageextension 50079 pageextension50079 extends "Sales Order List" 
+pageextension 50080 pageextension50080 extends "Sales Order List" 
 {
     // NPR5.36/KENU/20170830 CASE 283379 Added field "Promised Delivery Date"
     // NPR5.36/THRO/20170908 CASE 285645 Added action PostAndSendPdf2Nav

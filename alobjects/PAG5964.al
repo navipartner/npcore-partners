@@ -1,4 +1,4 @@
-pageextension 50062 pageextension50062 extends "Service Quote" 
+pageextension 50063 pageextension50063 extends "Service Quote" 
 {
     // PN1.03/MH/20140814  NAV-AddOn: PDF2NAV
     //   - Added Menu Items on Function-button: "E-mail Log" and "Send as PDF".

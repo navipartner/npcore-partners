@@ -4,6 +4,7 @@ table 6150717 "POS Menu Filter"
     // NPR5.41/TSA /20180417 CASE 310137 Added field "Current Register / POS Unit", function SetPOSUnitFilter()
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -fields 5,10,11
     // NPR5.48/TJ  /20181112  CASE 335629 Fixed the issue with wrong Object Name display
+    // NPR5.51/ALPO/20190805 CASE 362878 Predefined in "POS Menu Filter" View was lost while setting POS unit filter
 
     Caption = 'POS Menu Filter';
     LookupPageID = "POS Menu Filter List";
@@ -209,7 +210,10 @@ table 6150717 "POS Menu Filter"
               SetPOSUnitFilter ("Table No.", FilterStringText);
             //+NPR5.41 [310137]
 
-            if FilterStringText <> '' then FilterRecRef.SetView(FilterStringText);
+            if FilterStringText <> '' then begin
+              FilterRecRef.SetView(FilterStringText);
+              if FilterRecRef.FindFirst then;  //-+NPR5.51 [362878] (otherwise you are positioned at the end of the list, if DESCENDING order is used)
+            end;
             FilterRecVariant := FilterRecRef;
 
           end;
@@ -274,12 +278,14 @@ table 6150717 "POS Menu Filter"
         case TableNo of
           DATABASE::"Audit Roll" :
             begin
+              AuditRoll.SetView(FilterRecRef.GetView);  //-+NPR5.51 [362878]
               AuditRoll.CopyFilters (FilterRecVariant);
               AuditRoll.SetFilter ("Register No.", '=%1', GetRegisterNo ());
               FilterStringText := AuditRoll.GetView ();
             end;
           DATABASE::"POS Entry" :
             begin
+              POSEntry.SetView(FilterRecRef.GetView);  //-+NPR5.51 [362878]
               POSEntry.CopyFilters (FilterRecVariant);
               POSEntry.SetFilter ("POS Unit No.", '=%1', GetPosUnitNo ());
               FilterStringText := POSEntry.GetView ();

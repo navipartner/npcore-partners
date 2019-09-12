@@ -2,6 +2,7 @@ page 6059966 "MPOS Nets Transactions List"
 {
     // NPR5.33/NPKNAV/20170630  CASE 267203 Transport NPR5.33 - 30 June 2017
     // NPR5.34/CLVA/20170703 CASE 280444 Upgrading MPOS functionality to transcendence
+    // NPR5.51/CLVA/20190819 CASE 364011 Added field "EFT Transaction Entry No."
 
     Caption = 'MPOS Nets Transactions List';
     CardPageID = "MPOS Nets Transactions Card";
@@ -43,6 +44,9 @@ page 6059966 "MPOS Nets Transactions List"
                 {
                 }
                 field("Created Date";"Created Date")
+                {
+                }
+                field("EFT Transaction Entry No.";"EFT Transaction Entry No.")
                 {
                 }
             }

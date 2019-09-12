@@ -19,6 +19,7 @@ codeunit 6014545 "RP Blaster CPL Device Library"
     //  "N:\UDV\POS Devices\Tutorials\CLP programming reference\105-008-02_ProgrammingManual_REVC2"
     // 
     // NPR5.32/MMV /20170410 CASE 241995 Retail Print 2.0
+    // NPR5.51/MMV /20190801 CASE 360975 Buffer all template print data into one job.
 
     EventSubscriberInstance = Manual;
 
@@ -124,7 +125,9 @@ codeunit 6014545 "RP Blaster CPL Device Library"
 
     procedure InitJob(var DeviceSettings: Record "RP Device Settings")
     begin
-        PrintBuffer := '';
+        //-NPR5.51 [360975]
+        //PrintBuffer := '';
+        //+NPR5.51 [360975]
         Initialized := false;
 
         if DeviceSettings.FindSet then repeat

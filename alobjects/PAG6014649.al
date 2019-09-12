@@ -2,6 +2,7 @@ page 6014649 "Generic Filter Page"
 {
     // NPR5.45/NPKNAV/20180903  CASE 318531 Transport NPR5.45 - 31 August 2018
     // NPR5.48/TJ    /20181130  CASE 318531 Additional features added
+    // NPR5.51/TJ    /20190715  CASE 318531 Fixed a bug with having single field in the filter
 
     Caption = 'Generic Filter Page';
     DataCaptionExpression = PageCaptionExpr;
@@ -366,6 +367,9 @@ page 6014649 "Generic Filter Page"
         if CompleteFilterText <> '' then begin
           if CompleteFilterText[StrLen(CompleteFilterText)] = ')' then
             CompleteFilterText := CopyStr(CompleteFilterText,1,StrLen(CompleteFilterText) - 1);
+          //-NPR5.51 [318531]
+          if CompleteFilterText <> '' then
+          //+NPR5.51 [318531]
           CompleteFilterText += ',';
         end;
         CompleteFilterText += FieldName + FilterKeyWord + FilterValue + '))';

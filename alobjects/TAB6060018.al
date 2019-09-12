@@ -1,56 +1,21 @@
 table 6060018 "GIM - Document Type Version"
 {
+    // NPR5.51/MHA /20190819  CASE 365377 Generic Import Module is deprecated [VLOBJDEL] Object marked for deletion
+
     Caption = 'GIM - Document Type Version';
     LookupPageID = "GIM - Document Types";
 
     fields
     {
-        field(1;"Code";Code[10])
+        field(1;"Entry No.";Integer)
         {
-            Caption = 'Code';
-        }
-        field(2;"Sender ID";Code[20])
-        {
-            Caption = 'Sender ID';
-        }
-        field(3;"Version No.";Integer)
-        {
-            Caption = 'Version No.';
-        }
-        field(10;Base;Boolean)
-        {
-            Caption = 'Base';
-
-            trigger OnValidate()
-            begin
-                if Base <> xRec.Base then begin
-                  DocTypeVersion.SetRange(Code,Code);
-                  DocTypeVersion.SetRange("Sender ID","Sender ID");
-                  DocTypeVersion.SetRange(Base,true);
-                  if Base then begin
-                    if DocTypeVersion.FindFirst then begin
-                      if not Confirm(Text001) then
-                        Error('');
-                      DocTypeVersion.Base := false;
-                      DocTypeVersion.Modify;
-                    end;
-                  end else begin
-                    if not DocTypeVersion.FindFirst then
-                      if not Confirm(Text002) then
-                        Error('');
-                  end;
-                end;
-            end;
-        }
-        field(20;Description;Text[50])
-        {
-            Caption = 'Description';
+            Caption = 'Entry No.';
         }
     }
 
     keys
     {
-        key(Key1;"Code","Sender ID","Version No.")
+        key(Key1;"Entry No.")
         {
         }
     }
@@ -58,20 +23,5 @@ table 6060018 "GIM - Document Type Version"
     fieldgroups
     {
     }
-
-    trigger OnDelete()
-    begin
-        MapTableLine.SetRange("Document No.",'');
-        MapTableLine.SetRange("Doc. Type Code",Code);
-        MapTableLine.SetRange("Sender ID","Sender ID");
-        MapTableLine.SetRange("Version No.","Version No.");
-        MapTableLine.DeleteAll(true);
-    end;
-
-    var
-        DocTypeVersion: Record "GIM - Document Type Version";
-        Text001: Label 'Base version allready exists for this document type. Do you want to set this version as new base version?';
-        Text002: Label 'This will make current document type without base version. Do you want to continue?';
-        MapTableLine: Record "GIM - Mapping Table Line";
 }
 

@@ -6,7 +6,10 @@ codeunit 6151005 "POS Action - Load POS Quote"
     // NPR5.48/MHA /20181206  CASE 338537 Added Publisher OnAfterLoadFromQuote() in OnActionLoadFromQuote()
     // NPR5.48/MHA /20181130  CASE 338208 Added POS Sales Data (.xml) functionality to fully back/restore POS Sale
     // NPR5.49/TJ  /20190125  CASE 331208 Added additional place that calls into OnAfterLoadFromQuote()
-    // NPR5.50/ALST/23052019  CASE 351725 changed OnActionLoadFromQuote to set context properly on current POS Sale Line
+    // NPR5.50/ALST/20190523  CASE 351725 changed OnActionLoadFromQuote to set context properly on current POS Sale Line
+    // NPR5.51/ALST/20190620  CASE 353076 update the sale dates after retrieving from quote
+    // NPR5.51/MMV /20190820  CASE 364694 Handle EFT approvals.
+    //                                    Moved filter from RetailSetup to parameter.
 
 
     trigger OnRun()
@@ -25,7 +28,7 @@ codeunit 6151005 "POS Action - Load POS Quote"
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.1');
+        exit ('1.2'); //-+NPR5.51 [364694]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
@@ -58,6 +61,9 @@ codeunit 6151005 "POS Action - Load POS Quote"
 
           Sender.RegisterOptionParameter('QuoteInputType','IntPad,List,Input','IntPad');
           Sender.RegisterBooleanParameter('PreviewBeforeLoad',true);
+        //-NPR5.51 [364694]
+          Sender.RegisterOptionParameter('Filter','All,Register,Salesperson,Register+Salesperson', 'Register');
+        //+NPR5.51 [364694]
         end;
     end;
 
@@ -101,12 +107,17 @@ codeunit 6151005 "POS Action - Load POS Quote"
         POSSale: Codeunit "POS Sale";
         SalesTicketNo: Code[20];
         LastQuoteEntryNo: BigInteger;
+        "Filter": Integer;
     begin
-        //-NPR5.48 [334633]
+
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        POSQuoteMgt.SetSalePOSFilter(SalePOS,POSQuoteEntry);
-        //+NPR5.48 [334633]
+        //-NPR5.51 [364694]
+        //POSQuoteMgt.SetSalePOSFilter(SalePOS,POSQuoteEntry);
+        Filter := JSON.GetIntegerParameter('Filter', true);
+        POSQuoteMgt.SetSalePOSFilter(SalePOS,POSQuoteEntry, Filter);
+        //+NPR5.51 [364694]
+
         SalesTicketNo := JSON.GetString('SalesTicketNo',false);
         if SalesTicketNo = '' then begin
           if PAGE.RunModal(0,POSQuoteEntry) <> ACTION::LookupOK then
@@ -170,14 +181,23 @@ codeunit 6151005 "POS Action - Load POS Quote"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find;
+
+        //-NPR5.51 [364694]
+        POSQuoteEntry.SkipLineDeleteTrigger(true);
+        //+NPR5.51 [364694]
+
         //-NPR5.48 [338208]
         if POSQuoteMgt.LoadPOSSaleData(POSQuoteEntry,XmlDoc) then begin
           DeletePOSSalesLines(SalePOS);
+          //-NPR5.51
+          UpdateDates(XmlDoc,SalePOS);
+          //+NPR5.51
           POSQuoteMgt.Xml2POSSale(XmlDoc,SalePOS);
           //-NPR5.49 [331208]
           OnAfterLoadFromQuote(POSQuoteEntry,SalePOS);
           //+NPR5.49 [331208]
           POSQuoteEntry.Delete(true);
+
           POSSale.Refresh(SalePOS);
 
           //-NPR5.50
@@ -286,6 +306,21 @@ codeunit 6151005 "POS Action - Load POS Quote"
     begin
         //-NPR5.48 [338537]
         //+NPR5.48 [338537]
+    end;
+
+    local procedure UpdateDates(var XmlDoc: DotNet npNetXmlDocument;SalePOS: Record "Sale POS")
+    var
+        SaleLinePOS: Record "Sale Line POS";
+        XmlElement: DotNet npNetXmlElement;
+    begin
+        //-NPR5.51
+        XmlElement := XmlDoc.SelectSingleNode('/pos_sale/fields/field[@field_no=' + Format(SalePOS.FieldNo(Date)) + ']');
+        XmlElement.InnerText := Format(SalePOS.Date,0,9);
+        XmlElement := XmlDoc.SelectSingleNode('/pos_sale/fields/field[@field_no=' + Format(SalePOS.FieldNo("Start Time")) + ']');
+        XmlElement.InnerText := Format(SalePOS."Start Time",0,9);
+        foreach XmlElement in XmlDoc.SelectNodes('pos_sale/pos_sale_lines/pos_sale_line/fields/field[@field_no=' + Format(SaleLinePOS.FieldNo(Date)) + ']') do
+          XmlElement.InnerText := Format(SalePOS.Date,0,9);
+        //+NPR5.51
     end;
 }
 

@@ -42,6 +42,7 @@ page 6014587 "Item Group Statistics Subpage"
     // NPR4.12/BHR/29062015 CASE 217113 Display Cost Amount
     // NPR4.21/TS/20160225  CASE 226010 Commented code as not to display as Tree Structure
     // NPR5.31/BR/20172021  CASE 272890 Changed from ListPart to List (for export to Excel) and made non-editable
+    // NPR5.51/ZESO/20190620 CASE 358271 Added Item Group Filter from Advanced Sales Statistics Page
 
     Caption = 'Item Group Statistics Subpage';
     DeleteAllowed = false;
@@ -245,6 +246,7 @@ page 6014587 "Item Group Statistics Subpage"
         "LP%": Boolean;
         CostAmt: Decimal;
         "Last Year CostAmt": Decimal;
+        ItemGroupFilter: Code[20];
 
     procedure SetFilter(GlobalDim1: Code[20];GlobalDim2: Code[20];DatoStart: Date;DatoEnd: Date;LastYearCalc: Text[50])
     begin
@@ -362,6 +364,7 @@ page 6014587 "Item Group Statistics Subpage"
         txtDlg: Label 'Processing Item Group #1######## @2@@@@@@@@';
         "Count": Integer;
         Dlg: Dialog;
+        ValueEntry: Record "Value Entry";
     begin
         //ChangeEmptyFilter()
         //HideEmpty :=  NOT HideEmpty;
@@ -371,6 +374,9 @@ page 6014587 "Item Group Statistics Subpage"
           Current := Rec;
           Dlg.Open( txtDlg );
           ItemGroup.SetCurrentKey("Entry No.","Primary Key Length");
+          //-NPR5.51 [358271]
+          ItemGroup.SetFilter("No.",ItemGroupFilter);
+          //+NPR5.51 [358271]
           if ItemGroup.Find('-') then repeat
             Count += 1;
             Dlg.Update( 1, ItemGroup."No." );
@@ -380,7 +386,18 @@ page 6014587 "Item Group Statistics Subpage"
             ItemLedgerEntry.SetRange( "Item Group No.", ItemGroup."No." );
             if ItemLedgerEntry.Count > 0 then
               ItemLedgerEntry.CalcSums( Quantity );
-            if ItemLedgerEntry.Quantity <> 0 then begin
+            //-NPR5.51 [358271]
+            Clear(ValueEntry);
+            SetValueEntryFilter(ValueEntry);
+            ValueEntry.SetRange( "Item Group No.", ItemGroup."No." );
+            if ValueEntry.Count > 0 then
+              ValueEntry.CalcSums("Sales Amount (Actual)");
+
+
+            //IF ItemLedgerEntry.Quantity <> 0 THEN BEGIN
+            if not ((ItemLedgerEntry.Quantity = 0) and (ValueEntry."Sales Amount (Actual)" = 0)) then begin
+            //-NPR5.51 [358271]
+
               Get( ItemGroup."No." );
               TempItemGroup :=  ItemGroup;
               TempItemGroup.Insert;
@@ -411,10 +428,13 @@ page 6014587 "Item Group Statistics Subpage"
         HideEmpty := true;
     end;
 
-    procedure GetItemGroupCode(): Code[20]
+    procedure GetItemGroupCode(VarItemGroupFilter: Code[20])
     begin
         //GetItemGroupCode()
-        exit( "No." );
+        //-NPR5.51 [358271]
+        //EXIT( "No." );
+        ItemGroupFilter := VarItemGroupFilter;
+        //+NPR5.51 [358271]
     end;
 
     procedure UpdateHidden()

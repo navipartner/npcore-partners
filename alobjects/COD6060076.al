@@ -1,32 +1,12 @@
 codeunit 6060076 "Upgrade: NPR Pre-Map"
 {
     // NPR5.29/BR /20161205  CASE 258697 Upgrade Codeunit Created
+    // NPR5.51/MHA /20190701  CASE 359589 Object marked for delete [VLOBJDEL] Delete this object
 
     Subtype = Upgrade;
 
     trigger OnRun()
     begin
-    end;
-
-    trigger OnUpgradePerCompany()
-    begin
-      UpgradeDataExchangeMapping();
-    end;
-
-    procedure UpgradeDataExchangeMapping()
-    var
-        DataExchMapping: Record "Data Exch. Mapping";
-    begin
-        with DataExchMapping do begin
-            Reset;
-            if FindSet then
-                repeat
-                    if "Pre-Mapping Codeunit" = CODEUNIT::"Pre-map Incoming Purch. Doc" then begin
-                        "Pre-Mapping Codeunit" := CODEUNIT::"NPR Pre-map Incoming Purch Doc";
-                        Modify;
-                    end;
-                until Next = 0;
-        end;
     end;
 }
 

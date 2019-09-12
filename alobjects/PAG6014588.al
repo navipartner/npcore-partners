@@ -1,8 +1,10 @@
 page 6014588 "Item Statistics Subpage"
 {
-    // NPR4.12/BHR/29062015 CASE 2171113 display Cost Amount
-    // NPR4.21/TS/20160225  CASE 226010 HideEmty always set as True so as not to display Emty Lines
-    // NPR5.31/BR/20172021  CASE 272890 made non-editable
+    // NPR4.12/BHR /29062015 CASE 2171113 display Cost Amount
+    // NPR4.21/TS  /20160225 CASE 226010 HideEmty always set as True so as not to display Emty Lines
+    // NPR5.31/BR  /20172021 CASE 272890 made non-editable
+    // NPR5.51/RA  /20190628 CASE 338480 Added Function GetGlobals
+    // NPR5.51/YAHA/20190822 CASE 365732 Flow Item Category Filter From Advanced Sales Statistics to Item Statistics
 
     Caption = 'Item Statistics Subform';
     Editable = false;
@@ -140,18 +142,25 @@ page 6014588 "Item Statistics Subpage"
         CalcLastYear: Text[50];
         CostAmt: Decimal;
         "Last Year CostAmt": Decimal;
+        ItemCatCodeFilter: Code[20];
 
-    procedure SetFilter(GlobalDim1: Code[20];GlobalDim2: Code[20];DatoStart: Date;DatoEnd: Date;ItemGroup: Code[20];LastYearCalc: Text[50])
+    procedure SetFilter(GlobalDim1: Code[20];GlobalDim2: Code[20];DatoStart: Date;DatoEnd: Date;ItemGroup: Code[20];LastYearCalc: Text[50];ItemCatCode: Code[20])
     begin
         //SetFilter()
+        //-NPR5.51 [365732]
         if ( Dim1Filter <> GlobalDim1 ) or ( Dim2Filter <> GlobalDim2 ) or ( Periodestart <> DatoStart ) or
-           ( Periodeslut <> DatoEnd ) or ( ItemGroupFilter <> ItemGroup ) then
+        //   ( Periodeslut <> DatoEnd ) OR ( ItemGroupFilter <> ItemGroup ) THEN
+             ( Periodeslut <> DatoEnd ) or ( ItemGroupFilter <> ItemGroup ) or (ItemCatCodeFilter <> ItemCatCode) then
+        //-NPR5.51 [365732]
           ReleaseLock;
         Dim1Filter := GlobalDim1;
         Dim2Filter := GlobalDim2;
         Periodestart := DatoStart;
         Periodeslut := DatoEnd;
         CalcLastYear := LastYearCalc;
+        //-NPR5.51 [365732]
+        ItemCatCodeFilter := ItemCatCode;
+        //+NPR5.51 [365732]
 
         if ( ItemGroup = '' ) and ( ItemGroupFilter <> '' ) and HideEmpty then begin
           ItemGroupFilter := ItemGroup;
@@ -223,6 +232,14 @@ page 6014588 "Item Statistics Subpage"
           ItemLedgerEntry.SetFilter( "Posting Date", '%1..%2', Periodestart, Periodeslut )
         else
           ItemLedgerEntry.SetFilter( "Posting Date", '%1..%2', CalcDate(CalcLastYear,Periodestart), CalcDate(CalcLastYear,Periodeslut) );
+
+
+        //-NPR5.51 [365732]
+        if ItemCatCodeFilter <>  '' then
+          ItemLedgerEntry.SetRange("Item Category Code",ItemCatCodeFilter)
+        else
+          ItemLedgerEntry.SetRange("Item Category Code");
+        //+NPR5.51 [365732]
 
         if ItemGroupFilter <> '' then
           ItemLedgerEntry.SetRange( "Item Group No.", ItemGroupFilter )
@@ -353,6 +370,16 @@ page 6014588 "Item Statistics Subpage"
         LSAmount:=Show;
         LPA:=Show;
         "LP%":=Show;
+    end;
+
+    procedure GetGlobals(var InDim1Filter: Code[20];var InDim2Filter: Code[20];var InPeriodestart: Date;var InPeriodeslut: Date)
+    begin
+        //-NPR5.51 [338480]
+        InDim1Filter := Dim1Filter;
+        InDim2Filter := Dim2Filter;
+        InPeriodestart := Periodestart;
+        InPeriodeslut := Periodeslut;
+        //+NPR5.51 [338480]
     end;
 }
 

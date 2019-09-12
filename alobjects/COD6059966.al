@@ -72,7 +72,7 @@ codeunit 6059966 "MPOS Payment API"
 
         CallPaymentStart(POSLine);
 
-        if (not POSLine."Cash Terminal Approved") then begin
+        if (not POSLine."EFT Approved") then begin
             POSLine.Description := MPOSTransCancelErr;
             POSLine."Amount Including VAT" := 0;
             POSLine.Modify();
@@ -223,10 +223,10 @@ codeunit 6059966 "MPOS Payment API"
                     ParseAdyenJson(mPOSAdyenTransactionsResponse);
 
                     if (mPOSAdyenTransactionsResponse."Callback Result" = 'APPROVED') and (mPOSAdyenTransactionsResponse.Handled) then begin
-                        SaleLinePOS."Cash Terminal Approved" := true;
+              SaleLinePOS."EFT Approved" := true;
                         SaleLinePOS.Description := SaleLinePOS.Description + ' ' + Format(mPOSAdyenTransactionsResponse."Transaction No.");
                     end else
-                        SaleLinePOS."Cash Terminal Approved" := false;
+              SaleLinePOS."EFT Approved" := false;
                     SaleLinePOS.Modify;
                     Commit;
                 end;
@@ -250,7 +250,7 @@ codeunit 6059966 "MPOS Payment API"
 
                         if mPOSNetsTransactionsResponse."Callback Receipt 2".HasValue then begin
                             if Confirm(ValidateSignature, true) then begin
-                                SaleLinePOS."Cash Terminal Approved" := true;
+                  SaleLinePOS."EFT Approved" := true;
                                 //-NPR5.38
                                 if PaymentTypeFounded then begin
                                     SaleLinePOS."No." := PaymentTypePOS."No.";
@@ -261,10 +261,10 @@ codeunit 6059966 "MPOS Payment API"
                                 //+NPR5.38
                             end else begin
                                 Cancelled := CallCancelStart(SaleLinePOS);
-                                SaleLinePOS."Cash Terminal Approved" := false;
+                  SaleLinePOS."EFT Approved" := false;
                             end;
                         end else begin
-                            SaleLinePOS."Cash Terminal Approved" := true;
+                SaleLinePOS."EFT Approved" := true;
                             //-NPR5.38
                             if PaymentTypeFounded then begin
                                 SaleLinePOS."No." := PaymentTypePOS."No.";
@@ -275,7 +275,7 @@ codeunit 6059966 "MPOS Payment API"
                             //+NPR5.38
                         end;
                     end else
-                        SaleLinePOS."Cash Terminal Approved" := false;
+              SaleLinePOS."EFT Approved" := false;
                     SaleLinePOS.Modify;
                     Commit;
                 end;
@@ -562,10 +562,10 @@ codeunit 6059966 "MPOS Payment API"
                     ParseAdyenJson(mPOSAdyenTransactionsResponse);
 
                     if mPOSAdyenTransactionsResponse."Callback Result" = 'APPROVED' then begin
-                        SaleLinePOS."Cash Terminal Approved" := true;
+              SaleLinePOS."EFT Approved" := true;
                         SaleLinePOS.Description := SaleLinePOS.Description + ' ' + Format(mPOSAdyenTransactionsResponse."Transaction No.");
                     end else
-                        SaleLinePOS."Cash Terminal Approved" := false;
+              SaleLinePOS."EFT Approved" := false;
                     SaleLinePOS.Modify;
                     Commit;
                 end;

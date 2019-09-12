@@ -50,10 +50,6 @@ dotnet
         {
         }
 
-        type("System.Xml.XmlComment"; "npNetXmlComment")
-        {
-        }
-
         type("System.Xml.Xsl.XslCompiledTransform"; "npNetXslCompiledTransform")
         {
         }
@@ -70,10 +66,6 @@ dotnet
         {
         }
 
-        type("System.Xml.XmlAttributeCollection"; "npNetXmlAttributeCollection")
-        {
-        }
-
         type("System.Xml.XmlCDataSection"; "npNetXmlCDataSection")
         {
         }
@@ -83,6 +75,10 @@ dotnet
         }
 
         type("System.Xml.XmlException"; "npNetXmlException")
+        {
+        }
+
+        type("System.Xml.XmlComment";"npNetXmlComment")
         {
         }
     }
@@ -508,15 +504,15 @@ dotnet
         {
         }
 
-        type("System.Text.UTF8Encoding"; "npNetUTF8Encoding")
+        type("System.Boolean";"npNetBoolean")
         {
         }
 
-        type("System.Security.Cryptography.HMACSHA256"; "npNetHMACSHA256")
+        type("System.Text.UTF8Encoding";"npNetUTF8Encoding")
         {
         }
 
-        type("System.Boolean"; "npNetBoolean")
+        type("System.Security.Cryptography.HMACSHA256";"npNetHMACSHA256")
         {
         }
 
@@ -533,10 +529,6 @@ dotnet
         }
 
         type("System.Security.Cryptography.PaddingMode"; "npNetPaddingMode")
-        {
-        }
-
-        type("System.DateTimeKind"; "npNetDateTimeKind")
         {
         }
 
@@ -1140,6 +1132,10 @@ dotnet
         Culture = 'neutral';
         PublicKeyToken = '30ad4fe6b2a6aeed';
 
+        type("Newtonsoft.Json.Linq.JValue";"npNetJValue")
+        {
+        }
+
         type("Newtonsoft.Json.JsonSerializer"; "npNetJsonSerializer")
         {
         }
@@ -1153,9 +1149,6 @@ dotnet
         {
         }
         type("Newtonsoft.Json.Linq.JTokenWriter"; "npNetJTokenWriter")
-        {
-        }
-        type("Newtonsoft.Json.Linq.JValue"; "npNetJValue")
         {
         }
         type("Newtonsoft.Json.Linq.JProperty"; "npNetJProperty")

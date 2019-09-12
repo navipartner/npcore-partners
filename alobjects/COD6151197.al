@@ -1,10 +1,10 @@
 codeunit 6151197 "NpCs Send Order"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #344264/MHA /20190717  CASE 344264 Added <store_stock> to InitReqBody()
-    // #362443/MHA /20190719  CASE 342443 Added <opening_hour_set>
-    // #362197/MHA /20190719  CASE 362197 Added <to_store>
-    // #364557/MHA /20190821  CASE 364557 Added <post_on>
+    // NPR5.51/MHA /20190717  CASE 344264 Added <store_stock> to InitReqBody()
+    // NPR5.51/MHA /20190719  CASE 342443 Added <opening_hour_set>
+    // NPR5.51/MHA /20190719  CASE 362197 Added <to_store>
+    // NPR5.51/MHA /20190821  CASE 364557 Added <post_on>
 
 
     trigger OnRun()
@@ -98,10 +98,10 @@ codeunit 6151197 "NpCs Send Order"
                       '<mobile_phone_no>' + NpCsStoreLocal."Mobile Phone No." + '</mobile_phone_no>' +
                       '<callback encoding="base64">' + InitCallback(NpCsDocument) + '</callback>' +
                     '</from_store>' +
-                    //-#362197 [362197]
+                    //-NPR5.51 [362197]
                     '<to_store store_code="' + NpCsDocument."To Store Code" + '">' +
                     '</to_store>' +
-                    //+#362197 [362197]
+                    //+NPR5.51 [362197]
                     '<order_date>' + Format(SalesHeader."Order Date",0,9) + '</order_date>' +
                     '<posting_date>' + Format(SalesHeader."Posting Date",0,9) + '</posting_date>' +
                     '<due_date>' + Format(SalesHeader."Due Date",0,9)  + '</due_date>' +
@@ -129,24 +129,24 @@ codeunit 6151197 "NpCs Send Order"
                       '<sms_template_confirmed>' + NpCsDocument."Sms Template (Confirmed)" + '</sms_template_confirmed>' +
                       '<sms_template_rejected>' + NpCsDocument."Sms Template (Rejected)" + '</sms_template_rejected>' +
                       '<sms_template_expired>' + NpCsDocument."Sms Template (Expired)" + '</sms_template_expired>' +
-                      //-#362443 [362443]
+                      //-NPR5.51 [362443]
                       '<opening_hour_set>' + NpCsDocument."Opening Hour Set" + '</opening_hour_set>' +
-                      //+#362443 [362443]
+                      //+NPR5.51 [362443]
                       '<processing_expiry_duration>' + Format(NpCsDocument."Processing Expiry Duration",0,9) + '</processing_expiry_duration>' +
                       '<delivery_expiry_days_qty>' + Format(NpCsDocument."Delivery Expiry Days (Qty.)",0,9) + '</delivery_expiry_days_qty>' +
                     '</notification>' +
                     '<bill_to_customer_no>' + NpCsStore."Bill-to Customer No." + '</bill_to_customer_no>' +
                     '<archive_on_delivery>' + Format(NpCsDocument."Archive on Delivery",0,9) + '</archive_on_delivery>' +
-                    //-#344264 [#344264]
+                    //-NPR5.51 [344264]
                     '<store_stock>' + Format(NpCsDocument."Store Stock",0,9) + '</store_stock>' +
-                    //+#344264 [#344264]
-                    //-#364557 [364557]
+                    //+NPR5.51 [344264]
+                    //-NPR5.51 [364557]
                     '<post_on>' + Format(NpCsDocument."Post on",0,2) + '</post_on>' +
-                    //+#364557 [364557]
+                    //+NPR5.51 [364557]
                     '<bill_via>' + Format(NpCsDocument."Bill via",0,2) + '</bill_via>' +
-                    //-#364557 [364557]
+                    //-NPR5.51 [364557]
                     '<processing_print_template>' + NpCsDocument."Processing Print Template" + '</processing_print_template>' +
-                    //+#364557 [364557]
+                    //+NPR5.51 [364557]
                     '<delivery_print_template_pos>' + NpCsDocument."Delivery Print Template (POS)" + '</delivery_print_template_pos>' +
                     '<delivery_print_template_sales_doc>' + NpCsDocument."Delivery Print Template (S.)" + '</delivery_print_template_sales_doc>' +
                     '<prepaid_amount>' + Format(NpCsDocument."Prepaid Amount",0,9) + '</prepaid_amount>' +

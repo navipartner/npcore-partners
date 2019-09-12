@@ -3,6 +3,7 @@ table 6014445 "RP Template Line"
     // NPR5.32/MMV /20170411 CASE 241995 Retail Print 2.0
     // NPR5.44/MMV /20180706 CASE 315362 Added field 60, renamed field 44
     // NPR5.46/MMV /20180911 CASE 314067 Added field 52
+    // NPR5.51/MMV /20190712 CASE 360972 Added field 70
 
     Caption = 'RP Template Line';
 
@@ -398,6 +399,10 @@ table 6014445 "RP Template Line"
         field(60;"Data Item Record No.";Integer)
         {
             Caption = 'Data Item Record No.';
+        }
+        field(70;"Processing Function Parameter";Text[30])
+        {
+            Caption = 'Processing Function Parameter';
         }
     }
 

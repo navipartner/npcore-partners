@@ -35,7 +35,7 @@ page 6150627 "POS Workshift Checkpoint Card"
                 {
                     Importance = Promoted;
                 }
-                field("Direct Return Sales Line Count";"Direct Return Sales Line Count")
+                field("Direct Item Returns Line Count";"Direct Item Returns Line Count")
                 {
                 }
             }
@@ -45,11 +45,11 @@ page 6150627 "POS Workshift Checkpoint Card"
                 group(Sales)
                 {
                     Caption = 'Sales';
-                    field("Direct Sales (LCY)";"Direct Sales (LCY)")
+                    field("Direct Item Sales (LCY)";"Direct Item Sales (LCY)")
                     {
                         Importance = Promoted;
                     }
-                    field("Direct Return Sales (LCY)";"Direct Return Sales (LCY)")
+                    field("Direct Item Returns (LCY)";"Direct Item Returns (LCY)")
                     {
                         Importance = Promoted;
                     }

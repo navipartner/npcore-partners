@@ -1,6 +1,7 @@
 codeunit 6151159 "MM NRP Loyalty Wizard"
 {
     // MM1.38/TSA /20190522 CASE 338215 Initial Version
+    // MM1.40/TSA /20190613 CASE 358460 Minor issues with wizard fixed.
 
 
     trigger OnRun()
@@ -20,6 +21,7 @@ codeunit 6151159 "MM NRP Loyalty Wizard"
         CommunityCode: Code[20];
         MembershipCode: Code[20];
         BaseUrl: Text;
+        TenantName: Text;
         UserName: Text;
         Password: Text;
         Prefix: Code[10];
@@ -42,14 +44,14 @@ codeunit 6151159 "MM NRP Loyalty Wizard"
         if (PageAction <> ACTION::LookupOK) then
           Error ('');
 
-        NPRLoyaltyWizard.GetUserSetup (CommunityCode, MembershipCode, Prefix, PaymentTypeCode, GL_Account, BaseUrl, UserName, Password, Description, AuthCode, LoyaltyCompanyName, EarnFactor, BurnFactor);
+        NPRLoyaltyWizard.GetUserSetup (CommunityCode, MembershipCode, Prefix, PaymentTypeCode, GL_Account, BaseUrl, UserName, Password, Description, AuthCode, LoyaltyCompanyName, EarnFactor, BurnFactor, TenantName);
 
         CreateCommunity (CommunityCode, Prefix, CopyStr (Description, 1, 50));
         LoyaltyCode := CreateLoyalty (StrSubstNo ('%1-LOYALTY', CommunityCode), CopyStr (Description, 1, 50), EarnFactor, BurnFactor);
         CreateMembership (CommunityCode, StrSubstNo ('%1%2', Prefix, MembershipCode), LoyaltyCode, CopyStr (Description, 1, 50));
 
-        CreateEndpoints (CommunityCode, StrSubstNo ('%1-M', CommunityCode), BaseUrl, 0, UserName, Password);
-        CreateEndpoints (CommunityCode, StrSubstNo ('%1-L', CommunityCode), BaseUrl, 1, UserName, Password);
+        CreateEndpoints (CommunityCode, StrSubstNo ('%1-M', CommunityCode), BaseUrl, 0, UserName, Password, TenantName);
+        CreateEndpoints (CommunityCode, StrSubstNo ('%1-L', CommunityCode), BaseUrl, 1, UserName, Password, TenantName);
 
         CreatePaymentType (PaymentTypeCode, GL_Account, BurnFactor);
         CreateEFTSetup (PaymentTypeCode);
@@ -88,7 +90,12 @@ codeunit 6151159 "MM NRP Loyalty Wizard"
         MemberCommunity."External Member No. Series" :=     CreateNoSerie (StrSubstNo ('%1-ME', Prefix), 'NPR-ME0000000001');
         MemberCommunity."Member Logon Credentials" := MemberCommunity."Member Logon Credentials"::NA;
         MemberCommunity."Membership to Cust. Rel." := false;
-        MemberCommunity."Activate Loyalty Program" := false;
+
+        //-MM1.40 [358460]
+        //MemberCommunity."Activate Loyalty Program" := FALSE;
+        MemberCommunity."Activate Loyalty Program" := true;
+        //+MM1.40 [358460]
+
         MemberCommunity."Create Renewal Notifications" := false;
 
         MemberCommunity.Modify();
@@ -190,7 +197,7 @@ codeunit 6151159 "MM NRP Loyalty Wizard"
         exit (PaymentTypeCode);
     end;
 
-    local procedure CreateEndpoints(CommunityCode: Code[20];EndpointCode: Code[10];BaseUrl: Text;ServiceType: Integer;Username: Text[50];Password: Text[50])
+    local procedure CreateEndpoints(CommunityCode: Code[20];EndpointCode: Code[10];BaseUrl: Text;ServiceType: Integer;Username: Text[50];Password: Text[50];TenantName: Text)
     var
         NPRRemoteEndpointSetup: Record "MM NPR Remote Endpoint Setup";
     begin
@@ -206,10 +213,23 @@ codeunit 6151159 "MM NRP Loyalty Wizard"
           "User Account" := Username;
           "User Password" := Password;
           "Community Code" := CommunityCode;
-          case Type of
-            Type::LoyaltyServices: "Endpoint URI" := BaseUrl+'loyalty_services';
-            Type::MemberServices : "Endpoint URI" := BaseUrl+'member_services';
+          //-MM1.40 [358460]
+          // CASE Type OF
+          //   Type::LoyaltyServices: "Endpoint URI" := BaseUrl+'loyalty_services';
+          //   Type::MemberServices : "Endpoint URI" := BaseUrl+'member_services';
+          // END;
+          if (TenantName = '') then begin
+            case Type of
+              Type::LoyaltyServices: "Endpoint URI" := StrSubstNo ('%1%2', BaseUrl, 'loyalty_services');
+              Type::MemberServices : "Endpoint URI" := StrSubstNo ('%1%2', BaseUrl, 'member_services');
+            end;
+          end else begin
+            case Type of
+              Type::LoyaltyServices: "Endpoint URI" := StrSubstNo ('%1%2?tenant=%3', BaseUrl, 'loyalty_services', TenantName);
+              Type::MemberServices : "Endpoint URI" := StrSubstNo ('%1%2?tenant=%3', BaseUrl, 'member_services', TenantName)
+            end;
           end;
+          //+MM1.40 [358460]
 
           "Connection Timeout (ms)" := 8000;
           Insert ();

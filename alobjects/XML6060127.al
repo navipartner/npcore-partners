@@ -7,6 +7,7 @@ xmlport 6060127 "MM Create Membership"
     // MM1.17/TSA/20161209  CASE 259671 Added activationdate as optional field
     // MM1.18/TSA/20170207  CASE Changed to XML format
     // MM1.26/TSA /20180219 CASE 305631 Added element DocumentID
+    // MM1.40/TSA /20190827 CASE 360242 Adding support for attributes
 
     Caption = 'Create Membership';
     FormatEvaluate = Xml;
@@ -31,6 +32,29 @@ xmlport 6060127 "MM Create Membership"
                     fieldelement(activationdate;tmpMemberInfoCapture."Document Date")
                     {
                         MinOccurs = Zero;
+                    }
+                    textelement(attributes)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                        tableelement(tmpattributevalueset;"NPR Attribute Value Set")
+                        {
+                            MinOccurs = Zero;
+                            XmlName = 'attribute';
+                            UseTemporary = true;
+                            fieldattribute(code;TmpAttributeValueSet."Attribute Code")
+                            {
+                            }
+                            fieldattribute(value;TmpAttributeValueSet."Text Value")
+                            {
+                            }
+
+                            trigger OnBeforeInsertRecord()
+                            begin
+                                EntryNo += 1;
+                                TmpAttributeValueSet."Attribute Set ID" := EntryNo;
+                            end;
+                        }
                     }
                 }
                 tableelement(tmpmembershipresponse;"MM Membership")
@@ -105,6 +129,9 @@ xmlport 6060127 "MM Create Membership"
         {
         }
     }
+
+    var
+        EntryNo: Integer;
 
     procedure ClearResponse()
     begin

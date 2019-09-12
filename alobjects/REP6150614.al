@@ -33,13 +33,13 @@ report 6150614 "Posting Overview POS"
             column(DiscountAmount_POS_Entry;"Discount Amount")
             {
             }
-            column(TotalAmount_POS_Entry;"Total Amount")
+            column(TotalAmount_POS_Entry;"Amount Excl. Tax")
             {
             }
-            column(TotalTaxAmount_POS_Entry;"Total Tax Amount")
+            column(TotalTaxAmount_POS_Entry;"Tax Amount")
             {
             }
-            column(TotalAmountInclTax_POS_Entry;"Total Amount Incl. Tax")
+            column(TotalAmountInclTax_POS_Entry;"Amount Incl. Tax")
             {
             }
             column(POSStoreCode_POS_Entry;"POS Store Code")

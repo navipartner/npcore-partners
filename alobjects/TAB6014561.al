@@ -4,6 +4,7 @@ table 6014561 "RP Data Items"
     // NPR5.34/MMV /20170724 CASE 284505 TESTFIELD on critical fields.
     // NPR5.40/MMV /20180208 CASE 304639 Added new fields 30,31 for more overall template control
     // NPR5.50/MMV /20190502 CASE 353588 Added support for distinct iteration.
+    // NPR5.51/MMV /20190712 CASE 354694 Added type in field 13
 
     Caption = 'Data Items';
 
@@ -100,8 +101,8 @@ table 6014561 "RP Data Items"
         field(13;"Iteration Type";Option)
         {
             Caption = 'Iteration Type';
-            OptionCaption = ' ,First,Last,Total,Distinct';
-            OptionMembers = " ",First,Last,Total,Distinct;
+            OptionCaption = ' ,First,Last,Total,Distinct Values,Field Value';
+            OptionMembers = " ",First,Last,Total,"Distinct Values","Field Value";
 
             trigger OnValidate()
             begin
@@ -109,8 +110,8 @@ table 6014561 "RP Data Items"
                   Clear("Total Fields");
 
                 //-NPR5.50 [353588]
-                if "Iteration Type" <> "Iteration Type"::Distinct then
-                  Clear("Distinct Field ID");
+                if "Iteration Type" <> "Iteration Type"::"Distinct Values" then
+                  Clear("Field ID");
                 //+NPR5.50 [353588]
             end;
         }
@@ -201,10 +202,10 @@ table 6014561 "RP Data Items"
                 end;
             end;
         }
-        field(17;"Distinct Field ID";Integer)
+        field(17;"Field ID";Integer)
         {
             BlankZero = true;
-            Caption = 'Distinct Field ID';
+            Caption = 'Field ID';
 
             trigger OnLookup()
             var
@@ -219,7 +220,7 @@ table 6014561 "RP Data Items"
 
                 if FieldLookup.RunModal = ACTION::LookupOK then begin
                   FieldLookup.GetRecord(Field);
-                  "Distinct Field ID" := Field."No.";
+                  "Field ID" := Field."No.";
                 end;
                 //+NPR5.50 [353588]
             end;
@@ -229,7 +230,7 @@ table 6014561 "RP Data Items"
                 "Field": Record "Field";
             begin
                 //-NPR5.50 [353588]
-                Field.Get("Table ID", "Distinct Field ID");
+                Field.Get("Table ID", "Field ID");
                 //+NPR5.50 [353588]
             end;
         }

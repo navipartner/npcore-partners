@@ -51,6 +51,8 @@ page 6014432 "Audit Roll"
     // NPR5.48/TJ  /20181129 CASE 318531 Give ability to preset different Type filter
     // NPR5.48/TS  /20181213 CASE 339569 Added field Gift Voucher REf
     // NPR5.48/TJ  /20190122 CASE 335967 Added field "Unit of Measure Code"
+    // NPR5.51/TJ  /20190123 CASE 343685 Fixed double posting doc. no. generation for same ticket
+    // NPR5.51/YAHA/20190718 CASE 365357 Page action moved from tab ACTION to tab HOME
 
     Caption = 'Audit Roll';
     Editable = false;
@@ -427,6 +429,8 @@ page 6014432 "Audit Roll"
                 {
                     Caption = 'A4 Sales Ticket';
                     Image = Sales;
+                    Promoted = true;
+                    PromotedCategory = "Report";
 
                     trigger OnAction()
                     var
@@ -1134,6 +1138,7 @@ page 6014432 "Audit Roll"
         PostTempAuditRoll: Codeunit "Post Temp Audit Roll";
         AuditRollPosting: Record "Audit Roll Posting";
         TX001: Label 'Posted ?';
+        PostDocNo: Code[20];
     begin
         //PostReceipt
         
@@ -1145,14 +1150,21 @@ page 6014432 "Audit Roll"
           /* FINANCES */
           AuditRollPosting.DeleteAll;
           AuditRollPosting.TransferFromRevSilent(AuditRoll4,AuditRollPosting);
-          PostTempAuditRoll.SetPostingNo(PostTempAuditRoll.GetNewPostingNo(true));
+          //-NPR5.51 [343685]
+          //PostTempAuditRoll.SetPostingNo(PostTempAuditRoll.GetNewPostingNo(TRUE));
+          PostDocNo := PostTempAuditRoll.GetNewPostingNo(true);
+          PostTempAuditRoll.SetPostingNo(PostDocNo);
+          //+NPR5.51 [343685]
           PostTempAuditRoll.RunPost(AuditRollPosting);
           AuditRollPosting.UpdateChangesSilent;
         
           /* ITEM LEDGER ENTRIES */
           AuditRollPosting.DeleteAll;
           AuditRollPosting.TransferFromRevSilentItemLedg(AuditRoll4,AuditRollPosting);
-          PostTempAuditRoll.SetPostingNo(PostTempAuditRoll.GetNewPostingNo(true));
+          //-NPR5.51 [343685]
+          //PostTempAuditRoll.SetPostingNo(PostTempAuditRoll.GetNewPostingNo(TRUE));
+          PostTempAuditRoll.SetPostingNo(PostDocNo);
+          //+NPR5.51 [343685]
           PostTempAuditRoll.RunPostItemLedger(AuditRollPosting);
           AuditRollPosting.UpdateChangesSilent;
         end;

@@ -3,6 +3,7 @@ table 6151003 "POS Quote Line"
     // NPR5.47/MHA /20181011  CASE 302636 Object created - POS Quote (Saved POS Sale)
     // NPR5.48/MHA /20181129  CASE 336498 Added field 65 "Customer Price Group"
     // NPR5.48/MHA /20188208  CASE 338208 Added fields 200 "Sale Date",205 "Sale Type", 210 "Sale Line No."
+    // NPR5.51/MMV /20190820  CASE 364694 Added field 215
 
     Caption = 'POS Quote Line';
     DrillDownPageID = "POS Quote Lines";
@@ -154,6 +155,10 @@ table 6151003 "POS Quote Line"
             Caption = 'Sale Line No.';
             Description = 'NPR5.48';
         }
+        field(215;"EFT Approved";Boolean)
+        {
+            Caption = 'Electronic Funds Transfer Approved';
+        }
     }
 
     keys
@@ -167,5 +172,12 @@ table 6151003 "POS Quote Line"
     fieldgroups
     {
     }
+
+    trigger OnDelete()
+    begin
+        //-NPR5.51 [364694]
+        TestField("EFT Approved", false);
+        //+NPR5.51 [364694]
+    end;
 }
 

@@ -28,6 +28,8 @@ codeunit 6014413 "Label Library"
     // NPR5.46/JDH /20181001 CASE 294354 Restructured code for printing
     // NPR5.46.05/JDH/20181105 CASE 334681 adding an If Findfirst then, to get some data for calling the next function correct
     // NPR5.48/MMV /20181128 CASE 327107 Added events around retail journal print
+    // NPR5.51/BHR /20190614 CASE 358287  Add retail print and Price label for Posted Purchase Invoice
+    // NPR5.51/MMV /20190906 CASE 367416 Skip obsolete fields in NAV2018+ when moving to temp buffer.
 
 
     trigger OnRun()
@@ -228,10 +230,17 @@ codeunit 6014413 "Label Library"
         TmpSelectionBuffer.Init;
 
         Field.SetRange(TableNo, RecRefIn.Number);
+        //-NPR5.51 [367416]
+        Field.SetRange(Enabled, true);
+        //+NPR5.51 [367416]
         if Field.FindSet then repeat
-          FieldRefFrom := RecRefIn.Field(Field."No.");
-          FieldRefTo   := TmpSelectionBuffer.Field(Field."No.");
-          FieldRefTo.Value(FieldRefFrom);
+        //-NPR5.51 [367416]
+          if not FieldIsObsolete(Field.TableNo, Field."No.") then begin
+        //+NPR5.51 [367416]
+            FieldRefFrom := RecRefIn.Field(Field."No.");
+            FieldRefTo   := TmpSelectionBuffer.Field(Field."No.");
+            FieldRefTo.Value(FieldRefFrom);
+          end;
         until Field.Next = 0;
 
         TmpSelectionBuffer.Insert;
@@ -247,6 +256,7 @@ codeunit 6014413 "Label Library"
         TransferShipmentLine: Record "Transfer Shipment Line";
         PeriodDiscountLine: Record "Period Discount Line";
         TransferReceiptLine: Record "Transfer Receipt Line";
+        PurchInvLine: Record "Purch. Inv. Line";
     begin
         if not SelectionBufferOpen then
           exit;
@@ -344,6 +354,19 @@ codeunit 6014413 "Label Library"
                 PrintPeriodDiscount(PeriodDiscountLine,ReportType);
               end;
             //+NPR5.46 [294354]
+            //-NPR5.51 [358287]
+                DATABASE::"Purch. Inv. Line" :
+              begin
+                repeat
+                  if PurchInvLine.Get(TmpSelectionBuffer.RecordId) then begin
+                    PurchInvLine.Mark(true);
+                  end;
+                until TmpSelectionBuffer.Next = 0;
+                PurchInvLine.MarkedOnly(true);
+                if PurchInvLine.FindSet then
+                  PrintPostedPurchaseInvoice(PurchInvLine,ReportType);
+              end;
+            //-NPR5.51 [358287]
           end;
         end;
     end;
@@ -357,6 +380,7 @@ codeunit 6014413 "Label Library"
         TransferReceiptLine: Record "Transfer Receipt Line";
         RetailJournalMgt: Codeunit "Retail Journal Code";
         PeriodDiscountLine: Record "Period Discount Line";
+        PurchInvLine: Record "Purch. Inv. Line";
     begin
         //-NPR5.46 [294354]
         TmpRetailJnlCode := Format(CreateGuid);
@@ -418,6 +442,14 @@ codeunit 6014413 "Label Library"
 
               RetailJournalMgt.Campaign2RetailJnl(PeriodDiscountLine.Code, TmpRetailJnlCode);
             end;
+         //-NPR5.51 [358287]
+            DATABASE::"Purch. Inv. Line"  :
+            begin
+              RecRef.SetTable(PurchInvLine);
+              if PurchInvLine.FindFirst then;
+                RetailJournalMgt.PostedPurchaseInvoice2RetailJnl(PurchInvLine."Document No.", TmpRetailJnlCode);
+            end;
+          //+NPR5.51 [358287]
           else
             Error('table %1 is not supported for selected Printing', RecRef.Number);
           //+NPR5.46 [294354]
@@ -437,6 +469,29 @@ codeunit 6014413 "Label Library"
 
     local procedure "// Aux"()
     begin
+    end;
+
+    local procedure FieldIsObsolete(TableNo: Integer;FieldNo: Integer): Boolean
+    var
+        FieldRecRef: RecordRef;
+        FieldRef: FieldRef;
+    begin
+        //-NPR5.51 [367416]
+        FieldRecRef.Open(DATABASE::Field);
+        if not FieldRecRef.FieldExist(25) then
+          exit(false);
+
+        FieldRef := FieldRecRef.Field(1);
+        FieldRef.SetRange(TableNo);
+
+        FieldRef := FieldRecRef.Field(2);
+        FieldRef.SetRange(FieldNo);
+
+        FieldRef := FieldRecRef.Field(25); //ObsoleteState in NAV2018+
+        FieldRef.SetFilter('<>%1', 2); //Option 2 = Removed
+
+        exit(FieldRecRef.IsEmpty);
+        //+NPR5.51 [367416]
     end;
 
     local procedure PurchaseLineToRetailJnlLine(var PurchaseLine: Record "Purchase Line";var RetailJnlLine: Record "Retail Journal Line")
@@ -855,6 +910,19 @@ codeunit 6014413 "Label Library"
 
         PrintRetailJournal(RetailJnlLine,ReportType);
         RetailJnlLine.DeleteAll;
+        //+NPR5.46 [294354]
+    end;
+
+    local procedure PrintPostedPurchaseInvoice(var PurchInvLine: Record "Purch. Inv. Line";ReportType: Integer)
+    var
+        TempRetailJnlNo: Code[40];
+        RetailJournalCode: Codeunit "Retail Journal Code";
+    begin
+
+        Evaluate(TempRetailJnlNo, CreateGuid);
+        RetailJournalCode.SetRetailJnlTemp(TempRetailJnlNo);
+        RetailJournalCode.CopyPostedPurchaseInv2RetailJnlLines(PurchInvLine, TempRetailJnlNo);
+        FlushJournalToPrinter(TempRetailJnlNo, ReportType);
         //+NPR5.46 [294354]
     end;
 

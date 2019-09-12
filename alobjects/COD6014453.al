@@ -7,6 +7,7 @@ codeunit 6014453 "POS Sales Price Calc. Mgt."
     // NPR5.48/JDH /20181114 CASE 335967  Unit of Measure implementation
     // NPR5.48/TSA /20181211 CASE 339549 Fixing the price calc function to work with currency code.
     // NPR5.50/TSA /20190509 CASE 354578 Added OnAfterFindSalesLinePrice() publisher
+    // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup() in InitTempPOSItemSale() and ConvertPriceToVAT()
 
 
     trigger OnRun()
@@ -38,14 +39,17 @@ codeunit 6014453 "POS Sales Price Calc. Mgt."
     procedure InitTempPOSItemSale(var TempSaleLinePOS: Record "Sale Line POS" temporary;var TempSalePOS: Record "Sale POS" temporary)
     var
         VATPostingSetup: Record "VAT Posting Setup";
+        POSTaxCalculation: Codeunit "POS Tax Calculation";
+        Handled: Boolean;
     begin
         //-NPR5.45 [323705]
         if not Item.Get(TempSaleLinePOS."No.") then
           exit;
 
-        VATPostingSetup.SetRange("VAT Bus. Posting Group",Item."VAT Bus. Posting Gr. (Price)");
-        VATPostingSetup.SetRange("VAT Prod. Posting Group",Item."VAT Prod. Posting Group");
-        VATPostingSetup.FindFirst;
+        //-NPR5.51 [358985]
+        VATPostingSetup.Get(Item."VAT Bus. Posting Gr. (Price)",Item."VAT Prod. Posting Group");
+        POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
+        //+NPR5.51 [358985]
 
         TempSalePOS.Date := Today;
         TempSalePOS."Price including VAT" := TempSaleLinePOS."Price Includes VAT";
@@ -354,9 +358,14 @@ codeunit 6014453 "POS Sales Price Calc. Mgt."
     local procedure ConvertPriceToVAT(FromPricesInclVAT: Boolean;FromVATProdPostingGr: Code[10];FromVATBusPostingGr: Code[10];var UnitPrice: Decimal)
     var
         VATPostingSetup: Record "VAT Posting Setup";
+        POSTaxCalculation: Codeunit "POS Tax Calculation";
+        Handled: Boolean;
     begin
         if FromPricesInclVAT then begin
+          //-NPR5.51 [358985]
           VATPostingSetup.Get(FromVATBusPostingGr,FromVATProdPostingGr);
+          POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
+          //+NPR5.51 [358985]
 
           case VATPostingSetup."VAT Calculation Type" of
             VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT":

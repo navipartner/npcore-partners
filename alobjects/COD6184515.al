@@ -3,6 +3,7 @@ codeunit 6184515 "EFT Flexiiterm Integration"
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.48/MMV /20190125 CASE 341237 Renamed desc
     // NPR5.49/MMV /20190312 CASE 345188 Renamed object
+    // NPR5.51/MMV /20190626 CASE 359385 Added gift card load support.
 
 
     trigger OnRun()
@@ -80,6 +81,19 @@ codeunit 6184515 "EFT Flexiiterm Integration"
         if EftTransactionRequest."Amount Input" = 0 then
           Error(ZERO_AMOUNT_ERROR);
         EftTransactionRequest.Insert(true);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateGiftCardLoadRequest', '', false, false)]
+    local procedure OnCreateGiftcardLoadRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    begin
+        //-NPR5.51 [359385]
+        if not EftTransactionRequest.IsType(IntegrationType()) then
+          exit;
+        Handled := true;
+
+        EftTransactionRequest.TestField("Amount Input");
+        EftTransactionRequest.Insert(true);
+        //+NPR5.51 [359385]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnSendEftDeviceRequest', '', false, false)]

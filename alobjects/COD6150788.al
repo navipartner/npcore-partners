@@ -4,6 +4,7 @@ codeunit 6150788 "POS Action - Print Exch Label"
     // NPR5.36/MMV /20170913 CASE 289442 Format date for XML
     // NPR5.43/MMV /20180620 CASE 305061 Added use of new calendar dialog
     // NPR5.45/JC  /20180820 CASE 323894 Validate if qty is negative to proceed or not
+    // NPR5.51/MMV /20190821 CASE 365704 Rewrote datetime parsing to workaround BC14 EVALUATE difference.
 
 
     var
@@ -20,13 +21,7 @@ codeunit 6150788 "POS Action - Print Exch Label"
 
     local procedure ActionVersion(): Text
     begin
-        //-NPR5.45 [323894]
-        //-NPR5.43 [305061]
-        //EXIT('1.3');
-        //EXIT('1.4');
         exit('1.5');
-        //+NPR5.43 [305061]
-        //+NPR5.45 [323894]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -42,21 +37,13 @@ codeunit 6150788 "POS Action - Print Exch Label"
             then begin
                 RegisterWorkflowStep('1', 'if ((param.Setting != param.Setting["Package"]) && (param.Setting != param.Setting["Selection"]))' +
                                              '{ datepad({ title: labels.title, caption: labels.validfrom, value: context.defaultdate, notBlank: true}, "value").respond(); };');
-                //-NPR5.43 [305061]
-                //RegisterWorkflowStep('2', 'if ((param.Setting == param.Setting["Package"]) || (param.Setting == param.Setting["Selection"]))  { calendar(labels.title).respond(); };');
                 RegisterWorkflowStep('2', 'if ((param.Setting == param.Setting["Package"]) || (param.Setting == param.Setting["Selection"]))' +
                                              '{ calendar({caption: labels.calendar, title: labels.title, checkedByDefault: true, date: context.defaultdate, columns: [10, 12, 15] }).respond(); };');
-                //+NPR5.43 [305061]
                 RegisterWorkflow(true);
 
                 RegisterOptionParameter('Setting', 'Single,Line Quantity,All Lines,Selection,Package', 'Single');
-                //-NPR5.45 [323894]
                 RegisterBooleanParameter('PreventNegativeQty', true);
-                //+NPR5.45 [323894]
-                //-NPR5.34 [282999]
                 RegisterDataBinding();
-                //+NPR5.34 [282999]
-
             end;
     end;
 
@@ -85,9 +72,7 @@ codeunit 6150788 "POS Action - Print Exch Label"
     begin
         Captions.AddActionCaption(ActionCode, 'title', Title);
         Captions.AddActionCaption(ActionCode, 'validfrom', ValidFrom);
-        //-NPR5.43 [305061]
         Captions.AddActionCaption(ActionCode, 'calendar', CalendarCaption);
-        //+NPR5.43 [305061]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
@@ -105,17 +90,15 @@ codeunit 6150788 "POS Action - Print Exch Label"
         i: Integer;
         Position: Text;
         PreventNegativeQty: Boolean;
+        DateTime: DateTime;
     begin
         if not Action.IsThisAction(ActionCode) then
             exit;
 
-        //-NPR5.43 [305061]
         Handled := true;
-        //+NPR5.43 [305061]
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        //-NPR5.45 [323894]
         PreventNegativeQty := JSON.GetBooleanParameter('PreventNegativeQty', false);
         if PreventNegativeQty then begin
             POSSession.GetSaleLine(POSSaleLine);
@@ -123,21 +106,14 @@ codeunit 6150788 "POS Action - Print Exch Label"
             if SaleLinePOS.Quantity < 0 then
                 Error(ErrorTxtQtyCannotbeNeg);
         end;
-        //+NPR5.45 [323894]
 
-        //-NPR5.43 [305061]
-        // Date := JSON.GetDate('value', TRUE);
-        // JSON.SetScope('parameters',TRUE);
-        // Setting := JSON.GetInteger('Setting',TRUE);
+
         Setting := JSON.GetIntegerParameter('Setting', true);
-        //+NPR5.43 [305061]
 
         case Setting of
             0, 1, 2:
                 begin
-                    //-305061 [305061]
                     Date := JSON.GetDate('value', true);
-                    //+NPR5.43 [305061]
                     POSSession.GetSaleLine(POSSaleLine);
                     POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
                     PrintLines := SaleLinePOS;
@@ -145,8 +121,6 @@ codeunit 6150788 "POS Action - Print Exch Label"
                 end;
             3, 4:
                 begin
-                    //-NPR5.43 [305061]
-                    //EXIT;
                     JSON.GetJsonObject('value', CalendarObject, true);
 
                     // TODO: CTRLUPGRADE refactor this to use JsonObject that CalendarObject now is
@@ -155,7 +129,11 @@ codeunit 6150788 "POS Action - Print Exch Label"
                     Evaluate(Count, CalendarObject.Item('Rows').Item('count').ToString);
                     if Count < 1 then
                         exit;
-                    Evaluate(Date, CalendarObject.Item('Date').ToString);
+        //-NPR5.51 [365704]
+        //      EVALUATE(Date, CalendarObject.Item('Date').ToString);
+              JSON.SetScope('value', true);
+              Date := JSON.GetDate('Date', true);
+        //+NPR5.51 [365704]
 
                     for i := 1 to Count do begin
                         Position := CalendarObject.Item('Rows').Item(Format(i - 1)).ToString;
@@ -164,15 +142,10 @@ codeunit 6150788 "POS Action - Print Exch Label"
                     end;
                     */
                     PrintLines.MarkedOnly(true);
-                    //+NPR5.43 [305061]
                 end;
         end;
 
         ExchangeLabelMgt.PrintLabelsFromPOSWithoutPrompts(Setting, PrintLines, Date);
-
-        //-NPR5.43 [305061]
-        //Handled := TRUE;
-        //+NPR5.43 [305061]
     end;
 }
 

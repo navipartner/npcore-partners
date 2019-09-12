@@ -7,6 +7,7 @@ page 6059950 "Display Setup"
     // NPR5.46/CLVA/20180920 CASE 328581 Added function InitDisplayContent
     //                                   Removed relation to Codeunit 6059950 Display API
     // NPR5.50/CLVA/20190513 CASE 352390 Added field "Custom Display Codeunit"
+    // NPR5.51/ANPA/20190722 CASE 352390 Added field "Hide receipt"
 
     Caption = 'Display Setup';
     PageType = List;
@@ -62,6 +63,9 @@ page 6059950 "Display Setup"
                 {
                 }
                 field(Activate;Activate)
+                {
+                }
+                field("Hide receipt";"Hide receipt")
                 {
                 }
             }

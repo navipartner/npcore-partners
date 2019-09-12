@@ -1,6 +1,7 @@
 table 6184850 "FR Audit Setup"
 {
     // NPR5.48/MMV /20181025 CASE 318028 Created object
+    // NPR5.51/MMV /20190611 CASE 356076 Added field 35, 60
 
     Caption = 'FR Audit Setup';
 
@@ -31,9 +32,13 @@ table 6184850 "FR Audit Setup"
         {
             Caption = 'Signing Certificate Thumbprint';
         }
-        field(30;"Workshift Period Duration";DateFormula)
+        field(30;"Monthly Workshift Duration";DateFormula)
         {
-            Caption = 'Workshift Period Duration';
+            Caption = 'Monthly Workshift Duration';
+        }
+        field(35;"Yearly Workshift Duration";DateFormula)
+        {
+            Caption = 'Yearly Workshift Duration';
         }
         field(40;"Last Auto Archived Workshift";Integer)
         {
@@ -51,6 +56,10 @@ table 6184850 "FR Audit Setup"
         field(52;"Auto Archive SAS";Text[250])
         {
             Caption = 'Auto Archive SAS';
+        }
+        field(60;"Item VAT Identifier Filter";Text[250])
+        {
+            Caption = 'Item VAT Identifier Filter';
         }
     }
 

@@ -5,6 +5,7 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
     // NPR5.48/MHA /20190213  CASE 342920 Return Amount should not be rounded and it should consider Min. Amount on Payment Type and also End Sale with balancing
     // NPR5.49/MHA /20190306  CASE 342920 ScanReferenceNos parameter added
     // NPR5.50/ALST/20190521  CASE 352073 implemented selection method for printing
+    // NPR5.51/MHA /20190819  CASE 364542 Added function ValidateAmt() for validating Minimum Amount
 
 
     trigger OnRun()
@@ -18,6 +19,8 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
         Text003: Label 'Enter Amount:';
         Text004: Label 'Maximum Return Amount is: %1';
         Text005: Label 'Nothing to return';
+        Text006: Label 'Invalid Amount: %1\\Min. amount is %2';
+        Text007: Label 'Minimum Amount is %1';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "POS Action")
@@ -50,6 +53,9 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
 
         Sender.RegisterWorkflowStep('voucher_type_input', 'if (!param.VoucherTypeCode) {respond()} else {context.VoucherTypeCode = param.VoucherTypeCode}');
         Sender.RegisterWorkflowStep('amt_input', '{numpad({title: labels.IssueReturnVoucherTitle,caption: labels.Amount,value: context.voucher_amount,notBlank: true}).cancel(abort)};');
+        //-NPR5.51 [364542]
+        Sender.RegisterWorkflowStep('validate_amt','respond();');
+        //+NPR5.51 [364542]
         //-NPR5.50
         Sender.RegisterWorkflowStep('select_send_method', 'respond();');
         Sender.RegisterWorkflowStep('send_method_email',
@@ -173,8 +179,10 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
         if PaymentTypePOS."Rounding Precision" > 0 then
             ReturnAmount := Round(SaleAmount - PaidAmount, PaymentTypePOS."Rounding Precision");
 
+        //-NPR5.51 [364542]
         if (PaymentTypePOS."Minimum Amount" > 0) and (Abs(ReturnAmount) < Abs(PaymentTypePOS."Minimum Amount")) then
-            Error(Text005);
+          Error(Text007,PaymentTypePOS."Minimum Amount");
+        //+NPR5.51 [364542]
         //+NPR5.48 [342920]
         if ReturnAmount >= 0 then
             Error(Text005);
@@ -203,6 +211,10 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
         case WorkflowStep of
             'voucher_type_input':
                 VoucherTypeInput(JSON, FrontEnd);
+          //-NPR5.51 [364542]
+          'validate_amt':
+            ValidateAmt(JSON,FrontEnd);
+          //+NPR5.51 [364542]
             //-NPR5.50
             'select_send_method':
                 SelectSendMethod(JSON, POSSession, FrontEnd);
@@ -217,7 +229,6 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
             //+NPR5.49 [342920]
             'end_sale':
                 //+NPR5.48 [342920]
-                //EndSale(POSSession);
                 EndSale(JSON, POSSession);
                 //-NPR5.48 [342920]
         end;
@@ -291,16 +302,8 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
-        if SaleAmount > PaidAmount then
-            exit;
 
         //-NPR5.48 [342920]
-        // IF Subtotal <> 0 THEN
-        //  EXIT;
-        //
-        // POSSession.GetSale(POSSale);
-        // IF NOT POSSale.TryEndSale(POSSession) THEN
-        //  EXIT;
         POSSession.GetSetup(POSSetup);
         POSSetup.GetRegisterRecord(Register);
         if Abs(Subtotal) >= Abs(POSSetup.AmountRoundingPrecision()) then
@@ -313,6 +316,10 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
             exit;
         if not POSPaymentLine.GetPaymentType(ReturnPaymentTypePOS, Register."Return Payment Type", Register."Register No.") then
             exit;
+        //-NPR5.51 [364542]
+        if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount,PaidAmount,PaymentTypePOS,ReturnPaymentTypePOS) <> 0 then
+          exit;
+        //+NPR5.51 [364542]
 
         POSSession.GetSale(POSSale);
         if not POSSale.TryEndSaleWithBalancing(POSSession, PaymentTypePOS, ReturnPaymentTypePOS) then
@@ -325,6 +332,7 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
         SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
         VoucherType: Record "NpRv Voucher Type";
         SaleLinePOS: Record "Sale Line POS";
+        PaymentTypePOS: Record "Payment Type POS";
         POSPaymentLine: Codeunit "POS Payment Line";
         POSSaleLine: Codeunit "POS Sale Line";
         VoucherTypeCode: Text;
@@ -336,50 +344,44 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
         SubTotal: Decimal;
     begin
         JSON.SetScope('/', true);
-        JSON.SetScope('$amt_input', true);
-        Amount := JSON.GetDecimal('numpad', true);
+        //-NPR5.51 [364542]
+        Amount := JSON.GetDecimal('ReturnVoucherAmount',true);
+        //+NPR5.51 [364542]
         if Amount = 0 then
             exit;
 
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, SubTotal);
-        //-NPR5.48 [342920]
-        //ReturnAmount := -ReturnAmount;
-        ReturnAmount := PaidAmount - SaleAmount;
-        //+NPR5.48 [342920]
-        if Amount > ReturnAmount then
-            Error(Text004, ReturnAmount);
 
         JSON.SetScope('/', true);
         VoucherTypeCode := UpperCase(JSON.GetString('VoucherTypeCode', true));
         VoucherType.Get(VoucherTypeCode);
 
+        //-NPR5.51 [364542]
+        ReturnAmount := PaidAmount - SaleAmount;
+        PaymentTypePOS.Get(VoucherType."Payment Type");
+        if PaymentTypePOS."Rounding Precision" > 0 then
+          ReturnAmount := Round(ReturnAmount,PaymentTypePOS."Rounding Precision");
+
+        if Amount > ReturnAmount then
+          Error(Text004,ReturnAmount);
+
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
-        SaleLinePOS.Validate("Sale Type", SaleLinePOS."Sale Type"::Deposit);
-        SaleLinePOS.Validate(Type, SaleLinePOS.Type::"G/L Entry");
-        //-NPR5.49 [342920]
-        // SaleLinePOS.VALIDATE("No.",VoucherType."Account No.");
-        // SaleLinePOS.Description := VoucherType.Description;
-        // SaleLinePOS.Quantity := 1;
-        // SaleLinePOS.INSERT;
-        SaleLinePOS.Quantity := 1;
-        POSSaleLine.InsertLine(SaleLinePOS);
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        SaleLinePOS.Validate("No.", VoucherType."Account No.");
+        SaleLinePOS.Validate("Sale Type",SaleLinePOS."Sale Type"::Payment);
+        SaleLinePOS.Validate(Type,SaleLinePOS.Type::Payment);
+        SaleLinePOS.Validate("No.",VoucherType."Payment Type");
         SaleLinePOS.Description := VoucherType.Description;
+        SaleLinePOS.Quantity := 0;
+        SaleLinePOS."Unit Price" := 0;
+        SaleLinePOS."Amount Including VAT" := -Amount;
+        POSPaymentLine.InsertPaymentLine(SaleLinePOS,0);
+        POSPaymentLine.GetCurrentPaymentLine(SaleLinePOS);
+        SaleLinePOS.Quantity := 1;
+        //+NPR5.51 [364542]
         //+NPR5.49 [342920]
 
-        SaleLinePOS."Unit Price" := Amount;
-        SaleLinePOS."Amount Including VAT" := Amount;
-
         //-NPR5.48 [345467]
-        SaleLinePOS.UpdateAmounts(SaleLinePOS);
-        //+NPR5.48 [345467]
-
-        if SaleLinePOS."Discount Amount" > 0 then
-            SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
-        SaleLinePOS.Modify;
         POSSession.RequestRefreshData();
 
         SaleLinePOSVoucher.Init;
@@ -418,6 +420,36 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
         JSON.SetScope('parameters', true);
         JSON.SetContext('VoucherTypeCode', VoucherTypeCode);
         FrontEnd.SetActionContext(ActionCode(), JSON);
+    end;
+
+    local procedure ValidateAmt(JSON: Codeunit "POS JSON Management";FrontEnd: Codeunit "POS Front End Management")
+    var
+        PaymentTypePOS: Record "Payment Type POS";
+        VoucherType: Record "NpRv Voucher Type";
+        VoucherTypeCode: Text;
+        Amount: Decimal;
+    begin
+        //-NPR5.51 [364542]
+        JSON.SetScope('/',true);
+        VoucherTypeCode := UpperCase(JSON.GetString('VoucherTypeCode',true));
+        VoucherType.Get(VoucherTypeCode);
+        PaymentTypePOS.Get(VoucherType."Payment Type");
+
+        JSON.SetScope('/',true);
+        JSON.SetScope('$amt_input',true);
+        Amount := JSON.GetDecimal('numpad',true);
+        if PaymentTypePOS."Rounding Precision" > 0 then
+          Amount := Round(Amount,PaymentTypePOS."Rounding Precision");
+
+        if PaymentTypePOS."Minimum Amount" < 0 then
+          PaymentTypePOS."Minimum Amount" := Abs(PaymentTypePOS."Minimum Amount");
+
+        if Amount < PaymentTypePOS."Minimum Amount" then
+          Error(Text006,Amount,PaymentTypePOS."Minimum Amount");
+
+        JSON.SetContext('ReturnVoucherAmount',Amount);
+        FrontEnd.SetActionContext(ActionCode(),JSON);
+        //+NPR5.51 [364542]
     end;
 
     local procedure "--- Select"()

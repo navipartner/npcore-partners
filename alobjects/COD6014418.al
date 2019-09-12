@@ -763,7 +763,7 @@ codeunit 6014418 "Retail Sales Code"
               PepperTransactionRequest.Reset;
               PepperTransactionRequest.SetCurrentKey("Sales Ticket No.");
               PepperTransactionRequest.SetRange("Sales Ticket No.",AuditRoll."Sales Ticket No.");
-              PepperTransactionRequest.SetRange("Processing Type",PepperTransactionRequest."Processing Type"::Payment);
+              PepperTransactionRequest.SetRange("Processing Type",PepperTransactionRequest."Processing Type"::PAYMENT);
               PepperTransactionRequest.SetRange(Successful,true);
               PepperTransactionRequest.SetRange(Reversed,false);
               if PepperTransactionRequest.IsEmpty then begin
@@ -1021,7 +1021,7 @@ codeunit 6014418 "Retail Sales Code"
           PepperTransactionRequest.Reset;
           PepperTransactionRequest.SetCurrentKey("Sales Ticket No.");
           PepperTransactionRequest.SetRange("Sales Ticket No.",AuditRoll."Sales Ticket No.");
-          PepperTransactionRequest.SetRange("Processing Type",PepperTransactionRequest."Processing Type"::Payment);
+          PepperTransactionRequest.SetRange("Processing Type",PepperTransactionRequest."Processing Type"::PAYMENT);
           PepperTransactionRequest.SetRange(Successful,true);
           PepperTransactionRequest.SetRange(Reversed,false);
           AmountItt := PepperTransactionRequest.Count;

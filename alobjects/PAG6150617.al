@@ -15,6 +15,8 @@ page 6150617 "POS Unit Card"
     // NPR5.48/MMV /20181211 CASE 318028 Added field "POS Audit Profile"
     // NPR5.49/TJ  /20181115 CASE 335739 New field "POS View Profile"
     // NPR5.49/TSA /20190311 CASE 348458 Added field "POS End of Day Profile"
+    // NPR5.51/YAHA/20190717 CASE 360536 Field "POS Store Code","Default POS Payment Bin","Ean Box Sales Setup","POS Audit Profile","POS View Profile" set to Mandatory(TRUE)
+    // NPR5.51/SARA/20190823 CASE 363578 New field 'SMS Profile'
 
     Caption = 'POS Unit Card';
     RefreshOnActivate = true;
@@ -35,6 +37,7 @@ page 6150617 "POS Unit Card"
                 }
                 field("POS Store Code";"POS Store Code")
                 {
+                    ShowMandatory = true;
                 }
                 field("Global Dimension 1 Code";"Global Dimension 1 Code")
                 {
@@ -47,9 +50,11 @@ page 6150617 "POS Unit Card"
                 }
                 field("Default POS Payment Bin";"Default POS Payment Bin")
                 {
+                    ShowMandatory = true;
                 }
                 field("Ean Box Sales Setup";"Ean Box Sales Setup")
                 {
+                    ShowMandatory = true;
                 }
                 field("POS Sales Workflow Set";"POS Sales Workflow Set")
                 {
@@ -77,11 +82,16 @@ page 6150617 "POS Unit Card"
                 Caption = 'Profiles';
                 field("POS Audit Profile";"POS Audit Profile")
                 {
+                    ShowMandatory = true;
                 }
                 field("POS View Profile";"POS View Profile")
                 {
+                    ShowMandatory = true;
                 }
                 field("POS End of Day Profile";"POS End of Day Profile")
+                {
+                }
+                field("SMS Profile";"SMS Profile")
                 {
                 }
             }

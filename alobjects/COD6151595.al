@@ -5,6 +5,8 @@ codeunit 6151595 "NpDc Module Apply - Extra Item"
     // NPR5.43/MHA /20180629  CASE 319425 Updated Insert Line Event to use new InvokeOnBeforeInsertSaleLineWorkflow() in ApplyDiscount()
     // NPR5.47/MHA /20181022  CASE 332655 Discount should be calculated based on SaleLinePOS."Unit Price" instead of Item."Unit Price"
     // NPR5.50/TSA /20190507 CASE 345348 Added the OnAfterInsertPOSSaleLine() again, moved InvokeOnBeforeInsertSaleLineWorkflow() to before insert
+    // NPR5.51/MHA /20190724  CASE 343352 Added initiation of POSSession without GUI in ApplyDiscount()
+    // NPR5.51/MHA /20190725  CASE 355406 Applied Discount Amount cannot be more than 100%
 
 
     trigger OnRun()
@@ -22,7 +24,9 @@ codeunit 6151595 "NpDc Module Apply - Extra Item"
         SaleLinePOSCouponApply: Record "NpDc Sale Line POS Coupon";
         SalePOS: Record "Sale POS";
         SaleLinePOS: Record "Sale Line POS";
+        POSSale: Codeunit "POS Sale";
         SaleLineOut: Codeunit "POS Sale Line";
+        POSSetup: Codeunit "POS Setup";
         FrontEndMgt: Codeunit "POS Front End Management";
         POSSession: Codeunit "POS Session";
         LineNo: Integer;
@@ -45,6 +49,10 @@ codeunit 6151595 "NpDc Module Apply - Extra Item"
         // END;
         if FindSaleLinePOSCouponApply(SaleLinePOSCoupon,SaleLinePOSCouponApply,SaleLinePOS) then begin
           DiscountAmt := CalcDiscountAmount(SaleLinePOS,SaleLinePOSCoupon);
+          //-NPR5.51 [355406]
+          if DiscountAmt > SaleLinePOS."Amount Including VAT" then
+            DiscountAmt := SaleLinePOS."Amount Including VAT";
+          //+NPR5.51 [355406]
 
           if SaleLinePOSCouponApply."Discount Amount" <> DiscountAmt then begin
             SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;
@@ -55,11 +63,18 @@ codeunit 6151595 "NpDc Module Apply - Extra Item"
         end;
         //+NPR5.47 [332655]
 
-        //-NPR5.50 [345348]
-        POSSession.IsActiveSession(FrontEndMgt);
-        FrontEndMgt.GetSession(POSSession);
-        POSSession.GetSaleLine(SaleLineOut);
-        //+NPR5.50 [345348]
+        //-NPR5.51 [343352]
+        if POSSession.IsActiveSession(FrontEndMgt) then begin
+          FrontEndMgt.GetSession(POSSession);
+          POSSession.GetSaleLine(SaleLineOut);
+        end else begin
+          SalePOS.Get(SaleLinePOSCoupon."Register No.",SaleLinePOSCoupon."Sales Ticket No.");
+          POSSession.GetSale(POSSale);
+          POSSale.SetPosition(SalePOS.GetPosition(false));
+          POSSession.GetSaleLine(SaleLineOut);
+          SaleLineOut.Init(SalePOS."Register No.",SalePOS."Sales Ticket No.",POSSale,POSSetup,FrontEndMgt);
+        end;
+        //+NPR5.51 [343352]
 
         LineNo := GetNextLineNo(SaleLinePOSCoupon);
         SaleLinePOS.SetSkipCalcDiscount(true);
@@ -83,6 +98,11 @@ codeunit 6151595 "NpDc Module Apply - Extra Item"
         //-NPR5.47 [332655]
         DiscountAmt := CalcDiscountAmount(SaleLinePOS,SaleLinePOSCoupon);
         //+NPR5.47 [332655]
+
+        //-NPR5.51 [355406]
+        if DiscountAmt > SaleLinePOS."Amount Including VAT" then
+          DiscountAmt := SaleLinePOS."Amount Including VAT";
+        //+NPR5.51 [355406]
 
         SaleLinePOSCouponApply.Init;
         SaleLinePOSCouponApply."Register No." := SaleLinePOS."Register No.";

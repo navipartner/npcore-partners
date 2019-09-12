@@ -15,6 +15,9 @@ codeunit 6150702 "POS UI Management"
     // NPR5.49/VB  /20181106 CASE 335141 Introducing the POS Theme functionality
     // NPR5.49/TJ  /20190102 CASE 335739 Using POS View Profile instead of Register
     // NPR5.50/JAKUBV/20190603  CASE 338666 Transport NPR5.50 - 3 June 2019
+    // NPR5.51/MMV /20190625 CASE 359825 Added missing filter
+    // NPR5.51/VB  /20190709 CASE 361184 Passing NPR Version number to front end
+    // NPR5.51/VB  /20190719  CASE 352582 POS Administrative Templates feature
 
 
     trigger OnRun()
@@ -387,6 +390,97 @@ codeunit 6150702 "POS UI Management"
 
     end;
 
+    procedure InitializeAdministrativeTemplates(Register: Record Register)
+    var
+        AdminTemplate: Record "POS Administrative Template";
+        AdminTemplateScope: Record "POS Admin. Template Scope";
+        AdminTemplateScopeTmp: Record "POS Admin. Template Scope" temporary;
+        POSUnit: Record "POS Unit";
+        Templates: DotNet npNetList_Of_T;
+        Template: DotNet npNetDictionary_Of_T_U;
+    begin
+        //-NPR5.51 [352582]
+        AdminTemplateScope.SetRange("Applies To",AdminTemplateScope."Applies To"::All);
+        if AdminTemplateScope.FindSet then
+          repeat
+            AdminTemplateScopeTmp := AdminTemplateScope;
+            AdminTemplateScopeTmp.Insert();
+          until AdminTemplateScope.Next = 0;
+
+        if POSUnit.Get(Register."Register No.") then begin
+          AdminTemplateScope.SetRange("Applies To",AdminTemplateScope."Applies To"::"POS Unit");
+          AdminTemplateScope.SetRange("Applies To Code",POSUnit."No.");
+          if AdminTemplateScope.FindSet then
+            repeat
+              AdminTemplateScopeTmp := AdminTemplateScope;
+              AdminTemplateScopeTmp.Insert();
+            until AdminTemplateScope.Next = 0;
+        end;
+
+        AdminTemplateScope.SetRange("Applies To",AdminTemplateScope."Applies To"::User);
+        AdminTemplateScope.SetRange("Applies To Code",UserId);
+        if AdminTemplateScope.FindSet then
+          repeat
+            AdminTemplateScopeTmp := AdminTemplateScope;
+            AdminTemplateScopeTmp.Insert();
+          until AdminTemplateScope.Next = 0;
+
+        if AdminTemplateScopeTmp.IsEmpty then
+          exit;
+
+        Templates := Templates.List();
+        AdminTemplateScopeTmp.FindSet();
+        repeat
+          if AdminTemplate.Get(AdminTemplateScopeTmp."POS Admin. Template Id") and (AdminTemplate.Status <> AdminTemplate.Status::Draft) then begin
+            InitializeAdministrativeTemplatePolicy(Template,AdminTemplate.Id,AdminTemplate."Persist on Client",AdminTemplateScopeTmp."Applies To");
+            case AdminTemplate.Status of
+              AdminTemplate.Status::Active:
+                begin
+                  InitialiteAdministrativeTemplatePasswordPolicy(Template,'roleCenter',AdminTemplate."Role Center",AdminTemplate."Role Center Password");
+                  InitialiteAdministrativeTemplatePasswordPolicy(Template,'configuration',AdminTemplate.Configuration,AdminTemplate."Configuration Password");
+                end;
+              AdminTemplate.Status::Retired:
+                Template.Add('retired',true);
+            end;
+          end;
+          Templates.Add(Template);
+        until AdminTemplateScopeTmp.Next = 0;
+        FrontEnd.ApplyAdministrativeTemplates(Templates);
+        //+NPR5.51 [352582]
+    end;
+
+    local procedure InitializeAdministrativeTemplatePolicy(var Template: DotNet npNetDictionary_Of_T_U;Id: Guid;Persist: Boolean;AppliesTo: Integer)
+    begin
+        //-NPR5.51 [352582]
+        Template := Template.Dictionary();
+        Template.Add('id',Id);
+        Template.Add('persist',Persist);
+        Template.Add('strength',AppliesTo);
+        //+NPR5.51 [352582]
+    end;
+
+    local procedure InitialiteAdministrativeTemplatePasswordPolicy(Template: DotNet npNetDictionary_Of_T_U;PolicyName: Text;Policy: Option "Not Defined",Visible,Disabled,Hidden,Password;Password: Text)
+    var
+        PolicyObject: DotNet npNetDictionary_Of_T_U;
+    begin
+        //-NPR5.51 [352582]
+        case Policy of
+          Policy::Disabled:
+            Template.Add(PolicyName,'deny');
+          Policy::Hidden:
+            Template.Add(PolicyName,'hide');
+          Policy::Visible:
+            Template.Add(PolicyName,'allow');
+          Policy::Password:
+            begin
+              PolicyObject := PolicyObject.Dictionary();
+              PolicyObject.Add('password',Password);
+              Template.Add(PolicyName,PolicyObject);
+            end;
+        end;
+        //+NPR5.51 [352582]
+    end;
+
     procedure ConfigureFonts()
     var
         WebFont: Record "POS Web Font";
@@ -705,6 +799,9 @@ codeunit 6150702 "POS UI Management"
         //-NPR5.45 [323728]
         Options.Add('kioskUnlockEnabled', Setup.GetKioskUnlockEnabled());
         //+NPR5.45 [323728]
+        //-NPR5.51 [361184]
+        Options.Add('nprVersion',GetNPRVersion());
+        //+NPR5.51 [361184]
         FrontEnd.SetOptions(Options);
     end;
 
@@ -759,10 +856,18 @@ codeunit 6150702 "POS UI Management"
     local procedure RetrieveReusableWorkflowParameters(FieldNumber: Integer; var TmpPOSParameterValue: Record "POS Parameter Value" temporary)
     var
         POSParameterValue: Record "POS Parameter Value";
+        POSSetup: Record "POS Setup";
     begin
+        //-NPR5.51 [359825]
+        POSSetup.Get;
+        //+NPR5.51 [359825]
+
         //-NPR5.50 [338666]
         POSParameterValue.SetRange("Table No.", DATABASE::"POS Setup");
         POSParameterValue.SetRange(ID, FieldNumber);
+        //-NPR5.51 [359825]
+        POSParameterValue.SetRange("Record ID", POSSetup.RecordId);
+        //+NPR5.51 [359825]
         if POSParameterValue.FindSet then
             repeat
                 TmpPOSParameterValue := POSParameterValue;
@@ -770,6 +875,21 @@ codeunit 6150702 "POS UI Management"
             until POSParameterValue.Next = 0;
         TmpPOSParameterValue.SetParamFilterIndicator();
         //+NPR5.50 [338666]
+    end;
+
+    procedure GetNPRVersion(): Text
+    var
+        NPRUpgradeHistory: Record "NPR Upgrade History";
+    begin
+        //-NPR5.51 [361184]
+        with NPRUpgradeHistory do begin
+          SetCurrentKey("Upgrade Time");
+          SetAscending("Upgrade Time",false);
+          if not FindFirst then
+            exit('');
+          exit(Version);
+        end;
+        //+NPR5.51 [361184]
     end;
 }
 

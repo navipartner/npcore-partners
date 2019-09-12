@@ -6,6 +6,7 @@ page 6150900 "HC Audit Roll"
     // NPR5.48/MHA /20182111 CASE 326055 Added field 5022 "Reference"
     // NPR5.48/TJ  /20181115 CASE 331992 Added dimension fields
     // NPR5.48/TJ  /20190129 CASE 340446 Changes for version 2018 - removed actions POS Info and Show Period
+    // NPR5.51/TJ  /20190123 CASE 343685 Fixed double posting doc. no. generation for same ticket
 
     Caption = 'HC Audit Roll';
     Editable = false;
@@ -568,6 +569,7 @@ page 6150900 "HC Audit Roll"
         HCPostTempAuditRoll: Codeunit "HC Post Temp Audit Roll";
         HCAuditRollPosting: Record "HC Audit Roll Posting";
         TX001: Label 'Posted ?';
+        PostDocNo: Code[20];
     begin
         //Bogf�rBon
         
@@ -579,14 +581,21 @@ page 6150900 "HC Audit Roll"
           /* FINANCES */
           HCAuditRollPosting.DeleteAll;
           HCAuditRollPosting.TransferFromRevSilent( HCAuditRoll4, HCAuditRollPosting );
-          HCPostTempAuditRoll.setPostingNo(HCPostTempAuditRoll.getNewPostingNo(true));
+          //-NPR5.51 [343685]
+          //HCPostTempAuditRoll.setPostingNo(HCPostTempAuditRoll.getNewPostingNo(TRUE));
+          PostDocNo := HCPostTempAuditRoll.getNewPostingNo(true);
+          HCPostTempAuditRoll.setPostingNo(PostDocNo);
+          //+NPR5.51 [343685]
           HCPostTempAuditRoll.RunPost( HCAuditRollPosting );
           HCAuditRollPosting.UpdateChangesSilent;
         
           /* ITEM LEDGER ENTRIES */
           HCAuditRollPosting.DeleteAll;
           HCAuditRollPosting.TransferFromRevSilentItemLedg( HCAuditRoll4, HCAuditRollPosting );
-          HCPostTempAuditRoll.setPostingNo(HCPostTempAuditRoll.getNewPostingNo(true));
+          //-NPR5.51 [343685]
+          //HCPostTempAuditRoll.setPostingNo(HCPostTempAuditRoll.getNewPostingNo(TRUE));
+          HCPostTempAuditRoll.setPostingNo(PostDocNo);
+          //+NPR5.51 [343685]
           HCPostTempAuditRoll.RunPostItemLedger( HCAuditRollPosting );
           HCAuditRollPosting.UpdateChangesSilent;
         end;

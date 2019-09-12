@@ -1,4 +1,4 @@
-pageextension 50065 pageextension50065 extends "Sales Return Order" 
+pageextension 50066 pageextension50066 extends "Sales Return Order" 
 {
     // NPR4.10/TS/20150602 CASE 213397 Added field "Sell-to Customer Name 2" ,"Bill-to Name 2","Ship-to Name 2"
     // NPR5.36/THRO/20170908 CASE 285645 Added action PostAndSendPdf2Nav
@@ -6,6 +6,8 @@ pageextension 50065 pageextension50065 extends "Sales Return Order"
     //                                    Added field Document Processing.
     // MAG2.12/MHA /20180425  CASE 309647 Added fields 6151400 "Magento Payment Amount" under Invoicing Tab
     // NPR5.42/THRO/20180518 CASE 308179 Removed code from Action SendAsPdf and EmailLog
+    // NPR5.51/ZESO/20190618 CASE 353560 Added fields Shipment Method Code and Shipping Agent Code.
+    // NPR5.51/JAVA/20190906 CASE 353560 Removed fields Shipping Agent Code as 2017 includes the same by default.
     layout
     {
         addafter("Sell-to Customer Name")
@@ -29,6 +31,12 @@ pageextension 50065 pageextension50065 extends "Sales Return Order"
         addafter("Ship-to Name")
         {
             field("Ship-to Name 2";"Ship-to Name 2")
+            {
+            }
+        }
+        addafter("Ship-to Contact")
+        {
+            field("Shipment Method Code";"Shipment Method Code")
             {
             }
         }

@@ -1,7 +1,7 @@
 page 6151204 "NpCs Send to Store Orders"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #344264/MHA /20190717  CASE 344264 Added Last Log fields
+    // NPR5.51/MHA /20190627  CASE 344264 Added Last Log fields
 
     Caption = 'Send to Store Orders';
     InsertAllowed = false;

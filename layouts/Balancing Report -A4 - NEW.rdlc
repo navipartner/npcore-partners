@@ -1738,7 +1738,7 @@
                               <Top>11.25759in</Top>
                               <Left>0.02204in</Left>
                               <Height>0.6633in</Height>
-                              <Width>7.46161in</Width>
+                              <Width>7.46157in</Width>
                               <ZIndex>1</ZIndex>
                               <Visibility>
                                 <Hidden>=iif(Fields!PrintVAT_.Value,False,True)</Hidden>
@@ -1994,7 +1994,7 @@
                               <Width>7.50516in</Width>
                               <ZIndex>2</ZIndex>
                               <Visibility>
-                                <Hidden>=Fields!PrintEFT_.Value</Hidden>
+                                <Hidden>=iif(Fields!PrintEFT_.Value,False,true)</Hidden>
                               </Visibility>
                               <Style>
                                 <Border>
@@ -2736,7 +2736,7 @@
                               <Top>10.28504in</Top>
                               <Left>0.00938in</Left>
                               <Height>0.70866in</Height>
-                              <Width>7.53288in</Width>
+                              <Width>7.53286in</Width>
                               <ZIndex>3</ZIndex>
                               <Visibility>
                                 <Hidden>=iif(Fields!PrintClosing_.Value,False,True)</Hidden>
@@ -3223,7 +3223,7 @@
                               <Top>12.28408in</Top>
                               <Left>0.00938in</Left>
                               <Height>0.6633in</Height>
-                              <Width>7.50902in</Width>
+                              <Width>7.509in</Width>
                               <ZIndex>4</ZIndex>
                               <Visibility>
                                 <Hidden>=iif(Fields!PrintAttachedBins_.Value,False,True)</Hidden>

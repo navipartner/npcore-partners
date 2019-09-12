@@ -1,6 +1,7 @@
 xmlport 6151167 "NpGp POS Entries"
 {
     // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
+    // NPR5.51/ALST/20190711  CASE 337539 added fields
 
     Caption = 'Global POS Sales Entries';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/global_pos_sales';
@@ -26,6 +27,9 @@ xmlport 6151167 "NpGp POS Entries"
                 {
                 }
                 fieldattribute(document_no;TempNpGpPOSSalesEntry."Document No.")
+                {
+                }
+                fieldattribute(company;TempNpGpPOSSalesEntry."Original Company")
                 {
                 }
                 fieldelement(entry_time;TempNpGpPOSSalesEntry."Entry Time")
@@ -157,6 +161,9 @@ xmlport 6151167 "NpGp POS Entries"
                         fieldelement(amount_incl_vat_lcy;TempNpGpPOSSalesLine."Amount Incl. VAT (LCY)")
                         {
                         }
+                        fieldelement(global_reference;TempNpGpPOSSalesLine."Global Reference")
+                        {
+                        }
 
                         trigger OnBeforeInsertRecord()
                         begin
@@ -247,14 +254,14 @@ xmlport 6151167 "NpGp POS Entries"
     begin
         TempNpGpPOSSalesEntryTo.Copy(TempNpGpPOSSalesEntry,true);
         TempNpGpPOSSalesLineTo.Copy(TempNpGpPOSSalesLine,true);
-        TempNpGpPOSInfoPOSEntryTo.Copy(TempNpGpPOSInfoPOSEntryTo,true);
+        TempNpGpPOSInfoPOSEntryTo.Copy(TempNpGpPOSInfoPOSEntry,true);
     end;
 
     procedure SetSourceTables(var TempNpGpPOSSalesEntryFrom: Record "NpGp POS Sales Entry" temporary;var TempNpGpPOSSalesLineFrom: Record "NpGp POS Sales Line" temporary;var TempNpGpPOSInfoPOSEntryFrom: Record "NpGp POS Info POS Entry" temporary)
     begin
         TempNpGpPOSSalesEntry.Copy(TempNpGpPOSSalesEntryFrom,true);
         TempNpGpPOSSalesLine.Copy(TempNpGpPOSSalesLineFrom,true);
-        TempNpGpPOSInfoPOSEntryFrom.Copy(TempNpGpPOSInfoPOSEntry,true);
+        TempNpGpPOSInfoPOSEntry.Copy(TempNpGpPOSInfoPOSEntryFrom,true);
     end;
 }
 

@@ -5,6 +5,7 @@ codeunit 6014447 "Label Library Sub. Mgt."
     // NPR5.46/EMGO/20180910 CASE 324737  Changed ChooseLabel function and PrintLabel function from local til global function.
     //                                    Added Transfer Shipment Header case to ApplyFilterAndRun
     // NPR5.46/JDH /20181001 CASE 294354  Restructured functionality for printing
+    // NPR5.51/BHR /20190614 CASE 358287  Add retail print and Price label for Psted Purchase Invoice
 
 
     trigger OnRun()
@@ -44,6 +45,7 @@ codeunit 6014447 "Label Library Sub. Mgt."
     var
         ReportSelectionRetail: Record "Report Selection Retail";
     begin
+
         PrintLabel(Rec,ReportSelectionRetail."Report Type"::"Price Label");
     end;
 
@@ -59,6 +61,24 @@ codeunit 6014447 "Label Library Sub. Mgt."
         ReportSelectionRetail: Record "Report Selection Retail";
     begin
         PrintLabel(Rec,ReportSelectionRetail."Report Type"::"Price Label");
+    end;
+
+    [EventSubscriber(ObjectType::Page, 138, 'OnAfterActionEvent', 'RetailPrint', false, false)]
+    local procedure PostedPurchaseInvoiceOnAfterActionEventRetailPrint(var Rec: Record "Purch. Inv. Header")
+    begin
+        //-NPR5.51 [358287]
+        ChooseLabel(Rec);
+        //+NPR5.51 [358287]
+    end;
+
+    [EventSubscriber(ObjectType::Page, 138, 'OnAfterActionEvent', 'PriceLabel', false, false)]
+    local procedure PostedPurchaseInvoiceOnAfterActionEventPriceLabel(var Rec: Record "Purch. Inv. Header")
+    var
+        ReportSelectionRetail: Record "Report Selection Retail";
+    begin
+        //-NPR5.51 [358287]
+        PrintLabel(Rec,ReportSelectionRetail."Report Type"::"Price Label");
+        //+NPR5.51 [358287]
     end;
 
     [EventSubscriber(ObjectType::Page, 40, 'OnAfterActionEvent', 'PriceLabel', false, false)]
@@ -144,6 +164,8 @@ codeunit 6014447 "Label Library Sub. Mgt."
         PeriodDiscountLine: Record "Period Discount Line";
         TransferReceiptHeader: Record "Transfer Receipt Header";
         TransferReceiptLine: Record "Transfer Receipt Line";
+        PurchInvHeader: Record "Purch. Inv. Header";
+        PurchInvLine: Record "Purch. Inv. Line";
     begin
         RecRef2.GetTable(VarRec);
         case RecRef2.Number of
@@ -155,6 +177,7 @@ codeunit 6014447 "Label Library Sub. Mgt."
               if FromPrintLabelFunction then
                 PurchaseLine.SetRange(Type,PurchaseLine.Type::Item);
               RecRef.GetTable(PurchaseLine);
+
             end;
           DATABASE::"Transfer Header":
             begin
@@ -187,6 +210,17 @@ codeunit 6014447 "Label Library Sub. Mgt."
               RecRef.GetTable(PeriodDiscountLine);
             end;
           //+NPR5.46 [294354]
+
+          //-NPR5.51 [358287]
+            DATABASE::"Purch. Inv. Header":
+            begin
+              RecRef2.SetTable(PurchInvHeader);
+              PurchInvLine.SetRange("Document No.",PurchInvHeader."No.");
+              if FromPrintLabelFunction then
+                PurchInvLine.SetRange(Type,PurchInvLine.Type::Item);
+              RecRef.GetTable(PurchInvLine);
+            end;
+          //+NPR5.51 [358287]
           else begin
             RecRef := RecRef2;
             RecRef.SetRecFilter;

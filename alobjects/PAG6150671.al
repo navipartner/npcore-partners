@@ -13,19 +13,19 @@ page 6150671 "POS Entry Factbox"
             field("Currency Code";"Currency Code")
             {
             }
-            field("Sales Amount";"Sales Amount")
+            field("Item Sales (LCY)";"Item Sales (LCY)")
             {
             }
             field("Discount Amount";"Discount Amount")
             {
             }
-            field("Total Amount";"Total Amount")
+            field("Amount Excl. Tax";"Amount Excl. Tax")
             {
             }
-            field("Total Tax Amount";"Total Tax Amount")
+            field("Tax Amount";"Tax Amount")
             {
             }
-            field("Total Amount Incl. Tax";"Total Amount Incl. Tax")
+            field("Amount Incl. Tax";"Amount Incl. Tax")
             {
             }
             field("Rounding Amount (LCY)";"Rounding Amount (LCY)")
