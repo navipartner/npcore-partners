@@ -6,6 +6,7 @@ table 6060132 "MM Member Community"
     // MM1.14/TSA/20160523  CASE 240871 Reminder Service, field 60
     // MM1.17/TSA/20161214  CASE 243075 Member Point System added field Activate Loyality Program
     // MM1.30/TSA /20180614 CASE 319296 Added field Customer No. Series
+    // MM1.40/TSA /20190604 CASE 357360 Added "Foreign Membership" flowfield looking down into table 6060143
 
     Caption = 'Member Community';
     DrillDownPageID = "MM Member Community";
@@ -68,6 +69,13 @@ table 6060132 "MM Member Community"
         field(24;"Activate Loyalty Program";Boolean)
         {
             Caption = 'Activate Loyalty Program';
+        }
+        field(30;"Foreign Membership";Boolean)
+        {
+            CalcFormula = Exist("MM Foreign Membership Setup" WHERE ("Community Code"=FIELD(Code),
+                                                                     Disabled=CONST(false)));
+            Caption = 'Foreign Membership';
+            FieldClass = FlowField;
         }
         field(60;"Create Renewal Notifications";Boolean)
         {

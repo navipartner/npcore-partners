@@ -4,6 +4,7 @@ codeunit 6184550 TDC
     // NPR5.23/LS  /20160516 CASE 226819 Added Subscriber Function IdentifyMe_GetPhoneLookupCU
     // NPR5.23/LS  /20160617 CASE 226819 Modified DoLookupPhone function
     // NPR5.40/LS  /20180226  CASE 305526 Modified LoadToBuffer() to allow saving of Last Name and First Name
+    // NPR5.51/LS  /20190617  CASE 358751 Correct function LoadToBuffer due to string length
 
     TableNo = "Phone Lookup Buffer";
 
@@ -93,8 +94,12 @@ codeunit 6184550 TDC
               TMPPhoneLookupBuf.Name := DelPreSpaces(Format(StringArray.GetValue(2)));
               TMPPhoneLookupBuf.Name += ' ' + DelPreSpaces(Format(StringArray.GetValue(3)));
               //-NPR5.40 [305526]
-              TMPPhoneLookupBuf."First Name" := DelPreSpaces (DelPreSpaces(Format(StringArray.GetValue(2))));
-              TMPPhoneLookupBuf."Last Name"  := DelPreSpaces (DelPreSpaces(Format(StringArray.GetValue(3))));
+              //-NPR5.51 [358995]
+              //TMPPhoneLookupBuf."First Name" := DelPreSpaces (DelPreSpaces(FORMAT(StringArray.GetValue(2))));
+              //TMPPhoneLookupBuf."Last Name"  := DelPreSpaces (DelPreSpaces(FORMAT(StringArray.GetValue(3))));
+              TMPPhoneLookupBuf."First Name" := CopyStr(DelPreSpaces (DelPreSpaces(Format(StringArray.GetValue(2)))),1,50);
+              TMPPhoneLookupBuf."Last Name"  := CopyStr(DelPreSpaces (DelPreSpaces(Format(StringArray.GetValue(3)))),1,50);
+              //+NPR5.51 [358995]
               //+NPR5.40 [305526]
               TMPPhoneLookupBuf."Post Code" := DelPreSpaces(Format(StringArray.GetValue(5)));
               TMPPhoneLookupBuf.City := DelPreSpaces(Format(StringArray.GetValue(6)));

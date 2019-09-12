@@ -2,6 +2,8 @@ table 6150640 "POS Info"
 {
     // NPR5.26/OSFI/20160810 CASE 246167 Object Created
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 21
+    // NPR5.51/ALPO/20190826 CASE 364558 Define inheritable POS info codes (will be copied from Sales POS header to new lines)
+    //                                   Define accessible from front-end POS info codes
 
     Caption = 'POS Info';
     DrillDownPageID = "POS Info List";
@@ -45,6 +47,29 @@ table 6150640 "POS Info"
         field(40;"Once per Transaction";Boolean)
         {
             Caption = 'Once per Transaction';
+
+            trigger OnValidate()
+            begin
+                //-NPR5.51 [364558]
+                if "Once per Transaction" then
+                  "Copy from Header" := false;
+                //+NPR5.51 [364558]
+            end;
+        }
+        field(50;"Copy from Header";Boolean)
+        {
+            Caption = 'Copy from Header';
+            Description = 'NPR5.51';
+
+            trigger OnValidate()
+            begin
+                TestField("Once per Transaction",false);  //NPR5.51 [364558]
+            end;
+        }
+        field(60;"Available in Front-End";Boolean)
+        {
+            Caption = 'Available in Front-End';
+            Description = 'NPR5.51';
         }
     }
 

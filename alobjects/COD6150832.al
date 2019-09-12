@@ -192,7 +192,7 @@ codeunit 6150832 "POS Action - Balance Reg V2"
         // IF (NOT RetailFormCode.CheckSavedSales (SalePOS)) THEN
         //  ERROR ('');
         // //+NPR5.38 [296587]
-        if not POSQuoteMgt.CleanupPOSQuotes(SalePOS) then
+        if not POSQuoteMgt.CleanupPOSQuotesBeforeBalancing(SalePOS) then
             Error('');
         //+NPR5.48 [334633]
 

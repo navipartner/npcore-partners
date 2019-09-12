@@ -117,6 +117,7 @@ codeunit 6014435 "Retail Form Code"
     // NPR5.47/THRO/20181015 CASE 322837 More informative message in CreditVoucherLookup
     // NPR5.48/MHA /20181115 CASE 334633 Removed function CheckSavedSales() which have been replaced by CleanupPOSQuotes() in codeunit 6151006
     // NPR5.50/TJ  /20190503 CASE 347875 Not updating retail document as cashed if sale has been cancelled
+    // NPR5.51/MHA /20190614 CASE 358582 Changed scope of function OnBeforeAuditRoleLineInsertEvent() from Local to Global
 
     Permissions = TableData "Sales Invoice Header" = rimd,
                   TableData "Sales Invoice Line" = rimd,
@@ -687,7 +688,7 @@ codeunit 6014435 "Retail Form Code"
                     //Revisionsrulle."Discount Code" := Ekspeditionslinie."Discount Code";
                     //+NPR5.39 [305139]
                     Revisionsrulle."Period Discount code" := Ekspeditionslinie."Period Discount code";
-                    Revisionsrulle."Cash Terminal Approved" := Ekspeditionslinie."Cash Terminal Approved";
+              Revisionsrulle."Cash Terminal Approved" := Ekspeditionslinie."EFT Approved";
                     Revisionsrulle."Total Qty" := Ekspeditionslinie."Sales Order Amount";
                     Revisionsrulle."Starting Time" := "Start Time";
                     Revisionsrulle."Closing Time" := Time;
@@ -2737,7 +2738,7 @@ codeunit 6014435 "Retail Form Code"
     end;
 
     [IntegrationEvent(TRUE, TRUE)]
-    local procedure OnBeforeAuditRoleLineInsertEvent(var SalePOS: Record "Sale POS"; var SaleLinePos: Record "Sale Line POS"; var AuditRole: Record "Audit Roll")
+    procedure OnBeforeAuditRoleLineInsertEvent(var SalePOS: Record "Sale POS";var SaleLinePos: Record "Sale Line POS";var AuditRole: Record "Audit Roll")
     begin
     end;
 }

@@ -1,10 +1,12 @@
-codeunit 6184473 "EFT Payment"
+codeunit 6184473 "EFT Payment Mgt."
 {
     // NPR5.46/MMV /20180725 CASE 290734 Created object
     // NPR5.48/MMV /20190114 CASE 341237 Skip recovery prompt for a failed transaction when in self-service mode.
     //                                   Accept recovery of zero amounts without a currency specified.
     //                                   Moved reverse flags inside the main eft database transaction.
     // NPR5.50/MMV /20190508 CASE 354510 Store action state.
+    // NPR5.51/MMV /20190619 CASE 359229 Added safeguard against result amount without success.
+    // NPR5.51/MMV /20190603 CASE 355433 Moved implicit behaviour from events to function invocations
 
 
     trigger OnRun()
@@ -29,14 +31,11 @@ codeunit 6184473 "EFT Payment"
     begin
         CreateEftTransactionRequest(EFTSetup, PaymentTypePOS, Amount, CurrencyCode, SalePOS, EFTTransactionRequest);
         Commit; // Save the request record data regardless of any later errors when invoking.
-        //-NPR5.50 [354510]
         StoreActionState(EFTTransactionRequest);
-        //+NPR5.50 [354510]
         SendRequest(EFTTransactionRequest);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6184499, 'OnAfterEftIntegrationResponseReceived', '', false, false)]
-    local procedure OnAfterEftIntegrationResponseReceived(EftTransactionRequest: Record "EFT Transaction Request")
+    procedure HandleIntegrationResponse(EftTransactionRequest: Record "EFT Transaction Request")
     var
         POSSession: Codeunit "POS Session";
         POSFrontEnd: Codeunit "POS Front End Management";
@@ -46,13 +45,10 @@ codeunit 6184473 "EFT Payment"
         POSFrontEnd.GetSession(POSSession);
 
         case EftTransactionRequest."Processing Type" of
-            EftTransactionRequest."Processing Type"::Refund,
-          EftTransactionRequest."Processing Type"::Payment:
-                EftPaymentResponseReceived(EftTransactionRequest, POSFrontEnd, POSSession);
-            EftTransactionRequest."Processing Type"::Void:
-                EftVoidResponseReceived(EftTransactionRequest, POSFrontEnd, POSSession);
-            EftTransactionRequest."Processing Type"::xLookup:
-                EftLookupResponseReceived(EftTransactionRequest, POSFrontEnd, POSSession);
+          EftTransactionRequest."Processing Type"::REFUND,
+          EftTransactionRequest."Processing Type"::PAYMENT : EftPaymentResponseReceived(EftTransactionRequest, POSFrontEnd, POSSession);
+          EftTransactionRequest."Processing Type"::VOID : EftVoidResponseReceived(EftTransactionRequest, POSFrontEnd, POSSession);
+          EftTransactionRequest."Processing Type"::LOOK_UP : EftLookupResponseReceived(EftTransactionRequest, POSFrontEnd, POSSession);
         end;
     end;
 
@@ -68,9 +64,7 @@ codeunit 6184473 "EFT Payment"
     begin
         SetFinancialImpact(EftTransactionRequest);
         InsertPaymentLine(POSSession, EftTransactionRequest);
-        //-NPR5.48 [341237]
         MarkOriginalTransactionAsReversed(EftTransactionRequest);
-        //+NPR5.48 [341237]
         Commit; // This commit should handle both the payment line insertion and EFT transaction record result modification in one transaction to prevent synchronization issues.
         EFTInterface.OnAfterFinancialCommit(EftTransactionRequest);
         POSSession.RequestRefreshData();
@@ -80,24 +74,10 @@ codeunit 6184473 "EFT Payment"
                 exit; //Don't resume front end straight away as a subscriber indicated the transaction might be annulled now.
 
             POSSession.AddServerStopwatch('EFT_PAYMENT', EftTransactionRequest.Finished - EftTransactionRequest.Started);
-            //-NPR5.48 [341237]
         end;
-        //  IF EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::Refund THEN
-        //    IF GetInitialRequest(EftTransactionRequest."Processed Entry No.", OriginalEftTransactionRequest) THEN
-        //      MarkAsReversed(OriginalEftTransactionRequest, EftTransactionRequest."Entry No.");
-        //
-        //  IF EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::xLookup THEN
-        //    IF GetInitialRequest(EftTransactionRequest."Processed Entry No.", OriginalEftTransactionRequest) THEN
-        //      IF OriginalEftTransactionRequest."Processing Type" = OriginalEftTransactionRequest."Processing Type"::Refund THEN
-        //        IF GetInitialRequest(OriginalEftTransactionRequest."Processed Entry No.", OriginalEftTransactionRequest) THEN
-        //          MarkAsReversed(OriginalEftTransactionRequest, EftTransactionRequest."Entry No.");
-        // END;
-        //+NPR5.48 [341237]
 
-        //-NPR5.48 [341237]
         EFTInterface.OnBeforeResumeFrontEnd(EftTransactionRequest, Skip);
         if not Skip then
-            //+NPR5.48 [341237]
             POSFrontEnd.ResumeWorkflow();
     end;
 
@@ -128,11 +108,8 @@ codeunit 6184473 "EFT Payment"
                     Message(CAPTION_RECOVER_FAIL_SOFT, "Integration Type", OriginalEftTransactionRequest."Entry No.");
 
                     //Recovered transaction is in sync
-                    //-NPR5.48 [341237]
-                    //    ((OriginalEftTransactionRequest."Result Amount" = EftTransactionRequest."Result Amount") AND (OriginalEftTransactionRequest."Currency Code" = EftTransactionRequest."Currency Code")) :
-                ((OriginalEftTransactionRequest."Result Amount" = "Result Amount") and
-                    ((OriginalEftTransactionRequest."Currency Code" = "Currency Code") or ("Result Amount" = 0))):
-                    //+NPR5.48 [341237]
+            ((OriginalEftTransactionRequest."Result Amount" = "Result Amount") and
+              ((OriginalEftTransactionRequest."Currency Code" = "Currency Code") or ("Result Amount" = 0))) :
                     Message(CAPTION_RECOVER_SYNC, "Integration Type", OriginalEftTransactionRequest."Sales Ticket No.", Format(OriginalEftTransactionRequest."Processing Type"), "Result Amount", "Currency Code",
                                                   "Reference Number Output");
 
@@ -176,13 +153,11 @@ codeunit 6184473 "EFT Payment"
         if FinancialRecovery then begin
             //Ongoing workflow will be resumed later by the response handler
             case OriginalEftTransactionRequest."Processing Type" of
-                OriginalEftTransactionRequest."Processing Type"::Void:
-                    EftVoidResponseReceived(EftTransactionRequest, POSFrontEnd, POSSession);
+            OriginalEftTransactionRequest."Processing Type"::VOID : EftVoidResponseReceived(EftTransactionRequest, POSFrontEnd, POSSession);
 
-                OriginalEftTransactionRequest."Processing Type"::Refund,
-              OriginalEftTransactionRequest."Processing Type"::Payment:
-                    EftPaymentResponseReceived(EftTransactionRequest, POSFrontEnd, POSSession);
-            end;
+            OriginalEftTransactionRequest."Processing Type"::REFUND,
+            OriginalEftTransactionRequest."Processing Type"::PAYMENT : EftPaymentResponseReceived(EftTransactionRequest, POSFrontEnd, POSSession);
+          end;
         end else begin
             //-NPR5.48 [341237]
             EFTInterface.OnBeforeResumeFrontEnd(EftTransactionRequest, Skip);
@@ -214,9 +189,9 @@ codeunit 6184473 "EFT Payment"
 
         SetFinancialImpact(EftTransactionRequest);
 
-        if EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::xLookup then begin
+        if EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::LOOK_UP then begin
             OriginalEftTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
-            OriginalEftTransactionRequest.TestField("Processing Type", OriginalEftTransactionRequest."Processing Type"::Void);
+          OriginalEftTransactionRequest.TestField("Processing Type", OriginalEftTransactionRequest."Processing Type"::VOID);
             OriginalEftTransactionRequest.Get(OriginalEftTransactionRequest."Processed Entry No.");
         end else
             OriginalEftTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
@@ -284,12 +259,15 @@ codeunit 6184473 "EFT Payment"
         POSPaymentLine.GetPaymentLine(POSLine);
 
         POSLine."No." := EFTTransactionRequest."POS Payment Type Code";
-        POSLine."Cash Terminal Approved" := EFTTransactionRequest.Successful;
+        POSLine."EFT Approved" := EFTTransactionRequest.Successful;
         POSLine.Description := CopyStr(EFTTransactionRequest."POS Description", 1, MaxStrLen(POSLine.Description));
-        POSLine.Reference := CopyStr(EFTTransactionRequest."Reference Number Output", 1, MaxStrLen(POSLine.Reference));
-        ;
-        POSLine."Amount Including VAT" := EFTTransactionRequest."Result Amount";
-        POSLine."Currency Amount" := POSLine."Amount Including VAT";
+        POSLine.Reference := CopyStr (EFTTransactionRequest."Reference Number Output", 1, MaxStrLen (POSLine.Reference));
+        //-NPR5.51 [359229]
+        if POSLine."EFT Approved" then begin
+        //+NPR5.51 [359229]
+          POSLine."Amount Including VAT" := EFTTransactionRequest."Result Amount";
+          POSLine."Currency Amount" := POSLine."Amount Including VAT";
+        end;
 
         POSPaymentLine.InsertPaymentLine(POSLine, 0);
 
@@ -315,7 +293,7 @@ codeunit 6184473 "EFT Payment"
         with EFTTransactionRequestToRecover do begin
             SetRange("Register No.", SalePOS."Register No.");
             SetRange("Integration Type", IntegrationType);
-            SetFilter("Processing Type", '%1|%2|%3', "Processing Type"::Payment, "Processing Type"::Refund, "Processing Type"::Void);
+          SetFilter("Processing Type", '%1|%2|%3', "Processing Type"::PAYMENT, "Processing Type"::REFUND, "Processing Type"::VOID);
             if not FindLast then
                 exit(false);
 
@@ -328,21 +306,17 @@ codeunit 6184473 "EFT Payment"
             if ("External Result Received" and (Finished <> 0DT)) then
                 exit(false);
 
-            //-NPR5.48 [341237]
             if "Self Service" then
                 exit(false);
-            //+NPR5.48 [341237]
 
-            if ("Processing Type" = "Processing Type"::Void) then
+          if ("Processing Type" = "Processing Type"::VOID) then
                 if "Sales Ticket No." <> SalePOS."Sales Ticket No." then
                     exit(false); //We can only hope to recover a successful void result if we are still in the same sale.
         end;
 
-        //-NPR5.48 [341237]
         EFTInterface.OnBeforeLookupPrompt(EFTTransactionRequestToRecover, Skip);
         if Skip then
             exit(false);
-        //+NPR5.48 [341237]
 
         with EFTTransactionRequestToRecover do
             exit(Confirm(CAPTION_RECOVER_PROMPT, true, "Integration Type", "Sales Ticket No.", "Processing Type", "Amount Input", "Currency Code", "Reference Number Output"));
@@ -370,20 +344,18 @@ codeunit 6184473 "EFT Payment"
     var
         OriginalEftTransactionRequest: Record "EFT Transaction Request";
     begin
-        //-NPR5.48 [341237]
         if not EFTTransactionRequest.Successful then
             exit;
 
-        if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::Refund then
+        if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::REFUND then
             if GetInitialRequest(EFTTransactionRequest."Processed Entry No.", OriginalEftTransactionRequest) then
                 MarkAsReversed(OriginalEftTransactionRequest, EFTTransactionRequest."Entry No.");
 
-        if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::xLookup then
+        if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::LOOK_UP then
             if GetInitialRequest(EFTTransactionRequest."Processed Entry No.", OriginalEftTransactionRequest) then
-                if OriginalEftTransactionRequest."Processing Type" = OriginalEftTransactionRequest."Processing Type"::Refund then
+            if OriginalEftTransactionRequest."Processing Type" = OriginalEftTransactionRequest."Processing Type"::REFUND then
                     if GetInitialRequest(OriginalEftTransactionRequest."Processed Entry No.", OriginalEftTransactionRequest) then
                         MarkAsReversed(OriginalEftTransactionRequest, EFTTransactionRequest."Entry No.");
-        //+NPR5.48 [341237]
     end;
 
     local procedure MarkAsReversed(var EFTTransactionRequest: Record "EFT Transaction Request"; ReversedByEntryNo: Integer)

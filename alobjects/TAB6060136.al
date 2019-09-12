@@ -9,6 +9,7 @@ table 6060136 "MM Membership Alteration Setup"
     // MM1.24/NPKNAV/20171207  CASE 297852 Transport MM1.24 - 7 December 2017
     // MM1.25/TSA /20180119 CASE 300256 Card Expired Action
     // MM1.30/TSA /20180605 CASE 317428 Added "Grace Period Calculation"
+    // MM1.40/TSA /20190730 CASE 360275 Added field 85 "Auto-Admit Member On Sale"
 
     Caption = 'Membership Alteration Setup';
 
@@ -107,6 +108,12 @@ table 6060136 "MM Membership Alteration Setup"
         field(80;"Upgrade With New Duration";Boolean)
         {
             Caption = 'Upgrade With New Duration';
+        }
+        field(85;"Auto-Admit Member On Sale";Option)
+        {
+            Caption = 'Auto-Admit Member On Sale';
+            OptionCaption = 'No,Yes,Ask';
+            OptionMembers = NO,YES,ASK;
         }
         field(90;"Member Unit Price";Decimal)
         {

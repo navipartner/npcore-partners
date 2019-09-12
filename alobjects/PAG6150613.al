@@ -51,7 +51,9 @@ page 6150613 "NP Retail Setup"
     // NPR5.48/MMV /20181206  CASE 327107 Added action RFIDSetup
     // NPR5.48/MMV /20181026  CASE 318028 French certification
     // NPR5.50/MHA /20190422  CASE 337539 Added field 400 "Global Sales Setup"
-    // NPR5.50/MMV /20190521 CASE 355848 Added action LastErrorCallstack
+    // NPR5.50/MMV /20190521  CASE 355848 Added action LastErrorCallstack
+    // NPR5.51/CLVA/20190710  CASE 355871 Added Action Raptor
+    // NPR5.51/MHA /20190816  CASE 365332 Removed Page Manager actions
 
     Caption = 'NP Retail Setup';
     SourceTable = "NP Retail Setup";
@@ -547,23 +549,6 @@ page 6150613 "NP Retail Setup"
                         RunObject = Page "E-mail Setup";
                     }
                 }
-                group(PageManager)
-                {
-                    Caption = 'Page Manager';
-                    Image = TaskPage;
-                    action("Npm Views")
-                    {
-                        Caption = 'Npm Views';
-                        Image = List;
-                        RunObject = Page "Npm Views";
-                    }
-                    action("Npm Pages")
-                    {
-                        Caption = 'Npm Pages';
-                        Image = List;
-                        RunObject = Page "Npm Pages";
-                    }
-                }
                 group(ImportExport)
                 {
                     Caption = 'Import/Export';
@@ -689,6 +674,17 @@ page 6150613 "NP Retail Setup"
                         Caption = 'Notifications';
                         Image = List;
                         RunObject = Page "AF Notification Hub List";
+                    }
+                }
+                group(Raptor)
+                {
+                    Caption = 'Raptor';
+                    Image = Setup;
+                    action(Action6014612)
+                    {
+                        Caption = 'Setup';
+                        Image = List;
+                        RunObject = Page "Raptor Setup";
                     }
                 }
                 group(SalesTax)

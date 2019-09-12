@@ -1,9 +1,9 @@
 page 6151206 "NpCs Collect Store Order Card"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #344264/MHA /20190717  CASE 344264 Changed name and logic for field 240 from "Delivery Only (Non Stock)" to "From Store Stock"
-    // #362443/MHA /20190719  CASE 362443 Added "Opening Hour Set"
-    // #364557/MHA /20190819  CASE 364557 Added Posting fields 250 "Post on", 255 "Posting Document Type", 260 "Posting Document No."
+    // NPR5.51/MHA /20190717  CASE 344264 Changed name and logic for field 240 from "Delivery Only (Non Stock)" to "From Store Stock"
+    // NPR5.51/MHA /20190719  CASE 362443 Added "Opening Hour Set"
+    // NPR5.51/MHA /20190819  CASE 364557 Added Posting fields 250 "Post on", 255 "Posting Document Type", 260 "Posting Document No."
 
     Caption = 'Collect in Store Order Card';
     SourceTable = "NpCs Document";
@@ -269,9 +269,9 @@ page 6151206 "NpCs Collect Store Order Card"
                     var
                         NpCsCollectMgt: Codeunit "NpCs Collect Mgt.";
                     begin
-                        //-#364557 [364557]
+                        //-NPR5.51 [364557]
                         NpCsCollectMgt.PrintOrder(Rec);
-                        //+#364557 [364557]
+                        //+NPR5.51 [364557]
                     end;
                 }
                 action("Print Delivery")

@@ -5,6 +5,7 @@ table 6059950 "Display Setup"
     // NPR5.43/CLVA/20180606 CASE 300254 Added field Activate
     // NPR5.44/CLVA/20180629 CASE 318695 Added field Prices ex. VAT
     // NPR5.50/CLVA/20190513 CASE 352390 Added field "Custom Display Codeunit"
+    // NPR5.51/ANPA/20190722 CASE 352390 Added field "Hide reciept"
 
     Caption = 'Display Setup';
 
@@ -103,6 +104,11 @@ table 6059950 "Display Setup"
         {
             Caption = 'Custom Display Codeunit';
             TableRelation = AllObjWithCaption."Object ID" WHERE ("Object Type"=CONST(Codeunit));
+        }
+        field(25;"Hide receipt";Boolean)
+        {
+            Caption = 'Hide receipt';
+            Description = 'NPR5.51';
         }
     }
 

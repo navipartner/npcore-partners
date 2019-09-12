@@ -7,6 +7,8 @@ codeunit 6014444 "NPR Event Subscriber (Purch)"
     // NPR5.00.01/TJ/20160517 CASE 241673 Rearranged code and added new events
     // NPR5.29/NPKNAV/20170127  CASE 260472 Transport NPR5.29 - 27 januar 2017
     // NPR5.32/BR /20170503  CASE 274473 Hook into Item worksheet
+    // NPR5.51/ZESO/20190702 CASE 360630 Added Parameter %1 to enable filtering of Special Characters.
+    // NPR5.51/ZESO/20190723 CASE 360083 Enable Case Insensitive Filtering
 
 
     trigger OnRun()
@@ -47,7 +49,13 @@ codeunit 6014444 "NPR Event Subscriber (Purch)"
             if RetailSetup."Check Purchase Lines if vendor" then
                Item.SetFilter("Vendor No.",PurchHeader."Buy-from Vendor No.");
             if "Vendor Item No." <> '' then begin
-              Item.SetFilter("Vendor Item No.","Vendor Item No.");
+              //-NPR5.51 [360630]
+              //Item.SETFILTER("Vendor Item No.","Vendor Item No.");
+              //-NPR5.51 [360803]
+              //Item.SETFILTER("Vendor Item No.",'%1',"Vendor Item No.");
+              Item.SetFilter("Vendor Item No.",'%1','@' + "Vendor Item No.");
+              //+NPR5.51 [360803]
+              //-NPR5.51 [360630]
               if Item.FindFirst then begin
                 //-NPR4.14
                 //Type := Type::Item;

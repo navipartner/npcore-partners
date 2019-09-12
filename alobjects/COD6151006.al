@@ -2,6 +2,8 @@ codeunit 6151006 "POS Quote Mgt."
 {
     // NPR5.48/MHA /20181115  CASE 334633 Object created
     // NPR5.48/MHA /20181130  CASE 338208 Added POS Sales Data (.xml) functionality to fully back/restore POS Sale
+    // NPR5.51/MMV /20190820  CASE 364694 Cleanup before register balancing based on register no. for consistency.
+    //                                    Otherwise someone working day shift can have POS quotes living forever.
 
 
     trigger OnRun()
@@ -10,8 +12,9 @@ codeunit 6151006 "POS Quote Mgt."
 
     var
         Text000: Label 'Delete all saved POS Quotes,Terminate/Delete saved POS Quotes manually';
+        EFT_WARNING: Label 'WARNING:\%1 %2 has one or more POS Quotes linked to it with approved EFT transactions inside. These should be voided or completed as the transaction has already occurred!\\Do you want to continue with end of day?';
 
-    procedure CleanupPOSQuotes(SalePOS: Record "Sale POS") Confirmed: Boolean
+    procedure CleanupPOSQuotesBeforeBalancing(SalePOS: Record "Sale POS") Confirmed: Boolean
     var
         POSQuoteEntry: Record "POS Quote Entry";
         SelectedMenu: Integer;
@@ -19,11 +22,21 @@ codeunit 6151006 "POS Quote Mgt."
         if not GuiAllowed then
           exit(true);
 
-        SetSalePOSFilter(SalePOS,POSQuoteEntry);
+        //-NPR5.51 [364694]
+        //SetSalePOSFilter(SalePOS,POSQuoteEntry);
+        POSQuoteEntry.SetAutoCalcFields("Contains EFT Approval");
+        POSQuoteEntry.SetRange("Register No.", SalePOS."Register No.");
+        POSQuoteEntry.SetRange("Contains EFT Approval", true);
+        if not POSQuoteEntry.IsEmpty then
+          if not Confirm(EFT_WARNING, false, SalePOS.FieldCaption("Register No."), SalePOS."Register No.") then
+            exit(false);
+
+        POSQuoteEntry.SetRange("Contains EFT Approval");
+        //+NPR5.51 [364694]
+
         if not POSQuoteEntry.FindFirst then
           exit(true);
 
-        Confirmed := false;
         SelectedMenu := StrMenu(Text000,1);
         case SelectedMenu of
           1:
@@ -40,28 +53,27 @@ codeunit 6151006 "POS Quote Mgt."
         exit(Confirmed);
     end;
 
-    procedure SetSalePOSFilter(SalePOS: Record "Sale POS";var POSQuoteEntry: Record "POS Quote Entry")
-    var
-        RetailSetup: Record "Retail Setup";
+    procedure SetSalePOSFilter(SalePOS: Record "Sale POS";var POSQuoteEntry: Record "POS Quote Entry";"Filter": Option All,Register,Salesperson,"Register+Salesperson")
     begin
         Clear(POSQuoteEntry);
         POSQuoteEntry.FilterGroup(40);
-        RetailSetup.Get;
-        case RetailSetup."Show saved expeditions" of
-          RetailSetup."Show saved expeditions"::Register:
+        //-NPR5.51 [364694]
+        case Filter of
+          Filter::Register :
             begin
               POSQuoteEntry.SetRange("Register No.",SalePOS."Register No.");
             end;
-          RetailSetup."Show saved expeditions"::Salesperson:
+          Filter::Salesperson :
             begin
               POSQuoteEntry.SetRange("Salesperson Code",SalePOS."Salesperson Code");
             end;
-          RetailSetup."Show saved expeditions"::"Register+Salesperson":
+          Filter::"Register+Salesperson" :
             begin
               POSQuoteEntry.SetRange("Salesperson Code",SalePOS."Salesperson Code");
               POSQuoteEntry.SetRange("Register No.",SalePOS."Register No.");
             end;
         end;
+        //+NPR5.51 [364694]
         POSQuoteEntry.FilterGroup(0);
     end;
 

@@ -11,6 +11,7 @@ codeunit 6059940 "SMS Management"
     //                                   Added POS Entry List page subscriber
     // NPR5.40/JC  /20180320 CASE 292485 Fixed option value text
     // NPR5.48/BHR /20181115 CASE 331217 Show correct template
+    // NPR5.51/SARA/20190819 CASE 363578 Sending an SMS with the turnover based on the POS Workshift Checkpoint
 
 
     trigger OnRun()
@@ -626,6 +627,17 @@ codeunit 6059940 "SMS Management"
         //+NPR5.30 [263182]
     end;
 
+    local procedure GetDefaultSenderTo(): Text
+    var
+        IComm: Record "I-Comm";
+    begin
+        //-NPR5.51 [363578]
+        IComm.Get;
+        IComm.TestField("Reg. Turnover Mobile No.");
+        exit(IComm."Reg. Turnover Mobile No.");
+        //-NPR5.51 [363578]
+    end;
+
     local procedure "--- Publishers"()
     begin
     end;
@@ -705,6 +717,39 @@ codeunit 6059940 "SMS Management"
         //-NPR5.40 [304312]
         EditAndSendSMS(Rec);
         //+NPR5.40 [304312]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150627, 'OnAfterEndWorkshift', '', true, true)]
+    local procedure CodeUnit6150627OnAfterEndWorkshift(Mode: Option;UnitNo: Code[20];Successful: Boolean;PosEntryNo: Integer)
+    var
+        RecRef: RecordRef;
+        SMSTemplateHeader: Record "SMS Template Header";
+        POSWorkshifCheckpoint: Record "POS Workshift Checkpoint";
+        POSUnit: Record "POS Unit";
+        SMSBodyText: Text;
+        Sender: Text;
+        SendTo: Text;
+        SMSManagement: Codeunit "SMS Management";
+    begin
+        //-NPR5.51 [363578]
+        if Successful then begin
+          if POSUnit.Get(UnitNo) then
+          if POSUnit."SMS Profile" <> '' then begin
+            SMSTemplateHeader.Get(POSUnit."SMS Profile");
+            POSWorkshifCheckpoint.Reset;
+            POSWorkshifCheckpoint.SetRange("POS Entry No.",PosEntryNo);
+            if POSWorkshifCheckpoint.FindFirst then
+              RecRef.GetTable(POSWorkshifCheckpoint);
+            SMSBodyText := SMSManagement.MakeMessage(SMSTemplateHeader,RecRef);
+
+            Sender := SMSTemplateHeader."Alt. Sender";
+            if Sender = '' then
+              Sender := GetDefaultSender;
+            SendTo := GetDefaultSenderTo;
+            SendSMS(SendTo,Sender,SMSBodyText);
+          end;
+        end;
+        //+NPR5.51 [363578]
     end;
 
     local procedure "-- NaviDocs functions"()

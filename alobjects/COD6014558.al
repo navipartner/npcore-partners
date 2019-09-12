@@ -15,6 +15,7 @@ codeunit 6014558 "RP Data Join Buffer Mgt."
     // NPR5.46/MMV /20180913 CASE 314067 Removed unnecessary field map check.
     // NPR5.47/MMV /20181017 CASE 318084 Added support for different link types.
     // NPR5.50/MMV /20190502 CASE 353588 Added support for distinct iteration.
+    // NPR5.51/MMV /20190712 CASE 354694 Added support for field value iteration.
 
 
     trigger OnRun()
@@ -305,6 +306,9 @@ codeunit 6014558 "RP Data Join Buffer Mgt."
         FieldRef: FieldRef;
         DataProcessed: Boolean;
         tmpDistinctValueList: Record "Retail List" temporary;
+        FieldValue: Integer;
+        Itt: Integer;
+        StopIterating: Boolean;
     begin
         if ParentDataItem."Key ID" > 0 then
           ParentRecRef.CurrentKeyIndex(ParentDataItem."Key ID");
@@ -314,7 +318,7 @@ codeunit 6014558 "RP Data Join Buffer Mgt."
 
         case ParentDataItem."Iteration Type" of
         //-NPR5.50 [353588]
-          ParentDataItem."Iteration Type"::Distinct,
+          ParentDataItem."Iteration Type"::"Distinct Values",
         //+NPR5.50 [353588]
           ParentDataItem."Iteration Type"::" " :
             if not ParentRecRef.FindSet then
@@ -344,13 +348,23 @@ codeunit 6014558 "RP Data Join Buffer Mgt."
               end;
               ParentRecRef.SetRecFilter;
             end;
+        //-NPR5.51 [354694]
+          ParentDataItem."Iteration Type"::"Field Value" :
+            begin
+              if ParentRecRef.FindFirst then
+                ParentRecRef.SetRecFilter
+              else
+                exit(ShouldProcessingContinue(ParentDataItem, false));
+
+              FieldValue := ParentRecRef.Field(ParentDataItem."Field ID").Value;
+              if FieldValue < 1 then
+                exit(true);
+            end;
+        //+NPR5.51 [354694]
         end;
 
         repeat
-        //-NPR5.50 [353588]
-        //  IF TestConstraint(ParentDataItem, ParentRecRef) THEN BEGIN
           if TestConstraint(ParentDataItem, ParentRecRef) and TestDistinct(ParentDataItem, ParentRecRef, tmpDistinctValueList) then begin
-        //+NPR5.50 [353588]
             DataProcessed := true;
             FillRecord(ParentRecRef, ParentDataItem);
 
@@ -366,7 +380,18 @@ codeunit 6014558 "RP Data Join Buffer Mgt."
               ChildRecRef.Close;
             until ChildDataItems.Next = 0;
           end;
-        until ParentRecRef.Next = 0;
+
+        //-NPR5.51 [354694]
+          Itt += 1;
+
+          if ParentDataItem."Iteration Type" = ParentDataItem."Iteration Type"::"Field Value" then
+            StopIterating := FieldValue = Itt
+          else
+            StopIterating := ParentRecRef.Next = 0;
+
+        until StopIterating;
+        //UNTIL ParentRecRef.NEXT = 0;
+        //+NPR5.51 [354694]
 
         exit(ShouldProcessingContinue(ParentDataItem, DataProcessed));
     end;
@@ -490,10 +515,10 @@ codeunit 6014558 "RP Data Join Buffer Mgt."
         FieldRef: FieldRef;
     begin
         //-NPR5.50 [353588]
-        if DataItem."Iteration Type" <> DataItem."Iteration Type"::Distinct then
+        if DataItem."Iteration Type" <> DataItem."Iteration Type"::"Distinct Values" then
           exit(true);
 
-        FieldRef := RecRefIn.Field(DataItem."Distinct Field ID");
+        FieldRef := RecRefIn.Field(DataItem."Field ID");
         tmpDistinctValueList.SetRange(Value, Format(FieldRef.Value,0,9));
         if not tmpDistinctValueList.IsEmpty then
           exit(false);

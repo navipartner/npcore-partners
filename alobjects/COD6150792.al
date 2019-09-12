@@ -17,7 +17,7 @@ codeunit 6150792 "POS Action - Discount"
     // NPR5.44/MHA /20180724 CASE 300254 Deleted Publisher function OnAfterUpdatePOSSaleLine() [NPR5.43] and added trigger through OnAfterSetQuantity()
     // NPR5.45/MHA /20180807 CASE 317065 Added DiscountTypes DiscountPercentExtra,LineDiscountPercentExtra which will add extra flat Discount Percent
     // NPR5.48/TSA /20181214 CASE 338181 Use Amount field when doing final discount adjustment and price include vat is false, rounding on unit price and and reapply VAT on changed lines
-    // NPR5.50/JAKUBV/20190603  CASE 352178 Transport NPR5.50 - 3 June 2019
+    // NPR5.50/MHA /20190426 CASE 352178 POS Action Discount must not set Unit Price on Comment Lines
 
 
     trigger OnRun()

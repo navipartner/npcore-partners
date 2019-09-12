@@ -3,6 +3,7 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
     // NPR5.44/MHA /20180629  CASE 286547 Object created - Item AddOn
     // NPR5.48/MHA /20181113  CASE 334922 Added Web Client Dependency functionality
     // NPR5.50/MHA /20190521  CASE 355080 Added function FormatJson() and "Unit Price" = 0 should result in default price
+    // NPR5.51/MHA /20190725  CASE 355186 Serial No. functions added
 
 
     trigger OnRun()
@@ -632,6 +633,45 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
 
         ItemAddOn.SetRange(Enabled, true);
         exit(ItemAddOn.FindFirst);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150614, 'OnBeforeInsertPOSSalesLine', '', true, true)]
+    local procedure OnBeforeInsertPOSSalesLine(SalePOS: Record "Sale POS";SaleLinePOS: Record "Sale Line POS";POSEntry: Record "POS Entry";var POSSalesLine: Record "POS Sales Line")
+    begin
+        //-NPR5.51 [355186]
+        if POSSalesLine."Serial No." <> '' then
+          exit;
+
+        SetSerialNo(SaleLinePOS);
+        POSSalesLine."Serial No." := SaleLinePOS."Serial No.";
+        //+NPR5.51 [355186]
+    end;
+
+    local procedure SetSerialNo(var SaleLinePOS: Record "Sale Line POS")
+    var
+        SaleLinePOS2: Record "Sale Line POS";
+        SaleLinePOSAddOn: Record "NpIa Sale Line POS AddOn";
+    begin
+        //-NPR5.51 [355186]
+        if SaleLinePOS."Serial No." <> '' then
+          exit;
+
+        if SaleLinePOSAddOn.IsEmpty then
+          exit;
+
+        SaleLinePOSAddOn.SetRange("Register No.",SaleLinePOS."Register No.");
+        SaleLinePOSAddOn.SetRange("Sales Ticket No.",SaleLinePOS."Sales Ticket No.");
+        SaleLinePOSAddOn.SetRange("Sale Type",SaleLinePOS."Sale Type");
+        SaleLinePOSAddOn.SetRange("Sale Date",SaleLinePOS.Date);
+        SaleLinePOSAddOn.SetRange("Sale Line No.",SaleLinePOS."Line No.");
+        if not SaleLinePOSAddOn.FindSet then
+          exit;
+
+        repeat
+          if SaleLinePOS2.Get(SaleLinePOSAddOn."Register No.",SaleLinePOSAddOn."Sales Ticket No.",SaleLinePOSAddOn."Sale Date",SaleLinePOSAddOn."Sale Type",SaleLinePOSAddOn."Applies-to Line No.") then
+            SaleLinePOS."Serial No." := SaleLinePOS2."Serial No.";
+        until (SaleLinePOS."Serial No." <> '') or (SaleLinePOSAddOn.Next = 0);
+        //+NPR5.51 [355186]
     end;
 }
 

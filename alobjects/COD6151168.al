@@ -1,6 +1,7 @@
 codeunit 6151168 "NpGp POS Sales Sync Mgt."
 {
     // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
+    // NPR5.51/ALST/20190711  CASE 337539 modified the web request message
 
     TableNo = "Nc Task";
 
@@ -14,12 +15,17 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
         end;
     end;
 
+    var
+        ServicePasswordErr: Label 'Please check there is a password set up in %1';
+
     procedure ExportPOSEntry(var NcTask: Record "Nc Task")
     var
         POSEntry: Record "POS Entry";
         NpGpGlobalSalesSetup: Record "NpGp POS Sales Setup";
         NPRetailSetup: Record "NP Retail Setup";
+        ServicePassword: Record "Service Password";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
+        NpGpPOSSalesSetupCard: Page "NpGp POS Sales Setup Card";
         Credential: DotNet npNetNetworkCredential;
         HttpWebRequest: DotNet npNetHttpWebRequest;
         HttpWebResponse: DotNet npNetHttpWebResponse;
@@ -54,9 +60,13 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
         NcTask.Modify;
         Commit;
 
+        ServicePassword.SetRange(Key,NpGpGlobalSalesSetup."Service Password");
+        if not ServicePassword.FindFirst then
+          Error(ServicePasswordErr,NpGpPOSSalesSetupCard.Caption);
+
         HttpWebRequest := HttpWebRequest.Create(NpGpGlobalSalesSetup."Service Url");
         HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpGpGlobalSalesSetup."Service Username",NpGpGlobalSalesSetup."Service Password");
+        Credential := Credential.NetworkCredential(NpGpGlobalSalesSetup."Service Username",ServicePassword.GetPassword);
         HttpWebRequest.Credentials(Credential);
         HttpWebRequest.Method := 'POST';
         HttpWebRequest.ContentType := 'text/xml; charset=utf-8';
@@ -78,6 +88,7 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
     var
         POSSalesLine: Record "POS Sales Line";
         POSInfoPOSEntry: Record "POS Info POS Entry";
+        RetailCrossReference: Record "Retail Cross Reference";
         Xml: Text;
     begin
         XmlDoc := XmlDoc.XmlDocument;
@@ -89,7 +100,8 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
                    '<sales_entry xmlns="urn:microsoft-dynamics-nav/xmlports/global_pos_sales" ' +
                    '  pos_store_code="' + POSEntry."POS Store Code" + '"' +
                    '  pos_unit_no="' + POSEntry."POS Unit No." + '"' +
-                   '  document_no="' + POSEntry."Document No." + '">' +
+                   '  document_no="' + POSEntry."Document No." + '"' +
+                   '  company="' + CompanyName + '">' +
                      '<entry_time>' + Format(CreateDateTime(POSEntry."Entry Date",POSEntry."Ending Time"),0,9) + '</entry_time>' +
                      '<entry_type>' + Format(POSEntry."Entry Type",0,2) + '</entry_type>' +
                      '<retail_id>' + Format(POSEntry."Retail ID") + '</retail_id>' +
@@ -98,16 +110,17 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
                      '<salesperson_code>' + POSEntry."Salesperson Code" + '</salesperson_code>' +
                      '<currency_code>' + POSEntry."Currency Code" + '</currency_code>' +
                      '<currency_factor>' + Format(POSEntry."Currency Factor",0,9) + '</currency_factor>' +
-                     '<sales_amount>' + Format(POSEntry."Sales Amount",0,9) +'</sales_amount>' +
+                     '<sales_amount>' + Format(POSEntry."Item Sales (LCY)",0,9) +'</sales_amount>' +
                      '<discount_amount>' + Format(POSEntry."Discount Amount",0,9) + '</discount_amount>' +
-                     '<total_amount>' + Format(POSEntry."Total Amount",0,9) + '</total_amount>' +
-                     '<total_tax_amount>' + Format(POSEntry."Total Tax Amount",0,9) + '</total_tax_amount>' +
-                     '<total_amount_incl_tax>' + Format(POSEntry."Total Amount Incl. Tax",0,9) + '</total_amount_incl_tax>' +
+                     '<total_amount>' + Format(POSEntry."Amount Excl. Tax",0,9) + '</total_amount>' +
+                     '<total_tax_amount>' + Format(POSEntry."Tax Amount",0,9) + '</total_tax_amount>' +
+                     '<total_amount_incl_tax>' + Format(POSEntry."Amount Incl. Tax",0,9) + '</total_amount_incl_tax>' +
                      '<sales_lines>';
 
         POSSalesLine.SetRange("POS Entry No.",POSEntry."Entry No.");
         if POSSalesLine.FindSet then
           repeat
+            if RetailCrossReference.Get(POSSalesLine."Retail ID") then;
             Xml+=
                         '<sales_line line_no="' + Format(POSSalesLine."Line No.",0,9) + '">' +
                           '<retail_id>' + Format(POSSalesLine."Retail ID") + '</retail_id>' +
@@ -136,6 +149,7 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
                           '<line_discount_amount_incl_vat_lcy>' + Format(POSSalesLine."Line Dsc. Amt. Incl. VAT (LCY)",0,9) + '</line_discount_amount_incl_vat_lcy>' +
                           '<amount_excl_vat_lcy>' + Format(POSSalesLine."Amount Excl. VAT (LCY)",0,9) + '</amount_excl_vat_lcy>' +
                           '<amount_incl_vat_lcy>' + Format(POSSalesLine."Amount Incl. VAT (LCY)",0,9) + '</amount_incl_vat_lcy>' +
+                          '<global_reference>' + RetailCrossReference."Reference No." + '</global_reference>' +
                         '</sales_line>';
           until POSSalesLine.Next = 0;
         Xml +=
@@ -225,6 +239,7 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
     [TryFunction]
     procedure TryGetGlobalPosSalesService(NpGpPOSSalesSetup: Record "NpGp POS Sales Setup")
     var
+        ServicePassword: Record "Service Password";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         Credential: DotNet npNetNetworkCredential;
         HttpWebRequest: DotNet npNetHttpWebRequest;
@@ -238,7 +253,11 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
 
         HttpWebRequest := HttpWebRequest.Create(NpGpPOSSalesSetup."Service Url");
         HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpGpPOSSalesSetup."Service Username",NpGpPOSSalesSetup."Service Password");
+
+        ServicePassword.SetRange(Key,NpGpPOSSalesSetup."Service Password");
+        ServicePassword.FindFirst;
+
+        Credential := Credential.NetworkCredential(NpGpPOSSalesSetup."Service Username",ServicePassword.GetPassword);
         HttpWebRequest.Credentials(Credential);
         HttpWebRequest.Method := 'GET';
         NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);

@@ -15,6 +15,7 @@ page 6060121 "TM Ticket BOM"
     // TM1.36/TSA /20180801 CASE 316463 Added "Allow Rescan Within (Sec.)" field
     // TM1.38/TSA /20181012 CASE 332109 Added eTicket
     // TM1.38/TSA /20181026 CASE 308962 Adding setup to manage prepaid / postpaid tickets
+    // TM1.42/TSA /20190411 CASE 351050 Added "Revisit Condition (Statistics)"
 
     Caption = 'Ticket BOM';
     PageType = List;
@@ -42,10 +43,13 @@ page 6060121 "TM Ticket BOM"
                 field("Admission Entry Validation";"Admission Entry Validation")
                 {
                 }
-                field("Duration Formula";"Duration Formula")
+                field("Max No. Of Entries";"Max No. Of Entries")
                 {
                 }
-                field("Max No. Of Entries";"Max No. Of Entries")
+                field("Revisit Condition (Statistics)";"Revisit Condition (Statistics)")
+                {
+                }
+                field("Duration Formula";"Duration Formula")
                 {
                 }
                 field("Allow Rescan Within (Sec.)";"Allow Rescan Within (Sec.)")

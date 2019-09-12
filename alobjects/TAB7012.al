@@ -1,4 +1,4 @@
-tableextension 50050 tableextension50050 extends "Purchase Price" 
+tableextension 50051 tableextension50051 extends "Purchase Price" 
 {
     // VRT1.00/JDH/20170502 CASE 271133 Added Variety Fields for grouping
     // NPR5.31/NPKNAV/20170502  CASE 271133 Transport NPR5.31 - 2 May 2017

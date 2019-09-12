@@ -18,7 +18,7 @@ table 6150622 "POS Sales Line"
     // NPR5.50/MHA /20190422 CASE 337539 Added field 170 "Retail ID"
     // NPR5.50/MMV /20190328 CASE 300557 Added field 143,144.
     //                                   Renamed blank Type option to comment.
-    // #362329/MHA /20190718 CASE 362329 Added field 500 "Exclude from Posting"
+    // NPR5.51/MHA /20190718 CASE 362329 Added field 500 "Exclude from Posting"
 
     Caption = 'POS Sales Line';
     DrillDownPageID = "POS Sales Line List";
@@ -428,7 +428,7 @@ table 6150622 "POS Sales Line"
         field(500;"Exclude from Posting";Boolean)
         {
             Caption = 'Exclude from Posting';
-            Description = '#362329';
+            Description = 'NPR5.51';
         }
         field(5402;"Variant Code";Code[10])
         {

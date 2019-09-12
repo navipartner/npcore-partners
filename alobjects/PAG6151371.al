@@ -13,6 +13,10 @@ page 6151371 "CS Setup"
     //                                   Added Group RFID
     // NPR5.50/CLVA/20190515 CASE 350696 Added action "Devices" and "Stock-Take" > "Data"
     // NPR5.50/CLVA/20190527 CASE 355694 Added field "Item Reclass. Jour Temp Name" and "Item Reclass. Jour Batch Name"
+    // NPR5.51/CLVA/20190610 CASE 356107 Added action "Warehouse Receipt"
+    // NPR5.51/CLVA/20190627 CASE 359375 Added field Create Worksheet after Trans. for re-creation of worksheet after Stock-Take transfer
+    // NPR5.51/CLVA/20190812 CASE 362173 Added Group Physical Inventory Counting
+    // NPR5.51/CLVA/20190823 CASE 365967 Added action Posting Buffer and Store Users
 
     Caption = 'CS Setup';
     PageType = Card;
@@ -55,6 +59,9 @@ page 6151371 "CS Setup"
                 field("Aggregate Stock-Take Summarize";"Aggregate Stock-Take Summarize")
                 {
                 }
+                field("Create Worksheet after Trans.";"Create Worksheet after Trans.")
+                {
+                }
             }
             group(RFID)
             {
@@ -84,6 +91,16 @@ page 6151371 "CS Setup"
                 {
                 }
                 field("Item Reclass. Jour Batch Name";"Item Reclass. Jour Batch Name")
+                {
+                }
+            }
+            group("Physical Inventory Counting")
+            {
+                Caption = 'Physical Inventory Counting';
+                field("Phys. Inv Jour Temp Name";"Phys. Inv Jour Temp Name")
+                {
+                }
+                field("Phys. Inv Jour No. Series";"Phys. Inv Jour No. Series")
                 {
                 }
             }
@@ -129,6 +146,24 @@ page 6151371 "CS Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "CS Devices";
+            }
+            action("Posting Buffer")
+            {
+                Caption = 'Posting Buffer';
+                Image = PostBatch;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                RunObject = Page "CS Posting Buffer";
+            }
+            action("Store Users")
+            {
+                Caption = 'Store Users';
+                Image = Employee;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                RunObject = Page "CS Store Users";
             }
             group("Stock-Take")
             {
@@ -176,6 +211,16 @@ page 6151371 "CS Setup"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
                     RunObject = Page "CS Rfid Tag Models";
+                }
+                action("Warehouse Receipt")
+                {
+                    Caption = 'Warehouse Receipt';
+                    Image = Warehouse;
+                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                    //PromotedCategory = Process;
+                    //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
+                    //PromotedIsBig = true;
+                    RunObject = Page "CS Whse. Receipt List";
                 }
             }
         }

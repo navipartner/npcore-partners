@@ -11,6 +11,11 @@ codeunit 6151372 "CS WS"
     //                                                  GetRfidWhseReceiptData, ValidateRfidWhseReceiptData, CloseCounting, CloseRefill, UpdateRefill, ApproveCounting and CloseWarehouseCounting
     //                                   Removed functions GetRfidOfflineData, GetRfidOfflineDataAndJournals, GetRfidMasterData and GetRfidData
     // NPR5.50/CLVA/20190502 CASE 353741 Added functions ResetWarehouseCounting and GetItemObject
+    // NPR5.51/CLVA/20190610 CASE 356107 Added function SaveRfidWhseReceiptData
+    // NPR5.51/CLVA/20190712 CASE 350696 Added FRID model check
+    // NPR5.51/CLVA/20190820 CASE 365659 Changed CloseWarehouseCounting to use Phy. Inv. Journal
+    // NPR5.51/CLVA/20190826 CASE 365659 Added GetWarehouseCountingDetails
+    // NPR5.51/CLVA/20190701 CASE 350696 Added function GetRfidOfflineDataDeltaV2
 
 
     trigger OnRun()
@@ -22,6 +27,17 @@ codeunit 6151372 "CS WS"
         InternalCallId: Guid;
         headerlabel: Label 'STOCK';
         footerlabel: Label 'DELIVERY';
+        Txt001: Label 'There are unknown tags related to Whse. Receipt No. %1\\Please manual handle the conflict in the backend system';
+        Txt002: Label 'There are items not related to Whse. Receipt No. %1\\Please manual handle the conflict in the backend system';
+        Txt003: Label 'There are no items to handle related to Whse. Receipt No. %1';
+        Txt004: Label 'Qty. to Receive exceed Outstanding Qty. for item %1 %2';
+        Txt005: Label 'Physical Inventory Journal: %1, do not exist';
+        Txt006: Label 'Item Journal Template: %1, field Source Code is blank';
+        Txt007: Label 'Physical Inventory Journals: %1, field Reason Code is blank';
+        Txt008: Label 'Physical Inventory Journals: %1, field Posting No. Series is blank';
+        Txt009: Label 'Physical Inventory Journal: %1, is not empty';
+        Txt010: Label 'Capture Service is not configured in company: %1';
+        Txt011: Label 'There is nothing to save';
 
     procedure ProcessDocument(var Document: Text)
     var
@@ -340,6 +356,13 @@ codeunit 6151372 "CS WS"
         exit(CSHelperFunctions.CreateOfflineRfidDataDelta(DeviceId));
     end;
 
+    procedure GetRfidOfflineDataDeltaV2(DeviceId: Code[20]): Text
+    var
+        CSHelperFunctions: Codeunit "CS Helper Functions";
+    begin
+        exit(CSHelperFunctions.CreateOfflineRfidDataDeltaV2(DeviceId));
+    end;
+
     procedure UpdateRfidDeviceInfo(DeviceId: Code[20]; Lasttimestamp: Text; Location: Code[20]): Text
     var
         CSHelperFunctions: Codeunit "CS Helper Functions";
@@ -364,7 +387,25 @@ codeunit 6151372 "CS WS"
     procedure GetRfidTagData(TagId: Text): Text
     var
         CSRfidData: Record "CS Rfid Data";
+        CSRfidTagModels: Record "CS Rfid Tag Models";
+        TagFamily: Code[10];
+        TagModel: Code[10];
+        CSRfidItemPlaceholder: Record "CS Rfid Item Handling";
     begin
+        //-NPR5.51 [350696]
+        if (StrLen(TagId) > MaxStrLen(CSRfidItemPlaceholder."Rfid Id")) or (StrLen(TagId) < MaxStrLen(CSRfidTagModels.Family)) then
+          exit('UNKNOWNITEM');
+
+        TagFamily := CopyStr(TagId,1,4);
+        TagModel  := CopyStr(TagId,5,4);
+
+        if not CSRfidTagModels.Get(TagFamily,TagModel) then
+          exit('UNKNOWNITEM');
+
+        if CSRfidTagModels.Discontinued then
+          exit('UNKNOWNITEM');
+        //+NPR5.51 [350696]
+
         if CSRfidData.Get(TagId) then
             exit(CSRfidData."Combined key")
         else
@@ -475,6 +516,50 @@ codeunit 6151372 "CS WS"
                 exit(CSRfidData."Combined key" + '#1');
         end else
             exit('UNKNOWNITEM#2');
+    end;
+
+    procedure SaveRfidWhseReceiptData(DocNo: Text): Text
+    var
+        CSWhseReceiptData: Record "CS Whse. Receipt Data";
+        Result: Text;
+        WhseReceiptLine: Record "Warehouse Receipt Line";
+    begin
+        Clear(CSWhseReceiptData);
+        CSWhseReceiptData.SetRange("Tag Type",CSWhseReceiptData."Tag Type"::Unknown);
+        if CSWhseReceiptData.FindSet then
+          exit(StrSubstNo(Txt001,DocNo));
+
+        Clear(CSWhseReceiptData);
+        CSWhseReceiptData.SetRange("Tag Type",CSWhseReceiptData."Tag Type"::"Not on Document");
+        if CSWhseReceiptData.FindSet then
+          exit(StrSubstNo(Txt002,DocNo));
+
+        Clear(CSWhseReceiptData);
+        CSWhseReceiptData.SetRange("Tag Type",CSWhseReceiptData."Tag Type"::Document);
+        CSWhseReceiptData.SetRange("Transferred To Doc",false);
+        if not CSWhseReceiptData.FindSet then begin
+          exit(StrSubstNo(Txt003,DocNo));
+        end else begin
+          repeat
+            Clear(WhseReceiptLine);
+            WhseReceiptLine.SetCurrentKey("Source Type","Source Subtype","Source No.","Source Line No.");
+            WhseReceiptLine.SetRange("No.",CSWhseReceiptData."Doc. No.");
+            WhseReceiptLine.SetRange("Item No.",CSWhseReceiptData."Item No.");
+            WhseReceiptLine.SetRange("Variant Code",CSWhseReceiptData."Variant Code");
+            if WhseReceiptLine.FindSet then begin
+              if WhseReceiptLine."Qty. to Receive" = WhseReceiptLine."Qty. Outstanding" then
+                exit(StrSubstNo(Txt004,CSWhseReceiptData."Item No.",CSWhseReceiptData."Variant Code"));
+              WhseReceiptLine.Validate("Qty. to Receive",WhseReceiptLine."Qty. to Receive" + 1);
+              WhseReceiptLine.Modify(true);
+            end;
+
+            CSWhseReceiptData.Transferred := CurrentDateTime;
+            CSWhseReceiptData."Transferred By" := UserId;
+            CSWhseReceiptData."Transferred To Doc" := true;
+            CSWhseReceiptData.Modify();
+
+          until CSWhseReceiptData.Next = 0;
+        end;
     end;
 
     procedure CloseCounting(StockTakeId: Text; WorksheetName: Text): Text
@@ -599,28 +684,143 @@ codeunit 6151372 "CS WS"
         StockTakeWorksheet: Record "Stock-Take Worksheet";
         OK: Boolean;
         SessionID: Integer;
+        ItemJournalTemplate: Record "Item Journal Template";
+        ItemJournalBatch: Record "Item Journal Batch";
+        BaseItemJournalLine: Record "Item Journal Line";
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+        CSStockTakesDataTb: Record "CS Stock-Takes Data";
+        TestItemJournalLine: Record "Item Journal Line";
+        LineNo: Integer;
+        NewItemJournalLine: Record "Item Journal Line";
+        CSSetup: Record "CS Setup";
+        CSStockTakesDataQy: Query "CS Stock-Takes Data";
+        ItemJournalLine: Record "Item Journal Line";
+        ResetItemJournalLine: Record "Item Journal Line";
     begin
-        if not StockTakeWorksheet.Get(StockTakeConfigCode, WorksheetName) then
-            exit('UNKNOWNSTOCKTAKEWORKSHEET');
+        //-NPR5.51
+        // IF NOT StockTakeWorksheet.GET(StockTakeConfigCode,WorksheetName) THEN
+        //  EXIT('UNKNOWNSTOCKTAKEWORKSHEET');
+        //
+        // OK := STARTSESSION(SessionID, CODEUNIT::"CS UI WH Counting Handling", COMPANYNAME, StockTakeWorksheet);
+        // IF NOT OK THEN
+        //  EXIT(GETLASTERRORTEXT);
 
-        OK := StartSession(SessionID, CODEUNIT::"CS UI WH Counting Handling", CompanyName, StockTakeWorksheet);
-        if not OK then
-            exit(GetLastErrorText);
+        if not CSSetup.Get then
+          exit(StrSubstNo(Txt010,CompanyName));
 
-        exit(StockTakeConfigCode);
+        if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name",StockTakeConfigCode) then
+          exit(StrSubstNo(Txt005,StockTakeConfigCode));
+
+        ItemJournalTemplate.Get(ItemJournalBatch."Journal Template Name");
+
+        if ItemJournalTemplate."Source Code" = '' then
+          exit(StrSubstNo(Txt006,ItemJournalTemplate.Name));
+
+        if ItemJournalBatch."Reason Code" = '' then
+          exit(StrSubstNo(Txt007,ItemJournalBatch.Name));
+
+        Clear(BaseItemJournalLine);
+        BaseItemJournalLine.Init;
+        BaseItemJournalLine.Validate("Journal Template Name",ItemJournalBatch."Journal Template Name");
+        BaseItemJournalLine.Validate("Journal Batch Name",ItemJournalBatch.Name);
+        BaseItemJournalLine."Location Code" := ItemJournalBatch.Name;
+
+        Clear(NoSeriesMgt);
+        BaseItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series",BaseItemJournalLine."Posting Date",false);
+        BaseItemJournalLine."Source Code" := ItemJournalTemplate."Source Code";
+        BaseItemJournalLine."Reason Code" := ItemJournalBatch."Reason Code";
+        BaseItemJournalLine."Posting No. Series" := ItemJournalBatch."Posting No. Series";
+
+        Clear(TestItemJournalLine);
+        TestItemJournalLine.SetRange("Journal Template Name", BaseItemJournalLine."Journal Template Name");
+        TestItemJournalLine.SetRange("Journal Batch Name", BaseItemJournalLine."Journal Batch Name");
+        if TestItemJournalLine.FindSet then
+          exit(StrSubstNo(Txt009,StockTakeConfigCode,WorksheetName));
+
+        LineNo := 1000;
+
+        CSStockTakesDataQy.SetRange(Worksheet_Name,ItemJournalBatch."Journal Template Name");
+        CSStockTakesDataQy.SetRange(Stock_Take_Config_Code,ItemJournalBatch.Name);
+        CSStockTakesDataQy.Open;
+        while CSStockTakesDataQy.Read do
+        begin
+          Clear(ItemJournalLine);
+          ItemJournalLine.SetRange("Journal Template Name", BaseItemJournalLine."Journal Template Name");
+          ItemJournalLine.SetRange("Journal Batch Name", BaseItemJournalLine."Journal Batch Name");
+          ItemJournalLine.SetRange("Location Code", BaseItemJournalLine."Location Code");
+          ItemJournalLine.SetRange("Item No.", CSStockTakesDataQy.ItemNo);
+          ItemJournalLine.SetRange("Variant Code", CSStockTakesDataQy.Variant_Code);
+          if not ItemJournalLine.FindSet then begin
+            Clear(NewItemJournalLine);
+            NewItemJournalLine.Validate("Journal Template Name",BaseItemJournalLine."Journal Template Name");
+            NewItemJournalLine.Validate("Journal Batch Name",BaseItemJournalLine."Journal Batch Name");
+            NewItemJournalLine."Line No." := LineNo;
+            NewItemJournalLine.Insert(true);
+
+            NewItemJournalLine.Validate("Entry Type",NewItemJournalLine."Entry Type"::"Positive Adjmt.");
+            NewItemJournalLine.Validate("Item No.", CSStockTakesDataQy.ItemNo);
+            NewItemJournalLine.Validate("Variant Code",CSStockTakesDataQy.Variant_Code);
+            NewItemJournalLine.Validate("Location Code",BaseItemJournalLine."Location Code");
+            NewItemJournalLine.Validate("Phys. Inventory",true);
+            NewItemJournalLine.Validate("Qty. (Phys. Inventory)",CSStockTakesDataQy.Count_);
+            NewItemJournalLine."Posting Date" := WorkDate;
+            NewItemJournalLine."Document Date" := WorkDate;
+            NewItemJournalLine.Validate("External Document No.",'MOBILE');
+            NewItemJournalLine.Validate("Changed by User",true);
+            NewItemJournalLine."Document No." := BaseItemJournalLine."Document No.";
+            NewItemJournalLine."Source Code" := BaseItemJournalLine."Source Code";
+            NewItemJournalLine."Reason Code" := BaseItemJournalLine."Reason Code";
+            NewItemJournalLine."Posting No. Series" := BaseItemJournalLine."Posting No. Series";
+            NewItemJournalLine.Modify(true);
+            LineNo += 1000;
+          end else begin
+            ItemJournalLine.Validate("Qty. (Phys. Inventory)",CSStockTakesDataQy.Count_);
+            ItemJournalLine.Validate("Changed by User",true);
+            ItemJournalLine.Modify(true);
+          end;
+        end;
+
+        CSStockTakesDataQy.Close;
+
+        Clear(ResetItemJournalLine);
+        ResetItemJournalLine.SetRange("Journal Template Name", BaseItemJournalLine."Journal Template Name");
+        ResetItemJournalLine.SetRange("Journal Batch Name", BaseItemJournalLine."Journal Batch Name");
+        ResetItemJournalLine.SetRange("Location Code", BaseItemJournalLine."Location Code");
+        ResetItemJournalLine.SetRange("Changed by User",false);
+        ResetItemJournalLine.ModifyAll("Qty. (Phys. Inventory)",0,true);
+
+        Clear(CSStockTakesDataTb);
+        CSStockTakesDataTb.SetRange("Worksheet Name",ItemJournalBatch."Journal Template Name");
+        CSStockTakesDataTb.SetRange("Stock-Take Config Code",ItemJournalBatch.Name);
+        CSStockTakesDataTb.SetFilter("Item No.", '<>%1', '');
+        CSStockTakesDataTb.DeleteAll(false);
+
+        exit(StockTakeConfigCode)
+        //+NPR5.51
     end;
 
     procedure ResetWarehouseCounting(StockTakeConfigCode: Text; WorksheetName: Text): Text
     var
-        StockTakeWorksheet: Record "Stock-Take Worksheet";
+        CSSetup: Record "CS Setup";
+        ItemJournalBatch: Record "Item Journal Batch";
         CSStockTakesData: Record "CS Stock-Takes Data";
     begin
-        if not StockTakeWorksheet.Get(StockTakeConfigCode, WorksheetName) then
+        //-NPR5.51
+        //IF NOT StockTakeWorksheet.GET(StockTakeConfigCode,WorksheetName) THEN
+        if not CSSetup.Get then
+          exit(StrSubstNo(Txt010,CompanyName));
+
+        if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name",StockTakeConfigCode) then
             exit('UNKNOWNSTOCKTAKEWORKSHEET');
+        //+NPR5.51
 
         CSStockTakesData.SetRange("Transferred To Worksheet", false);
-        CSStockTakesData.SetRange("Stock-Take Config Code", StockTakeWorksheet."Stock-Take Config Code");
-        CSStockTakesData.SetRange("Worksheet Name", StockTakeWorksheet.Name);
+        //-NPR5.51
+        //CSStockTakesData.SETRANGE("Stock-Take Config Code",StockTakeWorksheet."Stock-Take Config Code");
+        //CSStockTakesData.SETRANGE("Worksheet Name",StockTakeWorksheet.Name);
+        CSStockTakesData.SetRange("Worksheet Name",ItemJournalBatch."Journal Template Name");
+        CSStockTakesData.SetRange("Stock-Take Config Code",ItemJournalBatch.Name);
+        //+NPR5.51
         CSStockTakesData.DeleteAll();
 
         exit(StockTakeConfigCode);
@@ -790,6 +990,34 @@ codeunit 6151372 "CS WS"
         end;
 
         exit(Result);
+    end;
+
+    procedure GetWarehouseCountingDetails(BatchName: Text): Text
+    var
+        ItemJournalTemplate: Record "Item Journal Template";
+        ItemJournalBatch: Record "Item Journal Batch";
+        CSItemJournal: Query "CS Item Journal";
+        CSSetup: Record "CS Setup";
+        PredictedQty: Integer;
+    begin
+        if not CSSetup.Get then
+          exit(StrSubstNo(Txt010,CompanyName));
+
+        if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name",BatchName) then
+          exit(StrSubstNo(Txt005,BatchName));
+
+
+        CSItemJournal.SetRange(CSItemJournal.Journal_Template_Name,CSSetup."Phys. Inv Jour Temp Name");
+        CSItemJournal.SetRange(CSItemJournal.Journal_Batch_Name,BatchName);
+        CSItemJournal.Open;
+        while CSItemJournal.Read do
+        begin
+          PredictedQty := CSItemJournal.Sum_Qty_Calculated;
+        end;
+
+        CSItemJournal.Close;
+
+        exit(Format(PredictedQty));
     end;
 }
 

@@ -5,6 +5,7 @@ page 6059968 "MPOS App Setup Card"
     // NPR5.36/MMV /20170926 CASE 291652 Added quickfix field 1000
     // NPR5.38/CLVA/20171011 CASE 289636 Added fields "Receipt Report ID" and "Receipt Report Caption"
     // NPR5.39/BR  /20180214 CASE 304312 Added Group "Receipts"
+    // NPR5.51/JAKUBV/20190904  CASE 364011 Transport NPR5.51 - 3 September 2019
 
     Caption = 'MPOS App Setup Card';
     SourceTable = "MPOS App Setup";
@@ -115,6 +116,14 @@ page 6059968 "MPOS App Setup Card"
                         MPOSPaymentGateway.Provider::NETS : PAGE.Run(PAGE::"MPOS Nets Transactions List");
                     end;
                 end;
+            }
+            action("EOD Receipts")
+            {
+                Caption = 'EOD Receipts';
+                Image = List;
+                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedCategory = Process;
+                RunObject = Page "MPOS EOD Receipts";
             }
         }
     }

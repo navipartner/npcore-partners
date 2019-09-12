@@ -17,6 +17,7 @@ codeunit 6014576 "Report - Retail Warranty"
     // NPR5.26/MMV /20160916 CASE 249408 Moved control codes from captions to in-line strings.
     // NPR5.33/MMV /20170630 CASE 280196 Removed old code preventing compile.
     // NPR5.37/TJ  /20171018 CASE 286283 Translated variables with danish specific letters into english
+    // NPR5.51/AlST/20190620 CASE 356129 allow for automatic printing of warranty on pos line creation
 
     TableNo = "Sale Line POS";
 
@@ -107,6 +108,7 @@ codeunit 6014576 "Report - Retail Warranty"
         NotesTxt41: Label 'This certificate replaces any. accompanying ';
         NotesTxt42: Label ' guarantee / warranty certificate';
         NotesTxt43: Label ' from the supplier.';
+        WarrantyPrintCaption: Label 'Auto printing of the warranty for this item has failed with the error: %1';
 
     procedure PrintBody()
     begin
@@ -304,6 +306,46 @@ codeunit 6014576 "Report - Retail Warranty"
         RetailConfiguration.Get;
         CompanyInformation.Get;
         CompanyInformation.CalcFields(Picture);
+    end;
+
+    local procedure "--Subscriptions--"()
+    begin
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterInsertSaleLine', '', true, true)]
+    local procedure PrintWarrantyAfterSaleLine(POSSalesWorkflowStep: Record "POS Sales Workflow Step";SaleLinePOS: Record "Sale Line POS")
+    var
+        Item: Record Item;
+    begin
+        //-NPR5.51
+        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CODEUNIT::"Report - Retail Warranty" then
+          exit;
+
+        if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
+          exit;
+
+        Item.Get(SaleLinePOS."No.");
+
+        if not Item."Guarantee voucher" then
+          exit;
+
+        if not TryAutoPrintWarranty(SaleLinePOS) and GuiAllowed then
+          Message(WarrantyPrintCaption, GetLastErrorText);
+        //+NPR5.51
+    end;
+
+    [TryFunction]
+    local procedure TryAutoPrintWarranty(SaleLinePOS: Record "Sale Line POS")
+    var
+        ReportSelectionRetail: Record "Report Selection Retail";
+        RetailReportSelectionMgt: Codeunit "Retail Report Selection Mgt.";
+        RecRef: RecordRef;
+    begin
+        //-NPR5.51
+        RecRef.GetTable(SaleLinePOS);
+        RetailReportSelectionMgt.SetRegisterNo(SaleLinePOS."Register No.");
+        RetailReportSelectionMgt.RunObjects(RecRef,ReportSelectionRetail."Report Type"::"Warranty Certificate");
+        //+NPR5.51
     end;
 }
 

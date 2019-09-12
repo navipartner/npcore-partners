@@ -1,7 +1,7 @@
 codeunit 6151205 "NpCs POS Session Mgt."
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
-    // #364557/MHA /20190821  CASE 364557 Delivery should also be possible from Posted Invoice
+    // NPR5.51/MHA /20190821  CASE 364557 Delivery should also be possible from Posted Invoice
 
 
     trigger OnRun()

@@ -4,6 +4,9 @@ codeunit 6150825 "POS Action - MPOS Native"
     // NPR5.39/CLVA/20170703 CASE 301776 Adding Scandit/barcode functionality to IOS
     // NPR5.50/CLVA/20190304 CASE 332844 Added parameters COUNTSALESFLOOR,COUNTSTOCKROOM,ASSIGNTAG,LOCATETAG and REFILL
     //                                   Added function BuildJSONGenericParams
+    // NPR5.51/CLVA/20190408 CASE 351364 Added support for Android
+    // NPR5.51/CLVA/20190605 CASE 357532 Added parameters APPROVE and SCANDITSCAN
+    // NPR5.51/CLVA/20190819 CASE 364011 Added "Register No." to action
 
     SingleInstance = true;
 
@@ -34,6 +37,7 @@ codeunit 6150825 "POS Action - MPOS Native"
         Err_NotApproved: Label 'Counting has not been approved';
         Err_Approved: Label 'Counting is already approved';
         Err_RefillClosed: Label 'Refill is already closed';
+        JSfunction: Label 'function CallNativeFunction(jsonobject) {debugger; var userAgent = navigator.userAgent || navigator.vendor || window.opera; if (/android/i.test(userAgent)) { window.top.mpos.handleBackendMessage(jsonobject); } if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) { window.webkit.messageHandlers.invokeAction.postMessage(jsonobject);}}';
 
     local procedure ActionCode(): Text
     begin
@@ -58,7 +62,9 @@ codeunit 6150825 "POS Action - MPOS Native"
           then begin
             RegisterWorkflowStep('1','respond();');
             RegisterWorkflow(false);
-            RegisterOptionParameter ('NativeAction', 'ADMISSION,EOD,PRINTLASTRECEIPT,SCANDITITEMINFO,SCANDITFINDITEM,COUNTSALESFLOOR,COUNTSTOCKROOM,ASSIGNTAG,LOCATETAG,REFILL,APPROVE', 'ADMISSION');
+            //-NPR5.51 [357532]
+            RegisterOptionParameter ('NativeAction', 'ADMISSION,EOD,PRINTLASTRECEIPT,SCANDITITEMINFO,SCANDITFINDITEM,COUNTSALESFLOOR,COUNTSTOCKROOM,ASSIGNTAG,LOCATETAG,REFILL,APPROVE,SCANDITSCAN', 'ADMISSION');
+            //+NPR5.51 [357532]
           end;
     end;
 
@@ -66,7 +72,7 @@ codeunit 6150825 "POS Action - MPOS Native"
     local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: JsonObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
-        NativeActionSetting: Option ADMISSION,EOD,PRINTLASTRECEIPT,SCANDITITEMINFO,SCANDITFINDITEM,COUNTSALESFLOOR,COUNTSTOCKROOM,ASSIGNTAG,LOCATETAG,REFILL,APPROVE;
+        NativeActionSetting: Option ADMISSION,EOD,PRINTLASTRECEIPT,SCANDITITEMINFO,SCANDITFINDITEM,COUNTSALESFLOOR,COUNTSTOCKROOM,ASSIGNTAG,LOCATETAG,REFILL,APPROVE,SCANDITSCAN;
         MPOSAppSetup: Record "MPOS App Setup";
         POSSale: Codeunit "POS Sale";
         SalePOS: Record "Sale POS";
@@ -118,7 +124,10 @@ codeunit 6150825 "POS Action - MPOS Native"
               MPOSAppSetup.TestField("Payment Gateway");
               MPOSPaymentGateway.Get(MPOSAppSetup."Payment Gateway");
               MPOSPaymentGateway.TestField("Merchant Id");
-              JSONString := BuildJSONParams(Format(NativeActionSetting),MPOSPaymentGateway."Merchant Id", '', '', '', Err_EODFailed);
+              //-NPR5.51 [364011]
+              //JSONString := BuildJSONParams(FORMAT(NativeActionSetting),MPOSPaymentGateway."Merchant Id", '', '', '', Err_EODFailed);
+              JSONString := BuildJSONParams(Format(NativeActionSetting),MPOSPaymentGateway."Merchant Id", SalePOS."Register No.", '', '', Err_EODFailed);
+              //+NPR5.51 [364011]
             end;
           NativeActionSetting::PRINTLASTRECEIPT :
             begin
@@ -138,6 +147,12 @@ codeunit 6150825 "POS Action - MPOS Native"
               if Barcode <> '' then
                 JSONString := BuildJSONParams(Format(NativeActionSetting),'0', '10', Barcode, '10', Err_ScanditFailed)
             end;
+          //-NPR5.51 [357532]
+          NativeActionSetting::SCANDITSCAN :
+          begin
+            JSONString := BuildJSONParams(Format(NativeActionSetting),'0', '0', '0', '0', Err_ScanditFailed)
+          end;
+          //+NPR5.51 [357532]
           //+NPR5.39
           //-NPR5.50 [332844]
           NativeActionSetting::COUNTSTOCKROOM :
@@ -312,7 +327,11 @@ codeunit 6150825 "POS Action - MPOS Native"
         Factory: DotNet npNetControlFactory;
     begin
         Model := Model.Model();
-        Model.AddScript('function CallNativeFunction(jsonObject) {console.log(jsonObject); window.webkit.messageHandlers.invokeAction.postMessage(jsonObject);}');
+        //-NPR5.51 [351364]
+        //Model.AddScript('function CallNativeFunction(jsonObject) {console.log(jsonObject); window.webkit.messageHandlers.invokeAction.postMessage(jsonObject);}');
+        //Model.AddScript('window.androidObject = function AndroidClass(){};');
+        Model.AddScript(JSfunction);
+        //+NPR5.51 [351364]
         Model.AddScript('CallNativeFunction('+JsonObject+');');
     end;
 

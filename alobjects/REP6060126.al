@@ -3,6 +3,7 @@ report 6060126 "TM Admission List"
     // TM1.13/BRI/20160419 CASE 239055 Initial Version of Attendance Report
     // #334163/JDH /20181109 CASE 334163 Added Caption to object
     // TM1.39/NPKNAV/20190125  CASE 343941 Transport TM1.39 - 25 January 2019
+    // TM1.42/TSA /20190610 CASE 357991 Removed PAGENO field for AL convert
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/TM Admission List.rdlc';
 
@@ -15,9 +16,6 @@ report 6060126 "TM Admission List"
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Admission Code";
             column(COMPANYNAME;CompanyName)
-            {
-            }
-            column(CurrReport_PAGENO;CurrReport.PageNo)
             {
             }
             column(AdmissionCode;"TM Admission"."Admission Code")

@@ -4,6 +4,7 @@ table 6060146 "MM NPR Remote Endpoint Setup"
     // #334163/JDH /20181109 CASE 334163 Added caption to object
     // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
     // MM1.37/TSA /20190228 CASE 343053 Added Loylaty Services
+    // MM1.40/TSA /20190604 CASE 357360 Added the option "Basic Authentication" to credentials type
 
     Caption = 'MM NPR Remote Endpoint Setup';
 
@@ -31,8 +32,8 @@ table 6060146 "MM NPR Remote Endpoint Setup"
         field(20;"Credentials Type";Option)
         {
             Caption = 'Credentials Type';
-            OptionCaption = 'SYSTEM,NAMED';
-            OptionMembers = SYSTEM,NAMED;
+            OptionCaption = 'System,Named,Basic Authentication';
+            OptionMembers = SYSTEM,NAMED,BASIC;
         }
         field(21;"User Domain";Text[30])
         {

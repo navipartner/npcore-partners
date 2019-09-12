@@ -12,6 +12,7 @@ page 6014516 "I-Comm"
     //                                 96, 97, 98, 99, 100, 101, 102, 110, 121, 122, 123 and groups Local Directories, Dataports, GUID, PDF Upload, Invoice
     // NPR5.27/LS  /20161027 CASE 251264 Added new groups "Config. Template" and "PhoneNoLookup" in tab "Name and Numbers"
     // NPR5.47/TS  /20181022 CASE 307097 Removed field  4,7,11,24,74,75,83,85. Fields names are referenced in case
+    // NPR5.51/THRO/20190710 CASE 360944 Added SMS Endpoint
 
     Caption = 'I-Comm Setup';
     SourceTable = "I-Comm";
@@ -63,6 +64,14 @@ page 6014516 "I-Comm"
                 }
                 field("SMS Type";"SMS Type")
                 {
+                }
+                group(Control6014407)
+                {
+                    ShowCaption = false;
+                    Visible = ("SMS Type" = "SMS Type"::Endpoint);
+                    field("SMS Endpoint";"SMS Endpoint")
+                    {
+                    }
                 }
                 field("SMS Provider";"SMS Provider")
                 {

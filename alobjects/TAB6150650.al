@@ -1,6 +1,8 @@
 table 6150650 "POS Audit Profile"
 {
     // NPR5.48/MMV /20181025 CASE 318028 Created object
+    // NPR5.51/MMV /20190617 CASE 356076 Added field 80
+    // NPR5.51/ALPO/20190802 CASE 362747 Added field 90 "Allow Printing Receipt Copy"
 
     Caption = 'POS Audit Profile';
     LookupPageID = "POS Audit Profiles";
@@ -80,6 +82,17 @@ table 6150650 "POS Audit Profile"
         field(70;"Allow Zero Amount Sales";Boolean)
         {
             Caption = 'Allow Zero Amount Sales';
+        }
+        field(80;"Print Receipt On Sale Cancel";Boolean)
+        {
+            Caption = 'Print Receipt On Sale Cancel';
+        }
+        field(90;"Allow Printing Receipt Copy";Option)
+        {
+            Caption = 'Allow Printing Receipt Copy';
+            Description = 'NPR5.51';
+            OptionCaption = 'Always,Only Once,Never';
+            OptionMembers = Always,"Only Once",Never;
         }
     }
 

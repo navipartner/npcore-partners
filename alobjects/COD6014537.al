@@ -50,6 +50,7 @@ codeunit 6014537 "RP Epson Label Device Library"
     //   the font used for printing. Valid font face pattern are [A|B][1..8][1..8]
     // 
     // NPR5.32/MMV /20170410 CASE 241995 Retail Print 2.0
+    // NPR5.51/MMV /20190801 CASE 360975 Buffer all template print data into one job.
 
     EventSubscriberInstance = Manual;
 
@@ -151,7 +152,9 @@ codeunit 6014537 "RP Epson Label Device Library"
 
     procedure InitJob()
     begin
-        PrintBuffer := '';
+        //-NPR5.51 [360975]
+        //PrintBuffer := '';
+        //+NPR5.51 [360975]
         PrinterInitialized := false;
     end;
 

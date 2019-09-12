@@ -1,6 +1,7 @@
 page 6059893 "Npm Page Subform"
 {
     // NPR5.33/MHA /20170126  CASE 264348 Object created - Module: Np Page Manager
+    // NPR5.51/MHA /20190816  CASE 365332 Np Page Manager is deprecated [VLOBJDEL] Object marked for deletion
 
     Caption = 'Npm Page Subform';
     DelayedInsert = true;
@@ -10,21 +11,6 @@ page 6059893 "Npm Page Subform"
 
     layout
     {
-        area(content)
-        {
-            repeater(Group)
-            {
-                field("View Code";"View Code")
-                {
-                }
-                field("Show Mandatory Fields";"Show Mandatory Fields")
-                {
-                }
-                field("Show Field Captions";"Show Field Captions")
-                {
-                }
-            }
-        }
     }
 
     actions

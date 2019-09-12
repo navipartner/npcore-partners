@@ -17,10 +17,11 @@ page 6060136 "MM Member Card"
     // MM1.22/TSA /20170905 CASE 289434 Print of the selected card not the last card
     // MM1.25/TSA /20180115 CASE 302353 Changed sort order to descending on member card subpage
     // MM1.28/TSA /20180420 CASE 310132 Providing default date for new card
-    // #312939/TSA /20180515 CASE 312939 "Generate New Card" action gets the selected membership from the subpage
+    // MM1.29/TSA /20180515 CASE 312939 "Generate New Card" action gets the selected membership from the subpage
     // MM1.29/NPKNAV/20180524  CASE 313795 Transport MM1.29 - 24 May 2018
-    // #334163/JDH /20181109 CASE 334163 Added Caption to Actions
+    // MM1.34/JDH /20181109 CASE 334163 Added Caption to Actions
     // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
+    // MM1.40/TSA /20190822 CASE 360242 Adding NPR Attributes
 
     Caption = 'Member Card';
     DataCaptionExpression = "External Member No.";
@@ -108,6 +109,210 @@ page 6060136 "MM Member Card"
                 SubPageLink = "Member Entry No."=FIELD("Entry No.");
                 SubPageView = SORTING("Entry No.")
                               ORDER(Descending);
+            }
+            group(Attributes)
+            {
+                Caption = 'Attributes';
+                field(NPRAttrTextArray_01;NPRAttrTextArray[1])
+                {
+                    CaptionClass = GetAttributeCaptionClass(1);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible01;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        //-MM1.40 [360242]
+                        OnAttributeLookup (1);
+                        //+MM1.40 [360242]
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (1);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_02;NPRAttrTextArray[2])
+                {
+                    CaptionClass = GetAttributeCaptionClass(2);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible02;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (2);
+                        //+MM1.40 [360242]
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (2);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_03;NPRAttrTextArray[3])
+                {
+                    CaptionClass = GetAttributeCaptionClass(3);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible03;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        //-MM1.40 [360242]
+                        OnAttributeLookup (3);
+                        //+MM1.40 [360242]
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (3);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_04;NPRAttrTextArray[4])
+                {
+                    CaptionClass = GetAttributeCaptionClass(4);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible04;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        //-MM1.40 [360242]
+                        OnAttributeLookup (4);
+                        //+MM1.40 [360242]
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (4);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_05;NPRAttrTextArray[5])
+                {
+                    CaptionClass = GetAttributeCaptionClass(5);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible05;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        //-MM1.40 [360242]
+                        OnAttributeLookup (5);
+                        //+MM1.40 [360242]
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (5);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_06;NPRAttrTextArray[6])
+                {
+                    CaptionClass = GetAttributeCaptionClass(6);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible06;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        //-MM1.40 [360242]
+                        OnAttributeLookup (6);
+                        //+MM1.40 [360242]
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (6);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_07;NPRAttrTextArray[7])
+                {
+                    CaptionClass = GetAttributeCaptionClass(7);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible07;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        //-MM1.40 [360242]
+                        OnAttributeLookup (7);
+                        //+MM1.40 [360242]
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (7);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_08;NPRAttrTextArray[8])
+                {
+                    CaptionClass = GetAttributeCaptionClass(8);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible08;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        //-MM1.40 [360242]
+                        OnAttributeLookup (8);
+                        //+MM1.40 [360242]
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (8);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_09;NPRAttrTextArray[9])
+                {
+                    CaptionClass = GetAttributeCaptionClass(9);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible09;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        //-MM1.40 [360242]
+                        OnAttributeLookup (9);
+                        //+MM1.40 [360242]
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (9);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_10;NPRAttrTextArray[10])
+                {
+                    CaptionClass = GetAttributeCaptionClass(10);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible10;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        //-MM1.40 [360242]
+                        OnAttributeLookup (10);
+                        //+MM1.40 [360242]
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (10);
+                        //+MM1.40 [360242]
+                    end;
+                }
             }
         }
         area(factboxes)
@@ -301,10 +506,101 @@ page 6060136 "MM Member Card"
         }
     }
 
+    trigger OnAfterGetRecord()
+    begin
+
+        //+MM1.40 [360242]
+        GetMasterDataAttributeValue ();
+        //-MM1.40 [360242]
+    end;
+
+    trigger OnOpenPage()
+    begin
+
+        //-MM1.40 [360242]
+        NPRAttrManagement.GetAttributeVisibility (GetAttributeTableId (), NPRAttrVisibleArray);
+        // Because NAV is stupid!
+        NPRAttrVisible01 := NPRAttrVisibleArray[1];
+        NPRAttrVisible02 := NPRAttrVisibleArray[2];
+        NPRAttrVisible03 := NPRAttrVisibleArray[3];
+        NPRAttrVisible04 := NPRAttrVisibleArray[4];
+        NPRAttrVisible05 := NPRAttrVisibleArray[5];
+        NPRAttrVisible06 := NPRAttrVisibleArray[6];
+        NPRAttrVisible07 := NPRAttrVisibleArray[7];
+        NPRAttrVisible08 := NPRAttrVisibleArray[8];
+        NPRAttrVisible09 := NPRAttrVisibleArray[9];
+        NPRAttrVisible10 := NPRAttrVisibleArray[10];
+        NPRAttrEditable := CurrPage.Editable ();
+        //+MM1.40 [360242]
+    end;
+
     var
         MemberRetailIntegration: Codeunit "MM Member Retail Integration";
         CONFIRM_PRINT: Label 'Do you want to print a member account card for %1?';
         CONFIRM_PRINT_FMT: Label '[%1] - %2';
         ACTIVATE_MEMBERSHIP: Label 'The membership has not been activated yet. Do you want to activate it now?';
+        NPRAttrTextArray: array [40] of Text[250];
+        NPRAttrManagement: Codeunit "NPR Attribute Management";
+        NPRAttrEditable: Boolean;
+        NPRAttrVisibleArray: array [40] of Boolean;
+        NPRAttrVisible01: Boolean;
+        NPRAttrVisible02: Boolean;
+        NPRAttrVisible03: Boolean;
+        NPRAttrVisible04: Boolean;
+        NPRAttrVisible05: Boolean;
+        NPRAttrVisible06: Boolean;
+        NPRAttrVisible07: Boolean;
+        NPRAttrVisible08: Boolean;
+        NPRAttrVisible09: Boolean;
+        NPRAttrVisible10: Boolean;
+
+    local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
+    begin
+
+        //-MM1.40 [360242]
+        NPRAttrManagement.SetEntryAttributeValue (GetAttributeTableId (), AttributeNumber, "Entry No.", NPRAttrTextArray[AttributeNumber]);
+        //+MM1.40 [360242]
+    end;
+
+    local procedure GetMasterDataAttributeValue()
+    begin
+
+        //-MM1.40 [360242]
+        NPRAttrManagement.GetEntryAttributeValue (NPRAttrTextArray, GetAttributeTableId, "Entry No.");
+        NPRAttrEditable := CurrPage.Editable ();
+        //+MM1.40 [360242]
+    end;
+
+    procedure GetAttributeVisibility(AttributeNumber: Integer): Boolean
+    begin
+
+        //-MM1.40 [360242]
+        exit (NPRAttrVisibleArray [AttributeNumber]);
+        //+MM1.40 [360242]
+    end;
+
+    local procedure GetAttributeTableId(): Integer
+    begin
+
+        //-MM1.40 [360242]
+        exit (DATABASE::"MM Member");
+        //+MM1.40 [360242]
+    end;
+
+    local procedure GetAttributeCaptionClass(AttributeNumber: Integer): Text[50]
+    begin
+
+        //-MM1.40 [360242]
+        exit (StrSubstNo ('6014555,%1,%2,2', GetAttributeTableId(), AttributeNumber));
+        //+MM1.40 [360242]
+    end;
+
+    local procedure OnAttributeLookup(AttributeNumber: Integer)
+    begin
+
+        //-MM1.40 [360242]
+        NPRAttrManagement.OnPageLookUp (GetAttributeTableId, AttributeNumber, Format (AttributeNumber,0,'<integer>'), NPRAttrTextArray[AttributeNumber] );
+        //+MM1.40 [360242]
+    end;
 }
 

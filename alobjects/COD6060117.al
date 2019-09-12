@@ -22,6 +22,7 @@ codeunit 6060117 "TM Ticket Retail Management"
     // TM1.30/TSA /20180420 CASE 310947 When there is no sale line available, item is selected from ticket request instead
     // TM1.39/TSA /20181109 CASE 335653 Signature change on POS_CreateRevokeRequest
     // TM1.41/TSA /20190509 CASE 353981 Dynamic ticket schedule price
+    // TM1.42/TSA /20190812 CASE 364739 Incorrect filter when receipt number is empty
 
 
     var
@@ -209,7 +210,14 @@ codeunit 6060117 "TM Ticket Retail Management"
         if (TicketReservationRequest.FindSet()) then begin
             repeat
                 TicketReservationRequest2.Reset();
-                TicketReservationRequest2.SetFilter("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
+            //-TM1.42 [364739]
+            // TicketReservationRequest2.SETFILTER ("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
+            if (TicketReservationRequest."Receipt No." <> '') then begin
+              TicketReservationRequest2.SetFilter ("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
+            end else begin
+              TicketReservationRequest2.SetFilter ("Session Token ID", '=%1', Token);
+            end;
+            //+TM1.42 [364739]
                 TicketReservationRequest2.SetFilter("Admission Code", '=%1', TicketReservationRequest."Admission Code");
                 TicketReservationRequest2.SetFilter("External Adm. Sch. Entry No.", '>%1', 0);
                 if (TicketReservationRequest2.FindLast()) then begin
@@ -235,7 +243,14 @@ codeunit 6060117 "TM Ticket Retail Management"
         if (TicketReservationRequest.FindSet()) then begin
             repeat
                 TicketReservationRequest2.Reset();
-                TicketReservationRequest2.SetFilter("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
+            //-TM1.42 [364739]
+            // TicketReservationRequest2.SETFILTER ("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
+            if (TicketReservationRequest."Receipt No." <> '') then begin
+              TicketReservationRequest2.SetFilter ("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
+            end else begin
+              TicketReservationRequest2.SetFilter ("Session Token ID", '=%1', Token);
+            end;
+            //+TM1.42 [364739]
                 TicketReservationRequest2.SetFilter("Admission Code", '=%1', TicketReservationRequest."Admission Code");
                 TicketReservationRequest2.SetFilter("Notification Address", '<>%1', '');
                 if (TicketReservationRequest2.FindLast()) then begin

@@ -24,6 +24,7 @@ table 6014404 "Report Selection Retail"
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj fields 3,5,9
     // NPR5.48/JDH /20181106 CASE 334560 Changed name for Data port ID / Name to XML port ID / Name. Fixed length for all objects reference
     // NPR5.50/TSA /20190423 CASE 352483 Added Report Type "Begin Workshift (POS Entry)"
+    // NPR5.51/ZESO/20190711 CASE 361680 Changed Object Type to XMLPort in Object Type Filter for Field 5.
 
     Caption = 'Usage - Retail';
 

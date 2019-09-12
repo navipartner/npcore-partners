@@ -1,6 +1,6 @@
 page 6151219 "NpCs Collect Store Inv. Lines"
 {
-    // #364557/MHA /20190821  CASE 364557 Object created - Collect in Store
+    // NPR5.51/MHA /20190821  CASE 364557 Object created - Collect in Store
 
     Caption = 'Lines';
     Editable = false;

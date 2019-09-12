@@ -1,39 +1,21 @@
 table 6060010 "GIM - Data Format"
 {
+    // NPR5.51/MHA /20190819  CASE 365377 Generic Import Module is deprecated [VLOBJDEL] Object marked for deletion
+
     Caption = 'GIM - Data Format';
     LookupPageID = "GIM - Data Format List";
 
     fields
     {
-        field(1;"Code";Code[20])
+        field(1;"Entry No.";Integer)
         {
-            Caption = 'Code';
-        }
-        field(5;Description;Text[50])
-        {
-            Caption = 'Description';
-        }
-        field(10;"CSV Field Delimiter";Text[10])
-        {
-            Caption = 'CSV Field Delimiter';
-        }
-        field(20;"CSV Field Separator";Text[10])
-        {
-            Caption = 'CSV Field Separator';
-        }
-        field(30;"CSV First Data Row";Integer)
-        {
-            Caption = 'CSV First Data Row';
-        }
-        field(40;"Excel First Data Row";Integer)
-        {
-            Caption = 'Excel First Data Row';
+            Caption = 'Entry No.';
         }
     }
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1;"Entry No.")
         {
         }
     }
@@ -41,19 +23,5 @@ table 6060010 "GIM - Data Format"
     fieldgroups
     {
     }
-
-    procedure GetCSVSetup(DocNo: Code[20];var FieldDelimiter: Text[30];var FieldSeparator: Text[30];var FirstDataRow: Integer)
-    begin
-        Get(DocNo);
-        if "CSV Field Delimiter" in ['','<None>'] then
-          FieldDelimiter := ''
-        else
-          FieldDelimiter := "CSV Field Delimiter";
-        FieldSeparator := "CSV Field Separator";
-        if "CSV First Data Row" = 0 then
-          FirstDataRow := 1
-        else
-          FirstDataRow := "CSV First Data Row";
-    end;
 }
 

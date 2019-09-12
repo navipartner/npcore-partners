@@ -21,6 +21,7 @@ codeunit 6150701 "POS JavaScript Interface"
     // NPR5.48/TJ  /20180806  CASE 323835 Using custom method function for key press
     // NPR5.48/MHA /20190213  CASE 341077 Added function OnActionV2() to support POS Actions from Nav .app
     // NPR5.50/VB  /20181205  CASE 338666 Supporting Workflows 2.0 (changed signature on ApplyDataState function)
+    // NPR5.51/MMV /20190731  CASE 363458 Added log of callstack when errors happen.
 
 
     var
@@ -109,8 +110,12 @@ codeunit 6150701 "POS JavaScript Interface"
             RefreshData(POSSession, FrontEnd);
             StopwatchStop('Data');
             Signal := Signal.SignalSuccess(WorkflowId, ActionId);
-        end else
+        end else begin
             Signal := Signal.SignalFailreAndThrowError(WorkflowId, ActionId, GetLastErrorText);
+        //-NPR5.51 [363458]
+          FrontEnd.Trace(Signal, 'ErrorCallStack', GetLastErrorCallstack);
+        //+NPR5.51 [363458]
+        end;
 
         StopwatchStop('All');
         //-NPR5.45 [315838]

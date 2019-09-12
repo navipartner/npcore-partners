@@ -71,7 +71,7 @@ report 6014459 "Balancing Report -A4 - POS"
             column(NetTurnoverLCY_;"POS Workshift Checkpoint"."Net Turnover (LCY)")
             {
             }
-            column(ReturnSalesLCY_;"POS Workshift Checkpoint"."Direct Return Sales (LCY)")
+            column(ReturnSalesLCY_;"POS Workshift Checkpoint"."Direct Item Returns (LCY)")
             {
             }
             column(TotalDiscountLCY_;"POS Workshift Checkpoint"."Total Discount (LCY)")
@@ -110,7 +110,7 @@ report 6014459 "Balancing Report -A4 - POS"
             column(ReceiptsCount_;"POS Workshift Checkpoint"."Receipts Count")
             {
             }
-            column(ReturnSalesCount_;"POS Workshift Checkpoint"."Direct Return Sales Line Count")
+            column(ReturnSalesCount_;"POS Workshift Checkpoint"."Direct Item Returns Line Count")
             {
             }
             column(ReceiptCopiesCount_;"POS Workshift Checkpoint"."Receipt Copies Count")
@@ -125,7 +125,7 @@ report 6014459 "Balancing Report -A4 - POS"
             column(DebitsalesCount_;"POS Workshift Checkpoint"."Credit Item Quantity Sum")
             {
             }
-            column(SalesLCY_;"POS Workshift Checkpoint"."Direct Sales (LCY)")
+            column(SalesLCY_;"POS Workshift Checkpoint"."Direct Item Sales (LCY)")
             {
             }
             column(SalesStaffLCY_;"POS Workshift Checkpoint"."Direct Sales - Staff (LCY)")
@@ -212,7 +212,7 @@ report 6014459 "Balancing Report -A4 - POS"
             column(NetTurnoverLCYlbl_;"POS Workshift Checkpoint".FieldCaption("Net Turnover (LCY)"))
             {
             }
-            column(ReturnSalesLCYlbl_;"POS Workshift Checkpoint".FieldCaption("Direct Return Sales (LCY)"))
+            column(ReturnSalesLCYlbl_;"POS Workshift Checkpoint".FieldCaption("Direct Item Returns (LCY)"))
             {
             }
             column(TotalDiscountLClbl_;"POS Workshift Checkpoint".FieldCaption("Total Discount (LCY)"))
@@ -251,7 +251,7 @@ report 6014459 "Balancing Report -A4 - POS"
             column(ReceiptsCountlbl_;"POS Workshift Checkpoint".FieldCaption("Receipts Count"))
             {
             }
-            column(ReturnSalesCountlbl_;"POS Workshift Checkpoint".FieldCaption("Direct Return Sales Line Count"))
+            column(ReturnSalesCountlbl_;"POS Workshift Checkpoint".FieldCaption("Direct Item Returns Line Count"))
             {
             }
             column(ReceiptCopiesCountlbl_;"POS Workshift Checkpoint".FieldCaption("Receipt Copies Count"))
@@ -266,7 +266,7 @@ report 6014459 "Balancing Report -A4 - POS"
             column(DebitSalesCountlbl_;"POS Workshift Checkpoint".FieldCaption("Credit Item Quantity Sum"))
             {
             }
-            column(SalesLCYlbl_;"POS Workshift Checkpoint".FieldCaption("Direct Sales (LCY)"))
+            column(SalesLCYlbl_;"POS Workshift Checkpoint".FieldCaption("Direct Item Sales (LCY)"))
             {
             }
             column(SalesStaffLCYlbl_;"POS Workshift Checkpoint".FieldCaption("Direct Sales - Staff (LCY)"))

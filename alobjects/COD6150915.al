@@ -135,13 +135,13 @@ codeunit 6150915 "HC POS Entry Management"
         Evaluate(TempPOSEntry."Document Date",NpXmlDomMgt.GetXmlText(XmlElement,'documentdate',0,false),9);
         Evaluate(TempPOSEntry."Currency Code",NpXmlDomMgt.GetXmlText(XmlElement,'currencycode',0,false),9);
         Evaluate(TempPOSEntry."Currency Factor",NpXmlDomMgt.GetXmlText(XmlElement,'currencyfactor',0,false),9);
-        Evaluate(TempPOSEntry."Sales Amount",NpXmlDomMgt.GetXmlText(XmlElement,'salesamount',0,false),9);
+        Evaluate(TempPOSEntry."Item Sales (LCY)",NpXmlDomMgt.GetXmlText(XmlElement,'salesamount',0,false),9);
         Evaluate(TempPOSEntry."Discount Amount",NpXmlDomMgt.GetXmlText(XmlElement,'discountamount',0,false),9);
         Evaluate(TempPOSEntry."Sales Quantity",NpXmlDomMgt.GetXmlText(XmlElement,'salesquantity',0,false),9);
         Evaluate(TempPOSEntry."Return Sales Quantity",NpXmlDomMgt.GetXmlText(XmlElement,'returnsalesquantity',0,false),9);
-        Evaluate(TempPOSEntry."Total Amount",NpXmlDomMgt.GetXmlText(XmlElement,'totalamount',0,false),9);
-        Evaluate(TempPOSEntry."Total Tax Amount",NpXmlDomMgt.GetXmlText(XmlElement,'totaltaxamount',0,false),9);
-        Evaluate(TempPOSEntry."Total Amount Incl. Tax",NpXmlDomMgt.GetXmlText(XmlElement,'totalamountincltax',0,false),9);
+        Evaluate(TempPOSEntry."Amount Excl. Tax",NpXmlDomMgt.GetXmlText(XmlElement,'totalamount',0,false),9);
+        Evaluate(TempPOSEntry."Tax Amount",NpXmlDomMgt.GetXmlText(XmlElement,'totaltaxamount',0,false),9);
+        Evaluate(TempPOSEntry."Amount Incl. Tax",NpXmlDomMgt.GetXmlText(XmlElement,'totalamountincltax',0,false),9);
         Evaluate(TempPOSEntry."Rounding Amount (LCY)",NpXmlDomMgt.GetXmlText(XmlElement,'roundingamountLCY',0,false),9);
         Evaluate(TempPOSEntry."Tax Area Code",NpXmlDomMgt.GetXmlText(XmlElement,'taxareacode',0,false),9);
         Evaluate(TempPOSEntry."POS Sale ID",NpXmlDomMgt.GetXmlText(XmlElement,'possaleid',0,false),9);

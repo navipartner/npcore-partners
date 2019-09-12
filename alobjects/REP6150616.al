@@ -34,13 +34,13 @@ report 6150616 "Sales Ticket A4 - POS Wrd"
             column(PE_DiscountAmount; "Discount Amount")
             {
             }
-            column(PE_TotalAmount; "Total Amount")
+            column(PE_TotalAmount;"Amount Excl. Tax")
             {
             }
-            column(PE_TotalTaxAmount; "Total Tax Amount")
+            column(PE_TotalTaxAmount;"Tax Amount")
             {
             }
-            column(PE_TotalAmountInclTax; "Total Amount Incl. Tax")
+            column(PE_TotalAmountInclTax;"Amount Incl. Tax")
             {
             }
             column(TotalAmountCaption; StrSubstNo(TotalAmountCaption, GeneralLedgerSetup."LCY Code"))

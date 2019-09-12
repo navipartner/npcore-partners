@@ -2,6 +2,8 @@ codeunit 6150809 "POS Action - PayIn Payout"
 {
     // NPR5.38/MHA /20180119  CASE 295072 Extended Workflow with Reason Code
     // NPR5.48/TSA /20190207 CASE 345292 Added UpdateAmounts() to get correct VAT calculation
+    // NPR5.51/TSA /20190626 CASE 347057 Added a hard error if account calculates tax
+    // NPR5.51/TSA /20190626 CASE 347057 Removed hard error
 
 
     trigger OnRun()
@@ -13,6 +15,7 @@ codeunit 6150809 "POS Action - PayIn Payout"
         PayOptionType: Option PAYIN,PAYOUT;
         AmountPrompt: Label 'Enter Amount.';
         DescriptionPrompt: Label 'Enter Description.';
+        VATSetupError: Label 'Pay-in and Pay-out are cash transactions that must not use accounts that post VAT. Check setup for account %1.';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")

@@ -22,6 +22,7 @@ table 6014426 "Retail Document Lines"
     // NPR5.38/JDH /20180116 CASE 302570 Translated option string on field 22 (Sales Type), as well as changed ENU caption to the same as in the POS Sales line
     // NPR5.45/MHA /20180803 CASE 323705 Changed FindItemSalesPrice() to use Retail Price function
     // NPR5.48/TS  /20181128 CASE 337806 UnitOfMeasure changed from  text to code
+    // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup() and removed redundant VAT calculation
 
     Caption = 'Retail Document Line';
     LookupPageID = "Retail Document Lines";
@@ -73,26 +74,16 @@ table 6014426 "Retail Document Lines"
                       Item.Get("No.");
                       if xRec."No." <> "No." then
                         "Variant Code" := '';
-                      VATPostingSetupGlobal.SetRange(VATPostingSetupGlobal."VAT Bus. Posting Group",Item."VAT Bus. Posting Gr. (Price)");
-                      VATPostingSetupGlobal.SetRange(VATPostingSetupGlobal."VAT Prod. Posting Group",Item."VAT Prod. Posting Group");
-                      //-NPR5.45 [323705]
-                      //VATPostingSetupGlobal.FIND('-');
-                      VATPostingSetupGlobal.FindFirst;
-                      //+NPR5.45 [323705]
-                      "Vat %" := VATPostingSetupGlobal."VAT %";
+                      //-NPR5.51 [358985]
+                      "VAT Bus. Posting Group" := Item."VAT Bus. Posting Gr. (Price)";
+                      Validate("VAT Prod. Posting Group",Item."VAT Prod. Posting Group");
+                      //+NPR5.51 [358985]
                 
                       //-NPR5.45 [323705]
-                      //RetailDocumentHeaderGlobal.SETRANGE(RetailDocumentHeaderGlobal."Document Type","Document Type");
-                      //RetailDocumentHeaderGlobal.SETRANGE(RetailDocumentHeaderGlobal."No.","Document No.");
-                      //RetailDocumentHeaderGlobal.FIND('-');
                       RetailDocumentHeaderGlobal.Get("Document Type","Document No.");
                       //+NPR5.45 [323705]
                 
                       Item.Get("No.");
-                      //-NPR5.23 [240916]
-                //      "NP Config".GET;
-                //      IF (Varen."Size Group" <> '') AND "NP Config"."Pop-up (Color-Size)" THEN ColorSizePopUp( Rec );
-                      //+NPR5.23 [240916]
                       if (Item."Price Includes VAT" = RetailDocumentHeaderGlobal."Prices Including VAT") then begin
                         /* Item VAT = Header VAT */
                         "Unit price" := Item."Unit Price";
@@ -487,9 +478,15 @@ table 6014426 "Retail Document Lines"
             TableRelation = "VAT Product Posting Group";
 
             trigger OnValidate()
+            var
+                POSTaxCalculation: Codeunit "POS Tax Calculation";
+                Handled: Boolean;
             begin
                 //TestStatusOpen;
                 VATPostingSetup.Get("VAT Bus. Posting Group","VAT Prod. Posting Group");
+                //-NPR5.51 [358985]
+                POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
+                //+NPR5.51 [358985]
                 "VAT Difference" := 0;
                 "Vat %" := VATPostingSetup."VAT %";
                 "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
@@ -510,7 +507,6 @@ table 6014426 "Retail Document Lines"
                     Round(
                       "Unit price" * (100 + "Vat %") / (100 + xRec."Vat %"),
                       Currency."Unit-Amount Rounding Precision");
-                //UpdateAmounts;
             end;
         }
         field(91;"Currency Code";Code[10])
@@ -638,7 +634,6 @@ table 6014426 "Retail Document Lines"
         Text1060002: Label 'You cannot receive more than %1 units.';
         Text1060003: Label 'You cannot ship more than %1 units.';
         RetailDocumentHeaderGlobal: Record "Retail Document Header";
-        VATPostingSetupGlobal: Record "VAT Posting Setup";
         Currency: Record Currency;
         StdTxt: Record "Standard Text";
         GLAcc: Record "G/L Account";
@@ -653,9 +648,6 @@ table 6014426 "Retail Document Lines"
         
         /* Find Rental Header */
         //-NPR5.45 [323705]
-        //RetailDocumentHeaderGlobal.SETRANGE(RetailDocumentHeaderGlobal."Document Type", "Document Type");
-        //RetailDocumentHeaderGlobal.SETRANGE(RetailDocumentHeaderGlobal."No.", "Document No.");
-        //RetailDocumentHeaderGlobal.FIND('-');
         RetailDocumentHeaderGlobal.Get("Document Type","Document No.");
         //+NPR5.45 [323705]
         
@@ -696,17 +688,14 @@ table 6014426 "Retail Document Lines"
           //+NPR5.32
         else if ("Price including VAT" and not SaleLinePOS."Price Includes VAT") then
           //-NPR5.32
-          //VALIDATE( "Unit price", EkspLinie."Unit Price" * (1 + "Vat %"/100) )
           "Unit price" := SaleLinePOS."Unit Price" * (1 + "Vat %"/100)
           //+NPR5.32
         else
           //-NPR5.32
-          //VALIDATE( "Unit price", EkspLinie."Unit Price" / (1 + "Vat %"/100));
           "Unit price" := SaleLinePOS."Unit Price" / (1 + "Vat %"/100);
           //+NPR5.32
         
         //-NPR5.32
-        //VALIDATE( "Line discount %", EkspLinie."Discount %" );
         "Line discount %" := SaleLinePOS."Discount %";
         "Line discount amount" := SaleLinePOS."Discount Amount";
         Amount := SaleLinePOS.Amount;
@@ -744,18 +733,6 @@ table 6014426 "Retail Document Lines"
 
         RetailDocumentHeader.Get("Document Type","Document No.");
         //-NPR5.45 [323705]
-        // IF RetailDocumentHeader."Customer Type" = RetailDocumentHeader."Customer Type"::Alm THEN
-        //  IF Customer.GET(RetailDocumentHeader."Customer No.") THEN;
-        //
-        // POSSalesPriceCalcMgt.GetItemSalesPrice(TempSalesPrice,"Currency Code","No.","Variant Code","Unit of measure",
-        //                                       RetailDocumentHeader."Prices Including VAT",Customer);
-        //
-        // IF TempSalesPrice."Price Includes VAT" AND NOT "Price including VAT" THEN
-        //  VatMult := 100 / (100 + "Vat %")
-        // ELSE
-        //  VatMult := 1;
-        //
-        // "Unit price" := TempSalesPrice."Unit Price" * VatMult;
         TempSaleLinePOS.Type := TempSaleLinePOS.Type::Item;
         TempSaleLinePOS."No." := "No.";
         TempSaleLinePOS."Variant Code" := "Variant Code";

@@ -17,7 +17,7 @@ codeunit 6014554 "Meta Trigger Management"
     // NPR5.22/MMV/20160425 CASE 232067  New keywords for customer location mgt.
     // NPR5.30/BHR /20170207 CASE 265676 Trim description
     // NPR5.32/BHR /20170525  CASE 270885 Add trigger for Initialization of sales doc
-    // #361926/JAVA/20190715 CASE 361926 Removed 'SHOP_IN_SHOP' action (Keyword[119]).
+    // NPR5.51/JAVA/20190715 CASE 361926 Removed 'SHOP_IN_SHOP' action (Keyword[119]).
 
 
     trigger OnRun()

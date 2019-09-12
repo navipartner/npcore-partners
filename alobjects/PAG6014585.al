@@ -14,6 +14,8 @@ page 6014585 "Advanced Sales Statistics"
     // NPR5.44/ZESO/20182906 CASE 312575 Added filter Item Category Code
     // NPR5.48/TJ  /20181115 CASE 330832 Increased Length of variable ItemCategoryCodeFilter from 10 to 20
     // NPR5.50/ZESO/20190430 CASE 353384 Removed Product Group Code filter
+    // NPR5.51/ZESO/20190620 CASE 358271 Flow Item Group Filter to Item Group Statistics
+    // NPR5.51/YAHA/20190822 CASE 365732 Flow Item Category Filter to Item Statistics
 
     Caption = 'Advanced Sales Statistics';
     DeleteAllowed = false;
@@ -343,7 +345,11 @@ page 6014585 "Advanced Sales Statistics"
                         ItemGroupStatistic.InitForm;
                         ItemGroupStatistic.SetFilter  ( Dim1Filter, Dim2Filter, "Period Start", "Period End", LastYearCalc);
                         //ItemGroupFilter :=
-                        ItemGroupStatistic.GetItemGroupCode;
+
+                        //-NPR5.51 [358271]
+                        //ItemGroupStatistic.GetItemGroupCode;
+                        ItemGroupStatistic.GetItemGroupCode(ItemGroupFilter);
+                        //-NPR5.51 [358271]
                         ItemGroupStatistic.ShowLastYear(ShowLastYear);
                         ItemGroupStatistic.ChangeEmptyFilter;
                         Sleep(10);
@@ -363,7 +369,10 @@ page 6014585 "Advanced Sales Statistics"
                     begin
                         //-NPR4.21
                         ItemStatistics.InitForm;
-                        ItemStatistics.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc );
+                        //-NPR5.51 [365732]
+                        //ItemStatistics.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc);
+                        ItemStatistics.SetFilter( Dim1Filter, Dim2Filter, "Period Start", "Period End", ItemGroupFilter, LastYearCalc,ItemCategoryCodeFilter);
+                        //+NPR5.51 [365732]
                         ItemStatistics.ShowLastYear( ShowLastYear );
                         ItemStatistics.ChangeEmptyFilter();
                         Sleep(10);

@@ -5,6 +5,8 @@ codeunit 6184513 "EFT MobilePay Integration"
     // NPR5.47/MMV /20181030 CASE 334510 Added string length check
     // NPR5.48/MMV /20190107 CASE 341674 Skip validation on import.
     // NPR5.49/MMV /20190312 CASE 345188 Renamed object
+    // NPR5.51/MMV /20190821 CASE 363895 Rewrote unix timestamp to not use .NET
+    // NPR5.51/MMV /20190827 CASE 352248 Made "assigned" fields editable for support edge cases.
 
 
     trigger OnRun()
@@ -193,7 +195,9 @@ codeunit 6184513 "EFT MobilePay Integration"
           'PoS Unit ID' :
             begin
               if xRec.Value <> '' then
-                if EFTTypePOSUnitGenParam.GetBooleanParameterValue(IntegrationType(), Rec."POS Unit No.", 'PoS Unit Assigned', false, false) then
+        //-NPR5.51 [352248]
+                if EFTTypePOSUnitGenParam.GetBooleanParameterValue(IntegrationType(), Rec."POS Unit No.", 'PoS Unit Assigned', false, true) then
+        //+NPR5.51 [352248]
                   Error('Unregister PoS Unit before adding new');
             end;
         end;
@@ -862,31 +866,32 @@ codeunit 6184513 "EFT MobilePay Integration"
         exit(true);
     end;
 
-    local procedure GetUnixTime(FromDateTime: DateTime) UnixTimeStamp: Integer
+    local procedure GetUnixTime(ToDateTime: DateTime) UnixTimeStamp: Integer
     var
-        SystemDateTime: DotNet npNetDateTime;
-        TypeOfDateTime: DotNet npNetType;
-        TypeOfTimeSpan: DotNet npNetType;
-        DotNetArray: DotNet npNetArray;
-        SystemObject: DotNet npNetObject;
-        Convert: DotNet npNetConvert;
-        MethodInfo: DotNet npNetMethodInfo;
-        DateTimeKind: DotNet npNetDateTimeKind;
-        Dur: Duration;
+        Duration: Duration;
+        DurationMs: BigInteger;
+        FromDateTime: DateTime;
     begin
-        TypeOfDateTime := GetDotNetType(SystemDateTime);
+        //-NPR5.51 [363895]
+        // TypeOfDateTime := GETDOTNETTYPE(SystemDateTime);
+        //
+        // DotNetArray := DotNetArray.CreateInstance(GETDOTNETTYPE(GETDOTNETTYPE('')),1);
+        // DotNetArray.SetValue(TypeOfDateTime,0);
+        // MethodInfo := TypeOfDateTime.GetMethod('Subtract', DotNetArray);
+        //
+        // DotNetArray := DotNetArray.CreateInstance(GETDOTNETTYPE(SystemObject),1);
+        // DotNetArray.SetValue(SystemDateTime.DateTime(1970,1,1,0,0,0,DateTimeKind.Utc),0);
+        //
+        // Dur := MethodInfo.Invoke(ToDateTime,DotNetArray);
+        //
+        // TypeOfTimeSpan := GETDOTNETTYPE(Dur);
+        // UnixTimeStamp := Convert.ToInt32(TypeOfTimeSpan.GetProperty('TotalSeconds').GetValue(Dur));
 
-        DotNetArray := DotNetArray.CreateInstance(GetDotNetType(GetDotNetType('')),1);
-        DotNetArray.SetValue(TypeOfDateTime,0);
-        MethodInfo := TypeOfDateTime.GetMethod('Subtract', DotNetArray);
-
-        DotNetArray := DotNetArray.CreateInstance(GetDotNetType(SystemObject),1);
-        DotNetArray.SetValue(SystemDateTime.DateTime(1970,1,1,0,0,0,DateTimeKind.Utc),0);
-
-        Dur := MethodInfo.Invoke(FromDateTime,DotNetArray);
-
-        TypeOfTimeSpan := GetDotNetType(Dur);
-        UnixTimeStamp := Convert.ToInt32(TypeOfTimeSpan.GetProperty('TotalSeconds').GetValue(Dur));
+        Evaluate(FromDateTime, '1970-01-01T00:00:00Z', 9);
+        Duration := ToDateTime - FromDateTime;
+        DurationMs := Duration;
+        exit((DurationMs / 1000) div 1); //Seconds with miliseconds shaved off
+        //+NPR5.51 [363895]
     end;
 
     local procedure GetHmacSha256Hash("Key": Text;Value: Text;Encoding: DotNet npNetEncoding): Text
@@ -961,14 +966,18 @@ codeunit 6184513 "EFT MobilePay Integration"
     var
         EFTTypePOSUnitGenParam: Record "EFT Type POS Unit Gen. Param.";
     begin
-        exit(EFTTypePOSUnitGenParam.GetBooleanParameterValue(IntegrationType(), EFTSetupIn."POS Unit No.", 'PoS Unit Assigned', false, false));
+        //-NPR5.51 [352248]
+        exit(EFTTypePOSUnitGenParam.GetBooleanParameterValue(IntegrationType(), EFTSetupIn."POS Unit No.", 'PoS Unit Assigned', false, true));
+        //+NPR5.51 [352248]
     end;
 
     local procedure GetPoSRegistered(EFTSetupIn: Record "EFT Setup"): Boolean
     var
         EFTTypePOSUnitGenParam: Record "EFT Type POS Unit Gen. Param.";
     begin
-        exit(EFTTypePOSUnitGenParam.GetBooleanParameterValue(IntegrationType(), EFTSetupIn."POS Unit No.", 'PoS Registered', false, false));
+        //-NPR5.51 [352248]
+        exit(EFTTypePOSUnitGenParam.GetBooleanParameterValue(IntegrationType(), EFTSetupIn."POS Unit No.", 'PoS Registered', false, true));
+        //+NPR5.51 [352248]
     end;
 
     local procedure GetAPIKey(EFTSetupIn: Record "EFT Setup"): Text
@@ -989,10 +998,7 @@ codeunit 6184513 "EFT MobilePay Integration"
     var
         EFTTypePaymentGenParam: Record "EFT Type Payment Gen. Param.";
     begin
-        //-NPR5.46.01 [333953]
-        //EXIT(EFTTypePaymentGenParam.GetOptionParameterValue(IntegrationType(), EFTSetupIn."Payment Type POS", 'Environment', 1, 'DEMO,PROD', TRUE));
         exit(EFTTypePaymentGenParam.GetOptionParameterValue(IntegrationType(), EFTSetupIn."Payment Type POS", 'Environment', 0, 'PROD,DEMO', true));
-        //+NPR5.46.01 [333953]
     end;
 }
 

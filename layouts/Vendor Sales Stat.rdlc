@@ -10,6 +10,12 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
+        <Field Name="PurchaseQty_VendorFormat">
+          <DataField>PurchaseQty_VendorFormat</DataField>
+        </Field>
+        <Field Name="SalesQty_VendorFormat">
+          <DataField>SalesQty_VendorFormat</DataField>
+        </Field>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -3148,6 +3154,15 @@
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
+            <Filters>
+              <Filter>
+                <FilterExpression>=IIF(IsNothing(Fields!SalesQty_Vendor.Value),True,False)</FilterExpression>
+                <Operator>Equal</Operator>
+                <FilterValues>
+                  <FilterValue DataType="Boolean">false</FilterValue>
+                </FilterValues>
+              </Filter>
+            </Filters>
             <Height>2.39918cm</Height>
             <Width>27.14221cm</Width>
             <Style>

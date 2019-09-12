@@ -9,6 +9,7 @@ page 6014637 "RP Template Matrix Designer"
     // NPR5.32/MMV /20170424 CASE 241995 Retail Print 2.0
     // NPR5.44/MMV /20180706 CASE 315362 Added field 60
     // NPR5.46/MMV /20180911 CASE 314067 Added field 52
+    // NPR5.51/MMV /20190712 CASE 360972 Added field 70
 
     AutoSplitKey = true;
     Caption = 'Template Matrix Designer';
@@ -162,6 +163,9 @@ page 6014637 "RP Template Matrix Designer"
                 {
                 }
                 field("Processing Function ID";"Processing Function ID")
+                {
+                }
+                field("Processing Function Parameter";"Processing Function Parameter")
                 {
                 }
             }

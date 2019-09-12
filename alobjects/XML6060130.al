@@ -10,6 +10,7 @@ xmlport 6060130 "MM Get Membership Members"
     // MM1.29.03/TSA /20180608 CASE 313795 element cardnumber was accidentily removed and now restored
     // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
     // MM1.37/TSA /20190213 CASE 345855 Cardnumber not returned for perpetual cards
+    // MM1.40/TSA /20190827 CASE 360242 Adding attribute support
 
     Caption = 'Get Membership Members';
     FormatEvaluate = Xml;
@@ -143,6 +144,25 @@ xmlport 6060130 "MM Get Membership Members"
                                 ApprovalText := Format (MembershipRole."GDPR Approval");
                             end;
                         }
+                        textelement(attributes)
+                        {
+                            MaxOccurs = Once;
+                            MinOccurs = Zero;
+                            tableelement(tmpattributevalueset;"NPR Attribute Value Set")
+                            {
+                                LinkFields = "Attribute Set ID"=FIELD("Member Entry No");
+                                LinkTable = tmpMemberInfoResponse;
+                                MinOccurs = Zero;
+                                XmlName = 'attribute';
+                                UseTemporary = true;
+                                fieldattribute(code;TmpAttributeValueSet."Attribute Code")
+                                {
+                                }
+                                fieldattribute(value;TmpAttributeValueSet."Text Value")
+                                {
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -177,6 +197,8 @@ xmlport 6060130 "MM Get Membership Members"
         MembershipRole: Record "MM Membership Role";
         Member: Record "MM Member";
         MemberCard: Record "MM Member Card";
+        NPRAttributeKey: Record "NPR Attribute Key";
+        NPRAttributeValueSet: Record "NPR Attribute Value Set";
     begin
 
         errordescription := '';
@@ -229,7 +251,20 @@ xmlport 6060130 "MM Get Membership Members"
             end;
             //+MM1.29 [313795]
 
-
+            //-MM1.40 [360242]
+            NPRAttributeKey.SetFilter ("Table ID", '=%1', DATABASE::"MM Member");
+            NPRAttributeKey.SetFilter ("MDR Code PK", '=%1', Format (Member."Entry No.", 0, '<integer>'));
+            if (NPRAttributeKey.FindFirst ()) then begin
+              NPRAttributeValueSet.SetFilter ("Attribute Set ID", '=%1', NPRAttributeKey."Attribute Set ID");
+              if (NPRAttributeValueSet.FindSet ()) then begin
+                repeat
+                  TmpAttributeValueSet.TransferFields (NPRAttributeValueSet, true);
+                  TmpAttributeValueSet."Attribute Set ID" := Member."Entry No.";
+                  TmpAttributeValueSet.Insert ();
+                until (NPRAttributeValueSet.Next () = 0);
+              end;
+            end;
+            //+MM1.40 [360242]
 
             if (not Member.Blocked) then
               if (tmpMemberInfoResponse.Insert ()) then ;

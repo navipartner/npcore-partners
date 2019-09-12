@@ -32,9 +32,12 @@ codeunit 6150725 "POS Action - Payment"
     // NPR5.48/MMV /20181211 CASE 318028 Moved zero sales check
     // NPR5.48/MMV /20190201 CASE 341237 Re-added skip after failed EFT
     // NPR5.49/MHA /20190404 CASE 351069 Zero payment should simply be skipped in CapturePayment()
-    // NPR5.50/MMV /20190503 CASE 353807 Fixed #351069. Broke cashback as the zero check is not on user input.
-    // NPR5.50/MMV /20190508 CASE 354510 Fixed #341237. Line No. in filter could be re-used and cause invalid decision to skip.
-    // #361514/THRO/20190718 CASE 361514 EventPublisherElement changed in OnBeforeEditPaymentParameters. Action renamed on Page 6150702
+    // NPR5.50/MMV /20190503 CASE 353807 Fixed 351069. Broke cashback as the zero check is not on user input.
+    // NPR5.50/MMV /20190508 CASE 354510 Fixed 341237. Line No. in filter could be re-used and cause invalid decision to skip.
+    // NPR5.51/MMV /20190624 CASE 359714 Error when using advanced posting without a default payment bin.
+    // NPR5.51/MMV /20190625 CASE 359896 Look for linked successfull EFT record on failure, in skip check function.
+    // NPR5.51/THRO/20190718 CASE 361514 EventPublisherElement changed in OnBeforeEditPaymentParameters. Action renamed on Page 6150702
+    // NPR5.51/MMV /20190820 CASE 364694 Allow ending sale with voided payment even without items.
 
 
     trigger OnRun()
@@ -120,18 +123,37 @@ codeunit 6150725 "POS Action - Payment"
         NPRetailSetup: Record "NP Retail Setup";
         POSUnit: Record "POS Unit";
         POSAuditProfile: Record "POS Audit Profile";
+        POSSale: Codeunit "POS Sale";
+        SalePOS: Record "Sale POS";
     begin
 
         if not Action.IsThisAction(ActionCode()) then
             exit;
 
         POSSession.GetSetup(Setup);
+        //-NPR5.51 [359714]
+        Setup.GetPOSUnit(POSUnit);
+        Register.Get(Setup.Register());
+        NPRetailSetup.Get;
+        //+NPR5.51 [359714]
 
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        //-NPR5.51 [359714]
+        if NPRetailSetup."Advanced Posting Activated" then begin
+          POSUnit.TestField("Default POS Payment Bin");
+        end;
+        //+NPR5.51 [359714]
+
+        //-NPR5.51 [364694]
+        // POSSession.GetSaleLine (POSSaleLine);
+        // POSSaleLine.GetCurrentSaleLine (SaleLinePOS);
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SaleLinePOS.SetFilter("Register No.", '=%1', SalePOS."Register No.");
+        SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
+        //+NPR5.51 [364694]
         SaleLinePOS.SetFilter(Type, '<>%1', SaleLinePOS.Type::Comment);
+
         if (SaleLinePOS.IsEmpty()) then begin
-            Setup.GetPOSUnit(POSUnit);
             if POSAuditProfile.Get(POSUnit."POS Audit Profile") then
                 if not POSAuditProfile."Allow Zero Amount Sales" then
                     Error(NO_SALES_LINES);
@@ -144,7 +166,9 @@ codeunit 6150725 "POS Action - Payment"
         JSON.InitializeJObjectParser(Parameters, FrontEnd);
         PaymentNo := JSON.GetString('paymentNo', true);
 
-        Register.Get(Setup.Register());
+        //-NPR5.51 [359714]
+        //Register.GET (Setup.Register());
+        //+NPR5.51 [359714]
 
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
@@ -593,7 +617,7 @@ codeunit 6150725 "POS Action - Payment"
         Handled: Boolean;
         EFTTransactionRequest: Record "EFT Transaction Request";
         POSSale: Codeunit "POS Sale";
-        EFTPayment: Codeunit "EFT Payment";
+        EFTPayment: Codeunit "EFT Payment Mgt.";
         EFTSetup: Record "EFT Setup";
         SalePOS: Record "Sale POS";
     begin
@@ -675,6 +699,7 @@ codeunit 6150725 "POS Action - Payment"
         EntryNo: Integer;
         Token: Guid;
         TmpVariant: Variant;
+        SecondaryEFTTransactionRequest: Record "EFT Transaction Request";
     begin
         //-NPR5.50 [354510]
         // POSSession.GetSale(POSSale);
@@ -706,10 +731,27 @@ codeunit 6150725 "POS Action - Payment"
             exit(false);
         //+NPR5.50 [354510]
 
-        if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::xLookup then
+        if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::LOOK_UP then
             exit(true);
 
-        exit(not EFTTransactionRequest.Successful);
+        //-NPR5.51 [359896]
+        if (not EFTTransactionRequest.Successful) then begin
+          SecondaryEFTTransactionRequest.SetFilter ("Initiated from Entry No.", '=%1', EFTTransactionRequest."Entry No.");
+          if SecondaryEFTTransactionRequest.FindLast () then begin
+            if ((SecondaryEFTTransactionRequest."Pepper Transaction Type Code" = EFTTransactionRequest."Pepper Transaction Type Code") and
+              (SecondaryEFTTransactionRequest."Pepper Trans. Subtype Code" = EFTTransactionRequest."Pepper Trans. Subtype Code") and
+              (SecondaryEFTTransactionRequest."Amount Input" = EFTTransactionRequest."Amount Input")) then begin
+                exit(not SecondaryEFTTransactionRequest.Successful);
+            end;
+          end;
+
+          exit(true);
+        end;
+
+        exit(false);
+
+        //EXIT(NOT EFTTransactionRequest.Successful);
+        //+NPR5.51 [359896]
     end;
 
     local procedure "--"()

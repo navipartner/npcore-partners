@@ -20,6 +20,8 @@ codeunit 6150627 "POS Workshift Checkpoint"
     // NPR5.49/TSA /20190315 CASE 348458 Correct the Turnover sums to exclude payout entries.
     // NPR5.50/TSA /20190429 CASE 353293 Handled the special scenario, when no bin checkpoint is included in manuel balancing
     // NPR5.50/TSA /20190528 CASE 356706 Make sure there is an open pos period after migrating to pos entry
+    // NPR5.51/MMV /20190611 CASE 356076 Added sub period support and new totalling fields.
+    // NPR5.51/TSA /20190813 CASE 363578 Added publisher OnAfterEndWorkshift
 
 
     trigger OnRun()
@@ -49,9 +51,34 @@ codeunit 6150627 "POS Workshift Checkpoint"
 
         //-NPR5.49 [348458]
         // Refactored code, moved implementation to local worker functions
-        exit (CloseWorkshiftWorker (Mode, UnitNo, DimensionSetId));
+
+        //-NPR5.51 [363578]
+        //EXIT (CloseWorkshiftWorker (Mode, UnitNo, DimensionSetId));
+        PosEntryNo := CloseWorkshiftWorker (Mode, UnitNo, DimensionSetId);
+
+        Commit;
+        OnAfterEndWorkshift (Mode, UnitNo, (PosEntryNo <> 0), PosEntryNo);
+
+        exit (PosEntryNo);
+        //+NPR5.51 [363578]
+
 
         //+NPR5.49 [348458]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterEndWorkshift(Mode: Option;UnitNo: Code[20];Successful: Boolean;PosEntryNo: Integer)
+    begin
+        //-NPR5.51 [363578]
+
+        //**
+        // Mode:          XREPORT = 0, ZREPORT = 1, CLOSEWORKSHIFT = 2
+        // Unit No.:      The POS Unit being balanced
+        // Successful:    EOD posted successfully
+        // Pos Entry No:  can be zero
+        //**
+
+        //+NPR5.51 [363578]
     end;
 
     procedure EndWorkshift_NotUsed(POSUnit: Code[10])
@@ -546,7 +573,6 @@ codeunit 6150627 "POS Workshift Checkpoint"
         DimMgt: Codeunit DimensionManagement;
         POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
         PeriodEntryNo: Integer;
-        AutoCreatePeriod: Boolean;
     begin
 
         //-NPR5.49 [348458]
@@ -579,22 +605,31 @@ codeunit 6150627 "POS Workshift Checkpoint"
             POSWorkshiftCheckpoint.SetFilter ("Type Filter", '=%1', POSWorkshiftCheckpoint.Type);
             POSWorkshiftCheckpoint.SetFilter ("Open Filter", '=%1', false);
 
-            POSWorkshiftCheckpoint.CalcFields ("FF Total Sales (LCY)", "FF Total Return Sale (LCY)", "FF Total Dir. Turnover (LCY)", "FF Total Dir. Neg. Amt. (LCY)", "FF Total Rounding Amt. (LCY)");
+            POSWorkshiftCheckpoint.CalcFields ("FF Total Dir. Item Sales (LCY)", "FF Total Dir. Item Return(LCY)", "FF Total Dir. Turnover (LCY)", "FF Total Dir. Neg. Turn. (LCY)", "FF Total Rounding Amt. (LCY)");
             POSWorkshiftCheckpoint."Perpetual Dir. Turnover (LCY)" := POSWorkshiftCheckpoint."FF Total Dir. Turnover (LCY)";
-            POSWorkshiftCheckpoint."Perpetual Dir. Neg. Amt. (LCY)" := POSWorkshiftCheckpoint."FF Total Dir. Neg. Amt. (LCY)";
+            POSWorkshiftCheckpoint."Perpetual Dir. Neg. Turn (LCY)" := POSWorkshiftCheckpoint."FF Total Dir. Neg. Turn. (LCY)";
             POSWorkshiftCheckpoint."Perpetual Rounding Amt. (LCY)" := POSWorkshiftCheckpoint."FF Total Rounding Amt. (LCY)";
-            POSWorkshiftCheckpoint."Perpetual Sales (LCY)" := POSWorkshiftCheckpoint."FF Total Sales (LCY)";
-            POSWorkshiftCheckpoint."Perpetual Return Sales (LCY)" := POSWorkshiftCheckpoint."FF Total Return Sale (LCY)";
+            POSWorkshiftCheckpoint."Perpetual Dir. Item Sales(LCY)" := POSWorkshiftCheckpoint."FF Total Dir. Item Sales (LCY)";
+            POSWorkshiftCheckpoint."Perpetual Dir. Item Ret. (LCY)" := POSWorkshiftCheckpoint."FF Total Dir. Item Return(LCY)";
             POSWorkshiftCheckpoint.Modify ();
 
-            // Create periodical checkpoints (Weekly, Monthly, Quarterly);
-            OnCheckTriggerAutoPeriodCheckpoint (POSWorkshiftCheckpoint, AutoCreatePeriod);
-            if AutoCreatePeriod then
-              CreatePeriodCheckpoint (CheckPointEntryNo, true);
+        //-NPR5.51 [356076]
+        //    OnCheckTriggerAutoPeriodCheckpoint (POSWorkshiftCheckpoint, AutoCreatePeriod);
+        //    IF AutoCreatePeriod THEN
+        //      CreatePeriodCheckpoint (CheckPointEntryNo, TRUE);
+        //+NPR5.51 [356076]
 
             POSEntryToPost.Get (EntryNo);
             POSEntryToPost.SetRecFilter();
+        //-NPR5.51 [356076]
+            POSAuditLogMgt.CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::DRAWER_COUNT, POSEntryToPost."Entry No.", POSEntryToPost."Fiscal No.",POSEntryToPost."POS Unit No.");
+            POSAuditLogMgt.CreateEntry(POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::GRANDTOTAL, POSEntryToPost."Entry No.", POSEntryToPost."Fiscal No.", POSEntryToPost."POS Unit No.");
+        //+NPR5.51 [356076]
             POSAuditLogMgt.CreateEntry (POSWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::WORKSHIFT_END, POSEntryToPost."Entry No.", POSEntryToPost."Fiscal No.", POSEntryToPost."POS Unit No.");
+
+        //-NPR5.51 [356076]
+            OnBeforePostWorkshift(POSWorkshiftCheckpoint);
+        //+NPR5.51 [356076]
 
             if (POSEntryToPost."Post Item Entry Status" < POSEntryToPost."Post Item Entry Status"::Posted) then
               POSPostEntries.SetPostItemEntries (true);
@@ -742,21 +777,21 @@ codeunit 6150627 "POS Workshift Checkpoint"
           "Redeemed Credit Voucher (LCY)" += POSWorkshiftCheckpoint."Redeemed Credit Voucher (LCY)";
           "Created Credit Voucher (LCY)" += POSWorkshiftCheckpoint."Created Credit Voucher (LCY)";
 
-          "Direct Sales (LCY)" += POSWorkshiftCheckpoint."Direct Sales (LCY)";
+          "Direct Item Sales (LCY)" += POSWorkshiftCheckpoint."Direct Item Sales (LCY)";
           "Direct Sales - Staff (LCY)" += POSWorkshiftCheckpoint."Direct Sales - Staff (LCY)";
-          "Direct Net Sales (LCY)" += POSWorkshiftCheckpoint."Direct Net Sales (LCY)";
+          "Direct Item Net Sales (LCY)" += POSWorkshiftCheckpoint."Direct Item Net Sales (LCY)";
           "Direct Sales Count" += POSWorkshiftCheckpoint."Direct Sales Count";
           "Cancelled Sales Count" += POSWorkshiftCheckpoint."Cancelled Sales Count";
           "Net Turnover (LCY)" += POSWorkshiftCheckpoint."Net Turnover (LCY)";
           "Turnover (LCY)" += POSWorkshiftCheckpoint."Turnover (LCY)";
           "Direct Turnover (LCY)" += POSWorkshiftCheckpoint."Direct Turnover (LCY)";
-          "Direct Negative Amounts (LCY)" += POSWorkshiftCheckpoint."Direct Negative Amounts (LCY)";
+          "Direct Negative Turnover (LCY)" += POSWorkshiftCheckpoint."Direct Negative Turnover (LCY)";
           "Direct Net Turnover (LCY)" += POSWorkshiftCheckpoint."Direct Net Turnover (LCY)";
           "Net Cost (LCY)" += POSWorkshiftCheckpoint."Net Cost (LCY)";
           "Profit Amount (LCY)" += POSWorkshiftCheckpoint."Profit Amount (LCY)";
 
-          "Direct Return Sales (LCY)" += POSWorkshiftCheckpoint."Direct Return Sales (LCY)";
-          "Direct Return Sales Line Count" += POSWorkshiftCheckpoint."Direct Return Sales Line Count";
+          "Direct Item Returns (LCY)" += POSWorkshiftCheckpoint."Direct Item Returns (LCY)";
+          "Direct Item Returns Line Count" += POSWorkshiftCheckpoint."Direct Item Returns Line Count";
           "Credit Real. Sale Amt. (LCY)" += POSWorkshiftCheckpoint."Credit Real. Sale Amt. (LCY)";
           "Credit Unreal. Sale Amt. (LCY)" += POSWorkshiftCheckpoint."Credit Unreal. Sale Amt. (LCY)";
           "Credit Real. Return Amt. (LCY)" += POSWorkshiftCheckpoint."Credit Real. Return Amt. (LCY)";
@@ -775,8 +810,8 @@ codeunit 6150627 "POS Workshift Checkpoint"
           "Line Discount (LCY)" += POSWorkshiftCheckpoint."Line Discount (LCY)";
           "Calculated Diff (LCY)" += POSWorkshiftCheckpoint."Calculated Diff (LCY)";
 
-          "Item Quantity Sum" += POSWorkshiftCheckpoint."Item Quantity Sum";
-          "Item Sales Line Count" += POSWorkshiftCheckpoint."Item Sales Line Count";
+          "Direct Item Quantity Sum" += POSWorkshiftCheckpoint."Direct Item Quantity Sum";
+          "Direct Item Sales Line Count" += POSWorkshiftCheckpoint."Direct Item Sales Line Count";
           "Receipts Count" += POSWorkshiftCheckpoint."Receipts Count";
           "Cash Drawer Open Count" += POSWorkshiftCheckpoint."Cash Drawer Open Count";
           "Receipt Copies Count" += POSWorkshiftCheckpoint."Receipt Copies Count";
@@ -1148,47 +1183,44 @@ codeunit 6150627 "POS Workshift Checkpoint"
           end;
           //+NPR5.48 [339571]
 
-          //-NPR5.48 [318028]
           if POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale"] then begin
-
-            //-NPR5.48 [339571]
-            // POSWorkshiftCheckpoint."Direct Turnover (LCY)" += "Amount Incl. VAT (LCY)";
-            // IF "Amount Incl. VAT (LCY)" < 0 THEN
-            //   POSWorkshiftCheckpoint."Direct Negative Amounts (LCY)" += "Amount Incl. VAT (LCY)";
-
-            //-NPR5.49 [348458]
-            // IF (Type <> Type::Voucher) THEN BEGIN
             if ((Type <> Type::Voucher) and
                 (Type <> Type::Payout) and
                 (Type <> Type::"G/L Account")) then begin
-            //+NPR5.49 [348458]
               POSWorkshiftCheckpoint."Direct Net Turnover (LCY)" += "Amount Excl. VAT (LCY)";
               POSWorkshiftCheckpoint."Direct Turnover (LCY)" += "Amount Incl. VAT (LCY)";
               if "Amount Incl. VAT (LCY)" < 0 then
-                 POSWorkshiftCheckpoint."Direct Negative Amounts (LCY)" += "Amount Incl. VAT (LCY)";
+                 POSWorkshiftCheckpoint."Direct Negative Turnover (LCY)" += "Amount Incl. VAT (LCY)";
             end;
-            //-NPR5.48 [339571]
-
           end;
-          //+NPR5.48 [318028]
 
           case Type of
 
             Type::Item : begin
               if (POSEntry."Entry Type" = POSEntry."Entry Type"::"Direct Sale") then begin //-+NPR5.45 [322769]
                 if (Quantity > 0) then begin
-                  POSWorkshiftCheckpoint."Direct Sales (LCY)" += "Amount Incl. VAT (LCY)";
+                  POSWorkshiftCheckpoint."Direct Item Sales (LCY)" += "Amount Incl. VAT (LCY)";
                   //-NPR5.48 [339571]
-                  POSWorkshiftCheckpoint."Direct Net Sales (LCY)" += "Amount Excl. VAT (LCY)";
+                  POSWorkshiftCheckpoint."Direct Item Net Sales (LCY)" += "Amount Excl. VAT (LCY)";
                   //+NPR5.48 [339571]
 
-                  POSWorkshiftCheckpoint."Item Sales Line Count" += 1
+                  POSWorkshiftCheckpoint."Direct Item Sales Line Count" += 1;
+        //-NPR5.51 [356076]
+                  POSWorkshiftCheckpoint."Direct Item Sales Quantity" += Quantity;
+        //+NPR5.51 [356076]
                 end;
 
                 if (Quantity < 0) then begin
-                  POSWorkshiftCheckpoint."Direct Return Sales (LCY)" += "Amount Incl. VAT (LCY)";
-                  POSWorkshiftCheckpoint."Direct Return Sales Line Count" += 1;
+                  POSWorkshiftCheckpoint."Direct Item Returns (LCY)" += "Amount Incl. VAT (LCY)";
+                  POSWorkshiftCheckpoint."Direct Item Returns Line Count" += 1;
+        //-NPR5.51 [356076]
+                  POSWorkshiftCheckpoint."Direct Item Returns Quantity" += Quantity;
+        //+NPR5.51 [356076]
                 end;
+
+        //-NPR5.51 [356076]
+                POSWorkshiftCheckpoint."Direct Item Quantity Sum" += Quantity;
+        //+NPR5.51 [356076]
               end;
 
               if (POSEntry."Entry Type" = POSEntry."Entry Type"::"Credit Sale") then begin //-+NPR5.45 [322769]
@@ -1337,11 +1369,10 @@ codeunit 6150627 "POS Workshift Checkpoint"
     begin
     end;
 
-    procedure CreatePeriodCheckpoint(LastCheckpointEntryNo: Integer;AutoCreate: Boolean) PeriodEntryNo: Integer
+    procedure CreatePeriodCheckpoint(POSEntryNo: Integer;POSUnit: Code[10];FromWorkshiftEntryNo: Integer;ToWorkshiftEntryNo: Integer;PeriodType: Code[20]) PeriodEntryNo: Integer
     var
         ZReportWorkshiftCheckpoint: Record "POS Workshift Checkpoint";
         PeriodWorkshiftCheckpoint: Record "POS Workshift Checkpoint";
-        LastWorkshiftCheckpoint: Record "POS Workshift Checkpoint";
         POSEntry: Record "POS Entry";
         TmpTaxEntryNo: Integer;
         TmpPeriodWorkshiftTaxCheckpoint: Record "POS Workshift Tax Checkpoint" temporary;
@@ -1350,15 +1381,20 @@ codeunit 6150627 "POS Workshift Checkpoint"
         POSAuditLog: Record "POS Audit Log";
     begin
 
-        LastWorkshiftCheckpoint.Get (LastCheckpointEntryNo);
+        //-NPR5.51 [356076]
+        // LastWorkshiftCheckpoint.GET (LastCheckpointEntryNo);
+        //
+        // ZReportWorkshiftCheckpoint.SETFILTER ("POS Unit No.", '=%1', LastWorkshiftCheckpoint."POS Unit No.");
+        // ZReportWorkshiftCheckpoint.SETFILTER (Type, '=%1', ZReportWorkshiftCheckpoint.Type::PREPORT);
+        // ZReportWorkshiftCheckpoint.SETFILTER (Open, '=%1', FALSE);
+        //
+        // IF (ZReportWorkshiftCheckpoint.FINDLAST ()) THEN
+        //  ZReportWorkshiftCheckpoint.SETFILTER ("Entry No.", '>%1', ZReportWorkshiftCheckpoint."Entry No.");
 
-        ZReportWorkshiftCheckpoint.SetFilter ("POS Unit No.", '=%1', LastWorkshiftCheckpoint."POS Unit No.");
-        ZReportWorkshiftCheckpoint.SetFilter (Type, '=%1', ZReportWorkshiftCheckpoint.Type::PREPORT);
+        ZReportWorkshiftCheckpoint.SetFilter("Entry No.", '>=%1&<=%2', FromWorkshiftEntryNo, ToWorkshiftEntryNo);
+        ZReportWorkshiftCheckpoint.SetFilter ("POS Unit No.", '=%1', POSUnit);
         ZReportWorkshiftCheckpoint.SetFilter (Open, '=%1', false);
-
-        if (ZReportWorkshiftCheckpoint.FindLast ()) then
-          ZReportWorkshiftCheckpoint.SetFilter ("Entry No.", '>%1', ZReportWorkshiftCheckpoint."Entry No.");
-
+        //+NPR5.51 [356076]
         ZReportWorkshiftCheckpoint.SetFilter (Type, '=%1', ZReportWorkshiftCheckpoint.Type::ZREPORT);
 
         if (not ZReportWorkshiftCheckpoint.FindSet ()) then
@@ -1366,12 +1402,20 @@ codeunit 6150627 "POS Workshift Checkpoint"
 
         PeriodWorkshiftCheckpoint.Init;
         PeriodWorkshiftCheckpoint."Entry No." := 0;
-        if AutoCreate then
-          PeriodWorkshiftCheckpoint."POS Entry No." := LastWorkshiftCheckpoint."POS Entry No.";
-        PeriodWorkshiftCheckpoint."POS Unit No." := LastWorkshiftCheckpoint."POS Unit No.";
+        //-NPR5.51 [356076]
+        // IF AutoCreate THEN
+        //  PeriodWorkshiftCheckpoint."POS Entry No." := LastWorkshiftCheckpoint."POS Entry No.";
+        // PeriodWorkshiftCheckpoint."POS Unit No." := LastWorkshiftCheckpoint."POS Unit No.";
+        PeriodWorkshiftCheckpoint."POS Entry No." := POSEntryNo;
+        PeriodWorkshiftCheckpoint."POS Unit No." := POSUnit;
+        PeriodWorkshiftCheckpoint.TestField("POS Unit No.");
+        //+NPR5.51 [356076]
         PeriodWorkshiftCheckpoint."Created At" := CurrentDateTime();
         PeriodWorkshiftCheckpoint.Open := true;
         PeriodWorkshiftCheckpoint.Type := PeriodWorkshiftCheckpoint.Type::PREPORT;
+        //-NPR5.51 [356076]
+        PeriodWorkshiftCheckpoint."Period Type" := PeriodType;
+        //+NPR5.51 [356076]
         PeriodWorkshiftCheckpoint.Insert ();
 
         repeat
@@ -1393,7 +1437,7 @@ codeunit 6150627 "POS Workshift Checkpoint"
             PeriodWorkshiftCheckpoint."Cash Terminal (LCY)" += "Cash Terminal (LCY)";
             PeriodWorkshiftCheckpoint."Redeemed Credit Voucher (LCY)" += "Redeemed Credit Voucher (LCY)";
             PeriodWorkshiftCheckpoint."Created Credit Voucher (LCY)" += "Created Credit Voucher (LCY)";
-            PeriodWorkshiftCheckpoint."Direct Sales (LCY)" += "Direct Sales (LCY)";
+            PeriodWorkshiftCheckpoint."Direct Item Sales (LCY)" += "Direct Item Sales (LCY)";
             PeriodWorkshiftCheckpoint."Direct Sales - Staff (LCY)" += "Direct Sales - Staff (LCY)";
             PeriodWorkshiftCheckpoint."Direct Sales Count" += "Direct Sales Count";
             PeriodWorkshiftCheckpoint."Cancelled Sales Count" += "Cancelled Sales Count";
@@ -1401,8 +1445,8 @@ codeunit 6150627 "POS Workshift Checkpoint"
             PeriodWorkshiftCheckpoint."Turnover (LCY)" += "Turnover (LCY)";
             PeriodWorkshiftCheckpoint."Net Cost (LCY)" += "Net Cost (LCY)";
             PeriodWorkshiftCheckpoint."Profit Amount (LCY)" += "Profit Amount (LCY)";
-            PeriodWorkshiftCheckpoint."Direct Return Sales (LCY)" += "Direct Return Sales (LCY)";
-            PeriodWorkshiftCheckpoint."Direct Return Sales Line Count" += "Direct Return Sales Line Count";
+            PeriodWorkshiftCheckpoint."Direct Item Returns (LCY)" += "Direct Item Returns (LCY)";
+            PeriodWorkshiftCheckpoint."Direct Item Returns Line Count" += "Direct Item Returns Line Count";
             PeriodWorkshiftCheckpoint."Total Discount (LCY)" += "Total Discount (LCY)";
             PeriodWorkshiftCheckpoint."Campaign Discount (LCY)" += "Campaign Discount (LCY)";
             PeriodWorkshiftCheckpoint."Mix Discount (LCY)" += "Mix Discount (LCY)";
@@ -1412,8 +1456,8 @@ codeunit 6150627 "POS Workshift Checkpoint"
             PeriodWorkshiftCheckpoint."Customer Discount (LCY)" += "Customer Discount (LCY)";
             PeriodWorkshiftCheckpoint."Line Discount (LCY)" += "Line Discount (LCY)";
             PeriodWorkshiftCheckpoint."Calculated Diff (LCY)" += "Calculated Diff (LCY)";
-            PeriodWorkshiftCheckpoint."Item Quantity Sum" += "Item Quantity Sum";
-            PeriodWorkshiftCheckpoint."Item Sales Line Count" += "Item Sales Line Count";
+            PeriodWorkshiftCheckpoint."Direct Item Quantity Sum" += "Direct Item Quantity Sum";
+            PeriodWorkshiftCheckpoint."Direct Item Sales Line Count" += "Direct Item Sales Line Count";
             PeriodWorkshiftCheckpoint."Receipts Count" += "Receipts Count";
             PeriodWorkshiftCheckpoint."Cash Drawer Open Count" += "Cash Drawer Open Count";
             PeriodWorkshiftCheckpoint."Receipt Copies Count" += "Receipt Copies Count";
@@ -1422,7 +1466,7 @@ codeunit 6150627 "POS Workshift Checkpoint"
             PeriodWorkshiftCheckpoint."Bin Transfer In Amount (LCY)" += "Bin Transfer In Amount (LCY)";
             PeriodWorkshiftCheckpoint."Opening Cash (LCY)" += "Opening Cash (LCY)";
             //-NPR5.48 [318028]
-            PeriodWorkshiftCheckpoint."Direct Negative Amounts (LCY)" += "Direct Negative Amounts (LCY)";
+            PeriodWorkshiftCheckpoint."Direct Negative Turnover (LCY)" += "Direct Negative Turnover (LCY)";
             PeriodWorkshiftCheckpoint."Direct Turnover (LCY)" += "Direct Turnover (LCY)";
             //+NPR5.48 [318028]
 
@@ -1431,11 +1475,11 @@ codeunit 6150627 "POS Workshift Checkpoint"
           end;
         until (ZReportWorkshiftCheckpoint.Next () = 0);
 
-        PeriodWorkshiftCheckpoint."Perpetual Sales (LCY)" := ZReportWorkshiftCheckpoint."Perpetual Sales (LCY)";
-        PeriodWorkshiftCheckpoint."Perpetual Return Sales (LCY)" := ZReportWorkshiftCheckpoint."Perpetual Return Sales (LCY)";
+        PeriodWorkshiftCheckpoint."Perpetual Dir. Item Sales(LCY)" := ZReportWorkshiftCheckpoint."Perpetual Dir. Item Sales(LCY)";
+        PeriodWorkshiftCheckpoint."Perpetual Dir. Item Ret. (LCY)" := ZReportWorkshiftCheckpoint."Perpetual Dir. Item Ret. (LCY)";
         //-NPR5.48 [318028]
         PeriodWorkshiftCheckpoint."Perpetual Dir. Turnover (LCY)" := ZReportWorkshiftCheckpoint."Perpetual Dir. Turnover (LCY)";
-        PeriodWorkshiftCheckpoint."Perpetual Dir. Neg. Amt. (LCY)" := ZReportWorkshiftCheckpoint."Perpetual Dir. Neg. Amt. (LCY)";
+        PeriodWorkshiftCheckpoint."Perpetual Dir. Neg. Turn (LCY)" := ZReportWorkshiftCheckpoint."Perpetual Dir. Neg. Turn (LCY)";
         PeriodWorkshiftCheckpoint."Perpetual Rounding Amt. (LCY)" := ZReportWorkshiftCheckpoint."Perpetual Rounding Amt. (LCY)";
         //+NPR5.48 [318028]
 
@@ -1452,11 +1496,15 @@ codeunit 6150627 "POS Workshift Checkpoint"
           until (TmpPeriodWorkshiftTaxCheckpoint.Next () = 0);
         end;
 
-        if AutoCreate then
-          if POSEntry.Get(PeriodWorkshiftCheckpoint."POS Entry No.") then;
-        //-NPR5.48 [318028]
-        POSAuditLogMgt.CreateEntry(PeriodWorkshiftCheckpoint.RecordId,POSAuditLog."Action Type"::WORKSHIFT_END,POSEntry."Entry No.",POSEntry."Fiscal No.",PeriodWorkshiftCheckpoint."POS Unit No.");
-        //+NPR5.48 [318028]
+        //-NPR5.51 [356076]
+        //IF AutoCreate THEN
+        //+NPR5.51 [356076]
+        if POSEntry.Get(PeriodWorkshiftCheckpoint."POS Entry No.") then;
+        //-NPR5.51 [356076]
+        POSAuditLogMgt.CreateEntry(PeriodWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::GRANDTOTAL, POSEntry."Entry No.", POSEntry."Fiscal No.", POSEntry."POS Unit No.");
+        //+NPR5.51 [356076]
+        POSAuditLogMgt.CreateEntry(PeriodWorkshiftCheckpoint.RecordId, POSAuditLog."Action Type"::WORKSHIFT_END, POSEntry."Entry No.", POSEntry."Fiscal No.", PeriodWorkshiftCheckpoint."POS Unit No.");
+
 
         exit (PeriodWorkshiftCheckpoint."Entry No.");
     end;
@@ -1783,7 +1831,7 @@ codeunit 6150627 "POS Workshift Checkpoint"
             end;
         
             //"Sales (LCY)" += AuditRoll."Amount Including VAT";
-            POSWorkshiftCheckpoint."Direct Sales (LCY)" += AuditRoll."Amount Including VAT";
+            POSWorkshiftCheckpoint."Direct Item Sales (LCY)" += AuditRoll."Amount Including VAT";
         
             if item.Get(AuditRoll."No.") then;
             if (AuditRoll."Customer No." <> '') then begin
@@ -1842,8 +1890,8 @@ codeunit 6150627 "POS Workshift Checkpoint"
         AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::Sale);
         AuditRoll.SetRange(Type,AuditRoll.Type::Item);
         AuditRoll.CalcSums(Quantity);
-        POSWorkshiftCheckpoint."Item Quantity Sum" := AuditRoll.Quantity;
-        POSWorkshiftCheckpoint."Item Sales Line Count" := AuditRoll.Count ();
+        POSWorkshiftCheckpoint."Direct Item Quantity Sum" := AuditRoll.Quantity;
+        POSWorkshiftCheckpoint."Direct Item Sales Line Count" := AuditRoll.Count ();
         AuditRoll.SetRange("Sale Type");
         AuditRoll.SetRange(Type);
         
@@ -1906,8 +1954,8 @@ codeunit 6150627 "POS Workshift Checkpoint"
             if (LastReceiptNo <> AuditRoll."Sales Ticket No.") then begin
               //NegativeBonQty += 1;
               //NegativeBonAmount += AuditRoll."Amount Including VAT";
-              POSWorkshiftCheckpoint."Direct Return Sales Line Count" += 1;
-              POSWorkshiftCheckpoint."Direct Return Sales (LCY)" += AuditRoll."Amount Including VAT";
+              POSWorkshiftCheckpoint."Direct Item Returns Line Count" += 1;
+              POSWorkshiftCheckpoint."Direct Item Returns (LCY)" += AuditRoll."Amount Including VAT";
             end;
           end;
           LastReceiptNo := AuditRoll."Sales Ticket No.";
@@ -2078,8 +2126,8 @@ codeunit 6150627 "POS Workshift Checkpoint"
         Kasseperiode."Cash Received"              := POSWorkshiftCheckpoint."Debtor Payment (LCY)"; // "Customer Payments";
         Kasseperiode."Pay Out"                    := POSWorkshiftCheckpoint."GL Payment (LCY)"; // "Out Payments";
         Kasseperiode."Debit Sale"                 := POSWorkshiftCheckpoint."Credit Item Sales (LCY)"; //DebetSalg;
-        Kasseperiode."Negative Sales Count"       := POSWorkshiftCheckpoint."Direct Return Sales Line Count";
-        Kasseperiode."Negative Sales Amount"      := POSWorkshiftCheckpoint."Direct Return Sales (LCY)";
+        Kasseperiode."Negative Sales Count"       := POSWorkshiftCheckpoint."Direct Item Returns Line Count";
+        Kasseperiode."Negative Sales Amount"      := POSWorkshiftCheckpoint."Direct Item Returns (LCY)";
         // Kasseperiode.Cheque                       := Check;
         // Kasseperiode."Balanced Cash Amount"       := "Sum (LCY)";
         // Kasseperiode."Gift Voucher Debit"         := Gavekortdebet;
@@ -2095,7 +2143,7 @@ codeunit 6150627 "POS Workshift Checkpoint"
         // Kasseperiode.WriteBalancingInfo;
         //
         Kasseperiode."Sales (Qty)"             := POSWorkshiftCheckpoint."Direct Sales Count"; //"Sales (Qty)";
-        Kasseperiode."Sales (LCY)"             := POSWorkshiftCheckpoint."Direct Sales (LCY)"; //"Sales (LCY)";
+        Kasseperiode."Sales (LCY)"             := POSWorkshiftCheckpoint."Direct Item Sales (LCY)"; //"Sales (LCY)";
         Kasseperiode."Debit Sales (Qty)"       := POSWorkshiftCheckpoint."Credit Item Quantity Sum"; // "Sales Debit (Qty)";
         Kasseperiode."Cancelled Sales"         := POSWorkshiftCheckpoint."Cancelled Sales Count"; //CancelledSales;
 
@@ -2113,7 +2161,7 @@ codeunit 6150627 "POS Workshift Checkpoint"
         Kasseperiode."Profit %"                := POSWorkshiftCheckpoint."Profit %"; // "Profit %";
         //
         // { Save Statistics }
-        Kasseperiode."No. Of Goods Sold"        := POSWorkshiftCheckpoint."Item Quantity Sum";
+        Kasseperiode."No. Of Goods Sold"        := POSWorkshiftCheckpoint."Direct Item Quantity Sum";
         Kasseperiode."No. Of Cash Receipts"     := POSWorkshiftCheckpoint."Receipts Count";
         Kasseperiode."No. Of Cash Box Openings" := POSWorkshiftCheckpoint."Cash Drawer Open Count";
         Kasseperiode."No. Of Receipt Copies"    := POSWorkshiftCheckpoint."Receipt Copies Count";
@@ -2302,9 +2350,9 @@ codeunit 6150627 "POS Workshift Checkpoint"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCheckTriggerAutoPeriodCheckpoint(POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";var AutoCreatePeriod: Boolean)
+    local procedure OnBeforePostWorkshift(POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint")
     begin
-        //-NPR5.43 [318028]
+        //-+NPR5.51 [356076]
     end;
 
     procedure CreateFirstCheckpointForUnit(POSUnitNo: Code[10];Comment: Text[50])

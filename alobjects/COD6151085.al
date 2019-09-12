@@ -2,7 +2,7 @@ codeunit 6151085 "RIS Retail Inventory Set Mgt."
 {
     // NPR5.40/MHA /20180320  CASE 307025 Object created - Retail Inventory Set
     // NPR5.49/MHA /20190226  CASE 335198 Url Parameters should be excluded from Service Namespace in TryRequestInventory()
-    // #361164/MHA /20190705  CASE 361164 Updated Exception Message parsing in TryRequestInventory()
+    // NPR5.51/MHA /20190705  CASE 361164 Updated Exception Message parsing in TryRequestInventory()
 
 
     trigger OnRun()
@@ -201,7 +201,7 @@ codeunit 6151085 "RIS Retail Inventory Set Mgt."
         XmlElement2 := XmlElement.SelectSingleNode('ms:locationFilter',XmlNamespaceManager);
         XmlElement2.InnerText := RetailInventoryBuffer."Location Filter";
         if not NpXmlDomMgt.SendWebRequest(XmlDoc,HttpWebRequest,HttpWebResponse,WebException) then begin
-          //-#361164 [361164]
+          //-NPR5.51 [361164]
           ErrorMessage := NpXmlDomMgt.GetWebExceptionMessage(WebException);
           if NpXmlDomMgt.TryLoadXml(ErrorMessage,XmlDoc) then begin
             NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
@@ -209,7 +209,7 @@ codeunit 6151085 "RIS Retail Inventory Set Mgt."
               ErrorMessage := XmlElement.InnerText;
           end;
           Error(CopyStr(ErrorMessage,1,1000));
-          //+#361164 [361164]
+          //+NPR5.51 [361164]
         end;
 
         Stream := HttpWebResponse.GetResponseStream;

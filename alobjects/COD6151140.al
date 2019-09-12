@@ -1,6 +1,7 @@
-codeunit 6151130 "POS Action - Change UOM"
+codeunit 6151140 "POS Action - Change UOM"
 {
-    // NPR5.50/ALST /20190418 CASE 342880 New object
+    // NPR5.50/ALST/20190418 CASE 342880 New object
+    // NPR5.51/TSA /20190418 CASE 342880 Renumbered object due to 6151130..6151139 Tickets and seating
 
 
     trigger OnRun()

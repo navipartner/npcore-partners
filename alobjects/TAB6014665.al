@@ -4,6 +4,7 @@ table 6014665 "Stock-Take Configuration"
     // NPR4.16/TSA/20150716 CASE 213313 - Adopted the dimensions for 7
     // NPR4.16/TSA/20150917 CASE 222486 Original Primary Key SQL Datatype of Variant was retained on previsous table definition, changed to default
     // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
+    // NPR5.51/TSA /20190722 CASE 359375 Added field 240 "Keep Worksheets"
 
     Caption = 'Stock-Take Configuration';
     LookupPageID = "Stock-Take Configurations";
@@ -208,6 +209,10 @@ table 6014665 "Stock-Take Configuration"
             Caption = 'Adjustment Method';
             OptionCaption = 'Stock-Take,Adjustment,Purchase (Adjmt.)';
             OptionMembers = STOCKTAKE,ADJUSTMENT,PURCHASE;
+        }
+        field(240;"Keep Worksheets";Boolean)
+        {
+            Caption = 'Keep Worksheets';
         }
     }
 

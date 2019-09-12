@@ -8,6 +8,7 @@ codeunit 6150787 "POS Action - Print Receipt"
     // NPR5.46/MMV /20181001 CASE 290734 EFT Framework refactoring
     // NPR5.48/MMV /20181026 CASE 318028 French certification
     // NPR5.50/ALST/20190527 CASE 353191 able to setup printing the last receipt to output the last balancing receipt as well
+    // NPR5.51/TSA /20190708 CASE 360453 Added seperate option for re-printing last balancing receipt
 
 
     trigger OnRun()
@@ -26,7 +27,7 @@ codeunit 6150787 "POS Action - Print Receipt"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.3'); //-NPR5.49 [353191]
+        exit('1.4'); //-NPR5.51 [360453]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -44,8 +45,12 @@ codeunit 6150787 "POS Action - Print Receipt"
 
             //-NPR5.50
             //RegisterOptionParameter('Setting','Last Receipt,Last Receipt Large,Choose Receipt,Choose Receipt Large,'Last Receipt');
-            RegisterOptionParameter('Setting','Last Receipt,Last Receipt Large,Choose Receipt,Choose Receipt Large,Last Receipt and Balance,Last Receipt and Balance Large','Last Receipt');
+            //-NPR5.51 [360453]
+            // RegisterOptionParameter('Setting','Last Receipt,Last Receipt Large,Choose Receipt,Choose Receipt Large,Last Receipt and Balance,Last Receipt and Balance Large','Last Receipt');
+            RegisterOptionParameter('Setting','Last Receipt,Last Receipt Large,Choose Receipt,Choose Receipt Large,Last Receipt and Balance,Last Receipt and Balance Large,Last Balance,Last Balance Large','Last Receipt');
             //+NPR5.50
+            //+NPR5.51 [360453]
+
             //-NPR5.43 [319257]
             RegisterBooleanParameter('Print Tickets',false);
             RegisterBooleanParameter('Print Memberships',false);
@@ -59,7 +64,7 @@ codeunit 6150787 "POS Action - Print Receipt"
     local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: JsonObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
-        Setting: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large","Last Receipt and Balance","Last Receipt and Balance Large";
+        Setting: Option "Last Receipt","Last Receipt Large","Choose Receipt","Choose Receipt Large","Last Receipt and Balance","Last Receipt and Balance Large","Last Balance","Last Balance Large";
         POSSetup: Codeunit "POS Setup";
         NPRetailSetup: Record "NP Retail Setup";
         SalesTicketNo: Code[20];
@@ -105,6 +110,13 @@ codeunit 6150787 "POS Action - Print Receipt"
           Setting::"Last Receipt and Balance Large":
             SalesTicketNo := LastReceiptPOSEntry(Setting);
           //+NPR5.50
+
+          //-NPR5.51 [360453]
+          Setting::"Last Balance",
+          Setting::"Last Balance Large" :
+            if NPRetailSetup."Advanced Posting Activated" then
+              SalesTicketNo := LastBalancePOSEntry (Setting = Setting::"Last Balance Large");
+          //+NPR5.51 [360453]
         end;
         //+NPR5.40 [304639]
         //-NPR5.43 [319257]
@@ -249,16 +261,45 @@ codeunit 6150787 "POS Action - Print Receipt"
           //PrintReceiptPOSEntry(POSEntry, Setting);
           POSEntryManagement.PrintEntry(POSEntry, Setting in [Setting::"Choose Receipt Large", Setting::"Last Receipt Large"]);
           //+NPR5.48 [318028]
-          //-NPR5.50
-          if Setting in [Setting::"Last Receipt and Balance",Setting::"Last Receipt and Balance Large"] then begin
-            POSBalanceEntry.CopyFilters(POSEntry);
-            POSBalanceEntry.SetRange("Entry Type", POSEntry."Entry Type"::Balancing);
-          if POSBalanceEntry.FindLast then
-            POSEntryManagement.PrintEntry(POSBalanceEntry, Setting = Setting::"Last Receipt and Balance Large");
-          end;
-          //+NPR5.50
+
+          //-NPR5.51 [360453]
+          // //-NPR5.50
+          // IF Setting IN [Setting::"Last Receipt and Balance",Setting::"Last Receipt and Balance Large"] THEN BEGIN
+          //   POSBalanceEntry.COPYFILTERS(POSEntry);
+          //   POSBalanceEntry.SETRANGE("Entry Type", POSEntry."Entry Type"::Balancing);
+          // IF POSBalanceEntry.FINDLAST THEN
+          //   POSEntryManagement.PrintEntry(POSBalanceEntry, Setting = Setting::"Last Receipt and Balance Large");
+          // END;
+          // //+NPR5.50
+          if (Setting in [Setting::"Last Receipt and Balance",Setting::"Last Receipt and Balance Large"]) then
+            LastBalancePOSEntry (Setting = Setting::"Last Receipt and Balance Large");
+          //+NPR5.51 [360453]
+
           exit(POSEntry."Document No.");
         end;
+    end;
+
+    local procedure LastBalancePOSEntry(LargePrint: Boolean): Code[20]
+    var
+        POSEntry: Record "POS Entry";
+        POSEntryManagement: Codeunit "POS Entry Management";
+    begin
+
+        //-NPR5.51 [360453]
+        if (CurrentRegisterNo = '') then
+          exit ('');
+
+        POSEntry.SetFilter ("POS Unit No.", '=%1', CurrentRegisterNo);
+        POSEntry.SetFilter ("System Entry", '=%1', false);
+        POSEntry.SetFilter ("Entry Type", '=%1', POSEntry."Entry Type"::Balancing);
+
+        if POSEntry.FindLast then begin
+
+           POSEntryManagement.PrintEntry (POSEntry, LargePrint);
+           exit (POSEntry."Document No.");
+
+        end;
+        //+NPR5.51 [360453]
     end;
 
     local procedure AdditionalPrints(RegisterNo: Code[10];SalesTicketNo: Code[20];var JSON: Codeunit "POS JSON Management")

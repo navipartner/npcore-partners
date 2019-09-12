@@ -1,8 +1,10 @@
 page 6151384 "CS Devices"
 {
     // NPR5.50/CLVA/20190304  CASE 332844 Object created
+    // NPR5.51/CLVA/20190830  CASE 365659 Page property Editable set to NO
 
     Caption = 'CS Devices';
+    Editable = false;
     PageType = List;
     SourceTable = "CS Devices";
 
@@ -43,6 +45,11 @@ page 6151384 "CS Devices"
         {
             action("Clear Device Info")
             {
+                Caption = 'Clear Device Info';
+                Image = ClearLog;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
 
                 trigger OnAction()
                 var

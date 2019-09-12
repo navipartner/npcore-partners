@@ -2,7 +2,7 @@ codeunit 6150635 "POS Page Navigation"
 {
     // NPR5.38/BR  /20171116  CASE 295255 Object Added
     // NPR5.38/NPKNAV/20180126  CASE 295255 Transport NPR5.38 - 26 January 2018
-    // #361514/THRO/20190717  CASE 361514 EventPublisherElement changed in Page30OnAfterActionPOSSalesLines. Action renamed on Page 30
+    // NPR5.51/THRO/20190717  CASE 361514 EventPublisherElement changed in Page30OnAfterActionPOSSalesLines. Action renamed on Page 30
     //                                    EventPublisherElement changed in Page31OnAfterActionPOSSalesLines. Action renamed on Page 31
     //                                    EventPublisherElement changed in Page6014425OnAfterActionPOSSalesLines. Action renamed on Page 6014425
     //                                    EventPublisherElement changed in Page6014511OnAfterActionPOSSalesLines. Action renamed on Page 6014511

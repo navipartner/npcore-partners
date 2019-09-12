@@ -1,7 +1,7 @@
 codeunit 6014486 "IC - Map ICR Barcodes"
 {
     // NPR5.46/JDH /2011101 CASE 324997 Codeunit to get the item cross reference and send it to the IC Partner
-    // #361679/BHR /20190718 CASE 361679 Change publisher on subscriber OnICOutboxTransactionCreated from ICOutboxTransactionCreated to OnInsertICOutboxSalesDocTransaction
+    // NPR5.51/BHR /20190718 CASE 361679 Change publisher on subscriber OnICOutboxTransactionCreated from ICOutboxTransactionCreated to OnInsertICOutboxSalesDocTransaction
 
 
     trigger OnRun()

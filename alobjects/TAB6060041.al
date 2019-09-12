@@ -1,13 +1,14 @@
 table 6060041 "Item Worksheet"
 {
-    // NPR4.18\BR\20160209  CASE 182391 Object Created
-    // NPR5.22\BR\20160321  CASE 182391 Added support for mapping an Excel file
-    // NPR5.22\BR\20160323  CASE 182391 Added support for Recommended Retail Price
-    // NPR5.22\BR\20160405  CASE 238374 Fix attributes not being deleted when deleteing
-    // NPR5.23\BR\20160602  CASE 240330 Added field Item No. Prefix and Prefix Code
-    // NPR5.25\BR \20160707 CASE 246088 Delete setup and any change fields
-    // NPR5.25\BR \20160708 CASE 246088 Added setup option
-    // NPR5.25\BR \20160718 CASE 246088 Added Parameter to CheckLines
+    // NPR4.18/BR  /20160209  CASE 182391 Object Created
+    // NPR5.22/BR  /20160321  CASE 182391 Added support for mapping an Excel file
+    // NPR5.22/BR  /20160323  CASE 182391 Added support for Recommended Retail Price
+    // NPR5.22/BR  /20160405  CASE 238374 Fix attributes not being deleted when deleteing
+    // NPR5.23/BR  /20160602  CASE 240330 Added field Item No. Prefix and Prefix Code
+    // NPR5.25/BR  /20160707  CASE 246088 Delete setup and any change fields
+    // NPR5.25/BR  /20160708  CASE 246088 Added setup option
+    // NPR5.25/BR  /20160718  CASE 246088 Added Parameter to CheckLines
+    // NPR5.51/MHA /20190819  CASE 365377 Removed field 160 "GIM Import Document No."
 
     Caption = 'Item Worksheet Batch';
     DataCaptionFields = Name,Description;
@@ -101,11 +102,6 @@ table 6060041 "Item Worksheet"
                     ItemWorksheetLine.RefreshVariants(0,true); //Update Headings
                   until ItemWorksheetLine.Next = 0;
             end;
-        }
-        field(160;"GIM Import Document No.";Code[20])
-        {
-            Caption = 'GIM Import Document No.';
-            TableRelation = "GIM - Import Document";
         }
         field(400;"Sales Price Currency Code";Code[10])
         {

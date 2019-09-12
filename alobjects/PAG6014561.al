@@ -39,7 +39,7 @@ page 6014561 "RP Data Items"
                 field("Total Fields";"Total Fields")
                 {
                 }
-                field("Distinct Field ID";"Distinct Field ID")
+                field("Field ID";"Field ID")
                 {
                 }
                 field("Skip Template If Empty";"Skip Template If Empty")

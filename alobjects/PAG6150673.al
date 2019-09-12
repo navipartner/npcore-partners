@@ -1,6 +1,7 @@
 page 6150673 "POS Audit Log"
 {
     // NPR5.48/MMV /20180605 CASE 318028 Created object
+    // NPR5.51/MMV /20190619 CASE 356076 Added missing action icon
 
     Caption = 'POS Audit Log';
     DeleteAllowed = false;
@@ -27,6 +28,9 @@ page 6150673 "POS Audit Log"
                     Caption = 'Record ID';
                 }
                 field("Action Type";"Action Type")
+                {
+                }
+                field("Action Custom Subtype";"Action Custom Subtype")
                 {
                 }
                 field("Acted on POS Entry No.";"Acted on POS Entry No.")
@@ -109,6 +113,7 @@ page 6150673 "POS Audit Log"
             action(ValidateLog)
             {
                 Caption = 'Validate Log';
+                Image = Approval;
 
                 trigger OnAction()
                 var

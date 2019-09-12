@@ -4,6 +4,7 @@ page 6014496 "Exchange Label"
     // NPR5.26/MMV /20160802 CASE 246998 Added field 30 - Quantity.
     //                                   Added field 32 - Unit of Measure.
     // NPR5.49/MHA /20190211 CASE 345209 Added field 35 "Unit Price"
+    // NPR5.51/ALST/20190628 CASE 337539 Added field 35 "Retail Cross Reference No."
 
     Caption = 'Exchange Label';
     Editable = false;
@@ -81,6 +82,9 @@ page 6014496 "Exchange Label"
                 {
                 }
                 field("Printed Date";"Printed Date")
+                {
+                }
+                field("Retail Cross Reference No.";"Retail Cross Reference No.")
                 {
                 }
             }

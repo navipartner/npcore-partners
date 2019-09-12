@@ -10,6 +10,8 @@ report 6014439 "Item Sales Postings"
     // NPR5.48/ZESO/20181219 CASE 340243 Changed left margin of Report from 0 to 1.5 cm
     // NPR5.49/ZESO/20181219 CASE 348784 Added New Column Sales Unit Price and Report filter
     // NPR5.50/ZESO/20190528 CASE 355450 Calculate Sales(Qty) and Sales Amount(Actual) directly from Value Entry
+    // NPR5.51/ZESO/20190730 CASE 363111 Added Option to Show Vendor No
+    // NPR5.51/ZESO/20190731 CASE 332037 Removed Option Print Sale Inc. VAT
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Item Sales Postings.rdlc';
 
@@ -80,6 +82,12 @@ report 6014439 "Item Sales Postings"
             column(Report_Filters;"Item Ledger Entry".GetFilters)
             {
             }
+            column(ShowVendorNo_;ShowVendorNo)
+            {
+            }
+            column(VendorNo_;Item."Vendor No.")
+            {
+            }
 
             trigger OnAfterGetRecord()
             begin
@@ -139,10 +147,10 @@ report 6014439 "Item Sales Postings"
                 //-NPR5.50 [355450]
 
 
-
-
-                if PrintUsingInclVAT then
-                  Item."Sales (LCY)" += 0;
+                //-NPR5.51 [332037]
+                //IF PrintUsingInclVAT THEN
+                  //Item."Sales (LCY)" += 0;
+                //+NPR5.51 [332037]
 
                 SetRange("Item No.","Item No.");
                 //-NPR4.21
@@ -172,13 +180,13 @@ report 6014439 "Item Sales Postings"
                 {
                     Caption = 'Include Items That Has Not Been Sold';
                 }
-                field(PrintUsingInclVAT;PrintUsingInclVAT)
-                {
-                    Caption = 'Sales (LCY) incl. VAT';
-                }
                 field(ShowVendorItemNo;ShowVendorItemNo)
                 {
                     Caption = 'Show Vendor Item No.';
+                }
+                field(ShowVendorNo;ShowVendorNo)
+                {
+                    Caption = 'Show Vendor No';
                 }
             }
         }
@@ -204,6 +212,7 @@ report 6014439 "Item Sales Postings"
         Total_Caption = 'Total';
         VendorItemNo_Caption = 'Vendor Item No.';
         SalesUnitPrice_Caption = 'Sales (Unit Price)';
+        VendorNo_Caption = 'Vendor No.';
     }
 
     trigger OnPreReport()
@@ -228,5 +237,6 @@ report 6014439 "Item Sales Postings"
         ItemSalesAmount: Decimal;
         ValueEntry: Record "Value Entry";
         ItemCOG: Decimal;
+        ShowVendorNo: Boolean;
 }
 

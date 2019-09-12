@@ -1,6 +1,7 @@
 codeunit 6150847 "POS Action - Run Page (Item)"
 {
     // NPR5.46/MHA /20181001  CASE 326620 Object created - Run Page with Item from Sale Line POS as Source Rec.
+    // NPR5.51/MHA /20190816  CASE 365332 Removed function OnLookupPageId()
 
 
     trigger OnRun()
@@ -98,28 +99,6 @@ codeunit 6150847 "POS Action - Run Page (Item)"
         Item.SetFilter("Variant Filter", Item."Variant Filter");
 
         RunPage(Item, PageId);
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', true, true)]
-    local procedure OnLookupPageId(var POSParameterValue: Record "POS Parameter Value"; Handled: Boolean)
-    var
-        NpmPage: Record "Npm Page";
-        NpmMetadataMgt: Codeunit "Npm Metadata Mgt.";
-    begin
-        if POSParameterValue."Action Code" <> ActionCode() then
-            exit;
-        if POSParameterValue.Name <> 'PageId' then
-            exit;
-        if POSParameterValue."Data Type" <> POSParameterValue."Data Type"::Integer then
-            exit;
-
-        Handled := true;
-
-        if NpmPage.IsEmpty then
-            NpmMetadataMgt.LoadNpmPages();
-        NpmPage.SetRange("Source Table No.", DATABASE::Item);
-        if PAGE.RunModal(0, NpmPage) = ACTION::LookupOK then
-            POSParameterValue.Value := Format(NpmPage."Page ID");
     end;
 
     local procedure "-- Locals --"()

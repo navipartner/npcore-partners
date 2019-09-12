@@ -20,6 +20,7 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
     // MM1.33/TSA /20180801 CASE 323744 Added DefaultInputValue parameter for EAN box support
     // MM1.33.01/TSA /20180912 CASE 328398 Fixed external to internal item number convert
     // MM1.36/TSA /20181112 CASE 335828 New function for show member card
+    // MM1.40/TSA /20190730 CASE 360275 Added Auto-Admit for renew, upgrade, extend
 
 
     trigger OnRun()
@@ -49,6 +50,7 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
         MEMBER_REQUIRED: Label 'Member identification must be specified.';
         NOT_MEMBERSHIP_SALES: Label 'The selected sales line is not a membership sales.';
         Text000: Label 'Update Membership metadata on Sale Line Insert';
+        ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
 
     local procedure "--Subscribers"()
     begin
@@ -427,6 +429,17 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
         MemberInfoEntryNo := MembershipManagement.CreateRenewMemberInfoRequest (ExternalMemberCardNo, ItemNo);
         MemberInfoCapture.Get (MemberInfoEntryNo);
         MembershipAlterationSetup.Get (MembershipAlterationSetup."Alteration Type"::RENEW, MemberInfoCapture."Membership Code", MemberInfoCapture."Item No.");
+
+        //-MM1.40 [360275]
+        if (MembershipAlterationSetup."Auto-Admit Member On Sale" = MembershipAlterationSetup."Auto-Admit Member On Sale"::ASK) then
+          if (Confirm (ADMIT_MEMBERS, true)) then
+            MemberInfoCapture."Auto-Admit Member" := true;
+
+        if (MembershipAlterationSetup."Auto-Admit Member On Sale" = MembershipAlterationSetup."Auto-Admit Member On Sale"::YES) then
+          MemberInfoCapture."Auto-Admit Member" := true;
+
+        MemberInfoCapture.Modify ();
+        //+MM1.40 [360275]
 
         AddItemToPOS (POSSession, MemberInfoEntryNo, ItemNo, MembershipAlterationSetup.Description, ExternalMemberCardNo, 1, MemberInfoCapture."Unit Price", SaleLinePOS);
     end;

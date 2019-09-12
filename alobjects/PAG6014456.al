@@ -30,6 +30,7 @@ page 6014456 "Table Export Wizard"
     //                                   Changed default parameters.
     //                                   Added escape character parameter.
     //                                   Add table fields by default.
+    // NPR5.51/ZESO/20190703 CASE 319037 Added Ticketing and Membership tables.
 
     Caption = 'Table Export Wizard';
     DelayedInsert = true;
@@ -254,19 +255,6 @@ page 6014456 "Table Export Wizard"
                         //+NPR5.40 [309303]
                     end;
                 }
-                action(StdRetailExclTransactions)
-                {
-                    Caption = 'Add Std and Retail Master & Setup';
-                    Image = Default;
-
-                    trigger OnAction()
-                    begin
-                        //-NPR5.40 [309303]
-                        // Std and Retail Master and Setup tables Excluding Transactions
-                        InsertTablesWithData(AllDataCategory::"StdRetail Master");
-                        //+NPR5.40 [309303]
-                    end;
-                }
                 action(StdTablesExclTransactions)
                 {
                     Caption = 'Add Std. Nav. Master & Setup';
@@ -280,9 +268,22 @@ page 6014456 "Table Export Wizard"
                         //+NPR5.40 [309303]
                     end;
                 }
+                action(StdRetailExclTransactions)
+                {
+                    Caption = 'Add Std Nav. and Retail Master & Setup';
+                    Image = Default;
+
+                    trigger OnAction()
+                    begin
+                        //-NPR5.40 [309303]
+                        // Std and Retail Master and Setup tables Excluding Transactions
+                        InsertTablesWithData(AllDataCategory::"StdRetail Master");
+                        //+NPR5.40 [309303]
+                    end;
+                }
                 action(ExcludeTransactionTables)
                 {
-                    Caption = 'Add All Tables Excl. Transaction';
+                    Caption = 'Add All Tables Excl. Ticketing/Membership';
                     Image = Default;
 
                     trigger OnAction()
@@ -291,6 +292,30 @@ page 6014456 "Table Export Wizard"
                         // All Master and Setup Tables
                         InsertTablesWithData(AllDataCategory::"All Master");
                         //+NPR5.40 [309303]
+                    end;
+                }
+                action(TicketingMasterSetupTables)
+                {
+                    Caption = 'Add Ticketing Master and Setup Tables';
+                    Image = Default;
+
+                    trigger OnAction()
+                    begin
+                        //-NPR5.51 [319037]
+                        InsertTablesWithData(AllDataCategory::TicketingSetupMaster);
+                        //-NPR5.51 [319037]
+                    end;
+                }
+                action(MembershipMasterSetupTables)
+                {
+                    Caption = 'Add Membership Master and Setup Tables';
+                    Image = Default;
+
+                    trigger OnAction()
+                    begin
+                        //-NPR5.51 [319037]
+                        InsertTablesWithData(AllDataCategory::MembershipMaster);
+                        //-NPR5.51 [319037]
                     end;
                 }
             }
@@ -326,7 +351,7 @@ page 6014456 "Table Export Wizard"
                 }
                 action(IncludeAllDataTables)
                 {
-                    Caption = 'Add All Tables Incl. Transactions';
+                    Caption = 'Add All Trans. Tables Excl. Ticket';
                     Image = Default;
 
                     trigger OnAction()
@@ -363,6 +388,18 @@ page 6014456 "Table Export Wizard"
                         // All Retail Tables including Transactions
                         InsertTablesWithData(AllDataCategory::"All Retail");
                         //+NPR5.40 [309303]
+                    end;
+                }
+                action(TicketingTransactionTables)
+                {
+                    Caption = 'Add Ticketing Tables Incl. Transaction';
+                    Image = Default;
+
+                    trigger OnAction()
+                    begin
+                        //-NPR5.51 [319037]
+                        InsertTablesWithData(AllDataCategory::TicketingTransactional);
+                        //+NPR5.51 [319037]
                     end;
                 }
             }
@@ -540,7 +577,7 @@ page 6014456 "Table Export Wizard"
         FileMode: Option OStream,,DotNetStream;
         TrimSpecialChars: Boolean;
         Text00001: Label '#1############\@2@@@@@@@@@@@@';
-        AllDataCategory: Option All,"All Std","All Retail","Std and Retail","All NPAdd-Ons","All Master","Std Master","Retail Master","StdRetail Master";
+        AllDataCategory: Option All,"All Std","All Retail","Std and Retail","All NPAdd-Ons","All Master","Std Master","Retail Master","StdRetail Master",TicketingSetupMaster,TicketingTransactional,MembershipMaster;
         ExportDataInXmlFormat: Boolean;
         EscapeCharacter: Text[1];
 
@@ -833,7 +870,7 @@ until AllObj.Next = 0;
         //+NPR5.33 [280329]
     end;
 
-    procedure InsertTablesWithData(AllTransferCategory: Option All,"All Std","All Retail","Std and Retail","All NPAdd-Ons","All Master","Std Master","Retail Master","StdRetail Master")
+    procedure InsertTablesWithData(AllTransferCategory: Option All,"All Std","All Retail","Std and Retail","All NPAdd-Ons","All Master","Std Master","Retail Master","StdRetail Master",TicketingSetupMaster,TicketingTransactional,MembershipMaster)
     var
         TableInformation: Record "Table Information";
         AllObj: Record AllObj;
@@ -844,6 +881,8 @@ until AllObj.Next = 0;
         TestOnCRM: Boolean;
         Window: Dialog;
     begin
+
+
         Window.Open(Text00001);
         TableInformation.SetRange("Company Name", UseCompanyName);
         AllObj.SetRange("Object Type", AllObj."Object Type"::Table);
@@ -876,6 +915,11 @@ until AllObj.Next = 0;
 
             AllTransferCategory::"StdRetail Master":
                 AllObj.SetRange("Object ID", 1, 6189999);        // Std and Retail Master and Setup tables
+          //-NPR5.51 [319037]
+          AllTransferCategory::TicketingSetupMaster : AllObj.SetFilter("Object ID",'%1|%2|%3|%4|%5',6060118,6060119,6060120,6060121,6059784);        // Ticketing Master and Setup Tables
+          AllTransferCategory::TicketingTransactional : AllObj.SetFilter("Object ID",'%1|%2|%3|%4|%5|%6|%7',6060111,6060113,6060110,6059785,6059786,6059787,6059788);  // Ticketing Transaction Tables
+          AllTransferCategory::MembershipMaster : AllObj.SetFilter("Object ID",'%1|%2|%3|%4|%5|%6|%7',6060124,6060125,6060140,6060141,6060142,6060132,6060136);  // Membership Master and Setup Tables
+          //+NPR5.51 [319037]
         end;
         //+NPR5.40 [309303]
 
@@ -893,6 +937,14 @@ until AllObj.Next = 0;
                     //IF RecordRef.COUNT > 0 THEN BEGIN
                     //+NPR5.48 [340086]
                     case AllTransferCategory of
+              //-NPR5.51 [319037]
+              AllTransferCategory::All:
+              if AllObj."Object ID" in [6059784..6059786,6060109,6060112,6060114..6060116,6060121,6060123] = false then
+                AddTable(AllObj."Object ID");
+              //+NPR5.51 [319037]
+
+
+
                         AllTransferCategory::"All Master":         // All Master and Setup Tables except Transactions
                                                                    //-NPR5.41 [311855]
                                                                    //IF AllObj."Object ID" IN [17,32,36,37,45..46,253..254,405,472..481,5802,5811,6014403,6014405..6014407,6150620..6150635,6150698,6150700,6150701,6151504] = FALSE THEN
@@ -920,44 +972,71 @@ until AllObj.Next = 0;
                                 //+NPR5.41 [311855]
                                 AddTable(AllObj."Object ID");
 
-                        AllTransferCategory::"Retail Master":
-                            begin      // All Retail Master and Setup Tables except Transactions
-                                       //-NPR5.41 [311855]
-                                       //IF AllObj."Object ID" IN [6014403,6014405..6014407,6150620..6150635,6150698,6150700,6150701,6151504] = FALSE THEN
-                                if AllObj."Object ID" in [6014403, 6014405 .. 6014409, 6014411 .. 6014426, 6014429 .. 6014432, 6014434 .. 6014436, 6014439 .. 6014444, 6014445 .. 6014446
-                                    , 6014449 .. 6014460, 6014473 .. 6014509, 6014552 .. 6014559, 6014561 .. 6014564, 6014628 .. 6014642, 6059768, 6059767
-                                      //-NPR5.48 [340086]
-                                      //              ,6059770..6059772,6059781..6059782,6059785..6059893,6059898,6059903..6059934,6059940..6059941,6059946,6059951..6059968
-                                      //              ,6059970..6060166,6150620..6150699,6150723..6150725,6150901..6184489,6184495..6184496,6184501..6184502,6184510..619999] = FALSE THEN
-                                      , 6059770 .. 6059772, 6059781 .. 6059782, 6059785 .. 6059893, 6059898 .. 6059899, 6059903 .. 6059934, 6059940 .. 6059941, 6059946, 6059951 .. 6059968
-                                      , 6059970 .. 6060166, 6150620 .. 6150699, 6150723 .. 6150725, 6150901 .. 6184489, 6184495 .. 6184496, 6184501 .. 6184502, 6184510 .. 6189999] = false then
-                                    //+NPR5.48 [340086]
-                                    //+NPR5.41 [311855]
+              AllTransferCategory::"Retail Master" : begin      // All Retail Master and Setup Tables except Transactions
+
+                //-NPR5.51 [319037]
+                //-NPR5.41 [311855]
+                //IF AllObj."Object ID" IN [6014403,6014405..6014407,6150620..6150635,6150698,6150700,6150701,6151504] = FALSE THEN
+                //IF AllObj."Object ID" IN [6014403,6014405..6014409,6014411..6014426,6014429..6014432,6014434..6014436,6014439..6014444,6014445..6014446
+                    //,6014449..6014460,6014473..6014509,6014552..6014559,6014561..6014564,6014628..6014642,6059768,6059767
+        //-NPR5.48 [340086]
+        //              ,6059770..6059772,6059781..6059782,6059785..6059893,6059898,6059903..6059934,6059940..6059941,6059946,6059951..6059968
+        //              ,6059970..6060166,6150620..6150699,6150723..6150725,6150901..6184489,6184495..6184496,6184501..6184502,6184510..619999] = FALSE THEN
+                      //,6059770..6059772,6059781..6059782,6059785..6059893,6059898..6059899,6059903..6059934,6059940..6059941,6059946,6059951..6059968
+                      //,6059970..6060166,6150620..6150699,6150723..6150725,6150901..6184489,6184495..6184496,6184501..6184502,6184510..6189999] = FALSE THEN
+        //+NPR5.48 [340086]
+                //+NPR5.41 [311855]
+
+                if AllObj."Object ID" in [6014403,6014405..6014409,6014411..6014416,6014418..6014426,6014429..6014432,6014434..6014436,6014439..6014444,6014445..6014446
+                    ,6014449..6014460,6014473..6014477,6014481..6014509,6014552..6014559,6014561..6014564,6014628..6014642,6059768
+                    ,6059770..6059772,6059781..6059782,6059785..6059893,6059898..6059899,6059903..6059934,6059940..6059941,6059946,6059951..6059968
+                    ,6059970..6060039,6060042..6060051,6060054,6060056..6060166,6150620..6150639,6150643..6150699,6150723..6150725,6150901..6151010
+                    ,6151013..6151099,6151103,6151108..6151124,6151131..6151589,6151591..6151598,6151604..6184489,6184495..6184496,6184501..6184502,6184510..6189999] = false then
+
+                //+NPR5.51 [319037]
                                     AddTable(AllObj."Object ID");
 
                                 //-NPR5.41 [311855]
                                 AddTable(308);
                                 AddTable(309);
                                 AddTable(310);
+                //-NPR5.51 [319037]
+                AddTable(6150731);
+                AddTable(6150732);
+                //+NPR5.51 [319037]
                             end;
                             //+NPR5.41 [311855]
 
-                        AllTransferCategory::"StdRetail Master":
-                            begin   // Retail Master and Setup Tables except Transactions
-                                    //-NPR5.41 [311855]
-                                    //IF AllObj."Object ID" IN [17,32,36,37,45..46,253..254,405,472..481,5802,5811,6014403,6014405..6014407,6150620..6150635,6150698,6150700,6150701,6151504] = FALSE THEN
-                                if AllObj."Object ID" in [17, 21, 25, 32 .. 62, 81, 83 .. 91, 95 .. 97, 99 .. 203, 205 .. 224, 240 .. 241, 244 .. 249, 253 .. 269
-                                  , 271 .. 276, 278 .. 288, 290, 295 .. 307, 317, 330 .. 339, 342 .. 347, 353 .. 1705, 5061 .. 5078, 5093 .. 5104, 5107 .. 5650
-                                  , 5740 .. 5800, 5802 .. 5811, 5815 .. 6084, 6506 .. 6550, 6650 .. 6670, 7030 .. 6009999
-                                    , 6014403, 6014405 .. 6014409, 6014411 .. 6014426, 6014429 .. 6014432, 6014434 .. 6014436, 6014439 .. 6014444, 6014445 .. 6014446
-                                    , 6014449 .. 6014460, 6014473 .. 6014509, 6014552 .. 6014559, 6014561 .. 6014564, 6014628 .. 6014642, 6059768, 6059767
-                                      //-NPR5.48 [340086]
-                                      //              ,6059770..6059772,6059781..6059782,6059785..6059893,6059898,6059903..6059934,6059940..6059941,6059946,6059951..6059968
-                                      //              ,6059970..6060166,6150620..6150699,6150723..6150725,6150901..6184489,6184495..6184496,6184501..6184502,6184510..619999] = FALSE THEN
-                                      , 6059770 .. 6059772, 6059781 .. 6059782, 6059785 .. 6059893, 6059898 .. 6059899, 6059903 .. 6059934, 6059940 .. 6059941, 6059946, 6059951 .. 6059968
-                                      , 6059970 .. 6060166, 6150620 .. 6150699, 6150723 .. 6150725, 6150901 .. 6184489, 6184495 .. 6184496, 6184501 .. 6184502, 6184510 .. 6189999] = false then
-                                    //+NPR5.48 [340086]
-                                    //+NPR5.41 [311855]
+              AllTransferCategory::"StdRetail Master" : begin   // Retail Master and Setup Tables except Transactions
+                //-NPR5.51 [319037]
+                //-NPR5.41 [311855]
+                //IF AllObj."Object ID" IN [17,32,36,37,45..46,253..254,405,472..481,5802,5811,6014403,6014405..6014407,6150620..6150635,6150698,6150700,6150701,6151504] = FALSE THEN
+
+                //IF AllObj."Object ID" IN [17,21,25,32..62,81,83..91,95..97,99..203,205..224,240..241,244..249,253..269
+                  //,271..276,278..288,290,295..307,317,330..339,342..347,353..1705,5061..5078,5093..5104,5107..5650
+                  //,5740..5800,5802..5811,5815..6084,6506..6550,6650..6670,7030..6009999
+                    //,6014403,6014405..6014409,6014411..6014426,6014429..6014432,6014434..6014436,6014439..6014444,6014445..6014446
+                    //,6014449..6014460,6014473..6014509,6014552..6014559,6014561..6014564,6014628..6014642,6059768,6059767
+        //-NPR5.48 [340086]
+        //              ,6059770..6059772,6059781..6059782,6059785..6059893,6059898,6059903..6059934,6059940..6059941,6059946,6059951..6059968
+        //              ,6059970..6060166,6150620..6150699,6150723..6150725,6150901..6184489,6184495..6184496,6184501..6184502,6184510..619999] = FALSE THEN
+                      //,6059770..6059772,6059781..6059782,6059785..6059893,6059898..6059899,6059903..6059934,6059940..6059941,6059946,6059951..6059968
+                     // ,6059970..6060166,6150620..6150699,6150723..6150725,6150901..6184489,6184495..6184496,6184501..6184502,6184510..6189999] = FALSE THEN
+
+        //+NPR5.48 [340086]
+                //+NPR5.41 [311855]
+                if AllObj."Object ID" in [17,21,25,32..62,81,83..91,95..97,99..203,205..224,240..241,244..249,253..269
+                                          ,271..276,278..288,290,295..307,317,330..339,342..347,353..1705,5061..5078,5093..5104,5107..5650
+                                          ,5740..5800,5802..5811,5815..6084,6506..6550,6650..6670,7030..6009999
+                                          ,6014403,6014405..6014409,6014411..6014416,6014418..6014426,6014429..6014432,6014434..6014436,6014439..6014444,6014445..6014446
+                                          ,6014449..6014460,6014473..6014477,6014481..6014509,6014552..6014559,6014561..6014564,6014628..6014642,6059768
+                                          ,6059770..6059772,6059781..6059782,6059785..6059893,6059898..6059899,6059903..6059934,6059940..6059941,6059946,6059951..6059968
+                                          ,6059970..6060039,6060042..6060051,6060054,6060056..6060166,6150620..6150639,6150643..6150699,6150723..6150725,6150901..6151010
+                                          ,6151013..6151099,6151103,6151108..6151124,6151131..6151589,6151591..6151598,6151604..6184489,6184495..6184496,6184501..6184502,6184510..6189999] = false then
+
+
+
+                //+NPR5.51 [319037]
                                     AddTable(AllObj."Object ID");
                                 //-NPR5.41 [311855]
                                 AddTable(308);
@@ -965,6 +1044,23 @@ until AllObj.Next = 0;
                                 AddTable(310);
                             end;
                         //+NPR5.41 [311855]
+
+              //-NPR5.51 [319037]
+              AllTransferCategory::TicketingSetupMaster: begin
+                if AllObj."Object ID" in [6060118,6060119,6060120,6060121,6059784] then
+                  AddTable(AllObj."Object ID");
+              end;
+
+              AllTransferCategory::TicketingTransactional: begin
+                if AllObj."Object ID" in [6059785,6059786,6060109..6060116,6060121,6060123,6059787,6059788] then
+                  AddTable(AllObj."Object ID");
+              end;
+
+              AllTransferCategory::MembershipMaster: begin
+                if AllObj."Object ID" in [6060124,6060125,6060140,6060141,6060142,6060132,6060136] then
+                  AddTable(AllObj."Object ID");
+              end;
+              //-NPR5.51 [319037]
 
                         else
                             AddTable(AllObj."Object ID");

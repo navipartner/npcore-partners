@@ -19,6 +19,7 @@ codeunit 6014550 "RP Aux - Misc. Library"
     //                                   to return formatted month.
     // NPR5.48/MMV /20181206 CASE 327107 Added hex conversions
     // NPR5.49/TSA /20190218 CASE 342244 Added functions MultiplicativeInverseEncode() and MultiplicativeInverseDecode() to obfuscation of numbers (receipt number)
+    // NPR5.51/MMV /20190712 CASE 360972 Added date formula functions
 
 
     trigger OnRun()
@@ -269,6 +270,16 @@ codeunit 6014550 "RP Aux - Misc. Library"
         //+NPR5.49 [342244]
     end;
 
+    local procedure CalculateDate(FormattedDate: Text;DateFormula: Text): Text
+    var
+        Date: Date;
+    begin
+        //-NPR5.51 [360972]
+        Evaluate(Date, FormattedDate);
+        exit(Format(CalcDate('<' + DateFormula + '>', Date)));
+        //+NPR5.51 [360972]
+    end;
+
     procedure "// Locals"()
     begin
     end;
@@ -394,6 +405,10 @@ codeunit 6014550 "RP Aux - Misc. Library"
         //-NPR5.49 [342244]
         AddFunction(tmpRetailList, 'OBFUSCATE_MI');
         //+NPR5.49 [342244]
+
+        //-NPR5.51 [360972]
+        AddFunction(tmpRetailList, 'CALC_DATE');
+        //+NPR5.51 [360972]
     end;
 
     [EventSubscriber(ObjectType::Table, 6014445, 'OnFunction', '', false, false)]
@@ -457,6 +472,10 @@ codeunit 6014550 "RP Aux - Misc. Library"
             //-NPR5.49 [342244]
             'OBFUSCATE_MI' : "Processing Value" := Format ( MultiplicativeInverseEncode (ParseAsBigInteger ("Processing Value")), 0, 9);
             //+NPR5.49 [342244]
+
+        //-NPR5.51 [360972]
+            'CALC_DATE' : "Processing Value" := CalculateDate("Processing Value", "Processing Function Parameter");
+        //+NPR5.51 [360972]
 
             //Legacy syntax (can no longer be selected on the list)
             'DECTOINT'        : FormatNumberNoDecimal("Processing Value");
