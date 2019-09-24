@@ -18,7 +18,7 @@ report 6014435 "Vendor/Item Group"
     //                                   Corrected DG Percent Calculation
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './VendorItem Group.rdlc';
+    RDLCLayout = './layouts/VendorItem Group.rdlc';
 
     Caption = 'Vendor/Item Group';
     UsageCategory = ReportsAndAnalysis;

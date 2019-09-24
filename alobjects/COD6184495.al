@@ -106,7 +106,7 @@ codeunit 6184495 "Pepper FileMgmt. Functions TSD"
 
     local procedure GetZipFileToInstall(Data: Text;var PepperB64File: Text)
     var
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         InStr: InStream;
         BinaryReader: DotNet npNetBinaryReader;
         MemoryStream: DotNet npNetMemoryStream;
@@ -158,7 +158,7 @@ codeunit 6184495 "Pepper FileMgmt. Functions TSD"
 
     local procedure SerializeJson("Object": Variant): Text
     var
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
     begin
         exit(JsonConvert.SerializeObject(Object));
     end;

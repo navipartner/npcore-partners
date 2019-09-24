@@ -8,7 +8,7 @@ report 6014416 "Sale Statistics per Vendor"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.40/TJ  /20180319  CASE 307717 Replaced hardcoded dates with DMY2DATE structure
     DefaultLayout = RDLC;
-    RDLCLayout = './Sale Statistics per Vendor.rdlc';
+    RDLCLayout = './layouts/Sale Statistics per Vendor.rdlc';
 
     Caption = 'Sale Statistics Per Vendor';
     UsageCategory = ReportsAndAnalysis;

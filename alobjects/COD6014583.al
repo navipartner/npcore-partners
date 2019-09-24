@@ -36,7 +36,7 @@ codeunit 6014583 "Report Printer Interface"
         RecordSpecified: Boolean;
         Err_InvalidRecRef: Label 'The first data item in report "%1" does not use table %2';
 
-    procedure RunReport(Number: Integer;ReqWindow: Boolean;SystemPrinter: Boolean;"Record": Variant)
+    procedure RunReport(Number: Integer; ReqWindow: Boolean; SystemPrinter: Boolean; "Record": Variant)
     var
         POSSession: Codeunit "POS Session";
         POSFrontEndMgt: Codeunit "POS Front End Management";
@@ -82,35 +82,35 @@ codeunit 6014583 "Report Printer Interface"
 
         //-NPR5.48 [338598]
         if GuiAllowed then
-        //+NPR5.48 [338598]
-          if not POSSession.IsActiveSession(POSFrontEndMgt) then begin
-            RunStandardReportFlow(Number, ReqWindow, SystemPrinter, Record);
-            exit;
-          end;
+            //+NPR5.48 [338598]
+            if not POSSession.IsActiveSession(POSFrontEndMgt) then begin
+                RunStandardReportFlow(Number, ReqWindow, SystemPrinter, Record);
+                exit;
+            end;
 
-        if not ObjectOutputMgt.TryGetOutputRec(ObjectOutputSelection."Object Type"::Report,Number,'',UserId, ObjectOutputSelection) then begin
-        //-NPR5.48 [338598]
-          if GuiAllowed then
-        //+NPR5.48 [338598]
-            RunStandardReportFlow(Number, ReqWindow, SystemPrinter, Record);
-          exit;
+        if not ObjectOutputMgt.TryGetOutputRec(ObjectOutputSelection."Object Type"::Report, Number, '', UserId, ObjectOutputSelection) then begin
+            //-NPR5.48 [338598]
+            if GuiAllowed then
+                //+NPR5.48 [338598]
+                RunStandardReportFlow(Number, ReqWindow, SystemPrinter, Record);
+            exit;
         end;
 
         RunCustomReportFlow(Number, ReqWindow, Record, ObjectOutputSelection);
         //+NPR5.47 [327664]
     end;
 
-    local procedure RunStandardReportFlow(Number: Integer;ReqWindow: Boolean;SystemPrinter: Boolean;"Record": Variant)
+    local procedure RunStandardReportFlow(Number: Integer; ReqWindow: Boolean; SystemPrinter: Boolean; "Record": Variant)
     begin
         //-NPR5.47 [327664]
         if RecordSpecified then
-          REPORT.Run(Number, ReqWindow, SystemPrinter, Record)
+            REPORT.Run(Number, ReqWindow, SystemPrinter, Record)
         else
-          REPORT.Run(Number, ReqWindow, SystemPrinter);
+            REPORT.Run(Number, ReqWindow, SystemPrinter);
         //+NPR5.47 [327664]
     end;
 
-    local procedure RunCustomReportFlow(Number: Integer;ReqWindow: Boolean;"Record": Variant;ObjectOutputSelection: Record "Object Output Selection")
+    local procedure RunCustomReportFlow(Number: Integer; ReqWindow: Boolean; "Record": Variant; ObjectOutputSelection: Record "Object Output Selection")
     var
         PDFStream: DotNet npNetMemoryStream;
     begin
@@ -118,22 +118,22 @@ codeunit 6014583 "Report Printer Interface"
         if not (ObjectOutputSelection."Output Type" in [ObjectOutputSelection."Output Type"::"Printer Name",
                                                         ObjectOutputSelection."Output Type"::"Google Print",
                                                         ObjectOutputSelection."Output Type"::"E-mail"]) then
-          ObjectOutputSelection.FieldError("Output Type");
+            ObjectOutputSelection.FieldError("Output Type");
 
         if not CreatePDF(Number, ReqWindow, Record, PDFStream) then
-          exit;
+            exit;
 
         if PDFStream.Length < 1 then
-          exit;
+            exit;
 
         if TryPrintPDF(ObjectOutputSelection."Output Path", PDFStream, ObjectOutputSelection."Output Type", Number) then
-          exit;
+            exit;
 
         LastErrorText := GetLastErrorText();
         if (not SuppressError) and GuiAllowed then begin
-          if LastErrorText <> '' then
-            LastErrorText := ' - ' + LastErrorText;
-          Error(Err_ReportPrint, Format(Number), LastErrorText);
+            if LastErrorText <> '' then
+                LastErrorText := ' - ' + LastErrorText;
+            Error(Err_ReportPrint, Format(Number), LastErrorText);
         end;
         //+NPR5.47 [327664]
     end;
@@ -152,35 +152,37 @@ codeunit 6014583 "Report Printer Interface"
     begin
     end;
 
-    local procedure CreatePDF(Number: Integer;ReqWindow: Boolean;var "Record": Variant;var OutPDFStream: DotNet npNetMemoryStream): Boolean
+    local procedure CreatePDF(Number: Integer; ReqWindow: Boolean; var "Record": Variant; var OutPDFStream: DotNet npNetMemoryStream): Boolean
     var
         Parameters: Text;
         OutStr: OutStream;
         RecRef: RecordRef;
     begin
         if ReqWindow then begin
-          Parameters := REPORT.RunRequestPage(Number);
-          if Parameters = '' then
-            exit(false);
+            Parameters := REPORT.RunRequestPage(Number);
+            if Parameters = '' then
+                exit(false);
         end;
 
         if Record.IsRecord then
-          RecRef.GetTable(Record)
-        else if Record.IsRecordRef then
-          RecRef := Record;
+            RecRef.GetTable(Record)
+        else
+            if Record.IsRecordRef then
+                RecRef := Record;
 
         OutPDFStream := OutPDFStream.MemoryStream();
+        OutStr := OutPDFStream;
 
         if RecordSpecified then begin
-          REPORT.SaveAs(Number, Parameters, REPORTFORMAT::Pdf, OutPDFStream, RecRef)
+            REPORT.SaveAs(Number, Parameters, REPORTFORMAT::Pdf, OutStr, RecRef)
         end else
-          REPORT.SaveAs(Number, Parameters, REPORTFORMAT::Pdf, OutPDFStream);
+            REPORT.SaveAs(Number, Parameters, REPORTFORMAT::Pdf, OutStr);
 
         exit(true);
     end;
 
     [TryFunction]
-    local procedure TryPrintPDF(OutputPath: Text;var Stream: DotNet npNetMemoryStream;OutputType: Integer;ObjectID: Integer)
+    local procedure TryPrintPDF(OutputPath: Text; var Stream: DotNet npNetMemoryStream; OutputType: Integer; ObjectID: Integer)
     var
         ObjectOutputSelection: Record "Object Output Selection";
         PrintMethodMgt: Codeunit "Print Method Mgt.";
@@ -191,12 +193,15 @@ codeunit 6014583 "Report Printer Interface"
         //+NPR5.30 [261964]
 
         case OutputType of
-          ObjectOutputSelection."Output Type"::"E-mail" : PrintMethodMgt.PrintViaEmail( OutputPath, Stream );
-          ObjectOutputSelection."Output Type"::"Printer Name" : PrintMethodMgt.PrintFileLocal( OutputPath, Stream, 'pdf');
-          //-NPR5.30 [261964]
-          //ObjectOutputSelection."Output Type"::"Google Print" : Success := PrintMethodMgt.PrintViaGoogleCloud( OutputPath, Stream, 'application/pdf', 0, ObjectID, OutErrorMessage);
-          ObjectOutputSelection."Output Type"::"Google Print" : PrintMethodMgt.PrintViaGoogleCloud( OutputPath, Stream, 'application/pdf', 0, ObjectID);
-          //+NPR5.30 [261964]
+            ObjectOutputSelection."Output Type"::"E-mail":
+                PrintMethodMgt.PrintViaEmail(OutputPath, Stream);
+            ObjectOutputSelection."Output Type"::"Printer Name":
+                PrintMethodMgt.PrintFileLocal(OutputPath, Stream, 'pdf');
+                //-NPR5.30 [261964]
+                //ObjectOutputSelection."Output Type"::"Google Print" : Success := PrintMethodMgt.PrintViaGoogleCloud( OutputPath, Stream, 'application/pdf', 0, ObjectID, OutErrorMessage);
+            ObjectOutputSelection."Output Type"::"Google Print":
+                PrintMethodMgt.PrintViaGoogleCloud(OutputPath, Stream, 'application/pdf', 0, ObjectID);
+                //+NPR5.30 [261964]
         end;
 
         //-NPR5.30 [261964]

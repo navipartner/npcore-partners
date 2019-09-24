@@ -85,7 +85,7 @@ codeunit 6151202 "NpCs POS Action Process Order"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', true, true)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: JsonObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         LocationFilter: Text;

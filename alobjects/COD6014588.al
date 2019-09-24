@@ -103,7 +103,7 @@ codeunit 6014588 "GCP API"
         AuthenticationHeader: DotNet npNetAuthenticationHeaderValue;
         HttpResponseMessage: DotNet npNetHttpResponseMessage;
         "Integer": DotNet npNetInt32;
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         Dictionary: DotNet npNetDictionary_Of_T_U;
         Encoding: DotNet npNetEncoding;
         Success: Boolean;
@@ -142,7 +142,7 @@ codeunit 6014588 "GCP API"
     end;
 
     [TryFunction]
-    procedure LookupPrinter(PrinterID: Text;var OutJObject: DotNet npNetJObject;FirstAttempt: Boolean)
+    procedure LookupPrinter(PrinterID: Text;var OutJObject: DotNet JObject;FirstAttempt: Boolean)
     var
         [SuppressDispose]
         FormUrlEncodedContent: DotNet npNetFormUrlEncodedContent;
@@ -175,7 +175,7 @@ codeunit 6014588 "GCP API"
     end;
 
     [TryFunction]
-    procedure GetPrinters(var OutJObject: DotNet npNetJObject;FirstAttempt: Boolean)
+    procedure GetPrinters(var OutJObject: DotNet JObject;FirstAttempt: Boolean)
     var
         [SuppressDispose]
         StringContent: DotNet npNetStringContent;
@@ -211,7 +211,7 @@ codeunit 6014588 "GCP API"
         [SuppressDispose]
         AuthenticationHeader: DotNet npNetAuthenticationHeaderValue;
         HttpResponseMessage: DotNet npNetHttpResponseMessage;
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         Dictionary: DotNet npNetDictionary_Of_T_U;
     begin
         Clear(_AccessToken);
@@ -249,7 +249,7 @@ codeunit 6014588 "GCP API"
         FormUrlEncodedContent: DotNet npNetFormUrlEncodedContent;
         AuthenticationHeader: DotNet npNetAuthenticationHeaderValue;
         HttpResponseMessage: DotNet npNetHttpResponseMessage;
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         Dictionary: DotNet npNetDictionary_Of_T_U;
     begin
         if StrLen(_RefreshToken) = 0 then
@@ -300,7 +300,7 @@ codeunit 6014588 "GCP API"
     end;
 
     [TryFunction]
-    local procedure TryParseJSON(HttpResponseMessage: DotNet npNetHttpResponseMessage;JObject: DotNet npNetJObject)
+    local procedure TryParseJSON(HttpResponseMessage: DotNet npNetHttpResponseMessage;JObject: DotNet JObject)
     var
         Text: Text;
     begin

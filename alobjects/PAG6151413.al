@@ -30,17 +30,17 @@ page 6151413 "Magento Item Picture List"
                     Visible = HasVariants;
                     repeater(Group)
                     {
-                        field("Item No.";"Item No.")
+                        field("Item No."; "Item No.")
                         {
                             Editable = false;
                         }
-                        field(Description;Description)
+                        field(Description; Description)
                         {
                             Editable = false;
                         }
                     }
                 }
-                part(MagentoPictureLinkSubform;"Magento Picture Link Subform")
+                part(MagentoPictureLinkSubform; "Magento Picture Link Subform")
                 {
                     Caption = 'Pictures';
                     ShowFilter = false;
@@ -49,7 +49,7 @@ page 6151413 "Magento Item Picture List"
         }
         area(factboxes)
         {
-            part(MagentoPictureDragDropAddin;"Magento DragDropPic. Addin")
+            part(MagentoPictureDragDropAddin; "Magento DragDropPic. Addin")
             {
                 Caption = 'Magento Picture';
             }
@@ -150,7 +150,7 @@ page 6151413 "Magento Item Picture List"
         //+MAG2.22 [359285]
 
         if ItemNo = '' then
-          Error(Text000);
+            Error(Text000);
 
         HasVariants := false;
         Init;

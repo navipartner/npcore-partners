@@ -56,7 +56,7 @@ codeunit 6150700 "POS Session"
         DataStore: DotNet npNetDataStore;
         CurrentView: DotNet npNetView0;
         KeyboardBindings: DotNet npNetList_Of_T;
-        ActionStateRecRef: array [1024] of RecordRef;
+        ActionStateRecRef: array[1024] of RecordRef;
         ActionStateCurrentActionId: Guid;
         ActionStateCurrentAction: Text;
         HardwareId: Text;
@@ -81,47 +81,47 @@ codeunit 6150700 "POS Session"
         SESSION_MISSING: Label 'POS Session object could not be retrieved. This is a programming bug, not a user error.';
         FRONTEND_MISSING: Label 'POS Front End object could not be retrieved. This is a programming bug, not a user error.';
         "--- Workflow 2.0 state ---": Integer;
-        Workflow20State: array [1000] of Codeunit "POS Workflows 2.0 - State";
+        Workflow20State: array[1000] of Codeunit "POS Workflows 2.0 - State";
         Workflow20StateIndex: DotNet npNetDictionary_Of_T_U;
-        Workflow20Map: array [1000] of Boolean;
+        Workflow20Map: array[1000] of Boolean;
 
     local procedure "---Initialization---"()
     begin
     end;
 
     [Scope('Personalization')]
-    procedure Constructor(FrameworkIn: DotNet npNetIFramework0;FrontEndIn: Codeunit "POS Front End Management";SetupIn: Codeunit "POS Setup";SessionIn: Codeunit "POS Session")
+    procedure Constructor(FrameworkIn: ControlAddIn Transcendence; FrontEndIn: Codeunit "POS Front End Management"; SetupIn: Codeunit "POS Setup"; SessionIn: Codeunit "POS Session")
     var
         JavaScriptInterface: Codeunit "POS JavaScript Interface";
         OldPOSSession: Codeunit "POS Session";
         OldFrontEnd: Codeunit "POS Front End Management";
     begin
         if not Initialized then begin
-          //-NPR5.43 [318028]
-          if OldPOSSession.IsActiveSession(OldFrontEnd) then begin
-            //Cleanup previous POS Session before initializing new one.
-            OldFrontEnd.GetSession(OldPOSSession);
-            OldPOSSession.Destructor();
-          end;
+            //-NPR5.43 [318028]
+            if OldPOSSession.IsActiveSession(OldFrontEnd) then begin
+                //Cleanup previous POS Session before initializing new one.
+                OldFrontEnd.GetSession(OldPOSSession);
+                OldPOSSession.Destructor();
+            end;
 
-          FrontEndIn.Initialize(FrameworkIn,SessionIn);
-          //+NPR5.43 [318028]
+            FrontEndIn.Initialize(FrameworkIn, SessionIn);
+            //+NPR5.43 [318028]
 
-          FrontEnd := FrontEndIn;
-          Setup := SetupIn;
-          This := SessionIn;
-          Clear(Stargate);
+            FrontEnd := FrontEndIn;
+            Setup := SetupIn;
+            This := SessionIn;
+            Clear(Stargate);
 
-          JavaScriptInterface.Initialize(SessionIn,FrontEndIn);
+            JavaScriptInterface.Initialize(SessionIn, FrontEndIn);
 
-          //-NPR5.43 [318028]
-          FrontEndKeeper.Initialize(FrameworkIn,FrontEnd,This);
-          BindSubscription(FrontEndKeeper);
-          //+NPR5.43 [318028]
+            //-NPR5.43 [318028]
+            FrontEndKeeper.Initialize(FrameworkIn, FrontEnd, This);
+            BindSubscription(FrontEndKeeper);
+            //+NPR5.43 [318028]
 
-          OnInitialize(FrontEnd);
+            OnInitialize(FrontEnd);
         end else
-          Message(Text001);
+            Message(Text001);
 
         Initialized := true;
     end;
@@ -136,7 +136,7 @@ codeunit 6150700 "POS Session"
         // Do not call this method from elsewhere!
 
         if InitializedUI then
-          exit;
+            exit;
 
         //-NPR5.40 [306347]
         DebugWithTimestamp('GetSalespersonRecord');
@@ -145,7 +145,7 @@ codeunit 6150700 "POS Session"
         //-NPR5.40 [306347]
         DebugWithTimestamp('GetRegisterRecord');
         //+NPR5.40 [306347]
-        Setup.GetRegisterRecord (Register);
+        Setup.GetRegisterRecord(Register);
 
         //-NPR5.40 [306347]
         DebugWithTimestamp('UI.Initialize');
@@ -183,13 +183,13 @@ codeunit 6150700 "POS Session"
         //-NPR5.40 [306347]
         DebugWithTimestamp('UI.InitializeMenus');
         //+NPR5.40 [306347]
-        UI.InitializeMenus(Register,Salesperson,This);
+        UI.InitializeMenus(Register, Salesperson, This);
         //-NPR5.37 [293905]
         //UI.ConfigureReusableWorkflows(This);
         //-NPR5.40 [306347]
         DebugWithTimestamp('UI.ConfigureReusableWorkflow');
         //+NPR5.40 [306347]
-        UI.ConfigureReusableWorkflows(This,Setup);
+        UI.ConfigureReusableWorkflows(This, Setup);
         //+NPR5.37 [293905]
         //-NPR5.37 [291777]
         //-NPR5.40 [306347]
@@ -231,16 +231,16 @@ codeunit 6150700 "POS Session"
 
         //-NPR5.47 [327471]
         PreviousRegisterNo := Register."Register No.";
-        Setup.GetRegisterRecord (Register);
+        Setup.GetRegisterRecord(Register);
 
         if (ResendMenus) then begin
-          Setup.GetSalespersonRecord(Salesperson);
+            Setup.GetSalespersonRecord(Salesperson);
 
-          UI.Initialize(FrontEnd);
-          UI.InitializeMenus(Register,Salesperson,This);
+            UI.Initialize(FrontEnd);
+            UI.InitializeMenus(Register, Salesperson, This);
 
-          if (PreviousRegisterNo <> Register."Register No.") then
-            UI.InitializeLogo (Register);
+            if (PreviousRegisterNo <> Register."Register No.") then
+                UI.InitializeLogo(Register);
 
         end;
         StartPOSSession();
@@ -257,18 +257,18 @@ codeunit 6150700 "POS Session"
         OnInitializeDataSource(DataStore);
 
         if DataStore.DataSources.Count > 0 then begin
-          RequestRefreshData();
-          JS.RefreshData(This,FrontEnd);
+            RequestRefreshData();
+            JS.RefreshData(This, FrontEnd);
         end;
     end;
 
     [Scope('Personalization')]
-    procedure InitializeSessionId(HardwareIdIn: Text;SessionNameIn: Text;HostNameIn: Text)
+    procedure InitializeSessionId(HardwareIdIn: Text; SessionNameIn: Text; HostNameIn: Text)
     begin
         HardwareId := HardwareIdIn;
         SessionName := SessionNameIn;
         HostName := HostNameIn;
-        OnFrontEndId(HardwareId,SessionName,HostName,This,FrontEnd);
+        OnFrontEndId(HardwareId, SessionName, HostName, This, FrontEnd);
     end;
 
     local procedure InitializeKeyboardBindings()
@@ -282,7 +282,7 @@ codeunit 6150700 "POS Session"
         POSKeyboardBindingMgt.DiscoverKeyboardBindings(KeyboardBindings);
         //+NPR5.48 [323835]
         if KeyboardBindings.Count > 0 then
-          FrontEnd.ConfigureKeyboardBindings(KeyboardBindings);
+            FrontEnd.ConfigureKeyboardBindings(KeyboardBindings);
         //+NPR5.38 [295800]
     end;
 
@@ -298,7 +298,7 @@ codeunit 6150700 "POS Session"
 
         //-NPR5.40 [306347]
         if not SessionStarted then
-          OnInitializationComplete(FrontEnd);
+            OnInitializationComplete(FrontEnd);
         //+NPR5.40 [306347]
 
         SessionStarted := true;
@@ -313,11 +313,11 @@ codeunit 6150700 "POS Session"
     begin
         //-NPR5.43 [318028]
         if not Finalized then begin
-          OnFinalize(FrontEnd);
-          UnbindSubscription(FrontEndKeeper);
-          ClearAll;
-          SessionActions.DeleteAll;
-          Finalized := true;
+            OnFinalize(FrontEnd);
+            UnbindSubscription(FrontEndKeeper);
+            ClearAll;
+            SessionActions.DeleteAll;
+            Finalized := true;
         end;
         //+NPR5.43 [318028]
     end;
@@ -334,21 +334,21 @@ codeunit 6150700 "POS Session"
     begin
     end;
 
-    procedure GetWorkflow20State(WorkflowId: Integer;ActionCode: Text;var State: Codeunit "POS Workflows 2.0 - State")
+    procedure GetWorkflow20State(WorkflowId: Integer; ActionCode: Text; var State: Codeunit "POS Workflows 2.0 - State")
     var
         StateIndex: Integer;
     begin
         //-NPR5.50 [338666]
         if (IsNull(Workflow20StateIndex)) then
-          Workflow20StateIndex := Workflow20StateIndex.Dictionary();
+            Workflow20StateIndex := Workflow20StateIndex.Dictionary();
 
         if (not Workflow20StateIndex.ContainsKey(WorkflowId)) then begin
-          StateIndex := GetNextWorkflow20StateIndex();
-          Workflow20StateIndex.Add(WorkflowId,StateIndex);
-          Clear(Workflow20State[StateIndex]);
-          Workflow20State[StateIndex].Constructor(FrontEnd,ActionCode);
+            StateIndex := GetNextWorkflow20StateIndex();
+            Workflow20StateIndex.Add(WorkflowId, StateIndex);
+            Clear(Workflow20State[StateIndex]);
+            Workflow20State[StateIndex].Constructor(FrontEnd, ActionCode);
         end else
-          StateIndex := Workflow20StateIndex.Item(WorkflowId);
+            StateIndex := Workflow20StateIndex.Item(WorkflowId);
 
         State := Workflow20State[StateIndex];
         //+NPR5.50 [338666]
@@ -360,10 +360,10 @@ codeunit 6150700 "POS Session"
     begin
         //-NPR5.50 [338666]
         for i := 1 to 1000 do begin
-          if not Workflow20Map[i] then begin
-            Workflow20Map[i] := true;
-            exit(i);
-          end;
+            if not Workflow20Map[i] then begin
+                Workflow20Map[i] := true;
+                exit(i);
+            end;
         end;
 
         // TODO: Here either we should retry to recover an old ID, or we should throw an error
@@ -376,7 +376,7 @@ codeunit 6150700 "POS Session"
     begin
         //-NPR5.50 [338666]
         if (not Workflow20StateIndex.ContainsKey(WorkflowId)) then
-          exit;
+            exit;
 
         StateIndex := Workflow20StateIndex.Item(WorkflowId);
         Workflow20StateIndex.Remove(WorkflowId);
@@ -396,14 +396,14 @@ codeunit 6150700 "POS Session"
         TransactionNo: Text;
     begin
         Clear(Sale);
-        Sale.InitializeNewSale(Register,FrontEnd,Setup,Sale);
+        Sale.InitializeNewSale(Register, FrontEnd, Setup, Sale);
     end;
 
     [Scope('Personalization')]
     procedure BeginAction("Action": Text): Guid
     begin
         if ActionStateInAction then
-          FrontEnd.ReportBug(StrSubstNo(Text004,Action,ActionStateCurrentAction,ActionStateCurrentActionId));
+            FrontEnd.ReportBug(StrSubstNo(Text004, Action, ActionStateCurrentAction, ActionStateCurrentActionId));
 
         ActionStateInAction := true;
         ActionState := ActionState.Dictionary();
@@ -415,33 +415,33 @@ codeunit 6150700 "POS Session"
     end;
 
     [Scope('Personalization')]
-    procedure StoreActionState("Key": Text;"Object": Variant)
+    procedure StoreActionState("Key": Text; "Object": Variant)
     begin
         if Object.IsRecord then
-          Object := StoreActionStateRecRef(Object);
+            Object := StoreActionStateRecRef(Object);
 
-        if not TryStoreActionState(Key,Object) then
-          FrontEnd.ReportBug(StrSubstNo(Text003,ActionStateCurrentAction,GetLastErrorText));
+        if not TryStoreActionState(Key, Object) then
+            FrontEnd.ReportBug(StrSubstNo(Text003, ActionStateCurrentAction, GetLastErrorText));
     end;
 
     [Scope('Personalization')]
-    procedure RetrieveActionState("Key": Text;var "Object": Variant)
+    procedure RetrieveActionState("Key": Text; var "Object": Variant)
     begin
         Object := ActionState.Item(Key);
     end;
 
     [Scope('Personalization')]
-    procedure RetrieveActionStateSafe("Key": Text;var "Object": Variant): Boolean
+    procedure RetrieveActionStateSafe("Key": Text; var "Object": Variant): Boolean
     begin
 
         if ActionState.ContainsKey(Key) then begin
-          RetrieveActionState(Key,Object);
-          exit(true);
+            RetrieveActionState(Key, Object);
+            exit(true);
         end;
     end;
 
     [Scope('Personalization')]
-    procedure RetrieveActionStateRecordRef("Key": Text;var RecRef: RecordRef)
+    procedure RetrieveActionStateRecordRef("Key": Text; var RecRef: RecordRef)
     var
         Index: Integer;
     begin
@@ -450,10 +450,10 @@ codeunit 6150700 "POS Session"
     end;
 
     [Scope('Personalization')]
-    procedure EndAction("Action": Text;Id: Guid)
+    procedure EndAction("Action": Text; Id: Guid)
     begin
         if (Action <> ActionStateCurrentAction) or (Id <> ActionStateCurrentActionId) then
-          FrontEnd.ReportBug(StrSubstNo(Text005,Action,Id,ActionStateCurrentAction,ActionStateCurrentActionId));
+            FrontEnd.ReportBug(StrSubstNo(Text005, Action, Id, ActionStateCurrentAction, ActionStateCurrentActionId));
 
         ClearActionState();
     end;
@@ -481,7 +481,7 @@ codeunit 6150700 "POS Session"
     begin
         //-NPR5.40 [306347]
         if ActionsDiscovered then
-          exit;
+            exit;
 
         POSAction.DiscoverActions();
         ActionsDiscovered := true;
@@ -497,23 +497,23 @@ codeunit 6150700 "POS Session"
         //  SessionActions.INSERT();
         SessionActions := ActionIn;
         if not SessionActions.Insert then begin
-          ActionIn.CalcFields(Workflow);
-          SessionActions.Workflow := ActionIn.Workflow;
-          //-NPR5.44 [286547]
-          ActionIn.CalcFields("Custom JavaScript Logic");
-          SessionActions."Custom JavaScript Logic" := ActionIn."Custom JavaScript Logic";
-          //+NPR5.44 [286547]
-          SessionActions.Modify;
+            ActionIn.CalcFields(Workflow);
+            SessionActions.Workflow := ActionIn.Workflow;
+            //-NPR5.44 [286547]
+            ActionIn.CalcFields("Custom JavaScript Logic");
+            SessionActions."Custom JavaScript Logic" := ActionIn."Custom JavaScript Logic";
+            //+NPR5.44 [286547]
+            SessionActions.Modify;
         end;
         //+NPR5.40 [306347]
     end;
 
     [Scope('Personalization')]
-    procedure RetrieveSessionAction(ActionCode: Code[20];var ActionOut: Record "POS Action"): Boolean
+    procedure RetrieveSessionAction(ActionCode: Code[20]; var ActionOut: Record "POS Action"): Boolean
     begin
         //-NPR5.40 [306347]
         if not SessionActions.Get(ActionCode) then
-          exit(false);
+            exit(false);
 
         ActionOut := SessionActions;
         SessionActions.CalcFields(Workflow);
@@ -549,10 +549,10 @@ codeunit 6150700 "POS Session"
     end;
 
     [Scope('Personalization')]
-    procedure GetSaleContext(var SaleOut: Codeunit "POS Sale";var SaleLineOut: Codeunit "POS Sale Line";var PaymentLineOut: Codeunit "POS Payment Line")
+    procedure GetSaleContext(var SaleOut: Codeunit "POS Sale"; var SaleLineOut: Codeunit "POS Sale Line"; var PaymentLineOut: Codeunit "POS Payment Line")
     begin
         SaleOut := Sale;
-        Sale.GetContext(SaleLineOut,PaymentLineOut);
+        Sale.GetContext(SaleLineOut, PaymentLineOut);
     end;
 
     [Scope('Personalization')]
@@ -566,7 +566,7 @@ codeunit 6150700 "POS Session"
     var
         PaymentLineOut: Codeunit "POS Payment Line";
     begin
-        Sale.GetContext(SaleLineOut,PaymentLineOut);
+        Sale.GetContext(SaleLineOut, PaymentLineOut);
     end;
 
     [Scope('Personalization')]
@@ -574,7 +574,7 @@ codeunit 6150700 "POS Session"
     var
         SaleLineOut: Codeunit "POS Sale Line";
     begin
-        Sale.GetContext(SaleLineOut,PaymentLineOut);
+        Sale.GetContext(SaleLineOut, PaymentLineOut);
     end;
 
     [Scope('Personalization')]
@@ -594,15 +594,15 @@ codeunit 6150700 "POS Session"
     begin
         //-NPR5.38 [295800]
         if IsNull(KeyboardBindings) then
-          exit(false);
+            exit(false);
 
         if (KeyboardBindings.Count = 0) and (not KeyboardBindings.Contains(KeyPress)) then
-          exit(false);
+            exit(false);
 
-        OnKeyPress(KeyPress,This,Setup,FrontEnd,Handled);
+        OnKeyPress(KeyPress, This, Setup, FrontEnd, Handled);
 
         if not Handled then
-          FrontEnd.ReportBug(StrSubstNo(Text006,KeyPress));
+            FrontEnd.ReportBug(StrSubstNo(Text006, KeyPress));
         //+NPR5.38 [295800]
     end;
 
@@ -626,7 +626,7 @@ codeunit 6150700 "POS Session"
     end;
 
     [Scope('Personalization')]
-    procedure GetSessionId(var HardwareIdOut: Text;var SessionNameOut: Text;var HostNameOut: Text)
+    procedure GetSessionId(var HardwareIdOut: Text; var SessionNameOut: Text; var HostNameOut: Text)
     begin
         HardwareIdOut := HardwareId;
         SessionNameOut := SessionName;
@@ -637,7 +637,7 @@ codeunit 6150700 "POS Session"
     procedure DebugWithTimestamp(Trace: Text)
     begin
         //-NPR5.40 [306347]
-        DebugTrace += Trace + ' at ' + Format(CurrentDateTime,0,'<Hours24,2>:<Minutes,2>:<Seconds,2><Second dec>') + ';';
+        DebugTrace += Trace + ' at ' + Format(CurrentDateTime, 0, '<Hours24,2>:<Minutes,2>:<Seconds,2><Second dec>') + ';';
         //+NPR5.40 [306347]
     end;
 
@@ -651,13 +651,13 @@ codeunit 6150700 "POS Session"
     end;
 
     [Scope('Personalization')]
-    procedure AddServerStopwatch(Keyword: Text;Duration: Duration)
+    procedure AddServerStopwatch(Keyword: Text; Duration: Duration)
     var
         Durationms: Integer;
     begin
         //-NPR5.43 [315838]
         Durationms := Duration;
-        ServerStopwatch += StrSubstNo('[%1:%2]', DelChr(Keyword,'=','[:]'), Durationms);
+        ServerStopwatch += StrSubstNo('[%1:%2]', DelChr(Keyword, '=', '[:]'), Durationms);
         //+NPR5.43 [315838]
     end;
 
@@ -698,7 +698,7 @@ codeunit 6150700 "POS Session"
         Setup.Initialize(UserId);
         Setup.GetRegisterRecord(Register);
 
-        Sale.InitializeAtLogin(Register,Setup);
+        Sale.InitializeAtLogin(Register, Setup);
     end;
 
     local procedure StoreActionStateRecRef("Object": Variant) StoredIndex: Integer
@@ -709,12 +709,12 @@ codeunit 6150700 "POS Session"
     end;
 
     [TryFunction]
-    local procedure TryStoreActionState("Key": Text;"Object": Variant)
+    local procedure TryStoreActionState("Key": Text; "Object": Variant)
     begin
         if ActionState.ContainsKey(Key) then
-          ActionState.Remove(Key);
+            ActionState.Remove(Key);
 
-        ActionState.Add(Key,Object);
+        ActionState.Add(Key, Object);
     end;
 
     local procedure "---Process---"()
@@ -779,11 +779,11 @@ codeunit 6150700 "POS Session"
         POSSessionCheck: Codeunit "POS Session";
         Active: Boolean;
     begin
-        OnDetectFramework(FrontEndOut,POSSessionCheck,Active);
+        OnDetectFramework(FrontEndOut, POSSessionCheck, Active);
         exit(Active);
     end;
 
-    procedure GetSession(var POSSessionOut: Codeunit "POS Session";WithError: Boolean): Boolean
+    procedure GetSession(var POSSessionOut: Codeunit "POS Session"; WithError: Boolean): Boolean
     var
         Active: Boolean;
         POSFrontEnd: Codeunit "POS Front End Management";
@@ -791,19 +791,19 @@ codeunit 6150700 "POS Session"
         //-NPR5.49 [345188]
         OnDetectFramework(POSFrontEnd, POSSessionOut, Active);
         if WithError and (not Active) then
-          Error(SESSION_MISSING);
+            Error(SESSION_MISSING);
         exit(Active);
         //+NPR5.49 [345188]
     end;
 
-    procedure GetFrontEnd(var POSFrontEndOut: Codeunit "POS Front End Management";WithError: Boolean): Boolean
+    procedure GetFrontEnd(var POSFrontEndOut: Codeunit "POS Front End Management"; WithError: Boolean): Boolean
     begin
         //-NPR5.49 [345188]
         if not Initialized then begin
-          if WithError then
-            Error(FRONTEND_MISSING)
-          else
-            exit(false);
+            if WithError then
+                Error(FRONTEND_MISSING)
+            else
+                exit(false);
         end;
 
         POSFrontEndOut := FrontEnd;
@@ -812,7 +812,7 @@ codeunit 6150700 "POS Session"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnDetectFramework(var FrontEndOut: Codeunit "POS Front End Management";var POSSessionOut: Codeunit "POS Session";var Active: Boolean)
+    local procedure OnDetectFramework(var FrontEndOut: Codeunit "POS Front End Management"; var POSSessionOut: Codeunit "POS Session"; var Active: Boolean)
     begin
     end;
 
@@ -841,7 +841,7 @@ codeunit 6150700 "POS Session"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnFrontEndId(HardwareId: Text;SessionName: Text;HostName: Text;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OnFrontEndId(HardwareId: Text; SessionName: Text; HostName: Text; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     begin
     end;
 
@@ -851,7 +851,7 @@ codeunit 6150700 "POS Session"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnKeyPress(KeyPress: Text;POSSession: Codeunit "POS Session";Setup: Codeunit "POS Setup";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnKeyPress(KeyPress: Text; POSSession: Codeunit "POS Session"; Setup: Codeunit "POS Setup"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     begin
     end;
 

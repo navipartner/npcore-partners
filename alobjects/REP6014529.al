@@ -5,7 +5,7 @@ report 6014529 "Vendor/Salesperson"
     // NPR5.39/TJ  /20180208  CASE 302634 Renamed Name property of controls totalTurnover and totalTotalTurnover
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './VendorSalesperson.rdlc';
+    RDLCLayout = './layouts/VendorSalesperson.rdlc';
 
     Caption = 'Vendor/Salesperson';
     UsageCategory = ReportsAndAnalysis;

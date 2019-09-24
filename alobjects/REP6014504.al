@@ -6,7 +6,7 @@ report 6014504 "Customer Note"
     // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
     // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
     DefaultLayout = RDLC;
-    RDLCLayout = './Customer Note.rdlc';
+    RDLCLayout = './layouts/Customer Note.rdlc';
 
     Caption = 'Customer Note';
     PreviewMode = PrintLayout;

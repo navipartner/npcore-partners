@@ -1348,7 +1348,6 @@ table 6060042 "Item Worksheet Line"
             trigger OnValidate()
             var
                 ItemCategory: Record "Item Category";
-                ProductGrp: Record "Product Group";
             begin
                 //-NPR5.29 [259274]
                 // IF "Item Category Code" <> xRec."Item Category Code" THEN BEGIN

@@ -6,7 +6,7 @@ report 6014474 "Item/Sales Person Top"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './ItemSales Person Top.rdlc';
+    RDLCLayout = './layouts/ItemSales Person Top.rdlc';
 
     Caption = 'Item/Sales Person Top';
 

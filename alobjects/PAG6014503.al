@@ -380,7 +380,7 @@ page 6014503 "Customer Repair Card"
                         RecID: RecordID;
                     begin
                         //-NPR5.30 [262923]
-                        ReportSelectionContract.SetRange("Report Type",ReportSelectionContract."Report Type"::"19");
+                        ReportSelectionContract.SetRange("Report Type",ReportSelectionContract."Report Type"::"Repair Label");
                         if ReportSelectionContract.FindFirst then begin
                           RecRef.Open(DATABASE::"Customer Repair");
                           RecID:=Rec.RecordId;

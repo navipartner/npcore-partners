@@ -68,63 +68,65 @@ codeunit 6151002 "POS Proxy - Display"
         //-NPR5.43 [300254]
         //IF NOT Register."Customer Display" THEN
         //  EXIT;
-        CustomerDisplayIsActivated(Register,MatrixIsActivated,DisplayIsActivated);
+        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
-          exit;
+            exit;
         //+NPR5.43 [300254]
 
         if not POSSession.IsActiveSession(FrontEnd) then
-          exit;
+            exit;
 
         //-NPR5.43 [300254]
         //IF DisplaySetup.GET(Register."Register No.") THEN
         if DisplayIsActivated then
-        //+NPR5.43 [300254]
-          Login(FrontEnd,Register."Register No.")
+            //+NPR5.43 [300254]
+            Login(FrontEnd, Register."Register No.")
         //-NPR5.42 [315824]
         //-NPR5.43 [300254]
         //ELSE
-        else if MatrixIsActivated then
-        //+NPR5.43 [300254]
-          UpdateDisplayFromSalePOS(SaleHeader,Register,Action::Login,'','');
+        else
+            if MatrixIsActivated then
+                //+NPR5.43 [300254]
+                UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Login, '', '');
         //+NPR5.42 [315824]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterInitSale', '', true, true)]
-    local procedure CU6150705OnAfterInitSale(SaleHeader: Record "Sale POS";FrontEnd: Codeunit "POS Front End Management")
+    local procedure CU6150705OnAfterInitSale(SaleHeader: Record "Sale POS"; FrontEnd: Codeunit "POS Front End Management")
     var
         Register: Record Register;
         TextValue: Text;
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
         if not Register.Get(SaleHeader."Register No.") then
-          exit;
+            exit;
 
         //-NPR5.43 [300254]
         //IF NOT Register."Customer Display" THEN
         //  EXIT;
-        CustomerDisplayIsActivated(Register,MatrixIsActivated,DisplayIsActivated);
+        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
-          exit;
+            exit;
         //+NPR5.43 [300254]
 
 
         //-NPR5.43 [300254]
         //IF DisplaySetup.GET(Register."Register No.") THEN
         if DisplayIsActivated then
-        //+NPR5.43 [300254]
-            Update2ndDisplayFromSalePOS(FrontEnd,SaleHeader,Register,Action::Clear,TextValue,0)
+            //+NPR5.43 [300254]
+            Update2ndDisplayFromSalePOS(FrontEnd, SaleHeader, Register, Action::Clear, TextValue, 0)
         //-NPR5.42 [315824]
         //-NPR5.43 [300254]
         //ELSE
-        else if MatrixIsActivated then
-        //+NPR5.43 [300254]
-          UpdateDisplayFromSalePOS(SaleHeader,Register,Action::Login,TextValue,'');
+        else
+            if MatrixIsActivated then
+                //+NPR5.43 [300254]
+                UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Login, TextValue, '');
         //+NPR5.42 [315824]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterInsertSaleLine', '', true, true)]
-    local procedure UpdateDisplayOnSaleLineInsert(POSSalesWorkflowStep: Record "POS Sales Workflow Step";SaleLinePOS: Record "Sale Line POS")
+    local procedure UpdateDisplayOnSaleLineInsert(POSSalesWorkflowStep: Record "POS Sales Workflow Step"; SaleLinePOS: Record "Sale Line POS")
     var
         Register: Record Register;
         TextValue: Text;
@@ -134,41 +136,42 @@ codeunit 6151002 "POS Proxy - Display"
     begin
         //-NPR5.43 [319425]
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-          exit;
+            exit;
 
         if POSSalesWorkflowStep."Subscriber Function" <> 'UpdateDisplayOnSaleLineInsert' then
-          exit;
+            exit;
         //+NPR5.43 [319425]
         if not Register.Get(SaleLinePOS."Register No.") then
-          exit;
+            exit;
 
         //-NPR5.43 [300254]
         //IF NOT Register."Customer Display" THEN
         //  EXIT;
-        CustomerDisplayIsActivated(Register,MatrixIsActivated,DisplayIsActivated);
+        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
-          exit;
+            exit;
         //+NPR5.43 [300254]
 
         if not POSSession.IsActiveSession(FrontEnd) then
-          exit;
+            exit;
 
         //-NPR5.43 [300254]
         //IF DisplaySetup.GET(Register."Register No.") THEN
         if DisplayIsActivated then
-        //+NPR5.43 [300254]
-          Update2ndDisplayFromSaleLinePOS(FrontEnd,SaleLinePOS,Action::Payment,0)
+            //+NPR5.43 [300254]
+            Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::Payment, 0)
         //-NPR5.42 [315824]
         //-NPR5.43 [300254]
         //ELSE
-        else if MatrixIsActivated then
-        //+NPR5.43 [300254]
-          UpdateDisplayFromSaleLinePOS(SaleLinePOS);
+        else
+            if MatrixIsActivated then
+                //+NPR5.43 [300254]
+                UpdateDisplayFromSaleLinePOS(SaleLinePOS);
         //+NPR5.42 [315824]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterDeletePOSSaleLine', '', true, true)]
-    local procedure CU6150706OnAfterDeletePOSSaleLine(var Sender: Codeunit "POS Sale Line";SaleLinePOS: Record "Sale Line POS")
+    local procedure CU6150706OnAfterDeletePOSSaleLine(var Sender: Codeunit "POS Sale Line"; SaleLinePOS: Record "Sale Line POS")
     var
         Register: Record Register;
         TextValue: Text;
@@ -182,35 +185,36 @@ codeunit 6151002 "POS Proxy - Display"
     begin
         //-NPR5.42 [305714]
         if not Register.Get(SaleLinePOS."Register No.") then
-          exit;
+            exit;
 
         //-NPR5.43 [300254]
         //IF NOT Register."Customer Display" THEN
         //  EXIT;
-        CustomerDisplayIsActivated(Register,MatrixIsActivated,DisplayIsActivated);
+        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
-          exit;
+            exit;
         //+NPR5.43 [300254]
 
         if not POSSession.IsActiveSession(FrontEnd) then
-          exit;
+            exit;
 
         //-NPR5.43 [300254]
         //IF DisplaySetup.GET(Register."Register No.") THEN BEGIN
         if DisplayIsActivated then
-        //+NPR5.43 [300254]
-          Update2ndDisplayFromSaleLinePOS(FrontEnd,SaleLinePOS,Action::DeleteLine,0)
+            //+NPR5.43 [300254]
+            Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::DeleteLine, 0)
         //-NPR5.42 [315824]
         //-NPR5.43 [300254]
         //END ELSE BEGIN
-        else if MatrixIsActivated then begin
-        //+NPR5.43 [300254]
-          CalculateTotals(SaleLinePOS,GrandTotal,Payment,Change);
-          if SaleLinePOS.Type = SaleLinePOS.Type::Payment then
-            UpdateDisplayFromSalePOS(SaleHeader,Register,Action::Payment,Format(GrandTotal,0,'<Precision,2:2><Standard Format,0>'),Format(GrandTotal-Payment,0,'<Precision,2:2><Standard Format,0>'))
-          else
-            UpdateDisplayFromSalePOS(SaleHeader,Register,Action::DeleteLine,Format(GrandTotal,0,'<Precision,2:2><Standard Format,0>'),'');
-        end;
+        else
+            if MatrixIsActivated then begin
+                //+NPR5.43 [300254]
+                CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
+                if SaleLinePOS.Type = SaleLinePOS.Type::Payment then
+                    UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
+                else
+                    UpdateDisplayFromSalePOS(SaleHeader, Register, Action::DeleteLine, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), '');
+            end;
         //+NPR5.42 [305714]
     end;
 
@@ -242,7 +246,7 @@ codeunit 6151002 "POS Proxy - Display"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterSetQuantity', '', true, true)]
-    local procedure CU6150706OnAfterSetQuantity(var Sender: Codeunit "POS Sale Line";var SaleLinePOS: Record "Sale Line POS")
+    local procedure CU6150706OnAfterSetQuantity(var Sender: Codeunit "POS Sale Line"; var SaleLinePOS: Record "Sale Line POS")
     var
         Register: Record Register;
         TextValue: Text;
@@ -251,30 +255,31 @@ codeunit 6151002 "POS Proxy - Display"
         "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;
     begin
         if not Register.Get(SaleLinePOS."Register No.") then
-          exit;
+            exit;
 
         //-NPR5.43 [300254]
         //IF NOT Register."Customer Display" THEN
         //  EXIT;
-        CustomerDisplayIsActivated(Register,MatrixIsActivated,DisplayIsActivated);
+        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
-          exit;
+            exit;
         //+NPR5.43 [300254]
 
         if not POSSession.IsActiveSession(FrontEnd) then
-          exit;
+            exit;
 
         //-NPR5.43 [300254]
         //IF DisplaySetup.GET(Register."Register No.") THEN
         if DisplayIsActivated then
-        //+NPR5.43 [300254]
-          Update2ndDisplayFromSaleLinePOS(FrontEnd,SaleLinePOS,Action::NewQuantity,SaleLinePOS.Quantity)
+            //+NPR5.43 [300254]
+            Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::NewQuantity, SaleLinePOS.Quantity)
         //-NPR5.42 [315824]
         //-NPR5.43 [300254]
         //ELSE
-        else if MatrixIsActivated then
-        //+NPR5.43 [300254]
-          UpdateDisplayFromSaleLinePOS(SaleLinePOS);
+        else
+            if MatrixIsActivated then
+                //+NPR5.43 [300254]
+                UpdateDisplayFromSaleLinePOS(SaleLinePOS);
         //+NPR5.42 [315824]
     end;
 
@@ -292,35 +297,36 @@ codeunit 6151002 "POS Proxy - Display"
         Change: Decimal;
     begin
         if not Register.Get(SaleLinePOS."Register No.") then
-          exit;
+            exit;
 
         //-NPR5.43 [300254]
         //IF NOT Register."Customer Display" THEN
         //  EXIT;
-        CustomerDisplayIsActivated(Register,MatrixIsActivated,DisplayIsActivated);
+        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
-          exit;
+            exit;
         //+NPR5.43 [300254]
 
         if not POSSession.IsActiveSession(FrontEnd) then
-          exit;
+            exit;
 
         //-NPR5.43 [300254]
         //IF DisplaySetup.GET(Register."Register No.") THEN BEGIN
         if DisplayIsActivated then
-        //+NPR5.43 [300254]
-          Update2ndDisplayFromSaleLinePOS(FrontEnd,SaleLinePOS,Action::Payment,0)
+            //+NPR5.43 [300254]
+            Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::Payment, 0)
         //-NPR5.42 [315824]
         //-NPR5.43 [300254]
         //END ELSE BEGIN
-        else if MatrixIsActivated then begin
-        //+NPR5.43 [300254]
-          CalculateTotals(SaleLinePOS,GrandTotal,Payment,Change);
-          if SaleLinePOS.Type = SaleLinePOS.Type::Payment then
-            UpdateDisplayFromSalePOS(SaleHeader,Register,Action::Payment,Format(GrandTotal,0,'<Precision,2:2><Standard Format,0>'),Format(GrandTotal-Payment,0,'<Precision,2:2><Standard Format,0>'))
-          else
-            UpdateDisplayFromSalePOS(SaleHeader,Register,Action::DeleteLine,Format(GrandTotal,0,'<Precision,2:2><Standard Format,0>'),'');
-        end;
+        else
+            if MatrixIsActivated then begin
+                //+NPR5.43 [300254]
+                CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
+                if SaleLinePOS.Type = SaleLinePOS.Type::Payment then
+                    UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'))
+                else
+                    UpdateDisplayFromSalePOS(SaleHeader, Register, Action::DeleteLine, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), '');
+            end;
         //+NPR5.42 [305714]
     end;
 
@@ -341,37 +347,38 @@ codeunit 6151002 "POS Proxy - Display"
         Change: Decimal;
     begin
         if not Register.Get(SaleLinePOS."Register No.") then
-          exit;
+            exit;
 
         //-NPR5.43 [300254]
         //IF NOT Register."Customer Display" THEN
         //  EXIT;
-        CustomerDisplayIsActivated(Register,MatrixIsActivated,DisplayIsActivated);
+        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
-          exit;
+            exit;
         //+NPR5.43 [300254]
 
         if not POSSession.IsActiveSession(FrontEnd) then
-          exit;
+            exit;
 
         //-NPR5.43 [300254]
         //IF DisplaySetup.GET(Register."Register No.") THEN BEGIN
         if DisplayIsActivated then
-        //+NPR5.43 [300254]
-          Update2ndDisplayFromSaleLinePOS(FrontEnd,SaleLinePOS,Action::Payment,0)
+            //+NPR5.43 [300254]
+            Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action::Payment, 0)
         //-NPR5.42 [315824]
         //-NPR5.43 [300254]
         //END ELSE BEGIN
-        else if MatrixIsActivated then begin
-        //+NPR5.43 [300254]
-          CalculateTotals(SaleLinePOS,GrandTotal,Payment,Change);
-          UpdateDisplayFromSalePOS(SaleHeader,Register,Action::Payment,Format(GrandTotal,0,'<Precision,2:2><Standard Format,0>'),Format(GrandTotal-Payment,0,'<Precision,2:2><Standard Format,0>'));
-        end;
+        else
+            if MatrixIsActivated then begin
+                //+NPR5.43 [300254]
+                CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
+                UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
+            end;
         //+NPR5.42 [305714]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150704, 'OnBeforeChangeToPaymentView', '', true, true)]
-    local procedure CU6150704OnBeforeChangeToPaymentView(var Sender: Codeunit "POS Front End Management";POSSession: Codeunit "POS Session")
+    local procedure CU6150704OnBeforeChangeToPaymentView(var Sender: Codeunit "POS Front End Management"; POSSession: Codeunit "POS Session")
     var
         Register: Record Register;
         FrontEnd: Codeunit "POS Front End Management";
@@ -385,35 +392,35 @@ codeunit 6151002 "POS Proxy - Display"
     begin
         //-NPR5.42 [315824]
         if not POSSession.IsActiveSession(FrontEnd) then
-          exit;
+            exit;
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         if not Register.Get(SaleLinePOS."Register No.") then
-          exit;
+            exit;
 
         //-NPR5.43 [300254]
         //IF NOT Register."Customer Display" THEN
         //  EXIT;
-        CustomerDisplayIsActivated(Register,MatrixIsActivated,DisplayIsActivated);
+        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) and (not DisplayIsActivated) then
-          exit;
+            exit;
         //+NPR5.43 [300254]
 
         //-NPR5.43 [300254]
         //IF DisplaySetup.GET(Register."Register No.") THEN
         if DisplayIsActivated then
-          exit;
+            exit;
         //+NPR5.43 [300254]
 
-        CalculateTotals(SaleLinePOS,GrandTotal,Payment,Change);
-        UpdateDisplayFromSalePOS(SaleHeader,Register,Action::Payment,Format(GrandTotal,0,'<Precision,2:2><Standard Format,0>'),Format(GrandTotal-Payment,0,'<Precision,2:2><Standard Format,0>'));
+        CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
+        UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
         //+NPR5.42 [315824]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150725, 'OnBeforeActionWorkflow', '', true, true)]
-    local procedure CU6150725OnBeforeActionWorkflow(PaymentTypePOS: Record "Payment Type POS";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: Codeunit "POS JSON Management";SubTotal: Decimal;var Handled: Boolean)
+    local procedure CU6150725OnBeforeActionWorkflow(PaymentTypePOS: Record "Payment Type POS"; Parameters: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: Codeunit "POS JSON Management"; SubTotal: Decimal; var Handled: Boolean)
     var
         POSSaleLine: Codeunit "POS Sale Line";
         SaleLinePOS: Record "Sale Line POS";
@@ -430,26 +437,26 @@ codeunit 6151002 "POS Proxy - Display"
     begin
         //-NPR5.45 [318695]
         if not POSSession.IsActiveSession(FrontEnd) then
-          exit;
+            exit;
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         if not Register.Get(SaleLinePOS."Register No.") then
-          exit;
+            exit;
 
-        CustomerDisplayIsActivated(Register,MatrixIsActivated,DisplayIsActivated);
+        CustomerDisplayIsActivated(Register, MatrixIsActivated, DisplayIsActivated);
         if (not MatrixIsActivated) then
-          exit;
+            exit;
 
         if PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::"Foreign Currency" then begin
-          CurrencyAmount := POSPaymentLine.RoundAmount(PaymentTypePOS, POSPaymentLine.CalculateForeignAmount(PaymentTypePOS, SubTotal));
-          Line1 := PadStr(PaymentTypePOS.Description, 20);
-          Line2 := PadStr(' ',20-StrLen(Format(CurrencyAmount,0,'<Precision,2:2><Standard Format,0>'))) + Format(CurrencyAmount,0,'<Precision,2:2><Standard Format,0>');
-          UpdateDisplay(Line1, Line2);
+            CurrencyAmount := POSPaymentLine.RoundAmount(PaymentTypePOS, POSPaymentLine.CalculateForeignAmount(PaymentTypePOS, SubTotal));
+            Line1 := PadStr(PaymentTypePOS.Description, 20);
+            Line2 := PadStr(' ', 20 - StrLen(Format(CurrencyAmount, 0, '<Precision,2:2><Standard Format,0>'))) + Format(CurrencyAmount, 0, '<Precision,2:2><Standard Format,0>');
+            UpdateDisplay(Line1, Line2);
         end else begin
-          CalculateTotals(SaleLinePOS,GrandTotal,Payment,Change);
-          UpdateDisplayFromSalePOS(SaleHeader,Register,Action::Payment,Format(GrandTotal,0,'<Precision,2:2><Standard Format,0>'),Format(GrandTotal-Payment,0,'<Precision,2:2><Standard Format,0>'));
+            CalculateTotals(SaleLinePOS, GrandTotal, Payment, Change);
+            UpdateDisplayFromSalePOS(SaleHeader, Register, Action::Payment, Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>'), Format(GrandTotal - Payment, 0, '<Precision,2:2><Standard Format,0>'));
         end;
         //+NPR5.45 [318695]
     end;
@@ -466,33 +473,35 @@ codeunit 6151002 "POS Proxy - Display"
         Line2: Text;
     begin
         with Rec do begin
-          if not (Type in [Type::"G/L Entry", Type::Item, Type::Customer, Type::"BOM List"]) then
-            exit;
+            if not (Type in [Type::"G/L Entry", Type::Item, Type::Customer, Type::"BOM List"]) then
+                exit;
 
-          if "No." = '' then
-            exit;
+            if "No." = '' then
+                exit;
 
           //-NPR5.51 [361939]
-          //IF (Type = Type::Item) AND ("Discount Type" IN ["Discount Type"::"BOM List", "Discount Type"::"6"]) THEN
-          if (Type = Type::Item) and ("Discount Type" = "Discount Type"::"BOM List") then
+            //IF (Type = Type::Item) AND ("Discount Type" IN ["Discount Type"::"BOM List", "Discount Type"::"6"]) THEN
+            if (Type = Type::Item) and ("Discount Type" = "Discount Type"::"BOM List") then
           //+NPR5.51 [361939]
-            exit;
+                exit;
 
-          Line1 := PadStr(Description, 20);
-          Total := ' = ' + Format("Amount Including VAT",0,'<Precision,0:2><Standard Format,0>');
+            Line1 := PadStr(Description, 20);
+            Total := ' = ' + Format("Amount Including VAT", 0, '<Precision,0:2><Standard Format,0>');
 
-          if ("Discount Type" <> "Discount Type"::" ") and ("Discount %" <> 0) then begin
-            if Amount <> 0 then
-              Sign := (Amount/Abs(Amount))
-            else
-              Sign := 1;
+            if ("Discount Type" <> "Discount Type"::" ") and ("Discount %" <> 0) then begin
+                if Amount <> 0 then
+                    Sign := (Amount / Abs(Amount))
+                else
+                    Sign := 1;
 
-            case Sign of
-               1 : Line2 := PadStr('x' + Format(Abs(Quantity))+ ' - ' + Format("Discount %",0,'<Precision,0:2><Standard Format,0>') + '%',20-StrLen(Total)) + Total;
-              -1 : Line2 := PadStr('x' + Format(Abs(Quantity))+ ' + ' + Format("Discount %",0,'<Precision,0:2><Standard Format,0>') + '%',20-StrLen(Total)) + Total;
-            end;
-          end else
-            Line2 := PadStr('x' + Format(Abs(Quantity)),20-StrLen(Total)) + Total;
+                case Sign of
+                    1:
+                        Line2 := PadStr('x' + Format(Abs(Quantity)) + ' - ' + Format("Discount %", 0, '<Precision,0:2><Standard Format,0>') + '%', 20 - StrLen(Total)) + Total;
+                    -1:
+                        Line2 := PadStr('x' + Format(Abs(Quantity)) + ' + ' + Format("Discount %", 0, '<Precision,0:2><Standard Format,0>') + '%', 20 - StrLen(Total)) + Total;
+                end;
+            end else
+                Line2 := PadStr('x' + Format(Abs(Quantity)), 20 - StrLen(Total)) + Total;
         end;
 
         //MESSAGE('UpdateDisplayFromSaleLinePOS:\' + Line1 + '\' + Line2);
@@ -500,7 +509,7 @@ codeunit 6151002 "POS Proxy - Display"
         UpdateDisplay(Line1, Line2);
     end;
 
-    local procedure UpdateDisplayFromSalePOS(SalePOS: Record "Sale POS";Register: Record Register;"Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;TextValue: Text[30];TextValue2: Text[30]): Boolean
+    local procedure UpdateDisplayFromSalePOS(SalePOS: Record "Sale POS"; Register: Record Register; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; TextValue: Text[30]; TextValue2: Text[30]): Boolean
     var
         Line1: Text;
         Line2: Text;
@@ -511,54 +520,56 @@ codeunit 6151002 "POS Proxy - Display"
         Clear(Line2);
 
         case Action of
-          Action::Login :
-            begin
-              //-NPR5.45 [323345]
-              Clear(ObjectOutputSelection);
-              ObjectOutputSelection.SetRange("Output Path",'DisplayBixolon');
-              if ObjectOutputSelection.FindSet then begin
-                repeat
-                  if (ObjectOutputSelection."User ID" = UserId) or (ObjectOutputSelection."User ID" = '') then
-                    BixolonSetupFound := true;
-                until ObjectOutputSelection.Next = 0;
+            Action::Login:
+                begin
+                    //-NPR5.45 [323345]
+                    Clear(ObjectOutputSelection);
+                    ObjectOutputSelection.SetRange("Output Path", 'DisplayBixolon');
+                    if ObjectOutputSelection.FindSet then begin
+                        repeat
+                            if (ObjectOutputSelection."User ID" = UserId) or (ObjectOutputSelection."User ID" = '') then
+                                BixolonSetupFound := true;
+                        until ObjectOutputSelection.Next = 0;
 
-                if not BixolonSetupFound then begin
-                  Message(BixolonError);
-                  exit;
+                        if not BixolonSetupFound then begin
+                            Message(BixolonError);
+                            exit;
+                        end;
+                    end else begin
+                        Message(BixolonError);
+                        exit;
+                    end;
+                    //+NPR5.45 [323345]
+
+                    Line1 := PadStr(Register."Display 1", 20);
+                    Line2 := PadStr(Register."Display 2", 20);
                 end;
-              end else begin
-                Message(BixolonError);
-                exit;
-              end;
-              //+NPR5.45 [323345]
 
-              Line1 := PadStr(Register."Display 1", 20);
-              Line2 := PadStr(Register."Display 2", 20);
-            end;
+            Action::Clear:
+                begin
+                    Line1 := ' ';
+                    Line2 := ' ';
+                end;
 
-          Action::Clear :
-            begin
-              Line1 := ' ';
-              Line2 := ' ';
-            end;
+            Action::Cancelled:
+                Line1 := CaptionCancelledSale;
 
-          Action::Cancelled :
-            Line1 := CaptionCancelledSale;
+            Action::Payment:
+                begin
+                    Line1 := PadStr(CaptionPaymentTotal, 20 - StrLen(TextValue)) + TextValue + ' ';
+                    Line2 := PadStr(CaptionBalanceTotal, 20 - StrLen(TextValue2)) + TextValue2 + ' ';
+                end;
+            Action::EndSale:
+                Line1 := PadStr(CaptionChangeTotal, 20 - StrLen(TextValue)) + TextValue + ' ';
 
-          Action::Payment : begin
-              Line1 := PadStr(CaptionPaymentTotal,20-StrLen(TextValue)) + TextValue + ' ';
-              Line2 := PadStr(CaptionBalanceTotal,20-StrLen(TextValue2)) + TextValue2 + ' ';
-            end;
-          Action::EndSale :
-            Line1 := PadStr(CaptionChangeTotal,20-StrLen(TextValue)) + TextValue + ' ';
+            Action::Closed:
+                Line1 := CaptionRegisterClosed;
 
-          Action::Closed :
-            Line1 := CaptionRegisterClosed;
-
-          Action::DeleteLine : begin
-            Line1 := CaptionDeletedSaleline;
-            Line2 := PadStr(CaptionPaymentTotal,20-StrLen(TextValue)) + TextValue + ' ';
-          end;
+            Action::DeleteLine:
+                begin
+                    Line1 := CaptionDeletedSaleline;
+                    Line2 := PadStr(CaptionPaymentTotal, 20 - StrLen(TextValue)) + TextValue + ' ';
+                end;
 
         end;
 
@@ -567,16 +578,16 @@ codeunit 6151002 "POS Proxy - Display"
         UpdateDisplay(Line1, Line2);
     end;
 
-    local procedure UpdateDisplay(Line1: Text;Line2: Text)
+    local procedure UpdateDisplay(Line1: Text; Line2: Text)
     var
         PrintToDisplay: Codeunit "Report - Print To Display";
     begin
 
-        PrintToDisplay.SetLine(Line1,Line2);
+        PrintToDisplay.SetLine(Line1, Line2);
         PrintToDisplay.Run();
     end;
 
-    procedure Update2ndDisplayFromSalePOS(var FrontEnd: Codeunit "POS Front End Management";var SalePOS: Record "Sale POS";var Register: Record Register;"Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;TextValue: Text[30];NewQuantity: Decimal): Boolean
+    procedure Update2ndDisplayFromSalePOS(var FrontEnd: Codeunit "POS Front End Management"; var SalePOS: Record "Sale POS"; var Register: Record Register; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; TextValue: Text[30]; NewQuantity: Decimal): Boolean
     var
         Line1: Text;
         Line2: Text;
@@ -591,50 +602,50 @@ codeunit 6151002 "POS Proxy - Display"
           Clear(Line2);
 
           case Action of
-            Action::Login :
-              begin
-                Login(FrontEnd,Register."Register No.");
-              end;
-            Action::Clear :
-              begin
-                CloseReceipt(FrontEnd);
-              end;
-            Action::Cancelled :
-              begin
-                Clear(FrontEnd);
-              end;
-            Action::Payment :
-              begin
-                SaleLinePOS.Reset;
-                SaleLinePOS.SetRange("Register No.",SalePOS."Register No.");
-                SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-                if SaleLinePOS.FindSet then
-                  Update2ndDisplayFromSaleLinePOS(FrontEnd,SaleLinePOS,Action,NewQuantity)
-                else
-                  Clear(FrontEnd);
-              end;
-            Action::EndSale :
-              begin
-                SaleLinePOS.Reset;
-                SaleLinePOS.SetRange("Register No.",SalePOS."Register No.");
-                SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-                if SaleLinePOS.FindSet then
-                  Update2ndDisplayFromSaleLinePOS(FrontEnd,SaleLinePOS,Action,NewQuantity)
-                else
-                  Clear(FrontEnd);
-              end;
-            Action::Closed :
-              begin
-                Line1 := CaptionRegisterClosed;
-                Closed(FrontEnd);
-              end;
+            Action::Login:
+                begin
+                    Login(FrontEnd, Register."Register No.");
+                end;
+            Action::Clear:
+                begin
+                    CloseReceipt(FrontEnd);
+                end;
+            Action::Cancelled:
+                begin
+                    Clear(FrontEnd);
+                end;
+            Action::Payment:
+                begin
+                    SaleLinePOS.Reset;
+                    SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+                    SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+                    if SaleLinePOS.FindSet then
+                        Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action, NewQuantity)
+                    else
+                        Clear(FrontEnd);
+                end;
+            Action::EndSale:
+                begin
+                    SaleLinePOS.Reset;
+                    SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+                    SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+                    if SaleLinePOS.FindSet then
+                        Update2ndDisplayFromSaleLinePOS(FrontEnd, SaleLinePOS, Action, NewQuantity)
+                    else
+                        Clear(FrontEnd);
+                end;
+            Action::Closed:
+                begin
+                    Line1 := CaptionRegisterClosed;
+                    Closed(FrontEnd);
+                end;
           end;
         //-NPR5.51 [352390]
         end;
         //+NPR5.51 [352390]
     end;
 
-    local procedure Update2ndDisplayFromSaleLinePOS(var FrontEnd: Codeunit "POS Front End Management";var Rec: Record "Sale Line POS";"Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity;NewQuantity: Decimal)
+    local procedure Update2ndDisplayFromSaleLinePOS(var FrontEnd: Codeunit "POS Front End Management"; var Rec: Record "Sale Line POS"; "Action": Option Login,Clear,Cancelled,Payment,EndSale,Closed,DeleteLine,NewQuantity; NewQuantity: Decimal)
     var
         Sign: Integer;
         Total: Text[30];
@@ -677,35 +688,35 @@ codeunit 6151002 "POS Proxy - Display"
             DisplayCustomContent.RecId := Rec.RecordId;
             DisplayCustomContent.Action := Action;
             DisplayCustomContent.NewQuantity := NewQuantity;
-            CODEUNIT.Run(DisplaySetup."Custom Display Codeunit",DisplayCustomContent);
+            CODEUNIT.Run(DisplaySetup."Custom Display Codeunit", DisplayCustomContent);
           end else begin
-          //+NPR5.50 [352390]
+            //+NPR5.50 [352390]
             SaleLinePOS.Reset;
-            SaleLinePOS.SetRange("Register No.",Rec."Register No.");
-            SaleLinePOS.SetRange("Sales Ticket No.",Rec."Sales Ticket No.");
-            SaleLinePOS.SetRange(Date,Rec.Date);
+            SaleLinePOS.SetRange("Register No.", Rec."Register No.");
+            SaleLinePOS.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
+            SaleLinePOS.SetRange(Date, Rec.Date);
             if SaleLinePOS.FindSet then begin
-              repeat
-                ShowLine := true;
+                repeat
+                    ShowLine := true;
 
-                if not (SaleLinePOS.Type in [SaleLinePOS.Type::"G/L Entry", SaleLinePOS.Type::Item, SaleLinePOS.Type::Customer, SaleLinePOS.Type::"BOM List", SaleLinePOS.Type::Payment]) then
-                  ShowLine := false;
+                    if not (SaleLinePOS.Type in [SaleLinePOS.Type::"G/L Entry", SaleLinePOS.Type::Item, SaleLinePOS.Type::Customer, SaleLinePOS.Type::"BOM List", SaleLinePOS.Type::Payment]) then
+                        ShowLine := false;
 
-                if SaleLinePOS."No." = '' then
-                  ShowLine := false;
+                    if SaleLinePOS."No." = '' then
+                        ShowLine := false;
 
-                if (Action = Action::DeleteLine) then
-                  ShowLine := (SaleLinePOS."Line No." <> Rec."Line No.");
+                    if (Action = Action::DeleteLine) then
+                        ShowLine := (SaleLinePOS."Line No." <> Rec."Line No.");
 
-                //-NPR5.42 [305714]
-                //IF (Action = Action::NewQuantity) THEN
-                //  IF (SaleLinePOS."Line No." = Rec."Line No.") THEN
-                //    SaleLinePOS.VALIDATE(Quantity,NewQuantity);
-                //+NPR5.42 [305714]
+                    //-NPR5.42 [305714]
+                    //IF (Action = Action::NewQuantity) THEN
+                    //  IF (SaleLinePOS."Line No." = Rec."Line No.") THEN
+                    //    SaleLinePOS.VALIDATE(Quantity,NewQuantity);
+                    //+NPR5.42 [305714]
 
-                if ShowLine then begin
-                   LineCounter += 1;
-                  if SaleLinePOS.Type = SaleLinePOS.Type::Payment then begin
+                    if ShowLine then begin
+                        LineCounter += 1;
+                        if SaleLinePOS.Type = SaleLinePOS.Type::Payment then begin
                     //-NPR5.51 [321307]
                     if SaleLinePOS."Amount Including VAT" <> SaleLinePOS."Currency Amount" then
                       PaymentAmountTxt := ' ' + SaleLinePOS."No." + ' ' + Format(SaleLinePOS."Currency Amount",0,'<Precision,2:2><Standard Format,0>')
@@ -726,31 +737,31 @@ codeunit 6151002 "POS Proxy - Display"
                       '#NEWLINE#' +
                       PadStr(SaleLinePOS.Description,DisplaySetup."Receipt GrandTotal Padding" - StrLen(PaymentAmountTxt)) + PaymentAmountTxt;
                     //+NPR5.51 [321307]
-                    Payment := Payment + SaleLinePOS."Amount Including VAT"
-                  end else begin
-                    Line1 := PadStr(SaleLinePOS.Description, DisplaySetup."Receipt Description Padding");
+                            Payment := Payment + SaleLinePOS."Amount Including VAT"
+                        end else begin
+                            Line1 := PadStr(SaleLinePOS.Description, DisplaySetup."Receipt Description Padding");
 
-                    //-NPR5.44 [318695]
-                    //Total := FORMAT(SaleLinePOS."Amount Including VAT",0,'<Precision,2:2><Standard Format,0>');
-                    if DisplaySetup."Prices ex. VAT" then begin
-                      Total := Format(SaleLinePOS.Amount,0,'<Precision,2:2><Standard Format,0>');
-                    end else begin
-                      Total := Format(SaleLinePOS."Amount Including VAT",0,'<Precision,2:2><Standard Format,0>');
-                    end;
-                    //+NPR5.44 [318695]
+                            //-NPR5.44 [318695]
+                            //Total := FORMAT(SaleLinePOS."Amount Including VAT",0,'<Precision,2:2><Standard Format,0>');
+                            if DisplaySetup."Prices ex. VAT" then begin
+                                Total := Format(SaleLinePOS.Amount, 0, '<Precision,2:2><Standard Format,0>');
+                            end else begin
+                                Total := Format(SaleLinePOS."Amount Including VAT", 0, '<Precision,2:2><Standard Format,0>');
+                            end;
+                            //+NPR5.44 [318695]
 
-                    if (SaleLinePOS."Discount Type" <> SaleLinePOS."Discount Type"::" ") and (SaleLinePOS."Discount %" <> 0) then begin
-                      if SaleLinePOS.Amount <> 0 then
-                        Sign := (SaleLinePOS.Amount/Abs(SaleLinePOS.Amount))
-                      else
-                        Sign := 1;
+                            if (SaleLinePOS."Discount Type" <> SaleLinePOS."Discount Type"::" ") and (SaleLinePOS."Discount %" <> 0) then begin
+                                if SaleLinePOS.Amount <> 0 then
+                                    Sign := (SaleLinePOS.Amount / Abs(SaleLinePOS.Amount))
+                                else
+                                    Sign := 1;
 
-                      case Sign of
+                                case Sign of
                           1 : Line2 := Line1 + ' ' + PadStr('x' + Format(Abs(SaleLinePOS.Quantity))+ ' - ' + Format(SaleLinePOS."Discount %",0,'<Precision,0:2><Standard Format,0>') + '%',DisplaySetup."Receipt Discount Padding"-StrLen(Total)) + Total;
                          -1 : Line2 := Line1 + ' ' + PadStr('x' + Format(Abs(SaleLinePOS.Quantity))+ ' + ' + Format(SaleLinePOS."Discount %",0,'<Precision,0:2><Standard Format,0>') + '%',DisplaySetup."Receipt Discount Padding"-StrLen(Total)) + Total;
-                      end;
-                    end else
-                      Line2 := Line1 + ' ' + PadStr('x' + Format(Abs(SaleLinePOS.Quantity)),DisplaySetup."Receipt Total Padding"-StrLen(Total)) + Total;
+                                end;
+                            end else
+                                Line2 := Line1 + ' ' + PadStr('x' + Format(Abs(SaleLinePOS.Quantity)), DisplaySetup."Receipt Total Padding" - StrLen(Total)) + Total;
 
                     //-NPR5.51 [321307]
                     if ReceiptText = '' then begin
@@ -758,98 +769,98 @@ codeunit 6151002 "POS Proxy - Display"
                       ReceiptText := PadStr('',DisplaySetup."Receipt GrandTotal Padding" - StrLen(GLSetup.GetCurrencyCode('')) - 2) + GLSetup.GetCurrencyCode('') + '#NEWLINE#';
                     end;
                     //+NPR5.51 [321307]
-                    ReceiptText := ReceiptText + Line2 + '#NEWLINE#';
+                            ReceiptText := ReceiptText + Line2 + '#NEWLINE#';
 
-                    //-NPR5.44 [318695]
-                    //GrandTotal := GrandTotal + SaleLinePOS."Amount Including VAT";
-                    if DisplaySetup."Prices ex. VAT" then begin
-                      GrandTotal := GrandTotal + SaleLinePOS.Amount;
-                      TotalTAX := TotalTAX + (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount);
-                      GrandTotalIncTax := GrandTotal + TotalTAX;
-                    end else begin
-                      GrandTotal := GrandTotal + SaleLinePOS."Amount Including VAT";
+                            //-NPR5.44 [318695]
+                            //GrandTotal := GrandTotal + SaleLinePOS."Amount Including VAT";
+                            if DisplaySetup."Prices ex. VAT" then begin
+                                GrandTotal := GrandTotal + SaleLinePOS.Amount;
+                                TotalTAX := TotalTAX + (SaleLinePOS."Amount Including VAT" - SaleLinePOS.Amount);
+                                GrandTotalIncTax := GrandTotal + TotalTAX;
+                            end else begin
+                                GrandTotal := GrandTotal + SaleLinePOS."Amount Including VAT";
+                            end;
+                            //+NPR5.44 [318695]
+
+                        end;
                     end;
-                    //+NPR5.44 [318695]
-
-                  end;
-                end;
-              until SaleLinePOS.Next = 0;
+                until SaleLinePOS.Next = 0;
             end;
 
-            GrandTotalTxt := Format(GrandTotal,0,'<Precision,2:2><Standard Format,0>');
+            GrandTotalTxt := Format(GrandTotal, 0, '<Precision,2:2><Standard Format,0>');
             //-NPR5.44 [318695]
-            GrandTotalIncTaxTxt := Format(GrandTotalIncTax,0,'<Precision,2:2><Standard Format,0>');
+            GrandTotalIncTaxTxt := Format(GrandTotalIncTax, 0, '<Precision,2:2><Standard Format,0>');
             //+NPR5.44 [318695]
-            PaymentTxt := Format(Payment,0,'<Precision,2:2><Standard Format,0>');
+            PaymentTxt := Format(Payment, 0, '<Precision,2:2><Standard Format,0>');
 
             //-NPR5.36
             Change := 0;
-            ChangeTxt := Format(Change,0,'<Precision,2:2><Standard Format,0>');
+            ChangeTxt := Format(Change, 0, '<Precision,2:2><Standard Format,0>');
             //-NPR5.44 [318695]
             if DisplaySetup."Prices ex. VAT" then begin
-              if(Payment > GrandTotalIncTax) then
+                if (Payment > GrandTotalIncTax) then
                 ChangeTxt := Format(Round((Payment-GrandTotalIncTax)*-1,0.01,'='),0,'<Precision,2:2><Standard Format,0>')
               //-NPR5.51 [321307]
               else
                 RemainingAmtTxt := Format(GrandTotalIncTax - Payment,0,'<Precision,2:2><Standard Format,0>');
               //+NPR5.51 [321307]
             end else begin
-            //+NPR5.44 [318695]
-              if(Payment > GrandTotal) then
+                //+NPR5.44 [318695]
+                if (Payment > GrandTotal) then
                 ChangeTxt := Format(Round((Payment-GrandTotal)*-1,0.01,'='),0,'<Precision,2:2><Standard Format,0>')
               //-NPR5.51 [321307]
               else
                 RemainingAmtTxt := Format(GrandTotal - Payment,0,'<Precision,2:2><Standard Format,0>');
               //+NPR5.51 [321307]
-            //-NPR5.44 [318695]
+                //-NPR5.44 [318695]
             end;
             //+NPR5.44 [318695]
             //+NPR5.36
 
             //-NPR5.44 [318695]
             if DisplaySetup."Prices ex. VAT" then begin
-              TotalTAXTxt := Format(TotalTAX,0,'<Precision,2:2><Standard Format,0>');
+                TotalTAXTxt := Format(TotalTAX, 0, '<Precision,2:2><Standard Format,0>');
 
-              ReceiptText := ReceiptText +
-                           '#NEWLINE#' +
-                           PadStr(CaptionSubTotal,DisplaySetup."Receipt GrandTotal Padding"-StrLen(GrandTotalTxt)) + GrandTotalTxt +
-                           '#NEWLINE#' +
-                           PadStr(CaptionTAXTotal,DisplaySetup."Receipt GrandTotal Padding"-StrLen(TotalTAXTxt)) + TotalTAXTxt +
-                           '#NEWLINE#' +
-                           PadStr(CaptionTotal,DisplaySetup."Receipt GrandTotal Padding"-StrLen(GrandTotalIncTaxTxt)) + GrandTotalIncTaxTxt +
-                           '#NEWLINE#' +
-                           '#NEWLINE#' +
-                           PadStr(CaptionPaymentTotal,DisplaySetup."Receipt GrandTotal Padding"-StrLen(PaymentTxt)) + PaymentTxt +
+                ReceiptText := ReceiptText +
+                             '#NEWLINE#' +
+                             PadStr(CaptionSubTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(GrandTotalTxt)) + GrandTotalTxt +
+                             '#NEWLINE#' +
+                             PadStr(CaptionTAXTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(TotalTAXTxt)) + TotalTAXTxt +
+                             '#NEWLINE#' +
+                             PadStr(CaptionTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(GrandTotalIncTaxTxt)) + GrandTotalIncTaxTxt +
+                             '#NEWLINE#' +
+                             '#NEWLINE#' +
+                             PadStr(CaptionPaymentTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(PaymentTxt)) + PaymentTxt +
                            //-NPR5.51 [321307]
                            '#NEWLINE#' +
                            PadStr(CaptionRemaningAmt,DisplaySetup."Receipt GrandTotal Padding" - StrLen(RemainingAmtTxt)) + RemainingAmtTxt +
                            //+NPR5.51 [321307]
-                           '#NEWLINE#' +
-                           PadStr(CaptionChangeTotal,DisplaySetup."Receipt GrandTotal Padding"-StrLen(ChangeTxt)) + ChangeTxt;
+                             '#NEWLINE#' +
+                             PadStr(CaptionChangeTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(ChangeTxt)) + ChangeTxt;
 
             end else begin
-            //+NPR5.44 [318695]
-              ReceiptText := ReceiptText +
-                           '#NEWLINE#' +
-                           '#NEWLINE#' +
-                           PadStr(CaptionTotal,DisplaySetup."Receipt GrandTotal Padding"-StrLen(GrandTotalTxt)) + GrandTotalTxt +
-                           '#NEWLINE#' +
-                           PadStr(CaptionPaymentTotal,DisplaySetup."Receipt GrandTotal Padding"-StrLen(PaymentTxt)) + PaymentTxt +
+                //+NPR5.44 [318695]
+                ReceiptText := ReceiptText +
+                             '#NEWLINE#' +
+                             '#NEWLINE#' +
+                             PadStr(CaptionTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(GrandTotalTxt)) + GrandTotalTxt +
+                             '#NEWLINE#' +
+                             PadStr(CaptionPaymentTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(PaymentTxt)) + PaymentTxt +
                            //-NPR5.51 [321307]
                            '#NEWLINE#' +
                            PadStr(CaptionRemaningAmt,DisplaySetup."Receipt GrandTotal Padding" - StrLen(RemainingAmtTxt)) + RemainingAmtTxt +
                            //+NPR5.51 [321307]
-                           '#NEWLINE#' +
-                           PadStr(CaptionChangeTotal,DisplaySetup."Receipt GrandTotal Padding"-StrLen(ChangeTxt)) + ChangeTxt;
-            //-NPR5.44 [318695]
+                             '#NEWLINE#' +
+                             PadStr(CaptionChangeTotal, DisplaySetup."Receipt GrandTotal Padding" - StrLen(ChangeTxt)) + ChangeTxt;
+                //-NPR5.44 [318695]
             end;
             //+NPR5.44 [318695]
             ReceiptText := ReceiptText + PaymentDetailsTxt;  //-+NPR5.51 [321307]
 
             if LineCounter = 0 then begin
-              Closed(FrontEnd);
+                Closed(FrontEnd);
             end else begin
-              case Action of
+                case Action of
                 Action::Cancelled : ;
                 Action::Clear : CloseReceipt(FrontEnd);
                 Action::Closed : Closed(FrontEnd);
@@ -857,9 +868,9 @@ codeunit 6151002 "POS Proxy - Display"
                 Action::Payment : Payments(FrontEnd,ReceiptText);
                 Action::DeleteLine : Payments(FrontEnd,ReceiptText);
                 Action::NewQuantity : Payments(FrontEnd,ReceiptText);
-              end
+                end
             end;
-          //-NPR5.50 [352390]
+            //-NPR5.50 [352390]
           end;
           //+NPR5.50 [352390]
         //-NPR5.51 [352390]
@@ -867,54 +878,56 @@ codeunit 6151002 "POS Proxy - Display"
         //+NPR5.51 [352390]
     end;
 
-    local procedure CalculateTotals(var Rec: Record "Sale Line POS";var GrandTotal: Decimal;var Payment: Decimal;var Change: Decimal)
+    local procedure CalculateTotals(var Rec: Record "Sale Line POS"; var GrandTotal: Decimal; var Payment: Decimal; var Change: Decimal)
     var
         SaleLinePOS: Record "Sale Line POS";
     begin
         SaleLinePOS.Reset;
-        SaleLinePOS.SetRange("Register No.",Rec."Register No.");
-        SaleLinePOS.SetRange("Sales Ticket No.",Rec."Sales Ticket No.");
-        SaleLinePOS.SetRange(Date,Rec.Date);
+        SaleLinePOS.SetRange("Register No.", Rec."Register No.");
+        SaleLinePOS.SetRange("Sales Ticket No.", Rec."Sales Ticket No.");
+        SaleLinePOS.SetRange(Date, Rec.Date);
         if SaleLinePOS.FindSet then begin
-          repeat
-            if SaleLinePOS.Type = SaleLinePOS.Type::Payment then begin
-              Payment := Payment + SaleLinePOS."Amount Including VAT"
-            end else begin
-              GrandTotal := GrandTotal + SaleLinePOS."Amount Including VAT";
-            end;
-          until SaleLinePOS.Next = 0;
+            repeat
+                if SaleLinePOS.Type = SaleLinePOS.Type::Payment then begin
+                    Payment := Payment + SaleLinePOS."Amount Including VAT"
+                end else begin
+                    GrandTotal := GrandTotal + SaleLinePOS."Amount Including VAT";
+                end;
+            until SaleLinePOS.Next = 0;
         end;
 
         Change := 0;
-        if(Payment > GrandTotal) then
-          Change := (Payment-GrandTotal)*-1;
+        if (Payment > GrandTotal) then
+            Change := (Payment - GrandTotal) * -1;
     end;
 
-    local procedure Login(var FrontEnd: Codeunit "POS Front End Management";RegisterNo: Code[10])
+    local procedure Login(var FrontEnd: Codeunit "POS Front End Management"; RegisterNo: Code[10])
     var
         POSSession: Codeunit "POS Session";
     begin
         if DisplaySetup."Media Downloaded" then
-          SetAction(0)
+            SetAction(0)
         else
-          SetAction(6);
+            SetAction(6);
 
         SetRegister(RegisterNo);
         SetReceiptCloseDuration(0);
         DisplayHandler();
-        if (POSSession.IsActiveSession (FrontEnd)) then
-          FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName, 'LOGIN');
+        if (POSSession.IsActiveSession(FrontEnd)) then
+            FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName, 'LOGIN');
 
         case DisplayHandlerAction of
-          //NPR5.38-
-          DisplayHandlerAction::OpenDisplay : begin
-                                                  Closed(FrontEnd);
-                                               end;
-          //NPR5.38+
-          DisplayHandlerAction::DownloadFiles : begin
-                                                  DisplaySetup."Media Downloaded" := true;
-                                                  DisplaySetup.Modify(true);
-                                                end;
+            //NPR5.38-
+            DisplayHandlerAction::OpenDisplay:
+                begin
+                    Closed(FrontEnd);
+                end;
+            //NPR5.38+
+            DisplayHandlerAction::DownloadFiles:
+                begin
+                    DisplaySetup."Media Downloaded" := true;
+                    DisplaySetup.Modify(true);
+                end;
         end;
     end;
 
@@ -926,7 +939,7 @@ codeunit 6151002 "POS Proxy - Display"
         FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName, 'CLOSED');
     end;
 
-    procedure EndSale(var FrontEnd: Codeunit "POS Front End Management";EndSaleDescription: Text;RegisterNo: Code[10])
+    procedure EndSale(var FrontEnd: Codeunit "POS Front End Management"; EndSaleDescription: Text; RegisterNo: Code[10])
     begin
         SetRegister(RegisterNo);
         SetAction(4);
@@ -941,7 +954,7 @@ codeunit 6151002 "POS Proxy - Display"
         FrontEnd.InvokeDevice(SecondaryMonitorRequest, ProtocolName, 'RECEIPTCLOSEDURATION');
     end;
 
-    procedure Payments(var FrontEnd: Codeunit "POS Front End Management";PaymentDescription: Text)
+    procedure Payments(var FrontEnd: Codeunit "POS Front End Management"; PaymentDescription: Text)
     begin
         SetAction(4);
         SetReceiptContent(PaymentDescription);
@@ -993,10 +1006,11 @@ codeunit 6151002 "POS Proxy - Display"
         SecondaryMonitorRequest.ReceiptContent := ReceiptContent;
         SecondaryMonitorRequest.ReceiptPlacement := DisplaySetup."Receipt Placement";
         SecondaryMonitorRequest.DisplayContentUrl := '';
-        SecondaryMonitorRequest.ContentType :=  ContentType;
+        SecondaryMonitorRequest.ContentType := ContentType;
 
         case DisplayHandlerAction of
-          DisplayHandlerAction::DownloadFiles : SecondaryMonitorRequest.DisplayContentHtml := SetContentHtml;
+            DisplayHandlerAction::DownloadFiles:
+                SecondaryMonitorRequest.DisplayContentHtml := SetContentHtml;
         end;
 
         SecondaryMonitorRequest.MediaDictionary := MediaDictionary;
@@ -1013,9 +1027,12 @@ codeunit 6151002 "POS Proxy - Display"
     local procedure SetContentHtml(): Text
     begin
         case DisplayContent.Type of
-           DisplayContent.Type::Html :  exit(CreateWebContent(DisplayContent.Code));
-           DisplayContent.Type::Image : exit(CreateImageContent(DisplayContent.Code));
-           DisplayContent.Type::Video : exit(CreateVideoContent(DisplayContent.Code));
+            DisplayContent.Type::Html:
+                exit(CreateWebContent(DisplayContent.Code));
+            DisplayContent.Type::Image:
+                exit(CreateImageContent(DisplayContent.Code));
+            DisplayContent.Type::Video:
+                exit(CreateVideoContent(DisplayContent.Code));
         end;
     end;
 
@@ -1026,16 +1043,16 @@ codeunit 6151002 "POS Proxy - Display"
     begin
         DisplayContentLines.SetRange("Content Code", ContentCode);
         if DisplayContentLines.FindFirst then begin
-          ContentHtml += '<!DOCTYPE html>';
-          ContentHtml += '<html>';
-          ContentHtml += '<head>';
-          ContentHtml += '    <meta http-equiv="Content-Type" content="text/html; charset=unicode" />';
-          ContentHtml += '    <meta http-equiv="X-UA-Compatible" content="IE=9" />';
-          ContentHtml += '</head>';
-          ContentHtml += '<body style="margin:0px;padding:0px;overflow:hidden">';
-          ContentHtml += '    <iframe src="' + DisplayContentLines.Url + '" frameborder="0" style="position: absolute; height: 100%; border: none; width: 100%; overflow:hidden" scrolling="no"></iframe>';
-          ContentHtml += '</body>';
-          ContentHtml += '</html>';
+            ContentHtml += '<!DOCTYPE html>';
+            ContentHtml += '<html>';
+            ContentHtml += '<head>';
+            ContentHtml += '    <meta http-equiv="Content-Type" content="text/html; charset=unicode" />';
+            ContentHtml += '    <meta http-equiv="X-UA-Compatible" content="IE=9" />';
+            ContentHtml += '</head>';
+            ContentHtml += '<body style="margin:0px;padding:0px;overflow:hidden">';
+            ContentHtml += '    <iframe src="' + DisplayContentLines.Url + '" frameborder="0" style="position: absolute; height: 100%; border: none; width: 100%; overflow:hidden" scrolling="no"></iframe>';
+            ContentHtml += '</body>';
+            ContentHtml += '</html>';
         end;
         exit(ContentHtml);
     end;
@@ -1049,49 +1066,49 @@ codeunit 6151002 "POS Proxy - Display"
         CurrExtension: Text[10];
     begin
         if DisplaySetup."Image Rotation Interval" = 0 then
-          DisplaySetup."Image Rotation Interval" := 3000;
+            DisplaySetup."Image Rotation Interval" := 3000;
 
         DisplayContentLines.SetRange("Content Code", ContentCode);
         if DisplayContentLines.FindSet then begin
-          ContentHtml += '<!DOCTYPE html>';
-          ContentHtml += '<html>';
-          ContentHtml += '<head>';
-          ContentHtml += '  <meta http-equiv="Content-Type" content="text/html; charset=unicode" />';
-          ContentHtml += '  <meta http-equiv="X-UA-Compatible" content="IE=9" />';
-          ContentHtml += '  <style type="text/css">';
-          ContentHtml += '      body { overflow: hidden; margin: 0px; padding: 0px; border: 0px }';
-          ContentHtml += '      .imageCarousel {display:none;}';
-          ContentHtml += '  </style>';
-          ContentHtml += '</head>';
-          ContentHtml += '<body>';
-          ContentHtml += '  <div style="width: 100%; height: 100%;">';
-          ImageCounter := 1;
-          repeat
-            GetImageContentAndExtension(DisplayContentLines,CurrBase64,CurrExtension);
-            ContentHtml += '    <img class="imageCarousel" src="' + Format(ImageCounter) + '.' + CurrExtension + '" style="width:100%; height: 100%;">';
-            MediaDictionary.Add(ImageCounter,Format(ImageCounter) + '.' + CurrExtension);
-            Base64Dictionary.Add(ImageCounter,CurrBase64);
-            ImageCounter += 1;
-          until DisplayContentLines.Next = 0;
-          ContentHtml += '  </div>';
-          ContentHtml += '  <script>';
-          ContentHtml += '    var myIndex = 0;';
-          ContentHtml += '    carousel();';
-          ContentHtml += '    function carousel() {';
-          ContentHtml += '      var i;';
-          ContentHtml += '      var x = document.getElementsByClassName("imageCarousel");';
-          ContentHtml += '      for (i = 0; i < x.length; i++) {';
-          ContentHtml += '             x[i].style.display = "none";';
-          ContentHtml += '      }';
-          ContentHtml += '      myIndex++;';
-          ContentHtml += '      if (myIndex > x.length) {myIndex = 1}';
-          ContentHtml += '        x[myIndex-1].style.display = "block";';
-          //ContentHtml += '        setTimeout(carousel, 3000);'; //Move to setup
-          ContentHtml += '        setTimeout(carousel, ' + Format(DisplaySetup."Image Rotation Interval") + ');';
-          ContentHtml += '    }';
-          ContentHtml += '  </script>';
-          ContentHtml += '</body>';
-          ContentHtml += '</html>';
+            ContentHtml += '<!DOCTYPE html>';
+            ContentHtml += '<html>';
+            ContentHtml += '<head>';
+            ContentHtml += '  <meta http-equiv="Content-Type" content="text/html; charset=unicode" />';
+            ContentHtml += '  <meta http-equiv="X-UA-Compatible" content="IE=9" />';
+            ContentHtml += '  <style type="text/css">';
+            ContentHtml += '      body { overflow: hidden; margin: 0px; padding: 0px; border: 0px }';
+            ContentHtml += '      .imageCarousel {display:none;}';
+            ContentHtml += '  </style>';
+            ContentHtml += '</head>';
+            ContentHtml += '<body>';
+            ContentHtml += '  <div style="width: 100%; height: 100%;">';
+            ImageCounter := 1;
+            repeat
+                GetImageContentAndExtension(DisplayContentLines, CurrBase64, CurrExtension);
+                ContentHtml += '    <img class="imageCarousel" src="' + Format(ImageCounter) + '.' + CurrExtension + '" style="width:100%; height: 100%;">';
+                MediaDictionary.Add(ImageCounter, Format(ImageCounter) + '.' + CurrExtension);
+                Base64Dictionary.Add(ImageCounter, CurrBase64);
+                ImageCounter += 1;
+            until DisplayContentLines.Next = 0;
+            ContentHtml += '  </div>';
+            ContentHtml += '  <script>';
+            ContentHtml += '    var myIndex = 0;';
+            ContentHtml += '    carousel();';
+            ContentHtml += '    function carousel() {';
+            ContentHtml += '      var i;';
+            ContentHtml += '      var x = document.getElementsByClassName("imageCarousel");';
+            ContentHtml += '      for (i = 0; i < x.length; i++) {';
+            ContentHtml += '             x[i].style.display = "none";';
+            ContentHtml += '      }';
+            ContentHtml += '      myIndex++;';
+            ContentHtml += '      if (myIndex > x.length) {myIndex = 1}';
+            ContentHtml += '        x[myIndex-1].style.display = "block";';
+            //ContentHtml += '        setTimeout(carousel, 3000);'; //Move to setup
+            ContentHtml += '        setTimeout(carousel, ' + Format(DisplaySetup."Image Rotation Interval") + ');';
+            ContentHtml += '    }';
+            ContentHtml += '  </script>';
+            ContentHtml += '</body>';
+            ContentHtml += '</html>';
         end;
         exit(ContentHtml);
     end;
@@ -1104,42 +1121,42 @@ codeunit 6151002 "POS Proxy - Display"
     begin
         DisplayContentLines.SetRange("Content Code", ContentCode);
         if DisplayContentLines.FindSet then begin
-          ContentHtml += '<!DOCTYPE html>';
-          ContentHtml += '<html>';
-          ContentHtml += '<head>';
-          ContentHtml += '  <meta http-equiv="Content-Type" content="text/html; charset=unicode" />';
-          ContentHtml += '  <meta http-equiv="X-UA-Compatible" content="IE=9" />';
-          ContentHtml += '  <style type="text/css">';
-          ContentHtml += '    body { overflow: hidden; margin: 0px; padding: 0px; border: 0px; }';
-          ContentHtml += '    .fullscreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }';
-          ContentHtml += '  </style>';
-          ContentHtml += '</head>';
-          ContentHtml += '<body>';
-          ContentHtml += '  <video muted autoplay class="fullscreen" onended="run()" id="fullscreenVideo">';
-          VideoCounter := 1;
-          repeat
-            ContentHtml += '    <source src="video' + Format(VideoCounter) + '.mp4" type="video/mp4">';
-            MediaDictionary.Add(VideoCounter,DisplayContentLines.Url);
-            VideoCounter += 1;
-          until DisplayContentLines.Next = 0;
-          ContentHtml += '  </video>';
-          ContentHtml += '  <script>';
-          ContentHtml += '    video_count = 1;';
-          ContentHtml += '    var videoPlayer = document.getElementById("fullscreenVideo");';
-          ContentHtml += '    function run() {';
-          ContentHtml += '      video_count++;';
+            ContentHtml += '<!DOCTYPE html>';
+            ContentHtml += '<html>';
+            ContentHtml += '<head>';
+            ContentHtml += '  <meta http-equiv="Content-Type" content="text/html; charset=unicode" />';
+            ContentHtml += '  <meta http-equiv="X-UA-Compatible" content="IE=9" />';
+            ContentHtml += '  <style type="text/css">';
+            ContentHtml += '    body { overflow: hidden; margin: 0px; padding: 0px; border: 0px; }';
+            ContentHtml += '    .fullscreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }';
+            ContentHtml += '  </style>';
+            ContentHtml += '</head>';
+            ContentHtml += '<body>';
+            ContentHtml += '  <video muted autoplay class="fullscreen" onended="run()" id="fullscreenVideo">';
+            VideoCounter := 1;
+            repeat
+                ContentHtml += '    <source src="video' + Format(VideoCounter) + '.mp4" type="video/mp4">';
+                MediaDictionary.Add(VideoCounter, DisplayContentLines.Url);
+                VideoCounter += 1;
+            until DisplayContentLines.Next = 0;
+            ContentHtml += '  </video>';
+            ContentHtml += '  <script>';
+            ContentHtml += '    video_count = 1;';
+            ContentHtml += '    var videoPlayer = document.getElementById("fullscreenVideo");';
+            ContentHtml += '    function run() {';
+            ContentHtml += '      video_count++;';
           //-=NPR5.51 [363658]
           //ContentHtml += '      if (video_count == 3) video_count = 1;';
           ContentHtml += StrSubstNo(
                          '      if (video_count == %1) video_count = 1;',VideoCounter);
           //+=NPR5.51 [363658]
-          ContentHtml += '      var nextVideo = "video" + video_count + ".mp4";';
-          ContentHtml += '      videoPlayer.src = nextVideo;';
-          ContentHtml += '      videoPlayer.play();';
-          ContentHtml += '    };';
-          ContentHtml += '  </script>';
-          ContentHtml += '</body>';
-          ContentHtml += '</html>';
+            ContentHtml += '      var nextVideo = "video" + video_count + ".mp4";';
+            ContentHtml += '      videoPlayer.src = nextVideo;';
+            ContentHtml += '      videoPlayer.play();';
+            ContentHtml += '    };';
+            ContentHtml += '  </script>';
+            ContentHtml += '</body>';
+            ContentHtml += '</html>';
         end;
         exit(ContentHtml);
     end;
@@ -1152,9 +1169,9 @@ codeunit 6151002 "POS Proxy - Display"
         String: DotNet npNetString;
         Int: Integer;
     begin
-        Arr := Arr.CreateInstance(GetDotNetType(Type),2);
-        Arr.SetValue(GetDotNetType(Int),0);
-        Arr.SetValue(GetDotNetType(String),1);
+        Arr := Arr.CreateInstance(GetDotNetType(Type), 2);
+        Arr.SetValue(GetDotNetType(Int), 0);
+        Arr.SetValue(GetDotNetType(String), 1);
 
         Type := GetDotNetType(Dict);
         Type := Type.MakeGenericType(Arr);
@@ -1162,7 +1179,7 @@ codeunit 6151002 "POS Proxy - Display"
         Dict := Activator.CreateInstance(Type);
     end;
 
-    local procedure GetImageContentAndExtension(DisplayContentLines: Record "Display Content Lines";var Base64: Text;var Extension: Text[10])
+    local procedure GetImageContentAndExtension(DisplayContentLines: Record "Display Content Lines"; var Base64: Text; var Extension: Text[10])
     var
         Convert: DotNet npNetConvert;
         Bytes: DotNet npNetArray;
@@ -1177,7 +1194,7 @@ codeunit 6151002 "POS Proxy - Display"
             DisplayContentLines.Image.CreateInStream(InS);
 
             MemoryStream := MemoryStream.MemoryStream();
-            CopyStream(MemoryStream,InS);
+            CopyStream(MemoryStream, InS);
 
             Bytes := MemoryStream.ToArray();
 
@@ -1187,34 +1204,42 @@ codeunit 6151002 "POS Proxy - Display"
             //Image.FromStream(MemoryStream);
 
             if (ImageFormat.Jpeg.Equals(Image.RawFormat)) then
-              Extension := 'jpeg'
-            else if (ImageFormat.Png.Equals(Image.RawFormat)) then
-              Extension := 'png'
-            else if (ImageFormat.Gif.Equals(Image.RawFormat)) then
-              Extension := 'gif'
-            else if (ImageFormat.Bmp.Equals(Image.RawFormat)) then
-              Extension := 'bmp'
-            else if (ImageFormat.Tiff.Equals(Image.RawFormat)) then
-              Extension := 'tiff'
-            else if (ImageFormat.Emf.Equals(Image.RawFormat)) then
-              Extension := 'emf'
-            else if (ImageFormat.Icon.Equals(Image.RawFormat)) then
-              Extension := 'icon'
-            else if (ImageFormat.Exif.Equals(Image.RawFormat)) then
-              Extension := 'exif'
-            else if (ImageFormat.Wmf.Equals(Image.RawFormat)) then
-              Extension := 'wmf';
+                Extension := 'jpeg'
+            else
+                if (ImageFormat.Png.Equals(Image.RawFormat)) then
+                    Extension := 'png'
+                else
+                    if (ImageFormat.Gif.Equals(Image.RawFormat)) then
+                        Extension := 'gif'
+                    else
+                        if (ImageFormat.Bmp.Equals(Image.RawFormat)) then
+                            Extension := 'bmp'
+                        else
+                            if (ImageFormat.Tiff.Equals(Image.RawFormat)) then
+                                Extension := 'tiff'
+                            else
+                                if (ImageFormat.Emf.Equals(Image.RawFormat)) then
+                                    Extension := 'emf'
+                                else
+                                    if (ImageFormat.Icon.Equals(Image.RawFormat)) then
+                                        Extension := 'icon'
+                                    else
+                                        if (ImageFormat.Exif.Equals(Image.RawFormat)) then
+                                            Extension := 'exif'
+                                        else
+                                            if (ImageFormat.Wmf.Equals(Image.RawFormat)) then
+                                                Extension := 'wmf';
 
             Base64 := Convert.ToBase64String(Bytes);
         end;
     end;
 
-    local procedure CustomerDisplayIsActivated(Register: Record Register;var MatrixIsActivated: Boolean;var DisplayIsActivated: Boolean)
+    local procedure CustomerDisplayIsActivated(Register: Record Register; var MatrixIsActivated: Boolean; var DisplayIsActivated: Boolean)
     begin
         MatrixIsActivated := Register."Customer Display";
         if not MatrixIsActivated then
           if DisplaySetup.Get(Register."Register No.") then begin
-            DisplayIsActivated := DisplaySetup.Activate;
+                DisplayIsActivated := DisplaySetup.Activate;
             //-352390 [352390]
             HideReceiptIsActivated := DisplaySetup."Hide receipt";
             //+352390 [352390]
@@ -1228,18 +1253,18 @@ codeunit 6151002 "POS Proxy - Display"
     end;
 
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
-    local procedure OnBeforeInsertWorkflowStep(var Rec: Record "POS Sales Workflow Step";RunTrigger: Boolean)
+    local procedure OnBeforeInsertWorkflowStep(var Rec: Record "POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
         //-NPR5.43 [319425]
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
-          exit;
+            exit;
 
         case Rec."Subscriber Function" of
-          'UpdateDisplayOnSaleLineInsert':
-            begin
-              Rec.Description := Text000;
-              Rec."Sequence No." := 10;
-            end;
+            'UpdateDisplayOnSaleLineInsert':
+                begin
+                    Rec.Description := Text000;
+                    Rec."Sequence No." := 10;
+                end;
         end;
         //+NPR5.43 [319425]
     end;

@@ -128,8 +128,8 @@ page 6151169 "NpGp POS Sales Lines"
                 Caption = 'POS Info';
                 Image = List;
                 RunObject = Page "NpGp POS Info POS Entry";
-                RunPageLink = "POS Entry No."=FIELD("POS Entry No."),
-                              "Sales Line No."=FIELD("Line No.");
+                //RunPageLink = "POS Entry No."=FIELD("POS Entry No."),
+                //              "Sales Line No."=FIELD("Line No.");
             }
         }
     }

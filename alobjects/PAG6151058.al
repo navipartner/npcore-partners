@@ -50,8 +50,8 @@ page 6151058 "Distribution Grp Memb Listpart"
                 Image = ItemAvailbyLoc;
                 Promoted = true;
                 RunObject = Page "Distribution Lines";
-                RunPageLink = "Distribution Group Member"=FIELD("Distribution Member Id"),
-                              "Distribution Item"=FILTER(<>'');
+                //RunPageLink = "Distribution Group Member"=FIELD("Distribution Member Id"),
+                //              "Distribution Item"=FILTER(<>'');
             }
             action("Demand Lines")
             {

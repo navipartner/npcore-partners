@@ -62,7 +62,7 @@ codeunit 6014628 "Managed Package Mgt."
     var
         FileMgt: Codeunit "File Management";
         TempBlob: Record TempBlob temporary;
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         InStream: InStream;
         JSON: Text;
         Handled: Boolean;
@@ -92,7 +92,7 @@ codeunit 6014628 "Managed Package Mgt."
 
     procedure ImportFromBlob(var TempBlob: Record TempBlob temporary)
     var
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         InStream: InStream;
         JSON: Text;
         Handled: Boolean;
@@ -126,11 +126,11 @@ codeunit 6014628 "Managed Package Mgt."
     var
         ManagedDependencyMgt: Codeunit "Managed Dependency Mgt.";
         DepMgtSetup: Record "Dependency Management Setup";
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         i: Integer;
-        Package: DotNet npNetJObject;
+        Package: DotNet JObject;
         FilterSpecific: Label '&$filter=Type eq ''%1'' and Name eq ''%2'' and Version eq ''%3''';
-        Data: DotNet npNetJObject;
+        Data: DotNet JObject;
         TmpManagedPackageLookup: Record "Managed Package Lookup" temporary;
         Handled: Boolean;
     begin
@@ -177,7 +177,7 @@ codeunit 6014628 "Managed Package Mgt."
         end;
     end;
 
-    local procedure LoadPackage(JObject: DotNet npNetJObject): Boolean
+    local procedure LoadPackage(JObject: DotNet JObject): Boolean
     var
         Selection: Integer;
         LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst;
@@ -221,7 +221,7 @@ codeunit 6014628 "Managed Package Mgt."
         exit(true);
     end;
 
-    local procedure LoadRecords(JObject: DotNet npNetJObject;LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst): Boolean
+    local procedure LoadRecords(JObject: DotNet JObject;LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst): Boolean
     var
         RecRef: RecordRef;
         FieldRef: FieldRef;
@@ -229,7 +229,7 @@ codeunit 6014628 "Managed Package Mgt."
         "Record": Integer;
         i: Integer;
         ManagedDependencyMgt: Codeunit "Managed Dependency Mgt.";
-        FieldsJObject: DotNet npNetJObject;
+        FieldsJObject: DotNet JObject;
         Total: Integer;
         Itt: Integer;
     begin
@@ -312,7 +312,7 @@ codeunit 6014628 "Managed Package Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnLoadPackage(var Handled: Boolean;PrimaryPackageTable: Integer;JObject: DotNet npNetJObject;LoadType: Option File,Blob,Download)
+    local procedure OnLoadPackage(var Handled: Boolean;PrimaryPackageTable: Integer;JObject: DotNet JObject;LoadType: Option File,Blob,Download)
     begin
         // Use this event to overwrite default import dialog flow and logic for your specific package type.
     end;

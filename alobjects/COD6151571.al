@@ -13,19 +13,19 @@ codeunit 6151571 "AF Helper Functions"
     var
         TXT001: Label 'Clear the customer tag and disable notifications?';
 
-    procedure GetValueAsText(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Text
+    procedure GetValueAsText(JObject: DotNet JObject;PropertyName: Text) ReturnValue: Text
     begin
         ReturnValue := JObject.GetValue(PropertyName).ToString;
     end;
 
-    procedure GetValueAsInteger(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Integer
+    procedure GetValueAsInteger(JObject: DotNet JObject;PropertyName: Text) ReturnValue: Integer
     var
         DotNetInteger: DotNet npNetInt32;
     begin
         ReturnValue := DotNetInteger.Parse(JObject.GetValue(PropertyName).ToString);
     end;
 
-    procedure GetValueAsDecimal(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Decimal
+    procedure GetValueAsDecimal(JObject: DotNet JObject;PropertyName: Text) ReturnValue: Decimal
     var
         DotNetDecimal: DotNet npNetDecimal;
         CultureInfo: DotNet npNetCultureInfo;
@@ -33,34 +33,40 @@ codeunit 6151571 "AF Helper Functions"
         ReturnValue := DotNetDecimal.Parse(JObject.GetValue(PropertyName).ToString,CultureInfo.InvariantCulture);
     end;
 
-    procedure GetValueAsDate(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Date
+    procedure GetValueAsDate(JObject: DotNet JObject;PropertyName: Text) ReturnValue: Date
     var
         DotNetDateTime: DotNet npNetDateTime;
         CultureInfo: DotNet npNetCultureInfo;
+        DtDataType: DotNet npNetType;
     begin
-        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(GetDotNetType(DotNetDateTime));
+        DtDataType := GetDotNetType(DotNetDateTime);
+        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(DtDataType);
         ReturnValue := DT2Date(DotNetDateTime);
     end;
 
-    procedure GetValueAsTime(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Time
+    procedure GetValueAsTime(JObject: DotNet JObject;PropertyName: Text) ReturnValue: Time
     var
         DotNetDateTime: DotNet npNetDateTime;
         CultureInfo: DotNet npNetCultureInfo;
+        DtDataType: DotNet npNetType;
     begin
-        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(GetDotNetType(DotNetDateTime));
+        DtDataType := GetDotNetType(DotNetDateTime);
+        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(DtDataType);
         ReturnValue := DT2Time(DotNetDateTime);
     end;
 
-    procedure GetValueAsDateTime(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: DateTime
+    procedure GetValueAsDateTime(JObject: DotNet JObject;PropertyName: Text) ReturnValue: DateTime
     var
         DotNetDateTime: DotNet npNetDateTime;
         CultureInfo: DotNet npNetCultureInfo;
+        DtDataType: DotNet npNetType;
     begin
-        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(GetDotNetType(DotNetDateTime));
+        DtDataType := GetDotNetType(DotNetDateTime);
+        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(DtDataType);
         ReturnValue := DotNetDateTime;
     end;
 
-    procedure GetValueAsBoolean(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Boolean
+    procedure GetValueAsBoolean(JObject: DotNet JObject;PropertyName: Text) ReturnValue: Boolean
     var
         DotNetBoolean: DotNet npNetBoolean;
     begin
@@ -121,7 +127,7 @@ codeunit 6151571 "AF Helper Functions"
     end;
 
     [TryFunction]
-    procedure TryParse(json: Text;var JToken: DotNet npNetJToken)
+    procedure TryParse(json: Text;var JToken: DotNet JToken)
     begin
         JToken := JToken.Parse(json);
     end;

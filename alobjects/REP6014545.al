@@ -7,7 +7,7 @@ report 6014545 "Acc. Statement w FIK-Card"
     // NPR5.49/BHR /20190111  CASE 341976 Comment Code as per OMA
     // NPR5.49/JAKUBV/20190402  CASE 341969 Transport NPR5.49 - 1 April 2019
     DefaultLayout = RDLC;
-    RDLCLayout = './Acc. Statement w FIK-Card.rdlc';
+    RDLCLayout = './layouts/Acc. Statement w FIK-Card.rdlc';
 
     Caption = 'Acc. Statement w FIK-Card';
 
@@ -93,7 +93,6 @@ report 6014545 "Acc. Statement w FIK-Card"
                 }
                 column(Customer__Last_Statement_No__;Format(Customer."Last Statement No."))
                 {
-                    DecimalPlaces = 0:0;
                 }
                 column(CustAddr_7_;CustAddr[7])
                 {

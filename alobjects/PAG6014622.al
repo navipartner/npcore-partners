@@ -100,16 +100,6 @@ page 6014622 "POS Web Fonts"
                         RemoveFont();
                     end;
                 }
-                action("Preview Font")
-                {
-                    Caption = 'Preview Font';
-                    Image = ViewDescription;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
-                    RunObject = Page "POS Web Font Preview";
-                    RunPageLink = Code=FIELD(Code);
-                }
             }
             group("Stylesheet (Css)")
             {
@@ -199,7 +189,7 @@ page 6014622 "POS Web Fonts"
                     var
                         ManagedDepMgt: Codeunit "Managed Dependency Mgt.";
                         Rec2: Record "POS Web Font";
-                        JArray: DotNet npNetJArray;
+                        JArray: DotNet JArray;
                     begin
                         CurrPage.SetSelectionFilter(Rec2);
                         //-NPR5.32.10 [265454]

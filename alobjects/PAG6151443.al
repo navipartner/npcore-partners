@@ -11,8 +11,8 @@ page 6151443 "Magento Display Config"
     DelayedInsert = true;
     PageType = List;
     SourceTable = "Magento Display Config";
-    SourceTableView = SORTING("No.",Type,"Sales Code","Sales Type","Starting Date","Starting Time","Ending Date","Ending Time")
-                      WHERE("Sales Type"=FILTER(<>"3"));
+    //SourceTableView = SORTING("No.",Type,"Sales Code","Sales Type","Starting Date","Starting Time","Ending Date","Ending Time")
+    //                  WHERE("Sales Type"=FILTER(<>));
     UsageCategory = Lists;
 
     layout

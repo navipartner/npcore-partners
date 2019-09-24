@@ -22,74 +22,74 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
     end;
 
-    local procedure AddElement(var XmlDoc: DotNet npNetXmlDocument;NodePath: Text;Name: Text[250];var XmlElement: DotNet npNetXmlElement): Boolean
+    local procedure AddElement(var XmlDoc: DotNet npNetXmlDocument; NodePath: Text; Name: Text[250]; var XmlElement: DotNet npNetXmlElement): Boolean
     var
         XmlElementParent: DotNet npNetXmlElement;
     begin
         if IsNull(XmlDoc) then
-          exit(false);
+            exit(false);
 
         XmlElementParent := XmlDoc.DocumentElement;
         if IsNull(XmlElementParent) then
-          exit(false);
+            exit(false);
 
         if NodePath <> '' then begin
-          NodePath := LowerCase(NodePath);
-          if not NpXmlDomMgt.FindNode(XmlElementParent,NodePath,XmlElementParent) then
-            exit(false);
+            NodePath := LowerCase(NodePath);
+            if not NpXmlDomMgt.FindNode(XmlElementParent, NodePath, XmlElementParent) then
+                exit(false);
         end;
 
-        if NpXmlDomMgt.FindNode(XmlElementParent,Name,XmlElement) then
-          exit(false);
+        if NpXmlDomMgt.FindNode(XmlElementParent, Name, XmlElement) then
+            exit(false);
 
-        NpXmlDomMgt.AddElement(XmlElementParent,Name,XmlElement);
+        NpXmlDomMgt.AddElement(XmlElementParent, Name, XmlElement);
         exit(not IsNull(XmlElement));
     end;
 
-    procedure AddContainer(var XmlDoc: DotNet npNetXmlDocument;NodePath: Text;Name: Text[250])
+    procedure AddContainer(var XmlDoc: DotNet npNetXmlDocument; NodePath: Text; Name: Text[250])
     var
         XmlElement: DotNet npNetXmlElement;
     begin
-        if not AddElement(XmlDoc,NodePath,Name,XmlElement) then
-          exit;
+        if not AddElement(XmlDoc, NodePath, Name, XmlElement) then
+            exit;
 
-        NpXmlDomMgt.AddAttribute(XmlElement,"AttributeName.ElementType","ElementType.Container");
+        NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.ElementType", "ElementType.Container");
     end;
 
-    procedure AddFieldInteger(var XmlDoc: DotNet npNetXmlDocument;NodePath: Text;Name: Text[250];Value: Integer)
+    procedure AddFieldInteger(var XmlDoc: DotNet npNetXmlDocument; NodePath: Text; Name: Text[250]; Value: Integer)
     var
         XmlElement: DotNet npNetXmlElement;
     begin
-        if not AddElement(XmlDoc,NodePath,Name,XmlElement) then
-          exit;
+        if not AddElement(XmlDoc, NodePath, Name, XmlElement) then
+            exit;
 
-        NpXmlDomMgt.AddAttribute(XmlElement,"AttributeName.ElementType","ElementType.Field");
-        NpXmlDomMgt.AddAttribute(XmlElement,"AttributeName.FieldType",Format(GetDotNetType(Value)));
-        XmlElement.InnerText := Format(Value,0,9);
+        NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.ElementType", "ElementType.Field");
+        NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.FieldType", Format(GetDotNetType(Value)));
+        XmlElement.InnerText := Format(Value, 0, 9);
     end;
 
-    procedure AddFieldDecimal(var XmlDoc: DotNet npNetXmlDocument;NodePath: Text;Name: Text[250];Value: Decimal)
+    procedure AddFieldDecimal(var XmlDoc: DotNet npNetXmlDocument; NodePath: Text; Name: Text[250]; Value: Decimal)
     var
         XmlElement: DotNet npNetXmlElement;
     begin
-        if not AddElement(XmlDoc,NodePath,Name,XmlElement) then
-          exit;
+        if not AddElement(XmlDoc, NodePath, Name, XmlElement) then
+            exit;
 
-        NpXmlDomMgt.AddAttribute(XmlElement,"AttributeName.ElementType","ElementType.Field");
-        NpXmlDomMgt.AddAttribute(XmlElement,"AttributeName.FieldType",Format(GetDotNetType(Value)));
-        XmlElement.InnerText := Format(Value,0,9);
+        NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.ElementType", "ElementType.Field");
+        NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.FieldType", Format(GetDotNetType(Value)));
+        XmlElement.InnerText := Format(Value, 0, 9);
     end;
 
-    procedure AddFieldText(var XmlDoc: DotNet npNetXmlDocument;NodePath: Text;Name: Text[250];Value: Text[250])
+    procedure AddFieldText(var XmlDoc: DotNet npNetXmlDocument; NodePath: Text; Name: Text[250]; Value: Text[250])
     var
         XmlElement: DotNet npNetXmlElement;
     begin
-        if not AddElement(XmlDoc,NodePath,Name,XmlElement) then
-          exit;
+        if not AddElement(XmlDoc, NodePath, Name, XmlElement) then
+            exit;
 
-        NpXmlDomMgt.AddAttribute(XmlElement,"AttributeName.ElementType","ElementType.Field");
-        NpXmlDomMgt.AddAttribute(XmlElement,"AttributeName.FieldType",Format(GetDotNetType(Value)));
-        XmlElement.InnerText := Format(Value,0,9);
+        NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.ElementType", "ElementType.Field");
+        NpXmlDomMgt.AddAttribute(XmlElement, "AttributeName.FieldType", Format(GetDotNetType(Value)));
+        XmlElement.InnerText := Format(Value, 0, 9);
     end;
 
     procedure InitGenericMagentoSetup(var MagentoSetup: Record "Magento Setup")
@@ -99,7 +99,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
         MagentoSetup.Get;
         if MagentoSetup."Generic Setup".HasValue then
-          MagentoSetup.CalcFields("Generic Setup");
+            MagentoSetup.CalcFields("Generic Setup");
 
         TempBlob.Blob := MagentoSetup."Generic Setup";
         InitGenericSetup(TempBlob);
@@ -116,7 +116,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         OutStream: OutStream;
     begin
         if TempBlob.Blob.HasValue then
-          exit;
+            exit;
 
         XmlDoc := XmlDoc.XmlDocument;
         XmlDoc.LoadXml('<?xml version="1.0" encoding="UTF-8"?>' +
@@ -129,7 +129,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
     end;
 
-    local procedure AddGenericBufferElement(var XmlElement: DotNet npNetXmlElement;var LineNo: Integer;Level: Integer;ParentNodePath: Text[250];var TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary)
+    local procedure AddGenericBufferElement(var XmlElement: DotNet npNetXmlElement; var LineNo: Integer; Level: Integer; ParentNodePath: Text[250]; var TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary)
     var
         XmlElement2: DotNet npNetXmlElement;
         XmlNodeList: DotNet npNetXmlNodeList;
@@ -141,11 +141,11 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         TempGenericSetupBuffer.Name := XmlElement.Name;
         TempGenericSetupBuffer."Node Path" := TempGenericSetupBuffer.Name;
         if ParentNodePath <> '' then
-          TempGenericSetupBuffer."Node Path" := ParentNodePath + '/' + TempGenericSetupBuffer."Node Path";
-        TempGenericSetupBuffer.Container := NpXmlDomMgt.GetXmlAttributeText(XmlElement,"AttributeName.ElementType",false) = "ElementType.Container";
+            TempGenericSetupBuffer."Node Path" := ParentNodePath + '/' + TempGenericSetupBuffer."Node Path";
+        TempGenericSetupBuffer.Container := NpXmlDomMgt.GetXmlAttributeText(XmlElement, "AttributeName.ElementType", false) = "ElementType.Container";
         if not TempGenericSetupBuffer.Container then begin
-          TempGenericSetupBuffer."Data Type" := NpXmlDomMgt.GetXmlAttributeText(XmlElement,"AttributeName.FieldType",false);
-          TempGenericSetupBuffer.Value := XmlElement.InnerText;
+            TempGenericSetupBuffer."Data Type" := NpXmlDomMgt.GetXmlAttributeText(XmlElement, "AttributeName.FieldType", false);
+            TempGenericSetupBuffer.Value := XmlElement.InnerText;
         end;
 
         TempGenericSetupBuffer.Level := Level;
@@ -153,16 +153,16 @@ codeunit 6151400 "Magento Generic Setup Mgt."
 
         ParentNodePath := TempGenericSetupBuffer."Node Path";
         if TempGenericSetupBuffer.Container then begin
-          XmlNodeList := XmlElement.ChildNodes;
-          for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement2 := XmlNodeList.ItemOf(i);
-            if XmlElement2.Name <> '#text' then
-              AddGenericBufferElement(XmlElement2,LineNo,Level + 1,ParentNodePath,TempGenericSetupBuffer);
-          end;
+            XmlNodeList := XmlElement.ChildNodes;
+            for i := 0 to XmlNodeList.Count - 1 do begin
+                XmlElement2 := XmlNodeList.ItemOf(i);
+                if XmlElement2.Name <> '#text' then
+                    AddGenericBufferElement(XmlElement2, LineNo, Level + 1, ParentNodePath, TempGenericSetupBuffer);
+            end;
         end;
     end;
 
-    local procedure EditGenericSetup(var TempBlob: Record TempBlob temporary;NodePath: Text)
+    local procedure EditGenericSetup(var TempBlob: Record TempBlob temporary; NodePath: Text)
     var
         TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary;
         XmlDoc: DotNet npNetXmlDocument;
@@ -175,30 +175,30 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         i: Integer;
     begin
         TempGenericSetupBuffer.DeleteAll;
-        if not LoadGenericSetup(TempBlob,XmlDoc) then
-          exit;
+        if not LoadGenericSetup(TempBlob, XmlDoc) then
+            exit;
 
         LineNo := 10000;
         XmlElement := XmlDoc.DocumentElement;
         if NodePath <> '' then
-          XmlElement := XmlElement.SelectSingleNode(NodePath);
+            XmlElement := XmlElement.SelectSingleNode(NodePath);
         if not NpXmlDomMgt.IsLeafNode(XmlElement) then begin
-          XmlNodeList := XmlElement.ChildNodes;
-          for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement2 := XmlNodeList.ItemOf(i);
-            AddGenericBufferElement(XmlElement2,LineNo,1,'',TempGenericSetupBuffer);
-          end;
+            XmlNodeList := XmlElement.ChildNodes;
+            for i := 0 to XmlNodeList.Count - 1 do begin
+                XmlElement2 := XmlNodeList.ItemOf(i);
+                AddGenericBufferElement(XmlElement2, LineNo, 1, '', TempGenericSetupBuffer);
+            end;
         end;
-        TempGenericSetupBuffer.ModifyAll("Root Element",XmlElement.Name);
+        TempGenericSetupBuffer.ModifyAll("Root Element", XmlElement.Name);
 
-        PAGE.RunModal(PAGE::"Magento Generic Setup Buffer",TempGenericSetupBuffer);
+        PAGE.RunModal(PAGE::"Magento Generic Setup Buffer", TempGenericSetupBuffer);
 
-        TempGenericSetupBuffer.SetRange(Container,false);
+        TempGenericSetupBuffer.SetRange(Container, false);
         if TempGenericSetupBuffer.FindSet then
-          repeat
-            XmlElement2 := XmlElement.SelectSingleNode(TempGenericSetupBuffer."Node Path");
-            XmlElement2.InnerText := TempGenericSetupBuffer.Value;
-          until TempGenericSetupBuffer.Next = 0;
+            repeat
+                XmlElement2 := XmlElement.SelectSingleNode(TempGenericSetupBuffer."Node Path");
+                XmlElement2.InnerText := TempGenericSetupBuffer.Value;
+            until TempGenericSetupBuffer.Next = 0;
         Clear(TempBlob.Blob);
         TempBlob.Blob.CreateOutStream(OutStream);
         XmlDoc.Save(OutStream);
@@ -212,7 +212,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         InitGenericMagentoSetup(MagentoSetup);
         Commit;
         TempBlob.Blob := MagentoSetup."Generic Setup";
-        EditGenericSetup(TempBlob,NodePath);
+        EditGenericSetup(TempBlob, NodePath);
         MagentoSetup."Generic Setup" := TempBlob.Blob;
         MagentoSetup.Modify(true);
     end;
@@ -221,7 +221,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
     end;
 
-    procedure LookupGenericSetup(var TempBlob: Record TempBlob temporary;RootNodePath: Text): Text
+    procedure LookupGenericSetup(var TempBlob: Record TempBlob temporary; RootNodePath: Text): Text
     var
         TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary;
         GenericSetupBuffer: Page "Magento Generic Setup Buffer";
@@ -235,9 +235,9 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         i: Integer;
     begin
         //-MAG1.21
-        LoadGenericSetupBuffer(TempBlob,RootNodePath,TempGenericSetupBuffer);
-        if PAGE.RunModal(PAGE::"Magento Generic Setup Buffer",TempGenericSetupBuffer) <> ACTION::LookupOK then
-          exit('');
+        LoadGenericSetupBuffer(TempBlob, RootNodePath, TempGenericSetupBuffer);
+        if PAGE.RunModal(PAGE::"Magento Generic Setup Buffer", TempGenericSetupBuffer) <> ACTION::LookupOK then
+            exit('');
 
         exit(TempGenericSetupBuffer.Value);
         //+MAG1.21
@@ -247,7 +247,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
     end;
 
-    procedure GetValueInteger(var TempBlob: Record TempBlob temporary;NodePath: Text) Value: Integer
+    procedure GetValueInteger(var TempBlob: Record TempBlob temporary; NodePath: Text) Value: Integer
     var
         XmlDoc: DotNet npNetXmlDocument;
         XmlElement: DotNet npNetXmlElement;
@@ -258,13 +258,13 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         XmlDoc.Load(InStream);
 
         XmlElement := XmlDoc.DocumentElement;
-        Evaluate(Value,NpXmlDomMgt.GetXmlText(XmlElement,NodePath,250,true),9);
+        Evaluate(Value, NpXmlDomMgt.GetXmlText(XmlElement, NodePath, 250, true), 9);
         exit(Value);
 
         exit(0);
     end;
 
-    procedure GetValueDecimal(var TempBlob: Record TempBlob temporary;NodePath: Text) Value: Decimal
+    procedure GetValueDecimal(var TempBlob: Record TempBlob temporary; NodePath: Text) Value: Decimal
     var
         XmlDoc: DotNet npNetXmlDocument;
         XmlElement: DotNet npNetXmlElement;
@@ -275,13 +275,13 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         XmlDoc.Load(InStream);
 
         XmlElement := XmlDoc.DocumentElement;
-        Evaluate(Value,NpXmlDomMgt.GetXmlText(XmlElement,NodePath,250,true),9);
+        Evaluate(Value, NpXmlDomMgt.GetXmlText(XmlElement, NodePath, 250, true), 9);
         exit(Value);
 
         exit(0);
     end;
 
-    procedure GetValueText(var TempBlob: Record TempBlob temporary;NodePath: Text): Text[250]
+    procedure GetValueText(var TempBlob: Record TempBlob temporary; NodePath: Text): Text[250]
     var
         XmlDoc: DotNet npNetXmlDocument;
         XmlElement: DotNet npNetXmlElement;
@@ -292,7 +292,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         XmlDoc.Load(InStream);
 
         XmlElement := XmlDoc.DocumentElement;
-        exit(Format(NpXmlDomMgt.GetXmlText(XmlElement,NodePath,250,true),0,9));
+        exit(Format(NpXmlDomMgt.GetXmlText(XmlElement, NodePath, 250, true), 0, 9));
 
         exit('');
     end;
@@ -301,12 +301,12 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
     end;
 
-    procedure LoadGenericSetup(var TempBlob: Record TempBlob temporary;var XmlDoc: DotNet npNetXmlDocument): Boolean
+    procedure LoadGenericSetup(var TempBlob: Record TempBlob temporary; var XmlDoc: DotNet npNetXmlDocument): Boolean
     var
         InStream: InStream;
     begin
         if not TempBlob.Blob.HasValue then
-          exit(false);
+            exit(false);
 
         TempBlob.Blob.CreateInStream(InStream);
         XmlDoc := XmlDoc.XmlDocument;
@@ -314,7 +314,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         exit(true);
     end;
 
-    procedure LoadGenericSetupBuffer(var TempBlob: Record TempBlob temporary;RootNodePath: Text;var TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary)
+    procedure LoadGenericSetupBuffer(var TempBlob: Record TempBlob temporary; RootNodePath: Text; var TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary)
     var
         XmlDoc: DotNet npNetXmlDocument;
         XmlElement: DotNet npNetXmlElement;
@@ -326,21 +326,21 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         //-MAG1.21
         TempGenericSetupBuffer.DeleteAll;
         InitGenericSetup(TempBlob);
-        if not LoadGenericSetup(TempBlob,XmlDoc) then
-          exit;
+        if not LoadGenericSetup(TempBlob, XmlDoc) then
+            exit;
 
         LineNo := 10000;
         XmlElement := XmlDoc.DocumentElement;
         if RootNodePath <> '' then
-          XmlElement := XmlElement.SelectSingleNode(RootNodePath);
+            XmlElement := XmlElement.SelectSingleNode(RootNodePath);
         if not NpXmlDomMgt.IsLeafNode(XmlElement) then begin
-          XmlNodeList := XmlElement.ChildNodes;
-          for i := 0 to XmlNodeList.Count - 1 do begin
-            XmlElement2 := XmlNodeList.ItemOf(i);
-            AddGenericBufferElement(XmlElement2,LineNo,1,'',TempGenericSetupBuffer);
-          end;
+            XmlNodeList := XmlElement.ChildNodes;
+            for i := 0 to XmlNodeList.Count - 1 do begin
+                XmlElement2 := XmlNodeList.ItemOf(i);
+                AddGenericBufferElement(XmlElement2, LineNo, 1, '', TempGenericSetupBuffer);
+            end;
         end;
-        TempGenericSetupBuffer.ModifyAll("Root Element",XmlElement.Name);
+        TempGenericSetupBuffer.ModifyAll("Root Element", XmlElement.Name);
         //+MAG1.21
     end;
 
@@ -348,50 +348,50 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
     end;
 
-    procedure ValidateValue(DataType: Text[50];NewValue: Text[250]) Value: Text[250]
+    procedure ValidateValue(DataType: Text[50]; NewValue: Text[250]) Value: Text[250]
     var
         Decimal: Decimal;
         "Integer": Integer;
     begin
         if NewValue = '' then
-          exit('');
+            exit('');
 
         case DataType of
-          Format(GetDotNetType(Integer)):
-            begin
-              Evaluate(Integer,NewValue,9);
-              exit(Format(Integer,0,9));
-            end;
-          Format(GetDotNetType(Decimal)):
-            begin
-              Evaluate(Decimal,NewValue,9);
-              exit(Format(Decimal,0,9));
-            end;
+            Format(GetDotNetType(Integer)):
+                begin
+                    Evaluate(Integer, NewValue, 9);
+                    exit(Format(Integer, 0, 9));
+                end;
+            Format(GetDotNetType(Decimal)):
+                begin
+                    Evaluate(Decimal, NewValue, 9);
+                    exit(Format(Decimal, 0, 9));
+                end;
         end;
 
-        exit(Format(NewValue,0,9));
+        exit(Format(NewValue, 0, 9));
     end;
 
     procedure "--- FieldRef Mgt"()
     begin
     end;
 
-    procedure GetFieldRefValue(var RecRef: RecordRef;FieldNo: Integer): Text
+    procedure GetFieldRefValue(var RecRef: RecordRef; FieldNo: Integer): Text
     var
         FieldRef: FieldRef;
     begin
         //-MAG1.21
-        if not OpenFieldRef(RecRef,FieldNo,FieldRef) then
-          exit('');
+        if not OpenFieldRef(RecRef, FieldNo, FieldRef) then
+            exit('');
 
         if LowerCase(Format(FieldRef.Class)) = 'flowfield' then
-          FieldRef.CalcField;
+            FieldRef.CalcField;
 
         exit(Format(FieldRef.Value));
         //+MAG1.21
     end;
 
-    procedure OpenRecRef(TableNo: Integer;var RecRef: RecordRef) TableExists: Boolean
+    procedure OpenRecRef(TableNo: Integer; var RecRef: RecordRef) TableExists: Boolean
     var
         "Object": Record "Object";
         AllObj: Record AllObj;
@@ -399,9 +399,9 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         //-MAG1.21
         //-MAG2.16 [322752]
         //IF NOT Object.GET(Object.Type::Table,'',TableNo) THEN
-        if not AllObj.Get(AllObj."Object Type"::Table,TableNo) then
-        //+MAG2.16 [322752]
-          exit(false);
+        if not AllObj.Get(AllObj."Object Type"::Table, TableNo) then
+            //+MAG2.16 [322752]
+            exit(false);
 
         Clear(RecRef);
         RecRef.Open(TableNo);
@@ -410,16 +410,16 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         //+MAG1.21
     end;
 
-    procedure OpenFieldRef(var RecRef: RecordRef;FieldNo: Integer;var FieldRef: FieldRef) FieldExists: Boolean
+    procedure OpenFieldRef(var RecRef: RecordRef; FieldNo: Integer; var FieldRef: FieldRef) FieldExists: Boolean
     var
         "Field": Record "Field";
     begin
         //-MAG1.21
         if RecRef.Number <= 0 then
-          exit(false);
+            exit(false);
 
-        if not Field.Get(RecRef.Number,FieldNo) then
-          exit(false);
+        if not Field.Get(RecRef.Number, FieldNo) then
+            exit(false);
 
         FieldRef := RecRef.Field(FieldNo);
 
@@ -427,16 +427,16 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         //+MAG1.21
     end;
 
-    procedure SetFieldRefFilter(var RecRef: RecordRef;FieldNo: Integer;FilterValue: Text) FieldExists: Boolean
+    procedure SetFieldRefFilter(var RecRef: RecordRef; FieldNo: Integer; FilterValue: Text) FieldExists: Boolean
     var
         FieldRef: FieldRef;
     begin
         //-MAG1.21
-        if not OpenFieldRef(RecRef,FieldNo,FieldRef) then
-          exit(false);
+        if not OpenFieldRef(RecRef, FieldNo, FieldRef) then
+            exit(false);
         //-MAG2.02
         // FieldRef.SETFILTER(FilterValue);
-        FieldRef.SetFilter('=%1',FilterValue);
+        FieldRef.SetFilter('=%1', FilterValue);
         //+MAG2.02
         exit(true);
         //+MAG1.21
@@ -455,20 +455,20 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
         //-MAG2.00
         if not (MagentoSetup.Get and (MagentoSetup."Variant System" in [MagentoSetup."Variant System"::Variety])) then
-          exit('');
+            exit('');
 
         SetupDimensionBuffer(XmlDoc);
         case MagentoSetup."Variant System" of
-          MagentoSetup."Variant System"::Variety:
-            begin
-              if not SetupDimensionBufferVariety(XmlDoc) then
-                exit('');
-            end;
+            MagentoSetup."Variant System"::Variety:
+                begin
+                    if not SetupDimensionBufferVariety(XmlDoc) then
+                        exit('');
+                end;
         end;
 
         TempBlob.Blob.CreateOutStream(OutStream);
         XmlDoc.Save(OutStream);
-        exit(LookupGenericSetup(TempBlob,"ElementName.VariantDimension"));
+        exit(LookupGenericSetup(TempBlob, "ElementName.VariantDimension"));
         //+MAG2.00
     end;
 
@@ -479,8 +479,8 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         //-MAG2.00
         TempBlob.DeleteAll;
         InitGenericSetup(TempBlob);
-        LoadGenericSetup(TempBlob,XmlDoc);
-        AddContainer(XmlDoc,'',"ElementName.VariantDimension");
+        LoadGenericSetup(TempBlob, XmlDoc);
+        AddContainer(XmlDoc, '', "ElementName.VariantDimension");
         //+MAG2.00
     end;
 
@@ -495,18 +495,18 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
         //-MAG2.00
         VarietyTableNo := 6059971;
-        if not OpenRecRef(VarietyTableNo,RecRef) then
-          exit(false);
+        if not OpenRecRef(VarietyTableNo, RecRef) then
+            exit(false);
 
         if not RecRef.FindSet then
-          exit(false);
+            exit(false);
 
         VarietyDescriptionFieldNo := 10;
         VarietyCodeFieldNo := 1;
         repeat
-          if OpenFieldRef(RecRef,VarietyDescriptionFieldNo,FieldRef) and OpenFieldRef(RecRef,VarietyCodeFieldNo,FieldRef2) then
-            if (Format(FieldRef.Value) <> '') and (Format(FieldRef2.Value) <> '') then
-              AddFieldText(XmlDoc,"ElementName.VariantDimension",Format(FieldRef.Value),Format(FieldRef2.Value));
+            if OpenFieldRef(RecRef, VarietyDescriptionFieldNo, FieldRef) and OpenFieldRef(RecRef, VarietyCodeFieldNo, FieldRef2) then
+                if (Format(FieldRef.Value) <> '') and (Format(FieldRef2.Value) <> '') then
+                    AddFieldText(XmlDoc, "ElementName.VariantDimension", Format(FieldRef.Value), Format(FieldRef2.Value));
         until RecRef.Next = 0;
 
         exit(true);

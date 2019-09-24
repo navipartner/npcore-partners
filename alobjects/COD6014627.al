@@ -24,18 +24,17 @@ codeunit 6014627 "Managed Dependency Mgt."
     // NPR5.42/MMV /20180405 CASE 314114 Fallback to user session if STARTSESSION fails
     // TM1.39/THRO/20181126 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
 
-    Permissions = TableData "POS Web Font"=rimd,
-                  TableData "Proxy Assembly"=rimd,
-                  TableData ".NET Assembly"=rimd,
-                  TableData "Web Client Dependency"=rimd,
-                  TableData "Add-in"=rimd;
+    Permissions = TableData "POS Web Font" = rimd,
+                  TableData ".NET Assembly" = rimd,
+                  TableData "Web Client Dependency" = rimd,
+                  TableData "Add-in" = rimd;
 
     trigger OnRun()
     begin
         ClearLastError();
 
         if not ReadDependenciesFromGroundControl() then
-          Error('Error when downloading dependencies from ground control: %1', GetLastErrorText);
+            Error('Error when downloading dependencies from ground control: %1', GetLastErrorText);
     end;
 
     local procedure MaxSupportedPayloadVersion(): Integer
@@ -45,7 +44,7 @@ codeunit 6014627 "Managed Dependency Mgt."
 
     procedure ValidateGroundControlConfiguration(DepMgtSetup: Record "Dependency Management Setup")
     var
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
     begin
         GetJSON(
           DepMgtSetup,
@@ -55,9 +54,9 @@ codeunit 6014627 "Managed Dependency Mgt."
           false);
     end;
 
-    procedure ExportManifest("Record": Variant;var JArray: DotNet npNetJArray;PayloadVersion: Integer)
+    procedure ExportManifest("Record": Variant; var JArray: DotNet JArray; PayloadVersion: Integer)
     var
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         [RunOnClient]
         IOFile: DotNet npNetFile;
         RecRef: RecordRef;
@@ -69,48 +68,49 @@ codeunit 6014627 "Managed Dependency Mgt."
         RecRef.GetTable(Record);
 
         if IsNull(JArray) then
-          exit;
+            exit;
         if JArray.Count = 0 then
-          exit;
+            exit;
         if not RecRef.FindFirst then
-          exit;
+            exit;
 
         GetTypeNameVersionFromRecordRef(RecRef, Type, Name, Version);
-        FileName := GetExportFileName(StrSubstNo('%1 %2 %3.json',Type,Name,Version));
+        FileName := GetExportFileName(StrSubstNo('%1 %2 %3.json', Type, Name, Version));
         if FileName = '' then
-          exit;
+            exit;
 
-        CreateDependencyJObject(JObject,Type,Name,'1.0');
-        AddToJObject(JObject,'Description','');
-        AddToJObject(JObject,'Payload Version', Format(PayloadVersion));
-        JObject.Add('Data',JArray);
+        CreateDependencyJObject(JObject, Type, Name, '1.0');
+        AddToJObject(JObject, 'Description', '');
+        AddToJObject(JObject, 'Payload Version', Format(PayloadVersion));
+        JObject.Add('Data', JArray);
 
-        IOFile.WriteAllText(FileName,JObject.ToString());
+        IOFile.WriteAllText(FileName, JObject.ToString());
     end;
 
-    procedure RecordToJArray("Record": Variant;var JArray: DotNet npNetJArray)
+    procedure RecordToJArray("Record": Variant; var JArray: DotNet JArray)
     var
         RecRef: RecordRef;
-        JObject: DotNet npNetJObject;
-        JObjectRec: DotNet npNetJObject;
+        JObject: DotNet JObject;
+        JObjectRec: DotNet JObject;
         i: Integer;
         Value: Variant;
     begin
         RecRef.GetTable(Record);
-        if RecRef.FindSet(false, false) then repeat
-          JObject := JObject.JObject();
-          AddToJObject(JObject,'Record',RecRef.Number);
-          JObjectRec := JObjectRec.JObject();
-          for i := 1 to RecRef.FieldCount do begin
-            FieldRefToVariant(RecRef.FieldIndex(i),Value);
-            AddToJObject(
-              JObjectRec,
-              RecRef.FieldIndex(i).Name,
-              Value);
-          end;
-          JObject.Add('Fields',JObjectRec);
-          AddToJArray(JArray,JObject);
-        until RecRef.Next = 0;
+        if RecRef.FindSet(false, false) then
+            repeat
+                JObject := JObject.JObject();
+                AddToJObject(JObject, 'Record', RecRef.Number);
+                JObjectRec := JObjectRec.JObject();
+                for i := 1 to RecRef.FieldCount do begin
+                    FieldRefToVariant(RecRef.FieldIndex(i), Value);
+                    AddToJObject(
+                      JObjectRec,
+                      RecRef.FieldIndex(i).Name,
+                      Value);
+                end;
+                JObject.Add('Fields', JObjectRec);
+                AddToJArray(JArray, JObject);
+            until RecRef.Next = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnAfterCompanyOpen', '', true, false)]
@@ -120,14 +120,14 @@ codeunit 6014627 "Managed Dependency Mgt."
         NavAppMgt: Codeunit "Nav App Mgt";
     begin
         if NavAppMgt.NavAPP_IsInstalling then
-          exit;
+            exit;
 
-        if CurrentClientType in [CLIENTTYPE::Windows,CLIENTTYPE::Web,CLIENTTYPE::Tablet,CLIENTTYPE::Phone,CLIENTTYPE::Desktop] then begin
-          //-NPR5.42 [314114]
-          //IF STARTSESSION(SessionId, CODEUNIT::"Managed Dependency Mgt.") THEN
-          if not StartSession(SessionId, CODEUNIT::"Managed Dependency Mgt.") then
-            ReadDependenciesFromGroundControl();
-          //+NPR5.42 [314114]
+        if CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop] then begin
+            //-NPR5.42 [314114]
+            //IF STARTSESSION(SessionId, CODEUNIT::"Managed Dependency Mgt.") THEN
+            if not StartSession(SessionId, CODEUNIT::"Managed Dependency Mgt.") then
+                ReadDependenciesFromGroundControl();
+            //+NPR5.42 [314114]
         end;
     end;
 
@@ -142,73 +142,73 @@ codeunit 6014627 "Managed Dependency Mgt."
     local procedure ReadDependenciesFromGroundControl() Result: Boolean
     var
         DepMgtSetup: Record "Dependency Management Setup";
-        JObject: DotNet npNetJObject;
-        Dependency: DotNet npNetJObject;
+        JObject: DotNet JObject;
+        Dependency: DotNet JObject;
         i: Integer;
         Type: Text;
     begin
         if not DependencyManagementConfigured(DepMgtSetup) then
-          exit(false);
+            exit(false);
 
-        if not GetJSON(DepMgtSetup, 'ManagedDependencyList', JObject, GetAvailableDependenciesFilter(DepMgtSetup),false) then
-          exit(false);
+        if not GetJSON(DepMgtSetup, 'ManagedDependencyList', JObject, GetAvailableDependenciesFilter(DepMgtSetup), false) then
+            exit(false);
 
         if JObject.Count = 0 then
-          exit(true);
+            exit(true);
 
         HoldSemaphore(); //Only one session should start downloading and storing dependencies, since there is no real synchronization for sessions downloading concurrently.
 
         //Recheck that there are still unresolved dependencies after grabbing semaphore.
         Clear(JObject);
         if not GetJSON(DepMgtSetup, 'ManagedDependencyList', JObject, GetAvailableDependenciesFilter(DepMgtSetup), false) then begin
-          Commit;
-          exit(false);
+            Commit;
+            exit(false);
         end;
 
         Result := true;
         for i := 0 to JObject.Count - 1 do begin
-          Dependency := JObject.Item(i);
-          if GetJSON(
-            DepMgtSetup,
-            'ManagedDependency',
-            Dependency,
-            StrSubstNo(
-              '&$filter=Type eq ''%1'' and Name eq ''%2'' and Version eq ''%3''',
-              JObject.Item(i).Item('Type'),
-              JObject.Item(i).Item('Name'),
-              JObject.Item(i).Item('Version')),
-            true)
-          then begin
-            if DeployDependency(Dependency.Item('BLOB').ToString()) then
-              Result := Result and UpdateLog(Dependency)
-            else
-              Result := false;
-          end else
-            Result := false;
+            Dependency := JObject.Item(i);
+            if GetJSON(
+              DepMgtSetup,
+              'ManagedDependency',
+              Dependency,
+              StrSubstNo(
+                '&$filter=Type eq ''%1'' and Name eq ''%2'' and Version eq ''%3''',
+                JObject.Item(i).Item('Type'),
+                JObject.Item(i).Item('Name'),
+                JObject.Item(i).Item('Version')),
+              true)
+            then begin
+                if DeployDependency(Dependency.Item('BLOB').ToString()) then
+                    Result := Result and UpdateLog(Dependency)
+                else
+                    Result := false;
+            end else
+                Result := false;
         end;
 
         Commit;
 
         if Result and (JObject.Count > 0) then
-          OnDependenciesDeployed();
+            OnDependenciesDeployed();
     end;
 
     local procedure DeployDependency(Base64: Text): Boolean
     var
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         i: Integer;
     begin
-        if not Base64StringToJObject(Base64,JObject) then
-          exit(false);
+        if not Base64StringToJObject(Base64, JObject) then
+            exit(false);
 
         for i := 0 to JObject.Count - 1 do
-          if not DeployOneDependency(JObject.Item(i)) then
-            exit(false);
+            if not DeployOneDependency(JObject.Item(i)) then
+                exit(false);
 
         exit(true);
     end;
 
-    local procedure DeployOneDependency(JObject: DotNet npNetJObject) Result: Boolean
+    local procedure DeployOneDependency(JObject: DotNet JObject) Result: Boolean
     var
         RecRef: RecordRef;
         FieldRef: FieldRef;
@@ -216,28 +216,28 @@ codeunit 6014627 "Managed Dependency Mgt."
         "Record": Integer;
         AllObj: Record AllObj;
     begin
-        Evaluate(Record,JObject.GetValue('Record').ToString());
+        Evaluate(Record, JObject.GetValue('Record').ToString());
 
         if not AllObj.Get(AllObj."Object Type"::Table, Record) then
-          exit(false);
+            exit(false);
 
         RecRef.Open(Record);
         if not RecRef.WritePermission then
-          exit(false);
+            exit(false);
 
         JObject := JObject.Item('Fields');
         foreach KeyValuePair in JObject do
-          if FieldRefByName(RecRef,KeyValuePair.Key,FieldRef) then
-            if not TextToFieldRef(KeyValuePair.Value,FieldRef) then
-              exit(false);
+            if FieldRefByName(RecRef, KeyValuePair.Key, FieldRef) then
+                if not TextToFieldRef(KeyValuePair.Value, FieldRef) then
+                    exit(false);
 
         Result := RecRef.Insert(false);
         if not Result then
-          Result := RecRef.Modify;
+            Result := RecRef.Modify;
     end;
 
     [TryFunction]
-    procedure GetJSON(DepMgtSetup: Record "Dependency Management Setup";Entity: Text;var JObject: DotNet npNetJObject;FilterText: Text;Specific: Boolean)
+    procedure GetJSON(DepMgtSetup: Record "Dependency Management Setup"; Entity: Text; var JObject: DotNet JObject; FilterText: Text; Specific: Boolean)
     var
         WebClient: DotNet npNetWebClient;
         Credential: DotNet npNetNetworkCredential;
@@ -254,14 +254,14 @@ codeunit 6014627 "Managed Dependency Mgt."
         JObject := JObject.Item('value');
 
         if Specific and (JObject.Count = 1) then
-          JObject := JObject.Item(0);
+            JObject := JObject.Item(0);
     end;
 
     [TryFunction]
-    procedure UpdateLog(Dependency: DotNet npNetJObject)
+    procedure UpdateLog(Dependency: DotNet JObject)
     var
         DepMgtSetup: Record "Dependency Management Setup";
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         HttpWebRequest: DotNet npNetHttpWebRequest;
         Credential: DotNet npNetNetworkCredential;
         StreamWriter: DotNet npNetStreamWriter;
@@ -274,15 +274,15 @@ codeunit 6014627 "Managed Dependency Mgt."
           Dependency.GetValue('Type').ToString(),
           Dependency.GetValue('Name').ToString(),
           Dependency.GetValue('Version').ToString());
-        AddToJObject(JObject,'Service_Tier',GetServerID);
+        AddToJObject(JObject, 'Service_Tier', GetServerID);
 
         HttpWebRequest := HttpWebRequest.Create(DepMgtSetup."OData URL" + '/ManagedDependenciesLog?$format=json');
         HttpWebRequest.Method := 'POST';
         HttpWebRequest.Accept := 'application/json';
         HttpWebRequest.ContentType := 'application/json';
-        HttpWebRequest.Credentials := Credential.NetworkCredential(DepMgtSetup.Username,DepMgtSetup.GetManagedDependencyPassword());
+        HttpWebRequest.Credentials := Credential.NetworkCredential(DepMgtSetup.Username, DepMgtSetup.GetManagedDependencyPassword());
 
-        StreamWriter := StreamWriter.StreamWriter(HttpWebRequest.GetRequestStream(),Encoding.UTF8);
+        StreamWriter := StreamWriter.StreamWriter(HttpWebRequest.GetRequestStream(), Encoding.UTF8);
         StreamWriter.Write(JObject.ToString());
         StreamWriter.Close();
 
@@ -294,21 +294,21 @@ codeunit 6014627 "Managed Dependency Mgt."
         String: DotNet npNetString;
     begin
         ID := GetUrl(CLIENTTYPE::Windows);
-        String := CopyStr(ID,StrPos(ID,'//'));
-        ID := String.Replace('//','') + '/' + TenantId;
+        String := CopyStr(ID, StrPos(ID, '//'));
+        ID := String.Replace('//', '') + '/' + TenantId;
         if ID = '' then
-          Error('Invalid address returned by GETURL: %1', GetLastErrorText);
+            Error('Invalid address returned by GETURL: %1', GetLastErrorText);
     end;
 
-    local procedure FieldRefByName(RecRef: RecordRef;Name: Text;var FieldRef: FieldRef): Boolean
+    local procedure FieldRefByName(RecRef: RecordRef; Name: Text; var FieldRef: FieldRef): Boolean
     var
         i: Integer;
     begin
         for i := 1 to RecRef.FieldCount do
-          if RecRef.FieldIndex(i).Name = Name then begin
-            FieldRef := RecRef.FieldIndex(i);
-            exit(true);
-          end;
+            if RecRef.FieldIndex(i).Name = Name then begin
+                FieldRef := RecRef.FieldIndex(i);
+                exit(true);
+            end;
     end;
 
     local procedure GetAvailableDependenciesFilter(DepMgtSetup: Record "Dependency Management Setup") "Filter": Text
@@ -323,7 +323,7 @@ codeunit 6014627 "Managed Dependency Mgt."
 
         //-NPR5.40 [307878]
         if not ControlAddin.WritePermission then
-          Filter += ' and Type ne ''Control Add-in''';
+            Filter += ' and Type ne ''Control Add-in''';
         //+NPR5.40 [307878]
     end;
 
@@ -333,111 +333,102 @@ codeunit 6014627 "Managed Dependency Mgt."
         FileManagement: Codeunit "File Management";
     begin
         FileName := FileManagement.SaveFileDialog(
-          TextExportTitle,DefaultFileName,
+          TextExportTitle, DefaultFileName,
           'JSON Files (*.json)|*.json|All Files (*.*)|*.*');
 
         if FileName = '' then
-          exit;
+            exit;
     end;
 
-    local procedure GetTypeNameVersionFromRecordRef(RecRef: RecordRef;var Type: Text;var Name: Text;var Version: Text)
+    local procedure GetTypeNameVersionFromRecordRef(RecRef: RecordRef; var Type: Text; var Name: Text; var Version: Text)
     var
         AddIn: Record "Add-in";
         DotNetAssembly: Record ".NET Assembly";
-        ProxyAssembly: Record "Proxy Assembly";
         WebClientDependency: Record "Web Client Dependency";
         WebFont: Record "POS Web Font";
         StargatePackage: Record "POS Stargate Package";
     begin
         case RecRef.Number of
-          DATABASE::"Add-in":
-            begin
-              RecRef.SetTable(AddIn);
-              Type := 'Control Add-in';
-              Name := AddIn."Add-in Name";
-              Version := AddIn.Version;
-            end;
-          DATABASE::".NET Assembly":
-            begin
-              RecRef.SetTable(DotNetAssembly);
-              Type := '.NET Assembly';
-              Name := DotNetAssembly."Assembly Name";
-              Version := '1.0';
-            end;
-          DATABASE::"Proxy Assembly":
-            begin
-              RecRef.SetTable(ProxyAssembly);
-              Type := 'Stargate Assembly';
-              Name := ProxyAssembly.Name;
-              Version := ProxyAssembly.Version;
-            end;
-          DATABASE::"Web Client Dependency":
-            begin
-              RecRef.SetTable(WebClientDependency);
-              Type := 'Web Client Dependency';
-              Name := StrSubstNo('%1 %2',WebClientDependency.Type,WebClientDependency.Code);
-              Version := '1.0';
-            end;
-          DATABASE::"POS Web Font":
-            begin
-              RecRef.SetTable(WebFont);
-              Type := 'Web Font';
-              Name := WebFont.Name;
-              Version := '1.0';
-            end;
-          DATABASE::"POS Stargate Package":
-            begin
-              RecRef.SetTable(StargatePackage);
-              Type := 'Stargate Package';
-              Name := StargatePackage.Name;
-              Version := StargatePackage.Version;
-            end;
-          else
-            begin
-              Type := 'Other';
-              Name := RecRef.Name;
-              Version := '1.0';
-            end;
+            DATABASE::"Add-in":
+                begin
+                    RecRef.SetTable(AddIn);
+                    Type := 'Control Add-in';
+                    Name := AddIn."Add-in Name";
+                    Version := AddIn.Version;
+                end;
+            DATABASE::".NET Assembly":
+                begin
+                    RecRef.SetTable(DotNetAssembly);
+                    Type := '.NET Assembly';
+                    Name := DotNetAssembly."Assembly Name";
+                    Version := '1.0';
+                end;
+            DATABASE::"Web Client Dependency":
+                begin
+                    RecRef.SetTable(WebClientDependency);
+                    Type := 'Web Client Dependency';
+                    Name := StrSubstNo('%1 %2', WebClientDependency.Type, WebClientDependency.Code);
+                    Version := '1.0';
+                end;
+            DATABASE::"POS Web Font":
+                begin
+                    RecRef.SetTable(WebFont);
+                    Type := 'Web Font';
+                    Name := WebFont.Name;
+                    Version := '1.0';
+                end;
+            DATABASE::"POS Stargate Package":
+                begin
+                    RecRef.SetTable(StargatePackage);
+                    Type := 'Stargate Package';
+                    Name := StargatePackage.Name;
+                    Version := StargatePackage.Version;
+                end;
+            else begin
+                    Type := 'Other';
+                    Name := RecRef.Name;
+                    Version := '1.0';
+                end;
         end;
     end;
 
-    procedure CreateDependencyJObject(var JObject: DotNet npNetJObject;Type: Text;Name: Text;Version: Text)
+    procedure CreateDependencyJObject(var JObject: DotNet JObject; Type: Text; Name: Text; Version: Text)
     begin
         JObject := JObject.JObject();
-        AddToJObject(JObject,'Type',Type);
-        AddToJObject(JObject,'Name',Name);
-        AddToJObject(JObject,'Version',Version);
+        AddToJObject(JObject, 'Type', Type);
+        AddToJObject(JObject, 'Name', Name);
+        AddToJObject(JObject, 'Version', Version);
     end;
 
-    procedure AddToJObject(JObject: DotNet npNetJObject;"Key": Text;Value: Variant)
+    procedure AddToJObject(JObject: DotNet JObject; "Key": Text; Value: Variant)
     var
-        JToken: DotNet npNetJToken;
+        JToken: DotNet JToken;
     begin
-        JObject.Add(Key,JToken.FromObject(Value));
+        JObject.Add(Key, JToken.FromObject(Value));
     end;
 
-    procedure AddToJArray(JArray: DotNet npNetJArray;JObject: DotNet npNetJObject)
+    procedure AddToJArray(JArray: DotNet JArray; JObject: DotNet JObject)
     var
         Type: DotNet npNetType;
         Types: DotNet npNetArray;
-        JToken: DotNet npNetJToken;
+        JToken: DotNet JToken;
         MethodInfo: DotNet npNetMethodInfo;
         Params: DotNet npNetArray;
     begin
         Type := GetDotNetType(JArray);
-        Types := Types.CreateInstance(GetDotNetType(GetDotNetType(0)),1);
-        Types.SetValue(GetDotNetType(JToken),0);
-        MethodInfo := Type.GetMethod('Add',Types);
+        Types := Types.CreateInstance(GetDotNetType(GetDotNetType(0)), 1);
+        Types.SetValue(GetDotNetType(JToken), 0);
+        MethodInfo := Type.GetMethod('Add', Types);
 
-        Params := Params.CreateInstance(GetDotNetType(JToken),1);
-        Params.SetValue(JObject,0);
-        MethodInfo.Invoke(JArray,Params);
+        Params := Params.CreateInstance(GetDotNetType(JToken), 1);
+        Params.SetValue(JObject, 0);
+        MethodInfo.Invoke(JArray, Params);
     end;
 
     [TryFunction]
-    procedure Base64StringToJObject(Base64: Text;var JObject: DotNet npNetJObject)
+    procedure Base64StringToJObject(Base64: Text; var JObject: DotNet JObject)
     var
-        JArray: DotNet npNetJArray;
+        JArray: DotNet JArray;
         MemStream: DotNet npNetMemoryStream;
         StreamReader: DotNet npNetStreamReader;
         Convert: DotNet npNetConvert;
@@ -445,30 +436,32 @@ codeunit 6014627 "Managed Dependency Mgt."
         JSON: Text;
         JsonTextReader: DotNet npNetJsonTextReader;
         DateParseHandling: DotNet npNetDateParseHandling;
+        NetConvHelper: Variant;
     begin
         MemStream := MemStream.MemoryStream(Convert.FromBase64String(Base64));
-        StreamReader := StreamReader.StreamReader(MemStream,Encoding.UTF8);
+        StreamReader := StreamReader.StreamReader(MemStream, Encoding.UTF8);
         JsonTextReader := JsonTextReader.JsonTextReader(StreamReader);
         JsonTextReader.DateParseHandling := DateParseHandling.None;
-        JObject := JArray.Load(JsonTextReader);
+        NetConvHelper := JArray.Load(JsonTextReader);
+        JObject := NetConvHelper;
     end;
 
-    procedure FieldRefToVariant(FieldRef: FieldRef;var Value: Variant)
+    procedure FieldRefToVariant(FieldRef: FieldRef; var Value: Variant)
     begin
         case UpperCase(Format(FieldRef.Type)) of
-          'BLOB' :
-            Value := BLOBToBase64String(FieldRef);
-          'DATE','TIME','DATEFORMULA','DURATION','RECORDID','DATETIME':
-            Value := Format(FieldRef.Value,0,9);
-          'TABLEFILTER':
-            Value := ''; //Not supported
-          else
-            Value := FieldRef.Value;
+            'BLOB':
+                Value := BLOBToBase64String(FieldRef);
+            'DATE', 'TIME', 'DATEFORMULA', 'DURATION', 'RECORDID', 'DATETIME':
+                Value := Format(FieldRef.Value, 0, 9);
+            'TABLEFILTER':
+                Value := ''; //Not supported
+            else
+                Value := FieldRef.Value;
         end;
     end;
 
     [TryFunction]
-    procedure TextToFieldRef(Value: Text;FieldRef: FieldRef)
+    procedure TextToFieldRef(Value: Text; FieldRef: FieldRef)
     var
         TempBlob: Record TempBlob temporary;
         MemStream: DotNet npNetMemoryStream;
@@ -488,68 +481,69 @@ codeunit 6014627 "Managed Dependency Mgt."
         ValueRecordID: RecordID;
     begin
         case UpperCase(Format(FieldRef.Type)) of
-          'CODE','TEXT':
-            FieldRef.Value := Value;
-          'INTEGER','BIGINTEGER','OPTION':
-            begin
-              Evaluate(ValueBigInt,Value);
-              FieldRef.Value := ValueBigInt;
-            end;
-          'DECIMAL':
-            begin
-              Evaluate(ValueDec,Value);
-              FieldRef.Value := ValueDec;
-            end;
-          'BOOLEAN':
-            begin
-              Evaluate(ValueBool,Value);
-              FieldRef.Value := ValueBool;
-            end;
-          'DATE':
-            begin
-              Evaluate(ValueDate,Value,9);
-              FieldRef.Value := ValueDate;
-            end;
-          'DATETIME':
-            begin
-              if not Evaluate(ValueDateTime, Value, 9) then //Legacy: Fallback to non-XML format parse since some packages contain DateTimes in that format.
-                Evaluate(ValueDateTime,Value);
-              FieldRef.Value := ValueDateTime;
-            end;
-          'TIME':
-            begin
-              Evaluate(ValueTime,Value,9);
-              FieldRef.Value := ValueTime;
-            end;
-          'BLOB':
-            begin
-              ValueText := Value;
-              MemStream := MemStream.MemoryStream(Convert.FromBase64String(ValueText));
-              TempBlob.Blob.CreateOutStream(OutStream);
-              CopyStream(OutStream,MemStream);
-              FieldRef.Value := TempBlob.Blob;
-            end;
-          'DATEFORMULA' :
-            begin
-              Evaluate(ValueDateFormula,Value,9);
-              FieldRef.Value := ValueDateFormula;
-            end;
-          'DURATION' :
-            begin
-              Evaluate(ValueDuration,Value,9);
-              FieldRef.Value := ValueDuration;
-            end;
-          'GUID' :
-            begin
-              Evaluate(ValueGUID,Value);
-              FieldRef.Value := ValueGUID;
-            end;
-          'RECORDID' :
-            begin
-              Evaluate(ValueRecordID,Value,9);
-              FieldRef.Value := ValueRecordID;
-            end;
-          'TABLEFILTER' : ; //Not supported
+            'CODE', 'TEXT':
+                FieldRef.Value := Value;
+            'INTEGER', 'BIGINTEGER', 'OPTION':
+                begin
+                    Evaluate(ValueBigInt, Value);
+                    FieldRef.Value := ValueBigInt;
+                end;
+            'DECIMAL':
+                begin
+                    Evaluate(ValueDec, Value);
+                    FieldRef.Value := ValueDec;
+                end;
+            'BOOLEAN':
+                begin
+                    Evaluate(ValueBool, Value);
+                    FieldRef.Value := ValueBool;
+                end;
+            'DATE':
+                begin
+                    Evaluate(ValueDate, Value, 9);
+                    FieldRef.Value := ValueDate;
+                end;
+            'DATETIME':
+                begin
+                    if not Evaluate(ValueDateTime, Value, 9) then //Legacy: Fallback to non-XML format parse since some packages contain DateTimes in that format.
+                        Evaluate(ValueDateTime, Value);
+                    FieldRef.Value := ValueDateTime;
+                end;
+            'TIME':
+                begin
+                    Evaluate(ValueTime, Value, 9);
+                    FieldRef.Value := ValueTime;
+                end;
+            'BLOB':
+                begin
+                    ValueText := Value;
+                    MemStream := MemStream.MemoryStream(Convert.FromBase64String(ValueText));
+                    TempBlob.Blob.CreateOutStream(OutStream);
+                    CopyStream(OutStream, MemStream);
+                    FieldRef.Value := TempBlob.Blob;
+                end;
+            'DATEFORMULA':
+                begin
+                    Evaluate(ValueDateFormula, Value, 9);
+                    FieldRef.Value := ValueDateFormula;
+                end;
+            'DURATION':
+                begin
+                    Evaluate(ValueDuration, Value, 9);
+                    FieldRef.Value := ValueDuration;
+                end;
+            'GUID':
+                begin
+                    Evaluate(ValueGUID, Value);
+                    FieldRef.Value := ValueGUID;
+                end;
+            'RECORDID':
+                begin
+                    Evaluate(ValueRecordID, Value, 9);
+                    FieldRef.Value := ValueRecordID;
+                end;
+            'TABLEFILTER':
+                ; //Not supported
         end;
     end;
 
@@ -564,27 +558,27 @@ codeunit 6014627 "Managed Dependency Mgt."
         FieldRef.CalcField;
         TempBlob.Blob := FieldRef.Value;
         if TempBlob.Blob.HasValue then begin
-          TempBlob.Blob.CreateInStream(InStream);
-          MemStream := MemStream.MemoryStream();
-          CopyStream(MemStream,InStream);
-          Value := Convert.ToBase64String(MemStream.ToArray);
+            TempBlob.Blob.CreateInStream(InStream);
+            MemStream := MemStream.MemoryStream();
+            CopyStream(MemStream, InStream);
+            Value := Convert.ToBase64String(MemStream.ToArray);
         end;
     end;
 
     procedure GetDependencyMgtSetup(var DepMgtSetup: Record "Dependency Management Setup")
     begin
         if not DepMgtSetup.Get then
-          DepMgtSetup.Insert();
+            DepMgtSetup.Insert();
     end;
 
-    local procedure SplitString(String: DotNet npNetString;var IEnumerable: DotNet npNetIEnumerable_Of_T)
+    local procedure SplitString(String: DotNet npNetString; var IEnumerable: DotNet npNetIEnumerable_Of_T)
     var
         CharArray: DotNet npNetArray;
         Char: Char;
     begin
         Char := ',';
-        CharArray := CharArray.CreateInstance(GetDotNetType(Char),1);
-        CharArray.SetValue(Char,0);
+        CharArray := CharArray.CreateInstance(GetDotNetType(Char), 1);
+        CharArray.SetValue(Char, 0);
         IEnumerable := String.Split(CharArray);
     end;
 
@@ -606,7 +600,7 @@ codeunit 6014627 "Managed Dependency Mgt."
     begin
     end;
 
-    procedure ParseJSON(Text: Text;var JObject: DotNet npNetJObject)
+    procedure ParseJSON(Text: Text; var JObject: DotNet JObject)
     var
         JsonTextReader: DotNet npNetJsonTextReader;
         StringReader: DotNet npNetStringReader;

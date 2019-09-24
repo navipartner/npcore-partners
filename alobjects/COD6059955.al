@@ -15,7 +15,7 @@ codeunit 6059955 "MCS Face Service API"
         PersonEntity: DotNet npNetPersonEntity;
         ResponseEntity: DotNet npNetFaceResponseEntity;
         DebugString: Text;
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         PersonGroups: Record "MCS Person Groups";
         Counter: Integer;
         FaceEntity: DotNet npNetFaceEntity;
@@ -33,18 +33,18 @@ codeunit 6059955 "MCS Face Service API"
         //MESSAGE('GetPersonGroup: ' + DebugString);
 
         if ErrorEntity.ErrorCode <> '' then
-          Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
+            Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
 
         Counter := 10000;
         PersonGroups.DeleteAll;
 
         foreach GroupEntity in ResponseEntity.Groups do begin
-          PersonGroups.Init;
-          PersonGroups.Id := Counter;
-          PersonGroups.PersonGroupId := GroupEntity.Id;
-          PersonGroups.Name := GroupEntity.Name;
-          PersonGroups.Insert;
-          Counter += 10000;
+            PersonGroups.Init;
+            PersonGroups.Id := Counter;
+            PersonGroups.PersonGroupId := GroupEntity.Id;
+            PersonGroups.Name := GroupEntity.Name;
+            PersonGroups.Insert;
+            Counter += 10000;
         end;
     end;
 
@@ -59,44 +59,44 @@ codeunit 6059955 "MCS Face Service API"
         ErrorEntity := ResponseEntity.Error;
 
         if ErrorEntity.ErrorCode <> '' then
-          Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
+            Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
     end;
 
     [EventSubscriber(ObjectType::Table, 6059957, 'OnBeforeDeleteEvent', '', false, false)]
-    local procedure OnBeforeDeletePersonGroup(var Rec: Record "MCS Person Groups";RunTrigger: Boolean)
+    local procedure OnBeforeDeletePersonGroup(var Rec: Record "MCS Person Groups"; RunTrigger: Boolean)
     var
         RecRef: RecordRef;
     begin
         if not RunTrigger then
-          exit;
+            exit;
 
         RecRef.GetTable(Rec);
         if RecRef.IsTemporary then
-          exit;
+            exit;
 
         InitializeEntities();
         InitializeClient();
 
         if (Rec.PersonGroupId <> '') then begin
-          ResponseEntity := FaceServiceAPI.DeletePersonGroup(Rec.PersonGroupId);
-          ErrorEntity := ResponseEntity.Error;
+            ResponseEntity := FaceServiceAPI.DeletePersonGroup(Rec.PersonGroupId);
+            ErrorEntity := ResponseEntity.Error;
         end;
 
         if ErrorEntity.ErrorCode <> '' then
-          Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
+            Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
     end;
 
     [EventSubscriber(ObjectType::Table, 6059957, 'OnAfterInsertEvent', '', false, false)]
-    local procedure OnAfterInsertPersonGroup(var Rec: Record "MCS Person Groups";RunTrigger: Boolean)
+    local procedure OnAfterInsertPersonGroup(var Rec: Record "MCS Person Groups"; RunTrigger: Boolean)
     var
         RecRef: RecordRef;
     begin
         if not RunTrigger then
-          exit;
+            exit;
 
         RecRef.GetTable(Rec);
         if RecRef.IsTemporary then
-          exit;
+            exit;
 
         InitializeEntities();
         InitializeClient();
@@ -105,46 +105,46 @@ codeunit 6059955 "MCS Face Service API"
         ErrorEntity := ResponseEntity.Error;
 
         if ErrorEntity.ErrorCode <> '' then
-          Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
+            Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
 
         foreach GroupEntity in ResponseEntity.Groups do begin
-          Rec.PersonGroupId := GroupEntity.Id;
-          Rec.Modify(true);
+            Rec.PersonGroupId := GroupEntity.Id;
+            Rec.Modify(true);
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6059958, 'OnBeforeDeleteEvent', '', false, false)]
-    local procedure OnBeforeDeletePerson(var Rec: Record "MCS Person";RunTrigger: Boolean)
+    local procedure OnBeforeDeletePerson(var Rec: Record "MCS Person"; RunTrigger: Boolean)
     var
         RecRef: RecordRef;
         MCSFaces: Record "MCS Faces";
         MCSPersonBusinessEntities: Record "MCS Person Business Entities";
     begin
         if not RunTrigger then
-          exit;
+            exit;
 
         RecRef.GetTable(Rec);
         if RecRef.IsTemporary then
-          exit;
+            exit;
 
         InitializeEntities();
         InitializeClient();
 
         if (Rec.PersonGroupId <> '') and (Rec.PersonId <> '') then begin
-          ResponseEntity := FaceServiceAPI.DeletePerson(Rec.PersonGroupId,Rec.PersonId);
-          ErrorEntity := ResponseEntity.Error;
+            ResponseEntity := FaceServiceAPI.DeletePerson(Rec.PersonGroupId, Rec.PersonId);
+            ErrorEntity := ResponseEntity.Error;
         end;
 
         if ErrorEntity.ErrorCode <> '' then begin
-          Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
+            Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
         end else begin
-          MCSFaces.Reset;
-          MCSFaces.SetRange(PersonId,Rec.PersonId);
-          MCSFaces.DeleteAll(true);
-          MCSPersonBusinessEntities.Reset;
-          MCSPersonBusinessEntities.SetCurrentKey(Key);
-          MCSPersonBusinessEntities.SetRange(Key,Rec.RecordId);
-          MCSPersonBusinessEntities.DeleteAll(true);
+            MCSFaces.Reset;
+            MCSFaces.SetRange(PersonId, Rec.PersonId);
+            MCSFaces.DeleteAll(true);
+            MCSPersonBusinessEntities.Reset;
+            MCSPersonBusinessEntities.SetCurrentKey(Key);
+            MCSPersonBusinessEntities.SetRange(Key, Rec.RecordId);
+            MCSPersonBusinessEntities.DeleteAll(true);
         end;
     end;
 
@@ -158,7 +158,7 @@ codeunit 6059955 "MCS Face Service API"
         ErrorEntity := ResponseEntity.Error;
 
         if ErrorEntity.ErrorCode <> '' then
-          Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
+            Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
     end;
 
     local procedure InitializeEntities()
@@ -173,7 +173,7 @@ codeunit 6059955 "MCS Face Service API"
         FaceEntity := FaceEntity.FaceEntity;
     end;
 
-    procedure CreatePersonBusinessEntity(Origin: RecordID;NewRecordID: RecordID)
+    procedure CreatePersonBusinessEntity(Origin: RecordID; NewRecordID: RecordID)
     var
         NewMCSPersonBusinessEntities: Record "MCS Person Business Entities";
         RecRef: RecordRef;
@@ -181,20 +181,20 @@ codeunit 6059955 "MCS Face Service API"
     begin
         MCSPersonBusinessEntities.Reset;
         MCSPersonBusinessEntities.SetCurrentKey(Key);
-        MCSPersonBusinessEntities.SetRange(Key,NewRecordID);
+        MCSPersonBusinessEntities.SetRange(Key, NewRecordID);
         if MCSPersonBusinessEntities.FindSet then
-          exit;
+            exit;
 
         MCSPersonBusinessEntities.Reset;
         MCSPersonBusinessEntities.SetCurrentKey(Key);
-        MCSPersonBusinessEntities.SetRange(Key,Origin);
+        MCSPersonBusinessEntities.SetRange(Key, Origin);
         if MCSPersonBusinessEntities.FindSet then begin
-          RecRef.Get(NewRecordID);
-          NewMCSPersonBusinessEntities.Init;
-          NewMCSPersonBusinessEntities.PersonId := MCSPersonBusinessEntities.PersonId;
-          NewMCSPersonBusinessEntities."Table Id" := RecRef.Number;
-          NewMCSPersonBusinessEntities.Key := NewRecordID;
-          NewMCSPersonBusinessEntities.Insert(true);
+            RecRef.Get(NewRecordID);
+            NewMCSPersonBusinessEntities.Init;
+            NewMCSPersonBusinessEntities.PersonId := MCSPersonBusinessEntities.PersonId;
+            NewMCSPersonBusinessEntities."Table Id" := RecRef.Number;
+            NewMCSPersonBusinessEntities.Key := NewRecordID;
+            NewMCSPersonBusinessEntities.Insert(true);
         end;
     end;
 
@@ -207,10 +207,10 @@ codeunit 6059955 "MCS Face Service API"
         ErrorEntity := ResponseEntity.Error;
 
         if ErrorEntity.ErrorCode <> '' then
-          Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
+            Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
     end;
 
-    procedure ImportPersonPicture(var MMMember: Record "MM Member";ModifyVar: Boolean)
+    procedure ImportPersonPicture(var MMMember: Record "MM Member"; ModifyVar: Boolean)
     var
         ServerFileName: Text;
         FileManagement: Codeunit "File Management";
@@ -233,115 +233,115 @@ codeunit 6059955 "MCS Face Service API"
         RecRef := MMMember.RecordId.GetRecord;
 
         if MCSAPISetup.Get(MCSAPISetup.API::Face) then begin
-          MMMember.TestField("Entry No.");
-          MMMember.TestField("First Name");
+            MMMember.TestField("Entry No.");
+            MMMember.TestField("First Name");
 
-          MCSAPISetup.TestField("Key 1");
-          MCSAPISetup.TestField("Key 2");
+            MCSAPISetup.TestField("Key 1");
+            MCSAPISetup.TestField("Key 2");
 
-          MCSPersonGroupsSetup.Get(RecRef.Number);
-          PersonGroups.Get(MCSPersonGroupsSetup."Person Groups Id");
-          PersonGroups.TestField(PersonGroupId);
+            MCSPersonGroupsSetup.Get(RecRef.Number);
+            PersonGroups.Get(MCSPersonGroupsSetup."Person Groups Id");
+            PersonGroups.TestField(PersonGroupId);
 
-          MemberName := MMMember."First Name";
-          if MMMember."Middle Name" <> ''  then
-            MemberName := MemberName + ' ' + MMMember."Middle Name";
-          if MMMember."Last Name" <> '' then
-            MemberName := MemberName + ' ' + MMMember."Last Name";
+            MemberName := MMMember."First Name";
+            if MMMember."Middle Name" <> '' then
+                MemberName := MemberName + ' ' + MMMember."Middle Name";
+            if MMMember."Last Name" <> '' then
+                MemberName := MemberName + ' ' + MMMember."Last Name";
 
-          UserData := Format(CurrentDateTime);
+            UserData := Format(CurrentDateTime);
 
-          ServerFileName := FileManagement.UploadFile('Import Picture','');
-          if ServerFileName <> '' then begin
+            ServerFileName := FileManagement.UploadFile('Import Picture', '');
+            if ServerFileName <> '' then begin
 
-            //3 streams because of NAV memory leak error if only one stream is used
-            StreamDotNet1 := FileDotNet.OpenRead(ServerFileName);
-            StreamDotNet2 := FileDotNet.OpenRead(ServerFileName);
-            StreamDotNet3 := FileDotNet.OpenRead(ServerFileName);
-            FileManagement.BLOBImportFromServerFile(TempBlob, ServerFileName);
+                //3 streams because of NAV memory leak error if only one stream is used
+                StreamDotNet1 := FileDotNet.OpenRead(ServerFileName);
+                StreamDotNet2 := FileDotNet.OpenRead(ServerFileName);
+                StreamDotNet3 := FileDotNet.OpenRead(ServerFileName);
+                FileManagement.BLOBImportFromServerFile(TempBlob, ServerFileName);
 
-            InitializeEntities();
-            InitializeClient();
+                InitializeEntities();
+                InitializeClient();
 
-            ResponseEntity := FaceServiceAPI.UploadAndIdentifyFaces(PersonGroups.PersonGroupId, StreamDotNet1);
-            if ErrorEntity.ErrorCode <> '' then
-              Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
-            //DebugString := JsonConvert.SerializeObject(ResponseEntity);
-            //    MESSAGE('UploadAndIdentifyFaces: ' + DebugString);
-
-            foreach FaceEntity in ResponseEntity.Faces do begin
-
-              PersonId := FaceEntity.PersonId;
-
-              if FaceEntity.Identified then begin
-                ResponseEntity := FaceServiceAPI.AddPersonFace(PersonGroups.PersonGroupId, FaceEntity.PersonId, StreamDotNet2);
-                ErrorEntity := ResponseEntity.Error;
+                ResponseEntity := FaceServiceAPI.UploadAndIdentifyFaces(PersonGroups.PersonGroupId, StreamDotNet1);
                 if ErrorEntity.ErrorCode <> '' then
-                  Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
+                    Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
                 //DebugString := JsonConvert.SerializeObject(ResponseEntity);
-                //MESSAGE('AddPersonFace: ' + DebugString);
-              end else begin
-                ResponseEntity := FaceServiceAPI.CreatePerson(PersonGroups.PersonGroupId, MemberName, UserData, StreamDotNet2, StreamDotNet3);
-                ErrorEntity := ResponseEntity.Error;
-                if ErrorEntity.ErrorCode <> '' then
-                  Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
+                //    MESSAGE('UploadAndIdentifyFaces: ' + DebugString);
 
-                foreach InnerFaceEntity in ResponseEntity.Faces do begin
-                  PersonId := InnerFaceEntity.PersonId;
+                foreach FaceEntity in ResponseEntity.Faces do begin
+
+                    PersonId := FaceEntity.PersonId;
+
+                    if FaceEntity.Identified then begin
+                        ResponseEntity := FaceServiceAPI.AddPersonFace(PersonGroups.PersonGroupId, FaceEntity.PersonId, StreamDotNet2);
+                        ErrorEntity := ResponseEntity.Error;
+                        if ErrorEntity.ErrorCode <> '' then
+                            Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
+                        //DebugString := JsonConvert.SerializeObject(ResponseEntity);
+                        //MESSAGE('AddPersonFace: ' + DebugString);
+                    end else begin
+                        ResponseEntity := FaceServiceAPI.CreatePerson(PersonGroups.PersonGroupId, MemberName, UserData, StreamDotNet2, StreamDotNet3);
+                        ErrorEntity := ResponseEntity.Error;
+                        if ErrorEntity.ErrorCode <> '' then
+                            Error(ErrorEntity.ErrorCode + ' - ' + ErrorEntity.ErrorMessage);
+
+                        foreach InnerFaceEntity in ResponseEntity.Faces do begin
+                            PersonId := InnerFaceEntity.PersonId;
+                        end;
+
+                        //DebugString := JsonConvert.SerializeObject(ResponseEntity);
+                        //MESSAGE('CreatePerson: ' + DebugString);
+                    end;
+
+                    MCSFaces.Init;
+                    MCSFaces.Age := Convert.ToDecimal(FaceEntity.Age);
+                    MCSFaces.Beard := Convert.ToDecimal(FaceEntity.Beard);
+                    MCSFaces.Created := CurrentDateTime;
+                    MCSFaces.Sideburns := Convert.ToDecimal(FaceEntity.Sideburns);
+                    MCSFaces.Moustache := Convert.ToDecimal(FaceEntity.Moustache);
+                    MCSFaces."Face Height" := FaceEntity.Height;
+                    MCSFaces."Face Position X" := FaceEntity.Left;
+                    MCSFaces."Face Position Y" := FaceEntity.Top;
+                    MCSFaces."Face Width" := FaceEntity.Width;
+                    MCSFaces.FaceId := FaceEntity.FaceId;
+                    MCSFaces.PersonId := PersonId;
+                    MCSFaces.IsSmiling := FaceEntity.IsSmiling;
+                    MCSFaces.Gender := FaceEntity.Gender;
+                    MCSFaces.Glasses := FaceEntity.Glasses;
+                    MCSFaces.Identified := FaceEntity.Identified;
+                    MCSFaces.Action := MCSFaces.Action::CaptureAndIdentifyFaces;
+                    MCSFaces.Picture := TempBlob.Blob;
+                    MCSFaces.Insert(true);
+
+                    if not MCSPerson.Get(MCSFaces.PersonId) then begin
+                        MCSPerson.Init;
+                        MCSPerson.PersonId := MCSFaces.PersonId;
+                        MCSPerson.PersonGroupId := PersonGroups.PersonGroupId;
+                        MCSPerson.Name := MemberName;
+                        MCSPerson.UserData := UserData;
+                        if MCSPerson.Insert(true) then begin
+                            MCSPersonBusinessEntities.Init;
+                            MCSPersonBusinessEntities.PersonId := MCSPerson.PersonId;
+                            MCSPersonBusinessEntities."Table Id" := RecRef.Number;
+                            MCSPersonBusinessEntities.Key := MMMember.RecordId;
+                            MCSPersonBusinessEntities.Insert(true);
+                        end;
+                    end else begin
+                        if not MCSPersonBusinessEntities.Get(MCSPerson.PersonId, RecRef.Number) then begin
+                            MCSPersonBusinessEntities.Init;
+                            MCSPersonBusinessEntities.PersonId := MCSPerson.PersonId;
+                            MCSPersonBusinessEntities."Table Id" := RecRef.Number;
+                            MCSPersonBusinessEntities.Key := MMMember.RecordId;
+                            MCSPersonBusinessEntities.Insert(true);
+                        end;
+                    end;
                 end;
 
-                //DebugString := JsonConvert.SerializeObject(ResponseEntity);
-                //MESSAGE('CreatePerson: ' + DebugString);
-              end;
-
-              MCSFaces.Init;
-              MCSFaces.Age := Convert.ToDecimal(FaceEntity.Age);
-              MCSFaces.Beard := Convert.ToDecimal(FaceEntity.Beard);
-              MCSFaces.Created := CurrentDateTime;
-              MCSFaces.Sideburns := Convert.ToDecimal(FaceEntity.Sideburns);
-              MCSFaces.Moustache := Convert.ToDecimal(FaceEntity.Moustache);
-              MCSFaces."Face Height" := FaceEntity.Height;
-              MCSFaces."Face Position X" := FaceEntity.Left;
-              MCSFaces."Face Position Y" := FaceEntity.Top;
-              MCSFaces."Face Width" := FaceEntity.Width;
-              MCSFaces.FaceId := FaceEntity.FaceId;
-              MCSFaces.PersonId := PersonId;
-              MCSFaces.IsSmiling := FaceEntity.IsSmiling;
-              MCSFaces.Gender := FaceEntity.Gender;
-              MCSFaces.Glasses := FaceEntity.Glasses;
-              MCSFaces.Identified := FaceEntity.Identified;
-              MCSFaces.Action := MCSFaces.Action::CaptureAndIdentifyFaces;
-              MCSFaces.Picture := TempBlob.Blob;
-              MCSFaces.Insert(true);
-
-              if not MCSPerson.Get(MCSFaces.PersonId) then begin
-                MCSPerson.Init;
-                MCSPerson.PersonId := MCSFaces.PersonId;
-                MCSPerson.PersonGroupId := PersonGroups.PersonGroupId;
-                MCSPerson.Name := MemberName;
-                MCSPerson.UserData := UserData;
-                if MCSPerson.Insert(true) then begin
-                  MCSPersonBusinessEntities.Init;
-                  MCSPersonBusinessEntities.PersonId := MCSPerson.PersonId;
-                  MCSPersonBusinessEntities."Table Id" := RecRef.Number;
-                  MCSPersonBusinessEntities.Key := MMMember.RecordId;
-                  MCSPersonBusinessEntities.Insert(true);
-                end;
-              end else begin
-                if not MCSPersonBusinessEntities.Get(MCSPerson.PersonId,RecRef.Number) then begin
-                  MCSPersonBusinessEntities.Init;
-                  MCSPersonBusinessEntities.PersonId := MCSPerson.PersonId;
-                  MCSPersonBusinessEntities."Table Id" := RecRef.Number;
-                  MCSPersonBusinessEntities.Key := MMMember.RecordId;
-                  MCSPersonBusinessEntities.Insert(true);
-                end;
-              end;
+                MMMember.Picture := TempBlob.Blob;
+                MMMember.Modify;
+                if FILE.Erase(ServerFileName) then;
             end;
-
-            MMMember.Picture := TempBlob.Blob;
-            MMMember.Modify;
-            if FILE.Erase(ServerFileName) then;
-          end;
         end;
     end;
 }

@@ -10,22 +10,13 @@ codeunit 6014632 "Touch - Event Subscribers"
     end;
 
     var
-        Marshaller: Codeunit "POS Event Marshaller";
-        CU: Codeunit "Touch - Event Publisher";
         EventTarget: Option ,Item,Customer;
         Text001: Label 'Please Type the Customer No you wish to create';
         TextErrCust: Label 'This customer already exists';
         TextConfirmNewCustomer: Label 'This will create a new customer. Are you sure you want to continue?';
 
-    procedure ConfigureItem(var MarshallerIn: Codeunit "POS Event Marshaller")
+    procedure ConfigureCustomer()
     begin
-        Marshaller := MarshallerIn;
-        EventTarget := EventTarget::Item;
-    end;
-
-    procedure ConfigureCustomer(var MarshallerIn: Codeunit "POS Event Marshaller")
-    begin
-        Marshaller := MarshallerIn;
         EventTarget := EventTarget::Customer;
     end;
 
@@ -35,8 +26,8 @@ codeunit 6014632 "Touch - Event Subscribers"
         ItemCard: Page "Item Card";
         TextConfirmNewItem: Label 'This will create a new item. Are you sure you want to continue?';
     begin
-        if not Marshaller.Confirm('',TextConfirmNewItem) then
-          exit;
+        if not Confirm(TextConfirmNewItem) then
+            exit;
 
         Item.Insert(true);
         Commit;
@@ -65,7 +56,7 @@ codeunit 6014632 "Touch - Event Subscribers"
     begin
         //-NPR5.23 [226819]
         //IF NOT Marshaller.Confirm('',TextConfirmNewCustomer) THEN
-          //EXIT;
+        //EXIT;
         // Cust.INSERT(TRUE);
         // COMMIT;
 
@@ -74,25 +65,25 @@ codeunit 6014632 "Touch - Event Subscribers"
         //RecRef.GETTABLE(Cust);
 
         if IComm.Get and (IComm."Use Auto. Cust. Lookup") then begin
-          IComm.TestField("Number Info Codeunit ID");
-          Customer.Init;
-          MasterNoInputDialog.SetInput(Customer."No.",Text001);
-          MasterNoInputDialog.LookupMode(true);
-          if MasterNoInputDialog.RunModal = ACTION::LookupOK then begin
-            //-NPR5.26
-            //MasterNoInputDialog.InputCode(Customer."No." )
-            MasterNoInputDialog.InputCode(CustomerNo);
-            Customer.Validate("No.", CustomerNo);
-            //+NPR5.26
-          end else
-            exit;
-          if Customer.Get(Customer."No." ) then
-            Error(TextErrCust);
+            IComm.TestField("Number Info Codeunit ID");
+            Customer.Init;
+            MasterNoInputDialog.SetInput(Customer."No.", Text001);
+            MasterNoInputDialog.LookupMode(true);
+            if MasterNoInputDialog.RunModal = ACTION::LookupOK then begin
+                //-NPR5.26
+                //MasterNoInputDialog.InputCode(Customer."No." )
+                MasterNoInputDialog.InputCode(CustomerNo);
+                Customer.Validate("No.", CustomerNo);
+                //+NPR5.26
+            end else
+                exit;
+            if Customer.Get(Customer."No.") then
+                Error(TextErrCust);
         end;
 
         if (Customer."No." = '') then
-         if not Marshaller.Confirm('',TextConfirmNewCustomer) then
-            exit;
+            if not Confirm(TextConfirmNewCustomer) then
+                exit;
 
         Customer.Insert(true);
         Commit;
@@ -114,24 +105,24 @@ codeunit 6014632 "Touch - Event Subscribers"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014631, 'OnLookupNew', '', false, false)]
-    local procedure Lookup_OnNew(CardPageId: Integer;var RecRef: RecordRef)
+    local procedure Lookup_OnNew(CardPageId: Integer; var RecRef: RecordRef)
     begin
         case EventTarget of
-          EventTarget::Item:
-            NewItem(RecRef);
-          EventTarget::Customer:
-            NewCustomer(RecRef);
+            EventTarget::Item:
+                NewItem(RecRef);
+            EventTarget::Customer:
+                NewCustomer(RecRef);
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014631, 'OnLookupShowCard', '', false, false)]
-    local procedure Lookup_OnCard(CardPageId: Integer;RecRef: RecordRef)
+    local procedure Lookup_OnCard(CardPageId: Integer; RecRef: RecordRef)
     begin
         case EventTarget of
-          EventTarget::Item:
-            ItemCard(RecRef);
-          EventTarget::Customer:
-            CustomerCard(RecRef);
+            EventTarget::Item:
+                ItemCard(RecRef);
+            EventTarget::Customer:
+                CustomerCard(RecRef);
         end;
     end;
 }

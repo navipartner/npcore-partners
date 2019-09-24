@@ -2,7 +2,7 @@ report 6014463 "Document Processing Status"
 {
     // NPR5.39/THRO/20180222 CASE 302597 Report created
     DefaultLayout = RDLC;
-    RDLCLayout = './Document Processing Status.rdlc';
+    RDLCLayout = './layouts/Document Processing Status.rdlc';
 
     Caption = 'Document Processing Status';
 

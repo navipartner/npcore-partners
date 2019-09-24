@@ -36,40 +36,40 @@ codeunit 6150849 "POS Action - End-of-Day V3"
 
     local procedure ActionCode(): Text
     begin
-        exit ('BALANCE_V3');
+        exit('BALANCE_V3');
     end;
 
     local procedure ActionVersion(): Text
     begin
 
-        exit ('1.6');
+        exit('1.6');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
 
-            RegisterWorkflowStep ('ValidateRequirements', 'respond()');
-            RegisterWorkflowStep ('NotifySubscribers', 'respond()');
-            RegisterWorkflowStep ('Eft_Discovery', 'respond()');
-            RegisterWorkflowStep ('Eft_Close', 'respond()');
-            RegisterWorkflowStep ('Eft_CloseDone', 'respond()');
-            RegisterWorkflowStep ('BalanceRegister', 'respond()');
-            RegisterWorkflowStep ('EndOfWorkflow', 'respond()');
+                RegisterWorkflowStep('ValidateRequirements', 'respond()');
+                RegisterWorkflowStep('NotifySubscribers', 'respond()');
+                RegisterWorkflowStep('Eft_Discovery', 'respond()');
+                RegisterWorkflowStep('Eft_Close', 'respond()');
+                RegisterWorkflowStep('Eft_CloseDone', 'respond()');
+                RegisterWorkflowStep('BalanceRegister', 'respond()');
+                RegisterWorkflowStep('EndOfWorkflow', 'respond()');
 
-            RegisterOptionParameter('Security','None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword','None');
-            RegisterOptionParameter ('Type', 'X-Report (prel),Z-Report (final),Close Workshift', 'X-Report (prel)');
+                RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
+                RegisterOptionParameter('Type', 'X-Report (prel),Z-Report (final),Close Workshift', 'X-Report (prel)');
 
-            RegisterWorkflow (false);
-          end;
+                RegisterWorkflow(false);
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
@@ -80,7 +80,7 @@ codeunit 6150849 "POS Action - End-of-Day V3"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         POSSetup: Codeunit "POS Setup";
@@ -99,109 +99,111 @@ codeunit 6150849 "POS Action - End-of-Day V3"
     begin
 
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         Handled := true;
 
-        JSON.InitializeJObjectParser (Context,FrontEnd);
-        EndOfDayType := JSON.GetIntegerParameter ('Type', true);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        EndOfDayType := JSON.GetIntegerParameter('Type', true);
         if (EndOfDayType < 0) then
-          EndOfDayType := 0;
+            EndOfDayType := 0;
 
-        POSSession.GetSetup (POSSetup);
-        POSSession.GetSale (POSSale);
-        POSSale.GetCurrentSale (SalePOS);
+        POSSession.GetSetup(POSSetup);
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
 
         POSSetup.GetRegisterRecord(Register);
 
-        POSSetup.GetPOSUnit (POSUnit);
-        POSSetup.GetSalespersonRecord (SalespersonPurchaser);
+        POSSetup.GetPOSUnit(POSUnit);
+        POSSetup.GetSalespersonRecord(SalespersonPurchaser);
         SalePOS."Register No." := Register."Register No.";
 
         NextWorkflowStep := NextWorkflowStep::NA;
         case WorkflowStep of
-          'ValidateRequirements' :
-            begin
-              if (not (ValidateRequirements (Register."Register No.", SalePOS."Sales Ticket No."))) then
-                FrontEnd.ContinueAtStep ('EndOfWorkflow');
-              POSCreateEntry.InsertUnitCloseBeginEntry (Register."Register No.", SalespersonPurchaser.Code);
-            end;
+            'ValidateRequirements':
+                begin
+                    if (not (ValidateRequirements(Register."Register No.", SalePOS."Sales Ticket No."))) then
+                        FrontEnd.ContinueAtStep('EndOfWorkflow');
+                    POSCreateEntry.InsertUnitCloseBeginEntry(Register."Register No.", SalespersonPurchaser.Code);
+                end;
 
-          'NotifySubscribers' :
-            begin
-            end;
+            'NotifySubscribers':
+                begin
+                end;
 
-          'Eft_Discovery' :
-            //-NPR5.49 [348458]
-            // EftDiscovery(POSSession);
-            if (EndOfDayType = EndOfDayTypeOption::"Z-Report") then
-              EftDiscovery (POSSession);
+            'Eft_Discovery':
+                //-NPR5.49 [348458]
+                // EftDiscovery(POSSession);
+                if (EndOfDayType = EndOfDayTypeOption::"Z-Report") then
+                    EftDiscovery(POSSession);
             //+NPR5.49 [348458]
 
-          'Eft_Close' :
-            //-NPR5.49 [348458]
-            // EftClose(POSSession, FrontEnd);
-            if (EndOfDayType = EndOfDayTypeOption::"Z-Report") then
-              EftClose (POSSession, FrontEnd);
+            'Eft_Close':
+                //-NPR5.49 [348458]
+                // EftClose(POSSession, FrontEnd);
+                if (EndOfDayType = EndOfDayTypeOption::"Z-Report") then
+                    EftClose(POSSession, FrontEnd);
             //+NPR5.49 [348458]
 
-          'Eft_CloseDone' :
-            //-NPR5.49 [348458]
-            // EftCloseDone(POSSession);
-            if (EndOfDayType = EndOfDayTypeOption::"Z-Report") then
-              EftCloseDone (POSSession);
-            //+NPR5.49 [348458]
+            'Eft_CloseDone':
+                //-NPR5.49 [348458]
+                // EftCloseDone(POSSession);
+                if (EndOfDayType = EndOfDayTypeOption::"Z-Report") then
+                    EftCloseDone(POSSession);
+                //+NPR5.49 [348458]
 
-          'BalanceRegister' :
-            begin
+            'BalanceRegister':
+                begin
 
-              POSManagePOSUnit.SetEndOfDayPOSUnitNo (POSUnit."No.");
+                    POSManagePOSUnit.SetEndOfDayPOSUnitNo(POSUnit."No.");
 
-              case (EndOfDayType) of
-                EndOfDayTypeOption::"Z-Report" :
-                  begin
-                    if (FinalEndOfDay (Register."Register No.", SalePOS."Dimension Set ID")) then begin
-                      ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry (Register."Register No.", SalespersonPurchaser.Code);
-                      POSManagePOSUnit.ClosePOSUnitNo (POSUnit."No.", ClosingEntryNo);
+                    case (EndOfDayType) of
+                        EndOfDayTypeOption::"Z-Report":
+                            begin
+                                if (FinalEndOfDay(Register."Register No.", SalePOS."Dimension Set ID")) then begin
+                                    ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(Register."Register No.", SalespersonPurchaser.Code);
+                                    POSManagePOSUnit.ClosePOSUnitNo(POSUnit."No.", ClosingEntryNo);
                       //-NPR5.51 [359508]
                       CheckAndPostAfterBalancing  (ClosingEntryNo);
                       //+NPR5.51 [359508]
-                    end else begin
-                      POSManagePOSUnit.ReOpenLastPeriodRegister (POSUnit."No.");
-                    end;
-                  end;
+                                end else begin
+                                    POSManagePOSUnit.ReOpenLastPeriodRegister(POSUnit."No.");
+                                end;
+                            end;
 
-                //-NPR5.49 [348458]
-                EndOfDayTypeOption::CloseWorkshift :
-                  begin
-                    CloseWorkshift (Register."Register No.", SalePOS."Dimension Set ID");
-                    ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry (Register."Register No.", SalespersonPurchaser.Code);
-                    POSManagePOSUnit.ClosePOSUnitNo (POSUnit."No.", ClosingEntryNo);
+                        //-NPR5.49 [348458]
+                        EndOfDayTypeOption::CloseWorkshift:
+                            begin
+                                CloseWorkshift(Register."Register No.", SalePOS."Dimension Set ID");
+                                ClosingEntryNo := POSCreateEntry.InsertUnitCloseEndEntry(Register."Register No.", SalespersonPurchaser.Code);
+                                POSManagePOSUnit.ClosePOSUnitNo(POSUnit."No.", ClosingEntryNo);
 
                     //-NPR5.51 [359508]
                     CheckAndPostAfterBalancing  (ClosingEntryNo);
                     //+NPR5.51 [359508]
 
-                  end;
-                //+NPR5.49 [348458]
+                            end;
+                        //+NPR5.49 [348458]
 
-                else begin
-                  PreliminaryEndOfDay (Register."Register No.", SalePOS."Dimension Set ID");
-                  POSManagePOSUnit.ReOpenLastPeriodRegister (POSUnit."No.");
+                        else begin
+                                PreliminaryEndOfDay(Register."Register No.", SalePOS."Dimension Set ID");
+                                POSManagePOSUnit.ReOpenLastPeriodRegister(POSUnit."No.");
+                            end;
+                    end;
+
                 end;
-              end;
 
-            end;
-
-          'EndOfWorkflow' :
-            begin
-              POSSession.ChangeViewLogin ();
-            end;
+            'EndOfWorkflow':
+                begin
+                    POSSession.ChangeViewLogin();
+                end;
         end;
 
         case NextWorkflowStep of
-          NextWorkflowStep::JUMP_BALANCE_REGISTER : FrontEnd.ContinueAtStep ('BalanceRegister');
-          NextWorkflowStep::EFT_CLOSE : FrontEnd.ContinueAtStep('Eft_Close');
+            NextWorkflowStep::JUMP_BALANCE_REGISTER:
+                FrontEnd.ContinueAtStep('BalanceRegister');
+            NextWorkflowStep::EFT_CLOSE:
+                FrontEnd.ContinueAtStep('Eft_Close');
         end;
     end;
 
@@ -209,11 +211,10 @@ codeunit 6150849 "POS Action - End-of-Day V3"
     begin
     end;
 
-    procedure ValidateRequirements(RegisterNo: Code[10];SalesTicketNo: Code[20]): Boolean
+    procedure ValidateRequirements(RegisterNo: Code[10]; SalesTicketNo: Code[20]): Boolean
     var
         RetailSetup: Record "Retail Setup";
         NPRetailSetup: Record "NP Retail Setup";
-        pageBalancingWeb: Page "Touch Screen - Balancing (Web)";
         "Audit Roll Check": Record "Audit Roll";
         Register: Record Register;
         "Payment Type - Detailed": Record "Payment Type - Detailed";
@@ -225,11 +226,11 @@ codeunit 6150849 "POS Action - End-of-Day V3"
         closingType: Option Cancel,Normal,Saved;
     begin
 
-        NPRetailSetup.Get ();
-        NPRetailSetup.TestField ("Advanced Posting Activated");
+        NPRetailSetup.Get();
+        NPRetailSetup.TestField("Advanced Posting Activated");
 
         if (SalesTicketNo = '') then
-          exit (true);
+            exit(true);
 
         // TODO - Needs to verified for UNITS / BINS
         RetailSetup.Get;
@@ -237,32 +238,33 @@ codeunit 6150849 "POS Action - End-of-Day V3"
 
         Register.Get(RegisterNo);
         if (Register.Status = Register.Status::Afsluttet) then
-          Error(t001);
+            Error(t001);
 
-        SalePOS.Get (RegisterNo, SalesTicketNo);
-        if (RetailSalesLineCode.LineExists (SalePOS)) then
-          Error(t002);
+        SalePOS.Get(RegisterNo, SalesTicketNo);
+        if (RetailSalesLineCode.LineExists(SalePOS)) then
+            Error(t002);
 
         //-NPR5.48 [334633]
         // IF (NOT RetailFormCode.CheckSavedSales (SalePOS)) THEN
         //  ERROR ('');
         if not POSQuoteMgt.CleanupPOSQuotesBeforeBalancing(SalePOS) then
-          Error('');
+            Error('');
         //+NPR5.48 [334633]
 
         if (RetailSetup."Balancing Posting Type" = RetailSetup."Balancing Posting Type"::TOTAL) then begin
-          if (Register.FindSet()) then repeat
-            if (Register."Register No." <> RegisterNo) then begin
-              Message(t003, Register."Register No.");
-              exit(false);
-            end;
-          until Register.Next = 0;
+            if (Register.FindSet()) then
+                repeat
+                    if (Register."Register No." <> RegisterNo) then begin
+                        Message(t003, Register."Register No.");
+                        exit(false);
+                    end;
+                until Register.Next = 0;
         end;
 
-        exit (true);
+        exit(true);
     end;
 
-    local procedure FinalEndOfDay(UnitNo: Code[10];DimensionSetId: Integer): Boolean
+    local procedure FinalEndOfDay(UnitNo: Code[10]; DimensionSetId: Integer): Boolean
     var
         POSEntry: Record "POS Entry";
         POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";
@@ -272,26 +274,26 @@ codeunit 6150849 "POS Action - End-of-Day V3"
 
         //-NPR5.49 [348458]
         // EntryNo := POSCheckpointMgr.CreateCheckpointWithDimension (TRUE, TRUE, UnitNo, DimensionSetId);
-        EntryNo := POSCheckpointMgr.EndWorkshift (EndOfDayTypeOption::"Z-Report", UnitNo, DimensionSetId);
+        EntryNo := POSCheckpointMgr.EndWorkshift(EndOfDayTypeOption::"Z-Report", UnitNo, DimensionSetId);
         //+NPR5.49 [348458]
 
-        if (not POSEntry.Get (EntryNo)) then
-          exit (false);
+        if (not POSEntry.Get(EntryNo)) then
+            exit(false);
 
-        PrintEndOfDayReport (UnitNo, EntryNo);
+        PrintEndOfDayReport(UnitNo, EntryNo);
 
         // We dont have a SalePOS as base for sending the SMS anymore
         //IF (NOT CODEUNIT.RUN (CODEUNIT::"Send Register Balance", SalePOS)) THEN
         //  MESSAGE(txtCannotSendSMSWB);
 
-        POSWorkshiftCheckpoint.SetFilter ("POS Entry No.", '=%1', EntryNo);
-        if (POSWorkshiftCheckpoint.FindFirst ()) then
-          exit (not POSWorkshiftCheckpoint.Open);
+        POSWorkshiftCheckpoint.SetFilter("POS Entry No.", '=%1', EntryNo);
+        if (POSWorkshiftCheckpoint.FindFirst()) then
+            exit(not POSWorkshiftCheckpoint.Open);
 
-        exit (false);
+        exit(false);
     end;
 
-    local procedure PreliminaryEndOfDay(UnitNo: Code[10];DimensionSetId: Integer): Boolean
+    local procedure PreliminaryEndOfDay(UnitNo: Code[10]; DimensionSetId: Integer): Boolean
     var
         POSEntry: Record "POS Entry";
         POSCheckpointMgr: Codeunit "POS Workshift Checkpoint";
@@ -300,18 +302,18 @@ codeunit 6150849 "POS Action - End-of-Day V3"
 
         //-NPR5.49 [348458]
         //EntryNo := POSCheckpointMgr.CreateCheckpointWithDimension (TRUE, FALSE, UnitNo, DimensionSetId);
-        EntryNo := POSCheckpointMgr.EndWorkshift (EndOfDayTypeOption::"X-Report", UnitNo, DimensionSetId);
+        EntryNo := POSCheckpointMgr.EndWorkshift(EndOfDayTypeOption::"X-Report", UnitNo, DimensionSetId);
         //+NPR5.49 [348458]
 
-        if (not POSEntry.Get (EntryNo)) then
-          exit (false);
+        if (not POSEntry.Get(EntryNo)) then
+            exit(false);
 
-        PrintEndOfDayReport (UnitNo, EntryNo);
+        PrintEndOfDayReport(UnitNo, EntryNo);
 
-        exit (true);
+        exit(true);
     end;
 
-    local procedure CloseWorkshift(UnitNo: Code[10];DimensionSetId: Integer): Boolean
+    local procedure CloseWorkshift(UnitNo: Code[10]; DimensionSetId: Integer): Boolean
     var
         POSEntry: Record "POS Entry";
         POSUnit: Record "POS Unit";
@@ -325,30 +327,30 @@ codeunit 6150849 "POS Action - End-of-Day V3"
         //-NPR5.49 [348458]
         PosIsManaged := false;
         WithPrint := true;
-        POSUnit.Get (UnitNo);
+        POSUnit.Get(UnitNo);
         if (POSUnit."POS End of Day Profile" <> '') then
-          if (POSEndofDayProfile.Get (POSUnit."POS End of Day Profile")) then
-            if (POSEndofDayProfile."End of Day Type" = POSEndofDayProfile."End of Day Type"::MASTER_SLAVE) then begin
-              PosIsManaged := (POSUnit."No." <> POSEndofDayProfile."Master POS Unit No.");
-              WithPrint := (POSEndofDayProfile."Close Workshift UI" <> POSEndofDayProfile."Close Workshift UI"::NO_PRINT);
-            end;
+            if (POSEndofDayProfile.Get(POSUnit."POS End of Day Profile")) then
+                if (POSEndofDayProfile."End of Day Type" = POSEndofDayProfile."End of Day Type"::MASTER_SLAVE) then begin
+                    PosIsManaged := (POSUnit."No." <> POSEndofDayProfile."Master POS Unit No.");
+                    WithPrint := (POSEndofDayProfile."Close Workshift UI" <> POSEndofDayProfile."Close Workshift UI"::NO_PRINT);
+                end;
 
         if (not PosIsManaged) then
-          Error (MustBeManaged);
+            Error(MustBeManaged);
 
-        EntryNo := POSCheckpointMgr.EndWorkshift (EndOfDayTypeOption::CloseWorkshift, UnitNo, DimensionSetId);
+        EntryNo := POSCheckpointMgr.EndWorkshift(EndOfDayTypeOption::CloseWorkshift, UnitNo, DimensionSetId);
 
-        if (not POSEntry.Get (EntryNo)) then
-          exit (false);
+        if (not POSEntry.Get(EntryNo)) then
+            exit(false);
 
         if (WithPrint) then
-          PrintEndOfDayReport (UnitNo, EntryNo);
+            PrintEndOfDayReport(UnitNo, EntryNo);
 
-        exit (true);
+        exit(true);
         //+NPR5.49 [348458]
     end;
 
-    local procedure PrintEndOfDayReport(UnitNo: Code[10];EntryNo: Integer)
+    local procedure PrintEndOfDayReport(UnitNo: Code[10]; EntryNo: Integer)
     var
         POSEntry: Record "POS Entry";
         RetailReportSelectionMgt: Codeunit "Retail Report Selection Mgt.";
@@ -357,15 +359,15 @@ codeunit 6150849 "POS Action - End-of-Day V3"
         RecRef: RecordRef;
     begin
 
-        POSEntry.Get (EntryNo);
-        POSEntry.TestField ("Entry Type", POSEntry."Entry Type"::Balancing);
+        POSEntry.Get(EntryNo);
+        POSEntry.TestField("Entry Type", POSEntry."Entry Type"::Balancing);
 
-        POSWorkshiftCheckpoint.SetFilter ("POS Entry No.", '=%1', EntryNo);
-        POSWorkshiftCheckpoint.FindFirst ();
-        RecRef.GetTable (POSWorkshiftCheckpoint);
+        POSWorkshiftCheckpoint.SetFilter("POS Entry No.", '=%1', EntryNo);
+        POSWorkshiftCheckpoint.FindFirst();
+        RecRef.GetTable(POSWorkshiftCheckpoint);
 
-        RetailReportSelectionMgt.SetRegisterNo (UnitNo);
-        RetailReportSelectionMgt.RunObjects (RecRef, ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
+        RetailReportSelectionMgt.SetRegisterNo(UnitNo);
+        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Balancing (POS Entry)");
     end;
 
     local procedure EftDiscovery(POSSession: Codeunit "POS Session")
@@ -377,13 +379,13 @@ codeunit 6150849 "POS Action - End-of-Day V3"
 
         EFTInterface.OnQueueCloseBeforeRegisterBalance(POSSession, tmpEFTSetup);
         if not tmpEFTSetup.FindSet then begin
-          NextWorkflowStep := NextWorkflowStep::JUMP_BALANCE_REGISTER;
-          exit;
+            NextWorkflowStep := NextWorkflowStep::JUMP_BALANCE_REGISTER;
+            exit;
         end;
 
         repeat
-          EFTSetup.Get(tmpEFTSetup.RecordId);
-          EFTSetup.Mark(true);
+            EFTSetup.Get(tmpEFTSetup.RecordId);
+            EFTSetup.Mark(true);
         until tmpEFTSetup.Next = 0;
         EFTSetup.MarkedOnly(true);
         EFTSetup.FindSet;
@@ -393,7 +395,7 @@ codeunit 6150849 "POS Action - End-of-Day V3"
         POSSession.StoreActionState('eft_close_list', EFTSetup);
     end;
 
-    local procedure EftClose(POSSession: Codeunit "POS Session";POSFrontEnd: Codeunit "POS Front End Management")
+    local procedure EftClose(POSSession: Codeunit "POS Session"; POSFrontEnd: Codeunit "POS Front End Management")
     var
         RecRef: RecordRef;
         EFTSetup: Record "EFT Setup";
@@ -406,10 +408,10 @@ codeunit 6150849 "POS Action - End-of-Day V3"
 
         POSSession.RetrieveActionStateRecordRef('eft_close_list', RecRef);
         if RecRef.Number = 0 then
-          exit;
+            exit;
         RecRef.SetTable(EFTSetup);
         if not EFTSetup.Find then
-          exit;
+            exit;
 
         POSSession.GetSale(POSSale);
         POSSession.GetSetup(POSSetup);
@@ -431,17 +433,17 @@ codeunit 6150849 "POS Action - End-of-Day V3"
 
         POSSession.RetrieveActionStateRecordRef('eft_close_list', RecRef);
         if RecRef.Number = 0 then
-          exit;
+            exit;
         RecRef.SetTable(EFTSetup);
         if EFTSetup.Next = 0 then
-          exit;
+            exit;
 
         POSSession.StoreActionState('eft_close_list', EFTSetup);
         NextWorkflowStep := NextWorkflowStep::EFT_CLOSE;
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeBalancing(SalePOS: Record "Sale POS";Register: Record Register)
+    local procedure OnBeforeBalancing(SalePOS: Record "Sale POS"; Register: Record Register)
     begin
     end;
 

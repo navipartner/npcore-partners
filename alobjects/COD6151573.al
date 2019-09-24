@@ -13,10 +13,10 @@ codeunit 6151573 "AF API - Spire Barcode"
         AFSetup: Record "AF Setup";
     begin
         if AFArgumentTableSpire.Value = '' then
-          exit;
+            exit;
 
         if not IsAFEnabled then
-          exit;
+            exit;
 
         AFSetup.Get;
         AFSetup.TestField("Spire Barcode - API Key");
@@ -41,7 +41,7 @@ codeunit 6151573 "AF API - Spire Barcode"
         WebUtility: DotNet npNetWebUtility;
         ImageStream: DotNet npNetMemoryStream;
         OutStr: OutStream;
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         JTokenWriter: DotNet npNetJTokenWriter;
         StringContent: DotNet npNetStringContent;
         Encoding: DotNet npNetEncoding;
@@ -58,39 +58,39 @@ codeunit 6151573 "AF API - Spire Barcode"
 
         JTokenWriter := JTokenWriter.JTokenWriter;
         with JTokenWriter do begin
-          WriteStartObject;
-          WritePropertyName('type');
-          WriteValue(AFHelperFunctions.GetOptionStringValue(AFArgumentTableSpire.Type,AFArgumentTableSpire.FieldNo(Type),AFArgumentTableSpire));
-          WritePropertyName('barcodevalue');
-          //WriteValue(WebUtility.UrlEncode(AFArgumentTableSpire.Value));
-          WriteValue(AFArgumentTableSpire.Value);
-          WritePropertyName('barheight');
-          WriteValue(Format(AFArgumentTableSpire."Barcode Height"));
-          WritePropertyName('barsize');
-          WriteValue(Format(AFArgumentTableSpire."Barcode Size"));
-          WritePropertyName('hasborder');
-          WriteValue(Format(AFArgumentTableSpire.Border,0,2));
-          WritePropertyName('reversecolor');
-          WriteValue(Format(AFArgumentTableSpire."Reverse Colors",0,2));
-          WritePropertyName('showtext');
-          WriteValue(Format(AFArgumentTableSpire."Include Text",0,2));
-          WritePropertyName('showchecksumchar');
-          WriteValue(Format(AFArgumentTableSpire."Show Checksum",0,2));
-          WritePropertyName('imageformat');
-          WriteValue(AFHelperFunctions.GetOptionStringValue(AFArgumentTableSpire."Image Type",AFArgumentTableSpire.FieldNo("Image Type"),AFArgumentTableSpire));
-          WriteEndObject;
-          JObject := Token;
+            WriteStartObject;
+            WritePropertyName('type');
+            WriteValue(AFHelperFunctions.GetOptionStringValue(AFArgumentTableSpire.Type, AFArgumentTableSpire.FieldNo(Type), AFArgumentTableSpire));
+            WritePropertyName('barcodevalue');
+            //WriteValue(WebUtility.UrlEncode(AFArgumentTableSpire.Value));
+            WriteValue(AFArgumentTableSpire.Value);
+            WritePropertyName('barheight');
+            WriteValue(Format(AFArgumentTableSpire."Barcode Height"));
+            WritePropertyName('barsize');
+            WriteValue(Format(AFArgumentTableSpire."Barcode Size"));
+            WritePropertyName('hasborder');
+            WriteValue(Format(AFArgumentTableSpire.Border, 0, 2));
+            WritePropertyName('reversecolor');
+            WriteValue(Format(AFArgumentTableSpire."Reverse Colors", 0, 2));
+            WritePropertyName('showtext');
+            WriteValue(Format(AFArgumentTableSpire."Include Text", 0, 2));
+            WritePropertyName('showchecksumchar');
+            WriteValue(Format(AFArgumentTableSpire."Show Checksum", 0, 2));
+            WritePropertyName('imageformat');
+            WriteValue(AFHelperFunctions.GetOptionStringValue(AFArgumentTableSpire."Image Type", AFArgumentTableSpire.FieldNo("Image Type"), AFArgumentTableSpire));
+            WriteEndObject;
+            JObject := Token;
         end;
 
-        StringContent := StringContent.StringContent(JObject.ToString,Encoding.UTF8,'application/json');
+        StringContent := StringContent.StringContent(JObject.ToString, Encoding.UTF8, 'application/json');
 
         Parameters := Parameters.Dictionary();
-        Parameters.Add('baseurl',AFArgumentTableSpire."Base Url");
-        Parameters.Add('restmethod','POST');
-        Parameters.Add('path',AFRequestUrl(AFArgumentTableSpire."API Routing",AFArgumentTableSpire."API Key"));
-        Parameters.Add('httpcontent',StringContent);
+        Parameters.Add('baseurl', AFArgumentTableSpire."Base Url");
+        Parameters.Add('restmethod', 'POST');
+        Parameters.Add('path', AFRequestUrl(AFArgumentTableSpire."API Routing", AFArgumentTableSpire."API Key"));
+        Parameters.Add('httpcontent', StringContent);
 
-        AFArgumentTableSpire."Request OK" := AFManagement.CallRESTWebService(Parameters,HttpResponseMessage);
+        AFArgumentTableSpire."Request OK" := AFManagement.CallRESTWebService(Parameters, HttpResponseMessage);
 
         ImageStream := HttpResponseMessage.Content.ReadAsStreamAsync.Result;
 
@@ -100,9 +100,9 @@ codeunit 6151573 "AF API - Spire Barcode"
         ImageStream.WriteTo(OutStr);
     end;
 
-    local procedure AFRequestUrl(APIRouting: Text;APIKey: Text): Text
+    local procedure AFRequestUrl(APIRouting: Text; APIKey: Text): Text
     begin
-        exit(APIRouting+'?code='+APIKey);
+        exit(APIRouting + '?code=' + APIKey);
     end;
 
     local procedure IsAFEnabled(): Boolean
@@ -110,7 +110,7 @@ codeunit 6151573 "AF API - Spire Barcode"
         AFSetup: Record "AF Setup";
     begin
         if AFSetup.Get() then
-          exit(AFSetup."Enable Azure Functions");
+            exit(AFSetup."Enable Azure Functions");
 
         exit(false);
     end;

@@ -3,7 +3,7 @@ report 6014510 "Purch Return Order NP"
     // NPR5.38/BHR/20171122 Copy of report 6641
     //                      Added Vendor Item NO
     DefaultLayout = RDLC;
-    RDLCLayout = './Purch Return Order NP.rdlc';
+    RDLCLayout = './layouts/Purch Return Order NP.rdlc';
 
     Caption = 'Return Order';
     PreviewMode = PrintLayout;

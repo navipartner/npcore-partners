@@ -14,7 +14,7 @@ codeunit 6059967 "MPOS Admission API"
         mPOSAppSetup.Get(Rec."Register No.");
 
         if not mPOSAppSetup.Enable then
-          exit;
+            exit;
 
         mPOSAppSetup.TestField("Ticket Admission Web Url");
 
@@ -27,31 +27,34 @@ codeunit 6059967 "MPOS Admission API"
     var
         Err_AdmissionFailed: Label 'Error opening the admission webpage';
 
-    [EventSubscriber(ObjectType::Codeunit, 6014630, 'HandleMetaTriggerEvent', '', false, false)]
-    local procedure OpenAdmissionServiceWebPage(var Sender: Codeunit "Touch - Sale POS (Web)";MetaTriggerName: Code[50];var SalePos: Record "Sale POS";var SaleLinePos: Record "Sale Line POS";var MetaTriggerHandled: Boolean;Validering: Code[50])
-    var
-        JSBridge: Page "JS Bridge";
-        JSON: Text;
-        mPOSAppSetup: Record "MPOS App Setup";
-    begin
-        if MetaTriggerHandled then
-          exit;
+        // TODO: CTRLUPGRADE - references a removed event publisher that's not used in Transcendence - INVESTIGATE
+        /*
+        [EventSubscriber(ObjectType::Codeunit, 6014630, 'HandleMetaTriggerEvent', '', false, false)]
+        local procedure OpenAdmissionServiceWebPage(var Sender: Codeunit "Touch - Sale POS (Web)";MetaTriggerName: Code[50];var SalePos: Record "Sale POS";var SaleLinePos: Record "Sale Line POS";var MetaTriggerHandled: Boolean;Validering: Code[50])
+        var
+            JSBridge: Page "JS Bridge";
+            JSON: Text;
+            mPOSAppSetup: Record "MPOS App Setup";
+        begin
+            if MetaTriggerHandled then
+              exit;
 
-        if MetaTriggerName <> 'MPOS_ADMISSION' then
-          exit;
+            if MetaTriggerName <> 'MPOS_ADMISSION' then
+              exit;
 
-        MetaTriggerHandled := true;
+            MetaTriggerHandled := true;
 
-        mPOSAppSetup.Get(SaleLinePos."Register No.");
-        mPOSAppSetup.TestField("Ticket Admission Web Url");
+            mPOSAppSetup.Get(SaleLinePos."Register No.");
+            mPOSAppSetup.TestField("Ticket Admission Web Url");
 
-        JSON := BuildJSONParams(mPOSAppSetup."Ticket Admission Web Url", '', '', '', Err_AdmissionFailed);
+            JSON := BuildJSONParams(mPOSAppSetup."Ticket Admission Web Url", '', '', '', Err_AdmissionFailed);
 
-        JSBridge.SetParameters('Admission', JSON, '');
-        JSBridge.RunModal;
-    end;
+            JSBridge.SetParameters('Admission', JSON, '');
+            JSBridge.RunModal;
+        end;
+        */
 
-    local procedure BuildJSONParams(BaseAddress: Text;Endpoint: Text;PrintJob: Text;RequestType: Text;ErrorCaption: Text) JSON: Text
+    local procedure BuildJSONParams(BaseAddress: Text; Endpoint: Text; PrintJob: Text; RequestType: Text; ErrorCaption: Text) JSON: Text
     begin
         JSON := '{';
         JSON += '"RequestMethod": "ADMISSION",';

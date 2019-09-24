@@ -14,27 +14,23 @@ codeunit 6150729 "POS Sales Print Mgt."
         Text001: Label 'Sales ticket %1 is posted.\An error occured during the printing of sales ticket %1.\Try to re-print sales ticket %1 from retail-mainmenu under "Audit roll". If the re-printing is unsuccessfull a description of the occurred error will be shown.';
         Text002: Label 'Print Credit Voucher';
 
-    local procedure "--- OnFinishSale Workflow"()
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
-    local procedure OnBeforeInsertWorkflowStep(var Rec: Record "POS Sales Workflow Step";RunTrigger: Boolean)
+    local procedure OnBeforeInsertWorkflowStep(var Rec: Record "POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
-          exit;
+            exit;
 
         case Rec."Subscriber Function" of
-          'PrintReceiptOnSale':
-            begin
-              Rec.Description := Text000;
-              Rec."Sequence No." := 20;
-            end;
-          'PrintCreditVoucherOnSale':
-            begin
-              Rec.Description := Text002;
-              Rec."Sequence No." := 30;
-            end;
+            'PrintReceiptOnSale':
+                begin
+                    Rec.Description := Text000;
+                    Rec."Sequence No." := 20;
+                end;
+            'PrintCreditVoucherOnSale':
+                begin
+                    Rec.Description := Text002;
+                    Rec."Sequence No." := 30;
+                end;
         end;
     end;
 
@@ -44,70 +40,69 @@ codeunit 6150729 "POS Sales Print Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
-    local procedure PrintReceiptOnSale(POSSalesWorkflowStep: Record "POS Sales Workflow Step";SalePOS: Record "Sale POS")
+    local procedure PrintReceiptOnSale(POSSalesWorkflowStep: Record "POS Sales Workflow Step"; SalePOS: Record "Sale POS")
     var
         AuditRoll: Record "Audit Roll";
         Register: Record Register;
-        Marshaller: Codeunit "POS Event Marshaller";
         NPRetailSetup: Record "NP Retail Setup";
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-          exit;
+            exit;
 
         if POSSalesWorkflowStep."Subscriber Function" <> 'PrintReceiptOnSale' then
-          exit;
+            exit;
 
         if NPRetailSetup.Get then
-          if NPRetailSetup."Advanced Posting Activated" then begin
-            PrintPOSEntrySalesReceipt(SalePOS);
-            exit;
-          end;
+            if NPRetailSetup."Advanced Posting Activated" then begin
+                PrintPOSEntrySalesReceipt(SalePOS);
+                exit;
+            end;
 
         //Legacy (Audit Roll) print:
 
         if not Register.Get(SalePOS."Register No.") then
-          exit;
+            exit;
 
-        AuditRoll.SetRange("Register No.",SalePOS."Register No.");
-        AuditRoll.SetRange("Sales Ticket No.",SalePOS."Sales Ticket No.");
+        AuditRoll.SetRange("Register No.", SalePOS."Register No.");
+        AuditRoll.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         if not AuditRoll.FindFirst then
-          exit;
+            exit;
 
         if SalePOS."Send Receipt Email" and (Register."Sales Ticket Email Output" = Register."Sales Ticket Email Output"::"Prompt With Print Overrule") then
-          exit;
+            exit;
 
-        if not PrintSalesReceipt(AuditRoll,true,false) then
-          Marshaller.DisplayMessage('',StrSubstNo(Text001,AuditRoll."Sales Ticket No."));
+        if not PrintSalesReceipt(AuditRoll, true, false) then
+            Message(Text001, AuditRoll."Sales Ticket No.");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
-    local procedure PrintCreditVoucherOnSale(POSSalesWorkflowStep: Record "POS Sales Workflow Step";SalePOS: Record "Sale POS")
+    local procedure PrintCreditVoucherOnSale(POSSalesWorkflowStep: Record "POS Sales Workflow Step"; SalePOS: Record "Sale POS")
     var
         AuditRoll: Record "Audit Roll";
         StdCodeunitCode: Codeunit "Std. Codeunit Code";
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-          exit;
+            exit;
 
         if POSSalesWorkflowStep."Subscriber Function" <> 'PrintCreditVoucherOnSale' then
-          exit;
+            exit;
 
-        AuditRoll.SetRange("Register No.",SalePOS."Register No.");
-        AuditRoll.SetRange("Sales Ticket No.",SalePOS."Sales Ticket No.");
+        AuditRoll.SetRange("Register No.", SalePOS."Register No.");
+        AuditRoll.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         if not AuditRoll.FindFirst then
-          exit;
+            exit;
 
         StdCodeunitCode.PrintCreditGiftVoucher(AuditRoll);
     end;
 
-    procedure PrintSalesReceipt(var AuditRoll: Record "Audit Roll";SilentError: Boolean;ViewDemand: Boolean): Boolean
+    procedure PrintSalesReceipt(var AuditRoll: Record "Audit Roll"; SilentError: Boolean; ViewDemand: Boolean): Boolean
     var
         StdCodeunitCode: Codeunit "Std. Codeunit Code";
     begin
         StdCodeunitCode.OnRunSetShowDemand(ViewDemand);
 
         if SilentError then
-          exit(StdCodeunitCode.Run(AuditRoll));
+            exit(StdCodeunitCode.Run(AuditRoll));
 
         StdCodeunitCode.Run(AuditRoll);
     end;
@@ -122,7 +117,7 @@ codeunit 6150729 "POS Sales Print Mgt."
         //-NPR5.39 [302687]
         POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         if not POSEntry.FindFirst then
-          exit;
+            exit;
 
         //-NPR5.51 [356076]
         if SkipCancelledReceipt(POSEntry) then

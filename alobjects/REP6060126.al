@@ -5,7 +5,7 @@ report 6060126 "TM Admission List"
     // TM1.39/NPKNAV/20190125  CASE 343941 Transport TM1.39 - 25 January 2019
     // TM1.42/TSA /20190610 CASE 357991 Removed PAGENO field for AL convert
     DefaultLayout = RDLC;
-    RDLCLayout = './TM Admission List.rdlc';
+    RDLCLayout = './layouts/TM Admission List.rdlc';
 
     Caption = 'TM Admission List';
 

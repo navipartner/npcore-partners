@@ -1,23 +1,23 @@
 {
   "id": "992c2309-cca4-43cb-9e41-911f482ec088",
-  "name": "NPR-to-AL-Conversion",
+  "name": "NP Retail",
   "publisher": "NaviPartner",
-  "version": "1.0.0.0",
+  "version": "1.0.3.0",
   "brief": "",
   "description": "",
   "privacyStatement": "",
   "EULA": "",
-  "help": "",
-  "url": "",
-  "logo": "",
+  "help": "https://www.navipartner.com/support/",
+  "url": "https://www.navipartner.com/",
+  "logo": "./media/NP-small-logo.png",
   "dependencies": [],
   "screenshots": [],
   "platform": "14.0.0.0",
   "application": "14.0.0.0",
   "idRanges": [
     {
-      "from": 50100,
-      "to": 50149
+      "from": 50000,
+      "to": 51000
     },
     {
       "from": 6014400,

@@ -14,34 +14,35 @@ codeunit 6150818 "POS Action - Set Tax Area Code"
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
-            RegisterWorkflowStep('do_lookup','respond();');
-            RegisterWorkflow(false);
-          end;
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
+                RegisterWorkflowStep('do_lookup', 'respond();');
+                RegisterWorkflow(false);
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         Confirmed: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         case WorkflowStep of
-          'do_lookup': SetTaxAreaCode(Context, POSSession,FrontEnd);
+            'do_lookup':
+                SetTaxAreaCode(Context, POSSession, FrontEnd);
         end;
         Handled := true;
     end;
 
-    local procedure SetTaxAreaCode(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure SetTaxAreaCode(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         Line: Record "Sale Line POS";
@@ -50,7 +51,7 @@ codeunit 6150818 "POS Action - Set Tax Area Code"
         POSSale: Codeunit "POS Sale";
         TaxAreaValue: Code[20];
     begin
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
 
         TaxAreaValue := List(true, true);
 
@@ -64,32 +65,32 @@ codeunit 6150818 "POS Action - Set Tax Area Code"
 
     local procedure ActionCode(): Text
     begin
-        exit ('SETTAXAREACODE');
+        exit('SETTAXAREACODE');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 
-    procedure List(Lookup: Boolean;ShowEmpty: Boolean): Code[20]
+    procedure List(Lookup: Boolean; ShowEmpty: Boolean): Code[20]
     var
         TaxAreaList: Page "Tax Area List";
         TaxArea: Record "Tax Area";
     begin
         if not ShowEmpty then begin
-          TaxArea.SetFilter(Description,'<>%1','');
-          TaxAreaList.SetTableView(TaxArea);
+            TaxArea.SetFilter(Description, '<>%1', '');
+            TaxAreaList.SetTableView(TaxArea);
         end;
 
         if Lookup then begin
-          TaxAreaList.LookupMode(true);
-          if TaxAreaList.RunModal = ACTION::LookupOK then begin
-            TaxAreaList.GetRecord(TaxArea);
-            exit(TaxArea.Code);
-          end;
+            TaxAreaList.LookupMode(true);
+            if TaxAreaList.RunModal = ACTION::LookupOK then begin
+                TaxAreaList.GetRecord(TaxArea);
+                exit(TaxArea.Code);
+            end;
         end else
-          TaxAreaList.RunModal;
+            TaxAreaList.RunModal;
     end;
 }
 

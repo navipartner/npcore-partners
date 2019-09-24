@@ -1,146 +1,146 @@
 report 6151013 "NpRv Voucher"
 {
     // NPR5.48/MHA /20190123  CASE 341711 Object created
-    RDLCLayout = './NpRv Voucher.rdlc';
-    WordLayout = './NpRv Voucher.docx';
+    RDLCLayout = './layouts/NpRv Voucher.rdlc';
+    WordLayout = './layouts/NpRv Voucher.docx';
 
     Caption = 'NpRv Voucher';
     DefaultLayout = Word;
 
     dataset
     {
-        dataitem("NpRv Voucher";"NpRv Voucher")
+        dataitem("NpRv Voucher"; "NpRv Voucher")
         {
-            column(No_NpRvVoucher;"NpRv Voucher"."No.")
+            column(No_NpRvVoucher; "NpRv Voucher"."No.")
             {
             }
-            column(VoucherType_NpRvVoucher;"NpRv Voucher"."Voucher Type")
+            column(VoucherType_NpRvVoucher; "NpRv Voucher"."Voucher Type")
             {
             }
-            column(Description_NpRvVoucher;"NpRv Voucher".Description)
+            column(Description_NpRvVoucher; "NpRv Voucher".Description)
             {
             }
-            column(ReferenceNo_NpRvVoucher;"NpRv Voucher"."Reference No.")
+            column(ReferenceNo_NpRvVoucher; "NpRv Voucher"."Reference No.")
             {
             }
-            column(StartingDate_NpRvVoucher;"NpRv Voucher"."Starting Date")
+            column(StartingDate_NpRvVoucher; "NpRv Voucher"."Starting Date")
             {
             }
-            column(EndingDate_NpRvVoucher;"NpRv Voucher"."Ending Date")
+            column(EndingDate_NpRvVoucher; "NpRv Voucher"."Ending Date")
             {
             }
-            column(NoSeries_NpRvVoucher;"NpRv Voucher"."No. Series")
+            column(NoSeries_NpRvVoucher; "NpRv Voucher"."No. Series")
             {
             }
-            column(ArchNoSeries_NpRvVoucher;"NpRv Voucher"."Arch. No. Series")
+            column(ArchNoSeries_NpRvVoucher; "NpRv Voucher"."Arch. No. Series")
             {
             }
-            column(ArchNo_NpRvVoucher;"NpRv Voucher"."Arch. No.")
+            column(ArchNo_NpRvVoucher; "NpRv Voucher"."Arch. No.")
             {
             }
-            column(AccountNo_NpRvVoucher;"NpRv Voucher"."Account No.")
+            column(AccountNo_NpRvVoucher; "NpRv Voucher"."Account No.")
             {
             }
-            column(ProvisionAccountNo_NpRvVoucher;"NpRv Voucher"."Provision Account No.")
+            column(ProvisionAccountNo_NpRvVoucher; "NpRv Voucher"."Provision Account No.")
             {
             }
-            column(PrintTemplateCode_NpRvVoucher;"NpRv Voucher"."Print Template Code")
+            column(PrintTemplateCode_NpRvVoucher; "NpRv Voucher"."Print Template Code")
             {
             }
-            column(Open_NpRvVoucher;"NpRv Voucher".Open)
+            column(Open_NpRvVoucher; "NpRv Voucher".Open)
             {
             }
-            column(Amount_NpRvVoucher;"NpRv Voucher".Amount)
+            column(Amount_NpRvVoucher; "NpRv Voucher".Amount)
             {
             }
-            column(InuseQuantity_NpRvVoucher;"NpRv Voucher"."In-use Quantity")
+            column(InuseQuantity_NpRvVoucher; "NpRv Voucher"."In-use Quantity")
             {
             }
-            column(InuseQuantityExternal_NpRvVoucher;"NpRv Voucher"."In-use Quantity (External)")
+            column(InuseQuantityExternal_NpRvVoucher; "NpRv Voucher"."In-use Quantity (External)")
             {
             }
-            column(EmailTemplateCode_NpRvVoucher;"NpRv Voucher"."E-mail Template Code")
+            column(EmailTemplateCode_NpRvVoucher; "NpRv Voucher"."E-mail Template Code")
             {
             }
-            column(SMSTemplateCode_NpRvVoucher;"NpRv Voucher"."SMS Template Code")
+            column(SMSTemplateCode_NpRvVoucher; "NpRv Voucher"."SMS Template Code")
             {
             }
-            column(SendVoucherModule_NpRvVoucher;"NpRv Voucher"."Send Voucher Module")
+            column(SendVoucherModule_NpRvVoucher; "NpRv Voucher"."Send Voucher Module")
             {
             }
-            column(SendviaPrint_NpRvVoucher;"NpRv Voucher"."Send via Print")
+            column(SendviaPrint_NpRvVoucher; "NpRv Voucher"."Send via Print")
             {
             }
-            column(SendviaEmail_NpRvVoucher;"NpRv Voucher"."Send via E-mail")
+            column(SendviaEmail_NpRvVoucher; "NpRv Voucher"."Send via E-mail")
             {
             }
-            column(SendviaSMS_NpRvVoucher;"NpRv Voucher"."Send via SMS")
+            column(SendviaSMS_NpRvVoucher; "NpRv Voucher"."Send via SMS")
             {
             }
-            column(ValidateVoucherModule_NpRvVoucher;"NpRv Voucher"."Validate Voucher Module")
+            column(ValidateVoucherModule_NpRvVoucher; "NpRv Voucher"."Validate Voucher Module")
             {
             }
-            column(ApplyPaymentModule_NpRvVoucher;"NpRv Voucher"."Apply Payment Module")
+            column(ApplyPaymentModule_NpRvVoucher; "NpRv Voucher"."Apply Payment Module")
             {
             }
-            column(CustomerNo_NpRvVoucher;"NpRv Voucher"."Customer No.")
+            column(CustomerNo_NpRvVoucher; "NpRv Voucher"."Customer No.")
             {
             }
-            column(ContactNo_NpRvVoucher;"NpRv Voucher"."Contact No.")
+            column(ContactNo_NpRvVoucher; "NpRv Voucher"."Contact No.")
             {
             }
-            column(Name_NpRvVoucher;"NpRv Voucher".Name)
+            column(Name_NpRvVoucher; "NpRv Voucher".Name)
             {
             }
-            column(Name2_NpRvVoucher;"NpRv Voucher"."Name 2")
+            column(Name2_NpRvVoucher; "NpRv Voucher"."Name 2")
             {
             }
-            column(Address_NpRvVoucher;"NpRv Voucher".Address)
+            column(Address_NpRvVoucher; "NpRv Voucher".Address)
             {
             }
-            column(Address2_NpRvVoucher;"NpRv Voucher"."Address 2")
+            column(Address2_NpRvVoucher; "NpRv Voucher"."Address 2")
             {
             }
-            column(PostCode_NpRvVoucher;"NpRv Voucher"."Post Code")
+            column(PostCode_NpRvVoucher; "NpRv Voucher"."Post Code")
             {
             }
-            column(City_NpRvVoucher;"NpRv Voucher".City)
+            column(City_NpRvVoucher; "NpRv Voucher".City)
             {
             }
-            column(County_NpRvVoucher;"NpRv Voucher".County)
+            column(County_NpRvVoucher; "NpRv Voucher".County)
             {
             }
-            column(CountryRegionCode_NpRvVoucher;"NpRv Voucher"."Country/Region Code")
+            column(CountryRegionCode_NpRvVoucher; "NpRv Voucher"."Country/Region Code")
             {
             }
-            column(Email_NpRvVoucher;"NpRv Voucher"."E-mail")
+            column(Email_NpRvVoucher; "NpRv Voucher"."E-mail")
             {
             }
-            column(PhoneNo_NpRvVoucher;"NpRv Voucher"."Phone No.")
+            column(PhoneNo_NpRvVoucher; "NpRv Voucher"."Phone No.")
             {
             }
-            column(VoucherMessage_NpRvVoucher;"NpRv Voucher"."Voucher Message")
+            column(VoucherMessage_NpRvVoucher; "NpRv Voucher"."Voucher Message")
             {
             }
-            column(Barcode_NpRvVoucher;"NpRv Voucher".Barcode)
+            column(Barcode_NpRvVoucher; "NpRv Voucher".Barcode)
             {
             }
-            column(IssueDate_NpRvVoucher;"NpRv Voucher"."Issue Date")
+            column(IssueDate_NpRvVoucher; "NpRv Voucher"."Issue Date")
             {
             }
-            column(IssueRegisterNo_NpRvVoucher;"NpRv Voucher"."Issue Register No.")
+            column(IssueRegisterNo_NpRvVoucher; "NpRv Voucher"."Issue Register No.")
             {
             }
-            column(IssueDocumentType_NpRvVoucher;"NpRv Voucher"."Issue Document Type")
+            column(IssueDocumentType_NpRvVoucher; "NpRv Voucher"."Issue Document Type")
             {
             }
-            column(IssueDocumentNo_NpRvVoucher;"NpRv Voucher"."Issue Document No.")
+            column(IssueDocumentNo_NpRvVoucher; "NpRv Voucher"."Issue Document No.")
             {
             }
-            column(IssueExternalDocumentNo_NpRvVoucher;"NpRv Voucher"."Issue External Document No.")
+            column(IssueExternalDocumentNo_NpRvVoucher; "NpRv Voucher"."Issue External Document No.")
             {
             }
-            column(IssueUserID_NpRvVoucher;"NpRv Voucher"."Issue User ID")
+            column(IssueUserID_NpRvVoucher; "NpRv Voucher"."Issue User ID")
             {
             }
         }

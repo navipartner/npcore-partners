@@ -8,7 +8,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
     // NPR5.33/BR/20170216 CASE 266527 Added functions for FTP and local file export
     // NPR5.33/BR/20170420 CASE 266527 Added functions and subscribers to support more export buttons
 
-    Permissions = TableData "Sales Invoice Header"=m;
+    Permissions = TableData "Sales Invoice Header" = m;
 
     trigger OnRun()
     var
@@ -29,7 +29,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         FolderStructureDelimiter: Text;
         LoggingConstTxt: Label 'Document Exchange Framework';
         SendDocTxt: Label 'Send document.';
-        DocSendSuccessMsg: Label 'The document was successfully created and exported to set export folder.', Comment='%1 is the actual document no.';
+        DocSendSuccessMsg: Label 'The document was successfully created and exported to set export folder.', Comment = '%1 is the actual document no.';
 
     procedure ImportUsingSetup()
     var
@@ -50,62 +50,66 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         CreateDocument := DocExchSetup."Create Document";
 
         if InboxPath <> '' then
-          ImportDirectory(InboxPath,ArchivePath,IsLocalInbox,IsLocalArchive,CreateDocument);
+            ImportDirectory(InboxPath, ArchivePath, IsLocalInbox, IsLocalArchive, CreateDocument);
 
         DocExchangePath.Reset;
-        DocExchangePath.SetRange(Direction,DocExchangePath.Direction::Import);
-        DocExchangePath.SetRange(Enabled,true);
-        if DocExchangePath.FindSet then repeat
-          if DocExchangePath."Archive Path" <> '' then
-            ArchivePath := DocExchangePath."Archive Path";
-          InboxPath := DocExchangePath.Path;
-          ImportDirectory(InboxPath,ArchivePath,IsLocalInbox,IsLocalArchive,CreateDocument);
-        until DocExchangePath.Next = 0;
+        DocExchangePath.SetRange(Direction, DocExchangePath.Direction::Import);
+        DocExchangePath.SetRange(Enabled, true);
+        if DocExchangePath.FindSet then
+            repeat
+                if DocExchangePath."Archive Path" <> '' then
+                    ArchivePath := DocExchangePath."Archive Path";
+                InboxPath := DocExchangePath.Path;
+                ImportDirectory(InboxPath, ArchivePath, IsLocalInbox, IsLocalArchive, CreateDocument);
+            until DocExchangePath.Next = 0;
     end;
 
-    procedure ImportDirectory(InboxPath: Text;ArchivePath: Text;IsLocalInbox: Boolean;IsLocalArchive: Boolean;CreateDocument: Boolean) Success: Boolean
+    procedure ImportDirectory(InboxPath: Text; ArchivePath: Text; IsLocalInbox: Boolean; IsLocalArchive: Boolean; CreateDocument: Boolean) Success: Boolean
     var
         DirectoryInfoServer: DotNet npNetDirectoryInfo;
         [RunOnClient]
         DirectoryInfoClient: DotNet npNetDirectoryInfo;
         FileInfo: DotNet npNetFileInfo;
         List: DotNet npNetList_Of_T;
+        NetConvHelper: Variant;
     begin
         FolderStructureDelimiter := '\';
         if InboxPath = '' then
-          ThrowError(StrSubstNo(InboxError,InboxPath));
+            ThrowError(StrSubstNo(InboxError, InboxPath));
         InboxPath := CheckFolderPath(InboxPath);
-        if not SearchForFolder(IsLocalInbox,InboxPath) then
-          ThrowError(StrSubstNo(FolderError,InboxPath));
+        if not SearchForFolder(IsLocalInbox, InboxPath) then
+            ThrowError(StrSubstNo(FolderError, InboxPath));
         if ArchivePath = '' then
-          ThrowError(StrSubstNo(ArchiveError,ArchivePath));
+            ThrowError(StrSubstNo(ArchiveError, ArchivePath));
         ArchivePath := CheckFolderPath(ArchivePath);
-        if not SearchForFolder(IsLocalArchive,ArchivePath) then
-          ThrowError(StrSubstNo(FolderError,ArchivePath));
+        if not SearchForFolder(IsLocalArchive, ArchivePath) then
+            ThrowError(StrSubstNo(FolderError, ArchivePath));
 
         if IsLocalInbox then begin
-        //this is how one would normally upload entire directory if the function would actually work
-        //  InboxPathServer := FileMgt.UploadClientDirectorySilent(InboxPath,'*.xml',FALSE)
-          DirectoryInfoClient := DirectoryInfoClient.DirectoryInfo(InboxPath);
-          List := DirectoryInfoClient.GetFiles();
+            //this is how one would normally upload entire directory if the function would actually work
+            //  InboxPathServer := FileMgt.UploadClientDirectorySilent(InboxPath,'*.xml',FALSE)
+            DirectoryInfoClient := DirectoryInfoClient.DirectoryInfo(InboxPath);
+            NetConvHelper := DirectoryInfoClient.GetFiles();
+            List := NetConvHelper;
         end else begin
-          DirectoryInfoServer := DirectoryInfoServer.DirectoryInfo(InboxPath);
-          List := DirectoryInfoServer.GetFiles();
+            DirectoryInfoServer := DirectoryInfoServer.DirectoryInfo(InboxPath);
+            NetConvHelper := DirectoryInfoServer.GetFiles();
+            List := NetConvHelper;
         end;
 
         foreach FileInfo in List do begin
-          ImportFile(FileInfo.Name,InboxPath,ArchivePath,IsLocalInbox,IsLocalArchive,CreateDocument);
+            ImportFile(FileInfo.Name, InboxPath, ArchivePath, IsLocalInbox, IsLocalArchive, CreateDocument);
         end;
     end;
 
-    local procedure ImportFile(FileName: Text;InboxPath: Text;ArchivePath: Text;IsLocalInbox: Boolean;IsLocalArchive: Boolean;CreateDocument: Boolean)
+    local procedure ImportFile(FileName: Text; InboxPath: Text; ArchivePath: Text; IsLocalInbox: Boolean; IsLocalArchive: Boolean; CreateDocument: Boolean)
     var
         ServerFilePath: Text;
     begin
-        PrepareFile(ServerFilePath,IsLocalInbox,InboxPath + FileName);
-        ProcessFile(ServerFilePath,CreateDocument);
-        ArchiveFile(ServerFilePath,ArchivePath + FileName,IsLocalArchive);
-        CleanupFile(ServerFilePath,IsLocalInbox,InboxPath + FileName);
+        PrepareFile(ServerFilePath, IsLocalInbox, InboxPath + FileName);
+        ProcessFile(ServerFilePath, CreateDocument);
+        ArchiveFile(ServerFilePath, ArchivePath + FileName, IsLocalArchive);
+        CleanupFile(ServerFilePath, IsLocalInbox, InboxPath + FileName);
         Commit;
     end;
 
@@ -125,7 +129,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         //-NPR5.29 [263705]
         DocExchSetup.Get;
         if not DocExchSetup."FTP Import Enabled" then
-          exit;
+            exit;
         FTPServer := DocExchSetup."Import FTP Server";
         FTPUsername := DocExchSetup."Import FTP Username";
         FTPPassword := DocExchSetup."Import FTP Password";
@@ -136,11 +140,11 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         CreateDocument := DocExchSetup."Create Document";
 
         if FTPServer <> '' then
-          ImportFTPFolder(FTPServer,FTPUsername,FTPPassword,FTPFolder,FTPFileMask,FTPArchiveFolder,FTPUsePassive,CreateDocument);
+            ImportFTPFolder(FTPServer, FTPUsername, FTPPassword, FTPFolder, FTPFileMask, FTPArchiveFolder, FTPUsePassive, CreateDocument);
         //+NPR5.29 [263705]
     end;
 
-    procedure ImportFTPFolder(FTPserver: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFileMask: Text;FTPArchiveFolder: Text;FTPUsePassive: Boolean;CreateDocument: Boolean) Success: Boolean
+    procedure ImportFTPFolder(FTPserver: Text; FTPUsername: Text; FTPPassword: Text; FTPFolder: Text; FTPFileMask: Text; FTPArchiveFolder: Text; FTPUsePassive: Boolean; CreateDocument: Boolean) Success: Boolean
     var
         FtpWebRequest: DotNet npNetFtpWebRequest;
         FtpWebResponse: DotNet npNetFtpWebResponse;
@@ -149,17 +153,17 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         StreamReader: DotNet npNetStreamReader;
         MemoryStream: DotNet npNetMemoryStream;
         FileName: Text;
-        FileNameList: array [20] of Text;
+        FileNameList: array[20] of Text;
         FileCounter: Integer;
         I: Integer;
     begin
         //-NPR5.29 [263705]
         //Get file list
-        if UpperCase(CopyStr(FTPserver,1,4)) <> 'FTP://' then
-          FTPserver := 'FTP://' + FTPserver;
+        if UpperCase(CopyStr(FTPserver, 1, 4)) <> 'FTP://' then
+            FTPserver := 'FTP://' + FTPserver;
         if FTPFileMask = '' then
-          FTPFileMask := '*.*';
-        InitFTPWebRequest(FtpWebRequest,'LIST',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFileMask,FTPUsePassive);
+            FTPFileMask := '*.*';
+        InitFTPWebRequest(FtpWebRequest, 'LIST', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFileMask, FTPUsePassive);
         FtpWebResponse := FtpWebRequest.GetResponse;
         Stream := FtpWebResponse.GetResponseStream;
         StreamReader := StreamReader.StreamReader(Stream);
@@ -167,32 +171,32 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         FileCounter := 0;
         //Store list of files, Maximum of 20 per execution
         while (not (StreamReader.EndOfStream)) and (FileCounter < 20) do begin
-          FileName := StreamReader.ReadLine;
-          if StrLen(FileName) > 56 then begin
-            FileName := CopyStr(FileName,56);
-            if CopyStr(FileName,1,1) <> '.' then begin
-              FileCounter := FileCounter + 1;
-              FileNameList[FileCounter] := FileName;
+            FileName := StreamReader.ReadLine;
+            if StrLen(FileName) > 56 then begin
+                FileName := CopyStr(FileName, 56);
+                if CopyStr(FileName, 1, 1) <> '.' then begin
+                    FileCounter := FileCounter + 1;
+                    FileNameList[FileCounter] := FileName;
+                end;
             end;
-          end;
         end;
         FtpWebResponse.Close;
         StreamReader.Close;
         Stream.Close;
 
         if FileCounter = 0 then
-          exit;
+            exit;
 
         Sleep(2000); //Allow 2 secs between retrieving the file list so that anything writing to the FTP can finish writing file
-        I:=0;
+        I := 0;
         repeat
-          I := I + 1;
-          ImportFTPFile(FTPserver,FTPUsername,FTPPassword,FTPFolder,FileNameList[I],FTPArchiveFolder,FTPUsePassive,CreateDocument);
+            I := I + 1;
+            ImportFTPFile(FTPserver, FTPUsername, FTPPassword, FTPFolder, FileNameList[I], FTPArchiveFolder, FTPUsePassive, CreateDocument);
         until I >= FileCounter;
         //-NPR5.29 [263705]
     end;
 
-    local procedure ImportFTPFile(FTPserver: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFilename: Text;FTPArchiveFolder: Text;FTPUsePassive: Boolean;CreateDocument: Boolean)
+    local procedure ImportFTPFile(FTPserver: Text; FTPUsername: Text; FTPPassword: Text; FTPFolder: Text; FTPFilename: Text; FTPArchiveFolder: Text; FTPUsePassive: Boolean; CreateDocument: Boolean)
     var
         FtpWebRequest: DotNet npNetFtpWebRequest;
         FtpWebResponse: DotNet npNetFtpWebResponse;
@@ -211,7 +215,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
     begin
         //-NPR5.29 [263705]
         //Download file and store in Blob
-        InitFTPWebRequest(FtpWebRequest,'RETR',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFilename,FTPUsePassive);
+        InitFTPWebRequest(FtpWebRequest, 'RETR', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive);
         FtpWebResponse := FtpWebRequest.GetResponse;
         Stream := FtpWebResponse.GetResponseStream;
         MemoryStream := MemoryStream.MemoryStream();
@@ -222,104 +226,104 @@ codeunit 6059932 "Doc. Exch. File Mgt."
 
         //Import file from Blob
         IncomingDocumentAttachment.Content := TempBlob.Blob;
-        if ImportAttachIncDoc.ImportAttachment(IncomingDocumentAttachment,FTPFilename) then begin
-          if CreateDocument then begin
-            IncomingDocument.Get(IncomingDocumentAttachment."Incoming Document Entry No.");
-            IncomingDocument.CreateDocumentWithDataExchange();
-          end;
+        if ImportAttachIncDoc.ImportAttachment(IncomingDocumentAttachment, FTPFilename) then begin
+            if CreateDocument then begin
+                IncomingDocument.Get(IncomingDocumentAttachment."Incoming Document Entry No.");
+                IncomingDocument.CreateDocumentWithDataExchange();
+            end;
 
-          //If imported: Archive file
-          if FTPArchiveFolder <> '' then begin
-            InitFTPWebRequest(FtpWebRequest,'STOR',FTPserver,FTPUsername,FTPPassword,FTPArchiveFolder,FTPFilename,FTPUsePassive);
-            TempBlob.Blob.CreateInStream(IStream,TEXTENCODING::UTF8);
-            IStream.Read(FileText);
-            Clear(IStream);
-            UTF8Encoding := UTF8Encoding.UTF8;
-            FtpWebRequest.ContentLength := UTF8Encoding.GetBytes(FileText).Length;
-            Stream := FtpWebRequest.GetRequestStream;
-            Stream.Write(UTF8Encoding.GetBytes(FileText),0,FtpWebRequest.ContentLength);
-            Stream.Close;
+            //If imported: Archive file
+            if FTPArchiveFolder <> '' then begin
+                InitFTPWebRequest(FtpWebRequest, 'STOR', FTPserver, FTPUsername, FTPPassword, FTPArchiveFolder, FTPFilename, FTPUsePassive);
+                TempBlob.Blob.CreateInStream(IStream, TEXTENCODING::UTF8);
+                IStream.Read(FileText);
+                Clear(IStream);
+                UTF8Encoding := UTF8Encoding.UTF8;
+                FtpWebRequest.ContentLength := UTF8Encoding.GetBytes(FileText).Length;
+                Stream := FtpWebRequest.GetRequestStream;
+                Stream.Write(UTF8Encoding.GetBytes(FileText), 0, FtpWebRequest.ContentLength);
+                Stream.Close;
+                FtpWebResponse := FtpWebRequest.GetResponse;
+                FtpWebResponse.Close;
+                Clear(IStream);
+            end;
+
+            //If imported: Delete file
+            InitFTPWebRequest(FtpWebRequest, 'DELE', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive);
             FtpWebResponse := FtpWebRequest.GetResponse;
             FtpWebResponse.Close;
-            Clear(IStream);
-          end;
-
-          //If imported: Delete file
-          InitFTPWebRequest(FtpWebRequest,'DELE',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFilename,FTPUsePassive);
-          FtpWebResponse := FtpWebRequest.GetResponse;
-          FtpWebResponse.Close;
         end;
 
         Commit;
         //+NPR5.29 [263705]
     end;
 
-    local procedure InitFTPWebRequest(var FtpWebRequest: DotNet npNetFtpWebRequest;FTPMethod: Text;FTPServerName: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFileNameOrMask: Text;FTPusePassive: Boolean)
+    local procedure InitFTPWebRequest(var FtpWebRequest: DotNet npNetFtpWebRequest; FTPMethod: Text; FTPServerName: Text; FTPUsername: Text; FTPPassword: Text; FTPFolder: Text; FTPFileNameOrMask: Text; FTPusePassive: Boolean)
     var
         NetworkCredential: DotNet npNetNetworkCredential;
     begin
         //-NPR5.29 [263705]
-        FtpWebRequest := FtpWebRequest.Create(GetFTPPath(FTPServerName,FTPFolder,FTPFileNameOrMask));
+        FtpWebRequest := FtpWebRequest.Create(GetFTPPath(FTPServerName, FTPFolder, FTPFileNameOrMask));
         FtpWebRequest.Credentials := NetworkCredential.NetworkCredential(FTPUsername, FTPPassword);
         FtpWebRequest.Method := FTPMethod;
         FtpWebRequest.KeepAlive := true;
         FtpWebRequest.UseBinary := true;
         if FTPusePassive then
-          FtpWebRequest.UsePassive := false;
+            FtpWebRequest.UsePassive := false;
         //+NPR5.29 [263705]
     end;
 
-    local procedure GetFTPPath(FTPServerName: Text;FTPFolder: Text;FTPFileNameOrMask: Text): Text
+    local procedure GetFTPPath(FTPServerName: Text; FTPFolder: Text; FTPFileNameOrMask: Text): Text
     var
         FTPStructureDelimiter: Text;
     begin
         //-NPR5.29 [263705]
         FTPStructureDelimiter := '/';
         if FTPFolder <> '' then
-          exit(FTPServerName + FTPStructureDelimiter + FTPFolder + FTPStructureDelimiter + FTPFileNameOrMask)
+            exit(FTPServerName + FTPStructureDelimiter + FTPFolder + FTPStructureDelimiter + FTPFileNameOrMask)
         else
-          exit(FTPServerName + FTPStructureDelimiter + FTPFileNameOrMask);
+            exit(FTPServerName + FTPStructureDelimiter + FTPFileNameOrMask);
         //+NPR5.29 [263705]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', false, false)]
-    local procedure ExportSalesDocumentOnAfterPost(var SalesHeader: Record "Sales Header";var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";SalesShptHdrNo: Code[20];RetRcpHdrNo: Code[20];SalesInvHdrNo: Code[20];SalesCrMemoHdrNo: Code[20])
+    local procedure ExportSalesDocumentOnAfterPost(var SalesHeader: Record "Sales Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; SalesShptHdrNo: Code[20]; RetRcpHdrNo: Code[20]; SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20])
     var
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         RecordRef: RecordRef;
     begin
         case SalesHeader."Document Type" of
-          SalesHeader."Document Type"::Invoice,SalesHeader."Document Type"::Order:
-            if SalesHeader.Invoice then begin
-              SalesInvHeader.Get(SalesInvHdrNo);
-        
-        //-NPR5.27 [248831]
-        /*
-              PostedSalesDoc := SalesInvHeader;
-              SendSalesDocument(PostedSalesDoc,SalesInvHeader."Sell-to Customer No.",SalesInvHdrNo,0);
-        */
-              RecordRef.GetTable(SalesInvHeader);
-              SendSalesDocument(RecordRef,SalesInvHeader."Sell-to Customer No.",SalesInvHdrNo,0);
-        //+NPR5.27 [248831]
-        
-            end;
-          SalesHeader."Document Type"::"Credit Memo":
-            begin
-              SalesCrMemoHeader.Get(SalesCrMemoHdrNo);
-        
-        //-NPR5.27 [248831]
-        /*
-              PostedSalesDoc := SalesCrMemoHeader;
-              SendSalesDocument(PostedSalesDoc,SalesCrMemoHeader."Sell-to Customer No.",SalesCrMemoHdrNo,0);
-        */
-              RecordRef.GetTable(SalesCrMemoHeader);
-              SendSalesDocument(RecordRef,SalesCrMemoHeader."Sell-to Customer No.",SalesCrMemoHdrNo,0);
-        //+NPR5.27 [248831]
-        
-            end;
-          else
-            exit;
+            SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::Order:
+                if SalesHeader.Invoice then begin
+                    SalesInvHeader.Get(SalesInvHdrNo);
+
+                    //-NPR5.27 [248831]
+                    /*
+                          PostedSalesDoc := SalesInvHeader;
+                          SendSalesDocument(PostedSalesDoc,SalesInvHeader."Sell-to Customer No.",SalesInvHdrNo,0);
+                    */
+                    RecordRef.GetTable(SalesInvHeader);
+                    SendSalesDocument(RecordRef, SalesInvHeader."Sell-to Customer No.", SalesInvHdrNo, 0);
+                    //+NPR5.27 [248831]
+
+                end;
+            SalesHeader."Document Type"::"Credit Memo":
+                begin
+                    SalesCrMemoHeader.Get(SalesCrMemoHdrNo);
+
+                    //-NPR5.27 [248831]
+                    /*
+                          PostedSalesDoc := SalesCrMemoHeader;
+                          SendSalesDocument(PostedSalesDoc,SalesCrMemoHeader."Sell-to Customer No.",SalesCrMemoHdrNo,0);
+                    */
+                    RecordRef.GetTable(SalesCrMemoHeader);
+                    SendSalesDocument(RecordRef, SalesCrMemoHeader."Sell-to Customer No.", SalesCrMemoHdrNo, 0);
+                    //+NPR5.27 [248831]
+
+                end;
+            else
+                exit;
         end;
 
     end;
@@ -527,23 +531,23 @@ codeunit 6059932 "Doc. Exch. File Mgt."
     begin
         //-NPR5.33 [266527]
         if not Confirm(Text002) then
-          exit;
-        if SalesInvoiceHeader."Doc. Exch. Exported" then
-          if not Confirm(Text001) then
             exit;
+        if SalesInvoiceHeader."Doc. Exch. Exported" then
+            if not Confirm(Text001) then
+                exit;
 
         RecordRef.GetTable(SalesInvoiceHeader);
-        SendSalesDocument(RecordRef,SalesInvoiceHeader."Sell-to Customer No.",SalesInvoiceHeader ."No.",0);
+        SendSalesDocument(RecordRef, SalesInvoiceHeader."Sell-to Customer No.", SalesInvoiceHeader."No.", 0);
         RecordRef.SetTable(SalesInvoiceHeader);
 
         if GuiAllowed then begin
-          if not SalesInvoiceHeader."Doc. Exch. File Exists" then begin
-            ActivityLog.SetRange("Record ID",RecordRef.RecordId);
-            if ActivityLog.FindLast then
-              Message(Text003,ActivityLog."Activity Message",ActivityLog."Activity Date")
-            else
-              Message(Text004);
-          end;
+            if not SalesInvoiceHeader."Doc. Exch. File Exists" then begin
+                ActivityLog.SetRange("Record ID", RecordRef.RecordId);
+                if ActivityLog.FindLast then
+                    Message(Text003, ActivityLog."Activity Message", ActivityLog."Activity Date")
+                else
+                    Message(Text004);
+            end;
         end;
         //+NPR5.33 [266527]
     end;
@@ -555,12 +559,12 @@ codeunit 6059932 "Doc. Exch. File Mgt."
     begin
         //-NPR5.33 [266527]
         if not SalesInvoiceHeader."Doc. Exch. Exported" or (SalesInvoiceHeader."Doc. Exch. Framework Status" = SalesInvoiceHeader."Doc. Exch. Framework Status"::"Delivered to Recepient") then
-          exit;
+            exit;
         RecordRef.Get(SalesInvoiceHeader."Doc. Exch. Setup Path Used");
 
         RecordRef.SetTable(DocExchPath);
         RecordRef.GetTable(SalesInvoiceHeader);
-        UpdateSalesDoc(RecordRef,DocExchPath,false,1);
+        UpdateSalesDoc(RecordRef, DocExchPath, false, 1);
         RecordRef.SetTable(SalesInvoiceHeader);
         //+NPR5.33 [266527]
     end;
@@ -576,23 +580,23 @@ codeunit 6059932 "Doc. Exch. File Mgt."
     begin
         //-NPR5.33 [266527]
         if not Confirm(Text002) then
-          exit;
-        if SalesCrMemoHeader."Doc. Exch. Exported" then
-          if not Confirm(Text001) then
             exit;
+        if SalesCrMemoHeader."Doc. Exch. Exported" then
+            if not Confirm(Text001) then
+                exit;
 
         RecordRef.GetTable(SalesCrMemoHeader);
-        SendSalesDocument(RecordRef,SalesCrMemoHeader ."Sell-to Customer No.",SalesCrMemoHeader."No.",0);
+        SendSalesDocument(RecordRef, SalesCrMemoHeader."Sell-to Customer No.", SalesCrMemoHeader."No.", 0);
         RecordRef.SetTable(SalesCrMemoHeader);
 
         if GuiAllowed then begin
-          if not SalesCrMemoHeader."Doc. Exch. File Exists" then begin
-            ActivityLog.SetRange("Record ID",RecordRef.RecordId);
-            if ActivityLog.FindLast then
-              Message(Text003,ActivityLog."Activity Message",ActivityLog."Activity Date")
-            else
-              Message(Text004);
-          end;
+            if not SalesCrMemoHeader."Doc. Exch. File Exists" then begin
+                ActivityLog.SetRange("Record ID", RecordRef.RecordId);
+                if ActivityLog.FindLast then
+                    Message(Text003, ActivityLog."Activity Message", ActivityLog."Activity Date")
+                else
+                    Message(Text004);
+            end;
         end;
         //+NPR5.33 [266527]
     end;
@@ -604,17 +608,17 @@ codeunit 6059932 "Doc. Exch. File Mgt."
     begin
         //-NPR5.33 [266527]
         if not SalesCrMemoHeader."Doc. Exch. Exported" or (SalesCrMemoHeader."Doc. Exch. Framework Status" = SalesCrMemoHeader."Doc. Exch. Framework Status"::"Delivered to Recepient") then
-          exit;
+            exit;
         RecordRef.Get(SalesCrMemoHeader."Doc. Exch. Setup Path Used");
 
         RecordRef.SetTable(DocExchPath);
         RecordRef.GetTable(SalesCrMemoHeader);
-        UpdateSalesDoc(RecordRef,DocExchPath,false,1);
+        UpdateSalesDoc(RecordRef, DocExchPath, false, 1);
         RecordRef.SetTable(SalesCrMemoHeader);
         //+NPR5.33 [266527]
     end;
 
-    procedure SendSalesDocument(var RecordRef: RecordRef;CustomerNo: Code[20];DocumentNo: Code[20];CalledFrom: Integer)
+    procedure SendSalesDocument(var RecordRef: RecordRef; CustomerNo: Code[20]; DocumentNo: Code[20]; CalledFrom: Integer)
     var
         DocExchPath: Record "Doc. Exchange Path";
         SendSuccess: Boolean;
@@ -624,21 +628,21 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         //RecordRef.GETTABLE(PostedSalesDoc);
         //+NPR5.27 [248831]
 
-        if not GatherExportSetup(CustomerNo,DocExchPath) then
-          exit;
-        SendSuccess := ExportDocument(RecordRef,DocumentNo,DocExchPath);
+        if not GatherExportSetup(CustomerNo, DocExchPath) then
+            exit;
+        SendSuccess := ExportDocument(RecordRef, DocumentNo, DocExchPath);
         if SendSuccess then
-          LogActivitySucceeded(RecordRef.RecordId,SendDocTxt,DocSendSuccessMsg)
+            LogActivitySucceeded(RecordRef.RecordId, SendDocTxt, DocSendSuccessMsg)
         else
-          LogActivityFailed(RecordRef.RecordId,SendDocTxt,'');
+            LogActivityFailed(RecordRef.RecordId, SendDocTxt, '');
 
         //-NPR5.27 [248831]
         //UpdateSalesDoc(PostedSalesDoc,DocExchPath,SendSuccess,CalledFrom);
-        UpdateSalesDoc(RecordRef,DocExchPath,SendSuccess,CalledFrom);
+        UpdateSalesDoc(RecordRef, DocExchPath, SendSuccess, CalledFrom);
         //+NPR5.27 [248831]
     end;
 
-    local procedure GatherExportSetup(CustomerNo: Code[20];var DocExchPath: Record "Doc. Exchange Path"): Boolean
+    local procedure GatherExportSetup(CustomerNo: Code[20]; var DocExchPath: Record "Doc. Exchange Path"): Boolean
     var
         DocExchSetup: Record "Doc. Exch. Setup";
     begin
@@ -647,28 +651,28 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         //IF NOT DocExchSetup.GET() OR NOT DocExchSetup."File Export Enabled" THEN
         //  EXIT(FALSE);
         if not DocExchSetup.Get() then
-          exit(false);
-        if (not DocExchSetup."File Export Enabled") and (not DocExchSetup."FTP Export Enabled") then
-          exit(false);
-        //+NPR5.33 [266527]
-        if not DocExchPath.Get(DocExchPath.Direction::Export,DocExchPath.Type::Customer,CustomerNo) then
-          if not DocExchPath.Get(DocExchPath.Direction::Export,DocExchPath.Type::All,'') then
             exit(false);
+        if (not DocExchSetup."File Export Enabled") and (not DocExchSetup."FTP Export Enabled") then
+            exit(false);
+        //+NPR5.33 [266527]
+        if not DocExchPath.Get(DocExchPath.Direction::Export, DocExchPath.Type::Customer, CustomerNo) then
+            if not DocExchPath.Get(DocExchPath.Direction::Export, DocExchPath.Type::All, '') then
+                exit(false);
 
         if not DocExchPath.Enabled and (DocExchPath."Electronic Format Code" = '') then
-          exit(false);
+            exit(false);
 
         if (DocExchPath.Path = '') and (DocExchPath."Archive Path" = '') then
-          //-NPR5.33 [266527]
-          if  (not DocExchPath."Use Export FTP Settings") then
-          //+NPR5.33 [266527]
-            exit(false);
+            //-NPR5.33 [266527]
+            if (not DocExchPath."Use Export FTP Settings") then
+                //+NPR5.33 [266527]
+                exit(false);
 
         exit(true);
     end;
 
     [TryFunction]
-    local procedure ExportDocument(var RecordRef: RecordRef;DocumentNo: Code[20];var DocExchPath: Record "Doc. Exchange Path")
+    local procedure ExportDocument(var RecordRef: RecordRef; DocumentNo: Code[20]; var DocExchPath: Record "Doc. Exchange Path")
     var
         ServerFilePath: Text;
         ClientFileName: Text;
@@ -678,10 +682,10 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         //Parameter RecordRef is now called by reference
         //+NPR5.27 [248831]
         if DocExchPath.Path <> '' then
-          DocExchPath.Path := StrSubstNo('%1\%2.xml',DelChr(DocExchPath.Path,'>','\'),DocumentNo);
+            DocExchPath.Path := StrSubstNo('%1\%2.xml', DelChr(DocExchPath.Path, '>', '\'), DocumentNo);
         if DocExchPath."Archive Path" <> '' then
-          DocExchPath."Archive Path" := StrSubstNo('%1\%2.xml',DelChr(DocExchPath."Archive Path",'>','\'),DocumentNo);
-        
+            DocExchPath."Archive Path" := StrSubstNo('%1\%2.xml', DelChr(DocExchPath."Archive Path", '>', '\'), DocumentNo);
+
         //-NPR5.27 [248831]
         /*
         SpecificRecordRef.GET(RecordRef.RECORDID);
@@ -689,35 +693,35 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         
         ProcessDocumentElectronically(ServerFilePath,ClientFileName,SpecificRecordRef,DocExchPath);
         */
-        ProcessDocumentElectronically(ServerFilePath,ClientFileName,RecordRef,DocExchPath);
+        ProcessDocumentElectronically(ServerFilePath, ClientFileName, RecordRef, DocExchPath);
         //+NPR5.27 [248831]
-        
+
         if ServerFilePath <> '' then begin
-          FolderStructureDelimiter := '\';
-          //-NPR5.33 [266527]
-          //IF DocExchPath.Path <> '' THEN
-          //  ExportFile(ServerFilePath,DocExchPath.Path);
-          //IF DocExchPath."Archive Path" <> '' THEN
-          //  ExportFile(ServerFilePath,DocExchPath."Archive Path");
-          if DocExchPath."Use Export FTP Settings" then begin
-            ExportFTPUsingSetup(ServerFilePath,DocumentNo);
-          end;
-          if DocExchPath.Path <> '' then
-            ExportFile(ServerFilePath,DocExchPath.Path,DocExchPath."Export Locally");
-          if DocExchPath."Archive Path" <> '' then
-            ExportFile(ServerFilePath,DocExchPath."Archive Path",DocExchPath."Export Locally");
-          //+NPR5.33 [266527]
+            FolderStructureDelimiter := '\';
+            //-NPR5.33 [266527]
+            //IF DocExchPath.Path <> '' THEN
+            //  ExportFile(ServerFilePath,DocExchPath.Path);
+            //IF DocExchPath."Archive Path" <> '' THEN
+            //  ExportFile(ServerFilePath,DocExchPath."Archive Path");
+            if DocExchPath."Use Export FTP Settings" then begin
+                ExportFTPUsingSetup(ServerFilePath, DocumentNo);
+            end;
+            if DocExchPath.Path <> '' then
+                ExportFile(ServerFilePath, DocExchPath.Path, DocExchPath."Export Locally");
+            if DocExchPath."Archive Path" <> '' then
+                ExportFile(ServerFilePath, DocExchPath."Archive Path", DocExchPath."Export Locally");
+            //+NPR5.33 [266527]
         end;
 
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure ProcessDocumentElectronically(var ServerFilePath: Text;var ClientFileName: Text;var RecordRef: RecordRef;DocExchPath: Record "Doc. Exchange Path")
+    local procedure ProcessDocumentElectronically(var ServerFilePath: Text; var ClientFileName: Text; var RecordRef: RecordRef; DocExchPath: Record "Doc. Exchange Path")
     begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059932, 'ProcessDocumentElectronically', '', false, false)]
-    local procedure SendW1DocFormats(var ServerFilePath: Text;var ClientFileName: Text;var RecordRef: RecordRef;DocExchPath: Record "Doc. Exchange Path")
+    local procedure SendW1DocFormats(var ServerFilePath: Text; var ClientFileName: Text; var RecordRef: RecordRef; DocExchPath: Record "Doc. Exchange Path")
     var
         ElectronicDocumentFormat: Record "Electronic Document Format";
         SpecificRecordRef: RecordRef;
@@ -725,19 +729,19 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         //-NPR5.27 [248831]
         //IF NOT DocExchPath."Localization Format Code" THEN
         if not DocExchPath."Localization Format Code" then begin
-          SpecificRecordRef.Get(RecordRef.RecordId);
-          SpecificRecordRef.SetRecFilter;
-        //+NPR5.27 [248831]
+            SpecificRecordRef.Get(RecordRef.RecordId);
+            SpecificRecordRef.SetRecFilter;
+            //+NPR5.27 [248831]
 
-          ElectronicDocumentFormat.SendElectronically(
-            ServerFilePath,ClientFileName,SpecificRecordRef,DocExchPath."Electronic Format Code");
+            ElectronicDocumentFormat.SendElectronically(
+              ServerFilePath, ClientFileName, SpecificRecordRef, DocExchPath."Electronic Format Code");
 
-        //-NPR5.27 [248831]
+            //-NPR5.27 [248831]
         end;
         //+NPR5.27 [248831]
     end;
 
-    local procedure ExportFile(SourceFile: Text;var DestinationFile: Text;LocalExport: Boolean)
+    local procedure ExportFile(SourceFile: Text; var DestinationFile: Text; LocalExport: Boolean)
     var
         FileMgt: Codeunit "File Management";
         DirectoryDoesntExist: Label 'Path %1 doesn''t exist on server or client.';
@@ -767,25 +771,25 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         // END;
 
         if LocalExport then begin
-          if FileMgt.ServerDirectoryExists(DirectoryPath) then begin
-            if FileMgt.ServerFileExists(DestinationFile) then
-              DestinationFile := AddSuffixToFileName(DestinationFile);
-            FileMgt.CopyServerFile(SourceFile,DestinationFile,false);
-            exit;
-          end;
+            if FileMgt.ServerDirectoryExists(DirectoryPath) then begin
+                if FileMgt.ServerFileExists(DestinationFile) then
+                    DestinationFile := AddSuffixToFileName(DestinationFile);
+                FileMgt.CopyServerFile(SourceFile, DestinationFile, false);
+                exit;
+            end;
         end else begin
-          if FileMgt.ClientDirectoryExists(DirectoryPath) then begin
-            if FileMgt.ClientFileExists(DestinationFile) then
-              DestinationFile := AddSuffixToFileName(DestinationFile);
-            FileMgt.DownloadToFile(SourceFile,DestinationFile);
-            exit;
-          end;
+            if FileMgt.ClientDirectoryExists(DirectoryPath) then begin
+                if FileMgt.ClientFileExists(DestinationFile) then
+                    DestinationFile := AddSuffixToFileName(DestinationFile);
+                FileMgt.DownloadToFile(SourceFile, DestinationFile);
+                exit;
+            end;
         end;
-        Error(DirectoryDoesntExist,DirectoryPath);
+        Error(DirectoryDoesntExist, DirectoryPath);
         //+NPR5.33 [266527]
     end;
 
-    procedure UpdateSalesDoc(var RecordRef: RecordRef;DocExchPath: Record "Doc. Exchange Path";SendSuccess: Boolean;UpdateFrom: Option SendDoc,DocList)
+    procedure UpdateSalesDoc(var RecordRef: RecordRef; DocExchPath: Record "Doc. Exchange Path"; SendSuccess: Boolean; UpdateFrom: Option SendDoc,DocList)
     var
         FieldRef: FieldRef;
         SalesInvHeader: Record "Sales Invoice Header";
@@ -793,7 +797,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         FileMgt: Codeunit "File Management";
     begin
         //-NPR5.27 [248831]
-        
+
         //Changed first parameter to RecordRef from Variant and second from Variant to Doc. Exch. Path
         /*
         DocExchPath := DocExchPathVar;
@@ -801,74 +805,76 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         */
         //+NPR5.27 [248831]
         case RecordRef.Number of
-          DATABASE::"Sales Invoice Header":
-            begin
-        
-        //-NPR5.27 [248831]
-        //      SalesInvHeader := PostedSalesDoc;
-              RecordRef.SetTable(SalesInvHeader);
-        //+NPR5.27 [248831]
-        
-              case UpdateFrom of
-                UpdateFrom::SendDoc:
-                  begin
-                    SalesInvHeader."Doc. Exch. Exported" := SendSuccess;
-                    SalesInvHeader."Doc. Exch. Setup Path Used" := DocExchPath.RecordId;
-                    SalesInvHeader."Doc. Exch. Exported to" := DocExchPath.Path;
-                    SalesInvHeader."Doc. Exch. File Exists" := SendSuccess;
-                    if SendSuccess then
-                      SalesInvHeader."Doc. Exch. Framework Status" := SalesInvHeader."Doc. Exch. Framework Status"::"Exported to Folder"
-                    else
-                      SalesInvHeader."Doc. Exch. Framework Status" := SalesInvHeader."Doc. Exch. Framework Status"::"File Validation Error";
-                  end;
-                UpdateFrom::DocList:
-                  begin
-                    SalesInvHeader."Doc. Exch. File Exists" := Exists(SalesInvHeader."Doc. Exch. Exported to");
-                    if not SalesInvHeader."Doc. Exch. File Exists" then //file has been picked up by the receipient
-                      SalesInvHeader."Doc. Exch. Framework Status" := SalesInvHeader."Doc. Exch. Framework Status"::"Delivered to Recepient"
-                    else if DelChr(DocExchPath.Path,'>','\') <> DelChr(FileMgt.GetDirectoryName(SalesInvHeader."Doc. Exch. Exported to"),'>','\') then
-                      SalesInvHeader."Doc. Exch. Framework Status" := SalesInvHeader."Doc. Exch. Framework Status"::"Setup Changed";
-                  end;
-              end;
-              SalesInvHeader.Modify;
-        
-        //-NPR5.27 [248831]
-        //      PostedSalesDoc := SalesInvHeader;
-              RecordRef.GetTable(SalesInvHeader);
-        //+NPR5.27 [248831]
-        
-            end;
-        
-        //-NPR5.33 [266527]
-          DATABASE::"Sales Cr.Memo Header":
-            begin
-              RecordRef.SetTable(SalesCrMemoHeader);
-              case UpdateFrom of
-                UpdateFrom::SendDoc:
-                  begin
-                    SalesCrMemoHeader."Doc. Exch. Exported" := SendSuccess;
-                    SalesCrMemoHeader."Doc. Exch. Setup Path Used" := DocExchPath.RecordId;
-                    SalesCrMemoHeader."Doc. Exch. Exported to" := DocExchPath.Path;
-                    SalesCrMemoHeader."Doc. Exch. File Exists" := SendSuccess;
-                    if SendSuccess then
-                      SalesInvHeader."Doc. Exch. Framework Status" := SalesCrMemoHeader."Doc. Exch. Framework Status"::"Exported to Folder"
-                    else
-                      SalesInvHeader."Doc. Exch. Framework Status" := SalesCrMemoHeader."Doc. Exch. Framework Status"::"File Validation Error";
-                  end;
-                UpdateFrom::DocList:
-                  begin
-                    SalesCrMemoHeader."Doc. Exch. File Exists" := Exists(SalesCrMemoHeader."Doc. Exch. Exported to");
-                    if not SalesCrMemoHeader."Doc. Exch. File Exists" then //file has been picked up by the receipient
-                      SalesCrMemoHeader."Doc. Exch. Framework Status" := SalesCrMemoHeader."Doc. Exch. Framework Status"::"Delivered to Recepient"
-                    else if DelChr(DocExchPath.Path,'>','\') <> DelChr(FileMgt.GetDirectoryName(SalesCrMemoHeader."Doc. Exch. Exported to"),'>','\') then
-                      SalesCrMemoHeader."Doc. Exch. Framework Status" := SalesCrMemoHeader."Doc. Exch. Framework Status"::"Setup Changed";
-                  end;
-              end;
-              SalesCrMemoHeader.Modify;
-              RecordRef.GetTable(SalesCrMemoHeader);
-            end;
-        //+NPR5.33 [266527]
-        
+            DATABASE::"Sales Invoice Header":
+                begin
+
+                    //-NPR5.27 [248831]
+                    //      SalesInvHeader := PostedSalesDoc;
+                    RecordRef.SetTable(SalesInvHeader);
+                    //+NPR5.27 [248831]
+
+                    case UpdateFrom of
+                        UpdateFrom::SendDoc:
+                            begin
+                                SalesInvHeader."Doc. Exch. Exported" := SendSuccess;
+                                SalesInvHeader."Doc. Exch. Setup Path Used" := DocExchPath.RecordId;
+                                SalesInvHeader."Doc. Exch. Exported to" := DocExchPath.Path;
+                                SalesInvHeader."Doc. Exch. File Exists" := SendSuccess;
+                                if SendSuccess then
+                                    SalesInvHeader."Doc. Exch. Framework Status" := SalesInvHeader."Doc. Exch. Framework Status"::"Exported to Folder"
+                                else
+                                    SalesInvHeader."Doc. Exch. Framework Status" := SalesInvHeader."Doc. Exch. Framework Status"::"File Validation Error";
+                            end;
+                        UpdateFrom::DocList:
+                            begin
+                                SalesInvHeader."Doc. Exch. File Exists" := Exists(SalesInvHeader."Doc. Exch. Exported to");
+                                if not SalesInvHeader."Doc. Exch. File Exists" then //file has been picked up by the receipient
+                                    SalesInvHeader."Doc. Exch. Framework Status" := SalesInvHeader."Doc. Exch. Framework Status"::"Delivered to Recepient"
+                                else
+                                    if DelChr(DocExchPath.Path, '>', '\') <> DelChr(FileMgt.GetDirectoryName(SalesInvHeader."Doc. Exch. Exported to"), '>', '\') then
+                                        SalesInvHeader."Doc. Exch. Framework Status" := SalesInvHeader."Doc. Exch. Framework Status"::"Setup Changed";
+                            end;
+                    end;
+                    SalesInvHeader.Modify;
+
+                    //-NPR5.27 [248831]
+                    //      PostedSalesDoc := SalesInvHeader;
+                    RecordRef.GetTable(SalesInvHeader);
+                    //+NPR5.27 [248831]
+
+                end;
+
+            //-NPR5.33 [266527]
+            DATABASE::"Sales Cr.Memo Header":
+                begin
+                    RecordRef.SetTable(SalesCrMemoHeader);
+                    case UpdateFrom of
+                        UpdateFrom::SendDoc:
+                            begin
+                                SalesCrMemoHeader."Doc. Exch. Exported" := SendSuccess;
+                                SalesCrMemoHeader."Doc. Exch. Setup Path Used" := DocExchPath.RecordId;
+                                SalesCrMemoHeader."Doc. Exch. Exported to" := DocExchPath.Path;
+                                SalesCrMemoHeader."Doc. Exch. File Exists" := SendSuccess;
+                                if SendSuccess then
+                                    SalesInvHeader."Doc. Exch. Framework Status" := SalesCrMemoHeader."Doc. Exch. Framework Status"::"Exported to Folder"
+                                else
+                                    SalesInvHeader."Doc. Exch. Framework Status" := SalesCrMemoHeader."Doc. Exch. Framework Status"::"File Validation Error";
+                            end;
+                        UpdateFrom::DocList:
+                            begin
+                                SalesCrMemoHeader."Doc. Exch. File Exists" := Exists(SalesCrMemoHeader."Doc. Exch. Exported to");
+                                if not SalesCrMemoHeader."Doc. Exch. File Exists" then //file has been picked up by the receipient
+                                    SalesCrMemoHeader."Doc. Exch. Framework Status" := SalesCrMemoHeader."Doc. Exch. Framework Status"::"Delivered to Recepient"
+                                else
+                                    if DelChr(DocExchPath.Path, '>', '\') <> DelChr(FileMgt.GetDirectoryName(SalesCrMemoHeader."Doc. Exch. Exported to"), '>', '\') then
+                                        SalesCrMemoHeader."Doc. Exch. Framework Status" := SalesCrMemoHeader."Doc. Exch. Framework Status"::"Setup Changed";
+                            end;
+                    end;
+                    SalesCrMemoHeader.Modify;
+                    RecordRef.GetTable(SalesCrMemoHeader);
+                end;
+                //+NPR5.33 [266527]
+
         end;
 
     end;
@@ -876,40 +882,40 @@ codeunit 6059932 "Doc. Exch. File Mgt."
     local procedure CheckFolderPath(FolderPath: Text): Text[250]
     begin
         if FolderPath <> '' then
-          if CopyStr(FolderPath,StrLen(FolderPath),1) <> FolderStructureDelimiter then
-            FolderPath := FolderPath + FolderStructureDelimiter;
+            if CopyStr(FolderPath, StrLen(FolderPath), 1) <> FolderStructureDelimiter then
+                FolderPath := FolderPath + FolderStructureDelimiter;
         exit(FolderPath);
     end;
 
-    local procedure SearchForFolder(var IsLocal: Boolean;FolderPath: Text) FolderExists: Boolean
+    local procedure SearchForFolder(var IsLocal: Boolean; FolderPath: Text) FolderExists: Boolean
     begin
         if IsLocal then
-          FolderExists := FileMgt.ClientDirectoryExists(FolderPath)
+            FolderExists := FileMgt.ClientDirectoryExists(FolderPath)
         else begin
-        //if its not local it can be that parameter is indeed set to point to server folder or parameter is not set so we need to check local side as well
-          FolderExists := FileMgt.ServerDirectoryExists(FolderPath);
-          if not FolderExists then begin
-            FolderExists := FileMgt.ClientDirectoryExists(FolderPath);
-            IsLocal := FolderExists;
-          end;
+            //if its not local it can be that parameter is indeed set to point to server folder or parameter is not set so we need to check local side as well
+            FolderExists := FileMgt.ServerDirectoryExists(FolderPath);
+            if not FolderExists then begin
+                FolderExists := FileMgt.ClientDirectoryExists(FolderPath);
+                IsLocal := FolderExists;
+            end;
         end;
         exit(FolderExists);
     end;
 
-    local procedure ProcessFile(FilePath: Text;CreateDocument: Boolean)
+    local procedure ProcessFile(FilePath: Text; CreateDocument: Boolean)
     var
         TempBlob: Record TempBlob;
         IncomingDocumentAttachment: Record "Incoming Document Attachment";
         ImportAttachIncDoc: Codeunit "Import Attachment - Inc. Doc.";
         IncomingDocument: Record "Incoming Document";
     begin
-        FileMgt.BLOBImportFromServerFile(TempBlob,FilePath);
+        FileMgt.BLOBImportFromServerFile(TempBlob, FilePath);
         IncomingDocumentAttachment.Content := TempBlob.Blob;
-        if ImportAttachIncDoc.ImportAttachment(IncomingDocumentAttachment,FilePath) then begin
-          if CreateDocument then begin
-            IncomingDocument.Get(IncomingDocumentAttachment."Incoming Document Entry No.");
-            IncomingDocument.CreateDocumentWithDataExchange();
-          end;
+        if ImportAttachIncDoc.ImportAttachment(IncomingDocumentAttachment, FilePath) then begin
+            if CreateDocument then begin
+                IncomingDocument.Get(IncomingDocumentAttachment."Incoming Document Entry No.");
+                IncomingDocument.CreateDocumentWithDataExchange();
+            end;
         end;
     end;
 
@@ -918,29 +924,29 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         Error(ErrorMsg);
     end;
 
-    local procedure PrepareFile(var ServerFilePath: Text;IsLocal: Boolean;FilePath: Text)
+    local procedure PrepareFile(var ServerFilePath: Text; IsLocal: Boolean; FilePath: Text)
     var
         TempServerPath: Text;
     begin
         if IsLocal then begin
-          TempServerPath := FileMgt.UploadFileSilent(FilePath);
-          ServerFilePath := FileMgt.GetDirectoryName(TempServerPath) + FolderStructureDelimiter + FileMgt.GetFileName(FilePath);
-          FileMgt.CopyServerFile(TempServerPath,ServerFilePath,true);
-          FileMgt.DeleteServerFile(TempServerPath);
+            TempServerPath := FileMgt.UploadFileSilent(FilePath);
+            ServerFilePath := FileMgt.GetDirectoryName(TempServerPath) + FolderStructureDelimiter + FileMgt.GetFileName(FilePath);
+            FileMgt.CopyServerFile(TempServerPath, ServerFilePath, true);
+            FileMgt.DeleteServerFile(TempServerPath);
         end else
-          ServerFilePath := FilePath;
+            ServerFilePath := FilePath;
     end;
 
-    local procedure ArchiveFile(SourcePath: Text;DestinationPath: Text;IsLocal: Boolean)
+    local procedure ArchiveFile(SourcePath: Text; DestinationPath: Text; IsLocal: Boolean)
     begin
         if IsLocal then begin
-          if FileMgt.ClientFileExists(DestinationPath) then
-            DestinationPath := AddSuffixToFileName(DestinationPath);
-          FileMgt.DownloadToFile(SourcePath,DestinationPath)
+            if FileMgt.ClientFileExists(DestinationPath) then
+                DestinationPath := AddSuffixToFileName(DestinationPath);
+            FileMgt.DownloadToFile(SourcePath, DestinationPath)
         end else begin
-          if FileMgt.ServerFileExists(DestinationPath) then
-            DestinationPath := AddSuffixToFileName(DestinationPath);
-          FileMgt.CopyServerFile(SourcePath,DestinationPath,false);
+            if FileMgt.ServerFileExists(DestinationPath) then
+                DestinationPath := AddSuffixToFileName(DestinationPath);
+            FileMgt.CopyServerFile(SourcePath, DestinationPath, false);
         end;
     end;
 
@@ -949,17 +955,17 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         Suffix: Text;
     begin
         //using datetime in a custom format that suits file naming
-        Suffix := Format(CurrentDateTime,0,'<Year4><Month,2><Day,2>-<Hours24,2><Minutes,2><Seconds,2>');
+        Suffix := Format(CurrentDateTime, 0, '<Year4><Month,2><Day,2>-<Hours24,2><Minutes,2><Seconds,2>');
         exit(FileMgt.GetDirectoryName(FilePath) +
              FolderStructureDelimiter + FileMgt.GetFileNameWithoutExtension(FilePath) + ' ' +
              Suffix + '.' + FileMgt.GetExtension(FilePath));
     end;
 
-    local procedure CleanupFile(ServerFilePath: Text;IsLocal: Boolean;ClientFilePath: Text)
+    local procedure CleanupFile(ServerFilePath: Text; IsLocal: Boolean; ClientFilePath: Text)
     begin
         FileMgt.DeleteServerFile(ServerFilePath);
         if IsLocal then
-          FileMgt.DeleteClientFile(ClientFilePath);
+            FileMgt.DeleteClientFile(ClientFilePath);
     end;
 
     procedure ShowWithStylesheet(var XmlDoc: DotNet npNetXmlDocument)
@@ -972,29 +978,29 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         XmlWriter: DotNet npNetXmlWriter;
     begin
         if IsNull(XmlStyleSheet) then begin
-          XmlStyleSheet := XmlStyleSheet.XmlDocument;
-          XmlStyleSheet.LoadXml('<?xml version="1.0" encoding="UTF-8"?>' +
-                                '<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">' +
-                                  '<xsl:output method="xml" encoding="UTF-8" />' +
-                                  '<xsl:template match="/">' +
-                                    '<xsl:copy>' +
-                                      '<xsl:apply-templates />' +
-                                    '</xsl:copy>' +
-                                  '</xsl:template>' +
-                                  '<xsl:template match="*">' +
-                                    '<xsl:element name="{local-name()}">' +
-                                       '<xsl:apply-templates select="@* | node()" />' +
-                                    '</xsl:element>' +
-                                  '</xsl:template>' +
-                                  '<xsl:template match="@*">' +
-                                    '<xsl:attribute name="{local-name()}"><xsl:value-of select="."/></xsl:attribute>' +
-                                  '</xsl:template>' +
-                                  '<xsl:template match="text() | processing-instruction() | comment()">' +
-                                    '<xsl:copy />' +
-                                  '</xsl:template>' +
-                                '</xsl:stylesheet>');
-          XslCompiledTransform := XslCompiledTransform.XslCompiledTransform;
-          XslCompiledTransform.Load(XmlStyleSheet);
+            XmlStyleSheet := XmlStyleSheet.XmlDocument;
+            XmlStyleSheet.LoadXml('<?xml version="1.0" encoding="UTF-8"?>' +
+                                  '<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">' +
+                                    '<xsl:output method="xml" encoding="UTF-8" />' +
+                                    '<xsl:template match="/">' +
+                                      '<xsl:copy>' +
+                                        '<xsl:apply-templates />' +
+                                      '</xsl:copy>' +
+                                    '</xsl:template>' +
+                                    '<xsl:template match="*">' +
+                                      '<xsl:element name="{local-name()}">' +
+                                         '<xsl:apply-templates select="@* | node()" />' +
+                                      '</xsl:element>' +
+                                    '</xsl:template>' +
+                                    '<xsl:template match="@*">' +
+                                      '<xsl:attribute name="{local-name()}"><xsl:value-of select="."/></xsl:attribute>' +
+                                    '</xsl:template>' +
+                                    '<xsl:template match="text() | processing-instruction() | comment()">' +
+                                      '<xsl:copy />' +
+                                    '</xsl:template>' +
+                                  '</xsl:stylesheet>');
+            XslCompiledTransform := XslCompiledTransform.XslCompiledTransform;
+            XslCompiledTransform.Load(XmlStyleSheet);
         end;
         MemoryStream := MemoryStream.MemoryStream;
         XmlDoc.Save(MemoryStream);
@@ -1003,7 +1009,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
 
         MemoryStream2 := MemoryStream2.MemoryStream;
         XmlWriter := XmlWriter.Create(MemoryStream2);
-        XslCompiledTransform.Transform(XmlReader,XmlWriter);
+        XslCompiledTransform.Transform(XmlReader, XmlWriter);
         MemoryStream2.Position := 0;
 
         Clear(XmlDoc);
@@ -1011,23 +1017,23 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         XmlDoc.Load(MemoryStream2);
     end;
 
-    local procedure LogActivitySucceeded(RelatedRecordID: RecordID;ActivityDescription: Text;ActivityMessage: Text)
+    local procedure LogActivitySucceeded(RelatedRecordID: RecordID; ActivityDescription: Text; ActivityMessage: Text)
     var
         ActivityLog: Record "Activity Log";
     begin
-        ActivityLog.LogActivity(RelatedRecordID,ActivityLog.Status::Success,LoggingConstTxt,
-          CopyStr(ActivityDescription,1,250),CopyStr(ActivityMessage,1,250));
+        ActivityLog.LogActivity(RelatedRecordID, ActivityLog.Status::Success, LoggingConstTxt,
+          CopyStr(ActivityDescription, 1, 250), CopyStr(ActivityMessage, 1, 250));
     end;
 
-    local procedure LogActivityFailed(RelatedRecordID: RecordID;ActivityDescription: Text;ActivityMessage: Text)
+    local procedure LogActivityFailed(RelatedRecordID: RecordID; ActivityDescription: Text; ActivityMessage: Text)
     var
         ActivityLog: Record "Activity Log";
     begin
         ActivityMessage := GetLastErrorText + ' ' + ActivityMessage;
         ClearLastError;
 
-        ActivityLog.LogActivity(RelatedRecordID,ActivityLog.Status::Failed,LoggingConstTxt,
-          CopyStr(ActivityDescription,1,250),CopyStr(ActivityMessage,1,250));
+        ActivityLog.LogActivity(RelatedRecordID, ActivityLog.Status::Failed, LoggingConstTxt,
+          CopyStr(ActivityDescription, 1, 250), CopyStr(ActivityMessage, 1, 250));
 
         //COMMIT;
 
@@ -1035,7 +1041,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         //  ERROR(ActivityMessage);
     end;
 
-    procedure ExportFTPUsingSetup(ServerFilePath: Text;DocumentNo: Text)
+    procedure ExportFTPUsingSetup(ServerFilePath: Text; DocumentNo: Text)
     var
         FTPServer: Text;
         FTPUsername: Text;
@@ -1050,7 +1056,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         //-NPR5.33 [266527]
         DocExchSetup.Get;
         if not DocExchSetup."FTP Export Enabled" then
-          exit;
+            exit;
         FTPServer := DocExchSetup."Export FTP Server";
         FTPUsername := DocExchSetup."Export FTP Username";
         FTPPassword := DocExchSetup."Export FTP Password";
@@ -1060,15 +1066,15 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         FTPUsePassive := DocExchSetup."Export FTP Using Passive";
 
         if FTPServer = '' then
-          exit;
-        if UpperCase(CopyStr(FTPServer,1,4)) <> 'FTP://' then
-          FTPServer := 'FTP://' + FTPServer;
+            exit;
+        if UpperCase(CopyStr(FTPServer, 1, 4)) <> 'FTP://' then
+            FTPServer := 'FTP://' + FTPServer;
         Sleep(1000);
-        ExportFTPFile(FTPServer,FTPUsername,FTPPassword,FTPFolder,FTPFileName,FTPUsePassive,ServerFilePath);
+        ExportFTPFile(FTPServer, FTPUsername, FTPPassword, FTPFolder, FTPFileName, FTPUsePassive, ServerFilePath);
         //+NPR5.33 [266527]
     end;
 
-    local procedure ExportFTPFile(FTPserver: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFilename: Text;FTPUsePassive: Boolean;ServerFilePath: Text)
+    local procedure ExportFTPFile(FTPserver: Text; FTPUsername: Text; FTPPassword: Text; FTPFolder: Text; FTPFilename: Text; FTPUsePassive: Boolean; ServerFilePath: Text)
     var
         FtpWebRequest: DotNet npNetFtpWebRequest;
         FtpWebResponse: DotNet npNetFtpWebResponse;
@@ -1088,15 +1094,15 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         //-NPR5.33 [266527]
 
         //Upload file
-        InitFTPWebRequest(FtpWebRequest,'STOR',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFilename,FTPUsePassive);
-        FileMgt.BLOBImportFromServerFile(TempBlob,ServerFilePath);
-        TempBlob.Blob.CreateInStream(IStream,TEXTENCODING::UTF8);
+        InitFTPWebRequest(FtpWebRequest, 'STOR', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive);
+        FileMgt.BLOBImportFromServerFile(TempBlob, ServerFilePath);
+        TempBlob.Blob.CreateInStream(IStream, TEXTENCODING::UTF8);
         IStream.Read(FileText);
         Clear(IStream);
         UTF8Encoding := UTF8Encoding.UTF8;
         FtpWebRequest.ContentLength := UTF8Encoding.GetBytes(FileText).Length;
         Stream := FtpWebRequest.GetRequestStream;
-        Stream.Write(UTF8Encoding.GetBytes(FileText),0,FtpWebRequest.ContentLength);
+        Stream.Write(UTF8Encoding.GetBytes(FileText), 0, FtpWebRequest.ContentLength);
         Stream.Close;
         FtpWebResponse := FtpWebRequest.GetResponse;
         FtpWebResponse.Close;

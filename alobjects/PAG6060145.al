@@ -11,13 +11,6 @@ page 6060145 "MM Member Info Capture Camera"
         {
             usercontrol(Camera;"NaviPartner.POS.Camera")
             {
-
-                trigger ControlAddInReady()
-                begin
-                    if Txt <> '' then
-                      CurrPage.Camera.LoadPhoto(Txt);
-                end;
-
                 trigger SaveCompleted(HTML: Text)
                 var
                     OutS: OutStream;

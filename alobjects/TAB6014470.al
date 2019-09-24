@@ -59,7 +59,7 @@ table 6014470 "Pacsoft Shipment Doc. Services"
         {
             Caption = 'Account Type';
             Enabled = false;
-            ValuesAllowed = ACCDK,BG,PG,KONTO;
+            ValuesAllowed = 'ACCDK','BG','PG','KONTO';
         }
     }
 

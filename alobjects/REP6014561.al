@@ -6,7 +6,7 @@ report 6014561 "Gift Voucher A5"
     // NPR5.38/JLK /20180125  CASE 303595 Added ENU object caption
     // NPR5.40/JLK /20180307  CASE 307438 Removed unused Audit Roll variable
     DefaultLayout = RDLC;
-    RDLCLayout = './Gift Voucher A5.rdlc';
+    RDLCLayout = './layouts/Gift Voucher A5.rdlc';
 
     Caption = 'Gift Voucher A5';
 

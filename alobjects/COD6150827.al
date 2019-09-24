@@ -17,49 +17,49 @@ codeunit 6150827 "POS Action - Item Card"
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
+            if DiscoverAction(
+              ActionCode(),
+              ActionDescription,
+              ActionVersion(),
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
 
-            RegisterWorkflow(false);
-            RegisterBooleanParameter('RefreshLine',true);
-            RegisterBooleanParameter('PageEditable',true);
-            //-NPR5.38 [289390]
-            RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
-            //+NPR5.38 [289390]
-          end;
+                RegisterWorkflow(false);
+                RegisterBooleanParameter('RefreshLine', true);
+                RegisterBooleanParameter('PageEditable', true);
+                //-NPR5.38 [289390]
+                RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
+                //+NPR5.38 [289390]
+            end;
     end;
 
     local procedure ActionCode(): Text
     begin
 
-        exit ('ITEMCARD');
+        exit('ITEMCARD');
     end;
 
     local procedure ActionVersion(): Text
     begin
 
-        exit ('1.2');
+        exit('1.2');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         Confirmed: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        OpenItemPage (Context, POSSession, FrontEnd);
+        OpenItemPage(Context, POSSession, FrontEnd);
         Handled := true;
     end;
 
-    local procedure OpenItemPage(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OpenItemPage(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         POSSaleLine: Codeunit "POS Sale Line";
@@ -71,24 +71,24 @@ codeunit 6150827 "POS Action - Item Card"
         ViewType: DotNet npNetViewType0;
         RetailItemCard: Page "Retail Item Card";
     begin
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        POSSession.GetCurrentView (CurrentView);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        POSSession.GetCurrentView(CurrentView);
 
-        if (CurrentView.Type.Equals (ViewType.Sale)) then begin
-          POSSession.GetSaleLine(POSSaleLine);
-          POSSaleLine.GetCurrentSaleLine(LinePOS);
-          if LinePOS.Type = LinePOS.Type::Item then begin
-            if Item.Get(LinePOS."No.") then begin
-              Item.SetRecFilter;
-              RetailItemCard.Editable(JSON.GetBooleanParameter ('PageEditable',false) );
-              RetailItemCard.SetRecord(Item);
-              RetailItemCard.RunModal;
-              if JSON.GetBooleanParameter ('RefreshLine',false) then begin
-                LinePOS.Validate("No.");
-                LinePOS.Modify(true);
-              end;
+        if (CurrentView.Type.Equals(ViewType.Sale)) then begin
+            POSSession.GetSaleLine(POSSaleLine);
+            POSSaleLine.GetCurrentSaleLine(LinePOS);
+            if LinePOS.Type = LinePOS.Type::Item then begin
+                if Item.Get(LinePOS."No.") then begin
+                    Item.SetRecFilter;
+                    RetailItemCard.Editable(JSON.GetBooleanParameter('PageEditable', false));
+                    RetailItemCard.SetRecord(Item);
+                    RetailItemCard.RunModal;
+                    if JSON.GetBooleanParameter('RefreshLine', false) then begin
+                        LinePOS.Validate("No.");
+                        LinePOS.Modify(true);
+                    end;
+                end;
             end;
-          end;
         end;
 
         POSSession.RequestRefreshData();

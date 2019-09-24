@@ -29,58 +29,60 @@ codeunit 6150789 "POS Action - Print Item"
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Type::Button,
-            "Subscriber Instances Allowed"::Multiple)
-          then begin
-            RegisterWorkflowStep('1', 'if (param.LineSetting == param.LineSetting["Selected Line"]) { intpad({ title: labels.title, caption: labels.caption, value: 1, notBlank: true}, "value").respond() } else { respond() };');
-            RegisterWorkflow(false);
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Type::Button,
+              "Subscriber Instances Allowed"::Multiple)
+            then begin
+                RegisterWorkflowStep('1', 'if (param.LineSetting == param.LineSetting["Selected Line"]) { intpad({ title: labels.title, caption: labels.caption, value: 1, notBlank: true}, "value").respond() } else { respond() };');
+                RegisterWorkflow(false);
 
-            RegisterOptionParameter('LineSetting','All Lines,Selected Line','Selected Line');
-            RegisterOptionParameter('PrintType','Price,Shelf,Sign','Price');
+                RegisterOptionParameter('LineSetting', 'All Lines,Selected Line', 'Selected Line');
+                RegisterOptionParameter('PrintType', 'Price,Shelf,Sign', 'Price');
 
-            //-NPR5.34 [282999]
-            RegisterDataBinding();
-            //+NPR5.34 [282999]
+                //-NPR5.34 [282999]
+                RegisterDataBinding();
+                //+NPR5.34 [282999]
 
-          end;
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "POS Caption Management")
     begin
-        Captions.AddActionCaption (ActionCode, 'title', Title);
-        Captions.AddActionCaption (ActionCode, 'caption', PrintQuantity);
+        Captions.AddActionCaption(ActionCode, 'title', Title);
+        Captions.AddActionCaption(ActionCode, 'caption', PrintQuantity);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         LineSetting: Option "All Lines","Selected Line";
         PrintType: Integer;
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        JSON.SetScope('parameters',true);
+        JSON.SetScope('parameters', true);
         LineSetting := JSON.GetInteger('LineSetting', true);
         PrintType := JSON.GetInteger('PrintType', true);
 
         case LineSetting of
-          LineSetting::"All Lines" : PrintAllLines(POSSession, FrontEnd, PrintType);
-          LineSetting::"Selected Line" : PrintSelectedLine(Context, POSSession, FrontEnd, PrintType);
+            LineSetting::"All Lines":
+                PrintAllLines(POSSession, FrontEnd, PrintType);
+            LineSetting::"Selected Line":
+                PrintSelectedLine(Context, POSSession, FrontEnd, PrintType);
         end;
 
         Handled := true;
     end;
 
-    local procedure PrintAllLines(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";PrintType: Integer)
+    local procedure PrintAllLines(POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; PrintType: Integer)
     var
         SaleLinePOS: Record "Sale Line POS";
         SaleLinePOS2: Record "Sale Line POS";
@@ -95,30 +97,31 @@ codeunit 6150789 "POS Action - Print Item"
         GUID := CreateGuid();
 
         with SaleLinePOS2 do begin
-          SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-          SetRange(Type, SaleLinePOS2.Type::Item);
+            SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+            SetRange(Type, SaleLinePOS2.Type::Item);
 
-          if FindSet then repeat
-            //-NPR5.37 [289725]
-            //-NPR5.46 [330714]
-            // LabelLibrary.ItemToRetailJnlLine("No.", "Variant Code", Quantity, GUID, RetailJnlLine);
-            LabelLibrary.ItemToRetailJnlLine("No.","Variant Code",Abs(Quantity),GUID,RetailJnlLine);
-            //+NPR5.46 [330714]
-            //SaleLineToRJL(GUID, RetailJnlLine, SaleLinePOS2);
-            //+NPR5.37 [289725]
-          until Next = 0;
+            if FindSet then
+                repeat
+                    //-NPR5.37 [289725]
+                    //-NPR5.46 [330714]
+                    // LabelLibrary.ItemToRetailJnlLine("No.", "Variant Code", Quantity, GUID, RetailJnlLine);
+                    LabelLibrary.ItemToRetailJnlLine("No.", "Variant Code", Abs(Quantity), GUID, RetailJnlLine);
+                    //+NPR5.46 [330714]
+                    //SaleLineToRJL(GUID, RetailJnlLine, SaleLinePOS2);
+                    //+NPR5.37 [289725]
+                until Next = 0;
         end;
 
         RetailJnlLine.SetRange("No.", GUID);
         if not RetailJnlLine.FindSet then
-          exit;
+            exit;
 
         PrintRJL(RetailJnlLine, PrintType);
 
         RetailJnlLine.DeleteAll;
     end;
 
-    local procedure PrintSelectedLine(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";PrintType: Integer)
+    local procedure PrintSelectedLine(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; PrintType: Integer)
     var
         GUID: Guid;
         JSON: Codeunit "POS JSON Management";
@@ -128,7 +131,7 @@ codeunit 6150789 "POS Action - Print Item"
         RetailJnlLine: Record "Retail Journal Line";
         LabelLibrary: Codeunit "Label Library";
     begin
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
 
         QuantityInput := JSON.GetInteger('value', true);
 
@@ -147,7 +150,7 @@ codeunit 6150789 "POS Action - Print Item"
 
         RetailJnlLine.SetRange("No.", GUID);
         if not RetailJnlLine.FindFirst then
-          exit;
+            exit;
 
         //-NPR5.37 [289725]
         // RetailJnlLine.Quantity := QuantityInput;
@@ -159,15 +162,18 @@ codeunit 6150789 "POS Action - Print Item"
         RetailJnlLine.DeleteAll;
     end;
 
-    local procedure PrintRJL(var RetailJnlLine: Record "Retail Journal Line";PrintType: Option Price,Shelf,Sign)
+    local procedure PrintRJL(var RetailJnlLine: Record "Retail Journal Line"; PrintType: Option Price,Shelf,Sign)
     var
         ReportSelectionRetail: Record "Report Selection Retail";
         LabelLibrary: Codeunit "Label Library";
     begin
         case PrintType of
-          PrintType::Price: ReportSelectionRetail."Report Type" := ReportSelectionRetail."Report Type"::"Price Label";
-          PrintType::Shelf: ReportSelectionRetail."Report Type" := ReportSelectionRetail."Report Type"::"Shelf Label";
-          PrintType::Sign:  ReportSelectionRetail."Report Type" := ReportSelectionRetail."Report Type"::Sign;
+            PrintType::Price:
+                ReportSelectionRetail."Report Type" := ReportSelectionRetail."Report Type"::"Price Label";
+            PrintType::Shelf:
+                ReportSelectionRetail."Report Type" := ReportSelectionRetail."Report Type"::"Shelf Label";
+            PrintType::Sign:
+                ReportSelectionRetail."Report Type" := ReportSelectionRetail."Report Type"::Sign;
         end;
 
         Commit;

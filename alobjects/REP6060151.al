@@ -21,7 +21,7 @@ report 6060151 "Event Team Template"
     // NPR5.48/TJ  /20181217 CASE 310452 Fixed deployed under 5.41 was pointing to wrong case no. Using proper case no. now
     // NPR5.51/TJ  /20190611 CASE 357701 Field Picture_Job removed from dataset
     DefaultLayout = RDLC;
-    RDLCLayout = './Event Team Template.rdlc';
+    RDLCLayout = './layouts/Event Team Template.rdlc';
 
     Caption = 'Event Team Template';
 

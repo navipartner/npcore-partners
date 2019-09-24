@@ -812,11 +812,11 @@ table 6014422 "Retail Journal Line"
         //+NPR5.46 [294354]
     end;
 
-    procedure SetItem(ItemNo: Code[20];VariantCode: Code[10];Barcode: Code[20])
+    procedure SetItem(ItemNo: Code[20];VariantCode: Code[10];BarcodeValue: Code[20])
     begin
         //-NPR5.46 [294354]
         if Barcode <> '' then
-          Validate(Barcode, Barcode)
+          Validate(Barcode, BarcodeValue)
         else begin
           "Variant Code" := VariantCode;
           Validate("Item No.", ItemNo);

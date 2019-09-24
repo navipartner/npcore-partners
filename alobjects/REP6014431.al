@@ -7,7 +7,7 @@ report 6014431 "Sales Person Trn. by Item Gr."
     // NPR5.39/TJ  /20180212  CASE 302634 Renamed Name property of controls Sort and SortBy to english
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales Person Trn. by Item Gr..rdlc';
+    RDLCLayout = './layouts/Sales Person Trn. by Item Gr..rdlc';
 
     Caption = 'Sales Person Trn. By Item Gr.';
     UsageCategory = ReportsAndAnalysis;

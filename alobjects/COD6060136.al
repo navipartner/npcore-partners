@@ -20,7 +20,7 @@ codeunit 6060136 "MM Member Notification"
     trigger OnRun()
     begin
 
-        HandleBatchNotifications (Today);
+        HandleBatchNotifications(Today);
     end;
 
     var
@@ -34,23 +34,23 @@ codeunit 6060136 "MM Member Notification"
         MembershipNotification: Record "MM Membership Notification";
     begin
 
-        MembershipNotification.SetCurrentKey ("Notification Status","Date To Notify");
-        MembershipNotification.SetFilter ("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
-        MembershipNotification.SetFilter ("Date To Notify", '<=%1', ReferenceDate);
-        MembershipNotification.SetFilter (Blocked, '=%1', false);
+        MembershipNotification.SetCurrentKey("Notification Status", "Date To Notify");
+        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
+        MembershipNotification.SetFilter("Date To Notify", '<=%1', ReferenceDate);
+        MembershipNotification.SetFilter(Blocked, '=%1', false);
         //-MM1.29 [314131]
-        MembershipNotification.SetFilter ("Processing Method", '=%1', MembershipNotification."Processing Method"::BATCH);
+        MembershipNotification.SetFilter("Processing Method", '=%1', MembershipNotification."Processing Method"::BATCH);
         //+MM1.29 [314131]
 
-        if (MembershipNotification.FindSet ()) then begin
-          repeat
-            HandleMembershipNotification (MembershipNotification);
+        if (MembershipNotification.FindSet()) then begin
+            repeat
+                HandleMembershipNotification(MembershipNotification);
 
-            //-MM1.38 [355234]
-            Commit ();
-            //+MM1.38 [355234]
+                //-MM1.38 [355234]
+                Commit();
+                //+MM1.38 [355234]
 
-          until (MembershipNotification.Next () = 0);
+            until (MembershipNotification.Next() = 0);
         end;
     end;
 
@@ -59,26 +59,26 @@ codeunit 6060136 "MM Member Notification"
         NotificationStatus: Integer;
     begin
 
-        NotificationStatus := NotificationIsValid (MembershipNotification);
+        NotificationStatus := NotificationIsValid(MembershipNotification);
 
         // Not Now
         if (NotificationStatus = 0) then
-          exit;
+            exit;
 
         if (NotificationStatus = 1) then begin
-          CreateRecipients (MembershipNotification);
-          NotifyRecipients (MembershipNotification);
-          CreateNextNotification (MembershipNotification);
-          MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PROCESSED;
+            CreateRecipients(MembershipNotification);
+            NotifyRecipients(MembershipNotification);
+            CreateNextNotification(MembershipNotification);
+            MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PROCESSED;
         end;
 
         if (NotificationStatus = -1) then begin
-          MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
+            MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
         end;
 
         MembershipNotification."Notification Processed At" := CurrentDateTime;
         MembershipNotification."Notification Processed By User" := UserId;
-        MembershipNotification.Modify ();
+        MembershipNotification.Modify();
         Commit;
     end;
 
@@ -92,70 +92,70 @@ codeunit 6060136 "MM Member Notification"
     begin
 
         if (MembershipNotification.Blocked) then
-          exit (0);
+            exit(0);
 
         if (MembershipNotification."Notification Status" <> MembershipNotification."Notification Status"::PENDING) then
-          exit (0);
+            exit(0);
 
-        if (not NotificationSetup.Get (MembershipNotification."Notification Code")) then
-          exit (0);
+        if (not NotificationSetup.Get(MembershipNotification."Notification Code")) then
+            exit(0);
 
         if (NotificationSetup."Cancel Overdue Notif. (Days)" <> 0) then begin
-          if (MembershipNotification."Date To Notify" + Abs (NotificationSetup."Cancel Overdue Notif. (Days)") < Today) then
-            exit (-1);
+            if (MembershipNotification."Date To Notify" + Abs(NotificationSetup."Cancel Overdue Notif. (Days)") < Today) then
+                exit(-1);
         end;
 
         case MembershipNotification."Notification Trigger" of
-          MembershipNotification."Notification Trigger"::RENEWAL :
-            begin
-              // Notification Date is offset from subscription ends
-              StartDate := CalcDate ('<+1D>', MembershipNotification."Date To Notify" + NotificationSetup."Days Before");
-              if (StartDate < Today) then
-                StartDate := Today;
+            MembershipNotification."Notification Trigger"::RENEWAL:
+                begin
+                    // Notification Date is offset from subscription ends
+                    StartDate := CalcDate('<+1D>', MembershipNotification."Date To Notify" + NotificationSetup."Days Before");
+                    if (StartDate < Today) then
+                        StartDate := Today;
 
-              if (MembershipManagement.GetMembershipValidDate (MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
-                exit (-1); // membership is valid, cancel notification
+                    if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
+                        exit(-1); // membership is valid, cancel notification
 
-              if (FromDate > Today) then
-                exit (-1); // Valid in the future, but not on startdate, cancel notification
+                    if (FromDate > Today) then
+                        exit(-1); // Valid in the future, but not on startdate, cancel notification
 
-              exit (1); // Send notification
-            end;
+                    exit(1); // Send notification
+                end;
 
-          MembershipNotification."Notification Trigger"::WELCOME :
-            begin
-              // Notification Date is offset from subscription starts
-              StartDate := MembershipNotification."Date To Notify";
-              if (StartDate < Today) then
-                StartDate := Today;
+            MembershipNotification."Notification Trigger"::WELCOME:
+                begin
+                    // Notification Date is offset from subscription starts
+                    StartDate := MembershipNotification."Date To Notify";
+                    if (StartDate < Today) then
+                        StartDate := Today;
 
-              if (MembershipManagement.GetMembershipValidDate (MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
-                exit (1); // valid, send notification
+                    if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
+                        exit(1); // valid, send notification
 
-              if (FromDate > Today) then
-                exit (0); //wait until membership becomes active
+                    if (FromDate > Today) then
+                        exit(0); //wait until membership becomes active
 
-              if (FromDate = 0D) then
-                exit (0); //wait until membership becomes active, not yet activated
+                    if (FromDate = 0D) then
+                        exit(0); //wait until membership becomes active, not yet activated
 
-              exit (-1); // Cancel welcome notification
-            end;
-          MembershipNotification."Notification Trigger"::WALLET_CREATE,
-          MembershipNotification."Notification Trigger"::WALLET_UPDATE :
-            begin
-              // Notification Date is offset from subscription starts
-              StartDate := MembershipNotification."Date To Notify";
-              if (StartDate < Today) then
-                StartDate := Today;
+                    exit(-1); // Cancel welcome notification
+                end;
+            MembershipNotification."Notification Trigger"::WALLET_CREATE,
+            MembershipNotification."Notification Trigger"::WALLET_UPDATE:
+                begin
+                    // Notification Date is offset from subscription starts
+                    StartDate := MembershipNotification."Date To Notify";
+                    if (StartDate < Today) then
+                        StartDate := Today;
 
-              if (MembershipManagement.GetMembershipValidDate (MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
-                exit (1); // valid, send notification
+                    if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
+                        exit(1); // valid, send notification
 
-              exit (0); // Wait for the membership to become active
-            end;
+                    exit(0); // Wait for the membership to become active
+                end;
         end;
 
-        exit (-1);
+        exit(-1);
     end;
 
     local procedure CreateRecipients(MembershipNotification: Record "MM Membership Notification")
@@ -171,115 +171,120 @@ codeunit 6060136 "MM Member Notification"
         NotificationSetup: Record "MM Member Notification Setup";
     begin
 
-        NotificationSetup.Get (MembershipNotification."Notification Code");
+        NotificationSetup.Get(MembershipNotification."Notification Code");
 
-        MembershipRole.SetFilter ("Membership Entry No.", '=%1', MembershipNotification."Membership Entry No.");
-        MembershipRole.SetFilter (Blocked, '=%1', false);
-        MembershipRole.SetFilter ("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipNotification."Membership Entry No.");
+        MembershipRole.SetFilter(Blocked, '=%1', false);
+        MembershipRole.SetFilter("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
 
         if (MembershipNotification."Member Entry No." <> 0) then begin
-          MembershipRole.SetFilter ("Member Entry No.", '=%1', MembershipNotification."Member Entry No.");
+            MembershipRole.SetFilter("Member Entry No.", '=%1', MembershipNotification."Member Entry No.");
         end else begin
-          if (MembershipNotification."Target Member Role" <> MembershipNotification."Target Member Role"::ALL_MEMBERS) then
-            MembershipRole.SetFilter ("Member Role", '=%1', MembershipRole."Member Role"::ADMIN);
+            if (MembershipNotification."Target Member Role" <> MembershipNotification."Target Member Role"::ALL_MEMBERS) then
+                MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::ADMIN);
         end;
         //+MM1.34 [328141]
 
-        if (MembershipRole.FindSet ()) then begin
-          repeat
-            MembershipRole.CalcFields ("Membership Code", "External Membership No.");
-            Member.Get (MembershipRole."Member Entry No.");
-            //-MM1.39 [350968]
-            Membership.Get (MembershipRole."Membership Entry No.");
-            //+MM1.39 [350968]
+        if (MembershipRole.FindSet()) then begin
+            repeat
+                MembershipRole.CalcFields("Membership Code", "External Membership No.");
+                Member.Get(MembershipRole."Member Entry No.");
+                //-MM1.39 [350968]
+                Membership.Get(MembershipRole."Membership Entry No.");
+                //+MM1.39 [350968]
 
-            if (not Member.Blocked) then begin
-              if (MemberNotificationEntry.Get (MembershipNotification."Entry No.", Member."Entry No.")) then begin
-                if ((not MemberNotificationEntry.Blocked) or
-                    (not (MemberNotificationEntry."Notification Send Status" = MemberNotificationEntry."Notification Send Status"::SENT))) then
-                  MemberNotificationEntry.Delete ();
-              end;
+                if (not Member.Blocked) then begin
+                    if (MemberNotificationEntry.Get(MembershipNotification."Entry No.", Member."Entry No.")) then begin
+                        if ((not MemberNotificationEntry.Blocked) or
+                            (not (MemberNotificationEntry."Notification Send Status" = MemberNotificationEntry."Notification Send Status"::SENT))) then
+                            MemberNotificationEntry.Delete();
+                    end;
 
-              MemberNotificationEntry.Init ();
-              MemberNotificationEntry.TransferFields (MembershipNotification, true);
+                    MemberNotificationEntry.Init();
+                    MemberNotificationEntry.TransferFields(MembershipNotification, true);
 
-              //-MM1.39 [350968]
-              MemberNotificationEntry."Auto-Renew" := Membership."Auto-Renew";
-              MemberNotificationEntry."Auto-Renew External Data" := Membership."Auto-Renew External Data";
-              MemberNotificationEntry."Auto-Renew Payment Method Code" := Membership."Auto-Renew Payment Method Code";
-              //+MM1.39 [350968]
+                    //-MM1.39 [350968]
+                    MemberNotificationEntry."Auto-Renew" := Membership."Auto-Renew";
+                    MemberNotificationEntry."Auto-Renew External Data" := Membership."Auto-Renew External Data";
+                    MemberNotificationEntry."Auto-Renew Payment Method Code" := Membership."Auto-Renew Payment Method Code";
+                    //+MM1.39 [350968]
 
-              MemberNotificationEntry."Member Entry No." := Member."Entry No.";
-              MemberNotificationEntry."External Member No." := Member."External Member No.";
-              MemberNotificationEntry."E-Mail Address" := Member."E-Mail Address";
-              MemberNotificationEntry."First Name" := Member."First Name";
-              MemberNotificationEntry."Middle Name" := Member."Middle Name";
-              MemberNotificationEntry."Last Name" := Member."Last Name";
-              MemberNotificationEntry."Display Name" := Member."Display Name";
-              MemberNotificationEntry.Address := Member.Address;
-              MemberNotificationEntry."Post Code Code" := Member."Post Code Code";
-              MemberNotificationEntry.City := Member.City;
-              MemberNotificationEntry."Country Code" := Member."Country Code";
-              MemberNotificationEntry.Country := Member.Country;
-              MemberNotificationEntry.Birthday := Member.Birthday;
-              MemberNotificationEntry."Phone No." := Member."Phone No.";
+                    MemberNotificationEntry."Member Entry No." := Member."Entry No.";
+                    MemberNotificationEntry."External Member No." := Member."External Member No.";
+                    MemberNotificationEntry."E-Mail Address" := Member."E-Mail Address";
+                    MemberNotificationEntry."First Name" := Member."First Name";
+                    MemberNotificationEntry."Middle Name" := Member."Middle Name";
+                    MemberNotificationEntry."Last Name" := Member."Last Name";
+                    MemberNotificationEntry."Display Name" := Member."Display Name";
+                    MemberNotificationEntry.Address := Member.Address;
+                    MemberNotificationEntry."Post Code Code" := Member."Post Code Code";
+                    MemberNotificationEntry.City := Member.City;
+                    MemberNotificationEntry."Country Code" := Member."Country Code";
+                    MemberNotificationEntry.Country := Member.Country;
+                    MemberNotificationEntry.Birthday := Member.Birthday;
+                    MemberNotificationEntry."Phone No." := Member."Phone No.";
 
-              MemberNotificationEntry."Community Code" := MembershipRole."Community Code";
-              MemberNotificationEntry."Membership Code" := MembershipRole."Membership Code";
-              MemberNotificationEntry."External Membership No." := MembershipRole."External Membership No.";
+                    MemberNotificationEntry."Community Code" := MembershipRole."Community Code";
+                    MemberNotificationEntry."Membership Code" := MembershipRole."Membership Code";
+                    MemberNotificationEntry."External Membership No." := MembershipRole."External Membership No.";
 
-              if (MemberCommunity.Get (MemberNotificationEntry."Community Code")) then
-                MemberNotificationEntry."Community Description" := MemberCommunity.Description;
+                    if (MemberCommunity.Get(MemberNotificationEntry."Community Code")) then
+                        MemberNotificationEntry."Community Description" := MemberCommunity.Description;
 
-              if (MembershipSetup.Get (MemberNotificationEntry."Membership Code")) then
-                MemberNotificationEntry."Membership Description" := MembershipSetup.Description;
+                    if (MembershipSetup.Get(MemberNotificationEntry."Membership Code")) then
+                        MemberNotificationEntry."Membership Description" := MembershipSetup.Description;
 
-              if (MembershipNotification."Member Card Entry No." = 0) then begin
-                MemberCard.SetFilter ("Membership Entry No.", '=%1', MembershipRole."Membership Entry No.");
-                MemberCard.SetFilter ("Member Entry No.", '=%1', MembershipRole."Member Entry No.");
-                MemberCard.SetFilter (Blocked, '=%1', false);
-              end else begin
-                MemberCard.SetFilter ("Entry No.", '=%1', MembershipNotification."Member Card Entry No.");
-              end;
+                    if (MembershipNotification."Member Card Entry No." = 0) then begin
+                        MemberCard.SetFilter("Membership Entry No.", '=%1', MembershipRole."Membership Entry No.");
+                        MemberCard.SetFilter("Member Entry No.", '=%1', MembershipRole."Member Entry No.");
+                        MemberCard.SetFilter(Blocked, '=%1', false);
+                    end else begin
+                        MemberCard.SetFilter("Entry No.", '=%1', MembershipNotification."Member Card Entry No.");
+                    end;
 
-              if (MemberCard.FindLast ()) then begin
-                MemberNotificationEntry."External Member Card No." := MemberCard."External Card No.";
-                MemberNotificationEntry."Pin Code" := MemberCard."Pin Code";
-                MemberNotificationEntry."Card Valid Until" := MemberCard."Valid Until";
-              end;
+                    if (MemberCard.FindLast()) then begin
+                        MemberNotificationEntry."External Member Card No." := MemberCard."External Card No.";
+                        MemberNotificationEntry."Pin Code" := MemberCard."Pin Code";
+                        MemberNotificationEntry."Card Valid Until" := MemberCard."Valid Until";
+                    end;
 
-              MembershipManagement.GetMembershipValidDate (MembershipNotification."Membership Entry No.", MembershipNotification."Date To Notify",
-                MemberNotificationEntry."Membership Valid From",
-                MemberNotificationEntry."Membership Valid Until");
+                    MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", MembershipNotification."Date To Notify",
+                      MemberNotificationEntry."Membership Valid From",
+                      MemberNotificationEntry."Membership Valid Until");
 
-              //-MM1.36 [328141]
-              if (MemberNotificationEntry."Card Valid Until" = 0D) then
-                MemberNotificationEntry."Card Valid Until" := MemberNotificationEntry."Membership Valid Until";
-              //+MM1.36 [328141]
+                    //-MM1.36 [328141]
+                    if (MemberNotificationEntry."Card Valid Until" = 0D) then
+                        MemberNotificationEntry."Card Valid Until" := MemberNotificationEntry."Membership Valid Until";
+                    //+MM1.36 [328141]
 
-              case Member."Notification Method" of
-                Member."Notification Method"::EMAIL : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::EMAIL;
-                Member."Notification Method"::NONE :  MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::NONE;
-                Member."Notification Method"::MANUAL : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::MANUAL;
-                Member."Notification Method"::SMS : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::SMS;
-                else Error (NOT_IMPLEMENTED, Member.FieldCaption (Member."Notification Method"), Member."Notification Method");
-              end;
-              //-MM1.36 [328141]
-              if (MembershipNotification."Notification Method Source" = MembershipNotification."Notification Method Source"::EXTERNAL) then
-                MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::MANUAL;
-              //+MM1.36 [328141]
+                    case Member."Notification Method" of
+                        Member."Notification Method"::EMAIL:
+                            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::EMAIL;
+                        Member."Notification Method"::NONE:
+                            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::NONE;
+                        Member."Notification Method"::MANUAL:
+                            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::MANUAL;
+                        Member."Notification Method"::SMS:
+                            MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::SMS;
+                        else
+                            Error(NOT_IMPLEMENTED, Member.FieldCaption(Member."Notification Method"), Member."Notification Method");
+                    end;
+                    //-MM1.36 [328141]
+                    if (MembershipNotification."Notification Method Source" = MembershipNotification."Notification Method Source"::EXTERNAL) then
+                        MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::MANUAL;
+                    //+MM1.36 [328141]
 
-              MemberNotificationEntry."Include NP Pass" := ((MembershipSetup."Enable NP Pass Integration") and (MembershipNotification."Include NP Pass"));
+                    MemberNotificationEntry."Include NP Pass" := ((MembershipSetup."Enable NP Pass Integration") and (MembershipNotification."Include NP Pass"));
 
-              //-MM1.38 [355234]
-              MembershipRole."Notification Token" := GenerateNotificationToken ();
-              MembershipRole.Modify ();
-              MemberNotificationEntry."Notification Token" := MembershipRole."Notification Token";
-              //+MM1.38 [355234]
+                    //-MM1.38 [355234]
+                    MembershipRole."Notification Token" := GenerateNotificationToken();
+                    MembershipRole.Modify();
+                    MemberNotificationEntry."Notification Token" := MembershipRole."Notification Token";
+                    //+MM1.38 [355234]
 
-              if (MemberNotificationEntry.Insert ()) then ;
-            end;
-          until ((MembershipRole.Next () = 0) or (MembershipNotification."Target Member Role" = MembershipNotification."Target Member Role"::FIRST_ADMIN))
+                    if (MemberNotificationEntry.Insert()) then;
+                end;
+            until ((MembershipRole.Next() = 0) or (MembershipNotification."Target Member Role" = MembershipNotification."Target Member Role"::FIRST_ADMIN))
         end;
     end;
 
@@ -291,84 +296,85 @@ codeunit 6060136 "MM Member Notification"
         SendStatus: Option;
     begin
 
-        MemberNotificationEntry.SetFilter ("Notification Entry No.", '=%1', MembershipNotification."Entry No.");
-        MemberNotificationEntry.SetFilter ("Notification Send Status", '=%1', MemberNotificationEntry."Notification Send Status"::PENDING);
-        MemberNotificationEntry.SetFilter (Blocked, '=%1', false);
+        MemberNotificationEntry.SetFilter("Notification Entry No.", '=%1', MembershipNotification."Entry No.");
+        MemberNotificationEntry.SetFilter("Notification Send Status", '=%1', MemberNotificationEntry."Notification Send Status"::PENDING);
+        MemberNotificationEntry.SetFilter(Blocked, '=%1', false);
 
-        if  (MemberNotificationEntry.FindSet ()) then begin
-          repeat
+        if (MemberNotificationEntry.FindSet()) then begin
+            repeat
 
-            //-MM1.29 [314131] refactored
-            SendStatus := MemberNotificationEntry2."Notification Send Status"::FAILED;
+                //-MM1.29 [314131] refactored
+                SendStatus := MemberNotificationEntry2."Notification Send Status"::FAILED;
 
-            case MemberNotificationEntry."Notification Method" of
-              MemberNotificationEntry."Notification Method"::NONE  :
-                begin
-                  SendStatus := MemberNotificationEntry2."Notification Send Status"::NOT_SENT;
+                case MemberNotificationEntry."Notification Method" of
+                    MemberNotificationEntry."Notification Method"::NONE:
+                        begin
+                            SendStatus := MemberNotificationEntry2."Notification Send Status"::NOT_SENT;
+                        end;
+
+                    MemberNotificationEntry."Notification Method"::EMAIL:
+                        begin
+                            //-MM1.29 [314131]
+                            //IF (SendMail (MemberNotificationEntry, ResponseMessage)) THEN
+                            //  MemberNotificationEntry2."Notification Send Status" := MemberNotificationEntry2."Notification Send Status"::SENT;
+
+                            if (MemberNotificationEntry."Include NP Pass") then begin
+                                CreateNpPass(MemberNotificationEntry);
+                                MemberNotificationEntry.Modify();
+                                if (MemberNotificationEntry."Notification Trigger" = MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE) then
+                                    SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
+                            end;
+
+                            if (MemberNotificationEntry."Notification Trigger" <> MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE) then
+                                if (SendMail(MemberNotificationEntry, ResponseMessage)) then
+                                    SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
+                            //+MM1.29 [314131]
+
+                        end;
+
+                    //-MM1.29.02 [317156]
+                    MemberNotificationEntry."Notification Method"::SMS:
+                        begin
+
+                            if (MemberNotificationEntry."Include NP Pass") then begin
+                                CreateNpPass(MemberNotificationEntry);
+                                MemberNotificationEntry.Modify();
+                                if (MemberNotificationEntry."Notification Trigger" = MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE) then
+                                    SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
+                            end;
+
+                            if (MemberNotificationEntry."Notification Trigger" <> MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE) then
+                                if (SendSMS(MemberNotificationEntry, ResponseMessage)) then
+                                    SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
+
+                        end;
+                    //+MM1.29.02 [317156]
+
+                    MemberNotificationEntry."Notification Method"::MANUAL:
+                        begin
+                            //-MM1.36 [328141]
+                            if (MemberNotificationEntry."Include NP Pass") then begin
+                                CreateNpPass(MemberNotificationEntry);
+                                MemberNotificationEntry.Modify();
+                            end;
+                            //+MM1.36 [328141]
+
+                            SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
+                        end;
+
+                    else
+                        Error(NOT_IMPLEMENTED, MemberNotificationEntry.FieldCaption("Notification Method"), MemberNotificationEntry."Notification Method");
                 end;
 
-              MemberNotificationEntry."Notification Method"::EMAIL :
-                begin
-                  //-MM1.29 [314131]
-                  //IF (SendMail (MemberNotificationEntry, ResponseMessage)) THEN
-                  //  MemberNotificationEntry2."Notification Send Status" := MemberNotificationEntry2."Notification Send Status"::SENT;
+                MemberNotificationEntry2.Get(MemberNotificationEntry."Notification Entry No.", MemberNotificationEntry."Member Entry No.");
+                MemberNotificationEntry2."Notification Sent At" := CurrentDateTime();
+                MemberNotificationEntry2."Notification Sent By User" := UserId;
+                MemberNotificationEntry2."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(MemberNotificationEntry2."Failed With Message"));
+                MemberNotificationEntry2."Notification Send Status" := SendStatus;
+                MemberNotificationEntry2.Modify();
+                Commit;
 
-                  if (MemberNotificationEntry."Include NP Pass") then begin
-                    CreateNpPass (MemberNotificationEntry);
-                    MemberNotificationEntry.Modify ();
-                    if (MemberNotificationEntry."Notification Trigger" = MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE) then
-                      SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
-                  end;
-
-                  if (MemberNotificationEntry."Notification Trigger" <> MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE) then
-                    if (SendMail (MemberNotificationEntry, ResponseMessage)) then
-                      SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
-                  //+MM1.29 [314131]
-
-                end;
-
-              //-MM1.29.02 [317156]
-              MemberNotificationEntry."Notification Method"::SMS :
-                begin
-
-                  if (MemberNotificationEntry."Include NP Pass") then begin
-                    CreateNpPass (MemberNotificationEntry);
-                    MemberNotificationEntry.Modify ();
-                    if (MemberNotificationEntry."Notification Trigger" = MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE) then
-                      SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
-                  end;
-
-                  if (MemberNotificationEntry."Notification Trigger" <> MemberNotificationEntry."Notification Trigger"::WALLET_UPDATE) then
-                    if (SendSMS (MemberNotificationEntry, ResponseMessage)) then
-                      SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
-
-                end;
-              //+MM1.29.02 [317156]
-
-              MemberNotificationEntry."Notification Method"::MANUAL :
-                begin
-                  //-MM1.36 [328141]
-                  if (MemberNotificationEntry."Include NP Pass") then begin
-                    CreateNpPass (MemberNotificationEntry);
-                    MemberNotificationEntry.Modify ();
-                  end;
-                  //+MM1.36 [328141]
-
-                  SendStatus := MemberNotificationEntry2."Notification Send Status"::SENT;
-                end;
-
-              else Error (NOT_IMPLEMENTED, MemberNotificationEntry.FieldCaption ("Notification Method"), MemberNotificationEntry."Notification Method");
-            end;
-
-            MemberNotificationEntry2.Get (MemberNotificationEntry."Notification Entry No.", MemberNotificationEntry."Member Entry No.");
-            MemberNotificationEntry2."Notification Sent At" := CurrentDateTime ();
-            MemberNotificationEntry2."Notification Sent By User" := UserId;
-            MemberNotificationEntry2."Failed With Message" := CopyStr (ResponseMessage, 1, MaxStrLen (MemberNotificationEntry2."Failed With Message"));
-            MemberNotificationEntry2."Notification Send Status" := SendStatus;
-            MemberNotificationEntry2.Modify ();
-            Commit;
-
-          until (MemberNotificationEntry.Next () = 0);
+            until (MemberNotificationEntry.Next() = 0);
         end;
     end;
 
@@ -379,36 +385,37 @@ codeunit 6060136 "MM Member Notification"
         NotificationSetup2: Record "MM Member Notification Setup";
     begin
 
-        NotificationSetup.Get (MembershipNotification."Notification Code");
+        NotificationSetup.Get(MembershipNotification."Notification Code");
 
         if (NotificationSetup."Next Notification Code" = '') then
-          exit;
+            exit;
 
-        if (not NotificationSetup2.Get (NotificationSetup."Next Notification Code")) then
-          exit;
+        if (not NotificationSetup2.Get(NotificationSetup."Next Notification Code")) then
+            exit;
 
-        MembershipNotification2.Init ();
+        MembershipNotification2.Init();
         MembershipNotification2."Entry No." := 0;
         MembershipNotification2."Membership Entry No." := MembershipNotification."Membership Entry No.";
         MembershipNotification2."Notification Code" := NotificationSetup2.Code;
         MembershipNotification2."Notification Trigger" := MembershipNotification."Notification Trigger";
 
         case MembershipNotification."Notification Trigger" of
-          MembershipNotification."Notification Trigger"::RENEWAL :
-            MembershipNotification2."Date To Notify" := MembershipNotification."Date To Notify" + NotificationSetup."Days Before" - NotificationSetup2."Days Before";
+            MembershipNotification."Notification Trigger"::RENEWAL:
+                MembershipNotification2."Date To Notify" := MembershipNotification."Date To Notify" + NotificationSetup."Days Before" - NotificationSetup2."Days Before";
 
-          MembershipNotification."Notification Trigger"::WELCOME :
-            MembershipNotification2."Date To Notify" := MembershipNotification."Date To Notify" - NotificationSetup."Days Past" + NotificationSetup2."Days Past";
+            MembershipNotification."Notification Trigger"::WELCOME:
+                MembershipNotification2."Date To Notify" := MembershipNotification."Date To Notify" - NotificationSetup."Days Past" + NotificationSetup2."Days Past";
 
-         else Error (NOT_IMPLEMENTED, MembershipNotification.FieldCaption ("Notification Trigger"), MembershipNotification."Notification Trigger");
+            else
+                Error(NOT_IMPLEMENTED, MembershipNotification.FieldCaption("Notification Trigger"), MembershipNotification."Notification Trigger");
         end;
 
         MembershipNotification2."Template Filter Value" := NotificationSetup2."Template Filter Value";
         MembershipNotification2."Target Member Role" := NotificationSetup2."Target Member Role";
-        MembershipNotification2.Insert ();
+        MembershipNotification2.Insert();
     end;
 
-    local procedure SendMail(MemberNotificationEntry: Record "MM Member Notification Entry";var ResponseMessage: Text): Boolean
+    local procedure SendMail(MemberNotificationEntry: Record "MM Member Notification Entry"; var ResponseMessage: Text): Boolean
     var
         RecordRef: RecordRef;
         EMailMgt: Codeunit "E-mail Management";
@@ -420,13 +427,13 @@ codeunit 6060136 "MM Member Notification"
         //ResponseMessage := EMailMgt.SendEmail(RecordRef, MemberNotificationEntry."E-Mail Address", TRUE);
         ResponseMessage := 'E-Mail address is missing.';
         if (MemberNotificationEntry."E-Mail Address" <> '') then
-          ResponseMessage := EMailMgt.SendEmail(RecordRef, MemberNotificationEntry."E-Mail Address", true);
+            ResponseMessage := EMailMgt.SendEmail(RecordRef, MemberNotificationEntry."E-Mail Address", true);
         //+#309087 [309087]
 
-        exit (ResponseMessage = '');
+        exit(ResponseMessage = '');
     end;
 
-    local procedure SendSMS(MemberNotificationEntry: Record "MM Member Notification Entry";var ResponseMessage: Text): Boolean
+    local procedure SendSMS(MemberNotificationEntry: Record "MM Member Notification Entry"; var ResponseMessage: Text): Boolean
     var
         RecordRef: RecordRef;
         SMSManagement: Codeunit "SMS Management";
@@ -437,49 +444,49 @@ codeunit 6060136 "MM Member Notification"
         RecordRef.GetTable(MemberNotificationEntry);
 
         if (MemberNotificationEntry."Phone No." = '') then
-          ResponseMessage := 'Phone number is missing.';
+            ResponseMessage := 'Phone number is missing.';
 
         if (MemberNotificationEntry."Phone No." <> '') then begin
-          Commit;
-          ResponseMessage := 'Template not found.';
-          if (SMSManagement.FindTemplate (RecordRef, SMSTemplateHeader)) then begin
-            SmsBody := SMSManagement.MakeMessage (SMSTemplateHeader, MemberNotificationEntry);
-            SMSManagement.SendSMS (MemberNotificationEntry."Phone No.", SMSTemplateHeader."Alt. Sender", SmsBody);
-            ResponseMessage := '';
-          end;
+            Commit;
+            ResponseMessage := 'Template not found.';
+            if (SMSManagement.FindTemplate(RecordRef, SMSTemplateHeader)) then begin
+                SmsBody := SMSManagement.MakeMessage(SMSTemplateHeader, MemberNotificationEntry);
+                SMSManagement.SendSMS(MemberNotificationEntry."Phone No.", SMSTemplateHeader."Alt. Sender", SmsBody);
+                ResponseMessage := '';
+            end;
         end;
 
-        exit (ResponseMessage = '');
+        exit(ResponseMessage = '');
     end;
 
     local procedure "--Notifications"()
     begin
     end;
 
-    procedure AddMemberWelcomeNotification(MembershipEntryNo: Integer;MemberEntryNo: Integer) NotificationEntryNo: Integer
+    procedure AddMemberWelcomeNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer) NotificationEntryNo: Integer
     var
         Membership: Record "MM Membership";
         NotificationSetup: Record "MM Member Notification Setup";
         MembershipNotification: Record "MM Membership Notification";
     begin
 
-        Membership.Get (MembershipEntryNo);
+        Membership.Get(MembershipEntryNo);
 
-        NotificationSetup.SetCurrentKey (Type, "Community Code", "Membership Code", "Days Past");
-        NotificationSetup.SetFilter (Type, '=%1', NotificationSetup.Type::WELCOME);
-        NotificationSetup.SetFilter ("Community Code", '=%1', Membership."Community Code");
-        NotificationSetup.SetFilter ("Membership Code", '=%1', Membership."Membership Code");
-        NotificationSetup.SetFilter ("Days Past", '0..' );
-        if (not NotificationSetup.FindFirst ()) then begin
-          NotificationSetup.SetFilter ("Membership Code", '=%1', '');
-          if (not NotificationSetup.FindFirst ()) then begin
-            NotificationSetup.SetFilter ("Community Code", '=%1', '');
-            if (not NotificationSetup.FindFirst ()) then
-              exit (0);
-          end;
+        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Past");
+        NotificationSetup.SetFilter(Type, '=%1', NotificationSetup.Type::WELCOME);
+        NotificationSetup.SetFilter("Community Code", '=%1', Membership."Community Code");
+        NotificationSetup.SetFilter("Membership Code", '=%1', Membership."Membership Code");
+        NotificationSetup.SetFilter("Days Past", '0..');
+        if (not NotificationSetup.FindFirst()) then begin
+            NotificationSetup.SetFilter("Membership Code", '=%1', '');
+            if (not NotificationSetup.FindFirst()) then begin
+                NotificationSetup.SetFilter("Community Code", '=%1', '');
+                if (not NotificationSetup.FindFirst()) then
+                    exit(0);
+            end;
         end;
 
-        MembershipNotification.Reset ();
+        MembershipNotification.Reset();
         MembershipNotification.Init();
         MembershipNotification."Membership Entry No." := MembershipEntryNo;
         MembershipNotification."Member Entry No." := MemberEntryNo;
@@ -496,9 +503,9 @@ codeunit 6060136 "MM Member Notification"
         MembershipNotification."Include NP Pass" := NotificationSetup."Include NP Pass";
         //+MM1.29 [314131]
 
-        MembershipNotification.Insert ();
+        MembershipNotification.Insert();
 
-        exit (MembershipNotification."Entry No.");
+        exit(MembershipNotification."Entry No.");
     end;
 
     procedure RefreshAllMembershipRenewalNotifications(MembershipCode: Code[20])
@@ -513,34 +520,34 @@ codeunit 6060136 "MM Member Notification"
     begin
 
         //-MM1.36 [331590]
-        Membership.SetFilter ("Membership Code", '=%1', MembershipCode);
-        if (Membership.FindSet ()) then begin
-          if (GuiAllowed) then
-            Window.Open (REFRESH_NOTIFICATION);
+        Membership.SetFilter("Membership Code", '=%1', MembershipCode);
+        if (Membership.FindSet()) then begin
+            if (GuiAllowed) then
+                Window.Open(REFRESH_NOTIFICATION);
 
-          MaxCount := Membership.Count ();
-          MembershipSetup.Get (MembershipCode);
-          CommunitySetup.Get (MembershipSetup."Community Code");
+            MaxCount := Membership.Count();
+            MembershipSetup.Get(MembershipCode);
+            CommunitySetup.Get(MembershipSetup."Community Code");
 
-          repeat
+            repeat
 
-            MembershipEntry.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
-            MembershipEntry.SetFilter (Blocked, '=%1', false);
-            // NEW,REGRET,RENEW,UPGRADE,EXTEND,CANCEL,AUTORENEW,FOREIGN
-            MembershipEntry.SetFilter (Context, '%1..%2 ', MembershipEntry.Context::NEW, MembershipEntry.Context::EXTEND);
-            if (MembershipEntry.FindLast ()) then
-              if (MembershipEntry."Valid Until Date" > Today) then
-                AddMembershipRenewalNotificationWorker (MembershipEntry, MembershipSetup, CommunitySetup);
+                MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+                MembershipEntry.SetFilter(Blocked, '=%1', false);
+                // NEW,REGRET,RENEW,UPGRADE,EXTEND,CANCEL,AUTORENEW,FOREIGN
+                MembershipEntry.SetFilter(Context, '%1..%2 ', MembershipEntry.Context::NEW, MembershipEntry.Context::EXTEND);
+                if (MembershipEntry.FindLast()) then
+                    if (MembershipEntry."Valid Until Date" > Today) then
+                        AddMembershipRenewalNotificationWorker(MembershipEntry, MembershipSetup, CommunitySetup);
+
+                if (GuiAllowed) then
+                    Window.Update(1, Round(CurrentCount / MaxCount * 10000, 1));
+
+                CurrentCount += 1;
+
+            until (Membership.Next() = 0);
 
             if (GuiAllowed) then
-              Window.Update (1, Round (CurrentCount/MaxCount*10000,1));
-
-            CurrentCount += 1;
-
-          until (Membership.Next () = 0);
-
-          if (GuiAllowed) then
-            Window.Close ();
+                Window.Close();
         end;
         //+MM1.36 [331590]
     end;
@@ -555,16 +562,16 @@ codeunit 6060136 "MM Member Notification"
         DaysToRenewal: Integer;
     begin
 
-        Membership.Get (MembershipLedgerEntry."Membership Entry No.");
-        MembershipSetup.Get (Membership."Membership Code");
-        CommunitySetup.Get (MembershipSetup."Community Code");
+        Membership.Get(MembershipLedgerEntry."Membership Entry No.");
+        MembershipSetup.Get(Membership."Membership Code");
+        CommunitySetup.Get(MembershipSetup."Community Code");
 
         //-MM1.36 [331590] refactored, code moved local worker
-        AddMembershipRenewalNotificationWorker (MembershipLedgerEntry, MembershipSetup, CommunitySetup);
+        AddMembershipRenewalNotificationWorker(MembershipLedgerEntry, MembershipSetup, CommunitySetup);
         //+MM1.36 [331590]
     end;
 
-    local procedure AddMembershipRenewalNotificationWorker(MembershipLedgerEntry: Record "MM Membership Entry";MembershipSetup: Record "MM Membership Setup";CommunitySetup: Record "MM Member Community")
+    local procedure AddMembershipRenewalNotificationWorker(MembershipLedgerEntry: Record "MM Membership Entry"; MembershipSetup: Record "MM Membership Setup"; CommunitySetup: Record "MM Member Community")
     var
         Membership: Record "MM Membership";
         NotificationSetup: Record "MM Member Notification Setup";
@@ -572,41 +579,41 @@ codeunit 6060136 "MM Member Notification"
         DaysToRenewal: Integer;
     begin
 
-        Membership.Get (MembershipLedgerEntry."Membership Entry No.");
+        Membership.Get(MembershipLedgerEntry."Membership Entry No.");
 
-        MembershipNotification.SetCurrentKey ("Membership Entry No.");
-        MembershipNotification.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
-        MembershipNotification.SetFilter ("Notification Trigger", '=%1', MembershipNotification."Notification Trigger"::RENEWAL);
-        MembershipNotification.SetFilter ("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
-        if (MembershipNotification.FindSet (true, true)) then begin
-          repeat
-            MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
-            MembershipNotification."Notification Processed At" := CurrentDateTime ();
-            MembershipNotification."Notification Processed By User" := UserId;
-            MembershipNotification.Modify ();
-          until (MembershipNotification.Next () = 0);
+        MembershipNotification.SetCurrentKey("Membership Entry No.");
+        MembershipNotification.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipNotification.SetFilter("Notification Trigger", '=%1', MembershipNotification."Notification Trigger"::RENEWAL);
+        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
+        if (MembershipNotification.FindSet(true, true)) then begin
+            repeat
+                MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
+                MembershipNotification."Notification Processed At" := CurrentDateTime();
+                MembershipNotification."Notification Processed By User" := UserId;
+                MembershipNotification.Modify();
+            until (MembershipNotification.Next() = 0);
         end;
 
         if (not ((MembershipSetup."Create Renewal Notifications") or (CommunitySetup."Create Renewal Notifications"))) then
-          exit;
+            exit;
 
         DaysToRenewal := MembershipLedgerEntry."Valid Until Date" - Today;
 
-        NotificationSetup.SetCurrentKey (Type, "Community Code", "Membership Code", "Days Before");
-        NotificationSetup.SetFilter (Type, '=%1', NotificationSetup.Type::RENEWAL);
-        NotificationSetup.SetFilter ("Community Code", '=%1', Membership."Community Code");
-        NotificationSetup.SetFilter ("Membership Code", '=%1', Membership."Membership Code");
-        NotificationSetup.SetFilter ("Days Before", '1..%1', DaysToRenewal);
-        if (not NotificationSetup.FindLast ()) then begin
-          NotificationSetup.SetFilter ("Membership Code", '=%1', '');
-          if (not NotificationSetup.FindLast ()) then begin
-            NotificationSetup.SetFilter ("Community Code", '=%1', '');
-            if (not NotificationSetup.FindLast ()) then
-              exit;
-          end;
+        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
+        NotificationSetup.SetFilter(Type, '=%1', NotificationSetup.Type::RENEWAL);
+        NotificationSetup.SetFilter("Community Code", '=%1', Membership."Community Code");
+        NotificationSetup.SetFilter("Membership Code", '=%1', Membership."Membership Code");
+        NotificationSetup.SetFilter("Days Before", '1..%1', DaysToRenewal);
+        if (not NotificationSetup.FindLast()) then begin
+            NotificationSetup.SetFilter("Membership Code", '=%1', '');
+            if (not NotificationSetup.FindLast()) then begin
+                NotificationSetup.SetFilter("Community Code", '=%1', '');
+                if (not NotificationSetup.FindLast()) then
+                    exit;
+            end;
         end;
 
-        MembershipNotification.Reset ();
+        MembershipNotification.Reset();
         MembershipNotification.Init();
         MembershipNotification."Entry No." := 0;
         MembershipNotification."Membership Entry No." := MembershipLedgerEntry."Membership Entry No.";
@@ -617,7 +624,7 @@ codeunit 6060136 "MM Member Notification"
         MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
         MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
 
-        MembershipNotification.Insert ();
+        MembershipNotification.Insert();
     end;
 
     procedure GenerateNotificationToken() Token: Text[64]
@@ -628,14 +635,17 @@ codeunit 6060136 "MM Member Notification"
 
         //-MM1.38 [355234]
         Randomize;
-        Token := UpperCase(DelChr(Format(CreateGuid),'=','{}-'));
+        Token := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
 
-        for n := StrLen(Token) to MaxStrLen (Token) do begin
-          case Random(3) of
-            1: Token[n] := 3*16 + Random(10) - 1; // 3*16 = 48    -> '0'
-            2: Token[n] := 4*16 + Random(25);     // 4*16 = 64 +1 -> 'A'
-            3: Token[n] := 6*16 + Random(25);     // 6*16 = 96 +1 -> 'a'
-          end;
+        for n := StrLen(Token) to MaxStrLen(Token) do begin
+            case Random(3) of
+                1:
+                    Token[n] := 3 * 16 + Random(10) - 1; // 3*16 = 48    -> '0'
+                2:
+                    Token[n] := 4 * 16 + Random(25);     // 4*16 = 64 +1 -> 'A'
+                3:
+                    Token[n] := 6 * 16 + Random(25);     // 6*16 = 96 +1 -> 'a'
+            end;
         end;
         //+MM1.38 [355234]
     end;
@@ -653,33 +663,33 @@ codeunit 6060136 "MM Member Notification"
         templateText: Text;
     begin
 
-        MemberNotificationSetup.Get (MemberNotificationEntry."Notification Code");
+        MemberNotificationSetup.Get(MemberNotificationEntry."Notification Code");
         if (not MemberNotificationSetup."Include NP Pass") then
-          exit;
+            exit;
 
-        RecRef.GetTable (MemberNotificationEntry);
+        RecRef.GetTable(MemberNotificationEntry);
 
-        MemberNotificationSetup.CalcFields ("PUT Passes Template");
-        if (MemberNotificationSetup."PUT Passes Template".HasValue ()) then begin
-          MemberNotificationSetup."PUT Passes Template".CreateInStream (instream);
-          while (not instream.EOS()) do begin
-            instream.ReadText (templateText);
-            PassData += AssignDataToPassTemplate (RecRef, templateText);
-          end;
+        MemberNotificationSetup.CalcFields("PUT Passes Template");
+        if (MemberNotificationSetup."PUT Passes Template".HasValue()) then begin
+            MemberNotificationSetup."PUT Passes Template".CreateInStream(instream);
+            while (not instream.EOS()) do begin
+                instream.ReadText(templateText);
+                PassData += AssignDataToPassTemplate(RecRef, templateText);
+            end;
         end else begin
-          templateText := GetDefaultTemplate();
-          PassData += AssignDataToPassTemplate (RecRef, templateText);
+            templateText := GetDefaultTemplate();
+            PassData += AssignDataToPassTemplate(RecRef, templateText);
         end;
 
         //JObject := JObject.Parse (PassData);
         //MESSAGE ('image type %1', GetStringValue (JObject, 'data.images[:1].type'));
         //ERROR ('Pass Data %1', COPYSTR (PassData, 1, 2048));
 
-        if (CreatePass (MemberNotificationEntry, PassData)) then
-          SetPassUrl (MemberNotificationEntry);
+        if (CreatePass(MemberNotificationEntry, PassData)) then
+            SetPassUrl(MemberNotificationEntry);
     end;
 
-    local procedure CreatePass(var MemberNotificationEntry: Record "MM Member Notification Entry";PassData: Text): Boolean
+    local procedure CreatePass(var MemberNotificationEntry: Record "MM Member Notification Entry"; PassData: Text): Boolean
     var
         MemberNotificationSetup: Record "MM Member Notification Setup";
         MembershipRole: Record "MM Membership Role";
@@ -687,17 +697,17 @@ codeunit 6060136 "MM Member Notification"
         FailReason: Text;
     begin
 
-        MemberNotificationSetup.Get (MemberNotificationEntry."Notification Code");
-        MembershipRole.Get (MemberNotificationEntry."Membership Entry No.", MemberNotificationEntry."Member Entry No.");
+        MemberNotificationSetup.Get(MemberNotificationEntry."Notification Code");
+        MembershipRole.Get(MemberNotificationEntry."Membership Entry No.", MemberNotificationEntry."Member Entry No.");
 
         if (MembershipRole."Wallet Pass Id" = '') then begin
-          MembershipRole."Wallet Pass Id" := UpperCase(DelChr(Format(CreateGuid),'=','{}-'));
-          MembershipRole.Modify ();
+            MembershipRole."Wallet Pass Id" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+            MembershipRole.Modify();
         end;
 
         MemberNotificationEntry."Wallet Pass Id" := MembershipRole."Wallet Pass Id";
 
-        exit (NPPassServerInvokeApi ('PUT', MemberNotificationSetup, MemberNotificationEntry."Wallet Pass Id", FailReason, PassData, JSONResult));
+        exit(NPPassServerInvokeApi('PUT', MemberNotificationSetup, MemberNotificationEntry."Wallet Pass Id", FailReason, PassData, JSONResult));
     end;
 
     local procedure SetPassUrl(var MemberNotificationEntry: Record "MM Member Notification Entry"): Boolean
@@ -705,39 +715,39 @@ codeunit 6060136 "MM Member Notification"
         MemberNotificationSetup: Record "MM Member Notification Setup";
         JSONResult: Text;
         FailReason: Text;
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
     begin
 
-        if (not MemberNotificationSetup.Get (MemberNotificationEntry."Notification Code")) then
-          exit (false);
+        if (not MemberNotificationSetup.Get(MemberNotificationEntry."Notification Code")) then
+            exit(false);
 
-        if not (NPPassServerInvokeApi ('GET', MemberNotificationSetup, MemberNotificationEntry."Wallet Pass Id", FailReason, '', JSONResult)) then
-          exit (false);
+        if not (NPPassServerInvokeApi('GET', MemberNotificationSetup, MemberNotificationEntry."Wallet Pass Id", FailReason, '', JSONResult)) then
+            exit(false);
 
         if (JSONResult = '') then
-          exit (false);
+            exit(false);
 
-        JObject := JObject.Parse (JSONResult);
-        MemberNotificationEntry."Wallet Pass Default URL" := GetStringValue (JObject, 'public_url.default');
-        MemberNotificationEntry."Wallet Pass Andriod URL" := GetStringValue (JObject, 'public_url.android');
-        MemberNotificationEntry."Wallet Pass Landing URL" := GetStringValue (JObject, 'public_url.landing'); //-+MM1.29.02 [317156]
+        JObject := JObject.Parse(JSONResult);
+        MemberNotificationEntry."Wallet Pass Default URL" := GetStringValue(JObject, 'public_url.default');
+        MemberNotificationEntry."Wallet Pass Andriod URL" := GetStringValue(JObject, 'public_url.android');
+        MemberNotificationEntry."Wallet Pass Landing URL" := GetStringValue(JObject, 'public_url.landing'); //-+MM1.29.02 [317156]
 
-        exit (true);
+        exit(true);
     end;
 
-    local procedure GetStringValue(JObject: DotNet npNetJObject;"Key": Text): Text
+    local procedure GetStringValue(JObject: DotNet JObject; "Key": Text): Text
     var
-        JToken: DotNet npNetJToken;
+        JToken: DotNet JToken;
     begin
 
-        JToken := JObject.SelectToken (Key, false);
-        if (IsNull (JToken)) then
-          exit ('');
+        JToken := JObject.SelectToken(Key, false);
+        if (IsNull(JToken)) then
+            exit('');
 
-        exit (JToken.ToString ());
+        exit(JToken.ToString());
     end;
 
-    procedure AssignDataToPassTemplate(var RecRef: RecordRef;Line: Text) NewLine: Text
+    procedure AssignDataToPassTemplate(var RecRef: RecordRef; Line: Text) NewLine: Text
     var
         FieldRef: FieldRef;
         "Count": Integer;
@@ -757,49 +767,49 @@ codeunit 6060136 "MM Member Notification"
     begin
         StartSeparator := '{[';
         EndSeparator := ']}';
-        SeparatorLength := StrLen (StartSeparator);
+        SeparatorLength := StrLen(StartSeparator);
 
         NewLine := Line;
-        while (StrPos (NewLine, StartSeparator) > 0) do begin
-          StartPos := StrPos (NewLine,StartSeparator);
-          EndPos := StrPos (NewLine,EndSeparator);
+        while (StrPos(NewLine, StartSeparator) > 0) do begin
+            StartPos := StrPos(NewLine, StartSeparator);
+            EndPos := StrPos(NewLine, EndSeparator);
 
-          Evaluate (FieldNo, CopyStr (NewLine,StartPos + SeparatorLength,EndPos - StartPos - SeparatorLength));
-          if (RecRef.FieldExist(FieldNo)) then begin
+            Evaluate(FieldNo, CopyStr(NewLine, StartPos + SeparatorLength, EndPos - StartPos - SeparatorLength));
+            if (RecRef.FieldExist(FieldNo)) then begin
 
-            FieldRef := RecRef.Field(FieldNo);
-            if UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD' then
-              FieldRef.CalcField;
+                FieldRef := RecRef.Field(FieldNo);
+                if UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD' then
+                    FieldRef.CalcField;
 
-            NewLine := DelStr (NewLine,StartPos,EndPos - StartPos + SeparatorLength);
+                NewLine := DelStr(NewLine, StartPos, EndPos - StartPos + SeparatorLength);
 
-            if (UpperCase (Format(Format(FieldRef.Type)))) = 'OPTION' then begin
-              OptionCaption := Format (FieldRef.OptionString);
-              Evaluate (OptionInt,Format (FieldRef.Value));
-              for i := 1 to OptionInt do
-                OptionCaption := DelStr(OptionCaption,1,StrPos(OptionCaption, ','));
-              if (StrPos(OptionCaption, ',' ) <> 0) then
-                OptionCaption := DelStr (OptionCaption, StrPos (OptionCaption, ','));
-              NewLine := InsStr (NewLine, OptionCaption, StartPos);
-            end else begin
-              NewLine := InsStr (NewLine, DelChr (Format(FieldRef.Value,0,9), '<=>', '"'), StartPos);
-            end;
-          end else
-            case FieldNo of
-              -100 : // thumbnail
-                begin
-                  FieldRef := RecRef.Field (MemberNotificationEntry.FieldNo ("Member Entry No."));
-                  MemberEntryNo := FieldRef.Value;
-
-                  NewLine := DelStr (NewLine, StartPos, EndPos - StartPos + SeparatorLength);
-                  if (not MembershipManagement.GetMemberImage (MemberEntryNo, B64Image)) then
-                      B64Image := '';
-                  NewLine := InsStr (NewLine, B64Image, StartPos);
+                if (UpperCase(Format(Format(FieldRef.Type)))) = 'OPTION' then begin
+                    OptionCaption := Format(FieldRef.OptionString);
+                    Evaluate(OptionInt, Format(FieldRef.Value));
+                    for i := 1 to OptionInt do
+                        OptionCaption := DelStr(OptionCaption, 1, StrPos(OptionCaption, ','));
+                    if (StrPos(OptionCaption, ',') <> 0) then
+                        OptionCaption := DelStr(OptionCaption, StrPos(OptionCaption, ','));
+                    NewLine := InsStr(NewLine, OptionCaption, StartPos);
+                end else begin
+                    NewLine := InsStr(NewLine, DelChr(Format(FieldRef.Value, 0, 9), '<=>', '"'), StartPos);
                 end;
-              else
-                Error(BAD_REFERENCE, FieldNo, Line);
-            end;
-          Line := NewLine;
+            end else
+                case FieldNo of
+                    -100: // thumbnail
+                        begin
+                            FieldRef := RecRef.Field(MemberNotificationEntry.FieldNo("Member Entry No."));
+                            MemberEntryNo := FieldRef.Value;
+
+                            NewLine := DelStr(NewLine, StartPos, EndPos - StartPos + SeparatorLength);
+                            if (not MembershipManagement.GetMemberImage(MemberEntryNo, B64Image)) then
+                                B64Image := '';
+                            NewLine := InsStr(NewLine, B64Image, StartPos);
+                        end;
+                    else
+                        Error(BAD_REFERENCE, FieldNo, Line);
+                end;
+            Line := NewLine;
         end;
 
         exit(NewLine);
@@ -815,39 +825,39 @@ codeunit 6060136 "MM Member Notification"
         CRLF[1] := 13;
         CRLF[2] := 10;
         template :=
-        '{"data":{'+CRLF+
-            '"expiration_date": "{[161]}T23:59:59+01:00",'+CRLF+
-            '"member": {'+CRLF+
-            '    "name": "{[123]}",'+CRLF+
-            '    "email": "{[110]}"'+CRLF+
-            '},'+CRLF+
-            '"membership": {'+CRLF+
-            '    "type": "{[156]}",'+CRLF+
-            '    "valid_from": "{[153]}",'+CRLF+
-            '    "valid_to": "{[154]}",'+CRLF+
-            '    "points": "{[170]}",'+CRLF+
-            '    "barcode": {'+CRLF+
-            '        "alt_text": "{[160]}",'+CRLF+
-            '        "value": "{[160]}"'+CRLF+
-            '    }'+CRLF+
-            '},'+CRLF+
-            '"images": ['+CRLF+
-            '    {'+CRLF+
-            '        "type": "thumbnail",'+CRLF+
-            '        "content": "{[-100]}"'+CRLF+
-            '    }'+CRLF+
-            ']'+CRLF+
+        '{"data":{' + CRLF +
+            '"expiration_date": "{[161]}T23:59:59+01:00",' + CRLF +
+            '"member": {' + CRLF +
+            '    "name": "{[123]}",' + CRLF +
+            '    "email": "{[110]}"' + CRLF +
+            '},' + CRLF +
+            '"membership": {' + CRLF +
+            '    "type": "{[156]}",' + CRLF +
+            '    "valid_from": "{[153]}",' + CRLF +
+            '    "valid_to": "{[154]}",' + CRLF +
+            '    "points": "{[170]}",' + CRLF +
+            '    "barcode": {' + CRLF +
+            '        "alt_text": "{[160]}",' + CRLF +
+            '        "value": "{[160]}"' + CRLF +
+            '    }' + CRLF +
+            '},' + CRLF +
+            '"images": [' + CRLF +
+            '    {' + CRLF +
+            '        "type": "thumbnail",' + CRLF +
+            '        "content": "{[-100]}"' + CRLF +
+            '    }' + CRLF +
+            ']' + CRLF +
             '}}';
         //+MM1.29.02 [317156]
 
-        exit (template);
+        exit(template);
     end;
 
     local procedure "---Inline Notifications"()
     begin
     end;
 
-    procedure CreateUpdateWalletNotification(MembershipEntryNo: Integer;MemberEntryNo: Integer;MemberCardEntryNo: Integer) EntryNo: Integer
+    procedure CreateUpdateWalletNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer) EntryNo: Integer
     var
         Membership: Record "MM Membership";
         MembershipSetup: Record "MM Membership Setup";
@@ -857,11 +867,11 @@ codeunit 6060136 "MM Member Notification"
 
         //-MM1.36 [328141]
         //EXIT (CreateWalletNotification (MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_UPDATE));
-        exit (CreateWalletNotification (MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_UPDATE, MembershipNotification."Notification Method Source"::MEMBER));
+        exit(CreateWalletNotification(MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_UPDATE, MembershipNotification."Notification Method Source"::MEMBER));
         //+MM1.36 [328141]
     end;
 
-    procedure CreateWalletSendNotification(MembershipEntryNo: Integer;MemberEntryNo: Integer;MemberCardEntryNo: Integer) EntryNo: Integer
+    procedure CreateWalletSendNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer) EntryNo: Integer
     var
         Membership: Record "MM Membership";
         MembershipSetup: Record "MM Membership Setup";
@@ -871,11 +881,11 @@ codeunit 6060136 "MM Member Notification"
 
         //-MM1.36 [328141]
         //EXIT (CreateWalletNotification (MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_CREATE));
-        exit (CreateWalletNotification (MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_CREATE, MembershipNotification."Notification Method Source"::MEMBER));
+        exit(CreateWalletNotification(MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationSetup.Type::WALLET_CREATE, MembershipNotification."Notification Method Source"::MEMBER));
         //+MM1.36 [328141]
     end;
 
-    procedure CreateWalletWithoutSendingNotification(MembershipEntryNo: Integer;MemberEntryNo: Integer;MemberCardEntryNo: Integer) EntryNo: Integer
+    procedure CreateWalletWithoutSendingNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer) EntryNo: Integer
     var
         Membership: Record "MM Membership";
         MembershipSetup: Record "MM Membership Setup";
@@ -889,15 +899,15 @@ codeunit 6060136 "MM Member Notification"
 
         NotificationTriggerType := NotificationSetup.Type::WALLET_CREATE;
 
-        if (MembershipRole.Get (MembershipEntryNo, MemberEntryNo)) then
-          if (MembershipRole."Wallet Pass Id" <> '') then
-            NotificationTriggerType := NotificationSetup.Type::WALLET_UPDATE;
+        if (MembershipRole.Get(MembershipEntryNo, MemberEntryNo)) then
+            if (MembershipRole."Wallet Pass Id" <> '') then
+                NotificationTriggerType := NotificationSetup.Type::WALLET_UPDATE;
 
-        exit (CreateWalletNotification (MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationTriggerType, MembershipNotification."Notification Method Source"::EXTERNAL));
+        exit(CreateWalletNotification(MembershipEntryNo, MemberEntryNo, MemberCardEntryNo, NotificationTriggerType, MembershipNotification."Notification Method Source"::EXTERNAL));
         //+MM1.36 [328141]
     end;
 
-    local procedure CreateWalletNotification(MembershipEntryNo: Integer;MemberEntryNo: Integer;MemberCardEntryNo: Integer;NotificationTriggerType: Option;NotificationSource: Option) EntryNo: Integer
+    local procedure CreateWalletNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; NotificationTriggerType: Option; NotificationSource: Option) EntryNo: Integer
     var
         Membership: Record "MM Membership";
         MembershipSetup: Record "MM Membership Setup";
@@ -905,39 +915,39 @@ codeunit 6060136 "MM Member Notification"
         MembershipNotification: Record "MM Membership Notification";
     begin
 
-        if (not Membership.Get (MembershipEntryNo)) then
-          exit (0);
+        if (not Membership.Get(MembershipEntryNo)) then
+            exit(0);
 
-        if (not MembershipSetup.Get (Membership."Membership Code")) then
-          exit (0);
+        if (not MembershipSetup.Get(Membership."Membership Code")) then
+            exit(0);
 
         if (not MembershipSetup."Enable NP Pass Integration") then
-          exit (0);
+            exit(0);
 
-        NotificationSetup.SetFilter (Type, '=%1', NotificationTriggerType);
-        if (NotificationSetup.IsEmpty ()) then
-          exit (0);
+        NotificationSetup.SetFilter(Type, '=%1', NotificationTriggerType);
+        if (NotificationSetup.IsEmpty()) then
+            exit(0);
 
-        NotificationSetup.SetFilter ("Membership Code", '=%1', Membership."Membership Code");
-        if (NotificationSetup.IsEmpty ()) then begin
-          NotificationSetup.Reset ();
-          NotificationSetup.SetFilter (Type, '=%1', NotificationTriggerType);
-          NotificationSetup.SetFilter ("Community Code", '=%1', Membership."Community Code");
-          if (NotificationSetup.IsEmpty ()) then
-            exit (0);
+        NotificationSetup.SetFilter("Membership Code", '=%1', Membership."Membership Code");
+        if (NotificationSetup.IsEmpty()) then begin
+            NotificationSetup.Reset();
+            NotificationSetup.SetFilter(Type, '=%1', NotificationTriggerType);
+            NotificationSetup.SetFilter("Community Code", '=%1', Membership."Community Code");
+            if (NotificationSetup.IsEmpty()) then
+                exit(0);
         end;
 
         NotificationSetup.FindFirst();
 
-        MembershipNotification.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
-        MembershipNotification.SetFilter ("Member Card Entry No.", '=%1', MemberCardEntryNo);
-        MembershipNotification.SetFilter ("Member Entry No.", '=%1', MemberEntryNo);
-        MembershipNotification.SetFilter ("Notification Code", '=%1', NotificationSetup.Code);
-        MembershipNotification.SetFilter ("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
-        MembershipNotification.SetFilter ("Date To Notify", '=%1', Today);
-        MembershipNotification.SetFilter ("Notification Trigger", '=%1', NotificationTriggerType);
-        if (MembershipNotification.FindFirst ()) then
-          exit (MembershipNotification."Entry No.");
+        MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipNotification.SetFilter("Member Card Entry No.", '=%1', MemberCardEntryNo);
+        MembershipNotification.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
+        MembershipNotification.SetFilter("Notification Code", '=%1', NotificationSetup.Code);
+        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
+        MembershipNotification.SetFilter("Date To Notify", '=%1', Today);
+        MembershipNotification.SetFilter("Notification Trigger", '=%1', NotificationTriggerType);
+        if (MembershipNotification.FindFirst()) then
+            exit(MembershipNotification."Entry No.");
 
         MembershipNotification."Membership Entry No." := MembershipEntryNo;
         MembershipNotification."Member Card Entry No." := MemberCardEntryNo;
@@ -955,9 +965,9 @@ codeunit 6060136 "MM Member Notification"
         MembershipNotification."Notification Method Source" := NotificationSource;
         //+MM1.36 [328141]
 
-        MembershipNotification.Insert ();
+        MembershipNotification.Insert();
 
-        exit (MembershipNotification."Entry No.");
+        exit(MembershipNotification."Entry No.");
     end;
 
     procedure SendInlineNotifications()
@@ -967,30 +977,30 @@ codeunit 6060136 "MM Member Notification"
     begin
 
         // inline notifications are for DEMO purpose only
-        Sleep (2000); // posting is occurring in a other thread.
+        Sleep(2000); // posting is occurring in a other thread.
         // I want posting to be done before sending out the notification
 
-        MembershipNotification.Reset ();
-        MembershipNotification.SetFilter ("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
-        MembershipNotification.SetFilter ("Processing Method", '=%1', MembershipNotification."Processing Method"::INLINE);
-        MembershipNotification.SetFilter ("Date To Notify", '=%1', Today);
-        MembershipNotification.SetFilter (Blocked, '=%1', false);
+        MembershipNotification.Reset();
+        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
+        MembershipNotification.SetFilter("Processing Method", '=%1', MembershipNotification."Processing Method"::INLINE);
+        MembershipNotification.SetFilter("Date To Notify", '=%1', Today);
+        MembershipNotification.SetFilter(Blocked, '=%1', false);
 
-        if (MembershipNotification.FindSet ()) then begin
-          repeat
-            MemberNotification.HandleMembershipNotification (MembershipNotification);
-          until (MembershipNotification.Next () = 0);
+        if (MembershipNotification.FindSet()) then begin
+            repeat
+                MemberNotification.HandleMembershipNotification(MembershipNotification);
+            until (MembershipNotification.Next() = 0);
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
-    local procedure OnBeforeInsertWorkflowStep(var Rec: Record "POS Sales Workflow Step";RunTrigger: Boolean)
+    local procedure OnBeforeInsertWorkflowStep(var Rec: Record "POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
 
         if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
-          exit;
-        if Rec."Subscriber Function" <>  'SendMemberNotificationOnSales' then
-          exit;
+            exit;
+        if Rec."Subscriber Function" <> 'SendMemberNotificationOnSales' then
+            exit;
 
         Rec.Description := INLINE_NOTIFICATION;
         Rec."Sequence No." := 101;
@@ -1004,23 +1014,23 @@ codeunit 6060136 "MM Member Notification"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
-    local procedure SendMemberNotificationOnSales(POSSalesWorkflowStep: Record "POS Sales Workflow Step";SalePOS: Record "Sale POS")
+    local procedure SendMemberNotificationOnSales(POSSalesWorkflowStep: Record "POS Sales Workflow Step"; SalePOS: Record "Sale POS")
     begin
 
 
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
-          exit;
+            exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'SendMemberNotificationOnSales' then
-          exit;
+            exit;
 
-        SendInlineNotifications ();
+        SendInlineNotifications();
     end;
 
     local procedure "-------"()
     begin
     end;
 
-    procedure NPPassServerInvokeApi(Method: Code[10];MemberNotificationSetup: Record "MM Member Notification Setup";PassID: Text;var ReasonText: Text;JSONIn: Text;var JSONOut: Text): Boolean
+    procedure NPPassServerInvokeApi(Method: Code[10]; MemberNotificationSetup: Record "MM Member Notification Setup"; PassID: Text; var ReasonText: Text; JSONIn: Text; var JSONOut: Text): Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         HttpWebRequest: DotNet npNetHttpWebRequest;
@@ -1034,79 +1044,79 @@ codeunit 6060136 "MM Member Notification"
     begin
 
         ReasonText := '';
-        Url := StrSubstNo ('%1%2?sync=%3', MemberNotificationSetup."NP Pass Server Base URL",
-                                           StrSubstNo (MemberNotificationSetup."Passes API", MemberNotificationSetup."Pass Type Code", PassID),
-                                           Format (MemberNotificationSetup."Pass Notification Method", 0, 9));
+        Url := StrSubstNo('%1%2?sync=%3', MemberNotificationSetup."NP Pass Server Base URL",
+                                           StrSubstNo(MemberNotificationSetup."Passes API", MemberNotificationSetup."Pass Type Code", PassID),
+                                           Format(MemberNotificationSetup."Pass Notification Method", 0, 9));
 
-        HttpWebRequest := HttpWebRequest.Create (Url);
+        HttpWebRequest := HttpWebRequest.Create(Url);
         HttpWebRequest.Timeout := 10000;
-        HttpWebRequest.KeepAlive (true);
+        HttpWebRequest.KeepAlive(true);
 
         HttpWebRequest.Method := Method;
         HttpWebRequest.ContentType := 'application/json';
         HttpWebRequest.Accept := 'application/json';
-        HttpWebRequest.UseDefaultCredentials (false);
-        HttpWebRequest.Headers.Add ('Authorization', StrSubstNo ('Bearer %1', MemberNotificationSetup."Pass Token"));
+        HttpWebRequest.UseDefaultCredentials(false);
+        HttpWebRequest.Headers.Add('Authorization', StrSubstNo('Bearer %1', MemberNotificationSetup."Pass Token"));
 
-        NpXmlDomMgt.SetTrustedCertificateValidation (HttpWebRequest);
+        NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
 
-        if (TrySendWebRequest (JSONIn, HttpWebRequest, HttpWebResponse)) then begin
-          TryReadResponseText (HttpWebResponse, ResponseText);
-          JSONOut := ResponseText;
-          exit (true);
+        if (TrySendWebRequest(JSONIn, HttpWebRequest, HttpWebResponse)) then begin
+            TryReadResponseText(HttpWebResponse, ResponseText);
+            JSONOut := ResponseText;
+            exit(true);
         end;
 
-        ReasonText := StrSubstNo ('Error from API %1\\%2', GetLastErrorText, Url);
+        ReasonText := StrSubstNo('Error from API %1\\%2', GetLastErrorText, Url);
 
         Exception := GetLastErrorObject();
-        if ((Format (GetDotNetType(Exception.GetBaseException ()))) <> (Format (GetDotNetType(WebException)))) then
-          Error (Exception.ToString ());
+        if ((Format(GetDotNetType(Exception.GetBaseException()))) <> (Format(GetDotNetType(WebException)))) then
+            Error(Exception.ToString());
 
-        WebException := Exception.GetBaseException ();
-        TryReadExceptionResponseText (WebException, StatusCode, StatusDescription, ResponseText);
+        WebException := Exception.GetBaseException();
+        TryReadExceptionResponseText(WebException, StatusCode, StatusDescription, ResponseText);
 
-        if (StrLen (ResponseText) > 0) then
-          Error (ResponseText);
+        if (StrLen(ResponseText) > 0) then
+            Error(ResponseText);
 
-        if (StrLen (ResponseText) = 0) then
-          Error (StrSubstNo (
-            '<Fault>'+
-              '<faultstatus>%1</faultstatus>'+
-              '<faultstring>%2 - %3</faultstring>'+
-            '</Fault>',
-            StatusCode,
-            StatusDescription,
-            Url));
+        if (StrLen(ResponseText) = 0) then
+            Error(StrSubstNo(
+              '<Fault>' +
+                '<faultstatus>%1</faultstatus>' +
+                '<faultstring>%2 - %3</faultstring>' +
+              '</Fault>',
+              StatusCode,
+              StatusDescription,
+              Url));
 
-        exit (false);
+        exit(false);
     end;
 
     [TryFunction]
-    local procedure TrySendWebRequest(JSON: Text;HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse)
+    local procedure TrySendWebRequest(JSON: Text; HttpWebRequest: DotNet npNetHttpWebRequest; var HttpWebResponse: DotNet npNetHttpWebResponse)
     var
         MemoryStreamOut: DotNet npNetMemoryStream;
         MemoryStreamIn: DotNet npNetMemoryStream;
         Encoding: DotNet npNetEncoding;
     begin
 
-        if (StrLen (JSON) > 0) then begin
-          MemoryStreamIn := MemoryStreamIn.MemoryStream (Encoding.UTF8.GetBytes(JSON));
-          MemoryStreamOut := HttpWebRequest.GetRequestStream ();
+        if (StrLen(JSON) > 0) then begin
+            MemoryStreamIn := MemoryStreamIn.MemoryStream(Encoding.UTF8.GetBytes(JSON));
+            MemoryStreamOut := HttpWebRequest.GetRequestStream();
 
-          MemoryStreamIn.WriteTo (MemoryStreamOut);
+            MemoryStreamIn.WriteTo(MemoryStreamOut);
 
-          MemoryStreamOut.Flush;
-          MemoryStreamOut.Close;
-          Clear (MemoryStreamOut);
+            MemoryStreamOut.Flush;
+            MemoryStreamOut.Close;
+            Clear(MemoryStreamOut);
 
-          MemoryStreamIn.Close ();
-          Clear (MemoryStreamIn);
+            MemoryStreamIn.Close();
+            Clear(MemoryStreamIn);
         end;
         HttpWebResponse := HttpWebRequest.GetResponse;
     end;
 
     [TryFunction]
-    local procedure TryReadResponseText(var HttpWebResponse: DotNet npNetHttpWebResponse;var ResponseText: Text)
+    local procedure TryReadResponseText(var HttpWebResponse: DotNet npNetHttpWebResponse; var ResponseText: Text)
     var
         StreamReader: DotNet npNetStreamReader;
     begin
@@ -1121,52 +1131,55 @@ codeunit 6060136 "MM Member Notification"
     end;
 
     [TryFunction]
-    local procedure TryReadExceptionResponseText(var WebException: DotNet npNetWebException;var StatusCode: Code[10];var StatusDescription: Text;var ResponseXml: Text)
+    local procedure TryReadExceptionResponseText(var WebException: DotNet npNetWebException; var StatusCode: Code[10]; var StatusDescription: Text; var ResponseXml: Text)
     var
         StreamReader: DotNet npNetStreamReader;
         HttpWebResponse: DotNet npNetHttpWebResponse;
         WebExceptionStatus: DotNet npNetWebExceptionStatus;
         SystemConvert: DotNet npNetConvert;
         StatusCodeInt: Integer;
+        DotNetType: DotNet npNetType;
     begin
 
         ResponseXml := '';
 
         // No respone body on time out
-        if (WebException.Status.Equals (WebExceptionStatus.Timeout)) then  begin
-          StatusCodeInt := SystemConvert.ChangeType (WebExceptionStatus.Timeout, GetDotNetType (StatusCodeInt));
-          StatusCode := Format (StatusCodeInt);
-          StatusDescription := WebExceptionStatus.Timeout.ToString();
-          exit;
+        if (WebException.Status.Equals(WebExceptionStatus.Timeout)) then begin
+            DotNetType := GetDotNetType(StatusCodeInt);
+            StatusCodeInt := SystemConvert.ChangeType(WebExceptionStatus.Timeout, DotNetType);
+            StatusCode := Format(StatusCodeInt);
+            StatusDescription := WebExceptionStatus.Timeout.ToString();
+            exit;
         end;
 
         // This happens for unauthorized and server side faults (4xx and 5xx)
         // The response stream in unauthorized fails in XML transformation later
-        if (WebException.Status.Equals (WebExceptionStatus.ProtocolError)) then begin
-          HttpWebResponse := WebException.Response ();
-          StatusCodeInt := SystemConvert.ChangeType (HttpWebResponse.StatusCode, GetDotNetType (StatusCodeInt));
-          StatusCode := Format (StatusCodeInt);
-          StatusDescription := HttpWebResponse.StatusDescription;
-          if (StatusCode[1] = '4') then // 4xx messages
-            exit;
+        if (WebException.Status.Equals(WebExceptionStatus.ProtocolError)) then begin
+            HttpWebResponse := WebException.Response();
+            DotNetType := GetDotNetType(StatusCodeInt);
+            StatusCodeInt := SystemConvert.ChangeType(HttpWebResponse.StatusCode, DotNetType);
+            StatusCode := Format(StatusCodeInt);
+            StatusDescription := HttpWebResponse.StatusDescription;
+            if (StatusCode[1] = '4') then // 4xx messages
+                exit;
         end;
 
         StreamReader := StreamReader.StreamReader(WebException.Response().GetResponseStream());
         ResponseXml := StreamReader.ReadToEnd;
 
         StreamReader.Close;
-        Clear (StreamReader);
+        Clear(StreamReader);
     end;
 
     [TryFunction]
-    local procedure TryGetWebExceptionResponse(var WebException: DotNet npNetWebException;var HttpWebResponse: DotNet npNetHttpWebResponse)
+    local procedure TryGetWebExceptionResponse(var WebException: DotNet npNetWebException; var HttpWebResponse: DotNet npNetHttpWebResponse)
     begin
 
         HttpWebResponse := WebException.Response;
     end;
 
     [TryFunction]
-    local procedure TryGetInnerWebException(var WebException: DotNet npNetWebException;var InnerWebException: DotNet npNetWebException)
+    local procedure TryGetInnerWebException(var WebException: DotNet npNetWebException; var InnerWebException: DotNet npNetWebException)
     begin
 
         InnerWebException := WebException.InnerException;
@@ -1200,7 +1213,7 @@ codeunit 6060136 "MM Member Notification"
     procedure XmlSafe(InText: Text): Text
     begin
 
-        exit (DelChr (InText, '<=>', DelChr (InText, '<=>', '1234567890 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-+*')));
+        exit(DelChr(InText, '<=>', DelChr(InText, '<=>', '1234567890 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-+*')));
     end;
 }
 

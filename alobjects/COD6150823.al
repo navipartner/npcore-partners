@@ -17,42 +17,42 @@ codeunit 6150823 "POS Action - Set Tax Liable"
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
-            RegisterWorkflowStep ('decl0', 'confirmtext = labels.prompt;');
-            RegisterWorkflowStep ('decl1', 'ask = false');
-            RegisterWorkflowStep ('confirm', 'confirm({title: labels.title, caption: confirmtext}).respond().no().respond();');
-            RegisterWorkflow(false);
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
+                RegisterWorkflowStep('decl0', 'confirmtext = labels.prompt;');
+                RegisterWorkflowStep('decl1', 'ask = false');
+                RegisterWorkflowStep('confirm', 'confirm({title: labels.title, caption: confirmtext}).respond().no().respond();');
+                RegisterWorkflow(false);
 
-          end;
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         Confirmed: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        SetTaxLiable (Context, POSSession, FrontEnd);
+        SetTaxLiable(Context, POSSession, FrontEnd);
         Handled := true;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "POS Caption Management")
     begin
-        Captions.AddActionCaption (ActionCode, 'title', Title);
-        Captions.AddActionCaption (ActionCode, 'prompt', Prompt);
+        Captions.AddActionCaption(ActionCode, 'title', Title);
+        Captions.AddActionCaption(ActionCode, 'prompt', Prompt);
     end;
 
-    local procedure SetTaxLiable(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure SetTaxLiable(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         Line: Record "Sale Line POS";
@@ -61,7 +61,7 @@ codeunit 6150823 "POS Action - Set Tax Liable"
         POSSale: Codeunit "POS Sale";
         TaxLiableValue: Boolean;
     begin
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
 
         TaxLiableValue := JSON.GetBoolean('value', true);
 
@@ -70,19 +70,19 @@ codeunit 6150823 "POS Action - Set Tax Liable"
         SalePOS.Validate("Tax Liable", TaxLiableValue);
         SalePOS.Modify(true);
         POSSale.Refresh(SalePOS);
-        POSSale.Modify(true,false);
+        POSSale.Modify(true, false);
 
         POSSession.RequestRefreshData();
     end;
 
     local procedure ActionCode(): Text
     begin
-        exit ('SETTAXLIABLE');
+        exit('SETTAXLIABLE');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 }
 

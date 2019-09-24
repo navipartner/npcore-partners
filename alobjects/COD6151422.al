@@ -64,7 +64,7 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
         SalesInvHeader: Record "Sales Invoice Header";
         PaymentGateway: Record "Magento Payment Gateway";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        JToken: DotNet npNetJToken;
+        JToken: DotNet JToken;
         HttpWebRequest: DotNet npNetHttpWebRequest;
         HttpWebResponse: DotNet npNetHttpWebResponse;
         WebException: DotNet npNetWebException;
@@ -132,7 +132,7 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
         SalesInvHeader: Record "Sales Invoice Header";
         PaymentGateway: Record "Magento Payment Gateway";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        JToken: DotNet npNetJToken;
+        JToken: DotNet JToken;
         HttpWebRequest: DotNet npNetHttpWebRequest;
         HttpWebResponse: DotNet npNetHttpWebResponse;
         WebException: DotNet npNetWebException;
@@ -187,7 +187,7 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         PaymentGateway: Record "Magento Payment Gateway";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        JToken: DotNet npNetJToken;
+        JToken: DotNet JToken;
         HttpWebRequest: DotNet npNetHttpWebRequest;
         HttpWebResponse: DotNet npNetHttpWebResponse;
         WebException: DotNet npNetWebException;
@@ -302,9 +302,9 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
         exit(PaymentGateway."Refund Codeunit Id" = CurrCodeunitId());
     end;
 
-    local procedure GetJsonText(JToken: DotNet npNetJToken;JPath: Text;MaxLen: Integer) Value: Text
+    local procedure GetJsonText(JToken: DotNet JToken;JPath: Text;MaxLen: Integer) Value: Text
     var
-        JToken2: DotNet npNetJToken;
+        JToken2: DotNet JToken;
     begin
         JToken2 := JToken.SelectToken(JPath);
         if IsNull(JToken2) then
@@ -317,7 +317,7 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
     end;
 
     [TryFunction]
-    local procedure ParseJson(Json: Text;var JToken: DotNet npNetJToken)
+    local procedure ParseJson(Json: Text;var JToken: DotNet JToken)
     begin
         JToken := JToken.Parse(Json);
     end;

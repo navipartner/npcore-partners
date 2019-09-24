@@ -38,9 +38,9 @@ page 6014456 "Table Export Wizard"
     PromotedActionCategories = 'New,Process,Execution,Template,Data,DBI,Setup,Test8';
     SourceTable = AllObj;
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Object Type","Object ID")
+    SourceTableView = SORTING ("Object Type", "Object ID")
                       ORDER(Ascending)
-                      WHERE("Object Type"=CONST(Table));
+                      WHERE ("Object Type" = CONST (Table));
     UsageCategory = Administration;
 
     layout
@@ -57,7 +57,7 @@ page 6014456 "Table Export Wizard"
                     repeater(Control6150614)
                     {
                         ShowCaption = false;
-                        field("Object ID";"Object ID")
+                        field("Object ID"; "Object ID")
                         {
 
                             trigger OnLookup(var Text: Text): Boolean
@@ -66,22 +66,22 @@ page 6014456 "Table Export Wizard"
                                 AllObj: Record AllObj;
                                 ac: Action;
                             begin
-                                AllObj.SetRange("Object Type",AllObj."Object Type"::Table);
+                                AllObj.SetRange("Object Type", AllObj."Object Type"::Table);
 
                                 if "Object ID" > 0 then
-                                  if AllObj.Get(AllObj."Object Type"::Table,"Object ID") then;
+                                    if AllObj.Get(AllObj."Object Type"::Table, "Object ID") then;
 
                                 AllObjects.SetTableView(AllObj);
                                 AllObjects.SetRecord(AllObj);
                                 AllObjects.LookupMode(true);
 
                                 if AllObjects.RunModal = ACTION::LookupOK then begin
-                                  AllObjects.GetRecord(AllObj);
-                                  TransferFields(AllObj);
-                                  Insert;
-                                  //-NPR5.48 [340086]
-                                  AddTableFields("Object ID");
-                                  //+NPR5.48 [340086]
+                                    AllObjects.GetRecord(AllObj);
+                                    TransferFields(AllObj);
+                                    Insert;
+                                    //-NPR5.48 [340086]
+                                    AddTableFields("Object ID");
+                                    //+NPR5.48 [340086]
                                 end;
                             end;
 
@@ -96,53 +96,50 @@ page 6014456 "Table Export Wizard"
                                 //+NPR5.48 [340086]
                             end;
                         }
-                        field("Object Name";"Object Name")
+                        field("Object Name"; "Object Name")
                         {
                             Editable = false;
                         }
                     }
-                    part("Fields";"Table Export Wizard Fields")
+                    part("Fields"; "Table Export Wizard Fields")
                     {
                         Caption = 'Fields';
-                        SubPageLink = TableNo=FIELD("Object ID");
+                        SubPageLink = TableNo = FIELD ("Object ID");
                     }
-                    part(TableFilters;"Export Wizard Filters")
+                    part(TableFilters; "Export Wizard Filters")
                     {
-                        SubPageLink = "Table Number"=FIELD("Object ID");
-                        SubPageView = SORTING("Table Number","Line No.");
+                        SubPageLink = "Table Number" = FIELD ("Object ID");
+                        SubPageView = SORTING ("Table Number", "Line No.");
                     }
                 }
                 group(Formatting)
                 {
                     Caption = 'Formatting';
-                    field(FieldStartDelimeter;FieldStartDelimeter)
+                    field(FieldStartDelimeter; FieldStartDelimeter)
                     {
                         Caption = 'Field Start Delimeter';
-                        OptionCaption = 'Field Start Delimeter';
                     }
-                    field(FieldEndDelimeter;FieldEndDelimeter)
+                    field(FieldEndDelimeter; FieldEndDelimeter)
                     {
                         Caption = 'Field End Delimeter';
-                        OptionCaption = 'Field End Delimeter';
                     }
-                    field(FieldSeparator;FieldSeparator)
+                    field(FieldSeparator; FieldSeparator)
                     {
                         Caption = 'Field Separator';
                     }
-                    field(RecordSeparator;RecordSeparator)
+                    field(RecordSeparator; RecordSeparator)
                     {
                         Caption = 'Record Separator';
                     }
-                    field(DataItemSeparator;DataItemSeparator)
+                    field(DataItemSeparator; DataItemSeparator)
                     {
                         Caption = 'Data Item Separator';
-                        OptionCaption = 'Data Item Separator';
                     }
-                    field(EscapeCharacter;EscapeCharacter)
+                    field(EscapeCharacter; EscapeCharacter)
                     {
                         Caption = 'Escape Character';
                     }
-                    field(ExportDataInXmlFormat;ExportDataInXmlFormat)
+                    field(ExportDataInXmlFormat; ExportDataInXmlFormat)
                     {
                         Caption = 'Use Xml-Format';
                     }
@@ -150,19 +147,19 @@ page 6014456 "Table Export Wizard"
                 group("Data Settings")
                 {
                     Caption = 'Data Settings';
-                    field(UseCompanyName;UseCompanyName)
+                    field(UseCompanyName; UseCompanyName)
                     {
                         Caption = 'Company';
                     }
-                    field(OutFileEncoding;OutFileEncoding)
+                    field(OutFileEncoding; OutFileEncoding)
                     {
                         Caption = 'File Encoding';
                     }
-                    field(FileMode;FileMode)
+                    field(FileMode; FileMode)
                     {
                         Caption = 'File Mode';
                     }
-                    field(SkipFlowFields;SkipFlowFields)
+                    field(SkipFlowFields; SkipFlowFields)
                     {
                         Caption = 'Skip Flow Fields';
                     }
@@ -170,7 +167,7 @@ page 6014456 "Table Export Wizard"
                 group("Export Settings")
                 {
                     Caption = 'Export Settings';
-                    field(RaiseErrors;RaiseErrors)
+                    field(RaiseErrors; RaiseErrors)
                     {
                         Caption = 'Raise Errors';
                     }
@@ -245,7 +242,6 @@ page 6014456 "Table Export Wizard"
             group(ExcludingTransactions)
             {
                 Caption = 'Excluding Transactions';
-                Image = Data;
                 action(RetailExclTransactions)
                 {
                     Caption = 'Add Retail Setup';
@@ -429,31 +425,32 @@ page 6014456 "Table Export Wizard"
                         Dia.Open(Text00001);
                         Obj.SetRange("Object Type", Obj."Object Type"::Table);
 
-                        Obj.SetFilter("Object ID",'%1..%2|%3..%4|%5..%6', 1, 49999, 199999, 11102034, 11102199, 2000000000); //Exclude Customer, OMA and Std NAV tables above 2000000000
+                        Obj.SetFilter("Object ID", '%1..%2|%3..%4|%5..%6', 1, 49999, 199999, 11102034, 11102199, 2000000000); //Exclude Customer, OMA and Std NAV tables above 2000000000
                         Total := Obj.Count;
                         TestOnCRM := not CRMIntegrationManagement.IsCRMIntegrationEnabled;
 
-                        if Obj.FindSet then repeat
-                          Count += 1;
-                          Dia.Update(1,Obj."Object ID");
-                          Dia.Update(2,Round(Count / Total * 10000,1));
-                          if not (IsEntryTable(Obj."Object ID") or
-                                  IsJournalTable(Obj."Object ID") or
-                                  IsPostedDocument(Obj."Object ID") or
-                                  IsOpenDocument(Obj."Object ID") or
-                                  IsPepperTable(Obj."Object ID") or
-                                  IsMustAvoidTable(Obj."Object ID")) then begin
-                            if CheckTablePermissions(Obj."Object ID") and not SkipCRMTable(Obj."Object ID",TestOnCRM) then begin
-                        //-NPR5.48 [340086]
-                        //      RecRef.OPEN(Obj."Object ID");
-                        //      IF NOT RecRef.ISEMPTY THEN
-                        //        AddTable(Obj."Object ID");
-                        //      RecRef.CLOSE;
-                              AddTable(Obj."Object ID");
-                        //+NPR5.48 [340086]
-                            end;
-                          end;
-                        until Obj.Next = 0;
+                        if Obj.FindSet then
+                            repeat
+                                Count += 1;
+                                Dia.Update(1, Obj."Object ID");
+                                Dia.Update(2, Round(Count / Total * 10000, 1));
+                                if not (IsEntryTable(Obj."Object ID") or
+                                        IsJournalTable(Obj."Object ID") or
+                                        IsPostedDocument(Obj."Object ID") or
+                                        IsOpenDocument(Obj."Object ID") or
+                                        IsPepperTable(Obj."Object ID") or
+                                        IsMustAvoidTable(Obj."Object ID")) then begin
+                                    if CheckTablePermissions(Obj."Object ID") and not SkipCRMTable(Obj."Object ID", TestOnCRM) then begin
+                                        //-NPR5.48 [340086]
+                                        //      RecRef.OPEN(Obj."Object ID");
+                                        //      IF NOT RecRef.ISEMPTY THEN
+                                        //        AddTable(Obj."Object ID");
+                                        //      RecRef.CLOSE;
+                                        AddTable(Obj."Object ID");
+                                        //+NPR5.48 [340086]
+                                    end;
+                                end;
+                            until Obj.Next = 0;
                         Dia.Close;
                         //+NPR5.44 [322867]
                     end;
@@ -475,22 +472,23 @@ page 6014456 "Table Export Wizard"
                         Dia.Open(Text00001);
                         Obj.SetRange("Object Type", Obj."Object Type"::Table);
 
-                        Obj.SetFilter("Object ID",'%1..%2', 1, 2000000000);
+                        Obj.SetFilter("Object ID", '%1..%2', 1, 2000000000);
                         Total := Obj.Count;
-                        if Obj.FindSet then repeat
-                          Count += 1;
-                          Dia.Update(1,Obj."Object ID");
-                          Dia.Update(2,Round(Count / Total * 10000,1));
-                          if IsPepperTable(Obj."Object ID") then begin
-                        //-NPR5.48 [340086]
-                        //    RecRef.OPEN(Obj."Object ID");
-                        //    IF NOT RecRef.ISEMPTY THEN
-                        //      AddTable(Obj."Object ID");
-                        //    RecRef.CLOSE;
-                            AddTable(Obj."Object ID");
-                        //+NPR5.48 [340086]
-                          end;
-                        until Obj.Next = 0;
+                        if Obj.FindSet then
+                            repeat
+                                Count += 1;
+                                Dia.Update(1, Obj."Object ID");
+                                Dia.Update(2, Round(Count / Total * 10000, 1));
+                                if IsPepperTable(Obj."Object ID") then begin
+                                    //-NPR5.48 [340086]
+                                    //    RecRef.OPEN(Obj."Object ID");
+                                    //    IF NOT RecRef.ISEMPTY THEN
+                                    //      AddTable(Obj."Object ID");
+                                    //    RecRef.CLOSE;
+                                    AddTable(Obj."Object ID");
+                                    //+NPR5.48 [340086]
+                                end;
+                            until Obj.Next = 0;
                         Dia.Close;
                         //+NPR5.45 [322867]
                     end;
@@ -583,9 +581,9 @@ page 6014456 "Table Export Wizard"
         ExportDataInXmlFormat: Boolean;
         EscapeCharacter: Text[1];
 
-    procedure AddField(TableID: Integer;FieldNo: Integer)
+    procedure AddField(TableID: Integer; FieldNo: Integer)
     begin
-        CurrPage.Fields.PAGE.AddField(TableID,FieldNo);
+        CurrPage.Fields.PAGE.AddField(TableID, FieldNo);
     end;
 
     procedure AddTable(TableID: Integer)
@@ -596,18 +594,18 @@ page 6014456 "Table Export Wizard"
         //-NPR5.48 [340086]
         RecRef.Open(TableID);
         if RecRef.IsEmpty then
-          exit;
+            exit;
         //+NPR5.48 [340086]
 
         Init;
         //-NPR5.23
-        if AllObj.Get(AllObj."Object Type"::Table,TableID) then begin
-          TransferFields(AllObj);
-        //+NPR5.23
-          if Insert then;
-        //-NPR5.48 [340086]
-        AddTableFields(TableID);
-        //+NPR5.48 [340086]
+        if AllObj.Get(AllObj."Object Type"::Table, TableID) then begin
+            TransferFields(AllObj);
+            //+NPR5.23
+            if Insert then;
+            //-NPR5.48 [340086]
+            AddTableFields(TableID);
+            //+NPR5.48 [340086]
         end;
     end;
 
@@ -616,16 +614,17 @@ page 6014456 "Table Export Wizard"
         "Field": Record "Field";
     begin
         //-NPR5.48 [340086]
-        Field.SetRange(TableNo,TableID);
+        Field.SetRange(TableNo, TableID);
         Field.SetRange(Enabled, true);
         if SkipFlowFields then
-          Field.SetRange(Class,Field.Class::Normal)
+            Field.SetRange(Class, Field.Class::Normal)
         else
-          Field.SetRange(Class,Field.Class::Normal,Field.Class::FlowField);
+            Field.SetRange(Class, Field.Class::Normal, Field.Class::FlowField);
 
-        if Field.FindSet then repeat
-          AddField(TableID, Field."No.");
-        until Field.Next = 0;
+        if Field.FindSet then
+            repeat
+                AddField(TableID, Field."No.");
+            until Field.Next = 0;
         //+NPR5.48 [340086]
     end;
 
@@ -740,12 +739,13 @@ page 6014456 "Table Export Wizard"
         //  AddTable(Object.ID)
         // UNTIL Object.NEXT = 0;
 
-        AllObj.SetRange("Object Type",AllObj."Object Type"::Table);
-        AllObj.SetRange("Object ID",1,49999);
-        AllObj.SetFilter("Object Name",'%1','*Setup');
-        if AllObj.FindSet then repeat
-          AddTable(AllObj."Object Type")
-        until AllObj.Next = 0;
+        AllObj.SetRange("Object Type", AllObj."Object Type"::Table);
+        AllObj.SetRange("Object ID", 1, 49999);
+        AllObj.SetFilter("Object Name", '%1', '*Setup');
+        if AllObj.FindSet then
+            repeat
+                AddTable(AllObj."Object Type")
+until AllObj.Next = 0;
         //+NPR5.46 [322752]
     end;
 
@@ -821,7 +821,6 @@ page 6014456 "Table Export Wizard"
         AddTable(DATABASE::"Retail Document Header");
         AddTable(DATABASE::"Retail Document Lines");
         AddTable(DATABASE::"Payment Type - Prefix");
-        AddTable(DATABASE::"Touch Screen - Menu Lines");
         AddTable(DATABASE::"E-mail Log");
         AddTable(DATABASE::"E-mail Template Header");
         AddTable(DATABASE::"E-mail Template Line");
@@ -831,7 +830,6 @@ page 6014456 "Table Export Wizard"
         //AddTable(DATABASE::"NAS - Tasks");
         //AddTable(DATABASE::"DBI - Field Filters");
         //+NPR5.23
-        AddTable(DATABASE::Table6059800);
         AddTable(DATABASE::"Manufacturing Setup");
         AddTable(DATABASE::"Order Promising Setup");
         //-NPR5.25
@@ -887,28 +885,36 @@ page 6014456 "Table Export Wizard"
 
         Window.Open(Text00001);
         TableInformation.SetRange("Company Name", UseCompanyName);
-        AllObj.SetRange("Object Type",AllObj."Object Type"::Table);
+        AllObj.SetRange("Object Type", AllObj."Object Type"::Table);
         //-NPR5.40 [309303]
         //AllObj.SETRANGE("Object ID",1,6060100);
         case AllTransferCategory of
-          AllTransferCategory::All                : AllObj.SetRange("Object ID",1,9999999);        // All Tables
+            AllTransferCategory::All:
+                AllObj.SetRange("Object ID", 1, 9999999);        // All Tables
 
-          AllTransferCategory::"All Std"         : AllObj.SetRange("Object ID",1,9999);            // All Std Nav Tables
+            AllTransferCategory::"All Std":
+                AllObj.SetRange("Object ID", 1, 9999);            // All Std Nav Tables
 
-          AllTransferCategory::"All Retail"    : AllObj.SetRange("Object ID",6014400,6189999);     // All Retail Tables
+            AllTransferCategory::"All Retail":
+                AllObj.SetRange("Object ID", 6014400, 6189999);     // All Retail Tables
 
-          AllTransferCategory::"Std and Retail" : AllObj.SetRange("Object ID",1,6189999);          // All Std and Retail Tables
+            AllTransferCategory::"Std and Retail":
+                AllObj.SetRange("Object ID", 1, 6189999);          // All Std and Retail Tables
 
-          AllTransferCategory::"All NPAdd-Ons"   : AllObj.SetRange("Object ID",6059767,6060166);   // Add-ons Tables
+            AllTransferCategory::"All NPAdd-Ons":
+                AllObj.SetRange("Object ID", 6059767, 6060166);   // Add-ons Tables
 
-          AllTransferCategory::"All Master"       : AllObj.SetRange("Object ID",1,9999999);        // All Master and Setup Tables
+            AllTransferCategory::"All Master":
+                AllObj.SetRange("Object ID", 1, 9999999);        // All Master and Setup Tables
 
-          AllTransferCategory::"Std Master"       : AllObj.SetRange("Object ID",1,9999);           // Std Master and Setup Tables
+            AllTransferCategory::"Std Master":
+                AllObj.SetRange("Object ID", 1, 9999);           // Std Master and Setup Tables
 
-          AllTransferCategory::"Retail Master"    : AllObj.SetRange("Object ID",6014400,6189999);  // Retail Master And Setup
+            AllTransferCategory::"Retail Master":
+                AllObj.SetRange("Object ID", 6014400, 6189999);  // Retail Master And Setup
 
-          AllTransferCategory::"StdRetail Master" : AllObj.SetRange("Object ID",1,6189999);        // Std and Retail Master and Setup tables
-
+            AllTransferCategory::"StdRetail Master":
+                AllObj.SetRange("Object ID", 1, 6189999);        // Std and Retail Master and Setup tables
           //-NPR5.51 [319037]
           AllTransferCategory::TicketingSetupMaster : AllObj.SetFilter("Object ID",'%1|%2|%3|%4|%5',6060118,6060119,6060120,6060121,6059784);        // Ticketing Master and Setup Tables
           AllTransferCategory::TicketingTransactional : AllObj.SetFilter("Object ID",'%1|%2|%3|%4|%5|%6|%7',6060111,6060113,6060110,6059785,6059786,6059787,6059788);  // Ticketing Transaction Tables
@@ -920,16 +926,17 @@ page 6014456 "Table Export Wizard"
         Total := AllObj.Count;
         TestOnCRM := not CRMIntegrationManagement.IsCRMIntegrationEnabled;
 
-        if AllObj.FindSet then repeat
-          Count += 1;
-          if CheckTablePermissions(AllObj."Object ID") and not SkipCRMTable(AllObj."Object ID",TestOnCRM) then begin
-            RecordRef.Open(AllObj."Object ID");
-            Window.Update(1,AllObj."Object ID");
-            Window.Update(2,Round(Count/Total*10000,1));
-            //-NPR5.48 [340086]
-            //IF RecordRef.COUNT > 0 THEN BEGIN
-            //+NPR5.48 [340086]
-            case AllTransferCategory of
+        if AllObj.FindSet then
+            repeat
+                Count += 1;
+                if CheckTablePermissions(AllObj."Object ID") and not SkipCRMTable(AllObj."Object ID", TestOnCRM) then begin
+                    RecordRef.Open(AllObj."Object ID");
+                    Window.Update(1, AllObj."Object ID");
+                    Window.Update(2, Round(Count / Total * 10000, 1));
+                    //-NPR5.48 [340086]
+                    //IF RecordRef.COUNT > 0 THEN BEGIN
+                    //+NPR5.48 [340086]
+                    case AllTransferCategory of
               //-NPR5.51 [319037]
               AllTransferCategory::All:
               if AllObj."Object ID" in [6059784..6059786,6060109,6060112,6060114..6060116,6060121,6060123] = false then
@@ -938,32 +945,32 @@ page 6014456 "Table Export Wizard"
 
 
 
-              AllTransferCategory::"All Master" :         // All Master and Setup Tables except Transactions
-                //-NPR5.41 [311855]
-                //IF AllObj."Object ID" IN [17,32,36,37,45..46,253..254,405,472..481,5802,5811,6014403,6014405..6014407,6150620..6150635,6150698,6150700,6150701,6151504] = FALSE THEN
+                        AllTransferCategory::"All Master":         // All Master and Setup Tables except Transactions
+                                                                   //-NPR5.41 [311855]
+                                                                   //IF AllObj."Object ID" IN [17,32,36,37,45..46,253..254,405,472..481,5802,5811,6014403,6014405..6014407,6150620..6150635,6150698,6150700,6150701,6151504] = FALSE THEN
 
-                if AllObj."Object ID" in [17,21,25,32..62,81,83..91,95..97,99..203,205..224,240..241,244..249,253..269
-                  ,271..276,278..288,290,295..307,317,330..339,342..347,353..1705,5061..5078,5093..5104,5107..5650,5740..5800
-                  ,5802..5811,5815..6084,6506..6550,6650..6670,7030..6009999
-                    ,6014403,6014405..6014409,6014411..6014426,6014429..6014432,6014434..6014436,6014439..6014444,6014445..6014446
-                    ,6014449..6014460,6014473..6014509,6014552..6014559,6014561..6014564,6014628..6014642,6059768,6059767
-        //-NPR5.48 [340086]
-        //              ,6059770..6059772,6059781..6059782,6059785..6059893,6059898,6059903..6059934,6059940..6059941,6059946,6059951..6059968
-        //              ,6059970..6060166,6150620..6150699,6150723..6150725,6150901..6184489,6184495..6184496,6184501..6184502,6184510..619999] = FALSE THEN
-                      ,6059770..6059772,6059781..6059782,6059785..6059893,6059898..6059899,6059903..6059934,6059940..6059941,6059946,6059951..6059968
-                      ,6059970..6060166,6150620..6150699,6150723..6150725,6150901..6184489,6184495..6184496,6184501..6184502,6184510..6189999] = false then
-        //+NPR5.48 [340086]
-                //+NPR5.41 [311855]
-                  AddTable(AllObj."Object ID");
+                            if AllObj."Object ID" in [17, 21, 25, 32 .. 62, 81, 83 .. 91, 95 .. 97, 99 .. 203, 205 .. 224, 240 .. 241, 244 .. 249, 253 .. 269
+                              , 271 .. 276, 278 .. 288, 290, 295 .. 307, 317, 330 .. 339, 342 .. 347, 353 .. 1705, 5061 .. 5078, 5093 .. 5104, 5107 .. 5650, 5740 .. 5800
+                              , 5802 .. 5811, 5815 .. 6084, 6506 .. 6550, 6650 .. 6670, 7030 .. 6009999
+                                , 6014403, 6014405 .. 6014409, 6014411 .. 6014426, 6014429 .. 6014432, 6014434 .. 6014436, 6014439 .. 6014444, 6014445 .. 6014446
+                                , 6014449 .. 6014460, 6014473 .. 6014509, 6014552 .. 6014559, 6014561 .. 6014564, 6014628 .. 6014642, 6059768, 6059767
+                                  //-NPR5.48 [340086]
+                                  //              ,6059770..6059772,6059781..6059782,6059785..6059893,6059898,6059903..6059934,6059940..6059941,6059946,6059951..6059968
+                                  //              ,6059970..6060166,6150620..6150699,6150723..6150725,6150901..6184489,6184495..6184496,6184501..6184502,6184510..619999] = FALSE THEN
+                                  , 6059770 .. 6059772, 6059781 .. 6059782, 6059785 .. 6059893, 6059898 .. 6059899, 6059903 .. 6059934, 6059940 .. 6059941, 6059946, 6059951 .. 6059968
+                                  , 6059970 .. 6060166, 6150620 .. 6150699, 6150723 .. 6150725, 6150901 .. 6184489, 6184495 .. 6184496, 6184501 .. 6184502, 6184510 .. 6189999] = false then
+                                //+NPR5.48 [340086]
+                                //+NPR5.41 [311855]
+                                AddTable(AllObj."Object ID");
 
-              AllTransferCategory::"Std Master" :         // All Std Nav Master And Setup Tables except Transactions
-                //-NPR5.41 [311855]
-                //IF AllObj."Object ID" IN [17,32,36,37,45..46,253..254,405,472..481,5802,5811] = FALSE THEN
-                if AllObj."Object ID" in [17,21,25,32..62,81,83..91,95..97,99..203,205..224,240..241,244..249,253..269
-                  ,271..276,278..288,290,295..307,317,330..339,342..347,353..1705,5061..5078,5093..5104,5107..5650,5740..5800
-                  ,5802..5811,5815..6084,6506..6550,6650..6670,7030..6009999] = false then
-                //+NPR5.41 [311855]
-                  AddTable(AllObj."Object ID");
+                        AllTransferCategory::"Std Master":         // All Std Nav Master And Setup Tables except Transactions
+                                                                   //-NPR5.41 [311855]
+                                                                   //IF AllObj."Object ID" IN [17,32,36,37,45..46,253..254,405,472..481,5802,5811] = FALSE THEN
+                            if AllObj."Object ID" in [17, 21, 25, 32 .. 62, 81, 83 .. 91, 95 .. 97, 99 .. 203, 205 .. 224, 240 .. 241, 244 .. 249, 253 .. 269
+                              , 271 .. 276, 278 .. 288, 290, 295 .. 307, 317, 330 .. 339, 342 .. 347, 353 .. 1705, 5061 .. 5078, 5093 .. 5104, 5107 .. 5650, 5740 .. 5800
+                              , 5802 .. 5811, 5815 .. 6084, 6506 .. 6550, 6650 .. 6670, 7030 .. 6009999] = false then
+                                //+NPR5.41 [311855]
+                                AddTable(AllObj."Object ID");
 
               AllTransferCategory::"Retail Master" : begin      // All Retail Master and Setup Tables except Transactions
 
@@ -987,18 +994,18 @@ page 6014456 "Table Export Wizard"
                     ,6151013..6151099,6151103,6151108..6151124,6151131..6151589,6151591..6151598,6151604..6184489,6184495..6184496,6184501..6184502,6184510..6189999] = false then
 
                 //+NPR5.51 [319037]
-                  AddTable(AllObj."Object ID");
+                                    AddTable(AllObj."Object ID");
 
-              //-NPR5.41 [311855]
-                AddTable(308);
-                AddTable(309);
-                AddTable(310);
+                                //-NPR5.41 [311855]
+                                AddTable(308);
+                                AddTable(309);
+                                AddTable(310);
                 //-NPR5.51 [319037]
                 AddTable(6150731);
                 AddTable(6150732);
                 //+NPR5.51 [319037]
-              end;
-              //+NPR5.41 [311855]
+                            end;
+                            //+NPR5.41 [311855]
 
               AllTransferCategory::"StdRetail Master" : begin   // Retail Master and Setup Tables except Transactions
                 //-NPR5.51 [319037]
@@ -1030,13 +1037,13 @@ page 6014456 "Table Export Wizard"
 
 
                 //+NPR5.51 [319037]
-                  AddTable(AllObj."Object ID");
-              //-NPR5.41 [311855]
-                AddTable(308);
-                AddTable(309);
-                AddTable(310);
-              end;
-              //+NPR5.41 [311855]
+                                    AddTable(AllObj."Object ID");
+                                //-NPR5.41 [311855]
+                                AddTable(308);
+                                AddTable(309);
+                                AddTable(310);
+                            end;
+                        //+NPR5.41 [311855]
 
               //-NPR5.51 [319037]
               AllTransferCategory::TicketingSetupMaster: begin
@@ -1055,13 +1062,13 @@ page 6014456 "Table Export Wizard"
               end;
               //-NPR5.51 [319037]
 
-              else
-                AddTable(AllObj."Object ID");
-            end;
-            //+NPR5.40 [309303]
-            RecordRef.Close;
-          end;
-        until AllObj.Next = 0;
+                        else
+                            AddTable(AllObj."Object ID");
+                    end;
+                    //+NPR5.40 [309303]
+                    RecordRef.Close;
+                end;
+            until AllObj.Next = 0;
         Window.Close;
     end;
 
@@ -1075,13 +1082,14 @@ page 6014456 "Table Export Wizard"
 
         FindSet;
         repeat
-          TableExportLibrary.AddTableForExport("Object ID");
+            TableExportLibrary.AddTableForExport("Object ID");
         until Next = 0;
 
         CurrPage.Fields.PAGE.GetFields(TempField);
-        if TempField.FindSet then repeat
-          TableExportLibrary.AddFieldForExport(TempField.TableNo,TempField."No.");
-        until TempField.Next = 0;
+        if TempField.FindSet then
+            repeat
+                TableExportLibrary.AddFieldForExport(TempField.TableNo, TempField."No.");
+            until TempField.Next = 0;
 
         //-NPR5.23
         CurrPage.TableFilters.PAGE.GetData(TempTableFilter);
@@ -1089,7 +1097,7 @@ page 6014456 "Table Export Wizard"
         //+NPR5.23
 
         if CompanyName <> UseCompanyName then
-          TableExportLibrary.SetCompany(UseCompanyName);
+            TableExportLibrary.SetCompany(UseCompanyName);
 
         TableExportLibrary.SetRecordSeparator(RecordSeparator);
         TableExportLibrary.SetDataItemSeparator(DataItemSeparator);
@@ -1112,20 +1120,20 @@ page 6014456 "Table Export Wizard"
         //+NPR5.41 [308570]
 
         case FileMode of
-          //-NPR5.38 [301053]
-          // FileMode::ADOStream :
-          //  BEGIN
-          //    TableExportLibrary.SetFileModeADO;
-          //    TableExportLibrary.SetOutFileEncoding(OutFileEncoding);
-          //  END;
-          //+NPR5.38 [301053]
-          FileMode::OStream :
-            TableExportLibrary.SetFileModeOStream;
-          FileMode::DotNetStream :
-            begin
-            TableExportLibrary.SetFileModeDotNetStream;
-            TableExportLibrary.SetOutFileEncoding(OutFileEncoding);
-            end;
+            //-NPR5.38 [301053]
+            // FileMode::ADOStream :
+            //  BEGIN
+            //    TableExportLibrary.SetFileModeADO;
+            //    TableExportLibrary.SetOutFileEncoding(OutFileEncoding);
+            //  END;
+            //+NPR5.38 [301053]
+            FileMode::OStream:
+                TableExportLibrary.SetFileModeOStream;
+            FileMode::DotNetStream:
+                begin
+                    TableExportLibrary.SetFileModeDotNetStream;
+                    TableExportLibrary.SetOutFileEncoding(OutFileEncoding);
+                end;
         end;
 
         TableExportLibrary.SetTrimSpecialChars(TrimSpecialChars);
@@ -1137,26 +1145,26 @@ page 6014456 "Table Export Wizard"
 
     procedure SetDefaultVars()
     begin
-        UseCompanyName        := CompanyName;
-        FileName              := '';
+        UseCompanyName := CompanyName;
+        FileName := '';
         //-NPR5.48 [340086]
         // FieldStartDelimeter   := '"';
         // FieldEndDelimeter     := '"';
         // FieldSeparator        := ';';
-        FieldStartDelimeter   := '';
-        FieldEndDelimeter     := '';
-        FieldSeparator        := '|';
+        FieldStartDelimeter := '';
+        FieldEndDelimeter := '';
+        FieldSeparator := '|';
         //+NPR5.48 [340086]
-        RaiseErrors           := true;
-        RecordSeparator       := '<NEWLINE>';
-        DataItemSeparator     := '<NEWLINE><NEWLINE>';
-        SkipFlowFields        := true;
-        ShowStatus            := true;
-        WriteFieldHeader      := false;
+        RaiseErrors := true;
+        RecordSeparator := '<NEWLINE>';
+        DataItemSeparator := '<NEWLINE><NEWLINE>';
+        SkipFlowFields := true;
+        ShowStatus := true;
+        WriteFieldHeader := false;
         WriteTableInformation := true;
-        OutFileEncoding       := 'utf-8';
-        FileMode              := FileMode::DotNetStream;
-        TrimSpecialChars      := false;
+        OutFileEncoding := 'utf-8';
+        FileMode := FileMode::DotNetStream;
+        TrimSpecialChars := false;
         //-NPR5.41 [308570]
         ExportDataInXmlFormat := true;
         //+NPR5.41 [308570]
@@ -1170,12 +1178,12 @@ page 6014456 "Table Export Wizard"
         LicensePermission: Record "License Permission";
     begin
         //-NPR5.20
-        LicensePermission.SetRange("Object Number",TableNo);
-        LicensePermission.SetRange("Object Type",LicensePermission."Object Type"::TableData);
+        LicensePermission.SetRange("Object Number", TableNo);
+        LicensePermission.SetRange("Object Type", LicensePermission."Object Type"::TableData);
         if LicensePermission.FindFirst and (LicensePermission."Read Permission" = LicensePermission."Read Permission"::Yes) then
-          exit(true)
+            exit(true)
         else
-          exit(false);
+            exit(false);
         //+NPR5.20
     end;
 
@@ -1188,10 +1196,10 @@ page 6014456 "Table Export Wizard"
         //-NPR5.23
         CurrPage.Fields.PAGE.GetFields(TempField);
         CurrPage.TableFilters.PAGE.GetData(TempTableFilter);
-        SavedExportWizard.SaveSetup(Rec,TempField,TempTableFilter,UseCompanyName,FileName,FieldStartDelimeter,FieldEndDelimeter,
-                                    FieldSeparator,RaiseErrors,RecordSeparator,DataItemSeparator,ShowStatus,WriteFieldHeader,
+        SavedExportWizard.SaveSetup(Rec, TempField, TempTableFilter, UseCompanyName, FileName, FieldStartDelimeter, FieldEndDelimeter,
+                                    FieldSeparator, RaiseErrors, RecordSeparator, DataItemSeparator, ShowStatus, WriteFieldHeader,
         //-NPR5.41 [308570]
-                                    WriteTableInformation,SkipFlowFields,OutFileEncoding,FileMode,TrimSpecialChars,ExportDataInXmlFormat);
+                                    WriteTableInformation, SkipFlowFields, OutFileEncoding, FileMode, TrimSpecialChars, ExportDataInXmlFormat);
         //+NPR5.41 [308570]
         //+NPR5.23
     end;
@@ -1204,29 +1212,29 @@ page 6014456 "Table Export Wizard"
         TempTableFilter: Record "Table Filter" temporary;
     begin
         //-NPR5.23
-        SavedExportWizard.LoadSetup(TempTable,TempField,TempTableFilter,UseCompanyName,FileName,FieldStartDelimeter,FieldEndDelimeter,
-                                    FieldSeparator,RaiseErrors,RecordSeparator,DataItemSeparator,ShowStatus,WriteFieldHeader,
+        SavedExportWizard.LoadSetup(TempTable, TempField, TempTableFilter, UseCompanyName, FileName, FieldStartDelimeter, FieldEndDelimeter,
+                                    FieldSeparator, RaiseErrors, RecordSeparator, DataItemSeparator, ShowStatus, WriteFieldHeader,
         //-NPR5.41 [308570]
-                                    WriteTableInformation,SkipFlowFields,OutFileEncoding,FileMode,TrimSpecialChars,ExportDataInXmlFormat);
+                                    WriteTableInformation, SkipFlowFields, OutFileEncoding, FileMode, TrimSpecialChars, ExportDataInXmlFormat);
         //+NPR5.41 [308570]
         DeleteAll;
         CurrPage.Fields.PAGE.ClearAllData();
         if TempTable.FindSet then
-          repeat
-            AddTable(TempTable."Object ID");
-          until TempTable.Next = 0;
+            repeat
+                AddTable(TempTable."Object ID");
+            until TempTable.Next = 0;
 
         if TempField.FindSet then
-          repeat
-            AddField(TempField.TableNo,TempField."No.");
-          until TempField.Next = 0;
+            repeat
+                AddField(TempField.TableNo, TempField."No.");
+            until TempField.Next = 0;
         CurrPage.TableFilters.PAGE.ClearAllData();
         CurrPage.TableFilters.PAGE.AddData(TempTableFilter);
         if FindFirst then;
         //+NPR5.23
     end;
 
-    local procedure SkipCRMTable(TableNo: Integer;DoTest: Boolean): Boolean
+    local procedure SkipCRMTable(TableNo: Integer; DoTest: Boolean): Boolean
     var
         "Object": Record "Object";
         TableMetadata: Record "Table Metadata";
@@ -1234,16 +1242,16 @@ page 6014456 "Table Export Wizard"
         //-NPR5.38 [297216]
         //-NPR5.40 [306844]
         //IF TableNo IN [6700..6712,6721] THEN
-        if TableNo  in [6700..6712,6721,2162..2200,5300..5311,5320..5331,5450..5456,6150704,6014623,6014622,6150713,6150714,6150703] then
-          exit(true);
+        if TableNo in [6700 .. 6712, 6721, 2162 .. 2200, 5300 .. 5311, 5320 .. 5331, 5450 .. 5456, 6150704, 6014623, 6150713, 6150714, 6150703] then
+            exit(true);
         //+NPR5.40 [306844]
         //+NPR5.38 [297216]
 
         //-NPR5.23
         if not DoTest then
-          exit(false);
+            exit(false);
         if TableMetadata.Get(TableNo) then
-          exit(TableMetadata.TableType = TableMetadata.TableType::CRM);
+            exit(TableMetadata.TableType = TableMetadata.TableType::CRM);
         //+NPR5.23
     end;
 

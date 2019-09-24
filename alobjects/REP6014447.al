@@ -10,7 +10,7 @@ report 6014447 "Sales Invoice A4 (Retail)"
     // NPR5.38/JLK /20180125 CASE 303595 Added ENU object caption
     // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales Invoice A4 (Retail).rdlc';
+    RDLCLayout = './layouts/Sales Invoice A4 (Retail).rdlc';
 
     Caption = 'Sales Invoice A4 (Retail)';
 

@@ -2,7 +2,7 @@ report 6014413 "Issued Tickets"
 {
     // TM1.17/NPKNAV/20161026  CASE 252175 Transport TM1.17
     DefaultLayout = RDLC;
-    RDLCLayout = './Issued Tickets.rdlc';
+    RDLCLayout = './layouts/Issued Tickets.rdlc';
 
     Caption = 'Issued Tickets';
 

@@ -10,7 +10,16 @@ page 6014697 "Embedded Videos"
     {
         area(content)
         {
-            // AL-Conversion: TODO #361632 - AL: Rewrite "NaviPartner.Retail.Controls" projects
+            usercontrol(Bridge;Bridge)
+            {
+
+                trigger OnFrameworkReady()
+                begin
+                    BridgeReady := true;
+                    JavaScriptBridgeMgt.Initialize(CurrPage.Bridge);
+                    EmbedHtml();
+                end;
+            }
         }
     }
 
@@ -35,30 +44,30 @@ page 6014697 "Embedded Videos"
         i: Integer;
     begin
         if not BridgeReady then
-            exit;
+          exit;
 
-        if not EmbeddedVideoMgt.FindEmbeddedVideos(ModuleCode, EmbeddedVideoBuffer) then begin
-            JavaScriptBridgeMgt.EmbedHtml('');
-            exit;
+        if not EmbeddedVideoMgt.FindEmbeddedVideos(ModuleCode,EmbeddedVideoBuffer) then begin
+          JavaScriptBridgeMgt.EmbedHtml('');
+          exit;
         end;
 
         ModuleName := EmbeddedVideoBuffer."Module Name";
         Columns := EmbeddedVideoBuffer.Columns;
         if Columns <= 0 then
-            Columns := 1;
+          Columns := 1;
 
         Videohtml := '<div style="width: 100%;height: 100%;overflow: scroll;"><table><tr>';
         repeat
-            i += 1;
-            if (i mod Columns = 1) and (i > 1) then
-                Videohtml += '</tr><tr>';
+          i += 1;
+          if (i mod Columns = 1) and (i > 1) then
+            Videohtml += '</tr><tr>';
 
-            Videohtml += '<td>' + EmbeddedVideoBuffer."Video Html" + '</td>';
+          Videohtml += '<td>' + EmbeddedVideoBuffer."Video Html" + '</td>';
         until EmbeddedVideoBuffer.Next = 0;
         Videohtml += '</tr></table></div>';
 
         JavaScriptBridgeMgt.EmbedHtml(Videohtml);
-        JavaScriptBridgeMgt.SetSize('100%', '100%');
+        JavaScriptBridgeMgt.SetSize('100%','100%');
     end;
 
     procedure SetModuleCode(NewModuleCode: Text)

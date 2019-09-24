@@ -19,40 +19,40 @@ codeunit 6150807 "POS Action - Import Sales Doc."
 
     local procedure ActionCode(): Text
     begin
-        exit ('IMPORTSALESDOC');
+        exit('IMPORTSALESDOC');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Type::Generic,
-            "Subscriber Instances Allowed"::Multiple)
-          then begin
-            RegisterWorkflow(false);
-            RegisterOptionParameter('ImportDocType','ImportSale','ImportSale');
-            RegisterTextParameter('Sales Ticket No.','');
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Type::Generic,
+              "Subscriber Instances Allowed"::Multiple)
+            then begin
+                RegisterWorkflow(false);
+                RegisterOptionParameter('ImportDocType', 'ImportSale', 'ImportSale');
+                RegisterTextParameter('Sales Ticket No.', '');
 
 
-          end;
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action"; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         Handled := true;
     end;
@@ -63,7 +63,7 @@ codeunit 6150807 "POS Action - Import Sales Doc."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         ImportDocType: Integer;
@@ -74,13 +74,13 @@ codeunit 6150807 "POS Action - Import Sales Doc."
         SalesTicketNo: Code[20];
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         //MESSAGE('DEBUG: %1\\%2', WorkflowStep, Context.ToString());
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        JSON.SetScope('parameters',true);
-        ImportDocType := JSON.GetInteger('ImportDocType',true);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        JSON.SetScope('parameters', true);
+        ImportDocType := JSON.GetInteger('ImportDocType', true);
         SalesTicketNo := JSON.GetString('Sales Ticket No.', false);
 
         POSSession.GetSale(POSSale);
@@ -91,7 +91,8 @@ codeunit 6150807 "POS Action - Import Sales Doc."
         //+NPR5.48 [334516]
 
         case ImportDocType of
-          0 : SetImportSale(SalePOS,SalesTicketNo);
+            0:
+                SetImportSale(SalePOS, SalesTicketNo);
         end;
 
         //-NPR5.48 [334516]
@@ -108,13 +109,13 @@ codeunit 6150807 "POS Action - Import Sales Doc."
     begin
     end;
 
-    procedure SetImportSale(var SalePOS: Record "Sale POS";SalesTicketNo: Code[20])
+    procedure SetImportSale(var SalePOS: Record "Sale POS"; SalesTicketNo: Code[20])
     var
         TouchScreenFunctions: Codeunit "Touch Screen - Functions";
         Validering: Code[10];
     begin
         with SalePOS do begin
-          TouchScreenFunctions.ImportSalesTicket(SalePOS,SalesTicketNo);
+            TouchScreenFunctions.ImportSalesTicket(SalePOS, SalesTicketNo);
         end;
     end;
 }

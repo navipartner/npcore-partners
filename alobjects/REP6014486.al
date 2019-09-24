@@ -7,7 +7,7 @@ report 6014486 "Retail Document A4"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
     DefaultLayout = RDLC;
-    RDLCLayout = './Retail Document A4.rdlc';
+    RDLCLayout = './layouts/Retail Document A4.rdlc';
 
     Caption = 'Retail Document A4';
     UseRequestPage = true;

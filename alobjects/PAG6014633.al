@@ -94,7 +94,7 @@ page 6014633 "GCP Ticket Options"
         TempRetailList: Record "Retail List" temporary;
         ShowValue: Text;
         GCPMgt: Codeunit "GCP Mgt.";
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         i: Integer;
     begin
         case Attribute of
@@ -140,7 +140,7 @@ page 6014633 "GCP Ticket Options"
     procedure LoadExistingTicketJSON(JSON: Text)
     var
         GCPMgt: Codeunit "GCP Mgt.";
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
     begin
         //Restore already existing blob values to page view. Only modifies blob again if user changes any value.
         if GCPMgt.TryParseJSON(JSON, 'print.color', JObject) then begin
@@ -164,7 +164,7 @@ page 6014633 "GCP Ticket Options"
         end;
     end;
 
-    local procedure FormatTicketAttributeJSON(Attribute: Text;var JObject: DotNet npNetJObject) JSON: Text
+    local procedure FormatTicketAttributeJSON(Attribute: Text;var JObject: DotNet JObject) JSON: Text
     var
         GCPMgt: Codeunit "GCP Mgt.";
         AttrJProperty: DotNet npNetJProperty;

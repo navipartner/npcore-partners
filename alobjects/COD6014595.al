@@ -44,7 +44,7 @@ codeunit 6014595 "NAV Webservice Library"
         end;
     end;
 
-    procedure InvokeWithResponse(var ReturnValue: Text;var NodeList: DotNet npNetXmlNodeList) Result: Boolean
+    procedure InvokeWithResponse(var ReturnValue: Text; var NodeList: DotNet npNetXmlNodeList) Result: Boolean
     var
         XMLDocument: DotNet npNetXmlDocument;
         StringLibrary: Codeunit "String Library";
@@ -74,12 +74,13 @@ codeunit 6014595 "NAV Webservice Library"
         end;
     end;
 
-    procedure InvokeWebService(Url: Text;Domain: Text;Username: Text;Password: Text;var XMLDocument: DotNet npNetXmlDocument) ReturnStatus: Integer
+    procedure InvokeWebService(Url: Text; Domain: Text; Username: Text; Password: Text; var XMLDocument: DotNet npNetXmlDocument) ReturnStatus: Integer
     var
         HttpWebRequest: DotNet npNetHttpWebRequest;
         HttpWebResponse: DotNet npNetHttpWebResponse;
         NetworkCredentials: DotNet npNetNetworkCredential;
         RequestStream: DotNet npNetStreamWriter;
+        NetConvHelper: Variant;
     begin
         // Create XMLHTTP and SEND
         HttpWebRequest := HttpWebRequest.Create(Url);
@@ -94,7 +95,8 @@ codeunit 6014595 "NAV Webservice Library"
         NetworkCredentials.Domain := Domain;
         HttpWebRequest.Credentials := NetworkCredentials;
 
-        RequestStream := HttpWebRequest.GetRequestStream();
+        NetConvHelper := HttpWebRequest.GetRequestStream();
+        RequestStream := NetConvHelper;
 
         XMLDocument.Save(RequestStream);
 
@@ -143,7 +145,7 @@ codeunit 6014595 "NAV Webservice Library"
         end;
     end;
 
-    procedure SelectNodes(Name: Text;NameSpace: Text;var XMLDocument: DotNet npNetXmlDocument;var NodeList: DotNet npNetXmlNodeList)
+    procedure SelectNodes(Name: Text; NameSpace: Text; var XMLDocument: DotNet npNetXmlDocument; var NodeList: DotNet npNetXmlNodeList)
     var
         XMLNameSpaceManager: DotNet npNetXmlNamespaceManager;
         XMLNameTable: DotNet npNetXmlNameTable;
@@ -153,7 +155,7 @@ codeunit 6014595 "NAV Webservice Library"
         NodeList := XMLDocument.SelectNodes(StrSubstNo('//tns:%1', Name), XMLNameSpaceManager);
     end;
 
-    procedure SelectNode(Name: Text;NameSpace: Text;var XMLDocument: DotNet npNetXmlDocument;var Node: DotNet npNetXmlNode)
+    procedure SelectNode(Name: Text; NameSpace: Text; var XMLDocument: DotNet npNetXmlDocument; var Node: DotNet npNetXmlNode)
     var
         XMLNameSpaceManager: DotNet npNetXmlNamespaceManager;
         XMLNameTable: DotNet npNetXmlNameTable;
@@ -163,7 +165,7 @@ codeunit 6014595 "NAV Webservice Library"
         Node := XMLDocument.SelectSingleNode(StrSubstNo('//tns:%1', Name), XMLNameSpaceManager);
     end;
 
-    procedure StoreXMLClientSide(var XMLDocument: DotNet npNetXmlDocument;Path: Text)
+    procedure StoreXMLClientSide(var XMLDocument: DotNet npNetXmlDocument; Path: Text)
     var
         [RunOnClient]
         StreamWriter: DotNet npNetStreamWriter;

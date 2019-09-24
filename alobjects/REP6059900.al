@@ -4,7 +4,7 @@ report 6059900 "Analyse Task Queue Usage"
     // TQ1.28/RMT/20150825 CASE 185346 Updated by TR and included in release
     // TQ1.32/TJ /20180319 CASE 307717 Replaced hardcoded dates with DMY2DATE structure
     DefaultLayout = RDLC;
-    RDLCLayout = './Analyse Task Queue Usage.rdlc';
+    RDLCLayout = './layouts/Analyse Task Queue Usage.rdlc';
 
     Caption = 'Analyse Task Queue Usage';
 

@@ -12,7 +12,7 @@ report 6014410 "Sales Ticket A4"
     //                                   Split quantity and price into two columns.
     // NPR5.51/ANPA/20190722 CASE 362537 Always showing discount
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales Ticket A4.rdlc';
+    RDLCLayout = './layouts/Sales Ticket A4.rdlc';
 
     Caption = 'Sales Ticket A4';
     PreviewMode = PrintLayout;

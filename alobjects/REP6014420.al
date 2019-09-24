@@ -6,7 +6,7 @@ report 6014420 "Item Group Top"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Item Group Top.rdlc';
+    RDLCLayout = './layouts/Item Group Top.rdlc';
 
     Caption = 'Item Group Top';
 

@@ -116,7 +116,7 @@ codeunit 6014589 "GCP Mgt."
         RefreshTokenValue: Text;
         TempRetailList: Record "Retail List" temporary;
         RetailList: Page "Retail List";
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         i: Integer;
         API: Codeunit "GCP API";
         Token: Record "OAuth Token";
@@ -154,7 +154,7 @@ codeunit 6014589 "GCP Mgt."
         exit(Success);
     end;
 
-    procedure GetPrinterInfo(ID: Text;var JObject: DotNet npNetJObject) Success: Boolean
+    procedure GetPrinterInfo(ID: Text;var JObject: DotNet JObject) Success: Boolean
     var
         API: Codeunit "GCP API";
         AccessTokenValue: Text;
@@ -283,7 +283,7 @@ codeunit 6014589 "GCP Mgt."
 
     procedure SetTicketOptions(var GCPSetup: Record "GCP Setup")
     var
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         GCPTicketOptions: Page "GCP Ticket Options";
         OutStream: OutStream;
         TicketJson: Text;
@@ -330,7 +330,7 @@ codeunit 6014589 "GCP Mgt."
         OutStream: OutStream;
         InStream: InStream;
         FileName: Variant;
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
     begin
         if not GetPrinterInfo(PrinterID, JObject) then
           exit;
@@ -346,7 +346,7 @@ codeunit 6014589 "GCP Mgt."
     end;
 
     [TryFunction]
-    procedure TryParseJSON(JSON: Text;Path: Text;var JObjectOut: DotNet npNetJObject)
+    procedure TryParseJSON(JSON: Text;Path: Text;var JObjectOut: DotNet JObject)
     begin
         Clear(JObjectOut);
         JObjectOut := JObjectOut.Parse(JSON);

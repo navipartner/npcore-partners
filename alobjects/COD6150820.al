@@ -14,38 +14,38 @@ codeunit 6150820 "POS Action - Run Object"
 
     local procedure ActionCode(): Text
     begin
-        exit ('RUNOBJECT');
+        exit('RUNOBJECT');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Type::Generic,
-            "Subscriber Instances Allowed"::Multiple)
-          then begin
-            RegisterWorkflowStep('1','respond();');
-            RegisterWorkflow(false);
-            RegisterTextParameter ('MenuFilterCode', '');
-          end;
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Type::Generic,
+              "Subscriber Instances Allowed"::Multiple)
+            then begin
+                RegisterWorkflowStep('1', 'respond();');
+                RegisterWorkflow(false);
+                RegisterTextParameter('MenuFilterCode', '');
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action"; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         Handled := true;
     end;
@@ -56,7 +56,7 @@ codeunit 6150820 "POS Action - Run Object"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         ObjectId: Integer;
@@ -64,10 +64,10 @@ codeunit 6150820 "POS Action - Run Object"
         MenuFilterCode: Code[20];
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        JSON.SetScope('parameters',true);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        JSON.SetScope('parameters', true);
 
         MenuFilterCode := JSON.GetString('MenuFilterCode', true);
         RunObject(MenuFilterCode, POSSession);
@@ -78,7 +78,7 @@ codeunit 6150820 "POS Action - Run Object"
     begin
     end;
 
-    local procedure RunObject(MenuFilterCode: Code[20];POSSession: Codeunit "POS Session")
+    local procedure RunObject(MenuFilterCode: Code[20]; POSSession: Codeunit "POS Session")
     var
         POSMenuFilter: Record "POS Menu Filter";
     begin

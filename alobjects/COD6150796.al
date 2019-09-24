@@ -20,61 +20,61 @@ codeunit 6150796 "POS Action - Delete POS Line"
 
     local procedure ActionCode(): Text
     begin
-        exit ('DELETE_POS_LINE');
+        exit('DELETE_POS_LINE');
     end;
 
     local procedure ActionVersion(): Text
     begin
 
-        exit ('1.2'); //-+NPR5.46 [314603]
+        exit('1.2'); //-+NPR5.46 [314603]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
 
-            RegisterWorkflowStep ('decl0', 'confirmtext = labels.notallowed;');
-            RegisterWorkflowStep ('decl1', 'if (!data.isEmpty())    {confirmtext = labels.Prompt.substitute(data("10"));};');
-            RegisterWorkflowStep ('confirm',  '(param.ConfirmDialog == param.ConfirmDialog["Yes"]) ? confirm({title: labels.title, caption: confirmtext}).respond() : respond();');
-            RegisterWorkflow(false);
-            RegisterDataBinding();
-            //-NPR5.42 [313914]
-            RegisterOptionParameter('Security','None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword','None');
-            //+NPR5.42 [313914]
-            RegisterOptionParameter('ConfirmDialog','No,Yes','No');
-          end;
+                RegisterWorkflowStep('decl0', 'confirmtext = labels.notallowed;');
+                RegisterWorkflowStep('decl1', 'if (!data.isEmpty())    {confirmtext = labels.Prompt.substitute(data("10"));};');
+                RegisterWorkflowStep('confirm', '(param.ConfirmDialog == param.ConfirmDialog["Yes"]) ? confirm({title: labels.title, caption: confirmtext}).respond() : respond();');
+                RegisterWorkflow(false);
+                RegisterDataBinding();
+                //-NPR5.42 [313914]
+                RegisterOptionParameter('Security', 'None,SalespersonPassword,CurrentSalespersonPassword,SupervisorPassword', 'None');
+                //+NPR5.42 [313914]
+                RegisterOptionParameter('ConfirmDialog', 'No,Yes', 'No');
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         Confirmed: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        DeletePosLine (Context, POSSession, FrontEnd);
+        DeletePosLine(Context, POSSession, FrontEnd);
         Handled := true;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "POS Caption Management")
     begin
-        Captions.AddActionCaption (ActionCode, 'title', Title);
-        Captions.AddActionCaption (ActionCode, 'notallowed', NotAllowed);
-        Captions.AddActionCaption (ActionCode, 'Prompt', Prompt);
+        Captions.AddActionCaption(ActionCode, 'title', Title);
+        Captions.AddActionCaption(ActionCode, 'notallowed', NotAllowed);
+        Captions.AddActionCaption(ActionCode, 'Prompt', Prompt);
     end;
 
-    local procedure DeletePosLine(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure DeletePosLine(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         POSSaleLine: Codeunit "POS Sale Line";
@@ -85,29 +85,29 @@ codeunit 6150796 "POS Action - Delete POS Line"
         CurrentViewType: DotNet npNetViewType0;
         ViewType: DotNet npNetViewType0;
     begin
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        POSSession.GetCurrentView (CurrentView);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        POSSession.GetCurrentView(CurrentView);
 
-        if (CurrentView.Type.Equals (ViewType.Sale)) then begin
-          POSSession.GetSaleLine(POSSaleLine);
-          //-NPR5.48 [330181]
-          DeleteAccessories(POSSaleLine);
-          //+NPR5.48 [330181]
-          POSSaleLine.DeleteLine();
+        if (CurrentView.Type.Equals(ViewType.Sale)) then begin
+            POSSession.GetSaleLine(POSSaleLine);
+            //-NPR5.48 [330181]
+            DeleteAccessories(POSSaleLine);
+            //+NPR5.48 [330181]
+            POSSaleLine.DeleteLine();
         end;
 
-        if (CurrentView.Type.Equals (ViewType.Payment)) then begin
-          POSSession.GetPaymentLine (POSPaymentLine);
-          //+NPR5.42 [288119]
-          POSPaymentLine.RefreshCurrent();
-          //-NPR5.42 [288119]
+        if (CurrentView.Type.Equals(ViewType.Payment)) then begin
+            POSSession.GetPaymentLine(POSPaymentLine);
+            //+NPR5.42 [288119]
+            POSPaymentLine.RefreshCurrent();
+            //-NPR5.42 [288119]
 
-          POSPaymentLine.DeleteLine();
+            POSPaymentLine.DeleteLine();
         end;
 
         //-NPR5.45 [323780]
-        POSSession.GetSale (POSSale);
-        POSSale.SetModified ();
+        POSSession.GetSale(POSSale);
+        POSSale.SetModified();
         //+NPR5.45 [323780]
 
         POSSession.RequestRefreshData();
@@ -121,19 +121,19 @@ codeunit 6150796 "POS Action - Delete POS Line"
         //-NPR5.48 [330181]
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
-          exit;
-        if SaleLinePOS."No." in ['','*'] then
-          exit;
+            exit;
+        if SaleLinePOS."No." in ['', '*'] then
+            exit;
 
-        SaleLinePOS2.SetRange("Register No.",SaleLinePOS."Register No.");
-        SaleLinePOS2.SetRange("Sales Ticket No.",SaleLinePOS."Sales Ticket No.");
-        SaleLinePOS2.SetRange("Sale Type",SaleLinePOS."Sale Type");
-        SaleLinePOS2.SetFilter("Line No.",'<>%1',SaleLinePOS."Line No.");
-        SaleLinePOS2.SetRange("Main Line No.",SaleLinePOS."Line No.");
-        SaleLinePOS2.SetRange(Accessory,true);
-        SaleLinePOS2.SetRange("Main Item No.",SaleLinePOS."No.");
+        SaleLinePOS2.SetRange("Register No.", SaleLinePOS."Register No.");
+        SaleLinePOS2.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+        SaleLinePOS2.SetRange("Sale Type", SaleLinePOS."Sale Type");
+        SaleLinePOS2.SetFilter("Line No.", '<>%1', SaleLinePOS."Line No.");
+        SaleLinePOS2.SetRange("Main Line No.", SaleLinePOS."Line No.");
+        SaleLinePOS2.SetRange(Accessory, true);
+        SaleLinePOS2.SetRange("Main Item No.", SaleLinePOS."No.");
         if SaleLinePOS2.IsEmpty then
-          exit;
+            exit;
 
         SaleLinePOS2.SetSkipCalcDiscount(true);
         SaleLinePOS2.DeleteAll(false);

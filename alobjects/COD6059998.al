@@ -20,7 +20,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         ActiveSession: Record "Active Session";
         NPRetailSetup: Record "NP Retail Setup";
 
-    local procedure CollectClientData(var ClientDiagnostics: Record "Client Diagnostics";NewSession: Boolean)
+    local procedure CollectClientData(var ClientDiagnostics: Record "Client Diagnostics"; NewSession: Boolean)
     var
         ClientDiagnosticsNpCaseMgt: Codeunit "Client Diagnostics NpCase Mgt.";
         PrevRec: Text;
@@ -28,20 +28,20 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         HasPOSInfo: Boolean;
     begin
         if CommitClientDiagnostics(ClientDiagnostics) then begin
-        //-NPR5.50 [356506]
-        //  ClientDiagnosticsNpCaseMgt.ScheduleSendClientDiagnostics(ClientDiagnostics)
-          if NewSession then
-            ClientDiagnosticsNpCaseMgt.ScheduleSendClientDiagnostics(ClientDiagnostics)
-          else
-            ClientDiagnosticsNpCaseMgt.Run(ClientDiagnostics);
-        //+NPR5.50 [356506]
+            //-NPR5.50 [356506]
+            //  ClientDiagnosticsNpCaseMgt.ScheduleSendClientDiagnostics(ClientDiagnostics)
+            if NewSession then
+                ClientDiagnosticsNpCaseMgt.ScheduleSendClientDiagnostics(ClientDiagnostics)
+            else
+                ClientDiagnosticsNpCaseMgt.Run(ClientDiagnostics);
+            //+NPR5.50 [356506]
         end;
 
         if not FindMySession() then
-          exit;
+            exit;
 
         if not ClientDiagnostics.Find then
-          exit;
+            exit;
 
         PrevRec := Format(ClientDiagnostics);
 
@@ -49,7 +49,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         HasPOSInfo := SetGeoPosition(ClientDiagnostics);
 
         if PrevRec = Format(ClientDiagnostics) then
-          exit;
+            exit;
 
         ClientDiagnostics."Login Info" := false;
         ClientDiagnostics."License Info" := HasLicenseInfo;
@@ -57,13 +57,13 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         ClientDiagnostics."POS Info" := HasPOSInfo;
         ClientDiagnostics."Logout Info" := false;
         if CommitClientDiagnostics(ClientDiagnostics) then begin
-        //-NPR5.50 [356506]
-        //  ClientDiagnosticsNpCaseMgt.ScheduleSendClientDiagnostics(ClientDiagnostics)
-          if NewSession then
-            ClientDiagnosticsNpCaseMgt.ScheduleSendClientDiagnostics(ClientDiagnostics)
-          else
-            ClientDiagnosticsNpCaseMgt.Run(ClientDiagnostics);
-        //+NPR5.50 [356506]
+            //-NPR5.50 [356506]
+            //  ClientDiagnosticsNpCaseMgt.ScheduleSendClientDiagnostics(ClientDiagnostics)
+            if NewSession then
+                ClientDiagnosticsNpCaseMgt.ScheduleSendClientDiagnostics(ClientDiagnostics)
+            else
+                ClientDiagnosticsNpCaseMgt.Run(ClientDiagnostics);
+            //+NPR5.50 [356506]
         end;
     end;
 
@@ -75,7 +75,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         HasLoginInfo: Boolean;
     begin
         if not InitCurrentUser(ClientDiagnostics) then
-          exit;
+            exit;
 
         PrevRec := Format(ClientDiagnostics);
 
@@ -83,7 +83,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         HasComputerInfo := SetComputerInfo(ClientDiagnostics);
 
         if PrevRec = Format(ClientDiagnostics) then
-          exit;
+            exit;
 
         ClientDiagnostics."Login Info" := HasLoginInfo;
         ClientDiagnostics."License Info" := false;
@@ -101,14 +101,14 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         HasLogoutInfo: Boolean;
     begin
         if not InitCurrentUser(ClientDiagnostics) then
-          exit;
+            exit;
 
         PrevRec := Format(ClientDiagnostics);
 
         HasLogoutInfo := SetLogoutInfo(ClientDiagnostics);
 
         if PrevRec = Format(ClientDiagnostics) then
-          exit;
+            exit;
 
         ClientDiagnostics."Login Info" := false;
         ClientDiagnostics."License Info" := false;
@@ -132,10 +132,10 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
 
         PrevRec := Format(ClientDiagnostics);
 
-        HasPOSInfo := SetPosClientType(POSClientType,ClientDiagnostics);
+        HasPOSInfo := SetPosClientType(POSClientType, ClientDiagnostics);
 
         if PrevRec = Format(ClientDiagnostics) then
-          exit;
+            exit;
 
         ClientDiagnostics."Login Info" := false;
         ClientDiagnostics."License Info" := false;
@@ -156,10 +156,10 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
 
         PrevRec := Format(ClientDiagnostics);
 
-        HasPOSInfo := SetIPAddress(IPAddress,ClientDiagnostics);
+        HasPOSInfo := SetIPAddress(IPAddress, ClientDiagnostics);
 
         if PrevRec = Format(ClientDiagnostics) then
-          exit;
+            exit;
 
         ClientDiagnostics."Login Info" := false;
         ClientDiagnostics."License Info" := false;
@@ -173,7 +173,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     var
         NewSessionID: Integer;
     begin
-        StartSession(NewSessionID,CODEUNIT::"Client Diagnostics Data Mgt.",CompanyName,ClientDiagnostics);
+        StartSession(NewSessionID, CODEUNIT::"Client Diagnostics Data Mgt.", CompanyName, ClientDiagnostics);
     end;
 
     local procedure CommitClientDiagnostics(ClientDiagnosticsFrom: Record "Client Diagnostics") HasNewInfo: Boolean
@@ -186,26 +186,26 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         ClientDiagnosticsTo.LockTable;
         ClientDiagnosticsTo.SetPosition(ClientDiagnosticsFrom.GetPosition(false));
         if not ClientDiagnosticsTo.Find then begin
-          HasNewInfo := true;
-          ClientDiagnosticsTo.Insert;
+            HasNewInfo := true;
+            ClientDiagnosticsTo.Insert;
         end;
 
         PrevRec := Format(ClientDiagnosticsTo);
 
         if ClientDiagnosticsFrom."Login Info" then
-          TransferLoginInfo(ClientDiagnosticsFrom,ClientDiagnosticsTo);
+            TransferLoginInfo(ClientDiagnosticsFrom, ClientDiagnosticsTo);
         if ClientDiagnosticsFrom."License Info" then
-          TransferLicenseInfo(ClientDiagnosticsFrom,ClientDiagnosticsTo);
+            TransferLicenseInfo(ClientDiagnosticsFrom, ClientDiagnosticsTo);
         if ClientDiagnosticsFrom."Computer Info" then
-          TransferComputerInfo(ClientDiagnosticsFrom,ClientDiagnosticsTo);
+            TransferComputerInfo(ClientDiagnosticsFrom, ClientDiagnosticsTo);
         if ClientDiagnosticsFrom."POS Info" then
-          TransferPosInfo(ClientDiagnosticsFrom,ClientDiagnosticsTo);
+            TransferPosInfo(ClientDiagnosticsFrom, ClientDiagnosticsTo);
         if ClientDiagnosticsFrom."Logout Info" then
-          TransferLogoutInfo(ClientDiagnosticsFrom,ClientDiagnosticsTo);
+            TransferLogoutInfo(ClientDiagnosticsFrom, ClientDiagnosticsTo);
 
         if PrevRec <> Format(ClientDiagnosticsTo) then begin
-          HasNewInfo := true;
-          ClientDiagnosticsTo.Modify;
+            HasNewInfo := true;
+            ClientDiagnosticsTo.Modify;
         end;
         Commit;
 
@@ -219,8 +219,8 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnBeforeCompanyOpen', '', true, true)]
     local procedure OnBeforeCompanyOpen()
     begin
-        if not (CurrentClientType in [CLIENTTYPE::Windows,CLIENTTYPE::Web,CLIENTTYPE::Tablet,CLIENTTYPE::Phone,CLIENTTYPE::Desktop]) then
-          exit;
+        if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop]) then
+            exit;
 
         LoginCurrUser();
     end;
@@ -228,8 +228,8 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     [EventSubscriber(ObjectType::Codeunit, 6014427, 'OnBeforeCompanyClose', '', true, true)]
     local procedure OnBeforeCompanyClose()
     begin
-        if not (CurrentClientType in [CLIENTTYPE::Windows,CLIENTTYPE::Web,CLIENTTYPE::Tablet,CLIENTTYPE::Phone,CLIENTTYPE::Desktop]) then
-          exit;
+        if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop]) then
+            exit;
 
         LogoutCurrUser();
     end;
@@ -248,14 +248,6 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         UpdatePOSClientType(ClientDiagnostics."POS Client Type"::Transcendence);
     end;
 
-    [EventSubscriber(ObjectType::Page, 6014651, 'OnInitializePageCompleted', '', true, true)]
-    local procedure OnInitializePageCompletedPOSSTD()
-    var
-        ClientDiagnostics: Record "Client Diagnostics";
-    begin
-        UpdatePOSClientType(ClientDiagnostics."POS Client Type"::Standard);
-    end;
-
     local procedure "--- Current User"()
     begin
     end;
@@ -266,15 +258,15 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     begin
         if (ActiveSession."Server Instance ID" = ServiceInstanceId) and
            (ActiveSession."Session ID" = SessionId) then
-          exit(true);
+            exit(true);
 
-        if ActiveSession.Get(ServiceInstanceId,SessionId) then
-          exit(true);
+        if ActiveSession.Get(ServiceInstanceId, SessionId) then
+            exit(true);
 
         for i := 0 to 200 do begin
-          Sleep(10);
-          if ActiveSession.Get(ServiceInstanceId,SessionId) then
-            exit(true);
+            Sleep(10);
+            if ActiveSession.Get(ServiceInstanceId, SessionId) then
+                exit(true);
         end;
 
         exit(false);
@@ -283,7 +275,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     procedure InitCurrentUser(var ClientDiagnostics: Record "Client Diagnostics"): Boolean
     begin
         if not FindMySession() then
-          exit(false);
+            exit(false);
 
         ClientDiagnostics.Init;
         ClientDiagnostics.Username := UserId;
@@ -304,7 +296,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         PrevRec: Text;
     begin
         if not ClientDiagnosticsEnabled() then
-          exit(false);
+            exit(false);
         PrevRec := Format(ClientDiagnostics);
 
         ClientDiagnostics."Client Name" := ActiveSession."Client Computer Name";
@@ -324,7 +316,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         PrevRec := Format(ClientDiagnostics);
 
         if User.Get(ActiveSession."User SID") then
-          ClientDiagnostics."License Type" := (User."License Type" + 1);
+            ClientDiagnostics."License Type" := (User."License Type" + 1);
         ClientDiagnostics."License Name" := SearchForLicenseText('Licensed to             : ');
         ClientDiagnostics."No. of Full Users" := SearchForGranule('450');
         ClientDiagnostics."No. of ISV Users" := SearchForGranule('490');
@@ -345,17 +337,17 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         ClientDiagnostics."Last Logon Date" := Today;
         ClientDiagnostics."Last Logon Time" := Time;
         if User.Get(ActiveSession."User SID") then
-          ClientDiagnostics."Full Name" := User."Full Name";
+            ClientDiagnostics."Full Name" := User."Full Name";
         ClientDiagnostics."Service Server Name" := ActiveSession."Server Computer Name";
         ClientDiagnostics."Service Instance" := ActiveSession."Server Instance Name";
         ClientDiagnostics."Company Name" := CompanyName;
         if IComm.Get then
-          ClientDiagnostics."Company ID" := IComm."Customer No.";
+            ClientDiagnostics."Company ID" := IComm."Customer No.";
         ClientDiagnostics."User Security ID" := ActiveSession."User SID";
         ClientDiagnostics."Windows Security ID" := Format(User."Windows Security ID");
         ClientDiagnostics."User Login Type" := ClientDiagnostics."User Login Type"::NAV;
         if ClientDiagnostics."Windows Security ID" <> '' then
-          ClientDiagnostics."User Login Type" := ClientDiagnostics."User Login Type"::Windows;
+            ClientDiagnostics."User Login Type" := ClientDiagnostics."User Login Type"::Windows;
         //-TM1.39 [334644]
         ClientDiagnostics."Application Version" := SystemEventWrapper.ApplicationBuild();
         //+TM1.39 [334644]
@@ -374,7 +366,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         exit(PrevRec <> Format(ClientDiagnostics));
     end;
 
-    local procedure SetPosClientType(POSClientType: Integer;var ClientDiagnostics: Record "Client Diagnostics") HasNewInfo: Boolean
+    local procedure SetPosClientType(POSClientType: Integer; var ClientDiagnostics: Record "Client Diagnostics") HasNewInfo: Boolean
     var
         PrevRec: Text;
     begin
@@ -385,20 +377,20 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         exit(PrevRec <> Format(ClientDiagnostics));
     end;
 
-    local procedure SetIPAddress(IPAddress: Text;var ClientDiagnostics: Record "Client Diagnostics") HasNewInfo: Boolean
+    local procedure SetIPAddress(IPAddress: Text; var ClientDiagnostics: Record "Client Diagnostics") HasNewInfo: Boolean
     var
         Latitude: Decimal;
         Longitude: Decimal;
-        JObject: DotNet npNetJObject;
-        JToken: DotNet npNetJToken;
+        JObject: DotNet JObject;
+        JToken: DotNet JToken;
         PrevRec: Text;
     begin
         if not ClientDiagnosticsEnabled() then
-          exit(false);
+            exit(false);
 
         //-NPR5.42
-        if not TryParseJson(IPAddress,JToken) then
-          exit(false);
+        if not TryParseJson(IPAddress, JToken) then
+            exit(false);
 
         JObject := JObject.Parse(JToken.ToString());
         //-NPR5.44 [323170]
@@ -425,12 +417,12 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         //EXIT(TRUE);
         PrevRec := Format(ClientDiagnostics);
 
-        if TryGetJsonValueAsText(JObject,'ip',IPAddress) and (StrLen(IPAddress) <= MaxStrLen(ClientDiagnostics."IP Address")) then
-          ClientDiagnostics."IP Address" := IPAddress;
-        if TryGetJsonValueAsDecimal(JObject,'latitude',Latitude) then
-          ClientDiagnostics."Geolocation Latitude" := Latitude;
-        if TryGetJsonValueAsDecimal(JObject,'longitude',Longitude) then
-          ClientDiagnostics."Geolocation Longitude" := Longitude;
+        if TryGetJsonValueAsText(JObject, 'ip', IPAddress) and (StrLen(IPAddress) <= MaxStrLen(ClientDiagnostics."IP Address")) then
+            ClientDiagnostics."IP Address" := IPAddress;
+        if TryGetJsonValueAsDecimal(JObject, 'latitude', Latitude) then
+            ClientDiagnostics."Geolocation Latitude" := Latitude;
+        if TryGetJsonValueAsDecimal(JObject, 'longitude', Longitude) then
+            ClientDiagnostics."Geolocation Longitude" := Longitude;
 
         exit(PrevRec <> Format(ClientDiagnostics));
         //+NPR5.44 [323170]
@@ -442,14 +434,14 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         PrevRec: Text;
     begin
         if not ClientDiagnosticsEnabled() then
-          exit(false);
+            exit(false);
         if ClientDiagnostics."IP Address" = '' then
-          exit(false);
+            exit(false);
 
         PrevRec := Format(ClientDiagnostics);
 
         if (ClientDiagnostics."Geolocation Latitude" = 0) or (ClientDiagnostics."Geolocation Longitude" = 0) then
-          POSGeolocation.IPAddress2GeoPosition(ClientDiagnostics."IP Address",ClientDiagnostics."Geolocation Latitude",ClientDiagnostics."Geolocation Longitude");
+            POSGeolocation.IPAddress2GeoPosition(ClientDiagnostics."IP Address", ClientDiagnostics."Geolocation Latitude", ClientDiagnostics."Geolocation Longitude");
 
         exit(PrevRec <> Format(ClientDiagnostics));
     end;
@@ -458,7 +450,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     begin
     end;
 
-    local procedure TransferComputerInfo(ClientDiagnosticsFrom: Record "Client Diagnostics";var ClientDiagnosticsTo: Record "Client Diagnostics")
+    local procedure TransferComputerInfo(ClientDiagnosticsFrom: Record "Client Diagnostics"; var ClientDiagnosticsTo: Record "Client Diagnostics")
     begin
         ClientDiagnosticsTo."Client Name" := ClientDiagnosticsFrom."Client Name";
         ClientDiagnosticsTo."Serial Number" := ClientDiagnosticsFrom."Serial Number";
@@ -467,7 +459,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         ClientDiagnosticsTo."Platform Version" := ClientDiagnosticsFrom."Platform Version";
     end;
 
-    local procedure TransferLicenseInfo(ClientDiagnosticsFrom: Record "Client Diagnostics";var ClientDiagnosticsTo: Record "Client Diagnostics")
+    local procedure TransferLicenseInfo(ClientDiagnosticsFrom: Record "Client Diagnostics"; var ClientDiagnosticsTo: Record "Client Diagnostics")
     begin
         ClientDiagnosticsTo."License Type" := ClientDiagnosticsFrom."License Type";
         ClientDiagnosticsTo."License Name" := ClientDiagnosticsFrom."License Name";
@@ -476,7 +468,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         ClientDiagnosticsTo."No. of Limited Users" := ClientDiagnosticsFrom."No. of Limited Users";
     end;
 
-    local procedure TransferLoginInfo(ClientDiagnosticsFrom: Record "Client Diagnostics";var ClientDiagnosticsTo: Record "Client Diagnostics")
+    local procedure TransferLoginInfo(ClientDiagnosticsFrom: Record "Client Diagnostics"; var ClientDiagnosticsTo: Record "Client Diagnostics")
     begin
         ClientDiagnosticsTo."Last Logon Date" := ClientDiagnosticsFrom."Last Logon Date";
         ClientDiagnosticsTo."Last Logon Time" := ClientDiagnosticsFrom."Last Logon Time";
@@ -491,13 +483,13 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         ClientDiagnosticsTo."Application Version" := ClientDiagnosticsFrom."Application Version";
     end;
 
-    local procedure TransferLogoutInfo(ClientDiagnosticsFrom: Record "Client Diagnostics";var ClientDiagnosticsTo: Record "Client Diagnostics")
+    local procedure TransferLogoutInfo(ClientDiagnosticsFrom: Record "Client Diagnostics"; var ClientDiagnosticsTo: Record "Client Diagnostics")
     begin
         ClientDiagnosticsTo."Last Logout Date" := ClientDiagnosticsFrom."Last Logout Date";
         ClientDiagnosticsTo."Last Logout Time" := ClientDiagnosticsFrom."Last Logout Time";
     end;
 
-    local procedure TransferPosInfo(ClientDiagnosticsFrom: Record "Client Diagnostics";var ClientDiagnosticsTo: Record "Client Diagnostics")
+    local procedure TransferPosInfo(ClientDiagnosticsFrom: Record "Client Diagnostics"; var ClientDiagnosticsTo: Record "Client Diagnostics")
     begin
         ClientDiagnosticsTo."POS Client Type" := ClientDiagnosticsFrom."POS Client Type";
         ClientDiagnosticsTo."IP Address" := ClientDiagnosticsFrom."IP Address";
@@ -518,16 +510,16 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         i: Integer;
     begin
         if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Desktop]) then
-          exit('');
+            exit('');
 
         NetworkInterfaces := NetworkInterface.GetAllNetworkInterfaces();
         for i := 0 to NetworkInterfaces.Length - 1 do begin
-          NetworkInterface := NetworkInterfaces.GetValue(i);
-          if NetworkInterface.GetIsNetworkAvailable() and (NetworkInterface.GetPhysicalAddress.ToString() <> '') then
-            MacAddress += ';' + NetworkInterface.GetPhysicalAddress.ToString();
+            NetworkInterface := NetworkInterfaces.GetValue(i);
+            if NetworkInterface.GetIsNetworkAvailable() and (NetworkInterface.GetPhysicalAddress.ToString() <> '') then
+                MacAddress += ';' + NetworkInterface.GetPhysicalAddress.ToString();
         end;
 
-        MacAddress := CopyStr(MacAddress,2);
+        MacAddress := CopyStr(MacAddress, 2);
         exit(MacAddress);
     end;
 
@@ -539,9 +531,9 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         FileVersionInfo: DotNet npNetFileVersionInfo;
     begin
         if not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Desktop]) then
-          exit('');
+            exit('');
 
-        Assembly        := Assembly.GetExecutingAssembly();
+        Assembly := Assembly.GetExecutingAssembly();
         FileVersionInfo := FileVersionInfo.GetVersionInfo(Assembly.Location);
         exit(FileVersionInfo.FileVersion)
     end;
@@ -559,14 +551,14 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     begin
         NoOfUsers := 0;
         if LicenseInfo.FindSet then
-          repeat
-            LineFound := StrPos(LicenseInfo.Text,GranuleIDText) = 1;
-            if LineFound then begin
-              NumberGroupSeparatorList := '.,�';
-              InfoText := DelChr(LicenseInfo.Text,'=',NumberGroupSeparatorList);
-              NoOfUsers += GetNoOfUsers(InfoText);
-            end;
-          until LicenseInfo.Next = 0;
+            repeat
+                LineFound := StrPos(LicenseInfo.Text, GranuleIDText) = 1;
+                if LineFound then begin
+                    NumberGroupSeparatorList := '.,�';
+                    InfoText := DelChr(LicenseInfo.Text, '=', NumberGroupSeparatorList);
+                    NoOfUsers += GetNoOfUsers(InfoText);
+                end;
+            until LicenseInfo.Next = 0;
         exit(NoOfUsers);
     end;
 
@@ -577,13 +569,15 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         IntFound: Integer;
         Match: DotNet npNetMatch;
         MatchCollection: DotNet npNetMatchCollection;
+        NetConvHelper: Variant;
     begin
         Pattern := '.*?\d+.*?(\d+)';
-        Match := Regex.Match(InputString,Pattern);
+        Match := Regex.Match(InputString, Pattern);
         if Match.Success then begin
-          MatchCollection := Match.Groups;
-          if Evaluate(IntFound,MatchCollection.Item(1).ToString) then
-            exit(IntFound);
+            NetConvHelper := Match.Groups;
+            MatchCollection := NetConvHelper;
+            if Evaluate(IntFound, MatchCollection.Item(1).ToString) then
+                exit(IntFound);
         end;
         exit(0);
     end;
@@ -593,14 +587,14 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         LicenseInfo: Record "License Information";
     begin
         if TextToFind = '' then
-          exit('');
+            exit('');
 
         InfoText := '';
-        LicenseInfo.SetFilter(Text,'%1*',TextToFind);
+        LicenseInfo.SetFilter(Text, '%1*', TextToFind);
         if not LicenseInfo.FindFirst then
-          exit('');
+            exit('');
 
-        InfoText := DelStr(LicenseInfo.Text,1,StrLen(TextToFind));
+        InfoText := DelStr(LicenseInfo.Text, 1, StrLen(TextToFind));
         exit(InfoText);
     end;
 
@@ -611,13 +605,13 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     local procedure ClientDiagnosticsEnabled(): Boolean
     begin
         if not NPRetailSetup.Get then
-          exit(false);
+            exit(false);
 
         exit(NPRetailSetup."Enable Client Diagnostics");
     end;
 
     [TryFunction]
-    local procedure TryGetJsonValueAsText(JObject: DotNet npNetJObject;PropertyName: Text;var ReturnValue: Text)
+    local procedure TryGetJsonValueAsText(JObject: DotNet JObject; PropertyName: Text; var ReturnValue: Text)
     begin
         //-NPR5.42
         ReturnValue := JObject.GetValue(PropertyName).ToString;
@@ -625,18 +619,18 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     end;
 
     [TryFunction]
-    local procedure TryGetJsonValueAsDecimal(JObject: DotNet npNetJObject;PropertyName: Text;var ReturnValue: Decimal)
+    local procedure TryGetJsonValueAsDecimal(JObject: DotNet JObject; PropertyName: Text; var ReturnValue: Decimal)
     var
         DotNetDecimal: DotNet npNetDecimal;
         CultureInfo: DotNet npNetCultureInfo;
     begin
         //-NPR5.42
-        ReturnValue := DotNetDecimal.Parse(JObject.GetValue(PropertyName).ToString,CultureInfo.InvariantCulture);
+        ReturnValue := DotNetDecimal.Parse(JObject.GetValue(PropertyName).ToString, CultureInfo.InvariantCulture);
         //+NPR5.42
     end;
 
     [TryFunction]
-    local procedure TryParseJson(json: Text;var JToken: DotNet npNetJToken)
+    local procedure TryParseJson(json: Text; var JToken: DotNet JToken)
     begin
         //-NPR5.42
         JToken := JToken.Parse(json);

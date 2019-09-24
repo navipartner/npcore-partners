@@ -7,8 +7,6 @@ codeunit 6014440 "POS Customer Location Mgt."
     // NPR5.23/MMV/20160512 Moved audit roll trace comment from GetSaleFromLoc() to LoadSavedSale() in Touch - Sale POS codeunits
     // NPR5.29/MMV /20161214 CASE 261034 Only show locations with sales attached in list when importing sale.
     // NPR5.31/MMV /20170317 CASE 264109 Applied change from 5.29 to Print action as well.
-    // NPR5.31/MMV /20170321 CASE 264112 New function StampSaleAndPrint.
-    //                                   Replaced Marshaller calls with system calls.
     // NPR5.31/MMV /20170322 CASE 270332 Added guard against floating sale lines.
 
     TableNo = "Sale POS";
@@ -19,13 +17,11 @@ codeunit 6014440 "POS Customer Location Mgt."
 
     var
         PrintEvent: Option "Trigger",OnSave;
-        ErrorTxt: Label 'Error';
         Error000001: Label 'No sale found at this location';
         Error000002: Label 'The selected location is invalid';
         Error000003: Label 'The current sale must not contain any lines before import';
         Error000004: Label 'There are no lines to save';
         Text0000001: Label 'Transferred to location receipt %1';
-        Marshaller: Codeunit "POS Event Marshaller";
         POSCustLoc: Record "POS Customer Location";
 
     procedure GetSaleFromLoc(LocNumber: Code[20]; var SalePOS: Record "Sale POS"; var SalePOSLoc: Record "Sale POS"): Boolean
@@ -46,21 +42,6 @@ codeunit 6014440 "POS Customer Location Mgt."
 
         if not EmptySale(SalePOS) then
             Error(Error000003);
-
-        // IF NOT POSCustLoc.GET(LocNumber) THEN BEGIN
-        //  Marshaller.Error(ErrorTxt,Error000002,FALSE);
-        //  EXIT(FALSE);
-        // END;
-        //
-        // IF NOT ExistingLocationReceipt(LocNumber) THEN BEGIN
-        //  Marshaller.Error(ErrorTxt,Error000001,FALSE);
-        //  EXIT(FALSE);
-        // END;
-        //
-        // IF NOT EmptySale(SalePOS) THEN BEGIN
-        //  Marshaller.Error(ErrorTxt,Error000003,FALSE);
-        //  EXIT(FALSE);
-        // END;
         //+NPR5.31 [264112]
 
         SalePOSLoc.SetRange("Customer Location No.", LocNumber);
@@ -87,16 +68,6 @@ codeunit 6014440 "POS Customer Location Mgt."
 
         if EmptySale(SalePOS) then
             Error(Error000004);
-
-        // IF NOT POSCustLoc.GET(LocNumber) THEN BEGIN
-        //  Marshaller.Error(ErrorTxt,Error000002,FALSE);
-        //  EXIT(FALSE);
-        // END;
-        //
-        // IF EmptySale(SalePOS) THEN BEGIN
-        //  Marshaller.Error(ErrorTxt,Error000004,FALSE);
-        //  EXIT(FALSE);
-        // END;
         //+NPR5.31 [264112]
 
         NewReceipt := not ExistingLocationReceipt(LocNumber);
@@ -141,10 +112,7 @@ codeunit 6014440 "POS Customer Location Mgt."
 
                     if POSCustLoc.Get(LocNumber) then begin
                         if not ExistingLocationReceipt(LocNumber) then begin
-                            //-NPR5.31 [264112]
-                            //Marshaller.Error(ErrorTxt, Error000001, FALSE);
                             Error(Error000001);
-                            //+NPR5.31 [264112]
                             exit;
                         end;
 
@@ -154,10 +122,7 @@ codeunit 6014440 "POS Customer Location Mgt."
                         RecRef.GetTable(SalePOS);
                         RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::CustomerLocationOnTrigger);
                     end else
-                        //-NPR5.31 [264112]
                         Error(Error000002);
-                    //Marshaller.Error(ErrorTxt,Error000002,FALSE);
-                    //+NPR5.31 [264112]
                 end;
 
             PrintEvent::OnSave: //Print sale being saved to location.

@@ -8,12 +8,11 @@ codeunit 6150717 "POS Front End Keeper"
 
     var
         POSSession: Codeunit "POS Session";
-        [RunOnClient]
-        Framework: DotNet npNetIFramework0;
+        Framework: ControlAddIn Transcendence;
         FrontEnd: Codeunit "POS Front End Management";
         Initialized: Boolean;
 
-    procedure Initialize(FrameworkIn: DotNet npNetIFramework0;FrontEndIn: Codeunit "POS Front End Management";POSSessionIn: Codeunit "POS Session")
+    procedure Initialize(FrameworkIn: ControlAddIn Transcendence; FrontEndIn: Codeunit "POS Front End Management"; POSSessionIn: Codeunit "POS Session")
     begin
         FrontEnd := FrontEndIn;
         Framework := FrameworkIn;
@@ -22,7 +21,7 @@ codeunit 6150717 "POS Front End Keeper"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150700, 'OnDetectFramework', '', false, false)]
-    local procedure DetectFrontEnd(var FrontEndOut: Codeunit "POS Front End Management";var POSSessionOut: Codeunit "POS Session";var Active: Boolean)
+    local procedure DetectFrontEnd(var FrontEndOut: Codeunit "POS Front End Management"; var POSSessionOut: Codeunit "POS Session"; var Active: Boolean)
     begin
         FrontEndOut := FrontEnd;
         POSSessionOut := POSSession;
@@ -30,10 +29,12 @@ codeunit 6150717 "POS Front End Keeper"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150704, 'OnDetectFramework', '', false, false)]
-    local procedure DetectFramework(var FrameworkOut: DotNet npNetIFramework0;var POSSessionOut: Codeunit "POS Session")
+    local procedure DetectFramework(var FrameworkOut: ControlAddIn Transcendence; var POSSessionOut: Codeunit "POS Session"; var Handled: Boolean)
     begin
         FrameworkOut := Framework;
         POSSessionOut := POSSession;
+        if Initialized then
+            Handled := true;
     end;
 }
 

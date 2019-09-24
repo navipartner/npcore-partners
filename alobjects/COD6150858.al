@@ -26,13 +26,13 @@ codeunit 6150858 "POS Action - Start POS"
     local procedure ActionCode(): Code[20]
     begin
 
-        exit ('START_POS');
+        exit('START_POS');
     end;
 
     local procedure ActionVersion(): Code[10]
     begin
 
-        exit ('1.3');
+        exit('1.3');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -40,18 +40,18 @@ codeunit 6150858 "POS Action - Start POS"
     begin
 
         with Sender do
-          if DiscoverAction(
-            ActionCode (),
-            ActionDescription,
-            ActionVersion (),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
+            if DiscoverAction(
+              ActionCode(),
+              ActionDescription,
+              ActionVersion(),
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
 
-            RegisterWorkflowStep ('ConfirmBin', 'context.ConfirmBin && confirm ({title: labels.title, caption: context.BinContents}).no(respond());');
-            RegisterWorkflow (true);
+                RegisterWorkflowStep('ConfirmBin', 'context.ConfirmBin && confirm ({title: labels.title, caption: context.BinContents}).no(respond());');
+                RegisterWorkflow(true);
 
-          end;
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
@@ -60,12 +60,12 @@ codeunit 6150858 "POS Action - Start POS"
         RetailSetup: Record "Retail Setup";
     begin
 
-        Captions.AddActionCaption (ActionCode, 'title', Title);
-        Captions.AddActionCaption (ActionCode, 'balancenow', BalanceNow);
+        Captions.AddActionCaption(ActionCode, 'title', Title);
+        Captions.AddActionCaption(ActionCode, 'balancenow', BalanceNow);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action"; Parameters: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         MasterPOSUnit: Record "POS Unit";
         POSEndofDayProfile: Record "POS End of Day Profile";
@@ -78,34 +78,34 @@ codeunit 6150858 "POS Action - Start POS"
     begin
 
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         Handled := true;
 
-        POSSession.GetSetup (Setup);
-        Setup.GetPOSUnit (POSUnit);
+        POSSession.GetSetup(Setup);
+        Setup.GetPOSUnit(POSUnit);
 
         //-NPR5.49 [348458]
-        POSUnit.Get (POSUnit."No."); // refresh state
+        POSUnit.Get(POSUnit."No."); // refresh state
 
         if (POSUnit."POS End of Day Profile" <> '') then begin
-          POSEndofDayProfile.Get (POSUnit."POS End of Day Profile");
+            POSEndofDayProfile.Get(POSUnit."POS End of Day Profile");
 
-          if (POSEndofDayProfile."End of Day Type" = POSEndofDayProfile."End of Day Type"::MASTER_SLAVE) then begin
-            MasterPOSUnit.Get (POSEndofDayProfile."Master POS Unit No.");
+            if (POSEndofDayProfile."End of Day Type" = POSEndofDayProfile."End of Day Type"::MASTER_SLAVE) then begin
+                MasterPOSUnit.Get(POSEndofDayProfile."Master POS Unit No.");
 
-            if (POSUnit."No." <> POSEndofDayProfile."Master POS Unit No.") then begin
-              if (MasterPOSUnit.Status <> MasterPOSUnit.Status::OPEN) then
-                Error (ManagedPos, MasterPOSUnit."No.", MasterPOSUnit.Name);
+                if (POSUnit."No." <> POSEndofDayProfile."Master POS Unit No.") then begin
+                    if (MasterPOSUnit.Status <> MasterPOSUnit.Status::OPEN) then
+                        Error(ManagedPos, MasterPOSUnit."No.", MasterPOSUnit.Name);
 
-              BinContentsHTML := StrSubstNo ('<b>%1</b>', WorkshiftWasClosed);
-              Context.SetContext ('ConfirmBin', true);
-              Context.SetContext ('BinContents', BinContentsHTML);
-              FrontEnd.SetActionContext (ActionCode, Context);
-              exit;
+                    BinContentsHTML := StrSubstNo('<b>%1</b>', WorkshiftWasClosed);
+                    Context.SetContext('ConfirmBin', true);
+                    Context.SetContext('BinContents', BinContentsHTML);
+                    FrontEnd.SetActionContext(ActionCode, Context);
+                    exit;
+                end;
+
             end;
-
-          end;
         end;
         //+NPR5.49 [348458]
 
@@ -116,47 +116,47 @@ codeunit 6150858 "POS Action - Start POS"
         //
         // IF (POSUnit.Status = POSUnit.Status::CLOSED) THEN BEGIN
 
-        Context.SetContext ('ConfirmBin', true);
+        Context.SetContext('ConfirmBin', true);
         //+NPR5.49 [348458]
 
-        POSWorkshiftCheckpoint.SetFilter ("POS Unit No.", '=%1', POSUnit."No.");
-        POSWorkshiftCheckpoint.SetFilter (Open, '=%1', false);
-        POSWorkshiftCheckpoint.SetFilter (Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
-        BinContentsHTML := StrSubstNo ('<b>%1</b>', FirstBalance);
+        POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
+        POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
+        POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
+        BinContentsHTML := StrSubstNo('<b>%1</b>', FirstBalance);
 
-        if (POSWorkshiftCheckpoint.FindLast ()) then begin
-          BinContentsHTML := StrSubstNo ('<b>%1</b>', EmptyBin);
+        if (POSWorkshiftCheckpoint.FindLast()) then begin
+            BinContentsHTML := StrSubstNo('<b>%1</b>', EmptyBin);
 
-          POSPaymentBinCheckpoint.SetFilter ("Workshift Checkpoint Entry No.", '=%1', POSWorkshiftCheckpoint."Entry No.");
-          POSPaymentBinCheckpoint.SetFilter ("New Float Amount", '>%1', 0);
+            POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', POSWorkshiftCheckpoint."Entry No.");
+            POSPaymentBinCheckpoint.SetFilter("New Float Amount", '>%1', 0);
 
-          if (POSPaymentBinCheckpoint.FindSet ()) then begin
-            BinContentsHTML := StrSubstNo ('<b>%1</b><p>', Expected);
-            //-NPR5.50 [352483]
-            //BinContentsHTML += '<center><table border="0" cellspacing="0" width="150">';
-            BinContentsHTML += '<center><table border="0" cellspacing="0" width="250">';
-            //+NPR5.50 [352483]
+            if (POSPaymentBinCheckpoint.FindSet()) then begin
+                BinContentsHTML := StrSubstNo('<b>%1</b><p>', Expected);
+                //-NPR5.50 [352483]
+                //BinContentsHTML += '<center><table border="0" cellspacing="0" width="150">';
+                BinContentsHTML += '<center><table border="0" cellspacing="0" width="250">';
+                //+NPR5.50 [352483]
 
-            repeat
-              BinContentsHTML += StrSubstNo ('<tr><td align="left"><b>%1:&nbsp;</b></td><td align="right"><b>&nbsp;%2</b></td></tr>',
-                POSPaymentBinCheckpoint.Description, Format (POSPaymentBinCheckpoint."New Float Amount", 0, '<Precision,2:2><Standard Format,0>'));
-            until (POSPaymentBinCheckpoint.Next () = 0);
+                repeat
+                    BinContentsHTML += StrSubstNo('<tr><td align="left"><b>%1:&nbsp;</b></td><td align="right"><b>&nbsp;%2</b></td></tr>',
+                      POSPaymentBinCheckpoint.Description, Format(POSPaymentBinCheckpoint."New Float Amount", 0, '<Precision,2:2><Standard Format,0>'));
+                until (POSPaymentBinCheckpoint.Next() = 0);
 
-            BinContentsHTML += '</table></center>';
-            BinContentsHTML += StrSubstNo ('<p><b>%1</b>', ConfirmBin);
+                BinContentsHTML += '</table></center>';
+                BinContentsHTML += StrSubstNo('<p><b>%1</b>', ConfirmBin);
 
-          end;
+            end;
         end;
 
         // END
 
 
-        Context.SetContext ('BinContents', BinContentsHTML);
-        FrontEnd.SetActionContext (ActionCode, Context);
+        Context.SetContext('BinContents', BinContentsHTML);
+        FrontEnd.SetActionContext(ActionCode, Context);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         POSUnit: Record "POS Unit";
         POSAction: Record "POS Action";
@@ -174,88 +174,89 @@ codeunit 6150858 "POS Action - Start POS"
     begin
 
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         Handled := true;
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        POSSession.GetSetup (Setup);
-        Setup.GetPOSUnit (POSUnit);
+        POSSession.GetSetup(Setup);
+        Setup.GetPOSUnit(POSUnit);
         //-NPR5.49 [348458]
-        POSUnit.Get (POSUnit."No."); // refresh state
+        POSUnit.Get(POSUnit."No."); // refresh state
         //+NPR5.49 [348458]
 
         case WorkflowStep of
-          'ConfirmBin' : begin
+            'ConfirmBin':
+                begin
 
-            JSON.SetScope('$ConfirmBin', true);
-            BinContentsConfirmed := JSON.GetBoolean('confirm', true);
+                    JSON.SetScope('$ConfirmBin', true);
+                    BinContentsConfirmed := JSON.GetBoolean('confirm', true);
 
-            if (not BinContentsConfirmed) then begin
+                    if (not BinContentsConfirmed) then begin
 
-              //-NPR5.49 [348458]
-              if (POSUnit."POS End of Day Profile" <> '') then begin
-                POSEndofDayProfile.Get (POSUnit."POS End of Day Profile");
-                if (POSEndofDayProfile."End of Day Type" = POSEndofDayProfile."End of Day Type"::MASTER_SLAVE) then
-                  if (POSEndofDayProfile."Master POS Unit No." <> POSUnit."No.") then
-                    Error (''); // This POS is managed, we dont allow balancing on this POS as an individual
-              end;
-              //+NPR5.49 [348458]
+                        //-NPR5.49 [348458]
+                        if (POSUnit."POS End of Day Profile" <> '') then begin
+                            POSEndofDayProfile.Get(POSUnit."POS End of Day Profile");
+                            if (POSEndofDayProfile."End of Day Type" = POSEndofDayProfile."End of Day Type"::MASTER_SLAVE) then
+                                if (POSEndofDayProfile."Master POS Unit No." <> POSUnit."No.") then
+                                    Error(''); // This POS is managed, we dont allow balancing on this POS as an individual
+                        end;
+                        //+NPR5.49 [348458]
 
-              // *****
-              // The Magical Confirm!
-              // This is a hack and workaround. The confirm is modal in C/AL, but not to the control-addin.
-              // It will allow the current workflow step to finish in frontend, before the InvokeWorkflow executes.
-              // (Note: PAGE.RUNMODAL will also work)
-              // *****
-              if (Confirm (BalanceNow, true)) then begin
-                EoDActionName := 'BALANCE_V3';
+                        // *****
+                        // The Magical Confirm!
+                        // This is a hack and workaround. The confirm is modal in C/AL, but not to the control-addin.
+                        // It will allow the current workflow step to finish in frontend, before the InvokeWorkflow executes.
+                        // (Note: PAGE.RUNMODAL will also work)
+                        // *****
+                        if (Confirm(BalanceNow, true)) then begin
+                            EoDActionName := 'BALANCE_V3';
 
-                if (not POSSession.RetrieveSessionAction (EoDActionName, POSAction)) then
-                  POSAction.Get (EoDActionName);
+                            if (not POSSession.RetrieveSessionAction(EoDActionName, POSAction)) then
+                                POSAction.Get(EoDActionName);
 
-                POSAction.SetWorkflowInvocationParameter ('Type', 1, FrontEnd);
-                FrontEnd.InvokeWorkflow (POSAction);
+                            POSAction.SetWorkflowInvocationParameter('Type', 1, FrontEnd);
+                            FrontEnd.InvokeWorkflow(POSAction);
 
-              end else begin
-                Message (NotConfirmedBin);
+                        end else begin
+                            Message(NotConfirmedBin);
 
-              end;
-            end;
+                        end;
+                    end;
 
-            if (BinContentsConfirmed) then begin
-              CreateFirstTimeCheckpoint (POSUnit."No.");
+                    if (BinContentsConfirmed) then begin
+                        CreateFirstTimeCheckpoint(POSUnit."No.");
 
-              POSUnit.Get (POSUnit."No.");
+                        POSUnit.Get(POSUnit."No.");
 
-              //-NPR5.48 [336921]
-              //POSUnit.Status := POSUnit.Status::OPEN;
-              //POSUnit.MODIFY ();
+                        //-NPR5.48 [336921]
+                        //POSUnit.Status := POSUnit.Status::OPEN;
+                        //POSUnit.MODIFY ();
 
-              //-NPR5.50 [350974]
-              // OpeningEntryNo := POSCreateEntry.InsertUnitOpenEntry (POSUnit."No.", Setup.Salesperson());
-              // POSOpenPOSUnit.OpenPosUnitNoWithPeriodEntryNo (POSUnit."No.", OpeningEntryNo);
-              POSOpenPOSUnit.ClosePOSUnitOpenPeriods (POSUnit."No."); // make sure pos period register is correct
-              POSOpenPOSUnit.OpenPOSUnit (POSUnit);
-              OpeningEntryNo := POSCreateEntry.InsertUnitOpenEntry (POSUnit."No.", Setup.Salesperson());
-              POSOpenPOSUnit.SetOpeningEntryNo (POSUnit."No.", OpeningEntryNo);
-              //+NPR5.50 [350974]
-              //+NPR5.48 [336921]
+                        //-NPR5.50 [350974]
+                        // OpeningEntryNo := POSCreateEntry.InsertUnitOpenEntry (POSUnit."No.", Setup.Salesperson());
+                        // POSOpenPOSUnit.OpenPosUnitNoWithPeriodEntryNo (POSUnit."No.", OpeningEntryNo);
+                        POSOpenPOSUnit.ClosePOSUnitOpenPeriods(POSUnit."No."); // make sure pos period register is correct
+                        POSOpenPOSUnit.OpenPOSUnit(POSUnit);
+                        OpeningEntryNo := POSCreateEntry.InsertUnitOpenEntry(POSUnit."No.", Setup.Salesperson());
+                        POSOpenPOSUnit.SetOpeningEntryNo(POSUnit."No.", OpeningEntryNo);
+                        //+NPR5.50 [350974]
+                        //+NPR5.48 [336921]
 
-              Commit;
-              //-NPR5.50 [352483]
-              PrintBeginWorkshift (POSUnit."No.");
-              //+NPR5.50 [352483]
+                        Commit;
+                        //-NPR5.50 [352483]
+                        PrintBeginWorkshift(POSUnit."No.");
+                        //+NPR5.50 [352483]
 
-              // Start Sale
-              POSSession.StartTransaction ();
-              POSSession.GetSale (POSSale);
-              POSSale.GetCurrentSale (SalePOS);
-              POSSession.ChangeViewSale();
-            end;
+                        // Start Sale
+                        POSSession.StartTransaction();
+                        POSSession.GetSale(POSSale);
+                        POSSale.GetCurrentSale(SalePOS);
+                        POSSession.ChangeViewSale();
+                    end;
 
-          end;
+                end;
         end;
     end;
 
@@ -268,14 +269,14 @@ codeunit 6150858 "POS Action - Start POS"
         POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";
     begin
 
-        POSWorkshiftCheckpoint.SetFilter ("POS Unit No.", '=%1', PosUnitNo);
-        POSWorkshiftCheckpoint.SetFilter (Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
-        POSWorkshiftCheckpoint.SetFilter (Open, '=%1', false);
+        POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', PosUnitNo);
+        POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
+        POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
 
-        if (not POSWorkshiftCheckpoint.FindLast ()) then
-          exit (-1); // Never been balanced
+        if (not POSWorkshiftCheckpoint.FindLast()) then
+            exit(-1); // Never been balanced
 
-        exit (Today - DT2Date (POSWorkshiftCheckpoint."Created At"));
+        exit(Today - DT2Date(POSWorkshiftCheckpoint."Created At"));
     end;
 
     local procedure CreateFirstTimeCheckpoint(UnitNo: Code[10])
@@ -283,17 +284,17 @@ codeunit 6150858 "POS Action - Start POS"
         POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";
     begin
 
-        POSWorkshiftCheckpoint.SetFilter ("POS Unit No.", '=%1', UnitNo);
-        POSWorkshiftCheckpoint.SetFilter (Open, '=%1', false);
-        POSWorkshiftCheckpoint.SetFilter (Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
+        POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', UnitNo);
+        POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
+        POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
 
-        if (POSWorkshiftCheckpoint.IsEmpty ()) then begin
-          POSWorkshiftCheckpoint."Entry No." := 0;
-          POSWorkshiftCheckpoint."POS Unit No." := UnitNo;
-          POSWorkshiftCheckpoint.Open := false;
-          POSWorkshiftCheckpoint.Type := POSWorkshiftCheckpoint.Type::ZREPORT;
-          POSWorkshiftCheckpoint."Created At" := CurrentDateTime ();
-          POSWorkshiftCheckpoint.Insert ();
+        if (POSWorkshiftCheckpoint.IsEmpty()) then begin
+            POSWorkshiftCheckpoint."Entry No." := 0;
+            POSWorkshiftCheckpoint."POS Unit No." := UnitNo;
+            POSWorkshiftCheckpoint.Open := false;
+            POSWorkshiftCheckpoint.Type := POSWorkshiftCheckpoint.Type::ZREPORT;
+            POSWorkshiftCheckpoint."Created At" := CurrentDateTime();
+            POSWorkshiftCheckpoint.Insert();
         end;
     end;
 
@@ -306,21 +307,21 @@ codeunit 6150858 "POS Action - Start POS"
     begin
 
         //-NPR5.50 [352483]
-        POSWorkshiftCheckpoint.SetFilter ("POS Unit No.", '=%1', UnitNo);
-        POSWorkshiftCheckpoint.SetFilter (Open, '=%1', false);
-        POSWorkshiftCheckpoint.SetFilter (Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
+        POSWorkshiftCheckpoint.SetFilter("POS Unit No.", '=%1', UnitNo);
+        POSWorkshiftCheckpoint.SetFilter(Open, '=%1', false);
+        POSWorkshiftCheckpoint.SetFilter(Type, '=%1', POSWorkshiftCheckpoint.Type::ZREPORT);
 
-        if (not POSWorkshiftCheckpoint.FindLast ()) then
-          exit;
+        if (not POSWorkshiftCheckpoint.FindLast()) then
+            exit;
 
-        ReportSelectionRetail.SetFilter ("Report Type", '=%1', ReportSelectionRetail."Report Type"::"Begin Workshift (POS Entry)");
-        if (not ReportSelectionRetail.FindFirst ()) then
-          exit;
+        ReportSelectionRetail.SetFilter("Report Type", '=%1', ReportSelectionRetail."Report Type"::"Begin Workshift (POS Entry)");
+        if (not ReportSelectionRetail.FindFirst()) then
+            exit;
 
-        POSWorkshiftCheckpoint.SetFilter ("Entry No.", '=%1', POSWorkshiftCheckpoint."Entry No.");
-        POSWorkshiftCheckpoint.FindFirst ();
-        RecRef.GetTable (POSWorkshiftCheckpoint);
-        RetailReportSelectionMgt.RunObjects (RecRef, ReportSelectionRetail."Report Type"::"Begin Workshift (POS Entry)");
+        POSWorkshiftCheckpoint.SetFilter("Entry No.", '=%1', POSWorkshiftCheckpoint."Entry No.");
+        POSWorkshiftCheckpoint.FindFirst();
+        RecRef.GetTable(POSWorkshiftCheckpoint);
+        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Begin Workshift (POS Entry)");
         //+NPR5.50 [352483]
     end;
 }

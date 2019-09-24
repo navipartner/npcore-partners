@@ -4,7 +4,7 @@ report 6060105 "Terminal Sales Ticket IV"
     // NPR5.36/TJ /20170927 CASE 286283 Renamed variables with danish specific letters into english letters
     // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
     DefaultLayout = RDLC;
-    RDLCLayout = './Terminal Sales Ticket IV.rdlc';
+    RDLCLayout = './layouts/Terminal Sales Ticket IV.rdlc';
 
     Caption = 'Terminal Sales Ticket IV';
     ShowPrintStatus = false;

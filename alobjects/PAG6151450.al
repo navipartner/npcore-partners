@@ -15,27 +15,7 @@ page 6151450 "Magento Text Editor Dialog"
             group(General)
             {
                 Caption = 'General';
-                usercontrol(TextEditor;"NaviPartner.NaviConnect.TextEditor.1.01")
-                {
 
-                    trigger OnRequestInitialization()
-                    begin
-                        CurrPage.TextEditor.Initialize(Options);
-                    end;
-
-                    trigger OnInitialized()
-                    begin
-                        TextEditorInitialized := true;
-                        SendDataToTextEditor();
-                    end;
-
-                    trigger OnContentChange(content: Text)
-                    begin
-                        EditorContent := content;
-                        if CloseAllowed then
-                          CurrPage.Close();
-                    end;
-                }
             }
         }
     }
@@ -57,12 +37,12 @@ page 6151450 "Magento Text Editor Dialog"
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
         if CloseAction = ACTION::Cancel then
-          exit(true);
+            exit(true);
 
         OKClicked := true;
 
         CloseAllowed := true;
-        CurrPage.TextEditor.RequestContent();
+        //CurrPage.TextEditor.RequestContent();
         exit(false);
     end;
 
@@ -80,15 +60,15 @@ page 6151450 "Magento Text Editor Dialog"
         "Object": DotNet npNetObject;
         Activator: DotNet npNetActivator;
     begin
-        Types := Types.CreateInstance(GetDotNetType(Type),2);
-        Types.SetValue(GetDotNetType(''),0);
-        Types.SetValue(GetDotNetType(Object),1);
+        Types := Types.CreateInstance(GetDotNetType(Type), 2);
+        Types.SetValue(GetDotNetType(''), 0);
+        Types.SetValue(GetDotNetType(Object), 1);
 
         Type := GetDotNetType(Options);
         Options := Activator.CreateInstance(Type.MakeGenericType(Types));
         //-MAG1.19
-        SetOption('statusbar',false);
-        SetOption('save_delay',10);
+        SetOption('statusbar', false);
+        SetOption('save_delay', 10);
         //+MAG1.19
     end;
 
@@ -99,9 +79,9 @@ page 6151450 "Magento Text Editor Dialog"
         Data: Text;
     begin
         if not TextEditorInitialized then
-          exit;
+            exit;
 
-        CurrPage.TextEditor.SetContent(EditorContent);
+        //CurrPage.TextEditor.SetContent(EditorContent);
     end;
 
     procedure SetContent(ContentIn: Text)
@@ -115,12 +95,12 @@ page 6151450 "Magento Text Editor Dialog"
         exit(EditorContent);
     end;
 
-    procedure SetOption(Option: Text;Value: Variant)
+    procedure SetOption(Option: Text; Value: Variant)
     begin
         if Options.ContainsKey(Option) then
-          Options.Remove(Option);
+            Options.Remove(Option);
 
-        Options.Add(Option,Value);
+        Options.Add(Option, Value);
     end;
 
     procedure GetOKClicked(): Boolean
@@ -135,8 +115,8 @@ page 6151450 "Magento Text Editor Dialog"
         TextEditor.SetContent(Content);
         if TextEditor.RunModal() = ACTION::OK then;
         if TextEditor.GetOKClicked() then begin
-          Content := TextEditor.GetContent();
-          exit(true);
+            Content := TextEditor.GetContent();
+            exit(true);
         end;
     end;
 }

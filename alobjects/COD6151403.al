@@ -42,22 +42,22 @@ codeunit 6151403 "Magento Webservice"
         Error002: Label 'Magento Integration has already been setup to %1';
 
     [Scope('Personalization')]
-    procedure GeneratePdfCreditMemo(DocumentNo: Code[20];CustomerNo: Code[20]) PdfCrMemo: Text
+    procedure GeneratePdfCreditMemo(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfCrMemo: Text
     var
         ReportSelections: Record "Report Selections";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         Filename: Text;
     begin
-        ReportSelections.SetRange(Usage,ReportSelections.Usage::"S.Cr.Memo");
-        ReportSelections.SetFilter("Report ID",'<>%1',0);
+        ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Cr.Memo");
+        ReportSelections.SetFilter("Report ID", '<>%1', 0);
         ReportSelections.FindFirst;
 
         SalesCrMemoHeader.Get(DocumentNo);
-        SalesCrMemoHeader.TestField("Bill-to Customer No.",CustomerNo);
+        SalesCrMemoHeader.TestField("Bill-to Customer No.", CustomerNo);
         SalesCrMemoHeader.SetRecFilter;
 
         Filename := TemporaryPath + 'CrMemo-' + DocumentNo + '.pdf';
-        REPORT.SaveAsPdf(ReportSelections."Report ID",Filename,SalesCrMemoHeader);
+        REPORT.SaveAsPdf(ReportSelections."Report ID", Filename, SalesCrMemoHeader);
 
         PdfCrMemo := GetBase64(Filename);
         if Erase(Filename) then;
@@ -66,23 +66,23 @@ codeunit 6151403 "Magento Webservice"
     end;
 
     [Scope('Personalization')]
-    procedure GeneratePdfOrder(DocumentNo: Code[20];CustomerNo: Code[20]) PdfSalesOrder: Text
+    procedure GeneratePdfOrder(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfSalesOrder: Text
     var
         SalesHeader: Record "Sales Header";
         ReportSelections: Record "Report Selections";
         Filename: Text;
     begin
         //-MAG2.07 [290144]
-        ReportSelections.SetRange(Usage,ReportSelections.Usage::"S.Order");
-        ReportSelections.SetFilter("Report ID",'<>%1',0);
+        ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Order");
+        ReportSelections.SetFilter("Report ID", '<>%1', 0);
         ReportSelections.FindFirst;
 
-        SalesHeader.Get(SalesHeader."Document Type"::Order,DocumentNo);
-        SalesHeader.TestField("Bill-to Customer No.",CustomerNo);
+        SalesHeader.Get(SalesHeader."Document Type"::Order, DocumentNo);
+        SalesHeader.TestField("Bill-to Customer No.", CustomerNo);
         SalesHeader.SetRecFilter;
 
         Filename := TemporaryPath + 'order-' + DocumentNo + '.pdf';
-        REPORT.SaveAsPdf(ReportSelections."Report ID",Filename,SalesHeader);
+        REPORT.SaveAsPdf(ReportSelections."Report ID", Filename, SalesHeader);
 
         PdfSalesOrder := GetBase64(Filename);
         if Erase(Filename) then;
@@ -92,22 +92,22 @@ codeunit 6151403 "Magento Webservice"
     end;
 
     [Scope('Personalization')]
-    procedure GeneratePdfInvoice(DocumentNo: Code[20];CustomerNo: Code[20]) PdfSalesInvoice: Text
+    procedure GeneratePdfInvoice(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfSalesInvoice: Text
     var
         SalesInvHeader: Record "Sales Invoice Header";
         ReportSelections: Record "Report Selections";
         Filename: Text;
     begin
-        ReportSelections.SetRange(Usage,ReportSelections.Usage::"S.Invoice");
-        ReportSelections.SetFilter("Report ID",'<>%1',0);
+        ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Invoice");
+        ReportSelections.SetFilter("Report ID", '<>%1', 0);
         ReportSelections.FindFirst;
 
         SalesInvHeader.Get(DocumentNo);
-        SalesInvHeader.TestField("Bill-to Customer No.",CustomerNo);
+        SalesInvHeader.TestField("Bill-to Customer No.", CustomerNo);
         SalesInvHeader.SetRecFilter;
 
         Filename := TemporaryPath + 'invoice-' + DocumentNo + '.pdf';
-        REPORT.SaveAsPdf(ReportSelections."Report ID",Filename,SalesInvHeader);
+        REPORT.SaveAsPdf(ReportSelections."Report ID", Filename, SalesInvHeader);
 
         PdfSalesInvoice := GetBase64(Filename);
         if Erase(Filename) then;
@@ -116,7 +116,7 @@ codeunit 6151403 "Magento Webservice"
     end;
 
     [Scope('Personalization')]
-    procedure GeneratePdfCustomerStatement(CustomerNo: Code[20];FromDate: Date;UntilDate: Date) PdfCustomerStatement: Text
+    procedure GeneratePdfCustomerStatement(CustomerNo: Code[20]; FromDate: Date; UntilDate: Date) PdfCustomerStatement: Text
     var
         ReportSelections: Record "Report Selections";
         Filename: Text;
@@ -124,12 +124,12 @@ codeunit 6151403 "Magento Webservice"
     begin
 
         //-MAG2.20 [351590]
-        ReportSelections.SetRange (Usage,ReportSelections.Usage::"C.Statement");
-        ReportSelections.SetFilter ("Report ID",'<>%1',0);
-        ReportSelections.FindFirst ();
+        ReportSelections.SetRange(Usage, ReportSelections.Usage::"C.Statement");
+        ReportSelections.SetFilter("Report ID", '<>%1', 0);
+        ReportSelections.FindFirst();
 
-        Customer.Get (CustomerNo);
-        Customer.SetRecFilter ();
+        Customer.Get(CustomerNo);
+        Customer.SetRecFilter();
 
         Filename := TemporaryPath + 'customerstatement-' + CustomerNo + '.pdf';
 
@@ -143,7 +143,7 @@ codeunit 6151403 "Magento Webservice"
     end;
 
     [Scope('Personalization')]
-    procedure GeneratePdfShipment(DocumentNo: Code[20];CustomerNo: Code[20]) PdfShipment: Text
+    procedure GeneratePdfShipment(DocumentNo: Code[20]; CustomerNo: Code[20]) PdfShipment: Text
     var
         SalesShipmentHeader: Record "Sales Shipment Header";
         ReportSelections: Record "Report Selections";
@@ -151,16 +151,16 @@ codeunit 6151403 "Magento Webservice"
     begin
 
         //-MAG2.20 [345376]
-        ReportSelections.SetRange (Usage,ReportSelections.Usage::"S.Shipment");
-        ReportSelections.SetFilter ("Report ID",'<>%1',0);
-        ReportSelections.FindFirst ();
+        ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Shipment");
+        ReportSelections.SetFilter("Report ID", '<>%1', 0);
+        ReportSelections.FindFirst();
 
-        SalesShipmentHeader.Get (DocumentNo);
-        SalesShipmentHeader.TestField ("Bill-to Customer No.", CustomerNo);
+        SalesShipmentHeader.Get(DocumentNo);
+        SalesShipmentHeader.TestField("Bill-to Customer No.", CustomerNo);
         SalesShipmentHeader.SetRecFilter;
 
         Filename := TemporaryPath + 'shipment-' + DocumentNo + '.pdf';
-        REPORT.SaveAsPdf (ReportSelections."Report ID",Filename, SalesShipmentHeader);
+        REPORT.SaveAsPdf(ReportSelections."Report ID", Filename, SalesShipmentHeader);
 
         PdfShipment := GetBase64(Filename);
         if Erase(Filename) then;
@@ -170,15 +170,15 @@ codeunit 6151403 "Magento Webservice"
     end;
 
     [Scope('Personalization')]
-    procedure GetInvoices(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
+    procedure GetInvoices(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
         //-MAG2.20 [345376]
-        documents.SetFilters (CustomerNo, '', StartDate, EndDate, false, true, false, false, false);
+        documents.SetFilters(CustomerNo, '', StartDate, EndDate, false, true, false, false, false);
         //+MAG2.20 [345376]
     end;
 
     [Scope('Personalization')]
-    procedure GetCrMemos(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
+    procedure GetCrMemos(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     var
         XmlDoc: DotNet npNetXmlDocument;
         XmlDocElement: DotNet npNetXmlElement;
@@ -189,82 +189,38 @@ codeunit 6151403 "Magento Webservice"
         EndDate2: Date;
     begin
         //-MAG2.20 [345376]
-        documents.SetFilters (CustomerNo, '', StartDate, EndDate, false, false, true, false, false);
+        documents.SetFilters(CustomerNo, '', StartDate, EndDate, false, false, true, false, false);
         //+MAG2.20 [345376]
     end;
 
     [Scope('Personalization')]
-    procedure GetOrders(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
+    procedure GetOrders(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
         //-MAG2.20 [345376]
-        documents.SetFilters (CustomerNo, '', StartDate, EndDate, false, false, false, true, false);
+        documents.SetFilters(CustomerNo, '', StartDate, EndDate, false, false, false, true, false);
         //+MAG2.20 [345376]
     end;
 
     [Scope('Personalization')]
-    procedure GetShipments(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
-    begin
-
-        //-MAG2.20 [345376]
-        documents.SetFilters (CustomerNo, '', StartDate, EndDate, false, false, false, false, true);
-        //+MAG2.20 [345376]
-    end;
-
-    [Scope('Personalization')]
-    procedure ListInvoices(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
+    procedure GetShipments(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.20 [345376]
-        documents.SetFilters (CustomerNo, '', StartDate, EndDate, true, true, false, false, false);
+        documents.SetFilters(CustomerNo, '', StartDate, EndDate, false, false, false, false, true);
         //+MAG2.20 [345376]
     end;
 
     [Scope('Personalization')]
-    procedure ListCrMemos(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
-    var
-        XmlDoc: DotNet npNetXmlDocument;
-        XmlDocElement: DotNet npNetXmlElement;
-        XmlElement: DotNet npNetXmlElement;
-        XmlElement2: DotNet npNetXmlElement;
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        StartDate2: Date;
-        EndDate2: Date;
+    procedure ListInvoices(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.20 [345376]
-        documents.SetFilters (CustomerNo, '', StartDate, EndDate, true, false, true, false, false);
+        documents.SetFilters(CustomerNo, '', StartDate, EndDate, true, true, false, false, false);
         //+MAG2.20 [345376]
     end;
 
     [Scope('Personalization')]
-    procedure ListOrders(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
-    begin
-
-        //-MAG2.20 [345376]
-        documents.SetFilters (CustomerNo, '', StartDate, EndDate, true, false, false, true, false);
-        //+MAG2.20 [345376]
-    end;
-
-    [Scope('Personalization')]
-    procedure ListShipments(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
-    begin
-
-        //-MAG2.20 [345376]
-        documents.SetFilters (CustomerNo, '', StartDate, EndDate, true, false, false, false, true);
-        //+MAG2.20 [345376]
-    end;
-
-    [Scope('Personalization')]
-    procedure GetInvoice(CustomerNo: Code[20];DocumentNumber: Code[20];var documents: XMLport "Magento Document Export")
-    begin
-
-        //-MAG2.20 [345376]
-        documents.SetFilters (CustomerNo, DocumentNumber, 0D, DMY2Date (31, 12, 9999), false, true, false, false, false);
-        //+MAG2.20 [345376]
-    end;
-
-    [Scope('Personalization')]
-    procedure GetCrMemo(CustomerNo: Code[20];DocumentNumber: Code[20];var documents: XMLport "Magento Document Export")
+    procedure ListCrMemos(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     var
         XmlDoc: DotNet npNetXmlDocument;
         XmlDocElement: DotNet npNetXmlElement;
@@ -276,33 +232,77 @@ codeunit 6151403 "Magento Webservice"
     begin
 
         //-MAG2.20 [345376]
-        documents.SetFilters (CustomerNo, DocumentNumber, 0D, DMY2Date (31, 12, 9999), false, false, true, false, false);
+        documents.SetFilters(CustomerNo, '', StartDate, EndDate, true, false, true, false, false);
         //+MAG2.20 [345376]
     end;
 
     [Scope('Personalization')]
-    procedure GetOrder(CustomerNo: Code[20];DocumentNumber: Code[20];var documents: XMLport "Magento Document Export")
+    procedure ListOrders(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.20 [345376]
-        documents.SetFilters (CustomerNo, DocumentNumber, 0D, DMY2Date (31, 12, 9999), false, false, false, true, false);
+        documents.SetFilters(CustomerNo, '', StartDate, EndDate, true, false, false, true, false);
         //+MAG2.20 [345376]
     end;
 
     [Scope('Personalization')]
-    procedure GetShipment(CustomerNo: Code[20];DocumentNumber: Code[20];var documents: XMLport "Magento Document Export")
+    procedure ListShipments(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
 
         //-MAG2.20 [345376]
-        documents.SetFilters (CustomerNo, DocumentNumber, 0D, DMY2Date (31, 12, 9999), false, false, false, false, true);
+        documents.SetFilters(CustomerNo, '', StartDate, EndDate, true, false, false, false, true);
         //+MAG2.20 [345376]
     end;
 
     [Scope('Personalization')]
-    procedure GetItemInventory(itemFilter: Text;variantFilter: Text;locationFilter: Text;var items: XMLport "Magento Avail. InventoryExport")
+    procedure GetInvoice(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
+    begin
+
+        //-MAG2.20 [345376]
+        documents.SetFilters(CustomerNo, DocumentNumber, 0D, DMY2Date(31, 12, 9999), false, true, false, false, false);
+        //+MAG2.20 [345376]
+    end;
+
+    [Scope('Personalization')]
+    procedure GetCrMemo(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
+    var
+        XmlDoc: DotNet npNetXmlDocument;
+        XmlDocElement: DotNet npNetXmlElement;
+        XmlElement: DotNet npNetXmlElement;
+        XmlElement2: DotNet npNetXmlElement;
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        StartDate2: Date;
+        EndDate2: Date;
+    begin
+
+        //-MAG2.20 [345376]
+        documents.SetFilters(CustomerNo, DocumentNumber, 0D, DMY2Date(31, 12, 9999), false, false, true, false, false);
+        //+MAG2.20 [345376]
+    end;
+
+    [Scope('Personalization')]
+    procedure GetOrder(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
+    begin
+
+        //-MAG2.20 [345376]
+        documents.SetFilters(CustomerNo, DocumentNumber, 0D, DMY2Date(31, 12, 9999), false, false, false, true, false);
+        //+MAG2.20 [345376]
+    end;
+
+    [Scope('Personalization')]
+    procedure GetShipment(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
+    begin
+
+        //-MAG2.20 [345376]
+        documents.SetFilters(CustomerNo, DocumentNumber, 0D, DMY2Date(31, 12, 9999), false, false, false, false, true);
+        //+MAG2.20 [345376]
+    end;
+
+    [Scope('Personalization')]
+    procedure GetItemInventory(itemFilter: Text; variantFilter: Text; locationFilter: Text; var items: XMLport "Magento Avail. InventoryExport")
     begin
         Clear(items);
-        items.SetFilters(itemFilter,variantFilter,locationFilter);
+        items.SetFilters(itemFilter, variantFilter, locationFilter);
     end;
 
     [Scope('Personalization')]
@@ -319,16 +319,16 @@ codeunit 6151403 "Magento Webservice"
         SalesHeader: Record "Sales Header";
     begin
         //-MAG2.03
-        SalesHeader.SetRange("Document Type",SalesHeader."Document Type"::Order);
-        SalesHeader.SetFilter("External Order No.",OrderNo);
+        SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
+        SalesHeader.SetFilter("External Order No.", OrderNo);
         if SalesHeader.FindFirst then
-          CustomerNo :=  SalesHeader."Sell-to Customer No.";
+            CustomerNo := SalesHeader."Sell-to Customer No.";
         exit(CustomerNo);
         //+MAG2.03
     end;
 
     [Scope('Personalization')]
-    procedure GetItemImage(ItemNo: Code[20];VariantCode: Code[10];ImageType: Option ANY,BASE,SMALL,THUMBNAIL;var ImageName: Text[250];var ImageDescription: Text[250];var ImageBase64: Text): Boolean
+    procedure GetItemImage(ItemNo: Code[20]; VariantCode: Code[10]; ImageType: Option ANY,BASE,SMALL,THUMBNAIL; var ImageName: Text[250]; var ImageDescription: Text[250]; var ImageBase64: Text): Boolean
     var
         Item: Record Item;
         MagentoPictureLink: Record "Magento Picture Link";
@@ -340,38 +340,41 @@ codeunit 6151403 "Magento Webservice"
     begin
 
         //-MAG2.20 [351060]
-        MagentoPictureLink.SetCurrentKey ("Item No.","Line No."); // No key on sorting
-        MagentoPictureLink.SetFilter ("Item No.", '=%1', ItemNo);
-        MagentoPictureLink.SetFilter ("Variant Value Code", '=%1', VariantCode);
+        MagentoPictureLink.SetCurrentKey("Item No.", "Line No."); // No key on sorting
+        MagentoPictureLink.SetFilter("Item No.", '=%1', ItemNo);
+        MagentoPictureLink.SetFilter("Variant Value Code", '=%1', VariantCode);
         case (ImageType) of
-          ImageType::BASE      : MagentoPictureLink.SetFilter ("Base Image", '=%1', true);
-          ImageType::SMALL     : MagentoPictureLink.SetFilter ("Small Image", '=%1', true);
-          ImageType::THUMBNAIL : MagentoPictureLink.SetFilter (Thumbnail, '=%1', true);
+            ImageType::BASE:
+                MagentoPictureLink.SetFilter("Base Image", '=%1', true);
+            ImageType::SMALL:
+                MagentoPictureLink.SetFilter("Small Image", '=%1', true);
+            ImageType::THUMBNAIL:
+                MagentoPictureLink.SetFilter(Thumbnail, '=%1', true);
         end;
-        if (not MagentoPictureLink.FindFirst ()) then
-          exit (false);
+        if (not MagentoPictureLink.FindFirst()) then
+            exit(false);
 
-        MagentoPicture.SetFilter (Type, '=%1', MagentoPicture.Type::Item);
-        MagentoPicture.SetFilter (Name, '=%1', MagentoPictureLink."Picture Name");
-        if (not MagentoPicture.FindFirst ()) then
-          exit (false);
+        MagentoPicture.SetFilter(Type, '=%1', MagentoPicture.Type::Item);
+        MagentoPicture.SetFilter(Name, '=%1', MagentoPictureLink."Picture Name");
+        if (not MagentoPicture.FindFirst()) then
+            exit(false);
 
-        if (not MagentoPicture.Picture.HasValue ()) then
-          exit (false);
+        if (not MagentoPicture.Picture.HasValue()) then
+            exit(false);
 
-        MagentoPicture.CalcFields (Picture);
-        MagentoPicture.Picture.CreateInStream (InStr);
+        MagentoPicture.CalcFields(Picture);
+        MagentoPicture.Picture.CreateInStream(InStr);
 
         //Note: This will only work for on-prem
         MemoryStream := InStr;
-        BinaryReader := BinaryReader.BinaryReader (InStr);
-        ImageBase64 := Convert.ToBase64String (BinaryReader.ReadBytes (MemoryStream.Length));
-        MemoryStream.Dispose ();
-        Clear (MemoryStream);
+        BinaryReader := BinaryReader.BinaryReader(InStr);
+        ImageBase64 := Convert.ToBase64String(BinaryReader.ReadBytes(MemoryStream.Length));
+        MemoryStream.Dispose();
+        Clear(MemoryStream);
 
         ImageName := MagentoPicture.Name;
         ImageDescription := MagentoPictureLink."Short Text";
-        exit (true);
+        exit(true);
         //+MAG2.20 [351060]
     end;
 
@@ -384,7 +387,7 @@ codeunit 6151403 "Magento Webservice"
         OutStr: OutStream;
     begin
         sales_orders.Import;
-        InsertImportEntry('ImportSalesOrders',ImportEntry);
+        InsertImportEntry('ImportSalesOrders', ImportEntry);
         ImportEntry."Document Name" := 'Magento Order-' + sales_orders.GetWebsiteCode() + '-' + sales_orders.GetOrderNo() + '.xml';
         ImportEntry."Document Source".CreateOutStream(OutStr);
         sales_orders.SetDestination(OutStr);
@@ -404,7 +407,7 @@ codeunit 6151403 "Magento Webservice"
     begin
         //-MAG2.12 [309647]
         sales_return_orders.Import;
-        InsertImportEntry('ImportSalesReturnOrders',ImportEntry);
+        InsertImportEntry('ImportSalesReturnOrders', ImportEntry);
         ImportEntry."Document Name" := 'Magento Return Order-' + sales_return_orders.GetReturnOrderNo() + '.xml';
         ImportEntry."Document Source".CreateOutStream(OutStr);
         sales_return_orders.SetDestination(OutStr);
@@ -416,22 +419,22 @@ codeunit 6151403 "Magento Webservice"
         //+MAG2.12 [309647]
     end;
 
-    local procedure InsertImportEntry(WebserviceFunction: Text;var ImportEntry: Record "Nc Import Entry")
+    local procedure InsertImportEntry(WebserviceFunction: Text; var ImportEntry: Record "Nc Import Entry")
     var
         NaviConnectSetupMgt: Codeunit "Nc Setup Mgt.";
     begin
         ImportEntry.Init;
         ImportEntry."Entry No." := 0;
-        ImportEntry."Import Type" := NaviConnectSetupMgt.GetImportTypeCode(CODEUNIT::"Magento Webservice",WebserviceFunction);
+        ImportEntry."Import Type" := NaviConnectSetupMgt.GetImportTypeCode(CODEUNIT::"Magento Webservice", WebserviceFunction);
         ImportEntry.Date := CurrentDateTime;
-        ImportEntry."Document Name" := ImportEntry."Import Type" + '-' + Format(ImportEntry.Date,0,9) + '.xml';
+        ImportEntry."Document Name" := ImportEntry."Import Type" + '-' + Format(ImportEntry.Date, 0, 9) + '.xml';
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
         ImportEntry.Insert(true);
     end;
 
     [Scope('Personalization')]
-    procedure InitSetup(MagentoUrl: Text;Hash: Text): Text
+    procedure InitSetup(MagentoUrl: Text; Hash: Text): Text
     var
         MagentoSetup: Record "Magento Setup";
         NpXmlSetup: Record "NpXml Setup";
@@ -441,19 +444,19 @@ codeunit 6151403 "Magento Webservice"
         NaviConnectSetupMgt: Codeunit "Nc Setup Mgt.";
         FormsAuthentication: DotNet npNetFormsAuthentication;
     begin
-        if LowerCase(Hash) <> LowerCase(FormsAuthentication.HashPasswordForStoringInConfigFile(MagentoUrl + 'D3W7k5pd7Pn64ctn25ng91ZkSvyDnjo2','MD5')) then
-          Error(Error001);
+        if LowerCase(Hash) <> LowerCase(FormsAuthentication.HashPasswordForStoringInConfigFile(MagentoUrl + 'D3W7k5pd7Pn64ctn25ng91ZkSvyDnjo2', 'MD5')) then
+            Error(Error001);
 
         if not MagentoSetup.Get then
-          MagentoSetup.Insert;
+            MagentoSetup.Insert;
         if (MagentoSetup."Magento Url" <> '') and (MagentoSetup."Magento Url" <> MagentoUrl) then
-          Error(Error002,MagentoSetup."Magento Url");
+            Error(Error002, MagentoSetup."Magento Url");
 
         //-MAG2.00
         MagentoSetup."Api Username Type" := MagentoSetup."Api Username Type"::Automatic;
         //+MAG2.00
 
-        MagentoSetup.Validate("Magento Url",MagentoUrl);
+        MagentoSetup.Validate("Magento Url", MagentoUrl);
         MagentoSetup."Magento Enabled" := true;
         MagentoSetup."Brands Enabled" := true;
         MagentoSetup."Attributes Enabled" := true;

@@ -15,40 +15,40 @@ codeunit 6150828 "POS Action - Item Inv Overview"
 
     local procedure ActionCode(): Text
     begin
-        exit ('ITEMINVOV');
+        exit('ITEMINVOV');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
-            RegisterWorkflow(false);
-            RegisterDataBinding();
-          end;
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
+                RegisterWorkflow(false);
+                RegisterDataBinding();
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         Confirmed: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        OpenItemInventoryOverviewPage (Context, POSSession, FrontEnd);
+        OpenItemInventoryOverviewPage(Context, POSSession, FrontEnd);
 
         Handled := true;
     end;
@@ -56,11 +56,11 @@ codeunit 6150828 "POS Action - Item Inv Overview"
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', false, false)]
     local procedure OnInitializeCaptions(Captions: Codeunit "POS Caption Management")
     begin
-        Captions.AddActionCaption (ActionCode, 'title', Title);
-        Captions.AddActionCaption (ActionCode, 'notallowed', NotAllowed);
+        Captions.AddActionCaption(ActionCode, 'title', Title);
+        Captions.AddActionCaption(ActionCode, 'notallowed', NotAllowed);
     end;
 
-    local procedure OpenItemInventoryOverviewPage(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure OpenItemInventoryOverviewPage(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         POSSaleLine: Codeunit "POS Sale Line";
@@ -73,18 +73,18 @@ codeunit 6150828 "POS Action - Item Inv Overview"
         ViewType: DotNet npNetViewType0;
         POSInventoryOverview: Page "POS Inventory Overview";
     begin
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        POSSession.GetCurrentView (CurrentView);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        POSSession.GetCurrentView(CurrentView);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        POSInventoryOverview.SetParameters('','',SalePOS."Location Code");
-        if (CurrentView.Type.Equals (ViewType.Sale)) then begin
-          POSSession.GetSaleLine(POSSaleLine);
-          POSSaleLine.GetCurrentSaleLine(LinePOS);
-          if LinePOS.Type = LinePOS.Type::Item then begin
-            POSInventoryOverview.SetParameters(LinePOS."No.",LinePOS."Variant Code",LinePOS."Location Code");
-          end;
+        POSInventoryOverview.SetParameters('', '', SalePOS."Location Code");
+        if (CurrentView.Type.Equals(ViewType.Sale)) then begin
+            POSSession.GetSaleLine(POSSaleLine);
+            POSSaleLine.GetCurrentSaleLine(LinePOS);
+            if LinePOS.Type = LinePOS.Type::Item then begin
+                POSInventoryOverview.SetParameters(LinePOS."No.", LinePOS."Variant Code", LinePOS."Location Code");
+            end;
         end;
         POSInventoryOverview.Run;
     end;

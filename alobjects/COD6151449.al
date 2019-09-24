@@ -35,14 +35,14 @@ codeunit 6151449 "Magento NpXml Value Mgt."
             'a','b','c','d','e','f','g','h','i','j','A','B','C','D','E','F','G','H','I','J',
             'k','l','m','n','o','p','q','r','s','t','K','L','M','N','O','P','Q','R','S','T',
             'u','v','w','x','y','z','U','V','W','X','Y','Z','-','.','_',' ': Output += Format(Input[i]);
-            '�': Output += 'ae';
-            '�','�': Output += 'oe';
-            '�','�': Output += 'aa';
-            '�','�','�','�': Output += 'e';
-            '�': Output += 'AE';
-            '�','�': Output += 'OE';
-            '�','�': Output += 'AA';
-            '�','�','�','�': Output += 'E';
+            'æ': Output += 'ae';
+            'ø','ö': Output += 'oe';
+            'å','ä': Output += 'aa';
+            'è','é','ë','ê': Output += 'e';
+            'Æ': Output += 'AE';
+            'Ø','Ö': Output += 'OE';
+            'Å','Ä': Output += 'AA';
+            'É','È','Ë','Ê': Output += 'E';
             else
               Output += '-';
           end;
