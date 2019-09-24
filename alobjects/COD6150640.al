@@ -17,6 +17,7 @@ codeunit 6150640 "POS Info Management"
     //                                   Copy inheritable POS info codes from 'Sale POS' to 'Sale line POS'
     //                                   Apply red color to sales line if a POS info code is applied to it
     //                                   Make POS info available from front-end to show on the button
+    // NPR5.51/ALPO/20190912 CASE 368351 Apply red color to POS sale lines only for selected POS info codes
 
 
     trigger OnRun()
@@ -765,11 +766,22 @@ codeunit 6150640 "POS Info Management"
     [EventSubscriber(ObjectType::Codeunit, 6150853, 'OnGetLineStyle', '', false, false)]
     local procedure FormatSaleLine_OnPOSInfoAssigment(var Color: Text;var Weight: Text;var Style: Text;SaleLinePOS: Record "Sale Line POS";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
+        POSInfo: Record "POS Info";
         POSInfoTransaction: Record "POS Info Transaction";
+        Found: Boolean;
     begin
         //-NPR5.51 [364558]
         FilterPOSInfoTrans(POSInfoTransaction,'',SaleLinePOS."Register No.",SaleLinePOS."Sales Ticket No.",SaleLinePOS."Line No.");
-        if not POSInfoTransaction.IsEmpty then
+        //IF NOT POSInfoTransaction.ISEMPTY THEN  //NPR5.51 [368351]-revoked
+        //-NPR5.51 [368351]
+        Found := false;
+        if POSInfoTransaction.FindSet then
+          repeat
+            if POSInfo.Get(POSInfoTransaction."POS Info Code") then
+              Found := POSInfo."Set POS Sale Line Color to Red";
+          until (POSInfoTransaction.Next = 0) or Found;
+        if Found then
+        //+NPR5.51 [368351]
           Color := 'red';
         POSSession.RequestRefreshData();
         //+NPR5.51 [364558]
