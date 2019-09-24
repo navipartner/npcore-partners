@@ -1251,30 +1251,6 @@
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Table NpRv Global Voucher Setup - Property Caption</note>
         </trans-unit>
-        <trans-unit id="Table 2625999814 - Field 4206022538 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Date</source>
-          <target>Dato</target>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table NpCs Store Opening Hours Entry - Field Calendar Date - Property Caption</note>
-        </trans-unit>
-        <trans-unit id="Table 2625999814 - Field 2169532623 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Start Time</source>
-          <target>Starttid</target>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table NpCs Store Opening Hours Entry - Field Start Time - Property Caption</note>
-        </trans-unit>
-        <trans-unit id="Table 2625999814 - Field 4240670190 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
-          <source>End Time</source>
-          <target>Sluttid</target>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table NpCs Store Opening Hours Entry - Field End Time - Property Caption</note>
-        </trans-unit>
-        <trans-unit id="Table 2625999814 - Field 2668337108 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Weekday</source>
-          <target>Ugedag</target>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table NpCs Store Opening Hours Entry - Field Weekday - Property Caption</note>
-        </trans-unit>
         <trans-unit id="Table 2528636246 - Field 4206022538 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Date</source>
           <target>Dato</target>
