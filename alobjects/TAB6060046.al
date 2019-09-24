@@ -861,7 +861,6 @@ table 6060046 "Registered Item Worksheet Line"
             trigger OnValidate()
             var
                 ItemCategory: Record "Item Category";
-                ProductGrp: Record "Product Group";
             begin
             end;
         }

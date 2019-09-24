@@ -61,7 +61,7 @@ codeunit 6150850 "POS Action - CK Payment"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: JsonObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
         JSON: Codeunit "POS JSON Management";
@@ -108,7 +108,7 @@ codeunit 6150850 "POS Action - CK Payment"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: JsonObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
     var
         EFTHandled: Boolean;
         PaymentTypeNo: Code[20];
@@ -257,7 +257,7 @@ codeunit 6150850 "POS Action - CK Payment"
     var
         PaymentTypeNo: Code[10];
         PaymentTypePOS: Record "Payment Type POS";
-        Context: DotNet npNetJObject;
+        Context: JsonObject;
         JSON: Codeunit "POS JSON Management";
         Txt001: Label 'CashKeeper error: %1 - %2';
         Txt002: Label 'Payment was cancelled';
@@ -347,7 +347,7 @@ codeunit 6150850 "POS Action - CK Payment"
         exit (Round(Amount, PaymentTypePOS."Rounding Precision", '='));
     end;
 
-    local procedure UpdatePaymentLine(CashKeeperTransaction: Record "CashKeeper Transaction";PaymentTypePOS: Record "Payment Type POS";Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management") Handled: Boolean
+    local procedure UpdatePaymentLine(CashKeeperTransaction: Record "CashKeeper Transaction";PaymentTypePOS: Record "Payment Type POS";Context: JsonObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management") Handled: Boolean
     var
         POSPaymentLine: Codeunit "POS Payment Line";
         AlternativTransactionRequest: Record "EFT Transaction Request";

@@ -2,7 +2,7 @@ report 6014425 "List of Status Phase"
 {
     // NPR5.41/JLK /20180419  CASE 301928 Object created
     DefaultLayout = RDLC;
-    RDLCLayout = './List of Status Phase.rdlc';
+    RDLCLayout = './layouts/List of Status Phase.rdlc';
 
     Caption = 'List of Status Phase';
     UsageCategory = ReportsAndAnalysis;

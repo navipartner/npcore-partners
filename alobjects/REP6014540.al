@@ -8,7 +8,7 @@ report 6014540 "Items With Low Sales"
     // NPR5.48/TJ  /20180102  CASE 340615 Removed Product Group Code from ReqFilterFields property on dataitem Item
     // NPR5.48/BHR /20190111  CASE 341976 Remove unused variables
     DefaultLayout = RDLC;
-    RDLCLayout = './Items With Low Sales.rdlc';
+    RDLCLayout = './layouts/Items With Low Sales.rdlc';
 
     Caption = 'Items With Low Sales';
     UsageCategory = ReportsAndAnalysis;
@@ -125,7 +125,6 @@ report 6014540 "Items With Low Sales"
             }
             column(txtPctTotalSales_;TxtPctTotalSales)
             {
-                DecimalPlaces = 1:1;
             }
             column(PageCaption;PageCaptionLbl)
             {

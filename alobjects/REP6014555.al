@@ -4,7 +4,7 @@ report 6014555 "NPR Attribute Filter"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ReqFilterFields property referencing to invalid field1030
     // NPR5.38/JLK /20180125  CASE 303595 Added ENU object caption
     DefaultLayout = RDLC;
-    RDLCLayout = './NPR Attribute Filter.rdlc';
+    RDLCLayout = './layouts/NPR Attribute Filter.rdlc';
 
     Caption = 'NPR Attribute Filter';
 

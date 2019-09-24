@@ -5,7 +5,7 @@ report 6014473 "Common balancing A4"
     // NPR5.39/JLK /20180212  CASE 300892 Removed CurrReport.PAGENO due to AL warning
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Common balancing A4.rdlc';
+    RDLCLayout = './layouts/Common balancing A4.rdlc';
 
     Caption = 'Common Balancing A4';
 

@@ -66,65 +66,65 @@ page 6150613 "NP Retail Setup"
             group(General)
             {
                 Caption = 'General';
-                field("Source Code";"Source Code")
+                field("Source Code"; "Source Code")
                 {
                 }
             }
             group(System)
             {
                 Caption = 'System';
-                field("Data Model Build";"Data Model Build")
+                field("Data Model Build"; "Data Model Build")
                 {
                     DrillDownPageID = "Retail Data Model Upgrade Log";
                     Editable = false;
                 }
-                field("Last Data Model Build Upgrade";"Last Data Model Build Upgrade")
+                field("Last Data Model Build Upgrade"; "Last Data Model Build Upgrade")
                 {
                     Editable = false;
                 }
-                field("Last Data Model Build User ID";"Last Data Model Build User ID")
+                field("Last Data Model Build User ID"; "Last Data Model Build User ID")
                 {
                     Editable = false;
                 }
-                field("Prev. Data Model Build";"Prev. Data Model Build")
+                field("Prev. Data Model Build"; "Prev. Data Model Build")
                 {
                     Editable = false;
                 }
-                field("Advanced POS Entries Activated";"Advanced POS Entries Activated")
+                field("Advanced POS Entries Activated"; "Advanced POS Entries Activated")
                 {
                 }
-                field("Advanced Posting Activated";"Advanced Posting Activated")
+                field("Advanced Posting Activated"; "Advanced Posting Activated")
                 {
                 }
-                field("Automatic Item Posting";"Automatic Item Posting")
+                field("Automatic Item Posting"; "Automatic Item Posting")
                 {
                 }
-                field("Adj. Cost after Item Posting";"Adj. Cost after Item Posting")
+                field("Adj. Cost after Item Posting"; "Adj. Cost after Item Posting")
                 {
                     Editable = AdjCostAfterItemPostingEditable;
                 }
-                field("Post to G/L after Item Posting";"Post to G/L after Item Posting")
+                field("Post to G/L after Item Posting"; "Post to G/L after Item Posting")
                 {
                     Editable = PostToGLAfterItemPostingEditable;
                 }
-                field("Automatic POS Posting";"Automatic POS Posting")
+                field("Automatic POS Posting"; "Automatic POS Posting")
                 {
                 }
-                field("Automatic Posting Method";"Automatic Posting Method")
+                field("Automatic Posting Method"; "Automatic Posting Method")
                 {
                 }
-                field("Item Price Codeunit ID";"Item Price Codeunit ID")
-                {
-                    Visible = false;
-                }
-                field("Item Price Codeunit Name";"Item Price Codeunit Name")
+                field("Item Price Codeunit ID"; "Item Price Codeunit ID")
                 {
                     Visible = false;
                 }
-                field("Item Price Function";"Item Price Function")
+                field("Item Price Codeunit Name"; "Item Price Codeunit Name")
+                {
+                    Visible = false;
+                }
+                field("Item Price Function"; "Item Price Function")
                 {
                 }
-                field("Global POS Sales Setup";"Global POS Sales Setup")
+                field("Global POS Sales Setup"; "Global POS Sales Setup")
                 {
                 }
             }
@@ -139,12 +139,12 @@ page 6150613 "NP Retail Setup"
                     group("Database Name")
                     {
                         Caption = 'Database Name';
-                        field("Environment Database Name";"Environment Database Name")
+                        field("Environment Database Name"; "Environment Database Name")
                         {
                             Caption = 'Stored';
                             Editable = false;
                         }
-                        field("ActiveSession.""Database Name""";ActiveSession."Database Name")
+                        field("ActiveSession.""Database Name"""; ActiveSession."Database Name")
                         {
                             Caption = 'Current';
                             Editable = false;
@@ -153,13 +153,13 @@ page 6150613 "NP Retail Setup"
                     group("Company Name")
                     {
                         Caption = 'Company Name';
-                        field("Environment Company Name";"Environment Company Name")
+                        field("Environment Company Name"; "Environment Company Name")
                         {
                             Caption = 'Stored';
                             Editable = false;
                             ShowCaption = false;
                         }
-                        field(CURRENTCOMPANY;CurrentCompany)
+                        field(CURRENTCOMPANY; CurrentCompany)
                         {
                             Caption = 'Current';
                             Editable = false;
@@ -169,13 +169,13 @@ page 6150613 "NP Retail Setup"
                     group("Tenant Name")
                     {
                         Caption = 'Tenant Name';
-                        field("Environment Tenant Name";"Environment Tenant Name")
+                        field("Environment Tenant Name"; "Environment Tenant Name")
                         {
                             Caption = 'Stored';
                             Editable = false;
                             ShowCaption = false;
                         }
-                        field(TENANTID;TenantId)
+                        field(TENANTID; TenantId)
                         {
                             Caption = 'Current';
                             Editable = false;
@@ -186,30 +186,30 @@ page 6150613 "NP Retail Setup"
                 group(Settings)
                 {
                     Caption = 'Settings';
-                    field("Environment Type";"Environment Type")
+                    field("Environment Type"; "Environment Type")
                     {
                     }
-                    field("Environment Verified";"Environment Verified")
+                    field("Environment Verified"; "Environment Verified")
                     {
                     }
-                    field("Environment Template";"Environment Template")
+                    field("Environment Template"; "Environment Template")
                     {
                         Importance = Additional;
                     }
-                    field("Enable Client Diagnostics";"Enable Client Diagnostics")
+                    field("Enable Client Diagnostics"; "Enable Client Diagnostics")
                     {
                     }
                 }
                 group(Posting)
                 {
                     Caption = 'Posting';
-                    field("Default POS Entry No. Series";"Default POS Entry No. Series")
+                    field("Default POS Entry No. Series"; "Default POS Entry No. Series")
                     {
                     }
-                    field("Max. POS Posting Diff. (LCY)";"Max. POS Posting Diff. (LCY)")
+                    field("Max. POS Posting Diff. (LCY)"; "Max. POS Posting Diff. (LCY)")
                     {
                     }
-                    field("POS Posting Diff. Account";"POS Posting Diff. Account")
+                    field("POS Posting Diff. Account"; "POS Posting Diff. Account")
                     {
                     }
                 }
@@ -457,12 +457,6 @@ page 6150613 "NP Retail Setup"
                         Image = List;
                         RunObject = Page ".NET Assemblies";
                     }
-                    action("Proxy Assemblies")
-                    {
-                        Caption = 'Proxy Assemblies';
-                        Image = List;
-                        RunObject = Page "Proxy Assemblies";
-                    }
                     action("POS Stargate Packages")
                     {
                         Caption = 'POS Stargate Packages';
@@ -480,12 +474,6 @@ page 6150613 "NP Retail Setup"
                         Caption = 'Lookup Templates';
                         Image = List;
                         RunObject = Page "Lookup Templates";
-                    }
-                    action("<Codeunit POS Web Session Management Setup>")
-                    {
-                        Caption = 'Trigger Database Deployment of Add-ins';
-                        Image = AddAction;
-                        RunObject = Codeunit "POS Web Session Management";
                     }
                     action("Trigger Permission Set Mgt.")
                     {
@@ -782,7 +770,7 @@ page 6150613 "NP Retail Setup"
                             LastErrorString: Text;
                         begin
                             //-NPR5.50 [355848]
-                            LastErrorString := StrSubstNo('%1\\%2',Format(GetLastErrorText), GetLastErrorCallstack);
+                            LastErrorString := StrSubstNo('%1\\%2', Format(GetLastErrorText), GetLastErrorCallstack);
                             Message(LastErrorString);
                             //+NPR5.50 [355848]
                         end;
@@ -1290,7 +1278,7 @@ page 6150613 "NP Retail Setup"
         //+NPR5.31 [263473]
         //-NPR5.38 [294723]
         if not InventorySetup.Get then
-          InventorySetup.Init;
+            InventorySetup.Init;
         PostToGLAfterItemPostingEditable := (not InventorySetup."Automatic Cost Posting");
         AdjCostAfterItemPostingEditable := (InventorySetup."Automatic Cost Adjustment" < InventorySetup."Automatic Cost Adjustment"::Day);
         //+NPR5.38 [294723]

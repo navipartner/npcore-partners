@@ -2,8 +2,8 @@ report 6150616 "Sales Ticket A4 - POS Wrd"
 {
     // NPR5.41/JLK /20180403  CASE 308435 Object created for Word Layout
     // NPR5.42/JLK /20180522  CASE 315964 Identified format issue
-    RDLCLayout = './Sales Ticket A4 - POS Wrd.rdlc';
-    WordLayout = './Sales Ticket A4 - POS Wrd.docx';
+    RDLCLayout = './layouts/Sales Ticket A4 - POS Wrd.rdlc';
+    WordLayout = './layouts/Sales Ticket A4 - POS Wrd.docx';
 
     Caption = 'Sales Ticket A4 - POS Wrd';
     DefaultLayout = Word;
@@ -11,27 +11,27 @@ report 6150616 "Sales Ticket A4 - POS Wrd"
 
     dataset
     {
-        dataitem(POS_Entry;"POS Entry")
+        dataitem(POS_Entry; "POS Entry")
         {
-            DataItemTableView = SORTING("Entry No.");
+            DataItemTableView = SORTING ("Entry No.");
             RequestFilterFields = "Entry No.";
-            column(PE_EntryNo;"Entry No.")
+            column(PE_EntryNo; "Entry No.")
             {
             }
-            column(PE_EntryDate;Format("Entry Date",0,4))
+            column(PE_EntryDate; Format("Entry Date", 0, 4))
             {
             }
-            column(PE_DocumentNo;"Document No.")
+            column(PE_DocumentNo; "Document No.")
             {
                 IncludeCaption = true;
             }
-            column(PE_POSUnitNo;"POS Unit No.")
+            column(PE_POSUnitNo; "POS Unit No.")
             {
             }
-            column(PE_EndingTime;"Ending Time")
+            column(PE_EndingTime; "Ending Time")
             {
             }
-            column(PE_DiscountAmount;"Discount Amount")
+            column(PE_DiscountAmount; "Discount Amount")
             {
             }
             column(PE_TotalAmount;"Amount Excl. Tax")
@@ -43,250 +43,250 @@ report 6150616 "Sales Ticket A4 - POS Wrd"
             column(PE_TotalAmountInclTax;"Amount Incl. Tax")
             {
             }
-            column(TotalAmountCaption;StrSubstNo(TotalAmountCaption,GeneralLedgerSetup."LCY Code"))
+            column(TotalAmountCaption; StrSubstNo(TotalAmountCaption, GeneralLedgerSetup."LCY Code"))
             {
             }
-            column(TotalAmountInclVATCaption;StrSubstNo(TotalAmountInclVATCaption,GeneralLedgerSetup."LCY Code"))
+            column(TotalAmountInclVATCaption; StrSubstNo(TotalAmountInclVATCaption, GeneralLedgerSetup."LCY Code"))
             {
             }
-            column(TotalTaxAmountCaption;TotalTaxText)
+            column(TotalTaxAmountCaption; TotalTaxText)
             {
             }
-            column(Picture_CompanyInformation;CompanyInformation.Picture)
+            column(Picture_CompanyInformation; CompanyInformation.Picture)
             {
             }
-            column(LCYCode_GeneralLedgerSetup;GeneralLedgerSetup."LCY Code")
+            column(LCYCode_GeneralLedgerSetup; GeneralLedgerSetup."LCY Code")
             {
             }
-            column(PS_Code;POSStore.Code)
+            column(PS_Code; POSStore.Code)
             {
             }
-            column(PS_Name;POSStore.Name)
+            column(PS_Name; POSStore.Name)
             {
             }
-            column(PS_Name2;POSStore."Name 2")
+            column(PS_Name2; POSStore."Name 2")
             {
             }
-            column(PS_Address;POSStore.Address)
+            column(PS_Address; POSStore.Address)
             {
             }
-            column(PS_Address2;POSStore."Address 2")
+            column(PS_Address2; POSStore."Address 2")
             {
             }
-            column(PS_PostCode;POSStore."Post Code")
+            column(PS_PostCode; POSStore."Post Code")
             {
             }
-            column(PS_City;POSStore.City)
+            column(PS_City; POSStore.City)
             {
             }
-            column(PS_PhoneNo;POSStore."Phone No.")
+            column(PS_PhoneNo; POSStore."Phone No.")
             {
             }
-            column(PS_VATRegistrationNo;POSStore."VAT Registration No.")
+            column(PS_VATRegistrationNo; POSStore."VAT Registration No.")
             {
             }
-            column(PS_EMail;POSStore."E-Mail")
+            column(PS_EMail; POSStore."E-Mail")
             {
             }
-            column(PS_HomePage;POSStore."Home Page")
+            column(PS_HomePage; POSStore."Home Page")
             {
             }
-            column(StoreAddr1;StoreAddr[1])
+            column(StoreAddr1; StoreAddr[1])
             {
             }
-            column(StoreAddr2;StoreAddr[2])
+            column(StoreAddr2; StoreAddr[2])
             {
             }
-            column(StoreAddr3;StoreAddr[3])
+            column(StoreAddr3; StoreAddr[3])
             {
             }
-            column(StoreAddr4;StoreAddr[4])
+            column(StoreAddr4; StoreAddr[4])
             {
             }
-            column(StoreAddr5;StoreAddr[5])
+            column(StoreAddr5; StoreAddr[5])
             {
             }
-            column(CustAddr1;CustAddr[1])
+            column(CustAddr1; CustAddr[1])
             {
             }
-            column(CustAddr2;CustAddr[2])
+            column(CustAddr2; CustAddr[2])
             {
             }
-            column(CustAddr3;CustAddr[3])
+            column(CustAddr3; CustAddr[3])
             {
             }
-            column(CustAddr4;CustAddr[4])
+            column(CustAddr4; CustAddr[4])
             {
             }
-            column(CustAddr5;CustAddr[5])
+            column(CustAddr5; CustAddr[5])
             {
             }
-            column(CustAddr6;CustAddr[6])
+            column(CustAddr6; CustAddr[6])
             {
             }
-            column(CustAddr7;CustAddr[7])
+            column(CustAddr7; CustAddr[7])
             {
             }
-            column(Code_SalespersonPurchaser;SalespersonPurchaser.Code)
+            column(Code_SalespersonPurchaser; SalespersonPurchaser.Code)
             {
             }
-            column(Name_SalespersonPurchaser;SalespersonPurchaser.Name)
+            column(Name_SalespersonPurchaser; SalespersonPurchaser.Name)
             {
             }
-            dataitem(POS_Sales_Line;"POS Sales Line")
+            dataitem(POS_Sales_Line; "POS Sales Line")
             {
-                DataItemLink = "POS Entry No."=FIELD("Entry No.");
-                DataItemTableView = SORTING("POS Entry No.","Line No.");
-                column(PSL_POSEntryNo;"POS Entry No.")
+                DataItemLink = "POS Entry No." = FIELD ("Entry No.");
+                DataItemTableView = SORTING ("POS Entry No.", "Line No.");
+                column(PSL_POSEntryNo; "POS Entry No.")
                 {
                 }
-                column(PSL_LineNo;"Line No.")
+                column(PSL_LineNo; "Line No.")
                 {
                 }
-                column(PSL_Type;Type)
+                column(PSL_Type; Type)
                 {
                 }
-                column(PSL_No;"No.")
-                {
-                    IncludeCaption = true;
-                }
-                column(PSL_Description;Description)
+                column(PSL_No; "No.")
                 {
                     IncludeCaption = true;
                 }
-                column(PSL_Quantity;Quantity)
+                column(PSL_Description; Description)
                 {
                     IncludeCaption = true;
                 }
-                column(PSL_UnitPrice;"Unit Price")
+                column(PSL_Quantity; Quantity)
                 {
                     IncludeCaption = true;
                 }
-                column(PSL_AmountInclVAT;"Amount Incl. VAT")
+                column(PSL_UnitPrice; "Unit Price")
                 {
                     IncludeCaption = true;
                 }
-                column(PSL_LineDiscount;"Line Discount %")
+                column(PSL_AmountInclVAT; "Amount Incl. VAT")
+                {
+                    IncludeCaption = true;
+                }
+                column(PSL_LineDiscount; "Line Discount %")
                 {
                 }
-                column(Description_ItemVariant;ItemVariant.Description)
+                column(Description_ItemVariant; ItemVariant.Description)
                 {
                 }
-                column(PSL_BlankZero_Quantity;BlankZero(Quantity))
+                column(PSL_BlankZero_Quantity; BlankZero(Quantity))
                 {
                 }
-                column(PSL_BlankZero_UnitPrice;BlankZero("Unit Price"))
+                column(PSL_BlankZero_UnitPrice; BlankZero("Unit Price"))
                 {
                 }
-                column(PSL_BlankZero_AmountInclVAT;BlankZero("Amount Incl. VAT"))
+                column(PSL_BlankZero_AmountInclVAT; BlankZero("Amount Incl. VAT"))
                 {
                 }
-                column(PSL_BlankZero_LineDiscount;BlankZero("Line Discount %"))
+                column(PSL_BlankZero_LineDiscount; BlankZero("Line Discount %"))
                 {
                 }
 
                 trigger OnAfterGetRecord()
                 begin
-                    if not ItemVariant.Get("No.","Variant Code") then
-                      Clear(ItemVariant);
+                    if not ItemVariant.Get("No.", "Variant Code") then
+                        Clear(ItemVariant);
                 end;
             }
-            dataitem(POS_Payment_Line;"POS Payment Line")
+            dataitem(POS_Payment_Line; "POS Payment Line")
             {
-                DataItemLink = "POS Entry No."=FIELD("Entry No.");
-                DataItemTableView = SORTING("POS Entry No.","Line No.");
-                column(PPL_POS_Entry_No;"POS Entry No.")
+                DataItemLink = "POS Entry No." = FIELD ("Entry No.");
+                DataItemTableView = SORTING ("POS Entry No.", "Line No.");
+                column(PPL_POS_Entry_No; "POS Entry No.")
                 {
                 }
-                column(PPL_Line_No;"Line No.")
-                {
-                    IncludeCaption = true;
-                }
-                column(PPL_Description;Description)
+                column(PPL_Line_No; "Line No.")
                 {
                     IncludeCaption = true;
                 }
-                column(PPL_Amount;Amount)
+                column(PPL_Description; Description)
                 {
                     IncludeCaption = true;
                 }
-                column(PPL_CurrencyCode;"Currency Code")
-                {
-                }
-                column(PPL_AmountSalesCurrency;"Amount (Sales Currency)")
+                column(PPL_Amount; Amount)
                 {
                     IncludeCaption = true;
                 }
-                column(PPL_POSPaymentMethodCode;"POS Payment Method Code")
+                column(PPL_CurrencyCode; "Currency Code")
+                {
+                }
+                column(PPL_AmountSalesCurrency; "Amount (Sales Currency)")
                 {
                     IncludeCaption = true;
                 }
-                column(PPL_BlankZero_Amount;BlankZero(Amount))
+                column(PPL_POSPaymentMethodCode; "POS Payment Method Code")
+                {
+                    IncludeCaption = true;
+                }
+                column(PPL_BlankZero_Amount; BlankZero(Amount))
                 {
                 }
-                column(PPL_BlankZero_AmountSalesCurrency;BlankZero("Amount (Sales Currency)"))
+                column(PPL_BlankZero_AmountSalesCurrency; BlankZero("Amount (Sales Currency)"))
                 {
                 }
             }
-            dataitem(POS_Tax_Amount_Line;"POS Tax Amount Line")
+            dataitem(POS_Tax_Amount_Line; "POS Tax Amount Line")
             {
-                DataItemLink = "POS Entry No."=FIELD("Entry No.");
-                DataItemTableView = SORTING("POS Entry No.","Tax Area Code for Key","Tax Jurisdiction Code","VAT Identifier","Tax %","Tax Group Code","Expense/Capitalize","Tax Type","Use Tax",Positive);
-                column(PTAL_POS_Entry_No;"POS Entry No.")
+                DataItemLink = "POS Entry No." = FIELD ("Entry No.");
+                DataItemTableView = SORTING ("POS Entry No.", "Tax Area Code for Key", "Tax Jurisdiction Code", "VAT Identifier", "Tax %", "Tax Group Code", "Expense/Capitalize", "Tax Type", "Use Tax", Positive);
+                column(PTAL_POS_Entry_No; "POS Entry No.")
                 {
                 }
-                column(PTAL_TaxCalculationType;"Tax Calculation Type")
-                {
-                    IncludeCaption = true;
-                }
-                column(PTAL_Tax_Percent;"Tax %")
+                column(PTAL_TaxCalculationType; "Tax Calculation Type")
                 {
                     IncludeCaption = true;
                 }
-                column(PTAL_TaxBaseAmount;"Tax Base Amount")
+                column(PTAL_Tax_Percent; "Tax %")
                 {
                     IncludeCaption = true;
                 }
-                column(PTAL_TaxAmount;"Tax Amount")
+                column(PTAL_TaxBaseAmount; "Tax Base Amount")
                 {
                     IncludeCaption = true;
                 }
-                column(PTAL_Quantity;Quantity)
+                column(PTAL_TaxAmount; "Tax Amount")
                 {
                     IncludeCaption = true;
                 }
-                column(PTAL_TaxAreaCode;"Tax Area Code")
+                column(PTAL_Quantity; Quantity)
                 {
                     IncludeCaption = true;
                 }
-                column(PTAL_VATIdentifier;"VAT Identifier")
+                column(PTAL_TaxAreaCode; "Tax Area Code")
                 {
                     IncludeCaption = true;
                 }
-                column(PTAL_AmountIncludingTax;"Amount Including Tax")
+                column(PTAL_VATIdentifier; "VAT Identifier")
                 {
                     IncludeCaption = true;
                 }
-                column(PTAL_LineAmount;"Line Amount")
+                column(PTAL_AmountIncludingTax; "Amount Including Tax")
                 {
                     IncludeCaption = true;
                 }
-                column(PTAL_BlankZero_Tax_Percent;BlankZero("Tax %"))
+                column(PTAL_LineAmount; "Line Amount")
+                {
+                    IncludeCaption = true;
+                }
+                column(PTAL_BlankZero_Tax_Percent; BlankZero("Tax %"))
                 {
                 }
-                column(PTAL_BlankZero_TaxBaseAmount;BlankZero("Tax Base Amount"))
+                column(PTAL_BlankZero_TaxBaseAmount; BlankZero("Tax Base Amount"))
                 {
                 }
-                column(PTAL_BlankZero_TaxAmount;BlankZero("Tax Amount"))
+                column(PTAL_BlankZero_TaxAmount; BlankZero("Tax Amount"))
                 {
                 }
-                column(PTAL_BlankZero_Quantity;BlankZero(Quantity))
+                column(PTAL_BlankZero_Quantity; BlankZero(Quantity))
                 {
                 }
-                column(PTAL_BlankZero_AmountIncludingTax;BlankZero("Amount Including Tax"))
+                column(PTAL_BlankZero_AmountIncludingTax; BlankZero("Amount Including Tax"))
                 {
                 }
-                column(PTAL_BlankZero_LineAmount;BlankZero("Line Amount"))
+                column(PTAL_BlankZero_LineAmount; BlankZero("Line Amount"))
                 {
                 }
             }
@@ -296,15 +296,15 @@ report 6150616 "Sales Ticket A4 - POS Wrd"
                 POSTaxAmountLine: Record "POS Tax Amount Line";
             begin
                 TotalTaxText := GetVATText("Entry No.");
-                if DelChr(TotalTaxText,'=','0123456789') = '' then
-                  TotalTaxText := StrSubstNo(TotalTaxAmountCaptionBlank,TotalTaxText)
+                if DelChr(TotalTaxText, '=', '0123456789') = '' then
+                    TotalTaxText := StrSubstNo(TotalTaxAmountCaptionBlank, TotalTaxText)
                 else
-                  TotalTaxText := StrSubstNo(TotalTaxAmountCaption,TotalTaxText);
+                    TotalTaxText := StrSubstNo(TotalTaxAmountCaption, TotalTaxText);
 
                 CompanyInformation.CalcFields(Picture);
 
                 if not POSStore.Get("POS Store Code") then
-                  Clear(POSStore);
+                    Clear(POSStore);
 
                 Clear(StoreAddr);
                 StoreAddr[1] := POSStore.Name;
@@ -316,17 +316,17 @@ report 6150616 "Sales Ticket A4 - POS Wrd"
 
                 Clear(CustAddr);
                 if not Customer.Get("Customer No.") then begin
-                  Clear(Customer);
-                  if Contact.Get("Customer No.") then begin
-                    CustAddr[1] := Contact.Name;
-                    CustAddr[2] := Contact."Name 2";
-                    CustAddr[3] := Contact.Address;
-                    CustAddr[4] := Contact."Address 2";
-                    CustAddr[5] := Contact."Post Code" + ' - ' + Contact.City;
-                    if Contact."No." <> '' then
-                      CustAddr[6] := ContactNoCaption + ': ' + Contact."No.";
-                    CustAddr[7] := '';
-                  end;
+                    Clear(Customer);
+                    if Contact.Get("Customer No.") then begin
+                        CustAddr[1] := Contact.Name;
+                        CustAddr[2] := Contact."Name 2";
+                        CustAddr[3] := Contact.Address;
+                        CustAddr[4] := Contact."Address 2";
+                        CustAddr[5] := Contact."Post Code" + ' - ' + Contact.City;
+                        if Contact."No." <> '' then
+                            CustAddr[6] := ContactNoCaption + ': ' + Contact."No.";
+                        CustAddr[7] := '';
+                    end;
                 end;
 
                 CustAddr[1] := Customer.Name;
@@ -335,12 +335,12 @@ report 6150616 "Sales Ticket A4 - POS Wrd"
                 CustAddr[4] := Customer."Address 2";
                 CustAddr[5] := Customer."Post Code" + ' - ' + Customer.City;
                 if Customer."No." <> '' then
-                  CustAddr[6] := CustomerNoCaption + ': ' + Customer."No.";
+                    CustAddr[6] := CustomerNoCaption + ': ' + Customer."No.";
                 CustAddr[7] := '';
                 CompressArray(CustAddr);
 
                 if not SalespersonPurchaser.Get(POS_Entry."Salesperson Code") then
-                  Clear(SalespersonPurchaser);
+                    Clear(SalespersonPurchaser);
             end;
 
             trigger OnPreDataItem()
@@ -389,8 +389,8 @@ report 6150616 "Sales Ticket A4 - POS Wrd"
 
     var
         TotalTaxText: Text;
-        StoreAddr: array [8] of Text;
-        CustAddr: array [8] of Text;
+        StoreAddr: array[8] of Text;
+        CustAddr: array[8] of Text;
         CompanyInformation: Record "Company Information";
         CustomerNoCaption: Label 'Customer No.';
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -410,25 +410,25 @@ report 6150616 "Sales Ticket A4 - POS Wrd"
         POSTaxAmountLine: Record "POS Tax Amount Line";
     begin
         with POSTaxAmountLine do begin
-          SetRange("POS Entry No.",EntryNo);
-          if Count > 1 then
+            SetRange("POS Entry No.", EntryNo);
+            if Count > 1 then
+                exit('');
+
+            if FindFirst then
+                exit(Format("Tax %") + '%');
+
             exit('');
-
-          if FindFirst then
-            exit(Format("Tax %") + '%');
-
-          exit('');
         end;
     end;
 
     local procedure BlankZero(DecimalValue: Decimal): Text
     begin
         if DecimalValue = 0 then
-          exit('');
+            exit('');
 
         //-NPR5.42
         //EXIT(FORMAT(DecimalValue,0,'<Precision,2:2><Standard Format,2>'));
-        exit(Format(DecimalValue,0,'<Sign><Integer Thousand><Decimals,3>'));
+        exit(Format(DecimalValue, 0, '<Sign><Integer Thousand><Decimals,3>'));
         //+NPR5.42
     end;
 }

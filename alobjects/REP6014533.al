@@ -4,7 +4,7 @@ report 6014533 "Inventory - flow"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
     DefaultLayout = RDLC;
-    RDLCLayout = './Inventory - flow.rdlc';
+    RDLCLayout = './layouts/Inventory - flow.rdlc';
 
     Caption = 'Inventory Flow';
     UseRequestPage = true;

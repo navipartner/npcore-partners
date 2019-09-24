@@ -22,36 +22,35 @@ codeunit 6150861 "POS Action - Doc. Import"
 
     local procedure ActionCode(): Text
     begin
-        exit ('SALES_DOC_IMP');
+        exit('SALES_DOC_IMP');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do begin
-          if DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple) then
-          begin
-            RegisterWorkflowStep('ImportDocument','respond();');
-            RegisterWorkflow(false);
+            if DiscoverAction(
+              ActionCode(),
+              ActionDescription,
+              ActionVersion(),
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple) then begin
+                RegisterWorkflowStep('ImportDocument', 'respond();');
+                RegisterWorkflow(false);
 
-            RegisterOptionParameter('DocumentType', 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order', 'Order');
-            RegisterBooleanParameter('SelectCustomer', true);
-          end;
+                RegisterOptionParameter('DocumentType', 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order', 'Order');
+                RegisterBooleanParameter('SelectCustomer', true);
+            end;
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         SalesHeader: Record "Sales Header";
         JSON: Codeunit "POS JSON Management";
@@ -59,23 +58,23 @@ codeunit 6150861 "POS Action - Doc. Import"
         DocumentType: Integer;
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
         Handled := true;
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
         SelectCustomer := JSON.GetBooleanParameter('SelectCustomer', true);
         DocumentType := JSON.GetIntegerParameter('DocumentType', true);
 
         if not CheckCustomer(POSSession, SelectCustomer) then
-          exit;
+            exit;
 
         if not SelectDocument(POSSession, SalesHeader, DocumentType) then
-          exit;
+            exit;
 
-        ImportFromDocument(Context, POSSession,FrontEnd, SalesHeader);
+        ImportFromDocument(Context, POSSession, FrontEnd, SalesHeader);
     end;
 
-    local procedure CheckCustomer(POSSession: Codeunit "POS Session";SelectCustomer: Boolean): Boolean
+    local procedure CheckCustomer(POSSession: Codeunit "POS Session"; SelectCustomer: Boolean): Boolean
     var
         POSSale: Codeunit "POS Sale";
         SalePOS: Record "Sale POS";
@@ -84,15 +83,15 @@ codeunit 6150861 "POS Action - Doc. Import"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         if SalePOS."Customer No." <> '' then begin
-          SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
-          exit(true);
+            SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
+            exit(true);
         end;
 
         if not SelectCustomer then
-          exit(true);
+            exit(true);
 
         if PAGE.RunModal(0, Customer) <> ACTION::LookupOK then
-          exit(false);
+            exit(false);
 
         SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", Customer."No.");
@@ -102,7 +101,7 @@ codeunit 6150861 "POS Action - Doc. Import"
         exit(true);
     end;
 
-    local procedure SelectDocument(POSSession: Codeunit "POS Session";var SalesHeader: Record "Sales Header";DocumentType: Integer): Boolean
+    local procedure SelectDocument(POSSession: Codeunit "POS Session"; var SalesHeader: Record "Sales Header"; DocumentType: Integer): Boolean
     var
         RetailSalesDocImpMgt: Codeunit "Retail Sales Doc. Imp. Mgt.";
         POSSale: Codeunit "POS Sale";
@@ -112,12 +111,12 @@ codeunit 6150861 "POS Action - Doc. Import"
         POSSale.GetCurrentSale(SalePOS);
 
         if SalePOS."Customer No." <> '' then
-          SalesHeader.SetRange("Bill-to Customer No.", SalePOS."Customer No.");
+            SalesHeader.SetRange("Bill-to Customer No.", SalePOS."Customer No.");
         SalesHeader.SetRange("Document Type", DocumentType);
         exit(RetailSalesDocImpMgt.SelectSalesDocument(SalesHeader.GetView(false), SalesHeader));
     end;
 
-    local procedure ImportFromDocument(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var SalesHeader: Record "Sales Header")
+    local procedure ImportFromDocument(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var SalesHeader: Record "Sales Header")
     var
         JSON: Codeunit "POS JSON Management";
         RetailSalesDocImpMgt: Codeunit "Retail Sales Doc. Imp. Mgt.";
@@ -132,37 +131,42 @@ codeunit 6150861 "POS Action - Doc. Import"
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
-    procedure OnGetParameterNameCaption(POSParameterValue: Record "POS Parameter Value";var Caption: Text)
+    procedure OnGetParameterNameCaption(POSParameterValue: Record "POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode then
-          exit;
+            exit;
 
         case POSParameterValue.Name of
-          'DocumentType' : Caption := CaptionDocType;
-          'SelectCustomer' : Caption := CaptionSelectCustomer;
+            'DocumentType':
+                Caption := CaptionDocType;
+            'SelectCustomer':
+                Caption := CaptionSelectCustomer;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
-    procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "POS Parameter Value";var Caption: Text)
+    procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode then
-          exit;
+            exit;
 
         case POSParameterValue.Name of
-          'DocumentType' : Caption := DescDocType;
-          'SelectCustomer' : Caption := DescSelectCustomer;
+            'DocumentType':
+                Caption := DescDocType;
+            'SelectCustomer':
+                Caption := DescSelectCustomer;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterOptionStringCaption', '', false, false)]
-    procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "POS Parameter Value";var Caption: Text)
+    procedure OnGetParameterOptionStringCaption(POSParameterValue: Record "POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode then
-          exit;
+            exit;
 
         case POSParameterValue.Name of
-          'DocumentType' : Caption := OptionDocType;
+            'DocumentType':
+                Caption := OptionDocType;
         end;
     end;
 }

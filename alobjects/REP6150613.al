@@ -3,7 +3,7 @@ report 6150613 "Sales Ticket A4 - POS Rdlc"
     // NPR5.39/JLK /20180212  CASE 302797 Object created
     // NPR5.40/JLK /20180314  CASE 307437 Added format on decimals in rdlc layout
     // NPR5.41/JLK /20180504  CASE 307437 Seperated Report to rdlc layout only
-    RDLCLayout = './Sales Ticket A4 - POS Rdlc.rdlc';
+    RDLCLayout = './layouts/Sales Ticket A4 - POS Rdlc.rdlc';
 
     Caption = 'Sales Ticket A4 - POS Rdlc';
     DefaultLayout = RDLC;

@@ -50,7 +50,7 @@ codeunit 6060139 "MM Loyalty Point Management"
         SUBTOTAL_ZERO: Label 'The SubTotal parameter must not be zero when discount type is based on "discount %" for %1 %2.';
 
     [EventSubscriber(ObjectType::Codeunit, 22, 'OnAfterInsertValueEntry', '', true, true)]
-    local procedure OnAfterInsertValueEntry(var ValueEntry: Record "Value Entry";var ItemJournalLine: Record "Item Journal Line")
+    local procedure OnAfterInsertValueEntry(var ValueEntry: Record "Value Entry";ItemJournalLine: Record "Item Journal Line")
     var
         POSSalesWorkflowStep: Record "POS Sales Workflow Step";
     begin

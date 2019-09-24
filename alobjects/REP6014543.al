@@ -5,7 +5,7 @@ report 6014543 "Item - Loss - Top 10"
     // NPR5.48/TJ  /20180102  CASE 340615 Removed Product Group Code from ReqFilterFields property on dataitem Item
     // NPR5.48/BHR /20190111  CASE 341976 Comment Code as per OMA
     DefaultLayout = RDLC;
-    RDLCLayout = './Item - Loss - Top 10.rdlc';
+    RDLCLayout = './layouts/Item - Loss - Top 10.rdlc';
 
     Caption = 'Item Shrinkage - Top 10';
 

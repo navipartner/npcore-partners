@@ -101,7 +101,7 @@ page 6150703 "POS Actions"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Type := Type::"3";
+        Type := 3;
     end;
 
     trigger OnOpenPage()

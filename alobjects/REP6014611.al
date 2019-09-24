@@ -4,7 +4,7 @@ report 6014611 "Sales Statistics w/ Variants"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales Statistics w Variants.rdlc';
+    RDLCLayout = './layouts/Sales Statistics w Variants.rdlc';
 
     Caption = 'Item - Sales Statistics';
     PreviewMode = PrintLayout;

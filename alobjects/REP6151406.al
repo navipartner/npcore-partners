@@ -6,6 +6,9 @@ report 6151406 "Magento Gift Voucher"
     // MAG2.22/MHA /20190619  CASE 357825 Added Data Items to be used with Word Layout
     // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print functionality
 
+    DefaultLayout = RDLC;
+    RDLCLayout = './layouts/Magento Gift Voucher.rdlc';
+
     Caption = 'Magento Gift Voucher';
     PreviewMode = PrintLayout;
 

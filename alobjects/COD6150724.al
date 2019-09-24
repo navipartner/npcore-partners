@@ -23,37 +23,37 @@ codeunit 6150724 "POS Action - Change View"
 
     local procedure ActionCode(): Text
     begin
-        exit ('CHANGE_VIEW');
+        exit('CHANGE_VIEW');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.1');
+        exit('1.1');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-        if DiscoverAction(
-          ActionCode,
-          ActionDescription,
-          ActionVersion,
-          Type::Generic,
-          "Subscriber Instances Allowed"::Single)
-        then begin
-          RegisterWorkflow(false);
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Type::Generic,
+              "Subscriber Instances Allowed"::Single)
+            then begin
+                RegisterWorkflow(false);
 
-          //RegisterOptionParameter('ViewType',ActionOptions,'');
-          RegisterOptionParameter('ViewType','Login,Sale,Payment,Balance,Locked','');
-          //-NPR5.36 [289011]
-          RegisterTextParameter('ViewCode','');
-          //+NPR5.36 [289011]
-        end;
+                //RegisterOptionParameter('ViewType',ActionOptions,'');
+                RegisterOptionParameter('ViewType', 'Login,Sale,Payment,Balance,Locked', '');
+                //-NPR5.36 [289011]
+                RegisterTextParameter('ViewCode', '');
+                //+NPR5.36 [289011]
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         ControlId: Text;
@@ -61,14 +61,14 @@ codeunit 6150724 "POS Action - Change View"
         DoNotClearTextBox: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        ChangeView(Context,POSSession,FrontEnd);
+        ChangeView(Context, POSSession, FrontEnd);
 
         Handled := true;
     end;
 
-    local procedure ChangeView(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure ChangeView(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         Item: Record Item;
         POSAction: Record "POS Action";
@@ -83,72 +83,75 @@ codeunit 6150724 "POS Action - Change View"
         POSActionCancelSale: Codeunit "POS Action - Cancel Sale";
         POSSaleLine: Codeunit "POS Sale Line";
     begin
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        ViewType := JSON.GetIntegerParameter('ViewType',true);
+        ViewType := JSON.GetIntegerParameter('ViewType', true);
         //-NPR5.36 [289011]
         POSSession.GetSetup(POSSetup);
         POSSetup.GetRegisterRecord(Register);
-        POSDefaultUserView.SetDefault (ViewType, Register."Register No.",JSON.GetStringParameter('ViewCode',false));
+        POSDefaultUserView.SetDefault(ViewType, Register."Register No.", JSON.GetStringParameter('ViewCode', false));
         //+NPR5.36 [289011]
 
-        POSSession.GetCurrentView (CurrentView);
+        POSSession.GetCurrentView(CurrentView);
 
         case ViewType of
-          ViewType::Login:
-            begin
+            ViewType::Login:
+                begin
 
-              //-NPR5.40 [308558]
-              POSCreateEntry.InsertUnitLogoutEntry (Register."Register No.", POSSetup.Salesperson ());
-              //+NPR5.40 [308558]
+                    //-NPR5.40 [308558]
+                    POSCreateEntry.InsertUnitLogoutEntry(Register."Register No.", POSSetup.Salesperson());
+                    //+NPR5.40 [308558]
 
-              if ((CurrentView.Type.Equals (CurrentViewType.Sale)) or (CurrentView.Type.Equals (CurrentViewType.Payment))) then begin
-                //-NPR5.40 [308558]
-                //        //-NPR5.39 [302779]
-                //        //CancelSale (Context,POSSession,FrontEnd);
-                //        //-NPR5.40 [306347]
-                //        //POSAction.GET('CANCEL_POS_SALE');
-                //        IF NOT POSSession.RetrieveSessionAction('CANCEL_POS_SALE',POSAction) THEN
-                //          POSAction.GET('CANCEL_POS_SALE');
-                //        //+NPR5.40 [306347]
-                //        //+NPR5.40 [302779]
-                //        FrontEnd.InvokeWorkflow(POSAction);
-                //        //+NPR5.39 [302779]
-                POSSession.GetSaleLine (POSSaleLine);
+                    if ((CurrentView.Type.Equals(CurrentViewType.Sale)) or (CurrentView.Type.Equals(CurrentViewType.Payment))) then begin
+                        //-NPR5.40 [308558]
+                        //        //-NPR5.39 [302779]
+                        //        //CancelSale (Context,POSSession,FrontEnd);
+                        //        //-NPR5.40 [306347]
+                        //        //POSAction.GET('CANCEL_POS_SALE');
+                        //        IF NOT POSSession.RetrieveSessionAction('CANCEL_POS_SALE',POSAction) THEN
+                        //          POSAction.GET('CANCEL_POS_SALE');
+                        //        //+NPR5.40 [306347]
+                        //        //+NPR5.40 [302779]
+                        //        FrontEnd.InvokeWorkflow(POSAction);
+                        //        //+NPR5.39 [302779]
+                        POSSession.GetSaleLine(POSSaleLine);
 
-                // if there are lines to delete
-                if (POSSaleLine.RefreshCurrent()) then
-                  Error (RemainingLines)
-                  //POSActionCancelSale.CancelSale (Context, POSSession, FrontEnd);
+                        // if there are lines to delete
+                        if (POSSaleLine.RefreshCurrent()) then
+                            Error(RemainingLines)
+                        //POSActionCancelSale.CancelSale (Context, POSSession, FrontEnd);
 
-                //+NPR5.40 [308558]
-              end;
+                        //+NPR5.40 [308558]
+                    end;
 
-              //-NPR5.40 [308558]
-              POSSession.StartPOSSession ();
+                    //-NPR5.40 [308558]
+                    POSSession.StartPOSSession();
 
-              //-#NPR5.33 [999999]
-              // POSSession.ChangeViewLogin();
-              // POSSession.InitializeSession();
-              //+#NPR5.33 [999999]
-              //-NPR5.39 [297087]      ]
+                    //-#NPR5.33 [999999]
+                    // POSSession.ChangeViewLogin();
+                    // POSSession.InitializeSession();
+                    //+#NPR5.33 [999999]
+                    //-NPR5.39 [297087]      ]
 
-              //POSCreateEntry.InsertUnitLogoutEntry (Register."Register No.", POSSetup.Salesperson ());
-              //+NPR5.39 [297087]
-              //+NPR5.40 [308558
+                    //POSCreateEntry.InsertUnitLogoutEntry (Register."Register No.", POSSetup.Salesperson ());
+                    //+NPR5.39 [297087]
+                    //+NPR5.40 [308558
 
-            end;
-          ViewType::Sale: POSSession.ChangeViewSale();
-          ViewType::Payment: POSSession.ChangeViewPayment();
-          ViewType::Balance: POSSession.ChangeViewBalancing();
-          ViewType::Locked:
-            begin
-              //+NPR5.39 [297087]
-              POSCreateEntry.InsertUnitLockEntry (Register."Register No.", POSSetup.Salesperson ());
-              //-NPR5.39 [297087]
+                end;
+            ViewType::Sale:
+                POSSession.ChangeViewSale();
+            ViewType::Payment:
+                POSSession.ChangeViewPayment();
+            ViewType::Balance:
+                POSSession.ChangeViewBalancing();
+            ViewType::Locked:
+                begin
+                    //+NPR5.39 [297087]
+                    POSCreateEntry.InsertUnitLockEntry(Register."Register No.", POSSetup.Salesperson());
+                    //-NPR5.39 [297087]
 
-              POSSession.ChangeViewLocked();
-            end;
+                    POSSession.ChangeViewLocked();
+                end;
         end;
     end;
 }

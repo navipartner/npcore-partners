@@ -400,7 +400,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     procedure InvokePayment(var EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
     var
         Body: Text;
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
     begin
         Body :=
         '{' +
@@ -453,7 +453,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     [TryFunction]
     procedure InvokeRefund(var EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
     var
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         Body: Text;
     begin
         Body :=
@@ -505,7 +505,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     [TryFunction]
     local procedure InvokeVoid(var EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";OriginalEFTTransactionRequest: Record "EFT Transaction Request";var Response: Text)
     var
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         Body: Text;
     begin
         Body :=
@@ -541,7 +541,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     [TryFunction]
     local procedure InvokeAbortTransaction(var EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup")
     var
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         Body: Text;
     begin
         Body :=
@@ -578,7 +578,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     [TryFunction]
     procedure InvokeAcquireCard(var EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
     var
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         Body: Text;
     begin
         //-NPR5.49 [345188]
@@ -622,7 +622,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     local procedure InvokeAbortAcquireCard(var EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
     var
         Body: Text;
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
     begin
         //-NPR5.49 [345188]
         Body :=
@@ -652,7 +652,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     [TryFunction]
     local procedure InvokeLookup(var EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";OriginalEftTransactionRequest: Record "EFT Transaction Request";var Response: Text)
     var
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         Body: Text;
     begin
         Body :=
@@ -691,7 +691,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     [TryFunction]
     local procedure InvokeDiagnoseTerminal(var EftTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";var Response: Text)
     var
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         Body: Text;
     begin
         Body :=
@@ -842,8 +842,8 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     [TryFunction]
     local procedure ParsePaymentTransaction(Response: Text;var EFTTransactionRequest: Record "EFT Transaction Request";var tmpCreditCardTransaction: Record "Credit Card Transaction" temporary)
     var
-        JObject: DotNet npNetJObject;
-        JToken: DotNet npNetJObject;
+        JObject: DotNet JObject;
+        JToken: DotNet JObject;
     begin
         ParseJSON(Response, JObject);
         JObject := JObject.Item('SaleToPOIResponse');
@@ -864,8 +864,8 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     [TryFunction]
     local procedure ParseVoidTransaction(Response: Text;var EFTTransactionRequest: Record "EFT Transaction Request")
     var
-        JObject: DotNet npNetJObject;
-        JToken: DotNet npNetJObject;
+        JObject: DotNet JObject;
+        JToken: DotNet JObject;
     begin
         ParseJSON(Response, JObject);
         JObject := JObject.Item('SaleToPOIResponse');
@@ -886,8 +886,8 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     [TryFunction]
     local procedure ParseStatusTransaction(Response: Text;var EFTTransactionRequest: Record "EFT Transaction Request";var tmpCreditCardTransaction: Record "Credit Card Transaction" temporary)
     var
-        JObject: DotNet npNetJObject;
-        JToken: DotNet npNetJObject;
+        JObject: DotNet JObject;
+        JToken: DotNet JObject;
     begin
         ParseJSON(Response, JObject);
         JObject := JObject.Item('SaleToPOIResponse');
@@ -908,8 +908,8 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     [TryFunction]
     local procedure ParseDiagnoseTransaction(Response: Text;var EFTTransactionRequest: Record "EFT Transaction Request")
     var
-        JObject: DotNet npNetJObject;
-        JToken: DotNet npNetJObject;
+        JObject: DotNet JObject;
+        JToken: DotNet JObject;
     begin
         ParseJSON(Response, JObject);
         JObject := JObject.Item('SaleToPOIResponse');
@@ -930,8 +930,8 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     [TryFunction]
     local procedure ParseCardAcquisition(Response: Text;var EFTTransactionRequest: Record "EFT Transaction Request")
     var
-        JObject: DotNet npNetJObject;
-        JToken: DotNet npNetJObject;
+        JObject: DotNet JObject;
+        JToken: DotNet JObject;
     begin
         ParseJSON(Response, JObject);
         JObject := JObject.Item('SaleToPOIResponse');
@@ -952,8 +952,8 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     [TryFunction]
     local procedure ParseAbortAcquireCard(Response: Text;var EFTTransactionRequest: Record "EFT Transaction Request")
     var
-        JObject: DotNet npNetJObject;
-        JToken: DotNet npNetJObject;
+        JObject: DotNet JObject;
+        JToken: DotNet JObject;
     begin
         ParseJSON(Response, JObject);
         JObject := JObject.Item('SaleToPOIResponse');
@@ -971,9 +971,9 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         ParseResponse(JToken, EFTTransactionRequest);
     end;
 
-    local procedure ParsePaymentResponse(JObject: DotNet npNetJObject;var EFTTransactionRequest: Record "EFT Transaction Request";var tmpCreditCardTransaction: Record "Credit Card Transaction" temporary)
+    local procedure ParsePaymentResponse(JObject: DotNet JObject;var EFTTransactionRequest: Record "EFT Transaction Request";var tmpCreditCardTransaction: Record "Credit Card Transaction" temporary)
     var
-        JToken: DotNet npNetJObject;
+        JToken: DotNet JObject;
         TransactionDateTime: DateTime;
         EFTAdyenCloudSignDialog: Codeunit "EFT Adyen Cloud Sign Dialog";
     begin
@@ -1034,7 +1034,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         end;
     end;
 
-    local procedure ParseReversalResponse(JObject: DotNet npNetJObject;var EFTTransactionRequest: Record "EFT Transaction Request")
+    local procedure ParseReversalResponse(JObject: DotNet JObject;var EFTTransactionRequest: Record "EFT Transaction Request")
     begin
         ParseResponse(JObject.Item('Response'), EFTTransactionRequest);
 
@@ -1042,10 +1042,10 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
           EFTTransactionRequest."Amount Output" := EFTTransactionRequest."Amount Input";
     end;
 
-    local procedure ParseStatusResponse(JObject: DotNet npNetJObject;var EFTTransactionRequest: Record "EFT Transaction Request";var tmpCreditCardTransaction: Record "Credit Card Transaction" temporary)
+    local procedure ParseStatusResponse(JObject: DotNet JObject;var EFTTransactionRequest: Record "EFT Transaction Request";var tmpCreditCardTransaction: Record "Credit Card Transaction" temporary)
     var
         OriginalEFTTransactionRequest: Record "EFT Transaction Request";
-        StatusResponse: DotNet npNetJObject;
+        StatusResponse: DotNet JObject;
     begin
         StatusResponse := JObject.Item('Response');
 
@@ -1076,12 +1076,12 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         ParseResponse(StatusResponse, EFTTransactionRequest); //Sets trx record result to match the lookup response rather than the repeated response result.
     end;
 
-    local procedure ParseDiagnoseResponse(JObject: DotNet npNetJObject;var EFTTransactionRequest: Record "EFT Transaction Request"): Text
+    local procedure ParseDiagnoseResponse(JObject: DotNet JObject;var EFTTransactionRequest: Record "EFT Transaction Request"): Text
     var
         TerminalStatus: Text;
         TerminalCommunication: Text;
         HostStatus: Text;
-        JToken: DotNet npNetJObject;
+        JToken: DotNet JObject;
     begin
         TerminalCommunication := UNKNOWN;
         if TrySelectToken(JObject, 'POIStatus.CommunicationOKFlag', JToken, false) then
@@ -1103,9 +1103,9 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         exit(StrSubstNo(DIAGNOSE, TerminalStatus, TerminalCommunication, HostStatus));
     end;
 
-    local procedure ParseCardAcquisitionResponse(JObject: DotNet npNetJObject;var EFTTransactionRequest: Record "EFT Transaction Request")
+    local procedure ParseCardAcquisitionResponse(JObject: DotNet JObject;var EFTTransactionRequest: Record "EFT Transaction Request")
     var
-        JToken: DotNet npNetJObject;
+        JToken: DotNet JObject;
     begin
         //-NPR5.49 [345188]
         TrySelectToken(JObject, 'Response', JToken, true);
@@ -1122,9 +1122,9 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         //+NPR5.49 [345188]
     end;
 
-    local procedure ParseResponse(JObject: DotNet npNetJObject;var EFTTransactionRequest: Record "EFT Transaction Request")
+    local procedure ParseResponse(JObject: DotNet JObject;var EFTTransactionRequest: Record "EFT Transaction Request")
     var
-        JToken: DotNet npNetJObject;
+        JToken: DotNet JObject;
     begin
         EFTTransactionRequest.Successful := (JObject.Item('Result').ToString = 'Success');
 
@@ -1136,9 +1136,9 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
             EFTTransactionRequest."Result Description" := JToken.ToString();
     end;
 
-    local procedure ParsePaymentInstrumentData(JObject: DotNet npNetJObject;var EFTTransactionRequest: Record "EFT Transaction Request")
+    local procedure ParsePaymentInstrumentData(JObject: DotNet JObject;var EFTTransactionRequest: Record "EFT Transaction Request")
     var
-        JToken: DotNet npNetJObject;
+        JToken: DotNet JObject;
     begin
         if TrySelectToken(JObject, 'PaymentInstrumentType', JToken, false) then
           EFTTransactionRequest."Payment Instrument Type" := JToken.ToString();
@@ -1160,7 +1160,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         end;
     end;
 
-    local procedure ParsePOIData(JObject: DotNet npNetJObject;var EFTTransactionRequest: Record "EFT Transaction Request")
+    local procedure ParsePOIData(JObject: DotNet JObject;var EFTTransactionRequest: Record "EFT Transaction Request")
     var
         TransactionDateTime: DateTime;
     begin
@@ -1173,7 +1173,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         //+NPR5.49 [345188]
     end;
 
-    local procedure ParseAuthenticationMethod(JObject: DotNet npNetJObject;var EFTTransactionRequest: Record "EFT Transaction Request")
+    local procedure ParseAuthenticationMethod(JObject: DotNet JObject;var EFTTransactionRequest: Record "EFT Transaction Request")
     var
         i: Integer;
     begin
@@ -1190,14 +1190,14 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         end;
     end;
 
-    local procedure ParseReceipts(JObject: DotNet npNetJObject;var EFTTransactionRequest: Record "EFT Transaction Request";var tmpCreditCardTransaction: Record "Credit Card Transaction" temporary)
+    local procedure ParseReceipts(JObject: DotNet JObject;var EFTTransactionRequest: Record "EFT Transaction Request";var tmpCreditCardTransaction: Record "Credit Card Transaction" temporary)
     var
         i: Integer;
         EntryNo: Integer;
         ReceiptNo: Integer;
         OutStream: OutStream;
         DocumentQualifier: Text;
-        JToken: DotNet npNetJObject;
+        JToken: DotNet JObject;
         OutputFormat: Text;
         j: Integer;
         Line: Text;
@@ -1277,7 +1277,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         end;
     end;
 
-    local procedure ParseAdditionalDataString(JObject: DotNet npNetJObject;var EFTTransactionRequest: Record "EFT Transaction Request")
+    local procedure ParseAdditionalDataString(JObject: DotNet JObject;var EFTTransactionRequest: Record "EFT Transaction Request")
     var
         NameValueCollection: DotNet npNetNameValueCollection;
         "Key": Text;
@@ -1337,7 +1337,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         //+NPR5.49 [345188]
     end;
 
-    local procedure ValidateHeader(JObject: DotNet npNetJObject;EFTTransactionRequest: Record "EFT Transaction Request")
+    local procedure ValidateHeader(JObject: DotNet JObject;EFTTransactionRequest: Record "EFT Transaction Request")
     var
         ServiceID: Integer;
         MessageCategory: Text;
@@ -1369,7 +1369,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     begin
     end;
 
-    local procedure ParseJSON(JSON: Text;var JObject: DotNet npNetJObject)
+    local procedure ParseJSON(JSON: Text;var JObject: DotNet JObject)
     var
         MemStream: DotNet npNetMemoryStream;
         StreamReader: DotNet npNetStreamReader;
@@ -1583,7 +1583,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     local procedure GetCardAcquisitionJSON(EFTTransactionRequest: Record "EFT Transaction Request";PrefixComma: Boolean): Text
     var
         AcquireCardRequest: Record "EFT Transaction Request";
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         AcquireDateTime: DateTime;
         Output: Text;
     begin

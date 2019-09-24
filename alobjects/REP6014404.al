@@ -2,7 +2,7 @@ report 6014404 "Return Reason Code Statistics"
 {
     // NPR5.31/JLK /20170314  CASE 260767 Object created
     DefaultLayout = RDLC;
-    RDLCLayout = './Return Reason Code Statistics.rdlc';
+    RDLCLayout = './layouts/Return Reason Code Statistics.rdlc';
 
     Caption = 'Return Reason Code Statistics';
     PreviewMode = PrintLayout;

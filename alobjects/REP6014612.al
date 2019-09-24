@@ -12,7 +12,7 @@ report 6014612 "Inventory per Variant at date"
     // NPR5.40/TJ  /20180319  CASE 307717 Replaced hardcoded dates with DMY2DATE structure
     // NPR5.51/ZESO/20190827  CASE 360802 Option Show Blank Location Code added + Changed Orientation to Landscape.
     DefaultLayout = RDLC;
-    RDLCLayout = './Inventory per Variant at date.rdlc';
+    RDLCLayout = './layouts/Inventory per Variant at date.rdlc';
 
     Caption = 'Inventory Per Date';
     Description = 'Inventory per Variant at date';

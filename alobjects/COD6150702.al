@@ -45,14 +45,14 @@ codeunit 6150702 "POS UI Management"
         Captions := Captions.Dictionary();
         ConfigureCaptions(Captions);
 
-        Caption.SetFilter("Caption ID",'<>%1','');
-        Caption.SetFilter("Language Code",'%1|%2','',Language."Abbreviated Name");
+        Caption.SetFilter("Caption ID", '<>%1', '');
+        Caption.SetFilter("Language Code", '%1|%2', '', Language."Abbreviated Name");
         if Caption.FindSet then
-          repeat
-            if Captions.ContainsKey(Caption."Caption ID") then
-              Captions.Remove(Caption."Caption ID");
-            Captions.Add(Caption."Caption ID",Caption.Caption);
-          until Caption.Next = 0;
+            repeat
+                if Captions.ContainsKey(Caption."Caption ID") then
+                    Captions.Remove(Caption."Caption ID");
+                Captions.Add(Caption."Caption ID", Caption.Caption);
+            until Caption.Next = 0;
 
         CaptionMgt.Initialize(FrontEnd);
         OnInitializeCaptions(CaptionMgt);
@@ -75,12 +75,12 @@ codeunit 6150702 "POS UI Management"
           CultureInfo := CultureInfo.CultureInfo(Register."Client Formatting Culture ID")
         */
         if (not POSUnit.Get(Register."Register No.")) or (not POSViewProfile.Get(POSUnit."POS View Profile")) then
-          Clear(POSViewProfile);
+            Clear(POSViewProfile);
         if POSViewProfile."Client Formatting Culture ID" <> '' then
-          CultureInfo := CultureInfo.CultureInfo(POSViewProfile."Client Formatting Culture ID")
+            CultureInfo := CultureInfo.CultureInfo(POSViewProfile."Client Formatting Culture ID")
         //+NPR5.49 [335739]
         else
-          CultureInfo := CultureInfo.CultureInfo(CultureInfo.CurrentUICulture.Name);
+            CultureInfo := CultureInfo.CultureInfo(CultureInfo.CurrentUICulture.Name);
         NumberFormat := CultureInfo.NumberFormat;
         //-NPR5.49 [335739]
         /*
@@ -90,11 +90,11 @@ codeunit 6150702 "POS UI Management"
           NumberFormat.NumberGroupSeparator := Register."Client Thousands Separator";
         */
         if POSViewProfile."Client Decimal Separator" <> '' then
-          NumberFormat.NumberDecimalSeparator := POSViewProfile."Client Decimal Separator";
+            NumberFormat.NumberDecimalSeparator := POSViewProfile."Client Decimal Separator";
         if POSViewProfile."Client Thousands Separator" <> '' then
-          NumberFormat.NumberGroupSeparator := POSViewProfile."Client Thousands Separator";
+            NumberFormat.NumberGroupSeparator := POSViewProfile."Client Thousands Separator";
         //+NPR5.49 [335739]
-        
+
         DateFormat := CultureInfo.DateTimeFormat;
         //-NPR5.49 [335739]
         /*
@@ -102,10 +102,10 @@ codeunit 6150702 "POS UI Management"
           DateFormat.DateSeparator := Register."Client Date Separator";
         */
         if POSViewProfile."Client Date Separator" <> '' then
-          DateFormat.DateSeparator := POSViewProfile."Client Date Separator";
+            DateFormat.DateSeparator := POSViewProfile."Client Date Separator";
         //+NPR5.49 [335739]
-        
-        FrontEnd.ConfigureFormat(NumberFormat,DateFormat);
+
+        FrontEnd.ConfigureFormat(NumberFormat, DateFormat);
 
     end;
 
@@ -120,9 +120,9 @@ codeunit 6150702 "POS UI Management"
         //-NPR5.49 [335739]
         //IF NOT Register.Picture.HASVALUE() THEN
         if (not POSUnit.Get(Register."Register No.")) or (not POSViewProfile.Get(POSUnit."POS View Profile")) or (not POSViewProfile.Picture.HasValue()) then
-        //+NPR5.49 [335739]
-          exit;
-        
+            //+NPR5.49 [335739]
+            exit;
+
         //-NPR5.49 [335739]
         /*
         Register.CALCFIELDS(Picture);
@@ -132,13 +132,13 @@ codeunit 6150702 "POS UI Management"
         POSViewProfile.Picture.CreateInStream(InStr);
         //+NPR5.49 [335739]
         MemStream := MemStream.MemoryStream();
-        CopyStream(MemStream,InStr);
-        
+        CopyStream(MemStream, InStr);
+
         FrontEnd.ConfigureLogo(Convert.ToBase64String(MemStream.ToArray()));
 
     end;
 
-    procedure InitializeMenus(Register: Record Register;Salesperson: Record "Salesperson/Purchaser";POSSession: Codeunit "POS Session")
+    procedure InitializeMenus(Register: Record Register; Salesperson: Record "Salesperson/Purchaser"; POSSession: Codeunit "POS Session")
     var
         Menu: Record "POS Menu";
         Menus: DotNet npNetList_Of_T;
@@ -151,28 +151,28 @@ codeunit 6150702 "POS UI Management"
         //+NPR5.42 [314128]
 
         with Menu do begin
-          SetRange(Blocked,false);
-          SetFilter("Register Type",'%1|%2',Register."Register Type",'');
-          SetFilter("Register No.",'%1|%2',Register."Register No.",'');
-          SetFilter("Salesperson Code",'%1|%2',Salesperson.Code,'');
-          // SETFILTER("Available in App",'%1|%2',TRUE,FALSE);  // TODO: fix this after developing app stuff
-          SetRange("Available on Desktop",true);                // TODO: fix this after developing app stuff
+            SetRange(Blocked, false);
+            SetFilter("Register Type", '%1|%2', Register."Register Type", '');
+            SetFilter("Register No.", '%1|%2', Register."Register No.", '');
+            SetFilter("Salesperson Code", '%1|%2', Salesperson.Code, '');
+            // SETFILTER("Available in App",'%1|%2',TRUE,FALSE);  // TODO: fix this after developing app stuff
+            SetRange("Available on Desktop", true);                // TODO: fix this after developing app stuff
 
-          if FindSet then begin
-            Menus := Menus.List();
-            repeat
-              //-NPR5.42 [314128]
-              //InitializeMenu(Menu,MenuObj,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
-              InitializeMenu(Menu,MenuObj,POSSession,tmpPOSParameterValue);
-              //+NPR5.42 [314128]
-              Menus.Add(MenuObj);
-            until Next = 0;
-            FrontEnd.ConfigureMenu(Menus);
-          end;
+            if FindSet then begin
+                Menus := Menus.List();
+                repeat
+                    //-NPR5.42 [314128]
+                    //InitializeMenu(Menu,MenuObj,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
+                    InitializeMenu(Menu, MenuObj, POSSession, tmpPOSParameterValue);
+                    //+NPR5.42 [314128]
+                    Menus.Add(MenuObj);
+                until Next = 0;
+                FrontEnd.ConfigureMenu(Menus);
+            end;
         end;
     end;
 
-    local procedure InitializeMenu(var Menu: Record "POS Menu";var MenuObj: DotNet npNetMenu;POSSession: Codeunit "POS Session";var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
+    local procedure InitializeMenu(var Menu: Record "POS Menu"; var MenuObj: DotNet npNetMenu; POSSession: Codeunit "POS Session"; var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
     var
         MenuButton: Record "POS Menu Button";
         MenuButtonObj: DotNet npNetMenuButton;
@@ -180,119 +180,121 @@ codeunit 6150702 "POS UI Management"
         //-NPR5.40 [306347]
         POSSession.DebugWithTimestamp('Initializing menu [' + Menu.Code + ']');
         //+NPR5.40 [306347]
-        InitializeMenuObject(Menu,MenuObj);
+        InitializeMenuObject(Menu, MenuObj);
 
         with MenuButton do begin
-          SetRange("Menu Code",Menu.Code);
-          SetRange(Blocked,false);
-          Menu.CopyFilter("Register Type","Register Type");
-          Menu.CopyFilter("Register No.","Register No.");
-          //Menu.COPYFILTER("Salesperson Code","Salesperson Code"); // TODO: this must happen in the front end
-          Menu.CopyFilter("Available in App","Available in App");
-          Menu.CopyFilter("Available on Desktop","Available on Desktop");
-          SetRange("Parent ID",0);
+            SetRange("Menu Code", Menu.Code);
+            SetRange(Blocked, false);
+            Menu.CopyFilter("Register Type", "Register Type");
+            Menu.CopyFilter("Register No.", "Register No.");
+            //Menu.COPYFILTER("Salesperson Code","Salesperson Code"); // TODO: this must happen in the front end
+            Menu.CopyFilter("Available in App", "Available in App");
+            Menu.CopyFilter("Available on Desktop", "Available on Desktop");
+            SetRange("Parent ID", 0);
 
-          //-NPR5.42 [314128]
-          //InitializeMenuButtons(MenuButton,MenuObj,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
-          InitializeMenuButtons(MenuButton,MenuObj,POSSession,tmpPOSParameterValue);
-          //+NPR5.42 [314128]
+            //-NPR5.42 [314128]
+            //InitializeMenuButtons(MenuButton,MenuObj,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
+            InitializeMenuButtons(MenuButton, MenuObj, POSSession, tmpPOSParameterValue);
+            //+NPR5.42 [314128]
         end;
     end;
 
-    local procedure InitializeMenuObject(Menu: Record "POS Menu";var MenuObj: DotNet npNetMenu)
+    local procedure InitializeMenuObject(Menu: Record "POS Menu"; var MenuObj: DotNet npNetMenu)
     begin
         with Menu do begin
-          MenuObj := MenuObj.Menu();
+            MenuObj := MenuObj.Menu();
 
-          MenuObj.Id := Code;
-          MenuObj.Caption := Caption;
-          MenuObj.Tooltip := Tooltip;
-          MenuObj.Class := "Custom Class Attribute";
+            MenuObj.Id := Code;
+            MenuObj.Caption := Caption;
+            MenuObj.Tooltip := Tooltip;
+            MenuObj.Class := "Custom Class Attribute";
         end;
     end;
 
-    local procedure InitializeSubmenu(var MenuButton: Record "POS Menu Button";ISubMenu: DotNet npNetISubMenu;POSSession: Codeunit "POS Session";var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
+    local procedure InitializeSubmenu(var MenuButton: Record "POS Menu Button"; ISubMenu: DotNet npNetISubMenu; POSSession: Codeunit "POS Session"; var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
     var
         SubMenuButton: Record "POS Menu Button";
     begin
         with SubMenuButton do begin
-          CopyFilters(MenuButton);
-          SetRange("Parent ID",MenuButton.ID);
+            CopyFilters(MenuButton);
+            SetRange("Parent ID", MenuButton.ID);
 
-          //-NPR5.42 [314128]
-          //InitializeMenuButtons(SubMenuButton,ISubMenu,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
-          InitializeMenuButtons(SubMenuButton,ISubMenu,POSSession,tmpPOSParameterValue);
-          //+NPR5.42 [314128]
+            //-NPR5.42 [314128]
+            //InitializeMenuButtons(SubMenuButton,ISubMenu,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
+            InitializeMenuButtons(SubMenuButton, ISubMenu, POSSession, tmpPOSParameterValue);
+            //+NPR5.42 [314128]
         end;
     end;
 
-    local procedure InitializeMenuButtons(var SubMenuButton: Record "POS Menu Button";ISubMenu: DotNet npNetISubMenu;POSSession: Codeunit "POS Session";var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
+    local procedure InitializeMenuButtons(var SubMenuButton: Record "POS Menu Button"; ISubMenu: DotNet npNetISubMenu; POSSession: Codeunit "POS Session"; var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
     var
         MenuButtonObj: DotNet npNetMenuButton;
     begin
         with SubMenuButton do begin
-          if FindSet then
-            repeat
-              //-NPR5.42 [314128]
-              //InitializeMenuButtonObject(SubMenuButton,MenuButtonObj,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
-              InitializeMenuButtonObject(SubMenuButton,MenuButtonObj,POSSession,tmpPOSParameterValue);
-              //+NPR5.42 [314128]
-              ISubMenu.MenuButtons.Add(MenuButtonObj);
-              if "Action Type" = "Action Type"::Submenu then
-                //-NPR5.42 [314128]
-                //InitializeSubmenu(SubMenuButton,MenuButtonObj,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
-                InitializeSubmenu(SubMenuButton,MenuButtonObj,POSSession,tmpPOSParameterValue);
-                //+NPR5.42 [314128]
-            until Next = 0;
+            if FindSet then
+                repeat
+                    //-NPR5.42 [314128]
+                    //InitializeMenuButtonObject(SubMenuButton,MenuButtonObj,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
+                    InitializeMenuButtonObject(SubMenuButton, MenuButtonObj, POSSession, tmpPOSParameterValue);
+                    //+NPR5.42 [314128]
+                    ISubMenu.MenuButtons.Add(MenuButtonObj);
+                    if "Action Type" = "Action Type"::Submenu then
+                        //-NPR5.42 [314128]
+                        //InitializeSubmenu(SubMenuButton,MenuButtonObj,POSSession,tmpPOSParameterValue,tmpPOSActionParameter);
+                        InitializeSubmenu(SubMenuButton, MenuButtonObj, POSSession, tmpPOSParameterValue);
+                    //+NPR5.42 [314128]
+                until Next = 0;
         end;
     end;
 
-    local procedure InitializeMenuButtonObject(MenuButton: Record "POS Menu Button";var MenuButtonObj: DotNet npNetMenuButton;POSSession: Codeunit "POS Session";var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
+    local procedure InitializeMenuButtonObject(MenuButton: Record "POS Menu Button"; var MenuButtonObj: DotNet npNetMenuButton; POSSession: Codeunit "POS Session"; var tmpPOSParameterValue: Record "POS Parameter Value" temporary)
     var
         "Action": DotNet npNetAction;
+        DotNetHelper: Variant;
+        DotNetEnum: DotNet npNetEnum;
     begin
         with MenuButton do begin
-          MenuButtonObj := MenuButtonObj.MenuButton();
-        //-NPR5.38 [290485]
-        //  MenuButtonObj.Caption := Caption;
-          MenuButtonObj.Caption := MenuButton.GetLocalizedCaption(FieldNo(Caption));
-        //+NPR5.38 [290485]
-          MenuButtonObj.Tooltip := Tooltip;
-          MenuButtonObj.BackgroundColor := "Background Color";
-          MenuButtonObj.Color := "Foreground Color";
-          MenuButtonObj.IconClass := "Icon Class";
-          MenuButtonObj.Class := "Custom Class Attribute";
-          MenuButtonObj.Bold := Bold;
-          MenuButtonObj.FontSize := "Font Size";
-          MenuButtonObj.Row := "Position Y";
-          MenuButtonObj.Column := "Position X";
-          MenuButtonObj.Enabled := Enabled;
+            MenuButtonObj := MenuButtonObj.MenuButton();
+            //-NPR5.38 [290485]
+            //  MenuButtonObj.Caption := Caption;
+            MenuButtonObj.Caption := MenuButton.GetLocalizedCaption(FieldNo(Caption));
+            //+NPR5.38 [290485]
+            MenuButtonObj.Tooltip := Tooltip;
+            MenuButtonObj.BackgroundColor := "Background Color";
+            MenuButtonObj.Color := "Foreground Color";
+            MenuButtonObj.IconClass := "Icon Class";
+            MenuButtonObj.Class := "Custom Class Attribute";
+            MenuButtonObj.Bold := Bold;
+            MenuButtonObj.FontSize := DotNetEnum.Parse(MenuButtonObj.FontSize.GetType(), Format("Font Size"));
+            MenuButtonObj.Row := "Position Y";
+            MenuButtonObj.Column := "Position X";
+            MenuButtonObj.Enabled := DotNetEnum.Parse(MenuButtonObj.Enabled.GetType(), Format(Enabled));
 
-        //-NPR5.38 [255773]
-          MenuButtonObj.Content.Add('keyMenu',"Menu Code");
-          MenuButtonObj.Content.Add('keyId',ID);
-        //+NPR5.38 [255773]
+            //-NPR5.38 [255773]
+            MenuButtonObj.Content.Add('keyMenu', "Menu Code");
+            MenuButtonObj.Content.Add('keyId', ID);
+            //+NPR5.38 [255773]
 
-          InitializeMenuButtonObjectFilters(MenuButton,MenuButtonObj);
+            InitializeMenuButtonObjectFilters(MenuButton, MenuButtonObj);
 
-          //-NPR5.42 [314128]
-          //GetAction(Action,POSSession,STRSUBSTNO('%1 [%2, %3]',MenuButton.TABLECAPTION,"Menu Code",Caption),tmpPOSParameterValue,tmpPOSActionParameter);
-          GetAction(Action,POSSession,StrSubstNo('%1 [%2, %3]',MenuButton.TableCaption,"Menu Code",Caption),tmpPOSParameterValue);
-          //+NPR5.42 [314128]
-          if not IsNull(Action) then
-            MenuButtonObj.Action := Action;
-        //-NPR5.36 [291454]
-          StoreButtonConfiguration(MenuButtonObj);
-        //+NPR5.36 [291454]
+            //-NPR5.42 [314128]
+            //GetAction(Action,POSSession,STRSUBSTNO('%1 [%2, %3]',MenuButton.TABLECAPTION,"Menu Code",Caption),tmpPOSParameterValue,tmpPOSActionParameter);
+            GetAction(Action, POSSession, StrSubstNo('%1 [%2, %3]', MenuButton.TableCaption, "Menu Code", Caption), tmpPOSParameterValue);
+            //+NPR5.42 [314128]
+            if not IsNull(Action) then
+                MenuButtonObj.Action := Action;
+            //-NPR5.36 [291454]
+            StoreButtonConfiguration(MenuButtonObj);
+            //+NPR5.36 [291454]
         end;
     end;
 
-    local procedure InitializeMenuButtonObjectFilters(MenuButton: Record "POS Menu Button";var MenuButtonObj: DotNet npNetMenuButton)
+    local procedure InitializeMenuButtonObjectFilters(MenuButton: Record "POS Menu Button"; var MenuButtonObj: DotNet npNetMenuButton)
     begin
         if MenuButton."Salesperson Code" <> '' then
-          MenuButtonObj.Content.Add('filterSalesPerson',MenuButton."Salesperson Code");
+            MenuButtonObj.Content.Add('filterSalesPerson', MenuButton."Salesperson Code");
         if MenuButton."Register No." <> '' then
-          MenuButtonObj.Content.Add('filterRegister',MenuButton."Register No.");
+            MenuButtonObj.Content.Add('filterRegister', MenuButton."Register No.");
     end;
 
     procedure InitializeWatermark()
@@ -305,19 +307,22 @@ codeunit 6150702 "POS UI Management"
         // If image is present, text won't be shown.
         //-NPR5.32.11 [281618]
 
-        if (not NPRetailSetup.Get ()) then
-          exit;
+        if (not NPRetailSetup.Get()) then
+            exit;
 
         case NPRetailSetup."Environment Type" of
-          NPRetailSetup."Environment Type"::DEMO : FrontEnd.ConfigureWatermark('', WaterMarkDemo);
-          NPRetailSetup."Environment Type"::DEV  :
-            begin
-              ActiveSession.SetFilter ("Session ID", '=%1', SessionId);
-              if (ActiveSession.FindFirst ()) then
-                FrontEnd.ConfigureWatermark('', ConvertStr (ActiveSession."Database Name", '_', ' '));
-            end;
-          NPRetailSetup."Environment Type"::TEST : FrontEnd.ConfigureWatermark('', WaterMarkTest);
-          NPRetailSetup."Environment Type"::PROD : ;
+            NPRetailSetup."Environment Type"::DEMO:
+                FrontEnd.ConfigureWatermark('', WaterMarkDemo);
+            NPRetailSetup."Environment Type"::DEV:
+                begin
+                    ActiveSession.SetFilter("Session ID", '=%1', SessionId);
+                    if (ActiveSession.FindFirst()) then
+                        FrontEnd.ConfigureWatermark('', ConvertStr(ActiveSession."Database Name", '_', ' '));
+                end;
+            NPRetailSetup."Environment Type"::TEST:
+                FrontEnd.ConfigureWatermark('', WaterMarkTest);
+            NPRetailSetup."Environment Type"::PROD:
+                ;
         end;
         //+NPR5.32.11 [281618]
     end;
@@ -342,43 +347,43 @@ codeunit 6150702 "POS UI Management"
         ThemeDep.SETRANGE("POS Theme Code",Register."POS Theme Code");
         */
         if (not POSUnit.Get(Register."Register No.")) or (not POSViewProfile.Get(POSUnit."POS View Profile")) or (not POSTheme.Get(POSViewProfile."POS Theme Code")) or POSTheme.Blocked then
-          exit;
-        
-        ThemeDep.SetRange("POS Theme Code",POSViewProfile."POS Theme Code");
+            exit;
+
+        ThemeDep.SetRange("POS Theme Code", POSViewProfile."POS Theme Code");
         //+NPR5.49 [335739]
-        ThemeDep.SetRange(Blocked,false);
-        ThemeDep.SetFilter("Dependency Code",'<>%1','');
+        ThemeDep.SetRange(Blocked, false);
+        ThemeDep.SetFilter("Dependency Code", '<>%1', '');
         if not ThemeDep.FindSet() then
-          exit;
-        
+            exit;
+
         Theme := Theme.List();
         repeat
-          Clear(DependencyContent);
-          case ThemeDep."Dependency Type" of
-            ThemeDep."Dependency Type"::Background, ThemeDep."Dependency Type"::Logo:
-              DependencyContent := WebClientDep.GetDataUri(ThemeDep."Dependency Code");
-            ThemeDep."Dependency Type"::JavaScript:
-              DependencyContent := WebClientDep.GetJavaScript(ThemeDep."Dependency Code");
-            ThemeDep."Dependency Type"::Stylesheet:
-              DependencyContent := WebClientDep.GetStyleSheet(ThemeDep."Dependency Code");
-          end;
-        
-          if DependencyContent <> '' then begin
-            ThemeLine := ThemeLine.Dictionary();
-            Theme.Add(ThemeLine);
-        
-            ThemeLine.Add('targetType',ThemeDep."Target Type");
-            case ThemeDep."Target Type" of
-              ThemeDep."Target Type"::Client:
-                ThemeLine.Add('guid',ThemeDep."Auto-Update GUID");
-              ThemeDep."Target Type"::View:
-                ThemeLine.Add('view',ThemeDep."Target Code");
-              ThemeDep."Target Type"::"View Type":
-                ThemeLine.Add('viewType',ThemeDep."Target View Type");
+            Clear(DependencyContent);
+            case ThemeDep."Dependency Type" of
+                ThemeDep."Dependency Type"::Background, ThemeDep."Dependency Type"::Logo:
+                    DependencyContent := WebClientDep.GetDataUri(ThemeDep."Dependency Code");
+                ThemeDep."Dependency Type"::JavaScript:
+                    DependencyContent := WebClientDep.GetJavaScript(ThemeDep."Dependency Code");
+                ThemeDep."Dependency Type"::Stylesheet:
+                    DependencyContent := WebClientDep.GetStyleSheet(ThemeDep."Dependency Code");
             end;
-            ThemeLine.Add('type',ThemeDep."Dependency Type");
-            ThemeLine.Add('content',DependencyContent);
-          end;
+
+            if DependencyContent <> '' then begin
+                ThemeLine := ThemeLine.Dictionary();
+                Theme.Add(ThemeLine);
+
+                ThemeLine.Add('targetType', ThemeDep."Target Type");
+                case ThemeDep."Target Type" of
+                    ThemeDep."Target Type"::Client:
+                        ThemeLine.Add('guid', ThemeDep."Auto-Update GUID");
+                    ThemeDep."Target Type"::View:
+                        ThemeLine.Add('view', ThemeDep."Target Code");
+                    ThemeDep."Target Type"::"View Type":
+                        ThemeLine.Add('viewType', ThemeDep."Target View Type");
+                end;
+                ThemeLine.Add('type', ThemeDep."Dependency Type");
+                ThemeLine.Add('content', DependencyContent);
+            end;
         until ThemeDep.Next = 0;
         FrontEnd.ConfigureTheme(Theme);
         //+NPR5.49 [335141]
@@ -481,12 +486,12 @@ codeunit 6150702 "POS UI Management"
         WebFont: Record "POS Web Font";
         Font: DotNet npNetFont0;
     begin
-        WebFont.SetFilter("Company Name",'%1|%2','',CompanyName);
+        WebFont.SetFilter("Company Name", '%1|%2', '', CompanyName);
         if WebFont.FindSet then
-          repeat
-            WebFont.GetFontDotNet_Obsolete(Font);
-            FrontEnd.ConfigureFont(Font);
-          until WebFont.Next = 0;
+            repeat
+                WebFont.GetFontDotNet(Font);
+                FrontEnd.ConfigureFont(Font);
+            until WebFont.Next = 0;
     end;
 
     local procedure ConfigureCaptions(Captions: DotNet npNetDictionary_Of_T_U)
@@ -590,189 +595,189 @@ codeunit 6150702 "POS UI Management"
         CaptionPayment_Paid: Label 'Paid';
         CaptionPayment_Balance: Label 'Balance';
     begin
-        Captions.Add('Sale_ReceiptNo',CaptionLabelReceiptNo);
-        Captions.Add('Sale_EANHeader',CaptionLabelEANHeader);
-        Captions.Add('Sale_LastSale',CaptionLabelLastSale);
-        Captions.Add('Login_FunctionButtonText',CaptionFunctionButtonText);
-        Captions.Add('Login_MainMenuButtonText',CaptionMainMenuButtonText);
-        Captions.Add('Sale_PaymentAmount',CaptionLabelPaymentAmount);
+        Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
+        Captions.Add('Sale_EANHeader', CaptionLabelEANHeader);
+        Captions.Add('Sale_LastSale', CaptionLabelLastSale);
+        Captions.Add('Login_FunctionButtonText', CaptionFunctionButtonText);
+        Captions.Add('Login_MainMenuButtonText', CaptionMainMenuButtonText);
+        Captions.Add('Sale_PaymentAmount', CaptionLabelPaymentAmount);
 
         //-NPR5.39 [299908]
         //Captions.Add('Sale_PaymentTotal',CaptionLabelPaymentTotal);
-        Captions.Add('Sale_PaymentTotal',StrSubstNo (CaptionLabelPaymentTotal2, GetLCYCode()));
+        Captions.Add('Sale_PaymentTotal', StrSubstNo(CaptionLabelPaymentTotal2, GetLCYCode()));
         //+NPR5.39 [299908]
 
-        Captions.Add('Sale_ReturnAmount',CaptionLabelReturnAmount);
-        Captions.Add('Sale_RegisterNo',CaptionLabelRegisterNo);
-        Captions.Add('Sale_SalesPersonCode',CaptionLabelSalesPersonCode);
-        Captions.Add('Login_Clear',CaptionLabelClear);
+        Captions.Add('Sale_ReturnAmount', CaptionLabelReturnAmount);
+        Captions.Add('Sale_RegisterNo', CaptionLabelRegisterNo);
+        Captions.Add('Sale_SalesPersonCode', CaptionLabelSalesPersonCode);
+        Captions.Add('Login_Clear', CaptionLabelClear);
 
         //-NPR5.37 [292323]
         //Captions.Add('Sale_SubTotal',CaptionLabelSubtotal);
-        Captions.Add('Sale_SubTotal',StrSubstNo (CaptionLabelSubtotal, GetLCYCode));
+        Captions.Add('Sale_SubTotal', StrSubstNo(CaptionLabelSubtotal, GetLCYCode));
         //+NPR5.37 [292323]
 
-        Captions.Add('Payment_PaymentInfo',CaptionPaymentInfo);
-        Captions.Add('Global_Cancel',CaptionGlobalCancel);
-        Captions.Add('Global_Close',CaptionGlobalClose);
-        Captions.Add('Global_Back',CaptionGlobalBack);
-        Captions.Add('Global_OK',CaptionGlobalOK);
-        Captions.Add('Global_Yes',CaptionGlobalYes);
-        Captions.Add('Global_No',CaptionGlobalNo);
-        Captions.Add('Global_Today',CaptionGlobalToday);
-        Captions.Add('Global_Tomorrow',CaptionGlobalTomorrow);
-        Captions.Add('Global_Yesterday',CaptionGlobalYesterday);
-        Captions.Add('CaptionBalancingRegisterTransactions',CaptionBalancingRegisterTransactions);
-        Captions.Add('CaptionBalancingRegisters',CaptionBalancingRegisters);
-        Captions.Add('CaptionBalancingReceipts',CaptionBalancingReceipts);
-        Captions.Add('CaptionBalancingBeginningBalance',CaptionBalancingBeginningBalance);
-        Captions.Add('CaptionBalancingCashMovements',CaptionBalancingCashMovements);
-        Captions.Add('CaptionBalancingMidTotal',CaptionBalancingMidTotal);
-        Captions.Add('CaptionBalancingManualCards',CaptionBalancingManualCards);
-        Captions.Add('CaptionBalancingTerminalCards',CaptionBalancingTerminalCards);
-        Captions.Add('CaptionBalancingOtherCreditCards',CaptionBalancingOtherCreditCards);
-        Captions.Add('CaptionBalancingTerminal',CaptionBalancingTerminal);
-        Captions.Add('CaptionBalancingGiftCards',CaptionBalancingGiftCards);
-        Captions.Add('CaptionBalancingCreditVouchers',CaptionBalancingCreditVouchers);
-        Captions.Add('CaptionBalancingCustomerOutPayments',CaptionBalancingCustomerOutPayments);
-        Captions.Add('CaptionBalancingDebitSales',CaptionBalancingDebitSales);
-        Captions.Add('CaptionBalancingStaffSales',CaptionBalancingStaffSales);
-        Captions.Add('CaptionBalancingNegativeReceiptAmount',CaptionBalancingNegativeReceiptAmount);
-        Captions.Add('CaptionBalancingForeignCurrency',CaptionBalancingForeignCurrency);
-        Captions.Add('CaptionBalancingReceiptStatistics',CaptionBalancingReceiptStatistics);
-        Captions.Add('CaptionBalancingNumberOfSales',CaptionBalancingNumberOfSales);
-        Captions.Add('CaptionBalancingCancelledSales',CaptionBalancingCancelledSales);
-        Captions.Add('CaptionBalancingNumberOfNegativeReceipts',CaptionBalancingNumberOfNegativeReceipts);
-        Captions.Add('CaptionBalancingTurnover',CaptionBalancingTurnover);
-        Captions.Add('CaptionBalancingCOGS',CaptionBalancingCOGS);
-        Captions.Add('CaptionBalancingContributionMargin',CaptionBalancingContributionMargin);
-        Captions.Add('CaptionBalancingDiscounts',CaptionBalancingDiscounts);
-        Captions.Add('CaptionBalancingCampaign',CaptionBalancingCampaign);
-        Captions.Add('CaptionBalancingMixed',CaptionBalancingMixed);
-        Captions.Add('CaptionBalancingQuantityDiscounts',CaptionBalancingQuantityDiscounts);
-        Captions.Add('CaptionBalancingSalespersonDiscounts',CaptionBalancingSalespersonDiscounts);
-        Captions.Add('CaptionBalancingBOMDiscounts',CaptionBalancingBOMDiscounts);
-        Captions.Add('CaptionBalancingCustomerDiscounts',CaptionBalancingCustomerDiscounts);
-        Captions.Add('CaptionBalancingOtherDiscounts',CaptionBalancingOtherDiscounts);
-        Captions.Add('CaptionBalancingTotalDiscounts',CaptionBalancingTotalDiscounts);
-        Captions.Add('CaptionBalancingOpenDrawer',CaptionBalancingOpenDrawer);
-        Captions.Add('CaptionBalancingAuditRoll',CaptionBalancingAuditRoll);
-        Captions.Add('CaptionBalancingCashCount',CaptionBalancingCashCount);
-        Captions.Add('CaptionBalancingCountedLCY',CaptionBalancingCountedLCY);
-        Captions.Add('CaptionBalancingDifferenceLCY',CaptionBalancingDifferenceLCY);
-        Captions.Add('CaptionBalancingNewCashAmount',CaptionBalancingNewCashAmount);
-        Captions.Add('CaptionBalancingPutInTheBank',CaptionBalancingPutInTheBank);
-        Captions.Add('CaptionBalancingMoneybagNo',CaptionBalancingMoneybagNo);
-        Captions.Add('CaptionBalancingAmount',CaptionBalancingAmount);
-        Captions.Add('CaptionBalancingNumber',CaptionBalancingNumber);
-        Captions.Add('CaptionBalancingRemainderTransferred',CaptionBalancingRemainderTransferred);
-        Captions.Add('CaptionBalancingDelete',CaptionBalancingDelete);
-        Captions.Add('CaptionBalancingClose',CaptionBalancingClose);
-        Captions.Add('CaptionBalancing1Turnover',CaptionBalancing1Turnover);
-        Captions.Add('CaptionBalancing2Counting',CaptionBalancing2Counting);
-        Captions.Add('CaptionBalancing3Close',CaptionBalancing3Close);
-        Captions.Add('CaptionDataGridSelected',CaptionDataGridSelected);
-        Captions.Add('Lookup_Search',CaptionLookupSearch);
-        Captions.Add('Lookup_Caption',CaptionLookup);
-        Captions.Add('Lookup_New',CaptionLookupNew);
-        Captions.Add('Lookup_Card',CaptionLookupShowCard);
-        Captions.Add('DialogCaption_Message',CaptionMessage);
-        Captions.Add('DialogCaption_Confirmation',CaptionConfirmation);
-        Captions.Add('DialogCaption_Error',CaptionError);
-        Captions.Add('DialogCaption_Numpad',CaptionNumpad);
-        Captions.Add('Locked_RegisterLocked',CaptionLockedRegisterLocked);
-        Captions.Add('CaptionTablet_ButtonItems',CaptionTabletButtonItems);
-        Captions.Add('CaptionTablet_ButtonMore',CaptionTabletButtonMore);
-        Captions.Add('CaptionTablet_ButtonPaymentMethods',CaptionTabletButtonPayments);
-        Captions.Add('LastSale_Total',CaptionLastSale_Total);
-        Captions.Add('LastSale_Paid',CaptionLastSale_Paid);
-        Captions.Add('LastSale_Change',CaptionLastSale_Change);
+        Captions.Add('Payment_PaymentInfo', CaptionPaymentInfo);
+        Captions.Add('Global_Cancel', CaptionGlobalCancel);
+        Captions.Add('Global_Close', CaptionGlobalClose);
+        Captions.Add('Global_Back', CaptionGlobalBack);
+        Captions.Add('Global_OK', CaptionGlobalOK);
+        Captions.Add('Global_Yes', CaptionGlobalYes);
+        Captions.Add('Global_No', CaptionGlobalNo);
+        Captions.Add('Global_Today', CaptionGlobalToday);
+        Captions.Add('Global_Tomorrow', CaptionGlobalTomorrow);
+        Captions.Add('Global_Yesterday', CaptionGlobalYesterday);
+        Captions.Add('CaptionBalancingRegisterTransactions', CaptionBalancingRegisterTransactions);
+        Captions.Add('CaptionBalancingRegisters', CaptionBalancingRegisters);
+        Captions.Add('CaptionBalancingReceipts', CaptionBalancingReceipts);
+        Captions.Add('CaptionBalancingBeginningBalance', CaptionBalancingBeginningBalance);
+        Captions.Add('CaptionBalancingCashMovements', CaptionBalancingCashMovements);
+        Captions.Add('CaptionBalancingMidTotal', CaptionBalancingMidTotal);
+        Captions.Add('CaptionBalancingManualCards', CaptionBalancingManualCards);
+        Captions.Add('CaptionBalancingTerminalCards', CaptionBalancingTerminalCards);
+        Captions.Add('CaptionBalancingOtherCreditCards', CaptionBalancingOtherCreditCards);
+        Captions.Add('CaptionBalancingTerminal', CaptionBalancingTerminal);
+        Captions.Add('CaptionBalancingGiftCards', CaptionBalancingGiftCards);
+        Captions.Add('CaptionBalancingCreditVouchers', CaptionBalancingCreditVouchers);
+        Captions.Add('CaptionBalancingCustomerOutPayments', CaptionBalancingCustomerOutPayments);
+        Captions.Add('CaptionBalancingDebitSales', CaptionBalancingDebitSales);
+        Captions.Add('CaptionBalancingStaffSales', CaptionBalancingStaffSales);
+        Captions.Add('CaptionBalancingNegativeReceiptAmount', CaptionBalancingNegativeReceiptAmount);
+        Captions.Add('CaptionBalancingForeignCurrency', CaptionBalancingForeignCurrency);
+        Captions.Add('CaptionBalancingReceiptStatistics', CaptionBalancingReceiptStatistics);
+        Captions.Add('CaptionBalancingNumberOfSales', CaptionBalancingNumberOfSales);
+        Captions.Add('CaptionBalancingCancelledSales', CaptionBalancingCancelledSales);
+        Captions.Add('CaptionBalancingNumberOfNegativeReceipts', CaptionBalancingNumberOfNegativeReceipts);
+        Captions.Add('CaptionBalancingTurnover', CaptionBalancingTurnover);
+        Captions.Add('CaptionBalancingCOGS', CaptionBalancingCOGS);
+        Captions.Add('CaptionBalancingContributionMargin', CaptionBalancingContributionMargin);
+        Captions.Add('CaptionBalancingDiscounts', CaptionBalancingDiscounts);
+        Captions.Add('CaptionBalancingCampaign', CaptionBalancingCampaign);
+        Captions.Add('CaptionBalancingMixed', CaptionBalancingMixed);
+        Captions.Add('CaptionBalancingQuantityDiscounts', CaptionBalancingQuantityDiscounts);
+        Captions.Add('CaptionBalancingSalespersonDiscounts', CaptionBalancingSalespersonDiscounts);
+        Captions.Add('CaptionBalancingBOMDiscounts', CaptionBalancingBOMDiscounts);
+        Captions.Add('CaptionBalancingCustomerDiscounts', CaptionBalancingCustomerDiscounts);
+        Captions.Add('CaptionBalancingOtherDiscounts', CaptionBalancingOtherDiscounts);
+        Captions.Add('CaptionBalancingTotalDiscounts', CaptionBalancingTotalDiscounts);
+        Captions.Add('CaptionBalancingOpenDrawer', CaptionBalancingOpenDrawer);
+        Captions.Add('CaptionBalancingAuditRoll', CaptionBalancingAuditRoll);
+        Captions.Add('CaptionBalancingCashCount', CaptionBalancingCashCount);
+        Captions.Add('CaptionBalancingCountedLCY', CaptionBalancingCountedLCY);
+        Captions.Add('CaptionBalancingDifferenceLCY', CaptionBalancingDifferenceLCY);
+        Captions.Add('CaptionBalancingNewCashAmount', CaptionBalancingNewCashAmount);
+        Captions.Add('CaptionBalancingPutInTheBank', CaptionBalancingPutInTheBank);
+        Captions.Add('CaptionBalancingMoneybagNo', CaptionBalancingMoneybagNo);
+        Captions.Add('CaptionBalancingAmount', CaptionBalancingAmount);
+        Captions.Add('CaptionBalancingNumber', CaptionBalancingNumber);
+        Captions.Add('CaptionBalancingRemainderTransferred', CaptionBalancingRemainderTransferred);
+        Captions.Add('CaptionBalancingDelete', CaptionBalancingDelete);
+        Captions.Add('CaptionBalancingClose', CaptionBalancingClose);
+        Captions.Add('CaptionBalancing1Turnover', CaptionBalancing1Turnover);
+        Captions.Add('CaptionBalancing2Counting', CaptionBalancing2Counting);
+        Captions.Add('CaptionBalancing3Close', CaptionBalancing3Close);
+        Captions.Add('CaptionDataGridSelected', CaptionDataGridSelected);
+        Captions.Add('Lookup_Search', CaptionLookupSearch);
+        Captions.Add('Lookup_Caption', CaptionLookup);
+        Captions.Add('Lookup_New', CaptionLookupNew);
+        Captions.Add('Lookup_Card', CaptionLookupShowCard);
+        Captions.Add('DialogCaption_Message', CaptionMessage);
+        Captions.Add('DialogCaption_Confirmation', CaptionConfirmation);
+        Captions.Add('DialogCaption_Error', CaptionError);
+        Captions.Add('DialogCaption_Numpad', CaptionNumpad);
+        Captions.Add('Locked_RegisterLocked', CaptionLockedRegisterLocked);
+        Captions.Add('CaptionTablet_ButtonItems', CaptionTabletButtonItems);
+        Captions.Add('CaptionTablet_ButtonMore', CaptionTabletButtonMore);
+        Captions.Add('CaptionTablet_ButtonPaymentMethods', CaptionTabletButtonPayments);
+        Captions.Add('LastSale_Total', CaptionLastSale_Total);
+        Captions.Add('LastSale_Paid', CaptionLastSale_Paid);
+        Captions.Add('LastSale_Change', CaptionLastSale_Change);
         //-NPR5.38 [303053]
-        Captions.Add('Payment_SaleLCY',CaptionPayment_SaleLCY);
-        Captions.Add('Payment_Paid',CaptionPayment_Paid);
-        Captions.Add('Payment_Balance',CaptionPayment_Balance);
+        Captions.Add('Payment_SaleLCY', CaptionPayment_SaleLCY);
+        Captions.Add('Payment_Paid', CaptionPayment_Paid);
+        Captions.Add('Payment_Balance', CaptionPayment_Balance);
         //+NPR5.38 [303053]
 
         RecRef.Open(DATABASE::"Sale Line POS");
         for i := 1 to RecRef.FieldCount do begin
-          FieldRef := RecRef.FieldIndex(i);
-          Captions.Add(StrSubstNo('Global_Record_%1_Field_%2',RecRef.Number,FieldRef.Number),FieldRef.Caption);
+            FieldRef := RecRef.FieldIndex(i);
+            Captions.Add(StrSubstNo('Global_Record_%1_Field_%2', RecRef.Number, FieldRef.Number), FieldRef.Caption);
         end;
     end;
 
-    procedure ConfigureReusableWorkflows(POSSession: Codeunit "POS Session";Setup: Codeunit "POS Setup")
+    procedure ConfigureReusableWorkflows(POSSession: Codeunit "POS Session"; Setup: Codeunit "POS Setup")
     var
         "Action": Record "POS Action" temporary;
         POSSetup: Record "POS Setup";
     begin
         //-NPR5.40 [306347]
         //Setup.Action_Item(Action);
-        Setup.Action_Item(Action,POSSession);
+        Setup.Action_Item(Action, POSSession);
         //+NPR5.40 [306347]
         //-NPR5.50 [338666]
         //ConfigureReusableWorkflow(Action,POSSession,STRSUBSTNO('%1, %2',POSSetup.TABLECAPTION,POSSetup.FIELDCAPTION("Item Insert Action Code")));
-        ConfigureReusableWorkflow(Action,POSSession,StrSubstNo('%1, %2',POSSetup.TableCaption,POSSetup.FieldCaption("Item Insert Action Code")),POSSetup.FieldNo("Item Insert Action Code"));
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Item Insert Action Code")), POSSetup.FieldNo("Item Insert Action Code"));
         //+NPR5.50 [338666]
 
         //-NPR5.40 [306347]
         //Setup.Action_Payment(Action);
-        Setup.Action_Payment(Action,POSSession);
+        Setup.Action_Payment(Action, POSSession);
         //+NPR5.40 [306347]
         //-NPR5.50 [338666]
         //ConfigureReusableWorkflow(Action,POSSession,STRSUBSTNO('%1, %2',POSSetup.TABLECAPTION,POSSetup.FIELDCAPTION("Payment Action Code")));
-        ConfigureReusableWorkflow(Action,POSSession,StrSubstNo('%1, %2',POSSetup.TableCaption,POSSetup.FieldCaption("Payment Action Code")),POSSetup.FieldNo("Payment Action Code"));
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Payment Action Code")), POSSetup.FieldNo("Payment Action Code"));
         //+NPR5.50 [338666]
 
         //-NPR5.40 [306347]
         //Setup.Action_Customer(Action);
-        Setup.Action_Customer(Action,POSSession);
+        Setup.Action_Customer(Action, POSSession);
         //+NPR5.40 [306347]
         //-NPR5.50 [338666]
         //ConfigureReusableWorkflow(Action,POSSession,STRSUBSTNO('%1, %2',POSSetup.TABLECAPTION,POSSetup.FIELDCAPTION("Customer Action Code")));
-        ConfigureReusableWorkflow(Action,POSSession,StrSubstNo('%1, %2',POSSetup.TableCaption,POSSetup.FieldCaption("Customer Action Code")),POSSetup.FieldNo("Customer Action Code"));
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Customer Action Code")), POSSetup.FieldNo("Customer Action Code"));
         //+NPR5.50 [338666]
 
         //-NPR5.37 [293905]
         //-NPR5.40 [306347]
         //Setup.Action_LockPOS(Action);
-        Setup.Action_LockPOS(Action,POSSession);
+        Setup.Action_LockPOS(Action, POSSession);
         //+NPR5.40 [306347]
         //-NPR5.50 [338666]
         //ConfigureReusableWorkflow(Action,POSSession,STRSUBSTNO('%1, %2',POSSetup.TABLECAPTION,POSSetup.FIELDCAPTION("Lock POS Action Code")));
-        ConfigureReusableWorkflow(Action,POSSession,StrSubstNo('%1, %2',POSSetup.TableCaption,POSSetup.FieldCaption("Lock POS Action Code")),POSSetup.FieldNo("Lock POS Action Code"));
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Lock POS Action Code")), POSSetup.FieldNo("Lock POS Action Code"));
         //+NPR5.50 [338666]
 
         //-NPR5.40 [306347]
         //Setup.Action_UnlockPOS(Action);
-        Setup.Action_UnlockPOS(Action,POSSession);
+        Setup.Action_UnlockPOS(Action, POSSession);
         //+NPR5.40 [306347]
         //-NPR5.50 [338666]
         //ConfigureReusableWorkflow(Action,POSSession,STRSUBSTNO('%1, %2',POSSetup.TABLECAPTION,POSSetup.FIELDCAPTION("Unlock POS Action Code")));
-        ConfigureReusableWorkflow(Action,POSSession,StrSubstNo('%1, %2',POSSetup.TableCaption,POSSetup.FieldCaption("Unlock POS Action Code")),POSSetup.FieldNo("Unlock POS Action Code"));
+        ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Unlock POS Action Code")), POSSetup.FieldNo("Unlock POS Action Code"));
         //+NPR5.50 [338666]
         //+NPR5.37 [293905]
     end;
 
-    procedure ConfigureReusableWorkflow("Action": Record "POS Action";POSSession: Codeunit "POS Session";Source: Text;FieldNumber: Integer)
+    procedure ConfigureReusableWorkflow("Action": Record "POS Action"; POSSession: Codeunit "POS Session"; Source: Text; FieldNumber: Integer)
     var
         Button: Record "POS Menu Button";
         WorkflowAction: DotNet npNetWorkflowAction;
         POSParameterValue: Record "POS Parameter Value" temporary;
     begin
         with Button do begin
-          "Action Type" := "Action Type"::Action;
-          "Action Code" := Action.Code;
-          //-NPR5.42 [314128]
-          //GetAction(WorkflowAction,POSSession,Source,POSParameterValue,POSActionParameter);
-          //-NPR5.50 [338666]
-          RetrieveReusableWorkflowParameters(FieldNumber,POSParameterValue);
-          //+NPR5.50 [338666]
-          GetAction(WorkflowAction,POSSession,Source,POSParameterValue);
-          //-NPR5.50 [338666]
-          POSParameterValue.Reset();
-          //+NPR5.50 [338666]
-          //+NPR5.42 [314128]
-          FrontEnd.ConfigureReusableWorkflow(WorkflowAction);
+            "Action Type" := "Action Type"::Action;
+            "Action Code" := Action.Code;
+            //-NPR5.42 [314128]
+            //GetAction(WorkflowAction,POSSession,Source,POSParameterValue,POSActionParameter);
+            //-NPR5.50 [338666]
+            RetrieveReusableWorkflowParameters(FieldNumber, POSParameterValue);
+            //+NPR5.50 [338666]
+            GetAction(WorkflowAction, POSSession, Source, POSParameterValue);
+            //-NPR5.50 [338666]
+            POSParameterValue.Reset();
+            //+NPR5.50 [338666]
+            //+NPR5.42 [314128]
+            FrontEnd.ConfigureReusableWorkflow(WorkflowAction);
         end;
     end;
 
@@ -783,16 +788,16 @@ codeunit 6150702 "POS UI Management"
     begin
         Options := Request.GetDictionary();
 
-        Options.Add('itemWorkflow',Setup.ActionCode_Item);
-        Options.Add('paymentWorkflow',Setup.ActionCode_Payment);
-        Options.Add('customerWorkflow',Setup.ActionCode_Customer);
+        Options.Add('itemWorkflow', Setup.ActionCode_Item);
+        Options.Add('paymentWorkflow', Setup.ActionCode_Payment);
+        Options.Add('customerWorkflow', Setup.ActionCode_Customer);
         //-NPR5.37 [293905]
-        Options.Add('lockWorkflow',Setup.ActionCode_LockPOS);
-        Options.Add('unlockWorkflow',Setup.ActionCode_UnlockPOS);
-        Options.Add('autoLockTimeout',Setup.GetLockTimeout());
+        Options.Add('lockWorkflow', Setup.ActionCode_LockPOS);
+        Options.Add('unlockWorkflow', Setup.ActionCode_UnlockPOS);
+        Options.Add('autoLockTimeout', Setup.GetLockTimeout());
         //+NPR5.37 [293905]
         //-NPR5.45 [323728]
-        Options.Add('kioskUnlockEnabled',Setup.GetKioskUnlockEnabled());
+        Options.Add('kioskUnlockEnabled', Setup.GetKioskUnlockEnabled());
         //+NPR5.45 [323728]
         //-NPR5.51 [361184]
         Options.Add('nprVersion',GetNPRVersion());
@@ -800,11 +805,11 @@ codeunit 6150702 "POS UI Management"
         FrontEnd.SetOptions(Options);
     end;
 
-    procedure AddActionCaption(Captions: DotNet npNetDictionary_Of_T_U;ActionCode: Text;CaptionId: Text;CaptionText: Text)
+    procedure AddActionCaption(Captions: DotNet npNetDictionary_Of_T_U; ActionCode: Text; CaptionId: Text; CaptionText: Text)
     begin
-        if (Captions.ContainsKey (ActionCode + '.' + CaptionId)) then
-          exit;
-        Captions.Add(ActionCode + '.' + CaptionId,CaptionText);
+        if (Captions.ContainsKey(ActionCode + '.' + CaptionId)) then
+            exit;
+        Captions.Add(ActionCode + '.' + CaptionId, CaptionText);
     end;
 
     [IntegrationEvent(false, false)]
@@ -818,11 +823,11 @@ codeunit 6150702 "POS UI Management"
     begin
 
         //-NPR5.37 [292323]
-        if (GeneralLedgerSetup.Get ()) then
-          if (GeneralLedgerSetup."LCY Code" <> '') then
-            exit (StrSubstNo ('(%1)',GeneralLedgerSetup."LCY Code"));
+        if (GeneralLedgerSetup.Get()) then
+            if (GeneralLedgerSetup."LCY Code" <> '') then
+                exit(StrSubstNo('(%1)', GeneralLedgerSetup."LCY Code"));
 
-        exit ('');
+        exit('');
         //+NPR5.37 [292323]
     end;
 
@@ -841,14 +846,14 @@ codeunit 6150702 "POS UI Management"
 
         POSParameterValue.SetRange("Table No.", DATABASE::"POS Menu Button");
         if POSParameterValue.FindSet then
-          repeat
-            tmpPOSParameterValue := POSParameterValue;
-            tmpPOSParameterValue.Insert;
-          until POSParameterValue.Next = 0;
+            repeat
+                tmpPOSParameterValue := POSParameterValue;
+                tmpPOSParameterValue.Insert;
+            until POSParameterValue.Next = 0;
         //+NPR5.40 [307453]
     end;
 
-    local procedure RetrieveReusableWorkflowParameters(FieldNumber: Integer;var TmpPOSParameterValue: Record "POS Parameter Value" temporary)
+    local procedure RetrieveReusableWorkflowParameters(FieldNumber: Integer; var TmpPOSParameterValue: Record "POS Parameter Value" temporary)
     var
         POSParameterValue: Record "POS Parameter Value";
         POSSetup: Record "POS Setup";
@@ -859,15 +864,15 @@ codeunit 6150702 "POS UI Management"
 
         //-NPR5.50 [338666]
         POSParameterValue.SetRange("Table No.", DATABASE::"POS Setup");
-        POSParameterValue.SetRange(ID,FieldNumber);
+        POSParameterValue.SetRange(ID, FieldNumber);
         //-NPR5.51 [359825]
         POSParameterValue.SetRange("Record ID", POSSetup.RecordId);
         //+NPR5.51 [359825]
         if POSParameterValue.FindSet then
-          repeat
-            TmpPOSParameterValue := POSParameterValue;
-            TmpPOSParameterValue.Insert;
-          until POSParameterValue.Next = 0;
+            repeat
+                TmpPOSParameterValue := POSParameterValue;
+                TmpPOSParameterValue.Insert;
+            until POSParameterValue.Next = 0;
         TmpPOSParameterValue.SetParamFilterIndicator();
         //+NPR5.50 [338666]
     end;

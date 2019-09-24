@@ -1,7 +1,7 @@
 report 6014423 "Rent Overview"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Rent Overview.rdlc';
+    RDLCLayout = './layouts/Rent Overview.rdlc';
     Caption = 'Rent Overview';
 
     dataset

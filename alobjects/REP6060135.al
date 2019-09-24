@@ -2,7 +2,7 @@ report 6060135 "MM Member Card Owner"
 {
     // MM1.25/NPKNAV/20180122  CASE 299537 Transport MM1.25 - 22 January 2018
     DefaultLayout = RDLC;
-    RDLCLayout = './MM Member Card Owner.rdlc';
+    RDLCLayout = './layouts/MM Member Card Owner.rdlc';
 
     Caption = 'Member Card Owner';
     ShowPrintStatus = false;

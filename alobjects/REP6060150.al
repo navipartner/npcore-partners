@@ -20,7 +20,7 @@ report 6060150 "Event Customer Template"
     // NPR5.48/TJ  /20181217 CASE 310426 Using new field Comments for Customer
     // NPR5.51/TJ  /20190611 CASE 357701 Field Picture_Job removed from dataset
     DefaultLayout = RDLC;
-    RDLCLayout = './Event Customer Template.rdlc';
+    RDLCLayout = './layouts/Event Customer Template.rdlc';
 
     Caption = 'Event Customer Template';
 

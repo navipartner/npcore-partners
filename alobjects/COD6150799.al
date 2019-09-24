@@ -23,30 +23,29 @@ codeunit 6150799 "POS Action - Credit Gift Vouch"
 
     local procedure ActionCode(): Text
     begin
-        exit ('CREDIT_GIFTVOUCHER');
+        exit('CREDIT_GIFTVOUCHER');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do begin
-          if DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple) then
-          begin
-            RegisterWorkflowStep('amount','numpad(labels.amount_title, labels.amount,context.voucher_amount).cancel(abort);');
-            RegisterWorkflowStep('process_sale','respond();');
-            RegisterWorkflow(true);
+            if DiscoverAction(
+              ActionCode(),
+              ActionDescription,
+              ActionVersion(),
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple) then begin
+                RegisterWorkflowStep('amount', 'numpad(labels.amount_title, labels.amount,context.voucher_amount).cancel(abort);');
+                RegisterWorkflowStep('process_sale', 'respond();');
+                RegisterWorkflow(true);
 
-          end;
+            end;
         end;
     end;
 
@@ -55,28 +54,29 @@ codeunit 6150799 "POS Action - Credit Gift Vouch"
     var
         UI: Codeunit "POS UI Management";
     begin
-        Captions.AddActionCaption (ActionCode(), 'amount', TextAmount);
-        Captions.AddActionCaption (ActionCode(), 'amount_title', TextAmountTitle);
+        Captions.AddActionCaption(ActionCode(), 'amount', TextAmount);
+        Captions.AddActionCaption(ActionCode(), 'amount_title', TextAmountTitle);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     begin
 
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        POSSession.GetSetup (Setup);
+        POSSession.GetSetup(Setup);
 
         case WorkflowStep of
-          'process_sale': OnProcessSale(POSSession,FrontEnd,Context);
+            'process_sale':
+                OnProcessSale(POSSession, FrontEnd, Context);
         end;
 
         Handled := true;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action"; Parameters: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
         POSPaymentLine: Codeunit "POS Payment Line";
@@ -89,26 +89,26 @@ codeunit 6150799 "POS Action - Credit Gift Vouch"
     begin
 
         if not Action.IsThisAction(ActionCode()) then
-          exit;
+            exit;
 
-        RetailSetup.Get ();
-        POSSession.GetSetup (Setup);
-        Register.Get (Setup.Register());
-        ValidateSetupBeforeWorkflow (Register);
+        RetailSetup.Get();
+        POSSession.GetSetup(Setup);
+        Register.Get(Setup.Register());
+        ValidateSetupBeforeWorkflow(Register);
 
         POSSession.GetPaymentLine(POSPaymentLine);
-        POSPaymentLine.CalculateBalance (SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+        POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
         if (SubTotal >= 0) then
-          SubTotal := 0;
+            SubTotal := 0;
 
-        Context.SetContext ('voucher_amount', Abs(SubTotal));
+        Context.SetContext('voucher_amount', Abs(SubTotal));
 
-        FrontEnd.SetActionContext (ActionCode(), Context);
+        FrontEnd.SetActionContext(ActionCode(), Context);
         Handled := true;
     end;
 
-    local procedure OnProcessSale(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: DotNet npNetJObject)
+    local procedure OnProcessSale(POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: JsonObject)
     var
         JSON: Codeunit "POS JSON Management";
         POSPaymentLine: Codeunit "POS Payment Line";
@@ -134,28 +134,28 @@ codeunit 6150799 "POS Action - Credit Gift Vouch"
 
         POSSession.GetPaymentLine(POSPaymentLine);
         POSSession.GetSaleLine(POSSaleLine);
-        POSSession.GetSale (POSSale);
-        Register.Get (Setup.Register());
+        POSSession.GetSale(POSSale);
+        Register.Get(Setup.Register());
 
-        JSON.InitializeJObjectParser (Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
 
-        POSPaymentLine.CalculateBalance (SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+        POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
         if (SubTotal >= 0) then
-          Error (InvalidAmount);
+            Error(InvalidAmount);
 
-        UnitAmount := GetAmount (Context, FrontEnd);
+        UnitAmount := GetAmount(Context, FrontEnd);
 
-        POSSaleLine.GetNewSaleLine (SaleLine);
-        SetVoucherSaleInfo (SaleLine, Register, Abs(UnitAmount));
-        SaleLine.Insert ();
+        POSSaleLine.GetNewSaleLine(SaleLine);
+        SetVoucherSaleInfo(SaleLine, Register, Abs(UnitAmount));
+        SaleLine.Insert();
 
-        CardActivated := CreateGiftVoucher (SaleLine);
+        CardActivated := CreateGiftVoucher(SaleLine);
 
         if (CardActivated) then begin
-          SaleLine.Modify ();
+            SaleLine.Modify();
         end else begin
-          SaleLine.Delete ();
+            SaleLine.Delete();
         end;
 
         //-NPR5.35 [288575]
@@ -163,7 +163,7 @@ codeunit 6150799 "POS Action - Credit Gift Vouch"
         //  POSSession.RequestRefreshData();
 
         POSSession.RequestRefreshData();
-        POSSale.TryEndSale (POSSession)
+        POSSale.TryEndSale(POSSession)
         //+NPR5.35 [288575]
     end;
 
@@ -171,29 +171,29 @@ codeunit 6150799 "POS Action - Credit Gift Vouch"
     begin
     end;
 
-    local procedure GetAmount(Context: DotNet npNetJObject;FrontEnd: Codeunit "POS Front End Management"): Decimal
+    local procedure GetAmount(Context: JsonObject; FrontEnd: Codeunit "POS Front End Management"): Decimal
     var
         JSON: Codeunit "POS JSON Management";
     begin
 
-        JSON.InitializeJObjectParser (Context,FrontEnd);
-        JSON.SetScope ('$amount', true);
-        exit (JSON.GetDecimal ('numpad', true));
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        JSON.SetScope('$amount', true);
+        exit(JSON.GetDecimal('numpad', true));
     end;
 
-    local procedure SetVoucherSaleInfo(var SaleLine: Record "Sale Line POS";Register: Record Register;pAmount: Decimal)
+    local procedure SetVoucherSaleInfo(var SaleLine: Record "Sale Line POS"; Register: Record Register; pAmount: Decimal)
     begin
 
         with SaleLine do begin
-          Type := SaleLine.Type::"G/L Entry";
-          "Sale Type" := "Sale Type"::Deposit;
-          "Register No." := Register."Register No.";
-          Validate ("No.", Register."Credit Voucher Account");
-          "Location Code" := Register."Location Code";
-          "Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-          "Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
-          Quantity := 1;
-          Amount := pAmount;
+            Type := SaleLine.Type::"G/L Entry";
+            "Sale Type" := "Sale Type"::Deposit;
+            "Register No." := Register."Register No.";
+            Validate("No.", Register."Credit Voucher Account");
+            "Location Code" := Register."Location Code";
+            "Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
+            "Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+            Quantity := 1;
+            Amount := pAmount;
 
         end;
     end;
@@ -206,18 +206,18 @@ codeunit 6150799 "POS Action - Credit Gift Vouch"
         CreditVoucher: Record "Credit Voucher";
     begin
 
-        PaymentLinePOS.SetTableView (SaleLine."Register No.", SaleLine."Sales Ticket No.");
-        PaymentLinePOS.GETPOSITION ();
+        PaymentLinePOS.SetTableView(SaleLine."Register No.", SaleLine."Sales Ticket No.");
+        PaymentLinePOS.GETPOSITION();
         Activated := PaymentLinePOS.CreateGiftVoucher(SaleLine, SaleLine.Amount);
 
         if (Activated) then
-          SaleLine.Description := CopyStr (StrSubstNo ('%1 %2 %3', CreditVoucher.TableCaption, CreditVoucher.FieldCaption("No."), SaleLine."Credit voucher ref."), 1, MaxStrLen(SaleLine.Description));
+            SaleLine.Description := CopyStr(StrSubstNo('%1 %2 %3', CreditVoucher.TableCaption, CreditVoucher.FieldCaption("No."), SaleLine."Credit voucher ref."), 1, MaxStrLen(SaleLine.Description));
 
         //-NPR5.48 [345327]
-        SaleLine.UpdateAmounts (SaleLine);
+        SaleLine.UpdateAmounts(SaleLine);
         //+NPR5.48 [345327]
 
-        exit (Activated);
+        exit(Activated);
     end;
 
     local procedure "--Validations"()
@@ -226,16 +226,16 @@ codeunit 6150799 "POS Action - Credit Gift Vouch"
 
     local procedure ValidateSetupBeforeWorkflow(Register: Record Register)
     begin
-        Register.TestField (Account);
-        Register.TestField ("Gift Voucher Account");
-        Register.TestField ("Credit Voucher Account");
-        Register.TestField ("Gift Voucher Discount Account");
+        Register.TestField(Account);
+        Register.TestField("Gift Voucher Account");
+        Register.TestField("Credit Voucher Account");
+        Register.TestField("Gift Voucher Discount Account");
 
         if (Register."Gift Voucher Account" = Register."Credit Voucher Account") then
-          Error (MustNotBeEqual, Register.TableCaption, Register."Gift Voucher Account", Register, Register."Credit Voucher Account");
+            Error(MustNotBeEqual, Register.TableCaption, Register."Gift Voucher Account", Register, Register."Credit Voucher Account");
 
         if (Register."Gift Voucher Account" = Register.Account) then
-          Error (MustNotBeEqual, Register, Register."Gift Voucher Account", Register, Register.Account);
+            Error(MustNotBeEqual, Register, Register."Gift Voucher Account", Register, Register.Account);
     end;
 }
 

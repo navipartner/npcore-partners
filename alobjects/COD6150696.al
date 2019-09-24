@@ -13,7 +13,11 @@ codeunit 6150696 "Managed Dependency Upgrade"
     begin
     end;
 
-    [UpgradePerDatabase]
+    trigger OnUpgradePerDatabase()
+    begin
+      Deploy();
+    end;
+
     procedure Deploy()
     var
         ManagedDependencyMgt: Codeunit "Managed Dependency Mgt.";

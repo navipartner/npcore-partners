@@ -1,3 +1,4 @@
+// TODO: CTRLUPGRADE - uses old Standard code; must be removed or refactored
 page 6014526 "Touch Screen - Customers"
 {
     // NPR4.10/VB/20150602 CASE 213003 Support for Web Client (JavaScript) client
@@ -24,25 +25,25 @@ page 6014526 "Touch Screen - Customers"
             repeater(Control6150621)
             {
                 ShowCaption = false;
-                field(Name;Name)
+                field(Name; Name)
                 {
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
                 }
-                field(Address;Address)
+                field(Address; Address)
                 {
                 }
-                field("Address 2";"Address 2")
+                field("Address 2"; "Address 2")
                 {
                 }
-                field(City;City)
+                field(City; City)
                 {
                 }
-                field("Phone No.";"Phone No.")
+                field("Phone No."; "Phone No.")
                 {
                 }
-                field(Balance;Balance)
+                field(Balance; Balance)
                 {
                 }
             }
@@ -62,28 +63,23 @@ page 6014526 "Touch Screen - Customers"
 
                 trigger OnAction()
                 var
-                    POSEventMarshaller: Codeunit "POS Event Marshaller";
+                    // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
+                    //POSEventMarshaller: Codeunit "POS Event Marshaller";
                     NewPhoneNo: Text;
                     Customer: Record Customer;
                 begin
-                    //-NPR5.26 [248133]
-                    //IF (NOT Marshaller.NumPadText(Text00001,newPhoneNo,FALSE,FALSE)) OR (newPhoneNo = '') THEN
-                    if (not POSEventMarshaller.NumPadText(Text00001,NewPhoneNo,false,false)) then
-                    //+NPR5.26 [248133]
-                      exit;
-                    //-NPR5.26 [248133]
-                    //INIT;
-                    //VALIDATE("No.", newPhoneNo);
-                    //INSERT(TRUE);
+                    // TODO: CTRLUPGRADE - must not use Marshaller
+                    Error('CTRLUPGRADE');
+                    /*
+                    if (not POSEventMarshaller.NumPadText(Text00001, NewPhoneNo, false, false)) then
+                        exit;
+                    */
                     Customer.Init;
                     if NewPhoneNo <> '' then
-                      Customer.Validate("No.",NewPhoneNo);
+                        Customer.Validate("No.", NewPhoneNo);
                     Customer.Insert(true);
-                    //+NPR5.26 [248133]
                     Commit;
-                    //-NPR5.26 [248133]
                     Get(Customer."No.");
-                    //+NPR5.26 [248133]
                     PushCard;
                 end;
             }
@@ -112,35 +108,36 @@ page 6014526 "Touch Screen - Customers"
         //CurrForm.SETSELECTIONFILTER(FinKto);
         GLAccCount := GLAccount.Count;
         if GLAccCount > 0 then begin
-          GLAccount.Find('-');
-          while GLAccCount > 0 do begin
-            GLAccCount := GLAccCount - 1;
-            GLAccount.MarkedOnly(false);
-            FirstAccNo := GLAccount."No.";
-            LastAccNo := FirstAccNo;
-            More := (GLAccCount > 0);
-            while More do
-              if GLAccount.Next = 0 then
-                More := false
-              else if not GLAccount.Mark then
-                More := false
-              else begin
-                LastAccNo := GLAccount."No.";
+            GLAccount.Find('-');
+            while GLAccCount > 0 do begin
                 GLAccCount := GLAccCount - 1;
-                if GLAccCount = 0 then
-                  More := false;
-              end;
-            if SelectionFilter <> '' then
-              SelectionFilter := SelectionFilter + '|';
-            if FirstAccNo = LastAccNo then
-              SelectionFilter := SelectionFilter + FirstAccNo
-            else
-              SelectionFilter := SelectionFilter + FirstAccNo + '..' + LastAccNo;
-            if GLAccCount > 0 then begin
-              GLAccount.MarkedOnly(true);
-              GLAccount.Next;
+                GLAccount.MarkedOnly(false);
+                FirstAccNo := GLAccount."No.";
+                LastAccNo := FirstAccNo;
+                More := (GLAccCount > 0);
+                while More do
+                    if GLAccount.Next = 0 then
+                        More := false
+                    else
+                        if not GLAccount.Mark then
+                            More := false
+                        else begin
+                            LastAccNo := GLAccount."No.";
+                            GLAccCount := GLAccCount - 1;
+                            if GLAccCount = 0 then
+                                More := false;
+                        end;
+                if SelectionFilter <> '' then
+                    SelectionFilter := SelectionFilter + '|';
+                if FirstAccNo = LastAccNo then
+                    SelectionFilter := SelectionFilter + FirstAccNo
+                else
+                    SelectionFilter := SelectionFilter + FirstAccNo + '..' + LastAccNo;
+                if GLAccCount > 0 then begin
+                    GLAccount.MarkedOnly(true);
+                    GLAccount.Next;
+                end;
             end;
-          end;
         end;
         exit(SelectionFilter);
     end;
@@ -169,56 +166,13 @@ page 6014526 "Touch Screen - Customers"
         CustomerCard.SetRecord(Rec);
         // formCard.LOOKUPMODE := TRUE;
         if CustomerCard.RunModal = ACTION::OK then begin
-          CustomerCard.GetRecord(Rec);
-          //CurrForm.UPDATE(FALSE);
-          LookUpOk := true;
-          //CurrForm.CLOSE;
+            CustomerCard.GetRecord(Rec);
+            //CurrForm.UPDATE(FALSE);
+            LookUpOk := true;
+            //CurrForm.CLOSE;
         end;
         CustomerCard.GetRecord(Rec);
         //CurrForm.UPDATE(FALSE);
-    end;
-
-    procedure SearchFor()
-    var
-        SearchBoxResult: Text[30];
-        SearchBoxResultFilter: Text[250];
-        POSEventMarshaller: Codeunit "POS Event Marshaller";
-        Txt001: Label 'Searching "Search Name" is limited to maximum 30 chars';
-        Txt002: Label 'Search form';
-        Txt003: Label 'Searching "No." is limited to maximum 20 chars';
-    begin
-        //Searchfor
-
-        case SearchType of
-          SearchType::Name:
-            begin
-              SearchBoxResult := CopyStr(POSEventMarshaller.SearchBox(Txt002,Txt001,MaxStrLen(SearchBoxResult)),1,30);
-              if SearchBoxResult <> '<CANCEL>' then begin
-                SetCurrentKey("Search Name");
-                SearchBoxResultFilter := '*@'+ SearchBoxResult + '*';
-                SetFilter("Search Name",'%1',SearchBoxResultFilter);
-                if Count = 0 then
-                  SetRange("Search Name");
-              end else begin
-                SetRange("Search Name");
-              end;
-            end;
-          SearchType::Number:
-            begin
-              if POSEventMarshaller.NumPadText(Txt003,SearchBoxResult,false,false) then begin
-                SetCurrentKey("Primary Key Length");
-                SetRange("No.",SearchBoxResult);
-                if Count = 0 then
-                  SetRange("No.");
-              end else
-                SetRange("No.");
-            end;
-        end;
-    end;
-
-    procedure GetLookUpOk(): Boolean
-    begin
-        exit(LookUpOk);
     end;
 
     procedure GetViewText(): Text
@@ -228,4 +182,3 @@ page 6014526 "Touch Screen - Customers"
         //+NPR5.30 [252646]
     end;
 }
-

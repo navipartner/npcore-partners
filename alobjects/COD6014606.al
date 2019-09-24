@@ -11,7 +11,6 @@ codeunit 6014606 "Dimension Lookup"
     end;
 
     var
-        Marshaller: Codeunit "POS Event Marshaller";
         Text001: Label 'There are no dimension values defined for %1 %2.';
         Text002: Label '%1 %2 does not exist. Please define it first.';
 
@@ -25,39 +24,39 @@ codeunit 6014606 "Dimension Lookup"
         OldDimSetID: Integer;
     begin
         if not Dim.Get(Sale.Parameters) then
-          Marshaller.DisplayError('',StrSubstNo(Text002,Dim.TableCaption,Sale.Parameters),true);
+            Error(Text002, Dim.TableCaption, Sale.Parameters);
 
-        DimVal.SetRange("Dimension Code",Dim.Code);
+        DimVal.SetRange("Dimension Code", Dim.Code);
         if DimVal.IsEmpty then
-          Marshaller.DisplayError('',StrSubstNo(Text001,Dim.TableCaption,Dim.Code),true);
+            Error(Text001, Dim.TableCaption, Dim.Code);
 
-        DimMgt.GetDimensionSet(DimSetEntryTmp,Sale."Dimension Set ID");
-        DimSetEntryTmp.SetRange("Dimension Code",Dim.Code);
+        DimMgt.GetDimensionSet(DimSetEntryTmp, Sale."Dimension Set ID");
+        DimSetEntryTmp.SetRange("Dimension Code", Dim.Code);
         if DimSetEntryTmp.FindFirst then begin
-          DimVal."Dimension Code" := Dim.Code;
-          DimVal.Code := DimSetEntryTmp."Dimension Value Code";
-          DimVal.Find();
+            DimVal."Dimension Code" := Dim.Code;
+            DimVal.Code := DimSetEntryTmp."Dimension Value Code";
+            DimVal.Find();
         end;
 
         DimValues.SetRecord(DimVal);
         DimValues.SetTableView(DimVal);
         DimValues.LookupMode := true;
         if DimValues.RunModal = ACTION::LookupOK then begin
-          DimValues.GetRecord(DimVal);
-          DimSetEntryTmp."Dimension Code" := Dim.Code;
-          DimSetEntryTmp."Dimension Value Code" := DimVal.Code;
-          DimSetEntryTmp."Dimension Value ID" := DimVal."Dimension Value ID";
-          if not DimSetEntryTmp.Insert() then
-            DimSetEntryTmp.Modify();
+            DimValues.GetRecord(DimVal);
+            DimSetEntryTmp."Dimension Code" := Dim.Code;
+            DimSetEntryTmp."Dimension Value Code" := DimVal.Code;
+            DimSetEntryTmp."Dimension Value ID" := DimVal."Dimension Value ID";
+            if not DimSetEntryTmp.Insert() then
+                DimSetEntryTmp.Modify();
 
-          OldDimSetID := Sale."Dimension Set ID";
-          Sale."Dimension Set ID" := DimSetEntryTmp.GetDimensionSetID(DimSetEntryTmp);
-          Sale.Modify();
+            OldDimSetID := Sale."Dimension Set ID";
+            Sale."Dimension Set ID" := DimSetEntryTmp.GetDimensionSetID(DimSetEntryTmp);
+            Sale.Modify();
 
-          if (OldDimSetID <> Sale."Dimension Set ID") and Sale.SalesLinesExist then
-            Sale.UpdateAllLineDim(Sale."Dimension Set ID",OldDimSetID);
+            if (OldDimSetID <> Sale."Dimension Set ID") and Sale.SalesLinesExist then
+                Sale.UpdateAllLineDim(Sale."Dimension Set ID", OldDimSetID);
 
-          Commit();
+            Commit();
         end;
     end;
 }

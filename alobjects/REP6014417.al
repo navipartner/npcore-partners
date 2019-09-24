@@ -14,7 +14,7 @@ report 6014417 "Inventory per Date"
     // NPR5.40/TJ  /20180319  CASE 307717 Replaced hardcoded dates with DMY2DATE structure
     // NPR5.51/ANPA/20190712  CASE 361236 The headlines have been changed so that they carry on to the next page
     DefaultLayout = RDLC;
-    RDLCLayout = './Inventory per Date.rdlc';
+    RDLCLayout = './layouts/Inventory per Date.rdlc';
 
     Caption = 'Inventory per Date';
     UsageCategory = ReportsAndAnalysis;

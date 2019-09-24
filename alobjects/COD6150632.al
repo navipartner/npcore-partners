@@ -6,14 +6,13 @@ codeunit 6150632 "JavaScript Bridge Management"
     end;
 
     var
-        [RunOnClient]
-        Bridge: DotNet npNetIBridge;
+        Bridge: ControlAddIn Bridge;
         Initialized: Boolean;
         Text_BridgeNotInitialzied: Label 'JavaScript Bridge has not been initialized. Please, make sure to call Initialize before invoking individual Bridge functions.';
         Text_RequestedDependencyScriptNotFound: Label 'Requested dependency script %1 is not available in your instance of Microsoft Dynamics NAV. It must be deployed in Web Client Dependencies before you can use this module.';
         AdHocModuleId: Integer;
 
-    procedure Initialize(BridgeIn: DotNet npNetIFramework0)
+    procedure Initialize(BridgeIn: ControlAddIn Bridge)
     begin
         Bridge := BridgeIn;
         Initialized := true;
@@ -124,13 +123,9 @@ codeunit 6150632 "JavaScript Bridge Management"
         InvokeFrontEndAsync(RegisterModuleRequest);
     end;
 
-    local procedure "--- Internal, local methods ---"()
-    begin
-    end;
-
     local procedure MakeSureBridgeIsInitialized()
     begin
-        if IsNull(Bridge) or (not Initialized) then
+        if not Initialized then
             Error(Text_BridgeNotInitialzied);
     end;
 
@@ -141,9 +136,66 @@ codeunit 6150632 "JavaScript Bridge Management"
     end;
 
     local procedure InvokeFrontEndAsync(Request: DotNet npNetDictionary_Of_T_U)
+    var
+        JsonRequest: JsonObject;
+        DictKey: Text;
+        DictVar: Variant;
+        DictText: Text;
+        DictInteger: Integer;
+        DictDecimal: Decimal;
+        DictBigInteger: BigInteger;
+        DictGuid: Guid;
+        DictBoolean: Boolean;
+        DictDate: Date;
+        DictDateTime: DateTime;
     begin
         MakeSureBridgeIsInitialized();
-        Bridge.InvokeFrontEndAsync(Request);
+        foreach DictKey in Request.Keys do begin
+            DictVar := Request.Item(DictKey);
+            case true of
+                DictVar.IsText:
+                    begin
+                        DictText := DictVar;
+                        JsonRequest.Add(DictKey, DictText);
+                    end;
+                DictVar.IsInteger:
+                    begin
+                        DictInteger := DictVar;
+                        JsonRequest.Add(DictKey, DictInteger);
+                    end;
+                DictVar.IsBigInteger:
+                    begin
+                        DictBigInteger := DictVar;
+                        JsonRequest.Add(DictKey, DictBigInteger);
+                    end;
+                DictVar.IsDecimal:
+                    begin
+                        DictDecimal := DictVar;
+                        JsonRequest.Add(DictKey, DictDecimal);
+                    end;
+                DictVar.IsGuid:
+                    begin
+                        DictGuid := DictVar;
+                        JsonRequest.Add(DictKey, DictGuid);
+                    end;
+                DictVar.IsBoolean:
+                    begin
+                        DictBoolean := DictVar;
+                        JsonRequest.Add(DictKey, DictBoolean);
+                    end;
+                DictVar.IsDate:
+                    begin
+                        DictDate := DictVar;
+                        JsonRequest.Add(DictKey, DictDate);
+                    end;
+                DictVar.IsDateTime:
+                    begin
+                        DictDateTime := DictVar;
+                        JsonRequest.Add(DictKey, DictDateTime);
+                    end;
+            end;
+        end;
+        Bridge.InvokeFrontEndAsync(JsonRequest);
     end;
 }
 

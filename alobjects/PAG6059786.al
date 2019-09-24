@@ -63,7 +63,7 @@ page 6059786 "TM Ticket Access Entry List"
                 Promoted = true;
                 PromotedCategory = Process;
                 RunObject = Page "TM Det. Ticket Access Entry";
-                RunPageLink = "Ticket Access Entry No."=FIELD("Entry No.");
+                //RunPageLink = "Ticket Access Entry No."=FIELD("Entry No.");
             }
         }
         area(processing)

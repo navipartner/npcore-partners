@@ -64,7 +64,7 @@ page 6014659 "Web Client Dependencies"
                 var
                     ManagedDepMgt: Codeunit "Managed Dependency Mgt.";
                     Rec2: Record "Web Client Dependency";
-                    JArray: DotNet npNetJArray;
+                    JArray: DotNet JArray;
                 begin
                     CurrPage.SetSelectionFilter(Rec2);
                     //-NPR5.32.10 [265454]

@@ -13,12 +13,12 @@ codeunit 6150851 "POS Action - Bin Transfer"
 
     local procedure ActionCode(): Text
     begin
-        exit ('BIN_TRANSFER');
+        exit('BIN_TRANSFER');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -32,12 +32,12 @@ codeunit 6150851 "POS Action - Bin Transfer"
           Sender."Subscriber Instances Allowed"::Multiple)
         then begin
 
-          Sender.RegisterWorkflowStep ('SELECTBIN', 'respond();');
-          Sender.RegisterWorkflowStep ('TRANSFER', 'respond();');
+            Sender.RegisterWorkflowStep('SELECTBIN', 'respond();');
+            Sender.RegisterWorkflowStep('TRANSFER', 'respond();');
 
-          Sender.RegisterOptionParameter ('SourceBinSelection', 'PosUnitDefaultBin,UserSelection,FixedParameter', 'PosUnitDefaultBin');
-          Sender.RegisterTextParameter ('SourceBin', '');
-          Sender.RegisterWorkflow (false);
+            Sender.RegisterOptionParameter('SourceBinSelection', 'PosUnitDefaultBin,UserSelection,FixedParameter', 'PosUnitDefaultBin');
+            Sender.RegisterTextParameter('SourceBin', '');
+            Sender.RegisterWorkflow(false);
 
         end;
     end;
@@ -48,19 +48,21 @@ codeunit 6150851 "POS Action - Bin Transfer"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     begin
         if not Action.IsThisAction(ActionCode()) then
-          exit;
+            exit;
 
         Handled := true;
         case WorkflowStep of
-          'SELECTBIN': SelectSourceBin (Context, POSSession, FrontEnd);
-          'TRANSFER' : TransferContentsToBin (Context, POSSession, FrontEnd);
+            'SELECTBIN':
+                SelectSourceBin(Context, POSSession, FrontEnd);
+            'TRANSFER':
+                TransferContentsToBin(Context, POSSession, FrontEnd);
         end;
     end;
 
-    procedure TransferContentsToBin(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    procedure TransferContentsToBin(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         CheckpointEntryNo: Integer;
@@ -79,85 +81,87 @@ codeunit 6150851 "POS Action - Bin Transfer"
         EntryNo: Integer;
     begin
 
-        JSON.InitializeJObjectParser (Context, FrontEnd);
-        FromBinNo := JSON.GetString ('FROM_BIN', true);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        FromBinNo := JSON.GetString('FROM_BIN', true);
 
         //-NPR5.43 [310815]
-        CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry (FromBinNo);
+        CheckpointEntryNo := POSWorkshiftCheckpoint.CreateEndWorkshiftCheckpoint_POSEntry(FromBinNo);
 
         //-NPR5.43 [311964]
-        WorkshiftCheckpoint.Get (CheckpointEntryNo);
+        WorkshiftCheckpoint.Get(CheckpointEntryNo);
         WorkshiftCheckpoint.Type := WorkshiftCheckpoint.Type::TRANSFER;
-        WorkshiftCheckpoint.Modify ();
+        WorkshiftCheckpoint.Modify();
         //+NPR5.43 [311964]
 
-        PaymentBinCheckpoint.CreatePosEntryBinCheckpoint (GetUnitNo (POSSession), FromBinNo, CheckpointEntryNo);
+        PaymentBinCheckpoint.CreatePosEntryBinCheckpoint(GetUnitNo(POSSession), FromBinNo, CheckpointEntryNo);
         Commit;
 
         // Confirm amounts counted and float/bank/safe transfer
-        POSPaymentBinCheckpoint.Reset ();
-        POSPaymentBinCheckpoint.FilterGroup (2);
-        POSPaymentBinCheckpoint.SetFilter ("Workshift Checkpoint Entry No.", '=%1', CheckpointEntryNo);
-        POSPaymentBinCheckpoint.FilterGroup (0);
+        POSPaymentBinCheckpoint.Reset();
+        POSPaymentBinCheckpoint.FilterGroup(2);
+        POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', CheckpointEntryNo);
+        POSPaymentBinCheckpoint.FilterGroup(0);
 
-        PaymentBinCheckpointPage.SetTableView (POSPaymentBinCheckpoint);
-        PaymentBinCheckpointPage.LookupMode (true);
+        PaymentBinCheckpointPage.SetTableView(POSPaymentBinCheckpoint);
+        PaymentBinCheckpointPage.LookupMode(true);
         PaymentBinCheckpointPage.SetTransferMode();
         PageAction := PaymentBinCheckpointPage.RunModal();
         Commit;
 
         if (PageAction = ACTION::LookupOK) then begin
-          POSPaymentBinCheckpoint.Reset ();
-          POSPaymentBinCheckpoint.SetFilter ("Workshift Checkpoint Entry No.", '=%1', CheckpointEntryNo);
-          POSPaymentBinCheckpoint.SetFilter (Status, '=%1' , POSPaymentBinCheckpoint.Status::READY);
-          if (POSPaymentBinCheckpoint.FindFirst ()) then begin
+            POSPaymentBinCheckpoint.Reset();
+            POSPaymentBinCheckpoint.SetFilter("Workshift Checkpoint Entry No.", '=%1', CheckpointEntryNo);
+            POSPaymentBinCheckpoint.SetFilter(Status, '=%1', POSPaymentBinCheckpoint.Status::READY);
+            if (POSPaymentBinCheckpoint.FindFirst()) then begin
 
-            POSSession.GetSale (POSSale);
-            POSSale.GetCurrentSale (SalePOS);
+                POSSession.GetSale(POSSale);
+                POSSale.GetCurrentSale(SalePOS);
 
-            EntryNo := POSCreateEntry.CreateBalancingEntryAndLines(SalePOS, false, CheckpointEntryNo);
+                EntryNo := POSCreateEntry.CreateBalancingEntryAndLines(SalePOS, false, CheckpointEntryNo);
 
-            //-NPR5.43 [311964]
-            // Posting
-            POSEntryToPost.Get (EntryNo);
-            POSEntryToPost.SetRecFilter();
+                //-NPR5.43 [311964]
+                // Posting
+                POSEntryToPost.Get(EntryNo);
+                POSEntryToPost.SetRecFilter();
 
-            if (POSEntryToPost."Post Item Entry Status" < POSEntryToPost."Post Item Entry Status"::Posted) then
-              POSPostEntries.SetPostItemEntries (false);
+                if (POSEntryToPost."Post Item Entry Status" < POSEntryToPost."Post Item Entry Status"::Posted) then
+                    POSPostEntries.SetPostItemEntries(false);
 
-            if (POSEntryToPost."Post Entry Status" < POSEntryToPost."Post Entry Status"::Posted) then
-              POSPostEntries.SetPostPOSEntries (true);
+                if (POSEntryToPost."Post Entry Status" < POSEntryToPost."Post Entry Status"::Posted) then
+                    POSPostEntries.SetPostPOSEntries(true);
 
-            POSPostEntries.SetStopOnError (true);
-            POSPostEntries.SetPostCompressed (false);
-            POSPostEntries.Run (POSEntryToPost);
-            Commit;
+                POSPostEntries.SetStopOnError(true);
+                POSPostEntries.SetPostCompressed(false);
+                POSPostEntries.Run(POSEntryToPost);
+                Commit;
 
-            POSSession.ChangeViewLogin ();
-            //+NPR5.43 [311964]
+                POSSession.ChangeViewLogin();
+                //+NPR5.43 [311964]
 
-          end;
+            end;
         end;
         //+NPR5.43 [310815]
     end;
 
-    local procedure SelectSourceBin(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure SelectSourceBin(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         JSON: Codeunit "POS JSON Management";
         FromBinNo: Code[10];
         SourceBinSelection: Integer;
     begin
 
-        JSON.InitializeJObjectParser (Context, FrontEnd);
-        SourceBinSelection := JSON.GetIntegerParameter ('SourceBinSelection', true);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        SourceBinSelection := JSON.GetIntegerParameter('SourceBinSelection', true);
         case SourceBinSelection of
-          1 : FromBinNo := UserSelectBin (POSSession);
-          2 : FromBinNo := GetFixedBin (Context, POSSession, FrontEnd);
-          else
-            FromBinNo := GetDefaultUnitBin (POSSession);
+            1:
+                FromBinNo := UserSelectBin(POSSession);
+            2:
+                FromBinNo := GetFixedBin(Context, POSSession, FrontEnd);
+            else
+                FromBinNo := GetDefaultUnitBin(POSSession);
         end;
-        JSON.SetContext ('FROM_BIN', FromBinNo);
-        FrontEnd.SetActionContext (ActionCode, JSON);
+        JSON.SetContext('FROM_BIN', FromBinNo);
+        FrontEnd.SetActionContext(ActionCode, JSON);
     end;
 
     local procedure UserSelectBin(POSSession: Codeunit "POS Session"): Code[10]
@@ -169,29 +173,29 @@ codeunit 6150851 "POS Action - Bin Transfer"
         PageAction: Action;
     begin
 
-        POSSession.GetSetup (POSSetup);
-        POSSetup.GetPOSUnit (POSUnit);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
 
-        POSUnittoBinRelation.SetFilter ("POS Unit No.", '=%1', POSUnit."No.");
-        POSUnittoBinRelation.FilterGroup (2);
-        POSUnittoBinRelationPage.SetTableView (POSUnittoBinRelation);
-        POSUnittoBinRelation.FilterGroup (0);
-        POSUnittoBinRelationPage.LookupMode (true);
-        PageAction := POSUnittoBinRelationPage.RunModal ();
+        POSUnittoBinRelation.SetFilter("POS Unit No.", '=%1', POSUnit."No.");
+        POSUnittoBinRelation.FilterGroup(2);
+        POSUnittoBinRelationPage.SetTableView(POSUnittoBinRelation);
+        POSUnittoBinRelation.FilterGroup(0);
+        POSUnittoBinRelationPage.LookupMode(true);
+        PageAction := POSUnittoBinRelationPage.RunModal();
         if (PageAction <> ACTION::LookupOK) then
-          Error  ('Bin selection aborted.');
+            Error('Bin selection aborted.');
 
-        POSUnittoBinRelationPage.GetRecord (POSUnittoBinRelation);
-        exit (POSUnittoBinRelation."POS Payment Bin No.");
+        POSUnittoBinRelationPage.GetRecord(POSUnittoBinRelation);
+        exit(POSUnittoBinRelation."POS Payment Bin No.");
     end;
 
-    local procedure GetFixedBin(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Code[10]
+    local procedure GetFixedBin(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"): Code[10]
     var
         JSON: Codeunit "POS JSON Management";
     begin
 
-        JSON.InitializeJObjectParser (Context, FrontEnd);
-        exit (JSON.GetStringParameter ('SourceBin', true));
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        exit(JSON.GetStringParameter('SourceBin', true));
     end;
 
     local procedure GetDefaultUnitBin(POSSession: Codeunit "POS Session"): Code[10]
@@ -200,11 +204,11 @@ codeunit 6150851 "POS Action - Bin Transfer"
         POSUnit: Record "POS Unit";
     begin
 
-        POSSession.GetSetup (POSSetup);
-        POSSetup.GetPOSUnit (POSUnit);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
 
-        POSUnit.TestField ("Default POS Payment Bin");
-        exit (POSUnit."Default POS Payment Bin");
+        POSUnit.TestField("Default POS Payment Bin");
+        exit(POSUnit."Default POS Payment Bin");
     end;
 
     local procedure GetUnitNo(POSSession: Codeunit "POS Session"): Code[10]
@@ -213,10 +217,10 @@ codeunit 6150851 "POS Action - Bin Transfer"
         POSUnit: Record "POS Unit";
     begin
 
-        POSSession.GetSetup (POSSetup);
-        POSSetup.GetPOSUnit (POSUnit);
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
 
-        exit (POSUnit."No.");
+        exit(POSUnit."No.");
     end;
 }
 

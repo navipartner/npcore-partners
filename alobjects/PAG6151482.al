@@ -22,15 +22,6 @@ page 6151482 "Magento Sales Chart"
             }
             usercontrol(chart;"Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
-
-                trigger DataPointClicked(point: DotNet npNetBusinessChartDataPoint)
-                begin
-                end;
-
-                trigger DataPointDoubleClicked(point: DotNet npNetBusinessChartDataPoint)
-                begin
-                end;
-
                 trigger AddInReady()
                 begin
                     ChartIsReady := true;

@@ -754,31 +754,31 @@ page 6014619 "Retail - Sales RC My Report"
             {
                 Caption = 'Create Electronic Credit Memos';
                 Image = ElectronicDoc;
-                RunObject = Report Report13601;
+                //RunObject = Report Report13601;
             }
             action("Create Electronic Reminders")
             {
                 Caption = 'Create Electronic Reminders';
                 Image = "Report";
-                RunObject = Report Report13602;
+                //RunObject = Report Report13602;
             }
             action("Create Electronic Fin. Chrg. Memos")
             {
                 Caption = 'Create Electronic Fin. Chrg. Memos';
                 Image = ElectronicDoc;
-                RunObject = Report Report13603;
+                //RunObject = Report Report13603;
             }
             action("Create Electronic Service Invoices")
             {
                 Caption = 'Create Electronic Service Invoices';
                 Image = ElectronicDoc;
-                RunObject = Report Report13604;
+                //RunObject = Report Report13604;
             }
             action("Create Electronic Service Credit Memos")
             {
                 Caption = 'Create Electronic Service Credit Memos';
                 Image = ElectronicDoc;
-                RunObject = Report Report13605;
+                //RunObject = Report Report13605;
             }
             separator(Separator6150682)
             {

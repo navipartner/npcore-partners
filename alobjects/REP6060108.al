@@ -37,7 +37,7 @@ report 6060108 "Balancing Ticket IV"
     // NPR5.39/JLK /20180219 CASE 305283 Corrected Label Payments_Lbl
     // NPR5.49/BHR /20190115  CASE 341969 Corrections as per OMA Guidelines
     DefaultLayout = RDLC;
-    RDLCLayout = './Balancing Ticket IV.rdlc';
+    RDLCLayout = './layouts/Balancing Ticket IV.rdlc';
 
     Caption = 'Counter Report Ticket IV';
 

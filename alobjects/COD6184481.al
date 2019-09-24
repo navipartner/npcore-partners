@@ -1,26 +1,13 @@
+// TODO: CTRLUPGRADE - This codeunit is the remnants of old Stargate v1 protocol codeunit after all Proxy Manager stuff was taken out - it may contain some legit stuff, but most likely should all be removed - INVESTIGATE
+
 codeunit 6184481 "Pepper Begin Workshift"
 {
     // NPR5.25/TSA/20160513  CASE 239285 Version up to 5.0.398.2
     // NPR5.26/TSA/20160809 CASE 248452 Assembly Version Up - JBAXI Support, General Improvements
 
     SingleInstance = true;
-    TableNo = TempBlob;
-
-    trigger OnRun()
-    begin
-
-        ProcessSignal(Rec);
-    end;
 
     var
-        POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
-        ExpectedResponseType: DotNet npNetType;
-        ExpectedResponseId: Guid;
-        ProtocolManagerId: Guid;
-        ProtocolStage: Integer;
-        QueuedRequests: DotNet npNetStack;
-        QueuedResponseTypes: DotNet npNetStack;
-        "--RequestSpecific": Integer;
         InitializedRequest: Boolean;
         StartWorkShiftRequest: DotNet npNetStartWorkshiftRequest;
         StartWorkShiftResponse: DotNet npNetStartWorkshiftResponse;
@@ -30,94 +17,18 @@ codeunit 6184481 "Pepper Begin Workshift"
         PepperTerminalCaptions: Codeunit "Pepper Terminal Captions";
         LastRestCode: Integer;
 
-    local procedure "---Protocol functions"()
+    local procedure InitializeProtocol()
     begin
-    end;
-
-    local procedure ProcessSignal(var TempBlob: Record TempBlob)
-    var
-        Signal: DotNet npNetSignal;
-        StartSignal: DotNet npNetStartSession;
-        QueryCloseSignal: DotNet npNetQueryClosePage;
-        Response: DotNet npNetMessageResponse;
-    begin
-
-        POSDeviceProxyManager.DeserializeObject(Signal,TempBlob);
-        case true of
-          Signal.TypeName = Format(GetDotNetType(StartSignal)):
-            begin
-              QueuedRequests := QueuedRequests.Stack();
-              QueuedResponseTypes := QueuedResponseTypes.Stack();
-
-              POSDeviceProxyManager.DeserializeSignal(StartSignal,Signal);
-              Start(StartSignal.ProtocolManagerId);
-            end;
-          Signal.TypeName = Format(GetDotNetType(Response)):
-            begin
-              POSDeviceProxyManager.DeserializeSignal(Response,Signal);
-              MessageResponse(Response.Envelope);
-            end;
-          Signal.TypeName = Format(GetDotNetType(QueryCloseSignal)):
-            if QueryClosePage() then
-              POSDeviceProxyManager.AbortByUserRequest(ProtocolManagerId);
-        end;
-    end;
-
-    local procedure Start(ProtocolManagerIdIn: Guid)
-    var
-        WebClientDependency: Record "Web Client Dependency";
-        VoidResponse: DotNet npNetVoidResponse;
-    begin
-        ProtocolManagerId := ProtocolManagerIdIn;
-
-        StartWorkShiftRequest.ConfigDriverParam := ConfigDriver;
-        StartWorkShiftRequest.OpenParam := PepperOpen;
-
-         AwaitResponse(
-           GetDotNetType(VoidResponse),
-           POSDeviceProxyManager.SendMessage(
-             ProtocolManagerId, StartWorkShiftRequest));
-    end;
-
-    local procedure MessageResponse(Envelope: DotNet npNetResponseEnvelope)
-    begin
-        if Envelope.ResponseTypeName <> Format(ExpectedResponseType) then
-          Error('Unknown response type: %1 (expected %2)',Envelope.ResponseTypeName,Format(ExpectedResponseType));
-    end;
-
-    local procedure QueryClosePage(): Boolean
-    begin
-        exit(true);
-    end;
-
-    local procedure CloseProtocol()
-    begin
-        POSDeviceProxyManager.ProtocolClose(ProtocolManagerId);
-    end;
-
-    local procedure AwaitResponse(Type: DotNet npNetType;Id: Guid)
-    begin
-        ExpectedResponseType := Type;
-        ExpectedResponseId := Id;
-    end;
-
-    local procedure "---Pepper_Set"()
-    begin
-    end;
-
-    procedure InitializeProtocol()
-    begin
-
         ClearAll();
 
-        StartWorkShiftRequest := StartWorkShiftRequest.StartWorkshiftRequest ();
-        StartWorkShiftResponse := StartWorkShiftResponse.StartWorkshiftResponse ();
+        StartWorkShiftRequest := StartWorkShiftRequest.StartWorkshiftRequest();
+        StartWorkShiftResponse := StartWorkShiftResponse.StartWorkshiftResponse();
 
-        PepperTerminalCaptions.GetLabels (Labels);
+        PepperTerminalCaptions.GetLabels(Labels);
         StartWorkShiftRequest.ProcessLabels := Labels;
 
-        ConfigDriver := ConfigDriver.ConfigDriverParam ();
-        PepperOpen := PepperOpen.OpenParam ();
+        ConfigDriver := ConfigDriver.ConfigDriverParam();
+        PepperOpen := PepperOpen.OpenParam();
 
         LastRestCode := -999998;
         InitializedRequest := true;
@@ -127,52 +38,43 @@ codeunit 6184481 "Pepper Begin Workshift"
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         if (TimeoutMillies = 0) then
-          TimeoutMillies := 15000;
+            TimeoutMillies := 15000;
 
         StartWorkShiftRequest.TimeoutMillies := TimeoutMillies;
     end;
 
-    procedure SetReceiptEncoding(PepperEncodingName: Code[20];NavisionEncodingName: Code[20])
+    procedure SetReceiptEncoding(PepperEncodingName: Code[20]; NavisionEncodingName: Code[20])
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         // Default value is UTF-8
         if (PepperEncodingName <> '') then
-          StartWorkShiftRequest.PepperReceiptEncoding := PepperEncodingName;
+            StartWorkShiftRequest.PepperReceiptEncoding := PepperEncodingName;
 
         // Default value is ISO-8859-1
         if (NavisionEncodingName <> '') then
-          StartWorkShiftRequest.NavisionReceiptEncoding := NavisionEncodingName;
+            StartWorkShiftRequest.NavisionReceiptEncoding := NavisionEncodingName;
     end;
 
     procedure SetPepperFolder(Folder: Text[250])
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         StartWorkShiftRequest.DllPath := Folder;
-    end;
-
-    procedure SetDecodeXmlTicketToText(DecodeXmlTicket: Boolean)
-    begin
-
-        if not InitializedRequest then
-          InitializeProtocol();
-
-        StartWorkShiftRequest.DecodeXmlReceiptToText := DecodeXmlTicket;
     end;
 
     procedure SetILP_UseConfigurationInstanceId(InstanceId: Integer)
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         StartWorkShiftRequest.PepperConfigInstanceId := InstanceId;
     end;
@@ -181,7 +83,7 @@ codeunit 6184481 "Pepper Begin Workshift"
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         StartWorkShiftRequest.XmlConfigurationString := XmlConfigContents;
     end;
@@ -190,16 +92,16 @@ codeunit 6184481 "Pepper Begin Workshift"
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         StartWorkShiftRequest.XmlLicenseString := XmlLicenseContents;
     end;
 
-    procedure SetILP_ForceGetPepperLicense(LicenseId: Code[8];CustomerId: Code[8])
+    procedure SetILP_ForceGetPepperLicense(LicenseId: Code[8]; CustomerId: Code[8])
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         StartWorkShiftRequest.LicenseId := LicenseId;
         StartWorkShiftRequest.CustomerId := CustomerId;
@@ -209,7 +111,7 @@ codeunit 6184481 "Pepper Begin Workshift"
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         ConfigDriver.ComPort := ComPortNumber;
     end;
@@ -218,16 +120,16 @@ codeunit 6184481 "Pepper Begin Workshift"
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         ConfigDriver.IPAddress := IpAddressAndPort;
     end;
 
-    procedure SetCDP_EftTerminalInformation(EftTerminalType: Integer;Language: Integer;CashRegisterNumber: Integer;ReceiptFormat: Code[2])
+    procedure SetCDP_EftTerminalInformation(EftTerminalType: Integer; Language: Integer; CashRegisterNumber: Integer; ReceiptFormat: Code[2])
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         ConfigDriver.PayTermType := EftTerminalType;
         ConfigDriver.LanguageCode := Language;
@@ -235,11 +137,11 @@ codeunit 6184481 "Pepper Begin Workshift"
         ConfigDriver.ReceiptFormat := ReceiptFormat;
     end;
 
-    procedure SetCDP_MatchboxInformation(FileOutputOption: Integer;CompanyId: Code[10];ShopId: Code[10];PosId: Code[10];FileName: Text)
+    procedure SetCDP_MatchboxInformation(FileOutputOption: Integer; CompanyId: Code[10]; ShopId: Code[10]; PosId: Code[10]; FileName: Text)
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         ConfigDriver.MbxFileSw := FileOutputOption;
 
@@ -249,11 +151,11 @@ codeunit 6184481 "Pepper Begin Workshift"
         ConfigDriver.MbxFile := FileName
     end;
 
-    procedure SetCDP_Filenames(OpenPrintFile: Text;ClosePrintFile: Text;TrxPrintFile: Text;CCTrxPrintFile: Text;DiffPrintFile: Text;EndOfDayPrintFile: Text;JournalPrintFile: Text;IniPrintFile: Text)
+    procedure SetCDP_Filenames(OpenPrintFile: Text; ClosePrintFile: Text; TrxPrintFile: Text; CCTrxPrintFile: Text; DiffPrintFile: Text; EndOfDayPrintFile: Text; JournalPrintFile: Text; IniPrintFile: Text)
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         ConfigDriver.OpenPrintFile := OpenPrintFile;
         ConfigDriver.ClosePrintFile := ClosePrintFile;
@@ -269,16 +171,16 @@ codeunit 6184481 "Pepper Begin Workshift"
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         ConfigDriver.XmlAdditionalParameters := XmlAdditionalParameters;
     end;
 
-    procedure SetHeaderFooters(OverwriteClientFiles: Boolean;ConfigurationFolder: Text;TrxHeaderContents: Text;TrxFooterContents: Text;CcTrxHeaderContents: Text;CcTrxFooterContents: Text;AdmHeaderContents: Text;AdmFooterContents: Text)
+    procedure SetHeaderFooters(OverwriteClientFiles: Boolean; ConfigurationFolder: Text; TrxHeaderContents: Text; TrxFooterContents: Text; CcTrxHeaderContents: Text; CcTrxFooterContents: Text; AdmHeaderContents: Text; AdmFooterContents: Text)
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         StartWorkShiftRequest.OverwriteClientHeaderAndFooterFiles := OverwriteClientFiles;
         StartWorkShiftRequest.ConfigurationFileFolder := ConfigurationFolder;
@@ -297,7 +199,7 @@ codeunit 6184481 "Pepper Begin Workshift"
     begin
 
         if not InitializedRequest then
-          InitializeProtocol();
+            InitializeProtocol();
 
         PepperOpen.OperatorNbr := OperatorNumber;
     end;
@@ -306,70 +208,41 @@ codeunit 6184481 "Pepper Begin Workshift"
     begin
     end;
 
-    local procedure "---Pepper_Get"()
-    begin
-    end;
-
     procedure GetILP_XmlLicenseString(var XmlLicenseContents: Text) HaveLicenseText: Boolean
     begin
 
         if (not InitializedRequest) then
-          exit (false);
+            exit(false);
 
         XmlLicenseContents := StartWorkShiftResponse.XmlLicenseString;
-        exit (XmlLicenseContents <> '');
+        exit(XmlLicenseContents <> '');
     end;
 
     procedure GetCDP_RecoveryRequired() RecoveryRequired: Boolean
     begin
 
         if (not InitializedRequest) then
-          exit (false);
+            exit(false);
 
-        exit (StartWorkShiftResponse.RecoveryRequired);
+        exit(StartWorkShiftResponse.RecoveryRequired);
     end;
 
     procedure GetPOP_ResultCode() ResultCode: Integer
     begin
 
         if (not InitializedRequest) then
-          exit (-999999);
+            exit(-999999);
 
-        exit (LastRestCode);
+        exit(LastRestCode);
     end;
 
     procedure GetPOP_OpenReceipt() OpenReceipt: Text
     begin
 
         if (not InitializedRequest) then
-          exit ('');
+            exit('');
 
-        exit (StartWorkShiftResponse.OpenReceipt ());
-    end;
-
-    local procedure "----"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Page, 6014657, 'ProtocolEvent', '', false, false)]
-    local procedure ProtocolEvent(ProtocolCodeunitID: Integer;EventName: Text;Data: Text;ResponseRequired: Boolean;var ReturnData: Text)
-    begin
-
-        if (ProtocolCodeunitID <> CODEUNIT::"Pepper Begin Workshift") then
-          exit;
-
-        case EventName of
-          'CloseForm':
-            CloseForm(Data);
-        end;
-    end;
-
-    local procedure CloseForm(Data: Text)
-    begin
-        StartWorkShiftResponse := StartWorkShiftResponse.Deserialize (Data);
-        LastRestCode := StartWorkShiftResponse.LastResultCode();
-
-        CloseProtocol ();
+        exit(StartWorkShiftResponse.OpenReceipt());
     end;
 }
 

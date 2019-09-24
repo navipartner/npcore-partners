@@ -3,7 +3,7 @@ report 6014450 "Items Received&Not Invoiced NP"
     // NPR5.47/BHR/20181009 CASE 331079 Copy report 17111 from CU NAVAPAC7.10
     // NPR5.48/BHR /20190204  CASE 344825 Rename report from"Items Received & Not Invoiced "
     DefaultLayout = RDLC;
-    RDLCLayout = './Items Received&Not Invoiced NP.rdlc';
+    RDLCLayout = './layouts/Items Received&Not Invoiced NP.rdlc';
 
     Caption = 'Items Received & Not Invoiced';
     UsageCategory = ReportsAndAnalysis;

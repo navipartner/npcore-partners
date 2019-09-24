@@ -2,7 +2,7 @@ report 6060134 "MM Member Info"
 {
     // MM1.25/BHR/20171120 CASE 296024 Report to show member details
     DefaultLayout = RDLC;
-    RDLCLayout = './MM Member Info.rdlc';
+    RDLCLayout = './layouts/MM Member Info.rdlc';
 
     Caption = 'Member Info';
 

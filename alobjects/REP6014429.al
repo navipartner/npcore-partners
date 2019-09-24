@@ -5,7 +5,7 @@ report 6014429 "Posting Overview Audit"
     // NPR5.39/TJ  /20180206 CASE 302634 Change OptionString property of global variable LastSalesType to english version
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Posting Overview Audit.rdlc';
+    RDLCLayout = './layouts/Posting Overview Audit.rdlc';
 
     Caption = 'Posting Overview Audit';
     UsageCategory = ReportsAndAnalysis;

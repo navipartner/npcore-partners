@@ -63,12 +63,12 @@ codeunit 6150725 "POS Action - Payment"
 
     local procedure ActionCode(): Text
     begin
-        exit ('PAYMENT');
+        exit('PAYMENT');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.3');
+        exit('1.3');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -81,16 +81,16 @@ codeunit 6150725 "POS Action - Payment"
           Sender.Type::Generic,
           Sender."Subscriber Instances Allowed"::Multiple)
         then begin
-          Sender.RegisterWorkflowStep ('voucher','context.capture_voucher && input({caption: labels.Voucher}).cancel(abort)');
-          Sender.RegisterWorkflowStep ('amount', 'if ((context.capture_amount) && (!param.HideAmountDialog) && ((!param.HideZeroAmountDialog) || (context.amounttocapture > 0))) {' +
-                                                 '  numpad({title: context.amount_description, caption: labels.Amount, value: context.amounttocapture}).cancel(abort);' +
-                                                 '}');
+            Sender.RegisterWorkflowStep('voucher', 'context.capture_voucher && input({caption: labels.Voucher}).cancel(abort)');
+            Sender.RegisterWorkflowStep('amount', 'if ((context.capture_amount) && (!param.HideAmountDialog) && ((!param.HideZeroAmountDialog) || (context.amounttocapture > 0))) {' +
+                                                   '  numpad({title: context.amount_description, caption: labels.Amount, value: context.amounttocapture}).cancel(abort);' +
+                                                   '}');
 
-          Sender.RegisterWorkflowStep ('capture_payment', 'respond();');
-          Sender.RegisterWorkflowStep ('tryEndSale', 'respond();');
+            Sender.RegisterWorkflowStep('capture_payment', 'respond();');
+            Sender.RegisterWorkflowStep('tryEndSale', 'respond();');
 
-          Sender.RegisterWorkflow (true);
-          Sender.RegisterDataBinding ();
+            Sender.RegisterWorkflow(true);
+            Sender.RegisterDataBinding();
         end;
     end;
 
@@ -98,12 +98,12 @@ codeunit 6150725 "POS Action - Payment"
     local procedure OnInitializeCaptions(Captions: Codeunit "POS Caption Management")
     begin
 
-        Captions.AddActionCaption (ActionCode(), 'Amount', TextAmountLabel);
-        Captions.AddActionCaption (ActionCode(), 'Voucher', TextVoucherLabel);
+        Captions.AddActionCaption(ActionCode(), 'Amount', TextAmountLabel);
+        Captions.AddActionCaption(ActionCode(), 'Voucher', TextVoucherLabel);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action"; Parameters: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
         JSON: Codeunit "POS JSON Management";
@@ -128,9 +128,9 @@ codeunit 6150725 "POS Action - Payment"
     begin
 
         if not Action.IsThisAction(ActionCode()) then
-          exit;
+            exit;
 
-        POSSession.GetSetup (Setup);
+        POSSession.GetSetup(Setup);
         //-NPR5.51 [359714]
         Setup.GetPOSUnit(POSUnit);
         Register.Get(Setup.Register());
@@ -151,53 +151,61 @@ codeunit 6150725 "POS Action - Payment"
         SaleLinePOS.SetFilter("Register No.", '=%1', SalePOS."Register No.");
         SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', SalePOS."Sales Ticket No.");
         //+NPR5.51 [364694]
-        SaleLinePOS.SetFilter (Type, '<>%1', SaleLinePOS.Type::Comment);
+        SaleLinePOS.SetFilter(Type, '<>%1', SaleLinePOS.Type::Comment);
 
-        if (SaleLinePOS.IsEmpty ()) then begin
-          if POSAuditProfile.Get(POSUnit."POS Audit Profile") then
-            if not POSAuditProfile."Allow Zero Amount Sales" then
-              Error (NO_SALES_LINES);
+        if (SaleLinePOS.IsEmpty()) then begin
+            if POSAuditProfile.Get(POSUnit."POS Audit Profile") then
+                if not POSAuditProfile."Allow Zero Amount Sales" then
+                    Error(NO_SALES_LINES);
         end;
 
-        POSSession.GetCurrentView (CurrentView);
-        if (CurrentView.Type.Equals (CurrentViewType.Sale)) then
-          POSSession.ChangeViewPayment();
+        POSSession.GetCurrentView(CurrentView);
+        if (CurrentView.Type.Equals(CurrentViewType.Sale)) then
+            POSSession.ChangeViewPayment();
 
-        JSON.InitializeJObjectParser(Parameters,FrontEnd);
-        PaymentNo := JSON.GetString('paymentNo',true);
+        JSON.InitializeJObjectParser(Parameters, FrontEnd);
+        PaymentNo := JSON.GetString('paymentNo', true);
 
         //-NPR5.51 [359714]
         //Register.GET (Setup.Register());
         //+NPR5.51 [359714]
 
-        POSSession.GetPaymentLine (POSPaymentLine);
-        POSPaymentLine.CalculateBalance (SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
         if (not POSPaymentLine.GetPaymentType(PaymentTypePOS, PaymentNo, Setup.Register())) then
-          Error (PaymentTypeNotFound, PaymentTypePOS.TableCaption, PaymentNo, Setup.Register());
+            Error(PaymentTypeNotFound, PaymentTypePOS.TableCaption, PaymentNo, Setup.Register());
 
         if (not POSPaymentLine.GetPaymentType(ReturnPaymentTypePOS, Register."Return Payment Type", Setup.Register())) then
-          Error (PaymentTypeNotFound, PaymentTypePOS.TableCaption, Register."Return Payment Type", Setup.Register());
+            Error(PaymentTypeNotFound, PaymentTypePOS.TableCaption, Register."Return Payment Type", Setup.Register());
 
-        OnBeforeActionWorkflow (PaymentTypePOS, Parameters, POSSession, FrontEnd, Context, SubTotal, Handled);
+        OnBeforeActionWorkflow(PaymentTypePOS, Parameters, POSSession, FrontEnd, Context, SubTotal, Handled);
 
         if (not Handled) then begin
-          case PaymentTypePOS."Processing Type" of
-            PaymentTypePOS."Processing Type"::Cash :                     Handled := ConfigureCashWorkflow (Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-            PaymentTypePOS."Processing Type"::"Foreign Currency" :       Handled := ConfigureForeignCashWorkflow (Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-            PaymentTypePOS."Processing Type"::"Gift Voucher" :           Handled := ConfigureVoucherWorkflow (Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-            PaymentTypePOS."Processing Type"::"Credit Voucher" :         Handled := ConfigureVoucherWorkflow (Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-            PaymentTypePOS."Processing Type"::"Foreign Gift Voucher" :   Handled := ConfigureForeignVoucherWorkflow (Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-            PaymentTypePOS."Processing Type"::"Foreign Credit Voucher" : Handled := ConfigureForeignVoucherWorkflow (Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-            PaymentTypePOS."Processing Type"::EFT :          Handled := ConfigureCashTerminalWorkflow (Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-            PaymentTypePOS."Processing Type"::"Manual Card" :            Handled := ConfigureManualCardWorkflow (Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-            else
-              // provide a resonable default
-              Handled := ConfigureCashWorkflow (Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
-          end;
+            case PaymentTypePOS."Processing Type" of
+                PaymentTypePOS."Processing Type"::Cash:
+                    Handled := ConfigureCashWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
+                PaymentTypePOS."Processing Type"::"Foreign Currency":
+                    Handled := ConfigureForeignCashWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
+                PaymentTypePOS."Processing Type"::"Gift Voucher":
+                    Handled := ConfigureVoucherWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
+                PaymentTypePOS."Processing Type"::"Credit Voucher":
+                    Handled := ConfigureVoucherWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
+                PaymentTypePOS."Processing Type"::"Foreign Gift Voucher":
+                    Handled := ConfigureForeignVoucherWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
+                PaymentTypePOS."Processing Type"::"Foreign Credit Voucher":
+                    Handled := ConfigureForeignVoucherWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
+                PaymentTypePOS."Processing Type"::EFT:
+                    Handled := ConfigureCashTerminalWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
+                PaymentTypePOS."Processing Type"::"Manual Card":
+                    Handled := ConfigureManualCardWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
+                else
+                    // provide a resonable default
+                    Handled := ConfigureCashWorkflow(Context, PaymentTypePOS, ReturnPaymentTypePOS, SalesAmount, PaidAmount);
+            end;
         end;
 
-        FrontEnd.SetActionContext (ActionCode, Context);
+        FrontEnd.SetActionContext(ActionCode, Context);
     end;
 
     [EventSubscriber(ObjectType::Page, 6150702, 'OnBeforeActionEvent', 'RefreshActionCodeParameters', true, true)]
@@ -207,15 +215,15 @@ codeunit 6150725 "POS Action - Payment"
         ParamValue: Record "POS Parameter Value";
     begin
         if Rec."Action Type" <> Rec."Action Type"::PaymentType then
-          exit;
+            exit;
         if not POSSetup.Get then
-          exit;
-        if POSSetup."Payment Action Code" <>  ActionCode() then
-          exit;
+            exit;
+        if POSSetup."Payment Action Code" <> ActionCode() then
+            exit;
 
-        ParamValue.FilterParameters(Rec.RecordId,0);
+        ParamValue.FilterParameters(Rec.RecordId, 0);
         if not ParamValue.IsEmpty then
-          exit;
+            exit;
 
         InitParameters(Rec);
     end;
@@ -224,19 +232,19 @@ codeunit 6150725 "POS Action - Payment"
     var
         POSParameterValue: Record "POS Parameter Value";
     begin
-        InitParameter(POSMenuButton,'HideAmountDialog',POSParameterValue."Data Type"::Boolean,'false');
-        InitParameter(POSMenuButton,'HideZeroAmountDialog',POSParameterValue."Data Type"::Boolean,'false');
+        InitParameter(POSMenuButton, 'HideAmountDialog', POSParameterValue."Data Type"::Boolean, 'false');
+        InitParameter(POSMenuButton, 'HideZeroAmountDialog', POSParameterValue."Data Type"::Boolean, 'false');
     end;
 
-    local procedure InitParameter(var POSMenuButton: Record "POS Menu Button";Name: Text;DataType: Option;DefaultValue: Text)
+    local procedure InitParameter(var POSMenuButton: Record "POS Menu Button"; Name: Text; DataType: Option; DefaultValue: Text)
     var
         POSParameterValue: Record "POS Parameter Value";
     begin
-        POSParameterValue.FilterParameters(POSMenuButton.RecordId,0);
-        POSParameterValue.SetRange("Action Code",ActionCode());
-        POSParameterValue.SetRange(Name,Name);
+        POSParameterValue.FilterParameters(POSMenuButton.RecordId, 0);
+        POSParameterValue.SetRange("Action Code", ActionCode());
+        POSParameterValue.SetRange(Name, Name);
         if not POSParameterValue.IsEmpty then
-          exit;
+            exit;
 
         POSParameterValue.InitForMenuButton(POSMenuButton);
         POSParameterValue."Action Code" := ActionCode();
@@ -247,7 +255,7 @@ codeunit 6150725 "POS Action - Payment"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         POSSale: Codeunit "POS Sale";
@@ -271,56 +279,59 @@ codeunit 6150725 "POS Action - Payment"
     begin
 
         if not Action.IsThisAction(ActionCode()) then
-          exit;
+            exit;
 
         Handled := true;
 
-        POSSession.GetSetup (Setup);
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        JSON.SetScope ('parameters', true);
-        PaymentNo := JSON.GetString ('paymentNo', true);
+        POSSession.GetSetup(Setup);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        JSON.SetScope('parameters', true);
+        PaymentNo := JSON.GetString('paymentNo', true);
 
         POSSession.GetPaymentLine(POSPaymentLine);
-        if (not POSPaymentLine.GetPaymentType (PaymentTypePOS, PaymentNo, Setup.Register)) then
-          Error (PaymentTypeNotFound, PaymentTypePOS.TableCaption, PaymentNo, Setup.Register);
+        if (not POSPaymentLine.GetPaymentType(PaymentTypePOS, PaymentNo, Setup.Register)) then
+            Error(PaymentTypeNotFound, PaymentTypePOS.TableCaption, PaymentNo, Setup.Register);
 
-        POSSession.GetSale (POSSale);
+        POSSession.GetSale(POSSale);
 
         case WorkflowStep of
-          'capture_payment' :
-            begin
-              POSSession.ClearActionState();
-              POSSession.StoreActionState ('ContextId', POSSession.BeginAction (ActionCode));
+            'capture_payment':
+                begin
+                    POSSession.ClearActionState();
+                    POSSession.StoreActionState('ContextId', POSSession.BeginAction(ActionCode));
 
-              OnBeforeAction (WorkflowStep, PaymentTypePOS, Context, POSSession, FrontEnd, PaymentHandled);
-              CapturePayment (Action, WorkflowStep, PaymentTypePOS, Context, POSSession, FrontEnd, PaymentHandled);
-              OnAfterAction (WorkflowStep, PaymentTypePOS, Context, POSSession, FrontEnd, PaymentHandled);
-            end;
+                    OnBeforeAction(WorkflowStep, PaymentTypePOS, Context, POSSession, FrontEnd, PaymentHandled);
+                    CapturePayment(Action, WorkflowStep, PaymentTypePOS, Context, POSSession, FrontEnd, PaymentHandled);
+                    OnAfterAction(WorkflowStep, PaymentTypePOS, Context, POSSession, FrontEnd, PaymentHandled);
+                end;
 
-          'tryEndSale' :
-            begin
-              PaymentHandled := true;
-              POSSale.SetModified ();
-              POSSession.RequestRefreshData ();
-              if SkipAfterEFTTransaction(POSSession) then
-                exit;
+            'tryEndSale':
+                begin
+                    PaymentHandled := true;
+                    POSSale.SetModified();
+                    POSSession.RequestRefreshData();
+                    if SkipAfterEFTTransaction(POSSession) then
+                        exit;
 
-              if PaymentTypePOS."Auto End Sale" then begin
-                Register.Get(Setup.Register);
-                if (not POSPaymentLine.GetPaymentType (ReturnPaymentTypePOS, Register."Return Payment Type", Register."Register No.")) then
-                  Error (PaymentTypeNotFound, PaymentTypePOS.TableCaption, PaymentNo, Setup.Register);
-                SaleIsEnded := POSSale.TryEndSaleWithBalancing(POSSession, PaymentTypePOS, ReturnPaymentTypePOS);
-              end;
-            end;
+                    if PaymentTypePOS."Auto End Sale" then begin
+                        Register.Get(Setup.Register);
+                        if (not POSPaymentLine.GetPaymentType(ReturnPaymentTypePOS, Register."Return Payment Type", Register."Register No.")) then
+                            Error(PaymentTypeNotFound, PaymentTypePOS.TableCaption, PaymentNo, Setup.Register);
+                        SaleIsEnded := POSSale.TryEndSaleWithBalancing(POSSession, PaymentTypePOS, ReturnPaymentTypePOS);
+                    end;
+                end;
         end;
 
         if (not PaymentHandled) then
-          Message (MissingImpl, PaymentTypePOS.TableCaption(), PaymentTypePOS."No.", PaymentTypePOS.FieldCaption ("Processing Type"), PaymentTypePOS."Processing Type", Register.TableCaption(), Setup.Register());
+            Message(MissingImpl, PaymentTypePOS.TableCaption(), PaymentTypePOS."No.", PaymentTypePOS.FieldCaption("Processing Type"), PaymentTypePOS."Processing Type", Register.TableCaption(), Setup.Register());
 
         case NextWorkflowStep of
-          NextWorkflowStep::InvokeEFTDevice : FrontEnd.ContinueAtStep ('EftPayment_invokedevice');
-          NextWorkflowStep::CheckResult : FrontEnd.ContinueAtStep ('EftPayment_createpospayment');
-          NextWorkflowStep::VoidPayment : FrontEnd.ContinueAtStep ('EftPayment_voidpayment');
+            NextWorkflowStep::InvokeEFTDevice:
+                FrontEnd.ContinueAtStep('EftPayment_invokedevice');
+            NextWorkflowStep::CheckResult:
+                FrontEnd.ContinueAtStep('EftPayment_createpospayment');
+            NextWorkflowStep::VoidPayment:
+                FrontEnd.ContinueAtStep('EftPayment_voidpayment');
         end;
     end;
 
@@ -329,17 +340,17 @@ codeunit 6150725 "POS Action - Payment"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeActionWorkflow(PaymentTypePOS: Record "Payment Type POS";Parameters: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";Context: Codeunit "POS JSON Management";SubTotal: Decimal;var Handled: Boolean)
+    local procedure OnBeforeActionWorkflow(PaymentTypePOS: Record "Payment Type POS"; Parameters: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: Codeunit "POS JSON Management"; SubTotal: Decimal; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeAction(WorkflowStep: Text;PaymentType: Record "Payment Type POS";Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeAction(WorkflowStep: Text; PaymentType: Record "Payment Type POS"; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterAction(WorkflowStep: Text;PaymentType: Record "Payment Type POS";Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAfterAction(WorkflowStep: Text; PaymentType: Record "Payment Type POS"; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     begin
     end;
 
@@ -347,70 +358,70 @@ codeunit 6150725 "POS Action - Payment"
     begin
     end;
 
-    local procedure ConfigureCashWorkflow(var Context: Codeunit "POS JSON Management";PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS";SalesAmount: Decimal;PaidAmount: Decimal): Boolean
+    local procedure ConfigureCashWorkflow(var Context: Codeunit "POS JSON Management"; PaymentType: Record "Payment Type POS"; ReturnPaymentType: Record "Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
 
-        Context.SetContext ('capture_amount', true);
-        Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
-        Context.SetContext ('amount_description', PaymentType.Description);
-        exit (true);
+        Context.SetContext('capture_amount', true);
+        Context.SetContext('amounttocapture', SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
+        Context.SetContext('amount_description', PaymentType.Description);
+        exit(true);
     end;
 
-    local procedure ConfigureManualCardWorkflow(var Context: Codeunit "POS JSON Management";PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS";SalesAmount: Decimal;PaidAmount: Decimal): Boolean
+    local procedure ConfigureManualCardWorkflow(var Context: Codeunit "POS JSON Management"; PaymentType: Record "Payment Type POS"; ReturnPaymentType: Record "Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
-        Context.SetContext ('capture_amount', true);
-        Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
-        Context.SetContext ('amount_description', PaymentType.Description);
-        exit (true);
+        Context.SetContext('capture_amount', true);
+        Context.SetContext('amounttocapture', SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
+        Context.SetContext('amount_description', PaymentType.Description);
+        exit(true);
     end;
 
-    local procedure ConfigureForeignCashWorkflow(var Context: Codeunit "POS JSON Management";PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS";SalesAmount: Decimal;PaidAmount: Decimal): Boolean
-    begin
-
-        Context.SetContext ('capture_amount', true);
-        Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
-        Context.SetContext ('amount_description', PaymentType.Description);
-        exit (true);
-    end;
-
-    local procedure ConfigureVoucherWorkflow(var Context: Codeunit "POS JSON Management";PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS";SalesAmount: Decimal;PaidAmount: Decimal): Boolean
+    local procedure ConfigureForeignCashWorkflow(var Context: Codeunit "POS JSON Management"; PaymentType: Record "Payment Type POS"; ReturnPaymentType: Record "Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
 
-        Context.SetContext ('capture_amount', false);
-        Context.SetContext ('capture_voucher', true);
-        Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
-        exit (true);
+        Context.SetContext('capture_amount', true);
+        Context.SetContext('amounttocapture', SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
+        Context.SetContext('amount_description', PaymentType.Description);
+        exit(true);
     end;
 
-    local procedure ConfigureForeignVoucherWorkflow(var Context: Codeunit "POS JSON Management";PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS";SalesAmount: Decimal;PaidAmount: Decimal): Boolean
+    local procedure ConfigureVoucherWorkflow(var Context: Codeunit "POS JSON Management"; PaymentType: Record "Payment Type POS"; ReturnPaymentType: Record "Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
+    begin
+
+        Context.SetContext('capture_amount', false);
+        Context.SetContext('capture_voucher', true);
+        Context.SetContext('amounttocapture', SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
+        exit(true);
+    end;
+
+    local procedure ConfigureForeignVoucherWorkflow(var Context: Codeunit "POS JSON Management"; PaymentType: Record "Payment Type POS"; ReturnPaymentType: Record "Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     var
         Amount: Decimal;
     begin
 
         Amount := SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType);
         if Amount < 0 then
-          Amount := 0;
+            Amount := 0;
 
-        Context.SetContext ('capture_amount', (PaymentType."Forced Amount" = false));
-        Context.SetContext ('capture_voucher', (PaymentType."Reference Incoming"));
-        Context.SetContext ('amounttocapture', Amount);
-        exit (true);
+        Context.SetContext('capture_amount', (PaymentType."Forced Amount" = false));
+        Context.SetContext('capture_voucher', (PaymentType."Reference Incoming"));
+        Context.SetContext('amounttocapture', Amount);
+        exit(true);
     end;
 
-    local procedure ConfigureCashTerminalWorkflow(var Context: Codeunit "POS JSON Management";PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS";SalesAmount: Decimal;PaidAmount: Decimal): Boolean
+    local procedure ConfigureCashTerminalWorkflow(var Context: Codeunit "POS JSON Management"; PaymentType: Record "Payment Type POS"; ReturnPaymentType: Record "Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
 
-        Context.SetContext ('capture_amount', (PaymentType."Forced Amount" = false));
-        Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
-        Context.SetContext ('amount_description', PaymentType.Description);
-        exit (true);
+        Context.SetContext('capture_amount', (PaymentType."Forced Amount" = false));
+        Context.SetContext('amounttocapture', SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
+        Context.SetContext('amount_description', PaymentType.Description);
+        exit(true);
     end;
 
     local procedure "--ActionHandlers"()
     begin
     end;
 
-    local procedure CapturePayment("Action": Record "POS Action";WorkflowStep: Text;PaymentTypePOS: Record "Payment Type POS";Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure CapturePayment("Action": Record "POS Action"; WorkflowStep: Text; PaymentTypePOS: Record "Payment Type POS"; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         POSPaymentLine: Codeunit "POS Payment Line";
@@ -425,119 +436,127 @@ codeunit 6150725 "POS Action - Payment"
     begin
 
         if (not Handled) then begin
-          JSON.InitializeJObjectParser (Context,FrontEnd);
-          POSSession.GetPaymentLine (POSPaymentLine);
-          POSPaymentLine.CalculateBalance (SalesAmount, PaidAmount, ReturnAmount, SubTotal);
-          //-NPR5.50 [353807]
-          //-NPR5.49 [351069]
-        //  IF SubTotal = 0 THEN BEGIN
-        //    Handled := TRUE;
-        //    EXIT;
-        //  END;
-          //+NPR5.49 [351069]
-          //+NPR5.50 [353807]
+            JSON.InitializeJObjectParser(Context, FrontEnd);
+            POSSession.GetPaymentLine(POSPaymentLine);
+            POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+            //-NPR5.50 [353807]
+            //-NPR5.49 [351069]
+            //  IF SubTotal = 0 THEN BEGIN
+            //    Handled := TRUE;
+            //    EXIT;
+            //  END;
+            //+NPR5.49 [351069]
+            //+NPR5.50 [353807]
 
-          POSSession.GetSale (POSSale);
-          POSSale.GetCurrentSale (SalePOS);
+            POSSession.GetSale(POSSale);
+            POSSale.GetCurrentSale(SalePOS);
 
-          Clear (POSLine);
-          POSSession.GetSetup (POSSetup);
-          POSLine."Register No." := POSSetup.Register();
+            Clear(POSLine);
+            POSSession.GetSetup(POSSetup);
+            POSLine."Register No." := POSSetup.Register();
 
-          POSLine."No." := PaymentTypePOS."No.";
-          POSLine."Register No." := SalePOS."Register No." ;
-          POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
+            POSLine."No." := PaymentTypePOS."No.";
+            POSLine."Register No." := SalePOS."Register No.";
+            POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
 
-          case PaymentTypePOS."Processing Type" of
-            PaymentTypePOS."Processing Type"::Cash :                    Handled := CaptureCashPayment (JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal);
-            PaymentTypePOS."Processing Type"::"Foreign Currency" :      Handled := CaptureForeignCashPayment (JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal);
-            PaymentTypePOS."Processing Type"::"Gift Voucher" :          Handled := CaptureGiftVoucherPayment (JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal);
-            PaymentTypePOS."Processing Type"::"Credit Voucher" :        Handled := CaptureCreditVoucherPayment (JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal);
-            PaymentTypePOS."Processing Type"::EFT : Handled := CaptureEftPayment (POSSession, JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal, FrontEnd);
-            PaymentTypePOS."Processing Type"::"Foreign Gift Voucher" :  Handled := CaptureForeignVoucherPayment (JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal);
-            PaymentTypePOS."Processing Type"::"Foreign Credit Voucher": Handled := CaptureForeignVoucherPayment (JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal);
-            PaymentTypePOS."Processing Type"::"Manual Card" :           Handled := CaptureManualCardPayment (JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal);
-            else
-              Handled := false;
-          end;
+            case PaymentTypePOS."Processing Type" of
+                PaymentTypePOS."Processing Type"::Cash:
+                    Handled := CaptureCashPayment(JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal);
+                PaymentTypePOS."Processing Type"::"Foreign Currency":
+                    Handled := CaptureForeignCashPayment(JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal);
+                PaymentTypePOS."Processing Type"::"Gift Voucher":
+                    Handled := CaptureGiftVoucherPayment(JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal);
+                PaymentTypePOS."Processing Type"::"Credit Voucher":
+                    Handled := CaptureCreditVoucherPayment(JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal);
+                PaymentTypePOS."Processing Type"::EFT:
+                    Handled := CaptureEftPayment(POSSession, JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal, FrontEnd);
+                PaymentTypePOS."Processing Type"::"Foreign Gift Voucher":
+                    Handled := CaptureForeignVoucherPayment(JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal);
+                PaymentTypePOS."Processing Type"::"Foreign Credit Voucher":
+                    Handled := CaptureForeignVoucherPayment(JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal);
+                PaymentTypePOS."Processing Type"::"Manual Card":
+                    Handled := CaptureManualCardPayment(JSON, POSPaymentLine, POSLine, PaymentTypePOS, SubTotal);
+                else
+                    Handled := false;
+            end;
         end;
     end;
 
-    local procedure CaptureCashPayment(JSON: Codeunit "POS JSON Management";POSPaymentLine: Codeunit "POS Payment Line";var POSLine: Record "Sale Line POS";PaymentType: Record "Payment Type POS";SubTotal: Decimal): Boolean
+    local procedure CaptureCashPayment(JSON: Codeunit "POS JSON Management"; POSPaymentLine: Codeunit "POS Payment Line"; var POSLine: Record "Sale Line POS"; PaymentType: Record "Payment Type POS"; SubTotal: Decimal): Boolean
     var
         AmountToCaptureLCY: Decimal;
         AmountToCapture: Decimal;
     begin
 
-        JSON.SetScope ('/', true);
-        AmountToCaptureLCY := JSON.GetDecimal('amounttocapture',false);
-        if JSON.SetScope('$amount',false) then
-          AmountToCaptureLCY := JSON.GetDecimal('numpad',true);
+        JSON.SetScope('/', true);
+        AmountToCaptureLCY := JSON.GetDecimal('amounttocapture', false);
+        if JSON.SetScope('$amount', false) then
+            AmountToCaptureLCY := JSON.GetDecimal('numpad', true);
         AmountToCapture := 0;
 
         //-NPR5.50 [353807]
         if AmountToCaptureLCY = 0 then
-          exit(true);
+            exit(true);
         //+NPR5.50 [353807]
 
-        ValidateAmount (PaymentType, AmountToCaptureLCY);
+        ValidateAmount(PaymentType, AmountToCaptureLCY);
 
         POSLine."Amount Including VAT" := AmountToCaptureLCY;
-        POSPaymentLine.InsertPaymentLine (POSLine, AmountToCapture);
+        POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
 
-        exit (true);
+        exit(true);
     end;
 
-    local procedure CaptureManualCardPayment(JSON: Codeunit "POS JSON Management";POSPaymentLine: Codeunit "POS Payment Line";var POSLine: Record "Sale Line POS";PaymentType: Record "Payment Type POS";SubTotal: Decimal): Boolean
+    local procedure CaptureManualCardPayment(JSON: Codeunit "POS JSON Management"; POSPaymentLine: Codeunit "POS Payment Line"; var POSLine: Record "Sale Line POS"; PaymentType: Record "Payment Type POS"; SubTotal: Decimal): Boolean
     var
         AmountToCaptureLCY: Decimal;
         AmountToCapture: Decimal;
     begin
-        JSON.SetScope ('/', true);
-        AmountToCaptureLCY := JSON.GetDecimal('amounttocapture',false);
-        if JSON.SetScope('$amount',false) then
-          AmountToCaptureLCY := JSON.GetDecimal('numpad',true);
+        JSON.SetScope('/', true);
+        AmountToCaptureLCY := JSON.GetDecimal('amounttocapture', false);
+        if JSON.SetScope('$amount', false) then
+            AmountToCaptureLCY := JSON.GetDecimal('numpad', true);
         AmountToCapture := 0;
 
         //-NPR5.50 [353807]
         if AmountToCaptureLCY = 0 then
-          exit(true);
+            exit(true);
         //+NPR5.50 [353807]
 
-        ValidateAmount (PaymentType, AmountToCaptureLCY);
+        ValidateAmount(PaymentType, AmountToCaptureLCY);
 
         POSLine."Amount Including VAT" := AmountToCaptureLCY;
-        POSPaymentLine.InsertPaymentLine (POSLine, AmountToCapture);
+        POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
 
-        exit (true);
+        exit(true);
     end;
 
-    local procedure CaptureForeignCashPayment(JSON: Codeunit "POS JSON Management";POSPaymentLine: Codeunit "POS Payment Line";var POSLine: Record "Sale Line POS";PaymentType: Record "Payment Type POS";SubTotal: Decimal): Boolean
+    local procedure CaptureForeignCashPayment(JSON: Codeunit "POS JSON Management"; POSPaymentLine: Codeunit "POS Payment Line"; var POSLine: Record "Sale Line POS"; PaymentType: Record "Payment Type POS"; SubTotal: Decimal): Boolean
     var
         AmountToCaptureLCY: Decimal;
         AmountToCapture: Decimal;
     begin
 
-        JSON.SetScope ('/', true);
-        AmountToCapture := JSON.GetDecimal('amounttocapture',false);
-        if JSON.SetScope('$amount',false) then
-          AmountToCapture := JSON.GetDecimal('numpad',true);
+        JSON.SetScope('/', true);
+        AmountToCapture := JSON.GetDecimal('amounttocapture', false);
+        if JSON.SetScope('$amount', false) then
+            AmountToCapture := JSON.GetDecimal('numpad', true);
         AmountToCaptureLCY := 0;
 
         //-NPR5.50 [353807]
         if AmountToCapture = 0 then
-          exit(true);
+            exit(true);
         //+NPR5.50 [353807]
 
-        ValidateAmount (PaymentType, AmountToCapture);
+        ValidateAmount(PaymentType, AmountToCapture);
 
         POSLine."Amount Including VAT" := AmountToCaptureLCY;
-        POSPaymentLine.InsertPaymentLine (POSLine, AmountToCapture);
+        POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
 
-        exit (true);
+        exit(true);
     end;
 
-    local procedure CaptureGiftVoucherPayment(JSON: Codeunit "POS JSON Management";POSPaymentLine: Codeunit "POS Payment Line";var POSLine: Record "Sale Line POS";PaymentType: Record "Payment Type POS";SubTotal: Decimal): Boolean
+    local procedure CaptureGiftVoucherPayment(JSON: Codeunit "POS JSON Management"; POSPaymentLine: Codeunit "POS Payment Line"; var POSLine: Record "Sale Line POS"; PaymentType: Record "Payment Type POS"; SubTotal: Decimal): Boolean
     var
         VoucherNumber: Code[20];
         AmountCapturedLCY: Decimal;
@@ -545,26 +564,26 @@ codeunit 6150725 "POS Action - Payment"
         VoucherStatusMsg: Text;
     begin
 
-        JSON.SetScope ('/', true);
-        JSON.SetScope ('$voucher', true);
-        VoucherNumber := JSON.GetString ('input', false);
+        JSON.SetScope('/', true);
+        JSON.SetScope('$voucher', true);
+        VoucherNumber := JSON.GetString('input', false);
         //-NPR5.44 [322837]
-        if not (VerifyGiftVoucherNumber (VoucherNumber,VoucherStatusMsg)) then begin
-          if VoucherStatusMsg <> '' then
-            Error(VoucherStatusMsg);
-          Error (VoucherNotValid, VoucherNumber);
+        if not (VerifyGiftVoucherNumber(VoucherNumber, VoucherStatusMsg)) then begin
+            if VoucherStatusMsg <> '' then
+                Error(VoucherStatusMsg);
+            Error(VoucherNotValid, VoucherNumber);
         end;
         //-NPR5.44 [322837]
 
-        ApplyGiftVoucherToPaymentLine (VoucherNumber, POSLine, PaymentType, AmountCapturedLCY, AmountCaptured);
+        ApplyGiftVoucherToPaymentLine(VoucherNumber, POSLine, PaymentType, AmountCapturedLCY, AmountCaptured);
 
         POSLine."Amount Including VAT" := AmountCapturedLCY;
-        POSPaymentLine.InsertPaymentLine (POSLine, AmountCaptured);
+        POSPaymentLine.InsertPaymentLine(POSLine, AmountCaptured);
 
-        exit (true);
+        exit(true);
     end;
 
-    local procedure CaptureCreditVoucherPayment(JSON: Codeunit "POS JSON Management";POSPaymentLine: Codeunit "POS Payment Line";var POSLine: Record "Sale Line POS";PaymentType: Record "Payment Type POS";SubTotal: Decimal): Boolean
+    local procedure CaptureCreditVoucherPayment(JSON: Codeunit "POS JSON Management"; POSPaymentLine: Codeunit "POS Payment Line"; var POSLine: Record "Sale Line POS"; PaymentType: Record "Payment Type POS"; SubTotal: Decimal): Boolean
     var
         VoucherNumber: Code[20];
         AmountCapturedLCY: Decimal;
@@ -572,26 +591,26 @@ codeunit 6150725 "POS Action - Payment"
         VoucherStatusMsg: Text;
     begin
 
-        JSON.SetScope ('/', true);
-        JSON.SetScope ('$voucher', true);
-        VoucherNumber := JSON.GetString ('input', false);
+        JSON.SetScope('/', true);
+        JSON.SetScope('$voucher', true);
+        VoucherNumber := JSON.GetString('input', false);
         //-NPR5.47 [322837]
-        if not (VerifyCreditVoucherNumber (VoucherNumber,VoucherStatusMsg)) then begin
-          if VoucherStatusMsg <> '' then
-            Error(VoucherStatusMsg);
-          Error (VoucherNotValid, VoucherNumber);
+        if not (VerifyCreditVoucherNumber(VoucherNumber, VoucherStatusMsg)) then begin
+            if VoucherStatusMsg <> '' then
+                Error(VoucherStatusMsg);
+            Error(VoucherNotValid, VoucherNumber);
         end;
         //+NPR5.47 [322837]
 
-        ApplyCreditVoucherToPaymentLine (VoucherNumber, POSLine, PaymentType, AmountCapturedLCY, AmountCaptured);
+        ApplyCreditVoucherToPaymentLine(VoucherNumber, POSLine, PaymentType, AmountCapturedLCY, AmountCaptured);
 
         POSLine."Amount Including VAT" := AmountCapturedLCY;
-        POSPaymentLine.InsertPaymentLine (POSLine, AmountCaptured);
+        POSPaymentLine.InsertPaymentLine(POSLine, AmountCaptured);
 
-        exit (true);
+        exit(true);
     end;
 
-    local procedure CaptureEftPayment(POSSession: Codeunit "POS Session";JSON: Codeunit "POS JSON Management";POSPaymentLine: Codeunit "POS Payment Line";var POSLine: Record "Sale Line POS";PaymentType: Record "Payment Type POS";SubTotal: Decimal;FrontEnd: Codeunit "POS Front End Management"): Boolean
+    local procedure CaptureEftPayment(POSSession: Codeunit "POS Session"; JSON: Codeunit "POS JSON Management"; POSPaymentLine: Codeunit "POS Payment Line"; var POSLine: Record "Sale Line POS"; PaymentType: Record "Payment Type POS"; SubTotal: Decimal; FrontEnd: Codeunit "POS Front End Management"): Boolean
     var
         AmountToCapture: Decimal;
         Register: Record Register;
@@ -603,23 +622,23 @@ codeunit 6150725 "POS Action - Payment"
         SalePOS: Record "Sale POS";
     begin
 
-        Register.Get (Setup.Register);
+        Register.Get(Setup.Register);
 
-        POSPaymentLine.GetPaymentLine (POSLine);
+        POSPaymentLine.GetPaymentLine(POSLine);
 
         if (PaymentType."Forced Amount") then begin
-          AmountToCapture := JSON.GetDecimal('amounttocapture',true);
+            AmountToCapture := JSON.GetDecimal('amounttocapture', true);
         end else begin
-          JSON.SetScope ('/', true);
-          AmountToCapture := JSON.GetDecimal('amounttocapture',false);
-          if JSON.SetScope('$amount',false) then
-            AmountToCapture := JSON.GetDecimal('numpad',true);
-          ValidateAmount (PaymentType, AmountToCapture);
+            JSON.SetScope('/', true);
+            AmountToCapture := JSON.GetDecimal('amounttocapture', false);
+            if JSON.SetScope('$amount', false) then
+                AmountToCapture := JSON.GetDecimal('numpad', true);
+            ValidateAmount(PaymentType, AmountToCapture);
         end;
 
         //-NPR5.50 [353807]
         if AmountToCapture = 0 then
-          exit(true);
+            exit(true);
         //+NPR5.50 [353807]
 
         POSSession.GetSale(POSSale);
@@ -632,7 +651,7 @@ codeunit 6150725 "POS Action - Payment"
         exit(true);
     end;
 
-    local procedure CaptureForeignVoucherPayment(JSON: Codeunit "POS JSON Management";POSPaymentLine: Codeunit "POS Payment Line";var POSLine: Record "Sale Line POS";PaymentType: Record "Payment Type POS";SubTotal: Decimal): Boolean
+    local procedure CaptureForeignVoucherPayment(JSON: Codeunit "POS JSON Management"; POSPaymentLine: Codeunit "POS Payment Line"; var POSLine: Record "Sale Line POS"; PaymentType: Record "Payment Type POS"; SubTotal: Decimal): Boolean
     var
         VoucherNumber: Code[20];
         AmountToCaptureLCY: Decimal;
@@ -642,36 +661,36 @@ codeunit 6150725 "POS Action - Payment"
     begin
 
         if (PaymentType."Forced Amount") then begin
-          AmountToCapture := JSON.GetDecimal('amounttocapture',true);
+            AmountToCapture := JSON.GetDecimal('amounttocapture', true);
         end else begin
-          JSON.SetScope ('/', true);
-          AmountToCapture := JSON.GetDecimal('amounttocapture',false);
-          if JSON.SetScope('$amount',false) then
-            AmountToCapture := JSON.GetDecimal('numpad',true);
-          ValidateAmount (PaymentType, AmountToCapture);
+            JSON.SetScope('/', true);
+            AmountToCapture := JSON.GetDecimal('amounttocapture', false);
+            if JSON.SetScope('$amount', false) then
+                AmountToCapture := JSON.GetDecimal('numpad', true);
+            ValidateAmount(PaymentType, AmountToCapture);
         end;
 
         if (PaymentType."Reference Incoming") then begin
-          JSON.SetScope ('/', true);
-          JSON.SetScope ('$voucher', true);
-          VoucherNumber := JSON.GetString ('input', true);
-          if (VoucherNumber = '') then
-            Error (VoucherNotValid, VoucherNumber);
+            JSON.SetScope('/', true);
+            JSON.SetScope('$voucher', true);
+            VoucherNumber := JSON.GetString('input', true);
+            if (VoucherNumber = '') then
+                Error(VoucherNotValid, VoucherNumber);
 
-          if (PaymentType."Processing Type" = PaymentType."Processing Type"::"Foreign Gift Voucher") then
-            IComm.TestForeignGiftVoucher (VoucherNumber);
-          if (PaymentType."Processing Type" = PaymentType."Processing Type"::"Foreign Credit Voucher") then
-            IComm.TestForeignCreditVoucher (VoucherNumber);
+            if (PaymentType."Processing Type" = PaymentType."Processing Type"::"Foreign Gift Voucher") then
+                IComm.TestForeignGiftVoucher(VoucherNumber);
+            if (PaymentType."Processing Type" = PaymentType."Processing Type"::"Foreign Credit Voucher") then
+                IComm.TestForeignCreditVoucher(VoucherNumber);
 
-          POSLine.Reference      := VoucherNumber;
-          POSLine.Description    := CopyStr(POSLine.Description + ' ' + VoucherNumber, 1,30);
+            POSLine.Reference := VoucherNumber;
+            POSLine.Description := CopyStr(POSLine.Description + ' ' + VoucherNumber, 1, 30);
         end;
 
         POSLine."Amount Including VAT" := 0;
-        POSPaymentLine.InsertPaymentLine (POSLine, AmountToCapture);
+        POSPaymentLine.InsertPaymentLine(POSLine, AmountToCapture);
 
-        RetailFormCode.PaymentGCVo (POSLine, PaymentType);
-        exit (true);
+        RetailFormCode.PaymentGCVo(POSLine, PaymentType);
+        exit(true);
     end;
 
     local procedure SkipAfterEFTTransaction(POSSession: Codeunit "POS Session"): Boolean
@@ -699,21 +718,21 @@ codeunit 6150725 "POS Action - Payment"
         // IF NOT EFTTransactionRequest.FINDLAST THEN
         //  EXIT(FALSE);
 
-        if POSSession.RetrieveActionStateSafe ('TransactionRequest_EntryNo', TmpVariant) then
-          EntryNo := TmpVariant;
-        if POSSession.RetrieveActionStateSafe ('TransactionRequest_Token', TmpVariant) then
-          Token := TmpVariant;
+        if POSSession.RetrieveActionStateSafe('TransactionRequest_EntryNo', TmpVariant) then
+            EntryNo := TmpVariant;
+        if POSSession.RetrieveActionStateSafe('TransactionRequest_Token', TmpVariant) then
+            Token := TmpVariant;
 
         if EntryNo = 0 then
-          exit(false);
+            exit(false);
         if not EFTTransactionRequest.Get(EntryNo) then
-          exit(false);
+            exit(false);
         if EFTTransactionRequest.Token <> Token then
-          exit(false);
+            exit(false);
         //+NPR5.50 [354510]
 
         if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::LOOK_UP then
-          exit(true);
+            exit(true);
 
         //-NPR5.51 [359896]
         if (not EFTTransactionRequest.Successful) then begin
@@ -739,43 +758,43 @@ codeunit 6150725 "POS Action - Payment"
     begin
     end;
 
-    procedure CalculateForeignAmount(PaymentTypePOS: Record "Payment Type POS";AmountLCY: Decimal) Amount: Decimal
+    procedure CalculateForeignAmount(PaymentTypePOS: Record "Payment Type POS"; AmountLCY: Decimal) Amount: Decimal
     var
         POSPaymentLine: Codeunit "POS Payment Line";
     begin
 
-        exit (POSPaymentLine.CalculateForeignAmount (PaymentTypePOS, AmountLCY));
+        exit(POSPaymentLine.CalculateForeignAmount(PaymentTypePOS, AmountLCY));
     end;
 
-    procedure RoundAmount(PaymentTypePOS: Record "Payment Type POS";Amount: Decimal): Decimal
+    procedure RoundAmount(PaymentTypePOS: Record "Payment Type POS"; Amount: Decimal): Decimal
     var
         POSPaymentLine: Codeunit "POS Payment Line";
     begin
 
-        exit (POSPaymentLine.RoundAmount (PaymentTypePOS, Amount));
+        exit(POSPaymentLine.RoundAmount(PaymentTypePOS, Amount));
     end;
 
-    local procedure ValidateAmount(PaymentTypePOS: Record "Payment Type POS";AmountToCapture: Decimal)
+    local procedure ValidateAmount(PaymentTypePOS: Record "Payment Type POS"; AmountToCapture: Decimal)
     begin
 
         if (PaymentTypePOS."Maximum Amount" <> 0) then
-          if (AmountToCapture > PaymentTypePOS."Maximum Amount") then
-            Error  (MaxAmountLimit, PaymentTypePOS.Description, PaymentTypePOS."Maximum Amount");
+            if (AmountToCapture > PaymentTypePOS."Maximum Amount") then
+                Error(MaxAmountLimit, PaymentTypePOS.Description, PaymentTypePOS."Maximum Amount");
 
         if (PaymentTypePOS."Minimum Amount" <> 0) then
-          if (AmountToCapture < PaymentTypePOS."Minimum Amount") then
-            Error (MaxAmountLimit, PaymentTypePOS.Description, PaymentTypePOS."Minimum Amount");
+            if (AmountToCapture < PaymentTypePOS."Minimum Amount") then
+                Error(MaxAmountLimit, PaymentTypePOS.Description, PaymentTypePOS."Minimum Amount");
 
         if (PaymentTypePOS."Rounding Precision" <> 0) then
-          if (AmountToCapture mod PaymentTypePOS."Rounding Precision") <> 0 then
-            Error (InvalidAmount, AmountToCapture, PaymentTypePOS.Description);
+            if (AmountToCapture mod PaymentTypePOS."Rounding Precision") <> 0 then
+                Error(InvalidAmount, AmountToCapture, PaymentTypePOS.Description);
     end;
 
-    local procedure SuggestAmount(SalesAmount: Decimal;PaidAmount: Decimal;PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS"): Decimal
+    local procedure SuggestAmount(SalesAmount: Decimal; PaidAmount: Decimal; PaymentType: Record "Payment Type POS"; ReturnPaymentType: Record "Payment Type POS"): Decimal
     var
         POSPaymentLine: Codeunit "POS Payment Line";
     begin
-        exit (POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
+        exit(POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
     end;
 
     local procedure "-- GiftVouchers"()
@@ -788,97 +807,97 @@ codeunit 6150725 "POS Action - Payment"
         PageAction: Action;
     begin
 
-        Clear (VoucherNoOut);
+        Clear(VoucherNoOut);
 
         GiftVoucher.Reset();
-        GiftVoucher.SetFilter (Status, '=%1', GiftVoucher.Status::Open);
-        GiftVoucher.SetFilter (Blocked, '=%1', false);
+        GiftVoucher.SetFilter(Status, '=%1', GiftVoucher.Status::Open);
+        GiftVoucher.SetFilter(Blocked, '=%1', false);
 
-        PageAction := PAGE.RunModal (PAGE::"Touch Screen - Gift Vouchers", GiftVoucher);
+        PageAction := PAGE.RunModal(PAGE::"Touch Screen - Gift Vouchers", GiftVoucher);
 
         if (PageAction = ACTION::LookupOK) then
-          VoucherNoOut := GiftVoucher."No.";
+            VoucherNoOut := GiftVoucher."No.";
 
         if (VoucherNoOut = '') then
-          exit (false);
+            exit(false);
 
-        exit ((PageAction = ACTION::LookupOK));
+        exit((PageAction = ACTION::LookupOK));
     end;
 
-    local procedure SelectGiftVoucherFromOfflineList(var VoucherNoOut: Code[20];OfflineVoucherNo: Code[20]): Boolean
+    local procedure SelectGiftVoucherFromOfflineList(var VoucherNoOut: Code[20]; OfflineVoucherNo: Code[20]): Boolean
     var
         GiftVoucher: Record "Gift Voucher";
         PageAction: Action;
     begin
 
         if (OfflineVoucherNo = '') then
-          exit (false);
+            exit(false);
 
         GiftVoucher.Reset();
         GiftVoucher.SetCurrentKey("Offline - No.");
-        GiftVoucher.SetFilter (Status, '=%1', GiftVoucher.Status::Open);
-        GiftVoucher.SetFilter (Blocked, '=%1', false);
-        GiftVoucher.SetFilter ("Offline - No.", '=%1', OfflineVoucherNo);
-        if (GiftVoucher.IsEmpty ()) then
-          exit (false);
+        GiftVoucher.SetFilter(Status, '=%1', GiftVoucher.Status::Open);
+        GiftVoucher.SetFilter(Blocked, '=%1', false);
+        GiftVoucher.SetFilter("Offline - No.", '=%1', OfflineVoucherNo);
+        if (GiftVoucher.IsEmpty()) then
+            exit(false);
 
         if (GiftVoucher.Count = 1) then begin
-          GiftVoucher.FindFirst ();
-          VoucherNoOut := GiftVoucher."No.";
-          exit (VoucherNoOut <> '');
+            GiftVoucher.FindFirst();
+            VoucherNoOut := GiftVoucher."No.";
+            exit(VoucherNoOut <> '');
         end;
 
-        PageAction := PAGE.RunModal (PAGE::"Touch Screen - Gift Vouchers", GiftVoucher);
+        PageAction := PAGE.RunModal(PAGE::"Touch Screen - Gift Vouchers", GiftVoucher);
 
         if (PageAction = ACTION::LookupOK) then
-          VoucherNoOut := GiftVoucher."No.";
+            VoucherNoOut := GiftVoucher."No.";
 
         if (VoucherNoOut = '') then
-          exit (false);
+            exit(false);
 
-        exit (PageAction = ACTION::LookupOK);
+        exit(PageAction = ACTION::LookupOK);
     end;
 
-    local procedure GiftVoucherExist(VoucherNo: Code[20];var VoucherStatusMsg: Text): Boolean
+    local procedure GiftVoucherExist(VoucherNo: Code[20]; var VoucherStatusMsg: Text): Boolean
     var
         GiftVoucher: Record "Gift Voucher";
     begin
 
         if (VoucherNo = '') then
-          exit (false);
+            exit(false);
 
         if GiftVoucher.Get(VoucherNo) then begin
-          if GiftVoucher.Blocked then begin
-            VoucherStatusMsg := StrSubstNo(VoucherBlocked,VoucherNo);
-            exit(false);
-          end;
-          if GiftVoucher.Status <> GiftVoucher.Status::Open then begin
-            VoucherStatusMsg := StrSubstNo(VoucherStatusNotOpen,VoucherNo,GiftVoucher.Status);
-            exit(false);
-          end;
-          exit(true);
+            if GiftVoucher.Blocked then begin
+                VoucherStatusMsg := StrSubstNo(VoucherBlocked, VoucherNo);
+                exit(false);
+            end;
+            if GiftVoucher.Status <> GiftVoucher.Status::Open then begin
+                VoucherStatusMsg := StrSubstNo(VoucherStatusNotOpen, VoucherNo, GiftVoucher.Status);
+                exit(false);
+            end;
+            exit(true);
         end else begin
-          VoucherStatusMsg := StrSubstNo(VoucherNotFound,VoucherNo);
-          exit(false);
+            VoucherStatusMsg := StrSubstNo(VoucherNotFound, VoucherNo);
+            exit(false);
         end;
     end;
 
-    local procedure VerifyGiftVoucherNumber(var VoucherNumber: Code[20];var VoucherStatusMsg: Text): Boolean
+    local procedure VerifyGiftVoucherNumber(var VoucherNumber: Code[20]; var VoucherStatusMsg: Text): Boolean
     begin
 
         if (VoucherNumber = '') then
-          if (not SelectGiftVoucherFromList (VoucherNumber)) then
-            VoucherNumber := '';
+            if (not SelectGiftVoucherFromList(VoucherNumber)) then
+                VoucherNumber := '';
 
-        if (not GiftVoucherExist (VoucherNumber,VoucherStatusMsg)) then
-          if (not SelectGiftVoucherFromOfflineList (VoucherNumber, VoucherNumber)) then
-            if (not CopyGiftVoucherFromCommonCompany (VoucherNumber)) then
-              VoucherNumber := '';
+        if (not GiftVoucherExist(VoucherNumber, VoucherStatusMsg)) then
+            if (not SelectGiftVoucherFromOfflineList(VoucherNumber, VoucherNumber)) then
+                if (not CopyGiftVoucherFromCommonCompany(VoucherNumber)) then
+                    VoucherNumber := '';
 
         if (VoucherNumber <> '') then
-          exit (GiftVoucherExist (VoucherNumber,VoucherStatusMsg));
+            exit(GiftVoucherExist(VoucherNumber, VoucherStatusMsg));
 
-        exit (false);
+        exit(false);
     end;
 
     local procedure CopyGiftVoucherFromCommonCompany(VoucherNo: Code[20]): Boolean
@@ -891,42 +910,42 @@ codeunit 6150725 "POS Action - Payment"
 
         RetailSetup.Get();
         if (not RetailSetup."Use I-Comm") then
-          exit (false);
+            exit(false);
 
         if (not ICommSetup.Get()) then
-          exit (false);
+            exit(false);
 
         if (ICommSetup."Company - Clearing" = '') then
-          exit (false);
+            exit(false);
 
-        CommonGiftVoucher.ChangeCompany (ICommSetup."Company - Clearing");
-        CommonGiftVoucher.SetFilter ("No.", '=%1', VoucherNo);
+        CommonGiftVoucher.ChangeCompany(ICommSetup."Company - Clearing");
+        CommonGiftVoucher.SetFilter("No.", '=%1', VoucherNo);
         if (not CommonGiftVoucher.FindFirst()) then
-          exit (false);
+            exit(false);
 
         LocalGiftVoucher.Init();
-        LocalGiftVoucher.Copy (CommonGiftVoucher);
+        LocalGiftVoucher.Copy(CommonGiftVoucher);
         LocalGiftVoucher."External Gift Voucher" := true;
         LocalGiftVoucher."Issuing Register No." := CommonGiftVoucher."Register No.";
-        LocalGiftVoucher."Issuing Sales Ticket No."   := CommonGiftVoucher."Sales Ticket No.";
-        exit (LocalGiftVoucher.Insert());
+        LocalGiftVoucher."Issuing Sales Ticket No." := CommonGiftVoucher."Sales Ticket No.";
+        exit(LocalGiftVoucher.Insert());
     end;
 
-    local procedure ApplyGiftVoucherToPaymentLine(VoucherNo: Code[20];var PaymentLine: Record "Sale Line POS";PaymentType: Record "Payment Type POS";var AmountCapturedLCY: Decimal;AmountCaptured: Decimal): Boolean
+    local procedure ApplyGiftVoucherToPaymentLine(VoucherNo: Code[20]; var PaymentLine: Record "Sale Line POS"; PaymentType: Record "Payment Type POS"; var AmountCapturedLCY: Decimal; AmountCaptured: Decimal): Boolean
     var
         GiftVoucher: Record "Gift Voucher";
     begin
 
-        GiftVoucher.Get (VoucherNo);
-        GiftVoucher.TestField (Status, GiftVoucher.Status::Open);
-        GiftVoucher.TestField (Blocked, false);
+        GiftVoucher.Get(VoucherNo);
+        GiftVoucher.TestField(Status, GiftVoucher.Status::Open);
+        GiftVoucher.TestField(Blocked, false);
 
         PaymentLine.Description := PaymentType."Sales Line Text" + ' - ' + GiftVoucher."No.";
         PaymentLine."Custom Descr" := true;
         PaymentLine."Gift Voucher Ref." := GiftVoucher."No.";
 
         if (GiftVoucher."External Gift Voucher") and (GiftVoucher."Created in Company" <> '') then
-          PaymentLine.Reference := GiftVoucher."Sales Ticket No.";
+            PaymentLine.Reference := GiftVoucher."Sales Ticket No.";
 
         PaymentLine.Clearing := PaymentLine.Clearing::Gavekort;
         PaymentLine."Discount Code" := GiftVoucher."No.";
@@ -934,7 +953,7 @@ codeunit 6150725 "POS Action - Payment"
         AmountCapturedLCY := GiftVoucher.Amount;
         AmountCaptured := 0;
 
-        exit (true);
+        exit(true);
     end;
 
     local procedure "-- CreditVouchers"()
@@ -947,64 +966,64 @@ codeunit 6150725 "POS Action - Payment"
         PageAction: Action;
     begin
 
-        Clear (VoucherNoOut);
+        Clear(VoucherNoOut);
 
         CreditVoucher.Reset();
-        CreditVoucher.SetFilter (Status, '=%1', CreditVoucher.Status::Open);
-        CreditVoucher.SetFilter (Blocked, '=%1', false);
+        CreditVoucher.SetFilter(Status, '=%1', CreditVoucher.Status::Open);
+        CreditVoucher.SetFilter(Blocked, '=%1', false);
 
-        PageAction := PAGE.RunModal (PAGE::"Touch Screen - Credit Vouchers", CreditVoucher);
+        PageAction := PAGE.RunModal(PAGE::"Touch Screen - Credit Vouchers", CreditVoucher);
 
         if (PageAction = ACTION::LookupOK) then
-          VoucherNoOut := CreditVoucher."No.";
+            VoucherNoOut := CreditVoucher."No.";
 
         if (VoucherNoOut = '') then
-          exit (false);
+            exit(false);
 
-        exit ((PageAction = ACTION::LookupOK));
+        exit((PageAction = ACTION::LookupOK));
     end;
 
-    local procedure SelectCreditVoucherFromOfflineList(var VoucherNoOut: Code[20];OfflineVoucherNo: Code[20]): Boolean
+    local procedure SelectCreditVoucherFromOfflineList(var VoucherNoOut: Code[20]; OfflineVoucherNo: Code[20]): Boolean
     var
         CreditVoucher: Record "Credit Voucher";
         PageAction: Action;
     begin
 
         if (OfflineVoucherNo = '') then
-          exit (false);
+            exit(false);
 
         CreditVoucher.Reset();
         CreditVoucher.SetCurrentKey("Offline - No.");
-        CreditVoucher.SetFilter (Status, '=%1', CreditVoucher.Status::Open);
-        CreditVoucher.SetFilter (Blocked, '=%1', false);
-        CreditVoucher.SetFilter ("Offline - No.", '=%1', OfflineVoucherNo);
-        if (CreditVoucher.IsEmpty ()) then
-          exit (false);
+        CreditVoucher.SetFilter(Status, '=%1', CreditVoucher.Status::Open);
+        CreditVoucher.SetFilter(Blocked, '=%1', false);
+        CreditVoucher.SetFilter("Offline - No.", '=%1', OfflineVoucherNo);
+        if (CreditVoucher.IsEmpty()) then
+            exit(false);
 
         if (CreditVoucher.Count = 1) then begin
-          CreditVoucher.FindFirst ();
-          VoucherNoOut := CreditVoucher."No.";
-          exit (VoucherNoOut <> '');
+            CreditVoucher.FindFirst();
+            VoucherNoOut := CreditVoucher."No.";
+            exit(VoucherNoOut <> '');
         end;
 
-        PageAction := PAGE.RunModal (PAGE::"Touch Screen - Credit Vouchers", CreditVoucher);
+        PageAction := PAGE.RunModal(PAGE::"Touch Screen - Credit Vouchers", CreditVoucher);
 
         if (PageAction = ACTION::LookupOK) then
-          VoucherNoOut := CreditVoucher."No.";
+            VoucherNoOut := CreditVoucher."No.";
 
         if (VoucherNoOut = '') then
-          exit (false);
+            exit(false);
 
-        exit (PageAction = ACTION::LookupOK);
+        exit(PageAction = ACTION::LookupOK);
     end;
 
-    local procedure CreditVoucherExist(VoucherNo: Code[20];var VoucherStatusMsg: Text): Boolean
+    local procedure CreditVoucherExist(VoucherNo: Code[20]; var VoucherStatusMsg: Text): Boolean
     var
         CreditVoucher: Record "Credit Voucher";
     begin
 
         if (VoucherNo = '') then
-          exit (false);
+            exit(false);
 
         //-NPR5.47 [322837]
         //CreditVoucher.RESET();
@@ -1014,42 +1033,42 @@ codeunit 6150725 "POS Action - Payment"
 
         //EXIT (NOT CreditVoucher.ISEMPTY ());
         if CreditVoucher.Get(VoucherNo) then begin
-          if CreditVoucher.Blocked then begin
-            VoucherStatusMsg := StrSubstNo(VoucherBlocked,VoucherNo);
-            exit(false);
-          end;
-          if CreditVoucher.Status <> CreditVoucher.Status::Open then begin
-            VoucherStatusMsg := StrSubstNo(VoucherStatusNotOpen,VoucherNo,CreditVoucher.Status);
-            exit(false);
-          end;
-          exit(true);
+            if CreditVoucher.Blocked then begin
+                VoucherStatusMsg := StrSubstNo(VoucherBlocked, VoucherNo);
+                exit(false);
+            end;
+            if CreditVoucher.Status <> CreditVoucher.Status::Open then begin
+                VoucherStatusMsg := StrSubstNo(VoucherStatusNotOpen, VoucherNo, CreditVoucher.Status);
+                exit(false);
+            end;
+            exit(true);
         end else begin
-          VoucherStatusMsg := StrSubstNo(VoucherNotFound,VoucherNo);
-          exit(false);
+            VoucherStatusMsg := StrSubstNo(VoucherNotFound, VoucherNo);
+            exit(false);
         end;
         //+NPR5.47 [322837]
     end;
 
-    local procedure VerifyCreditVoucherNumber(var VoucherNumber: Code[20];var VoucherStatusMsg: Text): Boolean
+    local procedure VerifyCreditVoucherNumber(var VoucherNumber: Code[20]; var VoucherStatusMsg: Text): Boolean
     begin
 
         if (VoucherNumber = '') then
-          if (not SelectCreditVoucherFromList (VoucherNumber)) then
-            VoucherNumber := '';
+            if (not SelectCreditVoucherFromList(VoucherNumber)) then
+                VoucherNumber := '';
 
         //-NPR5.47 [322837]
-        if (not CreditVoucherExist (VoucherNumber,VoucherStatusMsg)) then
-        //+NPR5.47 [322837]
-          if (not SelectCreditVoucherFromOfflineList (VoucherNumber, VoucherNumber)) then
-            if (not CopyCreditVoucherFromCommonCompany (VoucherNumber)) then
-              VoucherNumber := '';
+        if (not CreditVoucherExist(VoucherNumber, VoucherStatusMsg)) then
+            //+NPR5.47 [322837]
+            if (not SelectCreditVoucherFromOfflineList(VoucherNumber, VoucherNumber)) then
+                if (not CopyCreditVoucherFromCommonCompany(VoucherNumber)) then
+                    VoucherNumber := '';
 
         if (VoucherNumber <> '') then
-          //-NPR5.47 [322837]
-          exit (CreditVoucherExist (VoucherNumber,VoucherStatusMsg));
-          //+NPR5.47 [322837]
+            //-NPR5.47 [322837]
+            exit(CreditVoucherExist(VoucherNumber, VoucherStatusMsg));
+        //+NPR5.47 [322837]
 
-        exit (false);
+        exit(false);
     end;
 
     local procedure CopyCreditVoucherFromCommonCompany(VoucherNo: Code[20]): Boolean
@@ -1062,42 +1081,42 @@ codeunit 6150725 "POS Action - Payment"
 
         RetailSetup.Get();
         if (not RetailSetup."Use I-Comm") then
-          exit (false);
+            exit(false);
 
         if (not ICommSetup.Get()) then
-          exit (false);
+            exit(false);
 
         if (ICommSetup."Company - Clearing" = '') then
-          exit (false);
+            exit(false);
 
-        CommonCreditVoucher.ChangeCompany (ICommSetup."Company - Clearing");
-        CommonCreditVoucher.SetFilter ("No.", '=%1', VoucherNo);
+        CommonCreditVoucher.ChangeCompany(ICommSetup."Company - Clearing");
+        CommonCreditVoucher.SetFilter("No.", '=%1', VoucherNo);
         if (not CommonCreditVoucher.FindFirst()) then
-          exit (false);
+            exit(false);
 
         LocalCreditVoucher.Init();
-        LocalCreditVoucher.Copy (CommonCreditVoucher);
+        LocalCreditVoucher.Copy(CommonCreditVoucher);
         LocalCreditVoucher."External Credit Voucher" := true;
         LocalCreditVoucher."Issued on Drawer No" := CommonCreditVoucher."Register No.";
-        LocalCreditVoucher."Issued on Ticket No"   := CommonCreditVoucher."Sales Ticket No.";
-        exit (LocalCreditVoucher.Insert());
+        LocalCreditVoucher."Issued on Ticket No" := CommonCreditVoucher."Sales Ticket No.";
+        exit(LocalCreditVoucher.Insert());
     end;
 
-    local procedure ApplyCreditVoucherToPaymentLine(VoucherNo: Code[20];var PaymentLine: Record "Sale Line POS";PaymentType: Record "Payment Type POS";var AmountCapturedLCY: Decimal;AmountCaptured: Decimal): Boolean
+    local procedure ApplyCreditVoucherToPaymentLine(VoucherNo: Code[20]; var PaymentLine: Record "Sale Line POS"; PaymentType: Record "Payment Type POS"; var AmountCapturedLCY: Decimal; AmountCaptured: Decimal): Boolean
     var
         CreditVoucher: Record "Credit Voucher";
     begin
 
-        CreditVoucher.Get (VoucherNo);
-        CreditVoucher.TestField (Status, CreditVoucher.Status::Open);
-        CreditVoucher.TestField (Blocked, false);
+        CreditVoucher.Get(VoucherNo);
+        CreditVoucher.TestField(Status, CreditVoucher.Status::Open);
+        CreditVoucher.TestField(Blocked, false);
 
         PaymentLine.Description := PaymentType."Sales Line Text" + ' - ' + CreditVoucher."No.";
         PaymentLine."Custom Descr" := true;
         PaymentLine."Credit voucher ref." := CreditVoucher."No.";
 
         if (CreditVoucher."External Credit Voucher") and (CreditVoucher."Created in Company" <> '') then
-          PaymentLine.Reference := CreditVoucher."Sales Ticket No.";
+            PaymentLine.Reference := CreditVoucher."Sales Ticket No.";
 
         PaymentLine.Clearing := PaymentLine.Clearing::Tilgodebevis;
         PaymentLine."Discount Code" := CreditVoucher."No.";
@@ -1105,7 +1124,7 @@ codeunit 6150725 "POS Action - Payment"
         AmountCapturedLCY := CreditVoucher.Amount;
         AmountCaptured := 0;
 
-        exit (true);
+        exit(true);
     end;
 }
 

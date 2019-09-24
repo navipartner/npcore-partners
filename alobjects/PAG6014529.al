@@ -1,3 +1,4 @@
+// TODO: CTRLUPGRADE - uses old Standard code; must be removed or refactored
 page 6014529 "Touch Screen - Balancing Line"
 {
     // NPR4.10/VB/20150602 CASE 213003 Support for Web Client (JavaScript) client
@@ -20,21 +21,21 @@ page 6014529 "Touch Screen - Balancing Line"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field(Weight;Weight)
+                field(Weight; Weight)
                 {
                     Editable = false;
                 }
-                field(Quantity;Quantity)
+                field(Quantity; Quantity)
                 {
                 }
-                field(Amount;Amount)
+                field(Amount; Amount)
                 {
                 }
             }
             group(Control6150621)
             {
                 ShowCaption = false;
-                field("Sum";Sum)
+                field("Sum"; Sum)
                 {
                     Caption = 'Total';
                     Editable = false;
@@ -57,8 +58,12 @@ page 6014529 "Touch Screen - Balancing Line"
                 var
                     t001: Label 'Total counted amount';
                 begin
-                    if not Marshaller.NumPad(t001,dec,false,false) then
-                      exit;
+                    // TODO: CTRLUPGRADE - Refactor without Marshaller
+                    Error('CTRLUPGRADE');
+                    /*
+                    if not Marshaller.NumPad(t001, dec, false, false) then
+                        exit;
+                    */
 
                     recount;
 
@@ -90,36 +95,24 @@ page 6014529 "Touch Screen - Balancing Line"
         payment1: Record "Payment Type POS";
     begin
         if Find('-') then;
-        if not payment1.Get("Payment No.","Register No.") then
-          payment1.Get("Payment No.",'');
+        if not payment1.Get("Payment No.", "Register No.") then
+            payment1.Get("Payment No.", '');
     end;
 
     var
         dec: Decimal;
-        Marshaller: Codeunit "POS Event Marshaller";
+        // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
+        //Marshaller: Codeunit "POS Event Marshaller";
         "Sum": Decimal;
         payment: Record "Payment Type POS";
         payment1: Record "Payment Type POS";
         Total: Decimal;
 
-    procedure BalancingNow()
-    begin
-    end;
-
-    procedure SetLine(Sale: Record "Sale POS";"Payment Type POS": Record "Payment Type POS")
-    begin
-        //SetLine
-        FilterGroup(2);
-        SetRange("Payment No.", "Payment Type POS"."No.");
-        SetRange("Register No.", Sale."Register No.");
-        FilterGroup(0);
-    end;
-
     procedure setAmount(dec: Decimal)
     begin
         //setAmount
         if dec > 0 then
-          Validate(Amount, dec);
+            Validate(Amount, dec);
         Modify(true);
         CurrPage.Update(false);
     end;
@@ -128,7 +121,7 @@ page 6014529 "Touch Screen - Balancing Line"
     begin
         //setQuantity
         if dec >= 0 then
-          Validate(Quantity, dec);
+            Validate(Quantity, dec);
         Modify(true);
         CurrPage.Update(false);
     end;
@@ -137,9 +130,10 @@ page 6014529 "Touch Screen - Balancing Line"
     begin
         //reCount
 
-        if FindFirst then repeat
-          setQuantity(0);
-        until Next = 0;
+        if FindFirst then
+            repeat
+                setQuantity(0);
+            until Next = 0;
 
         CurrPage.Update(false);
     end;
@@ -153,8 +147,7 @@ page 6014529 "Touch Screen - Balancing Line"
         payment.SetRange("No.", "Payment No.");
         payment.SetRange("Register Filter", "Register No.");
         if payment.Find('-') then
-          payment.CalcFields("Balancing Total");
+            payment.CalcFields("Balancing Total");
         Sum := payment."Balancing Total";
     end;
 }
-

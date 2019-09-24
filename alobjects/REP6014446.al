@@ -11,7 +11,7 @@ report 6014446 "Salesperson Statistics"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.43/JDH /20180604 CASE 317971 Removed a danish unused label
     DefaultLayout = RDLC;
-    RDLCLayout = './Salesperson Statistics.rdlc';
+    RDLCLayout = './layouts/Salesperson Statistics.rdlc';
 
     Caption = 'Salesperson Statistics';
     UsageCategory = ReportsAndAnalysis;

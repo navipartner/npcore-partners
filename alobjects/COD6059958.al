@@ -10,13 +10,6 @@ codeunit 6059958 "MCS Webcam Proxy TSD"
     end;
 
     var
-        POSDeviceProxyManager: Codeunit "POS Device Proxy Manager";
-        ProtocolStage: Integer;
-        ExpectedResponseType: DotNet npNetType;
-        ExpectedResponseId: Guid;
-        QueuedRequests: DotNet npNetStack;
-        QueuedResponseTypes: DotNet npNetStack;
-        ProtocolManagerId: Guid;
         WebcamArgumentTable: Record "MCS Webcam Argument Table";
         Base64String: Text;
         IdentifyButtonText: Label 'Identify';
@@ -134,7 +127,7 @@ codeunit 6059958 "MCS Webcam Proxy TSD"
     local procedure CloseForm(Data: Text)
     var
         State: DotNet npNetState3;
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
         PersonEntity: DotNet npNetPersonEntity1;
         FaceEntity: DotNet npNetFaceEntity1;
         MCSPerson: Record "MCS Person";
@@ -234,7 +227,7 @@ codeunit 6059958 "MCS Webcam Proxy TSD"
 
     local procedure SerializeJson("Object": Variant): Text
     var
-        JsonConvert: DotNet npNetJsonConvert;
+        JsonConvert: DotNet JsonConvert;
     begin
         exit(JsonConvert.SerializeObject(Object));
     end;

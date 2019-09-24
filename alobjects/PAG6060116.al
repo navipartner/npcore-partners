@@ -26,10 +26,10 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
         {
             group(General)
             {
-                group(Matrix)
+                group(MatrixGroup)
                 {
                     Caption = 'Matrix';
-                    field(fld_LineFactOption;LineFactOption)
+                    field(fld_LineFactOption; LineFactOption)
                     {
                         Caption = 'Show as Lines';
                         Importance = Promoted;
@@ -47,7 +47,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                             UpdateMatrixSubForm;
                         end;
                     }
-                    field(fld_ColumnFactOption;ColumnFactOption)
+                    field(fld_ColumnFactOption; ColumnFactOption)
                     {
                         Caption = 'Show as Columns';
                         Importance = Promoted;
@@ -71,7 +71,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                 group(Display)
                 {
                     Caption = 'Display';
-                    field(fld_FactNameAsColumnHeading;FactNameAsColumnHeading)
+                    field(fld_FactNameAsColumnHeading; FactNameAsColumnHeading)
                     {
                         Caption = 'Fact Name As Column Heading';
                         Importance = Additional;
@@ -82,7 +82,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                             UpdateMatrixSubForm;
                         end;
                     }
-                    field(fld_HideAdmission;HideLinesWithZeroAdmissionCount)
+                    field(fld_HideAdmission; HideLinesWithZeroAdmissionCount)
                     {
                         Caption = 'Hide Lines having Zero Admitted';
                         Importance = Additional;
@@ -99,13 +99,13 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                 group(Metrics)
                 {
                     Caption = 'Metrics';
-                    field(VerticalTotalText;VerticalTotalText)
+                    field(VerticalTotalText; VerticalTotalText)
                     {
                         Caption = 'Matrix Total';
                         Editable = false;
                         Importance = Promoted;
                     }
-                    field(AdmissionDefinition;AdmissionDefinition)
+                    field(AdmissionDefinition; AdmissionDefinition)
                     {
                         Caption = 'Admission Count Def.';
                         Importance = Additional;
@@ -117,7 +117,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                             UpdateMatrixSubForm;
                         end;
                     }
-                    field(fld_DisplayOption;DisplayOption)
+                    field(fld_DisplayOption; DisplayOption)
                     {
                         Caption = 'Show Value As';
                         Importance = Promoted;
@@ -129,7 +129,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                             UpdateMatrixSubForm;
                         end;
                     }
-                    field(fld_PeriodType;PeriodType)
+                    field(fld_PeriodType; PeriodType)
                     {
                         Caption = 'View by';
                         Importance = Additional;
@@ -138,12 +138,12 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                         trigger OnValidate()
                         begin
                             DateFactFilter := '';
-                            FindPeriod ('');
+                            FindPeriod('');
                             MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
                             UpdateMatrixSubForm;
                         end;
                     }
-                    field(fld_TrendPeriodType;TrendPeriodType)
+                    field(fld_TrendPeriodType; TrendPeriodType)
                     {
                         Caption = 'Trend Period Type';
                         Importance = Additional;
@@ -157,14 +157,14 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                     }
                 }
             }
-            part(MATRIX;"TM Ticket Access Stat. Lines")
+            part(MATRIX; "TM Ticket Access Stat. Lines")
             {
                 ShowFilter = false;
             }
             group("Matrix Filters")
             {
                 Caption = 'Matrix Filters';
-                field(ItemFactFilter;ItemFactFilter)
+                field(ItemFactFilter; ItemFactFilter)
                 {
                     Caption = 'Item Filter';
 
@@ -173,16 +173,16 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                         ItemList: Page "Item List";
                     begin
 
-                        exit (FactLookup (LineFactOption::ITEM, Text));
+                        exit(FactLookup(LineFactOption::ITEM, Text));
                     end;
 
                     trigger OnValidate()
                     begin
-                        MATRIX_GenerateColumnCaptions (MATRIX_Step::Initial);
+                        MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
                         UpdateMatrixSubForm;
                     end;
                 }
-                field(TicketTypeFactFilter;TicketTypeFactFilter)
+                field(TicketTypeFactFilter; TicketTypeFactFilter)
                 {
                     Caption = 'Ticket Type Filter';
 
@@ -191,16 +191,16 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                         ItemList: Page "Item List";
                     begin
 
-                        exit (FactLookup (LineFactOption::TICKET_TYPE, Text));
+                        exit(FactLookup(LineFactOption::TICKET_TYPE, Text));
                     end;
 
                     trigger OnValidate()
                     begin
-                        MATRIX_GenerateColumnCaptions (MATRIX_Step::Initial);
+                        MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
                         UpdateMatrixSubForm;
                     end;
                 }
-                field(DateFactFilter;DateFactFilter)
+                field(DateFactFilter; DateFactFilter)
                 {
                     Caption = 'Date Filter';
 
@@ -209,10 +209,10 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                         DateValue: Date;
                     begin
 
-                        if (FactLookup (LineFactOption::ADMISSION_DATE, Text)) then begin
-                          if (Evaluate (DateValue, Text, 9)) then
-                            Text := Format (DateValue);
-                          exit (true);
+                        if (FactLookup(LineFactOption::ADMISSION_DATE, Text)) then begin
+                            if (Evaluate(DateValue, Text, 9)) then
+                                Text := Format(DateValue);
+                            exit(true);
                         end;
                     end;
 
@@ -226,60 +226,60 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
                         if SystemEventWrapper.MakeDateFilter(DateFactFilter) = 0 then;
                         //+TM1.39 [334644]
 
-                        TicketStatistics.SetFilter ("Admission Date", DateFactFilter);
+                        TicketStatistics.SetFilter("Admission Date", DateFactFilter);
                         DateFactFilter := TicketStatistics.GetFilter("Admission Date");
                         InternalDateFilter := DateFactFilter;
                         // DateFilterOnAfterValidate;
 
-                        MATRIX_GenerateColumnCaptions (MATRIX_Step::Initial);
+                        MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
                         UpdateMatrixSubForm;
                     end;
                 }
-                field(HourFactFilter;HourFactFilter)
+                field(HourFactFilter; HourFactFilter)
                 {
                     Caption = 'Hour Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
 
-                        exit (FactLookup (LineFactOption::ADMISSION_HOUR, Text));
+                        exit(FactLookup(LineFactOption::ADMISSION_HOUR, Text));
                     end;
 
                     trigger OnValidate()
                     begin
-                        MATRIX_GenerateColumnCaptions (MATRIX_Step::Initial);
+                        MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
                         UpdateMatrixSubForm;
                     end;
                 }
-                field(AdmissionCodeFilter;AdmissionCodeFilter)
+                field(AdmissionCodeFilter; AdmissionCodeFilter)
                 {
                     Caption = 'Admission Code Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
 
-                        exit (FactLookup (LineFactOption::ADMISSION_CODE, Text));
+                        exit(FactLookup(LineFactOption::ADMISSION_CODE, Text));
                     end;
 
                     trigger OnValidate()
                     begin
-                        MATRIX_GenerateColumnCaptions (MATRIX_Step::Initial);
+                        MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
                         UpdateMatrixSubForm;
                     end;
                 }
-                field(VariantCodeFilter;VariantCodeFilter)
+                field(VariantCodeFilter; VariantCodeFilter)
                 {
                     Caption = 'Variant Code Filter';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
 
-                        exit (FactLookup (LineFactOption::VARIANT_CODE, Text));
+                        exit(FactLookup(LineFactOption::VARIANT_CODE, Text));
                     end;
 
                     trigger OnValidate()
                     begin
-                        MATRIX_GenerateColumnCaptions (MATRIX_Step::Initial);
+                        MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
                         UpdateMatrixSubForm;
                     end;
                 }
@@ -287,27 +287,27 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
             group("Blocked Facts")
             {
                 Caption = 'Blocked Facts';
-                field(BlockedItemFactFilter;BlockedItemFactFilter)
+                field(BlockedItemFactFilter; BlockedItemFactFilter)
                 {
                     Caption = 'Blocked Item Filter';
                     Editable = false;
                 }
-                field(BlockedTicketTypeFactFilter;BlockedTicketTypeFactFilter)
+                field(BlockedTicketTypeFactFilter; BlockedTicketTypeFactFilter)
                 {
                     Caption = 'Blocked Ticket Type Filter';
                     Editable = false;
                 }
-                field(BlockedHourFactFilter;BlockedHourFactFilter)
+                field(BlockedHourFactFilter; BlockedHourFactFilter)
                 {
                     Caption = 'Blocked Hour Filter';
                     Editable = false;
                 }
-                field(BlockedAdmissionFactFilter;BlockedAdmissionFactFilter)
+                field(BlockedAdmissionFactFilter; BlockedAdmissionFactFilter)
                 {
                     Caption = 'Blocked Admisson Filter';
                     Editable = false;
                 }
-                field(BlockedVariantFactFilter;BlockedVariantFactFilter)
+                field(BlockedVariantFactFilter; BlockedVariantFactFilter)
                 {
                     Caption = 'Blocked Variant Code Filter';
                     Editable = false;
@@ -432,15 +432,15 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
         PeriodType := PeriodType::Day;
         //+TM1.28 [304216]
 
-        SetAutoFilterOnBlockedFacts ();
+        SetAutoFilterOnBlockedFacts();
 
-        CalcVerticalTotal ();
+        CalcVerticalTotal();
     end;
 
     trigger OnOpenPage()
     begin
 
-        TicketAccessStatisticsMgr.BuildCompressedStatistics (Today);
+        TicketAccessStatisticsMgr.BuildCompressedStatistics(Today);
 
         FindPeriod('');
         MATRIX_GenerateColumnCaptions(MATRIX_Step::Initial);
@@ -448,8 +448,8 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
     end;
 
     var
-        MATRIX_MatrixRecords: array [32] of Record "Dimension Code Buffer";
-        MATRIX_CaptionSet: array [32] of Text[80];
+        MATRIX_MatrixRecords: array[32] of Record "Dimension Code Buffer";
+        MATRIX_CaptionSet: array[32] of Text[80];
         MATRIX_CaptionRange: Text[250];
         MATRIX_PrimKeyFirstCaptionInCu: Text[80];
         MATRIX_CurrentNoOfColumns: Integer;
@@ -485,7 +485,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
     procedure MATRIX_GenerateColumnCaptions(MATRIX_SetWanted: Option Initial,Previous,Same,Next,PreviousColumn,NextColumn)
     var
         MatrixMgt: Codeunit "Matrix Management";
-        MATRIX_PeriodRecords: array [32] of Record Date;
+        MATRIX_PeriodRecords: array[32] of Record Date;
         i: Integer;
         RecRef: RecordRef;
         FieldRef: FieldRef;
@@ -495,100 +495,100 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
         AccessStatistics: Record "TM Ticket Access Statistics";
     begin
 
-        Clear (MATRIX_CaptionSet);
-        Clear (MATRIX_MatrixRecords);
+        Clear(MATRIX_CaptionSet);
+        Clear(MATRIX_MatrixRecords);
         MATRIX_CurrentNoOfColumns := 12;
 
         if (ColumnFactOption = ColumnFactOption::PERIOD) then begin
-          MatrixMgt.GeneratePeriodMatrixData (
-            MATRIX_SetWanted, MATRIX_CurrentNoOfColumns, FactNameAsColumnHeading,
-            PeriodType, DateFactFilter, MATRIX_PrimKeyFirstCaptionInCu,
-            MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns, MATRIX_PeriodRecords);
-          for i := 1 to MATRIX_CurrentNoOfColumns do begin
-            MATRIX_MatrixRecords[i]."Period Start" := MATRIX_PeriodRecords[i]."Period Start";
-            MATRIX_MatrixRecords[i]."Period End" := MATRIX_PeriodRecords[i]."Period End";
-          end;
+            MatrixMgt.GeneratePeriodMatrixData(
+              MATRIX_SetWanted, MATRIX_CurrentNoOfColumns, FactNameAsColumnHeading,
+              PeriodType, DateFactFilter, MATRIX_PrimKeyFirstCaptionInCu,
+              MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns, MATRIX_PeriodRecords);
+            for i := 1 to MATRIX_CurrentNoOfColumns do begin
+                MATRIX_MatrixRecords[i]."Period Start" := MATRIX_PeriodRecords[i]."Period Start";
+                MATRIX_MatrixRecords[i]."Period End" := MATRIX_PeriodRecords[i]."Period End";
+            end;
         end else begin
 
-          Clear(MATRIX_CaptionSet);
-          RecRef.GetTable (TicketFact);
-          RecRef.SetTable (TicketFact);
+            Clear(MATRIX_CaptionSet);
+            RecRef.GetTable(TicketFact);
+            RecRef.SetTable(TicketFact);
 
-          FieldRef := RecRef.FieldIndex(1);
-          HaveCaptions := true;
+            FieldRef := RecRef.FieldIndex(1);
+            HaveCaptions := true;
 
-          case ColumnFactOption of
-            ColumnFactOption::ITEM :
-              begin
-                FieldRef.SetFilter ('=%1', TicketFact."Fact Name"::ITEM);
-                if ((ItemFactFilter <> '') or (BlockedItemFactFilter <> '')) then begin
-                  FieldRef := RecRef.FieldIndex(2);
-                  FieldRef.SetFilter (FilterAndFilter (ItemFactFilter, BlockedItemFactFilter));
-                end;
-              end;
-            ColumnFactOption::TICKET_TYPE :
-              begin
-                FieldRef.SetFilter ('=%1', TicketFact."Fact Name"::TICKET_TYPE);
-                if ((TicketTypeFactFilter <> '') or (BlockedTicketTypeFactFilter <> '')) then begin
-                  FieldRef := RecRef.FieldIndex(2);
-                  FieldRef.SetFilter (FilterAndFilter (TicketTypeFactFilter, BlockedTicketTypeFactFilter));
-                end;
-               end;
-            ColumnFactOption::ADMISSION_DATE :
-              begin
-                FieldRef.SetFilter ('%1', TicketFact."Fact Name"::ADMISSION_DATE);
-                if (DateFactFilter <> '') then begin
-                  // cast native date to XML date on fact table
-                  AccessStatistics.SetFilter ("Admission Date", DateFactFilter);
-                  if (AccessStatistics.FindFirst ()) then ;
-                  FieldRef := RecRef.FieldIndex(2);
-                  FieldRef.SetFilter ('%1..%2', Format (AccessStatistics.GetRangeMin("Admission Date"),0,9), Format(AccessStatistics.GetRangeMax("Admission Date"),0,9));
-                end;
-              end;
-            ColumnFactOption::ADMISSION_HOUR :
-              begin
-                FieldRef.SetFilter ('%1', TicketFact."Fact Name"::ADMISSION_HOUR);
-                if ((HourFactFilter <> '') or (BlockedHourFactFilter <> '')) then begin
-                  FieldRef := RecRef.FieldIndex(2);
-                  FieldRef.SetFilter (FilterAndFilter (HourFactFilter, BlockedHourFactFilter));
-                end;
-              end;
-            ColumnFactOption::ADMISSION_CODE :
-              begin
-                FieldRef.SetFilter ('%1', TicketFact."Fact Name"::ADMISSION_CODE);
-                if ((AdmissionCodeFilter <> '') or (BlockedAdmissionFactFilter <> '')) then begin
-                  FieldRef := RecRef.FieldIndex(2);
-                  FieldRef.SetFilter (FilterAndFilter (AdmissionCodeFilter, BlockedAdmissionFactFilter));
-                end;
-              end;
-            //-TM1.36 [323024]
-            ColumnFactOption::VARIANT_CODE :
-              begin
-                FieldRef.SetFilter ('%1', TicketFact."Fact Name"::VARIANT_CODE);
-                if ((VariantCodeFilter <> '') or (BlockedVariantFactFilter <> '')) then begin
-                  FieldRef := RecRef.FieldIndex(2);
-                  FieldRef.SetFilter (FilterAndFilter (VariantCodeFilter, BlockedVariantFactFilter));
-                end;
-              end;
-            //+TM1.36 [323024]
+            case ColumnFactOption of
+                ColumnFactOption::ITEM:
+                    begin
+                        FieldRef.SetFilter('=%1', TicketFact."Fact Name"::ITEM);
+                        if ((ItemFactFilter <> '') or (BlockedItemFactFilter <> '')) then begin
+                            FieldRef := RecRef.FieldIndex(2);
+                            FieldRef.SetFilter(FilterAndFilter(ItemFactFilter, BlockedItemFactFilter));
+                        end;
+                    end;
+                ColumnFactOption::TICKET_TYPE:
+                    begin
+                        FieldRef.SetFilter('=%1', TicketFact."Fact Name"::TICKET_TYPE);
+                        if ((TicketTypeFactFilter <> '') or (BlockedTicketTypeFactFilter <> '')) then begin
+                            FieldRef := RecRef.FieldIndex(2);
+                            FieldRef.SetFilter(FilterAndFilter(TicketTypeFactFilter, BlockedTicketTypeFactFilter));
+                        end;
+                    end;
+                ColumnFactOption::ADMISSION_DATE:
+                    begin
+                        FieldRef.SetFilter('%1', TicketFact."Fact Name"::ADMISSION_DATE);
+                        if (DateFactFilter <> '') then begin
+                            // cast native date to XML date on fact table
+                            AccessStatistics.SetFilter("Admission Date", DateFactFilter);
+                            if (AccessStatistics.FindFirst()) then;
+                            FieldRef := RecRef.FieldIndex(2);
+                            FieldRef.SetFilter('%1..%2', Format(AccessStatistics.GetRangeMin("Admission Date"), 0, 9), Format(AccessStatistics.GetRangeMax("Admission Date"), 0, 9));
+                        end;
+                    end;
+                ColumnFactOption::ADMISSION_HOUR:
+                    begin
+                        FieldRef.SetFilter('%1', TicketFact."Fact Name"::ADMISSION_HOUR);
+                        if ((HourFactFilter <> '') or (BlockedHourFactFilter <> '')) then begin
+                            FieldRef := RecRef.FieldIndex(2);
+                            FieldRef.SetFilter(FilterAndFilter(HourFactFilter, BlockedHourFactFilter));
+                        end;
+                    end;
+                ColumnFactOption::ADMISSION_CODE:
+                    begin
+                        FieldRef.SetFilter('%1', TicketFact."Fact Name"::ADMISSION_CODE);
+                        if ((AdmissionCodeFilter <> '') or (BlockedAdmissionFactFilter <> '')) then begin
+                            FieldRef := RecRef.FieldIndex(2);
+                            FieldRef.SetFilter(FilterAndFilter(AdmissionCodeFilter, BlockedAdmissionFactFilter));
+                        end;
+                    end;
+                    //-TM1.36 [323024]
+                ColumnFactOption::VARIANT_CODE:
+                    begin
+                        FieldRef.SetFilter('%1', TicketFact."Fact Name"::VARIANT_CODE);
+                        if ((VariantCodeFilter <> '') or (BlockedVariantFactFilter <> '')) then begin
+                            FieldRef := RecRef.FieldIndex(2);
+                            FieldRef.SetFilter(FilterAndFilter(VariantCodeFilter, BlockedVariantFactFilter));
+                        end;
+                    end;
+                //+TM1.36 [323024]
 
-            else
-              HaveCaptions := false;
-          end;
+                else
+                    HaveCaptions := false;
+            end;
 
-          if (HaveCaptions) then begin
-            MatrixMgt.GenerateMatrixData (
-              RecRef, MATRIX_SetWanted, MATRIX_CurrentNoOfColumns, 2,
-              MATRIX_PrimKeyFirstCaptionInCu, MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns);
+            if (HaveCaptions) then begin
+                MatrixMgt.GenerateMatrixData(
+                  RecRef, MATRIX_SetWanted, MATRIX_CurrentNoOfColumns, 2,
+                  MATRIX_PrimKeyFirstCaptionInCu, MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns);
 
-            for i := 1 to MATRIX_CurrentNoOfColumns do
-              MATRIX_MatrixRecords[i].Code := MATRIX_CaptionSet[i];
+                for i := 1 to MATRIX_CurrentNoOfColumns do
+                    MATRIX_MatrixRecords[i].Code := MATRIX_CaptionSet[i];
 
-            if (FactNameAsColumnHeading) then
-              MatrixMgt.GenerateMatrixData (
-                RecRef, MATRIX_SetWanted, MATRIX_CurrentNoOfColumns, 10,
-                MATRIX_PrimKeyFirstCaptionInCu, MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns);
-          end;
+                if (FactNameAsColumnHeading) then
+                    MatrixMgt.GenerateMatrixData(
+                      RecRef, MATRIX_SetWanted, MATRIX_CurrentNoOfColumns, 10,
+                      MATRIX_PrimKeyFirstCaptionInCu, MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns);
+            end;
 
         end;
     end;
@@ -604,31 +604,31 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
     begin
 
         if (DateFactFilter <> '') then begin
-          Calendar.SetFilter ("Period Start", DateFactFilter);
+            Calendar.SetFilter("Period Start", DateFactFilter);
 
-          if (not PeriodFormMgt.FindDate ('-', Calendar, PeriodType)) then
-            PeriodFormMgt.FindDate ('-', Calendar, PeriodType::Day);
+            if (not PeriodFormMgt.FindDate('-', Calendar, PeriodType)) then
+                PeriodFormMgt.FindDate('-', Calendar, PeriodType::Day);
 
-          Calendar.SetRange ("Period Start");
+            Calendar.SetRange("Period Start");
         end;
 
         if Calendar."Period Start" = 0D then
-          Calendar."Period Start" := Today;  //-+TM1.28 [304216] Calendar."Period Start" := CALCDATE ('<-1D>', WORKDATE);
+            Calendar."Period Start" := Today;  //-+TM1.28 [304216] Calendar."Period Start" := CALCDATE ('<-1D>', WORKDATE);
 
         PeriodFormMgt.FindDate(SearchText, Calendar, PeriodType);
         Date1 := Calendar."Period Start";
         Date2 := Calendar."Period End";
 
         if (ColumnFactOption = ColumnFactOption::PERIOD) then begin
-          Date1 := Calendar."Period Start";
-          Calendar.Next (11);
-          Date2 := Calendar."Period End";
+            Date1 := Calendar."Period Start";
+            Calendar.Next(11);
+            Date2 := Calendar."Period End";
         end;
 
-        TicketStatistics.SetRange ("Admission Date Filter", NormalDate(Date1), NormalDate(Date2));
+        TicketStatistics.SetRange("Admission Date Filter", NormalDate(Date1), NormalDate(Date2));
 
         if (TicketStatistics.GetRangeMin("Admission Date Filter") = TicketStatistics.GetRangeMax("Admission Date Filter")) then
-          TicketStatistics.SetRange("Admission Date Filter", TicketStatistics.GetRangeMin("Admission Date Filter"));
+            TicketStatistics.SetRange("Admission Date Filter", TicketStatistics.GetRangeMin("Admission Date Filter"));
 
         InternalDateFilter := TicketStatistics.GetFilter("Admission Date Filter");
         DateFactFilter := InternalDateFilter;
@@ -640,60 +640,67 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
         // CurrPage.MATRIX.PAGE.SetFilters (ItemFactFilter, TicketTypeFactFilter, DateFactFilter, HourFactFilter, AdmissionCodeFilter, VariantCodeFilter,
         //  BlockedItemFactFilter, BlockedTicketTypeFactFilter, '', BlockedHourFactFilter, BlockedAdmissionFactFilter, BlockedVariantFactFilter);
 
-        CurrPage.MATRIX.PAGE.SetFilters (
+        CurrPage.MATRIX.PAGE.SetFilters(
           ItemFactFilter, TicketTypeFactFilter, DateFactFilter, HourFactFilter, AdmissionCodeFilter, VariantCodeFilter,
           BlockedItemFactFilter, BlockedTicketTypeFactFilter, '', BlockedHourFactFilter, BlockedAdmissionFactFilter, BlockedVariantFactFilter,
           HideLinesWithZeroAdmissionCount);
         //+#341289 [341289]
 
-        CurrPage.MATRIX.PAGE.Load (
+        CurrPage.MATRIX.PAGE.Load(
           MATRIX_CaptionSet,
           MATRIX_MatrixRecords,
           MATRIX_CurrentNoOfColumns,
           LineFactOption, ColumnFactOption, DisplayOption, PeriodType, AdmissionDefinition);
 
-        TicketStatisticsFilter.Reset ();
-        TicketStatisticsFilter.SetFilter ("Item No. Filter", FilterAndFilter (ItemFactFilter, BlockedItemFactFilter));
-        TicketStatisticsFilter.SetFilter ("Ticket Type Filter", FilterAndFilter (TicketTypeFactFilter, BlockedTicketTypeFactFilter));
-        TicketStatisticsFilter.SetFilter ("Admission Date Filter", FilterAndFilter (DateFactFilter, ''));
-        TicketStatisticsFilter.SetFilter ("Admission Hour Filter", FilterAndFilter (HourFactFilter, BlockedHourFactFilter));
-        TicketStatisticsFilter.SetFilter ("Admission Code Filter", FilterAndFilter (AdmissionCodeFilter, BlockedAdmissionFactFilter));
+        TicketStatisticsFilter.Reset();
+        TicketStatisticsFilter.SetFilter("Item No. Filter", FilterAndFilter(ItemFactFilter, BlockedItemFactFilter));
+        TicketStatisticsFilter.SetFilter("Ticket Type Filter", FilterAndFilter(TicketTypeFactFilter, BlockedTicketTypeFactFilter));
+        TicketStatisticsFilter.SetFilter("Admission Date Filter", FilterAndFilter(DateFactFilter, ''));
+        TicketStatisticsFilter.SetFilter("Admission Hour Filter", FilterAndFilter(HourFactFilter, BlockedHourFactFilter));
+        TicketStatisticsFilter.SetFilter("Admission Code Filter", FilterAndFilter(AdmissionCodeFilter, BlockedAdmissionFactFilter));
         //-TM1.36 [323024]
-        TicketStatisticsFilter.SetFilter ("Variant Code Filter", FilterAndFilter (VariantCodeFilter, BlockedVariantFactFilter));
+        TicketStatisticsFilter.SetFilter("Variant Code Filter", FilterAndFilter(VariantCodeFilter, BlockedVariantFactFilter));
         //+TM1.36 [323024]
 
         CalcVerticalTotal();
         CurrPage.Update(false);
     end;
 
-    procedure FactLookup(FactOption: Option;var FactFilter: Text[1024]): Boolean
+    procedure FactLookup(FactOption: Option; var FactFilter: Text[1024]): Boolean
     var
         FactList: Page "TM Ticket Access Facts";
         TicketFact: Record "TM Ticket Access Fact";
     begin
-        TicketFact.FilterGroup (2);
+        TicketFact.FilterGroup(2);
         case FactOption of
-          LineFactOption::ITEM :           TicketFact.SetFilter ("Fact Name", '=%1', TicketFact."Fact Name"::ITEM);
-          LineFactOption::TICKET_TYPE :    TicketFact.SetFilter ("Fact Name", '=%1', TicketFact."Fact Name"::TICKET_TYPE);
-          LineFactOption::ADMISSION_DATE : TicketFact.SetFilter ("Fact Name", '=%1', TicketFact."Fact Name"::ADMISSION_DATE);
-          LineFactOption::ADMISSION_HOUR : TicketFact.SetFilter ("Fact Name", '=%1', TicketFact."Fact Name"::ADMISSION_HOUR);
-          LineFactOption::ADMISSION_CODE : TicketFact.SetFilter ("Fact Name", '=%1', TicketFact."Fact Name"::ADMISSION_CODE);
-          //-TM1.36 [323024]
-          LineFactOption::VARIANT_CODE   : TicketFact.SetFilter ("Fact Name", '=%1', TicketFact."Fact Name"::VARIANT_CODE);
-          //+TM1.36 [323024]
+            LineFactOption::ITEM:
+                TicketFact.SetFilter("Fact Name", '=%1', TicketFact."Fact Name"::ITEM);
+            LineFactOption::TICKET_TYPE:
+                TicketFact.SetFilter("Fact Name", '=%1', TicketFact."Fact Name"::TICKET_TYPE);
+            LineFactOption::ADMISSION_DATE:
+                TicketFact.SetFilter("Fact Name", '=%1', TicketFact."Fact Name"::ADMISSION_DATE);
+            LineFactOption::ADMISSION_HOUR:
+                TicketFact.SetFilter("Fact Name", '=%1', TicketFact."Fact Name"::ADMISSION_HOUR);
+            LineFactOption::ADMISSION_CODE:
+                TicketFact.SetFilter("Fact Name", '=%1', TicketFact."Fact Name"::ADMISSION_CODE);
+            //-TM1.36 [323024]
+            LineFactOption::VARIANT_CODE:
+                TicketFact.SetFilter("Fact Name", '=%1', TicketFact."Fact Name"::VARIANT_CODE);
+            //+TM1.36 [323024]
 
-          else Error (INVALID_FACTOPTION);
+            else
+                Error(INVALID_FACTOPTION);
         end;
-        TicketFact.FilterGroup (0);
+        TicketFact.FilterGroup(0);
 
         FactList.LookupMode(true);
-        FactList.SetTableView (TicketFact);
-        FactList.SetSelection (TicketFact);
+        FactList.SetTableView(TicketFact);
+        FactList.SetSelection(TicketFact);
 
         if FactList.RunModal = ACTION::LookupOK then begin
-          FactFilter := FactList.GetSelectionFilter;
-          UpdateMatrixSubForm ();
-          exit(true);
+            FactFilter := FactList.GetSelectionFilter;
+            UpdateMatrixSubForm();
+            exit(true);
         end;
     end;
 
@@ -703,7 +710,7 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
     begin
 
         MatrixPeriod := DateFactFilter;
-        VerticalTotalText  := Format (TicketAccessStatisticsMgr.CalcVerticalTotal (LineFactOption, ColumnFactOption, TicketStatisticsFilter, MatrixPeriod, AdmissionDefinition));
+        VerticalTotalText := Format(TicketAccessStatisticsMgr.CalcVerticalTotal(LineFactOption, ColumnFactOption, TicketStatisticsFilter, MatrixPeriod, AdmissionDefinition));
     end;
 
     local procedure SetAutoFilterOnBlockedFacts()
@@ -711,58 +718,58 @@ page 6060116 "TM Ticket Access Stat. Mtrx"
         TicketAccessFact: Record "TM Ticket Access Fact";
     begin
 
-        TicketAccessFact.SetFilter (Block, '=%1', true);
-        if (TicketAccessFact.FindSet ()) then begin
-          repeat
-            case TicketAccessFact."Fact Name" of
+        TicketAccessFact.SetFilter(Block, '=%1', true);
+        if (TicketAccessFact.FindSet()) then begin
+            repeat
+                case TicketAccessFact."Fact Name" of
 
-              TicketAccessFact."Fact Name"::TICKET_TYPE :
-                if (BlockedTicketTypeFactFilter = '') then
-                  BlockedTicketTypeFactFilter := StrSubstNo ('<>%1', TicketAccessFact."Fact Code")
-                else
-                  BlockedTicketTypeFactFilter := StrSubstNo ('%1&<>%2', BlockedTicketTypeFactFilter, TicketAccessFact."Fact Code");
+                    TicketAccessFact."Fact Name"::TICKET_TYPE:
+                        if (BlockedTicketTypeFactFilter = '') then
+                            BlockedTicketTypeFactFilter := StrSubstNo('<>%1', TicketAccessFact."Fact Code")
+                        else
+                            BlockedTicketTypeFactFilter := StrSubstNo('%1&<>%2', BlockedTicketTypeFactFilter, TicketAccessFact."Fact Code");
 
-              TicketAccessFact."Fact Name"::ADMISSION_CODE :
-                if (BlockedAdmissionFactFilter = '') then
-                  BlockedAdmissionFactFilter := StrSubstNo ('<>%1', TicketAccessFact."Fact Code")
-                else
-                  BlockedAdmissionFactFilter := StrSubstNo ('%1&<>%2', BlockedAdmissionFactFilter, TicketAccessFact."Fact Code");
+                    TicketAccessFact."Fact Name"::ADMISSION_CODE:
+                        if (BlockedAdmissionFactFilter = '') then
+                            BlockedAdmissionFactFilter := StrSubstNo('<>%1', TicketAccessFact."Fact Code")
+                        else
+                            BlockedAdmissionFactFilter := StrSubstNo('%1&<>%2', BlockedAdmissionFactFilter, TicketAccessFact."Fact Code");
 
-              TicketAccessFact."Fact Name"::ITEM :
-                if (BlockedItemFactFilter = '') then
-                  BlockedItemFactFilter := StrSubstNo ('<>%1', TicketAccessFact."Fact Code")
-                else
-                  BlockedItemFactFilter := StrSubstNo ('%1&<>%2', BlockedItemFactFilter, TicketAccessFact."Fact Code");
+                    TicketAccessFact."Fact Name"::ITEM:
+                        if (BlockedItemFactFilter = '') then
+                            BlockedItemFactFilter := StrSubstNo('<>%1', TicketAccessFact."Fact Code")
+                        else
+                            BlockedItemFactFilter := StrSubstNo('%1&<>%2', BlockedItemFactFilter, TicketAccessFact."Fact Code");
 
-              TicketAccessFact."Fact Name"::ADMISSION_HOUR :
-                if (BlockedHourFactFilter = '') then
-                  BlockedHourFactFilter := StrSubstNo ('<>%1', TicketAccessFact."Fact Code")
-                else
-                  BlockedHourFactFilter := StrSubstNo ('%1&<>%2', BlockedHourFactFilter, TicketAccessFact."Fact Code");
+                    TicketAccessFact."Fact Name"::ADMISSION_HOUR:
+                        if (BlockedHourFactFilter = '') then
+                            BlockedHourFactFilter := StrSubstNo('<>%1', TicketAccessFact."Fact Code")
+                        else
+                            BlockedHourFactFilter := StrSubstNo('%1&<>%2', BlockedHourFactFilter, TicketAccessFact."Fact Code");
 
-              //-TM1.36 [323024]
-              TicketAccessFact."Fact Name"::VARIANT_CODE :
-                if (BlockedVariantFactFilter = '') then
-                  BlockedVariantFactFilter := StrSubstNo ('<>%1', TicketAccessFact."Fact Code")
-                else
-                  BlockedVariantFactFilter := StrSubstNo ('%1&<>%2', BlockedVariantFactFilter, TicketAccessFact."Fact Code");
-              //+TM1.36 [323024]
-            end;
-          until (TicketAccessFact.Next () = 0);
+                        //-TM1.36 [323024]
+                    TicketAccessFact."Fact Name"::VARIANT_CODE:
+                        if (BlockedVariantFactFilter = '') then
+                            BlockedVariantFactFilter := StrSubstNo('<>%1', TicketAccessFact."Fact Code")
+                        else
+                            BlockedVariantFactFilter := StrSubstNo('%1&<>%2', BlockedVariantFactFilter, TicketAccessFact."Fact Code");
+                        //+TM1.36 [323024]
+                end;
+            until (TicketAccessFact.Next() = 0);
         end;
     end;
 
-    local procedure FilterAndFilter(pFilter1: Text;pFilter2: Text) newFilter: Text
+    local procedure FilterAndFilter(pFilter1: Text; pFilter2: Text) newFilter: Text
     begin
 
         newFilter := pFilter1;
         if (newFilter = '') then
-          newFilter := pFilter2
+            newFilter := pFilter2
         else
-          if (pFilter2 <> '') then
-            newFilter := StrSubstNo ('%1&%2', pFilter1, pFilter2);
+            if (pFilter2 <> '') then
+                newFilter := StrSubstNo('%1&%2', pFilter1, pFilter2);
 
-        exit (newFilter);
+        exit(newFilter);
     end;
 }
 

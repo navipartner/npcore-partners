@@ -723,9 +723,9 @@ page 6059974 "Variety Matrix"
                         }
                         field(Total;Total)
                         {
-                            BlankZero = true;
+                            //BlankZero = true;
                             Caption = 'Total';
-                            DecimalPlaces = 0:5;
+                            //DecimalPlaces = 0:5;
                             Enabled = ShowTotal;
                         }
                     }

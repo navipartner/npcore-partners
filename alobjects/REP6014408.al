@@ -6,7 +6,7 @@ report 6014408 "Item Group Overview"
     //                                    Obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Item Group Overview.rdlc';
+    RDLCLayout = './layouts/Item Group Overview.rdlc';
 
     Caption = 'Item Group Overview';
     UsageCategory = ReportsAndAnalysis;

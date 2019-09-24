@@ -8,7 +8,7 @@ report 6014448 "Item Group Inventory Value"
     //                                    Cleared unused variables and Labels
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Item Group Inventory Value.rdlc';
+    RDLCLayout = './layouts/Item Group Inventory Value.rdlc';
 
     Caption = 'Item Group Inventory Value';
     UsageCategory = ReportsAndAnalysis;

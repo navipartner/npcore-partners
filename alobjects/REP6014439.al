@@ -13,7 +13,7 @@ report 6014439 "Item Sales Postings"
     // NPR5.51/ZESO/20190730 CASE 363111 Added Option to Show Vendor No
     // NPR5.51/ZESO/20190731 CASE 332037 Removed Option Print Sale Inc. VAT
     DefaultLayout = RDLC;
-    RDLCLayout = './Item Sales Postings.rdlc';
+    RDLCLayout = './layouts/Item Sales Postings.rdlc';
 
     Caption = 'Item Sales Postings';
     UsageCategory = ReportsAndAnalysis;

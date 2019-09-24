@@ -3,7 +3,7 @@ report 6060052 "Item Wise Sales Figures"
     // NPR70.00.00.00/LS/20150107  CASE 202876 : Report to 2013 version
     // NPR5.23.03/MHA/20160726  CASE 242557 Magento references updated according to MAG2.00
     DefaultLayout = RDLC;
-    RDLCLayout = './Item Wise Sales Figures.rdlc';
+    RDLCLayout = './layouts/Item Wise Sales Figures.rdlc';
 
     Caption = 'Item Wise Sales Figures';
     UsageCategory = ReportsAndAnalysis;

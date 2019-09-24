@@ -24,19 +24,18 @@ page 6060117 "TM Ticket Access Stat. Lines"
         {
             repeater(Group)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
                 }
-                field(Name;Name)
+                field(Name; Name)
                 {
                 }
-                field(LINE_Total;LINE_Total)
+                field(LINE_Total; LINE_Total)
                 {
                     Caption = 'Admissions';
                 }
-                field(Field1;MATRIX_CellData[1])
+                field(Field1; MATRIX_CellData[1])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[1];
                     StyleExpr = 'Strong';
 
@@ -45,9 +44,8 @@ page 6060117 "TM Ticket Access Stat. Lines"
                         MATRIX_OnDrillDown(1);
                     end;
                 }
-                field(Field2;MATRIX_CellData[2])
+                field(Field2; MATRIX_CellData[2])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[2];
                     StyleExpr = 'Strong';
 
@@ -56,9 +54,8 @@ page 6060117 "TM Ticket Access Stat. Lines"
                         MATRIX_OnDrillDown(2);
                     end;
                 }
-                field(Field3;MATRIX_CellData[3])
+                field(Field3; MATRIX_CellData[3])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[3];
                     StyleExpr = 'Strong';
 
@@ -67,9 +64,8 @@ page 6060117 "TM Ticket Access Stat. Lines"
                         MATRIX_OnDrillDown(3);
                     end;
                 }
-                field(Field4;MATRIX_CellData[4])
+                field(Field4; MATRIX_CellData[4])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[4];
                     StyleExpr = 'Strong';
 
@@ -78,9 +74,8 @@ page 6060117 "TM Ticket Access Stat. Lines"
                         MATRIX_OnDrillDown(4);
                     end;
                 }
-                field(Field5;MATRIX_CellData[5])
+                field(Field5; MATRIX_CellData[5])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[5];
                     StyleExpr = 'Strong';
 
@@ -89,9 +84,8 @@ page 6060117 "TM Ticket Access Stat. Lines"
                         MATRIX_OnDrillDown(5);
                     end;
                 }
-                field(Field6;MATRIX_CellData[6])
+                field(Field6; MATRIX_CellData[6])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[6];
                     StyleExpr = 'Strong';
 
@@ -100,9 +94,8 @@ page 6060117 "TM Ticket Access Stat. Lines"
                         MATRIX_OnDrillDown(6);
                     end;
                 }
-                field(Field7;MATRIX_CellData[7])
+                field(Field7; MATRIX_CellData[7])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[7];
                     StyleExpr = 'Strong';
 
@@ -111,9 +104,8 @@ page 6060117 "TM Ticket Access Stat. Lines"
                         MATRIX_OnDrillDown(7);
                     end;
                 }
-                field(Field8;MATRIX_CellData[8])
+                field(Field8; MATRIX_CellData[8])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[8];
                     StyleExpr = 'Strong';
 
@@ -122,9 +114,8 @@ page 6060117 "TM Ticket Access Stat. Lines"
                         MATRIX_OnDrillDown(8);
                     end;
                 }
-                field(Field9;MATRIX_CellData[9])
+                field(Field9; MATRIX_CellData[9])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[9];
                     StyleExpr = 'Strong';
 
@@ -133,9 +124,8 @@ page 6060117 "TM Ticket Access Stat. Lines"
                         MATRIX_OnDrillDown(9);
                     end;
                 }
-                field(Field10;MATRIX_CellData[10])
+                field(Field10; MATRIX_CellData[10])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[10];
                     StyleExpr = 'Strong';
 
@@ -144,9 +134,8 @@ page 6060117 "TM Ticket Access Stat. Lines"
                         MATRIX_OnDrillDown(10);
                     end;
                 }
-                field(Field11;MATRIX_CellData[11])
+                field(Field11; MATRIX_CellData[11])
                 {
-                    BlankZero = true;
                     CaptionClass = '3,' + MATRIX_CaptionSet[11];
                     StyleExpr = 'Strong';
 
@@ -155,9 +144,9 @@ page 6060117 "TM Ticket Access Stat. Lines"
                         MATRIX_OnDrillDown(11);
                     end;
                 }
-                field(Field12;MATRIX_CellData[12])
+                field(Field12; MATRIX_CellData[12])
                 {
-                    BlankZero = true;
+
                     CaptionClass = '3,' + MATRIX_CaptionSet[12];
                     StyleExpr = 'Strong';
 
@@ -188,7 +177,7 @@ page 6060117 "TM Ticket Access Stat. Lines"
         // MATRIX_OnAfterGetRecord (MATRIX_MaxNoOfMatrixColumn);
         //+TM1.39 [341289]
 
-        LINE_Total := DisplayCellValue (0, 0, false);
+        LINE_Total := DisplayCellValue(0, 0, false);
         //IF (ColumnFactOption = ColumnFactOption::PERIOD) THEN
         //  LINE_Total := '';
     end;
@@ -202,11 +191,11 @@ page 6060117 "TM Ticket Access Stat. Lines"
         // EXIT (TicketAdmissionStatisticsMgr.FindRec (LineFactOption, Rec, Which, TicketFactLineFilter,
         //                                            PeriodType, PeriodFilter, PeriodInitialized, InternalDateFilter));
 
-        Found := TicketAdmissionStatisticsMgr.FindRec (LineFactOption, Rec, Which, TicketFactLineFilter, PeriodType, PeriodFilter, PeriodInitialized, InternalDateFilter);
+        Found := TicketAdmissionStatisticsMgr.FindRec(LineFactOption, Rec, Which, TicketFactLineFilter, PeriodType, PeriodFilter, PeriodInitialized, InternalDateFilter);
         if (Found) then
-          MATRIX_OnAfterGetRecord (MATRIX_MaxNoOfMatrixColumn);
+            MATRIX_OnAfterGetRecord(MATRIX_MaxNoOfMatrixColumn);
 
-        exit (Rec.Visible and Found);
+        exit(Rec.Visible and Found);
         //+TM1.39 [341289]
     end;
 
@@ -220,23 +209,23 @@ page 6060117 "TM Ticket Access Stat. Lines"
         //                                            PeriodType, PeriodFilter));
 
         repeat
-          Step := TicketAdmissionStatisticsMgr.NextRec (LineFactOption, Rec, Steps, TicketFactLineFilter, PeriodType, PeriodFilter);
+            Step := TicketAdmissionStatisticsMgr.NextRec(LineFactOption, Rec, Steps, TicketFactLineFilter, PeriodType, PeriodFilter);
 
-          if (Step <> 0) then
-            MATRIX_OnAfterGetRecord (MATRIX_MaxNoOfMatrixColumn);
+            if (Step <> 0) then
+                MATRIX_OnAfterGetRecord(MATRIX_MaxNoOfMatrixColumn);
 
         until ((Rec.Visible) or (Step = 0));
 
-        exit (Step);
+        exit(Step);
         //+TM1.39 [341289]
     end;
 
     var
-        MatrixRecords: array [12] of Record "Dimension Code Buffer";
+        MatrixRecords: array[12] of Record "Dimension Code Buffer";
         MATRIX_ColumnTempRec: Record "Dimension Code Buffer";
         MATRIX_MaxNoOfMatrixColumn: Integer;
-        MATRIX_CellData: array [12] of Text[80];
-        MATRIX_CaptionSet: array [32] of Text[80];
+        MATRIX_CellData: array[12] of Text[80];
+        MATRIX_CaptionSet: array[32] of Text[80];
         MATRIX_Step: Option Initial,Previous,Same,Next;
         LINE_Total: Text[80];
         TicketAdmissionStatisticsMgr: Codeunit "TM Ticket Access Statistics";
@@ -267,14 +256,15 @@ page 6060117 "TM Ticket Access Stat. Lines"
         MATRIX_ColumnTempRec := MatrixRecords[MATRIX_ColumnOrdinal];
 
         if (ColumnFactOption = ColumnFactOption::PERIOD) then begin
-          MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatricsPeriod ('',  Format(MATRIX_ColumnTempRec."Period Start"), PeriodType, 0);
+            MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatricsPeriod('', Format(MATRIX_ColumnTempRec."Period Start"), PeriodType, 0);
 
-        end else if (LineFactOption = LineFactOption::PERIOD) then begin
-          MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatricsPeriod ('',  Format(Rec."Period Start"), PeriodType, 0);
+        end else
+            if (LineFactOption = LineFactOption::PERIOD) then begin
+                MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatricsPeriod('', Format(Rec."Period Start"), PeriodType, 0);
 
-        end;
+            end;
 
-        TicketAdmissionStatisticsMgr.StatisticsDrilldown (LineFactOption, Rec.Code,
+        TicketAdmissionStatisticsMgr.StatisticsDrilldown(LineFactOption, Rec.Code,
                 ColumnFactOption, MATRIX_ColumnTempRec.Code, true,
                 TicketDrilldownFilter, MatrixPeriod);
     end;
@@ -289,23 +279,23 @@ page 6060117 "TM Ticket Access Stat. Lines"
 
         CurrentColumnOrdinal := 0;
         while (CurrentColumnOrdinal < MATRIX_NumberOfColumns) do begin
-          CurrentColumnOrdinal += 1;
-          MATRIX_CellData[CurrentColumnOrdinal] := DisplayCellValue (0, CurrentColumnOrdinal, true);
+            CurrentColumnOrdinal += 1;
+            MATRIX_CellData[CurrentColumnOrdinal] := DisplayCellValue(0, CurrentColumnOrdinal, true);
 
-          Rec.Visible := ((Rec.Visible) or (not HideLinesWithZeroAdmitted) or (MATRIX_CellData[CurrentColumnOrdinal] <> ''));
+            Rec.Visible := ((Rec.Visible) or (not HideLinesWithZeroAdmitted) or (MATRIX_CellData[CurrentColumnOrdinal] <> ''));
         end;
         //+TM1.39 [341289]
     end;
 
-    procedure Load(MatrixColumns1: array [32] of Text[80];var MatrixRecords1: array [12] of Record "Dimension Code Buffer";CurrentNoOfMatrixColumns: Integer;pLineDimOption: Integer;pColumnDimOption: Integer;pDisplayOption: Option;pPeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period";pAdmissionDefinition: Option)
+    procedure Load(MatrixColumns1: array[32] of Text[80]; var MatrixRecords1: array[12] of Record "Dimension Code Buffer"; CurrentNoOfMatrixColumns: Integer; pLineDimOption: Integer; pColumnDimOption: Integer; pDisplayOption: Option; pPeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period"; pAdmissionDefinition: Option)
     var
         i: Integer;
     begin
 
         for i := 1 to 12 do begin
-          MATRIX_CaptionSet[i] := MatrixColumns1[i];
-          MatrixRecords[i] := MatrixRecords1[i];
-          MATRIX_CellData[i] := '';
+            MATRIX_CaptionSet[i] := MatrixColumns1[i];
+            MatrixRecords[i] := MatrixRecords1[i];
+            MATRIX_CellData[i] := '';
         end;
         MATRIX_MaxNoOfMatrixColumn := CurrentNoOfMatrixColumns;
 
@@ -317,48 +307,54 @@ page 6060117 "TM Ticket Access Stat. Lines"
 
         TicketFactLineFilter.Reset;
         case LineFactOption of
-          LineFactOption::ITEM :           TicketFactLineFilter.SetFilter ("Fact Code", ItemFactFilter);
-          LineFactOption::TICKET_TYPE :    TicketFactLineFilter.SetFilter ("Fact Code", TicketTypeFactFilter);
-          LineFactOption::ADMISSION_CODE : TicketFactLineFilter.SetFilter ("Fact Code", AdmissionCodeFactFilter);
-          LineFactOption::ADMISSION_DATE : TicketFactLineFilter.SetFilter ("Fact Code", DateFactFilter);
-          LineFactOption::ADMISSION_HOUR : TicketFactLineFilter.SetFilter ("Fact Code", HourFactFilter);
-          //-TM1.36 [323024]
-          LineFactOption::VARIANT_CODE   : TicketFactLineFilter.SetFilter ("Fact Code", VariantCodeFactFilter);
-          //+TM1.36 [323024]
+            LineFactOption::ITEM:
+                TicketFactLineFilter.SetFilter("Fact Code", ItemFactFilter);
+            LineFactOption::TICKET_TYPE:
+                TicketFactLineFilter.SetFilter("Fact Code", TicketTypeFactFilter);
+            LineFactOption::ADMISSION_CODE:
+                TicketFactLineFilter.SetFilter("Fact Code", AdmissionCodeFactFilter);
+            LineFactOption::ADMISSION_DATE:
+                TicketFactLineFilter.SetFilter("Fact Code", DateFactFilter);
+            LineFactOption::ADMISSION_HOUR:
+                TicketFactLineFilter.SetFilter("Fact Code", HourFactFilter);
+                //-TM1.36 [323024]
+            LineFactOption::VARIANT_CODE:
+                TicketFactLineFilter.SetFilter("Fact Code", VariantCodeFactFilter);
+                //+TM1.36 [323024]
         end;
     end;
 
-    procedure SetFilters(pItemFactFilter: Text;pTicketTypeFactFilter: Text;pAdmissionDateFactFilter: Text;pAdmissionHourFactFilter: Text;pAdmissionCodeFactFilter: Text;pVariantCodeFactFilter: Text;pBlockedItemFactFilter: Text;pBlockedTicketTypeFactFilter: Text;pBlockedDateFactFilter: Text;pBlockedHourFactFilter: Text;pBlockedAdmissionFactFilter: Text;pBlockedVariantCodeFactFilter: Text;pHideLinesWithZeroAdmitted: Boolean)
+    procedure SetFilters(pItemFactFilter: Text; pTicketTypeFactFilter: Text; pAdmissionDateFactFilter: Text; pAdmissionHourFactFilter: Text; pAdmissionCodeFactFilter: Text; pVariantCodeFactFilter: Text; pBlockedItemFactFilter: Text; pBlockedTicketTypeFactFilter: Text; pBlockedDateFactFilter: Text; pBlockedHourFactFilter: Text; pBlockedAdmissionFactFilter: Text; pBlockedVariantCodeFactFilter: Text; pHideLinesWithZeroAdmitted: Boolean)
     begin
-        Reset ();
+        Reset();
 
-        ItemFactFilter := FilterAndFilter (pItemFactFilter, pBlockedItemFactFilter);
-        TicketTypeFactFilter := FilterAndFilter (pTicketTypeFactFilter, pBlockedTicketTypeFactFilter);
-        DateFactFilter := FilterAndFilter (pAdmissionDateFactFilter, pBlockedDateFactFilter);
-        HourFactFilter := FilterAndFilter (pAdmissionHourFactFilter, pBlockedHourFactFilter);
-        AdmissionCodeFactFilter := FilterAndFilter (pAdmissionCodeFactFilter, pBlockedAdmissionFactFilter);
+        ItemFactFilter := FilterAndFilter(pItemFactFilter, pBlockedItemFactFilter);
+        TicketTypeFactFilter := FilterAndFilter(pTicketTypeFactFilter, pBlockedTicketTypeFactFilter);
+        DateFactFilter := FilterAndFilter(pAdmissionDateFactFilter, pBlockedDateFactFilter);
+        HourFactFilter := FilterAndFilter(pAdmissionHourFactFilter, pBlockedHourFactFilter);
+        AdmissionCodeFactFilter := FilterAndFilter(pAdmissionCodeFactFilter, pBlockedAdmissionFactFilter);
         //-TM1.36 [323024]
-        VariantCodeFactFilter := FilterAndFilter (pVariantCodeFactFilter, pBlockedVariantCodeFactFilter);
+        VariantCodeFactFilter := FilterAndFilter(pVariantCodeFactFilter, pBlockedVariantCodeFactFilter);
         //+TM1.36 [323024]
 
-        TicketStatisticsFilter.Reset ();
-        TicketStatisticsFilter.SetFilter ("Item No. Filter", ItemFactFilter);
-        TicketStatisticsFilter.SetFilter ("Ticket Type Filter", TicketTypeFactFilter);
-        TicketStatisticsFilter.SetFilter ("Admission Date Filter", DateFactFilter);
-        TicketStatisticsFilter.SetFilter ("Admission Hour Filter", HourFactFilter);
-        TicketStatisticsFilter.SetFilter ("Admission Code Filter", AdmissionCodeFactFilter);
+        TicketStatisticsFilter.Reset();
+        TicketStatisticsFilter.SetFilter("Item No. Filter", ItemFactFilter);
+        TicketStatisticsFilter.SetFilter("Ticket Type Filter", TicketTypeFactFilter);
+        TicketStatisticsFilter.SetFilter("Admission Date Filter", DateFactFilter);
+        TicketStatisticsFilter.SetFilter("Admission Hour Filter", HourFactFilter);
+        TicketStatisticsFilter.SetFilter("Admission Code Filter", AdmissionCodeFactFilter);
         //-TM1.36 [323024]
-        TicketStatisticsFilter.SetFilter ("Variant Code Filter", VariantCodeFactFilter);
+        TicketStatisticsFilter.SetFilter("Variant Code Filter", VariantCodeFactFilter);
         //+TM1.36 [323024]
 
-        TicketDrilldownFilter.Reset ();
-        TicketDrilldownFilter.SetFilter ("Item No.", ItemFactFilter);
-        TicketDrilldownFilter.SetFilter ("Ticket Type", TicketTypeFactFilter);
-        TicketDrilldownFilter.SetFilter ("Admission Date", DateFactFilter);
-        TicketDrilldownFilter.SetFilter ("Admission Hour", HourFactFilter);
-        TicketDrilldownFilter.SetFilter ("Admission Code", AdmissionCodeFactFilter);
+        TicketDrilldownFilter.Reset();
+        TicketDrilldownFilter.SetFilter("Item No.", ItemFactFilter);
+        TicketDrilldownFilter.SetFilter("Ticket Type", TicketTypeFactFilter);
+        TicketDrilldownFilter.SetFilter("Admission Date", DateFactFilter);
+        TicketDrilldownFilter.SetFilter("Admission Hour", HourFactFilter);
+        TicketDrilldownFilter.SetFilter("Admission Code", AdmissionCodeFactFilter);
         //-TM1.36 [323024]
-        TicketDrilldownFilter.SetFilter ("Variant Code", VariantCodeFactFilter);
+        TicketDrilldownFilter.SetFilter("Variant Code", VariantCodeFactFilter);
         //+TM1.36 [323024]
 
         //-TM1.39 [341289]
@@ -366,40 +362,41 @@ page 6060117 "TM Ticket Access Stat. Lines"
         //+TM1.39 [341289]
     end;
 
-    local procedure FilterAndFilter(pFilter1: Text;pFilter2: Text) newFilter: Text
+    local procedure FilterAndFilter(pFilter1: Text; pFilter2: Text) newFilter: Text
     begin
 
         newFilter := pFilter1;
         if (newFilter = '') then
-          newFilter := pFilter2
+            newFilter := pFilter2
         else
-          if (pFilter2 <> '') then
-            newFilter := StrSubstNo ('%1&%2', pFilter1, pFilter2);
+            if (pFilter2 <> '') then
+                newFilter := StrSubstNo('%1&%2', pFilter1, pFilter2);
 
-        exit (newFilter);
+        exit(newFilter);
     end;
 
-    procedure DisplayCellValue(FormatOption: Option A,B,C,D;ColumnOrdinal: Integer;IncludeColumns: Boolean) CellValue: Text[30]
+    procedure DisplayCellValue(FormatOption: Option A,B,C,D; ColumnOrdinal: Integer; IncludeColumns: Boolean) CellValue: Text[30]
     var
         MatrixPeriod: Text[30];
     begin
-        MATRIX_ColumnTempRec.Init ();
+        MATRIX_ColumnTempRec.Init();
         if (IncludeColumns) then
-          MATRIX_ColumnTempRec := MatrixRecords[ColumnOrdinal];
+            MATRIX_ColumnTempRec := MatrixRecords[ColumnOrdinal];
 
         MatrixPeriod := DateFactFilter;
 
         if (ColumnFactOption = ColumnFactOption::PERIOD) then begin
-          MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatricsPeriod ('',  Format(MATRIX_ColumnTempRec."Period Start"), PeriodType, 0);
-          if (not IncludeColumns) then
-            MatrixPeriod := DateFactFilter;
+            MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatricsPeriod('', Format(MATRIX_ColumnTempRec."Period Start"), PeriodType, 0);
+            if (not IncludeColumns) then
+                MatrixPeriod := DateFactFilter;
 
-        end else if (LineFactOption = LineFactOption::PERIOD) then begin
-          MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatricsPeriod ('',  Format (Rec."Period Start"), PeriodType, 0);
+        end else
+            if (LineFactOption = LineFactOption::PERIOD) then begin
+                MatrixPeriod := TicketAdmissionStatisticsMgr.FindMatricsPeriod('', Format(Rec."Period Start"), PeriodType, 0);
 
-        end;
+            end;
 
-        CellValue := TicketAdmissionStatisticsMgr.FormatCellValue (LineFactOption, Rec.Code,
+        CellValue := TicketAdmissionStatisticsMgr.FormatCellValue(LineFactOption, Rec.Code,
                             ColumnFactOption, MATRIX_ColumnTempRec.Code, IncludeColumns,
                             TicketStatisticsFilter, MatrixPeriod, DisplayOption, PeriodType, TrendPeriodType, AdmissionDefinition);
     end;

@@ -2,7 +2,7 @@ report 6150614 "Posting Overview POS"
 {
     // NPR5.40/JLK /20180314 CASE 307437 Object created
     DefaultLayout = RDLC;
-    RDLCLayout = './Posting Overview POS.rdlc';
+    RDLCLayout = './layouts/Posting Overview POS.rdlc';
 
     Caption = 'Posting Overview POS';
     PreviewMode = PrintLayout;

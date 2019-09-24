@@ -12,23 +12,14 @@ page 6059818 "Retail Sales Chart by Shop"
     {
         area(content)
         {
-            field("Date Range";StatusText)
+            field("Date Range"; StatusText)
             {
                 ShowCaption = true;
                 Style = Strong;
                 StyleExpr = TRUE;
             }
-            usercontrol(chart;"Microsoft.Dynamics.Nav.Client.BusinessChart")
+            usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
             {
-
-                trigger DataPointClicked(point: DotNet npNetBusinessChartDataPoint)
-                begin
-                end;
-
-                trigger DataPointDoubleClicked(point: DotNet npNetBusinessChartDataPoint)
-                begin
-                end;
-
                 trigger AddInReady()
                 begin
                     ChartIsReady := true;
@@ -139,8 +130,8 @@ page 6059818 "Retail Sales Chart by Shop"
         StatusText: Text[250];
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period",Period;
         Period: Option " ",Next,Previous;
-        SalesByPeriod: array [5] of Decimal;
-        OrderCount: array [5] of Decimal;
+        SalesByPeriod: array[5] of Decimal;
+        OrderCount: array[5] of Decimal;
         StartDate: Date;
         Enddate: Date;
         RetailSetup: Record "Retail Setup";
@@ -148,15 +139,15 @@ page 6059818 "Retail Sales Chart by Shop"
     local procedure UpdateChart()
     begin
         if not ChartIsReady then
-          exit;
+            exit;
         case RetailSetup."Margin and Turnover By Shop" of
-        RetailSetup."Margin and Turnover By Shop"::" ",RetailSetup."Margin and Turnover By Shop"::Dimension2  :
-          ChartMgt.TurnOver_RevenuebyDim2(BusChartBuf,Period,PeriodType,StartDate,Enddate);
-        RetailSetup."Margin and Turnover By Shop"::Dimension1  :
-        ChartMgt.TurnOver_RevenuebyDim1(BusChartBuf,Period,PeriodType,StartDate,Enddate);
+            RetailSetup."Margin and Turnover By Shop"::" ", RetailSetup."Margin and Turnover By Shop"::Dimension2:
+                ChartMgt.TurnOver_RevenuebyDim2(BusChartBuf, Period, PeriodType, StartDate, Enddate);
+            RetailSetup."Margin and Turnover By Shop"::Dimension1:
+                ChartMgt.TurnOver_RevenuebyDim1(BusChartBuf, Period, PeriodType, StartDate, Enddate);
         end;
         BusChartBuf.Update(CurrPage.chart);
-        StatusText := StrSubstNo('%1 to %2',StartDate,Enddate);
+        StatusText := StrSubstNo('%1 to %2', StartDate, Enddate);
     end;
 }
 

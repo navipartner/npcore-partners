@@ -1,3 +1,4 @@
+// TODO: CTRLUPGRADE - uses old Standard code; must be removed or refactored
 codeunit 6014498 "Exchange Label Management"
 {
     // NPR4.10/VB/20150602 CASE 213003 Support for Web Client (JavaScript) client
@@ -18,11 +19,6 @@ codeunit 6014498 "Exchange Label Management"
     // NPR5.49/MHA /20190211 CASE 345209 Amount Including Vat should be changed so that Discount is reflected
     // NPR5.51/ALST/20190624 CASE 337539 "Retail Cross Reference No." gets a value if global exchange is set up
 
-
-    trigger OnRun()
-    begin
-    end;
-
     var
         Text00001: Label 'The item was not found. Use manual procedure in order to return the item.';
         Text00002: Label 'The function can only be used with a POS Sale.';
@@ -30,7 +26,7 @@ codeunit 6014498 "Exchange Label Management"
         ExitOnFindLabel: Boolean;
         Text000: Label 'Exchange Label';
 
-    local procedure CreateExchLabelLineFromRecRef(var RecRef: RecordRef;ValidFromDate: Date;LabelBatchNumber: Integer;PackagedBatch: Boolean): Code[7]
+    local procedure CreateExchLabelLineFromRecRef(var RecRef: RecordRef; ValidFromDate: Date; LabelBatchNumber: Integer; PackagedBatch: Boolean): Code[7]
     var
         ExchangeLabel: Record "Exchange Label";
         RetailConfiguration: Record "Retail Setup";
@@ -44,48 +40,48 @@ codeunit 6014498 "Exchange Label Management"
         if Register.Get(RetailFormCode.FetchRegisterNumber) then;
 
         if StrLen(Register."Shop id") <> 3 then
-          Register."Shop id" := String.PadStrLeft(Register."Shop id",3,' ', false);
+            Register."Shop id" := String.PadStrLeft(Register."Shop id", 3, ' ', false);
 
-        ExchangeLabel."Store ID"               := Register."Shop id";
-        ExchangeLabel."Register No."           := Register."Register No.";
+        ExchangeLabel."Store ID" := Register."Shop id";
+        ExchangeLabel."Register No." := Register."Register No.";
 
-        ExchangeLabel."Company Name"           := CompanyName;
-        ExchangeLabel."Table No."              := RecRef.Number;
-        ExchangeLabel."Valid From"             := ValidFromDate;
+        ExchangeLabel."Company Name" := CompanyName;
+        ExchangeLabel."Table No." := RecRef.Number;
+        ExchangeLabel."Valid From" := ValidFromDate;
         //-345209 [345209]
         ExchangeLabel."Unit Price" := GetUnitPriceInclVat(RecRef);
         //+NPR5.49 [345209]
-        ExchangeLabel."Sales Price Incl. Vat"  := GetSalesPriceInclVat(RecRef);
+        ExchangeLabel."Sales Price Incl. Vat" := GetSalesPriceInclVat(RecRef);
         if Format(Register."Exchange Label Exchange Period") <> '' then
-          ExchangeLabel."Valid To"                   := CalcDate(Register."Exchange Label Exchange Period",ValidFromDate)
+            ExchangeLabel."Valid To" := CalcDate(Register."Exchange Label Exchange Period", ValidFromDate)
         else
-          ExchangeLabel."Valid To"                   := CalcDate(RetailConfiguration."Exchange Label Exchange Period",ValidFromDate);
-        ExchangeLabel."Batch No."          := LabelBatchNumber;
+            ExchangeLabel."Valid To" := CalcDate(RetailConfiguration."Exchange Label Exchange Period", ValidFromDate);
+        ExchangeLabel."Batch No." := LabelBatchNumber;
         ExchangeLabel."Packaged Batch" := PackagedBatch;
 
         case RecRef.Number of
-          DATABASE::"Sales Line" :
-            begin
-              AssignOptionFieldValue(ExchangeLabel."Sales Header Type", RecRef, 'Document Type');
-              AssignCodeFieldValue(ExchangeLabel."Sales Header No.",    RecRef, 'Document No.');
-              AssignCodeFieldValue(ExchangeLabel."Unit of Measure",     RecRef, 'Unit of Measure');
-            end;
-          DATABASE::"Sale Line POS" :
-            begin
-              AssignCodeFieldValue(ExchangeLabel."Register No.",        RecRef, 'Register No.');
-              AssignCodeFieldValue(ExchangeLabel."Sales Ticket No.",    RecRef, 'Sales Ticket No.');
-              AssignCodeFieldValue(ExchangeLabel."Unit of Measure",     RecRef, 'Unit of Measure Code');
-            end;
+            DATABASE::"Sales Line":
+                begin
+                    AssignOptionFieldValue(ExchangeLabel."Sales Header Type", RecRef, 'Document Type');
+                    AssignCodeFieldValue(ExchangeLabel."Sales Header No.", RecRef, 'Document No.');
+                    AssignCodeFieldValue(ExchangeLabel."Unit of Measure", RecRef, 'Unit of Measure');
+                end;
+            DATABASE::"Sale Line POS":
+                begin
+                    AssignCodeFieldValue(ExchangeLabel."Register No.", RecRef, 'Register No.');
+                    AssignCodeFieldValue(ExchangeLabel."Sales Ticket No.", RecRef, 'Sales Ticket No.');
+                    AssignCodeFieldValue(ExchangeLabel."Unit of Measure", RecRef, 'Unit of Measure Code');
+                end;
         end;
 
-        AssignIntegerFieldValue(ExchangeLabel."Sales Line No.",         RecRef, 'Line No.');
-        AssignCodeFieldValue(ExchangeLabel."Item No.",                  RecRef, 'No.');
-        AssignCodeFieldValue(ExchangeLabel."Variant Code",              RecRef, 'Variant Code');
+        AssignIntegerFieldValue(ExchangeLabel."Sales Line No.", RecRef, 'Line No.');
+        AssignCodeFieldValue(ExchangeLabel."Item No.", RecRef, 'No.');
+        AssignCodeFieldValue(ExchangeLabel."Variant Code", RecRef, 'Variant Code');
         //-NPR5.37 [292701]
         if PackagedBatch then
-          AssignDecimalFieldValue(ExchangeLabel.Quantity,                 RecRef, 'Quantity')
+            AssignDecimalFieldValue(ExchangeLabel.Quantity, RecRef, 'Quantity')
         else
-          ExchangeLabel.Quantity := 1;
+            ExchangeLabel.Quantity := 1;
         //AssignDecimalFieldValue(ExchangeLabel.Quantity,                 RecRef, 'Quantity');
         //+NPR5.37 [292701]
 
@@ -108,19 +104,19 @@ codeunit 6014498 "Exchange Label Management"
         RetailConfiguration.Get;
 
         with ExchangeLabel do begin
-          LabelCode := String.PadStrLeft("No.", 7, '0',false);
-          exit(Utility.CreateEAN(StoreCode + LabelCode, RetailConfiguration."EAN Prefix Exhange Label"));
+            LabelCode := String.PadStrLeft("No.", 7, '0', false);
+            exit(Utility.CreateEAN(StoreCode + LabelCode, RetailConfiguration."EAN Prefix Exhange Label"));
         end;
     end;
 
-    local procedure GetLabelFromLabelNo(LabelNo: Code[7];var ExchangeLabel: Record "Exchange Label")
+    local procedure GetLabelFromLabelNo(LabelNo: Code[7]; var ExchangeLabel: Record "Exchange Label")
     begin
         ExchangeLabel.SetCurrentKey("No.");
-        ExchangeLabel.SetRange("No.",LabelNo);
+        ExchangeLabel.SetRange("No.", LabelNo);
         ExchangeLabel.FindFirst;
     end;
 
-    local procedure PrintLabels(PrintType: Option Single,LineQuantity,All,Selection,Package;var LineRef: RecordRef;ValidFromDate: Date): Boolean
+    local procedure PrintLabels(PrintType: Option Single,LineQuantity,All,Selection,Package; var LineRef: RecordRef; ValidFromDate: Date): Boolean
     var
         ExchangeLabel: Record "Exchange Label";
         SaleLinePOS: Record "Sale Line POS";
@@ -140,67 +136,69 @@ codeunit 6014498 "Exchange Label Management"
         Date1: Date;
     begin
         if LineRef.IsEmpty then
-          Error(t001);
+            Error(t001);
 
         case PrintType of
-          PrintType::Single :
-            begin
-              PrintLabelFromRecRef(LineRef,ValidFromDate,0);
-            end;
-          PrintType::LineQuantity :
-            begin
-              AssignIntegerFieldValue(LineCount,LineRef,'Quantity');
-              while LineCount > 0 do begin
-                PrintLabelFromRecRef(LineRef,ValidFromDate,0);
-                LineCount -= 1;
-              end;
-            end;
-          PrintType::All :
-            begin
-              FieldRef := LineRef.Field(GetFieldNo(LineRef,'Line No.'));
-              FieldRef.SetRange();
-              FieldRef := LineRef.Field(GetFieldNo(LineRef,'Sale Type'));
-              FieldRef.SetRange();
-              if LineRef.FindSet then repeat
-                AssignIntegerFieldValue(LineCount,LineRef,'Quantity');
-                while LineCount > 0 do begin
-                  PrintLabelFromRecRef(LineRef,ValidFromDate,0);
-                  LineCount -= 1;
+            PrintType::Single:
+                begin
+                    PrintLabelFromRecRef(LineRef, ValidFromDate, 0);
                 end;
-              until LineRef.Next = 0;
-            end;
-          PrintType::Selection, PrintType::Package:
-            begin
-              LineRef.SetTable(SaleLinePOS);
-              LabelBatchNumber := GetLabelGroupBatchNo(SaleLinePOS);
+            PrintType::LineQuantity:
+                begin
+                    AssignIntegerFieldValue(LineCount, LineRef, 'Quantity');
+                    while LineCount > 0 do begin
+                        PrintLabelFromRecRef(LineRef, ValidFromDate, 0);
+                        LineCount -= 1;
+                    end;
+                end;
+            PrintType::All:
+                begin
+                    FieldRef := LineRef.Field(GetFieldNo(LineRef, 'Line No.'));
+                    FieldRef.SetRange();
+                    FieldRef := LineRef.Field(GetFieldNo(LineRef, 'Sale Type'));
+                    FieldRef.SetRange();
+                    if LineRef.FindSet then
+                        repeat
+                            AssignIntegerFieldValue(LineCount, LineRef, 'Quantity');
+                            while LineCount > 0 do begin
+                                PrintLabelFromRecRef(LineRef, ValidFromDate, 0);
+                                LineCount -= 1;
+                            end;
+                        until LineRef.Next = 0;
+                end;
+            PrintType::Selection, PrintType::Package:
+                begin
+                    LineRef.SetTable(SaleLinePOS);
+                    LabelBatchNumber := GetLabelGroupBatchNo(SaleLinePOS);
 
-              if LineRef.FindSet then repeat
-                CreateExchLabelLineFromRecRef(LineRef, ValidFromDate, LabelBatchNumber, (PrintType = PrintType::Package));
-              until LineRef.Next = 0;
+                    if LineRef.FindSet then
+                        repeat
+                            CreateExchLabelLineFromRecRef(LineRef, ValidFromDate, LabelBatchNumber, (PrintType = PrintType::Package));
+                        until LineRef.Next = 0;
 
-              ExchangeLabel.SetCurrentKey("Register No.","Sales Ticket No.","Batch No.");
-              ExchangeLabel.SetRange("Register No.", SaleLinePOS."Register No.");
-              ExchangeLabel.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
-              ExchangeLabel.SetRange("Batch No.", LabelBatchNumber);
-              ExchangeLabel.FindSet;
-              PrintLabel(ExchangeLabel);
-            end;
+                    ExchangeLabel.SetCurrentKey("Register No.", "Sales Ticket No.", "Batch No.");
+                    ExchangeLabel.SetRange("Register No.", SaleLinePOS."Register No.");
+                    ExchangeLabel.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+                    ExchangeLabel.SetRange("Batch No.", LabelBatchNumber);
+                    ExchangeLabel.FindSet;
+                    PrintLabel(ExchangeLabel);
+                end;
         end;
     end;
 
-    procedure PrintLabelsFromPOS(PrintType: Option Single,LineQuantity,All,Selection,Package;var SaleLinePOS: Record "Sale Line POS";var ValidFromDate: Date)
+    procedure PrintLabelsFromPOS(PrintType: Option Single,LineQuantity,All,Selection,Package; var SaleLinePOS: Record "Sale Line POS"; var ValidFromDate: Date)
     var
         RecRef: RecordRef;
     begin
         RecRef.GetTable(SaleLinePOS);
 
         if not PromptInput(PrintType, RecRef, ValidFromDate) then
-          exit;
+            exit;
 
-        PrintLabels(PrintType,RecRef,ValidFromDate);
+        PrintLabels(PrintType, RecRef, ValidFromDate);
     end;
 
-    procedure PrintLabelsFromPOSWithoutPrompts(PrintType: Option Single,LineQuantity,All,Selection,Package;var SaleLinePOS: Record "Sale Line POS";var ValidFromDate: Date)
+    procedure PrintLabelsFromPOSWithoutPrompts(PrintType: Option Single,LineQuantity,All,Selection,Package; var SaleLinePOS: Record "Sale Line POS"; var ValidFromDate: Date)
     var
         RecRef: RecordRef;
     begin
@@ -208,7 +206,7 @@ codeunit 6014498 "Exchange Label Management"
         PrintLabels(PrintType, RecRef, ValidFromDate);
     end;
 
-    procedure PrintLabelsFromSale(PrintType: Option Single,LineQuantity,All,Selection,Package;var SalesLine: Record "Sales Line")
+    procedure PrintLabelsFromSale(PrintType: Option Single,LineQuantity,All,Selection,Package; var SalesLine: Record "Sales Line")
     var
         RecRef: RecordRef;
         ValidFromDate: Date;
@@ -216,19 +214,19 @@ codeunit 6014498 "Exchange Label Management"
         RecRef.GetTable(SalesLine);
 
         if not PromptInput(PrintType, RecRef, ValidFromDate) then
-          exit;
+            exit;
 
-        PrintLabels(PrintType,RecRef,ValidFromDate);
+        PrintLabels(PrintType, RecRef, ValidFromDate);
     end;
 
-    local procedure PrintLabelFromRecRef(var RecRef: RecordRef;ValidFromDate: Date;LabelBatchNumber: Integer)
+    local procedure PrintLabelFromRecRef(var RecRef: RecordRef; ValidFromDate: Date; LabelBatchNumber: Integer)
     var
         ExchangeLabel: Record "Exchange Label";
         LabelNo: Code[10];
     begin
         if not IsItemLine(RecRef) then exit;
 
-        LabelNo := CreateExchLabelLineFromRecRef(RecRef,ValidFromDate,LabelBatchNumber,false);
+        LabelNo := CreateExchLabelLineFromRecRef(RecRef, ValidFromDate, LabelBatchNumber, false);
         GetLabelFromLabelNo(LabelNo, ExchangeLabel);
         Commit;
         PrintLabel(ExchangeLabel);
@@ -246,60 +244,72 @@ codeunit 6014498 "Exchange Label Management"
         RetailReportSelectionMgt.SetRegisterNo(RetailFormCode.FetchRegisterNumber());
 
         ExchangeLabel.SetRange("Packaged Batch", false);
-        if ExchangeLabel.FindSet then repeat
-          ExchangeLabelRec := ExchangeLabel;
-          ExchangeLabelRec.SetRecFilter;
-          RecRef.GetTable(ExchangeLabelRec);
-          RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Exchange Label");
-          Clear(RecRef);
-        until ExchangeLabel.Next = 0;
+        if ExchangeLabel.FindSet then
+            repeat
+                ExchangeLabelRec := ExchangeLabel;
+                ExchangeLabelRec.SetRecFilter;
+                RecRef.GetTable(ExchangeLabelRec);
+                RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Exchange Label");
+                Clear(RecRef);
+            until ExchangeLabel.Next = 0;
 
         ExchangeLabel.SetRange("Packaged Batch", true);
         if ExchangeLabel.FindSet then begin
-          RecRef.GetTable(ExchangeLabel);
-          RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Exchange Label");
+            RecRef.GetTable(ExchangeLabel);
+            RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Exchange Label");
         end;
     end;
 
-    local procedure PromptInput(PrintType: Option Single,LineQuantity,All,Selection,Package;var RecRef: RecordRef;var ValidFromDate: Date): Boolean
+    local procedure PromptInput(PrintType: Option Single,LineQuantity,All,Selection,Package; var RecRef: RecordRef; var ValidFromDate: Date): Boolean
     var
         SaleLinePOS: Record "Sale Line POS";
         Cancelled: Boolean;
         RetailSetup: Record "Retail Setup";
         FieldRef: FieldRef;
-        Marshaller: Codeunit "POS Event Marshaller";
+        // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
+        //Marshaller: Codeunit "POS Event Marshaller";
         RecRef2: RecordRef;
     begin
 
         RetailSetup.Get;
         if not (Evaluate(ValidFromDate, RetailSetup."Exchange label default date") and (StrLen(RetailSetup."Exchange label default date") > 0)) then
-          ValidFromDate := Today;
+            ValidFromDate := Today;
 
         RecRef.SetRecFilter;
 
         if PrintType in [PrintType::Single, PrintType::LineQuantity, PrintType::All] then begin
-          exit(Marshaller.NumPadDate(t002,ValidFromDate,false,false));
+            // TODO: CTRLUPGRADE - This block must be refactored without Marshaller
+            Error('CTRLUPGRADE');
+            /*
+            exit(Marshaller.NumPadDate(t002, ValidFromDate, false, false));
+            */
         end else begin
-          FieldRef := RecRef.Field(GetFieldNo(RecRef,'Line No.'));
-          FieldRef.SetRange();
-          FieldRef := RecRef.Field(GetFieldNo(RecRef,'Sale Type'));
-          FieldRef.SetRange();
-          if (RecRef.Number <> DATABASE::"Sale Line POS") then
-            Error(Text00002);
+            FieldRef := RecRef.Field(GetFieldNo(RecRef, 'Line No.'));
+            FieldRef.SetRange();
+            FieldRef := RecRef.Field(GetFieldNo(RecRef, 'Sale Type'));
+            FieldRef.SetRange();
+            if (RecRef.Number <> DATABASE::"Sale Line POS") then
+                Error(Text00002);
 
-          SaleLinePOS.SetView(RecRef.GetView);
-          SaleLinePOS.SetFilter(Quantity,'>%1',0);
-          SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
-          SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
-          if SaleLinePOS.FindSet then repeat
-            SaleLinePOS.Mark(true);
-          until SaleLinePOS.Next = 0;
-          ValidFromDate := Marshaller.CalendarGrid('',ValidFromDate,SaleLinePOS,Cancelled);
-          if not Cancelled then begin
-            Clear(RecRef);
-            RecRef.GetTable(SaleLinePOS);
-          end;
-          exit(not Cancelled);
+            SaleLinePOS.SetView(RecRef.GetView);
+            SaleLinePOS.SetFilter(Quantity, '>%1', 0);
+            SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
+            SaleLinePOS.SetRange(Type, SaleLinePOS.Type::Item);
+            if SaleLinePOS.FindSet then begin
+                repeat
+                    SaleLinePOS.Mark(true);
+                until SaleLinePOS.Next = 0;
+                // TODO: CTRLUPGRADE - This block must be refactored without Marshaller
+                Error('CTRLUPGRADE');
+                /*
+                ValidFromDate := Marshaller.CalendarGrid('', ValidFromDate, SaleLinePOS, Cancelled);
+                */
+            end;
+            if not Cancelled then begin
+                Clear(RecRef);
+                RecRef.GetTable(SaleLinePOS);
+            end;
+            exit(not Cancelled);
         end;
     end;
 
@@ -307,7 +317,7 @@ codeunit 6014498 "Exchange Label Management"
     begin
     end;
 
-    procedure ScanExchangeLabel(var SalePOS: Record "Sale POS";var Validering: Code[20];var CopyValidering: Code[20]) Found: Boolean
+    procedure ScanExchangeLabel(var SalePOS: Record "Sale POS"; var Validering: Code[20]; var CopyValidering: Code[20]) Found: Boolean
     var
         ExchangeLabel: Record "Exchange Label";
         IComm: Record "I-Comm";
@@ -319,90 +329,85 @@ codeunit 6014498 "Exchange Label Management"
         RetailConfiguration.Get;
 
         if CopyStr(CopyValidering, 1, 2) = RetailConfiguration."EAN Prefix Exhange Label" then begin
-          ExchangeLabel.SetCurrentKey(Barcode);
-          ExchangeLabel.SetRange(Barcode, CopyValidering);
+            ExchangeLabel.SetCurrentKey(Barcode);
+            ExchangeLabel.SetRange(Barcode, CopyValidering);
 
-          if not ExchangeLabel.FindFirst and RetailConfiguration."Use I-Comm" and IComm.Get
-            and (IComm."Exchange Label Center Company" <> '') then
-          begin
-            ExchangeLabel.ChangeCompany(IComm."Company - Clearing");
-          end;
-
-          if ExchangeLabel.FindFirst then begin
-            if ExchangeLabel."Packaged Batch" then begin
-              ExchangeLabel.SetRange(Barcode);
-              ExchangeLabel.SetRange("Batch No.", ExchangeLabel."Batch No.");
-              ExchangeLabel.SetRange("Store ID", ExchangeLabel."Store ID");
-              ExchangeLabel.SetRange("Register No.", ExchangeLabel."Register No.");
-              ExchangeLabel.SetRange("Sales Ticket No.", ExchangeLabel."Sales Ticket No.");
-              ExchangeLabel.SetCurrentKey("Register No.","Sales Ticket No.","Batch No.");
-              ExchangeLabel.FindSet;
+            if not ExchangeLabel.FindFirst and RetailConfiguration."Use I-Comm" and IComm.Get
+              and (IComm."Exchange Label Center Company" <> '') then begin
+                ExchangeLabel.ChangeCompany(IComm."Company - Clearing");
             end;
-            repeat
-              SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
-              SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
-              if SaleLinePOS.FindLast then
-                LineNo := SaleLinePOS."Line No." + 10000
-              else
-                LineNo := 10000;
 
-              if not Item.Get(ExchangeLabel."Item No.") then
-                Error(Text00001);
+            if ExchangeLabel.FindFirst then begin
+                if ExchangeLabel."Packaged Batch" then begin
+                    ExchangeLabel.SetRange(Barcode);
+                    ExchangeLabel.SetRange("Batch No.", ExchangeLabel."Batch No.");
+                    ExchangeLabel.SetRange("Store ID", ExchangeLabel."Store ID");
+                    ExchangeLabel.SetRange("Register No.", ExchangeLabel."Register No.");
+                    ExchangeLabel.SetRange("Sales Ticket No.", ExchangeLabel."Sales Ticket No.");
+                    ExchangeLabel.SetCurrentKey("Register No.", "Sales Ticket No.", "Batch No.");
+                    ExchangeLabel.FindSet;
+                end;
+                repeat
+                    SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+                    SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+                    if SaleLinePOS.FindLast then
+                        LineNo := SaleLinePOS."Line No." + 10000
+                    else
+                        LineNo := 10000;
 
-              SaleLinePOS.Init;
-              SaleLinePOS."Register No."     := SalePOS."Register No.";
-              SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
-              SaleLinePOS."Line No."         := LineNo;
-              SaleLinePOS.Date               := SalePOS.Date;
-              SaleLinePOS.Type               := SaleLinePOS.Type::Item;
-              SaleLinePOS."Sale Type"        := SaleLinePOS."Sale Type"::Sale;
-              SaleLinePOS."Eksp. Salgspris"  := true;
-              SaleLinePOS."Custom Price"     := true;
-              SaleLinePOS."Discount Type"    := SaleLinePOS."Discount Type"::Manual;
-              if ExchangeLabel."Variant Code" <> '' then
-                SaleLinePOS."Variant Code" := ExchangeLabel."Variant Code";
-              SaleLinePOS.Validate("No.", ExchangeLabel."Item No.");
+                    if not Item.Get(ExchangeLabel."Item No.") then
+                        Error(Text00001);
 
-              //-NPR5.48 [335967]
-              //SaleLinePOS."Unit of Measure Code" := ExchangeLabel."Unit of Measure";
-              SaleLinePOS.Validate("Unit of Measure Code", ExchangeLabel."Unit of Measure");
-              //+NPR5.48 [335967]
+                    SaleLinePOS.Init;
+                    SaleLinePOS."Register No." := SalePOS."Register No.";
+                    SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
+                    SaleLinePOS."Line No." := LineNo;
+                    SaleLinePOS.Date := SalePOS.Date;
+                    SaleLinePOS.Type := SaleLinePOS.Type::Item;
+                    SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
+                    SaleLinePOS."Eksp. Salgspris" := true;
+                    SaleLinePOS."Custom Price" := true;
+                    SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::Manual;
+                    if ExchangeLabel."Variant Code" <> '' then
+                        SaleLinePOS."Variant Code" := ExchangeLabel."Variant Code";
+                    SaleLinePOS.Validate("No.", ExchangeLabel."Item No.");
 
-              if ExchangeLabel.Quantity > 0 then
-                SaleLinePOS.Validate(Quantity, ExchangeLabel.Quantity * -1)
-              else
-                SaleLinePOS.Validate(Quantity, -1);
-              SaleLinePOS.Insert(true);
-              SaleLinePOS."Price Includes VAT" := true;
-              //-NPR5.49 [345209]
-              //SaleLinePOS.VALIDATE("Unit Price", ExchangeLabel."Sales Price Incl. Vat");
-              if ExchangeLabel."Unit Price" <> 0 then
-                SaleLinePOS.Validate("Unit Price",ExchangeLabel."Unit Price");
-              if SaleLinePOS."Unit Price" < ExchangeLabel."Sales Price Incl. Vat" then
-                SaleLinePOS.Validate("Unit Price", ExchangeLabel."Sales Price Incl. Vat")
-              else
-                SaleLinePOS.Validate("Amount Including VAT",ExchangeLabel."Sales Price Incl. Vat" * SaleLinePOS.Quantity);
-              //+NPR5.49 [345209]
-              SaleLinePOS.Modify;
-              Validering := '';
-              Found      := true;
-            until ExchangeLabel.Next = 0;
-          end;
+                    //-NPR5.48 [335967]
+                    //SaleLinePOS."Unit of Measure Code" := ExchangeLabel."Unit of Measure";
+                    SaleLinePOS.Validate("Unit of Measure Code", ExchangeLabel."Unit of Measure");
+                    //+NPR5.48 [335967]
+
+                    if ExchangeLabel.Quantity > 0 then
+                        SaleLinePOS.Validate(Quantity, ExchangeLabel.Quantity * -1)
+                    else
+                        SaleLinePOS.Validate(Quantity, -1);
+                    SaleLinePOS.Insert(true);
+                    SaleLinePOS."Price Includes VAT" := true;
+                    //-NPR5.49 [345209]
+                    //SaleLinePOS.VALIDATE("Unit Price", ExchangeLabel."Sales Price Incl. Vat");
+                    if ExchangeLabel."Unit Price" <> 0 then
+                        SaleLinePOS.Validate("Unit Price", ExchangeLabel."Unit Price");
+                    if SaleLinePOS."Unit Price" < ExchangeLabel."Sales Price Incl. Vat" then
+                        SaleLinePOS.Validate("Unit Price", ExchangeLabel."Sales Price Incl. Vat")
+                    else
+                        SaleLinePOS.Validate("Amount Including VAT", ExchangeLabel."Sales Price Incl. Vat" * SaleLinePOS.Quantity);
+                    //+NPR5.49 [345209]
+                    SaleLinePOS.Modify;
+                    Validering := '';
+                    Found := true;
+                until ExchangeLabel.Next = 0;
+            end;
         end;
     end;
 
-    local procedure "-- Aux"()
-    begin
-    end;
-
-    local procedure GetFieldNo(var RecRef: RecordRef;Name: Text[50]) FieldNo: Integer
+    local procedure GetFieldNo(var RecRef: RecordRef; Name: Text[50]) FieldNo: Integer
     var
         "Field": Record "Field";
     begin
-        Field.SetRange(TableNo,RecRef.Number);
-        Field.SetRange(FieldName,Name);
+        Field.SetRange(TableNo, RecRef.Number);
+        Field.SetRange(FieldName, Name);
         if Field.FindFirst then
-          FieldNo := Field."No.";
+            FieldNo := Field."No.";
         exit(FieldNo)
     end;
 
@@ -415,22 +420,22 @@ codeunit 6014498 "Exchange Label Management"
     begin
         //-NPR5.49 [345209]
         case RecRef.Number of
-          DATABASE::"Sales Line" :
-            begin
-              RecRef.SetTable(SalesLine);
-              UnitPrice := SalesLine."Unit Price";
+            DATABASE::"Sales Line":
+                begin
+                    RecRef.SetTable(SalesLine);
+                    UnitPrice := SalesLine."Unit Price";
 
-              if SalesHeader.Get(SalesLine."Document Type",SalesLine."Document No.") and (not SalesHeader."Prices Including VAT") then
-                UnitPrice *= (1 + (SalesLine."VAT %" / 100));
-            end;
-          DATABASE::"Sale Line POS" :
-            begin
-              RecRef.SetTable(SaleLinePOS);
-              UnitPrice := SaleLinePOS."Unit Price";
+                    if SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") and (not SalesHeader."Prices Including VAT") then
+                        UnitPrice *= (1 + (SalesLine."VAT %" / 100));
+                end;
+            DATABASE::"Sale Line POS":
+                begin
+                    RecRef.SetTable(SaleLinePOS);
+                    UnitPrice := SaleLinePOS."Unit Price";
 
-              if SalePOS.Get(SaleLinePOS."Register No.",SaleLinePOS."Sales Ticket No.") and (not SalePOS."Price including VAT") then
-                UnitPrice *= (1 + (SaleLinePOS."VAT %" / 100));
-            end;
+                    if SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.") and (not SalePOS."Price including VAT") then
+                        UnitPrice *= (1 + (SaleLinePOS."VAT %" / 100));
+                end;
         end;
 
         exit(UnitPrice);
@@ -447,25 +452,25 @@ codeunit 6014498 "Exchange Label Management"
         VATPct: Decimal;
     begin
         case RecRef.Number of
-          DATABASE::"Sales Line" :
-            begin
-              AssignIntegerFieldValue(DocumentType, RecRef, 'Document Type');
-              AssignCodeFieldValue(DocumentNo,      RecRef, 'Document No.');
-              AssignDecimalFieldValue(UnitPrice,    RecRef, 'Unit Price');
-              AssignDecimalFieldValue(VATPct,       RecRef, 'VAT %');
+            DATABASE::"Sales Line":
+                begin
+                    AssignIntegerFieldValue(DocumentType, RecRef, 'Document Type');
+                    AssignCodeFieldValue(DocumentNo, RecRef, 'Document No.');
+                    AssignDecimalFieldValue(UnitPrice, RecRef, 'Unit Price');
+                    AssignDecimalFieldValue(VATPct, RecRef, 'VAT %');
 
-              SalesHeader.Get(DocumentType,DocumentNo);
-              if not SalesHeader."Prices Including VAT" then
-                SalesPrice := UnitPrice * (1 + (VATPct / 100))
-              else
-                SalesPrice := UnitPrice;
-            end;
-          DATABASE::"Sale Line POS" :
-            begin
-              AssignDecimalFieldValue(UnitPrice,  RecRef, 'Amount Including VAT');
-              AssignDecimalFieldValue(Quantity,   RecRef, 'Quantity');
-              SalesPrice := UnitPrice / Quantity;
-            end;
+                    SalesHeader.Get(DocumentType, DocumentNo);
+                    if not SalesHeader."Prices Including VAT" then
+                        SalesPrice := UnitPrice * (1 + (VATPct / 100))
+                    else
+                        SalesPrice := UnitPrice;
+                end;
+            DATABASE::"Sale Line POS":
+                begin
+                    AssignDecimalFieldValue(UnitPrice, RecRef, 'Amount Including VAT');
+                    AssignDecimalFieldValue(Quantity, RecRef, 'Quantity');
+                    SalesPrice := UnitPrice / Quantity;
+                end;
         end;
     end;
 
@@ -473,13 +478,13 @@ codeunit 6014498 "Exchange Label Management"
     var
         ExchangeLabel: Record "Exchange Label";
     begin
-        ExchangeLabel.SetCurrentKey("Register No.","Sales Ticket No.","Batch No.");
+        ExchangeLabel.SetCurrentKey("Register No.", "Sales Ticket No.", "Batch No.");
         ExchangeLabel.SetRange("Register No.", SaleLinePOS."Register No.");
         ExchangeLabel.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
         if ExchangeLabel.FindLast then
-          exit(ExchangeLabel."Batch No." + 1)
+            exit(ExchangeLabel."Batch No." + 1)
         else
-          exit(1);
+            exit(1);
     end;
 
     procedure IsItemLine(RecRef: RecordRef): Boolean
@@ -489,56 +494,56 @@ codeunit 6014498 "Exchange Label Management"
         Type: Integer;
     begin
         case RecRef.Number of
-          DATABASE::"Sales Line" :
-            begin
-              AssignIntegerFieldValue(Type,  RecRef, 'Type');
-              exit(Type = SalesLine.Type::Item)
-            end;
-          DATABASE::"Sale Line POS" :
-            begin
-              AssignIntegerFieldValue(Type,  RecRef, 'Type');
-              exit(Type = SaleLinePOS.Type::Item)
-            end;
+            DATABASE::"Sales Line":
+                begin
+                    AssignIntegerFieldValue(Type, RecRef, 'Type');
+                    exit(Type = SalesLine.Type::Item)
+                end;
+            DATABASE::"Sale Line POS":
+                begin
+                    AssignIntegerFieldValue(Type, RecRef, 'Type');
+                    exit(Type = SaleLinePOS.Type::Item)
+                end;
         end;
     end;
 
-    local procedure AssignOptionFieldValue(var OptionVal: Option "1","2","3","4","5","6","7","8","9";RecordRef: RecordRef;FieldName: Text[50])
+    local procedure AssignOptionFieldValue(var OptionVal: Option "1","2","3","4","5","6","7","8","9"; RecordRef: RecordRef; FieldName: Text[50])
     var
         FieldRef: FieldRef;
         FieldNo: Integer;
     begin
-        FieldNo     := GetFieldNo(RecordRef,FieldName);
-        FieldRef    := RecordRef.Field(FieldNo);
-        OptionVal   := FieldRef.Value;
+        FieldNo := GetFieldNo(RecordRef, FieldName);
+        FieldRef := RecordRef.Field(FieldNo);
+        OptionVal := FieldRef.Value;
     end;
 
-    local procedure AssignIntegerFieldValue(var IntegerVal: Integer;RecordRef: RecordRef;FieldName: Text[50])
+    local procedure AssignIntegerFieldValue(var IntegerVal: Integer; RecordRef: RecordRef; FieldName: Text[50])
     var
         FieldRef: FieldRef;
         FieldNo: Integer;
     begin
-        FieldNo     := GetFieldNo(RecordRef,FieldName);
-        FieldRef    := RecordRef.Field(FieldNo);
-        IntegerVal  := FieldRef.Value;
+        FieldNo := GetFieldNo(RecordRef, FieldName);
+        FieldRef := RecordRef.Field(FieldNo);
+        IntegerVal := FieldRef.Value;
     end;
 
-    local procedure AssignCodeFieldValue(var CodeVal: Code[20];RecordRef: RecordRef;FieldName: Text[50])
+    local procedure AssignCodeFieldValue(var CodeVal: Code[20]; RecordRef: RecordRef; FieldName: Text[50])
     var
         FieldRef: FieldRef;
         FieldNo: Integer;
     begin
-        FieldNo    := GetFieldNo(RecordRef,FieldName);
-        FieldRef   := RecordRef.Field(FieldNo);
-        CodeVal    := FieldRef.Value;
+        FieldNo := GetFieldNo(RecordRef, FieldName);
+        FieldRef := RecordRef.Field(FieldNo);
+        CodeVal := FieldRef.Value;
     end;
 
-    local procedure AssignDecimalFieldValue(var DecimalVal: Decimal;RecordRef: RecordRef;FieldName: Text[50])
+    local procedure AssignDecimalFieldValue(var DecimalVal: Decimal; RecordRef: RecordRef; FieldName: Text[50])
     var
         FieldRef: FieldRef;
         FieldNo: Integer;
     begin
-        FieldNo    := GetFieldNo(RecordRef,FieldName);
-        FieldRef   := RecordRef.Field(FieldNo);
+        FieldNo := GetFieldNo(RecordRef, FieldName);
+        FieldRef := RecordRef.Field(FieldNo);
         DecimalVal := FieldRef.Value;
     end;
 
@@ -581,7 +586,7 @@ codeunit 6014498 "Exchange Label Management"
         exit(PrintType::All)
     end;
 
-    procedure ScanExchangeLabelRetailJnl(var RetailJnlLine: Record "Retail Journal Line";var Validering: Code[20]) Found: Boolean
+    procedure ScanExchangeLabelRetailJnl(var RetailJnlLine: Record "Retail Journal Line"; var Validering: Code[20]) Found: Boolean
     var
         ExchangeLabel: Record "Exchange Label";
         IComm: Record "I-Comm";
@@ -593,46 +598,46 @@ codeunit 6014498 "Exchange Label Management"
         RetailConfiguration.Get;
 
         if CopyStr(Validering, 1, 2) <> RetailConfiguration."EAN Prefix Exhange Label" then
-          exit(false);
+            exit(false);
 
         ExchangeLabel.SetCurrentKey(Barcode);
         ExchangeLabel.SetRange(Barcode, Validering);
 
         if not ExchangeLabel.FindFirst and RetailConfiguration."Use I-Comm" and
            IComm.Get and (IComm."Exchange Label Center Company" <> '') then
-          ExchangeLabel.ChangeCompany(IComm."Company - Clearing");
+            ExchangeLabel.ChangeCompany(IComm."Company - Clearing");
 
         if ExchangeLabel.FindFirst then begin
-          if ExchangeLabel."Packaged Batch" then begin
-            ExchangeLabel.SetRange(Barcode);
-            ExchangeLabel.SetRange("Batch No.", ExchangeLabel."Batch No.");
-            ExchangeLabel.SetRange("Store ID", ExchangeLabel."Store ID");
-            ExchangeLabel.SetRange("Register No.", ExchangeLabel."Register No.");
-            ExchangeLabel.SetRange("Sales Ticket No.", ExchangeLabel."Sales Ticket No.");
-            ExchangeLabel.SetCurrentKey("Register No.","Sales Ticket No.","Batch No.");
-            ExchangeLabel.FindSet;
-          end;
-
-          repeat
-            with RetailJnlLine do begin
-              if not Item.Get(ExchangeLabel."Item No.") then
-                Error(Text00001);
-
-              RetailJnlLine2.SetRange("No.", "No.");
-              if RetailJnlLine2.FindLast then;
-
-              Init;
-              "Line No." := RetailJnlLine2."Line No." + 10000;
-
-              Validate("Item No." , ExchangeLabel."Item No.");
-              "Sales Unit of measure" := ExchangeLabel."Unit of Measure";
-              Validate("Quantity to Print", ExchangeLabel.Quantity);
-              if ExchangeLabel."Variant Code" <> '' then
-                Validate("Variant Code", ExchangeLabel."Variant Code");
-              Insert;
+            if ExchangeLabel."Packaged Batch" then begin
+                ExchangeLabel.SetRange(Barcode);
+                ExchangeLabel.SetRange("Batch No.", ExchangeLabel."Batch No.");
+                ExchangeLabel.SetRange("Store ID", ExchangeLabel."Store ID");
+                ExchangeLabel.SetRange("Register No.", ExchangeLabel."Register No.");
+                ExchangeLabel.SetRange("Sales Ticket No.", ExchangeLabel."Sales Ticket No.");
+                ExchangeLabel.SetCurrentKey("Register No.", "Sales Ticket No.", "Batch No.");
+                ExchangeLabel.FindSet;
             end;
-          until ExchangeLabel.Next = 0;
-          exit(true);
+
+            repeat
+                with RetailJnlLine do begin
+                    if not Item.Get(ExchangeLabel."Item No.") then
+                        Error(Text00001);
+
+                    RetailJnlLine2.SetRange("No.", "No.");
+                    if RetailJnlLine2.FindLast then;
+
+                    Init;
+                    "Line No." := RetailJnlLine2."Line No." + 10000;
+
+                    Validate("Item No.", ExchangeLabel."Item No.");
+                    "Sales Unit of measure" := ExchangeLabel."Unit of Measure";
+                    Validate("Quantity to Print", ExchangeLabel.Quantity);
+                    if ExchangeLabel."Variant Code" <> '' then
+                        Validate("Variant Code", ExchangeLabel."Variant Code");
+                    Insert;
+                end;
+            until ExchangeLabel.Next = 0;
+            exit(true);
         end;
         exit(false);
     end;

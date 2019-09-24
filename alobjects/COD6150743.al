@@ -29,7 +29,7 @@ codeunit 6150743 "POS Geolocation"
     begin
         //-NPR5.40 [308907]
         if SkipGeolocationTracking() then
-          exit;
+            exit;
         //+NPR5.40 [308907]
 
         RegisterGeoLocationScript(FrontEnd);
@@ -39,11 +39,11 @@ codeunit 6150743 "POS Geolocation"
     begin
         //-NPR5.40 [308907]
         if GeolocationLogged then
-          exit(true);
+            exit(true);
 
         if (not NPRetailSetup.Get) or (not NPRetailSetup."Enable Client Diagnostics") then begin
-          GeolocationLogged := true;
-          exit(true);
+            GeolocationLogged := true;
+            exit(true);
         end;
 
         exit(false);
@@ -58,7 +58,7 @@ codeunit 6150743 "POS Geolocation"
     begin
         RegisterModuleRequest := RegisterModuleRequest.JsonRequest();
         RegisterModuleRequest.Method := 'RegisterModule';
-        RegisterModuleRequest.Content.Add('Name','GeoLocationByIP');
+        RegisterModuleRequest.Content.Add('Name', 'GeoLocationByIP');
         ScriptString := '(function() {' +
         ' var geolocation = new n$.Event.Method("GeoLocationMethod"); ' +
         ' $.ajax({' +
@@ -80,24 +80,24 @@ codeunit 6150743 "POS Geolocation"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnCustomMethod', '', false, false)]
-    local procedure OnCustomMethod(Method: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnCustomMethod(Method: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         ClientDiagnosticsDataMgt: Codeunit "Client Diagnostics Data Mgt.";
         JSON: Codeunit "POS JSON Management";
         ErrorText: Text;
     begin
         if Method <> 'GeoLocationMethod' then
-          exit;
+            exit;
 
         Handled := true;
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        ErrorText := JSON.GetString('error',false);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        ErrorText := JSON.GetString('error', false);
         if ErrorText <> '' then
-          exit;
+            exit;
 
         //-NPR5.40 [308907]
-        TrackGeoLocationByIP(JSON.GetString('result',true));
+        TrackGeoLocationByIP(JSON.GetString('result', true));
         //+NPR5.40 [308907]
     end;
 
@@ -105,7 +105,7 @@ codeunit 6150743 "POS Geolocation"
     begin
         //-NPR5.40 [308907]
         if SkipGeolocationTracking() then
-          exit;
+            exit;
 
         GeolocationLogged := true;
         OnTrackGeoLocationByIP(IPAddress);
@@ -123,16 +123,14 @@ codeunit 6150743 "POS Geolocation"
     begin
     end;
 
-    procedure IPAddress2GeoPosition(IPAddress: Text;var Latitude: Decimal;var Longitude: Decimal)
+    procedure IPAddress2GeoPosition(IPAddress: Text; var Latitude: Decimal; var Longitude: Decimal)
     var
         Parameters: DotNet npNetDictionary_Of_T_U;
         AFManagement: Codeunit "AF Management";
         AFHelperFunctions: Codeunit "AF Helper Functions";
         HttpResponseMessage: DotNet npNetHttpResponseMessage;
         Path: Text;
-        JObject: DotNet npNetJObject;
-        JToken: DotNet npNetJToken;
-        JTokenWriter: DotNet npNetJTokenWriter;
+        JObject: JsonObject;
         StringContent: DotNet npNetStringContent;
         TextString: Text;
         Encoding: DotNet npNetEncoding;
@@ -141,58 +139,48 @@ codeunit 6150743 "POS Geolocation"
     begin
         //-NPR5.40 [308907]
         if IPAddress = '' then
-          exit;
+            exit;
 
-        JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
-          WriteStartObject;
-          WritePropertyName('clientIp');
-          WriteValue(IPAddress);
-          WriteEndObject;
-          JObject := Token;
-        end;
-
-        StringContent := StringContent.StringContent(JObject.ToString,Encoding.UTF8,'application/json');
+        JObject.Add('clientIp', IPAddress);
+        JObject.WriteTo(TextString);
+        StringContent := StringContent.StringContent(TextString, Encoding.UTF8, 'application/json');
 
         Parameters := Parameters.Dictionary();
-        Parameters.Add('baseurl','https://navipartnerfa.azurewebsites.net');
-        Parameters.Add('restmethod','POST');
-        Parameters.Add('path','https://navipartnerfa.azurewebsites.net/api/GetClientGeoLocationByIPAddress?code=eavZjqJdKVynQxzsYPnsYpBGmSm61nxavel2VGulz6R5CrAxqhi6JA==');
-        Parameters.Add('httpcontent',StringContent);
+        Parameters.Add('baseurl', 'https://navipartnerfa.azurewebsites.net');
+        Parameters.Add('restmethod', 'POST');
+        Parameters.Add('path', 'https://navipartnerfa.azurewebsites.net/api/GetClientGeoLocationByIPAddress?code=eavZjqJdKVynQxzsYPnsYpBGmSm61nxavel2VGulz6R5CrAxqhi6JA==');
+        Parameters.Add('httpcontent', StringContent);
 
-        ResultVar := AFManagement.CallRESTWebService(Parameters,HttpResponseMessage);
+        ResultVar := AFManagement.CallRESTWebService(Parameters, HttpResponseMessage);
         if not ResultVar then
-          exit;
+            exit;
 
         TextString := HttpResponseMessage.Content.ReadAsStringAsync.Result;
         if TextString = '' then
-          exit;
+            exit;
 
-        if not TryParseJson(TextString,JToken) then
-          exit;
+        if not TryParseJson(TextString, JObject) then
+            exit;
 
-        JObject := JObject.Parse(JToken.ToString());
-        Latitude := GetJsonValueAsDecimal(JObject,'lat');
-        Longitude := GetJsonValueAsDecimal(JObject,'lon');
+        Latitude := GetJsonValueAsDecimal(JObject, 'lat');
+        Longitude := GetJsonValueAsDecimal(JObject, 'lon');
         //+NPR5.40 [308907]
     end;
 
-    local procedure GetJsonValueAsDecimal(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Decimal
+    local procedure GetJsonValueAsDecimal(JObject: JsonObject; PropertyName: Text) ReturnValue: Decimal
     var
-        DotNetDecimal: DotNet npNetDecimal;
         CultureInfo: DotNet npNetCultureInfo;
+        JToken: JsonToken;
     begin
-        //-NPR5.40 [308907]
-        ReturnValue := DotNetDecimal.Parse(JObject.GetValue(PropertyName).ToString,CultureInfo.InvariantCulture);
-        //+NPR5.40 [308907]
+        JObject.Get(PropertyName, JToken);
+        ReturnValue := JToken.AsValue().AsDecimal();
     end;
 
     [TryFunction]
-    local procedure TryParseJson(json: Text;var JToken: DotNet npNetJToken)
+    local procedure TryParseJson(json: Text; var JObject: JsonObject)
     begin
-        //-NPR5.40 [308907]
-        JToken := JToken.Parse(json);
-        //+NPR5.40 [308907]
+        Clear(JObject);
+        JObject.ReadFrom(json);
     end;
 }
 

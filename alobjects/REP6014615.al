@@ -8,7 +8,7 @@ report 6014615 "Sales Statistics Per Variety"
     // NPR5.46/ZESO/20180919  CASE 327284 Added Totals for Sales(Qty), Cost of Goods(LCY),Sale(LCY) and average of columns Profit and Profit %. and Option to print the totals or not.
     // NPR5.51/ANPA/20190607  CASE 356180 Corrected Inventory Calculation
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales Statistics Per Variety.rdlc';
+    RDLCLayout = './layouts/Sales Statistics Per Variety.rdlc';
 
     Caption = 'Sales Statistics Variant';
     UsageCategory = ReportsAndAnalysis;

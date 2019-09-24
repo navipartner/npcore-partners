@@ -4,8 +4,10 @@ codeunit 6014591 "Network Test Library"
     trigger OnRun()
     begin
         case Method of
-          'PING'   : Ping();
-          'Invoke' : InvokeAddress();
+            'PING':
+                Ping();
+            'Invoke':
+                InvokeAddress();
         end;
     end;
 
@@ -24,12 +26,12 @@ codeunit 6014591 "Network Test Library"
         Uri: DotNet npNetUri;
         Url: Text;
     begin
-        Uri  := Uri.Uri(ServerAddress);
-        Url  := Uri.Host;
+        Uri := Uri.Uri(ServerAddress);
+        Url := Uri.Host;
         Ping := Ping.Ping();
-        PingReply := Ping.Send(Url,3000);
+        PingReply := Ping.Send(Url, 3000);
         if not PingReply.Status.Equals(IPStatus.Success) then
-          Error('No response from %1.',Url);
+            Error('No response from %1.', Url);
     end;
 
     local procedure InvokeAddress() ReturnStatus: Integer
@@ -37,18 +39,20 @@ codeunit 6014591 "Network Test Library"
         HttpWebRequest: DotNet npNetHttpWebRequest;
         HttpWebResponse: DotNet npNetHttpWebResponse;
         RequestStream: DotNet npNetStreamWriter;
+        NetConvHelper: Variant;
     begin
         // Create XMLHTTP and SEND
-        HttpWebRequest        := HttpWebRequest.Create(ServerAddress);
+        HttpWebRequest := HttpWebRequest.Create(ServerAddress);
         HttpWebRequest.Method := 'GET';
 
         SetCredentials(HttpWebRequest);
 
-        RequestStream   := HttpWebRequest.GetRequestStream();
+        NetConvHelper := HttpWebRequest.GetRequestStream();
+        RequestStream := NetConvHelper;
 
         HttpWebResponse := HttpWebRequest.GetResponse();
 
-        if HttpWebResponse.StatusCode <> 200 then Error('Bad response from %1 : %2.',ServerAddress,HttpWebResponse.StatusCode);
+        if HttpWebResponse.StatusCode <> 200 then Error('Bad response from %1 : %2.', ServerAddress, HttpWebResponse.StatusCode);
     end;
 
     local procedure SetCredentials(var HttpWebRequest: DotNet npNetHttpWebRequest)
@@ -56,12 +60,12 @@ codeunit 6014591 "Network Test Library"
         NetworkCredentials: DotNet npNetNetworkCredential;
     begin
         if ClientUsername <> '' then begin
-          NetworkCredentials := NetworkCredentials.NetworkCredential();
-          NetworkCredentials.Password := Password;
-          NetworkCredentials.UserName := ClientUsername;
-          NetworkCredentials.Domain   := Domain;
+            NetworkCredentials := NetworkCredentials.NetworkCredential();
+            NetworkCredentials.Password := Password;
+            NetworkCredentials.UserName := ClientUsername;
+            NetworkCredentials.Domain := Domain;
 
-          HttpWebRequest.Credentials  := NetworkCredentials;
+            HttpWebRequest.Credentials := NetworkCredentials;
         end;
     end;
 
@@ -74,19 +78,19 @@ codeunit 6014591 "Network Test Library"
         This: Codeunit "Network Test Library";
     begin
         This.UseServerAddress := Url;
-        This.UseMethod        := 'Ping';
+        This.UseMethod := 'Ping';
         exit(This.Run())
     end;
 
-    procedure InvokeAddres(Url: Text;Domain: Text;Username: Text;Password: Text): Boolean
+    procedure InvokeAddres(Url: Text; Domain: Text; Username: Text; Password: Text): Boolean
     var
         This: Codeunit "Network Test Library";
     begin
-        This.UseMethod        := 'Invoke';
+        This.UseMethod := 'Invoke';
         This.UseServerAddress := Url;
-        This.UseUsername      := Username;
-        This.UsePassword      := Password;
-        This.UseDomain        := Domain;
+        This.UseUsername := Username;
+        This.UsePassword := Password;
+        This.UseDomain := Domain;
         exit(This.Run());
     end;
 
@@ -97,8 +101,8 @@ codeunit 6014591 "Network Test Library"
     procedure UseMethod(MethodIn: Text)
     begin
         Method := UpperCase(MethodIn);
-        if not (Method in ['PING','INVOKE']) then
-          Error('Illegal method. Valid methods at Invoke or Ping.');
+        if not (Method in ['PING', 'INVOKE']) then
+            Error('Illegal method. Valid methods at Invoke or Ping.');
     end;
 
     procedure UseServerAddress(ServerAddressIn: Text)
@@ -118,7 +122,7 @@ codeunit 6014591 "Network Test Library"
 
     procedure UseDomain(DomainIn: Text)
     begin
-        Domain   := DomainIn;
+        Domain := DomainIn;
     end;
 }
 

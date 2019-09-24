@@ -4,7 +4,7 @@ report 6014449 "Vendor trn. by Item group"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     DefaultLayout = RDLC;
-    RDLCLayout = './Vendor trn. by Item group.rdlc';
+    RDLCLayout = './layouts/Vendor trn. by Item group.rdlc';
 
     Caption = 'Vendor Trn. By Item Group';
     UsageCategory = ReportsAndAnalysis;

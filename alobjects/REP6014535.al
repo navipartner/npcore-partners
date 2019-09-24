@@ -16,7 +16,7 @@ report 6014535 "Sales Statistics By Department"
     // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
     // NPR5.51/BHR /20190708 CASE 361268  Add filter on blank dimension
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales Statistics By Department.rdlc';
+    RDLCLayout = './layouts/Sales Statistics By Department.rdlc';
 
     Caption = 'Sales Statistics By Department';
     UsageCategory = ReportsAndAnalysis;

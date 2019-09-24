@@ -2,7 +2,7 @@ report 6060100 "Data Cleanup Fill"
 {
     // NPR4.02/JC/20150318  CASE 207094 Data Cleanup for Customer, Vendor and Item
     DefaultLayout = RDLC;
-    RDLCLayout = './Data Cleanup Fill.rdlc';
+    RDLCLayout = './layouts/Data Cleanup Fill.rdlc';
 
     Caption = 'Data Cleanup Customer';
 
@@ -42,7 +42,6 @@ report 6060100 "Data Cleanup Fill"
             }
             column(Cust_Deleteable;Deleteable)
             {
-                OptionCaption = 'Can Be Deleted';
             }
             column(Cust_LedgerCnt;LedgerCnt)
             {

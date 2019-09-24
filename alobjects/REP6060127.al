@@ -3,7 +3,7 @@ report 6060127 "MM Member Card Print"
     // MM80.1.02/TSA/20151228  CASE 229684 Touch-up and enchancements
     // MM1.37/TJ  /20190201  CASE 350288 Using POS View Profile for register picture
     DefaultLayout = RDLC;
-    RDLCLayout = './MM Member Card Print.rdlc';
+    RDLCLayout = './layouts/MM Member Card Print.rdlc';
 
     Caption = 'Member Card Print';
 

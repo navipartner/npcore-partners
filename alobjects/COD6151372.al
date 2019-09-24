@@ -50,17 +50,17 @@ codeunit 6151372 "CS WS"
         IsEnable: Boolean;
         LogCommunication: Boolean;
     begin
-        CSHelperFunctions.CreateLogEntry(CSCommunicationLog,Document,IsEnable,LogCommunication);
+        CSHelperFunctions.CreateLogEntry(CSCommunicationLog, Document, IsEnable, LogCommunication);
 
-        XMLDOMManagement.LoadXMLDocumentFromText(Document,InputXmlDocument);
+        XMLDOMManagement.LoadXMLDocumentFromText(Document, InputXmlDocument);
         CSManagement.ProcessDocument(InputXmlDocument);
         CSManagement.GetOutboundDocument(OutputXmlDocument);
         Document := OutputXmlDocument.OuterXml;
 
-        CSHelperFunctions.UpdateLogEntry(CSCommunicationLog,'ProcessDocument',IsInternal,InternalCallId,Document,LogCommunication,'');
+        CSHelperFunctions.UpdateLogEntry(CSCommunicationLog, 'ProcessDocument', IsInternal, InternalCallId, Document, LogCommunication, '');
     end;
 
-    procedure ProcessData(DeviceId: Code[10];BatchId: Text;BatchNo: Text;PostData: Text;StockTakeConfig: Text;WorksheetName: Text;var Data: Text)
+    procedure ProcessData(DeviceId: Code[10]; BatchId: Text; BatchNo: Text; PostData: Text; StockTakeConfig: Text; WorksheetName: Text; var Data: Text)
     var
         CSStockTakeHandlingRfid: Record "CS Stock-Take Handling Rfid";
         OK: Boolean;
@@ -75,21 +75,21 @@ codeunit 6151372 "CS WS"
         Values: DotNet npNetArray;
     begin
         if (DeviceId = '') or (Data = '') then
-          exit;
+            exit;
 
         BigTextData.AddText(Data);
 
         CSStockTakeHandlingRfid.Init;
         CSStockTakeHandlingRfid.Id := CreateGuid;
         if BatchId <> '' then
-          CSStockTakeHandlingRfid."Batch Id" := BatchId
+            CSStockTakeHandlingRfid."Batch Id" := BatchId
         else
-          CSStockTakeHandlingRfid."Batch Id" := CreateGuid;
+            CSStockTakeHandlingRfid."Batch Id" := CreateGuid;
 
-        if Evaluate(ValInt,BatchNo) then
-          CSStockTakeHandlingRfid."Batch No." := ValInt;
-        if Evaluate(ValBool,PostData) then
-          CSStockTakeHandlingRfid."Batch Posting" := ValBool;
+        if Evaluate(ValInt, BatchNo) then
+            CSStockTakeHandlingRfid."Batch No." := ValInt;
+        if Evaluate(ValBool, PostData) then
+            CSStockTakeHandlingRfid."Batch Posting" := ValBool;
         CSStockTakeHandlingRfid.Created := CurrentDateTime;
         CSStockTakeHandlingRfid."Created By" := UserId;
         CSStockTakeHandlingRfid."Request Function" := 'StockTakeRfid';
@@ -116,11 +116,11 @@ codeunit 6151372 "CS WS"
         Data := '';
 
         if CSStockTakeHandlingRfid."Batch Posting" then begin
-          OK := StartSession(SessionID, CODEUNIT::"CS UI Stock-Take Handling Rfid", CompanyName, CSStockTakeHandlingRfid);
-          if not OK then begin
-            CSStockTakeHandlingRfid."Posting Error" := Format(CODEUNIT::"CS UI Stock-Take Handling Rfid");
-            CSStockTakeHandlingRfid."Posting Error Detail" := GetLastErrorText;
-          end;
+            OK := StartSession(SessionID, CODEUNIT::"CS UI Stock-Take Handling Rfid", CompanyName, CSStockTakeHandlingRfid);
+            if not OK then begin
+                CSStockTakeHandlingRfid."Posting Error" := Format(CODEUNIT::"CS UI Stock-Take Handling Rfid");
+                CSStockTakeHandlingRfid."Posting Error Detail" := GetLastErrorText;
+            end;
         end;
 
         BigTextData.AddText(Data);
@@ -129,7 +129,7 @@ codeunit 6151372 "CS WS"
         CSStockTakeHandlingRfid.Modify(false);
     end;
 
-    procedure IsInternalCall(LocalIsInternal: Boolean;LocalId: Guid)
+    procedure IsInternalCall(LocalIsInternal: Boolean; LocalId: Guid)
     begin
         IsInternal := LocalIsInternal;
         InternalCallId := LocalId;
@@ -154,49 +154,49 @@ codeunit 6151372 "CS WS"
         DetailTxt := 'n/a';
 
         if Barcode = '' then
-          exit(StrSubstNo('%1#%2',MasterTxt,DetailTxt));
+            exit(StrSubstNo('%1#%2', MasterTxt, DetailTxt));
 
         if not BarcodeLibrary.TranslateBarcodeToItemVariant(Barcode, ItemNo, VariantCode, ResolvingTable, true) then
-          exit(StrSubstNo('%1#%2',MasterTxt,DetailTxt));
+            exit(StrSubstNo('%1#%2', MasterTxt, DetailTxt));
 
         if not Item.Get(ItemNo) then
-          exit(StrSubstNo('%1#%2',MasterTxt,DetailTxt));
+            exit(StrSubstNo('%1#%2', MasterTxt, DetailTxt));
 
         if VariantCode <> '' then
-          Item.SetFilter("Variant Filter",VariantCode);
+            Item.SetFilter("Variant Filter", VariantCode);
 
-        Item.CalcFields(Inventory,"Qty. on Purch. Order");
+        Item.CalcFields(Inventory, "Qty. on Purch. Order");
 
         DetailTxt := Format(Item.Inventory);
-        ItemInventoryTxt := StrSubstNo('Stock: %1',Item.Inventory);
+        ItemInventoryTxt := StrSubstNo('Stock: %1', Item.Inventory);
 
         if Item."Qty. on Purch. Order" > 0 then begin
-          Clear(PurchaseLine);
-          PurchaseLine.SetRange("Document Type",PurchaseLine."Document Type"::Order);
-          PurchaseLine.SetRange(Type,PurchaseLine.Type::Item);
-          PurchaseLine.SetRange("No.",Item."No.");
-          if VariantCode <> '' then
-            PurchaseLine.SetRange("Variant Code",VariantCode);
-          if PurchaseLine.FindLast then
-            PurchaseLineExpectedReceiptDateTxt := StrSubstNo('Exp.: %1',PurchaseLine."Expected Receipt Date")
-          else
-            PurchaseLineExpectedReceiptDateTxt := StrSubstNo('Exp.: %1','n/a');
+            Clear(PurchaseLine);
+            PurchaseLine.SetRange("Document Type", PurchaseLine."Document Type"::Order);
+            PurchaseLine.SetRange(Type, PurchaseLine.Type::Item);
+            PurchaseLine.SetRange("No.", Item."No.");
+            if VariantCode <> '' then
+                PurchaseLine.SetRange("Variant Code", VariantCode);
+            if PurchaseLine.FindLast then
+                PurchaseLineExpectedReceiptDateTxt := StrSubstNo('Exp.: %1', PurchaseLine."Expected Receipt Date")
+            else
+                PurchaseLineExpectedReceiptDateTxt := StrSubstNo('Exp.: %1', 'n/a');
         end else
-          PurchaseLineExpectedReceiptDateTxt := StrSubstNo('Exp.: %1','n/a');
+            PurchaseLineExpectedReceiptDateTxt := StrSubstNo('Exp.: %1', 'n/a');
 
         Clear(ItemLedgerEntry);
-        ItemLedgerEntry.SetRange("Entry Type",ItemLedgerEntry."Entry Type"::Sale);
-        ItemLedgerEntry.SetRange("Item No.",Item."No.");
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
+        ItemLedgerEntry.SetRange("Item No.", Item."No.");
         if VariantCode <> '' then
-          ItemLedgerEntry.SetRange("Variant Code",VariantCode);
+            ItemLedgerEntry.SetRange("Variant Code", VariantCode);
         if ItemLedgerEntry.FindLast then
-          ItemLedgerEntryPostingDateTxt := StrSubstNo('Last: %1',ItemLedgerEntry."Posting Date")
+            ItemLedgerEntryPostingDateTxt := StrSubstNo('Last: %1', ItemLedgerEntry."Posting Date")
         else
-          ItemLedgerEntryPostingDateTxt := StrSubstNo('Last: %1','n/a');
+            ItemLedgerEntryPostingDateTxt := StrSubstNo('Last: %1', 'n/a');
 
-        MasterTxt := StrSubstNo('%1\n%2\n%3',ItemInventoryTxt,PurchaseLineExpectedReceiptDateTxt,ItemLedgerEntryPostingDateTxt);
+        MasterTxt := StrSubstNo('%1\n%2\n%3', ItemInventoryTxt, PurchaseLineExpectedReceiptDateTxt, ItemLedgerEntryPostingDateTxt);
 
-        exit(StrSubstNo('%1#%2',DetailTxt,MasterTxt));
+        exit(StrSubstNo('%1#%2', DetailTxt, MasterTxt));
     end;
 
     procedure GetItemPicture(Barcode: Code[20]) PictureBase64: Text
@@ -212,22 +212,22 @@ codeunit 6151372 "CS WS"
     begin
         //-NPR5.48 [318296]
         if not BarcodeLibrary.TranslateBarcodeToItemVariant(Barcode, ItemNo, VariantCode, ResolvingTable, true) then
-          exit('');
+            exit('');
 
         if not Item.Get(ItemNo) then
-          exit('');
+            exit('');
 
         if VariantCode <> '' then
-          Item.SetFilter("Variant Filter",VariantCode);
+            Item.SetFilter("Variant Filter", VariantCode);
 
         if Item.Picture.Count >= 1 then begin
-          Clear(PictureBase64);
-          TempBlob.Init;
-          MediaGuid := Item.Picture.Item(1);
-          TenantMedia.Get(MediaGuid);
-          TenantMedia.CalcFields(Content);
-          TempBlob.Blob:=TenantMedia.Content;
-          PictureBase64 := TempBlob.ToBase64String;
+            Clear(PictureBase64);
+            TempBlob.Init;
+            MediaGuid := Item.Picture.Item(1);
+            TenantMedia.Get(MediaGuid);
+            TenantMedia.CalcFields(Content);
+            TempBlob.Blob := TenantMedia.Content;
+            PictureBase64 := TempBlob.ToBase64String;
         end;
 
         exit(PictureBase64);
@@ -238,7 +238,7 @@ codeunit 6151372 "CS WS"
     var
         CSItemSeachHandling: Record "CS Item Seach Handling" temporary;
         Item: Record Item;
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         JTokenWriter: DotNet npNetJTokenWriter;
         Result: Text;
         MaxItems: Integer;
@@ -246,14 +246,14 @@ codeunit 6151372 "CS WS"
         CSSetup: Record "CS Setup";
     begin
         if Word = '' then
-          exit;
+            exit;
 
         if not CSSetup.Get then
-          exit;
+            exit;
 
         if CSSetup."Max Records In Search Result" = 0 then begin
-          CSSetup."Max Records In Search Result" := 100;
-          CSSetup.Modify;
+            CSSetup."Max Records In Search Result" := 100;
+            CSSetup.Modify;
         end;
 
         MaxItems := CSSetup."Max Records In Search Result";
@@ -262,88 +262,88 @@ codeunit 6151372 "CS WS"
         Clear(CSItemSeachHandling);
 
         if StrLen(Word) <= MaxStrLen(Item."No.") then begin
-          if Item.Get(Word) then begin
-            CSItemSeachHandling.Init;
-            CSItemSeachHandling."No." := Item."No.";
-            CSItemSeachHandling.Description := Item.Description;
-            CSItemSeachHandling."Description 2" := Item."Description 2";
-            CSItemSeachHandling.Rank := 1;
-            CSItemSeachHandling.Insert;
-            ItemsCounter += 1;
-          end;
-
-          Item.SetFilter("No.",'%1','@*' + Word + '*');
-          if Item.FindSet then begin
-            repeat
-              if not CSItemSeachHandling.Get(Item."No.") then begin
+            if Item.Get(Word) then begin
                 CSItemSeachHandling.Init;
                 CSItemSeachHandling."No." := Item."No.";
                 CSItemSeachHandling.Description := Item.Description;
                 CSItemSeachHandling."Description 2" := Item."Description 2";
-                CSItemSeachHandling.Rank := 2;
+                CSItemSeachHandling.Rank := 1;
                 CSItemSeachHandling.Insert;
                 ItemsCounter += 1;
-              end;
-            until (Item.Next = 0) or (ItemsCounter = MaxItems);
-          end;
+            end;
+
+            Item.SetFilter("No.", '%1', '@*' + Word + '*');
+            if Item.FindSet then begin
+                repeat
+                    if not CSItemSeachHandling.Get(Item."No.") then begin
+                        CSItemSeachHandling.Init;
+                        CSItemSeachHandling."No." := Item."No.";
+                        CSItemSeachHandling.Description := Item.Description;
+                        CSItemSeachHandling."Description 2" := Item."Description 2";
+                        CSItemSeachHandling.Rank := 2;
+                        CSItemSeachHandling.Insert;
+                        ItemsCounter += 1;
+                    end;
+                until (Item.Next = 0) or (ItemsCounter = MaxItems);
+            end;
         end;
 
         if (StrLen(Word) <= MaxStrLen(Item.Description)) then begin
-          Clear(Item);
-          Item.SetFilter(Description,'%1','@*' + Word + '*');
-          if Item.FindSet and  (ItemsCounter < MaxItems) then begin
-            repeat
-              if not CSItemSeachHandling.Get(Item."No.") then begin
-                CSItemSeachHandling.Init;
-                CSItemSeachHandling."No." := Item."No.";
-                CSItemSeachHandling.Description := Item.Description;
-                CSItemSeachHandling."Description 2" := Item."Description 2";
-                CSItemSeachHandling.Rank := 3;
-                CSItemSeachHandling.Insert;
-                ItemsCounter += 1;
-              end;
-            until (Item.Next = 0) or (ItemsCounter = MaxItems);
-          end;
+            Clear(Item);
+            Item.SetFilter(Description, '%1', '@*' + Word + '*');
+            if Item.FindSet and (ItemsCounter < MaxItems) then begin
+                repeat
+                    if not CSItemSeachHandling.Get(Item."No.") then begin
+                        CSItemSeachHandling.Init;
+                        CSItemSeachHandling."No." := Item."No.";
+                        CSItemSeachHandling.Description := Item.Description;
+                        CSItemSeachHandling."Description 2" := Item."Description 2";
+                        CSItemSeachHandling.Rank := 3;
+                        CSItemSeachHandling.Insert;
+                        ItemsCounter += 1;
+                    end;
+                until (Item.Next = 0) or (ItemsCounter = MaxItems);
+            end;
 
-          Clear(Item);
-          Item.SetFilter("Description 2",'%1','@*' + Word + '*');
-          if Item.FindSet and (ItemsCounter < MaxItems) then begin
-            repeat
-              if not CSItemSeachHandling.Get(Item."No.") then begin
-                CSItemSeachHandling.Init;
-                CSItemSeachHandling."No." := Item."No.";
-                CSItemSeachHandling.Description := Item.Description;
-                CSItemSeachHandling."Description 2" := Item."Description 2";
-                CSItemSeachHandling.Rank := 4;
-                CSItemSeachHandling.Insert;
-                ItemsCounter += 1;
-              end;
-            until (Item.Next = 0) or (ItemsCounter = MaxItems);
-          end;
+            Clear(Item);
+            Item.SetFilter("Description 2", '%1', '@*' + Word + '*');
+            if Item.FindSet and (ItemsCounter < MaxItems) then begin
+                repeat
+                    if not CSItemSeachHandling.Get(Item."No.") then begin
+                        CSItemSeachHandling.Init;
+                        CSItemSeachHandling."No." := Item."No.";
+                        CSItemSeachHandling.Description := Item.Description;
+                        CSItemSeachHandling."Description 2" := Item."Description 2";
+                        CSItemSeachHandling.Rank := 4;
+                        CSItemSeachHandling.Insert;
+                        ItemsCounter += 1;
+                    end;
+                until (Item.Next = 0) or (ItemsCounter = MaxItems);
+            end;
         end;
 
-        CSItemSeachHandling.SetCurrentKey(Rank,"No.");
+        CSItemSeachHandling.SetCurrentKey(Rank, "No.");
         if CSItemSeachHandling.FindSet then begin
-          JTokenWriter := JTokenWriter.JTokenWriter;
-          with JTokenWriter do begin
-            WriteStartObject;
-            WritePropertyName('items');
-            WriteStartArray;
-              repeat
+            JTokenWriter := JTokenWriter.JTokenWriter;
+            with JTokenWriter do begin
                 WriteStartObject;
-                WritePropertyName('key');
-                WriteValue(CSItemSeachHandling."No.");
-                WritePropertyName('description1');
-                WriteValue(CSItemSeachHandling.Description);
-                WritePropertyName('description2');
-                WriteValue(CSItemSeachHandling."Description 2");
+                WritePropertyName('items');
+                WriteStartArray;
+                repeat
+                    WriteStartObject;
+                    WritePropertyName('key');
+                    WriteValue(CSItemSeachHandling."No.");
+                    WritePropertyName('description1');
+                    WriteValue(CSItemSeachHandling.Description);
+                    WritePropertyName('description2');
+                    WriteValue(CSItemSeachHandling."Description 2");
+                    WriteEndObject;
+                until CSItemSeachHandling.Next = 0;
+                WriteEndArray;
                 WriteEndObject;
-              until CSItemSeachHandling.Next = 0;
-            WriteEndArray;
-            WriteEndObject;
-            JObject := Token;
-          end;
-          Result := JObject.ToString();
+                JObject := Token;
+            end;
+            Result := JObject.ToString();
         end;
 
         exit(Result);
@@ -363,16 +363,16 @@ codeunit 6151372 "CS WS"
         exit(CSHelperFunctions.CreateOfflineRfidDataDeltaV2(DeviceId));
     end;
 
-    procedure UpdateRfidDeviceInfo(DeviceId: Code[20];Lasttimestamp: Text;Location: Code[20]): Text
+    procedure UpdateRfidDeviceInfo(DeviceId: Code[20]; Lasttimestamp: Text; Location: Code[20]): Text
     var
         CSHelperFunctions: Codeunit "CS Helper Functions";
         Timestamp: BigInteger;
     begin
-        if not Evaluate(Timestamp,Lasttimestamp) then
-          exit;
+        if not Evaluate(Timestamp, Lasttimestamp) then
+            exit;
 
         if Timestamp = 0 then
-          exit;
+            exit;
 
         exit(CSHelperFunctions.UpdateDeviceInfo(DeviceId, Timestamp, Location));
     end;
@@ -407,12 +407,12 @@ codeunit 6151372 "CS WS"
         //+NPR5.51 [350696]
 
         if CSRfidData.Get(TagId) then
-          exit(CSRfidData."Combined key")
+            exit(CSRfidData."Combined key")
         else
-          exit('UNKNOWNITEM');
+            exit('UNKNOWNITEM');
     end;
 
-    procedure SetRfidTagData(StockTakeId: Text;StockTakeConfigCode: Text;WorksheetName: Text;TagId: Text): Text
+    procedure SetRfidTagData(StockTakeId: Text; StockTakeConfigCode: Text; WorksheetName: Text; TagId: Text): Text
     var
         CSStockTakesData: Record "CS Stock-Takes Data";
         CSRfidData: Record "CS Rfid Data";
@@ -425,23 +425,23 @@ codeunit 6151372 "CS WS"
         CSStockTakesData.Created := CurrentDateTime;
         CSStockTakesData."Created By" := UserId;
         if CSRfidData.Get(TagId) then begin
-          CSStockTakesData.Validate("Item No.",CSRfidData."Cross-Reference Item No.");
-          CSStockTakesData.Validate("Variant Code",CSRfidData."Cross-Reference Variant Code");
-          CSStockTakesData.Validate("Item Group Code",CSRfidData."Item Group Code");
-          CSStockTakesData."Combined key" := CSRfidData."Combined key";
-          Result := CSRfidData."Combined key";
+            CSStockTakesData.Validate("Item No.", CSRfidData."Cross-Reference Item No.");
+            CSStockTakesData.Validate("Variant Code", CSRfidData."Cross-Reference Variant Code");
+            CSStockTakesData.Validate("Item Group Code", CSRfidData."Item Group Code");
+            CSStockTakesData."Combined key" := CSRfidData."Combined key";
+            Result := CSRfidData."Combined key";
         end else
-          Result := 'UNKNOWNITEM';
+            Result := 'UNKNOWNITEM';
         if CSStockTakesData.Insert() then
-          exit(Result)
+            exit(Result)
         else
-          exit(Result);
+            exit(Result);
     end;
 
     procedure GetRfidWhseReceiptData(DocNo: Text): Text
     var
         WhseReceiptLine: Record "Warehouse Receipt Line";
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         JTokenWriter: DotNet npNetJTokenWriter;
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -449,73 +449,73 @@ codeunit 6151372 "CS WS"
         Result: Text;
     begin
         if DocNo = '' then
-          exit;
+            exit;
 
         JTokenWriter := JTokenWriter.JTokenWriter;
         with JTokenWriter do begin
-          WriteStartObject;
+            WriteStartObject;
 
-          WritePropertyName('item');
-          WriteStartArray;
+            WritePropertyName('item');
+            WriteStartArray;
 
-          WhseReceiptLine.SetRange("No.",DocNo);
-          if WhseReceiptLine.FindSet then begin
-            repeat
+            WhseReceiptLine.SetRange("No.", DocNo);
+            if WhseReceiptLine.FindSet then begin
+                repeat
 
-              Item.Get(WhseReceiptLine."Item No.");
+                    Item.Get(WhseReceiptLine."Item No.");
 
-              WriteStartObject;
-              WritePropertyName('key');
-              if WhseReceiptLine."Variant Code" <> '' then
-                WriteValue(WhseReceiptLine."Item No." + '-' + WhseReceiptLine."Variant Code")
-              else
-                WriteValue(WhseReceiptLine."Item No.");
-              WritePropertyName('title');
-              WriteValue(WhseReceiptLine.Description);
-              WritePropertyName('itemno');
-              WriteValue(WhseReceiptLine."Item No.");
-              WritePropertyName('variantcode');
-              WriteValue(WhseReceiptLine."Variant Code");
-              WritePropertyName('varianttitle');
-              if ItemVariant.Get(Item."No.",WhseReceiptLine."Variant Code") then
-                WriteValue(ItemVariant.Description)
-              else
-                WriteValue('');
-              WritePropertyName('itemgroup');
-              WriteValue(Item."Item Group");
-              WritePropertyName('qtytoreceive');
-              WriteValue(WhseReceiptLine."Qty. to Receive");
-              WritePropertyName('qtyoutstanding');
-              WriteValue(WhseReceiptLine."Qty. Outstanding");
-              WriteEndObject;
-            until WhseReceiptLine.Next = 0;
-          end;
+                    WriteStartObject;
+                    WritePropertyName('key');
+                    if WhseReceiptLine."Variant Code" <> '' then
+                        WriteValue(WhseReceiptLine."Item No." + '-' + WhseReceiptLine."Variant Code")
+                    else
+                        WriteValue(WhseReceiptLine."Item No.");
+                    WritePropertyName('title');
+                    WriteValue(WhseReceiptLine.Description);
+                    WritePropertyName('itemno');
+                    WriteValue(WhseReceiptLine."Item No.");
+                    WritePropertyName('variantcode');
+                    WriteValue(WhseReceiptLine."Variant Code");
+                    WritePropertyName('varianttitle');
+                    if ItemVariant.Get(Item."No.", WhseReceiptLine."Variant Code") then
+                        WriteValue(ItemVariant.Description)
+                    else
+                        WriteValue('');
+                    WritePropertyName('itemgroup');
+                    WriteValue(Item."Item Group");
+                    WritePropertyName('qtytoreceive');
+                    WriteValue(WhseReceiptLine."Qty. to Receive");
+                    WritePropertyName('qtyoutstanding');
+                    WriteValue(WhseReceiptLine."Qty. Outstanding");
+                    WriteEndObject;
+                until WhseReceiptLine.Next = 0;
+            end;
 
-          WriteEndArray;
+            WriteEndArray;
 
-          WriteEndObject;
-          JObject := Token;
-          Result := JObject.ToString();
+            WriteEndObject;
+            JObject := Token;
+            Result := JObject.ToString();
 
         end;
 
         exit(Result);
     end;
 
-    procedure ValidateRfidWhseReceiptData(DocNo: Text;TagId: Text): Text
+    procedure ValidateRfidWhseReceiptData(DocNo: Text; TagId: Text): Text
     var
         CSRfidData: Record "CS Rfid Data";
         WhseReceiptLine: Record "Warehouse Receipt Line";
     begin
         if CSRfidData.Get(TagId) then begin
-          WhseReceiptLine.SetRange("No.",DocNo);
-          WhseReceiptLine.SetRange("Item No.",CSRfidData."Cross-Reference Item No.");
-          if WhseReceiptLine.FindFirst then
-            exit(CSRfidData."Combined key"+'#0')
-          else
-            exit(CSRfidData."Combined key"+'#1');
+            WhseReceiptLine.SetRange("No.", DocNo);
+            WhseReceiptLine.SetRange("Item No.", CSRfidData."Cross-Reference Item No.");
+            if WhseReceiptLine.FindFirst then
+                exit(CSRfidData."Combined key" + '#0')
+            else
+                exit(CSRfidData."Combined key" + '#1');
         end else
-          exit('UNKNOWNITEM#2');
+            exit('UNKNOWNITEM#2');
     end;
 
     procedure SaveRfidWhseReceiptData(DocNo: Text): Text
@@ -562,37 +562,39 @@ codeunit 6151372 "CS WS"
         end;
     end;
 
-    procedure CloseCounting(StockTakeId: Text;WorksheetName: Text): Text
+    procedure CloseCounting(StockTakeId: Text; WorksheetName: Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
         OK: Boolean;
         SessionID: Integer;
     begin
         if not CSStockTakes.Get(StockTakeId) then
-          exit('UNKNOWNSTOCKTAKEID');
+            exit('UNKNOWNSTOCKTAKEID');
 
         case WorksheetName of
-          'SALESFLOOR' : begin
-                          if CSStockTakes."Salesfloor Closed" = 0DT then begin
-                            CSStockTakes."Salesfloor Closed" := CurrentDateTime;
-                            CSStockTakes."Salesfloor Closed By" := UserId;
-                            CSStockTakes.Modify(true);
-                          end;
-                         end;
-          'STOCKROOM' : begin
-                          if CSStockTakes."Stockroom Closed" = 0DT then begin
-                            CSStockTakes."Stockroom Closed" := CurrentDateTime;
-                            CSStockTakes."Stockroom Closed By" := UserId;
-                            CSStockTakes.Modify(true);
-                          end;
-                        end;
+            'SALESFLOOR':
+                begin
+                    if CSStockTakes."Salesfloor Closed" = 0DT then begin
+                        CSStockTakes."Salesfloor Closed" := CurrentDateTime;
+                        CSStockTakes."Salesfloor Closed By" := UserId;
+                        CSStockTakes.Modify(true);
+                    end;
+                end;
+            'STOCKROOM':
+                begin
+                    if CSStockTakes."Stockroom Closed" = 0DT then begin
+                        CSStockTakes."Stockroom Closed" := CurrentDateTime;
+                        CSStockTakes."Stockroom Closed By" := UserId;
+                        CSStockTakes.Modify(true);
+                    end;
+                end;
         end;
 
         Commit;
 
         OK := StartSession(SessionID, CODEUNIT::"CS UI Store Counting Handling", CompanyName, CSStockTakes);
         if not OK then begin
-          //TO DO GETLASTERRORTEXT;
+            //TO DO GETLASTERRORTEXT;
         end;
 
         exit(StockTakeId);
@@ -605,18 +607,18 @@ codeunit 6151372 "CS WS"
         SessionID: Integer;
     begin
         if not CSStockTakes.Get(StockTakeId) then
-          exit('UNKNOWNSTOCKTAKEID');
+            exit('UNKNOWNSTOCKTAKEID');
 
         if CSStockTakes."Refill Closed" = 0DT then begin
-          CSStockTakes."Refill Closed" := CurrentDateTime;
-          CSStockTakes."Refill Closed By" := UserId;
-          CSStockTakes.Modify(true);
+            CSStockTakes."Refill Closed" := CurrentDateTime;
+            CSStockTakes."Refill Closed By" := UserId;
+            CSStockTakes.Modify(true);
         end;
 
         exit(StockTakeId);
     end;
 
-    procedure UpdateRefill(StockTakeId: Text;ItemNo: Text;Refilled: Text): Text
+    procedure UpdateRefill(StockTakeId: Text; ItemNo: Text; Refilled: Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
         Item: Record Item;
@@ -624,25 +626,25 @@ codeunit 6151372 "CS WS"
         RefillStatus: Boolean;
     begin
         if not CSStockTakes.Get(StockTakeId) then
-          exit('UNKNOWNSTOCKTAKEID');
+            exit('UNKNOWNSTOCKTAKEID');
 
         if not Item.Get(ItemNo) then
-          exit('UNKNOWNITEMNO');
+            exit('UNKNOWNITEMNO');
 
         if not ((Refilled = '0') or (Refilled = '1')) then
-          exit;
+            exit;
 
         RefillStatus := (Refilled = '1');
 
-        CSRefillData.SetRange("Stock-Take Id",CSStockTakes."Stock-Take Id");
-        CSRefillData.SetRange("Item No.",Item."No.");
+        CSRefillData.SetRange("Stock-Take Id", CSStockTakes."Stock-Take Id");
+        CSRefillData.SetRange("Item No.", Item."No.");
         if CSRefillData.FindSet then begin
-          repeat
-            CSRefillData.Refilled := RefillStatus;
-            CSRefillData."Refilled By" := UserId;
-            CSRefillData."Refilled Date" := CurrentDateTime;
-            CSRefillData.Modify;
-          until CSRefillData.Next = 0;
+            repeat
+                CSRefillData.Refilled := RefillStatus;
+                CSRefillData."Refilled By" := UserId;
+                CSRefillData."Refilled Date" := CurrentDateTime;
+                CSRefillData.Modify;
+            until CSRefillData.Next = 0;
         end;
 
         exit(StockTakeId);
@@ -656,28 +658,28 @@ codeunit 6151372 "CS WS"
         StockTakeWorksheet: Record "Stock-Take Worksheet";
     begin
         if not CSStockTakes.Get(StockTakeId) then
-          exit('UNKNOWNSTOCKTAKEID');
+            exit('UNKNOWNSTOCKTAKEID');
 
         if CSStockTakes.Approved = 0DT then begin
-          CSStockTakes.Approved := CurrentDateTime;
-          CSStockTakes."Approved By" := UserId;
-          CSStockTakes.Modify(true);
+            CSStockTakes.Approved := CurrentDateTime;
+            CSStockTakes."Approved By" := UserId;
+            CSStockTakes.Modify(true);
 
-          StockTakeWorksheet.Get(CSStockTakes.Location,'STOCKROOM');
-          StockTakeWorksheet.Validate(Status,StockTakeWorksheet.Status::READY_TO_TRANSFER);
-          if StockTakeWorksheet.Modify(true) then
-            StartSession(SessionID, CODEUNIT::"CS UI Store Transfer Handling", CompanyName, StockTakeWorksheet);
+            StockTakeWorksheet.Get(CSStockTakes.Location, 'STOCKROOM');
+            StockTakeWorksheet.Validate(Status, StockTakeWorksheet.Status::READY_TO_TRANSFER);
+            if StockTakeWorksheet.Modify(true) then
+                StartSession(SessionID, CODEUNIT::"CS UI Store Transfer Handling", CompanyName, StockTakeWorksheet);
 
-          StockTakeWorksheet.Get(CSStockTakes.Location,'SALESFLOOR');
-          StockTakeWorksheet.Validate(Status,StockTakeWorksheet.Status::READY_TO_TRANSFER);
-          if StockTakeWorksheet.Modify(true) then
-            StartSession(SessionID, CODEUNIT::"CS UI Store Transfer Handling", CompanyName, StockTakeWorksheet);
+            StockTakeWorksheet.Get(CSStockTakes.Location, 'SALESFLOOR');
+            StockTakeWorksheet.Validate(Status, StockTakeWorksheet.Status::READY_TO_TRANSFER);
+            if StockTakeWorksheet.Modify(true) then
+                StartSession(SessionID, CODEUNIT::"CS UI Store Transfer Handling", CompanyName, StockTakeWorksheet);
         end;
 
         exit(StockTakeId);
     end;
 
-    procedure CloseWarehouseCounting(StockTakeConfigCode: Text;WorksheetName: Text): Text
+    procedure CloseWarehouseCounting(StockTakeConfigCode: Text; WorksheetName: Text): Text
     var
         StockTakeWorksheet: Record "Stock-Take Worksheet";
         OK: Boolean;
@@ -797,7 +799,7 @@ codeunit 6151372 "CS WS"
         //+NPR5.51
     end;
 
-    procedure ResetWarehouseCounting(StockTakeConfigCode: Text;WorksheetName: Text): Text
+    procedure ResetWarehouseCounting(StockTakeConfigCode: Text; WorksheetName: Text): Text
     var
         CSSetup: Record "CS Setup";
         ItemJournalBatch: Record "Item Journal Batch";
@@ -809,10 +811,10 @@ codeunit 6151372 "CS WS"
           exit(StrSubstNo(Txt010,CompanyName));
 
         if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name",StockTakeConfigCode) then
-          exit('UNKNOWNSTOCKTAKEWORKSHEET');
+            exit('UNKNOWNSTOCKTAKEWORKSHEET');
         //+NPR5.51
 
-        CSStockTakesData.SetRange("Transferred To Worksheet",false);
+        CSStockTakesData.SetRange("Transferred To Worksheet", false);
         //-NPR5.51
         //CSStockTakesData.SETRANGE("Stock-Take Config Code",StockTakeWorksheet."Stock-Take Config Code");
         //CSStockTakesData.SETRANGE("Worksheet Name",StockTakeWorksheet.Name);
@@ -837,7 +839,7 @@ codeunit 6151372 "CS WS"
         TempBlob: Record TempBlob;
         MediaGuid: Guid;
         TenantMedia: Record "Tenant Media";
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         JTokenWriter: DotNet npNetJTokenWriter;
         Result: Text;
         Var01: Text;
@@ -853,13 +855,13 @@ codeunit 6151372 "CS WS"
         Var11: Text;
     begin
         if Barcode = '' then
-          exit('');
+            exit('');
 
         if not BarcodeLibrary.TranslateBarcodeToItemVariant(Barcode, ItemNo, VariantCode, ResolvingTable, true) then
-          exit('');
+            exit('');
 
         if not Item.Get(ItemNo) then
-          exit('');
+            exit('');
 
         Var01 := '-';
         Var02 := '-';
@@ -874,8 +876,8 @@ codeunit 6151372 "CS WS"
         Var11 := '';
 
         if VariantCode <> '' then
-          Item.SetFilter("Variant Filter",VariantCode);
-        Item.CalcFields(Inventory,"Qty. on Purch. Order");
+            Item.SetFilter("Variant Filter", VariantCode);
+        Item.CalcFields(Inventory, "Qty. on Purch. Order");
 
         Var01 := Item."No.";
         Var02 := Item.Description;
@@ -884,36 +886,36 @@ codeunit 6151372 "CS WS"
         Var05 := VariantCode;
 
         if Item."Qty. on Purch. Order" > 0 then begin
-          Clear(PurchaseLine);
-          PurchaseLine.SetRange("Document Type",PurchaseLine."Document Type"::Order);
-          PurchaseLine.SetRange(Type,PurchaseLine.Type::Item);
-          PurchaseLine.SetRange("No.",Item."No.");
-          if VariantCode <> '' then
-            PurchaseLine.SetRange("Variant Code",VariantCode);
-          if PurchaseLine.FindLast then
-            Var06 := Format(PurchaseLine."Expected Receipt Date");
+            Clear(PurchaseLine);
+            PurchaseLine.SetRange("Document Type", PurchaseLine."Document Type"::Order);
+            PurchaseLine.SetRange(Type, PurchaseLine.Type::Item);
+            PurchaseLine.SetRange("No.", Item."No.");
+            if VariantCode <> '' then
+                PurchaseLine.SetRange("Variant Code", VariantCode);
+            if PurchaseLine.FindLast then
+                Var06 := Format(PurchaseLine."Expected Receipt Date");
         end;
 
         Clear(ItemLedgerEntry);
-        ItemLedgerEntry.SetRange("Entry Type",ItemLedgerEntry."Entry Type"::Sale);
-        ItemLedgerEntry.SetRange("Item No.",Item."No.");
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
+        ItemLedgerEntry.SetRange("Item No.", Item."No.");
         if VariantCode <> '' then
-          ItemLedgerEntry.SetRange("Variant Code",VariantCode);
+            ItemLedgerEntry.SetRange("Variant Code", VariantCode);
         if ItemLedgerEntry.FindLast then
-          Var07 := Format(ItemLedgerEntry."Posting Date");
+            Var07 := Format(ItemLedgerEntry."Posting Date");
 
         Clear(Item2);
         Item2.Get(Item."No.");
         if VariantCode <> '' then
-          Item2.SetFilter("Variant Filter",VariantCode);
-        Item2.SetFilter("Date Filter",'%1..%2', 0D, Today);
+            Item2.SetFilter("Variant Filter", VariantCode);
+        Item2.SetFilter("Date Filter", '%1..%2', 0D, Today);
         Item2.CalcFields("Sales (Qty.)");
         Var08 := Format(Item2."Sales (Qty.)");
 
         Clear(Item2);
         Item2.Get(Item."No.");
         if VariantCode <> '' then
-          Item2.SetFilter("Variant Filter",VariantCode);
+            Item2.SetFilter("Variant Filter", VariantCode);
         Item2.SetRange("Date Filter", CalcDate('<-CY>', WorkDate), CalcDate('<CY>', WorkDate));
         Item2.CalcFields("Sales (Qty.)");
         Var09 := Format(Item2."Sales (Qty.)");
@@ -921,69 +923,69 @@ codeunit 6151372 "CS WS"
         Clear(Item2);
         Item2.Get(Item."No.");
         if VariantCode <> '' then
-          Item2.SetFilter("Variant Filter",VariantCode);
+            Item2.SetFilter("Variant Filter", VariantCode);
         Item2.SetRange("Date Filter", CalcDate('<CY-2Y+1D>', WorkDate), CalcDate('<CY-1Y>', WorkDate));
         Item2.CalcFields("Sales (Qty.)");
         Var10 := Format(Item2."Sales (Qty.)");
 
         if Item.Picture.Count >= 1 then begin
-          TempBlob.Init;
-          MediaGuid := Item.Picture.Item(1);
-          TenantMedia.Get(MediaGuid);
-          TenantMedia.CalcFields(Content);
-          TempBlob.Blob:=TenantMedia.Content;
-          Var11 := TempBlob.ToBase64String;
+            TempBlob.Init;
+            MediaGuid := Item.Picture.Item(1);
+            TenantMedia.Get(MediaGuid);
+            TenantMedia.CalcFields(Content);
+            TempBlob.Blob := TenantMedia.Content;
+            Var11 := TempBlob.ToBase64String;
         end;
 
         JTokenWriter := JTokenWriter.JTokenWriter;
         with JTokenWriter do begin
-          WriteStartObject;
+            WriteStartObject;
 
-          WritePropertyName('item');
-          WriteStartArray;
+            WritePropertyName('item');
+            WriteStartArray;
 
-              WriteStartObject;
-              WritePropertyName('1');
-              WriteValue(Var01);
-              WritePropertyName('2');
-              WriteValue(Var02);
+            WriteStartObject;
+            WritePropertyName('1');
+            WriteValue(Var01);
+            WritePropertyName('2');
+            WriteValue(Var02);
 
-              WritePropertyName('headerlabel');
-              WriteValue(headerlabel);
-              WritePropertyName('3');
-              WriteValue(Var03);
-              WritePropertyName('linelabel1');
-              WriteValue(Date2DMY(CalcDate('<CY>', WorkDate),3));
-              WritePropertyName('8');
-              WriteValue(Var08);
-              WritePropertyName('linelabel2');
-              WriteValue(Date2DMY(CalcDate('<CY-1Y>', WorkDate),3));
-              WritePropertyName('9');
-              WriteValue(Var09);
-              WritePropertyName('linelabel3');
-              WriteValue(Date2DMY(CalcDate('<CY-2Y>', WorkDate),3));
-              WritePropertyName('10');
-              WriteValue(Var10);
-              WritePropertyName('footerlabel');
-              WriteValue(footerlabel);
-              WritePropertyName('6');
-              WriteValue(Var06);
+            WritePropertyName('headerlabel');
+            WriteValue(headerlabel);
+            WritePropertyName('3');
+            WriteValue(Var03);
+            WritePropertyName('linelabel1');
+            WriteValue(Date2DMY(CalcDate('<CY>', WorkDate), 3));
+            WritePropertyName('8');
+            WriteValue(Var08);
+            WritePropertyName('linelabel2');
+            WriteValue(Date2DMY(CalcDate('<CY-1Y>', WorkDate), 3));
+            WritePropertyName('9');
+            WriteValue(Var09);
+            WritePropertyName('linelabel3');
+            WriteValue(Date2DMY(CalcDate('<CY-2Y>', WorkDate), 3));
+            WritePropertyName('10');
+            WriteValue(Var10);
+            WritePropertyName('footerlabel');
+            WriteValue(footerlabel);
+            WritePropertyName('6');
+            WriteValue(Var06);
 
-              WritePropertyName('4');
-              WriteValue(Var04);
-              WritePropertyName('5');
-              WriteValue(Var05);
-              WritePropertyName('7');
-              WriteValue(Var07);
-              WritePropertyName('11');
-              WriteValue(Var11);
-              WriteEndObject;
+            WritePropertyName('4');
+            WriteValue(Var04);
+            WritePropertyName('5');
+            WriteValue(Var05);
+            WritePropertyName('7');
+            WriteValue(Var07);
+            WritePropertyName('11');
+            WriteValue(Var11);
+            WriteEndObject;
 
-          WriteEndArray;
+            WriteEndArray;
 
-          WriteEndObject;
-          JObject := Token;
-          Result := JObject.ToString();
+            WriteEndObject;
+            JObject := Token;
+            Result := JObject.ToString();
 
         end;
 
