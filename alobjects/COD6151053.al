@@ -1,7 +1,7 @@
 codeunit 6151053 "POS Payment View Event Mgt."
 {
     // NPR5.51/MHA /20190723  CASE 351688 Object created - Dimension Statistics during POS OnPayment View
-    // NPR5.51/MHA /20190823  CASE 359601 Added Skip Popup on Dimension Value
+    // NPR5.51/MHA /20190925  CASE 359601 Added Skip Popup on Dimension Value
 
 
     trigger OnRun()
@@ -47,6 +47,10 @@ codeunit 6151053 "POS Payment View Event Mgt."
         POSSession.GetFrontEnd(POSFrontEndMgt,false);
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
+        //-NPR5.51 [359601]
+        if SkipPopup(SalePOS,POSPaymentViewEventSetup) then
+          exit;
+        //+NPR5.51 [359601]
 
         POSPaymentViewLogEntry.SetCurrentKey("POS Unit","Sales Ticket No.");
         POSPaymentViewLogEntry.SetRange("POS Unit",SalePOS."Register No.");
@@ -79,6 +83,9 @@ codeunit 6151053 "POS Payment View Event Mgt."
           Clear(POSPaymentViewLogEntry);
           POSPaymentViewLogEntry.Init;
           POSPaymentViewLogEntry."Entry No." := 0;
+          //-NPR5.51 [359601]
+          POSPaymentViewLogEntry."POS Store" := SalePOS."POS Store Code";
+          //+NPR5.51 [359601]
           POSPaymentViewLogEntry."POS Unit" := SalePOS."Register No.";
           POSPaymentViewLogEntry."Sales Ticket No." := SalePOS."Sales Ticket No.";
           POSPaymentViewLogEntry."POS Sales No." := POSSalesNo;
@@ -90,10 +97,6 @@ codeunit 6151053 "POS Payment View Event Mgt."
 
         if not POSPaymentViewLogEntry."Post Code Popup" then
           exit;
-        //-NPR5.51 [359601]
-        if SkipPopup(SalePOS,POSPaymentViewEventSetup) then
-          exit;
-        //+NPR5.51 [359601]
 
         POSAction.Get('SALE_DIMENSION');
         case POSPaymentViewEventSetup."Popup Mode" of
@@ -136,8 +139,12 @@ codeunit 6151053 "POS Payment View Event Mgt."
         if POSPaymentViewEventSetup."Dimension Code" = '' then
           exit(true);
 
-        if HasDimValue(SalePOS,POSPaymentViewEventSetup."Dimension Code") then
-          exit(true);
+        //-#359601 [359601]
+        if POSPaymentViewEventSetup."Skip Popup on Dimension Value" then begin
+          if HasDimValue(SalePOS,POSPaymentViewEventSetup."Dimension Code") then
+            exit(true);
+        end;
+        //+#359601 [359601]
 
         exit(false);
         //+NPR5.51 [359601]
@@ -164,7 +171,6 @@ codeunit 6151053 "POS Payment View Event Mgt."
         //-NPR5.51 [359601]
         if SalePOS."Dimension Set ID" = 0 then
           exit(false);
-
         DimensionSetEntry.SetRange("Dimension Set ID",SalePOS."Dimension Set ID");
         DimensionSetEntry.SetRange("Dimension Code",DimensionCode);
         if not DimensionSetEntry.FindFirst then
