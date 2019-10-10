@@ -15,42 +15,41 @@ codeunit 6150874 "POS Action - EFT Gift Card"
 
     local procedure ActionCode(): Text
     begin
-        exit ('EFT_GIFT_CARD');
+        exit('EFT_GIFT_CARD');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.1');
+        exit('1.1');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do begin
-          if DiscoverAction(
-            ActionCode(),
-            ActionDescription,
-            ActionVersion(),
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple) then
-          begin
-            RegisterWorkflowStep('AmountPrompt','numpad({caption: labels.EftGiftcardCaption}).respond();');
-            RegisterWorkflowStep('RefreshUI', 'respond()');
-            RegisterWorkflow(false);
+            if DiscoverAction(
+              ActionCode(),
+              ActionDescription,
+              ActionVersion(),
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple) then begin
+                RegisterWorkflowStep('AmountPrompt', 'numpad({caption: labels.EftGiftcardCaption}).respond();');
+                RegisterWorkflowStep('RefreshUI', 'respond()');
+                RegisterWorkflow(false);
 
-            RegisterTextParameter('PaymentType', '');
-          end;
+                RegisterTextParameter('PaymentType', '');
+            end;
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
     local procedure OnInitializeCaptions(Captions: Codeunit "POS Caption Management")
     begin
-        Captions.AddActionCaption (ActionCode, 'EftGiftcardCaption', GIFTCARD_CAPTION);
+        Captions.AddActionCaption(ActionCode, 'EftGiftcardCaption', GIFTCARD_CAPTION);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         PaymentType: Text;
@@ -62,11 +61,11 @@ codeunit 6150874 "POS Action - EFT Gift Card"
         SalePOS: Record "Sale POS";
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
         Handled := true;
 
         if WorkflowStep = 'RefreshUI' then
-          exit;
+            exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         PaymentType := JSON.GetStringParameter('PaymentType', true);
@@ -81,53 +80,55 @@ codeunit 6150874 "POS Action - EFT Gift Card"
         EFTGiftCardMgt.StartGiftCardLoadTransaction(EFTSetup, PaymentTypePOS, Amount, '', SalePOS);
     end;
 
-    local procedure GetNumpadValue(JSON: Codeunit "POS JSON Management";Path: Text): Decimal
+    local procedure GetNumpadValue(JSON: Codeunit "POS JSON Management"; Path: Text): Decimal
     begin
-        JSON.SetScope ('/', true);
-        if (not JSON.SetScope ('$'+Path, false)) then
-          exit (0);
+        JSON.SetScope('/', true);
+        if (not JSON.SetScope('$' + Path, false)) then
+            exit(0);
 
-        exit (JSON.GetDecimal ('numpad', true));
+        exit(JSON.GetDecimal('numpad', true));
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
-    procedure OnGetParameterNameCaption(POSParameterValue: Record "POS Parameter Value";var Caption: Text)
+    procedure OnGetParameterNameCaption(POSParameterValue: Record "POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode then
-          exit;
+            exit;
 
         case POSParameterValue.Name of
-          'PaymentType' : Caption := CaptionPaymentType;
+            'PaymentType':
+                Caption := CaptionPaymentType;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterDescriptionCaption', '', false, false)]
-    procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "POS Parameter Value";var Caption: Text)
+    procedure OnGetParameterDescriptionCaption(POSParameterValue: Record "POS Parameter Value"; var Caption: Text)
     begin
         if POSParameterValue."Action Code" <> ActionCode then
-          exit;
+            exit;
 
         case POSParameterValue.Name of
-          'PaymentType' : Caption := DescPaymentType;
+            'PaymentType':
+                Caption := DescPaymentType;
         end;
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', false, false)]
-    local procedure OnLookupParameter(var POSParameterValue: Record "POS Parameter Value";Handled: Boolean)
+    local procedure OnLookupParameter(var POSParameterValue: Record "POS Parameter Value"; Handled: Boolean)
     var
         PaymentTypePOS: Record "Payment Type POS";
     begin
         if POSParameterValue."Action Code" <> ActionCode then
-          exit;
+            exit;
 
         case POSParameterValue.Name of
-          'PaymentType' :
-            begin
-              PaymentTypePOS.SetRange("Processing Type", PaymentTypePOS."Processing Type"::"Gift Voucher");
-              PaymentTypePOS.SetRange("Via Terminal", true);
-              if PAGE.RunModal(0, PaymentTypePOS) = ACTION::LookupOK then
-                POSParameterValue.Validate(Value, PaymentTypePOS."No.");
-            end;
+            'PaymentType':
+                begin
+                    PaymentTypePOS.SetRange("Processing Type", PaymentTypePOS."Processing Type"::"Gift Voucher");
+                    PaymentTypePOS.SetRange("Via Terminal", true);
+                    if PAGE.RunModal(0, PaymentTypePOS) = ACTION::LookupOK then
+                        POSParameterValue.Validate(Value, PaymentTypePOS."No.");
+                end;
         end;
     end;
 
@@ -137,17 +138,17 @@ codeunit 6150874 "POS Action - EFT Gift Card"
         PaymentTypePOS: Record "Payment Type POS";
     begin
         if POSParameterValue."Action Code" <> ActionCode then
-          exit;
+            exit;
 
         case POSParameterValue.Name of
-          'PaymentType' :
-            begin
-              if POSParameterValue.Value <> '' then begin
-                PaymentTypePOS.Get(POSParameterValue.Value, '');
-                PaymentTypePOS.TestField("Via Terminal", true);
-                PaymentTypePOS.TestField("Processing Type", PaymentTypePOS."Processing Type"::"Gift Voucher");
-              end;
-            end;
+            'PaymentType':
+                begin
+                    if POSParameterValue.Value <> '' then begin
+                        PaymentTypePOS.Get(POSParameterValue.Value, '');
+                        PaymentTypePOS.TestField("Via Terminal", true);
+                        PaymentTypePOS.TestField("Processing Type", PaymentTypePOS."Processing Type"::"Gift Voucher");
+                    end;
+                end;
         end;
     end;
 }
