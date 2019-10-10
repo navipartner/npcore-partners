@@ -15,35 +15,35 @@ codeunit 6151177 "POS Action - Print Posted Exch"
 
     local procedure ActionCode(): Text
     begin
-        exit ('PRINT_TMPL_POSTED');
+        exit('PRINT_TMPL_POSTED');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescriptionCaption,
-            ActionVersion,
-            Type::Generic,
-            "Subscriber Instances Allowed"::Multiple)
-          then begin
-            RegisterWorkflowStep('','respond();');
-            RegisterWorkflow(false);
-            RegisterTextParameter('Template','');
-            RegisterBooleanParameter('LastSale',false);
-            RegisterBooleanParameter('SingleLine',false);
-          end;
+            if DiscoverAction(
+              ActionCode,
+              ActionDescriptionCaption,
+              ActionVersion,
+              Type::Generic,
+              "Subscriber Instances Allowed"::Multiple)
+            then begin
+                RegisterWorkflowStep('', 'respond();');
+                RegisterWorkflow(false);
+                RegisterTextParameter('Template', '');
+                RegisterBooleanParameter('LastSale', false);
+                RegisterBooleanParameter('SingleLine', false);
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         POSEntry: Record "POS Entry";
         POSSalesLine: Record "POS Sales Line";
@@ -55,32 +55,32 @@ codeunit 6151177 "POS Action - Print Posted Exch"
         SingleLine: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        JSON.SetScope('parameters',true);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        JSON.SetScope('parameters', true);
 
-        LastSale := JSON.GetBooleanParameter('LastSale',true);
-        SingleLine := JSON.GetBooleanParameter('SingleLine',true);
+        LastSale := JSON.GetBooleanParameter('LastSale', true);
+        SingleLine := JSON.GetBooleanParameter('SingleLine', true);
 
         POSSession.GetSetup(POSSetup);
 
         POSEntry.FilterGroup(2);
-        POSEntry.SetRange("POS Unit No.",POSSetup.Register);
-        POSEntry.SetRange("Entry Type",POSEntry."Entry Type"::"Direct Sale");
+        POSEntry.SetRange("POS Unit No.", POSSetup.Register);
+        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Direct Sale");
         POSEntry.FilterGroup(0);
 
         if LastSale then begin
-          POSEntry.FindLast;
-          POSSalesLine.SetRange("POS Entry No.",POSEntry."Entry No.");
+            POSEntry.FindLast;
+            POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         end else
-          RunModalPage(POSEntry,POSSalesLine,SingleLine);
+            RunModalPage(POSEntry, POSSalesLine, SingleLine);
 
         if POSSalesLine.Count = 0 then
-          Error(NoSaleLinesErr);
+            Error(NoSaleLinesErr);
 
         RecordVar := POSSalesLine;
-        TemplateMgt.PrintTemplate(JSON.GetStringParameter('Template',true),RecordVar,0);
+        TemplateMgt.PrintTemplate(JSON.GetStringParameter('Template', true), RecordVar, 0);
 
         Handled := true;
     end;
@@ -89,7 +89,7 @@ codeunit 6151177 "POS Action - Print Posted Exch"
     begin
     end;
 
-    local procedure RunModalPage(var POSEntry: Record "POS Entry";var POSSalesLine: Record "POS Sales Line";SingleLine: Boolean)
+    local procedure RunModalPage(var POSEntry: Record "POS Entry"; var POSSalesLine: Record "POS Sales Line"; SingleLine: Boolean)
     var
         POSEntries: Page "POS Entries";
         POSSalesLineList: Page "POS Sales Line List";
@@ -98,19 +98,19 @@ codeunit 6151177 "POS Action - Print Posted Exch"
         POSEntries.Caption(ChooseDocumentCaption);
         POSEntries.SetTableView(POSEntry);
         if not (POSEntries.RunModal = ACTION::LookupOK) then
-          Error('');
+            Error('');
 
         POSEntries.GetRecord(POSEntry);
-        POSSalesLine.SetRange("POS Entry No.",POSEntry."Entry No.");
+        POSSalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
 
         if not SingleLine then
-          exit;
+            exit;
 
         POSSalesLineList.LookupMode(true);
         POSSalesLineList.Caption(ChooseDetailsCaption);
         POSSalesLineList.SetTableView(POSSalesLine);
         if not (POSSalesLineList.RunModal = ACTION::LookupOK) then
-          Error('');
+            Error('');
 
         POSSalesLineList.GetRecord(POSSalesLine);
         POSSalesLine.SetRecFilter;

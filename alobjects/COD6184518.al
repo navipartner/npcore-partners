@@ -1306,8 +1306,8 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     [TryFunction]
     local procedure ParseRejectNotification(Response: Text;var EFTTransactionRequest: Record "EFT Transaction Request")
     var
-        JObject: DotNet npNetJObject;
-        JToken: DotNet npNetJObject;
+        JObject: DotNet JObject;
+        JToken: DotNet JObject;
     begin
         //-NPR5.51 [355433]
         ParseJSON(Response, JObject);
@@ -1328,7 +1328,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         //+NPR5.51 [355433]
     end;
 
-    local procedure TrySelectToken(JObject: DotNet npNetJObject;Path: Text;var JToken: DotNet npNetJToken;WithError: Boolean): Boolean
+    local procedure TrySelectToken(JObject: DotNet JObject;Path: Text;var JToken: DotNet JToken;WithError: Boolean): Boolean
     begin
         //-NPR5.49 [345188]
         //JToken := JObject.SelectToken(Path);

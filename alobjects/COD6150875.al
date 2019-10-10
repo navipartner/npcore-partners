@@ -15,33 +15,33 @@ codeunit 6150875 "POS Action - Raptor"
 
     local procedure ActionCode(): Text
     begin
-        exit ('RAPTOR');
+        exit('RAPTOR');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Type::Generic,
-            "Subscriber Instances Allowed"::Multiple)
-          then begin
-            RegisterWorkflowStep('1','respond();');
-            RegisterWorkflow(false);
-            RegisterOptionParameter ('RaptorAction', 'GetUserIdOrderHistory', 'GetUserIdOrderHistory');
-          end;
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Type::Generic,
+              "Subscriber Instances Allowed"::Multiple)
+            then begin
+                RegisterWorkflowStep('1', 'respond();');
+                RegisterWorkflow(false);
+                RegisterOptionParameter('RaptorAction', 'GetUserIdOrderHistory', 'GetUserIdOrderHistory');
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         RaptorActionSetting: Option GetUserIdOrderHistory;
@@ -51,43 +51,43 @@ codeunit 6150875 "POS Action - Raptor"
         RaptorAPI: Codeunit "Raptor API";
         Result: Text;
         RaptorHelperFunctions: Codeunit "Raptor Helper Functions";
-        JArray: DotNet npNetJArray;
-        JObject: DotNet npNetJObject;
+        JArray: DotNet JArray;
+        JObject: DotNet JObject;
         ErrorMsg: Text;
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
 
         InitState();
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        JSON.SetScope('parameters',true);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        JSON.SetScope('parameters', true);
 
-        RaptorActionSetting := JSON.GetInteger ('RaptorAction', true);
+        RaptorActionSetting := JSON.GetInteger('RaptorAction', true);
 
         case RaptorActionSetting of
-          RaptorActionSetting::GetUserIdOrderHistory :
-            begin
-                if SalePOS."Customer No." <> '' then begin
+            RaptorActionSetting::GetUserIdOrderHistory:
+                begin
+                    if SalePOS."Customer No." <> '' then begin
 
-                  //Test customer value 27154950
-                  Result := RaptorAPI.GetUserIdOrderHistory(SalePOS."Customer No.",ErrorMsg);
+                        //Test customer value 27154950
+                        Result := RaptorAPI.GetUserIdOrderHistory(SalePOS."Customer No.", ErrorMsg);
 
-                  if ErrorMsg = '' then begin
+                        if ErrorMsg = '' then begin
 
-                    //>> Sample for reading result from Raptor
-                    RaptorHelperFunctions.TryParse(Result,JArray);
+                            //>> Sample for reading result from Raptor
+                            RaptorHelperFunctions.TryParse(Result, JArray);
 
-                    foreach JObject in JArray do begin
-                      Message(RaptorHelperFunctions.GetValueAsText(JObject,'ProductId') + ' , ' + Format(RaptorHelperFunctions.GetValueAsDate(JObject,'Orderdate')));
+                            foreach JObject in JArray do begin
+                                Message(RaptorHelperFunctions.GetValueAsText(JObject, 'ProductId') + ' , ' + Format(RaptorHelperFunctions.GetValueAsDate(JObject, 'Orderdate')));
+                            end;
+                            //<< Sample for reading result from Raptor
+                        end;
                     end;
-                    //<< Sample for reading result from Raptor
-                  end;
                 end;
-            end;
         end;
 
         Handled := true;
@@ -98,14 +98,6 @@ codeunit 6150875 "POS Action - Raptor"
         Clear(Model);
         Clear(ActiveModelID);
         Clear(TransactionDone);
-    end;
-
-    trigger Model::OnModelControlEvent(control: DotNet npNetControl;eventName: Text;data: DotNet npNetDictionary_Of_T_U)
-    begin
-    end;
-
-    trigger Model::OnTimer()
-    begin
     end;
 }
 
