@@ -1,4 +1,4 @@
-tableextension 50010 tableextension50010 extends "Purch. Rcpt. Header" 
+tableextension 6014409 tableextension6014409 extends "Purch. Rcpt. Header" 
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Field 6014414 "Pay-to E-mail" for defining Recipient when sending E-mail using PDF2NAV.

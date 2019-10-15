@@ -1,4 +1,4 @@
-tableextension 50023 tableextension50023 extends Job 
+tableextension 6014422 tableextension6014422 extends Job 
 {
     // NPR5.29/TJ/20161206 CASE 248723 Added new fields 6060150..6060161
     // NPR5.31/TJ/20170315 CASE 269162 Added new option "Ready to be Invoiced" to field "Event Status"
