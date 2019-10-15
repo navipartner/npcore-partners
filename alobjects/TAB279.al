@@ -1,4 +1,4 @@
-tableextension 50029 tableextension50029 extends "Extended Text Header" 
+tableextension 6014428 tableextension6014428 extends "Extended Text Header" 
 {
     // NPR5.49/TJ  /20190218 CASE 345047 New field Event
     fields

@@ -1,4 +1,4 @@
-pageextension 50027 pageextension50027 extends "Item Card" 
+pageextension 6014426 pageextension6014426 extends "Item Card" 
 {
     // VRT1.00/JDH /20150304 CASE 201022 Variety Page Added + Fields + shortcut to Matrix under button Item
     // NPR4.10/TSA /20150422 CASE 209946 - Shortcut Attributes

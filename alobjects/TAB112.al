@@ -1,4 +1,4 @@
-tableextension 50006 tableextension50006 extends "Sales Invoice Header" 
+tableextension 6014405 tableextension6014405 extends "Sales Invoice Header" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields 6014400..6060004

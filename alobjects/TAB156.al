@@ -1,4 +1,4 @@
-tableextension 50022 tableextension50022 extends Resource 
+tableextension 6014421 tableextension6014421 extends Resource 
 {
     // NPR5.29/TJ/20161013 CASE 248723 New field 6060150 E-Mail
     // NPR5.32/TJ/20170519 CASE 275966 New field 6060151 Over Capacitate Resource

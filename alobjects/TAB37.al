@@ -1,4 +1,4 @@
-tableextension 50034 tableextension50034 extends "Sales Line" 
+tableextension 6014433 tableextension6014433 extends "Sales Line" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     // NPR70.00.01.00/MH/20150216  CASE 204110 Removed NaviShop References (WS).

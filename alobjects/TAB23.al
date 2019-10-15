@@ -1,4 +1,4 @@
-tableextension 50025 tableextension50025 extends Vendor 
+tableextension 6014424 tableextension6014424 extends Vendor 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields 6014400..6060050

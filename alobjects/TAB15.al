@@ -1,4 +1,4 @@
-tableextension 50020 tableextension50020 extends "G/L Account" 
+tableextension 6014419 tableextension6014419 extends "G/L Account" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                Fields Added  : 6014400..6014404
