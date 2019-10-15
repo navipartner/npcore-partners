@@ -10,7 +10,7 @@ page 6014627 "Hardware Connector"
     {
         area(content)
         {
-            usercontrol(Bridge;"NaviPartner.Retail.Controls.Bridge")
+            usercontrol(Bridge; Bridge)
             {
 
                 trigger OnFrameworkReady()
@@ -20,10 +20,10 @@ page 6014627 "Hardware Connector"
                     JavaScriptBridgeManagement.RegisterAdHocModule('HardwareConnector', html, css, js);
                 end;
 
-                trigger OnInvokeMethod(method: Text;eventContent: Variant)
+                trigger OnInvokeMethod(method: Text; eventContent: JsonObject)
                 begin
                     if not (method in ['error', 'result']) then
-                      exit;
+                        exit;
 
                     methodGlobal := method;
                     contentGlobal := eventContent;
@@ -44,17 +44,17 @@ page 6014627 "Hardware Connector"
         css: Text;
         js: Text;
         methodGlobal: Text;
-        contentGlobal: DotNet npNetJObject;
+        contentGlobal: JsonObject;
         AutoClosed: Boolean;
 
-    procedure SetModule(htmlIn: Text;cssIn: Text;jsIn: Text)
+    procedure SetModule(htmlIn: Text; cssIn: Text; jsIn: Text)
     begin
         html := htmlIn;
         css := cssIn;
         js := jsIn;
     end;
 
-    procedure GetResponse(var methodOut: Text;var contentOut: DotNet npNetJObject)
+    procedure GetResponse(var methodOut: Text; var contentOut: JsonObject)
     begin
         methodOut := methodGlobal;
         contentOut := contentGlobal;
@@ -63,26 +63,6 @@ page 6014627 "Hardware Connector"
     procedure DidAutoClose(): Boolean
     begin
         exit(AutoClosed);
-    end;
-
-    trigger contentGlobal::PropertyChanged(sender: Variant;e: DotNet npNetPropertyChangedEventArgs)
-    begin
-    end;
-
-    trigger contentGlobal::PropertyChanging(sender: Variant;e: DotNet npNetPropertyChangingEventArgs)
-    begin
-    end;
-
-    trigger contentGlobal::ListChanged(sender: Variant;e: DotNet npNetListChangedEventArgs)
-    begin
-    end;
-
-    trigger contentGlobal::AddingNew(sender: Variant;e: DotNet npNetAddingNewEventArgs)
-    begin
-    end;
-
-    trigger contentGlobal::CollectionChanged(sender: Variant;e: DotNet npNetNotifyCollectionChangedEventArgs)
-    begin
     end;
 }
 

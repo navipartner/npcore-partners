@@ -90,9 +90,6 @@ End Function
         <Field Name="LastDateModified_Job">
           <DataField>LastDateModified_Job</DataField>
         </Field>
-        <Field Name="Picture_Job">
-          <DataField>Picture_Job</DataField>
-        </Field>
         <Field Name="BilltoName_Job">
           <DataField>BilltoName_Job</DataField>
         </Field>

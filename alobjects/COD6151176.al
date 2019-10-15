@@ -13,41 +13,41 @@ codeunit 6151176 "POS Action - Merge Smlr. Lines"
 
     local procedure ActionCode(): Text
     begin
-        exit ('MERGE_SIMILAR_LINES');
+        exit('MERGE_SIMILAR_LINES');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescriptionCaption,
-            ActionVersion,
-            Sender.Type::Generic,
-            Sender."Subscriber Instances Allowed"::Multiple)
-          then begin
-            RegisterWorkflowStep('','respond();');
-            RegisterWorkflow(false);
-          end;
+            if DiscoverAction(
+              ActionCode,
+              ActionDescriptionCaption,
+              ActionVersion,
+              Sender.Type::Generic,
+              Sender."Subscriber Instances Allowed"::Multiple)
+            then begin
+                RegisterWorkflowStep('', 'respond();');
+                RegisterWorkflow(false);
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         SalePOS: Record "Sale POS";
         JSON: Codeunit "POS JSON Management";
         POSSale: Codeunit "POS Sale";
     begin
         if not Action.IsThisAction(ActionCode) then
-          exit;
+            exit;
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -71,46 +71,46 @@ codeunit 6151176 "POS Action - Merge Smlr. Lines"
         TempSaleLinePOS: Record "Sale Line POS" temporary;
     begin
         with SaleLinePOS do begin
-          SetCurrentKey("No.");
-          SetRange("Register No.",SalePOS."Register No.");
-          SetRange("Sales Ticket No.",SalePOS."Sales Ticket No.");
-          SetRange(Date,SalePOS.Date);
-          SetRange("Sale Type",SalePOS."Sale type");
-          SetRange(Type,Type::Item);
-          SetFilter("Discount Type",'<>%1',"Discount Type"::Manual);
-          if not FindSet then
-            Error(NoLinesErr);
+            SetCurrentKey("No.");
+            SetRange("Register No.", SalePOS."Register No.");
+            SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+            SetRange(Date, SalePOS.Date);
+            SetRange("Sale Type", SalePOS."Sale type");
+            SetRange(Type, Type::Item);
+            SetFilter("Discount Type", '<>%1', "Discount Type"::Manual);
+            if not FindSet then
+                Error(NoLinesErr);
 
-          repeat
-            SetRange("No.","No.");
+            repeat
+                SetRange("No.", "No.");
 
-            if Count > 1 then begin
-              TempSaleLinePOS := SaleLinePOS;
-              TempSaleLinePOS.Insert;
+                if Count > 1 then begin
+                    TempSaleLinePOS := SaleLinePOS;
+                    TempSaleLinePOS.Insert;
 
-              Delete(true);
+                    Delete(true);
 
-              while Next > 0 do begin
-                TempSaleLinePOS.Quantity += Quantity;
-                Delete(true);
-              end;
+                    while Next > 0 do begin
+                        TempSaleLinePOS.Quantity += Quantity;
+                        Delete(true);
+                    end;
 
-              TempSaleLinePOS.Modify;
-            end;
+                    TempSaleLinePOS.Modify;
+                end;
 
-            SetRange("No.");
-          until Next = 0;
+                SetRange("No.");
+            until Next = 0;
 
-          if not TempSaleLinePOS.FindSet then
-            exit;
+            if not TempSaleLinePOS.FindSet then
+                exit;
 
-          repeat
-            SaleLinePOS := TempSaleLinePOS;
-            Insert;
+            repeat
+                SaleLinePOS := TempSaleLinePOS;
+                Insert;
 
-            UpdateAmounts(SaleLinePOS);
-            Modify;
-          until TempSaleLinePOS.Next = 0;
+                UpdateAmounts(SaleLinePOS);
+                Modify;
+            until TempSaleLinePOS.Next = 0;
         end;
     end;
 }

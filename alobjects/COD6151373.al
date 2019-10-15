@@ -280,47 +280,47 @@ codeunit 6151373 "CS Helper Functions"
             CSRfidItems.Close;
             WriteEndArray;
 
-        //-NPR5.51
-        // WritePropertyName('itemtag');
-        // WriteStartArray;
-        // IF CSDevices."Last Download Timestamp" <> 0 THEN
-        //  CSRfidItemTags.SETFILTER(Time_Stamp,STRSUBSTNO('>%1',CSDevices."Last Download Timestamp"));
-        // CSRfidItemTags.OPEN;
-        // WHILE CSRfidItemTags.READ DO BEGIN
-        //  WriteStartObject;
-        //  WritePropertyName('key');
-        //  WriteValue(CSRfidItemTags.Key);
-        //  WritePropertyName('item');
-        //  WriteValue(CSRfidItemTags.Combined_key);
-        //  WritePropertyName('itemgroup');
-        //  WriteValue(CSRfidItemTags.Item_Group_Code);
-        //  WriteEndObject;
-        // END;
-        // CSRfidItemTags.CLOSE;
-        // WriteEndArray;
-        //+NPR5.51
+            //-NPR5.51
+            // WritePropertyName('itemtag');
+            // WriteStartArray;
+            // IF CSDevices."Last Download Timestamp" <> 0 THEN
+            //  CSRfidItemTags.SETFILTER(Time_Stamp,STRSUBSTNO('>%1',CSDevices."Last Download Timestamp"));
+            // CSRfidItemTags.OPEN;
+            // WHILE CSRfidItemTags.READ DO BEGIN
+            //  WriteStartObject;
+            //  WritePropertyName('key');
+            //  WriteValue(CSRfidItemTags.Key);
+            //  WritePropertyName('item');
+            //  WriteValue(CSRfidItemTags.Combined_key);
+            //  WritePropertyName('itemgroup');
+            //  WriteValue(CSRfidItemTags.Item_Group_Code);
+            //  WriteEndObject;
+            // END;
+            // CSRfidItemTags.CLOSE;
+            // WriteEndArray;
+            //+NPR5.51
 
-        //-NPR5.50 [335051]
-        WritePropertyName('supportedTagModels');
-        WriteStartArray;
-          CSRfidTagModelsQuery.Open;
-          while CSRfidTagModelsQuery.Read do begin
-            WriteStartObject;
-            WritePropertyName('key');
-            WriteValue(CSRfidTagModelsQuery.Family+CSRfidTagModelsQuery.Model);
-            WritePropertyName('family');
-            WriteValue(CSRfidTagModelsQuery.Family);
-            WritePropertyName('model');
-            WriteValue(CSRfidTagModelsQuery.Model);
-            WriteEndObject;
-          end;
-          CSRfidTagModelsQuery.Close;
-        WriteEndArray;
-        //+NPR5.50 [335051]
+            //-NPR5.50 [335051]
+            WritePropertyName('supportedTagModels');
+            WriteStartArray;
+            CSRfidTagModelsQuery.Open;
+            while CSRfidTagModelsQuery.Read do begin
+                WriteStartObject;
+                WritePropertyName('key');
+                WriteValue(CSRfidTagModelsQuery.Family + CSRfidTagModelsQuery.Model);
+                WritePropertyName('family');
+                WriteValue(CSRfidTagModelsQuery.Family);
+                WritePropertyName('model');
+                WriteValue(CSRfidTagModelsQuery.Model);
+                WriteEndObject;
+            end;
+            CSRfidTagModelsQuery.Close;
+            WriteEndArray;
+            //+NPR5.50 [335051]
 
-        //-NPR5.50 [335051]
-        WritePropertyName('deviceinfo');
-        WriteStartArray;
+            //-NPR5.50 [335051]
+            WritePropertyName('deviceinfo');
+            WriteStartArray;
             WriteStartObject;
             WritePropertyName('lasttimestamp');
             WriteValue(CurrentTimestamp);
@@ -328,9 +328,9 @@ codeunit 6151373 "CS Helper Functions"
             WriteValue(CSSetup."Media Library");
             WritePropertyName('refreshItemCatelog');
             if CSDevices."Refresh Item Catalog" then
-              WriteValue('TRUE')
+                WriteValue('TRUE')
             else
-              WriteValue('FALSE');
+                WriteValue('FALSE');
             //-NPR5.50 [35374]
             //-NPR5.51
             WritePropertyName('currenttagcount');
@@ -338,11 +338,11 @@ codeunit 6151373 "CS Helper Functions"
             WriteValue(CSDevices."Current Tag Count");
             //+NPR5.50 [35374]
             WriteEndObject;
-        WriteEndArray;
-        //+NPR5.50 [335051]
+            WriteEndArray;
+            //+NPR5.50 [335051]
 
-        WriteEndObject;
-        JObject := Token;
+            WriteEndObject;
+            JObject := Token;
         end;
 
         CSDevices."Current Download Timestamp" := CurrentTimestamp;
@@ -353,7 +353,7 @@ codeunit 6151373 "CS Helper Functions"
 
     procedure CreateOfflineRfidDataDeltaV2(DeviceId: Code[20]) Result: Text
     var
-        JObject: DotNet npNetJObject;
+        JObject: DotNet JObject;
         JTokenWriter: DotNet npNetJTokenWriter;
         CSRfidItemGroups: Query "CS Rfid Item Groups";
         CSRfidItems: Query "CS Rfid Items";
@@ -368,170 +368,170 @@ codeunit 6151373 "CS Helper Functions"
         CSSetup.Get;
 
         if not CSSetup."Enable Capture Service" then
-          exit;
+            exit;
 
         if not CSDevices.Get(DeviceId) then begin
-          CSDevices.Init;
-          CSDevices."Device Id" := DeviceId;
-          CSDevices.Insert(true);
+            CSDevices.Init;
+            CSDevices."Device Id" := DeviceId;
+            CSDevices.Insert(true);
         end;
 
         CurrentTimestamp := CSDevices."Last Download Timestamp";
 
         CSRfidData.SetCurrentKey("Time Stamp");
         if CSDevices."Last Download Timestamp" <> 0 then
-          CSRfidData.SetFilter("Time Stamp",StrSubstNo('>%1',CSDevices."Last Download Timestamp"));
-        CSRfidData.SetRange("Cross-Reference Discontinue",false);
+            CSRfidData.SetFilter("Time Stamp", StrSubstNo('>%1', CSDevices."Last Download Timestamp"));
+        CSRfidData.SetRange("Cross-Reference Discontinue", false);
 
         JTokenWriter := JTokenWriter.JTokenWriter;
         with JTokenWriter do begin
-          WriteStartObject;
-
-          WritePropertyName('itemtag');
-          WriteStartArray;
-          if CSRfidData.FindSet then begin
-            CSDevices."Current Tag Count" := CSRfidData.Count;
-            repeat
-              WriteStartObject;
-              WritePropertyName('key');
-              WriteValue(CSRfidData.Key);
-              WritePropertyName('item');
-              WriteValue(CSRfidData."Combined key");
-              WritePropertyName('itemgroup');
-              WriteValue(CSRfidData."Item Group Code");
-              WriteEndObject;
-
-              CurrentTimestamp := CSRfidData."Time Stamp";
-
-            until CSRfidData.Next = 0;
-          end;
-          WriteEndArray;
-
-          WritePropertyName('itemgroup');
-          WriteStartArray;
-
-          WriteStartObject;
-          WritePropertyName('key');
-          WriteValue('UNKNOWNTAGS');
-          WritePropertyName('title');
-          WriteValue('UNKNOWN TAGS');
-          WriteEndObject;
-
-          if CSDevices."Last Download Timestamp" <> 0 then
-            CSRfidItemGroups.SetFilter(Time_Stamp,StrSubstNo('>%1',CSDevices."Last Download Timestamp"));
-          CSRfidItemGroups.Open;
-          while CSRfidItemGroups.Read do begin
             WriteStartObject;
-            WritePropertyName('key');
-            WriteValue(CSRfidItemGroups.Item_Group_Code);
-            WritePropertyName('title');
-            WriteValue(CSRfidItemGroups.Item_Group_Description);
-            WriteEndObject;
-          end;
-          CSRfidItemGroups.Close;
-          WriteEndArray;
 
-          WritePropertyName('item');
-          WriteStartArray;
+            WritePropertyName('itemtag');
+            WriteStartArray;
+            if CSRfidData.FindSet then begin
+                CSDevices."Current Tag Count" := CSRfidData.Count;
+                repeat
+                    WriteStartObject;
+                    WritePropertyName('key');
+                    WriteValue(CSRfidData.Key);
+                    WritePropertyName('item');
+                    WriteValue(CSRfidData."Combined key");
+                    WritePropertyName('itemgroup');
+                    WriteValue(CSRfidData."Item Group Code");
+                    WriteEndObject;
 
-          WriteStartObject;
-          WritePropertyName('key');
-          WriteValue('UNKNOWNITEM');
-          WritePropertyName('title');
-          WriteValue('UNKNOWN ITEM');
-          WritePropertyName('itemno');
-          WriteValue('UNKNOWNITEMNO');
-          WritePropertyName('variantcode');
-          WriteValue('');
-          WritePropertyName('varianttitle');
-          WriteValue('');
-          WritePropertyName('itemgroup');
-          WriteValue('UNKNOWNTAGS');
-          WritePropertyName('imageurl');
-          WriteValue('');
-          WriteEndObject;
+                    CurrentTimestamp := CSRfidData."Time Stamp";
 
-          if CSDevices."Last Download Timestamp" <> 0 then
-            CSRfidItems.SetFilter(Time_Stamp,StrSubstNo('>%1',CSDevices."Last Download Timestamp"));
-          CSRfidItems.Open;
-          while CSRfidItems.Read do begin
-            WriteStartObject;
-            WritePropertyName('key');
-            WriteValue(CSRfidItems.Combined_key);
-            WritePropertyName('title');
-            WriteValue(CSRfidItems.Item_Description);
-            WritePropertyName('itemno');
-            WriteValue(CSRfidItems.Cross_Reference_Item_No);
-            WritePropertyName('variantcode');
-            WriteValue(CSRfidItems.Cross_Reference_Variant_Code);
-            WritePropertyName('varianttitle');
-            WriteValue(CSRfidItems.Variant_Description);
+                until CSRfidData.Next = 0;
+            end;
+            WriteEndArray;
+
             WritePropertyName('itemgroup');
-            WriteValue(CSRfidItems.Item_Group_Code);
-            WritePropertyName('imageurl');
-            WriteValue(CSRfidItems.Image_Url);
-            WriteEndObject;
-          end;
-          CSRfidItems.Close;
-          WriteEndArray;
+            WriteStartArray;
 
-          WritePropertyName('itemtag');
-          WriteStartArray;
-          if CSDevices."Last Download Timestamp" <> 0 then
-            CSRfidItemTags.SetFilter(Time_Stamp,StrSubstNo('>%1',CSDevices."Last Download Timestamp"));
-          CSRfidItemTags.Open;
-          while CSRfidItemTags.Read do begin
             WriteStartObject;
             WritePropertyName('key');
-            WriteValue(CSRfidItemTags.Key);
+            WriteValue('UNKNOWNTAGS');
+            WritePropertyName('title');
+            WriteValue('UNKNOWN TAGS');
+            WriteEndObject;
+
+            if CSDevices."Last Download Timestamp" <> 0 then
+                CSRfidItemGroups.SetFilter(Time_Stamp, StrSubstNo('>%1', CSDevices."Last Download Timestamp"));
+            CSRfidItemGroups.Open;
+            while CSRfidItemGroups.Read do begin
+                WriteStartObject;
+                WritePropertyName('key');
+                WriteValue(CSRfidItemGroups.Item_Group_Code);
+                WritePropertyName('title');
+                WriteValue(CSRfidItemGroups.Item_Group_Description);
+                WriteEndObject;
+            end;
+            CSRfidItemGroups.Close;
+            WriteEndArray;
+
             WritePropertyName('item');
-            WriteValue(CSRfidItemTags.Combined_key);
-            WritePropertyName('itemgroup');
-            WriteValue(CSRfidItemTags.Item_Group_Code);
-            WriteEndObject;
-          end;
-          CSRfidItemTags.Close;
-          WriteEndArray;
+            WriteStartArray;
 
-          //-#335051 [335051]
-          WritePropertyName('supportedTagModels');
-          WriteStartArray;
+            WriteStartObject;
+            WritePropertyName('key');
+            WriteValue('UNKNOWNITEM');
+            WritePropertyName('title');
+            WriteValue('UNKNOWN ITEM');
+            WritePropertyName('itemno');
+            WriteValue('UNKNOWNITEMNO');
+            WritePropertyName('variantcode');
+            WriteValue('');
+            WritePropertyName('varianttitle');
+            WriteValue('');
+            WritePropertyName('itemgroup');
+            WriteValue('UNKNOWNTAGS');
+            WritePropertyName('imageurl');
+            WriteValue('');
+            WriteEndObject;
+
+            if CSDevices."Last Download Timestamp" <> 0 then
+                CSRfidItems.SetFilter(Time_Stamp, StrSubstNo('>%1', CSDevices."Last Download Timestamp"));
+            CSRfidItems.Open;
+            while CSRfidItems.Read do begin
+                WriteStartObject;
+                WritePropertyName('key');
+                WriteValue(CSRfidItems.Combined_key);
+                WritePropertyName('title');
+                WriteValue(CSRfidItems.Item_Description);
+                WritePropertyName('itemno');
+                WriteValue(CSRfidItems.Cross_Reference_Item_No);
+                WritePropertyName('variantcode');
+                WriteValue(CSRfidItems.Cross_Reference_Variant_Code);
+                WritePropertyName('varianttitle');
+                WriteValue(CSRfidItems.Variant_Description);
+                WritePropertyName('itemgroup');
+                WriteValue(CSRfidItems.Item_Group_Code);
+                WritePropertyName('imageurl');
+                WriteValue(CSRfidItems.Image_Url);
+                WriteEndObject;
+            end;
+            CSRfidItems.Close;
+            WriteEndArray;
+
+            WritePropertyName('itemtag');
+            WriteStartArray;
+            if CSDevices."Last Download Timestamp" <> 0 then
+                CSRfidItemTags.SetFilter(Time_Stamp, StrSubstNo('>%1', CSDevices."Last Download Timestamp"));
+            CSRfidItemTags.Open;
+            while CSRfidItemTags.Read do begin
+                WriteStartObject;
+                WritePropertyName('key');
+                WriteValue(CSRfidItemTags.Key);
+                WritePropertyName('item');
+                WriteValue(CSRfidItemTags.Combined_key);
+                WritePropertyName('itemgroup');
+                WriteValue(CSRfidItemTags.Item_Group_Code);
+                WriteEndObject;
+            end;
+            CSRfidItemTags.Close;
+            WriteEndArray;
+
+            //-#335051 [335051]
+            WritePropertyName('supportedTagModels');
+            WriteStartArray;
             CSRfidTagModelsQuery.Open;
             while CSRfidTagModelsQuery.Read do begin
-              WriteStartObject;
-              WritePropertyName('key');
-              WriteValue(CSRfidTagModelsQuery.Family+CSRfidTagModelsQuery.Model);
-              WritePropertyName('family');
-              WriteValue(CSRfidTagModelsQuery.Family);
-              WritePropertyName('model');
-              WriteValue(CSRfidTagModelsQuery.Model);
-              WriteEndObject;
+                WriteStartObject;
+                WritePropertyName('key');
+                WriteValue(CSRfidTagModelsQuery.Family + CSRfidTagModelsQuery.Model);
+                WritePropertyName('family');
+                WriteValue(CSRfidTagModelsQuery.Family);
+                WritePropertyName('model');
+                WriteValue(CSRfidTagModelsQuery.Model);
+                WriteEndObject;
             end;
             CSRfidTagModelsQuery.Close;
-          WriteEndArray;
-          //+#335051 [335051]
+            WriteEndArray;
+            //+#335051 [335051]
 
-          //-#335051 [335051]
-          WritePropertyName('deviceinfo');
-          WriteStartArray;
-              WriteStartObject;
-              WritePropertyName('key');
-              WriteValue(CSDevices."Device Id");
-              WritePropertyName('lasttimestamp');
-              WriteValue(CurrentTimestamp);
-              WritePropertyName('medialibrary');
-              WriteValue(CSSetup."Media Library");
-              WritePropertyName('refreshItemCatelog');
-              if CSDevices."Refresh Item Catalog" then
+            //-#335051 [335051]
+            WritePropertyName('deviceinfo');
+            WriteStartArray;
+            WriteStartObject;
+            WritePropertyName('key');
+            WriteValue(CSDevices."Device Id");
+            WritePropertyName('lasttimestamp');
+            WriteValue(CurrentTimestamp);
+            WritePropertyName('medialibrary');
+            WriteValue(CSSetup."Media Library");
+            WritePropertyName('refreshItemCatelog');
+            if CSDevices."Refresh Item Catalog" then
                 WriteValue('TRUE')
-              else
+            else
                 WriteValue('FALSE');
-              WriteEndObject;
-          WriteEndArray;
-          //+#335051 [335051]
+            WriteEndObject;
+            WriteEndArray;
+            //+#335051 [335051]
 
-          WriteEndObject;
-          JObject := Token;
+            WriteEndObject;
+            JObject := Token;
         end;
 
         CSDevices."Current Download Timestamp" := CurrentTimestamp;
@@ -866,24 +866,24 @@ codeunit 6151373 "CS Helper Functions"
         TransferHeader: Record "Transfer Header";
         PostingFinished: Boolean;
     begin
-        CSPostingBuffer.TestField(Posted,false);
+        CSPostingBuffer.TestField(Posted, false);
         ClearLastError;
 
         TransferHeader.Get(CSPostingBuffer."Key 1");
 
-        PostingFinished := CODEUNIT.Run(CODEUNIT::"CS UI Transfer Order Posting",TransferHeader);
+        PostingFinished := CODEUNIT.Run(CODEUNIT::"CS UI Transfer Order Posting", TransferHeader);
 
         if PostingFinished then begin
-          if TransferHeader.Get(CSPostingBuffer."Key 1") then begin
-            CSPostingBuffer.Aborted := true;
-            ErrorTxt := StrSubstNo('%1 : %2',GetLastErrorCode,GetLastErrorText);
-            CSPostingBuffer.Description := CopyStr(ErrorTxt,1,MaxStrLen(CSPostingBuffer.Description));
-          end else
-            CSPostingBuffer.Posted := true;
+            if TransferHeader.Get(CSPostingBuffer."Key 1") then begin
+                CSPostingBuffer.Aborted := true;
+                ErrorTxt := StrSubstNo('%1 : %2', GetLastErrorCode, GetLastErrorText);
+                CSPostingBuffer.Description := CopyStr(ErrorTxt, 1, MaxStrLen(CSPostingBuffer.Description));
+            end else
+                CSPostingBuffer.Posted := true;
         end else begin
-          CSPostingBuffer.Aborted := true;
-          ErrorTxt := StrSubstNo('%1 : %2',GetLastErrorCode,GetLastErrorText);
-          CSPostingBuffer.Description := CopyStr(ErrorTxt,1,MaxStrLen(CSPostingBuffer.Description));
+            CSPostingBuffer.Aborted := true;
+            ErrorTxt := StrSubstNo('%1 : %2', GetLastErrorCode, GetLastErrorText);
+            CSPostingBuffer.Description := CopyStr(ErrorTxt, 1, MaxStrLen(CSPostingBuffer.Description));
         end;
         CSPostingBuffer.Modify(true);
 
@@ -909,11 +909,11 @@ codeunit 6151373 "CS Helper Functions"
         TransferHeader.Get(CSPostingBuffer."Key 1");
         TransferPostReceipt.SetHideValidationDialog(true);
         if TransferPostReceipt.Run(TransferHeader) then begin
-          if PostedTransferHeader.Get(TransferHeader."No.") then begin
-            if PostedTransferHeader.Status = PostedTransferHeader.Status::Released then
-              ReleaseTransferDoc.Reopen(PostedTransferHeader);
-            PostedTransferHeader.Delete(true);
-          end;
+            if PostedTransferHeader.Get(TransferHeader."No.") then begin
+                if PostedTransferHeader.Status = PostedTransferHeader.Status::Released then
+                    ReleaseTransferDoc.Reopen(PostedTransferHeader);
+                PostedTransferHeader.Delete(true);
+            end;
         end;
     end;
 

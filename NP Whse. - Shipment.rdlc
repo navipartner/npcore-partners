@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <Height>2in</Height>
+        <Style />
+      </Body>
+      <Width>6.5in</Width>
+      <Page>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="AssUid__WhseShptHeaderCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AssUid__WhseShptHeaderCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AssUid__WhseShptHeaderCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="HrdLocCode_WhseShptHeaderCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>HrdLocCode_WhseShptHeaderCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>HrdLocCode_WhseShptHeaderCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="HeaderNo1_WhseShptHeaderCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>HeaderNo1_WhseShptHeaderCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>HeaderNo1_WhseShptHeaderCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ShelfNo_WhseShptLineCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ShelfNo_WhseShptLineCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ShelfNo_WhseShptLineCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ItemNo_WhseShptLineCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ItemNo_WhseShptLineCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ItemNo_WhseShptLineCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Desc_WhseShptLineCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Desc_WhseShptLineCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Desc_WhseShptLineCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="UomCode_WhseShptLineCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>UomCode_WhseShptLineCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>UomCode_WhseShptLineCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="LocCode_WhseShptLineCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>LocCode_WhseShptLineCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>LocCode_WhseShptLineCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Qty_WhseShptLineCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Qty_WhseShptLineCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Qty_WhseShptLineCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SourceNo_WhseShptLineCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SourceNo_WhseShptLineCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SourceNo_WhseShptLineCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SourceDoc_WhseShptLineCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SourceDoc_WhseShptLineCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SourceDoc_WhseShptLineCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ZoneCode_WhseShptLineCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ZoneCode_WhseShptLineCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ZoneCode_WhseShptLineCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="BinCode_WhseShptLineCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>BinCode_WhseShptLineCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>BinCode_WhseShptLineCaption</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="HeaderNo_WhseShptHeader">
+          <DataField>HeaderNo_WhseShptHeader</DataField>
+        </Field>
+        <Field Name="CompanyName">
+          <DataField>CompanyName</DataField>
+        </Field>
+        <Field Name="TodayFormatted">
+          <DataField>TodayFormatted</DataField>
+        </Field>
+        <Field Name="AssUid__WhseShptHeader">
+          <DataField>AssUid__WhseShptHeader</DataField>
+        </Field>
+        <Field Name="HrdLocCode_WhseShptHeader">
+          <DataField>HrdLocCode_WhseShptHeader</DataField>
+        </Field>
+        <Field Name="HeaderNo1_WhseShptHeader">
+          <DataField>HeaderNo1_WhseShptHeader</DataField>
+        </Field>
+        <Field Name="Show1">
+          <DataField>Show1</DataField>
+        </Field>
+        <Field Name="Show2">
+          <DataField>Show2</DataField>
+        </Field>
+        <Field Name="CurrReportPageNoCaption">
+          <DataField>CurrReportPageNoCaption</DataField>
+        </Field>
+        <Field Name="WarehouseShipmentCaption">
+          <DataField>WarehouseShipmentCaption</DataField>
+        </Field>
+        <Field Name="ShelfNo_WhseShptLine">
+          <DataField>ShelfNo_WhseShptLine</DataField>
+        </Field>
+        <Field Name="ItemNo_WhseShptLine">
+          <DataField>ItemNo_WhseShptLine</DataField>
+        </Field>
+        <Field Name="Desc_WhseShptLine">
+          <DataField>Desc_WhseShptLine</DataField>
+        </Field>
+        <Field Name="UomCode_WhseShptLine">
+          <DataField>UomCode_WhseShptLine</DataField>
+        </Field>
+        <Field Name="LocCode_WhseShptLine">
+          <DataField>LocCode_WhseShptLine</DataField>
+        </Field>
+        <Field Name="Qty_WhseShptLine">
+          <DataField>Qty_WhseShptLine</DataField>
+        </Field>
+        <Field Name="Qty_WhseShptLineFormat">
+          <DataField>Qty_WhseShptLineFormat</DataField>
+        </Field>
+        <Field Name="SourceNo_WhseShptLine">
+          <DataField>SourceNo_WhseShptLine</DataField>
+        </Field>
+        <Field Name="SourceDoc_WhseShptLine">
+          <DataField>SourceDoc_WhseShptLine</DataField>
+        </Field>
+        <Field Name="ZoneCode_WhseShptLine">
+          <DataField>ZoneCode_WhseShptLine</DataField>
+        </Field>
+        <Field Name="BinCode_WhseShptLine">
+          <DataField>BinCode_WhseShptLine</DataField>
+        </Field>
+        <Field Name="QtyPicked_WhseShptLineCaption">
+          <DataField>QtyPicked_WhseShptLineCaption</DataField>
+        </Field>
+        <Field Name="QtyPicked_WhseShptLine">
+          <DataField>QtyPicked_WhseShptLine</DataField>
+        </Field>
+        <Field Name="QtyPicked_WhseShptLineFormat">
+          <DataField>QtyPicked_WhseShptLineFormat</DataField>
+        </Field>
+        <Field Name="Barcode">
+          <DataField>Barcode</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>

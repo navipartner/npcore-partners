@@ -30,37 +30,40 @@ codeunit 6150877 "POS Action - Hardware Connect"
           ACTION_DESC,
           ActionVersion())
         then begin
-          Sender.RegisterWorkflow20(
-            HardwareConnectorMgt.GetSocketClientScript() +
-            'let hardwareResponse = await window._np_hardware_connector.sendRequestAndWaitForResponseAsync($context.Handler, $context.Content);' +
-            'workflow.respond("response", { result: hardwareResponse } );'
-          );
+            Sender.RegisterWorkflow20(
+              HardwareConnectorMgt.GetSocketClientScript() +
+              'let hardwareResponse = await window._np_hardware_connector.sendRequestAndWaitForResponseAsync($context.Handler, $context.Content);' +
+              'workflow.respond("response", { result: hardwareResponse } );'
+            );
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150733, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";State: Codeunit "POS Workflows 2.0 - State";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: Codeunit "POS JSON Management"; POSSession: Codeunit "POS Session"; State: Codeunit "POS Workflows 2.0 - State"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
-        JToken: DotNet npNetJToken;
+        JToken: JsonToken;
         Success: Boolean;
+        DummyJsonToken: JsonToken;
     begin
         if Action.Code <> ActionCode() then
-          exit;
+            exit;
 
         Handled := true;
 
         case WorkflowStep of
-          'response':
-            begin
-              Context.GetJToken(JToken, 'result', true);
-              Evaluate(Success, Format(JToken.Value('success')));
-              if not Success then
-                Error(Format(JToken.Value('errorText')));
-            end;
+            'response':
+                begin
+                    Context.GetJToken(JToken, 'result', true);
+                    Success := JToken.AsObject().Get('success', DummyJsonToken);
+                    if not Success then begin
+                        JToken.AsObject().Get('errorText', DummyJsonToken);
+                        Error(DummyJsonToken.AsValue().AsText());
+                    end;
+                end;
         end;
     end;
 
-    procedure QueueRequest(Handler: Text;Content: Text)
+    procedure QueueRequest(Handler: Text; Content: Text)
     var
         POSSession: Codeunit "POS Session";
         POSFrontEndManagement: Codeunit "POS Front End Management";
