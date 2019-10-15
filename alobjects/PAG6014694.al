@@ -14,29 +14,29 @@ page 6014694 "Retail Admin Activities - POS"
             cuegroup(POS)
             {
                 Caption = 'POS';
-                CueGroupLayout = Rows;
-                field("User Setups";"User Setups")
+                CueGroupLayout = Wide;
+                field("User Setups"; "User Setups")
                 {
                 }
-                field(Salespersons;Salespersons)
+                field(Salespersons; Salespersons)
                 {
                 }
-                field("POS Stores";"POS Stores")
+                field("POS Stores"; "POS Stores")
                 {
                 }
-                field("POS Units";"POS Units")
+                field("POS Units"; "POS Units")
                 {
                 }
-                field("Cash Registers";"Cash Registers")
+                field("Cash Registers"; "Cash Registers")
                 {
                 }
-                field("POS Payment Bins";"POS Payment Bins")
+                field("POS Payment Bins"; "POS Payment Bins")
                 {
                 }
-                field("POS Payment Methods";"POS Payment Methods")
+                field("POS Payment Methods"; "POS Payment Methods")
                 {
                 }
-                field("POS Posting Setups";"POS Posting Setups")
+                field("POS Posting Setups"; "POS Posting Setups")
                 {
                 }
             }
@@ -51,8 +51,8 @@ page 6014694 "Retail Admin Activities - POS"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 }

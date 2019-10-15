@@ -14,17 +14,16 @@ page 6014692 "Retail Admin Activities - Tick"
             cuegroup(Tickets)
             {
                 Caption = 'Tickets';
-                CueGroupLayout = Columns;
-                field("Ticket Types";"Ticket Types")
+                field("Ticket Types"; "Ticket Types")
                 {
                 }
-                field("Ticket Admission BOMs";"Ticket Admission BOMs")
+                field("Ticket Admission BOMs"; "Ticket Admission BOMs")
                 {
                 }
-                field("Ticket Schedules";"Ticket Schedules")
+                field("Ticket Schedules"; "Ticket Schedules")
                 {
                 }
-                field("Ticket Admissions";"Ticket Admissions")
+                field("Ticket Admissions"; "Ticket Admissions")
                 {
                 }
             }
@@ -39,8 +38,8 @@ page 6014692 "Retail Admin Activities - Tick"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 }

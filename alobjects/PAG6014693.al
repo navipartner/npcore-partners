@@ -14,11 +14,10 @@ page 6014693 "Retail Admin Activities - WFs"
             cuegroup("POS Sales Workflow Steps")
             {
                 Caption = 'POS Sales Workflow Steps';
-                CueGroupLayout = Columns;
-                field("Workflow Steps Enabled";"Workflow Steps Enabled")
+                field("Workflow Steps Enabled"; "Workflow Steps Enabled")
                 {
                 }
-                field("Workflow Steps Not Enabled";"Workflow Steps Not Enabled")
+                field("Workflow Steps Not Enabled"; "Workflow Steps Not Enabled")
                 {
                 }
             }
@@ -33,8 +32,8 @@ page 6014693 "Retail Admin Activities - WFs"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 }
