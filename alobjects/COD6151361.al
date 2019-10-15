@@ -9,14 +9,14 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
         MiniformMgmt: Codeunit "CS UI Management";
     begin
         MiniformMgmt.Initialize(
-          CSUIHeader,Rec,DOMxmlin,ReturnedNode,
-          RootNode,XMLDOMMgt,CSCommunication,CSUserId,
-          CurrentCode,StackCode,WhseEmpId,LocationFilter,CSSessionId);
+          CSUIHeader, Rec, DOMxmlin, ReturnedNode,
+          RootNode, XMLDOMMgt, CSCommunication, CSUserId,
+          CurrentCode, StackCode, WhseEmpId, LocationFilter, CSSessionId);
 
         if Code <> CurrentCode then
-          PrepareData
+            PrepareData
         else
-          ProcessInput;
+            ProcessInput;
 
         Clear(DOMxmlin);
     end;
@@ -87,128 +87,128 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
         Value: Text;
         ItemJournalLine: Record "Item Journal Line";
     begin
-        if XMLDOMMgt.FindNode(RootNode,'Header/Input',ReturnedNode) then
-          TextValue := ReturnedNode.InnerText
+        if XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode) then
+            TextValue := ReturnedNode.InnerText
         else
-          Error(Text006);
+            Error(Text006);
 
-        Evaluate(TableNo,CSCommunication.GetNodeAttribute(ReturnedNode,'TableNo'));
+        Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
         RecRef.Open(TableNo);
-        Evaluate(RecId,CSCommunication.GetNodeAttribute(ReturnedNode,'RecordID'));
+        Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
         if RecRef.Get(RecId) then begin
-          RecRef.SetTable(CSPhysInventoryHandling);
-          RecRef.SetRecFilter;
-          CSCommunication.SetRecRef(RecRef);
+            RecRef.SetTable(CSPhysInventoryHandling);
+            RecRef.SetRecFilter;
+            CSCommunication.SetRecRef(RecRef);
         end else begin
-          CSCommunication.RunPreviousUI(DOMxmlin);
-          exit;
+            CSCommunication.RunPreviousUI(DOMxmlin);
+            exit;
         end;
 
-        FuncGroup.KeyDef := CSCommunication.GetFunctionKey(CSUIHeader.Code,TextValue);
+        FuncGroup.KeyDef := CSCommunication.GetFunctionKey(CSUIHeader.Code, TextValue);
         ActiveInputField := 1;
 
         case FuncGroup.KeyDef of
-          FuncGroup.KeyDef::Esc:
-            begin
-              DeleteEmptyDataLines();
-              CSCommunication.RunPreviousUI(DOMxmlin);
-            end;
-          FuncGroup.KeyDef::"Function":
-            begin
-              FuncName := CSCommunication.GetNodeAttribute(ReturnedNode,'FuncName');
-              case FuncName of
-                  'DEFAULT':
-                  begin
-                    FuncValue := CSCommunication.GetNodeAttribute(ReturnedNode,'FuncValue');
-                    Evaluate(FuncFieldId,CSCommunication.GetNodeAttribute(ReturnedNode,'FieldID'));
-                    if CSFieldDefaults.Get(CSUserId,CurrentCode,FuncFieldId) then begin
-                      CSFieldDefaults.Value := FuncValue;
-                      CSFieldDefaults.Modify;
-                    end else begin
-                      Clear(CSFieldDefaults);
-                      CSFieldDefaults.Id := CSUserId;
-                      CSFieldDefaults."Use Case Code" := CurrentCode;
-                      CSFieldDefaults."Field No" := FuncFieldId;
-                      CSFieldDefaults.Insert;
-                      CSFieldDefaults.Value := FuncValue;
-                      CSFieldDefaults.Modify;
-                    end;
-                  end;
-                  'DELETELINE':
-                  begin
-                    Evaluate(FuncTableNo,CSCommunication.GetNodeAttribute(ReturnedNode,'FuncTableNo'));
-                    FuncRecRef.Open(FuncTableNo);
-                    Evaluate(FuncRecId,CSCommunication.GetNodeAttribute(ReturnedNode,'FuncRecordID'));
-                    if FuncRecRef.Get(FuncRecId) then begin
-                      FuncRecRef.SetTable(ItemJournalLine);
-                    ItemJournalLine.Delete(true);
-                  end;
+            FuncGroup.KeyDef::Esc:
+                begin
+                    DeleteEmptyDataLines();
+                    CSCommunication.RunPreviousUI(DOMxmlin);
                 end;
-              end;
-            end;
-          FuncGroup.KeyDef::Reset:
-            Reset(CSPhysInventoryHandling);
-          FuncGroup.KeyDef::Register:
-            begin
-              Register(CSPhysInventoryHandling);
-              if Remark = '' then begin
-                DeleteEmptyDataLines();
-                CSCommunication.RunPreviousUI(DOMxmlin)
-              end else
-                SendForm(ActiveInputField,CSPhysInventoryHandling);
-            end;
-          FuncGroup.KeyDef::Input:
-            begin
-              Evaluate(FldNo,CSCommunication.GetNodeAttribute(ReturnedNode,'FieldID'));
-
-              CommaString := TextValue;
-              Separator := ',';
-              Values := CommaString.Split(Separator.ToCharArray());
-
-              foreach Value in Values do begin
-
-                if Value <> '' then begin
-
-                  case FldNo of
-                    CSPhysInventoryHandling.FieldNo(Barcode):
-                      CheckBarcode(CSPhysInventoryHandling,Value);
-                    CSPhysInventoryHandling.FieldNo("Bin Code"):
-                      CheckBinCode(CSPhysInventoryHandling,Value);
-                    CSPhysInventoryHandling.FieldNo(Qty):
-                      CheckQty(CSPhysInventoryHandling,Value);
-                    else begin
-                      CSCommunication.FieldSetvalue(RecRef,FldNo,Value);
+            FuncGroup.KeyDef::"Function":
+                begin
+                    FuncName := CSCommunication.GetNodeAttribute(ReturnedNode, 'FuncName');
+                    case FuncName of
+                        'DEFAULT':
+                            begin
+                                FuncValue := CSCommunication.GetNodeAttribute(ReturnedNode, 'FuncValue');
+                                Evaluate(FuncFieldId, CSCommunication.GetNodeAttribute(ReturnedNode, 'FieldID'));
+                                if CSFieldDefaults.Get(CSUserId, CurrentCode, FuncFieldId) then begin
+                                    CSFieldDefaults.Value := FuncValue;
+                                    CSFieldDefaults.Modify;
+                                end else begin
+                                    Clear(CSFieldDefaults);
+                                    CSFieldDefaults.Id := CSUserId;
+                                    CSFieldDefaults."Use Case Code" := CurrentCode;
+                                    CSFieldDefaults."Field No" := FuncFieldId;
+                                    CSFieldDefaults.Insert;
+                                    CSFieldDefaults.Value := FuncValue;
+                                    CSFieldDefaults.Modify;
+                                end;
+                            end;
+                        'DELETELINE':
+                            begin
+                                Evaluate(FuncTableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'FuncTableNo'));
+                                FuncRecRef.Open(FuncTableNo);
+                                Evaluate(FuncRecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'FuncRecordID'));
+                                if FuncRecRef.Get(FuncRecId) then begin
+                                    FuncRecRef.SetTable(ItemJournalLine);
+                                    ItemJournalLine.Delete(true);
+                                end;
+                            end;
                     end;
-                  end;
-
-                  CSPhysInventoryHandling.Modify;
-
-                  RecRef.GetTable(CSPhysInventoryHandling);
-                  CSCommunication.SetRecRef(RecRef);
-                  ActiveInputField := CSCommunication.GetActiveInputNo(CurrentCode,FldNo);
-                  if Remark = '' then
-                    if CSCommunication.LastEntryField(CurrentCode,FldNo) then begin
-
-                      UpdateDataLine(CSPhysInventoryHandling);
-                      CreateDataLine(CSPhysInventoryHandling2,CSPhysInventoryHandling."Location Code",CSPhysInventoryHandling."Bin Code");
-                      RecRef.GetTable(CSPhysInventoryHandling2);
-                      CSCommunication.SetRecRef(RecRef);
-
-                      Clear(CSPhysInventoryHandling);
-                      CSPhysInventoryHandling := CSPhysInventoryHandling2;
-
-                      ActiveInputField := 1;
+                end;
+            FuncGroup.KeyDef::Reset:
+                Reset(CSPhysInventoryHandling);
+            FuncGroup.KeyDef::Register:
+                begin
+                    Register(CSPhysInventoryHandling);
+                    if Remark = '' then begin
+                        DeleteEmptyDataLines();
+                        CSCommunication.RunPreviousUI(DOMxmlin)
                     end else
-                      ActiveInputField += 1;
+                        SendForm(ActiveInputField, CSPhysInventoryHandling);
                 end;
-              end;
-            end;
-          else
-            Error(Text000);
+            FuncGroup.KeyDef::Input:
+                begin
+                    Evaluate(FldNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'FieldID'));
+
+                    CommaString := TextValue;
+                    Separator := ',';
+                    Values := CommaString.Split(Separator.ToCharArray());
+
+                    foreach Value in Values do begin
+
+                        if Value <> '' then begin
+
+                            case FldNo of
+                                CSPhysInventoryHandling.FieldNo(Barcode):
+                                    CheckBarcode(CSPhysInventoryHandling, Value);
+                                CSPhysInventoryHandling.FieldNo("Bin Code"):
+                                    CheckBinCode(CSPhysInventoryHandling, Value);
+                                CSPhysInventoryHandling.FieldNo(Qty):
+                                    CheckQty(CSPhysInventoryHandling, Value);
+                                else begin
+                                        CSCommunication.FieldSetvalue(RecRef, FldNo, Value);
+                                    end;
+                            end;
+
+                            CSPhysInventoryHandling.Modify;
+
+                            RecRef.GetTable(CSPhysInventoryHandling);
+                            CSCommunication.SetRecRef(RecRef);
+                            ActiveInputField := CSCommunication.GetActiveInputNo(CurrentCode, FldNo);
+                            if Remark = '' then
+                                if CSCommunication.LastEntryField(CurrentCode, FldNo) then begin
+
+                                    UpdateDataLine(CSPhysInventoryHandling);
+                                    CreateDataLine(CSPhysInventoryHandling2, CSPhysInventoryHandling."Location Code", CSPhysInventoryHandling."Bin Code");
+                                    RecRef.GetTable(CSPhysInventoryHandling2);
+                                    CSCommunication.SetRecRef(RecRef);
+
+                                    Clear(CSPhysInventoryHandling);
+                                    CSPhysInventoryHandling := CSPhysInventoryHandling2;
+
+                                    ActiveInputField := 1;
+                                end else
+                                    ActiveInputField += 1;
+                        end;
+                    end;
+                end;
+            else
+                Error(Text000);
         end;
 
-        if not (FuncGroup.KeyDef in [FuncGroup.KeyDef::Esc,FuncGroup.KeyDef::Register]) then
-          SendForm(ActiveInputField,CSPhysInventoryHandling);
+        if not (FuncGroup.KeyDef in [FuncGroup.KeyDef::Esc, FuncGroup.KeyDef::Register]) then
+            SendForm(ActiveInputField, CSPhysInventoryHandling);
     end;
 
     local procedure PrepareData()
@@ -220,10 +220,10 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
         ItemJournalBatch: Record "Item Journal Batch";
         CSSetup: Record "CS Setup";
     begin
-        XMLDOMMgt.FindNode(RootNode,'Header/Input',ReturnedNode);
+        XMLDOMMgt.FindNode(RootNode, 'Header/Input', ReturnedNode);
 
-        Evaluate(TableNo,CSCommunication.GetNodeAttribute(ReturnedNode,'TableNo'));
-        Evaluate(RecId,CSCommunication.GetNodeAttribute(ReturnedNode,'RecordID'));
+        Evaluate(TableNo, CSCommunication.GetNodeAttribute(ReturnedNode, 'TableNo'));
+        Evaluate(RecId, CSCommunication.GetNodeAttribute(ReturnedNode, 'RecordID'));
 
         RecRef.Open(TableNo);
         RecRef.Get(RecId);
@@ -231,17 +231,17 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
 
         CSSetup.Get;
         CSSetup.TestField("Phys. Inv Jour Temp Name");
-        if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name",UserId) then begin
-          ItemJournalBatch.Init;
-          ItemJournalBatch.Validate("Journal Template Name",CSSetup."Phys. Inv Jour Temp Name");
-          ItemJournalBatch.Validate(Name,UserId);
-          ItemJournalBatch.Description := StrSubstNo(Text028,UserId);
-          ItemJournalBatch.Validate("No. Series",CSSetup."Phys. Inv Jour No. Series");
-          ItemJournalBatch.Insert(true);
+        if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name", UserId) then begin
+            ItemJournalBatch.Init;
+            ItemJournalBatch.Validate("Journal Template Name", CSSetup."Phys. Inv Jour Temp Name");
+            ItemJournalBatch.Validate(Name, UserId);
+            ItemJournalBatch.Description := StrSubstNo(Text028, UserId);
+            ItemJournalBatch.Validate("No. Series", CSSetup."Phys. Inv Jour No. Series");
+            ItemJournalBatch.Insert(true);
         end;
 
         DeleteEmptyDataLines();
-        CreateDataLine(CSPhysInventoryHandling,Bin."Location Code",Bin.Code);
+        CreateDataLine(CSPhysInventoryHandling, Bin."Location Code", Bin.Code);
 
         RecRef.Close;
 
@@ -253,24 +253,24 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
 
         CSCommunication.SetRecRef(RecRef);
         ActiveInputField := 1;
-        SendForm(ActiveInputField,CSPhysInventoryHandling);
+        SendForm(ActiveInputField, CSPhysInventoryHandling);
     end;
 
-    local procedure SendForm(InputField: Integer;CSPhysInventoryHandling: Record "CS Phys. Inventory Handling")
+    local procedure SendForm(InputField: Integer; CSPhysInventoryHandling: Record "CS Phys. Inventory Handling")
     var
         Records: DotNet npNetXmlElement;
         CSSetup: Record "CS Setup";
     begin
-        CSCommunication.EncodeUI(CSUIHeader,StackCode,DOMxmlin,InputField,Remark,CSUserId);
+        CSCommunication.EncodeUI(CSUIHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
 
-        if AddSummarize(Records,CSPhysInventoryHandling) then
-          DOMxmlin.DocumentElement.AppendChild(Records);
+        if AddSummarize(Records, CSPhysInventoryHandling) then
+            DOMxmlin.DocumentElement.AppendChild(Records);
 
         CSMgt.SendXMLReply(DOMxmlin);
     end;
 
-    local procedure CheckBarcode(var CSPhysInventoryHandling: Record "CS Phys. Inventory Handling";InputValue: Text)
+    local procedure CheckBarcode(var CSPhysInventoryHandling: Record "CS Phys. Inventory Handling"; InputValue: Text)
     var
         BarcodeLibrary: Codeunit "Barcode Library";
         ItemNo: Code[20];
@@ -280,76 +280,76 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
         BinContent: Record "Bin Content";
     begin
         if InputValue = '' then begin
-          Remark := Text005;
-          exit;
+            Remark := Text005;
+            exit;
         end;
 
         if StrLen(InputValue) > MaxStrLen(CSPhysInventoryHandling.Barcode) then begin
-          Remark := Text008;
-          exit;
+            Remark := Text008;
+            exit;
         end;
 
         if BarcodeLibrary.TranslateBarcodeToItemVariant(InputValue, ItemNo, VariantCode, ResolvingTable, true) then begin
-          if not Item.Get(ItemNo) then begin
-            Remark := StrSubstNo(Text014,InputValue);
-            exit;
-          end;
+            if not Item.Get(ItemNo) then begin
+                Remark := StrSubstNo(Text014, InputValue);
+                exit;
+            end;
 
-          CSPhysInventoryHandling."Item No." := ItemNo;
-          CSPhysInventoryHandling."Variant Code" := VariantCode;
+            CSPhysInventoryHandling."Item No." := ItemNo;
+            CSPhysInventoryHandling."Variant Code" := VariantCode;
 
         end else begin
-          Remark := StrSubstNo(Text010,InputValue);
-          exit;
+            Remark := StrSubstNo(Text010, InputValue);
+            exit;
         end;
 
         CSPhysInventoryHandling.Barcode := InputValue;
     end;
 
-    local procedure CheckBinCode(var CSPhysInventoryHandling: Record "CS Phys. Inventory Handling";InputValue: Text)
+    local procedure CheckBinCode(var CSPhysInventoryHandling: Record "CS Phys. Inventory Handling"; InputValue: Text)
     var
         QtyToHandle: Decimal;
         BinContent: Record "Bin Content";
         Bin: Record Bin;
     begin
         if InputValue = '' then begin
-          Remark := Text009;
-          exit;
+            Remark := Text009;
+            exit;
         end;
 
         if StrLen(InputValue) > MaxStrLen(CSPhysInventoryHandling."Bin Code") then begin
-          Remark := Text008;
-          exit;
+            Remark := Text008;
+            exit;
         end;
 
         Clear(Bin);
-        Bin.SetRange("Location Code",CSPhysInventoryHandling."Location Code");
-        Bin.SetRange(Code,InputValue);
+        Bin.SetRange("Location Code", CSPhysInventoryHandling."Location Code");
+        Bin.SetRange(Code, InputValue);
         if not Bin.FindSet then
-          Remark := Text021;
+            Remark := Text021;
 
         CSPhysInventoryHandling."Bin Code" := InputValue;
     end;
 
-    local procedure CheckQty(var CSPhysInventoryHandling: Record "CS Phys. Inventory Handling";InputValue: Text)
+    local procedure CheckQty(var CSPhysInventoryHandling: Record "CS Phys. Inventory Handling"; InputValue: Text)
     var
         Qty: Decimal;
         BinContent: Record "Bin Content";
     begin
         if InputValue = '' then begin
-          Remark := Text011;
-          exit;
+            Remark := Text011;
+            exit;
         end;
 
-        if not Evaluate(Qty,InputValue) then begin
-          Remark := Text013;
-          exit;
+        if not Evaluate(Qty, InputValue) then begin
+            Remark := Text013;
+            exit;
         end;
 
         CSPhysInventoryHandling.Qty := Qty;
     end;
 
-    local procedure CreateDataLine(var CSPhysInventoryHandling: Record "CS Phys. Inventory Handling";LocationCode: Code[10];BinCode: Code[20])
+    local procedure CreateDataLine(var CSPhysInventoryHandling: Record "CS Phys. Inventory Handling"; LocationCode: Code[10]; BinCode: Code[20])
     var
         NewCSPhysInventoryHandling: Record "CS Phys. Inventory Handling";
         LineNo: Integer;
@@ -358,14 +358,14 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
         CSSetup: Record "CS Setup";
     begin
         if LocationCode = '' then
-          Error(Text020);
+            Error(Text020);
 
         Clear(NewCSPhysInventoryHandling);
         NewCSPhysInventoryHandling.SetRange(Id, CSSessionId);
         if NewCSPhysInventoryHandling.FindLast then
-          LineNo := NewCSPhysInventoryHandling."Line No." + 1
+            LineNo := NewCSPhysInventoryHandling."Line No." + 1
         else
-          LineNo := 1;
+            LineNo := 1;
 
         CSPhysInventoryHandling.Init;
         CSPhysInventoryHandling.Id := CSSessionId;
@@ -399,8 +399,8 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
         CSPhysInventoryHandling.Modify(true);
 
         if TransferDataLine(CSPhysInventoryHandling) then begin
-          CSPhysInventoryHandling."Transferred to Journal" := true;
-          CSPhysInventoryHandling.Modify(true);
+            CSPhysInventoryHandling."Transferred to Journal" := true;
+            CSPhysInventoryHandling.Modify(true);
         end;
     end;
 
@@ -408,9 +408,9 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
     var
         CSPhysInventoryHandling: Record "CS Phys. Inventory Handling";
     begin
-        CSPhysInventoryHandling.SetRange(Id,CSSessionId);
-        CSPhysInventoryHandling.SetRange(Handled,false);
-        CSPhysInventoryHandling.SetRange("Transferred to Journal",false);
+        CSPhysInventoryHandling.SetRange(Id, CSSessionId);
+        CSPhysInventoryHandling.SetRange(Handled, false);
+        CSPhysInventoryHandling.SetRange("Transferred to Journal", false);
         CSPhysInventoryHandling.DeleteAll(true);
     end;
 
@@ -421,17 +421,17 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
         ItemJournalLine: Record "Item Journal Line";
     begin
         ItemJnlTemplate.Get(CurrCSPhysInventoryHandling."Journal Template Name");
-        ItemJnlTemplate.TestField("Force Posting Report",false);
+        ItemJnlTemplate.TestField("Force Posting Report", false);
 
         Clear(ItemJournalLine);
-        ItemJournalLine.SetRange("Journal Template Name",CurrCSPhysInventoryHandling."Journal Template Name");
-        ItemJournalLine.SetRange("Journal Batch Name",CurrCSPhysInventoryHandling."Journal Batch Name");
-        ItemJournalLine.SetRange("Bin Code",CurrCSPhysInventoryHandling."Bin Code");
-        ItemJournalLine.SetRange("External Document No.",'MOBILE');
+        ItemJournalLine.SetRange("Journal Template Name", CurrCSPhysInventoryHandling."Journal Template Name");
+        ItemJournalLine.SetRange("Journal Batch Name", CurrCSPhysInventoryHandling."Journal Batch Name");
+        ItemJournalLine.SetRange("Bin Code", CurrCSPhysInventoryHandling."Bin Code");
+        ItemJournalLine.SetRange("External Document No.", 'MOBILE');
         if ItemJournalLine.FindSet then begin
-          repeat
-            ItemJnlPostBatch.Run(ItemJournalLine);
-          until ItemJournalLine.Next = 0;
+            repeat
+                ItemJnlPostBatch.Run(ItemJournalLine);
+            until ItemJournalLine.Next = 0;
         end;
     end;
 
@@ -459,29 +459,29 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
         //    ERROR(Text029,CSPhysInventoryHandling."Location Code",CSPhysInventoryHandling."Bin Code");
 
         Clear(ItemJournalLine);
-        ItemJournalLine.SetRange("Journal Template Name",CSSetup."Phys. Inv Jour Temp Name");
-        ItemJournalLine.SetRange("Journal Batch Name",UserId);
-        ItemJournalLine.SetRange("Location Code",CSPhysInventoryHandling."Location Code");
-        ItemJournalLine.SetRange("Bin Code",CSPhysInventoryHandling."Bin Code");
+        ItemJournalLine.SetRange("Journal Template Name", CSSetup."Phys. Inv Jour Temp Name");
+        ItemJournalLine.SetRange("Journal Batch Name", UserId);
+        ItemJournalLine.SetRange("Location Code", CSPhysInventoryHandling."Location Code");
+        ItemJournalLine.SetRange("Bin Code", CSPhysInventoryHandling."Bin Code");
         ItemJournalLine.DeleteAll;
 
         Clear(ItemJournalLine);
         ItemJournalLine.Init;
-        ItemJournalLine.Validate("Journal Template Name",CSSetup."Phys. Inv Jour Temp Name");
-        ItemJournalLine.Validate("Journal Batch Name",UserId);
-        ItemJournalLine.Validate("Location Code",CSPhysInventoryHandling."Location Code");
-        ItemJournalLine.Validate("Bin Code",CSPhysInventoryHandling."Bin Code");
+        ItemJournalLine.Validate("Journal Template Name", CSSetup."Phys. Inv Jour Temp Name");
+        ItemJournalLine.Validate("Journal Batch Name", UserId);
+        ItemJournalLine.Validate("Location Code", CSPhysInventoryHandling."Location Code");
+        ItemJournalLine.Validate("Bin Code", CSPhysInventoryHandling."Bin Code");
 
         ItemJnlTemplate.Get(CSSetup."Phys. Inv Jour Temp Name");
-        ItemJnlBatch.Get(ItemJournalLine."Journal Template Name",ItemJournalLine."Journal Batch Name");
+        ItemJnlBatch.Get(ItemJournalLine."Journal Template Name", ItemJournalLine."Journal Batch Name");
 
         Clear(NoSeriesMgt);
-        ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJnlBatch."No. Series",ItemJournalLine."Posting Date",false);
+        ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJnlBatch."No. Series", ItemJournalLine."Posting Date", false);
         ItemJournalLine."Source Code" := ItemJnlTemplate."Source Code";
         ItemJournalLine."Reason Code" := ItemJnlBatch."Reason Code";
         ItemJournalLine."Posting No. Series" := ItemJnlBatch."Posting No. Series";
 
-        CalculateInventory(ItemJournalLine,Item,WorkDate,false,false);
+        CalculateInventory(ItemJournalLine, Item, WorkDate, false, false);
 
         // CLEAR(ItemJournalLine);
         // ItemJournalLine.SETRANGE("Journal Template Name",CSSetup."Phys. Inv Jour Temp Name");
@@ -508,52 +508,52 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
         ItemJournalLine.SetRange("Item No.", CSPhysInventoryHandling."Item No.");
         ItemJournalLine.SetRange("Variant Code", CSPhysInventoryHandling."Variant Code");
         if not ItemJournalLine.FindSet then begin
-          Clear(NewItemJournalLine);
-          NewItemJournalLine.SetRange("Journal Template Name", CSPhysInventoryHandling."Journal Template Name");
-          NewItemJournalLine.SetRange("Journal Batch Name", CSPhysInventoryHandling."Journal Batch Name");
-          LineNo := 0;
-          if NewItemJournalLine.FindLast then
-            LineNo := NewItemJournalLine."Line No." + 1000
-          else
-            LineNo := 1000;
+            Clear(NewItemJournalLine);
+            NewItemJournalLine.SetRange("Journal Template Name", CSPhysInventoryHandling."Journal Template Name");
+            NewItemJournalLine.SetRange("Journal Batch Name", CSPhysInventoryHandling."Journal Batch Name");
+            LineNo := 0;
+            if NewItemJournalLine.FindLast then
+                LineNo := NewItemJournalLine."Line No." + 1000
+            else
+                LineNo := 1000;
 
-          Clear(ItemJournalLine);
-          ItemJournalLine.Validate("Journal Template Name",CSPhysInventoryHandling."Journal Template Name");
-          ItemJournalLine.Validate("Journal Batch Name",CSPhysInventoryHandling."Journal Batch Name");
-          ItemJournalLine."Line No." := LineNo;
-          ItemJournalLine.Insert(true);
+            Clear(ItemJournalLine);
+            ItemJournalLine.Validate("Journal Template Name", CSPhysInventoryHandling."Journal Template Name");
+            ItemJournalLine.Validate("Journal Batch Name", CSPhysInventoryHandling."Journal Batch Name");
+            ItemJournalLine."Line No." := LineNo;
+            ItemJournalLine.Insert(true);
 
-          ItemJournalLine.Validate("Entry Type",ItemJournalLine."Entry Type"::"Positive Adjmt.");
-          ItemJournalLine.Validate("Item No.", CSPhysInventoryHandling."Item No.");
-          ItemJournalLine.Validate("Variant Code",CSPhysInventoryHandling."Variant Code");
-          ItemJournalLine.Validate("Location Code",CSPhysInventoryHandling."Location Code");
-          ItemJournalLine.Validate("Phys. Inventory",true);
-          ItemJournalLine.Validate("Qty. (Phys. Inventory)",CSPhysInventoryHandling.Qty);
-          ItemJournalLine.Validate("Bin Code",CSPhysInventoryHandling."Bin Code");
-          ItemJournalLine."Posting Date" := WorkDate;
-          ItemJournalLine."Document Date" := WorkDate;
-          ItemJournalLine.Validate("External Document No.",'MOBILE');
-          ItemJournalLine.Validate("Changed by User",true);
+            ItemJournalLine.Validate("Entry Type", ItemJournalLine."Entry Type"::"Positive Adjmt.");
+            ItemJournalLine.Validate("Item No.", CSPhysInventoryHandling."Item No.");
+            ItemJournalLine.Validate("Variant Code", CSPhysInventoryHandling."Variant Code");
+            ItemJournalLine.Validate("Location Code", CSPhysInventoryHandling."Location Code");
+            ItemJournalLine.Validate("Phys. Inventory", true);
+            ItemJournalLine.Validate("Qty. (Phys. Inventory)", CSPhysInventoryHandling.Qty);
+            ItemJournalLine.Validate("Bin Code", CSPhysInventoryHandling."Bin Code");
+            ItemJournalLine."Posting Date" := WorkDate;
+            ItemJournalLine."Document Date" := WorkDate;
+            ItemJournalLine.Validate("External Document No.", 'MOBILE');
+            ItemJournalLine.Validate("Changed by User", true);
 
-          ItemJnlTemplate.Get(ItemJournalLine."Journal Template Name");
-          ItemJnlBatch.Get(ItemJournalLine."Journal Template Name",ItemJournalLine."Journal Batch Name");
+            ItemJnlTemplate.Get(ItemJournalLine."Journal Template Name");
+            ItemJnlBatch.Get(ItemJournalLine."Journal Template Name", ItemJournalLine."Journal Batch Name");
 
-          Clear(NoSeriesMgt);
-          ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJnlBatch."No. Series",ItemJournalLine."Posting Date",false);
-          ItemJournalLine."Source Code" := ItemJnlTemplate."Source Code";
-          ItemJournalLine."Reason Code" := ItemJnlBatch."Reason Code";
-          ItemJournalLine."Posting No. Series" := ItemJnlBatch."Posting No. Series";
-          ItemJournalLine.Modify(true);
+            Clear(NoSeriesMgt);
+            ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJnlBatch."No. Series", ItemJournalLine."Posting Date", false);
+            ItemJournalLine."Source Code" := ItemJnlTemplate."Source Code";
+            ItemJournalLine."Reason Code" := ItemJnlBatch."Reason Code";
+            ItemJournalLine."Posting No. Series" := ItemJnlBatch."Posting No. Series";
+            ItemJournalLine.Modify(true);
         end else begin
-          ItemJournalLine.Validate("Qty. (Phys. Inventory)",CSPhysInventoryHandling.Qty);
-          ItemJournalLine.Validate("Changed by User",true);
-          ItemJournalLine.Modify(true);
+            ItemJournalLine.Validate("Qty. (Phys. Inventory)", CSPhysInventoryHandling.Qty);
+            ItemJournalLine.Validate("Changed by User", true);
+            ItemJournalLine.Modify(true);
         end;
 
         exit(true);
     end;
 
-    local procedure AddSummarize(var Records: DotNet npNetXmlElement;CSPhysInventoryHandling: Record "CS Phys. Inventory Handling"): Boolean
+    local procedure AddSummarize(var Records: DotNet npNetXmlElement; CSPhysInventoryHandling: Record "CS Phys. Inventory Handling"): Boolean
     var
         "Record": DotNet npNetXmlElement;
         Line: DotNet npNetXmlElement;
@@ -574,206 +574,206 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
         Clear(ItemJournalLine);
         ItemJournalLine.SetRange("Journal Template Name", CSSetup."Phys. Inv Jour Temp Name");
         ItemJournalLine.SetRange("Journal Batch Name", UserId);
-        ItemJournalLine.SetRange("Location Code",CSPhysInventoryHandling."Location Code");
-        ItemJournalLine.SetRange("Bin Code",CSPhysInventoryHandling."Bin Code");
+        ItemJournalLine.SetRange("Location Code", CSPhysInventoryHandling."Location Code");
+        ItemJournalLine.SetRange("Bin Code", CSPhysInventoryHandling."Bin Code");
         if ItemJournalLine.FindSet then begin
-          Records := DOMxmlin.CreateElement('Records');
-          repeat
-            Record := DOMxmlin.CreateElement('Record');
-
-            CurrRecordID := ItemJournalLine.RecordId;
-            TableNo := CurrRecordID.TableNo;
-
-            if ItemJournalLine."Changed by User" then
-              Indicator := 'ok'
-            else
-              Indicator := 'minus';
-
-            if Indicator = 'minus' then begin
-              if CSUIHeader."Expand Summary Items" then begin
-                //1
-                Line := DOMxmlin.CreateElement('Line');
-                AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption(Description));
-                AddAttribute(Line,'Indicator',Indicator);
-                AddAttribute(Line,'Type',Format(LineType::TEXT));
-                AddAttribute(Line,'CollapsItems','FALSE');
-                Line.InnerText := ItemJournalLine."Bin Code";
-                Record.AppendChild(Line);
-
-                //2
-                Line := DOMxmlin.CreateElement('Line');
-                AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption("Qty. (Calculated)"));
-                AddAttribute(Line,'Type',Format(LineType::TEXT));
-                Line.InnerText := StrSubstNo(Text030,ItemJournalLine."Qty. (Calculated)",ItemJournalLine."Qty. (Phys. Inventory)",ItemJournalLine.Quantity);
-                Record.AppendChild(Line);
-
-                //3
-                Line := DOMxmlin.CreateElement('Line');
-                AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption("Item No."));
-                AddAttribute(Line,'Type',Format(LineType::TEXT));
-                if ItemJournalLine."Variant Code" <> '' then
-                  Line.InnerText := StrSubstNo(Text027,ItemJournalLine."Item No.",ItemJournalLine."Variant Code")
-                else
-                  Line.InnerText := ItemJournalLine."Item No.";
-                Record.AppendChild(Line);
-
-                //4
-                Line := DOMxmlin.CreateElement('Line');
-                AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption("Unit of Measure Code"));
-                AddAttribute(Line,'Type',Format(LineType::TEXT));
-                Line.InnerText := ItemJournalLine."Unit of Measure Code";
-                Record.AppendChild(Line);
-
-                //5
-                Item.Get(ItemJournalLine."Item No.");
-                Line := DOMxmlin.CreateElement('Line');
-                AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption(Description));
-                AddAttribute(Line,'Type',Format(LineType::TEXT));
-                Line.InnerText := Item.Description;
-                Record.AppendChild(Line);
-
-                //6
-                Line := DOMxmlin.CreateElement('Line');
-                AddAttribute(Line,'Descrip','');
-                AddAttribute(Line,'Type',Format(LineType::TEXT));
-                Line.InnerText := '';
-                Record.AppendChild(Line);
-              end else begin
-                Line := DOMxmlin.CreateElement('Line');
-                AddAttribute(Line,'Descrip','Description');
-                AddAttribute(Line,'Indicator',Indicator);
-                Line.InnerText := StrSubstNo(Text015,ItemJournalLine.Quantity,ItemJournalLine."Qty. (Calculated)",ItemJournalLine."Item No.",ItemJournalLine.Description);
-                //Line.InnerText := STRSUBSTNO(Text015,ItemJournalLine."Qty. (Phys. Inventory)",ItemJournalLine.Quantity,ItemJournalLine."Item No.",ItemJournalLine.Description);
-                Record.AppendChild(Line);
-
-                Line := DOMxmlin.CreateElement('Line');
-                AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption("Item No."));
-                AddAttribute(Line,'Type',Format(LineType::TEXT));
-                Line.InnerText := ItemJournalLine."Item No.";
-                Record.AppendChild(Line);
-
-                if (ItemJournalLine."Variant Code" <> '') then begin
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption("Variant Code"));
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  Line.InnerText := ItemJournalLine."Variant Code";
-                  Record.AppendChild(Line);
-                end;
-
-                Line := DOMxmlin.CreateElement('Line');
-                AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption("Bin Code"));
-                AddAttribute(Line,'Type',Format(LineType::TEXT));
-                Line.InnerText := ItemJournalLine."Bin Code";
-                Record.AppendChild(Line);
-              end;
-              Records.AppendChild(Record);
-            end;
-          until ItemJournalLine.Next = 0;
-
-          if ItemJournalLine.FindSet then begin
+            Records := DOMxmlin.CreateElement('Records');
             repeat
-              Record := DOMxmlin.CreateElement('Record');
+                Record := DOMxmlin.CreateElement('Record');
 
-              CurrRecordID := ItemJournalLine.RecordId;
-              TableNo := CurrRecordID.TableNo;
+                CurrRecordID := ItemJournalLine.RecordId;
+                TableNo := CurrRecordID.TableNo;
 
-              if ItemJournalLine."Changed by User" then
-                Indicator := 'ok'
-              else
-                Indicator := 'minus';
+                if ItemJournalLine."Changed by User" then
+                    Indicator := 'ok'
+                else
+                    Indicator := 'minus';
 
-              if Indicator = 'ok' then begin
-                if CSUIHeader."Expand Summary Items" then begin
-                  //1
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption(Description));
-                  AddAttribute(Line,'Indicator',Indicator);
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  AddAttribute(Line,'CollapsItems','FALSE');
-                  Line.InnerText := ItemJournalLine."Bin Code";
-                  Record.AppendChild(Line);
+                if Indicator = 'minus' then begin
+                    if CSUIHeader."Expand Summary Items" then begin
+                        //1
+                        Line := DOMxmlin.CreateElement('Line');
+                        AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption(Description));
+                        AddAttribute(Line, 'Indicator', Indicator);
+                        AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                        AddAttribute(Line, 'CollapsItems', 'FALSE');
+                        Line.InnerText := ItemJournalLine."Bin Code";
+                        Record.AppendChild(Line);
 
-                  //2
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption("Qty. (Calculated)"));
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  Line.InnerText := StrSubstNo(Text030,ItemJournalLine."Qty. (Calculated)",ItemJournalLine."Qty. (Phys. Inventory)",ItemJournalLine.Quantity);
-                  Record.AppendChild(Line);
+                        //2
+                        Line := DOMxmlin.CreateElement('Line');
+                        AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Qty. (Calculated)"));
+                        AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                        Line.InnerText := StrSubstNo(Text030, ItemJournalLine."Qty. (Calculated)", ItemJournalLine."Qty. (Phys. Inventory)", ItemJournalLine.Quantity);
+                        Record.AppendChild(Line);
 
-                  //3
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption("Item No."));
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  if ItemJournalLine."Variant Code" <> '' then
-                    Line.InnerText := StrSubstNo(Text027,ItemJournalLine."Item No.",ItemJournalLine."Variant Code")
-                  else
-                    Line.InnerText := ItemJournalLine."Item No.";
-                  Record.AppendChild(Line);
+                        //3
+                        Line := DOMxmlin.CreateElement('Line');
+                        AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Item No."));
+                        AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                        if ItemJournalLine."Variant Code" <> '' then
+                            Line.InnerText := StrSubstNo(Text027, ItemJournalLine."Item No.", ItemJournalLine."Variant Code")
+                        else
+                            Line.InnerText := ItemJournalLine."Item No.";
+                        Record.AppendChild(Line);
 
-                  //4
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption("Unit of Measure Code"));
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  Line.InnerText := ItemJournalLine."Unit of Measure Code";
-                  Record.AppendChild(Line);
+                        //4
+                        Line := DOMxmlin.CreateElement('Line');
+                        AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Unit of Measure Code"));
+                        AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                        Line.InnerText := ItemJournalLine."Unit of Measure Code";
+                        Record.AppendChild(Line);
 
-                  //5
-                  Item.Get(ItemJournalLine."Item No.");
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption(Description));
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  Line.InnerText := Item.Description;
-                  Record.AppendChild(Line);
+                        //5
+                        Item.Get(ItemJournalLine."Item No.");
+                        Line := DOMxmlin.CreateElement('Line');
+                        AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption(Description));
+                        AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                        Line.InnerText := Item.Description;
+                        Record.AppendChild(Line);
 
-                  //6
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip','');
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  Line.InnerText := '';
-                  Record.AppendChild(Line);
-                end else begin
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip','Description');
-                  AddAttribute(Line,'Indicator',Indicator);
-                  Line.InnerText := StrSubstNo(Text015,ItemJournalLine.Quantity,ItemJournalLine."Qty. (Calculated)",ItemJournalLine."Item No.",ItemJournalLine.Description);
-                  Record.AppendChild(Line);
+                        //6
+                        Line := DOMxmlin.CreateElement('Line');
+                        AddAttribute(Line, 'Descrip', '');
+                        AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                        Line.InnerText := '';
+                        Record.AppendChild(Line);
+                    end else begin
+                        Line := DOMxmlin.CreateElement('Line');
+                        AddAttribute(Line, 'Descrip', 'Description');
+                        AddAttribute(Line, 'Indicator', Indicator);
+                        Line.InnerText := StrSubstNo(Text015, ItemJournalLine.Quantity, ItemJournalLine."Qty. (Calculated)", ItemJournalLine."Item No.", ItemJournalLine.Description);
+                        //Line.InnerText := STRSUBSTNO(Text015,ItemJournalLine."Qty. (Phys. Inventory)",ItemJournalLine.Quantity,ItemJournalLine."Item No.",ItemJournalLine.Description);
+                        Record.AppendChild(Line);
 
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption("Item No."));
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  Line.InnerText := ItemJournalLine."Item No.";
-                  Record.AppendChild(Line);
+                        Line := DOMxmlin.CreateElement('Line');
+                        AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Item No."));
+                        AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                        Line.InnerText := ItemJournalLine."Item No.";
+                        Record.AppendChild(Line);
 
-                  if (ItemJournalLine."Variant Code" <> '') then begin
-                    Line := DOMxmlin.CreateElement('Line');
-                    AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption("Variant Code"));
-                    AddAttribute(Line,'Type',Format(LineType::TEXT));
-                    Line.InnerText := ItemJournalLine."Variant Code";
-                    Record.AppendChild(Line);
-                  end;
+                        if (ItemJournalLine."Variant Code" <> '') then begin
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Variant Code"));
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            Line.InnerText := ItemJournalLine."Variant Code";
+                            Record.AppendChild(Line);
+                        end;
 
-                  Line := DOMxmlin.CreateElement('Line');
-                  AddAttribute(Line,'Descrip',ItemJournalLine.FieldCaption("Bin Code"));
-                  AddAttribute(Line,'Type',Format(LineType::TEXT));
-                  Line.InnerText := ItemJournalLine."Bin Code";
-                  Record.AppendChild(Line);
+                        Line := DOMxmlin.CreateElement('Line');
+                        AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Bin Code"));
+                        AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                        Line.InnerText := ItemJournalLine."Bin Code";
+                        Record.AppendChild(Line);
+                    end;
+                    Records.AppendChild(Record);
                 end;
-                Records.AppendChild(Record);
-              end;
             until ItemJournalLine.Next = 0;
-          end;
-          exit(true);
+
+            if ItemJournalLine.FindSet then begin
+                repeat
+                    Record := DOMxmlin.CreateElement('Record');
+
+                    CurrRecordID := ItemJournalLine.RecordId;
+                    TableNo := CurrRecordID.TableNo;
+
+                    if ItemJournalLine."Changed by User" then
+                        Indicator := 'ok'
+                    else
+                        Indicator := 'minus';
+
+                    if Indicator = 'ok' then begin
+                        if CSUIHeader."Expand Summary Items" then begin
+                            //1
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption(Description));
+                            AddAttribute(Line, 'Indicator', Indicator);
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            AddAttribute(Line, 'CollapsItems', 'FALSE');
+                            Line.InnerText := ItemJournalLine."Bin Code";
+                            Record.AppendChild(Line);
+
+                            //2
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Qty. (Calculated)"));
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            Line.InnerText := StrSubstNo(Text030, ItemJournalLine."Qty. (Calculated)", ItemJournalLine."Qty. (Phys. Inventory)", ItemJournalLine.Quantity);
+                            Record.AppendChild(Line);
+
+                            //3
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Item No."));
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            if ItemJournalLine."Variant Code" <> '' then
+                                Line.InnerText := StrSubstNo(Text027, ItemJournalLine."Item No.", ItemJournalLine."Variant Code")
+                            else
+                                Line.InnerText := ItemJournalLine."Item No.";
+                            Record.AppendChild(Line);
+
+                            //4
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Unit of Measure Code"));
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            Line.InnerText := ItemJournalLine."Unit of Measure Code";
+                            Record.AppendChild(Line);
+
+                            //5
+                            Item.Get(ItemJournalLine."Item No.");
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption(Description));
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            Line.InnerText := Item.Description;
+                            Record.AppendChild(Line);
+
+                            //6
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', '');
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            Line.InnerText := '';
+                            Record.AppendChild(Line);
+                        end else begin
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', 'Description');
+                            AddAttribute(Line, 'Indicator', Indicator);
+                            Line.InnerText := StrSubstNo(Text015, ItemJournalLine.Quantity, ItemJournalLine."Qty. (Calculated)", ItemJournalLine."Item No.", ItemJournalLine.Description);
+                            Record.AppendChild(Line);
+
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Item No."));
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            Line.InnerText := ItemJournalLine."Item No.";
+                            Record.AppendChild(Line);
+
+                            if (ItemJournalLine."Variant Code" <> '') then begin
+                                Line := DOMxmlin.CreateElement('Line');
+                                AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Variant Code"));
+                                AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                                Line.InnerText := ItemJournalLine."Variant Code";
+                                Record.AppendChild(Line);
+                            end;
+
+                            Line := DOMxmlin.CreateElement('Line');
+                            AddAttribute(Line, 'Descrip', ItemJournalLine.FieldCaption("Bin Code"));
+                            AddAttribute(Line, 'Type', Format(LineType::TEXT));
+                            Line.InnerText := ItemJournalLine."Bin Code";
+                            Record.AppendChild(Line);
+                        end;
+                        Records.AppendChild(Record);
+                    end;
+                until ItemJournalLine.Next = 0;
+            end;
+            exit(true);
         end else
-          exit(false);
+            exit(false);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet npNetXmlNode;AttribName: Text[250];AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: DotNet npNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
     begin
-        if XMLDOMMgt.AddAttribute(NewChild,AttribName,AttribValue) > 0 then
-          Error(Text002,AttribName);
+        if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
+            Error(Text002, AttribName);
     end;
 
-    procedure CalculateInventory(BaseItemJournalLine: Record "Item Journal Line";var Item: Record Item;PostingDate: Date;ItemsNotOnInvt: Boolean;InclItemWithNoTrans: Boolean)
+    procedure CalculateInventory(BaseItemJournalLine: Record "Item Journal Line"; var Item: Record Item; PostingDate: Date; ItemsNotOnInvt: Boolean; InclItemWithNoTrans: Boolean)
     var
         CalculateInventory: Report "Calculate Inventory";
         NewItemJournalLine: Record "Item Journal Line";
@@ -793,67 +793,43 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
         NewItemJournalLine.SetRange("Journal Batch Name", BaseItemJournalLine."Journal Batch Name");
         LineNo := 0;
         if NewItemJournalLine.FindLast then
-          LineNo := NewItemJournalLine."Line No." + 1000
+            LineNo := NewItemJournalLine."Line No." + 1000
         else
-          LineNo := 1000;
+            LineNo := 1000;
 
         Clear(BinContent);
-        BinContent.SetRange("Location Code",BaseItemJournalLine."Location Code");
-        BinContent.SetRange("Bin Code",BaseItemJournalLine."Bin Code");
+        BinContent.SetRange("Location Code", BaseItemJournalLine."Location Code");
+        BinContent.SetRange("Bin Code", BaseItemJournalLine."Bin Code");
         if BinContent.FindSet then begin
-          repeat
+            repeat
 
-            Clear(ItemJournalLine);
-            ItemJournalLine.Validate("Journal Template Name",BaseItemJournalLine."Journal Template Name");
-            ItemJournalLine.Validate("Journal Batch Name",BaseItemJournalLine."Journal Batch Name");
-            ItemJournalLine."Line No." := LineNo;
-            ItemJournalLine.Insert(true);
+                Clear(ItemJournalLine);
+                ItemJournalLine.Validate("Journal Template Name", BaseItemJournalLine."Journal Template Name");
+                ItemJournalLine.Validate("Journal Batch Name", BaseItemJournalLine."Journal Batch Name");
+                ItemJournalLine."Line No." := LineNo;
+                ItemJournalLine.Insert(true);
 
-            ItemJournalLine.Validate("Entry Type",ItemJournalLine."Entry Type"::"Positive Adjmt.");
-            ItemJournalLine.Validate("Item No.", BinContent."Item No.");
-            ItemJournalLine.Validate("Variant Code",BinContent."Variant Code");
-            ItemJournalLine.Validate("Location Code",BaseItemJournalLine."Location Code");
-            ItemJournalLine.Validate("Phys. Inventory",true);
-            ItemJournalLine.Validate("Qty. (Phys. Inventory)",BinContent.Quantity);
-            ItemJournalLine.Validate("Bin Code",BinContent."Bin Code");
-            ItemJournalLine."Posting Date" := WorkDate;
-            ItemJournalLine."Document Date" := WorkDate;
-            ItemJournalLine.Validate("External Document No.",'MOBILE');
+                ItemJournalLine.Validate("Entry Type", ItemJournalLine."Entry Type"::"Positive Adjmt.");
+                ItemJournalLine.Validate("Item No.", BinContent."Item No.");
+                ItemJournalLine.Validate("Variant Code", BinContent."Variant Code");
+                ItemJournalLine.Validate("Location Code", BaseItemJournalLine."Location Code");
+                ItemJournalLine.Validate("Phys. Inventory", true);
+                ItemJournalLine.Validate("Qty. (Phys. Inventory)", BinContent.Quantity);
+                ItemJournalLine.Validate("Bin Code", BinContent."Bin Code");
+                ItemJournalLine."Posting Date" := WorkDate;
+                ItemJournalLine."Document Date" := WorkDate;
+                ItemJournalLine.Validate("External Document No.", 'MOBILE');
 
-            ItemJournalLine."Document No." := BaseItemJournalLine."Document No.";
-            ItemJournalLine."Source Code" := BaseItemJournalLine."Source Code";
-            ItemJournalLine."Reason Code" := BaseItemJournalLine."Reason Code";
-            ItemJournalLine."Posting No. Series" := BaseItemJournalLine."Posting No. Series";
-            ItemJournalLine.Modify(true);
-            LineNo += 1000;
+                ItemJournalLine."Document No." := BaseItemJournalLine."Document No.";
+                ItemJournalLine."Source Code" := BaseItemJournalLine."Source Code";
+                ItemJournalLine."Reason Code" := BaseItemJournalLine."Reason Code";
+                ItemJournalLine."Posting No. Series" := BaseItemJournalLine."Posting No. Series";
+                ItemJournalLine.Modify(true);
+                LineNo += 1000;
 
-          until BinContent.Next = 0;
+            until BinContent.Next = 0;
         end else
-          Error(Text029,BaseItemJournalLine."Location Code",BaseItemJournalLine."Bin Code");
-    end;
-
-    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
+            Error(Text029, BaseItemJournalLine."Location Code", BaseItemJournalLine."Bin Code");
     end;
 }
 

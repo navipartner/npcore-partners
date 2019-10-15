@@ -580,29 +580,5 @@ codeunit 6151362 "CS UI Stock Adjustment"
             CSWarehouseActivityHandling."Bin Code" := CSFieldDefaults.Value;
         end;
     end;
-
-    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
 }
 

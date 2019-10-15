@@ -37,7 +37,8 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
-        with Sender do begin
+        with Sender do
+        begin
             if DiscoverAction(
               ActionCode(),
               Text000,
@@ -101,11 +102,11 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         case WorkflowStep of
-            'seatingInput':
+'seatingInput' :
                 OnActionSeatingInput(JSON, FrontEnd);
-            'selectWaiterPad':
+'selectWaiterPad' :
                 OnActionSelectWaiterPad(JSON, FrontEnd);
-            'splitWaiterPad':
+'splitWaiterPad' :
                 OnActionSplitWaiterPad(JSON, FrontEnd);
         end;
 
@@ -245,18 +246,19 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
         NPREWaiterPadLine.SetRange("Waiter Pad No.", CurrNPREWaiterPad."No.");
         if NPREWaiterPadLine.FindSet then
             repeat
-                for i := 1 to NPREWaiterPadLine.Quantity do begin
-                    BillLine := '{ bill_id: 1';
-                    BillLine += ', array_index: ' + Format(ArrayIndex);
-                    BillLine += ', line_no: ' + Format(NPREWaiterPadLine."Line No.");
-                    BillLine += ', item_no: "' + Format(NPREWaiterPadLine."No.") + '"';
-                    BillLine += ', variant_code: "' + NPREWaiterPadLine."Variant Code" + '"';
-                    BillLine += ', description: "' + NPREWaiterPadLine.Description + '"';
-                    BillLine += ', qty: 1 },';
-                    Script += BillLine;
+                for i := 1 to NPREWaiterPadLine.Quantity do
+            begin
+                BillLine := '{ bill_id: 1';
+                BillLine += ', array_index: ' + Format(ArrayIndex);
+                BillLine += ', line_no: ' + Format(NPREWaiterPadLine."Line No.");
+                BillLine += ', item_no: "' + Format(NPREWaiterPadLine."No.") + '"';
+                BillLine += ', variant_code: "' + NPREWaiterPadLine."Variant Code" + '"';
+                BillLine += ', description: "' + NPREWaiterPadLine.Description + '"';
+                BillLine += ', qty: 1 },';
+                Script += BillLine;
 
-                    ArrayIndex += 1;
-                end;
+                ArrayIndex += 1;
+            end;
             until NPREWaiterPadLine.Next = 0;
 
         Script += '];';
@@ -293,15 +295,15 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
         Handled := true;
 
         case Sender of
-            'approve':
-                begin
-                    Approve(EventName, FrontEnd);
-                    FrontEnd.CloseModel(ModelID);
-                end;
-            'cancel', 'close':
-                begin
-                    FrontEnd.CloseModel(ModelID);
-                end;
+'approve' :
+        begin
+            Approve(EventName, FrontEnd);
+            FrontEnd.CloseModel(ModelID);
+        end;
+'cancel', 'close' :
+        begin
+            FrontEnd.CloseModel(ModelID);
+        end;
         end;
     end;
 
@@ -321,7 +323,8 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
         BillLines := BillLines.Parse(JsonText);
         NetConvHelper := BillLines.SelectTokens('$[?(@[''bill_id''] > 1)]');
         BillLineList := NetConvHelper;
-        foreach BillLine in BillLineList do begin
+        foreach BillLine in BillLineList do
+        begin
             FindBill(BillLine, TempNPREWaiterPad, NPREWaiterPad);
             ApproveBillLine(BillLine, NPREWaiterPad);
         end;
@@ -479,12 +482,5 @@ codeunit 6150670 "NPRE POS Action - Split Bill"
         exit(LineNo);
     end;
 
-    trigger Model::OnModelControlEvent(control: DotNet npNetControl; eventName: Text; data: DotNet npNetDictionary_Of_T_U)
-    begin
-    end;
-
-    trigger Model::OnTimer()
-    begin
-    end;
 }
 
