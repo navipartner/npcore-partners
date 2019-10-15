@@ -1,4 +1,4 @@
-pageextension 50066 pageextension50066 extends "Sales Return Order" 
+pageextension 6014465 pageextension6014465 extends "Sales Return Order" 
 {
     // NPR4.10/TS/20150602 CASE 213397 Added field "Sell-to Customer Name 2" ,"Bill-to Name 2","Ship-to Name 2"
     // NPR5.36/THRO/20170908 CASE 285645 Added action PostAndSendPdf2Nav

@@ -22,6 +22,7 @@ codeunit 6151166 "NpGp POS Sales Webservice"
         NpGpPOSSalesInitMgt.InsertPosSalesEntries(TempNpGpPOSSalesEntry,TempNpGpPOSSalesLine,TempNpGpPOSInfoPOSEntry);
     end;
 
+    [Scope('Personalization')]
     procedure GetGlobalSale(referenceNumber: Text;fullSale: Boolean;var npGpPOSEntries: XMLport "NpGp POS Entries")
     var
         TempNpGpPOSSalesEntry: Record "NpGp POS Sales Entry" temporary;

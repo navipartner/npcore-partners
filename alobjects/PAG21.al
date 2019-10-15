@@ -1,4 +1,4 @@
-pageextension 50022 pageextension50022 extends "Customer Card" 
+pageextension 6014421 pageextension6014421 extends "Customer Card" 
 {
     // PN1.00/MH/20140725  NAV-AddOn: PDF2NAV
     //   - Added Field 6014415 "Document Processing" for defining Print action on Sales Doc. Posting (Billing-page).

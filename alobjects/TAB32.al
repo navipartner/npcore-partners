@@ -1,4 +1,4 @@
-tableextension 50032 tableextension50032 extends "Item Ledger Entry" 
+tableextension 6014431 tableextension6014431 extends "Item Ledger Entry" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields NPR7.100.000 6014401..6014401

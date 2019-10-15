@@ -1,4 +1,4 @@
-tableextension 50037 tableextension50037 extends "Invoice Post. Buffer" 
+tableextension 6014436 tableextension6014436 extends "Invoice Post. Buffer" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added fields 6014400..6014401

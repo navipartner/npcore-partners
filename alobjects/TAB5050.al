@@ -1,4 +1,4 @@
-tableextension 50038 tableextension50038 extends Contact 
+tableextension 6014437 tableextension6014437 extends Contact 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields 6014400..6060150
