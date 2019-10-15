@@ -7,7 +7,7 @@ codeunit 6151493 "Raptor API"
     begin
     end;
 
-    procedure GetUserIdOrderHistory(UserIdentifier: Text;var ErrorMsg: Text): Text
+    procedure GetUserIdOrderHistory(UserIdentifier: Text; var ErrorMsg: Text): Text
     var
         RaptorManagement: Codeunit "Raptor Management";
         RaptorSetup: Record "Raptor Setup";
@@ -18,33 +18,33 @@ codeunit 6151493 "Raptor API"
         RequestStatus: Boolean;
         Result: Text;
         RaptorHelperFunctions: Codeunit "Raptor Helper Functions";
-        JArray: DotNet npNetJArray;
-        JObject: DotNet npNetJObject;
+        JArray: DotNet JArray;
+        JObject: DotNet JObject;
     begin
         if not IsEnabled then
-          exit;
+            exit;
 
         if UserIdentifier = '' then
-          exit;
+            exit;
 
         RaptorSetup.Get;
         RaptorSetup.TestField("API Key");
         RaptorSetup.TestField("Base Url");
 
         Baseurl := RaptorSetup."Base Url";
-        Path := '/v1/6184/GetUserIdOrderHistory/100/'+RaptorSetup."API Key"+'?UserIdentifier='+UserIdentifier;
+        Path := '/v1/6184/GetUserIdOrderHistory/100/' + RaptorSetup."API Key" + '?UserIdentifier=' + UserIdentifier;
 
         Parameters := Parameters.Dictionary();
-        Parameters.Add('baseurl',Baseurl);
-        Parameters.Add('restmethod','GET');
-        Parameters.Add('path',Path);
+        Parameters.Add('baseurl', Baseurl);
+        Parameters.Add('restmethod', 'GET');
+        Parameters.Add('path', Path);
 
-        RequestStatus := RaptorManagement.CallRaptorAPI(Parameters,HttpResponseMessage);
+        RequestStatus := RaptorManagement.CallRaptorAPI(Parameters, HttpResponseMessage);
         Result := HttpResponseMessage.Content.ReadAsStringAsync.Result;
 
         if not RequestStatus then begin
-          ErrorMsg := Result;
-          Result := '';
+            ErrorMsg := Result;
+            Result := '';
         end;
 
         exit(Result);
@@ -63,7 +63,7 @@ codeunit 6151493 "Raptor API"
         RaptorSetup: Record "Raptor Setup";
     begin
         if RaptorSetup.Get() then
-          exit(RaptorSetup."Enable Raptor Functions");
+            exit(RaptorSetup."Enable Raptor Functions");
 
         exit(false);
     end;

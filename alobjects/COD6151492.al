@@ -7,54 +7,60 @@ codeunit 6151492 "Raptor Helper Functions"
     begin
     end;
 
-    procedure GetValueAsText(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Text
+    procedure GetValueAsText(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Text
     begin
         ReturnValue := JObject.GetValue(PropertyName).ToString;
     end;
 
-    procedure GetValueAsInteger(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Integer
+    procedure GetValueAsInteger(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Integer
     var
         DotNetInteger: DotNet npNetInt32;
     begin
         ReturnValue := DotNetInteger.Parse(JObject.GetValue(PropertyName).ToString);
     end;
 
-    procedure GetValueAsDecimal(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Decimal
+    procedure GetValueAsDecimal(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Decimal
     var
         DotNetDecimal: DotNet npNetDecimal;
         CultureInfo: DotNet npNetCultureInfo;
     begin
-        ReturnValue := DotNetDecimal.Parse(JObject.GetValue(PropertyName).ToString,CultureInfo.InvariantCulture);
+        ReturnValue := DotNetDecimal.Parse(JObject.GetValue(PropertyName).ToString, CultureInfo.InvariantCulture);
     end;
 
-    procedure GetValueAsDate(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Date
+    procedure GetValueAsDate(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Date
     var
         DotNetDateTime: DotNet npNetDateTime;
         CultureInfo: DotNet npNetCultureInfo;
+        DotNetType: DotNet npNetType;
     begin
-        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(GetDotNetType(DotNetDateTime));
+        DotNetType := GetDotNetType(DotNetDateTime);
+        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(DotNetType);
         ReturnValue := DT2Date(DotNetDateTime);
     end;
 
-    procedure GetValueAsTime(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Time
+    procedure GetValueAsTime(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Time
     var
         DotNetDateTime: DotNet npNetDateTime;
         CultureInfo: DotNet npNetCultureInfo;
+        DotNetType: DotNet npNetType;
     begin
-        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(GetDotNetType(DotNetDateTime));
+        DotNetType := GetDotNetType(DotNetDateTime);
+        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(DotNetType);
         ReturnValue := DT2Time(DotNetDateTime);
     end;
 
-    procedure GetValueAsDateTime(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: DateTime
+    procedure GetValueAsDateTime(JObject: DotNet JObject; PropertyName: Text) ReturnValue: DateTime
     var
         DotNetDateTime: DotNet npNetDateTime;
         CultureInfo: DotNet npNetCultureInfo;
+        DotNetType: DotNet npNetType;
     begin
-        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(GetDotNetType(DotNetDateTime));
+        DotNetType := GetDotNetType(DotNetDateTime);
+        DotNetDateTime := JObject.GetValue(PropertyName).ToObject(DotNetType);
         ReturnValue := DotNetDateTime;
     end;
 
-    procedure GetValueAsBoolean(JObject: DotNet npNetJObject;PropertyName: Text) ReturnValue: Boolean
+    procedure GetValueAsBoolean(JObject: DotNet JObject; PropertyName: Text) ReturnValue: Boolean
     var
         DotNetBoolean: DotNet npNetBoolean;
     begin
@@ -63,10 +69,10 @@ codeunit 6151492 "Raptor Helper Functions"
 
     procedure GetBooleanAsText(BooleanState: Boolean): Text
     begin
-        if(BooleanState) then
-          exit('true')
+        if (BooleanState) then
+            exit('true')
         else
-          exit('false');
+            exit('false');
     end;
 
     procedure GetDateTimeAsText(DateTimeNow: DateTime): Text
@@ -77,29 +83,29 @@ codeunit 6151492 "Raptor Helper Functions"
         exit(DotNetDateTime.ToString('yyyy-MM-dd hh:mm:ss'));
     end;
 
-    procedure RemoveLastIndexOf(TextToTrim: Text;CharToTrim: Text): Text
+    procedure RemoveLastIndexOf(TextToTrim: Text; CharToTrim: Text): Text
     var
         DotNetString: DotNet npNetString;
         Index: Integer;
     begin
         if (TextToTrim = '') or (CharToTrim = '') then
-          exit;
+            exit;
 
         DotNetString := TextToTrim;
         Index := DotNetString.LastIndexOf(CharToTrim);
         if Index > 0 then
-          TextToTrim := DotNetString.Remove(Index,StrLen(CharToTrim));
+            TextToTrim := DotNetString.Remove(Index, StrLen(CharToTrim));
 
         exit(TextToTrim);
     end;
 
     [TryFunction]
-    procedure TryParse(json: Text;var JToken: DotNet npNetJToken)
+    procedure TryParse(json: Text; var JToken: DotNet JToken)
     begin
         JToken := JToken.Parse(json);
     end;
 
-    procedure GetOptionStringValue(OptionInt: Integer;FieldNoInt: Integer;RecordVariant: Variant): Text
+    procedure GetOptionStringValue(OptionInt: Integer; FieldNoInt: Integer; RecordVariant: Variant): Text
     var
         RecRef: RecordRef;
         FldRef: FieldRef;
@@ -108,7 +114,7 @@ codeunit 6151492 "Raptor Helper Functions"
         Separator: DotNet npNetString;
     begin
         if not RecordVariant.IsRecord then
-          exit;
+            exit;
 
         RecRef.GetTable(RecordVariant);
         FldRef := RecRef.Field(FieldNoInt);
@@ -125,7 +131,7 @@ codeunit 6151492 "Raptor Helper Functions"
         Encoding: DotNet npNetEncoding;
     begin
         if base64Value = '' then
-          exit('');
+            exit('');
 
         stringValue := Encoding.UTF8.GetString(Convert.FromBase64String(base64Value));
         exit(stringValue);
@@ -137,7 +143,7 @@ codeunit 6151492 "Raptor Helper Functions"
         Encoding: DotNet npNetEncoding;
     begin
         if stringValue = '' then
-          exit('');
+            exit('');
 
         base64Value := Convert.ToBase64String(Encoding.UTF8.GetBytes(stringValue));
         exit(base64Value);
