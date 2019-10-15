@@ -1,4 +1,4 @@
-pageextension 50002 pageextension50002 extends "User Setup" 
+pageextension 6014401 pageextension6014401 extends "User Setup" 
 {
     // NPR5.38/MHA /20180115  CASE 302240 Added fields 6014405 "Allow Register Switch" and 6014410 "Register Switch Filter"
     // NPR5.46/MMV /20180913  CASE 290734 Removed deprecated fields.

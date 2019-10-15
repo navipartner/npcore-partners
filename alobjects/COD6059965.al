@@ -148,6 +148,7 @@ codeunit 6059965 "MPOS Webservice"
     begin
     end;
 
+    [Scope('Personalization')]
     procedure SetTransactionResponse(json: Text): Boolean
     begin
         if json = '' then
@@ -156,6 +157,7 @@ codeunit 6059965 "MPOS Webservice"
         exit(ParseNetsTransactionJson(json));
     end;
 
+    [Scope('Personalization')]
     procedure SetEODResponse(json: Text): Boolean
     begin
         if json = '' then

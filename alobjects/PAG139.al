@@ -1,4 +1,4 @@
-pageextension 50013 pageextension50013 extends "Posted Purch. Invoice Subform" 
+pageextension 6014412 pageextension6014412 extends "Posted Purch. Invoice Subform" 
 {
     // VRT1.20/JDH /20150304 CASE 201022 Variety Action Added to raise Event
     actions

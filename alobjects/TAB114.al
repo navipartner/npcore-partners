@@ -1,4 +1,4 @@
-tableextension 50008 tableextension50008 extends "Sales Cr.Memo Header" 
+tableextension 6014407 tableextension6014407 extends "Sales Cr.Memo Header" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Field 6014400

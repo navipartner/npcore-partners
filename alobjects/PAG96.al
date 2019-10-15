@@ -1,4 +1,4 @@
-pageextension 50084 pageextension50084 extends "Sales Cr. Memo Subform" 
+pageextension 6014483 pageextension6014483 extends "Sales Cr. Memo Subform" 
 {
     // NPR4.04/JDH /20150427 CASE 212229 Removed references to old Variant solution "Color Size"
     // NPR5.22/TJ  /20160412 CASE 238601 Reworked how to check for Retail Setup read permission

@@ -22,6 +22,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     begin
     end;
 
+    [Scope('Personalization')]
     procedure UpsertPartners(var retail_voucher_partners: XMLport "NpRv Partners")
     var
         TempNpRvPartner: Record "NpRv Partner" temporary;
@@ -75,6 +76,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     begin
     end;
 
+    [Scope('Personalization')]
     procedure CreateVouchers(var vouchers: XMLport "NpRv Global Vouchers")
     var
         NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary;
@@ -160,6 +162,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     begin
     end;
 
+    [Scope('Personalization')]
     procedure ReserveVouchers(var vouchers: XMLport "NpRv Global Vouchers")
     var
         NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary;
@@ -253,6 +256,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     begin
     end;
 
+    [Scope('Personalization')]
     procedure CancelReserveVouchers(var vouchers: XMLport "NpRv Global Vouchers")
     var
         NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary;
@@ -307,6 +311,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     begin
     end;
 
+    [Scope('Personalization')]
     procedure RedeemVouchers(var vouchers: XMLport "NpRv Global Vouchers")
     var
         NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary;
@@ -420,6 +425,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     begin
     end;
 
+    [Scope('Personalization')]
     procedure InvokeRedeemPartnerVouchers(var NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary)
     var
         NpRvPartner: Record "NpRv Partner";
@@ -484,6 +490,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
         //+NPR5.49 [342811]
     end;
 
+    [Scope('Personalization')]
     procedure RedeemPartnerVouchers(var vouchers: XMLport "NpRv Global Vouchers")
     var
         NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary;
@@ -567,6 +574,7 @@ codeunit 6151020 "NpRv Global Voucher Webservice"
     begin
     end;
 
+    [Scope('Personalization')]
     procedure FindVoucher(VoucherTypeFilter: Text;ReferenceNo: Text[30];var Voucher: Record "NpRv Voucher"): Boolean
     var
         VoucherType: Record "NpRv Voucher Type";

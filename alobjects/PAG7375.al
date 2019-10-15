@@ -1,4 +1,4 @@
-pageextension 50073 pageextension50073 extends "Inventory Put-away" 
+pageextension 6014472 pageextension6014472 extends "Inventory Put-away" 
 {
     // NPR5.48/TS  /20181214  CASE 339845 Added Field Assigned User Id
     layout

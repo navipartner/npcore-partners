@@ -1,4 +1,4 @@
-tableextension 50015 tableextension50015 extends "Purch. Cr. Memo Hdr." 
+tableextension 6014414 tableextension6014414 extends "Purch. Cr. Memo Hdr." 
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Field 6014414 "Pay-to E-mail" for defining Recipient when sending E-mail using PDF2NAV.

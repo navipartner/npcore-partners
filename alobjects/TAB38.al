@@ -1,4 +1,4 @@
-tableextension 50035 tableextension50035 extends "Purchase Header" 
+tableextension 6014434 tableextension6014434 extends "Purchase Header" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                           Added Field 6014401
