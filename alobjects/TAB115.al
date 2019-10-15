@@ -1,4 +1,4 @@
-tableextension 50009 tableextension50009 extends "Sales Cr.Memo Line" 
+tableextension 6014408 tableextension6014408 extends "Sales Cr.Memo Line" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields 6014408..6014604

@@ -1,4 +1,4 @@
-pageextension 50005 pageextension50005 extends "Posted Sales Shpt. Subform" 
+pageextension 6014404 pageextension6014404 extends "Posted Sales Shpt. Subform" 
 {
     // VRT1.20/JDH /20150304 CASE 201022 Variety Action Added to raise Event
     actions

@@ -4,6 +4,7 @@ table 6150640 "POS Info"
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj -field 21
     // NPR5.51/ALPO/20190826 CASE 364558 Define inheritable POS info codes (will be copied from Sales POS header to new lines)
     //                                   Define accessible from front-end POS info codes
+    // NPR5.51/ALPO/20190912 CASE 368351 Apply red color to POS sale lines only for selected POS info codes
 
     Caption = 'POS Info';
     DrillDownPageID = "POS Info List";
@@ -69,6 +70,11 @@ table 6150640 "POS Info"
         field(60;"Available in Front-End";Boolean)
         {
             Caption = 'Available in Front-End';
+            Description = 'NPR5.51';
+        }
+        field(70;"Set POS Sale Line Color to Red";Boolean)
+        {
+            Caption = 'Set POS Sale Line Color to Red';
             Description = 'NPR5.51';
         }
     }

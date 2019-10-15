@@ -1,4 +1,4 @@
-pageextension 50010 pageextension50010 extends "Posted Purchase Receipt" 
+pageextension 6014409 pageextension6014409 extends "Posted Purchase Receipt" 
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Action Items: EmailLog and SendAsPDF.

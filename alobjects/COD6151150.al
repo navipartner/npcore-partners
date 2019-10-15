@@ -252,6 +252,7 @@ codeunit 6151150 "M2 Account WebService"
         end;
     end;
 
+    [Scope('Personalization')]
     procedure GetExtendedAccountDetails(var GetExtendedAccount: XMLport "M2 Get Extended Account")
     var
         ContactNo: Code[20];
@@ -277,6 +278,7 @@ codeunit 6151150 "M2 Account WebService"
         //+NPR5.51 [350001]
     end;
 
+    [Scope('Personalization')]
     procedure ListAllMailGroups(var ListMailingGroups: XMLport "M2 List Mailing Groups")
     begin
 
@@ -285,6 +287,7 @@ codeunit 6151150 "M2 Account WebService"
         //+NPR5.51 [362020]
     end;
 
+    [Scope('Personalization')]
     procedure ListMailGroupsForAccount(ContactNo: Code[20];var ListMailingGroups: XMLport "M2 List Mailing Groups")
     begin
 
@@ -296,6 +299,7 @@ codeunit 6151150 "M2 Account WebService"
         //+NPR5.51 [362020]
     end;
 
+    [Scope('Personalization')]
     procedure AddAccountToMailGroup(ContactNo: Code[20];MailGroupCode: Code[10];var ListMailingGroups: XMLport "M2 List Mailing Groups")
     var
         ContactMailingGroup: Record "Contact Mailing Group";
@@ -316,6 +320,7 @@ codeunit 6151150 "M2 Account WebService"
         //+NPR5.51 [362020]
     end;
 
+    [Scope('Personalization')]
     procedure RemoveAccountFromMailGroup(ContactNo: Code[20];MailGroupCode: Code[10];var ListMailingGroups: XMLport "M2 List Mailing Groups")
     var
         ContactMailingGroup: Record "Contact Mailing Group";

@@ -1,4 +1,4 @@
-pageextension 50038 pageextension50038 extends "Sales Invoice" 
+pageextension 6014437 pageextension6014437 extends "Sales Invoice" 
 {
     // NPR5.23/JDH /20160513 CASE 240916 Deleted old VariaX Matrix Action
     // NPR5.23/TS/20160603 CASE 2430085 Added field Posting Description

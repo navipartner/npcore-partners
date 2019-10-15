@@ -1,4 +1,4 @@
-pageextension 50007 pageextension50007 extends "Posted Sales Invoice Subform" 
+pageextension 6014406 pageextension6014406 extends "Posted Sales Invoice Subform" 
 {
     // VRT1.20/JDH /20150304 CASE 201022 Variety Action Added to raise Event
     actions
