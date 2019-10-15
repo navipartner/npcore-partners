@@ -1,4 +1,4 @@
-pageextension 50036 pageextension50036 extends "Sales Order" 
+pageextension 6014435 pageextension6014435 extends "Sales Order" 
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //                     - Added Action Items: EmailLog and SendAsPDF

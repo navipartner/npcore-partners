@@ -1,4 +1,4 @@
-tableextension 50033 tableextension50033 extends "Sales Header" 
+tableextension 6014432 tableextension6014432 extends "Sales Header" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                         Added fields : 6014400..6060009

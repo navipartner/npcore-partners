@@ -1,4 +1,4 @@
-tableextension 50040 tableextension50040 extends "CRM Account" 
+tableextension 6014439 tableextension6014439 extends "CRM Account" 
 {
     // Dynamics CRM Version: 7.1.0.2040
     // NPR5.36/TS  /20170912  CASE 277715  Adding new fields for CRM Integration

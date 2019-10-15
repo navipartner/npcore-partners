@@ -1,4 +1,4 @@
-pageextension 50021 pageextension50021 extends "G/L Account List" 
+pageextension 6014420 pageextension6014420 extends "G/L Account List" 
 {
     layout
     {

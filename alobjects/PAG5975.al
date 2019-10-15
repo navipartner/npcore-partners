@@ -1,4 +1,4 @@
-pageextension 50064 pageextension50064 extends "Posted Service Shipment" 
+pageextension 6014463 pageextension6014463 extends "Posted Service Shipment" 
 {
     // PN1.03/MH/20140814  NAV-AddOn: PDF2NAV
     //   - Added Menu Items on Function-button: "E-mail Log" and "Send as PDF".

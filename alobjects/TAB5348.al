@@ -1,4 +1,4 @@
-tableextension 50042 tableextension50042 extends "CRM Product" 
+tableextension 6014441 tableextension6014441 extends "CRM Product" 
 {
     // Dynamics CRM Version: 7.1.0.2040
     // NPR5.43/ZESO/20180618  CASE 313117  Adding new fields for CRM Integration WARNING: Dont remove it (Used in Mapping table Integration Field Mapping - Is not used directly in code anywhere)

@@ -1,4 +1,4 @@
-tableextension 50039 tableextension50039 extends "Marketing Setup" 
+tableextension 6014438 tableextension6014438 extends "Marketing Setup" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added Fields   6014400..6014410
