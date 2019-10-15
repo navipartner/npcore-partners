@@ -2,7 +2,7 @@
   "id": "992c2309-cca4-43cb-9e41-911f482ec088",
   "name": "NP Retail",
   "publisher": "NaviPartner",
-  "version": "5.51.0.0",
+  "version": "5.51.1.0",
   "brief": "",
   "description": "",
   "privacyStatement": "",
@@ -16,16 +16,8 @@
   "application": "14.0.0.0",
   "idRanges": [
     {
-      "from": 50000,
-      "to": 51000
-    },
-    {
       "from": 6014400,
       "to": 6900000
-    },
-    {
-      "from": 70000000,
-      "to": 79999999
     }
   ],
   "contextSensitiveHelpUrl": "https://ALProject14.com/help/",
