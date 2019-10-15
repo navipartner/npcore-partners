@@ -11,47 +11,47 @@
       <rd:DataSourceID>e564a040-0934-4855-91c2-d9adc2eeb71c</rd:DataSourceID>
     </DataSource>
   </DataSources>
-        <Field Name="TotalVAT_">
-          <DataField>TotalVAT_</DataField>
-        </Field>
-        <Field Name="TotalVAT_Format">
-          <DataField>TotalVAT_Format</DataField>
-        </Field>
-        <Field Name="LineDiscountPctNew">
-          <DataField>LineDiscountPctNew</DataField>
-        </Field>
-        <Field Name="LineDiscountAmount">
-          <DataField>LineDiscountAmount</DataField>
-        </Field>
-        <Field Name="UnitPriceExclDiscountLine">
-          <DataField>UnitPriceExclDiscountLine</DataField>
-        </Field>
-        <Field Name="BTWPerc">
-          <DataField>BTWPerc</DataField>
-        </Field>
-        <Field Name="BTWAmount">
-          <DataField>BTWAmount</DataField>
-        </Field>
-        <Field Name="BTWAmountFormat">
-          <DataField>BTWAmountFormat</DataField>
-        </Field>
-        <Field Name="BTWExcl">
-          <DataField>BTWExcl</DataField>
-        </Field>
-        <Field Name="BTWExclFormat">
-          <DataField>BTWExclFormat</DataField>
-        </Field>
-        <Field Name="BTWInc">
-          <DataField>BTWInc</DataField>
-        </Field>
-        <Field Name="BTWIncFormat">
-          <DataField>BTWIncFormat</DataField>
-        </Field>
-      <rd:DataSetInfo>
-        <rd:DataSetName>DataSet</rd:DataSetName>
-        <rd:SchemaPath>Report.xsd</rd:SchemaPath>
-        <rd:TableName>Result</rd:TableName>
-      </rd:DataSetInfo>
+  <Field Name="TotalVAT_">
+    <DataField>TotalVAT_</DataField>
+  </Field>
+  <Field Name="TotalVAT_Format">
+    <DataField>TotalVAT_Format</DataField>
+  </Field>
+  <Field Name="LineDiscountPctNew">
+    <DataField>LineDiscountPctNew</DataField>
+  </Field>
+  <Field Name="LineDiscountAmount">
+    <DataField>LineDiscountAmount</DataField>
+  </Field>
+  <Field Name="UnitPriceExclDiscountLine">
+    <DataField>UnitPriceExclDiscountLine</DataField>
+  </Field>
+  <Field Name="BTWPerc">
+    <DataField>BTWPerc</DataField>
+  </Field>
+  <Field Name="BTWAmount">
+    <DataField>BTWAmount</DataField>
+  </Field>
+  <Field Name="BTWAmountFormat">
+    <DataField>BTWAmountFormat</DataField>
+  </Field>
+  <Field Name="BTWExcl">
+    <DataField>BTWExcl</DataField>
+  </Field>
+  <Field Name="BTWExclFormat">
+    <DataField>BTWExclFormat</DataField>
+  </Field>
+  <Field Name="BTWInc">
+    <DataField>BTWInc</DataField>
+  </Field>
+  <Field Name="BTWIncFormat">
+    <DataField>BTWIncFormat</DataField>
+  </Field>
+  <rd:DataSetInfo>
+    <rd:DataSetName>DataSet</rd:DataSetName>
+    <rd:SchemaPath>Report.xsd</rd:SchemaPath>
+    <rd:TableName>Result</rd:TableName>
+  </rd:DataSetInfo>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -10827,6 +10827,12 @@ End Function
         <Field Name="ContactPostCode">
           <DataField>ContactPostCode</DataField>
         </Field>
+        <Field Name="TotalVAT_">
+          <DataField>TotalVAT_</DataField>
+        </Field>
+        <Field Name="TotalVAT_Format">
+          <DataField>TotalVAT_Format</DataField>
+        </Field>
         <Field Name="LineNo_AuditRollSale">
           <DataField>LineNo_AuditRollSale</DataField>
         </Field>
@@ -10851,11 +10857,17 @@ End Function
         <Field Name="ItemNo">
           <DataField>ItemNo</DataField>
         </Field>
+        <Field Name="LineDiscountPctNew">
+          <DataField>LineDiscountPctNew</DataField>
+        </Field>
         <Field Name="LineDiscountPct">
           <DataField>LineDiscountPct</DataField>
         </Field>
         <Field Name="LineDiscountPctFormat">
           <DataField>LineDiscountPctFormat</DataField>
+        </Field>
+        <Field Name="LineDiscountAmount">
+          <DataField>LineDiscountAmount</DataField>
         </Field>
         <Field Name="QuantityAmountLine">
           <DataField>QuantityAmountLine</DataField>
@@ -10880,6 +10892,9 @@ End Function
         </Field>
         <Field Name="VariantDesc">
           <DataField>VariantDesc</DataField>
+        </Field>
+        <Field Name="UnitPriceExclDiscountLine">
+          <DataField>UnitPriceExclDiscountLine</DataField>
         </Field>
         <Field Name="UnitPriceInlcDiscountLine">
           <DataField>UnitPriceInlcDiscountLine</DataField>
@@ -10913,6 +10928,27 @@ End Function
         </Field>
         <Field Name="DescriptionPaymentLine">
           <DataField>DescriptionPaymentLine</DataField>
+        </Field>
+        <Field Name="BTWPerc">
+          <DataField>BTWPerc</DataField>
+        </Field>
+        <Field Name="BTWAmount">
+          <DataField>BTWAmount</DataField>
+        </Field>
+        <Field Name="BTWAmountFormat">
+          <DataField>BTWAmountFormat</DataField>
+        </Field>
+        <Field Name="BTWExcl">
+          <DataField>BTWExcl</DataField>
+        </Field>
+        <Field Name="BTWExclFormat">
+          <DataField>BTWExclFormat</DataField>
+        </Field>
+        <Field Name="BTWInc">
+          <DataField>BTWInc</DataField>
+        </Field>
+        <Field Name="BTWIncFormat">
+          <DataField>BTWIncFormat</DataField>
         </Field>
         <Field Name="Number_Integer">
           <DataField>Number_Integer</DataField>
