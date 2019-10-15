@@ -38,8 +38,9 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
         InitState(EftTransactionRequest);
 
         case EftTransactionRequest."Processing Type" of
-          EftTransactionRequest."Processing Type"::REFUND,
-          EftTransactionRequest."Processing Type"::PAYMENT : StartPaymentTransaction(EftTransactionRequest); //Via async dialog & background session
+            EftTransactionRequest."Processing Type"::REFUND,
+          EftTransactionRequest."Processing Type"::PAYMENT:
+                StartPaymentTransaction(EftTransactionRequest); //Via async dialog & background session
         end;
     end;
 
@@ -67,13 +68,13 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
         EFTISMPBaxiTrxDialog: Codeunit "EFT ISMP Baxi Trx Dialog";
     begin
         if not POSSession.IsActiveSession(POSFrontEnd) then
-          Error(ERROR_SESSION, IntegrationType());
+            Error(ERROR_SESSION, IntegrationType());
 
         EntryNo := EftTransactionRequest."Entry No.";
         EFTISMPBaxiIntegration.InitializeGlobals(EftTransactionRequest."POS Payment Type Code", EftTransactionRequest."Register No.");
         if not EFTISMPBaxiIntegration.PaymentStart(EftTransactionRequest) then begin
-          HandleProtocolError(POSFrontEnd);
-          exit;
+            HandleProtocolError(POSFrontEnd);
+            exit;
         end;
 
         //EFTISMPBaxiTrxDialog.ShowTransactionDialog(EftTransactionRequest, POSFrontEnd);
@@ -92,7 +93,7 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
         EFTTransactionRequest.Get(EntryNo);
         EFTTransactionRequest."NST Error" := CopyStr(ErrorText, 1, MaxStrLen(EFTTransactionRequest."NST Error"));
         if not IsNullGuid(ActiveModelID) then
-          FrontEnd.CloseModel(ActiveModelID);
+            FrontEnd.CloseModel(ActiveModelID);
 
         OnAfterProtocolResponse(EFTTransactionRequest);
         Message(ErrorText);
@@ -113,87 +114,87 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
     local procedure Css(): Text
     begin
         exit(
-        '.adyen-dialog {'+
+        '.adyen-dialog {' +
         '  max-width: 17.5em;' +
         '  max-height: 20em;' +
-        '  width: 70vw;'+
-        '  height: 80vh;'+
-        '  background: linear-gradient(#f4f4f4, #dedede);'+
-        ' -webkit-box-shadow: 0px 0px 12px 2px rgba(143,143,143,1);'+
-        ' -moz-box-shadow: 0px 0px 12px 2px rgba(143,143,143,1);'+
-        '  box-shadow: 0px 0px 12px 2px rgba(143,143,143,1);'+
-        '  display: -webkit-box;'+
-        '  display: -moz-box;'+
-        '  display: -ms-flexbox;'+
-        '  display: -webkit-flex;'+
-        '  display: flex;'+
-        '  flex-flow: column wrap;'+
-        '  justify-content: space-around;'+
+        '  width: 70vw;' +
+        '  height: 80vh;' +
+        '  background: linear-gradient(#f4f4f4, #dedede);' +
+        ' -webkit-box-shadow: 0px 0px 12px 2px rgba(143,143,143,1);' +
+        ' -moz-box-shadow: 0px 0px 12px 2px rgba(143,143,143,1);' +
+        '  box-shadow: 0px 0px 12px 2px rgba(143,143,143,1);' +
+        '  display: -webkit-box;' +
+        '  display: -moz-box;' +
+        '  display: -ms-flexbox;' +
+        '  display: -webkit-flex;' +
+        '  display: flex;' +
+        '  flex-flow: column wrap;' +
+        '  justify-content: space-around;' +
         '  align-items: center;' +
-        '}'+
-        '.adyen-dialog-item {  '+
-        '  margin: auto;  '+
-        '  font-weight: bold;  '+
+        '}' +
+        '.adyen-dialog-item {  ' +
+        '  margin: auto;  ' +
+        '  font-weight: bold;  ' +
         '  font-family: Helvetica, Verdana, Arial, sans-serif;' +
-        '  text-align: center;'+
-        '}'+
-        '#adyen-caption { '+
-        '  margin-bottom: 0.2em;  '+
-        '  font-size: 1em;'+
+        '  text-align: center;' +
+        '}' +
+        '#adyen-caption { ' +
+        '  margin-bottom: 0.2em;  ' +
+        '  font-size: 1em;' +
         '  align-self: flex-start;' +
-        '}'+
-        '#adyen-amount { '+
-        '  margin-top: 0.2em;  '+
-        '  margin-bottom: 1em;  '+
-        '  font-size: 2em;'+
+        '}' +
+        '#adyen-amount { ' +
+        '  margin-top: 0.2em;  ' +
+        '  margin-bottom: 1em;  ' +
+        '  font-size: 2em;' +
         '  align-self: flex-start;' +
-        '}'+
-        '#adyen-status { '+
-        '  font-size: 1em;'+
-        '}'+
-        '#adyen-abort { '+
-        '  font-size: 1em;'+
-        '  background: grey;'+
-        '  border: none;'+
-        '  line-height: 2.5em;'+
+        '}' +
+        '#adyen-status { ' +
+        '  font-size: 1em;' +
+        '}' +
+        '#adyen-abort { ' +
+        '  font-size: 1em;' +
+        '  background: grey;' +
+        '  border: none;' +
+        '  line-height: 2.5em;' +
         '  cursor: pointer;' +
-        '  width: 80%;'+
+        '  width: 80%;' +
         '  align-self: flex-end;' +
         '}' +
-        '#adyen-spinner {'+
-        '  display: inline-block;'+
-        '  position: relative;'+
-        '  width: 64px;'+
-        '  height: 64px;'+
-        '}'+
-        '#adyen-spinner div {'+
-        '  box-sizing: border-box;'+
-        '  display: block;'+
-        '  position: absolute;'+
-        '  width: 51px;'+
-        '  height: 51px;'+
-        '  margin: 6px;'+
-        '  border: 6px solid #000000;'+
-        '  border-radius: 50%;'+
-        '  animation: adyen-spinner 1.6s cubic-bezier(0.5, 0, 0.5, 1) infinite;'+
-        '  border-color: #000000 transparent transparent transparent;'+
-        '}'+
-        '#adyen-spinner div:nth-child(1) {'+
-        '  animation-delay: -0.45s;'+
-        '}'+
-        '#adyen-spinner div:nth-child(2) {'+
-        '  animation-delay: -0.3s;'+
-        '}'+
-        '#adyen-spinner div:nth-child(3) {'+
-        '  animation-delay: -0.15s;'+
-        '}'+
-        '@keyframes adyen-spinner {'+
-        '  0% {'+
-        '    transform: rotate(0deg);'+
-        '  }'+
-        '  100% {'+
-        '    transform: rotate(360deg);'+
-        '  }'+
+        '#adyen-spinner {' +
+        '  display: inline-block;' +
+        '  position: relative;' +
+        '  width: 64px;' +
+        '  height: 64px;' +
+        '}' +
+        '#adyen-spinner div {' +
+        '  box-sizing: border-box;' +
+        '  display: block;' +
+        '  position: absolute;' +
+        '  width: 51px;' +
+        '  height: 51px;' +
+        '  margin: 6px;' +
+        '  border: 6px solid #000000;' +
+        '  border-radius: 50%;' +
+        '  animation: adyen-spinner 1.6s cubic-bezier(0.5, 0, 0.5, 1) infinite;' +
+        '  border-color: #000000 transparent transparent transparent;' +
+        '}' +
+        '#adyen-spinner div:nth-child(1) {' +
+        '  animation-delay: -0.45s;' +
+        '}' +
+        '#adyen-spinner div:nth-child(2) {' +
+        '  animation-delay: -0.3s;' +
+        '}' +
+        '#adyen-spinner div:nth-child(3) {' +
+        '  animation-delay: -0.15s;' +
+        '}' +
+        '@keyframes adyen-spinner {' +
+        '  0% {' +
+        '    transform: rotate(0deg);' +
+        '  }' +
+        '  100% {' +
+        '    transform: rotate(360deg);' +
+        '  }' +
         '}');
     end;
 
@@ -205,30 +206,30 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
         DialogAbortButton: DotNet npNetLabel;
         DialogAmount: DotNet npNetLabel;
     begin
-        Dialog := Factory.Panel().Set('Class','adyen-dialog');
+        Dialog := Factory.Panel().Set('Class', 'adyen-dialog');
         Dialog.FontSize('');
 
-        DialogCaption := Factory.Label(GetCaption(EFTTransactionRequest)).Set('Class','adyen-dialog-item').Set('Id','adyen-caption');
+        DialogCaption := Factory.Label(GetCaption(EFTTransactionRequest)).Set('Class', 'adyen-dialog-item').Set('Id', 'adyen-caption');
         DialogCaption.FontSize('');
 
-        DialogAmount := Factory.Label(Format(ModelAmount,0,'<Precision,2:2><Standard Format,2>')).Set('Class','adyen-dialog-item').Set('Id','adyen-amount');
+        DialogAmount := Factory.Label(Format(ModelAmount, 0, '<Precision,2:2><Standard Format,2>')).Set('Class', 'adyen-dialog-item').Set('Id', 'adyen-amount');
         DialogAmount.FontSize('');
 
-        DialogAbortButton := Factory.Label(TXT_ABORT).Set('Class','adyen-dialog-item').Set('Id','adyen-abort').SubscribeEvent('click');
+        DialogAbortButton := Factory.Label(TXT_ABORT).Set('Class', 'adyen-dialog-item').Set('Id', 'adyen-abort').SubscribeEvent('click');
         DialogAbortButton.FontSize('');
 
         Dialog.Append(
           DialogCaption,
           DialogAmount,
-          Factory.Panel().Set('Class','adyen-dialog-item').Set('Id','adyen-spinner')
+          Factory.Panel().Set('Class', 'adyen-dialog-item').Set('Id', 'adyen-spinner')
             .Append(
-              Factory.Panel().Set('Id','adyen-spinner-inner1'),
-              Factory.Panel().Set('Id','adyen-spinner-inner2'),
-              Factory.Panel().Set('Id','adyen-spinner-inner3'),
-              Factory.Panel().Set('Id','adyen-spinner-inner4')
+              Factory.Panel().Set('Id', 'adyen-spinner-inner1'),
+              Factory.Panel().Set('Id', 'adyen-spinner-inner2'),
+              Factory.Panel().Set('Id', 'adyen-spinner-inner3'),
+              Factory.Panel().Set('Id', 'adyen-spinner-inner4')
             ),
           DialogAbortButton,
-          Factory.Label().Set('Visible',false).Set('Id','adyen-timer').SubscribeEvent('click')
+          Factory.Label().Set('Visible', false).Set('Id', 'adyen-timer').SubscribeEvent('click')
         );
 
         Model.Append(Dialog);
@@ -240,7 +241,7 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
     begin
         JSScript := 'setInterval(function() { $("#adyen-timer").click(); }, 1000);';
         //JSScript += 'mpos.setWindowsId(window.name);';
-        JSScript += 'mpos.startEFTTransaction('+PaymentRequest(EFTTransactionRequest)+');';
+        JSScript += 'mpos.startEFTTransaction(' + PaymentRequest(EFTTransactionRequest) + ');';
         exit(JSScript);
 
         //EXIT('setInterval(function() { $("#adyen-timer").click(); }, 250);');
@@ -251,10 +252,10 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
         OriginalEFTTransactionRequest: Record "EFT Transaction Request";
     begin
         if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::AUXILIARY then
-          if EFTTransactionRequest."Auxiliary Operation ID" = 2 then begin
-            OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
-            exit(Format(OriginalEFTTransactionRequest."Processing Type"));
-          end;
+            if EFTTransactionRequest."Auxiliary Operation ID" = 2 then begin
+                OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
+                exit(Format(OriginalEFTTransactionRequest."Processing Type"));
+            end;
 
         exit(Format(EFTTransactionRequest."Processing Type"));
     end;
@@ -264,16 +265,16 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
         OriginalEFTTransactionRequest: Record "EFT Transaction Request";
     begin
         if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::AUXILIARY then
-          if EFTTransactionRequest."Auxiliary Operation ID" = 2 then begin
-            OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
-            exit(OriginalEFTTransactionRequest."Amount Input");
-          end;
+            if EFTTransactionRequest."Auxiliary Operation ID" = 2 then begin
+                OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
+                exit(OriginalEFTTransactionRequest."Amount Input");
+            end;
 
         exit(EFTTransactionRequest."Amount Input");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnProtocolUIResponse', '', false, false)]
-    local procedure OnProtocolUIResponse(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";ModelID: Guid;Sender: Text;EventName: Text;var Handled: Boolean)
+    local procedure OnProtocolUIResponse(POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
     var
         WebClientDependency: Record "Web Client Dependency";
         ModelIDVar: Variant;
@@ -281,15 +282,17 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
         EFTInterface: Codeunit "EFT Interface";
     begin
         if ModelID <> ActiveModelID then
-          exit;
+            exit;
         Handled := true;
 
         if TransactionDone then //The event is late, we have already acted on a result.
-          exit;
+            exit;
 
         case Sender of
-          'adyen-abort' : RequestAbort(FrontEnd);
-          'adyen-timer' : CheckResponse(POSSession, FrontEnd);
+            'adyen-abort':
+                RequestAbort(FrontEnd);
+            'adyen-timer':
+                CheckResponse(POSSession, FrontEnd);
         end;
     end;
 
@@ -299,26 +302,26 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
         EFTISMPBaxiIntegration: Codeunit "EFT ISMP Baxi Integration";
     begin
         if (Ticks < 3) then
-          exit;
+            exit;
 
         if not CloseOnIdle then begin
-          Model.AddScript('mpos.abortTransaction(window.name);');
-          FrontEnd.UpdateModel(Model, ActiveModelID);
+            Model.AddScript('mpos.abortTransaction(window.name);');
+            FrontEnd.UpdateModel(Model, ActiveModelID);
         end;
 
         EFTTransactionRequest.Get(EntryNo);
 
         if (CloseOnIdle and (EFTTransactionRequest."Result Code" = 2)) or (((Ticks - TickAbortRequested) > 5) and (AbortAttempts > 3)) then begin
-          TransactionDone := true;
-          EFTTransactionRequest."External Result Received" := true;
-          FrontEnd.CloseModel(ActiveModelID);
-          Clear(ActiveModelID);
-          OnAfterProtocolResponse(EFTTransactionRequest);
+            TransactionDone := true;
+            EFTTransactionRequest."External Result Received" := true;
+            FrontEnd.CloseModel(ActiveModelID);
+            Clear(ActiveModelID);
+            OnAfterProtocolResponse(EFTTransactionRequest);
         end else begin
-          if not AbortRequested then begin
-            TickAbortRequested := Ticks;
-            AbortRequested := true;
-          end;
+            if not AbortRequested then begin
+                TickAbortRequested := Ticks;
+                AbortRequested := true;
+            end;
         end;
 
         //Add timeout code
@@ -328,7 +331,7 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
         AbortAttempts += 1;
     end;
 
-    local procedure CheckResponse(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure CheckResponse(POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         EFTISMPBaxiIntegration: Codeunit "EFT ISMP Baxi Integration";
         EFTTransactionRequest: Record "EFT Transaction Request";
@@ -337,35 +340,35 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
 
         EFTTransactionRequest.Get(EntryNo);
 
-        if not EFTISMPBaxiIntegration.GetPaymentStatus(EFTTransactionRequest,TransactionNo) then begin
-          HandleProtocolError(FrontEnd);
-          exit;
+        if not EFTISMPBaxiIntegration.GetPaymentStatus(EFTTransactionRequest, TransactionNo) then begin
+            HandleProtocolError(FrontEnd);
+            exit;
         end;
 
         if (EFTTransactionRequest.Successful) or (EFTTransactionRequest."Result Code" > 0) then begin
-          TransactionDone := true;
-          EFTTransactionRequest."External Result Received" := true;
-          FrontEnd.CloseModel(ActiveModelID);
-          Clear(ActiveModelID);
-          if EFTTransactionRequest."Result Code" > 1 then
-            ErrorText := EFTTransactionRequest."Result Description";
-          OnAfterProtocolResponse(EFTTransactionRequest);
-          if ErrorText <> '' then
-            Message(ErrorText);
+            TransactionDone := true;
+            EFTTransactionRequest."External Result Received" := true;
+            FrontEnd.CloseModel(ActiveModelID);
+            Clear(ActiveModelID);
+            if EFTTransactionRequest."Result Code" > 1 then
+                ErrorText := EFTTransactionRequest."Result Description";
+            OnAfterProtocolResponse(EFTTransactionRequest);
+            if ErrorText <> '' then
+                Message(ErrorText);
         end else begin
-          //Add status lable
-          //PaymentStatus := EFTTransactionRequest."Result Description";
-          //Model.GetControlById('imgStatus').Set('Source',WebClientDependency.GetDataUri(STRSUBSTNO('MBP-%1',EFTTransactionRequest."Result Code")));
-          //Model.GetControlById('lb-status').Set('Caption',PaymentStatus);
-          //FrontEnd.UpdateModel(Model, ActiveModelID);
+            //Add status lable
+            //PaymentStatus := EFTTransactionRequest."Result Description";
+            //Model.GetControlById('imgStatus').Set('Source',WebClientDependency.GetDataUri(STRSUBSTNO('MBP-%1',EFTTransactionRequest."Result Code")));
+            //Model.GetControlById('lb-status').Set('Caption',PaymentStatus);
+            //FrontEnd.UpdateModel(Model, ActiveModelID);
         end;
 
         if Ticks > 80 then begin
-          if not TimeoutRequested then begin
-            Model.AddScript('mpos.abortTransaction(window.name);');
-            FrontEnd.UpdateModel(Model, ActiveModelID);
-            TimeoutRequested := true;
-          end;
+            if not TimeoutRequested then begin
+                Model.AddScript('mpos.abortTransaction(window.name);');
+                FrontEnd.UpdateModel(Model, ActiveModelID);
+                TimeoutRequested := true;
+            end;
         end;
     end;
 
@@ -389,28 +392,30 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
     begin
         MPOSAppSetup.Get(EFTTransactionRequest."Register No.");
 
-        MPOSAppSetup.TestField(Enable,true);
+        MPOSAppSetup.TestField(Enable, true);
         MPOSAppSetup.TestField("Payment Gateway");
 
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
         MerchantID := GetMerchantID(EFTSetup);
 
         if MPOSAppSetup."Handle EFT Print in NAV" then
-          InAppPrinting := 0
+            InAppPrinting := 0
         else
-          InAppPrinting := 1;
+            InAppPrinting := 1;
 
         case EFTTransactionRequest."Processing Type" of
-          EFTTransactionRequest."Processing Type"::REFUND : begin
-              BaxiAmount := EFTTransactionRequest."Amount Input" * -1;
-              BaxiAmountInCents := BaxiAmount * 100;
-              BaxiTransTypeId := 49;
-            end;
-          EFTTransactionRequest."Processing Type"::PAYMENT : begin
-              BaxiAmount := EFTTransactionRequest."Amount Input";
-              BaxiAmountInCents := BaxiAmount * 100;
-              BaxiTransTypeId := 48;
-            end;
+            EFTTransactionRequest."Processing Type"::REFUND:
+                begin
+                    BaxiAmount := EFTTransactionRequest."Amount Input" * -1;
+                    BaxiAmountInCents := BaxiAmount * 100;
+                    BaxiTransTypeId := 49;
+                end;
+            EFTTransactionRequest."Processing Type"::PAYMENT:
+                begin
+                    BaxiAmount := EFTTransactionRequest."Amount Input";
+                    BaxiAmountInCents := BaxiAmount * 100;
+                    BaxiTransTypeId := 48;
+                end;
         end;
 
         BaxiCurrency := GetCurrencyCode(EFTTransactionRequest."Currency Code");
@@ -425,8 +430,10 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
         MPOSNetsTransactions."Merchant Reference" := EFTTransactionRequest."Reference Number Input";
 
         case EFTTransactionRequest."Processing Type" of
-          EFTTransactionRequest."Processing Type"::REFUND : MPOSNetsTransactions."Transaction Type" := MPOSNetsTransactions."Transaction Type"::REFUND;
-          EFTTransactionRequest."Processing Type"::PAYMENT : MPOSNetsTransactions."Transaction Type" := MPOSNetsTransactions."Transaction Type"::PAY;
+            EFTTransactionRequest."Processing Type"::REFUND:
+                MPOSNetsTransactions."Transaction Type" := MPOSNetsTransactions."Transaction Type"::REFUND;
+            EFTTransactionRequest."Processing Type"::PAYMENT:
+                MPOSNetsTransactions."Transaction Type" := MPOSNetsTransactions."Transaction Type"::PAY;
         end;
 
         MPOSNetsTransactions."Transaction Type Id" := BaxiTransTypeId;
@@ -440,14 +447,14 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
         TransactionNo := MPOSNetsTransactions."Transaction No.";
 
         JSON := '{ "mPosRequest" : [{ "debug":"false" , "eft":"0" , "amount":"'
-                      +Format(BaxiAmountInCents)
-                      +'", "currency":"'+BaxiCurrency
-                      +'", "reference":"'+EFTTransactionRequest."Reference Number Input"
-                      +'", "inappprinting":"'+Format(InAppPrinting)
-                      +'", "transactionType":"'+Format(BaxiTransTypeId)
-                      +'", "paymentGateWay":"'+MPOSAppSetup."Payment Gateway"
-                      +'", "transactionNo":"'+Format(TransactionNo)
-                      +'","merchantId":"'+MerchantID+'" }]}';
+                      + Format(BaxiAmountInCents)
+                      + '", "currency":"' + BaxiCurrency
+                      + '", "reference":"' + EFTTransactionRequest."Reference Number Input"
+                      + '", "inappprinting":"' + Format(InAppPrinting)
+                      + '", "transactionType":"' + Format(BaxiTransTypeId)
+                      + '", "paymentGateWay":"' + MPOSAppSetup."Payment Gateway"
+                      + '", "transactionNo":"' + Format(TransactionNo)
+                      + '","merchantId":"' + MerchantID + '" }]}';
 
         BigTextVar.AddText(JSON);
         MPOSNetsTransactions."Request Json".CreateOutStream(Ostream);
@@ -463,13 +470,13 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
         if SalesLineCurrencyCode <> '' then
-          exit(SalesLineCurrencyCode);
+            exit(SalesLineCurrencyCode);
 
         GeneralLedgerSetup.Get;
         if GeneralLedgerSetup."LCY Code" <> '' then
-          exit(GeneralLedgerSetup."LCY Code");
+            exit(GeneralLedgerSetup."LCY Code");
 
-        Error(ErrorCurrencyIsNotDefined,GeneralLedgerSetup.TableName);
+        Error(ErrorCurrencyIsNotDefined, GeneralLedgerSetup.TableName);
     end;
 
     local procedure "// Aux"()
@@ -492,12 +499,5 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
     begin
     end;
 
-    trigger Model::OnModelControlEvent(control: DotNet npNetControl;eventName: Text;data: DotNet npNetDictionary_Of_T_U)
-    begin
-    end;
-
-    trigger Model::OnTimer()
-    begin
-    end;
 }
 
