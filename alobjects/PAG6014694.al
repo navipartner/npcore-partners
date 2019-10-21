@@ -14,7 +14,6 @@ page 6014694 "Retail Admin Activities - POS"
             cuegroup(POS)
             {
                 Caption = 'POS';
-                CueGroupLayout = Wide;
                 field("User Setups"; "User Setups")
                 {
                 }
