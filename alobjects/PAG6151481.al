@@ -22,7 +22,6 @@ page 6151481 "Magento Retail Activities"
             cuegroup(Orders)
             {
                 Caption = 'Orders';
-                CueGroupLayout = Wide;
 
                 actions
                 {
@@ -55,16 +54,16 @@ page 6151481 "Magento Retail Activities"
                     cuegroup(Control6150616)
                     {
                         ShowCaption = false;
-                        field("Sales Orders";"Sales Orders")
+                        field("Sales Orders"; "Sales Orders")
                         {
                             DrillDownPageID = "Sales Order List";
                         }
-                        field("Sales Quotes";"Sales Quotes")
+                        field("Sales Quotes"; "Sales Quotes")
                         {
                             DrillDownPageID = "Sales Quotes";
                             Visible = false;
                         }
-                        field("Sales Return Orders";"Sales Return Orders")
+                        field("Sales Return Orders"; "Sales Return Orders")
                         {
                             DrillDownPageID = "Sales Return Order List";
                         }
@@ -80,12 +79,12 @@ page 6151481 "Magento Retail Activities"
                     cuegroup(Control6150622)
                     {
                         ShowCaption = false;
-                        field("Magento Orders";"Magento Orders")
+                        field("Magento Orders"; "Magento Orders")
                         {
                             DrillDownPageID = "Sales Order List";
                             Visible = false;
                         }
-                        field("Daily Sales Invoices";"Daily Sales Invoices")
+                        field("Daily Sales Invoices"; "Daily Sales Invoices")
                         {
                             Caption = 'Daily Sales Invoices';
                             DrillDownPageID = "Posted Sales Invoices";
@@ -103,16 +102,16 @@ page 6151481 "Magento Retail Activities"
                     cuegroup(Control6150620)
                     {
                         ShowCaption = false;
-                        field("Import Pending";"Import Pending")
+                        field("Import Pending"; "Import Pending")
                         {
                             DrillDownPageID = "Nc Import List";
                         }
-                        field("Tasks Unprocessed";"Tasks Unprocessed")
+                        field("Tasks Unprocessed"; "Tasks Unprocessed")
                         {
                             DrillDownPageID = "Nc Task List";
                             Visible = false;
                         }
-                        field("Daily Sales Orders";"Daily Sales Orders")
+                        field("Daily Sales Orders"; "Daily Sales Orders")
                         {
                             DrillDownPageID = "Sales Order List";
                         }
@@ -136,10 +135,10 @@ page 6151481 "Magento Retail Activities"
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
-        SetFilter("Date Filter",'=%1',WorkDate);
+        SetFilter("Date Filter", '=%1', WorkDate);
     end;
 }
 
