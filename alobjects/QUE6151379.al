@@ -1,8 +1,10 @@
 query 6151379 "CS Item Journal Lines"
 {
     // NPR5.51/JAKUBV/20190904  CASE 365659 Transport NPR5.51 - 3 September 2019
+    // NPR5.52/CLVA  /20190926  CASE 370277 Added OrderBy
 
     Caption = 'CS Item Journal Lines';
+    OrderBy = Descending(Changed_by_User);
 
     elements
     {

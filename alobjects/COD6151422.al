@@ -1,6 +1,7 @@
 codeunit 6151422 "Magento Pmt. Adyen Mgt."
 {
     // MAG2.20/MHA /20190502  CASE 352184 Object created for Adyen Payment Capture/Cancel/Refund
+    // MAG2.23/MHA /20190821  CASE 365631 External Order No. is used as Reference
 
 
     trigger OnRun()
@@ -87,12 +88,20 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
               SalesHeader.Get(PaymentLine."Document Type",PaymentLine."Document No.");
               CurrencyCode := SalesHeader."Currency Code";
               Reference := SalesHeader."No.";
+              //-MAG2.23 [365631]
+              if SalesHeader."External Order No." <> '' then
+                Reference := SalesHeader."External Order No.";
+              //+MAG2.23 [365631]
             end;
           DATABASE::"Sales Invoice Header":
             begin
               SalesInvHeader.Get(PaymentLine."Document No.");
               CurrencyCode := SalesInvHeader."Currency Code";
               Reference := SalesInvHeader."No.";
+              //-MAG2.23 [365631]
+              if SalesInvHeader."External Order No." <> '' then
+                Reference := SalesInvHeader."External Order No.";
+              //+MAG2.23 [365631]
             end;
         end;
         if CurrencyCode = '' then begin
@@ -210,12 +219,20 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
               SalesHeader.Get(PaymentLine."Document Type",PaymentLine."Document No.");
               CurrencyCode := SalesHeader."Currency Code";
               Reference := SalesHeader."No.";
+              //-MAG2.23 [365631]
+              if SalesHeader."External Order No." <> '' then
+                Reference := SalesHeader."External Order No.";
+              //+MAG2.23 [365631]
             end;
           DATABASE::"Sales Cr.Memo Header":
             begin
               SalesCrMemoHeader.Get(PaymentLine."Document No.");
               CurrencyCode := SalesCrMemoHeader."Currency Code";
               Reference := SalesCrMemoHeader."No.";
+              //-MAG2.23 [365631]
+              if SalesCrMemoHeader."External Order No." <> '' then
+                Reference := SalesCrMemoHeader."External Order No.";
+              //+MAG2.23 [365631]
             end;
         end;
         if CurrencyCode = '' then begin

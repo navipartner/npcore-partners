@@ -27,6 +27,7 @@ codeunit 6150806 "POS Action - Receivables"
     // NPR5.48/MHA /20190213  CASE 345847 Return value should be TRUE when only 1 customer is found in GetCustomerFromCustomerSearch()
     // NPR5.49/MHA /20190328  CASE 350374 Added MaxStrLen to EanBox.Description in DiscoverEanBoxEvents()
     // NPR5.51/ANPA/20190723  CASE 350674 Updates sale line, if customer information changes
+    // NPR5.52/ALPO/20190920  CASE 364291 Stop execution if customer selection is cancelled
 
 
     trigger OnRun()
@@ -187,7 +188,8 @@ codeunit 6150806 "POS Action - Receivables"
     begin
         if (CustomerNo = '') then
           if (not SelectCustomerUI (CustomerNo,CustomerLookupPageNo,CustomerView)) then
-            exit (false);
+            Error('');  //NPR5.52 [364291]
+            //EXIT (FALSE);  //NPR5.52 [364291]-revoked
 
         SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS."Customer No." := '';

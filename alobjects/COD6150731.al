@@ -2,6 +2,7 @@ codeunit 6150731 "POS Action - Transfer Order"
 {
     // NPR5.43/THRO/20180604 CASE 315072 Transfer order list
     // NPR5.51/ALST/20190722 CASE 358552 added possibility to auto create new order woth location and global dimension set from the register
+    // NPR5.52/ALST/20191009 CASE 358552 fixed new record functionality
 
 
     trigger OnRun()
@@ -87,8 +88,14 @@ codeunit 6150731 "POS Action - Transfer Order"
 
         //-NPR5.51 [358552]
         if JSON.GetBooleanParameter('NewRecord',true) then
+        //-NPR5.52 [358552]
+        begin
+        //+NPR5.52 [358552]
           if Confirm(CreateNewRecordCaption,true,TransferHeader.FieldCaption("Transfer-from Code"),TransferHeader.FieldCaption("Shortcut Dimension 1 Code")) then
-            AddNewRecord(Register)
+            AddNewRecord(Register);
+        //-NPR5.52 [358552]
+        end
+        //+NPR5.52 [358552]
           else begin
         //+NPR5.51 [358552]
             if TransferFromFilter = '' then

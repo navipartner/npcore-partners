@@ -1,6 +1,7 @@
 codeunit 6059957 "MCS Webcam Proxy"
 {
     // NPR5.29/CLVA/20170125 CASE 264333 Added functionality to support image orientation;
+    // NPR5.52/TILA/20190924CASE 361782DeserializeState function removed
 
     SingleInstance = true;
     TableNo = TempBlob;
@@ -262,13 +263,6 @@ codeunit 6059957 "MCS Webcam Proxy"
 
     local procedure "--- Protocol Event Handling"()
     begin
-    end;
-
-    local procedure DeserializeState(Data: Text;var State: DotNet npNetState2)
-    var
-        JsonConvert: DotNet npNetJsonConvert;
-    begin
-        State := JsonConvert.DeserializeObject(Data,GetDotNetType(State));
     end;
 
     local procedure SerializeJson("Object": Variant): Text

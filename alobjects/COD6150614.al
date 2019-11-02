@@ -56,6 +56,9 @@ codeunit 6150614 "POS Create Entry"
     //                                   Write to POS Audit Log for additional system events.
     //                                   Removed undocumented code in CreatePOSSystemEntry()
     // NPR5.51/MHA /20190718 CASE 362329 Added "Exclude from Posting" on POS Sales Lines in InsertPOSSaleLine()
+    // NPR5.52/TSA /20190925 CASE 369231 Assign "Retail Serial No." value
+    // NPR5.52/TSA /20190904 CASE 367393 Added implementation of Navigate for POS Entry
+    // NPR5.52/ALPO/20191030 CASE 374750 Set "Exclude from Posting" on POS Sales Lines to TRUE for Credit Sales transactions
 
     TableNo = "Sale POS";
 
@@ -240,7 +243,7 @@ codeunit 6150614 "POS Create Entry"
         //POSEntry."Exit Point" := ;
         POSEntry."Tax Area Code" := SalePOS."Tax Area Code";
         //POSEntry."Transaction Specification" := ;
-        POSEntry."Prices Including VAT" := SalePOS."Price including VAT";
+        POSEntry."Prices Including VAT" := SalePOS."Prices Including VAT";
         //POSEntry."Reason Code" := ;
         //+NPR5.36 [279551]
         //-NPR5.40 [276562]
@@ -342,6 +345,10 @@ codeunit 6150614 "POS Create Entry"
           //-NPR5.51 [362329]
           "Exclude from Posting" := ExcludeFromPosting(SaleLinePOS);
           //+NPR5.51 [362329]
+          //-NPR5.52 [374750]
+          if not "Exclude from Posting" then
+            "Exclude from Posting" := POSEntry."Entry Type" = POSEntry."Entry Type"::"Credit Sale";
+          //+NPR5.52 [374750]
 
           "No." := SaleLinePOS."No.";
           "Variant Code" := SaleLinePOS."Variant Code";
@@ -395,7 +402,7 @@ codeunit 6150614 "POS Create Entry"
           //-NPR5.36 [279552]
           //"Line Discount Amount Excl. VAT" := SaleLinePOS."Discount %";
           //"Line Discount Amount Incl. VAT" := SaleLinePOS."Discount Amount";
-          PricesIncludeTax := SalePOS."Price including VAT";
+          PricesIncludeTax := SalePOS."Prices Including VAT";
           if (SaleLinePOS."Sale Type" in [SaleLinePOS."Sale Type"::"Gift Voucher"]) then
             PricesIncludeTax := true;
           if PricesIncludeTax then begin
@@ -441,6 +448,9 @@ codeunit 6150614 "POS Create Entry"
           //POSSalesLine.Nonstock :=
           //POSSalesLine."BOM Item No." :=
           "Serial No." := SaleLinePOS."Serial No.";
+          //-NPR5.52 [369231]
+          "Retail Serial No." := SaleLinePOS."Serial No. not Created";
+          //+NPR5.52 [369231]
           "Return Reason Code" := SaleLinePOS."Return Reason Code";
 
           //-NPR5.49 [342090]
@@ -1677,6 +1687,105 @@ codeunit 6150614 "POS Create Entry"
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertPOSBalanceLine(POSPaymentBinCheckpoint: Record "POS Payment Bin Checkpoint";POSEntry: Record "POS Entry";var POSBalancingLine: Record "POS Balancing Line")
     begin
+    end;
+
+    [EventSubscriber(ObjectType::Page, 344, 'OnAfterNavigateFindRecords', '', true, true)]
+    local procedure OnNavigateFindRecords(var DocumentEntry: Record "Document Entry";DocNoFilter: Text;PostingDateFilter: Text)
+    var
+        POSEntry: Record "POS Entry";
+        POSPeriodRegister: Record "POS Period Register";
+        RecordCount: Integer;
+    begin
+
+        //-#NPR5.52 [367393]
+        if (POSEntry.ReadPermission) then begin
+          if not (POSEntry.SetCurrentKey (POSEntry."Document No."))  then ;
+          POSEntry.Reset;
+          POSEntry.SetFilter ("Document No.", DocNoFilter);
+          POSEntry.SetFilter ("Posting Date", PostingDateFilter);
+          RecordCount := InsertIntoDocEntry (DocumentEntry, DATABASE::"POS Entry", 0, CopyStr (DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count ());
+
+          if (RecordCount = 0) then begin
+            if not (POSEntry.SetCurrentKey (POSEntry."Fiscal No."))  then ;
+            POSEntry.Reset;
+            POSEntry.SetFilter ("Fiscal No.", DocNoFilter);
+            POSEntry.SetFilter ("Posting Date", PostingDateFilter);
+            RecordCount := InsertIntoDocEntry (DocumentEntry, DATABASE::"POS Entry", 1, CopyStr (DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count ());
+          end;
+
+          if (RecordCount = 0) then begin
+            POSPeriodRegister.SetFilter ("Document No.", DocNoFilter);
+            if (POSPeriodRegister.FindFirst ()) then begin
+              POSEntry.Reset;
+              POSEntry.SetFilter ("POS Period Register No.", '=%1', POSPeriodRegister."No.");
+              POSEntry.SetFilter ("System Entry", '=%1', false);
+              RecordCount := InsertIntoDocEntry (DocumentEntry, DATABASE::"POS Entry", 2, CopyStr (DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count ());
+            end;
+          end;
+        end;
+        //+#NPR5.52 [367393]
+    end;
+
+    [EventSubscriber(ObjectType::Page, 344, 'OnAfterNavigateShowRecords', '', true, true)]
+    local procedure OnNavigateShowRecords(TableID: Integer;DocNoFilter: Text;PostingDateFilter: Text;ItemTrackingSearch: Boolean)
+    var
+        POSEntry: Record "POS Entry";
+        POSPeriodRegister: Record "POS Period Register";
+        DocumentEntry: Record "Document Entry" temporary;
+    begin
+
+        //-#NPR5.52 [367393]
+        if (TableID = DATABASE::"POS Entry") then begin
+
+          OnNavigateFindRecords (DocumentEntry, DocNoFilter, PostingDateFilter);
+
+          if (DocumentEntry."Document Type" = 0) then begin
+            if not (POSEntry.SetCurrentKey (POSEntry."Document No."))  then ;
+            POSEntry.SetFilter ("Document No.", DocumentEntry."Document No.");
+          end;
+
+          if (DocumentEntry."Document Type" = 1) then begin
+            if not (POSEntry.SetCurrentKey (POSEntry."Fiscal No."))  then ;
+            POSEntry.SetFilter ("Fiscal No.", DocumentEntry."Document No.");
+          end;
+
+          if (DocumentEntry."Document Type" = 2) then begin
+            POSPeriodRegister.SetFilter ("Document No.", DocumentEntry."Document No.");
+            if (POSPeriodRegister.FindFirst ()) then begin
+              POSEntry.SetFilter ("POS Period Register No.", '=%1', POSPeriodRegister."No.");
+              POSEntry.SetFilter ("System Entry", '=%1', false);
+            end;
+          end;
+
+          if (DocumentEntry."No. of Records" = 1) then
+            PAGE.Run (PAGE::"POS Entry List", POSEntry)
+          else
+            PAGE.Run (0, POSEntry);
+
+        end;
+        //+#NPR5.52 [367393]
+    end;
+
+    local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary;DocTableID: Integer;DocType: Integer;DocNoFilter: Code[20];DocTableName: Text[1024];DocNoOfRecords: Integer): Integer
+    begin
+
+        //-#NPR5.52 [367393]
+        if (DocNoOfRecords = 0) then
+          exit (DocNoOfRecords);
+
+        with DocumentEntry do begin
+          Init;
+          "Entry No." := "Entry No." + 1;
+          "Table ID" := DocTableID;
+          "Document Type" := DocType;
+          "Document No." := DocNoFilter;
+          "Table Name" := CopyStr(DocTableName,1,MaxStrLen("Table Name"));
+          "No. of Records" := DocNoOfRecords;
+          Insert;
+        end;
+
+        exit (DocNoOfRecords);
+        //+#NPR5.52 [367393]
     end;
 }
 

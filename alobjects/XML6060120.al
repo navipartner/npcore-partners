@@ -5,6 +5,7 @@ xmlport 6060120 "TM Ticket Details"
     // TM1.26/TSA /20171030 CASE 285601 Default only returns a non-printed tickets
     // TM1.26.01/TSA /20171213 CASE 299811 Changed layout of the request for web
     // TM1.35/TSA/20180725  CASE 323330 Transport TM1.35 - 25 July 2018
+    // TM1.43/TSA /20191010 CASE 367471 Added Ticket token to ticket response
 
     Caption = 'TM Ticket Details';
     Encoding = UTF8;
@@ -79,6 +80,21 @@ xmlport 6060120 "TM Ticket Details"
                             begin
                                 if (TmpTicket."Ticket No. for Printing" = '') then
                                   TmpTicket."Ticket No. for Printing" := TmpTicket."External Ticket No.";
+                            end;
+                        }
+                        textelement(token)
+                        {
+
+                            trigger OnBeforePassVariable()
+                            var
+                                TicketReservationRequest: Record "TM Ticket Reservation Request";
+                            begin
+
+                                //-TM1.43 [367471]
+                                token := '';
+                                if (TicketReservationRequest.Get (TmpTicket."Ticket Reservation Entry No.")) then
+                                  token := TicketReservationRequest."Session Token ID";
+                                //+TM1.43 [367471]
                             end;
                         }
                         textelement(valid_from)

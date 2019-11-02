@@ -3,6 +3,8 @@ codeunit 6151206 "NpCs POS Action Create Order"
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // NPR5.51/ALST/20190705  CASE 357848 function prototype changed
     // NPR5.51/MHA /20190719  CASE 362443 It should be possible to send to another local store
+    // NPR5.52/MHA /20191002  CASE 369476 From Store Code should be set in OnActionSelectToStoreCode()
+    // NPR5.52/MMV /20191002  CASE 352473 Added pdf2nav & send support to prepayment function.
 
 
     trigger OnRun()
@@ -298,6 +300,7 @@ codeunit 6151206 "NpCs POS Action Create Order"
         NpCsStoresbyDistance: Page "NpCs Stores by Distance";
         FromStoreCode: Text;
         PrevRec: Text;
+        FulFilledQty: Decimal;
     begin
         FromStoreCode := UpperCase(JSON.GetString('from_store_code',false));
         FromNpCsStore.Get(FromStoreCode);
@@ -337,6 +340,20 @@ codeunit 6151206 "NpCs POS Action Create Order"
           NpCsStoreInventoryBuffer.SetRange("Store Code",TempNpCsStore.Code);
           NpCsStoreInventoryBuffer.SetRange("In Stock",false);
           TempNpCsStore."In Stock" := NpCsStoreInventoryBuffer.IsEmpty;
+          //-NPR5.52 [369476]
+          NpCsStoreInventoryBuffer.SetRange("In Stock");
+          if NpCsStoreInventoryBuffer.FindSet then
+            repeat
+              if NpCsStoreInventoryBuffer.Quantity > 0 then begin
+                TempNpCsStore."Requested Qty." += NpCsStoreInventoryBuffer.Quantity;
+                if NpCsStoreInventoryBuffer.Inventory < 0 then
+                  NpCsStoreInventoryBuffer.Inventory := 0;
+                if NpCsStoreInventoryBuffer.Inventory > NpCsStoreInventoryBuffer.Quantity then
+                  NpCsStoreInventoryBuffer.Inventory := NpCsStoreInventoryBuffer.Quantity;
+                TempNpCsStore."Fullfilled Qty." += NpCsStoreInventoryBuffer.Inventory;
+              end;
+            until NpCsStoreInventoryBuffer.Next = 0;
+          //+NPR5.52 [369476]
 
           if PrevRec <> Format(TempNpCsStore) then
             TempNpCsStore.Modify;
@@ -347,6 +364,9 @@ codeunit 6151206 "NpCs POS Action Create Order"
         Clear(NpCsStoreInventoryBuffer);
         NpCsStoresbyDistance.SetSourceTables(TempNpCsStore,NpCsStoreInventoryBuffer);
         NpCsStoresbyDistance.SetShowInventory(true);
+        //-NPR5.52 [369476]
+        NpCsStoresbyDistance.SetFromStoreCode(FromStoreCode);
+        //+NPR5.52 [369476]
         NpCsStoresbyDistance.LookupMode(true);
         if NpCsStoresbyDistance.RunModal() <> ACTION::LookupOK then
           exit;
@@ -590,10 +610,10 @@ codeunit 6151206 "NpCs POS Action Create Order"
           SalePOS.Modify(true);
           POSSale.RefreshCurrent();
 
-          //-NPR5.51
-          // RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentPct, PrintPrepaymentInvoice, TRUE);
-          RetailSalesDocMgt.CreatePrepaymentLine(POSSession,SalesHeader,PrepaymentPct,PrintPrepaymentInvoice,true,false);
-          //+NPR5.51
+        //-NPR5.52 [352473]
+        //  RetailSalesDocMgt.CreatePrepaymentLine(POSSession,SalesHeader,PrepaymentPct,PrintPrepaymentInvoice,TRUE,FALSE);
+          RetailSalesDocMgt.CreatePrepaymentLine(POSSession,SalesHeader,PrepaymentPct,PrintPrepaymentInvoice,false,false,true,false);
+        //+NPR5.52 [352473]
 
           POSSession.RequestRefreshData();
           Commit;

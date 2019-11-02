@@ -11,6 +11,7 @@ table 6151371 "CS Setup"
     // NPR5.50/CLVA/20190527 CASE 355694 Added field "Item Reclass. Jour Temp Name" and "Item Reclass. Jour Batch Name"
     // NPR5.51/CLVA/20190627 CASE 359375 Added field Create Worksheet after Trans. for re-creation of worksheet after Stock-Take transfer
     // NPR5.51/CLVA/20190812 CASE 362173 Added field "Phys. Inv Jour Temp Name" and "Phys. Inv Jour No. Series"
+    // NPR5.52/CLVA/20190904 CASE 365967 Added field "Post with Job Queue", "Job Queue Category Code","Job Queue Priority for Post","Notify On Success","Run in User Session" and "Sum Qty. to Handle"
 
     Caption = 'CS Setup';
 
@@ -121,6 +122,39 @@ table 6151371 "CS Setup"
             Caption = 'Phys. Inv Jour No. Series';
             TableRelation = "No. Series";
         }
+        field(29;"Sum Qty. to Handle";Boolean)
+        {
+            Caption = 'Sum Qty. to Handle';
+        }
+        field(38;"Post with Job Queue";Boolean)
+        {
+            Caption = 'Post with Job Queue';
+        }
+        field(39;"Job Queue Category Code";Code[10])
+        {
+            Caption = 'Job Queue Category Code';
+            TableRelation = "Job Queue Category";
+        }
+        field(40;"Job Queue Priority for Post";Integer)
+        {
+            Caption = 'Job Queue Priority for Post';
+            InitValue = 1000;
+            MinValue = 0;
+
+            trigger OnValidate()
+            begin
+                if "Job Queue Priority for Post" < 0 then
+                  Error(TXT002);
+            end;
+        }
+        field(41;"Notify On Success";Boolean)
+        {
+            Caption = 'Notify On Success';
+        }
+        field(42;"Run in User Session";Boolean)
+        {
+            Caption = 'Run in User Session';
+        }
     }
 
     keys
@@ -137,5 +171,6 @@ table 6151371 "CS Setup"
     var
         DCHelperFunctions: Codeunit "CS Helper Functions";
         TXT001: Label 'Update Wharehouse Type on all UIs?';
+        TXT002: Label 'Job Queue Priority must be zero or positive.';
 }
 

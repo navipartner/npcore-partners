@@ -3,6 +3,7 @@ xmlport 6151153 "M2 Create Corporate Account"
     // NPR5.49/TSA /20190307 CASE 347894 Changed PasswordMD5 to PasswordHash
     // NPR5.49/JAKUBV/20190402  CASE 320424-01 Transport NPR5.49 - 1 April 2019
     // NPR5.51/TSA /20190812 CASE 364644 Added Person section
+    // MAG2.23/TSA /20191015 CASE 373151 Moved section person to be included in address, added name, removed company name, EAN
 
     Caption = 'Create Corporate Account';
     Encoding = UTF8;
@@ -29,40 +30,30 @@ xmlport 6151153 "M2 Create Corporate Account"
                 }
                 textelement(Company)
                 {
-                    fieldelement(CompanyName;TmpContactRequest."Company Name")
-                    {
-                    }
                     fieldelement(VatId;TmpContactRequest."VAT Registration No.")
                     {
                     }
-                    textelement(Ean)
-                    {
-                        MaxOccurs = Once;
-
-                        trigger OnAfterAssignVariable()
-                        begin
-                            if (Ean <> '') then
-                              Error ('EAN code is not supported in W1 version and must be left blank');
-                        end;
-                    }
                     fieldelement(CurrencyCode;TmpContactRequest."Currency Code")
-                    {
-                    }
-                }
-                textelement(Person)
-                {
-                    MaxOccurs = Once;
-                    MinOccurs = Zero;
-                    fieldelement(FirstName;TmpContactRequest."First Name")
-                    {
-                    }
-                    fieldelement(Surname;TmpContactRequest.Surname)
                     {
                     }
                 }
                 textelement(Address)
                 {
                     MaxOccurs = Once;
+                    textelement(Person)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                        fieldelement(FirstName;TmpContactRequest."First Name")
+                        {
+                        }
+                        fieldelement(LastName;TmpContactRequest.Surname)
+                        {
+                        }
+                    }
+                    fieldelement(Name;TmpContactRequest."Company Name")
+                    {
+                    }
                     fieldelement(Name2;TmpContactRequest."Name 2")
                     {
                     }
@@ -170,7 +161,7 @@ xmlport 6151153 "M2 Create Corporate Account"
                               TmpContactResponse."Company No." := '';
                         end;
                     }
-                    fieldelement(Name;TmpContactResponse.Name)
+                    fieldelement(Name;TmpContactResponse."Company Name")
                     {
                     }
                     textelement(personresponse)
@@ -193,9 +184,6 @@ xmlport 6151153 "M2 Create Corporate Account"
                             if (TmpContactResponse."First Name" = '') and (TmpContactResponse.Surname = '') then
                               currXMLport.Skip;
                         end;
-                    }
-                    fieldelement(CompanyName;TmpContactResponse."Company Name")
-                    {
                     }
                     fieldelement(Email;TmpContactResponse."E-Mail")
                     {

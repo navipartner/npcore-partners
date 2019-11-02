@@ -32,6 +32,8 @@ table 6014405 "Sale POS"
     // NPR5.45/MHA /20180803  CASE 323705 Signature changed on SaleLinePOS.FindItemSalesPrice()
     // NPR5.45/MMV /20180828  CASE 326466 Recalculate discount once on end of customer validate
     // NPR5.50/MHA /20190422 CASE 337539 Added field 170 "Retail ID"
+    // NPR5.52/ALPO/20190820 CASE 359596 Do not change unit price on the line after customer is selected, should new unit price is higher than existing one, unless there was a customer change
+    // NPR5.52/MMV /20191007 CASE 352473 Added "Prices Including VAT" switch validation.
 
     Caption = 'Sale';
 
@@ -93,6 +95,9 @@ table 6014405 "Sale POS"
                 Cust: Record Customer;
                 RetailFormCode: Codeunit "Retail Form Code";
                 POSSalesDiscountCalcMgt: Codeunit "POS Sales Discount Calc. Mgt.";
+                NewUnitPrice: Decimal;
+                xSaleLinePOS: Record "Sale Line POS";
+                POSSaleLine: Codeunit "POS Sale Line";
             begin
                 RetailSetup.Get();
                 Register.Get("Register No.");
@@ -251,12 +256,12 @@ table 6014405 "Sale POS"
                 end;
 
                 if Cust."No." <> '' then
-                  "Price including VAT"  := Cust."Prices Including VAT"
+                  "Prices Including VAT"  := Cust."Prices Including VAT"
                 else
                   //-NPR5.31 [269105]
                   ////"Price including VAT" := Ops�tning."Prices incl. VAT";
                   //"Price including VAT" := Ops�tning."Prices Include VAT";
-                  "Price including VAT" := RetailSetup."Prices incl. VAT";
+                  "Prices Including VAT" := RetailSetup."Prices incl. VAT";
                   //+NPR5.31 [269105]
 
                 if not Modify then;
@@ -270,12 +275,13 @@ table 6014405 "Sale POS"
                   SaleLinePOS.SetRange( Date, Date );
                   if SaleLinePOS.FindSet(true,false) then begin
                     repeat
+                      xSaleLinePOS := SaleLinePOS;  //NPR5.52 [359596]
                       Item.Get(SaleLinePOS."No.");
                       SaleLinePOS.Internal                  := Cust."Internal y/n";
                       SaleLinePOS."Customer Price Group"    := "Customer Price Group";
                       //-NPR5.32 [248534]
                       SaleLinePOS."Allow Line Discount"     := "Allow Line Discount";
-                      SaleLinePOS."Price Includes VAT"      := "Price including VAT";
+                      SaleLinePOS."Price Includes VAT"      := "Prices Including VAT";
                       SaleLinePOS."Gen. Bus. Posting Group" := "Gen. Bus. Posting Group";
                       SaleLinePOS."VAT Bus. Posting Group"  := "VAT Bus. Posting Group";
                       SaleLinePOS."Tax Area Code"           := "Tax Area Code";
@@ -287,13 +293,26 @@ table 6014405 "Sale POS"
                       //+NPR5.32.01 [248534]
                       //-NPR5.45 [323705]
                       //SaleLinePOS."Unit Price"              := SaleLinePOS.FindItemSalesPrice( SaleLinePOS );
-                      SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
+                      //SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();  //NPR5.52 [359596]-revoked
+                      //-NPR5.52 [359596]
+                      //Recalc.existing price to reflect possible VAT Rate/Price Inc. VAT change
+                      POSSaleLine.ConvertPriceToVAT(
+                        xSaleLinePOS."Price Includes VAT",xSaleLinePOS."VAT Bus. Posting Group",xSaleLinePOS."VAT Prod. Posting Group",
+                        SaleLinePOS,SaleLinePOS."Unit Price");
+                      NewUnitPrice := SaleLinePOS.FindItemSalesPrice();
+                      if (NewUnitPrice < SaleLinePOS."Unit Price") or
+                         not (xRec."Customer No." in ['',"Customer No."])
+                      then
+                        SaleLinePOS."Unit Price" := NewUnitPrice;
+                      //+NPR5.52 [359596]
                       //+NPR5.45 [323705]
                       SaleLinePOS.GetAmount(SaleLinePOS, Item, SaleLinePOS."Unit Price");
                       SaleLinePOS.Modify;
                     until SaleLinePOS.Next = 0;
-                    SaleLinePOS.Validate("Unit of Measure Code");
-                    SaleLinePOS.Modify;
+                    //-NPR5.52 [359596]-revoked
+                    //SaleLinePOS.VALIDATE("Unit of Measure Code");
+                    //SaleLinePOS.MODIFY;
+                    //+NPR5.52 [359596]-revoked
                   end;
                 end;
 
@@ -518,9 +537,38 @@ table 6014405 "Sale POS"
         {
             Caption = 'Payment Terms Code';
         }
-        field(120;"Price including VAT";Boolean)
+        field(120;"Prices Including VAT";Boolean)
         {
-            Caption = 'Price including VAT';
+            Caption = 'Prices Including VAT';
+
+            trigger OnValidate()
+            var
+                SaleLinePOS: Record "Sale Line POS";
+                xSaleLinePOS: Record "Sale Line POS";
+                POSSaleLine: Codeunit "POS Sale Line";
+            begin
+                //-NPR5.52 [352473]
+                if "Prices Including VAT" = xRec."Prices Including VAT" then
+                  exit;
+
+                SaleLinePOS.SetRange("Register No.", "Register No.");
+                SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
+                SaleLinePOS.SetRange("Sale Type", SaleLinePOS."Sale Type"::Sale);
+                SaleLinePOS.SetRange(Date, Date);
+                if SaleLinePOS.FindSet(true,false) then begin
+                  repeat
+                    xSaleLinePOS := SaleLinePOS;
+
+                    SaleLinePOS.Validate("Price Includes VAT", "Prices Including VAT");
+                    POSSaleLine.ConvertPriceToVAT(
+                      xSaleLinePOS."Price Includes VAT",xSaleLinePOS."VAT Bus. Posting Group",xSaleLinePOS."VAT Prod. Posting Group",SaleLinePOS,SaleLinePOS."Unit Price");
+
+                    SaleLinePOS.UpdateAmounts(SaleLinePOS);
+                    SaleLinePOS.Modify(true);
+                  until SaleLinePOS.Next = 0;
+                end;
+                //+NPR5.52 [352473]
+            end;
         }
         field(121;TouchScreen;Boolean)
         {

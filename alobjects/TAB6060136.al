@@ -10,6 +10,7 @@ table 6060136 "MM Membership Alteration Setup"
     // MM1.25/TSA /20180119 CASE 300256 Card Expired Action
     // MM1.30/TSA /20180605 CASE 317428 Added "Grace Period Calculation"
     // MM1.40/TSA /20190730 CASE 360275 Added field 85 "Auto-Admit Member On Sale"
+    // MM1.41/TSA /20191016 CASE 373297 Added Grace Period Preset
 
     Caption = 'Membership Alteration Setup';
 
@@ -70,6 +71,20 @@ table 6060136 "MM Membership Alteration Setup"
         field(30;"Activate Grace Period";Boolean)
         {
             Caption = 'Activate Grace Period';
+        }
+        field(32;"Grace Period Presets";Option)
+        {
+            Caption = 'Grace Period Presets';
+            OptionCaption = ' ,Valid for Expired Memberships,Valid for Active Memberships';
+            OptionMembers = NA,EXPIRED_MEMBERSHIP,ACTIVE_MEMBERSHIP;
+
+            trigger OnValidate()
+            var
+                MembershipManagement: Codeunit "MM Membership Management";
+            begin
+
+                MembershipManagement.ApplyGracePeriodPreset (Rec."Grace Period Presets", Rec);
+            end;
         }
         field(35;"Grace Period Relates To";Option)
         {

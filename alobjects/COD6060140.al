@@ -12,6 +12,7 @@ codeunit 6060140 "MM POS Action - Member Arrival"
     // MM1.33/MHA /20180817  CASE 326754 Added Ean Box Event Handler functions
     // MM1.36/TSA /20181119 CASE 335889 Refactored MemberArrival with Guests
     // MM1.37/MHA /20190328  CASE 350288 Added MaxStrLen to EanBox.Description in DiscoverEanBoxEvents()
+    // MM1.41/TSA /20190909 CASE 367779 SignatureChange PromptForMemberGuestArrival() and MemberFastCheckIn();
 
 
     trigger OnRun()
@@ -194,13 +195,23 @@ codeunit 6060140 "MM POS Action - Member Arrival"
 
               ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemFromMembership (ExternalMemberCardNo);
 
+              //-MM1.41 [367779]
+              // IF (POSWorkflowType = POSWorkflowMethod::Automatic) THEN
+              //   MemberTicketManager.MemberFastCheckIn (ExternalMemberCardNo, ExternalItemNo, AdmissionCode, 1);
+              //
+              // IF (POSWorkflowType = POSWorkflowMethod::GuestCheckin) THEN BEGIN
+              //   MemberTicketManager.PromptForMemberGuestArrival (ExternalMemberCardNo, AdmissionCode);
+              //   MemberTicketManager.MemberFastCheckIn (ExternalMemberCardNo, ExternalItemNo, AdmissionCode, 1);
+              // END;
+
               if (POSWorkflowType = POSWorkflowMethod::Automatic) then
-                MemberTicketManager.MemberFastCheckIn (ExternalMemberCardNo, ExternalItemNo, AdmissionCode, 1);
+                MemberTicketManager.MemberFastCheckIn (ExternalMemberCardNo, ExternalItemNo, AdmissionCode, 1, '');
 
               if (POSWorkflowType = POSWorkflowMethod::GuestCheckin) then begin
-                MemberTicketManager.PromptForMemberGuestArrival (ExternalMemberCardNo, AdmissionCode);
-                MemberTicketManager.MemberFastCheckIn (ExternalMemberCardNo, ExternalItemNo, AdmissionCode, 1);
+                MemberTicketManager.PromptForMemberGuestArrival (ExternalMemberCardNo, AdmissionCode, Token);
+                MemberTicketManager.MemberFastCheckIn (ExternalMemberCardNo, ExternalItemNo, AdmissionCode, 1, Token);
               end;
+              //+MM1.41 [367779]
 
             end;
         end;

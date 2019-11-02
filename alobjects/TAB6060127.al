@@ -15,6 +15,7 @@ table 6060127 "MM Membership"
     // MM1.33/TSA /20180824 CASE 326087 Testfield in onModify is not very good.
     // MM1.38/TSA /20190527 CASE 356057 Minor change
     // MM1.39/TSA /20190527 CASE 350968 Changed Auto-Renew from boolean to option
+    // MM1.41/TSA /20191021 CASE 369123 Block cascasde
 
     Caption = 'Membership';
     DrillDownPageID = "MM Memberships";
@@ -44,6 +45,9 @@ table 6060127 "MM Membership"
             Caption = 'Blocked';
 
             trigger OnValidate()
+            var
+                MembershipRole: Record "MM Membership Role";
+                Contact: Record Contact;
             begin
                 "Blocked At" := CreateDateTime (0D, 0T);
                 "Blocked By" := '';
@@ -51,6 +55,23 @@ table 6060127 "MM Membership"
                   "Blocked At" := CurrentDateTime ();
                   "Blocked By" := UserId;
                 end;
+
+                //-MM1.41 [369123]
+                MembershipRole.SetFilter ("Membership Entry No.", '=%1', "Entry No.");
+                MembershipRole.SetFilter ("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
+                if (MembershipRole.FindSet ()) then begin
+                  repeat
+
+                    MembershipRole.Validate (Blocked, Blocked);
+                    MembershipRole.Modify ();
+
+                    if (Contact.Get (MembershipRole."Contact No.")) then begin
+                      Contact.Validate ("Magento Contact", not Blocked);
+                      Contact.Modify();
+                    end;
+                  until (MembershipRole.Next () = 0);
+                end;
+                //+MM1.41 [369123]
             end;
         }
         field(16;"Blocked At";DateTime)

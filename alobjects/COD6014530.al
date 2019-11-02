@@ -27,6 +27,7 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
     // NPR5.42/MMV /20180507 CASE 306689 Added support for location specific payment type.
     // NPR5.43/MMV /20180620 CASE 317969 Moved constant string in-line instead of ENU caption.
     // NPR5.46/NPKNAV/20181008  CASE 290734-01 Transport NPR5.46 - 8 October 2018
+    // NPR5.52/TILA/20190924CASE 361782DeserializeState function removed
 
     SingleInstance = true;
     TableNo = TempBlob;
@@ -585,13 +586,6 @@ codeunit 6014530 "Credit Card Protocol C-sharp"
 
     local procedure "--- Protocol Event Handling"()
     begin
-    end;
-
-    local procedure DeserializeState(Data: Text;var State: DotNet npNetState)
-    var
-        JsonConvert: DotNet npNetJsonConvert;
-    begin
-        State := JsonConvert.DeserializeObject(Data,GetDotNetType(State));
     end;
 
     local procedure SerializeJson("Object": Variant): Text

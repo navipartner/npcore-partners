@@ -38,6 +38,7 @@ codeunit 6060129 "MM Member WebService Mgr"
     // MM1.36/TSA /20190110 CASE 328141 Added CreateWalletMemberPass support, CreateWallet(), ProcessCreateWalletRequest(), GetCreateWalletRequest()
     // MM1.39/TSA /20190529 CASE 350968 Added GetSetAutoRenewOption service
     // MM1.40/TSA /20190827 CASE 360242 Added Support to attributes
+    // MM1.41/TSA /20191001 CASE 359703 Added assignment of companyname on membership create
 
     TableNo = "Nc Import Entry";
 
@@ -1104,6 +1105,10 @@ codeunit 6060129 "MM Member WebService Mgr"
 
         Evaluate (MemberInfoCapture."Document Date", NpXmlDomMgt.GetXmlText (XmlElement, 'activationdate', 0, false), 9);
         MemberInfoCapture.Insert ();
+
+        //-MM1.41 [359703]
+        MemberInfoCapture."Company Name" := NpXmlDomMgt.GetXmlText (XmlElement, 'companyname', MaxStrLen (MemberInfoCapture."Company Name"), false);
+        //+MM1.41 [359703]
     end;
 
     local procedure GetXmlMembershipMemberInfo(XmlElement: DotNet npNetXmlElement;var MemberInfoCapture: Record "MM Member Info Capture")

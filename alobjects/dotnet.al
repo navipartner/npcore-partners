@@ -74,11 +74,11 @@ dotnet
         {
         }
 
-        type("System.Xml.XmlException";"npNetXmlException")
+        type("System.Xml.XmlComment";"npNetXmlComment")
         {
         }
 
-        type("System.Xml.XmlComment";"npNetXmlComment")
+        type("System.Xml.XmlException";"npNetXmlException")
         {
         }
     }
@@ -500,6 +500,10 @@ dotnet
         {
         }
 
+        type("System.Security.SecurityElement";"npNetSecurityElement")
+        {
+        }
+
         type("System.Security.Cryptography.MD5CryptoServiceProvider";"npNetMD5CryptoServiceProvider")
         {
         }
@@ -595,6 +599,10 @@ dotnet
         }
 
         type("NaviPartner.Retail.Nav.Classes.Json.DataGrid.DataGrid";"npNetDataGrid")
+        {
+        }
+
+        type("NaviPartner.Retail.Nav.ObjectModel.Model";"npNetModel")
         {
         }
 
@@ -751,10 +759,6 @@ dotnet
         }
 
         type("NaviPartner.Retail.Nav.App.ProtocolManager";"npNetProtocolManager")
-        {
-        }
-
-        type("NaviPartner.Retail.Nav.ObjectModel.Model";"npNetModel")
         {
         }
 
@@ -921,6 +925,14 @@ dotnet
         }
 
         type("Renci.SshNet.AuthenticationMethod";"npNetAuthenticationMethod")
+        {
+        }
+
+        type("Renci.SshNet.PrivateKeyAuthenticationMethod";"npNetPrivateKeyAuthenticationMethod")
+        {
+        }
+
+        type("Renci.SshNet.PrivateKeyFile";"npNetPrivateKeyFile")
         {
         }
 

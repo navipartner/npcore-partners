@@ -30,6 +30,11 @@ codeunit 6150615 "POS Post Entries"
     // NPR5.51/TSA /20190620 CASE 359403 Added filter to prevent balancing entries to double posted when using the post range function
     // NPR5.51/TSA /20190626 CASE 347057 Include lines of type PAYOUT in tax calculation check sum, since it was only half included
     // NPR5.51/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
+    // NPR5.52/ALPO/20190923 CASE 365326 POS Posting related fields moved to POS Posting Profiles from NP Retail Setup
+    // NPR5.52/SARA/20190924 CASE 369668 Added COMMIT function to avoid runtime errors
+    // NPR5.52/TSA /20190904 CASE 367393 Added implementation of Navigate for POS Entry
+    // NPR5.52/TSA /20190927 CASE 370654 Added one more posting description option for condenced posting
+    // NPR5.52/TSA /20191014 CASE 372920 Replenishment Method Assembly
 
     TableNo = "POS Entry";
 
@@ -156,7 +161,8 @@ codeunit 6150615 "POS Post Entries"
           CreateGenJournalLinesFromSalesTax(POSEntry,TempGenJournalLine);
 
           if StopOnErrorVar then begin
-            CheckandPostGenJournal(TempGenJournalLine);
+            //CheckandPostGenJournal(TempGenJournalLine);  //NPR5.52 [365326]-revoked
+            CheckandPostGenJournal(TempGenJournalLine,POSEntry);  //NPR5.52 [365326]
             UpdatePOSPostingLogEntry(POSPostingLogEntryNo,false);
             MarkPOSEntries(0,POSPostingLogEntryNo,POSEntry);
 
@@ -164,7 +170,8 @@ codeunit 6150615 "POS Post Entries"
             if not PreviewMode then
               Commit;
 
-            if not CheckandPostGenJournal(TempGenJournalLine) then begin
+            //IF NOT CheckandPostGenJournal(TempGenJournalLine) THEN BEGIN  //NPR5.52 [365326]-revoked
+            if not CheckandPostGenJournal(TempGenJournalLine,POSEntry) then begin  //NPR5.52 [365326]
               UpdatePOSPostingLogEntry(POSPostingLogEntryNo,true);
               MarkPOSEntries(1,POSPostingLogEntryNo,POSEntry);
             end else begin
@@ -629,15 +636,31 @@ codeunit 6150615 "POS Post Entries"
               POSPostItemEntries.SetPostingDate(ReplaceDocumentDate,ReplaceDocumentDate,PostingDate);
 
             if StopOnErrorVar then begin
+              //-NPR5.52 [372920] PostAssembly native code commits before posting
+              Commit;
+              POSPostItemEntries.PostAssemblyOrders (POSEntry, true);
+              Commit;
+              //+NPR5.52 [372920]
               POSPostItemEntries.Run(POSEntry);
               POSEntry.Validate("Post Item Entry Status",POSEntry."Post Item Entry Status"::Posted);
               POSEntry.Modify;
             end else begin
-              if POSPostItemEntries.Run(POSEntry) then begin
-                POSEntry.Validate("Post Item Entry Status",POSEntry."Post Item Entry Status"::Posted);
-              end else begin
-                POSEntry.Validate("Post Item Entry Status",POSEntry."Post Item Entry Status"::"Error while Posting");
-              end;
+              //-NPR5.52 [369668]
+              Commit;
+              //+NPR5.52 [369668]
+
+              //-NPR5.52 [372920]
+              // IF POSPostItemEntries.RUN(POSEntry) THEN BEGIN
+              //   POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::Posted);
+              // END ELSE BEGIN
+              //   POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::"Error while Posting");
+              // END;
+              POSEntry.Validate("Post Item Entry Status",POSEntry."Post Item Entry Status"::"Error while Posting");
+              if (POSPostItemEntries.PostAssemblyOrders (POSEntry, false)) then
+                if POSPostItemEntries.Run(POSEntry) then
+                  POSEntry.Validate("Post Item Entry Status",POSEntry."Post Item Entry Status"::Posted);
+
+              //+NPR5.52 [372920]
               POSEntry.Modify;
               Commit;
             end;
@@ -645,7 +668,7 @@ codeunit 6150615 "POS Post Entries"
         until POSEntry.Next = 0;
     end;
 
-    local procedure CheckandPostGenJournal(var GenJournalLine: Record "Gen. Journal Line"): Boolean
+    local procedure CheckandPostGenJournal(var GenJournalLine: Record "Gen. Journal Line";var POSEntry: Record "POS Entry"): Boolean
     var
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
@@ -667,7 +690,8 @@ codeunit 6150615 "POS Post Entries"
           repeat
             GenJournalLine.SetRange("Posting Date",GenJournalLine."Posting Date");
             GenJournalLine.SetRange("Document No.",GenJournalLine."Document No.");
-            if not CheckandPostGenJournalDocument(GenJournalLine) then
+            //IF NOT CheckandPostGenJournalDocument(GenJournalLine) THEN  //NPR5.52 [365326]-revoked
+            if not CheckandPostGenJournalDocument(GenJournalLine,POSEntry) then  //NPR5.52 [365326]
               exit(false);
             GenJournalLine.FindLast;
             GenJournalLine.SetRange("Posting Date");
@@ -677,10 +701,12 @@ codeunit 6150615 "POS Post Entries"
         exit(true);
     end;
 
-    local procedure CheckandPostGenJournalDocument(var GenJournalLine: Record "Gen. Journal Line"): Boolean
+    local procedure CheckandPostGenJournalDocument(var GenJournalLine: Record "Gen. Journal Line";var POSEntry: Record "POS Entry"): Boolean
     var
         TempGenJournalLine2: Record "Gen. Journal Line" temporary;
         NPRetailSetup: Record "NP Retail Setup";
+        POSPostingProfile: Record "POS Posting Profile";
+        POSEntry2: Record "POS Entry";
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         DifferenceAmount: Decimal;
     begin
@@ -691,17 +717,27 @@ codeunit 6150615 "POS Post Entries"
 
         if (Abs(DifferenceAmount) > 0) then begin
           NPRetailSetup.Get;
-          if (Abs(DifferenceAmount) > NPRetailSetup."Max. POS Posting Diff. (LCY)") then begin
+          //IF (ABS(DifferenceAmount) > NPRetailSetup."Max. POS Posting Diff. (LCY)") THEN BEGIN  //NPR5.52 [365326]-revoked
+          //-NPR5.52 [365326]
+          POSEntry2.Copy(POSEntry);
+          if POSEntry2."POS Unit No." = '' then
+            if not POSEntry2.FindFirst then
+              POSEntry2.Init;
+          NPRetailSetup.GetPostingProfile(POSEntry2."POS Unit No.",POSPostingProfile);
+          if (Abs(DifferenceAmount) > POSPostingProfile."Max. POS Posting Diff. (LCY)") then begin
+          //+NPR5.52 [365326]
             ErrorText := StrSubstNo(TextImbalance,GenJournalLine.FieldCaption("Document No."),GenJournalLine."Document No.",GenJournalLine.FieldCaption("Posting Date"),GenJournalLine."Posting Date",DifferenceAmount);
             if StopOnErrorVar then
               Error(ErrorText)
             else
               exit(false);
           end;
-          NPRetailSetup.TestField("POS Posting Diff. Account");
+          //NPRetailSetup.TESTFIELD("POS Posting Diff. Account");  //NPR5.52 [365326]-revoked
+          POSPostingProfile.TestField("POS Posting Diff. Account");  //NPR5.52 [365326]
           MakeGenJournalLine(
             0,
-            NPRetailSetup."POS Posting Diff. Account",
+            //NPRetailSetup."POS Posting Diff. Account",  //NPR5.52 [365326]-revoked
+            POSPostingProfile."POS Posting Diff. Account",  //NPR5.52 [365326]
             0,
             '',
             0,
@@ -1122,7 +1158,11 @@ codeunit 6150615 "POS Post Entries"
                        POSPaymentLineToBeCompressed."POS Store Code",
                        POSEntry."Posting Date",
                        POSEntry."POS Period Register No.",
-                       POSPaymentLineToBeCompressed."POS Payment Bin Code"
+                       //-NPR5.52 [370654]
+                       //POSPaymentLineToBeCompressed."POS Payment Bin Code"
+                       POSPaymentLineToBeCompressed."POS Payment Bin Code",
+                       POSPaymentMethod.Code
+                       //+NPR5.52 [370654]
                        ),1,MaxStrLen(POSPostingBuffer.Description))
               else
               //+NPR5.38 [294722]
@@ -1993,6 +2033,101 @@ codeunit 6150615 "POS Post Entries"
     [IntegrationEvent(false, false)]
     local procedure OnAfterPostPOSEntryBatch(var POSEntry: Record "POS Entry";PreviewMode: Boolean)
     begin
+    end;
+
+    [EventSubscriber(ObjectType::Page, 344, 'OnNavigateFindRecords', '', true, true)]
+    local procedure OnNavigateFindRecords(DocNoFilter: Code[250];PostingDateFilter: Text[250];var DocumentEntry: Record "Document Entry" temporary)
+    var
+        POSEntry: Record "POS Entry";
+        POSPeriodRegister: Record "POS Period Register";
+        RecordCount: Integer;
+    begin
+
+        //-NPR5.52 [367393]
+        if (POSEntry.ReadPermission) then begin
+          if not (POSEntry.SetCurrentKey (POSEntry."Document No."))  then ;
+          POSEntry.Reset;
+          POSEntry.SetFilter ("Document No.", DocNoFilter);
+          POSEntry.SetFilter ("Posting Date", PostingDateFilter);
+          RecordCount := InsertIntoDocEntry (DocumentEntry, DATABASE::"POS Entry", 0, CopyStr (DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count ());
+
+          if (RecordCount = 0) then begin
+            if not (POSEntry.SetCurrentKey (POSEntry."Fiscal No."))  then ;
+            POSEntry.Reset;
+            POSEntry.SetFilter ("Fiscal No.", DocNoFilter);
+            POSEntry.SetFilter ("Posting Date", PostingDateFilter);
+            RecordCount := InsertIntoDocEntry (DocumentEntry, DATABASE::"POS Entry", 1, CopyStr (DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count ());
+          end;
+
+          if (RecordCount = 0) then begin
+            POSPeriodRegister.SetFilter ("Document No.", DocNoFilter);
+            if (POSPeriodRegister.FindFirst ()) then begin
+              POSEntry.Reset;
+              POSEntry.SetFilter ("POS Period Register No.", '=%1', POSPeriodRegister."No.");
+              POSEntry.SetFilter ("System Entry", '=%1', false);
+              RecordCount := InsertIntoDocEntry (DocumentEntry, DATABASE::"POS Entry", 2, CopyStr (DocNoFilter, 1, 20), POSEntry.TableCaption, POSEntry.Count ());
+            end;
+          end;
+        end;
+        //+NPR5.52 [367393]
+    end;
+
+    [EventSubscriber(ObjectType::Page, 344, 'OnNavigateShowRecords', '', true, true)]
+    local procedure OnNavigateShowRecords(DocumentEntry: Record "Document Entry")
+    var
+        POSEntry: Record "POS Entry";
+        POSPeriodRegister: Record "POS Period Register";
+    begin
+
+        //-NPR5.52 [367393]
+        if (DocumentEntry."Table ID" = DATABASE::"POS Entry") then begin
+          if (DocumentEntry."Document Type" = 0) then begin
+            if not (POSEntry.SetCurrentKey (POSEntry."Document No."))  then ;
+            POSEntry.SetFilter ("Document No.", DocumentEntry."Document No.");
+          end;
+
+          if (DocumentEntry."Document Type" = 1) then begin
+            if not (POSEntry.SetCurrentKey (POSEntry."Fiscal No."))  then ;
+            POSEntry.SetFilter ("Fiscal No.", DocumentEntry."Document No.");
+          end;
+
+          if (DocumentEntry."Document Type" = 2) then begin
+            POSPeriodRegister.SetFilter ("Document No.", DocumentEntry."Document No.");
+            if (POSPeriodRegister.FindFirst ()) then begin
+              POSEntry.SetFilter ("POS Period Register No.", '=%1', POSPeriodRegister."No.");
+              POSEntry.SetFilter ("System Entry", '=%1', false);
+            end;
+          end;
+
+          if (DocumentEntry."No. of Records" = 1) then
+            PAGE.Run (PAGE::"POS Entry List", POSEntry)
+          else
+            PAGE.Run (0, POSEntry);
+
+        end;
+        //+NPR5.52 [367393]
+    end;
+
+    local procedure InsertIntoDocEntry(var DocumentEntry: Record "Document Entry" temporary;DocTableID: Integer;DocType: Integer;DocNoFilter: Code[20];DocTableName: Text[1024];DocNoOfRecords: Integer): Integer
+    begin
+
+        //-NPR5.52 [367393]
+        if (DocNoOfRecords = 0) then
+          exit (DocNoOfRecords);
+
+        with DocumentEntry do begin
+          Init;
+          "Entry No." := "Entry No." + 1;
+          "Table ID" := DocTableID;
+          "Document Type" := DocType;
+          "Document No." := DocNoFilter;
+          "Table Name" := CopyStr(DocTableName,1,MaxStrLen("Table Name"));
+          "No. of Records" := DocNoOfRecords;
+          Insert;
+        end;
+
+        exit (DocNoOfRecords);
+        //+NPR5.52 [367393]
     end;
 }
 

@@ -9,6 +9,8 @@ tableextension 6014431 tableextension6014431 extends "Item Ledger Entry"
     // NPR5.30/TJ  /20170224 CASE 266866 Removed keys containing fields Color and Size
     //                                   Removed unused fields
     //                                   Renamed and recaptioned our fields to follow proper naming standards
+    // NPR5.52/ZESO/20190930  CASE 349417 Added Table Relation to Fields Salesperson Code + Item Group No
+    // NPR5.52/ZESO/20191010  CASE 371446 Added field Document Date and Time id 6014417
     fields
     {
         field(6014401;"Group Sale";Boolean)
@@ -32,6 +34,10 @@ tableextension 6014431 tableextension6014431 extends "Item Ledger Entry"
         {
             Caption = 'Item Group No.';
             Description = 'NPR7.100.000';
+            TableRelation = "Item Group";
+            //This property is currently not supported
+            //TestTableRelation = false;
+            ValidateTableRelation = false;
         }
         field(6014408;"Vendor No.";Code[20])
         {
@@ -48,11 +54,20 @@ tableextension 6014431 tableextension6014431 extends "Item Ledger Entry"
         {
             Caption = 'Salesperson Code';
             Description = 'NPR7.100.000';
+            TableRelation = "Salesperson/Purchaser";
+            //This property is currently not supported
+            //TestTableRelation = false;
+            ValidateTableRelation = false;
         }
         field(6014416;"Document Time";Time)
         {
             Caption = 'Document Time';
             Description = 'NPR7.100.000';
+        }
+        field(6014417;"Document Date and Time";DateTime)
+        {
+            Caption = 'Document Date and Time';
+            Description = 'NPR5.52';
         }
     }
     keys

@@ -1,6 +1,7 @@
 xmlport 6151142 "M2 Get Budget Entries"
 {
     // NPR5.50/TSA /20190515 CASE 353714 Initial Version
+    // NPR5.52/TSA /20191007 CASE 354183 Added SalespersonCode to filter and response
 
     Caption = 'Get Budget Entries';
     Encoding = UTF8;
@@ -23,6 +24,12 @@ xmlport 6151142 "M2 Get Budget Entries"
                 fieldelement(CustomerNumber;TmpItemBudgetEntryRequest."Source No.")
                 {
                     MinOccurs = Zero;
+                }
+                textelement(salespersoncode)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                    XmlName = 'SalespersonCode';
                 }
                 fieldelement(ItemNumber;TmpItemBudgetEntryRequest."Item No.")
                 {
@@ -117,6 +124,24 @@ xmlport 6151142 "M2 Get Budget Entries"
                             fieldattribute(CustomerNumber;TmpItemBudgetEntryResponse."Source No.")
                             {
                             }
+                            textattribute(budgetsalespersoncode)
+                            {
+                                XmlName = 'SalespersonCode';
+
+                                trigger OnBeforePassVariable()
+                                var
+                                    Customer: Record Customer;
+                                begin
+
+                                    //-NPR5.52 [354183]
+                                    BudgetSalespersonCode := SalesPersonCode;
+                                    if (BudgetSalespersonCode = '') then
+                                      if (TmpItemBudgetEntryResponse."Source Type" = TmpItemBudgetEntryResponse."Source Type"::Customer) then
+                                        if (Customer.Get (TmpItemBudgetEntryResponse."Source No.")) then
+                                          BudgetSalespersonCode := Customer."Salesperson Code";
+                                    //+NPR5.52 [354183]
+                                end;
+                            }
                             fieldattribute(Description;TmpItemBudgetEntryResponse.Description)
                             {
                             }
@@ -183,7 +208,7 @@ xmlport 6151142 "M2 Get Budget Entries"
     procedure GenerateResponse()
     var
         ItemBudgetName: Record "Item Budget Name";
-        ItemBudgetEntry: Record "Item Budget Entry";
+        Customer: Record Customer;
         BudgetFromDate: Date;
         BudgetUntilDate: Date;
     begin
@@ -200,33 +225,7 @@ xmlport 6151142 "M2 Get Budget Entries"
         TmpItemBudgetNameResponse.TransferFields (ItemBudgetName, true);
         TmpItemBudgetNameResponse.Insert ();
 
-        ItemBudgetEntry.SetFilter ("Budget Name", '=%1', TmpItemBudgetEntryRequest."Budget Name");
-        if (TmpItemBudgetEntryRequest."Source No." <> '') then begin
-          ItemBudgetEntry.SetFilter ("Source Type", '=%1', ItemBudgetEntry."Source Type"::Customer);
-          ItemBudgetEntry.SetFilter ("Source No.", '=%1', TmpItemBudgetEntryRequest."Source No.");
-        end;
-
-        if (TmpItemBudgetEntryRequest."Item No." <> '') then
-          ItemBudgetEntry.SetFilter ("Item No.", '=%1', TmpItemBudgetEntryRequest."Item No.");
-
-        if (TmpItemBudgetEntryRequest."Location Code" <> '') then
-          ItemBudgetEntry.SetFilter ("Location Code", '=%1', TmpItemBudgetEntryRequest."Location Code");
-
-        if (TmpItemBudgetEntryRequest."Global Dimension 1 Code" <> '') then
-          ItemBudgetEntry.SetFilter ("Global Dimension 1 Code", '=%1', TmpItemBudgetEntryRequest."Global Dimension 1 Code");
-
-        if (TmpItemBudgetEntryRequest."Global Dimension 2 Code" <> '') then
-          ItemBudgetEntry.SetFilter ("Global Dimension 2 Code", '=%1', TmpItemBudgetEntryRequest."Global Dimension 2 Code");
-
-        if (TmpItemBudgetEntryRequest."Budget Dimension 1 Code" <> '') then
-          ItemBudgetEntry.SetFilter ("Budget Dimension 1 Code", '=%1', TmpItemBudgetEntryRequest."Budget Dimension 1 Code");
-
-        if (TmpItemBudgetEntryRequest."Budget Dimension 2 Code" <> '') then
-          ItemBudgetEntry.SetFilter ("Budget Dimension 2 Code", '=%1', TmpItemBudgetEntryRequest."Budget Dimension 2 Code");
-
-        if (TmpItemBudgetEntryRequest."Budget Dimension 3 Code" <> '') then
-          ItemBudgetEntry.SetFilter ("Budget Dimension 3 Code", '=%1', TmpItemBudgetEntryRequest."Budget Dimension 3 Code");
-
+        //-NPR5.52 [354183] Refactored, moved coded to a function
         if (FromDate = '') then
           FromDate := '1900-01-01';
 
@@ -243,6 +242,67 @@ xmlport 6151142 "M2 Get Budget Entries"
           exit;
         end;
 
+        with TmpItemBudgetEntryRequest do
+          if (SalesPersonCode = '') then begin
+              GetBudgetEntriesWorker ("Budget Name", "Source No.", "Item No.", "Location Code",
+                                      "Global Dimension 1 Code", "Global Dimension 2 Code",
+                                      "Budget Dimension 1 Code", "Budget Dimension 2 Code", "Budget Dimension 3 Code",
+                                      BudgetFromDate, BudgetUntilDate);
+          end else begin
+            Customer.SetFilter ("Salesperson Code", '=%1', SalesPersonCode);
+            if (Customer.FindSet ()) then begin
+              repeat
+                GetBudgetEntriesWorker ("Budget Name", Customer."No.", "Item No.", "Location Code",
+                                "Global Dimension 1 Code", "Global Dimension 2 Code",
+                                "Budget Dimension 1 Code", "Budget Dimension 2 Code", "Budget Dimension 3 Code",
+                                BudgetFromDate, BudgetUntilDate);
+              until (Customer.Next () = 0);
+            end;
+          end;
+
+        //+NPR5.52 [354183]
+
+
+        ExecutionTime := StrSubstNo ('%1 (ms)', Format (Time - StartTime, 0, 9));
+        ResponseCode := 'OK';
+        ResponseMessage := 'Success';
+        ResponseMessageId := Format (10);
+    end;
+
+    local procedure GetBudgetEntriesWorker(BudgetName: Code[10];CustomerNo: Code[20];ItemNo: Code[20];LocationCode: Code[10];GlblDim1Code: Code[10];GlblDim2Code: Code[10];BudgetDim1Code: Code[10];BudgetDim2Code: Code[10];BudgetDim3Code: Code[10];BudgetFromDate: Date;BudgetUntilDate: Date)
+    var
+        ItemBudgetEntry: Record "Item Budget Entry";
+    begin
+
+        //-NPR5.52 [354183]
+        ItemBudgetEntry.SetFilter ("Budget Name", '=%1', BudgetName);
+
+        if (CustomerNo <> '') then begin
+          ItemBudgetEntry.SetFilter ("Source Type", '=%1', ItemBudgetEntry."Source Type"::Customer);
+          ItemBudgetEntry.SetFilter ("Source No.", '=%1', CustomerNo);
+         end;
+
+        if (ItemNo <> '') then
+          ItemBudgetEntry.SetFilter ("Item No.", '=%1', ItemNo);
+
+        if (LocationCode <> '') then
+          ItemBudgetEntry.SetFilter ("Location Code", '=%1', LocationCode);
+
+        if (GlblDim1Code <> '') then
+          ItemBudgetEntry.SetFilter ("Global Dimension 1 Code", '=%1', GlblDim1Code);
+
+        if (GlblDim2Code <> '') then
+          ItemBudgetEntry.SetFilter ("Global Dimension 2 Code", '=%1', GlblDim2Code);
+
+        if (BudgetDim1Code<> '') then
+          ItemBudgetEntry.SetFilter ("Budget Dimension 1 Code", '=%1', BudgetDim1Code);
+
+        if (BudgetDim2Code <> '') then
+          ItemBudgetEntry.SetFilter ("Budget Dimension 2 Code", '=%1', BudgetDim2Code);
+
+        if (BudgetDim3Code <> '') then
+          ItemBudgetEntry.SetFilter ("Budget Dimension 3 Code", '=%1', BudgetDim3Code);
+
         ItemBudgetEntry.SetFilter (Date, '%1..%2', BudgetFromDate, BudgetUntilDate);
 
         if (ItemBudgetEntry.FindSet ()) then begin
@@ -252,11 +312,8 @@ xmlport 6151142 "M2 Get Budget Entries"
           until (ItemBudgetEntry.Next () = 0);
         end;
 
-
-        ExecutionTime := StrSubstNo ('%1 (ms)', Format (Time - StartTime, 0, 9));
-        ResponseCode := 'OK';
-        ResponseMessage := 'Success';
-        ResponseMessageId := Format (10);
+        exit;
+        //+NPR5.52 [354183]
     end;
 
     local procedure SetError(ErrorId: Integer;ErrorText: Text)

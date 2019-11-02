@@ -3,6 +3,7 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
     // TM1.26/TSA /20171101 CASE 276843 Initial Version
     // TM1.26/TSA /20171122  CASE 285601-01 Transport TM1.26 - 22 November 2017
     // TM1.27/TSA /20171218 CASE 300395 Added setup Timeout (ms)
+    // TM1.43/TSA /20191004 CASE 367471 refactored signatures to return fault message
     // 
     // 
     // *** TICKET SERVER setup ***
@@ -41,7 +42,11 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
         if (TicketReservationRequest."DIY Print Order Requested") then
           exit (true);
 
-        CreatTicketPrintOrderXml (TicketRequestXml, TicketReservationRequest."Session Token ID", MarkTicketAsPrinted);
+        //-TM1.43 [367471]
+        //CreatTicketPrintOrderXml (TicketRequestXml, TicketReservationRequest."Session Token ID", MarkTicketAsPrinted);
+        if (not CreatTicketPrintOrderXml (TicketRequestXml, TicketReservationRequest."Session Token ID", MarkTicketAsPrinted, FailReasonText)) then
+          exit (false);
+        //+TM1.43 [367471]
 
         if (WebServiceApi (FailReasonText, TicketRequestXml, ServiceResponse)) then begin
           FailReasonText := '';
@@ -299,7 +304,7 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
     begin
     end;
 
-    local procedure CreatTicketPrintOrderXml(var XmlDoc: DotNet npNetXmlDocument;var Token: Text[100];MarkTicketAsPrinted: Boolean)
+    local procedure CreatTicketPrintOrderXml(var XmlDoc: DotNet npNetXmlDocument;var Token: Text[100];MarkTicketAsPrinted: Boolean;var FailureReason: Text): Boolean
     var
         XmlText: Text;
         TempBlob: Record TempBlob temporary;
@@ -311,7 +316,12 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
         TempBlob.Insert ();
         TempBlob.Blob.CreateOutStream (OutStr, TEXTENCODING::UTF8);
 
-        TicketTicketServerRequest.SetRequestEntryNo (Token, MarkTicketAsPrinted);
+        //-TM1.43 [367471]
+        //TicketTicketServerRequest.SetRequestEntryNo (Token, MarkTicketAsPrinted);
+        if (not TicketTicketServerRequest.SetRequestEntryNo (Token, MarkTicketAsPrinted, FailureReason)) then
+          exit (false);
+        //+TM1.43 [367471]
+
         TicketTicketServerRequest.SetDestination (OutStr);
         TicketTicketServerRequest.Export;
         TempBlob.Modify ();
@@ -327,7 +337,11 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
         XmlDoc := XmlDoc.XmlDocument;
         XmlDoc.LoadXml (XmlText);
 
-        if (UserId = 'TSA') then Message (XmlText);
+        if (UserId = 'TSA') then Message (CopyStr (XmlText,1,1024));
+
+        //-TM1.43 [367471]
+        exit (true);
+        //+TM1.43 [367471]
     end;
 
     local procedure WebExceptionResponse(var XmlDoc: DotNet npNetXmlDocument;var ErrorCode: Code[10];var ErrorText: Text): Boolean

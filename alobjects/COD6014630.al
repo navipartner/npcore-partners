@@ -310,7 +310,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
                                            QueryClose;
                                          end;
                'TOGGLE_SALEVAT_YN'     : begin
-                                           "Price including VAT" := not "Price including VAT";
+                                           "Prices Including VAT" := not "Prices Including VAT";
                                            Validate("Customer No.");
                                            Modify(true);
                                          end;
@@ -1614,7 +1614,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
               CopyValidering := CopyStr(CopyValidering, 1, StrLen(CopyValidering)-1);
             Register.Get("Register No.");
             //"Price including VAT" := Register."Price including VAT std.";
-            "Price including VAT" := true;
+            "Prices Including VAT" := true;
             if not GetSalesPersonCode() then
               exit;
             //-NPR5.20
@@ -2679,7 +2679,7 @@ codeunit 6014630 "Touch - Sale POS (Web)"
           Date                    := Today;
           "Start Time"            := Time;
           "External Document No." := SalePOS."External Document No.";
-          "Price including VAT"   := SalePOS."Price including VAT";
+          "Prices Including VAT"   := SalePOS."Prices Including VAT";
           Modify(true);
 
         //-NPR5.26

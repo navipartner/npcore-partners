@@ -1,6 +1,7 @@
 page 6150637 "POS End of Day Profiles"
 {
     // NPR5.49/TSA /20190314 CASE 348458 Initial Version
+    // NPR5.52/SARA/20190912 CASE 368395 New field 'SMS Profile'
 
     Caption = 'POS End of Day Profile';
     PageType = List;
@@ -34,6 +35,9 @@ page 6150637 "POS End of Day Profiles"
                 {
                 }
                 field("Force Blind Counting";"Force Blind Counting")
+                {
+                }
+                field("SMS Profile";"SMS Profile")
                 {
                 }
             }

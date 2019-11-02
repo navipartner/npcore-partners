@@ -1,6 +1,7 @@
 codeunit 6151128 "POS Action - Run Item AddOn"
 {
     // NPR5.48/MHA /20181113  CASE 334922 Object created - Insert Item AddOns from the currently selected POS Sales Line
+    // NPR5.52/ALPO/20190912  CASE 354309 Suggest Item AddOns on after POS sale line insert
 
     SingleInstance = true;
 
@@ -14,6 +15,7 @@ codeunit 6151128 "POS Action - Run Item AddOn"
         Model: DotNet npNetModel;
         ActiveModelID: Guid;
         Text000: Label 'Insert Item AddOns from the currently selected POS Sales Line';
+        BaseLineNo: Integer;
 
     local procedure ActionCode(): Text
     begin
@@ -22,7 +24,8 @@ codeunit 6151128 "POS Action - Run Item AddOn"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.0');
+        //EXIT('1.0');  //NPR5.52 [354309]-revoked
+        exit('1.1');  //NPR5.52 [354309]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -41,15 +44,23 @@ codeunit 6151128 "POS Action - Run Item AddOn"
             RegisterWorkflow(false);
             Sender.RegisterDataSourceBinding('BUILTIN_SALELINE');
             Sender.RegisterCustomJavaScriptLogic('enable','return row.getField("ItemAddOn.ItemAddOn").rawValue;');
+            RegisterIntegerParameter('BaseLineNo',0);  //NPR5.52 [354309]
           end;
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
     local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    var
+        JSON: Codeunit "POS JSON Management";
     begin
         if not Action.IsThisAction(ActionCode) then
           exit;
+
+        //-NPR5.52 [354309]
+        JSON.InitializeJObjectParser(Context,FrontEnd);
+        BaseLineNo := JSON.GetIntegerParameter('BaseLineNo',false);
+        //+NPR5.52 [354309]
 
         case WorkflowStep of
           'run_addons' :
@@ -73,7 +84,12 @@ codeunit 6151128 "POS Action - Run Item AddOn"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        AppliesToLineNo := FindAppliesToLineNo(SaleLinePOS);
+        //-NPR5.52 [354309]
+        if BaseLineNo <> 0 then
+          AppliesToLineNo := BaseLineNo
+        else
+        //+NPR5.52 [354309]
+          AppliesToLineNo := FindAppliesToLineNo(SaleLinePOS);
         SaleLinePOS.Get(SaleLinePOS."Register No.",SaleLinePOS."Sales Ticket No.",SaleLinePOS.Date,SaleLinePOS."Sale Type",AppliesToLineNo);
 
         if SaleLinePOS.Type <> SaleLinePOS.Type::Item then
@@ -87,7 +103,8 @@ codeunit 6151128 "POS Action - Run Item AddOn"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         CurrNpIaItemAddOn := NpIaItemAddOn;
-        CreateUserInterface(SalePOS,AppliesToLineNo,NpIaItemAddOn);
+        //CreateUserInterface(SalePOS,AppliesToLineNo,NpIaItemAddOn);  //NPR5.52 [354309]-revoked
+        CreateUserInterface(SalePOS,SaleLinePOS,NpIaItemAddOn);  //NPR5.52 [354309]
         ActiveModelID := FrontEnd.ShowModel(Model);
     end;
 
@@ -95,12 +112,13 @@ codeunit 6151128 "POS Action - Run Item AddOn"
     begin
     end;
 
-    local procedure CreateUserInterface(SalePOS: Record "Sale POS";AppliesToLineNo: Integer;NpIaItemAddOn: Record "NpIa Item AddOn")
+    local procedure CreateUserInterface(SalePOS: Record "Sale POS";AppliesToSaleLinePOS: Record "Sale Line POS";NpIaItemAddOn: Record "NpIa Item AddOn")
     begin
         Model := Model.Model();
         Model.AddHtml(InitHtml());
         Model.AddStyle(InitCss());
-        Model.AddScript(InitScript(SalePOS,AppliesToLineNo,NpIaItemAddOn));
+        //Model.AddScript(InitScript(SalePOS,AppliesToLineNo,NpIaItemAddOn));  //NPR5.52 [354309]-revoked
+        Model.AddScript(InitScript(SalePOS,AppliesToSaleLinePOS,NpIaItemAddOn));  //NPR5.52 [354309]
     end;
 
     local procedure "--- Init"()
@@ -144,7 +162,7 @@ codeunit 6151128 "POS Action - Run Item AddOn"
         end;
     end;
 
-    local procedure InitScript(SalePOS: Record "Sale POS";AppliesToLineNo: Integer;NpIaItemAddOn: Record "NpIa Item AddOn") Script: Text
+    local procedure InitScript(SalePOS: Record "Sale POS";AppliesToSaleLinePOS: Record "Sale Line POS";NpIaItemAddOn: Record "NpIa Item AddOn") Script: Text
     var
         RetailModelScriptLibrary: Codeunit "Retail Model Script Library";
     begin
@@ -152,12 +170,13 @@ codeunit 6151128 "POS Action - Run Item AddOn"
         Script += RetailModelScriptLibrary.InitJQueryUi();
         Script += RetailModelScriptLibrary.InitTouchPunch();
         Script += RetailModelScriptLibrary.InitEscClose();
-        Script += InitScriptData(SalePOS,AppliesToLineNo,NpIaItemAddOn);
+        //Script += InitScriptData(SalePOS,AppliesToLineNo,NpIaItemAddOn);  //NPR5.52 [354309]-revoked
+        Script += InitScriptData(SalePOS,AppliesToSaleLinePOS,NpIaItemAddOn);  //NPR5.52 [354309]
 
         exit(Script);
     end;
 
-    local procedure InitScriptData(SalePOS: Record "Sale POS";AppliesToLineNo: Integer;NpIaItemAddOn: Record "NpIa Item AddOn") Script: Text
+    local procedure InitScriptData(SalePOS: Record "Sale POS";AppliesToSaleLinePOS: Record "Sale Line POS";NpIaItemAddOn: Record "NpIa Item AddOn") Script: Text
     var
         NpIaItemAddOnMgt: Codeunit "NpIa Item AddOn Mgt.";
     begin
@@ -166,7 +185,8 @@ codeunit 6151128 "POS Action - Run Item AddOn"
           'var $scope = angular.element(appElement).scope();' +
           '$scope.$apply(function() {';
 
-        Script += NpIaItemAddOnMgt.InitScriptAddOnLines(SalePOS,AppliesToLineNo,NpIaItemAddOn);
+        //Script += NpIaItemAddOnMgt.InitScriptAddOnLines(SalePOS,AppliesToLineNo,NpIaItemAddOn);  //NPR5.52 [354309]-revoked
+        Script += NpIaItemAddOnMgt.InitScriptAddOnLines(SalePOS,AppliesToSaleLinePOS,NpIaItemAddOn);  //NPR5.52 [354309]
         Script += NpIaItemAddOnMgt.InitScriptLabels(NpIaItemAddOn);
 
         Script += '});' +
@@ -212,9 +232,18 @@ codeunit 6151128 "POS Action - Run Item AddOn"
         FrontEnd.GetSession(POSSession);
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-        AppliesToLineNo := FindAppliesToLineNo(SaleLinePOS);
+        //-NPR5.52 [354309]
+        if BaseLineNo <> 0 then
+          AppliesToLineNo := BaseLineNo
+        else
+        //+NPR5.52 [354309]
+          AppliesToLineNo := FindAppliesToLineNo(SaleLinePOS);
         NpIaItemAddOnMgt.InsertPOSAddOnLines(CurrNpIaItemAddOn,AddOnLines,POSSession,AppliesToLineNo);
 
+        //-NPR5.52 [354309]
+        SaleLinePOS.Get(SaleLinePOS."Register No.",SaleLinePOS."Sales Ticket No.",SaleLinePOS.Date,SaleLinePOS."Sale Type",AppliesToLineNo);
+        POSSaleLine.SetPosition(SaleLinePOS.GetPosition);
+        //+NPR5.52 [354309]
         POSSession.RequestRefreshData();
         POSJavaScriptInterface.RefreshData(POSSession,FrontEnd);
     end;
@@ -239,6 +268,46 @@ codeunit 6151128 "POS Action - Run Item AddOn"
           exit(SaleLinePOS."Main Line No.");
 
         exit(SaleLinePOS."Line No.");
+    end;
+
+    local procedure "---OnSaleLineInsert Workflow"()
+    begin
+        //NPR5.52 [354309]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterInsertSaleLine', '', true, true)]
+    local procedure SuggestItemAddOnsOnSaleLineInsert(POSSalesWorkflowStep: Record "POS Sales Workflow Step";SaleLinePOS: Record "Sale Line POS")
+    var
+        Item: Record Item;
+        POSAction: Record "POS Action";
+        POSFrontEnd: Codeunit "POS Front End Management";
+        POSSession: Codeunit "POS Session";
+    begin
+        //-NPR5.52 [354309]
+        if (POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId()) or
+           (POSSalesWorkflowStep."Subscriber Function" <> 'SuggestItemAddOnsOnSaleLineInsert')
+        then
+          exit;
+
+        if not ((SaleLinePOS.Type = SaleLinePOS.Type::Item) and (SaleLinePOS."No." <> '')) then
+          exit;
+        Item.Get(SaleLinePOS."No.");
+        if Item."Item AddOn No." = '' then
+          exit;
+
+        if not POSSession.IsActiveSession(POSFrontEnd) then
+          exit;
+
+        POSFrontEnd.GetSession(POSSession);
+        POSAction.Get(ActionCode());
+        POSAction.SetWorkflowInvocationParameter('BaseLineNo',SaleLinePOS."Line No.",POSFrontEnd);
+        POSFrontEnd.InvokeWorkflow(POSAction);
+        //+NPR5.52 [354309]
+    end;
+
+    local procedure CurrCodeunitId(): Integer
+    begin
+        exit(CODEUNIT::"POS Action - Run Item AddOn");  //NPR5.52 [354309]
     end;
 
     trigger Model::OnModelControlEvent(control: DotNet npNetControl;eventName: Text;data: DotNet npNetDictionary_Of_T_U)

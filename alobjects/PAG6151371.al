@@ -17,6 +17,9 @@ page 6151371 "CS Setup"
     // NPR5.51/CLVA/20190627 CASE 359375 Added field Create Worksheet after Trans. for re-creation of worksheet after Stock-Take transfer
     // NPR5.51/CLVA/20190812 CASE 362173 Added Group Physical Inventory Counting
     // NPR5.51/CLVA/20190823 CASE 365967 Added action Posting Buffer and Store Users
+    // NPR5.52/CLVA/20190904 CASE 365967 Added Group "Job Queue" and field "Sum Qty. to Handle"
+    // NPR5.52/CLVA/20190905 CASE 365967 Added action Stores
+    // NPR5.52/CLVA/20190916 CASE 368484 Added action Store Users
 
     Caption = 'CS Setup';
     PageType = Card;
@@ -46,8 +49,11 @@ page 6151371 "CS Setup"
                 field("Zero Def. Qty. to Handle";"Zero Def. Qty. to Handle")
                 {
                 }
+                field("Sum Qty. to Handle";"Sum Qty. to Handle")
+                {
+                }
             }
-            group(Control6014409)
+            group("Stock-Take")
             {
                 Caption = 'Stock-Take';
                 field("Filter Worksheets by Location";"Filter Worksheets by Location")
@@ -104,6 +110,25 @@ page 6151371 "CS Setup"
                 {
                 }
             }
+            group("Job Queue")
+            {
+                Caption = 'Job Queue';
+                field("Post with Job Queue";"Post with Job Queue")
+                {
+                }
+                field("Job Queue Category Code";"Job Queue Category Code")
+                {
+                }
+                field("Job Queue Priority for Post";"Job Queue Priority for Post")
+                {
+                }
+                field("Notify On Success";"Notify On Success")
+                {
+                }
+                field("Run in User Session";"Run in User Session")
+                {
+                }
+            }
         }
     }
 
@@ -156,47 +181,41 @@ page 6151371 "CS Setup"
                 PromotedIsBig = true;
                 RunObject = Page "CS Posting Buffer";
             }
-            action("Store Users")
+            group(Stores)
             {
-                Caption = 'Store Users';
-                Image = Employee;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                RunObject = Page "CS Store Users";
-            }
-            group("Stock-Take")
-            {
-                Caption = 'Stock-Take';
-                action(Worksheet)
+                Caption = 'Stores';
+                action(List)
                 {
-                    Caption = 'Worksheet';
-                    Image = Worksheet;
+                    Caption = 'List';
+                    Image = BusinessRelation;
+                    Promoted = false;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
-                    RunObject = Page "Stock-Take Worksheet";
+                    RunObject = Page "POS Store List";
                 }
-                action(Counting)
+                action("Store Users")
                 {
-                    Caption = 'Counting';
+                    Caption = 'Store Users';
+                    Image = Employee;
+                    Promoted = false;
+                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                    //PromotedCategory = Process;
+                    //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
+                    //PromotedIsBig = true;
+                    RunObject = Page "CS Store Users";
+                }
+                action(Countings)
+                {
+                    Caption = 'Countings';
                     Image = Worksheet2;
+                    Promoted = false;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
-                    RunObject = Page "CS Stock-Take Handling";
-                }
-                action(Data)
-                {
-                    Caption = 'Data';
-                    Image = DataEntry;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
-                    //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedIsBig = true;
-                    RunObject = Page "CS Stock-Takes Data";
+                    RunObject = Page "CS Stock-Takes List";
                 }
             }
             group(Rfid)
@@ -212,15 +231,15 @@ page 6151371 "CS Setup"
                     //PromotedIsBig = true;
                     RunObject = Page "CS Rfid Tag Models";
                 }
-                action("Warehouse Receipt")
+                action("Counting Data")
                 {
-                    Caption = 'Warehouse Receipt';
-                    Image = Warehouse;
+                    Caption = 'Counting Data';
+                    Image = DataEntry;
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
-                    RunObject = Page "CS Whse. Receipt List";
+                    RunObject = Page "CS Stock-Takes Data";
                 }
             }
         }

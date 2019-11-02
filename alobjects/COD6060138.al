@@ -21,6 +21,8 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
     // MM1.33.01/TSA /20180912 CASE 328398 Fixed external to internal item number convert
     // MM1.36/TSA /20181112 CASE 335828 New function for show member card
     // MM1.40/TSA /20190730 CASE 360275 Added Auto-Admit for renew, upgrade, extend
+    // MM1.41/TSA /20190918 CASE 368608 Add the select member onAfterLogin workflow
+    // MM1.41/TSA /20191002 CASE 368608 Adding new action to edit current membership
 
 
     trigger OnRun()
@@ -63,7 +65,7 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.4');
+        exit ('1.5');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
@@ -81,13 +83,23 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
           Sender.Type::Generic,
           Sender."Subscriber Instances Allowed"::Multiple)
         then begin
+          //-MM1.41 [368608]
+          // FunctionOptionString := 'Member Arrival,'+
+          //                         'Select Membership,'+
+          //                         'View Membership Entry,Regret Membership Entry,'+
+          //                         'Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member';
+          // FOR N := 1 TO 10 DO
+          //   JSArr += STRSUBSTNO ('"%1",', SELECTSTR (N, FunctionOptionString));
+          // JSArr := STRSUBSTNO ('var optionNames = [%1];', COPYSTR (JSArr, 1, STRLEN(JSArr)-1));
+
           FunctionOptionString := 'Member Arrival,'+
                                   'Select Membership,'+
                                   'View Membership Entry,Regret Membership Entry,'+
-                                  'Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member';
-          for N := 1 to 10 do
+                                  'Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member,Edit Current Membership';
+          for N := 1 to 11 do
             JSArr += StrSubstNo ('"%1",', SelectStr (N, FunctionOptionString));
           JSArr := StrSubstNo ('var optionNames = [%1];', CopyStr (JSArr, 1, StrLen(JSArr)-1));
+          //+MM1.41 [368608]
 
 
           Sender.RegisterWorkflowStep ('0', JSArr +'windowTitle = labels.MembershipTitle.substitute (optionNames[param.Function].toString()); ');
@@ -181,6 +193,9 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
             7: CancelMembership (POSSession, DialogMethodType, MemberCardNumber);
             8: EditMembership (POSSession, DialogMethodType, MemberCardNumber);
             9: ShowMember (POSSession, DialogMethodType, MemberCardNumber);
+            //-MM1.41 [368608]
+            10:EditActiveMembership (POSSession, DialogMethodType, MemberCardNumber);
+            //+MM1.41 [368608]
           else
             Error ('POS Action: Function with ID %1 is not implemented.', FunctionId);
           end;
@@ -668,6 +683,29 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
         //+MM1.22 [289169]
     end;
 
+    local procedure EditActiveMembership(POSSession: Codeunit "POS Session";InputMethod: Option;ExternalMemberCardNo: Text[100])
+    var
+        POSSale: Codeunit "POS Sale";
+        SalePOS: Record "Sale POS";
+        Membership: Record "MM Membership";
+    begin
+
+        //-MM1.41 [368608]
+        POSSession.GetSale (POSSale);
+        POSSale.RefreshCurrent ();
+        POSSale.GetCurrentSale (SalePOS);
+
+        if (SalePOS."Customer No." = '') then
+          exit;
+
+        Membership.SetFilter ("Customer No.", '=%1', SalePOS."Customer No.");
+        if (not Membership.FindFirst ()) then
+          exit;
+
+        PAGE.RunModal (PAGE::"MM Membership Card", Membership);
+        //+MM1.41 [368608]
+    end;
+
     procedure ShowMember(POSSession: Codeunit "POS Session";InputMethod: Option;var ExternalMemberCardNo: Text[100])
     var
         MemberRetailIntegration: Codeunit "MM Member Retail Integration";
@@ -1015,6 +1053,81 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
         //-MM1.31 [319425]
         exit(CODEUNIT::"MM POS Action - Member Mgmt.");
         //+MM1.31 [319425]
+    end;
+
+    local procedure "--POS Workflow"()
+    begin
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150728, 'OnAfterLogin', '', true, true)]
+    local procedure OnAfterLogin_SelectMemberRequired(POSSalesWorkflowStep: Record "POS Sales Workflow Step";var POSSession: Codeunit "POS Session")
+    var
+        SaleLinePOS: Record "Sale Line POS";
+        SalePOS: Record "Sale POS";
+        MemberRetailIntegration: Codeunit "MM Member Retail Integration";
+        POSSale: Codeunit "POS Sale";
+        ExternalMemberCardNo: Text[100];
+        MembershipSelected: Boolean;
+    begin
+
+        //-MM1.41 [368608]
+        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
+          exit;
+
+        if POSSalesWorkflowStep."Subscriber Function" <> 'OnAfterLogin_SelectMemberRequired' then
+          exit;
+
+        POSSession.GetSale (POSSale);
+        POSSale.GetCurrentSale (SalePOS);
+        SalePOS.Find ();
+        POSSale.Refresh (SalePOS);
+
+        ClearLastError;
+
+        repeat
+          MembershipSelected := false;
+
+          if (ExternalMemberCardNo = '') then
+            if (not SelectMemberCardUI (ExternalMemberCardNo)) then
+              exit;
+
+          if (MemberRetailIntegration.POS_ValidateMemberCardNo (false, true, DialogMethod::NO_PROMPT, true, ExternalMemberCardNo)) then
+            MembershipSelected := AssignPOSMembership (SalePOS, ExternalMemberCardNo);
+
+          if (not MembershipSelected) then begin
+            Message ('There was an error selecting member %1:\\%2', ExternalMemberCardNo, GetLastErrorText);
+            ExternalMemberCardNo := '';
+          end;
+
+        until (MembershipSelected);
+
+        if (MembershipSelected) then begin
+          POSSale.Refresh (SalePOS);
+          POSSale.Modify (false, false);
+        end;
+
+        POSSession.RequestRefreshData ();
+
+        //+MM1.41 [368608]
+    end;
+
+    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    local procedure OnAfterLoginDiscovery(var Rec: Record "POS Sales Workflow Step";RunTrigger: Boolean)
+    begin
+
+        //-MM1.41 [368608]
+        if Rec."Subscriber Codeunit ID" <> CurrCodeunitId() then
+          exit;
+
+        case Rec."Subscriber Function" of
+          'OnAfterLogin_SelectMemberRequired':
+            begin
+              Rec.Description := CopyStr('On After Login, Select Member (Required)',1,MaxStrLen(Rec.Description));
+              Rec."Sequence No." := CurrCodeunitId();
+              Rec.Enabled := false;
+            end;
+        end;
+        //+MM1.41 [368608]
     end;
 }
 

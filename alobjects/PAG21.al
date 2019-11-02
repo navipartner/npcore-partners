@@ -30,6 +30,7 @@ pageextension 6014421 pageextension6014421 extends "Customer Card"
     // NPR5.42/THRO/20180516 CASE 308179 Removed code from Action SendAsPdf and EmailLog
     // NPR5.48/TSA /20181218 CASE 320424 Added "Magento Shipping Group", "Magento Payment Group", "Magento Store Code"
     // MAG2.20/MHA /20190426 CASE 320423 Added Magento Version visibility control
+    // NPR5.52/ZESO/20190925 CASE 358656 Added Fields Anonymized,Anonymized Date,To Anonymize and Customer Anonymization functionality.
     layout
     {
         addafter(Name)
@@ -37,6 +38,19 @@ pageextension 6014421 pageextension6014421 extends "Customer Card"
             field("Name 2";"Name 2")
             {
                 Importance = Additional;
+            }
+        }
+        addafter(AdjProfitPct)
+        {
+            field("To Anonymize";"To Anonymize")
+            {
+                Editable = ToAnonymizeEditable;
+            }
+            field(Anonymized;Anonymized)
+            {
+            }
+            field("Anonymized Date";"Anonymized Date")
+            {
             }
         }
         addafter("Disable Search by Name")
@@ -304,6 +318,33 @@ pageextension 6014421 pageextension6014421 extends "Customer Card"
                 }
             }
         }
+        addafter(PaymentRegistration)
+        {
+            action("Customer Anonymization")
+            {
+                Caption = 'Customer Anonymization';
+                Ellipsis = true;
+                Image = AbsenceCategory;
+                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    GDPRManagement: Codeunit "NP GDPR Management";
+                begin
+                    //-NPR5.52 [358656]
+                    TestField(Anonymized,false);
+                    TestField("To Anonymize",true);
+                    if (GDPRManagement.DoAnonymization("No.",ReasonText)) then
+                      if (not Confirm(Text000,false) )then
+                        Error('');
+
+
+                    Message(ReasonText);
+                    //+NPR5.52 [358656]
+                end;
+            }
+        }
     }
 
     var
@@ -326,6 +367,12 @@ pageextension 6014421 pageextension6014421 extends "Customer Card"
         NPRAttrVisible10: Boolean;
         MagentoVersion: Decimal;
 
+    var
+        ReasonText: Text;
+        Text000: Label 'All Customer Information wil be lost! Do you want to continue?';
+        ToAnonymizeEditable: Boolean;
+        UserSetup: Record "User Setup";
+
 
     //Unsupported feature: Code Modification on "OnAfterGetRecord".
 
@@ -347,6 +394,44 @@ pageextension 6014421 pageextension6014421 extends "Customer Card"
         NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Customer, "No.");
         NPRAttrEditable := CurrPage.Editable ();
         //+NPR4.11
+
+
+        //-NPR5.52 [358656]
+        if UserSetup.Get(UserId) then
+          if UserSetup."Anonymize Customers" then
+            ToAnonymizeEditable := true
+          else
+            ToAnonymizeEditable := false;
+
+        //-NPR5.52 [358656]
+        */
+    //end;
+
+
+    //Unsupported feature: Code Modification on "OnInit".
+
+    //trigger OnInit()
+    //Parameters and return type have not been exported.
+    //>>>> ORIGINAL CODE:
+    //begin
+        /*
+        FoundationOnly := ApplicationAreaMgmtFacade.IsFoundationEnabled;
+
+        SetCustomerNoVisibilityOnFactBoxes;
+        #4..8
+        CaptionTxt := CurrPage.Caption;
+        SetCaption(CaptionTxt);
+        CurrPage.Caption(CaptionTxt);
+        */
+    //end;
+    //>>>> MODIFIED CODE:
+    //begin
+        /*
+        #1..11
+
+        //-NPR5.52 [358656]
+        ToAnonymizeEditable := false;
+        //+NPR5.52 [358656]
         */
     //end;
 
@@ -391,6 +476,15 @@ pageextension 6014421 pageextension6014421 extends "Customer Card"
         //+MAG2.20 [320423]
 
         ShowCharts := "No." <> '';
+
+        //-NPR5.52 [358656]
+        if UserSetup.Get(UserId) then
+          if UserSetup."Anonymize Customers" then
+            ToAnonymizeEditable := true
+          else
+            ToAnonymizeEditable := false;
+
+        //-NPR5.52 [358656]
         */
     //end;
 

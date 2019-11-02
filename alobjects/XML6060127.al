@@ -8,6 +8,7 @@ xmlport 6060127 "MM Create Membership"
     // MM1.18/TSA/20170207  CASE Changed to XML format
     // MM1.26/TSA /20180219 CASE 305631 Added element DocumentID
     // MM1.40/TSA /20190827 CASE 360242 Adding support for attributes
+    // MM1.41/TSA /20191001 CASE 359703 Added the optional field company name
 
     Caption = 'Create Membership';
     FormatEvaluate = Xml;
@@ -30,6 +31,10 @@ xmlport 6060127 "MM Create Membership"
                     {
                     }
                     fieldelement(activationdate;tmpMemberInfoCapture."Document Date")
+                    {
+                        MinOccurs = Zero;
+                    }
+                    fieldelement(companyname;tmpMemberInfoCapture."Company Name")
                     {
                         MinOccurs = Zero;
                     }

@@ -17,6 +17,7 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
     // NPR5.48/TJ  /20190102 CASE 340615 Commented out usage of field Item."Product Group Code"
     // NPR5.51/MHA /20190718 CASE 362329 Added "Exclude from Posting" on POS Sales Lines in InsertPOSSaleLine()
     // NPR5.51/LS  /20190826 CASE 334335 Modified function UpgradeSetupsBalancingV3()
+    // NPR5.52/SARA/20191011 CASE 371142 Enhancement on conversion tool for POS Entry, function UpgradeSetupsBalancingV3
 
     Permissions = TableData "Audit Roll"=rimd;
 
@@ -791,6 +792,8 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
         POSPostingSetup: Record "POS Posting Setup";
         POSPostingSetupCheck: Record "POS Posting Setup";
         Register: Record Register;
+        POSStore: Record "POS Store";
+        POSUnitBinRelation: Record "POS Unit to Bin Relation";
         BlankPosStoreCode: Integer;
     begin
         //-NPR5.48 [334335]
@@ -801,12 +804,16 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
                                'Populate POS Payment Bin #2########\' +
                                'Set POS Posting Setup #3########');
         //+NPR5.51 [334335]
-
+        
         //1. Populate POS Payment Method
         POSPaymentMethod.Reset;  // Target
         POSPaymentMethodCheck.Reset;
         PaymentTypePOS.Reset;   //  Source
-
+        Register.Reset;
+        
+        //-NPR5.52[371142]
+        PaymentTypePOS.SetRange(Status,PaymentTypePOS.Status::Active); //Check for Active Status
+        //+NPR5.52[371142]
         if PaymentTypePOS.FindSet then repeat
           //-NPR5.51 [334335]
           if GuiAllowed then
@@ -818,70 +825,79 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
             POSPaymentMethod.Init;
             POSPaymentMethod.Code := PaymentTypePOS."No.";
             case PaymentTypePOS."Processing Type" of
-
+        
               PaymentTypePOS."Processing Type"::Cash :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::CASH;
-
+        
               PaymentTypePOS."Processing Type"::EFT :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::EFT;
-
+        
               PaymentTypePOS."Processing Type"::"Foreign Credit Voucher" :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::VOUCHER;
-
+        
               PaymentTypePOS."Processing Type"::"Foreign Gift Voucher" :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::VOUCHER;
-
+        
               PaymentTypePOS."Processing Type"::"Finance Agreement" :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::CUSTOMER;
-
+        
               PaymentTypePOS."Processing Type"::Payout :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::PAYOUT;
-
+        
               PaymentTypePOS."Processing Type"::"Foreign Currency" :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::CASH;
-
+        
               PaymentTypePOS."Processing Type"::"Gift Voucher" :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::VOUCHER;
-
+        
               PaymentTypePOS."Processing Type"::"Credit Voucher" :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::VOUCHER;
-
+        
               //-NPR5.51 [334335]
               PaymentTypePOS."Processing Type"::"Terminal Card" :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::EFT;
-
+        
               PaymentTypePOS."Processing Type"::"Manual Card" :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::EFT;
-
+        
               PaymentTypePOS."Processing Type"::"Other Credit Cards" :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::EFT;
-
+        
               PaymentTypePOS."Processing Type"::"Debit sale" :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::CUSTOMER;
-
+        
               PaymentTypePOS."Processing Type"::Invoice :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::CUSTOMER;
-
+        
               PaymentTypePOS."Processing Type"::DIBS :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::EFT;
-
+        
               PaymentTypePOS."Processing Type"::"Point Card" :
                 POSPaymentMethod."Processing Type":= POSPaymentMethod."Processing Type"::EFT;
               //+NPR5.51 [334335]
-
+        
             end;
             if PaymentTypePOS."To be Balanced" then
               POSPaymentMethod."Include In Counting" := POSPaymentMethod."Include In Counting"::YES
             else
               POSPaymentMethod."Include In Counting" := POSPaymentMethod."Include In Counting"::NO;
-
+        
             POSPaymentMethod."Post Condensed" := (PaymentTypePOS.Posting = PaymentTypePOS.Posting::Condensed);
             POSPaymentMethod."Rounding Type" := POSPaymentMethod."Rounding Type"::Nearest;
             POSPaymentMethod."Rounding Precision" := PaymentTypePOS."Rounding Precision";
+            //-NPR5.52[371142]
+            if POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::CASH then
+              POSPaymentMethod."Include In Counting" := POSPaymentMethod."Include In Counting"::YES;
+        
+            if Register.FindFirst then begin
+              POSPaymentMethod."Rounding Gains Account" := Register.Rounding;
+              POSPaymentMethod."Rounding Losses Account" := Register.Rounding;
+            end;
+            //-NPR5.52[371142]
             POSPaymentMethod.Insert(true);
           end;
         until PaymentTypePOS.Next = 0;
-
+        
         //2. POS Payment Bin
         POSPaymentBin.Reset;
         POSPaymentBinCheck.Reset;
@@ -900,27 +916,36 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
             POSPaymentBin."Attached to POS Unit No." := POSUnit."No.";
             POSPaymentBin."Eject Method" := 'Printer';
             POSPaymentBin."Bin Type" := POSPaymentBin."Bin Type"::CASH_DRAWER;
+            //-NPR5.52[371142]
+            POSPaymentBin.Description := 'Payment Bin' + ' ' + POSPaymentBin."No.";
+            //+NPR5.52[371142]
             POSPaymentBin.Insert(true);
           end;
+          //-NPR5.52[371142]
+          //Default POS Payment Bin
+          CreateDefaultBins(POSUnit."No.");
+          //+NPR5.52[371142]
         until POSUnit.Next = 0;
-
+        
         //3. POS Posting Setup
-        POSPostingSetup.Reset;
-        POSPostingSetupCheck.Reset;
-        PaymentTypePOS.Reset;
-        Register.Reset;
-        POSPostingSetupCheck.Reset;  //POS Store Code,POS Payment Method Code,POS Payment Bin Code
-        if POSPostingSetupCheck.Count < 1 then begin
-          if Register.FindSet then repeat
+        //-NPR5.52[371142]
+        /*
+        POSPostingSetup.RESET;
+        POSPostingSetupCheck.RESET;
+        PaymentTypePOS.RESET;
+        Register.RESET;
+        POSPostingSetupCheck.RESET;  //POS Store Code,POS Payment Method Code,POS Payment Bin Code
+        IF POSPostingSetupCheck.COUNT < 1 THEN BEGIN
+          IF Register.FINDSET THEN REPEAT
             BlankPosStoreCode := 1;
-            PaymentTypePOS.Reset;
-            if PaymentTypePOS.FindSet then repeat
+            PaymentTypePOS.RESET;
+            IF PaymentTypePOS.FINDSET THEN REPEAT
               //-NPR5.51 [334335]
-              if GuiAllowed then
-                ProgressDialog.Update(3,PaymentTypePOS.Count);
+              IF GUIALLOWED THEN
+                ProgressDialog.UPDATE(3,PaymentTypePOS.COUNT);
               //+NPR5.51 [334335]
-              POSPostingSetup.Reset;
-              POSPostingSetup.Init;
+              POSPostingSetup.RESET;
+              POSPostingSetup.INIT;
               POSPostingSetup."POS Store Code" := Register."Register No.";
               POSPostingSetup."POS Payment Method Code" := PaymentTypePOS."No.";
               POSPostingSetup."POS Payment Bin Code" := Register."Register No.";
@@ -929,19 +954,129 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
               POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
               POSPostingSetup."Difference Acc. No." := Register."Difference Account";
               POSPostingSetup."Difference Acc. No. (Neg)" := Register."Difference Account - Neg.";
-              POSPostingSetup.Insert(true);
-
+              POSPostingSetup.INSERT(TRUE);
+        
               BlankPosStoreCode +=1;
-
-            until PaymentTypePOS.Next = 0;
-          until Register.Next = 0;
+        
+            UNTIL PaymentTypePOS.NEXT = 0;
+          UNTIL Register.NEXT = 0;
+        END;
+        */
+        
+        POSPostingSetupCheck.Reset;
+        if POSPostingSetupCheck.Count < 1 then begin
+          //Global Setup
+          POSPostingSetup.Reset;
+          PaymentTypePOS.Reset;
+          Register.Reset;
+          POSPostingSetupCheck.Reset;  //POS Store Code,POS Payment Method Code,POS Payment Bin Code
+          BlankPosStoreCode := 1;
+          PaymentTypePOS.Reset;
+          PaymentTypePOS.SetRange(Status,PaymentTypePOS.Status::Active); //Check for Active Status
+          if PaymentTypePOS.FindSet then repeat
+            //-NPR5.51 [334335]
+            if GuiAllowed then
+              ProgressDialog.Update(3,PaymentTypePOS.Count);
+            //+NPR5.51 [334335]
+            POSPostingSetup.Reset;
+            POSPostingSetup.Init;
+            POSPostingSetup."POS Store Code" := '';
+            POSPostingSetup."POS Payment Method Code" := PaymentTypePOS."No.";
+            POSPostingSetup."POS Payment Bin Code" := '';
+            case PaymentTypePOS."Account Type" of
+              PaymentTypePOS."Account Type"::Bank:
+              begin
+                POSPostingSetup."Account Type":= POSPostingSetup."Account Type"::"Bank Account";
+                POSPostingSetup."Account No." := PaymentTypePOS."Bank Acc. No.";
+              end;
+              PaymentTypePOS."Account Type"::Customer:
+              begin
+                POSPostingSetup."Account Type":= POSPostingSetup."Account Type"::Customer;
+                POSPostingSetup."Account No." := PaymentTypePOS."Customer No.";
+              end;
+              PaymentTypePOS."Account Type"::"G/L Account":
+              begin
+                POSPostingSetup."Account Type":= POSPostingSetup."Account Type"::"G/L Account";
+                POSPostingSetup."Account No." := PaymentTypePOS."G/L Account No.";
+              end;
+            end;
+            POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
+            if Register.FindFirst then begin
+              POSPostingSetup."Difference Acc. No." := Register."Difference Account";
+              POSPostingSetup."Difference Acc. No. (Neg)" := Register."Difference Account - Neg.";
+            end;
+            POSPostingSetup.Insert(true);
+          until PaymentTypePOS.Next = 0;
+        
+          //Line Per POS Store
+          POSPostingSetup.Reset;
+          PaymentTypePOS.Reset;
+          POSStore.Reset;
+          Register.Reset;
+          POSPaymentMethod.Reset;
+          POSPostingSetupCheck.Reset;  //POS Store Code,POS Payment Method Code,POS Payment Bin Code
+          if POSStore.FindSet then repeat
+            POSPaymentMethod.Reset;
+            POSPaymentMethod.SetRange(POSPaymentMethod."Processing Type",POSPaymentMethod."Processing Type"::CASH);
+            if POSPaymentMethod.FindSet then repeat
+              //-NPR5.51 [334335]
+              if GuiAllowed then
+                ProgressDialog.Update(3,PaymentTypePOS.Count);
+              //+NPR5.51 [334335]
+              POSPostingSetup.Reset;
+              POSPostingSetup.Init;
+              POSPostingSetup."POS Store Code" := POSStore.Code;
+              POSPostingSetup."POS Payment Method Code" := POSPaymentMethod.Code;
+              POSPostingSetup."POS Payment Bin Code" := 'BANK';
+              if Register.FindFirst then begin
+                case Register."Balanced Type" of
+                  Register."Balanced Type"::Bank:
+                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"Bank Account";
+        
+                  Register."Balanced Type"::Finans:
+                    POSPostingSetup."Account Type" := POSPostingSetup."Account Type"::"G/L Account";
+                end;
+                POSPostingSetup."Account No." := Register."Balance Account";
+              end;
+              POSPostingSetup."Difference Account Type" := POSPostingSetup."Difference Account Type"::"G/L Account";
+              POSPostingSetup."Difference Acc. No." := Register."Difference Account";
+              POSPostingSetup."Difference Acc. No. (Neg)" := Register."Difference Account - Neg.";
+              POSPostingSetup.Insert(true);
+              BlankPosStoreCode +=1;
+            until POSPaymentMethod.Next = 0;
+          until POSStore.Next = 0;
         end;
+        
+        //Create/Update POS Unit to Bin Relation
+        
+        POSUnit.Reset;
+        if POSUnit.FindSet then begin
+          repeat
+            POSUnitBinRelation.Reset;
+            POSUnitBinRelation.SetRange("POS Unit No.",POSUnit."No.");
+            if POSUnitBinRelation.FindFirst then begin
+              if POSUnitBinRelation."POS Payment Bin No." = '' then
+                POSUnitBinRelation.Rename(POSUnitBinRelation."POS Unit No.",POSUnit."Default POS Payment Bin");
+            end else begin
+              POSUnitBinRelation.Init;
+              POSUnitBinRelation."POS Unit No." := POSUnit."No.";
+              POSUnitBinRelation."POS Payment Bin No." := POSUnit."Default POS Payment Bin";
+              POSUnitBinRelation."POS Unit Status" := POSUnitBinRelation."POS Unit Status"::OPEN;
+              POSUnitBinRelation."POS Payment Bin Status" := POSUnitBinRelation."POS Payment Bin Status"::OPEN;
+              POSUnitBinRelation."POS Unit Name" := POSUnit.Name;
+              POSUnitBinRelation.Insert(true);
+            end;
+          until POSUnit.Next = 0;
+        end;
+        //+NPR5.52[371142]
+        
         //-NPR5.51 [334335]
         if GuiAllowed then
           ProgressDialog.Close;
         //+NPR5.51 [334335]
-
+        
         //+NPR5.48 [334335]
+
     end;
 
     procedure ExcludeFromPosting(AuditRoll: Record "Audit Roll"): Boolean
@@ -952,6 +1087,44 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
 
         exit(AuditRoll."Sale Type" in [AuditRoll."Sale Type"::Comment,AuditRoll."Sale Type"::"Debit Sale",AuditRoll."Sale Type"::"Open/Close"]);
         //+NPR5.51 [362329]
+    end;
+
+    local procedure CreateDefaultBins(POSUnitNo: Code[10])
+    var
+        BinNoArray: array [3] of Code[10];
+        BinDescArray: array [3] of Text[20];
+        i: Integer;
+        POSPaymentBin: Record "POS Payment Bin";
+        POSPaymentBinCheck: Record "POS Payment Bin";
+    begin
+        //-NPR5.52[371142]
+        BinNoArray[1] := 'AUTO-BIN';
+        BinNoArray[2] := 'BANK';
+        BinNoArray[3] := 'SAFE';
+
+        BinDescArray[1] := 'Auto Count Bin';
+        BinDescArray[2] := 'Safe';
+        BinDescArray[3] := 'Bank';
+        for i := 1 to 3 do begin
+          //POSPaymentBinCheck.RESET;
+          //POSPaymentBinCheck.SETRANGE("No.",BinNoArray[i]);
+          //POSPaymentBinCheck.SETRANGE("Attached to POS Unit No.",POSUnitNo);
+          if not POSPaymentBinCheck.Get(BinNoArray[i]) then begin
+            POSPaymentBin.Init;
+            POSPaymentBin."No." := BinNoArray[i];
+            POSPaymentBin."POS Store Code" := '';
+            POSPaymentBin."Attached to POS Unit No." := '';
+            POSPaymentBin."Eject Method" := '';
+            POSPaymentBin.Description := BinDescArray[i];
+            case i of
+              1: POSPaymentBin."Bin Type" := POSPaymentBin."Bin Type"::VIRTUAL; //'AUTO-BIN'
+              2: POSPaymentBin."Bin Type" := POSPaymentBin."Bin Type"::BANK; //'BANK'
+              3: POSPaymentBin."Bin Type" := POSPaymentBin."Bin Type"::SAFE; //'SAFE'
+            end;
+            POSPaymentBin.Insert(true);
+          end;
+        end;
+        //+NPR5.52[371142]
     end;
 }
 

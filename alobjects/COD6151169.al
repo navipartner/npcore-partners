@@ -1,7 +1,10 @@
 codeunit 6151169 "POS Action - NpGp Return"
 {
     // NPR5.51/ALST/20190628 CASE 337539 New Object
+    // NPR5.52/ALST/20191009  CASE 372010 added permissions to service password
+    // NPR5.52/MHA /20191016 CASE 371388 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
 
+    Permissions = TableData "Service Password"=rimd;
 
     trigger OnRun()
     begin
@@ -92,7 +95,9 @@ codeunit 6151169 "POS Action - NpGp Return"
             end;
           'handle':
             begin
-              CheckSetup;
+              //-NPR5.52 [371388]
+              CheckSetup(POSSession);
+              //+NPR5.52 [371388]
               FindReference(Context,FrontEnd,POSSession,TempNpGpPOSSalesLine,TempNpGpPOSSalesEntry);
               if CompanyName = TempNpGpPOSSalesEntry."Original Company" then begin
                 VerifyReceiptForReversal(Context,FrontEnd,TempNpGpPOSSalesEntry."Document No.");
@@ -145,17 +150,21 @@ codeunit 6151169 "POS Action - NpGp Return"
         FindGlobalSaleByReferenceNo(FrontEnd,POSSession,Context,JSON,ReferenceNumber,TempNpGpPOSSalesLine,TempNpGpPOSSalesEntry);
     end;
 
-    local procedure CheckSetup(): Boolean
+    local procedure CheckSetup(POSSession: Codeunit "POS Session"): Boolean
     var
         Company: Record Company;
         NpGpPOSSalesSetup: Record "NpGp POS Sales Setup";
-        NPRetailSetup: Record "NP Retail Setup";
+        POSUnit: Record "POS Unit";
+        POSSetup: Codeunit "POS Setup";
         HttpUtility: DotNet npNetHttpUtility;
     begin
-        NpGpPOSSalesSetup.FindFirst;
+        //-NPR5.52 [371388]
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
 
-        NPRetailSetup.Get;
-        NPRetailSetup.TestField("Global POS Sales Setup",NpGpPOSSalesSetup.Code);
+        POSUnit.TestField("Global POS Sales Setup");
+        NpGpPOSSalesSetup.Get(POSUnit."Global POS Sales Setup");
+        //+NPR5.52 [371388]
 
         if DelChr(NpGpPOSSalesSetup."Company Name",'<',' ') = '' then
           Error(EmptyFieldErr,NpGpPOSSalesSetup.FieldName("Company Name"),NpGpPOSSalesSetup.TableName);
@@ -173,12 +182,14 @@ codeunit 6151169 "POS Action - NpGp Return"
         NpGpPOSSalesSetup: Record "NpGp POS Sales Setup";
         RetailCrossReference: Record "Retail Cross Reference";
         ObjectMetadata: Record "Object Metadata";
+        POSUnit: Record "POS Unit";
         ServicePassword: Record "Service Password";
         SalePOS: Record "Sale POS";
         NpGpUserSaleReturn: Page "NpGp User Sale Return";
         NpGpPOSSalesSetupCard: Page "NpGp POS Sales Setup Card";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         POSSale: Codeunit "POS Sale";
+        POSSetup: Codeunit "POS Setup";
         HttpWebRequest: DotNet npNetHttpWebRequest;
         Credential: DotNet npNetNetworkCredential;
         XmlNamespaceManager: DotNet npNetXmlNamespaceManager;
@@ -197,7 +208,13 @@ codeunit 6151169 "POS Action - NpGp Return"
         NameSpace: Text;
         FullSale: Boolean;
     begin
-        NpGpPOSSalesSetup.FindFirst;
+        //-NPR5.52 [371388]
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
+
+        POSUnit.TestField("Global POS Sales Setup");
+        NpGpPOSSalesSetup.Get(POSUnit."Global POS Sales Setup");
+        //+NPR5.52 [371388]
 
         JSON.InitializeJObjectParser(Context,FrontEnd);
 

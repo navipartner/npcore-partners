@@ -1,6 +1,8 @@
 page 6060059 "POS Inventory Overview"
 {
     // NPR5.34/BR  /20170726   CASE 282748 Object Created
+    // NPR5.52/ALPO/20191002 CASE 370333 New options to show inventory for current location only
+    //                                   - Function SetParameters: new call parameter: OnlyCurentLocIn [boolean]
 
     Caption = 'POS Inventory Overview';
     DelayedInsert = false;
@@ -152,12 +154,14 @@ page 6060059 "POS Inventory Overview"
         CurrentLocationCode: Code[10];
         QtyCurrentLocation: Decimal;
         TextSelectItemFirst: Label 'Please select an item.';
+        OnlyCurentLoc: Boolean;
 
-    procedure SetParameters(ItemCodeIn: Code[20];VariantCodeIn: Code[10];CurrentLocationIn: Code[10])
+    procedure SetParameters(ItemCodeIn: Code[20];VariantCodeIn: Code[10];CurrentLocationIn: Code[10];OnlyCurentLocIn: Boolean)
     begin
         ItemCode := ItemCodeIn;
         VariantCode := VariantCodeIn;
         CurrentLocationCode := CurrentLocationIn;
+        OnlyCurentLoc := OnlyCurentLocIn;  //NPR5.52 [370333]
     end;
 
     local procedure RefreshLines()
@@ -174,7 +178,8 @@ page 6060059 "POS Inventory Overview"
 
         if  (Item."No." <> '') and (ItemCode <> Item."No.") then begin
           //Open a new page with new Visible properties
-          POSInventoryOverview.SetParameters(ItemCode,VariantCode,CurrentLocationCode);
+          //POSInventoryOverview.SetParameters(ItemCode,VariantCode,CurrentLocationCode);  //NPR5.52 [370333]-revoked
+          POSInventoryOverview.SetParameters(ItemCode,VariantCode,CurrentLocationCode,OnlyCurentLoc);  //NPR5.52 [370333]
           POSInventoryOverview.Run;
           CurrPage.Close;
         end;
@@ -200,6 +205,10 @@ page 6060059 "POS Inventory Overview"
         if Variety4ValueCode <> '' then
           ItemVariant.SetFilter("Variety 4 Value",Variety4ValueCode);
 
+        //-NPR5.52 [370333]
+        if OnlyCurentLoc then
+          Location.SetRange(Code,CurrentLocationCode);
+        //+NPR5.52 [370333]
         if Location.FindSet then repeat
           Item.SetFilter("Location Filter",Location.Code);
           if HasVariants then begin

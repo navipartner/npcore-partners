@@ -17,7 +17,7 @@ codeunit 6150849 "POS Action - End-of-Day V3"
     // NPR5.48/TSA /20181127 CASE 336921 Changed POS Unit Status Management, cleaned up code
     // NPR5.49/TSA /20190311 CASE 348458 Added CloseWorkshift function, cleaned commented code
     // NPR5.51/TSA /20190622 CASE 359508 Adding support posting GL after balancing
-    // 
+    // NPR5.52/ALPO/20190923 CASE 365326 POS Posting related fields moved to POS Posting Profiles from NP Retail Setup
     // TODO Units and Bins must get correct status
 
 
@@ -468,13 +468,18 @@ codeunit 6150849 "POS Action - End-of-Day V3"
     var
         POSPeriodRegisterPostingFilter: Record "POS Period Register";
         NPRetailSetup: Record "NP Retail Setup";
+        POSPostingProfile: Record "POS Posting Profile";
     begin
 
         //-NPR5.51 [359508]
         if (not NPRetailSetup.Get ()) then
           exit;
 
-        with NPRetailSetup do
+        //WITH NPRetailSetup DO  //NPR5.52 [365326]-revoked
+        //-NPR5.52 [365326]
+        NPRetailSetup.GetPostingProfile(POSPeriodRegister."POS Unit No.",POSPostingProfile);
+        with POSPostingProfile do
+        //+NPR5.52 [365326]
           case ("Automatic POS Posting") of
             "Automatic POS Posting"::No : exit;
             "Automatic POS Posting"::AfterSale : exit;
@@ -501,7 +506,8 @@ codeunit 6150849 "POS Action - End-of-Day V3"
                 POSPeriodRegisterPostingFilter.SetFilter ("POS Store Code", '=%1', POSPeriodRegister."POS Store Code");
               end;
             else begin
-              Message ('The settting %1 is not yet supported.', NPRetailSetup."Automatic POS Posting");
+              //MESSAGE ('The settting %1 is not yet supported.', NPRetailSetup."Automatic POS Posting");  //NPR5.52 [365326]-revoked
+              Message('The setting %1 is not yet supported.',"Automatic POS Posting");  //NPR5.52 [365326]
               exit;
             end;
           end;
@@ -515,13 +521,18 @@ codeunit 6150849 "POS Action - End-of-Day V3"
         POSPeriodRegisterPostingFilter: Record "POS Period Register";
         NPRetailSetup: Record "NP Retail Setup";
         POSUnit: Record "POS Unit";
+        POSPostingProfile: Record "POS Posting Profile";
     begin
 
         //-NPR5.51 [359508]
         if (not NPRetailSetup.Get ()) then
           exit;
 
-        with NPRetailSetup do
+        //WITH NPRetailSetup DO  //NPR5.52 [365326]-revoked
+        //-NPR5.52 [365326]
+        NPRetailSetup.GetPostingProfile(POSPeriodRegister."POS Unit No.",POSPostingProfile);
+        with POSPostingProfile do
+        //+NPR5.52 [365326]
           case ("Automatic Item Posting") of
             "Automatic Item Posting"::No : exit;
             "Automatic Item Posting"::AfterSale : exit;

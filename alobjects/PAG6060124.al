@@ -20,6 +20,7 @@ page 6060124 "MM Membership Setup"
     // NPR5.43/CLVA/20180627 CASE 318490 Added Action Turnstile Setup
     // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
     // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
+    // MM1.41/TSA  /20191010 CASE 367471 Added Sponsorship Ticket Setup related action
 
     Caption = 'Membership Setup';
     CardPageID = "MM Membership Setup Card";
@@ -230,6 +231,15 @@ page 6060124 "MM Membership Setup"
                 PromotedIsBig = true;
                 RunObject = Page "MM Membership Limitation Setup";
                 RunPageLink = "Membership  Code"=FIELD(Code);
+            }
+            action("Sponsorship Ticket Setup")
+            {
+                Ellipsis = true;
+                Image = SetupLines;
+                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedIsBig = true;
+                RunObject = Page "MM Sponsorship Ticket Setup";
+                RunPageLink = "Membership Code"=FIELD(Code);
             }
             separator(Separator6014405)
             {

@@ -14,6 +14,9 @@ table 6150615 "POS Unit"
     // NPR5.49/TJ  /20181115 CASE 335739 New field "POS View Profile"
     // NPR5.49/TSA /20190311 CASE 348458 New field "EOD Managed by POS Unit"
     // NPR5.51/SARA/20190823 CASE 363578 New field 'SMS Profile'
+    // NPR5.52/ALPO/20190923 CASE 365326 New field "POS Posting Profile" (Posting related fields moved to POS Posting Profiles from NP Retail Setup)
+    // NPR5.52/SARA/20190924 CASE 368395 Delete field 'SMS Profile'(SMS profile move to POS End of Day Profile)
+    // NPR5.52/MHA /20191016 CASE 371388 Field 400 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
 
     Caption = 'POS Unit';
     DataCaptionFields = "No.",Name;
@@ -194,6 +197,12 @@ table 6150615 "POS Unit"
                 //+NPR5.45 [323705]
             end;
         }
+        field(400;"Global POS Sales Setup";Code[10])
+        {
+            Caption = 'Global POS Sales Setup';
+            Description = 'NPR5.52';
+            TableRelation = "NpGp POS Sales Setup";
+        }
         field(500;"POS Audit Profile";Code[20])
         {
             Caption = 'POS Audit Profile';
@@ -210,11 +219,11 @@ table 6150615 "POS Unit"
             Caption = 'POS End of Day Profile';
             TableRelation = "POS End of Day Profile";
         }
-        field(511;"SMS Profile";Code[20])
+        field(520;"POS Posting Profile";Code[20])
         {
-            Caption = 'SMS Profile';
-            Description = 'NPR5.51';
-            TableRelation = "SMS Template Header";
+            Caption = 'POS Posting Profile';
+            Description = 'NPR5.52';
+            TableRelation = "POS Posting Profile";
         }
     }
 

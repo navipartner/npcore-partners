@@ -8,12 +8,20 @@ pageextension 6014429 pageextension6014429 extends "Item List"
     // NPR5.33/ANEN/20170427 CASE 273989 Extending to 40 attributes
     // NPR5.38/BR  /20171116 CASE 295255 Added Action POS Sales Entries
     // NPR5.51/THRO/20190717 CASE 361514 Action POS Sales Entries named POSSalesEntries (for AL Conversion)
+    // NPR5.52/YAHA/20190310 CASE 367304 Add a new variable which will increase size of the vendor item no
     layout
     {
         addafter("VAT Prod. Posting Group")
         {
             field("Item Group";"Item Group")
             {
+            }
+        }
+        addafter("Vendor Item No.")
+        {
+            field(VendorItemNo;VendorItemNo)
+            {
+                Caption = 'Vendor Item No';
             }
         }
         addafter("Item Tracking Code")
@@ -158,6 +166,11 @@ pageextension 6014429 pageextension6014429 extends "Item List"
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
 
+    var
+        VendorItemNo: Text[100];
+        TblItem: Record Item;
+        TblVendor: Record Vendor;
+
 
     //Unsupported feature: Code Modification on "OnAfterGetRecord".
 
@@ -177,6 +190,12 @@ pageextension 6014429 pageextension6014429 extends "Item List"
         //+NPR4.11
 
         EnableControls;
+
+
+
+        //-NPR5.52 [367304]
+        GetVendorName;
+        //+NPR5.52 [367304]
         */
     //end;
 
@@ -215,5 +234,13 @@ pageextension 6014429 pageextension6014429 extends "Item List"
         #1..6
         */
     //end;
+
+    local procedure GetVendorName()
+    begin
+        if TblItem.Get(Rec."No.") then begin
+          Clear(VendorItemNo);
+             VendorItemNo := TblItem."Vendor Item No.";
+        end;
+    end;
 }
 

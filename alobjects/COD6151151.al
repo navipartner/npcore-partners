@@ -6,7 +6,8 @@ codeunit 6151151 "M2 Account Manager"
     // MAG2.21.01/TSA /20190502 CASE 320424 Reset password request forwarded to Magento
     // MAG2.21.01/TSA /20190506 CASE 353964 Try functions cant have DML statements, refactored the try functions to .run instead
     // NPR5.51/TSA /20190726 CASE 356090 Addded Member functionality to the account functions
-    // NPR5.51/TSA /20190812 CASE 364644  Added First Name, Last Name to Contact Type=Company, removed primary contact creation and miss-use of the Company contact for first "person"
+    // NPR5.51/TSA /20190812 CASE 364644 Added First Name, Last Name to Contact Type=Company, removed primary contact creation and miss-use of the Company contact for first "person"
+    // MAG2.23/TSA /20191009 CASE 372257 Added some info to resetpassword request
 
 
     trigger OnRun()
@@ -428,11 +429,15 @@ codeunit 6151151 "M2 Account Manager"
     var
         Contact: Record Contact;
         AccountComTemplate: Record "M2 Account Com. Template";
+        Customer: Record Customer;
+        ContactBusinessRelation: Record "Contact Business Relation";
+        MarketingSetup: Record "Marketing Setup";
         Token: Text[40];
         TemplateEntryNo: Integer;
         ReasonText: Text;
         Body: DotNet npNetJToken;
         Result: DotNet npNetJToken;
+        msg: Text;
     begin
 
         if (Email = '') then
@@ -444,7 +449,8 @@ codeunit 6151151 "M2 Account Manager"
         if (Contact.IsEmpty ()) then
           Error ('E-Mail does not identify a magento contact.');
 
-        Contact.FindFirst ();
+        //-MAG2.23 [372257]
+        // Contact.FINDFIRST ();
 
         //-MAG2.21.01 [320424]
         // Token := CreateSecurityToken (Email);
@@ -454,7 +460,28 @@ codeunit 6151151 "M2 Account Manager"
         // IF (NOT SendMail (AccountComTemplate, ReasonText)) THEN
         //  ERROR (ReasonText);
 
-        Body := Body.Parse (StrSubstNo ('{"customer":{"email":"%1"}}', Email));
+        // Body := Body.Parse (STRSUBSTNO ('{"customer":{"email":"%1"}}', Email));
+
+        Contact.FindSet ();
+        repeat
+
+          if (Contact."Company No." = '') then
+            Contact."Company No." := Contact."No.";
+
+          if (MarketingSetup.Get ()) then
+            if (ContactBusinessRelation.Get (Contact."Company No." , MarketingSetup."Bus. Rel. Code for Customers")) then
+              if (Customer.Get (ContactBusinessRelation."No.")) then
+                ;
+
+          Customer.TestField ("Magento Store Code");
+          msg := msg + StrSubstNo (',{"id":"%1","storecode":"%2"}', Contact."Company No.", Customer."Magento Store Code");
+
+        until (Contact.Next () = 0);
+
+        // {"account": {"email":"tim@sannes.se", "accounts" : [{"id":"a","storecode":"dk"},{"id":"b","storecode":"fi"}]}}
+        Body := Body.Parse (StrSubstNo ('{"account": {"email":"%1", "accounts":[%2]}}', Email, CopyStr (msg, 2)));
+        //+MAG2.23 [372257]
+
         MagentoApiPost ('passwordreset', Body, Result);
         //+MAG2.21.01 [320424]
     end;

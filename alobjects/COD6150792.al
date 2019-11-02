@@ -18,6 +18,7 @@ codeunit 6150792 "POS Action - Discount"
     // NPR5.45/MHA /20180807 CASE 317065 Added DiscountTypes DiscountPercentExtra,LineDiscountPercentExtra which will add extra flat Discount Percent
     // NPR5.48/TSA /20181214 CASE 338181 Use Amount field when doing final discount adjustment and price include vat is false, rounding on unit price and and reapply VAT on changed lines
     // NPR5.50/MHA /20190426 CASE 352178 POS Action Discount must not set Unit Price on Comment Lines
+    // NPR5.52/ALPO/20190924 CASE 369499 Disallow negative discount amount
 
 
     trigger OnRun()
@@ -45,6 +46,7 @@ codeunit 6150792 "POS Action - Discount"
         Text003: Label 'Supervisor Password';
         Text004: Label 'Invalid Password';
         Text005: Label 'Unit Price may not be changed when Line Type is %1';
+        NegativeDiscAmtErr: Label 'Negative discount amount is not allowed.';
 
     local procedure ActionCode(): Text
     begin
@@ -245,6 +247,12 @@ codeunit 6150792 "POS Action - Discount"
           8: ;    // [282117] No check for unit price
           9,10: ; // Clear functions
         end;
+
+        //-NPR5.52 [369499]
+        //1 = TotalDiscountAmount, 5 = LineDiscountAmount
+        if (DiscountType in [1,5]) and (Quantity < 0) then
+          Error(NegativeDiscAmtErr);
+        //+NPR5.52 [369499]
 
         case DiscountType of
           0 : SetTotalAmount(SalePOS,Quantity);
