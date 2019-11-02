@@ -358,7 +358,7 @@ codeunit 6151369 "CS UI Rfid Item Handling"
         Clear(ItemCrossReference);
         ItemCrossReference.SetRange("Cross-Reference Type",ItemCrossReference."Cross-Reference Type"::"Bar Code");
         ItemCrossReference.SetRange("Cross-Reference No.",TagId);
-        ItemCrossReference.SetRange("Rfid Tag",true);
+        ItemCrossReference.SetRange("Is Retail Serial No.",true);
         if ItemCrossReference.FindSet then begin
           CSRfidItemPlaceholder."Duplicate Tag Id" := true;
           Remark := StrSubstNo(Text024,InputValue);
@@ -586,7 +586,7 @@ codeunit 6151369 "CS UI Rfid Item Handling"
         ItemCrossReference.Validate("Variant Code",CSRfidItemHandling."Variant Code");
         ItemCrossReference.Validate("Cross-Reference Type",ItemCrossReference."Cross-Reference Type"::"Bar Code");
         ItemCrossReference.Validate("Cross-Reference No.",TagId);
-        ItemCrossReference.Validate("Rfid Tag",true);
+        ItemCrossReference.Validate("Is Retail Serial No.",true);
         ItemCrossReference.Insert(true);
 
         exit(true);

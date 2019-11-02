@@ -1,6 +1,7 @@
 codeunit 6151176 "POS Action - Merge Smlr. Lines"
 {
     // NPR5.51/ALST/20190701 CASE 360269 new object
+    // NPR5.52/ALST/20191017 CASE 360269 items with diferent unit prices will not be colapsed
 
 
     trigger OnRun()
@@ -18,7 +19,7 @@ codeunit 6151176 "POS Action - Merge Smlr. Lines"
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit ('1.1');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -83,6 +84,9 @@ codeunit 6151176 "POS Action - Merge Smlr. Lines"
 
           repeat
             SetRange("No.","No.");
+            //-NPR5.52 [360269]
+            SetRange("Unit Price","Unit Price");
+            //+NPR5.52 [360269]
 
             if Count > 1 then begin
               TempSaleLinePOS := SaleLinePOS;
@@ -99,6 +103,9 @@ codeunit 6151176 "POS Action - Merge Smlr. Lines"
             end;
 
             SetRange("No.");
+            //-NPR5.52 [360269]
+            SetRange("Unit Price");
+            //+NPR5.52 [360269]
           until Next = 0;
 
           if not TempSaleLinePOS.FindSet then

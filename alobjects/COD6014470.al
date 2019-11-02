@@ -1,6 +1,7 @@
 codeunit 6014470 "Dynamic Module Sales Setup"
 {
     // NPR5.41/TJ  /20180413 CASE 311170 New object
+    // NPR5.52/TJ  /20190905 CASE 366647 Showing message only if data is sent
 
 
     trigger OnRun()
@@ -37,7 +38,10 @@ codeunit 6014470 "Dynamic Module Sales Setup"
           exit;
 
         SetupValue := Value;
-        if SetupValue then
+        //-NPR5.52 [366647]
+        //IF SetupValue THEN
+        if SetupValue and (SalesInvHdrNo <> '') then
+        //+NPR5.52 [366647]
           Message(PostedSalesInvMsg,SalesInvHdrNo);
     end;
 
@@ -53,7 +57,10 @@ codeunit 6014470 "Dynamic Module Sales Setup"
           exit;
 
         SetupValue := Value;
-        if SetupValue then
+        //-NPR5.52 [366647]
+        //IF SetupValue THEN
+        if SetupValue and (SalesCrMemoHdrNo <> '') then
+        //+NPR5.52 [366647]
           Message(PostedSalesCrMemoMsg,SalesCrMemoHdrNo);
     end;
 
@@ -69,7 +76,10 @@ codeunit 6014470 "Dynamic Module Sales Setup"
           exit;
 
         SetupValue := Value;
-        if SetupValue then
+        //-NPR5.52 [366647]
+        //IF SetupValue THEN
+        if SetupValue and (SalesShptHdrNo <> '') then
+        //+NPR5.52 [366647]
           Message(PostedSalesShipmentMsg,SalesShptHdrNo);
     end;
 
@@ -85,7 +95,10 @@ codeunit 6014470 "Dynamic Module Sales Setup"
           exit;
 
         SetupValue := Value;
-        if SetupValue then
+        //-NPR5.52 [366647]
+        //IF SetupValue THEN
+        if SetupValue and (RetRcpHdrNo <> '') then
+        //+NPR5.52 [366647]
           Message(PostedReturnReceiptMsg,RetRcpHdrNo);
     end;
 

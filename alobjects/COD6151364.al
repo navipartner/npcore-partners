@@ -3,6 +3,7 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
     // NPR5.50/CLVA/20190527  CASE 355694 Object created
     // NPR5.51/CLVA/20190527  CASE 355694 Added bin content code by barcode
     // NPR5.51/CLVA/20190527  CASE 360382 Added option list
+    // NPR5.52/CLVA/20190927  CASE 370509 Added support for background posting
 
     TableNo = "CS UI Header";
 
@@ -729,21 +730,43 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         ItemJnlTemplate: Record "Item Journal Template";
         ItemJnlPostBatch: Codeunit "Item Jnl.-Post Batch";
         ItemJournalLine: Record "Item Journal Line";
+        CSPostingBuffer: Record "CS Posting Buffer";
+        PostingRecRef: RecordRef;
+        CSPostEnqueue: Codeunit "CS Post - Enqueue";
+        ItemJournalBatch: Record "Item Journal Batch";
     begin
         CSSetup.Get;
+        //-NPR5.52 [370509]
+        if CSSetup."Post with Job Queue" then begin
+          ItemJournalBatch.Get(CSSetup."Item Reclass. Jour Temp Name",CSSetup."Item Reclass. Jour Batch Name");
+          PostingRecRef.GetTable(ItemJournalBatch);
+          CSPostingBuffer.Init;
+          CSPostingBuffer."Table No." := PostingRecRef.Number;
+          CSPostingBuffer."Record Id" := PostingRecRef.RecordId;
+          CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::"Item Reclass.";
+          CSPostingBuffer."Session Id" := CSSessionId;
+          CSPostingBuffer."Job Queue Priority for Post" := 1000;
+          if CSPostingBuffer.Insert(true) then
+            CSPostEnqueue.Run(CSPostingBuffer)
+          else
+            Remark := GetLastErrorText;
+        end else begin
+        //+NPR5.52 [370509]
+          ItemJnlTemplate.Get(CSSetup."Item Reclass. Jour Temp Name");
+          ItemJnlTemplate.TestField("Force Posting Report",false);
 
-        ItemJnlTemplate.Get(CSSetup."Item Reclass. Jour Temp Name");
-        ItemJnlTemplate.TestField("Force Posting Report",false);
-
-        Clear(ItemJournalLine);
-        ItemJournalLine.SetRange("Journal Template Name",CSSetup."Item Reclass. Jour Temp Name");
-        ItemJournalLine.SetRange("Journal Batch Name",CSSetup."Item Reclass. Jour Batch Name");
-        ItemJournalLine.SetRange("External Document No.",CSSessionId);
-        if ItemJournalLine.FindSet then begin
-          repeat
-            ItemJnlPostBatch.Run(ItemJournalLine);
-          until ItemJournalLine.Next = 0;
+          Clear(ItemJournalLine);
+          ItemJournalLine.SetRange("Journal Template Name",CSSetup."Item Reclass. Jour Temp Name");
+          ItemJournalLine.SetRange("Journal Batch Name",CSSetup."Item Reclass. Jour Batch Name");
+          ItemJournalLine.SetRange("External Document No.",CSSessionId);
+          if ItemJournalLine.FindSet then begin
+            repeat
+              ItemJnlPostBatch.Run(ItemJournalLine);
+            until ItemJournalLine.Next = 0;
+          end;
+        //-NPR5.52 [370509]
         end;
+        //+NPR5.52 [370509]
     end;
 
     local procedure TransferDataLine(var CSItemReclassHandling: Record "CS Item Reclass. Handling";CSSetup: Record "CS Setup"): Boolean

@@ -11,6 +11,7 @@ page 6014470 "Retail Document Lines"
     // NPR4.12/TSA/20150630 CASE 217683 - Auto-Merge problem, Removed empty/blank function name
     // NPR5.29/TS/20161110  CASE 257587 Added Location Code
     // NPR5.48/TS  /20181220 CASE 335677 Enabled AutoSplitKey
+    // NPR5.52/YAHA/20191010 CASE 372273 Added field size and moved variant code after description
 
     AutoSplitKey = true;
     Caption = 'Rental Sub Form';
@@ -35,10 +36,13 @@ page 6014470 "Retail Document Lines"
                 field("Serial No.";"Serial No.")
                 {
                 }
+                field(Description;Description)
+                {
+                }
                 field("Variant Code";"Variant Code")
                 {
                 }
-                field(Description;Description)
+                field(Size;Size)
                 {
                 }
                 field("Lock Code";"Lock Code")

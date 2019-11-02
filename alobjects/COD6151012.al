@@ -3,6 +3,7 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
     // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
     // NPR5.48/MHA /20190123  CASE 341711 Added Send methods E-mail and SMS
     // NPR5.49/MHA /20190228  CASE 342811 Added functions OnLookupVoucherTypeCode(), OnValidateVoucherTypeCode()
+    // NPR5.52/ALPO/20190925  CASE 369420 Disallow negative quantity of gift vouchers to be sold
 
 
     trigger OnRun()
@@ -17,6 +18,8 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
         Text004: Label 'Enter Amount:';
         Text005: Label 'Enter Discount Amount:';
         Text006: Label 'Enter Discount Percent:';
+        QtyNotPositiveErr: Label 'You must specify a positive quantity.';
+        ConfirmReenterQtyMsg: Label '\Do you want to re-enter the quantity?';
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
     local procedure OnDiscoverActions(var Sender: Record "POS Action")
@@ -50,6 +53,9 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
         Sender.RegisterWorkflowStep('voucher_type_input','if (!param.VoucherTypeCode) {respond()} else {context.VoucherTypeCode = param.VoucherTypeCode}');
         Sender.RegisterWorkflowStep('qty_input','if(param.Quantity <= 0) {intpad({title: labels.IssueVoucherTitle,caption: labels.Quantity,value: 1,notBlank: true}).cancel(abort)} ' +
                                                 'else {context.$qty_input = {"numpad": param.Quantity}};');
+        //-NPR5.52 [369420]
+        Sender.RegisterWorkflowStep('check_qty','respond();');
+        //+NPR5.52 [369420]
         Sender.RegisterWorkflowStep('amt_input','if(param.Amount <= 0) {numpad({title: labels.IssueVoucherTitle,caption: labels.Amount,value: 0,notBlank: true}).cancel(abort)} ' +
                                                 'else {context.$amt_input = {"numpad": param.Amount}};');
         Sender.RegisterWorkflowStep('discount_input',
@@ -191,6 +197,10 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         case WorkflowStep of
+          //-NPR5.52 [369420]
+          'check_qty':
+            CheckQty(JSON,FrontEnd);
+          //+NPR5.52 [369420]
           'voucher_type_input':
             VoucherTypeInput(JSON,FrontEnd);
           //-NPR5.48 [341711]
@@ -245,6 +255,10 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
         JSON.SetScope('/',true);
         JSON.SetScope('$qty_input',true);
         SaleLinePOS.Quantity := JSON.GetInteger('numpad',true);
+        //-NPR5.52 [369420]
+        if SaleLinePOS.Quantity < 0 then
+          Error(QtyNotPositiveErr);
+        //+NPR5.52 [369420]
 
         POSSaleLine.InsertLine(SaleLinePOS);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
@@ -384,6 +398,23 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
         JSON.SetScope('parameters',true);
         JSON.SetContext('VoucherTypeCode',VoucherTypeCode);
         FrontEnd.SetActionContext(IssueVoucherActionCode(),JSON);
+    end;
+
+    local procedure CheckQty(JSON: Codeunit "POS JSON Management";FrontEnd: Codeunit "POS Front End Management")
+    var
+        Qty: Decimal;
+    begin
+        //-NPR5.52 [369420]
+        JSON.SetScope('/',true);
+        JSON.SetScope('$qty_input',true);
+        Qty := JSON.GetInteger('numpad',true);
+        if Qty <= 0 then begin
+          if Confirm(QtyNotPositiveErr + ConfirmReenterQtyMsg,true) then
+            FrontEnd.ContinueAtStep('qty_input')
+          else
+            Error('');
+        end;
+        //+NPR5.52 [369420]
     end;
 
     local procedure "--- Select"()

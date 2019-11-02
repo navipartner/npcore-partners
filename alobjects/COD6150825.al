@@ -7,6 +7,8 @@ codeunit 6150825 "POS Action - MPOS Native"
     // NPR5.51/CLVA/20190408 CASE 351364 Added support for Android
     // NPR5.51/CLVA/20190605 CASE 357532 Added parameters APPROVE and SCANDITSCAN
     // NPR5.51/CLVA/20190819 CASE 364011 Added "Register No." to action
+    // NPR5.52/CLVA/20190919 CASE 364011 Added the use of Text Con. JSfunction to Variable JSString
+    // NPR5.52/JAKUBV/20191022  CASE 351364-01 Transport NPR5.52 - 22 October 2019
 
     SingleInstance = true;
 
@@ -124,10 +126,10 @@ codeunit 6150825 "POS Action - MPOS Native"
               MPOSAppSetup.TestField("Payment Gateway");
               MPOSPaymentGateway.Get(MPOSAppSetup."Payment Gateway");
               MPOSPaymentGateway.TestField("Merchant Id");
-              //-NPR5.51 [364011]
+              //-NPR5.52 [364011]
               //JSONString := BuildJSONParams(FORMAT(NativeActionSetting),MPOSPaymentGateway."Merchant Id", '', '', '', Err_EODFailed);
               JSONString := BuildJSONParams(Format(NativeActionSetting),MPOSPaymentGateway."Merchant Id", SalePOS."Register No.", '', '', Err_EODFailed);
-              //+NPR5.51 [364011]
+              //+NPR5.52 [364011]
             end;
           NativeActionSetting::PRINTLASTRECEIPT :
             begin
@@ -325,13 +327,23 @@ codeunit 6150825 "POS Action - MPOS Native"
     var
         WebClientDependency: Record "Web Client Dependency";
         Factory: DotNet npNetControlFactory;
+        JSString: Text;
     begin
         Model := Model.Model();
-        //-NPR5.51 [351364]
+        //-NPR5.52 [351364]
         //Model.AddScript('function CallNativeFunction(jsonObject) {console.log(jsonObject); window.webkit.messageHandlers.invokeAction.postMessage(jsonObject);}');
         //Model.AddScript('window.androidObject = function AndroidClass(){};');
-        Model.AddScript(JSfunction);
-        //+NPR5.51 [351364]
+        //-#362731
+        //Model.AddScript(JSfunction);
+        JSString := 'function CallNativeFunction(jsonobject) { ';
+        JSString += 'debugger; ';
+        JSString += 'var userAgent = navigator.userAgent || navigator.vendor || window.opera; if (/android/i.test(userAgent)) { ';
+        JSString += 'window.top.mpos.handleBackendMessage(jsonobject); } ';
+        JSString += 'if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) { ';
+        JSString += 'window.webkit.messageHandlers.invokeAction.postMessage(jsonobject);}}';
+        Model.AddScript(JSString);
+        //+#362731
+        //+NPR5.52 [351364]
         Model.AddScript('CallNativeFunction('+JsonObject+');');
     end;
 

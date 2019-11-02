@@ -18,8 +18,21 @@ tableextension 6014437 tableextension6014437 extends Contact
     // NPR5.48/TSA /20181218 CASE 320424 Added Field 6151435 "Magento Account Status" and 6151440 "Magento Price Visibility"
     // MAG2.19/TSA /20190305 CASE 347894 Changed length of field 6151410 to 80
     // MAG2.20/MHA /20190426 CASE 320423 Added Validation and Lookup to Field "Magento Customer Group"
+    // NPR5.52/ZESO/20190925 CASE 358656 Added Fields Anonymized and Anonymized Date
     fields
     {
+        field(6151060;Anonymized;Boolean)
+        {
+            Caption = 'Anonymized';
+            Description = 'NPR5.52';
+            Editable = false;
+        }
+        field(6151061;"Anonymized Date";DateTime)
+        {
+            Caption = 'Anonymized Date';
+            Description = 'NPR5.52';
+            Editable = false;
+        }
         field(6151400;"Magento Contact";Boolean)
         {
             Caption = 'Magento Contact';

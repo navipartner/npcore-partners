@@ -7,6 +7,7 @@ tableextension 6014452 tableextension6014452 extends "User Setup"
     // NPR5.27/BHR /20160930  CASE 253589 Add lookup to field 'Use register'
     // NPR5.38/MHA /20180115  CASE 302240 Added fields 6014405 "Allow Register Switch" and 6014410 "Register Switch Filter"
     // NPR5.46/MMV /20181003  CASE 290734 Renamed field 6014400 to make its purpose clear when used with transcendence.
+    // NPR5.52/ZESO/20190925  CASE 358656 Added Field Anonymize Customers
     fields
     {
         field(6014400;"Backoffice Register No.";Code[10])
@@ -33,6 +34,11 @@ tableextension 6014452 tableextension6014452 extends "User Setup"
         {
             Caption = 'Connection Profile Code';
             TableRelation = "Connection Profile";
+        }
+        field(6151060;"Anonymize Customers";Boolean)
+        {
+            Caption = 'Anonymize Customers';
+            Description = 'NPR5.52';
         }
     }
 }

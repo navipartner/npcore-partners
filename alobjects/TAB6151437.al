@@ -5,6 +5,7 @@ table 6151437 "Magento Payment Mapping"
     // MAG1.20/MHA /20150826  CASE 219645 Added field 105 Payment Gateway Code
     // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
     // MAG2.05/MHA /20170712  CASE 283588 Added field 90 "Allow Adjust Payment Amount"
+    // MAG2.23/ALPO/20191004  CASE 367219 Auto set capture date for payments captured externally
 
     Caption = 'Magento Payment Mapping';
 
@@ -34,6 +35,11 @@ table 6151437 "Magento Payment Mapping"
             Caption = 'Payment Gateway Code';
             Description = 'MAG1.20';
             TableRelation = "Magento Payment Gateway";
+        }
+        field(110;"Captured Externally";Boolean)
+        {
+            Caption = 'Captured Externally';
+            Description = 'MAG2.23';
         }
     }
 

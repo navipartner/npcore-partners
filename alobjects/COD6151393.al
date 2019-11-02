@@ -4,6 +4,7 @@ codeunit 6151393 "CS UI Put Inv. List"
     // NPR5.43/NPKNAV/20180629  CASE 304872 Transport NPR5.43 - 29 June 2018
     // NPR5.48/CLVA  /20181109  CASE 335606 Added filter by "CS User"
     // NPR5.50/CLVA  /20190514  CASE 352719 Added support for selection by barcode
+    // NPR5.52/CLVA  /20190905  CASE 365967 Added filter to support Job Queue Posting
 
     TableNo = "CS UI Header";
 
@@ -137,7 +138,15 @@ codeunit 6151393 "CS UI Put Inv. List"
     local procedure PrepareData()
     var
         WhseActivityHeader: Record "Warehouse Activity Header";
+        TempWhseActivityHeader: Record "Warehouse Activity Header" temporary;
+        TestRecRef: RecordRef;
+        CSPostingBuffer: Record "CS Posting Buffer";
+        CSSetup: Record "CS Setup";
     begin
+        //-NPR5.52 [365967]
+        SelectLatestVersion;
+        //+NPR5.52 [365967]
+
         with WhseActivityHeader do begin
           Reset;
           SetRange(Type,Type::"Invt. Put-away");
@@ -158,10 +167,48 @@ codeunit 6151393 "CS UI Put Inv. List"
             MiniformHeader2.SaveXMLin(DOMxmlin);
             CODEUNIT.Run(MiniformHeader2."Handling Codeunit",MiniformHeader2);
           end else begin
-            RecRef.GetTable(WhseActivityHeader);
-            CSCommunication.SetRecRef(RecRef);
-            ActiveInputField := 1;
-            SendForm(ActiveInputField);
+            //-NPR5.52 [365967]
+            CSSetup.Get;
+            if CSSetup."Post with Job Queue" then begin
+              TempWhseActivityHeader.Reset;
+              TempWhseActivityHeader.DeleteAll;
+              if WhseActivityHeader.FindFirst then begin
+                repeat
+                  TestRecRef.GetTable(WhseActivityHeader);
+                  Clear(CSPostingBuffer);
+                  CSPostingBuffer.SetRange("Table No.",TestRecRef.Number);
+                  CSPostingBuffer.SetRange("Record Id",TestRecRef.RecordId);
+                  if not CSPostingBuffer.FindSet then begin
+                    TempWhseActivityHeader := WhseActivityHeader;
+                    TempWhseActivityHeader.Insert;
+                  end;
+                until WhseActivityHeader.Next = 0;
+              end;
+              Clear(TempWhseActivityHeader);
+              if TempWhseActivityHeader.FindSet then begin
+                RecRef.GetTable(TempWhseActivityHeader);
+                CSCommunication.SetRecRef(RecRef);
+                ActiveInputField := 1;
+                SendForm(ActiveInputField);
+              end else begin
+                if CSCommunication.GetNodeAttribute(ReturnedNode,'RunReturn') = '0' then begin
+                  CSMgt.SendError(Text009);
+                  exit;
+                end;
+                CSCommunication.DecreaseStack(DOMxmlin,PreviousCode);
+                MiniformHeader2.Get(PreviousCode);
+                MiniformHeader2.SaveXMLin(DOMxmlin);
+                CODEUNIT.Run(MiniformHeader2."Handling Codeunit",MiniformHeader2);
+              end;
+            end else begin
+            //+NPR5.52 [365967]
+              RecRef.GetTable(WhseActivityHeader);
+              CSCommunication.SetRecRef(RecRef);
+              ActiveInputField := 1;
+              SendForm(ActiveInputField);
+            //-NPR5.52 [365967]
+            end;
+            //+NPR5.52 [365967]
           end;
         end;
     end;

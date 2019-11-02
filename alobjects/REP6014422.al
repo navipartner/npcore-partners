@@ -6,6 +6,7 @@ report 6014422 "Issued/Admitted Ticket Stats"
     // NPR5.40/JLK /20180322  CASE 308825 Added Customer Filter
     // NPR5.41/JLK /20180406  CASE 308825 Added Customer Name in Filter
     // NPR5.49/BHR /20190207  CASE 343119 Correct Report as per OMA
+    // NPR5.52/YAHA/20190310  CASE 366687 Added variant code and grouping
     DefaultLayout = RDLC;
     RDLCLayout = './IssuedAdmitted Ticket Stats.rdlc';
 
@@ -38,6 +39,15 @@ report 6014422 "Issued/Admitted Ticket Stats"
             column(Getfilters;GetFilters)
             {
             }
+            column(VariantCodeLbl;VariantCodeLbl)
+            {
+            }
+            column(VariantVisibility;VariantVisibility)
+            {
+            }
+            column(ShowVariantLine;ShowVariantLine)
+            {
+            }
             dataitem(Item;Item)
             {
                 DataItemLink = "Ticket Type"=FIELD(Code);
@@ -46,6 +56,9 @@ report 6014422 "Issued/Admitted Ticket Stats"
                 {
                 }
                 column(Description_Item;Description)
+                {
+                }
+                column(VariantCode;VariantCode)
                 {
                 }
                 dataitem(CalcTicketAmount;"Integer")
@@ -68,6 +81,8 @@ report 6014422 "Issued/Admitted Ticket Stats"
                         IssuedTicket: Decimal;
                         TMTicketAccessStatistics: Record "TM Ticket Access Statistics";
                     begin
+
+
                         TMTicket.SetRange(Blocked,false);
                         TMTicket.SetRange("Item No.",Item."No.");
                         TMTicketAccessStatistics.SetRange("Item No.",Item."No.");
@@ -98,6 +113,73 @@ report 6014422 "Issued/Admitted Ticket Stats"
                           //+NPR5.40
                         until TMTicket.Next = 0;
 
+                        if SkipLineWithZero then
+                          if (IssuedTicket = 0) and (AdmittedTicket = 0) then
+                            CurrReport.Skip;
+                        TicketTypeAvailable := true;
+
+                        TotalIssuedTicketType += TotalIssuedTicketPerItem;
+                        TotalAdmittedTicketType += TotalAdmittedTicketPerItem;
+                    end;
+                }
+                dataitem("TM Ticket Access Statistics";"TM Ticket Access Statistics")
+                {
+                    column(Variant;"TM Ticket Access Statistics"."Variant Code" + '  ' + VariantDesc)
+                    {
+                    }
+                    column(TotalIssuedTicketPerVariant;TotalIssuedTicketPervariant)
+                    {
+                    }
+                    column(TotalAdmittedTicketPerVariant;TotalAdmittedTicketPerVariant)
+                    {
+                    }
+
+                    trigger OnAfterGetRecord()
+                    var
+                        TMTicket: Record "TM Ticket";
+                        AdmittedTicket: Decimal;
+                        IssuedTicket: Decimal;
+                        TMTicketAccessStatistics: Record "TM Ticket Access Statistics";
+                    begin
+                        //-NPR5.52 [366687]
+
+                        TMTicket.SetRange(Blocked,false);
+                        TMTicket.SetRange("Item No.",Item."No.");
+
+                        TMTicketAccessStatistics.SetRange("Item No.",Item."No.");
+                        TotalIssuedTicketPervariant := 0;
+                        TotalAdmittedTicketPerVariant := 0;
+                        Clear(VariantDesc);
+                        if "Variant Code" <> '' then begin
+                          if Itemvariant.Get("TM Ticket Access Statistics"."Item No.", "TM Ticket Access Statistics"."Variant Code") then
+                            VariantDesc:= Itemvariant.Description
+                        end;
+                        TMTicket.SetRange("Variant Code","TM Ticket Access Statistics"."Variant Code");
+
+
+                        if (StartDate <> 0D) and (EndDate <> 0D) then begin
+                          TMTicket.SetFilter("Valid From Date",'%1..%2',StartDate,EndDate);
+                          TMTicketAccessStatistics.SetFilter("Admission Date",'%1..%2',StartDate,EndDate);
+                        end;
+
+                        if EndDate = 0D then begin
+                          TMTicket.SetFilter("Valid From Date",'%1',StartDate);
+                          TMTicketAccessStatistics.SetFilter("Admission Date",'%1',StartDate);
+                        end;
+
+
+                        if CustomerFilter <> '' then
+                          TMTicket.SetFilter("Customer No.",CustomerFilter);
+
+                        if TMTicket.FindSet then repeat
+                          Clear(IssuedTicket);
+                          Clear(AdmittedTicket);
+                          GetIssuedTicketVariant(TMTicket,IssuedTicket);
+                          TotalIssuedTicketPervariant += IssuedTicket;
+                          GetAdmittedTicketVariant(TMTicket,AdmittedTicket);
+                          TotalAdmittedTicketPerVariant += AdmittedTicket;
+                        until TMTicket.Next = 0;
+
                         //-NPR5.40
                         // IF TMTicketAccessStatistics.FINDSET THEN REPEAT
                         //  CLEAR(AdmittedTicket);
@@ -111,8 +193,17 @@ report 6014422 "Issued/Admitted Ticket Stats"
                             CurrReport.Skip;
                         TicketTypeAvailable := true;
 
-                        TotalIssuedTicketType += TotalIssuedTicketPerItem;
-                        TotalAdmittedTicketType += TotalAdmittedTicketPerItem;
+                        //+NPR5.52 [366687]
+                    end;
+
+                    trigger OnPreDataItem()
+                    begin
+                        //-NPR5.52 [366687]
+                        "TM Ticket Access Statistics".SetRange("Item No.",Item."No.");
+                        "TM Ticket Access Statistics".SetFilter("Admission Date",'%1..%2',StartDate,EndDate);
+                        "TM Ticket Access Statistics".SetFilter("Variant Code",'<>%1','');
+                        Clear(VariantDesc);
+                        //+NPR5.52 [366687]
                     end;
                 }
 
@@ -120,6 +211,13 @@ report 6014422 "Issued/Admitted Ticket Stats"
                 begin
                     Clear(TotalIssuedTicketPerItem);
                     Clear(TotalAdmittedTicketPerItem);
+                end;
+
+                trigger OnPreDataItem()
+                begin
+                    //-NPR5.52 [366687]
+                    Clear(VariantCode);
+                    //+NPR5.52 [366687]
                 end;
             }
 
@@ -189,6 +287,10 @@ report 6014422 "Issued/Admitted Ticket Stats"
                             //+NPR5.40
                         end;
                     }
+                    field(VariantVisibility;VariantVisibility)
+                    {
+                        Caption = 'Show Variant';
+                    }
                 }
             }
         }
@@ -251,6 +353,18 @@ report 6014422 "Issued/Admitted Ticket Stats"
         CustomerFilter: Text;
         CustomerCaption: Label 'Customer Filter: %1';
         FilterCustomer: Text;
+        TMTicketAccessStatistics: Record "TM Ticket Access Statistics";
+        VariantCode: Code[10];
+        TMTicketAccessStatistics2: Record "TM Ticket Access Statistics";
+        TotalAdmittedTicketPerVariant: Decimal;
+        TotalIssuedTicketPervariant: Decimal;
+        TotalIssuedTicketTypePerVariant: Decimal;
+        TotalAdmittedTicketTypePerVariant: Decimal;
+        Itemvariant: Record "Item Variant";
+        VariantDesc: Text;
+        VariantVisibility: Boolean;
+        ShowVariantLine: Boolean;
+        VariantCodeLbl: Label 'Variant Code : ';
 
     local procedure GetIssuedTicket(Ticket: Record "TM Ticket";var IssuedAmount: Decimal)
     var
@@ -290,6 +404,52 @@ report 6014422 "Issued/Admitted Ticket Stats"
           TMTicketAccessStatistics.SetFilter ("Admission Hour", '=%1', AdmissionHour);
           if (TMTicketAccessStatistics.FindFirst ()) then
             AdmittedAmount += TMTicketAccessEntry.Quantity;
+        until TMTicketAccessEntry.Next = 0;
+        //+NPR5.40
+    end;
+
+    local procedure GetIssuedTicketVariant(Ticket: Record "TM Ticket";var IssuedAmount: Decimal)
+    var
+        TMTicketAccessEntry: Record "TM Ticket Access Entry";
+    begin
+        TMTicketAccessEntry.SetRange("Ticket No.",Ticket."No.");
+        if TMTicketAccessEntry.FindSet then repeat
+          IssuedAmount += TMTicketAccessEntry.Quantity;
+        until TMTicketAccessEntry.Next = 0;
+    end;
+
+    local procedure GetAdmittedTicketVariant(Ticket: Record "TM Ticket";var AdmittedAmount: Decimal)
+    var
+        TMTicketAccessEntry: Record "TM Ticket Access Entry";
+        TMTicketAccessStatistics: Record "TM Ticket Access Statistics";
+        ItemFactCode: Code[20];
+        TicketTypeFactCode: Code[20];
+        AdmissionHour: Integer;
+    begin
+        //-NPR5.40
+        TMTicketAccessEntry.SetRange("Ticket No.",Ticket."No.");
+        if TMTicketAccessEntry.FindSet then repeat
+          ItemFactCode := '';
+          if (ItemFactCode = '') then
+            ItemFactCode := Ticket."Item No.";
+          if (ItemFactCode = '') then
+            ItemFactCode := '<BLANK>';
+          TicketTypeFactCode := TMTicketAccessEntry."Ticket Type Code";
+          if (TicketTypeFactCode = '') then
+            TicketTypeFactCode := '<BLANK>';
+          Evaluate (AdmissionHour, Format (TMTicketAccessEntry."Access Time", 0, '<Hours24>'));
+          TMTicketAccessStatistics.Reset;
+          TMTicketAccessStatistics.SetFilter ("Item No.", '=%1', ItemFactCode);
+          TMTicketAccessStatistics.SetFilter ("Ticket Type", '=%1', TicketTypeFactCode);
+          TMTicketAccessStatistics.SetFilter ("Admission Code", '=%1',TMTicketAccessEntry."Admission Code");
+          TMTicketAccessStatistics.SetFilter ("Admission Date", '=%1', TMTicketAccessEntry."Access Date");
+          TMTicketAccessStatistics.SetFilter ("Admission Hour", '=%1', AdmissionHour);
+           if (TMTicketAccessStatistics.FindFirst ()) then
+              AdmittedAmount += TMTicketAccessEntry.Quantity;
+
+
+
+
         until TMTicketAccessEntry.Next = 0;
         //+NPR5.40
     end;

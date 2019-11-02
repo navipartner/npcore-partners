@@ -13,6 +13,7 @@ table 6060119 "TM Admission Schedule Lines"
     // TM1.36/TSA /20180827 CASE 322432 Added Seating Template Code
     // TM1.37/TSA /20180905 CASE 327324 Added fields for better control of arrival window
     // TM1.41/TSA /20190503 CASE 353981 Dynamic Pricing
+    // TM1.43/TSA /20190903 CASE 357359 Added option to Capacity Control (SEATING)
 
     Caption = 'Admission Schedule Lines';
 
@@ -75,8 +76,8 @@ table 6060119 "TM Admission Schedule Lines"
         field(44;"Capacity Control";Option)
         {
             Caption = 'Capacity Control';
-            OptionCaption = 'None,Sales,Admitted,Full';
-            OptionMembers = "NONE",SALES,ADMITTED,FULL;
+            OptionCaption = 'None,Sales,Admitted,Admitted & Departed,Seating';
+            OptionMembers = "NONE",SALES,ADMITTED,FULL,SEATING;
 
             trigger OnValidate()
             begin

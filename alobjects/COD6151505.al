@@ -50,6 +50,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     // NC2.22/MHA /20190605  CASE 334216 Adjusted ImportEntryError() to only overwrite Error Message if Last Error Text has value
     // NC2.22/MHA /20190613  CASE 358499 Added ClearLastErrorText before Task- and Import Processing
     // NC2.22/MHA /20190715  CASE 361919 Parsed OutStream to IOStream in InsertImportEntrySftp() for AL Compatability
+    // NC2.23/MHA /20190927  CASE 369170 SendErrorMail() is no longer a Try function as it contains MODIFY transaction and removed Gambit integration
 
     TableNo = "Task Line";
 
@@ -77,9 +78,6 @@ codeunit 6151505 "Nc Sync. Mgt."
         ImportTypeCode := CopyStr(UpperCase(GetParameterText("Parameter.DownloadType")),1,MaxStrLen(ImportType.Code));
         //+NC2.12 [313362]
         if GetParameterBool("Parameter.DownloadFtp") then begin
-          //-NC2.12 [313362]
-          //ImportTypeCode := COPYSTR(UPPERCASE(GetParameterText("Parameter.DownloadFtpType")),1,MAXSTRLEN(TaskProcessor.Code));
-          //+NC2.12 [313362]
           if ImportTypeCode = '' then
             DownloadFtp()
           else if ImportType.Get(ImportTypeCode) then
@@ -114,7 +112,6 @@ codeunit 6151505 "Nc Sync. Mgt."
     end;
 
     var
-        GambitMgt: Codeunit "Nc Gambit Management";
         Text000: Label 'NaviConnect Default';
         Text001: Label 'Error during Ftp Backup (%1):\\%2';
         SyncStartTime: DateTime;
@@ -222,7 +219,6 @@ codeunit 6151505 "Nc Sync. Mgt."
         ImportEntry."Import Type" := ImportType.Code;
         ImportEntry.Date := CurrentDateTime;
         //-NC.2.15 [306532]
-        //ImportEntry."Document Name" := Filename;
         ImportEntry."Document Name" := GetDocName(Filename,MaxStrLen(ImportEntry."Document Name"));
         //+NC.2.15 [306532]
         ImportEntry.Imported := false;
@@ -354,15 +350,6 @@ codeunit 6151505 "Nc Sync. Mgt."
         NcImportType.TestField("Server File Path");
 
         //-NC.2.15 [313184]
-        // FileSystem.SETRANGE(Path,NcImportType."Server File Path");
-        // FileSystem.SETRANGE("Is a file",TRUE);
-        // IF FileSystem.ISEMPTY THEN
-        //  EXIT;
-        //
-        // FileSystem.FINDSET;
-        // REPEAT
-        //  InsertImportEntry2(NcImportType,FileSystem);
-        // UNTIL FileSystem.NEXT = 0;
         ArrayHelper := ServerDirectoryHelper.GetFiles(NcImportType."Server File Path");
         for i := 0 to ArrayHelper.GetLength(0) - 1 do begin
           Filename := ArrayHelper.GetValue(i);
@@ -381,9 +368,6 @@ codeunit 6151505 "Nc Sync. Mgt."
         FileMgt: Codeunit "File Management";
     begin
         //-NC2.12 [313362]
-        //-NC.2.15 [313184]
-        // Filename := FileSystem.Path + '/' + FileSystem.Name;
-        // FileMgt.BLOBImportFromServerFile(TempBlob,Filename);
         FileMgt.BLOBImportFromServerFile(TempBlob,Filename);
         //+NC.2.15 [313184]
 
@@ -392,7 +376,6 @@ codeunit 6151505 "Nc Sync. Mgt."
         NcImportEntry."Import Type" := NcImportType.Code;
         NcImportEntry.Date := CurrentDateTime;
         //-NC.2.15 [306532]
-        //NcImportEntry."Document Name" := FileSystem.Name;
         NcImportEntry."Document Name" := GetDocName(FileMgt.GetFileName(Filename),MaxStrLen(NcImportEntry."Document Name"));
         //+NC.2.15 [306532]
         NcImportEntry.Imported := false;
@@ -530,11 +513,6 @@ codeunit 6151505 "Nc Sync. Mgt."
           exit;
         ErrorText := GetLastErrorText;
         //-NC2.22 [334216]
-        // CLEAR(ImportEntry."Last Error Message");
-        // IF STRLEN(ErrorText) > 0 THEN
-        //  ImportEntry."Error Message" := COPYSTR(ErrorText,1,MAXSTRLEN(ImportEntry."Error Message"));
-        // ImportEntry."Last Error Message".CREATEOUTSTREAM(OutStream);
-        // OutStream.WRITE(ErrorText);
         if ErrorText <> '' then begin
           Clear(ImportEntry."Last Error Message");
           ImportEntry."Error Message" := CopyStr(ErrorText,1,MaxStrLen(ImportEntry."Error Message"));
@@ -551,10 +529,13 @@ codeunit 6151505 "Nc Sync. Mgt."
         ImportEntry.Modify(true);
         ClearLastError;
         Commit;
-        if GambitMgt.Run(ImportEntry) then;
-        //-NC2.02 [262318]
-        if NcImportMgt.SendErrorMail(ImportEntry) then;
-        //+NC2.02 [262318]
+        //-NC2.23 [369170]
+        asserterror begin
+          NcImportMgt.SendErrorMail(ImportEntry);
+          Commit;
+          Error('');
+        end;
+        //+NC2.23 [369170]
     end;
 
     local procedure ImportEntryReset(var ImportEntry: Record "Nc Import Entry")
@@ -562,17 +543,7 @@ codeunit 6151505 "Nc Sync. Mgt."
         OutStream: OutStream;
         ErrorText: Text[1024];
     begin
-        //-NC2.22 [358499]
-        // ErrorText := GETLASTERRORTEXT;
-        // ImportEntry.GET(ImportEntry."Entry No.");
-        //+NC2.22 [358499]
         Clear(ImportEntry."Last Error Message");
-        //-NC2.22 [358499]
-        // IF STRLEN(ErrorText) > 0 THEN
-        //  ImportEntry."Error Message" := COPYSTR(ErrorText,1,MAXSTRLEN(ImportEntry."Error Message"));
-        // ImportEntry."Last Error Message".CREATEOUTSTREAM(OutStream);
-        // OutStream.WRITE(ErrorText);
-        //+NC2.22 [358499]
         ImportEntry.Imported := false;
         ImportEntry."Runtime Error" := true;
         //-NC2.16 [313184]
@@ -581,9 +552,6 @@ codeunit 6151505 "Nc Sync. Mgt."
         ImportEntry."Import Completed at" := 0DT;
         //+NC2.16 [313184]
         ImportEntry.Modify(true);
-        //-NC2.22 [358499]
-        // CLEARLASTERROR;
-        //+NC2.22 [358499]
         Commit;
     end;
 
@@ -619,9 +587,6 @@ codeunit 6151505 "Nc Sync. Mgt."
         if ErrorText <> '' then begin
           NaviConnectTask.Response.CreateOutStream(OutStream);
           OutStream.Write(ErrorText);
-          //-NC2.16 [313184]
-          //NaviConnectTask.MODIFY(TRUE);
-          //+NC2.16 [313184]
           ClearLastError;
         end;
 
@@ -629,7 +594,6 @@ codeunit 6151505 "Nc Sync. Mgt."
         NaviConnectTask.Modify(true);
         //+NC2.16 [313184]
         Commit;
-        GambitMgt.InsertEntry('MAGENTO_GENERAL_ERROR',0,0,UserId,ErrorText,true);
     end;
 
     local procedure TaskReset(var NaviConnectTask: Record "Nc Task")
@@ -710,7 +674,6 @@ codeunit 6151505 "Nc Sync. Mgt."
         repeat
           CutNextLine(ListDirectoryDetails,Details);
           //-NC2.05 [275177]
-          //Filename := ParseFilename(Details);
           Filename := Details;
           //+NC2.05 [275177]
         until (Filename <> '') or (ListDirectoryDetails = '');
@@ -755,7 +718,6 @@ codeunit 6151505 "Nc Sync. Mgt."
         end else begin
           Details := CopyStr(ListDirectoryDetails,1,Position - 1);
           //-NC2.05 [275177]
-          //ListDirectoryDetails := DELSTR(ListDirectoryDetails,1,Position + 2);
           ListDirectoryDetails := DelStr(ListDirectoryDetails,1,Position + 1);
           //-NC2.05 [275177]
         end;

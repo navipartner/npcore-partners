@@ -12,6 +12,7 @@ page 6060126 "MM Members"
     // NPR5.43/TS  /20180626 CASE 320616 Added Field Contact No.
     // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
     // MM1.40/TSA /20190822 CASE 360242 Adding NPR Attributes
+    // MM1.41/TSA /20191007 CASE 365970 Update Contact
 
     Caption = 'Members';
     CardPageID = "MM Member Card";
@@ -76,139 +77,135 @@ page 6060126 "MM Members"
                 field("Display Name";"Display Name")
                 {
                 }
-                group(Control6014421)
+                field(NPRAttrTextArray_01;NPRAttrTextArray[1])
                 {
-                    ShowCaption = false;
-                    field(NPRAttrTextArray_01;NPRAttrTextArray[1])
-                    {
-                        CaptionClass = GetAttributeCaptionClass(1);
-                        Editable = NPRAttrEditable;
-                        Visible = NPRAttrVisible01;
+                    CaptionClass = GetAttributeCaptionClass(1);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible01;
 
-                        trigger OnValidate()
-                        begin
-                            //-MM1.40 [360242]
-                            SetMasterDataAttributeValue (1);
-                            //+MM1.40 [360242]
-                        end;
-                    }
-                    field(NPRAttrTextArray_02;NPRAttrTextArray[2])
-                    {
-                        CaptionClass = GetAttributeCaptionClass(2);
-                        Editable = NPRAttrEditable;
-                        Visible = NPRAttrVisible02;
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (1);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_02;NPRAttrTextArray[2])
+                {
+                    CaptionClass = GetAttributeCaptionClass(2);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible02;
 
-                        trigger OnValidate()
-                        begin
-                            //-MM1.40 [360242]
-                            SetMasterDataAttributeValue (2);
-                            //+MM1.40 [360242]
-                        end;
-                    }
-                    field(NPRAttrTextArray_03;NPRAttrTextArray[3])
-                    {
-                        CaptionClass = GetAttributeCaptionClass(3);
-                        Editable = NPRAttrEditable;
-                        Visible = NPRAttrVisible03;
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (2);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_03;NPRAttrTextArray[3])
+                {
+                    CaptionClass = GetAttributeCaptionClass(3);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible03;
 
-                        trigger OnValidate()
-                        begin
-                            //-MM1.40 [360242]
-                            SetMasterDataAttributeValue (3);
-                            //+MM1.40 [360242]
-                        end;
-                    }
-                    field(NPRAttrTextArray_04;NPRAttrTextArray[4])
-                    {
-                        CaptionClass = GetAttributeCaptionClass(4);
-                        Editable = NPRAttrEditable;
-                        Visible = NPRAttrVisible04;
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (3);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_04;NPRAttrTextArray[4])
+                {
+                    CaptionClass = GetAttributeCaptionClass(4);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible04;
 
-                        trigger OnValidate()
-                        begin
-                            //-MM1.40 [360242]
-                            SetMasterDataAttributeValue (4);
-                            //+MM1.40 [360242]
-                        end;
-                    }
-                    field(NPRAttrTextArray_05;NPRAttrTextArray[5])
-                    {
-                        CaptionClass = GetAttributeCaptionClass(5);
-                        Editable = NPRAttrEditable;
-                        Visible = NPRAttrVisible05;
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (4);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_05;NPRAttrTextArray[5])
+                {
+                    CaptionClass = GetAttributeCaptionClass(5);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible05;
 
-                        trigger OnValidate()
-                        begin
-                            //-MM1.40 [360242]
-                            SetMasterDataAttributeValue (5);
-                            //+MM1.40 [360242]
-                        end;
-                    }
-                    field(NPRAttrTextArray_06;NPRAttrTextArray[6])
-                    {
-                        CaptionClass = GetAttributeCaptionClass(6);
-                        Editable = NPRAttrEditable;
-                        Visible = NPRAttrVisible06;
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (5);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_06;NPRAttrTextArray[6])
+                {
+                    CaptionClass = GetAttributeCaptionClass(6);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible06;
 
-                        trigger OnValidate()
-                        begin
-                            //-MM1.40 [360242]
-                            SetMasterDataAttributeValue (6);
-                            //+MM1.40 [360242]
-                        end;
-                    }
-                    field(NPRAttrTextArray_07;NPRAttrTextArray[7])
-                    {
-                        CaptionClass = GetAttributeCaptionClass(7);
-                        Editable = NPRAttrEditable;
-                        Visible = NPRAttrVisible07;
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (6);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_07;NPRAttrTextArray[7])
+                {
+                    CaptionClass = GetAttributeCaptionClass(7);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible07;
 
-                        trigger OnValidate()
-                        begin
-                            //-MM1.40 [360242]
-                            SetMasterDataAttributeValue (7);
-                            //+MM1.40 [360242]
-                        end;
-                    }
-                    field(NPRAttrTextArray_08;NPRAttrTextArray[8])
-                    {
-                        CaptionClass = GetAttributeCaptionClass(8);
-                        Editable = NPRAttrEditable;
-                        Visible = NPRAttrVisible08;
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (7);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_08;NPRAttrTextArray[8])
+                {
+                    CaptionClass = GetAttributeCaptionClass(8);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible08;
 
-                        trigger OnValidate()
-                        begin
-                            //-MM1.40 [360242]
-                            SetMasterDataAttributeValue (8);
-                            //+MM1.40 [360242]
-                        end;
-                    }
-                    field(NPRAttrTextArray_09;NPRAttrTextArray[9])
-                    {
-                        CaptionClass = GetAttributeCaptionClass(9);
-                        Editable = NPRAttrEditable;
-                        Visible = NPRAttrVisible09;
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (8);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_09;NPRAttrTextArray[9])
+                {
+                    CaptionClass = GetAttributeCaptionClass(9);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible09;
 
-                        trigger OnValidate()
-                        begin
-                            //-MM1.40 [360242]
-                            SetMasterDataAttributeValue (9);
-                            //+MM1.40 [360242]
-                        end;
-                    }
-                    field(NPRAttrTextArray_10;NPRAttrTextArray[10])
-                    {
-                        CaptionClass = GetAttributeCaptionClass(10);
-                        Editable = NPRAttrEditable;
-                        Visible = NPRAttrVisible10;
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (9);
+                        //+MM1.40 [360242]
+                    end;
+                }
+                field(NPRAttrTextArray_10;NPRAttrTextArray[10])
+                {
+                    CaptionClass = GetAttributeCaptionClass(10);
+                    Editable = NPRAttrEditable;
+                    Visible = NPRAttrVisible10;
 
-                        trigger OnValidate()
-                        begin
-                            //-MM1.40 [360242]
-                            SetMasterDataAttributeValue (10);
-                            //+MM1.40 [360242]
-                        end;
-                    }
+                    trigger OnValidate()
+                    begin
+                        //-MM1.40 [360242]
+                        SetMasterDataAttributeValue (10);
+                        //+MM1.40 [360242]
+                    end;
                 }
             }
         }
@@ -238,6 +235,19 @@ page 6060126 "MM Members"
 
                     Message (ResponseMessage);
                     //+MM1.19 [270067]
+                end;
+            }
+            action("Update Contact")
+            {
+                Caption = 'Synchronize Contact';
+                Image = CreateInteraction;
+
+                trigger OnAction()
+                begin
+
+                    //-MM1.41 [365970]
+                    SyncContact ();
+                    //+MM1.41 [365970]
                 end;
             }
             action(SetNPRAttributeFilter)
@@ -321,6 +331,7 @@ page 6060126 "MM Members"
         NPRAttrVisible08: Boolean;
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
+        CONFIRM_SYNC: Label 'Do you want to sync the contacts for %1 members?';
 
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin
@@ -361,6 +372,24 @@ page 6060126 "MM Members"
         //-MM1.40 [360242]
         exit (StrSubstNo ('6014555,%1,%2,2', GetAttributeTableId(), AttributeNumber));
         //+MM1.40 [360242]
+    end;
+
+    local procedure SyncContact()
+    var
+        Member: Record "MM Member";
+    begin
+
+        //-MM1.41 [365970]
+        CurrPage.SetSelectionFilter (Member);
+        if (Member.FindSet ()) then begin
+          if (Member.Count() > 1) then
+            if (not Confirm (CONFIRM_SYNC, true, Member.Count())) then
+              Error ('');
+          repeat
+            Member.Modify (true);
+          until (Member.Next () = 0);
+        end;
+        //+MM1.41 [365970]
     end;
 }
 

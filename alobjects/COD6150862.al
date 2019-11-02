@@ -1,6 +1,7 @@
 codeunit 6150862 "POS Action - Doc. Pay&Post"
 {
     // NPR5.50/MMV /20181105 CASE 300557 New action, based on CU 6150815
+    // NPR5.52/MMV /20191004 CASE 352473 Added send & pdf2nav support.
 
 
     trigger OnRun()
@@ -9,12 +10,16 @@ codeunit 6150862 "POS Action - Doc. Pay&Post"
 
     var
         ActionDescription: Label 'Create a payment line to balance an open sales order and post the order upon POS sale end.';
-        CaptionPrintSalesInvoice: Label 'Print Invoice';
-        DescPrintSalesInvoice: Label 'Print the sales invoice after posting';
+        CaptionPrintDocument: Label 'Print Document';
+        DescPrintDocument: Label 'Print the sales documents after posting';
         CaptionSelectCustomer: Label 'Select Customer';
         DescSelectCustomer: Label 'Prompt for customer selection if none on sale';
         CaptionOpenDoc: Label 'Open Document';
         DescOpenDoc: Label 'Open the selected order before remaining amount is imported';
+        CaptionSendDoc: Label 'Send Document';
+        DescSendDoc: Label 'Use Document Sending Profiles to send the posted document';
+        CaptionPdf2NavDoc: Label 'Pdf2Nav Send Document';
+        DescPdf2NavDoc: Label 'Use Pdf2Nav to send the posted document';
 
     local procedure ActionCode(): Text
     begin
@@ -23,7 +28,7 @@ codeunit 6150862 "POS Action - Doc. Pay&Post"
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit ('1.2'); //NPR5.52 [352473]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -40,9 +45,15 @@ codeunit 6150862 "POS Action - Doc. Pay&Post"
             RegisterWorkflowStep('PayAndPostDocument','respond();');
             RegisterWorkflow(false);
 
-            RegisterBooleanParameter('PrintInvoice', false);
+        //-NPR5.52 [352473]
+            RegisterBooleanParameter('PrintDocument', false);
+        //+NPR5.52 [352473]
             RegisterBooleanParameter('OpenDocument', false);
             RegisterBooleanParameter('SelectCustomer', true);
+        //-NPR5.52 [352473]
+            RegisterBooleanParameter('SendDocument', false);
+            RegisterBooleanParameter('Pdf2NavDocument', false);
+        //+NPR5.52 [352473]
           end;
         end;
     end;
@@ -54,7 +65,9 @@ codeunit 6150862 "POS Action - Doc. Pay&Post"
         JSON: Codeunit "POS JSON Management";
         SelectCustomer: Boolean;
         OpenDocument: Boolean;
-        PrintInvoice: Boolean;
+        PrintDocument: Boolean;
+        Send: Boolean;
+        Pdf2Nav: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
           exit;
@@ -63,7 +76,11 @@ codeunit 6150862 "POS Action - Doc. Pay&Post"
         JSON.InitializeJObjectParser(Context,FrontEnd);
         SelectCustomer := JSON.GetBooleanParameter('SelectCustomer', true);
         OpenDocument := JSON.GetBooleanParameter('OpenDocument', true);
-        PrintInvoice := JSON.GetBooleanParameter('PrintInvoice', true);
+        //-NPR5.52 [352473]
+        PrintDocument := JSON.GetBooleanParameter('PrintDocument', true);
+        Send := JSON.GetBooleanParameter('SendDocument', true);
+        Pdf2Nav := JSON.GetBooleanParameter('Pdf2NavDocument', true);
+        //+NPR5.52 [352473]
 
         if not CheckCustomer(POSSession, SelectCustomer) then
           exit;
@@ -74,7 +91,9 @@ codeunit 6150862 "POS Action - Doc. Pay&Post"
         if not ConfirmDocument(SalesHeader, OpenDocument) then
           exit;
 
-        CreateDocumentPaymentLine(POSSession, SalesHeader, PrintInvoice);
+        //-NPR5.52 [352473]
+        CreateDocumentPaymentLine(POSSession, SalesHeader, PrintDocument, Send, Pdf2Nav);
+        //+NPR5.52 [352473]
 
         POSSession.RequestRefreshData();
     end;
@@ -129,7 +148,7 @@ codeunit 6150862 "POS Action - Doc. Pay&Post"
         exit(true);
     end;
 
-    local procedure CreateDocumentPaymentLine(POSSession: Codeunit "POS Session";SalesHeader: Record "Sales Header";PrintInvoice: Boolean)
+    local procedure CreateDocumentPaymentLine(POSSession: Codeunit "POS Session";SalesHeader: Record "Sales Header";Print: Boolean;Send: Boolean;Pdf2Nav: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
         RetailSalesDocImpMgt: Codeunit "Retail Sales Doc. Imp. Mgt.";
@@ -141,7 +160,9 @@ codeunit 6150862 "POS Action - Doc. Pay&Post"
         POSApplyCustomerEntries: Codeunit "POS Apply Customer Entries";
         InvoiceNo: Text;
     begin
-        RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, true, true, true, PrintInvoice, true);
+        //-NPR5.52 [352473]
+        RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, true, true, true, Print, Pdf2Nav, Send, true);
+        //+NPR5.52 [352473]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
@@ -151,9 +172,13 @@ codeunit 6150862 "POS Action - Doc. Pay&Post"
           exit;
 
         case POSParameterValue.Name of
-          'PrintInvoice' : Caption := CaptionPrintSalesInvoice;
+          'PrintDocument' : Caption := CaptionPrintDocument;
           'OpenDocument' : Caption := CaptionOpenDoc;
           'SelectCustomer' : Caption := CaptionSelectCustomer;
+        //-NPR5.52 [352473]
+          'SendDocument' : Caption := CaptionSendDoc;
+          'Pdf2NavDocument' : Caption := CaptionPdf2NavDoc;
+        //+NPR5.52 [352473]
         end;
     end;
 
@@ -164,9 +189,13 @@ codeunit 6150862 "POS Action - Doc. Pay&Post"
           exit;
 
         case POSParameterValue.Name of
-          'PrintInvoice' : Caption := DescPrintSalesInvoice;
+          'PrintDocument' : Caption := DescPrintDocument;
           'OpenDocument' : Caption := DescOpenDoc;
           'SelectCustomer' : Caption := DescSelectCustomer;
+        //-NPR5.52 [352473]
+          'SendDocument' : Caption := DescSendDoc;
+          'Pdf2NavDocument' : Caption := DescPdf2NavDoc;
+        //+NPR5.52 [352473]
         end;
     end;
 

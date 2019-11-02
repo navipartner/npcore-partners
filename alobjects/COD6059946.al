@@ -1,6 +1,7 @@
 codeunit 6059946 "CashKeeper Proxy"
 {
     // NPR5.29\CLVA\20161108 CASE NPR5.29 Object Created
+    // NPR5.52/TILA/20190924CASE 361782DeserializeState function removed
 
     SingleInstance = true;
     TableNo = TempBlob;
@@ -159,13 +160,6 @@ codeunit 6059946 "CashKeeper Proxy"
 
     local procedure "--- Protocol Event Handling"()
     begin
-    end;
-
-    local procedure DeserializeState(Data: Text;var State: DotNet npNetState1)
-    var
-        JsonConvert: DotNet npNetJsonConvert;
-    begin
-        State := JsonConvert.DeserializeObject(Data,GetDotNetType(State));
     end;
 
     local procedure SerializeJson("Object": Variant): Text

@@ -5,6 +5,7 @@ report 6151406 "Magento Gift Voucher"
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
     // MAG2.22/MHA /20190619  CASE 357825 Added Data Items to be used with Word Layout
     // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print functionality
+    // MAG2.23/ZESO/20190911  CASE 365692 Display special danish characters correctly.
 
     Caption = 'Magento Gift Voucher';
     PreviewMode = PrintLayout;
@@ -227,8 +228,11 @@ report 6151406 "Magento Gift Voucher"
                 if "Gift Voucher Message".HasValue then begin
                   CalcFields("Gift Voucher Message");
                   "Gift Voucher Message".CreateInStream(InStream);
-                  StreamReader := StreamReader.StreamReader(InStream);
-                  GiftVoucherMessage := StreamReader.ReadToEnd();
+                  //-MAG2.23 [365692]
+                  //StreamReader := StreamReader.StreamReader(InStream);
+                  //GiftVoucherMessage := StreamReader.ReadToEnd();
+                  InStream.ReadText(GiftVoucherMessage);
+                  //+MAG2.23 [365692]
                   NulChr := 0;
                   GiftVoucherMessage := DelChr(GiftVoucherMessage,'=',Format(NulChr));
                 end;

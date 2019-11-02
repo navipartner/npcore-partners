@@ -671,7 +671,7 @@ table 6014422 "Retail Journal Line"
           TempSalePOS.Date := "Calculation Date";
         //+NPR5.47 [323705]
 
-        TempSalePOS."Price including VAT" := true;
+        TempSalePOS."Prices Including VAT" := true;
         //-NPR5.46 [294354]
         Item.Get("Item No.");
         //TempSalePOS."Customer Price Group" := "Customer Price Group";

@@ -16,6 +16,8 @@ page 6014503 "Customer Repair Card"
     // NPR5.40/TS  /20180105  CASE 300893 Group Invoice to renamed to Invoiced To
     // NPR5.40/TS  /20180308  CASE 307591 Removed Find Repair Card
     // NPR5.40/TS  /20180315  CASE 307592 Split General Tab
+    // NPR5.52/ANPA/20190920  CASE 369594 Removed page actions input and delete from section pictures from actiongroup <Action6150715>
+    // NPR5.52/ANPA/20190920  CASE 369595 Removed Fax No. field
 
     Caption = 'Customer Repair Card';
     PromotedActionCategories = 'New,Process,Reports,Pictures,Tasks';
@@ -80,9 +82,6 @@ page 6014503 "Customer Repair Card"
                 field("Mobile Phone No.";"Mobile Phone No.")
                 {
                     ShowMandatory = true;
-                }
-                field("Fax No.";"Fax No.")
-                {
                 }
                 field("E-mail";"E-mail")
                 {
@@ -688,36 +687,6 @@ page 6014503 "Customer Repair Card"
                 {
                     Caption = 'Picturedoc.&2';
                     Image = Setup;
-                    action(Action6150716)
-                    {
-                        Caption = '&Input';
-                        Image = Import;
-                        Promoted = true;
-                        PromotedCategory = Category4;
-
-                        trigger OnAction()
-                        begin
-                            ImageFound := "Picture Documentation2".HasValue;
-
-                            Clear(TempBlob);
-                            //-NPR5.26
-                            //Name:=FileManagement.BLOBImport(TempBlob,TextName);
-                            "Picture Path 2" := FileManagement.BLOBImport(TempBlob,TextName);
-                            //+NPR5.26
-                            "Picture Documentation2" := TempBlob.Blob;
-                            //-NPR5.26
-                            //IF Name= '' THEN
-                            //  EXIT;
-                            if "Picture Path 2" = '' then
-                              exit;
-                            //+NPR5.26
-                            if ImageFound then
-                              if not Confirm(Text10600001,false) then
-                                exit;
-
-                            CurrPage.SaveRecord;
-                        end;
-                    }
                     action(Action6150717)
                     {
                         Caption = 'O&utput';
@@ -744,22 +713,6 @@ page 6014503 "Customer Repair Card"
                                 FileManagement.BLOBExport(TempBlob,CustomerRepair."Picture Path 2",true);
                             end;
                             //+NPR5.26
-                        end;
-                    }
-                    action(Action6150718)
-                    {
-                        Caption = '&Delete';
-                        Image = Delete;
-                        Promoted = true;
-                        PromotedCategory = Category4;
-
-                        trigger OnAction()
-                        begin
-                            if "Picture Documentation2".HasValue then
-                              if Confirm(Text10600002,false) then begin
-                                Clear("Picture Documentation2");
-                                CurrPage.SaveRecord;
-                              end;
                         end;
                     }
                 }

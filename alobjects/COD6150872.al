@@ -1,6 +1,7 @@
 codeunit 6150872 "POS Action - Doc.Prepay Refund"
 {
     // NPR5.50/MMV /20181105 CASE 300557 Created object
+    // NPR5.52/MMV /20191004 CASE 352473 Added send & pdf2nav support.
     // 
     // This action does the reverse of action SALES_DOC_PREPAY.
     // It should only be used when full refund of prepayment invoices via the POS is intended. If the prepayment invoice(s) was not actually paid, a credit memo should just be applied manually to cancel it.
@@ -19,6 +20,10 @@ codeunit 6150872 "POS Action - Doc.Prepay Refund"
         NO_PREPAYMENT: Label '%1 %2 has no refundable prepayments!';
         CaptionSelectCustomer: Label 'Select Customer';
         DescSelectCustomer: Label 'Prompt for customer selection if none on sale';
+        CaptionSendDoc: Label 'Send Document';
+        DescSendDoc: Label 'Use Document Sending Profiles to send the posted document';
+        CaptionPdf2NavDoc: Label 'Pdf2Nav Send Document';
+        DescPdf2NavDoc: Label 'Use Pdf2Nav to send the posted document';
 
     local procedure ActionCode(): Text
     begin
@@ -27,7 +32,7 @@ codeunit 6150872 "POS Action - Doc.Prepay Refund"
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit ('1.2'); //NPR5.52 [352473]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -47,6 +52,10 @@ codeunit 6150872 "POS Action - Doc.Prepay Refund"
             RegisterBooleanParameter('PrintPrepaymentCreditNote', false);
             RegisterBooleanParameter('DeleteDocumentAfterRefund', false);
             RegisterBooleanParameter('SelectCustomer', true);
+        //-NPR5.52 [352473]
+            RegisterBooleanParameter('SendDocument', false);
+            RegisterBooleanParameter('Pdf2NavDocument', false);
+        //+NPR5.52 [352473]
           end;
         end;
     end;
@@ -59,6 +68,8 @@ codeunit 6150872 "POS Action - Doc.Prepay Refund"
         PrintPrepaymentCreditNote: Boolean;
         DeleteDocumentAfterRefund: Boolean;
         SelectCustomer: Boolean;
+        Send: Boolean;
+        Pdf2Nav: Boolean;
     begin
         if not Action.IsThisAction(ActionCode) then
           exit;
@@ -68,6 +79,10 @@ codeunit 6150872 "POS Action - Doc.Prepay Refund"
         PrintPrepaymentCreditNote := JSON.GetBooleanParameter('PrintPrepaymentCreditNote', true);
         DeleteDocumentAfterRefund := JSON.GetBooleanParameter('DeleteDocumentAfterRefund', true);
         SelectCustomer := JSON.GetBooleanParameter('SelectCustomer', true);
+        //-NPR5.52 [352473]
+        Send := JSON.GetBooleanParameter('SendDocument', true);
+        Pdf2Nav := JSON.GetBooleanParameter('Pdf2NavDocument', true);
+        //+NPR5.52 [352473]
 
         if not CheckCustomer(POSSession, SelectCustomer) then
           exit;
@@ -75,7 +90,9 @@ codeunit 6150872 "POS Action - Doc.Prepay Refund"
         if not SelectDocument(Context, POSSession, FrontEnd, SalesHeader) then
           exit;
 
-        CreatePrepaymentRefundLine(POSSession, SalesHeader, PrintPrepaymentCreditNote, DeleteDocumentAfterRefund);
+        //-NPR5.52 [352473]
+        CreatePrepaymentRefundLine(POSSession, SalesHeader, PrintPrepaymentCreditNote, DeleteDocumentAfterRefund, Send, Pdf2Nav);
+        //+NPR5.52 [352473]
 
         POSSession.RequestRefreshData();
     end;
@@ -122,13 +139,20 @@ codeunit 6150872 "POS Action - Doc.Prepay Refund"
         exit(RetailSalesDocImpMgt.SelectSalesDocument(SalesHeader.GetView(false), SalesHeader));
     end;
 
-    local procedure CreatePrepaymentRefundLine(POSSession: Codeunit "POS Session";SalesHeader: Record "Sales Header";PrintPrepaymentCreditNote: Boolean;DeleteDocumentAfterRefund: Boolean)
+    local procedure CreatePrepaymentRefundLine(POSSession: Codeunit "POS Session";SalesHeader: Record "Sales Header";Print: Boolean;DeleteDocumentAfterRefund: Boolean;Send: Boolean;Pdf2Nav: Boolean)
     var
         RetailSalesDocMgt: Codeunit "Retail Sales Doc. Mgt.";
+        POSPrepaymentMgt: Codeunit "POS Prepayment Mgt.";
     begin
-        if RetailSalesDocMgt.GetTotalPrepaidAmountNotDeducted(SalesHeader) <= 0 then
+        //-NPR5.52 [352473]
+        // IF RetailSalesDocMgt.GetTotalPrepaidAmountNotDeducted(SalesHeader) <= 0 THEN
+        //  ERROR(NO_PREPAYMENT, SalesHeader."Document Type", SalesHeader."No.");
+        // RetailSalesDocMgt.CreatePrepaymentRefundLine(POSSession, SalesHeader, PrintPrepaymentCreditNote, TRUE, DeleteDocumentAfterRefund);
+        if POSPrepaymentMgt.GetPrepaymentAmountToDeductInclVAT(SalesHeader) <= 0 then
           Error(NO_PREPAYMENT, SalesHeader."Document Type", SalesHeader."No.");
-        RetailSalesDocMgt.CreatePrepaymentRefundLine(POSSession, SalesHeader, PrintPrepaymentCreditNote, true, DeleteDocumentAfterRefund);
+
+        RetailSalesDocMgt.CreatePrepaymentRefundLine(POSSession, SalesHeader, Print, Send, Pdf2Nav, true, DeleteDocumentAfterRefund);
+        //+NPR5.52 [352473]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]
@@ -141,6 +165,10 @@ codeunit 6150872 "POS Action - Doc.Prepay Refund"
           'PrintPrepaymentCreditNote' : Caption := CaptionPrintDoc;
           'DeleteDocumentAfterRefund' : Caption := CaptionDeleteAfter;
           'SelectCustomer' : Caption := CaptionSelectCustomer;
+        //-NPR5.52 [352473]
+          'SendDocument' : Caption := CaptionSendDoc;
+          'Pdf2NavDocument' : Caption := CaptionPdf2NavDoc;
+        //+NPR5.52 [352473]
         end;
     end;
 
@@ -154,6 +182,10 @@ codeunit 6150872 "POS Action - Doc.Prepay Refund"
           'PrintPrepaymentCreditNote' : Caption := DescPrintDoc;
           'DeleteDocumentAfterRefund' : Caption := DescDeleteAfter;
           'SelectCustomer' : Caption := DescSelectCustomer;
+        //-NPR5.52 [352473]
+          'SendDocument' : Caption := DescSendDoc;
+          'Pdf2NavDocument' : Caption := DescPdf2NavDoc;
+        //+NPR5.52 [352473]
         end;
     end;
 

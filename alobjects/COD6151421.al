@@ -1,6 +1,7 @@
 codeunit 6151421 "Magento Lookup Return Order"
 {
     // MAG2.12/MHA /20180425  CASE 309647 Object created - Sales Return Order Import
+    // MAG2.23/MHA /20191018  CASE 369170 Removed unused Global Variables
 
     TableNo = "Nc Import Entry";
 
@@ -18,19 +19,11 @@ codeunit 6151421 "Magento Lookup Return Order"
           exit;
     end;
 
-    var
-        TempImportEntry: Record "Nc Import Entry" temporary;
-        GambitMgt: Codeunit "Nc Gambit Management";
-        NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        SyncMgt: Codeunit "Nc Sync. Mgt.";
-        ErrorText: Text;
-        ShowImported: Boolean;
-        WebClient: Boolean;
-
     procedure GetReturnOrderDocuments(ImportEntry: Record "Nc Import Entry";var TempSalesHeader: Record "Sales Header" temporary;var TempSalesCrMemoHeader: Record "Sales Cr.Memo Header" temporary): Boolean
     var
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         RecRef: RecordRef;
         XmlDoc: DotNet npNetXmlDocument;
         XmlElement: DotNet npNetXmlElement;

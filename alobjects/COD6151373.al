@@ -15,29 +15,43 @@ codeunit 6151373 "CS Helper Functions"
     //                                   Handling empty Item Group Code in export data
     // NPR5.51/CLVA/20190822 CASE 365967 Added function PostTransferOrder and TryPostTransferOrder
     // NPR5.51/CLVA/20190701 CASE 350696 Added function GetRfidOfflineDataDeltaV2
+    // NPR5.52/CLVA/20190904 CASE 365967 Removed function PostTransferOrder and TryPostTransferOrder
+    // NPR5.52/CLVA/20190910 CASE 364063 Added functions CreateNewCounting and CancelCounting
 
 
     trigger OnRun()
     begin
     end;
 
+    var
+        Err_CSStockTakes: Label 'There is already an open Stock-Take with id %1';
+        Err_PostingIsScheduled: Label 'Phy. Inventory Journal is scheduled for posting: %1 %2';
+        Err_StockTakeWorksheetNotEmpty: Label 'Phy. Inventory Journal is not empty: %1 %2';
+        Err_MissingLocation: Label 'Location is missing on POS Store';
+        Err_ConfirmForceClose: Label 'This will delete Phy. Inventory Journal: %1 %2';
+        Txt_CountingCancelled: Label 'Counting was cancelled';
+        Text001: Label 'Location %1';
+        Text002: Label 'Calculate Inventory for Location %1';
+        Text003: Label 'There is no Items on Location %1';
+        Err_PostingNotDone: Label 'The posting of the last counting is not finalised. Try again later.';
+
     procedure PublishWebService(Enable: Boolean)
     var
         WebService: Record "Web Service";
     begin
-        if Enable then begin
-          if not WebService.Get(WebService."Object Type"::Codeunit,'cs_service') then begin
-            WebService.Init;
+        IF Enable THEN BEGIN
+          IF NOT WebService.GET(WebService."Object Type"::Codeunit,'cs_service') THEN BEGIN
+            WebService.INIT;
             WebService."Object Type" := WebService."Object Type"::Codeunit;
             WebService."Service Name" := 'cs_service';
             WebService."Object ID" := 6151372;
-            WebService.Published := true;
-            WebService.Insert(true);
-          end;
-        end else begin
-          if WebService.Get(WebService."Object Type"::Codeunit,'cs_service') then
-            WebService.Delete(true);
-        end;
+            WebService.Published := TRUE;
+            WebService.INSERT(TRUE);
+          END;
+        END ELSE BEGIN
+          IF WebService.GET(WebService."Object Type"::Codeunit,'cs_service') THEN
+            WebService.DELETE(TRUE);
+        END;
     end;
 
     local procedure "-- Log functions"()
@@ -50,30 +64,30 @@ codeunit 6151373 "CS Helper Functions"
         CSSetup: Record "CS Setup";
         BigTextDocument: BigText;
     begin
-        if not CSSetup.Get then
-          exit;
+        IF NOT CSSetup.GET THEN
+          EXIT;
 
-        if not CSSetup."Enable Capture Service" then
-          exit;
+        IF NOT CSSetup."Enable Capture Service" THEN
+          EXIT;
 
-        IsEnable := true;
+        IsEnable := TRUE;
 
-        if not CSSetup."Log Communication" then
-          exit;
+        IF NOT CSSetup."Log Communication" THEN
+          EXIT;
 
-        LogCommunication := true;
+        LogCommunication := TRUE;
 
-        BigTextDocument.AddText(Document);
+        BigTextDocument.ADDTEXT(Document);
 
-        CSCommunicationLog.Init;
-        CSCommunicationLog.Id := CreateGuid;
-        CSCommunicationLog."Request Start" := CurrentDateTime;
-        CSCommunicationLog."Request Data".CreateOutStream(Ostream);
+        CSCommunicationLog.INIT;
+        CSCommunicationLog.Id := CREATEGUID;
+        CSCommunicationLog."Request Start" := CURRENTDATETIME;
+        CSCommunicationLog."Request Data".CREATEOUTSTREAM(Ostream);
 
-        BigTextDocument.Write(Ostream);
+        BigTextDocument.WRITE(Ostream);
 
-        CSCommunicationLog.Insert;
-        Commit;
+        CSCommunicationLog.INSERT;
+        COMMIT;
     end;
 
     procedure UpdateLogEntry(var CSCommunicationLog: Record "CS Communication Log";FunctionCalled: Text;IsInternalRequest: Boolean;InternalRequestId: Guid;Document: Text;LogCommunication: Boolean;"Device Id": Code[10])
@@ -81,24 +95,24 @@ codeunit 6151373 "CS Helper Functions"
         Ostream: OutStream;
         BigTextDocument: BigText;
     begin
-        if not LogCommunication then
-          exit;
+        IF NOT LogCommunication THEN
+          EXIT;
 
-        BigTextDocument.AddText(Document);
+        BigTextDocument.ADDTEXT(Document);
 
-        CSCommunicationLog."Request End" := CurrentDateTime;
+        CSCommunicationLog."Request End" := CURRENTDATETIME;
         CSCommunicationLog."Request Function" := FunctionCalled;
         CSCommunicationLog."Internal Request" := IsInternalRequest;
         CSCommunicationLog."Internal Log No." := InternalRequestId;
-        CSCommunicationLog.User := UserId;
+        CSCommunicationLog.User := USERID;
         //-NPR5.50 [344466]
         CSCommunicationLog."Device Id" := "Device Id";
         //+NPR5.50 [344466]
-        CSCommunicationLog."Response Data".CreateOutStream(Ostream);
+        CSCommunicationLog."Response Data".CREATEOUTSTREAM(Ostream);
 
-        BigTextDocument.Write(Ostream);
+        BigTextDocument.WRITE(Ostream);
 
-        CSCommunicationLog.Modify(true);
+        CSCommunicationLog.MODIFY(TRUE);
     end;
 
     local procedure "-- Debug"()
@@ -121,9 +135,9 @@ codeunit 6151373 "CS Helper Functions"
     var
         CSFieldDefaults: Record "CS Field Defaults";
     begin
-        Clear(CSFieldDefaults);
-        CSFieldDefaults.SetRange("Use Case Code",CSUIHeader.Code);
-        CSFieldDefaults.DeleteAll(true);
+        CLEAR(CSFieldDefaults);
+        CSFieldDefaults.SETRANGE("Use Case Code",CSUIHeader.Code);
+        CSFieldDefaults.DELETEALL(TRUE);
     end;
 
     procedure InitOfflineRfidData() Result: Text
@@ -131,22 +145,22 @@ codeunit 6151373 "CS Helper Functions"
         CSRfidOfflineData: Record "CS Rfid Data";
         ItemCrossReference: Record "Item Cross Reference";
     begin
-        if not Confirm('Re-create the offline datastore?',true) then
-          exit;
+        IF NOT CONFIRM('Re-create the offline datastore?',TRUE) THEN
+          EXIT;
 
-        CSRfidOfflineData.DeleteAll(true);
+        CSRfidOfflineData.DELETEALL(TRUE);
 
-        ItemCrossReference.SetRange("Rfid Tag",true);
-        ItemCrossReference.SetRange("Cross-Reference Type",ItemCrossReference."Cross-Reference Type"::"Bar Code");
-        if ItemCrossReference.FindSet then begin
-          repeat
+        ItemCrossReference.SETRANGE("Is Retail Serial No.",TRUE);
+        ItemCrossReference.SETRANGE("Cross-Reference Type",ItemCrossReference."Cross-Reference Type"::"Bar Code");
+        IF ItemCrossReference.FINDSET THEN BEGIN
+          REPEAT
             CreateCSRfidOfflineDataRecord(ItemCrossReference);
-          until ItemCrossReference.Next = 0;
-        end;
+          UNTIL ItemCrossReference.NEXT = 0;
+        END;
 
-        Clear(CSRfidOfflineData);
-        CSRfidOfflineData.FindSet;
-        Message('Offline data updated with: ' + Format(CSRfidOfflineData.Count) + ' records');
+        CLEAR(CSRfidOfflineData);
+        CSRfidOfflineData.FINDSET;
+        MESSAGE('Offline data updated with: ' + FORMAT(CSRfidOfflineData.COUNT) + ' records');
     end;
 
     procedure CreateOfflineRfidDataDelta(DeviceId: Code[20]) Result: Text
@@ -163,31 +177,31 @@ codeunit 6151373 "CS Helper Functions"
         CSRfidData: Record "CS Rfid Data";
         CurrentTimestamp: BigInteger;
     begin
-        CSSetup.Get;
+        CSSetup.GET;
 
-        if not CSSetup."Enable Capture Service" then
-          exit;
+        IF NOT CSSetup."Enable Capture Service" THEN
+          EXIT;
 
-        if not CSDevices.Get(DeviceId) then begin
-          CSDevices.Init;
+        IF NOT CSDevices.GET(DeviceId) THEN BEGIN
+          CSDevices.INIT;
           CSDevices."Device Id" := DeviceId;
-          CSDevices.Insert(true);
-        end;
+          CSDevices.INSERT(TRUE);
+        END;
 
         CurrentTimestamp := CSDevices."Last Download Timestamp";
 
-        CSRfidData.SetCurrentKey("Time Stamp");
-        if CSDevices."Last Download Timestamp" <> 0 then
-          CSRfidData.SetFilter("Time Stamp",StrSubstNo('>%1',CSDevices."Last Download Timestamp"));
-        CSRfidData.SetRange("Cross-Reference Discontinue",false);
+        CSRfidData.SETCURRENTKEY("Time Stamp");
+        IF CSDevices."Last Download Timestamp" <> 0 THEN
+          CSRfidData.SETFILTER("Time Stamp",STRSUBSTNO('>%1',CSDevices."Last Download Timestamp"));
+        CSRfidData.SETRANGE("Cross-Reference Discontinue",FALSE);
 
         // JTokenWriter := JTokenWriter.JTokenWriter;
         // WITH JTokenWriter DO BEGIN
         //  WriteStartObject;
         //  WritePropertyName('itemtag');
         //  WriteStartArray;
-            if CSRfidData.FindLast then begin
-              CSDevices."Current Tag Count" := CSRfidData.Count;
+            IF CSRfidData.FINDLAST THEN BEGIN
+              CSDevices."Current Tag Count" := CSRfidData.COUNT;
               CurrentTimestamp := CSRfidData."Time Stamp";
         //      REPEAT
         //        WriteStartObject;
@@ -202,14 +216,14 @@ codeunit 6151373 "CS Helper Functions"
         //        CurrentTimestamp := CSRfidData."Time Stamp";
 
         //      UNTIL CSRfidData.NEXT = 0;
-            end;
+            END;
         //  WriteEndArray;
         //  WriteEndObject;
         //  JObject := Token;
         //END;
 
         JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
+        WITH JTokenWriter DO BEGIN
         WriteStartObject;
 
         WritePropertyName('itemgroup');
@@ -222,18 +236,18 @@ codeunit 6151373 "CS Helper Functions"
         WriteValue('UNKNOWN TAGS');
         WriteEndObject;
 
-        if CSDevices."Last Download Timestamp" <> 0 then
-          CSRfidItemGroups.SetFilter(Time_Stamp,StrSubstNo('>%1',CSDevices."Last Download Timestamp"));
-        CSRfidItemGroups.Open;
-        while CSRfidItemGroups.Read do begin
+        IF CSDevices."Last Download Timestamp" <> 0 THEN
+          CSRfidItemGroups.SETFILTER(Time_Stamp,STRSUBSTNO('>%1',CSDevices."Last Download Timestamp"));
+        CSRfidItemGroups.OPEN;
+        WHILE CSRfidItemGroups.READ DO BEGIN
           WriteStartObject;
           WritePropertyName('key');
           WriteValue(CSRfidItemGroups.Item_Group_Code);
           WritePropertyName('title');
           WriteValue(CSRfidItemGroups.Item_Group_Description);
           WriteEndObject;
-        end;
-        CSRfidItemGroups.Close;
+        END;
+        CSRfidItemGroups.CLOSE;
         WriteEndArray;
 
         WritePropertyName('item');
@@ -256,10 +270,10 @@ codeunit 6151373 "CS Helper Functions"
         WriteValue('');
         WriteEndObject;
 
-        if CSDevices."Last Download Timestamp" <> 0 then
-          CSRfidItems.SetFilter(Time_Stamp,StrSubstNo('>%1',CSDevices."Last Download Timestamp"));
-        CSRfidItems.Open;
-        while CSRfidItems.Read do begin
+        IF CSDevices."Last Download Timestamp" <> 0 THEN
+          CSRfidItems.SETFILTER(Time_Stamp,STRSUBSTNO('>%1',CSDevices."Last Download Timestamp"));
+        CSRfidItems.OPEN;
+        WHILE CSRfidItems.READ DO BEGIN
           WriteStartObject;
           WritePropertyName('key');
           WriteValue(CSRfidItems.Combined_key);
@@ -276,8 +290,8 @@ codeunit 6151373 "CS Helper Functions"
           WritePropertyName('imageurl');
           WriteValue(CSRfidItems.Image_Url);
           WriteEndObject;
-        end;
-        CSRfidItems.Close;
+        END;
+        CSRfidItems.CLOSE;
         WriteEndArray;
 
         //-NPR5.51
@@ -303,8 +317,8 @@ codeunit 6151373 "CS Helper Functions"
         //-NPR5.50 [335051]
         WritePropertyName('supportedTagModels');
         WriteStartArray;
-          CSRfidTagModelsQuery.Open;
-          while CSRfidTagModelsQuery.Read do begin
+          CSRfidTagModelsQuery.OPEN;
+          WHILE CSRfidTagModelsQuery.READ DO BEGIN
             WriteStartObject;
             WritePropertyName('key');
             WriteValue(CSRfidTagModelsQuery.Family+CSRfidTagModelsQuery.Model);
@@ -313,8 +327,8 @@ codeunit 6151373 "CS Helper Functions"
             WritePropertyName('model');
             WriteValue(CSRfidTagModelsQuery.Model);
             WriteEndObject;
-          end;
-          CSRfidTagModelsQuery.Close;
+          END;
+          CSRfidTagModelsQuery.CLOSE;
         WriteEndArray;
         //+NPR5.50 [335051]
 
@@ -327,9 +341,9 @@ codeunit 6151373 "CS Helper Functions"
             WritePropertyName('medialibrary');
             WriteValue(CSSetup."Media Library");
             WritePropertyName('refreshItemCatelog');
-            if CSDevices."Refresh Item Catalog" then
+            IF CSDevices."Refresh Item Catalog" THEN
               WriteValue('TRUE')
-            else
+            ELSE
               WriteValue('FALSE');
             //-NPR5.50 [35374]
             //-NPR5.51
@@ -343,10 +357,10 @@ codeunit 6151373 "CS Helper Functions"
 
         WriteEndObject;
         JObject := Token;
-        end;
+        END;
 
         CSDevices."Current Download Timestamp" := CurrentTimestamp;
-        CSDevices.Modify(true);
+        CSDevices.MODIFY(TRUE);
 
         Result := JObject.ToString();
     end;
@@ -365,33 +379,33 @@ codeunit 6151373 "CS Helper Functions"
         CSRfidData: Record "CS Rfid Data";
         CurrentTimestamp: BigInteger;
     begin
-        CSSetup.Get;
+        CSSetup.GET;
 
-        if not CSSetup."Enable Capture Service" then
-          exit;
+        IF NOT CSSetup."Enable Capture Service" THEN
+          EXIT;
 
-        if not CSDevices.Get(DeviceId) then begin
-          CSDevices.Init;
+        IF NOT CSDevices.GET(DeviceId) THEN BEGIN
+          CSDevices.INIT;
           CSDevices."Device Id" := DeviceId;
-          CSDevices.Insert(true);
-        end;
+          CSDevices.INSERT(TRUE);
+        END;
 
         CurrentTimestamp := CSDevices."Last Download Timestamp";
 
-        CSRfidData.SetCurrentKey("Time Stamp");
-        if CSDevices."Last Download Timestamp" <> 0 then
-          CSRfidData.SetFilter("Time Stamp",StrSubstNo('>%1',CSDevices."Last Download Timestamp"));
-        CSRfidData.SetRange("Cross-Reference Discontinue",false);
+        CSRfidData.SETCURRENTKEY("Time Stamp");
+        IF CSDevices."Last Download Timestamp" <> 0 THEN
+          CSRfidData.SETFILTER("Time Stamp",STRSUBSTNO('>%1',CSDevices."Last Download Timestamp"));
+        CSRfidData.SETRANGE("Cross-Reference Discontinue",FALSE);
 
         JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
+        WITH JTokenWriter DO BEGIN
           WriteStartObject;
 
           WritePropertyName('itemtag');
           WriteStartArray;
-          if CSRfidData.FindSet then begin
-            CSDevices."Current Tag Count" := CSRfidData.Count;
-            repeat
+          IF CSRfidData.FINDSET THEN BEGIN
+            CSDevices."Current Tag Count" := CSRfidData.COUNT;
+            REPEAT
               WriteStartObject;
               WritePropertyName('key');
               WriteValue(CSRfidData.Key);
@@ -403,8 +417,8 @@ codeunit 6151373 "CS Helper Functions"
 
               CurrentTimestamp := CSRfidData."Time Stamp";
 
-            until CSRfidData.Next = 0;
-          end;
+            UNTIL CSRfidData.NEXT = 0;
+          END;
           WriteEndArray;
 
           WritePropertyName('itemgroup');
@@ -417,18 +431,18 @@ codeunit 6151373 "CS Helper Functions"
           WriteValue('UNKNOWN TAGS');
           WriteEndObject;
 
-          if CSDevices."Last Download Timestamp" <> 0 then
-            CSRfidItemGroups.SetFilter(Time_Stamp,StrSubstNo('>%1',CSDevices."Last Download Timestamp"));
-          CSRfidItemGroups.Open;
-          while CSRfidItemGroups.Read do begin
+          IF CSDevices."Last Download Timestamp" <> 0 THEN
+            CSRfidItemGroups.SETFILTER(Time_Stamp,STRSUBSTNO('>%1',CSDevices."Last Download Timestamp"));
+          CSRfidItemGroups.OPEN;
+          WHILE CSRfidItemGroups.READ DO BEGIN
             WriteStartObject;
             WritePropertyName('key');
             WriteValue(CSRfidItemGroups.Item_Group_Code);
             WritePropertyName('title');
             WriteValue(CSRfidItemGroups.Item_Group_Description);
             WriteEndObject;
-          end;
-          CSRfidItemGroups.Close;
+          END;
+          CSRfidItemGroups.CLOSE;
           WriteEndArray;
 
           WritePropertyName('item');
@@ -451,10 +465,10 @@ codeunit 6151373 "CS Helper Functions"
           WriteValue('');
           WriteEndObject;
 
-          if CSDevices."Last Download Timestamp" <> 0 then
-            CSRfidItems.SetFilter(Time_Stamp,StrSubstNo('>%1',CSDevices."Last Download Timestamp"));
-          CSRfidItems.Open;
-          while CSRfidItems.Read do begin
+          IF CSDevices."Last Download Timestamp" <> 0 THEN
+            CSRfidItems.SETFILTER(Time_Stamp,STRSUBSTNO('>%1',CSDevices."Last Download Timestamp"));
+          CSRfidItems.OPEN;
+          WHILE CSRfidItems.READ DO BEGIN
             WriteStartObject;
             WritePropertyName('key');
             WriteValue(CSRfidItems.Combined_key);
@@ -471,16 +485,16 @@ codeunit 6151373 "CS Helper Functions"
             WritePropertyName('imageurl');
             WriteValue(CSRfidItems.Image_Url);
             WriteEndObject;
-          end;
-          CSRfidItems.Close;
+          END;
+          CSRfidItems.CLOSE;
           WriteEndArray;
 
           WritePropertyName('itemtag');
           WriteStartArray;
-          if CSDevices."Last Download Timestamp" <> 0 then
-            CSRfidItemTags.SetFilter(Time_Stamp,StrSubstNo('>%1',CSDevices."Last Download Timestamp"));
-          CSRfidItemTags.Open;
-          while CSRfidItemTags.Read do begin
+          IF CSDevices."Last Download Timestamp" <> 0 THEN
+            CSRfidItemTags.SETFILTER(Time_Stamp,STRSUBSTNO('>%1',CSDevices."Last Download Timestamp"));
+          CSRfidItemTags.OPEN;
+          WHILE CSRfidItemTags.READ DO BEGIN
             WriteStartObject;
             WritePropertyName('key');
             WriteValue(CSRfidItemTags.Key);
@@ -489,15 +503,15 @@ codeunit 6151373 "CS Helper Functions"
             WritePropertyName('itemgroup');
             WriteValue(CSRfidItemTags.Item_Group_Code);
             WriteEndObject;
-          end;
-          CSRfidItemTags.Close;
+          END;
+          CSRfidItemTags.CLOSE;
           WriteEndArray;
 
           //-#335051 [335051]
           WritePropertyName('supportedTagModels');
           WriteStartArray;
-            CSRfidTagModelsQuery.Open;
-            while CSRfidTagModelsQuery.Read do begin
+            CSRfidTagModelsQuery.OPEN;
+            WHILE CSRfidTagModelsQuery.READ DO BEGIN
               WriteStartObject;
               WritePropertyName('key');
               WriteValue(CSRfidTagModelsQuery.Family+CSRfidTagModelsQuery.Model);
@@ -506,8 +520,8 @@ codeunit 6151373 "CS Helper Functions"
               WritePropertyName('model');
               WriteValue(CSRfidTagModelsQuery.Model);
               WriteEndObject;
-            end;
-            CSRfidTagModelsQuery.Close;
+            END;
+            CSRfidTagModelsQuery.CLOSE;
           WriteEndArray;
           //+#335051 [335051]
 
@@ -522,9 +536,9 @@ codeunit 6151373 "CS Helper Functions"
               WritePropertyName('medialibrary');
               WriteValue(CSSetup."Media Library");
               WritePropertyName('refreshItemCatelog');
-              if CSDevices."Refresh Item Catalog" then
+              IF CSDevices."Refresh Item Catalog" THEN
                 WriteValue('TRUE')
-              else
+              ELSE
                 WriteValue('FALSE');
               WriteEndObject;
           WriteEndArray;
@@ -532,11 +546,11 @@ codeunit 6151373 "CS Helper Functions"
 
           WriteEndObject;
           JObject := Token;
-        end;
+        END;
 
         CSDevices."Current Download Timestamp" := CurrentTimestamp;
-        CSDevices."Refresh Item Catalog" := false;
-        CSDevices.Modify(true);
+        CSDevices."Refresh Item Catalog" := FALSE;
+        CSDevices.MODIFY(TRUE);
 
         Result := JObject.ToString();
     end;
@@ -557,111 +571,111 @@ codeunit 6151373 "CS Helper Functions"
         CSRefillSections: Query "CS Refill Sections";
         CSStockTakes: Record "CS Stock-Takes";
     begin
-        if not CSSetup.Get then
-          exit;
+        IF NOT CSSetup.GET THEN
+          EXIT;
 
-        if not CSSetup."Enable Capture Service" then
-          exit;
+        IF NOT CSSetup."Enable Capture Service" THEN
+          EXIT;
 
-        if not CSStockTakes.Get(StockTakeId) then
-          exit;
+        IF NOT CSStockTakes.GET(StockTakeId) THEN
+          EXIT;
 
-        if (CSStockTakes."Create Refill Data Started" = 0DT) then begin
+        IF (CSStockTakes."Create Refill Data Started" = 0DT) THEN BEGIN
 
-          CSStockTakes."Create Refill Data Started" := CurrentDateTime;
+          CSStockTakes."Create Refill Data Started" := CURRENTDATETIME;
 
-          StockTakeWorksheet.Get(CSStockTakes.Location,'SALESFLOOR');
-          StockTakeWorkSheetLine.SetRange("Stock-Take Config Code", StockTakeWorksheet."Stock-Take Config Code");
-          StockTakeWorkSheetLine.SetRange("Worksheet Name", StockTakeWorksheet.Name);
-          if StockTakeWorkSheetLine.FindSet then begin
-            repeat
-              if StockTakeWorkSheetLine."Item No." <> '' then begin
-                if not CSRefillData.Get(StockTakeWorkSheetLine."Item No.",StockTakeWorkSheetLine."Variant Code",StockTakeWorksheet."Conf Location Code",CSStockTakes."Stock-Take Id") then begin
-                  CSRefillData.Init;
-                  CSRefillData.Validate("Item No.",StockTakeWorkSheetLine."Item No.");
-                  CSRefillData.Validate("Variant Code",StockTakeWorkSheetLine."Variant Code");
-                  CSRefillData.Validate(Location,StockTakeWorksheet."Conf Location Code");
+          StockTakeWorksheet.GET(CSStockTakes.Location,'SALESFLOOR');
+          StockTakeWorkSheetLine.SETRANGE("Stock-Take Config Code", StockTakeWorksheet."Stock-Take Config Code");
+          StockTakeWorkSheetLine.SETRANGE("Worksheet Name", StockTakeWorksheet.Name);
+          IF StockTakeWorkSheetLine.FINDSET THEN BEGIN
+            REPEAT
+              IF StockTakeWorkSheetLine."Item No." <> '' THEN BEGIN
+                IF NOT CSRefillData.GET(StockTakeWorkSheetLine."Item No.",StockTakeWorkSheetLine."Variant Code",StockTakeWorksheet."Conf Location Code",CSStockTakes."Stock-Take Id") THEN BEGIN
+                  CSRefillData.INIT;
+                  CSRefillData.VALIDATE("Item No.",StockTakeWorkSheetLine."Item No.");
+                  CSRefillData.VALIDATE("Variant Code",StockTakeWorkSheetLine."Variant Code");
+                  CSRefillData.VALIDATE(Location,StockTakeWorksheet."Conf Location Code");
                   CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
-                  CSRefillData.Insert(true);
-                end;
+                  CSRefillData.INSERT(TRUE);
+                END;
 
-                if CSRefillData."Variant Code" <> '' then
+                IF CSRefillData."Variant Code" <> '' THEN
                   CSRefillData."Combined key" := CSRefillData."Item No." + '-' + CSRefillData."Variant Code"
-                else
+                ELSE
                   CSRefillData."Combined key" := CSRefillData."Item No.";
 
                 CSRefillData."Qty. in Store" += StockTakeWorkSheetLine."Qty. (Counted)";
 
-                if Item.Get(CSRefillData."Item No.") then begin
-                  CSRefillData.Validate("Item Group Code",Item."Item Group");
-                  if CSSetup."Media Library" = CSSetup."Media Library"::Magento then begin
-                    MagentoPictureLink.SetRange("Item No.",Item."No.");
-                    MagentoPictureLink.SetRange("Base Image",true);
-                    if MagentoPictureLink.FindFirst then
-                      if MagentoPicture.Get(MagentoPicture.Type::Item,MagentoPictureLink."Picture Name") then
+                IF Item.GET(CSRefillData."Item No.") THEN BEGIN
+                  CSRefillData.VALIDATE("Item Group Code",Item."Item Group");
+                  IF CSSetup."Media Library" = CSSetup."Media Library"::Magento THEN BEGIN
+                    MagentoPictureLink.SETRANGE("Item No.",Item."No.");
+                    MagentoPictureLink.SETRANGE("Base Image",TRUE);
+                    IF MagentoPictureLink.FINDFIRST THEN
+                      IF MagentoPicture.GET(MagentoPicture.Type::Item,MagentoPictureLink."Picture Name") THEN
                         CSRefillData."Image Url" := MagentoPicture.GetMagentotUrl;
-                    end;
-                end;
+                    END;
+                END;
 
-                CSRefillData.Modify(true);
-              end;
-            until StockTakeWorkSheetLine.Next = 0;
-          end;
+                CSRefillData.MODIFY(TRUE);
+              END;
+            UNTIL StockTakeWorkSheetLine.NEXT = 0;
+          END;
 
-          Clear(StockTakeWorksheet);
-          Clear(StockTakeWorkSheetLine);
-          StockTakeWorksheet.Get(CSStockTakes.Location,'STOCKROOM');
-          StockTakeWorkSheetLine.SetRange("Stock-Take Config Code", StockTakeWorksheet."Stock-Take Config Code");
-          StockTakeWorkSheetLine.SetRange("Worksheet Name", StockTakeWorksheet.Name);
-          if StockTakeWorkSheetLine.FindSet then begin
-            repeat
-              if StockTakeWorkSheetLine."Item No." <> '' then begin
-                if not CSRefillData.Get(StockTakeWorkSheetLine."Item No.",StockTakeWorkSheetLine."Variant Code",StockTakeWorksheet."Conf Location Code",CSStockTakes."Stock-Take Id") then begin
-                  CSRefillData.Init;
-                  CSRefillData.Validate("Item No.",StockTakeWorkSheetLine."Item No.");
-                  CSRefillData.Validate("Variant Code",StockTakeWorkSheetLine."Variant Code");
-                  CSRefillData.Validate(Location,StockTakeWorksheet."Conf Location Code");
+          CLEAR(StockTakeWorksheet);
+          CLEAR(StockTakeWorkSheetLine);
+          StockTakeWorksheet.GET(CSStockTakes.Location,'STOCKROOM');
+          StockTakeWorkSheetLine.SETRANGE("Stock-Take Config Code", StockTakeWorksheet."Stock-Take Config Code");
+          StockTakeWorkSheetLine.SETRANGE("Worksheet Name", StockTakeWorksheet.Name);
+          IF StockTakeWorkSheetLine.FINDSET THEN BEGIN
+            REPEAT
+              IF StockTakeWorkSheetLine."Item No." <> '' THEN BEGIN
+                IF NOT CSRefillData.GET(StockTakeWorkSheetLine."Item No.",StockTakeWorkSheetLine."Variant Code",StockTakeWorksheet."Conf Location Code",CSStockTakes."Stock-Take Id") THEN BEGIN
+                  CSRefillData.INIT;
+                  CSRefillData.VALIDATE("Item No.",StockTakeWorkSheetLine."Item No.");
+                  CSRefillData.VALIDATE("Variant Code",StockTakeWorkSheetLine."Variant Code");
+                  CSRefillData.VALIDATE(Location,StockTakeWorksheet."Conf Location Code");
                   CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
-                  CSRefillData.Insert(true);
-                end;
+                  CSRefillData.INSERT(TRUE);
+                END;
 
-                if CSRefillData."Variant Code" <> '' then
+                IF CSRefillData."Variant Code" <> '' THEN
                   CSRefillData."Combined key" := CSRefillData."Item No." + '-' + CSRefillData."Variant Code"
-                else
+                ELSE
                   CSRefillData."Combined key" := CSRefillData."Item No.";
 
                 CSRefillData."Qty. in Stock" += StockTakeWorkSheetLine."Qty. (Counted)";
 
-                if Item.Get(CSRefillData."Item No.") then begin
-                  CSRefillData.Validate("Item Group Code",Item."Item Group");
-                  if CSSetup."Media Library" = CSSetup."Media Library"::Magento then begin
-                    MagentoPictureLink.SetRange("Item No.",Item."No.");
-                    MagentoPictureLink.SetRange("Base Image",true);
-                    if MagentoPictureLink.FindFirst then
-                      if MagentoPicture.Get(MagentoPicture.Type::Item,MagentoPictureLink."Picture Name") then
+                IF Item.GET(CSRefillData."Item No.") THEN BEGIN
+                  CSRefillData.VALIDATE("Item Group Code",Item."Item Group");
+                  IF CSSetup."Media Library" = CSSetup."Media Library"::Magento THEN BEGIN
+                    MagentoPictureLink.SETRANGE("Item No.",Item."No.");
+                    MagentoPictureLink.SETRANGE("Base Image",TRUE);
+                    IF MagentoPictureLink.FINDFIRST THEN
+                      IF MagentoPicture.GET(MagentoPicture.Type::Item,MagentoPictureLink."Picture Name") THEN
                         CSRefillData."Image Url" := MagentoPicture.GetMagentotUrl;
-                  end;
-                end;
+                  END;
+                END;
 
-                CSRefillData.Modify(true);
-              end;
-            until StockTakeWorkSheetLine.Next = 0;
-          end;
+                CSRefillData.MODIFY(TRUE);
+              END;
+            UNTIL StockTakeWorkSheetLine.NEXT = 0;
+          END;
 
-          CSStockTakes."Create Refill Data Ended" := CurrentDateTime;
-          CSStockTakes.Modify;
+          CSStockTakes."Create Refill Data Ended" := CURRENTDATETIME;
+          CSStockTakes.MODIFY;
 
-        end;
+        END;
 
         JTokenWriter := JTokenWriter.JTokenWriter;
-        with JTokenWriter do begin
+        WITH JTokenWriter DO BEGIN
         WriteStartObject;
 
         WritePropertyName('section');
         WriteStartArray;
-        CSRefillSections.SetFilter(Stock_Take_Id,CSStockTakes."Stock-Take Id");
-        CSRefillSections.Open;
-        while CSRefillSections.Read do begin
+        CSRefillSections.SETFILTER(Stock_Take_Id,CSStockTakes."Stock-Take Id");
+        CSRefillSections.OPEN;
+        WHILE CSRefillSections.READ DO BEGIN
             WriteStartObject;
             WritePropertyName('key');
             WriteValue(CSRefillSections.Item_No);
@@ -672,15 +686,15 @@ codeunit 6151373 "CS Helper Functions"
             WritePropertyName('marked');
             WriteValue(CSRefillSections.Refilled);
             WriteEndObject;
-        end;
-        CSRefillSections.Close;
+        END;
+        CSRefillSections.CLOSE;
         WriteEndArray;
 
         WritePropertyName('item');
         WriteStartArray;
-        CSRefillItems.SetFilter(Stock_Take_Id,CSStockTakes."Stock-Take Id");
-        CSRefillItems.Open;
-        while CSRefillItems.Read do begin
+        CSRefillItems.SETFILTER(Stock_Take_Id,CSStockTakes."Stock-Take Id");
+        CSRefillItems.OPEN;
+        WHILE CSRefillItems.READ DO BEGIN
             WriteStartObject;
             WritePropertyName('key');
             WriteValue(CSRefillItems.Combined_key);
@@ -703,13 +717,13 @@ codeunit 6151373 "CS Helper Functions"
             WritePropertyName('marked');
             WriteValue(CSRefillItems.Refilled);
             WriteEndObject;
-        end;
-        CSRefillItems.Close;
+        END;
+        CSRefillItems.CLOSE;
         WriteEndArray;
 
         WriteEndObject;
         JObject := Token;
-        end;
+        END;
 
         Result := JObject.ToString();
     end;
@@ -717,8 +731,8 @@ codeunit 6151373 "CS Helper Functions"
     procedure ClearDeviceInfo(var CSDevices: Record "CS Devices")
     begin
         CSDevices."Last Download Timestamp" := 0;
-        CSDevices."Refresh Item Catalog" := true;
-        CSDevices.Modify(true);
+        CSDevices."Refresh Item Catalog" := TRUE;
+        CSDevices.MODIFY(TRUE);
     end;
 
     local procedure CreateCSRfidOfflineDataRecord(ItemCrossReference: Record "Item Cross Reference")
@@ -733,41 +747,41 @@ codeunit 6151373 "CS Helper Functions"
         CSSetup: Record "CS Setup";
     begin
         //-NPR5.50 [346068]
-        if StrLen(ItemCrossReference."Cross-Reference No.") <> MaxStrLen(ItemCrossReference."Cross-Reference No.") then
-          exit;
+        IF STRLEN(ItemCrossReference."Cross-Reference No.") <> MAXSTRLEN(ItemCrossReference."Cross-Reference No.") THEN
+          EXIT;
 
-        TagModel := CopyStr(ItemCrossReference."Cross-Reference No.",1,4);
+        TagModel := COPYSTR(ItemCrossReference."Cross-Reference No.",1,4);
 
-        Clear(CSRfidTagModels);
-        CSRfidTagModels.SetRange(Model,TagModel);
-        if CSRfidTagModels.FindSet then begin
+        CLEAR(CSRfidTagModels);
+        CSRfidTagModels.SETRANGE(Model,TagModel);
+        IF CSRfidTagModels.FINDSET THEN BEGIN
 
           TagId := CSRfidTagModels.Family + ItemCrossReference."Cross-Reference No.";
 
-          if not CSRfidOfflineData.Get(TagId) then begin
-            CSRfidOfflineData.Init;
+          IF NOT CSRfidOfflineData.GET(TagId) THEN BEGIN
+            CSRfidOfflineData.INIT;
             CSRfidOfflineData.Key := TagId;
-            CSRfidOfflineData.Insert(true);
-          end;
+            CSRfidOfflineData.INSERT(TRUE);
+          END;
 
-          CSRfidOfflineData.Validate("Cross-Reference Item No.",ItemCrossReference."Item No.");
-          CSRfidOfflineData.Validate("Cross-Reference Variant Code",ItemCrossReference."Variant Code");
-          CSRfidOfflineData.Validate("Cross-Reference UoM",ItemCrossReference."Unit of Measure");
-          CSRfidOfflineData.Validate("Cross-Reference Description",ItemCrossReference.Description);
-          CSRfidOfflineData.Validate("Cross-Reference Discontinue",ItemCrossReference."Discontinue Bar Code");
-          CSRfidOfflineData.Validate(Heartbeat,CurrentDateTime);
-          if Item.Get(CSRfidOfflineData."Cross-Reference Item No.") then begin
-            CSRfidOfflineData.Validate("Item Group Code",Item."Item Group");
-            if CSSetup."Media Library" = CSSetup."Media Library"::Magento then begin
-              MagentoPictureLink.SetRange("Item No.",Item."No.");
-              MagentoPictureLink.SetRange("Base Image",true);
-              if MagentoPictureLink.FindFirst then
-                if MagentoPicture.Get(MagentoPicture.Type::Item,MagentoPictureLink."Picture Name") then
+          CSRfidOfflineData.VALIDATE("Cross-Reference Item No.",ItemCrossReference."Item No.");
+          CSRfidOfflineData.VALIDATE("Cross-Reference Variant Code",ItemCrossReference."Variant Code");
+          CSRfidOfflineData.VALIDATE("Cross-Reference UoM",ItemCrossReference."Unit of Measure");
+          CSRfidOfflineData.VALIDATE("Cross-Reference Description",ItemCrossReference.Description);
+          CSRfidOfflineData.VALIDATE("Cross-Reference Discontinue",ItemCrossReference."Discontinue Bar Code");
+          CSRfidOfflineData.VALIDATE(Heartbeat,CURRENTDATETIME);
+          IF Item.GET(CSRfidOfflineData."Cross-Reference Item No.") THEN BEGIN
+            CSRfidOfflineData.VALIDATE("Item Group Code",Item."Item Group");
+            IF CSSetup."Media Library" = CSSetup."Media Library"::Magento THEN BEGIN
+              MagentoPictureLink.SETRANGE("Item No.",Item."No.");
+              MagentoPictureLink.SETRANGE("Base Image",TRUE);
+              IF MagentoPictureLink.FINDFIRST THEN
+                IF MagentoPicture.GET(MagentoPicture.Type::Item,MagentoPictureLink."Picture Name") THEN
                   CSRfidOfflineData."Image Url" := MagentoPicture.GetMagentotUrl;
-            end;
-          end;
-          CSRfidOfflineData.Modify(true);
-        end;
+            END;
+          END;
+          CSRfidOfflineData.MODIFY(TRUE);
+        END;
         //+NPR5.50 [346068]
     end;
 
@@ -783,21 +797,21 @@ codeunit 6151373 "CS Helper Functions"
         CSSetup: Record "CS Setup";
     begin
         //-NPR5.50 [346068]
-        if StrLen(ItemCrossReference."Cross-Reference No.") <> MaxStrLen(ItemCrossReference."Cross-Reference No.") then
-          exit;
+        IF STRLEN(ItemCrossReference."Cross-Reference No.") <> MAXSTRLEN(ItemCrossReference."Cross-Reference No.") THEN
+          EXIT;
 
-        TagModel := CopyStr(ItemCrossReference."Cross-Reference No.",1,4);
+        TagModel := COPYSTR(ItemCrossReference."Cross-Reference No.",1,4);
 
-        Clear(CSRfidTagModels);
-        CSRfidTagModels.SetRange(Model,TagModel);
-        if CSRfidTagModels.FindSet then begin
+        CLEAR(CSRfidTagModels);
+        CSRfidTagModels.SETRANGE(Model,TagModel);
+        IF CSRfidTagModels.FINDSET THEN BEGIN
 
           TagId := CSRfidTagModels.Family + ItemCrossReference."Cross-Reference No.";
 
-          if CSRfidOfflineData.Get(TagId) then
-            CSRfidOfflineData.Delete(true);
+          IF CSRfidOfflineData.GET(TagId) THEN
+            CSRfidOfflineData.DELETE(TRUE);
 
-        end;
+        END;
         //+NPR5.50 [346068]
     end;
 
@@ -807,114 +821,251 @@ codeunit 6151373 "CS Helper Functions"
         StockTakeConfiguration: Record "Stock-Take Configuration";
         StockTakeTemplate: Record "Stock-Take Template";
     begin
-        if not CSSetup.Get then
-          exit;
+        IF NOT CSSetup.GET THEN
+          EXIT;
 
-        if not CSSetup."Enable Capture Service" then
-          exit;
+        IF NOT CSSetup."Enable Capture Service" THEN
+          EXIT;
 
-        if StockTakeWorksheet.Get(Location,Name) then
-          exit;
+        IF StockTakeWorksheet.GET(Location,Name) THEN
+          EXIT;
 
-        CSSetup.TestField("Stock-Take Template");
-        StockTakeTemplate.Get(CSSetup."Stock-Take Template");
+        CSSetup.TESTFIELD("Stock-Take Template");
+        StockTakeTemplate.GET(CSSetup."Stock-Take Template");
 
-        if not StockTakeConfiguration.Get(Location) then begin
-          StockTakeConfiguration.Init;
+        IF NOT StockTakeConfiguration.GET(Location) THEN BEGIN
+          StockTakeConfiguration.INIT;
           StockTakeConfiguration.Code := Location;
-          StockTakeConfiguration.TransferFields(StockTakeTemplate, false);
-          StockTakeConfiguration.Description := StrSubstNo('%1 Stock-Take',StockTakeConfiguration.Code);
+          StockTakeConfiguration.TRANSFERFIELDS(StockTakeTemplate, FALSE);
+          StockTakeConfiguration.Description := STRSUBSTNO('%1 Stock-Take',StockTakeConfiguration.Code);
           StockTakeConfiguration."Location Code" := Location;
-          StockTakeConfiguration."Inventory Calc. Date" := WorkDate;
+          StockTakeConfiguration."Inventory Calc. Date" := WORKDATE;
           StockTakeConfiguration."Stock-Take Template Code" := StockTakeTemplate.Code;
-          StockTakeConfiguration.Insert();
-        end;
+          StockTakeConfiguration.INSERT();
+        END;
 
-        StockTakeWorksheet.Init;
+        StockTakeWorksheet.INIT;
         StockTakeWorksheet."Stock-Take Config Code" := StockTakeConfiguration.Code;
         StockTakeWorksheet.Name := Name;
-        StockTakeWorksheet.Insert(true);
+        StockTakeWorksheet.INSERT(TRUE);
     end;
 
     procedure UpdateDeviceInfo(DeviceId: Code[10];CurrentTimestamp: BigInteger;Location: Code[20]) Result: Text
     var
         CSDevices: Record "CS Devices";
     begin
-        if not CSDevices.Get(DeviceId) then
-         exit;
+        IF NOT CSDevices.GET(DeviceId) THEN
+         EXIT;
 
-        if CurrentTimestamp = 0 then
-          exit;
+        IF CurrentTimestamp = 0 THEN
+          EXIT;
 
         CSDevices."Last Download Timestamp" := CurrentTimestamp;
         //-NPR5.50 [353741]
-        CSDevices."Refresh Item Catalog" := false;
+        CSDevices."Refresh Item Catalog" := FALSE;
         //+NPR5.50 [353741]
         CSDevices.Location := Location;
-        CSDevices.Modify(true);
+        CSDevices.MODIFY(TRUE);
 
         Result := 'updated';
     end;
 
-    local procedure "-- Posting Functions"()
+    procedure CreateNewCounting(Location: Record Location)
+    var
+        CSHelperFunctions: Codeunit "CS Helper Functions";
+        ItemJournalBatch: Record "Item Journal Batch";
+        ItemJournalLine: Record "Item Journal Line";
+        RecRef: RecordRef;
+        CSPostingBuffer: Record "CS Posting Buffer";
+        CSSetup: Record "CS Setup";
+        ItemJournalTemplate: Record "Item Journal Template";
+        CalculateInventory: Report "Calculate Inventory";
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+        Item: Record Item;
+        QtyCalculated: Decimal;
+        CSStockTakes: Record "CS Stock-Takes";
+        NewCSStockTakes: Record "CS Stock-Takes";
     begin
+        //IF NOT LocationRec.GET(GETFILTER(Location)) THEN
+        //  ERROR(Err_MissingLocation);
+
+        //-NPR5.52 [364063]
+        CLEAR(CSStockTakes);
+        CSStockTakes.SETRANGE(Location,Location.Code);
+        CSStockTakes.SETRANGE(Closed, 0DT);
+        IF CSStockTakes.FINDSET THEN
+         ERROR(Err_CSStockTakes,CSStockTakes."Stock-Take Id");
+
+        CLEAR(CSStockTakes);
+        CSStockTakes.SETRANGE(Location,Location.Code);
+        CSStockTakes.SETFILTER(Closed, '<>%1', 0DT);
+        CSStockTakes.SETRANGE("Journal Posted", FALSE);
+        IF CSStockTakes.FINDSET THEN
+         ERROR(Err_PostingNotDone);
+
+        CSSetup.GET;
+        CSSetup.TESTFIELD("Phys. Inv Jour Temp Name");
+        ItemJournalTemplate.GET(CSSetup."Phys. Inv Jour Temp Name");
+        IF NOT ItemJournalBatch.GET(CSSetup."Phys. Inv Jour Temp Name",Location.Code) THEN BEGIN
+          ItemJournalBatch.INIT;
+          ItemJournalBatch.VALIDATE("Journal Template Name",CSSetup."Phys. Inv Jour Temp Name");
+          ItemJournalBatch.VALIDATE(Name,Location.Code);
+          ItemJournalBatch.Description := STRSUBSTNO(Text001,Location.Code);
+          ItemJournalBatch.VALIDATE("No. Series",CSSetup."Phys. Inv Jour No. Series");
+          ItemJournalBatch."Reason Code" := ItemJournalTemplate."Reason Code";
+          ItemJournalBatch.INSERT(TRUE);
+        END ELSE BEGIN
+          RecRef.GETTABLE(ItemJournalBatch);
+          CLEAR(CSPostingBuffer);
+          CSPostingBuffer.SETRANGE("Table No.",RecRef.NUMBER);
+          CSPostingBuffer.SETRANGE("Record Id",RecRef.RECORDID);
+          CSPostingBuffer.SETRANGE(Executed,FALSE);
+          IF CSPostingBuffer.FINDSET THEN
+            ERROR(Err_PostingIsScheduled,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
+
+          CLEAR(ItemJournalLine);
+          ItemJournalLine.SETRANGE("Journal Template Name",ItemJournalBatch."Journal Template Name");
+          ItemJournalLine.SETRANGE("Journal Batch Name",ItemJournalBatch.Name);
+          IF ItemJournalLine.COUNT > 0 THEN
+            ERROR(Err_StockTakeWorksheetNotEmpty,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
+        END;
+
+        NewCSStockTakes.INIT;
+        NewCSStockTakes."Stock-Take Id" := CREATEGUID;
+        NewCSStockTakes.Created := CURRENTDATETIME;
+        NewCSStockTakes."Created By" := USERID;
+        NewCSStockTakes.Location := Location.Code;
+        NewCSStockTakes."Journal Template Name" := ItemJournalBatch."Journal Template Name";
+        NewCSStockTakes."Journal Batch Name" := ItemJournalBatch.Name;
+        NewCSStockTakes.INSERT(TRUE);
+
+        COMMIT;
+
+        IF GUIALLOWED THEN BEGIN
+          IF CONFIRM(STRSUBSTNO(Text002,Location.Code,TRUE)) THEN BEGIN
+            CLEAR(ItemJournalLine);
+            ItemJournalLine.INIT;
+            ItemJournalLine.VALIDATE("Journal Template Name",NewCSStockTakes."Journal Template Name");
+            ItemJournalLine.VALIDATE("Journal Batch Name",NewCSStockTakes."Journal Batch Name");
+            ItemJournalLine."Location Code" := NewCSStockTakes.Location;
+
+            CLEAR(NoSeriesMgt);
+            ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series",ItemJournalLine."Posting Date",FALSE);
+            ItemJournalLine."Source Code" := ItemJournalTemplate."Source Code";
+            ItemJournalLine."Reason Code" := ItemJournalBatch."Reason Code";
+            ItemJournalLine."Posting No. Series" := ItemJournalBatch."Posting No. Series";
+
+            CLEAR(Item);
+            Item.SETFILTER("Location Filter",NewCSStockTakes.Location);
+            IF NOT Item.FINDSET THEN
+              ERROR(Text003,Location);
+
+            CLEAR(CalculateInventory);
+            CalculateInventory.USEREQUESTPAGE(FALSE);
+            CalculateInventory.SETTABLEVIEW(Item);
+            CalculateInventory.SetItemJnlLine(ItemJournalLine);
+            CalculateInventory.InitializeRequest(WORKDATE,ItemJournalLine."Document No.",FALSE);
+            CalculateInventory.RUNMODAL;
+
+            CLEAR(ItemJournalLine);
+            ItemJournalLine.SETRANGE("Journal Template Name",NewCSStockTakes."Journal Template Name");
+            ItemJournalLine.SETRANGE("Journal Batch Name",NewCSStockTakes."Journal Batch Name");
+            ItemJournalLine.SETRANGE("Location Code",NewCSStockTakes.Location);
+            IF ItemJournalLine.FINDSET THEN BEGIN
+              REPEAT
+                QtyCalculated += ItemJournalLine."Qty. (Calculated)"
+              UNTIL ItemJournalLine.NEXT = 0;
+            END;
+
+            NewCSStockTakes."Predicted Qty." := QtyCalculated;
+            NewCSStockTakes."Inventory Calculated" := TRUE;
+            NewCSStockTakes.MODIFY(TRUE);
+          END;
+        END ELSE BEGIN
+          CLEAR(ItemJournalLine);
+          ItemJournalLine.INIT;
+          ItemJournalLine.VALIDATE("Journal Template Name",NewCSStockTakes."Journal Template Name");
+          ItemJournalLine.VALIDATE("Journal Batch Name",NewCSStockTakes."Journal Batch Name");
+          ItemJournalLine."Location Code" := NewCSStockTakes.Location;
+
+          CLEAR(NoSeriesMgt);
+          ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series",ItemJournalLine."Posting Date",FALSE);
+          ItemJournalLine."Source Code" := ItemJournalTemplate."Source Code";
+          ItemJournalLine."Reason Code" := ItemJournalBatch."Reason Code";
+          ItemJournalLine."Posting No. Series" := ItemJournalBatch."Posting No. Series";
+
+          CLEAR(Item);
+          Item.SETFILTER("Location Filter",NewCSStockTakes.Location);
+          IF NOT Item.FINDSET THEN
+            ERROR(Text003,Location);
+
+          CLEAR(CalculateInventory);
+          CalculateInventory.USEREQUESTPAGE(FALSE);
+          CalculateInventory.SETTABLEVIEW(Item);
+          CalculateInventory.SetItemJnlLine(ItemJournalLine);
+          CalculateInventory.InitializeRequest(WORKDATE,ItemJournalLine."Document No.",FALSE);
+          CalculateInventory.RUNMODAL;
+
+          CLEAR(ItemJournalLine);
+          ItemJournalLine.SETRANGE("Journal Template Name",NewCSStockTakes."Journal Template Name");
+          ItemJournalLine.SETRANGE("Journal Batch Name",NewCSStockTakes."Journal Batch Name");
+          ItemJournalLine.SETRANGE("Location Code",NewCSStockTakes.Location);
+          IF ItemJournalLine.FINDSET THEN BEGIN
+            REPEAT
+              QtyCalculated += ItemJournalLine."Qty. (Calculated)"
+            UNTIL ItemJournalLine.NEXT = 0;
+          END;
+
+          NewCSStockTakes."Predicted Qty." := QtyCalculated;
+          NewCSStockTakes."Inventory Calculated" := TRUE;
+          NewCSStockTakes.MODIFY(TRUE);
+        END;
     end;
 
-    procedure PostTransferOrder(var CSPostingBuffer: Record "CS Posting Buffer")
+    procedure CancelCounting(var CSStockTakes: Record "CS Stock-Takes")
     var
-        ErrorTxt: Text;
-        TransferHeader: Record "Transfer Header";
-        PostingFinished: Boolean;
+        ItemJournalBatch: Record "Item Journal Batch";
+        LocationRec: Record Location;
+        RecRef: RecordRef;
+        CSPostingBuffer: Record "CS Posting Buffer";
     begin
-        CSPostingBuffer.TestField(Posted,false);
-        ClearLastError;
+        IF CSStockTakes.Closed <> 0DT THEN
+          EXIT;
 
-        TransferHeader.Get(CSPostingBuffer."Key 1");
+        //-NPR5.52 [364063]
+        IF NOT LocationRec.GET(CSStockTakes.Location) THEN
+          ERROR(Err_MissingLocation);
 
-        PostingFinished := CODEUNIT.Run(CODEUNIT::"CS UI Transfer Order Posting",TransferHeader);
+        IF ItemJournalBatch.GET(CSStockTakes."Journal Template Name",CSStockTakes."Journal Batch Name") THEN BEGIN
+          RecRef.GETTABLE(ItemJournalBatch);
+          CLEAR(CSPostingBuffer);
+          CSPostingBuffer.SETRANGE("Table No.",RecRef.NUMBER);
+          CSPostingBuffer.SETRANGE("Record Id",RecRef.RECORDID);
+          CSPostingBuffer.SETRANGE(Executed,FALSE);
+          IF CSPostingBuffer.FINDSET THEN
+            ERROR(Err_PostingIsScheduled,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
 
-        if PostingFinished then begin
-          if TransferHeader.Get(CSPostingBuffer."Key 1") then begin
-            CSPostingBuffer.Aborted := true;
-            ErrorTxt := StrSubstNo('%1 : %2',GetLastErrorCode,GetLastErrorText);
-            CSPostingBuffer.Description := CopyStr(ErrorTxt,1,MaxStrLen(CSPostingBuffer.Description));
-          end else
-            CSPostingBuffer.Posted := true;
-        end else begin
-          CSPostingBuffer.Aborted := true;
-          ErrorTxt := StrSubstNo('%1 : %2',GetLastErrorCode,GetLastErrorText);
-          CSPostingBuffer.Description := CopyStr(ErrorTxt,1,MaxStrLen(CSPostingBuffer.Description));
-        end;
-        CSPostingBuffer.Modify(true);
+          IF NOT CONFIRM(STRSUBSTNO(Err_ConfirmForceClose,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name),TRUE) THEN
+            EXIT;
 
-        // IF TryPostTransferOrder(CSPostingBuffer) THEN BEGIN
-        //  CSPostingBuffer.Posted := TRUE;
-        // END ELSE BEGIN
-        //  CSPostingBuffer.Aborted := TRUE;
-        //  ErrorTxt := STRSUBSTNO('%1 : %2',GETLASTERRORCODE,GETLASTERRORTEXT);
-        //  CSPostingBuffer.Description := COPYSTR(ErrorTxt,1,MAXSTRLEN(CSPostingBuffer.Description));
-        // END;
-        // CSPostingBuffer.MODIFY(TRUE);
-    end;
+          ItemJournalBatch.DELETE(TRUE);
 
-    [TryFunction]
-    procedure TryPostTransferOrder(CSPostingBuffer: Record "CS Posting Buffer")
-    var
-        TransferPostReceipt: Codeunit "TransferOrder-Post Receipt";
-        WarehouseActivityHeader: Record "Warehouse Activity Header";
-        ReleaseTransferDoc: Codeunit "Release Transfer Document";
-        TransferHeader: Record "Transfer Header";
-        PostedTransferHeader: Record "Transfer Header";
-    begin
-        TransferHeader.Get(CSPostingBuffer."Key 1");
-        TransferPostReceipt.SetHideValidationDialog(true);
-        if TransferPostReceipt.Run(TransferHeader) then begin
-          if PostedTransferHeader.Get(TransferHeader."No.") then begin
-            if PostedTransferHeader.Status = PostedTransferHeader.Status::Released then
-              ReleaseTransferDoc.Reopen(PostedTransferHeader);
-            PostedTransferHeader.Delete(true);
-          end;
-        end;
+        END;
+        // StockTakeWorksheetLine.SETRANGE("Stock-Take Config Code",Location);
+        // StockTakeWorksheetLine.SETRANGE("Worksheet Name",'SALESFLOOR');
+        // StockTakeWorksheetLine.DELETEALL(TRUE);
+        //
+        // CLEAR(StockTakeWorksheetLine);
+        // StockTakeWorksheetLine.SETRANGE("Stock-Take Config Code",Location);
+        // StockTakeWorksheetLine.SETRANGE("Worksheet Name",'STOCKROOM');
+        // StockTakeWorksheetLine.DELETEALL(TRUE);
+        //+NPR5.52 [364063]
+
+        CSStockTakes.Closed := CURRENTDATETIME;
+        CSStockTakes."Closed By" := USERID;
+        CSStockTakes.Note := Txt_CountingCancelled;
+
+        CSStockTakes.MODIFY(TRUE);
     end;
 
     local procedure "-- Subscribers"()
@@ -927,20 +1078,20 @@ codeunit 6151373 "CS Helper Functions"
         CSSetup: Record "CS Setup";
     begin
         //-NPR5.50 [346068]
-        if not CSSetup.Get then
-          exit;
+        IF NOT CSSetup.GET THEN
+          EXIT;
 
-        if not CSSetup."Enable Capture Service" then
-          exit;
+        IF NOT CSSetup."Enable Capture Service" THEN
+          EXIT;
 
-        if Rec.IsTemporary then
-          exit;
+        IF Rec.ISTEMPORARY THEN
+          EXIT;
 
-        if Rec."Cross-Reference Type" <> Rec."Cross-Reference Type"::"Bar Code" then
-          exit;
+        IF Rec."Cross-Reference Type" <> Rec."Cross-Reference Type"::"Bar Code" THEN
+          EXIT;
 
-        if not Rec."Rfid Tag" then
-          exit;
+        IF NOT Rec."Is Retail Serial No." THEN
+          EXIT;
 
         CreateCSRfidOfflineDataRecord(Rec);
         //+NPR5.50 [346068]
@@ -952,20 +1103,20 @@ codeunit 6151373 "CS Helper Functions"
         CSSetup: Record "CS Setup";
     begin
         //-NPR5.50 [346068]
-        if not CSSetup.Get then
-          exit;
+        IF NOT CSSetup.GET THEN
+          EXIT;
 
-        if not CSSetup."Enable Capture Service" then
-          exit;
+        IF NOT CSSetup."Enable Capture Service" THEN
+          EXIT;
 
-        if Rec.IsTemporary then
-          exit;
+        IF Rec.ISTEMPORARY THEN
+          EXIT;
 
-        if Rec."Cross-Reference Type" <> Rec."Cross-Reference Type"::"Bar Code" then
-          exit;
+        IF Rec."Cross-Reference Type" <> Rec."Cross-Reference Type"::"Bar Code" THEN
+          EXIT;
 
-        if not Rec."Rfid Tag" then
-          exit;
+        IF NOT Rec."Is Retail Serial No." THEN
+          EXIT;
 
         CreateCSRfidOfflineDataRecord(Rec);
         //+NPR5.50 [346068]
@@ -977,20 +1128,20 @@ codeunit 6151373 "CS Helper Functions"
         CSSetup: Record "CS Setup";
     begin
         //-NPR5.50 [346068]
-        if not CSSetup.Get then
-          exit;
+        IF NOT CSSetup.GET THEN
+          EXIT;
 
-        if not CSSetup."Enable Capture Service" then
-          exit;
+        IF NOT CSSetup."Enable Capture Service" THEN
+          EXIT;
 
-        if Rec.IsTemporary then
-          exit;
+        IF Rec.ISTEMPORARY THEN
+          EXIT;
 
-        if Rec."Cross-Reference Type" <> Rec."Cross-Reference Type"::"Bar Code" then
-          exit;
+        IF Rec."Cross-Reference Type" <> Rec."Cross-Reference Type"::"Bar Code" THEN
+          EXIT;
 
-        if not Rec."Rfid Tag" then
-          exit;
+        IF NOT Rec."Is Retail Serial No." THEN
+          EXIT;
 
         DeleteCSRfidOfflineDataRecord(Rec);
         //+NPR5.50 [346068]

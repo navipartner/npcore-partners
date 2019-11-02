@@ -2,6 +2,8 @@ codeunit 6150727 "POS Action - Hyperlink"
 {
     // NPR5.36/VB/20170901  CASE 289035 Supporting hyperlink actions.
     // NPR5.51/ALST/20190626 CASE 353218 open url in iframe, removed back end running
+    // NPR5.52/ALST/20191001 CASE 368335 enlarger frame to 85%, added iFrame parameter, fixed input event on textbox class, added close button
+    //                                   added focus on iFrame content after loading, reenabled backend running
 
 
     trigger OnRun()
@@ -28,7 +30,7 @@ codeunit 6150727 "POS Action - Hyperlink"
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.1');
+        exit ('1.2');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -46,42 +48,105 @@ codeunit 6150727 "POS Action - Hyperlink"
           with Sender do begin
             //-NPR5.51
             //RegisterWorkflowStep('','param["back-end"] ? respond() : window.open(param.url, "_blank");');
-            RegisterWorkflowStep('',
-                                        'var ifrm = document.createElement("iframe");' +
-                                        'ifrm.src = param.url;' +
-                                        'ifrm.id = "checkin";' +
-                                        'ifrm.style.position = "absolute";' +
-                                        'ifrm.style.top="17%";' +
-                                        'ifrm.style.left="17%";' +
-                                        'ifrm.style.height="65%";' +
-                                        'ifrm.style.width="65%";' +
-                                        'ifrm.style.overflow="hidden";' +
-                                        'ifrm.style.zIndex= "101";' +
-                                        'document.body.appendChild(ifrm);' +
-
-                                        'document.getElementById("np-textbox2").addEventListener(''input'', closeIframe);' +
-                                        'function closeIframe()' +
+            RegisterWorkflowStep('',    //-NPR5.52 [368335]
+                                        'if (param["back-end"])' +
+                                            'respond();' +
+                                        'else' +
                                         '{' +
-                                            'var element = document.getElementById("checkin");' +
-                                            'element.parentNode.removeChild(element);' +
-                                        '};' +
-
-                                        '$(document).add(parent.document).click(function(e)' +
-                                        '{' +
-                                            'var iframe = $("iframe");' +
-                                            'if (!iframe.is(e.target) && iframe.has(e.target).length === 0)' +
+                                            'if (!param.iFrame)' +
                                             '{' +
-                                                'var element = document.getElementById("checkin");' +
-                                                'element.parentNode.removeChild(element);' +
+                                                'window.open(param.url, "_blank");' +
                                             '}' +
-                                        '});'
+                                            'else' +
+                                            '{' +
+                                            //+NPR5.52 [368335]
+                                                'var ifrm = document.createElement("iframe");' +
+                                                'ifrm.src = param.url;' +
+                                                //-NPR5.52 [368335]
+                                                // 'ifrm.id = "CheckIn";' +
+                                                'ifrm.id = "iFrameWindow";' +
+                                                'ifrm.onload= function()' +
+                                                '{' +
+                                                    'ifrm.contentWindow.focus();' +
+                                                '};' +
+                                                //+NPR5.52 [368335]
+                                                'ifrm.style.position = "absolute";' +
+                                                'ifrm.style.top="7%";' +
+                                                'ifrm.style.left="7%";' +
+                                                'ifrm.style.height="85%";' +
+                                                'ifrm.style.width="85%";' +
+                                                'ifrm.style.overflow="hidden";' +
+                                                'ifrm.style.zIndex= "101";' +
+                                                'document.body.appendChild(ifrm);' +
+                                                //-NPR5.52 [368335]
+                                                // 'document.getElementsById("np-textbox").addEventListener(''input'', closeIframe); +'
+
+                                                'var button = document.createElement("button");' +
+                                                'button.id = "closeIframe";' +
+                                                'button.style.position = "absolute";' +
+                                                'button.style.top="4%";' +
+                                                'button.style.left="89%";' +
+                                                'button.style.height="3%";' +
+                                                'button.style.width="3%";' +
+                                                'button.style.zIndex= "101";' +
+                                                'button.style.backgroundColor = "red";' +
+                                                'button.style.fontWeight = "900";' +
+                                                'button.innerHTML = ''X'';' +
+                                                'document.body.appendChild(button);' +
+
+                                                'button.addEventListener("click", function()' +
+                                                '{' +
+                                                    'closeIframe();' +
+                                                '});' +
+
+                                                'var textBoxElement = document.getElementsByClassName("np-textbox")[0];' +
+                                                'if (textBoxElement)' +
+                                                    'textBoxElement.addEventListener(''input'', closeIframe);' +
+                                                //+NPR5.52 [368335]
+
+                                                'function closeIframe()' +
+                                                '{' +
+                                                    //-NPR5.52 [368335]
+                                                    // 'var element = document.getElementById("checkin");' +
+                                                    // 'element.parentNode.removeChild(element);' +
+                                                    'var element = document.getElementById("iFrameWindow");' +
+                                                    'var element2 = document.getElementById("closeIframe");' +
+
+                                                    'if (element)' +
+                                                        'element.parentNode.removeChild(element);' +
+
+                                                    'if (element2)' +
+                                                        'element2.parentNode.removeChild(element2);' +
+                                                    //+NPR5.52 [368335]
+                                                '};' +
+                                                //-NPR5.52 [368335]
+                                                //'$(document).add(parent.document).click(function(e)' +
+                                                '$(document).on("click", function(e)' +
+                                                //+NPR5.52 [368335]
+                                                '{' +
+                                                    'var iframe = $("iframe");' +
+                                                    'if (!iframe.is(e.target) && iframe.has(e.target).length === 0)' +
+                                                        //-NPR5.52 [368335]
+                                                        'closeIframe();' +
+                                                        // '{' +
+                                                        //     'var element = document.getElementById("iFrameWindow");' +
+                                                        //     'element.parentNode.removeChild(element);' +
+                                                        // '}' +
+                                                        //+NPR5.52 [368335]
+                                                '});' +
+                                            '}' +
+                                        '}'
                                     );
             //+NPR5.51
             RegisterWorkflow(false);
             RegisterTextParameter('url','about:blank');
+            //-NPR5.52 [368335]
             //-NPR5.51
             //RegisterBooleanParameter('back-end',FALSE);
             //+NPR5.51
+            RegisterBooleanParameter('back-end',false);
+            RegisterBooleanParameter('iFrame',false);
+            //+NPR5.52 [368335]
           end;
         end;
     end;
@@ -94,6 +159,7 @@ codeunit 6150727 "POS Action - Hyperlink"
         if not Action.IsThisAction(ActionCode) then
           exit;
 
+        //-NPR5.52 [368335]
         //-NPR5.51
         // WITH JSON DO BEGIN
         //  InitializeJObjectParser(Context,FrontEnd);
@@ -101,6 +167,12 @@ codeunit 6150727 "POS Action - Hyperlink"
         //    HYPERLINK(GetStringParameter('url',TRUE));
         // END;
         //+NPR5.51
+        with JSON do begin
+          InitializeJObjectParser(Context,FrontEnd);
+          if GetBooleanParameter('back-end',true) then
+            HyperLink(GetStringParameter('url',true));
+        end;
+        //-NPR5.52 [368335]
 
         Handled := true;
     end;

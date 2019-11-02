@@ -1,6 +1,7 @@
 codeunit 6150869 "POS Action - Layaway Pay"
 {
     // NPR5.50/MMV /20181105 CASE 300557 Created object
+    // NPR5.52/MMV /20191004 CASE 352473 Updated parameters to insert final amount.
 
 
     trigger OnRun()
@@ -175,7 +176,9 @@ codeunit 6150869 "POS Action - Layaway Pay"
         if GetNextDuePrepayment(SalesHeader, NextInvoice, SalesInvoiceHeader."Due Date", false) then
           exit;
 
-        RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, true, true, true, false, true);
+        //-NPR5.52 [352473]
+        RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, true, true, true, false, false, false, true);
+        //+NPR5.52 [352473]
     end;
 
     local procedure GetTotalRemainingLayawayAmount(SalesHeader: Record "Sales Header";DueLaterThan: Date): Decimal

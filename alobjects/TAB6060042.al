@@ -33,6 +33,7 @@ table 6060042 "Item Worksheet Line"
     // NPR5.48/JAVA/20190205  CASE 334163 Transport NPR5.48 - 5 February 2019
     // NPR5.49/BHR /20190111 CASE 341967 Increase size of Variety Tables from code 20 to code 40
     // NPR5.50/THRO/20190526 CASE 356260 Bugfix in CheckManualValidation
+    // NPR5.52/THRO/20191002 CASE 370475 Set Item Category Code from Item
 
     Caption = 'Item Worksheet Line';
     DrillDownPageID = "Item Worksheet Page";
@@ -179,6 +180,9 @@ table 6060042 "Item Worksheet Line"
                 "Gross Weight" := Item."Gross Weight";
                 "Net Weight" := Item."Net Weight";
                 //+NPR5.23 [242498]
+                //-NPR5.52 [370475]
+                "Item Category Code" := Item."Item Category Code";
+                //-NPR5.52 [370475]
 
                 CopyItemAttributes(Item."No.");
 

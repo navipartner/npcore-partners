@@ -23,6 +23,7 @@ codeunit 6060116 "TM Ticket WebService Mgr"
     // TM1.39/TSA /20190124 CASE 335889 Member Guest ticket with ticket reuse when reentry
     // TM1.40/TSA /20190327 CASE 350287 Signature Change on RevalidateRequestForTicketReuse
     // TM1.41/TSA /20190508 CASE 353736 Incorrect loop iterator
+    // TM1.43/TSA /20190910 CASE 368043 Refactored usage of "External Item Code"
 
     TableNo = "Nc Import Entry";
 
@@ -512,8 +513,6 @@ codeunit 6060116 "TM Ticket WebService Mgr"
         TicketReservationRequest2: Record "TM Ticket Reservation Request";
         Admission: Record "TM Admission";
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
-        ItemNo: Code[20];
-        VariantCode: Code[10];
         ExternalItemType: Integer;
     begin
 
@@ -529,7 +528,10 @@ codeunit 6060116 "TM Ticket WebService Mgr"
           end;
         end;
 
-        if (not TicketRequestManager.TranslateBarcodeToItemVariant (TicketReservationRequest."External Item Code", ItemNo, VariantCode, ExternalItemType)) then begin
+        //-TM1.43 [368043]
+        //IF (NOT TicketRequestManager.TranslateBarcodeToItemVariant (TicketReservationRequest."External Item Code", ItemNo, VariantCode, ExternalItemType)) THEN BEGIN
+        if (not TicketRequestManager.TranslateBarcodeToItemVariant (TicketReservationRequest."External Item Code", TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", ExternalItemType)) then begin
+        //+TM1.43 [368043]
           TicketReservationResponse."Response Message" := StrSubstNo ('External Item [%1] does not resolve to an internal item.', TicketReservationRequest."External Item Code");
           TicketReservationResponse.Status := false;
         end;
@@ -551,6 +553,9 @@ codeunit 6060116 "TM Ticket WebService Mgr"
     end;
 
     local procedure InsertTicketReservation(XmlElement: DotNet npNetXmlElement;Token: Text[100];var TicketReservationRequest: Record "TM Ticket Reservation Request")
+    var
+        TicketRequestManager: Codeunit "TM Ticket Request Manager";
+        ExternalItemType: Integer;
     begin
 
         Initialize;
@@ -561,6 +566,10 @@ codeunit 6060116 "TM Ticket WebService Mgr"
         TicketReservationRequest."Created Date Time" := CurrentDateTime ();
 
         TicketReservationRequest."External Item Code" := CopyStr (NpXmlDomMgt.GetXmlAttributeText (XmlElement, 'external_id', true), 1, MaxStrLen (TicketReservationRequest."External Item Code"));
+        //-TM1.43 [368043]
+        TicketRequestManager.TranslateBarcodeToItemVariant (TicketReservationRequest."External Item Code", TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", ExternalItemType);
+        //+TM1.43 [368043]
+
         Evaluate (TicketReservationRequest.Quantity, NpXmlDomMgt.GetXmlAttributeText (XmlElement, 'qty', true));
         Evaluate (TicketReservationRequest."Ext. Line Reference No.", NpXmlDomMgt.GetXmlAttributeText (XmlElement, 'line_no', true));
         TicketReservationRequest."External Member No." := CopyStr (NpXmlDomMgt.GetXmlAttributeText (XmlElement, 'member_number', false), 1, MaxStrLen (TicketReservationRequest."External Member No."));
@@ -572,6 +581,9 @@ codeunit 6060116 "TM Ticket WebService Mgr"
     end;
 
     local procedure InsertTemporaryTicketReservation(XmlElement: DotNet npNetXmlElement;Token: Text[100];var TmpTicketReservationRequest: Record "TM Ticket Reservation Request" temporary)
+    var
+        TicketRequestManager: Codeunit "TM Ticket Request Manager";
+        ExternalItemType: Integer;
     begin
 
         //-#335889 [335889]
@@ -585,6 +597,9 @@ codeunit 6060116 "TM Ticket WebService Mgr"
           "Created Date Time" := CurrentDateTime ();
 
           "External Item Code" := CopyStr (NpXmlDomMgt.GetXmlAttributeText (XmlElement, 'external_id', true), 1, MaxStrLen ("External Item Code"));
+          //-TM1.43 [368043]
+          TicketRequestManager.TranslateBarcodeToItemVariant ("External Item Code", "Item No.", "Variant Code", ExternalItemType);
+          //+TM1.43 [368043]
           Evaluate (Quantity, NpXmlDomMgt.GetXmlAttributeText (XmlElement, 'qty', true));
           Evaluate ("Ext. Line Reference No.", NpXmlDomMgt.GetXmlAttributeText (XmlElement, 'line_no', true));
           "External Member No." := CopyStr (NpXmlDomMgt.GetXmlAttributeText (XmlElement, 'member_number', false), 1, MaxStrLen ("External Member No."));

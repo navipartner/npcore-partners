@@ -5,11 +5,18 @@ pageextension 6014439 pageextension6014439 extends "Sales Credit Memo"
     // NPR5.36/THRO/20170908 CASE 285645 Added action PostAndSendPdf2Nav
     // NPR5.38/BR  /20171117 CASE 295255 Added Action POS Entries
     // NPR5.49/BHR /20190227 CASE 346899 Add Action Import Scanner
+    // MAG2.23/MHA /20190911 CASE 355841 Added "Magento Payment Amount"
     layout
     {
         addafter("Responsibility Center")
         {
             field(NPRPostingDescription1;"Posting Description")
+            {
+            }
+        }
+        addafter("Bill-to")
+        {
+            field("Magento Payment Amount";"Magento Payment Amount")
             {
             }
         }

@@ -2,6 +2,7 @@ xmlport 6151156 "M2 Update Account"
 {
     // NPR5.49/TSA /20190328 CASE 320424 Initial Version
     // NPR5.51/TSA /20190812 CASE 364644 Added Person section
+    // MAG2.23/TSA /20191015 CASE 373151 Move Person to address, removed CompanyName, Ean added Name, PricesIncludeVat, Contact
 
     Caption = 'Update Account';
     Encoding = UTF8;
@@ -28,40 +29,30 @@ xmlport 6151156 "M2 Update Account"
                 {
                     MaxOccurs = Once;
                     MinOccurs = Zero;
-                    fieldelement(CompanyName;TmpContactRequest."Company Name")
-                    {
-                    }
                     fieldelement(VatId;TmpContactRequest."VAT Registration No.")
                     {
                     }
-                    textelement(Ean)
-                    {
-                        MaxOccurs = Once;
-
-                        trigger OnAfterAssignVariable()
-                        begin
-                            if (Ean <> '') then
-                              Error ('EAN code is not supported in W1 version and must be left blank');
-                        end;
-                    }
                     fieldelement(CurrencyCode;TmpContactRequest."Currency Code")
-                    {
-                    }
-                }
-                textelement(Person)
-                {
-                    MaxOccurs = Once;
-                    MinOccurs = Zero;
-                    fieldelement(FirstName;TmpContactRequest."First Name")
-                    {
-                    }
-                    fieldelement(Surname;TmpContactRequest.Surname)
                     {
                     }
                 }
                 textelement(Address)
                 {
                     MaxOccurs = Once;
+                    textelement(Person)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                        fieldelement(FirstName;TmpContactRequest."First Name")
+                        {
+                        }
+                        fieldelement(LastName;TmpContactRequest.Surname)
+                        {
+                        }
+                    }
+                    fieldelement(Name;TmpContactRequest."Company Name")
+                    {
+                    }
                     fieldelement(Name2;TmpContactRequest."Name 2")
                     {
                     }
@@ -160,7 +151,7 @@ xmlport 6151156 "M2 Update Account"
                               TmpContactResponse."Company No." := '';
                         end;
                     }
-                    fieldelement(Name;TmpContactResponse.Name)
+                    fieldelement(Name;TmpContactResponse."Company Name")
                     {
                     }
                     textelement(personresponse)
@@ -183,9 +174,6 @@ xmlport 6151156 "M2 Update Account"
                             if (TmpContactResponse."First Name" = '') and (TmpContactResponse.Surname = '') then
                               currXMLport.Skip;
                         end;
-                    }
-                    fieldelement(CompanyName;TmpContactResponse."Company Name")
-                    {
                     }
                     fieldelement(Email;TmpContactResponse."E-Mail")
                     {

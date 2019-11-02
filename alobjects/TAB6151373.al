@@ -8,6 +8,8 @@ table 6151373 "CS UI Header"
     // NPR5.50/CLVA/20190327 CASE 247747 Added field "Hid Fulfilled Lines"
     // NPR5.50/CLVA/20190327 CASE 347971 Added field "Add Posting Options"
     // NPR5.51/CLVA/20190612 CASE 357577 Added field "Update Posting Date"
+    // NPR5.52/CLVA/20191010 CASE 370452 Added field "Posting Type"
+    //                                   Discontinued the use of field "Add Posting Options"
 
     Caption = 'CS UI Header';
     LookupPageID = "CS UIs";
@@ -58,6 +60,7 @@ table 6151373 "CS UI Header"
         field(17;"Add Posting Options";Boolean)
         {
             Caption = 'Add Posting Options';
+            Description = 'NPR5.52 - Discontinued';
         }
         field(18;"Update Posting Date";Boolean)
         {
@@ -91,6 +94,12 @@ table 6151373 "CS UI Header"
         field(22;"Set defaults from last record";Boolean)
         {
             Caption = 'Set defaults from last record';
+        }
+        field(23;"Posting Type";Option)
+        {
+            Caption = 'Posting Type';
+            OptionCaption = 'Handle,Handle & Invoice';
+            OptionMembers = Handle,"Handle & Invoice";
         }
         field(25;XMLin;BLOB)
         {

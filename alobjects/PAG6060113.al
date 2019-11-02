@@ -18,12 +18,14 @@ page 6060113 "TM Ticket Make Reservation"
     // TM1.38.01/TSA /20181012 CASE 332109 Missplaced code section
     // TM1.39/TS  /20181206 CASE 343939 Added Missing Picture to Action
     // TM1.42/ALST/20190718 CASE 362158 made the page of type list to be compatible with mobile app
+    // TM1.43/ALST/20191015 CASE 362158 reverted 1.42, page is now back to worksheet
+    // TM1.44/ALST/20191016 CASE 362158 made the page of type listPlus to be compatible with mobile app and avoid extra click situation on open
 
     Caption = 'Make your reservation';
     DataCaptionExpression = StrSubstNo ('%1  - %2', Today, Time);
     DeleteAllowed = false;
     InsertAllowed = false;
-    PageType = List;
+    PageType = ListPlus;
     SourceTable = "TM Ticket Reservation Request";
     SourceTableTemporary = true;
 

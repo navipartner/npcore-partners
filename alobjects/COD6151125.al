@@ -4,6 +4,10 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
     // NPR5.48/MHA /20181113  CASE 334922 Added Web Client Dependency functionality
     // NPR5.50/MHA /20190521  CASE 355080 Added function FormatJson() and "Unit Price" = 0 should result in default price
     // NPR5.51/MHA /20190725  CASE 355186 Serial No. functions added
+    // NPR5.52/ALPO/20190912  CASE 354309 Possibility to predefine unit price and line discount % for Item AddOn entries set as select options
+    //                                    Possibility to fix the quantity so user would not be able to change it on sale line
+    //                                    Use Item AddOn quantity as default
+    //                                    Prevent deletion of fixed quantity dependent lines; Delete all dependent lines on main line deletion
 
 
     trigger OnRun()
@@ -13,53 +17,119 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
     var
         Text000: Label 'Approve';
         Text001: Label 'Cancel';
+        ConfirmDeleteAllDependentLines: Label 'There are one or more Item AddOn dependent lines, linked with the current line. Those will be deleted as well. Are you sure you want to continue?';
+        FixedDependentLineCannotBeDeletedErr: Label 'You cannot delete this line because it is a dependent Item AddOn line. Please delete the main line, and this line will be deleted automatically by the system.';
+        QtyIsFixedErr: Label 'The quantity of Item AddOn dependent line is fixed and cannot be changed in this way.';
 
     [EventSubscriber(ObjectType::Table, 6014406, 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeletePOSSaleLine(var Rec: Record "Sale Line POS";RunTrigger: Boolean)
     var
         SaleLinePOS: Record "Sale Line POS";
         SaleLinePOSAddOn: Record "NpIa Sale Line POS AddOn";
-        SaleLinePOSAddOn2: Record "NpIa Sale Line POS AddOn";
         POSSaleLine: Codeunit "POS Sale Line";
-        DeleteLine: Boolean;
     begin
         if Rec.IsTemporary then
           exit;
-
-        SaleLinePOSAddOn.SetRange("Register No.",Rec."Register No.");
-        SaleLinePOSAddOn.SetRange("Sales Ticket No.",Rec."Sales Ticket No.");
-        SaleLinePOSAddOn.SetRange("Sale Type",Rec."Sale Type");
-        SaleLinePOSAddOn.SetRange("Sale Date",Rec.Date);
-        SaleLinePOSAddOn.SetRange("Sale Line No.",Rec."Line No.");
-        if SaleLinePOSAddOn.IsEmpty then
-          exit;
-
-        SaleLinePOSAddOn.FindSet;
-        repeat
-          SaleLinePOSAddOn2.SetRange("Register No.",SaleLinePOSAddOn."Register No.");
-          SaleLinePOSAddOn2.SetRange("Sales Ticket No.",SaleLinePOSAddOn."Sales Ticket No.");
-          SaleLinePOSAddOn2.SetRange("Sale Type",SaleLinePOSAddOn."Sale Type");
-          SaleLinePOSAddOn2.SetRange("Sale Date",SaleLinePOSAddOn."Sale Date");
-          SaleLinePOSAddOn2.SetFilter("Sale Line No.",'<>%1',SaleLinePOSAddOn."Sale Line No.");
-          SaleLinePOSAddOn2.SetRange("Applies-to Line No.",SaleLinePOSAddOn."Sale Line No.");
-          if SaleLinePOSAddOn2.FindSet then
-            repeat
-              DeleteLine := SaleLinePOS.Get(
+        
+        //-NPR5.52 [354309]-revoked
+        /*SaleLinePOSAddOn.SETRANGE("Register No.",Rec."Register No.");
+        SaleLinePOSAddOn.SETRANGE("Sales Ticket No.",Rec."Sales Ticket No.");
+        SaleLinePOSAddOn.SETRANGE("Sale Type",Rec."Sale Type");
+        SaleLinePOSAddOn.SETRANGE("Sale Date",Rec.Date);
+        SaleLinePOSAddOn.SETRANGE("Sale Line No.",Rec."Line No.");
+        IF SaleLinePOSAddOn.ISEMPTY THEN
+          EXIT;
+        
+        SaleLinePOSAddOn.FINDSET;
+        REPEAT
+          SaleLinePOSAddOn2.SETRANGE("Register No.",SaleLinePOSAddOn."Register No.");
+          SaleLinePOSAddOn2.SETRANGE("Sales Ticket No.",SaleLinePOSAddOn."Sales Ticket No.");
+          SaleLinePOSAddOn2.SETRANGE("Sale Type",SaleLinePOSAddOn."Sale Type");
+          SaleLinePOSAddOn2.SETRANGE("Sale Date",SaleLinePOSAddOn."Sale Date");
+          SaleLinePOSAddOn2.SETFILTER("Sale Line No.",'<>%1',SaleLinePOSAddOn."Sale Line No.");
+          SaleLinePOSAddOn2.SETRANGE("Applies-to Line No.",SaleLinePOSAddOn."Sale Line No.");
+          IF SaleLinePOSAddOn2.FINDSET THEN
+            REPEAT
+              DeleteLine := SaleLinePOS.GET(
                 SaleLinePOSAddOn2."Register No.",
                 SaleLinePOSAddOn2."Sales Ticket No.",
                 SaleLinePOSAddOn2."Sale Date",
                 SaleLinePOSAddOn2."Sale Type",
                 SaleLinePOSAddOn2."Sale Line No.");
+        
+              SaleLinePOSAddOn2.DELETE(TRUE);
+        
+              IF DeleteLine THEN
+                SaleLinePOS.DELETE(TRUE);
+            UNTIL SaleLinePOSAddOn2.NEXT = 0;
+        UNTIL SaleLinePOSAddOn.NEXT = 0;
+        
+        SaleLinePOSAddOn.DELETEALL;
+        IF (Rec.FIND ()) THEN ;*/
+        //+NPR5.52 [354309]-revoked
+        
+        //-NPR5.52 [354309]
+        //AddOn (dependent) lines cannot be deleted other than together with main line
+        FilterSaleLinePOS2ItemAddOnPOSLine(Rec,SaleLinePOSAddOn);
+        SaleLinePOSAddOn.SetRange("Fixed Quantity",true);
+        if SaleLinePOSAddOn.FindFirst then
+          if SaleLinePOS.Get(
+              SaleLinePOSAddOn."Register No.",
+              SaleLinePOSAddOn."Sales Ticket No.",
+              SaleLinePOSAddOn."Sale Date",
+              SaleLinePOSAddOn."Sale Type",
+              SaleLinePOSAddOn."Applies-to Line No.")
+          then
+            Error(FixedDependentLineCannotBeDeletedErr);
+        //+NPR5.52 [354309]
 
-              SaleLinePOSAddOn2.Delete(true);
+    end;
 
-              if DeleteLine then
-                SaleLinePOS.Delete(true);
-            until SaleLinePOSAddOn2.Next = 0;
-        until SaleLinePOSAddOn.Next = 0;
+    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnBeforeDeletePOSSaleLine', '', true, false)]
+    local procedure OnBeforeDeletePOSSaleLine2(var Sender: Codeunit "POS Sale Line";SaleLinePOS: Record "Sale Line POS")
+    var
+        SaleLinePOSAddOn: Record "NpIa Sale Line POS AddOn";
+    begin
+        //-NPR5.52 [354309]
+        //Confirm deletion of AddOn (dependent) lines
+        FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS,SaleLinePOSAddOn);
+        SaleLinePOSAddOn.SetRange("Sale Line No.");
+        SaleLinePOSAddOn.SetRange("Applies-to Line No.",SaleLinePOS."Line No.");
+        if not SaleLinePOSAddOn.IsEmpty then
+          if not Confirm(ConfirmDeleteAllDependentLines,true) then
+            Error('');
+        //+NPR5.52 [354309]
+    end;
+
+    [EventSubscriber(ObjectType::Table, 6014406, 'OnAfterDeleteEvent', '', true, false)]
+    local procedure OnAfterDeletePOSSaleLine(var Rec: Record "Sale Line POS";RunTrigger: Boolean)
+    var
+        SaleLinePOS: Record "Sale Line POS";
+        SaleLinePOSAddOn: Record "NpIa Sale Line POS AddOn";
+    begin
+        //-NPR5.52 [354309]
+        if Rec.IsTemporary then
+          exit;
+
+        //Find and delete all dependent POS sales lines
+        FilterSaleLinePOS2ItemAddOnPOSLine(Rec,SaleLinePOSAddOn);
+        SaleLinePOSAddOn.SetRange("Sale Line No.");
+        SaleLinePOSAddOn.SetRange("Applies-to Line No.",Rec."Line No.");
+        if SaleLinePOSAddOn.FindSet then
+          repeat
+            if SaleLinePOS.Get(
+                SaleLinePOSAddOn."Register No.",
+                SaleLinePOSAddOn."Sales Ticket No.",
+                SaleLinePOSAddOn."Sale Date",
+                SaleLinePOSAddOn."Sale Type",
+                SaleLinePOSAddOn."Sale Line No.")
+            then
+              SaleLinePOS.Delete(true);
+          until SaleLinePOSAddOn.Next = 0;
 
         SaleLinePOSAddOn.DeleteAll;
-        if (Rec.Find ()) then ;
+        if Rec.Find() then;
+        //+NPR5.52 [354309]
     end;
 
     local procedure "--- POS Data Source"()
@@ -122,11 +192,12 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
     begin
     end;
 
-    procedure InitScriptAddOnLines(SalePOS: Record "Sale POS";AppliesToLineNo: Integer;NpIaItemAddOn: Record "NpIa Item AddOn") Script: Text
+    procedure InitScriptAddOnLines(SalePOS: Record "Sale POS";AppliesToSaleLinePOS: Record "Sale Line POS";NpIaItemAddOn: Record "NpIa Item AddOn") Script: Text
     var
         NpIaItemAddOnLine: Record "NpIa Item AddOn Line";
         NpIaItemAddOnLineOption: Record "NpIa Item AddOn Line Option";
         SaleLinePOS: Record "Sale Line POS";
+        BaseSaleLinePOS: Record "Sale Line POS";
         AddOnLine: Text;
         SelectedVariant: Text;
         i: Integer;
@@ -141,7 +212,8 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
           repeat
             Comment := '';
             Clear(SaleLinePOS);
-            if FindSaleLinePOS(SalePOS,AppliesToLineNo,NpIaItemAddOnLine,SaleLinePOS) then
+            //IF FindSaleLinePOS(SalePOS,AppliesToLineNo,NpIaItemAddOnLine,SaleLinePOS) THEN  //NPR5.52 [354309]-revoked
+            if FindSaleLinePOS(SalePOS,AppliesToSaleLinePOS."Line No.",NpIaItemAddOnLine,SaleLinePOS) then  //NPR5.52 [354309]
               Comment := GetItemAddOnComment(NpIaItemAddOn,SaleLinePOS);
 
             AddOnLine := '{ line_no: ' + Format(NpIaItemAddOnLine."Line No.");
@@ -153,7 +225,19 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
             //AddOnLine += ', description: "' + NpIaItemAddOnLine.Description + '"';
             AddOnLine += ', description: "' + FormatJson(NpIaItemAddOnLine.Description) + '"';
             //+NPR5.50 [355080]
-            AddOnLine += ', qty: ' + Format(SaleLinePOS.Quantity);
+            //AddOnLine += ', qty: ' + FORMAT(SaleLinePOS.Quantity);  //NPR5.52 [354309]-revoked
+            //-NPR5.52 [354309]
+            if SaleLinePOS.Quantity = 0 then begin
+              if NpIaItemAddOnLine."Per Unit" then begin
+                if AppliesToSaleLinePOS."Quantity (Base)" = 0 then
+                  AppliesToSaleLinePOS."Quantity (Base)" := 1;
+                AddOnLine += ', qty: ' + Format(Round(NpIaItemAddOnLine.Quantity * AppliesToSaleLinePOS."Quantity (Base)",0.00001),0,9);
+              end else
+                AddOnLine += ', qty: ' + Format(NpIaItemAddOnLine.Quantity,0,9);
+            end else
+              AddOnLine += ', qty: ' + Format(SaleLinePOS.Quantity,0,9);
+            AddOnLine += ', fixed: ' + Format(NpIaItemAddOnLine."Fixed Quantity",0,9);
+            //+NPR5.52 [354309]
             AddOnLine += ', comment: "' + Comment + '"';
             case NpIaItemAddOnLine.Type of
               NpIaItemAddOnLine.Type::Quantity:
@@ -283,8 +367,16 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
           SaleLinePOS.Validate("Discount %",NpIaItemAddOnLine."Discount %");
           POSSaleLine.InsertLine(SaleLinePOS);
 
-
-          if SaleLinePOSAddOn.FindLast then;
+          //IF SaleLinePOSAddOn.FINDLAST THEN;  //NPR5.52 [354309]-revoked
+          //-NPR5.52 [354309]  //fix: someone initially forgot to set the filters
+          SaleLinePOSAddOn.SetRange("Register No.",SaleLinePOS."Register No.");
+          SaleLinePOSAddOn.SetRange("Sales Ticket No.",SaleLinePOS."Sales Ticket No.");
+          SaleLinePOSAddOn.SetRange("Sale Type",SaleLinePOS."Sale Type");
+          SaleLinePOSAddOn.SetRange("Sale Date",SaleLinePOS.Date);
+          SaleLinePOSAddOn.SetRange("Sale Line No.",SaleLinePOS."Line No.");
+          if not SaleLinePOSAddOn.FindLast then
+            SaleLinePOSAddOn."Line No." := 0;
+          //+NPR5.52 [354309]
           LineNo := SaleLinePOSAddOn."Line No." + 10000;
           SaleLinePOSAddOn.Init;
           SaleLinePOSAddOn."Register No." := SaleLinePOS."Register No.";
@@ -296,6 +388,10 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
           SaleLinePOSAddOn."Applies-to Line No." := AppliesToLineNo;
           SaleLinePOSAddOn."AddOn No." := NpIaItemAddOnLine."AddOn No.";
           SaleLinePOSAddOn."AddOn Line No." := NpIaItemAddOnLine."Line No.";
+          //-NPR5.52 [354309]
+          SaleLinePOSAddOn."Fixed Quantity" := NpIaItemAddOnLine."Fixed Quantity";
+          SaleLinePOSAddOn."Per Unit" := NpIaItemAddOnLine."Per Unit";
+          //+NPR5.52 [354309]
           SaleLinePOSAddOn.Insert(true);
         end;
 
@@ -413,6 +509,12 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
               NpIaItemAddOnLine."Variant Code" := NpIaItemAddOnLineOption."Variant Code";
               NpIaItemAddOnLine.Description := NpIaItemAddOnLineOption.Description;
               NpIaItemAddOnLine.Quantity := NpIaItemAddOnLineOption.Quantity;
+              //-NPR5.52 [354309]
+              NpIaItemAddOnLine."Fixed Quantity" := NpIaItemAddOnLineOption."Fixed Quantity";
+              NpIaItemAddOnLine."Unit Price" := NpIaItemAddOnLineOption."Unit Price";
+              NpIaItemAddOnLine."Discount %" := NpIaItemAddOnLineOption."Discount %";
+              NpIaItemAddOnLine."Per Unit" := NpIaItemAddOnLineOption."Per Unit";
+              //+NPR5.52 [354309]
             end;
         end;
         //+NPR5.48 [334922]
@@ -657,11 +759,7 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
         if SaleLinePOSAddOn.IsEmpty then
           exit;
 
-        SaleLinePOSAddOn.SetRange("Register No.",SaleLinePOS."Register No.");
-        SaleLinePOSAddOn.SetRange("Sales Ticket No.",SaleLinePOS."Sales Ticket No.");
-        SaleLinePOSAddOn.SetRange("Sale Type",SaleLinePOS."Sale Type");
-        SaleLinePOSAddOn.SetRange("Sale Date",SaleLinePOS.Date);
-        SaleLinePOSAddOn.SetRange("Sale Line No.",SaleLinePOS."Line No.");
+        FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS,SaleLinePOSAddOn);
         if not SaleLinePOSAddOn.FindSet then
           exit;
 
@@ -670,6 +768,71 @@ codeunit 6151125 "NpIa Item AddOn Mgt."
             SaleLinePOS."Serial No." := SaleLinePOS2."Serial No.";
         until (SaleLinePOS."Serial No." <> '') or (SaleLinePOSAddOn.Next = 0);
         //+NPR5.51 [355186]
+    end;
+
+    local procedure IsFixedQty(SaleLinePOS: Record "Sale Line POS"): Boolean
+    var
+        SaleLinePOSAddOn: Record "NpIa Sale Line POS AddOn";
+    begin
+        //-NPR5.52 [354309]
+        FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS,SaleLinePOSAddOn);
+        SaleLinePOSAddOn.SetRange("Fixed Quantity",true);
+        exit(not SaleLinePOSAddOn.IsEmpty);
+        //+NPR5.52 [354309]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnBeforeSetQuantity', '', true, false)]
+    local procedure CheckFixedQtyOnBeforePOSSaleLineSetQty(var Sender: Codeunit "POS Sale Line";var SaleLinePOS: Record "Sale Line POS";var NewQuantity: Decimal)
+    begin
+        //-NPR5.52 [354309]
+        if IsFixedQty(SaleLinePOS) then
+          Error(QtyIsFixedErr);
+        //+NPR5.52 [354309]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterSetQuantity', '', true, false)]
+    local procedure UpdateDependentLineQty(var Sender: Codeunit "POS Sale Line";var SaleLinePOS: Record "Sale Line POS")
+    var
+        SaleLinePOSAddOn: Record "NpIa Sale Line POS AddOn";
+        SaleLinePOS2: Record "Sale Line POS";
+        xSaleLinePOS: Record "Sale Line POS";
+    begin
+        //-NPR5.52 [354309]
+        Sender.GetxRec(xSaleLinePOS);
+        if xSaleLinePOS."Quantity (Base)" = 0 then
+          exit;
+
+        FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS,SaleLinePOSAddOn);
+        SaleLinePOSAddOn.SetRange("Sale Line No.");
+        SaleLinePOSAddOn.SetRange("Applies-to Line No.",SaleLinePOS."Line No.");
+        SaleLinePOSAddOn.SetRange("Per Unit",true);
+        if SaleLinePOSAddOn.FindSet then
+          repeat
+            if SaleLinePOS2.Get(
+                SaleLinePOSAddOn."Register No.",
+                SaleLinePOSAddOn."Sales Ticket No.",
+                SaleLinePOSAddOn."Sale Date",
+                SaleLinePOSAddOn."Sale Type",
+                SaleLinePOSAddOn."Sale Line No.")
+            then begin
+              SaleLinePOS2.Validate(Quantity, Round(SaleLinePOS2.Quantity * SaleLinePOS."Quantity (Base)" / xSaleLinePOS."Quantity (Base)", 0.00001));
+              SaleLinePOS2.Modify;
+            end;
+          until SaleLinePOSAddOn.Next = 0;
+        //+NPR5.52 [354309]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150853, 'OnGetLineStyle', '', false, false)]
+    local procedure FormatDependentSaleLine(var Color: Text;var Weight: Text;var Style: Text;SaleLinePOS: Record "Sale Line POS";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    var
+        SaleLinePOSAddOn: Record "NpIa Sale Line POS AddOn";
+    begin
+        //-NPR5.52 [354309]
+        FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS,SaleLinePOSAddOn);
+        if not SaleLinePOSAddOn.IsEmpty then
+          Style := 'italic';
+        POSSession.RequestRefreshData();
+        //+NPR5.52 [354309]
     end;
 }
 

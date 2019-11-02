@@ -23,6 +23,7 @@ page 6014472 "Retail Journal Line"
     // NPR5.49/BHR /20190220 CASE 344000 Added the field Inventory, "Net Change","Purchases (Qty.)","Sales (Qty.)"
     // NPR5.49/TJ  /20190307 CASE 345733 New control Exchange Label
     // NPR5.50/ALST/20190408 CASE 350435 page update added
+    // NPR5.52/YAHA/20190609 CASE 367384 Field Re positioning
 
     AutoSplitKey = true;
     Caption = 'Label Printing Subform';
@@ -36,190 +37,21 @@ page 6014472 "Retail Journal Line"
     {
         area(content)
         {
-            repeater(Control6150661)
+            group(Control6014453)
             {
                 ShowCaption = false;
-                field("Calculation Date";"Calculation Date")
+                grid(Control6014452)
                 {
-                }
-                field("Register No.";"Register No.")
-                {
-                }
-                field("Customer Price Group";"Customer Price Group")
-                {
-                }
-                field("Customer Disc. Group";"Customer Disc. Group")
-                {
-                }
-                field("Item No.";"Item No.")
-                {
-                    Lookup = true;
-                }
-                field("New Item No.";"New Item No.")
-                {
-                    Visible = false;
-                }
-                field("Serial No.";"Serial No.")
-                {
-                }
-                field("Variant Code";"Variant Code")
-                {
-                }
-                field("Quantity to Print";"Quantity to Print")
-                {
-                }
-                field(Print;Print)
-                {
-                    Caption = 'Print';
-
-                    trigger OnValidate()
-                    var
-                        RecRef: RecordRef;
-                    begin
-                        RecRef.GetTable(Rec);
-                        LabelLibrary.ToggleLine(RecRef);
-                    end;
-                }
-                field(Description;Description)
-                {
-                }
-                field("Description 2";"Description 2")
-                {
-                    Visible = false;
-                }
-                field("Base Unit of measure";"Base Unit of measure")
-                {
-                    Visible = false;
-                }
-                field("Purch. Unit of measure";"Purch. Unit of measure")
-                {
-                    Visible = false;
-                }
-                field("Sales Unit of measure";"Sales Unit of measure")
-                {
-                    Visible = false;
-                }
-                field(Barcode;Barcode)
-                {
-                }
-                field("Quantity for Discount Calc";"Quantity for Discount Calc")
-                {
-                }
-                field("Discount Type";"Discount Type")
-                {
-                }
-                field("Discount Code";"Discount Code")
-                {
-                }
-                field("Variant Code 2";"Variant Code")
-                {
-                    Visible = false;
-                }
-                field("Unit Price";"Unit Price")
-                {
-                }
-                field("Discount Pct.";"Discount Pct.")
-                {
-                }
-                field("Discount Price Incl. Vat";"Discount Price Incl. Vat")
-                {
-                }
-                field("Discount Price Excl. VAT";"Discount Price Excl. VAT")
-                {
-                    Editable = false;
-                }
-                field("Item.""Unit Price""";Item."Unit Price")
-                {
-                    Caption = 'Unit price(Item Card)';
-                    Editable = false;
-                    Visible = false;
-                }
-                field("Last Direct Cost";"Last Direct Cost")
-                {
-                }
-                field("Item.""Unit Cost""";Item."Unit Cost")
-                {
-                    Caption = 'Unit cost';
-                    Editable = false;
-                    Visible = false;
-                }
-                field("Unit List Price";"Unit List Price")
-                {
-                }
-                field("VAT %";"VAT %")
-                {
-                    Editable = false;
-                }
-                field("Item group";"Item group")
-                {
-                    Visible = false;
-                }
-                field("Vendor No.";"Vendor No.")
-                {
-                    Visible = false;
-                }
-                field("Vendor Name";"Vendor Name")
-                {
-                    Editable = false;
-
-                    trigger OnLookup(var Text: Text): Boolean
-                    begin
-                        if PAGE.RunModal(PAGE::"Vendor List", Vendor) = ACTION::LookupOK then begin
-                          "Vendor No." := Vendor."No.";
-                          vendorName := Vendor.Name;
-                          Modify(true);
-                        end;
-                    end;
-                }
-                field("Vendor Item No.";"Vendor Item No.")
-                {
-                }
-                field(Inventory;Inventory)
-                {
-                }
-                field("Net Change";"Net Change")
-                {
-                }
-                field("Purchases (Qty.)";"Purchases (Qty.)")
-                {
-                }
-                field("Sales (Qty.)";"Sales (Qty.)")
-                {
-                }
-                field("Profit % (new)";"Profit % (new)")
-                {
-                    Visible = true;
-                }
-                field("Cannot edit unit price";"Cannot edit unit price")
-                {
-                    Visible = false;
-                }
-                field("Exchange Label";"Exchange Label")
-                {
-
-                    trigger OnValidate()
-                    begin
-                        //-NPR5.50 [350435]
-                        CurrPage.Update;
-                        //+NPR5.50 [350435]
-                    end;
-                }
-            }
-            group(Control6150622)
-            {
-                ShowCaption = false;
-                grid(Control6150621)
-                {
-                    GridLayout = Rows;
+                    GridLayout = Columns;
                     ShowCaption = false;
-                    group(Control6150620)
+                    group("Vendor No.")
                     {
+                        Caption = 'Vendor No.';
                         //The GridLayout property is only supported on controls of type Grid
                         //GridLayout = Rows;
-                        ShowCaption = false;
                         field("Vendor.""No.""";Vendor."No.")
                         {
-                            Caption = 'Vendor No.';
+                            ShowCaption = false;
 
                             trigger OnLookup(var Text: Text): Boolean
                             begin
@@ -241,9 +73,14 @@ page 6014472 "Retail Journal Line"
                                   VendorNoOnAfterValidate;
                             end;
                         }
+                    }
+                    group("Item Group")
+                    {
+                        Caption = 'Item Group';
                         field("Itemgroup.""No.""";Itemgroup."No.")
                         {
                             Caption = 'Item Group';
+                            ShowCaption = false;
 
                             trigger OnLookup(var Text: Text): Boolean
                             begin
@@ -265,10 +102,15 @@ page 6014472 "Retail Journal Line"
                                   ItemgroupNoOnAfterValidate;
                             end;
                         }
+                    }
+                    group("Unknown Item No.")
+                    {
+                        Caption = 'Unknown Item No.';
                         field(ShowUnknown;ShowUnknown)
                         {
                             Caption = 'Unknown Item No.';
                             OptionCaption = 'All,Only existing items,Only unknown items';
+                            ShowCaption = false;
 
                             trigger OnValidate()
                             begin
@@ -280,10 +122,15 @@ page 6014472 "Retail Journal Line"
                                   ShowUnknownOnAfterValidate;
                             end;
                         }
+                    }
+                    group("New Item")
+                    {
+                        Caption = 'New Item';
                         field(ShowNew;ShowNew)
                         {
                             Caption = 'New Item';
                             OptionCaption = 'All,Only existing items,Only new items';
+                            ShowCaption = false;
 
                             trigger OnValidate()
                             begin
@@ -295,10 +142,15 @@ page 6014472 "Retail Journal Line"
                                   ShowNewOnAfterValidate;
                             end;
                         }
+                    }
+                    group("Inventory Status")
+                    {
+                        Caption = 'Inventory Status';
                         field(ShowInventory;ShowInventory)
                         {
                             Caption = 'Inventory Status';
                             OptionCaption = 'All,In stock,Not in stock';
+                            ShowCaption = false;
 
                             trigger OnValidate()
                             begin
@@ -315,6 +167,180 @@ page 6014472 "Retail Journal Line"
                             end;
                         }
                     }
+                }
+            }
+            group(Control6014440)
+            {
+                ShowCaption = false;
+            }
+            repeater(Control6014441)
+            {
+                ShowCaption = false;
+                field("Calculation Date";"Calculation Date")
+                {
+                }
+                field("Item No.";"Item No.")
+                {
+                    Lookup = true;
+                }
+                field("Quantity to Print";"Quantity to Print")
+                {
+                }
+                field(Print;Print)
+                {
+                    Caption = 'Print';
+
+                    trigger OnValidate()
+                    var
+                        RecRef: RecordRef;
+                    begin
+                        RecRef.GetTable(Rec);
+                        LabelLibrary.ToggleLine(RecRef);
+                    end;
+                }
+                field(Description;Description)
+                {
+                }
+                field("Vendor Item No.";"Vendor Item No.")
+                {
+                }
+                field(Barcode;Barcode)
+                {
+                }
+                field("Unit Price";"Unit Price")
+                {
+                }
+                field("Item.""Unit Price""";Item."Unit Price")
+                {
+                    Caption = 'Unit price(Item Card)';
+                    Editable = false;
+                    Visible = true;
+                }
+                field("Last Direct Cost";"Last Direct Cost")
+                {
+                }
+                field("Item.""Unit Cost""";Item."Unit Cost")
+                {
+                    Caption = 'Unit cost';
+                    Editable = false;
+                    Visible = false;
+                }
+                field("Profit % (new)";"Profit % (new)")
+                {
+                    Visible = true;
+                }
+                field(Inventory;Inventory)
+                {
+                }
+                field("Register No.";"Register No.")
+                {
+                }
+                field("Customer Price Group";"Customer Price Group")
+                {
+                }
+                field("Customer Disc. Group";"Customer Disc. Group")
+                {
+                }
+                field("New Item No.";"New Item No.")
+                {
+                    Visible = false;
+                }
+                field("Serial No.";"Serial No.")
+                {
+                }
+                field("Variant Code";"Variant Code")
+                {
+                }
+                field("Description 2";"Description 2")
+                {
+                    Visible = false;
+                }
+                field("Base Unit of measure";"Base Unit of measure")
+                {
+                    Visible = false;
+                }
+                field("Purch. Unit of measure";"Purch. Unit of measure")
+                {
+                    Visible = false;
+                }
+                field("Sales Unit of measure";"Sales Unit of measure")
+                {
+                    Visible = false;
+                }
+                field("Quantity for Discount Calc";"Quantity for Discount Calc")
+                {
+                }
+                field("Discount Type";"Discount Type")
+                {
+                }
+                field("Discount Code";"Discount Code")
+                {
+                }
+                field("Variant Code 2";"Variant Code")
+                {
+                    Visible = false;
+                }
+                field("Discount Pct.";"Discount Pct.")
+                {
+                }
+                field("Discount Price Incl. Vat";"Discount Price Incl. Vat")
+                {
+                }
+                field("Discount Price Excl. VAT";"Discount Price Excl. VAT")
+                {
+                    Editable = false;
+                }
+                field("Unit List Price";"Unit List Price")
+                {
+                }
+                field("VAT %";"VAT %")
+                {
+                    Editable = false;
+                }
+                field("Item group";"Item group")
+                {
+                    Visible = false;
+                }
+                field(Control6014407;"Vendor No.")
+                {
+                    ShowCaption = false;
+                    Visible = false;
+                }
+                field("Vendor Name";"Vendor Name")
+                {
+                    Editable = false;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        if PAGE.RunModal(PAGE::"Vendor List", Vendor) = ACTION::LookupOK then begin
+                          "Vendor No." := Vendor."No.";
+                          vendorName := Vendor.Name;
+                          Modify(true);
+                        end;
+                    end;
+                }
+                field("Net Change";"Net Change")
+                {
+                }
+                field("Purchases (Qty.)";"Purchases (Qty.)")
+                {
+                }
+                field("Sales (Qty.)";"Sales (Qty.)")
+                {
+                }
+                field("Cannot edit unit price";"Cannot edit unit price")
+                {
+                    Visible = false;
+                }
+                field("Exchange Label";"Exchange Label")
+                {
+
+                    trigger OnValidate()
+                    begin
+                        //-NPR5.50 [350435]
+                        CurrPage.Update;
+                        //+NPR5.50 [350435]
+                    end;
                 }
             }
         }

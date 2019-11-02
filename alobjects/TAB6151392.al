@@ -1,8 +1,11 @@
 table 6151392 "CS Stock-Takes Data"
 {
     // NPR5.50/CLVA/20190304  CASE 332844 Object created
+    // NPR5.52/CLVA/20190909  CASE 364063 Added field Area
 
     Caption = 'CS Stock-Takes Data';
+    DrillDownPageID = "CS Stock-Takes Data List";
+    LookupPageID = "CS Stock-Takes Data List";
 
     fields
     {
@@ -94,6 +97,12 @@ table 6151392 "CS Stock-Takes Data"
         field(24;"Stock-Take Config Code";Code[10])
         {
             Caption = 'Stock-Take Config Code';
+        }
+        field(25;"Area";Option)
+        {
+            Caption = 'Area';
+            OptionCaption = 'Warehouse,Salesfloor,Stockroom';
+            OptionMembers = Warehouse,Salesfloor,Stockroom;
         }
     }
 

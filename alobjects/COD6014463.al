@@ -6,6 +6,7 @@ codeunit 6014463 "Sales-Post and Pdf2Nav"
     // NPR5.49/BHR /20190118 CASE 341617 Correction to print report based on setup
     // NPR5.51/BHR /20190513 CASE 353687 Reverted changes to case 341617
     // NPR5.51/THRO/20190818 CASE 365016 Commit before sending email - to allow popup with email confirmation
+    // NPR5.52/MMV /20191004 CASE 352473 Added support for handling prepayment documents.
 
     TableNo = "Sales Header";
 
@@ -30,6 +31,7 @@ codeunit 6014463 "Sales-Post and Pdf2Nav"
         DownloadInvoiceAlsoQst: Label 'You can also download the Sales - Invoice document now. Alternatively, you can access it from the Posted Sales Invoices window later.\\Do you want to download the Sales - Invoice document now?';
         DownloadCrMemoAlsoQst: Label 'You can also download the Sales - Credit Memo document now. Alternatively, you can access it from the Posted Sales Credit Memos window later.\\Do you want to download the Sales - Credit Memo document now?';
         SkipPrintHandling: Boolean;
+        Mode: Option Standard,PrepaymentInvoice,PrepaymentCreditMemo;
 
     local procedure "Code"()
     var
@@ -68,6 +70,9 @@ codeunit 6014463 "Sales-Post and Pdf2Nav"
             SalesPostViaJobQueue.EnqueueSalesDoc(SalesHeader)
           else begin
             CODEUNIT.Run(CODEUNIT::"Sales-Post",SalesHeader);
+        //-NPR5.52 [352473]
+            Mode := Mode::Standard;
+        //+NPR5.52 [352473]
             GetReport(SalesHeader);
           end;
           Commit;
@@ -80,78 +85,87 @@ codeunit 6014463 "Sales-Post and Pdf2Nav"
         CustomReportID: Integer;
         OrderPrinted: Boolean;
     begin
-        //-PN1.10
+
         Commit;
-        //+PN1.10
-        //-NPR5.39 [294224]
+
+
         SalesHeader.Copy(SalesHeader2);
-        //+NPR5.39 [294224]
-        with SalesHeader do
-          case "Document Type" of
-            "Document Type"::Order:
-              begin
-                if Ship then begin
-                  SalesShptHeader."No." := "Last Shipping No.";
-                  SalesShptHeader.SetRecFilter;
-        //-NPR5.39 [299380]
-                  OrderPrinted := HandleReport(ReportSelection.Usage::"S.Shipment");
-        //+NPR5.39 [299380]
-                end;
-        //-NPR5.39 [299380]
-        //        IF IsPrintingBothDocumentsForNonWindowsClient(Ship AND Invoice) THEN
-                if IsPrintingBothDocumentsForNonWindowsClient(Ship and Invoice and OrderPrinted) then
-        //+NPR5.39 [299380]
-                  if not Confirm(DownloadInvoiceAlsoQst,true) then
-                    exit;
-                if Invoice then begin
-                  SalesInvHeader."No." := "Last Posting No.";
-                  SalesInvHeader.SetRecFilter;
-                  HandleReport(ReportSelection.Usage::"S.Invoice");
-                end;
-              end;
-            "Document Type"::Invoice:
-              begin
-                if "Last Posting No." = '' then
-                  SalesInvHeader."No." := "No."
-                else
-                  SalesInvHeader."No." := "Last Posting No.";
-                SalesInvHeader.SetRecFilter;
 
-                HandleReport(ReportSelection.Usage::"S.Invoice");
-              end;
-            "Document Type"::"Return Order":
-              begin
-                if Receive then begin
-                  ReturnRcptHeader."No." := "Last Return Receipt No.";
-                  ReturnRcptHeader.SetRecFilter;
-        //-NPR5.39 [299380]
-                  OrderPrinted := HandleReport(ReportSelection.Usage::"S.Ret.Rcpt.");
-        //+NPR5.39 [299380]
-                end;
-        //-NPR5.39 [299380]
-        //        IF IsPrintingBothDocumentsForNonWindowsClient(Ship AND Invoice) THEN
-                if IsPrintingBothDocumentsForNonWindowsClient(Ship and Invoice and OrderPrinted) then
-        //+NPR5.39 [299380]
-                  if not Confirm(DownloadCrMemoAlsoQst,true) then
-                    exit;
-                if Invoice then begin
-                  SalesCrMemoHeader."No." := "Last Posting No.";
-                  SalesCrMemoHeader.SetRecFilter;
+        //-NPR5.52 [352473]
+        case Mode of
+          Mode::PrepaymentInvoice :
+            begin
+              SalesInvHeader."No." := SalesHeader."Last Prepayment No.";
+              SalesInvHeader.SetRecFilter;
+              HandleReport(ReportSelection.Usage::"S.Invoice");
+            end;
+          Mode::PrepaymentCreditMemo :
+            begin
+              SalesCrMemoHeader."No." := SalesHeader."Last Prepmt. Cr. Memo No.";
+              SalesCrMemoHeader.SetRecFilter;
+              HandleReport(ReportSelection.Usage::"S.Cr.Memo");
+            end;
+          Mode::Standard :
+            begin
+        //+NPR5.52 [352473]
+              with SalesHeader do
+                case "Document Type" of
+                  "Document Type"::Order:
+                    begin
+                      if Ship then begin
+                        SalesShptHeader."No." := "Last Shipping No.";
+                        SalesShptHeader.SetRecFilter;
+                        OrderPrinted := HandleReport(ReportSelection.Usage::"S.Shipment");
+                      end;
+                      if IsPrintingBothDocumentsForNonWindowsClient(Ship and Invoice and OrderPrinted) then
+                        if not Confirm(DownloadInvoiceAlsoQst,true) then
+                          exit;
+                      if Invoice then begin
+                        SalesInvHeader."No." := "Last Posting No.";
+                        SalesInvHeader.SetRecFilter;
+                        HandleReport(ReportSelection.Usage::"S.Invoice");
+                      end;
+                    end;
+                  "Document Type"::Invoice:
+                    begin
+                      if "Last Posting No." = '' then
+                        SalesInvHeader."No." := "No."
+                      else
+                        SalesInvHeader."No." := "Last Posting No.";
+                      SalesInvHeader.SetRecFilter;
 
-                  HandleReport(ReportSelection.Usage::"S.Cr.Memo");
-                end;
-              end;
-            "Document Type"::"Credit Memo":
-              begin
-                if "Last Posting No." = '' then
-                  SalesCrMemoHeader."No." := "No."
-                else
-                  SalesCrMemoHeader."No." := "Last Posting No.";
-                SalesCrMemoHeader.SetRecFilter;
+                      HandleReport(ReportSelection.Usage::"S.Invoice");
+                    end;
+                  "Document Type"::"Return Order":
+                    begin
+                      if Receive then begin
+                        ReturnRcptHeader."No." := "Last Return Receipt No.";
+                        ReturnRcptHeader.SetRecFilter;
+                        OrderPrinted := HandleReport(ReportSelection.Usage::"S.Ret.Rcpt.");
+                      end;
+                      if IsPrintingBothDocumentsForNonWindowsClient(Ship and Invoice and OrderPrinted) then
+                        if not Confirm(DownloadCrMemoAlsoQst,true) then
+                          exit;
+                      if Invoice then begin
+                        SalesCrMemoHeader."No." := "Last Posting No.";
+                        SalesCrMemoHeader.SetRecFilter;
 
-                HandleReport(ReportSelection.Usage::"S.Cr.Memo");
-              end;
-          end;
+                        HandleReport(ReportSelection.Usage::"S.Cr.Memo");
+                      end;
+                    end;
+                  "Document Type"::"Credit Memo":
+                    begin
+                      if "Last Posting No." = '' then
+                        SalesCrMemoHeader."No." := "No."
+                      else
+                        SalesCrMemoHeader."No." := "Last Posting No.";
+                      SalesCrMemoHeader.SetRecFilter;
+
+                      HandleReport(ReportSelection.Usage::"S.Cr.Memo");
+                    end;
+                end;
+            end;
+        end;
     end;
 
     local procedure ConfirmationMessage(): Text
@@ -277,6 +291,13 @@ codeunit 6014463 "Sales-Post and Pdf2Nav"
         //-NPR5.39 [299380]
         SkipPrintHandling := true;
         //+NPR5.39 [299380]
+    end;
+
+    procedure SetMode(NewMode: Integer)
+    begin
+        //-NPR5.52 [352473]
+        Mode := NewMode;
+        //+NPR5.52 [352473]
     end;
 }
 

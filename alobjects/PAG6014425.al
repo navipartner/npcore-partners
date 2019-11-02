@@ -93,6 +93,8 @@ page 6014425 "Retail Item Card"
     // MAG2.22/MHA /20190625  CASE 359285 Added field 6151500 "Magento Picture Variety Type"
     // NPR5.51/ZESO/20190828  CASE 365796 Added field 6014642 Shelf Label Type
     // NPR5.51/JAKUBV/20190904  CASE 361514 Transport NPR5.51 - 3 September 2019
+    // NPR5.52/ANPA/20191001  CASE 367476 Removed field "Units", "Barcodes" and "Reperation" in pageaction Related
+    // NPR5.52/SARA/20191014  CASE 372089 Redesign Magento fasttab for webclient
 
     Caption = 'Item Card NP Retail';
     PageType = Card;
@@ -1808,171 +1810,175 @@ page 6014425 "Retail Item Card"
             {
                 Caption = 'Magento';
                 Visible = MagentoEnabled;
-                field("Magento Item";"Magento Item")
+                group(Control6014404)
                 {
-                    Importance = Promoted;
+                    ShowCaption = false;
+                    field("Magento Item";"Magento Item")
+                    {
+                        Importance = Promoted;
 
-                    trigger OnValidate()
-                    begin
-                        //-MAG1.21
-                        //SetMagentoVisible();
-                        SetMagentoEnabled();
-                        //+MAG1.21
-                    end;
-                }
-                field("Magento Status";"Magento Status")
-                {
-                    Importance = Promoted;
-                }
-                field("Magento Name";"Magento Name")
-                {
-
-                    trigger OnValidate()
-                    begin
-                        //-MAG2.00
-                        //IF "Seo Link" <> '' THEN
-                        //  IF NOT CONFIRM(Text6059800,FALSE) THEN
-                        //    EXIT;
-                        //VALIDATE("Seo Link","Webshop Name");
-                        if "Seo Link" <> '' then
-                          if not Confirm(Text6151400,false) then
-                            exit;
-                        Validate("Seo Link","Magento Name");
-                        //+MAG2.00
-                    end;
-                }
-                field("FORMAT(""Magento Description"".HASVALUE)";Format("Magento Description".HasValue))
-                {
-                    Caption = 'Magento Description';
-
-                    trigger OnAssistEdit()
-                    var
-                        MagentoFunctions: Codeunit "Magento Functions";
-                        RecRef: RecordRef;
-                        FieldRef: FieldRef;
-                    begin
-                        RecRef.GetTable(Rec);
-                        //-MAG2.00
-                        //FieldRef := RecRef.FIELD(FIELDNO("Webshop Description"));
-                        FieldRef := RecRef.Field(FieldNo("Magento Description"));
-                        //+MAG2.00
-                        if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                          RecRef.SetTable(Rec);
-                          Modify(true);
-                          //-MAG1.22
-                          //MagentoItemMgt.TestItem(Rec);
-                          //+MAG1.22
+                        trigger OnValidate()
+                        begin
+                            //-MAG1.21
+                            //SetMagentoVisible();
+                            SetMagentoEnabled();
+                            //+MAG1.21
                         end;
-                    end;
-                }
-                field("FORMAT(""Magento Short Description"".HASVALUE)";Format("Magento Short Description".HasValue))
-                {
-                    Caption = 'Magento Short Description';
+                    }
+                    field("Magento Status";"Magento Status")
+                    {
+                        Importance = Promoted;
+                    }
+                    field("Magento Name";"Magento Name")
+                    {
 
-                    trigger OnAssistEdit()
-                    var
-                        MagentoFunctions: Codeunit "Magento Functions";
-                        RecRef: RecordRef;
-                        FieldRef: FieldRef;
-                    begin
-                        RecRef.GetTable(Rec);
-                        //-MAG2.00
-                        //FieldRef := RecRef.FIELD(FIELDNO("Webshop Short Description"));
-                        FieldRef := RecRef.Field(FieldNo("Magento Short Description"));
-                        //+MAG2.00
-                        if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
-                          RecRef.SetTable(Rec);
-                          Modify(true);
-                          //-MAG1.22
-                          ////-MAG1.18
-                          //MagentoItemMgt.TestItem(Rec);
-                          ////+MAG1.18
-                          //+MAG1.22
+                        trigger OnValidate()
+                        begin
+                            //-MAG2.00
+                            //IF "Seo Link" <> '' THEN
+                            //  IF NOT CONFIRM(Text6059800,FALSE) THEN
+                            //    EXIT;
+                            //VALIDATE("Seo Link","Webshop Name");
+                            if "Seo Link" <> '' then
+                              if not Confirm(Text6151400,false) then
+                                exit;
+                            Validate("Seo Link","Magento Name");
+                            //+MAG2.00
                         end;
-                    end;
-                }
-                field("Magento Brand";"Magento Brand")
-                {
-                    Visible = MagentoEnabledBrand;
-                }
-                field(MagentoUnitPrice;"Unit Price")
-                {
-                    Importance = Promoted;
-                }
-                field("Product New From";"Product New From")
-                {
-                }
-                field("Product New To";"Product New To")
-                {
-                }
-                field("Featured From";"Featured From")
-                {
-                }
-                field("Featured To";"Featured To")
-                {
-                }
-                field("Special Price";"Special Price")
-                {
-                    Visible = MagentoEnabledSpecialPrices;
-                }
-                field("Special Price From";"Special Price From")
-                {
-                    Visible = MagentoEnabledSpecialPrices;
-                }
-                field("Special Price To";"Special Price To")
-                {
-                    Visible = MagentoEnabledSpecialPrices;
-                }
-                field("Custom Options";"Custom Options")
-                {
-                    Visible = MagentoEnabledCustomOptions;
+                    }
+                    field("FORMAT(""Magento Description"".HASVALUE)";Format("Magento Description".HasValue))
+                    {
+                        Caption = 'Magento Description';
 
-                    trigger OnAssistEdit()
-                    var
-                        MagentoFunctions: Codeunit "Magento Functions";
-                        MagentoItemCustomOptions: Page "Magento Item Custom Options";
-                    begin
-                        //-MAG1.22
-                        Clear(MagentoItemCustomOptions);
-                        MagentoItemCustomOptions.SetItemNo("No.");
-                        MagentoItemCustomOptions.Run;
-                        //+MAG1.22
-                    end;
-                }
-                field(Backorder;Backorder)
-                {
-                }
-                field("Display Only";"Display Only")
-                {
-                    ToolTip = 'test';
-                }
-                field("Seo Link";"Seo Link")
-                {
-                }
-                field("Meta Title";"Meta Title")
-                {
-                }
-                field("Meta Description";"Meta Description")
-                {
-                }
-                field("Attribute Set ID";"Attribute Set ID")
-                {
-                    AssistEdit = true;
-                    Editable = NOT "Magento Item";
-                    Visible = MagentoEnabledAttributeSet;
-
-                    trigger OnAssistEdit()
-                    var
-                        MagentoAttributeSetMgt: Codeunit "Magento Attribute Set Mgt.";
-                    begin
-                        if "Attribute Set ID" <> 0 then begin
-                          CurrPage.Update(true);
-                          //-MAG1.21
-                          //MagentoAttributeSetMgt.EditItemAttributes("No.",'',FALSE);
-                          MagentoAttributeSetMgt.EditItemAttributes("No.",'');
-                          //+MAG1.21
+                        trigger OnAssistEdit()
+                        var
+                            MagentoFunctions: Codeunit "Magento Functions";
+                            RecRef: RecordRef;
+                            FieldRef: FieldRef;
+                        begin
+                            RecRef.GetTable(Rec);
+                            //-MAG2.00
+                            //FieldRef := RecRef.FIELD(FIELDNO("Webshop Description"));
+                            FieldRef := RecRef.Field(FieldNo("Magento Description"));
+                            //+MAG2.00
+                            if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
+                              RecRef.SetTable(Rec);
+                              Modify(true);
+                              //-MAG1.22
+                              //MagentoItemMgt.TestItem(Rec);
+                              //+MAG1.22
+                            end;
                         end;
-                    end;
+                    }
+                    field("FORMAT(""Magento Short Description"".HASVALUE)";Format("Magento Short Description".HasValue))
+                    {
+                        Caption = 'Magento Short Description';
+
+                        trigger OnAssistEdit()
+                        var
+                            MagentoFunctions: Codeunit "Magento Functions";
+                            RecRef: RecordRef;
+                            FieldRef: FieldRef;
+                        begin
+                            RecRef.GetTable(Rec);
+                            //-MAG2.00
+                            //FieldRef := RecRef.FIELD(FIELDNO("Webshop Short Description"));
+                            FieldRef := RecRef.Field(FieldNo("Magento Short Description"));
+                            //+MAG2.00
+                            if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
+                              RecRef.SetTable(Rec);
+                              Modify(true);
+                              //-MAG1.22
+                              ////-MAG1.18
+                              //MagentoItemMgt.TestItem(Rec);
+                              ////+MAG1.18
+                              //+MAG1.22
+                            end;
+                        end;
+                    }
+                    field("Magento Brand";"Magento Brand")
+                    {
+                        Visible = MagentoEnabledBrand;
+                    }
+                    field(MagentoUnitPrice;"Unit Price")
+                    {
+                        Importance = Promoted;
+                    }
+                    field("Product New From";"Product New From")
+                    {
+                    }
+                    field("Product New To";"Product New To")
+                    {
+                    }
+                    field("Featured From";"Featured From")
+                    {
+                    }
+                    field("Featured To";"Featured To")
+                    {
+                    }
+                    field("Special Price";"Special Price")
+                    {
+                        Visible = MagentoEnabledSpecialPrices;
+                    }
+                    field("Special Price From";"Special Price From")
+                    {
+                        Visible = MagentoEnabledSpecialPrices;
+                    }
+                    field("Special Price To";"Special Price To")
+                    {
+                        Visible = MagentoEnabledSpecialPrices;
+                    }
+                    field("Custom Options";"Custom Options")
+                    {
+                        Visible = MagentoEnabledCustomOptions;
+
+                        trigger OnAssistEdit()
+                        var
+                            MagentoFunctions: Codeunit "Magento Functions";
+                            MagentoItemCustomOptions: Page "Magento Item Custom Options";
+                        begin
+                            //-MAG1.22
+                            Clear(MagentoItemCustomOptions);
+                            MagentoItemCustomOptions.SetItemNo("No.");
+                            MagentoItemCustomOptions.Run;
+                            //+MAG1.22
+                        end;
+                    }
+                    field(Backorder;Backorder)
+                    {
+                    }
+                    field("Display Only";"Display Only")
+                    {
+                        ToolTip = 'test';
+                    }
+                    field("Seo Link";"Seo Link")
+                    {
+                    }
+                    field("Meta Title";"Meta Title")
+                    {
+                    }
+                    field("Meta Description";"Meta Description")
+                    {
+                    }
+                    field("Attribute Set ID";"Attribute Set ID")
+                    {
+                        AssistEdit = true;
+                        Editable = NOT "Magento Item";
+                        Visible = MagentoEnabledAttributeSet;
+
+                        trigger OnAssistEdit()
+                        var
+                            MagentoAttributeSetMgt: Codeunit "Magento Attribute Set Mgt.";
+                        begin
+                            if "Attribute Set ID" <> 0 then begin
+                              CurrPage.Update(true);
+                              //-MAG1.21
+                              //MagentoAttributeSetMgt.EditItemAttributes("No.",'',FALSE);
+                              MagentoAttributeSetMgt.EditItemAttributes("No.",'');
+                              //+MAG1.21
+                            end;
+                        end;
+                    }
                 }
                 group(Control6151430)
                 {
@@ -3011,26 +3017,8 @@ page 6014425 "Retail Item Card"
                         PAGE.RunModal(PAGE::"Accessory List",AccessorySparePart);
                     end;
                 }
-                action(Units)
-                {
-                    Caption = 'Units';
-                    Image = UnitOfMeasure;
-                    RunObject = Page "Item Units of Measure";
-                    RunPageLink = "Item No."=FIELD("No.");
-                }
                 separator(Separator6150694)
                 {
-                }
-                action(Barcodes)
-                {
-                    Caption = 'Barcodes';
-                    Image = BarCode;
-                    RunObject = Page "Alternative Number";
-                    RunPageLink = Code=FIELD("No."),
-                                  Type=CONST(Item);
-                    RunPageView = SORTING(Type,Code,"Alt. No.")
-                                  ORDER(Ascending);
-                    ShortCutKey = 'Ctrl+A';
                 }
                 action("POS Info")
                 {
@@ -3039,13 +3027,6 @@ page 6014425 "Retail Item Card"
                     RunObject = Page "POS Info Links";
                     RunPageLink = "Table ID"=CONST(27),
                                   "Primary Key"=FIELD("No.");
-                }
-                action(Reparation)
-                {
-                    Caption = 'Reparation';
-                    Image = ServiceZone;
-                    RunObject = Page "Customer Repair List";
-                    RunPageLink = Field50100=FIELD("No.");
                 }
             }
             group("Price Management")

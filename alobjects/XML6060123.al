@@ -3,6 +3,7 @@ xmlport 6060123 "TM Ticket TicketServer Request"
     // TM1.26/NPKNAV/20171122  CASE 285601-01 Transport TM1.26 - 22 November 2017
     // TM1.35/TSA /20180712 CASE 320783 Added Elements Valid From and Valid To
     // TM1.35/TSA /20180712 CASE 320783 Changed to XML date / time format
+    // TM1.43/TSA /20191004 CASE 367471 Refactored and reworked message signatures to be able to return fault reason
 
     Caption = 'Ticket TicketServer Request';
     Encoding = UTF8;
@@ -100,11 +101,15 @@ xmlport 6060123 "TM Ticket TicketServer Request"
 
                         GeneralLedgerSetup.Get ();
 
-                        TicketSetup.Get ();
-                        TicketSetup.TestField ("Default Ticket Language");
+                        //-TM1.43 [367471]
+                        // TicketSetup.GET ();
+                        // TicketSetup.TESTFIELD ("Default Ticket Language");
+                        //
+                        // TicketType.GET (TmpTicket."Ticket Type Code");
+                        // TicketType.TESTFIELD ("DIY Print Layout Code");
 
                         TicketType.Get (TmpTicket."Ticket Type Code");
-                        TicketType.TestField ("DIY Print Layout Code");
+                        //+TM1.43 [367471]
 
                         Item.Get (TmpTicket."Item No.");
 
@@ -192,15 +197,28 @@ xmlport 6060123 "TM Ticket TicketServer Request"
         AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
         DefaultAdmissionCode: Code[20];
 
-    procedure SetRequestEntryNo(Token: Text[100];MarkTicketAsPrinted: Boolean)
+    procedure SetRequestEntryNo(Token: Text[100];MarkTicketAsPrinted: Boolean;var FailureReason: Text): Boolean
     var
         TicketReservationRequest: Record "TM Ticket Reservation Request";
         Ticket: Record "TM Ticket";
     begin
 
         TicketReservationRequest.SetFilter ("Session Token ID", '=%1', Token);
-        if (not TicketReservationRequest.FindSet ()) then
-          exit;
+        //-TM1.43 [367471]
+        // IF (NOT TicketReservationRequest.FINDSET ()) THEN
+        //  EXIT;
+
+        if (not TicketReservationRequest.FindSet ()) then begin
+          FailureReason := 'Invalid Token.';
+          exit (false);
+        end;
+
+        TicketSetup.Get ();
+        if (TicketSetup."Default Ticket Language" = '') then begin
+          FailureReason := 'Ticket Setup."Default Ticket Language" must not be blank.';
+          exit (false);
+        end;
+
 
         repeat
           TmpTicketReservationRequest.TransferFields (TicketReservationRequest, true);
@@ -211,6 +229,14 @@ xmlport 6060123 "TM Ticket TicketServer Request"
 
             repeat
               TmpTicket.TransferFields (Ticket, true);
+              //-TM1.43 [367471]
+              TicketType.Get (TmpTicket."Ticket Type Code");
+              if (TicketType."DIY Print Layout Code" = '') then begin
+                FailureReason := StrSubstNo ('"DIY Print Layout Code" must not blank for "Ticket Type" %1.', TmpTicket."Ticket Type Code");
+                exit (false);
+              end;
+              //+TM1.43 [367471]
+
               if (TmpTicket.Insert()) then begin
                 Ticket."Printed Date" := Today;
                 if (MarkTicketAsPrinted) then
@@ -220,6 +246,10 @@ xmlport 6060123 "TM Ticket TicketServer Request"
 
           end;
         until (TicketReservationRequest.Next () = 0);
+
+        //-TM1.43 [367471]
+        exit (true);
+        //+TM1.43 [367471]
     end;
 }
 

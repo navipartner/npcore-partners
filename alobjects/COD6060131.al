@@ -63,6 +63,7 @@ codeunit 6060131 "MM Member Retail Integration"
     // MM1.40/TSA /20190614 CASE 358685 Changed subscriber for membership activation that are invoiced to customer
     // MM1.40/TSA /20190730 CASE 360275 Added AdmitMembersOnEndOfSalesWorker(), removed AdmittMembersOnCreateMembership(), corrected spelling of "admit"
     // MM1.40/TSA /20190830 CASE 360242 Added a confirm when printing membercard that is blocked
+    // MM1.41/TSA /20190910 CASE 368136 Discontinuing old code
 
 
     trigger OnRun()
@@ -106,10 +107,6 @@ codeunit 6060131 "MM Member Retail Integration"
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
         NOT_SUPPORTED_FOR_REMOTE: Label 'This membership action is not supported for a remote membership';
         CONFIRM_CARD_BLOCKED: Label 'This membercard is blocked, do you want to continue anyway?';
-
-    local procedure SetPOSMemberForSales()
-    begin
-    end;
 
     procedure POS_ValidateMemberCardNo(FailWithError: Boolean;AllowVerboseMode: Boolean;InputMode: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;ActivateMembership: Boolean;var ExternalMemberCardNo: Text[100]): Boolean
     var
@@ -167,6 +164,7 @@ codeunit 6060131 "MM Member Retail Integration"
         FormatedCardNumber: Text[50];
         FormatedForeignCardNumber: Text[50];
         ShowMemberDialog: Boolean;
+        PageAction: Action;
     begin
 
         //+MM1.36 [335828]
@@ -289,6 +287,7 @@ codeunit 6060131 "MM Member Retail Integration"
             POSMemberCard.LookupMode (true);
             POSMemberCard.SetRecord (Member);
             POSMemberCard.SetMembershipEntryNo (Membership."Entry No.");
+
             if (POSMemberCard.RunModal() <> ACTION::LookupOK) then
               Error ('');
 
@@ -623,20 +622,6 @@ codeunit 6060131 "MM Member Retail Integration"
           Error (TICKET_NOT_FOUND);
 
         exit (0);
-    end;
-
-    procedure GetMemberNoFromExternalCardNo(ExternalCardNo: Text[50];var NotFoundReason: Text) ExtMemberNo: Code[20]
-    var
-        MemberManagement: Codeunit "MM Membership Management";
-        Member: Record "MM Member";
-    begin
-
-        NotFoundReason := '';
-
-        if (not Member.Get (MemberManagement.GetMemberFromExtCardNo (ExternalCardNo, Today, NotFoundReason))) then
-          exit ('');
-
-        exit (Member."External Member No.");
     end;
 
     procedure NewMemberSalesInfoCapture(SaleLinePOS: Record "Sale Line POS") ReturnCode: Integer
@@ -1195,34 +1180,6 @@ codeunit 6060131 "MM Member Retail Integration"
         //+MM1.40 [360275]
     end;
 
-    local procedure UpdateMemberships(var MemberInfoCapture: Record "MM Member Info Capture")
-    var
-        MemberManagement: Codeunit "MM Membership Management";
-        Membership: Record "MM Membership";
-        Member: Record "MM Member";
-        ResponseMessage: Text;
-    begin
-
-        // Filter should be sent in record variable
-        if (MemberInfoCapture.FindSet ()) then begin
-
-          if (not Membership.Get (MemberInfoCapture."Membership Entry No.")) then begin
-            // in the POS, we assume that we now should create it rather then update
-            CreateMemberships (true, MemberInfoCapture, ResponseMessage);
-            exit;
-          end;
-
-          Member.Get (MemberInfoCapture."Member Entry No");
-          MemberManagement.UpdateMember (MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture);
-
-          while (MemberInfoCapture.Next <> 0) do begin
-            Member.Get (MemberInfoCapture."Member Entry No");
-            MemberManagement.UpdateMember (MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture);
-          end;
-
-        end;
-    end;
-
     procedure DeletePreemptiveMembership(ReceiptNo: Code[20];LineNo: Integer)
     var
         MemberInfoCapture: Record "MM Member Info Capture";
@@ -1325,488 +1282,24 @@ codeunit 6060131 "MM Member Retail Integration"
     begin
     end;
 
-    local procedure PrePush_MemberArrival(var SalePOS: Record "Sale POS";var SaleLinePOS: Record "Sale Line POS";var MenuLine: Record "Touch Screen - Menu Lines";var ValueToValidate: Code[50]) ReturnCode: Integer
-    var
-        ResponseMessage: Text;
-        ResponseCode: Integer;
-        MemberLimitationMgr: Codeunit "MM Member Limitation Mgr.";
-    begin
-
-        POS_ValidateMemberCardNo (true, true, 0, true, GlobalExternalCardNo);
-
-        //-NPR5.34 [284653]
-        MemberLimitationMgr.POS_CheckLimitMemberCardArrival (GlobalExternalCardNo, '', 'POS', ResponseMessage, ResponseCode);
-        if (ResponseCode <> 0) then
-          Error (ResponseMessage);
-        //+NPR5.34 [284653]
-
-        ValueToValidate := POS_GetExternalTicketItemFromMembership (GlobalExternalCardNo);
-
-        MenuLine.Parametre := ''; // must be numeric for EnterPush to work, as it evaluates to decimal and means default Qty
-        exit (1); // EnterPush - Process ValueToValidate
-    end;
-
-    local procedure PrePush_MemberArrivalFacialRecognition(var SalePOS: Record "Sale POS";var SaleLinePOS: Record "Sale Line POS";var MenuLine: Record "Touch Screen - Menu Lines";var ValueToValidate: Code[50]) ReturnCode: Integer
-    begin
-
-        POS_ValidateMemberCardNo (true, true, 1, true, GlobalExternalCardNo);
-        ValueToValidate := POS_GetExternalTicketItemFromMembership (GlobalExternalCardNo);
-
-        MenuLine.Parametre := ''; // must be numeric for EnterPush to work, as it evaluates to decimal and means default Qty
-        exit (1); // EnterPush - Process ValueToValidate
-    end;
-
-    local procedure PrePush_SetMemberNumber(var SalePOS: Record "Sale POS";var SaleLinePOS: Record "Sale Line POS";var MenuLine: Record "Touch Screen - Menu Lines";var ValueToValidate: Code[50]) ReturnCode: Integer
-    var
-        MembershipManagement: Codeunit "MM Membership Management";
-        Membership: Record "MM Membership";
-        NotFoundReasonText: Text;
-    begin
-
-        POS_ValidateMemberCardNo (true, true, 0, false,GlobalExternalCardNo);
-        if (not (Membership.Get (MembershipManagement.GetMembershipFromExtCardNo (GlobalExternalCardNo, Today, NotFoundReasonText)))) then
-          exit (-1104);
-
-        if (Membership."Customer No." <> '') then
-          SalePOS.Validate ("Customer No.", Membership."Customer No.");
-
-        exit (0);
-    end;
-
-    local procedure PrePush_CancelMembership(var SalePOS: Record "Sale POS";var SaleLinePOS: Record "Sale Line POS";var MenuLine: Record "Touch Screen - Menu Lines";var ValueToValidate: Code[50]) ReturnCode: Integer
-    var
-        MembershipManagement: Codeunit "MM Membership Management";
-        MembershipAlterationSetup: Record "MM Membership Alteration Setup";
-        ItemNo: Code[20];
-        ExternalCardNo: Text[100];
-    begin
-
-        POS_ValidateMemberCardNo (true, true, 0, false, ExternalCardNo);
-        DeleteMemberInfoCapture (SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
-
-        ItemNo := GetAlterMembershipItemSelection (MembershipAlterationSetup."Alteration Type"::CANCEL, ExternalCardNo, Today, CANCEL_NOT_VALID);
-        if (ItemNo = '') then
-          Error ('');
-
-        GlobalMemberInfoEntryNo := MembershipManagement.CreateCancelMemberInfoRequest (ExternalCardNo, ItemNo);
-        ValueToValidate := StrSubstNo ('%1', ItemNo);
-        MenuLine.Parametre := ''; // must be numeric for EnterPush to work, as it evaluates to decimal and means default Qty
-
-        exit (1); // EnterPush - Process ValueToValidate
-    end;
-
-    local procedure PrePush_RenewMembership(var SalePOS: Record "Sale POS";var SaleLinePOS: Record "Sale Line POS";var MenuLine: Record "Touch Screen - Menu Lines";var ValueToValidate: Code[50]) ReturnCode: Integer
-    var
-        MembershipManagement: Codeunit "MM Membership Management";
-        MembershipAlterationSetup: Record "MM Membership Alteration Setup";
-        ItemNo: Code[20];
-        ExternalCardNo: Text[100];
-    begin
-
-        POS_ValidateMemberCardNo (false, true, 0, false, ExternalCardNo);
-        DeleteMemberInfoCapture (SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
-
-        ItemNo := GetAlterMembershipItemSelection (MembershipAlterationSetup."Alteration Type"::RENEW, ExternalCardNo, Today, RENEW_NOT_VALID);
-        if (ItemNo = '') then
-          Error ('');
-
-        GlobalMemberInfoEntryNo := MembershipManagement.CreateRenewMemberInfoRequest (ExternalCardNo, ItemNo);
-        ValueToValidate := StrSubstNo ('%1', ItemNo);
-        MenuLine.Parametre := ''; // must be numeric for EnterPush to work, as it evaluates to decimal and means default Qty
-
-        exit (1); // EnterPush - Process ValueToValidate
-    end;
-
-    local procedure PrePush_ExtendMembership(var SalePOS: Record "Sale POS";var SaleLinePOS: Record "Sale Line POS";var MenuLine: Record "Touch Screen - Menu Lines";var ValueToValidate: Code[50]) ReturnCode: Integer
-    var
-        MembershipManagement: Codeunit "MM Membership Management";
-        MembershipAlterationSetup: Record "MM Membership Alteration Setup";
-        ItemNo: Code[20];
-        ExternalCardNo: Text[100];
-    begin
-
-        POS_ValidateMemberCardNo (true, true, 0, false, ExternalCardNo);
-        DeleteMemberInfoCapture (SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
-
-        ItemNo := GetAlterMembershipItemSelection (MembershipAlterationSetup."Alteration Type"::EXTEND, ExternalCardNo, Today, EXTEND_NOT_VALID);
-        if (ItemNo = '') then
-          Error ('');
-
-        GlobalMemberInfoEntryNo := MembershipManagement.CreateExtendMemberInfoRequest (ExternalCardNo, ItemNo);
-        ValueToValidate := StrSubstNo ('%1', ItemNo);
-        MenuLine.Parametre := ''; // must be numeric for EnterPush to work, as it evaluates to decimal and means default Qty
-
-        exit (1); // EnterPush - Process ValueToValidate
-    end;
-
-    local procedure PrePush_UpgradeMembership(var SalePOS: Record "Sale POS";var SaleLinePOS: Record "Sale Line POS";var MenuLine: Record "Touch Screen - Menu Lines";var ValueToValidate: Code[50]) ReturnCode: Integer
-    var
-        MembershipManagement: Codeunit "MM Membership Management";
-        MembershipAlterationSetup: Record "MM Membership Alteration Setup";
-        ItemNo: Code[20];
-        ExternalCardNo: Text[100];
-    begin
-
-        POS_ValidateMemberCardNo (true, true, 0, false, ExternalCardNo);
-        DeleteMemberInfoCapture (SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
-
-        ItemNo := GetAlterMembershipItemSelection (MembershipAlterationSetup."Alteration Type"::UPGRADE, ExternalCardNo, Today, UPGRADE_NOT_VALID);
-        if (ItemNo = '') then
-          Error ('');
-
-        GlobalMemberInfoEntryNo := MembershipManagement.CreateUpgradeMemberInfoRequest (ExternalCardNo, ItemNo);
-
-        ValueToValidate := StrSubstNo ('%1', ItemNo);
-        MenuLine.Parametre := ''; // must be numeric for EnterPush to work, as it evaluates to decimal and means default Qty
-
-        exit (1); // EnterPush - Process ValueToValidate
-    end;
-
-    local procedure PrePush_RegretMembership(var SalePOS: Record "Sale POS";var SaleLinePOS: Record "Sale Line POS";var MenuLine: Record "Touch Screen - Menu Lines";var ValueToValidate: Code[50]) ReturnCode: Integer
-    var
-        MembershipManagement: Codeunit "MM Membership Management";
-        MembershipAlterationSetup: Record "MM Membership Alteration Setup";
-        ItemNo: Code[20];
-        ExternalCardNo: Text[100];
-    begin
-
-        POS_ValidateMemberCardNo (true, true, 0, false, ExternalCardNo);
-        DeleteMemberInfoCapture (SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
-
-        ItemNo := GetAlterMembershipItemSelection (MembershipAlterationSetup."Alteration Type"::REGRET, ExternalCardNo, Today, REGRET_NOT_VALID);
-        if (ItemNo = '') then
-          Error ('');
-
-        GlobalMemberInfoEntryNo := MembershipManagement.CreateRegretMemberInfoRequest (ExternalCardNo, ItemNo);
-
-        ValueToValidate := StrSubstNo ('-1*%1', ItemNo);
-        MenuLine.Parametre := ''; // must be numeric for EnterPush to work, as it evaluates to decimal and means default Qty
-        exit (1); // EnterPush - Process ValueToValidate
-    end;
-
-    local procedure PrePush_LookUpMembershipEntries(var SalePOS: Record "Sale POS";var SaleLinePOS: Record "Sale Line POS";var MenuLine: Record "Touch Screen - Menu Lines";var ValueToValidate: Code[50]): Integer
-    var
-        Membership: Record "MM Membership";
-        MembershipManagement: Codeunit "MM Membership Management";
-        MembershipEntry: Record "MM Membership Entry";
-        LookupRecRef: RecordRef;
-        TmpRetailList: Record "Retail List" temporary;
-        LineNo: Integer;
-        NotFoundReasonText: Text;
-    begin
-
-        POS_ValidateMemberCardNo (false, false, 0, false, GlobalExternalCardNo);
-
-        if (not Membership.Get (MembershipManagement.GetMembershipFromExtCardNo (GlobalExternalCardNo, Today, NotFoundReasonText))) then
-          if (NotFoundReasonText <> '') then
-            Error (NotFoundReasonText)
-          else
-            Error (MEMBERSHIP_BLOCKED_NOT_FOUND, GlobalExternalCardNo);
-
-        MembershipEntry.SetCurrentKey ("Entry No.");
-        MembershipEntry.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
-        MembershipEntry.Ascending (false);
-        if (MembershipEntry.FindSet()) then begin
-
-          repeat
-            LineNo += 1;
-            TmpRetailList.Number := LineNo;
-            TmpRetailList.Choice := StrSubstNo ('%1: (%2) period %3 => %4', DT2Date (MembershipEntry."Created At"), MembershipEntry.Context, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
-            TmpRetailList.Value := MembershipEntry."Item No.";
-            TmpRetailList.Insert();
-          until (MembershipEntry.Next () = 0);
-
-          LookupRecRef.GetTable(TmpRetailList);
-          UI.DoLookup (SELECT_PRODUCT, LookupRecRef);
-        end;
-
-        MenuLine.Parametre := ''; // must be numeric for EnterPush to work, as it evaluates to decimal and means default Qty
-
-        exit (0);
-    end;
-
     local procedure "--POS"()
     begin
-    end;
-
-    local procedure PromptForMemberGuestArrival(SaleLinePOS: Record "Sale Line POS";MemberTicket: Record "TM Ticket";Token: Text[100];MembershipEntryNo: Integer;MemberNo: Integer)
-    var
-        Membership: Record "MM Membership";
-        Member: Record "MM Member";
-        MembershipAdmissionSetup: Record "MM Membership Admission Setup";
-        TicketReservationRequest: Record "TM Ticket Reservation Request";
-        TmpTicketReservationRequest: Record "TM Ticket Reservation Request" temporary;
-        ItemCrossReference: Record "Item Cross Reference";
-        TicketAdmissionBOM: Record "TM Ticket Admission BOM";
-        TicketRequestManager: Codeunit "TM Ticket Request Manager";
-        TicketRetailManagement: Codeunit "TM Ticket Retail Management";
-        TicketRequestMini: Page "TM Ticket Request Mini";
-        PageAction: Action;
-        ItemNo: Code[20];
-        VariantCode: Code[10];
-        ResolvingTable: Integer;
-        ResponseMessage: Text;
-        ResponseCode: Integer;
-    begin
-
-        //-TM1.19 [266372]
-        if (not Membership.Get (MembershipEntryNo)) then
-          exit;
-
-        if (not Member.Get (MemberNo)) then
-          exit;
-
-        TicketReservationRequest.SetFilter ("Session Token ID", '=%1', Token);
-        if (not TicketReservationRequest.FindFirst ()) then
-          exit;
-
-        MembershipAdmissionSetup.SetFilter ("Membership  Code", '=%1', Membership."Membership Code");
-        if (not MembershipAdmissionSetup.FindSet ()) then
-          exit;
-
-        repeat
-
-          case MembershipAdmissionSetup."Ticket No. Type" of
-            MembershipAdmissionSetup."Ticket No. Type"::ITEM :
-              begin
-                ItemCrossReference.SetFilter ("Item No.", '=%1', MembershipAdmissionSetup."Ticket No.");
-                ItemCrossReference.SetFilter ("Cross-Reference Type", '=%1', ItemCrossReference."Cross-Reference Type"::"Bar Code");
-                ItemCrossReference.SetFilter ("Discontinue Bar Code", '=%1', false);
-                ItemCrossReference.FindFirst ();
-                TmpTicketReservationRequest."External Item Code" := ItemCrossReference."Cross-Reference No.";
-              end;
-
-            MembershipAdmissionSetup."Ticket No. Type"::ITEM_CROSS_REF :
-              begin
-                TmpTicketReservationRequest."External Item Code" := CopyStr (MembershipAdmissionSetup."Ticket No.", 1, MaxStrLen (TmpTicketReservationRequest."External Item Code"));
-              end;
-
-            MembershipAdmissionSetup."Ticket No. Type"::ALTERNATIVE_NUMBER :
-              begin
-                Error ('Alternative numbers are being deprecated. Use Item Cross References instead. MembershipAdmissionSetup %1 %2 %3',
-                  MembershipAdmissionSetup."Membership  Code", MembershipAdmissionSetup."Admission Code", MembershipAdmissionSetup."Ticket No.");
-              end;
-          end;
-
-          TmpTicketReservationRequest."Admission Code" := MembershipAdmissionSetup."Admission Code";
-          TmpTicketReservationRequest."Admission Description" := CopyStr (MembershipAdmissionSetup.Description, 1, MaxStrLen (TmpTicketReservationRequest."Admission Description"));
-
-          TmpTicketReservationRequest."Entry No." += 1;
-          TmpTicketReservationRequest.Insert ();
-
-        until (MembershipAdmissionSetup.Next () = 0);
-
-        Commit;
-        TicketRequestMini.FillRequestTable (TmpTicketReservationRequest);
-        TicketRequestMini.LookupMode (true);
-        PageAction := TicketRequestMini.RunModal ();
-
-        if (not (PageAction = ACTION::LookupOK)) then
-          exit; // cancel from the guest dialog - no guests
-
-        Clear (TmpTicketReservationRequest);
-        TmpTicketReservationRequest.DeleteAll ();
-
-        TicketRequestMini.GetTicketRequest (TmpTicketReservationRequest);
-        TmpTicketReservationRequest.SetFilter (Quantity, '>%1', 0);
-        if (not TmpTicketReservationRequest.FindSet ()) then
-          exit;
-
-        TicketRequestManager.DeleteReservationRequest (Token, false);
-
-        repeat
-          TranslateBarcodeToItemVariant (TmpTicketReservationRequest."External Item Code", ItemNo, VariantCode, ResolvingTable);
-
-          TicketAdmissionBOM.SetFilter ("Item No.", '=%1', ItemNo);
-          TicketAdmissionBOM.SetFilter ("Variant Code", '=%1', VariantCode);
-          if (TmpTicketReservationRequest."Admission Code" <> '') then
-            TicketAdmissionBOM.SetFilter ("Admission Code", '=%1', TmpTicketReservationRequest."Admission Code");
-
-          if (TicketAdmissionBOM.FindSet ()) then begin
-            repeat
-              TicketRequestManager.POS_AppendToReservationRequest (Token,
-                SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.",
-                ItemNo, VariantCode, TicketAdmissionBOM."Admission Code",
-                TmpTicketReservationRequest.Quantity, -1, Member."External Member No.");
-            until (TicketAdmissionBOM.Next () = 0);
-
-          end else begin
-            Error (MEMBERGUEST_TICKET, MembershipAdmissionSetup.TableCaption,
-              MembershipAdmissionSetup."Membership  Code", TmpTicketReservationRequest."Admission Code",
-              StrSubstNo ('%1 [%2;%3]',TmpTicketReservationRequest."External Item Code", ItemNo, VariantCode),
-              TicketAdmissionBOM.TableCaption);
-          end;
-
-        until (TmpTicketReservationRequest.Next() = 0);
-
-        Commit;
-        ResponseMessage := '';
-
-        //-+NPR5.34 [267611]
-        if (TicketRetailManagement.IssueTicket (Token, Member."External Member No.", false, ResponseCode, ResponseMessage, SaleLinePOS, false)) then
-
-        TicketRequestManager.DeleteReservationRequest (Token, false);
-        SaleLinePOS.Delete;
-        Commit;
-        Error (ResponseMessage);
-
-        //+TM1.19 [266372]
-    end;
-
-    local procedure ShowAlterMembershipItemSelection(Type: Option;ExternalCardNo: Text[100];ReferenceDate: Date;NotValidMessage: Text) SalesItemNo: Code[20]
-    var
-        MembershipManagement: Codeunit "MM Membership Management";
-        Membership: Record "MM Membership";
-        MembershipAlterationSetup: Record "MM Membership Alteration Setup";
-        ItemNo: Code[20];
-        NotFoundReasonText: Text;
-    begin
-
-        if (not Membership.Get (MembershipManagement.GetMembershipFromExtCardNo (ExternalCardNo, ReferenceDate, NotFoundReasonText))) then
-          if (NotFoundReasonText <> '') then
-            Error (NotFoundReasonText)
-          else
-            Error (MEMBERSHIP_BLOCKED_NOT_FOUND, ExternalCardNo);
-
-        MembershipAlterationSetup.SetFilter ("Alteration Type", '=%1', Type);
-        MembershipAlterationSetup.SetFilter ("From Membership Code", '=%1', Membership."Membership Code");
-
-        ItemNo := ShowAlterMembershipLookupList (Membership."Entry No.",
-          MembershipAlterationSetup,
-          StrSubstNo (CHANGEMEMBERSHIP_LOOKUP_CAPTION, Format (MembershipAlterationSetup."Alteration Type"), Membership."External Membership No.", Membership."Membership Code"),
-          NotValidMessage);
-
-        exit (ItemNo);
     end;
 
     procedure TouchSalesPrePush(var SalePOS: Record "Sale POS";var SaleLinePOS: Record "Sale Line POS";var MenuLine: Record "Touch Screen - Menu Lines";var ValueToValidate: Code[50]) Result: Integer
     begin
 
-        case UpperCase (MenuLine.Parametre) of
-          'MEMBER_ARRIVAL':     exit (PrePush_MemberArrival (SalePOS, SaleLinePOS, MenuLine, ValueToValidate));
-          'MEMBER_ARRIVAL_FR':  exit (PrePush_MemberArrivalFacialRecognition (SalePOS, SaleLinePOS, MenuLine, ValueToValidate));
-
-          'SET_MEMBERNUMBER':   exit (PrePush_SetMemberNumber (SalePOS, SaleLinePOS, MenuLine, ValueToValidate));
-          'REGRET_MS_ENTRY':    exit (PrePush_RegretMembership (SalePOS, SaleLinePOS, MenuLine, ValueToValidate));
-
-          'RENEW_MEMBERSHIP' :  exit (PrePush_RenewMembership (SalePOS, SaleLinePOS, MenuLine, ValueToValidate));
-          'EXTEND_MEMBERSHIP':  exit (PrePush_ExtendMembership (SalePOS, SaleLinePOS, MenuLine, ValueToValidate));
-          'UPGRADE_MEMBERSHIP': exit (PrePush_UpgradeMembership (SalePOS, SaleLinePOS, MenuLine, ValueToValidate));
-          'CANCEL_MEMBERSHIP':  exit (PrePush_CancelMembership (SalePOS, SaleLinePOS, MenuLine, ValueToValidate));
-          'LOOKUP_MS_ENTRIES':  exit (PrePush_LookUpMembershipEntries (SalePOS, SaleLinePOS, MenuLine, ValueToValidate));
-
-        end;
-
-        exit (0);
+        //-MM1.41 [368136]
+        Error ('This function has been discontinued since MM1.40, codeunit 6060131, TouchSalesPrePush().');
+        //+MM1.41 [368136]
     end;
 
     procedure TouchSalesPostPush(var SalePOS: Record "Sale POS";var SaleLinePOS: Record "Sale Line POS";var MenuLine: Record "Touch Screen - Menu Lines";var PushAction: Text[250];var ValueToValidate: Code[50]) Result: Integer
-    var
-        MembershipManagement: Codeunit "MM Membership Management";
-        MemberInfoCapture: Record "MM Member Info Capture";
-        MembershipAlterationSetup: Record "MM Membership Alteration Setup";
-        NotFoundReason: Text;
-        Ticket: Record "TM Ticket";
-        ExternalMemberNo: Code[20];
-        TicketReservationRequest: Record "TM Ticket Reservation Request";
-        TicketRequestManager: Codeunit "TM Ticket Request Manager";
-        Token: Text[100];
     begin
-        MenuLine.Get (MenuLine."Menu No.", MenuLine.Type, MenuLine."No.");
 
-        case UpperCase (MenuLine.Parametre) of
-          'MEMBER_ARRIVAL',
-          'MEMBER_ARRIVAL_FR' :  begin
-            //-MM1.17 [259001]
-            //SaleLinePOS."Serial No." := GetMemberNoFromExternalCardNo (GlobalExternalCardNo, NotFoundReason);
-            //SaleLinePOS.MODIFY();
-        //    Ticket.SETFILTER ("Sales Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
-        //    Ticket.SETFILTER ("Line No.", '=%1', SaleLinePOS."Line No.");
-        //    IF (NOT Ticket.ISEMPTY ()) THEN
-        //      Ticket.MODIFYALL ("External Member Card No.", GetMemberNoFromExternalCardNo (GlobalExternalCardNo, NotFoundReason));
-            //+MM1.17 [259001]
-
-            //-TM1.19 [266372]
-            ExternalMemberNo := GetMemberNoFromExternalCardNo (GlobalExternalCardNo, NotFoundReason);
-            Ticket.SetFilter ("Sales Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
-            Ticket.SetFilter ("Line No.", '=%1', SaleLinePOS."Line No.");
-            if (Ticket.FindFirst ()) then
-              Ticket.ModifyAll ("External Member Card No.", GetMemberNoFromExternalCardNo (GlobalExternalCardNo, NotFoundReason));
-
-            if (TicketRequestManager.GetTicketToken (Ticket."No.", Token)) then begin
-              TicketReservationRequest.SetFilter ("Session Token ID", '=%1', Token);
-              TicketReservationRequest.ModifyAll ("External Member No.", ExternalMemberNo);
-
-              PromptForMemberGuestArrival (SaleLinePOS, Ticket, Token,
-                MembershipManagement.GetMembershipFromExtCardNo (GlobalExternalCardNo, Today, NotFoundReason),
-                MembershipManagement.GetMemberFromExtCardNo (GlobalExternalCardNo, Today, NotFoundReason) );
-            end;
-            //+TM1.19 [266372]
-
-          end;
-
-          'EDIT_MEMBERINFO' : begin
-            //-MM1.19 [271971]
-            MemberInfoCapture.SetCurrentKey ("Receipt No.", "Line No.");
-            //+MM1.19 [271971]
-            MemberInfoCapture.SetFilter ("Receipt No.", '=%1', SaleLinePOS."Sales Ticket No.");
-            MemberInfoCapture.SetFilter ("Line No.", '=%1', SaleLinePOS."Line No.");
-            if (MemberInfoCapture.IsEmpty ()) then
-              exit (-1105);
-
-            if (DisplayMemberInfoCaptureDialog (SaleLinePOS)) then
-              UpdateMemberships (MemberInfoCapture);
-            exit (0);
-          end;
-
-          'RENEW_MEMBERSHIP' : begin
-            MemberInfoCapture.Get (GlobalMemberInfoEntryNo);
-            MembershipAlterationSetup.Get (MembershipAlterationSetup."Alteration Type"::RENEW, MemberInfoCapture."Membership Code", MemberInfoCapture."Item No.");
-          end;
-
-          'EXTEND_MEMBERSHIP' : begin
-            MemberInfoCapture.Get (GlobalMemberInfoEntryNo);
-            MembershipAlterationSetup.Get (MembershipAlterationSetup."Alteration Type"::EXTEND, MemberInfoCapture."Membership Code", MemberInfoCapture."Item No.");
-          end;
-
-          'UPGRADE_MEMBERSHIP' : begin
-            MemberInfoCapture.Get (GlobalMemberInfoEntryNo);
-            MembershipAlterationSetup.Get (MembershipAlterationSetup."Alteration Type"::UPGRADE, MemberInfoCapture."Membership Code", MemberInfoCapture."Item No.");
-          end;
-
-
-          'CANCEL_MEMBERSHIP' : begin
-            MemberInfoCapture.Get (GlobalMemberInfoEntryNo);
-            MembershipAlterationSetup.Get (MembershipAlterationSetup."Alteration Type"::CANCEL, MemberInfoCapture."Membership Code", MemberInfoCapture."Item No.");
-          end;
-
-          'REGRET_MS_ENTRY' : begin
-            MemberInfoCapture.Get (GlobalMemberInfoEntryNo);
-            MembershipAlterationSetup.Get (MembershipAlterationSetup."Alteration Type"::REGRET, MemberInfoCapture."Membership Code", MemberInfoCapture."Item No.");
-          end;
-        end;
-
-        case UpperCase (MenuLine.Parametre) of
-          'RENEW_MEMBERSHIP',
-          'EXTEND_MEMBERSHIP',
-          'UPGRADE_MEMBERSHIP',
-          'CANCEL_MEMBERSHIP',
-          'REGRET_MS_ENTRY' : begin
-            MemberInfoCapture."Receipt No." :=  SaleLinePOS."Sales Ticket No.";
-            MemberInfoCapture."Line No." := SaleLinePOS."Line No.";
-            MemberInfoCapture.Modify ();
-
-            SaleLinePOS.Description := MembershipAlterationSetup.Description;
-            SaleLinePOS.Validate ("Unit Price", Abs(MemberInfoCapture."Unit Price"));
-            if (MemberInfoCapture."Unit Price" < 0) then
-              SaleLinePOS.Validate (Quantity, -1);
-            SaleLinePOS.Modify ();
-            exit (0);
-          end;
-        end;
-
-
-        exit (0);
+        //-MM1.41 [368136]
+        Error ('This function has been discontinued since MM1.40, codeunit 6060131, TouchSalesPostPush().');
+        //+MM1.41 [368136]
     end;
 
     local procedure "--- OnFinishSale Workflow"()
@@ -1856,112 +1349,6 @@ codeunit 6060131 "MM Member Retail Integration"
         //PrintMembershipSalesReceipt(AuditRoll."Sales Ticket No.");
         PrintMembershipOnEndOfSalesWorker (AuditRoll."Sales Ticket No.", false);
         //-MM1.32 [318132]
-    end;
-
-    local procedure "--GUI"()
-    begin
-    end;
-
-    local procedure GetAlterMembershipItemSelection(Type: Option;ExternalCardNo: Text[100];ReferenceDate: Date;NotValidMessage: Text) SalesItemNo: Code[20]
-    var
-        MembershipManagement: Codeunit "MM Membership Management";
-        Membership: Record "MM Membership";
-        MembershipAlterationSetup: Record "MM Membership Alteration Setup";
-        ItemNo: Code[20];
-        NotFoundReasonText: Text;
-    begin
-
-        if (not Membership.Get (MembershipManagement.GetMembershipFromExtCardNo (ExternalCardNo, ReferenceDate, NotFoundReasonText))) then
-          if (NotFoundReasonText <> '') then
-            Error (NotFoundReasonText)
-          else
-            Error (MEMBERSHIP_BLOCKED_NOT_FOUND, ExternalCardNo);
-
-        MembershipAlterationSetup.SetFilter ("Alteration Type", '=%1', Type);
-        MembershipAlterationSetup.SetFilter ("From Membership Code", '=%1', Membership."Membership Code");
-        if (not MembershipAlterationSetup.FindFirst ()) then
-          Error (NotValidMessage);
-
-        ItemNo := ShowAlterMembershipLookupList (Membership."Entry No.",
-          MembershipAlterationSetup,
-          StrSubstNo (CHANGEMEMBERSHIP_LOOKUP_CAPTION, Format (MembershipAlterationSetup."Alteration Type"), Membership."Membership Code", Membership."External Membership No."),
-          NotValidMessage);
-
-        exit (ItemNo);
-    end;
-
-    local procedure ShowAlterMembershipLookupList(MembershipEntryNo: Integer;var MembershipAlterationSetup: Record "MM Membership Alteration Setup";LookupCaption: Text;NotFoundMessage: Text) ItemNo: Code[20]
-    var
-        TmpMembershipEntry: Record "MM Membership Entry" temporary;
-        MembershipManagement: Codeunit "MM Membership Management";
-    begin
-
-        if (not MembershipAlterationSetup.FindFirst ()) then
-          Error (NotFoundMessage);
-
-        if (not MembershipManagement.GetMembershipChangeOptions (MembershipEntryNo, MembershipAlterationSetup, TmpMembershipEntry)) then
-          Error (NotFoundMessage);
-
-        ItemNo := DoLookupMembershipEntry (LookupCaption, TmpMembershipEntry);
-
-        exit (ItemNo);
-    end;
-
-    local procedure DoLookupRetailList(var TmpRetailList: Record "Retail List" temporary) ItemNo: Code[20]
-    var
-        LookupRecRef: RecordRef;
-        Position: Text;
-    begin
-        ItemNo := '';
-
-        LookupRecRef.GetTable(TmpRetailList);
-        // ConfigureLookupTemplate (Template, LookupRecRef);
-        // Position := Marshaller.Lookup(SELECT_PRODUCT, Template, LookupRecRef);
-        Position := UI.DoLookup (SELECT_PRODUCT, LookupRecRef);
-
-        if (Position <> '') then begin
-          LookupRecRef.SetPosition (Position);
-          if (LookupRecRef.Find ()) then begin
-            LookupRecRef.SetTable (TmpRetailList);
-            ItemNo := TmpRetailList.Value;
-          end;
-        end;
-
-        exit (ItemNo);
-    end;
-
-    local procedure DoLookupMembershipEntry(LookupCaption: Text;var TmpMembershipEntry: Record "MM Membership Entry" temporary) ItemNo: Code[20]
-    var
-        LookupRecRef: RecordRef;
-        Position: Text;
-    begin
-        ItemNo := '';
-
-        LookupRecRef.GetTable(TmpMembershipEntry);
-        //ConfigureLookupTemplate (Template, LookupRecRef);
-        //Position := Marshaller.Lookup(LookupCaption, Template, LookupRecRef);
-        Position := UI.DoLookup (LookupCaption, LookupRecRef);
-
-        if (Position <> '') then begin
-          LookupRecRef.SetPosition (Position);
-          if (LookupRecRef.Find ()) then begin
-            LookupRecRef.SetTable (TmpMembershipEntry);
-            ItemNo := TmpMembershipEntry."Item No.";
-          end;
-        end;
-
-        exit (ItemNo);
-    end;
-
-    local procedure SetReceiptReference(EntryNo: Integer;ReceiptNo: Code[20];LineNo: Integer)
-    var
-        MemberInfoCapture: Record "MM Member Info Capture";
-    begin
-
-        MemberInfoCapture.Get (EntryNo);
-        MemberInfoCapture."Receipt No." :=  ReceiptNo;
-        MemberInfoCapture."Line No." := LineNo;
-        MemberInfoCapture.Modify ();
     end;
 
     local procedure "--Util"()

@@ -1,6 +1,7 @@
 codeunit 6151359 "CS UI Phy. Inv. Journal List"
 {
     // NPR5.51/CLVA  /20190820  CASE 365659 Object created - NP Capture Service
+    // NPR5.52/CLVA  /20190904  CASE 365967 added "Post with Job Queue" functionality
 
     TableNo = "CS UI Header";
 
@@ -110,7 +111,7 @@ codeunit 6151359 "CS UI Phy. Inv. Journal List"
             Error(Text000);
         end;
 
-        if not (FuncGroup.KeyDef in [FuncGroup.KeyDef::Esc,FuncGroup.KeyDef::Input]) then
+        if not (FuncGroup.KeyDef in [FuncGroup.KeyDef::Esc,FuncGroup.KeyDef::Input,FuncGroup.KeyDef::Register]) then
           SendForm(ActiveInputField,ItemJournalBatch);
     end;
 
@@ -124,6 +125,9 @@ codeunit 6151359 "CS UI Phy. Inv. Journal List"
         CSPhysInventoryHandling: Record "CS Phys. Inventory Handling";
         ItemJournalBatch: Record "Item Journal Batch";
         CSSetup: Record "CS Setup";
+        TempItemJournalBatch: Record "Item Journal Batch" temporary;
+        TestRecRef: RecordRef;
+        CSPostingBuffer: Record "CS Posting Buffer";
     begin
         XMLDOMMgt.FindNode(RootNode,'Header/Input',ReturnedNode);
 
@@ -160,6 +164,10 @@ codeunit 6151359 "CS UI Phy. Inv. Journal List"
           ItemJournalBatch.Insert(true);
         end;
 
+        //-NPR5.52 [365967]
+        SelectLatestVersion;
+        //+NPR5.52 [365967]
+
         Clear(ItemJournalBatch);
         ItemJournalBatch.SetRange("Journal Template Name",CSSetup."Phys. Inv Jour Temp Name");
         ItemJournalBatch.SetRange(Name,Location.Code);
@@ -173,10 +181,45 @@ codeunit 6151359 "CS UI Phy. Inv. Journal List"
           CSUIHeader2.SaveXMLin(DOMxmlin);
           CODEUNIT.Run(CSUIHeader2."Handling Codeunit",CSUIHeader2);
         end else begin
-          RecRef.GetTable(ItemJournalBatch);
-          CSCommunication.SetRecRef(RecRef);
-          ActiveInputField := 1;
-          SendForm(ActiveInputField,ItemJournalBatch);
+          //-NPR5.52 [365967]
+          CSSetup.Get;
+          if CSSetup."Post with Job Queue" then begin
+            TempItemJournalBatch.Reset;
+            TempItemJournalBatch.DeleteAll;
+            if ItemJournalBatch.FindFirst then begin
+              repeat
+                TestRecRef.GetTable(ItemJournalBatch);
+                Clear(CSPostingBuffer);
+                CSPostingBuffer.SetRange("Table No.",TestRecRef.Number);
+                CSPostingBuffer.SetRange("Record Id",TestRecRef.RecordId);
+                CSPostingBuffer.SetRange(Executed,false);
+                if not CSPostingBuffer.FindSet then begin
+                  TempItemJournalBatch := ItemJournalBatch;
+                  TempItemJournalBatch.Insert;
+                end;
+              until ItemJournalBatch.Next = 0;
+            end;
+            Clear(TempItemJournalBatch);
+            if TempItemJournalBatch.FindSet then begin
+              RecRef.GetTable(TempItemJournalBatch);
+              CSCommunication.SetRecRef(RecRef);
+              ActiveInputField := 1;
+              SendForm(ActiveInputField,ItemJournalBatch);
+            end else begin
+              CSCommunication.DecreaseStack(DOMxmlin,PreviousCode);
+              CSUIHeader2.Get(PreviousCode);
+              CSUIHeader2.SaveXMLin(DOMxmlin);
+              CODEUNIT.Run(CSUIHeader2."Handling Codeunit",CSUIHeader2);
+            end;
+          end else begin
+          //+NPR5.52 [365967]
+            RecRef.GetTable(ItemJournalBatch);
+            CSCommunication.SetRecRef(RecRef);
+            ActiveInputField := 1;
+            SendForm(ActiveInputField,ItemJournalBatch);
+          //-NPR5.52 [365967]
+          end;
+          //+NPR5.52 [365967]
         end;
     end;
 
@@ -198,18 +241,40 @@ codeunit 6151359 "CS UI Phy. Inv. Journal List"
         ItemJnlTemplate: Record "Item Journal Template";
         ItemJnlPostBatch: Codeunit "Item Jnl.-Post Batch";
         ItemJournalLine: Record "Item Journal Line";
+        CSSetup: Record "CS Setup";
+        CSPostingBuffer: Record "CS Posting Buffer";
+        PostingRecRef: RecordRef;
+        CSPostEnqueue: Codeunit "CS Post - Enqueue";
     begin
-        ItemJnlTemplate.Get(ItemJournalBatch."Journal Template Name");
-        ItemJnlTemplate.TestField("Force Posting Report",false);
+        //-NPR5.52 [365967]
+        CSSetup.Get;
+        if CSSetup."Post with Job Queue" then begin
+          PostingRecRef.GetTable(ItemJournalBatch);
+          CSPostingBuffer.Init;
+          CSPostingBuffer."Table No." := PostingRecRef.Number;
+          CSPostingBuffer."Record Id" := PostingRecRef.RecordId;
+          CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::"Phy. Inv. Journal";
+          CSPostingBuffer."Job Queue Priority for Post" := 1;
+          if CSPostingBuffer.Insert(true) then
+            CSPostEnqueue.Run(CSPostingBuffer)
+          else
+            Remark := GetLastErrorText;
+        end else begin
+        //+NPR5.52 [365967]
+          ItemJnlTemplate.Get(ItemJournalBatch."Journal Template Name");
+          ItemJnlTemplate.TestField("Force Posting Report",false);
 
-        Clear(ItemJournalLine);
-        ItemJournalLine.SetRange("Journal Template Name",ItemJournalBatch."Journal Template Name");
-        ItemJournalLine.SetRange("Journal Batch Name",ItemJournalBatch.Name);
-        if ItemJournalLine.FindSet then begin
-          repeat
-            ItemJnlPostBatch.Run(ItemJournalLine);
-          until ItemJournalLine.Next = 0;
+          Clear(ItemJournalLine);
+          ItemJournalLine.SetRange("Journal Template Name",ItemJournalBatch."Journal Template Name");
+          ItemJournalLine.SetRange("Journal Batch Name",ItemJournalBatch.Name);
+          if ItemJournalLine.FindSet then begin
+            repeat
+              ItemJnlPostBatch.Run(ItemJournalLine);
+            until ItemJournalLine.Next = 0;
+          end;
+        //-NPR5.52 [365967]
         end;
+        //+NPR5.52 [365967]
     end;
 
     local procedure Reset(ItemJournalBatch: Record "Item Journal Batch")
