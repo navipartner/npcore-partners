@@ -2,6 +2,7 @@ codeunit 6150828 "POS Action - Item Inv Overview"
 {
     // NPR5.34/BR /20170724  CASE 282748 Object Created
     // NPR5.37.02/MMV /20171114  CASE 296478 Moved text constant to in-line constant
+    // NPR5.52/ALPO/20191002 CASE 370333 New options to show inventory for all items and/or for current location only
 
 
     trigger OnRun()
@@ -20,6 +21,7 @@ codeunit 6150828 "POS Action - Item Inv Overview"
 
     local procedure ActionVersion(): Text
     begin
+        exit('1.1');  //NPR5.52 [370333]
         exit('1.0');
     end;
 
@@ -35,7 +37,11 @@ codeunit 6150828 "POS Action - Item Inv Overview"
               Sender."Subscriber Instances Allowed"::Multiple)
             then begin
                 RegisterWorkflow(false);
-                RegisterDataBinding();
+            //-NPR5.52 [370333]
+            RegisterBooleanParameter(AllItemsParTxt,false);
+            RegisterBooleanParameter(OnlyCurrentLocParTxt,false);
+            //+NPR5.52 [370333]
+            //RegisterDataBinding();  //NPR5.52 [370333]-revoked
             end;
     end;
 
@@ -72,21 +78,56 @@ codeunit 6150828 "POS Action - Item Inv Overview"
         CurrentViewType: DotNet npNetViewType0;
         ViewType: DotNet npNetViewType0;
         POSInventoryOverview: Page "POS Inventory Overview";
+        ItemsByLocationOverview: Page "Items by Location Overview";
+        AllItems: Boolean;
+        OnlyCurrrentLocation: Boolean;
     begin
         JSON.InitializeJObjectParser(Context, FrontEnd);
         POSSession.GetCurrentView(CurrentView);
+        //-NPR5.52 [370333]
+        AllItems := JSON.GetBooleanParameter(AllItemsParTxt,false);
+        OnlyCurrrentLocation := JSON.GetBooleanParameter(OnlyCurrentLocParTxt,false);
+        //+NPR5.52 [370333]
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        POSInventoryOverview.SetParameters('', '', SalePOS."Location Code");
+        //-NPR5.52 [370333]
+
+        if AllItems then begin
+          Clear(ItemsByLocationOverview);
+          if OnlyCurrrentLocation then
+            ItemsByLocationOverview.SetFilters(SalePOS."Location Code");
+          ItemsByLocationOverview.Run;
+          exit;
+        end;
+
+        POSInventoryOverview.SetParameters('','',SalePOS."Location Code",OnlyCurrrentLocation);
+        //+NPR5.52 [370333]
+        //POSInventoryOverview.SetParameters('','',SalePOS."Location Code");  //NPR5.52 [370333]-revoked
         if (CurrentView.Type.Equals(ViewType.Sale)) then begin
             POSSession.GetSaleLine(POSSaleLine);
             POSSaleLine.GetCurrentSaleLine(LinePOS);
             if LinePOS.Type = LinePOS.Type::Item then begin
-                POSInventoryOverview.SetParameters(LinePOS."No.", LinePOS."Variant Code", LinePOS."Location Code");
+            //POSInventoryOverview.SetParameters(LinePOS."No.",LinePOS."Variant Code",LinePOS."Location Code");  //NPR5.52 [370333]-revoked
+            POSInventoryOverview.SetParameters(LinePOS."No.",LinePOS."Variant Code",LinePOS."Location Code",OnlyCurrrentLocation);  //NPR5.52 [370333]
             end;
         end;
         POSInventoryOverview.Run;
+    end;
+
+    local procedure "---parameters---"()
+    begin
+        //NPR5.52 [370333]
+    end;
+
+    local procedure AllItemsParTxt(): Text
+    begin
+        exit('AllItems');  //NPR5.52 [370333]
+    end;
+
+    local procedure OnlyCurrentLocParTxt(): Text
+    begin
+        exit('OnlyCurrentLocation');  //NPR5.52 [370333]
     end;
 }
 

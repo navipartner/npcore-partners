@@ -1,8 +1,11 @@
 table 6151388 "CS Refill Data"
 {
     // NPR5.50/CLVA/20190309  CASE 332844 Object created
+    // NPR5.52/CLVA/20190916 CASE 368484 Added page lookup
 
     Caption = 'CS Refill Data';
+    DrillDownPageID = "CS Refill Data";
+    LookupPageID = "CS Refill Data";
 
     fields
     {

@@ -4,6 +4,7 @@ codeunit 6150801 "POS Action - Customer"
     // NPR5.47/THRO /20180821  CASE 309611 Added Option SamplingGet to CustomerType
     // NPR5.47/THRO /20180821  CASE 309609 Added Option SamplingSend to CustomerType
     // TM1.39/THRO /20181126  CASE 334644 Removed unused Coudeunit 1 variable
+    // NPR5.52/SARA/20191004 CASE 368447 Error when using the "Hent udvalg" button
 
 
     trigger OnRun()
@@ -389,6 +390,12 @@ codeunit 6150801 "POS Action - Customer"
         //END;
         //+NPR5.47 [309611]
 
+        //-NPR5.52[368447]
+        //Reload salePOS to avoid Runtime error when Modify record
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalePOS.Find;
+        //+NPR5.52[368447]
         with SalePOS do begin
             "Retail Document Type" := "Retail Document Type"::"Selection Contract";
             RetailDocumentHandling.RetailDocument2Sale(SalePOS, "Salesperson Code");

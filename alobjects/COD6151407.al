@@ -23,6 +23,7 @@ codeunit 6151407 "Magento Item Mgt."
     // MAG2.17/TS  /20181019  CASE 333049 Seo Link should not be updated if Confirm is NO
     // MAG2.19/MHA /20190319  CASE 345884 Added function AutoUpdateSeoLink()
     // MAG2.20/MHA /20190430  CASE 353499 Removed function ItemOnAfterValidateAttributeSetId() and check on "Magento Item" when "Attribute Set ID" in ItemOnModify()
+    // MAG2.23/BHR /20190822  CASE 363897 Skip creation of websites when entries already exists
 
 
     trigger OnRun()
@@ -98,7 +99,12 @@ codeunit 6151407 "Magento Item Mgt."
         if not MagentoWebsite.FindFirst then
           exit;
 
-        if not MagentoWebsiteLink.Get(MagentoWebsite.Code,Item."No.",'') then begin
+        //-MAG2.23 [363897]
+        //IF NOT MagentoWebsiteLink.GET(MagentoWebsite.Code,Item."No.",'') THEN BEGIN
+        MagentoWebsiteLink.SetRange("Item No.",Item."No.");
+        MagentoWebsiteLink.SetRange("Variant Code",'');
+        if not MagentoWebsiteLink.FindFirst then begin
+        //+MAG2.23 [363897]
           MagentoWebsiteLink.Init;
           MagentoWebsiteLink."Website Code" := MagentoWebsite.Code;
           MagentoWebsiteLink."Item No." := Item."No.";

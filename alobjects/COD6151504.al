@@ -7,6 +7,7 @@ codeunit 6151504 "Nc Import Mgt."
     // NC2.02/MHA /20170227  CASE 262318 Added Try function SendErrorMail()
     // NC2.06/BR  /20170921  CASE 290771 Changed TryFunction call to support NAV 2017
     // NC2.12/MHA /20180502  CASE 313362 Bumped Version List to remove NPR5.36
+    // NC2.23/MHA /20190927  CASE 369170 SendErrorMail() is no longer a Try function as it contains MODIFY transaction
 
     TableNo = "Nc Import Entry";
 

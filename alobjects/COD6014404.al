@@ -111,6 +111,7 @@ codeunit 6014404 "NPR Event Subscriber"
     // TM1.39/THRO/20181126 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
     // NPR5.49/BHR /20171128 CASE 296801 Rename P43OnAfterActionEventImportFromScannerFile to P49OnAfterActionEventImportFromScannerFile
     //                                   Added Action Import From Scanner P43OnAfterActionEventImportFromScannerFile
+    // NPR5.52/ZESO/20191008 CASE 371446 Flow Document Date and Time in Value Entry
 
 
     trigger OnRun()
@@ -347,7 +348,9 @@ codeunit 6014404 "NPR Event Subscriber"
             "Group Sale" := ItemJournalLine."Group Sale";
             "Salesperson Code" := ItemJournalLine."Salespers./Purch. Code";
             "Document Time" := ItemJournalLine."Document Time";
-
+            //-NPR5.52 [371446]
+          "Document Date and Time" := CreateDateTime(ItemJournalLine."Posting Date","Document Time");
+          //+NPR5.52 [371446]
             //-NPR5.33 [264324]
             //  IF ("Vendor No." = '') OR ("Item Group No." = '') THEN
             //    IF Item.GET("Item No.") THEN BEGIN
@@ -379,6 +382,9 @@ codeunit 6014404 "NPR Event Subscriber"
             "Register No." := ItemJournalLine."Register Number";
             "Group Sale" := ItemJournalLine."Group Sale";
             "Salesperson Code" := ItemJournalLine."Salespers./Purch. Code";
+          //-NPR5.52 [371446]
+          "Document Date and Time" := CreateDateTime(ItemJournalLine."Posting Date",ItemJournalLine."Document Time");
+          //+NPR5.52 [371446]
             //- NPR5.43 [312575]
             "Item Category Code" := ItemJournalLine."Item Category Code";
 

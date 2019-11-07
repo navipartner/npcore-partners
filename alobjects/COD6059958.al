@@ -2,6 +2,7 @@ codeunit 6059958 "MCS Webcam Proxy TSD"
 {
     // NPR5.29/CLVA/20170125 CASE 264333 Added functionality to support image orientation;
     // NPR5.33/TSA/20170628  CASE 279495 Adjusted to stargate 2.0
+    // NPR5.52/TILA/20190924CASE 361782DeserializeState function removed
 
     SingleInstance = true;
 

@@ -568,6 +568,9 @@ codeunit 6014435 "Retail Form Code"
                                 /* Variant Code Check */
                                 if Ekspeditionslinie."Variant Code" = '' then begin
                                     ItemVariant.SetRange("Item No.", Ekspeditionslinie."No.");
+                      //-NPR5.52 [369078]
+                      ItemVariant.SetRange(Blocked,false);
+                      //+NPR5.52 [369078]
                                     if ItemVariant.Find('-') then
                                         Error(ErrItemVariant, Ekspeditionslinie."No.");
                                 end;
@@ -729,7 +732,7 @@ codeunit 6014435 "Retail Form Code"
                     Revisionsrulle."Sales Document No." := Ekspeditionslinie."Sales Document No.";
                     Revisionsrulle."Sales Document Line No." := Ekspeditionslinie."Sales Document Line No.";
                     Revisionsrulle."Sales Document Prepayment" := Ekspeditionslinie."Sales Document Prepayment";
-                    Revisionsrulle."Sales Doc. Prepayment %" := Ekspeditionslinie."Sales Doc. Prepayment %";
+              Revisionsrulle."Sales Doc. Prepayment %" := Ekspeditionslinie."Sales Doc. Prepayment Value";
                     Revisionsrulle."Sales Document Invoice" := Ekspeditionslinie."Sales Document Invoice";
                     Revisionsrulle."Sales Document Ship" := Ekspeditionslinie."Sales Document Ship";
                     //+NPR4.14

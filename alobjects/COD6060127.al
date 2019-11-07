@@ -109,7 +109,9 @@ codeunit 6060127 "MM Membership Management"
     // MM1.40/TSA /20190612 CASE 357360 Added function DeleteMember()
     // MM1.40/TSA /20190731 CASE 361664 Changed Cancel function to work with defaults when performing a system cancel. Corrected invalid return status
     // MM1.40/TSA /20190814 CASE 343352 Added function to get membership by customer number
-    // #360242/TSA /20190822 CASE 360242 Added NPR Attributes
+    // MM1.40/TSA /20190822 CASE 360242 Added NPR Attributes
+    // MM1.41/TSA /20191009 CASE 371937 Dateformula is considered twice
+    // MM1.41/TSA /20191016 CASE 373297 Added function to set grace period presets
 
 
     trigger OnRun()
@@ -2374,8 +2376,15 @@ codeunit 6060127 "MM Membership Management"
 
           MembershipSalesSetup."Valid From Base"::DATEFORMULA :
             begin
-              MembershipSalesSetup.TestField ("Valid From Date Calculation");
-              ValidFromDate := CalcDate (MembershipSalesSetup."Valid From Date Calculation", DocumentDate);
+              //-MM1.41 [371937]
+              //MembershipSalesSetup.TESTFIELD ("Valid From Date Calculation");
+              //ValidFromDate := CALCDATE (MembershipSalesSetup."Valid From Date Calculation", DocumentDate);
+              ValidFromDate := DocumentDate;
+              if (DocumentDate = WorkDate) then begin
+                MembershipSalesSetup.TestField ("Valid From Date Calculation");
+                ValidFromDate := CalcDate (MembershipSalesSetup."Valid From Date Calculation", DocumentDate);
+              end;
+              //+MM1.41 [371937]
             end;
 
           MembershipSalesSetup."Valid From Base"::FIRST_USE :
@@ -2590,6 +2599,37 @@ codeunit 6060127 "MM Membership Management"
         MembershipRole.SetFilter (Blocked, '=%1', false);
         if (MembershipRole.FindFirst ()) then
           AnonymousMemberCount := MembershipRole."Member Count";
+    end;
+
+    procedure ApplyGracePeriodPreset(Preset: Option;var MembershipAlterationSetup: Record "MM Membership Alteration Setup")
+    begin
+
+        //-MM1.41 [373297]
+        with MembershipAlterationSetup do begin
+          case Preset of
+            "Grace Period Presets"::NA :
+              begin
+              end;
+            "Grace Period Presets"::EXPIRED_MEMBERSHIP :
+              begin
+                "Grace Period Calculation" := "Grace Period Calculation"::ADVANCED;
+                "Grace Period Relates To" := "Grace Period Relates To"::END_DATE;
+                Evaluate ("Grace Period Before", '<+1D>');
+                Evaluate ("Grace Period After", '<+100Y>');
+                "Activate Grace Period" := true;
+              end;
+
+            "Grace Period Presets"::ACTIVE_MEMBERSHIP :
+              begin
+                "Grace Period Calculation" := "Grace Period Calculation"::ADVANCED;
+                "Grace Period Relates To" := "Grace Period Relates To"::END_DATE;
+                Evaluate ("Grace Period Before", '<-100Y>');
+                Evaluate ("Grace Period After", '<0D>');
+                "Activate Grace Period" := true;
+              end;
+          end;
+        end;
+        //+MM1.41 [373297]
     end;
 
     local procedure "--internal"()

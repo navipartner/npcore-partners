@@ -1,6 +1,7 @@
 page 6151006 "POS Entry Related Sales Doc."
 {
     // NPR5.50/MMV /20190417 CASE 300557 Created object
+    // NPR5.52/TSA /20191015 CASE 372920 Added lookup handler code
 
     Caption = 'POS Entry Related Sales Documents';
     DelayedInsert = false;
@@ -25,6 +26,24 @@ page 6151006 "POS Entry Related Sales Doc."
                 }
                 field("Sales Document No";"Sales Document No")
                 {
+
+                    trigger OnAssistEdit()
+                    begin
+
+                        //-NPR5.52 [372920]
+                        Rec.GetDocumentRecord (RecordVar);
+                        PAGE.Run (Rec.GetCardpageID(), RecordVar);
+                        //+NPR5.52 [372920]
+                    end;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+
+                        //-NPR5.52 [372920]
+                        Rec.GetDocumentRecord (RecordVar);
+                        PAGE.Run (Rec.GetCardpageID(), RecordVar);
+                        //+NPR5.52 [372920]
+                    end;
                 }
             }
         }
@@ -33,5 +52,8 @@ page 6151006 "POS Entry Related Sales Doc."
     actions
     {
     }
+
+    var
+        RecordVar: Variant;
 }
 

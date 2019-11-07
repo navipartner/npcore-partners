@@ -9,6 +9,7 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
     // MM1.37/TSA /20190328 CASE 350364 Added Member Select as EAN box Event
     // MM1.37/MHA /20190328  CASE 350288 Added MaxStrLen to EanBox.Description in DiscoverEanBoxEvents()
     // MM1.40/TSA /20190815 CASE 343352 Refactored coupon creation
+    // MM1.41/TSA /20191002 CASE 371095 Added RedeemablePoints KPI
 
 
     trigger OnRun()
@@ -413,6 +414,11 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
         DataSource.AddColumn('RemainingPoints', 'Remaining Points', DataType.String, false);
         DataSource.AddColumn('RemainingValue', 'Remaining Points', DataType.String, false);
 
+        //-MM1.41 [371095]
+        DataSource.AddColumn ('RedeemablePoints', 'Redeemable Points', DataType.String, false);
+        //+MM1.41 [371095]
+
+
         Handled := true;
     end;
 
@@ -421,6 +427,7 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
     var
         DataType: DotNet npNetDataType;
         POSSale: Codeunit "POS Sale";
+        LoyaltyPointManagement: Codeunit "MM Loyalty Point Management";
         SalePOS: Record "Sale POS";
         POSSalesInfo: Record "MM POS Sales Info";
         Membership: Record "MM Membership";
@@ -428,6 +435,7 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
         LoyaltySetup: Record "MM Loyalty Setup";
         RemainingPoints: Text;
         RemainingValue: Text;
+        RedeemablePoints: Text;
     begin
 
         if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
@@ -435,6 +443,10 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
 
         RemainingPoints := ' -- ';
         RemainingValue := '0.00';
+        //-MM1.41 [371095]
+        RedeemablePoints := ' -- ';
+        //+MM1.41 [371095]
+
 
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -447,11 +459,18 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
                 MembershipSetup.Get(Membership."Membership Code");
                 LoyaltySetup.Get(MembershipSetup."Loyalty Code");
                 RemainingValue := StrSubstNo('%1', Round(Membership."Remaining Points" * LoyaltySetup."Point Rate"));
+            //-MM1.41 [371095]
+            RedeemablePoints := StrSubstNo ('%1', LoyaltyPointManagement.CalculateRedeemablePoints (Membership."Entry No."));
+            //-MM1.41 [371095]
             end;
         end;
 
         DataRow.Add('RemainingPoints', RemainingPoints);
         DataRow.Add('RemainingValue', RemainingValue);
+
+        //-MM1.41 [371095]
+        DataRow.Add ('RedeemablePoints', RedeemablePoints);
+        //+MM1.41 [371095]
 
         Handled := true;
     end;

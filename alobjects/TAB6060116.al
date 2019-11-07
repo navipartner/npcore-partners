@@ -17,6 +17,7 @@ table 6060116 "TM Ticket Reservation Request"
     // TM1.23/TSA /20170718 CASE 284248 Added Field Primary Request Line Boolean
     // TM1.26/TSA /20171102 CASE 285601 Added Field "DIY Print Order Requested", "DIY Print Order At"
     // TM1.31/TSA /20180524 CASE 316500 Added key "Request Status", "Expires Date Time", IsEmpty dropped from 650 reads to 4 according to profiler for ExpireReservationRequests()
+    // TM1.43/TSA /20190910 CASE 368043 Added Item No. and Variant Code to make a separation from "External Item Code".
 
     Caption = 'Ticket Reservation Request';
 
@@ -87,6 +88,14 @@ table 6060116 "TM Ticket Reservation Request"
         field(40;"External Ticket Number";Text[30])
         {
             Caption = 'External Ticket Number';
+        }
+        field(50;"Item No.";Code[20])
+        {
+            Caption = 'Item No.';
+        }
+        field(51;"Variant Code";Code[10])
+        {
+            Caption = 'Variant Code';
         }
         field(60;"Admission Description";Text[50])
         {

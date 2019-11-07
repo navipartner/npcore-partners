@@ -14,6 +14,7 @@ table 6151504 "Nc Import Entry"
     // NC2.02/MHA /20170227  CASE 262318 Added fields 15 "Last Error E-mail Sent at" and 17 "Last Error E-mail Sent to"
     // NC2.12/MHA /20180418  CASE 308107 Length of field 3 "Code" extended from 10 to 20 and caption added to fields 30,35
     // NC2.16/MHA /20180907  CASE 313184 Added fields 40,45,50 for diagnostics
+    // NC2.23/MHA /20190927  CASE 369170 Field 70220322 "NaviPartner Case Url" Removed
 
     Caption = 'Nc Import Entry';
 
@@ -117,13 +118,6 @@ table 6151504 "Nc Import Entry"
             Caption = 'Import Duration (sec.)';
             Description = 'NC2.16';
             Editable = false;
-        }
-        field(70220322;"NaviPartner Case Url";Text[250])
-        {
-            Caption = 'NaviPartner Case Url';
-            Description = 'NC1.17';
-            Editable = false;
-            ExtendedDatatype = URL;
         }
     }
 

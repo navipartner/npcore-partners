@@ -5,6 +5,7 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
     // NPR5.44/MHA /20180724 CASE 323170 Changed Json parsing functions to Try functions
     // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
     // NPR5.50/MMV /20190529 CASE 356506 Send diagnostics on user session for logout to workaround session creation related crashes.
+    // NPR5.52/MHA /20191007 CASE 371704 Removed culture from TryGetJsonValueAsDecimal()
 
     TableNo = "Client Diagnostics";
 
@@ -624,9 +625,9 @@ codeunit 6059998 "Client Diagnostics Data Mgt."
         DotNetDecimal: DotNet npNetDecimal;
         CultureInfo: DotNet npNetCultureInfo;
     begin
-        //-NPR5.42
-        ReturnValue := DotNetDecimal.Parse(JObject.GetValue(PropertyName).ToString, CultureInfo.InvariantCulture);
-        //+NPR5.42
+        //-NPR5.52 [371704]
+        Evaluate(ReturnValue,JObject.GetValue(PropertyName).ToString);
+        //+NPR5.52 [371704]
     end;
 
     [TryFunction]

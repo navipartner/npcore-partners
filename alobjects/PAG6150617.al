@@ -17,6 +17,9 @@ page 6150617 "POS Unit Card"
     // NPR5.49/TSA /20190311 CASE 348458 Added field "POS End of Day Profile"
     // NPR5.51/YAHA/20190717 CASE 360536 Field "POS Store Code","Default POS Payment Bin","Ean Box Sales Setup","POS Audit Profile","POS View Profile" set to Mandatory(TRUE)
     // NPR5.51/SARA/20190823 CASE 363578 New field 'SMS Profile'
+    // NPR5.52/ALPO/20190923 CASE 365326 New field "POS Posting Profile" (Posting related fields moved to POS Posting Profiles from NP Retail Setup)
+    // NPR5.52/SARA/20190823 CASE 368395 Removed field 'SMS Profile' (Move to 'POS End of Day Profile')
+    // NPR5.52/MHA /20191016 CASE 371388 Field 400 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
 
     Caption = 'POS Unit Card';
     RefreshOnActivate = true;
@@ -52,13 +55,6 @@ page 6150617 "POS Unit Card"
                 {
                     ShowMandatory = true;
                 }
-                field("Ean Box Sales Setup";"Ean Box Sales Setup")
-                {
-                    ShowMandatory = true;
-                }
-                field("POS Sales Workflow Set";"POS Sales Workflow Set")
-                {
-                }
                 field("Item Price Codeunit ID";"Item Price Codeunit ID")
                 {
                     Visible = false;
@@ -91,7 +87,17 @@ page 6150617 "POS Unit Card"
                 field("POS End of Day Profile";"POS End of Day Profile")
                 {
                 }
-                field("SMS Profile";"SMS Profile")
+                field("POS Posting Profile";"POS Posting Profile")
+                {
+                }
+                field("Ean Box Sales Setup";"Ean Box Sales Setup")
+                {
+                    ShowMandatory = true;
+                }
+                field("POS Sales Workflow Set";"POS Sales Workflow Set")
+                {
+                }
+                field("Global POS Sales Setup";"Global POS Sales Setup")
                 {
                 }
             }

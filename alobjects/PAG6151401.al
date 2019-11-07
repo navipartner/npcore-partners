@@ -32,6 +32,10 @@ page 6151401 "Magento Setup"
     // MAG2.22/MHA /20190625  CASE 359285 Added field 34 "Picture Variety Type"
     // MAG2.22/MHA /20190708  CASE 352201 Added field 220 "Collect in Store Enabled"
     // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print functionality
+    // MAG2.23/MHA /20190826  CASE 363864 Added fields 700 "Post Retail Voucher on Import", 710 "E-mail Retail Vouchers to"
+    // MAG2.23/MHA /20190930  CASE 370831 B2B modules should not be visible for Magento 2
+    // MAG2.23/MHA /20191011  CASE 371791 Added fields 720 "Post Tickets on Import", 730 "Post Memberships on Import"
+    // MAG2.23/MHA /20191017  CASE 373262 Addded Post On Import Setup PagePart
 
     Caption = 'Magento Setup';
     PromotedActionCategories = 'New,Tasks,Reports,Display';
@@ -235,6 +239,7 @@ page 6151401 "Magento Setup"
                 group("B2B Modules")
                 {
                     Caption = 'B2B Modules';
+                    Visible = ("Magento Version" <> "Magento Version"::"2");
                     field("Customers Enabled";"Customers Enabled")
                     {
                     }
@@ -367,7 +372,7 @@ page 6151401 "Magento Setup"
                 {
                 }
             }
-            group(General)
+            group("Order Import")
             {
                 Caption = 'Order Import';
                 field("Payment Fee Account No.";"Payment Fee Account No.")
@@ -382,6 +387,26 @@ page 6151401 "Magento Setup"
                 field("Use Blank Code for LCY";"Use Blank Code for LCY")
                 {
                 }
+                field("E-mail Retail Vouchers to";"E-mail Retail Vouchers to")
+                {
+                }
+                group("Post On Import")
+                {
+                    Caption = 'Post On Import';
+                    field("Post Retail Vouchers on Import";"Post Retail Vouchers on Import")
+                    {
+                        ToolTip = 'Immediately post Sales Order Lines for new Retail Vouchers';
+                    }
+                    field("Post Tickets on Import";"Post Tickets on Import")
+                    {
+                    }
+                    field("Post Memberships on Import";"Post Memberships on Import")
+                    {
+                    }
+                }
+            }
+            part(Control6151459;"Magento Setup Post on Import")
+            {
             }
         }
     }

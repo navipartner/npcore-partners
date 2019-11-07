@@ -11,6 +11,8 @@ report 6014410 "Sales Ticket A4"
     //                                   space between serial no. and text and removed "show customer info on ticket" parameter.
     //                                   Split quantity and price into two columns.
     // NPR5.51/ANPA/20190722 CASE 362537 Always showing discount
+    // NPR5.52/ANPA/20191009  CASE 359431 Added DiscountTxt value
+    // NPR5.52/ANPA/20191004  CASE 371523 Added Sales Type as parameter
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Sales Ticket A4.rdlc';
 
@@ -92,6 +94,9 @@ report 6014410 "Sales Ticket A4"
                 {
                 }
                 column(Type_AuditRollSale;Type)
+                {
+                }
+                column(SaleType_AuditRollSale;AuditRollSale."Sale Type")
                 {
                 }
                 column(AmountLine;AmountLine)
@@ -526,6 +531,7 @@ report 6014410 "Sales Ticket A4"
         BTWExcl_Lbl = 'Excl.';
         BTWIncl_Lbl = 'Incl.';
         TotalBTW_Lbl = 'Total BTW';
+        Discount_Lbl = 'Discount';
     }
 
     trigger OnInitReport()

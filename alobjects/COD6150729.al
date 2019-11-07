@@ -3,6 +3,8 @@ codeunit 6150729 "POS Sales Print Mgt."
     // NPR5.39/MHA /20180202  CASE 302779 Object created - Implements POS Sales Workflow and overloads AuditRoll.PrintSalesReceipt()
     // NPR5.39/MMV /20180207  CASE 302687 Added support for POS Entry sales receipt.
     // NPR5.51/MMV /20190617  CASE 356076 Added support for cancelled sale receipt skip.
+    // NPR5.52/ALPO/20191004  CASE 370427 Added support to skip receipt printing on sale
+    //                                      - function SkipCancelledReceipt() renamed to SkipReceiptPrint()
 
 
     trigger OnRun()
@@ -120,7 +122,8 @@ codeunit 6150729 "POS Sales Print Mgt."
             exit;
 
         //-NPR5.51 [356076]
-        if SkipCancelledReceipt(POSEntry) then
+        //IF SkipCancelledReceipt(POSEntry) THEN  //NPR5.52 [370427]-revoked
+        if SkipReceiptPrint(POSEntry) then  //NPR5.52 [370427]
           exit;
         //+NPR5.51 [356076]
 
@@ -130,19 +133,25 @@ codeunit 6150729 "POS Sales Print Mgt."
         //+NPR5.39 [302687]
     end;
 
-    local procedure SkipCancelledReceipt(POSEntry: Record "POS Entry"): Boolean
+    local procedure SkipReceiptPrint(POSEntry: Record "POS Entry"): Boolean
     var
         POSAuditProfile: Record "POS Audit Profile";
         POSUnit: Record "POS Unit";
     begin
         //-NPR5.51 [356076]
-        if POSEntry."Entry Type" <> POSEntry."Entry Type"::"Cancelled Sale" then
-          exit(false);
-
+        //-NPR5.52 [370427]-revoked
+        //IF POSEntry."Entry Type" <> POSEntry."Entry Type"::"Cancelled Sale" THEN
+        //  EXIT(FALSE);
+        //+NPR5.52 [370427]-revoked
         POSUnit.Get(POSEntry."POS Unit No.");
         if not POSAuditProfile.Get(POSUnit."POS Audit Profile") then
           exit(false);
-        exit(not POSAuditProfile."Print Receipt On Sale Cancel");
+        //-NPR5.52 [370427]
+        exit(
+          ((POSEntry."Entry Type" <> POSEntry."Entry Type"::"Cancelled Sale") and POSAuditProfile."Do Not Print Receipt on Sale") or
+          ((POSEntry."Entry Type" = POSEntry."Entry Type"::"Cancelled Sale") and not POSAuditProfile."Print Receipt On Sale Cancel"));
+        //+NPR5.52 [370427]
+        //EXIT(NOT POSAuditProfile."Print Receipt On Sale Cancel");  //NPR5.52 [370427]-revoked
         //+NPR5.51 [356076]
     end;
 }

@@ -5,7 +5,7 @@ pageextension 6014455 pageextension6014455 extends "Item Cross Reference Entries
     {
         addafter("Discontinue Bar Code")
         {
-            field("Rfid Tag";"Rfid Tag")
+            field("Is Retail Serial No.";"Is Retail Serial No.")
             {
             }
         }

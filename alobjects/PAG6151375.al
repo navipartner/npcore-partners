@@ -8,6 +8,8 @@ page 6151375 "CS UI"
     // NPR5.50/CLVA/20190327 CASE 247747 Added field "Hid Fulfilled Lines"
     // NPR5.50/CLVA/20190327 CASE 347971 Added field "Add Posting Options"
     // NPR5.51/CLVA/20190612 CASE 357577 Added field "Update Posting Date"
+    // NPR5.52/CLVA/20191010 CASE 370452 Added field "Posting Type"
+    //                                   Removed field "Add Posting Options"
 
     Caption = 'CS UI';
     DataCaptionFields = "Code";
@@ -39,7 +41,7 @@ page 6151375 "CS UI"
                 field("Set defaults from last record";"Set defaults from last record")
                 {
                 }
-                field("Add Posting Options";"Add Posting Options")
+                field("Posting Type";"Posting Type")
                 {
                 }
                 field("Update Posting Date";"Update Posting Date")

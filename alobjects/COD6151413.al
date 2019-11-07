@@ -60,6 +60,11 @@ codeunit 6151413 "Magento Sales Order Mgt."
     // MAG2.22/MHA /20190711  CASE 361705 Corrected case for "E-mail OR Phone No." in GetCustomer()
     // MAG2.22/BHR /20190711  CASE 360098 Correction to filter on customer template Mapping
     // MAG2.22/MHA /20190724  CASE 343352 Added function UpdateExtCouponReservations()
+    // MAG2.23/BHR /20190807  CASE 360098 Re-Correction to filter on customer template Mapping
+    // MAG2.23/MHA /20190826  CASE 363864 Added Retail Voucher functions
+    // MAG2.23/ALPO/20191004  CASE 367219 Auto set capture date for payments captured externally
+    // MAG2.23/MHA /20191017  CASE 371791 Added Ticket- and Membership posting
+    // MAG2.23/MHA /20191017  CASE 373262 Added Post on Import Setup
 
     TableNo = "Nc Import Entry";
 
@@ -128,8 +133,16 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //-MAG2.20 [352201]
         InsertCollectDocument(XmlElement,SalesHeader);
         //+MAG2.20 [352201]
+        //-MAG2.23 [363864]
+        UpdateRetailVoucherCustomerInfo(SalesHeader);
+        //+MAG2.23 [363864]
         Commit;
         ActivateAndMailGiftVouchers(SalesHeader);
+
+        //-MAG2.23 [371791]
+        Commit;
+        PostOnImport(SalesHeader);
+        //+MAG2.23 [371791]
         exit(true);
     end;
 
@@ -242,6 +255,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
 
         TaxClass := NpXmlDomMgt.GetXmlAttributeText(XmlElement,'tax_class',true);
         NewCust := not GetCustomer(ExternalCustomerNo,XmlElement,Customer);
+
         if NewCust then begin
           //-MAG2.22 [357662]
           if not (MagentoSetup."Customer Update Mode" in [MagentoSetup."Customer Update Mode"::"Create and Update",MagentoSetup."Customer Update Mode"::Create]) then
@@ -296,6 +310,10 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //+MAG2.22 [357662]
         PrevCust := Format(Customer);
         //-MAG2.22 [360098]
+          //-MAG2.23 [360098]
+          Customer."Post Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement,'post_code',MaxStrLen(Customer."Post Code"),true));
+          Customer."Country/Region Code" := UpperCase(NpXmlDomMgt.GetXmlText(XmlElement,'country_code',MaxStrLen(Customer."Country/Region Code"),false));
+          //+MAG2.23 [360098]
         ConfigTemplateCode := MagentoMgt.GetCustConfigTemplate(TaxClass,Customer);
         //+MAG2.22 [360098]
         if (ConfigTemplateCode <> '') and ConfigTemplateHeader.Get(ConfigTemplateCode) then begin
@@ -387,6 +405,10 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //-MAG2.19 [347687]
         PaymentLine."Payment Gateway Shopper Ref." := ShopperReference;
         //+MAG2.19 [347687]
+        //-MAG2.23 [367219]
+        if PaymentMapping."Captured Externally" then
+          PaymentLine."Date Captured" := GetDate(SalesHeader."Order Date",SalesHeader."Posting Date");
+        //+MAG2.23 [367219]
         PaymentLine.Insert(true);
     end;
 
@@ -1232,6 +1254,228 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //+MAG2.22 [343352]
     end;
 
+    local procedure UpdateRetailVoucherCustomerInfo(SalesHeader: Record "Sales Header")
+    var
+        NpRvVoucher: Record "NpRv Voucher";
+        NpRvVoucherPrev: Record "NpRv Voucher";
+        NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
+    begin
+        //-MAG2.23 [363864]
+        NpRvExtVoucherSalesLine.SetRange("External Document No.",SalesHeader."External Order No.");
+        NpRvExtVoucherSalesLine.SetRange("Document Type",SalesHeader."Document Type");
+        NpRvExtVoucherSalesLine.SetRange("Document No.",SalesHeader."No.");
+        if not NpRvExtVoucherSalesLine.FindSet then
+          exit;
+
+        repeat
+          NpRvVoucher.Get(NpRvExtVoucherSalesLine."Voucher No.");
+          NpRvVoucherPrev := NpRvVoucher;
+
+          case MagentoSetup."E-mail Retail Vouchers to" of
+            MagentoSetup."E-mail Retail Vouchers to"::" ":
+              begin
+                NpRvVoucher.Validate("Customer No.",SalesHeader."Sell-to Customer No.");
+                NpRvVoucher."E-mail" := NpRvVoucherPrev."E-mail";
+              end;
+            MagentoSetup."E-mail Retail Vouchers to"::"Bill-to Customer":
+              begin
+                NpRvVoucher.Validate("Customer No.",SalesHeader."Bill-to Customer No.");
+                NpRvVoucher."E-mail" := SalesHeader."Bill-to E-mail";
+              end;
+          end;
+
+          if Format(NpRvVoucherPrev) <> Format(NpRvVoucher) then
+            NpRvVoucher.Modify(true);
+        until NpRvExtVoucherSalesLine.Next = 0;
+        //+MAG2.23 [363864]
+    end;
+
+    local procedure "--- Post On Import"()
+    begin
+    end;
+
+    local procedure PostOnImport(SalesHeader: Record "Sales Header")
+    var
+        ReleaseSalesDoc: Codeunit "Release Sales Document";
+        PrevRec: Text;
+    begin
+        //-MAG2.23 [371791]
+        if not HasLinesToPostOnImport(SalesHeader) then
+          exit;
+
+        if SalesHeader.Status <> SalesHeader.Status::Open then
+          ReleaseSalesDoc.PerformManualReopen(SalesHeader);
+
+        ResetSalesLines(SalesHeader);
+
+        MarkLinesForPosting(SalesHeader);
+
+        SalesHeader.Ship := true;
+        SalesHeader.Invoice := true;
+        SalesPost.Run(SalesHeader);
+        //+MAG2.23 [371791]
+    end;
+
+    local procedure HasLinesToPostOnImport(SalesHeader: Record "Sales Header"): Boolean
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        //-MAG2.23 [371791]
+        SalesLine.SetRange("Document Type",SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.",SalesHeader."No.");
+        SalesLine.SetFilter(Quantity,'<>%1',0);
+        if SalesLine.FindSet then
+          repeat
+            if IsLineToPost(SalesLine) then
+              exit(true);
+          until SalesLine.Next = 0;
+
+        exit(false);
+        //+MAG2.23 [371791]
+    end;
+
+    local procedure IsLineToPost(SalesLine: Record "Sales Line"): Boolean
+    begin
+        //-MAG2.23 [363864]
+        if MagentoSetup."Post Retail Vouchers on Import" then begin
+          if IsRetailVoucherLine(SalesLine) then
+            exit(true);
+        end;
+        //+MAG2.23 [363864]
+
+        //-MAG2.23 [371791]
+        if MagentoSetup."Post Tickets on Import" then begin
+          if IsTicketLine(SalesLine) then
+            exit(true);
+        end;
+
+        if MagentoSetup."Post Memberships on Import" then begin
+          if IsMembershipLine(SalesLine) then
+            exit(true);
+        end;
+        //+MAG2.23 [371791]
+
+        //-MAG2.23 [373262]
+        if HasPostOnImportSetup(SalesLine) then
+          exit(true);
+
+        exit(false);
+        //-MAG2.23 [373262]
+    end;
+
+    local procedure IsRetailVoucherLine(SalesLine: Record "Sales Line"): Boolean
+    var
+        NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
+    begin
+        //-MAG2.23 [363864]
+        NpRvExtVoucherSalesLine.SetRange("Document Type",SalesLine."Document Type");
+        NpRvExtVoucherSalesLine.SetRange("Document No.",SalesLine."Document No.");
+        NpRvExtVoucherSalesLine.SetRange("Document Line No.",SalesLine."Line No.");
+        exit(NpRvExtVoucherSalesLine.FindFirst);
+        //+MAG2.23 [363864]
+    end;
+
+    local procedure IsTicketLine(SalesLine: Record "Sales Line"): Boolean
+    var
+        Item: Record Item;
+    begin
+        //-MAG2.23 [371791]
+        if SalesLine.Type <> SalesLine.Type::Item then
+          exit(false);
+
+        if not Item.Get(SalesLine."No.") then
+          exit(false);
+
+        exit(Item."Ticket Type" <> '');
+        //+MAG2.23 [371791]
+    end;
+
+    local procedure IsMembershipLine(SalesLine: Record "Sales Line"): Boolean
+    var
+        MMMembershipAlterationSetup: Record "MM Membership Alteration Setup";
+        MMMembershipSalesSetup: Record "MM Membership Sales Setup";
+    begin
+        //-MAG2.23 [371791]
+        case SalesLine.Type of
+          SalesLine.Type::"G/L Account":
+            begin
+              if MMMembershipSalesSetup.Get(MMMembershipSalesSetup.Type::ACCOUNT,SalesLine."No.") then
+                exit(true);
+            end;
+          SalesLine.Type::Item:
+            begin
+              if MMMembershipSalesSetup.Get(MMMembershipSalesSetup.Type::ITEM,SalesLine."No.") then
+                exit(true);
+
+              MMMembershipAlterationSetup.SetRange("Sales Item No.",SalesLine."No.");
+              if MMMembershipAlterationSetup.FindFirst then
+                exit(true);
+            end;
+        end;
+
+        exit(false)
+        //+MAG2.23 [371791]
+    end;
+
+    local procedure HasPostOnImportSetup(SalesLine: Record "Sales Line"): Boolean
+    var
+        MagentoPostonImportSetup: Record "Magento Post on Import Setup";
+    begin
+        //-MAG2.23 [373262]
+        if SalesLine.Type = SalesLine.Type::" " then
+          exit;
+
+        exit(MagentoPostonImportSetup.Get(SalesLine.Type,SalesLine."No."));
+        //+MAG2.23 [373262]
+    end;
+
+    local procedure ResetSalesLines(SalesHeader: Record "Sales Header")
+    var
+        SalesLine: Record "Sales Line";
+        PrevRec: Text;
+    begin
+        //0MAG2.23 [371791]
+        SalesLine.SetRange("Document Type",SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.",SalesHeader."No.");
+        SalesLine.SetFilter(Quantity,'<>%1',0);
+        if SalesLine.FindSet then
+          repeat
+            PrevRec := Format(SalesLine);
+
+            SalesLine.Validate("Qty. to Ship",0);
+            SalesLine.Validate("Qty. to Invoice",0);
+
+            if PrevRec <> Format(SalesLine) then
+              SalesLine.Modify(true);
+          until SalesLine.Next = 0;
+        //+MAG2.23 [371791]
+    end;
+
+    local procedure MarkLinesForPosting(SalesHeader: Record "Sales Header"): Boolean
+    var
+        SalesLine: Record "Sales Line";
+        PrevRec: Text;
+    begin
+        //-MAG2.23 [371791]
+        SalesLine.SetRange("Document Type",SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.",SalesHeader."No.");
+        SalesLine.SetFilter(Quantity,'<>%1',0);
+        if SalesLine.FindSet then
+          repeat
+            if IsLineToPost(SalesLine) then begin
+              PrevRec := Format(SalesLine);
+
+              SalesLine.Validate("Qty. to Ship",SalesLine."Outstanding Quantity");
+
+              if PrevRec <> Format(SalesLine) then
+                SalesLine.Modify(true);
+            end;
+          until SalesLine.Next = 0;
+
+        exit(false);
+        //+MAG2.23 [371791]
+    end;
+
     local procedure "--- Get/Check"()
     begin
     end;
@@ -1478,6 +1722,17 @@ codeunit 6151413 "Magento Sales Order Mgt."
         ItemNo := Item."No.";
         VariantCode := ItemVariant.Code;
         exit(true);
+    end;
+
+    local procedure GetDate(Date1: Date;Date2: Date): Date
+    begin
+        //-MAG2.23 [367219]
+        if Date1 <> 0D then
+          exit(Date1);
+        if Date2 <> 0D then
+          exit(Date2);
+        exit(WorkDate);
+        //+MAG2.23 [367219]
     end;
 }
 

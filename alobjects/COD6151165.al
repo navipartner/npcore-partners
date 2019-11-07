@@ -1,6 +1,7 @@
 codeunit 6151165 "NpGp POS Session Mgt."
 {
     // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
+    // NPR5.52/MHA /20191016 CASE 371388 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
 
     TableNo = "Nc Task";
 
@@ -14,6 +15,7 @@ codeunit 6151165 "NpGp POS Session Mgt."
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnAfterEndSale', '', true, true)]
     local procedure OnAfterEndSale(var Sender: Codeunit "POS Sale";SalePOS: Record "Sale POS")
     var
+        POSUnit: Record "POS Unit";
         NcTask: Record "Nc Task";
         NPRetailSetup: Record "NP Retail Setup";
         NpGpPOSSalesSetup: Record "NpGp POS Sales Setup";
@@ -25,10 +27,15 @@ codeunit 6151165 "NpGp POS Session Mgt."
           exit;
         if not NPRetailSetup."Advanced POS Entries Activated" then
           exit;
-        if NPRetailSetup."Global POS Sales Setup" = '' then
+
+        //-NPR5.52 [371388]
+        if not POSUnit.Get(SalePOS."Register No.") then
           exit;
-        if not NpGpPOSSalesSetup.Get(NPRetailSetup."Global POS Sales Setup") then
+        if POSUnit."Global POS Sales Setup" = '' then
           exit;
+        if not NpGpPOSSalesSetup.Get(POSUnit."Global POS Sales Setup") then
+          exit;
+        //+NPR5.52 [371388]
         if not FindPosEntry(SalePOS,POSEntry) then
           exit;
 

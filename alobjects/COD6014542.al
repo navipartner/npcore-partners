@@ -1,14 +1,5 @@
 codeunit 6014542 "RP Zebra ZPL Device Library"
 {
-    // Zebra ZLP Command Library.
-    //  Work started by Mikkel Vilhelmsen.
-    //  Contributions providing function interfaces for valid
-    //  ZLP II language functional sequences are welcome. Functionality
-    //  for other printer languages should be put in a library on its own.
-    // 
-    //  All functions write ZLP II code to a string buffer which can
-    //  be sent to a printer or stored to a file.
-    // 
     // NPR5.32/MMV /20170410 CASE 241995 Retail Print 2.0
     // NPR5.34/MMV /20170707 CASE 269396 Support for aligning while rotating.
     // NPR5.48/MMV /20181126 CASE 327107 Added QR support
@@ -16,6 +7,7 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
     //                                   Added utf-8 support (not default to guarantee backwards comp. with older zebra printers).
     // NPR5.50/MMV /20190417 CASE 351975 Barcode parameter parse fix.
     // NPR5.51/MMV /20190801 CASE 360975 Buffer all template print data into one job.
+    // NPR5.52/MMV /20191017 CASE 371935 Added inverse color and graphic box support.
 
     EventSubscriberInstance = Manual;
 
@@ -41,6 +33,7 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
         SETTING_SETDARKNESS: Label 'Set darkness - value between 00 and 30';
         SETTING_RFID_EPC_MEM: Label 'Set EPC memory structure - Comma separated integers';
         SETTING_ENCODING: Label 'Set encoding for data.';
+        SETTING_LABELREVERSE: Label 'Reverse print colors. Y = Yes, N = No';
         ERR_FONT: Label 'Unsupported print font: %1';
         ERR_INVALID_COMMAND: Label 'Invalid command: %1';
         Encoding: Option "Windows-1252","UTF-8";
@@ -85,12 +78,6 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
         LookupOK := SelectFont(Value);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnLookupCommand', '', false, false)]
-    local procedure OnLookupCommand(var LookupOK: Boolean;var Value: Text)
-    begin
-        LookupOK := SelectCommand(Value);
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnLookupDeviceSetting', '', false, false)]
     local procedure OnLookupDeviceSetting(var LookupOK: Boolean;var tmpDeviceSetting: Record "RP Device Settings" temporary)
     begin
@@ -106,19 +93,13 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnGetTargetEncoding', '', false, false)]
     local procedure OnGetTargetEncoding(var TargetEncoding: Text)
     begin
-        //-NPR5.48 [327107]
-        //TargetEncoding := 'Windows-1252';
         TargetEncoding := GetEncoding();
-        //+NPR5.48 [327107]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnPrepareJobForHTTP', '', false, false)]
     local procedure OnPrepareJobForHTTP(var FormattedTargetEncoding: Text;var HTTPEndpoint: Text;var Supported: Boolean)
     begin
-        //-NPR5.48 [327107]
-        //FormattedTargetEncoding := 'Windows-1252';
         FormattedTargetEncoding := GetEncoding();
-        //+NPR5.48 [327107]
         HTTPEndpoint := '/pstprnt';
         Supported := true;
     end;
@@ -126,10 +107,7 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
     [EventSubscriber(ObjectType::Codeunit, 6014546, 'OnPrepareJobForBluetooth', '', false, false)]
     local procedure OnPrepareJobForBluetooth(var FormattedTargetEncoding: Text;var Supported: Boolean)
     begin
-        //-NPR5.48 [327107]
-        //FormattedTargetEncoding := 'Windows-1252';
         FormattedTargetEncoding := GetEncoding();
-        //+NPR5.48 [327107]
         Supported := true;
     end;
 
@@ -162,17 +140,10 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
     var
         CustomEncoding: Text;
     begin
-        //-NPR5.51 [360975]
-        //PrintBuffer := '';
-        //+NPR5.51 [360975]
-
         if HashTable.IsEmpty then
           ConstructHashTable;
 
         AddToBuffer('^XA'); // Ref sheet 372
-        //-NPR5.48 [327107]
-        //AddToBuffer('^CI27');
-        //+NPR5.48 [327107]
 
         if DeviceSettings.FindSet then repeat
           case DeviceSettings.Name of
@@ -184,18 +155,17 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
             'MEDIA_TYPE' : Setup('MT', DeviceSettings.Value);
             'PRINT_ORIENTATION' : Setup('PO', DeviceSettings.Value);
             'LABEL_HOME' : Setup('LH', DeviceSettings.Value);
-        //-NPR5.48 [327107]
             'RFID_EPC_MEMORY' : Setup('RB', DeviceSettings.Value);
+        //-NPR5.52 [371935]
+            'LABEL_REVERSE' : Setup('LR', DeviceSettings.Value);
+        //+NPR5.52 [371935]
             'ENCODING' : CustomEncoding := DeviceSettings.Value;
-        //+NPR5.48 [327107]
             else
               Error(Error_InvalidDeviceSetting, DeviceSettings.Name);
           end;
         until DeviceSettings.Next = 0;
 
-        //-NPR5.48 [327107]
         SetEncoding(CustomEncoding);
-        //+NPR5.48 [327107]
     end;
 
     procedure EndJob()
@@ -220,8 +190,12 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
             PrintBarcodeLegacy(Rotation, 'U', Height, 'Y', 'N', 'N', X, Y, TextIn);
           (CopyStr(FontType,1,7) = 'BARCODE') :
             ParseBarcodeParameters(TextIn, FontType, Rotation, Height, Width, X, Y);
-          (CopyStr(FontType,1,4) = 'Line') :
+        //-NPR5.52 [371935]
+          (UpperCase(CopyStr(FontType,1,4)) = 'LINE') :
             GraphicBox(Width, Height, 1, 'B', 0, X, Y);
+          (UpperCase(CopyStr(FontType,1,3)) = 'BOX') :
+            ParseGraphicBox(FontType, Width, Height, X, Y);
+        //+NPR5.52 [371935]
           (CopyStr(FontType,1,4) = 'Font') :
             begin
               StringLib.Construct(FontType);
@@ -295,7 +269,6 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
         StringLib: Codeunit "String Library";
         AfterSpace: Text;
     begin
-        //-NPR5.48 [327107]
         //EPC Class1Gen2 is implied for all commands.
         //EPC_STD command requires that device setting ^RB is also used to define the EPC memory structure.
 
@@ -317,7 +290,6 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
           else
             Error(ERR_INVALID_COMMAND, FontType);
         end;
-        //+NPR5.48 [327107]
     end;
 
     procedure GetPrintBytes(): Text
@@ -420,46 +392,28 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
 
     procedure PrintBarcode(Rotation: Option N,R,I,B;Type: Text[1];Height: Integer;Width: Integer;FirstParam: Text;SecondParam: Text;LineAbove: Text[1];Check: Text[1];X: Integer;Y: Integer;Data: Text[100])
     begin
-        //-NPR5.48 [327107]
-
         FieldOrigin(X,Y);
 
         case Type of
           '3' : //CODE39
             begin
-        //-NPR5.50 [351975]
-        //      BarcodeFieldDefault(Width, SecondParam, Height);
-        //      AddToBuffer(STRSUBSTNO('^B%1%2,%6,%3,%4,%5', Type, FORMAT(Rotation), Height, FirstParam, LineAbove, Check));
               BarcodeFieldDefault(Width, FirstParam, Height);
               AddToBuffer(StrSubstNo('^B%1%2,%6,%3,%4,%5', Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
-        //+NPR5.50 [351975]
             end;
           'E' : //EAN13
             begin
-        //-NPR5.50 [351975]
-        //      BarcodeFieldDefault(Width, SecondParam, Height);
-        //      AddToBuffer(STRSUBSTNO('^B%1%2,%3,%4,%5', Type, FORMAT(Rotation), Height, FirstParam, LineAbove, Check));
               BarcodeFieldDefault(Width, FirstParam, Height);
               AddToBuffer(StrSubstNo('^B%1%2,%3,%4,%5', Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
-        //+NPR5.50 [351975]
             end;
           'U' : //UPC-A
             begin
-        //-NPR5.50 [351975]
-        //      BarcodeFieldDefault(Width, SecondParam, Height);
-        //      AddToBuffer(STRSUBSTNO('^B%1%2,%3,%4,%5,%6', Type, FORMAT(Rotation), Height, FirstParam, LineAbove, Check));
               BarcodeFieldDefault(Width, FirstParam, Height);
               AddToBuffer(StrSubstNo('^B%1%2,%3,%4,%5,%6', Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
-        //+NPR5.50 [351975]
             end;
           'C' : //CODE128 in automatic subset mode
             begin
-        //-NPR5.50 [351975]
-        //      BarcodeFieldDefault(Width, SecondParam, Height);
-        //      AddToBuffer(STRSUBSTNO('^B%1%2,%3,%4,%5,%6,A', Type, FORMAT(Rotation), Height, FirstParam, LineAbove, Check));
               BarcodeFieldDefault(Width, FirstParam, Height);
               AddToBuffer(StrSubstNo('^B%1%2,%3,%4,%5,%6,A', Type, Format(Rotation), Height, SecondParam, LineAbove, Check));
-        //+NPR5.50 [351975]
             end;
           'Q' : //QR, model 2, alphanumeric input - FirstParam: Magnification, SecondParam: Error correction
             begin
@@ -470,7 +424,6 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
 
         FieldData(Data);
         FieldSeparator();
-        //+NPR5.48 [327107]
     end;
 
     procedure BarcodeFieldDefault(Width: Integer;WideNarrowRatio: Code[3];Height: Integer)
@@ -539,6 +492,37 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
         AddToBuffer(StrSubstNo(TempPattern,X,Y));
     end;
 
+    local procedure LabelReverse(Active: Text)
+    begin
+        //-NPR5.52 [371935]
+        case Active of
+          'Y' : AddToBuffer('^LRY');
+          'N' : AddToBuffer('^LRN');
+        end;
+        //+NPR5.52 [371935]
+    end;
+
+    local procedure ParseGraphicBox(FontType: Text;Width: Integer;Height: Integer;X: Integer;Y: Integer)
+    var
+        StringLib: Codeunit "String Library";
+        AfterSpace: Text;
+        Thickness: Integer;
+        Color: Text;
+        Rounding: Integer;
+    begin
+        //-NPR5.52 [371935]
+        StringLib.Construct(FontType);
+        AfterSpace := StringLib.SelectStringSep(2, ' ');
+        StringLib.Construct(AfterSpace);
+
+        Evaluate(Thickness,StringLib.SelectStringSep(1,','));
+        Color := StringLib.SelectStringSep(2,',');
+        Evaluate(Rounding,StringLib.SelectStringSep(3,','));
+
+        GraphicBox(Width, Height, Thickness, Color, Rounding, X, Y);
+        //+NPR5.52 [371935]
+    end;
+
     procedure MediaDarkness(Darkness: Integer)
     begin
         // Ref sheet 297
@@ -603,23 +587,7 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
         HeightText := StringLib.SelectStringSep(1,',');
         WidthText  := StringLib.SelectStringSep(2,',');
         if not Evaluate(Height,HeightText) or not Evaluate(Width,WidthText) then
-        //-NPR5.48 [327107]
           Error(ERR_FONT, HeightText + WidthText);
-        //  ERROR(err0001);
-        //+NPR5.48 [327107]
-
-        //-NPR5.34 [269396]
-        // IF Align > 0 THEN
-        //  StrLength := ROUND(((GetFontWidth('0')/10) * Width * STRLEN(TextIn)),1,'=') DIV 1;
-        //
-        // CASE Align OF
-        //  1 : X := X - (ROUND((StrLength / 2),1,'=') DIV 1);
-        //  2 : X := X - StrLength;
-        // END;
-        // IF X < 0 THEN BEGIN //If the alignment results in a start position outside the left side of label
-        //  StrLength := StrLength + X;
-        //  X := 0;
-        // END;
 
         if Align > 0 then begin
           StrLength := Round(((GetFontWidth('0')/10) * Width * StrLen(TextIn)),1,'=') div 1;
@@ -646,8 +614,6 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
             1,3 : Y := HorzStart;
           end;
         end;
-        //+NPR5.34 [269396]
-
 
         case Rotate of
           0 : Rotation := 'N';
@@ -704,6 +670,9 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
           'CF' : if Evaluate(IntegerValue,  StringLib.SelectStringSep(2,',')) and
                     Evaluate(IntegerValue2, StringLib.SelectStringSep(3,',')) then
                       ChangeDefaultFont(StringLib.SelectStringSep(1,','), IntegerValue, IntegerValue2);
+        //-NPR5.52 [371935]
+          'LR' : LabelReverse(CopyStr(Value,1,1));
+        //+NPR5.52 [371935]
         end;
     end;
 
@@ -863,17 +832,6 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
         end;
     end;
 
-    procedure SelectCommand(var Value: Text): Boolean
-    var
-        RetailList: Record "Retail List" temporary;
-    begin
-        ConstructCommandSelectionList(RetailList);
-        if PAGE.RunModal(PAGE ::"Retail List",RetailList) = ACTION::LookupOK then begin
-          Value := RetailList.Choice;
-          exit(true);
-        end;
-    end;
-
     local procedure SelectDeviceSetting(var tmpDeviceSetting: Record "RP Device Settings" temporary): Boolean
     var
         tmpRetailList: Record "Retail List" temporary;
@@ -911,6 +869,13 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
                 tmpDeviceSetting.Options := 'Windows-1252,utf-8';
               end;
         //+NPR5.48 [327107]
+        //-NPR5.52 [371935]
+            'LABEL_REVERSE' :
+              begin
+                tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
+                tmpDeviceSetting.Options := 'N,Y';
+              end;
+        //+NPR5.52 [371935]
           end;
           exit(tmpDeviceSetting.Insert);
         end;
@@ -963,13 +928,11 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
         AddOption(RetailList, 'RFID EPC_HEX', '');
         AddOption(RetailList, 'RFID EPC_ASCII', '');
         AddOption(RetailList, 'RFID EPC_STD', '');
-        AddOption(RetailList, 'Line', '');
-        //+NPR5.48 [327107]
-    end;
-
-    procedure ConstructCommandSelectionList(var RetailList: Record "Retail List" temporary)
-    begin
+        //-NPR5.52 [371935]
         AddOption(RetailList, 'LINE', '');
+        AddOption(RetailList, 'BOX 1,B,0', '');
+        //+NPR5.52 [371935]
+        //+NPR5.48 [327107]
     end;
 
     local procedure ConstructDeviceSettingList(var tmpRetailList: Record "Retail List" temporary)
@@ -986,6 +949,9 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
         AddOption(tmpRetailList, SETTING_RFID_EPC_MEM, 'RFID_EPC_MEMORY');
         AddOption(tmpRetailList, SETTING_ENCODING, 'ENCODING');
         //+NPR5.48 [327107]
+        //-NPR5.52 [371935]
+        AddOption(tmpRetailList, SETTING_LABELREVERSE, 'LABEL_REVERSE');
+        //+NPR5.52 [371935]
     end;
 
     procedure AddOption(var RetailList: Record "Retail List" temporary;Choice: Text;Value: Text)

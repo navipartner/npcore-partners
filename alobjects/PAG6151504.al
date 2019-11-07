@@ -26,6 +26,8 @@ page 6151504 "Nc Import List"
     // NC2.12/MHA /20180418  CASE 308107 Deleted function ShowXml() and added ShowDocumentSource() to enable multiple file types
     // NC2.16/MHA /20180907  CASE 313184 Added fields 40,45,50 for diagnostics
     // NC2.17/JDH /20181112 CASE 334163 Added Caption to Action Add File
+    // NC2.23/ZESO/20190819  CASE 360787 Added Export File and Import File for Web Client
+    // NC2.23/MHA /20190927  CASE 369170 Removed Gambit integration
 
     Caption = 'Import List';
     DelayedInsert = true;
@@ -75,7 +77,7 @@ page 6151504 "Nc Import List"
                     ShowCaption = false;
                     field(Control6150622;'')
                     {
-                        Caption = 'Error Message:                                                                                                                                                                                                                                                                                ';
+                        Caption = 'Error Message:                                                                                                                                                                                                                                                                                _';
                         HideValue = true;
                         ShowCaption = false;
                     }
@@ -137,10 +139,6 @@ page 6151504 "Nc Import List"
                     Visible = false;
                 }
                 field("Import Duration";"Import Duration")
-                {
-                    Visible = false;
-                }
-                field("NaviPartner Case Url";"NaviPartner Case Url")
                 {
                     Visible = false;
                 }
@@ -221,17 +219,53 @@ page 6151504 "Nc Import List"
                     EditXml();
                 end;
             }
-            action("Create Gambit Case")
+            action("Export Xml File")
             {
-                Caption = 'Create Gambit Case';
-                Image = Job;
-                Promoted = true;
-                PromotedCategory = Category5;
-                PromotedIsBig = true;
+                Caption = 'Export Xml File';
+                Image = ExportAttachment;
+                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedCategory = Process;
+                Visible = WebClient;
 
                 trigger OnAction()
+                var
+                    TempBlob: Record TempBlob temporary;
+                    FileMgt: Codeunit "File Management";
+                    Path: Text;
                 begin
-                    CreateGambitCase();
+                    //-NC2.23 [360787]
+                    CalcFields("Document Source");
+                    TempBlob.Blob := "Document Source";
+                    if not TempBlob.Blob.HasValue then
+                      exit;
+                    Path := FileMgt.BLOBExport(TempBlob,TemporaryPath + "Document Name",true);
+                    //+NC2.23 [360787]
+                end;
+            }
+            action("Import Xml File")
+            {
+                Caption = 'Import Xml File';
+                Image = ImportCodes;
+                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedCategory = Process;
+                Visible = WebClient;
+
+                trigger OnAction()
+                var
+                    TempBlob: Record TempBlob temporary;
+                    FileMgt: Codeunit "File Management";
+                    Path: Text;
+                    FileName: Text;
+                begin
+                    //-NC2.23 [360787]
+                    FileName := FileMgt.BLOBImportWithFilter(TempBlob,'Import Layout','',FileFilterTxt,FileFilterTxt);
+                    if FileName = '' then
+                      exit;
+
+                    "Document Source" := TempBlob.Blob;
+                    Modify(true);
+                    Clear(TempBlob);
+                    //+NC2.23 [360787]
                 end;
             }
         }
@@ -268,7 +302,7 @@ page 6151504 "Nc Import List"
     end;
 
     var
-        FilterImportType: Code[10];
+        FilterImportType: Code[20];
         GambitMgt: Codeunit "Nc Gambit Management";
         Text001: Label 'No Input';
         Text002: Label 'The %1 selected Import Entries will be scheduled for re-import\Continue?';
@@ -279,6 +313,7 @@ page 6151504 "Nc Import List"
         ShowImported: Boolean;
         Text004: Label '%1 Order(s) has been imported \\%2 Orders contained errors.';
         WebClient: Boolean;
+        FileFilterTxt: Label 'Text Files (*.txt)|*.txt';
 
     local procedure AddFile()
     var
@@ -301,11 +336,6 @@ page 6151504 "Nc Import List"
         Insert(true);
         CurrPage.Update(false);
         //+NC2.08 [297159]
-    end;
-
-    local procedure CreateGambitCase()
-    begin
-        GambitMgt.InsertCaseImportEntry(Rec);
     end;
 
     local procedure SetPresetFilters()

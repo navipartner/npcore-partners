@@ -9,6 +9,7 @@ table 6151416 "Magento Brand"
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
     // MAG2.22/MHA /20190614  CASE 358258 Extended field 110 "Meta Title" from 50 to 100
+    // MAG2.23/BHR /20190730  CASE 362728 Created New Field 15 Short Description
 
     Caption = 'Magento Brand';
     DrillDownPageID = "Magento Brands";
@@ -63,6 +64,9 @@ table 6151416 "Magento Brand"
                 "Seo Link" := MagentoFunctions.SeoFormat("Seo Link");
                 //+MAG1.02
             end;
+        }
+        field(15;"Short Description";BLOB)
+        {
         }
         field(100;"Logo Picture";Text[250])
         {

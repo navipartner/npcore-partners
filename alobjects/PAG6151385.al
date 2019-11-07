@@ -1,6 +1,7 @@
 page 6151385 "CS Stock-Takes List"
 {
     // NPR5.50/CLVA/20190304  CASE 332844 Object created
+    // NPR5.52/CLVA/20190905  CASE 364063 Added field "Journal Qty. (Calculated)"
 
     Caption = 'CS Stock-Takes List';
     CardPageID = "CS Stock-Takes Card";
@@ -20,6 +21,9 @@ page 6151385 "CS Stock-Takes List"
         {
             repeater(Group)
             {
+                field(Location;Location)
+                {
+                }
                 field(Created;Created)
                 {
                 }
@@ -56,6 +60,18 @@ page 6151385 "CS Stock-Takes List"
                 field("Refill Entries";"Refill Entries")
                 {
                 }
+                field("Inventory Calculated";"Inventory Calculated")
+                {
+                }
+                field("Predicted Qty.";"Predicted Qty.")
+                {
+                }
+                field("Journal Posted";"Journal Posted")
+                {
+                }
+                field("Stock-Take Id";"Stock-Take Id")
+                {
+                }
                 field(Note;Note)
                 {
                 }
@@ -73,8 +89,15 @@ page 6151385 "CS Stock-Takes List"
                 Image = LedgerEntries;
 
                 trigger OnAction()
+                var
+                    LocationRec: Record Location;
                 begin
-                    CreateNewCounting();
+                    //CreateNewCounting();
+                    if not LocationRec.Get(GetFilter(Location)) then
+                      Error(Err_MissingLocation);
+
+                    CSHelperFunctions.CreateNewCounting(LocationRec);
+                    CurrPage.Update();
                 end;
             }
             action("Force Close")
@@ -84,7 +107,10 @@ page 6151385 "CS Stock-Takes List"
 
                 trigger OnAction()
                 begin
-                    CancelCounting();
+                    //CancelCounting();
+
+                    CSHelperFunctions.CancelCounting(Rec);
+                    CurrPage.Update();
                 end;
             }
             group(Overview)
@@ -97,17 +123,26 @@ page 6151385 "CS Stock-Takes List"
                     RunObject = Page "CS Devices";
                     RunPageLink = Location=FIELD(Location);
                 }
-                action("&Worksheets")
+                action("&Item Journal")
                 {
-                    Caption = '&Worksheets';
+                    Caption = '&Item Journal';
                     Image = Worksheet2;
-                    RunObject = Page "Stock-Take Worksheet";
-                    RunPageLink = "Stock-Take Config Code"=FIELD(Location);
+                    RunObject = Page "Phys. Inventory Journal";
+                    RunPageLink = "Journal Template Name"=FIELD("Journal Template Name"),
+                                  "Journal Batch Name"=FIELD("Journal Batch Name");
+                }
+                action("&Item Journal Batch")
+                {
+                    Caption = '&Item Journal Batch';
+                    Image = InventoryJournal;
+                    RunObject = Page "Item Journal Batches";
+                    RunPageView = WHERE("Template Type"=CONST("Phys. Inventory"));
                 }
             }
             group(Process)
             {
                 Caption = 'Process';
+                Visible = false;
                 action("1. Close Stockroom")
                 {
                     Caption = '1. Close Stockroom';
@@ -166,5 +201,9 @@ page 6151385 "CS Stock-Takes List"
             }
         }
     }
+
+    var
+        CSHelperFunctions: Codeunit "CS Helper Functions";
+        Err_MissingLocation: Label 'Location is missing on POS Store';
 }
 
