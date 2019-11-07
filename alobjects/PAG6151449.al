@@ -9,6 +9,7 @@ page 6151449 "Magento Shipment Mapping"
     Caption = 'Shipment Method Mapping';
     PageType = List;
     SourceTable = "Magento Shipment Mapping";
+    UsageCategory = Administration;
 
     layout
     {

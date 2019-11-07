@@ -4,6 +4,7 @@ page 6014591 "Sales Statistics Time Period"
 
     Caption = 'Sales Statistics by Date Time';
     PageType = Card;
+    UsageCategory = ReportsAndAnalysis;
 
     layout
     {

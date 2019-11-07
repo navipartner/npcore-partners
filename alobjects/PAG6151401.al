@@ -40,6 +40,7 @@ page 6151401 "Magento Setup"
     Caption = 'Magento Setup';
     PromotedActionCategories = 'New,Tasks,Reports,Display';
     SourceTable = "Magento Setup";
+    UsageCategory = Administration;
 
     layout
     {

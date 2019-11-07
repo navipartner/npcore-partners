@@ -3,6 +3,7 @@ table 6151391 "CS Stock-Takes"
     // NPR5.50/CLVA/20190304  CASE 332844 Object created
     // NPR5.52/CLVA/20190905  CASE 364063 Refactored to use Item Journal
     //                                    Added fields "Journal Template Name","Journal Batch Name","Predicted Qty." and "Inventory Calculated"
+    // NPR5.52/CLVA/20191102 CASE 375749 Changed code to support version specific changes (NAV 2018+).
 
     Caption = 'CS Stock-Takes';
 
@@ -47,7 +48,8 @@ table 6151391 "CS Stock-Takes"
         }
         field(18;"Salesfloor Entries";Integer)
         {
-            CalcFormula = Count("CS Stock-Takes Data" WHERE (Stock-Take Id=FIELD(Stock-Take Id), Area=CONST(Salesfloor)));
+            CalcFormula = Count("CS Stock-Takes Data" WHERE ("Stock-Take Id"=FIELD("Stock-Take Id"),
+                                                             Area=CONST(Salesfloor)));
             Caption = 'Salesfloor Entries';
             FieldClass = FlowField;
         }
@@ -69,7 +71,8 @@ table 6151391 "CS Stock-Takes"
         }
         field(23;"Stockroom Entries";Integer)
         {
-            CalcFormula = Count("CS Stock-Takes Data" WHERE (Stock-Take Id=FIELD(Stock-Take Id), Area=CONST(Stockroom)));
+            CalcFormula = Count("CS Stock-Takes Data" WHERE ("Stock-Take Id"=FIELD("Stock-Take Id"),
+                                                             Area=CONST(Stockroom)));
             Caption = 'Stockroom Entries';
             FieldClass = FlowField;
         }
@@ -119,7 +122,7 @@ table 6151391 "CS Stock-Takes"
         }
         field(35;"Refill Entries";Integer)
         {
-            CalcFormula = Count("CS Refill Data" WHERE (Stock-Take Id=FIELD(Stock-Take Id)));
+            CalcFormula = Count("CS Refill Data" WHERE ("Stock-Take Id"=FIELD("Stock-Take Id")));
             Caption = 'Refill Entries';
             FieldClass = FlowField;
         }
@@ -139,7 +142,7 @@ table 6151391 "CS Stock-Takes"
         field(39;"Journal Batch Name";Code[10])
         {
             Caption = 'Journal Batch Name';
-            TableRelation = "Item Journal Batch".Name WHERE (Journal Template Name=FIELD(Journal Template Name));
+            TableRelation = "Item Journal Batch".Name WHERE ("Journal Template Name"=FIELD("Journal Template Name"));
         }
         field(40;"Predicted Qty.";Decimal)
         {
@@ -174,24 +177,24 @@ table 6151391 "CS Stock-Takes"
 
     trigger OnInsert()
     begin
-        CSStockTakes.SETRANGE(Location,Location);
-        CSStockTakes.SETRANGE(Closed, 0DT);
-        IF CSStockTakes.FINDSET THEN
-         ERROR(Err_CSStockTakes,"Stock-Take Id");
+        CSStockTakes.SetRange(Location,Location);
+        CSStockTakes.SetRange(Closed, 0DT);
+        if CSStockTakes.FindSet then
+         Error(Err_CSStockTakes,"Stock-Take Id");
     end;
 
     trigger OnModify()
     begin
-        IF ("Salesfloor Closed" <> 0DT) AND ("Stockroom Closed" <> 0DT) AND ("Refill Closed" <> 0DT) AND (Approved <> 0DT) THEN BEGIN
-         Closed := CURRENTDATETIME;
-         "Closed By" := USERID;
-        END;
+        if ("Salesfloor Closed" <> 0DT) and ("Stockroom Closed" <> 0DT) and ("Refill Closed" <> 0DT) and (Approved <> 0DT) then begin
+         Closed := CurrentDateTime;
+         "Closed By" := UserId;
+        end;
 
-        IF "Salesfloor Closed" <> 0DT THEN
+        if "Salesfloor Closed" <> 0DT then
          "Salesfloor Duration" := "Salesfloor Closed" - "Salesfloor Started";
-        IF "Stockroom Closed" <> 0DT THEN
+        if "Stockroom Closed" <> 0DT then
          "Stockroom Duration" := "Stockroom Closed" - "Stockroom Started";
-        IF "Refill Closed" <> 0DT THEN
+        if "Refill Closed" <> 0DT then
          "Refill Duration" := "Refill Closed" - "Refill Started";
     end;
 
@@ -225,42 +228,42 @@ table 6151391 "CS Stock-Takes"
         Item: Record Item;
         QtyCalculated: Decimal;
     begin
-        IF NOT LocationRec.GET(GETFILTER(Location)) THEN
-          ERROR(Err_MissingLocation);
+        if not LocationRec.Get(GetFilter(Location)) then
+          Error(Err_MissingLocation);
 
         //-NPR5.52 [364063]
-        CLEAR(CSStockTakes);
-        CSStockTakes.SETRANGE(Location,Location);
-        CSStockTakes.SETRANGE(Closed, 0DT);
-        IF CSStockTakes.FINDSET THEN
-         ERROR(Err_CSStockTakes,"Stock-Take Id");
+        Clear(CSStockTakes);
+        CSStockTakes.SetRange(Location,Location);
+        CSStockTakes.SetRange(Closed, 0DT);
+        if CSStockTakes.FindSet then
+         Error(Err_CSStockTakes,"Stock-Take Id");
 
-        CSSetup.GET;
-        CSSetup.TESTFIELD("Phys. Inv Jour Temp Name");
-        ItemJournalTemplate.GET(CSSetup."Phys. Inv Jour Temp Name");
-        IF NOT ItemJournalBatch.GET(CSSetup."Phys. Inv Jour Temp Name",LocationRec.Code) THEN BEGIN
-          ItemJournalBatch.INIT;
-          ItemJournalBatch.VALIDATE("Journal Template Name",CSSetup."Phys. Inv Jour Temp Name");
-          ItemJournalBatch.VALIDATE(Name,LocationRec.Code);
-          ItemJournalBatch.Description := STRSUBSTNO(Text001,LocationRec.Code);
-          ItemJournalBatch.VALIDATE("No. Series",CSSetup."Phys. Inv Jour No. Series");
-          ItemJournalBatch.VALIDATE("Reason Code",ItemJournalTemplate."Reason Code");
-          ItemJournalBatch.INSERT(TRUE);
-        END ELSE BEGIN
-          RecRef.GETTABLE(ItemJournalBatch);
-          CLEAR(CSPostingBuffer);
-          CSPostingBuffer.SETRANGE("Table No.",RecRef.NUMBER);
-          CSPostingBuffer.SETRANGE("Record Id",RecRef.RECORDID);
-          CSPostingBuffer.SETRANGE(Executed,FALSE);
-          IF CSPostingBuffer.FINDSET THEN
-            ERROR(Err_PostingIsScheduled,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
+        CSSetup.Get;
+        CSSetup.TestField("Phys. Inv Jour Temp Name");
+        ItemJournalTemplate.Get(CSSetup."Phys. Inv Jour Temp Name");
+        if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name",LocationRec.Code) then begin
+          ItemJournalBatch.Init;
+          ItemJournalBatch.Validate("Journal Template Name",CSSetup."Phys. Inv Jour Temp Name");
+          ItemJournalBatch.Validate(Name,LocationRec.Code);
+          ItemJournalBatch.Description := StrSubstNo(Text001,LocationRec.Code);
+          ItemJournalBatch.Validate("No. Series",CSSetup."Phys. Inv Jour No. Series");
+          ItemJournalBatch.Validate("Reason Code",ItemJournalTemplate."Reason Code");
+          ItemJournalBatch.Insert(true);
+        end else begin
+          RecRef.GetTable(ItemJournalBatch);
+          Clear(CSPostingBuffer);
+          CSPostingBuffer.SetRange("Table No.",RecRef.Number);
+          CSPostingBuffer.SetRange("Record Id",RecRef.RecordId);
+          CSPostingBuffer.SetRange(Executed,false);
+          if CSPostingBuffer.FindSet then
+            Error(Err_PostingIsScheduled,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
 
-          CLEAR(ItemJournalLine);
-          ItemJournalLine.SETRANGE("Journal Template Name",ItemJournalBatch."Journal Template Name");
-          ItemJournalLine.SETRANGE("Journal Batch Name",ItemJournalBatch.Name);
-          IF ItemJournalLine.COUNT > 0 THEN
-            ERROR(Err_StockTakeWorksheetNotEmpty,ItemJournalLine."Journal Template Name",ItemJournalLine."Journal Batch Name");
-        END;
+          Clear(ItemJournalLine);
+          ItemJournalLine.SetRange("Journal Template Name",ItemJournalBatch."Journal Template Name");
+          ItemJournalLine.SetRange("Journal Batch Name",ItemJournalBatch.Name);
+          if ItemJournalLine.Count > 0 then
+            Error(Err_StockTakeWorksheetNotEmpty,ItemJournalLine."Journal Template Name",ItemJournalLine."Journal Batch Name");
+        end;
 
         // CSHelperFunctions.CreateStockTakeWorksheet(Location,'SALESFLOOR',StockTakeWorksheet);
         // StockTakeWorksheet.TESTFIELD(Status,StockTakeWorksheet.Status::OPEN);
@@ -281,59 +284,62 @@ table 6151391 "CS Stock-Takes"
         // StockTakeConfiguration.MODIFY(TRUE);
         //+NPR5.52 [364063]
 
-        INIT;
-        "Stock-Take Id" := CREATEGUID;
-        Created := CURRENTDATETIME;
-        "Created By" := USERID;
+        Init;
+        "Stock-Take Id" := CreateGuid;
+        Created := CurrentDateTime;
+        "Created By" := UserId;
         //-NPR5.52 [364063]
         //Location := GETFILTER(Location);
         Location := LocationRec.Code;
         "Journal Template Name" := ItemJournalBatch."Journal Template Name";
         "Journal Batch Name" := ItemJournalBatch.Name;
         //+NPR5.52 [364063]
-        INSERT(TRUE);
+        Insert(true);
 
-        COMMIT;
+        Commit;
 
-        IF CONFIRM(STRSUBSTNO(Text002,Location,TRUE)) THEN BEGIN
-          CLEAR(ItemJournalLine);
-          ItemJournalLine.INIT;
-          ItemJournalLine.VALIDATE("Journal Template Name","Journal Template Name");
-          ItemJournalLine.VALIDATE("Journal Batch Name","Journal Batch Name");
+        if Confirm(StrSubstNo(Text002,Location,true)) then begin
+          Clear(ItemJournalLine);
+          ItemJournalLine.Init;
+          ItemJournalLine.Validate("Journal Template Name","Journal Template Name");
+          ItemJournalLine.Validate("Journal Batch Name","Journal Batch Name");
           ItemJournalLine."Location Code" := Location;
 
-          CLEAR(NoSeriesMgt);
-          ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series",ItemJournalLine."Posting Date",FALSE);
+          Clear(NoSeriesMgt);
+          ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series",ItemJournalLine."Posting Date",false);
           ItemJournalLine."Source Code" := ItemJournalTemplate."Source Code";
           ItemJournalLine."Reason Code" := ItemJournalBatch."Reason Code";
           ItemJournalLine."Posting No. Series" := ItemJournalBatch."Posting No. Series";
 
-          CLEAR(Item);
-          Item.SETFILTER("Location Filter",Location);
-          IF NOT Item.FINDSET THEN
-            ERROR(Text003,Location);
+          Clear(Item);
+          Item.SetFilter("Location Filter",Location);
+          if not Item.FindSet then
+            Error(Text003,Location);
 
-          CLEAR(CalculateInventory);
-          CalculateInventory.USEREQUESTPAGE(FALSE);
-          CalculateInventory.SETTABLEVIEW(Item);
+          Clear(CalculateInventory);
+          CalculateInventory.UseRequestPage(false);
+          CalculateInventory.SetTableView(Item);
           CalculateInventory.SetItemJnlLine(ItemJournalLine);
-          CalculateInventory.InitializeRequest(WORKDATE,ItemJournalLine."Document No.",FALSE);
-          CalculateInventory.RUNMODAL;
+          //-NPR5.52 [375749]
+          //CalculateInventory.InitializeRequest(WORKDATE,ItemJournalLine."Document No.",FALSE);
+          CalculateInventory.InitializeRequest(WorkDate,ItemJournalLine."Document No.",false,false);
+          //+NPR5.52 [375749]
+          CalculateInventory.RunModal;
 
-          CLEAR(ItemJournalLine);
-          ItemJournalLine.SETRANGE("Journal Template Name","Journal Template Name");
-          ItemJournalLine.SETRANGE("Journal Batch Name","Journal Batch Name");
-          ItemJournalLine.SETRANGE("Location Code",Location);
-          IF ItemJournalLine.FINDSET THEN BEGIN
-            REPEAT
+          Clear(ItemJournalLine);
+          ItemJournalLine.SetRange("Journal Template Name","Journal Template Name");
+          ItemJournalLine.SetRange("Journal Batch Name","Journal Batch Name");
+          ItemJournalLine.SetRange("Location Code",Location);
+          if ItemJournalLine.FindSet then begin
+            repeat
               QtyCalculated += ItemJournalLine."Qty. (Calculated)"
-            UNTIL ItemJournalLine.NEXT = 0;
-          END;
+            until ItemJournalLine.Next = 0;
+          end;
 
           "Predicted Qty." := QtyCalculated;
-          "Inventory Calculated" := TRUE;
-          MODIFY(TRUE);
-        END;
+          "Inventory Calculated" := true;
+          Modify(true);
+        end;
     end;
 
     procedure CancelCounting()
@@ -343,28 +349,28 @@ table 6151391 "CS Stock-Takes"
         RecRef: RecordRef;
         CSPostingBuffer: Record "CS Posting Buffer";
     begin
-        IF Closed <> 0DT THEN
-          EXIT;
+        if Closed <> 0DT then
+          exit;
 
         //-NPR5.52 [364063]
-        IF NOT LocationRec.GET(GETFILTER(Location)) THEN
-          ERROR(Err_MissingLocation);
+        if not LocationRec.Get(GetFilter(Location)) then
+          Error(Err_MissingLocation);
 
-        IF ItemJournalBatch.GET("Journal Template Name","Journal Batch Name") THEN BEGIN
-          RecRef.GETTABLE(ItemJournalBatch);
-          CLEAR(CSPostingBuffer);
-          CSPostingBuffer.SETRANGE("Table No.",RecRef.NUMBER);
-          CSPostingBuffer.SETRANGE("Record Id",RecRef.RECORDID);
-          CSPostingBuffer.SETRANGE(Executed,FALSE);
-          IF CSPostingBuffer.FINDSET THEN
-            ERROR(Err_PostingIsScheduled,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
+        if ItemJournalBatch.Get("Journal Template Name","Journal Batch Name") then begin
+          RecRef.GetTable(ItemJournalBatch);
+          Clear(CSPostingBuffer);
+          CSPostingBuffer.SetRange("Table No.",RecRef.Number);
+          CSPostingBuffer.SetRange("Record Id",RecRef.RecordId);
+          CSPostingBuffer.SetRange(Executed,false);
+          if CSPostingBuffer.FindSet then
+            Error(Err_PostingIsScheduled,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
 
-          IF NOT CONFIRM(STRSUBSTNO(Err_ConfirmForceClose,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name),TRUE) THEN
-            EXIT;
+          if not Confirm(StrSubstNo(Err_ConfirmForceClose,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name),true) then
+            exit;
 
-          ItemJournalBatch.DELETE(TRUE);
+          ItemJournalBatch.Delete(true);
 
-        END;
+        end;
         // StockTakeWorksheetLine.SETRANGE("Stock-Take Config Code",Location);
         // StockTakeWorksheetLine.SETRANGE("Worksheet Name",'SALESFLOOR');
         // StockTakeWorksheetLine.DELETEALL(TRUE);
@@ -375,57 +381,57 @@ table 6151391 "CS Stock-Takes"
         // StockTakeWorksheetLine.DELETEALL(TRUE);
         //+NPR5.52 [364063]
 
-        Closed := CURRENTDATETIME;
-        "Closed By" := USERID;
+        Closed := CurrentDateTime;
+        "Closed By" := UserId;
         Note := Txt_CountingCancelled;
 
-        MODIFY(TRUE);
+        Modify(true);
     end;
 
     procedure ApproveCounting()
     begin
-        IF ("Salesfloor Closed" = 0DT) THEN
-          ERROR(Err_SalesfloorClosed);
+        if ("Salesfloor Closed" = 0DT) then
+          Error(Err_SalesfloorClosed);
 
-        IF ("Stockroom Closed" = 0DT) THEN
-          ERROR(Err_StockroomClosed);
+        if ("Stockroom Closed" = 0DT) then
+          Error(Err_StockroomClosed);
 
-        IF ("Refill Closed" = 0DT) THEN
-          ERROR(Err_RefillClosed);
+        if ("Refill Closed" = 0DT) then
+          Error(Err_RefillClosed);
 
-        Approved := CURRENTDATETIME;
-        "Approved By" := USERID;
-        MODIFY(TRUE);
+        Approved := CurrentDateTime;
+        "Approved By" := UserId;
+        Modify(true);
     end;
 
     procedure CloseStockroom()
     begin
-        IF "Stockroom Closed" <> 0DT THEN
-          EXIT;
+        if "Stockroom Closed" <> 0DT then
+          exit;
 
-        IF ("Stockroom Started" = 0DT) THEN BEGIN
-          "Stockroom Started" := CURRENTDATETIME;
-          "Stockroom Started By" := USERID;
-        END;
+        if ("Stockroom Started" = 0DT) then begin
+          "Stockroom Started" := CurrentDateTime;
+          "Stockroom Started By" := UserId;
+        end;
 
-        "Stockroom Closed" := CURRENTDATETIME;
-        "Stockroom Closed By" := USERID;
-        MODIFY(TRUE);
+        "Stockroom Closed" := CurrentDateTime;
+        "Stockroom Closed By" := UserId;
+        Modify(true);
     end;
 
     procedure CloseSalesfloor()
     begin
-        IF "Salesfloor Closed" <> 0DT THEN
-          EXIT;
+        if "Salesfloor Closed" <> 0DT then
+          exit;
 
-        IF ("Salesfloor Started" = 0DT) THEN BEGIN
-          "Salesfloor Started" := CURRENTDATETIME;
-          "Salesfloor Started By" := USERID;
-        END;
+        if ("Salesfloor Started" = 0DT) then begin
+          "Salesfloor Started" := CurrentDateTime;
+          "Salesfloor Started By" := UserId;
+        end;
 
-        "Salesfloor Closed" := CURRENTDATETIME;
-        "Salesfloor Closed By" := USERID;
-        MODIFY(TRUE);
+        "Salesfloor Closed" := CurrentDateTime;
+        "Salesfloor Closed By" := UserId;
+        Modify(true);
     end;
 }
 
