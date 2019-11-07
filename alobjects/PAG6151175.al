@@ -5,6 +5,7 @@ page 6151175 "NpGp Cross Companies Setup"
     Caption = 'Cross Companies Setup';
     PageType = List;
     SourceTable = "NpGp Cross Company Setup";
+    UsageCategory = Administration;
 
     layout
     {

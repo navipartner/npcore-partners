@@ -7,6 +7,7 @@ codeunit 6059827 "Upgrade NPR5.52"
     // NPR5.52/MMV /20191004 CASE 352472 Renamed prepayment parameters.
     // NPR5.52/MHA /20191016 CASE 371388 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
     // NPR5.52/MHA /20191016 CASE 373294 Added function UpgPaymentTypePOS()
+    // NPR5.52/CLVA/20191104 CASE 375749 Added code to UpgradeTables function
 
     Subtype = Upgrade;
 
@@ -30,6 +31,10 @@ codeunit 6059827 "Upgrade NPR5.52"
         //-NPR5.52 [368395]
         DataUpgradeMgt.SetTableSyncSetup(DATABASE::"POS Unit",0,TableSynchSetup.Mode::Force);  //SMS profile move to POS End of Day Profile
         //+NPR5.52 [368395]
+
+        //-NPR5.52 [375749]
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"CS Posting Buffer",0,TableSynchSetup.Mode::Force);
+        //+NPR5.52 [375749]
     end;
 
     [UpgradePerCompany]

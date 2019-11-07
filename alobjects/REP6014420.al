@@ -9,6 +9,7 @@ report 6014420 "Item Group Top"
     RDLCLayout = './Item Group Top.rdlc';
 
     Caption = 'Item Group Top';
+    UsageCategory = ReportsAndAnalysis;
 
     dataset
     {
