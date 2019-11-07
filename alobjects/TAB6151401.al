@@ -26,6 +26,9 @@ table 6151401 "Magento Setup"
     // MAG2.22/MHA /20190625  CASE 359754 Added OptionValue "Customer No." to field 500 "Customer Mapping"
     // MAG2.22/MHA /20190708  CASE 352201 Added field 220 "Collect in Store Enabled"
     // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print fields 340 "Gift Voucher Bitmap", 345 "Voucher Number Format", 350 "Voucher Date Format", 425 "Credit Voucher Bitmap"
+    // MAG2.23/MHA /20190826  CASE 363864 Added fields 700 "Post Retail Voucher on Import", 710 "E-mail Retail Vouchers to"
+    // MAG2.23/MHA /20190930  CASE 370831 B2B modules should be disabled for Magento 2 as Pull has been implemented via NAV Web Services
+    // MAG2.23/MHA /20191011  CASE 371791 Added fields 720 "Post Tickets on Import", 730 "Post Memberships on Import"
 
     Caption = 'Magento Setup';
 
@@ -55,6 +58,17 @@ table 6151401 "Magento Setup"
                   UpdateApi();
                 end;
                 //+MAG2.20 [320423]
+                //-MAG2.23 [370831]
+                case "Magento Version" of
+                  "Magento Version"::"2":
+                    begin
+                      "Customers Enabled" := false;
+                      "Sales Prices Enabled" := false;
+                      "Sales Line Discounts Enabled" := false;
+                      "Item Disc. Group Enabled" := false;
+                    end;
+                end;
+                //+MAG2.23 [370831]
             end;
         }
         field(20;"Magento Url";Text[250])
@@ -458,6 +472,28 @@ table 6151401 "Magento Setup"
         {
             Caption = 'Auto Seo Link Disabled';
             Description = 'MAG2.03';
+        }
+        field(700;"Post Retail Vouchers on Import";Boolean)
+        {
+            Caption = 'Post Retail Vouchers on Import';
+            Description = 'MAG2.23';
+        }
+        field(710;"E-mail Retail Vouchers to";Option)
+        {
+            Caption = 'E-mail Retail Vouchers to';
+            Description = 'MAG2.23';
+            OptionCaption = ' ,Bill-to Customer';
+            OptionMembers = " ","Bill-to Customer";
+        }
+        field(720;"Post Tickets on Import";Boolean)
+        {
+            Caption = 'Post Tickets on Import';
+            Description = 'MAG2.23';
+        }
+        field(730;"Post Memberships on Import";Boolean)
+        {
+            Caption = 'Post Memberships on Import';
+            Description = 'MAG2.23';
         }
     }
 

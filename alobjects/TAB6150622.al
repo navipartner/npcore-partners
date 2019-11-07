@@ -19,6 +19,7 @@ table 6150622 "POS Sales Line"
     // NPR5.50/MMV /20190328 CASE 300557 Added field 143,144.
     //                                   Renamed blank Type option to comment.
     // NPR5.51/MHA /20190718 CASE 362329 Added field 500 "Exclude from Posting"
+    // NPR5.52/TSA /20190925 CASE 369231 Added field "Retail Serial No." aka "Serial No. not Created"
 
     Caption = 'POS Sales Line';
     DrillDownPageID = "POS Sales Line List";
@@ -458,6 +459,10 @@ table 6150622 "POS Sales Line"
         {
             Caption = 'BOM Item No.';
             TableRelation = Item;
+        }
+        field(6015;"Retail Serial No.";Code[30])
+        {
+            Caption = 'Retail Serial No.';
         }
         field(6500;"Serial No.";Code[20])
         {

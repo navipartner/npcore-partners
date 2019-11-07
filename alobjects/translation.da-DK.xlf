@@ -21,6 +21,36 @@
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension6014436 - Change ShippingAgentServices - Property Caption</note>
         </trans-unit>
+        <trans-unit id="Page 1931437772 - Control 1527594213 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Vendor No.</source>
+          <target>Kreditornr.</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Retail Journal Line - Control Vendor No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 1931437772 - Control 761149270 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Item Group</source>
+          <target>Varegruppe</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Retail Journal Line - Control Item Group - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 1931437772 - Control 2971843366 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Unknown Item No.</source>
+          <target>Ukendt varenummer</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Retail Journal Line - Control Unknown Item No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 1931437772 - Control 3755398875 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>New Item</source>
+          <target>Ny vare</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Retail Journal Line - Control New Item - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 1931437772 - Control 4261975834 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Inventory Status</source>
+          <target>Lagerstatus</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page Retail Journal Line - Control Inventory Status - Property Caption</note>
+        </trans-unit>
         <trans-unit id="Page 2811417786 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Global Voucher Setup</source>
           <target>Global voucher ops�tning</target>
@@ -33,11 +63,59 @@
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Query VAT Totals - Property Caption</note>
         </trans-unit>
+        <trans-unit id="Report 2882802867 - ReportLabel 503253756" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Discount</source>
+          <target>Rabat</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Report Sales Ticket A4 - ReportLabel Discount_Lbl</note>
+        </trans-unit>
         <trans-unit id="Report 3908757738 - ReportLabel 2707973462" size-unit="char" translate="yes" xml:space="preserve">
           <source>Sales (Unit Price)</source>
           <target>salg varepriser</target>
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Report Item Sales Postings - ReportLabel SalesUnitPrice_Caption</note>
+        </trans-unit>
+        <trans-unit id="Report 1106883950 - ReportLabel 3398307638" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Bank Account No.</source>
+          <target>Konto Nr.</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Report Sales Doc Confirmation A4 - ReportLabel BankAcc_Lbl</note>
+        </trans-unit>
+        <trans-unit id="Report 1106883950 - ReportLabel 1087017780" size-unit="char" translate="yes" xml:space="preserve">
+          <source>IBAN No.</source>
+          <target>IBAN nr.</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Report Sales Doc Confirmation A4 - ReportLabel IBANNo_Lbl</note>
+        </trans-unit>
+        <trans-unit id="Report 1106883950 - ReportLabel 503253756" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Discount %</source>
+          <target>Rabat i %</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Report Sales Doc Confirmation A4 - ReportLabel Discount_Lbl</note>
+        </trans-unit>
+        <trans-unit id="Report 1106883950 - ReportLabel 1829060576" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Total Incl. VAT</source>
+          <target>Total med moms</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Report Sales Doc Confirmation A4 - ReportLabel TotalInclVAT_Lbl</note>
+        </trans-unit>
+        <trans-unit id="Report 1106883950 - ReportLabel 2245719786" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Total Excl. VAT</source>
+          <target>Total uden moms</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Report Sales Doc Confirmation A4 - ReportLabel TotalExclVAT_Lbl</note>
+        </trans-unit>
+        <trans-unit id="Report 1106883950 - ReportLabel 3912393606" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Total Discount</source>
+          <target>Total rabat</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Report Sales Doc Confirmation A4 - ReportLabel TotalDiscount_Lbl</note>
+        </trans-unit>
+        <trans-unit id="Report 1106883950 - ReportLabel 2491197437" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Total VAT</source>
+          <target>Total moms</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Report Sales Doc Confirmation A4 - ReportLabel TotalVATPct_Lbl</note>
         </trans-unit>
         <trans-unit id="Report 2256174160 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Balancing Report -A4 - POS</source>

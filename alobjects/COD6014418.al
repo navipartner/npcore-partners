@@ -26,6 +26,7 @@ codeunit 6014418 "Retail Sales Code"
     // NPR5.45/MHA /20180821 CASE 324395 SaleLinePOS."Unit Price (LCY)" Renamed to "Unit Cost (LCY)"
     // NPR5.46/MMV /20181001 CASE 290734 EFT Framework refactoring
     // NPR5.50/TSA /20190502 CASE 342090 Added UpdateAmounts to ReverseSalesTicket2() function
+    // NPR5.52/ALPO/20191009 CASE 372122 Incorrect discount % handling when reversing sale return
 
     TableNo = "Audit Roll";
 
@@ -238,7 +239,7 @@ codeunit 6014418 "Retail Sales Code"
         
         SalesHeader.Copy(SalesHeader2);
         
-        SalePOS.Validate(SalePOS."Price including VAT",SalesHeader2."Prices Including VAT");
+        SalePOS.Validate(SalePOS."Prices Including VAT",SalesHeader2."Prices Including VAT");
         SalePOS.Validate("Location Code",SalesHeader2."Location Code");
         SalePOS.Modify;
         
@@ -628,7 +629,8 @@ codeunit 6014418 "Retail Sales Code"
           SaleLinePOS.Validate(Quantity,-AuditRoll.Quantity);
 
         SaleLinePOS."VAT %" := AuditRoll."VAT %";
-        SaleLinePOS."Discount %" := AuditRoll."Line Discount %";
+        //SaleLinePOS."Discount %" := AuditRoll."Line Discount %";  //NPR5.52 [372122]-revoked
+        SaleLinePOS."Discount %" := Abs(AuditRoll."Line Discount %");  //NPR5.52 [372122]
         SaleLinePOS."Discount Amount" := -AuditRoll."Line Discount Amount";
         SaleLinePOS."External Document No." := AuditRoll."Sales Ticket No.";
         SaleLinePOS.Amount := -AuditRoll.Amount;

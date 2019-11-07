@@ -63,6 +63,7 @@ codeunit 6060131 "MM Member Retail Integration"
     // MM1.40/TSA /20190614 CASE 358685 Changed subscriber for membership activation that are invoiced to customer
     // MM1.40/TSA /20190730 CASE 360275 Added AdmitMembersOnEndOfSalesWorker(), removed AdmittMembersOnCreateMembership(), corrected spelling of "admit"
     // MM1.40/TSA /20190830 CASE 360242 Added a confirm when printing membercard that is blocked
+    // MM1.41/TSA /20190910 CASE 368136 Discontinuing old code
 
 
     var
@@ -145,6 +146,7 @@ codeunit 6060131 "MM Member Retail Integration"
         FormatedCardNumber: Text[50];
         FormatedForeignCardNumber: Text[50];
         ShowMemberDialog: Boolean;
+        PageAction: Action;
     begin
 
         //+MM1.36 [335828]
@@ -270,6 +272,7 @@ codeunit 6060131 "MM Member Retail Integration"
                 POSMemberCard.LookupMode(true);
                 POSMemberCard.SetRecord(Member);
                 POSMemberCard.SetMembershipEntryNo(Membership."Entry No.");
+
                 if (POSMemberCard.RunModal() <> ACTION::LookupOK) then
                     Error('');
 
@@ -1293,29 +1296,6 @@ codeunit 6060131 "MM Member Retail Integration"
         //PrintMembershipSalesReceipt(AuditRoll."Sales Ticket No.");
         PrintMembershipOnEndOfSalesWorker(AuditRoll."Sales Ticket No.", false);
         //-MM1.32 [318132]
-    end;
-
-    local procedure DoLookupMembershipEntry(LookupCaption: Text; var TmpMembershipEntry: Record "MM Membership Entry" temporary) ItemNo: Code[20]
-    var
-        LookupRecRef: RecordRef;
-        Position: Text;
-    begin
-        ItemNo := '';
-
-        LookupRecRef.GetTable(TmpMembershipEntry);
-        //ConfigureLookupTemplate (Template, LookupRecRef);
-        //Position := Marshaller.Lookup(LookupCaption, Template, LookupRecRef);
-        Position := UI.DoLookup(LookupCaption, LookupRecRef);
-
-        if (Position <> '') then begin
-            LookupRecRef.SetPosition(Position);
-            if (LookupRecRef.Find()) then begin
-                LookupRecRef.SetTable(TmpMembershipEntry);
-                ItemNo := TmpMembershipEntry."Item No.";
-            end;
-        end;
-
-        exit(ItemNo);
     end;
 
     procedure TranslateBarcodeToItemVariant(Barcode: Text[50]; var ItemNo: Code[20]; var VariantCode: Code[10]; var ResolvingTable: Integer) Found: Boolean

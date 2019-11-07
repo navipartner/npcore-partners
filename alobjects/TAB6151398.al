@@ -1,6 +1,7 @@
 table 6151398 "CS Store Users"
 {
     // NPR5.51/CLVA  /20190813  CASE 365659 Object created - NP Capture Service
+    // NPR5.52/CLVA  /20190916  CASE 368484 Changed field Location to POS Store
 
     Caption = 'CS Store Users';
 
@@ -27,11 +28,11 @@ table 6151398 "CS Store Users"
                 UserManagement.ValidateUserID("User ID");
             end;
         }
-        field(2;"Location Code";Code[10])
+        field(2;"POS Store";Code[10])
         {
-            Caption = 'Location Code';
+            Caption = 'POS Store';
             NotBlank = true;
-            TableRelation = Location;
+            TableRelation = "POS Store";
         }
         field(10;Supervisor;Code[10])
         {
@@ -42,7 +43,7 @@ table 6151398 "CS Store Users"
 
     keys
     {
-        key(Key1;"User ID","Location Code")
+        key(Key1;"User ID","POS Store")
         {
         }
     }

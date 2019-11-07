@@ -2,6 +2,7 @@ table 6150680 "POS Entry Sales Doc. Link"
 {
     // NPR5.50/MMV /20190417 CASE 300557 Created object
     // NPR5.50/TSA /20190531 CASE 355186 Added options for service items
+    // NPR5.52/TSA /20191014 CASE 372920 Added options for assembly order and posted assembly order
 
     Caption = 'POS Entry Sales Doc. Link';
 
@@ -24,8 +25,8 @@ table 6150680 "POS Entry Sales Doc. Link"
         field(4;"Sales Document Type";Option)
         {
             Caption = 'Sales Document Type';
-            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order,Posted Invoice,Posted Credit Memo,Shipment,Return Receipt,Service Item';
-            OptionMembers = QUOTE,"ORDER",INVOICE,CREDIT_MEMO,BLANKET_ORDER,RETURN_ORDER,POSTED_INVOICE,POSTED_CREDIT_MEMO,SHIPMENT,RETURN_RECEIPT,SERVICE_ITEM;
+            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order,Posted Invoice,Posted Credit Memo,Shipment,Return Receipt,Service Item,Assembly Order,Posted Assembly Order';
+            OptionMembers = QUOTE,"ORDER",INVOICE,CREDIT_MEMO,BLANKET_ORDER,RETURN_ORDER,POSTED_INVOICE,POSTED_CREDIT_MEMO,SHIPMENT,RETURN_RECEIPT,SERVICE_ITEM,ASSEMBLY_ORDER,POSTED_ASSEMBLY_ORDER;
         }
         field(5;"Sales Document No";Code[20])
         {
@@ -88,6 +89,13 @@ table 6150680 "POS Entry Sales Doc. Link"
           "Sales Document Type"::SERVICE_ITEM:
             exit (PAGE::"Service Items");
           //+NPR5.50 [355186]
+          //-NPR5.52 [372920]
+          "Sales Document Type"::ASSEMBLY_ORDER:
+            exit (PAGE::"Assembly Order");
+          "Sales Document Type"::POSTED_ASSEMBLY_ORDER:
+            exit (PAGE::"Posted Assembly Order");
+          //+NPR5.52 [372920]
+
 
         end;
     end;
@@ -100,6 +108,8 @@ table 6150680 "POS Entry Sales Doc. Link"
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         ReturnReceiptHeader: Record "Return Receipt Header";
         ServiceItem: Record "Service Item";
+        AssemblyHeader: Record "Assembly Header";
+        PostedAssemblyHeader: Record "Posted Assembly Header";
     begin
         case "Sales Document Type" of
           "Sales Document Type"::QUOTE:
@@ -159,6 +169,22 @@ table 6150680 "POS Entry Sales Doc. Link"
               RecordOut := ServiceItem;
             end;
           //+NPR5.50 [355186]
+
+          //-NPR5.52 [372920]
+          "Sales Document Type"::ASSEMBLY_ORDER:
+            begin
+              AssemblyHeader.Get (AssemblyHeader."Document Type"::Order, "Sales Document No");
+              RecordOut := AssemblyHeader;
+            end;
+
+          "Sales Document Type"::POSTED_ASSEMBLY_ORDER:
+            begin
+              PostedAssemblyHeader.SetFilter ("Order No.", '=%1', "Sales Document No");
+              PostedAssemblyHeader.FindFirst ();
+              RecordOut := PostedAssemblyHeader;
+            end;
+          //+NPR5.52 [372920]
+
         end;
     end;
 }

@@ -949,7 +949,7 @@ codeunit 6150633 "POS Tax Calculation"
         //-NPR5.41 [311309]
         if SalePOS."Tax Area Code" = '' then
           exit;
-        if SalePOS."Price including VAT" then
+        if SalePOS."Prices Including VAT" then
           exit;
         TaxArea.Get(SalePOS."Tax Area Code");
         SetUpCurrency('');

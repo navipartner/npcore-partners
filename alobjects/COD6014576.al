@@ -18,6 +18,7 @@ codeunit 6014576 "Report - Retail Warranty"
     // NPR5.33/MMV /20170630 CASE 280196 Removed old code preventing compile.
     // NPR5.37/TJ  /20171018 CASE 286283 Translated variables with danish specific letters into english
     // NPR5.51/AlST/20190620 CASE 356129 allow for automatic printing of warranty on pos line creation
+    // NPR5.52/AlST/20191024 CASE 373793 focus on appropriate line for printing workflow
 
     TableNo = "Sale Line POS";
 
@@ -329,13 +330,17 @@ codeunit 6014576 "Report - Retail Warranty"
         if not Item."Guarantee voucher" then
           exit;
 
+        //-NPR5.52 [373793]
+        SaleLinePOS.SetRecFilter;
+        //+NPR5.52 [373793]
+
         if not TryAutoPrintWarranty(SaleLinePOS) and GuiAllowed then
           Message(WarrantyPrintCaption, GetLastErrorText);
         //+NPR5.51
     end;
 
     [TryFunction]
-    local procedure TryAutoPrintWarranty(SaleLinePOS: Record "Sale Line POS")
+    local procedure TryAutoPrintWarranty(var SaleLinePOS: Record "Sale Line POS")
     var
         ReportSelectionRetail: Record "Report Selection Retail";
         RetailReportSelectionMgt: Codeunit "Retail Report Selection Mgt.";

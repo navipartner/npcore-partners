@@ -41,6 +41,9 @@ codeunit 6150706 "POS Sale Line"
     // NPR5.51/ANPA/20190723 CASE 350674 Added UpdateLine, and the event OnUpdateLine
     // NPR5.51/ALPO/20190802 CASE 363243 Fix for POS Action ITEM_UNIT_PRICE: recalculate retrieved from barcode unit price to respect VAT rate
     // NPR5.51/ALPO/20190820 CASE 365161 Lines with Type=Comment excluded from CalculateBalance()
+    // NPR5.52/ALPO/20190912 CASE 354309 Make it possible for xRec to be available to subscribers via separate function call
+    //                                   New global 'xRec'; Removed local 'xRec' from SetQuantity()
+    // NPR5.52/ALPO/20190916 CASE 359596 Function ConvertPriceToVAT(): changed to be Global
 
 
     trigger OnRun()
@@ -49,6 +52,7 @@ codeunit 6150706 "POS Sale Line"
 
     var
         Rec: Record "Sale Line POS";
+        xRec: Record "Sale Line POS";
         Sale: Record "Sale POS";
         POSSale: Codeunit "POS Sale";
         Setup: Codeunit "POS Setup";
@@ -394,7 +398,6 @@ codeunit 6150706 "POS Sale Line"
     [Scope('Personalization')]
     procedure SetQuantity(Quantity: Decimal)
     var
-        xRec: Record "Sale Line POS";
         POSSalesDiscountCalcMgt: Codeunit "POS Sales Discount Calc. Mgt.";
     begin
         RefreshCurrent ();
@@ -826,7 +829,7 @@ codeunit 6150706 "POS Sale Line"
         //+NPR5.43 [319425]
     end;
 
-    local procedure ConvertPriceToVAT(FromPricesInclVAT: Boolean;FromVATBusPostingGr: Code[10];FromVATProdPostingGr: Code[10];SaleLinePOS: Record "Sale Line POS";var UnitPrice: Decimal)
+    procedure ConvertPriceToVAT(FromPricesInclVAT: Boolean;FromVATBusPostingGr: Code[10];FromVATProdPostingGr: Code[10];SaleLinePOS: Record "Sale Line POS";var UnitPrice: Decimal)
     var
         Currency: Record Currency;
         VATPostingSetup: Record "VAT Posting Setup";
@@ -881,6 +884,13 @@ codeunit 6150706 "POS Sale Line"
           UnitPrice := Round(UnitPrice,Currency."Unit-Amount Rounding Precision");
         end;
         //+NPR5.51 [363243]
+    end;
+
+    procedure GetxRec(var xSaleLinePOS: Record "Sale Line POS")
+    begin
+        //-NPR5.52 [354309]
+        xSaleLinePOS := xRec;
+        //+NPR5.52 [354309]
     end;
 }
 

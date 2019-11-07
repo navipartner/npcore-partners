@@ -2,6 +2,7 @@ codeunit 6150732 "POS Data Driver - Dimension"
 {
     // NPR5.44/TSA /20180709 CASE 321303 Initial Version
     // NPR5.48/MMV /20181105 CASE 334588 Fixed mismatch in event subscriber signature
+    // NPR5.52/ALPO/20190912 CASE 368673 Add dimension values to the data source even if there is no value at the moment
 
 
     trigger OnRun()
@@ -106,10 +107,15 @@ codeunit 6150732 "POS Data Driver - Dimension"
 
     local procedure AddDimesionValue(var DataRow: DotNet npNetDataRow0;var DimSetEntryTmp: Record "Dimension Set Entry" temporary;DimensionCode: Code[20];ShortcutNumber: Code[10])
     begin
+        //-NPR5.52 [368673]
+        if DimensionCode = '' then
+          exit;
+        //+NPR5.52 [368673]
 
         DimSetEntryTmp.SetFilter ("Dimension Code", '=%1', DimensionCode);
         if (not DimSetEntryTmp.FindFirst ()) then
-         exit;
+          //EXIT;  //NPR5.52 [368673]-revoked
+          DimSetEntryTmp.Init;  //NPR5.52 [368673]
 
         DataRow.Add (DimensionCode, DimSetEntryTmp."Dimension Value Code");
         DataRow.Add (ShortcutNumber, DimSetEntryTmp."Dimension Value Code");

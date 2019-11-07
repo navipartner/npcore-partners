@@ -13,6 +13,7 @@ page 6060140 "MM POS Member Card"
     // MM1.29/TSA /20180511 CASE 313795 Added GDPR option for guardian
     // MM1.34/TSA /20180907 CASE 327605 Open / Due Amount field
     // MM1.40/TSA /20190823 CASE 360242 Cleaned Green Code
+    // MM1.41/TSA /20191008 CASE 366261 When Clienttype is Phone, there is no "LookupOK"
 
     Caption = 'Member Details';
     DataCaptionExpression = "External Member No." + ' - ' + "Display Name";
@@ -143,6 +144,28 @@ page 6060140 "MM POS Member Card"
                 PromotedIsBig = true;
                 RunObject = Page "MM Member Card";
                 RunPageLink = "Entry No."=FIELD("Entry No.");
+            }
+            action("Register Arrival")
+            {
+                Caption = 'Register Arrival';
+                Image = Approve;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    MemberWebService: Codeunit "MM Member WebService";
+                    ResponseMessage: Text;
+                begin
+
+                    //-MM1.41 [366261]
+                    if (not MemberWebService.MemberRegisterArrival ("External Member No.", '', 'RTC-CLIENT', ResponseMessage)) then
+                      Error (ResponseMessage);
+
+                    Message (ResponseMessage);
+                    //+MM1.41 [366261]
+                end;
             }
             action("Activate Membership")
             {

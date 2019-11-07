@@ -11,6 +11,7 @@ tableextension 6014447 tableextension6014447 extends "Value Entry"
     // NPR5.48/TS  /20181203 CASE 338349 Item Category Code is 20
     // NPR5.50/ZESO/20190528 CASE 355450 Added SumIndexfields Invoiced Quantity,Sales Amount(Actual),Cost Amount (Actual) to Key
     //                                   Item Ledger Entry Type,Posting Date,Global Dimension 1 Code,Global Dimension 2 Code,Salespers./Purch. Code,Item Group No.,Item No.,Vendor No.,Source No.,Group Sale
+    // NPR5.52/ZESO/20191008 CASE 371446 Added field Document Date and Time ID 6014416
     fields
     {
         field(6014401;"Group Sale";Boolean)
@@ -56,6 +57,11 @@ tableextension 6014447 tableextension6014447 extends "Value Entry"
         {
             Caption = 'Item Category Code';
             Description = 'NPR5.43,NPR5.48';
+        }
+        field(6014416;"Document Date and Time";DateTime)
+        {
+            Caption = 'Document Date and Time';
+            Description = 'NPR5.52';
         }
     }
 }

@@ -18,6 +18,7 @@ table 6060126 "MM Member"
     // MM1.29.02/TSA /20180531 CASE 317156 Added SMS as notification method
     // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
     // MM1.33/TSA /20180803 CASE 323443 Added the post code lookup and field completion
+    // MM1.41/TSA /20190918 CASE 369123 Blocking a member also blocks the membership role
 
     Caption = 'Member';
     DrillDownPageID = "MM Members";
@@ -67,6 +68,11 @@ table 6060126 "MM Member"
                 MembershipRole.SetFilter ("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
                 if (MembershipRole.FindSet ()) then begin
                   repeat
+                    // -MM1.41 [369123]
+                    MembershipRole.Validate (Blocked, Blocked);
+                    MembershipRole.Modify ();
+                    //+MM1.41 [369123]
+
                     if (Contact.Get (MembershipRole."Contact No.")) then begin
                       Contact.Validate ("Magento Contact", not Blocked);
                       Contact.Modify();

@@ -3,6 +3,7 @@ codeunit 6150906 "HC Sales Document Management"
     // NPR5.38/BR  /20171031 CASE 295007 HQ Connector Created Object
     // NPR5.48/TJ  /20181221 CASE 336517 Added sales lines/tracking
     // NPR5.48/TJ  /20190129 CASE 340446 Changes for version 2018
+    // NPR5.52/TJ  /20190910 CASE 365896 Added publisher OnAfterUpdateSalesHeader
 
     TableNo = "Nc Import Entry";
 
@@ -70,6 +71,11 @@ codeunit 6150906 "HC Sales Document Management"
         //+NPR5.48 [336517]
 
         Commit;
+
+        //-NPR5.52 [365896]
+        OnAfterUpdateSalesHeader(SalesHeader);
+        //+NPR5.52 [365896]
+
         exit(true);
     end;
 
@@ -619,6 +625,11 @@ codeunit 6150906 "HC Sales Document Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertSalesLine(var TempSalesLine: Record "Sales Line";var SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterUpdateSalesHeader(var SalesHeader: Record "Sales Header")
     begin
     end;
 }

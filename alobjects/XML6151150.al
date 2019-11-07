@@ -3,6 +3,7 @@ xmlport 6151150 "M2 Authenticate"
     // NPR5.49/TSA /20181211 CASE 320425 Initial Version
     // NPR5.49/TSA /20190307 CASE 347894 Changed PasswordMD5 to PasswordHash
     // NPR5.51/TSA /20190812 CASE 364644 Added Person section
+    // MAG2.23/TSA /20191015 CASE 373151 Changed cardinality for person section
 
     Caption = 'Authenticate';
     Encoding = UTF8;
@@ -104,13 +105,6 @@ xmlport 6151150 "M2 Authenticate"
                             {
                                 MinOccurs = Zero;
                             }
-
-                            trigger OnBeforePassVariable()
-                            begin
-
-                                if (TmpContactResponse."First Name" = '') and (TmpContactResponse.Surname = '') then
-                                  currXMLport.Skip;
-                            end;
                         }
                         fieldelement(CompanyName;TmpContactResponse."Company Name")
                         {

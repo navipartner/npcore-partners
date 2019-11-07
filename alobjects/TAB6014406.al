@@ -101,6 +101,8 @@ table 6014406 "Sale Line POS"
     // NPR5.51/MHA /20190722 CASE 358985 Added hook OnGetVATPostingSetup() in UpdateVATSetup()
     // NPR5.51/MHA /20190812 CASE 358490 Removed test on RegisterGlobal."Credit Voucher Account" in Quantity - OnValidate()
     // NPR5.51/TSA /20190821 CASE 365487 Corner case when discount is 100% and VAT amount is rounded in different directions.
+    // NPR5.52/MMV /20190910 CASE 352473 Added fields for more sales document control
+    // NPR5.52/MHA /20191017 CASE 373294 Changed validation of Min. and Max. Amount for payment
 
     Caption = 'Sale Line';
     PasteIsValid = false;
@@ -727,14 +729,16 @@ table 6014406 "Sale Line POS"
                 end;
 
                 if Type = Type::Payment then begin
+                  //-NPR5.52 [373294]
                     if PaymentTypePOS."Maximum Amount" <> 0 then begin
-                        if "Amount Including VAT" > PaymentTypePOS."Maximum Amount" then
+                    if Abs("Amount Including VAT") > Abs(PaymentTypePOS."Maximum Amount") then
                             Error(ErrMaxExceeded, "No.", PaymentTypePOS."Maximum Amount");
                     end;
                     if PaymentTypePOS."Minimum Amount" <> 0 then begin
-                        if "Amount Including VAT" < PaymentTypePOS."Minimum Amount" then
+                    if Abs("Amount Including VAT") < PaymentTypePOS."Minimum Amount" then
                             Error(ErrMinExceeded, "No.", PaymentTypePOS."Minimum Amount");
                     end;
+                  //+NPR5.52 [373294]
                     if EuroExchRate <> 0 then
                         Euro := "Amount Including VAT" / EuroExchRate;
                 end;
@@ -1137,9 +1141,9 @@ table 6014406 "Sale Line POS"
         {
             Caption = 'Sales Document Prepayment';
         }
-        field(144; "Sales Doc. Prepayment %"; Decimal)
+        field(144;"Sales Doc. Prepayment Value";Decimal)
         {
-            Caption = 'Sales Doc. Prepayment %';
+            Caption = 'Sales Doc. Prepayment Value';
         }
         field(145; "Sales Document Invoice"; Boolean)
         {
@@ -1173,6 +1177,14 @@ table 6014406 "Sale Line POS"
         {
             Caption = 'Sales Document Delete';
         }
+        field(153;"Sales Doc. Prepay Is Percent";Boolean)
+        {
+            Caption = 'Sales Doc. Prepay Is Percent';
+        }
+        field(154;"Sales Document Pdf2Nav";Boolean)
+        {
+            Caption = 'Sales Document Pdf2Nav';
+        }
         field(155; "Posted Sales Document Type"; Option)
         {
             Caption = 'Posted Sales Document Type';
@@ -1198,6 +1210,10 @@ table 6014406 "Sale Line POS"
             TableRelation = IF ("Delivered Sales Document Type" = CONST (SHIPMENT)) "Sales Shipment Header"
             ELSE
             IF ("Delivered Sales Document Type" = CONST (RETURN_RECEIPT)) "Return Receipt Header";
+        }
+        field(159;"Sales Document Send";Boolean)
+        {
+            Caption = 'Sales Document Send';
         }
         field(160; "Orig. POS Sale ID"; Integer)
         {
@@ -2638,7 +2654,7 @@ table 6014406 "Sale Line POS"
 
         "Allow Line Discount" := SalePOS."Allow Line Discount";
         "Location Code" := SalePOS."Location Code";
-        "Price Includes VAT" := SalePOS."Price including VAT";
+        "Price Includes VAT" := SalePOS."Prices Including VAT";
         "Customer Price Group" := SalePOS."Customer Price Group";
         "Gen. Bus. Posting Group" := SalePOS."Gen. Bus. Posting Group";
         "VAT Bus. Posting Group" := SalePOS."VAT Bus. Posting Group";
