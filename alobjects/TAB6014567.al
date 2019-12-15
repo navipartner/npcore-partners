@@ -1,0 +1,28 @@
+table 6014567 "RP Data Join Field Map"
+{
+    Caption = 'RP Data Join Field Map';
+
+    fields
+    {
+        field(1;"Data Item Name";Text[50])
+        {
+            Caption = 'Data Item Name';
+        }
+        field(2;"Data Item Field No.";Integer)
+        {
+            Caption = 'Data Item Field No.';
+        }
+    }
+
+    keys
+    {
+        key(Key1;"Data Item Name","Data Item Field No.")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+}
+

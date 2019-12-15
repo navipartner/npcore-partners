@@ -1,0 +1,485 @@
+table 6184495 "EFT Transaction Request"
+{
+    // NPR5.20/BR  /20160316  CASE 231481 Object Created
+    // NPR5.22/BR  /20160407  CASE 231481 Added Result Display Text
+    // NPR5.25/BR  /20160527  CASE 231481 Added Option "Install" to field Processing Type
+    // NPR5.30/BR  /20161206  CASE 260315 Aligned OptionString and OptionCaption of field Processing Type
+    // NPR5.30/BR  /20170113  CASE 263458 Renamed Object from Pepper to EFT, added Fields Token, Integration Type and Transaction Subtype
+    // NPR5.30/BR  /20170117  CASE 263458 Added fields POS Description, Number of Attempts and Initiated from Entry No.
+    // NPR5.30/BR  /20170117  CASE 263458 Added Print Receipts Function
+    // NPR5.30/TJ  /20170215  CASE 265504 Changed ENU captions on fields with word Register in their name
+    // NPR5.35/BR  /20170815  CASE 284379 Added Field Cashback Amount
+    // NPR5.36/MMV /20170711  CASE 283791 New terminal print flow.
+    // NPR5.38/MHA /20170109  CASE 295549 Added fields to be used with MobilPay Integration
+    // NPR5.46/MMV /20180713  CASE 290734 Renamed, added and deleted fields for more generic EFT purposes.
+    // NPR5.48/MMV /20181221  CASE 340754 Added lookup & drilldown pages.
+    // NPR5.48/MMV /20190110  CASE 341237 Added new fields.
+    //                                    Removed deprecated mobilepay fields.
+    // NPR5.49/MMV /20190410  CASE 347476 Renamed field 420
+    // NPR5.51/MMV /20190626  CASE 359385 Added giftcard types in field 450 and renamed all options for AL compatibility.
+
+    Caption = 'EFT Transaction Request';
+    DrillDownPageID = "EFT Transaction Requests";
+    LookupPageID = "EFT Transaction Requests";
+
+    fields
+    {
+        field(10;"Entry No.";Integer)
+        {
+            AutoIncrement = true;
+            Caption = 'Entry No.';
+        }
+        field(12;Token;Guid)
+        {
+            Caption = 'Token';
+        }
+        field(15;"Integration Type";Code[20])
+        {
+            Caption = 'Integration Type';
+        }
+        field(20;"Pepper Terminal Code";Code[10])
+        {
+            Caption = 'Pepper Terminal Code';
+            TableRelation = "Pepper Terminal";
+        }
+        field(30;"Pepper Transaction Type Code";Code[10])
+        {
+            Caption = 'Pepper Transaction Type Code';
+            TableRelation = "Pepper EFT Transaction Type".Code WHERE ("Integration Type"=FIELD("Integration Type"));
+        }
+        field(35;"Pepper Trans. Subtype Code";Code[10])
+        {
+            Caption = 'Pepper Transaction Subtype Code';
+            TableRelation = "Pepper EFT Transaction Subtype" WHERE ("Integration Type Code"=FIELD("Integration Type"),
+                                                                    "Transaction Type Code"=FIELD("Pepper Transaction Type Code"));
+        }
+        field(40;Started;DateTime)
+        {
+            Caption = 'Started';
+        }
+        field(50;Finished;DateTime)
+        {
+            Caption = 'Finished';
+        }
+        field(60;"User ID";Code[50])
+        {
+            Caption = 'User ID';
+            TableRelation = User."User Name";
+            //This property is currently not supported
+            //TestTableRelation = false;
+        }
+        field(70;"Integration Version Code";Code[10])
+        {
+            Caption = 'Integration Version Code';
+            TableRelation = "Pepper Version";
+        }
+        field(80;"Sales Ticket No.";Code[20])
+        {
+            Caption = 'Sales Ticket No.';
+        }
+        field(83;"Sales Line No.";Integer)
+        {
+            Caption = 'Sales Line No.';
+        }
+        field(85;"POS Description";Text[100])
+        {
+            Caption = 'POS Description';
+        }
+        field(90;"Register No.";Code[10])
+        {
+            Caption = 'Cash Register No.';
+        }
+        field(95;"POS Payment Type Code";Code[10])
+        {
+            Caption = 'POS Payment Type Code';
+            TableRelation = "Payment Type POS";
+        }
+        field(96;"Original POS Payment Type Code";Code[10])
+        {
+            Caption = 'Original POS Payment Type Code';
+            TableRelation = "Payment Type POS";
+        }
+        field(100;"Result Code";Integer)
+        {
+            Caption = 'Result Code';
+        }
+        field(110;"Card Type";Text[4])
+        {
+            Caption = 'Card Type';
+        }
+        field(120;"Card Name";Text[24])
+        {
+            Caption = 'Card Name';
+        }
+        field(130;"Card Number";Text[30])
+        {
+            Caption = 'Card Number';
+        }
+        field(131;"Card Issuer ID";Text[30])
+        {
+            Caption = 'Card Issuer ID';
+        }
+        field(132;"Card Application ID";Text[30])
+        {
+            Caption = 'Card Application ID';
+        }
+        field(135;"Track Presence Input";Option)
+        {
+            Caption = 'Track Presence Input';
+            OptionCaption = 'Read From EFT,Manually Entered,Track 2 Data,Barcode,Any Track,Manully Entered On Pinpad';
+            OptionMembers = "From EFT","Manually Entered","Track 2 Data",Barcode,"Any Track","Manully Entered On Pinpad";
+        }
+        field(136;"Card Information Input";Text[40])
+        {
+            Caption = 'Card Information Input';
+        }
+        field(140;"Card Expiry Date";Text[4])
+        {
+            Caption = 'Card Expiry Date';
+        }
+        field(150;"Reference Number Input";Text[50])
+        {
+            Caption = 'Reference Number Input';
+        }
+        field(160;"Reference Number Output";Text[50])
+        {
+            Caption = 'Reference Number Output';
+        }
+        field(165;"Acquirer ID";Text[50])
+        {
+            Caption = 'Acquirer ID';
+        }
+        field(166;"Reconciliation ID";Text[50])
+        {
+            Caption = 'Reconciliation ID';
+        }
+        field(170;"Authorisation Number";Text[50])
+        {
+            Caption = 'Authorisation Number';
+        }
+        field(180;"Hardware ID";Text[200])
+        {
+            Caption = 'Hardware ID';
+        }
+        field(190;"Transaction Date";Date)
+        {
+            Caption = 'Transaction Date';
+        }
+        field(200;"Transaction Time";Time)
+        {
+            Caption = 'Transaction Time';
+        }
+        field(205;"Payment Instrument Type";Text[30])
+        {
+            Caption = 'Payment Instrument Type';
+        }
+        field(210;"Authentication Method";Option)
+        {
+            Caption = 'Authentication Method';
+            OptionCaption = 'None,Signature,PIN';
+            OptionMembers = "None",Signature,PIN;
+        }
+        field(215;"Signature Type";Option)
+        {
+            Caption = 'Signature Type';
+            OptionCaption = ' ,On Receipt,On Terminal,On POS';
+            OptionMembers = " ","On Receipt","On Terminal","On POS";
+        }
+        field(220;"Financial Impact";Boolean)
+        {
+            Caption = 'Financial Impact';
+        }
+        field(230;Mode;Option)
+        {
+            Caption = 'Mode';
+            OptionCaption = 'Production,TEST Local,TEST Remote';
+            OptionMembers = Production,"TEST Local","TEST Remote";
+        }
+        field(240;Successful;Boolean)
+        {
+            Caption = 'Successful';
+        }
+        field(250;"Result Description";Text[50])
+        {
+            Caption = 'Result Description';
+        }
+        field(260;"Bookkeeping Period";Text[4])
+        {
+            Caption = 'Bookkeeping Period';
+        }
+        field(270;"Result Display Text";Text[100])
+        {
+            Caption = 'Result Display Text';
+        }
+        field(300;"Amount Input";Decimal)
+        {
+            Caption = 'Amount Input';
+        }
+        field(310;"Amount Output";Decimal)
+        {
+            Caption = 'Amount Output';
+        }
+        field(315;"Result Amount";Decimal)
+        {
+            Caption = 'Result Amount';
+        }
+        field(320;"Currency Code";Code[10])
+        {
+            Caption = 'Currency Code';
+        }
+        field(330;"Cashback Amount";Decimal)
+        {
+            Caption = 'Cashback Amount';
+        }
+        field(340;"Fee Amount";Decimal)
+        {
+            Caption = 'Fee Amount';
+        }
+        field(345;"Tip Amount";Decimal)
+        {
+            Caption = 'Tip Amount';
+        }
+        field(350;"Offline mode";Boolean)
+        {
+            Caption = 'Offline mode';
+        }
+        field(360;"Client Assembly Version";Text[50])
+        {
+            Caption = 'Client Assembly Version';
+        }
+        field(370;"No. of Reprints";Integer)
+        {
+            Caption = 'No. of Reprints';
+        }
+        field(400;"Receipt 1";BLOB)
+        {
+            Caption = 'Receipt 1';
+        }
+        field(410;"Receipt 2";BLOB)
+        {
+            Caption = 'Receipt 2';
+        }
+        field(420;Logs;BLOB)
+        {
+            Caption = 'Logs';
+        }
+        field(450;"Processing Type";Option)
+        {
+            Caption = 'Processing Type';
+            OptionCaption = ',Payment,Refund,Open,Close,Auxiliary,Other,Void,Lookup,Setup,Gift Card Load';
+            OptionMembers = ,PAYMENT,REFUND,OPEN,CLOSE,AUXILIARY,OTHER,VOID,LOOK_UP,SETUP,GIFTCARD_LOAD;
+        }
+        field(460;"Processed Entry No.";Integer)
+        {
+            Caption = 'Processed Entry No.';
+            TableRelation = "EFT Transaction Request"."Entry No.";
+        }
+        field(470;"NST Error";Text[250])
+        {
+            Caption = 'NST Error';
+        }
+        field(480;"Client Error";Text[250])
+        {
+            Caption = 'Client Error';
+        }
+        field(490;"Force Closed";Boolean)
+        {
+            Caption = 'Force Closed';
+        }
+        field(500;Reversed;Boolean)
+        {
+            Caption = 'Reversed';
+        }
+        field(510;"Reversed by Entry No.";Integer)
+        {
+            Caption = 'Reversed by Entry No.';
+            TableRelation = "EFT Transaction Request"."Entry No.";
+        }
+        field(520;"Number of Attempts";Integer)
+        {
+            Caption = 'Number of Attempts';
+        }
+        field(530;"Initiated from Entry No.";Integer)
+        {
+            Caption = 'Initiated from Entry No.';
+            TableRelation = "EFT Transaction Request";
+        }
+        field(540;"External Result Received";Boolean)
+        {
+            Caption = 'External Result Received';
+        }
+        field(550;"Auto Voidable";Boolean)
+        {
+            Caption = 'Auto Voidable';
+        }
+        field(555;"Manual Voidable";Boolean)
+        {
+            Caption = 'Manual Voidable';
+        }
+        field(560;Recoverable;Boolean)
+        {
+            Caption = 'Recoverable';
+        }
+        field(570;Recovered;Boolean)
+        {
+            Caption = 'Recovered';
+        }
+        field(580;"Recovered by Entry No.";Integer)
+        {
+            Caption = 'Recovered by Entry No.';
+            TableRelation = "EFT Transaction Request"."Entry No.";
+        }
+        field(590;"Auxiliary Operation ID";Integer)
+        {
+            Caption = 'Auxiliary Operation ID';
+        }
+        field(595;"Auxiliary Operation Desc.";Text[50])
+        {
+            Caption = 'Auxiliary Operation Desc.';
+        }
+        field(625;"External Transaction ID";Text[50])
+        {
+            Caption = 'External Transaction ID';
+        }
+        field(630;"External Customer ID";Text[50])
+        {
+            Caption = 'External Customer ID';
+        }
+        field(635;"External Payment Token";Text[50])
+        {
+            Caption = 'External Payment Token';
+        }
+        field(650;"Additional Info";BLOB)
+        {
+            Caption = 'Additional Info';
+        }
+        field(660;"DCC Used";Boolean)
+        {
+            Caption = 'DCC Used';
+        }
+        field(670;"DCC Currency Code";Code[10])
+        {
+            Caption = 'DCC Currency Code';
+        }
+        field(675;"DCC Amount";Decimal)
+        {
+            Caption = 'DCC Amount';
+        }
+        field(680;"Self Service";Boolean)
+        {
+            Caption = 'Self Service';
+        }
+        field(690;"Stored Value Account Type";Text[50])
+        {
+            Caption = 'Stored Value Account Type';
+        }
+        field(700;"Stored Value Provider";Text[50])
+        {
+            Caption = 'Stored Value Provider';
+        }
+        field(710;"Stored Value ID";Text[50])
+        {
+            Caption = 'Stored Value ID';
+        }
+        field(720;"Internal Customer ID";Text[50])
+        {
+            Caption = 'Internal Customer ID';
+        }
+    }
+
+    keys
+    {
+        key(Key1;"Entry No.")
+        {
+        }
+        key(Key2;"Sales Ticket No.")
+        {
+        }
+        key(Key3;"Reference Number Output")
+        {
+        }
+        key(Key4;"Initiated from Entry No.")
+        {
+        }
+        key(Key5;"Register No.","Integration Type","Processing Type")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+
+    trigger OnInsert()
+    begin
+        if IsNullGuid(Token) then
+          Token := CreateGuid;
+    end;
+
+    var
+        EftRequestNotFound: Label 'Action Code %1 tried retrieving "TransactionRequest_EntryNo" from POS Session and got %2. There is however no record in %3 to match that entry number.';
+        EftRequestMissMatch: Label 'Action Code %1 has detected a EFT request identity missmatch:\\For Entry No. %2 the expected token is %3, but the record contains %4.';
+
+    procedure PrintReceipts(IsReprint: Boolean)
+    var
+        CreditCardTransaction: Record "Credit Card Transaction";
+        RecRef: RecordRef;
+        ReceiptNo: Integer;
+        EntryNo: Integer;
+        CreditCardTransaction2: Record "Credit Card Transaction";
+        First: Boolean;
+        EFTInterface: Codeunit "EFT Interface";
+        Handled: Boolean;
+    begin
+        //-NPR5.46 [290734]
+        // CreditCardTransaction.SETFILTER ("EFT Trans. Request Entry No.", '=%1', "Entry No.");
+        // IF ("Initiated from Entry No." <> 0) THEN
+        //  CreditCardTransaction.SETFILTER ("EFT Trans. Request Entry No.", '=%1', "Initiated from Entry No.");
+        //
+        // IF NOT Reprint THEN
+        //  CreditCardTransaction.SETFILTER("No. Printed", '=%1', 0);
+        //
+        // IF NOT CreditCardTransaction.FINDSET THEN
+        //  EXIT;
+        //
+        // CreditCardTransaction.PrintTerminalReceipt(FALSE);
+
+        if "Entry No." = 0 then
+          exit;
+
+        if IsReprint then begin
+          "No. of Reprints" += 1;
+          Modify;
+        end;
+
+        EFTInterface.OnPrintReceipt(Rec, Handled);
+        if Handled then
+          exit;
+
+        CreditCardTransaction.SetCurrentKey("EFT Trans. Request Entry No.","Receipt No.");
+        CreditCardTransaction.SetFilter ("EFT Trans. Request Entry No.", '=%1', "Entry No.");
+        if not CreditCardTransaction.FindSet then
+          exit;
+
+        First := true;
+        repeat
+          if (ReceiptNo <> CreditCardTransaction."Receipt No.") or (EntryNo <> CreditCardTransaction."EFT Trans. Request Entry No.") or (First) then begin
+            CreditCardTransaction2.SetRange("EFT Trans. Request Entry No.", CreditCardTransaction."EFT Trans. Request Entry No.");
+            CreditCardTransaction2.SetRange("Receipt No.", CreditCardTransaction."Receipt No.");
+            CreditCardTransaction2.PrintTerminalReceipt();
+          end;
+          ReceiptNo := CreditCardTransaction."Receipt No.";
+          EntryNo := CreditCardTransaction."EFT Trans. Request Entry No.";
+          First := false;
+        until CreditCardTransaction.Next = 0;
+        //+NPR5.46 [290734]
+    end;
+
+    procedure IsType(Type: Text): Boolean
+    begin
+        //-NPR5.46 [290734]
+        exit(Type = "Integration Type");
+        //+NPR5.46 [290734]
+    end;
+}
+
