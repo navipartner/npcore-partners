@@ -1,0 +1,86 @@
+table 6059786 "TM Ticket Access Entry"
+{
+    // NPR4.16/TSA/20150804  CASE 219659 - Added Field "Admission Code"
+    // NPR4.16/TSA/20150804  CASE 219659 - Changed PK Entry No to AutoInc, Extended 2nd key with admission code
+    // TM1.03/TSA/20160113  CASE 231260 - Dropped field Access Point No, changed captions
+    // TM1.12/TSA/20160407  CASE 230600 Added DAN Captions
+    // TM1.17/TSA /20161025  CASE 256152 Conform to OMA Guidelines
+    // TM1.31/TSA /20180524 CASE 316500 Removed SumIndexField Quantity from key "Ticket No.", "Admission Code"
+
+    Caption = 'Ticket Access Entry';
+    LookupPageID = "TM Ticket Access Entry List";
+
+    fields
+    {
+        field(1;"Entry No.";BigInteger)
+        {
+            AutoIncrement = true;
+            Caption = 'Entry No.';
+        }
+        field(2;"Ticket No.";Code[20])
+        {
+            Caption = 'Ticket No.';
+            TableRelation = "TM Ticket";
+        }
+        field(3;"Ticket Type Code";Code[10])
+        {
+            Caption = 'Ticket Type Code';
+            TableRelation = "TM Ticket Type";
+        }
+        field(10;"Access Date";Date)
+        {
+            Caption = 'Access Date';
+            Editable = false;
+        }
+        field(11;"Access Time";Time)
+        {
+            Caption = 'Access Time';
+        }
+        field(12;Description;Text[30])
+        {
+            Caption = 'Description';
+        }
+        field(20;"Customer No.";Code[20])
+        {
+            Caption = 'Customer No.';
+            TableRelation = Customer;
+        }
+        field(21;"Member Card Code";Code[10])
+        {
+            Caption = 'Member Card Code';
+        }
+        field(30;Status;Option)
+        {
+            Caption = 'Status';
+            OptionCaption = 'Access,Blocked';
+            OptionMembers = ACCESS,BLOCKED;
+        }
+        field(31;Quantity;Decimal)
+        {
+            Caption = 'Qty.';
+            Editable = false;
+            InitValue = 1;
+        }
+        field(40;"Admission Code";Code[20])
+        {
+            Caption = 'Admission Code';
+            Description = '#219658';
+            TableRelation = "TM Admission";
+        }
+    }
+
+    keys
+    {
+        key(Key1;"Entry No.")
+        {
+        }
+        key(Key2;"Ticket No.","Admission Code")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+}
+

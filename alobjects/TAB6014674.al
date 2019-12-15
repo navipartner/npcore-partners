@@ -1,0 +1,172 @@
+table 6014674 Endpoint
+{
+    // NPR5.23\BR\20160518  CASE 237658 Object created
+    // NPR5.25\BR\20160804  CASE 234602 Delete Releated tables
+    // NPR5.48/JDH /20181109 CASE 334163 Added Captions, and changed lookup and drilldown to list pages
+
+    Caption = 'Endpoint';
+    DrillDownPageID = "Endpoint List";
+    LookupPageID = "Endpoint List";
+
+    fields
+    {
+        field(10;"Code";Code[20])
+        {
+            Caption = 'Code';
+            NotBlank = true;
+        }
+        field(20;Description;Text[50])
+        {
+            Caption = 'Description';
+        }
+        field(30;"Table No.";Integer)
+        {
+            Caption = 'Table No.';
+            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Table));
+
+            trigger OnValidate()
+            var
+                EndpointFilter: Record "Endpoint Filter";
+            begin
+                if "Table No."  <> xRec."Table No." then begin
+                  EndpointFilter.SetRange("Endpoint Code",Code);
+                  if not EndpointFilter.IsEmpty then
+                    Error(TxtRemoveFilters);
+                end;
+            end;
+        }
+        field(35;"Table Name";Text[30])
+        {
+            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=CONST(Table),
+                                                             "Object ID"=FIELD("Table No.")));
+            Caption = 'Table Name';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(40;Active;Boolean)
+        {
+            Caption = 'Active';
+        }
+        field(50;"Max. Requests per Batch";Integer)
+        {
+            Caption = 'Max. Requests per Batch';
+        }
+        field(60;"Send when Max. Requests";Boolean)
+        {
+            Caption = 'Send when Max. Requests';
+        }
+        field(70;"Wait to Send";Duration)
+        {
+            Caption = 'Wait to Send';
+        }
+        field(80;"Delete Obsolete Requests";Boolean)
+        {
+            Caption = 'Delete Obsolete Requests';
+        }
+        field(90;"Delete Sent Requests After";Duration)
+        {
+            Caption = 'Delete Sent Requests After';
+        }
+        field(100;"Trigger on Insert";Boolean)
+        {
+            Caption = 'Insert';
+        }
+        field(101;"Trigger on Modify";Boolean)
+        {
+            Caption = 'Modify';
+        }
+        field(102;"Trigger on Delete";Boolean)
+        {
+            Caption = 'Delete';
+        }
+        field(103;"Trigger on Rename";Boolean)
+        {
+            Caption = 'Rename';
+        }
+        field(200;"Max. Requests per Query";Integer)
+        {
+            Caption = 'Max. Requests per Query';
+            Description = 'CASE 234602';
+        }
+        field(210;"Allow Query from Database";Text[250])
+        {
+            Caption = 'Allow Query from Database';
+            Description = 'CASE 234602';
+        }
+        field(220;"Allow Query from Company Name";Text[30])
+        {
+            Caption = 'Allow Query from Company Name';
+            Description = 'CASE 234602';
+        }
+        field(230;"Allow Query from User ID";Text[50])
+        {
+            Caption = 'Allow Query from User ID';
+            Description = 'CASE 234602';
+        }
+        field(240;"Query Name";Text[30])
+        {
+            Caption = 'Query Name';
+            Description = 'CASE 234602';
+        }
+        field(300;"No. of Inboud Queries";Integer)
+        {
+            CalcFormula = Count("Endpoint Query" WHERE ("Endpoint Code"=FIELD(Code),
+                                                        Direction=CONST(Incoming)));
+            Caption = 'No. of Inboud Queries';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(310;"No. of Outbound Queries";Integer)
+        {
+            CalcFormula = Count("Endpoint Query" WHERE ("Endpoint Code"=FIELD(Code),
+                                                        Direction=CONST(Outgoing)));
+            Caption = 'No. of Outbound Queries';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(320;"No. of Requests";Integer)
+        {
+            CalcFormula = Count("Endpoint Request" WHERE ("Endpoint Code"=FIELD(Code)));
+            Caption = 'No. of Requests';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+    }
+
+    keys
+    {
+        key(Key1;"Code")
+        {
+        }
+        key(Key2;"Query Name")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+
+    trigger OnDelete()
+    var
+        EndpointRequestBatch: Record "Endpoint Request Batch";
+        EndpointFilter: Record "Endpoint Filter";
+    begin
+        EndpointRequestBatch.SetRange("Endpoint Code",Code);
+        if not EndpointRequestBatch.IsEmpty then
+          Error(TxtCannotDelete,TableCaption,Code,EndpointRequestBatch.TableCaption);
+        //-NPR5.25
+        EndpointFilter.SetRange("Endpoint Code",Code);
+        EndpointFilter.DeleteAll(true);
+        //+NPR5.25
+    end;
+
+    var
+        TxtRemoveFilters: Label 'Please remove filters first.';
+        TxtCannotDelete: Label 'You cannot delete %1 %2 because there are %1 records for this record.';
+
+    local procedure LinkedSetupExists(): Boolean
+    begin
+    end;
+}
+
