@@ -13,37 +13,37 @@ codeunit 6151132 "TM POS Action - Seating"
 
     local procedure ActionCode(): Text
     begin
-        exit ('TM_SEATING');
+        exit('TM_SEATING');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.0');
+        exit('1.0');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
     local procedure OnDiscoverAction(var Sender: Record "POS Action")
     begin
         with Sender do
-          if DiscoverAction(
-            ActionCode,
-            ActionDescription,
-            ActionVersion,
-            Type::Generic,
-            "Subscriber Instances Allowed"::Multiple)
-          then begin
-            RegisterWorkflowStep ('1','respond();');
-            RegisterWorkflow (false);
-          end;
+            if DiscoverAction(
+              ActionCode,
+              ActionDescription,
+              ActionVersion,
+              Type::Generic,
+              "Subscriber Instances Allowed"::Multiple)
+            then begin
+                RegisterWorkflowStep('1', 'respond();');
+                RegisterWorkflow(false);
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', false, false)]
-    local procedure OnBeforeWorkflow("Action": Record "POS Action";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnBeforeWorkflow("Action": Record "POS Action"; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
     begin
-        if not Action.IsThisAction (ActionCode) then
-          exit;
+        if not Action.IsThisAction(ActionCode) then
+            exit;
 
         Handled := true;
     end;
@@ -54,21 +54,21 @@ codeunit 6151132 "TM POS Action - Seating"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnAction', '', false, false)]
-    local procedure OnAction("Action": Record "POS Action";WorkflowStep: Text;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    local procedure OnAction("Action": Record "POS Action"; WorkflowStep: Text; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         JSON: Codeunit "POS JSON Management";
     begin
 
-        if not Action.IsThisAction (ActionCode) then
-          exit;
+        if not Action.IsThisAction(ActionCode) then
+            exit;
 
         Handled := true;
 
-        JSON.InitializeJObjectParser(Context,FrontEnd);
-        JSON.SetScope('parameters',true);
+        JSON.InitializeJObjectParser(Context, FrontEnd);
+        JSON.SetScope('parameters', true);
         // MenuFilterCode := JSON.GetString('MenuFilterCode', TRUE);
 
-        ShowSeating (FrontEnd);
+        ShowSeating(FrontEnd);
     end;
 
     local procedure "-- Locals --"()

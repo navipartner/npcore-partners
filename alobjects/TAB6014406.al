@@ -1215,10 +1215,6 @@ table 6014406 "Sale Line POS"
         {
             Caption = 'Sales Document Send';
         }
-        field(159;"Sales Document Send";Boolean)
-        {
-            Caption = 'Sales Document Send';
-        }
         field(160; "Orig. POS Sale ID"; Integer)
         {
             Caption = 'Orig. POS Sale ID';

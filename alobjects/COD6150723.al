@@ -263,7 +263,7 @@ codeunit 6150723 "POS Action - Insert Item"
     begin
     end;
 
-    local procedure GetItem(var Item: Record Item;var ItemCrossReference: Record "Item Cross Reference";ItemIdentifier: Text;ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference)
+    local procedure GetItem(var Item: Record Item; var ItemCrossReference: Record "Item Cross Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference)
     var
         FirstRec: Text;
         TagId: Code[20];
@@ -296,32 +296,32 @@ codeunit 6150723 "POS Action - Insert Item"
                 else
                     Error(ERROR_ITEMSEARCH, ItemIdentifier);
 
-          //-NPR5.52 [369231]
-          ItemIdentifierType::SerialNoItemCrossReference :
-            begin
+            //-NPR5.52 [369231]
+            ItemIdentifierType::SerialNoItemCrossReference:
+                begin
 
-              TagId := CopyStr(ItemIdentifier,5);
+                    TagId := CopyStr(ItemIdentifier, 5);
 
-              ItemCrossReference.SetFilter ("Cross-Reference No.", '=%1', CopyStr (TagId, 1, MaxStrLen (ItemCrossReference."Cross-Reference No.")));
-              ItemCrossReference.SetFilter ("Cross-Reference Type", '=%1', ItemCrossReference."Cross-Reference Type"::"Bar Code");
-              ItemCrossReference.SetFilter ("Discontinue Bar Code", '=%1', false);
-              ItemCrossReference.SetFilter ("Is Retail Serial No.", '=%1', true);
-              ItemCrossReference.FindFirst;
-              FirstRec := Format(ItemCrossReference);
-              ItemCrossReference.FindLast;
-              if FirstRec <> Format(ItemCrossReference) then begin
-                if PAGE.RunModal(0,ItemCrossReference) <> ACTION::LookupOK then
-                  Error('');
-              end;
+                    ItemCrossReference.SetFilter("Cross-Reference No.", '=%1', CopyStr(TagId, 1, MaxStrLen(ItemCrossReference."Cross-Reference No.")));
+                    ItemCrossReference.SetFilter("Cross-Reference Type", '=%1', ItemCrossReference."Cross-Reference Type"::"Bar Code");
+                    ItemCrossReference.SetFilter("Discontinue Bar Code", '=%1', false);
+                    ItemCrossReference.SetFilter("Is Retail Serial No.", '=%1', true);
+                    ItemCrossReference.FindFirst;
+                    FirstRec := Format(ItemCrossReference);
+                    ItemCrossReference.FindLast;
+                    if FirstRec <> Format(ItemCrossReference) then begin
+                        if PAGE.RunModal(0, ItemCrossReference) <> ACTION::LookupOK then
+                            Error('');
+                    end;
 
-              Item.Get(ItemCrossReference."Item No.");
-            end;
-            //+NPR5.52 [369231]
+                    Item.Get(ItemCrossReference."Item No.");
+                end;
+                //+NPR5.52 [369231]
         end;
         //+NPR5.40 [294655]
     end;
 
-    local procedure AddItemLine(Item: Record Item;ItemCrossReference: Record "Item Cross Reference";ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;ItemQuantity: Decimal;UsePresetUnitPrice: Boolean;PresetUnitPrice: Decimal;Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    local procedure AddItemLine(Item: Record Item; ItemCrossReference: Record "Item Cross Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UsePresetUnitPrice: Boolean; PresetUnitPrice: Decimal; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
     var
         Line: Record "Sale Line POS";
         JSON: Codeunit "POS JSON Management";
@@ -378,10 +378,10 @@ codeunit 6150723 "POS Action - Insert Item"
                         "No." := ItemCrossReference."Item No.";
                         "Variant Code" := ItemCrossReference."Variant Code";
                         "Unit of Measure Code" := ItemCrossReference."Unit of Measure";
-                //-NPR5.52 [369231]
-                if (ItemCrossReference."Is Retail Serial No.") then
-                  "Serial No. not Created" := ItemCrossReference."Cross-Reference No.";
-                //+NPR5.52 [369231]
+                        //-NPR5.52 [369231]
+                        if (ItemCrossReference."Is Retail Serial No.") then
+                            "Serial No. not Created" := ItemCrossReference."Cross-Reference No.";
+                        //+NPR5.52 [369231]
 
                         //-NPR5.49 [350410]
                         // //-NPR5.48 [335967]
@@ -390,24 +390,24 @@ codeunit 6150723 "POS Action - Insert Item"
                         //+NPR5.49 [350410]
 
                     end;
-            //-NPR5.52 [369231]
-            ItemIdentifierType::SerialNoItemCrossReference :
-              begin
+                    //-NPR5.52 [369231]
+                ItemIdentifierType::SerialNoItemCrossReference:
+                    begin
 
-                SaleLinePOS.Reset;
-                //SaleLinePOS.SETCURRENTKEY("Serial No.");
-                SaleLinePOS.SetFilter(Type, '=%1',SaleLinePOS.Type::Item);
-                SaleLinePOS.SetFilter("Serial No. not Created", '=%1' , ItemCrossReference."Cross-Reference No.");
-                if not SaleLinePOS.IsEmpty then
-                  exit;
+                        SaleLinePOS.Reset;
+                        //SaleLinePOS.SETCURRENTKEY("Serial No.");
+                        SaleLinePOS.SetFilter(Type, '=%1', SaleLinePOS.Type::Item);
+                        SaleLinePOS.SetFilter("Serial No. not Created", '=%1', ItemCrossReference."Cross-Reference No.");
+                        if not SaleLinePOS.IsEmpty then
+                            exit;
 
-                "No." := ItemCrossReference."Item No.";
-                "Variant Code" := ItemCrossReference."Variant Code";
-                "Unit of Measure Code" := ItemCrossReference."Unit of Measure";
-                if (ItemCrossReference."Is Retail Serial No.") then
-                  "Serial No. not Created" := ItemCrossReference."Cross-Reference No.";
-              end;
-            //+NPR5.52 [369231]
+                        "No." := ItemCrossReference."Item No.";
+                        "Variant Code" := ItemCrossReference."Variant Code";
+                        "Unit of Measure Code" := ItemCrossReference."Unit of Measure";
+                        if (ItemCrossReference."Is Retail Serial No.") then
+                            "Serial No. not Created" := ItemCrossReference."Cross-Reference No.";
+                    end;
+                    //+NPR5.52 [369231]
             end;
 
             if (UseSpecificTracking and (ValidatedSerialNumber <> '')) then
@@ -545,21 +545,22 @@ codeunit 6150723 "POS Action - Insert Item"
 
             POSSaleLine.InsertLine(AccessorySaleLinePOS);
 
-          //-NPR5.52 [370961]
-          if AccessorySparePart."Use Alt. Price" then begin
-            if (AccessorySaleLinePOS."Price Includes VAT") and (not Item."Price Includes VAT") then
-              AccessorySparePart."Alt. Price" := AccessorySparePart."Alt. Price" * (1 + (AccessorySaleLinePOS."VAT %" / 100))
-            else if (not AccessorySaleLinePOS."Price Includes VAT") and (Item."Price Includes VAT") then
-              AccessorySparePart."Alt. Price" := AccessorySparePart."Alt. Price" / (1 + (AccessorySaleLinePOS."VAT %" / 100));
+            //-NPR5.52 [370961]
+            if AccessorySparePart."Use Alt. Price" then begin
+                if (AccessorySaleLinePOS."Price Includes VAT") and (not Item."Price Includes VAT") then
+                    AccessorySparePart."Alt. Price" := AccessorySparePart."Alt. Price" * (1 + (AccessorySaleLinePOS."VAT %" / 100))
+                else
+                    if (not AccessorySaleLinePOS."Price Includes VAT") and (Item."Price Includes VAT") then
+                        AccessorySparePart."Alt. Price" := AccessorySparePart."Alt. Price" / (1 + (AccessorySaleLinePOS."VAT %" / 100));
 
-            if AccessorySparePart."Show Discount" then
-              AccessorySaleLinePOS.Validate("Amount Including VAT",AccessorySparePart."Alt. Price")
-            else
-              AccessorySaleLinePOS.Validate("Unit Price",AccessorySparePart."Alt. Price");
-          end;
-          //+NPR5.52 [370961]
+                if AccessorySparePart."Show Discount" then
+                    AccessorySaleLinePOS.Validate("Amount Including VAT", AccessorySparePart."Alt. Price")
+                else
+                    AccessorySaleLinePOS.Validate("Unit Price", AccessorySparePart."Alt. Price");
+            end;
+            //+NPR5.52 [370961]
 
-                //-NPR5.40 [305045]
+            //-NPR5.40 [305045]
             AccessorySaleLinePOS."Item group accessory" := GroupAccessory;
             if (GroupAccessory) then
                 AccessorySaleLinePOS."Accessories Item Group No." := Item."Item Group";
@@ -717,14 +718,14 @@ codeunit 6150723 "POS Action - Insert Item"
 
         //-NPR5.52 [369231]
         if not EanBoxEvent.Get(EventCodeSerialNoItemCrossRef()) then begin
-          EanBoxEvent.Init;
-          EanBoxEvent.Code := EventCodeSerialNoItemCrossRef();
-          EanBoxEvent."Module Name" := Item.TableCaption;
-          EanBoxEvent.Description := CopyStr(ItemCrossReference.TableCaption,1,MaxStrLen(EanBoxEvent.Description));
-          EanBoxEvent."Action Code" := ActionCode();
-          EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
-          EanBoxEvent."Event Codeunit" := CurrCodeunitId();
-          EanBoxEvent.Insert(true);
+            EanBoxEvent.Init;
+            EanBoxEvent.Code := EventCodeSerialNoItemCrossRef();
+            EanBoxEvent."Module Name" := Item.TableCaption;
+            EanBoxEvent.Description := CopyStr(ItemCrossReference.TableCaption, 1, MaxStrLen(EanBoxEvent.Description));
+            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
+            EanBoxEvent."Event Codeunit" := CurrCodeunitId();
+            EanBoxEvent.Insert(true);
         end;
         //+NPR5.52 [369231]
     end;
@@ -749,13 +750,13 @@ codeunit 6150723 "POS Action - Insert Item"
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemNo', true, '');
                     Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemIdentifyerType', false, 'ItemSearch');
                 end;
-          //-NPR5.52 [369231]
-          EventCodeSerialNoItemCrossRef():
-            begin
-              Sender.SetNonEditableParameterValues(EanBoxEvent,'itemNo',true,'');
-              Sender.SetNonEditableParameterValues(EanBoxEvent,'itemIdentifyerType',false,'SerialNoItemCrossReference');
-            end;
-          //+NPR5.52 [369231]
+            //-NPR5.52 [369231]
+            EventCodeSerialNoItemCrossRef():
+                begin
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemNo', true, '');
+                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'itemIdentifyerType', false, 'SerialNoItemCrossReference');
+                end;
+                //+NPR5.52 [369231]
         end;
         //+NPR5.45 [319706]
     end;
@@ -815,7 +816,7 @@ codeunit 6150723 "POS Action - Insert Item"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6060107, 'SetEanBoxEventInScope', '', true, true)]
-    local procedure SetEanBoxEventInScopeSerialNoItemCrossRef(EanBoxSetupEvent: Record "Ean Box Setup Event";EanBoxValue: Text;var InScope: Boolean)
+    local procedure SetEanBoxEventInScopeSerialNoItemCrossRef(EanBoxSetupEvent: Record "Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         ItemCrossReference: Record "Item Cross Reference";
         CSRfidTagModels: Record "CS Rfid Tag Models";
@@ -826,30 +827,30 @@ codeunit 6150723 "POS Action - Insert Item"
     begin
         //-NPR5.52 [369231]
         if EanBoxSetupEvent."Event Code" <> EventCodeSerialNoItemCrossRef() then
-          exit;
+            exit;
 
         if not CSRfidTagModels.FindFirst then
-          exit;
+            exit;
 
         if (StrLen(EanBoxValue) > MaxStrLen(CSRfidData.Key)) or (StrLen(EanBoxValue) < MaxStrLen(CSRfidTagModels.Family)) then
-          exit;
+            exit;
 
-        TagFamily := CopyStr(EanBoxValue,1,4);
-        TagModel  := CopyStr(EanBoxValue,5,4);
-        TagId     := CopyStr(EanBoxValue,5);
+        TagFamily := CopyStr(EanBoxValue, 1, 4);
+        TagModel := CopyStr(EanBoxValue, 5, 4);
+        TagId := CopyStr(EanBoxValue, 5);
 
-        if not CSRfidTagModels.Get(TagFamily,TagModel) then
-          exit;
+        if not CSRfidTagModels.Get(TagFamily, TagModel) then
+            exit;
 
         if (StrLen(TagId) > MaxStrLen(ItemCrossReference."Cross-Reference No.")) then
-          exit;
+            exit;
 
-        ItemCrossReference.SetRange("Cross-Reference No.",UpperCase(TagId));
-        ItemCrossReference.SetRange("Cross-Reference Type",ItemCrossReference."Cross-Reference Type"::"Bar Code");
-        ItemCrossReference.SetRange("Is Retail Serial No.",true);
-        ItemCrossReference.SetRange("Discontinue Bar Code",false);
+        ItemCrossReference.SetRange("Cross-Reference No.", UpperCase(TagId));
+        ItemCrossReference.SetRange("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
+        ItemCrossReference.SetRange("Is Retail Serial No.", true);
+        ItemCrossReference.SetRange("Discontinue Bar Code", false);
         if ItemCrossReference.FindFirst then
-          InScope := true;
+            InScope := true;
         //+NPR5.52 [369231]
     end;
 
@@ -879,13 +880,6 @@ codeunit 6150723 "POS Action - Insert Item"
         //-NPR5.45 [319706]
         exit('ITEMSEARCH');
         //+NPR5.45 [319706]
-    end;
-
-    local procedure EventCodeSerialNoItemCrossRef(): Code[20]
-    begin
-        //-NPR5.52 [369231]
-        exit('SERIALNOITEMCROSSREF');
-        //+NPR5.52 [369231]
     end;
 
     local procedure EventCodeSerialNoItemCrossRef(): Code[20]

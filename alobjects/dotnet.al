@@ -74,11 +74,11 @@ dotnet
         {
         }
 
-        type("System.Xml.XmlComment";"npNetXmlComment")
+        type("System.Xml.XmlComment"; "npNetXmlComment")
         {
         }
 
-        type("System.Xml.XmlException";"npNetXmlException")
+        type("System.Xml.XmlException"; "npNetXmlException")
         {
         }
     }
@@ -500,7 +500,7 @@ dotnet
         {
         }
 
-        type("System.Security.SecurityElement";"npNetSecurityElement")
+        type("System.Security.SecurityElement"; "npNetSecurityElement")
         {
         }
 
@@ -508,15 +508,15 @@ dotnet
         {
         }
 
-        type("System.Boolean";"npNetBoolean")
+        type("System.Boolean"; "npNetBoolean")
         {
         }
 
-        type("System.Text.UTF8Encoding";"npNetUTF8Encoding")
+        type("System.Text.UTF8Encoding"; "npNetUTF8Encoding")
         {
         }
 
-        type("System.Security.Cryptography.HMACSHA256";"npNetHMACSHA256")
+        type("System.Security.Cryptography.HMACSHA256"; "npNetHMACSHA256")
         {
         }
 
@@ -606,7 +606,7 @@ dotnet
         {
         }
 
-        type("NaviPartner.Retail.Nav.ObjectModel.Model";"npNetModel")
+        type("NaviPartner.Retail.Nav.ObjectModel.Model"; "npNetModel")
         {
         }
 
@@ -928,19 +928,11 @@ dotnet
         {
         }
 
-        type("Renci.SshNet.PrivateKeyAuthenticationMethod";"npNetPrivateKeyAuthenticationMethod")
+        type("Renci.SshNet.PrivateKeyFile"; "npNetPrivateKeyFile")
         {
         }
 
-        type("Renci.SshNet.PrivateKeyFile";"npNetPrivateKeyFile")
-        {
-        }
-
-        type("Renci.SshNet.PrivateKeyAuthenticationMethod";"npNetPrivateKeyAuthenticationMethod")
-        {
-        }
-
-        type("Renci.SshNet.PrivateKeyFile";"npNetPrivateKeyFile")
+        type("Renci.SshNet.PrivateKeyAuthenticationMethod"; "npNetPrivateKeyAuthenticationMethod")
         {
         }
 
@@ -1152,7 +1144,7 @@ dotnet
         Culture = 'neutral';
         PublicKeyToken = '30ad4fe6b2a6aeed';
 
-        type("Newtonsoft.Json.Linq.JValue";"npNetJValue")
+        type("Newtonsoft.Json.Linq.JValue"; "npNetJValue")
         {
         }
 
@@ -1180,8 +1172,13 @@ dotnet
         type("Newtonsoft.Json.JsonConverter"; "npNetJsonConverter")
         {
         }
-
         type("Newtonsoft.Json.Converters.KeyValuePairConverter"; "npNetKeyValuePairConverter")
+        {
+        }
+        type("Newtonsoft.Json.Linq.JToken"; "npNetJToken")
+        {
+        }
+        type("Newtonsoft.Json.Linq.JObject"; "npNetJObject")
         {
         }
     }

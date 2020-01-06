@@ -10,94 +10,6 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="Code_TMTicketType">
-          <DataField>Code_TMTicketType</DataField>
-        </Field>
-        <Field Name="Description_TMTicketType">
-          <DataField>Description_TMTicketType</DataField>
-        </Field>
-        <Field Name="SkipLineWithZero">
-          <DataField>SkipLineWithZero</DataField>
-        </Field>
-        <Field Name="FilterStartDate">
-          <DataField>FilterStartDate</DataField>
-        </Field>
-        <Field Name="FilterEndDate">
-          <DataField>FilterEndDate</DataField>
-        </Field>
-        <Field Name="FilterCustomer">
-          <DataField>FilterCustomer</DataField>
-        </Field>
-        <Field Name="Getfilters">
-          <DataField>Getfilters</DataField>
-        </Field>
-        <Field Name="VariantCodeLbl">
-          <DataField>VariantCodeLbl</DataField>
-        </Field>
-        <Field Name="VariantVisibility">
-          <DataField>VariantVisibility</DataField>
-        </Field>
-        <Field Name="ShowVariantLine">
-          <DataField>ShowVariantLine</DataField>
-        </Field>
-        <Field Name="No_Item">
-          <DataField>No_Item</DataField>
-        </Field>
-        <Field Name="Description_Item">
-          <DataField>Description_Item</DataField>
-        </Field>
-        <Field Name="VariantCode">
-          <DataField>VariantCode</DataField>
-        </Field>
-        <Field Name="TotalIssuedTicketPerItem">
-          <DataField>TotalIssuedTicketPerItem</DataField>
-        </Field>
-        <Field Name="TotalIssuedTicketPerItemFormat">
-          <DataField>TotalIssuedTicketPerItemFormat</DataField>
-        </Field>
-        <Field Name="TotalAdmittedTicketPerItem">
-          <DataField>TotalAdmittedTicketPerItem</DataField>
-        </Field>
-        <Field Name="TotalAdmittedTicketPerItemFormat">
-          <DataField>TotalAdmittedTicketPerItemFormat</DataField>
-        </Field>
-        <Field Name="TicketTypeAvailable">
-          <DataField>TicketTypeAvailable</DataField>
-        </Field>
-        <Field Name="Variant">
-          <DataField>Variant</DataField>
-        </Field>
-        <Field Name="TotalIssuedTicketPerVariant">
-          <DataField>TotalIssuedTicketPerVariant</DataField>
-        </Field>
-        <Field Name="TotalIssuedTicketPerVariantFormat">
-          <DataField>TotalIssuedTicketPerVariantFormat</DataField>
-        </Field>
-        <Field Name="TotalAdmittedTicketPerVariant">
-          <DataField>TotalAdmittedTicketPerVariant</DataField>
-        </Field>
-        <Field Name="TotalAdmittedTicketPerVariantFormat">
-          <DataField>TotalAdmittedTicketPerVariantFormat</DataField>
-        </Field>
-        <Field Name="TotalIssuedTicketType">
-          <DataField>TotalIssuedTicketType</DataField>
-        </Field>
-        <Field Name="TotalIssuedTicketTypeFormat">
-          <DataField>TotalIssuedTicketTypeFormat</DataField>
-        </Field>
-        <Field Name="TotalAdmittedTicketType">
-          <DataField>TotalAdmittedTicketType</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -1821,4 +1733,92 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="Code_TMTicketType">
+          <DataField>Code_TMTicketType</DataField>
+        </Field>
+        <Field Name="Description_TMTicketType">
+          <DataField>Description_TMTicketType</DataField>
+        </Field>
+        <Field Name="SkipLineWithZero">
+          <DataField>SkipLineWithZero</DataField>
+        </Field>
+        <Field Name="FilterStartDate">
+          <DataField>FilterStartDate</DataField>
+        </Field>
+        <Field Name="FilterEndDate">
+          <DataField>FilterEndDate</DataField>
+        </Field>
+        <Field Name="FilterCustomer">
+          <DataField>FilterCustomer</DataField>
+        </Field>
+        <Field Name="Getfilters">
+          <DataField>Getfilters</DataField>
+        </Field>
+        <Field Name="VariantCodeLbl">
+          <DataField>VariantCodeLbl</DataField>
+        </Field>
+        <Field Name="VariantVisibility">
+          <DataField>VariantVisibility</DataField>
+        </Field>
+        <Field Name="ShowVariantLine">
+          <DataField>ShowVariantLine</DataField>
+        </Field>
+        <Field Name="No_Item">
+          <DataField>No_Item</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="VariantCode">
+          <DataField>VariantCode</DataField>
+        </Field>
+        <Field Name="TotalIssuedTicketPerItem">
+          <DataField>TotalIssuedTicketPerItem</DataField>
+        </Field>
+        <Field Name="TotalIssuedTicketPerItemFormat">
+          <DataField>TotalIssuedTicketPerItemFormat</DataField>
+        </Field>
+        <Field Name="TotalAdmittedTicketPerItem">
+          <DataField>TotalAdmittedTicketPerItem</DataField>
+        </Field>
+        <Field Name="TotalAdmittedTicketPerItemFormat">
+          <DataField>TotalAdmittedTicketPerItemFormat</DataField>
+        </Field>
+        <Field Name="TicketTypeAvailable">
+          <DataField>TicketTypeAvailable</DataField>
+        </Field>
+        <Field Name="Variant">
+          <DataField>Variant</DataField>
+        </Field>
+        <Field Name="TotalIssuedTicketPerVariant">
+          <DataField>TotalIssuedTicketPerVariant</DataField>
+        </Field>
+        <Field Name="TotalIssuedTicketPerVariantFormat">
+          <DataField>TotalIssuedTicketPerVariantFormat</DataField>
+        </Field>
+        <Field Name="TotalAdmittedTicketPerVariant">
+          <DataField>TotalAdmittedTicketPerVariant</DataField>
+        </Field>
+        <Field Name="TotalAdmittedTicketPerVariantFormat">
+          <DataField>TotalAdmittedTicketPerVariantFormat</DataField>
+        </Field>
+        <Field Name="TotalIssuedTicketType">
+          <DataField>TotalIssuedTicketType</DataField>
+        </Field>
+        <Field Name="TotalIssuedTicketTypeFormat">
+          <DataField>TotalIssuedTicketTypeFormat</DataField>
+        </Field>
+        <Field Name="TotalAdmittedTicketType">
+          <DataField>TotalAdmittedTicketType</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>
