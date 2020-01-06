@@ -14,13 +14,12 @@ codeunit 6151506 "Nc Gambit Management"
     begin
     end;
 
-    [TableSyncSetup]
     procedure GambitTableSyncSetup(var TableSynchSetup: Record "Table Synch. Setup")
     var
         DataUpgradeMgt: Codeunit "Data Upgrade Mgt.";
     begin
-        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Nc Task",0,TableSynchSetup.Mode::Force);
-        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Nc Import Entry",0,TableSynchSetup.Mode::Force);
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Nc Task", 0, TableSynchSetup.Mode::Force);
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Nc Import Entry", 0, TableSynchSetup.Mode::Force);
     end;
 }
 

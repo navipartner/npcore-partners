@@ -15,30 +15,28 @@ codeunit 6059827 "Upgrade NPR5.52"
     begin
     end;
 
-    [TableSyncSetup]
     procedure UpgradeTables(var TableSynchSetup: Record "Table Synch. Setup")
     var
         DataUpgradeMgt: Codeunit "Data Upgrade Mgt.";
     begin
         //-NPR5.52 [360258]
-        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"NPRE Restaurant Setup",DATABASE::"Upgrade NPRE Restaurant Setup",TableSynchSetup.Mode::Move);  //Field 'Auto print kintchen order' type changed from boolean to option
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"NPRE Restaurant Setup", DATABASE::"Upgrade NPRE Restaurant Setup", TableSynchSetup.Mode::Move);  //Field 'Auto print kintchen order' type changed from boolean to option
         //+NPR5.52 [360258]
 
         //-NPR5.52 [365326]
-        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"NP Retail Setup",DATABASE::"Upgrade NP Retail Setup",TableSynchSetup.Mode::Move);  //Posting related fields moved to POS Posting Profiles from NP Retail Setup
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"NP Retail Setup", DATABASE::"Upgrade NP Retail Setup", TableSynchSetup.Mode::Move);  //Posting related fields moved to POS Posting Profiles from NP Retail Setup
         //+NPR5.52 [365326]
 
         //-NPR5.52 [368395]
-        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"POS Unit",0,TableSynchSetup.Mode::Force);  //SMS profile move to POS End of Day Profile
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"POS Unit", 0, TableSynchSetup.Mode::Force);  //SMS profile move to POS End of Day Profile
         //+NPR5.52 [368395]
 
         //-NPR5.52 [375749]
-        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"CS Posting Buffer",0,TableSynchSetup.Mode::Force);
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"CS Posting Buffer", 0, TableSynchSetup.Mode::Force);
         //+NPR5.52 [375749]
     end;
 
-    [UpgradePerCompany]
-    procedure UpgradeData()
+    trigger OnUpgradePerCompany()
     begin
         MoveAndUpgradeTRestSetup;  //NPR5.52 [360258]
         MoveNPRetailSetup;  //NPR5.52 [365326]
@@ -55,23 +53,23 @@ codeunit 6059827 "Upgrade NPR5.52"
     begin
         //-NPR5.52 [360258]
         with UpgradeNPRERestaurantSetup do
-          if FindSet then
-            repeat
-              NPRERestaurantSetup.Init;
-              NPRERestaurantSetup.Code := Code;
-              if not NPRERestaurantSetup.Find then
-                NPRERestaurantSetup.Insert;
-              NPRERestaurantSetup."Waiter Pad No. Serie" := "Waiter Pad No. Serie";
-              NPRERestaurantSetup."Kitchen Order Template" := "Kitchen Order Template";
-              NPRERestaurantSetup."Pre Receipt Template" := "Pre Receipt Template";
-              if "Auto Print Kitchen Order" then
-                NPRERestaurantSetup."Auto Print Kitchen Order" := NPRERestaurantSetup."Auto Print Kitchen Order"::Yes
-              else
-                NPRERestaurantSetup."Auto Print Kitchen Order" := NPRERestaurantSetup."Auto Print Kitchen Order"::No;
-              NPRERestaurantSetup.Modify;
+            if FindSet then
+                repeat
+                    NPRERestaurantSetup.Init;
+                    NPRERestaurantSetup.Code := Code;
+                    if not NPRERestaurantSetup.Find then
+                        NPRERestaurantSetup.Insert;
+                    NPRERestaurantSetup."Waiter Pad No. Serie" := "Waiter Pad No. Serie";
+                    NPRERestaurantSetup."Kitchen Order Template" := "Kitchen Order Template";
+                    NPRERestaurantSetup."Pre Receipt Template" := "Pre Receipt Template";
+                    if "Auto Print Kitchen Order" then
+                        NPRERestaurantSetup."Auto Print Kitchen Order" := NPRERestaurantSetup."Auto Print Kitchen Order"::Yes
+                    else
+                        NPRERestaurantSetup."Auto Print Kitchen Order" := NPRERestaurantSetup."Auto Print Kitchen Order"::No;
+                    NPRERestaurantSetup.Modify;
 
-              Delete;
-            until Next = 0;
+                    Delete;
+                until Next = 0;
         //+NPR5.52 [360258]
     end;
 
@@ -84,46 +82,46 @@ codeunit 6059827 "Upgrade NPR5.52"
     begin
         //-NPR5.52 [365326]
         with UpgradeNPRetailSetup do
-          if FindSet then
-            repeat
-              POSPostingProfile.Init;
-              POSPostingProfile.Code := 'DEFAULT';
-              if not POSPostingProfile.Find then
-                POSPostingProfile.Insert;
-              POSPostingProfile.Description := 'Default POS Posting Profile';
-              POSPostingProfile."Default POS Entry No. Series" := "Default POS Entry No. Series";
-              POSPostingProfile."Max. POS Posting Diff. (LCY)" := "Max. POS Posting Diff. (LCY)";
-              POSPostingProfile."POS Posting Diff. Account" := "POS Posting Diff. Account";
-              POSPostingProfile."Automatic Item Posting" := "Automatic Item Posting";
-              POSPostingProfile."Automatic POS Posting" := "Automatic POS Posting";
-              POSPostingProfile."Automatic Posting Method" := "Automatic Posting Method";
-              POSPostingProfile."Adj. Cost after Item Posting" := "Adj. Cost after Item Posting";
-              POSPostingProfile."Post to G/L after Item Posting" := "Post to G/L after Item Posting";
-              POSPostingProfile.Modify;
-
-              if POSUnit.FindSet then
+            if FindSet then
                 repeat
-                  if POSUnit."POS Posting Profile" = '' then begin
-                    POSUnit."POS Posting Profile" := POSPostingProfile.Code;
-                    POSUnit.Modify;
-                  end;
-                until POSUnit.Next = 0;
+                    POSPostingProfile.Init;
+                    POSPostingProfile.Code := 'DEFAULT';
+                    if not POSPostingProfile.Find then
+                        POSPostingProfile.Insert;
+                    POSPostingProfile.Description := 'Default POS Posting Profile';
+                    POSPostingProfile."Default POS Entry No. Series" := "Default POS Entry No. Series";
+                    POSPostingProfile."Max. POS Posting Diff. (LCY)" := "Max. POS Posting Diff. (LCY)";
+                    POSPostingProfile."POS Posting Diff. Account" := "POS Posting Diff. Account";
+                    POSPostingProfile."Automatic Item Posting" := "Automatic Item Posting";
+                    POSPostingProfile."Automatic POS Posting" := "Automatic POS Posting";
+                    POSPostingProfile."Automatic Posting Method" := "Automatic Posting Method";
+                    POSPostingProfile."Adj. Cost after Item Posting" := "Adj. Cost after Item Posting";
+                    POSPostingProfile."Post to G/L after Item Posting" := "Post to G/L after Item Posting";
+                    POSPostingProfile.Modify;
 
-              //-NPR5.52 [371388]
-              if "Global POS Sales Setup" <> '' then
-                POSUnit.ModifyAll("Global POS Sales Setup","Global POS Sales Setup");
-              //+NPR5.52 [371388]
+                    if POSUnit.FindSet then
+                        repeat
+                            if POSUnit."POS Posting Profile" = '' then begin
+                                POSUnit."POS Posting Profile" := POSPostingProfile.Code;
+                                POSUnit.Modify;
+                            end;
+                        until POSUnit.Next = 0;
 
-              NPRetailSetup.Init;
-              NPRetailSetup."Primary Key" := UpgradeNPRetailSetup."Primary Key";
-              if not NPRetailSetup.Find then
-                NPRetailSetup.Insert;
-              NPRetailSetup.TransferFields(UpgradeNPRetailSetup,true);
-              NPRetailSetup."Default POS Posting Profile" := POSPostingProfile.Code;
-              NPRetailSetup.Modify;
+                    //-NPR5.52 [371388]
+                    if "Global POS Sales Setup" <> '' then
+                        POSUnit.ModifyAll("Global POS Sales Setup", "Global POS Sales Setup");
+                    //+NPR5.52 [371388]
 
-              Delete;
-            until Next = 0;
+                    NPRetailSetup.Init;
+                    NPRetailSetup."Primary Key" := UpgradeNPRetailSetup."Primary Key";
+                    if not NPRetailSetup.Find then
+                        NPRetailSetup.Insert;
+                    NPRetailSetup.TransferFields(UpgradeNPRetailSetup, true);
+                    NPRetailSetup."Default POS Posting Profile" := POSPostingProfile.Code;
+                    NPRetailSetup.Modify;
+
+                    Delete;
+                until Next = 0;
         //+NPR5.52 [365326]
     end;
 
@@ -154,42 +152,42 @@ codeunit 6059827 "Upgrade NPR5.52"
         //+NPR5.52 [352473]
     end;
 
-    procedure RenamePOSParameterValue(ActionCode: Text;CurrentName: Text;NewName: Text)
+    procedure RenamePOSParameterValue(ActionCode: Text; CurrentName: Text; NewName: Text)
     var
         POSParameterValue: Record "POS Parameter Value";
         POSParameterValue2: Record "POS Parameter Value";
     begin
         //-NPR5.52 [352473]
         with POSParameterValue do begin
-          SetRange("Action Code", ActionCode);
-          SetRange(Name, CurrentName);
-          if not FindSet(true, true) then
-            exit;
+            SetRange("Action Code", ActionCode);
+            SetRange(Name, CurrentName);
+            if not FindSet(true, true) then
+                exit;
 
-          repeat
-            POSParameterValue2 := POSParameterValue;
-            POSParameterValue2.Rename("Table No.", Code, ID, "Record ID", NewName);
-          until Next = 0;
+            repeat
+                POSParameterValue2 := POSParameterValue;
+                POSParameterValue2.Rename("Table No.", Code, ID, "Record ID", NewName);
+            until Next = 0;
         end;
         //+NPR5.52 [352473]
     end;
 
-    procedure RenamePOSActionParameter(ActionCode: Text;CurrentName: Text;NewName: Text)
+    procedure RenamePOSActionParameter(ActionCode: Text; CurrentName: Text; NewName: Text)
     var
         POSActionParameter: Record "POS Action Parameter";
         POSActionParameter2: Record "POS Action Parameter";
     begin
         //-NPR5.52 [352473]
         with POSActionParameter do begin
-          SetRange("POS Action Code", ActionCode);
-          SetRange(Name, CurrentName);
-          if not FindSet(true, true) then
-            exit;
+            SetRange("POS Action Code", ActionCode);
+            SetRange(Name, CurrentName);
+            if not FindSet(true, true) then
+                exit;
 
-          repeat
-            POSActionParameter2 := POSActionParameter;
-            POSActionParameter2.Rename("POS Action Code", NewName);
-          until Next = 0;
+            repeat
+                POSActionParameter2 := POSActionParameter;
+                POSActionParameter2.Rename("POS Action Code", NewName);
+            until Next = 0;
         end;
         //+NPR5.52 [352473]
     end;
@@ -199,10 +197,10 @@ codeunit 6059827 "Upgrade NPR5.52"
         PaymentTypePOS: Record "Payment Type POS";
     begin
         //-NPR5.52 [373294]
-        PaymentTypePOS.SetFilter("Fixed Rate",'=%1',0);
-        PaymentTypePOS.SetRange("Allow Cashback",false);
+        PaymentTypePOS.SetFilter("Fixed Rate", '=%1', 0);
+        PaymentTypePOS.SetRange("Allow Cashback", false);
         if PaymentTypePOS.FindFirst then
-          PaymentTypePOS.ModifyAll("Allow Cashback",true);
+            PaymentTypePOS.ModifyAll("Allow Cashback", true);
         //+NPR5.52 [373294]
     end;
 }
