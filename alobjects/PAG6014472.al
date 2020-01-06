@@ -31,7 +31,7 @@ page 6014472 "Retail Journal Line"
     MultipleNewLines = false;
     PageType = ListPart;
     SourceTable = "Retail Journal Line";
-    SourceTableView = SORTING("No.","Line No.");
+    SourceTableView = SORTING ("No.", "Line No.");
 
     layout
     {
@@ -49,14 +49,14 @@ page 6014472 "Retail Journal Line"
                         Caption = 'Vendor No.';
                         //The GridLayout property is only supported on controls of type Grid
                         //GridLayout = Rows;
-                        field("Vendor.""No.""";Vendor."No.")
+                        field("Vendor.""No."""; Vendor."No.")
                         {
                             ShowCaption = false;
 
                             trigger OnLookup(var Text: Text): Boolean
                             begin
                                 if PAGE.RunModal(PAGE::"Vendor List", Vendor) = ACTION::LookupOK then begin
-                                  SetRange("Vendor No.", Vendor."No.");
+                                    SetRange("Vendor No.", Vendor."No.");
                                 end;
                                 CurrPage.Update(false);
                             end;
@@ -64,20 +64,20 @@ page 6014472 "Retail Journal Line"
                             trigger OnValidate()
                             begin
                                 if Vendor."No." <> '' then begin
-                                  Vendor.Get(Vendor."No.");
-                                  SetRange("Vendor No.", Vendor."No.");
+                                    Vendor.Get(Vendor."No.");
+                                    SetRange("Vendor No.", Vendor."No.");
                                 end else begin
-                                  Clear(Vendor);
-                                  SetRange("Vendor No.");
+                                    Clear(Vendor);
+                                    SetRange("Vendor No.");
                                 end;
-                                  VendorNoOnAfterValidate;
+                                VendorNoOnAfterValidate;
                             end;
                         }
                     }
                     group("Item Group")
                     {
                         Caption = 'Item Group';
-                        field("Itemgroup.""No.""";Itemgroup."No.")
+                        field("Itemgroup.""No."""; Itemgroup."No.")
                         {
                             Caption = 'Item Group';
                             ShowCaption = false;
@@ -85,7 +85,7 @@ page 6014472 "Retail Journal Line"
                             trigger OnLookup(var Text: Text): Boolean
                             begin
                                 if PAGE.RunModal(PAGE::"Item Group Tree", Itemgroup) = ACTION::LookupOK then begin
-                                  SetRange("Item group", Itemgroup."No.");
+                                    SetRange("Item group", Itemgroup."No.");
                                 end;
                                 CurrPage.Update(false);
                             end;
@@ -93,20 +93,20 @@ page 6014472 "Retail Journal Line"
                             trigger OnValidate()
                             begin
                                 if Itemgroup."No." <> '' then begin
-                                  Itemgroup.Get(Itemgroup."No.");
-                                  SetRange("Item group", Itemgroup."No.");
+                                    Itemgroup.Get(Itemgroup."No.");
+                                    SetRange("Item group", Itemgroup."No.");
                                 end else begin
-                                  Clear(Itemgroup);
-                                  SetRange("Item group");
+                                    Clear(Itemgroup);
+                                    SetRange("Item group");
                                 end;
-                                  ItemgroupNoOnAfterValidate;
+                                ItemgroupNoOnAfterValidate;
                             end;
                         }
                     }
                     group("Unknown Item No.")
                     {
                         Caption = 'Unknown Item No.';
-                        field(ShowUnknown;ShowUnknown)
+                        field(ShowUnknown; ShowUnknown)
                         {
                             Caption = 'Unknown Item No.';
                             OptionCaption = 'All,Only existing items,Only unknown items';
@@ -115,18 +115,21 @@ page 6014472 "Retail Journal Line"
                             trigger OnValidate()
                             begin
                                 case ShowUnknown of
-                                  ShowUnknown::All : SetRange("Item No.");
-                                  ShowUnknown::"Only existing items" : SetFilter("Item No.", '<>%1', '');
-                                  ShowUnknown::"Only unknown items" : SetFilter("Item No.", '=%1', '');
+                                    ShowUnknown::All:
+                                        SetRange("Item No.");
+                                    ShowUnknown::"Only existing items":
+                                        SetFilter("Item No.", '<>%1', '');
+                                    ShowUnknown::"Only unknown items":
+                                        SetFilter("Item No.", '=%1', '');
                                 end;
-                                  ShowUnknownOnAfterValidate;
+                                ShowUnknownOnAfterValidate;
                             end;
                         }
                     }
                     group("New Item")
                     {
                         Caption = 'New Item';
-                        field(ShowNew;ShowNew)
+                        field(ShowNew; ShowNew)
                         {
                             Caption = 'New Item';
                             OptionCaption = 'All,Only existing items,Only new items';
@@ -135,18 +138,21 @@ page 6014472 "Retail Journal Line"
                             trigger OnValidate()
                             begin
                                 case ShowNew of
-                                  ShowNew::All : SetRange("New Item");
-                                  ShowNew::"Only existing items" : SetRange("New Item", false);
-                                  ShowNew::"Only new items" : SetRange("New Item", true);
+                                    ShowNew::All:
+                                        SetRange("New Item");
+                                    ShowNew::"Only existing items":
+                                        SetRange("New Item", false);
+                                    ShowNew::"Only new items":
+                                        SetRange("New Item", true);
                                 end;
-                                  ShowNewOnAfterValidate;
+                                ShowNewOnAfterValidate;
                             end;
                         }
                     }
                     group("Inventory Status")
                     {
                         Caption = 'Inventory Status';
-                        field(ShowInventory;ShowInventory)
+                        field(ShowInventory; ShowInventory)
                         {
                             Caption = 'Inventory Status';
                             OptionCaption = 'All,In stock,Not in stock';
@@ -155,15 +161,15 @@ page 6014472 "Retail Journal Line"
                             trigger OnValidate()
                             begin
                                 case ShowInventory of
-                                  ShowInventory::All :
-                                    SetRange(Inventory);
-                                  ShowInventory::"In stock" :
-                                    SetFilter(Inventory, '>%1', 0);
-                                  ShowInventory::"Not in stock" :
-                                    SetFilter(Inventory, '<=%1', 0);
+                                    ShowInventory::All:
+                                        SetRange(Inventory);
+                                    ShowInventory::"In stock":
+                                        SetFilter(Inventory, '>%1', 0);
+                                    ShowInventory::"Not in stock":
+                                        SetFilter(Inventory, '<=%1', 0);
                                 end;
                                 if Find('-') then;
-                                  ShowInventoryOnAfterValidate;
+                                ShowInventoryOnAfterValidate;
                             end;
                         }
                     }
@@ -176,17 +182,17 @@ page 6014472 "Retail Journal Line"
             repeater(Control6014441)
             {
                 ShowCaption = false;
-                field("Calculation Date";"Calculation Date")
+                field("Calculation Date"; "Calculation Date")
                 {
                 }
-                field("Item No.";"Item No.")
+                field("Item No."; "Item No.")
                 {
                     Lookup = true;
                 }
-                field("Quantity to Print";"Quantity to Print")
+                field("Quantity to Print"; "Quantity to Print")
                 {
                 }
-                field(Print;Print)
+                field(Print; Print)
                 {
                     Caption = 'Print';
 
@@ -198,141 +204,141 @@ page 6014472 "Retail Journal Line"
                         LabelLibrary.ToggleLine(RecRef);
                     end;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field("Vendor Item No.";"Vendor Item No.")
+                field("Vendor Item No."; "Vendor Item No.")
                 {
                 }
-                field(Barcode;Barcode)
+                field(Barcode; Barcode)
                 {
                 }
-                field("Unit Price";"Unit Price")
+                field("Unit Price"; "Unit Price")
                 {
                 }
-                field("Item.""Unit Price""";Item."Unit Price")
+                field("Item.""Unit Price"""; Item."Unit Price")
                 {
                     Caption = 'Unit price(Item Card)';
                     Editable = false;
                     Visible = true;
                 }
-                field("Last Direct Cost";"Last Direct Cost")
+                field("Last Direct Cost"; "Last Direct Cost")
                 {
                 }
-                field("Item.""Unit Cost""";Item."Unit Cost")
+                field("Item.""Unit Cost"""; Item."Unit Cost")
                 {
                     Caption = 'Unit cost';
                     Editable = false;
                     Visible = false;
                 }
-                field("Profit % (new)";"Profit % (new)")
+                field("Profit % (new)"; "Profit % (new)")
                 {
                     Visible = true;
                 }
-                field(Inventory;Inventory)
+                field(Inventory; Inventory)
                 {
                 }
-                field("Register No.";"Register No.")
+                field("Register No."; "Register No.")
                 {
                 }
-                field("Customer Price Group";"Customer Price Group")
+                field("Customer Price Group"; "Customer Price Group")
                 {
                 }
-                field("Customer Disc. Group";"Customer Disc. Group")
+                field("Customer Disc. Group"; "Customer Disc. Group")
                 {
                 }
-                field("New Item No.";"New Item No.")
-                {
-                    Visible = false;
-                }
-                field("Serial No.";"Serial No.")
-                {
-                }
-                field("Variant Code";"Variant Code")
-                {
-                }
-                field("Description 2";"Description 2")
+                field("New Item No."; "New Item No.")
                 {
                     Visible = false;
                 }
-                field("Base Unit of measure";"Base Unit of measure")
+                field("Serial No."; "Serial No.")
+                {
+                }
+                field("Variant Code"; "Variant Code")
+                {
+                }
+                field("Description 2"; "Description 2")
                 {
                     Visible = false;
                 }
-                field("Purch. Unit of measure";"Purch. Unit of measure")
+                field("Base Unit of measure"; "Base Unit of measure")
                 {
                     Visible = false;
                 }
-                field("Sales Unit of measure";"Sales Unit of measure")
+                field("Purch. Unit of measure"; "Purch. Unit of measure")
                 {
                     Visible = false;
                 }
-                field("Quantity for Discount Calc";"Quantity for Discount Calc")
-                {
-                }
-                field("Discount Type";"Discount Type")
-                {
-                }
-                field("Discount Code";"Discount Code")
-                {
-                }
-                field("Variant Code 2";"Variant Code")
+                field("Sales Unit of measure"; "Sales Unit of measure")
                 {
                     Visible = false;
                 }
-                field("Discount Pct.";"Discount Pct.")
+                field("Quantity for Discount Calc"; "Quantity for Discount Calc")
                 {
                 }
-                field("Discount Price Incl. Vat";"Discount Price Incl. Vat")
+                field("Discount Type"; "Discount Type")
                 {
                 }
-                field("Discount Price Excl. VAT";"Discount Price Excl. VAT")
+                field("Discount Code"; "Discount Code")
+                {
+                }
+                field("Variant Code 2"; "Variant Code")
+                {
+                    Visible = false;
+                }
+                field("Discount Pct."; "Discount Pct.")
+                {
+                }
+                field("Discount Price Incl. Vat"; "Discount Price Incl. Vat")
+                {
+                }
+                field("Discount Price Excl. VAT"; "Discount Price Excl. VAT")
                 {
                     Editable = false;
                 }
-                field("Unit List Price";"Unit List Price")
+                field("Unit List Price"; "Unit List Price")
                 {
                 }
-                field("VAT %";"VAT %")
+                field("VAT %"; "VAT %")
                 {
                     Editable = false;
                 }
-                field("Item group";"Item group")
+                field("Item group Field"; "Item group")
                 {
                     Visible = false;
                 }
-                field(Control6014407;"Vendor No.")
+                field(Control6014407; "Vendor No.")
                 {
                     ShowCaption = false;
                     Visible = false;
                 }
-                field("Vendor Name";"Vendor Name")
+                field("Vendor Name"; "Vendor Name")
                 {
                     Editable = false;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         if PAGE.RunModal(PAGE::"Vendor List", Vendor) = ACTION::LookupOK then begin
-                          "Vendor No." := Vendor."No.";
-                          vendorName := Vendor.Name;
-                          Modify(true);
+                            "Vendor No." := Vendor."No.";
+                            vendorName := Vendor.Name;
+                            Modify(true);
                         end;
                     end;
                 }
-                field("Net Change";"Net Change")
+                field("Net Change"; "Net Change")
                 {
                 }
-                field("Purchases (Qty.)";"Purchases (Qty.)")
+                field("Purchases (Qty.)"; "Purchases (Qty.)")
                 {
                 }
-                field("Sales (Qty.)";"Sales (Qty.)")
+                field("Sales (Qty.)"; "Sales (Qty.)")
                 {
                 }
-                field("Cannot edit unit price";"Cannot edit unit price")
+                field("Cannot edit unit price"; "Cannot edit unit price")
                 {
                     Visible = false;
                 }
-                field("Exchange Label";"Exchange Label")
+                field("Exchange Label"; "Exchange Label")
                 {
 
                     trigger OnValidate()
@@ -355,11 +361,11 @@ page 6014472 "Retail Journal Line"
         RecRef: RecordRef;
     begin
         if not Item.Get("Item No.") then
-          Item.Init;
+            Item.Init;
 
         vendorName := '';
         if Vendor.Get("Vendor No.") then
-          vendorName := Vendor.Name;
+            vendorName := Vendor.Name;
         CalcFields(Inventory);
         calcProfit;
 
@@ -373,7 +379,7 @@ page 6014472 "Retail Journal Line"
     begin
         RecRef.GetTable(Rec);
         if LabelLibrary.SelectionContains(RecRef) then
-          LabelLibrary.ToggleLine(RecRef);
+            LabelLibrary.ToggleLine(RecRef);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -405,7 +411,7 @@ page 6014472 "Retail Journal Line"
 
     procedure RoundIt(dec1: Decimal): Decimal
     begin
-        exit(Utility.FormatDec2Dec(dec1,2));
+        exit(Utility.FormatDec2Dec(dec1, 2));
     end;
 
     procedure GetSelectionFilter(var Lines: Record "Retail Journal Line")
@@ -416,18 +422,18 @@ page 6014472 "Retail Journal Line"
         CurrPage.SetSelectionFilter(Lines);
 
         if not Lines.FindFirst then
-          Error(t001);
+            Error(t001);
 
         if Lines.Count = 1 then
-          if not Confirm(t002,true) then Error('');
+            if not Confirm(t002, true) then Error('');
     end;
 
     procedure SetItemFilter(ItemNo1: Code[20])
     begin
         if ItemNo1 = '' then
-          SetRange("Item No.")
+            SetRange("Item No.")
         else
-          SetRange("Item No.", ItemNo1);
+            SetRange("Item No.", ItemNo1);
 
         CurrPage.Update(false);
     end;
@@ -480,13 +486,14 @@ page 6014472 "Retail Journal Line"
 
         //-NPR5.34 [282048]
         if Confirm(Caption_DeletePrintedLines) then begin
-          RetailJnlLine.SetRange("No.", "No.");
-          if RetailJnlLine.FindSet then repeat
-            RecRef.GetTable(RetailJnlLine);
-            if LabelLibrary.SelectionContains(RecRef) then
-              RetailJnlLine.Delete(true);
-            RecRef.Close;
-          until RetailJnlLine.Next = 0;
+            RetailJnlLine.SetRange("No.", "No.");
+            if RetailJnlLine.FindSet then
+                repeat
+                    RecRef.GetTable(RetailJnlLine);
+                    if LabelLibrary.SelectionContains(RecRef) then
+                        RetailJnlLine.Delete(true);
+                    RecRef.Close;
+                until RetailJnlLine.Next = 0;
         end;
         //+NPR5.34 [282048]
     end;

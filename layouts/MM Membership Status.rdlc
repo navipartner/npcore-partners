@@ -9,18 +9,18 @@
       </ConnectionProperties>
     </DataSource>
   </DataSources>
-        <Field Name="ValidFromDate">
-          <DataField>ValidFromDate</DataField>
-        </Field>
-        <Field Name="ValidUntilDate">
-          <DataField>ValidUntilDate</DataField>
-        </Field>
-        <Field Name="ValidFromDate">
-          <DataField>ValidFromDate</DataField>
-        </Field>
-        <Field Name="ValidUntilDate">
-          <DataField>ValidUntilDate</DataField>
-        </Field>
+  <Field Name="ValidFromDate">
+    <DataField>ValidFromDate</DataField>
+  </Field>
+  <Field Name="ValidUntilDate">
+    <DataField>ValidUntilDate</DataField>
+  </Field>
+  <Field Name="ValidFromDate">
+    <DataField>ValidFromDate</DataField>
+  </Field>
+  <Field Name="ValidUntilDate">
+    <DataField>ValidUntilDate</DataField>
+  </Field>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -1782,9 +1782,6 @@ End Function
         <Field Name="EmailNewsLetter_Member">
           <DataField>EmailNewsLetter_Member</DataField>
         </Field>
-        <Field Name="AsOfToday">
-          <DataField>AsOfToday</DataField>
-        </Field>
         <Field Name="PageCaption">
           <DataField>PageCaption</DataField>
         </Field>
@@ -1820,6 +1817,12 @@ End Function
         </Field>
         <Field Name="IssuedDateCaption">
           <DataField>IssuedDateCaption</DataField>
+        </Field>
+        <Field Name="ValidFromDate">
+          <DataField>ValidFromDate</DataField>
+        </Field>
+        <Field Name="ValidUntilDate">
+          <DataField>ValidUntilDate</DataField>
         </Field>
       </Fields>
       <Query>
