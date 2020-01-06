@@ -251,6 +251,8 @@ xmlport 6151153 "M2 Create Corporate Account"
     end;
 
     procedure SetResponse(var TmpContact: Record Contact temporary)
+    var
+        MembershipRole: Record "MM Membership Role";
     begin
 
         TmpContactResponse.TransferFields (TmpContact, true);
@@ -263,6 +265,7 @@ xmlport 6151153 "M2 Create Corporate Account"
         repeat
           TmpContactResponse.TransferFields (TmpContact, true);
           TmpContactResponse.Insert ();
+
         until (TmpContact.Next () = 0);
 
         ResponseCode := 'OK';
