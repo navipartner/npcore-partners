@@ -10447,11 +10447,20 @@ false, true)</Hidden>
       </DefaultValue>
       <Prompt>TotalBTW_Lbl</Prompt>
     </ReportParameter>
+    <ReportParameter Name="Discount_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Discount_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Discount_Lbl</Prompt>
+    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>30</NumberOfRows>
+      <NumberOfRows>31</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -10602,6 +10611,11 @@ false, true)</Hidden>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>29</RowIndex>
           <ParameterName>TotalBTW_Lbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>30</RowIndex>
+          <ParameterName>Discount_Lbl</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -10838,6 +10852,9 @@ End Function
         </Field>
         <Field Name="Type_AuditRollSale">
           <DataField>Type_AuditRollSale</DataField>
+        </Field>
+        <Field Name="SaleType_AuditRollSale">
+          <DataField>SaleType_AuditRollSale</DataField>
         </Field>
         <Field Name="AmountLine">
           <DataField>AmountLine</DataField>

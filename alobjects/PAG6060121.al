@@ -16,6 +16,7 @@ page 6060121 "TM Ticket BOM"
     // TM1.38/TSA /20181012 CASE 332109 Added eTicket
     // TM1.38/TSA /20181026 CASE 308962 Adding setup to manage prepaid / postpaid tickets
     // TM1.42/TSA /20190411 CASE 351050 Added "Revisit Condition (Statistics)"
+    // TM1.43/TSA /20190910 CASE 368043 Refactored usage of External Item Code
 
     Caption = 'Ticket BOM';
     PageType = List;
@@ -254,6 +255,10 @@ page 6060121 "TM Ticket BOM"
           //+#308962 [308962]
 
           TicketReservationRequest."External Item Code" := TicketRequestManager.GetExternalNo (ItemNo, VariantCode);
+          //-TM1.43 [368043]
+          TicketReservationRequest."Item No." := ItemNo;
+          TicketReservationRequest."Variant Code" := VariantCode;
+          //+TM1.43 [368043]
 
           TicketReservationRequest."Admission Code" := TicketAdmissionBOM."Admission Code";
           TicketReservationRequest."Admission Description" := TicketAdmissionBOM."Admission Description";

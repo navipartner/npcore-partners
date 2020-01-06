@@ -154,6 +154,8 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
     // NPR5.51/MMV /20190605  CASE 357277 Added support for skipping line transfer to POS entry.
     // NPR5.51/MHA /20190614  CASE 358582 Removed function OnBeforeAuditRollDebitSaleLineInsertEvent() and added corresponding invokes to codeunit 6014435
     // NPR5.51/ALST/20190705  CASE 357848 added possibility to prepay by amount not just percentage
+    // NPR5.52/MMV /20191002  CASE 352473 Fixed prepayment VAT & amount dialog bugs.
+    //                                    Added send & pdf2nav support to pre-sale end posting subscriber.
 
     Permissions = TableData "Audit Roll" = rimd;
     TableNo = "Sale POS";
@@ -272,6 +274,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         SendPostedPdf2Nav: Boolean;
         PrintingErrorTxt: Label 'Printing of Documents failed with error: %1';
         SendingErrorTxt: Label 'Sending of Documents failed with error: %1';
+        Pdf2NavSendingErrorTxt: Label 'Sending of Documents via Pdf2Nav failed with error: %1';
         RetailPrintErrorTxt: Label 'Retail printing of Documents failed with error: %1';
         RetailPrint: Boolean;
         CreatedSalesHeader: Record "Sales Header";
@@ -287,6 +290,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         POSTING_ERROR: Label 'A problem occured during posting of %1 %2.\Document was left in unposted state.\%3';
         DeleteSaleLinesAfterExport: Boolean;
         AmountExceedsSaleErr: Label 'The prepaid amount exceeds the total amount of the sale';
+        SendDocument: Boolean;
 
     procedure SetAsk(AskIn: Boolean)
     begin
@@ -472,6 +476,13 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         //+NPR5.51 [357277]
     end;
 
+    procedure SetSendDocument(SendDocumentIn: Boolean)
+    begin
+        //-NPR5.52 [352473]
+        SendDocument := SendDocumentIn;
+        //+NPR5.52 [352473]
+    end;
+
     procedure Reset()
     begin
         Ask := false;
@@ -503,6 +514,9 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         OpenSalesDocAfterExport := false;
         //+NPR5.50 [300557]
         Clear(CreatedSalesHeader);
+        //-NPR5.52 [352473]
+        SendDocument := false;
+        //+NPR5.52 [352473]
     end;
 
     procedure "--- Sales Document Functions"()
@@ -532,6 +546,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         NPRetailSetup: Record "NP Retail Setup";
         POSCreateEntry: Codeunit "POS Create Entry";
         Success: Boolean;
+        POSSalesDocumentOutputMgt: Codeunit "POS Sales Document Output Mgt.";
     begin
         if not Customer.Get(SalePOS."Customer No.") then
             exit;
@@ -640,32 +655,45 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
                     asserterror
                     begin
                         Success := false;
-                        //-NPR5.50 [300557]
-                        //        SalesPostAndPrint.GetReport(SalesHeader);
-                        PrintStandardReport(SalesHeader);
-                        //+NPR5.50 [300557]
-                        Success := true;
-                        Commit;
-                        Error('');
-                    end;
-                    if not Success then
-                        Message(PrintingErrorTxt, GetLastErrorText);
-                end;
-                if SendPostedPdf2Nav then begin
-                    ClearLastError;
-                    asserterror
-                    begin
-                        Success := false;
-                        SalesPostAndPdf2Nav.DontHandlePrint;
-                        SalesPostAndPdf2Nav.GetReport(SalesHeader);
-                        Success := true;
-                        Commit;
-                        Error('');
-                    end;
-                    if not Success then
-                        Message(SendingErrorTxt, GetLastErrorText);
-                end;
+        //-NPR5.52 [352473]
+                POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 0);
+        //+NPR5.52 [352473]
+                Success := true;
+                Commit;
+                Error('');
+              end;
+              if not Success then
+                Message(PrintingErrorTxt,GetLastErrorText);
             end;
+        //-NPR5.52 [352473]
+            if SendDocument then begin
+              ClearLastError;
+              asserterror begin
+                Success := false;
+                POSSalesDocumentOutputMgt.SendDocument(SalesHeader, 0);
+                Success := true;
+                Commit;
+                Error('');
+              end;
+              if not Success then
+                Message(SendingErrorTxt,GetLastErrorText);
+            end;
+        //+NPR5.52 [352473]
+            if SendPostedPdf2Nav then begin
+              ClearLastError;
+              asserterror begin
+                Success := false;
+        //-NPR5.52 [352473]
+                POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 0);
+        //+NPR5.52 [352473]
+                Success := true;
+                Commit;
+                Error('');
+              end;
+              if not Success then
+                Message(Pdf2NavSendingErrorTxt,GetLastErrorText);
+            end;
+          end;
 
             if ShowCreationMessage then
                 //-NPR5.50 [300557]
@@ -779,6 +807,10 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
 
         if OrderTypeSet then
             SalesHeader."Order Type" := OrderType;
+
+        //-NPR5.52 [352473]
+        SalesHeader.Validate("Prices Including VAT", SalePOS."Prices Including VAT");
+        //+NPR5.52 [352473]
 
         TransferInfoFromSalePOS(SalePOS, SalesHeader);
 
@@ -1297,7 +1329,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
                 SaleLinePOS."Sales Document Type" := SalesHeader."Document Type";
                 SaleLinePOS."Sales Document No." := SalesHeader."No.";
                 SaleLinePOS."Sales Document Prepayment" := true;
-                SaleLinePOS."Sales Doc. Prepayment %" := (SuggestedDepositAmount / SalesHeader."Amount Including VAT") * 100;
+            SaleLinePOS."Sales Doc. Prepayment Value" := (SuggestedDepositAmount/SalesHeader."Amount Including VAT")*100;
                 SaleLinePOS.Validate("Unit Price", SuggestedDepositAmount);
                 SaleLinePOS.Description := StrSubstNo(Text000009, SalesHeader."Document Type", SalesHeader."No.");
                 SaleLinePOS.Modify(true);
@@ -1375,95 +1407,6 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         //+NPR5.50 [300557]
     end;
 
-    procedure PrintStandardReport(SalesHeader: Record "Sales Header")
-    var
-        SalesShptHeader: Record "Sales Shipment Header";
-        SalesInvHeader: Record "Sales Invoice Header";
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        ReturnRcptHeader: Record "Return Receipt Header";
-        ReportSelection: Record "Report Selections";
-        "Record": Variant;
-    begin
-        //-NPR5.50 [300557]
-        //POS friendly print of standard NAV sales reports.
-        //Can be silent in webclient and does not auto print shipment or receivals.
-
-        with SalesHeader do begin
-            case "Document Type" of
-                "Document Type"::Order:
-                    begin
-                        if Invoice then begin
-                            SalesInvHeader."No." := "Last Posting No.";
-                            SalesInvHeader.SetRecFilter;
-                            Record := SalesInvHeader;
-                            ReportSelection.SetRange(Usage, ReportSelection.Usage::"S.Invoice");
-                        end else
-                            if Ship then begin
-                                SalesShptHeader."No." := "Last Shipping No.";
-                                SalesShptHeader.SetRecFilter;
-                                Record := SalesShptHeader;
-                                ReportSelection.SetRange(Usage, ReportSelection.Usage::"S.Shipment");
-                            end;
-                    end;
-                "Document Type"::Invoice:
-                    begin
-                        if "Last Posting No." = '' then
-                            SalesInvHeader."No." := "No."
-                        else
-                            SalesInvHeader."No." := "Last Posting No.";
-                        SalesInvHeader.SetRecFilter;
-                        Record := SalesInvHeader;
-                        ReportSelection.SetRange(Usage, ReportSelection.Usage::"S.Invoice");
-                    end;
-                "Document Type"::"Return Order":
-                    begin
-                        if Invoice then begin
-                            SalesCrMemoHeader."No." := "Last Posting No.";
-                            SalesCrMemoHeader.SetRecFilter;
-                            Record := SalesCrMemoHeader;
-                            ReportSelection.SetRange(Usage, ReportSelection.Usage::"S.Cr.Memo");
-                        end else
-                            if Receive then begin
-                                ReturnRcptHeader."No." := "Last Return Receipt No.";
-                                ReturnRcptHeader.SetRecFilter;
-                                Record := ReturnRcptHeader;
-                                ReportSelection.SetRange(Usage, ReportSelection.Usage::"S.Ret.Rcpt.");
-                            end;
-                    end;
-                "Document Type"::"Credit Memo":
-                    begin
-                        if "Last Posting No." = '' then
-                            SalesCrMemoHeader."No." := "No."
-                        else
-                            SalesCrMemoHeader."No." := "Last Posting No.";
-                        SalesCrMemoHeader.SetRecFilter;
-                        Record := SalesCrMemoHeader;
-                        ReportSelection.SetRange(Usage, ReportSelection.Usage::"S.Cr.Memo");
-                    end;
-            end;
-        end;
-
-        PrintReportSelection(ReportSelection, Record);
-        //+NPR5.50 [300557]
-    end;
-
-    local procedure PrintReportSelection(var ReportSelections: Record "Report Selections"; var RecordVariant: Variant)
-    var
-        ReportPrinterInterface: Codeunit "Report Printer Interface";
-    begin
-        //-NPR5.50 [300557]
-        if not RecordVariant.IsRecord then
-            exit;
-
-        if not ReportSelections.FindSet then
-            exit;
-
-        repeat
-            ReportPrinterInterface.RunReport(ReportSelections."Report ID", false, false, RecordVariant);
-        until ReportSelections.Next = 0;
-        //+NPR5.50 [300557]
-    end;
-
     procedure GetCreatedSalesHeader(var CreatedSalesHeaderOut: Record "Sales Header")
     begin
         //-NPR5.40 [300557]
@@ -1479,17 +1422,35 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         RecordVariant: Variant;
         SalesInvoiceHeader: Record "Sales Invoice Header";
         Print: Boolean;
+        POSPrepaymentMgt: Codeunit "POS Prepayment Mgt.";
+        Send: Boolean;
+        Pdf2Nav: Boolean;
+        POSSalesDocumentOutputMgt: Codeunit "POS Sales Document Output Mgt.";
     begin
-        //-NPR5.50 [300557]
         with SaleLinePOS do begin
             SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
+
+        //-NPR5.52 [352473]
           //-NPR5.51
           // ApplyPrepaymentPercentageToAllLines(SalesHeader, "Sales Doc. Prepayment %", TRUE);
-          ApplyPrepaymentValueToAllLines(SalesHeader,"Sales Doc. Prepayment %",true,false);
+          //ApplyPrepaymentValueToAllLines(SalesHeader,"Sales Doc. Prepayment Value",TRUE,FALSE);
           //+NPR5.51
+
+          if "Sales Doc. Prepay Is Percent" then
+            POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, true, "Sales Doc. Prepayment Value")
+          else
+            POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, true, "Sales Doc. Prepayment Value");
+
+          Pdf2Nav := "Sales Document Pdf2Nav";
+          Send := "Sales Document Send";
+        //+NPR5.52 [352473]
             Print := "Sales Document Print";
             "Sales Document Prepayment" := false;
             "Sales Document Print" := false;
+        //-NPR5.52 [352473]
+          "Sales Document Pdf2Nav" := false;
+          "Sales Document Send" := false;
+        //+NPR5.52 [352473]
             Modify(true);
 
             SalesPostPrepayments.Invoice(SalesHeader);
@@ -1501,15 +1462,20 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
 
             Commit;
 
+          //-NPR5.52 [352473]
             if Print then begin
-                ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Invoice");
-                SalesInvoiceHeader.Get("Posted Sales Document No.");
-                SalesInvoiceHeader.SetRecFilter;
-                RecordVariant := SalesInvoiceHeader;
-                PrintReportSelection(ReportSelections, RecordVariant);
+            POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 1);
             end;
+
+          if Send then begin
+            POSSalesDocumentOutputMgt.SendDocument(SalesHeader, 1);
+          end;
+
+          if Pdf2Nav then begin
+            POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 1);
+          end;
+          //+NPR5.52 [352473]
         end;
-        //+NPR5.50 [300557]
     end;
 
     local procedure PostPrepaymentRefundBeforePOSSaleEnd(var SalesHeader: Record "Sales Header"; var SaleLinePOS: Record "Sale Line POS")
@@ -1520,15 +1486,26 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         RecordVariant: Variant;
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         Print: Boolean;
+        Send: Boolean;
+        Pdf2Nav: Boolean;
+        POSSalesDocumentOutputMgt: Codeunit "POS Sales Document Output Mgt.";
     begin
         //-NPR5.50 [300557]
         with SaleLinePOS do begin
             SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
             DeleteAfter := "Sales Document Delete";
             Print := "Sales Document Print";
+          //-NPR5.52 [352473]
+          Send := "Sales Document Send";
+          Pdf2Nav := "Sales Document Pdf2Nav";
+          //+NPR5.52 [352473]
             "Sales Document Prepay. Refund" := false;
             "Sales Document Delete" := false;
             "Sales Document Print" := false;
+          //-NPR5.52 [352473]
+          "Sales Document Send" := false;
+          "Sales Document Pdf2Nav" := false;
+          //+NPR5.52 [352473]
             Modify(true);
 
             SalesPostPrepayments.CreditMemo(SalesHeader);
@@ -1543,13 +1520,19 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
 
             Commit;
 
-            if Print then begin
-                ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Cr.Memo");
-                SalesCrMemoHeader.Get("Posted Sales Document No.");
-                SalesCrMemoHeader.SetRecFilter;
-                RecordVariant := SalesCrMemoHeader;
-                PrintReportSelection(ReportSelections, RecordVariant);
-            end;
+          //-NPR5.52 [352473]
+          if Print then begin
+            POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 2);
+          end;
+
+          if Send then begin
+            POSSalesDocumentOutputMgt.SendDocument(SalesHeader, 2);
+          end;
+
+          if Pdf2Nav then begin
+            POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 2);
+          end;
+          //+NPR5.52 [352473]
         end;
         //+NPR5.50 [300557]
     end;
@@ -1564,6 +1547,9 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         ReturnReceiptHeader: Record "Return Receipt Header";
         SalesShipmentHeader: Record "Sales Shipment Header";
         Print: Boolean;
+        Send: Boolean;
+        Pdf2Nav: Boolean;
+        POSSalesDocumentOutputMgt: Codeunit "POS Sales Document Output Mgt.";
     begin
         //-NPR5.50 [300557]
         with SaleLinePOS do begin
@@ -1574,11 +1560,19 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
             SalesHeader.Receive := "Sales Document Receive";
             SalesHeader.Modify(true);
             Print := "Sales Document Print";
+          //-NPR5.52 [352473]
+          Send := "Sales Document Send";
+          Pdf2Nav := "Sales Document Pdf2Nav";
+          //+NPR5.52 [352473]
 
             "Sales Document Invoice" := false;
             "Sales Document Ship" := false;
             "Sales Document Receive" := false;
             "Sales Document Print" := false;
+          //-NPR5.52 [352473]
+          "Sales Document Send" := false;
+          "Sales Document Pdf2Nav" := false;
+          //+NPR5.52 [352473]
             Modify(true);
 
             SalesPost.Run(SalesHeader);
@@ -1634,69 +1628,51 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
             Modify(true);
             Commit;
 
-            if Print then begin
-                if "Posted Sales Document No." <> '' then begin
-                    case "Posted Sales Document Type" of
-                        "Posted Sales Document Type"::CREDIT_MEMO:
-                            begin
-                                ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Cr.Memo");
-                                SalesCrMemoHeader.Get("Posted Sales Document No.");
-                                SalesCrMemoHeader.SetRecFilter;
-                                RecordVariant := SalesCrMemoHeader;
-                            end;
-                        "Posted Sales Document Type"::INVOICE:
-                            begin
-                                ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Invoice");
-                                SalesInvoiceHeader.Get("Posted Sales Document No.");
-                                SalesInvoiceHeader.SetRecFilter;
-                                RecordVariant := SalesInvoiceHeader;
-                            end;
-                    end;
-                    PrintReportSelection(ReportSelections, RecordVariant);
-                end else
-                    if "Delivered Sales Document No." <> '' then begin
-                        case "Delivered Sales Document Type" of
-                            "Delivered Sales Document Type"::RETURN_RECEIPT:
-                                begin
-                                    ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Ret.Rcpt.");
-                                    ReturnReceiptHeader.Get("Delivered Sales Document No.");
-                                    ReturnReceiptHeader.SetRecFilter;
-                                    RecordVariant := ReturnReceiptHeader;
-                                end;
-                            "Delivered Sales Document Type"::SHIPMENT:
-                                begin
-                                    ReportSelections.SetRange(Usage, ReportSelections.Usage::"S.Shipment");
-                                    SalesShipmentHeader.Get("Delivered Sales Document No.");
-                                    SalesShipmentHeader.SetRecFilter;
-                                    RecordVariant := SalesShipmentHeader;
-                                end;
-                        end;
-                        PrintReportSelection(ReportSelections, RecordVariant);
-                    end;
-            end;
+          //-NPR5.52 [352473]
+          if Print then begin
+            POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 0);
+          end;
+
+          if Send then begin
+            POSSalesDocumentOutputMgt.SendDocument(SalesHeader, 0);
+          end;
+
+          if Pdf2Nav then begin
+            POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 0);
+          end;
+          //+NPR5.52 [352473]
         end;
         //+NPR5.50 [300557]
     end;
 
-    procedure CreatePrepaymentLine(var POSSession: Codeunit "POS Session";var SalesHeader: Record "Sales Header";PrepaymentVal: Decimal;PrintPrepaymentInvoice: Boolean;SyncPosting: Boolean;PayByAmount: Boolean)
+    procedure CreatePrepaymentLine(var POSSession: Codeunit "POS Session";var SalesHeader: Record "Sales Header";PrepaymentValue: Decimal;Print: Boolean;Send: Boolean;Pdf2Nav: Boolean;SyncPosting: Boolean;ValueIsAmount: Boolean)
     var
         PrepaymentAmount: Decimal;
         POSSale: Codeunit "POS Sale";
         POSSaleLine: Codeunit "POS Sale Line";
         SalePOS: Record "Sale POS";
         SaleLinePOS: Record "Sale Line POS";
+        POSPrepaymentMgt: Codeunit "POS Prepayment Mgt.";
     begin
-        //-NPR5.50 [300557]
-        //-NPR5.51
-        if not PayByAmount then
-        //+NPR5.51
-          if (PrepaymentVal <= 0) or (PrepaymentVal > 100) then
-              exit;
+        //-NPR5.52 [352473]
+        // //-NPR5.51
+        // IF NOT PayByAmount THEN
+        // //+NPR5.51
+        //  IF (PrepaymentVal <= 0) OR (PrepaymentVal > 100) THEN
+        //      EXIT;
+        //
+        // //-NPR5.51
+        // // PrepaymentAmount := ApplyPrepaymentPercentageToAllLines(SalesHeader, PrepaymentPrc, FALSE);
+        // PrepaymentAmount := ApplyPrepaymentValueToAllLines(SalesHeader,PrepaymentVal,FALSE,PayByAmount);
+        // //+NPR5.51
 
-        //-NPR5.51
-        // PrepaymentAmount := ApplyPrepaymentPercentageToAllLines(SalesHeader, PrepaymentPrc, FALSE);
-        PrepaymentAmount := ApplyPrepaymentValueToAllLines(SalesHeader,PrepaymentVal,false,PayByAmount);
-        //+NPR5.51
+        if ValueIsAmount then begin
+          POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, true, PrepaymentValue);
+          PrepaymentAmount := PrepaymentValue;
+        end else begin
+          PrepaymentAmount := POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, true, PrepaymentValue);
+        end;
+        //+NPR5.52 [352473]
 
         if PrepaymentAmount = 0 then
             exit;
@@ -1725,31 +1701,41 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         SaleLinePOS."Sales Document Prepayment" := true;
         //-NPR5.51
         //SaleLinePOS."Sales Doc. Prepayment %" := PrepaymentPrc;
-        SaleLinePOS."Sales Doc. Prepayment %" := PrepaymentVal;
+        SaleLinePOS."Sales Doc. Prepayment Value" := PrepaymentValue;
         //+NPR5.51
-        SaleLinePOS."Sales Document Print" := PrintPrepaymentInvoice;
+        //-NPR5.52 [352473]
+        SaleLinePOS."Sales Doc. Prepay Is Percent" := not ValueIsAmount;
+        //+NPR5.52 [352473]
+        SaleLinePOS."Sales Document Print" := Print;
+        //-NPR5.52 [352473]
+        SaleLinePOS."Sales Document Send" := Send;
+        SaleLinePOS."Sales Document Pdf2Nav" := Pdf2Nav;
+        //+NPR5.52 [352473]
         SaleLinePOS."Sales Document Sync. Posting" := SyncPosting;
         SaleLinePOS.Validate("Unit Price", PrepaymentAmount);
         SaleLinePOS.Description := StrSubstNo(PREPAYMENT, SalesHeader."Document Type", SalesHeader."No.");
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
-        //+NPR5.50 [300557]
     end;
 
-    procedure CreatePrepaymentRefundLine(var POSSession: Codeunit "POS Session"; var SalesHeader: Record "Sales Header"; PrintPrepaymentCreditMemo: Boolean; SyncPosting: Boolean; DeleteDocumentAfter: Boolean)
+    procedure CreatePrepaymentRefundLine(var POSSession: Codeunit "POS Session";var SalesHeader: Record "Sales Header";Print: Boolean;Send: Boolean;Pdf2Nav: Boolean;SyncPosting: Boolean;DeleteDocumentAfter: Boolean)
     var
         PrepaymentRefundAmount: Decimal;
         POSSale: Codeunit "POS Sale";
         POSSaleLine: Codeunit "POS Sale Line";
         SalePOS: Record "Sale POS";
         SaleLinePOS: Record "Sale Line POS";
+        POSPrepaymentMgt: Codeunit "POS Prepayment Mgt.";
     begin
         //-NPR5.50 [300557]
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
         POSSale.GetCurrentSale(SalePOS);
 
-        PrepaymentRefundAmount := GetTotalPrepaidAmountNotDeducted(SalesHeader);
+        //-NPR5.52 [352473]
+        //PrepaymentRefundAmount := GetTotalPrepaidAmountNotDeducted(SalesHeader);
+        PrepaymentRefundAmount := POSPrepaymentMgt.GetPrepaymentAmountToDeductInclVAT(SalesHeader);
+        //+NPR5.52 [352473]
 
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
@@ -1759,102 +1745,17 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         SaleLinePOS."Sales Document Type" := SalesHeader."Document Type";
         SaleLinePOS."Sales Document No." := SalesHeader."No.";
         SaleLinePOS."Sales Document Prepay. Refund" := true;
-        SaleLinePOS."Sales Document Print" := PrintPrepaymentCreditMemo;
+        SaleLinePOS."Sales Document Print" := Print;
+        //-NPR5.52 [352473]
+        SaleLinePOS."Sales Document Send" := Send;
+        SaleLinePOS."Sales Document Pdf2Nav" := Pdf2Nav;
+        //+NPR5.52 [352473]
         SaleLinePOS."Sales Document Sync. Posting" := SyncPosting;
         SaleLinePOS."Sales Document Delete" := DeleteDocumentAfter;
         SaleLinePOS.Validate("Unit Price", -PrepaymentRefundAmount);
         SaleLinePOS.Description := StrSubstNo(PREPAYMENT_REFUND, SalesHeader."Document Type", SalesHeader."No.");
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
-        //+NPR5.50 [300557]
-    end;
-
-    procedure ApplyPrepaymentValueToAllLines(SalesHeader: Record "Sales Header";PrepaymentValue: Decimal;Persist: Boolean;PayByAmount: Boolean): Decimal
-    var
-        SalesLine: Record "Sales Line";
-        Lines: Integer;
-        PrepaymentAmountDiff: Decimal;
-        TotalPrepayerAmnt: Decimal;
-        AmountPrepaied: Decimal;
-        LeftOver: Decimal;
-    begin
-        //-NPR5.50 [300557]
-        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        SalesLine.SetFilter("No.", '<>%1', '');
-        SalesLine.SetHideValidationDialog(true);
-
-        if not SalesLine.FindSet(Persist) then
-            exit(0);
-
-        //-NPR5.51
-        if PayByAmount then begin
-          Lines := SalesLine.Count;
-          TotalPrepayerAmnt := TotalPrepayedAmount(SalesLine);
-          if PrepaymentValue > TotalPrepayerAmnt then
-            Error(AmountExceedsSaleErr);
-
-          AmountPrepaied := PrepaymentValue;
-          LeftOver := PrepaymentValue;
-          PrepaymentAmountDiff := PrepaymentValue;
-          PrepaymentValue := Round((100 * PrepaymentValue) / TotalPrepayerAmnt,0.00001);
-        end;
-        //+NPR5.51
-
-        repeat
-            SalesLine.Validate("Prepmt. Line Amount", SalesLine."Prepmt. Amt. Inv."); //Set prepayment amount back to invoiced, in case someone modified it without posting.
-          //-NPR5.51
-          if PayByAmount then begin
-            Lines -= 1;
-            if Lines > 0 then begin
-              SalesLine.Validate(SalesLine."Prepmt. Line Amount",(SalesLine."Unit Price" * SalesLine.Quantity * AmountPrepaied) / TotalPrepayerAmnt);
-              LeftOver -= SalesLine."Prepmt. Line Amount";
-            end else
-              SalesLine.Validate(SalesLine."Prepmt. Line Amount",LeftOver);
-          end else begin
-          //+NPR5.51
-            SalesLine.Validate("Prepayment %", SalesLine."Prepayment %" + PrepaymentValue);
-            PrepaymentAmountDiff += (SalesLine."Prepmt. Line Amount" -  SalesLine."Prepmt. Amt. Inv.");
-          end;
-
-            if Persist then
-                SalesLine.Modify(true);
-        until SalesLine.Next = 0;
-
-        exit(PrepaymentAmountDiff);
-        //+NPR5.50 [300557]
-    end;
-
-    local procedure TotalPrepayedAmount(SalesLine: Record "Sales Line") TotalAmount: Decimal
-    var
-        Currency: Record Currency;
-    begin
-        //-NPR5.51
-        SalesLine.SetRecFilter;
-        SalesLine.SetRange("Line No.");
-        SalesLine.SetFilter("No.",'<>%1','');
-        if SalesLine.FindSet then repeat
-          if SalesLine."Currency Code" > '' then
-            if Currency.Get(SalesLine."Currency Code") then;
-
-          if Currency."Amount Rounding Precision" > 0 then
-            TotalAmount += Round(SalesLine.Quantity * SalesLine."Unit Price",Currency."Amount Rounding Precision")
-          else
-            TotalAmount += Round(SalesLine.Quantity * SalesLine."Unit Price");
-        until SalesLine.Next = 0;
-        //+NPR5.51
-    end;
-
-    procedure GetTotalPrepaidAmountNotDeducted(SalesHeader: Record "Sales Header"): Decimal
-    var
-        SalesLine: Record "Sales Line";
-    begin
-        //-NPR5.50 [300557]
-        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        SalesLine.SetFilter("No.", '<>%1', '');
-        SalesLine.CalcSums("Prepmt Amt to Deduct");
-        exit(SalesLine."Prepmt Amt to Deduct");
         //+NPR5.50 [300557]
     end;
 

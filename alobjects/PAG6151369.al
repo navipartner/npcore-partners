@@ -2,6 +2,7 @@ page 6151369 "CS Stock-Takes Data"
 {
     // NPR5.50/CLVA/20190515 CASE 350696 Object created - NP Capture Service
     // NPR5.51/CLVA/20190902 CASE 365659 Added captions
+    // NPR5.52/CLVA/20190917 CASE 368484 Added field Area
 
     Caption = 'CS Stock-Takes Data';
     DelayedInsert = false;
@@ -64,6 +65,9 @@ page 6151369 "CS Stock-Takes Data"
                 {
                 }
                 field("Stock-Take Config Code";"Stock-Take Config Code")
+                {
+                }
+                field("Area";Area)
                 {
                 }
             }

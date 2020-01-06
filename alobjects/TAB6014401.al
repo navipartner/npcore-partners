@@ -46,6 +46,7 @@ table 6014401 Register
     // NPR5.49/TJ  /20190201 CASE 335739 Fields 20,819,820,821,822,833 and 6150721 moved to new table POS View Profile
     //                                   Function DetectDecimalThousandsSeparator moved to same new table
     // NPR5.50/BHR /20190410 CASE 348128 Rename field 274 (www.address)
+    // NPR5.52/ALPO/20190926 CASE 368673 Active event (from Event Management module) on cash register. Copy dimension from event on selection
 
     Caption = 'Cash Register';
     LookupPageID = "Register List";
@@ -765,6 +766,41 @@ table 6014401 Register
         field(890;"Shop id";Code[20])
         {
             Caption = 'Shop id';
+        }
+        field(900;"Active Event No.";Code[20])
+        {
+            Caption = 'Active Event No.';
+            Description = 'NPR5.52 [368673]';
+            TableRelation = Job WHERE (Event=CONST(true));
+
+            trigger OnValidate()
+            var
+                FromDefDim: Record "Default Dimension";
+                ToDefDim: Record "Default Dimension";
+            begin
+                //-NPR5.52 [368673]
+                if "Active Event No." <> '' then begin
+                  FromDefDim.SetRange("Table ID",DATABASE::Job);
+                  FromDefDim.SetRange("No.","Active Event No.");
+                  FromDefDim.SetFilter("Dimension Code",'<>%1','');
+                  FromDefDim.SetFilter("Dimension Value Code",'<>%1','');
+                  if FromDefDim.FindSet then
+                    repeat
+                      ToDefDim.Init;
+                      ToDefDim."Table ID" := DATABASE::Register;
+                      ToDefDim."No." := "Register No.";
+                      ToDefDim."Dimension Code" := FromDefDim."Dimension Code";
+                      if not ToDefDim.Find then
+                        ToDefDim.Insert;
+                      ToDefDim."Dimension Value Code" := FromDefDim."Dimension Value Code";
+                      if ToDefDim."Value Posting" = ToDefDim."Value Posting"::"No Code" then
+                        ToDefDim."Value Posting" := ToDefDim."Value Posting"::" ";
+                      ToDefDim.Modify;
+                    until FromDefDim.Next = 0;
+                  DimMgt.UpdateDefaultDim(DATABASE::Register,"Register No.","Global Dimension 1 Code","Global Dimension 2 Code");
+                end;
+                //+NPR5.52 [368673]
+            end;
         }
         field(6184471;"MobilePay Payment Type";Code[10])
         {

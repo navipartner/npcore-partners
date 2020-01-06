@@ -3,6 +3,7 @@ codeunit 6151196 "NpCs Workflow Mgt."
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // NPR5.51/MHA /20190627  CASE 344264 Bumped version list for update to TaskScheduler in ScheduleRunWorkflow() from NAV10.* and newer
     // NPR5.51/MHA /20190822  CASE 364557 Removed Calcfields of "Sell-to Customer Name"
+    // NPR5.52/MHA /20191010  CASE 369476 Added function GetSmsSender() in NotifyCustomerSms()
 
     TableNo = "NpCs Document";
 
@@ -431,6 +432,7 @@ codeunit 6151196 "NpCs Workflow Mgt."
         SmsTemplateHeader: Record "SMS Template Header";
         SmsMgt: Codeunit "SMS Management";
         SmsContent: Text;
+        Sender: Text;
     begin
         if not NpCsDocument."Notify Customer via Sms" then
           exit(false);
@@ -473,9 +475,42 @@ codeunit 6151196 "NpCs Workflow Mgt."
         SmsTemplateHeader.TestField("Table No.",DATABASE::"NpCs Document");
         SmsContent := SmsMgt.MakeMessage(SmsTemplateHeader,NpCsDocument);
 
-        SmsMgt.SendSMS(NpCsDocument."Customer Phone No.",DelChr(NpCsDocument."Customer Phone No.",'=',' '),SmsContent);
+        //-NPR5.52 [369476]
+        Sender := GetSmsSender(NpCsDocument);
+        Sender := DelChr(Sender,'=',' ');
+        SmsMgt.SendSMS(NpCsDocument."Customer Phone No.",Sender,SmsContent);
+        //+NPR5.52 [369476]
 
         exit(true);
+    end;
+
+    local procedure GetSmsSender(NpCsDocument: Record "NpCs Document"): Text
+    var
+        CompanyInfo: Record "Company Information";
+        NpCsStore: Record "NpCs Store";
+    begin
+        //-NPR5.52 [369476]
+        if NpCsStore.Get(NpCsDocument."To Store Code") then begin
+          if NpCsStore."Mobile Phone No." <> '' then
+            exit(NpCsStore."Mobile Phone No.");
+
+          if NpCsStore."Contact Phone No." <> '' then
+            exit(NpCsStore."Contact Phone No.");
+        end;
+
+        if CompanyInfo.Get and (CompanyInfo."Phone No." <> '') then
+          exit(CompanyInfo."Phone No.");
+
+        if NpCsStore.Get(NpCsDocument."From Store Code") then begin
+          if (NpCsStore."Mobile Phone No." <> '') then
+            exit(NpCsStore."Mobile Phone No.");
+
+          if NpCsStore."Contact Phone No." <> '' then
+            exit(NpCsStore."Contact Phone No.");
+        end;
+
+        exit('noreply');
+        //+NPR5.52 [369476]
     end;
 
     [IntegrationEvent(TRUE, false)]

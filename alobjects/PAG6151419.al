@@ -9,6 +9,7 @@ page 6151419 "Magento Brand Card"
     // MAG1.21/TR/20151028  CASE 225601 Shortcut to Display Config added
     // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
     // MAG2.09/TS  /20180108  CASE 300893 Removed Caption on Action Container
+    // MAG2.23/BHR /20190730  CASE 362728 Add Short Description
 
     Caption = 'Brand Card';
     DelayedInsert = true;
@@ -48,6 +49,24 @@ page 6151419 "Magento Brand Card"
                     begin
                         RecRef.GetTable(Rec);
                         FieldRef := RecRef.Field(FieldNo(Description));
+                        if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
+                          RecRef.SetTable(Rec);
+                          Modify(true);
+                        end;
+                    end;
+                }
+                field("FORMAT(""Short Description"".HASVALUE)";Format("Short Description".HasValue))
+                {
+                    Caption = 'Short Description';
+                    Editable = false;
+
+                    trigger OnAssistEdit()
+                    var
+                        RecRef: RecordRef;
+                        FieldRef: FieldRef;
+                    begin
+                        RecRef.GetTable(Rec);
+                        FieldRef := RecRef.Field(FieldNo("Short Description"));
                         if MagentoFunctions.NaviEditorEditBlob(FieldRef) then begin
                           RecRef.SetTable(Rec);
                           Modify(true);

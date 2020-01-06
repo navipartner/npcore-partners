@@ -21,6 +21,7 @@ page 6151502 "Nc Task List"
     // NC2.13/MHA /20180605  CASE 312583 "Fields" PagePart moved to NAVIGATE Action "Fields" and removed empty fields under "Show Processed" to reduce Header Area
     // NC2.16/MHA /20181003  CASE 328785 Removed delete of file in ShowOutput()
     // NC2.17/MHA /20181121  CASE 335927 ShowOutput() now takes last Nc Task Output if Rec output is blank
+    // NC2.23/MHA /20190927  CASE 369170 Removed Gambit integration
 
     Caption = 'Task List';
     InsertAllowed = false;
@@ -71,7 +72,7 @@ page 6151502 "Nc Task List"
                     ShowCaption = false;
                     field(Control6150656;'')
                     {
-                        Caption = 'Response:                                                                                                                                                                                                                                                                                ';
+                        Caption = 'Response:                                                                                                                                                                                                                                                                               _';
                         HideValue = true;
                         ShowCaption = false;
                     }
@@ -137,9 +138,6 @@ page 6151502 "Nc Task List"
                 field("Process Count";"Process Count")
                 {
                 }
-                field("NaviPartner Case Url";"NaviPartner Case Url")
-                {
-                }
             }
         }
     }
@@ -189,19 +187,6 @@ page 6151502 "Nc Task List"
                 trigger OnAction()
                 begin
                     RescheduleForProcessing();
-                end;
-            }
-            action("Create Gambit Case")
-            {
-                Caption = 'Create Gambit Case';
-                Image = Job;
-                Promoted = true;
-                PromotedCategory = Category5;
-                PromotedIsBig = true;
-
-                trigger OnAction()
-                begin
-                    CreateGambitCase();
                 end;
             }
         }
@@ -269,7 +254,6 @@ page 6151502 "Nc Task List"
     end;
 
     var
-        GambitMgt: Codeunit "Nc Gambit Management";
         SyncMgt: Codeunit "Nc Sync. Mgt.";
         Text001: Label 'No Output';
         TaskMgt: Codeunit "Nc Task Mgt.";
@@ -358,11 +342,6 @@ page 6151502 "Nc Task List"
 
     local procedure "--- Actions"()
     begin
-    end;
-
-    local procedure CreateGambitCase()
-    begin
-        GambitMgt.InsertCaseTask(Rec);
     end;
 
     local procedure ImportNewTasks()

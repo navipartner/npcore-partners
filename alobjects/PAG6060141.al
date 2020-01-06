@@ -10,6 +10,7 @@ page 6060141 "MM Membership Alteration"
     // MM1.25/NPKNAV/20180122  CASE 300256 Transport MM1.25 - 22 January 2018
     // MM1.30/TSA/20180615  CASE 317428 Transport MM1.30 - 15 June 2018
     // MM1.40/TSA /20190730 CASE 360275 Added field "Auto-Admit Member On Sale"
+    // MM1.41/TSA /20191016 CASE 373297 Added "Grace Period Presets" and made some grace period settings fields not visible (by default)
 
     Caption = 'Membership Alteration';
     PageType = List;
@@ -49,8 +50,12 @@ page 6060141 "MM Membership Alteration"
                 field("Activate Grace Period";"Activate Grace Period")
                 {
                 }
+                field("Grace Period Presets";"Grace Period Presets")
+                {
+                }
                 field("Grace Period Relates To";"Grace Period Relates To")
                 {
+                    Visible = false;
                 }
                 field("Grace Period Calculation";"Grace Period Calculation")
                 {
@@ -58,9 +63,11 @@ page 6060141 "MM Membership Alteration"
                 }
                 field("Grace Period Before";"Grace Period Before")
                 {
+                    Visible = false;
                 }
                 field("Grace Period After";"Grace Period After")
                 {
+                    Visible = false;
                 }
                 field("Price Calculation";"Price Calculation")
                 {

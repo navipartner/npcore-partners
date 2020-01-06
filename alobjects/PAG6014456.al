@@ -31,6 +31,7 @@ page 6014456 "Table Export Wizard"
     //                                   Added escape character parameter.
     //                                   Add table fields by default.
     // NPR5.51/ZESO/20190703 CASE 319037 Added Ticketing and Membership tables.
+    // NPR5.52/SARA/20190916 CASE 368197 Refcator Table Export wizard for Webclient.
 
     Caption = 'Table Export Wizard';
     DelayedInsert = true;
@@ -47,71 +48,70 @@ page 6014456 "Table Export Wizard"
     {
         area(content)
         {
-            grid(Control6150617)
+            repeater(Control6150614)
             {
-                GridLayout = Columns;
                 ShowCaption = false;
-                group(Control6150621)
+                field("Object ID";"Object ID")
                 {
-                    ShowCaption = false;
-                    repeater(Control6150614)
-                    {
-                        ShowCaption = false;
-                        field("Object ID"; "Object ID")
-                        {
 
-                            trigger OnLookup(var Text: Text): Boolean
-                            var
-                                AllObjects: Page "All Objects";
-                                AllObj: Record AllObj;
-                                ac: Action;
-                            begin
-                                AllObj.SetRange("Object Type", AllObj."Object Type"::Table);
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        AllObjects: Page "All Objects";
+                        AllObj: Record AllObj;
+                        ac: Action;
+                    begin
+                        AllObj.SetRange("Object Type",AllObj."Object Type"::Table);
 
-                                if "Object ID" > 0 then
-                                    if AllObj.Get(AllObj."Object Type"::Table, "Object ID") then;
+                        if "Object ID" > 0 then
+                          if AllObj.Get(AllObj."Object Type"::Table,"Object ID") then;
 
-                                AllObjects.SetTableView(AllObj);
-                                AllObjects.SetRecord(AllObj);
-                                AllObjects.LookupMode(true);
+                        AllObjects.SetTableView(AllObj);
+                        AllObjects.SetRecord(AllObj);
+                        AllObjects.LookupMode(true);
 
-                                if AllObjects.RunModal = ACTION::LookupOK then begin
-                                    AllObjects.GetRecord(AllObj);
-                                    TransferFields(AllObj);
-                                    Insert;
-                                    //-NPR5.48 [340086]
-                                    AddTableFields("Object ID");
-                                    //+NPR5.48 [340086]
-                                end;
-                            end;
+                        if AllObjects.RunModal = ACTION::LookupOK then begin
+                          AllObjects.GetRecord(AllObj);
+                          TransferFields(AllObj);
+                          Insert;
+                          //-NPR5.48 [340086]
+                          AddTableFields("Object ID");
+                          //+NPR5.48 [340086]
+                        end;
+                    end;
 
-                            trigger OnValidate()
-                            var
-                                AllObj: Record AllObj;
-                            begin
-                                AllObj.Get(AllObj."Object Type"::Table, "Object ID");
-                                "Object Name" := AllObj."Object Name";
-                                //-NPR5.48 [340086]
-                                AddTableFields("Object ID");
-                                //+NPR5.48 [340086]
-                            end;
-                        }
-                        field("Object Name"; "Object Name")
-                        {
-                            Editable = false;
-                        }
-                    }
-                    part("Fields"; "Table Export Wizard Fields")
-                    {
-                        Caption = 'Fields';
-                        SubPageLink = TableNo = FIELD ("Object ID");
-                    }
-                    part(TableFilters; "Export Wizard Filters")
-                    {
-                        SubPageLink = "Table Number" = FIELD ("Object ID");
-                        SubPageView = SORTING ("Table Number", "Line No.");
-                    }
+                    trigger OnValidate()
+                    var
+                        AllObj: Record AllObj;
+                    begin
+                        AllObj.Get(AllObj."Object Type"::Table, "Object ID");
+                        "Object Name" := AllObj."Object Name";
+                        //-NPR5.48 [340086]
+                        AddTableFields("Object ID");
+                        //+NPR5.48 [340086]
+                    end;
                 }
+                field("Object Name";"Object Name")
+                {
+                    Editable = false;
+                }
+            }
+            group(Control6014410)
+            {
+                ShowCaption = false;
+                part("Fields";"Table Export Wizard Fields")
+                {
+                    Caption = 'Fields';
+                    SubPageLink = TableNo=FIELD("Object ID");
+                }
+                part(TableFilters;"Export Wizard Filters")
+                {
+                    SubPageLink = "Table Number"=FIELD("Object ID");
+                    SubPageView = SORTING("Table Number","Line No.");
+                }
+            }
+            grid(Control6014423)
+            {
+                ShowCaption = false;
                 group(Formatting)
                 {
                     Caption = 'Formatting';

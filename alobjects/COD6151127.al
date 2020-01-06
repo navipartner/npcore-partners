@@ -1,6 +1,7 @@
 codeunit 6151127 "POS Action - Insert Item AddOn"
 {
     // NPR5.48/MHA /20181113  CASE 334922 Object created - Insert Item AddOns directly from POS Action
+    // NPR5.52/ALPO/20190912  CASE 354309 Updated function call to respect the new signature
 
     SingleInstance = true;
 
@@ -192,6 +193,7 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
 
     local procedure InitScriptData(SalePOS: Record "Sale POS";NpIaItemAddOn: Record "NpIa Item AddOn") Script: Text
     var
+        AppliesToSaleLinePOS: Record "Sale Line POS";
         NpIaItemAddOnMgt: Codeunit "NpIa Item AddOn Mgt.";
     begin
         Script := '$(function () {' +
@@ -199,7 +201,11 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
           'var $scope = angular.element(appElement).scope();' +
           '$scope.$apply(function() {';
 
-        Script += NpIaItemAddOnMgt.InitScriptAddOnLines(SalePOS,0,NpIaItemAddOn);
+        //Script += NpIaItemAddOnMgt.InitScriptAddOnLines(SalePOS,0,NpIaItemAddOn);  //NPR5.52 [354309]-revoked
+        //-NPR5.52 [354309]
+        Clear(AppliesToSaleLinePOS);
+        Script += NpIaItemAddOnMgt.InitScriptAddOnLines(SalePOS,AppliesToSaleLinePOS,NpIaItemAddOn);
+        //+NPR5.52 [354309]
         Script += NpIaItemAddOnMgt.InitScriptLabels(NpIaItemAddOn);
 
         Script += '});' +

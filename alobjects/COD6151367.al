@@ -3,6 +3,8 @@ codeunit 6151367 "CS UI Warehouse Shipment"
     // NPR5.50/CLVA/20190425 CASE 352719 Object created - NP Capture Service
     // NPR5.51/CLVA/20190805 CASE 363088 Retaining source doc. no. filter
     // NPR5.51/CLVA/20190819 CASE 345567 Added field "Vendor Item No."
+    // NPR5.52/ALST/20190920 CASE 363091 quantity to ship must be 0 on warehouse shipment line if "Zero Def. Qty. to Handle" is true
+    // NPR5.52/CLVA/20191010 CASE 370452 Changed posting functionality
 
     TableNo = "CS UI Header";
 
@@ -137,7 +139,10 @@ codeunit 6151367 "CS UI Warehouse Shipment"
             FuncGroup.KeyDef::Register:
                 begin
                     if not Evaluate(ActionIndex, CSCommunication.GetNodeAttribute(ReturnedNode, 'ActionIndex')) then
-                        ActionIndex := 2;
+                        //-NPR5.52 [370452]
+                        //ActionIndex := 2;
+                        ActionIndex := MiniformHeader."Posting Type" + 1;
+                    //+NPR5.52 [370452]
                     Register(CSWarehouseShipmentHandling, ActionIndex);
                     if Remark = '' then begin
                         DeleteEmptyDataLines();
@@ -253,7 +258,10 @@ codeunit 6151367 "CS UI Warehouse Shipment"
         CSCommunication.EncodeUI(MiniformHeader, StackCode, DOMxmlin, InputField, Remark, CSUserId);
         CSCommunication.GetReturnXML(DOMxmlin);
 
-        if MiniformHeader."Add Posting Options" then
+        //-NPR5.52 [370452]
+        //IF MiniformHeader."Add Posting Options" THEN
+        if MiniformHeader."Posting Type" = MiniformHeader."Posting Type"::"Handle & Invoice" then
+            //+NPR5.52 [370452]
             AddAdditionalInfo(DOMxmlin, CSWarehouseShipmentHandling);
 
         if AddSummarize(Records) then
@@ -289,9 +297,9 @@ codeunit 6151367 "CS UI Warehouse Shipment"
 
             CSWarehouseShipmentHandling."Item No." := ItemNo;
             CSWarehouseShipmentHandling."Variant Code" := VariantCode;
-          //-NPR5.51
-          CSWarehouseShipmentHandling."Vendor Item No." := Item."Vendor Item No.";
-          //+NPR5.51
+            //-NPR5.51
+            CSWarehouseShipmentHandling."Vendor Item No." := Item."Vendor Item No.";
+            //+NPR5.51
 
             if (ResolvingTable = DATABASE::"Item Cross Reference") then begin
                 with ItemCrossReference do begin
@@ -381,7 +389,7 @@ codeunit 6151367 "CS UI Warehouse Shipment"
 
         //-NPR5.51 [363088]
         if (NewCSWarehouseShipmentHandling."Source Doc. No." <> '') and (NewCSWarehouseShipmentHandling."Source Doc. No." <> NewCSWarehouseShipmentHandling."No.") then
-          CSWarehouseShipmentHandling."Source Doc. No." := NewCSWarehouseShipmentHandling."Source Doc. No.";
+            CSWarehouseShipmentHandling."Source Doc. No." := NewCSWarehouseShipmentHandling."Source Doc. No.";
         //+NPR5.51 [363088]
 
         RecRefByVariant.GetTable(RecordVariant);
@@ -423,7 +431,7 @@ codeunit 6151367 "CS UI Warehouse Shipment"
         CSWarehouseShipmentHandling.DeleteAll(true);
     end;
 
-    local procedure AddAttribute(var NewChild: DotNet npNetXmlNode;AttribName: Text[250];AttribValue: Text[250])
+    local procedure AddAttribute(var NewChild: DotNet npNetXmlNode; AttribName: Text[250]; AttribValue: Text[250])
     begin
         if XMLDOMMgt.AddAttribute(NewChild, AttribName, AttribValue) > 0 then
             Error(Text002, AttribName);
@@ -578,7 +586,7 @@ codeunit 6151367 "CS UI Warehouse Shipment"
             exit(false);
     end;
 
-    local procedure AddAdditionalInfo(var xmlout: DotNet npNetXmlDocument;CSWarehouseShipmentHandling: Record "CS Warehouse Shipment Handling")
+    local procedure AddAdditionalInfo(var xmlout: DotNet npNetXmlDocument; CSWarehouseShipmentHandling: Record "CS Warehouse Shipment Handling")
     var
         CurrentRootNode: DotNet npNetXmlNode;
         XMLFunctionNode: DotNet npNetXmlNode;
@@ -664,5 +672,18 @@ codeunit 6151367 "CS UI Warehouse Shipment"
 
         exit(true);
     end;
-}
 
+    [EventSubscriber(ObjectType::Table, 7321, 'OnBeforeInsertEvent', '', false, false)]
+    local procedure EmptyQtyToShipOnWarehouseShipment(var Rec: Record "Warehouse Shipment Line"; RunTrigger: Boolean)
+    var
+        CSSetup: Record "CS Setup";
+    begin
+        //-NPR5.52 [363091]
+        if Rec.IsTemporary then
+            exit;
+
+        if CSSetup.Get and CSSetup."Zero Def. Qty. to Handle" then
+            Rec."Qty. to Ship" := 0;
+        //+NPR5.52 [363091]
+    end;
+}

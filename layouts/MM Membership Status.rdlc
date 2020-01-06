@@ -7,9 +7,20 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
+  <Field Name="ValidFromDate">
+    <DataField>ValidFromDate</DataField>
+  </Field>
+  <Field Name="ValidUntilDate">
+    <DataField>ValidUntilDate</DataField>
+  </Field>
+  <Field Name="ValidFromDate">
+    <DataField>ValidFromDate</DataField>
+  </Field>
+  <Field Name="ValidUntilDate">
+    <DataField>ValidUntilDate</DataField>
+  </Field>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -19,6 +30,9 @@
               <TablixColumns>
                 <TablixColumn>
                   <Width>0.8in</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>1in</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>1.25417in</Width>
@@ -81,9 +95,10 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
-                        <ColSpan>2</ColSpan>
+                        <ColSpan>3</ColSpan>
                       </CellContents>
                     </TablixCell>
+                    <TablixCell />
                     <TablixCell />
                     <TablixCell>
                       <CellContents>
@@ -323,7 +338,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=CDate(Fields!ValidToDate.Value)</Value>
+                                  <Value>=CDate(Fields!ValidFromDate.Value)</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>9pt</FontSize>
@@ -348,6 +363,43 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="ValidUntilDate">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto">=Fields!ValidUntilDate.Value</Value>
+                                  <Style>
+                                    <FontFamily>Segoe UI</FontFamily>
+                                    <FontSize>9pt</FontSize>
+                                    <Format>d</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>ValidUntilDate</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                            </Border>
+                            <VerticalAlign>Top</VerticalAlign>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -658,6 +710,38 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox2">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto" />
+                                  <Style>
+                                    <FontFamily>Segoe UI</FontFamily>
+                                    <FontSize>9pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox2</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox24">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -927,6 +1011,7 @@
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
+                <TablixMember />
               </TablixMembers>
             </TablixColumnHierarchy>
             <TablixRowHierarchy>
@@ -976,7 +1061,7 @@
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
             <Height>0.6in</Height>
-            <Width>11.04442in</Width>
+            <Width>12.04442in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -987,7 +1072,7 @@
         <Height>0.6in</Height>
         <Style />
       </Body>
-      <Width>11.04442in</Width>
+      <Width>12.16942in</Width>
       <Page>
         <PageHeader>
           <Height>1.32375in</Height>
@@ -1162,8 +1247,9 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox15</rd:DefaultName>
+                  <Top>0.0311cm</Top>
                   <Height>0.87842cm</Height>
-                  <Width>2.032cm</Width>
+                  <Width>4.60728cm</Width>
                   <Style>
                     <Border>
                       <Color>LightGrey</Color>
@@ -1196,7 +1282,7 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox15</rd:DefaultName>
-                  <Left>2.06728cm</Left>
+                  <Left>4.64256cm</Left>
                   <Height>0.87842cm</Height>
                   <Width>3.19cm</Width>
                   <ZIndex>1</ZIndex>
@@ -1232,7 +1318,7 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox15</rd:DefaultName>
-                  <Left>10.3505cm</Left>
+                  <Left>12.92578cm</Left>
                   <Height>0.87842cm</Height>
                   <Width>2.63865cm</Width>
                   <ZIndex>2</ZIndex>
@@ -1268,7 +1354,7 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox15</rd:DefaultName>
-                  <Left>16.19249cm</Left>
+                  <Left>18.76777cm</Left>
                   <Height>0.87842cm</Height>
                   <Width>4.45746cm</Width>
                   <ZIndex>3</ZIndex>
@@ -1304,7 +1390,7 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox15</rd:DefaultName>
-                  <Left>20.66055cm</Left>
+                  <Left>23.23583cm</Left>
                   <Height>0.87842cm</Height>
                   <Width>4.65665cm</Width>
                   <ZIndex>4</ZIndex>
@@ -1340,7 +1426,7 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox15</rd:DefaultName>
-                  <Left>7.27075cm</Left>
+                  <Left>9.84603cm</Left>
                   <Height>0.87842cm</Height>
                   <Width>3.048cm</Width>
                   <ZIndex>5</ZIndex>
@@ -1376,7 +1462,7 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox15</rd:DefaultName>
-                  <Left>5.23875cm</Left>
+                  <Left>7.81403cm</Left>
                   <Height>0.87842cm</Height>
                   <Width>2.032cm</Width>
                   <ZIndex>6</ZIndex>
@@ -1412,7 +1498,7 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox15</rd:DefaultName>
-                  <Left>12.98915cm</Left>
+                  <Left>15.56443cm</Left>
                   <Height>0.87842cm</Height>
                   <Width>3.20334cm</Width>
                   <ZIndex>7</ZIndex>
@@ -1448,7 +1534,8 @@
                     </Paragraph>
                   </Paragraphs>
                   <rd:DefaultName>Textbox15</rd:DefaultName>
-                  <Left>25.3172cm</Left>
+                  <Top>0.0311cm</Top>
+                  <Left>27.8572cm</Left>
                   <Height>0.87842cm</Height>
                   <Width>2.73563cm</Width>
                   <ZIndex>8</ZIndex>
@@ -1465,9 +1552,9 @@
                 </Textbox>
               </ReportItems>
               <KeepTogether>true</KeepTogether>
-              <Top>0.7627in</Top>
-              <Height>0.41597in</Height>
-              <Width>11.04442in</Width>
+              <Top>0.75046in</Top>
+              <Height>0.48308in</Height>
+              <Width>12.16942in</Width>
               <ZIndex>4</ZIndex>
               <Style>
                 <Border>
@@ -1695,9 +1782,6 @@ End Function
         <Field Name="EmailNewsLetter_Member">
           <DataField>EmailNewsLetter_Member</DataField>
         </Field>
-        <Field Name="AsOfToday">
-          <DataField>AsOfToday</DataField>
-        </Field>
         <Field Name="PageCaption">
           <DataField>PageCaption</DataField>
         </Field>
@@ -1733,6 +1817,12 @@ End Function
         </Field>
         <Field Name="IssuedDateCaption">
           <DataField>IssuedDateCaption</DataField>
+        </Field>
+        <Field Name="ValidFromDate">
+          <DataField>ValidFromDate</DataField>
+        </Field>
+        <Field Name="ValidUntilDate">
+          <DataField>ValidUntilDate</DataField>
         </Field>
       </Fields>
       <Query>

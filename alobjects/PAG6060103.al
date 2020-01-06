@@ -9,6 +9,7 @@ page 6060103 "TM Ticket Request"
     // NPR5.48/TSA /20181109 CASE 332109 removed eTicket button
     // NPR5.48/JDH /20181109 CASE 334163 Added Caption to Actions
     // TM1.39/NPKNAV/20190125  CASE 310057 Transport TM1.39 - 25 January 2019
+    // TM1.43/TSA /20190910 CASE 368043 Refactored usage of "External Item Code"
 
     Caption = 'Ticket Request';
     CardPageID = "TM Ticket Res. Request Page";
@@ -44,6 +45,12 @@ page 6060103 "TM Ticket Request"
                 {
                 }
                 field("External Item Code";"External Item Code")
+                {
+                }
+                field("Item No.";"Item No.")
+                {
+                }
+                field("Variant Code";"Variant Code")
                 {
                 }
                 field("Payment Option";"Payment Option")

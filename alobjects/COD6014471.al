@@ -1,6 +1,7 @@
 codeunit 6014471 "Dynamic Module Purchase Setup"
 {
     // NPR5.41/TJ  /20180413 CASE 311170 New object
+    // NPR5.52/TJ  /20190905 CASE 366647 Showing message only if data is sent
 
 
     trigger OnRun()
@@ -37,7 +38,10 @@ codeunit 6014471 "Dynamic Module Purchase Setup"
           exit;
 
         SetupValue := Value;
-        if SetupValue then
+        //-NPR5.52 [366647]
+        //IF SetupValue THEN
+        if SetupValue and (PurchInvHdrNo <> '') then
+        //+NPR5.52 [366647]
           Message(PostedPurchaseInvMsg,PurchInvHdrNo);
     end;
 
@@ -53,7 +57,10 @@ codeunit 6014471 "Dynamic Module Purchase Setup"
           exit;
 
         SetupValue := Value;
-        if SetupValue then
+        //-NPR5.52 [366647]
+        //IF SetupValue THEN
+        if SetupValue and (PurchCrMemoHdrNo <> '') then
+        //+NPR5.52 [366647]
           Message(PostedPurchaseCrMemoMsg,PurchCrMemoHdrNo);
     end;
 
@@ -69,7 +76,10 @@ codeunit 6014471 "Dynamic Module Purchase Setup"
           exit;
 
         SetupValue := Value;
-        if SetupValue then
+        //-NPR5.52 [366647]
+        //IF SetupValue THEN
+        if SetupValue and (PurchRcpHdrNo <> '') then
+        //+NPR5.52 [366647]
           Message(PostedPurchaseReceiptMsg,PurchRcpHdrNo);
     end;
 
@@ -85,7 +95,10 @@ codeunit 6014471 "Dynamic Module Purchase Setup"
           exit;
 
         SetupValue := Value;
-        if SetupValue then
+        //-NPR5.52 [366647]
+        //IF SetupValue THEN
+        if SetupValue and (RetShptHdrNo <> '') then
+        //+NPR5.52 [366647]
           Message(PostedReturnShipmentMsg,RetShptHdrNo);
     end;
 

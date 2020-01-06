@@ -1,6 +1,7 @@
 page 6151386 "CS Stock-Takes Card"
 {
     // NPR5.50/CLVA/20190304  CASE 332844 Object created
+    // NPR5.52/CLVA/20190905  CASE 364063 Added field "Journal Template Name","Journal Batch Name","Inventory Calculated" and "Journal Qty. (Calculated)"
 
     Caption = 'CS Stock-Takes Card';
     DelayedInsert = false;
@@ -39,6 +40,18 @@ page 6151386 "CS Stock-Takes Card"
                 {
                 }
                 field(Location;Location)
+                {
+                }
+                field("Journal Template Name";"Journal Template Name")
+                {
+                }
+                field("Journal Batch Name";"Journal Batch Name")
+                {
+                }
+                field("Inventory Calculated";"Inventory Calculated")
+                {
+                }
+                field("Predicted Qty.";"Predicted Qty.")
                 {
                 }
                 field(Note;Note)
@@ -122,7 +135,12 @@ page 6151386 "CS Stock-Takes Card"
 
                 trigger OnAction()
                 begin
-                    CancelCounting();
+                    //-NPR5.52 [364063]
+                    //CancelCounting();
+
+                    CSHelperFunctions.CancelCounting(Rec);
+                    CurrPage.Update();
+                    //+NPR5.52 [364063]
                 end;
             }
             group(Overview)
@@ -135,17 +153,19 @@ page 6151386 "CS Stock-Takes Card"
                     RunObject = Page "CS Devices";
                     RunPageLink = Location=FIELD(Location);
                 }
-                action("&Worksheets")
+                action("&Item Journal")
                 {
-                    Caption = '&Worksheets';
+                    Caption = '&Item Journal';
                     Image = Worksheet2;
-                    RunObject = Page "Stock-Take Worksheet";
-                    RunPageLink = "Stock-Take Config Code"=FIELD(Location);
+                    RunObject = Page "Phys. Inventory Journal";
+                    RunPageLink = "Journal Template Name"=FIELD("Journal Template Name"),
+                                  "Journal Batch Name"=FIELD("Journal Batch Name");
                 }
             }
             group(Process)
             {
                 Caption = 'Process';
+                Visible = false;
                 action("1. Close Stockroom")
                 {
                     Caption = '1. Close Stockroom';
@@ -204,5 +224,8 @@ page 6151386 "CS Stock-Takes Card"
             }
         }
     }
+
+    var
+        CSHelperFunctions: Codeunit "CS Helper Functions";
 }
 

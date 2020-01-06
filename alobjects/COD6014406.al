@@ -45,6 +45,7 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
     // NPR5.48/JDH /20181206 CASE 335967 Validating Unit of measure with correct value
     // NPR5.50/MMV /20190321 CASE 300557 Refactored.
     // NPR5.50/MMV /20190606 CASE 352473 Correct sign on return sales document amounts.
+    // NPR5.52/MMV /20191002  CASE 352473 Fixed prepayment VAT & amount dialog bugs.
 
     TableNo = "Sale POS";
 
@@ -168,7 +169,7 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
 
         SalePOS."Sales Document Type" := SalesHeader."Document Type";
         SalePOS."Sales Document No."  := SalesHeader."No.";
-        SalePOS.Validate("Price including VAT",SalesHeader."Prices Including VAT");
+        SalePOS.Validate("Prices Including VAT",SalesHeader."Prices Including VAT");
         SalePOS.Validate("Location Code", SalesHeader."Location Code");
         SalePOS.Modify;
 
@@ -312,7 +313,7 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
         SalePOS.Validate("Customer No.",SalesHeader."Bill-to Customer No.");
         SalePOS."Sales Document Type" := SalesHeader."Document Type";
         SalePOS."Sales Document No."  := SalesHeader."No.";
-        SalePOS.Validate("Price including VAT",SalesHeader."Prices Including VAT");
+        SalePOS.Validate("Prices Including VAT",SalesHeader."Prices Including VAT");
         SalePOS.Validate("Location Code", SalesHeader."Location Code");
         SalePOS.Modify;
 
@@ -500,7 +501,7 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
         //+NPR5.50 [300557]
     end;
 
-    procedure SalesDocumentAmountToPOS(var POSSession: Codeunit "POS Session";SalesHeader: Record "Sales Header";Invoice: Boolean;Ship: Boolean;Receive: Boolean;Print: Boolean;SyncPost: Boolean)
+    procedure SalesDocumentAmountToPOS(var POSSession: Codeunit "POS Session";SalesHeader: Record "Sales Header";Invoice: Boolean;Ship: Boolean;Receive: Boolean;Print: Boolean;Pdf2Nav: Boolean;Send: Boolean;SyncPost: Boolean)
     var
         txtDeposit: Label 'Deposit';
         ErrDoubleOrder: Label 'Error. Only one sales order can be processed per sale.';
@@ -510,6 +511,7 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
         POSSaleLine: Codeunit "POS Sale Line";
         SalePOS: Record "Sale POS";
         SaleLinePOS: Record "Sale Line POS";
+        POSPrepaymentMgt: Codeunit "POS Prepayment Mgt.";
     begin
         //-NPR5.50 [300557]
         POSSession.GetSale(POSSale);
@@ -529,10 +531,22 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
           POSSale.RefreshCurrent();
         end;
 
+        //-NPR5.52 [352473]
+        if not SalePOS."Prices Including VAT" then begin
+          SalePOS.Validate("Prices Including VAT", true);
+          SalePOS.Modify(true);
+          POSSale.RefreshCurrent();
+        end;
+        //-NPR5.52 [352473]
+
         SalesLine.SetRange("Document Type",SalesHeader."Document Type");
         SalesLine.SetRange("Document No.",SalesHeader."No.");
-        SalesLine.CalcSums("Amount Including VAT","Prepmt Amt to Deduct");
-        PaymentAmount := SalesLine."Amount Including VAT" - SalesLine."Prepmt Amt to Deduct";
+        //-NPR5.52 [352473]
+        // SalesLine.CALCSUMS("Amount Including VAT","Prepmt Amt to Deduct");
+        // PaymentAmount := SalesLine."Amount Including VAT" - SalesLine."Prepmt Amt to Deduct";
+        SalesLine.CalcSums("Amount Including VAT");
+        PaymentAmount := SalesLine."Amount Including VAT" - POSPrepaymentMgt.GetPrepaymentAmountToDeductInclVAT(SalesHeader);
+        //+NPR5.52 [352473]
 
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
@@ -546,6 +560,10 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
         SaleLinePOS."Sales Document Print" := Print;
         SaleLinePOS."Sales Document Receive" := Receive;
         SaleLinePOS."Sales Document Sync. Posting" := SyncPost;
+        //-NPR5.52 [352473]
+        SaleLinePOS."Sales Document Send" := Send;
+        SaleLinePOS."Sales Document Pdf2Nav" := Pdf2Nav;
+        //+NPR5.52 [352473]
         //-NPR5.50 [352473]
         //SaleLinePOS.VALIDATE("Unit Price", PaymentAmount);
         if SalesHeader."Document Type" in [SalesHeader."Document Type"::"Return Order",SalesHeader."Document Type"::"Credit Memo"] then

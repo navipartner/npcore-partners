@@ -2,6 +2,7 @@ codeunit 6150868 "POS Action - Layaway Create"
 {
     // NPR5.50/MMV /20181105 CASE 300557 Created object
     // NPR5.51/ALST/20190705 CASE 357848 function prototype changed
+    // NPR5.52/MMV /20191004 CASE 352473 Fixed prepayment VAT.
 
 
     trigger OnRun()
@@ -121,6 +122,12 @@ codeunit 6150868 "POS Action - Layaway Create"
         POSSale.GetCurrentSale(SalePOS);
         if not SelectCustomer(SalePOS) then
             SalePOS.TestField("Customer No.");
+        //-NPR5.52 [352473]
+        if not SalePOS."Prices Including VAT" then begin
+          SalePOS.Validate("Prices Including VAT", true);
+          SalePOS.Modify(true);
+        end;
+        //+NPR5.52 [352473]
         POSSale.RefreshCurrent();
 
         InsertCreationFeeItem(POSSession, CreationFeeItemNo);
@@ -296,6 +303,7 @@ codeunit 6150868 "POS Action - Layaway Create"
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
         RetailSalesDocMgt: Codeunit "Retail Sales Doc. Mgt.";
         SalesLine: Record "Sales Line";
+        POSPrepaymentMgt: Codeunit "POS Prepayment Mgt.";
     begin
         if FullPrepayment then begin
             SalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -308,10 +316,9 @@ codeunit 6150868 "POS Action - Layaway Create"
                     SalesLine.Modify(true);
                 until SalesLine.Next = 0;
         end else
-          //-NPR5.51
-          // RetailSalesDocMgt.ApplyPrepaymentValueToAllLines(SalesHeader, PrepaymentPct, TRUE);
-          RetailSalesDocMgt.ApplyPrepaymentValueToAllLines(SalesHeader,PrepaymentPct,true,false);
-          //+NPR5.51
+        //-NPR5.52 [352473]
+          POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, true, PrepaymentPct);
+        //+NPR5.52 [352473]
 
         SalesPostPrepayments.Invoice(SalesHeader);
 

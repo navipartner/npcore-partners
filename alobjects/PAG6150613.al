@@ -54,6 +54,13 @@ page 6150613 "NP Retail Setup"
     // NPR5.50/MMV /20190521  CASE 355848 Added action LastErrorCallstack
     // NPR5.51/CLVA/20190710  CASE 355871 Added Action Raptor
     // NPR5.51/MHA /20190816  CASE 365332 Removed Page Manager actions
+    // NPR5.52/ALPO/20190923  CASE 365326 The following fields moved to POS Posting Profiles and deleted from this table/page:
+    //                                       Default POS Entry No. Series, Max. POS Posting Diff. (LCY), POS Posting Diff. AccountCode, Automatic Item Posting,
+    //                                       Automatic POS Posting, Automatic Posting Method, Adj. Cost after Item Posting, Post to G/L after Item Posting
+    //                                    New field added: "Default POS Posting Profile"
+    // NPR5.52/BHR /20190925  CASE 368143 Moved the Action RFID setup to "Navigate and other configuration"
+    // NPR5.52/BHR /20191002  CASE 370447 remove Actions Step 1 to step 5 and rename action 'Upgrade to Balancing V3 Setups' to 'Upgrade Audit Roll to POS Entry '
+    // NPR5.52/MHA /20191016  CASE 371388 Field 400 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
 
     Caption = 'NP Retail Setup';
     SourceTable = "NP Retail Setup";
@@ -96,23 +103,6 @@ page 6150613 "NP Retail Setup"
                 field("Advanced Posting Activated"; "Advanced Posting Activated")
                 {
                 }
-                field("Automatic Item Posting"; "Automatic Item Posting")
-                {
-                }
-                field("Adj. Cost after Item Posting"; "Adj. Cost after Item Posting")
-                {
-                    Editable = AdjCostAfterItemPostingEditable;
-                }
-                field("Post to G/L after Item Posting"; "Post to G/L after Item Posting")
-                {
-                    Editable = PostToGLAfterItemPostingEditable;
-                }
-                field("Automatic POS Posting"; "Automatic POS Posting")
-                {
-                }
-                field("Automatic Posting Method"; "Automatic Posting Method")
-                {
-                }
                 field("Item Price Codeunit ID"; "Item Price Codeunit ID")
                 {
                     Visible = false;
@@ -124,7 +114,7 @@ page 6150613 "NP Retail Setup"
                 field("Item Price Function"; "Item Price Function")
                 {
                 }
-                field("Global POS Sales Setup"; "Global POS Sales Setup")
+                field("Default POS Posting Profile";"Default POS Posting Profile")
                 {
                 }
             }
@@ -197,19 +187,6 @@ page 6150613 "NP Retail Setup"
                         Importance = Additional;
                     }
                     field("Enable Client Diagnostics"; "Enable Client Diagnostics")
-                    {
-                    }
-                }
-                group(Posting)
-                {
-                    Caption = 'Posting';
-                    field("Default POS Entry No. Series"; "Default POS Entry No. Series")
-                    {
-                    }
-                    field("Max. POS Posting Diff. (LCY)"; "Max. POS Posting Diff. (LCY)")
-                    {
-                    }
-                    field("POS Posting Diff. Account"; "POS Posting Diff. Account")
                     {
                     }
                 }
@@ -367,69 +344,9 @@ page 6150613 "NP Retail Setup"
                 {
                     Caption = 'Upgrade';
                     Image = MoveUp;
-                    action(Step1)
-                    {
-                        Caption = 'Step 1';
-                        Image = AddAction;
-
-                        trigger OnAction()
-                        var
-                            RetailDataModelARUpgrade: Codeunit "Retail Data Model AR Upgrade";
-                        begin
-                            RetailDataModelARUpgrade.UpgradeAuditRollStep1;
-                        end;
-                    }
-                    action(Step2)
-                    {
-                        Caption = 'Step 2';
-                        Image = AddAction;
-
-                        trigger OnAction()
-                        var
-                            RetailDataModelARUpgrade: Codeunit "Retail Data Model AR Upgrade";
-                        begin
-                            RetailDataModelARUpgrade.UpgradeAuditRoll(2);
-                        end;
-                    }
-                    action(Step3)
-                    {
-                        Caption = 'Step 3';
-                        Image = AddAction;
-
-                        trigger OnAction()
-                        var
-                            RetailDataModelARUpgrade: Codeunit "Retail Data Model AR Upgrade";
-                        begin
-                            RetailDataModelARUpgrade.UpgradeAuditRoll(3);
-                        end;
-                    }
-                    action(Step4)
-                    {
-                        Caption = 'Step 4';
-                        Image = AddAction;
-
-                        trigger OnAction()
-                        var
-                            RetailDataModelARUpgrade: Codeunit "Retail Data Model AR Upgrade";
-                        begin
-                            RetailDataModelARUpgrade.UpgradeAuditRoll(4);
-                        end;
-                    }
-                    action(Step5)
-                    {
-                        Caption = 'Step 5';
-                        Image = AddAction;
-
-                        trigger OnAction()
-                        var
-                            RetailDataModelARUpgrade: Codeunit "Retail Data Model AR Upgrade";
-                        begin
-                            RetailDataModelARUpgrade.UpgradeAuditRoll(5);
-                        end;
-                    }
                     action(UpgradeBalV3Setup)
                     {
-                        Caption = 'Upgrade to Balancing V3 Setups';
+                        Caption = 'Upgrade Audit Roll to POS Entry';
 
                         trigger OnAction()
                         var
@@ -468,6 +385,12 @@ page 6150613 "NP Retail Setup"
                         Caption = 'Dependency Management Setup';
                         Image = Setup;
                         RunObject = Page "Dependency Management Setup";
+                    }
+                    action("RFID Setup")
+                    {
+                        Caption = 'RFID Setup';
+                        Image = Setup;
+                        RunObject = Page "RFID Setup";
                     }
                     action("Lookup Templates")
                     {
@@ -1080,12 +1003,6 @@ page 6150613 "NP Retail Setup"
                         Caption = 'Report Selection Contract';
                         Image = Print;
                         RunObject = Page "Report Selection - Contract";
-                    }
-                    action("RFID Setup")
-                    {
-                        Caption = 'RFID Setup';
-                        Image = Setup;
-                        RunObject = Page "RFID Setup";
                     }
                 }
                 group(EFTIntegration)

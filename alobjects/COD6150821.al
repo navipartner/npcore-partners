@@ -5,6 +5,7 @@ codeunit 6150821 "POS Action - Sale Annullation"
     // NPR5.48/TSA /20190208 CASE 343578 Added Creation of the POS Entry on document reversal
     // NPR5.48/TSA /20190208 CASE 343578 Added support for creating entry lines in contexts of a debet sale (reversing an invoice from the POS)
     // NPR5.49/TSA /20190218 CASE 342244 Added DeObfucation of salesticket number - fraud protection
+    // NPR5.52/SARA/20190920 CASE 365901 Update Dimension code for Return Order
 
 
     trigger OnRun()
@@ -124,6 +125,7 @@ codeunit 6150821 "POS Action - Sale Annullation"
         RetailSalesCode: Codeunit "Retail Sales Code";
         ReturnReason: Record "Return Reason";
         SaleLinePOS: Record "Sale Line POS";
+        NPRetailSetup: Record "NP Retail Setup";
         POSSale: Codeunit "POS Sale";
         SalePOS: Record "Sale POS";
         t001: Label 'Receipt No.';
@@ -144,7 +146,7 @@ codeunit 6150821 "POS Action - Sale Annullation"
         POSCreateEntry: Codeunit "POS Create Entry";
     begin
         POSSession.GetSetup(POSSetup);
-
+        NPRetailSetup.Get;
         JSON.InitializeJObjectParser(Context, FrontEnd);
 
         //Get ticket
@@ -225,6 +227,15 @@ codeunit 6150821 "POS Action - Sale Annullation"
         SalePOS."Retursalg Bonnummer" := SalesTicketNo;
         SalePOS.Modify;
 
+
+        //-NPR5.52[365901]
+        //Update Dimension code for Return Order
+        SalesHeader."Shortcut Dimension 1 Code" := SalePOS."Shortcut Dimension 1 Code";
+        SalesHeader."Shortcut Dimension 2 Code" := SalePOS."Shortcut Dimension 2 Code";
+        SalesHeader."Dimension Set ID"          := SalePOS."Dimension Set ID";
+        SalesHeader.Modify(true);
+        //+NPR5.52[365901]
+
         if not RetailSalesCode.ReverseSalesTicket(SalePOS) then begin //Has commit in it so let i be before we actually post and stuff
                                                                       //Back it all
             SalePOS."Retursalg Bonnummer" := '';
@@ -252,7 +263,9 @@ codeunit 6150821 "POS Action - Sale Annullation"
                     SaleLinePOS.Modify();
                 until (SaleLinePOS.Next() = 0);
             end;
-
+          //-NPR5.52[365901]
+          if NPRetailSetup."Advanced Posting Activated" then
+          //+NPR5.52[365901]
             POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, true);
 
             SaleLinePOS.Reset;

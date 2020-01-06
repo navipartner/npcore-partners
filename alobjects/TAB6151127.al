@@ -3,6 +3,8 @@ table 6151127 "NpIa Sale Line POS AddOn"
     // NPR5.44/MHA /20180629  CASE 286547 Object created - Item AddOn
     // NPR5.44/JDH /20180726  CASE 323366 Added table caption
     // NPR5.48/MHA /20181109  CASE 334922 Added field 32 "AddOn No."
+    // NPR5.52/ALPO/20190912  CASE 354309 Possibility to fix the quantity so user would not be able to change it on sale line
+    //                             Set whether or not specified quantity is per unit of main item
 
     Caption = 'Sale Line POS AddOn';
 
@@ -51,6 +53,16 @@ table 6151127 "NpIa Sale Line POS AddOn"
         field(35;"AddOn Line No.";Integer)
         {
             Caption = 'AddOn Line No.';
+        }
+        field(40;"Fixed Quantity";Boolean)
+        {
+            Caption = 'Fixed Quantity';
+            Description = 'NPR5.52';
+        }
+        field(50;"Per Unit";Boolean)
+        {
+            Caption = 'Per unit';
+            Description = 'NPR5.52';
         }
     }
 

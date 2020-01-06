@@ -3,6 +3,7 @@ page 6060094 "TM Ticket Res. Request Page"
     // TM1.22/NPKNAV/20170612  CASE 278142 Transport T0007 - 12 June 2017
     // TM1.23/TSA /20170724 CASE 284752 Added NPR Attribute Support
     // TM1.26/NPKNAV/20171122  CASE 285601-01 Transport TM1.26 - 22 November 2017
+    // TM1.43/TSA /20190910 CASE 368043 Refactored usage of External Item Code
 
     Caption = 'Ticket Res. Request Page';
     PageType = Card;
@@ -33,6 +34,12 @@ page 6060094 "TM Ticket Res. Request Page"
             {
                 Caption = 'Reguest Details';
                 field("External Item Code";"External Item Code")
+                {
+                }
+                field("Item No.";"Item No.")
+                {
+                }
+                field("Variant Code";"Variant Code")
                 {
                 }
                 field(Quantity;Quantity)

@@ -13,6 +13,7 @@ table 6060120 "TM Admission"
     // TM1.28/TSA /20180131 CASE 303925 Added Admission Base Calendar Code to establish "non-working" days.
     // TM1.28/TSA /20180219 CASE 305707 Added Ticket Base Calendar functionality
     // TM1.38/TSA /20181012 CASE 332109 Added eTicket
+    // TM1.43/TSA /20190903 CASE 357359 Added option to Capacity Control (SEATING)
 
     Caption = 'Admission';
     LookupPageID = "TM Ticket Admissions";
@@ -69,8 +70,8 @@ table 6060120 "TM Admission"
         field(44;"Capacity Control";Option)
         {
             Caption = 'Capacity Control';
-            OptionCaption = 'None,Sales,Admitted,Full';
-            OptionMembers = "NONE",SALES,ADMITTED,FULL;
+            OptionCaption = 'None,Sales,Admitted,Admitted & Departed,Seating';
+            OptionMembers = "NONE",SALES,ADMITTED,FULL,SEATING;
         }
         field(45;"Prebook From";DateFormula)
         {

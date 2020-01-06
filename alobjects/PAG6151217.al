@@ -1,6 +1,7 @@
 page 6151217 "NpCs Open. Hour Set Subpage"
 {
     // NPR5.51/MHA /20190719  CASE 362443 Object created - Collect Store Opening Hour Sets
+    // NPR5.52/MHA /20191021  CASE 362443 Adjusted caption of Period Group to signal intentional spaces to control width
 
     AutoSplitKey = true;
     Caption = 'Opening Hours';
@@ -42,7 +43,7 @@ page 6151217 "NpCs Open. Hour Set Subpage"
                 }
                 group(Period)
                 {
-                    Caption = 'Period        ';
+                    Caption = 'Period        _';
                     group(Control6014409)
                     {
                         ShowCaption = false;

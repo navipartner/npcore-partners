@@ -28,6 +28,7 @@ page 6060137 "MM Membership Card"
     // MM1.34/JDH /20181109 CASE 334163 Added Caption to Actions
     // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
     // MM1.40/TSA /20190822 CASE 360242 Adding NPR Attributes
+    // MM1.41/TSA /20191009 CASE 367471 Added Sponsorship Tickets
 
     Caption = 'Membership Card';
     DataCaptionExpression = "External Membership No."+' - ' + "Membership Code";
@@ -470,6 +471,17 @@ page 6060137 "MM Membership Card"
                         MemberNotification.HandleMembershipNotification (MembershipNotification);
                 end;
             }
+            action("Issue Sponsorship Tickets")
+            {
+                Caption = 'Issue Sponsorship Tickets';
+                Image = TeamSales;
+
+                trigger OnAction()
+                begin
+
+                    IssueAdHocSponsorshipTickets (Rec."Entry No.");
+                end;
+            }
             group(History)
             {
                 Caption = 'History';
@@ -509,6 +521,15 @@ page 6060137 "MM Membership Card"
                 RunObject = Page "MM Membership Notification";
                 RunPageLink = "Membership Entry No."=FIELD("Entry No.");
                 RunPageView = SORTING("Membership Entry No.");
+            }
+            action("Show Sponsorship Tickets")
+            {
+                Caption = 'Show Sponsorship Tickets';
+                Ellipsis = true;
+                Image = SalesPurchaseTeam;
+                RunObject = Page "MM Sponsorship Ticket Entry";
+                RunPageLink = "Membership Entry No."=FIELD("Entry No.");
+                RunPageView = SORTING("Membership Entry No.","Event Type");
             }
             action("Arrival Log")
             {
@@ -801,6 +822,16 @@ page 6060137 "MM Membership Card"
         //-MM1.40 [360242]
         NPRAttrManagement.OnPageLookUp (GetAttributeTableId, AttributeNumber, Format (AttributeNumber,0,'<integer>'), NPRAttrTextArray[AttributeNumber] );
         //+MM1.40 [360242]
+    end;
+
+    local procedure IssueAdHocSponsorshipTickets(MembershipEntryNo: Integer)
+    var
+        SponsorshipTicketMgmt: Codeunit "MM Sponsorship Ticket Mgmt.";
+        ResponseMessage: Text;
+    begin
+
+        if (not SponsorshipTicketMgmt.IssueAdHocTicket (MembershipEntryNo, ResponseMessage)) then
+          Error (ResponseMessage);
     end;
 }
 

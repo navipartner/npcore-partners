@@ -35,6 +35,7 @@ codeunit 6151401 "Magento Setup Mgt."
     // MAG2.13/TS  /20180504  CASE 309743 SetupTaxClasses was on Setup Credentials Function
     // MAG2.17/TS  /20181031  CASE 333862 Seo Link should be filled as well
     // MAG2.22/MHA /20190625  CASE 359285 Added Picture Variety Type in SetupNpXmlTemplates()
+    // MAG2.23/MHA /20191018  CASE 373610 Bumped version list in MagentoVersionNo()
 
 
     trigger OnRun()
@@ -990,9 +991,9 @@ codeunit 6151401 "Magento Setup Mgt."
 
     procedure MagentoVersionNo(): Code[20]
     begin
-        //-MAG2.22 [359285]
-        exit('2.22');
-        //+MAG2.22 [359285]
+        //-MAG2.23
+        exit('2.23');
+        //+MAG2.23
     end;
 
     procedure UpdateVersionNo(var MagentoSetup: Record "Magento Setup")

@@ -7,6 +7,7 @@ page 6151215 "NpCs Open. Hour Sets"
     Editable = false;
     PageType = List;
     SourceTable = "NpCs Open. Hour Set";
+    UsageCategory = Administration;
 
     layout
     {

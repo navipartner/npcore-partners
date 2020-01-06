@@ -15,12 +15,22 @@ codeunit 6060136 "MM Member Notification"
     // MM1.36/TSA /20190109 CASE 328141 Notification with send mode manual also creates wallet (for sending by 3:rd party)
     // MM1.38/TSA /20190517 CASE 355234 Added a notification token that uniquely identifies a member
     // MM1.39/TSA /20190529 CASE 350968 Transfering of membership auto-renew settings to notification entry
+    // MM1.41/TSA /20190917 CASE 368691 Refresh Notification excluded "auto-renew" entries
+    // MM1.41/TSA /20191004 CASE 367471 Added invokation of sponsorship ticket notification
 
 
     trigger OnRun()
+    var
+        SponsorshipTicketMgmt: Codeunit "MM Sponsorship Ticket Mgmt.";
     begin
 
+        // Invoked by Task Queue when scheduled for background notifications
+
         HandleBatchNotifications(Today);
+
+        //-#367935 [367935]
+        SponsorshipTicketMgmt.NotifyRecipients ();
+        //+#367935 [367935]
     end;
 
     var
@@ -534,7 +544,10 @@ codeunit 6060136 "MM Member Notification"
                 MembershipEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
                 MembershipEntry.SetFilter(Blocked, '=%1', false);
                 // NEW,REGRET,RENEW,UPGRADE,EXTEND,CANCEL,AUTORENEW,FOREIGN
-                MembershipEntry.SetFilter(Context, '%1..%2 ', MembershipEntry.Context::NEW, MembershipEntry.Context::EXTEND);
+            //-MM1.41 [368691]
+            //MembershipEntry.SETFILTER (Context, '%1..%2 ', MembershipEntry.Context::NEW, MembershipEntry.Context::EXTEND);
+            MembershipEntry.SetFilter (Context, '%1..%2|%3', MembershipEntry.Context::NEW, MembershipEntry.Context::EXTEND, MembershipEntry.Context::AUTORENEW);
+            //+MM1.41 [368691]
                 if (MembershipEntry.FindLast()) then
                     if (MembershipEntry."Valid Until Date" > Today) then
                         AddMembershipRenewalNotificationWorker(MembershipEntry, MembershipSetup, CommunitySetup);
@@ -974,6 +987,7 @@ codeunit 6060136 "MM Member Notification"
     var
         MembershipNotification: Record "MM Membership Notification";
         MemberNotification: Codeunit "MM Member Notification";
+        SponsorshipTicketMgmt: Codeunit "MM Sponsorship Ticket Mgmt.";
     begin
 
         // inline notifications are for DEMO purpose only
@@ -991,6 +1005,10 @@ codeunit 6060136 "MM Member Notification"
                 MemberNotification.HandleMembershipNotification(MembershipNotification);
             until (MembershipNotification.Next() = 0);
         end;
+
+        //-#367935 [367935]
+        SponsorshipTicketMgmt.NotifyRecipients ();
+        //+#367935 [367935]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]

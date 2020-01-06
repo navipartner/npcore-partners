@@ -18,6 +18,7 @@ page 6151411 "Magento Pictures"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Magento Picture";
+    UsageCategory = Administration;
 
     layout
     {

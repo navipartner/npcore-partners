@@ -5,6 +5,7 @@ codeunit 6150829 "POS Action - POS Info"
     // NPR5.37.02/MMV /20171114  CASE 296478 Moved text constant to in-line constant
     // NPR5.45/TSA /20180810 CASE 319879 Added support for info codes in the payment view and refactored
     // NPR5.51/ALPO/20190826 CASE 364558 Define application scope for POSInfo action
+    // NPR5.52/ALPO/20190920 CASE 364558 Data source set to 'BUILTIN_SALE'
 
 
     trigger OnRun()
@@ -44,11 +45,11 @@ codeunit 6150829 "POS Action - POS Info"
             RegisterBooleanParameter('ClearPOSInfo',false);
             //+NPR5.51 [364558]
                 RegisterWorkflow(false);
+            RegisterDataSourceBinding('BUILTIN_SALE');  //NPR5.52 [364558]
 
                 //-NPR5.45 [319879]
                 //RegisterDataBinding();
                 //+NPR5.45 [319879]
-
             end;
     end;
 

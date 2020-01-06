@@ -1,6 +1,7 @@
 page 6060089 "TM Ticket Request Factbox"
 {
     // TM1.23/TSA /20170724 CASE 284752 Initial Version
+    // TM1.43/TSA /20190910 CASE 368043 Refactored usage of "External Item Code"
 
     Caption = 'NP Attributes FactBox';
     PageType = CardPart;
@@ -37,6 +38,12 @@ page 6060089 "TM Ticket Request Factbox"
                 Visible = false;
             }
             field("External Item Code";"External Item Code")
+            {
+            }
+            field("Item No.";"Item No.")
+            {
+            }
+            field("Variant Code";"Variant Code")
             {
             }
             field(Quantity;Quantity)

@@ -1,0 +1,553 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <Height>2in</Height>
+        <Style />
+      </Body>
+      <Width>6.5in</Width>
+      <Page>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="ContactNo_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ContactNo_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ContactNo_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Telephone_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Telephone_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Telephone_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Email_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Email_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Email_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Website_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Website_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Website_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="VATNo_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>VATNo_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>VATNo_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="BankAcc_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>BankAcc_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>BankAcc_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="IBANNo_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>IBANNo_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>IBANNo_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SalesTicket_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SalesTicket_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SalesTicket_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SalesPerson_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SalesPerson_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SalesPerson_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SaleDate_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SaleDate_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SaleDate_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Description_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Description_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Description_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="No_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>No_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>No_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="VariantCode_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>VariantCode_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>VariantCode_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="UnitOfMeasure_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>UnitOfMeasure_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>UnitOfMeasure_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Qty_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Qty_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Qty_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Discount_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Discount_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Discount_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="UnitPrice_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>UnitPrice_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>UnitPrice_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Amount_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Amount_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Amount_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PriceInclDisc_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PriceInclDisc_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PriceInclDisc_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TextBalBefore">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TextBalBefore</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TextBalBefore</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TextBalCurrent">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TextBalCurrent</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TextBalCurrent</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PaymentRounding_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PaymentRounding_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PaymentRounding_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="PaymentReference_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>PaymentReference_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>PaymentReference_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Payment_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Payment_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Payment_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Saldo_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Saldo_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Saldo_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Page_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Page_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Page_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ReceiptCopy_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ReceiptCopy_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ReceiptCopy_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Payed_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Payed_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Payed_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="BalanceBefore_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>BalanceBefore_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>BalanceBefore_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="CurrentBalance_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>CurrentBalance_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>CurrentBalance_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TotalInclVAT_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TotalInclVAT_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TotalInclVAT_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TotalExclVAT_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TotalExclVAT_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TotalExclVAT_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TotalDiscount_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TotalDiscount_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TotalDiscount_Lbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TotalVATPct_Lbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TotalVATPct_Lbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TotalVATPct_Lbl</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="Picture_CompanyInformation">
+          <DataField>Picture_CompanyInformation</DataField>
+        </Field>
+        <Field Name="RegisterNo_AuditRoll">
+          <DataField>RegisterNo_AuditRoll</DataField>
+        </Field>
+        <Field Name="SalesTicketNo_AuditRoll">
+          <DataField>SalesTicketNo_AuditRoll</DataField>
+        </Field>
+        <Field Name="SaleDate_AuditRoll">
+          <DataField>SaleDate_AuditRoll</DataField>
+        </Field>
+        <Field Name="CopyNo_AuditRoll">
+          <DataField>CopyNo_AuditRoll</DataField>
+        </Field>
+        <Field Name="Name_SalespersonPurchaser">
+          <DataField>Name_SalespersonPurchaser</DataField>
+        </Field>
+        <Field Name="RegisterNo_Register">
+          <DataField>RegisterNo_Register</DataField>
+        </Field>
+        <Field Name="Name_Register">
+          <DataField>Name_Register</DataField>
+        </Field>
+        <Field Name="Addres_Register">
+          <DataField>Addres_Register</DataField>
+        </Field>
+        <Field Name="City_Register">
+          <DataField>City_Register</DataField>
+        </Field>
+        <Field Name="PostCode_Register">
+          <DataField>PostCode_Register</DataField>
+        </Field>
+        <Field Name="Telephone_Register">
+          <DataField>Telephone_Register</DataField>
+        </Field>
+        <Field Name="Email_Register">
+          <DataField>Email_Register</DataField>
+        </Field>
+        <Field Name="Website_Register">
+          <DataField>Website_Register</DataField>
+        </Field>
+        <Field Name="VATRegNo">
+          <DataField>VATRegNo</DataField>
+        </Field>
+        <Field Name="BankAccNo">
+          <DataField>BankAccNo</DataField>
+        </Field>
+        <Field Name="IBANNo">
+          <DataField>IBANNo</DataField>
+        </Field>
+        <Field Name="ContactNo">
+          <DataField>ContactNo</DataField>
+        </Field>
+        <Field Name="ContactName">
+          <DataField>ContactName</DataField>
+        </Field>
+        <Field Name="ContactAddress">
+          <DataField>ContactAddress</DataField>
+        </Field>
+        <Field Name="ContactCity">
+          <DataField>ContactCity</DataField>
+        </Field>
+        <Field Name="ContactPostCode">
+          <DataField>ContactPostCode</DataField>
+        </Field>
+        <Field Name="LineNo_AuditRollSale">
+          <DataField>LineNo_AuditRollSale</DataField>
+        </Field>
+        <Field Name="Type_AuditRollSale">
+          <DataField>Type_AuditRollSale</DataField>
+        </Field>
+        <Field Name="AmountLine">
+          <DataField>AmountLine</DataField>
+        </Field>
+        <Field Name="AmountLineFormat">
+          <DataField>AmountLineFormat</DataField>
+        </Field>
+        <Field Name="DescriptionLine">
+          <DataField>DescriptionLine</DataField>
+        </Field>
+        <Field Name="DescriptionLine2">
+          <DataField>DescriptionLine2</DataField>
+        </Field>
+        <Field Name="ItemInfo">
+          <DataField>ItemInfo</DataField>
+        </Field>
+        <Field Name="ItemNo">
+          <DataField>ItemNo</DataField>
+        </Field>
+        <Field Name="UnitOfMeasure">
+          <DataField>UnitOfMeasure</DataField>
+        </Field>
+        <Field Name="VariantCode">
+          <DataField>VariantCode</DataField>
+        </Field>
+        <Field Name="LineDiscountPct">
+          <DataField>LineDiscountPct</DataField>
+        </Field>
+        <Field Name="LineDiscountPctFormat">
+          <DataField>LineDiscountPctFormat</DataField>
+        </Field>
+        <Field Name="LineDiscountPctLine">
+          <DataField>LineDiscountPctLine</DataField>
+        </Field>
+        <Field Name="QuantityLine">
+          <DataField>QuantityLine</DataField>
+        </Field>
+        <Field Name="SerialNo_AuditrollSale">
+          <DataField>SerialNo_AuditrollSale</DataField>
+        </Field>
+        <Field Name="SerialNoNotCreate_AuditRollSale">
+          <DataField>SerialNoNotCreate_AuditRollSale</DataField>
+        </Field>
+        <Field Name="SeriealNoTxt">
+          <DataField>SeriealNoTxt</DataField>
+        </Field>
+        <Field Name="VariantDesc">
+          <DataField>VariantDesc</DataField>
+        </Field>
+        <Field Name="UnitPriceExclDiscountLine">
+          <DataField>UnitPriceExclDiscountLine</DataField>
+        </Field>
+        <Field Name="UnitPriceInclDiscountLine">
+          <DataField>UnitPriceInclDiscountLine</DataField>
+        </Field>
+        <Field Name="Number_Integer">
+          <DataField>Number_Integer</DataField>
+        </Field>
+        <Field Name="LCYCode_GeneralLedgerSetup">
+          <DataField>LCYCode_GeneralLedgerSetup</DataField>
+        </Field>
+        <Field Name="TotalAmountInclVAT">
+          <DataField>TotalAmountInclVAT</DataField>
+        </Field>
+        <Field Name="TotalAmountInclVATFormat">
+          <DataField>TotalAmountInclVATFormat</DataField>
+        </Field>
+        <Field Name="TotalDiscountPct">
+          <DataField>TotalDiscountPct</DataField>
+        </Field>
+        <Field Name="TotalLineDiscount">
+          <DataField>TotalLineDiscount</DataField>
+        </Field>
+        <Field Name="TotalLineDiscountFormat">
+          <DataField>TotalLineDiscountFormat</DataField>
+        </Field>
+        <Field Name="TotalAmountExclVAT">
+          <DataField>TotalAmountExclVAT</DataField>
+        </Field>
+        <Field Name="TotalAmountExclVATFormat">
+          <DataField>TotalAmountExclVATFormat</DataField>
+        </Field>
+        <Field Name="TotalVATAmount">
+          <DataField>TotalVATAmount</DataField>
+        </Field>
+        <Field Name="TotalVATAmountFormat">
+          <DataField>TotalVATAmountFormat</DataField>
+        </Field>
+        <Field Name="Reference_AuditRoll">
+          <DataField>Reference_AuditRoll</DataField>
+        </Field>
+        <Field Name="ShowAmountInclVatPayment">
+          <DataField>ShowAmountInclVatPayment</DataField>
+        </Field>
+        <Field Name="ShowAdditionalInfo">
+          <DataField>ShowAdditionalInfo</DataField>
+        </Field>
+        <Field Name="VATPct">
+          <DataField>VATPct</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>

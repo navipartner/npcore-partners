@@ -1,6 +1,7 @@
 codeunit 6151361 "CS UI Phys. Inventory Handling"
 {
     // NPR5.51/CLVA/20190812  CASE 362173 Object created
+    // NPR5.52/CLVA/20190916  CASE 368484 Changed field assigning
 
     TableNo = "CS UI Header";
 
@@ -469,9 +470,12 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
         ItemJournalLine.Init;
         ItemJournalLine.Validate("Journal Template Name", CSSetup."Phys. Inv Jour Temp Name");
         ItemJournalLine.Validate("Journal Batch Name", UserId);
-        ItemJournalLine.Validate("Location Code", CSPhysInventoryHandling."Location Code");
-        ItemJournalLine.Validate("Bin Code", CSPhysInventoryHandling."Bin Code");
-
+        //-NPR5.52 [370367]
+        //ItemJournalLine.VALIDATE("Location Code",CSPhysInventoryHandling."Location Code");
+        //ItemJournalLine.VALIDATE("Bin Code",CSPhysInventoryHandling."Bin Code");
+        ItemJournalLine."Location Code" := CSPhysInventoryHandling."Location Code";
+        ItemJournalLine."Bin Code" := CSPhysInventoryHandling."Bin Code";
+        //+NPR5.52 [370367]
         ItemJnlTemplate.Get(CSSetup."Phys. Inv Jour Temp Name");
         ItemJnlBatch.Get(ItemJournalLine."Journal Template Name", ItemJournalLine."Journal Batch Name");
 
@@ -780,6 +784,7 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
         LineNo: Integer;
         ItemJournalLine: Record "Item Journal Line";
         BinContent: Record "Bin Content";
+        TestItem: Record Item;
     begin
         // CLEAR(CalculateInventory);
         // CalculateInventory.USEREQUESTPAGE(FALSE);
@@ -803,30 +808,37 @@ codeunit 6151361 "CS UI Phys. Inventory Handling"
         if BinContent.FindSet then begin
             repeat
 
-                Clear(ItemJournalLine);
-                ItemJournalLine.Validate("Journal Template Name", BaseItemJournalLine."Journal Template Name");
-                ItemJournalLine.Validate("Journal Batch Name", BaseItemJournalLine."Journal Batch Name");
-                ItemJournalLine."Line No." := LineNo;
-                ItemJournalLine.Insert(true);
+            TestItem.Get(BinContent."Item No.");
+            if not TestItem.Blocked then begin
+              BinContent.CalcFields(Quantity);
 
-                ItemJournalLine.Validate("Entry Type", ItemJournalLine."Entry Type"::"Positive Adjmt.");
-                ItemJournalLine.Validate("Item No.", BinContent."Item No.");
-                ItemJournalLine.Validate("Variant Code", BinContent."Variant Code");
-                ItemJournalLine.Validate("Location Code", BaseItemJournalLine."Location Code");
-                ItemJournalLine.Validate("Phys. Inventory", true);
-                ItemJournalLine.Validate("Qty. (Phys. Inventory)", BinContent.Quantity);
-                ItemJournalLine.Validate("Bin Code", BinContent."Bin Code");
-                ItemJournalLine."Posting Date" := WorkDate;
-                ItemJournalLine."Document Date" := WorkDate;
-                ItemJournalLine.Validate("External Document No.", 'MOBILE');
+              Clear(ItemJournalLine);
+              ItemJournalLine.Validate("Journal Template Name",BaseItemJournalLine."Journal Template Name");
+              ItemJournalLine.Validate("Journal Batch Name",BaseItemJournalLine."Journal Batch Name");
+              ItemJournalLine."Line No." := LineNo;
+              ItemJournalLine.Insert(true);
 
-                ItemJournalLine."Document No." := BaseItemJournalLine."Document No.";
-                ItemJournalLine."Source Code" := BaseItemJournalLine."Source Code";
-                ItemJournalLine."Reason Code" := BaseItemJournalLine."Reason Code";
-                ItemJournalLine."Posting No. Series" := BaseItemJournalLine."Posting No. Series";
-                ItemJournalLine.Modify(true);
-                LineNo += 1000;
+              ItemJournalLine.Validate("Entry Type",ItemJournalLine."Entry Type"::"Positive Adjmt.");
+              ItemJournalLine.Validate("Item No.", BinContent."Item No.");
+              ItemJournalLine.Validate("Variant Code",BinContent."Variant Code");
+              ItemJournalLine.Validate("Location Code",BaseItemJournalLine."Location Code");
+              ItemJournalLine.Validate("Phys. Inventory",true);
+              //-NPR5.52 [368484]
+              //ItemJournalLine.VALIDATE("Qty. (Phys. Inventory)",BinContent.Quantity);
+              //+NPR5.52 [368484]
+              ItemJournalLine.Validate("Qty. (Calculated)",BinContent.Quantity);
+              ItemJournalLine.Validate("Bin Code",BinContent."Bin Code");
+              ItemJournalLine."Posting Date" := WorkDate;
+              ItemJournalLine."Document Date" := WorkDate;
+              ItemJournalLine.Validate("External Document No.",'MOBILE');
 
+              ItemJournalLine."Document No." := BaseItemJournalLine."Document No.";
+              ItemJournalLine."Source Code" := BaseItemJournalLine."Source Code";
+              ItemJournalLine."Reason Code" := BaseItemJournalLine."Reason Code";
+              ItemJournalLine."Posting No. Series" := BaseItemJournalLine."Posting No. Series";
+              ItemJournalLine.Modify(true);
+              LineNo += 1000;
+            end;
             until BinContent.Next = 0;
         end else
             Error(Text029, BaseItemJournalLine."Location Code", BaseItemJournalLine."Bin Code");

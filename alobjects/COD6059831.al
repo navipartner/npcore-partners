@@ -66,7 +66,7 @@ codeunit 6059831 "RFID Mgt."
         ItemCrossReference.Validate("Variant Code", VariantCode);
         ItemCrossReference.Validate("Cross-Reference Type", ItemCrossReference."Cross-Reference Type"::"Bar Code");
         ItemCrossReference.Validate("Cross-Reference No.", TagValue);
-        ItemCrossReference.Validate("Rfid Tag", true);
+        ItemCrossReference.Validate("Is Retail Serial No.", true);
         ItemCrossReference.Insert(true);
     end;
 

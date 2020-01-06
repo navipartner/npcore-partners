@@ -3,8 +3,8 @@ page 6059939 "Sales Price Maintenance Setup"
     // NPR5.25/CLVA/20160628 CASE 244461 : Sales Price Maintenance
     // NPR5.33/NPKNAV/20170630  CASE 272906 Transport NPR5.33 - 30 June 2017
     // NPR5.43/TS  /20180607 CASE 318039 Update Items that are defined on the Sales Price
-    // NPK1.00/TJ  /20190225 CASE 345782 Update price is using codeunit 6014481
     // NPR5.51/CLVA/20190704 CASE 360328 Removed Sales Price check
+    // NPR5.52/TJ  /20190225 CASE 345782 Update price is using codeunit 6014481
 
     AutoSplitKey = true;
     Caption = 'Sales Price Maintenance Setup';
@@ -140,7 +140,7 @@ page 6059939 "Sales Price Maintenance Setup"
         Item: Record Item;
         SalesPriceMaintenance: Codeunit "Sales Price Maintenance Event";
     begin
-        //-NPK1.00 [345782]
+        //-NPR5.52 [345782]
         /*
         //-NPR5.43 [318039]
         SalesPrice.SETRANGE("Sales Type","Sales Type");
@@ -165,7 +165,7 @@ page 6059939 "Sales Price Maintenance Setup"
               SalesPriceMaintenance.UpdateSalesPricesForStaff(Item);
             //+NPR5.51 [360328]
           until Item.Next = 0;
-        //+NPK1.00 [345782]
+        //+NPR5.52 [345782]
         Message(Text00003);
         //+NPR5.43 [318039]
 

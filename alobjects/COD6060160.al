@@ -123,7 +123,7 @@ codeunit 6060160 "POS Action - Get Event"
         //POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         SalePOS.Validate("Customer No.", Customer."No.");
-        SalePOS.Validate("Price including VAT", Customer."Prices Including VAT");
+        SalePOS.Validate("Prices Including VAT",Customer."Prices Including VAT");
         SalePOS.Modify;
         repeat
             JobTask.Get(JobPlanningLine."Job No.", JobPlanningLine."Job Task No.");

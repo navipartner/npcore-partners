@@ -6,6 +6,7 @@ report 6060132 "MM Membership Status"
     // MM1.26/TSA /20180131 CASE 303848 changed to filter group 5 for the system filter on the member role record
     // NPR5.42/JLK /20180523 CASE 316228 Seperated first name and last name, added email newsletter
     // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
+    // MM1.41/TSA /20191011 CASE 355444 Refactored
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/MM Membership Status.rdlc';
 
@@ -40,6 +41,12 @@ report 6060132 "MM Membership Status"
                             TempMembers."Code 1" := "MM Membership"."External Membership No.";
                             TempMembers."Description 2" := Format("MM Membership"."Issued Date");
                             //+MM1.24
+
+                            //-MM1.41 [355444]
+                            TempMembers."Code 3" := Format (ValidUntilDate);
+                            TempMembers."Code 4" := Format (ValidFromDate);
+                            //+MM1.41 [355444]
+
                             TempMembers.Insert;
                         end;
                     }
@@ -60,38 +67,57 @@ report 6060132 "MM Membership Status"
                 trigger OnAfterGetRecord()
                 var
                     Item: Record Item;
+                    MembershipManagement: Codeunit "MM Membership Management";
+                    ValidForReferenceDate: Boolean;
                 begin
-                    Clear(MemberDate);
-                    Clear(MemberItem);
-                    MMMembershipEntry.SetRange("Membership Entry No.","MM Membership"."Entry No.");
-                    MMMembershipEntry.SetRange(Blocked,false);
-                    if MMMembershipEntry.FindLast then begin
-                      MemberDate := MMMembershipEntry."Valid Until Date";
-                      if MMMembershipEntry."Item No." <> '' then
-                        if Item.Get(MMMembershipEntry."Item No.") then
-                            MemberItem := Item.Description;
-                    end;
+
+                    //-MM1.41 [355444]
+                    // CLEAR(MemberDate);
+                    // CLEAR(MemberItem);
+                    // MMMembershipEntry.SETRANGE("Membership Entry No.","MM Membership"."Entry No.");
+                    // MMMembershipEntry.SETRANGE(Blocked,FALSE);
+                    // IF MMMembershipEntry.FINDLAST THEN BEGIN
+                    //  MemberDate := MMMembershipEntry."Valid Until Date";
+                    //  IF MMMembershipEntry."Item No." <> '' THEN
+                    //    IF Item.GET(MMMembershipEntry."Item No.") THEN
+                    //        MemberItem := Item.Description;
+                    // END;
+                    //
+                    // CASE MembershipStatus OF
+                    //  MembershipStatus::Active : BEGIN
+                    //    IF AsOfToday THEN BEGIN
+                    //      IF NOT (MemberDate >= TODAY) THEN
+                    //        CurrReport.SKIP;
+                    //    END ELSE BEGIN
+                    //     IF NOT ((MemberDate >= StartDate) AND (MemberDate <= EndDate)) THEN
+                    //        CurrReport.SKIP;
+                    //    END;
+                    //  END;
+                    //  MembershipStatus::Expired : BEGIN
+                    //    IF AsOfToday THEN BEGIN
+                    //      IF (MemberDate > TODAY) THEN
+                    //        CurrReport.SKIP;
+                    //    END ELSE BEGIN
+                    //      IF ((MemberDate >= StartDate) AND (MemberDate <= EndDate)) THEN
+                    //        CurrReport.SKIP;
+                    //    END;
+                    //  END;
+                    // END;
+
+                    ValidForReferenceDate := MembershipManagement.GetMembershipValidDate ("MM Membership"."Entry No.", ReferenceDate, ValidFromDate, ValidUntilDate);
 
                     case MembershipStatus of
-                      MembershipStatus::Active : begin
-                        if AsOfToday then begin
-                          if not (MemberDate >= Today) then
+                      MembershipStatus::Active :
+                        begin
+                          if (not ValidForReferenceDate) then
                             CurrReport.Skip;
-                        end else begin
-                         if not ((MemberDate >= StartDate) and (MemberDate <= EndDate)) then
-                            CurrReport.Skip;
+                          if (Format (ExpiresWithinDateformula) <> '') then
+                            if (CalcDate (ExpiresWithinDateformula, ReferenceDate) < ValidUntilDate) then
+                              CurrReport.Skip;
                         end;
-                      end;
-                      MembershipStatus::Expired : begin
-                        if AsOfToday then begin
-                          if (MemberDate > Today) then
-                            CurrReport.Skip;
-                        end else begin
-                          if ((MemberDate >= StartDate) and (MemberDate <= EndDate)) then
-                            CurrReport.Skip;
-                        end;
-                      end;
+                      MembershipStatus::"Not Active" : if (ValidForReferenceDate) then CurrReport.Skip;
                     end;
+                    //+MM1.41 [355444]
                 end;
             }
         }
@@ -137,9 +163,6 @@ report 6060132 "MM Membership Status"
             {
                 IncludeCaption = true;
             }
-            column(AsOfToday;AsOfToday)
-            {
-            }
             column(PageCaption;PageCaption)
             {
             }
@@ -176,11 +199,22 @@ report 6060132 "MM Membership Status"
             column(IssuedDateCaption;MembershipIssuedDateCaption)
             {
             }
+            column(ValidFromDate;ValidFromDate)
+            {
+            }
+            column(ValidUntilDate;ValidUntilDate)
+            {
+            }
 
             trigger OnAfterGetRecord()
             begin
                 Evaluate(ConvValidDate,Description);
                 Evaluate(MMMembershipIssueDate,"Description 2");
+
+                //-MM1.41 [355444]
+                Evaluate (ValidUntilDate, TempMembers."Code 3");
+                Evaluate (ValidFromDate, TempMembers."Code 4");
+                //+MM1.41 [355444]
 
                 // CLEAR(MemberName);
                 // IF MMMember2.GET("Line No.") THEN BEGIN
@@ -211,19 +245,14 @@ report 6060132 "MM Membership Status"
                     {
                         Caption = 'Membership Status';
                     }
-                    field(AsOfToday;AsOfToday)
+                    field(ReferenceDate;ReferenceDate)
                     {
-                        Caption = 'As of Today';
+                        Caption = 'Reference Date';
                     }
-                    field(StartDate;StartDate)
+                    field(ExpiresWithinDateformula;ExpiresWithinDateformula)
                     {
-                        Caption = 'Start Date';
-                        Editable = NOT AsOfToday;
-                    }
-                    field(EndDate;EndDate)
-                    {
-                        Caption = 'End Date';
-                        Editable = NOT AsOfToday;
+                        Caption = 'Expires Within (Dateformula)';
+                        Editable = (MembershipStatus = 0);
                     }
                 }
             }
@@ -236,7 +265,9 @@ report 6060132 "MM Membership Status"
         trigger OnOpenPage()
         begin
 
-            AsOfToday := true;
+            //-MM1.41 [355444]
+            // AsOfToday := TRUE;
+            //+MM1.41 [355444]
         end;
     }
 
@@ -244,24 +275,43 @@ report 6060132 "MM Membership Status"
     {
     }
 
+    trigger OnInitReport()
+    begin
+
+        //-MM1.41 [355444]
+        ReferenceDate := Today;
+        //+MM1.41 [355444]
+    end;
+
     trigger OnPreReport()
     begin
+
+        //-MM1.41 [355444]
+        // IF Filters = '' THEN
+        //  Filters += MembershipStatusCaption + ' ' + FORMAT(MembershipStatus)
+        // ELSE
+        //  Filters += ' | ' + MembershipStatusCaption + ' ' + FORMAT(MembershipStatus);
+        //
+        // IF AsOfToday THEN BEGIN
+        //  IF Filters = '' THEN
+        //    Filters += DateFilterCaption + ' ' + FORMAT(TODAY)
+        //  ELSE
+        //    Filters += ' | ' + DateFilterCaption + ' ' + FORMAT(TODAY);
+        // END ELSE BEGIN
+        //  IF Filters = '' THEN
+        //    Filters += DateFilterCaption + ' ' + FORMAT(StartDate) + '..' + FORMAT(EndDate)
+        //  ELSE
+        //    Filters += ' | ' + DateFilterCaption + ' ' + FORMAT(StartDate) + '..' + FORMAT(EndDate);
+        // END;
+
         if Filters = '' then
           Filters += MembershipStatusCaption + ' ' + Format(MembershipStatus)
         else
           Filters += ' | ' + MembershipStatusCaption + ' ' + Format(MembershipStatus);
 
-        if AsOfToday then begin
-          if Filters = '' then
-            Filters += DateFilterCaption + ' ' + Format(Today)
-          else
-            Filters += ' | ' + DateFilterCaption + ' ' + Format(Today);
-        end else begin
-          if Filters = '' then
-            Filters += DateFilterCaption + ' ' + Format(StartDate) + '..' + Format(EndDate)
-          else
-            Filters += ' | ' + DateFilterCaption + ' ' + Format(StartDate) + '..' + Format(EndDate);
-        end;
+        Filters += ' | ' + DateFilterCaption + ' ' + Format(ReferenceDate);
+        Filters += ' | ' + ExpireWithinCaption + ' ' + Format(ExpiresWithinDateformula);
+        //+MM1.41 [355444]
     end;
 
     var
@@ -271,16 +321,12 @@ report 6060132 "MM Membership Status"
         MMMembershipEntry: Record "MM Membership Entry";
         MMMemberCard: Record "MM Member Card";
         MemberItem: Text;
-        MembershipStatus: Option Active,Expired;
-        StartDate: Date;
-        EndDate: Date;
-        [InDataSet]
-        AsOfToday: Boolean;
+        MembershipStatus: Option Active,"Not Active";
         MMMember2: Record "MM Member";
         PageCaption: Label 'Page %1 of %2';
         ReportCaption: Label 'Membership Status';
         MemberEntryNoCaption: Label 'Entry No.';
-        DateCaption: Label 'Valid Until Date';
+        DateCaption: Label 'Membership Valid Date';
         ConvValidDate: Date;
         Filters: Text;
         MembershipStatusCaption: Label 'Membership Status:';
@@ -290,5 +336,11 @@ report 6060132 "MM Membership Status"
         ExternalMemberNoCaption: Label 'Ext. Member No.';
         ExternalMembershipNoCaption: Label 'Ext. Membership No.';
         MembershipIssuedDateCaption: Label 'Membership Issue Date';
+        ReferenceDate: Date;
+        ExpiresWithinDateformula: DateFormula;
+        ValidFromDate: Date;
+        ValidUntilDate: Date;
+        ExpireWithinCaption: Label 'Expires Within:';
+        ShowActiveMemberships: Boolean;
 }
 

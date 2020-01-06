@@ -14,6 +14,7 @@ codeunit 6014410 "POS Apply Customer Entries"
     // NPR5.48/TSA /20190207 CASE 344901 Added UpdateAmounts to get VAT calculated correctly when ApplyCustomerEntries() (legacy)
     // NPR5.50/MMV /20181114 CASE 300557 Added function BalanceInvoice from CU 6014505.
     //                                   Moved OnRun trigger to separate function.
+    // NPR5.52/TJ  /20191003 CASE 335729 Fixed the filtering order when using SETVIEW
 
     Permissions = TableData "Cust. Ledger Entry"=rimd;
     TableNo = "Sale Line POS";
@@ -256,15 +257,21 @@ codeunit 6014410 "POS Apply Customer Entries"
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
         POSSale.GetCurrentSale(SalePOS);
-
+        
         SalePOS.TestField("Customer No.");
         SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
-
-        CustLedgEntry.SetRange("Customer No.", SalePOS."Customer No.");
-        CustLedgEntry.SetRange(Open, true);
+        //-NPR5.52 [335729]
         if CustLedgerEntryView <> '' then
           CustLedgEntry.SetView(CustLedgerEntryView);
-
+        //+NPR5.52 [335729]
+        CustLedgEntry.SetRange("Customer No.", SalePOS."Customer No.");
+        CustLedgEntry.SetRange(Open, true);
+        //-NPR5.52 [335729]
+        /*
+        IF CustLedgerEntryView <> '' THEN
+          CustLedgEntry.SETVIEW(CustLedgerEntryView);
+        */
+        //+NPR5.52 [335729]
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS."Buffer ID" := StrSubstNo('%1-%2', SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
         POSApplyCustomerEntries.SetSalesLine(SaleLinePOS, SaleLinePOS.FieldNo("Buffer ID"));
@@ -275,20 +282,21 @@ codeunit 6014410 "POS Apply Customer Entries"
           exit;
         DeleteExistingLines(SaleLinePOS);
         POSSaleLine.RefreshCurrent();
-
+        
         CustLedgEntry.Reset;
         CustLedgEntry.SetAutoCalcFields("Remaining Amount");
         CustLedgEntry.SetRange("Customer No.", SalePOS."Customer No.");
         CustLedgEntry.SetRange(Open, true);
         CustLedgEntry.SetRange("Applies-to ID", UserId);
-
+        
         if not CustLedgEntry.FindSet then
           exit;
-
+        
         repeat
           CreateApplyingPOSSaleLine(POSSaleLine, CustLedgEntry);
         until CustLedgEntry.Next = 0;
         //+NPR5.50 [300557]
+
     end;
 
     procedure BalanceDocument(var POSSession: Codeunit "POS Session";DocumentType: Integer;DocumentNo: Code[20];Silent: Boolean)

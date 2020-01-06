@@ -2,6 +2,7 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
 {
     // NPR5.48/MHA /20180920  CASE 302179 Object created
     // NPR5.48/MHA /20190123  CASE 341711 Added "Send via E-mail" and "Send via SMS"
+    // NPR5.52/MHA /20191015  CASE 372315 Added functions GetVouchersByCustomerNo(), GetVouchersByEmail()
 
 
     trigger OnRun()
@@ -48,6 +49,64 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
           Error(Text000,NpRvExtVoucherBuffer."Reference No.");
 
         Voucher2Buffer(NpRvVoucher,NpRvExtVoucherBuffer);
+    end;
+
+    procedure GetVouchersByCustomerNo(CustomerNo: Text;var vouchers: XMLport "NpRv Ext. Vouchers")
+    var
+        NpRvVoucher: Record "NpRv Voucher";
+        NpRvExtVoucherBuffer: Record "NpRv Ext. Voucher Buffer" temporary;
+        DocNo: Text;
+        LineNo: Integer;
+    begin
+        //-NPR5.52 [372315]
+        Clear(vouchers);
+        if StrLen(CustomerNo) > MaxStrLen(NpRvVoucher."Customer No.") then
+          exit;
+
+        DocNo := Format(CreateGuid);
+        NpRvVoucher.SetRange("Customer No.",UpperCase(CustomerNo));
+        if NpRvVoucher.FindSet then
+          repeat
+            LineNo += 10000;
+
+            NpRvExtVoucherBuffer.Init;
+            NpRvExtVoucherBuffer."Document No." := DocNo;
+            NpRvExtVoucherBuffer."Line No." := LineNo;
+            NpRvExtVoucherBuffer.Insert;
+            Voucher2Buffer(NpRvVoucher,NpRvExtVoucherBuffer);
+          until NpRvVoucher.Next = 0;
+
+        vouchers.SetSourceTable(NpRvExtVoucherBuffer);
+        //+NPR5.52 [372315]
+    end;
+
+    procedure GetVouchersByEmail(Email: Text;var vouchers: XMLport "NpRv Ext. Vouchers")
+    var
+        NpRvVoucher: Record "NpRv Voucher";
+        NpRvExtVoucherBuffer: Record "NpRv Ext. Voucher Buffer" temporary;
+        DocNo: Text;
+        LineNo: Integer;
+    begin
+        //-NPR5.52 [372315]
+        Clear(vouchers);
+        if StrLen(Email) > MaxStrLen(NpRvVoucher."E-mail") then
+          exit;
+
+        DocNo := Format(CreateGuid);
+        NpRvVoucher.SetFilter("E-mail",'@' + ConvertStr(Email,'@','?'));
+        if NpRvVoucher.FindSet then
+          repeat
+            LineNo += 10000;
+
+            NpRvExtVoucherBuffer.Init;
+            NpRvExtVoucherBuffer."Document No." := DocNo;
+            NpRvExtVoucherBuffer."Line No." := LineNo;
+            NpRvExtVoucherBuffer.Insert;
+            Voucher2Buffer(NpRvVoucher,NpRvExtVoucherBuffer);
+          until NpRvVoucher.Next = 0;
+
+        vouchers.SetSourceTable(NpRvExtVoucherBuffer);
+        //+NPR5.52 [372315]
     end;
 
     local procedure "--- Create Voucher"()

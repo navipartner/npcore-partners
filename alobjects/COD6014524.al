@@ -1,6 +1,7 @@
 codeunit 6014524 "SSH.NET SFTP Client"
 {
     // NPR5.48/MMV /20181002 CASE 322469 Created object
+    // NPR5.52/TJ  /20190909 CASE 305282 New functions ConstructPrivateKey and SearchFileAndDownload
     // 
     // Wraps SSH.NET SFTP Client
     // MIT License: https://github.com/sshnet/SSH.NET/blob/develop/LICENSE
@@ -29,6 +30,37 @@ codeunit 6014524 "SSH.NET SFTP Client"
 
         SftpClient := SftpClient.SftpClient(ConnectionInfo);
         SftpClient.Connect();
+    end;
+
+    procedure ConstructPrivateKey(Host: Text;Username: Text;PassPhrase: Text;PrivateKeyBase64: Text;Port: Integer;TimeoutMs: Integer)
+    var
+        ConnectionInfo: DotNet npNetConnectionInfo;
+        PrivateKeyAuthenticationMethod: DotNet npNetPrivateKeyAuthenticationMethod;
+        AuthenticationMethodArray: DotNet npNetArray;
+        AuthenticationMethod: DotNet npNetAuthenticationMethod;
+        PrivateKeyFile: DotNet npNetPrivateKeyFile;
+        PrivateKeyFileArray: DotNet npNetArray;
+        MemoryStream: DotNet npNetMemoryStream;
+        Convert: DotNet npNetConvert;
+    begin
+        //-NPR5.52 [305282]
+        MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(PrivateKeyBase64));
+        if PassPhrase <> '' then
+          PrivateKeyFile := PrivateKeyFile.PrivateKeyFile(MemoryStream,PassPhrase)
+        else
+          PrivateKeyFile := PrivateKeyFile.PrivateKeyFile(MemoryStream);
+        PrivateKeyFileArray := PrivateKeyFileArray.CreateInstance(GetDotNetType(PrivateKeyFile),1);
+        PrivateKeyFileArray.SetValue(PrivateKeyFile,0);
+        PrivateKeyAuthenticationMethod := PrivateKeyAuthenticationMethod.PrivateKeyAuthenticationMethod(Username,PrivateKeyFileArray);
+        AuthenticationMethodArray := AuthenticationMethodArray.CreateInstance(GetDotNetType(AuthenticationMethod),1);
+        AuthenticationMethodArray.SetValue(PrivateKeyAuthenticationMethod,0);
+
+        ConnectionInfo := ConnectionInfo.ConnectionInfo(Host,Username,AuthenticationMethodArray);
+        ConnectionInfo.Timeout(TimeoutMs);
+
+        SftpClient := SftpClient.SftpClient(ConnectionInfo);
+        SftpClient.Connect();
+        //+NPR5.52 [305282]
     end;
 
     procedure Destruct()
@@ -112,6 +144,42 @@ codeunit 6014524 "SSH.NET SFTP Client"
     procedure DeleteDirectory(RemotePath: Text)
     begin
         SftpClient.DeleteDirectory(RemotePath);
+    end;
+
+    procedure SearchFileAndDownload(LocalPath: Text;RemotePath: Text;PartialFileName: Text)
+    var
+        IEnumerable: DotNet npNetIEnumerable;
+        SftpFile: DotNet npNetSftpFile;
+        Directory: DotNet npNetDirectory;
+        SftpClientWrapper: DotNet npNetSFTPClientWrapper;
+        TypeHelper: Codeunit "Type Helper";
+        NoOfPatterns: Integer;
+        i: Integer;
+        Downloaded: Boolean;
+    begin
+        //-NPR5.52 [305282]
+        //use comma to separate several PartialFileName
+        if CopyStr(LocalPath,StrLen(LocalPath),1) <> '\' then
+          LocalPath += '\';
+        if CopyStr(RemotePath,StrLen(RemotePath),1) <> '/' then
+          RemotePath += '/';
+
+        if PartialFileName <> '' then
+          NoOfPatterns := TypeHelper.GetNumberOfOptions(PartialFileName) + 1;
+
+        IEnumerable := SftpClientWrapper.ListDirectory(SftpClient,RemotePath);
+        foreach SftpFile in IEnumerable do
+          if NoOfPatterns = 0 then
+            DownloadFile(LocalPath + SftpFile.Name,RemotePath + SftpFile.Name)
+          else begin
+            Downloaded := false;
+            for i := 1 to NoOfPatterns do
+              if (not Downloaded) and (StrPos(SftpFile.Name,SelectStr(i,PartialFileName)) > 0) then begin
+                DownloadFile(LocalPath + SftpFile.Name,RemotePath + SftpFile.Name);
+                Downloaded := true;
+              end;
+          end;
+        //+NPR5.52 [305282]
     end;
 }
 

@@ -30,6 +30,7 @@ codeunit 6014413 "Label Library"
     // NPR5.48/MMV /20181128 CASE 327107 Added events around retail journal print
     // NPR5.51/BHR /20190614 CASE 358287  Add retail print and Price label for Posted Purchase Invoice
     // NPR5.51/MMV /20190906 CASE 367416 Skip obsolete fields in NAV2018+ when moving to temp buffer.
+    // NPR5.52/SARA/20190906 CASE 366969 Added 'Shelf Label' and 'Price Label' for Item Worksheet line
 
 
     trigger OnRun()
@@ -257,6 +258,7 @@ codeunit 6014413 "Label Library"
         PeriodDiscountLine: Record "Period Discount Line";
         TransferReceiptLine: Record "Transfer Receipt Line";
         PurchInvLine: Record "Purch. Inv. Line";
+        ItemWorksheetLine: Record "Item Worksheet Line";
     begin
         if not SelectionBufferOpen then
           exit;
@@ -367,6 +369,18 @@ codeunit 6014413 "Label Library"
                   PrintPostedPurchaseInvoice(PurchInvLine,ReportType);
               end;
             //-NPR5.51 [358287]
+           //-NPR5.52 [366969]
+           DATABASE::"Item Worksheet Line":
+              begin
+                repeat
+                  if ItemWorksheetLine.Get(TmpSelectionBuffer.RecordId) then
+                    ItemWorksheetLine.Mark(true);
+                until TmpSelectionBuffer.Next = 0;
+                ItemWorksheetLine.MarkedOnly(true);
+                if ItemWorksheetLine.FindSet then
+                  PrintItemWorksheetLine(ItemWorksheetLine,ReportType);
+              end;
+           //+NPR5.52 [366969]
           end;
         end;
     end;
@@ -924,6 +938,68 @@ codeunit 6014413 "Label Library"
         RetailJournalCode.CopyPostedPurchaseInv2RetailJnlLines(PurchInvLine, TempRetailJnlNo);
         FlushJournalToPrinter(TempRetailJnlNo, ReportType);
         //+NPR5.46 [294354]
+    end;
+
+    local procedure PrintItemWorksheetLine(var ItemWorksheetLine: Record "Item Worksheet Line";ReportType: Integer)
+    var
+        RetailJnlLine: Record "Retail Journal Line";
+    begin
+        //-NPR5.52 [366969]
+        ItemWorksheetLineToRetailJnlLine(ItemWorksheetLine, RetailJnlLine);
+        if ItemWorksheetLine.FindSet then begin
+          PrintRetailJournal(RetailJnlLine,ReportType);
+          RetailJnlLine.DeleteAll;
+        end;
+        //+NPR5.52 [366969]
+    end;
+
+    local procedure ItemWorksheetLineToRetailJnlLine(var ItemWorksheetLine: Record "Item Worksheet Line";var RetailJnlLine: Record "Retail Journal Line")
+    var
+        GUID: Guid;
+        Item: Record Item;
+        RegisterNo: Code[10];
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        RetailFormCode: Codeunit "Retail Form Code";
+    begin
+        //-NPR5.52 [366969]
+        RetailJnlLine.Reset;
+        with ItemWorksheetLine do begin
+          if not FindSet then
+            exit;
+          RegisterNo := RetailFormCode.FetchRegisterNumber();
+          GUID := CreateGuid();
+          repeat
+            if not Item.Get("Item No.") then
+              Item.Get("Existing Item No.");
+            if Item."Costing Method" = Item."Costing Method"::Specific then begin
+              ItemLedgerEntry.SetRange("Item No.",Item."No.");
+              if ItemLedgerEntry.FindSet then repeat
+                RetailJnlLine.Init;
+                RetailJnlLine."Register No." := RegisterNo;
+                RetailJnlLine."No." := Format(GUID);
+                RetailJnlLine."Line No." := "Line No.";
+                RetailJnlLine.Validate("Item No.","Item No.");
+                RetailJnlLine."Quantity to Print" := 1;
+                RetailJnlLine.Description := Description;
+                RetailJnlLine."Serial No." := ItemLedgerEntry."Serial No.";
+                RetailJnlLine.Validate("Variant Code","Variant Code");
+                RetailJnlLine.Insert(true);
+              until ItemLedgerEntry.Next = 0;
+            end else begin
+              RetailJnlLine.Init;
+              RetailJnlLine."Register No." := RegisterNo;
+              RetailJnlLine."No." := Format(GUID);
+              RetailJnlLine."Line No." := "Line No.";
+              RetailJnlLine.Validate("Item No.","Item No.");
+              RetailJnlLine."Quantity to Print" := 1;
+              RetailJnlLine.Description := Description;
+              RetailJnlLine.Validate("Variant Code","Variant Code");
+              RetailJnlLine.Insert(true);
+            end;
+          until Next = 0;
+        end;
+        RetailJnlLine.SetRange("No.", Format(GUID));
+        //+NPR5.52 [366969]
     end;
 
     local procedure "// Event Publishers"()

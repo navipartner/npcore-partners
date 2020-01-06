@@ -433,7 +433,7 @@ codeunit 6014498 "Exchange Label Management"
                     RecRef.SetTable(SaleLinePOS);
                     UnitPrice := SaleLinePOS."Unit Price";
 
-                    if SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.") and (not SalePOS."Price including VAT") then
+              if SalePOS.Get(SaleLinePOS."Register No.",SaleLinePOS."Sales Ticket No.") and (not SalePOS."Prices Including VAT") then
                         UnitPrice *= (1 + (SaleLinePOS."VAT %" / 100));
                 end;
         end;
