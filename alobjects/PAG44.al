@@ -14,7 +14,7 @@ pageextension 6014439 pageextension6014439 extends "Sales Credit Memo"
             {
             }
         }
-        addafter("Bill-to")
+        addafter("EU 3-Party Trade")
         {
             field("Magento Payment Amount";"Magento Payment Amount")
             {

@@ -63,6 +63,11 @@ tableextension 6014447 tableextension6014447 extends "Value Entry"
             Caption = 'Document Date and Time';
             Description = 'NPR5.52';
         }
+        field(6014416;"Document Date and Time";DateTime)
+        {
+            Caption = 'Document Date and Time';
+            Description = 'NPR5.52';
+        }
     }
 }
 

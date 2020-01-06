@@ -7,6 +7,7 @@ page 6150741 "POS Admin. Template List"
     Editable = false;
     PageType = List;
     SourceTable = "POS Administrative Template";
+    UsageCategory = Administration;
 
     layout
     {

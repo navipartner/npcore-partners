@@ -502,6 +502,37 @@ codeunit 6151372 "CS WS"
           exit(Result);
     end;
 
+    procedure SetRfidTagDataByType(StockTakeId: Text;StockTakeConfigCode: Text;WorksheetName: Text;TagId: Text;"Area": Text): Text
+    var
+        CSStockTakesData: Record "CS Stock-Takes Data";
+        CSRfidData: Record "CS Rfid Data";
+        Result: Text;
+    begin
+        CSStockTakesData."Stock-Take Id" := StockTakeId;
+        CSStockTakesData."Stock-Take Config Code" := StockTakeConfigCode;
+        CSStockTakesData."Worksheet Name" := WorksheetName;
+        CSStockTakesData."Tag Id" := TagId;
+        CSStockTakesData.Created := CurrentDateTime;
+        CSStockTakesData."Created By" := UserId;
+        case Area of
+          '0' : CSStockTakesData.Area := CSStockTakesData.Area::Warehouse;
+          '1' : CSStockTakesData.Area := CSStockTakesData.Area::Salesfloor;
+          '2' : CSStockTakesData.Area := CSStockTakesData.Area::Stockroom;
+        end;
+        if CSRfidData.Get(TagId) then begin
+          CSStockTakesData.Validate("Item No.",CSRfidData."Cross-Reference Item No.");
+          CSStockTakesData.Validate("Variant Code",CSRfidData."Cross-Reference Variant Code");
+          CSStockTakesData.Validate("Item Group Code",CSRfidData."Item Group Code");
+          CSStockTakesData."Combined key" := CSRfidData."Combined key";
+          Result := CSRfidData."Combined key";
+        end else
+          Result := 'UNKNOWNITEM';
+        if CSStockTakesData.Insert() then
+          exit(Result)
+        else
+          exit(Result);
+    end;
+
     procedure GetRfidWhseReceiptData(DocNo: Text): Text
     var
         WhseReceiptLine: Record "Warehouse Receipt Line";

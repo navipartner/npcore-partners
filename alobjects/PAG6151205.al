@@ -15,6 +15,7 @@ page 6151205 "NpCs Collect Store Orders"
     SourceTableView = SORTING("Entry No.")
                       WHERE(Type=CONST("Collect in Store"),
                             "Document Type"=FILTER(Order|"Posted Invoice"));
+    UsageCategory = Lists;
 
     layout
     {
