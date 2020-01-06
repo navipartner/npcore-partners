@@ -139,6 +139,26 @@ xmlport 6151150 "M2 Authenticate"
                                 end;
                             end;
                         }
+                        tableelement(tmpmembershiproleresponse;"MM Membership Role")
+                        {
+                            LinkFields = "Contact No."=FIELD("No.");
+                            LinkTable = TmpContactResponse;
+                            MinOccurs = Zero;
+                            XmlName = 'Membership';
+                            UseTemporary = true;
+                            fieldelement(MembershipCode;TmpMembershipRoleResponse."Membership Code")
+                            {
+                            }
+                            fieldelement(ExternalMembershipNumber;TmpMembershipRoleResponse."External Membership No.")
+                            {
+                            }
+                            fieldelement(ExternalMemberNumber;TmpMembershipRoleResponse."External Member No.")
+                            {
+                            }
+                            fieldelement(DisplayName;TmpMembershipRoleResponse."Member Display Name")
+                            {
+                            }
+                        }
                     }
                 }
             }
@@ -190,6 +210,7 @@ xmlport 6151150 "M2 Authenticate"
           repeat
             TmpContactResponse.TransferFields (TmpContact, true);
             TmpContactResponse.Insert ();
+
           until (TmpContact.Next () = 0);
         end;
 

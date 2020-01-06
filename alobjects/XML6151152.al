@@ -139,6 +139,26 @@ xmlport 6151152 "M2 Get Account"
                         {
                         }
                     }
+                    tableelement(tmpmembershiproleresponse;"MM Membership Role")
+                    {
+                        LinkFields = "Contact No."=FIELD("No.");
+                        LinkTable = TmpContactResponse;
+                        MinOccurs = Zero;
+                        XmlName = 'Membership';
+                        UseTemporary = true;
+                        fieldelement(MembershipCode;TmpMembershipRoleResponse."Membership Code")
+                        {
+                        }
+                        fieldelement(ExternalMembershipNumber;TmpMembershipRoleResponse."External Membership No.")
+                        {
+                        }
+                        fieldelement(ExternalMemberNumber;TmpMembershipRoleResponse."External Member No.")
+                        {
+                        }
+                        fieldelement(DisplayName;TmpMembershipRoleResponse."Member Display Name")
+                        {
+                        }
+                    }
                     tableelement(tmpselltocustomer;Customer)
                     {
                         MaxOccurs = Once;
@@ -515,6 +535,7 @@ xmlport 6151152 "M2 Get Account"
     var
         ContactBusinessRelation: Record "Contact Business Relation";
         Contact: Record Contact;
+        MembershipRole: Record "MM Membership Role";
     begin
 
         ResponseMessage := 'Contact Id is unknown.';
