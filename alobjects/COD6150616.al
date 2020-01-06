@@ -11,6 +11,9 @@ codeunit 6150616 "POS Post Item Entries"
     // NPR5.50/TSA /20190531 CASE 355186 Added link in table "POS Entry Sales Doc. Link" when a service item is created
     // NPR5.51/TSA /20190624 CASE 359508 Added assignment of document no. from "POS Period Register."Document No.", when set
     // NPR5.51/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
+    // NPR5.52/ALPO/20190923 CASE 365326 POS Posting related fields moved to POS Posting Profiles from NP Retail Setup
+    // NPR5.52/TSA /20190925 CASE 369231 Added handling of Retail Serial No.
+    // NPR5.52/TSA /20191014 CASE 372920 Replenishment Method Assembly
 
     TableNo = "POS Entry";
 
@@ -21,6 +24,7 @@ codeunit 6150616 "POS Post Item Entries"
         POSSalesLine: Record "POS Sales Line";
         NPRetailSetup: Record "NP Retail Setup";
         TempItemToAdjust: Record Item temporary;
+        POSPostingProfile: Record "POS Posting Profile";
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
         AdjustCostItemEntries: Report "Adjust Cost - Item Entries";
         PostInventoryCosttoGL: Report "Post Inventory Cost to G/L";
@@ -51,6 +55,8 @@ codeunit 6150616 "POS Post Item Entries"
 
           CheckPostingrestrictions(POSEntry);
 
+          NPRetailSetup.GetPostingProfile(POSEntry."POS Unit No.",POSPostingProfile);  //NPR5.52 [365326]
+
           POSSalesLine.Reset;
           POSSalesLine.SetRange("POS Entry No.","Entry No.");
           POSSalesLine.SetRange(Type,POSSalesLine.Type::Item);
@@ -58,6 +64,7 @@ codeunit 6150616 "POS Post Item Entries"
           //-NPR5.51 [362329]
           POSSalesLine.SetRange("Exclude from Posting",false);
           //+NPR5.51 [362329]
+
           if POSSalesLine.FindSet then repeat
             POSSalesLine."Item Entry No." := PostItemJnlLine(POSEntry,POSSalesLine);
             POSSalesLine.Modify;
@@ -67,19 +74,28 @@ codeunit 6150616 "POS Post Item Entries"
             //+NPR5.50 [351655]
 
             //-NPR5.38 [301600]
-            if NPRetailSetup."Adj. Cost after Item Posting" then begin
+            //IF NPRetailSetup."Adj. Cost after Item Posting" THEN BEGIN  //NPR5.52 [365326]-revoked
+            if POSPostingProfile."Adj. Cost after Item Posting" then begin  //NPR5.52 [365326]
               if not TempItemToAdjust.Get(POSSalesLine."No.") then begin
                 TempItemToAdjust."No." := POSSalesLine."No.";
                 TempItemToAdjust.Insert;
               end;
             end;
             //+NPR5.38 [301600]
+
+            //-NPR5.52 [369231]
+            if (POSSalesLine."Retail Serial No." <> '') then
+              HandleRetailSerialNo (POSSalesLine);
+            //+NPR5.52 [369231]
+
           until POSSalesLine.Next  = 0;
+
         end;
 
         //-NPR5.38 [301600]
         //COMMIT;
-        if NPRetailSetup."Adj. Cost after Item Posting" then begin
+        //IF NPRetailSetup."Adj. Cost after Item Posting" THEN BEGIN  //NPR5.52 [365326]-revoked
+        if POSPostingProfile."Adj. Cost after Item Posting" then begin  //NPR5.52 [365326]
           if TempItemToAdjust.FindSet then repeat
             AdjustCostItemEntries.UseRequestPage(false);
             AdjustCostItemEntries.InitializeRequest(TempItemToAdjust."No.",'');
@@ -87,7 +103,8 @@ codeunit 6150616 "POS Post Item Entries"
             Clear(AdjustCostItemEntries);
           until TempItemToAdjust.Next = 0;
         end;
-        if NPRetailSetup."Post to G/L after Item Posting" then begin
+        //IF NPRetailSetup."Post to G/L after Item Posting" THEN BEGIN  //NPR5.52 [365326]-revoked
+        if POSPostingProfile."Post to G/L after Item Posting" then begin  //NPR5.52 [365326]
           PostInventoryCosttoGL.UseRequestPage(false);
           PostInventoryCosttoGL.InitializeRequest(1,'',true);
           PostInventoryCosttoGL.SaveAsXml(FileManagement.ServerTempFileName('.xml'));
@@ -355,6 +372,97 @@ codeunit 6150616 "POS Post Item Entries"
         exit(false);
     end;
 
+    local procedure CheckAndCreateAssemblyOrder(FailOnError: Boolean;POSEntry: Record "POS Entry";POSSalesLine: Record "POS Sales Line"): Boolean
+    var
+        Item: Record Item;
+        AssemblyHeader: Record "Assembly Header";
+        POSEntrySalesDocLink: Record "POS Entry Sales Doc. Link";
+        AssemblySetup: Record "Assembly Setup";
+        AssemblyPost: Codeunit "Assembly-Post";
+        CreateAssembly: Boolean;
+        CreateAssemblyLink: Boolean;
+    begin
+
+        //-NPR5.52 [372920]
+        if (POSSalesLine.Type <> POSSalesLine.Type::Item) then
+          exit (true);
+
+        if (POSSalesLine.Quantity <= 0) then
+          exit (true);
+
+        Item.Get (POSSalesLine."No.");
+        if (Item."Replenishment System" <> Item."Replenishment System"::Assembly) then
+          exit (true);
+
+        if (Item."Assembly Policy" <> Item."Assembly Policy"::"Assemble-to-Order") then
+          exit (true);
+
+        CreateAssembly := true;
+        CreateAssemblyLink := true;
+
+        POSEntrySalesDocLink.SetFilter ("POS Entry No.", '=%1', POSEntry."Entry No.");
+        POSEntrySalesDocLink.SetFilter ("POS Entry Reference Type", '=%1', POSEntrySalesDocLink."POS Entry Reference Type"::SALESLINE);
+        POSEntrySalesDocLink.SetFilter ("POS Entry Reference Line No.", '=%1', POSSalesLine."Line No.");
+        POSEntrySalesDocLink.SetFilter ("Sales Document Type", '=%1', POSEntrySalesDocLink."Sales Document Type"::ASSEMBLY_ORDER);
+        if (POSEntrySalesDocLink.FindFirst ()) then begin
+          CreateAssemblyLink := false;
+          CreateAssembly := (not AssemblyHeader.Get (AssemblyHeader."Document Type"::Order, POSEntrySalesDocLink."Sales Document No"));
+
+        end else begin
+          POSEntrySalesDocLink.SetFilter ("Sales Document Type", '=%1', POSEntrySalesDocLink."Sales Document Type"::POSTED_ASSEMBLY_ORDER);
+          if (not POSEntrySalesDocLink.IsEmpty ()) then
+            exit (true); // assembly was already posted for this line
+        end;
+
+        if (CreateAssembly) then begin
+          AssemblyHeader.Init;
+          AssemblyHeader.Validate ("Document Type", AssemblyHeader."Document Type"::Order);
+          AssemblyHeader.Insert (true);
+
+          AssemblyHeader.Validate ("Posting Date", POSEntry."Posting Date");
+          AssemblyHeader.Validate ("Item No.", POSSalesLine."No.");
+          AssemblyHeader.Validate ("Variant Code", POSSalesLine."Variant Code");
+          AssemblyHeader.Validate ("Location Code", POSSalesLine."Location Code");
+          AssemblyHeader.Validate (Quantity, POSSalesLine.Quantity);
+          AssemblyHeader."Description 2" := StrSubstNo ('%1: %2 - %3', POSEntry."Entry No.", POSEntry."Document No.", POSSalesLine."Line No.");
+          AssemblyHeader."Posting No." := AssemblyHeader."No.";
+          AssemblyHeader.Modify (true);
+        end;
+
+        if (CreateAssemblyLink) then begin
+          POSEntrySalesDocLink."POS Entry No." := POSEntry."Entry No.";
+          POSEntrySalesDocLink."POS Entry Reference Type" := POSEntrySalesDocLink."POS Entry Reference Type"::SALESLINE;
+          POSEntrySalesDocLink."POS Entry Reference Line No." := POSSalesLine."Line No.";
+          POSEntrySalesDocLink."Sales Document Type" := POSEntrySalesDocLink."Sales Document Type"::ASSEMBLY_ORDER;
+          POSEntrySalesDocLink."Sales Document No" := AssemblyHeader."No.";
+          POSEntrySalesDocLink.Insert ();
+        end;
+
+        if ((not CreateAssemblyLink) and (CreateAssembly)) then begin
+          POSEntrySalesDocLink."Sales Document No" := AssemblyHeader."No.";
+          POSEntrySalesDocLink.Modify ();
+        end;
+
+        // Commit the item posting for POS Sale, before attempting to post assembly order - note: there are commits in the AssemblyPost.RUN ();
+        Commit;
+
+        if (AssemblyPost.Run (AssemblyHeader)) then begin
+          POSEntrySalesDocLink.Delete ();
+          POSEntrySalesDocLink."Sales Document Type" := POSEntrySalesDocLink."Sales Document Type"::POSTED_ASSEMBLY_ORDER;
+          if (AssemblyHeader."Posting No." <> '') then
+            POSEntrySalesDocLink."Sales Document No" := AssemblyHeader."Posting No.";
+          if (not POSEntrySalesDocLink.Insert ()) then ;
+          Commit;
+          exit (true);
+        end;
+
+        if (FailOnError) then
+          Error (GetLastErrorText);
+
+        exit (false);
+        //+NPR5.52 [372920]
+    end;
+
     local procedure CheckAndCreateServiceItemPos(POSEntry: Record "POS Entry";POSSalesLine: Record "POS Sales Line")
     var
         ServItem: Record "Service Item";
@@ -549,6 +657,51 @@ codeunit 6150616 "POS Post Item Entries"
             Currency."Unit-Amount Rounding Precision"));
 
         //+NPR5.50 [351655]
+    end;
+
+    local procedure HandleRetailSerialNo(POSSalesLine: Record "POS Sales Line")
+    var
+        ItemCrossReference: Record "Item Cross Reference";
+    begin
+
+        //-NPR5.52 [369231]
+        if (POSSalesLine."Retail Serial No." = '') then
+          exit;
+
+        ItemCrossReference.SetCurrentKey ("Cross-Reference No.");
+        ItemCrossReference.SetFilter ("Cross-Reference No.", '=%1', POSSalesLine."Retail Serial No.");
+        ItemCrossReference.SetFilter ("Is Retail Serial No.", '=%1', true);
+        ItemCrossReference.SetFilter ("Discontinue Bar Code", '=%1', false);
+        if (ItemCrossReference.FindFirst ()) then begin
+          ItemCrossReference."Discontinue Bar Code" := true;
+          ItemCrossReference.Modify ();
+        end;
+
+        //+NPR5.52 [369231]
+    end;
+
+    procedure PostAssemblyOrders(POSEntry: Record "POS Entry";FailOnError: Boolean): Boolean
+    var
+        POSSalesLine: Record "POS Sales Line";
+    begin
+        //-NPR5.52 [372920]
+
+        if not PostToEntries(POSEntry) then
+          exit;
+
+        POSSalesLine.Reset;
+        POSSalesLine.SetRange ("POS Entry No.", POSEntry."Entry No.");
+        POSSalesLine.SetRange (Type, POSSalesLine.Type::Item);
+        POSSalesLine.SetFilter (Quantity,'>%1', 0);
+        POSSalesLine.SetRange("Exclude from Posting",false);
+        if POSSalesLine.FindSet then repeat
+          // Assembly posting does alot of commits in posting codeunit 900
+          if (not CheckAndCreateAssemblyOrder (FailOnError, POSEntry, POSSalesLine)) then
+            exit (false);
+        until (POSSalesLine.Next () = 0);
+
+        exit (true);
+        //+NPR5.52 [372920]
     end;
 
     local procedure "---Events"()

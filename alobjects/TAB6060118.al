@@ -10,6 +10,7 @@ table 6060118 "TM Admission Schedule"
     // TM1.28/TSA /20180131 CASE 303925 Added Admission Base Calendar Code to establish "non-working" days.
     // TM1.37/TSA /20180905 CASE 327324 Added fields for better control of arrival window
     // TM1.41/TSA /20190429 CASE 353352 Stop time and event duration is kept under better sync.
+    // TM1.43/TSA /20190903 CASE 357359 Added option to Capacity Control (SEATING)
 
     Caption = 'Admission Schedule';
 
@@ -199,8 +200,8 @@ table 6060118 "TM Admission Schedule"
         field(44;"Capacity Control";Option)
         {
             Caption = 'Capacity Control';
-            OptionCaption = 'None,Sales,Admitted,Full';
-            OptionMembers = "NONE",SALES,ADMITTED,FULL;
+            OptionCaption = 'None,Sales,Admitted,Admitted & Departed,Seating';
+            OptionMembers = "NONE",SALES,ADMITTED,FULL,SEATING;
         }
         field(45;"Prebook From";DateFormula)
         {

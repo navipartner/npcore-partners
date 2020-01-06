@@ -1,6 +1,7 @@
 xmlport 6151155 "M2 Update Shipto Address"
 {
     // NPR5.48/TSA /20181221 CASE 320424 Intial Version
+    // MAG2.23/TSA /20191015 CASE 373151 Added the contact field
 
     Caption = 'Add Shipto Address';
     Encoding = UTF8;
@@ -59,6 +60,9 @@ xmlport 6151155 "M2 Update Shipto Address"
                         {
                         }
                         fieldelement(Telephone;TmpShipToAddressRequest."Phone No.")
+                        {
+                        }
+                        fieldelement(Contact;TmpShipToAddressRequest.Contact)
                         {
                         }
                     }
@@ -149,6 +153,9 @@ xmlport 6151155 "M2 Update Shipto Address"
                             {
                             }
                             fieldelement(Telephone;TmpShipToAddressResponse."Phone No.")
+                            {
+                            }
+                            fieldelement(Contact;TmpShipToAddressResponse.Contact)
                             {
                             }
                         }

@@ -6,6 +6,7 @@ page 6151461 "Magento Customer Mapping"
     DelayedInsert = true;
     PageType = List;
     SourceTable = "Magento Customer Mapping";
+    UsageCategory = Administration;
 
     layout
     {

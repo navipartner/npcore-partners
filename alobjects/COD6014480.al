@@ -160,7 +160,7 @@ codeunit 6014480 "Retail Document Handling"
             if SalePOS."Customer No." <> '' then
                 RetailDocumentHeader.Validate("Customer No.", SalePOS."Customer No.")
             else
-                RetailDocumentHeader."Prices Including VAT" := SalePOS."Price including VAT";
+            RetailDocumentHeader."Prices Including VAT" := SalePOS."Prices Including VAT";
 
             RetailDocumentHeader."Salesperson Code" := SalePOS."Salesperson Code";
             RetailDocumentHeader.Date := Today;

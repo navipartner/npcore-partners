@@ -11,6 +11,7 @@ table 6151502 "Nc Task"
     // NC2.05/MHA /20170615  CASE 280860 NcTaskField.Processed has been deleted
     // NC2.12/MHA /20180418  CASE 308107 Added Task Output to OnDelete()
     // NC2.14/MHA /20180629  CASE 320762 Added field 25 "Record ID"
+    // NC2.23/MHA /20190927  CASE 369170 Field 70220322 "NaviPartner Case Url" Removed
 
     Caption = 'Nc Task';
 
@@ -125,12 +126,6 @@ table 6151502 "Nc Task"
             Editable = false;
             TableRelation = "Nc Task Processor";
         }
-        field(70220322;"NaviPartner Case Url";Text[250])
-        {
-            Caption = 'NaviPartner Case Url';
-            Editable = false;
-            ExtendedDatatype = URL;
-        }
     }
 
     keys
@@ -165,18 +160,6 @@ table 6151502 "Nc Task"
         NcTaskOutput.SetRange("Task Entry No.","Entry No.");
         NcTaskOutput.DeleteAll;
         //+NC2.12 [308107]
-    end;
-
-    trigger OnModify()
-    var
-        TaskField: Record "Nc Task Field";
-    begin
-        //-NC2.05 [280860]
-        // IF xRec.Processed <>  Processed THEN BEGIN
-        //  TaskField.SETRANGE("Task Entry No.","Entry No.");
-        //  TaskField.MODIFYALL(Processed,Processed);
-        // END;
-        //+NC2.05 [280860]
     end;
 }
 

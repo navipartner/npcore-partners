@@ -10,6 +10,7 @@ codeunit 6060045 "Item Wsht.-Check Line"
     // NPR5.35\BR \20170810  CASE 268786 Prevent errors with blank Variety values
     // NPR5.38/BR /20180112 CASE 268786 Only Create Item Worksheet Variety Value lines with "Create New" Item Worksheet Variant Lines
     // NPR5.50/THRO/20190515 CASE 355172 Removed error on internal/external barcode
+    // NPR5.52/THRO/20191018 CASE 373596 Change error message for missing item. Added Line No. to error message when StopOnError
 
 
     trigger OnRun()
@@ -51,6 +52,8 @@ codeunit 6060045 "Item Wsht.-Check Line"
         Text128: Label 'Item No. %1 is already used as a Barcode/Alternative No. for item %2. ';
         Text130: Label 'Internal Barcodes must start with 2.';
         TExt131: Label 'Vendor Barcodes must not start with 2.';
+        Text132: Label '%1 %2 not found.';
+        Text133: Label ' - %1: %2';
 
     procedure RunCheck(ItemWkshtLine: Record "Item Worksheet Line"; StopOnError: Boolean; CalledFromRegister: Boolean)
     var
@@ -208,7 +211,12 @@ codeunit 6060045 "Item Wsht.-Check Line"
                                         ProcessError(ItemWkshtLine, StrSubstNo(Text127, FieldCaption("Tariff No.")), StopOnError);
                             //+NPR4.19
                         end else begin
-                            ProcessError(ItemWkshtLine, StrSubstNo(Text123), StopOnError);
+                  //-NPR5.52 [373596]
+                  if "Existing Item No." <> '' then
+                    ProcessError(ItemWkshtLine,StrSubstNo(Text132,RecItem.TableCaption,"Existing Item No."),StopOnError)
+                  else
+                  //-NPR5.52 [373596]
+                    ProcessError(ItemWkshtLine,StrSubstNo(Text123),StopOnError);
                         end;
                     end;
 
@@ -485,6 +493,10 @@ codeunit 6060045 "Item Wsht.-Check Line"
     local procedure ProcessError(var ItemWkshtLine: Record "Item Worksheet Line"; ErrorText: Text[1024]; StopOnError: Boolean)
     begin
         if StopOnError then begin
+          //-NPR5.52 [373596]
+          if ItemWkshtLine."Line No." <> 0 then
+            ErrorText += StrSubstNo(Text133,ItemWkshtLine.FieldCaption("Line No."),ItemWkshtLine."Line No.");
+          //+NPR5.52 [373596]
             Error(ErrorText)
         end else begin
             if ItemWkshtLine.Status = ItemWkshtLine.Status::Error then begin

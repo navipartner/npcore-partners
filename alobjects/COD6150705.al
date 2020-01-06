@@ -553,7 +553,7 @@ codeunit 6150705 "POS Sale"
           Date                    := Today;
           "Start Time"            := Time;
           "External Document No." := SalePOS."External Document No.";
-          "Price including VAT"   := SalePOS."Price including VAT";
+          "Prices Including VAT"   := SalePOS."Prices Including VAT";
           Modify(true);
 
           POSInfoManagement.RetrieveSavedLines(Rec, SalePOS);

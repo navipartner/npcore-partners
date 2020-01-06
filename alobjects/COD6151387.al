@@ -21,6 +21,12 @@ codeunit 6151387 "CS UI Warehouse Activity"
     // NPR5.51/CLVA/20190612 CASE 357577 Added posting date functionality
     // NPR5.51/CLVA/20190628 CASE 360425 Summarizing qty
     // NPR5.51/CLVA/20190619 CASE 359268 Added receive posting.
+    // NPR5.52/CLVA/20190904 CASE 365967 Added support for Job Queue Posting and setup "Sum Qty. to Handle"
+    // NPR5.52/CLVA/20191010 CASE 370452 Changed posting functionality
+    // NPR5.52/TJ  /20191010 CASE 371682 Renamed function UpdateTakeLine to UpdateActivityLine and removed parameter QtyToHandle
+    //                                   Updating both Place and Take lines
+    //                                   Fixed suggested quantity after scan
+    //                                   Fixed quantity assign on split lines
 
     TableNo = "CS UI Header";
 
@@ -175,7 +181,10 @@ codeunit 6151387 "CS UI Warehouse Activity"
               if not Evaluate(ActionIndex,CSCommunication.GetNodeAttribute(ReturnedNode,'ActionIndex')) then
                 //-NPR5.50 [347971]
                 //ActionIndex := 1;
-                ActionIndex := 2;
+                //ActionIndex := 2;
+                //-NPR5.52 [370452]
+                ActionIndex := MiniformHeader."Posting Type" + 1;
+                //+NPR5.52 [370452]
                 //+NPR5.50 [347971]
               //+NPR5.48 [335606]
               Register(CSWarehouseActivityHandling,ActionIndex);
@@ -276,7 +285,10 @@ codeunit 6151387 "CS UI Warehouse Activity"
         CSCommunication.GetReturnXML(DOMxmlin);
 
         //-NPR5.50 [347971]
-        if MiniformHeader."Add Posting Options" then
+        //-NPR5.52 [370452]
+        //IF MiniformHeader."Add Posting Options" THEN
+        if MiniformHeader."Posting Type" = MiniformHeader."Posting Type"::"Handle & Invoice" then
+        //+NPR5.52 [370452]
         //+NPR5.50 [347971]
           AddAdditionalInfo(DOMxmlin,CSWarehouseActivityHandling);
 
@@ -299,6 +311,7 @@ codeunit 6151387 "CS UI Warehouse Activity"
         WhseActivityLine: Record "Warehouse Activity Line";
         QtytoHandle: Decimal;
         QtyOutstanding: Decimal;
+        CSSetup: Record "CS Setup";
     begin
         if InputValue = '' then begin
           Remark := Text005;
@@ -338,25 +351,40 @@ codeunit 6151387 "CS UI Warehouse Activity"
           exit;
         end;
 
-        //-NPR5.51 [360425]
-        QtytoHandle := 0;
-        QtyOutstanding := 0;
+        //-NPR5.52 [365967]
+        CSSetup.Get;
+        if CSSetup."Sum Qty. to Handle" then begin
+        //+NPR5.52 [365967]
+          //-#360425 [360425]
+          QtytoHandle := 0;
+          QtyOutstanding := 0;
 
-        WhseActivityLine.SetCurrentKey("Activity Type","No.","Sorting Sequence No.");
-        WhseActivityLine.SetRange("Activity Type",CSWarehouseActivityHandling."Activity Type");
-        WhseActivityLine.SetRange("No.",CSWarehouseActivityHandling."No.");
-        WhseActivityLine.SetRange("Item No.",CSWarehouseActivityHandling."Item No.");
-        WhseActivityLine.SetRange("Variant Code",CSWarehouseActivityHandling."Variant Code");
-        if WhseActivityLine.FindSet then begin
-          repeat
-            QtytoHandle := QtytoHandle + WhseActivityLine."Qty. to Handle";
-            QtyOutstanding := QtyOutstanding + WhseActivityLine."Qty. Outstanding";
-          until WhseActivityLine.Next = 0;
+          WhseActivityLine.SetCurrentKey("Activity Type","No.","Sorting Sequence No.");
+          WhseActivityLine.SetRange("Activity Type",CSWarehouseActivityHandling."Activity Type");
+          WhseActivityLine.SetRange("No.",CSWarehouseActivityHandling."No.");
+          WhseActivityLine.SetRange("Item No.",CSWarehouseActivityHandling."Item No.");
+          WhseActivityLine.SetRange("Variant Code",CSWarehouseActivityHandling."Variant Code");
+          //-NPR5.52 [371682]
+          case CSWarehouseActivityHandling."Activity Type" of
+            CSWarehouseActivityHandling."Activity Type"::Pick:
+              WhseActivityLine.SetRange("Action Type",WhseActivityLine."Action Type"::Take);
+            CSWarehouseActivityHandling."Activity Type"::"Put-away":
+              WhseActivityLine.SetRange("Action Type",WhseActivityLine."Action Type"::Place);
+          end;
+          //+NPR5.52 [371682]
+          if WhseActivityLine.FindSet then begin
+            repeat
+              QtytoHandle := QtytoHandle + WhseActivityLine."Qty. to Handle";
+              QtyOutstanding := QtyOutstanding + WhseActivityLine."Qty. Outstanding";
+            until WhseActivityLine.Next = 0;
 
-          CSWarehouseActivityHandling.Qty := QtyOutstanding - QtytoHandle;
+            CSWarehouseActivityHandling.Qty := QtyOutstanding - QtytoHandle;
 
+          end;
+          //+#360425 [360425]
+        //-NPR5.52 [365967]
         end;
-        //+NPR5.51 [360425]
+        //+NPR5.52 [365967]
 
         CSWarehouseActivityHandling.Barcode := InputValue;
     end;
@@ -888,10 +916,10 @@ codeunit 6151387 "CS UI Warehouse Activity"
     begin
         Remark := '';
         WhseActivityLine.SetRange("No.",CSWarehouseActivityHandling."No.");
-
+        
         if Location.Get(CSWarehouseActivityHandling."Location Code") then
           BinIsMandatory := Location."Bin Mandatory";
-
+        
         if BinIsMandatory then begin
           case CSWarehouseActivityHandling."Activity Type" of
             CSWarehouseActivityHandling."Activity Type"::Pick : WhseActivityLine.SetRange("Action Type",WhseActivityLine."Action Type"::Take);
@@ -903,7 +931,7 @@ codeunit 6151387 "CS UI Warehouse Activity"
             CSWarehouseActivityHandling."Activity Type"::"Invt. Pick" : WhseActivityLine.SetRange("Activity Type",WhseActivityLine."Activity Type"::"Invt. Pick");
           end;
         end;
-
+        
         if WhseActivityLine.FindSet then begin
           repeat
               //-NPR5.49 [346070]
@@ -914,15 +942,21 @@ codeunit 6151387 "CS UI Warehouse Activity"
               //WhseActivityLine.VALIDATE("Bin Code",'');
               //+NPR5.50 [247747]
               WhseActivityLine.Modify;
+              //-NPR5.52 [371682]
+              /*
               //-NPR5.49 [346070]
               UpdateTakeLine(WhseActivityLine,xRecQtyToHandle,1);
               //+NPR5.49 [346070]
+              */
+              UpdateActivityLine(WhseActivityLine,1);
+              //+NPR5.52 [371682]
           until WhseActivityLine.Next = 0;
         end else
           Error(Text007);
-
+        
         CSCommunication.SetRecRef(RecRef);
         ActiveInputField := 1;
+
     end;
 
     local procedure Register(CSWarehouseActivityHandling: Record "CS Warehouse Activity Handling";Index: Integer)
@@ -931,20 +965,50 @@ codeunit 6151387 "CS UI Warehouse Activity"
         WhseActivityRegister: Codeunit "Whse.-Activity-Register";
         WhseActivityPost: Codeunit "Whse.-Activity-Post";
         WarehouseActivityHeader: Record "Warehouse Activity Header";
+        CSSetup: Record "CS Setup";
+        PostingRecRef: RecordRef;
+        CSPostingBuffer: Record "CS Posting Buffer";
+        CSPostEnqueue: Codeunit "CS Post - Enqueue";
     begin
         Remark := '';
+
+        //-NPR5.52 [365967]
+        CSSetup.Get;
+        if CSSetup."Post with Job Queue" then begin
+          WarehouseActivityHeader.Get(CSWarehouseActivityHandling."Activity Type",CSWarehouseActivityHandling."No.");
+          PostingRecRef.GetTable(WarehouseActivityHeader);
+          CSPostingBuffer.Init;
+          CSPostingBuffer."Table No." := PostingRecRef.Number;
+          CSPostingBuffer."Record Id" := PostingRecRef.RecordId;
+          CSPostingBuffer."Posting Index" := Index;
+          CSPostingBuffer."Update Posting Date" := MiniformHeader."Update Posting Date";
+          case CSWarehouseActivityHandling."Activity Type" of
+            CSWarehouseActivityHandling."Activity Type"::"Invt. Movement" : CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::"Invt. Movement";
+            CSWarehouseActivityHandling."Activity Type"::"Invt. Pick" : CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::"Invt. Pick";
+            CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away" : CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::"Invt. Put-away";
+            CSWarehouseActivityHandling."Activity Type"::Movement : CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::Movement;
+            CSWarehouseActivityHandling."Activity Type"::Pick : CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::Pick;
+            CSWarehouseActivityHandling."Activity Type"::"Put-away" : CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::"Put-away";
+          end;
+          if CSPostingBuffer.Insert(true) then
+            CSPostEnqueue.Run(CSPostingBuffer)
+          else
+            Remark := GetLastErrorText;
+          exit;
+        end;
+        //+NPR5.52 [365967]
 
         WhseActivityLine.SetRange("No.",CSWarehouseActivityHandling."No.");
 
         if WhseActivityLine.FindSet then begin
 
-          //-NPR5.51 [357577]
+          //-#357577 [357577]
           if MiniformHeader."Update Posting Date" then begin
             WarehouseActivityHeader.Get(CSWarehouseActivityHandling."Activity Type",CSWarehouseActivityHandling."No.");
             WarehouseActivityHeader.Validate("Posting Date",Today);
             WarehouseActivityHeader.Modify(true);
           end;
-          //+NPR5.51 [357577]
+          //+#357577 [357577]
 
           repeat
             case CSWarehouseActivityHandling."Activity Type" of
@@ -955,15 +1019,15 @@ codeunit 6151387 "CS UI Warehouse Activity"
                   end;
                 end;
               CSWarehouseActivityHandling."Activity Type"::"Invt. Pick",CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away" : begin
-                  //-NPR5.51 [359268]
+                  //-#359268 [359268]
                   if WhseActivityLine."Qty. to Handle" <> 0 then begin
-                  //+NPR5.51 [359268]
+                  //+#359268 [359268]
                     WhseActivityPost.SetInvoiceSourceDoc(Index = 2);
                     WhseActivityPost.Run(WhseActivityLine);
                     Clear(WhseActivityPost);
-                  //-NPR5.51 [359268]
+                  //-#359268 [359268]
                   end;
-                  //+NPR5.51 [359268]
+                  //+#359268 [359268]
                 end;
             end;
           until WhseActivityLine.Next = 0;
@@ -995,7 +1059,7 @@ codeunit 6151387 "CS UI Warehouse Activity"
         //+NPR5.50 [247747]
         if Location.Get(CSWarehouseActivityHandling."Location Code") then
           BinIsMandatory := Location."Bin Mandatory";
-
+        
         if BinIsMandatory then begin
           case CSWarehouseActivityHandling."Activity Type" of
             CSWarehouseActivityHandling."Activity Type"::Pick : WhseActivityLine.SetRange("Action Type",WhseActivityLine."Action Type"::Take);
@@ -1007,9 +1071,9 @@ codeunit 6151387 "CS UI Warehouse Activity"
             CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away" : WhseActivityLine.SetRange("Activity Type",WhseActivityLine."Activity Type"::"Invt. Put-away");
           end;
         end;
-
+        
         if WhseActivityLine.FindSet then begin
-
+        
           Clear(WhseActivityLineSum);
           WhseActivityLineSum.CopyFilters(WhseActivityLine);
           if WhseActivityLineSum.FindSet then begin
@@ -1017,9 +1081,9 @@ codeunit 6151387 "CS UI Warehouse Activity"
               QtytoHandle := QtytoHandle + WhseActivityLineSum."Qty. to Handle";
               QtyOutstanding := QtyOutstanding + WhseActivityLineSum."Qty. Outstanding";
             until WhseActivityLineSum.Next = 0;
-
+        
             CurrQtytoHandle := CSWarehouseActivityHandling.Qty;
-
+        
         //UOM handling
         //    Item.GET(CSWarehouseActivityHandling."Item No.");
         //    IF (CSWarehouseActivityHandling."Unit of Measure" <> '') THEN BEGIN
@@ -1028,14 +1092,14 @@ codeunit 6151387 "CS UI Warehouse Activity"
         //          CurrQtytoHandle := CalcBaseQty(WhseActivityLine,ItemUnitofMeasure."Qty. per Unit of Measure");
         //      END;
         //    END;
-
+        
           end;
-
+        
           repeat
-
+        
             //IF (WhseActivityLine."Qty. to Handle" < WhseActivityLine."Qty. Outstanding") THEN BEGIN
             if (QtytoHandle < QtyOutstanding) then begin
-
+        
         //-NPR5.50 [247747]
         //      IF (CSWarehouseActivityHandling."Bin Code" <> WhseActivityLine."Bin Code") AND (WhseActivityLine."Bin Code" <> '') THEN BEGIN
         //        //ERROR(Text018,WhseActivityLine."Bin Code");
@@ -1043,9 +1107,9 @@ codeunit 6151387 "CS UI Warehouse Activity"
         //        EXIT(FALSE);
         //      END;
         //+NPR5.50 [247747]
-
+        
               FoundedRecToUpdate := true;
-
+        
               //IF (WhseActivityLine."Qty. to Handle" + CSWarehouseActivityHandling.Qty) > WhseActivityLine."Qty. Outstanding" THEN BEGIN
               if ((QtytoHandle + CSWarehouseActivityHandling.Qty) > QtyOutstanding) or (CurrQtytoHandle > QtyOutstanding) then begin
                 //-NPR5.48 [335606]
@@ -1054,15 +1118,17 @@ codeunit 6151387 "CS UI Warehouse Activity"
                 exit(false);
                 //-NPR5.48 [335606]
               end;// ELSE
-
+        
         //      ERROR('QtytoHandle: ' + FORMAT(QtytoHandle) +
         //          '\' + 'QtyOutstanding: ' + FORMAT(QtyOutstanding) +
         //          '\' + 'CurrQtytoHandle: ' + FORMAT(CurrQtytoHandle));
-
+        
               if (WhseActivityLine."Qty. to Handle" < WhseActivityLine."Qty. Outstanding") and (CurrQtytoHandle > 0) then begin
-
+        
                 //IF (WhseActivityLine."Qty. to Handle" + CSWarehouseActivityHandling.Qty) <= WhseActivityLine."Qty. Outstanding" THEN BEGIN
                 if (WhseActivityLine."Qty. to Handle" + CurrQtytoHandle) <= WhseActivityLine."Qty. Outstanding" then begin
+                  //-NPR5.52 [371682]
+                  /*
                   //-NPR5.50 [247747]
                   //IF CurrQtytoHandle > 0 THEN BEGIN
                   //  Qty := CurrQtytoHandle;
@@ -1072,32 +1138,41 @@ codeunit 6151387 "CS UI Warehouse Activity"
                     CurrQtytoHandle := CurrQtytoHandle - CSWarehouseActivityHandling.Qty;
                   //END;
                   //+NPR5.50 [247747]
+                  */
+                  Qty := WhseActivityLine."Qty. to Handle" + CurrQtytoHandle;
+                  CurrQtytoHandle := 0;
+                  //+NPR5.52 [371682]
                 end else begin
                   Qty := WhseActivityLine."Qty. Outstanding" - WhseActivityLine."Qty. to Handle";
                   CurrQtytoHandle := CurrQtytoHandle - Qty;
                 end;
-
+        
         //        ERROR('QtytoHandle: ' + FORMAT(QtytoHandle) +
         //          '\' + 'QtyOutstanding: ' + FORMAT(QtyOutstanding) +
         //          '\' + 'Qty: ' + FORMAT(Qty) +
         //          '\' + 'CurrQtytoHandle: ' + FORMAT(CurrQtytoHandle) +
         //          '\' + 'CSWarehouseActivityHandling.Qty: ' + FORMAT(CSWarehouseActivityHandling.Qty));
-
+        
                 WhseActivityLine.Validate("Qty. to Handle", Qty);
                 //-NPR5.50 [247747]
                 if CSWarehouseActivityHandling."Bin Code" <> '' then
                   WhseActivityLine.Validate("Bin Code",CSWarehouseActivityHandling."Bin Code");
                 //-NPR5.50 [247747]
                 WhseActivityLine.Modify(true);
+                //-NPR5.52 [371682]
+                /*
                 //-NPR5.49 [346070]
                 UpdateTakeLine(WhseActivityLine,WhseActivityLine."Qty. to Handle",0);
                 //+NPR5.49 [346070]
+                */
+                UpdateActivityLine(WhseActivityLine,0);
+                //+NPR5.52 [371682]
               end;
             end;
-
+        
           //UNTIL (WhseActivityLine.NEXT = 0) OR FoundedRecToUpdate;
           until (WhseActivityLine.Next = 0) or (CurrQtytoHandle = 0);
-
+        
           if not FoundedRecToUpdate then begin
             //-NPR5.48 [335606]
             //ERROR(Text016);
@@ -1105,13 +1180,14 @@ codeunit 6151387 "CS UI Warehouse Activity"
             exit(false);
             //-NPR5.48 [335606]
           end;
-
+        
         end else begin
           Remark := StrSubstNo(Text021,CSWarehouseActivityHandling."Item No.",CSWarehouseActivityHandling."No.");
           exit(false);
         end;
-
+        
         exit(true);
+
     end;
 
     procedure CheckBalanceQtyToHandle(var WhseActivLine2: Record "Warehouse Activity Line"): Boolean
@@ -1295,35 +1371,77 @@ codeunit 6151387 "CS UI Warehouse Activity"
         exit(Round(Qty * WhseActivLine."Qty. per Unit of Measure",0.00001));
     end;
 
-    local procedure UpdateTakeLine(WhseActivityLine: Record "Warehouse Activity Line";QtyToHandle: Decimal;ActionToTake: Option Increase,Decrease)
+    local procedure UpdateActivityLine(WhseActivityLine: Record "Warehouse Activity Line";ActionToTake: Option Increase,Decrease)
     var
-        WhseActivityLineTake: Record "Warehouse Activity Line";
+        WhseActivityLineUpdate: Record "Warehouse Activity Line";
+        UpdateActionType: Integer;
+        QtyToHandle: Decimal;
     begin
+        //-NPR5.52 [371682]
+        /*
         //-NPR5.50 [348151]
-        if not (WhseActivityLine."Action Type" = WhseActivityLine."Action Type"::Place) then
-          exit;
+        IF NOT (WhseActivityLine."Action Type" = WhseActivityLine."Action Type"::Place) THEN
+          EXIT;
         //+NPR5.50 [348151]
-
+        
         //-NPR5.49 [346070]
+        IF ActionToTake = ActionToTake::Decrease THEN
+          QtyToHandle := -1 * QtyToHandle;
+        WhseActivityLineTake.SETRANGE("Activity Type",WhseActivityLine."Activity Type");
+        WhseActivityLineTake.SETRANGE("No.",WhseActivityLine."No.");
+        WhseActivityLineTake.SETRANGE("Source Type",WhseActivityLine."Source Type");
+        WhseActivityLineTake.SETRANGE("Source Subtype",WhseActivityLine."Source Subtype");
+        WhseActivityLineTake.SETRANGE("Source No.",WhseActivityLine."Source No.");
+        WhseActivityLineTake.SETRANGE("Source Line No.",WhseActivityLine."Source Line No.");
+        WhseActivityLineTake.SETRANGE("Action Type",WhseActivityLineTake."Action Type"::Take);
+        IF WhseActivityLineTake.FINDFIRST THEN BEGIN
+          //-NPR5.50 [349530]
+          IF ActionToTake = ActionToTake::Increase THEN
+            WhseActivityLineTake.VALIDATE("Qty. to Handle",QtyToHandle)
+          ELSE
+          //-NPR5.50 [349530]
+            WhseActivityLineTake.VALIDATE("Qty. to Handle",WhseActivityLineTake."Qty. to Handle" + QtyToHandle);
+          WhseActivityLineTake.MODIFY(TRUE);
+        END;
+        //+NPR5.49 [346070]
+        */
+        if WhseActivityLine."Action Type" = WhseActivityLine."Action Type"::" " then
+          exit;
+        case WhseActivityLine."Action Type" of
+          WhseActivityLine."Action Type"::Place:
+            UpdateActionType := WhseActivityLine."Action Type"::Take;
+          WhseActivityLine."Action Type"::Take:
+            UpdateActionType := WhseActivityLine."Action Type"::Place;
+        end;
+        
+        WhseActivityLine.SetRange("Activity Type",WhseActivityLine."Activity Type");
+        WhseActivityLine.SetRange("No.",WhseActivityLine."No.");
+        WhseActivityLine.SetRange("Source Type",WhseActivityLine."Source Type");
+        WhseActivityLine.SetRange("Source Subtype",WhseActivityLine."Source Subtype");
+        WhseActivityLine.SetRange("Source No.",WhseActivityLine."Source No.");
+        WhseActivityLine.SetRange("Source Line No.",WhseActivityLine."Source Line No.");
+        WhseActivityLine.SetRange("Action Type",WhseActivityLine."Action Type");
+        if WhseActivityLine.FindSet then
+          repeat
+            QtyToHandle += WhseActivityLine."Qty. to Handle";
+          until WhseActivityLine.Next = 0;
+        
         if ActionToTake = ActionToTake::Decrease then
           QtyToHandle := -1 * QtyToHandle;
-        WhseActivityLineTake.SetRange("Activity Type",WhseActivityLine."Activity Type");
-        WhseActivityLineTake.SetRange("No.",WhseActivityLine."No.");
-        WhseActivityLineTake.SetRange("Source Type",WhseActivityLine."Source Type");
-        WhseActivityLineTake.SetRange("Source Subtype",WhseActivityLine."Source Subtype");
-        WhseActivityLineTake.SetRange("Source No.",WhseActivityLine."Source No.");
-        WhseActivityLineTake.SetRange("Source Line No.",WhseActivityLine."Source Line No.");
-        WhseActivityLineTake.SetRange("Action Type",WhseActivityLineTake."Action Type"::Take);
-        if WhseActivityLineTake.FindFirst then begin
-          //-NPR5.50 [349530]
-          if ActionToTake = ActionToTake::Increase then
-            WhseActivityLineTake.Validate("Qty. to Handle",QtyToHandle)
-          else
-          //-NPR5.50 [349530]
-            WhseActivityLineTake.Validate("Qty. to Handle",WhseActivityLineTake."Qty. to Handle" + QtyToHandle);
-          WhseActivityLineTake.Modify(true);
+        
+        WhseActivityLineUpdate.SetRange("Activity Type",WhseActivityLine."Activity Type");
+        WhseActivityLineUpdate.SetRange("No.",WhseActivityLine."No.");
+        WhseActivityLineUpdate.SetRange("Source Type",WhseActivityLine."Source Type");
+        WhseActivityLineUpdate.SetRange("Source Subtype",WhseActivityLine."Source Subtype");
+        WhseActivityLineUpdate.SetRange("Source No.",WhseActivityLine."Source No.");
+        WhseActivityLineUpdate.SetRange("Source Line No.",WhseActivityLine."Source Line No.");
+        WhseActivityLineUpdate.SetRange("Action Type",UpdateActionType);
+        if WhseActivityLineUpdate.FindFirst then begin
+          WhseActivityLineUpdate.Validate("Qty. to Handle",QtyToHandle);
+          WhseActivityLineUpdate.Modify(true);
         end;
-        //+NPR5.49 [346070]
+        //+NPR5.52 [371682]
+
     end;
 
     [EventSubscriber(ObjectType::Table, 7317, 'OnAfterInsertEvent', '', true, true)]

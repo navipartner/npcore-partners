@@ -15,7 +15,7 @@ page 6151393 "CS Store Users"
                 field("User ID";"User ID")
                 {
                 }
-                field("Location Code";"Location Code")
+                field("POS Store";"POS Store")
                 {
                 }
                 field(Supervisor;Supervisor)

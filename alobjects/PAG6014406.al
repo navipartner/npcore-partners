@@ -41,6 +41,7 @@ page 6014406 "Register Card"
     // NPR5.49/VB  /20181106 CASE 335141 Introducing the POS Theme functionality
     // NPR5.49/TJ  /20190201 CASE 335739 Fields 20,819,820,821,822,833 and 6150721 moved to new table
     //                                   Picture actions and decimal detect action moved to new page
+    // NPR5.52/ALPO/20190926 CASE 368673 Active event (from Event Management module) on cash register: new control "Active Event No."
 
     Caption = 'Cash Register Setup';
     RefreshOnActivate = true;
@@ -352,6 +353,9 @@ page 6014406 "Register Card"
                 {
                 }
                 field("Use Sales Statistics";"Use Sales Statistics")
+                {
+                }
+                field("Active Event No.";"Active Event No.")
                 {
                 }
             }

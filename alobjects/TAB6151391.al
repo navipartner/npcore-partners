@@ -1,6 +1,9 @@
 table 6151391 "CS Stock-Takes"
 {
     // NPR5.50/CLVA/20190304  CASE 332844 Object created
+    // NPR5.52/CLVA/20190905  CASE 364063 Refactored to use Item Journal
+    //                                    Added fields "Journal Template Name","Journal Batch Name","Predicted Qty." and "Inventory Calculated"
+    // NPR5.52/CLVA/20191102 CASE 375749 Changed code to support version specific changes (NAV 2018+).
 
     Caption = 'CS Stock-Takes';
 
@@ -46,7 +49,7 @@ table 6151391 "CS Stock-Takes"
         field(18;"Salesfloor Entries";Integer)
         {
             CalcFormula = Count("CS Stock-Takes Data" WHERE ("Stock-Take Id"=FIELD("Stock-Take Id"),
-                                                             "Worksheet Name"=FILTER('SALESFLOOR')));
+                                                             Area=CONST(Salesfloor)));
             Caption = 'Salesfloor Entries';
             FieldClass = FlowField;
         }
@@ -69,7 +72,7 @@ table 6151391 "CS Stock-Takes"
         field(23;"Stockroom Entries";Integer)
         {
             CalcFormula = Count("CS Stock-Takes Data" WHERE ("Stock-Take Id"=FIELD("Stock-Take Id"),
-                                                             "Worksheet Name"=FILTER('STOCKROOM')));
+                                                             Area=CONST(Stockroom)));
             Caption = 'Stockroom Entries';
             FieldClass = FlowField;
         }
@@ -131,6 +134,31 @@ table 6151391 "CS Stock-Takes"
         {
             Caption = 'Create Refill Data Ended';
         }
+        field(38;"Journal Template Name";Code[10])
+        {
+            Caption = 'Journal Template Name';
+            TableRelation = "Item Journal Template";
+        }
+        field(39;"Journal Batch Name";Code[10])
+        {
+            Caption = 'Journal Batch Name';
+            TableRelation = "Item Journal Batch".Name WHERE ("Journal Template Name"=FIELD("Journal Template Name"));
+        }
+        field(40;"Predicted Qty.";Decimal)
+        {
+            Caption = 'Predicted Qty.';
+            Editable = false;
+        }
+        field(41;"Inventory Calculated";Boolean)
+        {
+            Caption = 'Inventory Calculated';
+            Editable = false;
+        }
+        field(42;"Journal Posted";Boolean)
+        {
+            Caption = 'Journal Posted';
+            Editable = false;
+        }
     }
 
     keys
@@ -173,69 +201,185 @@ table 6151391 "CS Stock-Takes"
     var
         CSStockTakes: Record "CS Stock-Takes";
         Err_CSStockTakes: Label 'There is already an open Stock-Take with id %1';
-        Err_ConfirmForceClose: Label 'This will delete all Stock-Take Worksheet lines for location %1';
+        Err_ConfirmForceClose: Label 'This will delete Phy. Inventory Journal: %1 %2';
         Err_MissingLocation: Label 'Location is missing on POS Store';
         Err_SalesfloorClosed: Label 'Sales floor counting is not closed';
         Err_StockroomClosed: Label 'Stockroom counting is not closed';
         Err_RefillClosed: Label 'Refill is not closed';
         Txt_CountingCancelled: Label 'Counting was cancelled';
-        Err_StockTakeWorksheetNotEmpty: Label 'Worksheet is not empty for Stock-Take %1 %2';
+        Err_StockTakeWorksheetNotEmpty: Label 'Phy. Inventory Journal is not empty: %1 %2';
+        Err_PostingIsScheduled: Label 'Phy. Inventory Journal is scheduled for posting: %1 %2';
+        Text001: Label 'Location %1';
+        Text002: Label 'Calculate Inventory for Location %1';
+        Text003: Label 'There is no Items on Location %1';
 
     procedure CreateNewCounting()
     var
         LocationRec: Record Location;
-        StockTakeWorksheet: Record "Stock-Take Worksheet";
         CSHelperFunctions: Codeunit "CS Helper Functions";
-        StockTakeWorksheetLine: Record "Stock-Take Worksheet Line";
-        StockTakeConfiguration: Record "Stock-Take Configuration";
+        ItemJournalBatch: Record "Item Journal Batch";
+        ItemJournalLine: Record "Item Journal Line";
+        RecRef: RecordRef;
+        CSPostingBuffer: Record "CS Posting Buffer";
+        CSSetup: Record "CS Setup";
+        ItemJournalTemplate: Record "Item Journal Template";
+        CalculateInventory: Report "Calculate Inventory";
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+        Item: Record Item;
+        QtyCalculated: Decimal;
     begin
         if not LocationRec.Get(GetFilter(Location)) then
           Error(Err_MissingLocation);
 
-        CSHelperFunctions.CreateStockTakeWorksheet(Location,'SALESFLOOR',StockTakeWorksheet);
-        StockTakeWorksheet.TestField(Status,StockTakeWorksheet.Status::OPEN);
-        StockTakeWorksheetLine.SetRange("Stock-Take Config Code",StockTakeWorksheet."Stock-Take Config Code");
-        StockTakeWorksheetLine.SetRange("Worksheet Name",StockTakeWorksheet.Name);
-        if StockTakeWorksheetLine.Count > 0 then
-          Error(Err_StockTakeWorksheetNotEmpty,StockTakeWorksheet."Stock-Take Config Code",StockTakeWorksheet.Name);
+        //-NPR5.52 [364063]
+        Clear(CSStockTakes);
+        CSStockTakes.SetRange(Location,Location);
+        CSStockTakes.SetRange(Closed, 0DT);
+        if CSStockTakes.FindSet then
+         Error(Err_CSStockTakes,"Stock-Take Id");
 
-        CSHelperFunctions.CreateStockTakeWorksheet(Location,'STOCKROOM',StockTakeWorksheet);
-        StockTakeWorksheet.TestField(Status,StockTakeWorksheet.Status::OPEN);
-        StockTakeWorksheetLine.SetRange("Stock-Take Config Code",StockTakeWorksheet."Stock-Take Config Code");
-        StockTakeWorksheetLine.SetRange("Worksheet Name",StockTakeWorksheet.Name);
-        if StockTakeWorksheetLine.Count > 0 then
-          Error(Err_StockTakeWorksheetNotEmpty,StockTakeWorksheet."Stock-Take Config Code",StockTakeWorksheet.Name);
+        CSSetup.Get;
+        CSSetup.TestField("Phys. Inv Jour Temp Name");
+        ItemJournalTemplate.Get(CSSetup."Phys. Inv Jour Temp Name");
+        if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name",LocationRec.Code) then begin
+          ItemJournalBatch.Init;
+          ItemJournalBatch.Validate("Journal Template Name",CSSetup."Phys. Inv Jour Temp Name");
+          ItemJournalBatch.Validate(Name,LocationRec.Code);
+          ItemJournalBatch.Description := StrSubstNo(Text001,LocationRec.Code);
+          ItemJournalBatch.Validate("No. Series",CSSetup."Phys. Inv Jour No. Series");
+          ItemJournalBatch.Validate("Reason Code",ItemJournalTemplate."Reason Code");
+          ItemJournalBatch.Insert(true);
+        end else begin
+          RecRef.GetTable(ItemJournalBatch);
+          Clear(CSPostingBuffer);
+          CSPostingBuffer.SetRange("Table No.",RecRef.Number);
+          CSPostingBuffer.SetRange("Record Id",RecRef.RecordId);
+          CSPostingBuffer.SetRange(Executed,false);
+          if CSPostingBuffer.FindSet then
+            Error(Err_PostingIsScheduled,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
 
-        StockTakeConfiguration.Get(StockTakeWorksheet."Stock-Take Config Code");
-        StockTakeConfiguration."Inventory Calc. Date" := WorkDate;
-        StockTakeConfiguration.Modify(true);
+          Clear(ItemJournalLine);
+          ItemJournalLine.SetRange("Journal Template Name",ItemJournalBatch."Journal Template Name");
+          ItemJournalLine.SetRange("Journal Batch Name",ItemJournalBatch.Name);
+          if ItemJournalLine.Count > 0 then
+            Error(Err_StockTakeWorksheetNotEmpty,ItemJournalLine."Journal Template Name",ItemJournalLine."Journal Batch Name");
+        end;
+
+        // CSHelperFunctions.CreateStockTakeWorksheet(Location,'SALESFLOOR',StockTakeWorksheet);
+        // StockTakeWorksheet.TESTFIELD(Status,StockTakeWorksheet.Status::OPEN);
+        // StockTakeWorksheetLine.SETRANGE("Stock-Take Config Code",StockTakeWorksheet."Stock-Take Config Code");
+        // StockTakeWorksheetLine.SETRANGE("Worksheet Name",StockTakeWorksheet.Name);
+        // IF StockTakeWorksheetLine.COUNT > 0 THEN
+        //  ERROR(Err_StockTakeWorksheetNotEmpty,StockTakeWorksheet."Stock-Take Config Code",StockTakeWorksheet.Name);
+        //
+        // CSHelperFunctions.CreateStockTakeWorksheet(Location,'STOCKROOM',StockTakeWorksheet);
+        // StockTakeWorksheet.TESTFIELD(Status,StockTakeWorksheet.Status::OPEN);
+        // StockTakeWorksheetLine.SETRANGE("Stock-Take Config Code",StockTakeWorksheet."Stock-Take Config Code");
+        // StockTakeWorksheetLine.SETRANGE("Worksheet Name",StockTakeWorksheet.Name);
+        // IF StockTakeWorksheetLine.COUNT > 0 THEN
+        //  ERROR(Err_StockTakeWorksheetNotEmpty,StockTakeWorksheet."Stock-Take Config Code",StockTakeWorksheet.Name);
+        //
+        // StockTakeConfiguration.GET(StockTakeWorksheet."Stock-Take Config Code");
+        // StockTakeConfiguration."Inventory Calc. Date" := WORKDATE;
+        // StockTakeConfiguration.MODIFY(TRUE);
+        //+NPR5.52 [364063]
 
         Init;
         "Stock-Take Id" := CreateGuid;
         Created := CurrentDateTime;
         "Created By" := UserId;
-        Location := GetFilter(Location);
+        //-NPR5.52 [364063]
+        //Location := GETFILTER(Location);
+        Location := LocationRec.Code;
+        "Journal Template Name" := ItemJournalBatch."Journal Template Name";
+        "Journal Batch Name" := ItemJournalBatch.Name;
+        //+NPR5.52 [364063]
         Insert(true);
+
+        Commit;
+
+        if Confirm(StrSubstNo(Text002,Location,true)) then begin
+          Clear(ItemJournalLine);
+          ItemJournalLine.Init;
+          ItemJournalLine.Validate("Journal Template Name","Journal Template Name");
+          ItemJournalLine.Validate("Journal Batch Name","Journal Batch Name");
+          ItemJournalLine."Location Code" := Location;
+
+          Clear(NoSeriesMgt);
+          ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series",ItemJournalLine."Posting Date",false);
+          ItemJournalLine."Source Code" := ItemJournalTemplate."Source Code";
+          ItemJournalLine."Reason Code" := ItemJournalBatch."Reason Code";
+          ItemJournalLine."Posting No. Series" := ItemJournalBatch."Posting No. Series";
+
+          Clear(Item);
+          Item.SetFilter("Location Filter",Location);
+          if not Item.FindSet then
+            Error(Text003,Location);
+
+          Clear(CalculateInventory);
+          CalculateInventory.UseRequestPage(false);
+          CalculateInventory.SetTableView(Item);
+          CalculateInventory.SetItemJnlLine(ItemJournalLine);
+          //-NPR5.52 [375749]
+          //CalculateInventory.InitializeRequest(WORKDATE,ItemJournalLine."Document No.",FALSE);
+          CalculateInventory.InitializeRequest(WorkDate,ItemJournalLine."Document No.",false,false);
+          //+NPR5.52 [375749]
+          CalculateInventory.RunModal;
+
+          Clear(ItemJournalLine);
+          ItemJournalLine.SetRange("Journal Template Name","Journal Template Name");
+          ItemJournalLine.SetRange("Journal Batch Name","Journal Batch Name");
+          ItemJournalLine.SetRange("Location Code",Location);
+          if ItemJournalLine.FindSet then begin
+            repeat
+              QtyCalculated += ItemJournalLine."Qty. (Calculated)"
+            until ItemJournalLine.Next = 0;
+          end;
+
+          "Predicted Qty." := QtyCalculated;
+          "Inventory Calculated" := true;
+          Modify(true);
+        end;
     end;
 
     procedure CancelCounting()
     var
-        StockTakeWorksheetLine: Record "Stock-Take Worksheet Line";
+        ItemJournalBatch: Record "Item Journal Batch";
+        LocationRec: Record Location;
+        RecRef: RecordRef;
+        CSPostingBuffer: Record "CS Posting Buffer";
     begin
         if Closed <> 0DT then
           exit;
 
-        if not Confirm(StrSubstNo(Err_ConfirmForceClose,Location),true) then
-          exit;
+        //-NPR5.52 [364063]
+        if not LocationRec.Get(GetFilter(Location)) then
+          Error(Err_MissingLocation);
 
-        StockTakeWorksheetLine.SetRange("Stock-Take Config Code",Location);
-        StockTakeWorksheetLine.SetRange("Worksheet Name",'SALESFLOOR');
-        StockTakeWorksheetLine.DeleteAll(true);
+        if ItemJournalBatch.Get("Journal Template Name","Journal Batch Name") then begin
+          RecRef.GetTable(ItemJournalBatch);
+          Clear(CSPostingBuffer);
+          CSPostingBuffer.SetRange("Table No.",RecRef.Number);
+          CSPostingBuffer.SetRange("Record Id",RecRef.RecordId);
+          CSPostingBuffer.SetRange(Executed,false);
+          if CSPostingBuffer.FindSet then
+            Error(Err_PostingIsScheduled,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
 
-        Clear(StockTakeWorksheetLine);
-        StockTakeWorksheetLine.SetRange("Stock-Take Config Code",Location);
-        StockTakeWorksheetLine.SetRange("Worksheet Name",'STOCKROOM');
-        StockTakeWorksheetLine.DeleteAll(true);
+          if not Confirm(StrSubstNo(Err_ConfirmForceClose,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name),true) then
+            exit;
+
+          ItemJournalBatch.Delete(true);
+
+        end;
+        // StockTakeWorksheetLine.SETRANGE("Stock-Take Config Code",Location);
+        // StockTakeWorksheetLine.SETRANGE("Worksheet Name",'SALESFLOOR');
+        // StockTakeWorksheetLine.DELETEALL(TRUE);
+        //
+        // CLEAR(StockTakeWorksheetLine);
+        // StockTakeWorksheetLine.SETRANGE("Stock-Take Config Code",Location);
+        // StockTakeWorksheetLine.SETRANGE("Worksheet Name",'STOCKROOM');
+        // StockTakeWorksheetLine.DELETEALL(TRUE);
+        //+NPR5.52 [364063]
 
         Closed := CurrentDateTime;
         "Closed By" := UserId;

@@ -12,6 +12,7 @@ codeunit 6059940 "SMS Management"
     // NPR5.40/JC  /20180320 CASE 292485 Fixed option value text
     // NPR5.48/BHR /20181115 CASE 331217 Show correct template
     // NPR5.51/SARA/20190819 CASE 363578 Sending an SMS with the turnover based on the POS Workshift Checkpoint
+    // NPR5.52/SARA/20190912 CASE 368395 Move SMS profile from POS Unit to POS End of day Profile
 
 
     trigger OnRun()
@@ -726,6 +727,7 @@ codeunit 6059940 "SMS Management"
         SMSTemplateHeader: Record "SMS Template Header";
         POSWorkshifCheckpoint: Record "POS Workshift Checkpoint";
         POSUnit: Record "POS Unit";
+        POSEndOfdayProfile: Record "POS End of Day Profile";
         SMSBodyText: Text;
         Sender: Text;
         SendTo: Text;
@@ -734,8 +736,12 @@ codeunit 6059940 "SMS Management"
         //-NPR5.51 [363578]
         if Successful then begin
           if POSUnit.Get(UnitNo) then
-          if POSUnit."SMS Profile" <> '' then begin
-            SMSTemplateHeader.Get(POSUnit."SMS Profile");
+          //-NPR5.52 [368395]
+          if POSEndOfdayProfile.Get(POSUnit."POS End of Day Profile") then begin
+            // SMSTemplateHeader.GET(POSEndOfdayProfile."SMS Profile");
+            if (not SMSTemplateHeader.Get(POSEndOfdayProfile."SMS Profile")) then
+              exit;
+          //-NPR5.52 [368395]
             POSWorkshifCheckpoint.Reset;
             POSWorkshifCheckpoint.SetRange("POS Entry No.",PosEntryNo);
             if POSWorkshifCheckpoint.FindFirst then

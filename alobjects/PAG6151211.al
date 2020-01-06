@@ -9,6 +9,7 @@ page 6151211 "NpCs Arch. Document List"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "NpCs Arch. Document";
+    UsageCategory = History;
 
     layout
     {

@@ -21,6 +21,8 @@ table 6014402 "Payment Type POS"
     // NPR5.48/TS  /20181128 CASE 337806 Decreased Length of Location Code to 10
     // NPR5.50/TSA /20190530 CASE 354832 Added field 100 - "Reverse Unrealized VAT"
     // NPR5.51/TJ  /20190628 CASE 357069 Added field 110 "Open Drawer"
+    // NPR5.52/BHR /20190925 CASE 369605 Delete Null Key
+    // NPR5.52/MHA /20191016 CASE 373294 Added field 120 "Allow Cashback"
 
     Caption = 'Payment Type';
     LookupPageID = "Payment Type - Register";
@@ -652,6 +654,12 @@ table 6014402 "Payment Type POS"
         {
             Caption = 'Open Drawer';
             Description = 'NPR5.51';
+        }
+        field(120;"Allow Cashback";Boolean)
+        {
+            Caption = 'Allow Cashback';
+            Description = 'NPR5.52';
+            InitValue = true;
         }
         field(200; "PBS Gift Voucher"; Boolean)
         {

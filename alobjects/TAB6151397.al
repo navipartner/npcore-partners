@@ -1,6 +1,9 @@
 table 6151397 "CS Posting Buffer"
 {
     // NPR5.51/CLVA  /20190813  CASE 365659 Object created - NP Capture Service
+    // NPR5.52/CLVA  /20190904  CASE 365967 Added init values and delete handling
+    // NPR5.52/CLVA  /20190937  CASE 370509 Added "Job Type" option "Item Reclass."
+    //                                       Added field "Session Id"
 
     Caption = 'CS Posting Buffer';
 
@@ -10,59 +13,99 @@ table 6151397 "CS Posting Buffer"
         {
             AutoIncrement = true;
             Caption = 'Id';
+            Editable = false;
         }
-        field(10;"Entry Type";Option)
+        field(10;"Table No.";Integer)
         {
-            Caption = 'Entry Type';
-            OptionCaption = 'Transfer Order,Item Journal';
-            OptionMembers = "Transfer Order","Item Journal","Warehouse Activity";
+            Caption = 'Table No.';
+            Editable = false;
         }
-        field(11;"Key 1";Code[20])
+        field(11;"Record Id";RecordID)
         {
-            Caption = 'Key 1';
+            Caption = 'Record Id';
+            Editable = false;
         }
-        field(12;"key 2";Code[20])
+        field(12;"Created By";Code[50])
         {
-            Caption = 'key 2';
+            Caption = 'Created By';
+            Editable = false;
+            TableRelation = User."User Name";
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                UserMgt: Codeunit "User Management";
+            begin
+            end;
+
+            trigger OnValidate()
+            var
+                UserMgt: Codeunit "User Management";
+            begin
+            end;
         }
         field(13;Created;DateTime)
         {
             Caption = 'Created';
-        }
-        field(14;Posted;Boolean)
-        {
-            Caption = 'Posted';
-        }
-        field(15;Aborted;Boolean)
-        {
-            Caption = 'Aborted';
-        }
-        field(16;Description;Text[250])
-        {
-            Caption = 'Description';
-        }
-        field(17;"Start Time";Time)
-        {
-            Caption = 'Start Time';
-        }
-        field(18;"End time";Time)
-        {
-            Caption = 'End time';
-        }
-        field(19;"Job Duration";Duration)
-        {
-            Caption = 'Job Duration';
-        }
-        field(20;"Activity Type";Option)
-        {
-            Caption = 'Activity Type';
             Editable = false;
-            OptionCaption = ' ,Put-away,Pick,Movement,Invt. Put-away,Invt. Pick,Invt. Movement';
-            OptionMembers = " ","Put-away",Pick,Movement,"Invt. Put-away","Invt. Pick","Invt. Movement";
         }
-        field(21;"Job Execution No.";Integer)
+        field(14;Executed;Boolean)
         {
-            Caption = 'Job Execution No.';
+            Caption = 'Executed';
+            Editable = false;
+        }
+        field(15;"Posting Index";Integer)
+        {
+            Caption = 'Posting Index';
+        }
+        field(16;"Update Posting Date";Boolean)
+        {
+            Caption = 'Update Posting Date';
+        }
+        field(17;"Job Queue Status";Option)
+        {
+            Caption = 'Job Queue Status';
+            Editable = false;
+            OptionCaption = ' ,Scheduled for Posting,Error,Posting';
+            OptionMembers = " ","Scheduled for Posting",Error,Posting;
+
+            trigger OnLookup()
+            var
+                JobQueueEntry: Record "Job Queue Entry";
+            begin
+                if ("Job Queue Status" = "Job Queue Status"::" ") and Executed then
+                  exit;
+                JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+            end;
+        }
+        field(18;"Job Queue Entry ID";Guid)
+        {
+            Caption = 'Job Queue Entry ID';
+            Editable = false;
+        }
+        field(19;"Job Type";Option)
+        {
+            Caption = 'Job Type';
+            Editable = false;
+            OptionCaption = 'Invt. Pick,Invt. Put-away,Pick,Put-away,Phy. Inv. Journal,Item Journal,Transfer Order,Movement,Invt. Movement,Store Counting,Item Reclass.';
+            OptionMembers = "Invt. Pick","Invt. Put-away",Pick,"Put-away","Phy. Inv. Journal","Item Journal","Transfer Order",Movement,"Invt. Movement","Store Counting","Item Reclass.";
+        }
+        field(20;"Job Queue Priority for Post";Integer)
+        {
+            Caption = 'Job Queue Priority for Post';
+            Editable = false;
+            InitValue = 1000;
+            MinValue = 0;
+
+            trigger OnValidate()
+            begin
+                //IF "Job Queue Priority for Post" < 0 THEN
+                //  ERROR(TXT002);
+            end;
+        }
+        field(21;"Session Id";Text[30])
+        {
+            Caption = 'Session Id';
         }
     }
 
@@ -77,10 +120,25 @@ table 6151397 "CS Posting Buffer"
     {
     }
 
-    trigger OnModify()
+    trigger OnDelete()
     begin
-        if ("Start Time" > 0T) and ("End time" <> 0T) then
-          "Job Duration" := "End time" - "Start Time";
+        //-NPR5.52 [365967]
+        if not IsNullGuid("Job Queue Entry ID") then
+          if JobQueueEntry.Get("Job Queue Entry ID") then
+            JobQueueEntry.Delete(true);
+        //+NPR5.52 [365967]
     end;
+
+    trigger OnInsert()
+    begin
+        //-NPR5.52 [365967]
+        Created := CurrentDateTime;
+        "Created By" := UserId;
+        //+NPR5.52 [365967]
+    end;
+
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        TXT002: Label 'Job Queue Priority must be zero or positive.';
 }
 

@@ -6,6 +6,7 @@ page 6151054 "POS Payment View Event Setup"
     Caption = 'POS Payment View Event Setup';
     PageType = Card;
     SourceTable = "POS Payment View Event Setup";
+    UsageCategory = Administration;
 
     layout
     {

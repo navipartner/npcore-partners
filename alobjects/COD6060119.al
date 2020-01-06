@@ -46,10 +46,12 @@ codeunit 6060119 "TM Ticket Request Manager"
     // #335653/TSA /20181119 CASE 335653 Refactored GetExternalNo() to exclude alternative number
     // TM1.39/TSA /20190107 CASE 310057 Allowing external source to notify eTicket recipent
     // TM1.39/TSA /20190124 CASE 343585 Revoke for tickets with policy always did not consider multiple admissons codes
-    // #335889/TSA /20190124 CASE 335889 Refactored ticket request re-validation RevalidateRequestForTicketReuse();
+    // TM1.43/TSA /20190124 CASE 335889 Refactored ticket request re-validation RevalidateRequestForTicketReuse();
     // TM1.40/TSA /20190327 CASE 350287 Changed signature and filter in RevalidateRequestForTicketReuse()
     // TM1.41/TSA /20190501 CASE 352873 External Item number is same as item number unless variant code is defined
     // TM1.42/TSA /20190826 CASE 364739 Selection of notification address, Signature change on POS_AppendToReservationRequest2
+    // TM1.43/TSA /20190904 CASE 357359 Deleting a ticket token must also delete the seating reservation entry
+    // TM1.43/TSA /20190910 CASE 368043 Refactored usage of External Item Code
 
 
     trigger OnRun()
@@ -131,6 +133,7 @@ codeunit 6060119 "TM Ticket Request Manager"
         Ticket: Record "TM Ticket";
         TicketAccessEntry: Record "TM Ticket Access Entry";
         DetailedTicketAccessEntry: Record "TM Det. Ticket Access Entry";
+        SeatingReservationEntry: Record "TM Seating Reservation Entry";
     begin
 
         TicketReservationRequest.SetCurrentKey("Session Token ID");
@@ -155,6 +158,13 @@ codeunit 6060119 "TM Ticket Request Manager"
 
                     until (Ticket.Next = 0);
                 end;
+
+            //-TM1.43 [357359]
+            SeatingReservationEntry.SetCurrentKey ("Ticket Token");
+            SeatingReservationEntry.SetFilter ("Ticket Token", '=%1', Token);
+            if (not SeatingReservationEntry.IsEmpty ()) then
+              SeatingReservationEntry.DeleteAll ();
+            //+TM1.43 [357359]
 
                 if (not RemoveRequest) then begin
                     TicketReservationRequest."Admission Created" := false;
@@ -191,10 +201,6 @@ codeunit 6060119 "TM Ticket Request Manager"
     end;
 
     procedure IssueTicketFromReservation(TicketReservationRequest: Record "TM Ticket Reservation Request"; FailWithError: Boolean; var ResponseMessage: Text) ResponseCode: Integer
-    var
-        ItemNo: Code[20];
-        VariantCode: Code[10];
-        ResolvingTable: Integer;
     begin
 
         TicketReservationRequest.Get(TicketReservationRequest."Entry No.");
@@ -202,11 +208,13 @@ codeunit 6060119 "TM Ticket Request Manager"
             exit(0);
 
         with TicketReservationRequest do begin
-            if (not TranslateBarcodeToItemVariant("External Item Code", ItemNo, VariantCode, ResolvingTable)) then
-                Error(ITEM_NOT_FOUND, "External Item Code");
+          //-TM1.43 [368043]
+          // IF (NOT TranslateBarcodeToItemVariant ("External Item Code", ItemNo, VariantCode, ResolvingTable)) THEN
+          //   ERROR (ITEM_NOT_FOUND, "External Item Code");
 
-            ResponseCode := IssueTicket(ItemNo, VariantCode, Quantity, "Entry No.", FailWithError, ResponseMessage);
-
+          // ResponseCode := IssueTicket (ItemNo, VariantCode, Quantity, "Entry No.", FailWithError, ResponseMessage);
+          ResponseCode := IssueTicket ("Item No.", "Variant Code", Quantity, "Entry No.", FailWithError, ResponseMessage);
+          //+TM1.43 [368043]
         end;
     end;
 
@@ -318,7 +326,13 @@ codeunit 6060119 "TM Ticket Request Manager"
                     ReservationRequest2.SetCurrentKey("Session Token ID");
                     ReservationRequest2.SetFilter("Session Token ID", '=%1', ReservationRequest."Session Token ID");
                     ReservationRequest2.SetFilter("Ext. Line Reference No.", '=%1', ReservationRequest."Ext. Line Reference No.");
-                    ReservationRequest2.SetFilter("External Item Code", '=%1', ReservationRequest."External Item Code");
+
+              //-TM1.43 [368043]
+              // ReservationRequest2.SETFILTER ("External Item Code", '=%1', ReservationRequest."External Item Code");
+              ReservationRequest2.SetFilter ("Item No.", '=%1', ReservationRequest."Item No.");
+              ReservationRequest2.SetFilter ("Variant Code", '=%1', ReservationRequest."Variant Code");
+              //+TM1.43 [368043]
+
                     ReservationRequest2.SetFilter("Admission Code", '=%1', TicketBom."Admission Code");
                     if (ReservationRequest2.FindFirst()) then begin
 
@@ -629,9 +643,14 @@ codeunit 6060119 "TM Ticket Request Manager"
                     // For multiple request lines, loop the admission codes
                     TicketReservationRequest2.SetCurrentKey("Session Token ID");
                     TicketReservationRequest2.SetFilter("Session Token ID", '=%1', Token);
-                    //-TM1.27 [302215]
-                    TicketReservationRequest2.SetFilter("External Item Code", '=%1', TicketReservationRequest."External Item Code");
-                    //+TM1.27 [302215]
+
+              //-TM1.43 [368043]
+              // //-TM1.27 [302215]
+              // TicketReservationRequest2.SETFILTER ("External Item Code", '=%1', TicketReservationRequest."External Item Code");
+              // //+TM1.27 [302215]
+              TicketReservationRequest2.SetFilter ("Item No.", '=%1', TicketReservationRequest."Item No.");
+              TicketReservationRequest2.SetFilter ("Variant Code", '=%1', TicketReservationRequest."Variant Code");
+              //+TM1.43 [368043]
 
                     TicketReservationRequest2.FindSet();
                     repeat
@@ -828,6 +847,11 @@ codeunit 6060119 "TM Ticket Request Manager"
         ReservationRequest."Line No." := SalesLineNo;
 
         ReservationRequest."External Item Code" := GetExternalNo(ItemNo, VariantCode);
+        //-TM1.43 [368043]
+        ReservationRequest."Item No." := ItemNo;
+        ReservationRequest."Variant Code" := VariantCode;
+        //+TM1.43 [368043]
+
         ReservationRequest.Quantity := Quantity;
         ReservationRequest."External Member No." := ExternalMemberNo;
         ReservationRequest."Admission Description" := Admission.Description;
@@ -1030,6 +1054,12 @@ codeunit 6060119 "TM Ticket Request Manager"
             ReservationRequest."Session Token ID" := Token;
             ReservationRequest."Ext. Line Reference No." := 1;
 
+          //-TM1.43 [368043]
+          ReservationRequest."Item No." := Ticket."Item No.";
+          ReservationRequest."Variant Code" := Ticket."Variant Code";
+          ReservationRequest."External Item Code" := GetExternalNo (Ticket."Item No.", Ticket."Variant Code");
+          //+TM1.43 [368043]
+
             ReservationRequest."Admission Code" := TicketAccessEntry."Admission Code";
             ReservationRequest."Receipt No." := SalesReceiptNo;
             ReservationRequest."Line No." := SalesLineNo;
@@ -1074,7 +1104,7 @@ codeunit 6060119 "TM Ticket Request Manager"
         AbortTicketRevalidate: Boolean;
     begin
 
-        //-#335889 [335889]
+        //-TM1.43 [335889]
         // Precheck if member has tickets for today with same item numbers and qty. If so try to reuse those tickets.
         IsRepeatedEntry := true;
         //-TM1.40 [350287]
@@ -1085,8 +1115,11 @@ codeunit 6060119 "TM Ticket Request Manager"
         //+TM1.40 [350287]
 
         repeat
-
-            TicketReservationRequest.SetFilter("External Item Code", '=%1', TmpTicketReservationRequest."External Item Code");
+          //-TM1.43 [368043]
+          //TicketReservationRequest.SETFILTER ("External Item Code", '=%1', TmpTicketReservationRequest."External Item Code");
+          TicketReservationRequest.SetFilter ("Item No.", '=%1', TmpTicketReservationRequest."Item No.");
+          TicketReservationRequest.SetFilter ("Variant Code", '=%1', TmpTicketReservationRequest."Variant Code");
+          //+TM1.43 [368043]
             TicketReservationRequest.SetFilter("External Member No.", '=%1', TmpTicketReservationRequest."External Member No.");
             TicketReservationRequest.SetFilter("Created Date Time", '%1..%2', CreateDateTime(Today, 0T), CreateDateTime(Today, 235959T));
             TicketReservationRequest.SetFilter(Quantity, '=%1', TmpTicketReservationRequest.Quantity);
@@ -1129,7 +1162,7 @@ codeunit 6060119 "TM Ticket Request Manager"
         end;
 
         exit(false);
-        //+#335889 [335889]
+        //+TM1.43 [335889]
     end;
 
     procedure IsReservationRequest(Token: Text[100]): Boolean
@@ -1272,10 +1305,12 @@ codeunit 6060119 "TM Ticket Request Manager"
     begin
         ExternalNo := ItemNo;
 
+        //-TM1.43 [368043]
         //-TM1.41 [352873]
-        if (VariantCode = '') then
-            exit;
+        // IF (VariantCode = '') THEN
+        //   EXIT;
         //+TM1.41 [352873]
+        //+TM1.43 [368043]
 
         //-#335653 [335653]
         ItemCrossReference.SetFilter("Item No.", '=%1', ItemNo);
@@ -1332,7 +1367,11 @@ codeunit 6060119 "TM Ticket Request Manager"
                 if (ReservationRequest.Quantity = SaleLinePOS.Quantity) then
                     exit;
 
-                if (ReservationRequest."External Item Code" <> GetExternalNo(SaleLinePOS."No.", SaleLinePOS."Variant Code")) then begin
+            //-TM1.43 [368043]
+            // IF (ReservationRequest."External Item Code" <> GetExternalNo (SaleLinePOS."No.", SaleLinePOS."Variant Code")) THEN  BEGIN
+            if (ReservationRequest."Item No." <> SaleLinePOS."No.") or (ReservationRequest."Variant Code" <> SaleLinePOS."Variant Code") then begin
+            //+TM1.43 [368043]
+
                     if (ReservationRequest."Admission Created") then
                         Error(EXTERNAL_ITEM_CHANGE);
 

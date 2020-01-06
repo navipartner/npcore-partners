@@ -6,6 +6,8 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
     // NPR5.49/MHA /20190306  CASE 342920 ScanReferenceNos parameter added
     // NPR5.50/ALST/20190521  CASE 352073 implemented selection method for printing
     // NPR5.51/MHA /20190819  CASE 364542 Added function ValidateAmt() for validating Minimum Amount
+    // NPR5.52/MHA /20191015  CASE 372423 Negative Minimum Amount is rounded up to 0 instead of using absolute value
+    // NPR5.52/MHA /20191015  CASE 373127 SaleLinePOS Quantity should be modified to 1
 
 
     trigger OnRun()
@@ -179,10 +181,12 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
         if PaymentTypePOS."Rounding Precision" > 0 then
             ReturnAmount := Round(SaleAmount - PaidAmount, PaymentTypePOS."Rounding Precision");
 
-        //-NPR5.51 [364542]
-        if (PaymentTypePOS."Minimum Amount" > 0) and (Abs(ReturnAmount) < Abs(PaymentTypePOS."Minimum Amount")) then
+        //-NPR5.52 [372423]
+        if PaymentTypePOS."Minimum Amount" < 0 then
+          PaymentTypePOS."Minimum Amount" := 0;
+        if (PaymentTypePOS."Minimum Amount" > 0) and (-ReturnAmount < PaymentTypePOS."Minimum Amount") then
           Error(Text007,PaymentTypePOS."Minimum Amount");
-        //+NPR5.51 [364542]
+        //+NPR5.52 [372423]
         //+NPR5.48 [342920]
         if ReturnAmount >= 0 then
             Error(Text005);
@@ -380,6 +384,9 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
         SaleLinePOS.Quantity := 1;
         //+NPR5.51 [364542]
         //+NPR5.49 [342920]
+        //-NPR5.52 [373127]
+        SaleLinePOS.Modify;
+        //+NPR5.52 [373127]
 
         //-NPR5.48 [345467]
         POSSession.RequestRefreshData();
@@ -441,8 +448,10 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
         if PaymentTypePOS."Rounding Precision" > 0 then
           Amount := Round(Amount,PaymentTypePOS."Rounding Precision");
 
+        //-NPR5.52 [372423]
         if PaymentTypePOS."Minimum Amount" < 0 then
-          PaymentTypePOS."Minimum Amount" := Abs(PaymentTypePOS."Minimum Amount");
+          PaymentTypePOS."Minimum Amount" := 0;
+        //+NPR5.52 [372423]
 
         if Amount < PaymentTypePOS."Minimum Amount" then
           Error(Text006,Amount,PaymentTypePOS."Minimum Amount");

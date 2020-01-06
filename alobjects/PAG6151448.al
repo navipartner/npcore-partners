@@ -6,6 +6,7 @@ page 6151448 "Magento Payment Mapping"
     // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
     // MAG2.05/MHA /20170712  CASE 283588 Added field 90 "Allow Adjust Payment Amount"
     // MAG2.07/MHA /20170830  CASE 286943 Updated Magento Setup Actions to support Setup Event Subscription
+    // MAG2.23/ALPO/20191004  CASE 367219 Auto set capture date for payments captured externally: new control "Captured Externally"
 
     Caption = 'Payment Method Mapping';
     PageType = List;
@@ -31,6 +32,9 @@ page 6151448 "Magento Payment Mapping"
                 {
                 }
                 field("Payment Gateway Code";"Payment Gateway Code")
+                {
+                }
+                field("Captured Externally";"Captured Externally")
                 {
                 }
             }

@@ -9,6 +9,7 @@ page 6014450 "Mixed Discount"
     // NPR5.45/TS  /20180803  CASE 308194 Removed Quantity Sold and Turnover
     // NPR5.45/MHA /20180820  CASE 323568 Added Time Intervals
     // NPR5.46/JDH /20181002 CASE 294354 Changed how mix discount are send to Retail Journal
+    // NPR5.52/ANPA/20191001  CASE 370260 Removed Assist Edit for the Customer Disc. Group filter, added group around start date, end date, start time and end time
 
     Caption = 'Mix Discount';
     PageType = Card;
@@ -228,31 +229,40 @@ page 6014450 "Mixed Discount"
             {
                 Caption = 'Conditions';
                 Visible = "Mix Type" <> 2;
-                field("Starting date";"Starting date")
+                group(Control6150614)
                 {
-                    Importance = Promoted;
-                }
-                field("Ending date";"Ending date")
-                {
-                    Importance = Promoted;
-                }
-                field("Starting time";"Starting time")
-                {
-                }
-                field("Ending time";"Ending time")
-                {
-                }
-                field("Customer Disc. Group Filter";"Customer Disc. Group Filter")
-                {
+                    ShowCaption = false;
+                    field("Starting date";"Starting date")
+                    {
+                        Importance = Promoted;
+                    }
+                    field("Ending date";"Ending date")
+                    {
+                        Importance = Promoted;
+                    }
+                    field("Starting time";"Starting time")
+                    {
+                    }
+                    field("Ending time";"Ending time")
+                    {
+                    }
+                    field("Customer Disc. Group Filter";"Customer Disc. Group Filter")
+                    {
+                        AssistEdit = false;
 
-                    trigger OnAssistEdit()
-                    begin
-                        FilterAssist(FieldNo("Customer Disc. Group Filter"));
-                    end;
+                        trigger OnAssistEdit()
+                        begin
+                            FilterAssist(FieldNo("Customer Disc. Group Filter"));
+                        end;
+                    }
                 }
-                part(Control6014425;"Mixed Discount Time Intervals")
+                group(Control6150618)
                 {
-                    SubPageLink = "Mix Code"=FIELD(Code);
+                    ShowCaption = false;
+                    part(Control6014425;"Mixed Discount Time Intervals")
+                    {
+                        SubPageLink = "Mix Code"=FIELD(Code);
+                    }
                 }
             }
             part(SubForm;"Mixed Discount Lines")

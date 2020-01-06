@@ -3,6 +3,7 @@ table 6150650 "POS Audit Profile"
     // NPR5.48/MMV /20181025 CASE 318028 Created object
     // NPR5.51/MMV /20190617 CASE 356076 Added field 80
     // NPR5.51/ALPO/20190802 CASE 362747 Added field 90 "Allow Printing Receipt Copy"
+    // NPR5.52/ALPO/20191004 CASE 370427 Added field 100 "Do Not Print Receipt on Sale": option to skip receipt printing on sale
 
     Caption = 'POS Audit Profile';
     LookupPageID = "POS Audit Profiles";
@@ -93,6 +94,11 @@ table 6150650 "POS Audit Profile"
             Description = 'NPR5.51';
             OptionCaption = 'Always,Only Once,Never';
             OptionMembers = Always,"Only Once",Never;
+        }
+        field(100;"Do Not Print Receipt on Sale";Boolean)
+        {
+            Caption = 'Do Not Print Receipt on Sale';
+            Description = 'NPR5.52';
         }
     }
 

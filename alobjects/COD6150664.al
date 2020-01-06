@@ -4,6 +4,7 @@ codeunit 6150664 "NPRE Restaurant Print"
     // NPR5.34/MMV /20170726 CASE 285002 Refactored kitchen print.
     // NPR5.35/ANEN /20170821 CASE 283376 Solution rename to NP Restaurant
     // NPR5.41/THRO /20180412 CASE 309873 Print Templates moved to seperate table
+    // NPR5.52/ALPO/20190813 CASE 360258 Location specific setting of 'Auto print kintchen order'
 
 
     trigger OnRun()
@@ -12,6 +13,7 @@ codeunit 6150664 "NPRE Restaurant Print"
 
     var
         ERRPrint: Label '%1 fcn. Print - Variant must be Record or Recordref';
+        PrintKitchOderConfMsg: Label 'Do you want to send the order to the kitchen now?';
 
     procedure PrintWaiterPadPreReceiptPressed(WaiterPad: Record "NPRE Waiter Pad")
     begin
@@ -35,10 +37,35 @@ codeunit 6150664 "NPRE Restaurant Print"
     var
         NPHWaiterPadLine: Record "NPRE Waiter Pad Line";
         NPHHospitalitySetup: Record "NPRE Restaurant Setup";
+        Seating: Record "NPRE Seating";
+        SeatingLocation: Record "NPRE Seating Location";
+        Confirmed: Boolean;
     begin
-        NPHHospitalitySetup.Get;
+        //-NPR5.52 [360258]-revoked
+        //NPHHospitalitySetup.GET;
 
-        if NPHHospitalitySetup."Auto Print Kitchen Order" then PrintWaiterPadToKitchen(WaiterPad);
+        //IF NPHHospitalitySetup."Auto Print Kitchen Order" THEN PrintWaiterPadToKitchen(WaiterPad);
+        //+NPR5.52 [360258]-revoked
+
+        //-NPR5.52 [360258]
+        WaiterPad.CalcFields("Current Seating FF");
+        if not (Seating.Get(WaiterPad."Current Seating FF") and SeatingLocation.Get(Seating."Seating Location")) then
+          SeatingLocation.Init;
+        if SeatingLocation."Auto Print Kitchen Order" = SeatingLocation."Auto Print Kitchen Order"::Default then begin
+          NPHHospitalitySetup.Get;
+          SeatingLocation."Auto Print Kitchen Order" := NPHHospitalitySetup."Auto Print Kitchen Order" + 1;
+        end;
+        case SeatingLocation."Auto Print Kitchen Order" of
+          SeatingLocation."Auto Print Kitchen Order"::No:
+            Confirmed := false;
+          SeatingLocation."Auto Print Kitchen Order"::Yes:
+            Confirmed := true;
+          SeatingLocation."Auto Print Kitchen Order"::Ask:
+            Confirmed := Confirm(PrintKitchOderConfMsg,true);
+        end;
+        if Confirmed then
+          PrintWaiterPadToKitchen(WaiterPad);
+        //+NPR5.52 [360258]
     end;
 
     local procedure PrintWaiterPadToKitchen(WaiterPad: Record "NPRE Waiter Pad")

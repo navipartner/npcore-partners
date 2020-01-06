@@ -1,6 +1,7 @@
 table 6150652 "POS End of Day Profile"
 {
     // NPR5.49/TSA /20190314 CASE 348458 Initial Version
+    // NPR5.52/SARA/20190823 CASE 363578 New field 'SMS Profile'
 
     Caption = 'POS End of Day Profile';
     DrillDownPageID = "POS End of Day Profiles";
@@ -62,6 +63,12 @@ table 6150652 "POS End of Day Profile"
         field(40;"Force Blind Counting";Boolean)
         {
             Caption = 'Force Blind Counting';
+        }
+        field(41;"SMS Profile";Code[20])
+        {
+            Caption = 'SMS Profile';
+            Description = 'NPR5.52';
+            TableRelation = "SMS Template Header";
         }
     }
 

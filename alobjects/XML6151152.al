@@ -8,6 +8,7 @@ xmlport 6151152 "M2 Get Account"
     // MAG2.22/TSA /20190531 CASE 349994 Added Terms subsection for sell-to and bill-to
     // NPR5.51/TSA /20190812 CASE 364644 Added Person section
     // NPR5.51/JAKUBV/20190904  CASE 364282 Transport NPR5.51 - 3 September 2019
+    // MAG2.23/TSA /20191015 CASE 373151 Move Person to address, removed CompanyName, added Name, PricesIncludeVat, Contact
 
     Caption = 'Get Account';
     Encoding = UTF8;
@@ -70,19 +71,6 @@ xmlport 6151152 "M2 Get Account"
                     fieldattribute(Id;TmpContactResponse."No.")
                     {
                     }
-                    textelement(Person)
-                    {
-                        MaxOccurs = Once;
-                        MinOccurs = Zero;
-                        fieldelement(FirstName;TmpContactResponse."First Name")
-                        {
-                            MinOccurs = Zero;
-                        }
-                        fieldelement(LastName;TmpContactResponse.Surname)
-                        {
-                            MinOccurs = Zero;
-                        }
-                    }
                     textelement(accountaddress)
                     {
                         XmlName = 'Address';
@@ -94,6 +82,19 @@ xmlport 6151152 "M2 Get Account"
                             begin
                                 AccountEditable := Format (true, 0, 9);
                             end;
+                        }
+                        textelement(Person)
+                        {
+                            MaxOccurs = Once;
+                            MinOccurs = Zero;
+                            fieldelement(FirstName;TmpContactResponse."First Name")
+                            {
+                                MinOccurs = Zero;
+                            }
+                            fieldelement(LastName;TmpContactResponse.Surname)
+                            {
+                                MinOccurs = Zero;
+                            }
                         }
                         fieldelement(Name;TmpContactResponse.Name)
                         {
@@ -157,9 +158,6 @@ xmlport 6151152 "M2 Get Account"
                                 SellToEditable := Format ((TmpContactResponse.Type = TmpContactResponse.Type::Company), 0, 9);
                             end;
                         }
-                        fieldelement(CompanyName;TmpSellToCustomer.Name)
-                        {
-                        }
                         fieldelement(VatId;TmpSellToCustomer."VAT Registration No.")
                         {
                         }
@@ -169,6 +167,20 @@ xmlport 6151152 "M2 Get Account"
                         textelement(selltoaddress)
                         {
                             XmlName = 'Address';
+                            tableelement(tmpselltocustomercontact;Contact)
+                            {
+                                LinkTable = TmpSellToCustomer;
+                                MaxOccurs = Once;
+                                MinOccurs = Zero;
+                                XmlName = 'Person';
+                                UseTemporary = true;
+                                fieldelement(FirstName;TmpSellToCustomerContact."First Name")
+                                {
+                                }
+                                fieldelement(LastName;TmpSellToCustomerContact.Surname)
+                                {
+                                }
+                            }
                             fieldelement(Name;TmpSellToCustomer.Name)
                             {
                             }
@@ -222,6 +234,9 @@ xmlport 6151152 "M2 Get Account"
                             fieldelement(DiscountGroup;TmpSellToCustomer."Customer Disc. Group")
                             {
                             }
+                            fieldelement(PricesIncludeVat;TmpSellToCustomer."Prices Including VAT")
+                            {
+                            }
                         }
                     }
                     textelement(BillTo)
@@ -249,9 +264,6 @@ xmlport 6151152 "M2 Get Account"
                                       , 0, 9);
                                 end;
                             }
-                            fieldelement(CompanyName;TmpBillToCustomer.Name)
-                            {
-                            }
                             fieldelement(BalanceLCY;TmpBillToCustomer."Balance (LCY)")
                             {
                             }
@@ -261,6 +273,23 @@ xmlport 6151152 "M2 Get Account"
                             textelement(billtoaddress)
                             {
                                 XmlName = 'Address';
+                                tableelement(tmpbilltocustomercontact;Contact)
+                                {
+                                    LinkTable = TmpBillToCustomer;
+                                    MaxOccurs = Once;
+                                    MinOccurs = Zero;
+                                    XmlName = 'Person';
+                                    UseTemporary = true;
+                                    fieldelement(FirstName;TmpBillToCustomerContact."First Name")
+                                    {
+                                    }
+                                    fieldelement(LastName;TmpBillToCustomerContact.Surname)
+                                    {
+                                    }
+                                }
+                                fieldelement(Name;TmpBillToCustomer.Name)
+                                {
+                                }
                                 fieldelement(Name2;TmpBillToCustomer."Name 2")
                                 {
                                 }
@@ -381,6 +410,9 @@ xmlport 6151152 "M2 Get Account"
                                 fieldelement(Telephone;TmpShipToAddress."Phone No.")
                                 {
                                 }
+                                fieldelement(Contact;TmpShipToAddress.Contact)
+                                {
+                                }
                             }
                         }
                     }
@@ -480,6 +512,9 @@ xmlport 6151152 "M2 Get Account"
     end;
 
     procedure SetResponse(var TmpContactIn: Record Contact temporary;var TmpSellToCustomerIn: Record Customer temporary;var TmpBillToCustomerIn: Record Customer temporary;var TmpShipToAddressIn: Record "Ship-to Address" temporary)
+    var
+        ContactBusinessRelation: Record "Contact Business Relation";
+        Contact: Record Contact;
     begin
 
         ResponseMessage := 'Contact Id is unknown.';
@@ -504,6 +539,30 @@ xmlport 6151152 "M2 Get Account"
               TmpShipToAddress.Insert ();
             until (TmpShipToAddressIn.Next () = 0);
           end;
+
+          //-MAG2.23 [373151]
+          if (TmpSellToCustomer."No." <> '') then begin
+            ContactBusinessRelation.SetFilter ("Link to Table", '=%1', ContactBusinessRelation."Link to Table"::Customer);
+            ContactBusinessRelation.SetFilter ("No.", '=%1', TmpSellToCustomer."No.");
+            if (ContactBusinessRelation.FindFirst ()) then begin
+              if (Contact.Get (ContactBusinessRelation."Contact No.")) then begin
+                TmpSellToCustomerContact.TransferFields (Contact);
+                TmpSellToCustomerContact.Insert ();
+              end;
+            end;
+          end;
+
+          if (TmpBillToCustomer."No." <> '') then begin
+            ContactBusinessRelation.SetFilter ("Link to Table", '=%1', ContactBusinessRelation."Link to Table"::Customer);
+            ContactBusinessRelation.SetFilter ("No.", '=%1', TmpBillToCustomer."No.");
+            if (ContactBusinessRelation.FindFirst ()) then begin
+              if (Contact.Get (ContactBusinessRelation."Contact No.")) then begin
+                TmpBillToCustomerContact.TransferFields (Contact);
+                TmpBillToCustomerContact.Insert ();
+              end;
+            end;
+          end;
+          //+MAG2.23 [373151]
 
           ResponseCode := 'OK';
           ResponseMessage := ''; //STRSUBSTNO ('%1 %2', TmpBillToCustomer.COUNT, TmpSellToCustomer.count);

@@ -5,6 +5,8 @@ codeunit 6151145 "M2 POS Price WebService"
     // NPR5.49/TSA /20190307 CASE 345375 Added Customer Item By Period Service
     // MAG2.21/TSA /20190423 CASE 350006 Added consideration of a price date other than TODAY.
     // MAG2.21/TSA /20190423 CASE 350006 Corrected a spelling mistake.
+    // MAG2.23/TSA /20190930 CASE 370652 Customer No. was not set on request record passeed to ERP Price Calculation, removed TryFunction from TryPosQuoteRequest
+    // MAG2.23/TSA /20190930 CASE 370652 Unit of Measure Code was not set on request record passed to ERP Price Calculation,
 
 
     trigger OnRun()
@@ -36,8 +38,7 @@ codeunit 6151145 "M2 POS Price WebService"
         asserterror Error (''); // rollback any changes to the database we did in TryPosQuoteRequest()
     end;
 
-    [TryFunction]
-    local procedure TryPosQuoteRequest(var TmpSalePOS: Record "Sale POS" temporary;var TmpSaleLinePOS: Record "Sale Line POS" temporary)
+    local procedure TryPosQuoteRequest(var TmpSalePOS: Record "Sale POS" temporary;var TmpSaleLinePOS: Record "Sale Line POS" temporary): Boolean
     var
         Customer: Record Customer;
         VATBusPostingGroup: Code[20];
@@ -54,14 +55,14 @@ codeunit 6151145 "M2 POS Price WebService"
     begin
 
         // Prepare Lines for VAT
-        TmpSalePOS."Price including VAT" := true;
+        TmpSalePOS."Prices Including VAT" := true;
 
         VATBusPostingGroup := '';
         if (TmpSalePOS."Customer No." <> '') then begin
           if (Customer.Get (TmpSalePOS."Customer No.")) then begin
             VATBusPostingGroup := Customer."VAT Bus. Posting Group";
             TmpSalePOS."Customer No." := Customer."No.";
-            TmpSalePOS."Price including VAT" := Customer."Prices Including VAT";
+            TmpSalePOS."Prices Including VAT" := Customer."Prices Including VAT";
             TmpSalePOS."Customer Price Group" := Customer."Customer Price Group";
             TmpSalePOS."Customer Disc. Group" := Customer."Customer Disc. Group";
           end;
@@ -82,7 +83,7 @@ codeunit 6151145 "M2 POS Price WebService"
               TmpSaleLinePOS.Type := TmpSaleLinePOS.Type::Item;
               TmpSaleLinePOS.Description := Item.Description;
 
-              TmpSaleLinePOS."Price Includes VAT" := TmpSalePOS."Price including VAT";
+              TmpSaleLinePOS."Price Includes VAT" := TmpSalePOS."Prices Including VAT";
               TmpSaleLinePOS."VAT %" := VATPostingSetup."VAT %";
               TmpSaleLinePOS."VAT Calculation Type" := TmpSaleLinePOS."VAT Calculation Type"::"Normal VAT";
               TmpSaleLinePOS."VAT Bus. Posting Group" := VATBusPostingGroup;
@@ -145,6 +146,10 @@ codeunit 6151145 "M2 POS Price WebService"
           until (TmpSaleLinePOS2.Next () = 0);
 
         end;
+
+        //-MAG2.23, [370652]
+        exit (true);
+        //+MAG2.23, [370652]
     end;
 
     local procedure TEST_SOAP_PosPrice()
@@ -395,6 +400,9 @@ codeunit 6151145 "M2 POS Price WebService"
 
         TmpSalesHeader.Validate ("Currency Code", TmpSalesPriceResponse."Currency Code"); // Request Parameters, could be blank
         TmpSalesHeader."Bill-to Customer No." := Customer."No.";
+        //-MAG2.23 [370652]
+        TmpSalesHeader."Sell-to Customer No." := Customer."No.";
+        //+MAG2.23 [370652]
         TmpSalesHeader."Prices Including VAT" := false;
 
         TmpSalesLine.Type := TmpSalesLine.Type::Item;
@@ -406,7 +414,10 @@ codeunit 6151145 "M2 POS Price WebService"
         TmpSalesLine."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
         TmpSalesLine."VAT %" := VATPostingSetup."VAT %";
 
-        TmpSalesLine."Unit of Measure" := TmpSalesPriceResponse."Unit of Measure Code"; // Request Parameters, could be blank
+        //-MAG2.23 [370652]
+        //TmpSalesLine."Unit of Measure" := TmpSalesPriceResponse."Unit of Measure Code"; // Request Parameters, could be blank
+        TmpSalesLine."Unit of Measure Code" := TmpSalesPriceResponse."Unit of Measure Code"; // Request Parameters, could be blank
+        //-MAG2.23 [370652]
 
         // Build the qty bracket for which we will return prices
         TmpQtyBracket.DeleteAll ();
@@ -555,8 +566,12 @@ codeunit 6151145 "M2 POS Price WebService"
           repeat
             TmpSalesLine.Quantity := TmpQtyBracket."Minimum Quantity";
             TmpSalesLine."Qty. per Unit of Measure" := 1;
-            if (TmpSalesLine."Unit of Measure" <> '') then
-              if (ItemUnitofMeasure.Get (TmpSalesLine."No.", TmpSalesLine."Unit of Measure")) then
+            //-MAG2.23 [370652]
+            //IF (TmpSalesLine."Unit of Measure" <> '') THEN
+            //  IF (ItemUnitofMeasure.GET (TmpSalesLine."No.", TmpSalesLine."Unit of Measure")) THEN
+            if (TmpSalesLine."Unit of Measure Code" <> '') then
+              if (ItemUnitofMeasure.Get (TmpSalesLine."No.", TmpSalesLine."Unit of Measure Code")) then
+            //+MAG2.23 [370652]
                 if (ItemUnitofMeasure."Qty. per Unit of Measure" > 0) then
                   TmpSalesLine."Qty. per Unit of Measure" := ItemUnitofMeasure."Qty. per Unit of Measure";
 

@@ -17,6 +17,17 @@ table 6150613 "NP Retail Setup"
     // NPR5.42/TSA /20180502 CASE 312104 "Allow Zero Amount Sales" to allow cash-back on non-sales.
     // NPR5.45/MHA /20180803 CASE 323705 Added fields 300, 305, 310 to enable overload of Item Price functionality
     // NPR5.50/MHA /20190422 CASE 337539 Added field 400 "Global POS Sales Setup"
+    // NPR5.52/ALPO/20190923 CASE 365326 The following fields moved to POS Posting Profiles and deleted from this table:
+    //                                     100Default POS Entry No. SeriesCode10
+    //                                     140Max. POS Posting Diff. (LCY)Decimal
+    //                                     141POS Posting Diff. AccountCode20
+    //                                     10030Automatic Item PostingOption
+    //                                     10032Automatic POS PostingOption
+    //                                     10033Automatic Posting MethodOption
+    //                                     10035Adj. Cost after Item PostingBoolean
+    //                                     10036Post to G/L after Item PostingBoolean
+    //                                   New field added: "Default POS Posting Profile"
+    // NPR5.52/MHA /20191016 CASE 371388 Field 400 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
 
     Caption = 'NP Retail Setup';
 
@@ -30,22 +41,6 @@ table 6150613 "NP Retail Setup"
         {
             Caption = 'Source Code';
             TableRelation = "Source Code";
-        }
-        field(100;"Default POS Entry No. Series";Code[10])
-        {
-            Caption = 'Default POS Entry No. Series';
-            TableRelation = "No. Series";
-        }
-        field(140;"Max. POS Posting Diff. (LCY)";Decimal)
-        {
-            Caption = 'Max. POS Posting Diff. (LCY)';
-            Description = 'NPR5.36';
-        }
-        field(141;"POS Posting Diff. Account";Code[20])
-        {
-            Caption = 'Differences Account';
-            Description = 'NPR5.36';
-            TableRelation = "G/L Account";
         }
         field(150;"Sale Fiscal No. Series";Code[10])
         {
@@ -82,6 +77,12 @@ table 6150613 "NP Retail Setup"
         {
             Caption = 'Allow Zero Amount Sales';
             Description = 'NPR5.42 [312104]';
+        }
+        field(210;"Default POS Posting Profile";Code[20])
+        {
+            Caption = 'Default POS Posting Profile';
+            Description = 'NPR5.52';
+            TableRelation = "POS Posting Profile";
         }
         field(300;"Item Price Codeunit ID";Integer)
         {
@@ -144,6 +145,7 @@ table 6150613 "NP Retail Setup"
                 EventSubscription: Record "Event Subscription";
             begin
                 //-NPR5.45 [323705]
+
                 EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
                 EventSubscription.SetRange("Publisher Object ID",GetPublisherCodeunitId());
                 EventSubscription.SetRange("Published Function",GetPublisherFunction());
@@ -174,12 +176,6 @@ table 6150613 "NP Retail Setup"
                 EventSubscription.FindFirst;
                 //+NPR5.45 [323705]
             end;
-        }
-        field(400;"Global POS Sales Setup";Code[10])
-        {
-            Caption = 'Global POS Sales Setup';
-            Description = 'NPR5.50';
-            TableRelation = "NpGp POS Sales Setup";
         }
         field(10000;"Data Model Build";Integer)
         {
@@ -241,37 +237,6 @@ table 6150613 "NP Retail Setup"
                   RetailDataModelARUpgrade.DeactivatePoseidonPosting;
                 //+NPR5.36 [277103]
             end;
-        }
-        field(10030;"Automatic Item Posting";Option)
-        {
-            Caption = 'Automatic Item Posting';
-            Description = 'NPR5.38';
-            OptionCaption = 'No,After Sale,After End Of Day,After Last End Of Day in Store,After Last End Of Day Companywide';
-            OptionMembers = No,AfterSale,AfterEndOfDay,AfterLastEndofDayStore,AfterLastEndofDayCompany;
-        }
-        field(10032;"Automatic POS Posting";Option)
-        {
-            Caption = 'Automatic POS Posting';
-            Description = 'NPR5.38';
-            OptionCaption = 'No,After Sale,After End Of Day,After Last End Of Day in Store,After Last End Of Day Companywide';
-            OptionMembers = No,AfterSale,AfterEndOfDay,AfterLastEndofDayStore,AfterLastEndofDayCompany;
-        }
-        field(10033;"Automatic Posting Method";Option)
-        {
-            Caption = 'Automatic Posting Method';
-            Description = 'NPR5.38';
-            OptionCaption = 'Start New Session,Direct';
-            OptionMembers = StartNewSession,Direct;
-        }
-        field(10035;"Adj. Cost after Item Posting";Boolean)
-        {
-            Caption = 'Adj. Cost after Item Posting';
-            Description = 'NPR5.38';
-        }
-        field(10036;"Post to G/L after Item Posting";Boolean)
-        {
-            Caption = 'Post to G/L after Item Posting';
-            Description = 'NPR5.38';
         }
         field(20000;"Environment Database Name";Text[250])
         {
@@ -345,6 +310,25 @@ table 6150613 "NP Retail Setup"
         //-NPR5.45 [323705]
         exit('OnFindItemPrice');
         //+NPR5.45 [323705]
+    end;
+
+    procedure GetPostingProfile(POSUnitNo: Code[10];var POSPostingProfile: Record "POS Posting Profile")
+    var
+        POSUnit: Record "POS Unit";
+    begin
+        //-NPR5.52 [365326]
+        if POSUnitNo <> '' then begin
+          POSUnit.Get(POSUnitNo);
+          if POSUnit."POS Posting Profile" <> '' then begin
+            POSPostingProfile.Get(POSUnit."POS Posting Profile");
+            exit;
+          end else
+            if "Default POS Posting Profile" = '' then
+              POSUnit.TestField("POS Posting Profile");
+        end;
+        TestField("Default POS Posting Profile");
+        POSPostingProfile.Get("Default POS Posting Profile");
+        //+NPR5.52 [365326]
     end;
 }
 

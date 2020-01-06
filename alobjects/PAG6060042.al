@@ -19,6 +19,7 @@ page 6060042 "Item Worksheet Page"
     // NPR5.48/TS  /20181206  CASE 338656 Added Missing Picture to Action
     // NPR5.50/THRO/20190526  CASE 356260 Removed FieldsVisible and ShowAllInfo variables - Let user deside which fields to see. Field hidden by the variables set to visible=false
     // NPR5.51/MHA /20190819  CASE 365377 Removed action "GIM import document"
+    // NPR5.52/SARA/20190906  CASE 366969 Added action 'Shelf Label' and 'Price Label'
 
     AutoSplitKey = true;
     Caption = 'Item Worksheet Page';
@@ -637,6 +638,45 @@ page 6060042 "Item Worksheet Page"
                         //+NPR5.22
                     end;
                 }
+                action("Shelf Label")
+                {
+                    Caption = 'Shelf Label';
+                    Image = BinContent;
+                    Promoted = true;
+                    PromotedCategory = "Report";
+
+                    trigger OnAction()
+                    var
+                        ReportSelectionRetail: Record "Report Selection Retail";
+                        RecRef: RecordRef;
+                    begin
+                        //-NPR5.52 [366969]
+                        RecRef.GetTable(Rec);
+                        LabelLibrary.ToggleLine(RecRef);
+                        LabelLibrary.PrintSelection(ReportSelectionRetail."Report Type"::"Shelf Label");
+                        //+NPR5.52 [366969]
+                    end;
+                }
+                action("Price Label")
+                {
+                    Caption = 'Price Label';
+                    Image = BinLedger;
+                    Promoted = true;
+                    PromotedCategory = "Report";
+                    ShortCutKey = 'Ctrl+Alt+L';
+
+                    trigger OnAction()
+                    var
+                        ReportSelectionRetail: Record "Report Selection Retail";
+                        RecRef: RecordRef;
+                    begin
+                        //-NPR5.52 [366969]
+                        RecRef.GetTable(Rec);
+                        LabelLibrary.ToggleLine(RecRef);
+                        LabelLibrary.PrintSelection(ReportSelectionRetail."Report Type"::"Price Label");
+                        //+NPR5.52 [366969]
+                    end;
+                }
             }
             group(Worksheet)
             {
@@ -939,6 +979,7 @@ page 6060042 "Item Worksheet Page"
     var
         ItemWorksheetTemplate: Record "Item Worksheet Template";
         ItemWorksheetMgt: Codeunit "Item Worksheet Management";
+        LabelLibrary: Codeunit "Label Library";
         OpenedFromWorksheet: Boolean;
         CurrentWorksheetName: Code[10];
         WorksheetSelected: Boolean;

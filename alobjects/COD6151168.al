@@ -2,7 +2,11 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
 {
     // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
     // NPR5.51/ALST/20190711  CASE 337539 modified the web request message
+    // NPR5.52/ALST/20191009  CASE 372010 added permissions to service password
+    // NPR5.52/MHA /20191016 CASE 371388 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
+    // NPR5.52/MHA /20191017  CASE 373420 Added function XmlEscape()
 
+    Permissions = TableData "Service Password"=rimd;
     TableNo = "Nc Task";
 
     trigger OnRun()
@@ -22,7 +26,7 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
     var
         POSEntry: Record "POS Entry";
         NpGpGlobalSalesSetup: Record "NpGp POS Sales Setup";
-        NPRetailSetup: Record "NP Retail Setup";
+        POSUnit: Record "POS Unit";
         ServicePassword: Record "Service Password";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         NpGpPOSSalesSetupCard: Page "NpGp POS Sales Setup Card";
@@ -43,12 +47,14 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
         if not POSEntry.Find then
           exit;
 
-        if not NPRetailSetup.Get then
+        //-NPR5.52 [371388]
+        if not POSUnit.Get(POSEntry."POS Unit No.") then
           exit;
-        if NPRetailSetup."Global POS Sales Setup" = '' then
+        if POSUnit."Global POS Sales Setup" = '' then
           exit;
-        if not NpGpGlobalSalesSetup.Get(NPRetailSetup."Global POS Sales Setup") then
+        if not NpGpGlobalSalesSetup.Get(POSUnit."Global POS Sales Setup") then
           exit;
+        //+NPR5.52 [371388]
         NpGpGlobalSalesSetup.TestField("Service Url");
 
         ServiceName := GetServiceName(NpGpGlobalSalesSetup."Service Url");
@@ -101,7 +107,9 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
                    '  pos_store_code="' + POSEntry."POS Store Code" + '"' +
                    '  pos_unit_no="' + POSEntry."POS Unit No." + '"' +
                    '  document_no="' + POSEntry."Document No." + '"' +
-                   '  company="' + CompanyName + '">' +
+                   //-NPR5.52 [373420]
+                   '  company="' + XmlEscape(CompanyName) + '">' +
+                   //-NPR5.52 [373420]
                      '<entry_time>' + Format(CreateDateTime(POSEntry."Entry Date",POSEntry."Ending Time"),0,9) + '</entry_time>' +
                      '<entry_type>' + Format(POSEntry."Entry Type",0,2) + '</entry_type>' +
                      '<retail_id>' + Format(POSEntry."Retail ID") + '</retail_id>' +
@@ -282,6 +290,16 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
     local procedure TryGetWebResponse(HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse)
     begin
         HttpWebResponse := HttpWebRequest.GetResponse;
+    end;
+
+    local procedure XmlEscape(Input: Text) Output: Text
+    var
+        SecurityElement: DotNet npNetSecurityElement;
+    begin
+        //-NPR5.52 [373420]
+        Output := SecurityElement.Escape(Input);
+        exit(Output);
+        //+NPR5.52 [373420]
     end;
 }
 

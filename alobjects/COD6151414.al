@@ -1,7 +1,8 @@
 codeunit 6151414 "Magento Lookup Sales Order"
 {
-    // MAG1.21/TTH/20151118 CASE 227358 Replacing Type option field with Import type. Code moved here from page 6059808 "Naviconnect Import List"
-    // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
+    // MAG1.21/TTH /20151118  CASE 227358 Replacing Type option field with Import type. Code moved here from page 6059808 "Naviconnect Import List"
+    // MAG2.00/MHA /20160525  CASE 242557 Magento Integration
+    // MAG2.23/MHA /20191018  CASE 369170 Removed unused Global Variables
 
     TableNo = "Nc Import Entry";
 
@@ -20,19 +21,11 @@ codeunit 6151414 "Magento Lookup Sales Order"
           exit;
     end;
 
-    var
-        TempImportEntry: Record "Nc Import Entry" temporary;
-        GambitMgt: Codeunit "Nc Gambit Management";
-        NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
-        SyncMgt: Codeunit "Nc Sync. Mgt.";
-        ErrorText: Text;
-        ShowImported: Boolean;
-        WebClient: Boolean;
-
     procedure GetOrderDocuments(ImportEntry: Record "Nc Import Entry";var TempSalesHeader: Record "Sales Header" temporary;var TempSalesInvHeader: Record "Sales Invoice Header" temporary): Boolean
     var
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
+        NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         RecRef: RecordRef;
         XmlDoc: DotNet npNetXmlDocument;
         XmlElement: DotNet npNetXmlElement;

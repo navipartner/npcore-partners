@@ -52,7 +52,7 @@ codeunit 6014453 "POS Sales Price Calc. Mgt."
         //+NPR5.51 [358985]
 
         TempSalePOS.Date := Today;
-        TempSalePOS."Price including VAT" := TempSaleLinePOS."Price Includes VAT";
+        TempSalePOS."Prices Including VAT" := TempSaleLinePOS."Price Includes VAT";
         TempSaleLinePOS."VAT %" := VATPostingSetup."VAT %";
         TempSaleLinePOS."VAT Calculation Type" := TempSaleLinePOS."VAT Calculation Type"::"Normal VAT";
         TempSaleLinePOS."VAT Bus. Posting Group" := Item."VAT Bus. Posting Gr. (Price)";
@@ -135,7 +135,7 @@ codeunit 6014453 "POS Sales Price Calc. Mgt."
           //+NPR5.48 [339549]
 
           //+NPR5.45 [323705]
-          SetVAT(SalePOS."Price including VAT","VAT %","VAT Calculation Type","VAT Bus. Posting Group");
+          SetVAT(SalePOS."Prices Including VAT","VAT %","VAT Calculation Type","VAT Bus. Posting Group");
           //-NPR5.48 [335967]
           //SetUoM(ABS(Quantity),1);
           SetUoM(Abs(Quantity), "Qty. per Unit of Measure");
@@ -182,7 +182,7 @@ codeunit 6014453 "POS Sales Price Calc. Mgt."
             //+NPR5.41
               "Unit Price"                     := TempSalesPrice."Unit Price";
 
-          "Price Includes VAT"             := SalePOS."Price including VAT";
+          "Price Includes VAT"             := SalePOS."Prices Including VAT";
           "Allow Line Discount"            := TempSalesPrice."Allow Line Disc.";
           "Allow Invoice Discount"         := TempSalesPrice."Allow Invoice Disc.";
           if not "Allow Line Discount" then

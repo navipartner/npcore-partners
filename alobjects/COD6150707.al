@@ -19,6 +19,7 @@ codeunit 6150707 "POS Payment Line"
     // NPR5.50/MMV /20190403 CASE 300557 Added init handling
     // NPR5.50/TSA /20190530 CASE 354832 Added ReverseUnrealizedSalesVAT()
     // NPR5.51/ALPO/20190820 CASE 365161 Lines with Type=Comment excluded from CalculateBalance()
+    // NPR5.52/MHA /20191016 CASE 373294 Added "Allow Cashback" to ValidatePaymentLine()
 
 
     trigger OnRun()
@@ -389,6 +390,10 @@ codeunit 6150707 "POS Payment Line"
           PaymentType.TestField (PaymentType."G/L Account No.");
 
         PaymentType.TestField (Status, PaymentType.Status::Active);
+        //-NPR5.52 [373294]
+        if Line."Amount Including VAT" < 0 then
+          PaymentType.TestField("Allow Cashback");
+        //+NPR5.52 [373294]
     end;
 
     local procedure ApplyForeignAmountConversion(var SaleLinePOS: Record "Sale Line POS";PrecalculatedAmount: Boolean;ForeignAmount: Decimal)
@@ -407,8 +412,10 @@ codeunit 6150707 "POS Payment Line"
           if (PaymentType."Fixed Rate" <> 0) then
             "Currency Amount" := "Amount Including VAT" / ( PaymentType."Fixed Rate" / 100 );
 
-          if ("Currency Amount" < 0) then
-            "Currency Amount" := 0;
+          //-NPR5.52 [373294]
+          // IF ("Currency Amount" < 0) THEN
+          //  "Currency Amount" := 0;
+          //+NPR5.52 [373294]
 
           if (PrecalculatedAmount) then
             "Currency Amount" := ForeignAmount;

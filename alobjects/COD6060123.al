@@ -24,6 +24,8 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
     // TM1.41/TSA /20190509 CASE 353981 Schedule based pricing
     // TM1.41/TSA /20190527 CASE 356057 Revoke Ticket also sets the original sales ticket as a reference in return sales fields
     // TM1.42/TSA /20190826 CASE 357359 Seating UI
+    // TM1.43/TSA /20190902 CASE 357359 Seating UI
+    // TM1.43/TSA /20190910 CASE 368043 Refactored usage of "External Item Code"
 
 
     trigger OnRun()
@@ -387,12 +389,15 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
     local procedure OnBeforeSetQuantity(SaleLinePOS: Record "Sale Line POS"; var NewQuantity: Decimal)
     var
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
+        SeatingUI: Codeunit "TM Seating UI";
+        POSSession: Codeunit "POS Session";
+        FrontEnd: Codeunit "POS Front End Management";
         TicketType: Record "TM Ticket Type";
         Item: Record Item;
+        Ticket: Record "TM Ticket";
         Token: Text[100];
         ResponseMessage: Text;
         ResponseCode: Integer;
-        Ticket: Record "TM Ticket";
         UnitPrice: Decimal;
         CreateCount: Integer;
     begin
@@ -427,6 +432,12 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
 
         if (SaleLinePOS.Quantity > 0) then begin
             TicketRequestManager.POS_OnModifyQuantity(SaleLinePOS);
+          //-TM1.43 [357359]
+          if (TicketRequestManager.GetTokenFromReceipt (SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)) then begin
+            if (POSSession.IsActiveSession (FrontEnd)) then
+              SeatingUI.ShowSelectSeatUI (FrontEnd, Token);
+          end;
+          //+TM1.43 [357359]
             exit;
         end;
 
@@ -485,6 +496,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         TicketUnitPrice: Decimal;
         POSSession: Codeunit "POS Session";
         FrontEnd: Codeunit "POS Front End Management";
+        SeatingUI: Codeunit "TM Seating UI";
     begin
 
         //-TM1.23 [284248]
@@ -527,13 +539,16 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
 
                 Commit;
 
-
+        //-TM1.43 [357359]
         //    IF (USERID = 'TSA') THEN BEGIN
         //      IF (SaleLinePOS."No." = '32010') THEN BEGIN
         //        IF (POSSession.IsActiveSession (FrontEnd)) THEN
         //          SeatingUI.ShowUI (FrontEnd);
         //      END;
         //    END;
+          if (POSSession.IsActiveSession (FrontEnd)) then
+            SeatingUI.ShowSelectSeatUI (FrontEnd, Token);
+        //+TM1.43 [357359]
 
                 exit(1); // nothing to confirm;
             end;
@@ -562,12 +577,16 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
 
             Commit;
 
-        //      IF (USERID = 'TSA') THEN BEGIN
+        //-TM1.43 [357359]
+        //    IF (USERID = 'TSA') THEN BEGIN
         //      IF (SaleLinePOS."No." = '32010') THEN BEGIN
         //        IF (POSSession.IsActiveSession (FrontEnd)) THEN
         //          SeatingUI.ShowUI (FrontEnd);
         //      END;
         //    END;
+          if (POSSession.IsActiveSession (FrontEnd)) then
+            SeatingUI.ShowSelectSeatUI (FrontEnd, Token);
+        //+TM1.43 [357359]
 
             exit(1);
         end;
@@ -921,8 +940,13 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
             TicketReservationRequest2.ModifyAll("Request Status", TicketReservationRequest2."Request Status"::RESERVED);
 
             SaleLinePos.Type := SaleLinePos.Type::Item;
-            if (not BarcodeLibrary.TranslateBarcodeToItemVariant(TicketReservationRequest."External Item Code", SaleLinePos."No.", SaleLinePos."Variant Code", Resolver, false)) then
-                Error(ILLEGAL_VALUE, TicketReservationRequest."External Item Code", 'Barcode or Item');
+
+          //-TM1.43 [368043]
+          // IF (NOT BarcodeLibrary.TranslateBarcodeToItemVariant (TicketReservationRequest."External Item Code", SaleLinePos."No.", SaleLinePos."Variant Code", Resolver, FALSE)) THEN
+          //  ERROR (ILLEGAL_VALUE, TicketReservationRequest."External Item Code", 'Barcode or Item');
+          SaleLinePos."No." := TicketReservationRequest."Item No.";
+          SaleLinePos."Variant Code" := TicketReservationRequest."Variant Code";
+          //+TM1.43 [368043]
 
             SaleLinePos.Quantity := TicketReservationRequest.Quantity;
             POSSaleLine.InsertLine(SaleLinePos);

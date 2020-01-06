@@ -2,6 +2,7 @@ table 6151195 "NpCs Store"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // NPR5.51/MHA /20190719  CASE 362443 Added field 15 "Opening Hour Set"
+    // NPR5.52/MHA /20191002  CASE 369476 Added fields 140 "Requested Qty.", 150 "Fulfilled Qty."
 
     Caption = 'Collect Store';
     DrillDownPageID = "NpCs Stores";
@@ -93,6 +94,18 @@ table 6151195 "NpCs Store"
         field(135;"In Stock";Boolean)
         {
             Caption = 'In Stock';
+        }
+        field(140;"Requested Qty.";Decimal)
+        {
+            Caption = 'Requested Qty.';
+            DecimalPlaces = 0:5;
+            Description = 'NPR5.52';
+        }
+        field(150;"Fullfilled Qty.";Decimal)
+        {
+            Caption = 'Fullfilled Qty.';
+            DecimalPlaces = 0:5;
+            Description = 'NPR5.52';
         }
         field(200;"Salesperson Code";Code[10])
         {
