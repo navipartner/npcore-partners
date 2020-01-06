@@ -686,5 +686,19 @@ codeunit 6151367 "CS UI Warehouse Shipment"
           Rec."Qty. to Ship" := 0;
         //+NPR5.52 [363091]
     end;
+
+    [EventSubscriber(ObjectType::Table, 7321, 'OnBeforeInsertEvent', '', false, false)]
+    local procedure EmptyQtyToShipOnWarehouseShipment(var Rec: Record "Warehouse Shipment Line";RunTrigger: Boolean)
+    var
+        CSSetup: Record "CS Setup";
+    begin
+        //-NPR5.52 [363091]
+        if Rec.IsTemporary then
+          exit;
+
+        if  CSSetup.Get and CSSetup."Zero Def. Qty. to Handle" then
+          Rec."Qty. to Ship" := 0;
+        //+NPR5.52 [363091]
+    end;
 }
 

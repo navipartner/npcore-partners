@@ -5,6 +5,7 @@ page 6151150 "Customer GDPR Setup"
     Caption = 'Customer GDPR Setup';
     PageType = Card;
     SourceTable = "Customer GDPR SetUp";
+    UsageCategory = Administration;
 
     layout
     {

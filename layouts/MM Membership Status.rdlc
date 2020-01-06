@@ -15,6 +15,12 @@
         <Field Name="ValidUntilDate">
           <DataField>ValidUntilDate</DataField>
         </Field>
+        <Field Name="ValidFromDate">
+          <DataField>ValidFromDate</DataField>
+        </Field>
+        <Field Name="ValidUntilDate">
+          <DataField>ValidUntilDate</DataField>
+        </Field>
   <ReportSections>
     <ReportSection>
       <Body>

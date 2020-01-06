@@ -10,6 +10,7 @@ page 6151204 "NpCs Send to Store Orders"
     SourceTableView = SORTING("Entry No.")
                       WHERE(Type=CONST("Send to Store"),
                             "Document Type"=CONST(Order));
+    UsageCategory = Lists;
 
     layout
     {

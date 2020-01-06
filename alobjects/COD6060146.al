@@ -472,6 +472,10 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
         DataRow.Add ('RedeemablePoints', RedeemablePoints);
         //+MM1.41 [371095]
 
+        //-MM1.41 [371095]
+        DataRow.Add ('RedeemablePoints', RedeemablePoints);
+        //+MM1.41 [371095]
+
         Handled := true;
     end;
 

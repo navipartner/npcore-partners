@@ -888,6 +888,13 @@ codeunit 6150723 "POS Action - Insert Item"
         //+NPR5.52 [369231]
     end;
 
+    local procedure EventCodeSerialNoItemCrossRef(): Code[20]
+    begin
+        //-NPR5.52 [369231]
+        exit('SERIALNOITEMCROSSREF');
+        //+NPR5.52 [369231]
+    end;
+
     local procedure "--- Item Search"()
     begin
     end;

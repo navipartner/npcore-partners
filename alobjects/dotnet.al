@@ -936,6 +936,14 @@ dotnet
         {
         }
 
+        type("Renci.SshNet.PrivateKeyAuthenticationMethod";"npNetPrivateKeyAuthenticationMethod")
+        {
+        }
+
+        type("Renci.SshNet.PrivateKeyFile";"npNetPrivateKeyFile")
+        {
+        }
+
         type("Renci.SshNet.Sftp.SftpDownloadAsyncResult"; "npNetSftpDownloadAsyncResult")
         {
         }

@@ -658,27 +658,26 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         //-NPR5.52 [352473]
                 POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 0);
         //+NPR5.52 [352473]
-                        Success := true;
-                        Commit;
-                        Error('');
-                    end;
-                    if not Success then
-                        Message(PrintingErrorTxt, GetLastErrorText);
-                end;
+                Success := true;
+                Commit;
+                Error('');
+              end;
+              if not Success then
+                Message(PrintingErrorTxt,GetLastErrorText);
+            end;
         //-NPR5.52 [352473]
             if SendDocument then begin
-                    ClearLastError;
-                    asserterror
-                    begin
-                        Success := false;
+              ClearLastError;
+              asserterror begin
+                Success := false;
                 POSSalesDocumentOutputMgt.SendDocument(SalesHeader, 0);
-                        Success := true;
-                        Commit;
-                        Error('');
-                    end;
-                    if not Success then
-                        Message(SendingErrorTxt, GetLastErrorText);
-                end;
+                Success := true;
+                Commit;
+                Error('');
+              end;
+              if not Success then
+                Message(SendingErrorTxt,GetLastErrorText);
+            end;
         //+NPR5.52 [352473]
             if SendPostedPdf2Nav then begin
               ClearLastError;
@@ -694,7 +693,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
               if not Success then
                 Message(Pdf2NavSendingErrorTxt,GetLastErrorText);
             end;
-            end;
+          end;
 
             if ShowCreationMessage then
                 //-NPR5.50 [300557]
@@ -1522,7 +1521,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
             Commit;
 
           //-NPR5.52 [352473]
-            if Print then begin
+          if Print then begin
             POSSalesDocumentOutputMgt.PrintDocument(SalesHeader, 2);
           end;
 
@@ -1532,7 +1531,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
 
           if Pdf2Nav then begin
             POSSalesDocumentOutputMgt.SendPdf2NavDocument(SalesHeader, 2);
-            end;
+          end;
           //+NPR5.52 [352473]
         end;
         //+NPR5.50 [300557]

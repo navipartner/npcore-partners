@@ -8,6 +8,7 @@ page 6151151 "Customer GDPR Log Entries"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Customer GDPR Log Entries";
+    UsageCategory = History;
 
     layout
     {

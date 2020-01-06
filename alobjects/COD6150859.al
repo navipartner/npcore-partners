@@ -636,6 +636,10 @@ codeunit 6150859 "POS Action - Doc. Export"
                 Caption := DescNegDocType;
             'SetShowCreationMessage':
                 Caption := DescCreationMsg;
+        //-NPR5.52 [352473]
+          'PrepaymentDialog' : Caption := DescPrepaymentDlg;
+          'FixedPrepaymentValue' : Caption := DescFixedPrepaymentPct;
+        //+NPR5.52 [352473]
             'PrepaymentPctDialog':
                 Caption := DescPrepaymentDlg;
             'FixedPrepaymentPct':
@@ -664,8 +668,9 @@ codeunit 6150859 "POS Action - Doc. Export"
                 Caption := DescOpenDoc;
             'PayAndPostInNextSale':
                 Caption := DescPayAndPostNext;
-            'PrintPayAndPostInvoice':
-                Caption := DescPrintPayAndPost;
+        //-NPR5.52 [352473]
+          'PrintPayAndPostDocument' : Caption := DescPrintPayAndPost;
+        //+NPR5.52 [352473]
             //-NPR5.51 [357277]
             'SaveLinesOnPOSEntry':
                 Caption := DescSaveLinesOnPOSEntry;

@@ -6,6 +6,7 @@ page 6150647 "POS Info POS Entry"
     Editable = false;
     PageType = List;
     SourceTable = "POS Info POS Entry";
+    UsageCategory = Lists;
 
     layout
     {
