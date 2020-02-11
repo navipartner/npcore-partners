@@ -2,10 +2,11 @@ codeunit 6060141 "MM Loyalty WebService"
 {
     // MM1.19/NPKNAV/20170525  CASE 274690 Transport MM1.20 - 25 May 2017
     // MM1.37/TSA /20190204 CASE 338215 Points for payment, RegisterSale(), ReservePoints()
-    // MM130.1.37/TSA /20190110 CASE 353981 Changed property "Functional Visibility" to External
     // MM1.38/TSA /20190523 CASE 338215 Added Service GetLoyaltyConfiguration
     // MM1.40/TSA /20190813 CASE 343352 Added GetCouponEligibility(), TransformPointsToCoupon()
     // MM1.40/TSA /20190828 CASE 365879 Added ReceiptList and Receipt as PDF
+    // MM1.42/TSA /20191024 CASE 374403 Changed signature on IssueOneCoupon(), IssueOneCouponAndPrint(), and IssueCoupon()
+    // #370398/TSA /20200113 CASE 370398 Added the ListCoupons() service
 
 
     trigger OnRun()
@@ -446,7 +447,11 @@ codeunit 6060141 "MM Loyalty WebService"
             repeat
               if (LoyaltyPointsSetup.Get (TmpLoyaltyPointsSetup.Code, TmpLoyaltyPointsSetup."Line No.")) then begin
                 TmpLoyaltyPointsSetup.TransferFields (LoyaltyPointsSetup, true);
-                if (Coupon.Get (LoyaltyPointManagement.IssueOneCoupon (MembershipEntryNo, TmpLoyaltyPointsSetup, TmpMemberInfoCapture."Amount Incl VAT"))) then begin
+                //-MM1.42 [374403]
+                //IF (Coupon.GET (LoyaltyPointManagement.IssueOneCoupon (MembershipEntryNo, TmpLoyaltyPointsSetup, TmpMemberInfoCapture."Amount Incl VAT"))) THEN BEGIN
+                with TmpMemberInfoCapture do
+                if (Coupon.Get (LoyaltyPointManagement.IssueOneCoupon (MembershipEntryNo, TmpLoyaltyPointsSetup, "Document No.", "Document Date", "Amount Incl VAT"))) then begin
+                //+MM1.42 [374403]
                   TmpCoupon.TransferFields (Coupon, true);
                   TmpCoupon.Insert ();
                 end;
@@ -474,6 +479,83 @@ codeunit 6060141 "MM Loyalty WebService"
         ImportEntry."Runtime Error" := false;
 
         ImportEntry.Modify (true);
+    end;
+
+    procedure ListCoupons(var LoyaltyListCoupon: XMLport "MM Loyalty List Coupon")
+    var
+        TmpMemberInfoCapture: Record "MM Member Info Capture" temporary;
+        ImportEntry: Record "Nc Import Entry";
+        Coupon: Record "NpDc Coupon";
+        TmpCoupon: Record "NpDc Coupon" temporary;
+        Membership: Record "MM Membership";
+        MembershipManagement: Codeunit "MM Membership Management";
+        OutStr: OutStream;
+        ResponseMessage: Text;
+        ResponseMessageId: Text;
+        MembershipEntryNo: Integer;
+    begin
+
+        //-#370398 [370398]
+        LoyaltyListCoupon.Import ();
+
+        InsertImportEntry ('LoyaltyListCoupon', ImportEntry);
+        ImportEntry."Document Name" := StrSubstNo ('LoyaltyListCoupon-%1.xml', Format (CurrentDateTime(), 0, 9) );
+        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid),'=','{}-'));
+        ImportEntry.Imported := false;
+        ImportEntry."Runtime Error" := true;
+        ImportEntry.Modify (true);
+        Commit ();
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        LoyaltyListCoupon.SetDestination (OutStr);
+        LoyaltyListCoupon.Export;
+        ImportEntry.Modify(true);
+        Commit ();
+
+        // Process
+        LoyaltyListCoupon.GetRequest (TmpMemberInfoCapture);
+        if (TmpMemberInfoCapture."External Membership No." <> '') then
+          MembershipEntryNo := MembershipManagement.GetMembershipFromExtMembershipNo (TmpMemberInfoCapture."External Membership No.");
+
+        if (MembershipEntryNo > 0) then begin
+
+          if (Membership.Get (MembershipEntryNo)) then begin
+            if (Membership."Customer No." <> '') then begin
+              Coupon.SetFilter ("Customer No.", '=%1', Membership."Customer No.");
+              Coupon.SetFilter ("Starting Date", '=%1|<=%2', 0DT, CurrentDateTime());
+              Coupon.SetFilter ("Ending Date", '=%1|>=%2', 0DT, CurrentDateTime());
+              Coupon.SetAutoCalcFields("In-use Quantity", "Remaining Quantity");
+              if (Coupon.FindSet ()) then begin
+                repeat
+                  TmpCoupon.TransferFields (Coupon, true);
+                  if (Coupon."In-use Quantity" < Coupon."Remaining Quantity") then
+                    TmpCoupon.Insert ();
+                until (Coupon.Next () = 0);
+              end;
+            end;
+          end;
+
+          if (not TmpCoupon.IsEmpty ()) then begin
+            LoyaltyListCoupon.AddResponse (MembershipEntryNo, TmpCoupon, ResponseMessage);
+            Commit;
+          end else begin
+            LoyaltyListCoupon.AddErrorResponse ('No coupons available.');
+          end;
+
+        end else begin
+          LoyaltyListCoupon.AddErrorResponse ('Invalid Search Value.');
+        end;
+
+        // Log result
+        ImportEntry."Document Source".CreateOutStream (OutStr);
+        LoyaltyListCoupon.SetDestination (OutStr);
+        LoyaltyListCoupon.Export;
+
+        ImportEntry.Imported := true;
+        ImportEntry."Runtime Error" := false;
+
+        ImportEntry.Modify (true);
+        //+#370398 [370398]
     end;
 
     local procedure "--Locals"()
@@ -515,8 +597,7 @@ codeunit 6060141 "MM Loyalty WebService"
         CreateImportType ('LOYALTY-04', 'LoyaltyManagement', 'LoyaltyCreateCoupon');
 
         CreateImportType ('LOYALTY-05', 'LoyaltyManagement', 'GetLoyaltyReceiptList');
-        //CreateImportType ('LOYALTY-06', 'LoyaltyManagement', 'LoyaltyCreateCoupon');
-
+        CreateImportType ('LOYALTY-06', 'LoyaltyManagement', 'LoyaltyListCoupon');
 
         CreateImportType ('POINTS-01', 'PointManagement', 'RegisterSale');
         CreateImportType ('POINTS-02', 'PointManagement', 'ReservePoints');

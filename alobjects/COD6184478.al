@@ -1,6 +1,8 @@
 codeunit 6184478 "EFT Gift Card Mgt."
 {
     // NPR5.51/MMV /20190626 CASE 359385 Created object
+    // NPR5.53/MMV /20191203 CASE 349520 Only recover to payment line when original trx was unsuccessful. This should logically be implied but added safeguard against integration specific bugs.
+    // NPR5.53/MMV /20200114 CASE 375525 Return EntryNo from StartGiftCardLoadTransaction
 
 
     trigger OnRun()
@@ -9,21 +11,25 @@ codeunit 6184478 "EFT Gift Card Mgt."
 
     var
         CAPTION_RECOVER_PROMPT: Label 'The last %1 transaction on this register never completed successfully.\Do you want to attempt recovery of the below transaction now?\(This is strongly recommended but can be done later on the EFT transaction list)\\From Sales Ticket No.: %2\Type: %3\Amount: %4 %5\External Ref. No.: %6';
-        CAPTION_RECOVER_FAIL_HARD: Label 'Lookup failed for %1 transaction entry no. %2. No connection could be established.\Please try again later.';
-        CAPTION_RECOVER_FAIL_SOFT: Label 'Cannot lookup %1 result for transaction entry no. %2';
-        CAPTION_RECOVER_SYNC: Label '%1 transaction result is in sync with the originally recorded transaction result:\\From Sales Ticket No.: %2\Type: %3\Amount: %4 %5\External Ref. No.: %6';
+        CAPTION_RECOVER_FAIL_HARD: Label 'UNKNOWN:\Lookup failed for %1 transaction entry no. %2. No connection could be established.\Please try again later.';
+        CAPTION_RECOVER_FAIL_SOFT: Label 'UNKNOWN:\Cannot lookup %1 result for transaction entry no. %2';
+        CAPTION_RECOVER_SYNC: Label 'SUCCESS:\%1 transaction result is in sync with the originally recorded transaction result:\\From Sales Ticket No.: %2\Type: %3\Amount: %4 %5\External Ref. No.: %6';
         CAPTION_RECOVER_EARLIER: Label '%1 transaction result has already been recovered by an earlier lookup request (Entry No. %2):\\From Sales Ticket No.: %3\Type: %4\Recovered Amount: %5 %6\External Ref. No.: %7';
-        CAPTION_RECOVER_SAVE: Label 'A lost %1 transaction result from the current sale was recovered and re-created as a sale line:\\Type: %3\Amount: %4 %5\External Ref. No.: %6';
+        CAPTION_RECOVER_SAVE: Label 'SUCCESS:\A lost %1 transaction result from the current sale was recovered and re-created as a sale line:\\Type: %3\Amount: %4 %5\External Ref. No.: %6';
         CAPTION_RECOVER_WARN_STRONG: Label 'WARNING:\A %1 transaction result from an earlier sale was recovered. If the sale was cancelled this transaction should be reversed.\\From Sales Ticket No.: %2\Type: %4\Amount: %5 %6\External Ref. No.: %7';
-        WARNING_GIFT_TYPE: Label 'Warning:\The payment type %1 used for %2 is not set as %3. This is either caused by a wrong card swipe on terminal or incorrect setup.';
+        WARNING_GIFT_TYPE: Label 'WARNING:\The payment type %1 used for %2 is not set as %3. This is either caused by a wrong card swipe on terminal or incorrect setup.';
+        CAPTION_RECOVER_BUG_MISMATCH: Label 'ERROR:\%1 lookup result does not match the original result!\New Amount: %2 %3\\Original Sales Ticket No.: %4\Type: %5\Original Amount: %6 %7\External Ref. No.: %8';
 
-    procedure StartGiftCardLoadTransaction(EFTSetup: Record "EFT Setup";PaymentTypePOS: Record "Payment Type POS";Amount: Decimal;CurrencyCode: Code[10];SalePOS: Record "Sale POS")
+    procedure StartGiftCardLoadTransaction(EFTSetup: Record "EFT Setup";PaymentTypePOS: Record "Payment Type POS";Amount: Decimal;CurrencyCode: Code[10];SalePOS: Record "Sale POS"): Integer
     var
         EFTTransactionRequest: Record "EFT Transaction Request";
     begin
         CreateEftTransactionRequest(EFTSetup, PaymentTypePOS, Amount, CurrencyCode, SalePOS, EFTTransactionRequest);
         Commit; // Save the request record data regardless of any later errors when invoking.
         SendRequest(EFTTransactionRequest);
+        //-NPR5.53 [375525]
+        exit(EFTTransactionRequest."Entry No.");
+        //+NPR5.53 [375525]
     end;
 
     procedure HandleIntegrationResponse(EftTransactionRequest: Record "EFT Transaction Request")
@@ -100,6 +106,22 @@ codeunit 6184478 "EFT Gift Card Mgt."
                 Message(CAPTION_RECOVER_EARLIER, "Integration Type", OldRecoveryRequest."Entry No.", OriginalEftTransactionRequest."Sales Ticket No.", Format(OriginalEftTransactionRequest."Processing Type"),
                                                  OldRecoveryRequest."Result Amount", OldRecoveryRequest."Currency Code", OldRecoveryRequest."Reference Number Output");
               end;
+
+        //-NPR5.53 [349520]
+            //Detected programming/integration bug: mismatch in amount even though original was logged as successful.
+            (OriginalEftTransactionRequest.Successful and (OriginalEftTransactionRequest."Result Amount" <> 0)):
+              begin
+                Message(CAPTION_RECOVER_BUG_MISMATCH,
+                  "Integration Type",
+                  "Result Amount",
+                  "Currency Code",
+                  OriginalEftTransactionRequest."Sales Ticket No.",
+                  Format(OriginalEftTransactionRequest."Processing Type"),
+                  OriginalEftTransactionRequest."Result Amount",
+                  OriginalEftTransactionRequest."Currency Code",
+                  OriginalEftTransactionRequest."Reference Number Output");
+              end;
+        //+NPR5.53 [349520]
 
             //Recovered transaction is out of sync and from the currently active sale
             (OriginalEftTransactionRequest."Sales Ticket No." = SalePOS."Sales Ticket No.") :

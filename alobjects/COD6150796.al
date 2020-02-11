@@ -6,6 +6,7 @@ codeunit 6150796 "POS Action - Delete POS Line"
     // NPR5.45/TSA /20180803  CASE 323780 Added call to Sale.SetModified() to have the data driver refresh data
     // NPR5.46/TSA /20180914  CASE 314603 Refactored the security functionality to use secure methods
     // NPR5.48/MHA /20181121  CASE 330181 Added function DeleteAccessories()
+    // NPR5.53/TJ  /20191021  CASE 373234 Added new publisher OnBeforeDeleteSaleLinePOS()
 
 
     trigger OnRun()
@@ -90,6 +91,9 @@ codeunit 6150796 "POS Action - Delete POS Line"
 
         if (CurrentView.Type.Equals (ViewType.Sale)) then begin
           POSSession.GetSaleLine(POSSaleLine);
+          //-NPR5.53 [373234]
+          OnBeforeDeleteSaleLinePOS(POSSaleLine);
+          //+NPR5.53 [373234]
           //-NPR5.48 [330181]
           DeleteAccessories(POSSaleLine);
           //+NPR5.48 [330181]
@@ -138,6 +142,11 @@ codeunit 6150796 "POS Action - Delete POS Line"
         SaleLinePOS2.SetSkipCalcDiscount(true);
         SaleLinePOS2.DeleteAll(false);
         //-NPR5.48 [330181]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDeleteSaleLinePOS(POSSaleLine: Codeunit "POS Sale Line")
+    begin
     end;
 }
 

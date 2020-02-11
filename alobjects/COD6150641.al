@@ -5,6 +5,7 @@ codeunit 6150641 "POS Payment Bin Eject Mgt."
     // NPR5.41/MMV /20180425 CASE 312990 Proper fallback.
     // NPR5.43/MMV /20180627 CASE 320714 Filter on payment amount
     // NPR5.51/TJ  /20190628 CASE 357069 Drawer opening requirement is now checked based on Open Drawer field
+    // NPR5.53/ALPO/20191216 CASE 378985 Finish credit sale workflow: eject payment bin step
 
 
     trigger OnRun()
@@ -175,6 +176,37 @@ codeunit 6150641 "POS Payment Bin Eject Mgt."
         exit(not POSPaymentLine.IsEmpty);
     end;
 
+    local procedure CarryOutPaymentBinEject(SalePOS: Record "Sale POS";Force: Boolean)
+    var
+        NPRetailSetup: Record "NP Retail Setup";
+        POSPaymentBin: Record "POS Payment Bin";
+        POSUnit: Record "POS Unit";
+        OpenDrawer: Boolean;
+    begin
+        //-NPR5.53 [378985]
+        OpenDrawer := Force;
+        if not OpenDrawer then begin
+        //+NPR5.53 [378985]
+          if not NPRetailSetup.Get then
+            exit;
+
+          //Change below to just loop and fire open on all unique payment bin from pos payment lines when the payment bins are properly implemented on payments
+
+          if NPRetailSetup."Advanced Posting Activated" then
+            OpenDrawer := IsDrawerOpenRequiredPOSEntry(SalePOS)
+          else
+            OpenDrawer := IsDrawerOpenRequiredAuditRoll(SalePOS);
+
+          if not OpenDrawer then
+            exit;
+        end;  //NPR5.53 [378985]
+
+        if ((not POSUnit.Get(SalePOS."Register No.")) or (not POSPaymentBin.Get(POSUnit."Default POS Payment Bin"))) then
+          POSPaymentBin."Eject Method" := 'PRINTER';
+
+        EjectDrawer(POSPaymentBin, SalePOS);
+    end;
+
     local procedure "-- Finish Sales Workflow"()
     begin
     end;
@@ -193,33 +225,74 @@ codeunit 6150641 "POS Payment Bin Eject Mgt."
 
     [EventSubscriber(ObjectType::Codeunit, 6150705, 'OnFinishSale', '', true, true)]
     local procedure EjectPaymentBin(POSSalesWorkflowStep: Record "POS Sales Workflow Step";SalePOS: Record "Sale POS")
+    begin
+        if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CODEUNIT::"POS Payment Bin Eject Mgt." then
+          exit;
+        if POSSalesWorkflowStep."Subscriber Function" <> 'EjectPaymentBin' then
+          exit;
+        
+        CarryOutPaymentBinEject(SalePOS,false);  //NPR5.53 [378985]
+        
+        //-NPR5.53 [378985]-revoked (Moved to a separate function to avoid code duplication)
+        /*
+        IF NOT NPRetailSetup.GET THEN
+          EXIT;
+        
+        //Change below to just loop and fire open on all unique payment bin from pos payment lines when the payment bins are properly implemented on payments
+        
+        IF NPRetailSetup."Advanced Posting Activated" THEN
+          OpenDrawer := IsDrawerOpenRequiredPOSEntry(SalePOS)
+        ELSE
+          OpenDrawer := IsDrawerOpenRequiredAuditRoll(SalePOS);
+        
+        IF NOT OpenDrawer THEN
+          EXIT;
+        
+        IF ((NOT POSUnit.GET(SalePOS."Register No.")) OR (NOT POSPaymentBin.GET(POSUnit."Default POS Payment Bin"))) THEN
+          POSPaymentBin."Eject Method" := 'PRINTER';
+        
+        EjectDrawer(POSPaymentBin, SalePOS);
+        */
+        //+NPR5.53 [378985]-revoked
+
+    end;
+
+    local procedure "-- Finish Credit Sale Workflow"()
+    begin
+        //NPR5.53 [378985]
+    end;
+
+    [EventSubscriber(ObjectType::Table, 6150730, 'OnBeforeInsertEvent', '', true, true)]
+    local procedure OnBeforeInsertCreditSaleWorkflowStep(var Rec: Record "POS Sales Workflow Step";RunTrigger: Boolean)
+    begin
+        //-NPR5.53 [378985]
+        if Rec."Subscriber Codeunit ID" <> CODEUNIT::"POS Payment Bin Eject Mgt." then
+          exit;
+        if Rec."Subscriber Function" <> 'EjectPaymentBinOnCreditSale' then
+          exit;
+
+        Rec.Description := WORKFLOW_STEP;
+        Rec."Sequence No." := 10;
+        Rec.Enabled := false;
+        //+NPR5.53 [378985]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6014407, 'OnFinishCreditSale', '', true, true)]
+    local procedure EjectPaymentBinOnCreditSale(POSSalesWorkflowStep: Record "POS Sales Workflow Step";SalePOS: Record "Sale POS")
     var
         NPRetailSetup: Record "NP Retail Setup";
         OpenDrawer: Boolean;
         POSPaymentBin: Record "POS Payment Bin";
         POSUnit: Record "POS Unit";
     begin
+        //-NPR5.53 [378985]
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CODEUNIT::"POS Payment Bin Eject Mgt." then
           exit;
-        if POSSalesWorkflowStep."Subscriber Function" <> 'EjectPaymentBin' then
-          exit;
-        if not NPRetailSetup.Get then
+        if POSSalesWorkflowStep."Subscriber Function" <> 'EjectPaymentBinOnCreditSale' then
           exit;
 
-        //Change below to just loop and fire open on all unique payment bin from pos payment lines when the payment bins are properly implemented on payments
-
-        if NPRetailSetup."Advanced Posting Activated" then
-          OpenDrawer := IsDrawerOpenRequiredPOSEntry(SalePOS)
-        else
-          OpenDrawer := IsDrawerOpenRequiredAuditRoll(SalePOS);
-
-        if not OpenDrawer then
-          exit;
-
-        if ((not POSUnit.Get(SalePOS."Register No.")) or (not POSPaymentBin.Get(POSUnit."Default POS Payment Bin"))) then
-          POSPaymentBin."Eject Method" := 'PRINTER';
-
-        EjectDrawer(POSPaymentBin, SalePOS);
+        CarryOutPaymentBinEject(SalePOS,true);
+        //+NPR5.53 [378985]
     end;
 
     local procedure "-- Event Publishers"()

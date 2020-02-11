@@ -14,6 +14,7 @@ page 6151412 "Magento Picture Link Subform"
     // MAG2.17/JDH /20181112  CASE 334163 Added Caption to Object
     // MAG2.20/MHA /20190430  CASE 353499 Redesigned DownloadMiniature() to consider Magento Picture not existing
     // MAG2.22/MHA /20190625  CASE 359285 Added Variant Systems; Variety (Select on Item),Variety 1,Variety 2,Variety 3,Variety 4
+    // MAG2.24/YAHA/20191213  CASE 376760 Change layout of the grouping
 
     AutoSplitKey = true;
     Caption = 'Magento Picture Link Subform';
@@ -27,55 +28,47 @@ page 6151412 "Magento Picture Link Subform"
     {
         area(content)
         {
-            group(Control6150613)
+            repeater(Control6150624)
             {
                 ShowCaption = false;
-                group(Control6150626)
+                field(MiniatureLine;TempMagentoPicture.Picture)
                 {
-                    ShowCaption = false;
-                    repeater(Control6150624)
-                    {
-                        ShowCaption = false;
-                        field(MiniatureLine;TempMagentoPicture.Picture)
-                        {
-                            Caption = 'Miniature';
-                            Editable = false;
-                            Visible = MiniatureLinePicture;
-                        }
-                        field("Picture Name";"Picture Name")
-                        {
-                        }
-                        field("Base Image";"Base Image")
-                        {
-                        }
-                        field("Small Image";"Small Image")
-                        {
-                        }
-                        field(Thumbnail;Thumbnail)
-                        {
-                        }
-                        field("Short Text";"Short Text")
-                        {
-
-                            trigger OnValidate()
-                            begin
-                                //-MAG1.21
-                                TestField("Short Text");
-                                //+MAG1.21
-                            end;
-                        }
-                        field(Sorting;Sorting)
-                        {
-                        }
-                    }
-                    field(MiniatureSingle;TempMagentoPicture.Picture)
-                    {
-                        Caption = 'Miniature';
-                        Editable = false;
-                        Enabled = false;
-                        Visible = MiniatureSinglePicture;
-                    }
+                    Caption = 'Miniature';
+                    Editable = false;
+                    Visible = MiniatureLinePicture;
                 }
+                field("Picture Name";"Picture Name")
+                {
+                }
+                field("Base Image";"Base Image")
+                {
+                }
+                field("Small Image";"Small Image")
+                {
+                }
+                field(Thumbnail;Thumbnail)
+                {
+                }
+                field("Short Text";"Short Text")
+                {
+
+                    trigger OnValidate()
+                    begin
+                        //-MAG1.21
+                        TestField("Short Text");
+                        //+MAG1.21
+                    end;
+                }
+                field(Sorting;Sorting)
+                {
+                }
+            }
+            field(MiniatureSingle;TempMagentoPicture.Picture)
+            {
+                Caption = 'Miniature';
+                Editable = false;
+                Enabled = false;
+                Visible = MiniatureSinglePicture;
             }
         }
     }

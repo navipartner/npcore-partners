@@ -13,6 +13,7 @@ codeunit 6014580 "Object Output Mgt."
     // NPR5.44/MMV /20180706 CASE 315362 Cleanup and refactoring.
     // NPR5.44/MMV /20180706 CASE 321816 Auto detect windows client environment instead of relying on setup.
     // NPR5.48/MMV /20181128 CASE 327107 Added event for overruling object output
+    // NPR5.53/THRO/20200106 CASE 383562 Added PrintNode Raw ouput
 
 
     trigger OnRun()
@@ -369,6 +370,15 @@ codeunit 6014580 "Object Output Mgt."
               for i := 1 to NoOfPrints do
                 PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintBytes, TargetEncoding);
             end;
+          //-NPR5.53 [383562]
+          ObjectOutput."Output Type"::"PrintNode Raw" :
+            begin
+              Printer.OnGetPrintBytes(PrintBytes);
+              Printer.OnGetTargetEncoding(TargetEncoding);
+              for i := 1 to NoOfPrints do
+                PrintMethodMgt.PrintViaPrintNodeRaw(ObjectOutput."Output Path", PrintBytes, TargetEncoding);
+            end;
+          //+NPR5.53 [383562]
         end;
         //+NPR5.44 [315362]
     end;
@@ -433,6 +443,15 @@ codeunit 6014580 "Object Output Mgt."
               for i := 1 to NoOfPrints do
                 PrintMethodMgt.PrintBytesBluetooth(ObjectOutput."Output Path", PrintBytes, TargetEncoding);
             end;
+          //-NPR5.53 [383562]
+          ObjectOutput."Output Type"::"PrintNode Raw" :
+            begin
+              Printer.OnGetPrintBytes(PrintBytes);
+              Printer.OnGetTargetEncoding(TargetEncoding);
+              for i := 1 to NoOfPrints do
+                PrintMethodMgt.PrintViaPrintNodeRaw(ObjectOutput."Output Path", PrintBytes, TargetEncoding);
+            end;
+          //+NPR5.53 [383562]
         end;
         //+NPR5.44 [315362]
     end;

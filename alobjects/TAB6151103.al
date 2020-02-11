@@ -1,6 +1,7 @@
 table 6151103 "NpRi Reimbursement Entry"
 {
     // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
+    // NPR5.53/TSA /20191024 CASE 374363 Added "Account Type"::Membership
 
     Caption = 'Reimbursement Entry';
     DrillDownPageID = "NpRi Reimbursement Entries";
@@ -104,8 +105,8 @@ table 6151103 "NpRi Reimbursement Entry"
         field(310;"Account Type";Option)
         {
             Caption = 'Account Type';
-            OptionCaption = 'G/L Account,Customer,Vendor,Bank Account,Fixed Asset,IC Partner';
-            OptionMembers = "G/L Account",Customer,Vendor,"Bank Account","Fixed Asset","IC Partner";
+            OptionCaption = 'G/L Account,Customer,Vendor,Bank Account,Fixed Asset,IC Partner,Membership';
+            OptionMembers = "G/L Account",Customer,Vendor,"Bank Account","Fixed Asset","IC Partner",Membership;
         }
         field(315;"Account No.";Code[20])
         {
@@ -115,7 +116,8 @@ table 6151103 "NpRi Reimbursement Entry"
                             ELSE IF ("Account Type"=CONST(Vendor)) Vendor
                             ELSE IF ("Account Type"=CONST("Bank Account")) "Bank Account"
                             ELSE IF ("Account Type"=CONST("Fixed Asset")) "Fixed Asset"
-                            ELSE IF ("Account Type"=CONST("IC Partner")) "IC Partner";
+                            ELSE IF ("Account Type"=CONST("IC Partner")) "IC Partner"
+                            ELSE IF ("Account Type"=CONST(Membership)) "MM Membership";
         }
         field(320;"Reimbursement Amount";Decimal)
         {

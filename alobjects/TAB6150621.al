@@ -26,6 +26,9 @@ table 6150621 "POS Entry"
     // NPR5.50/MHA /20190422 CASE 337539 Added field 170 "Retail ID"
     // NPR5.51/MMV /20190624 CASE 356076 Added field 109,111 and renamed the other totalling fields to align more with workshift total field naming.
     //                            Removed 107 that ended up being useless.
+    // NPR5.53/SARA/20191024 CASE 373672 Added Field 600..650
+    // NPR5.53/ALPO/20191105 CASE 376035 Added field 180 "Event No." to save info about event used on sale
+    // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
 
     Caption = 'POS Entry';
     DrillDownPageID = "POS Entries";
@@ -209,6 +212,12 @@ table 6150621 "POS Entry"
         {
             Caption = 'Retail ID';
         }
+        field(180;"Event No.";Code[20])
+        {
+            Caption = 'Active Event No.';
+            Description = 'NPR5.53 [376035]';
+            TableRelation = Job WHERE (Event=CONST(true));
+        }
         field(200;"Customer Posting Group";Code[10])
         {
             Caption = 'Customer Posting Group';
@@ -309,6 +318,61 @@ table 6150621 "POS Entry"
         {
             Caption = 'Sales Document No.';
             TableRelation = "Sales Header"."No." WHERE ("Document Type"=FIELD("Sales Document Type"));
+        }
+        field(600;"Sale Lines";Integer)
+        {
+            CalcFormula = Count("POS Sales Line" WHERE ("POS Entry No."=FIELD("Entry No.")));
+            Caption = 'Sale Lines';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(610;"Payment Lines";Integer)
+        {
+            CalcFormula = Count("POS Payment Line" WHERE ("POS Entry No."=FIELD("Entry No.")));
+            Caption = 'Payment Lines';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(620;"Tax Lines";Integer)
+        {
+            CalcFormula = Count("POS Tax Amount Line" WHERE ("POS Entry No."=FIELD("Entry No.")));
+            Caption = 'Tax Lines';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(630;"Customer Sales (LCY)";Decimal)
+        {
+            CalcFormula = Sum("POS Sales Line"."Amount Incl. VAT" WHERE ("POS Entry No."=FIELD("Entry No."),
+                                                                         Type=FILTER(Customer)));
+            Caption = 'Customer Sales (LCY)';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(640;"G/L Sales (LCY)";Decimal)
+        {
+            CalcFormula = Sum("POS Sales Line"."Amount Incl. VAT" WHERE ("POS Entry No."=FIELD("Entry No."),
+                                                                         Type=FILTER("G/L Account")));
+            Caption = 'G/L Sales (LCY)';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(650;"Payment Amount";Decimal)
+        {
+            CalcFormula = Sum("POS Payment Line".Amount WHERE ("POS Entry No."=FIELD("Entry No.")));
+            Caption = 'Payment Amount';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(710;"NPRE Number of Guests";Integer)
+        {
+            Caption = 'Number of Guests';
+            Description = 'NPR5.53';
         }
         field(5052;"Contact No.";Code[20])
         {

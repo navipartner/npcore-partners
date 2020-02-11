@@ -4,6 +4,7 @@ codeunit 6151601 "NpDc Apply - Extra Item. Qty."
     // NPR5.50/TSA /20190507  CASE 345348 Added triggers for OnBeforeDeletePOSSaleLine, OnAfterDeletePOSSaleLine, OnBeforeSetQuantity, OnAfterSetQuantity, InvokeOnAfterInsertSaleLineWorkflow() trigger for the added item
     // NPR5.51/MHA /20190724  CASE 343352 Added initiation of POSSession without GUI in ApplyDiscount()
     // NPR5.51/MHA /20190725  CASE 355406 Applied Discount Amount cannot be more than 100%
+    // NPR5.53/MHA /20200120  CASE 384640 Check on Applied Discount Amount more than 100% should compare with future Qty.
 
 
     trigger OnRun()
@@ -61,10 +62,10 @@ codeunit 6151601 "NpDc Apply - Extra Item. Qty."
           end;
 
           DiscountAmt := CalcDiscountAmount(SaleLinePOS,SaleLinePOSCoupon,ExtraItemQty);
-          //-NPR5.51 [355433]
-          if DiscountAmt > SaleLinePOS."Amount Including VAT" then
-            DiscountAmt := SaleLinePOS."Amount Including VAT";
-          //+NPR5.51 [355433]
+          //-NPR5.53 [384640]
+          if DiscountAmt > SaleLinePOS."Unit Price" * ExtraItemQty then
+            DiscountAmt := SaleLinePOS."Unit Price" * ExtraItemQty;
+          //+NPR5.53 [384640]
 
           if SaleLinePOSCouponApply."Discount Amount" <> DiscountAmt then begin
             SaleLinePOSCouponApply."Discount Amount" := DiscountAmt;

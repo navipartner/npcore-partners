@@ -1,9 +1,10 @@
-page 6184510 "EFT BIN Ranges"
+page 6184510 "EFT BIN Range SubPage"
 {
     // NPR5.40/NPKNAV/20180330  CASE 290734 Transport NPR5.40 - 30 March 2018
+    // NPR5.53/MMV /20191204 CASE 349520 Switched type to ListPart
 
     Caption = 'EFT BIN Ranges';
-    PageType = List;
+    PageType = ListPart;
     SourceTable = "EFT BIN Range";
 
     layout

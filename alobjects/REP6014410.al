@@ -13,6 +13,7 @@ report 6014410 "Sales Ticket A4"
     // NPR5.51/ANPA/20190722 CASE 362537 Always showing discount
     // NPR5.52/ANPA/20191009  CASE 359431 Added DiscountTxt value
     // NPR5.52/ANPA/20191004  CASE 371523 Added Sales Type as parameter
+    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
     DefaultLayout = RDLC;
     RDLCLayout = './Sales Ticket A4.rdlc';
 
@@ -357,6 +358,10 @@ report 6014410 "Sales Ticket A4"
                 varLineNo: Integer;
             begin
                 Register.Get("Audit Roll"."Register No.");
+                //-NPR5.53 [371955]
+                POSUnit.Get("Register No.");
+                POSSetup.SetPOSUnit(POSUnit);
+                //+NPR5.53 [371955]
                 RetailSetup.Get;
                 if SalespersonPurchaser.Get("Audit Roll"."Salesperson Code") then;
                 Clear(AuditRollTotals);
@@ -547,9 +552,11 @@ report 6014410 "Sales Ticket A4"
         Customer: Record Customer;
         GeneralLedgerSetup: Record "General Ledger Setup";
         Item: Record Item;
+        POSUnit: Record "POS Unit";
         Register: Record Register;
         RetailSetup: Record "Retail Setup";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        POSSetup: Codeunit "POS Setup";
         ContactNo: Text;
         ContactName: Text;
         ContactAddress: Text;
@@ -723,7 +730,8 @@ report 6014410 "Sales Ticket A4"
           if (Type = Type::Item) and Item.Get("No.") and Item."No Print on Reciept" then
              exit(false);
 
-          if ("Amount Including VAT" <> 0) and (Type = Type::"G/L") and ("No." = Register.Rounding) then begin
+          //IF ("Amount Including VAT" <> 0) AND (Type = Type::"G/L") AND ("No." = Register.Rounding) THEN BEGIN  //NPR5.53 [371955]-revoked
+          if ("Amount Including VAT" <> 0) and (Type = Type::"G/L") and ("No." = POSSetup.RoundingAccount(true)) then begin  //NPR5.53 [371955]
             SubCurrencyGL := "Amount Including VAT";
             exit(false);
           end;

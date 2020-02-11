@@ -3,6 +3,7 @@ table 6060113 "TM Ticket Participant Wks."
     // TM1.16/TSA/20160816  CASE 245004 Transport TM1.16 - 19 July 2016
     // TM1.17/TSA20160916  CASE 251883 Added SMS Option
     // TM1.17/TSA /20161025  CASE 256152 Conform to OMA Guidelines
+    // TM1.45/TSA /20191101 CASE 374620 Added Notification Type::Stakeholder
 
     Caption = 'Ticket Participant Wks.';
     DrillDownPageID = "TM Ticket Participant Wks.";
@@ -75,8 +76,8 @@ table 6060113 "TM Ticket Participant Wks."
         field(25;"Notification Type";Option)
         {
             Caption = 'Notification Type';
-            OptionCaption = 'Reminder,Cancelation,Reschedule';
-            OptionMembers = REMINDER,CANCELATION,RESCHEDULE;
+            OptionCaption = 'Reminder,Cancelation,Reschedule,Stakeholder';
+            OptionMembers = REMINDER,CANCELATION,RESCHEDULE,STAKEHOLDER;
         }
         field(30;"Det. Ticket Access Entry No.";Integer)
         {

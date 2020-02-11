@@ -1,4 +1,4 @@
-pageextension 6014445 pageextension6014445 extends "Purchase Order" 
+pageextension 6014446 pageextension6014446 extends "Purchase Order" 
 {
     // PN1.00/MH/20140730  NAV-AddOn: PDF2NAV
     //   - Added Action Items: EmailLog and SendAsPDF.
@@ -21,6 +21,7 @@ pageextension 6014445 pageextension6014445 extends "Purchase Order"
     // NPR5.45/TS  /20180824  CASE 325688 Removed Extra Space in Insert Line with Vendor Item action
     // NPR5.48/TS  /20181220  CASE 338609 Added Shortcut to Price Label
     // NPR5.48/TS  /20190104  CASE 340491 Added Item Availability Factbox
+    // NPR5.53/SARA/20191022  CASE 373617 Correct pagelink for Item Availability FactBox
     layout
     {
         addafter("Job Queue Status")
@@ -80,6 +81,7 @@ pageextension 6014445 pageextension6014445 extends "Purchase Order"
             part("Item Availability FactBox";"NPR Item Availability FactBox")
             {
                 Caption = 'Item Availability FactBox';
+                Provider = PurchLines;
                 SubPageLink = "No."=FIELD("No.");
             }
         }

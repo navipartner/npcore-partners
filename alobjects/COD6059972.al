@@ -20,6 +20,7 @@ codeunit 6059972 "Variety Clone Data"
     // NPR5.44/JKL /20180716 CASE 321665 Variant Description 2::VarietyTableSetupFirst50 and Variant Description"::VarietyTableSetupNext50 to desc test
     // NPR5.47/NPKNAV/20181026  CASE 327541-01 Transport NPR5.47 - 26 October 2018
     // NPR5.48/JDH /20181214 CASE 338542 Moved codesection about Description for Item Cross reference to CU Description Control
+    // NPR5.53/SARA/20191023 CASE 345108 Insert Unit of Measure in Item Cross Reference
 
 
     trigger OnRun()
@@ -631,6 +632,9 @@ codeunit 6059972 "Variety Clone Data"
         //+NPR5.48 [338542]
         //+VRT1.11
 
+        //-NPR5.53 [345108]
+        ItemCrossRef."Unit of Measure" := GetUnitOfMeasure(ItemNo,1);
+        //+NPR5.53 [345108]
         ItemCrossRef.Insert;
     end;
 
@@ -1195,6 +1199,21 @@ codeunit 6059972 "Variety Clone Data"
         RetailSetup.TestField("Variant No. Series");
         NewVariantCode := NoSeriesMgt.GetNextNo(RetailSetup."Variant No. Series", Today, true);
         //+NPR5.43 [317108]
+    end;
+
+    local procedure GetUnitOfMeasure(ItemNo: Code[20];ReturnType: Integer): Code[10]
+    var
+        Item: Record Item;
+    begin
+
+        if not Item.Get(ItemNo) then
+          exit('');
+
+        case ReturnType of
+          1: exit(Item."Base Unit of Measure");
+          2: exit(Item."Sales Unit of Measure");
+          3: exit(Item."Purch. Unit of Measure");
+        end;
     end;
 }
 

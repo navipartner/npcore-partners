@@ -15,6 +15,7 @@ codeunit 6014410 "POS Apply Customer Entries"
     // NPR5.50/MMV /20181114 CASE 300557 Added function BalanceInvoice from CU 6014505.
     //                                   Moved OnRun trigger to separate function.
     // NPR5.52/TJ  /20191003 CASE 335729 Fixed the filtering order when using SETVIEW
+    // NPR5.53/MMV /20200108 CASE 373453 Save reference to posted document when balancing it.
 
     Permissions = TableData "Cust. Ledger Entry"=rimd;
     TableNo = "Sale Line POS";
@@ -368,6 +369,22 @@ codeunit 6014410 "POS Apply Customer Entries"
           "Buffer Document Type" := CustLedgerEntry."Document Type";
           "Buffer Document No." := CustLedgerEntry."Document No.";
           "Buffer ID" := "Register No." + '-' + "Sales Ticket No.";
+
+        //-NPR5.53 [373453]
+          case CustLedgerEntry."Document Type" of
+            CustLedgerEntry."Document Type"::Invoice :
+              begin
+                "Posted Sales Document Type" := "Posted Sales Document Type"::INVOICE;
+                "Posted Sales Document No." := CustLedgerEntry."Document No.";
+              end;
+            CustLedgerEntry."Document Type"::"Credit Memo" :
+              begin
+                "Posted Sales Document Type" := "Posted Sales Document Type"::CREDIT_MEMO;
+                "Posted Sales Document No." := CustLedgerEntry."Document No.";
+              end;
+          end;
+        //+NPR5.53 [373453]
+
           Validate(Quantity, 1);
           Validate("Unit Price", LineAmount);
           Description := StrSubstNo(BALANCING_OF, CustLedgerEntry.Description);

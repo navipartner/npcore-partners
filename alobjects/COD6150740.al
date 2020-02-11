@@ -7,6 +7,8 @@ codeunit 6150740 "POS Method - Wysiwyg"
     // 
     // DO NOT CHANGE THIS CODEUNIT! IF YOU BELIEVE THAT ANYTHING IN HERE SHOULD BE CHANGED, PLEASE CONTACT VJEKO AT npvb@navipartner.dk
     // IF YOU CHANGE ANYTHING IN HERE, IT WILL BE LOST AT MY NEXT DEPLOYMENT, AS I AM NOT MERGING THIS CODEUNIT; I AM MERELY IMPORTING THE FOB.
+    // 
+    // NPR5.53/VB  /20190917  CASE 362777 Fixes a bug discovered during development of case 362777.
 
 
     trigger OnRun()
@@ -49,10 +51,15 @@ codeunit 6150740 "POS Method - Wysiwyg"
 
     local procedure SaveConfiguration(Request: DotNet npNetJsonRequest;JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Boolean
     var
+        POSAction: Record "POS Action";
         TargetType: Text;
         Length: Integer;
         i: Integer;
     begin
+        //-NPR5.53 [362777]
+        POSAction.DiscoverActions();
+        //+NPR5.53 [362777]
+
         JSON.SetScope('data',true);
         Length := JSON.GetInteger('length',true);
         for i := 0 to Length - 1 do begin

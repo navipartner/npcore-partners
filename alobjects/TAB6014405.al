@@ -34,6 +34,11 @@ table 6014405 "Sale POS"
     // NPR5.50/MHA /20190422 CASE 337539 Added field 170 "Retail ID"
     // NPR5.52/ALPO/20190820 CASE 359596 Do not change unit price on the line after customer is selected, should new unit price is higher than existing one, unless there was a customer change
     // NPR5.52/MMV /20191007 CASE 352473 Added "Prices Including VAT" switch validation.
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
+    // NPR5.53/ALPO/20191105 CASE 376035 Save active event on Sale POS, copy event's dimensions directly to the sale instead of overwriting pos unit dimensions
+    // NPR5.53/BHR /20191008  CASE 369354 comment code in relation to 'New Customer Creation'
+    // NPR5.53/TJ  /20191205 CASE 380453 Country Code is now properly populated when setting Customer No.
+    // NPR5.53/ALPO/20191211 CASE 380609 NPRE: New guest arrival procedure. Store preselected Waiterpad No. and Seating Code as well as Number of Guests on Sale POS
 
     Caption = 'Sale';
 
@@ -53,6 +58,18 @@ table 6014405 "Sale POS"
         {
             Caption = 'POS Store Code';
             Description = 'NPR5.30';
+
+            trigger OnValidate()
+            begin
+                //-NPR5.53 [371956]
+                CreateDim(
+                  DATABASE::"POS Unit","Register No.",
+                  DATABASE::"POS Store","POS Store Code",
+                  DATABASE::Job,"Event No.",  //NPR5.53 [376035]
+                  DATABASE::Customer,"Customer No.",
+                  DATABASE::"Salesperson/Purchaser","Salesperson Code");
+                //+NPR5.53 [371956]
+            end;
         }
         field(4;"Salesperson Code";Code[10])
         {
@@ -63,7 +80,12 @@ table 6014405 "Sale POS"
             trigger OnValidate()
             begin
                 CreateDim(
-                  DATABASE::Register,"Register No.",
+                  //DATABASE::Register,"Register No.",  //NPR5.53 [371956]-revoked
+                  //-NPR5.53 [371956]
+                  DATABASE::"POS Unit","Register No.",
+                  DATABASE::"POS Store","POS Store Code",
+                  //+NPR5.53 [371956]
+                  DATABASE::Job,"Event No.",  //NPR5.53 [376035]
                   DATABASE::Customer,"Customer No.",
                   DATABASE::"Salesperson/Purchaser","Salesperson Code");
             end;
@@ -135,28 +157,29 @@ table 6014405 "Sale POS"
 
                 if ( "Customer Type" = "Customer Type"::Cash ) and ( "Customer No." <> '' ) then begin
                   if not Contact.Get( "Customer No." ) then begin
-                    DoCreate := false;
-                    case RetailSetup."New Customer Creation" of
-                      RetailSetup."New Customer Creation"::All :
-                        DoCreate := true;
-                      RetailSetup."New Customer Creation"::"Cash Customer" :
-                        DoCreate := true;
-                      RetailSetup."New Customer Creation"::"User Managed": begin
-                        SalesPerson.Get("Salesperson Code");
-                        case SalesPerson."Customer Creation" of
-                          SalesPerson."Customer Creation"::"Only cash" :
-                            DoCreate := true;
-                          SalesPerson."Customer Creation"::Allowed :
-                            DoCreate := true;
-                        end;
-                      end;
-                      RetailSetup."New Customer Creation"::Customer :
-                        DoCreate := false;
-                    end;
-
-                    if not DoCreate then
-                      Error(Text1060002);
-
+                //-NPR5.53 [369354]
+                //    DoCreate := FALSE;
+                //    CASE RetailSetup."New Customer Creation" OF
+                //      RetailSetup."New Customer Creation"::All :
+                //        DoCreate := TRUE;
+                //      RetailSetup."New Customer Creation"::"Cash Customer" :
+                //        DoCreate := TRUE;
+                //      RetailSetup."New Customer Creation"::"User Managed": BEGIN
+                //        SalesPerson.GET("Salesperson Code");
+                //        CASE SalesPerson."Customer Creation" OF
+                //          SalesPerson."Customer Creation"::"1" :
+                //            DoCreate := TRUE;
+                //          SalesPerson."Customer Creation"::"2" :
+                //            DoCreate := TRUE;
+                //        END;
+                //      END;
+                //      RetailSetup."New Customer Creation"::Customer :
+                //        DoCreate := FALSE;
+                //    END;
+                //
+                //    IF NOT DoCreate THEN
+                //      ERROR(Text1060002);
+                //+NPR5.53 [369354]
                     RetailFormCode.CreateContact("Customer No.");
 
                     if "Customer No." <> '' then begin
@@ -166,6 +189,9 @@ table 6014405 "Sale POS"
                       Address           := Contact.Address;
                       "Address 2"       := Contact."Address 2";
                       Validate("Post Code", Contact."Post Code");
+                      //-NPR5.53 [380453]
+                      Validate("Country Code",Contact."Country/Region Code");
+                      //+NPR5.53 [380453]
                     end;
                   end else begin
                     Name          := Contact.Name;
@@ -174,6 +200,9 @@ table 6014405 "Sale POS"
                     "Post Code"   := Contact."Post Code";
                     City          := Contact.City;
                     "Contact No." := Contact."No.";
+                    //-NPR5.53 [380453]
+                    Validate("Country Code",Contact."Country/Region Code");
+                    //+NPR5.53 [380453]
                   end;
                 end;
 
@@ -182,28 +211,29 @@ table 6014405 "Sale POS"
                 if ( "Customer No." <> '' ) and ( "Customer Type" = "Customer Type"::Ord ) then begin
                   //ohm - customer lookup
                   if not Cust.Get("Customer No.") then begin
-                    DoCreate := false;
-                    case RetailSetup."New Customer Creation" of
-                      RetailSetup."New Customer Creation"::All :
-                        DoCreate := true;
-                      RetailSetup."New Customer Creation"::"Cash Customer" :
-                        DoCreate := false;
-                      RetailSetup."New Customer Creation"::"User Managed": begin
-                        SalesPerson.Get("Salesperson Code");
-                        case SalesPerson."Customer Creation" of
-                          SalesPerson."Customer Creation"::"Only cash" :
-                            DoCreate := true;
-                          SalesPerson."Customer Creation"::Allowed :
-                            DoCreate := true;
-                        end;
-                      end;
-                      RetailSetup."New Customer Creation"::Customer :
-                        DoCreate := true;
-                    end;
-
-                    if not DoCreate then
-                      Error(Text1060002);
-
+                //-NPR5.53 [369354]
+                //    DoCreate := FALSE;
+                //    CASE RetailSetup."New Customer Creation" OF
+                //      RetailSetup."New Customer Creation"::All :
+                //        DoCreate := TRUE;
+                //      RetailSetup."New Customer Creation"::"Cash Customer" :
+                //        DoCreate := FALSE;
+                //      RetailSetup."New Customer Creation"::"User Managed": BEGIN
+                //        SalesPerson.GET("Salesperson Code");
+                //        CASE SalesPerson."Customer Creation" OF
+                //          SalesPerson."Customer Creation"::"1" :
+                //            DoCreate := TRUE;
+                //          SalesPerson."Customer Creation"::"2" :
+                //            DoCreate := TRUE;
+                //        END;
+                //      END;
+                //      RetailSetup."New Customer Creation"::Customer :
+                //        DoCreate := TRUE;
+                //    END;
+                //
+                //    IF NOT DoCreate THEN
+                //      ERROR(Text1060002);
+                //+NPR5.53 [369354]
                     RetailFormCode.CreateCustomer("Customer No.");
                   end;
 
@@ -214,7 +244,9 @@ table 6014405 "Sale POS"
                     "Address 2"  := Cust."Address 2";
                     "Post Code"  := Cust."Post Code";
                     City         := Cust.City;
-
+                    //-NPR5.53 [380453]
+                    Validate("Country Code",Cust."Country/Region Code");
+                    //+NPR5.53 [380453]
                     if Cust."Customer Price Group" <> '' then
                       "Customer Price Group" := Cust."Customer Price Group";
                     //-NPR5.31 [263093]
@@ -253,6 +285,9 @@ table 6014405 "Sale POS"
                   "Post Code"   := '';
                   City          := '';
                   "Contact No." := '';
+                  //-NPR5.53 [380453]
+                  Validate("Country Code",'');
+                  //+NPR5.53 [380453]
                 end;
 
                 if Cust."No." <> '' then
@@ -344,7 +379,12 @@ table 6014405 "Sale POS"
                   //DATABASE::Customer,Custno,
                   DATABASE::Customer,"Customer No.",
                   //+NPR5.30 [261728]
-                  DATABASE::Register,"Register No.",
+                  //DATABASE::Register,"Register No.",  //NPR5.53 [371956]-revoked
+                  //-NPR5.53 [371956]
+                  DATABASE::"POS Unit","Register No.",
+                  DATABASE::"POS Store","POS Store Code",
+                  //+NPR5.53 [371956]
+                  DATABASE::Job,"Event No.",  //NPR5.53 [376035]
                   DATABASE::"Salesperson/Purchaser","Salesperson Code");
                 //+NPR4.21
 
@@ -634,6 +674,28 @@ table 6014405 "Sale POS"
             Caption = 'Retail ID';
             Description = 'NPR5.50';
         }
+        field(180;"Event No.";Code[20])
+        {
+            Caption = 'Event No.';
+            Description = 'NPR5.53 [376035]';
+            TableRelation = Job WHERE (Event=CONST(true));
+
+            trigger OnValidate()
+            var
+                FromDefDim: Record "Default Dimension";
+                ToDefDim: Record "Default Dimension";
+                POSUnit: Record "POS Unit";
+            begin
+                //-NPR5.53 [376035]
+                CreateDim(
+                  DATABASE::Job,"Event No.",
+                  DATABASE::"POS Unit","Register No.",
+                  DATABASE::"POS Store","POS Store Code",
+                  DATABASE::Customer,"Customer No.",
+                  DATABASE::"Salesperson/Purchaser","Salesperson Code");
+                //+NPR5.53 [376035]
+            end;
+        }
         field(480;"Dimension Set ID";Integer)
         {
             Caption = 'Dimension Set ID';
@@ -652,6 +714,43 @@ table 6014405 "Sale POS"
             Description = 'NPR5.37';
             Editable = false;
             FieldClass = FlowField;
+        }
+        field(700;"NPRE Pre-Set Seating Code";Code[10])
+        {
+            Caption = 'Pre-Set Seating Code';
+            Description = 'NPR5.53';
+            TableRelation = "NPRE Seating";
+
+            trigger OnValidate()
+            var
+                SaleLinePOS: Record "Sale Line POS";
+                SaleLinePOS2: Record "Sale Line POS";
+            begin
+                //-NPR5.53 [380609]
+                SaleLinePOS.SetRange("Register No.","Register No.");
+                SaleLinePOS.SetRange("Sales Ticket No.","Sales Ticket No.");
+                SaleLinePOS.SetRange("Sale Type",SaleLinePOS."Sale Type"::Sale);
+                if "NPRE Pre-Set Seating Code" <> '' then
+                  SaleLinePOS.SetRange("NPRE Seating Code",xRec."NPRE Pre-Set Seating Code");
+                if SaleLinePOS.FindSet(true) then
+                  repeat
+                    SaleLinePOS2 := SaleLinePOS;
+                    SaleLinePOS2.Validate("NPRE Seating Code","NPRE Pre-Set Seating Code");
+                    SaleLinePOS2.Modify;
+                  until SaleLinePOS.Next = 0;
+                //+NPR5.53 [380609]
+            end;
+        }
+        field(701;"NPRE Pre-Set Waiter Pad No.";Code[20])
+        {
+            Caption = 'Pre-Set Waiter Pad No.';
+            Description = 'NPR5.53';
+            TableRelation = "NPRE Waiter Pad";
+        }
+        field(710;"NPRE Number of Guests";Integer)
+        {
+            Caption = 'Number of Guests';
+            Description = 'NPR5.53';
         }
     }
 
@@ -702,6 +801,7 @@ table 6014405 "Sale POS"
         //-NPR5.29 [262628]
         "POS Sale ID" := 0;
         //+NPR5.29 [262628]
+        "Event No." := Register."Active Event No.";  //NPR5.53 [376035]
     end;
 
     var
@@ -750,7 +850,7 @@ table 6014405 "Sale POS"
           end;
     end;
 
-    procedure CreateDim(Type1: Integer;No1: Code[20];Type2: Integer;No2: Code[20];Type3: Integer;No3: Code[20])
+    procedure CreateDim(Type1: Integer;No1: Code[20];Type2: Integer;No2: Code[20];Type3: Integer;No3: Code[20];Type4: Integer;No4: Code[20];Type5: Integer;No5: Code[20])
     var
         RetailConfiguration: Record "Retail Setup";
         TableID: array [10] of Integer;
@@ -764,6 +864,14 @@ table 6014405 "Sale POS"
         No[2] := No2;
         TableID[3] := Type3;
         No[3] := No3;
+        //-NPR5.53 [371956]
+        TableID[4] := Type4;
+        No[4] := No4;
+        //+NPR5.53 [371956]
+        //-NPR5.53 [376035]
+        TableID[5] := Type5;
+        No[5] := No5;
+        //+NPR5.53 [376035]
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
         OldDimSetID := "Dimension Set ID";

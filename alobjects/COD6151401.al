@@ -36,6 +36,7 @@ codeunit 6151401 "Magento Setup Mgt."
     // MAG2.17/TS  /20181031  CASE 333862 Seo Link should be filled as well
     // MAG2.22/MHA /20190625  CASE 359285 Added Picture Variety Type in SetupNpXmlTemplates()
     // MAG2.23/MHA /20191018  CASE 373610 Bumped version list in MagentoVersionNo()
+    // MAG2.24/MHA /20191018  CASE 386235 Bumped version list in MagentoVersionNo()
 
 
     trigger OnRun()
@@ -991,6 +992,9 @@ codeunit 6151401 "Magento Setup Mgt."
 
     procedure MagentoVersionNo(): Code[20]
     begin
+        //-MAG2.24
+        exit('2.24');
+        //+MAG2.24
         //-MAG2.23
         exit('2.23');
         //+MAG2.23

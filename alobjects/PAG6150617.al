@@ -20,6 +20,7 @@ page 6150617 "POS Unit Card"
     // NPR5.52/ALPO/20190923 CASE 365326 New field "POS Posting Profile" (Posting related fields moved to POS Posting Profiles from NP Retail Setup)
     // NPR5.52/SARA/20190823 CASE 368395 Removed field 'SMS Profile' (Move to 'POS End of Day Profile')
     // NPR5.52/MHA /20191016 CASE 371388 Field 400 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
+    // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
 
     Caption = 'POS Unit Card';
     RefreshOnActivate = true;
@@ -108,6 +109,15 @@ page 6150617 "POS Unit Card"
     {
         area(navigation)
         {
+            action(Dimensions)
+            {
+                Caption = 'Dimensions';
+                Image = Dimensions;
+                RunObject = Page "Default Dimensions";
+                RunPageLink = "Table ID"=CONST(6150615),
+                              "No."=FIELD("No.");
+                ShortCutKey = 'Shift+Ctrl+D';
+            }
             action("POS Unit Identity List")
             {
                 Caption = 'POS Unit Identity List';

@@ -22,6 +22,9 @@ page 6014490 "Retail Journal Header"
     // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
     // NPR5.48/TS  /20180104 CASE 338609 Added Shortcut Ctrl+Alt+L to Price Label
     // NPR5.49/ZESO/20190214 CASE 334538 Reworked Function for Sales Return
+    // NPR5.53/ZESO/20191108 CASE 334538 Enabled Function for Sales Return
+    // NPR5.53/TJ  /20191118 CASE 375557 Restored old print option List
+    // NPR5.53/MHA /20191121 CASE 374290 Added filter fields
 
     Caption = 'Retail Journal';
     PageType = Card;
@@ -90,6 +93,103 @@ page 6014490 "Retail Journal Header"
                     }
                     field("Shortcut Dimension 2 Code";"Shortcut Dimension 2 Code")
                     {
+                    }
+                }
+            }
+            group("Line Filters")
+            {
+                Caption = 'Line Filters';
+                grid(Control6014422)
+                {
+                    GridLayout = Columns;
+                    ShowCaption = false;
+                    group("Vendor No.")
+                    {
+                        Caption = 'Vendor No.';
+                        //The GridLayout property is only supported on controls of type Grid
+                        //GridLayout = Rows;
+                        field(VendorFilter;VendorFilter)
+                        {
+                            ShowCaption = false;
+                            TableRelation = Vendor;
+
+                            trigger OnValidate()
+                            begin
+                                //-NPR5.53 [374290]
+                                VendorFilter := UpperCase(VendorFilter);
+                                SetLineFilters();
+                                //+NPR5.53 [374290]
+                            end;
+                        }
+                    }
+                    group("Item Group")
+                    {
+                        Caption = 'Item Group';
+                        field(ItemGroupFilter;ItemGroupFilter)
+                        {
+                            Caption = 'Item Group';
+                            ShowCaption = false;
+                            TableRelation = "Item Group";
+
+                            trigger OnValidate()
+                            begin
+                                //-NPR5.53 [374290]
+                                ItemGroupFilter := UpperCase(ItemGroupFilter);
+                                SetLineFilters();
+                                //+NPR5.53 [374290]
+                            end;
+                        }
+                    }
+                    group("Unknown Item No.")
+                    {
+                        Caption = 'Unknown Item No.';
+                        field(ShowUnknown;ShowUnknown)
+                        {
+                            Caption = 'Unknown Item No.';
+                            OptionCaption = 'All,Only existing items,Only unknown items';
+                            ShowCaption = false;
+
+                            trigger OnValidate()
+                            begin
+                                //-NPR5.53 [374290]
+                                SetLineFilters();
+                                //+NPR5.53 [374290]
+                            end;
+                        }
+                    }
+                    group("New Item")
+                    {
+                        Caption = 'New Item';
+                        field(ShowNew;ShowNew)
+                        {
+                            Caption = 'New Item';
+                            OptionCaption = 'All,Only existing items,Only new items';
+                            ShowCaption = false;
+
+                            trigger OnValidate()
+                            begin
+                                //-NPR5.53 [374290]
+                                SetLineFilters();
+                                //+NPR5.53 [374290]
+                            end;
+                        }
+                    }
+                    group("Inventory Status")
+                    {
+                        Caption = 'Inventory Status';
+                        field(ShowInventory;ShowInventory)
+                        {
+                            Caption = 'Inventory Status';
+                            OptionCaption = 'All,In stock,Not in stock';
+                            ShowCaption = false;
+
+                            trigger OnValidate()
+                            begin
+                                //-NPR5.53 [374290]
+                                SetLineFilters();
+                                //+NPR5.53 [374290]
+                            end;
+                        }
                     }
                 }
             }
@@ -171,6 +271,7 @@ page 6014490 "Retail Journal Header"
                     Image = Change;
                     Promoted = true;
                     PromotedCategory = "Report";
+                    Visible = (NOT IsWebClient);
 
                     trigger OnAction()
                     begin
@@ -187,6 +288,24 @@ page 6014490 "Retail Journal Header"
                         //-NPR5.46 [294354]
                         SetPrintQuantityByInventory;
                         //+NPR5.46 [294354]
+                    end;
+                }
+                separator(Separator6014407)
+                {
+                }
+                action(List)
+                {
+                    Caption = 'List';
+                    Image = "Report";
+                    Promoted = true;
+                    PromotedCategory = "Report";
+
+                    trigger OnAction()
+                    begin
+                        //-NPR5.53 [375557]
+                        CurrPage.SubLine.PAGE.SetSkipConfirm(true);
+                        CurrPage.SubLine.PAGE.PrintSelection(REPORT::"Retail Journal List");
+                        //+NPR5.53 [375557]
                     end;
                 }
             }
@@ -289,9 +408,9 @@ page 6014490 "Retail Journal Header"
                 action(ImportFromReturnSales)
                 {
                     Caption = 'Return Sales';
-                    Enabled = false;
+                    Enabled = true;
                     Image = ReturnReceipt;
-                    Visible = false;
+                    Visible = true;
 
                     trigger OnAction()
                     begin
@@ -578,9 +697,22 @@ page 6014490 "Retail Journal Header"
         }
     }
 
+    trigger OnOpenPage()
+    begin
+        //-NPR5.53 [374290]
+        IsWebClient := not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Desktop]);
+        //+NPR5.53 [374290]
+    end;
+
     var
         Text001: Label 'Discount Code and Type updated successfully';
         RetailJournalCode: Codeunit "Retail Journal Code";
+        VendorFilter: Text;
+        ItemGroupFilter: Text;
+        ShowUnknown: Option All,"Only existing items","Only unknown items";
+        ShowNew: Option All,"Only existing items","Only new items";
+        ShowInventory: Option All,"In stock","Not in stock";
+        IsWebClient: Boolean;
 
     procedure UpdateDiscount(RetailJournalHeader: Record "Retail Journal Header")
     var
@@ -633,6 +765,13 @@ page 6014490 "Retail Journal Header"
         end;
         //+NPR5.31 [262904]
         Message(Text001);
+    end;
+
+    local procedure SetLineFilters()
+    begin
+        //-NPR5.53 [374290]
+        CurrPage.SubLine.PAGE.SetLineFilters(VendorFilter,ItemGroupFilter,ShowUnknown,ShowNew,ShowInventory);
+        //+NPR5.53 [374290]
     end;
 }
 

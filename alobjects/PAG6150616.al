@@ -9,6 +9,7 @@ page 6150616 "POS Unit List"
     // NPR5.45/MHA /20180803  CASE 323705 Added fields 300, 305, 310 to enable overload of Item Price functionality
     // NPR5.45/MHA /20180814  CASE 319706 Added field 200 Ean Box Sales Setup
     // NPR5.45/MHA /20180820 CASE 321266 Added field 205 "POS Sales Workflow Set"
+    // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
 
     Caption = 'POS Unit List';
     CardPageID = "POS Unit Card";
@@ -68,49 +69,85 @@ page 6150616 "POS Unit List"
     {
         area(navigation)
         {
-            action("POS Unit Identity List")
+            group("POS Unit")
             {
-                Caption = 'POS Unit Identity List';
-                Image = List;
-                RunObject = Page "POS Unit Identity List";
-            }
-            action("POS Period Registers")
-            {
-                Caption = 'POS Period Registers';
-                Image = Register;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                RunObject = Page "POS Period Register List";
-                RunPageLink = "POS Unit No."=FIELD("No.");
-            }
-            action("POS Entries")
-            {
-                Caption = 'POS Entries';
-                Image = LedgerEntries;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                RunObject = Page "POS Entry List";
-                RunPageLink = "POS Unit No."=FIELD("No.");
-            }
-            action("POS Unit Bins")
-            {
-                Caption = 'POS Unit Bins';
-                Image = List;
-                RunObject = Page "POS Unit to Bin Relation";
-                RunPageLink = "POS Unit No."=FIELD("No.");
-            }
-            action(Workshifts)
-            {
-                Caption = 'Workshifts';
-                Ellipsis = true;
-                Image = Sales;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                RunObject = Page "POS Workshift Checkpoints";
-                RunPageLink = "POS Unit No."=FIELD("No.");
+                Caption = 'POS Unit';
+                group(Dimensions)
+                {
+                    Caption = 'Dimensions';
+                    Image = Dimensions;
+                    action("Dimensions-Single")
+                    {
+                        Caption = 'Dimensions-Single';
+                        Image = Dimensions;
+                        RunObject = Page "Default Dimensions";
+                        RunPageLink = "Table ID"=CONST(6150615),
+                                      "No."=FIELD("No.");
+                        ShortCutKey = 'Shift+Ctrl+D';
+                    }
+                    action("Dimensions-&Multiple")
+                    {
+                        AccessByPermission = TableData Dimension=R;
+                        Caption = 'Dimensions-&Multiple';
+                        Image = DimensionSets;
+
+                        trigger OnAction()
+                        var
+                            POSUnit: Record "POS Unit";
+                            DefaultDimMultiple: Page "Default Dimensions-Multiple";
+                        begin
+                            //-NPR5.53 [371956]
+                            CurrPage.SetSelectionFilter(POSUnit);
+                            DefaultDimMultiple.SetMultiRecord(POSUnit,FieldNo("No."));
+                            DefaultDimMultiple.RunModal;
+                            //-NPR5.53 [371956]
+                        end;
+                    }
+                }
+                action("POS Unit Identity List")
+                {
+                    Caption = 'POS Unit Identity List';
+                    Image = List;
+                    RunObject = Page "POS Unit Identity List";
+                }
+                action("POS Period Registers")
+                {
+                    Caption = 'POS Period Registers';
+                    Image = Register;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Period Register List";
+                    RunPageLink = "POS Unit No."=FIELD("No.");
+                }
+                action("POS Entries")
+                {
+                    Caption = 'POS Entries';
+                    Image = LedgerEntries;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Entry List";
+                    RunPageLink = "POS Unit No."=FIELD("No.");
+                }
+                action("POS Unit Bins")
+                {
+                    Caption = 'POS Unit Bins';
+                    Image = List;
+                    RunObject = Page "POS Unit to Bin Relation";
+                    RunPageLink = "POS Unit No."=FIELD("No.");
+                }
+                action(Workshifts)
+                {
+                    Caption = 'Workshifts';
+                    Ellipsis = true;
+                    Image = Sales;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Workshift Checkpoints";
+                    RunPageLink = "POS Unit No."=FIELD("No.");
+                }
             }
         }
         area(processing)

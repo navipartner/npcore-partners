@@ -20,6 +20,7 @@ codeunit 6014438 "Scanner - Functions"
     // NPR5.44/TS  /20180723 CASE 321232 Check for Item in Cross Reference in GetItems, restructured getitem function to use barcode library
     // NPR5.50/BHR /20190508 CASE 348372 Validate Barcode
     // NPR5.51/THRO/20190822 CASE 366006 Check string lenght before padding in GoSend(). Remove leading Zeroes if string longer than Lenght for Padding::"Pre Zeroes"
+    // NPR5.53/THRO/20191220 CASE 383414 getItem() didn't return found Item No.
 
 
     trigger OnRun()
@@ -895,11 +896,17 @@ codeunit 6014438 "Scanner - Functions"
             begin
               beskr  := CopyStr('--->' + t003 + Item2."Vendor No." + ' ' + t004, 1, MaxStrLen(beskr));
               beskr2 := vnr;
+              //-NPR5.53 [383414]
+              vnr := ItemNo;
+              //+NPR5.53 [383414]
               exit;
             end;
         end;
         beskr := CopyStr(Item2.Description, 1, MaxStrLen(beskr));
         beskr2 := CopyStr(Item2."Description 2", 1, MaxStrLen(beskr2));
+        //-NPR5.53 [383414]
+        vnr := ItemNo;
+        //+NPR5.53 [383414]
 
         // vnr_orig := vnr;
         //

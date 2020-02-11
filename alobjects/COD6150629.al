@@ -14,6 +14,8 @@ codeunit 6150629 "POS Entry Management"
     // NPR5.51/ZESO/20190701  CASE 360453 Set Request Page to True
     // NPR5.51/MHA /20190718  CASE 362329 Skip "Exclude from Posting" Sales Lines
     // NPR5.51/ALPO/20190802  CASE 362747 Handle check of allowed number of receipt reprints
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
+    // NPR5.53/ALPO/20191218 CASE 382911 'DeObfuscateTicketNo' function moved here from CUs 6150798 and 6150821 to avoid code duplication
 
 
     trigger OnRun()
@@ -209,8 +211,10 @@ codeunit 6150629 "POS Entry Management"
         Register.Get(POSUnitCode);
         POSUnit."No." := Register."Register No.";
         POSUnit.Name := Register.Name;
-        POSUnit.Validate("Global Dimension 1 Code",Register."Global Dimension 1 Code");
-        POSUnit.Validate("Global Dimension 2 Code",Register."Global Dimension 2 Code");
+        //-NPR5.53 [371956]-revoked (Dimensions are controlled now from POS Unit)
+        //POSUnit.VALIDATE("Global Dimension 1 Code",Register."Global Dimension 1 Code");
+        //POSUnit.VALIDATE("Global Dimension 2 Code",Register."Global Dimension 2 Code");
+        //+NPR5.53 [371956]-revoked
         if not POSStore.Get(POSUnitCode) then
           CreatePOSStore(POSUnit,Register);
         if not POSPaymentBin.Get(POSUnitCode) then
@@ -235,8 +239,14 @@ codeunit 6150629 "POS Entry Management"
         POSStore.Validate("E-Mail",Register."E-mail");
         POSStore.Validate("Location Code",Register."Location Code");
         POSStore.Validate("VAT Registration No.",Register."VAT No.");
-        POSStore.Validate("Global Dimension 1 Code",Register."Global Dimension 1 Code");
-        POSStore.Validate("Global Dimension 2 Code",Register."Global Dimension 2 Code");
+        //-NPR5.53 [371956]-revoked
+        //POSStore.VALIDATE("Global Dimension 1 Code",Register."Global Dimension 1 Code");
+        //POSStore.VALIDATE("Global Dimension 2 Code",Register."Global Dimension 2 Code");
+        //+NPR5.53 [371956]-revoked
+        //-NPR5.53 [371956]
+        POSStore.Validate("Global Dimension 1 Code",POSUnit."Global Dimension 1 Code");
+        POSStore.Validate("Global Dimension 2 Code",POSUnit."Global Dimension 2 Code");
+        //+NPR5.53 [371956]
         POSStore.Validate("Gen. Bus. Posting Group",Register."Gen. Business Posting Group");
         POSStore.Validate("VAT Bus. Posting Group",Register."VAT Gen. Business Post.Gr");
         POSStore.Validate("Default POS Posting Setup",POSStore."Default POS Posting Setup"::Customer);
@@ -423,6 +433,26 @@ codeunit 6150629 "POS Entry Management"
 
         OnAfterPrintEntry(POSEntry, IsReprint);
         //+NPR5.48 [318028]
+    end;
+
+    procedure DeObfuscateTicketNo(ObfucationMethod: Option "None",MI;var SalesTicketNo: Code[20])
+    var
+        MyBigInt: BigInteger;
+        RPAuxMiscLibrary: Codeunit "RP Aux - Misc. Library";
+    begin
+        //-NPR5.53 [382911]
+        case ObfucationMethod of
+          ObfucationMethod::MI:  //Multiplicative Inverse
+          begin
+            if StrLen(SalesTicketNo) > 2 then
+              if CopyStr(SalesTicketNo,1,2) = 'MI' then
+                SalesTicketNo := CopyStr(SalesTicketNo,3);
+
+            if Evaluate(MyBigInt,SalesTicketNo) then
+              SalesTicketNo := Format(RPAuxMiscLibrary.MultiplicativeInverseDecode(MyBigInt),0,9);
+          end;
+        end;
+        //+NPR5.53 [382911]
     end;
 
     [IntegrationEvent(false, false)]

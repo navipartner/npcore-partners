@@ -101,6 +101,9 @@ codeunit 6014630 "Touch - Sale POS (Web)"
     // NPR5.48/MHA /20181115 CASE 334633 Removed reference to deleted function CheckSavedSales() in Codeunit 6014435
     // NPR5.51/JAVA/20190715 CASE 361926 Removed unused references (everything related ref. to REPORT::Report50068).
     // NPR5.51/ALPO/20190826 CASE 364558 Added new call parameters in accordance with function's POSInfoManagement.ProcessPOSInfoMenuFunction new signature
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
+    // NPR5.53/ALPO/20191105 CASE 376035 Save active event on Sale POS, copy event's dimensions directly to the sale instead of overwriting pos unit dimensions
+    // NPR5.53/BHR /20191004 CASE 369361 Removed Invalid Functionalities
 
 
     trigger OnRun()
@@ -417,8 +420,9 @@ codeunit 6014630 "Touch - Sale POS (Web)"
                                            TouchScreenFunctions.ImportSalesTicket(This,Validering);
                                          end;
                'BALANCE_REGISTER'      : begin
-                                           if RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline then
-                                             Marshaller.Error_Protocol(Text10600200, Text10600202,true);
+                                           //-NPR5.53 [369361]
+                                          // IF RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline THEN
+                                          //  Marshaller.Error_
         
                                            if RetailSalesLineCode.LineExists(This) then
                                              Marshaller.Error_Protocol(Text10600200,t039,true);
@@ -578,17 +582,21 @@ codeunit 6014630 "Touch - Sale POS (Web)"
               //-NPR5.20
               //'TERMINAL_ENDOFDAY'     : TouchScreenFunctions.CallTerminal(This, 'ENDOFDAY');
               'TERMINAL_OPENSHIFT'    : begin
-                                          if RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline then begin
-                                            Marshaller.DisplayError(Text10600200,Text10600202,true);
-                                          end;
+                                          //-NPR5.53 [369361]
+                                          //IF RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline THEN BEGIN
+                                          //  Marshaller.DisplayError(Text10600200,Text10600202,TRUE);
+                                          //END;
+                                          //+NPR5.53 [369361]
                                           Register.TestField("Register No.");
                                           This."Register No." := Register."Register No.";
                                           TouchScreenFunctions.CallTerminal(This, 'OPENSHIFT',0);
                                         end;
               'TERMINAL_AUX'          : begin
-                                          if RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline then begin
-                                            Marshaller.DisplayError(Text10600200,Text10600202,true);
-                                          end;
+                                          //-NPR5.53 [369361]
+                                          //IF RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline THEN BEGIN
+                                          //Marshaller.DisplayError(Text10600200,Text10600202,TRUE);
+                                          //END;
+                                          //+NPR5.53 [369361]
                                           Register.TestField("Register No.");
                                           This."Register No." := Register."Register No.";
                                           if not Evaluate (Int,MenuLines1.Parametre) then
@@ -596,9 +604,11 @@ codeunit 6014630 "Touch - Sale POS (Web)"
                                           TouchScreenFunctions.CallTerminal(This, 'AUX',Int);
                                         end;
               'TERMINAL_ENDOFDAY'     : begin
-                                          if RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline then begin
-                                             Marshaller.DisplayError(Text10600200,Text10600202,true);
-                                          end;
+                                          //-NPR5.53 [369361]
+                                          //IF RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline THEN BEGIN
+                                          //   Marshaller.DisplayError(Text10600200,Text10600202,TRUE);
+                                          //END;
+                                          //-NPR5.53 [369361]
                                           if RetailSalesLineCode.LineExists(This) then
                                             Marshaller.DisplayError(Text10600200,t045,true);
                                           NewSalesTicketNo(t038);
@@ -1300,7 +1310,10 @@ codeunit 6014630 "Touch - Sale POS (Web)"
           SaleLinePOS.Type := SaleLinePOS.Type::"G/L Entry";
           SaleLinePOS.Validate("No.",Register."Credit Voucher Account");
           SaleLinePOS."Location Code" := Register."Location Code";
-          SaleLinePOS."Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
+          //-NPR5.53 [371956]-revoked
+          //! Redundant lines. Dimensions are properly handled by CreateDim() function, not forgetting the Dimension Set ID field.
+          //SaleLinePOS."Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
+          //+NPR5.53 [371956]-revoked
           SaleLinePOS.Quantity := 1;
           //-NPR5.31 [269754]
           //SaleLinePOS.Description := Text10600071;
@@ -1622,8 +1635,19 @@ codeunit 6014630 "Touch - Sale POS (Web)"
             //+NPR5.20
             SaleLinePOSObject.CalculateBalance;
             "Location Code"             := Register."Location Code";
-            "Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-            "Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+            //-NPR5.53 [371956]-revoked
+            //! Redundant lines. Dimensions should be properly handled by CreateDim() function, not forgetting the Dimension Set ID field.
+            //"Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
+            //"Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+            //+NPR5.53 [371956]-revoked
+            //-NPR5.53 [371956]
+            CreateDim(
+              DATABASE::"POS Unit","Register No.",
+              DATABASE::"POS Store","POS Store Code",
+              DATABASE::Job,"Event No.",  //NPR5.53 [376035]
+              DATABASE::Customer,"Customer No.",
+              DATABASE::"Salesperson/Purchaser","Salesperson Code");
+            //+NPR5.53 [371956]
             Modify(true);
         
             case TouchScreenFunctions.RegisterTestOpen(This) of

@@ -1,7 +1,8 @@
-pageextension 6014449 pageextension6014449 extends "Salesperson/Purchaser Card" 
+pageextension 6014450 pageextension6014450 extends "Salesperson/Purchaser Card" 
 {
     // NPR5.29/TJ  /20170123 CASE 263484 Copies tab Security and action CashCodes from page 6014428
     // NPR5.38/AE  /20180113 CASE 289390 Added filed Supervisor POS
+    // NPR5.53/BHR /20191111 CASE 369354 Removed foeld Customer Creation
     layout
     {
         addafter(Invoicing)
@@ -13,9 +14,6 @@ pageextension 6014449 pageextension6014449 extends "Salesperson/Purchaser Card"
                 {
                 }
                 field("Supervisor POS";"Supervisor POS")
-                {
-                }
-                field("Customer Creation";"Customer Creation")
                 {
                 }
                 field("Reverse Sales Ticket";"Reverse Sales Ticket")

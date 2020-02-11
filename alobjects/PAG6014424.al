@@ -52,6 +52,9 @@ page 6014424 "Retail Setup"
     // NPR5.46/TSA /20180914 CASE 314603 Moved field to Security Group
     // NPR5.46/MMV /20180918 CASE 290734 Removed deprecated fields
     // NPR5.48/TS  /20181206 CASE 338656 Added Missing Picture to Action
+    // NPR5.53/ALPO/20191024 CASE 371955 Removed field 13 "Amount Rounding Precision": rounding related fields moved to POS Posting Profiles
+    // NPR5.53/BHR /20190810 CASE 369354 Removed Fields 'New Customer creation'
+    // NPR5.53/BHR /20191007  CASE 369361 Removed the fields "Company Function" - 6325,"Hotline no." - 5148, "Hosting Type" - 82
 
     Caption = 'Retail Setup';
     Editable = true;
@@ -69,15 +72,6 @@ page 6014424 "Retail Setup"
                 group("Company Infomation")
                 {
                     Caption = 'Company Information';
-                    field("Company - Function";"Company - Function")
-                    {
-                    }
-                    field("Hotline no.";"Hotline no.")
-                    {
-                    }
-                    field("Hosting type";"Hosting type")
-                    {
-                    }
                     field("Company No.";"Company No.")
                     {
                     }
@@ -446,9 +440,6 @@ page 6014424 "Retail Setup"
                     field("Path Filename to User Profile";"Path Filename to User Profile")
                     {
                     }
-                    field("Amount Rounding Precision";"Amount Rounding Precision")
-                    {
-                    }
                     field("Profit on Gifvouchers";"Profit on Gifvouchers")
                     {
                     }
@@ -548,9 +539,6 @@ page 6014424 "Retail Setup"
                     {
                     }
                     field("Rep. Cust. Default";"Rep. Cust. Default")
-                    {
-                    }
-                    field("New Customer Creation";"New Customer Creation")
                     {
                     }
                     field("Cash Customer Deposit rel.";"Cash Customer Deposit rel.")

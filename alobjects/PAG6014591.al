@@ -1,6 +1,7 @@
 page 6014591 "Sales Statistics Time Period"
 {
     // NPR5.52/ZESO/20191010  Object created
+    // NPR5.53/ZESO/20191211  CASE 371446 New Function SetGlobals
 
     Caption = 'Sales Statistics by Date Time';
     PageType = Card;
@@ -101,5 +102,21 @@ page 6014591 "Sales Statistics Time Period"
         EndDateTime: DateTime;
         Dim1Filter: Text;
         Dim2Filter: Text;
+
+    procedure SetGlobals(var InStartDate: Date;var InEndDate: Date;var InStartTime: Time;var InEndTime: Time;var InVarStatisticsBy: Option;var InVarItemFilter: Text;var InVarItemCatFilter: Text;var InVarItemGroupFilter: Text;var InVarDim1Filter: Text;var InVarDim2Filter: Text)
+    begin
+        //-NPR5.53 [371446]
+        InStartDate := StartDate;
+        InEndDate := EndDate;
+        InStartTime := StartTime;
+        InEndTime := EndTime;
+        InVarStatisticsBy := StatisticsBy;
+        InVarItemFilter := ItemNoFilter;
+        InVarItemCatFilter := ItemCategoryCodeFilter;
+        InVarItemGroupFilter := ItemGroupFilter;
+        InVarDim1Filter := Dim1Filter;
+        InVarDim2Filter := Dim2Filter;
+        //+NPR5.53 [371446]
+    end;
 }
 

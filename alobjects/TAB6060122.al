@@ -12,6 +12,8 @@ table 6060122 "TM Admission Schedule Entry"
     // TM1.24/TSA /20170921 CASE 289293 Regfactored OnDelete trigger
     // TM1.28/TSA /20180221 CASE 306039 Added "Visibility On Web"
     // TM1.37/TSA /20180905 CASE 327324 Added fields for better control of arrival window
+    // TM1.45/TSA /20191120 CASE 378212 Added the sales cut-off date and time
+    // TM1.45/TSA /20191203 CASE 380754 Added field Allocation By option
 
     Caption = 'Admission Schedule Entry';
     DrillDownPageID = "TM Admission Schedule Entry";
@@ -163,6 +165,36 @@ table 6060122 "TM Admission Schedule Entry"
         field(151;"Event Arrival Until Time";Time)
         {
             Caption = 'Event Arrival Until Time';
+        }
+        field(161;"Sales From Date";Date)
+        {
+            Caption = 'Sales From Date';
+        }
+        field(162;"Sales From Time";Time)
+        {
+            Caption = 'Sales From Time';
+        }
+        field(164;"Sales Until Date";Date)
+        {
+            Caption = 'Sales Until Date';
+        }
+        field(165;"Sales Until Time";Time)
+        {
+            Caption = 'Sales Until Time';
+        }
+        field(200;"Allocation By";Option)
+        {
+            Caption = 'Allocation By';
+            OptionCaption = 'Capacity,Waiting List';
+            OptionMembers = CAPACITY,WAITINGLIST;
+        }
+        field(210;"Waiting List Queue";Integer)
+        {
+            CalcFormula = Count("TM Ticket Waiting List" WHERE ("External Schedule Entry No."=FIELD("External Schedule Entry No."),
+                                                                Status=CONST(ACTIVE)));
+            Caption = 'Waiting List Queue';
+            Editable = false;
+            FieldClass = FlowField;
         }
     }
 

@@ -17,6 +17,7 @@ table 6184495 "EFT Transaction Request"
     //                                    Removed deprecated mobilepay fields.
     // NPR5.49/MMV /20190410  CASE 347476 Renamed field 420
     // NPR5.51/MMV /20190626  CASE 359385 Added giftcard types in field 450 and renamed all options for AL compatibility.
+    // NPR5.53/MMV /20191206 CASE 377533 Added fields 10000
 
     Caption = 'EFT Transaction Request';
     DrillDownPageID = "EFT Transaction Requests";
@@ -384,6 +385,12 @@ table 6184495 "EFT Transaction Request"
         field(720;"Internal Customer ID";Text[50])
         {
             Caption = 'Internal Customer ID';
+        }
+        field(10000;"FF Moved to POS Entry";Boolean)
+        {
+            CalcFormula = Exist("POS Entry" WHERE ("Document No."=FIELD("Sales Ticket No.")));
+            Caption = 'Moved to POS Entry';
+            FieldClass = FlowField;
         }
     }
 

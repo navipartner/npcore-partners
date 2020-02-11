@@ -1,6 +1,7 @@
 report 6151013 "NpRv Voucher"
 {
     // NPR5.48/MHA /20190123  CASE 341711 Object created
+    // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
     RDLCLayout = './NpRv Voucher.rdlc';
     WordLayout = './NpRv Voucher.docx';
 
@@ -51,6 +52,9 @@ report 6151013 "NpRv Voucher"
             {
             }
             column(Amount_NpRvVoucher;"NpRv Voucher".Amount)
+            {
+            }
+            column(InitialAmount_NpRvVoucher;"NpRv Voucher"."Initial Amount")
             {
             }
             column(InuseQuantity_NpRvVoucher;"NpRv Voucher"."In-use Quantity")

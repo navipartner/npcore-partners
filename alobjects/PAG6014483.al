@@ -8,6 +8,7 @@ page 6014483 "Turnover Stats"
     // NPR5.35/TJ /20170816 CASE 286283 Renamed variables/function into english and into proper naming terminology
     //                                  Removed unused variables
     // NPR5.40/BHR /20180316 CASE 308385 Removed unused function CallSub
+    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
 
     Caption = 'Turnover';
     DeleteAllowed = false;
@@ -254,6 +255,8 @@ page 6014483 "Turnover Stats"
         TotalNetAmt: Decimal;
         Register: Record Register;
         Txt001: Label 'All registers';
+        POSUnit: Record "POS Unit";
+        POSSetup: Codeunit "POS Setup";
     begin
         //TurnoverStatistics
         if SaleDate = 0D then
@@ -333,6 +336,11 @@ page 6014483 "Turnover Stats"
         AuditRoll.SetCurrentKey("Register No.","Sale Type",Type,"No.","Sale Date");
         if not Register.Get(RegisterNo2) then
           Register.Find('-');
+        //-NPR5.53 [371955]
+        POSUnit.Get(Register."Register No.");
+        POSSetup.SetPOSUnit(POSUnit);
+        //+NPR5.53 [371955]
+
         AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::Deposit);
         AuditRoll.SetRange(Type,AuditRoll.Type::"G/L");
         AuditRoll.SetRange("No.",Register."Gift Voucher Account");
@@ -348,7 +356,8 @@ page 6014483 "Turnover Stats"
         // Udbetaling
         AuditRoll.SetRange("Sale Type",AuditRoll."Sale Type"::"Out payment");
         AuditRoll.SetRange(Type,AuditRoll.Type::"G/L");
-        AuditRoll.SetFilter("No.",'<>%1&<>%2',Register.Rounding,Register."Gift Voucher Discount Account");
+        //AuditRoll.SETFILTER("No.",'<>%1&<>%2',Register.Rounding,Register."Gift Voucher Discount Account");  //NPR5.53 [371955]-revoked
+        AuditRoll.SetFilter("No.",'<>%1&<>%2',POSSetup.RoundingAccount(true),Register."Gift Voucher Discount Account");  //NPR5.53 [371955]
         AuditRoll.CalcSums(AuditRoll."Amount Including VAT");
         PayoutAmount := AuditRoll."Amount Including VAT";
         AuditRoll.SetRange("No.");

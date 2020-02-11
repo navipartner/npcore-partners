@@ -1,6 +1,7 @@
 codeunit 6059831 "RFID Mgt."
 {
     // NPR5.48/MMV /20181205 CASE 327107 Created object
+    // NPR5.53/MMV /20191114 CASE 377115 Removed confirm dialog. Added event instead for any future customization.
 
 
     trigger OnRun()
@@ -17,18 +18,31 @@ codeunit 6059831 "RFID Mgt."
         RetailJournalLine: Record "Retail Journal Line";
         FieldRef: FieldRef;
     begin
-        FieldRef := RecRef.Field(RetailJournalLine.FieldNo("RFID Tag Value"));
-        FieldRef.SetFilter('<>%1', '');
-        if not RecRef.FindSet then
+        //-NPR5.53 [377115]
+        // FieldRef := RecRef.FIELD(RetailJournalLine.FIELDNO("RFID Tag Value"));
+        // FieldRef.SETFILTER('<>%1', '');
+        // IF NOT RecRef.FINDSET THEN
+        //  EXIT;
+        //
+        // IF NOT CONFIRM(TXT_SAVE_RFID, TRUE) THEN
+        //  EXIT;
+        //
+        // REPEAT
+        //  RecRef.SETTABLE(RetailJournalLine);
+        //  InsertItemCrossReference(RetailJournalLine."Item No.", RetailJournalLine."Variant Code", RetailJournalLine."RFID Tag Value");
+        // UNTIL RecRef.NEXT = 0;
+
+        RecRef.SetTable(RetailJournalLine);
+        RetailJournalLine.SetFilter("RFID Tag Value", '<>%1', '');
+        if not RetailJournalLine.FindSet then
           exit;
 
-        if not Confirm(TXT_SAVE_RFID, true) then
-          exit;
+        OnBeforeSaveItemCrossReferenceValues(RetailJournalLine);
 
         repeat
-          RecRef.SetTable(RetailJournalLine);
           InsertItemCrossReference(RetailJournalLine."Item No.", RetailJournalLine."Variant Code", RetailJournalLine."RFID Tag Value");
-        until RecRef.Next = 0;
+        until RetailJournalLine.Next = 0;
+        //+NPR5.53 [377115]
     end;
 
     procedure GetNextRFIDValue(): Text
@@ -83,6 +97,11 @@ codeunit 6059831 "RFID Mgt."
         if StrLen(Value) >= Length then
           exit(Value);
         exit(PadStr('', Length - StrLen(Value), PadChar) + Value);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSaveItemCrossReferenceValues(var RetailJournalLine: Record "Retail Journal Line")
+    begin
     end;
 }
 

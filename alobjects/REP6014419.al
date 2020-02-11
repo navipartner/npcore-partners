@@ -3,6 +3,7 @@ report 6014419 "Vendor Sales Stat"
     // NPR5.29/TR  /20161118  CASE 247166 Report Created
     // NPR5.33/JLK /20170619  CASE 280879 Changed SalesQty and PurchaseQty to Decimal
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
+    // NPR5.53/ANPA/20191227  CASE 370940 Changed caption on request page
     DefaultLayout = RDLC;
     RDLCLayout = './Vendor Sales Stat.rdlc';
 
@@ -201,7 +202,7 @@ report 6014419 "Vendor Sales Stat"
             {
                 field("Start Date";StartDate)
                 {
-                    Caption = 'End Date';
+                    Caption = 'Start Date';
                 }
                 field("End Date";EndDate)
                 {

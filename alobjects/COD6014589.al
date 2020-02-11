@@ -23,6 +23,7 @@ codeunit 6014589 "GCP Mgt."
     // NPR5.29/MMV /20161207 CASE 260366 Handle BLOB tokens.
     // NPR5.30/MMV /20170208 CASE 261964 Refactored completely.
     // NPR5.51/MMV /20190617 CASE 358889 Improved lock timing.
+    // NPR5.53/MMV /20191029 CASE 374501 Fixed #358889
 
 
     trigger OnRun()
@@ -375,15 +376,19 @@ codeunit 6014589 "GCP Mgt."
             API.RefreshAccessToken();
             Token.AddOrUpdate('GOOGLE_PRINT_ACCESS', API.GetAccessTokenValue, API.GetAccessTokenTimeStamp, API.GetAccessTokenExpiresIn);
             OutAccessTokenValue := API.GetAccessTokenValue;
-            //-NPR5.51 [358889]
-            Commit;
-            //+NPR5.51 [358889]
+        //-NPR5.53 [374501]
+        //    COMMIT;
+        //+NPR5.53 [374501]
           end else
             OutAccessTokenValue := Token.GetValue();
         end;
 
         if (StrLen(OutAccessTokenValue) = 0) or (StrLen(OutRefreshTokenValue) = 0) then
           Error(Text000002);
+
+        //-NPR5.53 [374501]
+        Commit;
+        //+NPR5.53 [374501]
     end;
 }
 

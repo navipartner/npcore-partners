@@ -1,6 +1,7 @@
 codeunit 6151202 "NpCs POS Action Process Order"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+    // NPR5.53/MHA /20191128  CASE 378895 Added Parameter 'Sorting'
 
 
     trigger OnRun()
@@ -17,7 +18,9 @@ codeunit 6151202 "NpCs POS Action Process Order"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.0');
+        //-NPR5.53 [378895]
+        exit('1.1');
+        //+NPR5.53 [378895]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
@@ -38,6 +41,9 @@ codeunit 6151202 "NpCs POS Action Process Order"
 
         Sender.RegisterOptionParameter('Location From','POS Store,Location Filter Parameter','POS Store');
         Sender.RegisterTextParameter('Location Filter','');
+        //-NPR5.53 [378895]
+        Sender.RegisterOptionParameter('Sorting','Entry No.,Reference No.,Processing expires at','Entry No.');
+        //+NPR5.53 [378895]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', true, true)]
@@ -102,7 +108,9 @@ codeunit 6151202 "NpCs POS Action Process Order"
             begin
               JSON.InitializeJObjectParser(Context,FrontEnd);
               LocationFilter := GetLocationFilter(JSON,POSSession);
-              RunCollectInStoreOrders(LocationFilter);
+              //-NPR5.53 [378895]
+              RunCollectInStoreOrders(LocationFilter,JSON);
+              //+NPR5.53 [378895]
               POSSession.GetSale(POSSale);
               POSSale.RefreshCurrent();
               POSSession.RequestRefreshData();
@@ -110,11 +118,28 @@ codeunit 6151202 "NpCs POS Action Process Order"
         end;
     end;
 
-    local procedure RunCollectInStoreOrders(LocationFilter: Text)
+    local procedure RunCollectInStoreOrders(LocationFilter: Text;JSON: Codeunit "POS JSON Management")
     var
         NpCsDocument: Record "NpCs Document";
+        Sorting: Option "Entry No.","Reference No.","Processing expires at";
     begin
         SetUnprocessedFilter(LocationFilter,NpCsDocument);
+        //-NPR5.53 [378895]
+        case JSON.GetIntegerParameter('Sorting',false) of
+          Sorting::"Entry No.":
+            begin
+              NpCsDocument.SetCurrentKey("Entry No.");
+            end;
+          Sorting::"Reference No.":
+            begin
+              NpCsDocument.SetCurrentKey("Reference No.");
+            end;
+          Sorting::"Processing expires at":
+            begin
+              NpCsDocument.SetCurrentKey("Processing expires at");
+            end;
+        end;
+        //+NPR5.53 [378895]
         PAGE.RunModal(PAGE::"NpCs Collect Store Orders",NpCsDocument);
     end;
 

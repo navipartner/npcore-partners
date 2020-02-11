@@ -19,7 +19,7 @@ codeunit 6060115 "TM Ticket WebService"
     // TM1.29/TSA /20180322 CASE 308975 Adding ConsumeComplementaryItem, and changing GetComplementaryMembershipItemNo to check if consumed
     // TM1.36/TSA /20180830 CASE 326733 Removed ResolveIdentifiers()
     // TM1.38/TSA /20181025 CASE 332109 SendETicket()
-    // TM130.1.38/TSA /20190905 CASE 354603 Functional visibility
+    // TM1.45/TSA /20200114 CASE 384490 Ticket blocked checked for complementary item
 
 
     trigger OnRun()
@@ -258,6 +258,12 @@ codeunit 6060115 "TM Ticket WebService"
         if (not Ticket.FindFirst ()) then
           exit (-10);
 
+        //-TM1.45 [384490]
+        if (Ticket.Blocked) then
+          exit (-13);
+        //+TM1.45 [384490]
+
+
         if (not TicketType.Get (Ticket."Ticket Type Code")) then
           exit (-11);
 
@@ -295,6 +301,11 @@ codeunit 6060115 "TM Ticket WebService"
         Ticket.SetFilter ("External Ticket No.", '=%1', ExternalTicketNo);
         if (not Ticket.FindFirst ()) then
           exit (-10);
+
+        //-TM1.45 [384490]
+        if (Ticket.Blocked) then
+          exit (-13);
+        //+TM1.45 [384490]
 
         if (not TicketType.Get (Ticket."Ticket Type Code")) then
           exit (-11);

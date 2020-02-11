@@ -7,6 +7,7 @@ tableextension 6014430 tableextension6014430 extends "Jobs Setup"
     // NPR5.34/TJ/20170728 CASE 277938 Removed fields 6060158..6060163
     // NPR5.38/TJ/20171027 CASE 285194 Removed field 6060156,6060157 and 6060164
     // NPR5.48/TJ/20181119 CASE 287903 New field "Post Event on Sales Inv. Post"
+    // NPR5.53/TJ/20200109 CASE 346821 New field "Block Event Deletion"
     fields
     {
         field(6060150;"Auto. Create Job Task Line";Boolean)
@@ -48,6 +49,11 @@ tableextension 6014430 tableextension6014430 extends "Jobs Setup"
             Description = 'NPR5.48';
             OptionCaption = ' ,Only Inventory,Both Inventory and Job';
             OptionMembers = " ","Only Inventory","Both Inventory and Job";
+        }
+        field(6060157;"Block Event Deletion";BLOB)
+        {
+            Caption = 'Block Event Deletion';
+            Description = 'NPR5.53';
         }
     }
 }

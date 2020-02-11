@@ -18,6 +18,8 @@ table 6060116 "TM Ticket Reservation Request"
     // TM1.26/TSA /20171102 CASE 285601 Added Field "DIY Print Order Requested", "DIY Print Order At"
     // TM1.31/TSA /20180524 CASE 316500 Added key "Request Status", "Expires Date Time", IsEmpty dropped from 650 reads to 4 according to profiler for ExpireReservationRequests()
     // TM1.43/TSA /20190910 CASE 368043 Added Item No. and Variant Code to make a separation from "External Item Code".
+    // TM1.45/TSA /20191204 CASE 380754 Added Waiting List Reference Code, and request status option "Waiting List"
+    // TM1.45/TSA /20191216 CASE 382535 Added "Admission Inclusion", "Notification Format"
 
     Caption = 'Ticket Reservation Request';
 
@@ -39,8 +41,8 @@ table 6060116 "TM Ticket Reservation Request"
         field(12;"Request Status";Option)
         {
             Caption = 'Request Status';
-            OptionCaption = 'Registered,Confirmed,Expired,Canceled,Work In Progress,Reserved';
-            OptionMembers = REGISTERED,CONFIRMED,EXPIRED,CANCELED,WIP,RESERVED;
+            OptionCaption = 'Registered,Confirmed,Expired,Canceled,Work In Progress,Reserved,Waiting List';
+            OptionMembers = REGISTERED,CONFIRMED,EXPIRED,CANCELED,WIP,RESERVED,WAITINGLIST;
         }
         field(13;"Request Status Date Time";DateTime)
         {
@@ -81,6 +83,12 @@ table 6060116 "TM Ticket Reservation Request"
         {
             Caption = 'Admission Code';
         }
+        field(26;"Admission Inclusion";Option)
+        {
+            Caption = 'Admission Inclusion';
+            OptionCaption = 'Required,Optional and Selected,Optional and not Selected';
+            OptionMembers = REQUIRED,SELECTED,NOT_SELECTED;
+        }
         field(30;"Expires Date Time";DateTime)
         {
             Caption = 'Expires Date Time';
@@ -105,6 +113,10 @@ table 6060116 "TM Ticket Reservation Request"
         {
             Caption = 'Scheduled Time Description';
         }
+        field(70;"Waiting List Reference Code";Code[10])
+        {
+            Caption = 'Waiting List Reference Code';
+        }
         field(80;"Notification Method";Option)
         {
             Caption = 'Notification Method';
@@ -114,6 +126,12 @@ table 6060116 "TM Ticket Reservation Request"
         field(81;"Notification Address";Text[80])
         {
             Caption = 'Notification Address';
+        }
+        field(82;"Notification Format";Option)
+        {
+            Caption = 'Notification Format';
+            OptionCaption = 'Plain,HTML,Attachment,Wallet';
+            OptionMembers = PLAIN,HTML,ATTACHMENT,WALLET;
         }
         field(90;"DIY Print Order Requested";Boolean)
         {

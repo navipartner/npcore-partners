@@ -18,6 +18,8 @@ codeunit 6150702 "POS UI Management"
     // NPR5.51/MMV /20190625 CASE 359825 Added missing filter
     // NPR5.51/VB  /20190709 CASE 361184 Passing NPR Version number to front end
     // NPR5.51/VB  /20190719  CASE 352582 POS Administrative Templates feature
+    // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
+    // NPR5.53/TSA /20191219 CASE 382035 Added new caption Item_Count
 
 
     trigger OnRun()
@@ -589,6 +591,7 @@ codeunit 6150702 "POS UI Management"
         CaptionPayment_SaleLCY: Label 'Sale (LCY)';
         CaptionPayment_Paid: Label 'Paid';
         CaptionPayment_Balance: Label 'Balance';
+        CaptionItemCount: Label 'Item Count';
     begin
         Captions.Add('Sale_ReceiptNo',CaptionLabelReceiptNo);
         Captions.Add('Sale_EANHeader',CaptionLabelEANHeader);
@@ -611,6 +614,10 @@ codeunit 6150702 "POS UI Management"
         //Captions.Add('Sale_SubTotal',CaptionLabelSubtotal);
         Captions.Add('Sale_SubTotal',StrSubstNo (CaptionLabelSubtotal, GetLCYCode));
         //+NPR5.37 [292323]
+
+        //-NPR5.53 [382035]
+        Captions.Add ('Item_Count', CaptionItemCount);
+        //+NPR5.53 [382035]
 
         Captions.Add('Payment_PaymentInfo',CaptionPaymentInfo);
         Captions.Add('Global_Cancel',CaptionGlobalCancel);
@@ -751,6 +758,13 @@ codeunit 6150702 "POS UI Management"
         ConfigureReusableWorkflow(Action,POSSession,StrSubstNo('%1, %2',POSSetup.TableCaption,POSSetup.FieldCaption("Unlock POS Action Code")),POSSetup.FieldNo("Unlock POS Action Code"));
         //+NPR5.50 [338666]
         //+NPR5.37 [293905]
+
+        //-NPR5.53 [362777]
+        Setup.Action_Login(Action,POSSession);
+        ConfigureReusableWorkflow(Action,POSSession,StrSubstNo('%1, %2',POSSetup.TableCaption,POSSetup.FieldCaption("Login Action Code")),POSSetup.FieldNo("Login Action Code"));
+        Setup.Action_TextEnter(Action,POSSession);
+        ConfigureReusableWorkflow(Action,POSSession,StrSubstNo('%1, %2',POSSetup.TableCaption,POSSetup.FieldCaption("Text Enter Action Code")),POSSetup.FieldNo("Text Enter Action Code"));
+        //+NPR5.53 [362777]
     end;
 
     procedure ConfigureReusableWorkflow("Action": Record "POS Action";POSSession: Codeunit "POS Session";Source: Text;FieldNumber: Integer)
@@ -791,6 +805,10 @@ codeunit 6150702 "POS UI Management"
         Options.Add('unlockWorkflow',Setup.ActionCode_UnlockPOS);
         Options.Add('autoLockTimeout',Setup.GetLockTimeout());
         //+NPR5.37 [293905]
+        //-NPR5.53 [362777]
+        Options.Add('loginWorkflow',Setup.ActionCode_Login);
+        Options.Add('textEnterWorkflow',Setup.ActionCode_TextEnter);
+        //+NPR5.53 [362777]
         //-NPR5.45 [323728]
         Options.Add('kioskUnlockEnabled',Setup.GetKioskUnlockEnabled());
         //+NPR5.45 [323728]

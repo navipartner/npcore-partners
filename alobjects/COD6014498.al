@@ -17,6 +17,7 @@ codeunit 6014498 "Exchange Label Management"
     // NPR5.48/JDH /20181206 CASE 335967 Validating Unit of Measure Code
     // NPR5.49/MHA /20190211 CASE 345209 Amount Including Vat should be changed so that Discount is reflected
     // NPR5.51/ALST/20190624 CASE 337539 "Retail Cross Reference No." gets a value if global exchange is set up
+    // NPR5.53/ALST/20191028 CASE 372948 check EAN prefix in range instead of single value
 
 
     trigger OnRun()
@@ -318,7 +319,10 @@ codeunit 6014498 "Exchange Label Management"
     begin
         RetailConfiguration.Get;
 
-        if CopyStr(CopyValidering, 1, 2) = RetailConfiguration."EAN Prefix Exhange Label" then begin
+        //-NPR5.53 [372948]
+        //IF COPYSTR(CopyValidering, 1, 2) = RetailConfiguration."EAN Prefix Exhange Label" THEN BEGIN
+        if CheckPrefix(CopyValidering, RetailConfiguration."EAN Prefix Exhange Label") then begin
+        //+NPR5.53 [372948]
           ExchangeLabel.SetCurrentKey(Barcode);
           ExchangeLabel.SetRange(Barcode, CopyValidering);
 
@@ -554,6 +558,24 @@ codeunit 6014498 "Exchange Label Management"
         LineRef.SetTable(SaleLinePOS);
         ReferenceNo := NpGpPOSSalesInitMgt.InitReferenceNoSaleLinePOS(SaleLinePOS);
         //+NPR5.51
+    end;
+
+    procedure CheckPrefix(Barcode: Text;Prefix: Code[10]): Boolean
+    var
+        EAN13Prefix: Integer;
+        InternalUseRange: Integer;
+    begin
+        //-NPR5.53 [372948]
+        if (Evaluate(EAN13Prefix,CopyStr(Barcode,1,2)) and Evaluate(InternalUseRange,Prefix)) then begin
+          InternalUseRange := InternalUseRange div 10;
+
+          // EAN-13 ranges for internal usage are 20 - 29 and 40 - 49
+          if (InternalUseRange) in [2,4] then
+            exit((EAN13Prefix >= InternalUseRange * 10) and (EAN13Prefix < (InternalUseRange + 1) * 10));
+        end;
+
+        exit(CopyStr(Barcode,1,2) = Prefix);
+        //+NPR5.53 [372948]
     end;
 
     procedure "-- Enums"()

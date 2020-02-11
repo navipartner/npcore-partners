@@ -23,6 +23,7 @@ table 6014402 "Payment Type POS"
     // NPR5.51/TJ  /20190628 CASE 357069 Added field 110 "Open Drawer"
     // NPR5.52/BHR /20190925 CASE 369605 Delete Null Key
     // NPR5.52/MHA /20191016 CASE 373294 Added field 120 "Allow Cashback"
+    // NPR5.53/MHA /20191202 CASE 373294 Renamed field 120 to "Allow Refund"
 
     Caption = 'Payment Type';
     LookupPageID = "Payment Type - Register";
@@ -648,10 +649,10 @@ table 6014402 "Payment Type POS"
             Caption = 'Open Drawer';
             Description = 'NPR5.51';
         }
-        field(120;"Allow Cashback";Boolean)
+        field(120;"Allow Refund";Boolean)
         {
-            Caption = 'Allow Cashback';
-            Description = 'NPR5.52';
+            Caption = 'Allow Refund';
+            Description = 'NPR5.52,NPR5.53';
             InitValue = true;
         }
         field(200;"PBS Gift Voucher";Boolean)

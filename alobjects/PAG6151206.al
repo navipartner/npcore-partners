@@ -4,6 +4,8 @@ page 6151206 "NpCs Collect Store Order Card"
     // NPR5.51/MHA /20190717  CASE 344264 Changed name and logic for field 240 from "Delivery Only (Non Stock)" to "From Store Stock"
     // NPR5.51/MHA /20190719  CASE 362443 Added "Opening Hour Set"
     // NPR5.51/MHA /20190819  CASE 364557 Added Posting fields 250 "Post on", 255 "Posting Document Type", 260 "Posting Document No."
+    // NPR5.53/MHA /20191105  CASE 374049 Promoted Action "Send Notification to Customer"
+    // NPR5.53/MHA /20192811  CASE 379742 Added Action Print Confirmation
 
     Caption = 'Collect in Store Order Card';
     SourceTable = "NpCs Document";
@@ -274,6 +276,28 @@ page 6151206 "NpCs Collect Store Order Card"
                         //+NPR5.51 [364557]
                     end;
                 }
+                action("Print Confirmation")
+                {
+                    Caption = 'Print Confirmation';
+                    Ellipsis = true;
+                    Image = PrintReport;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    Visible = "Document Type" = "Document Type"::Order;
+
+                    trigger OnAction()
+                    var
+                        SalesHeader: Record "Sales Header";
+                        DocPrint: Codeunit "Document-Print";
+                        Usage: Option "Order Confirmation","Work Order","Pick Instruction";
+                    begin
+                        //-NPR5.53 [379742]
+                        SalesHeader.Get("Document Type","Document No.");
+                        DocPrint.PrintSalesOrder(SalesHeader,Usage::"Order Confirmation");
+                        //+NPR5.53 [379742]
+                    end;
+                }
                 action("Print Delivery")
                 {
                     Caption = 'Print Delivery';
@@ -336,6 +360,9 @@ page 6151206 "NpCs Collect Store Order Card"
                 {
                     Caption = 'Send Notification to Customer';
                     Image = SendTo;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
                     Visible = "Send Notification from Store";
 
                     trigger OnAction()

@@ -9,6 +9,7 @@ codeunit 6150628 "POS Payment Bin Checkpoint"
     // NPR5.49/TSA /20190313 CASE 347324 Missing Store on checkpoint
     // NPR5.49/TSA /20190315 CASE 348458 Same payment method over multiple bins on same unit was skipped.
     // NPR5.49/TSA /20190315 CASE 348458 Added POS Unit no to filters to handle shared bins
+    // NPR5.53/TSA /20191219 CASE 383012 Added support for keeping entries with zero bin movement
 
 
     trigger OnRun()
@@ -239,6 +240,7 @@ codeunit 6150628 "POS Payment Bin Checkpoint"
         POSPaymentMethod: Record "POS Payment Method";
         POSBinEntry: Record "POS Bin Entry";
         POSUnit: Record "POS Unit";
+        POSEndofDayProfile: Record "POS End of Day Profile";
         POSBinMovement: Boolean;
         LastCheckpointEntryNo: Integer;
     begin
@@ -440,8 +442,22 @@ codeunit 6150628 "POS Payment Bin Checkpoint"
         // END;
 
         if ((not POSBinMovement) and (PaymentBinCheckpoint."Calculated Amount Incl. Float" = 0)) then begin
-          BinEntry.Delete();
-          PaymentBinCheckpoint.Delete();
+
+          //-NPR5.53 [383012]
+          // BinEntry.DELETE();
+          // PaymentBinCheckpoint.DELETE();
+          POSEndofDayProfile.Init ();
+          if (POSUnit."POS End of Day Profile" <> '') then begin
+            if (not POSEndofDayProfile.Get (POSUnit."POS End of Day Profile")) then
+              POSEndofDayProfile.Init ();
+          end;
+
+          if (not POSEndofDayProfile."Show Zero Amount Lines") then begin
+            BinEntry.Delete();
+            PaymentBinCheckpoint.Delete();
+          end;
+          //-NPR5.53 [383012]
+
         end;
         //+NPR5.48 [339139]
     end;

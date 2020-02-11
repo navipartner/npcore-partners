@@ -31,6 +31,7 @@ pageextension 6014421 pageextension6014421 extends "Customer Card"
     // NPR5.48/TSA /20181218 CASE 320424 Added "Magento Shipping Group", "Magento Payment Group", "Magento Store Code"
     // MAG2.20/MHA /20190426 CASE 320423 Added Magento Version visibility control
     // NPR5.52/ZESO/20190925 CASE 358656 Added Fields Anonymized,Anonymized Date,To Anonymize and Customer Anonymization functionality.
+    // NPR5.53/ZESO/20200115 CASE 358656 Use Field 'To Anonymize On' instead of 'To Anonymize'.
     layout
     {
         addafter(Name)
@@ -42,7 +43,7 @@ pageextension 6014421 pageextension6014421 extends "Customer Card"
         }
         addafter(AdjProfitPct)
         {
-            field("To Anonymize";"To Anonymize")
+            field("To Anonymize On";"To Anonymize On")
             {
                 Editable = ToAnonymizeEditable;
             }

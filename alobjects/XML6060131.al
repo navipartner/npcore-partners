@@ -6,6 +6,7 @@ xmlport 6060131 "MM Update Member"
     // MM1.18/NPKNAV/20170309  CASE 265562 Transport MM1.18 - 8 March 2017
     // MM1.24/TSA /20171120 CASE 276832 - Added guardian section
     // MM1.40/TSA /20190827 CASE 360242 - Added Attributes
+    // MM1.42/TSA /20191205 CASE 381222 Added notification method
 
     Caption = 'Update Member';
     FormatEvaluate = Xml;
@@ -91,6 +92,11 @@ xmlport 6060131 "MM Update Member"
                             {
                             }
                         }
+                    }
+                    fieldelement(notificationmethod;tmpMemberInfoCapture."Notification Method")
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
                     }
                 }
                 tableelement(tmpmember;"MM Member")

@@ -118,6 +118,10 @@ codeunit 6014435 "Retail Form Code"
     // NPR5.48/MHA /20181115 CASE 334633 Removed function CheckSavedSales() which have been replaced by CleanupPOSQuotes() in codeunit 6151006
     // NPR5.50/TJ  /20190503 CASE 347875 Not updating retail document as cashed if sale has been cancelled
     // NPR5.51/MHA /20190614 CASE 358582 Changed scope of function OnBeforeAuditRoleLineInsertEvent() from Local to Global
+    // NPR5.53/ALPO/20191022 CASE 373743 Field "Sales Ticket Series" moved from "Cash Register" to "POS Audit Profile"
+    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
+    // NPR5.53/BHR /20191008 CASE 369354 Removed Code For Customer Creation
 
     Permissions = TableData "Sales Invoice Header"=rimd,
                   TableData "Sales Invoice Line"=rimd,
@@ -154,6 +158,7 @@ codeunit 6014435 "Retail Form Code"
         Text10600039: Label 'One payment type must have payment option Cash!';
         Text10600040: Label 'Change';
         Text10600078: Label 'Reverse sales ticket no. %1';
+        POSSetup: Codeunit "POS Setup";
         UsingTS: Boolean;
         ValueforTS: Decimal;
         Text10600200: Label 'Error';
@@ -240,7 +245,9 @@ codeunit 6014435 "Retail Form Code"
     begin
         //BalanceRegister
         RetailSetupGlobal.Get;
-        RetailSetupGlobal.CheckOnline;
+        //-NPR5.53 [369361]
+        //RetailSetupGlobal.CheckOnline;
+        //+NPR5.53 [369361]
 
         Register.Get(SalePOS."Register No.");
 
@@ -830,6 +837,7 @@ codeunit 6014435 "Retail Form Code"
         NPRetailSetup: Record "NP Retail Setup";
         GLSetup: Record "General Ledger Setup";
         SaleLinePOS: Record "Sale Line POS";
+        POSUnit: Record "POS Unit";
     begin
         //AfslutEkspedition()
         with Sale do begin
@@ -1026,11 +1034,14 @@ codeunit 6014435 "Retail Form Code"
                 Ekspeditionslinie."Location Code" := Kasse."Location Code";
         
               if Ekspeditionslinie."Shortcut Dimension 1 Code" = '' then
-                Ekspeditionslinie."Shortcut Dimension 1 Code" := Kasse."Global Dimension 1 Code";
+                //Ekspeditionslinie."Shortcut Dimension 1 Code" := Kasse."Global Dimension 1 Code";  //NPR5.53 [371956]-revoked
+                Ekspeditionslinie.Validate("Shortcut Dimension 1 Code",POSUnit."Global Dimension 1 Code");  //NPR5.53 [371956]
         
               if Ekspeditionslinie."Shortcut Dimension 2 Code" = '' then
-                Ekspeditionslinie."Shortcut Dimension 2 Code" := Kasse."Global Dimension 2 Code";
+                //Ekspeditionslinie."Shortcut Dimension 2 Code" := Kasse."Global Dimension 2 Code";  //NPR5.53 [371956]-revoked
+                Ekspeditionslinie.Validate("Shortcut Dimension 2 Code",POSUnit."Global Dimension 2 Code");  //NPR5.53 [371956]
         
+              //! Apparently the above code is redundant because the 'Kasse' is not referring to any record at this stage  //NPR5.53 [371956]
             /*---------------------------------------------------------------------------------------------*/
             /* MAKE AUDIT ROLL LINES */
             /*---------------------------------------------------------------------------------------------*/
@@ -1700,8 +1711,11 @@ codeunit 6014435 "Retail Form Code"
             Revisionsrulle."Sale Type"                    := Revisionsrulle."Sale Type"::Payment;
             Revisionsrulle."Sale Date"                    := Date;
             Revisionsrulle.Lokationskode                  := Kasse."Location Code";
-            Revisionsrulle."Shortcut Dimension 1 Code"    := Kasse."Global Dimension 1 Code";
-            Revisionsrulle."Shortcut Dimension 2 Code"    := Kasse."Global Dimension 2 Code";
+            //-NPR5.53 [371956]-revoked
+            //! Redundant lines. Dimensions are copied from SalePOS later (function MoveSaleDim2AuditRoll() few lines down).
+            //Revisionsrulle."Shortcut Dimension 1 Code"    := Kasse."Global Dimension 1 Code";
+            //Revisionsrulle."Shortcut Dimension 2 Code"    := Kasse."Global Dimension 2 Code";
+            //+NPR5.53 [371956]-revoked
             Revisionsrulle."Closing Time"                 := Time;
             Revisionsrulle."Retail Document Type"         := Sale."Retail Document Type";
             Revisionsrulle."Retail Document No."          := Sale."Retail Document No.";
@@ -1711,6 +1725,7 @@ codeunit 6014435 "Retail Form Code"
               Revisionsrulle."Receipt Type"                      := Revisionsrulle."Receipt Type"::"Negative receipt";
         
             Kasse.Get( "Register No." );
+            POSUnit.Get("Register No.");  //NPR5.53 [371955]
             Betalingsvalg.Reset;
             Betalingsvalg.SetRange("Processing Type",Betalingsvalg."Processing Type"::Cash);
             Betalingsvalg.SetRange(Status,Betalingsvalg.Status::Active);
@@ -1726,17 +1741,26 @@ codeunit 6014435 "Retail Form Code"
         
             //OHM
             // �reafrunding og byttepenge.
-            Kasse.TestField(Rounding);
-            if (Kasse.Rounding <> '') and (RetailSetupGlobal."Amount Rounding Precision" > 0) then begin
-              Afrunding := AfslKontrol - Round(AfslKontrol,RetailSetupGlobal."Amount Rounding Precision",'=');
+            //-NPR5.53 [371955]-revoked
+            //Kasse.TESTFIELD(Rounding);
+            //IF (Kasse.Rounding <> '') AND (RetailSetupGlobal."Amount Rounding Precision" > 0) THEN BEGIN
+            //  Afrunding := AfslKontrol - ROUND(AfslKontrol,RetailSetupGlobal."Amount Rounding Precision",'=');
+            //+NPR5.53 [371955]-revoked
+            //-NPR5.53 [371955]
+            POSSetup.SetPOSUnit(POSUnit);
+            if (POSSetup.RoundingAccount(false) <> '') and (POSSetup.AmountRoundingPrecision > 0) then begin
+              Afrunding := AfslKontrol - Round(AfslKontrol,POSSetup.AmountRoundingPrecision,POSSetup.AmountRoundingDirection);
+            //+NPR5.53 [371955]
               if (Afrunding <> 0) then begin
                 LineNo += 10000;
-                Finans.Get(Kasse.Rounding);
+                //Finans.GET(Kasse.Rounding);  //NPR5.53 [371955]-revoked
+                Finans.Get(POSSetup.RoundingAccount(true));  //NPR5.53 [371955]
                 Revisionsrulle."Amount Including VAT" := AfslKontrol - Afrunding;
                 InsertReturnAmountRounding(Sale,Afrunding,Finans,IsRounding,bNegBon,LineNo);
               end;
             end;
-            if (Round(AfslKontrol,RetailSetupGlobal."Amount Rounding Precision",'=') <> 0) then begin
+            //IF (ROUND(AfslKontrol,RetailSetupGlobal."Amount Rounding Precision",'=') <> 0) THEN BEGIN  //NPR5.53 [371955]-revoked
+            if (Round(AfslKontrol,POSSetup.AmountRoundingPrecision,POSSetup.AmountRoundingDirection) <> 0) then begin  //NPR5.53 [371955]
               if Revisionsrulle."Amount Including VAT" = 0 then
                 Revisionsrulle."Amount Including VAT" := AfslKontrol;
               if not bNegBon then begin
@@ -1794,8 +1818,15 @@ codeunit 6014435 "Retail Form Code"
             Revisionsrulle."Allocated No."          := Sale."Retail Document No.";
             Revisionsrulle.Type                     := Revisionsrulle.Type::"Debit Sale";
             Revisionsrulle.Lokationskode            := Kasse."Location Code";
-            Revisionsrulle."Shortcut Dimension 1 Code" := Kasse."Global Dimension 1 Code";
-            Revisionsrulle."Shortcut Dimension 2 Code" := Kasse."Global Dimension 2 Code";
+            //-NPR5.53 [371956]-revoked
+            //Revisionsrulle."Shortcut Dimension 1 Code" := Kasse."Global Dimension 1 Code";
+            //Revisionsrulle."Shortcut Dimension 2 Code" := Kasse."Global Dimension 2 Code";
+            //+NPR5.53 [371956]-revoked
+            //-NPR5.53 [371956]
+            Revisionsrulle."Shortcut Dimension 1 Code" := POSUnit."Global Dimension 1 Code";
+            Revisionsrulle."Shortcut Dimension 2 Code" := POSUnit."Global Dimension 2 Code";
+            //! How about updating Dimension Set ID?
+            //+NPR5.53 [371956]
             Revisionsrulle.Posted                   := true;
             Revisionsrulle."Closing Time"           := Time;
             Revisionsrulle."Retail Document Type"   := Sale."Retail Document Type";
@@ -1894,14 +1925,23 @@ codeunit 6014435 "Retail Form Code"
 
     procedure GetLastSalesTicketNumber(Kassenummer: Code[20]): Code[20]
     var
-        Kasse: Record Register;
         NrSerie: Codeunit NoSeriesManagement;
         NrSerieLinie: Record "No. Series Line";
+        POSAuditProfile: Record "POS Audit Profile";
+        POSUnit: Record "POS Unit";
     begin
         //HentSidsteBonnummer()
-
-        Kasse.Get( Kassenummer );
-        NrSerie.SetNoSeriesLineFilter( NrSerieLinie, Kasse."Sales Ticket Series", 0D );
+        //-NPR5.53 [373743]-revoked
+        //Kasse.GET( Kassenummer );
+        //NrSerie.SetNoSeriesLineFilter( NrSerieLinie, Kasse."Sales Ticket Series", 0D );
+        //+NPR5.53 [373743]-revoked
+        //-NPR5.53 [373743]
+        POSUnit.Get(Kassenummer);
+        POSUnit.TestField("POS Audit Profile");
+        POSAuditProfile.Get(POSUnit."POS Audit Profile");
+        POSAuditProfile.TestField("Sales Ticket No. Series");
+        NrSerie.SetNoSeriesLineFilter(NrSerieLinie,POSAuditProfile."Sales Ticket No. Series",0D);
+        //+NPR5.53 [373743]
         NrSerieLinie.Find('-');
         exit( NrSerieLinie."Last No. Used" );
     end;
@@ -2009,16 +2049,18 @@ codeunit 6014435 "Retail Form Code"
 
     procedure FetchSalesTicketNumber(Kassenummer: Code[10]) Bonnummer: Code[20]
     var
-        Kasse: Record Register;
         NrSerieStyring: Codeunit NoSeriesManagement;
         "Audit Roll": Record "Audit Roll";
         t002: Label 'Then receipt numbers are more than 2.100.000.000! Contact your solution center.';
         t003: Label 'The sales ticket no. is allready existing in the audit roll. Contact your solution center!';
+        POSAuditProfile: Record "POS Audit Profile";
+        POSUnit: Record "POS Unit";
     begin
         //HentBonnummer()
-        
-        Kasse.Get( Kassenummer );
-        Kasse.TestField( "Sales Ticket Series" );
+        //-NPR5.53 [373743]-revoked
+        //Kasse.GET( Kassenummer );
+        //Kasse.TESTFIELD( "Sales Ticket Series" );
+        //+NPR5.53 [373743]-revoked
         
         //d.OPEN(t001 + '#1####################');
         
@@ -2031,7 +2073,14 @@ codeunit 6014435 "Retail Form Code"
                                      Kasse."Sales Ticket Series");
           */
         
-          Bonnummer := NrSerieStyring.GetNextNo(Kasse."Sales Ticket Series",Today, true);
+          //Bonnummer := NrSerieStyring.GetNextNo(Kasse."Sales Ticket Series",TODAY, TRUE);  //NPR5.53 [373743]-revoked
+        //-NPR5.53 [373743]
+        POSUnit.Get(Kassenummer);
+        POSUnit.TestField("POS Audit Profile");
+        POSAuditProfile.Get(POSUnit."POS Audit Profile");
+        POSAuditProfile.TestField("Sales Ticket No. Series");
+        Bonnummer := NrSerieStyring.GetNextNo(POSAuditProfile."Sales Ticket No. Series",Today,true);
+        //-NPR5.53 [373743]
           Commit;
           //d.UPDATE(1, Bonnummer);
         
@@ -2142,8 +2191,11 @@ codeunit 6014435 "Retail Form Code"
             AuditRoll."Register No." := "Register No.";
             AuditRoll."Sales Ticket No." := "Sales Ticket No.";
             AuditRoll.Lokationskode := Register."Location Code";
-            AuditRoll."Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-            AuditRoll."Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+            //-NPR5.53 [371956]-revoked
+            //! Redundant lines. Dimensions are copied from SalePOS later (function MoveSaleDim2AuditRoll() few lines down).
+            //AuditRoll."Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
+            //AuditRoll."Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+            //+NPR5.53 [371956]-revoked
             AuditRoll."Sale Type" := AuditRoll."Sale Type"::"Out payment";
             AuditRoll."Sale Date" := Date;
             AuditRoll."Line No." := AuditRollLineNo;
@@ -2666,8 +2718,11 @@ codeunit 6014435 "Retail Form Code"
             SaleLinePOS2.Validate("No.",Register."City Gift Voucher Account");
             SaleLinePOS2.Description := CopyStr(Txt001,1,MaxStrLen(SaleLinePOS2.Description));
             SaleLinePOS2."Location Code" := Register."Location Code";
-            SaleLinePOS2."Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-            SaleLinePOS2."Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+            //-NPR5.53 [371956]-revoked
+            //! Redundant lines. Dimensions are properly handled by CreateDim() function, not forgetting the Dimension Set ID field.
+            //SaleLinePOS2."Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
+            //SaleLinePOS2."Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+            //+NPR5.53 [371956]-revoked
             SaleLinePOS2.Quantity := 1;
             SaleLinePOS2.Validate("Unit Price",Amount);
             //Ekspeditionslinie.Amount                 := bBel�b;
@@ -3450,8 +3505,11 @@ codeunit 6014435 "Retail Form Code"
             SaleLinePOS3.Validate("No.",AccountSelected);
 
             SaleLinePOS3."Location Code" := Register."Location Code";
-            SaleLinePOS3."Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-            SaleLinePOS3."Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+            //-NPR5.53 [371956]-revoked
+            //! Redundant lines. Dimensions are properly handled by CreateDim() function, not forgetting the Dimension Set ID field.
+            //SaleLinePOS3."Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
+            //SaleLinePOS3."Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+            //+NPR5.53 [371956]-revoked
             SaleLinePOS3.Quantity := 1;
             SaleLinePOS3."Price Includes VAT" := SalePOS."Prices Including VAT";
             SaleLinePOS3.Amount := Amount;
@@ -3535,8 +3593,11 @@ codeunit 6014435 "Retail Form Code"
           DiscLine.Type                        := DiscLine.Type::"G/L Entry";
           DiscLine."No."                       := Kasse."Gift Voucher Discount Account";
           DiscLine."Location Code"             := Kasse."Location Code";
-          DiscLine."Shortcut Dimension 1 Code" := Kasse."Global Dimension 1 Code";
-          DiscLine."Shortcut Dimension 2 Code" := Kasse."Global Dimension 2 Code";
+          //-NPR5.53 [371956]-revoked
+          //! Redundant lines. Dimensions are properly handled by CreateDim() function, not forgetting the Dimension Set ID field.
+          //DiscLine."Shortcut Dimension 1 Code" := Kasse."Global Dimension 1 Code";
+          //DiscLine."Shortcut Dimension 2 Code" := Kasse."Global Dimension 2 Code";
+          //+NPR5.53 [371956]-revoked
           DiscLine.Validate(Quantity,1);
           DiscLine.Amount                      := nRabat;
           DiscLine."Unit Price"                := nRabat;
@@ -4298,8 +4359,8 @@ codeunit 6014435 "Retail Form Code"
 
     procedure GetDiscountRounding("Sales Ticket No.": Code[20];"Register No.": Code[20]) Rounding: Decimal
     var
-        NPC: Record "Retail Setup";
         Linie: Record "Sale Line POS";
+        POSUnit: Record "POS Unit";
         Total: Decimal;
         TotalRounded: Decimal;
     begin
@@ -4307,7 +4368,11 @@ codeunit 6014435 "Retail Form Code"
         exit(0);
         //+NPR4.11
 
-        NPC.Get;
+        //NPC.GET;  //NPR5.53 [371955]-revoked
+        //-NPR5.53 [371955]
+        POSUnit.Get("Register No.");
+        POSSetup.SetPOSUnit(POSUnit);
+        //+NPR5.53 [371955]
 
         Linie.SetCurrentKey("Discount Type");;
         Linie.SetRange(Linie."Register No.","Register No.");
@@ -4328,13 +4393,17 @@ codeunit 6014435 "Retail Form Code"
 
         Rounding := Total - TotalRounded;
 
-        if Abs(Rounding) > NPC."Amount Rounding Precision" then Rounding := 0;
+        //IF ABS(Rounding) > NPC."Amount Rounding Precision" THEN Rounding := 0;  //NPR5.53 [371955]-revoked
+        //-NPR5.53 [371955]
+        if Abs(Rounding) > POSSetup.AmountRoundingPrecision then
+          Rounding := 0;
+        //+NPR5.53 [371955]
     end;
 
     procedure FixDiscountRounding("Sales Ticket No.": Code[20];"Register No.": Code[20];var Sale: Record "Sale POS") Rounding: Decimal
     var
-        NPC: Record "Retail Setup";
         Linie: Record "Sale Line POS";
+        POSUnit: Record "POS Unit";
         Total: Decimal;
         TotalRounded: Decimal;
     begin
@@ -4342,7 +4411,11 @@ codeunit 6014435 "Retail Form Code"
         exit(0);
         //+NPR4.11
 
-        NPC.Get;
+        //NPC.GET;  //NPR5.53 [371955]-revoked
+        //-NPR5.53 [371955]
+        POSUnit.Get("Register No.");
+        POSSetup.SetPOSUnit(POSUnit);
+        //+NPR5.53 [371955]
 
         Linie.SetCurrentKey("Discount Type");;
         Linie.SetRange(Linie."Register No.","Register No.");
@@ -4363,7 +4436,11 @@ codeunit 6014435 "Retail Form Code"
 
         Rounding := Total - TotalRounded;
 
-        if Abs(Rounding) > NPC."Amount Rounding Precision" then Rounding := 0;
+        //IF ABS(Rounding) > NPC."Amount Rounding Precision" THEN Rounding := 0;  //NPR5.53 [371955]-revoked
+        //-NPR5.53 [371955]
+        if Abs(Rounding) > POSSetup.AmountRoundingPrecision then
+          Rounding := 0;
+        //+NPR5.53 [371955]
 
         Linie.Find('-');
         Linie."Amount Including VAT" -= Rounding;
@@ -4513,14 +4590,14 @@ codeunit 6014435 "Retail Form Code"
             exit(true);
         
           Contact.Init;
-        
-          if RetailSetupGlobal."Create New Customer" then begin
-            if RetailSetupGlobal."New Customer Creation" = RetailSetupGlobal."New Customer Creation"::"User Managed" then begin
-            end;
-          end else begin
-            Error(ErrNoCash);
-          end;
-        
+        //-NPR5.53 [369354]
+        //  IF RetailSetupGlobal."Create New Customer" THEN BEGIN
+        //    IF RetailSetupGlobal."New Customer Creation" = RetailSetupGlobal."New Customer Creation"::"1" THEN BEGIN
+        //    END;
+        //  END ELSE BEGIN
+        //    ERROR(ErrNoCash);
+        //  END;
+        //+NPR5.53 [369354]
           //-NPR5.26 [252881]
           //IF CONFIRM(MsgTDC,TRUE) THEN
           //  IF Navneopslag.GetTDCCustBuffer( CustomerNo, TDCNavneBufferRecTmp, FALSE ) THEN
@@ -4554,26 +4631,26 @@ codeunit 6014435 "Retail Form Code"
         end else begin
           if Customer.Get(CustomerNo) then
             exit(true);
-        
-          if RetailSetupGlobal."Create New Customer" then begin
-            case RetailSetupGlobal."New Customer Creation" of
-              RetailSetupGlobal."New Customer Creation"::"Cash Customer":
-                Error(ErrNoCust);
-              RetailSetupGlobal."New Customer Creation"::"User Managed":
-                begin
-                  Salesperson.Get(SalespersonCode);
-                  case Salesperson."Customer Creation" of
-                    Salesperson."Customer Creation"::"Not allowed" :
-                      Error(ErrNoCust);
-                    Salesperson."Customer Creation"::"Only cash" :
-                      Error(ErrNoCust);
-                  end;
-                end;
-            end;
-          end else begin
-            Error(ErrNoCust);
-          end;
-        
+        //-NPR5.53 [369354]
+        //  IF RetailSetupGlobal."Create New Customer" THEN BEGIN
+        //    CASE RetailSetupGlobal."New Customer Creation" OF
+        //      RetailSetupGlobal."New Customer Creation"::"2":
+        //        ERROR(ErrNoCust);
+        //      RetailSetupGlobal."New Customer Creation"::"1":
+        //        BEGIN
+        //          Salesperson.GET(SalespersonCode);
+        //          CASE Salesperson."Customer Creation" OF
+        //            Salesperson."Customer Creation"::"0" :
+        //              ERROR(ErrNoCust);
+        //            Salesperson."Customer Creation"::"1" :
+        //              ERROR(ErrNoCust);
+        //          END;
+        //        END;
+        //    END;
+        //  END ELSE BEGIN
+        //    ERROR(ErrNoCust);
+        //  END;
+        //+NPR5.53 [369354]
           //-NPR5.26 [252881]
           //IF CONFIRM( MsgTDC, TRUE ) THEN BEGIN
           //  IF Navneopslag.GetTDCCustBuffer( CustomerNo, TDCNavneBufferRecTmp, FALSE) THEN

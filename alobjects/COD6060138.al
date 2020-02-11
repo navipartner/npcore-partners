@@ -23,6 +23,7 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
     // MM1.40/TSA /20190730 CASE 360275 Added Auto-Admit for renew, upgrade, extend
     // MM1.41/TSA /20190918 CASE 368608 Add the select member onAfterLogin workflow
     // MM1.41/TSA /20191002 CASE 368608 Adding new action to edit current membership
+    // MM1.42/TSA /20200114 CASE 385449 Changed the member lookup on login to show member list rather than member card list due to search limits on pages shown in browser
 
 
     trigger OnRun()
@@ -578,9 +579,6 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
     local procedure AssignPOSMembership(var SalePOS: Record "Sale POS";var ExternalMemberCardNo: Text[100]): Boolean
     var
         MembershipManagement: Codeunit "MM Membership Management";
-        Membership: Record "MM Membership";
-        MembershipSetup: Record "MM Membership Setup";
-        POSSalesInfo: Record "MM POS Sales Info";
         ReasonNotFound: Text;
         MembershipEntryNo: Integer;
     begin
@@ -590,8 +588,52 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
             exit (false);
 
         MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo (ExternalMemberCardNo, Today, ReasonNotFound);
-        if (not Membership.Get (MembershipEntryNo)) then
+
+        //-MM1.42 [385449] refactored into local function
+        if (MembershipEntryNo = 0) then
           Error (ReasonNotFound);
+
+        exit (AssignMembershipToPOSWorker (SalePOS, MembershipEntryNo, ExternalMemberCardNo));
+        //+MM1.42 [385449]
+    end;
+
+    local procedure AssignPOSMember(var SalePOS: Record "Sale POS";var ExternalMemberNo: Code[20]): Boolean
+    var
+        Membership: Record "MM Membership";
+        MemberCard: Record "MM Member Card";
+        MembershipManagement: Codeunit "MM Membership Management";
+        ReasonNotFound: Text;
+        MemberEntryNo: Integer;
+        MembershipEntryNo: Integer;
+        ExternalMemberCardNo: Text;
+    begin
+
+        //-MM1.42 [385449]
+        if (ExternalMemberNo = '') then
+          if (not SelectMemberUI (ExternalMemberNo)) then
+            exit (false);
+
+        MemberEntryNo := MembershipManagement.GetMemberFromExtMemberNo (ExternalMemberNo);
+
+        if (Membership.Get (MembershipManagement.GetMembershipFromExtMemberNo (ExternalMemberNo))) then
+          if (MemberCard.Get (MembershipManagement.GetMemberCardEntryNo (MemberEntryNo, Membership."Membership Code", Today))) then
+            ExternalMemberCardNo := MemberCard."External Card No.";
+
+        exit (AssignMembershipToPOSWorker (SalePOS, Membership."Entry No.", ExternalMemberCardNo));
+        //+MM1.42 [385449]
+    end;
+
+    local procedure AssignMembershipToPOSWorker(var SalePOS: Record "Sale POS";MembershipEntryNo: Integer;ExternalMemberCardNo: Text[200]): Boolean
+    var
+        MembershipManagement: Codeunit "MM Membership Management";
+        Membership: Record "MM Membership";
+        POSSalesInfo: Record "MM POS Sales Info";
+        MembershipSetup: Record "MM Membership Setup";
+    begin
+
+        //-MM1.42 [385449]
+        if (not Membership.Get (MembershipEntryNo)) then
+          exit (false);
 
         if (Membership."Customer No." <> '') then begin
           SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
@@ -610,7 +652,6 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
           SalePOS.Validate ("Customer No.", Membership."Customer No.");
         end;
 
-        //-MM1.25 [257011]
         if (not POSSalesInfo.Get (POSSalesInfo."Association Type"::HEADER, SalePOS."Sales Ticket No.", 0)) then begin
           POSSalesInfo."Association Type" := POSSalesInfo."Association Type"::HEADER;
           POSSalesInfo."Receipt No." := SalePOS."Sales Ticket No.";
@@ -622,9 +663,9 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
         POSSalesInfo."Membership Entry No." := MembershipEntryNo;
         POSSalesInfo."Scanned Card Data" := ExternalMemberCardNo;
         POSSalesInfo.Modify ();
-        //+MM1.25 [257011]
 
         exit (true);
+        //+MM1.42 [385449]
     end;
 
     local procedure UpdatePOSSalesInfo(var SaleLinePOS: Record "Sale Line POS";MembershipEntryNo: Integer;MemberEntryNo: Integer;MembercardEntryNo: Integer;ScannedCardData: Text[200])
@@ -966,6 +1007,20 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
         exit (ExtMemberCardNo <> '');
     end;
 
+    local procedure SelectMemberUI(var ExtMemberNo: Code[20]): Boolean
+    var
+        Member: Record "MM Member";
+    begin
+
+        //-MM1.42 [385449]
+        if (ACTION::LookupOK <> PAGE.RunModal (0, Member)) then
+          exit (false);
+
+        ExtMemberNo := Member."External Member No.";
+        exit (ExtMemberNo <> '');
+        //+MM1.42 [385449]
+    end;
+
     local procedure "--- Publisher"()
     begin
     end;
@@ -1064,9 +1119,13 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
     var
         SaleLinePOS: Record "Sale Line POS";
         SalePOS: Record "Sale POS";
+        Member: Record "MM Member";
+        MembershipManagement: Codeunit "MM Membership Management";
         MemberRetailIntegration: Codeunit "MM Member Retail Integration";
         POSSale: Codeunit "POS Sale";
+        POSMemberCard: Page "MM POS Member Card";
         ExternalMemberCardNo: Text[100];
+        ExternalMemberNo: Code[20];
         MembershipSelected: Boolean;
     begin
 
@@ -1085,18 +1144,38 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
         ClearLastError;
 
         repeat
+          //-MM1.42 [385449]
+          //  MembershipSelected := FALSE;
+          //
+          //  IF (ExternalMemberCardNo = '') THEN
+          //    IF (NOT SelectMemberCardUI (ExternalMemberCardNo)) THEN
+          //      EXIT;
+          //
+          // IF (MemberRetailIntegration.POS_ValidateMemberCardNo (FALSE, TRUE, DialogMethod::NO_PROMPT, TRUE, ExternalMemberCardNo)) THEN
+          //    MembershipSelected := AssignPOSMembership (SalePOS, ExternalMemberCardNo);
+          //
+          //  IF (NOT MembershipSelected) THEN BEGIN
+          //    MESSAGE ('There was an error selecting member %1:\\%2', ExternalMemberCardNo, GETLASTERRORTEXT);
+          //    ExternalMemberCardNo := '';
+          //  END;
+
           MembershipSelected := false;
 
-          if (ExternalMemberCardNo = '') then
-            if (not SelectMemberCardUI (ExternalMemberCardNo)) then
-              exit;
+          if (ExternalMemberNo = '') then
+            SelectMemberUI (ExternalMemberNo);
 
-          if (MemberRetailIntegration.POS_ValidateMemberCardNo (false, true, DialogMethod::NO_PROMPT, true, ExternalMemberCardNo)) then
-            MembershipSelected := AssignPOSMembership (SalePOS, ExternalMemberCardNo);
+          if (Member.Get (MembershipManagement.GetMemberFromExtMemberNo (ExternalMemberNo))) then begin
+            POSMemberCard.LookupMode (true);
+            POSMemberCard.SetRecord (Member);
+            //POSMemberCard.SetMembershipEntryNo (Membership."Entry No.");
+
+            if (POSMemberCard.RunModal() = ACTION::LookupOK) then
+              MembershipSelected := AssignPOSMember (SalePOS, ExternalMemberNo);
+          end;
 
           if (not MembershipSelected) then begin
-            Message ('There was an error selecting member %1:\\%2', ExternalMemberCardNo, GetLastErrorText);
-            ExternalMemberCardNo := '';
+            Message ('There was an error selecting member %1:\\%2', ExternalMemberNo, GetLastErrorText);
+            ExternalMemberNo := '';
           end;
 
         until (MembershipSelected);

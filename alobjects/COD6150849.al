@@ -19,6 +19,7 @@ codeunit 6150849 "POS Action - End-of-Day V3"
     // NPR5.51/TSA /20190622 CASE 359508 Adding support posting GL after balancing
     // NPR5.52/ALPO/20190923 CASE 365326 POS Posting related fields moved to POS Posting Profiles from NP Retail Setup
     // TODO Units and Bins must get correct status
+    // NPR5.53/BHR / 20191004 CASE 369361 Removed online checks
 
 
     trigger OnRun()
@@ -233,7 +234,9 @@ codeunit 6150849 "POS Action - End-of-Day V3"
 
         // TODO - Needs to verified for UNITS / BINS
         RetailSetup.Get;
-        RetailSetup.CheckOnline;
+        //-NPR5.53 [369361]
+        //RetailSetup.CheckOnline;
+        //+NPR5.53 [369361]
 
         Register.Get(RegisterNo);
         if (Register.Status = Register.Status::Afsluttet) then

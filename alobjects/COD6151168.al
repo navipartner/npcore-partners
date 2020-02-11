@@ -5,6 +5,7 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
     // NPR5.52/ALST/20191009  CASE 372010 added permissions to service password
     // NPR5.52/MHA /20191016 CASE 371388 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
     // NPR5.52/MHA /20191017  CASE 373420 Added function XmlEscape()
+    // NPR5.53/THRO/20191206  CASE 381416 Added extension_fields in xml and publisher OnInitReqBody
 
     Permissions = TableData "Service Password"=rimd;
     TableNo = "Nc Task";
@@ -158,6 +159,9 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
                           '<amount_excl_vat_lcy>' + Format(POSSalesLine."Amount Excl. VAT (LCY)",0,9) + '</amount_excl_vat_lcy>' +
                           '<amount_incl_vat_lcy>' + Format(POSSalesLine."Amount Incl. VAT (LCY)",0,9) + '</amount_incl_vat_lcy>' +
                           '<global_reference>' + RetailCrossReference."Reference No." + '</global_reference>' +
+                          //-NPR5.53 [381416]
+                          '<extension_fields/>' +
+                          //+NPR5.53 [381416]
                         '</sales_line>';
           until POSSalesLine.Next = 0;
         Xml +=
@@ -186,6 +190,9 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
           '</soapenv:Envelope>';
 
         XmlDoc.LoadXml(Xml);
+        //-NPR5.53 [381416]
+        OnInitReqBody(POSEntry,XmlDoc);
+        //+NPR5.53 [381416]
     end;
 
     procedure InitGlobalPosSalesService()
@@ -300,6 +307,11 @@ codeunit 6151168 "NpGp POS Sales Sync Mgt."
         Output := SecurityElement.Escape(Input);
         exit(Output);
         //+NPR5.52 [373420]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitReqBody(POSEntry: Record "POS Entry";var XmlDoc: DotNet npNetXmlDocument)
+    begin
     end;
 }
 

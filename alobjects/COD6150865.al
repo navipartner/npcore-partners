@@ -1,6 +1,7 @@
 codeunit 6150865 "POS Action - Customer Select"
 {
     // NPR5.50/MMV /20181105 CASE 300557 Created object
+    // NPR5.53/ALPO/20200203 CASE 388777 Sales View status bar was not updated after customer had been selected or removed
 
 
     trigger OnRun()
@@ -94,6 +95,7 @@ codeunit 6150865 "POS Action - Customer Select"
         SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
+        POSSale.SetModified();  //NPR5.53 [388777]
         POSSale.RefreshCurrent();
     end;
 
@@ -108,6 +110,7 @@ codeunit 6150865 "POS Action - Customer Select"
         SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
         SalePOS.Validate("Customer No.", '');
         SalePOS.Modify(true);
+        POSSale.SetModified();  //NPR5.53 [388777]
         POSSale.RefreshCurrent();
     end;
 

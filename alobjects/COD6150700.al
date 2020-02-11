@@ -36,6 +36,7 @@ codeunit 6150700 "POS Session"
     // NPR5.49/MMV /20190312 CASE 345188 Added helper function to minimize confusion & boilerplate.
     // NPR5.50/VB  /20181224  CASE 338666 Supporting Workflows 2.0 functionality
     // NPR5.51/VB  /20190719  CASE 352582 POS Administrative Templates feature
+    // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
 
     EventSubscriberInstance = Manual;
 
@@ -46,6 +47,7 @@ codeunit 6150700 "POS Session"
     var
         Register: Record Register;
         SessionActions: Record "POS Action" temporary;
+        ActionSequence: Record "POS Action Sequence";
         FrontEnd: Codeunit "POS Front End Management";
         FrontEndKeeper: Codeunit "POS Front End Keeper";
         Sale: Codeunit "POS Sale";
@@ -204,6 +206,10 @@ codeunit 6150700 "POS Session"
         DebugWithTimestamp('InitializeSecureMethods');
         FrontEnd.ConfigureSecureMethods();
         //+NPR5.43 [314603]
+        //-NPR5.53 [362777]
+        DebugWithTimestamp('ConfigureActionSequences');
+        FrontEnd.ConfigureActionSequences(SessionActions);
+        //+NPR5.53 [362777]
         //-NPR5.49 [335141]
         DebugWithTimestamp('InitializeTheme');
         UI.InitializeTheme(Register);

@@ -4,6 +4,7 @@ page 6151211 "NpCs Arch. Document List"
     // NPR5.51/MHA /20190717  CASE 344264 Added RunPageView to Action "Log Entries"
     // NPR5.51/MHA /20190719  CASE 362443 Added fields 13 "Inserted at", 5000 "Archived at"
     // NPR5.51/MHA /20190821  CASE 364557 Added added "Sell-to Customer Name" and "Location Code"
+    // NPR5.53/MHA /20191125  CASE 378895 Added UsageCategory History
 
     Caption = 'Archived Collect Document List';
     InsertAllowed = false;

@@ -4,6 +4,7 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
     // NPR5.51/MHA /20190717  CASE 344264 "Delivery Only (non stock)" changed to "From Store Stock"
     // NPR5.51/MHA /20190718  CASE 362329 Updated StrSubStNo on DeliveryText in InsertDocumentReference()
     // NPR5.51/MHA /20190821  CASE 364557 Delivery should also be possible from Posted Invoice
+    // NPR5.53/MHA /20191128  CASE 378895 Added Parameter 'Sorting'
 
 
     trigger OnRun()
@@ -29,7 +30,9 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.0');
+        //-NPR5.53 [378895]
+        exit('1.1');
+        //+NPR5.53 [378895]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
@@ -52,6 +55,9 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
         Sender.RegisterTextParameter('Location Filter','');
         Sender.RegisterTextParameter('Delivery Text',Text006);
         Sender.RegisterTextParameter('Prepaid Text',Text008);
+        //-NPR5.53 [378895]
+        Sender.RegisterOptionParameter('Sorting','Entry No.,Reference No.,Delivery expires at','Entry No.');
+        //+NPR5.53 [378895]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
@@ -535,6 +541,7 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
     local procedure SelectDocument(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";var NpCsDocument: Record "NpCs Document"): Boolean
     var
         LocationFilter: Text;
+        Sorting: Option "Entry No.","Reference No.","Delivery expires at";
     begin
         LocationFilter := GetLocationFilter(JSON,POSSession);
 
@@ -543,6 +550,22 @@ codeunit 6151203 "NpCs POS Action Deliver Order"
         NpCsDocument.SetRange("Delivery Status",NpCsDocument."Delivery Status"::Ready);
         if LocationFilter <> '' then
           NpCsDocument.SetFilter("Location Code",LocationFilter);
+        //-NPR5.53 [378895]
+        case JSON.GetIntegerParameter('Sorting',false) of
+          Sorting::"Entry No.":
+            begin
+              NpCsDocument.SetCurrentKey("Entry No.");
+            end;
+          Sorting::"Reference No.":
+            begin
+              NpCsDocument.SetCurrentKey("Reference No.");
+            end;
+          Sorting::"Delivery expires at":
+            begin
+              NpCsDocument.SetCurrentKey("Delivery expires at");
+            end;
+        end;
+        //+NPR5.53 [378895]
         if PAGE.RunModal(PAGE::"NpCs Collect Store Orders",NpCsDocument) = ACTION::LookupOK then
           exit(true);
 

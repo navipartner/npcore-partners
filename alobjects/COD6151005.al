@@ -10,6 +10,8 @@ codeunit 6151005 "POS Action - Load POS Quote"
     // NPR5.51/ALST/20190620  CASE 353076 update the sale dates after retrieving from quote
     // NPR5.51/MMV /20190820  CASE 364694 Handle EFT approvals.
     //                                    Moved filter from RetailSetup to parameter.
+    // NPR5.53/MHA /20200113  CASE 384104 Removed SetLast in the event that there are no lines in selected view
+    // NPR5.53/ALPO/20200129  CASE 388112 The sub-total on the POS Sales screen was not updated after retrieving POS Quote onto sale screen
 
 
     trigger OnRun()
@@ -202,9 +204,18 @@ codeunit 6151005 "POS Action - Load POS Quote"
 
           //-NPR5.50
           POSSession.GetSaleLine(POSSaleLine);
-          POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-          POSSaleLine.SetLast();
+          //POSSaleLine.GetCurrentSaleLine(SaleLinePOS);  //NPR5.53 [388112]-revoked
+          //-NPR5.53 [384104]
+          //POSSaleLine.SetLast();
+          //+NPR5.53 [384104]
           //+NPR5.50
+          //-NPR5.53 [388112]
+          SaleLinePOS.SetRange("Register No.",SalePOS."Register No.");
+          SaleLinePOS.SetRange("Sales Ticket No.",SalePOS."Sales Ticket No.");
+          SaleLinePOS.SetFilter(Type,'<>%1',SaleLinePOS.Type::Payment);
+          if not SaleLinePOS.IsEmpty then
+            POSSaleLine.SetLast();
+          //+NPR5.53 [388112]
 
           POSSession.RequestRefreshData();
           exit;

@@ -215,7 +215,7 @@ page 6014433 "Payment Type - Card"
                 field("Minimum Amount";"Minimum Amount")
                 {
                 }
-                field("Allow Cashback";"Allow Cashback")
+                field("Allow Refund";"Allow Refund")
                 {
                 }
             }

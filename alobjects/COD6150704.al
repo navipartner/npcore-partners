@@ -23,6 +23,7 @@ codeunit 6150704 "POS Front End Management"
     // NPR5.50/MHA /20190206 CASE 343617 Added OnAfterLogin Workflow
     // NPR5.50/VB  /20181223 CASE 338666 Supporting Workflows 2.0
     // NPR5.51/VB  /20190719  CASE 352582 POS Administrative Templates feature
+    // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
 
 
     trigger OnRun()
@@ -499,6 +500,38 @@ codeunit 6150704 "POS Front End Management"
         Request.Content.Add('templates',Templates);
         InvokeFrontEndAsync(Request);
         //+NPR5.51 [352582]
+    end;
+
+    [Scope('Personalization')]
+    procedure ConfigureActionSequences(var TempSessionAction: Record "POS Action" temporary)
+    var
+        Sequence: Record "POS Action Sequence";
+        Request: DotNet npNetJsonRequest;
+        SequenceContent: DotNet npNetList_Of_T;
+        SequenceEntry: DotNet npNetDictionary_Of_T_U;
+    begin
+        //-NPR5.53 [362777]
+        Sequence.SetActionsForValidation(TempSessionAction);
+        Sequence.RunActionSequenceDiscovery();
+        if not Sequence.FindSet() then
+          exit;
+
+        MakeSureFrameworkIsAvailable(true);
+
+        Request := Request.JsonRequest();
+        Request.Method := 'ConfigureActionSequences';
+        SequenceContent := SequenceContent.List();
+        repeat
+          SequenceEntry := SequenceEntry.Dictionary();
+          SequenceEntry.Add('referenceAction',Sequence."Reference POS Action Code");
+          SequenceEntry.Add('referenceType',LowerCase(Format(Sequence."Reference Type")));
+          SequenceEntry.Add('action',Sequence."POS Action Code");
+          SequenceEntry.Add('priority',Sequence."Sequence No.");
+          SequenceContent.Add(SequenceEntry);
+        until Sequence.Next = 0;
+        Request.Content.Add('sequences',SequenceContent);
+        InvokeFrontEndAsync(Request);
+        //+NPR5.53 [362777]
     end;
 
     [Scope('Personalization')]

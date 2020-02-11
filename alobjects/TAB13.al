@@ -6,19 +6,13 @@ tableextension 6014416 tableextension6014416 extends "Salesperson/Purchaser"
     // NPR5.26/CLVA/20160816 CASE 248272 Added field Picture
     // NPR5.34/KENU/20170712 CASE 281419 Added Key: "Name"
     // NPR5.38/AE  /20180113 CASE 289390 Added filed Supervisor POS
+    // NPR5.53/BHR /20191008 CASE 369354 deleted field 6014401
     fields
     {
         field(6014400;"Register Password";Code[20])
         {
             Caption = 'Register Password';
             Description = 'NPR7.100.000';
-        }
-        field(6014401;"Customer Creation";Option)
-        {
-            Caption = 'Customer Creation';
-            Description = 'NPR7.100.000';
-            OptionCaption = 'Not allowed,Only cash,Allowed';
-            OptionMembers = "Not allowed","Only cash",Allowed;
         }
         field(6014402;"Hide Register Imbalance";Boolean)
         {
