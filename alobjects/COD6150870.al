@@ -2,6 +2,7 @@ codeunit 6150870 "POS Action - Layaway Cancel"
 {
     // NPR5.50/MMV /20181105 CASE 300557 Created object
     // NPR5.50/MMV /20190613 CASE 300557 Changed application invocation.
+    // NPR5.53/MMV /20200108 CASE 373453 Error if there are unposted POS entries related to any of the layaway prepayment invoices.
 
 
     trigger OnRun()
@@ -16,6 +17,7 @@ codeunit 6150870 "POS Action - Layaway Cancel"
         LAYAWAY_CANCEL_LINE: Label 'Layaway of %1 %2 cancelled.';
         ERR_APPLICATION: Label 'Layaway prepayments were credited and sales order %1 was deleted successfully but an error occurred while applying customer entries and calculating amount to refund:\%2';
         ERR_DOCUMENT_POSTED_LINE: Label '%1 %2 has partially posted lines. Aborting action.';
+        ERR_UNPOSTED_POS_ENTRY: Label '%1 %2, %3 %4 is related to %5 %6 but has not yet been posted.\All related entries must be posted before layaway cancellation.';
         CaptionSelectCustomer: Label 'Select Customer';
         CaptionCancellationFee: Label 'Cancellation Fee';
         CaptionSkipFeeInvoice: Label 'Skip Fee Invoice';
@@ -91,6 +93,10 @@ codeunit 6150870 "POS Action - Layaway Cancel"
 
         if not SelectOrder(POSSession, SalesHeader, OrderPaymentTermsFilter) then
           exit;
+
+        //-NPR5.53 [373453]
+        CheckForUnpostedLinkedPOSEntries(SalesHeader);
+        //+NPR5.53 [373453]
 
         POSSession.GetSaleLine(POSSaleLine);
 
@@ -386,10 +392,10 @@ codeunit 6150870 "POS Action - Layaway Cancel"
         CODEUNIT.Run(CODEUNIT::"Cust. Entry-Edit",ApplyingCustLedgerEntry);
         Commit;
 
-        //-#300557 [300557]
+        //-NPR5.53 [300557]
         //CustEntryApplyPostedEntries.Apply(ApplyingCustLedgerEntry, '', 0D);
         CODEUNIT.Run(CODEUNIT::"CustEntry-Apply Posted Entries", ApplyingCustLedgerEntry);
-        //+#300557 [300557]
+        //+NPR5.53 [300557]
     end;
 
     local procedure InsertCommentLine(POSSaleLine: Codeunit "POS Sale Line";Description: Text)
@@ -401,6 +407,33 @@ codeunit 6150870 "POS Action - Layaway Cancel"
         SaleLinePOS.Type := SaleLinePOS.Type::Comment;
         SaleLinePOS.Description := Description;
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
+    end;
+
+    local procedure CheckForUnpostedLinkedPOSEntries(SalesHeader: Record "Sales Header")
+    var
+        POSEntrySalesDocLink: Record "POS Entry Sales Doc. Link";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        POSEntry: Record "POS Entry";
+    begin
+        //-NPR5.53 [373453]
+        SalesInvoiceHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
+        if SalesInvoiceHeader.FindSet then repeat
+          POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE);
+          POSEntrySalesDocLink.SetRange("Sales Document No", SalesInvoiceHeader."No.");
+          if POSEntrySalesDocLink.FindSet then repeat
+            POSEntry.Get(POSEntrySalesDocLink."POS Entry No.");
+            if POSEntry."Post Entry Status" <> POSEntry."Post Entry Status"::Posted then begin
+              Error(ERR_UNPOSTED_POS_ENTRY,
+                POSEntry.TableCaption,
+                POSEntry."Entry No.",
+                POSEntry.FieldCaption("Document No."),
+                POSEntry."Document No.",
+                SalesHeader."Document Type"::Invoice,
+                SalesInvoiceHeader."No.");
+            end;
+          until POSEntrySalesDocLink.Next = 0;
+        until SalesInvoiceHeader.Next = 0;
+        //+NPR5.53 [373453]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]

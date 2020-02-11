@@ -4,6 +4,7 @@ codeunit 6150789 "POS Action - Print Item"
     // NPR5.37/MMV /20171009  CASE 289725 Unify print flow.
     // NPR5.37.01/MMV /20171113 CASE 296267 Use entered quantity in 'Selected Line' mode.
     // NPR5.46/MHA /20181005  CASE 330714 Changed Label Quantity to ABS to enable print of negative quantities in PrintAllLines()
+    // NPR5.53/THRO/20200116  CASE 385790 Round up Quantity in PrintAllLines
 
 
     trigger OnRun()
@@ -102,7 +103,9 @@ codeunit 6150789 "POS Action - Print Item"
             //-NPR5.37 [289725]
             //-NPR5.46 [330714]
             // LabelLibrary.ItemToRetailJnlLine("No.", "Variant Code", Quantity, GUID, RetailJnlLine);
-            LabelLibrary.ItemToRetailJnlLine("No.","Variant Code",Abs(Quantity),GUID,RetailJnlLine);
+            //-NPR5.53 [385790]
+            LabelLibrary.ItemToRetailJnlLine("No.","Variant Code",Round(Abs(Quantity),1,'>'),GUID,RetailJnlLine);
+            //+NPR5.53 [385790]
             //+NPR5.46 [330714]
             //SaleLineToRJL(GUID, RetailJnlLine, SaleLinePOS2);
             //+NPR5.37 [289725]

@@ -6,6 +6,7 @@ codeunit 6184499 "EFT Framework Mgt."
     // NPR5.51/MMV /20190603 CASE 355433 Moved implicit behaviour from events to function invocations
     // NPR5.51/MMV /20190626 CASE 359385 Added support for gift cards
     // NPR5.51/MMV /20190716 CASE 355433 Limit cashback amount logged to 100% of trx amount.
+    // NPR5.53/MMV /20191216 CASE 377533 Added IsFromMostRecentSaleOnPOSUnit()
 
 
     trigger OnRun()
@@ -18,6 +19,7 @@ codeunit 6184499 "EFT Framework Mgt."
         ERROR_REQUEST_HANDLE: Label 'Integration type %1 does not handle %2 operations';
         ERROR_OUTSIDE_POS: Label 'Can only attempt transaction %1 from the POS';
         ERROR_SAME_POS: Label 'Can only attempt transaction %1 from the same register as the request originated';
+        CAPTION_OUTPUT: Label 'Electronic Funds Transfer Receipt';
 
     procedure CreateBeginWorkshiftRequest(var EFTTransactionRequest: Record "EFT Transaction Request";EFTSetup: Record "EFT Setup";POSUnitNo: Code[10];SalesReceiptNo: Code[20])
     var
@@ -494,6 +496,39 @@ codeunit 6184499 "EFT Framework Mgt."
           Cashback := EFTTransactionRequest."Amount Input";
         exit(Cashback);
         //+NPR5.51 [355433]
+    end;
+
+    procedure IsFromMostRecentSaleOnPOSUnit(EFTTransactionRequest: Record "EFT Transaction Request"): Boolean
+    var
+        POSEntry: Record "POS Entry";
+        SalePOS: Record "Sale POS";
+    begin
+        //-NPR5.53 [377533]
+        with EFTTransactionRequest do begin
+          if "Sales Ticket No." = '' then
+            exit(false);
+          if "Register No." = '' then
+            exit(false);
+
+          SalePOS.SetRange("Register No.", "Register No.");
+          SalePOS.SetRange(Date, DT2Date(Started));
+          SalePOS.SetFilter("Start Time", '>%1', DT2Time(Started));
+          if not SalePOS.IsEmpty then
+            exit(false);
+
+          POSEntry.SetRange("POS Unit No.", "Register No.");
+          POSEntry.SetFilter("Entry Type", '%1|%2', POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale");
+          if not POSEntry.FindLast then
+            exit(true);
+
+          if POSEntry."Document Date" > DT2Date(Started) then
+            exit(false);
+          if (POSEntry."Document Date" = DT2Date(Started)) and (POSEntry."Starting Time" > DT2Time(Started)) then
+            exit(false);
+
+          exit(true);
+        end;
+        //+NPR5.53 [377533]
     end;
 
     local procedure "// Event Publishers"()

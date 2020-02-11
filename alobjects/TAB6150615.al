@@ -17,6 +17,7 @@ table 6150615 "POS Unit"
     // NPR5.52/ALPO/20190923 CASE 365326 New field "POS Posting Profile" (Posting related fields moved to POS Posting Profiles from NP Retail Setup)
     // NPR5.52/SARA/20190924 CASE 368395 Delete field 'SMS Profile'(SMS profile move to POS End of Day Profile)
     // NPR5.52/MHA /20191016 CASE 371388 Field 400 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
+    // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
 
     Caption = 'POS Unit';
     DataCaptionFields = "No.",Name;
@@ -237,6 +238,20 @@ table 6150615 "POS Unit"
     fieldgroups
     {
     }
+
+    trigger OnDelete()
+    begin
+        DimMgt.DeleteDefaultDim(DATABASE::"POS Unit","No.");  //NPR5.53 [371956]
+    end;
+
+    trigger OnInsert()
+    begin
+        //-NPR5.53 [371956]
+        DimMgt.UpdateDefaultDim(
+          DATABASE::"POS Unit","No.",
+          "Global Dimension 1 Code","Global Dimension 2 Code");
+        //+NPR5.53 [371956]
+    end;
 
     var
         DimMgt: Codeunit DimensionManagement;

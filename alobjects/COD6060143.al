@@ -2,6 +2,7 @@ codeunit 6060143 "MM Loyalty Coupon Mgr"
 {
     // MM1.22/TSA /20170731 CASE 285403 Initial Version
     // MM1.28/TSA /20180425 CASE 307048 Refactored to handle value to redeem
+    // MM1.42/TSA /20191024 CASE 374403 Changed signature on IssueOneCoupon(), IssueOneCouponAndPrint(), and IssueCoupon()
 
 
     trigger OnRun()
@@ -12,7 +13,7 @@ codeunit 6060143 "MM Loyalty Coupon Mgr"
         Text000: Label 'Issue Coupon - Member Loyalty';
         Text001: Label 'Member Loyalty Coupons needs to be issued in context of a member.';
 
-    procedure IssueOneCoupon(CouponTypeCode: Code[20];MembershipEntryNo: Integer;PointsToRedeem: Integer;ValueToRedeem: Decimal) CouponNo: Code[20]
+    procedure IssueOneCoupon(CouponTypeCode: Code[20];MembershipEntryNo: Integer;DocumentNo: Code[20];PostingDate: Date;PointsToRedeem: Integer;ValueToRedeem: Decimal) CouponNo: Code[20]
     var
         CouponType: Record "NpDc Coupon Type";
         NpDcIssueCouponsQty: Report "NpDc Request Coupon Qty.";
@@ -23,10 +24,13 @@ codeunit 6060143 "MM Loyalty Coupon Mgr"
         CouponType.Get (CouponTypeCode);
         CouponType.TestField("Reference No. Pattern");
 
-        CouponNo := IssueCoupon(CouponType, MembershipEntryNo, PointsToRedeem, ValueToRedeem, false);
+        //-MM1.42 [374403]
+        //CouponNo := IssueCoupon(CouponType, MembershipEntryNo, PointsToRedeem, ValueToRedeem, FALSE);
+        CouponNo := IssueCoupon(CouponType, MembershipEntryNo, DocumentNo, PostingDate, PointsToRedeem, ValueToRedeem, false);
+        //+MM1.42 [374403]
     end;
 
-    procedure IssueOneCouponAndPrint(CouponTypeCode: Code[20];MembershipEntryNo: Integer;PointsToRedeem: Integer;ValueToRedeem: Decimal) CouponNo: Code[20]
+    procedure IssueOneCouponAndPrint(CouponTypeCode: Code[20];MembershipEntryNo: Integer;DocumentNo: Code[20];PostingDate: Date;PointsToRedeem: Integer;ValueToRedeem: Decimal) CouponNo: Code[20]
     var
         CouponType: Record "NpDc Coupon Type";
         NpDcIssueCouponsQty: Report "NpDc Request Coupon Qty.";
@@ -36,10 +40,13 @@ codeunit 6060143 "MM Loyalty Coupon Mgr"
         CouponType.Get (CouponTypeCode);
         CouponType.TestField("Reference No. Pattern");
 
-        CouponNo := IssueCoupon(CouponType, MembershipEntryNo, PointsToRedeem, ValueToRedeem, true);
+        //-MM1.42 [374403]
+        //CouponNo := IssueCoupon(CouponType, MembershipEntryNo, PointsToRedeem, ValueToRedeem, TRUE);
+        CouponNo := IssueCoupon(CouponType, MembershipEntryNo, DocumentNo, PostingDate, PointsToRedeem, ValueToRedeem, true);
+        //+MM1.42 [374403]
     end;
 
-    local procedure IssueCoupon(CouponType: Record "NpDc Coupon Type";MembershipEntryNo: Integer;PointsToRedeem: Integer;ValueToRedeem: Decimal;WithPrint: Boolean) CouponNo: Code[20]
+    local procedure IssueCoupon(CouponType: Record "NpDc Coupon Type";MembershipEntryNo: Integer;DocumentNo: Code[20];PostingDate: Date;PointsToRedeem: Integer;ValueToRedeem: Decimal;WithPrint: Boolean) CouponNo: Code[20]
     var
         Coupon: Record "NpDc Coupon";
         CouponMgt: Codeunit "NpDc Coupon Mgt.";
@@ -68,7 +75,10 @@ codeunit 6060143 "MM Loyalty Coupon Mgr"
         if (ValueToRedeem = 0) then
           CouponMgt.PostIssueCoupon(Coupon);
 
-        LoyaltyPointMgt.RedeemPointsCoupon (MembershipEntryNo, '', Today, Coupon."No.", PointsToRedeem);
+        //-MM1.42 [374403]
+        //LoyaltyPointMgt.RedeemPointsCoupon (MembershipEntryNo, '', TODAY, Coupon."No.", PointsToRedeem);
+        LoyaltyPointMgt.RedeemPointsCoupon (MembershipEntryNo, DocumentNo, PostingDate, Coupon."No.", PointsToRedeem);
+        //+MM1.42 [374403]
 
         if (WithPrint) then
           CouponMgt.PrintCoupon (Coupon);

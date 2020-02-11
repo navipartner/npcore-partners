@@ -6,6 +6,7 @@ table 6151413 "Magento Payment Gateway"
     // MAG2.01/TR  /20160710  CASE 254565 Removed InitValue for "Api Url"
     // MAG2.17/JDH /20181112  CASE 334163 Added Caption to Object
     // MAG2.20/MHA /20190502  CASE 352184 Added field 15 "Merchant Name"
+    // MAG2.24/MHA /20191202  CASE 377969 Extended length for field 7 "Api Password" from 100 to 250
 
     Caption = 'Magento Payment Gateway';
 
@@ -25,9 +26,10 @@ table 6151413 "Magento Payment Gateway"
         {
             Caption = 'Api Username';
         }
-        field(7;"Api Password";Text[100])
+        field(7;"Api Password";Text[250])
         {
             Caption = 'Api Password';
+            Description = 'MAG2.24';
         }
         field(10;"Merchant ID";Code[20])
         {

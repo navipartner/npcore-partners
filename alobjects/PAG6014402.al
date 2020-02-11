@@ -15,7 +15,7 @@ page 6014402 "Retail Item Journal"
     // NPR5.29/TJ  /20171301 CASE 262797 Removed NPR variables as they are not used
     // NPR5.30/TJ  /20170222 CASE 266258 Creating template for new page ID if doesn't allready exist
     // NPR5.30/TJ  /20170227 CASE 267424 Using GetItem function from RetailItemJnlMgt
-    // #377622/SARA/20191119 CASE 377622 Added Print Price Label function
+    // NPR5.53/SARA/20191119 CASE 377622 Added Print Price Label function
 
     AutoSplitKey = true;
     Caption = 'Item Journal';
@@ -602,8 +602,8 @@ page 6014402 "Retail Item Journal"
 
                 trigger OnAction()
                 begin
-                    //-#377622 [377622]
-                    //+#377622 [377622]
+                    //-NPR5.53 [377622]
+                    //+NPR5.53 [377622]
                 end;
             }
         }

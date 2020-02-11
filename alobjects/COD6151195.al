@@ -3,6 +3,7 @@ codeunit 6151195 "NpCs Collect Mgt."
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // NPR5.51/MHA /20190627  CASE 344264 Moved Archivation functionality to separate codeunit and added Expiration to Status Update
     // NPR5.51/MHA /20190819  CASE 364557 It should be possible to create collect order from one local store to another local store and added posting functions
+    // NPR5.53/MHA /20191129  CASE 378216 Archivation moved to asynchronous workflow procedure
 
 
     trigger OnRun()
@@ -119,7 +120,6 @@ codeunit 6151195 "NpCs Collect Mgt."
     var
         SalesHeader: Record "Sales Header";
         NpCsWorkflowMgt: Codeunit "NpCs Workflow Mgt.";
-        NpCsArchCollectMgt: Codeunit "NpCs Arch. Collect Mgt.";
     begin
         if SalesHeader.Get(NpCsDocument."Document Type",NpCsDocument."Document No.") then
           SalesHeader.Delete(true);
@@ -127,28 +127,15 @@ codeunit 6151195 "NpCs Collect Mgt."
         NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
         Commit;
 
-        if NpCsDocument."Archive on Delivery" then begin
-          //-NPR5.51 [344264]
-          NpCsArchCollectMgt.ArchiveCollectDocument(NpCsDocument);
-          //+NPR5.51 [344264]
-          Commit;
-        end;
         NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
     end;
 
     procedure ExpireProcessing(var NpCsDocument: Record "NpCs Document";SkipWorkflow: Boolean)
     var
-        NpCsArchCollectMgt: Codeunit "NpCs Arch. Collect Mgt.";
         NpCsWorkflowMgt: Codeunit "NpCs Workflow Mgt.";
     begin
         UpdateProcessingStatus(NpCsDocument,NpCsDocument."Processing Status"::Expired);
         NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
-        Commit;
-
-        if NpCsDocument."Archive on Delivery" then
-          //-NPR5.51 [344264]
-          NpCsArchCollectMgt.ArchiveCollectDocument(NpCsDocument);
-          //+NPR5.51 [344264]
         Commit;
 
         if not SkipWorkflow then
@@ -188,7 +175,6 @@ codeunit 6151195 "NpCs Collect Mgt."
     var
         NpCsWorkflowModule: Record "NpCs Workflow Module";
         SalesHeader: Record "Sales Header";
-        NpCsArchCollectMgt: Codeunit "NpCs Arch. Collect Mgt.";
         NpCsWorkflowMgt: Codeunit "NpCs Workflow Mgt.";
         LogMessage: Text;
         ErrorText: Text;
@@ -259,27 +245,14 @@ codeunit 6151195 "NpCs Collect Mgt."
         end;
         Commit;
 
-        if NpCsDocument."Archive on Delivery" then
-          //-NPR5.51 [344264]
-          NpCsArchCollectMgt.ArchiveCollectDocument(NpCsDocument);
-          //+NPR5.51 [344264]
-        Commit;
-
         NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
     end;
 
     procedure ExpireDelivery(var NpCsDocument: Record "NpCs Document";SkipWorkflow: Boolean)
     var
-        NpCsArchCollectMgt: Codeunit "NpCs Arch. Collect Mgt.";
         NpCsWorkflowMgt: Codeunit "NpCs Workflow Mgt.";
     begin
         UpdateDeliveryStatus(NpCsDocument,NpCsDocument."Delivery Status"::Expired,0,'');
-        Commit;
-
-        if NpCsDocument."Archive on Delivery" then
-          //-NPR5.51 [344264]
-          NpCsArchCollectMgt.ArchiveCollectDocument(NpCsDocument);
-          //+NPR5.51 [344264]
         Commit;
 
         if not SkipWorkflow then

@@ -11,6 +11,7 @@ codeunit 6150812 "POS Action - Balance Reg V1"
     // NPR5.38/TSA /20171123 CASE 297087 Added System events Unit Close
     // NPR5.46/MMV /20180927 CASE 290734 EFT framework refactoring
     // NPR5.48/MHA /20181115 CASE 334633 Replaced reference to function CheckSavedSales() with CleanupPOSQuotes() in ValidateRequirements()
+    // NPR5.53/BHR / 20191004 CASE 369361 Removed online checks
 
 
     trigger OnRun()
@@ -180,8 +181,9 @@ codeunit 6150812 "POS Action - Balance Reg V1"
     begin
 
         RetailSetup.Get;
-        RetailSetup.CheckOnline;
-
+        //-NPR5.53 [369361]
+        //RetailSetup.CheckOnline;
+        //+NPR5.53 [369361]
         Register.Get(RegisterNo);
         if (Register.Status = Register.Status::Afsluttet) then
           Error(t001);

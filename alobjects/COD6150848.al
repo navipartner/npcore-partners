@@ -2,6 +2,7 @@ codeunit 6150848 "POS Action - Adjust Inventory"
 {
     // NPR5.39/MHA /20180206  CASE 299736 Object created - Inventory Adjustment from POS
     // NPR5.45/MHA /20180806  CASE 323812 Added Return Reason functionality
+    // NPR5.53/ALST/20191216  CASE 381438 possible to adjust negative or positive
 
 
     trigger OnRun()
@@ -38,6 +39,9 @@ codeunit 6150848 "POS Action - Adjust Inventory"
             RegisterTextParameter('FixedReturnReason','');
             RegisterBooleanParameter('LookupReturnReason',false);
             //+NPR5.45 [323812]
+            //-NPR5.53 [381438]
+            RegisterBooleanParameter('NegativeInput', false);
+            //+NPR5.53 [381438]
             RegisterWorkflow(true);
 
           end;
@@ -131,6 +135,15 @@ codeunit 6150848 "POS Action - Adjust Inventory"
         //PerformAdjustInventory(POSSession,Quantity);
         JSON.SetScope('/',true);
         ReturnReasonCode := JSON.GetString('ReturnReason',false);
+
+        //-NPR5.53 [381438]
+        Quantity := Abs(Quantity);
+
+        JSON.SetScope('parameters',true);
+        if JSON.GetBoolean('NegativeInput', false) then
+          Quantity *= -1;
+        //+NPR5.53 [381438]
+
         PerformAdjustInventory(POSSession,Quantity,ReturnReasonCode);
         //+NPR5.45 [323812]
     end;
@@ -253,7 +266,7 @@ codeunit 6150848 "POS Action - Adjust Inventory"
     local procedure ActionVersion(): Text
     begin
         //-NPR5.45 [323812]
-        exit('1.1');
+        exit('1.2');
         //+NPR5.45 [323812]
         exit ('1.0');
     end;

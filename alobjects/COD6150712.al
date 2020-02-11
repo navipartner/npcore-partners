@@ -4,6 +4,7 @@ codeunit 6150712 "POS Data Driver - Sale Line"
     // NPR5.38/MHA /20180105  CASE 301053 Updated signature of RefreshDataSet() to match new publisher signature
     // NPR5.41/TSA /20180417 CASE 311374 Added field "Description 2" to become available for frontent to display.
     // NPR5.48/JC  /20190110 CASE 335967 Added field "Unit of Measure Code" to be displayed in UI grid
+    // NPR5.53/TSA /20191219 CASE 382035 Added field LineCount
 
 
     trigger OnRun()
@@ -48,6 +49,10 @@ codeunit 6150712 "POS Data Driver - Sale Line"
         DataSource.Totals.Add('AmountExclVAT');
         DataSource.Totals.Add('VATAmount');
         DataSource.Totals.Add('TotalAmount');
+
+        //-NPR5.53 [382035]
+        DataSource.Totals.Add('ItemCount');
+        //+NPR5.53 [382035]
 
         Handled := true;
     end;

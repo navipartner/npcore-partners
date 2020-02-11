@@ -10,6 +10,8 @@ table 6151373 "CS UI Header"
     // NPR5.51/CLVA/20190612 CASE 357577 Added field "Update Posting Date"
     // NPR5.52/CLVA/20191010 CASE 370452 Added field "Posting Type"
     //                                   Discontinued the use of field "Add Posting Options"
+    // NPR5.53/SARA/20191030 CASE 375024 Delete lines when header being deleted
+    // NPR5.53/CLVA/20191114 CASE 377135 Added posting option "Prompt User"
 
     Caption = 'CS UI Header';
     LookupPageID = "CS UIs";
@@ -98,8 +100,8 @@ table 6151373 "CS UI Header"
         field(23;"Posting Type";Option)
         {
             Caption = 'Posting Type';
-            OptionCaption = 'Handle,Handle & Invoice';
-            OptionMembers = Handle,"Handle & Invoice";
+            OptionCaption = 'Handle,Handle & Invoice,Prompt User';
+            OptionMembers = Handle,"Handle & Invoice","Prompt User";
         }
         field(25;XMLin;BLOB)
         {
@@ -117,6 +119,13 @@ table 6151373 "CS UI Header"
     fieldgroups
     {
     }
+
+    trigger OnDelete()
+    begin
+        //-NPR5.53 [375024]
+        DeleteCSUILines;
+        //+NPR5.53 [375024]
+    end;
 
     trigger OnInsert()
     var
@@ -148,6 +157,18 @@ table 6151373 "CS UI Header"
     begin
         XMLin.CreateOutStream(OutStrm);
         XMLDOMManagement.LoadXMLDocumentFromOutStream(OutStrm,DOMxmlin);
+    end;
+
+    local procedure DeleteCSUILines()
+    var
+        CSUILine: Record "CS UI Line";
+    begin
+        //-NPR5.53 [375024]
+        CSUILine.Reset;
+        CSUILine.SetRange("UI Code",Code);
+        if CSUILine.FindSet then
+          CSUILine.DeleteAll;
+        //+NPR5.53 [375024]
     end;
 }
 

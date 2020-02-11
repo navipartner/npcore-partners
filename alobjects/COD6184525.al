@@ -68,7 +68,7 @@ codeunit 6184525 "EFT ISMP Baxi Trx Dialog"
         EFTAdyenCloudProtocol: Codeunit "EFT Adyen Cloud Protocol";
         EFTTransactionRequest: Record "EFT Transaction Request";
         ContinueOnTransactionEntryNo: Integer;
-        EFTAdyenCloudBackgndResp: Codeunit "EFT Adyen Cloud Backgnd. Resp.";
+        EFTAdyenCloudBackgndResp: Codeunit "EFT Adyen Backgnd. Response";
     begin
         Ticks += 1;
 

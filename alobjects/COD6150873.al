@@ -2,6 +2,7 @@ codeunit 6150873 "POS Action - NETS Gift. Lookup"
 {
     // NPR5.51/MMV /20190625 CASE 359385 Created object
     // NPR5.51/MHA /20190705  CASE 361164 Updated Exception Message parsing InvokeWebservice()
+    // NPR5.53/MHA /20191212  CASE 374433 Fixed parsing of xml in OnAction()
 
 
     trigger OnRun()
@@ -135,13 +136,17 @@ codeunit 6150873 "POS Action - NETS Gift. Lookup"
         if not NpXmlDomMgt.TryLoadXml(Response,XmlDoc) then
           Error(Response);
 
+        //-NPR5.53 [374433]
+        NpXmlDomMgt.RemoveNameSpaces(XmlDoc);
         XmlElement := XmlDoc.DocumentElement;
-        if NpXmlDomMgt.FindNode(XmlElement,'ExpiryDate',XmlElement2) then
+        if NpXmlDomMgt.FindElement(XmlElement,'//ExpiryDate',false,XmlElement2) then
           ExpiryDateOut := XmlElement2.InnerText;
-        if NpXmlDomMgt.FindNode(XmlElement,'Balance',XmlElement2) then begin
-          Evaluate(BalanceOut,XmlElement2.InnerText);
+        if NpXmlDomMgt.FindElement(XmlElement,'//Balance',false,XmlElement2) then begin
+          Evaluate(BalanceOut,XmlElement2.InnerText,9);
+          BalanceOut /= 100;
           exit(true)
         end;
+        //+NPR5.53 [374433]
 
         exit(false);
     end;

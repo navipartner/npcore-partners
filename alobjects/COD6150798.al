@@ -7,6 +7,8 @@ codeunit 6150798 "POS Action - Reverse Sale"
     // NPR5.49/TSA /20190319 CASE 342090 Added first check for full return
     // NPR5.49/TSA /20190319 CASE 342090 Fixed a filtering issue
     // NPR5.50/TSA /20190502 CASE 353680 Quantity Return Management is only supported when POS Entry is enabled
+    // NPR5.53/ALPO/20191218 CASE 382911 'DeObfuscateTicketNo' function moved to CU 6150629 to avoid code duplication
+    // NPR5.53/ALPO/20191218 CASE 387339 The sub-total on the POS Sales screen was not updated when using the POS Action.
 
 
     trigger OnRun()
@@ -26,6 +28,7 @@ codeunit 6150798 "POS Action - Reverse Sale"
         MAX_TO_RETURN: Label 'Maximum number of items to return is %1.';
         COPIED_RECEIPT: Label 'This sales is copied from %1 and new return items can''t be added to the return sales.';
         QTY_ADJUSTED: Label 'Quantity was adjusted due to previous return sales.';
+        POSEntryMgt: Codeunit "POS Entry Management";
 
     local procedure ActionCode(): Text
     begin
@@ -153,7 +156,7 @@ codeunit 6150798 "POS Action - Reverse Sale"
         // AuditRoll.SETRANGE ("Sales Ticket No.", SalesTicketNo);
         // AuditRoll.FINDFIRST ();
 
-        DeObfuscateTicketNo (JSON.GetIntegerParameter ('ObfucationMethod', false), SalesTicketNo);
+        POSEntryMgt.DeObfuscateTicketNo (JSON.GetIntegerParameter ('ObfucationMethod', false), SalesTicketNo);
         AuditRoll.SetRange ("Sales Ticket No.", SalesTicketNo);
         if (not AuditRoll.FindFirst ()) then
           Error (NotFound, JSON.GetString ('input', true));
@@ -193,7 +196,7 @@ codeunit 6150798 "POS Action - Reverse Sale"
         POSSession.GetSaleLine (POSSaleLine);
 
         //-NPR5.49 [342244]
-        DeObfuscateTicketNo (JSON.GetIntegerParameter ('ObfucationMethod', false), SalesTicketNo);
+        POSEntryMgt.DeObfuscateTicketNo (JSON.GetIntegerParameter ('ObfucationMethod', false), SalesTicketNo);
         //+NPR5.49 [342244]
 
         //-NPR5.38 [296724]
@@ -213,6 +216,10 @@ codeunit 6150798 "POS Action - Reverse Sale"
         end;
 
         SaleLinePOS.ModifyAll("Return Sale Sales Ticket No.", SalesTicketNo);
+        //-NPR5.53 [387339]
+        if not SaleLinePOS.IsEmpty then
+          POSSaleLine.SetLast();
+        //+NPR5.53 [387339]
 
         //-NPR5.49 [342090]
         if (ApplyMaxReturnQty (SalePOS, SalesTicketNo)) then
@@ -268,27 +275,6 @@ codeunit 6150798 "POS Action - Reverse Sale"
         SalePOS.Modify(true);
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true,false);
-    end;
-
-    local procedure DeObfuscateTicketNo(ObfucationMethod: Integer;var SalesTicketNo: Code[20])
-    var
-        MyBigInt: BigInteger;
-        RPAuxMiscLibrary: Codeunit "RP Aux - Misc. Library";
-    begin
-
-        //-NPR5.49 [342244]
-        case ObfucationMethod of
-          1: // Multiplicative Inverse
-          begin
-            if (StrLen (SalesTicketNo) > 2) then
-              if (CopyStr (SalesTicketNo, 1,2) = 'MI') then
-                SalesTicketNo := CopyStr (SalesTicketNo, 3);
-
-            if (Evaluate (MyBigInt, SalesTicketNo)) then
-              SalesTicketNo := Format (RPAuxMiscLibrary.MultiplicativeInverseDecode (MyBigInt), 0, 9);
-          end;
-        end;
-        //+NPR5.49 [342244]
     end;
 
     local procedure IsCompleteReversal(SalesTicketNo: Code[20]): Boolean

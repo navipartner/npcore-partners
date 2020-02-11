@@ -2,8 +2,11 @@ table 6150629 "POS Tax Amount Line"
 {
     // NPR5.36/NPKNAV/20171003  CASE 279552 Transport NPR5.36 - 3 October 2017
     // NPR5.48/BHR /20190122 CASE 341968 Increase length of field 10030 from text30 to text 50
+    // NPR5.53/SARA/20191024 CASE 373672 Added Page 'POS Tax Line List' as LookupPageID + Added Field 600..620
 
     Caption = 'POS Tax Amount Line';
+    DrillDownPageID = "POS Tax Line List";
+    LookupPageID = "POS Tax Line List";
 
     fields
     {
@@ -128,6 +131,30 @@ table 6150629 "POS Tax Amount Line"
             AutoFormatType = 1;
             Caption = 'Line Amount';
             Editable = false;
+        }
+        field(600;"Entry Date";Date)
+        {
+            CalcFormula = Lookup("POS Entry"."Entry Date" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            Caption = 'Entry Date';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(610;"Starting Time";Time)
+        {
+            CalcFormula = Lookup("POS Entry"."Starting Time" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            Caption = 'Starting Time';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(620;"Ending Time";Time)
+        {
+            CalcFormula = Lookup("POS Entry"."Ending Time" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            Caption = 'Ending Time';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
         }
         field(10010;"Expense/Capitalize";Boolean)
         {

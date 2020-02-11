@@ -10,6 +10,7 @@ codeunit 6150617 "POS-Audit Roll Integration"
     // NPR5.41/JDH /20180426 CASE 312935  When Data Import is triggered, a test record is inserted, to find out if there is autoincrement in the PK. This causes an error in subscriber OnInsertPOSUnitInsertRegister
     // NPR5.51/ALST/20190715 CASE 361931 removed MarkAuditRollPosted, PostItemEntries, OnClosingPOSPeriodRegisterPostItemEntries, SaleIsPostedInAuditRoll, POSEntryIsPostedInAuditRoll - unused
     // NPR5.51/ALST/20190715 CASE 361931 removed FindPOSEntryNo, TryOpenPOSUnit - unused
+    // NPR5.53/ALPO/20191022 CASE 373743 Field "Sales Ticket Series" moved from "Cash Register" to "POS Audit Profile"
 
     Permissions = TableData "Audit Roll"=rimd;
 
@@ -288,7 +289,7 @@ codeunit 6150617 "POS-Audit Roll Integration"
         Register.Init;
         Register."Register No." := Rec."No.";
         POSStore.Get(Rec."POS Store Code");
-        Register."Sales Ticket Series" := POSStore."POS Entry Doc. No. Series";
+        //Register."Sales Ticket Series" := POSStore."POS Entry Doc. No. Series";  //NPR5.53 [373743]-revoked
         Register."Location Code" := POSStore."Location Code";
         Register.Insert(true);
     end;

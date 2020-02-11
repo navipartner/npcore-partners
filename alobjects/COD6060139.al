@@ -27,6 +27,9 @@ codeunit 6060139 "MM Loyalty Point Management"
     // MM1.40/TSA /20190813 CASE 343352 Points on web. Refactored GetCouponToRedeem() -> GetCouponToRedeemPOS() added GetCouponToRedeemWS(), GetEligibleCouponsToRedeemWorker()
     // MM1.41/TSA /20191001 CASE 371095 Previous Period point threshold calculation, added CalculateSpendablePoints()
     // MM1.41/TSA /20191018 CASE 372777 Changed posting date for points earn base on membership alterations
+    // MM1.42/TSA /20191024 CASE 374403 UnRedeemPointsCoupon(), changed signature on IssueOneCoupon()
+    // MM1.42/TSA /20191125 CASE 367972 Incorrect amount as VAT base for the on after sale
+    // MM1.42/TSA /20191203 CASE 361664 Refactored the after points has changed code, added AfterMembershipPointsUpdate()
 
 
     trigger OnRun()
@@ -204,7 +207,12 @@ codeunit 6060139 "MM Loyalty Point Management"
               AuditRoll.Quantity * -1,
               AuditRoll."Customer No.",
               AuditRoll."Sales Ticket No.",
-              AuditRoll."Amount Including VAT",
+
+              //-MM1.42 [367972]
+              // AuditRoll."Amount Including VAT",
+              AuditRoll.Amount,
+              //+MM1.42 [367972]
+
               AuditRoll."Line Discount Amount",
               LoyaltyPostingSourceEnum::POS_ENDOFSALE
             );
@@ -270,7 +278,6 @@ codeunit 6060139 "MM Loyalty Point Management"
 
         ValueEntry."Sales Amount (Actual)" := Amount;
         ValueEntry."Discount Amount" := DiscountAmount;
-
         ValueEntry."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
 
         CreatePointEntryFromValueEntry (ValueEntry, DataSource);
@@ -283,18 +290,12 @@ codeunit 6060139 "MM Loyalty Point Management"
         MemberCommunity: Record "MM Member Community";
         MembershipSetup: Record "MM Membership Setup";
         LoyaltySetup: Record "MM Loyalty Setup";
-        MembershipRole: Record "MM Membership Role";
         MembershipSalesSetup: Record "MM Membership Sales Setup";
         MembershipAlterationSetup: Record "MM Membership Alteration Setup";
         MembershipEntry: Record "MM Membership Entry";
         POSUnit: Record "POS Unit";
-        UpgradeAlteration: Record "MM Loyalty Alter Membership";
-        DowngradeAlteration: Record "MM Loyalty Alter Membership";
-        MembershipManagement: Codeunit "MM Membership Management";
         AwardPoints: Boolean;
-        MemberNotification: Codeunit "MM Member Notification";
-        UpgradeAvailable: Boolean;
-        DowngradeAvailable: Boolean;
+        MembershipManagement: Codeunit "MM Membership Management";
     begin
 
         if (ValueEntry."Item Ledger Entry Type" <> ValueEntry."Item Ledger Entry Type"::Sale) then
@@ -397,27 +398,32 @@ codeunit 6060139 "MM Loyalty Point Management"
 
         if (MembershipPointsEntry.Insert()) then ;
 
+        //-MM1.42 [361664]
         //-MM1.40 [361664]
-        // Check for upgrade
-        UpgradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", true, UpgradeAlteration);
-        DowngradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", false, DowngradeAlteration);
+        // // Check for upgrade
+        // UpgradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", TRUE, UpgradeAlteration);
+        // DowngradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", FALSE, DowngradeAlteration);
+        //
+        // IF (UpgradeAvailable AND NOT DowngradeAvailable) THEN
+        //  AlterMembership (Membership."Entry No.", UpgradeAlteration);
+        //
+        // IF (DowngradeAvailable AND NOT UpgradeAvailable) THEN
+        //  AlterMembership (Membership."Entry No.", DowngradeAlteration);
+        //
+        // //+MM1.40 [361664]
+        //
+        // IF (MembershipSetup."Enable NP Pass Integration") THEN BEGIN
+        //
+        //  MembershipRole.SETFILTER ("Membership Entry No.", '=%1', Membership."Entry No.");
+        //  MembershipRole.SETFILTER (Blocked, '=%1', FALSE);
+        //  MembershipRole.SETFILTER ("Wallet Pass Id", '<>%1', '');
+        //  IF (NOT MembershipRole.ISEMPTY ()) THEN
+        //    MemberNotification.CreateUpdateWalletNotification (Membership."Entry No.", 0, 0);
+        // END;
 
-        if (UpgradeAvailable and not DowngradeAvailable) then
-          AlterMembership (Membership."Entry No.", UpgradeAlteration);
+        AfterMembershipPointsUpdate (Membership."Entry No.", MembershipPointsEntry."Entry No.");
+        //+MM1.42 [361664]
 
-        if (DowngradeAvailable and not UpgradeAvailable) then
-          AlterMembership (Membership."Entry No.", DowngradeAlteration);
-
-        //+MM1.40 [361664]
-
-        if (MembershipSetup."Enable NP Pass Integration") then begin
-
-          MembershipRole.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
-          MembershipRole.SetFilter (Blocked, '=%1', false);
-          MembershipRole.SetFilter ("Wallet Pass Id", '<>%1', '');
-          if (not MembershipRole.IsEmpty ()) then
-            MemberNotification.CreateUpdateWalletNotification (Membership."Entry No.", 0, 0);
-        end;
 
         exit (true);
     end;
@@ -427,15 +433,29 @@ codeunit 6060139 "MM Loyalty Point Management"
         GenProductPostingGroup: Record "Gen. Product Posting Group";
         VATProductPostingGroup: Record "VAT Product Posting Group";
         VATPostingSetup: Record "VAT Posting Setup";
+        Item: Record Item;
+        Customer: Record Customer;
     begin
 
         if (IncludeVAT) then begin
           if (not GenProductPostingGroup.Get (ValueEntry."Gen. Prod. Posting Group")) then
             exit (0);
-          VATPostingSetup.SetFilter ("VAT Bus. Posting Group", '=%1', ValueEntry."Gen. Bus. Posting Group");
-          VATPostingSetup.SetFilter ("VAT Prod. Posting Group", '=%1', GenProductPostingGroup."Def. VAT Prod. Posting Group");
+
+          //-MM1.42 [367972]
+          // VATPostingSetup.SETFILTER ("VAT Bus. Posting Group", '=%1', ValueEntry."Gen. Bus. Posting Group");
+          // VATPostingSetup.SETFILTER ("VAT Prod. Posting Group", '=%1', GenProductPostingGroup."Def. VAT Prod. Posting Group");
+          if (not Item.Get (ValueEntry."Item No.")) then
+            exit (0);
+
+          VATPostingSetup.SetFilter ("VAT Bus. Posting Group", '=%1', Item."VAT Bus. Posting Gr. (Price)");
+          VATPostingSetup.SetFilter ("VAT Prod. Posting Group", '=%1', Item."VAT Prod. Posting Group");
+          if (Customer.Get (ValueEntry."Source No.")) then
+            VATPostingSetup.SetFilter ("VAT Bus. Posting Group", '=%1', Customer."VAT Bus. Posting Group");
+          //+MM1.42 [367972]
+
           if (not VATPostingSetup.FindFirst ()) then
             exit (0);
+
           AmountBase := ValueEntry."Sales Amount (Actual)" * ( (100 + VATPostingSetup."VAT %") / 100.0 );
         end else begin
           AmountBase := ValueEntry."Sales Amount (Actual)";
@@ -672,6 +692,40 @@ codeunit 6060139 "MM Loyalty Point Management"
         exit (RuleType::INCLUDE);
     end;
 
+    procedure AfterMembershipPointsUpdate(MembershipEntryNo: Integer;MembershipPointsEntryNo: Integer)
+    var
+        MembershipRole: Record "MM Membership Role";
+        UpgradeAlteration: Record "MM Loyalty Alter Membership";
+        DowngradeAlteration: Record "MM Loyalty Alter Membership";
+        MembershipManagement: Codeunit "MM Membership Management";
+        MemberNotification: Codeunit "MM Member Notification";
+        UpgradeAvailable: Boolean;
+        DowngradeAvailable: Boolean;
+    begin
+
+        //-MM1.42 [361664]
+        // Note: MembershipPointsEntryNo is optional and is allowed to be unassigned
+
+        // Check for upgrade
+        UpgradeAvailable := EligibleForMembershipAlteration (MembershipEntryNo, true, UpgradeAlteration);
+        DowngradeAvailable := EligibleForMembershipAlteration (MembershipEntryNo, false, DowngradeAlteration);
+
+        if (UpgradeAvailable and not DowngradeAvailable) then
+          AlterMembership (MembershipEntryNo, UpgradeAlteration);
+
+        if (DowngradeAvailable and not UpgradeAvailable) then
+          AlterMembership (MembershipEntryNo, DowngradeAlteration);
+
+        // Wallet update
+        MembershipRole.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipRole.SetFilter (Blocked, '=%1', false);
+        MembershipRole.SetFilter ("Wallet Pass Id", '<>%1', '');
+        if (not MembershipRole.IsEmpty ()) then
+          MemberNotification.CreateUpdateWalletNotification (MembershipEntryNo, 0, 0);
+
+        //+MM1.42 [361664]
+    end;
+
     local procedure "--RulesSelection"()
     begin
     end;
@@ -788,7 +842,7 @@ codeunit 6060139 "MM Loyalty Point Management"
     begin
     end;
 
-    procedure IssueOneCoupon(MembershipEntryNo: Integer;var TmpLoyaltyPointsSetup: Record "MM Loyalty Points Setup" temporary;SubTotal: Decimal) CouponNo: Code[20]
+    procedure IssueOneCoupon(MembershipEntryNo: Integer;var TmpLoyaltyPointsSetup: Record "MM Loyalty Points Setup" temporary;DocumentNo: Code[20];PostingDate: Date;SubTotal: Decimal) CouponNo: Code[20]
     var
         Membership: Record "MM Membership";
         LoyaltyCouponMgr: Codeunit "MM Loyalty Coupon Mgr";
@@ -799,7 +853,10 @@ codeunit 6060139 "MM Loyalty Point Management"
 
         //-MM1.40 [343352]
         if (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_COUPON) then
-          CouponNo := LoyaltyCouponMgr.IssueOneCoupon (TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, TmpLoyaltyPointsSetup."Points Threshold", 0);
+          //-MM1.42 [374403]
+          // CouponNo := LoyaltyCouponMgr.IssueOneCoupon (TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, TmpLoyaltyPointsSetup."Points Threshold", 0);
+          CouponNo := LoyaltyCouponMgr.IssueOneCoupon (TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, DocumentNo, PostingDate, TmpLoyaltyPointsSetup."Points Threshold", 0);
+          //+MM1.42 [374403]
 
         if (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_LOYALTY) then begin
           Membership.Get (MembershipEntryNo);
@@ -822,7 +879,11 @@ codeunit 6060139 "MM Loyalty Point Management"
           PointsToRedeem := Round (CouponAmount / TmpLoyaltyPointsSetup."Point Rate", 1);
 
           if (CouponAmount >= TmpLoyaltyPointsSetup."Minimum Coupon Amount") then
-            CouponNo := LoyaltyCouponMgr.IssueOneCoupon (TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, PointsToRedeem, CouponAmount);
+            //-MM1.42 [374403]
+            //CouponNo := LoyaltyCouponMgr.IssueOneCoupon (TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, PointsToRedeem, CouponAmount);
+            CouponNo := LoyaltyCouponMgr.IssueOneCoupon (TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, DocumentNo, PostingDate, PointsToRedeem, CouponAmount);
+            //+MM1.42 [374403]
+
 
           // IF (USERID = 'TSA') THEN MESSAGE ('Coupon Amount %1, SubTotal %2, Points(redeemable) %3,  Points(redeemed) %4, Rate %5', CouponAmount, SubTotal, RedeemablePoints, PointsToRedeem, TmpLoyaltyPointsSetup."Point Rate");
 
@@ -859,6 +920,43 @@ codeunit 6060139 "MM Loyalty Point Management"
         MembershipPointsEntry.Quantity := 1;
 
         MembershipPointsEntry.Insert;
+    end;
+
+    procedure UnRedeemPointsCoupon(MembershipEntryNo: Integer;DocumentNo: Code[20];DocumentDate: Date;CouponNo: Code[20]): Boolean
+    var
+        Membership: Record "MM Membership";
+        MembershipSetup: Record "MM Membership Setup";
+        MembershipPointsEntry: Record "MM Membership Points Entry";
+    begin
+
+        //-MM1.42 [374403]
+        if (CouponNo = '') then
+          exit;
+
+        MembershipPointsEntry.SetFilter ("Entry Type", '=%1', MembershipPointsEntry."Entry Type"::POINT_WITHDRAW);
+        MembershipPointsEntry.SetFilter ("Redeem Ref. Type", '=%1', MembershipPointsEntry."Redeem Ref. Type"::COUPON);
+        MembershipPointsEntry.SetFilter ("Redeem Reference No.", '=%1', CouponNo);
+        MembershipPointsEntry.SetFilter (Adjustment, '=%1', true);
+
+        if (not MembershipPointsEntry.IsEmpty ()) then
+          exit; // Already returned
+
+        MembershipPointsEntry.SetFilter (Adjustment, '=%1', false);
+        if (not MembershipPointsEntry.FindFirst ()) then
+          exit; // Invalid Coupon
+
+        MembershipPointsEntry."Entry No." := 0;
+
+        MembershipPointsEntry."Posting Date" := DocumentDate;
+        MembershipPointsEntry."Document No." := DocumentNo;
+
+        MembershipPointsEntry."Redeemed Points" *= -1;
+        MembershipPointsEntry.Points *= -1;
+        MembershipPointsEntry.Adjustment := true;
+
+        MembershipPointsEntry.Insert;
+        exit (true);
+        //+MM1.42 [374403]
     end;
 
     procedure GetCouponToRedeemPOS(MembershipEntryNo: Integer;var TmpLoyaltyPointsSetup: Record "MM Loyalty Points Setup" temporary;SubTotal: Decimal): Boolean
@@ -1159,12 +1257,6 @@ codeunit 6060139 "MM Loyalty Point Management"
         MembershipSetup: Record "MM Membership Setup";
         MembershipPointsEntry: Record "MM Membership Points Entry";
         LoyaltySetup: Record "MM Loyalty Setup";
-        UpgradeAlteration: Record "MM Loyalty Alter Membership";
-        DowngradeAlteration: Record "MM Loyalty Alter Membership";
-        MembershipRole: Record "MM Membership Role";
-        MemberNotification: Codeunit "MM Member Notification";
-        UpgradeAvailable: Boolean;
-        DowngradeAvailable: Boolean;
     begin
 
         Membership.Get (MembershipEntryNo);
@@ -1200,25 +1292,29 @@ codeunit 6060139 "MM Loyalty Point Management"
         MembershipPointsEntry.Quantity := 1;
         MembershipPointsEntry.Insert;
 
-        //-MM1.40 [361664]
-        // Check for upgrade
-        UpgradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", true, UpgradeAlteration);
-        DowngradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", false, DowngradeAlteration);
+        //-MM1.42 [361664]
+        // //-MM1.40 [361664]
+        // // Check for upgrade
+        // UpgradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", TRUE, UpgradeAlteration);
+        // DowngradeAvailable := EligibleForMembershipAlteration (Membership."Entry No.", FALSE, DowngradeAlteration);
+        //
+        // IF (UpgradeAvailable AND NOT DowngradeAvailable) THEN
+        //  AlterMembership (Membership."Entry No.", UpgradeAlteration);
+        //
+        // IF (DowngradeAvailable AND NOT UpgradeAvailable) THEN
+        //  AlterMembership (Membership."Entry No.", DowngradeAlteration);
+        //
+        // IF (MembershipSetup."Enable NP Pass Integration") THEN BEGIN
+        //  MembershipRole.SETFILTER ("Membership Entry No.", '=%1', Membership."Entry No.");
+        //  MembershipRole.SETFILTER (Blocked, '=%1', FALSE);
+        //  MembershipRole.SETFILTER ("Wallet Pass Id", '<>%1', '');
+        //  IF (NOT MembershipRole.ISEMPTY ()) THEN
+        //    MemberNotification.CreateUpdateWalletNotification (Membership."Entry No.", 0, 0);
+        // END;
+        // //+MM1.40 [361664]
 
-        if (UpgradeAvailable and not DowngradeAvailable) then
-          AlterMembership (Membership."Entry No.", UpgradeAlteration);
-
-        if (DowngradeAvailable and not UpgradeAvailable) then
-          AlterMembership (Membership."Entry No.", DowngradeAlteration);
-
-        if (MembershipSetup."Enable NP Pass Integration") then begin
-          MembershipRole.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
-          MembershipRole.SetFilter (Blocked, '=%1', false);
-          MembershipRole.SetFilter ("Wallet Pass Id", '<>%1', '');
-          if (not MembershipRole.IsEmpty ()) then
-            MemberNotification.CreateUpdateWalletNotification (Membership."Entry No.", 0, 0);
-        end;
-        //+MM1.40 [361664]
+        AfterMembershipPointsUpdate (Membership."Entry No.", MembershipPointsEntry."Entry No.");
+        //+MM1.42 [361664]
 
         exit (MembershipPointsEntry."Entry No.");
     end;

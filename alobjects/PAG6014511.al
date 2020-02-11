@@ -50,8 +50,9 @@ page 6014511 "Retail Item List"
     // NPR5.51/ZESO/20190814 CASE 363460 Added Item Status
     // NPR5.51/ZESO/20190708 CASE 361229 Added Page Action Attributes and Factbox Item Attributes
     // NPR5.51/SARA/20190904 CASE 366962 Added Page Action 'Shelf Labels'
+    // NPR5.53/MHA /20191113  CASE 374721 Updated Page Caption
 
-    Caption = 'Item List';
+    Caption = 'Retail Item List';
     CardPageID = "Retail Item Card";
     Editable = false;
     PageType = List;

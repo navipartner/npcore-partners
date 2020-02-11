@@ -62,6 +62,8 @@ codeunit 6014505 "Touch Screen - Functions"
     // NPR5.41/JDH /20180426 CASE 312644  Added indirect permissions to table Audit roll
     // NPR5.45/MHA /20180821 CASE 324395 SaleLinePOS."Unit Price (LCY)" Renamed to "Unit Cost (LCY)"
     // NPR5.46/MMV /20181001 CASE 290734 EFT Framework refactoring
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
+    // NPR5.53/BHR /20191004 CASE 369361 Removed connection checks
 
     Permissions = TableData "Audit Roll"=rimd;
 
@@ -391,7 +393,9 @@ codeunit 6014505 "Touch Screen - Functions"
                 'ENDOFDAY':
                   begin
                     RetailSetupGlobal.Get;
-                    RetailSetupGlobal.CheckOnline;
+                    //-NPR5.53 [369361]
+                    //RetailSetupGlobal.CheckOnline;
+                    //+NPR5.53 [369361]
                     if SalePOS.TouchScreen then begin
                     end else begin
                       Error('Only touch support');
@@ -441,7 +445,9 @@ codeunit 6014505 "Touch Screen - Functions"
                 'AUX':
                   begin
                     RetailSetupGlobal.Get;
-                    RetailSetupGlobal.CheckOnline;
+                    //-NPR5.53 [369361]
+                    //RetailSetupGlobal.CheckOnline;
+                    //+NPR5.53 [369361]
                     if SalePOS.TouchScreen then begin
                     end else begin
                       Error('Only touch support');
@@ -895,7 +901,6 @@ codeunit 6014505 "Touch Screen - Functions"
 
     procedure InfoItem(var SaleLinePOS: Record "Sale Line POS";var HeadingText: Text[250];var NPRTempBuffer: Record "NPR - TEMP Buffer")
     var
-        Register: Record Register;
         Item: Record Item;
         SaleLinePOS2: Record "Sale Line POS";
         QuantityDiscountLine: Record "Quantity Discount Line";
@@ -921,6 +926,7 @@ codeunit 6014505 "Touch Screen - Functions"
         TemplateCode: Code[50];
         QuantityDiscountHeader: Record "Quantity Discount Header";
         Vendor: Record Vendor;
+        POSUnit: Record "POS Unit";
     begin
         //info_Item
         Clear(HeadingText);
@@ -1030,7 +1036,8 @@ codeunit 6014505 "Touch Screen - Functions"
         
         /*------------------------------------------- MIX DISCOUNT ---------------------------------*/
         j := 0;
-        Register.Get(SaleLinePOS."Register No.");
+        //Register.GET(SaleLinePOS."Register No.");  //NPR5.53 [371956]-revoked
+        POSUnit.Get(SaleLinePOS."Register No.");  //NPR5.53 [371956]
         MixedDiscountLine.Reset;
         MixedDiscountLine.SetCurrentKey("No.");
         MixedDiscountLine.SetRange("No.",Item."No.");
@@ -1042,8 +1049,14 @@ codeunit 6014505 "Touch Screen - Functions"
         //+NPR5.31 [262904]
           repeat                       // MixedDiscount findes
             MixedDiscount.SetRange(Code,MixedDiscountLine.Code);
-            MixedDiscount.SetFilter("Global Dimension 1 Code",'%1|%2','',Register."Global Dimension 1 Code");
-            MixedDiscount.SetFilter("Global Dimension 2 Code",'%1|%2','',Register."Global Dimension 2 Code");
+            //-NPR5.53 [371956]-revoked
+            //MixedDiscount.SETFILTER("Global Dimension 1 Code",'%1|%2','',Register."Global Dimension 1 Code");
+            //MixedDiscount.SETFILTER("Global Dimension 2 Code",'%1|%2','',Register."Global Dimension 2 Code");
+            //+NPR5.53 [371956]-revoked
+            //-NPR5.53 [371956]
+            MixedDiscount.SetFilter("Global Dimension 1 Code",'%1|%2','',POSUnit."Global Dimension 1 Code");
+            MixedDiscount.SetFilter("Global Dimension 2 Code",'%1|%2','',POSUnit."Global Dimension 2 Code");
+            //+NPR5.53 [371956]
             if MixedDiscount.FindSet then
               if MixedDiscount.Status = MixedDiscount.Status::Active then begin
                 i += 1;

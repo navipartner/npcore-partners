@@ -4,6 +4,7 @@ codeunit 6151196 "NpCs Workflow Mgt."
     // NPR5.51/MHA /20190627  CASE 344264 Bumped version list for update to TaskScheduler in ScheduleRunWorkflow() from NAV10.* and newer
     // NPR5.51/MHA /20190822  CASE 364557 Removed Calcfields of "Sell-to Customer Name"
     // NPR5.52/MHA /20191010  CASE 369476 Added function GetSmsSender() in NotifyCustomerSms()
+    // NPR5.53/MHA /20191129  CASE 378216 Archivation added to RunWorkflow()
 
     TableNo = "NpCs Document";
 
@@ -43,9 +44,14 @@ codeunit 6151196 "NpCs Workflow Mgt."
 
     local procedure RunWorkflow(var NpCsDocument: Record "NpCs Document")
     var
+        NpCsArchCollectMgt: Codeunit "NpCs Arch. Collect Mgt.";
         PrevWorkflowStep: Integer;
     begin
         if NpCsDocument.Type = NpCsDocument.Type::"Collect in Store" then begin
+          //-NPR5.53 [378216]
+          if IsReadyForArchivation(NpCsDocument) then
+            NpCsArchCollectMgt.ArchiveCollectDocument(NpCsDocument);
+          //+NPR5.53 [378216]
           RunCallback(NpCsDocument);
           exit;
         end;
@@ -630,6 +636,30 @@ codeunit 6151196 "NpCs Workflow Mgt."
           exit(true);
 
         exit(false);
+    end;
+
+    local procedure IsReadyForArchivation(NpCsDocument: Record "NpCs Document"): Boolean
+    begin
+        //-NPR5.53 [378216]
+        if not NpCsDocument.Find then
+          exit(false);
+
+        case NpCsDocument."Delivery Status" of
+          NpCsDocument."Delivery Status"::Delivered,NpCsDocument."Delivery Status"::Expired:
+            begin
+              exit(NpCsDocument."Archive on Delivery");
+            end;
+        end;
+
+        case NpCsDocument."Processing Status" of
+          NpCsDocument."Processing Status"::Rejected,NpCsDocument."Processing Status"::Expired:
+            begin
+              exit(NpCsDocument."Archive on Delivery");
+            end;
+        end;
+
+        exit(false);
+        //+NPR5.53 [378216]
     end;
 }
 

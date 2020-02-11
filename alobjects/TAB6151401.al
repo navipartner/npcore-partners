@@ -29,6 +29,7 @@ table 6151401 "Magento Setup"
     // MAG2.23/MHA /20190826  CASE 363864 Added fields 700 "Post Retail Voucher on Import", 710 "E-mail Retail Vouchers to"
     // MAG2.23/MHA /20190930  CASE 370831 B2B modules should be disabled for Magento 2 as Pull has been implemented via NAV Web Services
     // MAG2.23/MHA /20191011  CASE 371791 Added fields 720 "Post Tickets on Import", 730 "Post Memberships on Import"
+    // MAG2.24/MHA /20191024  CASE 371807 Added Option "Phone No. to Customer No." to field 500 "Customer Mapping"
 
     Caption = 'Magento Setup';
 
@@ -369,9 +370,9 @@ table 6151401 "Magento Setup"
         field(500;"Customer Mapping";Option)
         {
             Caption = 'Customer Mapping';
-            Description = 'MAG2.00,MAG2.21,MAG2.22';
-            OptionCaption = 'E-mail,Phone No.,E-mail AND Phone No.,E-mail OR Phone No.,Customer No.';
-            OptionMembers = "E-mail","Phone No.","E-mail AND Phone No.","E-mail OR Phone No.","Customer No.";
+            Description = 'MAG2.00,MAG2.21,MAG2.22,MAG2.24';
+            OptionCaption = 'E-mail,Phone No.,E-mail AND Phone No.,E-mail OR Phone No.,Customer No.,Phone No. to Customer No.';
+            OptionMembers = "E-mail","Phone No.","E-mail AND Phone No.","E-mail OR Phone No.","Customer No.","Phone No. to Customer No.";
         }
         field(505;"Customer Posting Group";Code[10])
         {

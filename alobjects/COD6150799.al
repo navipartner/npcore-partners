@@ -2,6 +2,7 @@ codeunit 6150799 "POS Action - Credit Gift Vouch"
 {
     // NPR5.35/TSA /20170830 CASE 288575 Made the refresh unconditional
     // NPR5.48/TSA /20190207 CASE 345327 Added call to UpdateAmounts()
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
 
 
     trigger OnRun()
@@ -190,8 +191,11 @@ codeunit 6150799 "POS Action - Credit Gift Vouch"
           "Register No." := Register."Register No.";
           Validate ("No.", Register."Credit Voucher Account");
           "Location Code" := Register."Location Code";
-          "Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-          "Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+          //-NPR5.53 [371956]-revoked
+          //! Redundant lines. Dimensions should be properly handled by CreateDim() function, not forgetting the Dimension Set ID field.
+          //"Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
+          //"Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+          //+NPR5.53 [371956]-revoked
           Quantity := 1;
           Amount := pAmount;
 

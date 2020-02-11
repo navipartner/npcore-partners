@@ -16,6 +16,8 @@ codeunit 6014624 "Touch Screen - Balancing Mgt."
     // NPR5.32/CLVA/20170526 CASE 268630 Fix wrong mapping of "Cost of Goods Sold"
     // NPR5.48/BHR /20181120 CASE 329505 Add amount pertaining to different Document types
     // NPR5.48/TJ  /20181120 CASE 336040 Fixed wrong counting of negative sales
+    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
 
 
     trigger OnRun()
@@ -24,6 +26,7 @@ codeunit 6014624 "Touch Screen - Balancing Mgt."
 
     var
         Rec: Record "Payment Type POS";
+        POSUnit: Record "POS Unit";
         Marshaller: Codeunit "POS Event Marshaller";
         "--- GENERAL": Integer;
         countedUltimo: Boolean;
@@ -367,6 +370,7 @@ codeunit 6014624 "Touch Screen - Balancing Mgt."
         GvActFilter: Text[30];
         AuditRoll2: Record "Audit Roll";
         TempAmount: Decimal;
+        POSSetup: Codeunit "POS Setup";
     begin
         with Rec do begin
           npc.Get;
@@ -394,6 +398,11 @@ codeunit 6014624 "Touch Screen - Balancing Mgt."
           CRNoteAmt := 0;
          //+NPR5.48 [329505]
           Primo := Kasse."Opening Cash";
+        
+          //-NPR5.53 [371955]
+          POSUnit.Get(Kasse."Register No.");
+          POSSetup.SetPOSUnit(POSUnit);
+          //+NPR5.53 [371955]
         
           /* FIND LAST OPEN/CLOSE */
         
@@ -453,7 +462,8 @@ codeunit 6014624 "Touch Screen - Balancing Mgt."
             d.Update(1, t006);
             "Audit Roll".SetRange( "Sale Type", "Audit Roll"."Sale Type"::"Out payment" );
             "Audit Roll".SetRange( Type, "Audit Roll".Type::"G/L" );
-            "Audit Roll".SetFilter( "No.", '<>%1', Kasse.Rounding );
+            //"Audit Roll".SETFILTER( "No.", '<>%1', Kasse.Rounding );  //NPR5.53 [371955]-revoked
+            "Audit Roll".SetFilter("No.",'<>%1',POSSetup.RoundingAccount(true));  //NPR5.53 [371955]
             "Audit Roll".CalcSums( "Amount Including VAT" );
             "Out Payments" := "Audit Roll"."Amount Including VAT";
         
@@ -840,6 +850,7 @@ codeunit 6014624 "Touch Screen - Balancing Mgt."
           if ar."Sales Ticket No." > Sale."Sales Ticket No." then
             Marshaller.DisplayError(t018,t031,true);
         end;
+        POSUnit.Get(Kasse."Register No.");  //NPR5.53 [371956]
         
         Kasseperiode.Init;
         Kasseperiode."Register No."               := Kasse."Register No.";
@@ -893,8 +904,14 @@ codeunit 6014624 "Touch Screen - Balancing Mgt."
         Kasseperiode."Gift Voucher Debit"         := Gavekortdebet;
         Kasseperiode."Euro Difference"            := PaymentDiffeuro;
         Kasseperiode."Change Register"            := "Change (LCY)";
-        Kasseperiode."Shortcut Dimension 1 Code"  := Kasse."Global Dimension 1 Code";
-        Kasseperiode."Shortcut Dimension 2 Code"  := Kasse."Global Dimension 2 Code";
+        //-NPR5.53 [371956]-revoked
+        //Kasseperiode."Shortcut Dimension 1 Code"  := Kasse."Global Dimension 1 Code";
+        //Kasseperiode."Shortcut Dimension 2 Code"  := Kasse."Global Dimension 2 Code";
+        //+NPR5.53 [371956]-revoked
+        //-NPR5.53 [371956]
+        Kasseperiode."Shortcut Dimension 1 Code"  := POSUnit."Global Dimension 1 Code";
+        Kasseperiode."Shortcut Dimension 2 Code"  := POSUnit."Global Dimension 2 Code";
+        //+NPR5.53 [371956]
         Kasseperiode."Location Code"              := Kasse."Location Code";
         Kasseperiode."Money bag no."              := CopyStr(MoneyBagNo,1,MaxStrLen(Kasseperiode."Money bag no."));
         Kasseperiode."Alternative Register No."   := Sale."Alternative Register No.";

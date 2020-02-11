@@ -9,6 +9,7 @@ xmlport 6151152 "M2 Get Account"
     // NPR5.51/TSA /20190812 CASE 364644 Added Person section
     // NPR5.51/JAKUBV/20190904  CASE 364282 Transport NPR5.51 - 3 September 2019
     // MAG2.23/TSA /20191015 CASE 373151 Move Person to address, removed CompanyName, added Name, PricesIncludeVat, Contact
+    // MAG2.24/TSA /20191119 CASE 372304 Added Membership section
 
     Caption = 'Get Account';
     Encoding = UTF8;
@@ -543,6 +544,17 @@ xmlport 6151152 "M2 Get Account"
         if (TmpContactIn.FindFirst ()) then begin
           TmpContactResponse.TransferFields (TmpContactIn, true);
           TmpContactResponse.Insert ();
+
+          //-MAG2.24 [372304]
+          if (not MembershipRole.SetCurrentKey ("Contact No.")) then ;
+          MembershipRole.SetFilter ("Contact No.", '=%1', TmpContactIn."No.");
+          MembershipRole.SetFilter (Blocked, '=%1', false);
+          if (MembershipRole.FindFirst ()) then begin
+            MembershipRole.CalcFields ("External Member No.", "External Membership No.", "Member Display Name", "Membership Code");
+            TmpMembershipRoleResponse.TransferFields (MembershipRole, true);
+            TmpMembershipRoleResponse.Insert ();
+          end;
+          //+MAG2.24 [372304]
 
           if (TmpSellToCustomerIn.FindFirst ()) then begin
             TmpSellToCustomer.TransferFields (TmpSellToCustomerIn, true);

@@ -3,6 +3,7 @@ codeunit 6150731 "POS Action - Transfer Order"
     // NPR5.43/THRO/20180604 CASE 315072 Transfer order list
     // NPR5.51/ALST/20190722 CASE 358552 added possibility to auto create new order woth location and global dimension set from the register
     // NPR5.52/ALST/20191009 CASE 358552 fixed new record functionality
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
 
 
     trigger OnRun()
@@ -180,13 +181,18 @@ codeunit 6150731 "POS Action - Transfer Order"
 
     local procedure AddNewRecord(Register: Record Register)
     var
+        POSUnit: Record "POS Unit";
         TransferHeader: Record "Transfer Header";
         TransferOrder: Page "Transfer Order";
     begin
         //-NPR5.51 [358552]
         TransferHeader.Insert(true);
         TransferHeader.Validate("Transfer-from Code",Register."Location Code");
-        TransferHeader.Validate("Shortcut Dimension 1 Code",Register."Global Dimension 1 Code");
+        //TransferHeader.VALIDATE("Shortcut Dimension 1 Code",Register."Global Dimension 1 Code");  //NPR5.53 [371956]-revoked
+        //-NPR5.53 [371956]
+        POSUnit.Get(Register."Register No.");
+        TransferHeader.Validate("Shortcut Dimension 1 Code",POSUnit."Global Dimension 1 Code");  //Why only 1st global dim?
+        //+NPR5.53 [371956]
         TransferHeader.Modify;
 
         TransferOrder.SetRecord(TransferHeader);

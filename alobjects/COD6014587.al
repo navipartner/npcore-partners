@@ -10,6 +10,10 @@ codeunit 6014587 "Hardware Connector Mgt."
     // https://navipartner.visualstudio.com/Hardware%20Connector
     // 
     // TODO: Move the modal flow to a simple custom add-in in AL with the javascript nicely bundled inside, instead of using the bridge (which includes jquery) and minified js in a string.
+    // 
+    // NPR5.53/MMV /20191016 CASE 349793 Added byte handling function
+    // NPR5.53/MMV /20191111 CASE 375532 Moved commit outside tryfunction.
+    //                                   Added better error message.
 
 
     trigger OnRun()
@@ -18,6 +22,8 @@ codeunit 6014587 "Hardware Connector Mgt."
 
     var
         PAGE_CLOSED: Label 'The hardware connector page does not work if you manually close it. Please try again and keep it open.';
+        SOCKET_ERROR: Label 'Connection failure with hardware connector on the local machine.\Please verify that it is running and try again.';
+        PRINT_CAPTION: Label 'Printing...';
 
     procedure SendRawPrintRequest(PrinterName: Text;PrintBytes: Text;TargetEncoding: Text)
     var
@@ -30,8 +36,34 @@ codeunit 6014587 "Hardware Connector Mgt."
 
         Content := '{ "PrinterName": "' + EscapeJSON(PrinterName) + '", "PrintJob": "' + PrintBytes + '" }';
 
-        if not TrySendGenericRequest('RawPrint', Content) then
+        //-NPR5.53 [375532]
+        //Open modal dialog page using JS bridge to invoke socket client.
+        Commit;
+
+        if not TrySendGenericRequest('RawPrint', Content, PRINT_CAPTION) then
+        //+NPR5.53 [375532]
           Message(GetLastErrorText);
+    end;
+
+    procedure SendRawBytesPrintRequest(PrinterName: Text;var TempBlob: Record TempBlob)
+    var
+        Content: Text;
+        Success: Boolean;
+        InStream: InStream;
+        Stream: DotNet npNetMemoryStream;
+        PrintBytes: Text;
+        Convert: DotNet npNetConvert;
+    begin
+        //-NPR5.53 [349793]
+        TempBlob.Blob.CreateInStream(InStream);
+        Stream := InStream;
+        PrintBytes := Convert.ToBase64String(Stream.ToArray());
+
+        Content := '{ "PrinterName": "' + EscapeJSON(PrinterName) + '", "PrintJob": "' + PrintBytes + '" }';
+
+        if not TrySendGenericRequest('RawPrint', Content, PRINT_CAPTION) then
+          Message(GetLastErrorText);
+        //+NPR5.53 [349793]
     end;
 
     local procedure "// Aux"()
@@ -39,7 +71,7 @@ codeunit 6014587 "Hardware Connector Mgt."
     end;
 
     [TryFunction]
-    local procedure TrySendGenericRequest(Handler: Text;Content: Text)
+    local procedure TrySendGenericRequest(Handler: Text;Content: Text;Caption: Text)
     var
         POSSession: Codeunit "POS Session";
         POSActionHardwareConnect: Codeunit "POS Action - Hardware Connect";
@@ -49,19 +81,23 @@ codeunit 6014587 "Hardware Connector Mgt."
           POSActionHardwareConnect.QueueRequest(Handler, Content);
         end else begin
           //Open modal page to run JS outside POS, synchronously.
-          SendRequestOutsidePOS(Handler, Content);
+        //-NPR5.53 [375532]
+          SendRequestOutsidePOS(Handler, Content, Caption);
+        //+NPR5.53 [375532]
         end;
     end;
 
-    local procedure SendRequestOutsidePOS(Handler: Text;Content: Text)
+    local procedure SendRequestOutsidePOS(Handler: Text;Content: Text;Caption: Text)
     var
         HardwareConnector: Page "Hardware Connector";
         ResponseMethod: Text;
         Success: Boolean;
         ResponseOut: DotNet npNetJObject;
     begin
-        //Open modal dialog page using JS bridge to invoke socket client.
-        Commit;
+        //-NPR5.53 [375532]
+        // //Open modal dialog page using JS bridge to invoke socket client.
+        // COMMIT;
+        //+NPR5.53 [375532]
 
         HardwareConnector.SetModule('', '',
           GetSocketClientScript() +
@@ -72,14 +108,19 @@ codeunit 6014587 "Hardware Connector Mgt."
             '} catch (exception) {' +
               'new n$.Event.Method("error").raise(exception);' +
             '}' +
-          '}))');
+        //-NPR5.53 [375532]
+          '}))', Caption);
+        //+NPR5.53 [375532]
 
         HardwareConnector.RunModal;
         if HardwareConnector.DidAutoClose() then begin
           HardwareConnector.GetResponse(ResponseMethod, ResponseOut);
 
           if ResponseMethod = 'error' then
-            Error(ResponseOut.ToString());
+          //-NPR5.53 [375532]
+            Error(SOCKET_ERROR);
+            //ERROR(ResponseOut.ToString());
+          //+NPR5.53 [375532]
         end else begin
           Error(PAGE_CLOSED);
         end;

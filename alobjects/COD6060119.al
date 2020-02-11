@@ -39,11 +39,11 @@ codeunit 6060119 "TM Ticket Request Manager"
     // TM1.31/TSA /20180524 CASE 316500 Added key "Request Status", "Expires Date Time", IsEmpty dropped from 650 reads to 4 according to profiler
     // TM1.31/TSA /20180515 CASE 306040 Handling of negative change of qty on return tickets
     // TM1.36/TSA /20180802 CASE 323737 Reintroduced LockResource for high intensity concurrent web-service interactions
-    // #325345/TSA /20180820 CASE 325345 Changed Request Status to "Registered" so it is include by the expire function
+    // TM1.36/TSA /20180820 CASE 325345 Changed Request Status to "Registered" so it is include by the expire function
     // TM1.38/TSA /20181014 CASE 332109 Added eTicket functionality
-    // #333705/TSA /20181105 CASE 333705 Missing filter on variant code on ticket bom
-    // #335653/TSA /20181109 CASE 335653 Signature Change on POS_CreateRevokeRequest
-    // #335653/TSA /20181119 CASE 335653 Refactored GetExternalNo() to exclude alternative number
+    // TM1.38/TSA /20181105 CASE 333705 Missing filter on variant code on ticket bom
+    // TM1.38/TSA /20181109 CASE 335653 Signature Change on POS_CreateRevokeRequest
+    // TM1.38/TSA /20181119 CASE 335653 Refactored GetExternalNo() to exclude alternative number
     // TM1.39/TSA /20190107 CASE 310057 Allowing external source to notify eTicket recipent
     // TM1.39/TSA /20190124 CASE 343585 Revoke for tickets with policy always did not consider multiple admissons codes
     // TM1.43/TSA /20190124 CASE 335889 Refactored ticket request re-validation RevalidateRequestForTicketReuse();
@@ -52,6 +52,12 @@ codeunit 6060119 "TM Ticket Request Manager"
     // TM1.42/TSA /20190826 CASE 364739 Selection of notification address, Signature change on POS_AppendToReservationRequest2
     // TM1.43/TSA /20190904 CASE 357359 Deleting a ticket token must also delete the seating reservation entry
     // TM1.43/TSA /20190910 CASE 368043 Refactored usage of External Item Code
+    // TM1.45/TSA /20191113 CASE 322432 Row Seat Section field populated for seating arrangments
+    // TM1.45/TSA /20191121 CASE 378212 Added Sales cut-off dates in IssueTicket();
+    // TM1.45/TSA /20191202 CASE 374620 Fixed eTicket Status due to Stakeholder notification
+    // TM1.45/TSA /20191204 CASE 380754 Waiting List adoption
+    // TM1.45/TSA /20191216 CASE 382535 Added assignment of Admission Inclusion when request is created
+    // TM1.45/TSA /20200121 CASE 382535 Had to refactor IssueTicket() function break it down in smaller reusable units
 
 
     trigger OnRun()
@@ -82,6 +88,10 @@ codeunit 6060119 "TM Ticket Request Manager"
         MAX_TO_REVOKE: Label 'Maximum number of tickets to revoke is %1.';
         MISSING_RECIPIENT: Label '%1 is blank.';
         NOT_ETICKET: Label '%1 has no %2 marked for %3 in %4.';
+        SALES_NOT_STARTED_1200: Label 'Ticket sales does not start until %1 for %2 using ticket item %3 %4.';
+        SALES_STOPPED_1201: Label 'Ticket sales ended at %1 for %2 using ticket item %3 %4.';
+        WAITINGLIST_REQUIRED_1202: Label 'Waitinglist reference code is required to book a ticket for this time schedule.';
+        WAITINGLIST_FAULT_1203: Label 'A problem redeeming the waiting list reference code.';
 
     procedure LockResources()
     var
@@ -138,7 +148,12 @@ codeunit 6060119 "TM Ticket Request Manager"
 
         TicketReservationRequest.SetCurrentKey ("Session Token ID");
         TicketReservationRequest.SetFilter ("Session Token ID", '=%1', Token);
-        TicketReservationRequest.SetFilter ("Request Status", '<>%1', TicketReservationRequest."Request Status"::RESERVED);
+
+        //-TM1.45 [380754]
+        // TicketReservationRequest.SETFILTER ("Request Status", '<>%1', TicketReservationRequest."Request Status"::RESERVED);
+        TicketReservationRequest.SetFilter ("Request Status", '<>%1 & <>%2', TicketReservationRequest."Request Status"::RESERVED, TicketReservationRequest."Request Status"::WAITINGLIST);
+        //+TM1.45 [380754]
+
         if (TicketReservationRequest.FindSet (true, false)) then begin
 
           if (TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::CONFIRMED) then
@@ -146,6 +161,7 @@ codeunit 6060119 "TM Ticket Request Manager"
 
           repeat
             Ticket.SetFilter ("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+
             if (Ticket.FindSet (true, true)) then begin
               repeat
                 Ticket.Delete ();
@@ -201,24 +217,49 @@ codeunit 6060119 "TM Ticket Request Manager"
     end;
 
     procedure IssueTicketFromReservation(TicketReservationRequest: Record "TM Ticket Reservation Request";FailWithError: Boolean;var ResponseMessage: Text) ResponseCode: Integer
+    var
+        Ticket: Record "TM Ticket";
     begin
 
         TicketReservationRequest.Get (TicketReservationRequest."Entry No.");
         if (TicketReservationRequest."Admission Created") then
           exit (0);
 
-        with TicketReservationRequest do begin
-          //-TM1.43 [368043]
-          // IF (NOT TranslateBarcodeToItemVariant ("External Item Code", ItemNo, VariantCode, ResolvingTable)) THEN
-          //   ERROR (ITEM_NOT_FOUND, "External Item Code");
+        //-TM1.45 [382535] refactored
+        // WITH TicketReservationRequest DO BEGIN
+        //  //-TM1.43 [368043]
+        //  // IF (NOT TranslateBarcodeToItemVariant ("External Item Code", ItemNo, VariantCode, ResolvingTable)) THEN
+        //  //   ERROR (ITEM_NOT_FOUND, "External Item Code");
+        //
+        //  // ResponseCode := IssueTicket (ItemNo, VariantCode, Quantity, "Entry No.", FailWithError, ResponseMessage);
+        //
+        //  ResponseCode := IssueTicketOriginal ("Item No.", "Variant Code", Quantity, "Entry No.", FailWithError, ResponseMessage);
+        //  //+TM1.43 [368043]
+        // END;
 
-          // ResponseCode := IssueTicket (ItemNo, VariantCode, Quantity, "Entry No.", FailWithError, ResponseMessage);
-          ResponseCode := IssueTicket ("Item No.", "Variant Code", Quantity, "Entry No.", FailWithError, ResponseMessage);
-          //+TM1.43 [368043]
+        with TicketReservationRequest do begin
+
+          //IF (TicketReservationRequest."Request Status" <> TicketReservationRequest."Request Status"::CONFIRMED) THEN
+            ResponseCode := IssueTicketOriginal ("Item No.","Variant Code", Quantity, "Entry No.", FailWithError, ResponseMessage);
+
+        //  IF (TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::CONFIRMED) THEN BEGIN
+        //    Ticket.SETFILTER ("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+        //    IF (Ticket.FINDSET ()) THEN BEGIN
+        //      REPEAT
+        //
+        //        ResponseCode := _IssueAdmissionsAppendToTicket (Ticket, 1, TicketReservationRequest, FailWithError, ResponseMessage);
+        //        IF (ResponseCode <> 0) THEN
+        //          EXIT (ResponseCode);
+        //
+        //      UNTIL (Ticket.NEXT () = 0);
+        //    END;
+        //  END;
+
         end;
+        //+TM1.45 [382535]
     end;
 
-    local procedure IssueTicket(ItemNo: Code[20];VariantCode: Code[10];Quantity: Integer;RequestEntryNo: Integer;FailWithError: Boolean;var ResponseMessage: Text) ResponseCode: Integer
+    local procedure IssueTicketOriginal(ItemNo: Code[20];VariantCode: Code[10];Quantity: Integer;RequestEntryNo: Integer;FailWithError: Boolean;var ResponseMessage: Text) ResponseCode: Integer
     var
         Item: Record Item;
         TicketType: Record "TM Ticket Type";
@@ -239,6 +280,8 @@ codeunit 6060119 "TM Ticket Request Manager"
         HighDate: Date;
         UserSetup: Record "User Setup";
         Window: Dialog;
+        WaitingListReferenceCode: Code[10];
+        CreateAdmission: Boolean;
     begin
 
         Item.Get (ItemNo);
@@ -301,22 +344,37 @@ codeunit 6060119 "TM Ticket Request Manager"
           TicketManagement.SetTicketProperties (Ticket, TicketValidDate);
           Ticket.Insert(true);
 
+
           // Create Ticket Content
           TicketBom.SetFilter ("Item No.", '=%1', ItemNo);
           TicketBom.SetFilter ("Variant Code", '=%1', VariantCode);
           if (TicketBom.FindSet ()) then begin
+
+            //-TM1.45 [378212]
+            ResponseCode := CheckTicketBomSalesDateLimit (FailWithError, TicketBom, Quantity, Today, ResponseMessage);
+            if (ResponseCode <> 0) then begin
+              if (FailWithError) then
+                Error (ResponseMessage);
+              exit (ResponseCode);
+            end;
+            //+TM1.45 [378212]
 
             //-TM1.23 [285079]
             ReservationRequest."Primary Request Line" := true;
             //+TM1.23 [285079]
 
             // this is the request we are working with, which may or may not be correct regarding the admission code...
-            ReservationRequest."Admission Created" := true;
+            //-TM1.45 [382535]
+            // ReservationRequest."Admission Created" := TRUE;
+            ReservationRequest."Admission Created" := (ReservationRequest."Admission Inclusion" <> ReservationRequest."Admission Inclusion"::NOT_SELECTED);
+            CreateAdmission := ReservationRequest."Admission Created";
+            //-TM1.45 [382535]
+
             ReservationRequest."Request Status" := ReservationRequest."Request Status"::REGISTERED;
             ReservationRequest."Expires Date Time" := CurrentDateTime + 1500 * 1000;
             ReservationRequest.Modify ();
 
-            repeat
+            repeat // Ticket BOM
               Clear (AdmissionSchEntry);
               TicketValidDate := Today;
 
@@ -336,38 +394,42 @@ codeunit 6060119 "TM Ticket Request Manager"
               ReservationRequest2.SetFilter ("Admission Code", '=%1', TicketBom."Admission Code");
               if (ReservationRequest2.FindFirst ()) then begin
 
+                WaitingListReferenceCode := ReservationRequest2."Waiting List Reference Code"; //-+TM1.45 [380754]
+
                 if (ReservationRequest2."External Adm. Sch. Entry No." <> 0) then begin
                   AdmissionSchEntry.SetFilter ("External Schedule Entry No.", '=%1', ReservationRequest2."External Adm. Sch. Entry No.");
-                  //-#316122 [316122]
                   AdmissionSchEntry.SetFilter (Cancelled, '=%1', false);
-                  //+#316122 [316122]
                   if (AdmissionSchEntry.FindFirst ()) then begin
 
-                    //-TM1.20 [270164]
                     if (AdmissionSchEntry."Admission Code" <> TicketBom."Admission Code") then
                       Error (WRONG_SCH_ENTRY, ReservationRequest2."External Adm. Sch. Entry No.", TicketBom."Admission Code");
-                    //-TM1.20 [270164]
 
                     TicketValidDate := AdmissionSchEntry."Admission Start Date";
                   end;
                 end;
 
-                ReservationRequest2."Admission Created" := true;
+                //-TM1.45 [382535]
+                //ReservationRequest2."Admission Created" := TRUE;
+                ReservationRequest2."Admission Created" := (ReservationRequest2."Admission Inclusion" <> ReservationRequest2."Admission Inclusion"::NOT_SELECTED);
+                CreateAdmission := ReservationRequest2."Admission Created";
+                //-TM1.45 [382535]
                 ReservationRequest2."Request Status" := ReservationRequest."Request Status"::REGISTERED;
                 ReservationRequest2."Expires Date Time" := CurrentDateTime + 1500 * 1000;
                 ReservationRequest2.Modify ();
 
               end else begin
-                //-TM1.20 [270164]
-                if (ReservationRequest."Admission Code" <> '') then
-                  TicketBom2.Get (Ticket."Item No.", Ticket."Variant Code", ReservationRequest."Admission Code");
+
+                //-TM1.45 [380754]
+                WaitingListReferenceCode := ReservationRequest."Waiting List Reference Code";
+
+                //IF (ReservationRequest."Admission Code" <> '') THEN
+                //  TicketBom2.GET (Ticket."Item No.", Ticket."Variant Code", ReservationRequest."Admission Code");
+                //+TM1.45 [380754]
 
                 if (ReservationRequest."External Adm. Sch. Entry No." <> 0) then begin
 
                   AdmissionSchEntry.SetFilter ("External Schedule Entry No.", '=%1', ReservationRequest."External Adm. Sch. Entry No.");
-                  //-#316122 [316122]
                   AdmissionSchEntry.SetFilter (Cancelled, '=%1', false);
-                  //+#316122 [316122]
                   if (not AdmissionSchEntry.FindFirst ()) then
                     Error (INVALID_SCH_ENTRY, ReservationRequest."External Adm. Sch. Entry No.");
 
@@ -380,8 +442,6 @@ codeunit 6060119 "TM Ticket Request Manager"
                     Clear (AdmissionSchEntry);
                   end;
                 end;
-                //+TM1.20 [270164]
-
               end;
 
               TicketBom2.Get (Ticket."Item No.", Ticket."Variant Code", Admission."Admission Code");
@@ -389,7 +449,20 @@ codeunit 6060119 "TM Ticket Request Manager"
               if (Quantity < 0) then
                 TicketQuantity := Abs (TicketQuantity) * -1;
 
-              ResponseCode := TicketManagement.CreateAdmissionAccessEntry (FailWithError, Ticket, TicketQuantity * TicketBom2.Quantity, TicketBom2."Admission Code", AdmissionSchEntry, ResponseMessage);
+              //-TM1.45 [380754]
+              if (i = 1) then begin
+                ResponseCode := ValidateWaitingListReferenceCode (FailWithError, WaitingListReferenceCode, Admission."Admission Code", AdmissionSchEntry, ResponseMessage);
+                if (ResponseCode <> 0) then
+                  exit (ResponseCode);
+              end;
+              //+TM1.45 [380754]
+
+              //-TM1.45 [382535]
+              // ResponseCode := TicketManagement.CreateAdmissionAccessEntry (FailWithError, Ticket, TicketQuantity * TicketBom2.Quantity, TicketBom2."Admission Code", AdmissionSchEntry, ResponseMessage);
+              ResponseCode := 0;
+              if (CreateAdmission) then
+                ResponseCode := TicketManagement.CreateAdmissionAccessEntry (FailWithError, Ticket, TicketQuantity * TicketBom2.Quantity, TicketBom2."Admission Code", AdmissionSchEntry, ResponseMessage);
+              //+TM1.45 [382535]
 
               if (ResponseCode <> 0) then begin
                 if (GetShowProgressBar()) then
@@ -420,6 +493,318 @@ codeunit 6060119 "TM Ticket Request Manager"
 
         if (GetShowProgressBar()) then
           Window.Close ();
+    end;
+
+    local procedure _IssueNewTickets(ItemNo: Code[20];VariantCode: Code[10];Quantity: Integer;RequestEntryNo: Integer;FailWithError: Boolean;var ResponseMessage: Text) ResponseCode: Integer
+    var
+        Item: Record Item;
+        TicketType: Record "TM Ticket Type";
+        Ticket: Record "TM Ticket";
+        AdmissionSchEntry: Record "TM Admission Schedule Entry";
+        ReservationRequest: Record "TM Ticket Reservation Request";
+        ReservationRequest2: Record "TM Ticket Reservation Request";
+        TicketBom: Record "TM Ticket Admission BOM";
+        TicketBom2: Record "TM Ticket Admission BOM";
+        Admission: Record "TM Admission";
+        TicketAccessEntry: Record "TM Ticket Access Entry";
+        TicketManagement: Codeunit "TM Ticket Management";
+        NumberOfTickets: Integer;
+        TicketQuantity: Integer;
+        i: Integer;
+        TicketValidDate: Date;
+        LowDate: Date;
+        HighDate: Date;
+        UserSetup: Record "User Setup";
+        Window: Dialog;
+        WaitingListReferenceCode: Code[10];
+        CreateAdmission: Boolean;
+    begin
+
+        //-TM1.45 [382535] - refactored
+        Item.Get (ItemNo);
+        if (not TicketType.Get(Item."Ticket Type")) then begin
+          ResponseMessage := StrSubstNo (NOT_TICKET_ITEM, ItemNo, Item.FieldCaption ("Ticket Type"), Item."Ticket Type");
+          Error (ResponseMessage);
+        end;
+
+        if ((not TicketType."Is Ticket") or (TicketType.Code = '')) then begin
+          ResponseMessage := StrSubstNo (NOT_TICKET_ITEM, ItemNo, Item.FieldCaption ("Ticket Type"), Item."Ticket Type");
+          Error (ResponseMessage);
+        end;
+
+        //-TM1.26 [295263]
+        TicketBom.SetFilter ("Item No.", '=%1', ItemNo);
+        TicketBom.SetFilter ("Variant Code", '=%1', VariantCode);
+        if (TicketBom.IsEmpty ()) then begin
+          ResponseMessage := StrSubstNo (NO_TICKET_BOM, TicketBom.TableCaption, TicketBom.GetFilters);
+          Error (ResponseMessage);
+        end;
+        TicketBom.Reset ();
+        //+TM1.26 [295263]
+
+        TicketQuantity := Quantity;
+        NumberOfTickets := Quantity;
+
+        if (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP) then
+          NumberOfTickets := 1;
+
+        if (TicketType."Admission Registration" = TicketType."Admission Registration"::INDIVIDUAL) then
+          TicketQuantity := 1;
+
+        if (Quantity < 0) then
+          TicketQuantity := Abs (TicketQuantity) * -1;
+
+        ReservationRequest.Get (RequestEntryNo);
+        if (ReservationRequest."Revoke Ticket Request") then
+          exit;
+
+        if (GetShowProgressBar()) then
+          Window.Open ('Creating tickets... @1@@@@@@@@@@@@@');
+
+        ReservationRequest."Primary Request Line" := true;
+        ReservationRequest."Admission Created" := true;
+        ReservationRequest."Request Status" := ReservationRequest."Request Status"::REGISTERED;
+        ReservationRequest."Expires Date Time" := CurrentDateTime + 1500 * 1000;
+        ReservationRequest.Modify ();
+
+        for i := 1 to Abs (NumberOfTickets) do begin
+
+          ResponseCode := _IssueOneTicket (ItemNo, VariantCode, TicketQuantity, TicketType, ReservationRequest, FailWithError, ResponseMessage);
+          if (ResponseCode <> 0) then begin
+            if (GetShowProgressBar()) then
+              Window.Close ();
+            exit (ResponseCode);
+          end;
+
+          if (GetShowProgressBar()) then
+            if (i mod 10 = 0) then
+              Window.Update (1, Round (i / NumberOfTickets * 10000, 1));
+
+        end;
+
+        if (GetShowProgressBar()) then
+          Window.Close ();
+        //+TM1.45 [382535]
+    end;
+
+    local procedure _IssueOneTicket(ItemNo: Code[20];VariantCode: Code[10];QuantityPerTicket: Integer;TicketType: Record "TM Ticket Type";ReservationRequest: Record "TM Ticket Reservation Request";FailWithError: Boolean;var ResponseMessage: Text) ResponseCode: Integer
+    var
+        Ticket: Record "TM Ticket";
+        TicketBom: Record "TM Ticket Admission BOM";
+        TicketAccessEntry: Record "TM Ticket Access Entry";
+        TicketManagement: Codeunit "TM Ticket Management";
+        LowDate: Date;
+        HighDate: Date;
+        UserSetup: Record "User Setup";
+    begin
+
+        //-TM1.45 [382535] - refactored
+        Ticket.Init;
+        Ticket."No."               := '';
+        Ticket."No. Series"        := TicketType."No. Series";
+        Ticket."Ticket Type Code"  := TicketType.Code;
+        Ticket."Item No."          := ItemNo;
+        Ticket."Variant Code"      := VariantCode;
+        Ticket."Customer No."      := ReservationRequest."Customer No.";
+        Ticket."Ticket Reservation Entry No." := ReservationRequest."Entry No.";
+        Ticket."External Member Card No." := ReservationRequest."External Member No.";
+        Ticket."Sales Receipt No." := ReservationRequest."Receipt No.";
+        Ticket."Line No." := ReservationRequest."Line No.";
+
+        if (UserSetup.Get (CopyStr (UserId, 1, MaxStrLen (UserSetup."User ID")))) then
+          Ticket."Salesperson Code" := UserSetup."Salespers./Purch. Code";
+
+        if (Ticket."Salesperson Code" = '') then
+          Ticket."Salesperson Code" := CopyStr (UserId, 1, MaxStrLen (Ticket."Salesperson Code"));
+
+        TicketManagement.SetTicketProperties (Ticket, Today);
+        Ticket.Insert(true);
+
+        ResponseCode := _IssueAdmissionsAppendToTicket (Ticket, QuantityPerTicket, ReservationRequest, FailWithError, ResponseMessage);
+
+        // Update ticket valid from / to dates based on contents
+        if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
+          TicketAccessEntry.SetFilter ("Ticket No.", '=%1', Ticket."No.");
+          if (TicketAccessEntry.FindSet ()) then begin
+            repeat
+              TicketManagement.GetTicketAccessEntryValidDateBoundery (Ticket, LowDate, HighDate);
+              Ticket."Valid From Date" := LowDate;
+              Ticket."Valid To Date" := HighDate;
+              Ticket.Modify ();
+            until (TicketAccessEntry.Next () = 0);
+          end;
+        end;
+        //+TM1.45 [382535]
+    end;
+
+    local procedure _IssueAdmissionsAppendToTicket(Ticket: Record "TM Ticket";QuantityPerTicket: Integer;ReservationRequest: Record "TM Ticket Reservation Request";FailWithError: Boolean;var ResponseMessage: Text) ResponseCode: Integer
+    var
+        TicketBom: Record "TM Ticket Admission BOM";
+    begin
+
+        //-TM1.45 [382535] - refactored
+        // Create Ticket Content
+        TicketBom.SetFilter ("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.SetFilter ("Variant Code", '=%1', Ticket."Variant Code" );
+        if (TicketBom.FindSet ()) then begin
+
+          ResponseCode := CheckTicketBomSalesDateLimit (FailWithError, TicketBom, QuantityPerTicket, Today, ResponseMessage);
+          if (ResponseCode <> 0) then begin
+            if (FailWithError) then
+              Error (ResponseMessage);
+            exit (ResponseCode);
+          end;
+
+          repeat
+            ResponseCode := _IssueOneAdmission (FailWithError, ReservationRequest, Ticket, TicketBom."Admission Code", QuantityPerTicket, true, ResponseMessage);
+            if (ResponseCode <> 0) then
+              exit (ResponseCode);
+
+          until (TicketBom.Next () = 0);
+        end;
+        //+TM1.45 [382535]
+    end;
+
+    local procedure _IssueOneAdmission(FailWithError: Boolean;SourceRequest: Record "TM Ticket Reservation Request";Ticket: Record "TM Ticket";AdmissionCode: Code[20];QuantityPerTicket: Integer;ValidateWaitinglistReference: Boolean;var ResponseMessage: Text) ResponseCode: Integer
+    var
+        AdmissionSchEntry: Record "TM Admission Schedule Entry";
+        ReservationRequest: Record "TM Ticket Reservation Request";
+        TicketBom: Record "TM Ticket Admission BOM";
+        Admission: Record "TM Admission";
+        TicketManagement: Codeunit "TM Ticket Management";
+        WaitingListReferenceCode: Code[10];
+        CreateAdmission: Boolean;
+    begin
+
+        //-TM1.45 [382535] refactored and cleanup
+        Clear (AdmissionSchEntry);
+
+        Admission.Get (AdmissionCode);
+        TicketBom.Get (Ticket."Item No.", Ticket."Variant Code", AdmissionCode);
+        CreateAdmission := (TicketBom."Admission Inclusion" <> TicketBom."Admission Inclusion"::NOT_SELECTED);
+
+        // Lets see if there is a specific request for the admission code, then it might carry some additional scheduling information
+        ReservationRequest.SetCurrentKey ("Session Token ID");
+        ReservationRequest.SetFilter ("Session Token ID", '=%1', SourceRequest."Session Token ID");
+        ReservationRequest.SetFilter ("Ext. Line Reference No.", '=%1', SourceRequest."Ext. Line Reference No.");
+        ReservationRequest.SetFilter ("Item No.", '=%1', Ticket."Item No.");
+        ReservationRequest.SetFilter ("Variant Code", '=%1', Ticket."Variant Code");
+        ReservationRequest.SetFilter ("Admission Code", '=%1', AdmissionCode);
+        if (ReservationRequest.FindFirst ()) then begin
+
+          WaitingListReferenceCode := ReservationRequest."Waiting List Reference Code";
+
+          // Does the request carry schedule info for this admission?
+          if (ReservationRequest."External Adm. Sch. Entry No." <> 0) then begin
+            AdmissionSchEntry.SetFilter ("External Schedule Entry No.", '=%1', ReservationRequest."External Adm. Sch. Entry No.");
+            AdmissionSchEntry.SetFilter (Cancelled, '=%1', false);
+            if (AdmissionSchEntry.FindFirst ()) then begin
+
+              if (AdmissionSchEntry."Admission Code" <> AdmissionCode) then
+                Error (WRONG_SCH_ENTRY, ReservationRequest."External Adm. Sch. Entry No.", AdmissionCode);
+
+            end;
+          end;
+
+          ReservationRequest."Admission Created" := (ReservationRequest."Admission Inclusion" <> ReservationRequest."Admission Inclusion"::NOT_SELECTED);
+          CreateAdmission := ReservationRequest."Admission Created";
+          ReservationRequest."Request Status" := ReservationRequest."Request Status"::REGISTERED;
+          ReservationRequest."Expires Date Time" := CurrentDateTime + 1500 * 1000;
+          ReservationRequest.Modify ();
+
+        end else begin
+
+          WaitingListReferenceCode := SourceRequest."Waiting List Reference Code";
+
+          // Does the source requests schedule info apply to this admission?
+          if (SourceRequest."External Adm. Sch. Entry No." <> 0) then begin
+            AdmissionSchEntry.SetFilter ("External Schedule Entry No.", '=%1', SourceRequest."External Adm. Sch. Entry No.");
+            AdmissionSchEntry.SetFilter (Cancelled, '=%1', false);
+            if (not AdmissionSchEntry.FindFirst ()) then
+              Error (INVALID_SCH_ENTRY, SourceRequest."External Adm. Sch. Entry No.");
+
+            if (AdmissionSchEntry."Admission Code" <> AdmissionCode) then
+              Clear (AdmissionSchEntry); // Schedule Entry is not for this admission
+
+          end;
+        end;
+
+        if (not CreateAdmission) then
+          exit (0);
+
+        if (ValidateWaitinglistReference) then begin
+          ResponseCode := ValidateWaitingListReferenceCode (FailWithError, WaitingListReferenceCode, Admission."Admission Code", AdmissionSchEntry, ResponseMessage);
+          if (ResponseCode <> 0) then
+            exit (ResponseCode);
+        end;
+
+        ResponseCode := TicketManagement.CreateAdmissionAccessEntry (FailWithError, Ticket, QuantityPerTicket * TicketBom.Quantity, AdmissionCode, AdmissionSchEntry, ResponseMessage);
+
+        exit (ResponseCode);
+        //+TM1.45 [382535]
+    end;
+
+    local procedure ValidateWaitingListReferenceCode(FailWithError: Boolean;WaitingListReferenceCode: Code[10];AdmissionCode: Code[20];var AdmissionSchEntry: Record "TM Admission Schedule Entry";var ResponseMessage: Text) ResponseCode: Integer
+    var
+        AdmissionSchEntryWaitingList: Record "TM Admission Schedule Entry";
+        TicketWaitingList: Record "TM Ticket Waiting List";
+        TicketManagement: Codeunit "TM Ticket Management";
+        TicketWaitingListMgr: Codeunit "TM Ticket Waiting List Mgr.";
+    begin
+
+        //-TM1.45 [380754]
+        if (AdmissionSchEntry."Entry No." <= 0) then
+          if (not AdmissionSchEntry.Get (TicketManagement.GetCurrentScheduleEntry (AdmissionCode, false))) then
+            exit (0); // No default schedule - let someone else worry about that
+
+        if (AdmissionSchEntry."Allocation By" = AdmissionSchEntry."Allocation By"::CAPACITY) then
+          exit (0); // Normal
+
+        if (WaitingListReferenceCode = '') then begin
+          ResponseCode := -1202;
+          ResponseMessage := StrSubstNo ('[%1] - %2', ResponseCode, WAITINGLIST_REQUIRED_1202);
+          if (FailWithError) then
+            Error (ResponseMessage);
+          exit (ResponseCode);
+        end;
+
+        if (not TicketWaitingListMgr.GetWaitingListAdmSchEntry (WaitingListReferenceCode, CreateDateTime (Today, Time), true, AdmissionSchEntryWaitingList, TicketWaitingList, ResponseMessage)) then begin
+          if (FailWithError) then
+            Error (ResponseMessage);
+          // WAITINGLIST_FAULT_1203
+          exit (-1203);
+        end;
+
+        exit (0); // OK
+        //+TM1.45 [380754]
+    end;
+
+    local procedure CheckTicketBomSalesDateLimit(FailWithError: Boolean;TicketBom: Record "TM Ticket Admission BOM";Quantity: Integer;ReferenceDate: Date;var ResponseMessage: Text) ResponseCode: Integer
+    begin
+
+        //+TM1.45 [378212]
+        if ((TicketBom.Default) and (Quantity > 0)) then begin
+
+          if ((TicketBom."Sales From Date" <> 0D) and (ReferenceDate < TicketBom."Sales From Date")) then begin
+            ResponseMessage := StrSubstNo (SALES_NOT_STARTED_1200, TicketBom."Sales From Date", TicketBom."Admission Code", TicketBom."Item No.", TicketBom."Variant Code");
+            if (FailWithError) then
+              Error (ResponseMessage);
+            ResponseCode := -1200;
+            exit (ResponseCode);
+          end;
+
+          if ((TicketBom."Sales Until Date" <> 0D) and (ReferenceDate > TicketBom."Sales Until Date")) then begin
+            ResponseMessage := StrSubstNo (SALES_STOPPED_1201, TicketBom."Sales Until Date", TicketBom."Admission Code", TicketBom."Item No.", TicketBom."Variant Code");
+            if (FailWithError) then
+              Error (ResponseMessage);
+            ResponseCode := -1201;
+            exit (ResponseCode);
+          end;
+
+        end;
+
+        exit (0);
+        //+TM1.45 [378212]
     end;
 
     procedure FinalizePayment(Token: Text[100])
@@ -830,6 +1215,7 @@ codeunit 6060119 "TM Ticket Request Manager"
     var
         ReservationRequest: Record "TM Ticket Reservation Request";
         Admission: Record "TM Admission";
+        TicketAdmissionBOM: Record "TM Ticket Admission BOM";
         TicketManagement: Codeunit "TM Ticket Management";
         AdmSchEntry: Record "TM Admission Schedule Entry";
     begin
@@ -845,6 +1231,11 @@ codeunit 6060119 "TM Ticket Request Manager"
         ReservationRequest."Admission Code" := AdmissionCode;
         ReservationRequest."Receipt No." := SalesReceiptNo;
         ReservationRequest."Line No." := SalesLineNo;
+
+        //-TM1.45 [382535]
+        TicketAdmissionBOM.Get (ItemNo, VariantCode, AdmissionCode);
+        ReservationRequest."Admission Inclusion" := TicketAdmissionBOM."Admission Inclusion";
+        //-TM1.45 [382535]
 
         ReservationRequest."External Item Code" := GetExternalNo (ItemNo, VariantCode);
         //-TM1.43 [368043]
@@ -1565,6 +1956,7 @@ codeunit 6060119 "TM Ticket Request Manager"
     begin
 
         TicketNotificationEntry.SetFilter ("Ticket No.", '=%1', TicketNo);
+        TicketNotificationEntry.SetFilter ("Notification Trigger", '=%1', TicketNotificationEntry."Notification Trigger"::ETICKET_CREATE);
         if (TicketNotificationEntry.IsEmpty ()) then
           exit (false);
 
@@ -1580,6 +1972,14 @@ codeunit 6060119 "TM Ticket Request Manager"
 
         TicketNotificationEntry."Entry No." := 0;
         TicketNotificationEntry."Notification Send Status" := TicketNotificationEntry."Notification Send Status"::PENDING;
+
+        //-TM1.45 [374620]
+        case VoidETicket of
+          true : TicketNotificationEntry."Ticket Trigger Type" := TicketNotificationEntry."Ticket Trigger Type"::CANCEL_RESERVE;
+          false: TicketNotificationEntry."Ticket Trigger Type" := TicketNotificationEntry."Ticket Trigger Type"::RESERVE;
+        end;
+        //+TM1.45 [374620]
+
         TicketNotificationEntry.Insert ();
 
         //-TM1.39 [310057]
@@ -1654,6 +2054,8 @@ codeunit 6060119 "TM Ticket Request Manager"
         TicketAccessEntry: Record "TM Ticket Access Entry";
         DetTicketAccessEntry: Record "TM Det. Ticket Access Entry";
         AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
+        SeatingReservationEntry: Record "TM Seating Reservation Entry";
+        SeatingTemplate: Record "TM Seating Template";
     begin
 
         TicketNotificationEntry.Init;
@@ -1775,19 +2177,12 @@ codeunit 6060119 "TM Ticket Request Manager"
             if (Admission2.Get (Admission."Location Admission Code")) then
               TicketNotificationEntry."Adm. Location Description" := Admission2.Description;
 
-          TicketAccessEntry.SetFilter ("Ticket No.", '=%1', Ticket."No.");
-          TicketAccessEntry.SetFilter ("Admission Code", '=%1', TicketAdmissionBOM."Admission Code");
-          if (TicketAccessEntry.FindFirst ()) then begin
-
-            TicketNotificationEntry."Quantity To Admit" := TicketAccessEntry.Quantity;
-
-            DetTicketAccessEntry.SetFilter ("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
-            DetTicketAccessEntry.SetFilter (Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
-            if (DetTicketAccessEntry.IsEmpty ()) then
-              DetTicketAccessEntry.SetFilter (Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
-
-            if (DetTicketAccessEntry.FindFirst ()) then begin
-              AdmissionScheduleEntry.SetFilter ("External Schedule Entry No.", '=%1', DetTicketAccessEntry."External Adm. Sch. Entry No.");
+          //-TM1.45 [322432]
+          if (Admission."Capacity Control" = Admission."Capacity Control"::SEATING) then begin
+            SeatingReservationEntry.SetFilter ("Ticket Token", '=%1', TicketNotificationEntry."Ticket Token");
+            SeatingReservationEntry.SetFilter ("Admission Code", '=%1', TicketNotificationEntry."Admission Code");
+            if (SeatingReservationEntry.FindSet ()) then begin
+              AdmissionScheduleEntry.SetFilter ("External Schedule Entry No.", '=%1', SeatingReservationEntry."External Schedule Entry No.");
               AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
               if (AdmissionScheduleEntry.FindFirst ()) then begin
                 TicketNotificationEntry."Event Start Date" := AdmissionScheduleEntry."Admission Start Date";
@@ -1795,13 +2190,57 @@ codeunit 6060119 "TM Ticket Request Manager"
                 TicketNotificationEntry."Relevant Date" := AdmissionScheduleEntry."Admission Start Date";
                 TicketNotificationEntry."Relevant Time" := AdmissionScheduleEntry."Event Arrival From Time";
               end;
+              TicketNotificationEntry."Quantity To Admit" := 1;
+              repeat
+                SeatingTemplate.SetFilter ("Admission Code", '=%1', TicketNotificationEntry."Admission Code");
+                SeatingTemplate.SetFilter (ElementId, '=%1', SeatingReservationEntry.ElementId);
+                if (SeatingTemplate.FindFirst ()) then begin
+                  TicketNotificationEntry.Seat := SeatingTemplate.Description;
+                  if (SeatingTemplate.Get (SeatingTemplate."Parent Entry No.")) then begin
+                    TicketNotificationEntry.Row := SeatingTemplate.Description;
+                    if (SeatingTemplate.Get (SeatingTemplate."Parent Entry No.")) then begin
+                      TicketNotificationEntry.Section := SeatingTemplate.Description;
+                    end;
+                  end;
+                end;
+                TicketNotificationEntry."Entry No." := 0;
+                TicketNotificationEntry.Insert ();
+                TmpNotificationsCreated.TransferFields (TicketNotificationEntry, true);
+                TmpNotificationsCreated.Insert ();
+              until (SeatingReservationEntry.Next () = 0);
             end;
-
           end;
+          //+TM1.45 [322432]
 
-          TicketNotificationEntry.Insert ();
-          TmpNotificationsCreated.TransferFields (TicketNotificationEntry, true);
-          TmpNotificationsCreated.Insert ();
+          if (Admission."Capacity Control" <> Admission."Capacity Control"::SEATING) then begin //-+TM1.45 [322432]
+            TicketAccessEntry.SetFilter ("Ticket No.", '=%1', Ticket."No.");
+            TicketAccessEntry.SetFilter ("Admission Code", '=%1', TicketAdmissionBOM."Admission Code");
+            if (TicketAccessEntry.FindFirst ()) then begin
+
+              TicketNotificationEntry."Quantity To Admit" := TicketAccessEntry.Quantity;
+
+              DetTicketAccessEntry.SetFilter ("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+              DetTicketAccessEntry.SetFilter (Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
+              if (DetTicketAccessEntry.IsEmpty ()) then
+                DetTicketAccessEntry.SetFilter (Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+
+              if (DetTicketAccessEntry.FindFirst ()) then begin
+                AdmissionScheduleEntry.SetFilter ("External Schedule Entry No.", '=%1', DetTicketAccessEntry."External Adm. Sch. Entry No.");
+                AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
+                if (AdmissionScheduleEntry.FindFirst ()) then begin
+                  TicketNotificationEntry."Event Start Date" := AdmissionScheduleEntry."Admission Start Date";
+                  TicketNotificationEntry."Event Start Time" := AdmissionScheduleEntry."Admission Start Time";
+                  TicketNotificationEntry."Relevant Date" := AdmissionScheduleEntry."Admission Start Date";
+                  TicketNotificationEntry."Relevant Time" := AdmissionScheduleEntry."Event Arrival From Time";
+                end;
+              end;
+
+            end;
+            TicketNotificationEntry."Entry No." := 0; //-+TM1.45 [322432]
+            TicketNotificationEntry.Insert ();
+            TmpNotificationsCreated.TransferFields (TicketNotificationEntry, true);
+            TmpNotificationsCreated.Insert ();
+          end; //-+TM1.45 [322432]
 
         until (TicketAdmissionBOM.Next () = 0);
 

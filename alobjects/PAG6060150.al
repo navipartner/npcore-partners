@@ -30,6 +30,7 @@ page 6060150 "Event Card"
     //                                   Total Amount OnDrillDown trigger customized
     // NPR5.49/TJ  /20190218 CASE 345047 Added field Language Code
     // NPR5.49/TJ  /20190318 CASE 346693 Added action Sales Documents
+    // NPR5.53/TJ  /20191119 CASE 374886 All controls are editable per setup based on Locked field
 
     Caption = 'Event Card';
     PageType = Card;
@@ -47,6 +48,7 @@ page 6060150 "Event Card"
                 Caption = 'General';
                 field("No.";"No.")
                 {
+                    Editable = GlobalEditable;
 
                     trigger OnAssistEdit()
                     begin
@@ -56,47 +58,61 @@ page 6060150 "Event Card"
                 }
                 field("Event Status";"Event Status")
                 {
+                    Editable = GlobalEditable;
                 }
                 field(Description;Description)
                 {
+                    Editable = GlobalEditable;
                 }
                 field("Event Customer No.";"Event Customer No.")
                 {
+                    Editable = GlobalEditable;
                 }
                 field("Bill-to Contact No.";"Bill-to Contact No.")
                 {
+                    Editable = GlobalEditable;
                 }
                 field("Bill-to Name";"Bill-to Name")
                 {
+                    Editable = GlobalEditable;
                     Importance = Promoted;
                 }
                 field("Bill-to Address";"Bill-to Address")
                 {
+                    Editable = GlobalEditable;
                 }
                 field("Bill-to Address 2";"Bill-to Address 2")
                 {
+                    Editable = GlobalEditable;
                 }
                 field("Bill-to Post Code";"Bill-to Post Code")
                 {
+                    Editable = GlobalEditable;
                 }
                 field("Bill-to City";"Bill-to City")
                 {
+                    Editable = GlobalEditable;
                 }
                 field("Bill-to Country/Region Code";"Bill-to Country/Region Code")
                 {
+                    Editable = GlobalEditable;
                     Importance = Additional;
                 }
                 field("Bill-to Contact";"Bill-to Contact")
                 {
+                    Editable = GlobalEditable;
                 }
                 field("Bill-to E-Mail";"Bill-to E-Mail")
                 {
+                    Editable = GlobalEditable;
                 }
                 field("Search Description";"Search Description")
                 {
+                    Editable = GlobalEditable;
                 }
                 field("Person Responsible";"Person Responsible")
                 {
+                    Editable = GlobalEditable;
                     Importance = Promoted;
 
                     trigger OnValidate()
@@ -111,16 +127,20 @@ page 6060150 "Event Card"
                 }
                 field(Blocked;Blocked)
                 {
+                    Editable = GlobalEditable;
                 }
                 field("Organizer E-Mail";"Organizer E-Mail")
                 {
+                    Editable = GlobalEditable;
                     Importance = Additional;
                 }
                 field("Calendar Item Status";"Calendar Item Status")
                 {
+                    Editable = GlobalEditable;
                 }
                 field("Job Posting Group";"Job Posting Group")
                 {
+                    Editable = GlobalEditable;
                 }
                 field("Total Amount";"Total Amount")
                 {
@@ -140,7 +160,18 @@ page 6060150 "Event Card"
                 }
                 field("Language Code";"Language Code")
                 {
+                    Editable = GlobalEditable;
                     Importance = Additional;
+                }
+                field(Locked;Locked)
+                {
+
+                    trigger OnValidate()
+                    begin
+                        //-NPR5.53 [374886]
+                        SetGlobalEditable();
+                        //+NPR5.53 [374886]
+                    end;
                 }
                 group("Additional Information")
                 {
@@ -162,6 +193,7 @@ page 6060150 "Event Card"
             group("Promoted Attributes 1")
             {
                 Caption = 'Promoted Attributes 1';
+                Editable = GlobalEditable;
                 Visible = AttributeVisibleSet1;
                 grid(Control6014503)
                 {
@@ -588,6 +620,7 @@ page 6060150 "Event Card"
             group("Promoted Attributes 2")
             {
                 Caption = 'Promoted Attributes 2';
+                Editable = GlobalEditable;
                 Visible = AttributeVisibleSet2;
                 grid(Control6014513)
                 {
@@ -939,6 +972,7 @@ page 6060150 "Event Card"
             group(Duration)
             {
                 Caption = 'Duration';
+                Editable = GlobalEditable;
                 field("Preparation Period";"Preparation Period")
                 {
                 }
@@ -962,11 +996,13 @@ page 6060150 "Event Card"
             }
             part(Control6014400;"Event Planning Lines Subpage")
             {
+                Editable = GlobalEditable;
                 SubPageLink = "Job No."=FIELD("No.");
             }
             group("Foreign Trade")
             {
                 Caption = 'Foreign Trade';
+                Editable = GlobalEditable;
                 field("Currency Code";"Currency Code")
                 {
                     Editable = CurrencyCodeEditable;
@@ -1463,6 +1499,9 @@ page 6060150 "Event Card"
           AssignTemplateSetupToVariables(i);
         end;
         //+NPR5.33 [277972]
+        //-NPR5.53 [374886]
+        SetGlobalEditable();
+        //+NPR5.53 [374886]
     end;
 
     trigger OnInit()
@@ -1474,6 +1513,9 @@ page 6060150 "Event Card"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         "Event" := true;
+        //-NPR5.53 [374886]
+        SetGlobalEditable();
+        //+NPR5.53 [374886]
     end;
 
     var
@@ -1561,6 +1603,7 @@ page 6060150 "Event Card"
         EventAttributeTemplateName: array [2] of Code[20];
         EventTicketMgt: Codeunit "Event Ticket Management";
         EventEWSMgt: Codeunit "Event EWS Management";
+        GlobalEditable: Boolean;
 
     local procedure CurrencyCheck()
     begin
@@ -1780,6 +1823,13 @@ page 6060150 "Event Card"
     procedure GetArrayLen(Dimension: Integer): Integer
     begin
         exit(ArrayLen(AttributeValue,Dimension));
+    end;
+
+    local procedure SetGlobalEditable()
+    begin
+        //-NPR5.53 [374886]
+        GlobalEditable := not Locked;
+        //+NPR5.53 [374886]
     end;
 }
 

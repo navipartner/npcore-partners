@@ -17,6 +17,8 @@ codeunit 6060136 "MM Member Notification"
     // MM1.39/TSA /20190529 CASE 350968 Transfering of membership auto-renew settings to notification entry
     // MM1.41/TSA /20190917 CASE 368691 Refresh Notification excluded "auto-renew" entries
     // MM1.41/TSA /20191004 CASE 367471 Added invokation of sponsorship ticket notification
+    // MM1.42/TSA /20191128 CASE 378212 Added SELECTLATESTVERSION
+    // MM1.42/TSA /20191220 CASE 382728 Refactored usage of Member."Notification Method"
 
 
     trigger OnRun()
@@ -25,7 +27,6 @@ codeunit 6060136 "MM Member Notification"
     begin
 
         // Invoked by Task Queue when scheduled for background notifications
-
         HandleBatchNotifications (Today);
 
         //-#367935 [367935]
@@ -43,6 +44,10 @@ codeunit 6060136 "MM Member Notification"
     var
         MembershipNotification: Record "MM Membership Notification";
     begin
+
+        //-MM1.42 [378212]
+        SelectLatestVersion ();
+        //+MM1.42 [378212]
 
         MembershipNotification.SetCurrentKey ("Notification Status","Date To Notify");
         MembershipNotification.SetFilter ("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
@@ -179,6 +184,8 @@ codeunit 6060136 "MM Member Notification"
         MembershipSetup: Record "MM Membership Setup";
         MemberCommunity: Record "MM Member Community";
         NotificationSetup: Record "MM Member Notification Setup";
+        Method: Code[10];
+        Address: Text;
     begin
 
         NotificationSetup.Get (MembershipNotification."Notification Code");
@@ -267,13 +274,33 @@ codeunit 6060136 "MM Member Notification"
                 MemberNotificationEntry."Card Valid Until" := MemberNotificationEntry."Membership Valid Until";
               //+MM1.36 [328141]
 
-              case Member."Notification Method" of
-                Member."Notification Method"::EMAIL : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::EMAIL;
-                Member."Notification Method"::NONE :  MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::NONE;
-                Member."Notification Method"::MANUAL : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::MANUAL;
-                Member."Notification Method"::SMS : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::SMS;
-                else Error (NOT_IMPLEMENTED, Member.FieldCaption (Member."Notification Method"), Member."Notification Method");
-              end;
+              //-MM1.42 [382728]
+              //CASE Member."Notification Method" OF
+              //  Member."Notification Method"::EMAIL : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::EMAIL;
+              //  Member."Notification Method"::NONE :  MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::NONE;
+              //  Member."Notification Method"::MANUAL : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::MANUAL;
+              //  Member."Notification Method"::SMS : MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::SMS;
+              //  ELSE ERROR (NOT_IMPLEMENTED, Member.FIELDCAPTION (Member."Notification Method"), Member."Notification Method");
+              //END;
+
+              with MembershipNotification do
+                case "Notification Trigger" of
+                  "Notification Trigger"::WELCOME       : MembershipManagement.GetCommunicationMethod_Welcome ("Member Entry No.", "Membership Entry No.", Method, Address);
+                  "Notification Trigger"::RENEWAL       : MembershipManagement.GetCommunicationMethod_Renew ("Member Entry No.", "Membership Entry No.", Method, Address);
+                  "Notification Trigger"::WALLET_CREATE : MembershipManagement.GetCommunicationMethod_MemberCard ("Member Entry No.", "Membership Entry No.", Method, Address);
+                end;
+
+              with MemberNotificationEntry do
+                case Method of
+                  'SMS'     : "Notification Method" := "Notification Method"::SMS;
+                  'W-SMS'   : "Notification Method" := "Notification Method"::SMS;
+                  'EMAIL'   : "Notification Method" := "Notification Method"::EMAIL;
+                  'W-EMAIL' : "Notification Method" := "Notification Method"::EMAIL;
+                else
+                  "Notification Method" := "Notification Method"::NONE;
+                end;
+              //+MM1.42 [382728]
+
               //-MM1.36 [328141]
               if (MembershipNotification."Notification Method Source" = MembershipNotification."Notification Method Source"::EXTERNAL) then
                 MemberNotificationEntry."Notification Method" := MemberNotificationEntry."Notification Method"::MANUAL;
@@ -983,6 +1010,10 @@ codeunit 6060136 "MM Member Notification"
         // inline notifications are for DEMO purpose only
         Sleep (2000); // posting is occurring in a other thread.
         // I want posting to be done before sending out the notification
+
+        //-MM1.42 [378212]
+        SelectLatestVersion ();
+        //+MM1.42 [378212]
 
         MembershipNotification.Reset ();
         MembershipNotification.SetFilter ("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);

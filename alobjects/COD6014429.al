@@ -1,10 +1,36 @@
 codeunit 6014429 "POS Sales Document Output Mgt."
 {
     // NPR5.52/MMV /20190911 CASE 352473 Created object
+    // NPR5.53/MMV /20200102 CASE 377510 Added OnRun trigger for better error handling
 
+    TableNo = "Sales Header";
 
     trigger OnRun()
+    var
+        SalesHeader: Record "Sales Header";
     begin
+        //-NPR5.53 [377510]
+        SalesHeader := Rec;
+        SalesHeader.SetRecFilter;
+
+        case OutputMethodType of
+          OutputMethodType::Print : PrintDocument(SalesHeader, OutputDocumentType);
+          OutputMethodType::Send : SendDocument(SalesHeader, OutputDocumentType);
+          OutputMethodType::Pdf2Nav : SendPdf2NavDocument(SalesHeader, OutputDocumentType);
+        end;
+        //+NPR5.53 [377510]
+    end;
+
+    var
+        OutputMethodType: Option Send,Print,Pdf2Nav;
+        OutputDocumentType: Option Standard,PrepayInvoice,PrepayCredit;
+
+    procedure SetOnRunOperation(OutputMethodTypeIn: Integer;OutputDocumentTypeIn: Integer)
+    begin
+        //-NPR5.53 [377510]
+        OutputMethodType := OutputMethodTypeIn;
+        OutputDocumentType := OutputDocumentTypeIn;
+        //+NPR5.53 [377510]
     end;
 
     procedure SendDocument(SalesHeader: Record "Sales Header";Type: Option Standard,PrepayInvoice,PrepayCredit)

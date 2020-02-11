@@ -206,12 +206,12 @@ page 6059785 "TM Ticket List"
                     DIYTicketPrint.ViewOnlineSingleTicket (Rec."No.");
                 end;
             }
-            action("View eTicket")
+            action("View Ticket Notifications")
             {
-                Caption = 'View eTicket';
+                Caption = 'View Ticket Notifications';
                 Ellipsis = true;
                 Image = ElectronicNumber;
-                RunObject = Page "TM ETicket Notification Entry";
+                RunObject = Page "TM Ticket Notification Entry";
                 RunPageLink = "Ticket No."=FIELD("No.");
             }
             separator(Separator6014407)

@@ -1,6 +1,7 @@
 codeunit 6151152 "M2 Budget WebService"
 {
     // NPR5.50/TSA /20190515 CASE 353714 Initial Version
+    // MAG2.24/TSA /20191022 CASE 354183 Added Get Simple Budget
 
 
     trigger OnRun()
@@ -32,6 +33,18 @@ codeunit 6151152 "M2 Budget WebService"
 
         GetBudgetEntries.Import ();
         GetBudgetEntries.GenerateResponse ();
+    end;
+
+    procedure GetSimpleBudgetData(var GetSimpleBudget: XMLport "M2 Get Simple Budget")
+    begin
+
+        //-MAG2.24 354183
+        SelectLatestVersion ();
+
+        GetSimpleBudget.Import ();
+        GetSimpleBudget.GetRequest ();
+        GetSimpleBudget.CreateResponse ();
+        //+MAG2.24 354183
     end;
 }
 

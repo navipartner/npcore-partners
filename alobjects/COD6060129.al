@@ -39,6 +39,10 @@ codeunit 6060129 "MM Member WebService Mgr"
     // MM1.39/TSA /20190529 CASE 350968 Added GetSetAutoRenewOption service
     // MM1.40/TSA /20190827 CASE 360242 Added Support to attributes
     // MM1.41/TSA /20191001 CASE 359703 Added assignment of companyname on membership create
+    // MM1.42/TSA /20191205 CASE  Added notification method
+    // MM1.42/TSA /20191210 CASE 381356 Correct VAT calculation for membership amount
+    // MM1.42/TSA /20191212 CASE 382170 General enhancements
+    // #382728/TSA /20191231 CASE 382728 Added GetSetMemberCommunicationOption service
 
     TableNo = "Nc Import Entry";
 
@@ -84,6 +88,8 @@ codeunit 6060129 "MM Member WebService Mgr"
             'CreateWalletMemberPass'          : CreateWallet (XmlDoc, "Document ID");
 
             'GetSetAutoRenewOption'           : ; // Do nothing, handled by xmlport
+            'GetSetMemberComOption'           : ; // Do nothing, handled by xmlport
+
             else
               Error (MISSING_CASE, "Import Type", FunctionName);
           end;
@@ -135,6 +141,7 @@ codeunit 6060129 "MM Member WebService Mgr"
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipSalesSetup: Record "MM Membership Sales Setup";
+        VATPostingSetup: Record "VAT Posting Setup";
         MembershipManagement: Codeunit "MM Membership Management";
         Membership: Record "MM Membership";
         Item: Record Item;
@@ -159,8 +166,23 @@ codeunit 6060129 "MM Member WebService Mgr"
         if (MemberInfoCapture.Amount = 0) then begin
           Item.Get (MemberInfoCapture."Item No.");
           MemberInfoCapture."Unit Price" := Item."Unit Price";
-          MemberInfoCapture.Amount := Item."Unit Price";
-          MemberInfoCapture."Amount Incl VAT" := Item."Unit Price";
+          //-MM1.42 [381356]
+          // MemberInfoCapture.Amount := Item."Unit Price";
+          // MemberInfoCapture."Amount Incl VAT" := Item."Unit Price";
+          VATPostingSetup.SetFilter ("VAT Bus. Posting Group", '=%1', Item."VAT Bus. Posting Gr. (Price)");
+          VATPostingSetup.SetFilter ("VAT Prod. Posting Group", '=%1', Item."VAT Prod. Posting Group");
+          if (not VATPostingSetup.FindFirst ()) then
+            VATPostingSetup.Init ();
+
+          if (Item."Price Includes VAT") then begin
+            MemberInfoCapture."Amount Incl VAT" := Item."Unit Price";
+            MemberInfoCapture.Amount := Round (MemberInfoCapture."Amount Incl VAT" / ((100 + VATPostingSetup."VAT %") / 100.0 ), 0.01);
+          end else begin
+            MemberInfoCapture.Amount := Item."Unit Price";
+            MemberInfoCapture."Amount Incl VAT" := Round (MemberInfoCapture.Amount * ((100 + VATPostingSetup."VAT %") / 100.0 ), 0.01);
+          end;
+          //+MM1.42 [381356]
+
         end;
         //+#285403 [285403]
 
@@ -1120,6 +1142,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         DateTextField: Text;
         MemberCardTypeText: Text;
         isPermanent: Boolean;
+        NotificationMethodText: Text[30];
     begin
 
         MemberInfoCapture."Entry No." := 0;
@@ -1145,7 +1168,6 @@ codeunit 6060129 "MM Member WebService Mgr"
         MemberInfoCapture.Country := NpXmlDomMgt.GetXmlText (XmlElement, 'country', MaxStrLen (MemberInfoCapture.Country), false);
         MemberInfoCapture."Phone No." := NpXmlDomMgt.GetXmlText (XmlElement, 'phoneno', MaxStrLen (MemberInfoCapture."Phone No."), false);
 
-
         //-MM1.32 [318132]
         if (MemberInfoCapture."E-Mail Address" = '') and (MemberInfoCapture."Phone No." <> '') then
           MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::SMS;
@@ -1157,6 +1179,16 @@ codeunit 6060129 "MM Member WebService Mgr"
           MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::EMAIL;
         //+MM1.32 [318132]
 
+        //-MM1.42 [381222]
+        NotificationMethodText := NpXmlDomMgt.GetXmlText (XmlElement, 'notificationmethod', MaxStrLen (NotificationMethodText), false);
+        case UpperCase (NotificationMethodText) of
+          'NO_THANKYOU', '0'                                                            : MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::NO_THANKYOU;
+          'EMAIL', '1',  Format (MemberInfoCapture."Notification Method"::EMAIL, 0, 9)  : MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::EMAIL;
+          'MANUAL', '2', Format (MemberInfoCapture."Notification Method"::MANUAL, 0, 9) : MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::MANUAL;
+          'SMS', '3',    Format (MemberInfoCapture."Notification Method"::SMS, 0, 9)    : MemberInfoCapture."Notification Method" := MemberInfoCapture."Notification Method"::SMS;
+          'DEFAULT', '4',Format (MemberInfoCapture."Notification Method"::DEFAULT, 0, 9): ; // Do nothing
+        end;
+        //+MM1.42 [381222]
 
         //-MM1.18 [265562]
         //EVALUATE (MemberInfoCapture.Birthday, NpXmlDomMgt.GetXmlText (XmlElement, 'birthday', 0, FALSE));
@@ -1302,7 +1334,13 @@ codeunit 6060129 "MM Member WebService Mgr"
           Membership.SetFilter ("Customer No.", '=%1', CustomerNo);
           Membership.SetFilter (Blocked, '=%1', false);
           if (Membership.FindFirst ()) then
-            MemberInfoCapture."External Member No" := Membership."External Membership No.";
+            //-MM1.42 [382170]
+            //MemberInfoCapture."External Member No" := Membership."External Membership No.";
+            if (MemberInfoCapture."External Membership No." = '') then //-+MM1.42 [382170]
+              MemberInfoCapture."External Membership No." := Membership."External Membership No.";
+            if (MemberInfoCapture."External Membership No." <> Membership."External Membership No.") then
+              MemberInfoCapture."External Membership No." := '';
+            //+MM1.42 [382170]
         end;
 
         //-#303635 [303635]

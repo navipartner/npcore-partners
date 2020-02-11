@@ -9,6 +9,7 @@ codeunit 6150825 "POS Action - MPOS Native"
     // NPR5.51/CLVA/20190819 CASE 364011 Added "Register No." to action
     // NPR5.52/CLVA/20190919 CASE 364011 Added the use of Text Con. JSfunction to Variable JSString
     // NPR5.52/JAKUBV/20191022  CASE 351364-01 Transport NPR5.52 - 22 October 2019
+    // NPR5.53/CLVA/20191204 CASE 379042 Added support for IOS 13
 
     SingleInstance = true;
 
@@ -339,7 +340,10 @@ codeunit 6150825 "POS Action - MPOS Native"
         JSString += 'debugger; ';
         JSString += 'var userAgent = navigator.userAgent || navigator.vendor || window.opera; if (/android/i.test(userAgent)) { ';
         JSString += 'window.top.mpos.handleBackendMessage(jsonobject); } ';
-        JSString += 'if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) { ';
+        //-NPR5.53 [379042]
+        //JSString += 'if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) { ';
+        JSString += 'if (/iPad|iPhone|iPod|Macintosh/.test(userAgent) && !window.MSStream) { ';
+        //+NPR5.53 [379042]
         JSString += 'window.webkit.messageHandlers.invokeAction.postMessage(jsonobject);}}';
         Model.AddScript(JSString);
         //+#362731

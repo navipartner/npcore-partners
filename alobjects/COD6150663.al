@@ -1,7 +1,9 @@
 codeunit 6150663 "NPRE Waiter Pad Management"
 {
-    // NPR5.34/ANEN  /2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.35/ANEN /20170821 CASE 283376 Solution rename to NP Restaurant
+    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
+    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
+    // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
+    // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
 
 
     trigger OnRun()
@@ -106,19 +108,24 @@ codeunit 6150663 "NPRE Waiter Pad Management"
     var
         WaiterPadLine: Record "NPRE Waiter Pad Line";
         MergeToWaiterPadLine: Record "NPRE Waiter Pad Line";
+        WPadLinePrintCategory: Record "NPRE W.Pad Line Print Category";
+        WPadLinePrintCategory2: Record "NPRE W.Pad Line Print Category";
+        WPadLinePrntLogEntry: Record "NPRE W.Pad Line Prnt Log Entry";
+        WPadLinePrntLogEntry2: Record "NPRE W.Pad Line Prnt Log Entry";
         NPHWaiterPadPOSManagement: Codeunit "NPRE Waiter Pad POS Management";
     begin
-
         WaiterPadLine.Reset;
-        WaiterPadLine.SetFilter("Waiter Pad No.", '=%1', WaiterPad."No.");
+        WaiterPadLine.SetRange("Waiter Pad No.",WaiterPad."No.");
         if WaiterPadLine.FindSet then begin
           repeat
             MergeToWaiterPadLine.Init;
             MergeToWaiterPadLine.Validate("Waiter Pad No.", MergeToWaiterPad."No.");
             MergeToWaiterPadLine.Insert(true);
 
-            MergeToWaiterPadLine."Sent To. Kitchen Print" := WaiterPadLine."Sent To. Kitchen Print";
-            MergeToWaiterPadLine."Print Category" := WaiterPadLine."Print Category";
+            //-NPR5.53 [360258]-revoked
+            //MergeToWaiterPadLine."Sent To. Kitchen Print" := WaiterPadLine."Sent To. Kitchen Print";
+            //MergeToWaiterPadLine."Print Category" := WaiterPadLine."Print Category";
+            //+NPR5.53 [360258]-revoked
             MergeToWaiterPadLine."Register No." := WaiterPadLine."Register No.";
             MergeToWaiterPadLine."Start Date" := WaiterPadLine."Start Date";
             MergeToWaiterPadLine."Start Time" := WaiterPadLine."Start Time";
@@ -144,10 +151,38 @@ codeunit 6150663 "NPRE Waiter Pad Management"
 
             MergeToWaiterPadLine.Modify(true);
 
+            //-NPR5.53 [360258]
+            WPadLinePrintCategory.SetRange("Waiter Pad No.",WaiterPadLine."Waiter Pad No.");
+            WPadLinePrintCategory.SetRange("Waiter Pad Line No.",WaiterPadLine."Line No.");
+            if WPadLinePrintCategory.FindSet then
+              repeat
+                WPadLinePrintCategory2 := WPadLinePrintCategory;
+                WPadLinePrintCategory2."Waiter Pad No." := MergeToWaiterPadLine."Waiter Pad No.";
+                WPadLinePrintCategory2."Waiter Pad Line No." := MergeToWaiterPadLine."Line No.";
+                WPadLinePrintCategory2.Insert;
+              until WPadLinePrintCategory.Next = 0;
+
+            WPadLinePrntLogEntry.SetCurrentKey("Waiter Pad No.","Waiter Pad Line No.");
+            WPadLinePrntLogEntry.SetRange("Waiter Pad No.",WaiterPadLine."Waiter Pad No.");
+            WPadLinePrntLogEntry.SetRange("Waiter Pad Line No.",WaiterPadLine."Line No.");
+            if WPadLinePrntLogEntry.FindSet then
+              repeat
+                WPadLinePrntLogEntry2 := WPadLinePrntLogEntry;
+                WPadLinePrntLogEntry2."Waiter Pad No." := MergeToWaiterPadLine."Waiter Pad No.";
+                WPadLinePrntLogEntry2."Waiter Pad Line No." := MergeToWaiterPadLine."Line No.";
+                WPadLinePrntLogEntry2.Modify;
+              until WPadLinePrntLogEntry.Next = 0;
+            //+NPR5.53 [360258]
 
             WaiterPadLine.Delete(true);
           until (0 =  WaiterPadLine.Next);
         end;
+
+        //-NPR5.53 [380918]
+        WaiterPad."Number of Guests" := 0;
+        WaiterPad."Billed Number of Guests" := 0;
+        WaiterPad.Modify;
+        //+NPR5.53 [380918]
 
         NPHWaiterPadPOSManagement.CloseWaiterPad(WaiterPad);
 

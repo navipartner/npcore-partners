@@ -4,6 +4,7 @@ page 6184504 "EFT Adyen Payment Type Setup"
     // NPR5.49/MMV /20190410 CASE 347476 Added field 7
     // NPR5.50/MMV /20190430 CASE 352465 Added field 8
     // NPR5.51/MMV /20190520 CASE 355433 Added field 9, 10
+    // NPR5.53/MMV /20191211 CASE 377533 Added fields 11, 12
 
     Caption = 'EFT Adyen Payment Type Setup';
     DelayedInsert = false;
@@ -20,6 +21,9 @@ page 6184504 "EFT Adyen Payment Type Setup"
         {
             group(General)
             {
+                field("Merchant Account";"Merchant Account")
+                {
+                }
                 field("API Key";"API Key")
                 {
                 }
@@ -45,6 +49,9 @@ page 6184504 "EFT Adyen Payment Type Setup"
                 {
                 }
                 field("Cashback Allowed";"Cashback Allowed")
+                {
+                }
+                field("Recurring API URL Prefix";"Recurring API URL Prefix")
                 {
                 }
             }

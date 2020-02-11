@@ -18,6 +18,7 @@ codeunit 6151590 "NpDc Coupon Mgt."
     // NPR5.49/MHA /20190328  CASE 350374 Added MaxStrLen to EanBox.Description in DiscoverEanBoxEvents()
     // NPR5.51/MHA /20190626  CASE 355406 Coupon Events are now triggered for posting and cancel
     // NPR5.51/MHA /20190724  CASE 343352 Introduced "In-use Quantity (External)" on Coupons
+    // NPR5.53/MHA /20191029  CASE 374605 OnCancelDiscountApplication() might delete SaleLinePOSCoupon by itself
 
 
     trigger OnRun()
@@ -44,7 +45,10 @@ codeunit 6151590 "NpDc Coupon Mgt."
           repeat
             if SaleLinePOSCoupon.Type = SaleLinePOSCoupon.Type::Coupon then
               NpDcCouponModuleMgt.OnCancelDiscountApplication(Coupon,SaleLinePOSCoupon);
-            SaleLinePOSCoupon.Delete;
+            //-NPR5.53 [374605]
+            if SaleLinePOSCoupon.Find then
+              SaleLinePOSCoupon.Delete;
+            //+NPR5.53 [374605]
           until SaleLinePOSCoupon.Next = 0;
         end;
         //+NPR5.51 [355406]
@@ -868,7 +872,10 @@ codeunit 6151590 "NpDc Coupon Mgt."
                   Coupon.CalcFields("Issue Coupon Module","Validate Coupon Module","Apply Discount Module");
               NpDcCouponModuleMgt.OnCancelDiscountApplication(Coupon,SaleLinePOSCoupon);
             end;
-            SaleLinePOSCoupon.Delete;
+            //-NPR5.53 [374605]
+            if SaleLinePOSCoupon.Find then
+              SaleLinePOSCoupon.Delete;
+            //+NPR5.53 [374605]
           until SaleLinePOSCoupon.Next = 0;
         //+NPR5.51 [355406]
 

@@ -12,6 +12,7 @@ codeunit 6150708 "POS Setup"
     // NPR5.37/TSA /20171024 CASE 293905 Added function GetLockTimeout(), ActionCode_UnlockPOS(), Action_UnlockPOS, ActionCode_LockPOS(), Action_LockPOS
     // NPR5.40/VB  /20180213 CASE 306347 Performance improvement due to physical-table action discovery
     // NPR5.45/TJ  /20180908 CASE 323728 Checking if unlock PIN is set for kiosk mode
+    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
 
 
     trigger OnRun()
@@ -26,6 +27,7 @@ codeunit 6150708 "POS Setup"
         RegisterRec: Record Register;
         POSUnitRec: Record "POS Unit";
         POSStoreRec: Record "POS Store";
+        POSPostingProfile: Record "POS Posting Profile";
         Initialized: Boolean;
         SetupInitialized: Boolean;
 
@@ -117,7 +119,24 @@ codeunit 6150708 "POS Setup"
 
     procedure AmountRoundingPrecision(): Decimal
     begin
-        exit(RetailSetup."Amount Rounding Precision");
+        //EXIT(RetailSetup."Amount Rounding Precision");  //NPR5.53 [371955]-revoked
+        exit(POSPostingProfile."POS Sales Amt. Rndng Precision");  //NPR5.53 [371955]
+    end;
+
+    procedure AmountRoundingDirection(): Text[1]
+    begin
+        //-NPR5.53 [371955]
+        exit(POSPostingProfile.RoundingDirection);
+        //+NPR5.53 [371955]
+    end;
+
+    procedure RoundingAccount(Mandatory: Boolean): Code[20]
+    begin
+        //-NPR5.53 [371955]
+        if Mandatory then
+          POSPostingProfile.TestField("POS Sales Rounding Account");
+        exit(POSPostingProfile."POS Sales Rounding Account");
+        //+NPR5.53 [371955]
     end;
 
     procedure ExchangeLabelDefaultDate(): Code[10]
@@ -130,6 +149,16 @@ codeunit 6150708 "POS Setup"
         exit(RetailSetup."Open Register Password");
     end;
 
+    local procedure FindPOSPostingProfile()
+    var
+        NPRetailSetup: Record "NP Retail Setup";
+    begin
+        //-NPR5.53 [371955]
+        NPRetailSetup.Get;
+        NPRetailSetup.GetPostingProfile(POSUnitRec."No.",POSPostingProfile);
+        //+NPR5.53 [371955]
+    end;
+
     local procedure "---Set Record => functions---"()
     begin
     end;
@@ -140,8 +169,14 @@ codeunit 6150708 "POS Setup"
     end;
 
     procedure SetRegister(Register: Record Register)
+    var
+        POSUnit: Record "POS Unit";
     begin
         RegisterRec := Register;
+        //-NPR5.53 [371955]
+        POSUnit.Get(RegisterRec."Register No.");
+        SetPOSUnit(POSUnit);
+        //+NPR5.53 [371955]
     end;
 
     procedure SetPOSUnit(POSUnit: Record "POS Unit")
@@ -149,6 +184,7 @@ codeunit 6150708 "POS Setup"
         //-NPR5.32.10 [279551]
         POSUnitRec := POSUnit;
         //+NPR5.32.10 [279551]
+        FindPOSPostingProfile;  //NPR5.53 [371955]
     end;
 
     procedure SetPOSStore(POSStore: Record "POS Store")

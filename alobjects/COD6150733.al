@@ -2,6 +2,7 @@ codeunit 6150733 "POS Workflows 2.0"
 {
     // NPR5.50/JAKUBV/20190603  CASE 338666 Transport NPR5.50 - 3 June 2019
     // NPR5.51/MMV /20190731  CASE 363458 Added log of callstack when errors happen.
+    // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
 
 
     trigger OnRun()
@@ -82,9 +83,16 @@ codeunit 6150733 "POS Workflows 2.0"
         asserterror begin
           Executing := true;
           OnAction(POSAction,WorkflowStep,JSON,POSSession,State,FrontEnd20,Handled);
-          Executing := false;
-          Commit;
-          Error('');
+        //-NPR5.53 [362777]
+          if Handled then begin
+        //+NPR5.53 [362777]
+            Executing := false;
+            Commit;
+            Error('');
+        //-NPR5.53 [362777]
+          end else
+            Error(Text001,Action);
+        //+NPR5.53 [362777]
         end;
         StopwatchStop('Action');
         POSSession.SetInAction(false);

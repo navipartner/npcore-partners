@@ -1,7 +1,9 @@
 table 6151134 "TM Seating Reservation Entry"
 {
     // TM1.43/TSA /20190903 CASE 357359 Initial Version
+    // TM1.45/TSA /20191112 CASE 322432 Added index
 
+    Caption = 'Seating Reservation Entry';
 
     fields
     {
@@ -32,6 +34,14 @@ table 6151134 "TM Seating Reservation Entry"
         {
             Caption = 'Created At';
         }
+        field(50;"Admission Code";Code[20])
+        {
+            Caption = 'Admission Code';
+        }
+        field(51;"Schedule Code";Code[20])
+        {
+            Caption = 'Schedule Code';
+        }
     }
 
     keys
@@ -40,6 +50,9 @@ table 6151134 "TM Seating Reservation Entry"
         {
         }
         key(Key2;"External Schedule Entry No.")
+        {
+        }
+        key(Key3;"Ticket Token")
         {
         }
     }

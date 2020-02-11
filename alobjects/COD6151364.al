@@ -4,6 +4,9 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
     // NPR5.51/CLVA/20190527  CASE 355694 Added bin content code by barcode
     // NPR5.51/CLVA/20190527  CASE 360382 Added option list
     // NPR5.52/CLVA/20190927  CASE 370509 Added support for background posting
+    // NPR5.53/CLVA/20191118  CASE 377888 Changed posting to background posting
+    // NPR5.53/CLVA/20191121  CASE 377462 Changed No. Serie to TODAY. Added Qty validation
+    // NPR5.53/CLVA/20191211  CASE 381606 Changed background posting to journal line
 
     TableNo = "CS UI Header";
 
@@ -63,6 +66,8 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         Text024: Label 'New Bin Code is equal existent Bin Code';
         StrMenuTxt: Text;
         Text025: Label 'Please select bin';
+        Text026: Label 'Qty. can not be 0';
+        Text029: Label 'Inventory move for item %1 : %2 to Bin %3 is already added for posting';
 
     local procedure ProcessInput()
     var
@@ -291,6 +296,9 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         ResolvingTable: Integer;
         Item: Record Item;
         BinContent: Record "Bin Content";
+        CSSetup: Record "CS Setup";
+        ItemJournalBatch: Record "Item Journal Batch";
+        ItemJournalLine: Record "Item Journal Line";
     begin
         if InputValue = '' then begin
           Remark := Text005;
@@ -332,6 +340,25 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
           CSItemReclassHandling."Bin Code" := BinContent."Bin Code";
           CSItemReclassHandling.Qty := BinContent.Quantity;
           //-NPR5.51 [360382]
+
+          //-NPR5.53 [379973]
+          if CSItemReclassHandling."Bin Code" <> '' then begin
+            CSSetup.Get;
+            if ItemJournalBatch.Get(CSSetup."Item Reclass. Jour Temp Name",CSSetup."Item Reclass. Jour Batch Name") then begin
+              Clear(ItemJournalLine);
+              ItemJournalLine.SetRange("Journal Template Name",ItemJournalBatch."Journal Template Name");
+              ItemJournalLine.SetRange("Journal Batch Name",ItemJournalBatch.Name);
+              ItemJournalLine.SetRange("Item No.",CSItemReclassHandling."Item No.");
+              ItemJournalLine.SetRange("Variant Code",CSItemReclassHandling."Variant Code");
+              ItemJournalLine.SetRange("Bin Code",CSItemReclassHandling."Bin Code");
+              if ItemJournalLine.FindFirst then begin
+                Remark := StrSubstNo(Text029,CSItemReclassHandling."Item No.",CSItemReclassHandling."Variant Code",CSItemReclassHandling."Bin Code");
+                exit;
+              end;
+            end;
+          end;
+          //+NPR5.53 [379973]
+
           repeat
             BinContent.CalcFields(Quantity);
             StrMenuTxt := StrMenuTxt + BinContent."Bin Code" + ' | ' + Format(BinContent.Quantity) + ' ' + BinContent."Unit of Measure Code" + ',';
@@ -364,8 +391,15 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         BinContent.SetRange("Item No.",CSItemReclassHandlingPlaceholder."Item No.");
         BinContent.SetRange("Variant Code",CSItemReclassHandlingPlaceholder."Variant Code");
         BinContent.SetRange("Bin Code",InputValue);
-        if not BinContent.FindSet then
+        //-NPR5.53 [381606]
+        //IF NOT BinContent.FINDSET THEN
+        if not BinContent.FindSet then begin
+        //+NPR5.53 [381606]
           Remark := Text021;
+        //-NPR5.53 [381606]
+          exit;
+        end;
+        //+NPR5.53 [381606]
 
         CSItemReclassHandlingPlaceholder."Bin Code" := InputValue;
         //-NPR5.51 [355694]
@@ -406,9 +440,16 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         Clear(Bin);
         Bin.SetRange("Location Code",CSItemReclassHandlingPlaceholder."Location Code");
         Bin.SetRange(Code,InputValue);
-        if not Bin.FindSet then
+        //-NPR5.53 [381606]
+        //IF NOT Bin.FINDSET THEN
+        if not Bin.FindSet then begin
+        //+NPR5.53 [381606]
           Remark := Text021;
         //+NPR5.51 [355694]
+        //-NPR5.53 [381606]
+          exit;
+        end;
+        //+NPR5.53 [381606]
 
         CSItemReclassHandlingPlaceholder."New Bin Code" := InputValue;
     end;
@@ -427,6 +468,13 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
           Remark := Text013;
           exit;
         end;
+
+        //-NPR5.53 [377462]
+        if Qty = 0 then begin
+          Remark := Text026;
+          exit;
+        end;
+        //+NPR5.53 [377462]
 
         //-NPR5.51 [355694]
         Clear(BinContent);
@@ -502,12 +550,17 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         LineNo: Integer;
         CSSetup: Record "CS Setup";
     begin
-        CSSetup.Get;
+        //-NPR5.53 [377462]
+        //CSSetup.GET;
+        //+NPR5.53 [377462]
 
         CSItemReclassHandling.Handled := true;
         CSItemReclassHandling.Modify(true);
 
-        if TransferDataLine(CSItemReclassHandling,CSSetup) then begin
+        //-NPR5.53 [377462]
+        //IF TransferDataLine(CSItemReclassHandling,CSSetup) THEN BEGIN
+        if TransferDataLine(CSItemReclassHandling) then begin
+        //+NPR5.53 [377462]
           CSItemReclassHandling."Transferred to Worksheet" := true;
           CSItemReclassHandling.Modify(true);
         end;
@@ -769,7 +822,7 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         //+NPR5.52 [370509]
     end;
 
-    local procedure TransferDataLine(var CSItemReclassHandling: Record "CS Item Reclass. Handling";CSSetup: Record "CS Setup"): Boolean
+    local procedure TransferDataLine(var CSItemReclassHandling: Record "CS Item Reclass. Handling"): Boolean
     var
         ItemJournalLine: Record "Item Journal Line";
         NewItemJournalLine: Record "Item Journal Line";
@@ -778,7 +831,15 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         ItemJnlBatch: Record "Item Journal Batch";
         NoSeriesMgt: Codeunit NoSeriesManagement;
         ItemJnlPostBatch: Codeunit "Item Jnl.-Post Batch";
+        PostingRecRef: RecordRef;
+        CSPostEnqueue: Codeunit "CS Post - Enqueue";
+        CSPostingBuffer: Record "CS Posting Buffer";
+        CSSetup: Record "CS Setup";
     begin
+        //-NPR5.53 [377462]
+        CSSetup.Get;
+        //+NPR5.53 [377462]
+
         Clear(NewItemJournalLine);
         NewItemJournalLine.SetRange("Journal Template Name", CSSetup."Item Reclass. Jour Temp Name");
         NewItemJournalLine.SetRange("Journal Batch Name", CSSetup."Item Reclass. Jour Batch Name");
@@ -808,17 +869,43 @@ codeunit 6151364 "CS UI Item Reclass. Handling"
         ItemJnlTemplate.Get(ItemJournalLine."Journal Template Name");
         ItemJnlBatch.Get(ItemJournalLine."Journal Template Name",ItemJournalLine."Journal Batch Name");
 
-        Clear(NoSeriesMgt);
-        ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJnlBatch."No. Series",ItemJournalLine."Posting Date",false);
+        //-NPR5.53 [377462]
+        if CSSetup."Post with Job Queue" then begin
+          ItemJournalLine."Document No." := Format(Today);
+        end else begin
+          Clear(NoSeriesMgt);
+          ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJnlBatch."No. Series",ItemJournalLine."Posting Date",false);
+        end;
+        //+NPR5.53 [377462]
         ItemJournalLine."Source Code" := ItemJnlTemplate."Source Code";
         ItemJournalLine."Reason Code" := ItemJnlBatch."Reason Code";
         ItemJournalLine."Posting No. Series" := ItemJnlBatch."Posting No. Series";
         ItemJournalLine."External Document No." := CSSessionId;
         ItemJournalLine.Modify(true);
 
-        //-NPR5.51 [355694]
-        ItemJnlPostBatch.Run(ItemJournalLine);
-        //+NPR5.51 [355694]
+        //-NPR5.53 [377888]
+        if CSSetup."Post with Job Queue" then begin
+          //-NPR5.53 [381606]
+          PostingRecRef.GetTable(ItemJnlBatch);
+          //PostingRecRef.GETTABLE(ItemJournalLine);
+          //+NPR5.53 [381606]
+          CSPostingBuffer.Init;
+          CSPostingBuffer."Table No." := PostingRecRef.Number;
+          CSPostingBuffer."Record Id" := PostingRecRef.RecordId;
+          CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::"Item Reclass.";
+          CSPostingBuffer."Session Id" := CSSessionId;
+          if CSPostingBuffer.Insert(true) then
+            CSPostEnqueue.Run(CSPostingBuffer)
+          else
+            Remark := GetLastErrorText;
+        end else begin
+          //+NPR5.53 [377888]
+          //-NPR5.51 [355694]
+          ItemJnlPostBatch.Run(ItemJournalLine);
+          //+NPR5.51 [355694]
+          //-NPR5.53 [377888]
+        end;
+        //+NPR5.53 [377888]
 
         exit(true);
     end;

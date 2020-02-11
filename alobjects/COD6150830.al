@@ -4,6 +4,7 @@ codeunit 6150830 "POS Action - Exchange Label"
     // NPR5.41/MMV /20180424 CASE 311653 Select line after scan.
     // NPR5.45/MHA /20180817  CASE 319706 Added Ean Box Event Handler functions
     // NPR5.49/MHA /20190328  CASE 350374 Added MaxStrLen to EanBox.Description in DiscoverEanBoxEvents()
+    // NPR5.53/ALST/20191028  CASE 372948 check EAN prefix in range instead of single value
 
 
     trigger OnRun()
@@ -204,6 +205,7 @@ codeunit 6150830 "POS Action - Exchange Label"
         ExchangeLabel: Record "Exchange Label";
         IComm: Record "I-Comm";
         RetailConfiguration: Record "Retail Setup";
+        ExchangeLabelManagement: Codeunit "Exchange Label Management";
     begin
         //-NPR5.45 [319706]
         if StrLen(Barcode) > MaxStrLen(ExchangeLabel.Barcode) then
@@ -211,7 +213,10 @@ codeunit 6150830 "POS Action - Exchange Label"
 
         Barcode := UpperCase(Barcode);
         RetailConfiguration.Get;
-        if CopyStr(Barcode,1,2) <> RetailConfiguration."EAN Prefix Exhange Label" then
+        //-NPR5.53 [372948]
+        //IF COPYSTR(Barcode,1,2) <> RetailConfiguration."EAN Prefix Exhange Label" THEN
+        if not ExchangeLabelManagement.CheckPrefix(Barcode, RetailConfiguration."EAN Prefix Exhange Label") then
+        //+NPR5.53 [372948]
           exit(false);
 
         ExchangeLabel.SetCurrentKey(Barcode);

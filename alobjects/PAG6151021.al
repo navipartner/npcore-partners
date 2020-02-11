@@ -3,6 +3,7 @@ page 6151021 "NpRv Arch. Voucher Card"
     // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
     // NPR5.48/MHA /20180921  CASE 302179 Added fields 1005, 1007, 1010, 1013 and deleted field 80
     // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner fields used with Cross Company Vouchers
+    // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
 
     Caption = 'Archived Retail Voucher Card';
     Editable = false;
@@ -56,6 +57,10 @@ page 6151021 "NpRv Arch. Voucher Card"
                     ShowCaption = false;
                     field("Issue Date";"Issue Date")
                     {
+                    }
+                    field("Initial Amount";"Initial Amount")
+                    {
+                        Editable = false;
                     }
                     field(Amount;Amount)
                     {

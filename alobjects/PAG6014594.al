@@ -1,6 +1,9 @@
 page 6014594 "Sales Statistics Subform"
 {
     // NPR5.52/ZESO/20191010  Object created
+    // NPR5.53/ZESO/20191205  CASE 371446 New Function GetGlobals
+    // NPR5.53/ZESO/20191210  CASE 371446 Populate Description
+    // NPR5.53/ZESO/20191211  CASE 371446 New Function SetTempRec
 
     Caption = 'Sales Statistics Subform';
     DeleteAllowed = false;
@@ -96,6 +99,9 @@ page 6014594 "Sales Statistics Subform"
         ItemAmtQuery: Query "Sales Stats - Item Sales";
         ItemGroupAmtQuery: Query "Sales Stats - Item Grp Sales";
         ItemCatAmtQuery: Query "Sales Stats - Item Cat Sales";
+        Item: Record Item;
+        ItemCategory: Record "Item Category";
+        ItemGroup: Record "Item Group";
     begin
         TempRec.DeleteAll;
         StartDateTime := CreateDateTime(StartDate,StartTime);
@@ -120,6 +126,10 @@ page 6014594 "Sales Statistics Subform"
               while ItemQtyQuery.Read do begin
                 TempRec.Init;
                 TempRec."No." := ItemQtyQuery.Item_No;
+                //-NPR5.53 [371446]
+                if Item.Get(ItemQtyQuery.Item_No) then
+                  TempRec.Description := Item.Description;
+                //+NPR5.53 [371446]
                 TempRec."Sales (Qty)" := -ItemQtyQuery.Sum_Quantity;
                 TempRec.Insert;
               end;
@@ -157,6 +167,10 @@ page 6014594 "Sales Statistics Subform"
               while ItemGroupQtyQuery.Read do begin
                 TempRec.Init;
                 TempRec."No." := ItemGroupQtyQuery.Item_Group_No;
+                //-NPR5.53 [371446]
+                if ItemGroup.Get(ItemGroupQtyQuery.Item_Group_No) then
+                  TempRec.Description := ItemGroup.Description;
+                //+NPR5.53 [371446]
                 TempRec."Sales (Qty)" := -ItemGroupQtyQuery.Sum_Quantity;
                 TempRec.Insert;
               end;
@@ -190,6 +204,10 @@ page 6014594 "Sales Statistics Subform"
               while ItemCatQtyQuery.Read do begin
                 TempRec.Init;
                 TempRec."No." := ItemCatQtyQuery.Item_Category_Code;
+                //-NPR5.53 [371446]
+                if ItemCategory.Get(ItemCatQtyQuery.Item_Category_Code) then
+                  TempRec.Description := ItemCategory.Description;
+                //+NPR5.53 [371446]
                 TempRec."Sales (Qty)" := -ItemCatQtyQuery.Sum_Quantity;
                 TempRec.Insert;
               end;
@@ -295,6 +313,29 @@ page 6014594 "Sales Statistics Subform"
           //ValueEntry.SETFILTER("Item No.",ItemNoFilter)
         //ELSE
           //ValueEntry.SETRANGE("Item No.",varNo);
+    end;
+
+    procedure GetGlobals(var InStartDate: Date;var InEndDate: Date;var InStartTime: Time;var InEndTime: Time;var InVarStatisticsBy: Option;var InVarItemFilter: Text;var InVarItemCatFilter: Text;var InVarItemGroupFilter: Text;var InVarDim1Filter: Text;var InVarDim2Filter: Text)
+    begin
+        //-NPR5.53 [371446]
+        InStartDate := DT2Date(StartDateTime);
+        InEndDate := DT2Date(EndDateTime);
+        InStartTime := DT2Time(StartDateTime);
+        InEndTime := DT2Time(EndDateTime);
+        InVarStatisticsBy := Statistics;
+        InVarItemFilter := ItemNoFilter;
+        InVarItemCatFilter := ItemCategoryCodeFilter;
+        InVarItemGroupFilter := ItemGroupFilter;
+        InVarDim1Filter := Dim1Filter;
+        InVarDim2Filter := Dim2Filter;
+        //+NPR5.53 [371446]
+    end;
+
+    procedure SetTempRec(var NewTempRec: Record "Sales Statistics Time Period")
+    begin
+        //-NPR5.53 [371446]
+        TempRec.Copy(NewTempRec,true);
+        //+NPR5.53 [371446]
     end;
 }
 

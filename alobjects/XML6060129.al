@@ -9,6 +9,7 @@ xmlport 6060129 "MM Get Membership"
     // MM1.22/TSA /20170818 CASE 287080 - Added details to member count attribute named and anonymous
     // MM1.29/TSA /20180502 CASE 306121 - Added membership entry details to output
     // MM1.40/TSA /20190827 CASE 360242 - Added support for Attributes
+    // MM1.42/TSA /20191121 CASE 378339 - Added descriptive names
 
     Caption = 'Get Membership';
     FormatEvaluate = Xml;
@@ -72,9 +73,17 @@ xmlport 6060129 "MM Get Membership"
                         MinOccurs = Zero;
                         fieldelement(communitycode;tmpMembershipResponse."Community Code")
                         {
+                            textattribute(communityname)
+                            {
+                                XmlName = 'name';
+                            }
                         }
                         fieldelement(membershipcode;tmpMembershipResponse."Membership Code")
                         {
+                            textattribute(membershipname)
+                            {
+                                XmlName = 'name';
+                            }
                         }
                         fieldelement(membershipnumber;tmpMembershipResponse."External Membership No.")
                         {
@@ -120,6 +129,22 @@ xmlport 6060129 "MM Get Membership"
                                 fieldattribute(code;TmpAttributeValueSet."Attribute Code")
                                 {
                                 }
+                                textattribute(attributename)
+                                {
+                                    XmlName = 'name';
+
+                                    trigger OnBeforePassVariable()
+                                    var
+                                        NPRAttribute: Record "NPR Attribute";
+                                    begin
+
+                                        //-MM1.42 [378339]
+                                        AttributeName := '';
+                                        if (NPRAttribute.Get (TmpAttributeValueSet."Attribute Code")) then
+                                          AttributeName := NPRAttribute.Name;
+                                        //+MM1.42 [378339]
+                                    end;
+                                }
                                 fieldattribute(value;TmpAttributeValueSet."Text Value")
                                 {
                                 }
@@ -141,6 +166,27 @@ xmlport 6060129 "MM Get Membership"
                             }
                             fieldelement(context;TmpMembershipEntry.Context)
                             {
+                                textattribute(contextname)
+                                {
+                                    XmlName = 'name';
+
+                                    trigger OnBeforePassVariable()
+                                    begin
+
+                                        //-MM1.42 [378339]
+                                        case TmpMembershipEntry.Context of
+                                          TmpMembershipEntry.Context::NEW       : ContextName := 'New';
+                                          TmpMembershipEntry.Context::AUTORENEW : ContextName := 'Auto-Renew';
+                                          TmpMembershipEntry.Context::CANCEL    : ContextName := 'Cancel';
+                                          TmpMembershipEntry.Context::EXTEND    : ContextName := 'Extend';
+                                          TmpMembershipEntry.Context::FOREIGN   : ContextName := 'Foreign Membership';
+                                          TmpMembershipEntry.Context::REGRET    : ContextName := 'Regret';
+                                          TmpMembershipEntry.Context::RENEW     : ContextName := 'Renew';
+                                          TmpMembershipEntry.Context::UPGRADE   : ContextName := 'Upgrade';
+                                        end;
+                                        //+MM1.42 [378339]
+                                    end;
+                                }
                             }
                             fieldelement(blocked;TmpMembershipEntry.Blocked)
                             {
@@ -203,6 +249,7 @@ xmlport 6060129 "MM Get Membership"
         MembershipEntry: Record "MM Membership Entry";
         NPRAttributeKey: Record "NPR Attribute Key";
         NPRAttributeValueSet: Record "NPR Attribute Value Set";
+        MemberCommunity: Record "MM Member Community";
         MembershipManagement: Codeunit "MM Membership Management";
         AdminMemberCount: Integer;
         NamedMemberCount: Integer;
@@ -219,8 +266,15 @@ xmlport 6060129 "MM Get Membership"
         tmpMembershipResponse.TransferFields (Membership, true);
         if (tmpMembershipResponse.Insert ()) then ;
 
+
         MembershipSetup.Get (Membership."Membership Code");
         MemberCardinality := Format (MembershipSetup."Membership Member Cardinality");
+
+        //-MM1.42 [378339]
+        MemberCommunity.Get (Membership."Community Code");
+        CommunityName := MemberCommunity.Description;
+        MembershipName := MembershipSetup.Description;
+        //-MM1.42 [378339]
 
         //-MM1.22 [287080]
         // MembershipRole.SETFILTER ("Membership Entry No.", '=%1', MembershipEntryNo);

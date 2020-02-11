@@ -31,6 +31,7 @@ table 6060134 "MM Member Info Capture"
     // MM1.29.02/TSA /20180528 CASE 317156 Added SMS as notification option
     // MM1.32/TSA /20180710 CASE 318132 Added field "Member Card Type" option
     // MM1.40/TSA /20190730 CASE 360275 Added field "Auto-Admit Member"
+    // MM1.42/TSA /20191205 CASE 381222 Changed InitValue for Notification Method from EMAIL to new option DEFAULT
 
     Caption = 'Member Info Capture';
 
@@ -140,9 +141,9 @@ table 6060134 "MM Member Info Capture"
         field(40;"Notification Method";Option)
         {
             Caption = 'Notification Method';
-            InitValue = EMAIL;
-            OptionCaption = ' ,E-Mail,Manual,SMS';
-            OptionMembers = NO_THANKYOU,EMAIL,MANUAL,SMS;
+            InitValue = DEFAULT;
+            OptionCaption = ' ,E-Mail,Manual,SMS,Default';
+            OptionMembers = NO_THANKYOU,EMAIL,MANUAL,SMS,DEFAULT;
         }
         field(60;"News Letter";Option)
         {

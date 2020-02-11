@@ -2,6 +2,7 @@ codeunit 6151102 "NpRi Reimbursement Mgt."
 {
     // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
     // NPR5.46/MHA /20181002  CASE 323942 Corrected Exit clause on "Reimbursement Date" in RunReimbursement()
+    // NPR5.53/MHA /20191105  CASE 364131 Next Reimbursement Date should still be calculated even when no open entries
 
     TableNo = "NpRi Reimbursement";
 
@@ -184,11 +185,22 @@ codeunit 6151102 "NpRi Reimbursement Mgt."
     begin
         if not NpRiParty.Get(NpRiReimbursement."Party Type",NpRiReimbursement."Party No.") then
           exit;
-        if not FindOpenEntries(NpRiReimbursement,NpRiReimbursementEntry) then
+        //-NPR5.53 [364131]
+        if not FindOpenEntries(NpRiReimbursement,NpRiReimbursementEntry) then begin
+          NpRiReimbursement."Last Posting Date" := NpRiReimbursement."Posting Date";
+          NpRiReimbursement."Last Reimbursement at" := CurrentDateTime;
+          NpRiReimbursement."Posting Date" := 0D;
+          if Format(NpRiParty."Next Posting Date Calculation") <> '' then
+            NpRiReimbursement."Posting Date" := CalcDate(NpRiParty."Next Posting Date Calculation",NpRiReimbursement."Last Posting Date");
+          NpRiReimbursement."Reimbursement Date" := 0D;
+          if Format(NpRiParty."Reimburse every") <> '' then
+            NpRiReimbursement."Reimbursement Date" := CalcDate(NpRiParty."Reimburse every",DT2Date(NpRiReimbursement."Last Reimbursement at"));
+          NpRiReimbursement.Modify(true);
+
           exit;
+        end;
+        //+NPR5.53 [364131]
         //-NPR5.46 [323942]
-        // IF (NpRiReimbursement."Reimbursement Date" = 0D) OR (NpRiReimbursement."Reimbursement Date" < TODAY) THEN
-        //  EXIT;
         if NpRiReimbursement."Reimbursement Date" = 0D then
           exit;
         if NpRiReimbursement."Reimbursement Date" > Today then
