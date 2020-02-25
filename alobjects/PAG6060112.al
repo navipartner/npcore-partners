@@ -23,7 +23,7 @@ page 6060112 "TM Ticket Select Schedule"
     PageType = StandardDialog;
     SourceTable = "TM Admission Schedule Entry";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Admission Start Date","Admission Start Time");
+    SourceTableView = SORTING("Admission Start Date", "Admission Start Time");
 
     layout
     {
@@ -31,46 +31,45 @@ page 6060112 "TM Ticket Select Schedule"
         {
             repeater(Group)
             {
-                field("Schedule Code";"Schedule Code")
+                field("Schedule Code"; "Schedule Code")
                 {
                     Editable = false;
                 }
-                field("Admission Code";"Admission Code")
+                field("Admission Code"; "Admission Code")
                 {
                     Editable = false;
                     Visible = false;
                 }
-                field("Admission Start Date";"Admission Start Date")
+                field("Admission Start Date"; "Admission Start Date")
                 {
                     Editable = false;
                     Style = Favorable;
-                    StyleExpr = CalendarExceptionText ='';
+                    StyleExpr = CalendarExceptionText = '';
                 }
-                field("Admission Start Time";"Admission Start Time")
+                field("Admission Start Time"; "Admission Start Time")
                 {
                     Editable = false;
                 }
-                field("Remaining Reservation";RemainingReservations)
+                field("Remaining Reservation"; RemainingReservations)
                 {
                     Caption = 'Remaining Reservation';
                     Editable = false;
                     Visible = false;
                 }
-                field(RemainingAdmitted;RemainingAdmitted)
+                field(RemainingAdmitted; RemainingAdmitted)
                 {
                     Caption = 'Remaining Admitted';
                     Editable = false;
                     Visible = false;
                 }
-                field(Remaining;RemainingText)
+                field(Remaining; RemainingText)
                 {
-                    BlankNumbers = BlankNegAndZero;
                     Caption = 'Remaining';
                     Editable = false;
                     Style = Unfavorable;
                     StyleExpr = Remaining <= 0;
                 }
-                field(CalendarException;CalendarExceptionText)
+                field(CalendarException; CalendarExceptionText)
                 {
                     Caption = 'Calendar Exception';
                     Editable = false;
@@ -82,7 +81,7 @@ page 6060112 "TM Ticket Select Schedule"
             group(Control6014401)
             {
                 ShowCaption = false;
-                field(LocalDateTimeText;LocalDateTimeText)
+                field(LocalDateTimeText; LocalDateTimeText)
                 {
                     Caption = 'Time:';
                     Enabled = false;
@@ -102,38 +101,43 @@ page 6060112 "TM Ticket Select Schedule"
         Admission: Record "TM Admission";
     begin
 
-        LocalDateTimeText := StrSubstNo ('%1 %2', Format (Today), Format (Time));
+        LocalDateTimeText := StrSubstNo('%1 %2', Format(Today), Format(Time));
 
-        CalcFields ("Open Reservations", "Open Admitted", "Initial Entry");
-        TicketManagement.GetMaxCapacity ("Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
+        CalcFields("Open Reservations", "Open Admitted", "Initial Entry");
+        TicketManagement.GetMaxCapacity("Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
 
         RemainingReservations := MaxCapacity - "Open Reservations";
         RemainingAdmitted := MaxCapacity - "Open Admitted";
 
         case CapacityControl of
-          Admission."Capacity Control"::ADMITTED : Remaining := MaxCapacity - "Open Admitted" - "Open Reservations";
-          Admission."Capacity Control"::FULL     : Remaining := MaxCapacity - "Open Admitted" - "Open Reservations";
-          Admission."Capacity Control"::NONE     : Remaining := MaxCapacity;
-          Admission."Capacity Control"::SALES    : Remaining := MaxCapacity - "Initial Entry";
-          Admission."Capacity Control"::SEATING  : Remaining := MaxCapacity - "Open Admitted" - "Open Reservations"; //-+#322432 [322432]
+            Admission."Capacity Control"::ADMITTED:
+                Remaining := MaxCapacity - "Open Admitted" - "Open Reservations";
+            Admission."Capacity Control"::FULL:
+                Remaining := MaxCapacity - "Open Admitted" - "Open Reservations";
+            Admission."Capacity Control"::NONE:
+                Remaining := MaxCapacity;
+            Admission."Capacity Control"::SALES:
+                Remaining := MaxCapacity - "Initial Entry";
+            Admission."Capacity Control"::SEATING:
+                Remaining := MaxCapacity - "Open Admitted" - "Open Reservations"; //-+#322432 [322432]
         end;
 
         //-TM1.45 [380754]
-        RemainingText := Format (Remaining);
+        RemainingText := Format(Remaining);
         if (Rec."Allocation By" = Rec."Allocation By"::WAITINGLIST) then begin
-          CalcFields ("Waiting List Queue");
-          RemainingText := StrSubstNo ('%1', WAITING_LIST);
-          if ("Waiting List Queue" > 0) then
-            RemainingText := StrSubstNo ('%1 (%2)', WAITING_LIST, "Waiting List Queue");
+            CalcFields("Waiting List Queue");
+            RemainingText := StrSubstNo('%1', WAITING_LIST);
+            if ("Waiting List Queue" > 0) then
+                RemainingText := StrSubstNo('%1 (%2)', WAITING_LIST, "Waiting List Queue");
         end;
         //+TM1.45 [380754]
 
-        TicketManagement.CheckTicketBaseCalendar (false, Rec."Admission Code", gTicketItemNo, gTicketVariantCode, Rec."Admission Start Date", CalendarExceptionText);
+        TicketManagement.CheckTicketBaseCalendar(false, Rec."Admission Code", gTicketItemNo, gTicketVariantCode, Rec."Admission Start Date", CalendarExceptionText);
     end;
 
     trigger OnInit()
     begin
-        LocalDateTimeText := StrSubstNo ('%1 %2', Format (Today), Format (Time));
+        LocalDateTimeText := StrSubstNo('%1 %2', Format(Today), Format(Time));
     end;
 
     trigger OnOpenPage()
@@ -141,8 +145,8 @@ page 6060112 "TM Ticket Select Schedule"
 
         //-TM1.45 [378212]
         // FINDFIRST ();
-        if (not FindFirst ()) then
-          Error (NO_TIMESLOTS);
+        if (not FindFirst()) then
+            Error(NO_TIMESLOTS);
         //+TM1.45 [378212]
     end;
 
@@ -159,31 +163,31 @@ page 6060112 "TM Ticket Select Schedule"
         NO_TIMESLOTS: Label 'There are no timeslots available for sales at this time for this event.';
         WAITING_LIST: Label 'Waiting List';
 
-    procedure FillPage(var AdmissionScheduleEntryFilter: Record "TM Admission Schedule Entry";TicketQty: Decimal;TicketItemNo: Code[20];TicketVariantCode: Code[10]): Boolean
+    procedure FillPage(var AdmissionScheduleEntryFilter: Record "TM Admission Schedule Entry"; TicketQty: Decimal; TicketItemNo: Code[20]; TicketVariantCode: Code[10]): Boolean
     var
         AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
     begin
 
-        AdmissionScheduleEntry.CopyFilters (AdmissionScheduleEntryFilter);
-        if (AdmissionScheduleEntry.IsEmpty ()) then
-          exit (false);
+        AdmissionScheduleEntry.CopyFilters(AdmissionScheduleEntryFilter);
+        if (AdmissionScheduleEntry.IsEmpty()) then
+            exit(false);
 
-        if (AdmissionScheduleEntry.FindSet ()) then begin
-          repeat
-            //-TM1.45 [378339]
-            // AddToTempRecord (AdmissionScheduleEntry, TicketQty);
-            AddToTempRecord (AdmissionScheduleEntry, TicketQty, TicketItemNo, TicketVariantCode);
+        if (AdmissionScheduleEntry.FindSet()) then begin
+            repeat
+                //-TM1.45 [378339]
+                // AddToTempRecord (AdmissionScheduleEntry, TicketQty);
+                AddToTempRecord(AdmissionScheduleEntry, TicketQty, TicketItemNo, TicketVariantCode);
             //+TM1.45 [378339]
-          until (AdmissionScheduleEntry.Next() = 0);
+            until (AdmissionScheduleEntry.Next() = 0);
         end;
 
         gTicketItemNo := TicketItemNo;
         gTicketVariantCode := TicketVariantCode;
 
-        exit (true);
+        exit(true);
     end;
 
-    local procedure AddToTempRecord(AdmissionScheduleEntry: Record "TM Admission Schedule Entry";TicketQty: Decimal;TicketItemNo: Code[20];TicketVariantCode: Code[10])
+    local procedure AddToTempRecord(AdmissionScheduleEntry: Record "TM Admission Schedule Entry"; TicketQty: Decimal; TicketItemNo: Code[20]; TicketVariantCode: Code[10])
     var
         MaxCapacity: Integer;
         CapacityControl: Option;
@@ -195,10 +199,10 @@ page 6060112 "TM Ticket Select Schedule"
     begin
 
         //-TM1.45 [378212] // refactored, moved code to function
-        if (TicketManagement.ValidateAdmSchEntryForSales (AdmissionScheduleEntry, TicketItemNo, TicketVariantCode, Today, Time, Remaining)) then begin
+        if (TicketManagement.ValidateAdmSchEntryForSales(AdmissionScheduleEntry, TicketItemNo, TicketVariantCode, Today, Time, Remaining)) then begin
 
-          Rec.TransferFields (AdmissionScheduleEntry, true);
-          if (Rec.Insert ()) then ;
+            Rec.TransferFields(AdmissionScheduleEntry, true);
+            if (Rec.Insert()) then;
         end;
         //+TM1.45 [378212]
     end;

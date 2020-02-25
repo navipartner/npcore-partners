@@ -108,6 +108,12 @@ End Function
         <Field Name="Amount_NpRvVoucherFormat">
           <DataField>Amount_NpRvVoucherFormat</DataField>
         </Field>
+        <Field Name="InitialAmount_NpRvVoucher">
+          <DataField>InitialAmount_NpRvVoucher</DataField>
+        </Field>
+        <Field Name="InitialAmount_NpRvVoucherFormat">
+          <DataField>InitialAmount_NpRvVoucherFormat</DataField>
+        </Field>
         <Field Name="InuseQuantity_NpRvVoucher">
           <DataField>InuseQuantity_NpRvVoucher</DataField>
         </Field>

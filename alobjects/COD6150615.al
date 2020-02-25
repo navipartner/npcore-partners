@@ -134,26 +134,26 @@ codeunit 6150615 "POS Post Entries"
         if PostItemEntriesVar then begin
             //Item entries are posted first and committed after each POS Entry is posted
             PostItemEntries(POSEntry);
-          //-NPR5.53 [376362] Logging is not working for item posting errors
-          //  //-NPR5.38 [302791]
-          //  IF (NOT PreviewMode) AND (POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::"Error while Posting") THEN BEGIN
-          //    POSPostingLogEntryNo := CreatePOSPostingLogEntry(POSEntry);
-          //    UpdatePOSPostingLogEntry(POSPostingLogEntryNo,TRUE);
-          //    COMMIT; //Commit the start of the log
-          //  END;
-          //  //+NPR5.38 [302791]
-          //+NPR5.53 [376362]
+            //-NPR5.53 [376362] Logging is not working for item posting errors
+            //  //-NPR5.38 [302791]
+            //  IF (NOT PreviewMode) AND (POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::"Error while Posting") THEN BEGIN
+            //    POSPostingLogEntryNo := CreatePOSPostingLogEntry(POSEntry);
+            //    UpdatePOSPostingLogEntry(POSPostingLogEntryNo,TRUE);
+            //    COMMIT; //Commit the start of the log
+            //  END;
+            //  //+NPR5.38 [302791]
+            //+NPR5.53 [376362]
         end;
 
         if PostPOSEntriesVar then begin
             //POS Entries must belong to the same POS Legder Register Entry
             POSPostingLogEntryNo := CreatePOSPostingLogEntry(POSEntry);
 
-          //-NPR5.53 [376362]
-          //IF NOT PreviewMode THEN
-          //  COMMIT;
-          Commit;
-          //+NPR5.53 [376362]
+            //-NPR5.53 [376362]
+            //IF NOT PreviewMode THEN
+            //  COMMIT;
+            Commit;
+            //+NPR5.53 [376362]
 
             CreateTempRecordsToPost(POSEntry, TempPOSSalesLineToPost, TempPOSPaymentLinetoPost);
             CreatePostingBufferLinesFromPOSSalesLines(TempPOSSalesLineToPost, TempPOSPostingBuffer, PostCompressedVar);
@@ -184,11 +184,11 @@ codeunit 6150615 "POS Post Entries"
 
             end else begin
 
-            //-NPR5.53 [376362]
-            // IF NOT PreviewMode THEN
-            //  COMMIT;
-            Commit;
-            //+NPR5.53 [376362]
+                //-NPR5.53 [376362]
+                // IF NOT PreviewMode THEN
+                //  COMMIT;
+                Commit;
+                //+NPR5.53 [376362]
 
                 //IF NOT CheckandPostGenJournal(TempGenJournalLine) THEN BEGIN  //NPR5.52 [365326]-revoked
                 if not CheckandPostGenJournal(TempGenJournalLine, POSEntry) then begin  //NPR5.52 [365326]
@@ -202,23 +202,24 @@ codeunit 6150615 "POS Post Entries"
             end;
         end;
 
-        if POSEntry.FindSet then repeat
-          //-NPR5.53 [376362]
-          // OnAfterPostPOSEntry(POSEntry,PreviewMode);
-          OnAfterPostPOSEntry(POSEntry,false);
-          //+NPR5.53 [376362]
-        until POSEntry.Next  = 0;
+        if POSEntry.FindSet then
+            repeat
+                //-NPR5.53 [376362]
+                // OnAfterPostPOSEntry(POSEntry,PreviewMode);
+                OnAfterPostPOSEntry(POSEntry, false);
+            //+NPR5.53 [376362]
+            until POSEntry.Next = 0;
 
         //-NPR5.49 [331208]
         //-NPR5.53 [376362]
         //OnAfterPostPOSEntryBatch(POSEntry,PreviewMode);
-        OnAfterPostPOSEntryBatch(POSEntry,false);
+        OnAfterPostPOSEntryBatch(POSEntry, false);
         //+NPR5.53 [376362]
 
         //+NPR5.49 [331208]
 
         if ShowProgressDialog then
-          ProgressWindow.Close;
+            ProgressWindow.Close;
 
         //-NPR5.53 [376362]
         // IF PreviewMode THEN BEGIN
@@ -300,12 +301,12 @@ codeunit 6150615 "POS Post Entries"
                 if (POSEntry."Post Entry Status" in [POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting"]) then begin
                     //+NPR5.38 [301600]
 
-            //-NPR5.53 [376362]
-            // OnCheckPostingRestrictions(POSEntry,PreviewMode);
-            // OnBeforePostPOSEntry(POSEntry,PreviewMode);
-            OnCheckPostingRestrictions(POSEntry,false);
-            OnBeforePostPOSEntry(POSEntry,false);
-            //+NPR5.53 [376362]
+                    //-NPR5.53 [376362]
+                    // OnCheckPostingRestrictions(POSEntry,PreviewMode);
+                    // OnBeforePostPOSEntry(POSEntry,PreviewMode);
+                    OnCheckPostingRestrictions(POSEntry, false);
+                    OnBeforePostPOSEntry(POSEntry, false);
+                    //+NPR5.53 [376362]
 
 
                     POSEntry.Recalculate;
@@ -349,7 +350,7 @@ codeunit 6150615 "POS Post Entries"
                     PreviousPOSPeriodRegister := POSEntry."POS Period Register No.";
                     //-NPR5.38 [301600]
                 end;
-                //+NPR5.38 [301600]
+            //+NPR5.38 [301600]
             until POSEntry.Next = 0;
     end;
 
@@ -648,7 +649,7 @@ codeunit 6150615 "POS Post Entries"
 
                         if AmountToPostToAccount <> 0 then
                             MakeGenJournalFromPOSBalancingLine(POSBalancingLine, AmountToPostToAccount, GetGLAccountType(POSPostingSetup), POSPostingSetup."Account No.", POSBalancingLine.Description, GenJournalLine);
-                        //+NPR5.38 [302777]
+                    //+NPR5.38 [302777]
                     until POSBalancingLine.Next = 0;
             until POSEntry.Next = 0;
     end;
@@ -672,6 +673,8 @@ codeunit 6150615 "POS Post Entries"
         Commit;
         //+NPR5.53 [376362]
 
+        if POSEntry.FindSet then
+            repeat
                 if ShowProgressDialog then begin
                     LineCount := LineCount + 1;
                     ProgressWindow.Update(11, Round(LineCount / NoOfRecords * 10000, 1));
@@ -683,55 +686,55 @@ codeunit 6150615 "POS Post Entries"
                     if PostingDateExists then
                         POSPostItemEntries.SetPostingDate(ReplaceDocumentDate, ReplaceDocumentDate, PostingDate);
 
-            //-NPR5.53 [376362]
-            //    IF StopOnErrorVar THEN BEGIN
-            //
-            //      //-#372920 [372920] PostAssembly native code commits before posting
-            //      COMMIT;
-            //      POSPostItemEntries.PostAssemblyOrders (POSEntry, TRUE);
-            //      COMMIT;
-            //      //+#372920 [372920]
-            //
-            //      POSPostItemEntries.RUN(POSEntry);
-            //      POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::Posted);
-            //      POSEntry.MODIFY;
-            //
-            //    END ELSE BEGIN
-            //      //-#369668 [369668]
-            //      COMMIT;
-            //      //+#369668 [369668]
-            //
-            //      //-#372920 [372920]
-            //      // IF POSPostItemEntries.RUN(POSEntry) THEN BEGIN
-            //      //   POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::Posted);
-            //      // END ELSE BEGIN
-            //      //   POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::"Error while Posting");
-            //      // END;
-            //
-            //      POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::"Error while Posting");
-            //
-            //      IF (POSPostItemEntries.PostAssemblyOrders (POSEntry, FALSE)) THEN
-            //        IF POSPostItemEntries.RUN(POSEntry) THEN
-            //          POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::Posted);
-            //
-            //      //+#372920 [372920]
-            //      POSEntry.MODIFY;
-            //      COMMIT;
-            //
-            //    END;
+                    //-NPR5.53 [376362]
+                    //    IF StopOnErrorVar THEN BEGIN
+                    //
+                    //      //-#372920 [372920] PostAssembly native code commits before posting
+                    //      COMMIT;
+                    //      POSPostItemEntries.PostAssemblyOrders (POSEntry, TRUE);
+                    //      COMMIT;
+                    //      //+#372920 [372920]
+                    //
+                    //      POSPostItemEntries.RUN(POSEntry);
+                    //      POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::Posted);
+                    //      POSEntry.MODIFY;
+                    //
+                    //    END ELSE BEGIN
+                    //      //-#369668 [369668]
+                    //      COMMIT;
+                    //      //+#369668 [369668]
+                    //
+                    //      //-#372920 [372920]
+                    //      // IF POSPostItemEntries.RUN(POSEntry) THEN BEGIN
+                    //      //   POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::Posted);
+                    //      // END ELSE BEGIN
+                    //      //   POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::"Error while Posting");
+                    //      // END;
+                    //
+                    //      POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::"Error while Posting");
+                    //
+                    //      IF (POSPostItemEntries.PostAssemblyOrders (POSEntry, FALSE)) THEN
+                    //        IF POSPostItemEntries.RUN(POSEntry) THEN
+                    //          POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::Posted);
+                    //
+                    //      //+#372920 [372920]
+                    //      POSEntry.MODIFY;
+                    //      COMMIT;
+                    //
+                    //    END;
 
-            POSEntryToPost.Get (POSEntry."Entry No.");
-            if StopOnErrorVar then begin
-              POSPostItemTransaction.Run (POSEntryToPost);
+                    POSEntryToPost.Get(POSEntry."Entry No.");
+                    if StopOnErrorVar then begin
+                        POSPostItemTransaction.Run(POSEntryToPost);
 
-            end else begin
-              if (not POSPostItemTransaction.Run (POSEntryToPost)) then ;
+                    end else begin
+                        if (not POSPostItemTransaction.Run(POSEntryToPost)) then;
 
-            end;
-            //+NPR5.53 [376362]
+                    end;
+                    //+NPR5.53 [376362]
 
-          end;
-        until POSEntry.Next = 0;
+                end;
+            until POSEntry.Next = 0;
     end;
 
     local procedure CheckandPostGenJournal(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "POS Entry"): Boolean
@@ -861,15 +864,15 @@ codeunit 6150615 "POS Post Entries"
                 //-NPR5.38 [285957]
 
                 GenJnlPostLine.Run(GenJournalLine);
-                //IF StopOnErrorVar THEN BEGIN
-                //  GenJnlPostLine.RUN(GenJournalLine);
-                //END ELSE BEGIN
-                //  IF NOT GenJnlPostLine.RUN(GenJournalLine) THEN BEGIN
-                //    ErrorText := GETLASTERRORTEXT;
-                //    EXIT(FALSE);
-                //  END;
-                //END;
-                //+NPR5.38 [285957]
+            //IF StopOnErrorVar THEN BEGIN
+            //  GenJnlPostLine.RUN(GenJournalLine);
+            //END ELSE BEGIN
+            //  IF NOT GenJnlPostLine.RUN(GenJournalLine) THEN BEGIN
+            //    ErrorText := GETLASTERRORTEXT;
+            //    EXIT(FALSE);
+            //  END;
+            //END;
+            //+NPR5.38 [285957]
             until GenJournalLine.Next = 0;
         exit(true);
     end;
@@ -1466,7 +1469,7 @@ codeunit 6150615 "POS Post Entries"
         //-NPR5.53 [380054]
         //CASE POSPostingSetup."Account Type" OF
         case POSPostingSetup."Difference Account Type" of
-        //+NPR5.53 [380054]
+            //+NPR5.53 [380054]
             POSPostingSetup."Difference Account Type"::"G/L Account":
                 exit(GenJournalLine."Account Type"::"G/L Account");
             POSPostingSetup."Difference Account Type"::"Bank Account":
@@ -1498,7 +1501,7 @@ codeunit 6150615 "POS Post Entries"
                     POSEntry.Modify(true);
                     //-NPR5.38 [301600]
                 end;
-                //+NPR5.38 [301600]
+            //+NPR5.38 [301600]
             until POSEntry.Next = 0;
     end;
 
@@ -1555,7 +1558,7 @@ codeunit 6150615 "POS Post Entries"
 
         //-NPR5.53 [376362]
         //OnAfterInsertPOSPostingBufferToGenJnl(POSPostingBuffer,GenJournalLine,PreviewMode);
-        OnAfterInsertPOSPostingBufferToGenJnl(POSPostingBuffer,GenJournalLine,false);
+        OnAfterInsertPOSPostingBufferToGenJnl(POSPostingBuffer, GenJournalLine, false);
         //+NPR5.53 [376362]
     end;
 
@@ -1602,7 +1605,7 @@ codeunit 6150615 "POS Post Entries"
 
         //-NPR5.53 [376362]
         // OnAfterInsertPOSBalancingLineToGenJnl(POSBalancingLine,GenJournalLine,PreviewMode);
-        OnAfterInsertPOSBalancingLineToGenJnl(POSBalancingLine,GenJournalLine,false);
+        OnAfterInsertPOSBalancingLineToGenJnl(POSBalancingLine, GenJournalLine, false);
         //+NPR5.53 [376362]
     end;
 
@@ -1632,13 +1635,13 @@ codeunit 6150615 "POS Post Entries"
             "Posting Date" := PostingDate;
             "Document Date" := "Posting Date";
 
-          //-NPR5.53 [376362]
-          // IF PreviewMode THEN
-          //   "Document No." := FakeDocNoTxt
-          // ELSE
-          //  "Document No." := DocumentNo;
-          "Document No." := DocumentNo;
-          //+NPR5.53 [376362]
+            //-NPR5.53 [376362]
+            // IF PreviewMode THEN
+            //   "Document No." := FakeDocNoTxt
+            // ELSE
+            //  "Document No." := DocumentNo;
+            "Document No." := DocumentNo;
+            //+NPR5.53 [376362]
 
             "External Document No." := ExternalDocNo;
             Description := CopyStr(PostingDescription, 1, MaxStrLen(Description));
@@ -1781,13 +1784,13 @@ codeunit 6150615 "POS Post Entries"
                             GenJnlLine."Reason Code" := POSEntry."Reason Code";
                             //GenJnlLine."Document Type"
 
-                //-NPR5.53 [376362]
-                // IF PreviewMode THEN
-                //   GenJnlLine."Document No." := FakeDocNoTxt
-                // ELSE
-                //   GenJnlLine."Document No." := POSEntry."Document No.";
-                GenJnlLine."Document No." := POSEntry."Document No.";
-                //+NPR5.53 [376362]
+                            //-NPR5.53 [376362]
+                            // IF PreviewMode THEN
+                            //   GenJnlLine."Document No." := FakeDocNoTxt
+                            // ELSE
+                            //   GenJnlLine."Document No." := POSEntry."Document No.";
+                            GenJnlLine."Document No." := POSEntry."Document No.";
+                            //+NPR5.53 [376362]
 
                             //GenJnlLine."External Document No."
                             GenJnlLine."System-Created Entry" := true;
@@ -1916,13 +1919,13 @@ codeunit 6150615 "POS Post Entries"
                     TempGenJnlLine."Reason Code" := POSEntry."Reason Code";
                     //TempGenJnlLine."Document Type"
 
-              //-NPR5.53 [376362]
-              // IF PreviewMode THEN
-              //   TempGenJnlLine."Document No." := FakeDocNoTxt
-              // ELSE
-              //   TempGenJnlLine."Document No." := POSEntry."Document No.";
-              TempGenJnlLine."Document No." := POSEntry."Document No.";
-              //+NPR5.53 [376362]
+                    //-NPR5.53 [376362]
+                    // IF PreviewMode THEN
+                    //   TempGenJnlLine."Document No." := FakeDocNoTxt
+                    // ELSE
+                    //   TempGenJnlLine."Document No." := POSEntry."Document No.";
+                    TempGenJnlLine."Document No." := POSEntry."Document No.";
+                    //+NPR5.53 [376362]
 
                     //TempGenJnlLine."External Document No."
                     TempGenJnlLine."System-Created Entry" := true;
@@ -2009,7 +2012,7 @@ codeunit 6150615 "POS Post Entries"
     begin
 
         //-NPR5.53 [376362]
-        Error ('This function has been discontinued.');
+        Error('This function has been discontinued.');
         // GenJnlPostPreview.Start;
         // PreviewMode := TRUE;
         // IF NOT Code(POSEntry) THEN BEGIN
@@ -2031,7 +2034,7 @@ codeunit 6150615 "POS Post Entries"
     begin
 
         //-NPR5.53 [376362]
-        Error ('This function has been discontinued.');
+        Error('This function has been discontinued.');
         // //-NPR5.37 [293133];
         // GenJnlPostPreview.Start;
         // PreviewMode := TRUE;
@@ -2145,14 +2148,14 @@ codeunit 6150615 "POS Post Entries"
         //-NPR5.53 [375258]
         POSEntry2.Copy(POSEntry);
         with POSEntry2 do begin
-          FilterGroup(-1);
-          SetRange("Post Entry Status","Post Entry Status"::Unposted,"Post Entry Status"::"Error while Posting");
-          SetRange("Post Item Entry Status","Post Item Entry Status"::Unposted,"Post Item Entry Status"::"Error while Posting");
-          FilterGroup(0);
-          if FindSet then
-            repeat
-              POSPostingControl.CheckGlobalDimAndDimSetConsistency(RecordId,"Shortcut Dimension 1 Code","Shortcut Dimension 2 Code","Dimension Set ID",0);
-            until Next = 0;
+            FilterGroup(-1);
+            SetRange("Post Entry Status", "Post Entry Status"::Unposted, "Post Entry Status"::"Error while Posting");
+            SetRange("Post Item Entry Status", "Post Item Entry Status"::Unposted, "Post Item Entry Status"::"Error while Posting");
+            FilterGroup(0);
+            if FindSet then
+                repeat
+                    POSPostingControl.CheckGlobalDimAndDimSetConsistency(RecordId, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID", 0);
+                until Next = 0;
         end;
         //+NPR5.53 [375258]
     end;

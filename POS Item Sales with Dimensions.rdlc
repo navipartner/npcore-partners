@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <Height>2in</Height>
+        <Style />
+      </Body>
+      <Width>6.5in</Width>
+      <Page>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="AppliedFiltersLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AppliedFiltersLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AppliedFiltersLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ContribMarginLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ContribMarginLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ContribMarginLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="CostAmtLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>CostAmtLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>CostAmtLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="CoverMarginLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>CoverMarginLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>CoverMarginLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DiscountAmtLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DiscountAmtLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DiscountAmtLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ItemNoLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ItemNoLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ItemNoLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DateLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DateLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DateLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SalesAmtLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SalesAmtLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SalesAmtLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SalesAmtInclVATLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SalesAmtInclVATLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SalesAmtInclVATLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SoldQtyLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SoldQtyLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SoldQtyLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="UnitCostLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>UnitCostLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>UnitCostLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="VariantCodeCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>VariantCodeCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>VariantCodeCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="LocationCodeCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>LocationCodeCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>LocationCodeCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="POSUnitNoCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>POSUnitNoCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>POSUnitNoCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DescriptionCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DescriptionCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DescriptionCaption</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="FilterFieldName">
+          <DataField>FilterFieldName</DataField>
+        </Field>
+        <Field Name="FilterValue">
+          <DataField>FilterValue</DataField>
+        </Field>
+        <Field Name="LineNo">
+          <DataField>LineNo</DataField>
+        </Field>
+        <Field Name="ItemNo">
+          <DataField>ItemNo</DataField>
+        </Field>
+        <Field Name="VariantCode">
+          <DataField>VariantCode</DataField>
+        </Field>
+        <Field Name="LocationCode">
+          <DataField>LocationCode</DataField>
+        </Field>
+        <Field Name="POSUnitNo">
+          <DataField>POSUnitNo</DataField>
+        </Field>
+        <Field Name="Description">
+          <DataField>Description</DataField>
+        </Field>
+        <Field Name="QtyBase">
+          <DataField>QtyBase</DataField>
+        </Field>
+        <Field Name="QtyBaseFormat">
+          <DataField>QtyBaseFormat</DataField>
+        </Field>
+        <Field Name="SalesAmtLCY">
+          <DataField>SalesAmtLCY</DataField>
+        </Field>
+        <Field Name="SalesAmtLCYFormat">
+          <DataField>SalesAmtLCYFormat</DataField>
+        </Field>
+        <Field Name="SalesAmtLCYInclVAT">
+          <DataField>SalesAmtLCYInclVAT</DataField>
+        </Field>
+        <Field Name="SalesAmtLCYInclVATFormat">
+          <DataField>SalesAmtLCYInclVATFormat</DataField>
+        </Field>
+        <Field Name="CostAmtLCY">
+          <DataField>CostAmtLCY</DataField>
+        </Field>
+        <Field Name="CostAmtLCYFormat">
+          <DataField>CostAmtLCYFormat</DataField>
+        </Field>
+        <Field Name="DiscountAmtLCY">
+          <DataField>DiscountAmtLCY</DataField>
+        </Field>
+        <Field Name="DiscountAmtLCYFormat">
+          <DataField>DiscountAmtLCYFormat</DataField>
+        </Field>
+        <Field Name="PostingDate">
+          <DataField>PostingDate</DataField>
+        </Field>
+        <Field Name="DimSetID">
+          <DataField>DimSetID</DataField>
+        </Field>
+        <Field Name="DimCode">
+          <DataField>DimCode</DataField>
+        </Field>
+        <Field Name="DimName">
+          <DataField>DimName</DataField>
+        </Field>
+        <Field Name="DimValueCode">
+          <DataField>DimValueCode</DataField>
+        </Field>
+        <Field Name="DimValueName">
+          <DataField>DimValueName</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>

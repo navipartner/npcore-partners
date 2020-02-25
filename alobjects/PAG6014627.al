@@ -7,6 +7,9 @@ page 6014627 "Hardware Connector"
     Editable = false;
     PageType = StandardDialog;
 
+    // TODO: MMV - NaviPartner.Retail.Controls.Bridge can't be used or missing reference.
+    /*
+
     layout
     {
         area(content)
@@ -39,6 +42,7 @@ page 6014627 "Hardware Connector"
             }
         }
     }
+    */
 
     actions
     {
@@ -54,7 +58,7 @@ page 6014627 "Hardware Connector"
         AutoClosed: Boolean;
         PageCaption: Text;
 
-    procedure SetModule(htmlIn: Text;cssIn: Text;jsIn: Text;caption: Text)
+    procedure SetModule(htmlIn: Text; cssIn: Text; jsIn: Text; caption: Text)
     begin
         html := htmlIn;
         css := cssIn;
