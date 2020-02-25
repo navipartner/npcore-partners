@@ -59,6 +59,11 @@ codeunit 6150614 "POS Create Entry"
     // NPR5.52/TSA /20190925 CASE 369231 Assign "Retail Serial No." value
     // NPR5.52/TSA /20190904 CASE 367393 Added implementation of Navigate for POS Entry
     // NPR5.52/ALPO/20191030 CASE 374750 Set "Exclude from Posting" on POS Sales Lines to TRUE for Credit Sales transactions
+    // NPR5.53/ALPO/20191022 CASE 373743 Field "Sales Ticket Series" moved from "Cash Register" to "POS Audit Profile"
+    // NPR5.53/ALPO/20191105 CASE 376035 Save active event on Sale POS and POS Entry
+    // NPR5.53/ALPO/20191204 CASE 379729 Total amounts were not calculated on POS Entry for Credit Sales and Credit Memos
+    // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
+    // NPR5.53/MMV /20200108 CASE 373453 Support for storing links to posted documents when unposted document fields are blank.
 
     TableNo = "Sale POS";
 
@@ -222,6 +227,7 @@ codeunit 6150614 "POS Create Entry"
         if SalePOS."Contact No." <> '' then
           if Contact.Get(CopyStr(SalePOS."Contact No.",1,MaxStrLen(Contact."No."))) then
             POSEntry."Contact No." := Contact."No.";
+        POSEntry."Event No." := SalePOS."Event No.";  //NPR5.53 [376035]
 
         POSEntry."Shortcut Dimension 1 Code" := SalePOS."Shortcut Dimension 1 Code";
         POSEntry."Shortcut Dimension 2 Code" := SalePOS."Shortcut Dimension 2 Code";
@@ -254,6 +260,7 @@ codeunit 6150614 "POS Create Entry"
         // END;
         //+NPR5.37 [294362]
         //+NPR5.40 [276562]
+        POSEntry."NPRE Number of Guests" := SalePOS."NPRE Number of Guests";  //NPR5.53 [380918]
         OnBeforeInsertPOSEntry(SalePOS,POSEntry);
         //-NPR5.38 [302693]
         if POSEntry.Description = '' then begin
@@ -345,10 +352,12 @@ codeunit 6150614 "POS Create Entry"
           //-NPR5.51 [362329]
           "Exclude from Posting" := ExcludeFromPosting(SaleLinePOS);
           //+NPR5.51 [362329]
-          //-NPR5.52 [374750]
-          if not "Exclude from Posting" then
-            "Exclude from Posting" := POSEntry."Entry Type" = POSEntry."Entry Type"::"Credit Sale";
-          //+NPR5.52 [374750]
+          //-NPR5.53 [379729]-revoked
+        //  //-NPR5.52 [374750]
+        //  IF NOT "Exclude from Posting" THEN
+        //    "Exclude from Posting" := POSEntry."Entry Type" = POSEntry."Entry Type"::"Credit Sale";
+        //  //+NPR5.52 [374750]
+          //+NPR5.53 [379729]-revoked
 
           "No." := SaleLinePOS."No.";
           "Variant Code" := SaleLinePOS."Variant Code";
@@ -452,33 +461,35 @@ codeunit 6150614 "POS Create Entry"
           "Retail Serial No." := SaleLinePOS."Serial No. not Created";
           //+NPR5.52 [369231]
           "Return Reason Code" := SaleLinePOS."Return Reason Code";
-
+          "NPRE Seating Code" := SaleLinePOS."NPRE Seating Code";  //NPR5.53 [380918]
           //-NPR5.49 [342090]
           CreateRMAEntry (POSEntry, SalePOS, SaleLinePOS);
           //+NPR5.49 [342090]
 
           //-NPR5.50 [300557]
+        //-NPR5.53 [373453]
           if SaleLinePOS."Sales Document No." <> '' then begin
             POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, SaleLinePOS."Sales Document Type", SaleLinePOS."Sales Document No.");
+          end;
 
-            if SaleLinePOS."Posted Sales Document No." <> '' then begin
-              case SaleLinePOS."Posted Sales Document Type" of
-                SaleLinePOS."Posted Sales Document Type"::INVOICE :
-                  POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE, SaleLinePOS."Posted Sales Document No.");
-                SaleLinePOS."Posted Sales Document Type"::CREDIT_MEMO :
-                  POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::POSTED_CREDIT_MEMO, SaleLinePOS."Posted Sales Document No.");
-              end;
-            end;
-
-            if SaleLinePOS."Delivered Sales Document No." <> '' then begin
-              case SaleLinePOS."Delivered Sales Document Type" of
-                SaleLinePOS."Delivered Sales Document Type"::SHIPMENT :
-                  POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::SHIPMENT, SaleLinePOS."Delivered Sales Document No.");
-                SaleLinePOS."Delivered Sales Document Type"::RETURN_RECEIPT :
-                  POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::RETURN_RECEIPT, SaleLinePOS."Delivered Sales Document No.");
-              end;
+          if SaleLinePOS."Posted Sales Document No." <> '' then begin
+            case SaleLinePOS."Posted Sales Document Type" of
+              SaleLinePOS."Posted Sales Document Type"::INVOICE :
+                POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE, SaleLinePOS."Posted Sales Document No.");
+              SaleLinePOS."Posted Sales Document Type"::CREDIT_MEMO :
+                POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::POSTED_CREDIT_MEMO, SaleLinePOS."Posted Sales Document No.");
             end;
           end;
+
+          if SaleLinePOS."Delivered Sales Document No." <> '' then begin
+            case SaleLinePOS."Delivered Sales Document Type" of
+              SaleLinePOS."Delivered Sales Document Type"::SHIPMENT :
+                POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::SHIPMENT, SaleLinePOS."Delivered Sales Document No.");
+              SaleLinePOS."Delivered Sales Document Type"::RETURN_RECEIPT :
+                POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSSalesLine, POSEntrySalesDocLink."Sales Document Type"::RETURN_RECEIPT, SaleLinePOS."Delivered Sales Document No.");
+            end;
+          end;
+        //+NPR5.53 [373453]
 
           "Applies-to Doc. Type" := SaleLinePOS."Buffer Document Type";
           "Applies-to Doc. No." := SaleLinePOS."Buffer Document No.";
@@ -1553,7 +1564,8 @@ codeunit 6150614 "POS Create Entry"
     local procedure FillFiscalNo(var POSEntry: Record "POS Entry";NoSeriesCode: Code[10];NoSeriesDate: Date)
     var
         NoSeriesManagement: Codeunit NoSeriesManagement;
-        Register: Record Register;
+        POSAuditProfile: Record "POS Audit Profile";
+        POSUnit: Record "POS Unit";
     begin
         //-NPR5.40 [308457]
         //-NPR5.48 [318028]
@@ -1563,8 +1575,16 @@ codeunit 6150614 "POS Create Entry"
         //  POSEntry."Fiscal No." := NoSeriesManagement.GetNextNo(NoSeriesCode,NoSeriesDate,TRUE);
         if NoSeriesCode = '' then begin
           POSEntry."Fiscal No." := POSEntry."Document No.";
-          Register.Get(POSEntry."POS Unit No.");
-          POSEntry."Fiscal No. Series" := Register."Sales Ticket Series";
+          //-NPR5.53 [373743]-revoked
+          //Register.GET(POSEntry."POS Unit No.");
+          //POSEntry."Fiscal No. Series" := Register."Sales Ticket Series";
+          //+NPR5.53 [373743]-revoked
+          //-NPR5.53 [373743]
+          POSUnit.Get(POSEntry."POS Unit No.");
+          POSUnit.TestField("POS Audit Profile");
+          POSAuditProfile.Get(POSUnit."POS Audit Profile");
+          POSEntry."Fiscal No. Series" := POSAuditProfile."Sales Ticket No. Series";
+          //+NPR5.53 [373743]
         end else begin
           POSEntry."Fiscal No." := NoSeriesManagement.GetNextNo(NoSeriesCode,NoSeriesDate,true);
           POSEntry."Fiscal No. Series" := NoSeriesCode;

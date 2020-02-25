@@ -6,6 +6,7 @@ codeunit 6150829 "POS Action - POS Info"
     // NPR5.45/TSA /20180810 CASE 319879 Added support for info codes in the payment view and refactored
     // NPR5.51/ALPO/20190826 CASE 364558 Define application scope for POSInfo action
     // NPR5.52/ALPO/20190920 CASE 364558 Data source set to 'BUILTIN_SALE'
+    // NPR5.53/ALPO/20200204 CASE 388697 Set value 'All Lines' as default option for parameter 'ApplicationScope'
 
 
     trigger OnRun()
@@ -24,8 +25,9 @@ codeunit 6150829 "POS Action - POS Info"
 
     local procedure ActionVersion(): Text
     begin
-        //EXIT ('1.4');  //NPR5.51 [364558]-revoked
-        exit ('1.5');  //NPR5.51 [364558]
+        //EXIT ('1.4');
+        //EXIT ('1.5');  //NPR5.51 [364558]
+        exit ('1.6');  //NPR5.53 [388697]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -41,7 +43,8 @@ codeunit 6150829 "POS Action - POS Info"
             then begin
                 RegisterTextParameter('POSInfoCode', '');
             //-NPR5.51 [364558]
-            RegisterOptionParameter('ApplicationScope',' ,Current Line,All Lines,New Lines,Ask',' ');
+            //RegisterOptionParameter('ApplicationScope',' ,Current Line,All Lines,New Lines,Ask',' ');  //NPR5.53 [388697]-revoked
+            RegisterOptionParameter('ApplicationScope',' ,Current Line,All Lines,New Lines,Ask','All Lines');  //NPR5.53 [388697]
             RegisterBooleanParameter('ClearPOSInfo',false);
             //+NPR5.51 [364558]
                 RegisterWorkflow(false);

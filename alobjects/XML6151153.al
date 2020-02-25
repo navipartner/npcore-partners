@@ -4,6 +4,7 @@ xmlport 6151153 "M2 Create Corporate Account"
     // NPR5.49/JAKUBV/20190402  CASE 320424-01 Transport NPR5.49 - 1 April 2019
     // NPR5.51/TSA /20190812 CASE 364644 Added Person section
     // MAG2.23/TSA /20191015 CASE 373151 Moved section person to be included in address, added name, removed company name, EAN
+    // MAG2.24/TSA /20191119 CASE 372304 Added membership opt-out feature ExcludeFromMembership field and added a membership section
 
     Caption = 'Create Corporate Account';
     Encoding = UTF8;
@@ -26,6 +27,10 @@ xmlport 6151153 "M2 Create Corporate Account"
                     }
                     fieldattribute(PasswordHash;TmpContactRequest."Magento Password (Md5)")
                     {
+                    }
+                    fieldattribute(ExcludeFromMembership;TmpContactRequest."Exclude from Segment")
+                    {
+                        Occurrence = Optional;
                     }
                 }
                 textelement(Company)
@@ -215,6 +220,26 @@ xmlport 6151153 "M2 Create Corporate Account"
                             end;
                         end;
                     }
+                    tableelement(tmpmembershiproleresponse;"MM Membership Role")
+                    {
+                        LinkFields = "Contact No."=FIELD("No.");
+                        LinkTable = TmpContactResponse;
+                        MinOccurs = Zero;
+                        XmlName = 'Membership';
+                        UseTemporary = true;
+                        fieldelement(MembershipCode;TmpMembershipRoleResponse."Membership Code")
+                        {
+                        }
+                        fieldelement(ExternalMembershipNumber;TmpMembershipRoleResponse."External Membership No.")
+                        {
+                        }
+                        fieldelement(ExternalMemberNumber;TmpMembershipRoleResponse."External Member No.")
+                        {
+                        }
+                        fieldelement(DisplayName;TmpMembershipRoleResponse."Member Display Name")
+                        {
+                        }
+                    }
                 }
             }
         }
@@ -251,6 +276,8 @@ xmlport 6151153 "M2 Create Corporate Account"
     end;
 
     procedure SetResponse(var TmpContact: Record Contact temporary)
+    var
+        MembershipRole: Record "MM Membership Role";
     begin
 
         TmpContactResponse.TransferFields (TmpContact, true);
@@ -263,6 +290,16 @@ xmlport 6151153 "M2 Create Corporate Account"
         repeat
           TmpContactResponse.TransferFields (TmpContact, true);
           TmpContactResponse.Insert ();
+          //-MAG2.24 [372304]
+          if (not MembershipRole.SetCurrentKey ("Contact No.")) then ;
+          MembershipRole.SetFilter ("Contact No.", '=%1', TmpContact."No.");
+          MembershipRole.SetFilter (Blocked, '=%1', false);
+          if (MembershipRole.FindFirst ()) then begin
+            MembershipRole.CalcFields ("External Member No.", "External Membership No.", "Member Display Name", "Membership Code");
+            TmpMembershipRoleResponse.TransferFields (MembershipRole, true);
+            TmpMembershipRoleResponse.Insert ();
+          end;
+          //+MAG2.24 [372304]
         until (TmpContact.Next () = 0);
 
         ResponseCode := 'OK';

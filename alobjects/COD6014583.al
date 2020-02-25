@@ -23,6 +23,7 @@ codeunit 6014583 "Report Printer Interface"
     // NPR5.30/MMV /20170209 CASE 261964 Updated google print function.
     // NPR5.47/TJ  /20180919 CASE 327664 Recoded by MMV to properly work on web client
     // NPR5.48/MMV /20181203 CASE 338596 Only check for POS on GUI sessions.
+    // NPR5.53/THRO/20200106 CASE 383562 Added PrintNode pdf print
 
 
     trigger OnRun()
@@ -117,6 +118,7 @@ codeunit 6014583 "Report Printer Interface"
         //-NPR5.47 [327664]
         if not (ObjectOutputSelection."Output Type" in [ObjectOutputSelection."Output Type"::"Printer Name",
                                                         ObjectOutputSelection."Output Type"::"Google Print",
+                                                        ObjectOutputSelection."Output Type"::"PrintNode PDF", //NPR5.53 [383562]
                                                         ObjectOutputSelection."Output Type"::"E-mail"]) then
             ObjectOutputSelection.FieldError("Output Type");
 
@@ -202,6 +204,15 @@ codeunit 6014583 "Report Printer Interface"
             ObjectOutputSelection."Output Type"::"Google Print":
                 PrintMethodMgt.PrintViaGoogleCloud(OutputPath, Stream, 'application/pdf', 0, ObjectID);
                 //+NPR5.30 [261964]
+          //-NPR5.53 [383562]
+          ObjectOutputSelection."Output Type"::"PrintNode PDF" :
+            begin
+              ObjectOutputSelection."Object Type" := ObjectOutputSelection."Object Type"::Report;
+              ObjectOutputSelection."Object ID" := ObjectID;
+              ObjectOutputSelection.GetObjectName();
+              PrintMethodMgt.PrintViaPrintNodePdf(OutputPath, Stream, ObjectOutputSelection."Object Name");
+            end;
+          //+NPR5.53 [383562]
         end;
 
         //-NPR5.30 [261964]

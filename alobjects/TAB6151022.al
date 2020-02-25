@@ -1,6 +1,7 @@
 table 6151022 "NpRv Ext. Voucher Sales Line"
 {
     // NPR5.48/MHA /20180921  CASE 302179 Object created
+    // NPR5.53/MHA /20191114  CASE 372315 Top-up added to OptionString of field 35 Type
 
     Caption = 'External Retail Voucher Sales Line';
     DrillDownPageID = "NpRv Ext. Voucher Sales Lines";
@@ -36,8 +37,9 @@ table 6151022 "NpRv Ext. Voucher Sales Line"
         field(35;Type;Option)
         {
             Caption = 'Type';
-            OptionCaption = 'New Voucher,Payment';
-            OptionMembers = "New Voucher",Payment;
+            Description = 'NPR5.53';
+            OptionCaption = 'New Voucher,Payment,Top-up';
+            OptionMembers = "New Voucher",Payment,"Top-up";
         }
         field(50;"Voucher Type";Code[20])
         {

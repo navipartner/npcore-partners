@@ -39,43 +39,58 @@ codeunit 6014478 "POS End Sale Post Processing"
     //                                   ISEMPTY instead of COUNT
     //                                   Removed deprecated retail order functionality
     // NPR5.46/MMV /20180918 CASE 328879 Removed standard POS marshaller use.
+    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
+    // NPR5.53/MMV /20191106 CASE 376362 Added explicit pos entry auto post invoke.
 
     TableNo = "Sale POS";
 
     trigger OnRun()
     var
-        AuditRoll: Record "Audit Roll";
         NPRetailSetup: Record "NP Retail Setup";
+    begin
+        if not NPRetailSetup.Get then
+          NPRetailSetup.Init;
+        //-NPR5.53 [376362]
+        // IF NPRetailSetup."Advanced Posting Activated" THEN
+        //  EXIT;
+
+        if NPRetailSetup."Advanced Posting Activated" then begin
+          PostPOSEntry(Rec);
+        end else begin
+          PostAuditRoll(Rec);
+        end;
+        //+NPR5.53 [376362]
+    end;
+
+    var
+        ERR_MISSING_ENTRY: Label 'Missing %1, %2 %3';
+
+    local procedure PostAuditRoll(var SalePOS: Record "Sale POS")
+    var
+        AuditRoll: Record "Audit Roll";
         PaymentTypePOS: Record "Payment Type POS";
         Postsale: Codeunit "Post sale";
         Register: Record Register;
         RetailSetup: Record "Retail Setup";
+        POSUnit: Record "POS Unit";
+        POSSetup: Codeunit "POS Setup";
         ImmediatePostItemEntries: Boolean;
         PostParam: Boolean;
     begin
-        //-NPR5.42 [315838]
-        if not NPRetailSetup.Get then
-          NPRetailSetup.Init;
-        if NPRetailSetup."Advanced Posting Activated" then
-          exit;
-        //+NPR5.42 [315838]
-        
         RetailSetup.Get ();
-        Register.Get ("Register No.");
-        
-        //-NPR5.42 [315838]
-        // AuditRoll.SETRANGE ("Register No.","Register No.");
-        // AuditRoll.SETRANGE ("Sales Ticket No.","Sales Ticket No.");
-        // AuditRoll.FINDSET ();
-        //+NPR5.42 [315838]
+        Register.Get (SalePOS."Register No.");
+        //-NPR5.53 [371955]
+        POSUnit.Get(SalePOS."Register No.");
+        POSSetup.SetPOSUnit(POSUnit);
+        //+NPR5.53 [371955]
         
         // {---------------------------------------------------------------------------------------------}
         // { POSTING OF AUDIT ROLL RECEIPT }
         // {---------------------------------------------------------------------------------------------}
         
         AuditRoll.Reset;
-        AuditRoll.SetRange( "Register No.", "Register No." );
-        AuditRoll.SetRange( "Sales Ticket No.", "Sales Ticket No." );
+        AuditRoll.SetRange( "Register No.", SalePOS."Register No." );
+        AuditRoll.SetRange( "Sales Ticket No.", SalePOS."Sales Ticket No." );
         
         /* Payment Post Processing */
         if AuditRoll.FindSet then repeat
@@ -92,36 +107,29 @@ codeunit 6014478 "POS End Sale Post Processing"
         /* General */
         AuditRoll.Reset;
         AuditRoll.SetCurrentKey( "Register No.","Sales Ticket No.","Sale Type",Type );
-        AuditRoll.SetRange( "Register No.", "Register No." );
-        AuditRoll.SetRange( "Sales Ticket No.", "Sales Ticket No." );
+        AuditRoll.SetRange( "Register No.", SalePOS."Register No." );
+        AuditRoll.SetRange( "Sales Ticket No.", SalePOS."Sales Ticket No." );
         AuditRoll.SetRange( "Sale Date", Today );
         
         /* Customer payments */
         AuditRoll.SetRange( "Sale Type", AuditRoll."Sale Type"::Deposit );
         AuditRoll.SetRange( Type, AuditRoll.Type::Customer );
-        //-NPR5.42 [315838]
-        //IF AuditRoll.COUNT > 0 THEN
         if (not AuditRoll.IsEmpty) then
-        //+NPR5.42 [315838]
           PostParam := PostParam or RetailSetup."Post Customer Payment imme.";
         
         /* Normal item sale */
         AuditRoll.SetRange( "Sale Type", AuditRoll."Sale Type"::Sale );
         AuditRoll.SetRange( Type, AuditRoll.Type::Item );
-        //-NPR5.42 [315838]
-        //IF AuditRoll.COUNT > 0 THEN
         if (not AuditRoll.IsEmpty) then
-        //+NPR5.42 [315838]
           PostParam := PostParam or RetailSetup."Poste Sales Ticket Immediately";
         
         /* Register Payouts */
         AuditRoll.SetRange( Type );
         AuditRoll.SetRange( "Sale Type", AuditRoll."Sale Type"::"Out payment" );
-        AuditRoll.SetFilter("No.", '<>%1', Register.Rounding);
-        //-NPR5.42 [315838]
-        //IF AuditRoll.COUNT > 0 THEN
+        //AuditRoll.SETFILTER("No.", '<>%1', Register.Rounding);  //NPR5.53 [371955]-revoked
+        AuditRoll.SetFilter("No.",'<>%1',POSSetup.RoundingAccount(true));  //NPR5.53 [371955]
+        
         if (not AuditRoll.IsEmpty) then
-        //+NPR5.42 [315838]
           PostParam := PostParam or RetailSetup."Post Payouts imme.";
         
         /* Payments with optional immediate posting */
@@ -149,41 +157,26 @@ codeunit 6014478 "POS End Sale Post Processing"
         
         ImmediatePostItemEntries := (RetailSetup."Immediate postings" <> RetailSetup."Immediate postings"::" ");
         
-        //-NPR5.42 [315838]
         if PostParam or ImmediatePostItemEntries then begin
-          Postsale.SetParam( Rec,ImmediatePostItemEntries,PostParam );
+          Postsale.SetParam( SalePOS,ImmediatePostItemEntries,PostParam );
           if not Postsale.Run(AuditRoll) then;
         end;
         
         Commit;
-        
-        // IF NOT NPRetailSetup.GET THEN
-        //  NPRetailSetup.INIT;
-        // IF NOT NPRetailSetup."Advanced Posting Activated" THEN BEGIN
-        //  IF PostParam OR ImmediatePostItemEntries THEN BEGIN
-        //    Postsale.SetParam( Rec,ImmediatePostItemEntries,PostParam );
-        //    IF NOT Postsale.RUN(AuditRoll) THEN;
-        //   END;
-        // END;
-        //
-        // COMMIT;
-        //
-        // IF RetailSetup."Create retail order" = RetailSetup."Create retail order"::"After payment" THEN BEGIN
-        //  IF ("Retail Document Type" = "Retail Document Type"::"Retail Order") AND
-        //     ("Retail Document No." <> '') THEN BEGIN
-        //
-        //  END ELSE BEGIN
-        //    IF Register.Touchscreen THEN
-        //      bCreateRetailOrder := Marshaller.Confirm(t003,t002)
-        //    ELSE
-        //      bCreateRetailOrder := CONFIRM( t002, FALSE );
-        //
-        //    IF bCreateRetailOrder THEN
-        //      RetailFormCode.ReceiptToRetailOrder(Rec, 0, Register.Touchscreen,"Retail Document Type"::"Retail Order");
-        //  END;
-        // END;
-        //+NPR5.42 [315838]
 
+    end;
+
+    local procedure PostPOSEntry(SalePOS: Record "Sale POS")
+    var
+        POSPostingControl: Codeunit "POS Posting Control";
+        POSEntry: Record "POS Entry";
+        POSEntryManagement: Codeunit "POS Entry Management";
+    begin
+        //-NPR5.53 [376362]
+        if not POSEntryManagement.FindPOSEntryViaDocumentNo(SalePOS."Sales Ticket No.", POSEntry) then
+          Error(ERR_MISSING_ENTRY, POSEntry.TableCaption, POSEntry.FieldCaption("Document No."), SalePOS."Sales Ticket No.");
+        POSPostingControl.AutomaticPostEntry(POSEntry);
+        //+NPR5.53 [376362]
     end;
 }
 

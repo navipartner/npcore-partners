@@ -26,7 +26,7 @@ page 6184513 "EFT BIN Group Card"
             {
                 SubPageLink = "Group Code"=FIELD(Code);
             }
-            part(Control6014406;"EFT BIN Ranges")
+            part(Control6014406;"EFT BIN Range SubPage")
             {
                 SubPageLink = "BIN Group Code"=FIELD(Code);
             }

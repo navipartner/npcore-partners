@@ -47,6 +47,7 @@ codeunit 6151551 "NpXml Mgt."
     // NC2.20/MHA /20190411  CASE 342115 SOAPAction should only be added to Header if not explicitly defined in underlying Header table
     // NC2.22/MHA /20190614  CASE 355993 NpXml Attributes with default Field Type should not have Custom Value Codeunit nor Xml Value Function
     // NC2.22/MHA /20190627  CASE 342115 Added SetTrustedCertificateValidation() in SendApi() and removed green code before 2.19
+    // NC2.24/MHA /20191122  CASE 373950 Added ReplaceSpecialChar() to GetFilename()
 
 
     trigger OnRun()
@@ -924,6 +925,9 @@ codeunit 6151551 "NpXml Mgt."
     var
         Path: Text[1024];
     begin
+        //-NC2.24 [373950]
+        PrimaryKeyValue := ReplaceSpecialChar(PrimaryKeyValue);
+        //+NC2.24 [373950]
         if PrimaryKeyValue <> '' then
             exit(Path + DelChr(Format(Today, 0, 9) + Format(Time), '=', ',.: ') + '-' + XmlEntityType + '-' +
                  PrimaryKeyValue + '.xml');

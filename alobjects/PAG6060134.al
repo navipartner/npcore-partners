@@ -34,6 +34,7 @@ page 6060134 "MM Member Info Capture"
     // MM1.33/TSA /20180821 CASE 324065 Guardian set when adding a member for membership with a guardian defined
     // MM1.34/TSA /20180906 CASE 327614 Added a test for maximum combined length of name fields
     // MM1.40/TSA /20190822 CASE 360242 Adding NPR Attributes
+    // MM1.42/TSA /20191118 CASE 378202 Picture is not commited to DB, unless you commit the record and when a field is validated with code on the page, its not the same record - picture is removed.
 
     Caption = 'Member Information';
     DataCaptionExpression = "External Member No";
@@ -233,6 +234,13 @@ page 6060134 "MM Member Info Capture"
                 field(Picture2;Picture)
                 {
                     Editable = false;
+
+                    trigger OnValidate()
+                    begin
+                        //-MM1.42 [378202]
+                        Commit;
+                        //+MM1.42 [378202]
+                    end;
                 }
                 field(FirstName2;"First Name")
                 {
@@ -357,6 +365,14 @@ page 6060134 "MM Member Info Capture"
                 Visible = ShowNewMemberSection;
                 field(Picture;Picture)
                 {
+
+                    trigger OnValidate()
+                    begin
+
+                        //-MM1.42 [378202]
+                        Commit;
+                        //+MM1.42 [378202]
+                    end;
                 }
                 field(Gender;Gender)
                 {

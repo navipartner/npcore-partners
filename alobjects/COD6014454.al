@@ -4,6 +4,7 @@ codeunit 6014454 "Permission Set Mgt."
     // NPR5.38/JDH /20171214 CASE 299296 Changed lazy insert to correct "if not get then inserts" - Changed Hardcoded values to codefield.
     // NPR5.40/JDH /20180326 CASE 309189 Only if there is proper permission to write, it runs the permission set upgrade
     // NPR5.41/JDH /20180426 CASE 312644 Added code to support that this CU is executed as part of the database upgrade procedure (in a new seperate thread)
+    // NPR5.53/YAHA/20191112 CASE 375070 Adding permission for user BUTIK on  page 9650
 
 
     trigger OnRun()
@@ -56,6 +57,14 @@ codeunit 6014454 "Permission Set Mgt."
             repeat
                 GiveExecutePermission(RoleID, AllObj."Object Type", AllObj."Object ID")
 until AllObj.Next = 0;
+
+        //-NPR5.53 [375070]
+        AllObj.SetRange("Object ID",9650);
+        if AllObj.FindSet then repeat
+          GiveExecutePermission(RoleID,AllObj."Object Type",AllObj."Object ID")
+        until AllObj.Next = 0;
+        //+NPR5.53 [375070]
+
 
         AllObj.SetRange("Object ID", 9805, 9807);
         if AllObj.FindSet then

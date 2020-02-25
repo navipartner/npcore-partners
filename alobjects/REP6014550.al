@@ -14,6 +14,7 @@ report 6014550 "Statement E-Mail"
     // 
     // NPR5.44/THRO/20180716 CASE 316218 Disabling Send Through NaviDocs if NaviDocs isn't enabled
     //                                   Setting Date Filter to StartDate..EndDate for use in report 6014545
+    // NPR5.53/ZESO/20191213 CASE 382223 Correct bug on Email address being used.
 
     Caption = 'Statement - Paper/E-Mail';
     ProcessingOnly = true;
@@ -76,8 +77,12 @@ report 6014550 "Statement E-Mail"
                         if SendToEmail = '' then
                           SendToEmail := Customer."E-Mail";
                         //+NPR5.43 [316218]
+
                           EmailAttachmentTemp.Insert;
-                          if EmailMgt.SetupEmailTemplate(RecRef,Customer."E-Mail",true,EmailTemplateHeader) = '' then
+                          //-NPR5.53 [382223]
+                          //IF EmailMgt.SetupEmailTemplate(RecRef,Customer."E-Mail",TRUE,EmailTemplateHeader) = '' THEN
+                          if EmailMgt.SetupEmailTemplate(RecRef,SendToEmail,true,EmailTemplateHeader) = '' then
+                          //+NPR5.53 [382223]
                             if EmailMgt.CreateSmtpMessageFromEmailTemplate(EmailTemplateHeader,RecRef,DATABASE::Customer) = '' then begin
                               if EmailMgt.AddAttachmentToSmtpMessage(EmailAttachmentTemp) then begin
                                 EmailMgt.SendSmtpMessage(RecRef,true);

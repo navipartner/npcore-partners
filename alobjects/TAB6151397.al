@@ -4,6 +4,8 @@ table 6151397 "CS Posting Buffer"
     // NPR5.52/CLVA  /20190904  CASE 365967 Added init values and delete handling
     // NPR5.52/CLVA  /20190937  CASE 370509 Added "Job Type" option "Item Reclass."
     //                                       Added field "Session Id"
+    // NPR5.53/CLVA  /20191029  CASE 374331 Added "Job Type" option "Approve Counting"
+    // NPR5.53/CLVA  /20191118  CASE 377721 Added "Job Type" option "Unplanned Count"
 
     Caption = 'CS Posting Buffer';
 
@@ -47,12 +49,12 @@ table 6151397 "CS Posting Buffer"
         field(13;Created;DateTime)
         {
             Caption = 'Created';
-            Editable = false;
+            Editable = true;
         }
         field(14;Executed;Boolean)
         {
             Caption = 'Executed';
-            Editable = false;
+            Editable = true;
         }
         field(15;"Posting Index";Integer)
         {
@@ -65,7 +67,7 @@ table 6151397 "CS Posting Buffer"
         field(17;"Job Queue Status";Option)
         {
             Caption = 'Job Queue Status';
-            Editable = false;
+            Editable = true;
             OptionCaption = ' ,Scheduled for Posting,Error,Posting';
             OptionMembers = " ","Scheduled for Posting",Error,Posting;
 
@@ -87,8 +89,8 @@ table 6151397 "CS Posting Buffer"
         {
             Caption = 'Job Type';
             Editable = false;
-            OptionCaption = 'Invt. Pick,Invt. Put-away,Pick,Put-away,Phy. Inv. Journal,Item Journal,Transfer Order,Movement,Invt. Movement,Store Counting,Item Reclass.';
-            OptionMembers = "Invt. Pick","Invt. Put-away",Pick,"Put-away","Phy. Inv. Journal","Item Journal","Transfer Order",Movement,"Invt. Movement","Store Counting","Item Reclass.";
+            OptionCaption = 'Invt. Pick,Invt. Put-away,Pick,Put-away,Phy. Inv. Journal,Item Journal,Transfer Order,Movement,Invt. Movement,Store Counting,Item Reclass.,Approve Counting,Unplanned Count';
+            OptionMembers = "Invt. Pick","Invt. Put-away",Pick,"Put-away","Phy. Inv. Journal","Item Journal","Transfer Order",Movement,"Invt. Movement","Store Counting","Item Reclass.","Approve Counting","Unplanned Count";
         }
         field(20;"Job Queue Priority for Post";Integer)
         {

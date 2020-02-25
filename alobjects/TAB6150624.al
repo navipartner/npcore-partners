@@ -6,6 +6,7 @@ table 6150624 "POS Balancing Line"
     //                                 Added the fields 160 Orig. POS Sale ID and 161 Orig. POS Line No.
     // NPR5.36/AP/20170717 CASE 262628 Added "POS Ledg. Register No."
     // NPR5.38/BR/20171214 CASE 299888 Renamed from POS Ledg. Register No. to POS Period Register No. (incl. Captions)
+    // NPR5.53/SARA/20191024 CASE 373672 Added Field 600..620
 
     Caption = 'POS Balancing Line';
 
@@ -161,6 +162,30 @@ table 6150624 "POS Balancing Line"
             begin
                 //ShowDimensions;
             end;
+        }
+        field(600;"Entry Date";Date)
+        {
+            CalcFormula = Lookup("POS Entry"."Entry Date" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            Caption = 'Entry Date';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(610;"Starting Time";Time)
+        {
+            CalcFormula = Lookup("POS Entry"."Starting Time" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            Caption = 'Starting Time';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(620;"Ending Time";Time)
+        {
+            CalcFormula = Lookup("POS Entry"."Ending Time" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            Caption = 'Ending Time';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
         }
     }
 

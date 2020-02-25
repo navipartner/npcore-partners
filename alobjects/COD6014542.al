@@ -8,6 +8,7 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
     // NPR5.50/MMV /20190417 CASE 351975 Barcode parameter parse fix.
     // NPR5.51/MMV /20190801 CASE 360975 Buffer all template print data into one job.
     // NPR5.52/MMV /20191017 CASE 371935 Added inverse color and graphic box support.
+    // NPR5.53/MMV /20200113 CASE 381166 Added support for sensor select command
 
     EventSubscriberInstance = Manual;
 
@@ -34,6 +35,7 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
         SETTING_RFID_EPC_MEM: Label 'Set EPC memory structure - Comma separated integers';
         SETTING_ENCODING: Label 'Set encoding for data.';
         SETTING_LABELREVERSE: Label 'Reverse print colors. Y = Yes, N = No';
+        SETTING_SENSOR_SELECT: Label 'Sensor Select. A = Auto, R = Reflective, T = Transmissive';
         ERR_FONT: Label 'Unsupported print font: %1';
         ERR_INVALID_COMMAND: Label 'Invalid command: %1';
         Encoding: Option "Windows-1252","UTF-8";
@@ -159,6 +161,9 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
         //-NPR5.52 [371935]
             'LABEL_REVERSE' : Setup('LR', DeviceSettings.Value);
         //+NPR5.52 [371935]
+        //-NPR5.53 [381166]
+            'SENSOR_SELECT' : Setup('JS', DeviceSettings.Value);
+        //+NPR5.53 [381166]
             'ENCODING' : CustomEncoding := DeviceSettings.Value;
             else
               Error(Error_InvalidDeviceSetting, DeviceSettings.Name);
@@ -502,6 +507,17 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
         //+NPR5.52 [371935]
     end;
 
+    local procedure SensorSelect(Value: Text)
+    begin
+        //-NPR5.53 [381166]
+        case Value of
+          'A' : AddToBuffer('^JSA');
+          'R' : AddToBuffer('^JSR');
+          'T' : AddToBuffer('^JST');
+        end;
+        //+NPR5.53 [381166]
+    end;
+
     local procedure ParseGraphicBox(FontType: Text;Width: Integer;Height: Integer;X: Integer;Y: Integer)
     var
         StringLib: Codeunit "String Library";
@@ -673,6 +689,9 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
         //-NPR5.52 [371935]
           'LR' : LabelReverse(CopyStr(Value,1,1));
         //+NPR5.52 [371935]
+        //-NPR5.53 [381166]
+          'JS' : SensorSelect(CopyStr(Value,1,1));
+        //+NPR5.53 [381166]
         end;
     end;
 
@@ -876,6 +895,13 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
                 tmpDeviceSetting.Options := 'N,Y';
               end;
         //+NPR5.52 [371935]
+        //-NPR5.53 [381166]
+            'SENSOR_SELECT' :
+              begin
+                tmpDeviceSetting."Data Type" := tmpDeviceSetting."Data Type"::Option;
+                tmpDeviceSetting.Options := 'A,R,T';
+              end;
+        //+NPR5.53 [381166]
           end;
           exit(tmpDeviceSetting.Insert);
         end;
@@ -952,6 +978,9 @@ codeunit 6014542 "RP Zebra ZPL Device Library"
         //-NPR5.52 [371935]
         AddOption(tmpRetailList, SETTING_LABELREVERSE, 'LABEL_REVERSE');
         //+NPR5.52 [371935]
+        //-NPR5.53 [381166]
+        AddOption(tmpRetailList, SETTING_SENSOR_SELECT, 'SENSOR_SELECT');
+        //+NPR5.53 [381166]
     end;
 
     procedure AddOption(var RetailList: Record "Retail List" temporary;Choice: Text;Value: Text)

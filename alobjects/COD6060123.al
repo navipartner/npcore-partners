@@ -26,6 +26,9 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
     // TM1.42/TSA /20190826 CASE 357359 Seating UI
     // TM1.43/TSA /20190902 CASE 357359 Seating UI
     // TM1.43/TSA /20190910 CASE 368043 Refactored usage of "External Item Code"
+    // TM1.45/TSA /20191025 CASE 374463 Playing with WF20
+    // TM1.45/TSA /20191112 CASE 322432 Signature Change
+    // TM1.45/TSA /20191203 CASE 380754 Signature Change
 
 
     trigger OnRun()
@@ -56,14 +59,18 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
     begin
     end;
 
-    local procedure ActionCode(): Text
+    local procedure ActionCode(VersionCode: Code[10]): Text
     begin
+
+        if (VersionCode <> '') then
+          exit (StrSubstNo ('TM_TICKETMGMT_%1', VersionCode));
+
         exit('TM_TICKETMGMT');
     end;
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.2');
+        exit ('1.2.74');
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
@@ -72,9 +79,11 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         FunctionOptionString: Text;
         JSArr: Text;
         N: Integer;
+        OptionsNameArray: Text;
     begin
+
         if Sender.DiscoverAction(
-          ActionCode(),
+          ActionCode(''),
           ActionDescription,
           ActionVersion(),
           Sender.Type::Generic,
@@ -89,7 +98,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
                 JSArr += StrSubstNo('"%1",', SelectStr(N, FunctionOptionString));
             JSArr := StrSubstNo('var optionNames = [%1];', CopyStr(JSArr, 1, StrLen(JSArr) - 1));
 
-            // Sender.RegisterWorkflowStep ('0', JSArr +'windowTitle = labels.TicketTitle.substitute (optionNames[param.Function].toString()); ');
+          Sender.RegisterWorkflowStep ('0', JSArr +'windowTitle = labels.TicketTitle.substitute (optionNames[param.Function].toString()); ');
             Sender.RegisterWorkflowStep('0', JSArr + 'if (param.Function < 0) {param.Function = 1;}; windowTitle = labels.TicketTitle.substitute (optionNames[param.Function].toString());');
 
             Sender.RegisterWorkflowStep('ticketnumber', '(context.ShowTicketDialog) && input ({caption: labels.TicketPrompt, title: windowTitle}).ok(respond).cancel(abort);');
@@ -103,6 +112,61 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
             Sender.RegisterTextParameter('Admission Code', '');
             Sender.RegisterTextParameter('DefaultTicketNumber', '');
         end;
+
+        //-TM1.45 [374463]
+        if (Sender.DiscoverAction20 (
+          ActionCode ('2'),
+          ActionDescription,
+          ActionVersion()))
+        then begin
+
+          FunctionOptionString := 'Admission Count,'+
+                                  'Register Arrival,'+
+                                  'Revoke Reservation,Edit Reservation,Reconfirm Reservation,'+
+                                  'Edit Ticketholder,'+
+                                  'Change Confirmed Ticket Quantity,Pickup Ticket Reservation,Convert To Membership';
+          for N := 1 to 9 do
+            OptionsNameArray += StrSubstNo ('"%1",', SelectStr (N, FunctionOptionString));
+          OptionsNameArray := StrSubstNo ('var optionNames = [%1];', CopyStr (OptionsNameArray, 1, StrLen (OptionsNameArray)-1));
+
+          Sender.RegisterWorkflow20 (
+
+            'await workflow.respond ("ConfigureWorkflow");' +
+
+            OptionsNameArray +
+            'if ($param.Function < 0) {$param.Function = 1;}; windowTitle = $labels.TicketTitle.substitute (optionNames[$param.Function].toString());' +
+
+            'if ($context.ShowTicketDialog) { '+
+            '   await ($context.ticketnumber = await popup.input ({caption: $labels.TicketPrompt, title: windowTitle}));'+
+            '   if (!$context.ticketnumber.ok) return;'+
+            '}' +
+
+            'await workflow.respond ("RefineWorkflow");'+
+
+            'if ($context.ShowTicketQtyDialog) { '+
+            '   await ($context.ticketqty = await popup.numpad ({caption: $labels.TicketQtyPrompt.substitute($context.TicketMaxQty), title: windowTitle}));'+
+            '   if (!$context.ticketqty.ok) return;'+
+            '}' +
+
+            'if ($context.ShowReferenceDialog) { '+
+            '   await ($context.ticketreference = await popup.input ({caption: $labels.ReferencePrompt, title: windowTitle}));'+
+            '   if (!$context.ticketreference.ok) return;'+
+            '}' +
+
+            //'await popup.message (JSON.stringify($context));' +
+            'await workflow.respond ("DoAction");' +
+
+            'if ($context.Verbose) { '+
+            '  await popup.message ({caption: $context.VerboseMessage, title: windowTitle});'+
+            '}'
+          );
+
+          Sender.RegisterOptionParameter ('Function', FunctionOptionString, 'Register Arrival');
+          Sender.RegisterTextParameter ('Admission Code', '');
+          Sender.RegisterTextParameter ('DefaultTicketNumber', '');
+
+        end;
+        //+TM1.45 [374463]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150702, 'OnInitializeCaptions', '', true, true)]
@@ -110,10 +174,15 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
     var
         UI: Codeunit "POS UI Management";
     begin
-        Captions.AddActionCaption(ActionCode, 'TicketPrompt', TicketNumberPrompt);
-        Captions.AddActionCaption(ActionCode, 'TicketQtyPrompt', TicketQtyPrompt);
-        Captions.AddActionCaption(ActionCode, 'TicketTitle', TicketTitle);
-        Captions.AddActionCaption(ActionCode, 'ReferencePrompt', ReferencePrompt);
+        Captions.AddActionCaption (ActionCode(''), 'TicketPrompt', TicketNumberPrompt);
+        Captions.AddActionCaption (ActionCode(''), 'TicketQtyPrompt', TicketQtyPrompt);
+        Captions.AddActionCaption (ActionCode(''), 'TicketTitle', TicketTitle);
+        Captions.AddActionCaption (ActionCode(''), 'ReferencePrompt', ReferencePrompt);
+
+        Captions.AddActionCaption (ActionCode('2'), 'TicketPrompt', TicketNumberPrompt);
+        Captions.AddActionCaption (ActionCode('2'), 'TicketQtyPrompt', TicketQtyPrompt);
+        Captions.AddActionCaption (ActionCode('2'), 'TicketTitle', TicketTitle);
+        Captions.AddActionCaption (ActionCode('2'), 'ReferencePrompt', ReferencePrompt);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnBeforeWorkflow', '', true, true)]
@@ -123,15 +192,11 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         POSSaleLine: Codeunit "POS Sale Line";
         JSON: Codeunit "POS JSON Management";
         SaleLinePOS: Record "Sale Line POS";
-        Token: Text[100];
         FunctionId: Integer;
-        ShowTicketDialog: Boolean;
-        ShowTicketQtyDialog: Boolean;
-        ShowReferenceDialog: Boolean;
         DefaultTicketNumber: Text;
     begin
 
-        if (not Action.IsThisAction(ActionCode())) then
+        if (not Action.IsThisAction (ActionCode (''))) then
             exit;
 
         JSON.InitializeJObjectParser(Parameters, FrontEnd);
@@ -144,39 +209,35 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        ShowTicketDialog := false;
-        ShowTicketQtyDialog := false;
-        ShowReferenceDialog := false;
+        //-TM1.45 [374463]
+        ConfigureWorkflow (Context, FunctionId, DefaultTicketNumber, SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
 
-        case FunctionId of
-            0:
-                ShowTicketDialog := false; // Admission Count
-            1:
-                ShowTicketDialog := true; // Register Arrival
-            2:
-                ShowTicketDialog := true; // Revoke Reservation
-            3:
-                ShowTicketDialog := not (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)); // Edit Reservation
-            4:
-                ShowTicketDialog := false; // Reconfirm Reservation
-            5:
-                ShowTicketDialog := not (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)); // Edit Ticketholder
-            6:
-                begin // Change Confirmed Ticket Quantity
-                    ShowTicketDialog := true;
-                    ShowTicketQtyDialog := true;
-                end;
-            7:
-                ShowReferenceDialog := true; // Pick-up Ticket Reservation
-            8:
-                ShowTicketDialog := true; // Convert To Membership
-        end;
+        // ShowTicketDialog := FALSE;
+        // ShowTicketQtyDialog := FALSE;
+        // ShowReferenceDialog := FALSE;
+        //
+        // CASE FunctionId OF
+        //  0 : ShowTicketDialog := FALSE; // Admission Count
+        //  1 : ShowTicketDialog := TRUE; // Register Arrival
+        //  2 : ShowTicketDialog := TRUE; // Revoke Reservation
+        //  3 : ShowTicketDialog := NOT (GetRequestToken (SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)); // Edit Reservation
+        //  4 : ShowTicketDialog := FALSE; // Reconfirm Reservation
+        //  5 : ShowTicketDialog := NOT (GetRequestToken (SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)); // Edit Ticketholder
+        //  6 :
+        //    BEGIN // Change Confirmed Ticket Quantity
+        //      ShowTicketDialog := TRUE;
+        //      ShowTicketQtyDialog := TRUE;
+        //    END;
+        //  7 : ShowReferenceDialog := TRUE; // Pick-up Ticket Reservation
+        //  8 : ShowTicketDialog := TRUE; // Convert To Membership
+        // END;
+        //
+        // Context.SetContext ('ShowTicketDialog', ShowTicketDialog AND (DefaultTicketNumber = ''));
+        // Context.SetContext ('ShowTicketQtyDialog', ShowTicketQtyDialog);
+        // Context.SetContext ('ShowReferenceDialog', ShowReferenceDialog);
+        //+TM1.45 [374463]
 
-        Context.SetContext('ShowTicketDialog', ShowTicketDialog and (DefaultTicketNumber = ''));
-        Context.SetContext('ShowTicketQtyDialog', ShowTicketQtyDialog);
-        Context.SetContext('ShowReferenceDialog', ShowReferenceDialog);
-        FrontEnd.SetActionContext(ActionCode, Context);
-
+        FrontEnd.SetActionContext (ActionCode(''), Context);
         Handled := true;
     end;
 
@@ -193,7 +254,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         TicketReference: Code[20];
     begin
 
-        if (not Action.IsThisAction(ActionCode())) then
+        if (not Action.IsThisAction (ActionCode (''))) then
             exit;
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
@@ -258,10 +319,149 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
             end;
 
             POSSession.RequestRefreshData();
+
         end;
 
-        FrontEnd.SetActionContext(ActionCode, JSON);
+        FrontEnd.SetActionContext (ActionCode(''), JSON);
         Handled := true;
+    end;
+
+    local procedure "----"()
+    begin
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150733, 'OnAction', '', true, true)]
+    local procedure OnAction20("Action": Record "POS Action";WorkflowStep: Text;var Context: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";State: Codeunit "POS Workflows 2.0 - State";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    begin
+
+        if (not Action.IsThisAction (ActionCode ('2')) ) then
+          exit;
+
+        Handled := true;
+
+        OnActionWorker (WorkflowStep, Context, POSSession, State, FrontEnd);
+    end;
+
+    local procedure ConfigureWorkflow(Context: Codeunit "POS JSON Management";FunctionId: Integer;DefaultTicketNumber: Text;SalesReceiptNo: Code[20];SaleLineNo: Integer)
+    var
+        Token: Text[100];
+        ShowTicketDialog: Boolean;
+        ShowTicketQtyDialog: Boolean;
+        ShowReferenceDialog: Boolean;
+    begin
+
+        //-TM1.45 [374463]
+        Context.SetContext ('TicketPrompt', TicketNumberPrompt);
+        Context.SetContext ('TicketQtyPrompt', TicketQtyPrompt);
+        Context.SetContext ('TicketTitle', TicketTitle);
+        Context.SetContext ('ReferencePrompt', ReferencePrompt);
+
+        ShowTicketDialog := false;
+        ShowTicketQtyDialog := false;
+        ShowReferenceDialog := false;
+
+        if (FunctionId < 0) then
+          FunctionId := 1;
+
+        case FunctionId of
+          0 : ShowTicketDialog := false; // Admission Count
+          1 : ShowTicketDialog := true; // Register Arrival
+          2 : ShowTicketDialog := true; // Revoke Reservation
+          3 : ShowTicketDialog := not (GetRequestToken (SalesReceiptNo, SaleLineNo, Token)); // Edit Reservation
+          4 : ShowTicketDialog := false; // Reconfirm Reservation
+          5 : ShowTicketDialog := not (GetRequestToken (SalesReceiptNo, SaleLineNo, Token)); // Edit Ticketholder
+          6 :
+            begin // Change Confirmed Ticket Quantity
+              ShowTicketDialog := true;
+              ShowTicketQtyDialog := true;
+            end;
+          7 : ShowReferenceDialog := true; // Pick-up Ticket Reservation
+          8 : ShowTicketDialog := true; // Convert To Membership
+        end;
+
+        Context.SetContext ('ShowTicketDialog', ShowTicketDialog and (DefaultTicketNumber = ''));
+        Context.SetContext ('ShowTicketQtyDialog', ShowTicketQtyDialog);
+        Context.SetContext ('ShowReferenceDialog', ShowReferenceDialog);
+
+        //+TM1.45 [374463]
+    end;
+
+    local procedure DoWorkflowFunction(FunctionId: Integer;Context: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";AdmissionCode: Code[20];ExternalTicketNumber: Code[20];TicketReference: Text)
+    begin
+
+        case FunctionId of
+          0 : ShowQuickStatistics (AdmissionCode);
+          1 :
+            begin
+              SetGroupTicketConfirmedQuantity (POSSession, Context, ExternalTicketNumber, AdmissionCode);
+              RegisterArrival (ExternalTicketNumber, AdmissionCode);
+            end;
+          2 : RevokeTicketReservation (POSSession, ExternalTicketNumber);
+          3 : EditReservation (POSSession, ExternalTicketNumber);
+          4 : ReconfirmReservation (POSSession, ExternalTicketNumber);
+          5 : EditTicketholder (POSSession, ExternalTicketNumber);
+          6 : SetGroupTicketConfirmedQuantity (POSSession, Context, ExternalTicketNumber, '');
+          7 : PickupPreConfirmedTicket (POSSession, TicketReference);
+          8 : Error ('WF20 support for EAN box is completed yet.'); //ConvertToMembership (POSSession, Context, FrontEnd, ExternalTicketNumber, AdmissionCode);
+        else
+          Error ('Function with ID %1 is not implemented.', FunctionId);
+        end;
+    end;
+
+    local procedure OnActionWorker(WorkflowStep: Text;Context: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";State: Codeunit "POS Workflows 2.0 - State";FrontEnd: Codeunit "POS Front End Management")
+    var
+        FunctionId: Integer;
+        AdmissionCode: Code[20];
+        ExternalTicketNumber: Code[50];
+        TicketMaxQty: Integer;
+        ShowQtyDialog: Boolean;
+        DefaultTicketNumber: Text;
+        TicketReference: Code[20];
+    begin
+
+        FunctionId := Context.GetIntegerParameter ('Function', true);
+        if (FunctionId < 0) then
+          FunctionId := 1;
+
+        AdmissionCode := Context.GetStringParameter ('Admission Code', false);
+        DefaultTicketNumber := Context.GetStringParameter ('DefaultTicketNumber', false);
+
+        Context.SetScope ('', true);
+        Context.SetScope ('TicketReference', false);
+        TicketReference := Context.GetString ('value', false);
+
+        Context.SetScopeRoot (true);
+        Context.SetScope ('ticketnumber', false);
+        if (DefaultTicketNumber = '' ) then begin
+          ExternalTicketNumber := CopyStr (Context.GetString ('value', false), 1, MaxStrLen (ExternalTicketNumber));
+        end else begin
+          ExternalTicketNumber := CopyStr (DefaultTicketNumber, 1, MaxStrLen (ExternalTicketNumber));
+          if (FunctionId = 1) then begin
+            Context.SetContext ('Verbose', true);
+            Context.SetContext ('VerboseMessage', Welcome);
+          end;
+        end;
+
+        Context.SetScopeRoot (true);
+
+        case WorkflowStep of
+          'ConfigureWorkflow' : ConfigureWorkflow (Context, FunctionId, '', '', 0);
+          'RefineWorkflow' :
+            begin
+              TicketMaxQty := GetGroupTicketQuantity (POSSession, Context, ExternalTicketNumber, AdmissionCode, FunctionId, ShowQtyDialog);
+              Context.SetContext ('TicketMaxQty', TicketMaxQty);
+              Context.SetContext ('ShowTicketQtyDialog', ShowQtyDialog);
+            end;
+          'DoAction' :
+            begin
+              Message ('Do %1 with %2', FunctionId, ExternalTicketNumber);
+              DoWorkflowFunction (FunctionId, Context, POSSession, FrontEnd, AdmissionCode, ExternalTicketNumber, TicketReference);
+            end;
+        end;
+    end;
+
+    local procedure "--"()
+    begin
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150706, 'OnAfterInsertSaleLine', '', true, true)]
@@ -435,7 +635,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
           //-TM1.43 [357359]
           if (TicketRequestManager.GetTokenFromReceipt (SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token)) then begin
             if (POSSession.IsActiveSession (FrontEnd)) then
-              SeatingUI.ShowSelectSeatUI (FrontEnd, Token);
+              SeatingUI.ShowSelectSeatUI (FrontEnd, Token, false); //-+TM1.45 [322432]
           end;
           //+TM1.43 [357359]
             exit;
@@ -547,7 +747,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         //      END;
         //    END;
           if (POSSession.IsActiveSession (FrontEnd)) then
-            SeatingUI.ShowSelectSeatUI (FrontEnd, Token);
+            SeatingUI.ShowSelectSeatUI (FrontEnd, Token, false); //-+TM1.45 [322432]
         //+TM1.43 [357359]
 
                 exit(1); // nothing to confirm;
@@ -557,7 +757,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         Commit;
         ResponseCode := -1;
         ResponseMessage := ABORTED;
-        if (AquireTicketAdmissionSchedule(Token, SaleLinePOS, true)) then
+        if (AquireTicketAdmissionSchedule (Token, SaleLinePOS, true, ResponseMessage)) then //-+TM1.45 [380754]
             ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage);
 
         if (ResponseCode = 0) then begin
@@ -566,13 +766,13 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
             AquireTicketParticipant(Token, ExternalMemberNo);
 
             //-TM1.41 [353981]
-            if (GetTicketUnitPrice(Token, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then begin
-                SaleLinePOS.Validate("Unit Price", TicketUnitPrice);
-                SaleLinePOS.UpdateAmounts(SaleLinePOS);
-                SaleLinePOS."Eksp. Salgspris" := false;
-                SaleLinePOS."Custom Price" := false;
-                SaleLinePOS.Modify();
-            end;
+        //  IF (GetTicketUnitPrice (Token, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) THEN BEGIN
+        //    SaleLinePOS.VALIDATE ("Unit Price", TicketUnitPrice);
+        //    SaleLinePOS.UpdateAmounts (SaleLinePOS);
+        //    SaleLinePOS."Eksp. Salgspris" := FALSE;
+        //    SaleLinePOS."Custom Price" := FALSE;
+        //    SaleLinePOS.MODIFY ();
+        //  END;
             //+TM1.41 [353981]
 
             Commit;
@@ -585,7 +785,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         //      END;
         //    END;
           if (POSSession.IsActiveSession (FrontEnd)) then
-            SeatingUI.ShowSelectSeatUI (FrontEnd, Token);
+            SeatingUI.ShowSelectSeatUI (FrontEnd, Token, false); //-+TM1.45 [322432]
         //+TM1.43 [357359]
 
             exit(1);
@@ -748,7 +948,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         end;
 
         if (Token <> '') then
-            AquireTicketAdmissionSchedule(Token, SaleLinePOS, HaveSalesTicket);
+          AquireTicketAdmissionSchedule (Token, SaleLinePOS, HaveSalesTicket, ResponseMessage); //-+TM1.45 [380754]
     end;
 
     local procedure ReconfirmReservation(POSSession: Codeunit "POS Session"; ExternalTicketNumber: Code[50])
@@ -776,7 +976,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
                 if (ResponseCode <> 0) then
                     Error(ResponseMessage);
 
-                AquireTicketAdmissionSchedule(Token, SaleLinePOS, true);
+            AquireTicketAdmissionSchedule (Token, SaleLinePOS, true, ResponseMessage); //-+TM1.45 [380754]
             end;
         end;
     end;
@@ -1094,13 +1294,13 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
     begin
     end;
 
-    local procedure AquireTicketAdmissionSchedule(Token: Text[100]; var SaleLinePOS: Record "Sale Line POS"; HaveSalesLine: Boolean) LookupOK: Boolean
+    local procedure AquireTicketAdmissionSchedule(Token: Text[100];var SaleLinePOS: Record "Sale Line POS";HaveSalesLine: Boolean;var ResponseMessage: Text) LookupOK: Boolean
     var
         TicketRetailManagement: Codeunit "TM Ticket Retail Management";
     begin
 
         //-TM1.21
-        LookupOK := TicketRetailManagement.AquireTicketAdmissionSchedule(Token, SaleLinePOS, HaveSalesLine);
+        LookupOK := TicketRetailManagement.AquireTicketAdmissionSchedule (Token, SaleLinePOS, HaveSalesLine, ResponseMessage); //-+TM1.45 [380754]
         exit(LookupOK);
         //+TM1.21
     end;
@@ -1273,7 +1473,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
             //EanBoxEvent.Description := TMTicket.FIELDCAPTION ("External Ticket No.");
             EanBoxEvent.Description := CopyStr(TMTicket.FieldCaption("External Ticket No."), 1, MaxStrLen(EanBoxEvent.Description));
             //+TM1.40 [350434]
-            EanBoxEvent."Action Code" := ActionCode();
+          EanBoxEvent."Action Code" := ActionCode ('');
             EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
             EanBoxEvent."Event Codeunit" := CurrCodeunitId();
             EanBoxEvent.Insert(true);

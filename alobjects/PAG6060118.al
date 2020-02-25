@@ -5,6 +5,8 @@ page 6060118 "TM Ticket Schedules"
     // TM1.12/TSA /20160407 CASE 230600 Added DAN Captions
     // TM1.28/TSA /20180201 CASE 303925 Added calendar customization
     // TM1.37/TSA /20180905 CASE 327324 Added fields for better control of arrival window
+    // TM1.45/TSA /20191108 CASE 374620 Added "Notify Stakeholder"
+    // TM1.45/TSA /20191120 CASE 378212 Added Sales cut-off date and time
 
     Caption = 'Ticket Schedules';
     PageType = List;
@@ -62,6 +64,18 @@ page 6060118 "TM Ticket Schedules"
                 field("Event Arrival Until Time";"Event Arrival Until Time")
                 {
                 }
+                field("Sales From Date (Rel.)";"Sales From Date (Rel.)")
+                {
+                }
+                field("Sales From Time";"Sales From Time")
+                {
+                }
+                field("Sales Until Date (Rel.)";"Sales Until Date (Rel.)")
+                {
+                }
+                field("Sales Until Time";"Sales Until Time")
+                {
+                }
                 field(Monday;Monday)
                 {
                 }
@@ -84,6 +98,9 @@ page 6060118 "TM Ticket Schedules"
                 {
                 }
                 field("Prebook Is Required";"Prebook Is Required")
+                {
+                }
+                field("Notify Stakeholder";"Notify Stakeholder")
                 {
                 }
                 field("Max Capacity Per Sch. Entry";"Max Capacity Per Sch. Entry")

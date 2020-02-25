@@ -6,6 +6,8 @@ codeunit 6150821 "POS Action - Sale Annullation"
     // NPR5.48/TSA /20190208 CASE 343578 Added support for creating entry lines in contexts of a debet sale (reversing an invoice from the POS)
     // NPR5.49/TSA /20190218 CASE 342244 Added DeObfucation of salesticket number - fraud protection
     // NPR5.52/SARA/20190920 CASE 365901 Update Dimension code for Return Order
+    // NPR5.53/ALPO/20191218 CASE 382911 'DeObfuscateTicketNo' function moved to CU 6150629 to avoid code duplication
+    // NPR5.53/ALPO/20200110 CASE 384386 POS Action did not respect settings for default view after end of sale and always applied sale view. And did it without starting new transaction.
 
 
     trigger OnRun()
@@ -104,7 +106,7 @@ codeunit 6150821 "POS Action - Sale Annullation"
                 end;
         end;
 
-        POSSession.ChangeViewSale();
+        //POSSession.ChangeViewSale ();  //NPR5.53 [384386]-revoked
         POSSession.RequestRefreshData();
 
         Handled := true;
@@ -144,6 +146,7 @@ codeunit 6150821 "POS Action - Sale Annullation"
         PostedSalesInvoicePage: Page "Posted Sales Invoice";
         RetailSalesDocMgt: Codeunit "Retail Sales Doc. Mgt.";
         POSCreateEntry: Codeunit "POS Create Entry";
+        POSEntryMgt: Codeunit "POS Entry Management";
     begin
         POSSession.GetSetup(POSSetup);
         NPRetailSetup.Get;
@@ -174,7 +177,7 @@ codeunit 6150821 "POS Action - Sale Annullation"
         //-NPR5.49 [342244]
         // AuditRoll.SETRANGE ("Sales Ticket No.", SalesTicketNo);
         // AuditRoll.FINDFIRST ();
-        DeObfuscateTicketNo(JSON.GetIntegerParameter('ObfucationMethod', false), SalesTicketNo);
+        POSEntryMgt.DeObfuscateTicketNo (JSON.GetIntegerParameter ('ObfucationMethod', false), SalesTicketNo);
         AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
         if (not AuditRoll.FindFirst()) then begin
             JSON.SetScope('/', true);
@@ -338,28 +341,6 @@ codeunit 6150821 "POS Action - Sale Annullation"
             Error(ERR_NotApplied, PostedInvoiceNo);
 
         exit(SalesHeader."No.");
-    end;
-
-    local procedure DeObfuscateTicketNo(ObfucationMethod: Integer; var SalesTicketNo: Code[20])
-    var
-        MyBigInt: BigInteger;
-        RPAuxMiscLibrary: Codeunit "RP Aux - Misc. Library";
-    begin
-
-        //-NPR5.49 [342244]
-        case ObfucationMethod of
-            1: // Multiplicative Inverse
-                begin
-                    if (StrLen(SalesTicketNo) > 2) then
-                        if (CopyStr(SalesTicketNo, 1, 2) = 'MI') then
-                            SalesTicketNo := CopyStr(SalesTicketNo, 3);
-
-                    if (Evaluate(MyBigInt, SalesTicketNo)) then
-                        SalesTicketNo := Format(RPAuxMiscLibrary.MultiplicativeInverseDecode(MyBigInt), 0, 9);
-                end;
-        end;
-
-        //+NPR5.49 [342244]
     end;
 }
 

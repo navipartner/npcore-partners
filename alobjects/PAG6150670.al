@@ -2,6 +2,7 @@ page 6150670 "POS Balancing Line"
 {
     // NPR5.39/NPKNAV/20180223  CASE 302690-01 Transport NPR5.39 - 23 February 2018
     // NPR5.48/JDH /20181109 CASE 334163 Added Caption to Object
+    // NPR5.53/SARA/20191024 CASE 373672 Addde Action button POS Entry Card
 
     Caption = 'POS Balancing Line';
     Editable = false;
@@ -14,19 +15,22 @@ page 6150670 "POS Balancing Line"
         {
             repeater(Group)
             {
-                field("POS Entry No.";"POS Entry No.")
+                field("Entry Date";"Entry Date")
+                {
+                }
+                field("Document No.";"Document No.")
+                {
+                }
+                field("Starting Time";"Starting Time")
+                {
+                }
+                field("Ending Time";"Ending Time")
                 {
                 }
                 field("POS Store Code";"POS Store Code")
                 {
                 }
                 field("POS Unit No.";"POS Unit No.")
-                {
-                }
-                field("Document No.";"Document No.")
-                {
-                }
-                field("Line No.";"Line No.")
                 {
                 }
                 field("POS Period Register No.";"POS Period Register No.")
@@ -110,12 +114,35 @@ page 6150670 "POS Balancing Line"
                 field("Dimension Set ID";"Dimension Set ID")
                 {
                 }
+                field("POS Entry No.";"POS Entry No.")
+                {
+                }
+                field("Line No.";"Line No.")
+                {
+                }
             }
         }
     }
 
     actions
     {
+        area(navigation)
+        {
+            group("POS Entry")
+            {
+                Caption = 'POS Entry';
+                action("POS Entry Card")
+                {
+                    Caption = 'POS Entry Card';
+                    Image = List;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    RunObject = Page "POS Entry Card";
+                    RunPageLink = "Entry No."=FIELD("POS Entry No.");
+                    RunPageView = SORTING("Entry No.");
+                }
+            }
+        }
     }
 }
 

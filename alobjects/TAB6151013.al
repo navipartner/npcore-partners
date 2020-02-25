@@ -6,6 +6,8 @@ table 6151013 "NpRv Voucher"
     // NPR5.48/MHA /20190213  CASE 345739 No. Series length has been increased from 10 to 20 in NAV2018 and newer
     // NPR5.49/MHA /20190228  CASE 342811 Added partner fields
     // NPR5.50/MHA /20190426  CASE 353079 Added field 62 "Allow Top-up"
+    // NPR5.53/MHA /20191122  CASE 378597 Fixed mapping of Name 2 in UpdateContactInfo()
+    // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
 
     Caption = 'Retail Voucher';
     DrillDownPageID = "NpRv Vouchers";
@@ -113,6 +115,15 @@ table 6151013 "NpRv Voucher"
             CalcFormula = Sum("NpRv Voucher Entry"."Remaining Amount" WHERE ("Voucher No."=FIELD("No.")));
             Caption = 'Amount';
             DecimalPlaces = 2:2;
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(76;"Initial Amount";Decimal)
+        {
+            CalcFormula = Sum("NpRv Voucher Entry".Amount WHERE ("Voucher No."=FIELD("No."),
+                                                                 "Entry Type"=FILTER("Issue Voucher"|"Partner Issue Voucher"|"Top-up")));
+            Caption = 'Initial Amount';
+            Description = 'NPR5.53';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -466,7 +477,9 @@ table 6151013 "NpRv Voucher"
         if "Contact No." <> '' then begin
           Cont.Get("Contact No.");
           Name := Cont.Name;
-          "Name 2" := Cont.Name;
+          //-NPR5.53 [378597]
+          "Name 2" := Cont."Name 2";
+          //+NPR5.53 [378597]
           Address := Cont.Address;
           "Address 2" := Cont."Address 2";
           City := Cont.City;
@@ -481,7 +494,9 @@ table 6151013 "NpRv Voucher"
         if "Customer No." <> '' then begin
           Cust.Get("Customer No.");
           Name := Cust.Name;
-          "Name 2" := Cust.Name;
+          //-NPR5.53 [378597]
+          "Name 2" := Cust."Name 2";
+          //+NPR5.53 [378597]
           Address := Cust.Address;
           "Address 2" := Cust."Address 2";
           City := Cust.City;

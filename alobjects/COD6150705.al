@@ -28,6 +28,8 @@ codeunit 6150705 "POS Sale"
     // NPR5.48/JDH /20181204 CASE 335967 Possible to call this object in Mock Mode, to allow the test framework to run without a Major Tom session
     // NPR5.50/MMV /20190328 CASE 300557 Added sales document handling
     //                                   Added init handling
+    // NPR5.53/MMV /20191106 CASE 376362 Added explicit pos entry auto post invoke.
+    // NPR5.53/MHA /20190114 CASE 384841 Signature updated for CalculateRemainingPaymentSuggestion()
 
 
     trigger OnRun()
@@ -495,7 +497,9 @@ codeunit 6150705 "POS Sale"
         if not PaymentType."Auto End Sale" then
           exit (false);
 
-        exit (POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType) = 0);
+        //-NPR5.53 [384841]
+        exit (POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, false) = 0);
+        //+NPR5.53 [384841]
     end;
 
     [Scope('Personalization')]
@@ -647,8 +651,10 @@ codeunit 6150705 "POS Sale"
         asserterror begin
           InvokeOnFinishSaleWorkflow(Rec);
           Commit;
-          CODEUNIT.Run(CODEUNIT::"POS End Sale Post Processing",Rec);
-          Commit;
+        //-NPR5.53 [376362]
+        //  CODEUNIT.RUN(CODEUNIT::"POS End Sale Post Processing",Rec);
+        //  COMMIT;
+        //+NPR5.53 [376362]
           OnAfterEndSale(xRec);
           Commit;
 
@@ -659,6 +665,12 @@ codeunit 6150705 "POS Sale"
         if not Success then
           Message(ERROR_AFTER_END_SALE, GetLastErrorText);
         //+NPR5.40 [308457]
+
+        //-NPR5.53 [376362]
+        ClearLastError;
+        if not CODEUNIT.Run(CODEUNIT::"POS End Sale Post Processing", Rec) then
+          Message(ERROR_AFTER_END_SALE, GetLastErrorText);
+        //+NPR5.53 [376362]
     end;
 
     local procedure LogStopwatch(Keyword: Text;Duration: Duration)

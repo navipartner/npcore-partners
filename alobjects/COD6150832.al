@@ -20,6 +20,7 @@ codeunit 6150832 "POS Action - Balance Reg V2"
     // NPR5.41/JDH /20180426 CASE 312644  Added indirect permissions to table Audit roll
     // NPR5.46/MMV /20181001 CASE 290734 EFT Framework refactoring
     // NPR5.48/MHA /20181115 CASE 334633 Replaced reference to function CheckSavedSales() with CleanupPOSQuotes() in ValidateRequirements()
+    // NPR5.53/BHR / 20191004 CASE 369361 Removed online checks
 
     Permissions = TableData "Audit Roll" = rimd;
 
@@ -177,7 +178,9 @@ codeunit 6150832 "POS Action - Balance Reg V2"
     begin
 
         RetailSetup.Get;
-        RetailSetup.CheckOnline;
+        //-NPR5.53 [369361]
+        //RetailSetup.CheckOnline;
+        //+NPR5.53 [369361]
 
         Register.Get(RegisterNo);
         if (Register.Status = Register.Status::Afsluttet) then

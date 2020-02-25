@@ -21,36 +21,6 @@
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension6014436 - Change ShippingAgentServices - Property Caption</note>
         </trans-unit>
-        <trans-unit id="Page 1931437772 - Control 1527594213 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Vendor No.</source>
-          <target>Kreditornr.</target>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Page Retail Journal Line - Control Vendor No. - Property Caption</note>
-        </trans-unit>
-        <trans-unit id="Page 1931437772 - Control 761149270 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Item Group</source>
-          <target>Varegruppe</target>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Page Retail Journal Line - Control Item Group - Property Caption</note>
-        </trans-unit>
-        <trans-unit id="Page 1931437772 - Control 2971843366 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Unknown Item No.</source>
-          <target>Ukendt varenummer</target>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Page Retail Journal Line - Control Unknown Item No. - Property Caption</note>
-        </trans-unit>
-        <trans-unit id="Page 1931437772 - Control 3755398875 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
-          <source>New Item</source>
-          <target>Ny vare</target>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Page Retail Journal Line - Control New Item - Property Caption</note>
-        </trans-unit>
-        <trans-unit id="Page 1931437772 - Control 4261975834 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Inventory Status</source>
-          <target>Lagerstatus</target>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Page Retail Journal Line - Control Inventory Status - Property Caption</note>
-        </trans-unit>
         <trans-unit id="Page 2811417786 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Global Voucher Setup</source>
           <target>Global voucher ops�tning</target>

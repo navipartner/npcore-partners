@@ -10,6 +10,8 @@ page 6060119 "TM Admission Schedule Lines"
     // TM1.28/TSA /20180221 CASE 306039 Added "Visibility On Web"
     // TM1.37/TSA /20180905 CASE 327324 Added fields for better control of arrival window
     // TM1.41/TSA /20190507 CASE 353981 Adding Scheduled based pricing
+    // TM1.45/TSA /20191120 CASE 378212 Added sales cut-off date and time
+    // TM1.45/TSA /20200116 CASE 385922 Added Concurrency Code field
 
     Caption = 'Admission Schedule Lines';
     PageType = List;
@@ -62,6 +64,9 @@ page 6060119 "TM Admission Schedule Lines"
                 field("Capacity Control";"Capacity Control")
                 {
                 }
+                field("Concurrency Code";"Concurrency Code")
+                {
+                }
                 field("Prebook From";"Prebook From")
                 {
                 }
@@ -93,6 +98,18 @@ page 6060119 "TM Admission Schedule Lines"
                 {
                 }
                 field("Event Arrival Until Time";"Event Arrival Until Time")
+                {
+                }
+                field("Sales From Date (Rel.)";"Sales From Date (Rel.)")
+                {
+                }
+                field("Sales From Time";"Sales From Time")
+                {
+                }
+                field("Sales Until Date (Rel.)";"Sales Until Date (Rel.)")
+                {
+                }
+                field("Sales Until Time";"Sales Until Time")
                 {
                 }
                 field("Pricing Option";"Pricing Option")

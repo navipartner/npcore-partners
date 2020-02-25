@@ -1,6 +1,7 @@
 codeunit 6151131 "TM Seating UI"
 {
     // TM1.43/TSA /20190617 CASE 357359 Initial Version
+    // TM1.45/TSA /20191113 CASE 322432 Alot of small changes
     // 
     // ##### SINGLE INSTANCE #####
 
@@ -17,6 +18,7 @@ codeunit 6151131 "TM Seating UI"
         Iteration: Integer;
         ReservationUpdateEntryNo: Integer;
         ShowExtAdmSchEntryNo: Integer;
+        EditReservation: Boolean;
 
     local procedure ConstructUI(ExtAdmScheduleEntryNo: Integer): Boolean
     var
@@ -64,7 +66,7 @@ codeunit 6151131 "TM Seating UI"
         exit(true);
     end;
 
-    procedure ShowSelectSeatUI(POSFrontEnd: Codeunit "POS Front End Management"; Token: Text[100])
+    procedure ShowSelectSeatUI(POSFrontEnd: Codeunit "POS Front End Management";Token: Text[100];EditCurrentReservation: Boolean)
     var
         TmpSeatingReservationEntry: Record "TM Seating Reservation Entry" temporary;
         ShowUI: Boolean;
@@ -74,14 +76,16 @@ codeunit 6151131 "TM Seating UI"
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if (TicketReservationRequest.FindSet()) then
             repeat
-                ShowUI := ShowUIAdmissionScheduleEntry(POSFrontEnd, TicketReservationRequest."External Adm. Sch. Entry No.");
+            ShowUI := ShowUIAdmissionScheduleEntry (POSFrontEnd, TicketReservationRequest."External Adm. Sch. Entry No.", EditCurrentReservation);
             until (ShowUI or (TicketReservationRequest.Next() = 0));
     end;
 
-    procedure ShowUIAdmissionScheduleEntry(POSFrontEnd: Codeunit "POS Front End Management"; ExtAdmScheduleEntryNo: Integer): Boolean
+    procedure ShowUIAdmissionScheduleEntry(POSFrontEnd: Codeunit "POS Front End Management";ExtAdmScheduleEntryNo: Integer;EditCurrentReservation: Boolean): Boolean
     var
         AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
     begin
+
+        EditReservation := EditCurrentReservation;
 
         if (ExtAdmScheduleEntryNo <= 0) then
             exit(false);
@@ -90,6 +94,7 @@ codeunit 6151131 "TM Seating UI"
             exit(false);
 
         ShowExtAdmSchEntryNo := ExtAdmScheduleEntryNo;
+
 
         // Asynchrounous
         ActiveModelID := POSFrontEnd.ShowModel(Model);
@@ -170,11 +175,16 @@ codeunit 6151131 "TM Seating UI"
     [EventSubscriber(ObjectType::Codeunit, 6150701, 'OnProtocolUIResponse', '', true, true)]
     local procedure OnUIResponse(POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; ModelID: Guid; Sender: Text; EventName: Text; var Handled: Boolean)
     var
+        SaleLinePOS: Record "Sale Line POS";
+        POSSale: Codeunit "POS Sale";
+        POSSaleLine: Codeunit "POS Sale Line";
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
         ResponseMessage: Text;
         ResponseCode: Integer;
         seatNo: Integer;
         ShowUI: Boolean;
+        ReceiptNo: Code[20];
+        ReceiptLineNo: Integer;
     begin
 
         if ModelID <> ActiveModelID then
@@ -186,7 +196,7 @@ codeunit 6151131 "TM Seating UI"
             'ticketing-refresh-timer':
                 begin
                     Model.AddScript(UpdateSeatReservationList(ShowExtAdmSchEntryNo));
-                    FrontEnd.UpdateModel(Model, ActiveModelID);
+              FrontEnd.UpdateModel (Model, ActiveModelID);
                 end;
 
             'ticketing-make-reservation':
@@ -213,7 +223,7 @@ codeunit 6151131 "TM Seating UI"
                     // Goto next ticket in BOM
                     if (TicketReservationRequest.Next() <> 0) then begin
                         repeat
-                            ShowUI := ShowUIAdmissionScheduleEntry(FrontEnd, ShowExtAdmSchEntryNo);
+                  ShowUI := ShowUIAdmissionScheduleEntry (FrontEnd, ShowExtAdmSchEntryNo, EditReservation);
                         until (ShowUI or (TicketReservationRequest.Next() = 0));
                     end;
 
@@ -301,61 +311,57 @@ codeunit 6151131 "TM Seating UI"
         '<div class="seating-dialog">' +
         '<svg width="100%" height="100%" viewBox="0 0 1200 1200" preserveAspectRatio="none"> ' +
 
-          '<style>' +
-            'a:hover rect { fill: #007eff; }' +
-            '.free_seat {fill: #bcbcbc; opacity: 1; cursor: pointer;}' +
-            '.taken_seat {fill: #ec0000; opacity: 1; cursor: not-allowed;}' +
-            '.seat-highlight {fill: #00ec00; opacity: 1;}' +
-            '.seat-selected {fill: #1d1d1d; opacity: 1;}' +
-            '.btnText {font: bold 20px sans-serif; fill: black;}' +
-            '.isDisabled { opacity: 0.5; cursor: not-allowed; }' +
-          '</style>' +
+          '<style>'+
+            'a:hover rect { fill: #007eff; }'+
+            '.free_seat {fill: #bcbcbc; opacity: 1; cursor: pointer;}'+
+            '.taken_seat {fill: #ec0000; opacity: 1; cursor: not-allowed;}'+
+            '.seat-highlight {fill: #00ec00; opacity: 1;}'+
+            '.seat-selected {fill: #1d1d1d; opacity: 1;}'+
+            '.btnText32 {font: bold 32px sans-serif; fill: black;}'+
+            '.btnText24 {font: bold 24px sans-serif; fill: black;}'+
+            '.btnText12 {font: bold 12px sans-serif;}'+
+            '.isDisabled { opacity: 0.5; cursor: not-allowed; }'+
+            '.hidden_seat { opacity: 0.0; }'+
+          '</style>'+
 
-          '<polygon points="150,10 450,10 400,50 200,50" style="fill:#eeeeee;stroke:#999999;stroke-width:1"/>' +
-          '<text x="300" y="30" fill=white text-anchor="middle" alignment-baseline="middle">screen</text>' +
+          '<svg x="200" width="800" height="800" preserveaspectratio="none">'+
+          LoadSVGForAdmSchEntry (ExtAdmScheduleEntryNo) +
+          '</svg>'+
 
-          '<svg height="800">' +
-          LoadSVGForAdmSchEntry(ExtAdmScheduleEntryNo) +
-          '</svg>' +
+          '<foreignObject x="500" y="900" width="200" height="150">'+
+          '  <body xmlns="http://www.w3.org/1999/xhtml">'+
+          '    <div valign=center><form class="btnText32" >'+
+          '     <input type="radio" name="assignment" id="assign_as_group" checked>Group<br>'+
+          '     <input type="radio" name="assignment" id="assign_as_individual">Individuals'+
+          '    </form></div>'+
+          '  </body>'+
+          '</foreignObject>'+
 
-          '<line x1="0" y1="0" x2="1200" y2="800" style="stroke:rgb(255,0,0);stroke-width:2" />' +
-          '<line x1="0" y1="0" x2="0" y2="100%" style="stroke:rgb(255,0,0);stroke-width:2" />' +
+          '<a href="#" id="submitBtn">'+
+          '  <rect x="860" y="900" rx="10" ry="10" height="60" width="140" fill="#00b2ff" stroke="black" />'+
+          '  <text x="930" y="933" class="btnText32" text-anchor="middle" alignment-baseline="middle">Reserve</text>'+
+          '</a>'+
 
-          '<foreignObject x="0" y="520" width="200" height="150">' +
-          '  <body xmlns="http://www.w3.org/1999/xhtml">' +
-          '    <form class="btnText" >' +
-          '     <input type="radio" name="assignment" id="assign_as_group" checked>Group<br>' +
-          '   <input type="radio" name="assignment" id="assign_as_individual">Individuals' +
-          '    </form>' +
-          '  </body>' +
-          '</foreignObject>' +
+          '<a href="#" id="cancelBtn">'+
+          '  <rect x="200" y="900" rx="10" ry="10" height="60" width="140" fill="#00b2ff" stroke="black" />'+
+          '  <text x="270" y="933" class="btnText32" text-anchor="middle" alignment-baseline="middle">Cancel</text>'+
+          '</a>'+
 
-          '<a href="#" id="submitBtn">' +
-          '  <rect x="400" y="900" rx="10" ry="10" height="60" width="140" fill="#00b2ff" stroke="black" />' +
-          '  <text x="470" y="930" class="btnText" text-anchor="middle" alignment-baseline="middle">Reserve</text>' +
-          '</a>' +
+          '<a href="#" id="prevBtn">'+
+          '  <rect x="200" y="1000" rx="10" ry="10" height="30" width="140" fill="#00b2ff" stroke="black" />'+
+          '  <text x="270" y="1017" class="btnText24" text-anchor="middle" alignment-baseline="middle">Previous</text>'+
+          '</a>'+
 
-          '<a href="#" id="cancelBtn">' +
-          '  <rect x="100" y="900" rx="10" ry="10" height="60" width="140" fill="#00b2ff" stroke="black" />' +
-          '  <text x="170" y="930" class="btnText" text-anchor="middle" alignment-baseline="middle">Cancel</text>' +
-          '</a>' +
+          '<a href="#" id="nextBtn">'+
+          '  <rect x="860" y="1000" rx="10" ry="10" height="30" width="140" fill="#00b2ff" stroke="black" />'+
+          '  <text x="930" y="1017" class="btnText24" text-anchor="middle" alignment-baseline="middle">Next</text>'+
+          '</a>'+
 
-          '<a href="#" id="prevBtn">' +
-          '  <rect x="100" y="1000" rx="10" ry="10" height="30" width="140" fill="#00b2ff" stroke="black" />' +
-          '  <text x="170" y="1017" class="btnText" text-anchor="middle" alignment-baseline="middle">Previous</text>' +
-          '</a>' +
-
-          '<a href="#" id="nextBtn">' +
-          '  <rect x="400" y="1000" rx="10" ry="10" height="30" width="140" fill="#00b2ff" stroke="black" />' +
-          '  <text x="470" y="1017" class="btnText" text-anchor="middle" alignment-baseline="middle">Next</text>' +
-          '</a>' +
-
-          StrSubstNo('<text x="300" y="1060" class="btnText" text-anchor="middle" alignment-baseline="middle">%1 - <%2> %3 - %4</text>',
+          StrSubstNo ('<text x="600" y="1060" class="btnText32" text-anchor="middle" alignment-baseline="middle">%1 - <%2> %3 - %4</text>',
             Admission.Description,
             AdmissionScheduleEntry."Admission Start Date",
             AdmissionScheduleEntry."Admission Start Time",
-            AdmissionScheduleEntry."Admission End Time") +
-
+            AdmissionScheduleEntry."Admission End Time")+
 
           '<script><![CDATA[' +
 
@@ -394,7 +400,7 @@ codeunit 6151131 "TM Seating UI"
             '  n$.respondExplicit("ticketing-prevSchedule",{});' +
             '});' +
 
-            'setInterval (function() {updateSeatReservations();}, 3000);' +
+           // 'setInterval (function() {updateSeatReservations();}, 3000);'+
 
             // ************************************** //
             'function updateSeatReservations() {' +
@@ -421,7 +427,6 @@ codeunit 6151131 "TM Seating UI"
             '    element = element.nextElementSibling;' +
             '  }' +
             '}' +
-
 
             'function eventMouseOutSeat() {' +
             '  numberOfSeatsToAllocate = 1;' +
@@ -468,27 +473,66 @@ codeunit 6151131 "TM Seating UI"
              '   document.getElementById("submitBtn").classList.remove ("isDisabled");' +
             '}' +
 
+            // Set quantity of seats to reserve
+            'function setSeatsToReserve (seatCount) {'+
+            '  maxSeatsToAllocate = seatCount;'+
+            '}'+
+
+
+            // Mark seats already reserved
             'function reserveSeats (csvStringOfElementIds) {' +
             '  var seatIds = csvStringOfElementIds.split('','');' +
             '  for (var i = 0; i < seatIds.length; i++) {' +
             '    reserveSeat(seatIds[i]);' +
             '  }' +
+            '}'+
 
+            'function reserveSeat (elementId) {'+
+            '  var element = document.getElementById (elementId);'+
+            '  element.classList.remove ("free_seat");'+
+            '  element.removeEventListener ("mouseover", eventMouseOverSeat);'+
+            '  element.removeEventListener ("click", eventMouseClickSeat);'+
+            '  element.classList.add ("taken_seat");'+
             '}' +
 
-            'function setSeatsToReserve (seatCount) {' +
-            '  maxSeatsToAllocate = seatCount;' +
+            // Mark seats as disabled
+            'function disableSeats (csvStringOfElementIds) {'+
+            '  var seatIds = csvStringOfElementIds.split('','');'+
+            '  for (var i = 0; i < seatIds.length; i++) {'+
+            '    disableSeat(seatIds[i]);'+
+            '  }'+
             '}' +
 
-            'function reserveSeat (elementId) {' +
+            'function disableSeat (elementId) {'+
             '  var element = document.getElementById (elementId);' +
             '  element.classList.remove ("free_seat");' +
             '  element.removeEventListener ("mouseover", eventMouseOverSeat);' +
             '  element.removeEventListener ("click", eventMouseClickSeat);' +
-            '  element.classList.add ("taken_seat");' +
+            '  element.classList.add ("isDisabled");'+
+            '}'+
+
+            // Edit already reserved seats
+            'function editReservedSeats (csvStringOfElementIds) {'+
+            '  seatAllocationIndex = 0;'+
+            '  var seatIds = csvStringOfElementIds.split('','');'+
+            '  for (var i = 0; i < seatIds.length; i++) {'+
+            '    editReservedSeat (seatIds[i]);'+
+            '    seatsSelected[i] = seatIds[i];'+
+            '  }'+
+            '}'+
+
+            'function editReservedSeat (elementId) {'+
+            '  var element = document.getElementById (elementId);'+
+            '  element.classList.remove ("taken_seat");'+
+            '  element.addEventListener ("mouseover", eventMouseOverSeat);'+
+            '  element.addEventListener ("click", eventMouseClickSeat);'+
+            '  element.classList.add ("free_seat");'+
+            '  element.classList.add ("seat-selected");'+
             '}' +
 
             CreateInitialSeatReservationList(ExtAdmScheduleEntryNo) +
+            GetSeatDisabledList (ExtAdmScheduleEntryNo) +
+            GetSeatReservationEditList (EditReservation) +
             StrSubstNo('setSeatsToReserve (%1);', TicketReservationRequest.Quantity) +
 
           ']]></script>' +
@@ -501,15 +545,51 @@ codeunit 6151131 "TM Seating UI"
 
     local procedure Javascript() JsText: Text
     begin
-
-        //JsText := 'ticket-seating-main ()';
-        //JsText += 'setInterval(function() { $("#npr-refresh-timer").click(); }, 250);';
     end;
 
     local procedure LoadSVGForAdmSchEntry(ExtAdmScheduleEntryNo: Integer) SVG: Text
+    var
+        AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
+        SeatingTemplate: Record "TM Seating Template";
+        WebClientDependency: Record "Web Client Dependency";
+        SeatingSetup: Record "TM Seating Setup";
+        SvgCode: Code[10];
+        OutStr: OutStream;
     begin
 
-        exit(CreateSeatingTest(50, 5));
+        AdmissionScheduleEntry.SetFilter ("External Schedule Entry No.", '=%1', ExtAdmScheduleEntryNo);
+        AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
+        AdmissionScheduleEntry.FindFirst ();
+
+        SeatingSetup.Get (AdmissionScheduleEntry."Admission Code");
+        case SeatingSetup."Template Cache" of
+          SeatingSetup."Template Cache"::NO_CACHE : SvgCode := '';
+          SeatingSetup."Template Cache"::ADMIN  :   SvgCode := CopyStr (AdmissionScheduleEntry."Admission Code", 1, 10);
+          SeatingSetup."Template Cache"::SCHEDULE : SvgCode := StrSubstNo ('%1%2', CopyStr (AdmissionScheduleEntry."Admission Code", 1, 10), CopyStr (AdmissionScheduleEntry."Schedule Code", 1, 5));
+          SeatingSetup."Template Cache"::ENTRY    : SvgCode := StrSubstNo ('AS-%1', Format (ExtAdmScheduleEntryNo, 0, 9));
+        end;
+
+        if (SvgCode <> '') then
+          if (WebClientDependency.Get (WebClientDependency.Type::SVG, SvgCode)) then
+            exit (WebClientDependency.GetSvg (SvgCode));
+
+        SVG := CreateSeatingTemplate (ExtAdmScheduleEntryNo);
+
+        if (SvgCode <> '') then begin
+          WebClientDependency.Init;
+          WebClientDependency.Type := WebClientDependency.Type::SVG;
+
+          WebClientDependency.Code := SvgCode;
+          WebClientDependency.Description := StrSubstNo ('Entry created at %1', CurrentDateTime());
+          WebClientDependency.Insert ();
+
+          Clear (WebClientDependency.BLOB);
+          WebClientDependency.BLOB.CreateOutStream (OutStr);
+          OutStr.WriteText (SVG);
+          WebClientDependency.Modify (true);
+        end;
+
+        exit (SVG);
     end;
 
     local procedure UpdateSeatReservationList(ExtAdmScheduleEntryNo: Integer) JavaScriptFunction: Text
@@ -530,7 +610,7 @@ codeunit 6151131 "TM Seating UI"
         CSV: Text;
     begin
 
-        // 'reserveSeats ("1,2,3,4")
+        // 'reservedSeats ("1,2,3,4")
         if (SeatingReservationEntry.SetCurrentKey("External Schedule Entry No.")) then;
         SeatingReservationEntry.SetFilter("External Schedule Entry No.", '=%1', ExtAdmScheduleEntryNo);
         SeatingReservationEntry.SetFilter("Entry No.", '>%1', ReservationUpdateEntryNo);
@@ -550,6 +630,59 @@ codeunit 6151131 "TM Seating UI"
         exit(StrSubstNo('reserveSeats ("%1");', CSV));
     end;
 
+    local procedure GetSeatReservationEditList(EditMode: Boolean) JavaScriptFunction: Text
+    var
+        SeatingReservationEntry: Record "TM Seating Reservation Entry";
+        CSV: Text;
+    begin
+
+        // 'editReservedSeats ("1,2,3,4")
+        if (not EditMode) then
+          exit ('');
+
+        SeatingReservationEntry.SetFilter ("Ticket Token", '=%1', TicketReservationRequest."Session Token ID");
+        if (not SeatingReservationEntry.FindSet ()) then
+          exit ('');
+
+        CSV := StrSubstNo ('%1', SeatingReservationEntry.ElementId);
+
+        if (SeatingReservationEntry.Next () <> 0) then
+          repeat
+            CSV += StrSubstNo (',%1', SeatingReservationEntry.ElementId);
+          until (SeatingReservationEntry.Next () = 0);
+
+        exit (StrSubstNo ('editReservedSeats ("%1");', CSV));
+    end;
+
+    local procedure GetSeatDisabledList(ExtAdmScheduleEntryNo: Integer) JavaScriptFunction: Text
+    var
+        AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
+        SeatingTemplate: Record "TM Seating Template";
+        CSV: Text;
+    begin
+
+        // 'disabledSeats ("1,2,3,4")
+
+        AdmissionScheduleEntry.SetFilter ("External Schedule Entry No.", '=%1', ExtAdmScheduleEntryNo);
+        AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
+        AdmissionScheduleEntry.FindFirst ();
+
+        SeatingTemplate.SetFilter ("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
+        SeatingTemplate.SetFilter ("Entry Type", '=%1', SeatingTemplate."Entry Type"::LEAF);
+        SeatingTemplate.SetFilter ("Reservation Category", '=%1', SeatingTemplate."Reservation Category"::BLOCKED);
+        if (not SeatingTemplate.FindSet ()) then
+          exit ('');
+
+        CSV := StrSubstNo ('%1', SeatingTemplate.ElementId);
+
+        if (SeatingTemplate.Next () <> 0) then
+          repeat
+            CSV += StrSubstNo (',%1', SeatingTemplate.ElementId);
+          until (SeatingTemplate.Next () = 0);
+
+        exit (StrSubstNo ('disableSeats ("%1");', CSV));
+    end;
+
     local procedure SaveSeatReservation(TicketReservationRequest: Record "TM Ticket Reservation Request"; EventContents: Text)
     var
         AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
@@ -567,6 +700,10 @@ codeunit 6151131 "TM Seating UI"
         JObject := JObject.Parse(EventContents);
         SeatList := GetStringValueFromJson(JObject, 'seatlist');
 
+        SeatingReservationEntry.SetCurrentKey ("Ticket Token");
+        SeatingReservationEntry.SetFilter ("Ticket Token", '=%1', TicketReservationRequest."Session Token ID");
+        SeatingReservationEntry.DeleteAll ();
+
         repeat
             SeatId := NextElement(SeatList);
             SeatingReservationEntry."Entry No." := 0;
@@ -575,6 +712,13 @@ codeunit 6151131 "TM Seating UI"
             SeatingReservationEntry."Reservation Status" := SeatingReservationEntry."Reservation Status"::RESERVED;
             SeatingReservationEntry."Ticket Token" := TicketReservationRequest."Session Token ID";
             SeatingReservationEntry."Created At" := CurrentDateTime();
+
+          AdmissionScheduleEntry.SetFilter ("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
+          AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
+          AdmissionScheduleEntry.FindFirst ();
+          SeatingReservationEntry."Admission Code" := AdmissionScheduleEntry."Admission Code";
+          SeatingReservationEntry."Schedule Code"  := AdmissionScheduleEntry."Schedule Code";
+
             SeatingReservationEntry.Insert();
         until (SeatList = '');
     end;
@@ -672,11 +816,12 @@ codeunit 6151131 "TM Seating UI"
         ry: Integer;
         a: Integer;
         b: Integer;
-        arcfactor: Decimal;
-        v: Decimal;
-        x: Decimal;
-        y: Decimal;
+        ViewPort: Decimal;
     begin
+
+        ViewPort := cols*50;
+        if (rows > cols) then
+          ViewPort := rows*50;
 
         width := 25;
         height := 25;
@@ -685,28 +830,148 @@ codeunit 6151131 "TM Seating UI"
 
         // small angle approximation of cos (x) is 1-x*x/2 (radians) in the range 0..1 (0..57 degrees)
 
+        SeatText := StrSubstNo ('<svg viewbox="0 0 %1 %1" preserveaspectratio="none">', Format (ViewPort, 0, 9));
 
         for a := 0 to rows - 1 do begin
             for b := 0 to cols - 1 do begin
-                v := (b + 0.5 - cols / 2) / (cols / 2) / ((a + height) / height);
-                arcfactor := (1 - v * v / 2) * height * 5;
-
-                //x := 50 + b*width + b*10;
-                x := b * width + b * 10;
-                y := 50 + a * height + a * 10 + arcfactor;
-
-                SeatText += StrSubstNo('<rect class="free_seat" id="%1" x="%2" y="%3" rx="%4" ry="%5" width="%6" height="%7" transform="%8" stroke="black"/>',
-                  b + a * cols + 1,
-                  Round(x, 1),
-                  Round(y, 1),
-                  rx,
-                  ry,
-                  width,
-                  height,
-                  StrSubstNo('rotate(%1 %2,%3)', Round(v / 2 / 3.14 * 360, 1) * -1, Round(x + width / 2, 1), Round(y + height / 2, 1)) // rad to deg
-                )
-            end;
+            SeatText += CreateSeatWithPreset ((b + a*cols + 1), 'free_seat', a, b, cols, rows);
+          end;
         end;
+
+        SeatText += '</svg>';
+    end;
+
+    local procedure CreateSeatingTemplate(ExtAdmScheduleEntryNo: Integer) SeatText: Text
+    var
+        AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
+        SeatingTemplate: Record "TM Seating Template";
+        Row: Integer;
+        Col: Integer;
+        MaxRows: Integer;
+        MaxCols: Integer;
+        ViewPort: Decimal;
+        ElementId: Integer;
+        Middle: Integer;
+        HalfScreenTop: Integer;
+        HalfScreenBottom: Integer;
+        CssClassName: Text;
+        SeatSize: Integer;
+        ScreenIllustrationHeight: Integer;
+    begin
+
+        AdmissionScheduleEntry.SetFilter ("External Schedule Entry No.", '=%1', ExtAdmScheduleEntryNo);
+        AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
+        AdmissionScheduleEntry.FindFirst ();
+
+        SeatingTemplate.SetFilter ("Admission Code", '=%1', AdmissionScheduleEntry."Admission Code");
+        SeatingTemplate.SetFilter ("Entry Type", '=%1', SeatingTemplate."Entry Type"::NODE);
+        MaxRows := SeatingTemplate.Count () - 1; // Exclude root node
+
+        SeatingTemplate.SetFilter ("Entry Type", '=%1', SeatingTemplate."Entry Type"::LEAF);
+        MaxCols := Round (SeatingTemplate.Count () / MaxRows, 1, '>');
+
+        // some magic numbers to create the seats
+        SeatSize := 35;
+
+        ViewPort := (MaxCols+1)*SeatSize;
+        if (MaxRows > MaxCols) then
+          ViewPort := (MaxRows+1)*SeatSize;
+        // end magic numbers
+
+        SeatText := StrSubstNo ('<svg x="%2" viewbox="0 0 %1 %1" preserveaspectratio="none">', Format (ViewPort+70, 0, 9), Round((800/(MaxCols*SeatSize)*35),1));
+        Middle := Round (MaxCols*SeatSize / 2, 1);
+        HalfScreenTop := Round (0.75 * Middle, 1);
+        HalfScreenBottom := Round (HalfScreenTop * 0.25, 1);
+        ScreenIllustrationHeight := Round (ViewPort * 0.05, 1);
+
+        SeatText += StrSubstNo ('%1%3%2%3',
+          StrSubstNo ('<polygon points="%1,%5 %2,%5 %3,%6 %4,%6" style="fill:#000000;stroke:#000000;stroke-width:1"/>',
+            Middle - HalfScreenTop + 5,
+            Middle + HalfScreenTop + 5,
+            Middle + HalfScreenTop - HalfScreenBottom + 5,
+            Middle - HalfScreenTop + HalfScreenBottom + 5,
+            10, 10+ScreenIllustrationHeight),
+
+          StrSubstNo ('<text x="%1" y="%2" class="btnText12" fill="white" text-anchor="middle" alignment-baseline="middle" >screen</text>',
+            Middle+5,
+            Round (10+(ScreenIllustrationHeight/2),1)),
+
+          CRLF);
+
+        SeatingTemplate.SetCurrentKey ("Parent Entry No.",Ordinal);
+        SeatingTemplate.FindSet ();
+        Row := 0;
+        Col := 0;
+        repeat
+          ElementId += 1;
+          if (SeatingTemplate.ElementId = 0) then begin
+            SeatingTemplate.ElementId := ElementId;
+            SeatingTemplate.Modify ();
+            end;
+          CssClassName := 'free_seat';
+          if (SeatingTemplate."Reservation Category" = SeatingTemplate."Reservation Category"::HIDDEN) then
+            CssClassName := 'hidden_seat';
+
+          SeatText += CreateSeatWithPreset (SeatingTemplate.ElementId, CssClassName, Row, Col, MaxCols, MaxRows);
+
+          Col += 1;
+          if (Col >= MaxCols) then begin
+            Row += 1;
+            Col := 0;
+          end;
+
+        until (SeatingTemplate.Next () = 0);
+
+        SeatText += '</svg>';
+    end;
+
+    local procedure CreateSeatWithPreset(elementId: Integer;cssClassName: Text;a: Integer;b: Integer;cols: Integer;rows: Integer): Text
+    var
+        width: Integer;
+        height: Integer;
+        rx: Integer;
+        ry: Integer;
+    begin
+
+        // some magic numbers to describe the seats
+        width := 25;
+        height := 25;
+        rx := 5;
+        ry := 5;
+
+        exit (CreateSeat (elementId, cssClassName, a, b, cols, rows, width, height, rx, ry));
+    end;
+
+    local procedure CreateSeat(elementId: Integer;cssClassName: Text;a: Integer;b: Integer;cols: Integer;rows: Integer;width: Integer;height: Integer;rx: Integer;ry: Integer) SeatText: Text
+    var
+        arcfactor: Decimal;
+        v: Decimal;
+        x: Decimal;
+        y: Decimal;
+    begin
+
+        // small angle approximation of cos (x) is 1-x*x/2 (radians) in the range 0..1 (0..57 degrees)
+        v := (b + 0.5 - cols/2) / (cols/2) / ((a+height)/height) ;
+        arcfactor :=  (1 - v*v/2) * height*3;
+
+        // calculate (x,y) position for seat. (offset + seat size + spacing)
+        x := 5 + b*width + b*10;
+        y := 25 + a*height + a*10 + arcfactor;
+
+        SeatText += StrSubstNo ('<rect %1 %2 %3 %4 %5 %6 stroke="black"/>%7',
+          StrSubstNo ('class="%1"', cssClassName),
+          StrSubstNo ('id="%1"', Format (elementId, 0, 9)),
+          StrSubstNo ('x="%1" y="%2"', Format (Round (x, 1), 0, 9), Format (Round (y, 1), 0, 9)),
+          StrSubstNo ('rx="%1" ry="%2"', rx, ry),
+          StrSubstNo ('width="%1" height="%2"', width, height),
+          StrSubstNo ('transform="rotate(%1 %2,%3)"',  Format(Round (v/2/3.14*360,1)*-1,0,9), Format (Round (x+width/2,1),0,9) , Format (Round (y+height/2,1),0,9)), // rad to deg
+          CRLF);
+    end;
+
+    local procedure CRLF() CRLF: Text[2]
+    begin
+        CRLF[1] := 13;
+        CRLF[2] := 10;
     end;
 
 }

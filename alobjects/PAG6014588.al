@@ -5,6 +5,7 @@ page 6014588 "Item Statistics Subpage"
     // NPR5.31/BR  /20172021 CASE 272890 made non-editable
     // NPR5.51/RA  /20190628 CASE 338480 Added Function GetGlobals
     // NPR5.51/YAHA/20190822 CASE 365732 Flow Item Category Filter From Advanced Sales Statistics to Item Statistics
+    // NPR5.53/YAHA/20200107 CASE 384124 Adding vendor no - to be used in filters
 
     Caption = 'Item Statistics Subform';
     Editable = false;
@@ -92,6 +93,9 @@ page 6014588 "Item Statistics Subpage"
                 {
                     Caption = '-> Last year';
                     Visible = "LP%";
+                }
+                field("Vendor No.";"Vendor No.")
+                {
                 }
             }
         }

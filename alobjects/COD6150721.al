@@ -9,6 +9,7 @@ codeunit 6150721 "POS Action - Login"
     // NPR5.49/TSA /20190314 CASE 348458 Added state check for POS Open when end-of-day is managed by a different POS.
     // NPR5.51/TSA /20190622 CASE 359508 Adding a new pos period when the period is status closed (or missing) and the unit is open
     // NPR5.51/MMV /20190628 CASE 356076 Added system entry for login without balancing
+    // NPR5.53/TJ  /20191202 CASE 379680 New publisher OnAfterFindSalesperson
 
 
     trigger OnRun()
@@ -104,6 +105,9 @@ codeunit 6150721 "POS Action - Login"
               SalespersonPurchaser.SetRange ("Register Password", Password);
 
               if ((SalespersonPurchaser.FindFirst () and (Password <> ''))) then begin
+                //-NPR5.53 [379680]
+                OnAfterFindSalesperson(SalespersonPurchaser);
+                //+NPR5.53 [379680]
                 Setup.SetSalesperson (SalespersonPurchaser);
 
                 //-NPR5.46 [328338] - refactored
@@ -472,6 +476,11 @@ codeunit 6150721 "POS Action - Login"
         //-NPR5.38 [297087]
         POSCreateEntry.InsertUnitOpenEntry (Register."Register No.", '');
         //+NPR5.38 [297087]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterFindSalesperson(var SalespersonPurchaser: Record "Salesperson/Purchaser")
+    begin
     end;
 }
 

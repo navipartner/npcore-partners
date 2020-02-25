@@ -47,6 +47,10 @@ table 6014401 Register
     //                                   Function DetectDecimalThousandsSeparator moved to same new table
     // NPR5.50/BHR /20190410 CASE 348128 Rename field 274 (www.address)
     // NPR5.52/ALPO/20190926 CASE 368673 Active event (from Event Management module) on cash register. Copy dimension from event on selection
+    // NPR5.53/ALPO/20191013 CASE 371955 Removed field 25 "Rounding": moved to "POS Posting Profile" (Table 6150653)
+    // NPR5.53/ALPO/20191023 CASE 373743 Removed field 21 "Sales Ticket Series": moved to "POS Audit Profile" (Table 6150650)
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
+    // NPR5.53/ALPO/20191105 CASE 376035 Save active event on Sale POS, copy event's dimensions directly to the sale instead of overwriting pos unit dimensions
 
     Caption = 'Cash Register';
     LookupPageID = "Register List";
@@ -221,11 +225,6 @@ table 6014401 Register
             Caption = 'VAT Gen. Business Posting Group (Price)';
             TableRelation = "VAT Business Posting Group";
         }
-        field(21;"Sales Ticket Series";Code[10])
-        {
-            Caption = 'Sales Ticket Series';
-            TableRelation = "No. Series";
-        }
         field(22;"Status Set By Sales Ticket";Code[20])
         {
             Caption = 'Status set by Sales Ticket';
@@ -233,12 +232,6 @@ table 6014401 Register
         field(23;"Name 2";Text[50])
         {
             Caption = 'Name 2';
-        }
-        field(25;Rounding;Code[20])
-        {
-            Caption = 'Rounding';
-            Description = 'Kontonummer til �reafrunding.';
-            TableRelation = "G/L Account"."No." WHERE (Blocked=CONST(false));
         }
         field(26;"Register Change Account";Code[20])
         {
@@ -778,28 +771,39 @@ table 6014401 Register
                 FromDefDim: Record "Default Dimension";
                 ToDefDim: Record "Default Dimension";
             begin
+                //-NPR5.53 [376035]-revoked
+                /*
                 //-NPR5.52 [368673]
-                if "Active Event No." <> '' then begin
-                  FromDefDim.SetRange("Table ID",DATABASE::Job);
-                  FromDefDim.SetRange("No.","Active Event No.");
-                  FromDefDim.SetFilter("Dimension Code",'<>%1','');
-                  FromDefDim.SetFilter("Dimension Value Code",'<>%1','');
-                  if FromDefDim.FindSet then
-                    repeat
-                      ToDefDim.Init;
-                      ToDefDim."Table ID" := DATABASE::Register;
+                IF "Active Event No." <> '' THEN BEGIN
+                  FromDefDim.SETRANGE("Table ID",DATABASE::Job);
+                  FromDefDim.SETRANGE("No.","Active Event No.");
+                  FromDefDim.SETFILTER("Dimension Code",'<>%1','');
+                  FromDefDim.SETFILTER("Dimension Value Code",'<>%1','');
+                  IF FromDefDim.FINDSET THEN
+                    REPEAT
+                      ToDefDim.INIT;
+                      //ToDefDim."Table ID" := DATABASE::Register;  //NPR5.53 [371956]-revoked
+                      ToDefDim."Table ID" := DATABASE::"POS Unit";  //NPR5.53 [371956]
                       ToDefDim."No." := "Register No.";
                       ToDefDim."Dimension Code" := FromDefDim."Dimension Code";
-                      if not ToDefDim.Find then
-                        ToDefDim.Insert;
+                      IF NOT ToDefDim.FIND THEN
+                        ToDefDim.INSERT;
                       ToDefDim."Dimension Value Code" := FromDefDim."Dimension Value Code";
-                      if ToDefDim."Value Posting" = ToDefDim."Value Posting"::"No Code" then
+                      IF ToDefDim."Value Posting" = ToDefDim."Value Posting"::"No Code" THEN
                         ToDefDim."Value Posting" := ToDefDim."Value Posting"::" ";
-                      ToDefDim.Modify;
-                    until FromDefDim.Next = 0;
-                  DimMgt.UpdateDefaultDim(DATABASE::Register,"Register No.","Global Dimension 1 Code","Global Dimension 2 Code");
-                end;
+                      ToDefDim.MODIFY;
+                    UNTIL FromDefDim.NEXT = 0;
+                  //DimMgt.UpdateDefaultDim(DATABASE::Register,"Register No.","Global Dimension 1 Code","Global Dimension 2 Code");  //NPR5.53 [371956]-revoked
+                  //-NPR5.53 [371956]
+                  POSUnit.GET("Register No.");
+                  DimMgt.UpdateDefaultDim(DATABASE::"POS Unit",POSUnit."No.",POSUnit."Global Dimension 1 Code",POSUnit."Global Dimension 2 Code");
+                  POSUnit.MODIFY;
+                  //+NPR5.53 [371956]
+                END;
                 //+NPR5.52 [368673]
+                */
+                //+NPR5.53 [376035]-revoked
+
             end;
         }
         field(6184471;"MobilePay Payment Type";Code[10])
@@ -895,7 +899,7 @@ table 6014401 Register
         //+NPR4.21
         
         // ERROR(Text1060000,Kassenummer);
-        DimMgt.UpdateDefaultDim( DATABASE::Register,"Register No.", "Global Dimension 1 Code","Global Dimension 2 Code");
+        //DimMgt.UpdateDefaultDim( DATABASE::Register,"Register No.", "Global Dimension 1 Code","Global Dimension 2 Code");  //NPR5.53 [371956]-revoked
         
         "Connected To Server":=true;
         
@@ -930,6 +934,7 @@ table 6014401 Register
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer;var ShortcutDimCode: Code[20])
     begin
+        DimsAreDiscontinuedOnRegister;  //NPR5.53 [371956]
         DimMgt.ValidateDimValueCode(FieldNumber,ShortcutDimCode);
         DimMgt.SaveDefaultDim(DATABASE::Register,"Register No.",FieldNumber,ShortcutDimCode);
         Modify;
@@ -1101,6 +1106,15 @@ table 6014401 Register
         Register."Credit Voucher Account" := PaymentTypePOS."G/L Account No.";
         Register.Status := Register.Status::Ekspedition;
         Register.Insert;
+    end;
+
+    procedure DimsAreDiscontinuedOnRegister()
+    var
+        CannotChangeHereLbl: Label 'Dimensions cannot be changed on Cash Register. Please update them on POS Unit instead.';
+    begin
+        //-NPR5.53 [371956]
+        Error(CannotChangeHereLbl);
+        //+NPR5.53 [371956]
     end;
 }
 

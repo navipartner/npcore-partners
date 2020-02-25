@@ -1,7 +1,8 @@
 table 6059897 "Data Log Setup (Table)"
 {
-    // DL1.00/MH/20140801  NP-AddOn: Data Log
+    // DL1.00/MHA /20140801  NP-AddOn: Data Log
     //   - This Table contains Setup information of which Record Changes to log.
+    // DL1.16/MHA /20191127  Extended length of field 2 "Table Name" from 30 to 250
 
     Caption = 'Data Log Setup (Table)';
 
@@ -12,11 +13,12 @@ table 6059897 "Data Log Setup (Table)"
             Caption = 'Table ID';
             TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Table));
         }
-        field(2;"Table Name";Text[30])
+        field(2;"Table Name";Text[250])
         {
             CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE ("Object Type"=CONST(Table),
                                                                            "Object ID"=FIELD("Table ID")));
             Caption = 'Table Name';
+            Description = 'DL1.16';
             Editable = false;
             FieldClass = FlowField;
         }

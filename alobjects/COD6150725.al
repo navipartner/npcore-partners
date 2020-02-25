@@ -38,6 +38,7 @@ codeunit 6150725 "POS Action - Payment"
     // NPR5.51/MMV /20190625 CASE 359896 Look for linked successfull EFT record on failure, in skip check function.
     // NPR5.51/THRO/20190718 CASE 361514 EventPublisherElement changed in OnBeforeEditPaymentParameters. Action renamed on Page 6150702
     // NPR5.51/MMV /20190820 CASE 364694 Allow ending sale with voided payment even without items.
+    // NPR5.53/MHA /20200114 CASE 384841 Added parameter to SuggestAmount() to allow for negative payment balance
 
 
     trigger OnRun()
@@ -362,7 +363,9 @@ codeunit 6150725 "POS Action - Payment"
     begin
 
         Context.SetContext('capture_amount', true);
-        Context.SetContext('amounttocapture', SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
+        //-NPR5.53 [384841]
+        Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, true));
+        //+NPR5.53 [384841]
         Context.SetContext('amount_description', PaymentType.Description);
         exit(true);
     end;
@@ -370,7 +373,9 @@ codeunit 6150725 "POS Action - Payment"
     local procedure ConfigureManualCardWorkflow(var Context: Codeunit "POS JSON Management"; PaymentType: Record "Payment Type POS"; ReturnPaymentType: Record "Payment Type POS"; SalesAmount: Decimal; PaidAmount: Decimal): Boolean
     begin
         Context.SetContext('capture_amount', true);
-        Context.SetContext('amounttocapture', SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
+        //-NPR5.53 [384841]
+        Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, false));
+        //+NPR5.53 [384841]
         Context.SetContext('amount_description', PaymentType.Description);
         exit(true);
     end;
@@ -379,7 +384,9 @@ codeunit 6150725 "POS Action - Payment"
     begin
 
         Context.SetContext('capture_amount', true);
-        Context.SetContext('amounttocapture', SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
+        //-NPR5.53 [384841]
+        Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, false));
+        //+NPR5.53 [384841]
         Context.SetContext('amount_description', PaymentType.Description);
         exit(true);
     end;
@@ -389,7 +396,9 @@ codeunit 6150725 "POS Action - Payment"
 
         Context.SetContext('capture_amount', false);
         Context.SetContext('capture_voucher', true);
-        Context.SetContext('amounttocapture', SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
+        //-NPR5.53 [384841]
+        Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, false));
+        //+NPR5.53 [384841]
         exit(true);
     end;
 
@@ -397,8 +406,9 @@ codeunit 6150725 "POS Action - Payment"
     var
         Amount: Decimal;
     begin
-
-        Amount := SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType);
+        //-NPR5.53 [384841]
+        Amount := SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType,false);
+        //+NPR5.53 [384841]
         if Amount < 0 then
             Amount := 0;
 
@@ -412,7 +422,9 @@ codeunit 6150725 "POS Action - Payment"
     begin
 
         Context.SetContext('capture_amount', (PaymentType."Forced Amount" = false));
-        Context.SetContext('amounttocapture', SuggestAmount(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
+        //-NPR5.53 [384841]
+        Context.SetContext ('amounttocapture', SuggestAmount (SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, false));
+        //+NPR5.53 [384841]
         Context.SetContext('amount_description', PaymentType.Description);
         exit(true);
     end;
@@ -790,11 +802,13 @@ codeunit 6150725 "POS Action - Payment"
                 Error(InvalidAmount, AmountToCapture, PaymentTypePOS.Description);
     end;
 
-    local procedure SuggestAmount(SalesAmount: Decimal; PaidAmount: Decimal; PaymentType: Record "Payment Type POS"; ReturnPaymentType: Record "Payment Type POS"): Decimal
+    local procedure SuggestAmount(SalesAmount: Decimal;PaidAmount: Decimal;PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS";AllowNegativePaymentBalance: Boolean): Decimal
     var
         POSPaymentLine: Codeunit "POS Payment Line";
     begin
-        exit(POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType));
+        //-NPR5.53 [384841]
+        exit (POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, AllowNegativePaymentBalance));
+        //+NPR5.53 [384841]
     end;
 
     local procedure "-- GiftVouchers"()

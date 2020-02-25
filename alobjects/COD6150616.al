@@ -14,6 +14,7 @@ codeunit 6150616 "POS Post Item Entries"
     // NPR5.52/ALPO/20190923 CASE 365326 POS Posting related fields moved to POS Posting Profiles from NP Retail Setup
     // NPR5.52/TSA /20190925 CASE 369231 Added handling of Retail Serial No.
     // NPR5.52/TSA /20191014 CASE 372920 Replenishment Method Assembly
+    // NPR5.53/TSA /20191212 CASE 381559 Fixed issue with assembly order rename
 
     TableNo = "POS Entry";
 
@@ -439,8 +440,15 @@ codeunit 6150616 "POS Post Item Entries"
         end;
 
         if ((not CreateAssemblyLink) and (CreateAssembly)) then begin
-          POSEntrySalesDocLink."Sales Document No" := AssemblyHeader."No.";
-          POSEntrySalesDocLink.Modify ();
+          //-NPR5.53 [381559]
+          // POSEntrySalesDocLink."Sales Document No" := AssemblyHeader."No.";
+          // POSEntrySalesDocLink.MODIFY ();
+          if (POSEntrySalesDocLink."Sales Document No" <> AssemblyHeader."No.") then begin
+            POSEntrySalesDocLink.Delete ();
+            POSEntrySalesDocLink."Sales Document No" := AssemblyHeader."No.";
+            POSEntrySalesDocLink.Insert ();
+          end;
+          //+NPR5.53 [381559]
         end;
 
         // Commit the item posting for POS Sale, before attempting to post assembly order - note: there are commits in the AssemblyPost.RUN ();

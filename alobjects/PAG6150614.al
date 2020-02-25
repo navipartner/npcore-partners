@@ -7,6 +7,7 @@ page 6150614 "POS Store List"
     // NPR5.38/BR  /20171214  CASE 299888 Changed ENU Caption from POS Ledger Register to POS Period Register No.
     // NPR5.48/TS  /20181213  CASE 339803 Added field Store Group Code
     // NPR5.50/CLVA/20190304 CASE 332844 Added Action Group "Stock-Take"
+    // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
 
     Caption = 'POS Store List';
     CardPageID = "POS Store Card";
@@ -56,47 +57,83 @@ page 6150614 "POS Store List"
     {
         area(navigation)
         {
-            action("POS Unit List")
+            group("POS Store")
             {
-                Caption = 'POS Unit List';
-                Image = List;
-                RunObject = Page "POS Unit List";
-            }
-            action("NP Retail Setup")
-            {
-                Caption = 'NP Retail Setup';
-                Image = Setup;
-                RunObject = Page "NP Retail Setup";
-            }
-            action("POS Posting Setup")
-            {
-                Caption = 'POS Posting Setup';
-                Image = GeneralPostingSetup;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                RunObject = Page "POS Posting Setup";
-                RunPageLink = "POS Store Code"=FIELD(Code);
-            }
-            action("POS Period Registers")
-            {
-                Caption = 'POS Period Registers';
-                Image = Register;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                RunObject = Page "POS Period Register List";
-                RunPageLink = "POS Store Code"=FIELD(Code);
-            }
-            action("POS Entries")
-            {
-                Caption = 'POS Entries';
-                Image = LedgerEntries;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                RunObject = Page "POS Entry List";
-                RunPageLink = "POS Store Code"=FIELD(Code);
+                Caption = 'POS Store';
+                group(Dimensions)
+                {
+                    Caption = 'Dimensions';
+                    Image = Dimensions;
+                    action("Dimensions-Single")
+                    {
+                        Caption = 'Dimensions-Single';
+                        Image = Dimensions;
+                        RunObject = Page "Default Dimensions";
+                        RunPageLink = "Table ID"=CONST(6150614),
+                                      "No."=FIELD(Code);
+                        ShortCutKey = 'Shift+Ctrl+D';
+                    }
+                    action("Dimensions-&Multiple")
+                    {
+                        AccessByPermission = TableData Dimension=R;
+                        Caption = 'Dimensions-&Multiple';
+                        Image = DimensionSets;
+
+                        trigger OnAction()
+                        var
+                            POSStore: Record "POS Store";
+                            DefaultDimMultiple: Page "Default Dimensions-Multiple";
+                        begin
+                            //-NPR5.53 [371956]
+                            CurrPage.SetSelectionFilter(POSStore);
+                            DefaultDimMultiple.SetMultiRecord(POSStore,FieldNo(Code));
+                            DefaultDimMultiple.RunModal;
+                            //-NPR5.53 [371956]
+                        end;
+                    }
+                }
+                action("POS Unit List")
+                {
+                    Caption = 'POS Unit List';
+                    Image = List;
+                    RunObject = Page "POS Unit List";
+                }
+                action("NP Retail Setup")
+                {
+                    Caption = 'NP Retail Setup';
+                    Image = Setup;
+                    RunObject = Page "NP Retail Setup";
+                }
+                action("POS Posting Setup")
+                {
+                    Caption = 'POS Posting Setup';
+                    Image = GeneralPostingSetup;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Posting Setup";
+                    RunPageLink = "POS Store Code"=FIELD(Code);
+                }
+                action("POS Period Registers")
+                {
+                    Caption = 'POS Period Registers';
+                    Image = Register;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Period Register List";
+                    RunPageLink = "POS Store Code"=FIELD(Code);
+                }
+                action("POS Entries")
+                {
+                    Caption = 'POS Entries';
+                    Image = LedgerEntries;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Entry List";
+                    RunPageLink = "POS Store Code"=FIELD(Code);
+                }
             }
             group("Stock-Take")
             {

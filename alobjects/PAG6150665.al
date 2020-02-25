@@ -1,8 +1,9 @@
 page 6150665 "NPRE Seating"
 {
-    // NPR5.34/ANEN  /2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.34/ANEN  /20170717  CASE 262628 Added support for status (fld "Status", "Status Description")
-    // NPR5.35/ANEN /20170821 CASE 283376 Solution rename to NP Restaurant
+    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
+    // NPR5.34/ANEN/20170717 CASE 262628 Added support for status (fld "Status", "Status Description")
+    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
+    // NPR5.53/ALPO/20191210 CASE 380609 Dimensions: NPRE Seating integration
 
     Caption = 'Seating';
     PageType = Card;
@@ -65,6 +66,19 @@ page 6150665 "NPRE Seating"
     {
         area(navigation)
         {
+            group(Seating)
+            {
+                Caption = 'Seating';
+                action(Dimensions)
+                {
+                    Caption = 'Dimensions';
+                    Image = Dimensions;
+                    RunObject = Page "Default Dimensions";
+                    RunPageLink = "Table ID"=CONST(6150665),
+                                  "No."=FIELD(Code);
+                    ShortCutKey = 'Shift+Ctrl+D';
+                }
+            }
         }
     }
 

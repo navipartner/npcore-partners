@@ -2,6 +2,7 @@ table 6151023 "NpRv Ext. Voucher Buffer"
 {
     // NPR5.48/MHA /20180921  CASE 302179 Object created
     // NPR5.48/MHA /20190123  CASE 341711 Added fields 100 "Send via Print", 105 "Send via E-mail", 107 "Send via SMS"
+    // NPR5.53/MHA /20191118  CASE 372315 Added field 62 "Allow Top-up"
 
     Caption = 'Global Voucher Buffer';
 
@@ -43,6 +44,11 @@ table 6151023 "NpRv Ext. Voucher Buffer"
             Caption = 'Account No.';
             TableRelation = "G/L Account" WHERE ("Account Type"=CONST(Posting),
                                                  "Direct Posting"=CONST(true));
+        }
+        field(62;"Allow Top-up";Boolean)
+        {
+            Caption = 'Allow Top-up';
+            Description = 'NPR5.53';
         }
         field(70;Open;Boolean)
         {

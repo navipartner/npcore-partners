@@ -44,6 +44,9 @@ codeunit 6150706 "POS Sale Line"
     // NPR5.52/ALPO/20190912 CASE 354309 Make it possible for xRec to be available to subscribers via separate function call
     //                                   New global 'xRec'; Removed local 'xRec' from SetQuantity()
     // NPR5.52/ALPO/20190916 CASE 359596 Function ConvertPriceToVAT(): changed to be Global
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
+    // NPR5.53/TSA /20191219 CASE 382035 Added possibility to show item count as part of the sales summary on POS
+    // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
 
 
     trigger OnRun()
@@ -66,6 +69,7 @@ codeunit 6150706 "POS Sale Line"
         Text001: Label 'After Sale Line POS is inserted';
         Initialized: Boolean;
         CannotCalcPriceInclVATErr: Label 'Prices including VAT cannot be calculated when %1 is %2.';
+        ItemCountWhenCalculatedBalance: Decimal;
 
     [Scope('Personalization')]
     procedure Init(RegisterNo: Code[20];SalesTicketNo: Code[20];SaleIn: Codeunit "POS Sale";SetupIn: Codeunit "POS Setup";FrontEndIn: Codeunit "POS Front End Management")
@@ -126,8 +130,11 @@ codeunit 6150706 "POS Sale Line"
 
           if Register.Get (Setup.Register()) then begin
             "Location Code" := Register."Location Code";
-            "Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-            "Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+            //-NPR5.53 [371956]-revoked
+            //! Redundant lines. Dimensions should be properly handled by CreateDim() function, not forgetting the Dimension Set ID field.
+            //"Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
+            //"Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+            //+NPR5.53 [371956]-revoked
           end;
         end;
     end;
@@ -263,6 +270,7 @@ codeunit 6150706 "POS Sale Line"
           Validate(Quantity,Line.Quantity);
 
           "Customer No. Line" := Line."Customer No. Line";
+          Validate("NPRE Seating Code",Line."NPRE Seating Code");  //NPR5.53 [380918]
 
           if ("Sale Type" = "Sale Type"::"Out payment") then begin
             "Unit Price" := Line."Unit Price";
@@ -471,6 +479,8 @@ codeunit 6150706 "POS Sale Line"
         VATAmount := 0;
         TotalAmount := 0;
 
+        ItemCountWhenCalculatedBalance := 0; //-+NPR5.53 [382035]
+
         with Rec do begin
           if ("Register No." <> '') and ("Sales Ticket No." <> '') then begin
         //-NPR5.42 [315838]
@@ -481,6 +491,7 @@ codeunit 6150706 "POS Sale Line"
             SaleLine.SetFilter(Type,'<>%1',Type::Comment);  //-+NPR5.51 [365161]
             if SaleLine.FindSet then begin
               repeat
+                ItemCountWhenCalculatedBalance += SaleLine.Quantity; //-+NPR5.53 [382035]
                 if SaleLine."Sale Type" in [SaleLine."Sale Type"::Sale, SaleLine."Sale Type"::Deposit] then begin
                   AmountExclVAT += SaleLine.Amount;
                   TotalAmount += SaleLine."Amount Including VAT";
@@ -519,6 +530,10 @@ codeunit 6150706 "POS Sale Line"
         CurrDataSet.Totals.Add('VATAmount',VATAmount);
         CurrDataSet.Totals.Add('TotalAmount',TotalAmount);
         //+NPR5.38 [301053]
+
+        //-NPR5.53 [382035]
+        CurrDataSet.Totals.Add('ItemCount',ItemCountWhenCalculatedBalance);
+        //+NPR5.53 [382035]
     end;
 
     [Scope('Personalization')]

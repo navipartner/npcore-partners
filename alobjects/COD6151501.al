@@ -32,6 +32,7 @@ codeunit 6151501 "Nc Task Mgt."
     // NC2.14/MHA /20180629  CASE 308107 Added Task Output to CleanTasks()
     // NC2.14/MHA /20180629  CASE 320762 Added Record ID to Nc Tasks
     // NC2.22/MHA /20190613  CASE 358499 Added function TaskComplete()
+    // NC2.24/MHA /20191126  CASE 378811 Fixed previous value for Rename in InsertTasks() and removed green code
 
     TableNo = "Nc Task";
 
@@ -84,40 +85,22 @@ codeunit 6151501 "Nc Task Mgt."
         if TaskProcessor.Code = '' then
           TaskProcessor.Code := 'NC';
         Initialize();
-        //-NC2.08 [297750]
-        //CleanTasks();
-        //COMMIT;
-        //
-        //+NC2.08 [297750]
         Clear(TempDataLogRecord);
-        //-NC2.07 [293599]
-        //CLEAR(TempTaskField);
-        //+NC2.07 [293599]
         Clear(TempTask);
         TempDataLogRecord.DeleteAll;
-        //-NC2.07 [293599]
-        //TempTaskField.DELETEALL;
-        //+NC2.07 [293599]
         TempTask.DeleteAll;
         if UseDialog then
           Window.Open(Text001);
 
-        //-NC2.07 [293599]
-        //IF NaviConnectSetup."Max Task Count per Batch" <= 0 THEN
-        //  NaviConnectSetup."Max Task Count per Batch" := 1000;
-        //+NC2.07 [293599]
         if DataLogSubScriberMgt.GetNewRecords(TaskProcessor.Code,true,
                                               NaviConnectSetup."Max Task Count per Batch",TempDataLogRecord) then begin
           if UseDialog then
             Window.Update(1,10000);
           //-NC2.07 [293599]
-          //InsertTempTasks(TaskProcessor,'',TempDataLogRecord,TempTask,TempTaskField);
           InsertTempTasks(TaskProcessor,'',TempDataLogRecord,TempTask);
           //+NC2.07 [293599]
           TempDataLogRecord.DeleteAll;
           //-NC2.07 [293599]
-          //DeleteDuplicates(TaskProcessor,TempTask,TempTaskField);
-          //InsertTasks(TempTask,TempTaskField);
           DeleteDuplicates(TaskProcessor,TempTask);
           InsertTasks(TempTask);
           //+NC2.07 [293599]
@@ -128,14 +111,8 @@ codeunit 6151501 "Nc Task Mgt."
           Window.Close;
 
         Clear(TempDataLogRecord);
-        //-NC2.07 [293599]
-        //CLEAR(TempTaskField);
-        //+NC2.07 [293599]
         Clear(TempTask);
         TempDataLogRecord.DeleteAll;
-        //-NC2.07 [293599]
-        //TempTaskField.DELETEALL;
-        //+NC2.07 [293599]
         TempTask.DeleteAll;
 
         TaskProcesLine.SetRange("Task Processor Code",TaskProcessor.Code);
@@ -153,13 +130,10 @@ codeunit 6151501 "Nc Task Mgt."
               if UseDialog then
                 Window.Update(1,10000);
               //-NC2.07 [293599]
-              //InsertTempTasks(TaskProcessor,TaskProcesLine.Value,TempDataLogRecord,TempTask,TempTaskField);
               InsertTempTasks(TaskProcessor,TaskProcesLine.Value,TempDataLogRecord,TempTask);
               //+NC2.07 [293599]
               TempDataLogRecord.DeleteAll;
               //-NC2.07 [293599]
-              //DeleteDuplicates(TaskProcessor,TempTask,TempTaskField);
-              //InsertTasks(TempTask,TempTaskField);
               DeleteDuplicates(TaskProcessor,TempTask);
               InsertTasks(TempTask);
               //+NC2.07 [293599]
@@ -307,8 +281,10 @@ codeunit 6151501 "Nc Task Mgt."
                 TaskField."Field Name" := DataLogField."Field Name";
                 TaskField."Previous Value" := DataLogField."Previous Field Value";
                 TaskField."New Value" := DataLogField."Field Value";
-                if TempTask.Type in [TempTask.Type::Delete,TempTask.Type::Rename] then
+                //-NC2.24 [378811]
+                if TempTask.Type in [TempTask.Type::Delete] then
                   TaskField."Previous Value" := TaskField."New Value";
+                //+NC2.24 [378811]
                 TaskField."Log Date" := DataLogField."Log Date";
                 TaskField."Task Entry No." := Task."Entry No.";
                 TaskField.Insert;

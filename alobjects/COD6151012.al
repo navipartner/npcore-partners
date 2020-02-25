@@ -4,6 +4,7 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
     // NPR5.48/MHA /20190123  CASE 341711 Added Send methods E-mail and SMS
     // NPR5.49/MHA /20190228  CASE 342811 Added functions OnLookupVoucherTypeCode(), OnValidateVoucherTypeCode()
     // NPR5.52/ALPO/20190925  CASE 369420 Disallow negative quantity of gift vouchers to be sold
+    // NPR5.53/MHA /20200103  CASE 384055 Customer No. is carried to Retail Voucher in IssueVoucher()
 
 
     trigger OnRun()
@@ -238,7 +239,9 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
     var
         SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
         VoucherType: Record "NpRv Voucher Type";
+        SalePOS: Record "Sale POS";
         SaleLinePOS: Record "Sale Line POS";
+        POSSale: Codeunit "POS Sale";
         POSSaleLine: Codeunit "POS Sale Line";
         VoucherTypeCode: Text;
         DiscountType: Text;
@@ -301,6 +304,20 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
         SaleLinePOSVoucher."Voucher Type" := VoucherType.Code;
         SaleLinePOSVoucher.Description := VoucherType.Description;
         SaleLinePOSVoucher."Starting Date" := CurrentDateTime;
+        //-NPR5.53 [384055]
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        case SalePOS."Customer Type" of
+          SalePOS."Customer Type"::Ord:
+            begin
+              SaleLinePOSVoucher.Validate("Customer No.",SalePOS."Customer No.");
+            end;
+          SalePOS."Customer Type"::Cash:
+            begin
+              SaleLinePOSVoucher.Validate("Contact No.",SalePOS."Customer No.");
+            end;
+        end;
+        //+NPR5.53 [384055]
         //-NPR5.48 [341711]
         JSON.SetScope('/',true);
         SaleLinePOSVoucher."Send via Print" := JSON.GetBoolean('SendMethodPrint',false);

@@ -15,7 +15,7 @@ xmlport 6060121 "TM Ticket Set Attributes"
             tableelement(tmpticketreservationrequest;"TM Ticket Reservation Request")
             {
                 MaxOccurs = Once;
-                XmlName = 'set_attributes';
+                XmlName = 'setattributes';
                 UseTemporary = true;
                 fieldattribute(token;TmpTicketReservationRequest."Session Token ID")
                 {

@@ -14,6 +14,7 @@ codeunit 6059911 "Delete Old Entries"
     // TQ1.26/TS/20150716  CASE 211152 Added code to check if Data Log Table is available
     // TQ1.28/MHA/20151216  CASE 229609 Task Queue
     // NPR5.29/MMV /20161201 CASE 259957 Removed invalid table ID references blocking data log from being cleaned.
+    // NPR5.53/BHR/20190917 CASE 326663 Rework logic to delete data based on table size
 
     TableNo = "Task Line";
 
@@ -30,6 +31,13 @@ codeunit 6059911 "Delete Old Entries"
         if Company.FindSet then repeat
           AddMessageLine2OutputLog(StrSubstNo(Text004, Company.Name));
           Commit;
+
+          //-NPR5.53 [326663]
+          //max size of data to delete
+          MaxSizeToDelete := GetParameterInt('DEL MAX SIZE DATA_KB');
+          OriginalMaxSizeToDelete := MaxSizeToDelete ;
+          //+NPR5.53 [326663]
+
           //Credit Card Transaction
           if GetParameterBool('DEL CREDIT CARD LOG') then
             DeleteCreditCardLog(Rec, Company.Name, GetParameterCalcDate('CREDIT CARD LOG DATE'));
@@ -112,6 +120,12 @@ codeunit 6059911 "Delete Old Entries"
         Text003: Label ' - %1 records deleted in table %2';
         Text004: Label 'Deleting Entries in %1';
         Text005: Label 'Company: Name=';
+        TableInformation: Record "Table Information";
+        CurrentTotRecordSize: Decimal;
+        MaxSizeToDelete: Decimal;
+        NoOfRowsToDeleteAllowed: Integer;
+        Counter: Integer;
+        OriginalMaxSizeToDelete: Integer;
 
     procedure CheckForParameters(TaskLine: Record "Task Line")
     var
@@ -127,7 +141,14 @@ codeunit 6059911 "Delete Old Entries"
 
         TaskLine."Table 1 No." := 2000000006;
         Evaluate(TaskLine."Table 1 Filter", Text005 + CompanyName);
+
         TaskLine.Modify;
+
+        //-NPR5.53 [326663]
+        //max size of data to delete
+        TaskLine.InsertParameter('DEL MAX SIZE DATA_KB',4);
+        TaskLine.SetParameterInt('DEL MAX SIZE DATA_KB',500000);
+        //+NPR5.53 [326663]
 
         //Credit Card Transaction
         TaskLine.InsertParameter('DEL CREDIT CARD LOG',6);
@@ -163,11 +184,13 @@ codeunit 6059911 "Delete Old Entries"
         //DataLog
         TaskLine.InsertParameter('DEL DATA LOG',6);
 
+
         //Audit Roll
         TaskLine.InsertParameter('BACKUP AUDIT ROLL',6);
         TaskLine.InsertParameter('BCK AUDIT ROLL DATE',7);
         Evaluate(DateForm, '<-5Y>');
         TaskLine.SetParameterDateFormula('BCK AUDIT ROLL DATE', DateForm);
+
 
         Commit;
         Error(Text002);
@@ -200,6 +223,22 @@ codeunit 6059911 "Delete Old Entries"
 
         StartTime := Time;
         NoOfEntries := CreditCardTrans.Count;
+        //-NPR5.53 [326663
+        NoOfRowsToDeleteAllowed := 0;
+        Counter := 0;
+        NoOfRowsToDeleteAllowed := GetNoOfRowsToDelete(CompanyToDelete,DATABASE::"Credit Card Transaction",NoOfEntries);
+        if (OriginalMaxSizeToDelete <> 0) then begin
+         if (NoOfRowsToDeleteAllowed <> 0)  then begin
+           NoOfEntries := NoOfRowsToDeleteAllowed;
+           if CreditCardTrans.FindSet then
+              repeat
+                CreditCardTrans.Delete;
+                Counter += 1;
+                CreditCardTrans.Next;
+              until Counter = NoOfRowsToDeleteAllowed;
+          end;
+         end else
+        //+NPR5.53 [326663]
         CreditCardTrans.DeleteAll;
         WriteLogAndCommit(TaskLine, CreditCardTrans.TableCaption);
     end;
@@ -238,6 +277,22 @@ codeunit 6059911 "Delete Old Entries"
               TaskLog.SetRange("Starting Time", 0DT, LastDateTimeToDelete);
               StartTime := Time;
               NoOfEntries := TaskLog.Count;
+              //-NPR5.53 [326663]
+              NoOfRowsToDeleteAllowed := 0;
+              Counter := 0;
+              NoOfRowsToDeleteAllowed := GetNoOfRowsToDelete(CompanyToDelete,DATABASE::"Task Log (Task)",NoOfEntries);
+              if (OriginalMaxSizeToDelete <> 0) then begin
+                if (NoOfRowsToDeleteAllowed <> 0)  then begin
+                  NoOfEntries := NoOfRowsToDeleteAllowed;
+                   if TaskLog.FindSet then
+                      repeat
+                        TaskLog.Delete;
+                        Counter += 1;
+                        TaskLog.Next;
+                      until Counter = NoOfRowsToDeleteAllowed;
+                end;
+               end else
+              //+NPR5.53 [326663]
               TaskLog.DeleteAll;
               if NoOfEntries <> 0 then
                 WriteLogAndCommit(TaskLine, TaskLog.TableCaption);
@@ -247,6 +302,22 @@ codeunit 6059911 "Delete Old Entries"
               TaskOutputLog.SetRange("Journal Line No.", TaskLine2."Line No.");
               TaskOutputLog.SetRange("Import DateTime", 0DT, LastDateTimeToDelete);
               NoOfEntries := TaskOutputLog.Count;
+              //-NPR5.53 [326663]
+              NoOfRowsToDeleteAllowed := 0;
+              Counter := 0;
+              NoOfRowsToDeleteAllowed := GetNoOfRowsToDelete(CompanyToDelete,DATABASE::"Task Output Log",NoOfEntries);
+              if (OriginalMaxSizeToDelete <> 0) then begin
+               if (NoOfRowsToDeleteAllowed <> 0) then begin
+                 NoOfEntries := NoOfRowsToDeleteAllowed;
+                   if TaskOutputLog.FindSet then
+                      repeat
+                        TaskOutputLog.Delete;
+                        Counter += 1;
+                        TaskOutputLog.Next;
+                      until Counter = NoOfRowsToDeleteAllowed;
+                 end;
+               end else
+              //+NPR5.53 [326663]
               TaskOutputLog.DeleteAll;
               if NoOfEntries <> 0 then
                 WriteLogAndCommit(TaskLine, TaskOutputLog.TableCaption);
@@ -282,6 +353,22 @@ codeunit 6059911 "Delete Old Entries"
           DataLogField.SetFilter("Log Date",'<%1',TimeStamp);
 
           NoOfEntries := DataLogField.Count;
+          //-NPR5.53 [326663]
+          NoOfRowsToDeleteAllowed := 0;
+          Counter := 0;
+          NoOfRowsToDeleteAllowed := GetNoOfRowsToDelete(CompanyToDelete,DATABASE::"Data Log Field",NoOfEntries);
+          if (OriginalMaxSizeToDelete <> 0) then begin
+            if (NoOfRowsToDeleteAllowed <> 0) then begin
+              NoOfEntries := NoOfRowsToDeleteAllowed;
+              if DataLogField.FindSet then
+                repeat
+                  DataLogField.Delete;
+                  Counter += 1;
+                   DataLogField.Next;
+                until Counter = NoOfRowsToDeleteAllowed;
+            end;
+          end else
+          //+NPR5.53 [326663]
           DataLogField.DeleteAll;
           if NoOfEntries <> 0 then
             WriteLogAndCommit(TaskLine, DataLogField.TableCaption);
@@ -291,6 +378,22 @@ codeunit 6059911 "Delete Old Entries"
           DataLogRecord.SetFilter("Log Date",'<%1',TimeStamp);
 
           NoOfEntries += DataLogRecord.Count;
+            //-NPR5.53 [326663]
+          NoOfRowsToDeleteAllowed := 0;
+          Counter := 0;
+          NoOfRowsToDeleteAllowed := GetNoOfRowsToDelete(CompanyToDelete,DATABASE::"Data Log Record",NoOfEntries);
+          if (OriginalMaxSizeToDelete <> 0) then begin
+            if (NoOfRowsToDeleteAllowed <> 0) then begin
+              NoOfEntries := NoOfRowsToDeleteAllowed;
+              if DataLogRecord.FindSet then
+                repeat
+                  DataLogRecord.Delete;
+                  Counter += 1;
+                  DataLogRecord.Next;
+                until Counter = NoOfRowsToDeleteAllowed;
+            end;
+          end else
+          //+NPR5.53 [326663]
           DataLogRecord.DeleteAll;
           if NoOfEntries <> 0 then
             WriteLogAndCommit(TaskLine, DataLogRecord.TableCaption);
@@ -366,6 +469,7 @@ codeunit 6059911 "Delete Old Entries"
         AuditRoll: Record "Audit Roll";
         AuditRollBck: Record "Audit Roll Backup";
         LastDate: Date;
+        TotalNoOfRowsDeleted: Integer;
     begin
         if LastDateToBackup = 0D then
           exit;
@@ -379,15 +483,24 @@ codeunit 6059911 "Delete Old Entries"
         if AuditRoll.FindFirst then repeat
           AuditRoll.SetRange("Sale Date", AuditRoll."Sale Date");
           NoOfEntries := AuditRoll.Count;
-          if AuditRoll.FindSet(true, false) then repeat
-            AuditRollBck.TransferFields(AuditRoll);
-            AuditRollBck.Insert;
-            AuditRoll.Delete;
-          until AuditRoll.Next = 0;
+          //-NPR5.53 [326663]
+          NoOfRowsToDeleteAllowed := GetNoOfRowsToDelete(CompanyToBackup ,DATABASE::"Audit Roll",NoOfEntries);
+            if NoOfRowsToDeleteAllowed <> 0  then begin
+          //+NPR5.53 [326663]
+              if AuditRoll.FindSet(true, false) then repeat
+                AuditRollBck.TransferFields(AuditRoll);
+                AuditRollBck.Insert;
+                AuditRoll.Delete;
+              until AuditRoll.Next = 0;
+          //-NPR5.53 [326663]
+            end else
+              exit;
+          //+NPR5.53 [326663]
           AuditRoll.SetRange("Sale Date", 0D, LastDateToBackup);
 
           if NoOfEntries <> 0 then
             WriteLogAndCommit(TaskLine, AuditRoll.TableCaption);
+
 
           if not TaskLine.TimeSlotStillValid then
             exit;
@@ -451,6 +564,35 @@ codeunit 6059911 "Delete Old Entries"
 
         exit(BestKeyNo);
         //+TQ1.22
+    end;
+
+    local procedure GetNoOfRowsToDelete(CompanyToDelete: Text;"Table": Integer;OriginalRowCount: Integer): Integer
+    var
+        ActualRecordSizeToDelete: Integer;
+        NoOfRowstodelete: Integer;
+    begin
+        //-NPR5.53 [326663]
+        if OriginalRowCount = 0 then exit(0);
+        if MaxSizeToDelete = 0 then exit(0);
+         if MaxSizeToDelete > 0 then begin
+           TableInformation.SetRange(TableInformation."Company Name",CompanyToDelete);
+           TableInformation.SetRange(TableInformation."Table No.",Table);
+           if TableInformation.FindFirst then begin
+              ActualRecordSizeToDelete := Round((OriginalRowCount  * TableInformation."Record Size") / 1000,1,'=');
+             if MaxSizeToDelete > ActualRecordSizeToDelete then begin
+                MaxSizeToDelete := MaxSizeToDelete - ActualRecordSizeToDelete;
+               exit(OriginalRowCount);
+             end else begin
+               NoOfRowstodelete := Round((MaxSizeToDelete / TableInformation."Record Size") * 1000,1,'=');
+               MaxSizeToDelete := 0 ;
+               //NoOfEntries := NoOfRowstodelete;
+               exit(NoOfRowstodelete);
+             end;
+           end;
+         end else
+          exit(OriginalRowCount);
+
+        //-NPR5.53 [326663]
     end;
 }
 

@@ -3,8 +3,9 @@ page 6184499 "EFT Tr. Rq. Comment Subform"
     // NPR5.20\BR\20160316  CASE 231481 Object Created
     // NPR5.30/BR  /20170113  CASE 263458 Renamed Object from Pepper to EFT
     // NPR5.46/MMV /20181003 CASE 290734 EFT Framework refactored.
+    // NPR5.53/MMV /20191206 CASE 377533 Changed caption
 
-    Caption = 'Pepper Tr. Rq. Comment Subform';
+    Caption = 'EFT Tr. Rq. Comment Subform';
     Editable = false;
     PageType = ListPart;
     SourceTable = "EFT Transact. Req. Comment";

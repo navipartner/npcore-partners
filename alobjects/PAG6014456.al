@@ -32,6 +32,8 @@ page 6014456 "Table Export Wizard"
     //                                   Add table fields by default.
     // NPR5.51/ZESO/20190703 CASE 319037 Added Ticketing and Membership tables.
     // NPR5.52/SARA/20190916 CASE 368197 Refcator Table Export wizard for Webclient.
+    // NPR5.53/ZESO/20200106 CASE 382903 Exclude fields which have are Obsolete
+    // NPR5.53/THRO/20200204 CASE 385785 Skip Obsolete tables
 
     Caption = 'Table Export Wizard';
     DelayedInsert = true;
@@ -616,6 +618,9 @@ page 6014456 "Table Export Wizard"
         //-NPR5.48 [340086]
         Field.SetRange(TableNo, TableID);
         Field.SetRange(Enabled, true);
+        //-NPR5.53 [382903]
+        Field.SetFilter(ObsoleteState,'<>%1',Field.ObsoleteState::Removed);
+        //-NPR5.53 [382903]
         if SkipFlowFields then
             Field.SetRange(Class, Field.Class::Normal)
         else
@@ -929,7 +934,9 @@ until AllObj.Next = 0;
         if AllObj.FindSet then
             repeat
                 Count += 1;
-                if CheckTablePermissions(AllObj."Object ID") and not SkipCRMTable(AllObj."Object ID", TestOnCRM) then begin
+          //-NPR5.53 [385785]
+          if CheckTablePermissions(AllObj."Object ID") and not SkipCRMTable(AllObj."Object ID",TestOnCRM) and not IsTableObsolete(AllObj."Object ID") then begin
+          //+NPR5.53 [385785]
                     RecordRef.Open(AllObj."Object ID");
                     Window.Update(1, AllObj."Object ID");
                     Window.Update(2, Round(Count / Total * 10000, 1));
@@ -1672,6 +1679,17 @@ until AllObj.Next = 0;
         6184493,//Pepper Terminal Type
         6184494//Pepper Version
         ]);
+    end;
+
+    local procedure IsTableObsolete(TableNo: Integer): Boolean
+    var
+        TableMetadata: Record "Table Metadata";
+    begin
+        //-NPR5.53 [385785]
+        if TableMetadata.Get(TableNo) then
+          exit(TableMetadata.ObsoleteState = TableMetadata.ObsoleteState::Removed);
+        exit(false);
+        //+NPR5.53 [385785]
     end;
 }
 

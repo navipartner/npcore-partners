@@ -12,6 +12,7 @@ tableextension 6014423 tableextension6014423 extends Customer
     // NPR5.48/TSA /20181219 CASE 320424 Added Fields "Magento Shipping Group", "Magento Payment Group", "Magento Store Code"
     // MAG2.20/MHA /20190426 CASE 320423 Added Validation and Lookup to Fields "Magento Display Group", "Magento Shipping Group", "Magento Payment Group"
     // NPR5.52/ZESO/20190925 CASE 358656 Added Fields Anonymized,Anonymized Date and To Anonymize
+    // NPR5.53/ZESO/20200115 CASE 358656 Added Field To Anonymize On
     fields
     {
         field(6014400;Type;Option)
@@ -87,6 +88,11 @@ tableextension 6014423 tableextension6014423 extends Customer
         {
             Caption = 'To Anomymize';
             Description = 'NPR5.52';
+        }
+        field(6151063;"To Anonymize On";Date)
+        {
+            Caption = 'To Anonymize On';
+            Description = 'NPR5.53';
         }
         field(6151450;"External Customer No.";Code[20])
         {

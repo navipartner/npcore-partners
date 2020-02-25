@@ -7,6 +7,7 @@ report 6014563 "Receipt A5 - No Addr."
     // NPR4.18/KN/20151210 CASE 227187   Added pager numbers to footer. Only shown if the total number of pages is more than 1.
     // NPR5.23/JDH /20160517 CASE 240916 Removed old VariaX Solution
     // NPR5.38/JLK /20180124  CASE 300892 Corrected AL Error on Blank Text Constants
+    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Receipt A5 - No Addr..rdlc';
 
@@ -377,7 +378,8 @@ report 6014563 "Receipt A5 - No Addr."
                         if (Type=Type::Item) and Item.Get("No.") and Item."No Print on Reciept" then
                            CurrReport.Skip;
                         
-                        if ("Amount Including VAT" <> 0) and (Type = Type::"G/L") and ("No." = Register.Rounding) then begin
+                        //IF ("Amount Including VAT" <> 0) AND (Type = Type::"G/L") AND ("No." = Register.Rounding) THEN BEGIN  //NPR5.53 [371955]-revoked
+                        if ("Amount Including VAT" <> 0) and (Type = Type::"G/L") and ("No." = POSSetup.RoundingAccount(true)) then begin  //NPR5.53 [371955]
                           SubCurrencyGL:="Amount Including VAT";
                           CurrReport.Skip;
                         end;
@@ -572,6 +574,10 @@ report 6014563 "Receipt A5 - No Addr."
                 Register.Get("Register No.");
                 Utility.GetTicketText(TempRetailComment, Register);
                 //-NPR4.18
+                //-NPR5.53 [371955]
+                POSUnit.Get("Register No.");
+                POSSetup.SetPOSUnit(POSUnit);
+                //+NPR5.53 [371955]
             end;
 
             trigger OnPreDataItem()
@@ -616,7 +622,9 @@ report 6014563 "Receipt A5 - No Addr."
     var
         NPRetailConfig: Record "Retail Setup";
         PrintersRegister: Record Register;
+        POSUnit: Record "POS Unit";
         "Retail Form Code": Codeunit "Retail Form Code";
+        POSSetup: Codeunit "POS Setup";
         SubCurrencyGL: Decimal;
         VAT: Decimal;
         OutStandingAmount: Decimal;

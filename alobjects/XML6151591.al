@@ -1,6 +1,7 @@
 xmlport 6151591 "NpDc Ext. Coupon"
 {
     // NPR5.51/MHA /20190724  CASE 343352 Object created
+    // NPR5.53/MHA /20200115  CASE 343352 Fixed typo of <in_use_quanity> to <in_use_quantity>
 
     Caption = 'NpDc Coupon';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/discount_coupon';
@@ -48,7 +49,7 @@ xmlport 6151591 "NpDc Ext. Coupon"
                 {
                     MinOccurs = Zero;
                 }
-                fieldelement(in_use_quanity;TempNpDcExtCouponBuffer."In-use Quantity")
+                fieldelement(in_use_quantity;TempNpDcExtCouponBuffer."In-use Quantity")
                 {
                     MaxOccurs = Once;
                     MinOccurs = Zero;
