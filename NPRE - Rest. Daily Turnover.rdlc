@@ -1,0 +1,199 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <Height>2in</Height>
+        <Style />
+      </Body>
+      <Width>6.5in</Width>
+      <Page>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="AppliedFiltersLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AppliedFiltersLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AppliedFiltersLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="AveragePerGuestLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AveragePerGuestLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AveragePerGuestLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="AveragePerTableLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>AveragePerTableLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>AveragePerTableLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="DateLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>DateLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>DateLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="NoOfGuestsLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>NoOfGuestsLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>NoOfGuestsLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="NoOfTablesLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>NoOfTablesLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>NoOfTablesLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TableNoLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TableNoLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TableNoLbl</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="TurnoverLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>TurnoverLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>TurnoverLbl</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="ShowTableNo">
+          <DataField>ShowTableNo</DataField>
+        </Field>
+        <Field Name="FilterFieldName">
+          <DataField>FilterFieldName</DataField>
+        </Field>
+        <Field Name="FilterValue">
+          <DataField>FilterValue</DataField>
+        </Field>
+        <Field Name="LineNo">
+          <DataField>LineNo</DataField>
+        </Field>
+        <Field Name="SeatingCode">
+          <DataField>SeatingCode</DataField>
+        </Field>
+        <Field Name="QtyBase">
+          <DataField>QtyBase</DataField>
+        </Field>
+        <Field Name="QtyBaseFormat">
+          <DataField>QtyBaseFormat</DataField>
+        </Field>
+        <Field Name="TurnoverAmt">
+          <DataField>TurnoverAmt</DataField>
+        </Field>
+        <Field Name="TurnoverAmtFormat">
+          <DataField>TurnoverAmtFormat</DataField>
+        </Field>
+        <Field Name="PostingDate">
+          <DataField>PostingDate</DataField>
+        </Field>
+        <Field Name="NumberOfGuests">
+          <DataField>NumberOfGuests</DataField>
+        </Field>
+        <Field Name="NumberOfTables">
+          <DataField>NumberOfTables</DataField>
+        </Field>
+        <Field Name="DimSetID">
+          <DataField>DimSetID</DataField>
+        </Field>
+        <Field Name="DimCode">
+          <DataField>DimCode</DataField>
+        </Field>
+        <Field Name="DimName">
+          <DataField>DimName</DataField>
+        </Field>
+        <Field Name="DimValueCode">
+          <DataField>DimValueCode</DataField>
+        </Field>
+        <Field Name="DimValueName">
+          <DataField>DimValueName</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>

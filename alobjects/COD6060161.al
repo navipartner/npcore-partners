@@ -27,21 +27,21 @@ codeunit 6060161 "POS Action - Chg. Active Event"
               Sender.Type::Generic,
               Sender."Subscriber Instances Allowed"::Multiple)
             then begin
-            //-NPR5.53 [376035]-revoked
-            //RegisterWorkflowStep('textfield','if (param.DialogType == param.DialogType["TextField"]) {input({title: labels.Title, caption: context.CaptionText, value: ""}).cancel(abort);}');
-            //RegisterWorkflowStep('GetEventID',' {respond();}');
-            //+NPR5.53 [376035]-revoked
-            //-NPR5.53 [376035]
-            RegisterWorkflowStep('textfield',
-              'if ((!param.ClearEvent) && (param.DialogType == param.DialogType["TextField"])) ' +
-              '{input({title: labels.Title, caption: context.CaptionText, value: ""}).cancel(abort);}');
-            RegisterWorkflowStep('ProcessChange',' {respond();}');
-            //+NPR5.53 [376035]
+                //-NPR5.53 [376035]-revoked
+                //RegisterWorkflowStep('textfield','if (param.DialogType == param.DialogType["TextField"]) {input({title: labels.Title, caption: context.CaptionText, value: ""}).cancel(abort);}');
+                //RegisterWorkflowStep('GetEventID',' {respond();}');
+                //+NPR5.53 [376035]-revoked
+                //-NPR5.53 [376035]
+                RegisterWorkflowStep('textfield',
+                  'if ((!param.ClearEvent) && (param.DialogType == param.DialogType["TextField"])) ' +
+                  '{input({title: labels.Title, caption: context.CaptionText, value: ""}).cancel(abort);}');
+                RegisterWorkflowStep('ProcessChange', ' {respond();}');
+                //+NPR5.53 [376035]
                 RegisterOptionParameter('DialogType', 'TextField,List', 'List');
-            //-NPR5.53 [376035]
-            RegisterBooleanParameter('ClearEvent',false);
-            RegisterBooleanParameter('OnlyCurrentSale',false);
-            //+NPR5.53 [376035]
+                //-NPR5.53 [376035]
+                RegisterBooleanParameter('ClearEvent', false);
+                RegisterBooleanParameter('OnlyCurrentSale', false);
+                //+NPR5.53 [376035]
                 RegisterWorkflow(false);
                 RegisterDataSourceBinding(ThisDataSource);
             end;
@@ -85,32 +85,32 @@ codeunit 6060161 "POS Action - Chg. Active Event"
         if not (DialogType in [DialogType::TextField, DialogType::List]) then
             DialogType := DialogType::List;
         //-NPR5.53 [376035]
-        ClearEvent := JSON.GetBooleanParameter('ClearEvent',false);
+        ClearEvent := JSON.GetBooleanParameter('ClearEvent', false);
         if ClearEvent then
-          EventNo := '';
-        OnlyCurrentSale := JSON.GetBooleanParameter('OnlyCurrentSale',false);
+            EventNo := '';
+        OnlyCurrentSale := JSON.GetBooleanParameter('OnlyCurrentSale', false);
 
         if not ClearEvent then begin
-        //+NPR5.53 [376035]
-          POSSession.GetSale(POSSale);
-          POSSale.GetCurrentSale(SalePOS);
-          SalePOS.TestField("Register No.");
-          CashRegister.Get(SalePOS."Register No.");
+            //+NPR5.53 [376035]
+            POSSession.GetSale(POSSale);
+            POSSale.GetCurrentSale(SalePOS);
+            SalePOS.TestField("Register No.");
+            CashRegister.Get(SalePOS."Register No.");
 
-          case DialogType of
-            DialogType::TextField:
-              EventNo := CopyStr(GetInput(JSON,'textfield'),1,MaxStrLen(EventNo));
-            DialogType::List:
-                begin
-              EventNo := CashRegister."Active Event No.";
-              if not SelectEventFromList(EventNo) then
-                Error('');
+            case DialogType of
+                DialogType::TextField:
+                    EventNo := CopyStr(GetInput(JSON, 'textfield'), 1, MaxStrLen(EventNo));
+                DialogType::List:
+                    begin
+                        EventNo := CashRegister."Active Event No.";
+                        if not SelectEventFromList(EventNo) then
+                            Error('');
+                    end;
             end;
-          end;
         end;  //NPR5.53 [376035]
 
         //UpdateCurrentEvent(Context,POSSession,FrontEnd,EventNo);  //NPR5.53 [376035]-revoked
-        UpdateCurrentEvent(Context,POSSession,FrontEnd,EventNo,not OnlyCurrentSale);  //NPR5.53 [376035]
+        UpdateCurrentEvent(Context, POSSession, FrontEnd, EventNo, not OnlyCurrentSale);  //NPR5.53 [376035]
     end;
 
     local procedure "---DataSourceExtension"()
@@ -171,9 +171,9 @@ codeunit 6060161 "POS Action - Chg. Active Event"
         //IF NOT Job.GET(CashRegister."Active Event No.") THEN
         //+NPR5.53 [376035]-revoked
         if not Job.Get(SalePOS."Event No.") then  //NPR5.53 [376035]
-          Job.Init;
+            Job.Init;
         //DataRow.Add(DataSourceField_EventNo(),CashRegister."Active Event No.");  //NPR5.53 [376035]-revoked
-        DataRow.Add(DataSourceField_EventNo(),SalePOS."Event No.");  //NPR5.53 [376035]
+        DataRow.Add(DataSourceField_EventNo(), SalePOS."Event No.");  //NPR5.53 [376035]
         DataRow.Add(DataSourceField_EventDescription(), Job.Description);
     end;
 
@@ -221,7 +221,7 @@ codeunit 6060161 "POS Action - Chg. Active Event"
         exit(false);
     end;
 
-    local procedure UpdateCurrentEvent(Context: DotNet npNetJObject;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";EventNo: Code[20];UpdateRegister: Boolean)
+    local procedure UpdateCurrentEvent(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; EventNo: Code[20]; UpdateRegister: Boolean)
     var
         NewDimSetEntryTmp: Record "Dimension Set Entry" temporary;
         OldDimSetEntryTmp: Record "Dimension Set Entry" temporary;
@@ -233,19 +233,19 @@ codeunit 6060161 "POS Action - Chg. Active Event"
         OldDimeSetID: Integer;
     begin
         if EventNo <> '' then begin  //NPR5.53 [376035]
-          FilterJobs(Job);
-          Job."No." := EventNo;
-          Job.Find;
+            FilterJobs(Job);
+            Job."No." := EventNo;
+            Job.Find;
         end;  //NPR5.53 [376035]
-        
+
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         if UpdateRegister then begin  //NPR5.53 [376035]
-          SalePOS.TestField("Register No.");
-          CashRegister.Get(SalePOS."Register No.");
-        //-NPR5.53 [376035]
-          CashRegister."Active Event No." := EventNo;
-          CashRegister.Modify;
+            SalePOS.TestField("Register No.");
+            CashRegister.Get(SalePOS."Register No.");
+            //-NPR5.53 [376035]
+            CashRegister."Active Event No." := EventNo;
+            CashRegister.Modify;
         end;
         //+NPR5.53 [376035]
         //-NPR5.53 [376035]-revoked
@@ -270,8 +270,8 @@ codeunit 6060161 "POS Action - Chg. Active Event"
         //+NPR5.53 [376035]-revoked
         //-NPR5.53 [376035]
         if SalePOS."Event No." = EventNo then
-          Error(IsAlreadyAssigned,EventNo,SalePOS.FieldCaption("Sales Ticket No."),SalePOS."Sales Ticket No.");
-        SalePOS.Validate("Event No.",EventNo);
+            Error(IsAlreadyAssigned, EventNo, SalePOS.FieldCaption("Sales Ticket No."), SalePOS."Sales Ticket No.");
+        SalePOS.Validate("Event No.", EventNo);
         //+NPR5.53 [376035]
         POSSale.Refresh(SalePOS);
         POSSale.Modify(true, true);

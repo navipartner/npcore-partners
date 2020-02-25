@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <Height>2in</Height>
+        <Style />
+      </Body>
+      <Width>6.5in</Width>
+      <Page>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <ReportParameters>
+    <ReportParameter Name="FirstName_MemberCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>FirstName_MemberCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>FirstName_MemberCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="LastName_MemberCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>LastName_MemberCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>LastName_MemberCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Address_MemberCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Address_MemberCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Address_MemberCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="Email_MemberCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>Email_MemberCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>Email_MemberCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="EmailNewsLetter_MemberCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>EmailNewsLetter_MemberCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>EmailNewsLetter_MemberCaption</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="Code_Membership">
+          <DataField>Code_Membership</DataField>
+        </Field>
+        <Field Name="EntryNo_Member">
+          <DataField>EntryNo_Member</DataField>
+        </Field>
+        <Field Name="ValidToDate">
+          <DataField>ValidToDate</DataField>
+        </Field>
+        <Field Name="FirstName_Member">
+          <DataField>FirstName_Member</DataField>
+        </Field>
+        <Field Name="LastName_Member">
+          <DataField>LastName_Member</DataField>
+        </Field>
+        <Field Name="Address_Member">
+          <DataField>Address_Member</DataField>
+        </Field>
+        <Field Name="PostCode_Member">
+          <DataField>PostCode_Member</DataField>
+        </Field>
+        <Field Name="City_Member">
+          <DataField>City_Member</DataField>
+        </Field>
+        <Field Name="CountryCode_Member">
+          <DataField>CountryCode_Member</DataField>
+        </Field>
+        <Field Name="Email_Member">
+          <DataField>Email_Member</DataField>
+        </Field>
+        <Field Name="EmailNewsLetter_Member">
+          <DataField>EmailNewsLetter_Member</DataField>
+        </Field>
+        <Field Name="PageCaption">
+          <DataField>PageCaption</DataField>
+        </Field>
+        <Field Name="ReportCaption">
+          <DataField>ReportCaption</DataField>
+        </Field>
+        <Field Name="MemberEntryNoCaption">
+          <DataField>MemberEntryNoCaption</DataField>
+        </Field>
+        <Field Name="DateCaption">
+          <DataField>DateCaption</DataField>
+        </Field>
+        <Field Name="Filters">
+          <DataField>Filters</DataField>
+        </Field>
+        <Field Name="FilterCaption">
+          <DataField>FilterCaption</DataField>
+        </Field>
+        <Field Name="ExternalMembershipNo_Membership">
+          <DataField>ExternalMembershipNo_Membership</DataField>
+        </Field>
+        <Field Name="ExternalMemberNo_Member">
+          <DataField>ExternalMemberNo_Member</DataField>
+        </Field>
+        <Field Name="IssuedDate_Membership">
+          <DataField>IssuedDate_Membership</DataField>
+        </Field>
+        <Field Name="ExternalMemberNoCaption">
+          <DataField>ExternalMemberNoCaption</DataField>
+        </Field>
+        <Field Name="ExternalMembershipNoCaption">
+          <DataField>ExternalMembershipNoCaption</DataField>
+        </Field>
+        <Field Name="IssuedDateCaption">
+          <DataField>IssuedDateCaption</DataField>
+        </Field>
+        <Field Name="ValidFromDate">
+          <DataField>ValidFromDate</DataField>
+        </Field>
+        <Field Name="ValidUntilDate">
+          <DataField>ValidUntilDate</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>

@@ -27,39 +27,39 @@ table 6014408 "Credit Voucher"
 
     fields
     {
-        field(1;"No.";Code[20])
+        field(1; "No."; Code[20])
         {
             Caption = 'No.';
         }
-        field(2;"Register No.";Code[10])
+        field(2; "Register No."; Code[10])
         {
             Caption = 'Cash Register No.';
         }
-        field(3;"Sales Ticket No.";Code[20])
+        field(3; "Sales Ticket No."; Code[20])
         {
             Caption = 'Sales Ticket No.';
         }
-        field(4;"Issue Date";Date)
+        field(4; "Issue Date"; Date)
         {
             Caption = 'Issue Date';
         }
-        field(5;Salesperson;Code[10])
+        field(5; Salesperson; Code[10])
         {
             Caption = 'Salesperson';
             TableRelation = "Salesperson/Purchaser".Code;
         }
-        field(6;"Shortcut Dimension 1 Code";Code[20])
+        field(6; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(1));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
         }
-        field(7;"Location Code";Code[10])
+        field(7; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
             TableRelation = Location;
         }
-        field(8;Status;Option)
+        field(8; Status; Option)
         {
             Caption = 'Status';
             OptionCaption = 'Open,Cashed,Cancelled';
@@ -72,38 +72,38 @@ table 6014408 "Credit Voucher"
                 RetailSetup.Get;
 
                 if (xRec.Status = Status::Cashed) and (Status = Status::Open) then begin
-                  "Cashed on Register No." := '';
-                  "Cashed on Sales Ticket No." := '';
-                  "Cashed Date" := 0D;
-                  "Cashed Salesperson" := '';
-                  "Cashed in Global Dim 1 Code" := '';
-                  "Cashed in Location Code" := '';
-                  "Cashed External" := false;
+                    "Cashed on Register No." := '';
+                    "Cashed on Sales Ticket No." := '';
+                    "Cashed Date" := 0D;
+                    "Cashed Salesperson" := '';
+                    "Cashed in Global Dim 1 Code" := '';
+                    "Cashed in Location Code" := '';
+                    "Cashed External" := false;
                 end;
 
                 if RetailSetup."Use I-Comm" then begin
-                  RecIComm.Get;
-                  if RecIComm."Company - Clearing" <> '' then
-                    IComm.DBCreditVoucher(Rec,false,true,true,TempAmount);
+                    RecIComm.Get;
+                    if RecIComm."Company - Clearing" <> '' then
+                        IComm.DBCreditVoucher(Rec, false, true, true, TempAmount);
                 end;
             end;
         }
-        field(9;Amount;Decimal)
+        field(9; Amount; Decimal)
         {
             Caption = 'Amount';
             MaxValue = 9999999;
         }
-        field(10;Name;Text[50])
+        field(10; Name; Text[50])
         {
             Caption = 'Name';
             Description = 'NPR5.38';
         }
-        field(11;Address;Text[50])
+        field(11; Address; Text[50])
         {
             Caption = 'Address';
             Description = 'NPR5.38';
         }
-        field(12;"Post Code";Code[20])
+        field(12; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
             TableRelation = "Post Code";
@@ -115,253 +115,254 @@ table 6014408 "Credit Voucher"
             begin
 
                 PostCode.Reset;
-                PostCode.SetRange(Code,"Post Code");
+                PostCode.SetRange(Code, "Post Code");
                 if PostCode.Find('-') then
-                  City := PostCode.City;
+                    City := PostCode.City;
             end;
         }
-        field(13;City;Text[50])
+        field(13; City; Text[50])
         {
             Caption = 'City';
             Description = 'NPR5.38';
         }
-        field(22;"Cashed on Register No.";Code[10])
+        field(22; "Cashed on Register No."; Code[10])
         {
             Caption = 'Cashed on Cash Register No.';
         }
-        field(23;"Cashed on Sales Ticket No.";Code[20])
+        field(23; "Cashed on Sales Ticket No."; Code[20])
         {
             Caption = 'Cashed on Sales Ticket No.';
         }
-        field(24;"Cashed Date";Date)
+        field(24; "Cashed Date"; Date)
         {
             Caption = 'Cashed Date';
         }
-        field(25;"Cashed Salesperson";Code[10])
+        field(25; "Cashed Salesperson"; Code[10])
         {
             Caption = 'Cashed Salesperson';
             TableRelation = "Salesperson/Purchaser";
         }
-        field(26;"Cashed in Global Dim 1 Code";Code[20])
+        field(26; "Cashed in Global Dim 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Cashed in Department Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(1));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
         }
-        field(27;"Cashed in Location Code";Code[10])
+        field(27; "Cashed in Location Code"; Code[10])
         {
             Caption = 'Cashed in Location Code';
             TableRelation = Location;
         }
-        field(30;"Cashed External";Boolean)
+        field(30; "Cashed External"; Boolean)
         {
             Caption = 'Cashed External';
         }
-        field(32;Blocked;Boolean)
+        field(32; Blocked; Boolean)
         {
             Caption = 'Blocked';
         }
-        field(33;"Last Date Modified";Date)
+        field(33; "Last Date Modified"; Date)
         {
             Caption = 'Last Date Modified';
         }
-        field(34;Reference;Text[50])
+        field(34; Reference; Text[50])
         {
             Caption = 'Reference';
         }
-        field(35;Nummerserie;Code[10])
+        field(35; Nummerserie; Code[10])
         {
             Caption = 'Numberserie';
         }
-        field(36;"Customer No";Code[20])
+        field(36; "Customer No"; Code[20])
         {
             Caption = 'Customer No.';
-            TableRelation = IF ("Customer Type"=CONST(Alm)) Customer."No."
-                            ELSE IF ("Customer Type"=CONST(Kontant)) Contact."No.";
+            TableRelation = IF ("Customer Type" = CONST(Alm)) Customer."No."
+            ELSE
+            IF ("Customer Type" = CONST(Kontant)) Contact."No.";
             ValidateTableRelation = false;
         }
-        field(37;Invoiced;Boolean)
+        field(37; Invoiced; Boolean)
         {
             Caption = 'Invoiced';
         }
-        field(38;"Invoiced on enclosure";Option)
+        field(38; "Invoiced on enclosure"; Option)
         {
             Caption = 'Invoiced on enclosure';
             OptionCaption = 'Offer,Order,Invoice,Creditnote,Requisition Worksheet';
             OptionMembers = Tilbud,Ordre,Faktura,Kreditnota,Rammeordre;
         }
-        field(39;"Invoiced on enclosure no.";Code[20])
+        field(39; "Invoiced on enclosure no."; Code[20])
         {
             Caption = 'Invoiced on enclosure no.';
-            TableRelation = "Sales Header"."No." WHERE ("Document Type"=FIELD("Invoiced on enclosure"));
+            TableRelation = "Sales Header"."No." WHERE("Document Type" = FIELD("Invoiced on enclosure"));
         }
-        field(40;"Checked external via enclosure";Code[20])
+        field(40; "Checked external via enclosure"; Code[20])
         {
             Caption = 'Checked external via enclosure No';
         }
-        field(41;"Issued on Drawer No";Code[10])
+        field(41; "Issued on Drawer No"; Code[10])
         {
             Caption = 'Issued on Drawer No';
         }
-        field(42;"Issued on Ticket No";Code[20])
+        field(42; "Issued on Ticket No"; Code[20])
         {
             Caption = 'Issued on Ticket No';
         }
-        field(43;"Issued Audit Roll Type";Integer)
+        field(43; "Issued Audit Roll Type"; Integer)
         {
             Caption = 'Issued Audit Roll Type';
         }
-        field(44;"Issued Audit Roll Line";Integer)
+        field(44; "Issued Audit Roll Line"; Integer)
         {
             Caption = 'Issued Audit Roll Line';
         }
-        field(45;"Checked Audit";Integer)
+        field(45; "Checked Audit"; Integer)
         {
             Caption = 'Checked Audit';
         }
-        field(46;"Check Audit Roll Line";Integer)
+        field(46; "Check Audit Roll Line"; Integer)
         {
             Caption = 'Check Audit Roll Line';
         }
-        field(47;"External Credit Voucher";Boolean)
+        field(47; "External Credit Voucher"; Boolean)
         {
             Caption = 'External Gift Voucher';
         }
-        field(48;"Status manually changed on";Date)
+        field(48; "Status manually changed on"; Date)
         {
             Caption = 'Status manually changed on';
         }
-        field(49;"Status manually changed by";Code[20])
+        field(49; "Status manually changed by"; Code[20])
         {
             Caption = 'Status manually changed by';
         }
-        field(50;"Customer Type";Option)
+        field(50; "Customer Type"; Option)
         {
             Caption = 'Customer Type';
             OptionCaption = 'Ordinary,Cash';
             OptionMembers = Alm,Kontant;
         }
-        field(51;"Cashed in store";Code[30])
+        field(51; "Cashed in store"; Code[30])
         {
             Caption = 'Cashed in store';
         }
-        field(53;"External no";Code[20])
+        field(53; "External no"; Code[20])
         {
             Caption = 'Alien no';
         }
-        field(54;"Cancelled by salesperson";Code[20])
+        field(54; "Cancelled by salesperson"; Code[20])
         {
             Caption = 'Cancelled by salesperson';
         }
-        field(55;"Created in Company";Code[30])
+        field(55; "Created in Company"; Code[30])
         {
             Caption = 'Created in Company';
         }
-        field(56;"Offline - No.";Code[20])
+        field(56; "Offline - No."; Code[20])
         {
             Caption = 'Offline - No.';
         }
-        field(57;"Primary Key Length";Integer)
+        field(57; "Primary Key Length"; Integer)
         {
             Caption = 'Primary Key Length';
         }
-        field(58;Offline;Boolean)
+        field(58; Offline; Boolean)
         {
             Caption = 'Offline';
         }
-        field(59;"Shortcut Dimension 2 Code";Code[20])
+        field(59; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(2));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
         }
-        field(60;"Cashed in Global Dim 2 Code";Code[20])
+        field(60; "Cashed in Global Dim 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Cashed in Department Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(2));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
         }
-        field(61;"Payment Type No.";Code[20])
+        field(61; "Payment Type No."; Code[20])
         {
             Caption = 'Payment Type No.';
             NotBlank = true;
         }
-        field(62;"Exported date";Date)
+        field(62; "Exported date"; Date)
         {
             Caption = 'Exported the';
         }
-        field(70;"Cashed POS Entry No.";Integer)
+        field(70; "Cashed POS Entry No."; Integer)
         {
             Caption = 'Cashed POS Entry No.';
             Description = 'NPR5.38 [302766]';
             TableRelation = "POS Entry";
         }
-        field(71;"Cashed POS Payment Line No.";Integer)
+        field(71; "Cashed POS Payment Line No."; Integer)
         {
             Caption = 'Cashed POS Payment Line No.';
             Description = 'NPR5.38 [302766]';
-            TableRelation = "POS Payment Line"."Line No." WHERE ("POS Entry No."=FIELD("Cashed POS Entry No."));
+            TableRelation = "POS Payment Line"."Line No." WHERE("POS Entry No." = FIELD("Cashed POS Entry No."));
         }
-        field(72;"Cashed POS Unit No.";Code[10])
+        field(72; "Cashed POS Unit No."; Code[10])
         {
             Caption = 'Cashed POS Unit No.';
             Description = 'NPR5.38 [302766]';
         }
-        field(75;"Issuing POS Entry No";Integer)
+        field(75; "Issuing POS Entry No"; Integer)
         {
             Caption = 'Issuing POS Entry No';
             Description = 'NPR5.38 [302766]';
             TableRelation = "POS Entry";
         }
-        field(76;"Issuing POS Sale Line No.";Integer)
+        field(76; "Issuing POS Sale Line No."; Integer)
         {
             Caption = 'Issuing POS Sale Line No.';
             Description = 'NPR5.38 [302766]';
-            TableRelation = "POS Sales Line"."Line No." WHERE ("POS Entry No."=FIELD("Issuing POS Entry No"));
+            TableRelation = "POS Sales Line"."Line No." WHERE("POS Entry No." = FIELD("Issuing POS Entry No"));
         }
-        field(77;"Issuing POS Unit No.";Code[10])
+        field(77; "Issuing POS Unit No."; Code[10])
         {
             Caption = 'Issuing POS Unit No.';
             Description = 'NPR5.38 [302766]';
         }
-        field(6014400;"No. Printed";Integer)
+        field(6014400; "No. Printed"; Integer)
         {
             Caption = 'No. Printed';
         }
-        field(6014401;Comment;Boolean)
+        field(6014401; Comment; Boolean)
         {
-            CalcFormula = Exist("Retail Comment" WHERE ("Table ID"=CONST(6014410),
-                                                        "No."=FIELD("No.")));
+            CalcFormula = Exist ("Retail Comment" WHERE("Table ID" = CONST(6014410),
+                                                        "No." = FIELD("No.")));
             Caption = 'Comment';
             FieldClass = FlowField;
         }
-        field(6151400;"Voucher No.";Code[20])
+        field(6151400; "Voucher No."; Code[20])
         {
             Caption = 'Voucher No.';
             Description = 'MAG2.00';
         }
-        field(6151405;"External Credit Voucher No.";Code[10])
+        field(6151405; "External Credit Voucher No."; Code[10])
         {
             Caption = 'External Credit Voucher No.';
             Description = 'MAG2.00';
         }
-        field(6151410;"External Reference No.";Code[30])
+        field(6151410; "External Reference No."; Code[30])
         {
             Caption = 'External Reference No.';
             Description = 'MAG2.00';
         }
-        field(6151415;"Expire Date";Date)
+        field(6151415; "Expire Date"; Date)
         {
             Caption = 'Expire Date';
             Description = 'MAG2.00';
         }
-        field(6151420;"Currency Code";Code[10])
+        field(6151420; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
             Description = 'MAG2.00';
             TableRelation = Currency;
         }
-        field(6151425;"Sales Order No.";Code[20])
+        field(6151425; "Sales Order No."; Code[20])
         {
             Caption = 'Sales Order No.';
             Description = 'MAG2.00';
@@ -370,37 +371,37 @@ table 6014408 "Credit Voucher"
 
     keys
     {
-        key(Key1;"No.")
+        key(Key1; "No.")
         {
         }
-        key(Key2;Status,"Issue Date","Primary Key Length")
-        {
-            SumIndexFields = Amount;
-        }
-        key(Key3;"Sales Ticket No.")
-        {
-        }
-        key(Key4;Status,"Issue Date","Cashed Date","External Credit Voucher")
+        key(Key2; Status, "Issue Date", "Primary Key Length")
         {
             SumIndexFields = Amount;
         }
-        key(Key5;Status,"Cashed Date")
+        key(Key3; "Sales Ticket No.")
         {
         }
-        key(Key6;Name,"Primary Key Length")
-        {
-        }
-        key(Key7;"Primary Key Length")
-        {
-        }
-        key(Key8;"Offline - No.")
-        {
-        }
-        key(Key9;Status,"Issue Date","Cashed Date","External Credit Voucher","Location Code")
+        key(Key4; Status, "Issue Date", "Cashed Date", "External Credit Voucher")
         {
             SumIndexFields = Amount;
         }
-        key(Key10;"External Reference No.")
+        key(Key5; Status, "Cashed Date")
+        {
+        }
+        key(Key6; Name, "Primary Key Length")
+        {
+        }
+        key(Key7; "Primary Key Length")
+        {
+        }
+        key(Key8; "Offline - No.")
+        {
+        }
+        key(Key9; Status, "Issue Date", "Cashed Date", "External Credit Voucher", "Location Code")
+        {
+            SumIndexFields = Amount;
+        }
+        key(Key10; "External Reference No.")
         {
         }
     }
@@ -414,26 +415,26 @@ table 6014408 "Credit Voucher"
         RetailSetup.Get;
 
         if "No." = '' then begin
-          RetailSetup.TestField("Credit Voucher No. Management");
-          if "External Credit Voucher" then begin
-            NoSeriesMgt.InitSeries(RetailSetup."Foreign Credit Voucher No.Seri",xRec.Nummerserie,0D,"No.",Nummerserie);
-            //-NPR70.00.01.04
-            "Voucher No." := "No.";
-            //+NPR70.00.01.04
-          end else begin
-            NoSeriesMgt.InitSeries(RetailSetup."Credit Voucher No. Management",xRec.Nummerserie,0D,"No.",Nummerserie);
-            //-NPR70.00.01.04
-            "Voucher No." := "No.";
-            //+NPR70.00.01.04
-            if RetailSetup."EAN Mgt. Credit voucher" <> '' then
-              "No." := Utility.CreateEAN("No.",Format(RetailSetup."EAN Mgt. Credit voucher"));
-          end;
+            RetailSetup.TestField("Credit Voucher No. Management");
+            if "External Credit Voucher" then begin
+                NoSeriesMgt.InitSeries(RetailSetup."Foreign Credit Voucher No.Seri", xRec.Nummerserie, 0D, "No.", Nummerserie);
+                //-NPR70.00.01.04
+                "Voucher No." := "No.";
+                //+NPR70.00.01.04
+            end else begin
+                NoSeriesMgt.InitSeries(RetailSetup."Credit Voucher No. Management", xRec.Nummerserie, 0D, "No.", Nummerserie);
+                //-NPR70.00.01.04
+                "Voucher No." := "No.";
+                //+NPR70.00.01.04
+                if RetailSetup."EAN Mgt. Credit voucher" <> '' then
+                    "No." := Utility.CreateEAN("No.", Format(RetailSetup."EAN Mgt. Credit voucher"));
+            end;
         end;
 
         if RetailSetup."Use I-Comm" and (not "External Credit Voucher") then begin
-          RecIComm.Get;
-          if RecIComm."Company - Clearing" <> '' then
-            RetailCodeunit.CreditVoucherCommonCreate(Rec);
+            RecIComm.Get;
+            if RecIComm."Company - Clearing" <> '' then
+                RetailCodeunit.CreditVoucherCommonCreate(Rec);
         end;
 
         "Primary Key Length" := StrLen("No.");
@@ -446,9 +447,9 @@ table 6014408 "Credit Voucher"
         "Last Date Modified" := Today;
         RetailSetup.Get;
         if RetailSetup."Use I-Comm" then begin
-          RecIComm.Get;
-          if RecIComm."Company - Clearing" <> '' then
-            IComm.DBCreditVoucher(Rec,false,false,true,TempAmount);
+            RecIComm.Get;
+            if RecIComm."Company - Clearing" <> '' then
+                IComm.DBCreditVoucher(Rec, false, false, true, TempAmount);
         end;
 
         "Primary Key Length" := StrLen("No.");
@@ -465,7 +466,7 @@ table 6014408 "Credit Voucher"
         RetailCodeunit: Codeunit "Retail Table Code";
         NoSeriesMgt: Codeunit NoSeriesManagement;
 
-    procedure PrintCreditVoucher(ViewDemand: Boolean;Copy2: Boolean)
+    procedure PrintCreditVoucher(ViewDemand: Boolean; Copy2: Boolean)
     var
         RetailReportSelectionMgt: Codeunit "Retail Report Selection Mgt.";
         ReportSelectionRetail: Record "Report Selection Retail";
@@ -477,13 +478,13 @@ table 6014408 "Credit Voucher"
 
         RecRef.GetTable(Rec);
         RetailReportSelectionMgt.SetRequestWindow(ViewDemand);
-        RetailReportSelectionMgt.SetRegisterNo(RetailFormCode.FetchRegisterNumber() );
+        RetailReportSelectionMgt.SetRegisterNo(RetailFormCode.FetchRegisterNumber());
         //-NPR5.29 [241549]
         // IF Kopi THEN
         //  RetailReportSelectionMgt.RunObjects(RecRef,ReportSelectionRetail."Report Type"::"7")
         // ELSE
         //+NPR5.29 [241549]
-        RetailReportSelectionMgt.RunObjects(RecRef,ReportSelectionRetail."Report Type"::"Credit Voucher");
+        RetailReportSelectionMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Credit Voucher");
     end;
 
     procedure CreateInvoice()
@@ -500,7 +501,7 @@ table 6014408 "Credit Voucher"
     begin
         //RedeemF4
         if Status = Status::Cashed then
-          Error(ErrCredit);
+            Error(ErrCredit);
 
         Status := Status::Cashed;
         "Cashed on Sales Ticket No." := 'F4';
@@ -513,10 +514,10 @@ table 6014408 "Credit Voucher"
         AuditRoll: Record "Audit Roll";
     begin
         //FindIssuedAuditRoll
-        AuditRoll.SetRange("Register No.","Issued on Drawer No");
-        AuditRoll.SetRange("Sales Ticket No.","Issued on Ticket No");
-        AuditRoll.SetRange("Sale Type","Issued Audit Roll Type");
-        AuditRoll.SetRange("Line No.","Issued Audit Roll Line");
+        AuditRoll.SetRange("Register No.", "Issued on Drawer No");
+        AuditRoll.SetRange("Sales Ticket No.", "Issued on Ticket No");
+        AuditRoll.SetRange("Sale Type", "Issued Audit Roll Type");
+        AuditRoll.SetRange("Line No.", "Issued Audit Roll Line");
         AuditRoll.Find('-');
         /*FORMISSUE
         NaviForm.SetDoc( RevRulle."Sale Date", RevRulle."Posted Doc. No." );
@@ -530,10 +531,10 @@ table 6014408 "Credit Voucher"
         AuditRoll: Record "Audit Roll";
     begin
         //FindRedeemedAuditRoll
-        AuditRoll.SetRange("Register No.","Cashed on Register No.");
-        AuditRoll.SetRange("Sales Ticket No.","Cashed on Sales Ticket No.");
-        AuditRoll.SetRange("Sale Type","Checked Audit");
-        AuditRoll.SetRange("Line No.","Check Audit Roll Line");
+        AuditRoll.SetRange("Register No.", "Cashed on Register No.");
+        AuditRoll.SetRange("Sales Ticket No.", "Cashed on Sales Ticket No.");
+        AuditRoll.SetRange("Sale Type", "Checked Audit");
+        AuditRoll.SetRange("Line No.", "Check Audit Roll Line");
         AuditRoll.Find('-');
         /*FORMISSUE
         NaviForm.SetDoc( RevRulle."Sale Date", RevRulle."Posted Doc. No." );
@@ -552,7 +553,7 @@ table 6014408 "Credit Voucher"
         Status := Status::Open;
     end;
 
-    procedure RedeemFromSaleLinePOS(var SaleLinePOS: Record "Sale Line POS";SalespersonCode: Code[20];LineNo: Integer)
+    procedure RedeemFromSaleLinePOS(var SaleLinePOS: Record "Sale Line POS"; SalespersonCode: Code[20]; LineNo: Integer)
     var
         AuditRoll: Record "Audit Roll";
         ErrRedeemed: Label 'The voucher %1 has already been redeemed on the %2';
@@ -567,7 +568,7 @@ table 6014408 "Credit Voucher"
         RetailSetup.Get;
 
         if Status = Status::Cashed then
-          Error(ErrRedeemed,"No.","Cashed Date");
+            Error(ErrRedeemed, "No.", "Cashed Date");
 
         Status := Status::Cashed;
         "Cashed on Register No." := SaleLinePOS."Register No.";
@@ -582,16 +583,16 @@ table 6014408 "Credit Voucher"
         "Payment Type No." := SaleLinePOS."No.";
 
         if RetailSetup."Use I-Comm" then begin
-          RecIComm.Get;
-          if RecIComm."Company - Clearing" <> '' then begin
-              SaleHeader.Get(SaleLinePOS."Register No.",SaleLinePOS."Sales Ticket No.");
-              Amount2 := FormCode.GetGCVoAmount(SaleLinePOS,PaymentType::Credit,false);
-              if Amount2 <> SaleLinePOS."Amount Including VAT" then begin
-                if Amount2 <> 0 then
-                  Error(ErrAmount,SaleLinePOS."Foreign No.")
-              end else begin
-                RetailCode.CreditVoucherCommonValidate(SaleHeader,"No.",Status::Cashed );
-              end;
+            RecIComm.Get;
+            if RecIComm."Company - Clearing" <> '' then begin
+                SaleHeader.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
+                Amount2 := FormCode.GetGCVoAmount(SaleLinePOS, PaymentType::Credit, false);
+                if Amount2 <> SaleLinePOS."Amount Including VAT" then begin
+                    if Amount2 <> 0 then
+                        Error(ErrAmount, SaleLinePOS."Foreign No.")
+                end else begin
+                    RetailCode.CreditVoucherCommonValidate(SaleHeader, "No.", Status::Cashed);
+                end;
             end;
         end;
     end;
@@ -602,7 +603,7 @@ table 6014408 "Credit Voucher"
         "Issuing POS Entry No" := POSSalesLine."POS Entry No.";
         "Issuing POS Sale Line No." := POSSalesLine."Line No.";
         "Issuing POS Unit No." := POSSalesLine."POS Unit No.";
-        "Issued on Ticket No" :=  POSSalesLine."Document No.";
+        "Issued on Ticket No" := POSSalesLine."Document No.";
         Salesperson := POSSalesLine."Salesperson Code";
         Status := Status::Open;
         //-NPR5.38 [302766]

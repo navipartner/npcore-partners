@@ -9,34 +9,37 @@ page 6150750 "POS (Dragonglass)"
     {
         area(content)
         {
-            usercontrol(Framework;"NaviPartner.Retail.Controls.Dragonglass")
+            // TODO: VB - Control add-ins issues, refactoring required!!!
+            /*
+            usercontrol(Framework; "NaviPartner.Retail.Controls.Dragonglass")
             {
 
                 trigger OnFrameworkReady()
                 begin
                     if POSSession.IsFinalized() then
-                      exit;
+                        exit;
                     POSSession.DebugWithTimestamp('OnFrameworkReady');
                     Initialize();
                 end;
 
-                trigger OnInvokeMethod(method: Text;eventContent: Variant)
+                trigger OnInvokeMethod(method: Text; eventContent: Variant)
                 begin
                     if POSSession.IsFinalized() then
-                      exit;
+                        exit;
                     POSSession.DebugWithTimestamp('Method:' + method);
-                    if not PreHandleMethod(method,eventContent) then
-                      JavaScript.InvokeMethod(method,eventContent,POSSession,FrontEnd);
+                    if not PreHandleMethod(method, eventContent) then
+                        JavaScript.InvokeMethod(method, eventContent, POSSession, FrontEnd);
                 end;
 
-                trigger OnAction("action": Text;workflowStep: Text;workflowId: Integer;actionId: Integer;context: Variant)
+                trigger OnAction("action": Text; workflowStep: Text; workflowId: Integer; actionId: Integer; context: Variant)
                 begin
                     if POSSession.IsFinalized() then
-                      Error(SESSION_FINALIZED_ERROR);
+                        Error(SESSION_FINALIZED_ERROR);
                     POSSession.DebugWithTimestamp('Action:' + action);
-                    JavaScript.InvokeAction(action,workflowStep,workflowId,actionId,context,POSSession,FrontEnd);
+                    JavaScript.InvokeAction(action, workflowStep, workflowId, actionId, context, POSSession, FrontEnd);
                 end;
             }
+            */
         }
     }
 
@@ -68,7 +71,9 @@ page 6150750 "POS (Dragonglass)"
 
     local procedure Initialize()
     begin
-        POSSession.Constructor(CurrPage.Framework,FrontEnd,Setup,POSSession);
+        //POSSession.Constructor(CurrPage.Framework, FrontEnd, Setup, POSSession);
+        // TODO: VB - Control add-ins issues, refactoring required!!!
+        Error('TODO: VB - Control add-ins issues, refactoring required!!!');
     end;
 
     local procedure Finalize()
@@ -80,12 +85,15 @@ page 6150750 "POS (Dragonglass)"
     begin
     end;
 
-    local procedure PreHandleMethod(Method: Text;Context: DotNet npNetJObject): Boolean
+    local procedure PreHandleMethod(Method: Text; Context: DotNet npNetJObject): Boolean
     begin
         case Method of
-          'KeepAlive':              exit(true);
-          'CloseRequested':         exit(CloseRequested());
-          'InitializationComplete': exit(InitializationComplete());
+            'KeepAlive':
+                exit(true);
+            'CloseRequested':
+                exit(CloseRequested());
+            'InitializationComplete':
+                exit(InitializationComplete());
         end;
     end;
 

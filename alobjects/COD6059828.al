@@ -21,7 +21,7 @@ codeunit 6059828 "Upgrade NPR5.53"
         GLSetup: Record "General Ledger Setup";
         POSPostingControl: Codeunit "POS Posting Control";
 
-    [TableSyncSetup]
+    //[TableSyncSetup]
     procedure UpgradeTables(var TableSynchSetup: Record "Table Synch. Setup")
     var
         DataUpgradeMgt: Codeunit "Data Upgrade Mgt.";
@@ -32,18 +32,18 @@ codeunit 6059828 "Upgrade NPR5.53"
         DataUpgradeMgt.SetTableSyncSetup(DATABASE::"POS Entry Output Log", 0, TableSynchSetup.Mode::Force);
         //+NPR5.53 [349793]
         //-NPR5.53 [371955]
-        DataUpgradeMgt.SetTableSyncSetup(DATABASE::Register,DATABASE::"Upgrade Register",TableSynchSetup.Mode::Copy);  //371955,373743
-        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Retail Setup",DATABASE::"Upgrade Retail Setup",TableSynchSetup.Mode::Copy);
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::Register, DATABASE::"Upgrade Register", TableSynchSetup.Mode::Copy);  //371955,373743
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Retail Setup", DATABASE::"Upgrade Retail Setup", TableSynchSetup.Mode::Copy);
         //+NPR5.53 [371955]
         //-NPR5.53 [369354]
-        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Salesperson/Purchaser",0,TableSynchSetup.Mode::Force);  //Remove Fields from Salesperson/Purchaser
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Salesperson/Purchaser", 0, TableSynchSetup.Mode::Force);  //Remove Fields from Salesperson/Purchaser
         //+NPR5.53 [369354]
         //-NPR5.53 [360258]
-        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"NPRE Waiter Pad Line",DATABASE::"Upgrade NPRE Waiter Pad Line",TableSynchSetup.Mode::Copy);  //Field "Print Category" moved to a subtable
+        DataUpgradeMgt.SetTableSyncSetup(DATABASE::"NPRE Waiter Pad Line", DATABASE::"Upgrade NPRE Waiter Pad Line", TableSynchSetup.Mode::Copy);  //Field "Print Category" moved to a subtable
         //+NPR5.53 [360258]
     end;
 
-    [UpgradePerCompany]
+    //[UpgradePerCompany]
     procedure UpgradeData()
     begin
         MoveWarrantyPrintStep(); //NPR5.53 [349793]
@@ -67,12 +67,12 @@ codeunit 6059828 "Upgrade NPR5.53"
     begin
         //-NPR5.53 [349793]
         with POSSalesWorkflowStep do begin
-          SetRange("Subscriber Codeunit ID", 6014576);
-          if FindSet(true, true) then
-            repeat
-              POSSalesWorkflowStep2 := POSSalesWorkflowStep;
-              POSSalesWorkflowStep2.Rename("Set Code","Workflow Code",6150737,"Subscriber Function");
-            until Next = 0;
+            SetRange("Subscriber Codeunit ID", 6014576);
+            if FindSet(true, true) then
+                repeat
+                    POSSalesWorkflowStep2 := POSSalesWorkflowStep;
+                    POSSalesWorkflowStep2.Rename("Set Code", "Workflow Code", 6150737, "Subscriber Function");
+                until Next = 0;
         end;
         //+NPR5.53 [349793]
     end;
@@ -87,83 +87,83 @@ codeunit 6059828 "Upgrade NPR5.53"
         //-NPR5.53 [375258]
         GLSetup.Get;
         with POSEntry do
-          if FindSet(true) then
-            repeat
-              if DimSetIDUpdated("Shortcut Dimension 1 Code","Shortcut Dimension 2 Code","Dimension Set ID") then
-                Modify;
-            until Next = 0;
+            if FindSet(true) then
+                repeat
+                    if DimSetIDUpdated("Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID") then
+                        Modify;
+                until Next = 0;
 
         with POSSalesLine do
-          if FindSet(true) then
-            repeat
-              if DimSetIDUpdated("Shortcut Dimension 1 Code","Shortcut Dimension 2 Code","Dimension Set ID") then
-                Modify;
-            until Next = 0;
+            if FindSet(true) then
+                repeat
+                    if DimSetIDUpdated("Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID") then
+                        Modify;
+                until Next = 0;
 
         with POSPaymentLine do
-          if FindSet(true) then
-            repeat
-              if DimSetIDUpdated("Shortcut Dimension 1 Code","Shortcut Dimension 2 Code","Dimension Set ID") then
-                Modify;
-            until Next = 0;
+            if FindSet(true) then
+                repeat
+                    if DimSetIDUpdated("Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID") then
+                        Modify;
+                until Next = 0;
 
         with AuditRoll do
-          if FindSet(true) then
-            repeat
-              if DimSetIDUpdated("Shortcut Dimension 1 Code","Shortcut Dimension 2 Code","Dimension Set ID") then
-                Modify;
-            until Next = 0;
+            if FindSet(true) then
+                repeat
+                    if DimSetIDUpdated("Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID") then
+                        Modify;
+                until Next = 0;
         //+NPR5.53 [375258]
     end;
 
-    local procedure DimSetIDUpdated(var GlobalDim1: Code[20];var GlobalDim2: Code[20];var DimSetID: Integer): Boolean
+    local procedure DimSetIDUpdated(var GlobalDim1: Code[20]; var GlobalDim2: Code[20]; var DimSetID: Integer): Boolean
     var
         TempDimSetEntry: Record "Dimension Set Entry" temporary;
         DimMgt: Codeunit DimensionManagement;
     begin
         //-NPR5.53 [375258]
-        if POSPostingControl.DimUsageIsConsistent(GlobalDim1,GlobalDim2,DimSetID) then
-          exit(false);
+        if POSPostingControl.DimUsageIsConsistent(GlobalDim1, GlobalDim2, DimSetID) then
+            exit(false);
 
-        DimMgt.GetDimensionSet(TempDimSetEntry,DimSetID);
+        DimMgt.GetDimensionSet(TempDimSetEntry, DimSetID);
 
         if GLSetup."Global Dimension 1 Code" = '' then
-          GlobalDim1 := ''
+            GlobalDim1 := ''
         else
-          UpdateDimSet(TempDimSetEntry,GLSetup."Global Dimension 1 Code",GlobalDim1);
+            UpdateDimSet(TempDimSetEntry, GLSetup."Global Dimension 1 Code", GlobalDim1);
 
         if GLSetup."Global Dimension 2 Code" = '' then
-          GlobalDim2 := ''
+            GlobalDim2 := ''
         else
-          UpdateDimSet(TempDimSetEntry,GLSetup."Global Dimension 2 Code",GlobalDim2);
+            UpdateDimSet(TempDimSetEntry, GLSetup."Global Dimension 2 Code", GlobalDim2);
 
         DimSetID := DimMgt.GetDimensionSetID(TempDimSetEntry);
         exit(true);
         //+NPR5.53 [375258]
     end;
 
-    local procedure UpdateDimSet(var DimSetEntry: Record "Dimension Set Entry";DimCode: Code[20];DimValueCode: Code[20])
+    local procedure UpdateDimSet(var DimSetEntry: Record "Dimension Set Entry"; DimCode: Code[20]; DimValueCode: Code[20])
     var
         DimValue: Record "Dimension Value";
     begin
         //-NPR5.53 [375258]
-        if DimSetEntry.Get(DimSetEntry."Dimension Set ID",DimCode) then begin
-          if (DimSetEntry."Dimension Value Code" <> DimValueCode) or (DimValueCode = '') then
-            DimSetEntry.Delete
-          else
-            exit;
+        if DimSetEntry.Get(DimSetEntry."Dimension Set ID", DimCode) then begin
+            if (DimSetEntry."Dimension Value Code" <> DimValueCode) or (DimValueCode = '') then
+                DimSetEntry.Delete
+            else
+                exit;
         end;
         if DimValueCode <> '' then begin
-          DimSetEntry."Dimension Code" := DimCode;
-          DimSetEntry."Dimension Value Code" := DimValueCode;
-          if not DimValue.Get(DimSetEntry."Dimension Code",DimSetEntry."Dimension Value Code") then begin
-            DimValue.Init;
-            DimValue."Dimension Code" := DimSetEntry."Dimension Code";
-            DimValue.Code := DimSetEntry."Dimension Value Code";
-            DimValue.Insert(true);
-          end;
-          DimSetEntry."Dimension Value ID" := DimValue."Dimension Value ID";
-          DimSetEntry.Insert;
+            DimSetEntry."Dimension Code" := DimCode;
+            DimSetEntry."Dimension Value Code" := DimValueCode;
+            if not DimValue.Get(DimSetEntry."Dimension Code", DimSetEntry."Dimension Value Code") then begin
+                DimValue.Init;
+                DimValue."Dimension Code" := DimSetEntry."Dimension Code";
+                DimValue.Code := DimSetEntry."Dimension Value Code";
+                DimValue.Insert(true);
+            end;
+            DimSetEntry."Dimension Value ID" := DimValue."Dimension Value ID";
+            DimSetEntry.Insert;
         end;
         //+NPR5.53 [375258]
     end;
@@ -181,82 +181,83 @@ codeunit 6059828 "Upgrade NPR5.53"
     begin
         //-NPR5.53 [371955]
         if POSPostingProfile.IsEmpty then begin
-          POSPostingProfile.Init;
-          POSPostingProfile.Code := 'DEFAULT';
-          POSPostingProfile.Description := 'Created by upgrade process';
-          POSPostingProfile.Insert;
+            POSPostingProfile.Init;
+            POSPostingProfile.Code := 'DEFAULT';
+            POSPostingProfile.Description := 'Created by upgrade process';
+            POSPostingProfile.Insert;
         end;
 
         if UpgradeRetailSetup.Get then begin
-          POSPostingProfile.ModifyAll("POS Sales Amt. Rndng Precision",UpgradeRetailSetup."Amount Rounding Precision");
-          UpgradeRetailSetup.DeleteAll;
+            POSPostingProfile.ModifyAll("POS Sales Amt. Rndng Precision", UpgradeRetailSetup."Amount Rounding Precision");
+            UpgradeRetailSetup.DeleteAll;
         end;
 
         if UpgradeCashRegister.FindSet then
-          repeat
-            if UpgradeCashRegister.Rounding <> '' then begin
-              POSPostingProfile.SetFilter("POS Sales Rounding Account",'%1|%2','',UpgradeCashRegister.Rounding);
-              if POSPostingProfile.FindFirst then begin
-                if POSPostingProfile."POS Sales Rounding Account" = '' then begin
-                  POSPostingProfile."POS Sales Rounding Account" := UpgradeCashRegister.Rounding;
-                  POSPostingProfile.Modify;
-                end;
-              end else begin
-                POSPostingProfile.SetRange("POS Sales Rounding Account");
-                POSPostingProfile.FindFirst;
-                POSPostingProfile.Code := UpgradeCashRegister.Rounding;
-                POSPostingProfile."POS Sales Rounding Account" := UpgradeCashRegister.Rounding;
-                POSPostingProfile.Insert;
-              end;
-              if POSUnit.Get(UpgradeCashRegister."Register No.") then
-                if POSUnit."POS Posting Profile" <> POSPostingProfile.Code then begin
-                  POSUnit."POS Posting Profile" := POSPostingProfile.Code;
-                  POSUnit.Modify;
-                end;
-            end;
-
-            //-NPR5.53 [373743]
-            //Move Sales Ticket No. Series to POS Audit Profile
-            if UpgradeCashRegister."Sales Ticket Series" <> '' then
-              if POSUnit.Get(UpgradeCashRegister."Register No.") then begin
-                case true of
-                  (POSUnit."POS Audit Profile" = '') or not POSAuditProfile.Get(POSUnit."POS Audit Profile"):
-                  begin
-                    POSAuditProfile.Init;
-                    POSAuditProfile.Code := POSUnit."POS Audit Profile";
-                    if POSAuditProfile.Code = '' then
-                      POSAuditProfile.Code := UpgradeCashRegister."Sales Ticket Series";
-                    if not POSAuditProfile.Find then
-                      POSAuditProfile.Insert;
-                    POSAuditProfile."Sales Ticket No. Series" := UpgradeCashRegister."Sales Ticket Series";
-                    POSAuditProfile.Modify;
-                  end;
-
-                  POSAuditProfile.Get(POSUnit."POS Audit Profile"):
-                  begin
-                    if POSAuditProfile."Sales Ticket No. Series" = '' then begin
-                      POSAuditProfile."Sales Ticket No. Series" := UpgradeCashRegister."Sales Ticket Series";
-                      POSAuditProfile.Modify;
-                    end else if POSAuditProfile."Sales Ticket No. Series" <> UpgradeCashRegister."Sales Ticket Series" then begin
-                      POSAuditProfile2 := POSAuditProfile;
-                      POSAuditProfile.Code := StrSubstNo('%1-01',CopyStr(POSAuditProfile.Code,1,MaxStrLen(POSAuditProfile.Code) - 3));
-                      while POSAuditProfile.Find do
-                        POSAuditProfile.Code := IncStr(POSAuditProfile.Code);
-                      POSAuditProfile.TransferFields(POSAuditProfile2,false);
-                      POSAuditProfile.Insert;
-                      POSAuditProfile."Sales Ticket No. Series" := UpgradeCashRegister."Sales Ticket Series";
-                      POSAuditProfile.Modify;
+            repeat
+                if UpgradeCashRegister.Rounding <> '' then begin
+                    POSPostingProfile.SetFilter("POS Sales Rounding Account", '%1|%2', '', UpgradeCashRegister.Rounding);
+                    if POSPostingProfile.FindFirst then begin
+                        if POSPostingProfile."POS Sales Rounding Account" = '' then begin
+                            POSPostingProfile."POS Sales Rounding Account" := UpgradeCashRegister.Rounding;
+                            POSPostingProfile.Modify;
+                        end;
+                    end else begin
+                        POSPostingProfile.SetRange("POS Sales Rounding Account");
+                        POSPostingProfile.FindFirst;
+                        POSPostingProfile.Code := UpgradeCashRegister.Rounding;
+                        POSPostingProfile."POS Sales Rounding Account" := UpgradeCashRegister.Rounding;
+                        POSPostingProfile.Insert;
                     end;
-                  end;
+                    if POSUnit.Get(UpgradeCashRegister."Register No.") then
+                        if POSUnit."POS Posting Profile" <> POSPostingProfile.Code then begin
+                            POSUnit."POS Posting Profile" := POSPostingProfile.Code;
+                            POSUnit.Modify;
+                        end;
                 end;
-                if POSUnit."POS Audit Profile" <> POSAuditProfile.Code then begin
-                  POSUnit."POS Audit Profile" := POSAuditProfile.Code;
-                  POSUnit.Modify;
-                end;
-              end;
-            //+NPR5.53 [373743]
-            UpgradeCashRegister.Delete;
-          until UpgradeCashRegister.Next = 0;
+
+                //-NPR5.53 [373743]
+                //Move Sales Ticket No. Series to POS Audit Profile
+                if UpgradeCashRegister."Sales Ticket Series" <> '' then
+                    if POSUnit.Get(UpgradeCashRegister."Register No.") then begin
+                        case true of
+                            (POSUnit."POS Audit Profile" = '') or not POSAuditProfile.Get(POSUnit."POS Audit Profile"):
+                                begin
+                                    POSAuditProfile.Init;
+                                    POSAuditProfile.Code := POSUnit."POS Audit Profile";
+                                    if POSAuditProfile.Code = '' then
+                                        POSAuditProfile.Code := UpgradeCashRegister."Sales Ticket Series";
+                                    if not POSAuditProfile.Find then
+                                        POSAuditProfile.Insert;
+                                    POSAuditProfile."Sales Ticket No. Series" := UpgradeCashRegister."Sales Ticket Series";
+                                    POSAuditProfile.Modify;
+                                end;
+
+                            POSAuditProfile.Get(POSUnit."POS Audit Profile"):
+                                begin
+                                    if POSAuditProfile."Sales Ticket No. Series" = '' then begin
+                                        POSAuditProfile."Sales Ticket No. Series" := UpgradeCashRegister."Sales Ticket Series";
+                                        POSAuditProfile.Modify;
+                                    end else
+                                        if POSAuditProfile."Sales Ticket No. Series" <> UpgradeCashRegister."Sales Ticket Series" then begin
+                                            POSAuditProfile2 := POSAuditProfile;
+                                            POSAuditProfile.Code := StrSubstNo('%1-01', CopyStr(POSAuditProfile.Code, 1, MaxStrLen(POSAuditProfile.Code) - 3));
+                                            while POSAuditProfile.Find do
+                                                POSAuditProfile.Code := IncStr(POSAuditProfile.Code);
+                                            POSAuditProfile.TransferFields(POSAuditProfile2, false);
+                                            POSAuditProfile.Insert;
+                                            POSAuditProfile."Sales Ticket No. Series" := UpgradeCashRegister."Sales Ticket Series";
+                                            POSAuditProfile.Modify;
+                                        end;
+                                end;
+                        end;
+                        if POSUnit."POS Audit Profile" <> POSAuditProfile.Code then begin
+                            POSUnit."POS Audit Profile" := POSAuditProfile.Code;
+                            POSUnit.Modify;
+                        end;
+                    end;
+                //+NPR5.53 [373743]
+                UpgradeCashRegister.Delete;
+            until UpgradeCashRegister.Next = 0;
         //+NPR5.53 [371955]
     end;
 
@@ -269,30 +270,30 @@ codeunit 6059828 "Upgrade NPR5.53"
     begin
         //-NPR5.53 [371956]
         if CashRegister.FindSet then
-          repeat
-            DefaultDim.SetRange("Table ID",DATABASE::Register);
-            DefaultDim.SetRange("No.",CashRegister."Register No.");
-            if DefaultDim.FindSet then begin
-              if not POSUnit.Get(CashRegister."Register No.") then begin
-                POSUnit.Init;
-                POSUnit."No." := CashRegister."Register No.";
-                POSUnit.Name := 'Created by Dimension Upgrade Process';
-                POSUnit.Insert;
-              end;
-              DefaultDim2.SetRange("Table ID",DATABASE::"POS Unit");
-              DefaultDim2.SetRange("No.",POSUnit."No.");
-              DefaultDim2.DeleteAll;
-              repeat
-                DefaultDim2 := DefaultDim;
-                DefaultDim2."Table ID" := DATABASE::"POS Unit";
-                DefaultDim2.Insert;
-              until DefaultDim.Next = 0;
-              POSUnit."Global Dimension 1 Code" := CashRegister."Global Dimension 1 Code";
-              POSUnit."Global Dimension 2 Code" := CashRegister."Global Dimension 2 Code";
-              POSUnit.Modify;
-              DefaultDim.DeleteAll;
-            end;
-          until CashRegister.Next = 0;
+            repeat
+                DefaultDim.SetRange("Table ID", DATABASE::Register);
+                DefaultDim.SetRange("No.", CashRegister."Register No.");
+                if DefaultDim.FindSet then begin
+                    if not POSUnit.Get(CashRegister."Register No.") then begin
+                        POSUnit.Init;
+                        POSUnit."No." := CashRegister."Register No.";
+                        POSUnit.Name := 'Created by Dimension Upgrade Process';
+                        POSUnit.Insert;
+                    end;
+                    DefaultDim2.SetRange("Table ID", DATABASE::"POS Unit");
+                    DefaultDim2.SetRange("No.", POSUnit."No.");
+                    DefaultDim2.DeleteAll;
+                    repeat
+                        DefaultDim2 := DefaultDim;
+                        DefaultDim2."Table ID" := DATABASE::"POS Unit";
+                        DefaultDim2.Insert;
+                    until DefaultDim.Next = 0;
+                    POSUnit."Global Dimension 1 Code" := CashRegister."Global Dimension 1 Code";
+                    POSUnit."Global Dimension 2 Code" := CashRegister."Global Dimension 2 Code";
+                    POSUnit.Modify;
+                    DefaultDim.DeleteAll;
+                end;
+            until CashRegister.Next = 0;
         //+NPR5.53 [371956]
     end;
 
@@ -303,7 +304,7 @@ codeunit 6059828 "Upgrade NPR5.53"
     begin
         //-NPR5.53 [377727]
         if RaptorSetup.Get then
-          RaptorManagement.InitializeDefaultActions(false,true);
+            RaptorManagement.InitializeDefaultActions(false, true);
         //+NPR5.53 [377727]
     end;
 
@@ -314,15 +315,15 @@ codeunit 6059828 "Upgrade NPR5.53"
     begin
         //-NPR5.53 [382232]
         if NpRvVoucherType.IsEmpty then
-          exit;
+            exit;
         NpRvVoucherType.FindSet;
         repeat
-          if (NpRvVoucherType."Minimum Amount Issue" = 0) and (NpRvVoucherType."Payment Type" <> '') then
-            if PaymentTypePOS.Get(NpRvVoucherType."Payment Type") then
-              if PaymentTypePOS."Minimum Amount" > 0 then begin
-                NpRvVoucherType."Minimum Amount Issue" := PaymentTypePOS."Minimum Amount";
-                NpRvVoucherType.Modify;
-              end;
+            if (NpRvVoucherType."Minimum Amount Issue" = 0) and (NpRvVoucherType."Payment Type" <> '') then
+                if PaymentTypePOS.Get(NpRvVoucherType."Payment Type") then
+                    if PaymentTypePOS."Minimum Amount" > 0 then begin
+                        NpRvVoucherType."Minimum Amount Issue" := PaymentTypePOS."Minimum Amount";
+                        NpRvVoucherType.Modify;
+                    end;
         until NpRvVoucherType.Next = 0;
         //+NPR5.53 [382232]
     end;
@@ -339,20 +340,20 @@ codeunit 6059828 "Upgrade NPR5.53"
     begin
         //-NPR5.53 [360258]
         with UpgradeWaiterPadLine do
-          if FindSet then
-            repeat
-              if WaiterPadLine.Get("Waiter Pad No.","Line No.") then begin
-                if "Sent To. Kitchen Print" then
-                  RestaurantPrint.LogWaiterPadLinePrint(WaiterPadLine,PrintTemplate."Print Type"::"Kitchen Order",FlowStatus."Status Object"::WaiterPadLineMealFlow,'',"Print Category",0DT);
-                if "Print Category" <> '' then begin
-                  PrintCategory.Code := "Print Category";
-                  if not PrintCategory.Find then
-                    PrintCategory.Init;
-                  WaiterPadPOSMgt.AddWPadLinePrintCategory(WaiterPadLine,PrintCategory);
-                end;
-              end;
-              Delete;
-            until Next = 0;
+            if FindSet then
+                repeat
+                    if WaiterPadLine.Get("Waiter Pad No.", "Line No.") then begin
+                        if "Sent To. Kitchen Print" then
+                            RestaurantPrint.LogWaiterPadLinePrint(WaiterPadLine, PrintTemplate."Print Type"::"Kitchen Order", FlowStatus."Status Object"::WaiterPadLineMealFlow, '', "Print Category", 0DT);
+                        if "Print Category" <> '' then begin
+                            PrintCategory.Code := "Print Category";
+                            if not PrintCategory.Find then
+                                PrintCategory.Init;
+                            WaiterPadPOSMgt.AddWPadLinePrintCategory(WaiterPadLine, PrintCategory);
+                        end;
+                    end;
+                    Delete;
+                until Next = 0;
         //+NPR5.53 [360258]
     end;
 
@@ -362,19 +363,19 @@ codeunit 6059828 "Upgrade NPR5.53"
         PrintTemplate2: Record "NPRE Print Template";
     begin
         //-NPR5.53 [360258]
-        PrintTemplate.SetRange("Print Type",PrintTemplate."Print Type"::"Pre Receipt");
+        PrintTemplate.SetRange("Print Type", PrintTemplate."Print Type"::"Pre Receipt");
         if not PrintTemplate.IsEmpty then
-          exit;  //Already upgraded
+            exit;  //Already upgraded
 
-        PrintTemplate.SetRange("Print Type",PrintTemplate."Print Type"::"Serving Request");
+        PrintTemplate.SetRange("Print Type", PrintTemplate."Print Type"::"Serving Request");
         if PrintTemplate.FindSet then
-          repeat
-            PrintTemplate2 := PrintTemplate;
-            PrintTemplate2."Print Type" := PrintTemplate2."Print Type"::"Pre Receipt";
-            PrintTemplate2.Insert;
+            repeat
+                PrintTemplate2 := PrintTemplate;
+                PrintTemplate2."Print Type" := PrintTemplate2."Print Type"::"Pre Receipt";
+                PrintTemplate2.Insert;
 
-            PrintTemplate.Delete;
-          until PrintTemplate.Next = 0;
+                PrintTemplate.Delete;
+            until PrintTemplate.Next = 0;
         //+NPR5.53 [360258]
     end;
 
@@ -386,23 +387,23 @@ codeunit 6059828 "Upgrade NPR5.53"
         RPTemplateMgt: Codeunit "RP Template Mgt.";
     begin
         //-NPR5.53 [360258]
-        RPDataItemLinks.SetRange("Table ID",DATABASE::"NPRE Waiter Pad Line");
-        RPDataItemLinks.SetRange("Field ID",5);  //Removed field "Sent to. Kitchen Print"
+        RPDataItemLinks.SetRange("Table ID", DATABASE::"NPRE Waiter Pad Line");
+        RPDataItemLinks.SetRange("Field ID", 5);  //Removed field "Sent to. Kitchen Print"
         if RPDataItemLinks.FindSet then
-          repeat
-            if RPTemplateHeader.Get(RPDataItemLinks."Data Item Code") then begin
-              if not RPTemplateHeader.Archived then
-                RPDataItemLinks.Delete(true)
-              else begin
-                RPTemplateMgt.CreateNewVersion(RPTemplateHeader);
-                RPTemplateHeader."Version Comments" := CopyStr('Cleared links to obsolete field "Sent to. Kitchen Print"',1,MaxStrLen(RPTemplateHeader."Version Comments"));
-                RPTemplateHeader.Modify(true);
-                RPDataItemLinks2.CopyFilters(RPDataItemLinks);
-                RPDataItemLinks2.SetRange("Data Item Code",RPTemplateHeader.Code);
-                RPDataItemLinks2.DeleteAll;
-              end;
-            end;
-          until RPDataItemLinks.Next = 0;
+            repeat
+                if RPTemplateHeader.Get(RPDataItemLinks."Data Item Code") then begin
+                    if not RPTemplateHeader.Archived then
+                        RPDataItemLinks.Delete(true)
+                    else begin
+                        RPTemplateMgt.CreateNewVersion(RPTemplateHeader);
+                        RPTemplateHeader."Version Comments" := CopyStr('Cleared links to obsolete field "Sent to. Kitchen Print"', 1, MaxStrLen(RPTemplateHeader."Version Comments"));
+                        RPTemplateHeader.Modify(true);
+                        RPDataItemLinks2.CopyFilters(RPDataItemLinks);
+                        RPDataItemLinks2.SetRange("Data Item Code", RPTemplateHeader.Code);
+                        RPDataItemLinks2.DeleteAll;
+                    end;
+                end;
+            until RPDataItemLinks.Next = 0;
         //+NPR5.53 [360258]
     end;
 
@@ -413,15 +414,15 @@ codeunit 6059828 "Upgrade NPR5.53"
     begin
         //-NPR5.53 [388666]
         if POSInfoPOSEntry.FindSet(true) then
-          repeat
-            if POSEntry.Get(POSInfoPOSEntry."POS Entry No.") then begin
-              POSInfoPOSEntry."Document No." := POSEntry."Document No.";
-              POSInfoPOSEntry."Entry Date" := POSEntry."Entry Date";
-              POSInfoPOSEntry."POS Unit No." := POSEntry."POS Unit No.";
-              POSInfoPOSEntry."Salesperson Code" := POSEntry."Salesperson Code";
-              POSInfoPOSEntry.Modify;
-            end;
-          until POSInfoPOSEntry.Next = 0;
+            repeat
+                if POSEntry.Get(POSInfoPOSEntry."POS Entry No.") then begin
+                    POSInfoPOSEntry."Document No." := POSEntry."Document No.";
+                    POSInfoPOSEntry."Entry Date" := POSEntry."Entry Date";
+                    POSInfoPOSEntry."POS Unit No." := POSEntry."POS Unit No.";
+                    POSInfoPOSEntry."Salesperson Code" := POSEntry."Salesperson Code";
+                    POSInfoPOSEntry.Modify;
+                end;
+            until POSInfoPOSEntry.Next = 0;
         //+NPR5.53 [388666]
     end;
 }

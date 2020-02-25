@@ -53,101 +53,101 @@ codeunit 6150640 "POS Info Management"
     begin
         if Rec.Type = Rec.Type::Item then begin
             POSInfoLinkTable.Reset;
-          POSInfoLinkTable.SetRange("Table ID",DATABASE::Item);
+            POSInfoLinkTable.SetRange("Table ID", DATABASE::Item);
             POSInfoLinkTable.SetRange("Primary Key", Rec."No.");
-          //-NPR5.53 [388697]-revoked
-          /*
-          IF POSInfoLinkTable.FINDFIRST THEN REPEAT
-            CLEAR(Info);
-            BEGIN
-              POSInfo.GET(POSInfoLinkTable."POS Info Code");
-              POSInfoTransaction.SETRANGE("Register No.",Rec."Register No.");
-              POSInfoTransaction.SETRANGE("Sales Ticket No.",Rec."Sales Ticket No.");
-              IF NOT POSInfo."Once per Transaction" THEN
-                POSInfoTransaction.SETRANGE("Sales Line No.",Rec."Line No.")
-              ELSE
-                POSInfoTransaction.SETRANGE("Sales Line No.");
-        
-              POSInfoTransaction.SETRANGE("POS Info Code",POSInfoLinkTable."POS Info Code");
-              IF NOT POSInfoTransaction.FINDFIRST THEN BEGIN
-                //-NPR5.53 [370575]
-                //IF POSInfo.Type = POSInfo.Type::"Request Data" THEN BEGIN
-                CASE POSInfo.Type OF
-                  POSInfo.Type::"Request Data":
-                //+NPR5.53 [370575]
-                    CASE POSInfo."Input Type" OF
-                      POSInfo."Input Type"::Text : BEGIN
-                        Info := POSEventMarshaller.SearchBox(POSInfo.Message,'',30);
-                        IF Info = '' THEN
-                          IF POSInfo."Input Mandatory" THEN
-                            POSEventMarshaller.DisplayError('Error','Error',TRUE);
-                      END;
-                      POSInfo."Input Type"::Table : BEGIN
-                        POSInfoLookupPage.SetPOSInfo(POSInfo);
-                        POSInfoLookupPage.LOOKUPMODE(TRUE);
-                        IF POSInfoLookupPage.RUNMODAL = ACTION::LookupOK THEN BEGIN
-                          POSInfoLookupPage.GETRECORD(POSInfoLookupTable);
-                          RecRef.OPEN(POSInfo."Table No.");
-                          RecRef.GET(POSInfoLookupTable.RecID);
-                          Info := CreatePrimKeyString(RecRef);
-                        END;
-                      END;
-                      POSInfo."Input Type"::SubCode : BEGIN
-                        POSInfoLookupPage.SetPOSInfo(POSInfo);
-                        POSInfoLookupPage.LOOKUPMODE(TRUE);
-                        IF POSInfoLookupPage.RUNMODAL = ACTION::LookupOK THEN BEGIN
-                          POSInfoLookupPage.GETRECORD(POSInfoLookupTable);
-                          Info := POSInfoLookupTable."Field 1";
-                        END;
-                      END;
-                    END;
-                //-NPR5.53 [370575]
-                {
-                END ELSE BEGIN
-                  MESSAGE(POSInfo.Message);
-                  Info := POSInfo.Message;
-                END;
-                }
-                  POSInfo.Type::"Show Message":
-                    BEGIN
-                      MESSAGE(POSInfo.Message);
-                      Info := POSInfo.Message;
-                    END;
-                  POSInfo.Type::"Write Default Message":
-                    Info := POSInfo.Message;
-                END;
-                //+NPR5.53 [370575]
-        
-                TempPOSInfoTransaction.INIT;
-                TempPOSInfoTransaction."Register No." := Rec."Register No.";
-                TempPOSInfoTransaction."Sales Ticket No." := Rec."Sales Ticket No.";
+            //-NPR5.53 [388697]-revoked
+            /*
+            IF POSInfoLinkTable.FINDFIRST THEN REPEAT
+              CLEAR(Info);
+              BEGIN
+                POSInfo.GET(POSInfoLinkTable."POS Info Code");
+                POSInfoTransaction.SETRANGE("Register No.",Rec."Register No.");
+                POSInfoTransaction.SETRANGE("Sales Ticket No.",Rec."Sales Ticket No.");
                 IF NOT POSInfo."Once per Transaction" THEN
-                  TempPOSInfoTransaction."Sales Line No." := Rec."Line No.";
-                TempPOSInfoTransaction."Sale Date" := Rec.Date;
-                TempPOSInfoTransaction."Receipt Type" := Rec.Type;
-                TempPOSInfoTransaction."Entry No." := 0;
-                TempPOSInfoTransaction."POS Info Code" := POSInfo.Code;
-                TempPOSInfoTransaction."POS Info" := Info;
-                TempPOSInfoTransaction.INSERT(TRUE);
+                  POSInfoTransaction.SETRANGE("Sales Line No.",Rec."Line No.")
+                ELSE
+                  POSInfoTransaction.SETRANGE("Sales Line No.");
+
+                POSInfoTransaction.SETRANGE("POS Info Code",POSInfoLinkTable."POS Info Code");
+                IF NOT POSInfoTransaction.FINDFIRST THEN BEGIN
+                  //-NPR5.53 [370575]
+                  //IF POSInfo.Type = POSInfo.Type::"Request Data" THEN BEGIN
+                  CASE POSInfo.Type OF
+                    POSInfo.Type::"Request Data":
+                  //+NPR5.53 [370575]
+                      CASE POSInfo."Input Type" OF
+                        POSInfo."Input Type"::Text : BEGIN
+                          Info := POSEventMarshaller.SearchBox(POSInfo.Message,'',30);
+                          IF Info = '' THEN
+                            IF POSInfo."Input Mandatory" THEN
+                              POSEventMarshaller.DisplayError('Error','Error',TRUE);
+                        END;
+                        POSInfo."Input Type"::Table : BEGIN
+                          POSInfoLookupPage.SetPOSInfo(POSInfo);
+                          POSInfoLookupPage.LOOKUPMODE(TRUE);
+                          IF POSInfoLookupPage.RUNMODAL = ACTION::LookupOK THEN BEGIN
+                            POSInfoLookupPage.GETRECORD(POSInfoLookupTable);
+                            RecRef.OPEN(POSInfo."Table No.");
+                            RecRef.GET(POSInfoLookupTable.RecID);
+                            Info := CreatePrimKeyString(RecRef);
+                          END;
+                        END;
+                        POSInfo."Input Type"::SubCode : BEGIN
+                          POSInfoLookupPage.SetPOSInfo(POSInfo);
+                          POSInfoLookupPage.LOOKUPMODE(TRUE);
+                          IF POSInfoLookupPage.RUNMODAL = ACTION::LookupOK THEN BEGIN
+                            POSInfoLookupPage.GETRECORD(POSInfoLookupTable);
+                            Info := POSInfoLookupTable."Field 1";
+                          END;
+                        END;
+                      END;
+                  //-NPR5.53 [370575]
+                  {
+                  END ELSE BEGIN
+                    MESSAGE(POSInfo.Message);
+                    Info := POSInfo.Message;
+                  END;
+                  }
+                    POSInfo.Type::"Show Message":
+                      BEGIN
+                        MESSAGE(POSInfo.Message);
+                        Info := POSInfo.Message;
+                      END;
+                    POSInfo.Type::"Write Default Message":
+                      Info := POSInfo.Message;
+                  END;
+                  //+NPR5.53 [370575]
+
+                  TempPOSInfoTransaction.INIT;
+                  TempPOSInfoTransaction."Register No." := Rec."Register No.";
+                  TempPOSInfoTransaction."Sales Ticket No." := Rec."Sales Ticket No.";
+                  IF NOT POSInfo."Once per Transaction" THEN
+                    TempPOSInfoTransaction."Sales Line No." := Rec."Line No.";
+                  TempPOSInfoTransaction."Sale Date" := Rec.Date;
+                  TempPOSInfoTransaction."Receipt Type" := Rec.Type;
+                  TempPOSInfoTransaction."Entry No." := 0;
+                  TempPOSInfoTransaction."POS Info Code" := POSInfo.Code;
+                  TempPOSInfoTransaction."POS Info" := Info;
+                  TempPOSInfoTransaction.INSERT(TRUE);
+                END;
               END;
-            END;
-          UNTIL POSInfoLinkTable.NEXT = 0;
-          FrontEndUpdateIsNeeded := TempPOSInfoTransaction.FINDSET;
-          IF FrontEndUpdateIsNeeded THEN
-            REPEAT
-              POSInfoTransaction := TempPOSInfoTransaction;
-              POSInfoTransaction."Entry No." := 0;
-              POSInfoTransaction.INSERT(TRUE);
-            UNTIL TempPOSInfoTransaction.NEXT = 0;
-          */
-          //+NPR5.53 [388697]-revoked
-          //-NPR5.53 [388697]
-          FrontEndUpdateIsNeeded := ProcessPOSInfoLinkEntries(POSInfoLinkTable,Rec,ApplicScope::"Current Line");
-          //+NPR5.53 [388697]
+            UNTIL POSInfoLinkTable.NEXT = 0;
+            FrontEndUpdateIsNeeded := TempPOSInfoTransaction.FINDSET;
+            IF FrontEndUpdateIsNeeded THEN
+              REPEAT
+                POSInfoTransaction := TempPOSInfoTransaction;
+                POSInfoTransaction."Entry No." := 0;
+                POSInfoTransaction.INSERT(TRUE);
+              UNTIL TempPOSInfoTransaction.NEXT = 0;
+            */
+            //+NPR5.53 [388697]-revoked
+            //-NPR5.53 [388697]
+            FrontEndUpdateIsNeeded := ProcessPOSInfoLinkEntries(POSInfoLinkTable, Rec, ApplicScope::"Current Line");
+            //+NPR5.53 [388697]
         end;
-        FrontEndUpdateIsNeeded := CopyPOSInfoTransFromHeader(Rec,POSInfoTransaction) or FrontEndUpdateIsNeeded;
+        FrontEndUpdateIsNeeded := CopyPOSInfoTransFromHeader(Rec, POSInfoTransaction) or FrontEndUpdateIsNeeded;
         if FrontEndUpdateIsNeeded then
-          CallFrontEndUpdate();
+            CallFrontEndUpdate();
 
     end;
 
@@ -160,9 +160,9 @@ codeunit 6150640 "POS Info Management"
     begin
         //CLEAR(Info);  //NPR5.53 [388697]-revoked
         POSInfoLinkTable.Reset;
-        POSInfoLinkTable.SetRange("Table ID",DATABASE::Customer);
-        POSInfoLinkTable.SetRange("Primary Key",Rec."Customer No.");
-        
+        POSInfoLinkTable.SetRange("Table ID", DATABASE::Customer);
+        POSInfoLinkTable.SetRange("Primary Key", Rec."Customer No.");
+
         //-NPR5.53 [388697]
         pSaleLinePos.Init;
         pSaleLinePos."Register No." := Rec."Register No.";
@@ -170,11 +170,11 @@ codeunit 6150640 "POS Info Management"
         pSaleLinePos.Date := Rec.Date;
         pSaleLinePos."Sale Type" := pSaleLinePos."Sale Type"::Sale;
         pSaleLinePos."Line No." := 0;
-        
-        FrontEndUpdateIsNeeded := ProcessPOSInfoLinkEntries(POSInfoLinkTable,pSaleLinePos,ApplicScope::"All Lines");
-        
+
+        FrontEndUpdateIsNeeded := ProcessPOSInfoLinkEntries(POSInfoLinkTable, pSaleLinePos, ApplicScope::"All Lines");
+
         if FrontEndUpdateIsNeeded then
-          CallFrontEndUpdate();
+            CallFrontEndUpdate();
         //+NPR5.53 [388697]
         //-NPR5.53 [388697]-revoked
         /*
@@ -281,10 +281,10 @@ codeunit 6150640 "POS Info Management"
                 POSInfoPOSEntry."POS Info Code" := POSInfoTransaction."POS Info Code";
                 POSInfoPOSEntry."Entry No." := POSInfoTransaction."Entry No.";
                 POSInfoPOSEntry.TransferFields(POSInfoTransaction, false);
-            //-NPR5.53 [388666]
-            POSInfoPOSEntry."POS Unit No." := POSEntry."POS Unit No.";
-            POSInfoPOSEntry."Salesperson Code" := POSEntry."Salesperson Code";
-            //+NPR5.53 [388666]
+                //-NPR5.53 [388666]
+                POSInfoPOSEntry."POS Unit No." := POSEntry."POS Unit No.";
+                POSInfoPOSEntry."Salesperson Code" := POSEntry."Salesperson Code";
+                //+NPR5.53 [388666]
                 POSInfoPOSEntry.Insert;
             until POSInfoTransaction.Next = 0;
         end else begin
@@ -297,10 +297,10 @@ codeunit 6150640 "POS Info Management"
                     POSInfoPOSEntry."POS Info Code" := POSInfoAuditRoll."POS Info Code";
                     POSInfoPOSEntry."Entry No." := POSInfoAuditRoll."Entry No.";
                     POSInfoPOSEntry.TransferFields(POSInfoAuditRoll, false);
-            //-NPR5.53 [388666]
-            POSInfoPOSEntry."POS Unit No." := POSEntry."POS Unit No.";
-            POSInfoPOSEntry."Salesperson Code" := POSEntry."Salesperson Code";
-            //+NPR5.53 [388666]
+                    //-NPR5.53 [388666]
+                    POSInfoPOSEntry."POS Unit No." := POSEntry."POS Unit No.";
+                    POSInfoPOSEntry."Salesperson Code" := POSEntry."Salesperson Code";
+                    //+NPR5.53 [388666]
                     POSInfoPOSEntry.Insert;
                 until POSInfoAuditRoll.Next = 0;
         end;
@@ -318,39 +318,39 @@ codeunit 6150640 "POS Info Management"
     end;
 
     [EventSubscriber(ObjectType::Table, 6014406, 'OnAfterDeleteEvent', '', true, true)]
-    local procedure OnAfterDeleteSaleLinePOS(var Rec: Record "Sale Line POS";RunTrigger: Boolean)
+    local procedure OnAfterDeleteSaleLinePOS(var Rec: Record "Sale Line POS"; RunTrigger: Boolean)
     begin
         DeleteLine(Rec);
     end;
 
-    local procedure ProcessPOSInfoLinkEntries(var POSInfoLinkTable: Record "POS Info Link Table";pSaleLinePos: Record "Sale Line POS";pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask) FrontEndUpdateIsNeeded: Boolean
+    local procedure ProcessPOSInfoLinkEntries(var POSInfoLinkTable: Record "POS Info Link Table"; pSaleLinePos: Record "Sale Line POS"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask) FrontEndUpdateIsNeeded: Boolean
     var
         POSInfo: Record "POS Info";
         TempPOSInfoTransaction: Record "POS Info Transaction" temporary;
     begin
         //-NPR5.53 [388697]
         if POSInfoLinkTable.FindSet then
-          repeat
-            POSInfo.Get(POSInfoLinkTable."POS Info Code");
-            ConfirmPOSInfoTransOverwrite(pSaleLinePos,POSInfo,pApplicScope);
+            repeat
+                POSInfo.Get(POSInfoLinkTable."POS Info Code");
+                ConfirmPOSInfoTransOverwrite(pSaleLinePos, POSInfo, pApplicScope);
 
-            TempPOSInfoTransaction.Init;
-            TempPOSInfoTransaction.CopyFromPOSInfo(POSInfo);
-            TempPOSInfoTransaction."POS Info" := CopyStr(GetPosInfoOutput(POSInfo),1,MaxStrLen(TempPOSInfoTransaction."POS Info"));
-            TempPOSInfoTransaction.Insert(true);
-          until POSInfoLinkTable.Next = 0;
+                TempPOSInfoTransaction.Init;
+                TempPOSInfoTransaction.CopyFromPOSInfo(POSInfo);
+                TempPOSInfoTransaction."POS Info" := CopyStr(GetPosInfoOutput(POSInfo), 1, MaxStrLen(TempPOSInfoTransaction."POS Info"));
+                TempPOSInfoTransaction.Insert(true);
+            until POSInfoLinkTable.Next = 0;
 
         FrontEndUpdateIsNeeded := false;
         if TempPOSInfoTransaction.FindSet then
-          repeat
-            TempPOSInfoTransaction.ShowMessage;
-            if SaleLineApplyPOSInfo(pSaleLinePos,TempPOSInfoTransaction,pApplicScope,false) then
-              FrontEndUpdateIsNeeded := true;
-          until TempPOSInfoTransaction.Next = 0;
+            repeat
+                TempPOSInfoTransaction.ShowMessage;
+                if SaleLineApplyPOSInfo(pSaleLinePos, TempPOSInfoTransaction, pApplicScope, false) then
+                    FrontEndUpdateIsNeeded := true;
+            until TempPOSInfoTransaction.Next = 0;
         //+NPR5.53 [388697]
     end;
 
-    procedure ProcessPOSInfoMenuFunction(pSaleLinePos: Record "Sale Line POS";pPOSInfoCode: Code[20];pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask;pClearInfo: Boolean) FrontEndUpdateIsNeeded: Boolean
+    procedure ProcessPOSInfoMenuFunction(pSaleLinePos: Record "Sale Line POS"; pPOSInfoCode: Code[20]; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask; pClearInfo: Boolean) FrontEndUpdateIsNeeded: Boolean
     var
         POSInfo: Record "POS Info";
         POSInfoTransaction: Record "POS Info Transaction";
@@ -480,90 +480,93 @@ codeunit 6150640 "POS Info Management"
         //+NPR5.53 [388697]-revoked
         //-NPR5.53 [388697]
         POSInfo.Get(pPOSInfoCode);
-        CheckAndAdjustApplicationScope(pSaleLinePos,POSInfo,pApplicScope);
+        CheckAndAdjustApplicationScope(pSaleLinePos, POSInfo, pApplicScope);
         if not pClearInfo then
-          ConfirmPOSInfoTransOverwrite(pSaleLinePos,POSInfo,pApplicScope);
-        
+            ConfirmPOSInfoTransOverwrite(pSaleLinePos, POSInfo, pApplicScope);
+
         POSInfoTransParam.Init;
         POSInfoTransParam.CopyFromPOSInfo(POSInfo);
         if not pClearInfo then begin
-          POSInfoTransParam."POS Info" := CopyStr(GetPosInfoOutput(POSInfo),1,MaxStrLen(POSInfoTransParam."POS Info"));
-          POSInfoTransParam.ShowMessage;
+            POSInfoTransParam."POS Info" := CopyStr(GetPosInfoOutput(POSInfo), 1, MaxStrLen(POSInfoTransParam."POS Info"));
+            POSInfoTransParam.ShowMessage;
         end;
-        
-        FrontEndUpdateIsNeeded := SaleLineApplyPOSInfo(pSaleLinePos,POSInfoTransParam,pApplicScope,pClearInfo);
+
+        FrontEndUpdateIsNeeded := SaleLineApplyPOSInfo(pSaleLinePos, POSInfoTransParam, pApplicScope, pClearInfo);
         //+NPR5.53 [388697]
-        
+
         if FrontEndUpdateIsNeeded then
-          CallFrontEndUpdate();
+            CallFrontEndUpdate();
 
     end;
 
-    local procedure CheckAndAdjustApplicationScope(pSaleLinePos: Record "Sale Line POS";POSInfo: Record "POS Info";var pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
+    local procedure CheckAndAdjustApplicationScope(pSaleLinePos: Record "Sale Line POS"; POSInfo: Record "POS Info"; var pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
     var
         SaleLinePos2: Record "Sale Line POS";
     begin
         //-NPR5.53 [388697]
         if pApplicScope = pApplicScope::"New Lines" then
-          POSInfo.TestField("Copy from Header",true);
+            POSInfo.TestField("Copy from Header", true);
 
-        SaleLinePos2.SetRange("Register No.",pSaleLinePos."Register No.");
-        SaleLinePos2.SetRange("Sales Ticket No.",pSaleLinePos."Sales Ticket No.");
-        SaleLinePos2.SetRange(Date,pSaleLinePos.Date);
-        SaleLinePos2.SetRange("Sale Type",pSaleLinePos."Sale Type");
-        if SaleLinePos2.IsEmpty and (pApplicScope in [pApplicScope::" ",pApplicScope::Ask]) then
-          pApplicScope := pApplicScope::"New Lines";
+        SaleLinePos2.SetRange("Register No.", pSaleLinePos."Register No.");
+        SaleLinePos2.SetRange("Sales Ticket No.", pSaleLinePos."Sales Ticket No.");
+        SaleLinePos2.SetRange(Date, pSaleLinePos.Date);
+        SaleLinePos2.SetRange("Sale Type", pSaleLinePos."Sale Type");
+        if SaleLinePos2.IsEmpty and (pApplicScope in [pApplicScope::" ", pApplicScope::Ask]) then
+            pApplicScope := pApplicScope::"New Lines";
         if pApplicScope = pApplicScope::" " then
-          pApplicScope := pApplicScope::"Current Line";
+            pApplicScope := pApplicScope::"Current Line";
 
         if pApplicScope = pApplicScope::Ask then
-          pApplicScope := StrMenu(DialogOptionsLbl,1,DialogInstructionsLbl);
+            pApplicScope := StrMenu(DialogOptionsLbl, 1, DialogInstructionsLbl);
         if not (pApplicScope in [pApplicScope::"Current Line" .. pApplicScope::"New Lines"]) then
-          Error('');
+            Error('');
         //+NPR5.53 [388697]
     end;
 
-    local procedure ConfirmPOSInfoTransOverwrite(pSaleLinePos: Record "Sale Line POS";POSInfo: Record "POS Info";pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
+    local procedure ConfirmPOSInfoTransOverwrite(pSaleLinePos: Record "Sale Line POS"; POSInfo: Record "POS Info"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
     var
         POSInfoTransaction: Record "POS Info Transaction";
         Confirmed: Boolean;
     begin
         //-NPR5.53 [388697]
-        SetPosInfoTransactionFilters(POSInfoTransaction,pSaleLinePos,POSInfo,pApplicScope);
+        SetPosInfoTransactionFilters(POSInfoTransaction, pSaleLinePos, POSInfo, pApplicScope);
         Confirmed := POSInfoTransaction.IsEmpty;
         if not Confirmed then
-          Confirmed := Confirm(StrSubstNo(ConfText001,POSInfo.Code),true);
+            Confirmed := Confirm(StrSubstNo(ConfText001, POSInfo.Code), true);
         if not Confirmed then
-          Error('');
+            Error('');
         //+NPR5.53 [388697]
     end;
 
-    local procedure SetPosInfoTransactionFilters(var POSInfoTransaction: Record "POS Info Transaction";pSaleLinePos: Record "Sale Line POS";POSInfo: Record "POS Info";pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
+    local procedure SetPosInfoTransactionFilters(var POSInfoTransaction: Record "POS Info Transaction"; pSaleLinePos: Record "Sale Line POS"; POSInfo: Record "POS Info"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask)
     begin
         //-NPR5.53 [388697]
-        POSInfoTransaction.SetRange("Register No.",pSaleLinePos."Register No.");
-        POSInfoTransaction.SetRange("Sales Ticket No.",pSaleLinePos."Sales Ticket No.");
+        POSInfoTransaction.SetRange("Register No.", pSaleLinePos."Register No.");
+        POSInfoTransaction.SetRange("Sales Ticket No.", pSaleLinePos."Sales Ticket No.");
         case true of
-          not POSInfo."Once per Transaction" and (pApplicScope = pApplicScope::"Current Line"):
-            POSInfoTransaction.SetRange("Sales Line No.",pSaleLinePos."Line No.");
-          pApplicScope = pApplicScope::"New Lines":
-            POSInfoTransaction.SetRange("Sales Line No.",0);
-          else
-            POSInfoTransaction.SetRange("Sales Line No.");
+            not POSInfo."Once per Transaction" and (pApplicScope = pApplicScope::"Current Line"):
+                POSInfoTransaction.SetRange("Sales Line No.", pSaleLinePos."Line No.");
+            pApplicScope = pApplicScope::"New Lines":
+                POSInfoTransaction.SetRange("Sales Line No.", 0);
+            else
+                POSInfoTransaction.SetRange("Sales Line No.");
         end;
-        POSInfoTransaction.SetRange("POS Info Code",POSInfo.Code);
+        POSInfoTransaction.SetRange("POS Info Code", POSInfo.Code);
         //+NPR5.53 [388697]
     end;
 
     local procedure GetPosInfoOutput(POSInfo: Record "POS Info") Info: Text
     var
         POSInfoLookupTable: Record "POS Info Lookup";
-        POSEventMarshaller: Codeunit "POS Event Marshaller";
+        //POSEventMarshaller: Codeunit "POS Event Marshaller";
         POSInfoLookupPage: Page "POS Info Lookup";
         RecRef: RecordRef;
         Cancelled: Boolean;
     begin
-        //-NPR5.53 [388697]
+        // TODO: Uses POS Event Marshaller, refactoring required!!!
+        Error('TODO: Uses POS Event Marshaller, refactoring required!!!');
+        /*
+        //-NPR5.53 [388697]        
         Info := '';
         case POSInfo.Type of
           POSInfo.Type::"Request Data":
@@ -607,9 +610,10 @@ codeunit 6150640 "POS Info Management"
             Info := POSInfo.Message;
         end;
         //+NPR5.53 [388697]
+        */
     end;
 
-    local procedure SaleLineApplyPOSInfo(pSaleLinePos: Record "Sale Line POS";POSInfoTransParam: Record "POS Info Transaction";pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask;pClearInfo: Boolean) FrontEndUpdateIsNeeded: Boolean
+    local procedure SaleLineApplyPOSInfo(pSaleLinePos: Record "Sale Line POS"; POSInfoTransParam: Record "POS Info Transaction"; pApplicScope: Option " ","Current Line","All Lines","New Lines",Ask; pClearInfo: Boolean) FrontEndUpdateIsNeeded: Boolean
     var
         POSInfo: Record "POS Info";
         POSInfoTransaction: Record "POS Info Transaction";
@@ -618,58 +622,59 @@ codeunit 6150640 "POS Info Management"
     begin
         //-NPR5.53 [388697]
         FrontEndUpdateIsNeeded := false;
-        if not POSInfoTransParam."Once per Transaction" and (pApplicScope in [pApplicScope::"Current Line",pApplicScope::"All Lines"]) then begin
-          SaleLinePos2.SetRange("Register No.",pSaleLinePos."Register No.");
-          SaleLinePos2.SetRange("Sales Ticket No.",pSaleLinePos."Sales Ticket No.");
-          SaleLinePos2.SetRange(Date,pSaleLinePos.Date);
-          SaleLinePos2.SetRange("Sale Type",pSaleLinePos."Sale Type");
-          if pApplicScope = pApplicScope::"Current Line" then
-            SaleLinePos2.SetRange("Line No.",pSaleLinePos."Line No.");
-          if SaleLinePos2.FindSet then
-            repeat
-              SaleLinePosTmp := SaleLinePos2;
-              SaleLinePosTmp.Insert;
-            until SaleLinePos2.Next = 0;
+        if not POSInfoTransParam."Once per Transaction" and (pApplicScope in [pApplicScope::"Current Line", pApplicScope::"All Lines"]) then begin
+            SaleLinePos2.SetRange("Register No.", pSaleLinePos."Register No.");
+            SaleLinePos2.SetRange("Sales Ticket No.", pSaleLinePos."Sales Ticket No.");
+            SaleLinePos2.SetRange(Date, pSaleLinePos.Date);
+            SaleLinePos2.SetRange("Sale Type", pSaleLinePos."Sale Type");
+            if pApplicScope = pApplicScope::"Current Line" then
+                SaleLinePos2.SetRange("Line No.", pSaleLinePos."Line No.");
+            if SaleLinePos2.FindSet then
+                repeat
+                    SaleLinePosTmp := SaleLinePos2;
+                    SaleLinePosTmp.Insert;
+                until SaleLinePos2.Next = 0;
         end;
-        if POSInfoTransParam."Once per Transaction" or (pApplicScope in [pApplicScope::"All Lines",pApplicScope::"New Lines"]) then begin
-          SaleLinePosTmp.Init;
-          SaleLinePosTmp."Register No." := pSaleLinePos."Register No.";
-          SaleLinePosTmp."Sales Ticket No." := pSaleLinePos."Sales Ticket No.";
-          SaleLinePosTmp.Date := pSaleLinePos.Date;
-          SaleLinePosTmp."Sale Type" := pSaleLinePos."Sale Type";
-          SaleLinePosTmp.Type := SaleLinePosTmp.Type::Item;
-          SaleLinePosTmp."Line No." := 0;
-          SaleLinePosTmp.Insert;
+        if POSInfoTransParam."Once per Transaction" or (pApplicScope in [pApplicScope::"All Lines", pApplicScope::"New Lines"]) then begin
+            SaleLinePosTmp.Init;
+            SaleLinePosTmp."Register No." := pSaleLinePos."Register No.";
+            SaleLinePosTmp."Sales Ticket No." := pSaleLinePos."Sales Ticket No.";
+            SaleLinePosTmp.Date := pSaleLinePos.Date;
+            SaleLinePosTmp."Sale Type" := pSaleLinePos."Sale Type";
+            SaleLinePosTmp.Type := SaleLinePosTmp.Type::Item;
+            SaleLinePosTmp."Line No." := 0;
+            SaleLinePosTmp.Insert;
         end;
         POSInfo.Get(POSInfoTransParam."POS Info Code");
-        SetPosInfoTransactionFilters(POSInfoTransaction,pSaleLinePos,POSInfo,pApplicScope);
+        SetPosInfoTransactionFilters(POSInfoTransaction, pSaleLinePos, POSInfo, pApplicScope);
         if SaleLinePosTmp.FindSet then
-          repeat
-            POSInfoTransaction.SetRange("Sales Line No.",SaleLinePosTmp."Line No.");
-            if POSInfoTransaction.FindFirst then begin
-              if pClearInfo then
-                POSInfoTransaction.Delete
-              else begin
-                POSInfoTransaction."POS Info" := POSInfoTransParam."POS Info";
-                POSInfoTransaction.Modify;
-              end;
-              FrontEndUpdateIsNeeded := true;
-            end else if not pClearInfo then begin
-              POSInfoTransaction.Init;
-              POSInfoTransaction."Register No." := SaleLinePosTmp."Register No.";
-              POSInfoTransaction."Sales Ticket No." := SaleLinePosTmp."Sales Ticket No.";
-              POSInfoTransaction."Sales Line No." := SaleLinePosTmp."Line No.";
-              POSInfoTransaction."Sale Date" := SaleLinePosTmp.Date;
-              POSInfoTransaction."Receipt Type" := SaleLinePosTmp.Type;
-              POSInfoTransaction."Entry No." := 0;
-              POSInfoTransaction."POS Info Code" := POSInfoTransParam."POS Info Code";
-              POSInfoTransaction."POS Info" := POSInfoTransParam."POS Info";
-              POSInfoTransaction."POS Info Type" := POSInfoTransParam."POS Info Type";
-              POSInfoTransaction."Once per Transaction" := POSInfoTransParam."Once per Transaction";
-              POSInfoTransaction.Insert(true);
-              FrontEndUpdateIsNeeded := true;
-            end;
-          until SaleLinePosTmp.Next = 0;
+            repeat
+                POSInfoTransaction.SetRange("Sales Line No.", SaleLinePosTmp."Line No.");
+                if POSInfoTransaction.FindFirst then begin
+                    if pClearInfo then
+                        POSInfoTransaction.Delete
+                    else begin
+                        POSInfoTransaction."POS Info" := POSInfoTransParam."POS Info";
+                        POSInfoTransaction.Modify;
+                    end;
+                    FrontEndUpdateIsNeeded := true;
+                end else
+                    if not pClearInfo then begin
+                        POSInfoTransaction.Init;
+                        POSInfoTransaction."Register No." := SaleLinePosTmp."Register No.";
+                        POSInfoTransaction."Sales Ticket No." := SaleLinePosTmp."Sales Ticket No.";
+                        POSInfoTransaction."Sales Line No." := SaleLinePosTmp."Line No.";
+                        POSInfoTransaction."Sale Date" := SaleLinePosTmp.Date;
+                        POSInfoTransaction."Receipt Type" := SaleLinePosTmp.Type;
+                        POSInfoTransaction."Entry No." := 0;
+                        POSInfoTransaction."POS Info Code" := POSInfoTransParam."POS Info Code";
+                        POSInfoTransaction."POS Info" := POSInfoTransParam."POS Info";
+                        POSInfoTransaction."POS Info Type" := POSInfoTransParam."POS Info Type";
+                        POSInfoTransaction."Once per Transaction" := POSInfoTransParam."Once per Transaction";
+                        POSInfoTransaction.Insert(true);
+                        FrontEndUpdateIsNeeded := true;
+                    end;
+            until SaleLinePosTmp.Next = 0;
         //+NPR5.53 [388697]
     end;
 
@@ -872,7 +877,7 @@ codeunit 6150640 "POS Info Management"
         end;
     end;
 
-    procedure CopyPOSInfoTransFromHeader(SaleLinePos: Record "Sale Line POS";var POSInfoTransaction: Record "POS Info Transaction"): Boolean
+    procedure CopyPOSInfoTransFromHeader(SaleLinePos: Record "Sale Line POS"; var POSInfoTransaction: Record "POS Info Transaction"): Boolean
     var
         POSInfo: Record "POS Info";
         POSInfoTransaction_Hdr: Record "POS Info Transaction";
@@ -881,40 +886,40 @@ codeunit 6150640 "POS Info Management"
         if not (SaleLinePos.Type in [SaleLinePos.Type::Item, SaleLinePos.Type::"Item Group", SaleLinePos.Type::"G/L Entry"]) or
           (SaleLinePos."Sale Type" = SaleLinePos."Sale Type"::Comment)
         then
-          exit(false);
+            exit(false);
 
         POSInfoTransaction_Hdr.SetRange("Register No.", SaleLinePos."Register No.");
         POSInfoTransaction_Hdr.SetRange("Sales Ticket No.", SaleLinePos."Sales Ticket No.");
         POSInfoTransaction_Hdr.SetRange("Sales Line No.", 0);
         POSInfoTransaction_Hdr.SetFilter("POS Info Code", '<>%1', '');
         if not POSInfoTransaction_Hdr.FindSet then
-          exit(false);
+            exit(false);
 
         Updated := false;
         repeat
-          POSInfo.Get(POSInfoTransaction_Hdr."POS Info Code");
-          if not POSInfo."Once per Transaction" and POSInfo."Copy from Header" then begin
-            SaleLinePos.TestField("Line No.");  //Ensure line has been already inserted
-            POSInfoTransaction.Reset;
-            POSInfoTransaction.SetRange("Register No.",SaleLinePos."Register No.");
-            POSInfoTransaction.SetRange("Sales Ticket No.",SaleLinePos."Sales Ticket No.");
-            POSInfoTransaction.SetRange("Sales Line No.",SaleLinePos."Line No.");
-            POSInfoTransaction.SetRange("POS Info Code",POSInfoTransaction_Hdr."POS Info Code");
-            if POSInfoTransaction.IsEmpty then begin
-              POSInfoTransaction.Init;
-              POSInfoTransaction."Register No." := SaleLinePos."Register No.";
-              POSInfoTransaction."Sales Ticket No." := SaleLinePos."Sales Ticket No.";
-              POSInfoTransaction."Sales Line No." := SaleLinePos."Line No.";
-              POSInfoTransaction."Sale Date" := SaleLinePos.Date;
-              POSInfoTransaction."Receipt Type" := SaleLinePos.Type;
-              POSInfoTransaction."Entry No." := 0;
-              POSInfoTransaction."POS Info Code" := POSInfoTransaction_Hdr."POS Info Code";
-              POSInfoTransaction."POS Info" := POSInfoTransaction_Hdr."POS Info";
-              POSInfoTransaction.Insert(true);
-              if not Updated then
-                Updated := true;
+            POSInfo.Get(POSInfoTransaction_Hdr."POS Info Code");
+            if not POSInfo."Once per Transaction" and POSInfo."Copy from Header" then begin
+                SaleLinePos.TestField("Line No.");  //Ensure line has been already inserted
+                POSInfoTransaction.Reset;
+                POSInfoTransaction.SetRange("Register No.", SaleLinePos."Register No.");
+                POSInfoTransaction.SetRange("Sales Ticket No.", SaleLinePos."Sales Ticket No.");
+                POSInfoTransaction.SetRange("Sales Line No.", SaleLinePos."Line No.");
+                POSInfoTransaction.SetRange("POS Info Code", POSInfoTransaction_Hdr."POS Info Code");
+                if POSInfoTransaction.IsEmpty then begin
+                    POSInfoTransaction.Init;
+                    POSInfoTransaction."Register No." := SaleLinePos."Register No.";
+                    POSInfoTransaction."Sales Ticket No." := SaleLinePos."Sales Ticket No.";
+                    POSInfoTransaction."Sales Line No." := SaleLinePos."Line No.";
+                    POSInfoTransaction."Sale Date" := SaleLinePos.Date;
+                    POSInfoTransaction."Receipt Type" := SaleLinePos.Type;
+                    POSInfoTransaction."Entry No." := 0;
+                    POSInfoTransaction."POS Info Code" := POSInfoTransaction_Hdr."POS Info Code";
+                    POSInfoTransaction."POS Info" := POSInfoTransaction_Hdr."POS Info";
+                    POSInfoTransaction.Insert(true);
+                    if not Updated then
+                        Updated := true;
+                end;
             end;
-          end;
         until POSInfoTransaction_Hdr.Next = 0;
         POSInfoTransaction.Reset;
         exit(Updated);
@@ -930,10 +935,10 @@ codeunit 6150640 "POS Info Management"
         FilterPOSInfoTrans(POSInfoTransaction, '', SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.");
         Found := false;
         if POSInfoTransaction.FindSet then
-          repeat
-            if POSInfo.Get(POSInfoTransaction."POS Info Code") then
-              Found := POSInfo."Set POS Sale Line Color to Red";
-          until (POSInfoTransaction.Next = 0) or Found;
+            repeat
+                if POSInfo.Get(POSInfoTransaction."POS Info Code") then
+                    Found := POSInfo."Set POS Sale Line Color to Red";
+            until (POSInfoTransaction.Next = 0) or Found;
         if Found then
             Color := 'red';
         POSSession.RequestRefreshData();
@@ -965,7 +970,7 @@ codeunit 6150640 "POS Info Management"
 
     local procedure DataSoucePOSInfoColumnName(POSInfoCode: Code[20]): Text
     begin
-        exit(StrSubstNo('%1',POSInfoCode));
+        exit(StrSubstNo('%1', POSInfoCode));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', false, false)]
@@ -975,9 +980,9 @@ codeunit 6150640 "POS Info Management"
     begin
         if ThisDataSource <> DataSourceName then
             exit;
-        POSInfo.SetRange("Available in Front-End",true);
+        POSInfo.SetRange("Available in Front-End", true);
         if POSInfo.IsEmpty then
-          exit;
+            exit;
 
         Extensions.Add(ThisExtension);
     end;
@@ -1025,8 +1030,8 @@ codeunit 6150640 "POS Info Management"
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         if SaleLinePOS."Line No." = 0 then begin  //new sale
-          SaleLinePOS."Register No." := SalePOS."Register No.";
-          SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
+            SaleLinePOS."Register No." := SalePOS."Register No.";
+            SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
         end;
 
         repeat
@@ -1046,11 +1051,11 @@ codeunit 6150640 "POS Info Management"
         POSSession: Codeunit "POS Session";
     begin
         if POSSession.IsActiveSession(POSFrontEndManagement) then begin
-          POSFrontEndManagement.GetSession(POSSession);
-          POSSession.GetSale(POSSale);
-          //POSSale.Modify(TRUE,TRUE);  //NPR5.53 [388697]-revoked
-          POSSale.SetModified;  //NPR5.53 [388697]
-          POSSession.RequestRefreshData();
+            POSFrontEndManagement.GetSession(POSSession);
+            POSSession.GetSale(POSSale);
+            //POSSale.Modify(TRUE,TRUE);  //NPR5.53 [388697]-revoked
+            POSSale.SetModified;  //NPR5.53 [388697]
+            POSSession.RequestRefreshData();
         end;
     end;
 }
