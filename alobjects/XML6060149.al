@@ -1,7 +1,9 @@
 xmlport 6060149 "MM Get Loyalty Receipt List"
 {
     // MM1.40/TSA /20190828 CASE 365879 Initial Version
+    // MM1.42/TSA /20191106 CASE 365879 Added storeaddress and currencycode
 
+    Caption = 'Get Loyalty Receipt List';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
 
@@ -132,8 +134,47 @@ xmlport 6060149 "MM Get Loyalty Receipt List"
                             fieldattribute(entryno;tmpPosEntryResponse."Entry No.")
                             {
                             }
-                            fieldelement(storecode;tmpPosEntryResponse."POS Store Code")
+                            tableelement(posstore;"POS Store")
                             {
+                                LinkFields = Code=FIELD("POS Store Code");
+                                LinkTable = tmpPosEntryResponse;
+                                XmlName = 'storeaddress';
+                                fieldattribute(storecode;tmpPosEntryResponse."POS Store Code")
+                                {
+                                }
+                                fieldelement(name;PosStore.Name)
+                                {
+                                }
+                                fieldelement(name2;PosStore."Name 2")
+                                {
+                                }
+                                fieldelement(address;PosStore.Address)
+                                {
+                                }
+                                fieldelement(address2;PosStore."Address 2")
+                                {
+                                }
+                                fieldelement(postcode;PosStore."Post Code")
+                                {
+                                }
+                                fieldelement(city;PosStore.City)
+                                {
+                                }
+                                fieldelement(contact;PosStore.Contact)
+                                {
+                                }
+                                fieldelement(county;PosStore.County)
+                                {
+                                }
+                                fieldelement(country;PosStore."Country/Region Code")
+                                {
+                                }
+                                fieldelement(vatregistrationno;PosStore."VAT Registration No.")
+                                {
+                                }
+                                fieldelement(registrationno;PosStore."Registration No.")
+                                {
+                                }
                             }
                             fieldelement(posunit;tmpPosEntryResponse."POS Unit No.")
                             {
@@ -160,6 +201,9 @@ xmlport 6060149 "MM Get Loyalty Receipt List"
                             }
                             fieldelement(amountinclvat;tmpPosEntryResponse."Amount Incl. Tax")
                             {
+                                textattribute(currencycode)
+                                {
+                                }
                                 fieldattribute(vatamount;tmpPosEntryResponse."Tax Amount")
                                 {
                                 }
@@ -215,6 +259,7 @@ xmlport 6060149 "MM Get Loyalty Receipt List"
     var
         Membership: Record "MM Membership";
         POSEntry: Record "POS Entry";
+        GeneralLedgerSetup: Record "General Ledger Setup";
     begin
 
 
@@ -246,6 +291,11 @@ xmlport 6060149 "MM Get Loyalty Receipt List"
             until (POSEntry.Next () = 0);
           end;
         end;
+
+        //-MM1.42 [365879]
+        GeneralLedgerSetup.Get ();
+        currencycode := GeneralLedgerSetup."LCY Code";
+        //+MM1.42 [365879]
     end;
 
     procedure AddErrorResponse(ErrorMessage: Text)

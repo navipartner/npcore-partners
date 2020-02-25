@@ -1,6 +1,7 @@
 codeunit 6151060 "NP GDPR Management"
 {
     // NPR5.52/ZESO/20190925 CASE 358656 Object Created
+    // NPR5.53/ZESO/20200115 CASE 358656 Reworked Codeunit to cater for new job parameters, check for ILES, remove customer no from email address
 
     Permissions = TableData "Sales Shipment Header"=rm,
                   TableData "Sales Invoice Header"=rm,
@@ -12,18 +13,57 @@ codeunit 6151060 "NP GDPR Management"
     var
         Customer: Record Customer;
         ReasonText: Text;
+        VarNoOfCustomers: Integer;
+        VarCount: Integer;
+        CustToAnonymise: Record "Customers to Anonymize";
+        GDPRSetup: Record "Customer GDPR SetUp";
     begin
-
         VarCheckPeriod := GetParameterBool('CHECK_PERIOD');
+        //-NPR5.53 [358656]
 
-        Customer.Reset;
-        Customer.SetRange(Customer.Anonymized,false);
-        if not VarCheckPeriod then
-          Customer.SetRange("To Anonymize",true);
-        if Customer.FindSet then
-          repeat
-            DoAnonymization(Customer."No.",ReasonText);
-          until Customer.Next =0;
+
+        //Customer.RESET;
+        //Customer.SETRANGE(Customer.Anonymized,FALSE);
+        //IF NOT VarCheckPeriod THEN
+          //Customer.SETRANGE("To Anonymize",TRUE);
+        //IF Customer.FINDSET THEN
+          //REPEAT
+            //DoAnonymization(Customer."No.",ReasonText);
+          //UNTIL Customer.NEXT =0;
+
+
+        VarNoOfCustomers := GetParameterInt('NO_OF_CUSTOMERS');
+
+        if GDPRSetup.Get then;
+
+
+        case VarCheckPeriod of
+          false:
+            begin
+              Customer.Reset;
+              Customer.SetRange(Customer.Anonymized,false);
+              Customer.SetRange(Customer."To Anonymize On",Today);
+              if Customer.FindSet then
+                repeat
+                  DoAnonymization(Customer."No.",ReasonText);
+                until Customer.Next =0;
+            end;
+
+         true:
+            begin
+              PopulateCustToAnonymise;
+              CustToAnonymise.Reset;
+              if CustToAnonymise.FindSet then
+                repeat
+                  DoAnonymization(CustToAnonymise."Customer No",ReasonText);
+                  CustToAnonymise.Delete;
+                  VarCount += 1;
+                until (CustToAnonymise.Next =0) or (VarCount = VarNoOfCustomers);
+            end;
+        end;
+
+
+        //+NPR5.53 [358656]
     end;
 
     var
@@ -49,6 +89,7 @@ codeunit 6151060 "NP GDPR Management"
         MemberFound: Boolean;
         Membership: Record "MM Membership";
         UserSetup: Record "User Setup";
+        ILE: Record "Item Ledger Entry";
     begin
         if UserSetup.Get(UserId) then
           if not UserSetup."Anonymize Customers" then
@@ -82,6 +123,20 @@ codeunit 6151060 "NP GDPR Management"
           CLE.SetFilter("Posting Date",'>%1',CalcDate(VarPeriod,Today));
           if CLE.FindFirst then
             TransactionFound := true;
+
+          //-NPR5.53 [358656]
+          if TransactionFound = false then begin
+            ILE.Reset;
+            ILE.SetCurrentKey("Source Type","Source No.","Item No.","Variant Code","Posting Date");
+            ILE.SetRange(ILE."Source Type",ILE."Source Type"::Customer);
+            ILE.SetRange(ILE."Source No.",CustNo);
+            ILE.SetFilter("Posting Date",'>%1',CalcDate(VarPeriod,Today));
+            if ILE.FindFirst then
+              TransactionFound := true;
+          end;
+          //+NPR5.53 [358656]
+
+
         end;
 
         CLE.SetCurrentKey("Customer No.",Open,Positive,"Due Date","Currency Code");
@@ -89,6 +144,20 @@ codeunit 6151060 "NP GDPR Management"
         CLE.SetRange(Open,true);
         if CLE.FindFirst then
           OpenTransactionFound := true;
+
+        //-NPR5.53 [358656]
+        if not OpenTransactionFound  then begin
+            ILE.Reset;
+            ILE.SetCurrentKey("Source Type","Source No.","Item No.","Variant Code","Posting Date");
+            ILE.SetRange(ILE."Source Type",ILE."Source Type"::Customer);
+            ILE.SetRange(ILE."Source No.",CustNo);
+            ILE.SetRange(Open,true);
+            if ILE.FindFirst then
+              OpenTransactionFound := true;
+        end;
+        //+NPR5.53 [358656]
+
+
 
         Membership.SetRange("Customer No.",CustNo);
         if Membership.FindFirst then
@@ -132,7 +201,10 @@ codeunit 6151060 "NP GDPR Management"
         Customer.GLN := '';
         Customer."Post Code" := '';
         Customer."Country/Region Code" := '';
-        Customer."E-Mail" := StrSubstNo ('anonymous%1@nowhere.com', CustNo);
+        //-NPR5.53 [358656]
+        //Customer."E-Mail" := STRSUBSTNO ('anonymous%1@nowhere.com', CustNo);
+        Customer."E-Mail" := '------@----';
+        //+NPR5.53 [358656]
         Customer."Home Page" := 'nowhere.com';
         Customer.Anonymized := true;
         Customer."Anonymized Date" := CurrentDateTime;
@@ -173,7 +245,10 @@ codeunit 6151060 "NP GDPR Management"
           Clear(Contact.Picture);
           Contact."Post Code" := '';
           Contact."Country/Region Code" := '';
-          Contact."E-Mail" := StrSubstNo ('anonymous%1@nowhere.com', Contact."No.");
+          //-NPR5.53 [358656]
+          //Contact."E-Mail" := STRSUBSTNO ('anonymous%1@nowhere.com', Contact."No.");
+          Contact."E-Mail" := '------@----';
+          //-NPR5.53 [358656]
           Contact."Home Page" := 'www.nowhere.com';
           Contact."First Name" := '------';
           Contact."Middle Name" := '------';
@@ -181,7 +256,10 @@ codeunit 6151060 "NP GDPR Management"
           Contact."Job Title" := '------';
           Contact.Initials := '------';
           Contact."Mobile Phone No." := '';
-          Contact."Search E-Mail" := StrSubstNo ('anonymous%1@nowhere.com', Contact."No.");
+          //-NPR5.53 [358656]
+          //Contact."Search E-Mail" := STRSUBSTNO ('anonymous%1@nowhere.com', Contact."No.");
+          Contact."Search E-Mail" := '------@----';
+          //+NPR5.53 [358656]
           Contact."Company Name":= '------';
           Contact.Pager := '';
           Contact."Magento Contact" := false;
@@ -214,7 +292,10 @@ codeunit 6151060 "NP GDPR Management"
             Clear(Contact.Picture);
             Contact."Post Code" := '';
             Contact."Country/Region Code" := '';
-            Contact."E-Mail" := StrSubstNo ('anonymous%1@nowhere.com', Contact."No.");
+            //-NPR5.53 [358656]
+            //Contact."E-Mail" := STRSUBSTNO ('anonymous%1@nowhere.com', Contact."No.");
+            Contact."E-Mail" := '------@----';
+            //-NPR5.53 [358656]
             Contact."Home Page" := 'www.nowhere.com';
             Contact."First Name" := '------';
             Contact."Middle Name" := '------';
@@ -222,7 +303,10 @@ codeunit 6151060 "NP GDPR Management"
             Contact."Job Title" := '------';
             Contact.Initials := '------';
             Contact."Mobile Phone No." := '';
-            Contact."Search E-Mail" := StrSubstNo ('anonymous%1@nowhere.com', Contact."No.");
+            //-NPR5.53 [358656]
+            //Contact."Search E-Mail" := STRSUBSTNO ('anonymous%1@nowhere.com', Contact."No.");
+            Contact."Search E-Mail" := '------@----';
+            //+NPR5.53 [358656]
             Contact."Company Name":= '------';
             Contact.Pager := '';
             Contact."Magento Contact" := false;
@@ -271,7 +355,10 @@ codeunit 6151060 "NP GDPR Management"
             SalesInvHdr."Bill-to Post Code" := '';
             SalesInvHdr."Bill-to County" := '';
             SalesInvHdr."Bill-to Country/Region Code" := '';
-            SalesInvHdr."Bill-to E-mail" := StrSubstNo ('anonymous%1@nowhere.com', VarCustNo);
+            //-NPR5.53 [358656]
+            //SalesInvHdr."Bill-to E-mail" := STRSUBSTNO ('anonymous%1@nowhere.com', VarCustNo);
+            SalesInvHdr."Bill-to E-mail" := '------@----';
+            //+NPR5.53 [358656]
             SalesInvHdr."Sell-to Post Code":= '';
             SalesInvHdr."Sell-to County" := '';
             SalesInvHdr."Sell-to Country/Region Code" := '';
@@ -320,7 +407,10 @@ codeunit 6151060 "NP GDPR Management"
             SalesCrMemoHdr."Bill-to Post Code" := '';
             SalesCrMemoHdr."Bill-to County" := '';
             SalesCrMemoHdr."Bill-to Country/Region Code" := '';
-            SalesCrMemoHdr."Bill-to E-mail" := StrSubstNo ('anonymous%1@nowhere.com', VarCustNo);
+            //-NPR5.53 [358656]
+            //SalesCrMemoHdr."Bill-to E-mail" := STRSUBSTNO ('anonymous%1@nowhere.com', VarCustNo);
+            SalesCrMemoHdr."Bill-to E-mail" := '------@----';
+            //+NPR5.53 [358656]
             SalesCrMemoHdr."Sell-to Post Code":= '';
             SalesCrMemoHdr."Sell-to County" := '';
             SalesCrMemoHdr."Sell-to Country/Region Code" := '';
@@ -441,7 +531,10 @@ codeunit 6151060 "NP GDPR Management"
             SalesShipmentHdr."Sell-to Post Code":= '';
             SalesShipmentHdr."Sell-to County" := '';
             SalesShipmentHdr."Sell-to Country/Region Code" := '';
-            SalesShipmentHdr."Bill-to E-mail" := StrSubstNo ('anonymous%1@nowhere.com', VarCustNo);
+            //-NPR5.53 [358656]
+            //SalesShipmentHdr."Bill-to E-mail" := STRSUBSTNO ('anonymous%1@nowhere.com', VarCustNo);
+            SalesShipmentHdr."Bill-to E-mail" := '------@----';
+            //+NPR5.53 [358656]
             SalesShipmentHdr.Modify(true);
           until SalesShipmentHdr.Next =0;
     end;
@@ -508,17 +601,88 @@ codeunit 6151060 "NP GDPR Management"
             Job."Bill-to Contact" := '------';
             Job."Bill-to Country/Region Code" := '';
             Job."Bill-to County" := '';
-            Job."Bill-to E-Mail" := StrSubstNo ('anonymous%1@nowhere.com', VarCustNo);
+            //-NPR5.53 [358656]
+            //Job."Bill-to E-Mail" := STRSUBSTNO ('anonymous%1@nowhere.com', VarCustNo);
+            Job."Bill-to E-Mail" := '------@----';
+            //+NPR5.53 [358656]
             Job."Bill-to Name" := '------';
             Job."Bill-to Name 2" := '------';
             Job."Bill-to Post Code" := '';
-            Job."Organizer E-Mail" := StrSubstNo ('anonymous%1@nowhere.com', VarCustNo);
+            //-NPR5.53 [358656]
+            //Job."Organizer E-Mail" := STRSUBSTNO ('anonymous%1@nowhere.com', VarCustNo);
+            Job."Organizer E-Mail" := '------@----';
+            //+NPR5.53 [358656]
             Job."Person Responsible Name" := '------';
             Job."Person Responsible" := '------';
             Job.Modify(true);
 
 
           until Job.Next =0;
+    end;
+
+    local procedure PopulateCustToAnonymise()
+    var
+        GDPRSetup: Record "Customer GDPR SetUp";
+        DateFormulaTxt: Text[250];
+        VarPeriod: DateFormula;
+        VarEntryNo: Integer;
+        Window: Dialog;
+        Customer: Record Customer;
+        CLE: Record "Cust. Ledger Entry";
+        CustToAnonymize: Record "Customers to Anonymize";
+        ILE: Record "Item Ledger Entry";
+        NoCLE: Boolean;
+        NoILE: Boolean;
+        VarDateToUse: Date;
+    begin
+        //-NPR5.53 [358656]
+        CustToAnonymize.Reset;
+        CustToAnonymize.DeleteAll;
+
+
+        if GDPRSetup.Get then;
+
+        DateFormulaTxt := '-' + Format(GDPRSetup."Anonymize After");
+        Evaluate(VarPeriod,DateFormulaTxt);
+
+
+        VarEntryNo := 0;
+        Customer.Reset;
+        Customer.SetRange(Customer.Anonymized,false);
+        Customer.SetFilter(Customer."Customer Posting Group",GDPRSetup."Customer Posting Group Filter");
+        Customer.SetFilter(Customer."Gen. Bus. Posting Group",GDPRSetup."Gen. Bus. Posting Group Filter");
+        if Customer.FindSet then
+          repeat
+            if (Today - Customer."Last Date Modified") >= (Today - CalcDate(VarPeriod,Today)) then begin
+              NoCLE := false;
+              NoILE := false;
+              CLE.Reset;
+              CLE.SetCurrentKey("Customer No.","Posting Date","Currency Code");
+              CLE.SetRange("Customer No.",Customer."No.");
+              CLE.SetFilter("Posting Date",'>%1',CalcDate(VarPeriod,Today));
+              if not CLE.FindFirst then
+                NoCLE := true;
+
+              ILE.Reset;
+              ILE.SetCurrentKey("Source Type","Source No.","Item No.","Variant Code","Posting Date");
+              ILE.SetRange(ILE."Source Type",ILE."Source Type"::Customer);
+              ILE.SetRange(ILE."Source No.",Customer."No.");
+              ILE.SetFilter("Posting Date",'>%1',CalcDate(VarPeriod,Today));
+              if not ILE.FindFirst then
+                NoILE := true;
+
+
+              if NoILE and NoCLE then begin
+                CustToAnonymize.Init;
+                CustToAnonymize."Entry No" := VarEntryNo;
+                CustToAnonymize."Customer No" := Customer."No.";
+                CustToAnonymize."Customer Name" := Customer.Name;
+                CustToAnonymize.Insert;
+                VarEntryNo += 1;
+              end;
+            end;
+          until Customer.Next =0;
+        //+NPR5.53 [358656]
     end;
 }
 

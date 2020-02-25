@@ -7,6 +7,8 @@ page 6150900 "HC Audit Roll"
     // NPR5.48/TJ  /20181115 CASE 331992 Added dimension fields
     // NPR5.48/TJ  /20190129 CASE 340446 Changes for version 2018 - removed actions POS Info and Show Period
     // NPR5.51/TJ  /20190123 CASE 343685 Fixed double posting doc. no. generation for same ticket
+    // NPR5.53/TJ  /20191114 CASE 377556 Actions "Show Documents" and Navigate are now hidden
+    //                                   New action "Show Documents Custom"
 
     Caption = 'HC Audit Roll';
     Editable = false;
@@ -363,6 +365,7 @@ page 6150900 "HC Audit Roll"
                 {
                     Caption = 'Show Documents';
                     Image = "Action";
+                    Visible = false;
 
                     trigger OnAction()
                     var
@@ -404,6 +407,7 @@ page 6150900 "HC Audit Roll"
                 {
                     Caption = 'Naviger';
                     Image = Navigate;
+                    Visible = false;
 
                     trigger OnAction()
                     var
@@ -412,6 +416,11 @@ page 6150900 "HC Audit Roll"
                         Naviger.SetDoc("Sale Date","Posted Doc. No.");
                         Naviger.Run;
                     end;
+                }
+                action(ShowDocumentsCustom)
+                {
+                    Caption = 'Show Documents Custom';
+                    Image = ShowList;
                 }
                 separator(Separator6150674)
                 {

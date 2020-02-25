@@ -21,6 +21,8 @@ codeunit 6014426 "Std. Table Code"
     // NPR5.43/JKL /20180531 CASE 317359 Added function to automatically apply item group master template if defined.
     // NPR5.48/BHR /20190108 CASE 334217 Validate "Inventory Posting Group" only wheb type <> service on Item group
     // NPR5.50/RA  /20190403 CASE 350418 NPR5.48 is giving problems for "Politikens Boghal"
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
+    // NPR5.53/ALPO/20191210 CASE 380609 Dimensions: NPRE Seating integration
 
 
     trigger OnRun()
@@ -225,8 +227,10 @@ codeunit 6014426 "Std. Table Code"
     begin
         case "Table ID" of
           //+NPR7.000.000
-          DATABASE::Register :
-            UpdateRegisterGlobalDimCode(GlobalDimCodeNo,"No.",NewDimValue);
+          //-NPR5.53 [371956]-revoked
+          //DATABASE::Register :
+          //  UpdateRegisterGlobalDimCode(GlobalDimCodeNo,"No.",NewDimValue);
+          //+NPR5.53 [371956]-revoked
           DATABASE::"Payment Type POS" :
             UpdatePaymentTypePOSGlobalDimCode(GlobalDimCodeNo,"No.",NewDimValue);
           DATABASE::"Item Group" :
@@ -238,6 +242,16 @@ codeunit 6014426 "Std. Table Code"
           DATABASE::"Quantity Discount Header" :
             UpdateQuantityDiscountGlobalDimCode(GlobalDimCodeNo,"No.",NewDimValue);
           //-NPR7.000.000
+          //-NPR5.53 [371956]
+          DATABASE::"POS Store":
+            UpdatePOSStoreGlobalDimCode(GlobalDimCodeNo,"No.",NewDimValue);
+          DATABASE::"POS Unit":
+            UpdatePOSUnitGlobalDimCode(GlobalDimCodeNo,"No.",NewDimValue);
+          //+NPR5.53 [371956]
+          //-NPR5.53 [380609]
+          DATABASE::"NPRE Seating":
+            UpdateNPRESeatingGlobalDimCode(GlobalDimCodeNo,"No.",NewDimValue);
+          //+NPR5.53 [380609]
         end;
     end;
 
@@ -245,6 +259,7 @@ codeunit 6014426 "Std. Table Code"
     var
         Register: Record Register;
     begin
+        exit;  //NPR5.53 [371956]
         if Register.Get(RegisterNo) then begin
           case GlobalDimCodeNo of
             1:
@@ -329,6 +344,76 @@ codeunit 6014426 "Std. Table Code"
           end;
           QuantityDiscount.Modify(true);
         end;
+    end;
+
+    local procedure UpdatePOSStoreGlobalDimCode(GlobalDimCodeNo: Integer;POSStoreCode: Code[20];NewDimValue: Code[20])
+    var
+        POSStore: Record "POS Store";
+    begin
+        //-NPR5.53 [371956]
+        if POSStore.Get(POSStoreCode) then begin
+          case GlobalDimCodeNo of
+            1:
+              POSStore."Global Dimension 1 Code" := NewDimValue;
+            2:
+              POSStore."Global Dimension 2 Code" := NewDimValue;
+          end;
+          POSStore.Modify(true);
+        end;
+        //+NPR5.53 [371956]
+    end;
+
+    local procedure UpdatePOSUnitGlobalDimCode(GlobalDimCodeNo: Integer;POSUnitNo: Code[20];NewDimValue: Code[20])
+    var
+        POSUnit: Record "POS Unit";
+    begin
+        //-NPR5.53 [371956]
+        if POSUnit.Get(POSUnitNo) then begin
+          case GlobalDimCodeNo of
+            1:
+              POSUnit."Global Dimension 1 Code" := NewDimValue;
+            2:
+              POSUnit."Global Dimension 2 Code" := NewDimValue;
+          end;
+          POSUnit.Modify(true);
+        end;
+        //+NPR5.53 [371956]
+    end;
+
+    [EventSubscriber(ObjectType::Table, 6150615, 'OnAfterModifyEvent', '', true, false)]
+    local procedure UpdateCashRegGlobalDimsOnPOSUnitGlobalDimChange(var Rec: Record "POS Unit";var xRec: Record "POS Unit";RunTrigger: Boolean)
+    var
+        CashRegister: Record Register;
+    begin
+        //-NPR5.53 [371956]
+        with Rec do
+          if ("Global Dimension 1 Code" <> xRec."Global Dimension 1 Code") or
+             ("Global Dimension 2 Code" <> xRec."Global Dimension 2 Code")
+          then begin
+            CashRegister.Get("No.");
+            CashRegister."Global Dimension 1 Code" := "Global Dimension 1 Code";
+            CashRegister."Global Dimension 2 Code" := "Global Dimension 2 Code";
+            CashRegister.Modify;
+          end;
+        //+NPR5.53 [371956]
+    end;
+
+    local procedure UpdateNPRESeatingGlobalDimCode(GlobalDimCodeNo: Integer;SeatingCode: Code[20];NewDimValue: Code[20])
+    var
+        NPRESeating: Record "NPRE Seating";
+    begin
+        //-NPR5.53 [380609]
+        SeatingCode := CopyStr(SeatingCode,1,MaxStrLen(NPRESeating.Code));
+        if NPRESeating.Get(SeatingCode) then begin
+          case GlobalDimCodeNo of
+            1:
+              NPRESeating."Global Dimension 1 Code" := NewDimValue;
+            2:
+              NPRESeating."Global Dimension 2 Code" := NewDimValue;
+          end;
+          NPRESeating.Modify(true);
+        end;
+        //+NPR5.53 [380609]
     end;
 }
 

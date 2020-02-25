@@ -6,6 +6,8 @@ xmlport 6060113 "TM Admission Capacity Check"
     // TM1.39/NPKNAV/20190125  CASE 343941 Transport TM1.39 - 25 January 2019
     // TM1.41/TSA /20190411 CASE 351846 Fixed the "event arrival from time" bug
     // TM1.41/TSA/20190527  CASE 353981 Transport TM1.41 - 27 May 2019
+    // TM1.45/TSA /20191121 CASE 378339 Added Sales and Event Arrival cut-off dates and times
+    // TM1.45/TSA /20191210 CASE 380754 Added filter by admission code to get the current schedules and added some for data to response, including waitinglist info
 
     Caption = 'TM Admission Capacity Check';
     Encoding = UTF8;
@@ -23,8 +25,13 @@ xmlport 6060113 "TM Admission Capacity Check"
                 {
                     XmlName = 'admission_schedule_entry';
                     UseTemporary = true;
+                    fieldattribute(admission_code;TmpAdmScheduleEntryRequest."Admission Code")
+                    {
+                        Occurrence = Optional;
+                    }
                     fieldattribute(external_entry_no;TmpAdmScheduleEntryRequest."External Schedule Entry No.")
                     {
+                        Occurrence = Optional;
                     }
 
                     trigger OnBeforeInsertRecord()
@@ -45,6 +52,12 @@ xmlport 6060113 "TM Admission Capacity Check"
                     fieldattribute(external_entry_no;TmpAdmScheduleEntryResponse."External Schedule Entry No.")
                     {
                     }
+                    fieldattribute(start_date;TmpAdmScheduleEntryResponse."Admission Start Date")
+                    {
+                    }
+                    fieldattribute(start_time;TmpAdmScheduleEntryResponse."Admission Start Time")
+                    {
+                    }
                     textattribute(responsestatus)
                     {
                         XmlName = 'status';
@@ -52,6 +65,19 @@ xmlport 6060113 "TM Admission Capacity Check"
                         trigger OnBeforePassVariable()
                         begin
                             ResponseStatus := Format((CapacityStatusCode = 1), 0, 9);
+                        end;
+                    }
+                    textattribute(allocationby)
+                    {
+                        XmlName = 'allocation_by';
+
+                        trigger OnBeforePassVariable()
+                        begin
+
+                            case TmpAdmScheduleEntryResponse."Allocation By" of
+                              TmpAdmScheduleEntryResponse."Allocation By"::CAPACITY    : AllocationBy := 'capacity';
+                              TmpAdmScheduleEntryResponse."Allocation By"::WAITINGLIST : AllocationBy := 'waitinglist';
+                            end;
                         end;
                     }
                     textattribute(responseremaining)
@@ -96,6 +122,24 @@ xmlport 6060113 "TM Admission Capacity Check"
                     textattribute(includesvat)
                     {
                         XmlName = 'includes_vat';
+                    }
+                    fieldattribute(event_arrival_from_time;TmpAdmScheduleEntryResponse."Event Arrival From Time")
+                    {
+                    }
+                    fieldattribute(event_arrival_until_time;TmpAdmScheduleEntryResponse."Event Arrival Until Time")
+                    {
+                    }
+                    fieldattribute(sales_from_date;TmpAdmScheduleEntryResponse."Sales From Date")
+                    {
+                    }
+                    fieldattribute(sales_from_time;TmpAdmScheduleEntryResponse."Sales From Time")
+                    {
+                    }
+                    fieldattribute(sales_until_date;TmpAdmScheduleEntryResponse."Sales Until Date")
+                    {
+                    }
+                    fieldattribute(sales_until_time;TmpAdmScheduleEntryResponse."Sales Until Time")
+                    {
                     }
 
                     trigger OnAfterGetRecord()
@@ -150,6 +194,15 @@ xmlport 6060113 "TM Admission Capacity Check"
                                   RemainingCapacity := MaxCapacity - "Initial Entry";
                                   SetCapacityStatusCode ();
                                 end;
+
+                              //-TM1.45 [378339]
+                              Admission."Capacity Control"::SEATING :
+                                begin
+                                  RemainingCapacity := MaxCapacity - "Open Admitted" - "Open Reservations";
+                                  SetCapacityStatusCode ();
+                                end;
+                              //+TM1.45 [378339]
+
                             end;
                             //-TM1.37 [327324]
                             //    IF ("Admission Start Date" = TODAY) THEN BEGIN
@@ -253,7 +306,9 @@ xmlport 6060113 "TM Admission Capacity Check"
         repeat
           TmpAdmScheduleEntryResponse.TransferFields (TmpAdmScheduleEntryRequest, true);
           GetEntry (TmpAdmScheduleEntryResponse);
-          TmpAdmScheduleEntryResponse.Insert ();
+          //-TM1.45 [380754]
+          // TmpAdmScheduleEntryResponse.INSERT ();
+          //+TM1.45 [380754]
 
         until (TmpAdmScheduleEntryRequest.Next () = 0);
     end;
@@ -262,15 +317,41 @@ xmlport 6060113 "TM Admission Capacity Check"
     var
         AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
     begin
-        if (TmpAdmissionScheduleEntry."External Schedule Entry No." < 1) then
-          exit;
 
-        AdmissionScheduleEntry.SetFilter ("External Schedule Entry No.", '=%1', TmpAdmissionScheduleEntry."External Schedule Entry No.");
+        //-TM1.45 [380754]
+        // IF (TmpAdmissionScheduleEntry."External Schedule Entry No." < 1) THEN
+        //  EXIT;
+        //
+        // AdmissionScheduleEntry.SETFILTER ("External Schedule Entry No.", '=%1', TmpAdmissionScheduleEntry."External Schedule Entry No.");
+        // AdmissionScheduleEntry.SETFILTER (Cancelled, '=%1', FALSE);
+        // IF (NOT AdmissionScheduleEntry.FINDFIRST ()) THEN
+        //  EXIT;
+        //
+        // TmpAdmissionScheduleEntry.TRANSFERFIELDS (AdmissionScheduleEntry, TRUE);
+
+        if (TmpAdmissionScheduleEntry."Admission Code" = '') then begin
+          AdmissionScheduleEntry.SetFilter ("External Schedule Entry No.", '=%1', TmpAdmissionScheduleEntry."External Schedule Entry No.");
+          AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
+
+          TmpAdmissionScheduleEntry.Init;
+          if (AdmissionScheduleEntry.FindFirst ()) then
+            TmpAdmissionScheduleEntry.TransferFields (AdmissionScheduleEntry, true);
+
+          TmpAdmissionScheduleEntry.Insert ();
+          exit;
+        end;
+
+        AdmissionScheduleEntry.SetFilter ("Admission Code", TmpAdmissionScheduleEntry."Admission Code");
+        AdmissionScheduleEntry.SetFilter ("Admission Start Date", '>=%1', Today);
+        AdmissionScheduleEntry.SetFilter ("Visibility On Web", '=%1', AdmissionScheduleEntry."Visibility On Web"::VISIBLE);
         AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
-        if (not AdmissionScheduleEntry.FindFirst ()) then
-          exit;
-
-        TmpAdmissionScheduleEntry.TransferFields (AdmissionScheduleEntry, true);
+        if (AdmissionScheduleEntry.FindSet ()) then begin
+          repeat
+            TmpAdmissionScheduleEntry.TransferFields (AdmissionScheduleEntry, true);
+            TmpAdmissionScheduleEntry.Insert ();
+          until (AdmissionScheduleEntry.Next () = 0);
+        end;
+        //+TM1.45 [380754]
     end;
 
     local procedure SetCapacityStatusCode()

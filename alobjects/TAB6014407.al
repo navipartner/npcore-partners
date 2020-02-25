@@ -68,6 +68,7 @@ table 6014407 "Audit Roll"
     // NPR5.45/THRO/20180815 CASE 321951 Added Fieldgroup Brick (Sales Ticket No.,Description,No.,Sale Date,Starting Time,Register No.)
     // NPR5.45/MHA /20180821 CASE 324395 SaleLinePOS."Unit Price (LCY)" Renamed to "Unit Cost (LCY)"
     // NPR5.48/JDH /20181113 CASE 334555 Changed Unit of measure code from Text to Code
+    // NPR5.53/BHR /20191111 CASE 369361 Comment Offline code
 
     Caption = 'Audit Roll';
     DrillDownPageID = "Audit Roll";
@@ -1054,11 +1055,13 @@ table 6014407 "Audit Roll"
         if "Offline receipt no." = '' then
           "Offline receipt no." := "Sales Ticket No.";
         RetailSetup.Get;
-        if RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline then begin
-          Offline := true;
-          "Offline - Gift voucher ref."   := "Gift voucher ref.";
-          "Offline - Credit voucher ref." := "Credit voucher ref.";
-        end;
+        //-NPR5.53 [369361]
+        // IF RetailSetup."Company - Function" = RetailSetup."Company - Function"::"1" THEN BEGIN
+        //  Offline := TRUE;
+        //  "Offline - Gift voucher ref."   := "Gift voucher ref.";
+        //  "Offline - Credit voucher ref." := "Credit voucher ref.";
+        // END;
+        //+NPR5.53 [369361]
     end;
 
     var

@@ -96,7 +96,7 @@ page 6151385 "CS Stock-Takes List"
                     if not LocationRec.Get(GetFilter(Location)) then
                       Error(Err_MissingLocation);
 
-                    CSHelperFunctions.CreateNewCounting(LocationRec);
+                    CSHelperFunctions.CreateNewCountingV2(LocationRec);
                     CurrPage.Update();
                 end;
             }

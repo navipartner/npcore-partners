@@ -28,6 +28,7 @@ page 6151504 "Nc Import List"
     // NC2.17/JDH /20181112 CASE 334163 Added Caption to Action Add File
     // NC2.23/ZESO/20190819  CASE 360787 Added Export File and Import File for Web Client
     // NC2.23/MHA /20190927  CASE 369170 Removed Gambit integration
+    // NC2.24/MHA /20191108  CASE 373525 Changed extension filter for Import File to reflect "Document Name"
 
     Caption = 'Import List';
     DelayedInsert = true;
@@ -206,9 +207,9 @@ page 6151504 "Nc Import List"
                     //+NC2.12 [308107]
                 end;
             }
-            action("Edit Xml")
+            action("Edit File")
             {
-                Caption = 'Edit Xml';
+                Caption = 'Edit File';
                 Image = EditAttachment;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
@@ -216,12 +217,14 @@ page 6151504 "Nc Import List"
 
                 trigger OnAction()
                 begin
-                    EditXml();
+                    //-NC2.24 [373525]
+                    EditFile();
+                    //+NC2.24 [373525]
                 end;
             }
-            action("Export Xml File")
+            action("Export File")
             {
-                Caption = 'Export Xml File';
+                Caption = 'Export File';
                 Image = ExportAttachment;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
@@ -242,9 +245,9 @@ page 6151504 "Nc Import List"
                     //+NC2.23 [360787]
                 end;
             }
-            action("Import Xml File")
+            action("Import File")
             {
-                Caption = 'Import Xml File';
+                Caption = 'Import File';
                 Image = ImportCodes;
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
@@ -256,9 +259,16 @@ page 6151504 "Nc Import List"
                     FileMgt: Codeunit "File Management";
                     Path: Text;
                     FileName: Text;
+                    Extension: Text;
                 begin
                     //-NC2.23 [360787]
-                    FileName := FileMgt.BLOBImportWithFilter(TempBlob,'Import Layout','',FileFilterTxt,FileFilterTxt);
+                    //-NC2.24 [373525]
+                    //FileName := FileMgt.BLOBImportWithFilter(TempBlob,'Import Layout','',FileFilterTxt,FileFilterTxt);
+                    Extension := FileMgt.GetExtension("Document Name");
+                    if Extension = '' then
+                      Extension := '*';
+                    FileName := FileMgt.BLOBImportWithFilter(TempBlob,Text005,"Document Name",FileMgt.GetToFilterText('',"Document Name"),'*.' + Extension);
+                    //+NC2.24 [373525]
                     if FileName = '' then
                       exit;
 
@@ -303,7 +313,6 @@ page 6151504 "Nc Import List"
 
     var
         FilterImportType: Code[20];
-        GambitMgt: Codeunit "Nc Gambit Management";
         Text001: Label 'No Input';
         Text002: Label 'The %1 selected Import Entries will be scheduled for re-import\Continue?';
         Text003: Label 'No Documents';
@@ -313,7 +322,7 @@ page 6151504 "Nc Import List"
         ShowImported: Boolean;
         Text004: Label '%1 Order(s) has been imported \\%2 Orders contained errors.';
         WebClient: Boolean;
-        FileFilterTxt: Label 'Text Files (*.txt)|*.txt';
+        Text005: Label 'Import File';
 
     local procedure AddFile()
     var
@@ -390,12 +399,10 @@ page 6151504 "Nc Import List"
         //+NC2.02 [262318]
     end;
 
-    local procedure EditXml()
+    local procedure EditFile()
     var
         TempBlob: Record TempBlob temporary;
         FileMgt: Codeunit "File Management";
-        MemoryStream: DotNet npNetMemoryStream;
-        XmlDoc: DotNet npNetXmlDocument;
         f: File;
         InStr: InStream;
         OutStr: OutStream;
@@ -409,20 +416,11 @@ page 6151504 "Nc Import List"
 
         f.Open(Path);
         f.CreateInStream(InStr);
-        MemoryStream := InStr;
-        XmlDoc := XmlDoc.XmlDocument;
-        XmlDoc.Load(MemoryStream);
-        MemoryStream.Flush;
-        MemoryStream.Close;
-        Clear(MemoryStream);
-
+        //-NC2.24 [373525]
         Clear(TempBlob);
         TempBlob.Blob.CreateOutStream(OutStr);
-        MemoryStream := OutStr;
-        XmlDoc.Save(MemoryStream);
-        MemoryStream.Flush;
-        MemoryStream.Close;
-        Clear(MemoryStream);
+        CopyStream(OutStr,InStr);
+        //+NC2.24 [373525]
         f.Close;
         Erase(Path);
 

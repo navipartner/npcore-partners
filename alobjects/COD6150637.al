@@ -4,6 +4,8 @@ codeunit 6150637 "POS Posting Control"
     // NPR5.38/BR  /20180119  CASE 302791 Handle Separate session posting and regular posting the same way, commitwise
     // NPR5.42/MMV /20180504  CASE 314110 Incorrect posting parameter was set.
     // NPR5.52/ALPO/20190923  CASE 365326 POS Posting related fields moved to POS Posting Profiles from NP Retail Setup
+    // NPR5.53/ALPO/20191104 CASE 375258 Check posted dimension consistency
+    // NPR5.53/MMV /20191106 CASE 376362 Disabled subscriber. AutomaticPostEntry is directly invoked outside the POS entry creation transaction instead.
 
 
     trigger OnRun()
@@ -12,6 +14,10 @@ codeunit 6150637 "POS Posting Control"
 
     var
         TextCouldNotBePosted: Label 'The POS Entry could not be posted. Please contact your system administrator to adjust the posting setup.';
+        DimConsistencyErr: Label 'There was an attempt to post a transaction with inconsistent dimensions. The following values were used:\%1=%2, %3=%4, %5=%6.\RecordID: %7.\This indicates a programming bug, no a user error. Please contact system vendor.\\Error call stack:\%8\Ref. case ID 375258';
+        GLSetup: Record "General Ledger Setup";
+        GLSetupGot: Boolean;
+        DimConsistencyErrHdr: Label 'Dimension consistency check error', Comment='{Max.Length 140}';
 
     procedure AutomaticPostPeriodRegister(var POSPeriodRegister: Record "POS Period Register")
     var
@@ -83,7 +89,7 @@ codeunit 6150637 "POS Posting Control"
 
     end;
 
-    local procedure AutomaticPostEntry(var POSEntry: Record "POS Entry")
+    procedure AutomaticPostEntry(var POSEntry: Record "POS Entry")
     var
         NPRetailSetup: Record "NP Retail Setup";
         POSPostingProfile: Record "POS Posting Profile";
@@ -161,14 +167,171 @@ codeunit 6150637 "POS Posting Control"
         exit(not POSUnit.IsEmpty);
     end;
 
-    local procedure "---- Subscribers"()
+    local procedure "//Dim. Consistency Check"()
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, 6150614, 'OnAfterInsertPOSEntry', '', true, true)]
-    local procedure OnAfterInsertPOSEntryPost(var SalePOS: Record "Sale POS";var POSEntry: Record "POS Entry")
+    procedure CheckGlobalDimAndDimSetConsistency(RecID: RecordID;GlobalDim1: Code[20];GlobalDim2: Code[20];DimSetID: Integer;RespType: Option "Show Error","Log and Continue")
+    var
+        DimSetEntry: Record "Dimension Set Entry";
+        LastErrorStack: Text;
     begin
-        AutomaticPostEntry(POSEntry);
+        //-NPR5.53 [375258]
+        if DimUsageIsConsistent(GlobalDim1,GlobalDim2,DimSetID) then
+          exit;
+        GetGLSetup;
+        LastErrorStack := GetLastErrorCallstack;
+        case RespType of
+          RespType::"Show Error":
+            Error(DimConsistencyErr,
+              GLSetup.FieldCaption("Global Dimension 1 Code"),GlobalDim1,
+              GLSetup.FieldCaption("Global Dimension 2 Code"),GlobalDim2,
+              DimSetEntry.FieldCaption("Dimension Set ID"),DimSetID,
+              RecID,
+              LastErrorStack);
+
+          RespType::"Log and Continue":
+            MakeNote(
+              RecID,
+              DimConsistencyErrHdr,
+              StrSubstNo(DimConsistencyErr,
+                GLSetup.FieldCaption("Global Dimension 1 Code"),GlobalDim1,
+                GLSetup.FieldCaption("Global Dimension 2 Code"),GlobalDim2,
+                DimSetEntry.FieldCaption("Dimension Set ID"),DimSetID,
+                RecID,
+                LastErrorStack),
+                UserId,'');
+        end;
+        //+NPR5.53 [375258]
+    end;
+
+    procedure DimUsageIsConsistent(GlobalDim1: Code[20];GlobalDim2: Code[20];DimSetID: Integer) Ok: Boolean
+    begin
+        //-NPR5.53 [375258]
+        if (DimSetID = 0) and (GlobalDim1 = '') and (GlobalDim2 = '') then
+          exit(true);
+        GetGLSetup;
+        Ok := CheckDimInDimSet(GLSetup."Global Dimension 1 Code",GlobalDim1,DimSetID);
+        if Ok then
+          Ok := CheckDimInDimSet(GLSetup."Global Dimension 2 Code",GlobalDim2,DimSetID);
+        //+NPR5.53 [375258]
+    end;
+
+    [TryFunction]
+    local procedure CheckDimInDimSet(DimCode: Code[20];DimValueCode: Code[20];DimSetID: Integer)
+    var
+        DimSetEntry: Record "Dimension Set Entry";
+    begin
+        //-NPR5.53 [375258]
+        if DimCode = '' then
+          exit;
+
+        if DimValueCode <> '' then begin
+          if DimSetID = 0 then
+            Error('');
+          DimSetEntry.Get(DimSetID,DimCode);
+          DimSetEntry.TestField("Dimension Value Code",DimValueCode);
+        end;
+
+        if DimValueCode = '' then begin
+          if DimSetID = 0 then
+            exit;
+          if DimSetEntry.Get(DimSetID,DimCode) then
+            Error('');
+        end;
+        //+NPR5.53 [375258]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150614, 'OnAfterInsertPOSEntry', '', false, false)]
+    local procedure CheckDimOnAfterInsertPOSEntry(var SalePOS: Record "Sale POS";var POSEntry: Record "POS Entry")
+    begin
+        //-NPR5.53 [375258]
+        with POSEntry do
+          CheckGlobalDimAndDimSetConsistency(RecordId,"Shortcut Dimension 1 Code","Shortcut Dimension 2 Code","Dimension Set ID",1);
+        //+NPR5.53 [375258]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150614, 'OnAfterInsertPOSPaymentLine', '', false, false)]
+    local procedure CheckDimOnAfterInsertPOSPmtLine(SalePOS: Record "Sale POS";SaleLinePOS: Record "Sale Line POS";POSEntry: Record "POS Entry";POSPaymentLine: Record "POS Payment Line")
+    begin
+        //-NPR5.53 [375258]
+        with POSPaymentLine do
+          CheckGlobalDimAndDimSetConsistency(RecordId,"Shortcut Dimension 1 Code","Shortcut Dimension 2 Code","Dimension Set ID",1);
+        //+NPR5.53 [375258]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150614, 'OnAfterInsertPOSSalesLine', '', false, false)]
+    local procedure CheckDimOnAfterInsertPOSSalesLine(SalePOS: Record "Sale POS";SaleLinePOS: Record "Sale Line POS";POSEntry: Record "POS Entry";var POSSalesLine: Record "POS Sales Line")
+    begin
+        //-NPR5.53 [375258]
+        with POSSalesLine do
+          CheckGlobalDimAndDimSetConsistency(RecordId,"Shortcut Dimension 1 Code","Shortcut Dimension 2 Code","Dimension Set ID",1);
+        //+NPR5.53 [375258]
+    end;
+
+    local procedure GetGLSetup()
+    begin
+        //-NPR5.53 [375258]
+        if GLSetupGot then
+          exit;
+        GLSetup.Get;
+        GLSetupGot := true;
+        //+NPR5.53 [375258]
+    end;
+
+    procedure MakeNote(RecID: RecordID;HeaderTxt: Text;MessageTxt: Text;FromUserID: Text[50];SentToUserID: Text[50])
+    var
+        RecordLink: Record "Record Link";
+    begin
+        //-NPR5.53 [375258]
+        RecordLink.Init;
+        RecordLink."Link ID" := 0;
+        RecordLink."Record ID" := RecID;
+        RecordLink.Type := RecordLink.Type::Note;
+        RecordLink.Company := CompanyName;
+        RecordLink.Created := CurrentDateTime;
+        RecordLink.Description := CopyStr(HeaderTxt,1,MaxStrLen(RecordLink.Description));
+        RecordLink."User ID" := FromUserID;
+        RecordLink."To User ID" := SentToUserID;
+        RecordLink.Notify := SentToUserID <> '';
+        SetNoteURL(RecordLink,RecID);
+        SetNoteText(RecordLink,HeaderTxt,MessageTxt);
+        RecordLink.Insert;
+        //+NPR5.53 [375258]
+    end;
+
+    local procedure SetNoteURL(var RecordLink: Record "Record Link";RecID: RecordID)
+    var
+        PageMgt: Codeunit "Page Management";
+        PageID: Integer;
+        Link: Text;
+    begin
+        //-NPR5.53 [375258]
+        PageID := PageMgt.GetPageID(RecID);
+        Link := GetUrl(CLIENTTYPE::Default,CompanyName,OBJECTTYPE::Page,PageID);
+        RecordLink.URL1 := CopyStr(Link,1,MaxStrLen(RecordLink.URL1));
+        if StrLen(Link) > MaxStrLen(RecordLink.URL1) then
+          RecordLink.URL2 := CopyStr(Link,StrLen(RecordLink.URL1) + 1,MaxStrLen(RecordLink.URL2));
+        //+NPR5.53 [375258]
+    end;
+
+    local procedure SetNoteText(var RecordLink: Record "Record Link";NoteHeading: Text;NewNoteText: Text)
+    var
+        BinWriter: DotNet npNetBinaryWriter;
+        OStr: OutStream;
+        c1: Char;
+        lf: Text;
+        Note: Text;
+    begin
+        //-NPR5.53 [375258]
+        c1 := 13;
+        lf[1] := c1;
+        Note := CopyStr(NoteHeading,1,140) + lf + ConvertStr(NewNoteText,'\',lf);
+
+        RecordLink.Note.CreateOutStream(OStr,TEXTENCODING::UTF8);
+        BinWriter := BinWriter.BinaryWriter(OStr);
+        BinWriter.Write(Note);
+        //+NPR5.53 [375258]
     end;
 }
 

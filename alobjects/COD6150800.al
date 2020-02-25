@@ -3,6 +3,8 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
     // // TODO - request workflow step - this should happen automatically after action callback is received in javascript
     // //        - so, no direct invocation of next step, it just happens
     // NPR5.48/TSA /20190207 CASE 345292 SalesLine UpdateAmounts() needs to invoked to get the VAT fields correctly initialized
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
+    // NPR5.53/YAHA/20191114 CASE 376207 Parameter being taken from the Retail setup for gift menu sale
 
 
     trigger OnRun()
@@ -159,8 +161,13 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
         Context.SetContext('prompt_discount_amount', RetailSetup."Popup Gift Voucher Quantity" and (DiscountType = DiscountType::AMOUNT));
         Context.SetContext('prompt_discount_percent', RetailSetup."Popup Gift Voucher Quantity" and (DiscountType = DiscountType::PERCENTAGE));
 
-        //Context.SetContext ('prompt_quantity', RetailSetup."Popup Gift Voucher Quantity");
-        Context.SetContext('prompt_quantity', false);
+        //-NPR5.53 [376207]
+        Context.SetContext ('prompt_quantity', RetailSetup."Popup Gift Voucher Quantity");
+        //Context.SetContext ('prompt_quantity', FALSE);
+        //+NPR5.53 [376207]
+
+
+
         //Context.SetContext ('prompt_barcode', PaymentTypePOS."PBS Gift Voucher Barcode");
         Context.SetContext('prompt_voucherno', true);
         TempVoucherNo := NoSeriesManagement.GetNextNo(RetailSetup."Gift Voucher No. Management", Today, false);
@@ -385,8 +392,11 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
             "Sale Type" := "Sale Type"::Deposit;
             Validate("No.", PaymentTypePOS."G/L Account No.");
             "Location Code" := Register."Location Code";
-            "Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-            "Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+          //-NPR5.53 [371956]-revoked
+          //! Redundant lines. Dimensions should be properly handled by CreateDim() function, not forgetting the Dimension Set ID field.
+          //"Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
+          //"Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+          //+NPR5.53 [371956]-revoked
             Quantity := 1;
             Amount := pAmount;
         end;
@@ -409,8 +419,11 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
             //+NPR5.48 [345292]
 
             "Location Code" := Register."Location Code";
-            "Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-            "Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+          //-NPR5.53 [371956]-revoked
+          //! Redundant lines. Dimensions should be properly handled by CreateDim() function, not forgetting the Dimension Set ID field.
+          //"Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
+          //"Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+          //+NPR5.53 [371956]-revoked
             Validate(Quantity, 1);
             Amount := pAmount;
             "Unit Price" := pAmount;
@@ -445,10 +458,14 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
 
         with PaymentLine do begin
             "Amount Including VAT" := 0;
-            "No." := PaymentTypePOS."No.";
+          //"No." := PaymentTypePOS."No.";  //NPR5.53 [371956]-revoked
+          Validate("No.",PaymentTypePOS."No.");  //NPR5.53 [371956]
             "Location Code" := Register."Location Code";
-            "Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-            "Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+          //-NPR5.53 [371956]-revoked
+          //! Redundant lines. Dimensions should be properly handled by CreateDim() function, not forgetting the Dimension Set ID field.
+          //"Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
+          //"Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+          //+NPR5.53 [371956]-revoked
             Description := StrSubstNo('%1 %2', PaymentTypePOS."Sales Line Text", 'Capture Pending');
 
             POSPaymentLine.InsertPaymentLine(PaymentLine, 0);
@@ -500,17 +517,26 @@ codeunit 6150800 "POS Action - Sale Gift Voucher"
             exit(false);
         RetailSetup.TestField("Gift Voucher No. Management");
 
-        if GiftVoucher.Get(VoucherNo) then begin
+
+        //-NPR5.53 [376207]
+        if not RetailSetup."Popup Gift Voucher Quantity" then begin
+          if GiftVoucher.Get(VoucherNo) then begin
             if GiftVoucher.Amount > 0 then begin
-                if Confirm(StrSubstNo(Text0002, NewTempNo, GiftVoucher.Amount), false) then
-                    GiftVoucher.Delete(true)
-                else
-                    exit;
+              if Confirm(StrSubstNo(Text0002,NewTempNo,GiftVoucher.Amount),false) then
+                GiftVoucher.Delete(true)
+              else
+                exit;
             end else
-                GiftVoucher.Delete(true);
+              GiftVoucher.Delete(true);
+          end;
         end;
+        //+NPR5.53 [376207]
+
 
         if VoucherNo = GeneratedVoucherNo then begin
+          //-NPR5.53 [376207]
+          GiftVoucher."No.":= '';
+          //+NPR5.53 [376207]
             NoSeriesManagement.InitSeries(RetailSetup."Gift Voucher No. Management",
             RetailSetup."Gift Voucher No. Management", 0D, GiftVoucher."No.", RetailSetup."Gift Voucher No. Management");
             if RetailSetup."EAN Mgt. Gift voucher" <> '' then

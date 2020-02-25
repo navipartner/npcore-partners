@@ -22,6 +22,7 @@ codeunit 6014409 "Post audit roll"
     // NPR5.29/MHA /20170116  CASE 262116 Adjusted Filter Reset on Item Ledger Posting
     // NPR5.36/TJ  /20170920  CASE 286283 Renamed variables/function into english and into proper naming terminology
     //                                    Removed unused variables
+    // NPR5.53/BHR / 20191004 CASE 369361 Removed Invalid Functionalities
 
     TableNo = "Audit Roll";
 
@@ -30,8 +31,10 @@ codeunit 6014409 "Post audit roll"
         Txt001: Label 'Posting of audit roll is not possible in offline mode';
     begin
         RetailSetup.Get;
-        if RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline then
-          Error(Txt001);
+        //-NPR5.53 [369361]
+        //IF RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline THEN
+        //  ERROR(Txt001);
+        //+NPR5.53 [369361]
         RunCode(Rec);
     end;
 
@@ -197,10 +200,10 @@ codeunit 6014409 "Post audit roll"
         
         RetailSetup.Get();
         Clear(AuditRollPosting);
-        
-        if RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline then
-          Error(t001);
-        
+        //-NPR5.53 [369361]
+        //IF RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline THEN
+        //  ERROR(t001);
+        //+NPR5.53 [369361]
         RetailSetup.Validate("Posting Source Code",RetailSetup."Posting Source Code");
         
         Register.SetFilter("Register No.",Rec.GetFilter("Register No."));

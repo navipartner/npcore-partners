@@ -22,6 +22,9 @@ codeunit 6150627 "POS Workshift Checkpoint"
     // NPR5.50/TSA /20190528 CASE 356706 Make sure there is an open pos period after migrating to pos entry
     // NPR5.51/MMV /20190611 CASE 356076 Added sub period support and new totalling fields.
     // NPR5.51/TSA /20190813 CASE 363578 Added publisher OnAfterEndWorkshift
+    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
+    // NPR5.53/TSA /20191107 CASE 376170 Added number series support for Z and X reports
 
 
     trigger OnRun()
@@ -562,6 +565,8 @@ codeunit 6150627 "POS Workshift Checkpoint"
     local procedure CreateBalancingEntryAndPost(Mode: Option;UnitNo: Code[20];CheckPointEntryNo: Integer;DimensionSetId: Integer) EntryNo: Integer
     var
         POSUnit: Record "POS Unit";
+        POSEndofDayProfile: Record "POS End of Day Profile";
+        POSEntry: Record "POS Entry";
         POSPaymentBinCheckpoint: Record "POS Payment Bin Checkpoint";
         SalePOS: Record "Sale POS";
         POSAuditLog: Record "POS Audit Log";
@@ -572,11 +577,17 @@ codeunit 6150627 "POS Workshift Checkpoint"
         POSPostEntries: Codeunit "POS Post Entries";
         DimMgt: Codeunit DimensionManagement;
         POSAuditLogMgt: Codeunit "POS Audit Log Mgt.";
+        NoSeriesManagement: Codeunit NoSeriesManagement;
         PeriodEntryNo: Integer;
     begin
 
         //-NPR5.49 [348458]
         POSUnit.Get (UnitNo);
+
+        //-NPR5.53 [376170]
+        if (not POSEndofDayProfile.Get (POSUnit."POS End of Day Profile")) then
+          POSEndofDayProfile.Init;
+        //+NPR5.53 [376170]
 
         POSPaymentBinCheckpoint.Reset ();
         POSPaymentBinCheckpoint.SetFilter ("Workshift Checkpoint Entry No.", '=%1', CheckPointEntryNo);
@@ -588,6 +599,16 @@ codeunit 6150627 "POS Workshift Checkpoint"
           SalePOS."POS Store Code" := POSUnit."POS Store Code";
           SalePOS.Date := Today;
           SalePOS."Sales Ticket No." := DelChr (Format (CurrentDateTime(), 0, 9), '<=>', DelChr (Format (CurrentDateTime(), 0, 9), '<=>', '01234567890'));
+
+          //-NPR5.53 [376170]
+          if (Mode = EodWorkshiftMode::ZREPORT) and (POSEndofDayProfile."Z-Report Number Series" <> '') then
+            SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo (POSEndofDayProfile."Z-Report Number Series", Today, true);
+          if (Mode = EodWorkshiftMode::XREPORT) and (POSEndofDayProfile."X-Report Number Series" <> '') then
+            SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo (POSEndofDayProfile."X-Report Number Series", Today, true);
+          if (Mode = EodWorkshiftMode::CLOSEWORKSHIFT) and (POSEndofDayProfile."X-Report Number Series" <> '') then
+            SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo (POSEndofDayProfile."X-Report Number Series", Today, true);
+          //+NPR5.53 [376170]
+
           SalePOS."Salesperson Code" := TryGetSalesperson();
           SalePOS."Start Time" := Time;
           SalePOS."Dimension Set ID" := DimensionSetId;
@@ -1561,6 +1582,8 @@ codeunit 6150627 "POS Workshift Checkpoint"
         FirstReceiptNo: Code[20];
         AuditRoll: Record "Audit Roll";
         "Payment Type POS": Record "Payment Type POS";
+        POSUnit: Record "POS Unit";
+        POSSetup: Codeunit "POS Setup";
         ThisReceiptNo: Code[20];
         aReceiptType_count: array [10] of Integer;
         aReceiptType_amount: array [10] of Decimal;
@@ -1601,6 +1624,11 @@ codeunit 6150627 "POS Workshift Checkpoint"
     begin
         RetailSetup.Get();
         CashRegister.Get (RegNo);
+        //-NPR5.53 [371955]
+        POSUnit.Get(RegNo);
+        POSSetup.SetPOSUnit(POSUnit);
+        //+NPR5.53 [371955]
+        
         Window.Open(t005 + '\#1##############################\' + t002);
         
         //Primo := Kasse."Opening Cash";
@@ -1658,7 +1686,8 @@ codeunit 6150627 "POS Workshift Checkpoint"
         Window.Update(1, t006);
         AuditRoll.SetRange( "Sale Type", AuditRoll."Sale Type"::"Out payment" );
         AuditRoll.SetRange( Type, AuditRoll.Type::"G/L" );
-        AuditRoll.SetFilter( "No.", '<>%1', CashRegister.Rounding );
+        //AuditRoll.SETFILTER( "No.", '<>%1', CashRegister.Rounding );  //NPR5.53 [371955]-revoked
+        AuditRoll.SetFilter("No.",'<>%1',POSSetup.RoundingAccount(true));  //NPR5.53 [371955]
         AuditRoll.CalcSums( "Amount Including VAT" );
         //"Out Payments" := AuditRoll."Amount Including VAT";
         POSWorkshiftCheckpoint."GL Payment (LCY)" := AuditRoll."Amount Including VAT";
@@ -2029,6 +2058,7 @@ codeunit 6150627 "POS Workshift Checkpoint"
         Itt: Integer;
         "--": Integer;
         Register: Record Register;
+        POSUnit: Record "POS Unit";
         POSWorkshiftCheckpoint: Record "POS Workshift Checkpoint";
         POSPaymentBinCheckpoint: Record "POS Payment Bin Checkpoint";
         POSBinEntry: Record "POS Bin Entry";
@@ -2046,6 +2076,7 @@ codeunit 6150627 "POS Workshift Checkpoint"
 
         Kasseperiode.Init;
         Register.Get (Sale."Register No.");
+        POSUnit.Get(Sale."Register No.");  //NPR5.53 [371956]
 
         Kasseperiode."Register No." := Register."Register No.";
         Kasseperiode."Sales Ticket No." := Sale."Sales Ticket No.";
@@ -2133,8 +2164,14 @@ codeunit 6150627 "POS Workshift Checkpoint"
         // Kasseperiode."Gift Voucher Debit"         := Gavekortdebet;
         // Kasseperiode."Euro Difference"            := PaymentDiffeuro;
         // Kasseperiode."Change Register"            := "Change (LCY)";
-        Kasseperiode."Shortcut Dimension 1 Code"  := Register."Global Dimension 1 Code";
-        Kasseperiode."Shortcut Dimension 2 Code"  := Register."Global Dimension 2 Code";
+        //-NPR5.53 [371956]-revoked
+        //Kasseperiode."Shortcut Dimension 1 Code"  := Register."Global Dimension 1 Code";
+        //Kasseperiode."Shortcut Dimension 2 Code"  := Register."Global Dimension 2 Code";
+        //+NPR5.53 [371956]-revoked
+        //-NPR5.53 [371956]
+        Kasseperiode."Shortcut Dimension 1 Code"  := POSUnit."Global Dimension 1 Code";
+        Kasseperiode."Shortcut Dimension 2 Code"  := POSUnit."Global Dimension 2 Code";
+        //+NPR5.53 [371956]
         Kasseperiode."Location Code"              := Register."Location Code";
         // Kasseperiode."Money bag no."              := COPYSTR(MoneyBagNo,1,MAXSTRLEN(Kasseperiode."Money bag no."));
         Kasseperiode."Alternative Register No."   := Sale."Alternative Register No.";

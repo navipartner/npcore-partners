@@ -11,6 +11,9 @@ table 6060118 "TM Admission Schedule"
     // TM1.37/TSA /20180905 CASE 327324 Added fields for better control of arrival window
     // TM1.41/TSA /20190429 CASE 353352 Stop time and event duration is kept under better sync.
     // TM1.43/TSA /20190903 CASE 357359 Added option to Capacity Control (SEATING)
+    // #378212/TSA /20191120 CASE 378212 Added Sales Cut-off dates
+    // #378212/TSA /20191120 CASE 378212 Removed default assignment of "Event Arrival From Time", "Event Arrival Until Time"
+    // TM1.45/TSA/20200122  CASE 374620 Transport TM1.45 - 22 January 2020
 
     Caption = 'Admission Schedule';
 
@@ -118,12 +121,16 @@ table 6060118 "TM Admission Schedule"
 
             trigger OnValidate()
             begin
-                "Event Arrival From Time" := "Start Time";
+                //-#378212 [378212]
+                // "Event Arrival From Time" := "Start Time";
+                //
+                // //-TM1.41 [353352]
+                // "Stop Time" := "Start Time" + "Event Duration";
+                // "Event Arrival Until Time" := "Stop Time";
+                // //+TM1.41 [353352]
 
-                //-TM1.41 [353352]
                 "Stop Time" := "Start Time" + "Event Duration";
-                "Event Arrival Until Time" := "Stop Time";
-                //+TM1.41 [353352]
+                //+#378212 [378212]
             end;
         }
         field(23;"Stop Time";Time)
@@ -136,7 +143,9 @@ table 6060118 "TM Admission Schedule"
                   Error (STOP_TIME);
                 "Event Duration" := "Stop Time" - "Start Time";
 
-                "Event Arrival Until Time" := "Stop Time";
+                //-#378212 [378212]
+                //"Event Arrival Until Time" := "Stop Time";
+                //+#378212 [378212]
             end;
         }
         field(24;"Recur Duration";Duration)
@@ -150,7 +159,10 @@ table 6060118 "TM Admission Schedule"
             trigger OnValidate()
             begin
                 "Stop Time" := "Start Time" + "Event Duration";
-                "Event Arrival Until Time" := "Stop Time";
+
+                //-#378212 [378212]
+                // "Event Arrival Until Time" := "Stop Time";
+                //+#378212 [378212]
             end;
         }
         field(30;Monday;Boolean)
@@ -215,6 +227,12 @@ table 6060118 "TM Admission Schedule"
         {
             Caption = 'Bookable Passed Start (Secs)';
         }
+        field(70;"Notify Stakeholder";Option)
+        {
+            Caption = 'Notify Stakeholder';
+            OptionCaption = ' ,All,Reserve,Reserve & Cancel,Admit,Admit & Depart';
+            OptionMembers = NA,ALL,RESERVE,RESERVE_CANCEL,ADMIT,ADMIT_DEPART;
+        }
         field(100;"Admission Base Calendar Code";Code[10])
         {
             Caption = 'Admission Base Calendar Code';
@@ -227,6 +245,22 @@ table 6060118 "TM Admission Schedule"
         field(151;"Event Arrival Until Time";Time)
         {
             Caption = 'Event Arrival Until Time';
+        }
+        field(160;"Sales From Date (Rel.)";DateFormula)
+        {
+            Caption = 'Sales From Date (Rel.)';
+        }
+        field(162;"Sales From Time";Time)
+        {
+            Caption = 'Sales From Time';
+        }
+        field(163;"Sales Until Date (Rel.)";DateFormula)
+        {
+            Caption = 'Sales Until Date (Rel.)';
+        }
+        field(165;"Sales Until Time";Time)
+        {
+            Caption = 'Sales Until Time';
         }
     }
 

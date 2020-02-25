@@ -103,6 +103,13 @@ table 6014406 "Sale Line POS"
     // NPR5.51/TSA /20190821 CASE 365487 Corner case when discount is 100% and VAT amount is rounded in different directions.
     // NPR5.52/MMV /20190910 CASE 352473 Added fields for more sales document control
     // NPR5.52/MHA /20191017 CASE 373294 Changed validation of Min. and Max. Amount for payment
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
+    //                                     - Cash Register has been removed from CreateDim function call parameters. It is not needed here, because register/pos unit
+    //                                       dimensions are inherited by Sale POS header and thus are received by all Sale POS lines. No need to consider them here again.
+    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
+    // NPR5.53/MHA /20191030 CASE 374819 Removed VAT % from TransferToSalesLine()
+    // NPR5.53/ALPO/20191210 CASE 380609 NPRE: inherit seating dimensions
+    // NPR5.53/SARA/20200129 CASE 387895 Roll back changes for case 380979
 
     Caption = 'Sale Line';
     PasteIsValid = false;
@@ -201,9 +208,11 @@ table 6014406 "Sale Line POS"
                 end;
 
                 CreateDim(
-                  DATABASE::Register, "Register No.",
+                  //DATABASE::Register,"Register No.",  //NPR5.53 [371956]-revoked
                   NPRDimMgt.TypeToTableNPR(Type), "No.",
                   NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
+                  DATABASE::"NPRE Seating","NPRE Seating Code",  //NPR5.53 [380609]
+                  //0,'',  //NPR5.53 [371956]  //NPR5.53 [380609]-revoked
                   0, '');
                 //+NPR5.45 [324395]
             end;
@@ -546,10 +555,12 @@ table 6014406 "Sale Line POS"
 
             trigger OnValidate()
             var
+                POSUnit: Record "POS Unit";
                 SaleLinePOS: Record "Sale Line POS";
                 ErrMin: Label 'Discount % cannot be negative.';
                 ErrMax: Label 'Discount % cannot exeed 100.';
                 RetailFormCode: Codeunit "Retail Form Code";
+                POSSetup: Codeunit "POS Setup";
                 GiftFound: Boolean;
                 Trans0001: Label 'A deptorpayment cannot have discount';
                 Trans0002: Label 'An itemgroup cannot have discount';
@@ -568,7 +579,11 @@ table 6014406 "Sale Line POS"
                 //  "Line Discount %, manually" := FALSE;
                 //+NPR5.48 [334922]
 
-                RetailSetup.Get;
+                //RetailSetup.GET;  //NPR5.53 [371955]-revoked
+                //-NPR5.53 [371955]
+                POSUnit.Get("Register No.");
+                POSSetup.SetPOSUnit(POSUnit);
+                //+NPR5.53 [371955]
 
                 case Type of
                     Type::"G/L Entry":
@@ -577,7 +592,8 @@ table 6014406 "Sale Line POS"
                                 Error(Trans0003);
                             "Discount Type" := "Discount Type"::" ";
                             "Discount Code" := '';
-                            "Discount Amount" := Round("Unit Price" * "Discount %" / 100, RetailSetup."Amount Rounding Precision");
+                      //"Discount Amount" := ROUND("Unit Price" * "Discount %" / 100,RetailSetup."Amount Rounding Precision");  //NPR5.53 [371955]-revoked
+                      "Discount Amount" := Round("Unit Price" * "Discount %" / 100,POSSetup.AmountRoundingPrecision);  //NPR5.53 [371955]
                             "Amount Including VAT" := "Unit Price" - "Discount Amount";
                         end;
                     Type::Item:
@@ -914,18 +930,13 @@ table 6014406 "Sale Line POS"
 
             trigger OnValidate()
             begin
-                //-NPR5.45 [324395]
-                // CreateDim(
-                //  DATABASE::Register,"Register No.",
-                //  NPRDimMgt.TypeToTableNPR(Type),"No.",
-                //  DATABASE::"Period Discount","Period Discount code",
-                //  NPRDimMgt.DiscountTypeToTableNPR("Discount Type"),"Discount Code");
                 CreateDim(
-                  DATABASE::Register, "Register No.",
+                  //DATABASE::Register,"Register No.",  //NPR5.53 [371956]-revoked
                   NPRDimMgt.TypeToTableNPR(Type), "No.",
                   NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
+                  DATABASE::"NPRE Seating","NPRE Seating Code",  //NPR5.53 [380609]
+                  //0,'',  //NPR5.53 [371956]  //NPR5.53 [380609]-revoked
                   0, '');
-                //+NPR5.45 [324395]
             end;
         }
         field(59; "Lookup On No."; Boolean)
@@ -1284,18 +1295,13 @@ table 6014406 "Sale Line POS"
             begin
                 RetailSetup.Get;
                 if RetailSetup."Use Adv. dimensions" then
-                    //-NPR5.45 [324395]
-                    // CreateDim(
-                    //  DATABASE::Register,"Register No.",
-                    //  NPRDimMgt.TypeToTableNPR(Type),"No.",
-                    //  DATABASE::"Period Discount","Period Discount code",
-                    //  NPRDimMgt.DiscountTypeToTableNPR("Discount Type"),"Discount Code");
                     CreateDim(
-                    DATABASE::Register, "Register No.",
-                    NPRDimMgt.TypeToTableNPR(Type), "No.",
-                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                    0, '');
-                //+NPR5.45 [324395]
+                    //DATABASE::Register,"Register No.",  //NPR5.53 [371956]-revoked
+                    NPRDimMgt.TypeToTableNPR(Type),"No.",
+                    NPRDimMgt.DiscountTypeToTableNPR("Discount Type"),"Discount Code",
+                    DATABASE::"NPRE Seating","NPRE Seating Code",  //NPR5.53 [380609]
+                    //0,'',  //NPR5.53 [371956]  //NPR5.53 [380609]-revoked
+                    0,'');
             end;
         }
         field(402; "Discount Calculated"; Boolean)
@@ -1369,6 +1375,23 @@ table 6014406 "Sale Line POS"
             Description = 'NPR5.33';
             OptionCaption = 'Normal VAT,Reverse Charge VAT,Full VAT,Sales Tax';
             OptionMembers = "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
+        }
+        field(700;"NPRE Seating Code";Code[10])
+        {
+            Caption = 'Seating Code';
+            Description = 'NPR5.53';
+            TableRelation = "NPRE Seating";
+
+            trigger OnValidate()
+            begin
+                //-NPR5.53 [380609]
+                CreateDim(
+                  DATABASE::"NPRE Seating","NPRE Seating Code",
+                  NPRDimMgt.TypeToTableNPR(Type),"No.",
+                  NPRDimMgt.DiscountTypeToTableNPR("Discount Type"),"Discount Code",
+                  0,'');
+                //+NPR5.53 [380609]
+            end;
         }
         field(801; "Insurance Category"; Code[50])
         {
@@ -1459,18 +1482,13 @@ table 6014406 "Sale Line POS"
 
             trigger OnValidate()
             begin
-                //-NPR5.45 [324395]
-                // CreateDim(
-                //  DATABASE::Register,"Register No.",
-                //  NPRDimMgt.TypeToTableNPR(Type),"No.",
-                //  DATABASE::"Period Discount","Period Discount code",
-                //  NPRDimMgt.DiscountTypeToTableNPR("Discount Type"),"Discount Code");
                 CreateDim(
-                  DATABASE::Register, "Register No.",
-                  NPRDimMgt.TypeToTableNPR(Type), "No.",
-                  NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code",
-                  0, '');
-                //+NPR5.45 [324395]
+                  //DATABASE::Register,"Register No.",  //NPR5.53 [371956]-revoked
+                  NPRDimMgt.TypeToTableNPR(Type),"No.",
+                  NPRDimMgt.DiscountTypeToTableNPR("Discount Type"),"Discount Code",
+                  DATABASE::"NPRE Seating","NPRE Seating Code",  //NPR5.53 [380609]
+                  //0,'',  //NPR5.53 [371956]  //NPR5.53 [380609]-revoked
+                  0,'');
             end;
         }
         field(6012; "MR Anvendt antal"; Decimal)
@@ -2122,8 +2140,10 @@ table 6014406 "Sale Line POS"
         SaleLinePOS.Quantity := 1;
         SaleLinePOS."Unit Price" := -1 * RoundingAmount;
         SaleLinePOS."Amount Including VAT" := -1 * RoundingAmount;
-        SaleLinePOS."Shortcut Dimension 1 Code" := RegisterGlobal."Global Dimension 1 Code";
-        SaleLinePOS."Shortcut Dimension 2 Code" := RegisterGlobal."Global Dimension 2 Code";
+        //-NPR5.53 [371956]-revoked (Dimenensions are handled by the CreateDim() function)
+        //SaleLinePOS."Shortcut Dimension 1 Code" := RegisterGlobal."Global Dimension 1 Code";
+        //SaleLinePOS."Shortcut Dimension 2 Code" := RegisterGlobal."Global Dimension 2 Code";
+        //+NPR5.53 [371956]-revoked
         SaleLinePOS."Discount Type" := "Discount Type"::Rounding;
         SaleLinePOS.Insert(true);
 
@@ -2164,7 +2184,9 @@ table 6014406 "Sale Line POS"
         SalesLine.Description := Description;
         SalesLine."Unit Price" := "Unit Price";
 
-        SalesLine."VAT %" := "VAT %";
+        //-NPR5.53 [374819]
+        //SalesLine."VAT %" := "VAT %";
+        //+NPR5.53 [374819]
         SalesLine."Line Discount %" := "Discount %";
         SalesLine."Line Discount Amount" := "Discount Amount";
         SalesLine.Amount := Amount;
@@ -2473,7 +2495,6 @@ table 6014406 "Sale Line POS"
         TotalAmountInclVAT: Decimal;
         TotalQuantityBase: Decimal;
     begin
-
         //-NPR5.31 [248534]
         with SaleLinePOS do begin
             //-NPR5.48 [335967]
@@ -2537,7 +2558,6 @@ table 6014406 "Sale Line POS"
                                              Currency."Amount Rounding Precision") - TotalAmount;
                             //+NPR5.48 [335967]
                             "Amount Including VAT" := Round("Amount Including VAT");
-
                   //-NPR5.51 [365487]
                   if ("Amount Including VAT" = 0) then
                     Amount := 0;
@@ -2661,6 +2681,7 @@ table 6014406 "Sale Line POS"
         "Tax Area Code" := SalePOS."Tax Area Code";
         "Tax Liable" := SalePOS."Tax Liable";
         //+NPR5.45 [324395]
+        "NPRE Seating Code" := SalePOS."NPRE Pre-Set Seating Code";  //NPR5.53 [380609]
     end;
 
     local procedure InitFromCustomer()
@@ -2840,18 +2861,21 @@ table 6014406 "Sale Line POS"
 
     local procedure TestPaymentTypePOS()
     var
-        Register: Record Register;
+        POSUnit: Record "POS Unit";
         SaleLinePOS: Record "Sale Line POS";
     begin
         //-NPR5.45 [324395]
         GetPaymentTypePOS(PaymentTypePOS);
-        Register.Get("Register No.");
+        //Register.GET("Register No.");  //NPR5.53 [371956]-revoked
+        POSUnit.Get("Register No.");  //NPR5.53 [371956]
 
         if (PaymentTypePOS."G/L Account No." = '') and (PaymentTypePOS."Customer No." = '') and (PaymentTypePOS."Bank Acc. No." = '') then
             Error(Text001, "No.");
         PaymentTypePOS.TestField(Status, PaymentTypePOS.Status::Active);
         if PaymentTypePOS."Global Dimension 1 Code" <> '' then
-            PaymentTypePOS.TestField("Global Dimension 1 Code", Register."Global Dimension 1 Code");
+          //PaymentTypePOS.TESTFIELD("Global Dimension 1 Code",Register."Global Dimension 1 Code");  //NPR5.53 [371956]-revoked
+          //Why is it here? Why only 1st global dim? What was the idea here? If you know it, please explain (ALPO)
+          PaymentTypePOS.TestField("Global Dimension 1 Code",POSUnit."Global Dimension 1 Code");  //NPR5.53 [371956]
 
         if PaymentTypePOS."Processing Type" <> PaymentTypePOS."Processing Type"::Invoice then
             exit;

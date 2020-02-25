@@ -20,6 +20,8 @@ table 6150622 "POS Sales Line"
     //                                   Renamed blank Type option to comment.
     // NPR5.51/MHA /20190718 CASE 362329 Added field 500 "Exclude from Posting"
     // NPR5.52/TSA /20190925 CASE 369231 Added field "Retail Serial No." aka "Serial No. not Created"
+    // NPR5.53/SARA/20191024 CASE 373672 Added Field 600..620
+    // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
 
     Caption = 'POS Sales Line';
     DrillDownPageID = "POS Sales Line List";
@@ -430,6 +432,36 @@ table 6150622 "POS Sales Line"
         {
             Caption = 'Exclude from Posting';
             Description = 'NPR5.51';
+        }
+        field(600;"Entry Date";Date)
+        {
+            CalcFormula = Lookup("POS Entry"."Entry Date" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            Caption = 'Entry Date';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(610;"Starting Time";Time)
+        {
+            CalcFormula = Lookup("POS Entry"."Starting Time" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            Caption = 'Starting Time';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(620;"Ending Time";Time)
+        {
+            CalcFormula = Lookup("POS Entry"."Ending Time" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            Caption = 'Ending Time';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(700;"NPRE Seating Code";Code[10])
+        {
+            Caption = 'Seating Code';
+            Description = 'NPR5.53';
+            TableRelation = "NPRE Seating";
         }
         field(5402;"Variant Code";Code[10])
         {

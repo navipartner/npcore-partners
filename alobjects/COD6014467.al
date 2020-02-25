@@ -13,6 +13,7 @@ codeunit 6014467 "Retail Journal Code"
     // NPR5.50/ZESO/20190513 CASE 353996 Read Unit Price from Purchase Line instead of from Item Card.
     // NPR5.51/BHR /20190614 CASE 358287  Add retail print and Price label for Posted Purchase Invoice
     // NPR5.51/BHR /20190722 CASE 348731  Add selection for Purchase lines Quantity
+    // NPR5.53/TJ  /20191118 CASE 375557 New function to print report from Retail Journal which is not part of the Report Selection Retail
 
 
     trigger OnRun()
@@ -785,6 +786,17 @@ codeunit 6014467 "Retail Journal Code"
 
         exit(RecRef.FindSet);
         //-NPR5.49 [334538]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6014413, 'OnBeforePrintRetailJournal', '', true, true)]
+    local procedure PrintRetailJournalList(var JournalLine: Record "Retail Journal Line";ReportType: Integer;var Skip: Boolean)
+    begin
+        //-NPR5.53 [375557]
+        if ReportType <> REPORT::"Retail Journal List" then
+          exit;
+        REPORT.Run(ReportType,true,false,JournalLine);
+        Skip := true;
+        //+NPR5.53 [375557]
     end;
 }
 

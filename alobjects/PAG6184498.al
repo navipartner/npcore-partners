@@ -11,6 +11,8 @@ page 6184498 "EFT Transaction Requests"
     // NPR5.40/MMV /20180328  CASE 276562 Changed caption from Pepper to EFT.
     // NPR5.46/MMV /20180913  CASE 290734 Added new actions and changed fields around.
     // NPR5.48/MMV /20181221  CASE 340754 Removed page actions lookup, void, refund as the user flow has been replaced with action EFT_OPERATION approach.
+    // NPR5.53/MMV /20191206 CASE 377533 Changed styling and added new flowfield for error overview.
+    //                                   Added logging factbox.
 
     Caption = 'EFT Transaction Requests';
     Editable = false;
@@ -26,39 +28,20 @@ page 6184498 "EFT Transaction Requests"
         {
             repeater(Group)
             {
+                InstructionalText = 'Blue: Recovered & in sync\Yellow: Recovered but on different receipt number\Red: Unfinished, no external result or unposted amount';
                 field("Entry No.";"Entry No.")
                 {
-                    Style = Attention;
-                    StyleExpr = NOT Successful;
+                    StyleExpr = Style;
                 }
                 field("Integration Type";"Integration Type")
                 {
-                }
-                field("Pepper Terminal Code";"Pepper Terminal Code")
-                {
-                    Style = Attention;
-                    StyleExpr = NOT Successful;
-                    Visible = false;
-                }
-                field(Mode;Mode)
-                {
-                    Style = Attention;
-                    StyleExpr = NOT Successful;
-                }
-                field("Pepper Transaction Type Code";"Pepper Transaction Type Code")
-                {
-                    Style = Attention;
-                    StyleExpr = NOT Successful;
-                    Visible = false;
-                }
-                field("Pepper Trans. Subtype Code";"Pepper Trans. Subtype Code")
-                {
-                    Visible = false;
+                    StyleExpr = Style;
                 }
                 field("Processing Type";"Processing Type")
                 {
+                    StyleExpr = Style;
                 }
-                field("Auxiliary Operation ID";"Auxiliary Operation ID")
+                field("Auxiliary Operation Desc.";"Auxiliary Operation Desc.")
                 {
                 }
                 field(Started;Started)
@@ -77,38 +60,42 @@ page 6184498 "EFT Transaction Requests"
                 }
                 field("Sales Ticket No.";"Sales Ticket No.")
                 {
-                    Style = Attention;
-                    StyleExpr = NOT Successful;
                 }
                 field("Register No.";"Register No.")
-                {
-                    Style = Attention;
-                    StyleExpr = NOT Successful;
-                }
-                field("Offline mode";"Offline mode")
                 {
                 }
                 field("User ID";"User ID")
                 {
                 }
-                field("Integration Version Code";"Integration Version Code")
+                field(Successful;Successful)
                 {
                 }
-                field("Client Assembly Version";"Client Assembly Version")
+                field("External Result Received";"External Result Received")
                 {
                 }
-                field("Auxiliary Operation Desc.";"Auxiliary Operation Desc.")
+                field("Force Closed";"Force Closed")
+                {
+                }
+                field(Reversed;Reversed)
+                {
+                }
+                field(Recovered;Recovered)
+                {
+                }
+                field("Result Display Text";"Result Display Text")
+                {
+                }
+                field("NST Error";"NST Error")
+                {
+                }
+                field("Client Error";"Client Error")
                 {
                 }
                 field("Result Code";"Result Code")
                 {
-                    Style = Attention;
-                    StyleExpr = NOT Successful;
                 }
                 field("Result Description";"Result Description")
                 {
-                    Style = Attention;
-                    StyleExpr = NOT Successful;
                 }
                 field("Card Type";"Card Type")
                 {
@@ -130,6 +117,33 @@ page 6184498 "EFT Transaction Requests"
                 }
                 field("Authorisation Number";"Authorisation Number")
                 {
+                }
+                field("Auxiliary Operation ID";"Auxiliary Operation ID")
+                {
+                }
+                field(Mode;Mode)
+                {
+                }
+                field("Offline mode";"Offline mode")
+                {
+                }
+                field("Integration Version Code";"Integration Version Code")
+                {
+                }
+                field("Client Assembly Version";"Client Assembly Version")
+                {
+                }
+                field("Pepper Terminal Code";"Pepper Terminal Code")
+                {
+                    Visible = false;
+                }
+                field("Pepper Transaction Type Code";"Pepper Transaction Type Code")
+                {
+                    Visible = false;
+                }
+                field("Pepper Trans. Subtype Code";"Pepper Trans. Subtype Code")
+                {
+                    Visible = false;
                 }
                 field("External Transaction ID";"External Transaction ID")
                 {
@@ -167,40 +181,19 @@ page 6184498 "EFT Transaction Requests"
                 field("Fee Amount";"Fee Amount")
                 {
                 }
-                field(Successful;Successful)
-                {
-                }
-                field("External Result Received";"External Result Received")
-                {
-                }
                 field("Financial Impact";"Financial Impact")
-                {
-                }
-                field("Result Display Text";"Result Display Text")
-                {
-                }
-                field("NST Error";"NST Error")
-                {
-                }
-                field("Client Error";"Client Error")
-                {
-                }
-                field("Force Closed";"Force Closed")
                 {
                 }
                 field("Processed Entry No.";"Processed Entry No.")
                 {
                 }
-                field(Reversed;Reversed)
-                {
-                }
                 field("Reversed by Entry No.";"Reversed by Entry No.")
                 {
                 }
-                field(Recovered;Recovered)
+                field("Recovered by Entry No.";"Recovered by Entry No.")
                 {
                 }
-                field("Recovered by Entry No.";"Recovered by Entry No.")
+                field("Initiated from Entry No.";"Initiated from Entry No.")
                 {
                 }
                 field("Receipt 1";"Receipt 1".HasValue)
@@ -217,10 +210,10 @@ page 6184498 "EFT Transaction Requests"
                 field(Token;Token)
                 {
                 }
-                field("Initiated from Entry No.";"Initiated from Entry No.")
+                field("Number of Attempts";"Number of Attempts")
                 {
                 }
-                field("Number of Attempts";"Number of Attempts")
+                field("FF Moved to POS Entry";"FF Moved to POS Entry")
                 {
                 }
             }
@@ -232,6 +225,10 @@ page 6184498 "EFT Transaction Requests"
                 SubPageLink = "Entry No."=FIELD("Entry No.");
                 SubPageView = SORTING("Entry No.")
                               ORDER(Ascending);
+            }
+            part(Control6014410;"EFT Transaction Log Factbox")
+            {
+                SubPageLink = "Transaction Entry No."=FIELD("Entry No.");
             }
         }
     }
@@ -317,16 +314,25 @@ page 6184498 "EFT Transaction Requests"
         if (Finished <> 0DT) and (Started <> 0DT) then
           TransDuration := Finished - Started;
         //+NPR5.28 [259563]
+
+        //-NPR5.53 [377533]
+        Style := SetStyle();
+        //+NPR5.53 [377533]
     end;
 
     trigger OnOpenPage()
     begin
+        //-NPR5.53 [377533]
+        SetAutoCalcFields("FF Moved to POS Entry");
+        //+NPR5.53 [377533]
+
         if FindFirst then;
     end;
 
     var
         DisplayText: Text;
         TransDuration: Duration;
+        Style: Text;
 
     local procedure ClosePageIfInsidePOS()
     var
@@ -337,6 +343,41 @@ page 6184498 "EFT Transaction Requests"
         if POSSession.IsActiveSession(POSFrontEnd) then
           CurrPage.Close();
         //+NPR5.46 [290734]
+    end;
+
+    local procedure SetStyle(): Text
+    var
+        EFTTransactionRequest: Record "EFT Transaction Request";
+        EFTFrameworkMgt: Codeunit "EFT Framework Mgt.";
+    begin
+        //-NPR5.53 [377533]
+        if (Recovered) then begin
+          if EFTTransactionRequest.Get("Recovered by Entry No.") then
+            if EFTTransactionRequest."Result Amount" <> 0 then
+              if EFTTransactionRequest."Sales Ticket No." <> "Sales Ticket No." then
+                exit('Ambiguous'); //Recovered with an amount but too late to post automatically in same sale.
+
+          exit('StrongAccent'); //Recovered and in sync.
+        end;
+
+        if (Finished = 0DT) and ("Amount Input" <> 0) then begin
+          if (not EFTFrameworkMgt.IsFromMostRecentSaleOnPOSUnit(Rec)) then
+            exit('Unfavorable'); //Lost trx result
+
+          exit(''); //Currently ongoing trx
+        end;
+
+        if (not "External Result Received") and ("Amount Input" <> 0) then
+          exit('Unfavorable'); //Lost trx result
+
+        if "Result Amount" <> 0 then begin
+          if (not "FF Moved to POS Entry") then
+            if (not EFTFrameworkMgt.IsFromMostRecentSaleOnPOSUnit(Rec)) then
+              exit('Unfavorable'); //Lost trx result
+        end;
+
+        exit('');
+        //+NPR5.53 [377533]
     end;
 }
 

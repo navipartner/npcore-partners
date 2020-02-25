@@ -66,6 +66,12 @@ codeunit 6059784 "TM Ticket Management"
     // TM1.42/TSA /20190826 CASE 340984 Changed sort order for next_available
     // TM1.43/TSA /20190904 CASE 357359 Ticketing, changed RegisterDefaultAdmissionArrivalOnPosSales() to local
     // TM1.43/TSA /20190910 CASE 368043 Refactored "External Item Code"
+    // TM1.45/TSA /20191107 CASE 374620 Added OnDetailedTicketEvent() publisher
+    // TM1.45/TSA /20191121 CASE 378339 Added ValidateAdmSchEntryForSales()
+    // TM1.45/TSA /20191127 CASE 379766 Deligates ticket activation method to Ticket BOM
+    // TM1.45/TSA /20191202 CASE 357359 Tickets
+    // #380754/TSA /20191204 CASE 380754 Waiting list adoption
+    // #385922/TSA /20200116 CASE 385922 refactored CheckAdmissionCapacityExceeded() to also check for concurrent capacity
 
 
     trigger OnRun()
@@ -85,6 +91,7 @@ codeunit 6059784 "TM Ticket Management"
         RESERVATION_NOT_FOUND: Label 'The required reservation for ticket %1 and %2 was not found.';
         NOT_VALID: Label 'Ticket %1 is not valid for %2.';
         CAPACITY_EXCEEDED: Label 'The capacity for %1 has been exceeded. Entry is not allowed.';
+        CONCURRENT_CAPACITY_EXCEEDED: Label 'The cuncurrent capacity for group %1 has been exceeded. Entry is not allowed.';
         RESERVATION_MISMATCH: Label 'Your reservation is not for the current event.';
         RESERVATION_NOT_FOR_TODAY: Label 'Your reservation seem not to be valid for the current %1 event. Reservation entry is for %2 %3. ';
         CONF_RES_NOT_FOR_TODAY: Label 'Your reservation seem not to be valid for the current %1 event. Reservation entry is for %2 %3.\\Do you want to proceed with the current action anyway? ';
@@ -112,6 +119,7 @@ codeunit 6059784 "TM Ticket Management"
         ITEM_CONSUMED: Label '%1 is marked as consumed for ticket %2.';
         TICKET_CALENDAR: Label 'Ticket calendar defined for %1 %2 %3 states that ticket is not valid for %4.';
         RESERVATION_NOT_FOR_NOW: Label 'The ticket reservation for %4 allows admission from %1 until %2 on %3.\\Current time is: %5';
+        EVENT_SOLD_OUT: Label 'This event is sold out. Sign-up on the waiting list to get notified if ticket cancelations.';
         SUCCESS: Label '0';
         UNEXPECTED_NO: Label '-1000';
         INVALID_REFERENCE_NO: Label '-1001';
@@ -142,6 +150,8 @@ codeunit 6059784 "TM Ticket Management"
         ITEM_CONSUMED_NO: Label '-1026';
         TICKET_CALENDAR_NO: Label '-1027';
         RESERVATION_NOT_FOR_NOW_NO: Label '-1028';
+        EVENT_SOLD_OUT_NO: Label '-1029';
+        CONCURRENT_CAPACITY_EXCEEDED_NO: Label '-1030';
         INVOICE_TEXT1: Label 'Admission on %1 {%2}';
         INVOICE_TEXT2: Label 'Admission on %1 {%2,...}';
         POSTPAID_RESULT: Label 'Number of postpaid tickets: %1\\Number of invoices: %2\\Invoices created: %3';
@@ -262,12 +272,27 @@ codeunit 6059784 "TM Ticket Management"
           Ticket.SetFilter ("Line No.", '=%1', SalesLineNo);
           if (Ticket.FindSet ()) then begin
             repeat
-              if (TicketType.Get (Ticket."Ticket Type Code")) then begin
-                if (TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) then
-                  RegisterDefaultAdmissionArrivalOnPosSales (true, Ticket, '', ResponseMessage);
 
-                if (TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) then
-                  RegisterAllAdmissionArrivalOnPosSales (true, Ticket, ResponseMessage);
+              if (TicketType.Get (Ticket."Ticket Type Code")) then begin
+
+                //-TM1.45 [379766]
+                // IF (TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) THEN
+                //   RegisterDefaultAdmissionArrivalOnPosSales (TRUE, Ticket, '', ResponseMessage);
+                //
+                // IF (TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) THEN
+                //   RegisterAllAdmissionArrivalOnPosSales (TRUE, Ticket, ResponseMessage);
+
+                if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
+                  if (TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) then
+                    RegisterDefaultAdmissionArrivalOnPosSales (true, Ticket, ResponseMessage);
+
+                  if (TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) then
+                    RegisterAllAdmissionArrivalOnPosSales (true, Ticket, ResponseMessage);
+                end;
+
+                if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then
+                  RegisterTicketBomAdmissionArrivalOnPosSales (true, Ticket, ResponseMessage);
+                //+TM1.45 [379766]
 
               end;
             until (Ticket.Next () = 0);
@@ -662,38 +687,12 @@ codeunit 6059784 "TM Ticket Management"
           //
           end;
         end else begin
-          //-TM1.24 [287582]
-          if (AdmissionSchEntry."Admission End Date" = Today) then begin
-            //-+TM1.37 [327324] IF ((AdmissionSchEntry."Bookable Passed Start (Secs)" = 0) AND
-            if ((AdmissionSchEntry."Event Arrival Until Time" = 0T) and
-                (AdmissionSchEntry."Admission End Time" < Time)) then
-              exit (RaiseError (FailWithError, ResponseMessage,
-                StrSubstNo (SCHEDULE_ENTRY_EXPIRED,
-                  AdmissionSchEntry."External Schedule Entry No.",
-                  StrSubstNo ('%1 - %2', Format (AdmissionSchEntry."Admission End Date", 0, 9), Format (AdmissionSchEntry."Admission Start Time", 0, 9)),
-                  StrSubstNo ('%1 - %2', Format (Today, 0, 9), Format (Time, 0, 9))),
-                SCHEDULE_ENTRY_EXPIRED_NO));
 
-            //-+TM1.37 [327324] IF ((AdmissionSchEntry."Bookable Passed Start (Secs)" <> 0) AND
-            //-+TM1.37 [327324]     ((AdmissionSchEntry."Admission Start Time" + AdmissionSchEntry."Bookable Passed Start (Secs)"*1000) < TIME)) THEN
-            if ((AdmissionSchEntry."Event Arrival Until Time" <> 0T) and
-                (AdmissionSchEntry."Event Arrival Until Time" < Time)) then
-              exit (RaiseError (FailWithError, ResponseMessage,
-                StrSubstNo (SCHEDULE_ENTRY_EXPIRED,
-                  AdmissionSchEntry."External Schedule Entry No.",
-                  StrSubstNo ('%1 - %2', Format (AdmissionSchEntry."Admission End Date", 0, 9), Format (AdmissionSchEntry."Admission Start Time", 0, 9)),
-                  StrSubstNo ('%1 - %2', Format (Today, 0, 9), Format (Time, 0, 9))),
-                SCHEDULE_ENTRY_EXPIRED_NO2));
-          end;
+          //-#380754 [380754] refactored
+          if (IsSelectedAdmissionSchEntryExpired (AdmissionSchEntry, Today, Time, ResponseMessage, ResponseCode)) then
+            exit (RaiseError (FailWithError, ResponseMessage, ResponseMessage, Format (ResponseCode,0,9)));
+          //+#380754 [380754]
 
-          if (AdmissionSchEntry."Admission End Date" < Today) then
-              exit (RaiseError (FailWithError, ResponseMessage,
-                StrSubstNo (SCHEDULE_ENTRY_EXPIRED,
-                  AdmissionSchEntry."External Schedule Entry No.",
-                  StrSubstNo ('%1 - %2', Format (AdmissionSchEntry."Admission End Date", 0, 9), Format (AdmissionSchEntry."Admission End Time", 0, 9)),
-                  StrSubstNo ('%1 - %2', Format (Today, 0, 9), Format (Time, 0, 9))),
-                SCHEDULE_ENTRY_EXPIRED_NO3));
-          //+TM1.24 [287582]
         end;
 
         TicketAccessEntry.Init ();
@@ -746,6 +745,47 @@ codeunit 6059784 "TM Ticket Management"
         //+TM1.28 [305707]
 
         exit (0);
+    end;
+
+    local procedure IsSelectedAdmissionSchEntryExpired(AdmissionSchEntry: Record "TM Admission Schedule Entry";ReferenceDate: Date;ReferenceTime: Time;var ResponseMessage: Text;var ResponseCode: Integer) IsExpired: Boolean
+    begin
+
+        //-#380754 [380754]
+        if (AdmissionSchEntry."Admission End Date" = ReferenceDate) then begin
+
+          if ((AdmissionSchEntry."Event Arrival Until Time" = 0T) and
+              (AdmissionSchEntry."Admission End Time" < ReferenceTime)) then begin
+            ResponseMessage := StrSubstNo (SCHEDULE_ENTRY_EXPIRED,
+                AdmissionSchEntry."External Schedule Entry No.",
+                StrSubstNo ('%1 - %2', Format (AdmissionSchEntry."Admission End Date", 0, 9), Format (AdmissionSchEntry."Admission Start Time", 0, 9)),
+                StrSubstNo ('%1 - %2', Format (ReferenceDate, 0, 9), Format (ReferenceTime, 0, 9)));
+            Evaluate (ResponseCode, SCHEDULE_ENTRY_EXPIRED_NO);
+            exit (true);
+          end;
+
+          if ((AdmissionSchEntry."Event Arrival Until Time" <> 0T) and
+              (AdmissionSchEntry."Event Arrival Until Time" < ReferenceTime)) then begin
+            ResponseMessage := StrSubstNo (SCHEDULE_ENTRY_EXPIRED,
+                AdmissionSchEntry."External Schedule Entry No.",
+                StrSubstNo ('%1 - %2', Format (AdmissionSchEntry."Admission End Date", 0, 9), Format (AdmissionSchEntry."Admission Start Time", 0, 9)),
+                StrSubstNo ('%1 - %2', Format (ReferenceDate, 0, 9), Format (ReferenceTime, 0, 9)));
+            Evaluate (ResponseCode, SCHEDULE_ENTRY_EXPIRED_NO2);
+            exit (true);
+          end;
+
+        end;
+
+        if (AdmissionSchEntry."Admission End Date" < ReferenceDate) then begin
+          ResponseMessage := StrSubstNo (SCHEDULE_ENTRY_EXPIRED,
+              AdmissionSchEntry."External Schedule Entry No.",
+              StrSubstNo ('%1 - %2', Format (AdmissionSchEntry."Admission End Date", 0, 9), Format (AdmissionSchEntry."Admission End Time", 0, 9)),
+              StrSubstNo ('%1 - %2', Format (ReferenceDate, 0, 9), Format (ReferenceTime, 0, 9)));
+          Evaluate (ResponseCode, SCHEDULE_ENTRY_EXPIRED_NO3);
+          exit (true);
+        end;
+
+        exit (false); // not expired
+        //+#380754 [380754]
     end;
 
     procedure CreatePaymentEntry(Ticket: Record "TM Ticket")
@@ -842,64 +882,16 @@ codeunit 6059784 "TM Ticket Management"
         //-TM1.20 [269171]
     end;
 
-    local procedure RegisterDefaultAdmissionArrivalOnPosSales(FailWithError: Boolean;Ticket: Record "TM Ticket";AdmissionCode: Code[20];ResponseMessage: Text): Boolean
+    local procedure RegisterDefaultAdmissionArrivalOnPosSales(FailWithError: Boolean;Ticket: Record "TM Ticket";ResponseMessage: Text): Boolean
     var
-        Admission: Record "TM Admission";
-        AdmissionSchEntry: Record "TM Admission Schedule Entry";
-        TicketAccessEntry: Record "TM Ticket Access Entry";
-        DetTicketAccessEntry: Record "TM Det. Ticket Access Entry";
+        AdmissionCode: Code[20];
     begin
 
-        if (AdmissionCode = '') then
-          AdmissionCode := GetDefaultAdmissionCode (Ticket."Item No.", Ticket."Variant Code");
+        AdmissionCode := GetDefaultAdmissionCode (Ticket."Item No.", Ticket."Variant Code");
 
-        if (AdmissionCode = '') then
-          Error (NO_ADMISSION_CODE, Ticket."Item No.");
-
-        Admission.Get (AdmissionCode);
-        if (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then
-          Error (SCHEDULE_REQUIRED, AdmissionCode);
-
-
-        if (not AdmissionSchEntry.Get (GetCurrentScheduleEntry (AdmissionCode, true))) then
-          Error (ADM_NOT_OPEN, AdmissionCode, Today);
-
-        //-#357359 [357359]
-        DetTicketAccessEntry.SetFilter ("Ticket No.", '=%1', Ticket."No.");
-        DetTicketAccessEntry.SetFilter (Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
-        DetTicketAccessEntry.FindFirst ();
-        if (DetTicketAccessEntry."External Adm. Sch. Entry No." <> AdmissionSchEntry."External Schedule Entry No.") then begin
-          ResponseMessage := StrSubstNo ('There seems to be an incorrect setup for automatic ticket arrival. The event selected (%1) is not the same as the upcomming event (%2).',
-            DetTicketAccessEntry."External Adm. Sch. Entry No.",
-            AdmissionSchEntry."External Schedule Entry No.");
-          exit (0 = RaiseError (FailWithError, ResponseMessage, ResponseMessage, '-1202'));
-        end;
-        //+#357359 [357359]
-
-
-        //-TM1.24 [287582]
-        if ((AdmissionSchEntry."Admission Start Date" < Ticket."Valid From Date") or
-          (AdmissionSchEntry."Admission Start Date" > Ticket."Valid To Date")) then begin
-          ResponseMessage := StrSubstNo (NOT_VALID, Ticket."External Ticket No.", AdmissionSchEntry."Admission Start Date");
-          exit;
-        end;
-        //+TM1.24 [287582]
-
-        TicketAccessEntry.Reset ();
-        TicketAccessEntry.SetFilter ("Ticket No.", '=%1', Ticket."No.");
-        TicketAccessEntry.SetFilter ("Admission Code", '=%1', AdmissionCode);
-        if (TicketAccessEntry.FindFirst ()) then begin
-          RegisterArrival_Worker (TicketAccessEntry."Entry No.", AdmissionSchEntry."Entry No.");
-          //-#357359 [357359]
-          // CheckAdmissionCapacityExceeded (FailWithError, AdmissionSchEntry."Entry No.", ResponseMessage);
-          if (CheckAdmissionCapacityExceeded (FailWithError, AdmissionSchEntry."Entry No.", ResponseMessage) <> 0) then
-            exit (0 = RaiseError (FailWithError, ResponseMessage, ResponseMessage, '-1201'));
-          //+#357359 [357359]
-        end;
-
-        //-#357359 [357359]
-        exit (true);
-        //+#357359 [357359]
+        //-TM1.45 [379766] - refactored, implementation moved
+        exit (RegisterAdmissionArrivalOnPosSales (FailWithError, Ticket, AdmissionCode, ResponseMessage));
+        //+TM1.45 [379766]
     end;
 
     local procedure RegisterAllAdmissionArrivalOnPosSales(FailWithError: Boolean;Ticket: Record "TM Ticket";ResponseMessage: Text)
@@ -918,8 +910,78 @@ codeunit 6059784 "TM Ticket Management"
         TicketBom.FindSet ();
         repeat
           Admission.Get (TicketBom."Admission Code");
-          RegisterDefaultAdmissionArrivalOnPosSales (FailWithError, Ticket, Admission."Admission Code", ResponseMessage);
+          //-TM1.45 [379766]
+          // RegisterDefaultAdmissionArrivalOnPosSales (FailWithError, Ticket, Admission."Admission Code", ResponseMessage);
+          RegisterAdmissionArrivalOnPosSales (FailWithError, Ticket, Admission."Admission Code", ResponseMessage);
+          //+TM1.45 [379766]
+
         until (TicketBom.Next () = 0);
+    end;
+
+    local procedure RegisterTicketBomAdmissionArrivalOnPosSales(FailWithError: Boolean;Ticket: Record "TM Ticket";ResponseMessage: Text)
+    var
+        Admission: Record "TM Admission";
+        AdmissionSchEntry: Record "TM Admission Schedule Entry";
+        TicketAccessEntry: Record "TM Ticket Access Entry";
+        TicketBom: Record "TM Ticket Admission BOM";
+        TicketType: Record "TM Ticket Type";
+    begin
+
+        //-TM1.45 [379766]
+        TicketType.Get (Ticket."Ticket Type Code");
+
+        TicketBom.SetFilter ("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.SetFilter ("Variant Code", '=%1', Ticket."Variant Code");
+        if (not TicketBom.FindSet ()) then
+          Error (NO_ADMISSION_CODE, Ticket."Item No.");
+
+        repeat
+          Admission.Get (TicketBom."Admission Code");
+
+          case TicketBom."Activation Method" of
+            TicketBom."Activation Method"::SCAN : ; // Ignore
+            TicketBom."Activation Method"::POS  : RegisterAdmissionArrivalOnPosSales (FailWithError, Ticket, Admission."Admission Code", ResponseMessage);
+            TicketBom."Activation Method"::NA   :
+              begin
+                if ((TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) and TicketBom.Default) then
+                  RegisterAdmissionArrivalOnPosSales (FailWithError, Ticket, Admission."Admission Code", ResponseMessage);
+                if (TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) then
+                  RegisterAdmissionArrivalOnPosSales (FailWithError, Ticket, Admission."Admission Code", ResponseMessage);
+              end;
+          end;
+        until (TicketBom.Next () = 0);
+        //+TM1.45 [379766]
+    end;
+
+    local procedure RegisterAdmissionArrivalOnPosSales(FailWithError: Boolean;Ticket: Record "TM Ticket";AdmissionCode: Code[20];ResponseMessage: Text): Boolean
+    var
+        Admission: Record "TM Admission";
+        AdmissionSchEntry: Record "TM Admission Schedule Entry";
+        TicketAccessEntry: Record "TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "TM Det. Ticket Access Entry";
+    begin
+
+        //-TM1.45 [379766] - refactored
+        if (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then begin
+          DetTicketAccessEntry.SetFilter ("Ticket No.", '=%1', Ticket."No.");
+          DetTicketAccessEntry.SetFilter (Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
+          if (not DetTicketAccessEntry.FindFirst ()) then
+            Error (SCHEDULE_REQUIRED, AdmissionCode);
+
+          AdmissionSchEntry.SetFilter ("External Schedule Entry No.", '=%1', DetTicketAccessEntry."External Adm. Sch. Entry No.");
+          AdmissionSchEntry.SetFilter (Cancelled, '=%1', false);
+          if not (AdmissionSchEntry.FindFirst ()) then
+            AdmissionSchEntry."Entry No." := -1;
+
+        end else begin
+
+          AdmissionSchEntry."Entry No." := -1;
+
+        end;
+
+        exit (0 = ValidateTicketForArrival (0, Ticket."No.", AdmissionCode, AdmissionSchEntry."Entry No.", FailWithError, ResponseMessage));
+
+        //+TM1.45 [379766]
     end;
 
     procedure GetReceiptRequestToken(ReceiptNo: Code[20];LineNumber: Integer;var Token: Text[100]): Boolean
@@ -1419,6 +1481,10 @@ codeunit 6059784 "TM Ticket Management"
         AdmittedTicketAccessEntry.Open := true;
         AdmittedTicketAccessEntry.Insert (true);
 
+        //-TM1.45 [374620]
+        OnDetailedTicketEvent (AdmittedTicketAccessEntry);
+        //+TM1.45 [374620]
+
         CloseReservationEntry (AdmittedTicketAccessEntry);
     end;
 
@@ -1454,6 +1520,10 @@ codeunit 6059784 "TM Ticket Management"
         ReservationTicketAccessEntry.Quantity := TicketAccessEntry.Quantity;
         ReservationTicketAccessEntry.Open := true;
         ReservationTicketAccessEntry.Insert (true);
+
+        //-TM1.45 [374620]
+        OnDetailedTicketEvent (ReservationTicketAccessEntry);
+        //+TM1.45 [374620]
     end;
 
     local procedure RegisterDeparture_Worker(TicketAccessEntryNo: BigInteger)
@@ -1478,6 +1548,10 @@ codeunit 6059784 "TM Ticket Management"
           exit; // Something wrong with the references - nothing fatal, but messy. Hard error is no good...
 
         DepartureTicketAccessEntry.Modify ();
+
+        //-TM1.45 [374620]
+        OnDetailedTicketEvent (DepartureTicketAccessEntry);
+        //+TM1.45 [374620]
     end;
 
     local procedure RegisterPayment_Worker(TicketAccessEntryNo: BigInteger;PaymentType: Option;PaymentReferenceNo: Code[20])
@@ -1518,6 +1592,10 @@ codeunit 6059784 "TM Ticket Management"
         //  CloseInitialEntry (PaymentTicketAccessEntry);
         CloseInitialEntry (PaymentTicketAccessEntry);
         //+TM1.24 [287582]
+
+        //-TM1.45 [374620]
+        OnDetailedTicketEvent (PaymentTicketAccessEntry);
+        //+TM1.45 [374620]
     end;
 
     local procedure RegisterCancel_Worker(TicketAccessEntryNo: BigInteger)
@@ -1541,7 +1619,6 @@ codeunit 6059784 "TM Ticket Management"
         OpenTicketAccessEntry.SetFilter (Quantity, '>%1', 0);
         if (OpenTicketAccessEntry.FindSet ()) then begin
 
-          //-TM1.20 [269171]
           InitialTicketAccessEntry.SetCurrentKey ("Ticket Access Entry No.");
           InitialTicketAccessEntry.SetFilter ("Ticket Access Entry No.", '=%1', TicketAccessEntryNo);
           InitialTicketAccessEntry.SetFilter (Type, '=%1', InitialTicketAccessEntry.Type::INITIAL_ENTRY);
@@ -1551,21 +1628,15 @@ codeunit 6059784 "TM Ticket Management"
           AdmittedTicketAccessEntry.SetFilter ("Ticket Access Entry No.", '=%1', TicketAccessEntryNo);
           AdmittedTicketAccessEntry.SetFilter (Type, '=%1', InitialTicketAccessEntry.Type::ADMITTED);
 
-          //-TM1.26 [296731]
           HaveAdmissionEntry := AdmittedTicketAccessEntry.FindFirst ();
           if (not HaveAdmissionEntry) then
             AdmittedTicketAccessEntry.Quantity := 0;
-
-          //IF (NOT AdmittedTicketAccessEntry.FINDFIRST ()) THEN
-          //  AdmittedTicketAccessEntry.Quantity := 0;
-          //+TM1.26 [296731]
 
           ReservationTicketAccessEntry.SetCurrentKey ("Ticket Access Entry No.");
           ReservationTicketAccessEntry.SetFilter ("Ticket Access Entry No.", '=%1', TicketAccessEntryNo);
           ReservationTicketAccessEntry.SetFilter (Type, '=%1', InitialTicketAccessEntry.Type::RESERVATION);
           if (not ReservationTicketAccessEntry.FindFirst ()) then
             ReservationTicketAccessEntry.Quantity := 0;
-          //+TM1.20 [269171]
 
           QtyToCancel := InitialTicketAccessEntry.Quantity - AdmittedTicketAccessEntry.Quantity;
           if (QtyToCancel = 0) then
@@ -1575,21 +1646,20 @@ codeunit 6059784 "TM Ticket Management"
           CancelTicketAccessEntry."Ticket No." := TicketAccessEntry."Ticket No.";
           CancelTicketAccessEntry."Ticket Access Entry No." := TicketAccessEntry."Entry No.";
           CancelTicketAccessEntry.Type := CancelTicketAccessEntry.Type::CANCELED;
-          //-TM1.26 [293916] - Cancel on non-admission ticket occurs on same time as initial entry
-          // CancelTicketAccessEntry."External Adm. Sch. Entry No." := 0;
           CancelTicketAccessEntry."External Adm. Sch. Entry No." := InitialTicketAccessEntry."External Adm. Sch. Entry No.";
-          //+TM1.26 [293916]
-
           CancelTicketAccessEntry.Quantity := QtyToCancel;
           CancelTicketAccessEntry.Open := false;
 
-          //-TM1.26 [296731]
-          // CancelTicketAccessEntry.INSERT (TRUE);
-          if (not HaveAdmissionEntry) then
+          //-TM1.45 [374620]
+          //IF (NOT HaveAdmissionEntry) THEN
+          //  CancelTicketAccessEntry.INSERT (TRUE);
+          if (not HaveAdmissionEntry) then begin
             CancelTicketAccessEntry.Insert (true);
+            OnDetailedTicketEvent (CancelTicketAccessEntry);
+          end;
+          //+TM1.45 [374620]
 
           ClosedByEntryNo := CancelTicketAccessEntry."Entry No.";
-          //+TM1.26 [296731]
 
           repeat
             case OpenTicketAccessEntry.Type of
@@ -1599,25 +1669,21 @@ codeunit 6059784 "TM Ticket Management"
                   CancelTicketAccessEntry."Closed By Entry No." := OpenTicketAccessEntry."Entry No.";
                   CancelTicketAccessEntry."Entry No." := 0;
                   CancelTicketAccessEntry.Type := CancelTicketAccessEntry.Type::CANCELED;
-                  //#310947 CancelTicketAccessEntry.Quantity := OpenTicketAccessEntry.Quantity;
                   CancelTicketAccessEntry.Quantity := QtyToCancel;
                   CancelTicketAccessEntry."External Adm. Sch. Entry No." := OpenTicketAccessEntry."External Adm. Sch. Entry No.";
                   CancelTicketAccessEntry.Insert (true);
 
-                  //-TM1.40 [350287]
                   if (QtyToCancel =  AdmittedTicketAccessEntry.Quantity) then
                     OpenTicketAccessEntry.Open := false;
-                  //+TM1.40 [350287]
 
                   OpenTicketAccessEntry."Closed By Entry No." := CancelTicketAccessEntry."Entry No.";
                   OpenTicketAccessEntry.Modify();
 
                 end;
-              //+TM1.26 [296731]
 
               OpenTicketAccessEntry.Type::RESERVATION :
                 begin
-                  //-#310947 [310947]
+
                   ReservedQty := OpenTicketAccessEntry.Quantity;
                   if ((ReservedQty <> QtyToCancel) and (OpenTicketAccessEntry.Open)) then begin
                     OpenTicketAccessEntry.Quantity := ReservedQty - QtyToCancel; // new reserved qty, line is still open, reservation is active
@@ -1630,20 +1696,17 @@ codeunit 6059784 "TM Ticket Management"
                     OpenTicketAccessEntry.Modify();
                   end;
 
-        //          //-TM1.27 [296731] Only when 100% revoke
-        //          IF (TicketAccessEntry.Quantity = 1) THEN BEGIN
-        //            OpenTicketAccessEntry.Open := FALSE;
-        //            OpenTicketAccessEntry.MODIFY();
-        //          END;
-        //          //+TM1.27 [296731]
-                  //+#310947 [310947]
-
                   CancelTicketAccessEntry."Closed By Entry No." := ClosedByEntryNo;
                   CancelTicketAccessEntry."Entry No." := 0;
                   CancelTicketAccessEntry.Type := CancelTicketAccessEntry.Type::RESERVATION;
                   CancelTicketAccessEntry.Quantity := - QtyToCancel;
                   CancelTicketAccessEntry."External Adm. Sch. Entry No." := ReservationTicketAccessEntry."External Adm. Sch. Entry No.";
                   CancelTicketAccessEntry.Insert (true);
+
+                  //-TM1.45 [374620]
+                  OnDetailedTicketEvent (CancelTicketAccessEntry);
+                  //+TM1.45 [374620]
+
                 end;
 
               OpenTicketAccessEntry.Type::INITIAL_ENTRY :
@@ -1668,6 +1731,11 @@ codeunit 6059784 "TM Ticket Management"
           CancelTicketAccessEntry.Quantity := TicketAccessEntry.Quantity;
           CancelTicketAccessEntry.Open := false;
           CancelTicketAccessEntry.Insert (true);
+
+          //-TM1.45 [374620]
+          OnDetailedTicketEvent (CancelTicketAccessEntry);
+          //+TM1.45 [374620]
+
         end;
     end;
 
@@ -1704,8 +1772,6 @@ codeunit 6059784 "TM Ticket Management"
     begin
 
         exit (CloseTicketAccessEntry (ClosedByAccessEntry, DetailedTicketAccessEntry.Type::PAYMENT));
-
-        exit (CloseTicketAccessEntry (ClosedByAccessEntry, DetailedTicketAccessEntry.Type::ADMITTED));
     end;
 
     local procedure CloseTicketAccessEntry(var ClosedByAccessEntry: Record "TM Det. Ticket Access Entry";ClosingEntryType: Option) Closed: Boolean
@@ -1961,6 +2027,7 @@ codeunit 6059784 "TM Ticket Management"
         Schedule: Record "TM Admission Schedule";
         AdmissionSchedule: Record "TM Admission Schedule Lines";
         AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
+        SeatingTemplate: Record "TM Seating Template";
     begin
 
         if (not Admission.Get (AdmissionCode)) then
@@ -1994,13 +2061,112 @@ codeunit 6059784 "TM Ticket Management"
             Error (UNSUPPORTED_VALIDATION_METHOD);
         end;
 
-        //-#357359 [357359]
+        //-TM1.45 [357359]
         if (CapacityControl = Admission."Capacity Control"::SEATING) then begin
-           // MaxCapacity :=
+           // MaxCapacity := 150;
+          SeatingTemplate.SetFilter ("Admission Code", '=%1', Admission."Admission Code");
+          SeatingTemplate.SetFilter ("Reservation Category", '=%1|=%2', SeatingTemplate."Reservation Category"::AVAILABLE, SeatingTemplate."Reservation Category"::NA);
+          SeatingTemplate.SetFilter ("Entry Type", '=%1', SeatingTemplate."Entry Type"::LEAF);
+          MaxCapacity := SeatingTemplate.Count ();
         end;
-        //+#357359 [357359]
+        //+TM1.45 [357359]
 
         exit (true);
+    end;
+
+    procedure ValidateAdmSchEntryForSales(AdmissionScheduleEntry: Record "TM Admission Schedule Entry";TicketItemNo: Code[20];TicketVariantCode: Code[10];ReferenceDate: Date;ReferenceTime: Time;var RemainingQuantityOut: Integer): Boolean
+    var
+        Item: Record Item;
+        TicketType: Record "TM Ticket Type";
+        TicketBOM: Record "TM Ticket Admission BOM";
+        Admission: Record "TM Admission";
+        MaxCapacity: Integer;
+        CapacityControl: Option;
+        ActivateOnSales: Boolean;
+        IsReservation: Boolean;
+        ConcurrentQuantity: Integer;
+        ConcurrentMaxQty: Integer;
+    begin
+
+        //-TM1.45 [378339]
+        with AdmissionScheduleEntry do begin
+
+          if (not Admission.Get ("Admission Code")) then
+            Admission.Init();
+
+          if (not TicketBOM.Get (TicketItemNo, TicketVariantCode, "Admission Code")) then
+            TicketBOM.Init();
+
+          GetMaxCapacity ("Admission Code", "Schedule Code", "Entry No.", MaxCapacity, CapacityControl);
+          RemainingQuantityOut := MaxCapacity - CalculateCurrentCapacity (CapacityControl, AdmissionScheduleEntry."Entry No.");
+
+          with AdmissionScheduleEntry do
+            if (CalculateConcurrentCapacity ("Admission Code", "Schedule Code", "Admission Start Date", ConcurrentQuantity, ConcurrentMaxQty)) then
+              if (ConcurrentQuantity >= ConcurrentMaxQty) then
+                exit (false);
+
+          // Should this time slot be listed?
+          IsReservation := ((Admission.Type = Admission.Type::OCCASION) and (Admission."Prebook Is Required"));
+          ActivateOnSales := false;
+          if (Item.Get (TicketItemNo)) then begin
+            if (TicketType.Get (Item."Ticket Type")) then begin
+              if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
+                ActivateOnSales := (TicketBOM."Activation Method" = TicketBOM."Activation Method"::POS);
+                if (TicketBOM."Activation Method" = TicketBOM."Activation Method"::NA) then
+                  TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_TYPE // delegate to Ticket Type setup
+              end;
+
+              if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then
+                 ActivateOnSales := ((TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) or
+                                     ((TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) and TicketBOM.Default));
+            end;
+          end;
+
+          if ("Event Arrival From Time" = 0T) then
+            "Event Arrival From Time" := "Admission Start Time";
+
+          if ("Event Arrival Until Time" = 0T) then
+            "Event Arrival Until Time" := "Admission End Time";
+
+          // if ticket will be admitted automatically, we also need to check valid admission time
+          if (ActivateOnSales) then begin
+            if ("Admission Start Date" <> ReferenceDate) then
+              exit (false); // When ticket is activated on sales, and its a reservation for another date than the reference date, it cant be sold now, dont validate the time slot
+
+            if (ReferenceTime < "Event Arrival From Time") then
+              exit (false);
+          end;
+
+          if (IsReservation) or (Admission."Default Schedule" = Admission."Default Schedule"::SCHEDULE_ENTRY) then begin
+            // when we pass arrival until time, we cant sell this time slot.
+            if (("Admission Start Date" = ReferenceDate) and (ReferenceTime > "Event Arrival Until Time")) then
+              exit (false);
+          end;
+
+
+          // Verify the general window of sales
+          if (TicketBOM."Enforce Schedule Sales Limits") then begin
+            if ("Sales From Date" <> 0D) then begin
+              if ("Sales From Date" > ReferenceDate) then
+                exit (false);
+              if ("Sales From Date" = ReferenceDate) then
+                if ("Sales From Time" > ReferenceTime) then
+                  exit (false);
+            end;
+
+            if ("Sales Until Date" <> 0D) then begin
+              if (ReferenceDate > "Sales Until Date") then
+                exit (false);
+              if (ReferenceDate = "Sales Until Date") then
+                if (ReferenceTime > "Sales Until Time") then
+                  exit (false);
+            end;
+          end;
+
+        end;
+
+        exit (true);
+        //+TM1.45 [378339]
     end;
 
     local procedure CheckAdmissionCapacityExceeded(FailWithError: Boolean;AdmissionScheduleEntryNo: Integer;var ResponseMessage: Text): Integer
@@ -2010,12 +2176,15 @@ codeunit 6059784 "TM Ticket Management"
         AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
         Schedule: Record "TM Admission Schedule";
         AdmissionSchedule: Record "TM Admission Schedule Lines";
-        SeatingReservationEntry: Record "TM Seating Reservation Entry";
+        WaitingListSetup: Record "TM Waiting List Setup";
+        AdmissionGroupConcurrency: Record "TM Concurrent Admission Setup";
         MaxCapacity: Integer;
         AdmittedCount: Integer;
         CapacityExceeded: Boolean;
         CapacityControl: Option;
+        ResultCode: Integer;
     begin
+        //-#385922 [385922] Refactored
         //-NPR4.16 - New Function
         // This function should be called after the entry transaction have been created
         // That will allow us to catch a zero count as an error
@@ -2025,8 +2194,54 @@ codeunit 6059784 "TM Ticket Management"
         Schedule.Get (AdmissionScheduleEntry."Schedule Code");
         AdmissionSchedule.Get (AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code");
 
-        GetMaxCapacity (Admission."Admission Code", Schedule."Schedule Code", AdmissionScheduleEntryNo, MaxCapacity, CapacityControl);
-        CapacityExceeded := false;
+        GetMaxCapacity (AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntryNo, MaxCapacity, CapacityControl);
+
+        //-#385922 [385922] Refactored - implementation moved to function
+        AdmittedCount := CalculateCurrentCapacity (CapacityControl, AdmissionScheduleEntryNo);
+        //+#385922 [385922]
+
+        if (AdmittedCount = 0) then
+          Error (UNEXPECTED, AdmissionScheduleEntry.TableCaption (), Admission."Admission Code", AdmittedCount, SHOULD_NOT_BE_ZERO, 0 ,0);
+
+        CapacityExceeded := (AdmittedCount > MaxCapacity);
+
+        if (CapacityExceeded) then
+          exit (RaiseError (FailWithError, ResponseMessage, StrSubstNo (CAPACITY_EXCEEDED, Admission."Admission Code"), CAPACITY_EXCEEDED_NO));
+
+        //-#385922 [385922]
+        if (CalculateConcurrentCapacity (AdmissionSchedule."Admission Code", AdmissionSchedule."Schedule Code", AdmissionScheduleEntry."Admission Start Date", AdmittedCount, MaxCapacity)) then begin
+          AdmissionGroupConcurrency.Get (AdmissionSchedule."Concurrency Code");
+          CapacityExceeded := (AdmittedCount > MaxCapacity);
+          if (CapacityExceeded) then
+            exit (RaiseError (FailWithError, ResponseMessage, StrSubstNo (CONCURRENT_CAPACITY_EXCEEDED, AdmissionGroupConcurrency.Code), CONCURRENT_CAPACITY_EXCEEDED_NO));
+        end;
+        //+#385922 [385922]
+
+        //-#380754 [380754]
+        if (Admission."Waiting List Setup Code" <> '') then begin
+          if (not WaitingListSetup.Get (Admission."Waiting List Setup Code")) then
+            WaitingListSetup.Init;
+
+          if (AdmittedCount >= MaxCapacity - WaitingListSetup."Activate WL at Remaining Qty.") then begin
+            AdmissionScheduleEntry."Allocation By" := AdmissionScheduleEntry."Allocation By"::WAITINGLIST;
+            AdmissionScheduleEntry.Modify ();
+          end;
+        end;
+        //+#380754 [380754]
+
+        exit (0);
+    end;
+
+    local procedure CalculateCurrentCapacity(CapacityControl: Option;AdmissionScheduleEntryNo: Integer) AdmittedCount: Integer
+    var
+        Admission: Record "TM Admission";
+        DetailedTicketAccessEntry: Record "TM Det. Ticket Access Entry";
+        AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
+        SeatingReservationEntry: Record "TM Seating Reservation Entry";
+    begin
+
+        //-#385922 [385922] (refactored)
+        AdmissionScheduleEntry.Get (AdmissionScheduleEntryNo);
 
         case CapacityControl of
           Admission."Capacity Control"::NONE :
@@ -2062,28 +2277,71 @@ codeunit 6059784 "TM Ticket Management"
               AdmittedCount := AdmissionScheduleEntry."Open Admitted" + AdmissionScheduleEntry."Open Reservations";
             end;
 
-          //-#357359 [357359]
+          //-TM1.45 [357359]
           Admission."Capacity Control"::SEATING :
             begin
               SeatingReservationEntry.SetCurrentKey ("External Schedule Entry No.");
               SeatingReservationEntry.SetFilter ("External Schedule Entry No.", '=%1', AdmissionScheduleEntry."External Schedule Entry No.");
               AdmittedCount := SeatingReservationEntry.Count ();
             end;
-          //+#357359 [357359]
+          //+TM1.45 [357359]
 
           else
             Error (UNSUPPORTED_VALIDATION_METHOD);
         end;
 
-        if (AdmittedCount = 0) then
-          Error (UNEXPECTED, AdmissionScheduleEntry.TableCaption (), Admission."Admission Code", AdmittedCount, SHOULD_NOT_BE_ZERO, 0 ,0);
+        exit (AdmittedCount);
+        //+#385922 [385922]
+    end;
 
-        CapacityExceeded := (AdmittedCount > MaxCapacity);
+    procedure CalculateConcurrentCapacity(AdmissionCode: Code[20];ScheduleCode: Code[20];ReferenceDate: Date;var ActualCount: Integer;var MaxCount: Integer): Boolean
+    var
+        AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
+        AdmissionSchedule: Record "TM Admission Schedule Lines";
+        AdmissionGroupConcurrency: Record "TM Concurrent Admission Setup";
+    begin
 
-        if (CapacityExceeded) then
-          exit (RaiseError (FailWithError, ResponseMessage, StrSubstNo (CAPACITY_EXCEEDED, Admission."Admission Code"), CAPACITY_EXCEEDED_NO));
+        //+#385922 [385922]
+        ActualCount := 0;
+        MaxCount := 0;
+        if (not AdmissionSchedule.Get (AdmissionCode, ScheduleCode)) then
+          exit;
 
-        exit (0);
+        if (not AdmissionGroupConcurrency.Get (AdmissionSchedule."Concurrency Code")) then
+          exit;
+
+        if (AdmissionGroupConcurrency."Concurrency Type" = AdmissionGroupConcurrency."Concurrency Type"::NA) then
+          exit;
+
+        MaxCount := AdmissionGroupConcurrency."Total Capacity";
+        if (MaxCount = 0) then
+          exit;
+
+        AdmissionSchedule.Reset ();
+        AdmissionSchedule.SetFilter ("Concurrency Code", '=%1', AdmissionSchedule."Concurrency Code");
+
+        with AdmissionGroupConcurrency do
+          case "Concurrency Type" of
+            "Concurrency Type"::CONCURRENCY_CODE : ;
+            "Concurrency Type"::ADMISSION : AdmissionSchedule.SetFilter ("Admission Code", '=%1', AdmissionCode);
+            "Concurrency Type"::SCHEDULE  : AdmissionSchedule.SetFilter ("Schedule Code", '=%1', ScheduleCode);
+          end;
+
+        if (AdmissionSchedule.FindSet ()) then begin
+          repeat
+            AdmissionScheduleEntry.Reset ();
+            AdmissionScheduleEntry.SetFilter ("Admission Code", '=%1', AdmissionSchedule."Admission Code");
+            AdmissionScheduleEntry.SetFilter ("Schedule Code", '=%1', AdmissionSchedule."Schedule Code");
+            AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
+            AdmissionScheduleEntry.SetFilter ("Admission Start Date", '=%1', ReferenceDate);
+            if (AdmissionScheduleEntry.FindLast ()) then
+              ActualCount += CalculateCurrentCapacity (AdmissionGroupConcurrency."Capacity Control", AdmissionScheduleEntry."Entry No.");
+
+          until (AdmissionSchedule.Next () = 0);
+        end;
+
+        exit (true);
+        //+#385922 [385922]
     end;
 
     local procedure CheckTicketCapacityExceeded(FailWithError: Boolean;TicketAccessEntryNo: Integer;var ResponseMessage: Text): Boolean
@@ -2257,6 +2515,14 @@ codeunit 6059784 "TM Ticket Management"
               AdmissionScheduleEntry.CalcFields ("Open Reservations", "Open Admitted");
               AdmittedCount := AdmissionScheduleEntry."Open Admitted" + AdmissionScheduleEntry."Open Reservations";
             end;
+
+          //-TM1.45 [357359]
+          Admission."Capacity Control"::SEATING :
+            begin
+              AdmissionScheduleEntry.CalcFields ("Open Reservations", "Open Admitted");
+              AdmittedCount := AdmissionScheduleEntry."Open Admitted" + AdmissionScheduleEntry."Open Reservations";
+            end;
+          //+TM1.45 [357359]
 
           else
             Error (UNSUPPORTED_VALIDATION_METHOD);
@@ -2653,6 +2919,15 @@ codeunit 6059784 "TM Ticket Management"
 
         Hash := FormsAuthentication.HashPasswordForStoringInConfigFile (ToMd5,'MD5');
         exit (LowerCase(Hash));
+    end;
+
+    local procedure "--Publishers"()
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnDetailedTicketEvent(DetTicketAccessEntry: Record "TM Det. Ticket Access Entry")
+    begin
     end;
 }
 

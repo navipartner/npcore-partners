@@ -65,6 +65,10 @@ table 6014400 "Retail Setup"
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj
     // NPR5.46/BHR /20181005  CASE 324954 Removed Unused fields fron Retail Setup
     // NPR5.48/BHR /20190114  CASE 341974 Change field type of the fields 5116,5117 and 5118 from text30 to Code 20
+    // NPR5.53/ALPO/20191023  CASE 371955 Removed field 13 "Amount Rounding Precision": rounding related fields moved to POS Posting Profiles
+    // NPR5.53/BHR /20190810  CASE 369354 Delete field 1002 "New Customer Creation"
+    // NPR5.53/BHR /20191007  CASE 369361 Removed the fields "Company Function" - 6325,"Hotline no." - 5148, "Hosting Type" - 82
+    //                                    Removed function For online/Offline Checks
 
     Caption = 'Retail Setup';
 
@@ -85,25 +89,6 @@ table 6014400 "Retail Setup"
             Caption = 'Posting When Balancing';
             OptionCaption = 'Total,Per Register';
             OptionMembers = Total,"Per Register";
-        }
-        field(13;"Amount Rounding Precision";Decimal)
-        {
-            Caption = 'Amount Rounding Precision';
-            Description = 'Afrundingspr�cision for �reafrunding';
-            InitValue = 0.25;
-            MaxValue = 1;
-            MinValue = 0;
-
-            trigger OnValidate()
-            var
-                "Integer": Integer;
-                t001: Label '%1';
-            begin
-                if "Amount Rounding Precision" <> 0 then
-                  if not Evaluate(Integer,StrSubstNo(t001,1/"Amount Rounding Precision")) then
-                    Error(Text1060006+
-                          Text1060007);
-            end;
         }
         field(14;"Sales Ticket Line Text1";Code[50])
         {
@@ -216,13 +201,6 @@ table 6014400 "Retail Setup"
         {
             Caption = 'EAN-External';
             Description = 'ekstern eannummer';
-        }
-        field(82;"Hosting type";Option)
-        {
-            Caption = 'Hosting Type';
-            Description = 'Ops�tter printervalg afh�ngig af hostingtype.';
-            OptionCaption = 'Client,Citrix,Terminal Server,Terminal Server 2008';
-            OptionMembers = Client,Citrix,"Terminal Server","Terminal Server 2008";
         }
         field(83;"Get register no. using";Option)
         {
@@ -418,21 +396,10 @@ table 6014400 "Retail Setup"
 
             trigger OnValidate()
             begin
-                if not "Create New Customer" then
-                  "New Customer Creation" := "New Customer Creation"::All;
-            end;
-        }
-        field(1002;"New Customer Creation";Option)
-        {
-            Caption = 'New Customer Creation';
-            Description = 'Ops�tning af hvem der kan oprette kunder';
-            OptionCaption = 'All,User Managed,Cash Customer,Customer';
-            OptionMembers = All,"User Managed","Cash Customer",Customer;
-
-            trigger OnValidate()
-            begin
-                if "New Customer Creation" <> "New Customer Creation"::All then
-                  TestField("Create New Customer",true);
+                //-NPR5.53 [369354]
+                //IF NOT "Create New Customer" THEN
+                //  "New Customer Creation" := "New Customer Creation"::"0";
+                //+NPR5.53 [369354]
             end;
         }
         field(1015;"Company No.";Code[20])
@@ -834,11 +801,6 @@ table 6014400 "Retail Setup"
             Caption = 'Item Unit On Expeditions';
             Description = 'Udskriv vareenheder p� bon';
         }
-        field(5148;"Hotline no.";Code[20])
-        {
-            Caption = 'Hotline No.';
-            Description = 'Her angiver man det hotlinie kunden kan bruge';
-        }
         field(5149;"Rep. Cust. Default";Option)
         {
             Caption = 'Rep. Cust. Default';
@@ -1209,12 +1171,6 @@ table 6014400 "Retail Setup"
             Caption = 'Allow I-Comm';
             Description = 'Tillad brugen af I-Comm tabellen og lignende kommunikationstabeller';
         }
-        field(6325;"Company - Function";Option)
-        {
-            Caption = 'Company Function';
-            OptionCaption = 'Hosted Solution,Offline Local Client,Demo Company,Template Company,Offline Server,Common Company,Concern Company';
-            OptionMembers = Server,Offline,Demo,Template,"Offline server","Common Company",Concern;
-        }
         field(6330;SamletBonRabat;Boolean)
         {
             Caption = 'Combined Discount';
@@ -1337,29 +1293,5 @@ table 6014400 "Retail Setup"
         recRef: RecordRef;
         TextAuditRollWillBeDisabled: Label 'Warning: this will disable the creation of Audit Roll records. Do you want to continue?';
         AllObj: Record AllObj;
-
-    procedure CheckOffline()
-    var
-        t001: Label 'This company is not an OFFLINE company';
-    begin
-        //checkoffline
-
-        Get;
-        if not ("Company - Function" in ["Company - Function"::Offline,
-                                         "Company - Function"::"Offline server"]) then
-          Error(t001);
-    end;
-
-    procedure CheckOnline()
-    var
-        t001: Label 'This company is not an ONLINE company';
-    begin
-        //checkonline
-
-        Get;
-        if ("Company - Function" in ["Company - Function"::Offline,
-                                         "Company - Function"::"Offline server"]) then
-          Error(t001);
-    end;
 }
 

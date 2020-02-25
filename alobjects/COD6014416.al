@@ -26,6 +26,8 @@ codeunit 6014416 "Mixed Discount Management"
     // NPR5.45/MMV /20180904  CASE 327304 Handle variant code wildcard correctly.
     // NPR5.45/MMV /20180905  CASE 327277 Fixed combination mixes in the initial scoping.
     // NPR5.46/MMV /20181009  CASE 331487 Fixed incorrect unit price assignment when applying mix to lines.
+    // NPR5.53/SARA/20191128  CASE 378232 Fixed Mix discount applied to wrong priority
+    // NPR5.53/SARA/20200122  CASE 380979 New feature with Mixed Discount with Customer having Price Incl VAT = False
 
 
     trigger OnRun()
@@ -619,7 +621,12 @@ codeunit 6014416 "Mixed Discount Management"
             //-NPR5.31 [262964]
             TempSaleLinePOSApplyNew."Invoice (Qty)" := TempSaleLinePOSApplyNew."MR Anvendt antal";
             //+NPR5.31 [262964]
-            TempSaleLinePOSApplyNew."Amount Including VAT" := TempSaleLinePOSApplyNew."Unit Price" * TempSaleLinePOSApplyNew."MR Anvendt antal";
+            //-NPR5.53 [380979]
+            if TempSaleLinePOSApplyNew."Price Includes VAT" then
+              TempSaleLinePOSApplyNew."Amount Including VAT" := TempSaleLinePOSApplyNew."Unit Price" * TempSaleLinePOSApplyNew."MR Anvendt antal"
+            else
+              TempSaleLinePOSApplyNew."Amount Including VAT" := TempSaleLinePOSApplyNew."Unit Price" * TempSaleLinePOSApplyNew."MR Anvendt antal"*(1 + TempSaleLinePOSApplyNew."VAT %" / 100);
+            //+NPR5.53 [380979]
             TempSaleLinePOSApplyNew.Insert;
 
             QtyToApply -= TempSaleLinePOSApplyCopy."MR Anvendt antal";
@@ -973,8 +980,10 @@ codeunit 6014416 "Mixed Discount Management"
         if TempMixedDiscountLine.Get(TempMixedDiscount.Code,TempMixedDiscountLine."Disc. Grouping Type"::"Item Group",TempSaleLinePOS."Item Group",'') and (HighestPriority > TempMixedDiscountLine.Priority) then
           HighestPriority := TempMixedDiscountLine.Priority;
 
-        if TempMixedDiscountLine.Get(TempMixedDiscount.Code,TempMixedDiscountLine."Disc. Grouping Type"::"Item Group",TempSaleLinePOS."Item Disc. Group",'') and (HighestPriority > TempMixedDiscountLine.Priority) then
-          HighestPriority := TempMixedDiscountLine.Priority;
+        //-NPR5.53 [378232]
+        //IF TempMixedDiscountLine.GET(TempMixedDiscount.Code,TempMixedDiscountLine."Disc. Grouping Type"::"Item Group",TempSaleLinePOS."Item Disc. Group",'') AND (HighestPriority > TempMixedDiscountLine.Priority) THEN
+        if TempMixedDiscountLine.Get(TempMixedDiscount.Code,TempMixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group",TempSaleLinePOS."Item Disc. Group",'') and (HighestPriority > TempMixedDiscountLine.Priority) then
+        //+NPR5.53 [378232]
 
         exit(HighestPriority);
         //+NPR5.31 [262964]
@@ -1016,7 +1025,12 @@ codeunit 6014416 "Mixed Discount Management"
         //    TempSaleLinePOSApply."Unit Price" := TempSaleLinePOS."Unit Price";
         //+NPR5.46 [331487]
             //+NPR5.38 [300637]
-            TempSaleLinePOSApply."Amount Including VAT" := TempSaleLinePOSApply."MR Anvendt antal" * TempSaleLinePOSApply."Unit Price";
+            //-NPR5.53 [380979]
+            if TempSaleLinePOSApply."Price Includes VAT" then
+              TempSaleLinePOSApply."Amount Including VAT" := TempSaleLinePOSApply."MR Anvendt antal" * TempSaleLinePOSApply."Unit Price"
+            else
+              TempSaleLinePOSApply."Amount Including VAT" := TempSaleLinePOSApply."MR Anvendt antal" * TempSaleLinePOSApply."Unit Price" * (1 + TempSaleLinePOSApply."VAT %" / 100);
+            //+NPR5.53 [380979]
             //-NPR5.40 [306304]
             TempSaleLinePOSApply."VAT Base Amount" := TempSaleLinePOSApply."Amount Including VAT" - TempSaleLinePOSApply."Amount Including VAT" / (1 + TempSaleLinePOSApply."VAT %" / 100);
             TempSaleLinePOSApply.Amount := TempSaleLinePOSApply."Amount Including VAT" - TempSaleLinePOSApply."VAT Base Amount";

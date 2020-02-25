@@ -1,6 +1,7 @@
 codeunit 6151132 "TM POS Action - Seating"
 {
     // TM1.43/TSA /20190618 CASE 357359 Initial Version
+    // TM1.45/TSA /20191112 CASE 322432 edit reservation
 
 
     trigger OnRun()
@@ -66,21 +67,28 @@ codeunit 6151132 "TM POS Action - Seating"
 
         JSON.InitializeJObjectParser(Context, FrontEnd);
         JSON.SetScope('parameters', true);
-        // MenuFilterCode := JSON.GetString('MenuFilterCode', TRUE);
 
-        ShowSeating(FrontEnd);
+        ShowSeating (FrontEnd, POSSession);
     end;
 
     local procedure "-- Locals --"()
     begin
     end;
 
-    local procedure ShowSeating(FrontEnd: Codeunit "POS Front End Management")
+    local procedure ShowSeating(FrontEnd: Codeunit "POS Front End Management";POSSession: Codeunit "POS Session")
     var
+        SaleLinePOS: Record "Sale Line POS";
         SeatingUI: Codeunit "TM Seating UI";
+        TicketRequestManager: Codeunit "TM Ticket Request Manager";
+        POSSaleLine: Codeunit "POS Sale Line";
+        TicketToken: Text[100];
     begin
-        // FrontEnd.PauseWorkflow ();
-        //SeatingUI.ShowSelectSeatUI (FrontEnd);
+
+        POSSession.GetSaleLine (POSSaleLine);
+        POSSaleLine.GetCurrentSaleLine (SaleLinePOS);
+
+        TicketRequestManager.GetTokenFromReceipt (SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", TicketToken);
+        SeatingUI.ShowSelectSeatUI (FrontEnd, TicketToken, true);
     end;
 }
 

@@ -1,4 +1,4 @@
-pageextension 6014466 pageextension6014466 extends "Purchase Return Order" 
+pageextension 6014467 pageextension6014467 extends "Purchase Return Order" 
 {
     // NPR5.38/TS  /20171120  CASE 296906 Added Action PDF2NAV
     //                                    Added field Document Processing.

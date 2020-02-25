@@ -11,6 +11,7 @@ page 6014405 "Register List"
     // NPR5.30/TJ  /20170215 CASE 265504 Changed page ENU caption
     // NPR5.31/CLVA/20161205 CASE 251884 Added Action mPos Setup
     // NPR5.46/MMV /20180918 CASE 290734 Removed deprecated fields, most from standard POS
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
 
     Caption = 'Cash Register List';
     CardPageID = "Register Card";
@@ -72,10 +73,13 @@ page 6014405 "Register List"
                 {
                     Caption = 'Dimensions-Single';
                     Image = Dimensions;
-                    RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID"=CONST(6014401),
-                                  "No."=FIELD("Register No.");
                     ShortCutKey = 'Shift+Ctrl+D';
+                    Visible = false;
+
+                    trigger OnAction()
+                    begin
+                        DimsAreDiscontinuedOnRegister;  //NPR5.53 [371956]
+                    end;
                 }
                 action("Dimensions-Mulitple")
                 {
@@ -88,6 +92,7 @@ page 6014405 "Register List"
                         Register: Record Register;
                         DefaultDimMultiple: Page "Default Dimensions-Multiple";
                     begin
+                        DimsAreDiscontinuedOnRegister;  //NPR5.53 [371956]
                         //-NPR5.29 [263787]
                         /*
                         CurrPage.SETSELECTIONFILTER(Register);

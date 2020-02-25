@@ -8,6 +8,8 @@ codeunit 6151151 "M2 Account Manager"
     // NPR5.51/TSA /20190726 CASE 356090 Addded Member functionality to the account functions
     // NPR5.51/TSA /20190812 CASE 364644 Added First Name, Last Name to Contact Type=Company, removed primary contact creation and miss-use of the Company contact for first "person"
     // MAG2.23/TSA /20191009 CASE 372257 Added some info to resetpassword request
+    // MAG2.23.01/TSA /20191009 CASE 372257 Changed to Contact."No." rather then "Company No." in reset password request
+    // MAG2.24/TSA /20191119 CASE 372304 Added Membership opt-out feature
 
 
     trigger OnRun()
@@ -474,7 +476,7 @@ codeunit 6151151 "M2 Account Manager"
                 ;
 
           Customer.TestField ("Magento Store Code");
-          msg := msg + StrSubstNo (',{"id":"%1","storecode":"%2"}', Contact."Company No.", Customer."Magento Store Code");
+          msg := msg + StrSubstNo (',{"id":"%1","storecode":"%2"}', Contact."No.", Customer."Magento Store Code");
 
         until (Contact.Next () = 0);
 
@@ -818,12 +820,16 @@ codeunit 6151151 "M2 Account Manager"
         Customer.Validate (Address , TmpContact.Address);
         Customer.Validate ("Address 2", TmpContact."Address 2");
 
+        //-MAG2.24 [372304] validation order is important in BC
+        if (TmpContact."Country/Region Code" <> '') then
+          Customer.Validate ("Country/Region Code", TmpContact."Country/Region Code");
+        //-MAG2.24 [372304]
         if (TmpContact."Post Code" <> '') then
           Customer.Validate ("Post Code", TmpContact."Post Code");
         if (TmpContact.City <> '') then
           Customer.Validate (City, TmpContact.City);
-        if (TmpContact."Country/Region Code" <> '') then
-          Customer.Validate ("Country/Region Code", TmpContact."Country/Region Code");
+        //IF (TmpContact."Country/Region Code" <> '') THEN
+        //  Customer.VALIDATE ("Country/Region Code", TmpContact."Country/Region Code");
 
         if (TmpContact."Currency Code" <> '') then
           Customer.Validate ("Currency Code", TmpContact."Currency Code");
@@ -1344,6 +1350,11 @@ codeunit 6151151 "M2 Account Manager"
         MembershipManagement: Codeunit "MM Membership Management";
         Membership: Record "MM Membership";
     begin
+
+        //-MAG2.24 [372304] Opt-out on membership create
+        if (TmpContact."Exclude from Segment") then
+          exit (false);
+        //+MAG2.24 [372304]
 
         //-NPR5.51 [356090]
         MembershipSalesSetup.SetFilter ("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);

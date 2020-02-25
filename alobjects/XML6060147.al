@@ -2,6 +2,7 @@ xmlport 6060147 "MM Loyalty Coupon Eligibility"
 {
     // MM1.40/TSA /20190813 CASE 343352 Initial Version
 
+    Caption = 'Loyalty Coupon Eligibility';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
 

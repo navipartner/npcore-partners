@@ -10,6 +10,7 @@ table 6150614 "POS Store"
     // NPR5.38/BR/20180125 CASE 302803 Added field Posting Compression, renamed field POS Ledger No. Series to POS Period Register No. Series
     // NPR5.48/MMV /20180615 CASE 318028 Added field 28 for countries with location specific registration no.
     // NPR5.51/TSA /20190722 CASE 361917 Removed unreferenced functions SendToJournal(), PostToEntries(), PostOnFinaliseSale(), PostOnClosePOS()
+    // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
 
     Caption = 'POS Store';
     DataCaptionFields = "Code", Name;
@@ -292,6 +293,16 @@ table 6150614 "POS Store"
         POSPostingSetup.SetRange("POS Store Code", Code);
         POSPostingSetup.DeleteAll(true);
         //+NPR5.36 [289641]
+        DimMgt.DeleteDefaultDim(DATABASE::"POS Store",Code);  //NPR5.53 [371956]
+    end;
+
+    trigger OnInsert()
+    begin
+        //-NPR5.53 [371956]
+        DimMgt.UpdateDefaultDim(
+          DATABASE::"POS Store",Code,
+          "Global Dimension 1 Code","Global Dimension 2 Code");
+        //+NPR5.53 [371956]
     end;
 
     var

@@ -11,6 +11,7 @@ xmlport 6060130 "MM Get Membership Members"
     // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
     // MM1.37/TSA /20190213 CASE 345855 Cardnumber not returned for perpetual cards
     // MM1.40/TSA /20190827 CASE 360242 Adding attribute support
+    // MM1.42/TSA /20191205 CASE 381222 Added notification method
 
     Caption = 'Get Membership Members';
     FormatEvaluate = Xml;
@@ -162,6 +163,9 @@ xmlport 6060130 "MM Get Membership Members"
                                 {
                                 }
                             }
+                        }
+                        fieldelement(notificationmethod;tmpMemberInfoResponse."Notification Method")
+                        {
                         }
                     }
                 }

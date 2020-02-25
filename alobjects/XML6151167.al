@@ -2,6 +2,7 @@ xmlport 6151167 "NpGp POS Entries"
 {
     // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
     // NPR5.51/ALST/20190711  CASE 337539 added fields
+    // NPR5.53/THRO/20191206  CASE 381416 Added extension_fields section in sales_line
 
     Caption = 'Global POS Sales Entries';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/global_pos_sales';
@@ -163,6 +164,34 @@ xmlport 6151167 "NpGp POS Entries"
                         }
                         fieldelement(global_reference;TempNpGpPOSSalesLine."Global Reference")
                         {
+                        }
+                        textelement(extension_fields)
+                        {
+                            MinOccurs = Zero;
+                            textelement(extension_field)
+                            {
+                                MinOccurs = Zero;
+                                textelement(field_no)
+                                {
+                                }
+                                textelement(field_value)
+                                {
+
+                                    trigger OnAfterAssignVariable()
+                                    var
+                                        RecRef: RecordRef;
+                                        FldRef: FieldRef;
+                                        FieldNo: Integer;
+                                    begin
+                                        if Evaluate(FieldNo,field_no) then begin
+                                          RecRef.GetTable(TempNpGpPOSSalesLine);
+                                          FldRef := RecRef.Field(FieldNo);
+                                          if Evaluate(FldRef,field_value,9) then
+                                            RecRef.SetTable(TempNpGpPOSSalesLine);
+                                        end;
+                                    end;
+                                }
+                            }
                         }
 
                         trigger OnBeforeInsertRecord()

@@ -12,6 +12,7 @@ page 6014428 "Salesperson Card"
     // NPR5.30/TJ  /20170222 CASE 266875 Removed function AutoCreateCustomer as it's not used anywhere
     // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer
     // NPR5.42/TS  /20180509 CASE 313970 Added Masjked on field Register Password
+    // NPR5.53/BHR /20190810 CASE 369354 Removed Fields 'New Customer creation'
 
     Caption = 'Salesperson/Purchaser Card';
     SourceTable = "Salesperson/Purchaser";
@@ -60,9 +61,6 @@ page 6014428 "Salesperson Card"
                 field("Register Password";"Register Password")
                 {
                     ExtendedDatatype = Masked;
-                }
-                field("Customer Creation";"Customer Creation")
-                {
                 }
                 field("Reverse Sales Ticket";"Reverse Sales Ticket")
                 {

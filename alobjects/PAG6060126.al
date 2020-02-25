@@ -13,6 +13,8 @@ page 6060126 "MM Members"
     // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
     // MM1.40/TSA /20190822 CASE 360242 Adding NPR Attributes
     // MM1.41/TSA /20191007 CASE 365970 Update Contact
+    // MM1.42/TSA /20191219 CASE 382728 Added Preferred Com. Method related action
+    // MM1.42/TSA /20200114 CASE 385449 Added CreateMembership action
 
     Caption = 'Members';
     CardPageID = "MM Member Card";
@@ -215,6 +217,34 @@ page 6060126 "MM Members"
     {
         area(processing)
         {
+            action("Create Membership")
+            {
+                Caption = 'Create Membership';
+                Ellipsis = true;
+                Image = NewCustomer;
+                Promoted = true;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    MembershipSalesSetup: Record "MM Membership Sales Setup";
+                    MembershipRole: Record "MM Membership Role";
+                    MembershipEntryNo: Integer;
+                begin
+
+                    //-MM1.42 [385449]
+                    if (SelectMembershipSetup (MembershipSalesSetup)) then
+                      MembershipEntryNo := CreateMembership (MembershipSalesSetup);
+
+                    if (MembershipEntryNo > 0) then begin
+                      MembershipRole.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
+                      MembershipRole.FindFirst ();
+                      Rec.SetFilter ("Entry No.", '=%1', MembershipRole."Member Entry No.");
+                      CurrPage.Update (false);
+                    end;
+                    //+MM1.42 [385449]
+                end;
+            }
             action("Register Arrival")
             {
                 Caption = 'Register Arrival';
@@ -275,6 +305,17 @@ page 6060126 "MM Members"
         }
         area(navigation)
         {
+            action("Preferred Communication Methods")
+            {
+                Caption = 'Preferred Com. Methods';
+                Ellipsis = true;
+                Image = ChangeDimensions;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                RunObject = Page "MM Member Communication";
+                RunPageLink = "Member Entry No."=FIELD("Entry No.");
+            }
             action("Arrival Log")
             {
                 Caption = 'Arrival Log';
@@ -390,6 +431,72 @@ page 6060126 "MM Members"
           until (Member.Next () = 0);
         end;
         //+MM1.41 [365970]
+    end;
+
+    local procedure SelectMembershipSetup(var MembershipSalesSetup: Record "MM Membership Sales Setup"): Boolean
+    var
+        MembershipSalesSetupPage: Page "MM Membership Sales Setup";
+    begin
+
+        //-MM1.42 [385449]
+        MembershipSalesSetup.SetFilter ("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
+        if (MembershipSalesSetup.Count () = 1) then begin
+          exit (MembershipSalesSetup.FindFirst ());
+
+        end else begin
+          MembershipSalesSetupPage.SetTableView (MembershipSalesSetup);
+          MembershipSalesSetupPage.LookupMode (true);
+          if (ACTION::LookupOK = MembershipSalesSetupPage.RunModal ()) then begin
+            MembershipSalesSetupPage.GetRecord (MembershipSalesSetup);
+            exit (true);
+          end;
+        end;
+
+        exit (false);
+        //+MM1.42 [385449]
+    end;
+
+    local procedure CreateMembership(MembershipSalesSetup: Record "MM Membership Sales Setup") MembershipEntryNo: Integer
+    var
+        MemberInfoCapture: Record "MM Member Info Capture";
+        MemberCommunity: Record "MM Member Community";
+        MembershipSetup: Record "MM Membership Setup";
+        MemberInfoCapturePage: Page "MM Member Info Capture";
+        MembershipPage: Page "MM Membership Card";
+        PageAction: Action;
+        MembershipManagement: Codeunit "MM Membership Management";
+    begin
+
+        //-MM1.42 [385449]
+        MembershipSetup.Get (MembershipSalesSetup."Membership Code");
+
+        MemberCommunity.Get (MembershipSetup."Community Code");
+        MemberCommunity.CalcFields ("Foreign Membership");
+        MemberCommunity.TestField ("Foreign Membership", false);
+
+        MemberInfoCapture.Init ();
+        MemberInfoCapture."Item No." := MembershipSalesSetup."No.";
+        MemberInfoCapture.Insert ();
+
+        MemberInfoCapturePage.SetRecord (MemberInfoCapture);
+        MemberInfoCapture.SetFilter ("Entry No.", '=%1', MemberInfoCapture."Entry No.");
+        MemberInfoCapturePage.SetTableView (MemberInfoCapture);
+        Commit ();
+
+        MemberInfoCapturePage.LookupMode (true);
+        PageAction := MemberInfoCapturePage.RunModal ();
+
+        if (PageAction = ACTION::LookupOK) then begin
+          MemberInfoCapturePage.GetRecord (MemberInfoCapture);
+
+          case MembershipSalesSetup."Business Flow Type" of
+            MembershipSalesSetup."Business Flow Type"::MEMBERSHIP : MembershipEntryNo := MembershipManagement.CreateMembershipAll (MembershipSalesSetup, MemberInfoCapture, true);
+          else
+            Error ('Not implemented.');
+          end;
+
+        end;
+        //+MM1.42 [385449]
     end;
 }
 

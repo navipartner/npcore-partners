@@ -1,6 +1,7 @@
 codeunit 6184524 "EFT ISMP Baxi Protocol"
 {
     // NPR5.51/CLVA/20190805 CASE 364011 Created object
+    // NPR5.53/CLVA/20191029 CASE 374331 Added support for Android
 
     SingleInstance = true;
 
@@ -238,10 +239,18 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
     local procedure Javascript(EFTTransactionRequest: Record "EFT Transaction Request"): Text
     var
         JSScript: Text;
+        Json: Text;
     begin
         JSScript := 'setInterval(function() { $("#adyen-timer").click(); }, 1000);';
         //JSScript += 'mpos.setWindowsId(window.name);';
-        JSScript += 'mpos.startEFTTransaction(' + PaymentRequest(EFTTransactionRequest) + ');';
+        //-NPR5.53 [361955]
+        //JSScript += 'mpos.startEFTTransaction('+PaymentRequest(EFTTransactionRequest)+');';
+        Json := PaymentRequest(EFTTransactionRequest);
+        JSScript += 'var userAgent = navigator.userAgent || navigator.vendor || window.opera; if (/android/i.test(userAgent)) { ';
+        JSScript += 'window.top.mpos.handleEFTBackendMessage('+Json+'); } ';
+        JSScript += 'if (/iPad|iPhone|iPod|Macintosh/.test(userAgent) && !window.MSStream) { ';
+        JSScript += 'mpos.startEFTTransaction('+Json+');}';
+        //+NPR5.53 [361955]
         exit(JSScript);
 
         //EXIT('setInterval(function() { $("#adyen-timer").click(); }, 250);');
@@ -300,12 +309,21 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
     var
         EFTTransactionRequest: Record "EFT Transaction Request";
         EFTISMPBaxiIntegration: Codeunit "EFT ISMP Baxi Integration";
+        JSScript: Text;
     begin
         if (Ticks < 3) then
             exit;
 
         if not CloseOnIdle then begin
-            Model.AddScript('mpos.abortTransaction(window.name);');
+          //-NPR5.53 [361955]
+          //Model.AddScript('mpos.abortTransaction(window.name);');
+          JSScript += 'var userAgent = navigator.userAgent || navigator.vendor || window.opera; if (/android/i.test(userAgent)) { ';
+          JSScript += 'window.top.mpos.handleEFTAbortBackendMessage(window.name); } ';
+          JSScript += 'if (/iPad|iPhone|iPod|Macintosh/.test(userAgent) && !window.MSStream) { ';
+          JSScript += 'mpos.abortTransaction(window.name);}';
+          Model.AddScript(JSScript);
+          //-NPR5.53 [361955]
+
             FrontEnd.UpdateModel(Model, ActiveModelID);
         end;
 

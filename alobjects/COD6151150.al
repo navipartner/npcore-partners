@@ -7,6 +7,7 @@ codeunit 6151150 "M2 Account WebService"
     // MAG2.21.01/TSA /20190426 CASE 350001 Added GetExtendedAccountDetails
     // MAG2.21.01/TSA /20190506 CASE 353964 Refactored to not use try functions
     // NPR5.51/TSA /20190724 CASE 362020 Adding actions for contact / mail group management
+    // MAG2.24/TSA /20191126 CASE 378812 Added ShopperRecognition service
 
 
     trigger OnRun()
@@ -337,6 +338,27 @@ codeunit 6151150 "M2 Account WebService"
         // Implicit export
 
         //+NPR5.51 [362020]
+    end;
+
+    procedure GetShopperRecognition(var ShopperRecognition: XMLport "M2 Shopper Recognition")
+    var
+        TmpEFTShopperRecognition: Record "EFT Shopper Recognition" temporary;
+        EFTShopperRecognition: Codeunit "EFT Shopper Recognition";
+    begin
+
+        //-MAG2.24 [378812]
+        SelectLatestVersion;
+        ShopperRecognition.Import;
+        ShopperRecognition.GetRequest (TmpEFTShopperRecognition);
+
+        if (not EFTShopperRecognition.GetShopperReference (TmpEFTShopperRecognition)) then
+          if (not EFTShopperRecognition.CreateShopperReference (TmpEFTShopperRecognition)) then
+            ShopperRecognition.SetErrorResponse (
+              StrSubstNo ('Integration Type "%1" exist with differnt Shopper Reference value for "%2" "%3", replace is not supported.',
+                TmpEFTShopperRecognition."Integration Type", Format (TmpEFTShopperRecognition."Entity Type"), TmpEFTShopperRecognition."Entity Key"));
+
+        ShopperRecognition.SetResponse (TmpEFTShopperRecognition);
+        //+MAG2.24 [378812]
     end;
 
     local procedure "--"()

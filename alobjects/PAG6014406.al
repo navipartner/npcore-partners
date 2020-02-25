@@ -42,6 +42,9 @@ page 6014406 "Register Card"
     // NPR5.49/TJ  /20190201 CASE 335739 Fields 20,819,820,821,822,833 and 6150721 moved to new table
     //                                   Picture actions and decimal detect action moved to new page
     // NPR5.52/ALPO/20190926 CASE 368673 Active event (from Event Management module) on cash register: new control "Active Event No."
+    // NPR5.53/ALPO/20191013 CASE 371955 Removed field 25 "Rounding": moved to "POS Posting Profile" (Table 6150653)
+    // NPR5.53/ALPO/20191023 CASE 373743 Removed field 21 "Sales Ticket Series": moved to "POS Audit Profile" (Table 6150650)
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
 
     Caption = 'Cash Register Setup';
     RefreshOnActivate = true;
@@ -293,9 +296,6 @@ page 6014406 "Register Card"
                     field("Register Change Account";"Register Change Account")
                     {
                     }
-                    field(Rounding;Rounding)
-                    {
-                    }
                     field("Location Code";"Location Code")
                     {
                     }
@@ -341,10 +341,6 @@ page 6014406 "Register Card"
                 }
                 field("Customer No. auto debit sale";"Customer No. auto debit sale")
                 {
-                }
-                field("Sales Ticket Series";"Sales Ticket Series")
-                {
-                    Importance = Promoted;
                 }
                 field("Exchange Label Exchange Period";"Exchange Label Exchange Period")
                 {
@@ -463,9 +459,12 @@ page 6014406 "Register Card"
                 {
                     Caption = 'Dimensions';
                     Image = DefaultDimension;
-                    RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID"=CONST(6014401),
-                                  "No."=FIELD("Register No.");
+                    Visible = false;
+
+                    trigger OnAction()
+                    begin
+                        DimsAreDiscontinuedOnRegister;  //NPR5.53 [371956]
+                    end;
                 }
             }
         }

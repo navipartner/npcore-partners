@@ -3,6 +3,7 @@ page 6151022 "NpRv Arch. Vouchers"
     // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
     // NPR5.48/MHA /20180921  CASE 302179 Added field 1007 "Issue Document Type", 1013 "Issue External Document No."
     // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner fields used with Cross Company Vouchers
+    // NPR5.53/MHA /20191212  CASE 380284 Added "Initial Amount" and hidden "Amount"
 
     Caption = 'Archived Retail Vouchers';
     CardPageID = "NpRv Arch. Voucher Card";
@@ -29,8 +30,12 @@ page 6151022 "NpRv Arch. Vouchers"
                 field("Issue Date";"Issue Date")
                 {
                 }
+                field("Initial Amount";"Initial Amount")
+                {
+                }
                 field(Amount;Amount)
                 {
+                    Visible = false;
                 }
                 field("Starting Date";"Starting Date")
                 {

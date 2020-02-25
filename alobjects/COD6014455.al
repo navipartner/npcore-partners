@@ -17,6 +17,8 @@ codeunit 6014455 "POS Sales Discount Calc. Mgt."
     //                                    Fixed LineOperation value.
     // NPR5.46/JDH /20180927  CASE 294354 Made ApplyDiscount and OnFindActiveSaleLineDiscounts global
     // NPR5.48/MMV /20181217  CASE 340154 Added doc and removed old comments.
+    // NPR5.53/MHA /20190103  CASE 382816 Quantity changes should also trigger update in UpdateDiscOnSalesLine()
+    // NPR5.53/ALPO/20200128  CASE 387544 Fixed a bug where an attempt was made to change an old version of a Sale Line record.
     // 
     // This module is invoked by the sale line wrapper codeunit in transcendence inside insert,modify,delete functions.
     // It is specifically not invoked from table field validations or table subscribers to prevent unnecessary cascading.
@@ -232,8 +234,15 @@ codeunit 6014455 "POS Sales Discount Calc. Mgt."
             TempSaleLinePOS."Discount Calculated" := false;
             TempSaleLinePOS.UpdateAmounts(TempSaleLinePOS);
             if SaleLinePOS.Get(TempSaleLinePOS."Register No.",TempSaleLinePOS."Sales Ticket No.",TempSaleLinePOS.Date,TempSaleLinePOS."Sale Type",TempSaleLinePOS."Line No.") then begin
-              if (SaleLinePOS."Discount Type" <> TempSaleLinePOS."Discount Type") or (SaleLinePOS."Discount %" <> TempSaleLinePOS."Discount %") or (SaleLinePOS."Discount Amount" <> TempSaleLinePOS."Discount Amount") then begin
-                SaleLinePOS := TempSaleLinePOS;
+              if (SaleLinePOS."Discount Type" <> TempSaleLinePOS."Discount Type")
+                  or (SaleLinePOS."Discount %" <> TempSaleLinePOS."Discount %")
+                  or (SaleLinePOS."Discount Amount" <> TempSaleLinePOS."Discount Amount")
+                  //-NPR5.53 [382816]
+                  or (SaleLinePOS.Quantity <> TempSaleLinePOS.Quantity)
+                  //+NPR5.53 [382816]
+              then begin
+                //SaleLinePOS := TempSaleLinePOS;  //NPR5.53 [387544]-revoked
+                SaleLinePOS.TransferFields(TempSaleLinePOS,false);  //NPR5.53 [387544]
                 SaleLinePOS.Modify;
               end;
             end else begin

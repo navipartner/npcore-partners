@@ -6,6 +6,7 @@ codeunit 6014447 "Label Library Sub. Mgt."
     //                                    Added Transfer Shipment Header case to ApplyFilterAndRun
     // NPR5.46/JDH /20181001 CASE 294354  Restructured functionality for printing
     // NPR5.51/BHR /20190614 CASE 358287  Add retail print and Price label for Psted Purchase Invoice
+    // NPR5.53/SARA/20191119 CASE 377622 Added Print Price Label for Retail Item Journal
 
 
     trigger OnRun()
@@ -89,6 +90,16 @@ codeunit 6014447 "Label Library Sub. Mgt."
         //-NPR5.43 [317852]
         PrintLabel(Rec,ReportSelectionRetail."Report Type"::"Price Label");
         //+NPR5.43 [317852]
+    end;
+
+    [EventSubscriber(ObjectType::Page, 6014402, 'OnAfterActionEvent', 'PriceLabel', false, false)]
+    local procedure RetailItemJournalOnAfterActionEventPriceLabel(var Rec: Record "Item Journal Line")
+    var
+        ReportSelectionRetail: Record "Report Selection Retail";
+    begin
+        //-NPR5.53 [377622]
+        PrintLabel(Rec,ReportSelectionRetail."Report Type"::"Price Label");
+        //+NPR5.53 [377622]
     end;
 
     [EventSubscriber(ObjectType::Page, 6014453, 'OnAfterActionEvent', 'RetailPrint', true, true)]

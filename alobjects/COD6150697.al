@@ -18,6 +18,8 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
     // NPR5.51/MHA /20190718 CASE 362329 Added "Exclude from Posting" on POS Sales Lines in InsertPOSSaleLine()
     // NPR5.51/LS  /20190826 CASE 334335 Modified function UpgradeSetupsBalancingV3()
     // NPR5.52/SARA/20191011 CASE 371142 Enhancement on conversion tool for POS Entry, function UpgradeSetupsBalancingV3
+    // NPR5.53/SARA/20191119 CASE 375828 Modify mapping for fields 'Rounding Gain Account' and 'Rounding Losses Account' for POS Paymeny Method
+    // NPR5.53/SARA/20191206 CASE 381094 Correction Description for in POS Payment Bin for 'Bank' and 'Safe'
 
     Permissions = TableData "Audit Roll"=rimd;
 
@@ -794,6 +796,7 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
         Register: Record Register;
         POSStore: Record "POS Store";
         POSUnitBinRelation: Record "POS Unit to Bin Relation";
+        POSPostingProfile: Record "POS Posting Profile";
         BlankPosStoreCode: Integer;
     begin
         //-NPR5.48 [334335]
@@ -889,11 +892,19 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
             if POSPaymentMethod."Processing Type" = POSPaymentMethod."Processing Type"::CASH then
               POSPaymentMethod."Include In Counting" := POSPaymentMethod."Include In Counting"::YES;
         
-            if Register.FindFirst then begin
+            //-NPR5.53 [375828]
+            /*
+            IF Register.FINDFIRST THEN BEGIN
               POSPaymentMethod."Rounding Gains Account" := Register.Rounding;
               POSPaymentMethod."Rounding Losses Account" := Register.Rounding;
+            END;
+            */
+            if POSPostingProfile.FindFirst then begin
+              POSPaymentMethod."Rounding Gains Account" := POSPostingProfile."POS Sales Rounding Account";
+              POSPaymentMethod."Rounding Losses Account" := POSPostingProfile."POS Sales Rounding Account";
             end;
-            //-NPR5.52[371142]
+            //+NPR5.53 [375828]
+            //+NPR5.52[371142]
             POSPaymentMethod.Insert(true);
           end;
         until PaymentTypePOS.Next = 0;
@@ -1103,8 +1114,13 @@ codeunit 6150697 "Retail Data Model AR Upgrade"
         BinNoArray[3] := 'SAFE';
 
         BinDescArray[1] := 'Auto Count Bin';
-        BinDescArray[2] := 'Safe';
-        BinDescArray[3] := 'Bank';
+        //-NPR5.53 [381094]
+        //BinDescArray[2] := 'Safe';
+        //BinDescArray[3] := 'Bank';
+        BinDescArray[2] := 'Bank';
+        BinDescArray[3] := 'Safe';
+        //+NPR5.53 [381094]
+
         for i := 1 to 3 do begin
           //POSPaymentBinCheck.RESET;
           //POSPaymentBinCheck.SETRANGE("No.",BinNoArray[i]);

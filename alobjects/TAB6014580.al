@@ -10,6 +10,7 @@ table 6014580 "Object Output Selection"
     // NPR5.29/MMV /20161018 CASE 253590 Added new option 'HTTP' in field 10.
     // NPR5.32/MMV /20170324 CASE 253590 Added new option 'Bluetooth' in field 10.
     //                                   Removed field 12.
+    // NPR5.53/THRO/20200106 CASE 383562 Added new Option 'PrintNode PDF' and 'PrintNode Raw' in field 10
 
     Caption = 'Object Output Selection';
 
@@ -67,8 +68,8 @@ table 6014580 "Object Output Selection"
         field(10;"Output Type";Option)
         {
             Caption = 'Output Type';
-            OptionCaption = 'Printer Name,File,Epson Web,E-mail,Google Print,HTTP,Bluetooth';
-            OptionMembers = "Printer Name",File,"Epson Web","E-mail","Google Print",HTTP,Bluetooth;
+            OptionCaption = 'Printer Name,File,Epson Web,E-mail,Google Print,HTTP,Bluetooth,PrintNode PDF,PrintNode Raw';
+            OptionMembers = "Printer Name",File,"Epson Web","E-mail","Google Print",HTTP,Bluetooth,"PrintNode PDF","PrintNode Raw";
         }
         field(11;"Output Path";Text[250])
         {
@@ -82,6 +83,7 @@ table 6014580 "Object Output Selection"
             var
                 Printer: Record Printer;
                 GCPMgt: Codeunit "GCP Mgt.";
+                PrintNodeMgt: Codeunit "PrintNode Mgt.";
                 ID: Text;
             begin
                 case "Output Type" of
@@ -96,6 +98,15 @@ table 6014580 "Object Output Selection"
                       if GCPMgt.LookupPrinters(ID) then
                         "Output Path" := ID;
                     end;
+                  //-NPR5.53 [383562]
+                  "Output Type"::"PrintNode PDF",
+                  "Output Type"::"PrintNode Raw" :
+                    begin
+                      if PrintNodeMgt.LookupPrinter(ID) then
+                        "Output Path" := ID;
+                    end;
+                  //-NPR5.53 [383562]
+
                 end;
             end;
         }

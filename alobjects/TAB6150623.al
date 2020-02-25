@@ -11,6 +11,7 @@ table 6150623 "POS Payment Line"
     // NPR5.38/BR/20171214 CASE 299888 Renamed from POS Ledg. Register No. to POS Period Register No. (incl. Captions)
     // NPR5.42/TSA /20180511 CASE 314834 Dimensions are editable when entry is unposted
     // NPR5.50/TSA /20190520 CASE 354832 Added VAT related fields 84-106 for reversing unrealized VAT when using a voucher with preliminary VAT
+    // NPR5.53/SARA/20191024 CASE 373672 Added Field 600..620
 
     Caption = 'POS Payment Line';
     DrillDownPageID = "POS Payment Line List";
@@ -233,6 +234,30 @@ table 6150623 "POS Payment Line"
         field(502;Token;Text[50])
         {
             Caption = 'Token';
+        }
+        field(600;"Entry Date";Date)
+        {
+            CalcFormula = Lookup("POS Entry"."Entry Date" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            Caption = 'Entry Date';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(610;"Starting Time";Time)
+        {
+            CalcFormula = Lookup("POS Entry"."Starting Time" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            Caption = 'Starting Time';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(620;"Ending Time";Time)
+        {
+            CalcFormula = Lookup("POS Entry"."Ending Time" WHERE ("Entry No."=FIELD("POS Entry No.")));
+            Caption = 'Ending Time';
+            Description = 'NPR5.53';
+            Editable = false;
+            FieldClass = FlowField;
         }
     }
 

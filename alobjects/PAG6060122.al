@@ -13,6 +13,9 @@ page 6060122 "TM Admission Schedule Entry"
     // TM1.28/TSA /20180221 CASE 306039 Added "Visibility On Web"
     // TM1.37/TSA/20180927  CASE 327324 Transport TM1.37 - 27 September 2018
     // TM1.39/TSA /20181102 CASE 334585 A control of type 'FlowFilter' is not allowed in a parent control of type 'Repeater'
+    // TM1.45/TSA /20191204 CASE 378212 Added sales limitation fields
+    // TM1.45/TSA /20191204 CASE 380754 Added Waiting list properties and actions
+    // TM1.45/TSA /20200116 CASE 385922 Added Concurrency Capacity calculation field
 
     Caption = 'Admission Schedule Entry';
     InsertAllowed = false;
@@ -94,11 +97,35 @@ page 6060122 "TM Admission Schedule Entry"
                 field("Max Capacity Per Sch. Entry";"Max Capacity Per Sch. Entry")
                 {
                 }
+                field(ConcurrentCapacityText;ConcurrentCapacityText)
+                {
+                    Caption = 'Concurrent Capacity';
+                    Editable = false;
+                }
                 field("Event Arrival From Time";"Event Arrival From Time")
                 {
                 }
                 field("Event Arrival Until Time";"Event Arrival Until Time")
                 {
+                }
+                field("Sales From Date";"Sales From Date")
+                {
+                }
+                field("Sales From Time";"Sales From Time")
+                {
+                }
+                field("Sales Until Date";"Sales Until Date")
+                {
+                }
+                field("Sales Until Time";"Sales Until Time")
+                {
+                }
+                field("Allocation By";"Allocation By")
+                {
+                }
+                field("Waiting List Queue";"Waiting List Queue")
+                {
+                    Editable = false;
                 }
             }
         }
@@ -135,8 +162,24 @@ page 6060122 "TM Admission Schedule Entry"
                 RunPageView = SORTING("Applies To Schedule Entry No.")
                               ORDER(Ascending);
             }
+            action("Waiting List")
+            {
+                Caption = 'Waiting List';
+                Ellipsis = true;
+                Image = Open;
+                Promoted = true;
+                PromotedCategory = Process;
+                RunObject = Page "TM Ticket Waiting List";
+                RunPageLink = "External Schedule Entry No."=FIELD("External Schedule Entry No.");
+            }
         }
     }
+
+    trigger OnAfterGetRecord()
+    begin
+
+        ConcurrentCapacityText := CalculateConcurrentCapacity (Rec);
+    end;
 
     trigger OnOpenPage()
     begin
@@ -144,6 +187,9 @@ page 6060122 "TM Admission Schedule Entry"
         //-+TM1.19 [266768]
         Rec.SetFilter (Cancelled, '=%1', false);
     end;
+
+    var
+        ConcurrentCapacityText: Text[20];
 
     local procedure NotifyTicketHolders()
     var
@@ -160,6 +206,22 @@ page 6060122 "TM Admission Schedule Entry"
         TicketParticipantWks.FilterGroup (0);
 
         PAGE.Run (0, TicketParticipantWks);
+    end;
+
+    local procedure CalculateConcurrentCapacity(AdmissionScheduleEntry: Record "TM Admission Schedule Entry") ResultText: Text[30]
+    var
+        TicketManagement: Codeunit "TM Ticket Management";
+        Actual: Integer;
+        MaxCapacity: Integer;
+    begin
+
+        //-TM1.45 [385922]
+        ResultText := '-/-';
+        with AdmissionScheduleEntry do
+          if (TicketManagement.CalculateConcurrentCapacity ("Admission Code", "Schedule Code", "Admission Start Date", Actual, MaxCapacity)) then
+            ResultText := StrSubstNo ('%1/%2', Actual, MaxCapacity);
+
+        //+TM1.45 [385922]
     end;
 }
 

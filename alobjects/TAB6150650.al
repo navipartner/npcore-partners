@@ -4,6 +4,7 @@ table 6150650 "POS Audit Profile"
     // NPR5.51/MMV /20190617 CASE 356076 Added field 80
     // NPR5.51/ALPO/20190802 CASE 362747 Added field 90 "Allow Printing Receipt Copy"
     // NPR5.52/ALPO/20191004 CASE 370427 Added field 100 "Do Not Print Receipt on Sale": option to skip receipt printing on sale
+    // NPR5.53/ALPO/20191022 CASE 373743 Added field 110 "Sales Ticket No. Series": moved from "Cash Register" (Table 6014401)
 
     Caption = 'POS Audit Profile';
     LookupPageID = "POS Audit Profiles";
@@ -99,6 +100,12 @@ table 6150650 "POS Audit Profile"
         {
             Caption = 'Do Not Print Receipt on Sale';
             Description = 'NPR5.52';
+        }
+        field(110;"Sales Ticket No. Series";Code[10])
+        {
+            Caption = 'Sales Ticket No. Series';
+            Description = 'NPR5.53';
+            TableRelation = "No. Series";
         }
     }
 

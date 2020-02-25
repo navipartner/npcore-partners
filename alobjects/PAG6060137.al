@@ -29,10 +29,13 @@ page 6060137 "MM Membership Card"
     // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
     // MM1.40/TSA /20190822 CASE 360242 Adding NPR Attributes
     // MM1.41/TSA /20191009 CASE 367471 Added Sponsorship Tickets
+    // MM1.42/TSA /20191024 CASE 374403 Changed signature on IssueOneCoupon(), IssueOneCouponAndPrint(), and IssueCoupon()
+    // MM1.42/ALPO/20191125 CASE 377727 Raptor integration
 
     Caption = 'Membership Card';
     DataCaptionExpression = "External Membership No."+' - ' + "Membership Code";
     InsertAllowed = false;
+    PromotedActionCategories = 'New,Process,Report,History,Raptor';
     SourceTable = "MM Membership";
 
     layout
@@ -482,33 +485,6 @@ page 6060137 "MM Membership Card"
                     IssueAdHocSponsorshipTickets (Rec."Entry No.");
                 end;
             }
-            group(History)
-            {
-                Caption = 'History';
-                Image = History;
-                action("Ledger E&ntries")
-                {
-                    Caption = 'Ledger E&ntries';
-                    Image = CustomerLedger;
-                    Promoted = false;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
-                    RunObject = Page "Customer Ledger Entries";
-                    RunPageLink = "Customer No."=FIELD("Customer No.");
-                    RunPageView = SORTING("Customer No.");
-                    ShortCutKey = 'Ctrl+F7';
-                }
-                action(Statistics)
-                {
-                    Caption = 'Statistics';
-                    Image = Statistics;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    RunObject = Page "Customer Statistics";
-                    RunPageLink = "No."=FIELD("Customer No.");
-                    ShortCutKey = 'F7';
-                }
-            }
         }
         area(navigation)
         {
@@ -542,6 +518,90 @@ page 6060137 "MM Membership Card"
                 RunObject = Page "MM Member Arrival Log";
                 RunPageLink = "External Membership No."=FIELD("External Membership No.");
             }
+            group(History)
+            {
+                Caption = 'History';
+                Image = History;
+                action("Ledger E&ntries")
+                {
+                    Caption = 'Ledger E&ntries';
+                    Image = CustomerLedger;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    RunObject = Page "Customer Ledger Entries";
+                    RunPageLink = "Customer No."=FIELD("Customer No.");
+                    RunPageView = SORTING("Customer No.");
+                    ShortCutKey = 'Ctrl+F7';
+                }
+                action(ItemLedgerEntries)
+                {
+                    Caption = 'Item Ledger Entries';
+                    Image = ItemLedger;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    RunObject = Page "Item Ledger Entries";
+                    RunPageLink = "Source No."=FIELD("Customer No.");
+                    RunPageView = SORTING("Source Type","Source No.","Posting Date")
+                                  ORDER(Descending)
+                                  WHERE("Source Type"=CONST(Customer));
+                }
+                action(Statistics)
+                {
+                    Caption = 'Statistics';
+                    Image = Statistics;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    RunObject = Page "Customer Statistics";
+                    RunPageLink = "No."=FIELD("Customer No.");
+                    ShortCutKey = 'F7';
+                }
+            }
+            group("Raptor Integration")
+            {
+                Caption = 'Raptor Integration';
+                action(RaptorBrowsingHistory)
+                {
+                    Caption = 'Browsing History';
+                    Enabled = RaptorEnabled;
+                    Image = ViewRegisteredOrder;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    Visible = RaptorEnabled;
+
+                    trigger OnAction()
+                    var
+                        RaptorAction: Record "Raptor Action";
+                        RaptorMgt: Codeunit "Raptor Management";
+                    begin
+                        //-MM1.42 [377727]
+                        TestField("Customer No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory,true,RaptorAction) then
+                          RaptorMgt.ShowRaptorData(RaptorAction,"Customer No.");
+                        //+MM1.42 [377727]
+                    end;
+                }
+                action(RaptorRecommendations)
+                {
+                    Caption = 'Recommendations';
+                    Enabled = RaptorEnabled;
+                    Image = SuggestElectronicDocument;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    Visible = RaptorEnabled;
+
+                    trigger OnAction()
+                    var
+                        RaptorAction: Record "Raptor Action";
+                        RaptorMgt: Codeunit "Raptor Management";
+                    begin
+                        //-MM1.42 [377727]
+                        TestField("Customer No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations,true,RaptorAction) then
+                          RaptorMgt.ShowRaptorData(RaptorAction,"Customer No.");
+                        //+MM1.42 [377727]
+                    end;
+                }
+            }
         }
     }
 
@@ -560,6 +620,8 @@ page 6060137 "MM Membership Card"
         if (not NeedsActivation) then begin
           MembershipManagement.GetMembershipValidDate (Rec."Entry No.", Today, ValidFromDate, ValidUntilDate);
           ShowCurrentPeriod := StrSubstNo ('%1 - %2', ValidFromDate, ValidUntilDate);
+          if (ValidUntilDate < Today) then
+            ShowCurrentPeriod := StrSubstNo ('%1 - %2 (%3)', ValidFromDate, ValidUntilDate, MEMBERSHIP_EXPIRED);
         end;
 
         //-MM1.40 [360242]
@@ -576,6 +638,8 @@ page 6060137 "MM Membership Card"
     end;
 
     trigger OnOpenPage()
+    var
+        RaptorSetup: Record "Raptor Setup";
     begin
         //-MM1.40 [360242]
         NPRAttrManagement.GetAttributeVisibility (GetAttributeTableId (), NPRAttrVisibleArray);
@@ -592,6 +656,10 @@ page 6060137 "MM Membership Card"
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
         NPRAttrEditable := CurrPage.Editable ();
         //+MM1.40 [360242]
+
+        //-MM1.42 [377727]
+        RaptorEnabled := (RaptorSetup.Get and RaptorSetup."Enable Raptor Functions");
+        //+MM1.42 [377727]
     end;
 
     var
@@ -617,6 +685,8 @@ page 6060137 "MM Membership Card"
         NPRAttrVisible08: Boolean;
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
+        RaptorEnabled: Boolean;
+        MEMBERSHIP_EXPIRED: Label 'Expired';
 
     local procedure AddMembershipMember()
     var
@@ -715,7 +785,10 @@ page 6060137 "MM Membership Card"
 
             if (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_COUPON) then
               if (TmpLoyaltyPointsSetup."Points Threshold" <= Membership."Remaining Points") then
-                LoyaltyCouponMgr.IssueOneCouponAndPrint (TmpLoyaltyPointsSetup."Coupon Type Code", Membership."Entry No.", TmpLoyaltyPointsSetup."Points Threshold",0);
+                //-MM1.42 [374403]
+                //LoyaltyCouponMgr.IssueOneCouponAndPrint (TmpLoyaltyPointsSetup."Coupon Type Code", Membership."Entry No.", TmpLoyaltyPointsSetup."Points Threshold",0);
+                LoyaltyCouponMgr.IssueOneCouponAndPrint (TmpLoyaltyPointsSetup."Coupon Type Code", Membership."Entry No.", Membership."External Membership No.", Today, TmpLoyaltyPointsSetup."Points Threshold",0);
+                //+MM1.42 [374403]
 
           until (TmpLoyaltyPointsSetup.Next () = 0);
         end;

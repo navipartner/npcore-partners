@@ -1,6 +1,7 @@
 codeunit 6151185 "MM Sponsorship Ticket Mgmt."
 {
     // MM1.41/TSA /20191004 CASE 367471 Initial Version
+    // MM1.42/TSA/20200122  CASE 382728 Transport MM1.43 - 22 January 2020
 
 
     trigger OnRun()
@@ -54,7 +55,11 @@ codeunit 6151185 "MM Sponsorship Ticket Mgmt."
         Token := TicketRequestManager.GetNewToken ();
         Member.Get (MembershipRole."Member Entry No.");
 
-        CreateTicketRequest (Token, Member, SponsorshipTicketSetup);
+        //-MM1.42 [382728]
+        //CreateTicketRequest (Token, Member, SponsorshipTicketSetup);
+        CreateTicketRequest (Token, MembershipRole, SponsorshipTicketSetup);
+        //+MM1.42 [382728]
+
         if (0 <> TicketRequestManager.IssueTicketFromReservationToken (Token, false, ResponseMessage)) then begin
           TicketRequestManager.DeleteReservationRequest (Token, true);
           exit (false);
@@ -65,14 +70,20 @@ codeunit 6151185 "MM Sponsorship Ticket Mgmt."
         exit (true);
     end;
 
-    local procedure CreateTicketRequest(Token: Text;Member: Record "MM Member";SponsorshipTicketSetup: Record "MM Sponsorship Ticket Setup")
+    local procedure CreateTicketRequest(Token: Text;MembershipRole: Record "MM Membership Role";SponsorshipTicketSetup: Record "MM Sponsorship Ticket Setup")
     var
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
+        MembershipManagement: Codeunit "MM Membership Management";
+        MemberTicketManager: Codeunit "MM Member Ticket Manager";
         TicketSetup: Record "TM Ticket Setup";
         TicketAdmissionBOM: Record "TM Ticket Admission BOM";
         TicketReservationRequest: Record "TM Ticket Reservation Request";
         Admission: Record "TM Admission";
+        Method: Code[10];
+        Address: Text[200];
     begin
+
+        MembershipRole.CalcFields ("External Member No.");
 
         TicketAdmissionBOM.SetFilter ("Item No.", '=%1', SponsorshipTicketSetup."Item No.");
         TicketAdmissionBOM.SetFilter ("Variant Code", '=%1', SponsorshipTicketSetup."Variant Code");
@@ -82,35 +93,45 @@ codeunit 6151185 "MM Sponsorship Ticket Mgmt."
           TicketReservationRequest."Entry No." := 0;
           TicketReservationRequest."Session Token ID" := Token;
 
-          TicketReservationRequest.Quantity := SponsorshipTicketSetup.Quantity;
+          //-MM1.42 [382728]
+          //  TicketReservationRequest.Quantity := SponsorshipTicketSetup.Quantity;
+          //
+          //  TicketReservationRequest."External Item Code" := TicketRequestManager.GetExternalNo (SponsorshipTicketSetup."Item No.", SponsorshipTicketSetup."Variant Code");
+          //  TicketReservationRequest."Item No." := SponsorshipTicketSetup."Item No.";
+          //  TicketReservationRequest."Variant Code" := SponsorshipTicketSetup."Variant Code";
+          //
+          //  TicketReservationRequest."Admission Code" := TicketAdmissionBOM."Admission Code";
+          //  TicketReservationRequest."Admission Description" := TicketAdmissionBOM."Admission Description";
+          //  IF (TicketReservationRequest."Admission Description" = '') THEN
+          //    TicketReservationRequest."Admission Description" := Admission.Description;
+          //  TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::PREPAID;
+          //
+          //  CASE Member."Notification Method" OF
+          //    Member."Notification Method"::EMAIL :
+          //      BEGIN
+          //        TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL;
+          //        TicketReservationRequest."Notification Address" := Member."E-Mail Address";
+          //      END;
+          //    Member."Notification Method"::SMS :
+          //      BEGIN
+          //        TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
+          //        TicketReservationRequest."Notification Address" := Member."Phone No.";
+          //      END;
+          //    ELSE BEGIN
+          //      TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::NA;
+          //      TicketReservationRequest."Notification Address" := '';
+          //    END;
+          //  END;
+          //  TicketReservationRequest."External Member No." := Member."External Member No.";
 
-          TicketReservationRequest."External Item Code" := TicketRequestManager.GetExternalNo (SponsorshipTicketSetup."Item No.", SponsorshipTicketSetup."Variant Code");
-          TicketReservationRequest."Item No." := SponsorshipTicketSetup."Item No.";
-          TicketReservationRequest."Variant Code" := SponsorshipTicketSetup."Variant Code";
+          MemberTicketManager.PrefillTicketRequest (MembershipRole."Member Entry No.", MembershipRole."Membership Entry No.",
+            TicketAdmissionBOM."Item No.", TicketAdmissionBOM."Variant Code", TicketAdmissionBOM."Admission Code", TicketReservationRequest);
 
-          TicketReservationRequest."Admission Code" := TicketAdmissionBOM."Admission Code";
-          TicketReservationRequest."Admission Description" := TicketAdmissionBOM."Admission Description";
-          if (TicketReservationRequest."Admission Description" = '') then
-            TicketReservationRequest."Admission Description" := Admission.Description;
+          if (TicketAdmissionBOM."Admission Description" <> '') then
+            TicketReservationRequest."Admission Description" := TicketAdmissionBOM."Admission Description";
           TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::PREPAID;
-
-          case Member."Notification Method" of
-            Member."Notification Method"::EMAIL :
-              begin
-                TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL;
-                TicketReservationRequest."Notification Address" := Member."E-Mail Address";
-              end;
-            Member."Notification Method"::SMS :
-              begin
-                TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
-                TicketReservationRequest."Notification Address" := Member."Phone No.";
-              end;
-            else begin
-              TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::NA;
-              TicketReservationRequest."Notification Address" := '';
-            end;
-          end;
-          TicketReservationRequest."External Member No." := Member."External Member No.";
+          TicketReservationRequest.Quantity := SponsorshipTicketSetup.Quantity;
+          //+MM1.42 [382728]
 
           TicketReservationRequest."External Order No." := '';
           TicketReservationRequest."Customer No." := '';

@@ -2,6 +2,8 @@ table 6150652 "POS End of Day Profile"
 {
     // NPR5.49/TSA /20190314 CASE 348458 Initial Version
     // NPR5.52/SARA/20190823 CASE 363578 New field 'SMS Profile'
+    // NPR5.53/TSA /20191107 CASE 376170 Added number series for Z & X reports
+    // NPR5.53/TSA /20191219 CASE 383012 Added field "Show Zero Amount Lines"
 
     Caption = 'POS End of Day Profile';
     DrillDownPageID = "POS End of Day Profiles";
@@ -69,6 +71,20 @@ table 6150652 "POS End of Day Profile"
             Caption = 'SMS Profile';
             Description = 'NPR5.52';
             TableRelation = "SMS Template Header";
+        }
+        field(50;"Z-Report Number Series";Code[10])
+        {
+            Caption = 'Z-Report Number Series';
+            TableRelation = "No. Series";
+        }
+        field(51;"X-Report Number Series";Code[10])
+        {
+            Caption = 'X-Report Number Series';
+            TableRelation = "No. Series";
+        }
+        field(60;"Show Zero Amount Lines";Boolean)
+        {
+            Caption = 'Show Zero Amount Lines';
         }
     }
 

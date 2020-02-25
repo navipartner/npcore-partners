@@ -27,6 +27,8 @@ codeunit 6014418 "Retail Sales Code"
     // NPR5.46/MMV /20181001 CASE 290734 EFT Framework refactoring
     // NPR5.50/TSA /20190502 CASE 342090 Added UpdateAmounts to ReverseSalesTicket2() function
     // NPR5.52/ALPO/20191009 CASE 372122 Incorrect discount % handling when reversing sale return
+    // NPR5.53/ALPO/20191030 CASE 371956 Dimensions: fixed inconsistency between global dimension and dimension set id handling
+    // NPR5.53/MHA /20200128 CASE 374750 Change Sale Type to "Sale" in InsertAnnulmentLine() as it is a dummy line used for creating POS Entry
 
     TableNo = "Audit Roll";
 
@@ -660,7 +662,7 @@ codeunit 6014418 "Retail Sales Code"
         SaleLinePOS.Internal := AuditRoll.Internal;
         SaleLinePOS."Variant Code" := AuditRoll."Variant Code";
         SaleLinePOS."System-Created Entry" := AuditRoll."System-Created Entry";
-        SaleLinePOS."Shortcut Dimension 1 Code" := AuditRoll."Department Code";
+        //SaleLinePOS."Shortcut Dimension 1 Code" := AuditRoll."Department Code";  //NPR5.53 [371956]-revoked (redundant line)
         SaleLinePOS."Serial No. not Created" := AuditRoll."Serial No. not Created";
         SaleLinePOS."Foreign No." := AuditRoll."Fremmed nummer";
 
@@ -674,8 +676,15 @@ codeunit 6014418 "Retail Sales Code"
           SaleLinePOS."Discount Code" := AuditRoll."Credit voucher ref.";
         end;
 
-        SaleLinePOS.Validate("Shortcut Dimension 1 Code",AuditRoll."Shortcut Dimension 1 Code");
-        SaleLinePOS.Validate("Shortcut Dimension 2 Code",AuditRoll."Shortcut Dimension 2 Code");
+        //-NPR5.53 [371956]-revoked
+        //SaleLinePOS.VALIDATE("Shortcut Dimension 1 Code",AuditRoll."Shortcut Dimension 1 Code");
+        //SaleLinePOS.VALIDATE("Shortcut Dimension 2 Code",AuditRoll."Shortcut Dimension 2 Code");
+        //+NPR5.53 [371956]-revoked
+        //-NPR5.53 [371956]
+        SaleLinePOS."Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
+        SaleLinePOS."Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
+        SaleLinePOS."Dimension Set ID" := AuditRoll."Dimension Set ID";
+        //+NPR5.53 [371956]
 
         RetailSetup.Get;
         if RetailSetup."Use Adv. dimensions" then
@@ -885,14 +894,18 @@ codeunit 6014418 "Retail Sales Code"
     end;
 
     procedure ModifyAnnulmentSalePOS(var SalePOS: Record "Sale POS";var AuditRoll: Record "Audit Roll")
+    var
+        OldDimSetID: Integer;
     begin
         //ModifyTilbF�rEkspHoved
         SalePOS.Validate("Customer Type",AuditRoll."Customer Type");
         SalePOS.Validate("Customer No.",AuditRoll."Customer No.");
         SalePOS.Validate("Location Code",AuditRoll.Lokationskode);
         //Sale.VALIDATE("Department Code",Revisionsrulle."Department Code");
-        SalePOS.Validate("Shortcut Dimension 1 Code",AuditRoll."Shortcut Dimension 1 Code");
-        SalePOS.Validate("Shortcut Dimension 2 Code",AuditRoll."Shortcut Dimension 2 Code");
+        //-NPR5.53 [371956]-revoked
+        //SalePOS.VALIDATE("Shortcut Dimension 1 Code",AuditRoll."Shortcut Dimension 1 Code");
+        //SalePOS.VALIDATE("Shortcut Dimension 2 Code",AuditRoll."Shortcut Dimension 2 Code");
+        //+NPR5.53 [371956]-revoked
         SalePOS.Validate(Kontankundenr,AuditRoll."Cash Customer No.");
         SalePOS.Validate("Sale type",AuditRoll."Receipt Type");
         SalePOS.Validate("Salesperson Code",AuditRoll."Salesperson Code");
@@ -901,7 +914,17 @@ codeunit 6014418 "Retail Sales Code"
         SalePOS."Retail Document No." := AuditRoll."Retail Document No.";
         SalePOS."Non-editable sale" := true;
         SalePOS."Sale type" := SalePOS."Sale type"::Annullment;
+        //-NPR5.53 [371956]
+        SalePOS."Shortcut Dimension 1 Code" := AuditRoll."Shortcut Dimension 1 Code";
+        SalePOS."Shortcut Dimension 2 Code" := AuditRoll."Shortcut Dimension 2 Code";
+        SalePOS."Dimension Set ID" := AuditRoll."Dimension Set ID";
+        //+NPR5.53 [371956]
         SalePOS.Modify;
+
+        //-NPR5.53 [371956]
+        if SalePOS.SalesLinesExist then
+          SalePOS.UpdateAllLineDim(SalePOS."Dimension Set ID",OldDimSetID);
+        //+NPR5.53 [371956]
     end;
 
     procedure InsertAnnulmentLine(var SalePOS: Record "Sale POS";var AuditRoll: Record "Audit Roll")
@@ -924,7 +947,9 @@ codeunit 6014418 "Retail Sales Code"
         SaleLinePOS."Register No." := SalePOS."Register No.";
         SaleLinePOS."Sales Ticket No." := SalePOS."Sales Ticket No.";
         SaleLinePOS.Date := Today;
-        SaleLinePOS."Sale Type" := AuditRoll."Sale Type";
+        //-NPR5.53 [374750]
+        SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Sale;
+        //+NPR5.53 [374750]
         SaleLinePOS.ForceApris := true;
         if AuditRoll.Type = AuditRoll.Type::"Debit Sale" then
           if AuditRoll."No." <> '' then            // Bem�rkning

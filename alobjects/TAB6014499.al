@@ -1,6 +1,8 @@
 table 6014499 "Print Tags"
 {
-    // NPR4.18/MMV/20151222 CASE 225584 Created table
+    // NPR4.18/MMV /20151222 CASE 225584 Created table
+    // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
+    //                                   - "Print Tag" field set to be not blank
 
     Caption = 'Print Tags';
 
@@ -9,6 +11,7 @@ table 6014499 "Print Tags"
         field(1;"Print Tag";Text[100])
         {
             Caption = 'Print Tag';
+            NotBlank = true;
 
             trigger OnValidate()
             var

@@ -24,6 +24,7 @@ codeunit 6060116 "TM Ticket WebService Mgr"
     // TM1.40/TSA /20190327 CASE 350287 Signature Change on RevalidateRequestForTicketReuse
     // TM1.41/TSA /20190508 CASE 353736 Incorrect loop iterator
     // TM1.43/TSA /20190910 CASE 368043 Refactored usage of "External Item Code"
+    // TM1.45/TSA /20191206 CASE 380754 Added waitinglist_reference_code
 
     TableNo = "Nc Import Entry";
 
@@ -71,6 +72,7 @@ codeunit 6060116 "TM Ticket WebService Mgr"
     local procedure ImportTicketReservations(XmlDoc: DotNet npNetXmlDocument;RequestEntryNo: Integer;DocumentID: Text[100])
     var
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
+        TicketWaitingListMgr: Codeunit "TM Ticket Waiting List Mgr.";
         TicketReservationResponse: Record "TM Ticket Reservation Response";
         TicketReservationRequest: Record "TM Ticket Reservation Request";
         XmlElement: DotNet npNetXmlElement;
@@ -121,7 +123,15 @@ codeunit 6060116 "TM Ticket WebService Mgr"
             CreateResponse (TicketReservationRequest, TicketReservationResponse);
 
             if (ValidTicketRequest (TicketReservationRequest, TicketReservationResponse)) then begin
-              TicketCreated := TicketCreated and CreateTicket (TicketReservationRequest, TicketReservationResponse);
+
+              //-TM1.45 [380754]
+              //TicketCreated := TicketCreated AND CreateTicket (TicketReservationRequest, TicketReservationResponse);
+              if (TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::WAITINGLIST) then begin
+                TicketWaitingListMgr.CreateWaitingListEntry (TicketReservationRequest, TicketReservationRequest."Notification Address");
+              end else begin
+                TicketCreated := TicketCreated and CreateTicket (TicketReservationRequest, TicketReservationResponse);
+              end;
+              //+TM1.45 [380754]
 
             end else begin
               TicketCreated := false;
@@ -181,7 +191,6 @@ codeunit 6060116 "TM Ticket WebService Mgr"
         if (TicketReservationRequest.FindSet (true,false)) then begin
           TicketReservationRequest.ModifyAll ("Expires Date Time", CurrentDateTime + 1500 * 1000);
           exit;
-
         end;
 
         TicketReservationRequest.Reset ();
@@ -556,6 +565,7 @@ codeunit 6060116 "TM Ticket WebService Mgr"
     var
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
         ExternalItemType: Integer;
+        WaitingListOptInAddress: Text[200];
     begin
 
         Initialize;
@@ -576,6 +586,15 @@ codeunit 6060116 "TM Ticket WebService Mgr"
         TicketReservationRequest."Admission Code" := CopyStr (NpXmlDomMgt.GetXmlAttributeText (XmlElement, 'admission_code', false), 1, MaxStrLen (TicketReservationRequest."Admission Code"));
 
         Evaluate (TicketReservationRequest."External Adm. Sch. Entry No.", NpXmlDomMgt.GetXmlAttributeText (XmlElement, 'admission_schedule_entry', false));
+
+        //-TM1.45 [380754]
+        TicketReservationRequest."Waiting List Reference Code" := CopyStr (NpXmlDomMgt.GetXmlAttributeText (XmlElement, 'waitinglist_reference_code', false), 1, MaxStrLen (TicketReservationRequest."Waiting List Reference Code"));
+        WaitingListOptInAddress := CopyStr (NpXmlDomMgt.GetXmlAttributeText (XmlElement, 'waitinglist_opt-in_address', false), 1, MaxStrLen (WaitingListOptInAddress));
+        if (WaitingListOptInAddress <> '') then begin
+          TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::WAITINGLIST;
+          TicketReservationRequest."Notification Address" := WaitingListOptInAddress;
+        end;
+        //+TM1.45 [380754]
 
         TicketReservationRequest.Insert ();
     end;

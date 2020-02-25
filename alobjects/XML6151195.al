@@ -5,6 +5,7 @@ xmlport 6151195 "NpCs Sales Document"
     // NPR5.51/MHA /20190719  CASE 342443 Added <opening_hour_set>
     // NPR5.51/MHA /20190719  CASE 362197 Added <to_store>
     // NPR5.51/MHA /20190821  CASE 364557 Added <post_on>
+    // NPR5.53/MHA /20191204  CASE 378216 Added <processing_status>
 
     Caption = 'Collect Sales Document';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/collect_in_store_sales_document';
@@ -100,6 +101,11 @@ xmlport 6151195 "NpCs Sales Document"
                     {
                         XmlName = 'store_code';
                     }
+                }
+                textelement(processing_status)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
                 }
                 fieldelement(order_date;TempSalesHeader."Order Date")
                 {

@@ -2,6 +2,7 @@ codeunit 6014504 "Retail Contract Mgt."
 {
     // NPR5.27/MHA /20161025  CASE 255580 Codeunit Renamed from Retail Photo Code, Removed redundant and unused functions, Renamed remaining functions from Danish to English, Customer Repair Functions added
     // NPR5.29/MMV /20170110  CASE 260033 Added report interface support for better webclient printing.
+    // NPR5.53/ALPO/20191025  CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
 
 
     trigger OnRun()
@@ -224,8 +225,8 @@ codeunit 6014504 "Retail Contract Mgt."
     procedure PosSaleToWarranty(var SalePos: Record "Sale POS"): Code[20]
     var
         Item: Record Item;
+        POSUnit: Record "POS Unit";
         PhotoSetup: Record "Retail Contract Setup";
-        Register: Record Register;
         SaleLinePos: Record "Sale Line POS";
         WarrantyDirectory: Record "Warranty Directory";
         WarrantyLine: Record "Warranty Line";
@@ -233,7 +234,8 @@ codeunit 6014504 "Retail Contract Mgt."
         LineNo: Integer;
     begin
         //-NPR5.27 [255580]
-        Register.Get(SalePos."Register No.");
+        //Register.GET(SalePos."Register No.");  //NPR5.53 [371956]-revoked
+        POSUnit.Get(SalePos."Register No.");  //NPR5.53 [371956]
         PhotoSetup.Get;
         if PhotoSetup."Check Customer No." then
           SalePos.TestField("Customer No.");
@@ -248,8 +250,14 @@ codeunit 6014504 "Retail Contract Mgt."
         WarrantyDirectory.Bonnummer := SaleLinePos."Sales Ticket No.";
         WarrantyDirectory.Kassenummer := SaleLinePos."Register No.";
         WarrantyDirectory."Posting Date" := SaleLinePos.Date;
-        WarrantyDirectory."Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-        WarrantyDirectory."Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+        //-NPR5.53 [371956]-revoked
+        //WarrantyDirectory."Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
+        //WarrantyDirectory."Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
+        //+NPR5.53 [371956]-revoked
+        //-NPR5.53 [371956]
+        WarrantyDirectory."Shortcut Dimension 1 Code" := POSUnit."Global Dimension 1 Code";
+        WarrantyDirectory."Shortcut Dimension 2 Code" := POSUnit."Global Dimension 2 Code";
+        //+NPR5.53 [371956]
         WarrantyDirectory.Modify;
 
         SaleLinePos.SetRange("Register No.",SaleLinePos."Register No.");

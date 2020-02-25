@@ -3,6 +3,7 @@ codeunit 6184514 "EFT MobilePay Protocol"
     // NPR5.46/MMV /20181008 CASE 290734 Created object
     // NPR5.47/MMV /20181030 CASE 334510 Added string length check
     // NPR5.49/MMV /20190312 CASE 345188 Renamed object
+    // NPR5.53/MMV /20191112 CASE 375566 Do not clear activemodelID to prevent handling of late events.
 
     SingleInstance = true;
 
@@ -19,6 +20,7 @@ codeunit 6184514 "EFT MobilePay Protocol"
         CloseOnIdle: Boolean;
         ProtocolError: Label 'An unexpected error ocurred in the %1 protocol:\%2';
         ERROR_SESSION: Label 'Critical Error: Session object could not be retrieved for %1 payment. ';
+        DialogOpen: Boolean;
 
     local procedure IntegrationType(): Text
     begin
@@ -51,6 +53,9 @@ codeunit 6184514 "EFT MobilePay Protocol"
 
         CreateUserInterface(EftTransactionRequest);
         ActiveModelID := POSFrontEnd.ShowModel(Model);
+        //-NPR5.53 [375566]
+        DialogOpen := true;
+        //+NPR5.53 [375566]
     end;
 
     local procedure CreateUserInterface(EFTTransactionRequest: Record "EFT Transaction Request")
@@ -140,7 +145,10 @@ codeunit 6184514 "EFT MobilePay Protocol"
             TransactionDone := true;
             EFTTransactionRequest."External Result Received" := true;
             FrontEnd.CloseModel(ActiveModelID);
-            Clear(ActiveModelID);
+        //-NPR5.53 [375566]
+        //  CLEAR(ActiveModelID);
+          DialogOpen := false;
+        //+NPR5.53 [375566]
             OnAfterProtocolResponse(EFTTransactionRequest);
         end;
 
@@ -169,7 +177,10 @@ codeunit 6184514 "EFT MobilePay Protocol"
             TransactionDone := true;
             EFTTransactionRequest."External Result Received" := true;
             FrontEnd.CloseModel(ActiveModelID);
-            Clear(ActiveModelID);
+        //-NPR5.53 [375566]
+        //  CLEAR(ActiveModelID);
+          DialogOpen := false;
+        //+NPR5.53 [375566]
             OnAfterProtocolResponse(EFTTransactionRequest);
         end else begin
             PaymentStatus := EFTTransactionRequest."Result Description";
@@ -198,6 +209,9 @@ codeunit 6184514 "EFT MobilePay Protocol"
         Clear(EFTMobilePayIntegration);
         Clear(TransactionDone);
         Clear(CloseOnIdle);
+        //-NPR5.53 [375566]
+        Clear(DialogOpen);
+        //+NPR5.53 [375566]
     end;
 
     local procedure HandleProtocolError(FrontEnd: Codeunit "POS Front End Management")
@@ -209,12 +223,16 @@ codeunit 6184514 "EFT MobilePay Protocol"
         ErrorText := StrSubstNo(ProtocolError, IntegrationType(), GetLastErrorText);
 
         EFTTransactionRequest.Get(EntryNo);
-        //-NPR5.47 [334510]
-        //EFTTransactionRequest."NST Error" := ErrorText;
         EFTTransactionRequest."NST Error" := CopyStr(ErrorText, 1, MaxStrLen(EFTTransactionRequest."NST Error"));
-        //+NPR5.47 [334510]
-        if not IsNullGuid(ActiveModelID) then
+        //-NPR5.53 [375566]
+        //IF NOT ISNULLGUID(ActiveModelID) THEN
+        if DialogOpen then begin
+        //+NPR5.53 [375566]
             FrontEnd.CloseModel(ActiveModelID);
+        //-NPR5.53 [375566]
+          DialogOpen := false;
+        //+NPR5.53 [375566]
+        end;
 
         OnAfterProtocolResponse(EFTTransactionRequest);
         Message(ErrorText);
