@@ -167,7 +167,7 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
                         //-MM1.37 [350364]
                         4:
                             SetCustomer(POSSession, MemberCardNumber);
-                            //+MM1.37 [350364]
+                    //+MM1.37 [350364]
 
                     end;
                 end;
@@ -175,14 +175,14 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnCancelDiscountApplication', '', true, true)]
-    local procedure OnCancelDiscountApplication(Coupon: Record "NpDc Coupon";SaleLinePOSCoupon: Record "NpDc Sale Line POS Coupon")
+    local procedure OnCancelDiscountApplication(Coupon: Record "NpDc Coupon"; SaleLinePOSCoupon: Record "NpDc Sale Line POS Coupon")
     var
         LoyaltyPointManagement: Codeunit "MM Loyalty Point Management";
     begin
 
         //-MM1.42 [374403]
-        if (LoyaltyPointManagement.UnRedeemPointsCoupon (0, SaleLinePOSCoupon."Sales Ticket No.", SaleLinePOSCoupon."Sale Date", Coupon."No.")) then
-          Coupon.Delete;
+        if (LoyaltyPointManagement.UnRedeemPointsCoupon(0, SaleLinePOSCoupon."Sales Ticket No.", SaleLinePOSCoupon."Sale Date", Coupon."No.")) then
+            Coupon.Delete;
 
         //+MM1.42 [374403]
     end;
@@ -262,48 +262,48 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
         //IF (LoyaltyPointMgr.GetCouponToRedeem (MembershipEntryNo, TmpLoyaltyPointsSetup)) THEN BEGIN
-        if (LoyaltyPointMgr.GetCouponToRedeemPOS (MembershipEntryNo, TmpLoyaltyPointsSetup, SubTotal)) then begin
+        if (LoyaltyPointMgr.GetCouponToRedeemPOS(MembershipEntryNo, TmpLoyaltyPointsSetup, SubTotal)) then begin
             //+MM1.32 [321176]
 
             TmpLoyaltyPointsSetup.Reset;
             TmpLoyaltyPointsSetup.FindSet();
             repeat
 
-            //-MM1.40 [343352]
-            //    IF (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_COUPON) THEN
-            //      CouponNo := LoyaltyCouponMgr.IssueOneCoupon (TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, TmpLoyaltyPointsSetup."Points Threshold", 0);
-            //
-            //    //-#307048 [307048]
-            //    IF (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_LOYALTY) THEN BEGIN
-            //      Membership.CALCFIELDS ("Remaining Points");
-            //
-            //      // POSSession.GetPaymentLine (POSPaymentLine);
-            //      // POSPaymentLine.CalculateBalance (SalesAmount, PaidAmount, ReturnAmount, SubTotal);
-            //      CouponAmount := SubTotal;
-            //      IF (Membership."Remaining Points" * TmpLoyaltyPointsSetup."Point Rate" < SubTotal) THEN
-            //        CouponAmount := Membership."Remaining Points" * TmpLoyaltyPointsSetup."Point Rate";
-            //
-            //      PointsToRedeem := ROUND (CouponAmount / TmpLoyaltyPointsSetup."Point Rate", 1);
-            //
-            //      IF (CouponAmount >= TmpLoyaltyPointsSetup."Minimum Coupon Amount") THEN
-            //        CouponNo := LoyaltyCouponMgr.IssueOneCoupon (TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, PointsToRedeem, CouponAmount);
-            //
-            //    END;
-            //    //+#307048 [307048]
+                //-MM1.40 [343352]
+                //    IF (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_COUPON) THEN
+                //      CouponNo := LoyaltyCouponMgr.IssueOneCoupon (TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, TmpLoyaltyPointsSetup."Points Threshold", 0);
+                //
+                //    //-#307048 [307048]
+                //    IF (TmpLoyaltyPointsSetup."Value Assignment" = TmpLoyaltyPointsSetup."Value Assignment"::FROM_LOYALTY) THEN BEGIN
+                //      Membership.CALCFIELDS ("Remaining Points");
+                //
+                //      // POSSession.GetPaymentLine (POSPaymentLine);
+                //      // POSPaymentLine.CalculateBalance (SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+                //      CouponAmount := SubTotal;
+                //      IF (Membership."Remaining Points" * TmpLoyaltyPointsSetup."Point Rate" < SubTotal) THEN
+                //        CouponAmount := Membership."Remaining Points" * TmpLoyaltyPointsSetup."Point Rate";
+                //
+                //      PointsToRedeem := ROUND (CouponAmount / TmpLoyaltyPointsSetup."Point Rate", 1);
+                //
+                //      IF (CouponAmount >= TmpLoyaltyPointsSetup."Minimum Coupon Amount") THEN
+                //        CouponNo := LoyaltyCouponMgr.IssueOneCoupon (TmpLoyaltyPointsSetup."Coupon Type Code", MembershipEntryNo, PointsToRedeem, CouponAmount);
+                //
+                //    END;
+                //    //+#307048 [307048]
 
-            //-MM1.42 [374403]
-            //CouponNo := LoyaltyPointMgr.IssueOneCoupon (MembershipEntryNo, TmpLoyaltyPointsSetup, SubTotal);
-            CouponNo := LoyaltyPointMgr.IssueOneCoupon (MembershipEntryNo, TmpLoyaltyPointsSetup, SalePOS."Sales Ticket No.", SalePOS.Date, SubTotal);
-            //+MM1.42 [374403]
+                //-MM1.42 [374403]
+                //CouponNo := LoyaltyPointMgr.IssueOneCoupon (MembershipEntryNo, TmpLoyaltyPointsSetup, SubTotal);
+                CouponNo := LoyaltyPointMgr.IssueOneCoupon(MembershipEntryNo, TmpLoyaltyPointsSetup, SalePOS."Sales Ticket No.", SalePOS.Date, SubTotal);
+                //+MM1.42 [374403]
 
-            //+MM1.40 [343352]
+                //+MM1.40 [343352]
 
                 Coupon.Get(CouponNo);
 
                 //-MM1.33 [326754]
                 //POSActionTextEnter.ScanBarcode (Context, POSSession, FrontEnd, Coupon."Reference No.");
                 EanBoxEventHandler.InvokeEanBox(Coupon."Reference No.", Context, POSSession, FrontEnd);
-                //+MM1.33 [326754]
+            //+MM1.33 [326754]
 
             until (TmpLoyaltyPointsSetup.Next() = 0);
         end;
@@ -433,7 +433,7 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
         DataSource.AddColumn('RemainingValue', 'Remaining Points', DataType.String, false);
 
         //-MM1.41 [371095]
-        DataSource.AddColumn ('RedeemablePoints', 'Redeemable Points', DataType.String, false);
+        DataSource.AddColumn('RedeemablePoints', 'Redeemable Points', DataType.String, false);
         //+MM1.41 [371095]
 
 
@@ -477,9 +477,9 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
                 MembershipSetup.Get(Membership."Membership Code");
                 LoyaltySetup.Get(MembershipSetup."Loyalty Code");
                 RemainingValue := StrSubstNo('%1', Round(Membership."Remaining Points" * LoyaltySetup."Point Rate"));
-            //-MM1.41 [371095]
-            RedeemablePoints := StrSubstNo ('%1', LoyaltyPointManagement.CalculateRedeemablePoints (Membership."Entry No."));
-            //-MM1.41 [371095]
+                //-MM1.41 [371095]
+                RedeemablePoints := StrSubstNo('%1', LoyaltyPointManagement.CalculateRedeemablePoints(Membership."Entry No."));
+                //-MM1.41 [371095]
             end;
         end;
 
@@ -487,11 +487,7 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
         DataRow.Add('RemainingValue', RemainingValue);
 
         //-MM1.41 [371095]
-        DataRow.Add ('RedeemablePoints', RedeemablePoints);
-        //+MM1.41 [371095]
-
-        //-MM1.41 [371095]
-        DataRow.Add ('RedeemablePoints', RedeemablePoints);
+        DataRow.Add('RedeemablePoints', RedeemablePoints);
         //+MM1.41 [371095]
 
         Handled := true;
