@@ -24,6 +24,7 @@ codeunit 6014560 "Report - Sales Ticket"
     // NPR5.27/TSA/20160923  CASE 253316 Fixed a performance issue to validate drawer opening
     // NPR5.33/ANEN/20170427 CASE 273989 Extending to 40 attributes
     // NPR5.34/KENU/20170726 CASE 284023 Removed all "PrefixSpace", using '  ' instead
+    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
 
     TableNo = "Audit Roll";
 
@@ -87,9 +88,11 @@ codeunit 6014560 "Report - Sales Ticket"
         Contact: Record Contact;
         Customer: Record Customer;
         Item: Record Item;
+        POSUnit: Record "POS Unit";
         Register: Record Register;
         RetailConfiguration: Record "Retail Setup";
         Salesperson: Record "Salesperson/Purchaser";
+        POSSetup: Codeunit "POS Setup";
         CurrPageNo: Integer;
         Text10600012: Label '%2 - Bon %1/%4 - %3';
         HeaderReceiptCopy: Label '*** COPY ***';
@@ -672,7 +675,8 @@ codeunit 6014560 "Report - Sales Ticket"
           if (Type = Type::Item) and Item.Get("No.") and Item."No Print on Reciept" then
              exit(false);
 
-          if ("Amount Including VAT" <> 0) and (Type = Type::"G/L") and ("No." = Register.Rounding) then begin
+          //IF ("Amount Including VAT" <> 0) AND (Type = Type::"G/L") AND ("No." = Register.Rounding) THEN BEGIN  //#[371955]-revoked
+          if ("Amount Including VAT" <> 0) and (Type = Type::"G/L") and ("No." = POSSetup.RoundingAccount(true)) then begin  //NPR5.53 [371955]
             SubCurrencyGL := "Amount Including VAT";
             exit(false);
           end;
@@ -725,6 +729,10 @@ codeunit 6014560 "Report - Sales Ticket"
 
         Register.Get(AuditRoll."Register No.");
         RetailConfiguration.Get;
+        //-NPR5.53 [371955]
+        POSUnit.Get(AuditRoll."Register No.");
+        POSSetup.SetPOSUnit(POSUnit);
+        //+NPR5.53 [371955]
     end;
 
     procedure "-- Aux functions --"()

@@ -35,6 +35,9 @@ codeunit 6014414 "Post Temp Audit Roll"
     // NPR5.42/JC  /20180515 CASE 315194 Fix issue with getting register no. for Payment Type POS
     // NPR5.49/TJ  /20181210 CASE 331208 Publisher added OnAfterRunPostItemLedger
     // NPR5.51/LS  /20190709  CASE 351736  Changed function MovementEntries, length of "Global Dimension 1" from 10 to 20 as per standard Dim code
+    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
+    // NPR5.53/JAKUBV/20200121  CASE 369361 Transport NPR5.53 - 21 January 2020
 
     Permissions = TableData "Audit Roll"=rimd;
 
@@ -598,6 +601,7 @@ codeunit 6014414 "Post Temp Audit Roll"
         ItemTrackingCode: Record "Item Tracking Code";
         VendorReturnReason: Codeunit "Vendor Return Reason";
         ItemJrnl: Record Item;
+        POSUnit: Record "POS Unit";
     begin
         //Postervarekladde()
         RetailSetup.Get;
@@ -606,6 +610,7 @@ codeunit 6014414 "Post Temp Audit Roll"
           VendorReturnReason.CreateRetPurchOrder(RevRulle);
 
           Kasse.Get("Register No.");
+          POSUnit.Get("Register No.");  //NPR5.53 [371956]
           VarekldLinie.Init;
           Varekllbr += 1;
 
@@ -756,17 +761,29 @@ codeunit 6014414 "Post Temp Audit Roll"
 
           VarekldLinie.Validate( "Return Reason Code", "Return Reason Code" );
 
-          if RevRulle."Shortcut Dimension 1 Code" = '' then
-            VarekldLinie.Validate("Shortcut Dimension 1 Code",Kasse."Global Dimension 1 Code")
-          else
-            VarekldLinie.Validate("Shortcut Dimension 1 Code","Shortcut Dimension 1 Code");
-
-          if RevRulle."Shortcut Dimension 2 Code" = '' then
-            VarekldLinie.Validate("Shortcut Dimension 2 Code",Kasse."Global Dimension 2 Code")
-          else
-            VarekldLinie.Validate("Shortcut Dimension 2 Code","Shortcut Dimension 2 Code");
+          //-NPR5.53 [371956]-revoked
+        //  IF RevRulle."Shortcut Dimension 1 Code" = '' THEN
+        //    VarekldLinie.VALIDATE("Shortcut Dimension 1 Code",Kasse."Global Dimension 1 Code")
+        //  ELSE
+        //    VarekldLinie.VALIDATE("Shortcut Dimension 1 Code","Shortcut Dimension 1 Code");
+        //
+        //  IF RevRulle."Shortcut Dimension 2 Code" = '' THEN
+        //    VarekldLinie.VALIDATE("Shortcut Dimension 2 Code",Kasse."Global Dimension 2 Code")
+        //  ELSE
+        //    VarekldLinie.VALIDATE("Shortcut Dimension 2 Code","Shortcut Dimension 2 Code");
+          //+NPR5.53 [371956]-revoked
 
           VarekldLinie."Dimension Set ID" := "Dimension Set ID";
+          //-NPR5.53 [371956]
+          if "Shortcut Dimension 1 Code" = '' then
+            VarekldLinie.Validate("Shortcut Dimension 1 Code",POSUnit."Global Dimension 1 Code")
+          else
+            VarekldLinie."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
+          if "Shortcut Dimension 2 Code" = '' then
+            VarekldLinie.Validate("Shortcut Dimension 2 Code",POSUnit."Global Dimension 2 Code")
+          else
+            VarekldLinie."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
+          //+NPR5.53 [371956]
 
           if not RetailSetup."Debug Posting" then begin
             VarekldLinie.Insert;
@@ -1189,11 +1206,13 @@ codeunit 6014414 "Post Temp Audit Roll"
     procedure RunPost(var Rec: Record "Audit Roll Posting" temporary)
     var
         BetValgRec: Record "Payment Type POS";
+        POSUnit: Record "POS Unit";
         XBonNr: Code[20];
         ChangeSum: Decimal;
         ChangeDep: Code[20];
         t002: Label 'Posting of audit roll is not possible in offline mode';
         POSAuditRollIntegration: Codeunit "POS-Audit Roll Integration";
+        POSSetup: Codeunit "POS Setup";
     begin
         //RunPost
         
@@ -1201,14 +1220,20 @@ codeunit 6014414 "Post Temp Audit Roll"
         DebugPostingMsg := false;
         RetailSetup.Get();
         
-        if RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline then
-          Error(t002);
+        //-NPR5.53 [369361]
+        //IF RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline THEN
+        //  ERROR(t002);
+        //+NPR5.53 [369361]
         
         if not Rec.FindLast then
           exit;
         
         if not DoNotPost then begin
           Kasse.Get("Register No.");
+          //-NPR5.53 [371955]
+          POSUnit.Get("Register No.");
+          POSSetup.SetPOSUnit(POSUnit);
+          //+NPR5.53 [371955]
           PostOnlySalesTicketNo := true;
           if FindSet then begin
             XBonNr := "Sales Ticket No.";
@@ -1429,7 +1454,8 @@ codeunit 6014414 "Post Temp Audit Roll"
             if FindSet then repeat
               RevisionUdbetaling := Rec;
               Counter += 1;
-              if "No." = Kasse.Rounding then begin
+              //IF "No." = Kasse.Rounding THEN BEGIN  //NPR5.53 [371955]-revoked
+              if "No." = POSSetup.RoundingAccount(true) then begin  //NPR5.53 [371955]
                 ChangeSum += "Amount Including VAT";
                 ChangeDep := "Department Code";
               end else
@@ -1437,7 +1463,8 @@ codeunit 6014414 "Post Temp Audit Roll"
               StatusVindueOpdater(7,'',Round(Counter / Total) * 10000);
             until Next = 0;
             if ChangeSum <> 0 then
-              MovementEntries( Kasse.Rounding, ChangeSum, "Register No.", AccountType::"G/L", ChangeDep, '', BogfDate, Rec );
+              //MovementEntries( Kasse.Rounding, ChangeSum, "Register No.", AccountType::"G/L", ChangeDep, '', BogfDate, Rec );  //NPR5.53 [371955]-revoked
+              MovementEntries(POSSetup.RoundingAccount(true),ChangeSum,"Register No.",AccountType::"G/L",ChangeDep,'',BogfDate,Rec);  //NPR5.53 [371955]
         
             StatusVindueOpdater(7,'',10000);
         
@@ -1482,8 +1509,10 @@ codeunit 6014414 "Post Temp Audit Roll"
         DebugPostingMsg := false;
         RetailSetup.Get();
         
-        if RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline then
-          Error(t002);
+        //-NPR5.53 [369361]
+        //IF RetailSetup."Company - Function" = RetailSetup."Company - Function"::Offline THEN
+        //  ERROR(t002);
+        //+NPR5.53 [369361]
         
         if not Rec.FindLast then
           exit;

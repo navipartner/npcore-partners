@@ -31,24 +31,24 @@ table 6151003 "POS Quote Line"
         field(15; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST ("G/L Entry")) "G/L Account"."No."
+            TableRelation = IF (Type = CONST("G/L Entry")) "G/L Account"."No."
             ELSE
-            IF (Type = CONST ("Item Group")) "Item Group"."No."
+            IF (Type = CONST("Item Group")) "Item Group"."No."
             ELSE
-            IF (Type = CONST (Repair)) "Customer Repair"."No."
+            IF (Type = CONST(Repair)) "Customer Repair"."No."
             ELSE
-            IF (Type = CONST (Payment)) "Payment Type POS"."No." WHERE (Status = CONST (Active),
-                                                                                          "Via Terminal" = CONST (false))
+            IF (Type = CONST(Payment)) "Payment Type POS"."No." WHERE(Status = CONST(Active),
+                                                                                          "Via Terminal" = CONST(false))
             ELSE
-            IF (Type = CONST (Customer)) Customer."No."
+            IF (Type = CONST(Customer)) Customer."No."
             ELSE
-            IF (Type = CONST (Item)) Item."No.";
+            IF (Type = CONST(Item)) Item."No.";
             ValidateTableRelation = false;
         }
         field(20; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST (Item)) "Item Variant".Code WHERE ("Item No." = FIELD ("No."));
+            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
         }
         field(25; Description; Text[80])
         {
@@ -61,7 +61,7 @@ table 6151003 "POS Quote Line"
         field(30; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE ("Item No." = FIELD ("No."));
+            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."));
         }
         field(35; Quantity; Decimal)
         {
@@ -155,7 +155,7 @@ table 6151003 "POS Quote Line"
             Caption = 'Sale Line No.';
             Description = 'NPR5.48';
         }
-        field(215;"EFT Approved";Boolean)
+        field(215; "EFT Approved"; Boolean)
         {
             Caption = 'Electronic Funds Transfer Approved';
         }

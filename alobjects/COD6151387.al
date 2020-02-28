@@ -27,6 +27,10 @@ codeunit 6151387 "CS UI Warehouse Activity"
     //                                   Updating both Place and Take lines
     //                                   Fixed suggested quantity after scan
     //                                   Fixed quantity assign on split lines
+    // #348151/TJ  /20190308 CASE 348151 Fixed issue with UpdateTakeLine
+    // NPR5.53/CLVA/20191112 CASE 377135 Object was not insync with hotfix 348151
+    // NPR5.53/CLVA/20191114 CASE 377135 Added posting options
+    // NPR5.53/CLVA/20191115 CASE 377135 Changed posting rutine
 
     TableNo = "CS UI Header";
 
@@ -110,6 +114,7 @@ codeunit 6151387 "CS UI Warehouse Activity"
         CSFieldDefaults: Record "CS Field Defaults";
         WhseActivityLine: Record "Warehouse Activity Line";
         ActionIndex: Integer;
+        CSUILine: Record "CS UI Line";
     begin
         if XMLDOMMgt.FindNode(RootNode,'Header/Input',ReturnedNode) then
           TextValue := ReturnedNode.InnerText
@@ -222,10 +227,17 @@ codeunit 6151387 "CS UI Warehouse Activity"
                   CSFieldDefaults.SetRange("Use Case Code",CurrentCode);
                   if CSFieldDefaults.FindSet then begin
                     repeat
-                      CSCommunication.FieldSetvalue(RecRef,CSFieldDefaults."Field No",CSFieldDefaults.Value);
-                      RecRef.SetTable(CSWarehouseActivityHandling);
-                      RecRef.SetRecFilter;
-                      CSCommunication.SetRecRef(RecRef);
+
+                      Clear(CSUILine);
+                      CSUILine.SetRange("UI Code",MiniformHeader.Code);
+                      CSUILine.SetRange("Field No.",CSFieldDefaults."Field No");
+                      CSUILine.SetRange("Field Type",CSUILine."Field Type"::Input);
+                      if not CSUILine.FindSet then begin
+                        CSCommunication.FieldSetvalue(RecRef,CSFieldDefaults."Field No",CSFieldDefaults.Value);
+                        RecRef.SetTable(CSWarehouseActivityHandling);
+                        RecRef.SetRecFilter;
+                        CSCommunication.SetRecRef(RecRef);
+                      end;
                     until CSFieldDefaults.Next = 0;
                   end;
 
@@ -287,7 +299,10 @@ codeunit 6151387 "CS UI Warehouse Activity"
         //-NPR5.50 [347971]
         //-NPR5.52 [370452]
         //IF MiniformHeader."Add Posting Options" THEN
-        if MiniformHeader."Posting Type" = MiniformHeader."Posting Type"::"Handle & Invoice" then
+        //-NPR5.53 [377135]
+        //IF MiniformHeader."Posting Type" = MiniformHeader."Posting Type"::"Handle & Invoice" THEN
+        if MiniformHeader."Posting Type" = MiniformHeader."Posting Type"::"Prompt User" then
+        //+NPR5.53 [377135]
         //+NPR5.52 [370452]
         //+NPR5.50 [347971]
           AddAdditionalInfo(DOMxmlin,CSWarehouseActivityHandling);
@@ -891,10 +906,16 @@ codeunit 6151387 "CS UI Warehouse Activity"
           exit;
 
         case CSWarehouseActivityHandling."Activity Type" of
-          CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away" : StrMenuTxt := 'Receive,Receive and Invoice';
+          //-NPR5.53 [377135]
+          //CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away" : StrMenuTxt := 'Receive,Receive and Invoice';
+          CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away" : StrMenuTxt := 'Handle,Handle & Invoice';
+          //+NPR5.53 [377135]
           //-NPR5.51
           //CSWarehouseActivityHandling."Activity Type"::"Invt. Pick" : StrMenuTxt := 'Ship,Ship and Invoice';
-          CSWarehouseActivityHandling."Activity Type"::"Invt. Pick" : StrMenuTxt := 'Ship,Ship and Receive';
+          //-NPR5.53 [377135]
+          //CSWarehouseActivityHandling."Activity Type"::"Invt. Pick" : StrMenuTxt := 'Ship,Ship and Receive';
+          CSWarehouseActivityHandling."Activity Type"::"Invt. Pick" : StrMenuTxt := 'Handle,Handle & Invoice';
+          //+NPR5.53 [377135]
           //+NPR5.51
         end;
 
@@ -969,6 +990,7 @@ codeunit 6151387 "CS UI Warehouse Activity"
         PostingRecRef: RecordRef;
         CSPostingBuffer: Record "CS Posting Buffer";
         CSPostEnqueue: Codeunit "CS Post - Enqueue";
+        Posted: Boolean;
     begin
         Remark := '';
 
@@ -1009,13 +1031,18 @@ codeunit 6151387 "CS UI Warehouse Activity"
             WarehouseActivityHeader.Modify(true);
           end;
           //+#357577 [357577]
-
+          //-NPR5.53 [377135]
+          Posted := false;
+          //+NPR5.53 [377135]
           repeat
             case CSWarehouseActivityHandling."Activity Type" of
               CSWarehouseActivityHandling."Activity Type"::Pick,CSWarehouseActivityHandling."Activity Type"::"Put-away" : begin
                   if CheckBalanceQtyToHandle(WhseActivityLine) then begin
                     WhseActivityRegister.ShowHideDialog(true);
                     WhseActivityRegister.Run(WhseActivityLine);
+                    //-NPR5.53 [377135]
+                    Posted := true;
+                    //+NPR5.53 [377135]
                   end;
                 end;
               CSWarehouseActivityHandling."Activity Type"::"Invt. Pick",CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away" : begin
@@ -1025,12 +1052,19 @@ codeunit 6151387 "CS UI Warehouse Activity"
                     WhseActivityPost.SetInvoiceSourceDoc(Index = 2);
                     WhseActivityPost.Run(WhseActivityLine);
                     Clear(WhseActivityPost);
+                    //-NPR5.53 [377135]
+                    Posted := true;
+                    //+NPR5.53 [377135]
                   //-#359268 [359268]
                   end;
                   //+#359268 [359268]
                 end;
             end;
-          until WhseActivityLine.Next = 0;
+          //-NPR5.53 [377135]
+          //UNTIL WhseActivityLine.NEXT = 0;
+          until (WhseActivityLine.Next = 0) or Posted;
+          //+NPR5.53 [377135]
+
         end else
           Error(Text007);
     end;
@@ -1385,6 +1419,10 @@ codeunit 6151387 "CS UI Warehouse Activity"
         //+NPR5.50 [348151]
         
         //-NPR5.49 [346070]
+        //-#348151 [348151]
+        IF NOT (WhseActivityLine."Action Type" = WhseActivityLine."Action Type"::Place) THEN
+          EXIT;
+        //+#348151 [348151]
         IF ActionToTake = ActionToTake::Decrease THEN
           QtyToHandle := -1 * QtyToHandle;
         WhseActivityLineTake.SETRANGE("Activity Type",WhseActivityLine."Activity Type");

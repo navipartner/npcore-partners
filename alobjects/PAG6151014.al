@@ -6,6 +6,7 @@ page 6151014 "NpRv Voucher Card"
     // NPR5.48/MHA /20190123  CASE 341711 Added field 90 "E-mail Template Code", 95 "SMS Template Code", 103 "Send via Print", 105 "Send via E-mail", 107 "Send via SMS"
     // NPR5.49/MHA /20190228  CASE 342811 Added Retail Voucher Partner fields used with Cross Company Vouchers
     // NPR5.50/MHA /20190426  CASE 353079 Added field 62 "Allow Top-up"
+    // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
 
     Caption = 'Retail Voucher Card';
     SourceTable = "NpRv Voucher";
@@ -64,6 +65,10 @@ page 6151014 "NpRv Voucher Card"
                     }
                     field(Open;Open)
                     {
+                    }
+                    field("Initial Amount";"Initial Amount")
+                    {
+                        Editable = false;
                     }
                     field(Amount;Amount)
                     {

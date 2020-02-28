@@ -1,6 +1,7 @@
 codeunit 6151356 "CS Post - Enqueue"
 {
     // NPR5.52/CLVA  /20190904  CASE 365967 Object created - NP Capture Service
+    // NPR5.53/CLVA  /20191128  CASE 379973 Added "Earliest Start Date/Time" on RFID Store Counting
 
     TableNo = "CS Posting Buffer";
 
@@ -35,6 +36,12 @@ codeunit 6151356 "CS Post - Enqueue"
           JobQueueEntry."Job Queue Category Code" := CSSetup."Job Queue Category Code";
           JobQueueEntry."Timeout (sec.)" := 600;
           JobQueueEntry.Priority := CSSetup."Job Queue Priority for Post" + "Job Queue Priority for Post";
+          //-NPR5.53 [379973]
+          if "Job Type" = "Job Type"::"Approve Counting" then begin
+            if CSSetup."Earliest Start Date/Time" <> 0DT then
+              JobQueueEntry."Earliest Start Date/Time" := CSSetup."Earliest Start Date/Time";
+          end;
+          //+NPR5.53 [379973]
           JobQueueEntry.Insert(true);
           CODEUNIT.Run(CODEUNIT::"Job Queue - Enqueue",JobQueueEntry);
           if GuiAllowed then

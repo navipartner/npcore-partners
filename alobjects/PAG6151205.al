@@ -4,6 +4,9 @@ page 6151205 "NpCs Collect Store Orders"
     // NPR5.51/MHA /20190717  CASE 344264 Added Last Log fields and changed name and logic for field 240 to "From Store Stock"
     // NPR5.51/MHA /20190719  CASE 362443 Added "Inserted at" changed Visible on some fields
     // NPR5.51/MHA /20190819  CASE 364557 Removed InsertAllowed
+    // NPR5.53/MHA /20191105  CASE 374049 Promoted Action "Send Notification to Customer" and added UsageCategory = Lists
+    // NPR5.53/MHA /20192811  CASE 379742 Added Action Print Confirmation
+    // NPR5.53/MHA /20191128  CASE 378895 Removed Sorting Key
 
     Caption = 'Collect in Store Orders';
     CardPageID = "NpCs Collect Store Order Card";
@@ -12,8 +15,7 @@ page 6151205 "NpCs Collect Store Orders"
     PageType = List;
     RefreshOnActivate = true;
     SourceTable = "NpCs Document";
-    SourceTableView = SORTING("Entry No.")
-                      WHERE(Type=CONST("Collect in Store"),
+    SourceTableView = WHERE(Type=CONST("Collect in Store"),
                             "Document Type"=FILTER(Order|"Posted Invoice"));
     UsageCategory = Lists;
 
@@ -179,6 +181,29 @@ page 6151205 "NpCs Collect Store Orders"
                         //+NPR5.51 [364557]
                     end;
                 }
+                action("Print Confirmation")
+                {
+                    Caption = 'Print Confirmation';
+                    Ellipsis = true;
+                    Image = PrintReport;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
+                    Visible = "Document Type" = "Document Type"::Order;
+
+                    trigger OnAction()
+                    var
+                        ReportSelections: Record "Report Selections";
+                        SalesHeader: Record "Sales Header";
+                        DocPrint: Codeunit "Document-Print";
+                        Usage: Option "Order Confirmation","Work Order","Pick Instruction";
+                    begin
+                        //-NPR5.53 [379742]
+                        SalesHeader.Get("Document Type","Document No.");
+                        DocPrint.PrintSalesOrder(SalesHeader,Usage::"Order Confirmation");
+                        //+NPR5.53 [379742]
+                    end;
+                }
                 action("Print Delivery")
                 {
                     Caption = 'Print Delivery';
@@ -241,6 +266,9 @@ page 6151205 "NpCs Collect Store Orders"
                 {
                     Caption = 'Send Notification to Customer';
                     Image = SendTo;
+                    Promoted = true;
+                    PromotedCategory = Process;
+                    PromotedIsBig = true;
                     Visible = "Send Notification from Store";
 
                     trigger OnAction()

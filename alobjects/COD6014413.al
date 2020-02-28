@@ -31,6 +31,7 @@ codeunit 6014413 "Label Library"
     // NPR5.51/BHR /20190614 CASE 358287  Add retail print and Price label for Posted Purchase Invoice
     // NPR5.51/MMV /20190906 CASE 367416 Skip obsolete fields in NAV2018+ when moving to temp buffer.
     // NPR5.52/SARA/20190906 CASE 366969 Added 'Shelf Label' and 'Price Label' for Item Worksheet line
+    // NPR5.53/MHA /20191121 CASE 374290 Added function SetSelectionBuffer()
 
 
     trigger OnRun()
@@ -245,6 +246,14 @@ codeunit 6014413 "Label Library"
         until Field.Next = 0;
 
         TmpSelectionBuffer.Insert;
+    end;
+
+    procedure SetSelectionBuffer(RecVariant: Variant)
+    begin
+        //-NPR5.53 [374290]
+        TmpSelectionBuffer.GetTable(RecVariant);
+        SelectionBufferOpen := true;
+        //+NPR5.53 [374290]
     end;
 
     procedure PrintSelection(ReportType: Integer)

@@ -2,8 +2,10 @@ table 6060110 "TM Ticket Notification Entry"
 {
     // TM1.38/TSA/20181025  CASE 332109 Transport TM1.38 - 25 October 2018
     // TM1.39/TSA /20190109 CASE 310057 Added field "Notification Group Id" and "Admission Code"
+    // TM1.45/TSA /20191107 CASE 374620 Added Notification Trigger::Stakeholder, "Admission Schedule Entry No.", "Det. Ticket Access Entry No.", "Ticket Trigger Type"
+    // TM1.45/TSA /20191204 CASE 380754 Added "Notification Trigger"::Waiting List and "Ticket Trigger Type"::Added to WL and "Ticket Trigger Type"::Notified by WL and Waiting List Reference Code
 
-    Caption = 'TM Ticket Notification Entry';
+    Caption = 'Ticket Notification Entry';
 
     fields
     {
@@ -37,16 +39,34 @@ table 6060110 "TM Ticket Notification Entry"
         field(35;"Notification Trigger";Option)
         {
             Caption = 'Notification Trigger';
-            OptionCaption = 'Not Applicable,eTicket Update,eTicket Create';
-            OptionMembers = NA,ETICKET_UPDATE,ETICKET_CREATE;
+            OptionCaption = 'Not Applicable,eTicket Update,eTicket Create,Stakeholder,Waiting List';
+            OptionMembers = NA,ETICKET_UPDATE,ETICKET_CREATE,STAKEHOLDER,WAITINGLIST;
         }
         field(40;"Ticket Type Code";Code[20])
         {
             Caption = 'Ticket Type Code';
         }
+        field(47;"Notification Process Method";Option)
+        {
+            Caption = 'Notification Process Method';
+            OptionCaption = 'Manual,Inline,Batch';
+            OptionMembers = MANUAL,INLINE,BATCH;
+        }
         field(50;"Ticket Token";Text[100])
         {
             Caption = 'Ticket Token';
+        }
+        field(51;"Ticket Item No.";Code[20])
+        {
+            Caption = 'Ticket Item No.';
+        }
+        field(52;"Ticket Variant Code";Code[10])
+        {
+            Caption = 'Ticket Variant Code';
+        }
+        field(53;"Ticket External Item No.";Code[20])
+        {
+            Caption = 'Ticket External Item No.';
         }
         field(60;"Ticket No.";Code[20])
         {
@@ -113,6 +133,14 @@ table 6060110 "TM Ticket Notification Entry"
         {
             Caption = 'Ticket No. for Printing';
         }
+        field(110;"Admission Schedule Entry No.";Integer)
+        {
+            Caption = 'Admission Schedule Entry No.';
+        }
+        field(115;"Det. Ticket Access Entry No.";Integer)
+        {
+            Caption = 'Det. Ticket Access Entry No.';
+        }
         field(150;Section;Text[30])
         {
             Caption = 'Section';
@@ -161,9 +189,19 @@ table 6060110 "TM Ticket Notification Entry"
         {
             Caption = 'Quantity To Admit';
         }
+        field(190;"Waiting List Reference Code";Code[10])
+        {
+            Caption = 'Waiting List Reference Code';
+        }
         field(200;"Failed With Message";Text[250])
         {
             Caption = 'Failed With Message';
+        }
+        field(210;"Ticket Trigger Type";Option)
+        {
+            Caption = 'Ticket Trigger Type';
+            OptionCaption = 'Reservation,Cancelation,Admitted,Departed,Added to Waiting List,Waitinglist Notification';
+            OptionMembers = RESERVE,CANCEL_RESERVE,ADMIT,DEPART,ADDED_TO_WL,NOTIFIED_BY_WL;
         }
         field(405;"eTicket Type Code";Text[30])
         {
@@ -196,6 +234,9 @@ table 6060110 "TM Ticket Notification Entry"
         {
         }
         key(Key3;"eTicket Pass Id")
+        {
+        }
+        key(Key4;"Ticket Token")
         {
         }
     }

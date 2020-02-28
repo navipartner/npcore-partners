@@ -45,7 +45,9 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
     // NPR5.48/JDH /20181206 CASE 335967 Validating Unit of measure with correct value
     // NPR5.50/MMV /20190321 CASE 300557 Refactored.
     // NPR5.50/MMV /20190606 CASE 352473 Correct sign on return sales document amounts.
-    // NPR5.52/MMV /20191002  CASE 352473 Fixed prepayment VAT & amount dialog bugs.
+    // NPR5.52/MMV /20191002 CASE 352473 Fixed prepayment VAT & amount dialog bugs.
+    // NPR5.53/MMV /20191219 CASE 377510 Support for importing document silently to sync with document changes.
+    // NPR5.53/MMV /20191220 CASE 375290 Calculate amount to be invoiced correctly. Support split posting in SalesDocumentAmountToPOS()
 
     TableNo = "Sale POS";
 
@@ -100,6 +102,12 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
               else
                 OrderType := 0;
             end;
+        //-NPR5.53 [377510]
+          StrPos(Parameters, 'IMPORT_DOCUMENT_SYNC')>0:
+            begin
+              SynchronizePOSSaleWithDocument(Rec);
+            end;
+        //+NPR5.53 [377510]
           else
             Error('')
         end;
@@ -118,8 +126,11 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
         TextMsgDocDelete: Label 'Please note that %1 %2 has been deleted';
         PREPAYMENT: Label 'Prepayment for %1 %2';
         ERR_DUPLICATE_DOCUMENT: Label 'Only one sales document can be processed per sale.';
-        DOCUMENT_IMPORTED: Label '%1 %2 was imported in POS. The document has been deleted.';
+        DOCUMENT_IMPORTED_DELETED: Label '%1 %2 was imported in POS. The document has been deleted.';
+        DOCUMENT_IMPORTED: Label '%1 %2 was imported in POS.';
         ERR_DOCUMENT_POSTED_LINE: Label '%1 %2 has partially posted lines. Aborting action.';
+        DOCUMENT_FULL_AMOUNT: Label 'Remaining Amount for %1 %2';
+        DOCUMENT_SPLIT_AMOUNT: Label 'Amount for %1 %2';
 
     procedure SalesDocumentToPOSLegacy(var SalePOS: Record "Sale POS";DocumentTypeIn: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order")
     var
@@ -417,6 +428,16 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
 
     procedure SalesDocumentToPOS(var POSSession: Codeunit "POS Session";var SalesHeader: Record "Sales Header")
     var
+        txtDeposit: Label 'Deposit';
+        ErrDoubleOrder: Label 'Error. Only one sales order can be processed per sale.';
+    begin
+        //-NPR5.53 [377510]
+        SalesDocumentToPOSCustom(POSSession, SalesHeader, true, true);
+        //+NPR5.53 [377510]
+    end;
+
+    procedure SalesDocumentToPOSCustom(var POSSession: Codeunit "POS Session";var SalesHeader: Record "Sales Header";DeleteDocument: Boolean;ShowSuccessMessage: Boolean)
+    var
         SaleLinePOS: Record "Sale Line POS";
         SalesLine: Record "Sales Line";
         txtDeposit: Label 'Deposit';
@@ -425,7 +446,7 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
         POSSaleLine: Codeunit "POS Sale Line";
         SalePOS: Record "Sale POS";
     begin
-        //-NPR5.50 [300557]
+        //-NPR5.53 [377510]
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
         POSSale.GetCurrentSale(SalePOS);
@@ -447,6 +468,7 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
         repeat
           POSSaleLine.GetNewSaleLine(SaleLinePOS);
 
+          SaleLinePOS.SetSkipCalcDiscount(true); //Prevent overwrite of any discounts from sales document, until lines are added,deleted,removed.
           SaleLinePOS.Silent := true;
 
           case SalesLine.Type of
@@ -485,20 +507,28 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
           SaleLinePOS.Validate("Allow Line Discount", SalesLine."Allow Line Disc.");
           SaleLinePOS.Validate("Discount %", SalesLine."Line Discount %");
           SaleLinePOS.Validate("Discount Amount", SalesLine."Line Discount Amount");
+
           SaleLinePOS.Validate("Allow Invoice Discount", SalesLine."Allow Invoice Disc.");
           SaleLinePOS.Validate("Invoice Discount Amount", SalesLine."Inv. Discount Amount");
 
           SaleLinePOS.UpdateAmounts(SaleLinePOS);
-          SaleLinePOS.Insert(true);
+          POSSaleLine.InsertLineRaw(SaleLinePOS, false);
+          SaleLinePOS.SetSkipCalcDiscount(false);
         until SalesLine.Next = 0;
 
-        SalesHeader.Delete(true);
-        POSSaleLine.ResendAllOnAfterInsertPOSSaleLine();
+        if DeleteDocument then begin
+          SalesHeader.Delete(true);
+        end;
 
         Commit;
 
-        Message(StrSubstNo(DOCUMENT_IMPORTED, SalesHeader."Document Type", SalesHeader."No."));
-        //+NPR5.50 [300557]
+        if ShowSuccessMessage then begin
+          if DeleteDocument then
+            Message(StrSubstNo(DOCUMENT_IMPORTED_DELETED, SalesHeader."Document Type", SalesHeader."No."))
+          else
+            Message(StrSubstNo(DOCUMENT_IMPORTED, SalesHeader."Document Type", SalesHeader."No."));
+        end;
+        //+NPR5.53 [377510]
     end;
 
     procedure SalesDocumentAmountToPOS(var POSSession: Codeunit "POS Session";SalesHeader: Record "Sales Header";Invoice: Boolean;Ship: Boolean;Receive: Boolean;Print: Boolean;Pdf2Nav: Boolean;Send: Boolean;SyncPost: Boolean)
@@ -513,13 +543,14 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
         SaleLinePOS: Record "Sale Line POS";
         POSPrepaymentMgt: Codeunit "POS Prepayment Mgt.";
     begin
-        //-NPR5.50 [300557]
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
         POSSale.GetCurrentSale(SalePOS);
 
-        if DocumentIsPartiallyPosted(SalesHeader) then
-          Error(ERR_DOCUMENT_POSTED_LINE, SalesHeader."Document Type", SalesHeader."No.");
+        //-NPR5.53 [375290]
+        // IF DocumentIsPartiallyPosted(SalesHeader) THEN
+        //  ERROR(ERR_DOCUMENT_POSTED_LINE, SalesHeader."Document Type", SalesHeader."No.");
+        //+NPR5.53 [375290]
 
         if SalePOS."Customer No." <> '' then begin
           SalePOS.TestField("Customer Type", SalePOS."Customer Type"::Ord);
@@ -531,22 +562,19 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
           POSSale.RefreshCurrent();
         end;
 
-        //-NPR5.52 [352473]
         if not SalePOS."Prices Including VAT" then begin
           SalePOS.Validate("Prices Including VAT", true);
           SalePOS.Modify(true);
           POSSale.RefreshCurrent();
         end;
-        //-NPR5.52 [352473]
 
-        SalesLine.SetRange("Document Type",SalesHeader."Document Type");
-        SalesLine.SetRange("Document No.",SalesHeader."No.");
-        //-NPR5.52 [352473]
-        // SalesLine.CALCSUMS("Amount Including VAT","Prepmt Amt to Deduct");
-        // PaymentAmount := SalesLine."Amount Including VAT" - SalesLine."Prepmt Amt to Deduct";
-        SalesLine.CalcSums("Amount Including VAT");
-        PaymentAmount := SalesLine."Amount Including VAT" - POSPrepaymentMgt.GetPrepaymentAmountToDeductInclVAT(SalesHeader);
-        //+NPR5.52 [352473]
+        //-NPR5.53 [375290]
+        // SalesLine.SETRANGE("Document Type",SalesHeader."Document Type");
+        // SalesLine.SETRANGE("Document No.",SalesHeader."No.");
+        // SalesLine.CALCSUMS("Amount Including VAT");
+        // PaymentAmount := SalesLine."Amount Including VAT" - POSPrepaymentMgt.GetPrepaymentAmountToDeductInclVAT(SalesHeader);
+        PaymentAmount := GetTotalAmountToBeInvoiced(SalesHeader);
+        //+NPR5.53 [375290]
 
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
         SaleLinePOS."Sale Type" := SaleLinePOS."Sale Type"::Deposit;
@@ -560,21 +588,21 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
         SaleLinePOS."Sales Document Print" := Print;
         SaleLinePOS."Sales Document Receive" := Receive;
         SaleLinePOS."Sales Document Sync. Posting" := SyncPost;
-        //-NPR5.52 [352473]
         SaleLinePOS."Sales Document Send" := Send;
         SaleLinePOS."Sales Document Pdf2Nav" := Pdf2Nav;
-        //+NPR5.52 [352473]
-        //-NPR5.50 [352473]
-        //SaleLinePOS.VALIDATE("Unit Price", PaymentAmount);
         if SalesHeader."Document Type" in [SalesHeader."Document Type"::"Return Order",SalesHeader."Document Type"::"Credit Memo"] then
           SaleLinePOS.Validate("Unit Price", -PaymentAmount)
         else
           SaleLinePOS.Validate("Unit Price", PaymentAmount);
-        //+NPR5.50 [352473]
-        SaleLinePOS.Description := StrSubstNo(Text001, SalesHeader."Document Type", SalesHeader."No.");
+        //-NPR5.53 [375290]
+        if DocumentIsSetToFullPosting(SalesHeader) then begin
+          SaleLinePOS.Description := StrSubstNo(DOCUMENT_FULL_AMOUNT, SalesHeader."Document Type", SalesHeader."No.")
+        end else begin
+          SaleLinePOS.Description := StrSubstNo(DOCUMENT_SPLIT_AMOUNT, SalesHeader."Document Type", SalesHeader."No.");
+        end;
+        //+NPR5.53 [375290]
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
-        //+NPR5.50 [300557]
     end;
 
     procedure SetOrderType(OrderTypeOption: Option NotSet,"Order",Lending)
@@ -665,6 +693,98 @@ codeunit 6014406 "Retail Sales Doc. Imp. Mgt."
 
         exit(false);
         //+NPR5.50 [300557]
+    end;
+
+    local procedure GetTotalAmountToBeInvoiced(SalesHeader: Record "Sales Header"): Decimal
+    var
+        SalesPost: Codeunit "Sales-Post";
+        TempSalesLine: Record "Sales Line" temporary;
+        SalesLine: Record "Sales Line";
+        TempVATAmountLine: Record "VAT Amount Line" temporary;
+        TotalSalesLine: Record "Sales Line";
+        TotalSalesLineLCY: Record "Sales Line";
+        VATAmount: Decimal;
+        ProfitLCY: Decimal;
+        ProfitPct: Decimal;
+        TotalAdjCostLCY: Decimal;
+        VATAmountText: Text[30];
+    begin
+        //-NPR5.53 [375290]
+        SalesPost.GetSalesLines(SalesHeader,TempSalesLine,1);
+        Clear(SalesPost);
+        SalesLine.CalcVATAmountLines(0,SalesHeader,TempSalesLine,TempVATAmountLine);
+
+        SalesPost.SumSalesLinesTemp(
+          SalesHeader,TempSalesLine,1,TotalSalesLine,TotalSalesLineLCY,
+          VATAmount,VATAmountText,ProfitLCY,ProfitPct,TotalAdjCostLCY);
+
+        if SalesHeader."Prices Including VAT" then begin
+          exit(TotalSalesLine.Amount + VATAmount);
+        end else begin
+          exit(TotalSalesLine."Amount Including VAT");
+        end;
+        //+NPR5.53 [375290]
+    end;
+
+    local procedure SynchronizePOSSaleWithDocument(SalePOS: Record "Sale POS")
+    var
+        SalesHeader: Record "Sales Header";
+        POSSession: Codeunit "POS Session";
+        POSSale: Codeunit "POS Sale";
+        POSSaleLine: Codeunit "POS Sale Line";
+    begin
+        //-NPR5.53 [377510]
+        SalePOS.TestField("Sales Document No.");
+        SalesHeader.Get(SalePOS."Sales Document Type", SalePOS."Sales Document No.");
+        POSSession.GetSession(POSSession, true);
+        POSSession.GetSale(POSSale);
+        POSSession.GetSaleLine(POSSaleLine);
+
+        POSSaleLine.DeleteAll();
+
+        POSSale.RefreshCurrent();
+        POSSale.GetCurrentSale(SalePOS);
+        Clear(SalePOS."Sales Document No.");
+        Clear(SalePOS."Sales Document Type");
+        SalePOS."Customer Type" := SalePOS."Customer Type"::Ord;
+        SalePOS.Validate("Customer No.", SalesHeader."Bill-to Customer No.");
+        SalePOS.Modify;
+        POSSale.RefreshCurrent();
+
+        SalesDocumentToPOSCustom(POSSession, SalesHeader, false, false);
+        //+NPR5.53 [377510]
+    end;
+
+    procedure DocumentIsSetToFullPosting(SalesHeader: Record "Sales Header"): Boolean
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        //-NPR5.53 [377510]
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        if SalesLine.FindSet then repeat
+          if ((SalesLine."Qty. to Invoice" + SalesLine."Quantity Invoiced") <> SalesLine.Quantity) then
+            exit(false);
+        until SalesLine.Next = 0;
+
+        exit(true);
+        //+NPR5.53 [377510]
+    end;
+
+    procedure SetDocumentToFullPosting(SalesHeader: Record "Sales Header")
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        //-NPR5.53 [377510]
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        if SalesLine.FindSet(true) then repeat
+          if ((SalesLine."Qty. to Invoice" + SalesLine."Quantity Invoiced") <> SalesLine.Quantity) then begin
+            SalesLine.Validate("Qty. to Invoice", SalesLine.Quantity - SalesLine."Quantity Invoiced");
+            SalesLine.Modify(true);
+          end;
+        until SalesLine.Next = 0;
+        //+NPR5.53 [377510]
     end;
 }
 

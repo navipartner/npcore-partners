@@ -20,6 +20,10 @@ page 6060113 "TM Ticket Make Reservation"
     // TM1.42/ALST/20190718 CASE 362158 made the page of type list to be compatible with mobile app
     // TM1.43/ALST/20191015 CASE 362158 reverted 1.42, page is now back to worksheet
     // TM1.44/ALST/20191016 CASE 362158 made the page of type listPlus to be compatible with mobile app and avoid extra click situation on open
+    // TM1.45/TSA /20191112 CASE 322432 Seating capacity
+    // TM1.45/TSA /20191126 CASE 379541 Detecting change to reservation when customer no and external reference changes
+    // TM1.45/TSA /20200114 CASE 380754 Waitinglist, Added Time Overlap confirmation
+    // TM1.45/TSA /20200114 CASE 382535 Dynamic Admission
 
     Caption = 'Make your reservation';
     DataCaptionExpression = StrSubstNo ('%1  - %2', Today, Time);
@@ -41,6 +45,14 @@ page 6060113 "TM Ticket Make Reservation"
                     Editable = false;
                     Style = Unfavorable;
                     StyleExpr = gVisualQueueUnfavorable;
+
+                    trigger OnValidate()
+                    begin
+
+                        //-TM1.45 [379541]
+                        gReservationEdited := true;
+                        //+TM1.45 [379541]
+                    end;
                 }
                 field("Customer No.";"Customer No.")
                 {
@@ -51,6 +63,10 @@ page 6060113 "TM Ticket Make Reservation"
 
                         ModifyAll ("Customer No.", "Customer No.");
                         CurrPage.Update (false);
+
+                        //-TM1.45 [379541]
+                        gReservationEdited := true;
+                        //+TM1.45 [379541]
                     end;
                 }
                 field("External Order No.";"External Order No.")
@@ -62,6 +78,10 @@ page 6060113 "TM Ticket Make Reservation"
 
                         ModifyAll ("External Order No.", "External Order No.");
                         CurrPage.Update (false);
+
+                        //-TM1.45 [379541]
+                        gReservationEdited := true;
+                        //+TM1.45 [379541]
                     end;
                 }
                 field("Payment Option";"Payment Option")
@@ -73,6 +93,10 @@ page 6060113 "TM Ticket Make Reservation"
 
                         ModifyAll ("Payment Option", "Payment Option");
                         CurrPage.Update (false);
+
+                        //-TM1.45 [379541]
+                        gReservationEdited := true;
+                        //+TM1.45 [379541]
                     end;
                 }
                 field("Admission Code";"Admission Code")
@@ -100,6 +124,48 @@ page 6060113 "TM Ticket Make Reservation"
                         CurrPage.Update (false);
                     end;
                 }
+                field("Admission Inclusion";"Admission Inclusion")
+                {
+
+                    trigger OnValidate()
+                    var
+                        CurrentEntryNo: Integer;
+                        CommonQty: Integer;
+                    begin
+
+                        //-TM1.45 [382535] Required is a system option that cant be changed by user
+                        if (xRec."Admission Inclusion" = xRec."Admission Inclusion"::REQUIRED) then
+                          Error (NOT_EDITABLE, FieldCaption ("Admission Inclusion"));
+
+                        if (Rec."Admission Inclusion" = Rec."Admission Inclusion"::REQUIRED) then
+                          Error (NOT_EDITABLE, FieldCaption ("Admission Inclusion"));
+
+                        if (xRec."Admission Inclusion" <> xRec."Admission Inclusion"::REQUIRED) and (Rec."Admission Inclusion" = Rec."Admission Inclusion"::REQUIRED) then
+                          Error (NOT_REQUIRED, FieldCaption ("Admission Inclusion"));
+
+                        // User can set either Selected or Not Selected
+                        if (xRec."Admission Inclusion" = xRec."Admission Inclusion"::NOT_SELECTED) and (Rec."Admission Inclusion" <> xRec."Admission Inclusion") then begin
+                          CurrentEntryNo := Rec."Entry No.";
+                          Rec.SetFilter (Quantity, '<>%1', 0);
+                          if (Rec.FindFirst ()) then
+                            CommonQty := Rec.Quantity;
+                          Rec.Reset;
+                          Rec.Get (CurrentEntryNo);
+                          Rec.Quantity := CommonQty;
+                          Rec."Admission Inclusion" := Rec."Admission Inclusion"::SELECTED;
+                          Rec.Modify ();
+                        end;
+
+                        if (xRec."Admission Inclusion" = xRec."Admission Inclusion"::SELECTED) and (Rec."Admission Inclusion" <> xRec."Admission Inclusion") then begin
+                          Rec.Quantity := 0;
+                          Rec."Admission Inclusion" := Rec."Admission Inclusion"::NOT_SELECTED;
+                          Rec.Modify ();
+                        end;
+
+                        gReservationEdited := true;
+                        //+TM1.45 [382535]
+                    end;
+                }
                 field(Quantity;Quantity)
                 {
                     Editable = gAllowQuantityChange;
@@ -111,6 +177,11 @@ page 6060113 "TM Ticket Make Reservation"
                         TicketRequestManager: Codeunit "TM Ticket Request Manager";
                         ResponseMessage: Text;
                     begin
+
+                        //-TM1.45 [382535]
+                        if ("Admission Inclusion" = "Admission Inclusion"::NOT_SELECTED) then
+                          Error (QTY_NOT_EDITABLE);
+                        //+TM1.45 [382535]
 
                         if (Quantity < 1) then
                           Error (QTY_MUST_BE_GT_ZERO);
@@ -141,9 +212,58 @@ page 6060113 "TM Ticket Make Reservation"
                         CurrPage.Update (false);
                     end;
                 }
+                field("Waiting List Reference Code";"Waiting List Reference Code")
+                {
+
+                    trigger OnValidate()
+                    var
+                        AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
+                        TicketWaitingList: Record "TM Ticket Waiting List";
+                        WaitingListSetup: Record "TM Waiting List Setup";
+                        TicketWaitingListMgr: Codeunit "TM Ticket Waiting List Mgr.";
+                        ResponseMessage: Text;
+                        Admission: Record "TM Admission";
+                    begin
+
+                        //-TM1.45 [380754]
+                        if ("Waiting List Reference Code" <> '') then
+                          if (not TicketWaitingListMgr.GetWaitingListAdmSchEntry ("Waiting List Reference Code", CreateDateTime (Today, Time), false, AdmissionScheduleEntry, TicketWaitingList, ResponseMessage)) then
+                            Error (ResponseMessage);
+
+                        if ("Waiting List Reference Code" = '') then begin
+                          "External Adm. Sch. Entry No." := -1;
+                          "Scheduled Time Description" := '';
+
+                        end else begin
+                          Admission.Get ("Admission Code");
+                          WaitingListSetup.Get (Admission."Waiting List Setup Code");
+
+                          if (WaitingListSetup."Enforce Same Item") then begin
+                            TestField ("Item No.", TicketWaitingList."Item No.");
+                            TestField ("Variant Code", TicketWaitingList."Variant Code");
+                          end;
+
+                          Validate (Quantity, TicketWaitingList.Quantity);
+                          "External Adm. Sch. Entry No." := AdmissionScheduleEntry."External Schedule Entry No.";
+                          "Scheduled Time Description" := StrSubstNo ('%1 - %2', AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+                          if (gDeliverTicketTo = '') then
+                            gDeliverTicketTo := TicketWaitingList."Notification Address";
+
+                        end;
+
+                        Modify ();
+                        gReservationEdited := true;
+                        CurrPage.Update (false);
+
+                        CalcVisualQueueUnfavorable (Rec);
+                        //+TM1.45 [380754]
+                    end;
+                }
             }
             group(Control6014406)
             {
+                //The GridLayout property is only supported on controls of type Grid
+                //GridLayout = Columns;
                 ShowCaption = false;
                 Visible = gShowDeliverTo;
                 field(gDeliverTicketTo;gDeliverTicketTo)
@@ -212,6 +332,13 @@ page 6060113 "TM Ticket Make Reservation"
             gConfirmStatusText := STATUS_CONFIRMED;
     end;
 
+    trigger OnModifyRecord(): Boolean
+    begin
+
+        if ("Admission Created") then
+          Error ('Confirmed admissions can not be altered.');
+    end;
+
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
 
@@ -243,29 +370,51 @@ page 6060113 "TM Ticket Make Reservation"
         gTicketVariantCode: Code[10];
         gDeliverTicketTo: Text;
         gShowDeliverTo: Boolean;
+        WAITING_LIST: Label 'Waiting List';
+        gAddToWaitingList: Boolean;
+        NO_NOTIFICATION_ADDR: Label 'When you have selected a ticket schedule with waiting list, you need to provide e-mail or sms in the deliver-to field.';
+        gLimitToDateSelected: Date;
+        DIFFERENT_DATES: Label 'The selected time schedules have different dates. This schedule is for %1 whereas the previous was for %2. Continue anyway?';
+        DIFFERENT_DATES_WARNING: Label 'Please note that the selected time schedules have different dates.';
+        QTY_NOT_EDITABLE: Label 'Quantity can not be changed for admissions that are not included.';
+        NOT_EDITABLE: Label '%1 can not be changed when admission is required.';
+        NOT_REQUIRED: Label '%1 can not be chanegd to required when intial value was optional.';
 
     local procedure ChangeQuantity(NewQuantity: Integer)
     var
         TicketReservationRequest: Record "TM Ticket Reservation Request";
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
         ResponseMessage: Text;
+        CurrentEntryNo: Integer;
     begin
+
+        CurrentEntryNo := Rec."Entry No.";
 
         gReservationEdited := true;
         gQuantityChanged := true;
+
+
+        Rec.Reset ();
         ModifyAll (Quantity, NewQuantity);
+
+        Rec.SetFilter ("Admission Inclusion", '=%1', Rec."Admission Inclusion"::NOT_SELECTED);
+        ModifyAll (Quantity, 0);
+
+        Rec.Reset ();
+        Rec.Get (CurrentEntryNo);
     end;
 
     local procedure SelectSchedule()
     var
-        PageScheduleEntry: Page "TM Ticket Select Schedule";
         AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
         TicketReservationRequest: Record "TM Ticket Reservation Request";
+        TMAdmission: Record "TM Admission";
+        TicketRequestManager: Codeunit "TM Ticket Request Manager";
+        TicketWaitingListMgr: Codeunit "TM Ticket Waiting List Mgr.";
+        PageScheduleEntry: Page "TM Ticket Select Schedule";
         PageAction: Action;
         OldEntryNo: Integer;
-        TicketRequestManager: Codeunit "TM Ticket Request Manager";
         ResponseMessage: Text;
-        TMAdmission: Record "TM Admission";
         "0DF": DateFormula;
         ToDate: Date;
     begin
@@ -297,9 +446,32 @@ page 6060113 "TM Ticket Make Reservation"
         //+TM1.38 [331917]
           OldEntryNo := "External Adm. Sch. Entry No.";
           PageScheduleEntry.GetRecord (AdmissionScheduleEntry);
+
           "External Adm. Sch. Entry No." := AdmissionScheduleEntry."External Schedule Entry No.";
           "Scheduled Time Description" := StrSubstNo ('%1 - %2', AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+
+          //-TM1.45 [380754]
+          if (AdmissionScheduleEntry."Allocation By" = AdmissionScheduleEntry."Allocation By"::WAITINGLIST) then begin
+            "Scheduled Time Description" := StrSubstNo ('%1', WAITING_LIST);
+          end;
+
+          if (gLimitToDateSelected = 0D) then
+            gLimitToDateSelected := AdmissionScheduleEntry."Admission Start Date";
+
+          if (gLimitToDateSelected <> 0D) then begin
+            if (gLimitToDateSelected <> AdmissionScheduleEntry."Admission Start Date") then begin
+              if (not Confirm (DIFFERENT_DATES, false, AdmissionScheduleEntry."Admission Start Date", gLimitToDateSelected)) then
+                Error ('');
+              gLimitToDateSelected := AdmissionScheduleEntry."Admission Start Date";
+            end;
+          end;
+          //+TM1.45 [380754]
+
           Modify ();
+
+          //-#380754 [380754]
+          ConfirmOverlappingTimes (Rec."Entry No.", Rec."External Adm. Sch. Entry No.");
+          //+#380754 [380754]
 
           if (OldEntryNo <> "External Adm. Sch. Entry No.") then begin
             gReservationEdited := true;
@@ -357,7 +529,11 @@ page 6060113 "TM Ticket Make Reservation"
               Admission."Capacity Control"::FULL : Remaining :=  MaxCapacity - AdmissionSchEntry."Open Admitted" - AdmissionSchEntry."Open Reservations";
               Admission."Capacity Control"::NONE : exit (false);
               Admission."Capacity Control"::SALES : Remaining := MaxCapacity - AdmissionSchEntry."Initial Entry";
+              //-TM1.45 [322432]
+              Admission."Capacity Control"::SEATING : Remaining := MaxCapacity - AdmissionSchEntry."Open Admitted" - AdmissionSchEntry."Open Reservations";
+              //+TM1.45 [322432]
             end;
+
             //IF ((ScheduleLine."Max Capacity Per Sch. Entry" - AdmissionSchEntry."Open Reservations" - AdmissionSchEntry."Open Admitted") < TicketReservationRequest.Quantity) THEN
             //  EXIT (TRUE);
             exit (Remaining < TicketReservationRequest.Quantity);
@@ -371,6 +547,8 @@ page 6060113 "TM Ticket Make Reservation"
     procedure LoadTicketRequest(Token: Text[100])
     var
         TicketReservationRequest: Record "TM Ticket Reservation Request";
+        AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
+        ShowDifferentDatesWarning: Boolean;
     begin
 
         TicketReservationRequest.SetFilter ("Session Token ID", '=%1', Token);
@@ -383,10 +561,31 @@ page 6060113 "TM Ticket Make Reservation"
             TransferFields (TicketReservationRequest, true);
             Insert ();
 
+            //-TM1.45 [380754]
+            if (TicketReservationRequest."External Adm. Sch. Entry No." > 0) then begin
+              AdmissionScheduleEntry.SetFilter ("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
+              AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
+              if (AdmissionScheduleEntry.FindLast ()) then begin
+
+                if (gLimitToDateSelected = 0D) then
+                  gLimitToDateSelected := AdmissionScheduleEntry."Admission Start Date";
+
+                if (gLimitToDateSelected <> 0D) then
+                  ShowDifferentDatesWarning := ShowDifferentDatesWarning or (gLimitToDateSelected <> AdmissionScheduleEntry."Admission Start Date");
+
+              end;
+            end;
+            //+TM1.45 [380754]
+
           until (TicketReservationRequest.Next () = 0);
         end;
         gReservationEdited := false;
         gBatchTicketCreateMode := (Rec."Payment Option" <> Rec."Payment Option"::DIRECT);
+
+        //-TM1.45 [380754]
+        if (ShowDifferentDatesWarning) then
+          Message (DIFFERENT_DATES_WARNING, AdmissionScheduleEntry."Admission Start Date", gLimitToDateSelected)
+        //+TM1.45 [380754]
     end;
 
     procedure SetTicketItem(ItemNo: Code[20];VariantCode: Code[10])
@@ -411,14 +610,15 @@ page 6060113 "TM Ticket Make Reservation"
 
     procedure FinalizeReservationRequest(FailWithError: Boolean;var ResponseMessage: Text): Integer
     var
-        TicketRequestManager: Codeunit "TM Ticket Request Manager";
         TicketReservationRequest: Record "TM Ticket Reservation Request";
+        TicketRequestManager: Codeunit "TM Ticket Request Manager";
+        TicketWaitingListMgr: Codeunit "TM Ticket Waiting List Mgr.";
     begin
 
         //-TM1.38 [332109]
         if (gDeliverTicketTo <> '') then begin
           Rec.Reset;
-          if (Rec.FindFirst ()) then ;
+          if (Rec.FindSet ()) then ;
           repeat
             TicketReservationRequest.Get (Rec."Entry No.");
 
@@ -433,12 +633,34 @@ page 6060113 "TM Ticket Make Reservation"
         end;
         //+TM1.38 [332109]
 
-        if (gReservationEdited) then begin
+        //-TM1.45 [380754]
+        Rec.Reset;
+        Rec.SetFilter ("Scheduled Time Description", '=%1', WAITING_LIST);
+        if (Rec.FindSet ()) then begin
+          if (gDeliverTicketTo = '') then begin
+            ResponseMessage := NO_NOTIFICATION_ADDR;
+            exit (10);
+          end;
+
           TicketRequestManager.DeleteReservationRequest (Rec."Session Token ID", false);
+          repeat
+            TicketReservationRequest.Get (Rec."Entry No.");
+            TicketWaitingListMgr.CreateWaitingListEntry (Rec, gDeliverTicketTo);
+          until (Rec.Next () = 0);
+          Message ('Added to waiting list.');
+          ResponseMessage := 'If this message is shown, waiting list return code 11 is not handled properly.';
+          exit (11);
+        end;
+        Rec.Reset ();
+        //-TM1.45 [380754]
+
+        if (gReservationEdited) then begin
+          //TicketRequestManager.DeleteReservationRequest (Rec."Session Token ID", FALSE);
 
           Rec.Reset;
           if (Rec.FindFirst ()) then ; //+-TM1.33 [316195]
           repeat
+
             TicketReservationRequest.Get (Rec."Entry No.");
             TicketReservationRequest.Quantity := Rec.Quantity;
             TicketReservationRequest."External Adm. Sch. Entry No." := Rec."External Adm. Sch. Entry No.";
@@ -448,8 +670,15 @@ page 6060113 "TM Ticket Make Reservation"
               TicketReservationRequest."Payment Option" := Rec."Payment Option";
               TicketReservationRequest."Customer No." := Rec."Customer No.";
             end;
+            TicketReservationRequest."Waiting List Reference Code" := Rec."Waiting List Reference Code"; //-+TM1.45 [380754]
+            TicketReservationRequest."Admission Inclusion" := Rec."Admission Inclusion"; //-+TM1.45 [382535]
 
-            TicketReservationRequest.Modify ();
+            //-TM1.45 [382535]
+            //TicketReservationRequest.MODIFY ();
+            if (not TicketReservationRequest."Admission Created") then
+              TicketReservationRequest.Modify ();
+            //+TM1.45 [382535]
+
           until (Rec.Next () = 0);
           TicketRequestManager.SetShowProgressBar (gBatchTicketCreateMode);
           exit (TicketRequestManager.IssueTicketFromReservationToken (Rec."Session Token ID", FailWithError, ResponseMessage));
@@ -470,6 +699,57 @@ page 6060113 "TM Ticket Make Reservation"
     procedure SetTicketBatchMode()
     begin
         gBatchTicketCreateMode := true;
+    end;
+
+    local procedure ConfirmOverlappingTimes(SelectedRequestEntryNo: Integer;SelectedExternaAdmSchEntryNo: Integer)
+    var
+        AdmissionScheduleEntry1: Record "TM Admission Schedule Entry";
+        AdmissionScheduleEntry2: Record "TM Admission Schedule Entry";
+        Admission: Record "TM Admission";
+        TimeOverlapIssue: Boolean;
+    begin
+
+        //-#380754 [380754]
+        AdmissionScheduleEntry1.SetFilter ("External Schedule Entry No.", '=%1', SelectedExternaAdmSchEntryNo);
+        AdmissionScheduleEntry1.SetFilter (Cancelled, '=%1', false);
+        AdmissionScheduleEntry1.FindFirst ();
+        Admission.Get (AdmissionScheduleEntry1."Admission Code");
+        if (Admission.Type = Admission.Type::LOCATION) then
+          exit;
+
+        Rec.Reset ();
+        Rec.FindSet ();
+        repeat
+          TimeOverlapIssue := false;
+
+          if (Rec."External Adm. Sch. Entry No." <> SelectedExternaAdmSchEntryNo) then begin
+            if (Rec."External Adm. Sch. Entry No." <> 0) then begin
+              AdmissionScheduleEntry2.SetFilter ("External Schedule Entry No.", '=%1', Rec."External Adm. Sch. Entry No.");
+              AdmissionScheduleEntry2.SetFilter (Cancelled, '=%1', false);
+              AdmissionScheduleEntry2.FindFirst ();
+              Admission.Get (AdmissionScheduleEntry2."Admission Code");
+              if ((AdmissionScheduleEntry1."Admission Start Date" = AdmissionScheduleEntry2."Admission Start Date") and
+                  (Admission.Type = Admission.Type::OCCASION)) then
+
+                TimeOverlapIssue := (((AdmissionScheduleEntry1."Admission Start Time" >= AdmissionScheduleEntry2."Admission Start Time") and
+                                      (AdmissionScheduleEntry1."Admission Start Time" <= AdmissionScheduleEntry2."Admission End Time")) or
+                                     ((AdmissionScheduleEntry1."Admission End Time" >= AdmissionScheduleEntry2."Admission Start Time") and
+                                      (AdmissionScheduleEntry1."Admission End Time" <= AdmissionScheduleEntry2."Admission End Time")));
+
+            end;
+          end;
+
+        until ((Rec.Next () = 0) or TimeOverlapIssue);
+
+        Rec.Get (SelectedRequestEntryNo);
+
+        if (TimeOverlapIssue) then
+          if (not Confirm ('Your selected time %1 for %2 seems to overlap with your time selection for %3 at %4. Do you want to continue anyway?', false,
+             AdmissionScheduleEntry1."Admission Start Time", AdmissionScheduleEntry1."Admission Code",
+             AdmissionScheduleEntry2."Admission Code", AdmissionScheduleEntry2."Admission Start Time")) then
+            Error ('');
+
+        //+#380754 [380754]
     end;
 }
 

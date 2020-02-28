@@ -1,6 +1,7 @@
 page 6150647 "POS Info POS Entry"
 {
     // NPR5.41/THRO/20180424 CASE 312185 Page created
+    // NPR5.53/ALPO/20200204 CASE 387750 Added fields: "Document No.", "Entry Date", "POS Unit No.", "Salesperson Code"
 
     Caption = 'POS Info POS Entry';
     Editable = false;
@@ -14,10 +15,22 @@ page 6150647 "POS Info POS Entry"
         {
             repeater(Group)
             {
+                field("Entry Date";"Entry Date")
+                {
+                }
                 field("POS Entry No.";"POS Entry No.")
                 {
                 }
+                field("Document No.";"Document No.")
+                {
+                }
                 field("Sales Line No.";"Sales Line No.")
+                {
+                }
+                field("POS Unit No.";"POS Unit No.")
+                {
+                }
+                field("Salesperson Code";"Salesperson Code")
                 {
                 }
                 field("Receipt Type";"Receipt Type")

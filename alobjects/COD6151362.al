@@ -3,6 +3,9 @@ codeunit 6151362 "CS UI Stock Adjustment"
     // NPR5.51/ALST/20190731 CASE 362173 new object, used to adjust stock after counting bin contents
     // NPR5.51/CLVA/20190826 CASE 362173 Rearranged code to optimize functionality
     // NPR5.51/CLVA/20190830 CASE 366739 Changed error handling to overcome text overflow
+    // NPR5.53/SARA/20191030 CASE 375030 Added validation for Location = Directed PutAway and Pick
+    // NPR5.53/CLVA/20191118 CASE 377721 Changed posting to background posting
+    // NPR5.53/CLVA/20191128 CASE 379973 Handling duplicate entries
 
     TableNo = "CS UI Header";
 
@@ -49,6 +52,7 @@ codeunit 6151362 "CS UI Stock Adjustment"
         Text013: Label 'Input value is not valid';
         Text014: Label 'Item %1 doesn''t exist';
         Text019: Label 'Bin Code is blank';
+        Text020: Label 'Location Should not be DirectedPutAway/Pick';
         Text028: Label '%1 Item Journal';
         InventoryAdjCaption: Label 'Inventory adjusted to %1';
         AdjustInventoryCaption: Label 'Adjust inventory';
@@ -62,6 +66,7 @@ codeunit 6151362 "CS UI Stock Adjustment"
         AtributeErr: Label 'Failed to add the attribute: %1.';
         AdjustingFailedErr: Label 'Adjustment could not be done because posting failed. Error: %1';
         MissingBarcodeErr: Label 'Barcode must be scanned before adjustment can be done';
+        Text029: Label 'Adjustment for item %1 : %2 to Bin %3 is already added for posting';
 
     local procedure ProcessInput()
     var
@@ -236,6 +241,10 @@ codeunit 6151362 "CS UI Stock Adjustment"
           exit;
         end;
 
+        //-NPR5.53 [375030]
+        if Location."Directed Put-away and Pick" then
+          Remark := Text020;
+        //+NPR5.53 [375030]
         CSWarehouseActivityHandling."Location Code" := InputValue;
     end;
 
@@ -247,6 +256,9 @@ codeunit 6151362 "CS UI Stock Adjustment"
         ResolvingTable: Integer;
         Item: Record Item;
         ItemCrossReference: Record "Item Cross Reference";
+        ItemJnlTemplate: Record "Item Journal Template";
+        ItemJournalBatch: Record "Item Journal Batch";
+        ItemJournalLine: Record "Item Journal Line";
     begin
         if InputValue = '' then begin
           Remark := Text005;
@@ -266,6 +278,28 @@ codeunit 6151362 "CS UI Stock Adjustment"
 
           CSWarehouseActivityHandling."Item No." := ItemNo;
           CSWarehouseActivityHandling."Variant Code" := VariantCode;
+
+          //-NPR5.53 [379973]
+          if CSWarehouseActivityHandling."Bin Code" <> '' then begin
+            ItemJnlTemplate.SetRange(Type,ItemJnlTemplate.Type::Item);
+            if ItemJnlTemplate.FindFirst then begin
+
+              if ItemJournalBatch.Get(ItemJnlTemplate.Name,UserId) then begin
+                Clear(ItemJournalLine);
+                ItemJournalLine.SetRange("Journal Template Name",ItemJournalBatch."Journal Template Name");
+                ItemJournalLine.SetRange("Journal Batch Name",ItemJournalBatch.Name);
+                ItemJournalLine.SetRange("Item No.",CSWarehouseActivityHandling."Item No.");
+                ItemJournalLine.SetRange("Variant Code",CSWarehouseActivityHandling."Variant Code");
+                ItemJournalLine.SetRange("Bin Code",CSWarehouseActivityHandling."Bin Code");
+                if ItemJournalLine.FindFirst then begin
+                  Remark := StrSubstNo(Text029,CSWarehouseActivityHandling."Item No.",CSWarehouseActivityHandling."Variant Code",CSWarehouseActivityHandling."Bin Code");
+                  exit;
+                end;
+              end;
+
+            end;
+          end;
+          //+NPR5.53 [379973]
 
           if (ResolvingTable = DATABASE::"Item Cross Reference") then begin
             with ItemCrossReference do begin
@@ -372,6 +406,10 @@ codeunit 6151362 "CS UI Stock Adjustment"
         ItemJournalBatch: Record "Item Journal Batch";
         ItemJnlPostBatch: Codeunit "Item Jnl.-Post Batch";
         LineNo: Integer;
+        PostingRecRef: RecordRef;
+        CSPostEnqueue: Codeunit "CS Post - Enqueue";
+        CSPostingBuffer: Record "CS Posting Buffer";
+        CSSetup: Record "CS Setup";
     begin
         Clear(Remark);
 
@@ -432,15 +470,36 @@ codeunit 6151362 "CS UI Stock Adjustment"
         ItemJournalLine.Validate("Bin Code",CSWarehouseActivityHandling."Bin Code");
         ItemJournalLine.Validate("Posting Date",Today);
         ItemJournalLine."Document Date" := WorkDate;
-        ItemJournalLine.Validate("External Document No.",'MOBILE');
+        //-NPR5.53 [377721]
+        //ItemJournalLine.VALIDATE("External Document No.",'MOBILE');
+        ItemJournalLine.Validate("External Document No.",CSSessionId);
+        //+NPR5.53 [377721]
         ItemJournalLine.Validate("Changed by User",true);
         ItemJournalLine."Document No." := Format(Today);
         ItemJournalLine.Modify(true);
         //NPR5.51+
 
-        Commit;
-
-        PostingFinished := CODEUNIT.Run(CODEUNIT::"Item Jnl.-Post Batch",ItemJournalLine);
+        //-NPR5.53 [377721]
+        CSSetup.Get;
+        if CSSetup."Post with Job Queue" then begin
+          PostingRecRef.GetTable(ItemJournalBatch);
+          CSPostingBuffer.Init;
+          CSPostingBuffer."Table No." := PostingRecRef.Number;
+          CSPostingBuffer."Record Id" := PostingRecRef.RecordId;
+          CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::"Unplanned Count";
+          CSPostingBuffer."Session Id" := CSSessionId;
+          if CSPostingBuffer.Insert(true) then begin
+            CSPostEnqueue.Run(CSPostingBuffer);
+            PostingFinished := true;
+          end else
+            Remark := GetLastErrorText;
+        end else begin
+          //+NPR5.53 [377721]
+          Commit;
+          PostingFinished := CODEUNIT.Run(CODEUNIT::"Item Jnl.-Post Batch",ItemJournalLine);
+          //-NPR5.53 [377721]
+        end;
+        //+NPR5.53 [377721]
 
         //NPR5.51-
         //DeleteItemBatch(ItemJournalLine."Journal Template Name",ItemJournalLine."Journal Batch Name");

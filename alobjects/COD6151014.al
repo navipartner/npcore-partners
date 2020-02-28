@@ -6,6 +6,7 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
     // NPR5.49/MHA /20190228  CASE 342811 Added functions OnLookupVoucherTypeCode(), OnValidateVoucherTypeCode() and implemented new Voucher Validation interface
     // NPR5.50/MHA /20190426  CASE 353079 Removed wrong quotation marks in workflow step voucher_input
     // NPR5.51/MHA /20190823  CASE 364542 VoucherType in EndSale() should depend on the Scanned Voucher in VoucherPayment()
+    // NPR5.53/MHA /20190114 CASE 384841 Signature updated for CalculateRemainingPaymentSuggestion()
 
 
     trigger OnRun()
@@ -259,10 +260,10 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
           exit;
         if not POSPaymentLine.GetPaymentType(ReturnPaymentTypePOS,Register."Return Payment Type",Register."Register No.") then
           exit;
-        //-NPR5.51 [364542]
-        if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount,PaidAmount,PaymentTypePOS,ReturnPaymentTypePOS) <> 0 then
+        //-NPR5.53 [384841]
+        if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount,PaidAmount,PaymentTypePOS,ReturnPaymentTypePOS, false) <> 0 then
           exit;
-        //+NPR5.51 [364542]
+        //+NPR5.53 [384841]
 
         POSSession.GetSale(POSSale);
         if not POSSale.TryEndSaleWithBalancing(POSSession,PaymentTypePOS,ReturnPaymentTypePOS) then

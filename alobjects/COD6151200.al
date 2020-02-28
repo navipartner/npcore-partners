@@ -5,6 +5,12 @@ codeunit 6151200 "NpCs Import Sales Document"
     // NPR5.51/MHA /20190719  CASE 342443 Added <opening_hour_set>
     // NPR5.51/MHA /20190719  CASE 362197 Added functions InsertToStore(), GetToStoreCode()
     // NPR5.51/MHA /20190821  CASE 364557 Added <post_on>
+    // NPR5.53/MHA /20191024  CASE 364714 Item Cross Reference should be considered when finding Item
+    // NPR5.53/MHA /20191024  CASE 374282 "Unit Price" should be validated after Quantity to avoid Price recalculation
+    // NPR5.53/MHA /20191118  CASE 377915 "External Order No." is no longer set as it is only used by M2 integration
+    // NPR5.53/MHA /20191129  CASE 378895 Added Comment Type in InsertSalesLine()
+    // NPR5.53/MHA /20191204  CASE 378216 Added import of <processing_status> if occurs
+    // NPR5.53/MHA /20191209  CASE 381524 Added Nav Publisher OnFindItemVariant()
 
     TableNo = "Nc Import Entry";
 
@@ -247,7 +253,9 @@ codeunit 6151200 "NpCs Import Sales Document"
         SalesHeader.Init;
         SalesHeader."Document Type" := NpXmlDomMgt.GetElementInt(XmlElement,'to_document_type',true);
         SalesHeader."No." := '';
-        SalesHeader."External Order No." := CopyStr(DocNo,1,MaxStrLen(SalesHeader."External Order No."));
+        //-NPR5.53 [377915]
+        //SalesHeader."External Order No." := COPYSTR(DocNo,1,MAXSTRLEN(SalesHeader."External Order No."));
+        //+NPR5.53 [377915]
         SalesHeader."External Document No." := CopyStr(DocNo,1,MaxStrLen(SalesHeader."External Document No."));
         SalesHeader.Insert(true);
 
@@ -275,6 +283,7 @@ codeunit 6151200 "NpCs Import Sales Document"
         StoreCode: Code[20];
         BillToCustNo: Code[20];
         OutStr: OutStream;
+        ProcessingStatus: Integer;
     begin
         //-NPR5.51 [344264]
         DocType := NpXmlDomMgt.GetAttributeInt(XmlElement,'','document_type',true);
@@ -298,6 +307,12 @@ codeunit 6151200 "NpCs Import Sales Document"
         //+NPR5.51 [362197]
         NpCsDocument."Next Workflow Step" := NpCsDocument."Next Workflow Step"::"Order Status";
         NpCsDocument."Processing Status" := NpCsDocument."Processing Status"::Pending;
+        //-NPR5.53 [378216]
+        if Evaluate(ProcessingStatus,NpXmlDomMgt.GetElementText(XmlElement,'processing_status',0,false),9) then begin
+          if ProcessingStatus in [NpCsDocument."Processing Status"::" ",NpCsDocument."Processing Status"::Pending] then
+             NpCsDocument."Processing Status" := ProcessingStatus;
+        end;
+        //+NPR5.53 [378216]
         NpCsDocument."Processing updated at" := CurrentDateTime;
         NpCsDocument."Customer No." := NpXmlDomMgt.GetAttributeCode(XmlElement,'sell_to_customer','customer_no',MaxStrLen(NpCsDocument."Customer No."),false);
         NpCsDocument."Customer E-mail" := NpXmlDomMgt.GetElementText(XmlElement,'sell_to_customer/email',MaxStrLen(NpCsDocument."Customer E-mail"),false);
@@ -368,12 +383,22 @@ codeunit 6151200 "NpCs Import Sales Document"
               SalesLine.Validate("Unit of Measure Code",NpXmlDomMgt.GetElementCode(XmlElement,'unit_of_measure_code',MaxStrLen(SalesLine."Unit of Measure Code"),true));
               SalesLine.Description := NpXmlDomMgt.GetElementText(XmlElement,'description',MaxStrLen(SalesLine.Description),true);
               SalesLine."Description 2" := NpXmlDomMgt.GetElementText(XmlElement,'description_2',MaxStrLen(SalesLine."Description 2"),false);
-              SalesLine.Validate("Unit Price",NpXmlDomMgt.GetElementDec(XmlElement,'unit_price',true));
+              //-NPR5.53 [374282]
               SalesLine.Validate(Quantity,NpXmlDomMgt.GetElementDec(XmlElement,'quantity',true));
+              SalesLine.Validate("Unit Price",NpXmlDomMgt.GetElementDec(XmlElement,'unit_price',true));
+              //+NPR5.53 [374282]
               SalesLine.Validate("VAT %",NpXmlDomMgt.GetElementDec(XmlElement,'vat_pct',true));
               SalesLine.Validate("Amount Including VAT",NpXmlDomMgt.GetElementDec(XmlElement,'line_amount',true));
               SalesLine.Modify(true);
             end;
+          //-NPR5.53 [378895]
+          SalesLine.Type::" ":
+            begin
+              SalesLine.Description := NpXmlDomMgt.GetElementText(XmlElement,'description',MaxStrLen(SalesLine.Description),true);
+              SalesLine."Description 2" := NpXmlDomMgt.GetElementText(XmlElement,'description_2',MaxStrLen(SalesLine."Description 2"),false);
+              SalesLine.Modify(true);
+            end;
+          //+NPR5.53 [378895]
         end;
         SalesLine.Modify(true);
     end;
@@ -502,8 +527,16 @@ codeunit 6151200 "NpCs Import Sales Document"
         FromCrossRefNo: Code[20];
         FromItemNo: Code[20];
         FromVariantCode: Code[10];
+        Found: Boolean;
     begin
         Clear(ItemVariant);
+        //-NPR5.53 [381524]
+        OnFindItemVariant(XmlElement,ItemVariant,Found);
+        if Found then
+          exit;
+
+        Clear(ItemVariant);
+        //+NPR5.53 [381524]
 
         StoreCode := GetFromStoreCode(XmlElement);
         FromCrossRefNo := NpXmlDomMgt.GetElementCode(XmlElement,'cross_reference_no',MaxStrLen(ItemVariant."Item No."),false);
@@ -546,6 +579,33 @@ codeunit 6151200 "NpCs Import Sales Document"
           end;
           exit;
         end;
+
+        //-NPR5.53 [364714]
+        Clear(ItemCrossRef);
+        ItemCrossRef.SetRange("Cross-Reference No.",FromItemNo);
+        ItemCrossRef.SetRange("Discontinue Bar Code",false);
+        if not ItemCrossRef.FindFirst then
+          ItemCrossRef.SetRange("Discontinue Bar Code");
+
+        if ItemCrossRef.FindFirst then begin
+          ItemVariant."Item No." := ItemCrossRef."Item No.";
+          ItemVariant.Code := ItemCrossRef."Variant Code";
+
+          if NpCsDocumentMapping."From No." <> '' then begin
+            NpCsDocumentMapping.Validate("To No.",ItemCrossRef."Cross-Reference No.");
+            NpCsDocumentMapping.Modify(true);
+          end;
+
+          exit;
+        end;
+        //+NPR5.53 [364714]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFindItemVariant(XmlElement: DotNet npNetXmlElement;var ItemVariant: Record "Item Variant";var Found: Boolean)
+    begin
+        //-NPR5.53 [381524]
+        //+NPR5.53 [381524]
     end;
 
     local procedure GetCrossRefNo(ItemVariant: Record "Item Variant") CrossRefNo: Code[20]

@@ -5,6 +5,7 @@ table 6151012 "NpRv Voucher Type"
     // NPR5.48/MHA /20190213  CASE 345739 No. Series length has been increased from 10 to 20 in NAV2018 and newer
     // NPR5.49/MHA /20190228  CASE 342811 Added field 60 "Partner Code"
     // NPR5.50/MHA /20190426  CASE 353079 Added field 62 "Allow Top-up"
+    // NPR5.53/THRO/20191216  CASE 382232 Added field 72 "Minimum Amount Issue"
 
     Caption = 'Retail Voucher Type';
     DrillDownPageID = "NpRv Voucher Types";
@@ -78,6 +79,10 @@ table 6151012 "NpRv Voucher Type"
         {
             Caption = 'Payment Type';
             TableRelation = "Payment Type POS";
+        }
+        field(72;"Minimum Amount Issue";Decimal)
+        {
+            Caption = 'Minimum Amount Issue';
         }
         field(75;"E-mail Template Code";Code[20])
         {

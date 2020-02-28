@@ -4,6 +4,7 @@ codeunit 6060142 "MM Loyalty WebService Mgr"
     // MM1.37/TSA /20190226 CASE 338215 Points for payments refactored
     // MM1.37/TSA /20190226 CASE 338215 Added GetLoyaltyPointsEntries
     // MM1.40/TSA /20190828 CASE 365879 Added GetLoyaltyReceiptList
+    // MM1.42/TSA /20191212 CASE 382170 General enhancements
 
     TableNo = "Nc Import Entry";
 
@@ -125,10 +126,16 @@ codeunit 6060142 "MM Loyalty WebService Mgr"
           Membership.SetFilter ("Customer No.", '=%1', CustomerNo);
           Membership.SetFilter (Blocked, '=%1', false);
           if (Membership.FindFirst ()) then
+            //-MM1.42 [382170]
             //-MM1.40 [365879]�
             //MemberInfoCapture."External Member No" := Membership."External Membership No.";
-            MemberInfoCapture."External Membership No." := Membership."External Membership No.";
+            //MemberInfoCapture."External Membership No." := Membership."External Membership No.";
             //+MM1.40 [365879]
+            if (MemberInfoCapture."External Membership No." = '') then //-+MM1.42 [382170]
+              MemberInfoCapture."External Membership No." := Membership."External Membership No.";
+            if (MemberInfoCapture."External Membership No." <> Membership."External Membership No.") then
+              MemberInfoCapture."External Membership No." := '';
+            //+MM1.42 [382170]
         end;
 
         MemberInfoCapture.Insert

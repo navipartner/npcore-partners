@@ -1,71 +1,73 @@
 codeunit 6151493 "Raptor API"
 {
     // NPR5.51/CLVA/20190710  CASE 355871 Object created
+    // NPR5.53/ALPO/20191119 CASE 377727 Raptor integration enhancements
 
 
     trigger OnRun()
     begin
     end;
 
-    procedure GetUserIdOrderHistory(UserIdentifier: Text; var ErrorMsg: Text): Text
+    procedure SendRaptorRequest(BaseUrl: Text;Path: Text;var ErrorMsg: Text) Result: Text
     var
-        RaptorManagement: Codeunit "Raptor Management";
-        RaptorSetup: Record "Raptor Setup";
         Parameters: DotNet npNetDictionary_Of_T_U;
-        Baseurl: Text;
-        Path: Text;
         HttpResponseMessage: DotNet npNetHttpResponseMessage;
         RequestStatus: Boolean;
-        Result: Text;
-        RaptorHelperFunctions: Codeunit "Raptor Helper Functions";
-        JArray: DotNet JArray;
-        JObject: DotNet JObject;
     begin
-        if not IsEnabled then
-            exit;
-
-        if UserIdentifier = '' then
-            exit;
-
-        RaptorSetup.Get;
-        RaptorSetup.TestField("API Key");
-        RaptorSetup.TestField("Base Url");
-
-        Baseurl := RaptorSetup."Base Url";
-        Path := '/v1/6184/GetUserIdOrderHistory/100/' + RaptorSetup."API Key" + '?UserIdentifier=' + UserIdentifier;
-
         Parameters := Parameters.Dictionary();
-        Parameters.Add('baseurl', Baseurl);
-        Parameters.Add('restmethod', 'GET');
-        Parameters.Add('path', Path);
+        Parameters.Add('baseurl',BaseUrl);
+        Parameters.Add('restmethod','GET');
+        Parameters.Add('path',Path);
 
-        RequestStatus := RaptorManagement.CallRaptorAPI(Parameters, HttpResponseMessage);
+        RequestStatus := CallRaptorAPI(Parameters,HttpResponseMessage);
         Result := HttpResponseMessage.Content.ReadAsStringAsync.Result;
 
         if not RequestStatus then begin
             ErrorMsg := Result;
             Result := '';
         end;
-
-        exit(Result);
-
-        // Sample for reading result from Raptor
-        // RaptorHelperFunctions.TryParse(result,JArray);
-        //
-        // FOREACH JObject IN JArray DO BEGIN
-        //  MESSAGE(RaptorHelperFunctions.GetValueAsText(JObject,'ProductId'));
-        //  MESSAGE(RaptorHelperFunctions.GetValueAsText(JObject,'Orderdate'));
-        // END;
     end;
 
-    local procedure IsEnabled(): Boolean
+    procedure CallRaptorAPI(var Parameters: DotNet npNetDictionary_Of_T_U;var HttpResponseMessage: DotNet npNetHttpResponseMessage): Boolean
     var
-        RaptorSetup: Record "Raptor Setup";
+        HttpContent: DotNet npNetHttpContent;
+        HttpClient: DotNet npNetHttpClient;
+        AuthHeaderValue: DotNet npNetAuthenticationHeaderValue;
+        EntityTagHeaderValue: DotNet npNetEntityTagHeaderValue;
+        Uri: DotNet npNetUri;
+        Bytes: DotNet npNetArray;
+        Encoding: DotNet npNetEncoding;
+        Convert: DotNet npNetConvert;
+        HttpRequestMessage: DotNet npNetHttpRequestMessage;
+        HttpMethod: DotNet npNetHttpMethod;
     begin
-        if RaptorSetup.Get() then
-            exit(RaptorSetup."Enable Raptor Functions");
+        HttpClient := HttpClient.HttpClient();
+        HttpClient.BaseAddress := Uri.Uri(Format(Parameters.Item('baseurl')));
 
-        exit(false);
+        HttpRequestMessage :=
+          HttpRequestMessage.HttpRequestMessage(HttpMethod.HttpMethod(UpperCase(Format(Parameters.Item('restmethod')))),
+                                                Format(Parameters.Item('path')));;
+
+        if Parameters.ContainsKey('accept') then
+          HttpRequestMessage.Headers.Add('Accept',Format(Parameters.Item('accept')));
+
+        if Parameters.ContainsKey('username') then begin
+          if Parameters.ContainsKey('password') then
+            Bytes := Encoding.ASCII.GetBytes(StrSubstNo('%1:%2',Format(Parameters.Item('username')),Format(Parameters.Item('password'))))
+          else
+            Bytes := Encoding.ASCII.GetBytes(StrSubstNo('%1:%2',Format(Parameters.Item('username')),''));
+          AuthHeaderValue := AuthHeaderValue.AuthenticationHeaderValue('Basic',Convert.ToBase64String(Bytes));
+          HttpRequestMessage.Headers.Authorization := AuthHeaderValue;
+        end;
+
+        if Parameters.ContainsKey('etag') then
+          HttpRequestMessage.Headers.IfMatch.Add(Parameters.Item('etag'));
+
+        if Parameters.ContainsKey('httpcontent') then
+          HttpRequestMessage.Content := Parameters.Item('httpcontent');
+
+        HttpResponseMessage := HttpClient.SendAsync(HttpRequestMessage).Result;
+        exit(HttpResponseMessage.IsSuccessStatusCode);
     end;
 }
 

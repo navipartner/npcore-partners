@@ -4,6 +4,7 @@ table 6151198 "NpCs Document"
     // NPR5.51/MHA /20190717  CASE 344264 Added functions for return Last Log Entry texts and changed name and logic for field 240
     // NPR5.51/MHA /20190719  CASE 362443 "To Store Code" may now refer to Local Store and added field 13 "Inserted at"
     // NPR5.51/MHA /20190819  CASE 364557 Added options "Posted Invoice", "Posted Credit Memo" to field 5 "Document Type"
+    // NPR5.53/MHA /20191128  CASE 378895 Added Keys "Reference","Processing expires at", and "Delivery expires at"
 
     Caption = 'Collect Document';
     DataCaptionFields = "Document Type","Reference No.","Sell-to Customer Name";
@@ -474,6 +475,15 @@ table 6151198 "NpCs Document"
         {
         }
         key(Key2;"Document Type","Document No.")
+        {
+        }
+        key(Key3;"Reference No.")
+        {
+        }
+        key(Key4;"Processing expires at")
+        {
+        }
+        key(Key5;"Delivery expires at")
         {
         }
     }

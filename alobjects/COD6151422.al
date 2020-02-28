@@ -2,6 +2,7 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
 {
     // MAG2.20/MHA /20190502  CASE 352184 Object created for Adyen Payment Capture/Cancel/Refund
     // MAG2.23/MHA /20190821  CASE 365631 External Order No. is used as Reference
+    // MAG2.24/MHA /20191118  CASE 377930 Added Shopper Reference functions
 
 
     trigger OnRun()
@@ -136,9 +137,6 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
 
     local procedure Cancel(PaymentLine: Record "Magento Payment Line")
     var
-        GeneralLedgerSetup: Record "General Ledger Setup";
-        SalesHeader: Record "Sales Header";
-        SalesInvHeader: Record "Sales Invoice Header";
         PaymentGateway: Record "Magento Payment Gateway";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         JToken: DotNet JToken;
@@ -147,7 +145,6 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
         WebException: DotNet npNetWebException;
         Url: Text;
         Request: Text;
-        CurrencyCode: Code[10];
         Reference: Text;
         ErrorMessage: Text;
         Response: Text;
@@ -159,14 +156,9 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
         InitWebRequest(Url,PaymentGateway."Api Username",PaymentGateway."Api Password",HttpWebRequest);
 
         PaymentLine.TestField("Document Table No.",DATABASE::"Sales Header");
-        SalesHeader.Get(PaymentLine."Document Type",PaymentLine."Document No.");
-        CurrencyCode := SalesHeader."Currency Code";
-        Reference := SalesHeader."No.";
-
-        if CurrencyCode = '' then begin
-          GeneralLedgerSetup.Get;
-          CurrencyCode := GeneralLedgerSetup."LCY Code";
-        end;
+        //-MAG2.24 [377930]
+        Reference := PaymentLine."Document No.";
+        //+MAG2.24 [377930]
 
         Request :=
           '{' +
@@ -263,6 +255,74 @@ codeunit 6151422 "Magento Pmt. Adyen Mgt."
         Response := GetJsonText(JToken,'response',0);
         if Response <> '[refund-received]' then
           Error(Response);
+    end;
+
+    local procedure "--- Shopper Reference"()
+    begin
+    end;
+
+    [EventSubscriber(ObjectType::Table, 6151409, 'OnAfterInsertEvent', '', true, true)]
+    local procedure OnInsertPaymentLine(var Rec: Record "Magento Payment Line";RunTrigger: Boolean)
+    begin
+        //-MAG2.24 [377930]
+        if not RunTrigger then
+          exit;
+        if not IsAdyenPaymentLine(Rec) then
+          exit;
+
+        UpsertShopperRef(Rec);
+        //+MAG2.24 [377930]
+    end;
+
+    [EventSubscriber(ObjectType::Table, 6151409, 'OnAfterModifyEvent', '', true, true)]
+    local procedure OnModifyPaymentLine(var Rec: Record "Magento Payment Line";var xRec: Record "Magento Payment Line";RunTrigger: Boolean)
+    begin
+        //-MAG2.24 [377930]
+        if not RunTrigger then
+          exit;
+        if not IsAdyenPaymentLine(Rec) then
+          exit;
+
+        UpsertShopperRef(Rec);
+        //+MAG2.24 [377930]
+    end;
+
+    local procedure UpsertShopperRef(PaymentLine: Record "Magento Payment Line")
+    var
+        SalesHeader: Record "Sales Header";
+        EFTShopperRecognition: Record "EFT Shopper Recognition";
+        EFTAdyenCloudIntegration: Codeunit "EFT Adyen Cloud Integration";
+        PrevRec: Text;
+    begin
+        //-MAG2.24 [377930]
+        if not IsAdyenPaymentLine(PaymentLine) then
+          exit;
+        if PaymentLine."Payment Gateway Shopper Ref." = '' then
+          exit;
+        if PaymentLine."Document Table No." <> DATABASE::"Sales Header" then
+          exit;
+        if not SalesHeader.Get(PaymentLine."Document Type",PaymentLine."Document No.") then
+          exit;
+        if SalesHeader."Sell-to Customer No." = '' then
+          exit;
+
+        if not EFTShopperRecognition.Get(EFTAdyenCloudIntegration.IntegrationType(),PaymentLine."Payment Gateway Shopper Ref.") then begin
+          EFTShopperRecognition.Init;
+          EFTShopperRecognition."Integration Type" := EFTAdyenCloudIntegration.IntegrationType();
+          EFTShopperRecognition."Shopper Reference" := PaymentLine."Payment Gateway Shopper Ref.";
+          EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Customer;
+          EFTShopperRecognition."Entity Key" := SalesHeader."Sell-to Customer No.";
+          EFTShopperRecognition.Insert(true);
+        end;
+
+        PrevRec := Format(EFTShopperRecognition);
+
+        EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Customer;
+        EFTShopperRecognition."Entity Key" := SalesHeader."Sell-to Customer No.";
+
+        if PrevRec <> Format(EFTShopperRecognition) then
+          EFTShopperRecognition.Modify(true);
+        //+MAG2.24 [377930]
     end;
 
     procedure "--- Aux"()

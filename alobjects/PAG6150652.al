@@ -39,10 +39,16 @@ page 6150652 "POS Entry List"
     // NPR5.50/TSA /20190424 CASE 352319 Added navigation to workshifts
     // NPR5.51/TSA /20190623 CASE 359403 Refactored Post Range action
     // NPR5.51/TSA /20190624 CASE 359508 Changed navigate to consider the period document no
+    // NPR5.53/SARA/20191024 CASE 373672 Refactore POS Entry List
+    // NPR5.53/SARA/20200124 CASE 387227 Move Navigate action to Navigate Ribbon
+    // NPR5.53/SARA/20200129 CASE 387885 Apply 'Entry Type' is NOT "Cancelled" as default filter
+    // NPR5.53/SARA/20200205 CASE 389242 Remove shortcut POs Info Audit Roll
 
     Caption = 'POS Entry List';
+    CardPageID = "POS Entry Card";
     Editable = false;
     PageType = List;
+    PromotedActionCategories = 'New,Process,Report,POS Entry Lists,Failed POS Lists,Posting Entries';
     SourceTable = "POS Entry";
     SourceTableView = SORTING("Entry No.")
                       ORDER(Descending);
@@ -79,17 +85,34 @@ page 6150652 "POS Entry List"
             }
             repeater(Group)
             {
+                FreezeColumn = "Ending Time";
                 field("System Entry";"System Entry")
                 {
+                    Visible = false;
                 }
                 field("Entry No.";"Entry No.")
+                {
+                    Visible = false;
+                }
+                field("Entry Date";"Entry Date")
+                {
+                }
+                field("Document No.";"Document No.")
+                {
+                }
+                field("Starting Time";"Starting Time")
+                {
+                }
+                field("Ending Time";"Ending Time")
                 {
                 }
                 field("Fiscal No.";"Fiscal No.")
                 {
+                    Visible = false;
                 }
                 field("POS Store Code";"POS Store Code")
                 {
+                    Visible = false;
                 }
                 field("POS Unit No.";"POS Unit No.")
                 {
@@ -97,11 +120,9 @@ page 6150652 "POS Entry List"
                 field("Salesperson Code";"Salesperson Code")
                 {
                 }
-                field("Document No.";"Document No.")
-                {
-                }
                 field("POS Period Register No.";"POS Period Register No.")
                 {
+                    Visible = false;
                 }
                 field("Shortcut Dimension 1 Code";"Shortcut Dimension 1 Code")
                 {
@@ -114,15 +135,6 @@ page 6150652 "POS Entry List"
                 field("Entry Type";"Entry Type")
                 {
                 }
-                field("Entry Date";"Entry Date")
-                {
-                }
-                field("Starting Time";"Starting Time")
-                {
-                }
-                field("Ending Time";"Ending Time")
-                {
-                }
                 field(Description;Description)
                 {
                 }
@@ -132,6 +144,7 @@ page 6150652 "POS Entry List"
                 field(LastOpenSalesDocumentNo;LastOpenSalesDocumentNo)
                 {
                     Caption = 'Last Open Sales Doc.';
+                    Visible = false;
 
                     trigger OnDrillDown()
                     var
@@ -149,6 +162,7 @@ page 6150652 "POS Entry List"
                 field(LastPostedSalesDocumentNo;LastPostedSalesDocumentNo)
                 {
                     Caption = 'Last Posted Sales Doc.';
+                    Visible = false;
 
                     trigger OnDrillDown()
                     var
@@ -165,6 +179,7 @@ page 6150652 "POS Entry List"
                 }
                 field("No. of Print Output Entries";"No. of Print Output Entries")
                 {
+                    Visible = false;
                 }
                 field("Post Item Entry Status";"Post Item Entry Status")
                 {
@@ -181,14 +196,15 @@ page 6150652 "POS Entry List"
                 field("Amount Incl. Tax";"Amount Incl. Tax")
                 {
                 }
-                field("Currency Code";"Currency Code")
-                {
-                }
                 field("Rounding Amount (LCY)";"Rounding Amount (LCY)")
                 {
                 }
-                field("Prices Including VAT";"Prices Including VAT")
+                field("Amount Incl. Tax & Round";"Amount Incl. Tax & Round")
                 {
+                }
+                field("Currency Code";"Currency Code")
+                {
+                    Visible = false;
                 }
                 field("Reason Code";"Reason Code")
                 {
@@ -200,7 +216,6 @@ page 6150652 "POS Entry List"
                 }
                 field("POS Sale ID";"POS Sale ID")
                 {
-                    Visible = false;
                 }
                 field("Transaction Type";"Transaction Type")
                 {
@@ -224,12 +239,14 @@ page 6150652 "POS Entry List"
                 Caption = 'Sales';
                 Editable = false;
                 SubPageLink = "POS Entry No."=FIELD("Entry No.");
+                Visible = false;
             }
             part(Payments;"POS Payment Line Subpage")
             {
                 Caption = 'Payments';
                 Editable = false;
                 SubPageLink = "POS Entry No."=FIELD("Entry No.");
+                Visible = false;
             }
             part(Taxes;"POS Tax Line Subpage")
             {
@@ -238,6 +255,7 @@ page 6150652 "POS Entry List"
                 SubPageLink = "POS Entry No."=FIELD("Entry No.");
                 SubPageView = SORTING("POS Entry No.","Tax Area Code for Key","Tax Jurisdiction Code","VAT Identifier","Tax %","Tax Group Code","Expense/Capitalize","Tax Type","Use Tax",Positive)
                               ORDER(Ascending);
+                Visible = false;
             }
         }
         area(factboxes)
@@ -277,6 +295,13 @@ page 6150652 "POS Entry List"
                 RunObject = Page "POS Payment Line List";
                 RunPageLink = "POS Entry No."=FIELD("Entry No.");
             }
+            action("Tax Lines")
+            {
+                Caption = 'Tax Lines';
+                Image = TaxDetail;
+                RunObject = Page "POS Tax Line List";
+                RunPageLink = "POS Entry No."=FIELD("Entry No.");
+            }
             action("Balancing Lines")
             {
                 Caption = 'Balancing Lines';
@@ -293,6 +318,7 @@ page 6150652 "POS Entry List"
                               "POS Entry No."=FIELD("Entry No.");
                 RunPageView = SORTING("Table ID","POS Entry No.","POS Entry Line No.",Code,"Line No.")
                               ORDER(Ascending);
+                Visible = false;
             }
             action(ShowDimensions)
             {
@@ -322,7 +348,7 @@ page 6150652 "POS Entry List"
                     //+NPR5.38 [302690]
                 end;
             }
-            action("POS Info")
+            action("POS Info POS Entry")
             {
                 Caption = 'POS Info';
                 Image = Info;
@@ -336,6 +362,7 @@ page 6150652 "POS Entry List"
                 Image = "Action";
                 RunObject = Page "POS Info Audit Roll";
                 RunPageLink = "Sales Ticket No."=FIELD("Document No.");
+                Visible = false;
             }
             action("POS Audit Log")
             {
@@ -452,6 +479,41 @@ page 6150652 "POS Entry List"
                     }
                 }
             }
+            group("NpRv Vouchers")
+            {
+                Caption = 'NpRv Vouchers';
+                action("Voucher Lines")
+                {
+                    Caption = 'Voucher Lines';
+                    Image = RefreshVoucher;
+                    RunObject = Page "NpRv Vouchers";
+                    RunPageLink = "Issue Document No."=FIELD("Document No.");
+
+                    trigger OnAction()
+                    var
+                        TaxFree: Codeunit "Tax Free Handler Mgt.";
+                    begin
+                    end;
+                }
+                action("Voucher List")
+                {
+                    Caption = 'Voucher List';
+                    Image = VoucherDescription;
+                    RunObject = Page "NpRv Vouchers";
+
+                    trigger OnAction()
+                    var
+                        TaxFree: Codeunit "Tax Free Handler Mgt.";
+                    begin
+                    end;
+                }
+                action("Voucher Types")
+                {
+                    Caption = 'Voucher Types';
+                    Image = VoucherGroup;
+                    RunObject = Page "NpRv Voucher Types";
+                }
+            }
             group(EFT)
             {
                 Caption = '&EFT';
@@ -462,6 +524,328 @@ page 6150652 "POS Entry List"
                     RunObject = Page "EFT Transaction Requests";
                     RunPageLink = "Sales Ticket No."=FIELD("Document No.");
                 }
+            }
+            group("POS Entry Lists")
+            {
+                Caption = 'POS Entry Lists';
+                action("Sales Line List")
+                {
+                    Caption = 'Sales Line List';
+                    Image = Sales;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Sales Line List";
+                }
+                action("Payment Line List")
+                {
+                    Caption = 'Payment Line List';
+                    Image = Payment;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Payment Line List";
+                }
+                action("Tax Line List")
+                {
+                    Caption = 'Tax Line List';
+                    Image = TaxDetail;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Tax Line List";
+                }
+                action("Balancing Line List")
+                {
+                    Caption = 'Balancing Line List';
+                    Image = Balance;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Balancing Line";
+                }
+            }
+            group("Failed POS Lists")
+            {
+                Caption = 'Failed POS Lists';
+                action("Failed Item Posting List")
+                {
+                    Caption = 'Failed Item Posting List';
+                    Image = ErrorLog;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Entries";
+                    RunPageView = SORTING("Entry No.")
+                                  WHERE("Post Item Entry Status"=FILTER("Error while Posting"));
+                }
+                action("Failed G/L Posting List")
+                {
+                    Caption = 'Failed G/L Posting List';
+                    Image = ErrorLog;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Entries";
+                    RunPageView = SORTING("Entry No.")
+                                  WHERE("Post Entry Status"=FILTER("Error while Posting"));
+                }
+                action("Unposted Item List")
+                {
+                    Caption = 'Unposted Item List';
+                    Image = Pause;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Entries";
+                    RunPageView = SORTING("Entry No.")
+                                  WHERE("Post Item Entry Status"=FILTER(Unposted));
+                }
+                action("Unposted G/L List")
+                {
+                    Caption = 'Unposted G/L List';
+                    Image = Pause;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+                    RunObject = Page "POS Entries";
+                    RunPageView = SORTING("Entry No.")
+                                  WHERE("Post Entry Status"=FILTER(Unposted));
+                }
+            }
+            group("Posting Entries")
+            {
+                Caption = 'Posting Entries';
+                action("&Navigate")
+                {
+                    Caption = '&Navigate';
+                    Image = Navigate;
+                    Promoted = true;
+                    PromotedCategory = Category6;
+
+                    trigger OnAction()
+                    var
+                        POSPeriodRegister: Record "POS Period Register";
+                        Navigate: Page Navigate;
+                    begin
+                        //-NPR5.51 [359508]
+                        // Navigate.SetDoc("Posting Date","Document No.");
+                        // Navigate.RUN;
+
+                        Navigate.SetDoc("Posting Date","Document No.");
+                        if ("Entry Type" <> "Entry Type"::Balancing) then
+                          if (POSPeriodRegister.Get ("POS Period Register No.")) then
+                            if (POSPeriodRegister."Document No." <> '') then
+                              Navigate.SetDoc ("Posting Date", POSPeriodRegister."Document No.");
+
+                        Navigate.Run;
+                        //+NPR5.51 [359508]
+                    end;
+                }
+            }
+        }
+        area(processing)
+        {
+            action("Post Entry")
+            {
+                Caption = 'Post Entry';
+                Image = Post;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    POSPostEntries: Codeunit "POS Post Entries";
+                    POSEntryToPost: Record "POS Entry";
+                begin
+                    POSEntryToPost.SetRange("Entry No.","Entry No.");
+                    if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
+                      POSPostEntries.SetPostItemEntries(true);
+                    if Rec."Post Entry Status" < "Post Entry Status"::Posted then
+                      POSPostEntries.SetPostPOSEntries(true);
+                    POSPostEntries.SetStopOnError(true);
+                    POSPostEntries.SetPostCompressed(false);
+                    POSPostEntries.Run(POSEntryToPost);
+                    CurrPage.Update(false);
+                end;
+            }
+            action("Post Range")
+            {
+                Caption = 'Post Range';
+                Image = PostBatch;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    POSEntryToPost: Record "POS Entry";
+                    POSPostEntries: Codeunit "POS Post Entries";
+                    ErrorDuringPosting: Boolean;
+                    ItemPosting: Boolean;
+                    POSPosting: Boolean;
+                begin
+
+                    //-NPR5.51 [359403]
+                    // POSEntryToPost.COPYFILTERS(Rec);
+                    // //-NPR5.38 [285957]
+                    // //POSPostEntries.SetPostItemEntries(TRUE);
+                    // //POSPostEntries.SetPostPOSEntries(TRUE);
+                    // POSPostEntries.SetPostItemEntries(CONFIRM(TextPostItemEntries));
+                    // POSPostEntries.SetPostPOSEntries(CONFIRM(TextPostPosEntries));
+                    // //+NPR5.38 [285957]
+                    // POSPostEntries.SetStopOnError(TRUE);
+                    // POSPostEntries.SetPostCompressed(CONFIRM(TextPostCompressed));
+                    // POSPostEntries.RUN(POSEntryToPost);
+
+                    ItemPosting := Confirm (TextPostItemEntries);
+                    POSPosting := Confirm (TextPostPosEntries);
+
+                    POSPostEntries.SetPostCompressed(Confirm(TextPostCompressed));
+                    POSPostEntries.SetStopOnError(true);
+
+                    if (ItemPosting) then begin
+                      POSEntryToPost.Reset;
+                      POSEntryToPost.CopyFilters(Rec);
+                      POSEntryToPost.SetFilter("Post Item Entry Status",'<2');
+                      POSPostEntries.SetPostItemEntries (true);
+                      POSPostEntries.SetPostPOSEntries (false);
+                      repeat
+
+                        if (POSEntryToPost.FindLast ()) then
+                          POSEntryToPost.SetFilter ("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
+
+                        POSPostEntries.Run (POSEntryToPost);
+                        Commit;
+
+                        ErrorDuringPosting := not POSEntryToPost.IsEmpty ();
+                        POSEntryToPost.SetFilter ("POS Period Register No.", GetFilter ("POS Period Register No."));
+
+                      until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
+                    end;
+
+                    if (POSPosting) then begin
+                      POSEntryToPost.Reset;
+                      POSEntryToPost.CopyFilters(Rec);
+                      POSEntryToPost.SetFilter("Post Entry Status",'<2');
+                      POSPostEntries.SetPostItemEntries (false);
+                      POSPostEntries.SetPostPOSEntries (true);
+                      repeat
+
+                        if (POSEntryToPost.FindLast ()) then
+                          POSEntryToPost.SetFilter ("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
+
+                        POSPostEntries.Run (POSEntryToPost);
+                        Commit;
+
+                        ErrorDuringPosting := not POSEntryToPost.IsEmpty ();
+                        POSEntryToPost.SetFilter ("POS Period Register No.", GetFilter ("POS Period Register No."));
+
+                      until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
+                    end;
+                    //+NPR5.51 [359403]
+
+                    CurrPage.Update(false);
+                end;
+            }
+            action("Preview Post Entry")
+            {
+                Caption = 'Preview Post Entry';
+                Image = ViewPostedOrder;
+                Visible = false;
+
+                trigger OnAction()
+                var
+                    POSEntryToPost: Record "POS Entry";
+                    POSPostEntries: Codeunit "POS Post Entries";
+                begin
+                    POSEntryToPost.SetRange("Entry No.","Entry No.");
+                    if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
+                      POSPostEntries.SetPostItemEntries(true);
+                    if Rec."Post Entry Status" < "Post Entry Status"::Posted then
+                      POSPostEntries.SetPostPOSEntries(true);
+                    POSPostEntries.SetStopOnError(true);
+                    POSPostEntries.SetPostCompressed(false);
+                    POSPostEntries.Preview(POSEntryToPost);
+                    CurrPage.Update(false);
+                end;
+            }
+            action("Preview Post Range")
+            {
+                Caption = 'Preview Post Range';
+                Image = ViewWorksheet;
+                Visible = false;
+
+                trigger OnAction()
+                var
+                    POSEntryToPost: Record "POS Entry";
+                    POSPostEntries: Codeunit "POS Post Entries";
+                begin
+                    POSEntryToPost.CopyFilters(Rec);
+                    //-NPR5.38 [285957]
+                    //POSPostEntries.SetPostItemEntries(TRUE);
+                    //POSPostEntries.SetPostPOSEntries(TRUE);
+                    POSPostEntries.SetPostItemEntries(Confirm(TextPostItemEntries));
+                    POSPostEntries.SetPostPOSEntries(Confirm(TextPostPosEntries));
+                    //+NPR5.38 [285957]
+                    POSPostEntries.SetStopOnError(true);
+                    POSPostEntries.SetPostCompressed(Confirm(TextPostCompressed));
+                    POSPostEntries.Preview(POSEntryToPost);
+                    CurrPage.Update(false);
+                end;
+            }
+            action("Compare Preview Post Entry to Audit Roll Posting")
+            {
+                Caption = 'Compare Preview Post Entry to Audit Roll Posting';
+                Image = CompareCOA;
+                Visible = false;
+
+                trigger OnAction()
+                var
+                    POSEntryToPost: Record "POS Entry";
+                    POSPostEntries: Codeunit "POS Post Entries";
+                begin
+                    //-NPR5.37 [293133]
+                    POSEntryToPost.SetRange("Entry No.","Entry No.");
+                    if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
+                      POSPostEntries.SetPostItemEntries(true);
+                    if Rec."Post Entry Status" < "Post Entry Status"::Posted then
+                      POSPostEntries.SetPostPOSEntries(true);
+                    POSPostEntries.SetStopOnError(true);
+                    POSPostEntries.SetPostCompressed(false);
+                    POSPostEntries.CompareToAuditRoll(POSEntryToPost);
+                    CurrPage.Update(false);
+                    //+NPR5.37 [293133]
+                end;
+            }
+            action(Action6014435)
+            {
+                Caption = '&Navigate';
+                Image = Navigate;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                Visible = false;
+
+                trigger OnAction()
+                var
+                    POSPeriodRegister: Record "POS Period Register";
+                    Navigate: Page Navigate;
+                begin
+                    //-NPR5.51 [359508]
+                    // Navigate.SetDoc("Posting Date","Document No.");
+                    // Navigate.RUN;
+
+                    Navigate.SetDoc("Posting Date","Document No.");
+                    if ("Entry Type" <> "Entry Type"::Balancing) then
+                      if (POSPeriodRegister.Get ("POS Period Register No.")) then
+                        if (POSPeriodRegister."Document No." <> '') then
+                          Navigate.SetDoc ("Posting Date", POSPeriodRegister."Document No.");
+
+                    Navigate.Run;
+                    //+NPR5.51 [359508]
+                end;
             }
             group(Print)
             {
@@ -623,205 +1007,6 @@ page 6150652 "POS Entry List"
                 }
             }
         }
-        area(processing)
-        {
-            action("Post Entry")
-            {
-                Caption = 'Post Entry';
-                Image = Post;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-
-                trigger OnAction()
-                var
-                    POSPostEntries: Codeunit "POS Post Entries";
-                    POSEntryToPost: Record "POS Entry";
-                begin
-                    POSEntryToPost.SetRange("Entry No.","Entry No.");
-                    if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
-                      POSPostEntries.SetPostItemEntries(true);
-                    if Rec."Post Entry Status" < "Post Entry Status"::Posted then
-                      POSPostEntries.SetPostPOSEntries(true);
-                    POSPostEntries.SetStopOnError(true);
-                    POSPostEntries.SetPostCompressed(false);
-                    POSPostEntries.Run(POSEntryToPost);
-                    CurrPage.Update(false);
-                end;
-            }
-            action("Post Range")
-            {
-                Caption = 'Post Range';
-                Image = PostBatch;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-
-                trigger OnAction()
-                var
-                    POSEntryToPost: Record "POS Entry";
-                    POSPostEntries: Codeunit "POS Post Entries";
-                    ErrorDuringPosting: Boolean;
-                    ItemPosting: Boolean;
-                    POSPosting: Boolean;
-                begin
-
-                    //-NPR5.51 [359403]
-                    // POSEntryToPost.COPYFILTERS(Rec);
-                    // //-NPR5.38 [285957]
-                    // //POSPostEntries.SetPostItemEntries(TRUE);
-                    // //POSPostEntries.SetPostPOSEntries(TRUE);
-                    // POSPostEntries.SetPostItemEntries(CONFIRM(TextPostItemEntries));
-                    // POSPostEntries.SetPostPOSEntries(CONFIRM(TextPostPosEntries));
-                    // //+NPR5.38 [285957]
-                    // POSPostEntries.SetStopOnError(TRUE);
-                    // POSPostEntries.SetPostCompressed(CONFIRM(TextPostCompressed));
-                    // POSPostEntries.RUN(POSEntryToPost);
-
-                    ItemPosting := Confirm (TextPostItemEntries);
-                    POSPosting := Confirm (TextPostPosEntries);
-
-                    POSPostEntries.SetPostCompressed(Confirm(TextPostCompressed));
-                    POSPostEntries.SetStopOnError(true);
-
-                    if (ItemPosting) then begin
-                      POSEntryToPost.Reset;
-                      POSEntryToPost.CopyFilters(Rec);
-                      POSEntryToPost.SetFilter("Post Item Entry Status",'<2');
-                      POSPostEntries.SetPostItemEntries (true);
-                      POSPostEntries.SetPostPOSEntries (false);
-                      repeat
-
-                        if (POSEntryToPost.FindLast ()) then
-                          POSEntryToPost.SetFilter ("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
-
-                        POSPostEntries.Run (POSEntryToPost);
-                        Commit;
-
-                        ErrorDuringPosting := not POSEntryToPost.IsEmpty ();
-                        POSEntryToPost.SetFilter ("POS Period Register No.", GetFilter ("POS Period Register No."));
-
-                      until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
-                    end;
-
-                    if (POSPosting) then begin
-                      POSEntryToPost.Reset;
-                      POSEntryToPost.CopyFilters(Rec);
-                      POSEntryToPost.SetFilter("Post Entry Status",'<2');
-                      POSPostEntries.SetPostItemEntries (false);
-                      POSPostEntries.SetPostPOSEntries (true);
-                      repeat
-
-                        if (POSEntryToPost.FindLast ()) then
-                          POSEntryToPost.SetFilter ("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
-
-                        POSPostEntries.Run (POSEntryToPost);
-                        Commit;
-
-                        ErrorDuringPosting := not POSEntryToPost.IsEmpty ();
-                        POSEntryToPost.SetFilter ("POS Period Register No.", GetFilter ("POS Period Register No."));
-
-                      until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
-                    end;
-                    //+NPR5.51 [359403]
-
-                    CurrPage.Update(false);
-                end;
-            }
-            action("Preview Post Entry")
-            {
-                Caption = 'Preview Post Entry';
-                Image = ViewPostedOrder;
-
-                trigger OnAction()
-                var
-                    POSEntryToPost: Record "POS Entry";
-                    POSPostEntries: Codeunit "POS Post Entries";
-                begin
-                    POSEntryToPost.SetRange("Entry No.","Entry No.");
-                    if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
-                      POSPostEntries.SetPostItemEntries(true);
-                    if Rec."Post Entry Status" < "Post Entry Status"::Posted then
-                      POSPostEntries.SetPostPOSEntries(true);
-                    POSPostEntries.SetStopOnError(true);
-                    POSPostEntries.SetPostCompressed(false);
-                    POSPostEntries.Preview(POSEntryToPost);
-                    CurrPage.Update(false);
-                end;
-            }
-            action("Preview Post Range")
-            {
-                Caption = 'Preview Post Range';
-                Image = ViewWorksheet;
-
-                trigger OnAction()
-                var
-                    POSEntryToPost: Record "POS Entry";
-                    POSPostEntries: Codeunit "POS Post Entries";
-                begin
-                    POSEntryToPost.CopyFilters(Rec);
-                    //-NPR5.38 [285957]
-                    //POSPostEntries.SetPostItemEntries(TRUE);
-                    //POSPostEntries.SetPostPOSEntries(TRUE);
-                    POSPostEntries.SetPostItemEntries(Confirm(TextPostItemEntries));
-                    POSPostEntries.SetPostPOSEntries(Confirm(TextPostPosEntries));
-                    //+NPR5.38 [285957]
-                    POSPostEntries.SetStopOnError(true);
-                    POSPostEntries.SetPostCompressed(Confirm(TextPostCompressed));
-                    POSPostEntries.Preview(POSEntryToPost);
-                    CurrPage.Update(false);
-                end;
-            }
-            action("Compare Preview Post Entry to Audit Roll Posting")
-            {
-                Caption = 'Compare Preview Post Entry to Audit Roll Posting';
-                Image = CompareCOA;
-
-                trigger OnAction()
-                var
-                    POSEntryToPost: Record "POS Entry";
-                    POSPostEntries: Codeunit "POS Post Entries";
-                begin
-                    //-NPR5.37 [293133]
-                    POSEntryToPost.SetRange("Entry No.","Entry No.");
-                    if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
-                      POSPostEntries.SetPostItemEntries(true);
-                    if Rec."Post Entry Status" < "Post Entry Status"::Posted then
-                      POSPostEntries.SetPostPOSEntries(true);
-                    POSPostEntries.SetStopOnError(true);
-                    POSPostEntries.SetPostCompressed(false);
-                    POSPostEntries.CompareToAuditRoll(POSEntryToPost);
-                    CurrPage.Update(false);
-                    //+NPR5.37 [293133]
-                end;
-            }
-            action("&Navigate")
-            {
-                Caption = '&Navigate';
-                Image = Navigate;
-                Promoted = true;
-                PromotedCategory = Process;
-
-                trigger OnAction()
-                var
-                    POSPeriodRegister: Record "POS Period Register";
-                    Navigate: Page Navigate;
-                begin
-                    //-NPR5.51 [359508]
-                    // Navigate.SetDoc("Posting Date","Document No.");
-                    // Navigate.RUN;
-
-                    Navigate.SetDoc("Posting Date","Document No.");
-                    if ("Entry Type" <> "Entry Type"::Balancing) then
-                      if (POSPeriodRegister.Get ("POS Period Register No.")) then
-                        if (POSPeriodRegister."Document No." <> '') then
-                          Navigate.SetDoc ("Posting Date", POSPeriodRegister."Document No.");
-
-                    Navigate.Run;
-                    //+NPR5.51 [359508]
-                end;
-            }
-        }
     }
 
     trigger OnAfterGetRecord()
@@ -852,6 +1037,10 @@ page 6150652 "POS Entry List"
         //+NPR5.48 [318028]
 
         SetRange("System Entry",false);
+        //-NPR5.53 [387885]
+        if GetFilter("Entry Type") = '' then
+          SetFilter("Entry Type",'<>%1',"Entry Type"::"Cancelled Sale");
+        //+NPR5.53 [387885]
         if FindFirst then;
     end;
 

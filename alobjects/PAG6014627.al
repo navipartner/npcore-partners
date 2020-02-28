@@ -1,16 +1,25 @@
 page 6014627 "Hardware Connector"
 {
     // NPR5.51/MMV /20190731 CASE 360975 Created object
+    // NPR5.53/MMV /20191111 CASE 375532 Added caption
 
     Caption = 'Hardware Connector';
     Editable = false;
     PageType = StandardDialog;
 
+    // TODO: MMV - NaviPartner.Retail.Controls.Bridge can't be used or missing reference.
+    /*
+
     layout
     {
         area(content)
         {
-            usercontrol(Bridge; Bridge)
+            field(PageCaption;PageCaption)
+            {
+                Style = Strong;
+                StyleExpr = TRUE;
+            }
+            usercontrol(Bridge;"NaviPartner.Retail.Controls.Bridge")
             {
 
                 trigger OnFrameworkReady()
@@ -33,6 +42,7 @@ page 6014627 "Hardware Connector"
             }
         }
     }
+    */
 
     actions
     {
@@ -46,12 +56,16 @@ page 6014627 "Hardware Connector"
         methodGlobal: Text;
         contentGlobal: JsonObject;
         AutoClosed: Boolean;
+        PageCaption: Text;
 
-    procedure SetModule(htmlIn: Text; cssIn: Text; jsIn: Text)
+    procedure SetModule(htmlIn: Text; cssIn: Text; jsIn: Text; caption: Text)
     begin
         html := htmlIn;
         css := cssIn;
         js := jsIn;
+        //-NPR5.53 [375532]
+        PageCaption := caption;
+        //+NPR5.53 [375532]
     end;
 
     procedure GetResponse(var methodOut: Text; var contentOut: JsonObject)

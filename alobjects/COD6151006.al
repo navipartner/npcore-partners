@@ -4,6 +4,7 @@ codeunit 6151006 "POS Quote Mgt."
     // NPR5.48/MHA /20181130  CASE 338208 Added POS Sales Data (.xml) functionality to fully back/restore POS Sale
     // NPR5.51/MMV /20190820  CASE 364694 Cleanup before register balancing based on register no. for consistency.
     //                                    Otherwise someone working day shift can have POS quotes living forever.
+    // NPR5.53/ALPO/20191127  CASE 379255 Include "Retail Cross Reference" into scope
 
 
     trigger OnRun()
@@ -85,6 +86,7 @@ codeunit 6151006 "POS Quote Mgt."
         NpRvSaleLinePOSReference: Record "NpRv Sale Line POS Reference";
         NpRvSaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
         POSInfoTransaction: Record "POS Info Transaction";
+        RetailCrossReference: Record "Retail Cross Reference";
         SaleLinePOS: Record "Sale Line POS";
         NpDcSaleLinePOSNewCouponFieldBuffer: Record "Field" temporary;
         NpDcSaleLinePOSCouponFieldBuffer: Record "Field" temporary;
@@ -92,6 +94,7 @@ codeunit 6151006 "POS Quote Mgt."
         NpRvSaleLinePOSReferenceFieldBuffer: Record "Field" temporary;
         NpRvSaleLinePOSVoucherFieldBuffer: Record "Field" temporary;
         POSInfoTransactionFieldBuffer: Record "Field" temporary;
+        RetailCrossReferenceFieldBuffer: Record "Field" temporary;
         SalePOSFieldBuffer: Record "Field" temporary;
         SaleLinePOSFieldBuffer: Record "Field" temporary;
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
@@ -126,6 +129,11 @@ codeunit 6151006 "POS Quote Mgt."
 
         RecRef.GetTable(NpDcSaleLinePOSNewCoupon);
         FindFields(RecRef,false,NpDcSaleLinePOSNewCouponFieldBuffer);
+
+        //-NPR5.53 [379255]
+        RecRef.GetTable(RetailCrossReference);
+        FindFields(RecRef,false,RetailCrossReferenceFieldBuffer);
+        //+NPR5.53 [379255]
 
         NpXmlDomMgt.InitDoc(XmlDoc,XmlRoot,'pos_sale');
         RecRef.GetTable(SalePOS);
@@ -235,6 +243,16 @@ codeunit 6151006 "POS Quote Mgt."
                 RecRef2Xml(RecRef,XmlElement4,NpDcSaleLinePOSNewCouponFieldBuffer);
               until NpDcSaleLinePOSNewCoupon.Next = 0;
             end;
+
+            //-NPR5.53 [379255]
+            if not IsNullGuid(SaleLinePOS."Retail ID") then
+              if RetailCrossReference.Get(SaleLinePOS."Retail ID") then begin
+                NpXmlDomMgt.AddElement(XmlElement2,'retail_cross_references',XmlElement3);
+                NpXmlDomMgt.AddElement(XmlElement3,'retail_cross_reference',XmlElement4);
+                RecRef.GetTable(RetailCrossReference);
+                RecRef2Xml(RecRef,XmlElement4,RetailCrossReferenceFieldBuffer);
+              end;
+            //+NPR5.53 [379255]
 
             OnPOSSaleLine2Xml(SaleLinePOS,XmlElement);
           until SaleLinePOS.Next = 0;
@@ -371,6 +389,7 @@ codeunit 6151006 "POS Quote Mgt."
         NpRvSaleLinePOSReference: Record "NpRv Sale Line POS Reference";
         NpRvSaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
         POSInfoTransaction: Record "POS Info Transaction";
+        RetailCrossReference: Record "Retail Cross Reference";
         SaleLinePOS: Record "Sale Line POS";
         NpDcSaleLinePOSNewCouponFieldBuffer: Record "Field" temporary;
         NpDcSaleLinePOSCouponFieldBuffer: Record "Field" temporary;
@@ -378,6 +397,7 @@ codeunit 6151006 "POS Quote Mgt."
         NpRvSaleLinePOSReferenceFieldBuffer: Record "Field" temporary;
         NpRvSaleLinePOSVoucherFieldBuffer: Record "Field" temporary;
         POSInfoTransactionFieldBuffer: Record "Field" temporary;
+        RetailCrossReferenceFieldBuffer: Record "Field" temporary;
         SalePOSFieldBuffer: Record "Field" temporary;
         SaleLinePOSFieldBuffer: Record "Field" temporary;
         XmlElement: DotNet npNetXmlElement;
@@ -385,6 +405,7 @@ codeunit 6151006 "POS Quote Mgt."
         XmlRoot: DotNet npNetXmlElement;
         RecRef: RecordRef;
         PrevRec: Text;
+        Position: Integer;
     begin
         //-NPR5.48 [338208]
         if IsNull(XmlDoc) then
@@ -420,6 +441,11 @@ codeunit 6151006 "POS Quote Mgt."
 
         RecRef.GetTable(NpDcSaleLinePOSNewCoupon);
         FindFields(RecRef,false,NpDcSaleLinePOSNewCouponFieldBuffer);
+
+        //-NPR5.53 [379255]
+        RecRef.GetTable(RetailCrossReference);
+        FindFields(RecRef,false,RetailCrossReferenceFieldBuffer);
+        //+NPR5.53 [379255]
 
         RecRef.GetTable(SalePOS);
         PrevRec := Format(RecRef);
@@ -508,6 +534,21 @@ codeunit 6151006 "POS Quote Mgt."
             NpDcSaleLinePOSNewCoupon."Sales Ticket No." := SalePOS."Sales Ticket No.";
             NpDcSaleLinePOSNewCoupon.Insert(true);
           end;
+
+          //-NPR5.53 [379255]
+          foreach XmlElement2 in XmlElement.SelectNodes('retail_cross_references/retail_cross_reference') do begin
+            RetailCrossReference.Init;
+            RecRef.GetTable(RetailCrossReference);
+            Xml2RecRef(XmlElement2,RetailCrossReferenceFieldBuffer,RecRef);
+            RecRef.SetTable(RetailCrossReference);
+            Position := StrPos(RetailCrossReference."Record Value",'_');
+            if Position <> 0 then
+              RetailCrossReference."Record Value" := StrSubstNo('%1_%2',SalePOS."Sales Ticket No.",CopyStr(RetailCrossReference."Record Value",Position + 1))
+            else
+              RetailCrossReference."Record Value" := SalePOS."Sales Ticket No.";
+            RetailCrossReference.Insert(true);
+          end;
+          //+NPR5.53 [379255]
 
           OnXml2POSSaleLine(XmlElement,SaleLinePOS);
         end;

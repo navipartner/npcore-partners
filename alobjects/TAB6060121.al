@@ -13,6 +13,8 @@ table 6060121 "TM Ticket Admission BOM"
     // TM1.36/TSA /20180801 CASE 316463 Added field "Allow Rescan Within (Sec.)"
     // TM1.38/TSA /20181012 CASE 332109 New field "publish as eTicket"
     // TM1.42/TSA /20190411 CASE 351050 Added field "Revisit Condition (Statistics)"
+    // TM1.45/TSA /20191120 CASE 378212 Added Sales cut-off dates
+    // TM1.45/TSA /20191216 CASE 382535 Added "Admission Inclusion", "Admission Unit Price"
 
     Caption = 'Ticket Admission BOM';
 
@@ -72,6 +74,16 @@ table 6060121 "TM Ticket Admission BOM"
             BlankZero = true;
             Caption = 'Max No. Of Entries';
             Description = 'TM1.00';
+        }
+        field(50;"Admission Inclusion";Option)
+        {
+            Caption = 'Admission Inclusion';
+            OptionCaption = 'Required,Optional and Selected,Optional and not Selected';
+            OptionMembers = REQUIRED,SELECTED,NOT_SELECTED;
+        }
+        field(55;"Admission Unit Price";Decimal)
+        {
+            Caption = 'Admission Unit Price';
         }
         field(60;"Activation Method";Option)
         {
@@ -151,6 +163,18 @@ table 6060121 "TM Ticket Admission BOM"
         {
             Caption = 'Ticket Base Calendar Code';
             TableRelation = "Base Calendar";
+        }
+        field(166;"Sales From Date";Date)
+        {
+            Caption = 'Sales From Date';
+        }
+        field(167;"Sales Until Date";Date)
+        {
+            Caption = 'Sales Until Date';
+        }
+        field(168;"Enforce Schedule Sales Limits";Boolean)
+        {
+            Caption = 'Enforce Schedule Sales Limits';
         }
     }
 

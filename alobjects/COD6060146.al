@@ -10,6 +10,7 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
     // MM1.37/MHA /20190328  CASE 350288 Added MaxStrLen to EanBox.Description in DiscoverEanBoxEvents()
     // MM1.40/TSA /20190815 CASE 343352 Refactored coupon creation
     // MM1.41/TSA /20191002 CASE 371095 Added RedeemablePoints KPI
+    // MM1.42/TSA /20191024 CASE 374403 OnCancelDiscountApplication(), signature change on IssueOneCoupon()
 
 
     trigger OnRun()
@@ -173,6 +174,19 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
         end;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, 6151591, 'OnCancelDiscountApplication', '', true, true)]
+    local procedure OnCancelDiscountApplication(Coupon: Record "NpDc Coupon";SaleLinePOSCoupon: Record "NpDc Sale Line POS Coupon")
+    var
+        LoyaltyPointManagement: Codeunit "MM Loyalty Point Management";
+    begin
+
+        //-MM1.42 [374403]
+        if (LoyaltyPointManagement.UnRedeemPointsCoupon (0, SaleLinePOSCoupon."Sales Ticket No.", SaleLinePOSCoupon."Sale Date", Coupon."No.")) then
+          Coupon.Delete;
+
+        //+MM1.42 [374403]
+    end;
+
     local procedure "--Functions"()
     begin
     end;
@@ -277,7 +291,11 @@ codeunit 6060146 "MM POS Action - Member Loyalty"
             //    END;
             //    //+#307048 [307048]
 
-            CouponNo := LoyaltyPointMgr.IssueOneCoupon (MembershipEntryNo, TmpLoyaltyPointsSetup, SubTotal);
+            //-MM1.42 [374403]
+            //CouponNo := LoyaltyPointMgr.IssueOneCoupon (MembershipEntryNo, TmpLoyaltyPointsSetup, SubTotal);
+            CouponNo := LoyaltyPointMgr.IssueOneCoupon (MembershipEntryNo, TmpLoyaltyPointsSetup, SalePOS."Sales Ticket No.", SalePOS.Date, SubTotal);
+            //+MM1.42 [374403]
+
             //+MM1.40 [343352]
 
                 Coupon.Get(CouponNo);

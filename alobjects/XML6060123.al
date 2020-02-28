@@ -4,6 +4,7 @@ xmlport 6060123 "TM Ticket TicketServer Request"
     // TM1.35/TSA /20180712 CASE 320783 Added Elements Valid From and Valid To
     // TM1.35/TSA /20180712 CASE 320783 Changed to XML date / time format
     // TM1.43/TSA /20191004 CASE 367471 Refactored and reworked message signatures to be able to return fault reason
+    // TM1.45/TSA /20191118 CASE 352050 Assigned the name field with customer name when customer is assigned
 
     Caption = 'Ticket TicketServer Request';
     Encoding = UTF8;
@@ -97,6 +98,8 @@ xmlport 6060123 "TM Ticket TicketServer Request"
                     }
 
                     trigger OnAfterGetRecord()
+                    var
+                        Customer: Record Customer;
                     begin
 
                         GeneralLedgerSetup.Get ();
@@ -166,6 +169,12 @@ xmlport 6060123 "TM Ticket TicketServer Request"
 
                         ticket_sub_title := Admission.Description;
                         quantity := Format (TmpTicketReservationRequest.Quantity, 0, 9);
+
+                        //-TM1.45 [352050]
+                        if (TmpTicketReservationRequest."Customer No." <> '') then
+                          if (Customer.Get (TmpTicketReservationRequest."Customer No.")) then
+                            name := Customer.Name;
+                        //+TM1.45 [352050]
                     end;
                 }
             }
@@ -195,6 +204,7 @@ xmlport 6060123 "TM Ticket TicketServer Request"
         TicketAccessEntry: Record "TM Ticket Access Entry";
         DetTicketAccessEntry: Record "TM Det. Ticket Access Entry";
         AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
+        TicketReservationRequest: Record "TM Ticket Reservation Request";
         DefaultAdmissionCode: Code[20];
 
     procedure SetRequestEntryNo(Token: Text[100];MarkTicketAsPrinted: Boolean;var FailureReason: Text): Boolean

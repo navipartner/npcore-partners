@@ -6,6 +6,7 @@ page 6150650 "POS Entries"
     // NPR5.39/BR  /20180212  CASE 302687 Added 'Print' Group Promoted Actions for Major Tom use
     // NPR5.40/TSA /20180308  CASE 307267 Refactored print for balancing
     // NPR5.46/MMV /20181001 CASE 290734 EFT Framework refactoring
+    // NPR5.53/SARA/20191024 CASE 373672 Add Post and Post Range actions
 
     Caption = 'POS Entries';
     Editable = false;
@@ -141,6 +142,7 @@ page 6150650 "POS Entries"
                 Image = Navigate;
                 Promoted = true;
                 PromotedCategory = Process;
+                PromotedIsBig = true;
 
                 trigger OnAction()
                 var
@@ -148,6 +150,99 @@ page 6150650 "POS Entries"
                 begin
                     Navigate.SetDoc("Posting Date","Document No.");
                     Navigate.Run;
+                end;
+            }
+            action("Post Entry")
+            {
+                Caption = 'Post Entry';
+                Image = Post;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    POSPostEntries: Codeunit "POS Post Entries";
+                    POSEntryToPost: Record "POS Entry";
+                begin
+                    //-NPR5.53 [373672]
+                    POSEntryToPost.SetRange("Entry No.","Entry No.");
+                    if Rec."Post Item Entry Status" < "Post Item Entry Status"::Posted then
+                      POSPostEntries.SetPostItemEntries(true);
+                    if Rec."Post Entry Status" < "Post Entry Status"::Posted then
+                      POSPostEntries.SetPostPOSEntries(true);
+                    POSPostEntries.SetStopOnError(true);
+                    POSPostEntries.SetPostCompressed(false);
+                    POSPostEntries.Run(POSEntryToPost);
+                    CurrPage.Update(false);
+                    //+NPR5.53 [373672]
+                end;
+            }
+            action("Post Range")
+            {
+                Caption = 'Post Range';
+                Image = PostBatch;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    POSEntryToPost: Record "POS Entry";
+                    POSPostEntries: Codeunit "POS Post Entries";
+                    ErrorDuringPosting: Boolean;
+                    ItemPosting: Boolean;
+                    POSPosting: Boolean;
+                begin
+                    //-NPR5.53 [373672]
+                    ItemPosting := Confirm (TextPostItemEntries);
+                    POSPosting := Confirm (TextPostPosEntries);
+
+                    POSPostEntries.SetPostCompressed(Confirm(TextPostCompressed));
+                    POSPostEntries.SetStopOnError(true);
+
+                    if (ItemPosting) then begin
+                      POSEntryToPost.Reset;
+                      POSEntryToPost.CopyFilters(Rec);
+                      POSEntryToPost.SetFilter("Post Item Entry Status",'<2');
+                      POSPostEntries.SetPostItemEntries (true);
+                      POSPostEntries.SetPostPOSEntries (false);
+                      repeat
+
+                        if (POSEntryToPost.FindLast ()) then
+                          POSEntryToPost.SetFilter ("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
+
+                        POSPostEntries.Run (POSEntryToPost);
+                        Commit;
+
+                        ErrorDuringPosting := not POSEntryToPost.IsEmpty ();
+                        POSEntryToPost.SetFilter ("POS Period Register No.", GetFilter ("POS Period Register No."));
+
+                      until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
+                    end;
+
+                    if (POSPosting) then begin
+                      POSEntryToPost.Reset;
+                      POSEntryToPost.CopyFilters(Rec);
+                      POSEntryToPost.SetFilter("Post Entry Status",'<2');
+                      POSPostEntries.SetPostItemEntries (false);
+                      POSPostEntries.SetPostPOSEntries (true);
+                      repeat
+
+                        if (POSEntryToPost.FindLast ()) then
+                          POSEntryToPost.SetFilter ("POS Period Register No.", '=%1', POSEntryToPost."POS Period Register No.");
+
+                        POSPostEntries.Run (POSEntryToPost);
+                        Commit;
+
+                        ErrorDuringPosting := not POSEntryToPost.IsEmpty ();
+                        POSEntryToPost.SetFilter ("POS Period Register No.", GetFilter ("POS Period Register No."));
+
+                      until (ErrorDuringPosting or POSEntryToPost.IsEmpty());
+                    end;
+
+                    CurrPage.Update(false);
+                    //+NPR5.53 [373672]
                 end;
             }
             group(Print)
@@ -290,5 +385,8 @@ page 6150650 "POS Entries"
         TextClicktoSeeAuditRoll: Label 'Click here to see Audit Roll';
         AdvancedPostingOff: Boolean;
         Text10600006: Label 'There are no credit card transactions attached to sales ticket no. %1/Register %2';
+        TextPostItemEntries: Label 'Post Item Entries?';
+        TextPostPosEntries: Label 'Post all other Entries?';
+        TextPostCompressed: Label 'Post Compressed?';
 }
 

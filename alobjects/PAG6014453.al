@@ -31,6 +31,7 @@ page 6014453 "Campaign Discount"
     // NPR5.42/MHA /20180521  CASE 315554 Added Period Fields to enable Weekly Condition
     // NPR5.45/TS  /20180803  CASE 308194 Removed Quantity Sold and Turnover
     // NPR5.46/JDH /20180928 CASE 294354  Added Retail Print Actions, and removed the old ones
+    // NPR5.53/ALPO/20191029 CASE 369115 New control added: "Block Custom Disc."
 
     Caption = 'Period Discount';
     PageType = Card;
@@ -66,6 +67,9 @@ page 6014453 "Campaign Discount"
                     Editable = false;
                 }
                 field(Status;Status)
+                {
+                }
+                field("Block Custom Disc.";"Block Custom Disc.")
                 {
                 }
                 field(Control6014404;Comment)

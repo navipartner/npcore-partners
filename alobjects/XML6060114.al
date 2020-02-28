@@ -9,6 +9,7 @@ xmlport 6060114 "TM Ticket Reservation"
     // TM1.18/TSA/20170120 CASE 264123 Included a detailed response, useful when having more than one reservation line
     // TM1.26/TSA /20171109 CASE 295981 Added an error result path rather then a success path
     // TM1.36/TSA/20180830  CASE 323737 Transport TM1.36 - 30 August 2018
+    // TM1.45/TSA /20191206 CASE 380754 Add waitinglist_ref_code attribute
 
     Caption = 'Ticket Reservation';
     Encoding = UTF8;
@@ -62,6 +63,14 @@ xmlport 6060114 "TM Ticket Reservation"
                         Occurrence = Optional;
                     }
                     fieldattribute(admission_code;tmpTicketReservationRequest."Admission Code")
+                    {
+                        Occurrence = Optional;
+                    }
+                    fieldattribute(waitinglist_reference_code;tmpTicketReservationRequest."Waiting List Reference Code")
+                    {
+                        Occurrence = Optional;
+                    }
+                    fieldattribute("waitinglist_opt-in_address";tmpTicketReservationRequest."Notification Address")
                     {
                         Occurrence = Optional;
                     }
@@ -190,6 +199,11 @@ xmlport 6060114 "TM Ticket Reservation"
         if (ReservationSuccess) then
           tmpTicketReservationResponse."Response Message" := 'OK';
         //+TM1.26 [295981]
+
+        //-TM1.45 [380754]
+        //IF (NOT ReservationSuccess) THEN
+        //  tmpTicketReservationResponse."Session Token ID" := '';
+        //+TM1.45 [380754]
 
         tmpTicketReservationResponse.Insert ();
 

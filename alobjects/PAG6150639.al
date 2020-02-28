@@ -1,6 +1,7 @@
 page 6150639 "POS Posting Profile Card"
 {
     // NPR5.52/ALPO/20190923 CASE 365326 Posting related fields moved here (POS Posting Profiles) from NP Retail Setup
+    // NPR5.53/ALPO/20191017 CASE 371955 New group 'Rounding' with fields "POS Sales Rounding Account", "POS Sales Amt. Rndng Precision", "Rounding Type"
 
     Caption = 'POS Posting Profile Card';
     PageType = Card;
@@ -34,11 +35,28 @@ page 6150639 "POS Posting Profile Card"
                 field("Automatic Posting Method";"Automatic Posting Method")
                 {
                 }
-                field("Max. POS Posting Diff. (LCY)";"Max. POS Posting Diff. (LCY)")
+                group("Posting Difference")
                 {
+                    Caption = 'Posting Difference';
+                    field("Max. POS Posting Diff. (LCY)";"Max. POS Posting Diff. (LCY)")
+                    {
+                    }
+                    field("POS Posting Diff. Account";"POS Posting Diff. Account")
+                    {
+                    }
                 }
-                field("POS Posting Diff. Account";"POS Posting Diff. Account")
+                group(Rounding)
                 {
+                    Caption = 'Rounding';
+                    field("POS Sales Rounding Account";"POS Sales Rounding Account")
+                    {
+                    }
+                    field("POS Sales Amt. Rndng Precision";"POS Sales Amt. Rndng Precision")
+                    {
+                    }
+                    field("Rounding Type";"Rounding Type")
+                    {
+                    }
                 }
             }
             group(Numbering)

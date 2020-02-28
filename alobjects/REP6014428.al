@@ -5,6 +5,7 @@ report 6014428 "Shelf Labels"
     // NPR5.41/BHR /20180410 CASE 302733 Remove field Status from Autocalcfields
     // TM1.39/THRO/20181126 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
     // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
+    // NPR5.53/ANPA/20191029  CASE 374286 Made the report able to print more than one of each label
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Shelf Labels.rdlc';
 
@@ -23,11 +24,17 @@ report 6014428 "Shelf Labels"
                 j: Integer;
             begin
                 if Retail_Journal_Line."Quantity to Print" > 0 then begin
-                  TMPRetail_Journal_Line_Col1.Init;
-                  TMPRetail_Journal_Line_Col1.TransferFields(Retail_Journal_Line);
-                  TMPRetail_Journal_Line_Col1."Line No." := LineNo;
-                  TMPRetail_Journal_Line_Col1.Insert;
-                  LineNo := LineNo + 1;
+                  //-NPR5.53 [374286]
+                  for k := 1 to Retail_Journal_Line."Quantity to Print" do begin
+                  //+NPR5.53 [374286]
+                    TMPRetail_Journal_Line_Col1.Init;
+                    TMPRetail_Journal_Line_Col1.TransferFields(Retail_Journal_Line);
+                    TMPRetail_Journal_Line_Col1."Line No." := LineNo;
+                    TMPRetail_Journal_Line_Col1.Insert;
+                    LineNo := LineNo + 1;
+                  //-NPR5.53 [374286]
+                  end;
+                  //+NPR5.53 [374286]
                 end;
             end;
         }
@@ -190,6 +197,7 @@ report 6014428 "Shelf Labels"
         TMPBeforeUnitPrice: Decimal;
         BeforeCaptionTxt: Text;
         ItemVariant: Record "Item Variant";
+        k: Integer;
 
     local procedure GetItemNPRAttr(ItemRec: Record Item)
     var

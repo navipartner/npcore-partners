@@ -1,6 +1,7 @@
 codeunit 6150861 "POS Action - Doc. Import"
 {
     // NPR5.50/MMV /20181105 CASE 300557 New action, based on CU 6150815
+    // NPR5.53/ALPO/20191211 CASE 378678 Data source extension to have number of open sales orders available for displaying on a POS button
 
 
     trigger OnRun()
@@ -27,7 +28,8 @@ codeunit 6150861 "POS Action - Doc. Import"
 
     local procedure ActionVersion(): Text
     begin
-        exit('1.0');
+        exit ('1.1');  //NPR5.53 [378678]
+        //EXIT ('1.0');  //NPR5.53 [378678]-revoked
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', false, false)]
@@ -42,6 +44,7 @@ codeunit 6150861 "POS Action - Doc. Import"
               Sender."Subscriber Instances Allowed"::Multiple) then begin
                 RegisterWorkflowStep('ImportDocument', 'respond();');
                 RegisterWorkflow(false);
+            RegisterDataSourceBinding(ThisDataSource);  //NPR5.53 [378678]
 
                 RegisterOptionParameter('DocumentType', 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order', 'Order');
                 RegisterBooleanParameter('SelectCustomer', true);
@@ -168,6 +171,64 @@ codeunit 6150861 "POS Action - Doc. Import"
             'DocumentType':
                 Caption := OptionDocType;
         end;
+    end;
+
+    procedure "//Data Source Extension"()
+    begin
+    end;
+
+    local procedure ThisDataSource(): Text
+    begin
+        exit('BUILTIN_SALE');  //NPR5.53 [378678]
+    end;
+
+    local procedure ThisExtension(): Text
+    begin
+        exit('SalesDoc');  //NPR5.53 [378678]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDiscoverDataSourceExtensions', '', true, false)]
+    local procedure OnDiscoverDataSourceExtension(DataSourceName: Text;Extensions: DotNet npNetList_Of_T)
+    begin
+        //-NPR5.53 [378678]
+        if ThisDataSource <> DataSourceName then
+          exit;
+
+        Extensions.Add(ThisExtension);
+        //+NPR5.53 [378678]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnGetDataSourceExtension', '', true, false)]
+    local procedure OnGetDataSourceExtension(DataSourceName: Text;ExtensionName: Text;var DataSource: DotNet npNetDataSource0;var Handled: Boolean;Setup: Codeunit "POS Setup")
+    var
+        DataType: DotNet npNetDataType;
+    begin
+        //-NPR5.53 [378678]
+        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+          exit;
+
+        Handled := true;
+
+        DataSource.AddColumn('OpenOrdersQty','Number of open sales orders',DataType.String,true);
+        //+NPR5.53 [378678]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6150710, 'OnDataSourceExtensionReadData', '', true, false)]
+    local procedure OnDataSourceExtensionReadData(DataSourceName: Text;ExtensionName: Text;var RecRef: RecordRef;DataRow: DotNet npNetDataRow0;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management";var Handled: Boolean)
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        //-NPR5.53 [378678]
+        if (DataSourceName <> ThisDataSource) or (ExtensionName <> ThisExtension) then
+          exit;
+
+        Handled := true;
+
+        SalesHeader.SetRange("Document Type",SalesHeader."Document Type"::Order);
+        SalesHeader.SetRange(Status,SalesHeader.Status::Open);
+
+        DataRow.Add('OpenOrdersQty',SalesHeader.Count);
+        //+NPR5.53 [378678]
     end;
 }
 

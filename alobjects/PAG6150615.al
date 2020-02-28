@@ -8,6 +8,7 @@ page 6150615 "POS Store Card"
     // NPR5.38/BR/20171214  CASE 299888 Changed ENU Caption from POS Ledger Register to POS Period Register
     // NPR5.38/BR/20180125 CASE 302803 Added fields Posting Compression, POS Period Register No. Series
     // NPR5.48/MMV /20180615 CASE 318028 Added field 28 for countries with location specific registration no.
+    // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
 
     Caption = 'POS Store Card';
     RefreshOnActivate = true;
@@ -145,6 +146,15 @@ page 6150615 "POS Store Card"
     {
         area(navigation)
         {
+            action(Dimensions)
+            {
+                Caption = 'Dimensions';
+                Image = Dimensions;
+                RunObject = Page "Default Dimensions";
+                RunPageLink = "Table ID"=CONST(6150614),
+                              "No."=FIELD(Code);
+                ShortCutKey = 'Shift+Ctrl+D';
+            }
             action("POS Unit List")
             {
                 Caption = 'POS Unit List';

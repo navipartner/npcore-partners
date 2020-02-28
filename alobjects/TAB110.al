@@ -14,6 +14,7 @@ tableextension 6014403 tableextension6014403 extends "Sales Shipment Header"
     // NPR5.34/BHR/20170720  CASE 283061 Cleared property MinValue of  field Kolli
     // NPR5.36/BHR/20170919  CASE 290780 Fiels Delivery Instructions for Pakkelabels
     // NPR5.43/BHR /20180615 CASE 318441 Rename field from 6014451 to 6014452
+    // NPR5.53/MHA /20191211 CASE 380837 Added fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
     fields
     {
         field(6014400;"Sales Ticket No.";Code[20])
@@ -53,6 +54,17 @@ tableextension 6014403 tableextension6014403 extends "Sales Shipment Header"
         field(6014452;"Delivery Instructions";Text[50])
         {
             Caption = 'Delivery Instructions';
+        }
+        field(6151300;"NpEc Store Code";Code[20])
+        {
+            Caption = 'E-commerce Store Code';
+            Description = 'NPR5.53';
+            TableRelation = "NpEc Store";
+        }
+        field(6151305;"NpEc Document No.";Code[50])
+        {
+            Caption = 'E-commerce Document No.';
+            Description = 'NPR5.53';
         }
         field(6151405;"External Order No.";Code[20])
         {

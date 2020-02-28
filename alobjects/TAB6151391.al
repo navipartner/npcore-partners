@@ -4,6 +4,8 @@ table 6151391 "CS Stock-Takes"
     // NPR5.52/CLVA/20190905  CASE 364063 Refactored to use Item Journal
     //                                    Added fields "Journal Template Name","Journal Batch Name","Predicted Qty." and "Inventory Calculated"
     // NPR5.52/CLVA/20191102 CASE 375749 Changed code to support version specific changes (NAV 2018+).
+    // NPR5.53/CLVA/20191125  CASE 377563 Added OnDelete code
+    // NPR5.53/CLVA/20191125  CASE 375919 Added field "Adjust Inventory"
 
     Caption = 'CS Stock-Takes';
 
@@ -159,6 +161,10 @@ table 6151391 "CS Stock-Takes"
             Caption = 'Journal Posted';
             Editable = false;
         }
+        field(43;"Adjust Inventory";Boolean)
+        {
+            Caption = 'Adjust Inventory';
+        }
     }
 
     keys
@@ -174,6 +180,20 @@ table 6151391 "CS Stock-Takes"
     fieldgroups
     {
     }
+
+    trigger OnDelete()
+    var
+        CSStockTakesData: Record "CS Stock-Takes Data";
+        CSRefillData: Record "CS Refill Data";
+    begin
+        //-NPR5.53 [377563]
+        CSStockTakesData.SetRange("Stock-Take Id","Stock-Take Id");
+        CSStockTakesData.DeleteAll(true);
+
+        CSRefillData.SetRange("Stock-Take Id","Stock-Take Id");
+        CSRefillData.DeleteAll(true);
+        //+NPR5.53 [377563]
+    end;
 
     trigger OnInsert()
     begin

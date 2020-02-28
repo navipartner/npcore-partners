@@ -3,7 +3,9 @@ xmlport 6151150 "M2 Authenticate"
     // NPR5.49/TSA /20181211 CASE 320425 Initial Version
     // NPR5.49/TSA /20190307 CASE 347894 Changed PasswordMD5 to PasswordHash
     // NPR5.51/TSA /20190812 CASE 364644 Added Person section
-    // MAG2.23/TSA /20191015 CASE 373151 Changed cardinality for person section
+    // MAG2.23/TSA /20191015 CASE 373151 Changed cardinality for person section, added storecode
+    // MAG2.24/TSA /20191015 CASE 373151 Added storecode
+    // MAG2.24/TSA /20191119 CASE 372304 Added Membership section
 
     Caption = 'Authenticate';
     Encoding = UTF8;
@@ -139,6 +141,55 @@ xmlport 6151150 "M2 Authenticate"
                                 end;
                             end;
                         }
+                        textelement(storecode)
+                        {
+                            XmlName = 'StoreCode';
+
+                            trigger OnBeforePassVariable()
+                            begin
+
+                                //-MAG2.24 [373151]
+                                StoreCode := Customer."Magento Store Code";
+                                //-MAG2.24 [373151]
+                            end;
+                        }
+                        tableelement(tmpmembershiproleresponse;"MM Membership Role")
+                        {
+                            LinkFields = "Contact No."=FIELD("No.");
+                            LinkTable = TmpContactResponse;
+                            MinOccurs = Zero;
+                            XmlName = 'Membership';
+                            UseTemporary = true;
+                            fieldelement(MembershipCode;TmpMembershipRoleResponse."Membership Code")
+                            {
+                            }
+                            fieldelement(ExternalMembershipNumber;TmpMembershipRoleResponse."External Membership No.")
+                            {
+                            }
+                            fieldelement(ExternalMemberNumber;TmpMembershipRoleResponse."External Member No.")
+                            {
+                            }
+                            fieldelement(DisplayName;TmpMembershipRoleResponse."Member Display Name")
+                            {
+                            }
+                        }
+
+                        trigger OnAfterGetRecord()
+                        var
+                            ContactBusinessRelation: Record "Contact Business Relation";
+                            MarketingSetup: Record "Marketing Setup";
+                        begin
+
+                            //-MAG2.24 [373151]
+                            if (TmpContactResponse."Company No." = '') then
+                              TmpContactResponse."Company No." := TmpContactResponse."No.";
+
+                            if (MarketingSetup.Get ()) then
+                              if (ContactBusinessRelation.Get (TmpContactResponse."Company No." , MarketingSetup."Bus. Rel. Code for Customers")) then
+                                if (not Customer.Get (ContactBusinessRelation."No.")) then
+                                  Clear (Customer);
+                            //-MAG2.24 [373151]
+                        end;
                     }
                 }
             }
@@ -165,6 +216,7 @@ xmlport 6151150 "M2 Authenticate"
     var
         RequestEntryCount: Integer;
         StartTime: Time;
+        Customer: Record Customer;
 
     procedure GetRequest(var TmpOneTimePassword: Record "M2 One Time Password" temporary)
     begin
@@ -183,6 +235,8 @@ xmlport 6151150 "M2 Authenticate"
     end;
 
     procedure SetResponse(var TmpContact: Record Contact temporary)
+    var
+        MembershipRole: Record "MM Membership Role";
     begin
 
         TmpContact.Reset ();
@@ -190,6 +244,16 @@ xmlport 6151150 "M2 Authenticate"
           repeat
             TmpContactResponse.TransferFields (TmpContact, true);
             TmpContactResponse.Insert ();
+            //-MAG2.24 [372304]
+            if (not MembershipRole.SetCurrentKey ("Contact No.")) then ;
+            MembershipRole.SetFilter ("Contact No.", '=%1', TmpContact."No.");
+            MembershipRole.SetFilter (Blocked, '=%1', false);
+            if (MembershipRole.FindFirst ()) then begin
+              MembershipRole.CalcFields ("External Member No.", "External Membership No.", "Member Display Name", "Membership Code");
+              TmpMembershipRoleResponse.TransferFields (MembershipRole, true);
+              TmpMembershipRoleResponse.Insert ();
+            end;
+            //+MAG2.24 [372304]
           until (TmpContact.Next () = 0);
         end;
 

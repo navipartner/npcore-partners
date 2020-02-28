@@ -14,11 +14,16 @@ page 6060140 "MM POS Member Card"
     // MM1.34/TSA /20180907 CASE 327605 Open / Due Amount field
     // MM1.40/TSA /20190823 CASE 360242 Cleaned Green Code
     // MM1.41/TSA /20191008 CASE 366261 When Clienttype is Phone, there is no "LookupOK"
+    // MM1.42/TSA /20191118 CASE 378190 Adding Statistics and Ledger Entry Button
+    // MM1.42/ALPO/20191125 CASE 377727 Raptor integration: new page actions "Raptor Order History", "Raptor Recommendations"
+    // MM1.42/ALPO/20191127 CASE 379072 New tab 'CRM', same as on the page 6060136 "MM Member Card".
+    //                                     - Controls moved to the tab: Picture, Gender, Birthday, "E-Mail News Letter"
 
     Caption = 'Member Details';
     DataCaptionExpression = "External Member No." + ' - ' + "Display Name";
     DeleteAllowed = false;
     InsertAllowed = false;
+    PromotedActionCategories = 'New,Process,Report,History,Raptor';
     ShowFilter = false;
     SourceTable = "MM Member";
 
@@ -28,23 +33,12 @@ page 6060140 "MM POS Member Card"
         {
             group(General)
             {
-                field(Picture;Picture)
-                {
-                }
                 field("External Member No.";"External Member No.")
                 {
                     Editable = false;
                 }
                 field("Display Name";"Display Name")
                 {
-                }
-                field(Gender;Gender)
-                {
-                }
-                field(Birthday;Birthday)
-                {
-                    Style = Favorable;
-                    StyleExpr = IsBirthday;
                 }
                 field(Blocked;Blocked)
                 {
@@ -62,13 +56,30 @@ page 6060140 "MM POS Member Card"
                 field("E-Mail Address";"E-Mail Address")
                 {
                 }
-                field("E-Mail News Letter";"E-Mail News Letter")
-                {
-                }
                 field("MembershipRoleDisplay.""GDPR Approval""";MembershipRoleDisplay."GDPR Approval")
                 {
                     Caption = 'GDPR Approval';
                     Editable = false;
+                }
+            }
+            group(CRM)
+            {
+                field(Picture;Picture)
+                {
+                }
+                field(Gender;Gender)
+                {
+                }
+                field(Birthday;Birthday)
+                {
+                    Style = Favorable;
+                    StyleExpr = IsBirthday;
+                }
+                field("E-Mail News Letter";"E-Mail News Letter")
+                {
+                }
+                field("Notification Method";"Notification Method")
+                {
                 }
             }
             group(Membership)
@@ -232,6 +243,141 @@ page 6060140 "MM POS Member Card"
                 end;
             }
         }
+        area(navigation)
+        {
+            group(History)
+            {
+                Caption = 'History';
+                Image = History;
+                action(LedgerEntries)
+                {
+                    Caption = 'Ledger E&ntries';
+                    Image = CustomerLedger;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    ShortCutKey = 'Ctrl+F7';
+
+                    trigger OnAction()
+                    var
+                        CustLedgerEntry: Record "Cust. Ledger Entry";
+                        CustomerLedgerEntries: Page "Customer Ledger Entries";
+                    begin
+
+                        //-MM1.42 [378190]
+                        if (Membership."Customer No." = '') then
+                          Error (NO_ENTRIES, Rec."External Member No.");
+
+                        CustLedgerEntry.FilterGroup (2);
+                        CustLedgerEntry.SetFilter ("Customer No.", '=%1', Membership."Customer No.");
+                        CustLedgerEntry.FilterGroup (0);
+
+                        CustomerLedgerEntries.Editable (false);
+                        CustomerLedgerEntries.SetTableView (CustLedgerEntry);
+                        CustomerLedgerEntries.RunModal ();
+                        //+MM1.42 [378190]
+                    end;
+                }
+                action(ItemLedgerEntries)
+                {
+                    Caption = 'Item Ledger Entries';
+                    Image = ItemLedger;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+
+                    trigger OnAction()
+                    var
+                        ItemLedgerEntry: Record "Item Ledger Entry";
+                    begin
+                        //-MM1.42 [377727]
+                        if (Membership."Customer No." = '') then
+                          Error(NO_ENTRIES,Rec."External Member No.");
+
+                        ItemLedgerEntry.SetCurrentKey("Source Type","Source No.","Posting Date");
+                        ItemLedgerEntry.FilterGroup(2);
+                        ItemLedgerEntry.SetRange("Source Type",ItemLedgerEntry."Source Type"::Customer);
+                        ItemLedgerEntry.SetRange("Source No.",Membership."Customer No.");
+                        ItemLedgerEntry.FilterGroup(0);
+                        ItemLedgerEntry.Ascending(false);
+                        if ItemLedgerEntry.FindFirst then;
+                        PAGE.RunModal(0,ItemLedgerEntry);
+                        //+MM1.42 [377727]
+                    end;
+                }
+                action(CustomerStatisics)
+                {
+                    Caption = 'Statistics';
+                    Image = Statistics;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    ShortCutKey = 'F7';
+
+                    trigger OnAction()
+                    var
+                        Customer: Record Customer;
+                        CustomerStatistics: Page "Customer Statistics";
+                    begin
+
+                        //-MM1.42 [378190]
+                        if (Membership."Customer No." = '') then
+                          Error (NO_ENTRIES, Rec."External Member No.");
+
+                        Customer.Get (Membership."Customer No.");
+                        CustomerStatistics.SetRecord (Customer);
+                        CustomerStatistics.Editable (false);
+                        CustomerStatistics.RunModal ();
+                        //+MM1.42 [378190]
+                    end;
+                }
+            }
+            group("Raptor Integration")
+            {
+                Caption = 'Raptor Integration';
+                action(RaptorBrowsingHistory)
+                {
+                    Caption = 'Browsing History';
+                    Enabled = RaptorEnabled;
+                    Image = ViewRegisteredOrder;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    Visible = RaptorEnabled;
+
+                    trigger OnAction()
+                    var
+                        RaptorAction: Record "Raptor Action";
+                        RaptorMgt: Codeunit "Raptor Management";
+                    begin
+                        //-MM1.42 [377727]
+                        if (Membership."Customer No." = '') then
+                          Error(NO_ENTRIES,"External Member No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory,true,RaptorAction) then
+                          RaptorMgt.ShowRaptorData(RaptorAction,Membership."Customer No.");
+                        //+MM1.42 [377727]
+                    end;
+                }
+                action(RaptorRecommendations)
+                {
+                    Caption = 'Recommendations';
+                    Enabled = RaptorEnabled;
+                    Image = SuggestElectronicDocument;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    Visible = RaptorEnabled;
+
+                    trigger OnAction()
+                    var
+                        RaptorAction: Record "Raptor Action";
+                        RaptorMgt: Codeunit "Raptor Management";
+                    begin
+                        //-MM1.42 [377727]
+                        if (Membership."Customer No." = '') then
+                          Error(NO_ENTRIES,"External Member No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations,true,RaptorAction) then
+                          RaptorMgt.ShowRaptorData(RaptorAction,Membership."Customer No.");
+                        //+MM1.42 [377727]
+                    end;
+                }
+            }
+        }
     }
 
     trigger OnAfterGetRecord()
@@ -310,6 +456,15 @@ page 6060140 "MM POS Member Card"
         IsInvalid := (Blocked);
     end;
 
+    trigger OnOpenPage()
+    var
+        RaptorSetup: Record "Raptor Setup";
+    begin
+        //-MM1.42 [377727]
+        RaptorEnabled := (RaptorSetup.Get and RaptorSetup."Enable Raptor Functions");
+        //+MM1.42 [377727]
+    end;
+
     var
         Membership: Record "MM Membership";
         ValidFromDate: Date;
@@ -328,6 +483,8 @@ page 6060140 "MM POS Member Card"
         CONFIRM_PRINT: Label 'Do you want to print a member account card for %1?';
         CONFIRM_PRINT_FMT: Label '[%1] - %2';
         MemberRetailIntegration: Codeunit "MM Member Retail Integration";
+        NO_ENTRIES: Label 'No entries found for member %1.';
+        RaptorEnabled: Boolean;
 
     procedure SetMembershipEntryNo(MembershipEntryNo: Integer)
     begin
@@ -404,6 +561,22 @@ page 6060140 "MM POS Member Card"
           Error (NO_QUESTIONNAIR);
 
         ProfileManagement.ShowContactQuestionnaireCard (Contact, '', 0);
+    end;
+
+    local procedure CreateMembership()
+    var
+        MembershipSalesSetup: Record "MM Membership Sales Setup";
+        MembershipSalesSetupPage: Page "MM Membership Sales Setup";
+    begin
+
+        MembershipSalesSetup.SetFilter ("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
+        if (MembershipSalesSetup.Count () = 1) then begin
+          MembershipSalesSetup.FindFirst ();
+          MembershipSalesSetupPage.CreateMembership (MembershipSalesSetup);
+        end else begin
+          MembershipSalesSetupPage.SetTableView (MembershipSalesSetup);
+          MembershipSalesSetupPage.RunModal ();
+        end;
     end;
 }
 

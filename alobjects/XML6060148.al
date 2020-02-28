@@ -1,7 +1,9 @@
 xmlport 6060148 "MM Loyalty Create Coupon"
 {
     // MM1.40/TSA /20190813 CASE 343352 Initial Version
+    // MM1.42/TSA /20191024 CASE 374403 Added documentno, documentdate
 
+    Caption = 'Loyalty Create Coupon';
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
 
@@ -19,6 +21,12 @@ xmlport 6060148 "MM Loyalty Create Coupon"
                     XmlName = 'request';
                     UseTemporary = true;
                     fieldelement(membershipnumber;tmpMemberInfoCapture."External Membership No.")
+                    {
+                    }
+                    fieldelement(documentno;tmpMemberInfoCapture."Document No.")
+                    {
+                    }
+                    fieldelement(documentdate;tmpMemberInfoCapture."Document Date")
                     {
                     }
                     fieldelement(ordervalue;tmpMemberInfoCapture."Amount Incl VAT")

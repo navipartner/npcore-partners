@@ -71,7 +71,7 @@ table 6014409 "Gift Voucher"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No." = CONST (1));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
         }
         field(7; "Location Code"; Code[10])
         {
@@ -167,7 +167,7 @@ table 6014409 "Gift Voucher"
         {
             CaptionClass = '1,2,1';
             Caption = 'Cashed in Department Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No." = CONST (1));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
         }
         field(27; "Cashed in Location Code"; Code[10])
         {
@@ -197,9 +197,9 @@ table 6014409 "Gift Voucher"
         field(36; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
-            TableRelation = IF ("Customer Type" = CONST (Alm)) Customer."No."
+            TableRelation = IF ("Customer Type" = CONST(Alm)) Customer."No."
             ELSE
-            IF ("Customer Type" = CONST (Kontant)) Contact."No.";
+            IF ("Customer Type" = CONST(Kontant)) Contact."No.";
             ValidateTableRelation = false;
         }
         field(37; Invoiced; Boolean)
@@ -294,13 +294,13 @@ table 6014409 "Gift Voucher"
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No." = CONST (2));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
         }
         field(60; "Cashed in Global Dim 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Cashed in Department Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No." = CONST (2));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
         }
         field(61; "Payment Type No."; Code[20])
         {
@@ -325,7 +325,7 @@ table 6014409 "Gift Voucher"
         {
             Caption = 'Cashed POS Payment Line No.';
             Description = 'NPR5.38 [302766]';
-            TableRelation = "POS Payment Line"."Line No." WHERE ("POS Entry No." = FIELD ("Cashed POS Entry No."));
+            TableRelation = "POS Payment Line"."Line No." WHERE("POS Entry No." = FIELD("Cashed POS Entry No."));
         }
         field(72; "Cashed POS Unit No."; Code[10])
         {
@@ -342,7 +342,7 @@ table 6014409 "Gift Voucher"
         {
             Caption = 'Issuing POS Sale Line No.';
             Description = 'NPR5.38 [302766]';
-            TableRelation = "POS Sales Line"."Line No." WHERE ("POS Entry No." = FIELD ("Issuing POS Entry No"));
+            TableRelation = "POS Sales Line"."Line No." WHERE("POS Entry No." = FIELD("Issuing POS Entry No"));
         }
         field(77; "Issuing POS Unit No."; Code[10])
         {
@@ -355,8 +355,8 @@ table 6014409 "Gift Voucher"
         }
         field(6014401; Comment; Boolean)
         {
-            CalcFormula = Exist ("Retail Comment" WHERE ("Table ID" = CONST (6014410),
-                                                        "No." = FIELD ("No.")));
+            CalcFormula = Exist ("Retail Comment" WHERE("Table ID" = CONST(6014410),
+                                                        "No." = FIELD("No.")));
             Caption = 'Comment';
             FieldClass = FlowField;
         }

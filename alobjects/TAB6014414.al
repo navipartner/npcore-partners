@@ -60,14 +60,14 @@ table 6014414 "Period Discount Line"
         }
         field(3; Description; Text[50])
         {
-            CalcFormula = Lookup (Item.Description WHERE ("No." = FIELD ("Item No.")));
+            CalcFormula = Lookup (Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Description';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; "Unit Price"; Decimal)
         {
-            CalcFormula = Lookup (Item."Unit Price" WHERE ("No." = FIELD ("Item No.")));
+            CalcFormula = Lookup (Item."Unit Price" WHERE("No." = FIELD("Item No.")));
             Caption = 'Unit Price';
             Editable = false;
             FieldClass = FlowField;
@@ -141,7 +141,7 @@ table 6014414 "Period Discount Line"
         }
         field(12; "Unit Price Incl. VAT"; Boolean)
         {
-            CalcFormula = Lookup (Item."Price Includes VAT" WHERE ("No." = FIELD ("Item No.")));
+            CalcFormula = Lookup (Item."Price Includes VAT" WHERE("No." = FIELD("Item No.")));
             Caption = 'Price Includes VAT';
             Editable = false;
             FieldClass = FlowField;
@@ -163,12 +163,12 @@ table 6014414 "Period Discount Line"
                     //-NPR5.50 [299278]
                     if Item."Price Includes VAT" then begin
                         //+NPR5.50 [299278]
-                    //-NPR5.51 [358985]
-                    if VATPostingSetup.Get(ItemGroup."VAT Bus. Posting Group",ItemGroup."VAT Prod. Posting Group") then begin
-                      POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
+                        //-NPR5.51 [358985]
+                        if VATPostingSetup.Get(ItemGroup."VAT Bus. Posting Group", ItemGroup."VAT Prod. Posting Group") then begin
+                            POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
                             VATPct := VATPostingSetup."VAT %";
-                    end;
-                    //+NPR5.51 [358985]
+                        end;
+                        //+NPR5.51 [358985]
                         //-NPR5.50 [299278]
                     end else
                         VATPct := 0;
@@ -193,9 +193,9 @@ table 6014414 "Period Discount Line"
         }
         field(20; Comment; Boolean)
         {
-            CalcFormula = Exist ("Retail Comment" WHERE ("Table ID" = CONST (6014414),
-                                                        "No." = FIELD (Code),
-                                                        "No. 2" = FIELD ("Item No.")));
+            CalcFormula = Exist ("Retail Comment" WHERE("Table ID" = CONST(6014414),
+                                                        "No." = FIELD(Code),
+                                                        "No. 2" = FIELD("Item No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -220,7 +220,7 @@ table 6014414 "Period Discount Line"
         field(27; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE ("Item No." = FIELD ("Item No."));
+            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
         }
         field(28; "Last Date Modified"; Date)
         {
@@ -258,52 +258,52 @@ table 6014414 "Period Discount Line"
         }
         field(101; Inventory; Decimal)
         {
-            CalcFormula = Sum ("Item Ledger Entry".Quantity WHERE ("Item No." = FIELD ("Item No."),
-                                                                  "Posting Date" = FIELD ("Date Filter"),
-                                                                  "Global Dimension 1 Code" = FIELD ("Global Dimension 1 Filter"),
-                                                                  "Global Dimension 2 Code" = FIELD ("Global Dimension 2 Filter"),
-                                                                  "Location Code" = FIELD ("Location Filter")));
+            CalcFormula = Sum ("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
+                                                                  "Posting Date" = FIELD("Date Filter"),
+                                                                  "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
+                                                                  "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
+                                                                  "Location Code" = FIELD("Location Filter")));
             Caption = 'Inventory Quantity';
             Editable = false;
             FieldClass = FlowField;
         }
         field(102; "Quantity On Purchase Order"; Decimal)
         {
-            CalcFormula = Sum ("Purchase Line"."Outstanding Qty. (Base)" WHERE ("Document Type" = CONST (Order),
-                                                                               Type = CONST (Item),
-                                                                               "No." = FIELD ("Item No."),
-                                                                               "Order Date" = FIELD ("Date Filter"),
-                                                                               "Shortcut Dimension 1 Code" = FIELD ("Global Dimension 1 Filter"),
-                                                                               "Shortcut Dimension 2 Code" = FIELD ("Global Dimension 2 Filter"),
-                                                                               "Location Code" = FIELD ("Location Filter")));
+            CalcFormula = Sum ("Purchase Line"."Outstanding Qty. (Base)" WHERE("Document Type" = CONST(Order),
+                                                                               Type = CONST(Item),
+                                                                               "No." = FIELD("Item No."),
+                                                                               "Order Date" = FIELD("Date Filter"),
+                                                                               "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
+                                                                               "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
+                                                                               "Location Code" = FIELD("Location Filter")));
             Caption = 'Quantity in Purchase Order';
             Editable = false;
             FieldClass = FlowField;
         }
         field(200; "Quantity Sold"; Decimal)
         {
-            CalcFormula = - Sum ("Item Ledger Entry".Quantity WHERE ("Item No." = FIELD ("Item No."),
-                                                                   "Discount Type" = CONST (Period),
-                                                                   "Discount Code" = FIELD (Code),
-                                                                   "Entry Type" = CONST (Sale),
-                                                                   "Posting Date" = FIELD ("Date Filter"),
-                                                                   "Global Dimension 1 Code" = FIELD ("Global Dimension 1 Filter"),
-                                                                   "Global Dimension 2 Code" = FIELD ("Global Dimension 2 Filter"),
-                                                                   "Location Code" = FIELD ("Location Filter")));
+            CalcFormula = - Sum ("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
+                                                                   "Discount Type" = CONST(Period),
+                                                                   "Discount Code" = FIELD(Code),
+                                                                   "Entry Type" = CONST(Sale),
+                                                                   "Posting Date" = FIELD("Date Filter"),
+                                                                   "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
+                                                                   "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
+                                                                   "Location Code" = FIELD("Location Filter")));
             Caption = 'Sold Quantity';
             Editable = false;
             FieldClass = FlowField;
         }
         field(201; Turnover; Decimal)
         {
-            CalcFormula = Sum ("Value Entry"."Sales Amount (Actual)" WHERE ("Item No." = FIELD ("Item No."),
-                                                                           "Discount Type" = CONST (Period),
-                                                                           "Discount Code" = FIELD (Code),
-                                                                           "Item Ledger Entry Type" = CONST (Sale),
-                                                                           "Posting Date" = FIELD ("Date Filter"),
-                                                                           "Global Dimension 1 Code" = FIELD ("Global Dimension 1 Filter"),
-                                                                           "Global Dimension 2 Code" = FIELD ("Global Dimension 2 Filter"),
-                                                                           "Location Code" = FIELD ("Location Filter")));
+            CalcFormula = Sum ("Value Entry"."Sales Amount (Actual)" WHERE("Item No." = FIELD("Item No."),
+                                                                           "Discount Type" = CONST(Period),
+                                                                           "Discount Code" = FIELD(Code),
+                                                                           "Item Ledger Entry Type" = CONST(Sale),
+                                                                           "Posting Date" = FIELD("Date Filter"),
+                                                                           "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
+                                                                           "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
+                                                                           "Location Code" = FIELD("Location Filter")));
             Caption = 'Turnover';
             Editable = false;
             FieldClass = FlowField;
@@ -330,12 +330,12 @@ table 6014414 "Period Discount Line"
                     GLSetup.Get();
                     ItemGroup.Get(Item."Item Group");
                     if Item."Price Includes VAT" then begin
-                    //-NPR5.51 [358985]
-                    if VATPostingSetup.Get(ItemGroup."VAT Bus. Posting Group",ItemGroup."VAT Prod. Posting Group") then begin
-                      POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup,Handled);
+                        //-NPR5.51 [358985]
+                        if VATPostingSetup.Get(ItemGroup."VAT Bus. Posting Group", ItemGroup."VAT Prod. Posting Group") then begin
+                            POSTaxCalculation.OnGetVATPostingSetup(VATPostingSetup, Handled);
                             VATPct := VATPostingSetup."VAT %";
-                    end;
-                    //+NPR5.51 [358985]
+                        end;
+                        //+NPR5.51 [358985]
                     end else
                         VATPct := 0;
 

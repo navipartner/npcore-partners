@@ -95,8 +95,9 @@ page 6014425 "Retail Item Card"
     // NPR5.51/JAKUBV/20190904  CASE 361514 Transport NPR5.51 - 3 September 2019
     // NPR5.52/ANPA/20191001  CASE 367476 Removed field "Units", "Barcodes" and "Reperation" in pageaction Related
     // NPR5.52/SARA/20191014  CASE 372089 Redesign Magento fasttab for webclient
+    // NPR5.53/MHA /20191113  CASE 374721 Updated Page Caption
 
-    Caption = 'Item Card NP Retail';
+    Caption = 'Retail Item Card';
     PageType = Card;
     PromotedActionCategories = 'New,Process,Reports,Manage,Retail,Magento';
     RefreshOnActivate = true;

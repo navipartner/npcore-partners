@@ -10,6 +10,7 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
     // NC2.17/MHA /20181116  CASE 335927 Removed green code and added Export File Type
     // NC2.22/MHA /20190621  CASE 358239 GetFieldValue() should use Xml format
     // NC14.00.2.22/MHA /20190715  CASE 361941 Excel support
+    // NC2.24/MHA /20191104  CASE 374375 Added RecFilter and FilterGroups to RecRefWithinPackage() to consider package filters on Primary Key
 
     TableNo = "Nc Task";
 
@@ -429,6 +430,10 @@ codeunit 6151091 "Nc RapidConnect Export Mgt."
         end;
         //+NC2.14 [322308]
         RecRef2 := RecRef.Duplicate;
+        //-NC2.24 [374375]
+        RecRef2.SetRecFilter;
+        RecRef2.FilterGroup(40);
+        //+NC2.24 [374375]
         //-NC14.00.2.22 [361941]
         ConfigXMLExchange.ApplyPackageFilter(ConfigPackageTable,RecRef2);
         //+NC14.00.2.22 [361941]

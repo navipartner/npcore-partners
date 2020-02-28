@@ -4,6 +4,7 @@ table 6151018 "NpRv Arch. Voucher"
     // NPR5.48/MHA /20180921  CASE 302179 Deleted field 80 "In-use Quantity" and added field 1007 "Issue Document Type", 1013 "Issue External Document No."
     // NPR5.48/MHA /20190213  CASE 345739 No. Series length has been increased from 10 to 20 in NAV2018 and newer
     // NPR5.49/MHA /20190228  CASE 342811 Added partner fields
+    // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
 
     Caption = 'Archived Retail Voucher';
     DrillDownPageID = "NpRv Arch. Vouchers";
@@ -74,6 +75,15 @@ table 6151018 "NpRv Arch. Voucher"
             CalcFormula = Sum("NpRv Arch. Voucher Entry"."Remaining Amount" WHERE ("Arch. Voucher No."=FIELD("No.")));
             Caption = 'Amount';
             DecimalPlaces = 2:2;
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(76;"Initial Amount";Decimal)
+        {
+            CalcFormula = Sum("NpRv Arch. Voucher Entry".Amount WHERE ("Arch. Voucher No."=FIELD("No."),
+                                                                       "Entry Type"=FILTER("Issue Voucher"|"Partner Issue Voucher"|"Top-up")));
+            Caption = 'Initial Amount';
+            Description = 'NPR5.53';
             Editable = false;
             FieldClass = FlowField;
         }

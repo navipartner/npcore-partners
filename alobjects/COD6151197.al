@@ -5,6 +5,7 @@ codeunit 6151197 "NpCs Send Order"
     // NPR5.51/MHA /20190719  CASE 342443 Added <opening_hour_set>
     // NPR5.51/MHA /20190719  CASE 362197 Added <to_store>
     // NPR5.51/MHA /20190821  CASE 364557 Added <post_on>
+    // NPR5.53/MHA /20191204  CASE 378216 Added <processing_status>
 
 
     trigger OnRun()
@@ -99,9 +100,11 @@ codeunit 6151197 "NpCs Send Order"
                       '<callback encoding="base64">' + InitCallback(NpCsDocument) + '</callback>' +
                     '</from_store>' +
                     //-NPR5.51 [362197]
-                    '<to_store store_code="' + NpCsDocument."To Store Code" + '">' +
-                    '</to_store>' +
+                    '<to_store store_code="' + NpCsDocument."To Store Code" + '" />' +
                     //+NPR5.51 [362197]
+                    //-NPR5.53 [378216]
+                    '<processing_status>' + Format(NpCsDocument."Processing Status"::Pending,0,2) + '</processing_status>' +
+                    //+NPR5.53 [378216]
                     '<order_date>' + Format(SalesHeader."Order Date",0,9) + '</order_date>' +
                     '<posting_date>' + Format(SalesHeader."Posting Date",0,9) + '</posting_date>' +
                     '<due_date>' + Format(SalesHeader."Due Date",0,9)  + '</due_date>' +

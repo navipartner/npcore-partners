@@ -11,6 +11,9 @@ page 6060120 "TM Ticket Admissions"
     // TM1.21/ANEN /20170406 CASE 271150 Added field "POS Schedule Selection To Date"
     // TM1.28/TSA /20180201 CASE 303925 Added field for Base Calendar
     // TM1.38/TSA /20181012 CASE 332109 Adding eTicket
+    // TM1.45/TSA /20191108 CASE 374620 Added "Stakeholder (E-Mail/Phone No.)"
+    // TM1.45/TSA /20191113 CASE 322432 Added Seating Setup button
+    // TM1.45/TSA /20191207 CASE 380754 Added waitinglist fields and action to notify
 
     Caption = 'Ticket Admissions';
     PageType = List;
@@ -56,14 +59,6 @@ page 6060120 "TM Ticket Admissions"
                 {
                     Visible = false;
                 }
-                field("Unbookable Before Start (Secs)";"Unbookable Before Start (Secs)")
-                {
-                    Visible = false;
-                }
-                field("Bookable Passed Start (Secs)";"Bookable Passed Start (Secs)")
-                {
-                    Visible = false;
-                }
                 field("Capacity Control";"Capacity Control")
                 {
                 }
@@ -71,6 +66,9 @@ page 6060120 "TM Ticket Admissions"
                 {
                 }
                 field("Ticketholder Notification Type";"Ticketholder Notification Type")
+                {
+                }
+                field("Stakeholder (E-Mail/Phone No.)";"Stakeholder (E-Mail/Phone No.)")
                 {
                 }
                 field("Dependent Admission Code";"Dependent Admission Code")
@@ -122,6 +120,9 @@ page 6060120 "TM Ticket Admissions"
                 {
                     Visible = false;
                 }
+                field("Waiting List Setup Code";"Waiting List Setup Code")
+                {
+                }
             }
         }
     }
@@ -162,6 +163,49 @@ page 6060120 "TM Ticket Admissions"
                 Caption = 'Event List';
                 Image = CustomerList;
                 RunObject = Report "TM Admission List";
+            }
+            action("Seating Setup")
+            {
+                Caption = 'Seating Setup';
+                Image = Segment;
+                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedIsBig = true;
+                RunObject = Page "TM Seating Setup";
+                RunPageLink = "Admission Code"=FIELD("Admission Code");
+            }
+            action("Waiting List Setup")
+            {
+                Caption = 'Waiting List Setup';
+                Ellipsis = true;
+                Image = Open;
+                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedCategory = Process;
+                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedIsBig = true;
+                RunObject = Page "TM Waiting List Setup";
+            }
+        }
+        area(processing)
+        {
+            action("Send Waitinglist Notifications")
+            {
+                Caption = 'Send Waitinglist Notifications';
+                Image = Interaction;
+                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedCategory = Process;
+                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    TicketWaitingListMgr: Codeunit "TM Ticket Waiting List Mgr.";
+                begin
+
+                    //-TM1.45 [380754]
+                    if ("Waiting List Setup Code" <> '') then
+                      TicketWaitingListMgr.ProcessAdmission (Rec, Today, true);
+                    //+TM1.45 [380754]
+                end;
             }
         }
     }

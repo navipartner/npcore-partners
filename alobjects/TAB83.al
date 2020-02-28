@@ -1,4 +1,4 @@
-tableextension 6014451 tableextension6014451 extends "Item Journal Line" 
+tableextension 6014452 tableextension6014452 extends "Item Journal Line" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge
     //                                        Added fields 6014401..6014604

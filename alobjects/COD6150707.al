@@ -20,6 +20,8 @@ codeunit 6150707 "POS Payment Line"
     // NPR5.50/TSA /20190530 CASE 354832 Added ReverseUnrealizedSalesVAT()
     // NPR5.51/ALPO/20190820 CASE 365161 Lines with Type=Comment excluded from CalculateBalance()
     // NPR5.52/MHA /20191016 CASE 373294 Added "Allow Cashback" to ValidatePaymentLine()
+    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
+    // NPR5.53/MHA /20190114 CASE 384841 Added parameter NegativePaymentBalance to function CalculateRemainingPaymentSuggestion()
 
 
     trigger OnRun()
@@ -250,8 +252,14 @@ codeunit 6150707 "POS Payment Line"
         //
         //ReturnAmount := Total - ReturnRounding;
         ReturnAmount := SaleAmount - PaidAmount - RoundingAmount - ReturnRounding;
-        if (ReturnAmount < 0) and (Register.Rounding <> '') and (Setup.AmountRoundingPrecision > 0) then
-          ReturnAmount := Round(ReturnAmount,Setup.AmountRoundingPrecision,'=');
+        //-NPR5.53 [371955]-revoked
+        //IF (ReturnAmount < 0) AND (Register.Rounding <> '') AND (Setup.AmountRoundingPrecision > 0) THEN
+        //  ReturnAmount := ROUND(ReturnAmount,Setup.AmountRoundingPrecision,'=');
+        //+NPR5.53 [371955]-revoked
+        //-NPR5.53 [371955]
+        if (ReturnAmount < 0) and (Setup.RoundingAccount(false) <> '') and (Setup.AmountRoundingPrecision > 0) then
+          ReturnAmount := Round(ReturnAmount,Setup.AmountRoundingPrecision,Setup.AmountRoundingDirection);
+        //+NPR5.53 [371955]
         //+NPR5.47 [335992]
     end;
 
@@ -390,9 +398,10 @@ codeunit 6150707 "POS Payment Line"
           PaymentType.TestField (PaymentType."G/L Account No.");
 
         PaymentType.TestField (Status, PaymentType.Status::Active);
+
         //-NPR5.52 [373294]
         if Line."Amount Including VAT" < 0 then
-          PaymentType.TestField("Allow Cashback");
+          PaymentType.TestField("Allow Refund");
         //+NPR5.52 [373294]
     end;
 
@@ -505,7 +514,7 @@ codeunit 6150707 "POS Payment Line"
     end;
 
     [Scope('Personalization')]
-    procedure CalculateRemainingPaymentSuggestion(SalesAmount: Decimal;PaidAmount: Decimal;PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS"): Decimal
+    procedure CalculateRemainingPaymentSuggestion(SalesAmount: Decimal;PaidAmount: Decimal;PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS";AllowNegativePaymentBalance: Boolean): Decimal
     var
         Balance: Decimal;
         ReturnRoundedBalance: Decimal;
@@ -514,8 +523,13 @@ codeunit 6150707 "POS Payment Line"
         //-NPR5.38 [300957]
         Balance := PaidAmount - SalesAmount;
 
-        if (SalesAmount >= 0) and (Balance >= 0) then //Paid exact or more.
+        if (SalesAmount >= 0) and (Balance >= 0) then begin //Paid exact or more.
+          //-NPR5.53 [384841]
+          if AllowNegativePaymentBalance and (PaymentType."No." = ReturnPaymentType."No.") then
+            exit(RoundAmount(PaymentType, CalculateForeignAmount(PaymentType, Balance)) * -1);
+          //+NPR5.53 [384841]
           exit(0);
+        end;
 
         if (SalesAmount >= 0) and (Balance < 0) then //Not paid enough.
           exit(RoundAmount(PaymentType, CalculateForeignAmount(PaymentType, Balance)) * -1);
@@ -552,7 +566,9 @@ codeunit 6150707 "POS Payment Line"
         CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, SubTotal);
         Register.Get(RegisterNo);
         GetPaymentType(ReturnPaymentTypePOS, Register."Return Payment Type", RegisterNo);
-        exit(CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, PaymentTypePOS, ReturnPaymentTypePOS));
+        //-NPR5.53 [384841
+        exit(CalculateRemainingPaymentSuggestion(SaleAmount, PaidAmount, PaymentTypePOS, ReturnPaymentTypePOS,false));
+        //+NPR5.53 [384841
         //+NPR5.46 [290734]
     end;
 

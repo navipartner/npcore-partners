@@ -63,6 +63,8 @@ codeunit 6014505 "Touch Screen - Functions"
     // NPR5.41/JDH /20180426 CASE 312644  Added indirect permissions to table Audit roll
     // NPR5.45/MHA /20180821 CASE 324395 SaleLinePOS."Unit Price (LCY)" Renamed to "Unit Cost (LCY)"
     // NPR5.46/MMV /20181001 CASE 290734 EFT Framework refactoring
+    // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
+    // NPR5.53/BHR /20191004 CASE 369361 Removed connection checks
 
     Permissions = TableData "Audit Roll" = rimd;
 
@@ -275,6 +277,8 @@ codeunit 6014505 "Touch Screen - Functions"
         RoundingPrecision := Round(PaymentTypePOS."Rounding Precision" / 2, 0.001, '=');
     end;
 
+                    //RetailSetupGlobal.CheckOnline;
+                    //+NPR5.53 [369361]
     procedure DeleteCustomerLine(var SalePOS: Record "Sale POS")
     var
         SaleLinePOS: Record "Sale Line POS";

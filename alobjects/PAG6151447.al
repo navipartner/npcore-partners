@@ -5,6 +5,7 @@ page 6151447 "Magento Item Picture Factbox"
     // MAG10.00.2.00/MHA/20161118  CASE 258544 Changed Miniature to use Picture instead of TempItem.Picture
     // NPR5.42/MHA /20170828  CASE 287064 LoadPicture() only downloads picture if Miniature is set in Magento Setup
     // MAG2.20/MHA/20190502  CASE 353499 Magento Integration
+    // MAG2.24/MHA /20191203  CASE 379760 Added Find Picture code to LoadPicture()
 
     Caption = 'Picture';
     PageType = CardPart;
@@ -57,17 +58,17 @@ page 6151447 "Magento Item Picture Factbox"
           exit;
         //+MAG2.20 [353499]
         //+NPR5.42 [287064]
-        // CLEAR(Picture);
-        // MagentoPictureLink.SETRANGE("Item No.","No.");
-        // MagentoPictureLink.SETRANGE("Base Image",TRUE);
-        // IF NOT MagentoPictureLink.FINDFIRST THEN
-        //  EXIT;
-        //
-        // IF NOT MagentoPicture.GET(MagentoPicture.Type::Item,MagentoPictureLink."Picture Name") THEN
-        //  EXIT;
-        //
-        // IF MagentoPicture.DownloadPicture(TempItem) THEN
-        //  Picture := TempItem.Picture
+        //-MAG2.24 [379760]
+        Clear(TempMagentoPicture.Picture);
+        MagentoPictureLink.SetRange("Item No.","No.");
+        MagentoPictureLink.SetRange("Base Image",true);
+        if not MagentoPictureLink.FindFirst then
+          exit;
+
+        if not MagentoPicture.Get(MagentoPicture.Type::Item,MagentoPictureLink."Picture Name") then
+          exit;
+        //+MAG2.24 [379760]
+
         if MagentoPicture.Get(MagentoPicture.Type::Item,MagentoPictureLink."Picture Name") then begin
           TempMagentoPicture.Init;
           TempMagentoPicture := MagentoPicture;
