@@ -12,6 +12,7 @@ table 6151371 "CS Setup"
     // NPR5.51/CLVA/20190627 CASE 359375 Added field Create Worksheet after Trans. for re-creation of worksheet after Stock-Take transfer
     // NPR5.51/CLVA/20190812 CASE 362173 Added field "Phys. Inv Jour Temp Name" and "Phys. Inv Jour No. Series"
     // NPR5.52/CLVA/20190904 CASE 365967 Added field "Post with Job Queue", "Job Queue Category Code","Job Queue Priority for Post","Notify On Success","Run in User Session" and "Sum Qty. to Handle"
+    // NPR5.53/CLVA/20191128 CASE 379973 Added field "Earliest Start Date/Time"
 
     Caption = 'CS Setup';
 
@@ -154,6 +155,10 @@ table 6151371 "CS Setup"
         field(42;"Run in User Session";Boolean)
         {
             Caption = 'Run in User Session';
+        }
+        field(43;"Earliest Start Date/Time";DateTime)
+        {
+            Caption = 'Earliest Start Date/Time';
         }
     }
 

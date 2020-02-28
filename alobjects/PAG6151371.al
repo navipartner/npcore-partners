@@ -20,6 +20,9 @@ page 6151371 "CS Setup"
     // NPR5.52/CLVA/20190904 CASE 365967 Added Group "Job Queue" and field "Sum Qty. to Handle"
     // NPR5.52/CLVA/20190905 CASE 365967 Added action Stores
     // NPR5.52/CLVA/20190916 CASE 368484 Added action Store Users
+    // NPR5.53/CLVA/20191125 CASE 377467 Added action Schedule
+    // NPR5.53/CLVA/20191128 CASE 379973 Added field "Earliest Start Date/Time"
+    // NPR5.53/CLVA/20191125 CASE 377467 Added action "Counting Supervisor"
 
     Caption = 'CS Setup';
     PageType = Card;
@@ -73,6 +76,9 @@ page 6151371 "CS Setup"
             {
                 Caption = 'RFID';
                 field("Stock-Take Template";"Stock-Take Template")
+                {
+                }
+                field("Earliest Start Date/Time";"Earliest Start Date/Time")
                 {
                 }
             }
@@ -216,6 +222,27 @@ page 6151371 "CS Setup"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
                     RunObject = Page "CS Stock-Takes List";
+                }
+                action(Schedule)
+                {
+                    Caption = 'Schedule';
+                    Image = Planning;
+                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                    //PromotedCategory = Process;
+                    //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
+                    //PromotedIsBig = true;
+                    RunObject = Page "CS Counting Schedule";
+                }
+                action("Counting Supervisor")
+                {
+                    Caption = 'Counting Supervisor';
+                    Image = Employee;
+                    Promoted = false;
+                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                    //PromotedCategory = Process;
+                    //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
+                    //PromotedIsBig = true;
+                    RunObject = Page "CS Counting Supervisor";
                 }
             }
             group(Rfid)

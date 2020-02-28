@@ -1140,10 +1140,6 @@ dotnet
     }
     assembly("Newtonsoft.Json")
     {
-        Version = '10.0.0.0';
-        Culture = 'neutral';
-        PublicKeyToken = '30ad4fe6b2a6aeed';
-
         type("Newtonsoft.Json.Linq.JValue"; "npNetJValue")
         {
         }
@@ -1169,6 +1165,14 @@ dotnet
         type("Newtonsoft.Json.Linq.JContainer"; "npNetJContainer")
         {
         }
+        type("Newtonsoft.Json.FloatParseHandling"; "npNetFloatParseHandling")
+        {
+        }
+
+        type("Newtonsoft.Json.FloatFormatHandling"; "npNetFloatFormatHandling")
+        {
+        }
+
         type("Newtonsoft.Json.JsonConverter"; "npNetJsonConverter")
         {
         }
@@ -1179,6 +1183,12 @@ dotnet
         {
         }
         type("Newtonsoft.Json.Linq.JObject"; "npNetJObject")
+        {
+        }
+        type("Newtonsoft.Json.Linq.JArray"; "npNetJArray")
+        {
+        }
+        type("Newtonsoft.Json.JsonConvert"; "npNetJsonConvert")
         {
         }
     }
@@ -2400,6 +2410,72 @@ dotnet
         }
 
         type("NaviPartner.Retail.Stargate.Messaging.PaymentGateway.Process.PaymentGatewayProcessRequest"; "npNetPaymentGatewayProcessRequest0")
+        {
+        }
+    }
+
+    assembly("NaviPartner.Retail.Stargate.Messaging.VerifoneVIM")
+    {
+        Version = '5.0.1835.1';
+        Culture = 'neutral';
+        PublicKeyToken = '909fa1bba7619e33';
+
+        type("NaviPartner.Retail.Stargate.Messaging.VerifoneVIM.Requests.Transaction.TransactionRequest"; "npNetTransactionRequest2")
+        {
+        }
+
+        type("NaviPartner.Retail.Stargate.Messaging.VerifoneVIM.Requests.Login.LoginRequest"; "npNetLoginRequest")
+        {
+        }
+
+        type("NaviPartner.Retail.Stargate.Messaging.VerifoneVIM.Requests.Logout.LogoutRequest"; "npNetLogoutRequest")
+        {
+        }
+
+        type("NaviPartner.Retail.Stargate.Messaging.VerifoneVIM.Requests.BalanceEnquiry.BalanceEnquiryRequest"; "npNetBalanceEnquiryRequest0")
+        {
+        }
+
+        type("NaviPartner.Retail.Stargate.Messaging.VerifoneVIM.Requests.Reconciliation.ReconciliationRequest"; "npNetReconciliationRequest")
+        {
+        }
+
+        type("NaviPartner.Retail.Stargate.Messaging.VerifoneVIM.Requests.TransactionStatus.TransactionStatusRequest"; "npNetTransactionStatusRequest")
+        {
+        }
+
+        type("NaviPartner.Retail.Stargate.Messaging.VerifoneVIM.Requests.Login.LoginResponse"; "npNetLoginResponse")
+        {
+        }
+
+        type("NaviPartner.Retail.Stargate.Messaging.VerifoneVIM.Requests.Logout.LogoutResponse"; "npNetLogoutResponse")
+        {
+        }
+
+        type("NaviPartner.Retail.Stargate.Messaging.VerifoneVIM.Requests.Transaction.TransactionResponse"; "npNetTransactionResponse1")
+        {
+        }
+
+        type("NaviPartner.Retail.Stargate.Messaging.VerifoneVIM.Requests.TransactionStatus.TransactionStatusResponse"; "npNetTransactionStatusResponse")
+        {
+        }
+
+        type("NaviPartner.Retail.Stargate.Messaging.VerifoneVIM.Requests.BalanceEnquiry.BalanceEnquiryResponse"; "npNetBalanceEnquiryResponse")
+        {
+        }
+
+        type("NaviPartner.Retail.Stargate.Messaging.VerifoneVIM.Requests.Reconciliation.ReconciliationResponse"; "npNetReconciliationResponse")
+        {
+        }
+    }
+
+    assembly("NaviPartner.Retail.Stargate.Messaging.JSONSerializer")
+    {
+        Version = '5.0.1791.0';
+        Culture = 'neutral';
+        PublicKeyToken = '909fa1bba7619e33';
+
+        type("NaviPartner.Retail.Stargate.Messaging.JSONSerializer.Serializer"; "npNetSerializer")
         {
         }
     }

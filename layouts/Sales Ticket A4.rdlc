@@ -1946,7 +1946,7 @@
                         </TablixMember>
                       </TablixMembers>
                       <Visibility>
-                        <Hidden>=iif((Fields!QuantityLine.Value &lt;&gt; "") AND NOT Fields!ShowOutPayment.Value, 
+                        <Hidden>=iif((Fields!QuantityLine.Value &lt;&gt; "") AND NOT Fields!ShowOutPayment.Value,
 false, true)</Hidden>
                       </Visibility>
                     </TablixMember>
@@ -3700,7 +3700,7 @@ false, true)</Hidden>
                         </TablixMember>
                       </TablixMembers>
                       <Visibility>
-                        <Hidden>=iif((Fields!QuantityLine.Value &lt;&gt; "") AND NOT Fields!ShowOutPayment.Value, 
+                        <Hidden>=iif((Fields!QuantityLine.Value &lt;&gt; "") AND NOT Fields!ShowOutPayment.Value,
 false, true)</Hidden>
                       </Visibility>
                     </TablixMember>
@@ -10677,14 +10677,14 @@ If Not (group1 = currentgroup1)
     currentgroup1 = group1
     currentgroup2 = group2
     currentgroup3 = group3
-     ELSE 
+     ELSE
       If Not (group2 = currentgroup2)
-        newPage = TRUE 
+        newPage = TRUE
         currentgroup2 = group2
         currentgroup3 = group3
         ELSE
           If Not (group3 = currentgroup3)
-          newPage = TRUE 
+          newPage = TRUE
           currentgroup3 = group3
          End If
      End If

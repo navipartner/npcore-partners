@@ -65,6 +65,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
     // MAG2.23/ALPO/20191004  CASE 367219 Auto set capture date for payments captured externally
     // MAG2.23/MHA /20191017  CASE 371791 Added Ticket- and Membership posting
     // MAG2.23/MHA /20191017  CASE 373262 Added Post on Import Setup
+    // MAG2.24/MHA /20191024  CASE 371807 Added "Phone No. to Customer No." GetCustomer()
+    // MAG2.24/MHA /20191118  CASE 372315 Adjusted InsertSalesLineRetailVoucher() to support Top-up
+    // MAG2.24/MHA /20191122  CASE 378597 Only Customer No., E-mail and Phone No. should be touched in UpdateRetailVoucherCustomerInfo()
 
     TableNo = "Nc Import Entry";
 
@@ -262,8 +265,10 @@ codeunit 6151413 "Magento Sales Order Mgt."
             Error(Text002,MagentoSetup."Customer Update Mode");
           //+MAG2.22 [357662]
           VATBusPostingGroup := MagentoMgt.GetVATBusPostingGroup(TaxClass);
-          Customer.Init;
-          Customer."No." := '';
+
+          //-MAG2.24 [371807]
+          InitCustomer(XmlElement,Customer);
+          //+MAG2.24 [371807]
           Customer."External Customer No." := ExternalCustomerNo;
           Customer.Insert(true);
           //-MAG2.22 [360098]
@@ -300,7 +305,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
           MagentoSetup."Customer Update Mode"::Create:
             begin
               if not NewCust then
-                  exit;
+                exit;
             end;
           MagentoSetup."Customer Update Mode"::None:
             begin
@@ -1010,9 +1015,14 @@ codeunit 6151413 "Magento Sales Order Mgt."
     begin
         //-MAG2.17 [302179]
         ReferenceNo := CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement,'external_no',true),1,MaxStrLen(NpRvVoucher."Reference No."));
+
+        //-MAG2.24 [372315]
         NpRvVoucher.SetRange("Reference No.",ReferenceNo);
-        NpRvVoucher.SetRange("Issue Date",0D);
         NpRvVoucher.FindFirst;
+        NpRvVoucher.CalcFields("Issue Date");
+        if (NpRvVoucher."Issue Date" <> 0D) then
+          NpRvVoucher.TestField("Allow Top-up");
+        //+MAG2.24 [372315]
 
         NpRvVoucher.TestField("Account No.");
 
@@ -1048,6 +1058,10 @@ codeunit 6151413 "Magento Sales Order Mgt."
         NpRvExtVoucherSalesLine."Document No." := SalesLine."Document No.";
         NpRvExtVoucherSalesLine."Document Line No." := SalesLine."Line No.";
         NpRvExtVoucherSalesLine.Type := NpRvExtVoucherSalesLine.Type::"New Voucher";
+        //-MAG2.24 [372315]
+        if NpRvVoucher."Issue Date" <> 0D then
+          NpRvExtVoucherSalesLine.Type := NpRvExtVoucherSalesLine.Type::"Top-up";
+        //+MAG2.24 [372315]
         NpRvExtVoucherSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
         NpRvExtVoucherSalesLine."Voucher No." := NpRvVoucher."No.";
         NpRvExtVoucherSalesLine."Reference No." := NpRvVoucher."Reference No.";
@@ -1256,6 +1270,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
 
     local procedure UpdateRetailVoucherCustomerInfo(SalesHeader: Record "Sales Header")
     var
+        Customer: Record Customer;
         NpRvVoucher: Record "NpRv Voucher";
         NpRvVoucherPrev: Record "NpRv Voucher";
         NpRvExtVoucherSalesLine: Record "NpRv Ext. Voucher Sales Line";
@@ -1271,16 +1286,24 @@ codeunit 6151413 "Magento Sales Order Mgt."
           NpRvVoucher.Get(NpRvExtVoucherSalesLine."Voucher No.");
           NpRvVoucherPrev := NpRvVoucher;
 
+          //-MAG2.24 [378597]
+          NpRvVoucher."Customer No." := SalesHeader."Sell-to Customer No.";
+          //+MAG2.24 [378597]
           case MagentoSetup."E-mail Retail Vouchers to" of
             MagentoSetup."E-mail Retail Vouchers to"::" ":
               begin
-                NpRvVoucher.Validate("Customer No.",SalesHeader."Sell-to Customer No.");
                 NpRvVoucher."E-mail" := NpRvVoucherPrev."E-mail";
+                //-MAG2.24 [378597]
+                NpRvVoucher."Phone No." := NpRvVoucherPrev."Phone No.";
+                //+MAG2.24 [378597]
               end;
             MagentoSetup."E-mail Retail Vouchers to"::"Bill-to Customer":
               begin
-                NpRvVoucher.Validate("Customer No.",SalesHeader."Bill-to Customer No.");
-                NpRvVoucher."E-mail" := SalesHeader."Bill-to E-mail";
+                //-MAG2.24 [378597]
+                Customer.Get(SalesHeader."Bill-to Customer No.");
+                NpRvVoucher."E-mail" := Customer."E-Mail";
+                NpRvVoucher."Phone No." := Customer."Phone No.";;
+                //+MAG2.24 [378597]
               end;
           end;
 
@@ -1547,6 +1570,16 @@ codeunit 6151413 "Magento Sales Order Mgt."
               exit(Customer.Get(CustNo));
             end;
           //+MAG2.22 [359754]
+          //-MAG2.24 [371807]
+          MagentoSetup."Customer Mapping"::"Phone No. to Customer No.":
+            begin
+              CustNo := NpXmlDomMgt.GetXmlText(XmlElement,'phone',MaxStrLen(Customer."No."),false);
+              if CustNo = '' then
+                exit(false);
+
+              exit(Customer.Get(CustNo));
+            end;
+          //+MAG2.24 [371807]
         end;
 
         exit(false);
@@ -1595,6 +1628,26 @@ codeunit 6151413 "Magento Sales Order Mgt."
 
     local procedure "--- Set"()
     begin
+    end;
+
+    local procedure InitCustomer(XmlElement: DotNet npNetXmlElement;var Cust: Record Customer)
+    begin
+        //-MAG2.24 [371807]
+        Initialize();
+
+        Cust.Init;
+        Cust."No." := '';
+        case MagentoSetup."Customer Mapping" of
+          MagentoSetup."Customer Mapping"::"Customer No.":
+            begin
+              Cust."No." := NpXmlDomMgt.GetAttributeCode(XmlElement,'','customer_no',MaxStrLen(Cust."No."),false);
+            end;
+          MagentoSetup."Customer Mapping"::"Phone No. to Customer No.":
+            begin
+              Cust."No." := NpXmlDomMgt.GetXmlText(XmlElement,'phone',MaxStrLen(Cust."No."),false);
+            end;
+        end;
+        //+MAG2.24 [371807]
     end;
 
     local procedure SetFieldText(var RecRef: RecordRef;FieldNo: Integer;Value: Text)

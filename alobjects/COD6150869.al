@@ -2,6 +2,7 @@ codeunit 6150869 "POS Action - Layaway Pay"
 {
     // NPR5.50/MMV /20181105 CASE 300557 Created object
     // NPR5.52/MMV /20191004 CASE 352473 Updated parameters to insert final amount.
+    // NPR5.53/MMV /20200108 CASE 373453 Error if there are unposted POS entries related to any of the layaway prepayment invoices.
 
 
     trigger OnRun()
@@ -14,6 +15,7 @@ codeunit 6150869 "POS Action - Layaway Pay"
         LAYAWAY_NEXT_DATE: Label 'Layaway Next Due Date: %1';
         LAYAWAY_NEXT_AMOUNT: Label 'Layaway Next Amount: %1';
         LAYAWAY_COMPLETED: Label 'Layaway Fully Paid';
+        ERR_UNPOSTED_POS_ENTRY: Label '%1 %2, %3 %4 is related to %5 %6 but has not yet been posted.\All related entries must be posted before new layaway payment.';
         CaptionSelectCustomer: Label 'Select Customer';
         CaptionOrderPayTermsFilter: Label 'Payment Terms Filter';
         CaptionSelectionMethod: Label 'Selection Method';
@@ -79,6 +81,10 @@ codeunit 6150869 "POS Action - Layaway Pay"
 
         if not SelectOrder(POSSession, SalesHeader, OrderPaymentTermsFilter) then
           exit;
+
+        //-NPR5.53 [373453]
+        CheckForUnpostedLinkedPOSEntries(SalesHeader);
+        //+NPR5.53 [373453]
 
         if not SelectPrepaymentInvoice(SalesHeader, SalesInvoiceHeader, SelectionMethod) then
           exit;
@@ -254,6 +260,33 @@ codeunit 6150869 "POS Action - Layaway Pay"
         SaleLinePOS.Type := SaleLinePOS.Type::Comment;
         SaleLinePOS.Description := Description;
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
+    end;
+
+    local procedure CheckForUnpostedLinkedPOSEntries(SalesHeader: Record "Sales Header")
+    var
+        POSEntrySalesDocLink: Record "POS Entry Sales Doc. Link";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        POSEntry: Record "POS Entry";
+    begin
+        //-NPR5.53 [373453]
+        SalesInvoiceHeader.SetRange("Prepayment Order No.", SalesHeader."No.");
+        if SalesInvoiceHeader.FindSet then repeat
+          POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE);
+          POSEntrySalesDocLink.SetRange("Sales Document No", SalesInvoiceHeader."No.");
+          if POSEntrySalesDocLink.FindSet then repeat
+            POSEntry.Get(POSEntrySalesDocLink."POS Entry No.");
+            if POSEntry."Post Entry Status" <> POSEntry."Post Entry Status"::Posted then begin
+              Error(ERR_UNPOSTED_POS_ENTRY,
+                POSEntry.TableCaption,
+                POSEntry."Entry No.",
+                POSEntry.FieldCaption("Document No."),
+                POSEntry."Document No.",
+                SalesHeader."Document Type"::Invoice,
+                SalesInvoiceHeader."No.");
+            end;
+          until POSEntrySalesDocLink.Next = 0;
+        until SalesInvoiceHeader.Next = 0;
+        //+NPR5.53 [373453]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150705, 'OnGetParameterNameCaption', '', false, false)]

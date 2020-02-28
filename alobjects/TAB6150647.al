@@ -2,6 +2,7 @@ table 6150647 "POS Info POS Entry"
 {
     // NPR5.38/BR  /20171222 CASE 295503 Object Created
     // NPR5.41/THRO/20180416 CASE 311499 Added field 3 Sales Line No.
+    // NPR5.53/ALPO/20200204 CASE 387750 Added fields: 2 "Document No.", 4 "Entry Date", 26 "POS Unit No.", 27 "Salesperson Code"
 
     Caption = 'POS Info POS Entry';
 
@@ -12,9 +13,19 @@ table 6150647 "POS Info POS Entry"
             Caption = 'POS Entry No.';
             TableRelation = "POS Entry";
         }
+        field(2;"Document No.";Code[20])
+        {
+            Caption = 'Document No.';
+            Description = 'NPR5.53';
+        }
         field(3;"Sales Line No.";Integer)
         {
             Caption = 'Sales Line No.';
+        }
+        field(4;"Entry Date";Date)
+        {
+            Caption = 'Entry Date';
+            Description = 'NPR5.53';
         }
         field(5;"Receipt Type";Option)
         {
@@ -58,6 +69,18 @@ table 6150647 "POS Info POS Entry"
         field(25;"Discount Amount";Decimal)
         {
             Caption = 'Discount Amount';
+        }
+        field(26;"POS Unit No.";Code[10])
+        {
+            Caption = 'POS Unit No.';
+            Description = 'NPR5.53';
+            TableRelation = "POS Unit";
+        }
+        field(27;"Salesperson Code";Code[10])
+        {
+            Caption = 'Salesperson Code';
+            Description = 'NPR5.53';
+            TableRelation = "Salesperson/Purchaser";
         }
     }
 

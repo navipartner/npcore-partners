@@ -1,6 +1,7 @@
 codeunit 6014472 "Dynamic Module Cross Ref Setup"
 {
     // NPR5.52/SARA/20191016 CASE 372997 Object created - Manage unique Cross Reference No by Type
+    // NPR5.53/SARA/20191111 CASE 376257 Corrected bug on unique Cross Reference No by Type
 
 
     trigger OnRun()
@@ -53,24 +54,41 @@ codeunit 6014472 "Dynamic Module Cross Ref Setup"
         SetupValue: Boolean;
         SettingID: Integer;
     begin
-
+        //-NPR5.53 [376257]
+        /*
         SettingID := 2; //Customer
-        if DynamicModuleHelper.ModuleIsEnabledAndReturnSetupValue(GetModuleName(),SettingID,Value) then
+        IF DynamicModuleHelper.ModuleIsEnabledAndReturnSetupValue(GetModuleName(),SettingID,Value) THEN
           SetupValue := Value;
-        if SetupValue then
+        IF SetupValue THEN
           TestUniqueCrossRefNo(Rec."Cross-Reference No.",SettingID);
-
+        
         SettingID := 3; //Vendor
-        if DynamicModuleHelper.ModuleIsEnabledAndReturnSetupValue(GetModuleName(),SettingID,Value) then
+        IF DynamicModuleHelper.ModuleIsEnabledAndReturnSetupValue(GetModuleName(),SettingID,Value) THEN
           SetupValue := Value;
-        if SetupValue then
+        IF SetupValue THEN
           TestUniqueCrossRefNo(Rec."Cross-Reference No.",SettingID);
-
+        
         SettingID := 4; //Bar Code
+        IF DynamicModuleHelper.ModuleIsEnabledAndReturnSetupValue(GetModuleName(),SettingID,Value) THEN
+          SetupValue := Value;
+        IF SetupValue THEN
+          TestUniqueCrossRefNo(Rec."Cross-Reference No.",SettingID);
+        */
+        SettingID := 0;
+        case Rec."Cross-Reference Type" of
+          Rec."Cross-Reference Type"::Customer: SettingID := 2;
+          Rec."Cross-Reference Type"::Vendor: SettingID := 3;
+          Rec."Cross-Reference Type"::"Bar Code": SettingID := 4;
+        end;
+        if SettingID = 0 then
+          exit;
+        
         if DynamicModuleHelper.ModuleIsEnabledAndReturnSetupValue(GetModuleName(),SettingID,Value) then
           SetupValue := Value;
         if SetupValue then
           TestUniqueCrossRefNo(Rec."Cross-Reference No.",SettingID);
+        //+NPR5.53 [376257]
+
     end;
 
     local procedure "---Test"()

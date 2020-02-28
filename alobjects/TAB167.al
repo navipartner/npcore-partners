@@ -10,6 +10,7 @@ tableextension 6014422 tableextension6014422 extends Job
     // NPR5.38/TJ/20171027 CASE 285194 Removed fields 6060160 and 6060165
     //                                 Changed TableRelation property of field "Organizer E-Mail" from default to "Event Exch. Int. E-Mail"
     // NPR5.48/TJ/20190131 CASE 342308 Added field "Est. Total Amount Incl. VAT"
+    // NPR5.53/TJ/20191119 CASE 374886 Added field Locked
     fields
     {
         field(6060150;"Starting Time";Time)
@@ -106,6 +107,11 @@ tableextension 6014422 tableextension6014422 extends Job
             Caption = 'Event Customer No.';
             Description = 'NPR5.35';
             TableRelation = Customer;
+        }
+        field(6151578;Locked;Boolean)
+        {
+            Caption = 'Locked';
+            Description = 'NPR5.53';
         }
     }
 }

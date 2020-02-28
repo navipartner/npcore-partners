@@ -3,6 +3,7 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
     // NPR5.48/MHA /20180920  CASE 302179 Object created
     // NPR5.48/MHA /20190123  CASE 341711 Added "Send via E-mail" and "Send via SMS"
     // NPR5.52/MHA /20191015  CASE 372315 Added functions GetVouchersByCustomerNo(), GetVouchersByEmail()
+    // NPR5.53/MHA /20191118  CASE 372315 Added "Allow Top-up" to Voucher2Buffer()
 
 
     trigger OnRun()
@@ -297,6 +298,9 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
         NpRvExtVoucherBuffer."Starting Date" := NpRvVoucher."Starting Date";
         NpRvExtVoucherBuffer."Ending Date" := NpRvVoucher."Ending Date";
         NpRvExtVoucherBuffer."Account No." := NpRvVoucher."Account No.";
+        //-NPR5.53 [372315]
+        NpRvExtVoucherBuffer."Allow Top-up" := NpRvVoucher."Allow Top-up";
+        //+NPR5.53 [372315]
         NpRvExtVoucherBuffer.Open := NpRvVoucher.Open;
         NpRvExtVoucherBuffer."In-use Quantity" := NpRvVoucher.CalcInUseQty();
         NpRvExtVoucherBuffer.Amount := NpRvVoucher.Amount;

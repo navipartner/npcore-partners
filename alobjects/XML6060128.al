@@ -11,6 +11,7 @@ xmlport 6060128 "MM Add Member"
     // MM1.24/TSA /20171031 CASE 276832 - Refactored membercard section to elements instead of attributes
     // MM1.29/TSA /20180516 CASE 313795 - Added GDPR Approval status
     // MM1.40/TSA /20190827 CASE 360242 - Added Attributes
+    // MM1.42/TSA /20191205 CASE 381222 - Added notification method
 
     Caption = 'Add Member';
     FormatEvaluate = Xml;
@@ -126,6 +127,11 @@ xmlport 6060128 "MM Add Member"
                                 TmpAttributeValueSet."Attribute Set ID" := EntryNo;
                             end;
                         }
+                    }
+                    fieldelement(notificationmethod;tmpMemberInfoCapture."Notification Method")
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
                     }
                 }
                 tableelement(tmpmember;"MM Member")

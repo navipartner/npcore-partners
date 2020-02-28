@@ -37,6 +37,9 @@ codeunit 6060150 "Event Management"
     // NPR5.48/TJ  /20181119 CASE 287903 Added new process that allows posting inventory directly from sales invoice created from job
     // NPR5.49/TJ  /20181207 CASE 331208 Integration with POS
     // NPR5.49/TJ  /20190226 CASE 346780 Fixed an issue with specifying time on type thats not a resource
+    // NPR5.53/TJ  /20200110 CASE 346821 New functions to set statuses on Jobs Setup page
+    //                                   New process to block deletion of events in specified status
+    // NPR5.53/TJ  /20200206 CASE 385993 Fixed a bug preventing event delete with no setup
 
     Permissions = TableData "Job Ledger Entry"=imd,
                   TableData "Job Register"=imd,
@@ -72,6 +75,7 @@ codeunit 6060150 "Event Management"
         SalesDocErr: Label 'The %1 %2 does not exist anymore. A printed copy of the document was created before the document was deleted.';
         POSDocProcessingErr: Label 'Document is currently being processed on POS. Please try again later.';
         POSDocErr: Label 'POS document %1 %2 no longer exists.';
+        BlockDeleteErr: Label 'You can''t delete event %1 as it is in status %2. Please check %3 for blocked statuses.';
 
     [EventSubscriber(ObjectType::Table, 167, 'OnAfterInsertEvent', '', false, false)]
     local procedure JobOnAfterInsert(var Rec: Record Job;RunTrigger: Boolean)
@@ -146,6 +150,14 @@ codeunit 6060150 "Event Management"
               JobTask.Insert(true);
             end;
           end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, 167, 'OnBeforeDeleteEvent', '', true, true)]
+    local procedure JobOnBeforeDelete(var Rec: Record Job;RunTrigger: Boolean)
+    begin
+        //-NPR5.53 [346821]
+        BlockDeleteIfInStatus(Rec);
+        //+NPR5.53 [346821]
     end;
 
     [EventSubscriber(ObjectType::Table, 167, 'OnAfterDeleteEvent', '', false, false)]
@@ -678,6 +690,29 @@ codeunit 6060150 "Event Management"
             until Next = 0;
         end;
         //+NPR5.49 [331208]
+    end;
+
+    [EventSubscriber(ObjectType::Page, 463, 'OnAfterActionEvent', 'SetStatusToBlockEventDelete', true, true)]
+    local procedure SetStatusesToBlockEventDelete(var Rec: Record "Jobs Setup")
+    var
+        GenericMultipleCheckList: Page "Generic Multiple Check List";
+        OutS: OutStream;
+        OptionFilter: Text;
+    begin
+        //-NPR5.53 [346821]
+        GenericMultipleCheckList.SetOptions(GetJobEventStatusOptions(),GetBlockEventDeleteOptionFilter());
+        GenericMultipleCheckList.LookupMode(true);
+        if GenericMultipleCheckList.RunModal = ACTION::LookupOK then begin
+          OptionFilter := GenericMultipleCheckList.GetSelectedOption();
+          if OptionFilter = '' then
+            Clear(Rec."Block Event Deletion")
+          else begin
+            Rec."Block Event Deletion".CreateOutStream(OutS);
+            OutS.Write(OptionFilter);
+          end;
+          Rec.Modify;
+        end;
+        //+NPR5.53 [346821]
     end;
 
     local procedure CheckTime(StartDate: Date;EndDate: Date;StartTime: Time;EndTime: Time)
@@ -2423,6 +2458,74 @@ codeunit 6060150 "Event Management"
         end;
         exit(HasEntries);
         //+NPR5.49 [331208]
+    end;
+
+    procedure GetBlockEventDeleteOptionFilter() OptionFilter: Text
+    var
+        InS: InStream;
+    begin
+        //-NPR5.53 [346821]
+        JobsSetup.Get();
+        if JobsSetup."Block Event Deletion".HasValue then begin
+          JobsSetup.CalcFields("Block Event Deletion");
+          JobsSetup."Block Event Deletion".CreateInStream(InS);
+          InS.Read(OptionFilter);
+        end;
+        exit(OptionFilter);
+        //+NPR5.53 [346821]
+    end;
+
+    local procedure GetJobEventStatusOptions() OptionCaption: Text
+    var
+        RecRef: RecordRef;
+        FldRef: FieldRef;
+        Job: Record Job;
+    begin
+        //-NPR5.53 [346821]
+        RecRef.Open(DATABASE::Job);
+        FldRef := RecRef.Field(Job.FieldNo("Event Status"));
+        OptionCaption := FldRef.OptionCaption;
+        RecRef.Close;
+        OptionCaption := RemoveEmptyOptionsFromEventStatusOption(OptionCaption);
+        exit(OptionCaption);
+        //+NPR5.53 [346821]
+    end;
+
+    local procedure RemoveEmptyOptionsFromEventStatusOption(OptionString: Text) CleanedOptionString: Text
+    var
+        i: Integer;
+        TypeHelper: Codeunit "Type Helper";
+        OptionValue: Text;
+    begin
+        //-NPR5.53 [346821]
+        for i := 0 to TypeHelper.GetNumberOfOptions(OptionString) do begin
+          OptionValue := SelectStr(i + 1,OptionString);
+          if OptionValue <> '' then begin
+            if CleanedOptionString <> '' then
+              CleanedOptionString += ',';
+            CleanedOptionString += OptionValue;
+          end;
+        end;
+        exit(CleanedOptionString);
+        //+NPR5.53 [346821]
+    end;
+
+    local procedure BlockDeleteIfInStatus(Job: Record Job)
+    var
+        OptionFilter: Text;
+    begin
+        //-NPR5.53 [346821]
+        Job.SetRecFilter;
+        //-NPR5.53 [385993]
+        //Job.SETFILTER("Event Status",GetBlockEventDeleteOptionFilter());
+        OptionFilter := GetBlockEventDeleteOptionFilter();
+        if OptionFilter = '' then
+          exit;
+        Job.SetFilter("Event Status",OptionFilter);
+        //+NPR5.53 [385993]
+        if not Job.IsEmpty then
+          Error(BlockDeleteErr,Job."No.",Format(Job."Event Status"),JobsSetup.TableCaption);
+        //+NPR5.53 [346821]
     end;
 }
 

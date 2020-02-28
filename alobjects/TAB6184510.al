@@ -1,6 +1,7 @@
 table 6184510 "EFT BIN Range"
 {
     // NPR5.40/NPKNAV/20180330  CASE 290734 Transport NPR5.40 - 30 March 2018
+    // NPR5.53/MMV /20191204 CASE 349520 Added conditional validation
 
     Caption = 'EFT BIN Range';
 
@@ -23,8 +24,10 @@ table 6184510 "EFT BIN Range"
             var
                 EFTBINGroup: Record "EFT BIN Group";
             begin
-                EFTBINGroup.Get("BIN Group Code");
-                "BIN Group Priority" := EFTBINGroup.Priority;
+                //-NPR5.53 [349520]
+                if EFTBINGroup.Get("BIN Group Code") then
+                //+NPR5.53 [349520]
+                  "BIN Group Priority" := EFTBINGroup.Priority;
             end;
         }
         field(4;"BIN Group Priority";Integer)

@@ -22,11 +22,15 @@ page 6060136 "MM Member Card"
     // MM1.34/JDH /20181109 CASE 334163 Added Caption to Actions
     // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
     // MM1.40/TSA /20190822 CASE 360242 Adding NPR Attributes
+    // MM1.42/ALPO/20191125 CASE 377727 Raptor integration
+    // MM1.42/TSA /20191205 CASE 372557 Added Wallet Create and Welcome message create to member card
+    // MM1.42/TSA /20191219 CASE 382728 Added Preferred Com. Methods related action
 
     Caption = 'Member Card';
     DataCaptionExpression = "External Member No.";
     InsertAllowed = false;
     PageType = Document;
+    PromotedActionCategories = 'New,Process,Report,History,Raptor';
     SourceTable = "MM Member";
 
     layout
@@ -57,7 +61,6 @@ page 6060136 "MM Member Card"
                 }
                 field("Phone No.";"Phone No.")
                 {
-                    Importance = Additional;
                 }
                 field("Social Security No.";"Social Security No.")
                 {
@@ -97,6 +100,17 @@ page 6060136 "MM Member Card"
                 }
                 field("Notification Method";"Notification Method")
                 {
+
+                    trigger OnAssistEdit()
+                    var
+                        MemberCommunication: Record "MM Member Communication";
+                        PageMemberCommunication: Page "MM Member Communication";
+                    begin
+
+                        MemberCommunication.SetFilter ("Member Entry No.", '=%1', Rec."Entry No.");
+                        PageMemberCommunication.SetTableView (MemberCommunication);
+                        PageMemberCommunication.RunModal ();
+                    end;
                 }
             }
             part(MembershipListPart;"MM Member Membership ListPart")
@@ -470,6 +484,65 @@ page 6060136 "MM Member Card"
                     Message (ReasonText);
                 end;
             }
+            action("Create Welcome Notification")
+            {
+                Caption = 'Create Welcome Notification';
+                Image = Interaction;
+                Promoted = true;
+                PromotedCategory = Process;
+
+                trigger OnAction()
+                var
+                    MemberNotification: Codeunit "MM Member Notification";
+                    MembershipNotification: Record "MM Membership Notification";
+                    MembershipRole: Record "MM Membership Role";
+                    EntryNo: Integer;
+                begin
+
+                    //-MM1.42 [372557]
+                    MembershipRole.SetFilter ("Member Entry No.", '=%1', Rec."Entry No.");
+                    MembershipRole.SetFilter (Blocked, '=%1', false);
+                    if (MembershipRole.FindSet ()) then begin
+                      repeat
+                        EntryNo := MemberNotification.AddMemberWelcomeNotification (MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.");
+                        if (MembershipNotification.Get (EntryNo)) then
+                          if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
+                            MemberNotification.HandleMembershipNotification (MembershipNotification);
+
+                      until (MembershipRole.Next () = 0);
+                    end;
+                    //+MM1.42 [372557]
+                end;
+            }
+            action("Create Wallet Notification")
+            {
+                Caption = 'Create Wallet Notification';
+                Image = Interaction;
+                Promoted = true;
+                PromotedCategory = Process;
+
+                trigger OnAction()
+                var
+                    MemberNotification: Codeunit "MM Member Notification";
+                    MembershipNotification: Record "MM Membership Notification";
+                    MembershipRole: Record "MM Membership Role";
+                    EntryNo: Integer;
+                begin
+
+                    //-MM1.42 [372557]
+                    MembershipRole.SetFilter ("Member Entry No.", '=%1', Rec."Entry No.");
+                    MembershipRole.SetFilter (Blocked, '=%1', false);
+                    if (MembershipRole.FindSet ()) then begin
+                      repeat
+                        EntryNo := MemberNotification.CreateWalletSendNotification (MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0);
+                        if (MembershipNotification.Get (EntryNo)) then
+                          if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
+                            MemberNotification.HandleMembershipNotification (MembershipNotification);
+                      until (MembershipRole.Next () = 0);
+                    end;
+                    //+MM1.42 [372557]
+                end;
+            }
         }
         area(navigation)
         {
@@ -482,6 +555,17 @@ page 6060136 "MM Member Card"
                 PromotedIsBig = true;
                 RunObject = Page "TM Ticket List";
                 RunPageLink = "External Member Card No."=FIELD("External Member No.");
+            }
+            action("Preferred Communication Methods")
+            {
+                Caption = 'Preferred Com. Methods';
+                Ellipsis = true;
+                Image = ChangeDimensions;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                RunObject = Page "MM Member Communication";
+                RunPageLink = "Member Entry No."=FIELD("Entry No.");
             }
             action("Member Notifications")
             {
@@ -503,8 +587,151 @@ page 6060136 "MM Member Card"
                 RunObject = Page "MM Member Arrival Log";
                 RunPageLink = "External Member No."=FIELD("External Member No.");
             }
+            group(History)
+            {
+                Caption = 'History';
+                Image = History;
+                action(LedgerEntries)
+                {
+                    Caption = 'Ledger E&ntries';
+                    Image = CustomerLedger;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    ShortCutKey = 'Ctrl+F7';
+
+                    trigger OnAction()
+                    var
+                        CustLedgerEntry: Record "Cust. Ledger Entry";
+                        CustomerLedgerEntries: Page "Customer Ledger Entries";
+                    begin
+                        //-MM1.42 [377727]
+                        if (Membership."Customer No." = '') then
+                          Error(NO_ENTRIES,Rec."External Member No.");
+
+                        CustLedgerEntry.FilterGroup(2);
+                        CustLedgerEntry.SetRange("Customer No.",Membership."Customer No.");
+                        CustLedgerEntry.FilterGroup(0);
+
+                        CustomerLedgerEntries.Editable(false);
+                        CustomerLedgerEntries.SetTableView(CustLedgerEntry);
+                        CustomerLedgerEntries.RunModal;
+                        //+MM1.42 [377727]
+                    end;
+                }
+                action(ItemLedgerEntries)
+                {
+                    Caption = 'Item Ledger Entries';
+                    Image = ItemLedger;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+
+                    trigger OnAction()
+                    var
+                        ItemLedgerEntry: Record "Item Ledger Entry";
+                    begin
+                        //-MM1.42 [377727]
+                        if (Membership."Customer No." = '') then
+                          Error(NO_ENTRIES,Rec."External Member No.");
+
+                        ItemLedgerEntry.SetCurrentKey("Source Type","Source No.","Posting Date");
+                        ItemLedgerEntry.FilterGroup(2);
+                        ItemLedgerEntry.SetRange("Source Type",ItemLedgerEntry."Source Type"::Customer);
+                        ItemLedgerEntry.SetRange("Source No.",Membership."Customer No.");
+                        ItemLedgerEntry.FilterGroup(0);
+                        ItemLedgerEntry.Ascending(false);
+                        if ItemLedgerEntry.FindFirst then;
+                        PAGE.RunModal(0,ItemLedgerEntry);
+                        //+MM1.42 [377727]
+                    end;
+                }
+                action(CustomerStatisics)
+                {
+                    Caption = 'Statistics';
+                    Image = Statistics;
+                    Promoted = true;
+                    PromotedCategory = Category4;
+                    ShortCutKey = 'F7';
+
+                    trigger OnAction()
+                    var
+                        Customer: Record Customer;
+                        CustomerStatistics: Page "Customer Statistics";
+                    begin
+                        //-MM1.42 [377727]
+                        if (Membership."Customer No." = '') then
+                          Error(NO_ENTRIES,Rec."External Member No.");
+
+                        Customer.Get(Membership."Customer No.");
+                        CustomerStatistics.SetRecord(Customer);
+                        CustomerStatistics.Editable(false);
+                        CustomerStatistics.RunModal;
+                        //+MM1.42 [377727]
+                    end;
+                }
+            }
+            group("Raptor Integration")
+            {
+                Caption = 'Raptor Integration';
+                action(RaptorBrowsingHistory)
+                {
+                    Caption = 'Browsing History';
+                    Enabled = RaptorEnabled;
+                    Image = ViewRegisteredOrder;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    Visible = RaptorEnabled;
+
+                    trigger OnAction()
+                    var
+                        RaptorAction: Record "Raptor Action";
+                        RaptorMgt: Codeunit "Raptor Management";
+                    begin
+                        //-MM1.42 [377727]
+                        if (Membership."Customer No." = '') then
+                          Error(NO_ENTRIES,"External Member No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory,true,RaptorAction) then
+                          RaptorMgt.ShowRaptorData(RaptorAction,Membership."Customer No.");
+                        //+MM1.42 [377727]
+                    end;
+                }
+                action(RaptorReShowRaptorDatacommendations)
+                {
+                    Caption = 'Recommendations';
+                    Enabled = RaptorEnabled;
+                    Image = SuggestElectronicDocument;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    Visible = RaptorEnabled;
+
+                    trigger OnAction()
+                    var
+                        RaptorAction: Record "Raptor Action";
+                        RaptorMgt: Codeunit "Raptor Management";
+                    begin
+                        //-MM1.42 [377727]
+                        if (Membership."Customer No." = '') then
+                          Error(NO_ENTRIES,"External Member No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations,true,RaptorAction) then
+                          RaptorMgt.ShowRaptorData(RaptorAction,Membership."Customer No.");
+                        //+MM1.42 [377727]
+                    end;
+                }
+            }
         }
     }
+
+    trigger OnAfterGetCurrRecord()
+    var
+        MembershipRole: Record "MM Membership Role";
+    begin
+        //-MM1.42 [377727]
+        Clear(Membership);
+        MembershipRole.SetRange("Member Entry No.","Entry No.");
+        MembershipRole.SetRange(Blocked,false);
+        if MembershipRole.FindFirst() then
+          Membership.Get(MembershipRole."Membership Entry No.");
+        //+MM1.42 [377727]
+    end;
 
     trigger OnAfterGetRecord()
     begin
@@ -515,6 +742,8 @@ page 6060136 "MM Member Card"
     end;
 
     trigger OnOpenPage()
+    var
+        RaptorSetup: Record "Raptor Setup";
     begin
 
         //-MM1.40 [360242]
@@ -532,9 +761,13 @@ page 6060136 "MM Member Card"
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
         NPRAttrEditable := CurrPage.Editable ();
         //+MM1.40 [360242]
+        //-MM1.42 [377727]
+        RaptorEnabled := (RaptorSetup.Get and RaptorSetup."Enable Raptor Functions");
+        //+MM1.42 [377727]
     end;
 
     var
+        Membership: Record "MM Membership";
         MemberRetailIntegration: Codeunit "MM Member Retail Integration";
         CONFIRM_PRINT: Label 'Do you want to print a member account card for %1?';
         CONFIRM_PRINT_FMT: Label '[%1] - %2';
@@ -553,6 +786,8 @@ page 6060136 "MM Member Card"
         NPRAttrVisible08: Boolean;
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
+        RaptorEnabled: Boolean;
+        NO_ENTRIES: Label 'No entries found for member %1.';
 
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin

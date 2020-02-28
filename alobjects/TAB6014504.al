@@ -25,6 +25,7 @@ table 6014504 "Customer Repair"
     //                                    Renamed all the danish OptionString properties to english
     // NPR5.38/TJ  /20171218  CASE 225415 Renumbered fields from range 50xxx to range below 50000
     // NPR5.41/TS  /20180403  CASE 309631 Corrected Captions
+    // NPR5.53/ALPO/20191025  CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
 
     Caption = 'Customer Repair';
     LookupPageID = "Customer Repair List";
@@ -1042,6 +1043,7 @@ table 6014504 "Customer Repair"
     trigger OnInsert()
     var
         NoSeriesMgt: Codeunit NoSeriesManagement;
+        POSUnit: Record "POS Unit";
         RecRegister: Record Register;
         UserSetup: Record "User Setup";
     begin
@@ -1071,8 +1073,15 @@ table 6014504 "Customer Repair"
         if UserSetup.Get(UserId) then begin
           if RecRegister.Get(UserSetup."Backoffice Register No.") then begin
             Location := RecRegister."Location Code";
-            "Global Dimension 1 Code" := RecRegister."Global Dimension 1 Code";
-            "Global Dimension 2 Code" := RecRegister."Global Dimension 2 Code";
+            //-NPR5.53 [371956]-revoked
+            //"Global Dimension 1 Code" := RecRegister."Global Dimension 1 Code";
+            //"Global Dimension 2 Code" := RecRegister."Global Dimension 2 Code";
+            //+NPR5.53 [371956]-revoked
+            //-NPR5.53 [371956]
+            POSUnit.Get(UserSetup."Backoffice Register No.");
+            "Global Dimension 1 Code" := POSUnit."Global Dimension 1 Code";
+            "Global Dimension 2 Code" := POSUnit."Global Dimension 2 Code";
+            //+NPR5.53 [371956]
           end;
         end;
         //+NPR5.29

@@ -8,6 +8,9 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
     // NPR5.51/MHA /20190819  CASE 364542 Added function ValidateAmt() for validating Minimum Amount
     // NPR5.52/MHA /20191015  CASE 372423 Negative Minimum Amount is rounded up to 0 instead of using absolute value
     // NPR5.52/MHA /20191015  CASE 373127 SaleLinePOS Quantity should be modified to 1
+    // NPR5.53/THRO/20191216  CASE 382232 "Minimum Amount" for issuing voucher moved to NpRv Voucher Type
+    // NPR5.53/MHA /20200103  CASE 384055 Customer No. is carried to Retail Voucher in IssueReturnVoucher()
+    // NPR5.53/MHA /20190114 CASE 384841 Signature updated for CalculateRemainingPaymentSuggestion()
 
 
     trigger OnRun()
@@ -320,10 +323,10 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
             exit;
         if not POSPaymentLine.GetPaymentType(ReturnPaymentTypePOS, Register."Return Payment Type", Register."Register No.") then
             exit;
-        //-NPR5.51 [364542]
-        if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount,PaidAmount,PaymentTypePOS,ReturnPaymentTypePOS) <> 0 then
+        //-NPR5.53 [384841]
+        if POSPaymentLine.CalculateRemainingPaymentSuggestion(SaleAmount,PaidAmount,PaymentTypePOS,ReturnPaymentTypePOS,false) <> 0 then
           exit;
-        //+NPR5.51 [364542]
+        //+NPR5.53 [384841]
 
         POSSession.GetSale(POSSale);
         if not POSSale.TryEndSaleWithBalancing(POSSession, PaymentTypePOS, ReturnPaymentTypePOS) then
@@ -335,9 +338,11 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
     var
         SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
         VoucherType: Record "NpRv Voucher Type";
+        SalePOS: Record "Sale POS";
         SaleLinePOS: Record "Sale Line POS";
         PaymentTypePOS: Record "Payment Type POS";
         POSPaymentLine: Codeunit "POS Payment Line";
+        POSSale: Codeunit "POS Sale";
         POSSaleLine: Codeunit "POS Sale Line";
         VoucherTypeCode: Text;
         DiscountType: Text;
@@ -402,6 +407,20 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
         SaleLinePOSVoucher."Voucher Type" := VoucherType.Code;
         SaleLinePOSVoucher.Description := VoucherType.Description;
         SaleLinePOSVoucher."Starting Date" := CurrentDateTime;
+        //-NPR5.53 [384055]
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        case SalePOS."Customer Type" of
+          SalePOS."Customer Type"::Ord:
+            begin
+              SaleLinePOSVoucher.Validate("Customer No.",SalePOS."Customer No.");
+            end;
+          SalePOS."Customer Type"::Cash:
+            begin
+              SaleLinePOSVoucher.Validate("Contact No.",SalePOS."Customer No.");
+            end;
+        end;
+        //+NPR5.53 [384055]
         //-NPR5.50
         JSON.SetScope('/', true);
         SaleLinePOSVoucher."Send via Print" := JSON.GetBoolean('SendMethodPrint', false);
@@ -448,13 +467,19 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
         if PaymentTypePOS."Rounding Precision" > 0 then
           Amount := Round(Amount,PaymentTypePOS."Rounding Precision");
 
+        //-NPR5.53 [382232]
         //-NPR5.52 [372423]
-        if PaymentTypePOS."Minimum Amount" < 0 then
-          PaymentTypePOS."Minimum Amount" := 0;
+        //IF PaymentTypePOS."Minimum Amount" < 0 THEN
+        //  PaymentTypePOS."Minimum Amount" := 0;
         //+NPR5.52 [372423]
 
-        if Amount < PaymentTypePOS."Minimum Amount" then
-          Error(Text006,Amount,PaymentTypePOS."Minimum Amount");
+        //IF Amount < PaymentTypePOS."Minimum Amount" THEN
+        //  ERROR(Text006,Amount,PaymentTypePOS."Minimum Amount");
+        if VoucherType."Minimum Amount Issue" < 0 then
+          VoucherType."Minimum Amount Issue" := 0;
+        if Amount < VoucherType."Minimum Amount Issue" then
+          Error(Text006,Amount,VoucherType."Minimum Amount Issue");
+        //+NPR5.53 [382232]
 
         JSON.SetContext('ReturnVoucherAmount',Amount);
         FrontEnd.SetActionContext(ActionCode(),JSON);

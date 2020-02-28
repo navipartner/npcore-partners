@@ -112,6 +112,12 @@ codeunit 6060127 "MM Membership Management"
     // MM1.40/TSA /20190822 CASE 360242 Added NPR Attributes
     // MM1.41/TSA /20191009 CASE 371937 Dateformula is considered twice
     // MM1.41/TSA /20191016 CASE 373297 Added function to set grace period presets
+    // MM1.42/TSA /20191028 CASE 374557 Synchronized Card Valid Until option when adding member resulted in blank date
+    // MM1.42/TSA /20191127 CASE 379686 Changed filter for finding past or future membership entries when calculating the valid period
+    // MM1.42/TSA /20191205 CASE 381222 Handled default notification method selection
+    // MM1.42/TSA /20191209 CASE 361664 Middle name added to display name
+    // MM1.42/TSA /20191220 CASE 382728 GetCommunicationMethod_Wallet(), CreateMemberCommunicationDefaultSetup()
+    // MM1.42/TSA /20200117 CASE 384394 Refactored the ExtendMemberCards() functionality executed when membership are renewed etc, cleanup
 
 
     trigger OnRun()
@@ -355,6 +361,10 @@ codeunit 6060127 "MM Membership Management"
         if (not CreateMemberRole (FailWithError, Member."Entry No.", MembershipEntryNo, MembershipInfoCapture, MemberCount, ReasonText)) then
           exit (false);
 
+        //-MM1.42 [382728]
+        CreateMemberCommunicationDefaultSetup (Member."Entry No.");
+        //+MM1.42 [382728]
+
         //-MM1.33 [324065]
         if (MembershipInfoCapture."Guardian External Member No." <> '') then begin
           GuardianMemberEntryNo := GetMemberFromExtMemberNo (MembershipInfoCapture."Guardian External Member No.");
@@ -401,8 +411,11 @@ codeunit 6060127 "MM Membership Management"
 
         OnAfterMemberCreateEvent (Membership, Member);
 
-        if (MembershipSetup."Create Welcome Notification") then
-          AddMemberCreateNotification (MembershipEntryNo, Member, MembershipInfoCapture);
+        //-MM1.42 [382728]
+        //IF (MembershipSetup."Create Welcome Notification") THEN
+        //  AddMemberCreateNotification (MembershipEntryNo, Member, MembershipInfoCapture);
+        AddMemberCreateNotification (MembershipEntryNo, MembershipSetup, Member, MembershipInfoCapture);
+        //+MM1.42 [382728]
 
         MemberEntryNo := Member."Entry No.";
         exit (MemberEntryNo <> 0);
@@ -700,6 +713,8 @@ codeunit 6060127 "MM Membership Management"
           MembershipEntry.SetCurrentKey ("Membership Entry No.");
           MembershipEntry.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
           MembershipEntry.SetFilter ("Valid From Date", '>=%1', ReferenceDate);
+          MembershipEntry.SetFilter (Blocked, '=%1', false); //-+ MM1.42 [379686]
+          MembershipEntry.SetFilter (Context, '<>%1', MembershipEntry.Context::REGRET); //-+ MM1.42 [379686]
           if (MembershipEntry.FindFirst ()) then begin
             ValidFromDate := MembershipEntry."Valid From Date";
             ValidUntilDate := MembershipEntry."Valid Until Date";
@@ -709,6 +724,8 @@ codeunit 6060127 "MM Membership Management"
             MembershipEntry.Reset ();
             MembershipEntry.SetCurrentKey ("Membership Entry No.");
             MembershipEntry.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo); //-+ [279983]
+            MembershipEntry.SetFilter (Blocked, '=%1', false); //-+ MM1.42 [379686]
+            MembershipEntry.SetFilter (Context, '<>%1', MembershipEntry.Context::REGRET); //-+ MM1.42 [379686]
             if (MembershipEntry.FindLast ()) then begin
               ValidFromDate := MembershipEntry."Valid From Date";
               ValidUntilDate := MembershipEntry."Valid Until Date";
@@ -1386,6 +1403,7 @@ codeunit 6060127 "MM Membership Management"
         Membership: Record "MM Membership";
         Member: Record "MM Member";
         MembershipEntry: Record "MM Membership Entry";
+        MemberCard: Record "MM Member Card";
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
         NotFoundReasonText: Text;
@@ -1446,8 +1464,6 @@ codeunit 6060127 "MM Membership Management"
         StartDateNew: Date;
         EndDateNew: Date;
         EntryNo: Integer;
-        NeedExtendMemberCard: Boolean;
-        CardEntryNo: Integer;
     begin
 
         //-MM1.25 [299783] Refactoring the membership alteration function to be able to be verbose
@@ -1523,12 +1539,17 @@ codeunit 6060127 "MM Membership Management"
         SuggestedUnitPrice += MembershipAlterationSetup."Member Unit Price" * GetMembershipMemberCountForAlteration (Membership."Entry No.", MembershipAlterationSetup);
         //+MM1.22 [287080]
 
-        //-#300256 [300256]
-        NeedExtendMemberCard := RequireExtendMemberCard (MemberInfoCapture."Membership Entry No.", MemberInfoCapture."External Card No.", EndDateNew, MembershipAlterationSetup, CardEntryNo);
-        if (NeedExtendMemberCard) then
-          if (not AllowExtendMemberCard (CardEntryNo, MembershipAlterationSetup, EndDateNew, ReasonText)) then
-            exit (ExitFalseOrWithError (WithConfirm, ReasonText));
-        //-#300256 [300256]
+        //-MM1.42 [384394]
+        // //-#300256 [300256]
+        // NeedExtendMemberCard := RequireExtendMemberCard (MemberInfoCapture."Membership Entry No.", MemberInfoCapture."External Card No.", EndDateNew, MembershipAlterationSetup, CardEntryNo);
+        // IF (NeedExtendMemberCard) THEN
+        //  IF (NOT AllowExtendMemberCard (CardEntryNo, MembershipAlterationSetup, EndDateNew, ReasonText)) THEN
+        //    EXIT (ExitFalseOrWithError (WithConfirm, ReasonText));
+        // //-#300256 [300256]
+        if (not CheckExtendMemberCards (WithConfirm, false, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText))
+        then
+          exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+        //+MM1.42 [384394]
 
         //-MM1.25 [299783]
         ReasonText := StrSubstNo ('%1: %4 -> %5 {%2 .. %3}', MemberInfoCapture."Information Context", StartDateNew, EndDateNew, Membership."Membership Code", MembershipAlterationSetup."To Membership Code");
@@ -1543,11 +1564,17 @@ codeunit 6060127 "MM Membership Management"
             end;
 
           MemberInfoCapture."Membership Code" := Membership."Membership Code";
-          //-MM1.19 [270308]
-          if (NeedExtendMemberCard) then
-            if (not ExtendMemberCard (false, MemberInfoCapture."Membership Entry No.", CardEntryNo, MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."Card Entry No.", ReasonText)) then
-              exit (ExitFalseOrWithError (WithConfirm, ReasonText));
-          //-MM1.19 [270308]
+
+          //-MM1.42 [384394]
+          //  //-MM1.19 [270308]
+          //  IF (NeedExtendMemberCard) THEN
+          //    IF (NOT ExtendMemberCard (FALSE, MemberInfoCapture."Membership Entry No.", CardEntryNo, MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."Card Entry No.", ReasonText)) THEN
+          //      EXIT (ExitFalseOrWithError (WithConfirm, ReasonText));
+          //  //-MM1.19 [270308]
+          if (not CheckExtendMemberCards (false, true, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.",MemberInfoCapture."Card Entry No.", ReasonText)) then
+            exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+          //+MM1.42 [384394]
+
           EntryNo := AddMembershipLedgerEntry (MemberInfoCapture."Membership Entry No.", MemberInfoCapture, StartDateNew, EndDateNew);
 
           OnMembershipChangeEvent (MembershipEntry."Membership Entry No.");
@@ -1625,8 +1652,6 @@ codeunit 6060127 "MM Membership Management"
         NewFraction: Decimal;
         StartDateLedgerEntryNo: Integer;
         EndDateLedgerEntryNo: Integer;
-        NeedExtendMemberCard: Boolean;
-        CardEntryNo: Integer;
     begin
 
         OutStartDate := 0D;
@@ -1709,10 +1734,15 @@ codeunit 6060127 "MM Membership Management"
 
         SuggestedUnitPrice += MembershipAlterationSetup."Member Unit Price" * GetMembershipMemberCountForAlteration (Membership."Entry No.", MembershipAlterationSetup);
 
-        NeedExtendMemberCard := RequireExtendMemberCard (MemberInfoCapture."Membership Entry No.", MemberInfoCapture."External Card No.", EndDateNew, MembershipAlterationSetup, CardEntryNo);
-        if (NeedExtendMemberCard) then
-          if (not AllowExtendMemberCard (CardEntryNo, MembershipAlterationSetup, EndDateNew, ReasonText)) then
-            exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+        //-MM1.42 [384394]
+        // NeedExtendMemberCard := RequireExtendMemberCard (MemberInfoCapture."Membership Entry No.", MemberInfoCapture."External Card No.", EndDateNew, MembershipAlterationSetup, CardEntryNo);
+        // IF (NeedExtendMemberCard) THEN
+        //  IF (NOT AllowExtendMemberCard (CardEntryNo, MembershipAlterationSetup, EndDateNew, ReasonText)) THEN
+        //    EXIT (ExitFalseOrWithError (WithConfirm, ReasonText));
+        if (not CheckExtendMemberCards (WithConfirm, false, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText))
+        then
+          exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+        //+MM1.42 [384394]
 
         ReasonText := StrSubstNo ('%1: %4 -> %5 {%2 .. %3}', MemberInfoCapture."Information Context", StartDateNew, EndDateNew, Membership."Membership Code", MembershipAlterationSetup."To Membership Code");
 
@@ -1726,10 +1756,13 @@ codeunit 6060127 "MM Membership Management"
 
           MemberInfoCapture."Membership Code" := Membership."Membership Code";
 
-
-          if (NeedExtendMemberCard) then
-            if (not ExtendMemberCard (false, MemberInfoCapture."Membership Entry No.", CardEntryNo, MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."Card Entry No.", ReasonText)) then
-              exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+          //-MM1.42 [384394]
+          // IF (NeedExtendMemberCard) THEN
+          //   IF (NOT ExtendMemberCard (FALSE, MemberInfoCapture."Membership Entry No.", CardEntryNo, MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."Card Entry No.", ReasonText)) THEN
+          //     EXIT (ExitFalseOrWithError (WithConfirm, ReasonText));
+          if (not CheckExtendMemberCards (false, true, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
+            exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+          //+MM1.42 [384394]
 
           EntryNo := AddMembershipLedgerEntry (MemberInfoCapture."Membership Entry No.", MemberInfoCapture, StartDateNew, EndDateNew);
 
@@ -1822,8 +1855,6 @@ codeunit 6060127 "MM Membership Management"
         EndDateNew: Date;
         EntryNo: Integer;
         RemainingFraction: Decimal;
-        NeedExtendMemberCard: Boolean;
-        CardEntryNo: Integer;
         ValidFromDate: Date;
     begin
 
@@ -1904,12 +1935,17 @@ codeunit 6060127 "MM Membership Management"
 
         SuggestedUnitPrice += MembershipAlterationSetup."Member Unit Price" * GetMembershipMemberCountForAlteration (Membership."Entry No.", MembershipAlterationSetup);
 
-        //-#300256 [300256]
-        NeedExtendMemberCard := RequireExtendMemberCard (MemberInfoCapture."Membership Entry No.", MemberInfoCapture."External Card No.", EndDateNew, MembershipAlterationSetup, CardEntryNo);
-        if (NeedExtendMemberCard) then
-          if (not AllowExtendMemberCard (CardEntryNo, MembershipAlterationSetup, EndDateNew, ReasonText)) then
-            exit (ExitFalseOrWithError (WithConfirm, ReasonText));
-        //-#300256 [300256]
+        //-MM1.42 [384394]
+        // //-#300256 [300256]
+        // NeedExtendMemberCard := RequireExtendMemberCard (MemberInfoCapture."Membership Entry No.", MemberInfoCapture."External Card No.", EndDateNew, MembershipAlterationSetup, CardEntryNo);
+        // IF (NeedExtendMemberCard) THEN
+        //  IF (NOT AllowExtendMemberCard (CardEntryNo, MembershipAlterationSetup, EndDateNew, ReasonText)) THEN
+        //    EXIT (ExitFalseOrWithError (WithConfirm, ReasonText));
+        // //-#300256 [300256]
+        if (not CheckExtendMemberCards (WithConfirm, false, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText))
+        then
+          exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+        //+MM1.42 [384394]
 
         ReasonText := StrSubstNo ('%1: %4 -> %5 {%2 .. %3} {%6 {%7,%8} -> %9}',
                                   MemberInfoCapture."Information Context", StartDateNew, EndDateNew, Membership."Membership Code", MembershipAlterationSetup."To Membership Code",
@@ -1923,9 +1959,14 @@ codeunit 6060127 "MM Membership Management"
           end;
 
           MemberInfoCapture."Membership Code" := Membership."Membership Code";
-          if (NeedExtendMemberCard) then
-            if (not ExtendMemberCard (false, MemberInfoCapture."Membership Entry No.", CardEntryNo, MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."Card Entry No.", ReasonText)) then
-              exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+
+          //-MM1.42 [384394]
+          // IF (NeedExtendMemberCard) THEN
+          //   IF (NOT ExtendMemberCard (FALSE, MemberInfoCapture."Membership Entry No.", CardEntryNo, MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."Card Entry No.", ReasonText)) THEN
+          //    EXIT (ExitFalseOrWithError (WithConfirm, ReasonText));
+          if (not CheckExtendMemberCards (false, true, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
+            exit (ExitFalseOrWithError (WithConfirm, ReasonText));
+          //+MM1.42 [384394]
 
           EntryNo := AddMembershipLedgerEntry (MemberInfoCapture."Membership Entry No.", MemberInfoCapture, StartDateNew, EndDateNew);
           if (StartDateNew = MembershipEntry."Valid From Date") then begin
@@ -2127,8 +2168,6 @@ codeunit 6060127 "MM Membership Management"
         StartDateNew: Date;
         EndDateNew: Date;
         EntryNo: Integer;
-        NeedExtendMemberCard: Boolean;
-        CardEntryNo: Integer;
     begin
 
         if (MemberInfoCapture."Document Date" = 0D) then
@@ -2181,10 +2220,14 @@ codeunit 6060127 "MM Membership Management"
         SuggestedUnitPrice := Item."Unit Price";
         SuggestedUnitPrice += MembershipAlterationSetup."Member Unit Price" * GetMembershipMemberCountForAlteration (Membership."Entry No.", MembershipAlterationSetup);
 
-        NeedExtendMemberCard := RequireExtendMemberCard (MemberInfoCapture."Membership Entry No.", MemberInfoCapture."External Card No.", EndDateNew, MembershipAlterationSetup, CardEntryNo);
-        if (NeedExtendMemberCard) then
-          if (not AllowExtendMemberCard (CardEntryNo, MembershipAlterationSetup, EndDateNew, ReasonText)) then
-            exit (ExitFalseOrWithError (false, ReasonText));
+        //-MM1.42 [384394]
+        // NeedExtendMemberCard := RequireExtendMemberCard (MemberInfoCapture."Membership Entry No.", MemberInfoCapture."External Card No.", EndDateNew, MembershipAlterationSetup, CardEntryNo);
+        // IF (NeedExtendMemberCard) THEN
+        //  IF (NOT AllowExtendMemberCard (CardEntryNo, MembershipAlterationSetup, EndDateNew, ReasonText)) THEN
+        //    EXIT (ExitFalseOrWithError (FALSE, ReasonText));
+        if (not CheckExtendMemberCards (false, false, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
+          exit (false);
+        //+MM1.42 [384394]
 
         if (WithUpdate) then begin
           MemberInfoCapture."Duration Formula" := MembershipAlterationSetup."Membership Duration";
@@ -2193,8 +2236,12 @@ codeunit 6060127 "MM Membership Management"
           if (not MembershipAutoRenew.CreateInvoice (MemberInfoCapture, StartDateNew, EndDateNew)) then
             exit (false);
 
-          if (NeedExtendMemberCard) then
-            ExtendMemberCard (false, MemberInfoCapture."Membership Entry No.", CardEntryNo, MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."Card Entry No.", ReasonText);
+          //-MM1.42 [384394]
+          // IF (NeedExtendMemberCard) THEN
+          //  ExtendMemberCard (FALSE, MemberInfoCapture."Membership Entry No.", CardEntryNo, MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."Card Entry No.", ReasonText);
+          if (not CheckExtendMemberCards (false, true, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
+            exit (false);
+          //+MM1.42 [384394]
 
           EntryNo := AddMembershipLedgerEntry (MemberInfoCapture."Membership Entry No.", MemberInfoCapture, StartDateNew, EndDateNew);
 
@@ -2207,58 +2254,6 @@ codeunit 6060127 "MM Membership Management"
         exit (true);
     end;
 
-    local procedure RequireExtendMemberCard(MembershipEntryNo: Integer;ExternalMemberCardNo: Text[50];NewEndDate: Date;AlterationSetup: Record "MM Membership Alteration Setup";var CardEntryNo: Integer): Boolean
-    var
-        MemberCard: Record "MM Member Card";
-    begin
-
-        MemberCard.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
-        if (ExternalMemberCardNo = '') then begin
-          MemberCard.SetFilter (Blocked, '=%1', false);
-          if (MemberCard.IsEmpty ()) then
-            exit (false);
-          MemberCard.FindLast();
-          ExternalMemberCardNo := MemberCard."External Card No.";
-        end;
-
-        MemberCard.SetFilter ("External Card No.", '=%1', ExternalMemberCardNo);
-        MemberCard.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
-
-        if (not MemberCard.FindFirst ()) then
-          exit (false);
-
-        CardEntryNo := MemberCard."Entry No.";
-
-        case AlterationSetup."Card Expired Action" of
-          AlterationSetup."Card Expired Action"::IGNORE :  exit (false);
-          AlterationSetup."Card Expired Action"::PREVENT : exit (true);
-          AlterationSetup."Card Expired Action"::UPDATE : exit (NewEndDate > MemberCard."Valid Until");
-          AlterationSetup."Card Expired Action"::NEW :    exit (NewEndDate > MemberCard."Valid Until");
-        end;
-
-        exit (false); // No need to extend card
-    end;
-
-    local procedure AllowExtendMemberCard(CardEntryNo: Integer;AlterationSetup: Record "MM Membership Alteration Setup";NewEndDate: Date;var ReasonText: Text): Boolean
-    var
-        MemberCard: Record "MM Member Card";
-        TmpReasonText: Text;
-    begin
-
-        TmpReasonText := '';
-        if (not MemberCard.Get (CardEntryNo)) then
-          TmpReasonText := StrSubstNo (MEMBERCARD_NOT_FOUND, StrSubstNo ('%1 %2', MemberCard.FieldCaption("Entry No."), CardEntryNo));
-
-        if (AlterationSetup."Card Expired Action" = AlterationSetup."Card Expired Action"::PREVENT) then
-          if (NewEndDate > MemberCard."Valid Until") then
-            TmpReasonText := StrSubstNo (PREVENT_CARD_EXTEND, MemberCard."External Card No.", NewEndDate);
-
-        if (TmpReasonText <> '') then
-          ReasonText := TmpReasonText;
-
-        exit (TmpReasonText = '');
-    end;
-
     local procedure ExtendMemberCard(FailWithError: Boolean;MembershipEntryNo: Integer;CardEntryNo: Integer;ExpiredCardOption: Integer;NewTimeFrameEndDate: Date;var MemberCardEntryNoOut: Integer;ResponseMessage: Text): Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
@@ -2269,7 +2264,6 @@ codeunit 6060127 "MM Membership Management"
         NewUntilDate: Date;
     begin
 
-        //-#300256 [300256]
         MemberCard.Get (CardEntryNo);
         Membership.Get (MembershipEntryNo);
         MembershipSetup.Get (Membership."Membership Code");
@@ -2278,17 +2272,11 @@ codeunit 6060127 "MM Membership Management"
           MembershipSetup."Card Expire Date Calculation"::NA : NewUntilDate := 0D;
           MembershipSetup."Card Expire Date Calculation"::DATEFORMULA :
             begin
-              // xx
-              //      IF (MemberCard."Valid Until" = 0D) THEN
-              //        MemberCard."Valid Until" := TODAY;
-              //      NewUntilDate := CALCDATE (MembershipSetup."Card Number Valid Until", MemberCard."Valid Until");
-
               if (MemberCard."Valid Until" <= Today) then
                 MemberCard."Valid Until" := CalcDate ('<-1D>', Today); // An expired card appears to have been valid until yesterday
 
               NewUntilDate := CalcDate (MembershipSetup."Card Number Valid Until",
                 CalcDate ('<+1D>', MemberCard."Valid Until")); // Card should be valid from day after current end date, or they will overlap
-              // xx
             end;
           MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED : NewUntilDate := NewTimeFrameEndDate;
         end;
@@ -2308,18 +2296,64 @@ codeunit 6060127 "MM Membership Management"
 
           AlterationSetup."Card Expired Action"::UPDATE :
             begin
+              //-MM1.42 [384394]
+              MemberCardEntryNoOut := CardEntryNo;
+              //+MM1.42 [384394]
               MemberCard."Valid Until" := NewUntilDate;
               exit (MemberCard.Modify ());
             end;
         end;
+    end;
 
-        // MemberInfoCapture."Valid Until" := NewEndDate;
-        // MemberEntryNo := GetMemberFromExtCardNo (ExternalMemberCardNo, TODAY, ResponseMessage);
+    local procedure CheckExtendMemberCards(FailWithError: Boolean;WithUpdate: Boolean;MembershipEntryNo: Integer;ExpiredCardOption: Integer;NewTimeFrameEndDate: Date;ExternalCardNo: Text[100];var MemberCardEntryNoOut: Integer;var ResponseMessage: Text): Boolean
+    var
+        MemberInfoCapture: Record "MM Member Info Capture";
+        AlterationSetup: Record "MM Membership Alteration Setup";
+        MemberCard: Record "MM Member Card";
+        Membership: Record "MM Membership";
+        MembershipSetup: Record "MM Membership Setup";
+        NewUntilDate: Date;
+        UpdateRequired: Boolean;
+        NewCardEntryNo: Integer;
+    begin
 
-        //TODO
-        // Setup to reuse current card, with new end date, IssueMemberCardWorker will create a new card if setup allows it.
-        //EXIT (IssueMemberCardWorker (FailWithError, MembershipEntryNo, MemberEntryNo, MemberInfoCapture, FALSE, MemberCardEntryNoOut, ResponseMessage, TRUE));
-        //+#300256 [300256]
+        //-MM1.42 [384394]
+        ResponseMessage := '';
+
+        MemberCard.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
+        MemberCard.SetFilter (Blocked, '=%1', false);
+        if (not MemberCard.FindSet ()) then
+          exit (true);
+
+        repeat
+
+          if (ExternalCardNo = '') then
+            ExternalCardNo := MemberCard."External Card No.";
+
+          UpdateRequired := (NewTimeFrameEndDate > MemberCard."Valid Until");
+          case ExpiredCardOption of
+            AlterationSetup."Card Expired Action"::IGNORE  : UpdateRequired := false;
+            AlterationSetup."Card Expired Action"::PREVENT : if (UpdateRequired) then ResponseMessage := StrSubstNo (PREVENT_CARD_EXTEND, MemberCard."External Card No.", NewTimeFrameEndDate);
+            AlterationSetup."Card Expired Action"::UPDATE  : ;
+            AlterationSetup."Card Expired Action"::NEW     : ;
+          end;
+
+          if (ResponseMessage <> '') then
+            ExitFalseOrWithError (FailWithError, ResponseMessage);
+
+          if ((WithUpdate) and (UpdateRequired)) then begin
+            if (not ExtendMemberCard (FailWithError, MembershipEntryNo, MemberCard."Entry No.", ExpiredCardOption, NewTimeFrameEndDate, NewCardEntryNo, ResponseMessage)) then
+              exit (false);
+
+            if (MemberCard."External Card No." = ExternalCardNo) then // The time entry will be tagged with responsible card entry no that requires printing
+              MemberCardEntryNoOut := NewCardEntryNo;
+
+          end;
+
+        until (MemberCard.Next () = 0);
+
+        exit (true);
+        //+MM1.42 [384394]
     end;
 
     local procedure PrefillMemberInfoCapture(var MemberInfoCapture: Record "MM Member Info Capture";Member: Record "MM Member";Membership: Record "MM Membership";ExternalMemberCardNo: Text[50];MembershipSalesItemNo: Code[20])
@@ -2350,6 +2384,7 @@ codeunit 6060127 "MM Membership Management"
     procedure AddMembershipLedgerEntry_NEW(MembershipEntryNo: Integer;DocumentDate: Date;MembershipSalesSetup: Record "MM Membership Sales Setup";MemberInfoCapture: Record "MM Member Info Capture") LedgerEntryNo: Integer
     var
         MembershipSetup: Record "MM Membership Setup";
+        MemberCard: Record "MM Member Card";
         ValidFromDate: Date;
         ValidUntilDate: Date;
     begin
@@ -2360,13 +2395,6 @@ codeunit 6060127 "MM Membership Management"
         if (DocumentDate = 0D) then
           DocumentDate :=  WorkDate;
 
-        //-MM1.17 [259671]
-        // IF (MembershipSalesSetup."Valid From Base" = MembershipSalesSetup."Valid From Base"::SALESDATE) THEN BEGIN
-        //  ValidFromDate := DocumentDate;
-        // END ELSE BEGIN
-        //  MembershipSalesSetup.TESTFIELD ("Valid From Date Calculation");
-        //  ValidFromDate := CALCDATE (MembershipSalesSetup."Valid From Date Calculation", DocumentDate);
-        // END;
         case MembershipSalesSetup."Valid From Base" of
           MembershipSalesSetup."Valid From Base"::PROMPT :
             ValidFromDate := MemberInfoCapture."Document Date";
@@ -2376,21 +2404,16 @@ codeunit 6060127 "MM Membership Management"
 
           MembershipSalesSetup."Valid From Base"::DATEFORMULA :
             begin
-              //-MM1.41 [371937]
-              //MembershipSalesSetup.TESTFIELD ("Valid From Date Calculation");
-              //ValidFromDate := CALCDATE (MembershipSalesSetup."Valid From Date Calculation", DocumentDate);
               ValidFromDate := DocumentDate;
               if (DocumentDate = WorkDate) then begin
                 MembershipSalesSetup.TestField ("Valid From Date Calculation");
                 ValidFromDate := CalcDate (MembershipSalesSetup."Valid From Date Calculation", DocumentDate);
               end;
-              //+MM1.41 [371937]
             end;
 
           MembershipSalesSetup."Valid From Base"::FIRST_USE :
             ValidFromDate := 0D;
         end;
-        //+MM1.17 [259671]
 
         if ((MembershipSetup.Perpetual) or (MembershipSalesSetup."Valid Until Calculation" = MembershipSalesSetup."Valid Until Calculation"::END_OF_TIME)) then begin
           if (ValidFromDate = 0D) then
@@ -2405,12 +2428,18 @@ codeunit 6060127 "MM Membership Management"
 
         MemberInfoCapture."Membership Code" := MembershipSalesSetup."Membership Code";
 
-        //-MM1.23 [257011]
         if (MemberInfoCapture."Information Context" = MemberInfoCapture."Information Context"::FOREIGN) then begin
           if (IsMembershipActive (MembershipEntryNo, Today, false)) then
             exit (0); //Hmm
         end;
-        //+MM1.23 [257011]
+
+        //-MM1.42 [384394]
+        if (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED) then begin
+          MemberCard.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
+          if (ValidUntilDate <> 0D) then
+            MemberCard.ModifyAll ("Valid Until", ValidUntilDate);
+        end;
+        //+MM1.42 [384394]
 
         exit (AddMembershipLedgerEntry (MembershipEntryNo, MemberInfoCapture, ValidFromDate, ValidUntilDate));
     end;
@@ -2439,15 +2468,9 @@ codeunit 6060127 "MM Membership Management"
           exit;
 
         if (Membership."Customer No." = '') then begin
-          //-NPR5.34 [279229]
-          //Membership."Customer No." := CreateCustomerFromTemplate (MembershipSetup."Customer Config. Template Code", Membership."External Membership No.");
           Membership."Customer No." :=
-            //-#319296 [319296]
-            //CreateCustomerFromTemplate (MembershipSetup."Customer Config. Template Code", MembershipSetup."Contact Config. Template Code", Membership."External Membership No.");
             CreateCustomerFromTemplate (Community."Customer No. Series", MembershipSetup."Customer Config. Template Code", MembershipSetup."Contact Config. Template Code", Membership."External Membership No.");
-            //+#319296 [319296]
 
-          //+NPR5.34 [279229]
           Membership.Modify ();
         end;
 
@@ -2460,23 +2483,6 @@ codeunit 6060127 "MM Membership Management"
           Customer.Modify (true);
         end;
         //Xx
-
-        //-MM1.26 [294868]
-        // MembershipRole.SETFILTER ("Membership Entry No.", '=%1', MembershipEntryNo);
-        // MembershipRole.SETFILTER ("Member Role", '=%1', MembershipRole."Member Role"::ADMIN);
-        // MembershipRole.SETFILTER (Blocked, '=%1', FALSE);
-
-        // IF (MembershipRole.ISEMPTY ()) THEN
-        //   EXIT;
-        //
-        // MembershipRole.FINDFIRST ();
-        // UpdateCustomerFromMember (MembershipEntryNo, MembershipRole."Member Entry No.");
-        // AdminMemberEntryNo := MembershipRole."Member Entry No.";
-        //
-        // MembershipRole.RESET();
-        // MembershipRole.SETFILTER ("Membership Entry No.", '=%1', MembershipEntryNo);
-        // MembershipRole.SETFILTER ("Member Entry No.", '<>%1', AdminMemberEntryNo);
-        // MembershipRole.SETFILTER ("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
 
         MembershipRole.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipRole.SetFilter ("Member Role", '=%1', MembershipRole."Member Role"::GUARDIAN);
@@ -2498,7 +2504,6 @@ codeunit 6060127 "MM Membership Management"
         MembershipRole.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipRole.SetFilter ("Member Entry No.", '<>%1', AdminMemberEntryNo);
         MembershipRole.SetFilter ("Member Role", '<>%1&<>%2', MembershipRole."Member Role"::ANONYMOUS, MembershipRole."Member Role"::GUARDIAN);
-        //+MM1.26 [294868]
 
         MembershipRole.SetFilter (Blocked, '=%1', false);
         if (MembershipRole.FindSet ()) then begin
@@ -2587,12 +2592,10 @@ codeunit 6060127 "MM Membership Management"
         MembershipRole.SetFilter (Blocked, '=%1', false);
         MemberMemberCount := MembershipRole.Count();
 
-        //-MM1.32 [313795]
         MembershipRole.SetFilter ("Membership Entry No.", '=%1', MembershipEntryno);
         MembershipRole.SetFilter ("Member Role", '=%1', MembershipRole."Member Role"::DEPENDENT);
         MembershipRole.SetFilter (Blocked, '=%1', false);
         MemberMemberCount += MembershipRole.Count();
-        //+MM1.32 [313795]
 
         MembershipRole.SetFilter ("Membership Entry No.", '=%1', MembershipEntryno);
         MembershipRole.SetFilter ("Member Role", '=%1', MembershipRole."Member Role"::ANONYMOUS);
@@ -2604,7 +2607,6 @@ codeunit 6060127 "MM Membership Management"
     procedure ApplyGracePeriodPreset(Preset: Option;var MembershipAlterationSetup: Record "MM Membership Alteration Setup")
     begin
 
-        //-MM1.41 [373297]
         with MembershipAlterationSetup do begin
           case Preset of
             "Grace Period Presets"::NA :
@@ -2629,11 +2631,154 @@ codeunit 6060127 "MM Membership Management"
               end;
           end;
         end;
-        //+MM1.41 [373297]
+    end;
+
+    procedure CreateMemberCommunicationDefaultSetup(MemberEntryNo: Integer)
+    var
+        MembershipRole: Record "MM Membership Role";
+        MemberCommunication: Record "MM Member Communication";
+        MemberCommunicationSetup: Record "MM Member Communication Setup";
+        Member: Record "MM Member";
+    begin
+
+        //-MM1.42 [382728]
+        if not (Member.Get (MemberEntryNo)) then
+          exit;
+
+        MembershipRole.SetFilter ("Member Entry No.", '=%1', MemberEntryNo);
+        if (not MembershipRole.FindSet ()) then
+          exit;
+
+        repeat
+
+          MemberCommunication.Init ();
+          MemberCommunication."Member Entry No." := MembershipRole."Member Entry No.";
+          MemberCommunication."Membership Entry No." := MembershipRole."Membership Entry No.";
+
+          MembershipRole.CalcFields ("Membership Code");
+          MemberCommunicationSetup.SetFilter ("Membership Code", '=%1', MembershipRole."Membership Code");
+          if (MemberCommunicationSetup.FindSet ()) then begin
+            repeat
+              MemberCommunication."Message Type" := MemberCommunicationSetup."Message Type";
+              MemberCommunication."Preferred Method"  := MemberCommunicationSetup."Preferred Method";
+
+              if (MemberCommunicationSetup."Preferred Method" = MemberCommunicationSetup."Preferred Method"::MEMBER) then begin
+                case Member."Notification Method" of
+                  Member."Notification Method"::EMAIL  : MemberCommunication."Preferred Method"  := MemberCommunicationSetup."Preferred Method"::EMAIL;
+                  Member."Notification Method"::SMS    : MemberCommunication."Preferred Method"  := MemberCommunicationSetup."Preferred Method"::SMS;
+                  else begin
+                    MemberCommunication."Preferred Method"  := MemberCommunication."Preferred Method"::MANUAL;
+                    MemberCommunication."Accepted Communication" := MemberCommunication."Accepted Communication"::"OPT-OUT";
+                  end;
+                end;
+              end;
+              MemberCommunication."Changed At" := CurrentDateTime ();
+
+              if (not MemberCommunication.Insert ()) then ;
+
+            until (MemberCommunicationSetup.Next () = 0);
+          end;
+
+        until (MembershipRole.Next () = 0);
+        //+MM1.42 [382728]
+    end;
+
+    procedure GetCommunicationMethod_Welcome(MemberEntryNo: Integer;MembershipEntryNo: Integer;var Method: Code[10];var Address: Text[200]): Boolean
+    var
+        MemberCommunication: Record "MM Member Communication";
+    begin
+
+        //-MM1.42 [382728]
+        exit (GetCommunicationMethodWorker (MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::WELCOME, Method, Address));
+        //+MM1.42 [382728]
+    end;
+
+    procedure GetCommunicationMethod_Renew(MemberEntryNo: Integer;MembershipEntryNo: Integer;var Method: Code[10];var Address: Text[200]): Boolean
+    var
+        MemberCommunication: Record "MM Member Communication";
+    begin
+
+        //-MM1.42 [382728]
+        exit (GetCommunicationMethodWorker (MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::RENEW, Method, Address));
+        //+MM1.42 [382728]
+    end;
+
+    procedure GetCommunicationMethod_MemberCard(MemberEntryNo: Integer;MembershipEntryNo: Integer;var Method: Code[10];var Address: Text[200]): Boolean
+    var
+        MemberCommunication: Record "MM Member Communication";
+    begin
+
+        //-MM1.42 [382728]
+        exit (GetCommunicationMethodWorker (MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::MEMBERCARD, Method, Address));
+        //+MM1.42 [382728]
+    end;
+
+    procedure GetCommunicationMethod_Ticket(MemberEntryNo: Integer;MembershipEntryNo: Integer;var Method: Code[10];var Address: Text[200]): Boolean
+    var
+        MemberCommunication: Record "MM Member Communication";
+    begin
+
+        //-MM1.42 [382728]
+        exit (GetCommunicationMethodWorker (MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::TICKETS, Method, Address));
+        //+MM1.42 [382728]
     end;
 
     local procedure "--internal"()
     begin
+    end;
+
+    local procedure GetCommunicationMethodWorker(MemberEntryNo: Integer;MembershipEntryNo: Integer;MessageType: Option;var Method: Code[10];var Address: Text[200]): Boolean
+    var
+        MemberCommunication: Record "MM Member Communication";
+        Member: Record "MM Member";
+        MembershipRole: Record "MM Membership Role";
+    begin
+
+        //-MM1.42 [382728]
+        Method := 'NA';
+        Address := '';
+
+        if (not Member.Get (MemberEntryNo)) then
+          exit (false);
+
+        case Member."Notification Method" of
+          Member."Notification Method"::EMAIL : Method := 'EMAIL';
+          Member."Notification Method"::SMS   : Method := 'SMS';
+          Member."Notification Method"::MANUAL: Method := 'MANUAL';
+          Member."Notification Method"::NONE  : exit (false); // Master kill switch
+        end;
+
+        if (MembershipEntryNo = 0) then begin
+          MembershipRole.SetFilter ("Member Entry No.", '=%1', MemberEntryNo);
+          MembershipRole.SetFilter (Blocked, '=%1', false);
+          if (MembershipRole.FindFirst ()) then
+            MembershipEntryNo := MembershipRole."Membership Entry No.";
+        end;
+
+        if (MemberCommunication.Get (MemberEntryNo, MembershipEntryNo, MessageType)) then begin
+          case MemberCommunication."Preferred Method" of
+            MemberCommunication."Preferred Method"::EMAIL        : Method := 'EMAIL';
+            MemberCommunication."Preferred Method"::WALLET_EMAIL : Method := 'W-EMAIL';  // code 10
+            MemberCommunication."Preferred Method"::SMS          : Method := 'SMS';
+            MemberCommunication."Preferred Method"::WALLET_SMS   : Method := 'W-SMS';
+            MemberCommunication."Preferred Method"::MANUAL       : Method := 'MANUAL';
+          end;
+
+          if (MemberCommunication."Accepted Communication" = MemberCommunication."Accepted Communication"::"OPT-OUT") then
+            Method := 'NA';
+        end;
+
+        case Method of
+          'EMAIL'  : Address := Member."E-Mail Address";
+          'W_EMAIL': Address := Member."E-Mail Address";
+          'SMS'    : Address := Member."Phone No.";
+          'W-SMS'  : Address := Member."Phone No.";
+          'MANUAL' : Address := '';
+          'NA'     : Address := '';
+        end;
+
+        exit (Address <> '');
+        //+MM1.42 [382728]
     end;
 
     local procedure TransferInfoCaptureAttributes(MemberInfoCaptureEntryNo: Integer;DestinationTableID: Integer;DestinationEntryNo: Integer)
@@ -2688,22 +2833,22 @@ codeunit 6060127 "MM Membership Management"
         MemberNotification: Codeunit "MM Member Notification";
     begin
 
-        //-MM1.29.02 [314131] Function moved to notification codeunit
         MemberNotification.AddMembershipRenewalNotification (MembershipLedgerEntry);
     end;
 
-    local procedure AddMemberCreateNotification(MembershipEntryNo: Integer;Member: Record "MM Member";MemberInfoCapture: Record "MM Member Info Capture")
+    local procedure AddMemberCreateNotification(MembershipEntryNo: Integer;MembershipSetup: Record "MM Membership Setup";Member: Record "MM Member";MemberInfoCapture: Record "MM Member Info Capture")
     var
         MemberNotification: Codeunit "MM Member Notification";
     begin
 
-        //-MM1.29.02 [314131] Function moved to notification codeunit
-        MemberNotification.AddMemberWelcomeNotification (MembershipEntryNo, Member."Entry No.");
+        //-MM1.42 [382728]
+        // MemberNotification.AddMemberWelcomeNotification (MembershipEntryNo, Member."Entry No.");
+        if (MembershipSetup."Create Welcome Notification") then
+          MemberNotification.AddMemberWelcomeNotification (MembershipEntryNo, Member."Entry No.");
+        //+MM1.42 [382728]
 
-        //-MM1.32 [318132]
         if (MemberInfoCapture."Member Card Type" in [MemberInfoCapture."Member Card Type"::CARD_PASSSERVER, MemberInfoCapture."Member Card Type"::PASSSERVER]) then
           MemberNotification.CreateWalletSendNotification (MembershipEntryNo, Member."Entry No.", 0);
-        //+MM1.32 [318132]
     end;
 
     local procedure ValidAlterationGracePeriod(MembershipAlterationSetup: Record "MM Membership Alteration Setup";MembershipEntry: Record "MM Membership Entry";ReferenceDate: Date): Boolean
@@ -2729,18 +2874,6 @@ codeunit 6060127 "MM Membership Management"
         LowerBoundDate := 0D;
         UpperBoundDate := DMY2Date (31, 12, 9999); //31129999D;
 
-
-        //-MM1.30 [317428]
-        // IF (FORMAT (MembershipAlterationSetup."Grace Period Before") <> '') THEN BEGIN
-        //  GraceDayCount := ABS ((GracePeriodDate - CALCDATE (MembershipAlterationSetup."Grace Period Before", GracePeriodDate)));
-        //  LowerBoundDate := GracePeriodDate - GraceDayCount;
-        // END;
-        //
-        // IF (FORMAT (MembershipAlterationSetup."Grace Period After") <> '') THEN BEGIN
-        //  GraceDayCount := ABS ((GracePeriodDate - CALCDATE (MembershipAlterationSetup."Grace Period After", GracePeriodDate)));
-        //  UpperBoundDate := GracePeriodDate + GraceDayCount;
-        // END;
-
         if (Format (MembershipAlterationSetup."Grace Period Before") <> '') then begin
           if (MembershipAlterationSetup."Grace Period Calculation" = MembershipAlterationSetup."Grace Period Calculation"::SIMPLE) then begin
             GraceDayCount := Abs ((GracePeriodDate - CalcDate (MembershipAlterationSetup."Grace Period Before", GracePeriodDate)));
@@ -2760,7 +2893,6 @@ codeunit 6060127 "MM Membership Management"
             UpperBoundDate := CalcDate (MembershipAlterationSetup."Grace Period After", GracePeriodDate);
           end;
         end;
-        //+MM1.30 [317428]
 
         InGracePeriod := ((LowerBoundDate <= ReferenceDate) and (ReferenceDate <= UpperBoundDate));
         exit (InGracePeriod);
@@ -2773,7 +2905,6 @@ codeunit 6060127 "MM Membership Management"
         MemberCount: Integer;
     begin
 
-        //-#300395 [300395] refactored for ReasontText
         Membership.Get (MembershipEntryNo);
 
         ReasonText := UPGRADE_TO_CODE_MISSING;
@@ -2782,11 +2913,6 @@ codeunit 6060127 "MM Membership Management"
 
         MembershipSetup.Get (ToMembershipCode);
         if (ToMembershipCode <> Membership."Membership Code") then begin
-
-          //-MM1.23 [293364]
-          //  IF (StartDate > TODAY) THEN
-          //    EXIT (ExitFalseOrWithError (WithConfirm, FUTUREDATE_NOT_SUPPORTED));
-          //+MM1.23 [293364]
 
           MemberCount := GetMembershipMemberCount (MembershipEntryNo);
           ReasonText := StrSubstNo (TO_MANY_MEMBERS, Membership."External Membership No.", MembershipSetup.Code, MembershipSetup."Membership Member Cardinality");
@@ -2808,7 +2934,6 @@ codeunit 6060127 "MM Membership Management"
         AnonymousMemberCount: Integer;
     begin
 
-        //-MM1.22 [287080]
         Membership.Get (MembershipEntryNo);
         MembershipSetup.Get (Membership."Membership Code");
 
@@ -2818,8 +2943,6 @@ codeunit 6060127 "MM Membership Management"
           exit (AdminMemberCount + MemberMemberCount);
 
         exit (AdminMemberCount + MemberMemberCount + AnonymousMemberCount);
-
-        //+MM1.22 [287080]
     end;
 
     local procedure GetMembershipMemberCountForAlteration(MembershipEntryNo: Integer;MembershipAlterationSetup: Record "MM Membership Alteration Setup") MemberCount: Integer
@@ -2831,7 +2954,6 @@ codeunit 6060127 "MM Membership Management"
         AnonymousMemberCount: Integer;
     begin
 
-        //-MM1.22 [287080]
         Membership.Get (MembershipEntryNo);
         MembershipSetup.Get (Membership."Membership Code");
 
@@ -2849,8 +2971,6 @@ codeunit 6060127 "MM Membership Management"
         end;
 
         exit (MemberCount);
-
-        //+MM1.22 [287080]
     end;
 
     local procedure ConflictingLedgerEntries(MembershipEntryNo: Integer;StartDate: Date;EndDate: Date;var StartEntryNo: Integer;var EndEntryNo: Integer) HaveConflict: Boolean
@@ -2872,7 +2992,6 @@ codeunit 6060127 "MM Membership Management"
 
         EntryNo := 0;
 
-        //-MM1.17 [261887]
         MembershipEntry.SetCurrentKey ("Membership Entry No.");
         MembershipEntry.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipEntry.SetFilter ("Valid From Date", '<=%1', DateToCheck);
@@ -2880,14 +2999,6 @@ codeunit 6060127 "MM Membership Management"
         MembershipEntry.SetFilter (Blocked, '=%1', false);
         if (not MembershipEntry.FindLast ()) then
           exit (false);
-
-        // MembershipEntry.SETCURRENTKEY ("Membership Entry No.");
-        // MembershipEntry.SETFILTER ("Membership Entry No.", '=%1', MembershipEntryNo);
-        // MembershipEntry.SETFILTER ("Valid From Date", '>=%1', DateToCheck);
-        // MembershipEntry.SETFILTER (Blocked, '=%1', FALSE);
-        // IF (NOT MembershipEntry.FINDFIRST ()) THEN
-        //  EXIT (FALSE);
-        //+MM1.17 [261887]
 
         EntryNo := MembershipEntry."Entry No.";
         exit (true);
@@ -2907,7 +3018,6 @@ codeunit 6060127 "MM Membership Management"
         if (Period_Start = Period_End) then
           exit (1);
 
-        //EXIT ((calcdate ('<+1D>', Period_Date) - Period_Start) / (calcdate ('<+1D>', Period_End) - Period_Start));
         exit ((Period_Date - Period_Start) / (Period_End - Period_Start));
     end;
 
@@ -2947,13 +3057,11 @@ codeunit 6060127 "MM Membership Management"
         MembershipLedgerEntry."Valid Until Date" := ValidUntilDate;
         MembershipLedgerEntry."Original Context" := MembershipLedgerEntry.Context;
 
-        //-MM1.17 [259671]
         if (ValidFromDate = 0D) and (MembershipLedgerEntry.Context = MembershipLedgerEntry.Context::NEW) then begin
           MembershipLedgerEntry."Valid From Date" := 0D;
           MembershipLedgerEntry."Valid Until Date" := 0D;
           MembershipLedgerEntry."Activate On First Use" := true;
         end;
-        //+MM1.17 [259671]
 
         MembershipLedgerEntry."Item No." := MemberInfoCapture."Item No.";
         MembershipLedgerEntry."Membership Code" := MemberInfoCapture."Membership Code";
@@ -2962,10 +3070,8 @@ codeunit 6060127 "MM Membership Management"
         MembershipLedgerEntry.Amount := MemberInfoCapture.Amount;
         MembershipLedgerEntry."Amount Incl VAT" := MemberInfoCapture."Amount Incl VAT";
 
-        //-MM1.29 [316141]
         if (Item.Get (MembershipLedgerEntry."Item No.")) then
           MembershipLedgerEntry."Unit Price (Base)" := Item."Unit Price";
-        //+MM1.29 [316141]
 
         MembershipLedgerEntry."Receipt No." := MemberInfoCapture."Receipt No.";
         MembershipLedgerEntry."Line No." := MemberInfoCapture."Line No.";
@@ -2975,14 +3081,11 @@ codeunit 6060127 "MM Membership Management"
         MembershipLedgerEntry."Document Line No." := MemberInfoCapture."Document Line No.";
         MembershipLedgerEntry."Import Entry Document ID" := MemberInfoCapture."Import Entry Document ID";
         MembershipLedgerEntry.Description := MemberInfoCapture.Description;
-        //-MM1.19 [270308]
         MembershipLedgerEntry."Member Card Entry No." := MemberInfoCapture."Card Entry No.";
-        //-MM1.19 [270308]
 
         MembershipLedgerEntry."Auto-Renew Entry No." := MemberInfoCapture."Auto-Renew Entry No.";
         MembershipLedgerEntry.Insert ();
 
-        //XX
         if (MembershipLedgerEntry.Context in [MembershipLedgerEntry.Context::UPGRADE, MembershipLedgerEntry.Context::RENEW]) then begin
           Membership.Get (MembershipEntryNo);
           if (Membership."Customer No." <> '') then begin
@@ -2998,20 +3101,11 @@ codeunit 6060127 "MM Membership Management"
             end;
           end;
         end;
-        //xx
 
-        //-MM1.22 [285403]
         OnAfterInsertMembershipEntry  (MembershipLedgerEntry);
-        //+MM1.22 [285403]
 
         if (not MembershipLedgerEntry."Activate On First Use") then
           AddMembershipRenewalNotification (MembershipLedgerEntry);
-
-        //-MM1.32 [318132]
-        // //-MM1.29 [314131]
-        // IF (MembershipSetup."Enable NP Pass Integration") THEN
-        //  MemberNotification.CreateWalletUpdateNotification (Membership."Entry No.");
-        // //+MM1.29 [314131]
 
         if ((MembershipSetup."Enable NP Pass Integration") and
             (MemberInfoCapture."Information Context" <>  MemberInfoCapture."Information Context"::FOREIGN)) then begin
@@ -3027,7 +3121,6 @@ codeunit 6060127 "MM Membership Management"
               MemberNotification.CreateUpdateWalletNotification (Membership."Entry No.", 0, 0);
           end;
         end;
-        //+MM1.32 [318132]
 
         exit (MembershipLedgerEntry."Entry No.");
     end;
@@ -3036,15 +3129,15 @@ codeunit 6060127 "MM Membership Management"
     var
         MembershipEntry: Record "MM Membership Entry";
         Membership: Record "MM Membership";
+        MemberCard: Record "MM Member Card";
+        MembershipSetup: Record "MM Membership Setup";
     begin
 
         Membership.Get (MembershipEntryNo);
 
-        //-MM1.17 [259671]
         MembershipEntry.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
         if (not MembershipEntry.FindFirst ()) then
           Error (NO_LEDGER_ENTRY, Membership."External Membership No.");
-          //EXIT; // only first entry can be activated on first use
 
         if (not MembershipEntry."Activate On First Use") then
           exit; // Allready activated
@@ -3054,13 +3147,18 @@ codeunit 6060127 "MM Membership Management"
         MembershipEntry."Activate On First Use" := false;
         MembershipEntry.Modify;
 
-        //-MM1.22 [285403]
+        //-MM1.42 [384394]
+        MembershipSetup.Get (Membership."Membership Code");
+        if (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED) then begin
+          MemberCard.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
+          MemberCard.ModifyAll ("Valid Until", MembershipEntry."Valid Until Date");
+        end;
+        //+MM1.42 [384394]
+
         OnAfterInsertMembershipEntry  (MembershipEntry);
-        //+MM1.22 [285403]
 
         AddMembershipRenewalNotification (MembershipEntry);
         Commit;
-        //+MM1.17 [259671]
     end;
 
     procedure MembershipNeedsActivation(MembershipEntryNo: Integer): Boolean
@@ -3068,13 +3166,11 @@ codeunit 6060127 "MM Membership Management"
         MembershipEntry: Record "MM Membership Entry";
     begin
 
-        //-MM1.17 [259671]
         MembershipEntry.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
         if (not MembershipEntry.FindFirst ()) then
           exit (true); // :)
 
         exit (MembershipEntry."Activate On First Use");
-        //+MM1.17 [259671]
     end;
 
     local procedure GetCommunityMembership(MembershipCode: Code[20];CreateWhenMissing: Boolean) MembershipEntryNo: Integer
@@ -3321,14 +3417,17 @@ codeunit 6060127 "MM Membership Management"
         end;
 
         Customer.Validate (Address, CopyStr (Member.Address, 1, MaxStrLen (Customer.Address)));
-        Customer.Validate (City, CopyStr (Member.City, 1, MaxStrLen (Customer.City)));
-        Customer.Validate ("Post Code", CopyStr (Member."Post Code Code", 1, MaxStrLen (Customer."Post Code")));
-        Customer.Validate ("Country/Region Code", CopyStr (Member."Country Code", 1, MaxStrLen (Customer."Country/Region Code")));
 
+        //** shifted order since BC clears city and postcode when country code is validated
         // the magento integration requires a country code, until "mandatory fields" have been implemented for member creation
         // this should remain.
+        Customer.Validate ("Country/Region Code", CopyStr (Member."Country Code", 1, MaxStrLen (Customer."Country/Region Code")));
         if (Customer."Country/Region Code" = '') then
           Customer.Validate ("Country/Region Code", 'DK');
+
+        Customer.Validate (City, CopyStr (Member.City, 1, MaxStrLen (Customer.City)));
+        Customer.Validate ("Post Code", CopyStr (Member."Post Code Code", 1, MaxStrLen (Customer."Post Code")));
+        //**
 
         Customer.Validate ("Phone No.", CopyStr (Member."Phone No.", 1, MaxStrLen (Customer."Phone No.")));
         Customer.Validate ("E-Mail", CopyStr (Member."E-Mail Address", 1, MaxStrLen (Customer."E-Mail")));
@@ -3411,19 +3510,23 @@ codeunit 6060127 "MM Membership Management"
         Contact.Validate (Surname, CopyStr (Member."Last Name", 1, MaxStrLen (Contact.Surname)));
 
         Contact.Validate (Address, CopyStr (Member.Address, 1, MaxStrLen (Contact.Address)));
-        Contact.Validate ("Post Code", CopyStr (Member."Post Code Code", 1, MaxStrLen (Contact."Post Code")));
-        Contact.Validate (City, CopyStr (Member.City, 1, MaxStrLen (Contact.City)));
 
+        //** shifted validation order
         if (Member."Country Code" <> '') then
           Contact.Validate ("Country/Region Code", CopyStr (Member."Country Code", 1, MaxStrLen (Contact."Country/Region Code")));
-
-        Contact.Validate ("Phone No.", CopyStr (Member."Phone No.", 1, MaxStrLen (Contact."Phone No.")));
-        Contact.Validate ("E-Mail", CopyStr (Member."E-Mail Address", 1, MaxStrLen (Contact."E-Mail")));
 
         // the magento integration requires a country code, until "mandatory fields" have been implemented for member creation
         // this should remain.
         if (Contact."Country/Region Code" = '') then
           Contact.Validate ("Country/Region Code", 'DK');
+
+        Contact.Validate ("Post Code", CopyStr (Member."Post Code Code", 1, MaxStrLen (Contact."Post Code")));
+        Contact.Validate (City, CopyStr (Member.City, 1, MaxStrLen (Contact.City)));
+        //**
+
+        Contact.Validate ("Phone No.", CopyStr (Member."Phone No.", 1, MaxStrLen (Contact."Phone No.")));
+        Contact.Validate ("E-Mail", CopyStr (Member."E-Mail Address", 1, MaxStrLen (Contact."E-Mail")));
+
 
         Contact."Magento Contact" := (not Member.Blocked) and (Member."E-Mail Address" <> '');
 
@@ -3611,13 +3714,27 @@ codeunit 6060127 "MM Membership Management"
         Member.Gender := MemberInfoCapture.Gender;
         Member.Birthday := MemberInfoCapture.Birthday;
         Member."E-Mail News Letter" := MemberInfoCapture."News Letter";
+
         Member."Notification Method" := MemberInfoCapture."Notification Method";
+        //-MM1.42 [381222]
+        if (MemberInfoCapture."Notification Method" = MemberInfoCapture."Notification Method"::DEFAULT) then begin
+          Member."Notification Method" := MemberInfoCapture."Notification Method"::EMAIL;
+          if ((Member."Phone No." <> '') and (Member."E-Mail Address" = '')) then
+            Member."Notification Method" := MemberInfoCapture."Notification Method"::SMS;
+        end;
+        //+MM1.42 [381222]
 
         MemberInfoCapture.CalcFields (Picture);
         if (MemberInfoCapture.Picture.HasValue()) then begin
           Member.Picture := MemberInfoCapture.Picture;
         end;
+
         Member."Display Name" := StrSubstNo ('%1 %2', Member."First Name", Member."Last Name");
+        //-MM1.42 [361664]
+        if (StrLen (Member."Middle Name") > 0) then
+          if (StrLen (Member."First Name") + StrLen (Member."Middle Name") + StrLen (Member."Last Name") + 2 <= MaxStrLen (Member."Display Name")) then
+            Member."Display Name" := StrSubstNo ('%1 %2 %3', Member."First Name", Member."Middle Name",  Member."Last Name");
+        //+MM1.42 [361664]
 
         OnAfterMemberFieldsAssignmentEvent (CurrentMember, Member);
 
@@ -3917,7 +4034,10 @@ codeunit 6060127 "MM Membership Management"
 
         if (MemberInfoCapture."External Card No." = '') then
           if (MembershipSetup."Card Number Scheme" = MembershipSetup."Card Number Scheme"::GENERATED) then
-            GenerateExtCardNoSimple (MembershipSetup.Code, MemberInfoCapture);
+            //-MM1.42 [374557]
+            // GenerateExtCardNoSimple (MembershipSetup.Code, MemberInfoCapture);
+            GenerateExtCardNoSimple (MembershipEntryNo, MembershipSetup.Code, MemberInfoCapture);
+            //+MM1.42 [374557]
 
         if (not AllowBlankNumber) and (MemberInfoCapture."External Card No." = '') then begin
           RaiseError (FailWithError, ReasonMessage, MEMBERCARD_BLANK, MEMBERCARD_BLANK_NO);
@@ -3993,9 +4113,10 @@ codeunit 6060127 "MM Membership Management"
         ExternalNo := NoSeriesManagement.GetNextNo (Community."External Member No. Series", Today, true);
     end;
 
-    local procedure GenerateExtCardNoSimple(MembershipCode: Code[20];var MemberInfoCapture: Record "MM Member Info Capture")
+    local procedure GenerateExtCardNoSimple(MembershipEntryNo: Integer;MembershipCode: Code[20];var MemberInfoCapture: Record "MM Member Info Capture")
     var
         MembershipSetup: Record "MM Membership Setup";
+        MembershipEntry: Record "MM Membership Entry";
         BaseNumberPadding: Code[100];
         PAN: Code[100];
         PanLength: Integer;
@@ -4041,6 +4162,17 @@ codeunit 6060127 "MM Membership Management"
         if (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::DATEFORMULA) then
           MemberInfoCapture."Valid Until" := CalcDate (MembershipSetup."Card Number Valid Until", Today);
         //+#300256 [300256]
+
+        //-MM1.42 [374557]
+        if (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED) then begin
+          MembershipEntry.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
+          MembershipEntry.SetFilter (Blocked, '=%1', false);
+          if (MembershipEntry.FindLast ()) then begin
+            if (not MembershipEntry."Activate On First Use") then
+              MemberInfoCapture."Valid Until" := MembershipEntry."Valid Until Date";
+          end;
+        end;
+        //+MM1.42 [374557]
     end;
 
     procedure GenerateExtCardNo(GeneratePattern: Text[30];ExternalMemberNo: Code[20];ExternalMembershipNo: Code[20];NumberSeries: Code[10]) ExtCardNo: Code[50]

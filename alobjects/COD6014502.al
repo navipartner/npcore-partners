@@ -8,6 +8,7 @@ codeunit 6014502 SMS
     // NPR5.38/MHA /20180105  CASE 301053 Added ConstValue to empty Text Constant ErrEmpty and deleted unused function SendSMSMultiple()
     // NPR5.40/JDH /20180320 CASE 308647 cleaned up code and variables
     // NPR5.51/THRO/20190710 CASE 360944 Added option to send sms to Nc Endpoint
+    // NPR5.53/ZESO/20200110 CASE 382779 Change in Credentials Old UserName : navipartner, Old password : n4vipartner
 
 
     trigger OnRun()
@@ -108,8 +109,12 @@ codeunit 6014502 SMS
                                             SMSMessage +
                                             '&to=' + PhoneNo +
                                             '&from=' + From +
-                                            '&username=navipartner' +
-                                            '&password=n4vipartner');
+                                            //-NPR5.53 [382779]
+                                            //'&username=navipartner' +
+                                            //'&password=n4vipartner');
+                                            '&username= O7LbM2B6' +
+                                            '&password=OujrSE78');
+                                            //+NPR5.53 [382779]
           HttpRequest.Timeout := 10000;
           HttpRequest.UseDefaultCredentials(true);
           HttpRequest.Method := 'POST';

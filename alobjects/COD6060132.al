@@ -7,6 +7,7 @@ codeunit 6060132 "MM Import Members"
     // MM1.25/TSA /20171214 CASE 298666 Added filter to business flow type
     // MM1.25/TSA /20180109 CASE 301612 Added import of loyalty points - **** Breaking Change for Field Layout ****
     // #xxx/TSA /20180316 CASE xxx Added iComm setup warning
+    // MM1.42/TSA /20191205 CASE 372557 Added SMS option
 
 
     trigger OnRun()
@@ -248,8 +249,9 @@ codeunit 6060132 "MM Import Members"
 
         GMemberInfo."E-Mail Address" := FldEmail;
         case LowerCase (FldNotificationMethod) of
-          'email' : GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::EMAIL;
+          'email'  : GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::EMAIL;
           'manual' : GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::MANUAL;
+          'sms'    : GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::SMS; //-+MM1.42 [372557]
           else
             GMemberInfo."Notification Method" := GMemberInfo."Notification Method"::NO_THANKYOU;
         end;

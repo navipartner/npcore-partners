@@ -1,7 +1,8 @@
 codeunit 6151165 "NpGp POS Session Mgt."
 {
     // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
-    // NPR5.52/MHA /20191016 CASE 371388 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
+    // NPR5.52/MHA /20191016  CASE 371388 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
+    // NPR5.53/MHA /20191120  CASE 378375 Added function OnAfterDebitSalePostEvent() to include Credit Sales
 
     TableNo = "Nc Task";
 
@@ -45,6 +46,41 @@ codeunit 6151165 "NpGp POS Session Mgt."
 
         if NpGpPOSSalesSetup."Sync POS Sales Immediately" then
           ScheduleTaskProcessing(NcTask);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6014407, 'OnAfterDebitSalePostEvent', '', true, true)]
+    local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "Retail Sales Doc. Mgt.";SalePOS: Record "Sale POS";SalesHeader: Record "Sales Header";Posted: Boolean;WriteInAuditRoll: Boolean)
+    var
+        POSUnit: Record "POS Unit";
+        NcTask: Record "Nc Task";
+        NPRetailSetup: Record "NP Retail Setup";
+        NpGpPOSSalesSetup: Record "NpGp POS Sales Setup";
+        POSEntry: Record "POS Entry";
+        NpGpPOSSalesInitMgt: Codeunit "NpGp POS Sales Init Mgt.";
+        TaskProcessorCode: Text;
+    begin
+        //-NPR5.53 [378375]
+        if not NPRetailSetup.Get then
+          exit;
+        if not NPRetailSetup."Advanced POS Entries Activated" then
+          exit;
+
+        if not POSUnit.Get(SalePOS."Register No.") then
+          exit;
+        if POSUnit."Global POS Sales Setup" = '' then
+          exit;
+        if not NpGpPOSSalesSetup.Get(POSUnit."Global POS Sales Setup") then
+          exit;
+        if not FindPosEntry(SalePOS,POSEntry) then
+          exit;
+
+        TaskProcessorCode := NpGpPOSSalesInitMgt.InitSyncSetup();
+        if not InsertNcTask(TaskProcessorCode,POSEntry,POSEntry."Document No.",NcTask) then
+          exit;
+
+        if NpGpPOSSalesSetup."Sync POS Sales Immediately" then
+          ScheduleTaskProcessing(NcTask);
+        //+NPR5.53 [378375]
     end;
 
     local procedure FindPosEntry(SalePOS: Record "Sale POS";var POSEntry: Record "POS Entry"): Boolean

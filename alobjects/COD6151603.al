@@ -1,6 +1,7 @@
 codeunit 6151603 "NpDc Non-POS Application Mgt."
 {
     // NPR5.51/MHA /20190724  CASE 343352 Object created
+    // NPR5.53/MHA /20190115  CASE 343352 Added VAT % from request
 
 
     trigger OnRun()
@@ -19,7 +20,6 @@ codeunit 6151603 "NpDc Non-POS Application Mgt."
           ScanCoupons(SalePOS,TempNpDcExtCouponBuffer);
 
           TransferPOSSalesLines(SalePOS,TempSaleLinePOS);
-
           Error('');
         end;
 
@@ -75,6 +75,7 @@ codeunit 6151603 "NpDc Non-POS Application Mgt."
     var
         Register: Record Register;
         UserSetup: Record "User Setup";
+        POSSale: Codeunit "POS Sale";
         SalesTicketNo: Code[20];
     begin
         if not Register.Get('-_-') then begin
@@ -119,6 +120,9 @@ codeunit 6151603 "NpDc Non-POS Application Mgt."
         SaleLinePOS.Type := SaleLinePOS.Type::Item;
         SaleLinePOS."No." := TempSaleLinePOS."No.";
         SaleLinePOS."Variant Code" := TempSaleLinePOS."Variant Code";
+        //-NPR5.53 [343352]
+        SaleLinePOS."VAT %" := TempSaleLinePOS."VAT %";
+        //+NPR5.53 [343352]
         SaleLinePOS.Description := TempSaleLinePOS.Description;
         SaleLinePOS."Description 2" := TempSaleLinePOS."Description 2";
         SaleLinePOS."Unit Price" := TempSaleLinePOS."Unit Price";
@@ -131,7 +135,9 @@ codeunit 6151603 "NpDc Non-POS Application Mgt."
           SaleLinePOS."Unit of Measure Code" := TempSaleLinePOS."Unit of Measure Code";
         SaleLinePOS."Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item,SaleLinePOS."Unit of Measure Code");
         SaleLinePOS."Quantity (Base)" := UOMMgt.CalcBaseQty(SaleLinePOS.Quantity,SaleLinePOS."Qty. per Unit of Measure");
-        SaleLinePOS.UpdateAmounts(SaleLinePOS);
+        //-NPR5.53 [343352]
+        //SaleLinePOS.UpdateAmounts(SaleLinePOS);
+        //+NPR5.53 [343352]
         SaleLinePOS.Insert;
     end;
 

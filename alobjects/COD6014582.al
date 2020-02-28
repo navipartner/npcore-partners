@@ -19,6 +19,7 @@ codeunit 6014582 "Print Method Mgt."
     // NPR5.30/MMV /20170209 CASE 261964 Updated google print function.
     // NPR5.32/MMV /20170313 CASE 253590 Added support for bluetooth print.
     // NPR5.51/MMV /20190801 CASE 360975 Invoke hardware connector when attempting to print raw outside the POS.
+    // NPR5.53/THRO/20200106 CASE 383562 Added function PrintViaPrintNodePdf
 
 
     procedure PrintBytesLocal(PrinterName: Text; PrintBytes: Text; TargetEncoding: Text)
@@ -105,6 +106,24 @@ codeunit 6014582 "Print Method Mgt."
         SmtpMail.CreateMessage('NaviPartner', 'noreply@navipartner.dk', PrinterName, 'Document Print', '', false);
         SmtpMail.AddAttachmentStream(Stream, 'Document.pdf');
         SmtpMail.Send();
+    end;
+
+    procedure PrintViaPrintNodePdf(PrinterID: Text;var PdfStream: DotNet npNetMemoryStream;DocumentDescription: Text)
+    var
+        PrintNodeAPIMgt: Codeunit "PrintNode API Mgt.";
+    begin
+        //-NPR5.53 [383562]
+        PrintNodeAPIMgt.SendPDFStream(PrinterID,PdfStream,DocumentDescription,'','');
+        //+NPR5.53 [383562]
+    end;
+
+    procedure PrintViaPrintNodeRaw(PrinterID: Text;PrintBytes: Text;TargetEncoding: Text)
+    var
+        PrintNodeAPIMgt: Codeunit "PrintNode API Mgt.";
+    begin
+        //-NPR5.53 [383562]
+        PrintNodeAPIMgt.SendRawText(PrinterID,PrintBytes,TargetEncoding,'','','');
+        //+NPR5.53 [383562]
     end;
 
     procedure PrintBytesViaClientAddin(PrinterName: Text; PrintBytes: Text; TargetEncoding: Text)

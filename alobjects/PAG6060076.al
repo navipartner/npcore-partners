@@ -4,6 +4,7 @@ page 6060076 "MM Membership Setup Card"
     // MM1.29/NPKNAV/20180524  CASE 313795 Transport MM1.29 - 24 May 2018
     // #334163/JDH /20181109 CASE 334163 Added Caption to Object
     // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
+    // MM1.42/TSA /20191105 CASE 375381 Added Auto-Renew setup fields
 
     Caption = 'Membership Setup Card';
     PageType = Card;
@@ -56,6 +57,12 @@ page 6060076 "MM Membership Setup Card"
                 {
                 }
                 field("Allow Membership Delete";"Allow Membership Delete")
+                {
+                }
+                field("Auto-Renew Model";"Auto-Renew Model")
+                {
+                }
+                field("Recurring Payment Code";"Recurring Payment Code")
                 {
                 }
             }
@@ -190,6 +197,14 @@ page 6060076 "MM Membership Setup Card"
 
     actions
     {
+        area(navigation)
+        {
+            action("Recurring Payment Setup")
+            {
+                Caption = 'Recurring Payment Setup';
+                RunObject = Page "MM Recurring Payment Setup";
+            }
+        }
     }
 }
 

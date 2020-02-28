@@ -1,6 +1,7 @@
 query 6014415 "Sales Stats - Item Grp Sales"
 {
     // NPR5.52/ZESO/20191010  Object created
+    // NPR5.53/JAKUBV/20200121  CASE 371446-01 Transport NPR5.53 - 21 January 2020
 
     Caption = 'Sales Stats - Item Grp Sales';
 
@@ -27,6 +28,9 @@ query 6014415 "Sales Stats - Item Grp Sales"
             {
             }
             filter(Filter_Dim_2_Code;"Global Dimension 2 Code")
+            {
+            }
+            filter(Filter_Vendor_No;"Vendor No.")
             {
             }
             column(Item_Group_No;"Item Group No.")

@@ -57,7 +57,7 @@ table 6014415 "Quantity Discount Line"
         }
         field(7; "Price Includes VAT"; Boolean)
         {
-            CalcFormula = Lookup (Item."Price Includes VAT" WHERE ("No." = FIELD ("Item No.")));
+            CalcFormula = Lookup (Item."Price Includes VAT" WHERE("No." = FIELD("Item No.")));
             Caption = 'Price Includes VAT';
             Editable = false;
             FieldClass = FlowField;
@@ -133,12 +133,12 @@ table 6014415 "Quantity Discount Line"
         if QuantityDiscountLine.FindSet then
             //+NPR5.31 [262904]
             repeat
-              if ("Unit Price" > QuantityDiscountLine."Unit Price") and (Quantity > QuantityDiscountLine.Quantity) then begin
-                  Message(Text1060000 +
-                          Text1060001 +
-                          Text1060002, QuantityDiscountLine."Item No.", QuantityDiscountLine.Quantity);
-                  exit;
-              end;
+                if ("Unit Price" > QuantityDiscountLine."Unit Price") and (Quantity > QuantityDiscountLine.Quantity) then begin
+                    Message(Text1060000 +
+                            Text1060001 +
+                            Text1060002, QuantityDiscountLine."Item No.", QuantityDiscountLine.Quantity);
+                    exit;
+                end;
             until QuantityDiscountLine.Next = 0;
 
 

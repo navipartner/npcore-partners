@@ -1,6 +1,7 @@
 query 6014411 "Sales Statistics - Item Qty"
 {
     // NPR5.52/ZESO/20191010  Object created
+    // NPR5.53/ZESO/20191211  CASE 371446 Added Vendor No filter
 
     Caption = 'Sales Statistics - Item Qty';
 
@@ -27,6 +28,9 @@ query 6014411 "Sales Statistics - Item Qty"
             {
             }
             filter(Filter_Dim_2_Code;"Global Dimension 2 Code")
+            {
+            }
+            filter(Filter_Vendor_No;"Vendor No.")
             {
             }
             column(Item_No;"Item No.")

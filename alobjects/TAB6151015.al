@@ -6,6 +6,7 @@ table 6151015 "NpRv Sale Line POS Voucher"
     // NPR5.50/MHA /20190426  CASE 353079 Added Option "Top-up" to field 30 "Type"
     // NPR5.50/MMV /20190527  CASE 356003 Added field 310,
     //                                    Added Option "Partner Issue Voucher" to field 30, for "delayed" partner voucher posting through same flow as normal.
+    // NPR5.53/MHA /20200103  CASE 384055 Updated Name 2 reference in UpdateContactInfo()
 
     Caption = 'Sale Line POS Retail Voucher';
     DrillDownPageID = "NpRv Sale Line POS Vouchers";
@@ -254,7 +255,9 @@ table 6151015 "NpRv Sale Line POS Voucher"
         if "Contact No." <> '' then begin
           Cont.Get("Contact No.");
           Name := Cont.Name;
-          "Name 2" := Cont.Name;
+          //-NPR5.53 [384055]
+          "Name 2" := Cont."Name 2";
+          //+NPR5.53 [384055]
           Address := Cont.Address;
           "Address 2" := Cont."Address 2";
           City := Cont.City;
@@ -269,7 +272,9 @@ table 6151015 "NpRv Sale Line POS Voucher"
         if "Customer No." <> '' then begin
           Cust.Get("Customer No.");
           Name := Cust.Name;
-          "Name 2" := Cust.Name;
+          //-NPR5.53 [384055]
+          "Name 2" := Cust."Name 2";
+          //+NPR5.53 [384055]
           Address := Cust.Address;
           "Address 2" := Cust."Address 2";
           City := Cust.City;

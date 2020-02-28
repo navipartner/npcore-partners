@@ -31,6 +31,7 @@ codeunit 6014553 "Touch - Payment Line POS"
     // NPR5.46/MMV /20181002 CASE 290734 EFT Framework refactoring
     // NPR5.47/JDH /20181030 CASE 333988 Removed reference to Object MobilePOSAPI - it was deleted in previous version
     // NPR5.48/JDH /20181106 CASE 334584 Function GetPaymentLines. Renamed Parameter from Grid to DGrid. Grid is a reserved word in Ext V2
+    // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
 
 
     var
@@ -66,6 +67,8 @@ codeunit 6014553 "Touch - Payment Line POS"
         Register: Record Register;
         PaymentType1: Record "Payment Type POS";
         Txt001: Label 'You have to set a return payment type on the register';
+        POSUnit: Record "POS Unit";
+        POSSetup: Codeunit "POS Setup";
         DiscountRounding: Decimal;
     begin
         //UdregnSaldo
@@ -90,6 +93,10 @@ codeunit 6014553 "Touch - Payment Line POS"
 
             AmountGlobal := BalanceGlobal;
             Register.Get("Register No.");
+          //-NPR5.53 [371955]
+          POSUnit.Get("Register No.");
+          POSSetup.SetPOSUnit(POSUnit);
+          //+NPR5.53 [371955]
 
             if not TouchScreenFunctions.GetPaymentType(PaymentType1, Register, Register."Return Payment Type") then
                 Error(Txt001);
@@ -114,17 +121,25 @@ codeunit 6014553 "Touch - Payment Line POS"
 
             if BalanceGlobal < 0 then
                 if RetailSetupGlobal.Get then
-                    if (Register.Rounding <> '') and (RetailSetupGlobal."Amount Rounding Precision" > 0) then begin
+              //IF (Register.Rounding <> '') AND (RetailSetupGlobal."Amount Rounding Precision" > 0) THEN BEGIN  //NPR5.53 [371955]-revoked
+              if (POSSetup.RoundingAccount(false) <> '') and (POSSetup.AmountRoundingPrecision > 0) then begin  //NPR5.53 [371955]
                         Decimal := Abs(BalanceGlobal) - Round(Abs(BalanceGlobal), 1, '<');
                         Counter := 0;
-                        ReturnRoundingAmount := Counter * RetailSetupGlobal."Amount Rounding Precision" - Decimal;
+                //ReturnRoundingAmount := Counter * RetailSetupGlobal."Amount Rounding Precision" - Decimal;  //NPR5.53 [371955]-revoked
+                ReturnRoundingAmount := Counter * POSSetup.AmountRoundingPrecision - Decimal;  //NPR5.53 [371955]
                         repeat
                             Counter := Counter + 1;
-                            if Abs(Counter * RetailSetupGlobal."Amount Rounding Precision" - Decimal) <= Abs(ReturnRoundingAmount) then
-                                ReturnRoundingAmount := Counter * RetailSetupGlobal."Amount Rounding Precision" - Decimal;
-                        until Counter * RetailSetupGlobal."Amount Rounding Precision" >= 1;
+                //-NPR5.53 [371955]-revoked
+                //  IF ABS(Counter * RetailSetupGlobal."Amount Rounding Precision" - Decimal) <= ABS(ReturnRoundingAmount) THEN
+                //    ReturnRoundingAmount := Counter * RetailSetupGlobal."Amount Rounding Precision" - Decimal;
+                //UNTIL Counter * RetailSetupGlobal."Amount Rounding Precision" >= 1;
+                //+NPR5.53 [371955]-revoked
+                //-NPR5.53 [371955]
+                  if Abs(Counter * POSSetup.AmountRoundingPrecision - Decimal) <= Abs(ReturnRoundingAmount) then
+                    ReturnRoundingAmount := Counter * POSSetup.AmountRoundingPrecision - Decimal;
+                until Counter * POSSetup.AmountRoundingPrecision >= 1;
+                //+NPR5.53 [371955]
                     end;
-
 
             SaleLinePOS.CalcSums(SaleLinePOS.Amount);
             AmountExclVAT := SaleLinePOS.Amount;

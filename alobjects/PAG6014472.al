@@ -24,11 +24,12 @@ page 6014472 "Retail Journal Line"
     // NPR5.49/TJ  /20190307 CASE 345733 New control Exchange Label
     // NPR5.50/ALST/20190408 CASE 350435 page update added
     // NPR5.52/YAHA/20190609 CASE 367384 Field Re positioning
+    // NPR5.53/TJ  /20191119 CASE 375557 New function SetSkipConfirm
+    // NPR5.53/MHA /20191121 CASE 374290 Moved filter fields to Main Page
 
     AutoSplitKey = true;
-    Caption = 'Label Printing Subform';
+    Caption = 'Lines';
     DelayedInsert = true;
-    MultipleNewLines = false;
     PageType = ListPart;
     SourceTable = "Retail Journal Line";
     SourceTableView = SORTING ("No.", "Line No.");
@@ -37,164 +38,34 @@ page 6014472 "Retail Journal Line"
     {
         area(content)
         {
-            group(Control6014453)
-            {
-                ShowCaption = false;
-                grid(Control6014452)
-                {
-                    GridLayout = Columns;
-                    ShowCaption = false;
-                    group("Vendor No.")
-                    {
-                        Caption = 'Vendor No.';
-                        //The GridLayout property is only supported on controls of type Grid
-                        //GridLayout = Rows;
-                        field("Vendor.""No."""; Vendor."No.")
-                        {
-                            ShowCaption = false;
-
-                            trigger OnLookup(var Text: Text): Boolean
-                            begin
-                                if PAGE.RunModal(PAGE::"Vendor List", Vendor) = ACTION::LookupOK then begin
-                                    SetRange("Vendor No.", Vendor."No.");
-                                end;
-                                CurrPage.Update(false);
-                            end;
-
-                            trigger OnValidate()
-                            begin
-                                if Vendor."No." <> '' then begin
-                                    Vendor.Get(Vendor."No.");
-                                    SetRange("Vendor No.", Vendor."No.");
-                                end else begin
-                                    Clear(Vendor);
-                                    SetRange("Vendor No.");
-                                end;
-                                VendorNoOnAfterValidate;
-                            end;
-                        }
-                    }
-                    group("Item Group")
-                    {
-                        Caption = 'Item Group';
-                        field("Itemgroup.""No."""; Itemgroup."No.")
-                        {
-                            Caption = 'Item Group';
-                            ShowCaption = false;
-
-                            trigger OnLookup(var Text: Text): Boolean
-                            begin
-                                if PAGE.RunModal(PAGE::"Item Group Tree", Itemgroup) = ACTION::LookupOK then begin
-                                    SetRange("Item group", Itemgroup."No.");
-                                end;
-                                CurrPage.Update(false);
-                            end;
-
-                            trigger OnValidate()
-                            begin
-                                if Itemgroup."No." <> '' then begin
-                                    Itemgroup.Get(Itemgroup."No.");
-                                    SetRange("Item group", Itemgroup."No.");
-                                end else begin
-                                    Clear(Itemgroup);
-                                    SetRange("Item group");
-                                end;
-                                ItemgroupNoOnAfterValidate;
-                            end;
-                        }
-                    }
-                    group("Unknown Item No.")
-                    {
-                        Caption = 'Unknown Item No.';
-                        field(ShowUnknown; ShowUnknown)
-                        {
-                            Caption = 'Unknown Item No.';
-                            OptionCaption = 'All,Only existing items,Only unknown items';
-                            ShowCaption = false;
-
-                            trigger OnValidate()
-                            begin
-                                case ShowUnknown of
-                                    ShowUnknown::All:
-                                        SetRange("Item No.");
-                                    ShowUnknown::"Only existing items":
-                                        SetFilter("Item No.", '<>%1', '');
-                                    ShowUnknown::"Only unknown items":
-                                        SetFilter("Item No.", '=%1', '');
-                                end;
-                                ShowUnknownOnAfterValidate;
-                            end;
-                        }
-                    }
-                    group("New Item")
-                    {
-                        Caption = 'New Item';
-                        field(ShowNew; ShowNew)
-                        {
-                            Caption = 'New Item';
-                            OptionCaption = 'All,Only existing items,Only new items';
-                            ShowCaption = false;
-
-                            trigger OnValidate()
-                            begin
-                                case ShowNew of
-                                    ShowNew::All:
-                                        SetRange("New Item");
-                                    ShowNew::"Only existing items":
-                                        SetRange("New Item", false);
-                                    ShowNew::"Only new items":
-                                        SetRange("New Item", true);
-                                end;
-                                ShowNewOnAfterValidate;
-                            end;
-                        }
-                    }
-                    group("Inventory Status")
-                    {
-                        Caption = 'Inventory Status';
-                        field(ShowInventory; ShowInventory)
-                        {
-                            Caption = 'Inventory Status';
-                            OptionCaption = 'All,In stock,Not in stock';
-                            ShowCaption = false;
-
-                            trigger OnValidate()
-                            begin
-                                case ShowInventory of
-                                    ShowInventory::All:
-                                        SetRange(Inventory);
-                                    ShowInventory::"In stock":
-                                        SetFilter(Inventory, '>%1', 0);
-                                    ShowInventory::"Not in stock":
-                                        SetFilter(Inventory, '<=%1', 0);
-                                end;
-                                if Find('-') then;
-                                ShowInventoryOnAfterValidate;
-                            end;
-                        }
-                    }
-                }
-            }
-            group(Control6014440)
-            {
-                ShowCaption = false;
-            }
             repeater(Control6014441)
             {
                 ShowCaption = false;
-                field("Calculation Date"; "Calculation Date")
+                field(ItemNo;ItemNo)
                 {
-                }
-                field("Item No."; "Item No.")
-                {
+                    Caption = 'Item No.';
                     Lookup = true;
+                    TableRelation = Item;
+
+                    trigger OnValidate()
+                    begin
+                        //-NPR5.53 [374290]
+                        Validate("Item No.",ItemNo);
+                        Clear(Item);
+                        if Item.Get(ItemNo) then;
+                        //+NPR5.53 [374290]
+                    end;
                 }
-                field("Quantity to Print"; "Quantity to Print")
+                field("Calculation Date";"Calculation Date")
                 {
                 }
-                field(Print; Print)
+                field("Quantity to Print";"Quantity to Print")
+                {
+                }
+                field(Print;Print)
                 {
                     Caption = 'Print';
+                    Visible = (NOT IsWebClient);
 
                     trigger OnValidate()
                     var
@@ -307,23 +178,13 @@ page 6014472 "Retail Journal Line"
                 {
                     Visible = false;
                 }
-                field(Control6014407; "Vendor No.")
+                field("Vendor No.";"Vendor No.")
                 {
-                    ShowCaption = false;
                     Visible = false;
                 }
                 field("Vendor Name"; "Vendor Name")
                 {
                     Editable = false;
-
-                    trigger OnLookup(var Text: Text): Boolean
-                    begin
-                        if PAGE.RunModal(PAGE::"Vendor List", Vendor) = ACTION::LookupOK then begin
-                            "Vendor No." := Vendor."No.";
-                            vendorName := Vendor.Name;
-                            Modify(true);
-                        end;
-                    end;
                 }
                 field("Net Change"; "Net Change")
                 {
@@ -358,15 +219,14 @@ page 6014472 "Retail Journal Line"
 
     trigger OnAfterGetRecord()
     var
+        Vendor: Record Vendor;
         RecRef: RecordRef;
     begin
+        //-NPR5.53 [374290]
+        ItemNo := "Item No.";
+        //+NPR5.53 [374290]
         if not Item.Get("Item No.") then
-            Item.Init;
-
-        vendorName := '';
-        if Vendor.Get("Vendor No.") then
-            vendorName := Vendor.Name;
-        CalcFields(Inventory);
+          Item.Init;
         calcProfit;
 
         RecRef.GetTable(Rec);
@@ -380,29 +240,39 @@ page 6014472 "Retail Journal Line"
         RecRef.GetTable(Rec);
         if LabelLibrary.SelectionContains(RecRef) then
             LabelLibrary.ToggleLine(RecRef);
+
+        ItemNo := '';
+        Clear(Item);
+        //+NPR5.53 [374290]
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
+        //-NPR5.53 [374290]
+        ItemNo := '';
+        Clear(Item);
+        //+NPR5.53 [374290]
         Print := false;
         //-NPR5.46 [294354]
         SetupNewLine(xRec);
         //+NPR5.46 [294354]
     end;
 
+    trigger OnOpenPage()
+    begin
+        //-NPR5.53 [374290]
+        IsWebClient := not (CurrentClientType in [CLIENTTYPE::Windows, CLIENTTYPE::Desktop]);
+        //+NPR5.53 [374290]
+    end;
+
     var
         Item: Record Item;
-        Utility: Codeunit Utility;
-        Vendor: Record Vendor;
-        Itemgroup: Record "Item Group";
-        ShowUnknown: Option All,"Only existing items","Only unknown items";
-        ShowNew: Option All,"Only existing items","Only new items";
-        ShowInventory: Option All,"In stock","Not in stock";
-        ShowAvance: Option Alle,Positiv,Negativ;
-        vendorName: Text[50];
         Print: Boolean;
         LabelLibrary: Codeunit "Label Library";
         Caption_DeletePrintedLines: Label 'Delete printed lines?';
+        SkipConfirm: Boolean;
+        IsWebClient: Boolean;
+        ItemNo: Text;
 
     procedure DeleteLines()
     begin
@@ -410,6 +280,8 @@ page 6014472 "Retail Journal Line"
     end;
 
     procedure RoundIt(dec1: Decimal): Decimal
+    var
+        Utility: Codeunit Utility;
     begin
         exit(Utility.FormatDec2Dec(dec1, 2));
     end;
@@ -438,36 +310,6 @@ page 6014472 "Retail Journal Line"
         CurrPage.Update(false);
     end;
 
-    local procedure VendorNoOnAfterValidate()
-    begin
-        CurrPage.Update(false);
-    end;
-
-    local procedure ItemgroupNoOnAfterValidate()
-    begin
-        CurrPage.Update(false);
-    end;
-
-    local procedure ShowUnknownOnAfterValidate()
-    begin
-        CurrPage.Update(false);
-    end;
-
-    local procedure ShowNewOnAfterValidate()
-    begin
-        CurrPage.Update(false);
-    end;
-
-    local procedure ShowInventoryOnAfterValidate()
-    begin
-        CurrPage.Update(false);
-    end;
-
-    local procedure ShowAvanceOnAfterValidate()
-    begin
-        CurrPage.Update(false);
-    end;
-
     procedure InvertSelection()
     var
         RecRef: RecordRef;
@@ -480,10 +322,28 @@ page 6014472 "Retail Journal Line"
     procedure PrintSelection(ReportType: Integer)
     var
         RetailJnlLine: Record "Retail Journal Line";
+        TempRetailJnlLine: Record "Retail Journal Line" temporary;
         RecRef: RecordRef;
     begin
+        //-NPR5.53 [374290]
+        if IsWebClient then begin
+          CurrPage.SetSelectionFilter(RetailJnlLine);
+          if RetailJnlLine.FindSet then
+            repeat
+              TempRetailJnlLine.Init;
+              TempRetailJnlLine := RetailJnlLine;
+              TempRetailJnlLine.Insert;
+            until RetailJnlLine.Next = 0;
+          LabelLibrary.SetSelectionBuffer(TempRetailJnlLine);
+        end;
+        //+NPR5.53 [374290]
+
         LabelLibrary.PrintSelection(ReportType);
 
+        //-NPR5.53 [375557]
+        if SkipConfirm then
+          exit;
+        //+NPR5.53 [375557]
         //-NPR5.34 [282048]
         if Confirm(Caption_DeletePrintedLines) then begin
             RetailJnlLine.SetRange("No.", "No.");
@@ -496,6 +356,70 @@ page 6014472 "Retail Journal Line"
                 until RetailJnlLine.Next = 0;
         end;
         //+NPR5.34 [282048]
+    end;
+
+    procedure SetSkipConfirm(SkipConfirmHere: Boolean)
+    begin
+        //-NPR5.53 [375557]
+        SkipConfirm := SkipConfirmHere;
+        //+NPR5.53 [375557]
+    end;
+
+    procedure SetLineFilters(VendorFilter: Text;ItemGroupFilter: Text;ShowUnknown: Option All,"Only existing items","Only unknown items";ShowNew: Option All,"Only existing items","Only new items";ShowInventory: Option All,"In stock","Not in stock")
+    begin
+        //-NPR5.53 [374290]
+        FilterGroup(40);
+        SetFilter("Vendor No.",VendorFilter);
+        SetFilter("Item group",ItemGroupFilter);
+
+        case ShowUnknown of
+          ShowUnknown::All:
+            begin
+              SetRange("Item No.");
+            end;
+          ShowUnknown::"Only existing items":
+            begin
+              SetFilter("Item No.",'<>%1','');
+            end;
+          ShowUnknown::"Only unknown items":
+            begin
+              SetFilter("Item No.",'=%1','');
+            end;
+        end;
+
+        case ShowNew of
+          ShowNew::All:
+            begin
+              SetRange("New Item");
+            end;
+          ShowNew::"Only existing items":
+            begin
+              SetRange("New Item",false);
+            end;
+          ShowNew::"Only new items":
+            begin
+              SetRange("New Item",true);
+            end;
+        end;
+
+        case ShowInventory of
+          ShowInventory::All:
+            begin
+              SetRange(Inventory);
+            end;
+          ShowInventory::"In stock":
+            begin
+              SetFilter(Inventory,'>%1',0);
+            end;
+          ShowInventory::"Not in stock":
+            begin
+              SetFilter(Inventory,'<=%1',0);
+            end;
+        end;
+
+        FilterGroup(0);
+        CurrPage.Update(false);
+        //+NPR5.53 [374290]
     end;
 }
 

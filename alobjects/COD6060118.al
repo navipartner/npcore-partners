@@ -20,6 +20,7 @@ codeunit 6060118 "TM Admission Sch. Management"
     // TM1.28/TSA /20180221 CASE 306039 Added "Visibility On Web" field
     // #308299/TSA /20180315 CASE 308299 I18 hardcoded date
     // TM1.37/TSA /20180905 CASE 327324 Added fields for better control of arrival window
+    // TM1.45/TSA /20191120 CASE 378212 Added the sales cut-off date
 
 
     trigger OnRun()
@@ -345,6 +346,29 @@ codeunit 6060118 "TM Admission Sch. Management"
           "Event Arrival From Time" := AdmissionScheduleLines."Event Arrival From Time";
           "Event Arrival Until Time" := AdmissionScheduleLines."Event Arrival Until Time";
            //+TM1.37 [327324]
+
+          //-TM1.45 [378212]
+          if (Format (AdmissionScheduleLines."Sales From Date (Rel.)") <> '') then
+            "Sales From Date" := CalcDate (AdmissionScheduleLines."Sales From Date (Rel.)", "Admission Start Date");
+
+          "Sales From Time" := AdmissionScheduleLines."Sales From Time";
+          if (("Sales From Time" <> 0T) and ("Sales From Date" = 0D)) then
+            "Sales From Date" := "Admission Start Date";
+
+          if (Format (AdmissionScheduleLines."Sales Until Date (Rel.)") <> '') then
+            "Sales Until Date" := CalcDate (AdmissionScheduleLines."Sales Until Date (Rel.)", "Admission End Date");
+
+          "Sales Until Time" := AdmissionScheduleLines."Sales Until Time";
+          if (("Sales Until Time" <> 0T) and ("Sales Until Date" = 0D)) then
+            "Sales Until Date" := "Admission End Date";
+
+          if (("Sales Until Time" = 0T) and ("Sales Until Date" = "Admission End Date")) then
+            "Sales Until Time" := "Admission End Time";
+
+          if (("Sales From Date" = "Admission Start Date") and ("Sales From Time" > "Admission End Time")) then
+            "Sales From Time" := "Admission Start Time";
+
+          //+TM1.45 [378212]
 
           "Max Capacity Per Sch. Entry" := AdmissionScheduleLines."Max Capacity Per Sch. Entry";
 

@@ -14,6 +14,8 @@ table 6060119 "TM Admission Schedule Lines"
     // TM1.37/TSA /20180905 CASE 327324 Added fields for better control of arrival window
     // TM1.41/TSA /20190503 CASE 353981 Dynamic Pricing
     // TM1.43/TSA /20190903 CASE 357359 Added option to Capacity Control (SEATING)
+    // TM1.45/TSA /20191120 CASE 378212 Added Sales cut-off dates, inheritence of values from schedule
+    // TM1.45/TSA /20200116 CASE 385922 Added Concurrency Code lookup field
 
     Caption = 'Admission Schedule Lines';
 
@@ -120,6 +122,11 @@ table 6060119 "TM Admission Schedule Lines"
             Caption = 'Seating Template Code';
             TableRelation = "TM Seating Setup";
         }
+        field(75;"Concurrency Code";Code[20])
+        {
+            Caption = 'Concurrency Code';
+            TableRelation = "TM Concurrent Admission Setup";
+        }
         field(80;"Pricing Option";Option)
         {
             Caption = 'Pricing Option';
@@ -157,6 +164,22 @@ table 6060119 "TM Admission Schedule Lines"
         field(151;"Event Arrival Until Time";Time)
         {
             Caption = 'Event Arrival Until Time';
+        }
+        field(160;"Sales From Date (Rel.)";DateFormula)
+        {
+            Caption = 'Sales From Date (Rel.)';
+        }
+        field(162;"Sales From Time";Time)
+        {
+            Caption = 'Sales From Time';
+        }
+        field(163;"Sales Until Date (Rel.)";DateFormula)
+        {
+            Caption = 'Sales Until Date (Rel.)';
+        }
+        field(165;"Sales Until Time";Time)
+        {
+            Caption = 'Sales Until Time';
         }
         field(200;"Scheduled Start Time";Time)
         {
@@ -297,6 +320,13 @@ table 6060119 "TM Admission Schedule Lines"
         "Event Arrival From Time" := AdmissionSchedule."Event Arrival From Time";
         "Event Arrival Until Time" := AdmissionSchedule."Event Arrival Until Time";
         //-TM1.37 [327324]
+
+        //-TM1.45 [378212]
+        "Sales From Date (Rel.)" := AdmissionSchedule."Sales From Date (Rel.)";
+        "Sales From Time" := AdmissionSchedule."Sales From Time";
+        "Sales Until Date (Rel.)" := AdmissionSchedule."Sales Until Date (Rel.)";
+        "Sales Until Time" := AdmissionSchedule."Sales Until Time";
+        //+TM1.45 [378212]
     end;
 
     local procedure IfAllowOverride()

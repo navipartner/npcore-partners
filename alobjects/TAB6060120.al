@@ -14,6 +14,8 @@ table 6060120 "TM Admission"
     // TM1.28/TSA /20180219 CASE 305707 Added Ticket Base Calendar functionality
     // TM1.38/TSA /20181012 CASE 332109 Added eTicket
     // TM1.43/TSA /20190903 CASE 357359 Added option to Capacity Control (SEATING)
+    // TM1.45/TSA /20191101 CASE 374620 Added "Stakeholder (E-Mail/Phone No.)"
+    // TM1.45/TSA /20191203 CASE 380754 Added Waiting List Setup Code
 
     Caption = 'Admission';
     LookupPageID = "TM Ticket Admissions";
@@ -109,6 +111,15 @@ table 6060120 "TM Admission"
         field(61;"POS Schedule Selection Date F.";DateFormula)
         {
             Caption = 'POS Admission Schedule Entry Selection Date Filter';
+        }
+        field(70;"Stakeholder (E-Mail/Phone No.)";Text[40])
+        {
+            Caption = 'Stakeholder (E-Mail/Phone No.)';
+        }
+        field(80;"Waiting List Setup Code";Code[20])
+        {
+            Caption = 'Waiting List Setup Code';
+            TableRelation = "TM Waiting List Setup";
         }
         field(100;"Admission Base Calendar Code";Code[10])
         {

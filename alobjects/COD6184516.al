@@ -5,6 +5,8 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
     // NPR5.51/MMV /20190626 CASE 359385 Removed gift card balance handling (Is now only supported via explicit action).
     //                                   Added gift card load support.
     // NPR5.51/MMV /20190718 CASE 331463 Match card prefix again after result if it switched during trx. (This final match is too late for any surcharge).
+    // NPR5.53/MMV /20191219 CASE 383259 Corrections to #331463
+    // NPR5.53/MMV /20200113 CASE 385078 Send cashback value to flexiiterm
 
 
     procedure SendRequest(EFTTransactionRequest: Record "EFT Transaction Request")
@@ -48,6 +50,9 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         State.UseFee := EFTFlexiitermIntegration.GetSurchargeStatus(EFTSetup);
         State.IsBarcode := false;
         State.CardSwipeActivatesTerminal := true;
+        //-NPR5.53 [385078]
+        State.Cashback := EFTTransactionRequest."Cashback Amount";
+        //+NPR5.53 [385078]
 
         GatewayRequest := GatewayRequest.PaymentGatewayProcessRequest();
         GatewayRequest.Path := EFTFlexiitermIntegration.GetFolderPath(EFTSetup);
@@ -64,19 +69,29 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         CreditCardHelper: Codeunit "Credit Card Protocol Helper";
         PaymentTypePOS: Record "Payment Type POS";
         SalePOS: Record "Sale POS";
+        NewCardNumber: Text;
     begin
 
         State := State.Deserialize(Data);
 
         EFTTransactionRequest.Get(State.RequestEntryNo);
         //-NPR5.51 [331463]
-        if EFTTransactionRequest."Card Number" <> State.CardPan then begin //Card was switched around during transaction
+        //-NPR5.53 [383259]
+        // IF EFTTransactionRequest."Card Number" <> State.CardPan THEN BEGIN //Card was switched around during transaction
+        NewCardNumber := CreditCardHelper.CutCardPan(State.CardPan);
+
+        if (NewCardNumber <> '') and (EFTTransactionRequest."Card Number" <> NewCardNumber) then begin //Card was switched around during transaction
+          EFTTransactionRequest."Card Number" := NewCardNumber;
+        //+NPR5.53 [383259]
+
           SalePOS.Get(EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
           if CreditCardHelper.FindPaymentType(EFTTransactionRequest."Card Number", PaymentTypePOS, SalePOS."Location Code") then begin
             EFTTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
             EFTTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EFTTransactionRequest."Card Name"));
           end;
-          EFTTransactionRequest."Card Number" := State.CardPan;
+        //-NPR5.53 [383259]
+        //  EFTTransactionRequest."Card Number" := State.CardPan;
+        //+NPR5.53 [383259]
         end;
         //+NPR5.51 [331463]
 

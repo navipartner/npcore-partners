@@ -23,6 +23,7 @@ codeunit 6060117 "TM Ticket Retail Management"
     // TM1.39/TSA /20181109 CASE 335653 Signature change on POS_CreateRevokeRequest
     // TM1.41/TSA /20190509 CASE 353981 Dynamic ticket schedule price
     // TM1.42/TSA /20190812 CASE 364739 Incorrect filter when receipt number is empty
+    // TM1.45/TSA /20191203 CASE 380754 Waiting List schedule selection, changed signature on AquireTicketAdmissionSchedule()
 
 
     var
@@ -58,7 +59,7 @@ codeunit 6060117 "TM Ticket Retail Management"
         Commit;
         ResponseCode := -1;
         ResponseMessage := ABORTED;
-        if (AquireTicketAdmissionSchedule(Token, SaleLinePOS, UpdateSalesLine)) then begin
+        if (AquireTicketAdmissionSchedule (Token, SaleLinePOS, UpdateSalesLine, ResponseMessage)) then begin //-+TM1.45 [380754]
             ResponseMessage := '';
             ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage);
         end;
@@ -76,7 +77,7 @@ codeunit 6060117 "TM Ticket Retail Management"
         //-TM1.19 [266372]
     end;
 
-    procedure AquireTicketAdmissionSchedule(Token: Text[100]; var SaleLinePOS: Record "Sale Line POS"; HaveSalesLine: Boolean) LookupOK: Boolean
+    procedure AquireTicketAdmissionSchedule(Token: Text[100];var SaleLinePOS: Record "Sale Line POS";HaveSalesLine: Boolean;var ResponseMessage: Text) LookupOK: Boolean
     var
         PageAction: Action;
         Item: Record Item;
@@ -85,11 +86,10 @@ codeunit 6060117 "TM Ticket Retail Management"
         DisplayTicketeservationRequest: Page "TM Ticket Make Reservation";
         TicketManagement: Codeunit "TM Ticket Management";
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
-        ResponseMessage: Text;
         NewQuantity: Integer;
         ResolvedByTable: Integer;
+        ResultCode: Integer;
     begin
-        //-NPR5.32.10
 
         TicketReservationRequest.Reset();
         TicketReservationRequest.FilterGroup(2);
@@ -98,7 +98,6 @@ codeunit 6060117 "TM Ticket Retail Management"
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.FilterGroup(0);
 
-        //-TM1.17 - update / refresh the schedule entries
         TicketReservationRequest.FindSet();
         repeat
             if (TicketReservationRequest."Admission Code" <> '') then
@@ -114,26 +113,33 @@ codeunit 6060117 "TM Ticket Retail Management"
         end;
         //+#310947 [310947]
 
-        //-TM1.21
         repeat
             Clear(DisplayTicketeservationRequest);
             DisplayTicketeservationRequest.LoadTicketRequest(Token);
-            //-TM1.28 [305707]
             DisplayTicketeservationRequest.SetTicketItem(SaleLinePOS."No.", SaleLinePOS."Variant Code");
-            //+TM1.28 [305707]
             DisplayTicketeservationRequest.AllowQuantityChange(HaveSalesLine);
             DisplayTicketeservationRequest.LookupMode(true);
             DisplayTicketeservationRequest.Editable(true);
 
-            if (ResponseMessage <> '') then
+          //-TM1.45 [380754] refactored
+          if (ResultCode <> 0) then
                 if (not Confirm(SCHEDULE_ERROR, true, ResponseMessage)) then
                     exit(false);
 
             PageAction := DisplayTicketeservationRequest.RunModal();
-            if (PageAction <> ACTION::LookupOK) then
-                exit(false);
+          if (PageAction <> ACTION::LookupOK) then begin
+            ResponseMessage := ABORTED;
+            exit (false);
+          end;
 
-        until (DisplayTicketeservationRequest.FinalizeReservationRequest(false, ResponseMessage) = 0);
+          ResultCode := DisplayTicketeservationRequest.FinalizeReservationRequest (false, ResponseMessage);
+          if (ResultCode = 11) then begin
+            ResponseMessage := ''; // Silent error downstream
+            exit (false);
+          end;
+          //+TM1.45 [380754]
+
+        until (ResultCode = 0);
 
         if (HaveSalesLine) then begin
             //-TM1.41 [353981]
@@ -148,11 +154,9 @@ codeunit 6060117 "TM Ticket Retail Management"
             SaleLinePOS.Modify();
             Commit;
             //+TM1.41 [353981]
-
         end;
 
         exit(true);
-        //+TM1.21
     end;
 
     procedure AquireTicketParticipant(Token: Text[100]; ExternalMemberNo: Code[20]): Boolean

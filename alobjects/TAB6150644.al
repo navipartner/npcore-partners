@@ -3,6 +3,7 @@ table 6150644 "POS Info Transaction"
     // NPR5.26/OSFI/20160810 CASE 246167 Object Created
     // NPR5.30/TJ  /20170215 CASE 265504 Changed ENU captions on fields with word Register in their name
     // NPR5.48/MHA /20181120 CASE 334922 Added key "Entry No."
+    // NPR5.53/ALPO/20200204 CASE 388697 Entries with Type = Write Default Message were not saved to "POS Info Transaction"/"POS Info POS Entry" tables
 
     Caption = 'POS Info Transaction';
 
@@ -43,6 +44,13 @@ table 6150644 "POS Info Transaction"
         {
             Caption = 'POS Info';
         }
+        field(12;"POS Info Type";Option)
+        {
+            Caption = 'POS Info Type';
+            Description = 'NPR5.53';
+            OptionCaption = 'Show Message,Request Data,Write Default Message';
+            OptionMembers = "Show Message","Request Data","Write Default Message";
+        }
         field(20;"No.";Code[30])
         {
             Caption = 'No.';
@@ -66,6 +74,11 @@ table 6150644 "POS Info Transaction"
         field(25;"Discount Amount";Decimal)
         {
             Caption = 'Discount Amount';
+        }
+        field(40;"Once per Transaction";Boolean)
+        {
+            Caption = 'Once per Transaction';
+            Description = 'NPR5.53';
         }
     }
 
@@ -94,6 +107,23 @@ table 6150644 "POS Info Transaction"
           else
             "Entry No." := 1;
         end;
+    end;
+
+    procedure CopyFromPOSInfo(POSInfo: Record "POS Info")
+    begin
+        //-NPR5.53 [388697]
+        "POS Info Code" := POSInfo.Code;
+        "POS Info Type" := POSInfo.Type;
+        "Once per Transaction" := POSInfo."Once per Transaction";
+        //+NPR5.53 [388697]
+    end;
+
+    procedure ShowMessage()
+    begin
+        //-NPR5.53 [388697]
+        if ("POS Info Type" = "POS Info Type"::"Show Message") and ("POS Info" <> '') then
+          Message("POS Info");
+        //+NPR5.53 [388697]
     end;
 }
 

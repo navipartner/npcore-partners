@@ -3,6 +3,8 @@ codeunit 6151161 "MM Loyalty Points Mgr (Server)"
     // MM1.37/TSA /20190204 CASE 338215 Initial Version
     // MM1.38/TSA /20190523 CASE 338215 Added GetLoyaltyConfiguration
     // MM1.40/TSA /20190819 CASE 365517 Fixing version difference for how deleteall() starts a transaction when table is empty.
+    // MM1.42/TSA /20191125 CASE 371694 Added post point assignment invokation
+    // MM1.42/TSA /20191127 CASE 371694 Added Template Type selection (General / Intercompnay)
 
 
     trigger OnRun()
@@ -33,6 +35,7 @@ codeunit 6151161 "MM Loyalty Points Mgr (Server)"
         PAYMENT_4: Label 'The attempted reserved number of points (%1), exceed the members current balance (%2).';
         SALE_1: Label 'Incorrect sign.';
         JNL_NOT_EMPTY: Label 'The %1 %2 is not empty. Confirm YES to delete lines and proceed.';
+        SELECT_JNL_TYPE: Label 'Select journal template type:';
 
     procedure RegisterSales(var TmpAuthorizationIn: Record "MM Loyalty Ledger Entry (Srvr)" temporary;var TmpSaleLinesIn: Record "MM Register Sales Buffer" temporary;var TmpPaymentLinesIn: Record "MM Register Sales Buffer" temporary;var TmpPointsOut: Record "MM Loyalty Ledger Entry (Srvr)";var ResponseMessage: Text;var ResponseMessageId: Text): Boolean
     var
@@ -41,7 +44,9 @@ codeunit 6151161 "MM Loyalty Points Mgr (Server)"
         MembershipPointsEntry: Record "MM Membership Points Entry";
         Membership: Record "MM Membership";
         MembershipSetup: Record "MM Membership Setup";
+        MembershipRole: Record "MM Membership Role";
         LoyaltyPointManagement: Codeunit "MM Loyalty Point Management";
+        MemberNotification: Codeunit "MM Member Notification";
         MembershipEntryNo: Integer;
         TotalEarnAmount: Decimal;
         TotalBurnAmount: Decimal;
@@ -92,6 +97,10 @@ codeunit 6151161 "MM Loyalty Points Mgr (Server)"
         LoyaltyStoreLedger.Balance := Membership."Remaining Points";
         LoyaltyStoreLedger.Insert ();
 
+        //-MM1.42 [371694]
+        LoyaltyPointManagement.AfterMembershipPointsUpdate (Membership."Entry No.", 0);
+        //+MM1.42 [371694]
+
         TmpPointsOut.TransferFields (LoyaltyStoreLedger, true);
         TmpPointsOut.Insert();
         exit (true);
@@ -104,6 +113,8 @@ codeunit 6151161 "MM Loyalty Points Mgr (Server)"
         Membership: Record "MM Membership";
         MembershipSetup: Record "MM Membership Setup";
         LoyaltySetup: Record "MM Loyalty Setup";
+        MembershipRole: Record "MM Membership Role";
+        LoyaltyPointManagement: Codeunit "MM Loyalty Point Management";
         MembershipEntryNo: Integer;
     begin
 
@@ -139,6 +150,10 @@ codeunit 6151161 "MM Loyalty Points Mgr (Server)"
         Membership.CalcFields ("Remaining Points");
         LoyaltyStoreLedger.Balance := Membership."Remaining Points";
         LoyaltyStoreLedger.Insert ();
+
+        //-MM1.42 [371694]
+        LoyaltyPointManagement.AfterMembershipPointsUpdate (Membership."Entry No.", 0);
+        //+MM1.42 [371694]
 
         TmpPointsOut.TransferFields (LoyaltyStoreLedger, true);
         TmpPointsOut.Insert();
@@ -716,9 +731,19 @@ codeunit 6151161 "MM Loyalty Points Mgr (Server)"
         NoSeriesManagement: Codeunit NoSeriesManagement;
         GenJnlPostBatch: Codeunit "Gen. Jnl.-Post Batch";
         DocumentNo: Code[20];
+        JnlType: Option;
     begin
 
-        GenJournalBatch.SetFilter ("Template Type", '=%1', GenJournalBatch."Template Type"::General);
+        //-MM1.42 [371694]
+        // GenJournalBatch.SETFILTER ("Template Type", '=%1', GenJournalBatch."Template Type"::General);
+        JnlType := StrMenu (StrSubstNo ('%1,%2', Format (GenJournalBatch."Template Type"::General), Format (GenJournalBatch."Template Type"::Intercompany)), 1, SELECT_JNL_TYPE);
+        case JnlType of
+          1 : GenJournalBatch.SetFilter ("Template Type", '=%1', GenJournalBatch."Template Type"::General);
+          2 : GenJournalBatch.SetFilter ("Template Type", '=%1', GenJournalBatch."Template Type"::Intercompany);
+          else Error ('');
+        end;
+        //+MM1.42 [371694]
+
         GenJournalBatch.SetFilter (Recurring, '=%1', false);
         GenJournalBatch.FindFirst ();
 
@@ -766,9 +791,19 @@ codeunit 6151161 "MM Loyalty Points Mgr (Server)"
         NoSeriesManagement: Codeunit NoSeriesManagement;
         GenJnlPostBatch: Codeunit "Gen. Jnl.-Post Batch";
         DocumentNo: Code[20];
+        JnlType: Option;
     begin
 
-        GenJournalBatch.SetFilter ("Template Type", '=%1', GenJournalBatch."Template Type"::General);
+        //-MM1.42 [371694]
+        // GenJournalBatch.SETFILTER ("Template Type", '=%1', GenJournalBatch."Template Type"::General);
+        JnlType := StrMenu (StrSubstNo ('%1,%2', Format (GenJournalBatch."Template Type"::General), Format (GenJournalBatch."Template Type"::Intercompany)), 1, SELECT_JNL_TYPE);
+        case JnlType of
+          1 : GenJournalBatch.SetFilter ("Template Type", '=%1', GenJournalBatch."Template Type"::General);
+          2 : GenJournalBatch.SetFilter ("Template Type", '=%1', GenJournalBatch."Template Type"::Intercompany);
+          else Error ('');
+        end;
+        //+MM1.42 [371694]
+
         GenJournalBatch.SetFilter (Recurring, '=%1', false);
         GenJournalBatch.FindFirst ();
 

@@ -4,6 +4,7 @@ codeunit 6059965 "MPOS Webservice"
     // NPR5.36/CLVA/20170830 CASE 288630 Added register handling
     // NPR5.38/CLVA/20170830 CASE 297273 Added function GetCompanyInfo
     // NPR5.51/CLVA/20190808 CASE 364011 Added functions SetTransactionResponse, ParseNetsJson, GetString and GetInt
+    // NPR5.53/CLVA/20191227 CASE 361862 Removed optionalData handling from Nets transaction result
 
 
     trigger OnRun()
@@ -224,7 +225,9 @@ codeunit 6059965 "MPOS Webservice"
             MPOSNetsTransactions."Callback OrganisationNumber" := GetString(JToken, 'organisationNumber');
             MPOSNetsTransactions."Callback BankAgent" := GetString(JToken, 'bankAgent');
             MPOSNetsTransactions."Callback AccountType" := GetString(JToken, 'accountType');
-            MPOSNetsTransactions."Callback OptionalData" := GetString(JToken, 'optionalData');
+          //-NPR5.53 [361862]
+          //MPOSNetsTransactions."Callback OptionalData" := GetString(JToken,'optionalData');
+          //+NPR5.53 [361862]
             MPOSNetsTransactions."Callback ResponseCode" := GetString(JToken, 'responseCode');
             MPOSNetsTransactions."Callback RejectionSource" := GetInt(JToken, 'rejectionSource');
             MPOSNetsTransactions."Callback RejectionReason" := GetString(JToken, 'rejectionReason');

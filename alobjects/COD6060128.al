@@ -39,9 +39,9 @@ codeunit 6060128 "MM Member WebService"
     // MM1.35/TSA /20181023 CASE 333592 Added GetMembershipRoles()
     // MM1.35/TSA /20181024 CASE 328141 Removed the dedicated SOAP Action, since it is same as option 3 in PrintMemberCard()
     // MM1.36/TSA /20190110 CASE 328141 Added CreateWalletMemberPass()
-    // MM130.1.36/TSA /20190110 CASE 353981 Changed property "Functional Visibility" to External
     // MM1.38/TSA /20190517 CASE 355234 Added ValidateNotificationToken(), ExpireNotificationToken(), GenerateNotificationToken()
     // MM1.39/TSA /20190529 CASE 350968 Added GetSetAutoRenew
+    // MM1.42/TSA /20191231 CASE 382728 Added GetSetMemberCommunication service
 
 
     trigger OnRun()
@@ -914,6 +914,90 @@ codeunit 6060128 "MM Member WebService"
         //+MM1.38 [355234]
     end;
 
+    procedure GetSetComOptions(var GetSetMemberComOptions: XMLport "MM Member Communication")
+    var
+        ImportEntry: Record "Nc Import Entry";
+        NaviConnectSyncMgt: Codeunit "Nc Sync. Mgt.";
+        OutStr: OutStream;
+        MemberCommunication: Record "MM Member Communication";
+        TmpMemberCommunication: Record "MM Member Communication" temporary;
+        MembershipManagement: Codeunit "MM Membership Management";
+        ExternalMemberNo: Code[20];
+        ExternalMembershipNo: Code[20];
+        MemberEntryNo: Integer;
+        MembershipEntryNo: Integer;
+        ResponseMessage: Text;
+    begin
+
+        //-MM1.42 [382728]
+
+        GetSetMemberComOptions.Import ();
+
+        InsertImportEntry ('GetSetMemberComOption', ImportEntry);
+        ImportEntry."Document Name" := StrSubstNo ('GetSetMemberComOption-%1.xml', Format (CurrentDateTime(), 0, 9) );
+        ImportEntry."Document ID" := UpperCase(DelChr(Format(CreateGuid),'=','{}-'));
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        GetSetMemberComOptions.SetDestination(OutStr);
+        GetSetMemberComOptions.Export;
+        ImportEntry.Modify(true);
+        Commit ();
+
+        if (NaviConnectSyncMgt.ProcessImportEntry (ImportEntry)) then begin
+
+          GetSetMemberComOptions.GetRequest (ExternalMemberNo, ExternalMembershipNo, TmpMemberCommunication);
+
+          MemberEntryNo := MembershipManagement.GetMemberFromExtMemberNo (ExternalMemberNo);
+          MembershipEntryNo := MembershipManagement.GetMembershipFromExtMembershipNo (ExternalMembershipNo);
+
+          if (MemberEntryNo = 0) or (MembershipEntryNo = 0) then begin
+            ResponseMessage := StrSubstNo ('Member number "%1" or Membership number "%2" is invalid.', ExternalMemberNo, ExternalMembershipNo);
+            GetSetMemberComOptions.SetErrorResponse (ResponseMessage);
+
+          end else begin
+            TmpMemberCommunication.Reset ();
+
+            MembershipManagement.CreateMemberCommunicationDefaultSetup (MemberEntryNo);
+
+            if (TmpMemberCommunication.FindSet ()) then begin
+              repeat
+                if (MemberCommunication.Get (MemberEntryNo, MembershipEntryNo, TmpMemberCommunication."Message Type")) then begin
+                  MemberCommunication.TransferFields (TmpMemberCommunication, false);
+                  MemberCommunication."Changed At" := CurrentDateTime ();
+                  MemberCommunication.Modify ();
+                end;
+              until (TmpMemberCommunication.Next () = 0);
+
+              if (TmpMemberCommunication.IsTemporary ()) then
+                TmpMemberCommunication.DeleteAll ();
+            end;
+
+            MemberCommunication.Reset ();
+            MemberCommunication.SetFilter ("Member Entry No.", '=%1', MemberEntryNo);
+            MemberCommunication.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
+            if (MemberCommunication.FindSet ()) then begin
+              repeat
+                TmpMemberCommunication.TransferFields (MemberCommunication, true);
+                TmpMemberCommunication.Insert ();
+              until (MemberCommunication.Next () = 0);
+            end;
+
+            GetSetMemberComOptions.SetResponse (ExternalMemberNo, ExternalMembershipNo, TmpMemberCommunication);
+
+          end;
+        end else begin
+          GetSetMemberComOptions.SetErrorResponse (ImportEntry."Error Message");
+        end;
+
+        ImportEntry."Document Source".CreateOutStream(OutStr);
+        GetSetMemberComOptions.SetDestination(OutStr);
+        GetSetMemberComOptions.Export;
+        ImportEntry.Modify(true);
+
+        Commit ();
+        //+MM1.42 [382728]
+    end;
+
     local procedure "--RecuringPayment"()
     begin
     end;
@@ -1262,6 +1346,7 @@ codeunit 6060128 "MM Member WebService"
         CreateImportType ('MEMBER-16', 'MemberManagement', 'CreateWalletMemberPass');
         CreateImportType ('MEMBER-17', 'MemberManagement', 'GetMembershipRoles');
         CreateImportType ('MEMBER-18', 'MemberManagement', 'GetSetAutoRenewOption');
+        CreateImportType ('MEMBER-19', 'MemberManagement', 'GetSetMemberComOption');
 
         Commit;
     end;

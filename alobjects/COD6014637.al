@@ -2,13 +2,14 @@ codeunit 6014637 "Generic Filter Page Mgt."
 {
     // NPR5.45/TJ  /20180719 CASE 318531 New object
     // NPR5.48/TJ  /20181129 CASE 318531 Recoded and additional features added
+    // NPR5.53/TJ  /20190626 CASE 349301 Function AdvancedFilter changed to be global
 
 
     trigger OnRun()
     begin
     end;
 
-    local procedure AdvancedFilter(RecRef: RecordRef;var FilterStringText: Text) FilterPageOK: Boolean
+    procedure AdvancedFilter(RecRef: RecordRef;var FilterStringText: Text) FilterPageOK: Boolean
     var
         FilterBuilder: FilterPageBuilder;
         FilterViewName: Text;

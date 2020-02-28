@@ -5,6 +5,7 @@ codeunit 6150634 "POS Give Change"
     //                                    Removed subscriber (replaced with direct call from transcendence).
     // NPR5.38/BR  /20171219  CASE 300558 Take Dimensions from Sale
     // NPR5.38/MMV /20180108  CASE 300957 Rounding fix.
+    // NPR5.53/ALPO/20191024  CASE 371955 Rounding related fields moved to POS Posting Profiles
 
 
     trigger OnRun()
@@ -14,6 +15,7 @@ codeunit 6150634 "POS Give Change"
     var
         TextNoReturnPaymentType: Label 'Setup missing: no %1 could be found to give the customer change in. ';
         TextChange: Label 'Change';
+        POSSetup: Codeunit "POS Setup";
 
     procedure InsertChange(SalePOS: Record "Sale POS";ReturnPaymentType: Record "Payment Type POS";Balance: Decimal) ChangeToGive: Decimal
     var
@@ -126,25 +128,33 @@ codeunit 6150634 "POS Give Change"
     end;
 
     local procedure GetRoundingAccount(SalePOS: Record "Sale POS";var GLAccount: Record "G/L Account")
-    var
-        RetailSetup: Record "Retail Setup";
-        Register: Record Register;
     begin
-        Register.Get(SalePOS."Register No.");
-        Register.TestField(Rounding);
-        GLAccount.Get(Register.Rounding);
+        //-NPR5.53 [371955]-revoked
+        //Register.GET(SalePOS."Register No.");
+        //Register.TESTFIELD(Rounding);
+        //GLAccount.GET(Register.Rounding);
+        //+NPR5.53 [371955]-revoked
+        //-NPR5.53 [371955]
+        SetPOSSetupPOSUnitContext(SalePOS."Register No.");
+        GLAccount.Get(POSSetup.RoundingAccount(true));
+        //+NPR5.53 [371955]
     end;
 
     local procedure GetRoundingAmount(SalePOS: Record "Sale POS";ChangeAmount: Decimal): Decimal
-    var
-        RetailSetup: Record "Retail Setup";
-        Register: Record Register;
     begin
-        RetailSetup.Get;
-        Register.Get(SalePOS."Register No.");
-        if (RetailSetup."Amount Rounding Precision" = 0) or (Register.Rounding = '') then
+        //-NPR5.53 [371955]-revoked
+        //RetailSetup.GET;
+        //Register.GET(SalePOS."Register No.");
+        //IF (RetailSetup."Amount Rounding Precision" = 0) OR (Register.Rounding = '') THEN
+        //  EXIT(0);
+        //EXIT(ChangeAmount - ROUND(ChangeAmount,RetailSetup."Amount Rounding Precision",'='));
+        //+NPR5.53 [371955]-revoked
+        //-NPR5.53 [371955]
+        SetPOSSetupPOSUnitContext(SalePOS."Register No.");
+        if (POSSetup.AmountRoundingPrecision = 0) or (POSSetup.RoundingAccount(false) = '') then
           exit(0);
-        exit(ChangeAmount - Round(ChangeAmount,RetailSetup."Amount Rounding Precision",'='));
+        exit(ChangeAmount - Round(ChangeAmount,POSSetup.AmountRoundingPrecision,POSSetup.AmountRoundingDirection));
+        //+NPR5.53 [371955]
     end;
 
     local procedure GetLastLineNo(SalePOS: Record "Sale POS"): Integer
@@ -214,6 +224,16 @@ codeunit 6150634 "POS Give Change"
           until Next = 0;
         end;
         exit(TotalAmount);
+    end;
+
+    local procedure SetPOSSetupPOSUnitContext(POSUnitNo: Code[10])
+    var
+        POSUnit: Record "POS Unit";
+    begin
+        //-NPR5.53 [371955]
+        POSUnit.Get(POSUnitNo);
+        POSSetup.SetPOSUnit(POSUnit);
+        //+NPR5.53 [371955]
     end;
 }
 

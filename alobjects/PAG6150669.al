@@ -42,7 +42,7 @@ page 6150669 "NPRE Restaurant Setup"
             {
                 Caption = 'Print Category';
                 Image = PrintForm;
-                RunObject = Page "NPRE Print Category";
+                RunObject = Page "NPRE Print Categories";
             }
         }
     }

@@ -1,7 +1,8 @@
 page 6150661 "NPRE Waiter Pad Subform"
 {
-    // NPR5.34/ANEN  /2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.35/ANEN /20170821 CASE 283376 Solution rename to NP Restaurant
+    // NPR5.34/ANEN/2017012  CASE 270255 Object Created for Hospitality - Version 1.0
+    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
+    // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
 
     Caption = 'Lines';
     InsertAllowed = false;
@@ -14,6 +15,15 @@ page 6150661 "NPRE Waiter Pad Subform"
         {
             repeater(Group)
             {
+                field(LineIsMarked;LineIsMarked)
+                {
+                    Caption = 'Select';
+
+                    trigger OnValidate()
+                    begin
+                        Mark(not Mark);  //NPR5.53 [360258]
+                    end;
+                }
                 field("Waiter Pad No.";"Waiter Pad No.")
                 {
                     Editable = false;
@@ -155,6 +165,22 @@ page 6150661 "NPRE Waiter Pad Subform"
                     Editable = false;
                     Visible = false;
                 }
+                field("AssignedPrintCategoriesAsString()";AssignedPrintCategoriesAsString())
+                {
+                    Caption = 'Print Categories';
+                    Editable = false;
+
+                    trigger OnDrillDown()
+                    begin
+                        ShowPrintCategories();  //NPR5.53 [360258]
+                    end;
+                }
+                field("Kitchen Order Sent";"Kitchen Order Sent")
+                {
+                }
+                field("Serving Requested";"Serving Requested")
+                {
+                }
             }
         }
     }
@@ -165,6 +191,8 @@ page 6150661 "NPRE Waiter Pad Subform"
         {
             action("Change Quantiy")
             {
+                Enabled = false;
+                Visible = false;
 
                 trigger OnAction()
                 begin
@@ -173,6 +201,8 @@ page 6150661 "NPRE Waiter Pad Subform"
             }
             action("Delete Line")
             {
+                Enabled = false;
+                Visible = false;
 
                 trigger OnAction()
                 begin
@@ -181,5 +211,27 @@ page 6150661 "NPRE Waiter Pad Subform"
             }
         }
     }
+
+    trigger OnAfterGetRecord()
+    begin
+        LineIsMarked := Mark;  //NPR5.53 [360258]
+    end;
+
+    var
+        LineIsMarked: Boolean;
+
+    procedure GetSelection(var WaiterPadLine: Record "NPRE Waiter Pad Line")
+    begin
+        //-NPR5.53 [360258]
+        WaiterPadLine.Copy(Rec);
+        //+NPR5.53 [360258]
+    end;
+
+    procedure ClearMarkedLines()
+    begin
+        //-NPR5.53 [360258]
+        ClearMarks;
+        //+NPR5.53 [360258]
+    end;
 }
 

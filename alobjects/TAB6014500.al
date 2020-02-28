@@ -7,6 +7,7 @@ table 6014500 "Used Goods Registration"
     // NPR5.39/TJ  /20180212  CASE 302634 Renamed OptionString property of field 25 Identification to english
     // NPR5.39/JDH /20180220  CASE 305746 Name, Address and Address 2 Extended to 50
     // NPR5.43/RA  /20180419  CASE 311886 On field 45 added option "B+"
+    // NPR5.53/BHR /20191008  CASE 369354 Removed Code For Customer Creation
 
     Caption = 'Used Goods Registration';
     LookupPageID = "Used Goods Reg. List";
@@ -77,95 +78,105 @@ table 6014500 "Used Goods Registration"
                 RetailSetup: Record "Retail Setup";
                 SalespersonPurchaser: Record "Salesperson/Purchaser";
             begin
-                RetailSetup.Get();
-                if not Customer.Get("Purchased By Customer No.") then begin
-                  if RetailSetup."Create New Customer" then begin
-                    case RetailSetup."New Customer Creation" of
-                      RetailSetup."New Customer Creation"::"Cash Customer" :
-                        begin
-                          Customer."No." := "Purchased By Customer No.";
-                          Customer.Type    := Customer.Type::Cash;
-                          Customer.Insert;
-                        end;
-                      RetailSetup."New Customer Creation"::Customer:
-                        begin
-                          Customer."No." := "Purchased By Customer No.";
-                          Customer.Type    := Customer.Type::Customer;
-                
-                          //-NPR5.30 [264913]
-                          /*
-                          Customer."Payment Terms Code" := RetailSetup."Terms of Payment";
-                          Customer.VALIDATE("Gen. Bus. Posting Group",RetailSetup."Gen. Bus. Posting Group");
-                          Customer.VALIDATE("Customer Posting Group",RetailSetup."Customer Posting Group");
-                          */
-                          ApplyCustomerConfigTemplate(RetailSetup."Customer Config. Template",Customer);
-                          //+NPR5.30 [264913]
-                
-                          Customer.Insert;
-                        end;
-                      RetailSetup."New Customer Creation"::"User Managed":
-                        begin
-                          SalespersonPurchaser.Get("Salesperson Code");
-                          case SalespersonPurchaser."Customer Creation" of
-                            SalespersonPurchaser."Customer Creation"::"Not allowed" :
-                              Error(Text1060003);
-                            SalespersonPurchaser."Customer Creation"::"Only cash" :
-                              begin
-                                Customer."No." := "Purchased By Customer No.";
-                                Customer.Type    := Customer.Type::Cash;
-                                Customer.Insert;
-                              end;
-                            SalespersonPurchaser."Customer Creation"::Allowed :
-                              begin
-                                Customer."No." := "Purchased By Customer No.";
-                                Customer.Type := Customer.Type::Customer;
-                
-                                //-NPR5.30 [264913]
-                                /*
-                                Customer."Payment Terms Code" := RetailSetup."Terms of Payment";
-                                Customer.VALIDATE("Gen. Bus. Posting Group",RetailSetup."Gen. Bus. Posting Group");
-                                Customer.VALIDATE("Customer Posting Group",RetailSetup."Customer Posting Group");
-                                */
-                                ApplyCustomerConfigTemplate(RetailSetup."Customer Config. Template",Customer);
-                                //+NPR5.30 [264913]
-                
-                                Customer.Insert;
-                              end;
-                          end;
-                        end;
-                    end;
-                    Commit;
-                    //-NPR5.26
-                    //Aktion := PAGE.RUNMODAL(PAGE::"Phone No lookup",Customer);
-                    //IF (Aktion = ACTION::OK) THEN BEGIN
-                    if PAGE.RunModal(PAGE::"Customer List",Customer) = ACTION::LookupOK then begin
-                    //+NPR5.26
-                      "Purchased By Customer No." := Customer."No.";
-                      Name := Customer.Name;
-                      Address := Customer.Address;
-                      "Address 2" := Customer."Address 2";
-                      Validate("Post Code",Customer."Post Code");
-                      //-NPR5.26
-                      By := Customer.City
-                      //+NPR5.26
-                    end else begin
-                      "Purchased By Customer No." := '';
-                      if Customer."No." <> '' then
-                        if Confirm(StrSubstNo(Text1060004,Customer."No.",Customer.Name),true) then
-                          Customer.Delete;
-                    end;
-                  end else
-                    Error(Text1060005);
-                end else begin
+                //-NPR5.53 [369354]
+                // RetailSetup.GET();
+                // IF NOT Customer.GET("Purchased By Customer No.") THEN BEGIN
+                //  IF RetailSetup."Create New Customer" THEN BEGIN
+                //    CASE RetailSetup."New Customer Creation" OF
+                //      RetailSetup."New Customer Creation"::"2" :
+                //        BEGIN
+                //          Customer."No." := "Purchased By Customer No.";
+                //          Customer.Type    := Customer.Type::Cash;
+                //          Customer.INSERT;
+                //        END;
+                //      RetailSetup."New Customer Creation"::"3":
+                //        BEGIN
+                //          Customer."No." := "Purchased By Customer No.";
+                //          Customer.Type    := Customer.Type::Customer;
+                //
+                //          //-NPR5.30 [264913]
+                //          {
+                //          Customer."Payment Terms Code" := RetailSetup."Terms of Payment";
+                //          Customer.VALIDATE("Gen. Bus. Posting Group",RetailSetup."Gen. Bus. Posting Group");
+                //          Customer.VALIDATE("Customer Posting Group",RetailSetup."Customer Posting Group");
+                //          }
+                //          ApplyCustomerConfigTemplate(RetailSetup."Customer Config. Template",Customer);
+                //          //+NPR5.30 [264913]
+                //
+                //          Customer.INSERT;
+                //        END;
+                //      RetailSetup."New Customer Creation"::"1":
+                //        BEGIN
+                //          SalespersonPurchaser.GET("Salesperson Code");
+                //          CASE SalespersonPurchaser."Customer Creation" OF
+                //            SalespersonPurchaser."Customer Creation"::"0" :
+                //              ERROR(Text1060003);
+                //            SalespersonPurchaser."Customer Creation"::"1" :
+                //              BEGIN
+                //                Customer."No." := "Purchased By Customer No.";
+                //                Customer.Type    := Customer.Type::Cash;
+                //                Customer.INSERT;
+                //              END;
+                //            SalespersonPurchaser."Customer Creation"::"2" :
+                //              BEGIN
+                //                Customer."No." := "Purchased By Customer No.";
+                //                Customer.Type := Customer.Type::Customer;
+                //
+                //                //-NPR5.30 [264913]
+                //                {
+                //                Customer."Payment Terms Code" := RetailSetup."Terms of Payment";
+                //                Customer.VALIDATE("Gen. Bus. Posting Group",RetailSetup."Gen. Bus. Posting Group");
+                //                Customer.VALIDATE("Customer Posting Group",RetailSetup."Customer Posting Group");
+                //                }
+                //                ApplyCustomerConfigTemplate(RetailSetup."Customer Config. Template",Customer);
+                //                //+NPR5.30 [264913]
+                //
+                //                Customer.INSERT;
+                //              END;
+                //          END;
+                //        END;
+                //    END;
+                //    COMMIT;
+                //    //-NPR5.26
+                //    //Aktion := PAGE.RUNMODAL(PAGE::"Phone No lookup",Customer);
+                //    //IF (Aktion = ACTION::OK) THEN BEGIN
+                //    IF PAGE.RUNMODAL(PAGE::"Customer List",Customer) = ACTION::LookupOK THEN BEGIN
+                //    //+NPR5.26
+                //      "Purchased By Customer No." := Customer."No.";
+                //      Name := Customer.Name;
+                //      Address := Customer.Address;
+                //      "Address 2" := Customer."Address 2";
+                //      VALIDATE("Post Code",Customer."Post Code");
+                //      //-NPR5.26
+                //      By := Customer.City
+                //      //+NPR5.26
+                //    END ELSE BEGIN
+                //      "Purchased By Customer No." := '';
+                //      IF Customer."No." <> '' THEN
+                //        IF CONFIRM(STRSUBSTNO(Text1060004,Customer."No.",Customer.Name),TRUE) THEN
+                //          Customer.DELETE;
+                //    END;
+                //  END ELSE
+                //    ERROR(Text1060005);
+                // END ELSE BEGIN
+                //  Name := Customer.Name;
+                //  Address := Customer.Address;
+                //  "Address 2" := Customer."Address 2";
+                //  VALIDATE("Post Code",Customer."Post Code");
+                //  //-NPR5.26
+                //  By := Customer.City
+                //  //+NPR5.26
+                // END;
+
+
+                if Customer.Get("Purchased By Customer No.") then begin
                   Name := Customer.Name;
                   Address := Customer.Address;
                   "Address 2" := Customer."Address 2";
                   Validate("Post Code",Customer."Post Code");
-                  //-NPR5.26
-                  By := Customer.City
-                  //+NPR5.26
+                  By := Customer.City;
                 end;
-
+                //+NPR5.53 [369354]
             end;
         }
         field(21;Name;Text[50])

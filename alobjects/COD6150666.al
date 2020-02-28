@@ -1,7 +1,8 @@
 codeunit 6150666 "NPRE POS Action - Save to Wa."
 {
-    // NPR5.45/MHA /20180827  CASE 318369 Object created
-    // NPR5.50/TJ  /20190530  CASE 346384 New parameter added
+    // NPR5.45/MHA /20180827 CASE 318369 Object created
+    // NPR5.50/TJ  /20190530 CASE 346384 New parameter added
+    // NPR5.53/ALPO/20191211 CASE 380609 NPRE: New guest arrival procedure. Use preselected Waiterpad No. and Seating Code as well as Number of Guests
 
 
     trigger OnRun()
@@ -36,22 +37,29 @@ codeunit 6150666 "NPRE POS Action - Save to Wa."
             Type::Generic,
             "Subscriber Instances Allowed"::Multiple)
           then begin
+            //-NPR5.53 [380609]
+            RegisterWorkflowStep('addPresetValuesToContext','respond();');
+            //+NPR5.53 [380609]
             RegisterWorkflowStep('seatingInput',
-              'if (param.FixedSeatingCode) {' +
-              '  context.seatingCode = param.FixedSeatingCode;' +
-              '  respond();' +
-              '} else {' +
-              '  switch(param.InputType + "") {' +
-              '    case "0":' +
-              '      stringpad(labels["InputTypeLabel"]).respond("seatingCode");' +
-              '      break;' +
-              '    case "1":' +
-              '      intpad(labels["InputTypeLabel"]).respond("seatingCode");' +
-              '      break;' +
-              '    case "2":' +
-              '      respond();' +
-              '      break;' +
-              '  }' +
+              'if (!context.seatingCode) {' +  //NPR5.53 [380609]
+                'if (param.FixedSeatingCode) {' +
+                '  context.seatingCode = param.FixedSeatingCode;' +
+                '  respond();' +
+                '} else {' +
+                '  switch(param.InputType + "") {' +
+                '    case "0":' +
+                //'      stringpad(labels["InputTypeLabel"]).respond("seatingCode");' +  //NPR5.53 [380609]-revoked
+                '      stringpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +  //NPR5.53 [380609]
+                '      break;' +
+                '    case "1":' +
+                //'      intpad(labels["InputTypeLabel"]).respond("seatingCode");' +  //NPR5.53 [380609]-revoked
+                '      intpad(labels["InputTypeLabel"]).respond("seatingCode").cancel(abort);' +  //NPR5.53 [380609]
+                '      break;' +
+                '    case "2":' +
+                '      respond();' +
+                '      break;' +
+                '  }' +
+                '}' +  //NPR5.53 [380609]
               '}'
             );
             RegisterWorkflowStep('createNewWaiterPad',
@@ -60,8 +68,10 @@ codeunit 6150666 "NPRE POS Action - Save to Wa."
               '}'
             );
             RegisterWorkflowStep('selectWaiterPad',
-              'if (context.seatingCode) {' +
-              '  respond();' +
+              'if (!context.waiterPadNo) {' +  //NPR5.53 [380609]
+                'if (context.seatingCode) {' +
+                '  respond();' +
+                '}' +  //NPR5.53 [380609]
               '}'
             );
             RegisterWorkflowStep('saveSale2Pad',
@@ -102,6 +112,10 @@ codeunit 6150666 "NPRE POS Action - Save to Wa."
 
         JSON.InitializeJObjectParser(Context,FrontEnd);
         case WorkflowStep of
+          //-NPR5.53 [380609]
+          'addPresetValuesToContext':
+            OnActionAddPresetValuesToContext(JSON,FrontEnd,POSSession);
+          //+NPR5.53 [380609]
           'seatingInput':
             OnActionSeatingInput(JSON,FrontEnd);
           'createNewWaiterPad':
@@ -113,6 +127,43 @@ codeunit 6150666 "NPRE POS Action - Save to Wa."
         end;
 
         Handled := true;
+    end;
+
+    local procedure OnActionAddPresetValuesToContext(JSON: Codeunit "POS JSON Management";FrontEnd: Codeunit "POS Front End Management";POSSession: Codeunit "POS Session")
+    var
+        NPRESeating: Record "NPRE Seating";
+        NPRESeatingWaiterPadLink: Record "NPRE Seating - Waiter Pad Link";
+        NPREWaiterPad: Record "NPRE Waiter Pad";
+        SalePOS: Record "Sale POS";
+        NPREWaiterPadPOSMgt: Codeunit "NPRE Waiter Pad POS Management";
+        POSSale: Codeunit "POS Sale";
+        ConfirmString: Text;
+    begin
+        //-NPR5.53 [380609]
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        if SalePOS."NPRE Pre-Set Seating Code" <> '' then begin
+          NPRESeating.Get(SalePOS."NPRE Pre-Set Seating Code");
+          JSON.SetContext('seatingCode',SalePOS."NPRE Pre-Set Seating Code");
+
+          if SalePOS."NPRE Pre-Set Waiter Pad No." = '' then begin
+            ConfirmString := GetConfirmString(NPRESeating);
+            if ConfirmString <> '' then
+              JSON.SetContext('confirmString',ConfirmString);
+          end;
+        end;
+
+        if SalePOS."NPRE Pre-Set Waiter Pad No." <> '' then begin
+          NPREWaiterPad.Get(SalePOS."NPRE Pre-Set Waiter Pad No.");
+          if SalePOS."NPRE Pre-Set Seating Code" <> '' then
+            if not NPRESeatingWaiterPadLink.Get(NPRESeating.Code,NPREWaiterPad."No.") then
+              NPREWaiterPadPOSMgt.AddNewWaiterPadForSeating(NPRESeating.Code,NPREWaiterPad,NPRESeatingWaiterPadLink);
+          JSON.SetContext('waiterPadNo',SalePOS."NPRE Pre-Set Waiter Pad No.");
+        end;
+
+        FrontEnd.SetActionContext(ActionCode(),JSON);
+        //+NPR5.53 [380609]
     end;
 
     local procedure OnActionSeatingInput(JSON: Codeunit "POS JSON Management";FrontEnd: Codeunit "POS Front End Management")
@@ -178,6 +229,13 @@ codeunit 6150666 "NPRE POS Action - Save to Wa."
         POSSale.GetCurrentSale(SalePOS);
 
         NPREWaiterPadPOSMgt.MoveSaleFromPOSToWaiterPad(SalePOS,NPREWaiterPad);
+        //-NPR5.53 [380609]
+        SalePOS.Find;
+        NPREWaiterPadPOSMgt.ClearSaleHdrNPREPresetFields(SalePOS,false);
+        POSSale.Refresh(SalePOS);
+        POSSale.Modify(true,false);
+        //+NPR5.53 [380609]
+
         Commit;
         POSSession.RequestRefreshData();
 

@@ -7,6 +7,7 @@ table 6059811 "Retail Sales Cue"
     // NPR5.27/BHR /20161025  CASE 254757 Modified the Field 20, Removed filter
     // NPR5.30/MHA /20170130  CASE 264958 Field added: 40 Pending Inc. Documents
     // NPR5.30/BHR /20170207  CASE 264863 Field 45 for failed payments
+    // NPR5.53/MHA /20191118  CASE 377965 Updated CalcFormula on Field 45 "Failed Webshop Payments"
 
     Caption = 'NaviConnect Cue';
 
@@ -92,9 +93,10 @@ table 6059811 "Retail Sales Cue"
         field(45;"Failed Webshop Payments";Integer)
         {
             CalcFormula = Count("Magento Payment Line" WHERE ("Document Table No."=CONST(112),
-                                                              "Account No."=FILTER(<>''),
-                                                              Posted=FILTER(false)));
+                                                              "Payment Gateway Code"=FILTER(<>''),
+                                                              "Date Captured"=FILTER(=0D)));
             Caption = 'Failed Webshop Payments';
+            Description = 'NPR5.53';
             FieldClass = FlowField;
         }
     }

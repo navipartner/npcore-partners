@@ -2,6 +2,7 @@ xmlport 6151011 "NpRv Ext. Vouchers"
 {
     // NPR5.48/MHA /20180921  CASE 302179 Object created
     // NPR5.48/MHA /20190123  CASE 341711 Added fields 100 "Send via Print", 105 "Send via E-mail", 107 "Send via SMS"
+    // NPR5.53/MHA /20191118  CASE 372315 Added <allow_topup>
 
     Caption = 'Global Vouchers';
     DefaultNamespace = 'urn:microsoft-dynamics-schemas/codeunit/external_voucher_service';
@@ -41,6 +42,10 @@ xmlport 6151011 "NpRv Ext. Vouchers"
                     MinOccurs = Zero;
                 }
                 fieldelement(account_no;NpRvExtVoucherBuffer."Account No.")
+                {
+                    MinOccurs = Zero;
+                }
+                fieldelement(allow_topup;NpRvExtVoucherBuffer."Allow Top-up")
                 {
                     MinOccurs = Zero;
                 }

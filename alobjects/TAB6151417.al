@@ -4,6 +4,7 @@ table 6151417 "Magento Product Relation"
     // MAG1.07/MH/20150309  CASE 208131 Updated captions
     // MAG2.00/MHA/20160525  CASE 242557 Magento Integration
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Object
+    // MAG2.24/BHR /20191023 CASE 370883 increase size of field 50 to 100
 
     Caption = 'Magento Product Relation';
 
@@ -35,10 +36,11 @@ table 6151417 "Magento Product Relation"
         {
             Caption = 'Position';
         }
-        field(10;"To Item Description";Text[50])
+        field(10;"To Item Description";Text[100])
         {
             CalcFormula = Lookup(Item.Description WHERE ("No."=FIELD("To Item No.")));
             Caption = 'Description';
+            Description = 'MAG2.24';
             Editable = false;
             FieldClass = FlowField;
         }
