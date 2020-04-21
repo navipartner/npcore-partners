@@ -6,7 +6,7 @@ resources:
     ref: 'refs/heads/master'
 
 jobs:
-- template: Templates/Job/BuildALApp.yml@ScriptsRepo
+- template: YAML/Templates/Job/BuildALApp.yml@ScriptsRepo
   parameters:
     agentPoolName: NP Deployment
     containerImageName: mcr.microsoft.com/businesscentral/onprem:1904-w1-ltsc2019
