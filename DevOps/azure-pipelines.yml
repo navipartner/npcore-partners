@@ -1,0 +1,17 @@
+resources:
+  repositories:
+  - repository: ScriptsRepo
+    type: git
+    name:  'NpCore/NpDevOps'
+    ref: 'refs/heads/master'
+
+jobs:
+- template: Templates/Job/BuildALApp.yml@ScriptsRepo
+  parameters:
+    agentPoolName: NP Deployment
+    containerImageName: mcr.microsoft.com/businesscentral/onprem:1904-w1-ltsc2019
+    containerName: buildtest
+    serverInstanceName: NAV
+    containerAdminUsername: admin
+    containerAdminPassword: P@ssword1
+    scriptsRepo: ScriptsRepo
