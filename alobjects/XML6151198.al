@@ -1,0 +1,164 @@
+xmlport 6151198 "NpCs Store Inventory"
+{
+    // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
+
+    Caption = 'Collect Store Inventory';
+    DefaultNamespace = 'urn:microsoft-dynamics-nav/xmlports/collect_store_inventory';
+    Encoding = UTF8;
+    FormatEvaluate = Xml;
+    PreserveWhiteSpace = true;
+    UseDefaultNamespace = true;
+
+    schema
+    {
+        textelement(store_inventory)
+        {
+            MaxOccurs = Once;
+            textelement(collect_request)
+            {
+                MaxOccurs = Once;
+                MinOccurs = Zero;
+                textelement(products)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                    tableelement(tempitem;Item)
+                    {
+                        MinOccurs = Zero;
+                        XmlName = 'product';
+                        UseTemporary = true;
+                        fieldattribute(sku;TempItem.Description)
+                        {
+                        }
+
+                        trigger OnAfterInitRecord()
+                        begin
+                            if ItemNo = '' then
+                              ItemNo := '0'
+                            else
+                              ItemNo := IncStr(ItemNo);
+                            TempItem."No." := ItemNo;
+                        end;
+                    }
+                }
+                textelement(request_stores)
+                {
+                    MaxOccurs = Once;
+                    XmlName = 'stores';
+                    tableelement(tempnpcsstore;"NpCs Store")
+                    {
+                        MinOccurs = Zero;
+                        XmlName = 'store';
+                        UseTemporary = true;
+                        fieldattribute(code;TempNpCsStore.Code)
+                        {
+                        }
+
+                        trigger OnAfterInsertRecord()
+                        begin
+                            Store2InventoryBuffer();
+                        end;
+                    }
+                }
+
+                trigger OnBeforePassVariable()
+                begin
+                    currXMLport.Skip;
+                end;
+            }
+            textelement(collect_response)
+            {
+                MaxOccurs = Once;
+                MinOccurs = Zero;
+                textelement(response_stores)
+                {
+                    MaxOccurs = Once;
+                    XmlName = 'stores';
+                    tableelement(tempnpcsstore2;"NpCs Store")
+                    {
+                        MinOccurs = Zero;
+                        XmlName = 'store';
+                        UseTemporary = true;
+                        fieldattribute(code;TempNpCsStore2.Code)
+                        {
+                        }
+                        textelement(store_products)
+                        {
+                            MaxOccurs = Once;
+                            MinOccurs = Zero;
+                            XmlName = 'products';
+                            tableelement(tempitem2;Item)
+                            {
+                                MinOccurs = Zero;
+                                XmlName = 'product';
+                                UseTemporary = true;
+                                fieldattribute(sku;TempItem2.Description)
+                                {
+                                }
+                                textelement(iteminventory)
+                                {
+                                    XmlName = 'inventory';
+
+                                    trigger OnBeforePassVariable()
+                                    begin
+                                        Clear(NpCsStoreInventoryBuffer);
+                                        if NpCsStoreInventoryBuffer.Get(TempNpCsStore2.Code,TempItem2.Description) then;
+                                        ItemInventory := Format(NpCsStoreInventoryBuffer.Inventory,0,9);
+                                    end;
+                                }
+
+                                trigger OnPreXmlItem()
+                                begin
+                                    TempItem2.Copy(TempItem,true);
+                                end;
+                            }
+                        }
+                    }
+                }
+
+                trigger OnBeforePassVariable()
+                var
+                    NpCsStoreMgt: Codeunit "NpCs Store Mgt.";
+                begin
+                    NpCsStoreMgt.SetBufferInventory(NpCsStoreInventoryBuffer);
+                    TempNpCsStore2.Copy(TempNpCsStore,true);
+                end;
+
+                trigger OnAfterAssignVariable()
+                begin
+                    currXMLport.Skip;
+                end;
+            }
+        }
+    }
+
+    requestpage
+    {
+
+        layout
+        {
+        }
+
+        actions
+        {
+        }
+    }
+
+    var
+        NpCsStoreInventoryBuffer: Record "NpCs Store Inventory Buffer" temporary;
+        ItemNo: Code[20];
+
+    local procedure Store2InventoryBuffer()
+    begin
+        TempItem.FindSet;
+        repeat
+          if not NpCsStoreInventoryBuffer.Get(TempNpCsStore.Code,TempItem.Description) then begin
+            NpCsStoreInventoryBuffer.Init;
+            NpCsStoreInventoryBuffer."Store Code" := TempNpCsStore.Code;
+            NpCsStoreInventoryBuffer.Sku := TempItem.Description;
+            NpCsStoreInventoryBuffer.Insert;
+          end;
+        until TempItem.Next = 0;
+    end;
+}
+

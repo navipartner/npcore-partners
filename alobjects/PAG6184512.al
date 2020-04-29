@@ -1,0 +1,29 @@
+page 6184512 "EFT BIN Group Payment Links"
+{
+    // NPR5.42/NPKNAV/20180525  CASE 306689 Transport NPR5.42 - 25 May 2018
+
+    Caption = 'EFT BIN Group Payment Links';
+    PageType = ListPart;
+    SourceTable = "EFT BIN Group Payment Link";
+
+    layout
+    {
+        area(content)
+        {
+            repeater(Group)
+            {
+                field("Location Code";"Location Code")
+                {
+                }
+                field("Payment Type POS";"Payment Type POS")
+                {
+                }
+            }
+        }
+    }
+
+    actions
+    {
+    }
+}
+
