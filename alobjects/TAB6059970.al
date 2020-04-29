@@ -1,0 +1,130 @@
+table 6059970 "Variety Setup"
+{
+    // VRT1.11/MHA/20160412  CASE 236840 Added field 40 Hide Inactive Variants
+    // VRT1.11/JDH /20160601 CASE 242940 Added new fields for new functionalities + Captions
+    // NPR5.43/JDH /20180628 CASE 317108 Added "Create Variant Code From"
+
+    Caption = 'Variety Setup';
+
+    fields
+    {
+        field(1;"Primary Key";Code[10])
+        {
+            Caption = 'Primary Key';
+        }
+        field(9;"Variety Enabled";Boolean)
+        {
+            Caption = 'Variety Enabled';
+        }
+        field(10;"Item Journal Blocking";Option)
+        {
+            Caption = 'Item Journal Blocking';
+            OptionCaption = 'Total Block Item If Variants,Sale Block Item If Variants,Allow Non Variants';
+            OptionMembers = TotalBlockItemIfVariants,SaleBlockItemIfVariants,AllowNonVariants;
+        }
+        field(20;"Barcode Type (Alt. No.)";Option)
+        {
+            Caption = 'Barcode Type (Alt. No.)';
+            OptionCaption = ' ,EAN8,EAN13';
+            OptionMembers = " ",EAN8,EAN13;
+        }
+        field(21;"Alt. No. No. Series (I)";Code[10])
+        {
+            Caption = 'Alt. No. No. Series (Item)';
+            TableRelation = "No. Series";
+        }
+        field(22;"Create Alt. No. automatic";Boolean)
+        {
+            Caption = 'Create Alt. No. automatic';
+        }
+        field(23;"Alt. No. No. Series (V)";Code[10])
+        {
+            Caption = 'Alt. No. No. Series (Variant)';
+            TableRelation = "No. Series";
+        }
+        field(30;"Barcode Type (Item Cross Ref.)";Option)
+        {
+            Caption = 'Barcode Type (Item Cross Ref.)';
+            OptionCaption = ' ,EAN8,EAN13';
+            OptionMembers = " ",EAN8,EAN13;
+        }
+        field(31;"Item Cross Ref. No. Series (I)";Code[10])
+        {
+            Caption = 'Item Cross Ref. No. Series (Item)';
+            TableRelation = "No. Series";
+        }
+        field(32;"Create Item Cross Ref. auto.";Boolean)
+        {
+            Caption = 'Create Item Cross Ref. auto.';
+            InitValue = true;
+        }
+        field(33;"Item Cross Ref. No. Series (V)";Code[10])
+        {
+            Caption = 'Item Cross Ref. No. Series (Variant)';
+            TableRelation = "No. Series";
+        }
+        field(34;"Item Cross Ref. Description(I)";Option)
+        {
+            Caption = 'Item Cross Ref. Description (Item)';
+            OptionCaption = 'Item Description 1,Item Description 2';
+            OptionMembers = ItemDescription1,ItemDescription2;
+        }
+        field(35;"Item Cross Ref. Description(V)";Option)
+        {
+            Caption = 'Item Cross Ref. Description (Variant)';
+            OptionCaption = 'Item Description 1,Item Description 2,Variant Description 1,Variant Description 2';
+            OptionMembers = ItemDescription1,ItemDescription2,VariantDescription1,VariantDescription2;
+        }
+        field(40;"Hide Inactive Values";Boolean)
+        {
+            Caption = 'Hide Inactive Values';
+            Description = 'VRT1.11';
+        }
+        field(60;"Variant Description";Option)
+        {
+            Caption = 'Variant Description';
+            Description = 'VRT1.11';
+            OptionCaption = 'Variety Table Setup First 50,Variety Table Setup Next 50,Item Description 1,Item Description 2';
+            OptionMembers = VarietyTableSetupFirst50,VarietyTableSetupNext50,ItemDescription1,ItemDescription2;
+        }
+        field(61;"Variant Description 2";Option)
+        {
+            Caption = 'Variant Description 2';
+            Description = 'VRT1.11';
+            InitValue = VarietyTableSetupNext50;
+            OptionCaption = 'Variety Table Setup First 50,Variety Table Setup Next 50,Item Description 1,Item Description 2';
+            OptionMembers = VarietyTableSetupFirst50,VarietyTableSetupNext50,ItemDescription1,ItemDescription2;
+        }
+        field(70;"Create Variant Code From";Text[60])
+        {
+            Caption = 'Create Variant Code From';
+
+            trigger OnLookup()
+            var
+                EventSubscription: Record "Event Subscription";
+            begin
+                //-NPR5.43 [317108]
+                EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
+                EventSubscription.SetRange("Publisher Object ID",CODEUNIT::"Variety Clone Data");
+                EventSubscription.SetRange("Published Function",'GetNewVariantCode');
+                if PAGE.RunModal(PAGE::"Event Subscriptions",EventSubscription) <> ACTION::LookupOK then
+                  exit;
+
+                Validate("Create Variant Code From",EventSubscription."Subscriber Function");
+                //+NPR5.43 [317108]
+            end;
+        }
+    }
+
+    keys
+    {
+        key(Key1;"Primary Key")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+}
+

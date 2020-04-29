@@ -1,0 +1,299 @@
+page 6151590 "NpDc Coupon Type Card"
+{
+    // NPR5.34/MHA /20170720  CASE 282799 Object created - NpDc: NaviPartner Discount Coupon
+    // NPR5.37/MHA /20171012  CASE 293232 Deleted field 1010 "Coupon Qty. (Closed)" and renamed field 1020 "Posted Coupon Qty." to "Arch. Coupon Qty."
+    // NPR5.39/MHA /20180214  CASE 305146 Added field 70 "Enabled"
+    // NPR5.40/MHA /20180308  CASE 305859 Added Action "Comments" and InitCouponType() in OnNewRecord()
+    // NPR5.42/MHA /20180521  CASE 305859 Added field 67 Print on Issue
+
+    Caption = 'Coupon Type Card';
+    PageType = Card;
+    PromotedActionCategories = 'New,Process,Reports,Manage,Setup';
+    SourceTable = "NpDc Coupon Type";
+
+    layout
+    {
+        area(content)
+        {
+            group(General)
+            {
+                group(Control6014442)
+                {
+                    ShowCaption = false;
+                    field("Code";Code)
+                    {
+                        ShowMandatory = true;
+                    }
+                    field(Description;Description)
+                    {
+                    }
+                    field("Discount Type";"Discount Type")
+                    {
+                    }
+                    group(Control6014439)
+                    {
+                        ShowCaption = false;
+                        Visible = ("Discount Type"=0);
+                        field("Discount Amount";"Discount Amount")
+                        {
+                            ShowMandatory = true;
+                        }
+                    }
+                    group(Control6014440)
+                    {
+                        ShowCaption = false;
+                        Visible = ("Discount Type"=1);
+                        field("Discount %";"Discount %")
+                        {
+                            ShowMandatory = true;
+                        }
+                        field("Max. Discount Amount";"Max. Discount Amount")
+                        {
+                            ToolTip = 'Max. Discount Amount per Sale';
+                        }
+                    }
+                    field(Enabled;Enabled)
+                    {
+                    }
+                }
+                group(Control6014443)
+                {
+                    ShowCaption = false;
+                    field("Coupon Qty. (Open)";"Coupon Qty. (Open)")
+                    {
+                    }
+                    field("Arch. Coupon Qty.";"Arch. Coupon Qty.")
+                    {
+                    }
+                }
+            }
+            group("Issue Coupon")
+            {
+                Caption = 'Issue Coupon';
+                group(Control6014426)
+                {
+                    ShowCaption = false;
+                    field("Issue Coupon Module";"Issue Coupon Module")
+                    {
+
+                        trigger OnValidate()
+                        begin
+                            CurrPage.Update(true);
+                        end;
+                    }
+                }
+                group(Control6014427)
+                {
+                    ShowCaption = false;
+                    field("Reference No. Pattern";"Reference No. Pattern")
+                    {
+                        ShowMandatory = true;
+                        ToolTip = '[S] ~ Coupon No. [AN] ~ Random Char [AN*3] ~ 3 Random Chars';
+                    }
+                    field("Customer No.";"Customer No.")
+                    {
+                        Caption = 'Customer No.';
+                    }
+                    field("Print Template Code";"Print Template Code")
+                    {
+                    }
+                    field("Print on Issue";"Print on Issue")
+                    {
+                    }
+                }
+            }
+            group("Validate Coupon")
+            {
+                Caption = 'Validate Coupon';
+                group(Control6014430)
+                {
+                    ShowCaption = false;
+                    field("Validate Coupon Module";"Validate Coupon Module")
+                    {
+
+                        trigger OnValidate()
+                        begin
+                            CurrPage.Update(true);
+                        end;
+                    }
+                }
+                group(Control6014431)
+                {
+                    ShowCaption = false;
+                    field("Starting Date";"Starting Date")
+                    {
+                    }
+                    field("Ending Date";"Ending Date")
+                    {
+                    }
+                }
+            }
+            group("Apply Discount")
+            {
+                Caption = 'Apply Discount';
+                group(Control6014432)
+                {
+                    ShowCaption = false;
+                    field("Apply Discount Module";"Apply Discount Module")
+                    {
+
+                        trigger OnValidate()
+                        begin
+                            CurrPage.Update(true);
+                        end;
+                    }
+                }
+                group(Control6014433)
+                {
+                    ShowCaption = false;
+                    field("Max Use per Sale";"Max Use per Sale")
+                    {
+                    }
+                    field("Multi-Use Coupon";"Multi-Use Coupon")
+                    {
+                    }
+                    field("Multi-Use Qty.";"Multi-Use Qty.")
+                    {
+                        Caption = 'Multi-Use Qty.';
+                    }
+                }
+            }
+        }
+    }
+
+    actions
+    {
+        area(processing)
+        {
+            action("Issue Coupons")
+            {
+                Caption = 'Issue Coupons';
+                Image = PostedVoucherGroup;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    NpDcCouponMgt: Codeunit "NpDc Coupon Mgt.";
+                begin
+                    NpDcCouponMgt.IssueCoupons(Rec);
+                end;
+            }
+        }
+        area(navigation)
+        {
+            group(Setup)
+            {
+                action("Setup Issue Coupon")
+                {
+                    Caption = 'Setup Issue Coupon';
+                    Image = VoucherGroup;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+                    Visible = HasIssueCouponSetup;
+
+                    trigger OnAction()
+                    var
+                        NpDcCouponModuleMgt: Codeunit "NpDc Coupon Module Mgt.";
+                    begin
+                        NpDcCouponModuleMgt.OnSetupIssueCoupon(Rec);
+                    end;
+                }
+                action("Setup Validate Coupon")
+                {
+                    Caption = 'Setup Validate Coupon';
+                    Image = RefreshVoucher;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+                    Visible = HasValidateCouponSetup;
+
+                    trigger OnAction()
+                    var
+                        NpDcCouponModuleMgt: Codeunit "NpDc Coupon Module Mgt.";
+                    begin
+                        NpDcCouponModuleMgt.OnSetupValidateCoupon(Rec);
+                    end;
+                }
+                action("Setup Apply Discount")
+                {
+                    Caption = 'Setup Apply Discount';
+                    Image = Voucher;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+                    Visible = HasApplyDiscountSetup;
+
+                    trigger OnAction()
+                    var
+                        NpDcCouponModuleMgt: Codeunit "NpDc Coupon Module Mgt.";
+                    begin
+                        NpDcCouponModuleMgt.OnSetupApplyDiscount(Rec);
+                    end;
+                }
+            }
+            separator(Separator6014422)
+            {
+            }
+            action(Coupons)
+            {
+                Caption = 'Coupons';
+                Image = Voucher;
+                RunObject = Page "NpDc Coupons";
+                RunPageLink = "Coupon Type"=FIELD(Code);
+                ShortCutKey = 'Ctrl+F7';
+            }
+            action(Comments)
+            {
+                Caption = 'Co&mments';
+                Image = ViewComments;
+                RunObject = Page "Retail Comments";
+                RunPageLink = "Table ID"=CONST(6151590),
+                              "No."=FIELD(Code),
+                              "No. 2"=FILTER(''),
+                              Option=CONST("0"),
+                              "Option 2"=CONST("0"),
+                              Integer=CONST(0),
+                              "Integer 2"=CONST(0);
+            }
+        }
+    }
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        SetHasSetup();
+    end;
+
+    trigger OnNewRecord(BelowxRec: Boolean)
+    var
+        NpDcCouponMgt: Codeunit "NpDc Coupon Mgt.";
+    begin
+        //-NPR5.40 [305859]
+        NpDcCouponMgt.InitCouponType(Rec);
+        //+NPR5.40 [305859]
+    end;
+
+    var
+        HasApplyDiscountSetup: Boolean;
+        HasIssueCouponSetup: Boolean;
+        HasValidateCouponSetup: Boolean;
+
+    local procedure SetHasSetup()
+    var
+        NpDcCouponModuleMgt: Codeunit "NpDc Coupon Module Mgt.";
+    begin
+        HasIssueCouponSetup := false;
+        NpDcCouponModuleMgt.OnHasIssueCouponSetup(Rec,HasIssueCouponSetup);
+
+        HasValidateCouponSetup := false;
+        NpDcCouponModuleMgt.OnHasValidateCouponSetup(Rec,HasValidateCouponSetup);
+
+        HasApplyDiscountSetup := false;
+        NpDcCouponModuleMgt.OnHasApplyDiscountSetup(Rec,HasApplyDiscountSetup);
+
+        CurrPage.Update(false);
+    end;
+}
+

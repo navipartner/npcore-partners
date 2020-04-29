@@ -1,0 +1,62 @@
+table 6184493 "Pepper Terminal Type"
+{
+    // NPR5.20\BR\20160316  CASE 231481 Object Created
+    // NPR5.25/BR/20160509  CASE 231481 Added field Force Fixed Currency Check.
+
+    Caption = 'Pepper Terminal Type';
+    DataCaptionFields = ID,Description;
+    DrillDownPageID = "Pepper Terminal Types";
+    LookupPageID = "Pepper Terminal Types";
+
+    fields
+    {
+        field(10;ID;Integer)
+        {
+            Caption = 'ID';
+        }
+        field(20;Description;Text[100])
+        {
+            Caption = 'Description';
+        }
+        field(30;Active;Boolean)
+        {
+            Caption = 'Active';
+
+            trigger OnValidate()
+            begin
+                if Active then
+                  TestField(Deprecated,false);
+            end;
+        }
+        field(40;Deprecated;Boolean)
+        {
+            Caption = 'Deprecated';
+
+            trigger OnValidate()
+            begin
+                if Deprecated then
+                  TestField(Active,false);
+            end;
+        }
+        field(200;Overtender;Boolean)
+        {
+            Caption = 'Overtender';
+        }
+        field(250;"Force Fixed Currency Check";Boolean)
+        {
+            Caption = 'Force Fixed Currency Check';
+        }
+    }
+
+    keys
+    {
+        key(Key1;ID)
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+}
+

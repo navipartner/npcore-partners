@@ -1,0 +1,125 @@
+table 6151603 "NpDc Sale Line POS New Coupon"
+{
+    // NPR5.36/MHA /20170831  CASE 286812 Object created - Discount Coupon Issue Module
+    // NPR5.41/MHA /20180412  CASE 307048 Added fields for predefining Discount
+
+    Caption = 'NpDc Sale Line POS New Coupon';
+
+    fields
+    {
+        field(1;"Register No.";Code[10])
+        {
+            Caption = 'Cash Register No.';
+            NotBlank = true;
+            TableRelation = Register;
+        }
+        field(5;"Sales Ticket No.";Code[20])
+        {
+            Caption = 'Sales Ticket No.';
+            Editable = false;
+            NotBlank = true;
+        }
+        field(10;"Sale Type";Option)
+        {
+            Caption = 'Sale Type';
+            OptionCaption = 'Sale,Payment,Debit Sale,Gift Voucher,Credit Voucher,Deposit,Out payment,Comment,Cancelled,Open/Close';
+            OptionMembers = Sale,Payment,"Debit Sale","Gift Voucher","Credit Voucher",Deposit,"Out payment",Comment,Cancelled,"Open/Close";
+        }
+        field(15;"Sale Date";Date)
+        {
+            Caption = 'Sale Date';
+        }
+        field(20;"Sale Line No.";Integer)
+        {
+            Caption = 'Sale Line No.';
+        }
+        field(25;"Line No.";Integer)
+        {
+            Caption = 'Line No.';
+        }
+        field(30;"Starting Date";DateTime)
+        {
+            Caption = 'Starting Date';
+            Description = 'NPR5.41';
+        }
+        field(35;"Ending Date";DateTime)
+        {
+            Caption = 'Ending Date';
+            Description = 'NPR5.41';
+        }
+        field(50;"Coupon Type";Code[20])
+        {
+            Caption = 'Coupon Type';
+            TableRelation = "NpDc Coupon Type";
+        }
+        field(55;Quantity;Decimal)
+        {
+            Caption = 'Quantity';
+            DecimalPlaces = 0:5;
+            Description = 'NPR5.41';
+        }
+        field(60;"Discount Type";Option)
+        {
+            Caption = 'Discount Type';
+            Description = 'NPR5.41';
+            OptionCaption = 'Discount Amount,Discount %';
+            OptionMembers = "Discount Amount","Discount %";
+        }
+        field(65;"Discount %";Decimal)
+        {
+            Caption = 'Discount %';
+            DecimalPlaces = 0:5;
+            Description = 'NPR5.41';
+            MaxValue = 100;
+            MinValue = 0;
+        }
+        field(70;"Max. Discount Amount";Decimal)
+        {
+            BlankZero = true;
+            Caption = 'Max. Discount Amount';
+            Description = 'NPR5.41';
+        }
+        field(75;"Amount per Qty.";Decimal)
+        {
+            AutoFormatType = 1;
+            Caption = 'Amount per Qty.';
+            Description = 'NPR5.41';
+        }
+        field(80;"Max Use per Sale";Integer)
+        {
+            Caption = 'Max Use per Sale';
+            Description = 'NPR5.41';
+            InitValue = 1;
+            MinValue = 1;
+        }
+    }
+
+    keys
+    {
+        key(Key1;"Register No.","Sales Ticket No.","Sale Type","Sale Date","Sale Line No.","Line No.")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+
+    var
+        SkipCalcDiscount: Boolean;
+
+    procedure GetSkipCalcDiscount(): Boolean
+    begin
+        //-NPR5.31 [262904]
+        exit(SkipCalcDiscount);
+        //+NPR5.31 [262904]
+    end;
+
+    procedure SetSkipCalcDiscount(NewSkipCalcDiscount: Boolean)
+    begin
+        //-NPR5.31 [262904]
+        SkipCalcDiscount := NewSkipCalcDiscount;
+        //+NPR5.31 [262904]
+    end;
+}
+

@@ -1,0 +1,46 @@
+query 6014417 "POS Entry with Sales Lines"
+{
+    // NPR5.53/ALPO/20191016 CASE 371478 Query for report 60144441 "POS Item Sales with Dimensions"
+
+    Caption = 'POS Entry with Sales Lines';
+
+    elements
+    {
+        dataitem(POS_Entry;"POS Entry")
+        {
+            column(Posting_Date;"Posting Date")
+            {
+            }
+            column(POS_Unit_No;"POS Unit No.")
+            {
+            }
+            dataitem(POS_Sales_Line;"POS Sales Line")
+            {
+                DataItemLink = "POS Entry No."=POS_Entry."Entry No.";
+                SqlJoinType = InnerJoin;
+                column(POS_Entry_No;"POS Entry No.")
+                {
+                }
+                column(Line_No;"Line No.")
+                {
+                }
+                column(Type;Type)
+                {
+                }
+                column(No;"No.")
+                {
+                }
+                column(Location_Code;"Location Code")
+                {
+                }
+                column(Dimension_Set_ID;"Dimension Set ID")
+                {
+                }
+                column(Exclude_from_Posting;"Exclude from Posting")
+                {
+                }
+            }
+        }
+    }
+}
+

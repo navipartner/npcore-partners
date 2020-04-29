@@ -1,0 +1,127 @@
+table 6150729 "POS Sales Workflow"
+{
+    // NPR5.39/MHA /20180202  CASE 302779 Object created - POS Workflow
+    // NPR5.45/MHA /20180820  CASE 321266 Updated Calcformula of field 100 "Workflow Steps"
+
+    Caption = 'POS Sales Workflow';
+    DrillDownPageID = "POS Sales Workflows";
+    LookupPageID = "POS Sales Workflows";
+
+    fields
+    {
+        field(1;"Code";Code[20])
+        {
+            Caption = 'Code';
+            NotBlank = true;
+        }
+        field(5;Description;Text[100])
+        {
+            Caption = 'Description';
+        }
+        field(10;"Publisher Codeunit ID";Integer)
+        {
+            BlankZero = true;
+            Caption = 'Publisher Codeunit ID';
+        }
+        field(15;"Publisher Codeunit Name";Text[50])
+        {
+            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=CONST(Codeunit),
+                                                             "Object ID"=FIELD("Publisher Codeunit ID")));
+            Caption = 'Publisher Codeunit Name';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(20;"Publisher Function";Text[80])
+        {
+            Caption = 'Publisher Function';
+        }
+        field(100;"Workflow Steps";Integer)
+        {
+            CalcFormula = Count("POS Sales Workflow Step" WHERE ("Set Code"=CONST(''),
+                                                                 "Workflow Code"=FIELD(Code)));
+            Caption = 'Workflow Steps';
+            Description = 'NPR5.45';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+    }
+
+    keys
+    {
+        key(Key1;"Code")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+
+    trigger OnDelete()
+    var
+        POSSalesWorkflowStep: Record "POS Sales Workflow Step";
+    begin
+        POSSalesWorkflowStep.SetRange("Workflow Code",Code);
+        if POSSalesWorkflowStep.FindFirst then
+          POSSalesWorkflowStep.DeleteAll;
+    end;
+
+    procedure DiscoverPOSSalesWorkflow(NewCode: Code[20];NewDescription: Text[100];NewPublisherCodeunitId: Integer;NewPublisherFunction: Text[80])
+    var
+        PrevRec: Text;
+    begin
+        if not Get(NewCode) then begin
+          Init;
+          Code := NewCode;
+          Insert(true);
+        end;
+
+        PrevRec := Format(Rec);
+
+        Description := NewDescription;
+        "Publisher Codeunit ID" := NewPublisherCodeunitId;
+        "Publisher Function" := NewPublisherFunction;
+
+        if PrevRec <> Format(Rec) then
+          Modify(true);
+    end;
+
+    [IntegrationEvent(TRUE, false)]
+    procedure OnDiscoverPOSSalesWorkflows()
+    begin
+    end;
+
+    procedure InitPOSSalesWorkflowSteps() StepsInitiated: Integer
+    var
+        EventSubscription: Record "Event Subscription";
+        POSSalesWorkflowStep: Record "POS Sales Workflow Step";
+    begin
+        EventSubscription.SetRange("Publisher Object Type",EventSubscription."Publisher Object Type"::Codeunit);
+        EventSubscription.SetRange("Publisher Object ID","Publisher Codeunit ID");
+        EventSubscription.SetRange("Published Function","Publisher Function");
+        if not EventSubscription.FindSet then
+          exit(0);
+
+        repeat
+          //-NPR5.45 [321266]
+          //IF NOT POSSalesWorkflowStep.GET(Code,EventSubscription."Subscriber Codeunit ID",EventSubscription."Subscriber Function") THEN BEGIN
+          if not POSSalesWorkflowStep.Get('', Code,EventSubscription."Subscriber Codeunit ID",EventSubscription."Subscriber Function") then begin
+          //+NPR5.45 [321266]
+            StepsInitiated += 1;
+
+            POSSalesWorkflowStep.Init;
+            //-NPR5.45 [321266]
+            POSSalesWorkflowStep."Set Code" := '';
+            //+NPR5.45 [321266]
+            POSSalesWorkflowStep."Workflow Code" := Code;
+            POSSalesWorkflowStep."Subscriber Codeunit ID" := EventSubscription."Subscriber Codeunit ID";
+            POSSalesWorkflowStep."Subscriber Function" := EventSubscription."Subscriber Function";
+            POSSalesWorkflowStep.Enabled := true;
+            POSSalesWorkflowStep.Insert(true);
+          end;
+        until EventSubscription.Next = 0;
+
+        exit(StepsInitiated);
+    end;
+}
+

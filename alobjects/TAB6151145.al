@@ -1,0 +1,161 @@
+table 6151145 "M2 Price Calculation Buffer"
+{
+    // NPR5.48/TSA /20181207 CASE 320426 First Version
+
+    Caption = 'Sales Price';
+    LookupPageID = "Sales Prices";
+
+    fields
+    {
+        field(1;"Item No.";Code[20])
+        {
+            Caption = 'Item No.';
+            NotBlank = true;
+            TableRelation = Item;
+        }
+        field(2;"Source Code";Code[20])
+        {
+            Caption = 'Sales Code';
+        }
+        field(3;"Currency Code";Code[10])
+        {
+            Caption = 'Currency Code';
+            TableRelation = Currency;
+        }
+        field(4;"Starting Date";Date)
+        {
+            Caption = 'Starting Date';
+        }
+        field(5;"Unit Price";Decimal)
+        {
+            AutoFormatExpression = "Currency Code";
+            AutoFormatType = 2;
+            Caption = 'Unit Price';
+            MinValue = 0;
+        }
+        field(6;"Line Discount %";Decimal)
+        {
+            AutoFormatType = 2;
+            Caption = 'Line Discount %';
+            MaxValue = 100;
+            MinValue = 0;
+        }
+        field(7;"Price Includes VAT";Boolean)
+        {
+            Caption = 'Price Includes VAT';
+        }
+        field(10;"Allow Invoice Disc.";Boolean)
+        {
+            Caption = 'Allow Invoice Disc.';
+            InitValue = true;
+        }
+        field(11;"VAT Bus. Posting Gr. (Price)";Code[10])
+        {
+            Caption = 'VAT Bus. Posting Gr. (Price)';
+            TableRelation = "VAT Business Posting Group";
+        }
+        field(12;"VAT Prod. Posting Group";Code[10])
+        {
+            Caption = 'VAT Prod. Posting Group';
+            TableRelation = "VAT Product Posting Group";
+        }
+        field(13;"Source Type";Option)
+        {
+            Caption = 'Sales Type';
+            OptionCaption = 'Unit Price,Customer,Customer Price Group,All Customers,Campaign,Item Discount,Item Discount Group,Customer Discount Group';
+            OptionMembers = "Unit Price",Customer,"Customer Price Group","All Customers",Campaign,"Item Discount","Item Discount Group","Customer Discount Group";
+        }
+        field(14;"Minimum Quantity";Decimal)
+        {
+            Caption = 'Minimum Quantity';
+            DecimalPlaces = 0:5;
+            MinValue = 0;
+        }
+        field(15;"Ending Date";Date)
+        {
+            Caption = 'Ending Date';
+        }
+        field(100;"Total VAT %";Decimal)
+        {
+            Caption = 'Total VAT %';
+            MinValue = 0;
+        }
+        field(110;"Request ID";Text[40])
+        {
+            Caption = 'Request ID';
+        }
+        field(120;Priority;Integer)
+        {
+            Caption = 'Priority';
+        }
+        field(130;Age;Integer)
+        {
+            Caption = 'Age';
+        }
+        field(140;"Unit Price Base";Decimal)
+        {
+            AutoFormatExpression = "Currency Code";
+            AutoFormatType = 2;
+            Caption = 'Unit Price Base';
+        }
+        field(150;"Show Details";Boolean)
+        {
+            Caption = 'Show Details';
+        }
+        field(160;"Response Message";Text[250])
+        {
+            Caption = 'Response Message';
+        }
+        field(5400;"Unit of Measure Code";Code[10])
+        {
+            Caption = 'Unit of Measure Code';
+            TableRelation = "Item Unit of Measure".Code WHERE ("Item No."=FIELD("Item No."));
+        }
+        field(5700;"Variant Code";Code[10])
+        {
+            Caption = 'Variant Code';
+            TableRelation = "Item Variant".Code WHERE ("Item No."=FIELD("Item No."));
+        }
+        field(7001;"Allow Line Disc.";Boolean)
+        {
+            Caption = 'Allow Line Disc.';
+            InitValue = true;
+        }
+        field(6151145;"Price End Date";Date)
+        {
+            Caption = 'Price End Date';
+        }
+        field(6151146;"Discount End Date";Date)
+        {
+            Caption = 'Discount End Date';
+        }
+    }
+
+    keys
+    {
+        key(Key1;"Item No.","Source Type","Source Code","Starting Date","Currency Code","Variant Code","Unit of Measure Code","Minimum Quantity","Request ID")
+        {
+        }
+        key(Key2;"Request ID",Priority,Age)
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+
+    var
+        CustPriceGr: Record "Customer Price Group";
+        Text000: Label '%1 cannot be after %2';
+        Cust: Record Customer;
+        Text001: Label '%1 must be blank.';
+        Campaign: Record Campaign;
+        Item: Record Item;
+        Text002: Label 'If Sales Type = %1, then you can only change Starting Date and Ending Date from the Campaign Card.';
+
+    local procedure UpdateValuesFromItem()
+    begin
+    end;
+}
+
