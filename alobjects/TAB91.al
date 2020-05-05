@@ -8,6 +8,7 @@ tableextension 6014453 tableextension6014453 extends "User Setup"
     // NPR5.38/MHA /20180115  CASE 302240 Added fields 6014405 "Allow Register Switch" and 6014410 "Register Switch Filter"
     // NPR5.46/MMV /20181003  CASE 290734 Renamed field 6014400 to make its purpose clear when used with transcendence.
     // NPR5.52/ZESO/20190925  CASE 358656 Added Field Anonymize Customers
+    // NPR5.54/TSA /20200221 CASE 392247 Added field "Block Role Center"
     fields
     {
         field(6014400;"Backoffice Register No.";Code[10])
@@ -39,6 +40,10 @@ tableextension 6014453 tableextension6014453 extends "User Setup"
         {
             Caption = 'Anonymize Customers';
             Description = 'NPR5.52';
+        }
+        field(6151070;"Block Role Center";Boolean)
+        {
+            Caption = 'Block Role Center';
         }
     }
 }

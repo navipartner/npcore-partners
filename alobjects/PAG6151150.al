@@ -2,8 +2,12 @@ page 6151150 "Customer GDPR Setup"
 {
     // NPR5.52/JAKUBV/20191022  CASE 358656 Transport NPR5.52 - 22 October 2019
     // NPR5.53/ZESO/20200115 CASE 358656 Added Fields Customer Posting Group Filter, Gen. Bus. Posting Group Filter, No of Customers and Page Action 'Extract Customers'
+    // NPR5.54/ZESO/20200310 CASE 358656 Refactored Code which gives list of Customers to be anonymised.
+    // NPR5.54/ZESO/20200310 CASE 358656 Set InsertAllowed and DeleteAllowed to No
 
     Caption = 'Customer GDPR Setup';
+    DeleteAllowed = false;
+    InsertAllowed = false;
     PageType = Card;
     SourceTable = "Customer GDPR SetUp";
     UsageCategory = Administration;
@@ -71,6 +75,7 @@ page 6151150 "Customer GDPR Setup"
                     ILE: Record "Item Ledger Entry";
                     NoCLE: Boolean;
                     NoILE: Boolean;
+                    NoTrans: Boolean;
                 begin
 
                     CustToAnonymize.Reset;
@@ -95,12 +100,44 @@ page 6151150 "Customer GDPR Setup"
                     Customer.SetRange(Customer.Anonymized,false);
                     Customer.SetFilter(Customer."Customer Posting Group",GDPRSetup."Customer Posting Group Filter");
                     Customer.SetFilter(Customer."Gen. Bus. Posting Group",GDPRSetup."Gen. Bus. Posting Group Filter");
+                    //-NPR5.54 [358656]
+                    Customer.SetFilter("Last Date Modified",'<>%1',0D);
+                    //+NPR5.54 [358656]
                     if Customer.FindSet then
                       repeat
                         Window.Update(1,Customer."No.");
 
+                        //-NPR5.54 [358656]
+                        //IF (TODAY - Customer."Last Date Modified") >= (TODAY - CALCDATE(VarPeriod,TODAY)) THEN BEGIN
+                        NoTrans := true;
 
-                        if (Today - Customer."Last Date Modified") >= (Today - CalcDate(VarPeriod,Today)) then begin
+                        CLE.Reset;
+                        CLE.SetCurrentKey("Customer No.","Posting Date","Currency Code");
+                        CLE.SetRange("Customer No.",Customer."No.");
+                        NoTrans := CLE.FindFirst;
+
+
+                        if NoTrans then begin
+                          ILE.Reset;
+                          ILE.SetCurrentKey("Source Type","Source No.","Item No.","Variant Code","Posting Date");
+                          ILE.SetRange(ILE."Source Type",ILE."Source Type"::Customer);
+                          ILE.SetRange(ILE."Source No.",Customer."No.");
+                          NoTrans := ILE.FindFirst;
+                        end;
+
+
+                        if NoTrans then begin
+                          if (Today - Customer."Last Date Modified") >= (Today - CalcDate(VarPeriod,Today)) then begin
+                            CustToAnonymize.Init;
+                            CustToAnonymize."Entry No" := VarEntryNo;
+                            CustToAnonymize."Customer No" := Customer."No.";
+                            CustToAnonymize."Customer Name" := Customer.Name;
+                            CustToAnonymize.Insert;
+                            VarEntryNo += 1;
+                          end;
+                        end else begin
+                        //+NPR5.54 [358656]
+
                           NoCLE := false;
                           NoILE := false;
                           CLE.Reset;
@@ -118,9 +155,6 @@ page 6151150 "Customer GDPR Setup"
                           if not ILE.FindFirst then
                             NoILE := true;
 
-
-
-
                           if NoILE and NoCLE then begin
                             CustToAnonymize.Init;
                             CustToAnonymize."Entry No" := VarEntryNo;
@@ -136,7 +170,30 @@ page 6151150 "Customer GDPR Setup"
                 end;
             }
         }
+        area(navigation)
+        {
+            action("Web Requests")
+            {
+                Caption = 'Web Requests';
+                Ellipsis = true;
+                Image = AbsenceCategory;
+                Promoted = true;
+                PromotedCategory = Process;
+                RunObject = Page "GDPR Anonymization Request";
+            }
+        }
     }
+
+    trigger OnOpenPage()
+    begin
+        //-NPR5.54 [358656]
+        Reset;
+        if not Get then begin
+          Init;
+          Insert;
+        end;
+        //-NPR5.54 [358656]
+    end;
 
     var
         GenBusPostingGrp: Record "Gen. Business Posting Group";

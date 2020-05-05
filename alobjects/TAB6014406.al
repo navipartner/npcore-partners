@@ -110,8 +110,13 @@ table 6014406 "Sale Line POS"
     // NPR5.53/MHA /20191030 CASE 374819 Removed VAT % from TransferToSalesLine()
     // NPR5.53/ALPO/20191210 CASE 380609 NPRE: inherit seating dimensions
     // NPR5.53/SARA/20200129 CASE 387895 Roll back changes for case 380979
+    // NPR5.54/ALPO/20200213 CASE 385837 Copy comment lines from POS Sale to Sales Order
+    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale: DrillDownPageID set to page 6150748 "POS Sale Lines Subpage"
+    // NPR5.54/MMV /20200220 CASE 391871 Moved GUID creation from table subscribers to table trigger to have everything centralized.
+    // NPR5.54/TSA /20200311 CASE 395683 Initialization of currency to get correct rounding precision and including discount amount in rounding
 
     Caption = 'Sale Line';
+    DrillDownPageID = "POS Sale Lines Subpage";
     PasteIsValid = false;
 
     fields
@@ -1765,12 +1770,8 @@ table 6014406 "Sale Line POS"
         Err002: Label 'A financial account has not been selected for the purchase %1';
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
     begin
-        //-NPR5.51 [359385]
-        // IF "Cash Terminal Approved" THEN
-        //  ERROR(ErrTerm,"No.");
         if "EFT Approved" then
             Error(ERR_EFT_DELETE);
-        //+NPR5.51 [359385]
 
         RetailSetup.Get;
         Deleting := true;
@@ -1915,20 +1916,17 @@ table 6014406 "Sale Line POS"
     trigger OnInsert()
     begin
         if "Orig. POS Sale ID" = 0 then begin
-            //-NPR5.48 [335967]
-            //SalePOS.GET("Register No.","Sales Ticket No.");
             GetPOSHeader;
-            //+NPR5.48 [335967]
+
             "Orig. POS Sale ID" := SalePOS."POS Sale ID";
             "Orig. POS Line No." := "Line No.";
         end;
 
-        //-NPR5.40 [294655]
-        // IF Item.GET(ItemGlobal."No.") THEN BEGIN
-        //  IF Item."Std. Sales Qty." <> 0 THEN
-        //    VALIDATE(Quantity, Item."Std. Sales Qty.");
-        // END;
-        //+NPR5.40 [294655]
+        //-NPR5.54 [391871]
+        if IsNullGuid("Retail ID") then begin
+          "Retail ID" := CreateGuid();
+        end;
+        //+NPR5.54 [391871]
     end;
 
     trigger OnRename()
@@ -2162,11 +2160,13 @@ table 6014406 "Sale Line POS"
         //SalesLine.Description := Description;
         //+NPR5.40 [306257]
 
-        if "No." = '*' then begin
+        //IF "No." = '*' THEN BEGIN  //NPR5.54 [385837]-revoked
+        if ("No." = '*') or (Type = Type::Comment) then begin  //NPR5.54 [385837]
             SalesLine."No." := '';
             //-NPR5.40 [306257]
             SalesLine.Description := Description;
             //+NPR5.40 [306257]
+          SalesLine."Description 2" := "Description 2";  //NPR5.54 [385837]
             exit;
         end;
 
@@ -2495,6 +2495,10 @@ table 6014406 "Sale Line POS"
         TotalAmountInclVAT: Decimal;
         TotalQuantityBase: Decimal;
     begin
+        //-NPR5.54 [395683]
+        Currency.InitRoundingPrecision ();
+        //+NPR5.54 [395683]
+
         //-NPR5.31 [248534]
         with SaleLinePOS do begin
             //-NPR5.48 [335967]
@@ -2545,8 +2549,13 @@ table 6014406 "Sale Line POS"
                 "Amount Including VAT" := "Amount Including VAT" - "Discount Amount";
 
                 //-NPR5.48 [338181]
-                "Line Amount" := Round(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
-                //+NPR5.48 [338181]
+
+            //-NPR5.54 [395683]
+            //"Line Amount" := ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
+            "Line Amount" := Round (Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
+            //+NPR5.54 [395683]
+
+            //+NPR5.48 [338181]
 
                 case "VAT Calculation Type" of
                     "VAT Calculation Type"::"Reverse Charge VAT",
@@ -2602,9 +2611,14 @@ table 6014406 "Sale Line POS"
                         "Discount %" := Round(100 - (Amount - "Discount Amount") / Amount * 100, 0.0001);
                 Amount := Amount - "Discount Amount";
 
-                //-NPR5.48 [338181]
-                "Line Amount" := Round(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
-                //+NPR5.48 [338181]
+            //-NPR5.48 [338181]
+
+            //-NPR5.54 [395683]
+            //"Line Amount" := ROUND(Quantity * "Unit Price", Currency."Amount Rounding Precision") - "Discount Amount";
+            "Line Amount" := Round (Quantity * "Unit Price" - "Discount Amount", Currency."Amount Rounding Precision");
+            //+NPR5.54 [395683]
+
+            //+NPR5.48 [338181]
 
                 case "VAT Calculation Type" of
                     "VAT Calculation Type"::"Reverse Charge VAT",

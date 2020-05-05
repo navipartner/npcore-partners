@@ -5,6 +5,7 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
     // NPR5.49/MHA /20190228  CASE 342811 Added functions OnLookupVoucherTypeCode(), OnValidateVoucherTypeCode()
     // NPR5.52/ALPO/20190925  CASE 369420 Disallow negative quantity of gift vouchers to be sold
     // NPR5.53/MHA /20200103  CASE 384055 Customer No. is carried to Retail Voucher in IssueVoucher()
+    // NPR5.54/MHA /20200310  CASE 372135 Added Generation of Voucher- and Reference No. in IssueVoucher() in order to display Reference No on POS Sales Line
 
 
     trigger OnRun()
@@ -238,9 +239,12 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
     local procedure IssueVoucher(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session")
     var
         SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
+        SaleLinePOSReference: Record "NpRv Sale Line POS Reference";
         VoucherType: Record "NpRv Voucher Type";
         SalePOS: Record "Sale POS";
         SaleLinePOS: Record "Sale Line POS";
+        TempVoucher: Record "NpRv Voucher" temporary;
+        NpRvVoucherMgt: Codeunit "NpRv Voucher Mgt.";
         POSSale: Codeunit "POS Sale";
         POSSaleLine: Codeunit "POS Sale Line";
         VoucherTypeCode: Text;
@@ -330,6 +334,28 @@ codeunit 6151012 "NpRv Issue POS Action Mgt."
           SaleLinePOSVoucher."Phone No." := CopyStr(JSON.GetString('input',false),1,MaxStrLen(SaleLinePOSVoucher."Phone No."));
         //+NPR5.48 [341711]
         SaleLinePOSVoucher.Insert;
+
+        //-NPR5.54 [372135]
+        NpRvVoucherMgt.GenerateTempVoucher(VoucherType,TempVoucher);
+
+        SaleLinePOSVoucher.Description := TempVoucher.Description;
+        SaleLinePOSVoucher.Modify;
+
+        SaleLinePOSReference.Init;
+        SaleLinePOSReference."Register No." := SaleLinePOSVoucher."Register No.";
+        SaleLinePOSReference."Sales Ticket No." := SaleLinePOSVoucher."Sales Ticket No.";
+        SaleLinePOSReference."Sale Type" := SaleLinePOSVoucher."Sale Type";
+        SaleLinePOSReference."Sale Date" := SaleLinePOSVoucher."Sale Date";
+        SaleLinePOSReference."Sale Line No." := SaleLinePOSVoucher."Sale Line No.";
+        SaleLinePOSReference."Voucher Line No." := SaleLinePOSVoucher."Line No.";
+        SaleLinePOSReference."Voucher No." := TempVoucher."No.";
+        SaleLinePOSReference."Reference No." := TempVoucher."Reference No.";
+        SaleLinePOSReference.Insert;
+
+        SaleLinePOS.Description := TempVoucher.Description;
+        SaleLinePOS.Modify;
+        POSSession.RequestRefreshData();
+        //+NPR5.54 [372135]
     end;
 
     local procedure ScanReferenceNos(SaleLinePOS: Record "Sale Line POS";Quantity: Decimal)

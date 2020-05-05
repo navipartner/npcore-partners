@@ -28,6 +28,7 @@ codeunit 6014416 "Mixed Discount Management"
     // NPR5.46/MMV /20181009  CASE 331487 Fixed incorrect unit price assignment when applying mix to lines.
     // NPR5.53/SARA/20191128  CASE 378232 Fixed Mix discount applied to wrong priority
     // NPR5.53/SARA/20200122  CASE 380979 New feature with Mixed Discount with Customer having Price Incl VAT = False
+    // NPR5.54/SARA/20200320  CASE 396777 Fix Exit Variable in fonction FindPriority
 
 
     trigger OnRun()
@@ -984,6 +985,9 @@ codeunit 6014416 "Mixed Discount Management"
         //IF TempMixedDiscountLine.GET(TempMixedDiscount.Code,TempMixedDiscountLine."Disc. Grouping Type"::"Item Group",TempSaleLinePOS."Item Disc. Group",'') AND (HighestPriority > TempMixedDiscountLine.Priority) THEN
         if TempMixedDiscountLine.Get(TempMixedDiscount.Code,TempMixedDiscountLine."Disc. Grouping Type"::"Item Disc. Group",TempSaleLinePOS."Item Disc. Group",'') and (HighestPriority > TempMixedDiscountLine.Priority) then
         //+NPR5.53 [378232]
+          //-NPR5.54 [396777]
+          HighestPriority := TempMixedDiscountLine.Priority;
+          //+NPR5.54 [396777]
 
         exit(HighestPriority);
         //+NPR5.31 [262964]

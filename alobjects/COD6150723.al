@@ -27,6 +27,11 @@ codeunit 6150723 "POS Action - Insert Item"
     // NPR5.52/CLVA/20190928  CASE 369231  Added support for serial no./rfid tag validation
     //                                    Added EventCodeSerialNoItemCrossRef and SetEanBoxEventInScopeSerialNoItemCrossRef
     // NPR5.52/MHA /20191014  CASE 370961 Accessory Alt. Price is adjusted for Price Includes VAT in AddAccessoryForItem()
+    // NPR5.54/ALPO/20200218  CASE 388951 Suggest Item AddOns after new line is inserted
+    // NPR5.54/TSA /20200221 CASE 369231 Added SerialNoItemCrossReference as an option in itemIdentifyerType so EAN box discovery works
+    // NPR5.54/CLVA/20200302 CASE 369231 Added option value SerialNoItemCrossReference to local variable ItemIdentifierType in function Step_AddSalesLine
+    // NPR5.54/MMV /20200304 CASE 364340 Isolated line insertion from JSON parsing in global function for test purposes.
+    // NPR5.54/ALPO/20200410 CASE 399978 AddItemLine(): fixed issue with unit price not being passed to POS line
 
 
     trigger OnRun()
@@ -48,8 +53,9 @@ codeunit 6150723 "POS Action - Insert Item"
         TEXTeditDesc_lead: Label 'Line description';
         TEXTeditDesc_title: Label 'Add or change description.';
         ERROR_ITEMSEARCH: Label 'Could not find a matching item for input %1';
+        COMMENT_UNKNOWN_TAG: Label 'Unknown RFID Tag %1';
 
-    local procedure ActionCode(): Text
+    procedure ActionCode(): Text
     begin
         exit('ITEM');
     end;
@@ -74,8 +80,6 @@ codeunit 6150723 "POS Action - Insert Item"
           Sender.Type::Generic,
           Sender."Subscriber Instances Allowed"::Single)
         then begin
-
-            //-NPR5.40 [294655]
             Sender.RegisterWorkflowStep('editDescription', 'param.descriptionEdit && input({title: labels.editDesc_title, caption: labels.editDesc_lead, value: context.defaultDescription}).cancel(abort);');
             Sender.RegisterWorkflowStep('skipContextDialogs', 'goto("addSalesLine")');
 
@@ -88,26 +92,11 @@ codeunit 6150723 "POS Action - Insert Item"
 
             Sender.RegisterWorkflow(false);
 
-            //  itemTrackingCode := 'context.reask; reask = false; context.validatedSerialNumber; context.useSpecificTracking; ';
-            //  itemTrackingCode := itemTrackingCode + 'context.prompt_itemTracking && input(labels.itemTracking_title, labels.itemTracking_lead, context.itemTracking_instructions, context.inputSerialDefault, true).cancel()';
-            //  itemTrackingCode := itemTrackingCode + '.goto("doneItemTracking"); if (context.useSpecificTracking == true) {respond() }';
-            //
-            //  Sender.RegisterWorkflowStep('itemTracking', itemTrackingCode);
-            //  Sender.RegisterWorkflowStep('reaskStep','if (context.reask == true) { goto("itemTracking"); }');
-            //  Sender.RegisterWorkflowStep('doneItemTracking', '');
-            //
-            //  Sender.RegisterWorkflowStep('doneItemTracking', '');
-            //  Sender.RegisterWorkflowStep ('EditDesc', 'if (param.descriptionEdit == true) {input({title: labels.editDesc_title, caption: labels.editDesc_lead, value: context.defaultDescription}).respond();} ');
-            //
-            //  Sender.RegisterWorkflowStep ('itemSearch','context.itemSearchItemNo;');
-            //  Sender.RegisterWorkflowStep ('unitprice', 'context.isMiscItem && numpad ({title: labels.UnitpriceTitle, caption: labels.UnitPriceCaption}).cancel(abort).ok(respond);');
-            //
-            //  Sender.RegisterWorkflowStep('addSalesLine','respond()');
-            //
-            //  Sender.RegisterWorkflow(TRUE);
-            //+NPR5.40 [294655]
+          //-NPR5.54 [369231]
+          // Sender.RegisterOptionParameter('itemIdentifyerType','ItemNo,ItemCrossReference,ItemSearch','ItemNo');
+          Sender.RegisterOptionParameter('itemIdentifyerType','ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference','ItemNo');
+          //+NPR5.54 [369231]
 
-            Sender.RegisterOptionParameter('itemIdentifyerType', 'ItemNo,ItemCrossReference,ItemSearch', 'ItemNo');
             Sender.RegisterTextParameter('itemNo', '');
             Sender.RegisterDecimalParameter('itemQuantity', 1);
             Sender.RegisterBooleanParameter('descriptionEdit', false);
@@ -148,10 +137,6 @@ codeunit 6150723 "POS Action - Insert Item"
                 Step_AddSalesLine(Context, POSSession, FrontEnd);
         end;
 
-        //-NPR5.40 [294655]
-        //JSON.InitializeJObjectParser(Context,FrontEnd);
-        //+NPR5.40 [294655]
-
         Handled := true;
     end;
 
@@ -162,7 +147,7 @@ codeunit 6150723 "POS Action - Insert Item"
         InputSerial: Code[20];
         UnitPrice: Decimal;
         ItemIdentifier: Text;
-        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch;
+        ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;
         Item: Record Item;
         ItemCrossReference: Record "Item Cross Reference";
         ItemQuantity: Decimal;
@@ -171,8 +156,10 @@ codeunit 6150723 "POS Action - Insert Item"
         PresetUnitPrice: Decimal;
         DialogContext: Codeunit "POS JSON Management";
         DialogPrompt: Boolean;
+        SetUnitPrice: Boolean;
+        CustomDescription: Text;
+        ValidatedSerialNumber: Text;
     begin
-        //-NPR5.40 [294655]
         JSON.InitializeJObjectParser(Context, FrontEnd);
         HasPrompted := JSON.GetBoolean('promptPrice', false) or JSON.GetBoolean('promptSerial', false);
         JSON.SetScope('parameters', true);
@@ -207,8 +194,33 @@ codeunit 6150723 "POS Action - Insert Item"
             end;
         end;
 
-        AddItemLine(Item, ItemCrossReference, ItemIdentifierType, ItemQuantity, UsePresetUnitPrice, PresetUnitPrice, Context, POSSession, FrontEnd);
-        //+NPR5.40 [294655]
+        //-NPR5.54 [364340]
+        JSON.InitializeJObjectParser(Context,FrontEnd);
+        JSON.SetScope ('/', true);
+        UseSpecificTracking := JSON.GetBoolean('useSpecificTracking', false);
+        ValidatedSerialNumber := JSON.GetString('validatedSerialNumber', false);
+
+        if UsePresetUnitPrice then begin
+          UnitPrice := PresetUnitPrice;
+          SetUnitPrice := true;
+        end else begin
+          JSON.InitializeJObjectParser(Context,FrontEnd);
+          if (JSON.SetScope('$unitPrice',false)) then begin
+            UnitPrice := JSON.GetDecimal('numpad',true);
+            SetUnitPrice := true;
+          end;
+        end;
+
+        JSON.InitializeJObjectParser(Context,FrontEnd);
+        if JSON.SetScope('$itemTrackingOptional',false) then
+          InputSerial := JSON.GetString('input',false);
+
+        JSON.InitializeJObjectParser(Context,FrontEnd);
+        if JSON.SetScope('$editDescription',false) then
+          CustomDescription := JSON.GetString('input',false);
+
+        AddItemLine(Item, ItemCrossReference, ItemIdentifierType, ItemQuantity, UnitPrice, SetUnitPrice, CustomDescription, InputSerial, UseSpecificTracking, ValidatedSerialNumber, POSSession, FrontEnd);
+        //+NPR5.54 [364340]
     end;
 
     local procedure Step_ItemTracking(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
@@ -321,43 +333,38 @@ codeunit 6150723 "POS Action - Insert Item"
         //+NPR5.40 [294655]
     end;
 
-    local procedure AddItemLine(Item: Record Item; ItemCrossReference: Record "Item Cross Reference"; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference; ItemQuantity: Decimal; UsePresetUnitPrice: Boolean; PresetUnitPrice: Decimal; Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
+    procedure AddItemLine(Item: Record Item;ItemCrossReference: Record "Item Cross Reference";ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference;ItemQuantity: Decimal;UnitPrice: Decimal;SetUnitPrice: Boolean;CustomDescription: Text;InputSerial: Text;UseSpecificTracking: Boolean;ValidatedSerialNumber: Text;POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         Line: Record "Sale Line POS";
         JSON: Codeunit "POS JSON Management";
         SaleLine: Codeunit "POS Sale Line";
-        ValidatedSerialNumber: Code[20];
-        UseSpecificTracking: Boolean;
-        InputSerial: Code[20];
-        UnitPrice: Decimal;
-        CustomDescription: Text;
-        SetUnitPrice: Boolean;
         SaleLinePOS: Record "Sale Line POS";
     begin
-        //-NPR5.40 [294655]
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        JSON.SetScope('/', true);
-        UseSpecificTracking := JSON.GetBoolean('useSpecificTracking', false);
-        ValidatedSerialNumber := JSON.GetString('validatedSerialNumber', false);
-
-        if UsePresetUnitPrice then begin
-            UnitPrice := PresetUnitPrice;
-            SetUnitPrice := true;
-        end else begin
-            JSON.InitializeJObjectParser(Context, FrontEnd);
-            if (JSON.SetScope('$unitPrice', false)) then begin
-                UnitPrice := JSON.GetDecimal('numpad', true);
-                SetUnitPrice := true;
-            end;
-        end;
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        if JSON.SetScope('$itemTrackingOptional', false) then
-            InputSerial := JSON.GetString('input', false);
-
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        if JSON.SetScope('$editDescription', false) then
-            CustomDescription := JSON.GetString('input', false);
+        //-NPR5.54 [364340]
+        // JSON.InitializeJObjectParser(Context,FrontEnd);
+        // JSON.SetScope ('/', TRUE);
+        // UseSpecificTracking := JSON.GetBoolean('useSpecificTracking', FALSE);
+        // ValidatedSerialNumber := JSON.GetString('validatedSerialNumber', FALSE);
+        //
+        // IF UsePresetUnitPrice THEN BEGIN
+        //  UnitPrice := PresetUnitPrice;
+        //  SetUnitPrice := TRUE;
+        // END ELSE BEGIN
+        //  JSON.InitializeJObjectParser(Context,FrontEnd);
+        //  IF (JSON.SetScope('$unitPrice',FALSE)) THEN BEGIN
+        //    UnitPrice := JSON.GetDecimal('numpad',TRUE);
+        //    SetUnitPrice := TRUE;
+        //  END;
+        // END;
+        //
+        // JSON.InitializeJObjectParser(Context,FrontEnd);
+        // IF JSON.SetScope('$itemTrackingOptional',FALSE) THEN
+        //  InputSerial := JSON.GetString('input',FALSE);
+        //
+        // JSON.InitializeJObjectParser(Context,FrontEnd);
+        // IF JSON.SetScope('$editDescription',FALSE) THEN
+        //  CustomDescription := JSON.GetString('input',FALSE);
+        //+NPR5.54 [364340]
 
         if ItemQuantity = 0 then
             ItemQuantity := 1;
@@ -378,24 +385,15 @@ codeunit 6150723 "POS Action - Insert Item"
                         "No." := ItemCrossReference."Item No.";
                         "Variant Code" := ItemCrossReference."Variant Code";
                         "Unit of Measure Code" := ItemCrossReference."Unit of Measure";
-                        //-NPR5.52 [369231]
                         if (ItemCrossReference."Is Retail Serial No.") then
                             "Serial No. not Created" := ItemCrossReference."Cross-Reference No.";
-                        //+NPR5.52 [369231]
-
-                        //-NPR5.49 [350410]
-                        // //-NPR5.48 [335967]
-                        // Description := ItemCrossReference.Description;
-                        // //+NPR5.48 [335967]
-                        //+NPR5.49 [350410]
 
                     end;
-                    //-NPR5.52 [369231]
+
                 ItemIdentifierType::SerialNoItemCrossReference:
                     begin
 
                         SaleLinePOS.Reset;
-                        //SaleLinePOS.SETCURRENTKEY("Serial No.");
                         SaleLinePOS.SetFilter(Type, '=%1', SaleLinePOS.Type::Item);
                         SaleLinePOS.SetFilter("Serial No. not Created", '=%1', ItemCrossReference."Cross-Reference No.");
                         if not SaleLinePOS.IsEmpty then
@@ -407,7 +405,6 @@ codeunit 6150723 "POS Action - Insert Item"
                         if (ItemCrossReference."Is Retail Serial No.") then
                             "Serial No. not Created" := ItemCrossReference."Cross-Reference No.";
                     end;
-                    //+NPR5.52 [369231]
             end;
 
             if (UseSpecificTracking and (ValidatedSerialNumber <> '')) then
@@ -429,12 +426,10 @@ codeunit 6150723 "POS Action - Insert Item"
         POSSession.GetSaleLine(SaleLine);
         SaleLine.InsertLine(Line);
         AddAccessories(Item, SaleLine);
-        //-NPR5.45 [324395]
         AutoExplodeBOM(Item, SaleLine);
-        //+NPR5.45 [324395]
+        AddItemAddOns(FrontEnd,Item,Line."Line No.");  //NPR5.54 [388951]
 
         POSSession.RequestRefreshData();
-        //+NPR5.40 [294655]
     end;
 
     local procedure AutoExplodeBOM(Item: Record Item; POSSaleLine: Codeunit "POS Sale Line")
@@ -578,6 +573,20 @@ codeunit 6150723 "POS Action - Insert Item"
             //+NPR5.40 [305045]
 
         until (AccessorySparePart.Next() = 0);
+    end;
+
+    local procedure AddItemAddOns(POSFrontEnd: Codeunit "POS Front End Management";Item: Record Item;BaseLineNo: Integer)
+    var
+        POSAction: Record "POS Action";
+    begin
+        //-NPR5.54 [388951]
+        if Item."Item AddOn No." = '' then
+          exit;
+
+        POSAction.Get('RUN_ITEM_ADDONS');
+        POSAction.SetWorkflowInvocationParameter('BaseLineNo',BaseLineNo,POSFrontEnd);
+        POSFrontEnd.InvokeWorkflow(POSAction);
+        //+NPR5.54 [388951]
     end;
 
     local procedure "-- Serial number support functions"()

@@ -26,6 +26,7 @@ page 6014472 "Retail Journal Line"
     // NPR5.52/YAHA/20190609 CASE 367384 Field Re positioning
     // NPR5.53/TJ  /20191119 CASE 375557 New function SetSkipConfirm
     // NPR5.53/MHA /20191121 CASE 374290 Moved filter fields to Main Page
+    // NPR5.54/SARA/20200316 CASE 395769 Re activate button 'Invert Selection'
 
     AutoSplitKey = true;
     Caption = 'Lines';
@@ -65,7 +66,6 @@ page 6014472 "Retail Journal Line"
                 field(Print;Print)
                 {
                     Caption = 'Print';
-                    Visible = (NOT IsWebClient);
 
                     trigger OnValidate()
                     var

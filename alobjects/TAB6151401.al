@@ -30,6 +30,7 @@ table 6151401 "Magento Setup"
     // MAG2.23/MHA /20190930  CASE 370831 B2B modules should be disabled for Magento 2 as Pull has been implemented via NAV Web Services
     // MAG2.23/MHA /20191011  CASE 371791 Added fields 720 "Post Tickets on Import", 730 "Post Memberships on Import"
     // MAG2.24/MHA /20191024  CASE 371807 Added Option "Phone No. to Customer No." to field 500 "Customer Mapping"
+    // MAG2.25/MHA /20200204  CASE 387936 Added fields 750 "Send Order Confirmation", 760 "Order Conf. E-mail Template"
 
     Caption = 'Magento Setup';
 
@@ -495,6 +496,24 @@ table 6151401 "Magento Setup"
         {
             Caption = 'Post Memberships on Import';
             Description = 'MAG2.23';
+        }
+        field(750;"Send Order Confirmation";Boolean)
+        {
+            Caption = 'Send Order Confirmation';
+            Description = 'MAG2.25';
+
+            trigger OnValidate()
+            begin
+                //-MAG2.25 [387936]
+                "Release Order on Import" := true;
+                //+MAG2.25 [387936]
+            end;
+        }
+        field(760;"E-mail Template (Order Conf.)";Code[20])
+        {
+            Caption = 'E-mail Template (Order Confirmation)';
+            Description = 'MAG2.25';
+            TableRelation = "E-mail Template Header" WHERE ("Table No."=CONST(36));
         }
     }
 

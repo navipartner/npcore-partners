@@ -5,6 +5,7 @@ codeunit 6151006 "POS Quote Mgt."
     // NPR5.51/MMV /20190820  CASE 364694 Cleanup before register balancing based on register no. for consistency.
     //                                    Otherwise someone working day shift can have POS quotes living forever.
     // NPR5.53/ALPO/20191127  CASE 379255 Include "Retail Cross Reference" into scope
+    // NPR5.54/ALPO/20200203  CASE 364658 Preserve current values of Device/Host/User from being overwritten by the ones from saved sale
 
 
     trigger OnRun()
@@ -420,6 +421,14 @@ codeunit 6151006 "POS Quote Mgt."
         FindFields(RecRef,true,SalePOSFieldBuffer);
         if SalePOSFieldBuffer.Get(RecRef.Number,SalePOS.FieldNo("POS Sale ID")) then
           SalePOSFieldBuffer.Delete;
+        //-NPR5.54 [364658]
+        if SalePOSFieldBuffer.Get(RecRef.Number,SalePOS.FieldNo("Device ID")) then
+          SalePOSFieldBuffer.Delete;
+        if SalePOSFieldBuffer.Get(RecRef.Number,SalePOS.FieldNo("Host Name")) then
+          SalePOSFieldBuffer.Delete;
+        if SalePOSFieldBuffer.Get(RecRef.Number,SalePOS.FieldNo("User ID")) then
+          SalePOSFieldBuffer.Delete;
+        //+NPR5.54 [364658]
 
         RecRef.GetTable(SaleLinePOS);
         FindFields(RecRef,false,SaleLinePOSFieldBuffer);

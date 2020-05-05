@@ -7,6 +7,7 @@ tableextension 6014414 tableextension6014414 extends "Purch. Cr. Memo Hdr."
     // NPR5.44/BHR/20180709 CASE 321560 New fields "Sell-to" 6014420 to 6014430
     // NPR5.48/JDH /20181109 CASE 334163 Added Caption to Sell To Phone No.
     // NPR5.53/MHA /20191211 CASE 380837 Added fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
+    // NPR5.54/MHA /20200311  CASE 390380 Removed fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
     fields
     {
         field(6014414;"Pay-to E-mail";Text[80])
@@ -62,17 +63,6 @@ tableextension 6014414 tableextension6014414 extends "Purch. Cr. Memo Hdr."
             CalcFormula = Lookup(Customer."Phone No." WHERE ("No."=FIELD("Sell-to Customer No.")));
             Caption = 'Sell-to Phone No.';
             FieldClass = FlowField;
-        }
-        field(6151300;"NpEc Store Code";Code[20])
-        {
-            Caption = 'E-commerce Store Code';
-            Description = 'NPR5.53';
-            TableRelation = "NpEc Store";
-        }
-        field(6151305;"NpEc Document No.";Code[50])
-        {
-            Caption = 'E-commerce Document No.';
-            Description = 'NPR5.53';
         }
     }
 }

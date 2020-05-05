@@ -1,6 +1,7 @@
 page 6060093 "TM Offline Ticket Validation"
 {
     // TM1.22/NPKNAV/20170612  CASE 278142 Transport T0007 - 12 June 2017
+    // TM90.1.46/TSA /20200203 CASE 383196 Added mass modify on event date and event time
 
     Caption = 'Offline Ticket Validation';
     PageType = List;
@@ -40,12 +41,59 @@ page 6060093 "TM Offline Ticket Validation"
                 }
                 field("Event Date";"Event Date")
                 {
+
+                    trigger OnValidate()
+                    begin
+
+                        //-TM90.1.46 [383196]
+                        OfflineTicketValidationRec.Reset ();
+                        OfflineTicketValidationRec.CopyFilters (Rec);
+                        OfflineTicketValidationRec.SetFilter ("Import Reference No.", '=%1', Rec."Import Reference No.");
+                        OfflineTicketValidationRec.SetFilter ("Process Status", '=%1', Rec."Process Status"::UNHANDLED);
+                        if (Rec."Event Date" <> xRec."Event Date") then
+                          if (Confirm (APPLY_ON_ALL, true, Rec."Event Date", OfflineTicketValidationRec.Count, Rec."Import Reference No.")) then begin
+                            OfflineTicketValidationRec.ModifyAll ("Event Date", Rec."Event Date");
+                            CurrPage.Update (false);
+                          end;
+                        //+TM90.1.46 [383196]
+                    end;
                 }
                 field("Event Time";"Event Time")
                 {
+
+                    trigger OnValidate()
+                    begin
+
+                        //-TM90.1.46 [383196]
+                        OfflineTicketValidationRec.Reset ();
+                        OfflineTicketValidationRec.CopyFilters (Rec);
+                        OfflineTicketValidationRec.SetFilter ("Import Reference No.", '=%1', Rec."Import Reference No.");
+                        OfflineTicketValidationRec.SetFilter ("Process Status", '=%1', Rec."Process Status"::UNHANDLED);
+                        if (Rec."Event Time" <> xRec."Event Time") then
+                          if (Confirm (APPLY_ON_ALL, true, Rec."Event Time", OfflineTicketValidationRec.Count, Rec."Import Reference No.")) then begin
+                            OfflineTicketValidationRec.ModifyAll ("Event Time", Rec."Event Time");
+                            CurrPage.Update (false);
+                          end;
+                        //+TM90.1.46 [383196]
+                    end;
                 }
                 field("Process Status";"Process Status")
                 {
+
+                    trigger OnValidate()
+                    begin
+
+                        //-TM90.1.46 [383196]
+                        OfflineTicketValidationRec.Reset ();
+                        OfflineTicketValidationRec.CopyFilters (Rec);
+                        OfflineTicketValidationRec.SetFilter ("Import Reference No.", '=%1', Rec."Import Reference No.");
+                        if (Rec."Process Status" <> xRec."Process Status") then
+                          if (Confirm (APPLY_ON_ALL, true, Rec."Process Status", OfflineTicketValidationRec.Count, Rec."Import Reference No.")) then begin
+                            OfflineTicketValidationRec.ModifyAll ("Process Status", Rec."Process Status");
+                            CurrPage.Update (false);
+                          end;
+                        //+TM90.1.46 [383196]
+                    end;
                 }
                 field("Process Response Text";"Process Response Text")
                 {
@@ -117,6 +165,8 @@ page 6060093 "TM Offline Ticket Validation"
     end;
 
     var
+        OfflineTicketValidationRec: Record "TM Offline Ticket Validation";
         OfflineTicketValidation: Codeunit "TM Offline Ticket Validation";
+        APPLY_ON_ALL: Label 'Apply %1 on all unhandled lines (%2) in batch %3?';
 }
 

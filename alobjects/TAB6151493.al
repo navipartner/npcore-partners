@@ -1,6 +1,7 @@
 table 6151493 "Raptor Action"
 {
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
+    // NPR5.54/ALPO/20200302 CASE 355871 Possibility to specify user identifier parameter name
 
     Caption = 'Raptor Action';
     DrillDownPageID = "Raptor Action List";
@@ -38,6 +39,11 @@ table 6151493 "Raptor Action"
         field(6;"Raptor Module API Req. String";Text[50])
         {
             Caption = 'Raptor Module API Req. String';
+        }
+        field(20;"User Identifier Param. Name";Text[30])
+        {
+            Caption = 'User Identifier Param. Name';
+            Description = 'NPR5.54';
         }
         field(51;"Show Date-Time Created";Boolean)
         {

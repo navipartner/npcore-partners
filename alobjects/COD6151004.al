@@ -6,6 +6,8 @@ codeunit 6151004 "POS Action - Save POS Quote"
     // NPR5.48/MHA /20181206  CASE 338537 Added Publisher OnBeforeSaveAsQuote() in OnActionSaveAsQuote()
     // NPR5.50/MHA /20190520  CASE 354507 Some Sale Line POS fields should be reset before delete is possible
     // NPR5.51/MMV /20190820  CASE 364694 Handle EFT approvals
+    // NPR5.54/ALPO/20200203  CASE 364658 Part of the code moved from OnActionSaveAsQuote() to a separate global function CreatePOSQuote() to be able to call it from outside of the object
+    // NPR5.54/MMV /20200320 CASE 364340 Added explicit "Retail ID" fields
 
 
     trigger OnRun()
@@ -106,22 +108,71 @@ codeunit 6151004 "POS Action - Save POS Quote"
     local procedure OnActionSaveAsQuote(JSON: Codeunit "POS JSON Management";POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
     var
         SalePOS: Record "Sale POS";
-        SaleLinePOS: Record "Sale Line POS";
         POSQuoteEntry: Record "POS Quote Entry";
         POSSale: Codeunit "POS Sale";
         RPTemplateHeader: Record "RP Template Header";
         RPTemplateMgt: Codeunit "RP Template Mgt.";
-        LineNo: Integer;
         PrintAfterSave: Boolean;
         PrintTemplateCode: Code[20];
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find;
-
+        
+        //-NPR5.54 [364658]-revoked
+        /*
         //-NPR5.48 [338537]
         OnBeforeSaveAsQuote(SalePOS);
         //+NPR5.48 [338537]
+        InsertPOSQuoteEntry(SalePOS,POSQuoteEntry);
+        
+        SaleLinePOS.SETRANGE("Register No.",SalePOS."Register No.");
+        SaleLinePOS.SETRANGE("Sales Ticket No.",SalePOS."Sales Ticket No.");
+        IF SaleLinePOS.FINDSET THEN
+          REPEAT
+            InsertPOSQuoteLine(SaleLinePOS,POSQuoteEntry,LineNo);
+            //-NPR5.50 [354507]
+            IF SaleLinePOS."EFT Approved" OR SaleLinePOS."From Selection" THEN BEGIN
+              SaleLinePOS."EFT Approved" := FALSE;
+              SaleLinePOS."From Selection" := FALSE;
+              SaleLinePOS.MODIFY;
+            END;
+            //+NPR5.50 [354507]
+            SaleLinePOS.DELETE(TRUE);
+          UNTIL SaleLinePOS.NEXT = 0;
+        
+        SalePOS.DELETE(TRUE);
+        */
+        //+NPR5.54 [364658]-revoked
+        CreatePOSQuote(SalePOS,POSQuoteEntry);  //NPR5.54 [364658]
+        
+        Commit;
+        POSSale.SelectViewForEndOfSale(POSSession);
+        
+        PrintAfterSave := JSON.GetBooleanParameter('PrintAfterSave',false);
+        if not PrintAfterSave then
+          exit;
+        
+        PrintTemplateCode := JSON.GetStringParameter('PrintTemplate',false);
+        if not RPTemplateHeader.Get(PrintTemplateCode) then
+          exit;
+        RPTemplateHeader.CalcFields("Table ID");
+        if RPTemplateHeader."Table ID" <> DATABASE::"POS Quote Entry" then
+          exit;
+        
+        POSQuoteEntry.SetRecFilter;
+        RPTemplateMgt.PrintTemplate(RPTemplateHeader.Code,POSQuoteEntry,0);
+
+    end;
+
+    procedure CreatePOSQuote(SalePOS: Record "Sale POS";var POSQuoteEntry: Record "POS Quote Entry")
+    var
+        SaleLinePOS: Record "Sale Line POS";
+        LineNo: Integer;
+    begin
+        //-NPR5.54 [364658]
+        OnBeforeSaveAsQuote(SalePOS);
+
         InsertPOSQuoteEntry(SalePOS,POSQuoteEntry);
 
         SaleLinePOS.SetRange("Register No.",SalePOS."Register No.");
@@ -129,33 +180,16 @@ codeunit 6151004 "POS Action - Save POS Quote"
         if SaleLinePOS.FindSet then
           repeat
             InsertPOSQuoteLine(SaleLinePOS,POSQuoteEntry,LineNo);
-            //-NPR5.50 [354507]
             if SaleLinePOS."EFT Approved" or SaleLinePOS."From Selection" then begin
               SaleLinePOS."EFT Approved" := false;
               SaleLinePOS."From Selection" := false;
               SaleLinePOS.Modify;
             end;
-            //+NPR5.50 [354507]
             SaleLinePOS.Delete(true);
           until SaleLinePOS.Next = 0;
 
         SalePOS.Delete(true);
-        Commit;
-        POSSale.SelectViewForEndOfSale(POSSession);
-
-        PrintAfterSave := JSON.GetBooleanParameter('PrintAfterSave',false);
-        if not PrintAfterSave then
-          exit;
-
-        PrintTemplateCode := JSON.GetStringParameter('PrintTemplate',false);
-        if not RPTemplateHeader.Get(PrintTemplateCode) then
-          exit;
-        RPTemplateHeader.CalcFields("Table ID");
-        if RPTemplateHeader."Table ID" <> DATABASE::"POS Quote Entry" then
-          exit;
-
-        POSQuoteEntry.SetRecFilter;
-        RPTemplateMgt.PrintTemplate(RPTemplateHeader.Code,POSQuoteEntry,0);
+        //+NPR5.54 [364658]
     end;
 
     local procedure InsertPOSQuoteEntry(SalePOS: Record "Sale POS";var POSQuoteEntry: Record "POS Quote Entry")
@@ -178,6 +212,9 @@ codeunit 6151004 "POS Action - Save POS Quote"
         POSQuoteEntry."Customer Disc. Group" := SalePOS."Customer Disc. Group";
         POSQuoteEntry.Attention := SalePOS."Contact No.";
         POSQuoteEntry.Reference := SalePOS.Reference;
+        //-NPR5.54 [364340]
+        POSQuoteEntry."Retail ID" := SalePOS."Retail ID";
+        //+NPR5.54 [364340]
         //+NPR5.48 [336498]
         //-NPR5.48 [338208]
         POSQuoteMgt.POSSale2Xml(SalePOS,XmlDoc);
@@ -223,6 +260,9 @@ codeunit 6151004 "POS Action - Save POS Quote"
         //-NPR5.51 [364694]
         POSQuoteLine."EFT Approved" := SaleLinePOS."EFT Approved";
         //+NPR5.51 [364694]
+        //-NPR5.54 [364340]
+        POSQuoteLine."Line Retail ID" := SaleLinePOS."Retail ID";
+        //+NPR5.54 [364340]
         POSQuoteLine.Insert(true);
     end;
 

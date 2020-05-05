@@ -20,6 +20,10 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
     //                                   Added disable recurring contract API request
     // NPR5.53/MMV /20200128 CASE 377533 Added auto abort if API returns InProgress and we find a matching candidate on most recently logged trx.
     //                                   Added variable lookup timeout.
+    // NPR5.54/MMV /20200218 CASE 387990 Added response status code buffer.
+    //                                   Parse web exception on error to fill buffer.
+    //                                   Handle acquire card hard error.
+    // NPR5.54/MMV /20200227 CASE 364340 Changed background session method.
 
 
     trigger OnRun()
@@ -39,6 +43,8 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         RequestResponseBuffer: Text;
         ABORT_ACQUIRE_SWIPE_HEADER: Label 'Card Scanned';
         ABORT_ACQUIRE_SWIPE_LINE: Label 'Please Remove Card';
+        ResponseStatusCodeBuffer: Integer;
+        ResponseErrorBodyBuffer: Text;
 
     local procedure IntegrationType(): Text
     begin
@@ -92,7 +98,9 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         POSSession.GetSession(POSSession, true);
         POSSession.GetFrontEnd(POSFrontEnd, true);
 
-        EFTTrxBackgroundSessionMgt.CreateRequestRecord(EftTransactionRequest."Entry No.", EFTTransactionAsyncRequest);
+        //-NPR5.54 [364340]
+        EFTTrxBackgroundSessionMgt.CreateRequestRecord(EftTransactionRequest, EFTTransactionAsyncRequest);
+        //+NPR5.54 [364340]
         Commit;
 
         StartSession(SessionId, CODEUNIT::"EFT Adyen Backgnd. Trx Req.", CompanyName, EFTTransactionAsyncRequest);
@@ -163,7 +171,9 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         POSSession.GetSession(POSSession, true);
         POSSession.GetFrontEnd(POSFrontEnd, true);
 
-        EFTTrxBackgroundSessionMgt.CreateRequestRecord(EftTransactionRequest."Entry No.", EFTTransactionAsyncRequest);
+        //-NPR5.54 [364340]
+        EFTTrxBackgroundSessionMgt.CreateRequestRecord(EftTransactionRequest, EFTTransactionAsyncRequest);
+        //+NPR5.54 [364340]
         Commit;
 
         StartSession(SessionId, CODEUNIT::"EFT Adyen Backgnd. Trx Req.", CompanyName, EFTTransactionAsyncRequest);
@@ -376,7 +386,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         EFTSetup.FindSetup(OriginalEFTTransactionRequest."Register No.", OriginalEFTTransactionRequest."Original POS Payment Type Code");
 
         if InvokeAbortTransaction(EFTTransactionRequest, EFTSetup) then begin
-          EFTTransactionRequest."External Result Received" := true;
+          EFTTransactionRequest."External Result Known" := true;
           EFTTransactionRequest.Successful := true;
         end else
           EFTTransactionRequest."NST Error" := CopyStr(GetLastErrorText, 1, MaxStrLen(EFTTransactionRequest."NST Error"));
@@ -400,11 +410,9 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
 
         HandleProtocolResponse(EFTTransactionRequest);
 
-        //-NPR5.53 [377533]
-        if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::AUXILIARY) and (EFTTransactionRequest."Auxiliary Operation ID" = 2) then begin
-          EFTAdyenCloudIntegration.ProcessOriginalTrxAfterAcquireCardFailure(EFTTransactionRequest);
-        end;
-        //+NPR5.53 [377533]
+        //-NPR5.54 [387990]
+        EFTAdyenCloudIntegration.ProcessOriginalTrxAfterAcquireCardFailure(EFTTransactionRequest);
+        //+NPR5.54 [387990]
     end;
 
     local procedure StartAcquireCard(EftTransactionRequest: Record "EFT Transaction Request")
@@ -421,7 +429,9 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         POSSession.GetSession(POSSession, true);
         POSSession.GetFrontEnd(POSFrontEnd, true);
 
-        EFTTrxBackgroundSessionMgt.CreateRequestRecord(EftTransactionRequest."Entry No.", EFTTransactionAsyncRequest);
+        //-NPR5.54 [364340]
+        EFTTrxBackgroundSessionMgt.CreateRequestRecord(EftTransactionRequest, EFTTransactionAsyncRequest);
+        //+NPR5.54 [364340]
         Commit;
 
         StartSession(SessionId, CODEUNIT::"EFT Adyen Backgnd. Trx Req.", CompanyName, EFTTransactionAsyncRequest);
@@ -556,6 +566,7 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         Response: Text;
         RecordFound: Boolean;
         EFTTrxBackgroundSessionMgt: Codeunit "EFT Trx Background Session Mgt";
+        EFTAdyenCloudIntegration: Codeunit "EFT Adyen Cloud Integration";
     begin
         //-NPR5.53 [377533]
         EFTTrxBackgroundSessionMgt.TryGetResponseRecord(TransactionEntryNo, EFTTransactionAsyncResponse);
@@ -564,6 +575,10 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
           EFTTransactionRequest.LockTable;
           EFTTransactionRequest.Get(TransactionEntryNo);
           EFTTransactionRequest."NST Error" := EFTTransactionAsyncResponse."Error Text";
+        //-NPR5.54 [387990]
+          EFTTransactionRequest."External Result Known" := not EFTTransactionAsyncResponse."Transaction Started";
+          EFTAdyenCloudIntegration.ProcessOriginalTrxAfterAcquireCardFailure(EFTTransactionRequest);
+        //+NPR5.54 [387990]
           HandleProtocolResponse(EFTTransactionRequest);
         end else begin
           EFTTransactionAsyncResponse.Response.CreateInStream(InStream, TEXTENCODING::UTF8);
@@ -919,10 +934,22 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         ResponseStreamReader: DotNet npNetStreamReader;
         HttpStatusCode: DotNet npNetHttpStatusCode;
         Response: Text;
+        Convert: DotNet npNetConvert;
+        WebRequestHelper: Codeunit "Web Request Helper";
+        ResponseNavStream: InStream;
+        ResponseHeaders: DotNet npNetNameValueCollection;
+        WebException: DotNet npNetWebException;
+        WebExceptionStatus: DotNet npNetWebExceptionStatus;
+        TempBlob: Record TempBlob temporary;
     begin
         //-NPR5.53 [377533]
         ClearRequestResponseBuffer();
         //+NPR5.53 [377533]
+        //-NPR5.54 [387990]
+        ClearResponseErrorBodyBuffer();
+        ClearResponseStatusCodeBuffer();
+        //+NPR5.54 [387990]
+
         AppendRequestResponseBuffer(Body, 'Request');
 
         HttpWebRequest := HttpWebRequest.Create(URL);
@@ -930,6 +957,9 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         HttpWebRequest.Headers.Add('x-api-key', APIKey);
         HttpWebRequest.Method('POST');
         HttpWebRequest.Timeout(TimeoutMs);
+        //-NPR5.54 [387990]
+        HttpWebRequest.KeepAlive(false);
+        //+NPR5.54 [387990]
 
         ReqStream := HttpWebRequest.GetRequestStream;
         ReqStreamWriter := ReqStreamWriter.StreamWriter(ReqStream);
@@ -937,19 +967,40 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         ReqStreamWriter.Flush;
         ReqStreamWriter.Close;
 
-        HttpWebResponse := HttpWebRequest.GetResponse;
-        ResponseStream := HttpWebResponse.GetResponseStream;
-        ResponseStreamReader := ResponseStreamReader.StreamReader(ResponseStream);
-        Response := ResponseStreamReader.ReadToEnd();
-        HttpWebResponse.Close();
-        ResponseStreamReader.Close();
+        //-NPR5.54 [387990]
+        // HttpWebResponse := HttpWebRequest.GetResponse;
+        // ResponseStream := HttpWebResponse.GetResponseStream;
+        // ResponseStreamReader := ResponseStreamReader.StreamReader(ResponseStream);
+        // Response := ResponseStreamReader.ReadToEnd();
+        // HttpWebResponse.Close();
+        // ResponseStreamReader.Close();
+        //
+        // AppendRequestResponseBuffer(Response, 'Response');
+        //
+        // IF NOT HttpWebResponse.StatusCode.Equals(HttpStatusCode.OK) THEN
+        //  ERROR(ERROR_INVOKE, FORMAT(HttpWebResponse.StatusCode));
 
-        AppendRequestResponseBuffer(Response, 'Response');
+        TempBlob.Blob.CreateInStream(ResponseNavStream, TEXTENCODING::UTF8);
 
-        //-NPR5.53 [377533]
-        if not HttpWebResponse.StatusCode.Equals(HttpStatusCode.OK) then
-          Error(ERROR_INVOKE, Format(HttpWebResponse.StatusCode));
-        //+NPR5.53 [377533]
+        if WebRequestHelper.GetWebResponse(HttpWebRequest, HttpWebResponse, ResponseNavStream, HttpStatusCode, ResponseHeaders, false) then begin
+          while (not ResponseNavStream.EOS) do
+            ResponseNavStream.Read(Response);
+          AppendRequestResponseBuffer(Response, 'Response');
+          ResponseStatusCodeBuffer := HttpWebResponse.StatusCode;
+          HttpWebResponse.Close();
+        end else begin
+          ResponseErrorBodyBuffer := WebRequestHelper.GetWebResponseError(WebException, URL);
+          if WebException.Status.Equals(WebExceptionStatus.ProtocolError) then begin
+            HttpWebResponse := WebException.Response;
+            ResponseStatusCodeBuffer := HttpWebResponse.StatusCode;
+          end;
+          AppendRequestResponseBuffer(StrSubstNo('(%1) %2', ResponseStatusCodeBuffer, ResponseErrorBodyBuffer), 'Response');
+        end;
+
+        if not (ResponseStatusCodeBuffer = 200) then begin
+          Error(ERROR_INVOKE, URL, Format(ResponseStatusCodeBuffer));
+        end;
+        //+NPR5.54 [387990]
 
         exit(Response);
     end;
@@ -1258,11 +1309,39 @@ codeunit 6184518 "EFT Adyen Cloud Protocol"
         //+NPR5.53 [377533]
     end;
 
+    procedure ClearResponseStatusCodeBuffer()
+    begin
+        //-NPR5.54 [387990]
+        Clear(ResponseStatusCodeBuffer);
+        //+NPR5.54 [387990]
+    end;
+
+    procedure GetResponseStatusCodeBuffer(): Integer
+    begin
+        //-NPR5.54 [387990]
+        exit(ResponseStatusCodeBuffer);
+        //+NPR5.54 [387990]
+    end;
+
+    procedure ClearResponseErrorBodyBuffer()
+    begin
+        //-NPR5.54 [387990]
+        Clear(ResponseErrorBodyBuffer);
+        //+NPR5.54 [387990]
+    end;
+
+    procedure GetResponseErrorBodyBuffer(): Text
+    begin
+        //-NPR5.54 [387990]
+        exit(ResponseErrorBodyBuffer);
+        //+NPR5.54 [387990]
+    end;
+
     local procedure HandleError(var EFTTransactionRequest: Record "EFT Transaction Request";ErrorText: Text)
     begin
         //-NPR5.53 [377533]
         EFTTransactionRequest.Successful := false;
-        EFTTransactionRequest."External Result Received" := false; //Could not parse response correctly - needs to go to lookup.
+        EFTTransactionRequest."External Result Known" := false; //Could not parse response correctly - needs to go to lookup.
         EFTTransactionRequest."Amount Output" := 0;
         EFTTransactionRequest."Result Amount" := 0;
         EFTTransactionRequest."NST Error" := CopyStr(ErrorText,1,MaxStrLen(EFTTransactionRequest."NST Error"));

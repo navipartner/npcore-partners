@@ -72,6 +72,8 @@ codeunit 6059784 "TM Ticket Management"
     // TM1.45/TSA /20191202 CASE 357359 Tickets
     // #380754/TSA /20191204 CASE 380754 Waiting list adoption
     // #385922/TSA /20200116 CASE 385922 refactored CheckAdmissionCapacityExceeded() to also check for concurrent capacity
+    // TM90.1.46/TSA /20200127 CASE 387138 DiyPrint URL via mail
+    // TM90.1.46/TSA /20200214 CASE 391018 Fixed a problem with admission capacity controll NONE
 
 
     trigger OnRun()
@@ -351,13 +353,11 @@ codeunit 6059784 "TM Ticket Management"
         Ticket: Record "TM Ticket";
         Ticket2: Record "TM Ticket";
         TicketSetup: Record "TM Ticket Setup";
-        TicketType: Record "TM Ticket Type";
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
-        SinglePrintJob: Boolean;
-        PrintObjectId: Integer;
-        PrintObjectType: Integer;
+        TicketDIYTicketPrint: Codeunit "TM Ticket DIY Ticket Print";
         ResponseMessage: Text;
         PrintTicket: Boolean;
+        PublishError: Boolean;
     begin
 
         Ticket.SetCurrentKey("Sales Receipt No.");
@@ -386,6 +386,25 @@ codeunit 6059784 "TM Ticket Management"
                 Message (ResponseMessage);
             end;
           end;
+
+          //-TM90.1.46 [387138]
+          if (TicketDIYTicketPrint.CheckPublishTicketUrl (Ticket."No.")) then begin
+            TicketSetup.Get ();
+
+            PublishError := not TicketDIYTicketPrint.PublishTicketUrl (Ticket."No.", ResponseMessage);
+
+            if (not PublishError) and (TicketDIYTicketPrint.CheckSendTicketUrl (Ticket."No.")) then
+              PublishError := not TicketDIYTicketPrint.SendTicketUrl (Ticket."No.", ResponseMessage);
+
+            if (PublishError) then begin
+              if (TicketSetup."Show Send Fail Message In POS") then
+                Message (ResponseMessage);
+            end else begin
+              PrintTicket := not TicketSetup."Suppress Print When eTicket";
+            end;
+
+          end;
+          //+TM90.1.46 [387138]
 
           if (PrintTicket) then begin
             Ticket2.SetFilter ("No.", '=%1', Ticket."No.");
@@ -2113,12 +2132,15 @@ codeunit 6059784 "TM Ticket Management"
               if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
                 ActivateOnSales := (TicketBOM."Activation Method" = TicketBOM."Activation Method"::POS);
                 if (TicketBOM."Activation Method" = TicketBOM."Activation Method"::NA) then
-                  TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_TYPE // delegate to Ticket Type setup
+                  TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_TYPE; // delegate to Ticket Type setup
               end;
 
-              if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then
+              if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
                  ActivateOnSales := ((TicketType."Activation Method" = TicketType."Activation Method"::POS_ALL) or
                                      ((TicketType."Activation Method" = TicketType."Activation Method"::POS_DEFAULT) and TicketBOM.Default));
+
+              end;
+
             end;
           end;
 
@@ -2195,6 +2217,11 @@ codeunit 6059784 "TM Ticket Management"
         AdmissionSchedule.Get (AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code");
 
         GetMaxCapacity (AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code", AdmissionScheduleEntryNo, MaxCapacity, CapacityControl);
+
+        //-TM90.1.46 [391018]
+        if (CapacityControl = Admission."Capacity Control"::NONE) then
+          exit (0);
+        //+TM90.1.46 [391018]
 
         //-#385922 [385922] Refactored - implementation moved to function
         AdmittedCount := CalculateCurrentCapacity (CapacityControl, AdmissionScheduleEntryNo);
@@ -2653,7 +2680,7 @@ codeunit 6059784 "TM Ticket Management"
         if (not Preview) then begin
           CreatePostpaidTicketInvoice (ShowDialog, TmpAggregatedPerRequest, TmpAdmissionPerDate);
           MarkPostpaidTicketAsInvoiced (ShowDialog, TmpDetailedAccessEntries, TmpAggregatedPerRequest, TmpTicket);
-          if (not TmpAggregatedPerRequest.IsEmpty) then begin;
+          if (not TmpAggregatedPerRequest.IsEmpty) then begin
             TmpAggregatedPerRequest.FindFirst ();
             FirstInvoiceNo := CopyStr (TmpAggregatedPerRequest.Description, 1, 20);
             TmpAggregatedPerRequest.FindLast ();
@@ -2708,7 +2735,7 @@ codeunit 6059784 "TM Ticket Management"
             Index += 1;
             if (ShowDialog) then
               if ((Index mod (MaxCount+100 div 100) = 0)) then
-                gWindow.Update (2, Round (Index/MaxCount*10000,1))
+                gWindow.Update (2, Round (Index/MaxCount*10000,1));
 
           until (DetTicketAccessEntry.Next () = 0);
         end;
@@ -2780,7 +2807,7 @@ codeunit 6059784 "TM Ticket Management"
             Index += 1;
             if (ShowDialog) then
               if ((Index mod (MaxCount+100 div 100) = 0)) then
-                gWindow.Update (2, Round (Index/MaxCount*10000,1))
+                gWindow.Update (2, Round (Index/MaxCount*10000,1));
 
         until (TmpPostpaidTickets.Next () = 0);
     end;

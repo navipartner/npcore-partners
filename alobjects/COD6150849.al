@@ -20,6 +20,7 @@ codeunit 6150849 "POS Action - End-of-Day V3"
     // NPR5.52/ALPO/20190923 CASE 365326 POS Posting related fields moved to POS Posting Profiles from NP Retail Setup
     // TODO Units and Bins must get correct status
     // NPR5.53/BHR / 20191004 CASE 369361 Removed online checks
+    // NPR5.54/MMV /20200225 CASE 364340 Added EFT event before pause
 
 
     trigger OnRun()
@@ -407,6 +408,9 @@ codeunit 6150849 "POS Action - End-of-Day V3"
         POSSale: Codeunit "POS Sale";
         SalePOS: Record "Sale POS";
         POSSetup: Codeunit "POS Setup";
+        EFTInterface: Codeunit "EFT Interface";
+        SkipPause: Boolean;
+        EFTTransactionMgt: Codeunit "EFT Transaction Mgt.";
     begin
 
         POSSession.RetrieveActionStateRecordRef('eft_close_list', RecRef);
@@ -420,11 +424,14 @@ codeunit 6150849 "POS Action - End-of-Day V3"
         POSSession.GetSetup(POSSetup);
         POSSale.GetCurrentSale(SalePOS);
 
-        EFTFrameworkMgt.CreateEndWorkshiftRequest(EFTTransactionRequest, EFTSetup, POSSetup.Register, SalePOS."Sales Ticket No.");
-        Commit;
-        EFTFrameworkMgt.SendRequest(EFTTransactionRequest);
 
-        POSFrontEnd.PauseWorkflow();
+        //-NPR5.54 [364340]
+        // EFTFrameworkMgt.CreateEndWorkshiftRequest(EFTTransactionRequest, EFTSetup, POSSetup.Register, SalePOS."Sales Ticket No.");
+        // COMMIT;
+        // EFTFrameworkMgt.SendRequest(EFTTransactionRequest);
+        // POSFrontEnd.PauseWorkflow();
+        EFTTransactionMgt.StartEndWorkshift(EFTSetup, SalePOS);
+        //+NPR5.54 [364340]
     end;
 
     local procedure EftCloseDone(POSSession: Codeunit "POS Session")

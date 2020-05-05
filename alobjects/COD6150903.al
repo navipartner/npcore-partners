@@ -12,6 +12,7 @@ codeunit 6150903 "HC Connector Web Service"
     begin
     end;
 
+    [Scope('Personalization')]
     procedure InsertAuditRoll(var auditrolllineimport: XMLport "HC Audit Roll")
     var
         NaviConnectImportEntry: Record "Nc Import Entry";
@@ -36,6 +37,7 @@ codeunit 6150903 "HC Connector Web Service"
         //+NPR5.44 [318391]
     end;
 
+    [Scope('Personalization')]
     procedure InsertPOSEntry(var posentryimport: XMLport "HC POS Entry")
     var
         NaviConnectImportEntry: Record "Nc Import Entry";
@@ -59,6 +61,7 @@ codeunit 6150903 "HC Connector Web Service"
         //+NPR5.44 [318391]
     end;
 
+    [Scope('Personalization')]
     procedure InsertSalesDocument(var salesdocumentimport: XMLport "HC Sales Document")
     var
         NaviConnectImportEntry: Record "Nc Import Entry";
@@ -82,6 +85,7 @@ codeunit 6150903 "HC Connector Web Service"
         //+NPR5.44 [318391]
     end;
 
+    [Scope('Personalization')]
     procedure InsertCustomer(var customerimport: XMLport "HC Customer")
     var
         NaviConnectImportEntry: Record "Nc Import Entry";
@@ -105,6 +109,7 @@ codeunit 6150903 "HC Connector Web Service"
         //+NPR5.44 [318391]
     end;
 
+    [Scope('Personalization')]
     procedure GetCustomerPrice(var customerPriceRequest: XMLport "HC Customer Price Request")
     var
         NaviConnectImportEntry: Record "Nc Import Entry";
@@ -151,6 +156,7 @@ codeunit 6150903 "HC Connector Web Service"
         //+NPR5.38 [297859]
     end;
 
+    [Scope('Personalization')]
     procedure GenericWebRequest(var genericrequest: XMLport "HC Generic Request")
     var
         NaviConnectImportEntry: Record "Nc Import Entry";

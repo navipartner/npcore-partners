@@ -13,6 +13,7 @@ table 6151371 "CS Setup"
     // NPR5.51/CLVA/20190812 CASE 362173 Added field "Phys. Inv Jour Temp Name" and "Phys. Inv Jour No. Series"
     // NPR5.52/CLVA/20190904 CASE 365967 Added field "Post with Job Queue", "Job Queue Category Code","Job Queue Priority for Post","Notify On Success","Run in User Session" and "Sum Qty. to Handle"
     // NPR5.53/CLVA/20191128 CASE 379973 Added field "Earliest Start Date/Time"
+    // NPR5.54/CLVA/20202003 CASE 389224 Added field "Batch Size"
 
     Caption = 'CS Setup';
 
@@ -159,6 +160,12 @@ table 6151371 "CS Setup"
         field(43;"Earliest Start Date/Time";DateTime)
         {
             Caption = 'Earliest Start Date/Time';
+        }
+        field(44;"Batch Size";Integer)
+        {
+            Caption = 'Batch Size';
+            MaxValue = 1000;
+            MinValue = 10;
         }
     }
 

@@ -1,6 +1,8 @@
 codeunit 6151321 "NpEc Purch. Doc. Import Mgt."
 {
     // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
+    // NPR5.54/MHA /20200228  CASE 319135 Removed validation of "VAT Prod. Posting Group" to avoid reset of "Unit Price"
+    // NPR5.54/MHA /20200311  CASE 390380 E-commerce reference moved to NpEc Document
 
 
     trigger OnRun()
@@ -65,6 +67,7 @@ codeunit 6151321 "NpEc Purch. Doc. Import Mgt."
 
     procedure InsertInvoiceHeader(XmlElement: DotNet npNetXmlElement;var PurchHeader: Record "Purchase Header")
     var
+        NpEcDocument: Record "NpEc Document";
         Vendor: Record Vendor;
         NpEcStore: Record "NpEc Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
@@ -81,10 +84,18 @@ codeunit 6151321 "NpEc Purch. Doc. Import Mgt."
         PurchHeader.Init;
         PurchHeader."Document Type" := PurchHeader."Document Type"::Invoice;
         PurchHeader."No." := '';
-        PurchHeader."NpEc Store Code" := NpEcStore.Code;
-        PurchHeader."NpEc Document No." := GetInvoiceNo(XmlElement);
+        //-NPR5.54 [390380]
         PurchHeader."Vendor Invoice No." := NpXmlDomMgt.GetElementCode(XmlElement,'vendor_invoice_no',MaxStrLen(PurchHeader."Vendor Invoice No."),false);
         PurchHeader.Insert(true);
+
+        NpEcDocument.Init;
+        NpEcDocument."Entry No." := 0;
+        NpEcDocument."Store Code" := NpEcStore.Code;
+        NpEcDocument."Reference No." := GetInvoiceNo(XmlElement);
+        NpEcDocument."Document Type" := NpEcDocument."Document Type"::"Purchase Invoice";
+        NpEcDocument."Document No." := PurchHeader."No.";
+        NpEcDocument.Insert(true);
+        //+NPR5.54 [390380]
 
         PurchHeader.Validate("Buy-from Vendor No.",Vendor."No.");
 
@@ -207,7 +218,9 @@ codeunit 6151321 "NpEc Purch. Doc. Import Mgt."
           PurchLine.Validate("Direct Unit Cost",DirectUnitCost)
         else
           PurchLine."Direct Unit Cost" := DirectUnitCost;
-        PurchLine.Validate("VAT Prod. Posting Group");
+        //-NPR5.54 [319135]
+        //PurchLine.VALIDATE("VAT Prod. Posting Group");
+        //+NPR5.54 [319135]
 
         if PurchLine."Direct Unit Cost" <> 0 then
           PurchLine.Validate("Line Amount",LineAmount)
@@ -247,12 +260,139 @@ codeunit 6151321 "NpEc Purch. Doc. Import Mgt."
         PurchLine.Modify(true);
     end;
 
+    local procedure "--- NpEc Document Mgt."()
+    begin
+    end;
+
+    [EventSubscriber(ObjectType::Table, 38, 'OnBeforeDeleteEvent', '', true, true)]
+    local procedure OnBeforeDeletePurchHeader(var Rec: Record "Purchase Header";RunTrigger: Boolean)
+    var
+        NpEcDocument: Record "NpEc Document";
+    begin
+        //-NPR5.54 [390380]
+        if Rec.IsTemporary then
+          exit;
+
+        case Rec."Document Type" of
+          Rec."Document Type"::Quote:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Quote");
+            end;
+          Rec."Document Type"::Order:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Order");
+            end;
+          Rec."Document Type"::Invoice:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Invoice");
+            end;
+          Rec."Document Type"::"Credit Memo":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Credit Memo");
+            end;
+          Rec."Document Type"::"Blanket Order":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Blanket Order");
+            end;
+          Rec."Document Type"::"Return Order":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Return Order");
+            end;
+        end;
+        NpEcDocument.SetRange("Document No.",Rec."No.");
+        if NpEcDocument.IsEmpty then
+          exit;
+
+        NpEcDocument.DeleteAll;
+        //+NPR5.54 [390380]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 90, 'OnAfterPostPurchaseDoc', '', true, true)]
+    local procedure OnAfterPostPurchDoc(var PurchaseHeader: Record "Purchase Header";var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";PurchRcpHdrNo: Code[20];RetShptHdrNo: Code[20];PurchInvHdrNo: Code[20];PurchCrMemoHdrNo: Code[20])
+    var
+        NpEcDocument: Record "NpEc Document";
+        NpEcDocument2: Record "NpEc Document";
+    begin
+        //-NPR5.54 [390380]
+        case PurchaseHeader."Document Type" of
+          PurchaseHeader."Document Type"::Quote:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Quote");
+            end;
+          PurchaseHeader."Document Type"::Order:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Order");
+            end;
+          PurchaseHeader."Document Type"::Invoice:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Invoice");
+            end;
+          PurchaseHeader."Document Type"::"Credit Memo":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Credit Memo");
+            end;
+          PurchaseHeader."Document Type"::"Blanket Order":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Blanket Order");
+            end;
+          PurchaseHeader."Document Type"::"Return Order":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Return Order");
+            end;
+        end;
+        NpEcDocument.SetRange("Document No.",PurchaseHeader."No.");
+        if not NpEcDocument.FindLast then
+          exit;
+
+        if PurchInvHdrNo <> '' then begin
+          NpEcDocument2.Init;
+          NpEcDocument2."Entry No." := 0;
+          NpEcDocument2."Store Code" := NpEcDocument."Store Code";
+          NpEcDocument2."Reference No." := NpEcDocument."Reference No.";
+          NpEcDocument2."Document Type" := NpEcDocument2."Document Type"::"Posted Purchase Invoice";
+          NpEcDocument2."Document No." := PurchInvHdrNo;
+          NpEcDocument2.Insert(true);
+        end;
+
+        if PurchCrMemoHdrNo <> '' then begin
+          NpEcDocument2.Init;
+          NpEcDocument2."Entry No." := 0;
+          NpEcDocument2."Store Code" := NpEcDocument."Store Code";
+          NpEcDocument2."Reference No." := NpEcDocument."Reference No.";
+          NpEcDocument2."Document Type" := NpEcDocument2."Document Type"::"Posted Purchase Credit Memo";
+          NpEcDocument2."Document No." := PurchCrMemoHdrNo;
+          NpEcDocument2.Insert(true);
+        end;
+
+        if PurchRcpHdrNo <> '' then begin
+          NpEcDocument2.Init;
+          NpEcDocument2."Entry No." := 0;
+          NpEcDocument2."Store Code" := NpEcDocument."Store Code";
+          NpEcDocument2."Reference No." := NpEcDocument."Reference No.";
+          NpEcDocument2."Document Type" := NpEcDocument2."Document Type"::"Posted Purchase Receipt";
+          NpEcDocument2."Document No." := PurchRcpHdrNo;
+          NpEcDocument2.Insert(true);
+        end;
+
+        if RetShptHdrNo <> '' then begin
+          NpEcDocument2.Init;
+          NpEcDocument2."Entry No." := 0;
+          NpEcDocument2."Store Code" := NpEcDocument."Store Code";
+          NpEcDocument2."Reference No." := NpEcDocument."Reference No.";
+          NpEcDocument2."Document Type" := NpEcDocument2."Document Type"::"Posted Purchase Return Shipment";
+          NpEcDocument2."Document No." := RetShptHdrNo;
+          NpEcDocument2.Insert(true);
+        end;
+        //+NPR5.54 [390380]
+    end;
+
     local procedure "--- Get/Check"()
     begin
     end;
 
     procedure FindInvoice(XmlElement: DotNet npNetXmlElement;var PurchHeader: Record "Purchase Header"): Boolean
     var
+        NpEcDocument: Record "NpEc Document";
         NpEcStore: Record "NpEc Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         InvoiceNo: Text;
@@ -265,10 +405,15 @@ codeunit 6151321 "NpEc Purch. Doc. Import Mgt."
         if InvoiceNo = '' then
           exit(false);
 
-        PurchHeader.SetRange("Document Type",PurchHeader."Document Type"::Invoice);
-        PurchHeader.SetRange("NpEc Store Code",NpEcStore.Code);
-        PurchHeader.SetRange("NpEc Document No.",InvoiceNo);
-        exit(PurchHeader.FindFirst);
+        //-NPR5.54 [390380]
+        NpEcDocument.SetRange("Store Code",NpEcStore.Code);
+        NpEcDocument.SetRange("Reference No.",InvoiceNo);
+        NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Invoice");
+        if not NpEcDocument.FindLast then
+          exit(false);
+
+        exit(PurchHeader.Get(PurchHeader."Document Type"::Invoice,NpEcDocument."Document No."));
+        //+NPR5.54 [390380]
     end;
 
     local procedure FindItemVariant(ReferenceNo: Text;var ItemVariant: Record "Item Variant"): Boolean
@@ -318,15 +463,52 @@ codeunit 6151321 "NpEc Purch. Doc. Import Mgt."
 
     procedure FindPostedInvoice(XmlElement: DotNet npNetXmlElement;var PurchInvHeader: Record "Purch. Inv. Header"): Boolean
     var
+        NpEcDocument: Record "NpEc Document";
         NpEcStore: Record "NpEc Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         InvoiceNo: Text;
     begin
         FindStore(XmlElement,NpEcStore);
         InvoiceNo := GetInvoiceNo(XmlElement);
-        PurchInvHeader.SetRange("NpEc Store Code",NpEcStore.Code);
-        PurchInvHeader.SetRange("NpEc Document No.",InvoiceNo);
-        exit(PurchInvHeader.FindFirst);
+        //-NPR5.54 [390380]
+        NpEcDocument.SetRange("Store Code",NpEcStore.Code);
+        NpEcDocument.SetRange("Reference No.",InvoiceNo);
+        NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Posted Purchase Invoice");
+        if not NpEcDocument.FindLast then
+          exit(false);
+
+        exit(PurchInvHeader.Get(NpEcDocument."Document No."));
+        //+NPR5.54 [390380]
+    end;
+
+    procedure FindPostedInvoices(XmlElement: DotNet npNetXmlElement;var TempPurchInvHeader: Record "Purch. Inv. Header" temporary): Boolean
+    var
+        NpEcDocument: Record "NpEc Document";
+        NpEcStore: Record "NpEc Store";
+        PurchInvHeader: Record "Purch. Inv. Header";
+        NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
+        InvoiceNo: Text;
+    begin
+        //-NPR5.54 [390380]
+        FindStore(XmlElement,NpEcStore);
+        InvoiceNo := GetInvoiceNo(XmlElement);
+
+        NpEcDocument.SetRange("Store Code",NpEcStore.Code);
+        NpEcDocument.SetRange("Reference No.",InvoiceNo);
+        NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Posted Purchase Invoice");
+        if not NpEcDocument.FindSet then
+          exit(false);
+
+        repeat
+          if PurchInvHeader.Get(NpEcDocument."Document No.") and not TempPurchInvHeader.Get(PurchInvHeader."No.") then begin
+            TempPurchInvHeader.Init;
+            TempPurchInvHeader := PurchInvHeader;
+            TempPurchInvHeader.Insert;
+          end;
+        until NpEcDocument.Next = 0;
+
+        exit(TempPurchInvHeader.FindFirst);
+        //+NPR5.54 [390380]
     end;
 
     local procedure FindStore(XmlElement: DotNet npNetXmlElement;var NpEcStore: Record "NpEc Store")
@@ -364,10 +546,12 @@ codeunit 6151321 "NpEc Purch. Doc. Import Mgt."
 
     local procedure GetInvoiceNo(XmlElement: DotNet npNetXmlElement) InvoiceNo: Text
     var
-        PurchHeader: Record "Purchase Header";
+        NpEcDocument: Record "NpEc Document";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
     begin
-        InvoiceNo := NpXmlDomMgt.GetAttributeCode(XmlElement,'/*/purchase_invoice','invoice_no',MaxStrLen(PurchHeader."NpEc Document No."),true);
+        //-NPR5.54 [390380]
+        InvoiceNo := NpXmlDomMgt.GetAttributeCode(XmlElement,'/*/purchase_invoice','invoice_no',MaxStrLen(NpEcDocument."Reference No."),true);
+        //+NPR5.54 [390380]
         if InvoiceNo = '' then
           Error(Text000,'invoice_no','purchase_invoice');
     end;
@@ -384,6 +568,43 @@ codeunit 6151321 "NpEc Purch. Doc. Import Mgt."
           exit(true);
 
         exit(false);
+    end;
+
+    procedure GetDocReferenceNo(PurchHeader: Record "Purchase Header"): Text
+    var
+        NpEcDocument: Record "NpEc Document";
+    begin
+        //-NPR5.54 [390380]
+        case PurchHeader."Document Type" of
+          PurchHeader."Document Type"::Quote:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Quote");
+            end;
+          PurchHeader."Document Type"::Order:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Order");
+            end;
+          PurchHeader."Document Type"::Invoice:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Invoice");
+            end;
+          PurchHeader."Document Type"::"Credit Memo":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Credit Memo");
+            end;
+          PurchHeader."Document Type"::"Blanket Order":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Blanket Order");
+            end;
+          PurchHeader."Document Type"::"Return Order":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Purchase Return Order");
+            end;
+        end;
+        NpEcDocument.SetRange("Document No.",PurchHeader."No.");
+        if NpEcDocument.FindLast then;
+        exit(NpEcDocument."Reference No.");
+        //+NPR5.54 [390380]
     end;
 }
 

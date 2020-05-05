@@ -15,6 +15,8 @@ tableextension 6014405 tableextension6014405 extends "Sales Invoice Header"
     // NPR5.26/TJ/20160816 CASE 248831 Added new fields for Document Exchange Framework integration: 6059931..6059935
     // NPR5.34/BHR/20170720  CASE 283061 Cleared property MinValue of field Kolli
     // NPR5.53/MHA /20191211 CASE 380837 Added fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
+    // NPR5.54/MHA /20200311  CASE 390380 Disabled fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No.".
+    //                                    Can be removed in the next release.
     fields
     {
         field(6014400;"Sales Ticket No.";Code[20])
@@ -91,14 +93,15 @@ tableextension 6014405 tableextension6014405 extends "Sales Invoice Header"
         }
         field(6151300;"NpEc Store Code";Code[20])
         {
-            Caption = 'E-commerce Store Code';
-            Description = 'NPR5.53';
-            TableRelation = "NpEc Store";
+            Caption = 'NpEc Store Code';
+            Description = 'NPR5.53,NPR5.54';
+            Enabled = false;
         }
         field(6151305;"NpEc Document No.";Code[50])
         {
-            Caption = 'E-commerce Document No.';
-            Description = 'NPR5.53';
+            Caption = 'NpEc Document No.';
+            Description = 'NPR5.53,NPR5.54';
+            Enabled = false;
         }
         field(6151400;"Magento Payment Amount";Decimal)
         {

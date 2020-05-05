@@ -2,6 +2,9 @@ codeunit 6150874 "POS Action - EFT Gift Card"
 {
     // NPR5.51/MMV /20190625 CASE 359385 Created object
     // NPR5.53/MMV /20200114 CASE 375525 Added support for discount & sequential giftcard issuing.
+    // NPR5.54/MMV /20200302 CASE 364340 Moved gift card functions into EFT payment object.
+    //                                   Isolated business logic.
+    //                                   Break loop if lookup trx happens instead, or trx error.
 
 
     trigger OnRun()
@@ -131,16 +134,30 @@ codeunit 6150874 "POS Action - EFT Gift Card"
         Amount: Decimal;
         DiscountPercent: Decimal;
         NoOfVouchers: Integer;
-        PaymentTypePOS: Record "Payment Type POS";
-        POSSale: Codeunit "POS Sale";
-        SalePOS: Record "Sale POS";
     begin
-        //-NPR5.53 [375525]
+        //-NPR5.54 [364340]
+        PrepareGiftCardLoopJSONParse(JSON, PaymentType, Amount, DiscountPercent, NoOfVouchers);
+        PrepareGiftCardLoopBusinessLogic(POSSession, PaymentType, Amount, DiscountPercent, NoOfVouchers);
+        //-NPR5.54 [364340]
+    end;
+
+    local procedure PrepareGiftCardLoopJSONParse(JSON: Codeunit "POS JSON Management";var PaymentType: Text;var Amount: Decimal;var DiscountPercent: Decimal;var NoOfVouchers: Integer)
+    begin
+        //-NPR5.54 [364340]
         PaymentType := JSON.GetStringParameter('PaymentType', true);
         Amount := GetNumpadValue(JSON, 'AmountPrompt');
         DiscountPercent := GetNumpadValue(JSON, 'DiscountPctPrompt');
         NoOfVouchers := GetIntpadValue(JSON, 'QuantityPrompt');
+        //+NPR5.54 [364340]
+    end;
 
+    procedure PrepareGiftCardLoopBusinessLogic(POSSession: Codeunit "POS Session";PaymentType: Text;Amount: Decimal;DiscountPercent: Decimal;NoOfVouchers: Integer)
+    var
+        PaymentTypePOS: Record "Payment Type POS";
+        POSSale: Codeunit "POS Sale";
+        SalePOS: Record "Sale POS";
+    begin
+        //-NPR5.54 [364340]
         if NoOfVouchers = 0 then
           NoOfVouchers := 1;
 
@@ -162,20 +179,20 @@ codeunit 6150874 "POS Action - EFT Gift Card"
         POSSession.StoreActionState('eft_gift_card_discount_percent', DiscountPercent);
         POSSession.StoreActionState('eft_gift_card_total_number', NoOfVouchers);
         POSSession.StoreActionState('eft_gift_card_current_number', 1);
-        //+NPR5.53 [375525]
+        //+NPR5.54 [364340]
     end;
 
-    local procedure LoadGiftCard(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")
+    procedure LoadGiftCard(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management"): Integer
     var
         Amount: Decimal;
         PaymentType: Text;
-        EFTGiftCardMgt: Codeunit "EFT Gift Card Mgt.";
         EftEntryNo: Integer;
         Variant: Variant;
         POSSale: Codeunit "POS Sale";
         EFTSetup: Record "EFT Setup";
         SalePOS: Record "Sale POS";
         PaymentTypePOS: Record "Payment Type POS";
+        EFTPaymentMgt: Codeunit "EFT Transaction Mgt.";
     begin
         //-NPR5.53 [375525]
         POSSession.RetrieveActionState('eft_gift_card_amount', Variant);
@@ -188,13 +205,18 @@ codeunit 6150874 "POS Action - EFT Gift Card"
         PaymentTypePOS.GetByRegister(PaymentType, SalePOS."Register No.");
         EFTSetup.FindSetup(SalePOS."Register No.", PaymentTypePOS."No.");
 
-        FrontEnd.PauseWorkflow();
-        EftEntryNo := EFTGiftCardMgt.StartGiftCardLoadTransaction(EFTSetup, PaymentTypePOS, Amount, '', SalePOS);
+        //-NPR5.54 [364340]
+        EftEntryNo := EFTPaymentMgt.StartGiftCardLoad(EFTSetup, PaymentTypePOS, Amount, '', SalePOS);
+        //+NPR5.54 [364340]
         POSSession.StoreActionState('eft_gift_card_entry_no', EftEntryNo);
         //+NPR5.53 [375525]
+
+        //-NPR5.54 [364340]
+        exit(EftEntryNo);
+        //+NPR5.54 [364340]
     end;
 
-    procedure InsertVoucherDiscountLine(POSSession: Codeunit "POS Session")
+    procedure InsertVoucherDiscountLine(POSSession: Codeunit "POS Session"): Guid
     var
         SaleLinePOS: Record "Sale Line POS";
         POSSaleLine: Codeunit "POS Sale Line";
@@ -215,15 +237,17 @@ codeunit 6150874 "POS Action - EFT Gift Card"
         POSSession.RetrieveActionState('eft_gift_card_amount', Variant);
         Amount := Variant;
 
-        if DiscountPercent = 0 then
-          exit;
-
+        //-NPR5.54 [364340]
         EFTTransactionRequest.Get(EftEntryNo);
-        if (not EFTTransactionRequest.Successful) or (EFTTransactionRequest."Result Amount"= 0) then begin
+        if (not EFTTransactionRequest.Successful) or (EFTTransactionRequest."Result Amount"= 0) or (EFTTransactionRequest."Processing Type" <> EFTTransactionRequest."Processing Type"::GIFTCARD_LOAD) then begin
           Error('');
         end;
         EFTTransactionRequest.TestField(Successful);
         EFTTransactionRequest.TestField("Result Amount");
+        //+NPR5.54 [364340]
+
+        if DiscountPercent = 0 then
+          exit;
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
@@ -249,6 +273,10 @@ codeunit 6150874 "POS Action - EFT Gift Card"
 
         POSSession.RequestRefreshData();
         //+NPR5.53 [375525]
+
+        //-NPR5.54 [364340]
+        exit(SaleLinePOS."Retail ID");
+        //+NPR5.54 [364340]
     end;
 
     local procedure GiftCardLoopIterate(POSSession: Codeunit "POS Session";FrontEnd: Codeunit "POS Front End Management")

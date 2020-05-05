@@ -5,6 +5,7 @@ report 6060136 "MM Membership Not Renewed"
     RDLCLayout = './MM Membership Not Renewed.rdlc';
 
     Caption = 'Membership Not Renewed';
+    UsageCategory = ReportsAndAnalysis;
 
     dataset
     {

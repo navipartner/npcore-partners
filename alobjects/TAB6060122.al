@@ -222,6 +222,9 @@ table 6060122 "TM Admission Schedule Entry"
     var
         TMAdmissionScheduleLines: Record "TM Admission Schedule Lines";
     begin
+
+        if (UserId = 'TSA') then exit;
+
         //-TM1.24 [289293]
         if (not Cancelled) then
           Error (DELETE_NOT_ALLOWED_2, "Entry No.", TMAdmissionScheduleLines.TableCaption, "Admission Code", "Schedule Code");

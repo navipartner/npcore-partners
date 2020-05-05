@@ -18,6 +18,11 @@ table 6184495 "EFT Transaction Request"
     // NPR5.49/MMV /20190410  CASE 347476 Renamed field 420
     // NPR5.51/MMV /20190626  CASE 359385 Added giftcard types in field 450 and renamed all options for AL compatibility.
     // NPR5.53/MMV /20191206 CASE 377533 Added fields 10000
+    // NPR5.54/MMV /20200218 CASE 387990 Renamed field "External Result Received" to "External Result Known" to better describe situations where lack of request/initialization implies known result.
+    // NPR5.54/MMV /20200219 CASE 364340 Created key on "Hardware ID,Processing Type".
+    //                                   Added options to "Authentication Method".
+    //                                   Added field "Result Processed" to distinguish between parsing external trx response with known result ("External Result Known" -> TRUE) and
+    //                                   parsing the EFT record information onto the POS sales lines. ("Result Processed" -> TRUE). Previously only indication was "Finished" timestamp 0DT.
 
     Caption = 'EFT Transaction Request';
     DrillDownPageID = "EFT Transaction Requests";
@@ -78,9 +83,17 @@ table 6184495 "EFT Transaction Request"
         {
             Caption = 'Sales Ticket No.';
         }
+        field(81;"Sales ID";Guid)
+        {
+            Caption = 'Sales ID';
+        }
         field(83;"Sales Line No.";Integer)
         {
             Caption = 'Sales Line No.';
+        }
+        field(84;"Sales Line ID";Guid)
+        {
+            Caption = 'Sales Line ID';
         }
         field(85;"POS Description";Text[100])
         {
@@ -177,8 +190,8 @@ table 6184495 "EFT Transaction Request"
         field(210;"Authentication Method";Option)
         {
             Caption = 'Authentication Method';
-            OptionCaption = 'None,Signature,PIN';
-            OptionMembers = "None",Signature,PIN;
+            OptionCaption = 'None,Signature,PIN,Loyalty,Consumer Device';
+            OptionMembers = "None",Signature,PIN,Loyalty,ConsumerDevice;
         }
         field(215;"Signature Type";Option)
         {
@@ -236,9 +249,17 @@ table 6184495 "EFT Transaction Request"
         {
             Caption = 'Fee Amount';
         }
+        field(341;"Fee Line ID";Guid)
+        {
+            Caption = 'Fee Line ID';
+        }
         field(345;"Tip Amount";Decimal)
         {
             Caption = 'Tip Amount';
+        }
+        field(346;"Tip Line ID";Guid)
+        {
+            Caption = 'Tip Line ID';
         }
         field(350;"Offline mode";Boolean)
         {
@@ -305,9 +326,9 @@ table 6184495 "EFT Transaction Request"
             Caption = 'Initiated from Entry No.';
             TableRelation = "EFT Transaction Request";
         }
-        field(540;"External Result Received";Boolean)
+        field(540;"External Result Known";Boolean)
         {
-            Caption = 'External Result Received';
+            Caption = 'External Result Known';
         }
         field(550;"Auto Voidable";Boolean)
         {
@@ -386,6 +407,14 @@ table 6184495 "EFT Transaction Request"
         {
             Caption = 'Internal Customer ID';
         }
+        field(730;"Result Processed";Boolean)
+        {
+            Caption = 'Result Processed';
+        }
+        field(740;"Access Token";BLOB)
+        {
+            Caption = 'Access Token';
+        }
         field(10000;"FF Moved to POS Entry";Boolean)
         {
             CalcFormula = Exist("POS Entry" WHERE ("Document No."=FIELD("Sales Ticket No.")));
@@ -411,6 +440,9 @@ table 6184495 "EFT Transaction Request"
         key(Key5;"Register No.","Integration Type","Processing Type")
         {
         }
+        key(Key6;"Hardware ID")
+        {
+        }
     }
 
     fieldgroups
@@ -429,11 +461,11 @@ table 6184495 "EFT Transaction Request"
 
     procedure PrintReceipts(IsReprint: Boolean)
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         RecRef: RecordRef;
         ReceiptNo: Integer;
         EntryNo: Integer;
-        CreditCardTransaction2: Record "Credit Card Transaction";
+        CreditCardTransaction2: Record "EFT Receipt";
         First: Boolean;
         EFTInterface: Codeunit "EFT Interface";
         Handled: Boolean;

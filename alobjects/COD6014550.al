@@ -20,6 +20,7 @@ codeunit 6014550 "RP Aux - Misc. Library"
     // NPR5.48/MMV /20181206 CASE 327107 Added hex conversions
     // NPR5.49/TSA /20190218 CASE 342244 Added functions MultiplicativeInverseEncode() and MultiplicativeInverseDecode() to obfuscation of numbers (receipt number)
     // NPR5.51/MMV /20190712 CASE 360972 Added date formula functions
+    // NPR5.54/BHR /20200219 CASE 389444 Allow print Text from POS Unit
 
 
     trigger OnRun()
@@ -147,6 +148,7 @@ codeunit 6014550 "RP Aux - Misc. Library"
         RecRef: RecordRef;
         AuditRoll: Record "Audit Roll";
         POSEntry: Record "POS Entry";
+        POSUnit: Record "POS Unit";
     begin
         //-NPR5.44 [315362]
         //Register.GET(RetailFormCode.FetchRegisterNumber());
@@ -157,21 +159,41 @@ codeunit 6014550 "RP Aux - Misc. Library"
               RecRef.SetTable(AuditRoll);
               AuditRoll.Find;
               Register.Get(AuditRoll."Register No.");
+              //-NPR5.54 [389444]
+              Utility.GetTicketText(tmpRetailComment, Register);
+              //+NPR5.54 [389444]
             end;
           DATABASE::"POS Entry" :
             begin
               RecRef := RecordID.GetRecord();
               RecRef.SetTable(POSEntry);
               POSEntry.Find;
-              Register.Get(POSEntry."POS Unit No.");
+              //-NPR5.54 [389444]
+              //Register.GET(POSEntry."POS Unit No.");
+              POSUnit.Get(POSEntry."POS Unit No.");
+              Utility.GetPOSUnitTicketText(tmpRetailComment, POSUnit);
+              if not tmpRetailComment.FindFirst then begin
+                Register.Get(POSEntry."POS Unit No.");
+                Utility.GetTicketText(tmpRetailComment, Register);
+              end;
+              //+NPR5.54 [389444]
+
             end;
-          else
-            Register.Get(RetailFormCode.FetchRegisterNumber());
+          //-NPR5.54 [389444]
+          //ELSE
+          else begin
+          //-NPR5.54 [389444]
+              Register.Get(RetailFormCode.FetchRegisterNumber());
+           //-NPR5.54 [389444]
+              Utility.GetTicketText(tmpRetailComment, Register);
+          end;
+           //+NPR5.54 [389444]
         end;
         //+NPR5.44 [315362]
 
-        Utility.GetTicketText(tmpRetailComment, Register);
-
+        //-NPR5.54 [389444]
+        //  Utility.GetTicketText(tmpRetailComment, Register);
+        //-NPR5.54 [389444]
         LinePrintMgt.SetFont(TemplateLine."Type Option");
         if tmpRetailComment.FindSet then repeat
           LinePrintMgt.AddTextField(1, TemplateLine.Align, tmpRetailComment.Comment);

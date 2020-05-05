@@ -2,6 +2,7 @@ table 6151388 "CS Refill Data"
 {
     // NPR5.50/CLVA/20190309  CASE 332844 Object created
     // NPR5.52/CLVA/20190916 CASE 368484 Added page lookup
+    // NPR5.54/CLVA/20200310 CASE 384506 Changed "Item Description" and "Variant Description" to FieldClass Normal
 
     Caption = 'CS Refill Data';
     DrillDownPageID = "CS Refill Data";
@@ -43,18 +44,15 @@ table 6151388 "CS Refill Data"
         }
         field(13;"Item Description";Text[50])
         {
-            CalcFormula = Lookup(Item.Description WHERE ("No."=FIELD("Item No.")));
             Caption = 'Item Description';
             Editable = false;
-            FieldClass = FlowField;
+            FieldClass = Normal;
         }
         field(14;"Variant Description";Text[50])
         {
-            CalcFormula = Lookup("Item Variant".Description WHERE (Code=FIELD("Variant Code"),
-                                                                   "Item No."=FIELD("Item No.")));
             Caption = 'Variant Description';
             Editable = false;
-            FieldClass = FlowField;
+            FieldClass = Normal;
         }
         field(15;"Item Group Code";Code[10])
         {

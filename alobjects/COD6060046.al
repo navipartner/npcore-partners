@@ -60,6 +60,7 @@ codeunit 6060046 "Item Wsht.-Register Line"
         TxtNotImplemented: Label 'Not implemented yet. Please set Sales Price handling to Item of Item+Variant in the Item Worksheet Template';
         CalledFromTest: Boolean;
 
+    [Scope('Personalization')]
     procedure RunWithCheck(var ItemWkshLine2: Record "Item Worksheet Line")
     begin
         ItemWkshLine.Copy(ItemWkshLine2);
@@ -1515,6 +1516,7 @@ codeunit 6060046 "Item Wsht.-Register Line"
         //+NPR5.50 [353052]
     end;
 
+    [Scope('Personalization')]
     procedure ProcessLinePurchasePrices()
     var
         PurchasePrice: Record "Purchase Price";
@@ -1735,6 +1737,7 @@ codeunit 6060046 "Item Wsht.-Register Line"
     begin
     end;
 
+    [Scope('Personalization')]
     procedure SetCalledFromTest(ParCalledFromTest: Boolean)
     begin
         //-NPR5.25 [246088]
@@ -1742,6 +1745,7 @@ codeunit 6060046 "Item Wsht.-Register Line"
         //+NPR5.25 [246088]
     end;
 
+    [Scope('Personalization')]
     procedure InsertChangeRecords(VarItemWkshLine: Record "Item Worksheet Line")
     var
         ExistingItem: Record Item;

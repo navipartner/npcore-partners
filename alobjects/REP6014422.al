@@ -7,6 +7,8 @@ report 6014422 "Issued/Admitted Ticket Stats"
     // NPR5.41/JLK /20180406  CASE 308825 Added Customer Name in Filter
     // NPR5.49/BHR /20190207  CASE 343119 Correct Report as per OMA
     // NPR5.52/YAHA/20190310  CASE 366687 Added variant code and grouping
+    // NPR5.54/SARA/20200225  CASE 379540 Apply changes on filtering on issued and admitted tickets
+    // NPR5.54/BHR /20200324  CASE 397507 Set ReqFilterFields for DataItem Item -allow filter on Item No./AdmissionCode
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/IssuedAdmitted Ticket Stats.rdlc';
 
@@ -48,10 +50,14 @@ report 6014422 "Issued/Admitted Ticket Stats"
             column(ShowVariantLine;ShowVariantLine)
             {
             }
+            column(AdmissionCode;AdmissionCodeFilter)
+            {
+            }
             dataitem(Item;Item)
             {
                 DataItemLink = "Ticket Type"=FIELD(Code);
                 DataItemTableView = SORTING("No.");
+                RequestFilterFields = "No.";
                 column(No_Item;"No.")
                 {
                 }
@@ -88,12 +94,18 @@ report 6014422 "Issued/Admitted Ticket Stats"
                         TMTicketAccessStatistics.SetRange("Item No.",Item."No.");
 
                         if (StartDate <> 0D) and (EndDate <> 0D) then begin
-                          TMTicket.SetFilter("Valid From Date",'%1..%2',StartDate,EndDate);
+                          //-NPR5.54 [379540]
+                          //TMTicket.SETFILTER("Valid From Date",'%1..%2',StartDate,EndDate);
+                          TMTicket.SetFilter("Valid From Date",'%1..%2',InitialStartDate,EndDate);
+                          //+NPR5.54 [379540]
                           TMTicketAccessStatistics.SetFilter("Admission Date",'%1..%2',StartDate,EndDate);
                         end;
 
                         if EndDate = 0D then begin
-                          TMTicket.SetFilter("Valid From Date",'%1',StartDate);
+                          //-NPR5.54 [379540]
+                          //TMTicket.SETFILTER("Valid From Date",'%1',StartDate);
+                          TMTicket.SetFilter("Valid From Date",'%1..%2',InitialStartDate,StartDate);
+                          //+NPR5.54 [379540]
                           TMTicketAccessStatistics.SetFilter("Admission Date",'%1',StartDate);
                         end;
 
@@ -102,9 +114,17 @@ report 6014422 "Issued/Admitted Ticket Stats"
                           TMTicket.SetFilter("Customer No.",CustomerFilter);
                         //+308825
 
+                        //-NPR5.54 [397507]
+                        if AdmissionCode <>'' then
+                          TMTicketAccessStatistics.SetFilter("Admission Code",'%1',AdmissionCode);
+                        //+NPR5.54 [397507]
+
                         if TMTicket.FindSet then repeat
                           Clear(IssuedTicket);
-                          GetIssuedTicket(TMTicket,IssuedTicket);
+                          //-NPR5.54 [379540]
+                          if TMTicket."Valid From Date" in [StartDate..EndDate] then
+                          //+NPR5.54 [379540]
+                            GetIssuedTicket(TMTicket,IssuedTicket);
                           TotalIssuedTicketPerItem += IssuedTicket;
                           //-NPR5.40
                           Clear(AdmittedTicket);
@@ -124,6 +144,7 @@ report 6014422 "Issued/Admitted Ticket Stats"
                 }
                 dataitem("TM Ticket Access Statistics";"TM Ticket Access Statistics")
                 {
+                    DataItemTableView = SORTING("Entry No.");
                     column(Variant;"TM Ticket Access Statistics"."Variant Code" + '  ' + VariantDesc)
                     {
                     }
@@ -167,7 +188,10 @@ report 6014422 "Issued/Admitted Ticket Stats"
                           TMTicketAccessStatistics.SetFilter("Admission Date",'%1',StartDate);
                         end;
 
-
+                        //-NPR5.54 [397507]
+                        if AdmissionCode <>'' then
+                          TMTicketAccessStatistics.SetFilter("Admission Code",'%1',AdmissionCode);
+                        //+NPR5.54 [397507]
                         if CustomerFilter <> '' then
                           TMTicket.SetFilter("Customer No.",CustomerFilter);
 
@@ -202,6 +226,10 @@ report 6014422 "Issued/Admitted Ticket Stats"
                         "TM Ticket Access Statistics".SetRange("Item No.",Item."No.");
                         "TM Ticket Access Statistics".SetFilter("Admission Date",'%1..%2',StartDate,EndDate);
                         "TM Ticket Access Statistics".SetFilter("Variant Code",'<>%1','');
+                        //-NPR5.54 [397507]
+                        if AdmissionCode <>'' then
+                          "TM Ticket Access Statistics".SetFilter("Admission Code",'%1',AdmissionCode);
+                        //+NPR5.54 [397507]
                         Clear(VariantDesc);
                         //+NPR5.52 [366687]
                     end;
@@ -291,6 +319,11 @@ report 6014422 "Issued/Admitted Ticket Stats"
                     {
                         Caption = 'Show Variant';
                     }
+                    field(AdmissionCode;AdmissionCode)
+                    {
+                        Caption = 'Admission Code';
+                        TableRelation = "TM Ticket Access Fact"."Fact Code" WHERE ("Fact Name"=FILTER(ADMISSION_CODE));
+                    }
                 }
             }
         }
@@ -322,6 +355,7 @@ report 6014422 "Issued/Admitted Ticket Stats"
     trigger OnPreReport()
     var
         Cust: Record Customer;
+        Year: Integer;
     begin
         //-NPR5.41
         if CustomerFilter <> '' then
@@ -331,10 +365,20 @@ report 6014422 "Issued/Admitted Ticket Stats"
 
         FilterStartDate := StrSubstNo(StartDateCaption,Format(StartDate));
         FilterEndDate := StrSubstNo(EndDateCaption,Format(EndDate));
+        //-NPR5.54 [379540]
+        if EndDate = 0D then
+          EndDate := StartDate;
+        Year := Date2DMY(StartDate,3);
+        InitialStartDate := DMY2Date(1,1,Year);
+        //+NPR5.54 [379540]
+
         //-NPR5.41
         //FilterCustomer := STRSUBSTNO(CustomerCaption,CustomerFilter);
-        FilterCustomer := StrSubstNo(CustomerCaption,CustomerFilter) + ' - ' + Cust.Name;
+        FilterCustomer := StrSubstNo(CustomerCaption,CustomerFilter) + ' ' + Cust.Name;
         //+NPR5.41
+        //-NPR5.54 [397507]
+        AdmissionCodeFilter:= AdmissionCodeLbl+' '+AdmissionCode;
+        //+NPR5.54 [397507]
     end;
 
     var
@@ -342,6 +386,7 @@ report 6014422 "Issued/Admitted Ticket Stats"
         TotalIssuedTicketPerItem: Decimal;
         StartDate: Date;
         EndDate: Date;
+        InitialStartDate: Date;
         TotalIssuedTicketType: Decimal;
         TotalAdmittedTicketType: Integer;
         SkipLineWithZero: Boolean;
@@ -365,11 +410,18 @@ report 6014422 "Issued/Admitted Ticket Stats"
         VariantVisibility: Boolean;
         ShowVariantLine: Boolean;
         VariantCodeLbl: Label 'Variant Code : ';
+        AdmissionCode: Code[100];
+        AdmissionCodeFilter: Text;
+        AdmissionCodeLbl: Label 'Admission Code: ';
 
     local procedure GetIssuedTicket(Ticket: Record "TM Ticket";var IssuedAmount: Decimal)
     var
         TMTicketAccessEntry: Record "TM Ticket Access Entry";
     begin
+        //-NPR5.54 [397507]
+        if AdmissionCode <>'' then
+          TMTicketAccessEntry.SetFilter("Admission Code",'%1',AdmissionCode);
+        //+NPR5.54 [397507]
         TMTicketAccessEntry.SetRange("Ticket No.",Ticket."No.");
         if TMTicketAccessEntry.FindSet then repeat
           IssuedAmount += TMTicketAccessEntry.Quantity;
@@ -386,6 +438,14 @@ report 6014422 "Issued/Admitted Ticket Stats"
     begin
         //-NPR5.40
         TMTicketAccessEntry.SetRange("Ticket No.",Ticket."No.");
+        //-NPR5.54 [379540]
+        TMTicketAccessEntry.SetFilter("Access Date",'%1..%2',StartDate,EndDate);
+        //+NPR5.54 [379540]
+
+        //-NPR5.54 [397507]
+        if AdmissionCode <>'' then
+          TMTicketAccessEntry.SetFilter("Admission Code",'%1',AdmissionCode);
+        //+NPR5.54 [397507]
         if TMTicketAccessEntry.FindSet then repeat
           ItemFactCode := '';
           if (ItemFactCode = '') then
@@ -412,6 +472,10 @@ report 6014422 "Issued/Admitted Ticket Stats"
     var
         TMTicketAccessEntry: Record "TM Ticket Access Entry";
     begin
+        //-NPR5.54 [397507]
+        if AdmissionCode <>'' then
+          TMTicketAccessEntry.SetFilter("Admission Code",'%1',AdmissionCode);
+        //+NPR5.54 [397507]
         TMTicketAccessEntry.SetRange("Ticket No.",Ticket."No.");
         if TMTicketAccessEntry.FindSet then repeat
           IssuedAmount += TMTicketAccessEntry.Quantity;
@@ -428,6 +492,10 @@ report 6014422 "Issued/Admitted Ticket Stats"
     begin
         //-NPR5.40
         TMTicketAccessEntry.SetRange("Ticket No.",Ticket."No.");
+          //-NPR5.54 [397507]
+            if AdmissionCode <>'' then
+              TMTicketAccessEntry.SetFilter("Admission Code",'%1',AdmissionCode);
+          //+NPR5.54 [397507]
         if TMTicketAccessEntry.FindSet then repeat
           ItemFactCode := '';
           if (ItemFactCode = '') then
@@ -444,11 +512,9 @@ report 6014422 "Issued/Admitted Ticket Stats"
           TMTicketAccessStatistics.SetFilter ("Admission Code", '=%1',TMTicketAccessEntry."Admission Code");
           TMTicketAccessStatistics.SetFilter ("Admission Date", '=%1', TMTicketAccessEntry."Access Date");
           TMTicketAccessStatistics.SetFilter ("Admission Hour", '=%1', AdmissionHour);
+
            if (TMTicketAccessStatistics.FindFirst ()) then
               AdmittedAmount += TMTicketAccessEntry.Quantity;
-
-
-
 
         until TMTicketAccessEntry.Next = 0;
         //+NPR5.40

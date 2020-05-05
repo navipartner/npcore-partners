@@ -1,14 +1,17 @@
 page 6151491 "Raptor Setup"
 {
-    // NPR5.51/CLVA/20190710  CASE 355871 Object created
+    // NPR5.51/CLVA/20190710 CASE 355871 Object created
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
     // NPR5.53/ALPO/20191128 CASE 379012 Raptor tracking integration: send info about sold products to Raptor
+    // NPR5.54/ALPO/20200227 CASE 355871 Possibility to define Raptor tracking service types
 
+    AccessByPermission = TableData "Raptor Setup"=M;
     Caption = 'Raptor Setup';
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
     SourceTable = "Raptor Setup";
+    UsageCategory = Administration;
 
     layout
     {
@@ -38,6 +41,9 @@ page 6151491 "Raptor Setup"
                 {
                 }
                 field("Tracking Service Url";"Tracking Service Url")
+                {
+                }
+                field("Tracking Service Type";"Tracking Service Type")
                 {
                 }
             }

@@ -159,6 +159,9 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
     // NPR5.53/MMV /20191024 CASE 349793 Added Output Type handling
     // NPR5.53/ALPO/20191216 CASE 378985 Finish credit sale workflow
     // NPR5.53/MMV /20191219 CASE 377510 Rolled back #357277, replaced with a silent re-import into active sale before ending to keep order & POS sale contents in sync.
+    // NPR5.54/ALPO/20200206 CASE 389537 Sale header entry was not deleted from "Sales POS" table after Credit Sale has been posted
+    // NPR5.54/ALPO/20200213 CASE 385837 Copy comment lines from POS Sale to Sales Order
+    // NPR5.54/ALPO/20200228 CASE 392239 Possibility to use location code from POS store, POS sale or specific location as an alternative to using location from Register
 
     Permissions = TableData "Audit Roll" = rimd;
     TableNo = "Sale POS";
@@ -296,6 +299,8 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         OnFinishCreditSaleDescription: Label 'On finish credit sale workflow';
         ERR_ORDER_SALE_SYNC: Label '%1 %2 was created successfully but an error occurred when syncing changes with POS, preventing POS sale from ending:\%3';
         ERR_DOC_MISSING: Label '%1 %2 is missing after page closed. Cannot sync with POS and end sale.';
+        UseLocationFrom: Option Register,"POS Store","POS Sale","Specific Location";
+        UseLocationCode: Code[10];
 
     procedure SetAsk(AskIn: Boolean)
     begin
@@ -517,6 +522,14 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
         //+NPR5.52 [352473]
     end;
 
+    procedure SetLocationSource(NewSource: Option Register,"POS Store","POS Sale","Specific Location";NewLocationCode: Code[10])
+    begin
+        //-NPR5.54 [392239]
+        UseLocationFrom := NewSource;
+        UseLocationCode := NewLocationCode;
+        //+NPR5.54 [392239]
+    end;
+
     procedure "--- Sales Document Functions"()
     begin
     end;
@@ -576,7 +589,7 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
             SaleLinePOS.SetRange("Register No.", "Register No.");
             SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
             SaleLinePOS.ModifyAll(Silent, true);
-            SaleLinePOS.SetFilter("No.", '<>%1', '');
+          //SaleLinePOS.SETFILTER( "No.", '<>%1', '' );  //NPR5.54 [385837]-revoked
 
             if SaleLinePOS.FindSet then begin
                 CopySaleCommentLines(SalePOS, SalesHeader);
@@ -612,6 +625,10 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
                     POSCreateEntry.CreatePOSEntryForCreatedSalesDocument(SalePOS, SalesHeader, Posted);
                 end;
                 SaleLinePOS.DeleteAll;
+            //-NPR5.54 [389537]
+            if not ReturnAmount then
+              SalePOS.Delete;
+            //+NPR5.54 [389537]
             end else
                 ConvertSaleLinePOSToComments(SalesHeader, SalePOS);
 
@@ -674,10 +691,9 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
 
     procedure CreateSalesHeader(var SalePOS: Record "Sale POS"; var SalesHeader: Record "Sales Header")
     var
-        Register: Record Register;
         Customer: Record Customer;
     begin
-        Register.Get(SalePOS."Register No.");
+        //Register.GET(SalePOS."Register No.");  //NPR5.54 [392239]-revoked
 
         SalesHeader.Init;
         SalesHeader."Document Type" := DocumentType;
@@ -717,7 +733,8 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
             SalesHeader."Sell-to Contact" := SalePOS."Contact No.";
         SalesHeader."Your Reference" := SalePOS.Reference;
         SalesHeader."External Document No." := SalePOS.Reference;
-        SalesHeader.Validate("Location Code", Register."Location Code");
+        //SalesHeader.VALIDATE("Location Code", Register."Location Code");  //NPR5.54 [392239]-revoked
+        SalesHeader.Validate("Location Code",GetLocationCode(SalePOS));  //NPR5.54 [392239]
         if Customer.Get(SalePOS."Customer No.") then
             SalesHeader."Document Processing" := Customer."Document Processing";
         SalesHeader.Ship := Ship;
@@ -1763,6 +1780,29 @@ codeunit 6014407 "Retail Sales Doc. Mgt."
 
         SalePOS.Get(SalePOS."Register No.", SalePOS."Sales Ticket No.");
         //+NPR5.53 [377510]
+    end;
+
+    local procedure GetLocationCode(SalePOS: Record "Sale POS"): Code[10]
+    var
+        POSStore: Record "POS Store";
+        Register: Record Register;
+    begin
+        //-NPR5.54 [392239]
+        case UseLocationFrom of
+          UseLocationFrom::Register: begin
+            Register.Get(SalePOS."Register No.");
+            exit(Register."Location Code");
+          end;
+          UseLocationFrom::"POS Store": begin
+            POSStore.Get(SalePOS."POS Store Code");
+            exit(POSStore."Location Code");
+          end;
+          UseLocationFrom::"POS Sale":
+            exit(SalePOS."Location Code");
+          UseLocationFrom::"Specific Location":
+            exit(UseLocationCode);
+        end;
+        //+NPR5.54 [392239]
     end;
 
     local procedure "--- Audit Roll Transfer"()

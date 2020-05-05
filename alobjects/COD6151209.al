@@ -3,6 +3,7 @@ codeunit 6151209 "NpCs Arch. Collect Mgt."
     // NPR5.51/MHA /20190717  CASE 344264 Object created - Archive Collect in Store Documents
     // NPR5.51/MHA /20190719  CASE 344264 Added "Opening Hour Set"
     // NPR5.51/MHA /20190821  CASE 364557 Added "Post on", "Sell-to Customer Name", "Location Code"
+    // NPR5.54/MHA /20200214  CASE 390590 Posting of Sales Document is only mandatory for Store Stock Orders
 
 
     trigger OnRun()
@@ -43,8 +44,10 @@ codeunit 6151209 "NpCs Arch. Collect Mgt."
                 end;
               NpCsDocument."Bill via"::"Sales Document":
                 begin
-                  if NpCsDocument."Delivery Status" = NpCsDocument."Delivery Status"::Delivered then
+                  //-NPR5.54 [390590]
+                  if (NpCsDocument."Delivery Status" = NpCsDocument."Delivery Status"::Delivered) and NpCsDocument."Store Stock" then
                     Error(Text006,NpCsDocument."Document Type",NpCsDocument."Document No.",NpCsDocument.FieldCaption("Bill via"),NpCsDocument."Bill via");
+                  //+NPR5.54 [390590]
 
                   SalesHeader.Delete(true);
                 end;

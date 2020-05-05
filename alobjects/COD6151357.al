@@ -8,6 +8,8 @@ codeunit 6151357 "CS Post"
     // NPR5.53/CLVA  /20191119  CASE 377721 Added support for Unplanned Count
     // NPR5.53/CLVA  /20191122  CASE 377462 Updating doument no. on Item Reclass. Journal
     // NPR5.53/CLVA  /20191128  CASE 377467 Added check if journal exist
+    // NPR5.54/CLVA  /20200217  CASE 391080 Added qty check before updating journal. Changed functions PostItemJournal and PostStoreApprovel to Local = No
+    // NPR5.54/CLVA  /20200225  CASE Changed posting timing.
 
     TableNo = "CS Posting Buffer";
 
@@ -48,6 +50,7 @@ codeunit 6151357 "CS Post"
     var
         Text023: Label '%1 = ''%2'', %3 = ''%4'', %5 = ''%6'', %7 = ''%8'': The total base quantity to take %9 must be equal to the total base quantity to place %10.';
         Text024: Label '%1 = ''%2'', %3 = ''%4'':\The total base quantity to take %5 must be equal to the total base quantity to place %6.';
+        Text025: Label 'Predicted Qty. %1 is not equal to Item Journal Qty.(Calculated) total %2';
 
     local procedure PostTransferOrder(var RecRef: RecordRef)
     var
@@ -150,7 +153,7 @@ codeunit 6151357 "CS Post"
         //+NPR5.52 [367425]
     end;
 
-    local procedure PostItemJournal(var RecRef: RecordRef)
+    procedure PostItemJournal(var RecRef: RecordRef)
     var
         ItemJournalBatch: Record "Item Journal Batch";
         ItemJnlTemplate: Record "Item Journal Template";
@@ -236,7 +239,7 @@ codeunit 6151357 "CS Post"
         end;
     end;
 
-    local procedure PostStoreApprovel(var RecRef: RecordRef)
+    procedure PostStoreApprovel(var RecRef: RecordRef)
     var
         CSStockTakes: Record "CS Stock-Takes";
         ItemJournalBatch: Record "Item Journal Batch";
@@ -252,14 +255,37 @@ codeunit 6151357 "CS Post"
         PostingRecRef: RecordRef;
         CSPostingBuffer: Record "CS Posting Buffer";
         CSPostEnqueue: Codeunit "CS Post - Enqueue";
+        CalcItemJournalLine: Record "Item Journal Line";
+        QtyCalculated: Decimal;
     begin
         RecRef.SetTable(CSStockTakes);
         CSStockTakes.Find;
+
+        //-NPR5.54 [392901]
+        if CSStockTakes."Journal Posted" then
+          exit;
+        //+NPR5.54 [392901]
 
         ItemJournalBatch.Get(CSStockTakes."Journal Template Name",CSStockTakes."Journal Batch Name");
         ItemJournalTemplate.Get(ItemJournalBatch."Journal Template Name");
 
         ItemJournalTemplate.TestField("Source Code");
+
+        //-NPR5.54 [391080]
+        QtyCalculated := 0;
+        Clear(CalcItemJournalLine);
+        CalcItemJournalLine.SetRange("Journal Template Name",CSStockTakes."Journal Template Name");
+        CalcItemJournalLine.SetRange("Journal Batch Name",CSStockTakes."Journal Batch Name");
+        CalcItemJournalLine.SetRange("Location Code",CSStockTakes.Location);
+        if CalcItemJournalLine.FindSet then begin
+          repeat
+            QtyCalculated += CalcItemJournalLine."Qty. (Calculated)"
+          until CalcItemJournalLine.Next = 0;
+        end;
+
+        if CSStockTakes."Predicted Qty." <> QtyCalculated then
+          Error(Text025,CSStockTakes."Predicted Qty.",QtyCalculated);
+        //+NPR5.54 [391080]
 
         Clear(BaseItemJournalLine);
         BaseItemJournalLine.Init;
@@ -348,16 +374,22 @@ codeunit 6151357 "CS Post"
           CSStockTakes.Modify(true);
         end;
 
-        PostingRecRef.GetTable(ItemJournalBatch);
-        CSPostingBuffer.Init;
-        CSPostingBuffer."Table No." := PostingRecRef.Number;
-        CSPostingBuffer."Record Id" := PostingRecRef.RecordId;
-        CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::"Store Counting";
-        //-NPR5.53 [377462]
-        CSPostingBuffer."Job Queue Priority for Post" := 2000;
-        //+NPR5.53 [377462]
-        if CSPostingBuffer.Insert(true) then
-          CSPostEnqueue.Run(CSPostingBuffer);
+        //-NPR5.54 [391080]
+        if not CSStockTakes."Manuel Posting" then begin
+        //+NPR5.54 [391080]
+          PostingRecRef.GetTable(ItemJournalBatch);
+          CSPostingBuffer.Init;
+          CSPostingBuffer."Table No." := PostingRecRef.Number;
+          CSPostingBuffer."Record Id" := PostingRecRef.RecordId;
+          CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::"Store Counting";
+          //-NPR5.53 [377462]
+          CSPostingBuffer."Job Queue Priority for Post" := 2000;
+          //+NPR5.53 [377462]
+          if CSPostingBuffer.Insert(true) then
+            CSPostEnqueue.Run(CSPostingBuffer);
+        //-NPR5.54 [391080]
+        end;
+        //+NPR5.54 [391080]
     end;
 
     local procedure PostUnplannedCounting(var RecRef: RecordRef;var CSPostingBuffer: Record "CS Posting Buffer")

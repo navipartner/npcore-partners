@@ -7,6 +7,7 @@ codeunit 6184519 "EFT Adyen Cloud Trx Dialog"
     // NPR5.51/MMV /20190827 CASE 357279 Changed timings on dialog
     // NPR5.53/MMV /20191120 CASE 377533 Added force abort button
     // NPR5.53/MMV /20200126 CASE 377533 Changed force abort timer limit
+    // NPR5.54/MMV /20200226 CASE 364340 Split up the error handling between finding
 
     SingleInstance = true;
 
@@ -89,10 +90,29 @@ codeunit 6184519 "EFT Adyen Cloud Trx Dialog"
         EFTTransactionRequest: Record "EFT Transaction Request";
         ContinueOnTransactionEntryNo: Integer;
         EFTAdyenCloudBackgndResp: Codeunit "EFT Adyen Backgnd. Response";
+        EFTTrxBackgroundSessionMgt: Codeunit "EFT Trx Background Session Mgt";
     begin
+        //-NPR5.54 [364340]
+        if not EFTTrxBackgroundSessionMgt.ResponseExists(TransactionEntryNo) then
+          exit;
+
         EFTTransactionRequest."Entry No." := TransactionEntryNo;
+        EFTAdyenCloudBackgndResp.SetRunMode(0);
         if not EFTAdyenCloudBackgndResp.Run(EFTTransactionRequest) then
             exit;
+
+        //Response was found with a lock, i.e. no dirty read. Process it and close dialog regardless of success status.
+        //Display any uncaught errors (extremely critical as payment might have been processed. Will need to be handled via trx lookup, assuming error was transient or missing config).
+
+        EFTTransactionRequest.Reset;
+        EFTTransactionRequest."Entry No." := TransactionEntryNo;
+        EFTAdyenCloudBackgndResp.SetRunMode(1);
+        if not EFTAdyenCloudBackgndResp.Run(EFTTransactionRequest) then begin
+          Message(GetLastErrorText);
+          if FrontEnd.IsPaused then
+            FrontEnd.ResumeWorkflow();
+        end;
+        //+NPR5.54 [364340]
 
         Done := true;
 
@@ -125,19 +145,16 @@ codeunit 6184519 "EFT Adyen Cloud Trx Dialog"
     begin
         EFTTransactionRequest.Get(TransactionEntryNo);
 
-        //-NPR5.53 [377533]
-        EFTAdyenCloudIntegration.AbortTransaction(EFTTransactionRequest);
+        //-NPR5.54 [364340]
+        EFTAdyenCloudIntegration.AbortTransaction(EFTTransactionRequest, EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
+        //+NPR5.54 [364340]
 
         if not AbortRequested then begin
-        //-NPR5.53 [377533]
           FirstAbortRequestedTime := CurrentDateTime;
-        //+NPR5.53 [377533]
           AbortRequested := true;
         end;
 
-        //-NPR5.53 [377533]
         if (CurrentDateTime - FirstAbortRequestedTime) > (1000 * 60) then begin //Force Abort button visible 1 minute after first abort attempt.
-        //+NPR5.53 [377533]
           Model.GetControlById('adyen-force-abort').Set('Visible', true);
           FrontEnd.UpdateModel(Model, ActiveModelID);
         end;
@@ -148,10 +165,8 @@ codeunit 6184519 "EFT Adyen Cloud Trx Dialog"
         EFTTransactionRequest: Record "EFT Transaction Request";
         EFTAdyenCloudProtocol: Codeunit "EFT Adyen Cloud Protocol";
     begin
-        //-NPR5.53 [377533]
         if not Confirm(CONFIRM_FORCE_ABORT, false) then
           exit;
-        //+NPR5.53 [377533]
         EFTTransactionRequest.Get(TransactionEntryNo);
         EFTAdyenCloudProtocol.ForceCloseTransaction(EFTTransactionRequest);
         FrontEnd.CloseModel(ActiveModelID);

@@ -699,7 +699,7 @@ codeunit 6014418 "Retail Sales Code"
         AuditRoll: Record "Audit Roll";
         AuditRollList: Page "Audit Roll";
         GiftCertOnTicket: Boolean;
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         DibsTransID: Text[30];
         OrderID: Text[30];
         Amount: Decimal;
@@ -937,7 +937,7 @@ codeunit 6014418 "Retail Sales Code"
         CreditVoucher: Record "Credit Voucher";
         PepperTransactionRequest: Record "EFT Transaction Request";
         PepperProtocol: Codeunit "Pepper Protocol";
-        CCTrans: Record "Credit Card Transaction";
+        CCTrans: Record "EFT Receipt";
         Register: Record Register;
         AmountItt: Integer;
         TextRefundMandatory: Label 'There are %1 related Card payments to ticket %2. To process the cancellation all Card payments must be reversed or cancelled.';

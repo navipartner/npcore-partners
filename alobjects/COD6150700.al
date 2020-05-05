@@ -37,6 +37,8 @@ codeunit 6150700 "POS Session"
     // NPR5.50/VB  /20181224  CASE 338666 Supporting Workflows 2.0 functionality
     // NPR5.51/VB  /20190719  CASE 352582 POS Administrative Templates feature
     // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
+    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
+    // NPR5.54/MMV /20200305 CASE 364340 Added mock constructor.
 
     EventSubscriberInstance = Manual;
 
@@ -86,6 +88,7 @@ codeunit 6150700 "POS Session"
         Workflow20State: array[1000] of Codeunit "POS Workflows 2.0 - State";
         Workflow20StateIndex: DotNet npNetDictionary_Of_T_U;
         Workflow20Map: array[1000] of Boolean;
+        IsMock: Boolean;
 
     local procedure "---Initialization---"()
     begin
@@ -126,6 +129,30 @@ codeunit 6150700 "POS Session"
             Message(Text001);
 
         Initialized := true;
+    end;
+
+    [Scope('Personalization')]
+    procedure MockConstructor(FrontEndIn: Codeunit "POS Front End Management";SetupIn: Codeunit "POS Setup";SessionIn: Codeunit "POS Session")
+    var
+        NullObject: DotNet npNetObject;
+    begin
+        //-NPR5.54 [364340]
+        FrontEnd := FrontEndIn;
+        Setup := SetupIn;
+        This := SessionIn;
+
+        FrontEnd.MockInitialize(This);
+
+        IsMock := true;
+
+        FrontEndKeeper.Initialize(NullObject,FrontEnd,This);
+        BindSubscription(FrontEndKeeper);
+
+        OnInitialize(FrontEnd);
+        Initialized := true;
+
+        InitializeSession(false);
+        //+NPR5.54 [364340]
     end;
 
     [Scope('Personalization')]
@@ -406,6 +433,15 @@ codeunit 6150700 "POS Session"
     end;
 
     [Scope('Personalization')]
+    procedure ResumeTransaction(SalePOS: Record "Sale POS")
+    begin
+        //-NPR5.54 [364658]
+        Clear(Sale);
+        Sale.ResumeExistingSale(SalePOS,Register,FrontEnd,Setup,Sale);
+        //+NPR5.54 [364658]
+    end;
+
+    [Scope('Personalization')]
     procedure BeginAction("Action": Text): Guid
     begin
         if ActionStateInAction then
@@ -674,6 +710,13 @@ codeunit 6150700 "POS Session"
         Result := ServerStopwatch;
         ServerStopwatch := '';
         //+NPR5.43 [315838]
+    end;
+
+    procedure IsAMockSession(): Boolean
+    begin
+        //-NPR5.54 [364340]
+        exit(IsMock);
+        //+NPR5.54 [364340]
     end;
 
     local procedure "---Data Refresh---"()

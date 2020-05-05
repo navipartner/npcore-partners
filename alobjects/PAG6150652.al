@@ -42,10 +42,13 @@ page 6150652 "POS Entry List"
     // NPR5.53/SARA/20191024 CASE 373672 Refactore POS Entry List
     // NPR5.53/SARA/20200124 CASE 387227 Move Navigate action to Navigate Ribbon
     // NPR5.53/SARA/20200129 CASE 387885 Apply 'Entry Type' is NOT "Cancelled" as default filter
-    // NPR5.53/SARA/20200205 CASE 389242 Remove shortcut POs Info Audit Roll
+    // NPR5.53/SARA/20200205 CASE 389242 Remove shortcut 'POS Info Audit Roll'
+    // NPR5.54/SARA/20200218 CASE 391360 Remove Shortcut 'POS Audit Log'
+    // NPR5.54/SARA/20200228 CASE 393492 Remove Delete button
 
     Caption = 'POS Entry List';
     CardPageID = "POS Entry Card";
+    DeleteAllowed = false;
     Editable = false;
     PageType = List;
     PromotedActionCategories = 'New,Process,Report,POS Entry Lists,Failed POS Lists,Posting Entries';
@@ -350,7 +353,7 @@ page 6150652 "POS Entry List"
             }
             action("POS Info POS Entry")
             {
-                Caption = 'POS Info';
+                Caption = 'POS Info POS Entry';
                 Image = Info;
                 RunObject = Page "POS Info POS Entry";
                 RunPageLink = "POS Entry No."=FIELD("Entry No.");
@@ -368,6 +371,7 @@ page 6150652 "POS Entry List"
             {
                 Caption = 'POS Audit Log';
                 Image = InteractionLog;
+                Visible = false;
 
                 trigger OnAction()
                 var

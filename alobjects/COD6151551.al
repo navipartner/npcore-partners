@@ -48,6 +48,7 @@ codeunit 6151551 "NpXml Mgt."
     // NC2.22/MHA /20190614  CASE 355993 NpXml Attributes with default Field Type should not have Custom Value Codeunit nor Xml Value Function
     // NC2.22/MHA /20190627  CASE 342115 Added SetTrustedCertificateValidation() in SendApi() and removed green code before 2.19
     // NC2.24/MHA /20191122  CASE 373950 Added ReplaceSpecialChar() to GetFilename()
+    // NC2.25/MHA /20200311  CASE 392967 FilterGroups added to SetRecRefXmlFilter()
 
 
     trigger OnRun()
@@ -313,6 +314,7 @@ codeunit 6151551 "NpXml Mgt."
         BufferInteger: Integer;
         BufferBoolean: Boolean;
         Handled: Boolean;
+        i: Integer;
     begin
         Clear(RecRef2);
         if NpXmlElement."Generic Child Codeunit ID" <> 0 then
@@ -325,10 +327,17 @@ codeunit 6151551 "NpXml Mgt."
         if RecRef.Number = NpXmlElement."Table No." then
             RecRef2.SetRecFilter;
 
+        //-NC2.25 [392967]
+        i := 40;
+        //+NC2.25 [392967]
         NpXmlFilter.SetRange("Xml Template Code", NpXmlElement."Xml Template Code");
         NpXmlFilter.SetRange("Xml Element Line No.", NpXmlElement."Line No.");
         if NpXmlFilter.FindSet then
             repeat
+            //-NC2.25 [392967]
+            i += 1;
+            RecRef2.FilterGroup(i);
+            //+NC2.25 [392967]
                 FieldRef2 := RecRef2.Field(NpXmlFilter."Field No.");
                 case NpXmlFilter."Filter Type" of
                     NpXmlFilter."Filter Type"::TableLink:
@@ -365,6 +374,10 @@ codeunit 6151551 "NpXml Mgt."
                         end;
                 end;
             until NpXmlFilter.Next = 0;
+
+        //-NC2.25 [392967]
+        RecRef2.FilterGroup(0);
+        //+NC2.25 [392967]
 
         case NpXmlElement."Iteration Type" of
             NpXmlElement."Iteration Type"::First:

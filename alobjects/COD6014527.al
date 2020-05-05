@@ -17,7 +17,7 @@ codeunit 6014527 "Credit Card Protocol Helper"
     var
         CompanyInformation: Record "Company Information";
         SalePOS: Record "Sale POS";
-        Transaction: Record "Credit Card Transaction";
+        Transaction: Record "EFT Receipt";
         ResultAmount: Decimal;
         EntryNo: Integer;
     begin
@@ -139,7 +139,7 @@ codeunit 6014527 "Credit Card Protocol Helper"
 
     local procedure CreateTransactionLine(SalePOS: Record "Sale POS";SaleLinePOS: Record "Sale Line POS";var EntryNo: Integer;Type: Integer;ReceiptText: Text)
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
     begin
         CreditCardTransaction.Init;
         CreditCardTransaction."Entry No." := EntryNo;

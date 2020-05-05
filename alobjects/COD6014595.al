@@ -24,6 +24,7 @@ codeunit 6014595 "NAV Webservice Library"
         ServiceName: Text;
         ServiceMethod: Text;
 
+    [Scope('Personalization')]
     procedure Invoke(var ReturnValue: Text) Succes: Boolean
     var
         NodeList: DotNet npNetXmlNodeList;
@@ -44,6 +45,7 @@ codeunit 6014595 "NAV Webservice Library"
         end;
     end;
 
+    [Scope('Personalization')]
     procedure InvokeWithResponse(var ReturnValue: Text; var NodeList: DotNet npNetXmlNodeList) Result: Boolean
     var
         XMLDocument: DotNet npNetXmlDocument;
@@ -74,6 +76,7 @@ codeunit 6014595 "NAV Webservice Library"
         end;
     end;
 
+    [Scope('Personalization')]
     procedure InvokeWebService(Url: Text; Domain: Text; Username: Text; Password: Text; var XMLDocument: DotNet npNetXmlDocument) ReturnStatus: Integer
     var
         HttpWebRequest: DotNet npNetHttpWebRequest;
@@ -109,6 +112,7 @@ codeunit 6014595 "NAV Webservice Library"
         exit(HttpWebResponse.StatusCode);
     end;
 
+    [Scope('Personalization')]
     procedure BuildRequestEnvelope(var XMLDocument: DotNet npNetXmlDocument)
     var
         Node: DotNet npNetXmlNode;
@@ -145,6 +149,7 @@ codeunit 6014595 "NAV Webservice Library"
         end;
     end;
 
+    [Scope('Personalization')]
     procedure SelectNodes(Name: Text; NameSpace: Text; var XMLDocument: DotNet npNetXmlDocument; var NodeList: DotNet npNetXmlNodeList)
     var
         XMLNameSpaceManager: DotNet npNetXmlNamespaceManager;
@@ -155,6 +160,7 @@ codeunit 6014595 "NAV Webservice Library"
         NodeList := XMLDocument.SelectNodes(StrSubstNo('//tns:%1', Name), XMLNameSpaceManager);
     end;
 
+    [Scope('Personalization')]
     procedure SelectNode(Name: Text; NameSpace: Text; var XMLDocument: DotNet npNetXmlDocument; var Node: DotNet npNetXmlNode)
     var
         XMLNameSpaceManager: DotNet npNetXmlNamespaceManager;
@@ -165,6 +171,7 @@ codeunit 6014595 "NAV Webservice Library"
         Node := XMLDocument.SelectSingleNode(StrSubstNo('//tns:%1', Name), XMLNameSpaceManager);
     end;
 
+    [Scope('Personalization')]
     procedure StoreXMLClientSide(var XMLDocument: DotNet npNetXmlDocument; Path: Text)
     var
         [RunOnClient]
@@ -175,6 +182,7 @@ codeunit 6014595 "NAV Webservice Library"
         StreamWriter.Close();
     end;
 
+    [Scope('Personalization')]
     procedure Reset()
     begin
         ParameterList := '';
@@ -182,6 +190,7 @@ codeunit 6014595 "NAV Webservice Library"
         ServiceType := '';
     end;
 
+    [Scope('Personalization')]
     procedure AddParameter(Name: Text; Value: Text)
     var
         Parameter: Text;
@@ -210,10 +219,12 @@ codeunit 6014595 "NAV Webservice Library"
             NameSpace := StrSubstNo('urn:microsoft-dynamics-schemas/%1/%2', LowerCase(ServiceType), ServiceName);
     end;
 
+    [Scope('Personalization')]
     procedure "-- Result Accessors"()
     begin
     end;
 
+    [Scope('Personalization')]
     procedure GetNodeValue(NodeName: Text): Text
     var
         Node: DotNet npNetXmlNode;
@@ -222,35 +233,42 @@ codeunit 6014595 "NAV Webservice Library"
         exit(Node.InnerText)
     end;
 
+    [Scope('Personalization')]
     procedure "-- Properties"()
     begin
     end;
 
+    [Scope('Personalization')]
     procedure UsePassword(PasswordIn: Text)
     begin
         ServicePassword := PasswordIn;
     end;
 
+    [Scope('Personalization')]
     procedure UseDomainName(DomainNameIn: Text)
     begin
         ServiceDomainName := DomainNameIn;
     end;
 
+    [Scope('Personalization')]
     procedure UseUserName(UsernameIn: Text)
     begin
         ServiceUserName := UsernameIn
     end;
 
+    [Scope('Personalization')]
     procedure UseUrl(UrlIn: Text)
     begin
         ServiceUrl := UrlIn;
     end;
 
+    [Scope('Personalization')]
     procedure UseBaseUrl(ServiceBaseUrlIn: Text)
     begin
         ServiceBaseUrl := ServiceBaseUrlIn;
     end;
 
+    [Scope('Personalization')]
     procedure UseCompanyName(ServiceCompanyNameIn: Text)
     var
         StringLibrary: Codeunit "String Library";
@@ -260,21 +278,25 @@ codeunit 6014595 "NAV Webservice Library"
         ServiceCompanyName := StringLibrary.Text;
     end;
 
+    [Scope('Personalization')]
     procedure UseServiceInstanceName(ServiceInstanceNameIn: Text)
     begin
         ServiceInstanceName := ServiceInstanceNameIn;
     end;
 
+    [Scope('Personalization')]
     procedure UseServiceType(ServiceTypeIn: Text)
     begin
         ServiceType := ServiceTypeIn;
     end;
 
+    [Scope('Personalization')]
     procedure UseServiceName(ServiceNameIn: Text)
     begin
         ServiceName := ServiceNameIn;
     end;
 
+    [Scope('Personalization')]
     procedure UseServiceMethod(ServiceMethodIn: Text)
     begin
         ServiceMethod := ServiceMethodIn;

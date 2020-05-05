@@ -13,6 +13,9 @@ codeunit 6150708 "POS Setup"
     // NPR5.40/VB  /20180213 CASE 306347 Performance improvement due to physical-table action discovery
     // NPR5.45/TJ  /20180908 CASE 323728 Checking if unlock PIN is set for kiosk mode
     // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
+    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
+    // NPR5.54/TSA /20200219 CASE 391850 Refresh of the POS Setup record when POS Unit is changed, added GetNamedActionSetup();
+    // NPR5.54/TSA /20200220 CASE 392121 Added ActionCode_IdleTimout(), Action_IdleTimeout();
 
 
     trigger OnRun()
@@ -28,6 +31,7 @@ codeunit 6150708 "POS Setup"
         POSUnitRec: Record "POS Unit";
         POSStoreRec: Record "POS Store";
         POSPostingProfile: Record "POS Posting Profile";
+        POSUnitIdentityGlobal: Record "POS Unit Identity";
         Initialized: Boolean;
         SetupInitialized: Boolean;
 
@@ -73,6 +77,8 @@ codeunit 6150708 "POS Setup"
           SetPOSStore(POSStore);
         //+NPR5.32.10 [279551]
 
+        POSUnitIdentityGlobal := POSUnitIdentity;  //NPR5.54 [364658]
+
         RetailSetup.Get();
         Initialized := true;
     end;
@@ -87,8 +93,24 @@ codeunit 6150708 "POS Setup"
         if SetupInitialized then
           exit;
 
-        Setup.Get();
+        //-NPR5.54 [391850]
+        //Setup.GET();
+        Setup.Get (POSUnitRec."POS Named Actions Profile");
+        //+NPR5.54 [391850]
+
         SetupInitialized := true;
+    end;
+
+    local procedure InitializeSetupPosUnit(POSUnit: Record "POS Unit")
+    begin
+
+        //-NPR5.54 [391850]
+        if (not SetupInitialized) then
+          InitializeSetup ();
+
+        if (POSUnit."POS Named Actions Profile" <> '') then
+          Setup.Get (POSUnit."POS Named Actions Profile");
+        //+NPR5.54 [391850]
     end;
 
     local procedure MakeSureIsInitialized()
@@ -184,6 +206,11 @@ codeunit 6150708 "POS Setup"
         //-NPR5.32.10 [279551]
         POSUnitRec := POSUnit;
         //+NPR5.32.10 [279551]
+
+        //-NPR5.54 [391850]
+        InitializeSetupPosUnit (POSUnitRec);
+        //+NPR5.54 [391850]
+
         FindPOSPostingProfile;  //NPR5.53 [371955]
     end;
 
@@ -227,6 +254,13 @@ codeunit 6150708 "POS Setup"
         //+NPR5.32.10 [279551]
     end;
 
+    procedure GetPOSUnitIdentity(var POSUnitIdentity: Record "POS Unit Identity")
+    begin
+        //-NPR5.54 [364658]
+        POSUnitIdentity := POSUnitIdentityGlobal;
+        //+NPR5.54 [364658]
+    end;
+
     procedure GetLockTimeout() LockTimeoutInSeconds: Integer
     begin
         //-NPR5.37 [293905]
@@ -251,6 +285,14 @@ codeunit 6150708 "POS Setup"
         //-NPR5.45 [323728]
         exit(POSUnitRec."Kiosk Mode Unlock PIN" <> '');
         //+NPR5.45 [323728]
+    end;
+
+    procedure GetNamedActionSetup(var POSSetupOut: Record "POS Setup")
+    begin
+
+        //-NPR5.54 [391850]
+        POSSetupOut := Setup;
+        //+NPR5.54 [391850]
     end;
 
     local procedure "---Action Settings---"()
@@ -341,6 +383,16 @@ codeunit 6150708 "POS Setup"
         //+NPR5.37 [293905]
     end;
 
+    procedure Action_IdleTimeout(var ActionOut: Record "POS Action";POSSession: Codeunit "POS Session") IsConfigured: Boolean
+    begin
+
+        //-NPR5.54 [392121]
+        Clear(ActionOut);
+        InitializeSetup();
+        IsConfigured := POSSession.RetrieveSessionAction (ActionCode_IdleTimeout, ActionOut);
+        //+NPR5.54 [392121]
+    end;
+
     procedure ActionCode_Login(): Code[20]
     begin
         with Setup do begin
@@ -408,6 +460,15 @@ codeunit 6150708 "POS Setup"
           exit("Lock POS Action Code");
         end;
         //+NPR5.37 [293905]
+    end;
+
+    procedure ActionCode_IdleTimeout(): Code[20]
+    begin
+
+        //-NPR5.54 [392121]
+        InitializeSetup();
+        exit (Setup."Idle Timeout Action Code");
+        //+NPR5.54 [392121]
     end;
 }
 

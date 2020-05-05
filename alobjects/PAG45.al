@@ -1,4 +1,4 @@
-pageextension 6014440 pageextension6014440 extends "Sales List" 
+pageextension 6014441 pageextension6014441 extends "Sales List" 
 {
     // NPR5.53/ALPO/20191010 CASE 360297 Prepayment/layaway functionality additions
     //                                     Control "Assigned User ID": property 'Visible' set to false

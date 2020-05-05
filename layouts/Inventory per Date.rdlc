@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -10,6 +10,91 @@
       <rd:SecurityType>None</rd:SecurityType>
     </DataSource>
   </DataSources>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+      <Fields>
+        <Field Name="COMPANYNAME">
+          <DataField>COMPANYNAME</DataField>
+        </Field>
+        <Field Name="CalcMethod">
+          <DataField>CalcMethod</DataField>
+        </Field>
+        <Field Name="No_Item">
+          <DataField>No_Item</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="UnitCost_Item">
+          <DataField>UnitCost_Item</DataField>
+        </Field>
+        <Field Name="UnitCost_ItemFormat">
+          <DataField>UnitCost_ItemFormat</DataField>
+        </Field>
+        <Field Name="VendorItemNo_Item">
+          <DataField>VendorItemNo_Item</DataField>
+        </Field>
+        <Field Name="NetChange_Item">
+          <DataField>NetChange_Item</DataField>
+        </Field>
+        <Field Name="NetChange_ItemFormat">
+          <DataField>NetChange_ItemFormat</DataField>
+        </Field>
+        <Field Name="UnitPrice_Item">
+          <DataField>UnitPrice_Item</DataField>
+        </Field>
+        <Field Name="UnitPrice_ItemFormat">
+          <DataField>UnitPrice_ItemFormat</DataField>
+        </Field>
+        <Field Name="LastDirectCost_Item">
+          <DataField>LastDirectCost_Item</DataField>
+        </Field>
+        <Field Name="LastDirectCost_ItemFormat">
+          <DataField>LastDirectCost_ItemFormat</DataField>
+        </Field>
+        <Field Name="CostValuation">
+          <DataField>CostValuation</DataField>
+        </Field>
+        <Field Name="CostValuationFormat">
+          <DataField>CostValuationFormat</DataField>
+        </Field>
+        <Field Name="GrossAvg">
+          <DataField>GrossAvg</DataField>
+        </Field>
+        <Field Name="GrossAvgFormat">
+          <DataField>GrossAvgFormat</DataField>
+        </Field>
+        <Field Name="ActualSales">
+          <DataField>ActualSales</DataField>
+        </Field>
+        <Field Name="ActualSalesFormat">
+          <DataField>ActualSalesFormat</DataField>
+        </Field>
+        <Field Name="LatestSalesDate">
+          <DataField>LatestSalesDate</DataField>
+        </Field>
+        <Field Name="Itemfilter">
+          <DataField>Itemfilter</DataField>
+        </Field>
+        <Field Name="EndDate">
+          <DataField>EndDate</DataField>
+        </Field>
+        <Field Name="ItemGroup_Item">
+          <DataField>ItemGroup_Item</DataField>
+        </Field>
+        <Field Name="GroupByItemGroup">
+          <DataField>GroupByItemGroup</DataField>
+        </Field>
+        <Field Name="LatestPurchaseDate_ItemLedgerEntry">
+          <DataField>LatestPurchaseDate_ItemLedgerEntry</DataField>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -31,6 +116,9 @@
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.75524in</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>0.72383in</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>0.73477in</Width>
@@ -211,7 +299,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Parameters!UnitPrice_Caption.Value</Value>
+                                  <Value EvaluationMode="Auto">=Parameters!SalesPrice_Caption.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -239,6 +327,46 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox1">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto">=Fields!CalcMethod.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox1</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
+                            <PaddingLeft>1pt</PaddingLeft>
+                            <PaddingRight>1pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -522,6 +650,37 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox2">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto" />
+                                  <Style>
+                                    <FontSize>6pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox2</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox44">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -773,6 +932,39 @@
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>UnitPrice_Item</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox3">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto">=Fields!LastDirectCost_Item.Value</Value>
+                                  <Style>
+                                    <FontSize>6pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox3</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1111,6 +1303,49 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox5">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto" />
+                                  <Style>
+                                    <FontSize>6pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox5</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="kostv�rdi2">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -1253,6 +1488,7 @@
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
+                <TablixMember />
               </TablixMembers>
             </TablixColumnHierarchy>
             <TablixRowHierarchy>
@@ -1302,7 +1538,7 @@
             <Top>0.36554in</Top>
             <Left>0.00636in</Left>
             <Height>0.87163in</Height>
-            <Width>7.38006in</Width>
+            <Width>8.10389in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1338,7 +1574,7 @@
             <Top>0.2582cm</Top>
             <Left>9.2798cm</Left>
             <Height>0.635cm</Height>
-            <Width>9.48171cm</Width>
+            <Width>11.32024cm</Width>
             <ZIndex>1</ZIndex>
             <Style>
               <Border>
@@ -1407,7 +1643,7 @@
         <Height>3.14242cm</Height>
         <Style />
       </Body>
-      <Width>18.86311cm</Width>
+      <Width>20.60004cm</Width>
       <Page>
         <PageHeader>
           <Height>2.88397cm</Height>
@@ -1540,7 +1776,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>1.58333cm</Top>
-              <Left>14.44831cm</Left>
+              <Left>15.08331cm</Left>
               <Height>0.423cm</Height>
               <Width>4.3132cm</Width>
               <ZIndex>4</ZIndex>
@@ -1570,7 +1806,7 @@
               <Top>2.19717cm</Top>
               <Left>0.1495cm</Left>
               <Height>0.52917cm</Height>
-              <Width>18.61201cm</Width>
+              <Width>20.45054cm</Width>
               <ZIndex>5</ZIndex>
               <Style>
                 <Border>
@@ -1616,7 +1852,7 @@
               <Top>0.49775cm</Top>
               <Left>0.1495cm</Left>
               <Height>0.423cm</Height>
-              <Width>18.61201cm</Width>
+              <Width>20.45054cm</Width>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -1640,9 +1876,9 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.11675cm</Top>
-              <Left>11.47406cm</Left>
+              <Left>14.01406cm</Left>
               <Height>0.37008cm</Height>
-              <Width>7.28745cm</Width>
+              <Width>6.58598cm</Width>
               <ZIndex>1</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
@@ -1667,6 +1903,33 @@
     </ReportSection>
   </ReportSections>
   <ReportParameters>
+    <ReportParameter Name="No_ItemCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>No_ItemCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>No_ItemCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="LastDirectCost_ItemCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>LastDirectCost_ItemCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>LastDirectCost_ItemCaption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="ItemGroup_ItemCaption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>ItemGroup_ItemCaption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>ItemGroup_ItemCaption</Prompt>
+    </ReportParameter>
     <ReportParameter Name="Report_Caption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -1784,118 +2047,119 @@
       </DefaultValue>
       <Prompt>LastPurchaseDate_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="No_ItemCaption">
+    <ReportParameter Name="LastCostPrice_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>No_ItemCaption</Value>
+          <Value>LastCostPrice_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>No_ItemCaption</Prompt>
+      <Prompt>LastCostPrice_Caption</Prompt>
     </ReportParameter>
-    <ReportParameter Name="LastDirectCost_ItemCaption">
+    <ReportParameter Name="SalesPrice_Caption">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>LastDirectCost_ItemCaption</Value>
+          <Value>SalesPrice_Caption</Value>
         </Values>
       </DefaultValue>
-      <Prompt>LastDirectCost_ItemCaption</Prompt>
-    </ReportParameter>
-    <ReportParameter Name="ItemGroup_ItemCaption">
-      <DataType>String</DataType>
-      <DefaultValue>
-        <Values>
-          <Value>ItemGroup_ItemCaption</Value>
-        </Values>
-      </DefaultValue>
-      <Prompt>ItemGroup_ItemCaption</Prompt>
+      <Prompt>SalesPrice_Caption</Prompt>
     </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>16</NumberOfRows>
+      <NumberOfRows>18</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>Report_Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>1</RowIndex>
-          <ParameterName>No_Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>2</RowIndex>
-          <ParameterName>Description_Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>3</RowIndex>
-          <ParameterName>VendorItemNo_Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>4</RowIndex>
-          <ParameterName>Inventory_Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>5</RowIndex>
-          <ParameterName>UnitPrice_Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>6</RowIndex>
-          <ParameterName>InvValue_Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>7</RowIndex>
-          <ParameterName>TotalProfit_Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>8</RowIndex>
-          <ParameterName>RecentSale_Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>9</RowIndex>
-          <ParameterName>Total_Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>10</RowIndex>
-          <ParameterName>PerDate_Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>11</RowIndex>
-          <ParameterName>Footer_Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>12</RowIndex>
-          <ParameterName>LastPurchaseDate_Caption</ParameterName>
-        </CellDefinition>
-        <CellDefinition>
-          <ColumnIndex>0</ColumnIndex>
-          <RowIndex>13</RowIndex>
           <ParameterName>No_ItemCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>14</RowIndex>
+          <RowIndex>1</RowIndex>
           <ParameterName>LastDirectCost_ItemCaption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
-          <RowIndex>15</RowIndex>
+          <RowIndex>2</RowIndex>
           <ParameterName>ItemGroup_ItemCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>3</RowIndex>
+          <ParameterName>Report_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>4</RowIndex>
+          <ParameterName>No_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>5</RowIndex>
+          <ParameterName>Description_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>6</RowIndex>
+          <ParameterName>VendorItemNo_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>7</RowIndex>
+          <ParameterName>Inventory_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>8</RowIndex>
+          <ParameterName>UnitPrice_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>9</RowIndex>
+          <ParameterName>InvValue_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>10</RowIndex>
+          <ParameterName>TotalProfit_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>11</RowIndex>
+          <ParameterName>RecentSale_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>12</RowIndex>
+          <ParameterName>Total_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>13</RowIndex>
+          <ParameterName>PerDate_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>14</RowIndex>
+          <ParameterName>Footer_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>15</RowIndex>
+          <ParameterName>LastPurchaseDate_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>16</RowIndex>
+          <ParameterName>LastCostPrice_Caption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>17</RowIndex>
+          <ParameterName>SalesPrice_Caption</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
@@ -1945,89 +2209,4 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Cm</rd:ReportUnitType>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Fields>
-        <Field Name="COMPANYNAME">
-          <DataField>COMPANYNAME</DataField>
-        </Field>
-        <Field Name="CalcMethod">
-          <DataField>CalcMethod</DataField>
-        </Field>
-        <Field Name="No_Item">
-          <DataField>No_Item</DataField>
-        </Field>
-        <Field Name="Description_Item">
-          <DataField>Description_Item</DataField>
-        </Field>
-        <Field Name="UnitCost_Item">
-          <DataField>UnitCost_Item</DataField>
-        </Field>
-        <Field Name="UnitCost_ItemFormat">
-          <DataField>UnitCost_ItemFormat</DataField>
-        </Field>
-        <Field Name="VendorItemNo_Item">
-          <DataField>VendorItemNo_Item</DataField>
-        </Field>
-        <Field Name="NetChange_Item">
-          <DataField>NetChange_Item</DataField>
-        </Field>
-        <Field Name="NetChange_ItemFormat">
-          <DataField>NetChange_ItemFormat</DataField>
-        </Field>
-        <Field Name="UnitPrice_Item">
-          <DataField>UnitPrice_Item</DataField>
-        </Field>
-        <Field Name="UnitPrice_ItemFormat">
-          <DataField>UnitPrice_ItemFormat</DataField>
-        </Field>
-        <Field Name="LastDirectCost_Item">
-          <DataField>LastDirectCost_Item</DataField>
-        </Field>
-        <Field Name="LastDirectCost_ItemFormat">
-          <DataField>LastDirectCost_ItemFormat</DataField>
-        </Field>
-        <Field Name="CostValuation">
-          <DataField>CostValuation</DataField>
-        </Field>
-        <Field Name="CostValuationFormat">
-          <DataField>CostValuationFormat</DataField>
-        </Field>
-        <Field Name="GrossAvg">
-          <DataField>GrossAvg</DataField>
-        </Field>
-        <Field Name="GrossAvgFormat">
-          <DataField>GrossAvgFormat</DataField>
-        </Field>
-        <Field Name="ActualSales">
-          <DataField>ActualSales</DataField>
-        </Field>
-        <Field Name="ActualSalesFormat">
-          <DataField>ActualSalesFormat</DataField>
-        </Field>
-        <Field Name="LatestSalesDate">
-          <DataField>LatestSalesDate</DataField>
-        </Field>
-        <Field Name="Itemfilter">
-          <DataField>Itemfilter</DataField>
-        </Field>
-        <Field Name="EndDate">
-          <DataField>EndDate</DataField>
-        </Field>
-        <Field Name="ItemGroup_Item">
-          <DataField>ItemGroup_Item</DataField>
-        </Field>
-        <Field Name="GroupByItemGroup">
-          <DataField>GroupByItemGroup</DataField>
-        </Field>
-        <Field Name="LatestPurchaseDate_ItemLedgerEntry">
-          <DataField>LatestPurchaseDate_ItemLedgerEntry</DataField>
-        </Field>
-      </Fields>
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-    </DataSet>
-  </DataSets>
 </Report>

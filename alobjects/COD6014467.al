@@ -14,6 +14,8 @@ codeunit 6014467 "Retail Journal Code"
     // NPR5.51/BHR /20190614 CASE 358287  Add retail print and Price label for Posted Purchase Invoice
     // NPR5.51/BHR /20190722 CASE 348731  Add selection for Purchase lines Quantity
     // NPR5.53/TJ  /20191118 CASE 375557 New function to print report from Retail Journal which is not part of the Report Selection Retail
+    // NPR5.54/ALPO/20200310 CASE 385913 Do not overwrite "Unite Price" (field 29) in Retail Journal by field's "Unit Price (LCY)" value from Purchase Invoice Line
+    //                                   Added publishers to alter this behaviour in customer specific solutions
 
 
     trigger OnRun()
@@ -561,10 +563,11 @@ codeunit 6014467 "Retail Journal Code"
 
 
             //-NPR5.50 [353996]
-            RetailJnlLine."Unit Price" := PurchaseLine."Unit Price (LCY)";
+            //RetailJnlLine."Unit Price" := PurchaseLine."Unit Price (LCY)";  //NPR5.54 [385913]-revoked
             RetailJnlLine."Last Direct Cost" := PurchaseLine."Direct Unit Cost";
             //-NPR5.50 [353996]
 
+            OnBeforeRetJnlLineInsertFromPurchLine(PurchaseLine,RetailJnlLine);  //NPR5.54 [385913]
             RetailJnlLine.Insert();
           until Next = 0;
         end;
@@ -610,8 +613,10 @@ codeunit 6014467 "Retail Journal Code"
               RetailJnlLine.SetItem("No.", "Variant Code", '');
             RetailJnlLine."Quantity to Print" := Quantity;
 
-            RetailJnlLine."Unit Price" := PurchInvLine."Unit Price (LCY)";
+            //RetailJnlLine."Unit Price" := PurchInvLine."Unit Price (LCY)";  //NPR5.54 [385913]-revoked
             RetailJnlLine."Last Direct Cost" := PurchInvLine."Direct Unit Cost";
+
+            OnBeforeRetJnlLineInsertFromPurchInvLine(PurchInvLine,RetailJnlLine);  //NPR5.54 [385913]
             RetailJnlLine.Insert();
           until Next = 0;
         end;
@@ -797,6 +802,18 @@ codeunit 6014467 "Retail Journal Code"
         REPORT.Run(ReportType,true,false,JournalLine);
         Skip := true;
         //+NPR5.53 [375557]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRetJnlLineInsertFromPurchLine(PurchaseLine: Record "Purchase Line";var RetailJnlLine: Record "Retail Journal Line")
+    begin
+        //NPR5.54 [385913]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRetJnlLineInsertFromPurchInvLine(PurchInvLine: Record "Purch. Inv. Line";var RetailJnlLine: Record "Retail Journal Line")
+    begin
+        //NPR5.54 [385913]
     end;
 }
 

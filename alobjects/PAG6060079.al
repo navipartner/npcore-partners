@@ -4,6 +4,7 @@ page 6060079 "TM Ticket Setup"
     // TM1.27/TSA /20171218 CASE 300395 added field "Timeout (ms)"
     // TM1.38/TSA /20181012 CASE 332109 Added NP-Pass fields
     // TM1.38/TSA /20181026 CASE 308962 Added setup fields for prepaid and postpaid ticket create process
+    // TM90.1.46/TSA /20200326 CASE 397084 Added wizard fields
 
     Caption = 'Ticket Setup';
     PageType = Card;
@@ -104,6 +105,31 @@ page 6060079 "TM Ticket Setup"
                     field("Postpaid Ticket Server Export";"Postpaid Ticket Server Export")
                     {
                     }
+                }
+            }
+            group(Wizard)
+            {
+                Caption = 'Wizard';
+                field("Wizard Ticket Type No. Series";"Wizard Ticket Type No. Series")
+                {
+                }
+                field("Wizard Ticket Type Template";"Wizard Ticket Type Template")
+                {
+                }
+                field("Wizard Ticket Bom Template";"Wizard Ticket Bom Template")
+                {
+                }
+                field("Wizard Adm. Code No. Series";"Wizard Adm. Code No. Series")
+                {
+                }
+                field("Wizard Admission Template";"Wizard Admission Template")
+                {
+                }
+                field("Wizard Sch. Code No. Series";"Wizard Sch. Code No. Series")
+                {
+                }
+                field("Wizard Item No. Series";"Wizard Item No. Series")
+                {
                 }
             }
         }

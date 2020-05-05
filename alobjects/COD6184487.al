@@ -1674,7 +1674,7 @@ codeunit 6184487 "Pepper Library Transcendence"
 
     local procedure ReadyReceiptsForPrint(EFTTransactionRequest: Record "EFT Transaction Request")
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         EntryNo: Integer;
         StreamIn: InStream;
         EFTTransactionType: Record "Pepper EFT Transaction Type";
@@ -1712,7 +1712,7 @@ codeunit 6184487 "Pepper Library Transcendence"
 
     local procedure MakeReceipt(EFTTransactionRequest: Record "EFT Transaction Request";var StreamIn: InStream;var EntryNo: Integer;ReceiptType: Option CUSTOMER,MERCHANT)
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         RetailComment: Record "Retail Comment";
         Register: Record Register;
         Utility: Codeunit Utility;
@@ -1770,7 +1770,7 @@ codeunit 6184487 "Pepper Library Transcendence"
         end;
     end;
 
-    local procedure WriteRequestLine(var ParCreditCardTransaction: Record "Credit Card Transaction";ParEntryNo: Integer;ParText: Text)
+    local procedure WriteRequestLine(var ParCreditCardTransaction: Record "EFT Receipt";ParEntryNo: Integer;ParText: Text)
     begin
 
         with ParCreditCardTransaction do begin
@@ -2086,7 +2086,7 @@ codeunit 6184487 "Pepper Library Transcendence"
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnPrintReceipt', '', false, false)]
     local procedure OnPrintReceipt(EFTTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
     begin
         //-NPR5.46 [290734]
         if not EFTTransactionRequest.IsType(GetIntegrationType()) then

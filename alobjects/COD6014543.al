@@ -102,6 +102,7 @@ codeunit 6014543 "RP Epson V Device Library"
     // NPR5.37/MMV /20171012 CASE 290904 Added encoding command.
     // NPR5.40/MMV /20180305 CASE 284505 Moved from global string buffer to global blob buffer for performance.
     //                                   Removed excessive usage of escape command library for performance.
+    // NPR5.54/MMV /20200207 CASE 389961 Removed .NET interop in SetFontStretch
 
     EventSubscriberInstance = Manual;
 
@@ -441,19 +442,15 @@ codeunit 6014543 "RP Epson V Device Library"
     end;
 
     procedure SetFontStretch(Height: Integer;Width: Integer)
-    var
-        Int: Integer;
-        n: Char;
-        nByte: Text;
-        Convert: DotNet npNetConvert;
     begin
-        //-NPR5.40 [284505]
-        // TempPattern := '0' + ESC.GetBitPatternAndPad(Width,3) + '0' + ESC.GetBitPatternAndPad(Height,3);
-        // n           := ESC.TranslateBitPattern(TempPattern);
-        nByte := '0' + GetThreeBitFontPattern(Width) + '0' + GetThreeBitFontPattern(Height);
-        n := Convert.ToInt32(nByte,2);
-        //+NPR5.40 [284505]
-        SelectCharacterSize(n);
+        //-NPR5.54 [389961]
+        if (Height > 7) or (Height < 0) then
+          Height := 0;
+        if (Width > 7) or (Width < 0) then
+          Width := 0;
+
+        SelectCharacterSize(Power(2,4) * Width + Height); //Width is packed into upper half of 8-bit byte.
+        //+NPR5.54 [389961]
     end;
 
     procedure SetFontFace(FontFace: Text[30])

@@ -7,6 +7,7 @@ report 6014457 "Sales Stat/Analysis"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
     // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
+    // NPR5.54/YAHA/20200324  CASE 394872 Removed Company Picture
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Sales StatAnalysis.rdlc';
 

@@ -9,6 +9,7 @@ report 6014499 "Inventory Campaign Stat."
     // NPR5.38/JKL /20180125  CASE 299279 Added Vendor No. Vendor Name
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.41/JKL /20180423 CASE 299279  removed calc fields on starting date / ending dat, Consumption Inventory changed to show current inventory + location filter active
+    // NPR5.54/YAHA/20200324  CASE 394872 Removed Company Picture
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Inventory Campaign Stat..rdlc';
 

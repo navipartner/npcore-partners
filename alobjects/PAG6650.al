@@ -1,4 +1,4 @@
-pageextension 6014468 pageextension6014468 extends "Posted Return Shipment" 
+pageextension 6014469 pageextension6014469 extends "Posted Return Shipment" 
 {
     // NPR4.10/TS/20150602  CASE 213397  Added field  "Buy-from Vendor Name 2", "Pay-to Name 2", "Ship-to Name 2"
     layout

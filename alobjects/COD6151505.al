@@ -51,6 +51,7 @@ codeunit 6151505 "Nc Sync. Mgt."
     // NC2.22/MHA /20190613  CASE 358499 Added ClearLastErrorText before Task- and Import Processing
     // NC2.22/MHA /20190715  CASE 361919 Parsed OutStream to IOStream in InsertImportEntrySftp() for AL Compatability
     // NC2.23/MHA /20190927  CASE 369170 SendErrorMail() is no longer a Try function as it contains MODIFY transaction and removed Gambit integration
+    // NC2.25/MHA /20200120  CASE 386177 Ftp 'LIST' replaced with 'NLST' in CheckFtpUrlExists()
 
     TableNo = "Task Line";
 
@@ -996,7 +997,9 @@ codeunit 6151505 "Nc Sync. Mgt."
         MemoryStream: DotNet npNetMemoryStream;
     begin
         FtpWebRequest := FtpWebRequest.Create(FtpUrl);
-        FtpWebRequest.Method := 'LIST'; //WebRequestMethods.Ftp.ListDirectory
+        //-NC2.25 [386177]
+        FtpWebRequest.Method := 'NLST'; //WebRequestMethods.Ftp.ListDirectory
+        //+NC2.25 [386177]
         //-NC2.19 [340695]
         FtpWebRequest.KeepAlive := false;
         //-NC2.19 [340695]

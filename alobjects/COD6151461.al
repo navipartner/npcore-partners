@@ -4,6 +4,7 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
     // MAG2.09/MHA /20171108  CASE 295656 Api Method changed to REST (Json)
     // MAG2.22/MHA /20190625  CASE 359285 Adjusted SetupTemplate() to delete existing Template if Version Id belongs to Magento
     // MAG2.22/MHA /20190708  CASE 352201 Added function SetupTemplateCollectStore
+    // MAG2.25/MHA /20200416  CASE 400486 Cleared Api Credentials in SetupTemplate() because Bearer Auth is used instead
 
 
     trigger OnRun()
@@ -158,6 +159,11 @@ codeunit 6151461 "M2 NpXml Setup Mgt."
         NpXmlTemplate."API Transfer" := true;
         NpXmlTemplate."API Url" := MagentoSetup."Api Url" + NpXmlTemplate."Xml Root Name";
         NpXmlTemplate."API Authorization" := MagentoSetup."Api Authorization";
+        //-MAG2.25 [400486]
+        NpXmlTemplate."API Username Type" := NpXmlTemplate."API Username Type"::Custom;
+        NpXmlTemplate."API Username" := '';
+        NpXmlTemplate."API Password" := '';
+        //+MAG2.25 [400486]
         //-MAG2.09 [295656]
         //NpXmlTemplate."API Content-Type" := 'naviconnect/xml';
         NpXmlTemplate."API Content-Type" := 'naviconnect/json';

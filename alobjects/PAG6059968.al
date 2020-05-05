@@ -6,6 +6,7 @@ page 6059968 "MPOS App Setup Card"
     // NPR5.38/CLVA/20171011 CASE 289636 Added fields "Receipt Report ID" and "Receipt Report Caption"
     // NPR5.39/BR  /20180214 CASE 304312 Added Group "Receipts"
     // NPR5.51/JAKUBV/20190904  CASE 364011 Transport NPR5.51 - 3 September 2019
+    // NPR5.54/TJ  /20200303 CASE 393290 Removed group Receipts with all the fields
 
     Caption = 'MPOS App Setup Card';
     SourceTable = "MPOS App Setup";
@@ -44,22 +45,6 @@ page 6059968 "MPOS App Setup Card"
             {
                 Caption = 'Admission';
                 field("Ticket Admission Web Url";"Ticket Admission Web Url")
-                {
-                }
-            }
-            group(Receipts)
-            {
-                Caption = 'Receipts';
-                field("Audit Roll Report ID";"Audit Roll Report ID")
-                {
-                }
-                field("Audit Roll Report Caption";"Audit Roll Report Caption")
-                {
-                }
-                field("POS Entry Report ID";"POS Entry Report ID")
-                {
-                }
-                field("POS Entry Report Caption";"POS Entry Report Caption")
                 {
                 }
             }

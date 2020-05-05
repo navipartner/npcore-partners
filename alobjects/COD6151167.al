@@ -2,6 +2,7 @@ codeunit 6151167 "NpGp POS Sales Init Mgt."
 {
     // NPR5.50/MHA /20190422  CASE 337539 Object created - [NpGp] NaviPartner Global POS Sales
     // NPR5.51/MHA /20190711  CASE 361618 Added Explicit DataLogMgt.OnDatabaseInsert() in InsertPosSalesEntry() to catch log of Autoincrement integer
+    // NPR5.54/MMV /20200220 CASE 391871 Moved GUID creation from table subscribers to table trigger to have everything centralized.
 
 
     trigger OnRun()
@@ -213,26 +214,6 @@ codeunit 6151167 "NpGp POS Sales Init Mgt."
               Rec."Pattern Guide" := CopyStr(Text001,1,MaxStrLen(Rec."Pattern Guide"));
             end;
         end;
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6014405, 'OnBeforeInsertEvent', '', true, true)]
-    local procedure OnBeforeInsertSalePOS(var Rec: Record "Sale POS")
-    begin
-        if Rec.IsTemporary then
-          exit;
-
-        if IsNullGuid(Rec."Retail ID") then
-          Rec."Retail ID" := CreateGuid;
-    end;
-
-    [EventSubscriber(ObjectType::Table, 6014406, 'OnBeforeInsertEvent', '', true, true)]
-    local procedure OnBeforeInsertSaleLinePOS(var Rec: Record "Sale Line POS";RunTrigger: Boolean)
-    begin
-        if Rec.IsTemporary then
-          exit;
-
-        if IsNullGuid(Rec."Retail ID") then
-          Rec."Retail ID" := CreateGuid;
     end;
 
     [EventSubscriber(ObjectType::Table, 6150621, 'OnBeforeInsertEvent', '', true, true)]

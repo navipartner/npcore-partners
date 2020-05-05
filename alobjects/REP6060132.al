@@ -8,6 +8,7 @@ report 6060132 "MM Membership Status"
     // MM1.32/TSA/20180725  CASE 323333 Transport MM1.32 - 25 July 2018
     // MM1.41/TSA /20191011 CASE 355444 Refactored
     // MM1.42/TSA /20191213 CASE 382181 Refactored again, adding options for "active and renewed", "active and not renewed", + general clean-up
+    // MM1.43/TSA /20200203 CASE 388818 Added "Required filter fields" or the table filtering will no be shown in web client
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/MM Membership Status.rdlc';
 
@@ -18,16 +19,20 @@ report 6060132 "MM Membership Status"
     {
         dataitem("MM Membership Setup";"MM Membership Setup")
         {
+            RequestFilterFields = "Code","Loyalty Code","Code";
             dataitem("MM Membership";"MM Membership")
             {
                 DataItemLink = "Membership Code"=FIELD(Code);
+                RequestFilterFields = "Company Name","Community Code","Membership Code","Customer No.";
                 dataitem("MM Membership Role";"MM Membership Role")
                 {
                     //The property 'DataItemTableView' shouldn't have an empty value.
                     //DataItemTableView = '';
+                    RequestFilterFields = "Member Role";
                     dataitem("MM Member";"MM Member")
                     {
                         DataItemLink = "Entry No."=FIELD("Member Entry No.");
+                        RequestFilterFields = "First Name","Middle Name","Last Name","Country Code";
 
                         trigger OnAfterGetRecord()
                         var
@@ -205,6 +210,21 @@ report 6060132 "MM Membership Status"
             column(ValidUntilDate;ValidUntilDate)
             {
             }
+            column(Date2Caption;Date2Caption)
+            {
+            }
+            column(City_Caption;City_Caption)
+            {
+            }
+            column(ZipCode_Caption;ZipCode_Caption)
+            {
+            }
+            column(Country_Caption;Country_Caption)
+            {
+            }
+            column(MembershipType_Caption;MembershipType_Caption)
+            {
+            }
 
             trigger OnAfterGetRecord()
             begin
@@ -311,9 +331,10 @@ report 6060132 "MM Membership Status"
         PageCaption: Label 'Page %1 of %2';
         ReportCaption: Label 'Membership Status';
         MemberEntryNoCaption: Label 'Entry No.';
-        DateCaption: Label 'Membership Valid Date';
+        DateCaption: Label 'From Date';
         ConvValidDate: Date;
         Filters: Text;
+        Date2Caption: Label 'Until Date';
         MembershipStatusCaption: Label 'Membership Status:';
         DateFilterCaption: Label 'Date:';
         FilterCaption: Label 'Filters';
@@ -329,6 +350,10 @@ report 6060132 "MM Membership Status"
         ShowActiveMemberships: Boolean;
         RenewedWithin: DateFormula;
         RenewedWithinCaption: Label 'Renewed Within:';
+        City_Caption: Label 'City';
+        ZipCode_Caption: Label 'Postcode';
+        Country_Caption: Label 'Country';
+        MembershipType_Caption: Label 'Type';
 
     local procedure CheckForSkip()
     begin

@@ -1,4 +1,4 @@
-pageextension 6014422 pageextension6014422 extends "Customer List" 
+pageextension 6014423 pageextension6014423 extends "Customer List" 
 {
     // NPR4.11/TSA/20150623 CASE 209946 - Shortcut Attributes
     // PN1.08/TTH/10122015 CASE 229069 Added Customer Statement Sending
@@ -15,6 +15,7 @@ pageextension 6014422 pageextension6014422 extends "Customer List"
     // NPR5.38/BR  /20171117 CASE 295255 Added Action POS Entries
     // NPR5.42/THRO/20180516 CASE 308179 Removed code from Action SendAsPdf and EmailLog
     // NPR5.51/MAOT/20190717 CASE 359891 Added column 'E-Mail'
+    // NPR5.54/ZESO/20200303 CASE 358656 Added Page Action Customer Anonymization
     layout
     {
         addafter(Name)
@@ -223,6 +224,27 @@ pageextension 6014422 pageextension6014422 extends "Customer List"
                 Caption = 'PhoneLookup';
                 Image = ImportLog;
             }
+            action("Customer Anonymization")
+            {
+                Caption = 'Customer Anonymization';
+                Image = AbsenceCategory;
+
+                trigger OnAction()
+                var
+                    Cust: Record Customer;
+                    GDPRManagement: Codeunit "NP GDPR Management";
+                begin
+                    //+NPR5.54 [358656]
+                    CurrPage.SetSelectionFilter(Cust);
+                    Cust.TestField(Anonymized,false);
+                    if (GDPRManagement.DoAnonymization(Cust."No.",ReasonText)) then
+                      if (not Confirm(Text000,false) )then
+                        Error('');
+
+                    Message(ReasonText);
+                    //+NPR5.54 [358656]
+                end;
+            }
         }
     }
 
@@ -241,6 +263,10 @@ pageextension 6014422 pageextension6014422 extends "Customer List"
         NPRAttrVisible08: Boolean;
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
+
+    var
+        Text000: Label 'All Customer Information wil be lost! Do you want to continue?';
+        ReasonText: Text;
 
 
     //Unsupported feature: Code Insertion on "OnAfterGetRecord".

@@ -55,9 +55,9 @@ codeunit 6014536 "RP Aux - EFT Print Helper"
     local procedure OnFunction(CodeunitID: Integer;FunctionName: Text;var TemplateLine: Record "RP Template Line";RecID: RecordID;var Skip: Boolean;var Handled: Boolean)
     var
         RecRef: RecordRef;
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         NewReceipt: Boolean;
-        CreditCardTransaction2: Record "Credit Card Transaction";
+        CreditCardTransaction2: Record "EFT Receipt";
         FirstReceipt: Boolean;
         EFTTransactionRequest: Record "EFT Transaction Request";
     begin
@@ -66,7 +66,7 @@ codeunit 6014536 "RP Aux - EFT Print Helper"
 
         Handled := true;
 
-        if RecID.TableNo <> DATABASE::"Credit Card Transaction" then
+        if RecID.TableNo <> DATABASE::"EFT Receipt" then
           exit;
 
         RecRef := RecID.GetRecord;

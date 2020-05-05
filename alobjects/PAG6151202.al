@@ -2,6 +2,7 @@ page 6151202 "NpCs Store Card Workflows"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // NPR5.51/MHA /20190822  CASE 364557 Added field 300 "Processing Print Template"
+    // NPR5.54/MHA /20200130  CASE 378956 Added Store Notification Fields
 
     Caption = 'Store Workflow Relations';
     DelayedInsert = true;
@@ -21,6 +22,24 @@ page 6151202 "NpCs Store Card Workflows"
                 {
                 }
                 field("Send Notification from Store";"Send Notification from Store")
+                {
+                }
+                field("Notify Store via E-mail";"Notify Store via E-mail")
+                {
+                }
+                field("Store E-mail Temp. (Pending)";"Store E-mail Temp. (Pending)")
+                {
+                }
+                field("Store E-mail Temp. (Expired)";"Store E-mail Temp. (Expired)")
+                {
+                }
+                field("Notify Store via Sms";"Notify Store via Sms")
+                {
+                }
+                field("Store Sms Template (Pending)";"Store Sms Template (Pending)")
+                {
+                }
+                field("Store Sms Template (Expired)";"Store Sms Template (Expired)")
                 {
                 }
                 field("Notify Customer via E-mail";"Notify Customer via E-mail")

@@ -1,8 +1,9 @@
 table 6151491 "Raptor Setup"
 {
-    // NPR5.51/CLVA/20190710  CASE 355871 Object created
+    // NPR5.51/CLVA/20190710 CASE 355871 Object created
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
     // NPR5.53/ALPO/20191128 CASE 379012 Raptor tracking integration: send info about sold products to Raptor
+    // NPR5.54/ALPO/20200227 CASE 355871 Possibility to define Raptor tracking service types
 
     Caption = 'Raptor Setup';
 
@@ -55,6 +56,20 @@ table 6151491 "Raptor Setup"
                 RaptorMgt.SetupJobQueue("Send Data to Raptor");
             end;
         }
+        field(17;"Tracking Service Type";Text[30])
+        {
+            Caption = 'Tracking Service Type';
+
+            trigger OnLookup()
+            begin
+                RaptorMgt.SelectTrackingServiceType("Tracking Service Type");  //NPR5.54 [355871]
+            end;
+
+            trigger OnValidate()
+            begin
+                RaptorMgt.ValidateTrackingServiceType("Tracking Service Type");  //NPR5.54 [355871]
+            end;
+        }
     }
 
     keys
@@ -82,6 +97,10 @@ table 6151491 "Raptor Setup"
           "Base Url" := 'https://api.raptorsmartadvisor.com';
         if ("Tracking Service Url" = '') or Force then
           "Tracking Service Url" := 'https://t.raptorsmartadvisor.com';
+        //-NPR5.54 [355871]
+        if ("Tracking Service Type" = '') or Force then
+          RaptorMgt.GetDefaultTrackingServiceType("Tracking Service Type");
+        //+NPR5.54 [355871]
     end;
 }
 

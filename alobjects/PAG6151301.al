@@ -1,6 +1,7 @@
 page 6151301 "NpEc Store Card"
 {
     // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
+    // NPR5.54/MHA /20200129  CASE 367842 Added fields 160 "Allow Create Customers", 170 "Update Customers from Sales Order"
 
     Caption = 'Np E-commerce Store Card';
     PageType = Card;
@@ -36,6 +37,12 @@ page 6151301 "NpEc Store Card"
                     ShowCaption = false;
                 }
                 field("Customer Config. Template Code";"Customer Config. Template Code")
+                {
+                }
+                field("Allow Create Customers";"Allow Create Customers")
+                {
+                }
+                field("Update Customers from S. Order";"Update Customers from S. Order")
                 {
                 }
             }

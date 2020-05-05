@@ -1,6 +1,7 @@
 codeunit 6184527 "EFT Verifone Vim Protocol"
 {
     // NPR5.53/MMV /20191204 CASE 349520 Added object
+    // NPR5.54/MMV /20200414 CASE 364340 Handle lookups correctly for refund and voids
 
 
     trigger OnRun()
@@ -94,6 +95,10 @@ codeunit 6184527 "EFT Verifone Vim Protocol"
 
         if EftTransactionRequest."Processed Entry No." <> 0 then begin
           OriginalEftTrxRequest.Get(EftTransactionRequest."Processed Entry No.");
+          //-NPR5.54 [364340]
+          if OriginalEftTrxRequest.Recovered then
+            OriginalEftTrxRequest.Get(OriginalEftTrxRequest."Recovered by Entry No.");
+          //+NPR5.54 [364340]
           TransactionRequest.TransactionToRevertTerminalTrxID := OriginalEftTrxRequest."External Transaction ID";
           TransactionRequest.TransactionToRevertTerminalID := OriginalEftTrxRequest."Hardware ID";
           TransactionRequest.TransactionToRevertTerminalTrxTimestamp := CreateDateTime(OriginalEftTrxRequest."Transaction Date", OriginalEftTrxRequest."Transaction Time");
@@ -125,6 +130,10 @@ codeunit 6184527 "EFT Verifone Vim Protocol"
         TransactionRequest.TransactionTypeCaption := DIALOG_TYPE_REVERSAL;
 
         OriginalEftTrxRequest.Get(EftTransactionRequest."Processed Entry No.");
+        //-NPR5.54 [364340]
+        if OriginalEftTrxRequest.Recovered then
+          OriginalEftTrxRequest.Get(OriginalEftTrxRequest."Recovered by Entry No.");
+        //+NPR5.54 [364340]
         TransactionRequest.TransactionToRevertTerminalTrxID := OriginalEftTrxRequest."External Transaction ID";
         TransactionRequest.TransactionToRevertTerminalID := OriginalEftTrxRequest."Hardware ID";
         TransactionRequest.TransactionToRevertTerminalTrxTimestamp := CreateDateTime(OriginalEftTrxRequest."Transaction Date", OriginalEftTrxRequest."Transaction Time");
@@ -469,7 +478,7 @@ codeunit 6184527 "EFT Verifone Vim Protocol"
 
         EFTTransactionRequest.Get(EftEntryNo);
         EFTTransactionRequest.Successful := false;
-        EFTTransactionRequest."External Result Received" := false; //Could not parse response correctly - needs to go to lookup.
+        EFTTransactionRequest."External Result Known" := false; //Could not parse response correctly - needs to go to lookup.
         EFTTransactionRequest."Amount Output" := 0;
         EFTTransactionRequest."NST Error" := CopyStr(GetLastErrorText,1,MaxStrLen(EFTTransactionRequest."NST Error"));
         EFTTransactionRequest.Modify(true);

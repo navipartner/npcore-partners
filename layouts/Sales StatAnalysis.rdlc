@@ -7511,22 +7511,6 @@
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
             </Textbox>
-            <Image Name="Image1">
-              <Source>Database</Source>
-              <Value>=System.Convert.ToBase64String(Fields!Picture_CompanyInformation.Value)</Value>
-              <MIMEType>image/png</MIMEType>
-              <Sizing>FitProportional</Sizing>
-              <Top>0.0625in</Top>
-              <Left>5.07375in</Left>
-              <Height>0.53718in</Height>
-              <Width>2.58554in</Width>
-              <ZIndex>1</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-              </Style>
-            </Image>
             <Textbox Name="Textbox48">
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
@@ -7549,7 +7533,7 @@
               <Left>0.07071in</Left>
               <Height>0.2in</Height>
               <Width>4.16516in</Width>
-              <ZIndex>2</ZIndex>
+              <ZIndex>1</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -7582,7 +7566,7 @@
               <Left>1.57552in</Left>
               <Height>0.2in</Height>
               <Width>0.84896in</Width>
-              <ZIndex>3</ZIndex>
+              <ZIndex>2</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -7615,7 +7599,7 @@
               <Left>0.07071in</Left>
               <Height>0.2in</Height>
               <Width>1.26783in</Width>
-              <ZIndex>4</ZIndex>
+              <ZIndex>3</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -7650,7 +7634,7 @@
               <Left>6.21658in</Left>
               <Height>0.19708in</Height>
               <Width>1.44271in</Width>
-              <ZIndex>5</ZIndex>
+              <ZIndex>4</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -8051,7 +8035,7 @@
               <Top>3.28016cm</Top>
               <Height>1.05897cm</Height>
               <Width>19.45459cm</Width>
-              <ZIndex>6</ZIndex>
+              <ZIndex>5</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -8086,7 +8070,7 @@
               <Left>2.88062in</Left>
               <Height>0.2in</Height>
               <Width>1.71875in</Width>
-              <ZIndex>7</ZIndex>
+              <ZIndex>6</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -8102,7 +8086,7 @@
               <Top>4.51552cm</Top>
               <Height>0.12443cm</Height>
               <Width>19.4546cm</Width>
-              <ZIndex>8</ZIndex>
+              <ZIndex>7</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>

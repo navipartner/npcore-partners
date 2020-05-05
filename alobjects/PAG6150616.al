@@ -10,6 +10,7 @@ page 6150616 "POS Unit List"
     // NPR5.45/MHA /20180814  CASE 319706 Added field 200 Ean Box Sales Setup
     // NPR5.45/MHA /20180820 CASE 321266 Added field 205 "POS Sales Workflow Set"
     // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
+    // NPR5.54/TSA /20200221 CASE 392247 Added "POS Type"
 
     Caption = 'POS Unit List';
     CardPageID = "POS Unit Card";
@@ -60,6 +61,9 @@ page 6150616 "POS Unit List"
                 field("Item Price Function";"Item Price Function")
                 {
                     Visible = false;
+                }
+                field("POS Type";"POS Type")
+                {
                 }
             }
         }

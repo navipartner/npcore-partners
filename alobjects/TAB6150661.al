@@ -8,6 +8,7 @@ table 6150661 "NPRE Waiter Pad Line"
     //                                   - Removed fields:
     //                                      5 "Sent To. Kitchen Print"
     //                                      6 "Print Category"
+    // NPR5.54/ALPO/20200331 CASE 398454 Preserve price VAT parameters and use it when copying waiter pad lines to a POS sale
 
     Caption = 'Waiter Pad Line';
 
@@ -201,6 +202,23 @@ table 6150661 "NPRE Waiter Pad Line"
         {
             Caption = 'Unit of Measure Code';
             TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."));
+        }
+        field(70;"Price Includes VAT";Boolean)
+        {
+            Caption = 'Price Includes VAT';
+            Description = 'NPR5.54';
+        }
+        field(71;"VAT Bus. Posting Group";Code[10])
+        {
+            Caption = 'VAT Bus. Posting Group';
+            Description = 'NPR5.54';
+            TableRelation = "VAT Business Posting Group";
+        }
+        field(72;"VAT Prod. Posting Group";Code[10])
+        {
+            Caption = 'VAT Prod. Posting Group';
+            Description = 'NPR5.54';
+            TableRelation = "VAT Product Posting Group";
         }
         field(100; "Print Category Filter"; Code[20])
         {

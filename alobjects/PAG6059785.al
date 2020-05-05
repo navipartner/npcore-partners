@@ -15,6 +15,7 @@ page 6059785 "TM Ticket List"
     // NPR5.43/TS  20180626 CASE 317161 Promoted Action Print Selected Tickets
     // TM1.38/TSA /20181023 CASE 332109 Added eTicket support
     // TM1.39/NPKNAV/20190125  CASE 310057 Transport TM1.39 - 25 January 2019
+    // TM90.1.46/TSA /20200129 CASE 387138 Refactored ChangeTicketholder();
 
     Caption = 'Ticket List';
     DeleteAllowed = false;
@@ -270,16 +271,20 @@ page 6059785 "TM Ticket List"
 
         TicketReservationRequest.Get ("Ticket Reservation Entry No.");
 
-        case TicketReservationRequest."Notification Method" of
-          TicketReservationRequest."Notification Method"::EMAIL : SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
-          TicketReservationRequest."Notification Method"::SMS : SuggestNotificationMethod := SuggestNotificationMethod::SMS;
-          else begin
-            SuggestNotificationMethod := SuggestNotificationMethod::NA;
-            TicketReservationRequest."Notification Address" := '';
-          end;
-        end;
 
-        TicketNotifyParticipant.AquireTicketParticipant (TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address");
+        //-TM90.1.46 [387138]
+        // CASE TicketReservationRequest."Notification Method" OF
+        //  TicketReservationRequest."Notification Method"::EMAIL : SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
+        //  TicketReservationRequest."Notification Method"::SMS : SuggestNotificationMethod := SuggestNotificationMethod::SMS;
+        //  ELSE BEGIN
+        //    SuggestNotificationMethod := SuggestNotificationMethod::NA;
+        //    TicketReservationRequest."Notification Address" := '';
+        //  END;
+        // END;
+
+        //TicketNotifyParticipant.AquireTicketParticipant (TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address");
+        TicketNotifyParticipant.AquireTicketParticipantForce (TicketReservationRequest."Session Token ID", TicketReservationRequest."Notification Method", TicketReservationRequest."Notification Address", true);
+        //+TM90.1.46 [387138]
     end;
 
     local procedure ToggleTicketBlock()

@@ -13,6 +13,9 @@ page 6184498 "EFT Transaction Requests"
     // NPR5.48/MMV /20181221  CASE 340754 Removed page actions lookup, void, refund as the user flow has been replaced with action EFT_OPERATION approach.
     // NPR5.53/MMV /20191206 CASE 377533 Changed styling and added new flowfield for error overview.
     //                                   Added logging factbox.
+    // NPR5.54/MMV /20200218 CASE 377533 Rolled back parts of styling due to perf.
+    // NPR5.54/MMV /20200219 CASE 364340 Created field "Result Processed".
+    // NPR5.54/JAKUBV/20200408  CASE 387990 Transport NPR5.54 - 8 April 2020
 
     Caption = 'EFT Transaction Requests';
     Editable = false;
@@ -70,7 +73,10 @@ page 6184498 "EFT Transaction Requests"
                 field(Successful;Successful)
                 {
                 }
-                field("External Result Received";"External Result Received")
+                field("External Result Known";"External Result Known")
+                {
+                }
+                field("Result Processed";"Result Processed")
                 {
                 }
                 field("Force Closed";"Force Closed")
@@ -321,10 +327,17 @@ page 6184498 "EFT Transaction Requests"
     end;
 
     trigger OnOpenPage()
+    var
+        NPRetailSetup: Record "NP Retail Setup";
     begin
-        //-NPR5.53 [377533]
-        SetAutoCalcFields("FF Moved to POS Entry");
-        //+NPR5.53 [377533]
+        //-NPR5.54 [377533]
+        if NPRetailSetup.Get() then begin
+          if NPRetailSetup."Advanced Posting Activated" then begin
+            UsesPOSEntry := true;
+            SetAutoCalcFields("FF Moved to POS Entry");
+          end;
+        end;
+        //+NPR5.54 [377533]
 
         if FindFirst then;
     end;
@@ -333,6 +346,7 @@ page 6184498 "EFT Transaction Requests"
         DisplayText: Text;
         TransDuration: Duration;
         Style: Text;
+        UsesPOSEntry: Boolean;
 
     local procedure ClosePageIfInsidePOS()
     var
@@ -350,7 +364,6 @@ page 6184498 "EFT Transaction Requests"
         EFTTransactionRequest: Record "EFT Transaction Request";
         EFTFrameworkMgt: Codeunit "EFT Framework Mgt.";
     begin
-        //-NPR5.53 [377533]
         if (Recovered) then begin
           if EFTTransactionRequest.Get("Recovered by Entry No.") then
             if EFTTransactionRequest."Result Amount" <> 0 then
@@ -360,24 +373,19 @@ page 6184498 "EFT Transaction Requests"
           exit('StrongAccent'); //Recovered and in sync.
         end;
 
-        if (Finished = 0DT) and ("Amount Input" <> 0) then begin
-          if (not EFTFrameworkMgt.IsFromMostRecentSaleOnPOSUnit(Rec)) then
-            exit('Unfavorable'); //Lost trx result
-
-          exit(''); //Currently ongoing trx
+        //-NPR5.54 [377533]
+        if ((Finished = 0DT) or (not "External Result Known"))
+          and ("Amount Input" <> 0) then begin
+          exit('Unfavorable'); //Lost trx result
         end;
 
-        if (not "External Result Received") and ("Amount Input" <> 0) then
-          exit('Unfavorable'); //Lost trx result
-
         if "Result Amount" <> 0 then begin
-          if (not "FF Moved to POS Entry") then
-            if (not EFTFrameworkMgt.IsFromMostRecentSaleOnPOSUnit(Rec)) then
-              exit('Unfavorable'); //Lost trx result
+          if ((not "FF Moved to POS Entry") and UsesPOSEntry) then
+            exit('Unfavorable'); //EFT handled it correctly but sale never ended.
         end;
 
         exit('');
-        //+NPR5.53 [377533]
+        //+NPR5.54 [377533]
     end;
 }
 

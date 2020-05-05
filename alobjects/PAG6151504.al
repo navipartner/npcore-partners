@@ -29,6 +29,7 @@ page 6151504 "Nc Import List"
     // NC2.23/ZESO/20190819  CASE 360787 Added Export File and Import File for Web Client
     // NC2.23/MHA /20190927  CASE 369170 Removed Gambit integration
     // NC2.24/MHA /20191108  CASE 373525 Changed extension filter for Import File to reflect "Document Name"
+    // NPR5.54/CLVA/20200127 CASE 366790 Added function ShowFormattedDocumentSource
 
     Caption = 'Import List';
     DelayedInsert = true;
@@ -207,6 +208,20 @@ page 6151504 "Nc Import List"
                     //+NC2.12 [308107]
                 end;
             }
+            action("Show Formatted Source")
+            {
+                Caption = 'Show Formatted Source';
+                Image = XMLFile;
+                Promoted = true;
+                PromotedCategory = Process;
+
+                trigger OnAction()
+                begin
+                    //-NPR5.54 [366790]
+                    ShowFormattedDocumentSource();
+                    //+NPR5.54 [366790]
+                end;
+            }
             action("Edit File")
             {
                 Caption = 'Edit File';
@@ -323,6 +338,7 @@ page 6151504 "Nc Import List"
         Text004: Label '%1 Order(s) has been imported \\%2 Orders contained errors.';
         WebClient: Boolean;
         Text005: Label 'Import File';
+        Text006: Label 'XML Stylesheet is empty for Import Type: %1';
 
     local procedure AddFile()
     var
@@ -499,6 +515,129 @@ page 6151504 "Nc Import List"
         else
           Message(Text001);
         //+NC2.12 [308107]
+    end;
+
+    local procedure ShowFormattedDocumentSource()
+    var
+        TempBlob: Record TempBlob temporary;
+        FileMgt: Codeunit "File Management";
+        StreamReader: DotNet npNetStreamReader;
+        InStr: InStream;
+        Path: Text;
+        Content: Text;
+        NcImportType: Record "Nc Import Type";
+        XMLStylesheetPath: Text;
+        [RunOnClient]
+        XslCompiledTransform: DotNet npNetXslCompiledTransform;
+        LocalTempFile: Text;
+        HtmlContent: Text;
+        ServerFileName: Text;
+    begin
+        //-NPR5.54 [366790]
+        CalcFields("Document Source");
+        if "Document Source".HasValue then begin
+
+          TestField("Import Type");
+          NcImportType.Get("Import Type");
+
+          NcImportType.CalcFields("XML Stylesheet");
+          if not NcImportType."XML Stylesheet".HasValue then
+            Error(Text006);
+
+          TempBlob.Blob := NcImportType."XML Stylesheet";
+          XMLStylesheetPath := FileMgt.BLOBExport(TempBlob,'Stylesheet.xslt',false);
+          //HYPERLINK(XMLStylesheetPath);
+
+          XslCompiledTransform := XslCompiledTransform.XslCompiledTransform;
+          XslCompiledTransform.Load(XMLStylesheetPath);
+
+          LocalTempFile := FileMgt.ClientTempFileName('html');
+
+          TempBlob.Blob := "Document Source";
+          Path := FileMgt.BLOBExport(TempBlob,TemporaryPath + "Document Name",false);
+
+          XslCompiledTransform.Transform(Path, LocalTempFile);
+
+          ServerFileName := FileMgt.UploadFileSilent(LocalTempFile);
+
+          HtmlContent := GetFormattedDocumentAsString(ServerFileName, true);//HYPERLINK(LocalTempFile);
+          PreviewFormattedDocument("Document Name", HtmlContent);
+
+        end else
+          Message(Text001);
+        //+NPR5.54 [366790]
+    end;
+
+    local procedure GetFormattedDocumentAsString(FileName: Text;DeleteFile: Boolean) String: Text
+    var
+        TempFile: File;
+        Istream: InStream;
+        StreamReader: DotNet npNetStreamReader;
+        Encoding: DotNet npNetEncoding;
+    begin
+        //-NPR5.54 [366790]
+        if Exists(FileName) then begin
+          TempFile.Open(FileName);
+          TempFile.CreateInStream(Istream);
+
+          StreamReader := StreamReader.StreamReader(Istream,Encoding.Unicode);
+          String := StreamReader.ReadToEnd();
+          TempFile.Close;
+
+          if DeleteFile then
+            FILE.Erase(FileName);
+
+          exit(String);
+        end;
+        //+NPR5.54 [366790]
+    end;
+
+    local procedure PreviewFormattedDocument(Title: Text;Content: Text)
+    var
+        HTMLContent: Text;
+        JToken: DotNet npNetJToken;
+        [RunOnClient]
+        WinForm: DotNet npNetForm;
+        [RunOnClient]
+        WinText: DotNet npNetTextBox;
+        [RunOnClient]
+        Colour: DotNet npNetColor;
+        [RunOnClient]
+        DockStyle: DotNet npNetDockStyle;
+        [RunOnClient]
+        WebBrowser: DotNet npNetWebBrowser;
+        [RunOnClient]
+        FormWindowState: DotNet npNetFormWindowState;
+    begin
+        //-NPR5.54 [366790]
+        if (Content = '') then
+          exit;
+
+        if CurrentClientType in [CLIENTTYPE::Tablet,CLIENTTYPE::Web,CLIENTTYPE::Phone] then begin
+          Message('Brigde framework is missing\Please use the RTC client for previewing');
+        end else begin
+          WinForm := WinForm.Form;
+          Colour := Colour.Color;
+          WinText := WinText.TextBox;
+          WinForm.Width := 1000;
+          WinForm.Height := 600;
+          WinForm.ActiveForm;
+          WinForm.Text := Title;
+          WinForm.WindowState := FormWindowState.Normal;
+          WinForm.ShowInTaskbar := false;
+          WinForm.ShowIcon := false;
+
+          WebBrowser := WebBrowser.WebBrowser;
+          WebBrowser.Dock :=  DockStyle.Fill;
+          WebBrowser.DocumentText := '0';
+          WebBrowser.Document.OpenNew(true);
+          WebBrowser.Document.Write(Content);
+          WebBrowser.Refresh();
+
+          WinForm.Controls.Add(WebBrowser);
+          WinForm.ShowDialog;
+        end;
+        //+NPR5.54 [366790]
     end;
 }
 

@@ -2,6 +2,7 @@ codeunit 6184529 "EFT Adyen Response Parser"
 {
     // NPR5.53/MMV /20191120 CASE 377533 Created object
     // NPR5.53/MMV /20200131 CASE 377533 Added support for aborting InProgress/Busy terminal automatically
+    // NPR5.54/MMV /20200213 CASE 387990 Re-wrote receipt parsing to prevent locking FIND.
 
 
     trigger OnRun()
@@ -80,7 +81,7 @@ codeunit 6184529 "EFT Adyen Response Parser"
           EFTTransactionRequest."Processing Type"::PAYMENT : EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Output";
           EFTTransactionRequest."Processing Type"::REFUND : EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Output" * -1;
         end;
-        EFTTransactionRequest."External Result Received" := true;
+        EFTTransactionRequest."External Result Known" := true;
     end;
 
     local procedure ParseVoidTransaction(Response: Text;var EFTTransactionRequest: Record "EFT Transaction Request")
@@ -109,7 +110,7 @@ codeunit 6184529 "EFT Adyen Response Parser"
         ParseReversalResponse(JObject, EFTTransactionRequest);
 
         EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Output";
-        EFTTransactionRequest."External Result Received" := true;
+        EFTTransactionRequest."External Result Known" := true;
     end;
 
     local procedure ParseStatusTransaction(Response: Text;var EFTTransactionRequest: Record "EFT Transaction Request")
@@ -127,7 +128,7 @@ codeunit 6184529 "EFT Adyen Response Parser"
         ParseStatusResponse(JObject, EFTTransactionRequest);
 
         EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Output";
-        EFTTransactionRequest."External Result Received" := true;
+        EFTTransactionRequest."External Result Known" := true;
     end;
 
     local procedure ParseDiagnoseTransaction(Response: Text;var EFTTransactionRequest: Record "EFT Transaction Request")
@@ -145,7 +146,7 @@ codeunit 6184529 "EFT Adyen Response Parser"
         EFTTransactionRequest."Result Display Text" := CopyStr(ParseDiagnoseResponse(JObject, EFTTransactionRequest), 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
 
         EFTTransactionRequest.Successful := true;
-        EFTTransactionRequest."External Result Received" := true;
+        EFTTransactionRequest."External Result Known" := true;
     end;
 
     local procedure ParseCardAcquisition(Response: Text;var EFTTransactionRequest: Record "EFT Transaction Request")
@@ -162,7 +163,7 @@ codeunit 6184529 "EFT Adyen Response Parser"
         JObject := JObject.Item('CardAcquisitionResponse');
         ParseCardAcquisitionResponse(JObject, EFTTransactionRequest);
 
-        EFTTransactionRequest."External Result Received" := true;
+        EFTTransactionRequest."External Result Known" := true;
     end;
 
     local procedure ParseAbortAcquireCard(Response: Text;var EFTTransactionRequest: Record "EFT Transaction Request")
@@ -179,7 +180,7 @@ codeunit 6184529 "EFT Adyen Response Parser"
         TrySelectToken(JObject, 'EnableServiceResponse.Response', JToken, true);
         ParseResponse(JToken, EFTTransactionRequest);
 
-        EFTTransactionRequest."External Result Received" := true;
+        EFTTransactionRequest."External Result Known" := true;
     end;
 
     local procedure ParseRejectNotification(Response: Text;var EFTTransactionRequest: Record "EFT Transaction Request")
@@ -221,7 +222,7 @@ codeunit 6184529 "EFT Adyen Response Parser"
           end;
 
           EFTTransactionRequest.Successful := true;
-          EFTTransactionRequest."External Result Received" := true;
+          EFTTransactionRequest."External Result Known" := true;
         end else begin
           TrySelectToken(JObject, 'errorCode', JToken, true);
           ErrorMsg += JToken.ToString();
@@ -230,7 +231,7 @@ codeunit 6184529 "EFT Adyen Response Parser"
 
           EFTTransactionRequest."Result Description" := CopyStr(ErrorMsg,1,MaxStrLen(EFTTransactionRequest."Result Description"));;
           EFTTransactionRequest.Successful := false;
-          EFTTransactionRequest."External Result Received" := true;
+          EFTTransactionRequest."External Result Known" := true;
         end;
     end;
 
@@ -453,10 +454,15 @@ codeunit 6184529 "EFT Adyen Response Parser"
         ParsePrint: Boolean;
         TotalLength: Integer;
         RequiredSignature: Boolean;
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
     begin
         if JObject.Count() < 1 then
           exit;
+
+        //-NPR5.54 [387990]
+        EntryNo := GetLastReceiptLineEntryNo(EFTTransactionRequest);
+        ReceiptNo := GetLastReceiptNo(EFTTransactionRequest);
+        //+NPR5.54 [387990]
 
         for i := 0 to (JObject.Count()-1) do begin
 
@@ -481,18 +487,11 @@ codeunit 6184529 "EFT Adyen Response Parser"
           end;
 
           if ParsePrint then begin
-
             if JObject.Item(i).Item('OutputContent').Item('OutputFormat').ToString() = 'Text' then begin
+        //-NPR5.54 [387990]
+              ReceiptNo += 1;
+        //+NPR5.54 [387990]
               JToken := JObject.Item(i).Item('OutputContent').Item('OutputText');
-
-              CreditCardTransaction.SetRange("Register No.", EFTTransactionRequest."Register No.");
-              CreditCardTransaction.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
-              if (CreditCardTransaction.FindLast()) then begin
-                EntryNo := CreditCardTransaction."Entry No.";
-                ReceiptNo := CreditCardTransaction."Receipt No.";
-              end;
-              CreditCardTransaction.Reset;
-
               for j := 0 to (JToken.Count()-1) do begin
 
                 Name := '';
@@ -507,27 +506,10 @@ codeunit 6184529 "EFT Adyen Response Parser"
 
                 OutStream.WriteText(StrSubstNo('%1  %2\', Name, Value));
 
-                Name := SubstituteCurrencyChars(Name);
-                Value := SubstituteCurrencyChars(Value);
-
+        //-NPR5.54 [387990]
                 EntryNo += 1;
-
-                CreditCardTransaction.Init;
-                CreditCardTransaction.Date := Today;
-                CreditCardTransaction."Transaction Time" := Time;
-                CreditCardTransaction."Register No." := EFTTransactionRequest."Register No.";
-                CreditCardTransaction."Sales Ticket No." := EFTTransactionRequest."Sales Ticket No.";
-                CreditCardTransaction."EFT Trans. Request Entry No." := EFTTransactionRequest."Entry No.";
-                CreditCardTransaction."Receipt No." := ReceiptNo + 1;
-
-                TotalLength := StrLen(Name) + StrLen(Value) + 2;
-                if TotalLength = 2 then
-                  CreditCardTransaction.Text := ' '
-                else if TotalLength <= 40 then
-                  CreditCardTransaction.Text := Name + PadStr('', 40-StrLen(Name)-StrLen(Value), ' ') + Value;
-
-                CreditCardTransaction."Entry No." := EntryNo;
-                CreditCardTransaction.Insert;
+                InsertReceiptLine(Name, Value, ReceiptNo, EntryNo, EFTTransactionRequest);
+        //+NPR5.54 [387990]
               end;
             end;
           end;
@@ -639,6 +621,58 @@ codeunit 6184529 "EFT Adyen Response Parser"
 
     local procedure "// Aux"()
     begin
+    end;
+
+    local procedure GetLastReceiptLineEntryNo(EFTTransactionRequest: Record "EFT Transaction Request"): Integer
+    var
+        CreditCardTransaction: Record "EFT Receipt";
+    begin
+        //-NPR5.54 [387990]
+        CreditCardTransaction.SetRange("Register No.", EFTTransactionRequest."Register No.");
+        CreditCardTransaction.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
+        if (CreditCardTransaction.FindLast()) then;
+        exit(CreditCardTransaction."Entry No.");
+        //+NPR5.54 [387990]
+    end;
+
+    local procedure GetLastReceiptNo(EFTTransactionRequest: Record "EFT Transaction Request"): Integer
+    var
+        CreditCardTransaction: Record "EFT Receipt";
+    begin
+        //-NPR5.54 [387990]
+        CreditCardTransaction.SetRange("Register No.", EFTTransactionRequest."Register No.");
+        CreditCardTransaction.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
+        if (CreditCardTransaction.FindLast()) then;
+        exit(CreditCardTransaction."Receipt No.");
+        //+NPR5.54 [387990]
+    end;
+
+    local procedure InsertReceiptLine(Name: Text;Value: Text;ReceiptNo: Integer;EntryNo: Integer;EFTTransactionRequest: Record "EFT Transaction Request")
+    var
+        CreditCardTransaction: Record "EFT Receipt";
+        TotalLength: Integer;
+    begin
+        //-NPR5.54 [387990]
+        Name := SubstituteCurrencyChars(Name);
+        Value := SubstituteCurrencyChars(Value);
+
+        CreditCardTransaction.Init;
+        CreditCardTransaction.Date := Today;
+        CreditCardTransaction."Transaction Time" := Time;
+        CreditCardTransaction."Register No." := EFTTransactionRequest."Register No.";
+        CreditCardTransaction."Sales Ticket No." := EFTTransactionRequest."Sales Ticket No.";
+        CreditCardTransaction."EFT Trans. Request Entry No." := EFTTransactionRequest."Entry No.";
+        CreditCardTransaction."Receipt No." := ReceiptNo;
+
+        TotalLength := StrLen(Name) + StrLen(Value) + 2;
+        if TotalLength = 2 then
+          CreditCardTransaction.Text := ' '
+        else if TotalLength <= 40 then
+          CreditCardTransaction.Text := Name + PadStr('', 40-StrLen(Name)-StrLen(Value), ' ') + Value;
+
+        CreditCardTransaction."Entry No." := EntryNo;
+        CreditCardTransaction.Insert;
+        //+NPR5.54 [387990]
     end;
 
     local procedure ParseJSON(JSON: Text;var JObject: DotNet npNetJObject)

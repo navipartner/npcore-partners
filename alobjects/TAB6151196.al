@@ -3,6 +3,7 @@ table 6151196 "NpCs Workflow"
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // NPR5.51/MHA /20190723  CASE 362443 Removed unused field 205 "Auto Post Order on"
     // NPR5.51/MHA /20190819  CASE 364557 Added fields 350 "Store Stock", 360 "Post on", 380 "Bill via"
+    // NPR5.54/MHA /20200130  CASE 378956 Added Store Notification Fields
 
     Caption = 'Collect Workflow';
     DrillDownPageID = "NpCs Workflows";
@@ -38,18 +39,32 @@ table 6151196 "NpCs Workflow"
         {
             Caption = 'Notify Store via E-mail';
         }
-        field(120; "E-mail Template"; Code[20])
+        field(120;"Store E-mail Temp. (Pending)";Code[20])
         {
-            Caption = 'E-mail Template';
+            Caption = 'Store E-mail Template (Pending)';
+            Description = 'NPR5.54';
+            TableRelation = "E-mail Template Header".Code WHERE ("Table No."=CONST(6151198));
+        }
+        field(122;"Store E-mail Temp. (Expired)";Code[20])
+        {
+            Caption = 'Store E-mail Template (Expired)';
+            Description = 'NPR5.54';
             TableRelation = "E-mail Template Header".Code WHERE ("Table No." = CONST (6151198));
         }
         field(125; "Notify Store via Sms"; Boolean)
         {
             Caption = 'Notify Store via Sms';
         }
-        field(130; "Sms Template"; Code[10])
+        field(130;"Store Sms Template (Pending)";Code[10])
         {
-            Caption = 'Sms Template';
+            Caption = 'Store Sms Template (Pending)';
+            Description = 'NPR5.54';
+            TableRelation = "SMS Template Header".Code WHERE ("Table No."=CONST(6151198));
+        }
+        field(132;"Store Sms Template (Expired)";Code[10])
+        {
+            Caption = 'Store Sms Template (Expired)';
+            Description = 'NPR5.54';
             TableRelation = "SMS Template Header".Code WHERE ("Table No." = CONST (6151198));
         }
         field(135; "Customer Mapping"; Option)

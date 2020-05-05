@@ -1,4 +1,4 @@
-pageextension 6014477 pageextension6014477 extends "Sales Invoice List" 
+pageextension 6014479 pageextension6014479 extends "Sales Invoice List" 
 {
     // NPR5.36/THRO/20170908 CASE 285645 Added action PostAndSendPdf2Nav
     actions

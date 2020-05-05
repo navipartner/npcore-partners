@@ -1,6 +1,7 @@
 table 6184516 "EFT Transaction Async Request"
 {
     // NPR5.53/MMV /20191120 CASE 377533 Created object
+    // NPR5.54/MMV /20200219 CASE 364340 Added fields 40, 50
 
     Caption = 'EFT Transaction Async Request';
 
@@ -19,11 +20,22 @@ table 6184516 "EFT Transaction Async Request"
         {
             Caption = 'Abort Requested';
         }
+        field(40;Metadata;BLOB)
+        {
+            Caption = 'Metadata';
+        }
+        field(50;"Hardware ID";Text[200])
+        {
+            Caption = 'Hardware ID';
+        }
     }
 
     keys
     {
         key(Key1;"Request Entry No")
+        {
+        }
+        key(Key2;"Hardware ID")
         {
         }
     }

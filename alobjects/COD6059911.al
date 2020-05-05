@@ -204,7 +204,7 @@ codeunit 6059911 "Delete Old Entries"
 
     procedure DeleteCreditCardLog(TaskLine: Record "Task Line";CompanyToDelete: Text[50];LastDateToDelete: Date)
     var
-        CreditCardTrans: Record "Credit Card Transaction";
+        CreditCardTrans: Record "EFT Receipt";
         RecRef: RecordRef;
     begin
         if LastDateToDelete = 0D then
@@ -226,7 +226,7 @@ codeunit 6059911 "Delete Old Entries"
         //-NPR5.53 [326663
         NoOfRowsToDeleteAllowed := 0;
         Counter := 0;
-        NoOfRowsToDeleteAllowed := GetNoOfRowsToDelete(CompanyToDelete,DATABASE::"Credit Card Transaction",NoOfEntries);
+        NoOfRowsToDeleteAllowed := GetNoOfRowsToDelete(CompanyToDelete,DATABASE::"EFT Receipt",NoOfEntries);
         if (OriginalMaxSizeToDelete <> 0) then begin
          if (NoOfRowsToDeleteAllowed <> 0)  then begin
            NoOfEntries := NoOfRowsToDeleteAllowed;

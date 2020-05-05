@@ -5,6 +5,7 @@ table 6151198 "NpCs Document"
     // NPR5.51/MHA /20190719  CASE 362443 "To Store Code" may now refer to Local Store and added field 13 "Inserted at"
     // NPR5.51/MHA /20190819  CASE 364557 Added options "Posted Invoice", "Posted Credit Memo" to field 5 "Document Type"
     // NPR5.53/MHA /20191128  CASE 378895 Added Keys "Reference","Processing expires at", and "Delivery expires at"
+    // NPR5.54/MHA /20200130  CASE 378956 Added Store Notification Fields
 
     Caption = 'Collect Document';
     DataCaptionFields = "Document Type","Reference No.","Sell-to Customer Name";
@@ -91,6 +92,14 @@ table 6151198 "NpCs Document"
                 "Sms Template (Confirmed)" := NpCsStoreWorkflowRelation."Sms Template (Confirmed)";
                 "Sms Template (Rejected)" := NpCsStoreWorkflowRelation."Sms Template (Rejected)";
                 "Sms Template (Expired)" := NpCsStoreWorkflowRelation."Sms Template (Expired)";
+                //-NPR5.54 [378956]
+                "Notify Store via E-mail" := NpCsStoreWorkflowRelation."Notify Store via E-mail";
+                "Store E-mail Temp. (Pending)" := NpCsStoreWorkflowRelation."Store E-mail Temp. (Pending)";
+                "Store E-mail Temp. (Expired)" := NpCsStoreWorkflowRelation."Store E-mail Temp. (Expired)";
+                "Notify Store via Sms" := NpCsStoreWorkflowRelation."Notify Store via Sms";
+                "Store Sms Template (Pending)" := NpCsStoreWorkflowRelation."Store Sms Template (Pending)";
+                "Store Sms Template (Expired)" := NpCsStoreWorkflowRelation."Store Sms Template (Expired)";
+                //+NPR5.54 [378956]
                 //-NPR5.51 [364557]
                 "Processing Print Template" := NpCsStoreWorkflowRelation."Processing Print Template";
                 //+NPR5.51 [364557]
@@ -365,6 +374,40 @@ table 6151198 "NpCs Document"
             Caption = 'Salesperson Code';
             Description = 'NPR5.51';
             TableRelation = "Salesperson/Purchaser";
+        }
+        field(400;"Notify Store via E-mail";Boolean)
+        {
+            Caption = 'Notify Store via E-mail';
+            Description = 'NPR5.54';
+        }
+        field(410;"Store E-mail Temp. (Pending)";Code[20])
+        {
+            Caption = 'Store E-mail Template (Pending)';
+            Description = 'NPR5.54';
+            TableRelation = "E-mail Template Header".Code WHERE ("Table No."=CONST(6151198));
+        }
+        field(420;"Store E-mail Temp. (Expired)";Code[20])
+        {
+            Caption = 'Store E-mail Template (Expired)';
+            Description = 'NPR5.54';
+            TableRelation = "E-mail Template Header".Code WHERE ("Table No."=CONST(6151198));
+        }
+        field(430;"Notify Store via Sms";Boolean)
+        {
+            Caption = 'Notify Store via Sms';
+            Description = 'NPR5.54';
+        }
+        field(440;"Store Sms Template (Pending)";Code[10])
+        {
+            Caption = 'Store Sms Template (Pending)';
+            Description = 'NPR5.54';
+            TableRelation = "SMS Template Header".Code WHERE ("Table No."=CONST(6151198));
+        }
+        field(450;"Store Sms Template (Expired)";Code[10])
+        {
+            Caption = 'Store Sms Template (Expired)';
+            Description = 'NPR5.54';
+            TableRelation = "SMS Template Header".Code WHERE ("Table No."=CONST(6151198));
         }
         field(1000;"Send Order Module";Code[20])
         {

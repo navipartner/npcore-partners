@@ -2,6 +2,7 @@ table 6151200 "NpCs Store Workflow Relation"
 {
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // NPR5.51/MHA /20190822  CASE 364557 Added field 300 "Processing Print Template"
+    // NPR5.54/MHA /20200130  CASE 378956 Added Store Notification Fields
 
     Caption = 'Collect Workflow Relation';
 
@@ -38,6 +39,14 @@ table 6151200 "NpCs Store Workflow Relation"
                 "Sms Template (Confirmed)" := NpCsWorkflow."Sms Template (Confirmed)";
                 "Sms Template (Rejected)" := NpCsWorkflow."Sms Template (Rejected)";
                 "Sms Template (Expired)" := NpCsWorkflow."Sms Template (Expired)";
+                //-NPR5.54 [378956]
+                "Notify Store via E-mail" := NpCsWorkflow."Notify Store via E-mail";
+                "Store E-mail Temp. (Pending)" := NpCsWorkflow."Store E-mail Temp. (Pending)";
+                "Store E-mail Temp. (Expired)" := NpCsWorkflow."Store E-mail Temp. (Expired)";
+                "Notify Store via Sms" := NpCsWorkflow."Notify Store via Sms";
+                "Store Sms Template (Pending)" := NpCsWorkflow."Store Sms Template (Pending)";
+                "Store Sms Template (Expired)" := NpCsWorkflow."Store Sms Template (Expired)";
+                //+NPR5.54 [378956]
             end;
         }
         field(10;"Workflow Description";Text[50])
@@ -302,6 +311,116 @@ table 6151200 "NpCs Store Workflow Relation"
                 RPTemplateHeader.SetRange("Table ID",DATABASE::"NpCs Document");
                 if PAGE.RunModal(0,RPTemplateHeader) = ACTION::LookupOK then
                   Validate("Delivery Print Template (S.)",RPTemplateHeader.Code);
+            end;
+        }
+        field(400;"Notify Store via E-mail";Boolean)
+        {
+            Caption = 'Notify Store via E-mail';
+            Description = 'NPR5.54';
+        }
+        field(410;"Store E-mail Temp. (Pending)";Code[20])
+        {
+            Caption = 'Store E-mail Template (Pending)';
+            Description = 'NPR5.54';
+            TableRelation = "E-mail Template Header".Code WHERE ("Table No."=CONST(6151198));
+            //This property is currently not supported
+            //TestTableRelation = false;
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                EmailTemplateHeader: Record "E-mail Template Header";
+                NpCsStore: Record "NpCs Store";
+            begin
+                //-NPR5.54 [378956]
+                NpCsStore.Get("Store Code");
+                if EmailTemplateHeader.ChangeCompany(NpCsStore."Company Name") then;
+
+                if EmailTemplateHeader.Get("Store E-mail Temp. (Pending)") then;
+                EmailTemplateHeader.SetRange("Table No.",DATABASE::"NpCs Document");
+                if PAGE.RunModal(0,EmailTemplateHeader) = ACTION::LookupOK then
+                  Validate("Store E-mail Temp. (Pending)",EmailTemplateHeader.Code);
+                //+NPR5.54 [378956]
+            end;
+        }
+        field(420;"Store E-mail Temp. (Expired)";Code[20])
+        {
+            Caption = 'Store E-mail Template (Expired)';
+            Description = 'NPR5.54';
+            TableRelation = "E-mail Template Header".Code WHERE ("Table No."=CONST(6151198));
+            //This property is currently not supported
+            //TestTableRelation = false;
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                EmailTemplateHeader: Record "E-mail Template Header";
+                NpCsStore: Record "NpCs Store";
+            begin
+                //-NPR5.54 [378956]
+                NpCsStore.Get("Store Code");
+                if EmailTemplateHeader.ChangeCompany(NpCsStore."Company Name") then;
+
+                if EmailTemplateHeader.Get("Store E-mail Temp. (Expired)") then;
+                EmailTemplateHeader.SetRange("Table No.",DATABASE::"NpCs Document");
+                if PAGE.RunModal(0,EmailTemplateHeader) = ACTION::LookupOK then
+                  Validate("Store E-mail Temp. (Expired)",EmailTemplateHeader.Code);
+                //+NPR5.54 [378956]
+            end;
+        }
+        field(430;"Notify Store via Sms";Boolean)
+        {
+            Caption = 'Notify Store via Sms';
+            Description = 'NPR5.54';
+        }
+        field(440;"Store Sms Template (Pending)";Code[10])
+        {
+            Caption = 'Store Sms Template (Pending)';
+            Description = 'NPR5.54';
+            TableRelation = "SMS Template Header".Code WHERE ("Table No."=CONST(6151198));
+            //This property is currently not supported
+            //TestTableRelation = false;
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                NpCsStore: Record "NpCs Store";
+                SMSTemplateHeader: Record "SMS Template Header";
+            begin
+                //-NPR5.54 [378956]
+                NpCsStore.Get("Store Code");
+                if SMSTemplateHeader.ChangeCompany(NpCsStore."Company Name") then;
+
+                if SMSTemplateHeader.Get("Store Sms Template (Pending)") then;
+                SMSTemplateHeader.SetRange("Table No.",DATABASE::"NpCs Document");
+                if PAGE.RunModal(0,SMSTemplateHeader) = ACTION::LookupOK then
+                  Validate("Store Sms Template (Pending)",SMSTemplateHeader.Code);
+                //+NPR5.54 [378956]
+            end;
+        }
+        field(450;"Store Sms Template (Expired)";Code[10])
+        {
+            Caption = 'Store Sms Template (Expired)';
+            Description = 'NPR5.54';
+            TableRelation = "SMS Template Header".Code WHERE ("Table No."=CONST(6151198));
+            //This property is currently not supported
+            //TestTableRelation = false;
+            ValidateTableRelation = false;
+
+            trigger OnLookup()
+            var
+                NpCsStore: Record "NpCs Store";
+                SMSTemplateHeader: Record "SMS Template Header";
+            begin
+                //-NPR5.54 [378956]
+                NpCsStore.Get("Store Code");
+                if SMSTemplateHeader.ChangeCompany(NpCsStore."Company Name") then;
+
+                if SMSTemplateHeader.Get("Store Sms Template (Expired)") then;
+                SMSTemplateHeader.SetRange("Table No.",DATABASE::"NpCs Document");
+                if PAGE.RunModal(0,SMSTemplateHeader) = ACTION::LookupOK then
+                  Validate("Store Sms Template (Expired)",SMSTemplateHeader.Code);
+                //+NPR5.54 [378956]
             end;
         }
     }

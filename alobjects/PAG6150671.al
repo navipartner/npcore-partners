@@ -3,6 +3,7 @@ page 6150671 "POS Entry Factbox"
     // NPR5.39/BR  /20180129  CASE 302696 Object Created
     // NPR5.53/SARA/20191024  CASE 373672 Change request to POS List
     // NPR5.53/SARA/20200127  CASE 387442 Added field "No. of Print Output Entries"
+    // NPR5.54/SARA/20200324  CASE 393490 Calculate Discount Amount
 
     Caption = 'POS Entry Factbox';
     PageType = CardPart;
@@ -33,6 +34,7 @@ page 6150671 "POS Entry Factbox"
             }
             field("Discount Amount";"Discount Amount")
             {
+                Caption = 'Disc. Amt Excl. VAT';
             }
             field("Amount Incl. Tax";"Amount Incl. Tax")
             {
@@ -83,6 +85,14 @@ page 6150671 "POS Entry Factbox"
     {
     }
 
+    trigger OnAfterGetRecord()
+    begin
+        //-NPR5.54 [393490]
+        if "Discount Amount" = 0 then
+          UpdateDiscountAmt;
+        //+NPR5.54 [393490]
+    end;
+
     local procedure TaxDetail()
     var
         TaxAmountLine: Record "POS Tax Amount Line";
@@ -102,6 +112,21 @@ page 6150671 "POS Entry Factbox"
           1: SalesLine.SetRange(Type,SalesLine.Type::Item);
         end;
         PAGE.Run(0,SalesLine);
+    end;
+
+    local procedure UpdateDiscountAmt()
+    var
+        POSSalesLine: Record "POS Sales Line";
+    begin
+        //-NPR5.54 [393490]
+        POSSalesLine.Reset;
+        POSSalesLine.SetRange("POS Entry No.","Entry No.");
+        if POSSalesLine.FindSet then begin
+          repeat
+            "Discount Amount" += POSSalesLine."Line Discount Amount Excl. VAT";
+          until POSSalesLine.Next = 0;
+        end;
+        //+NPR5.54 [393490]
     end;
 }
 

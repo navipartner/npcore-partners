@@ -21,6 +21,8 @@ page 6150617 "POS Unit Card"
     // NPR5.52/SARA/20190823 CASE 368395 Removed field 'SMS Profile' (Move to 'POS End of Day Profile')
     // NPR5.52/MHA /20191016 CASE 371388 Field 400 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
     // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
+    // NPR5.54/BHR /20200210 CASE 389444 Field 'POS Unit Receipt Text Profile'
+    // NPR5.54/TSA /20200219 CASE 391850 Added "POS Named Actions Profile"
 
     Caption = 'POS Unit Card';
     RefreshOnActivate = true;
@@ -70,6 +72,9 @@ page 6150617 "POS Unit Card"
                 field("Kiosk Mode Unlock PIN";"Kiosk Mode Unlock PIN")
                 {
                 }
+                field("POS Type";"POS Type")
+                {
+                }
                 field(Status;Status)
                 {
                 }
@@ -91,6 +96,9 @@ page 6150617 "POS Unit Card"
                 field("POS Posting Profile";"POS Posting Profile")
                 {
                 }
+                field("POS Unit Receipt Text Profile";"POS Unit Receipt Text Profile")
+                {
+                }
                 field("Ean Box Sales Setup";"Ean Box Sales Setup")
                 {
                     ShowMandatory = true;
@@ -99,6 +107,9 @@ page 6150617 "POS Unit Card"
                 {
                 }
                 field("Global POS Sales Setup";"Global POS Sales Setup")
+                {
+                }
+                field("POS Named Actions Profile";"POS Named Actions Profile")
                 {
                 }
             }

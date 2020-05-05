@@ -13,6 +13,8 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     // NPR5.53/MMV /20191211 CASE 377533 Changed protocol response handler.
     //                                   Added aux operations for detecting shopper & clearing shopper contracts.
     // NPR5.53/MMV /20200131 CASE 377533 Copy payment information onto void record for correct posting & log.
+    // NPR5.54/MMV /20200218 CASE 387990 Set recoverable false at the same time as external response received for acquire card.
+    // NPR5.54/MMV /20200414 CASE 364340 Handle card data correctly for voids
 
 
     trigger OnRun()
@@ -155,10 +157,23 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateLookupTransactionRequest', '', false, false)]
     local procedure OnCreateLookupTransactionRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    var
+        OriginalEftTransactionRequest: Record "EFT Transaction Request";
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
           exit;
         Handled := true;
+
+        //-NPR5.54 [364340]
+        OriginalEftTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
+        if OriginalEftTransactionRequest."Processing Type" = OriginalEftTransactionRequest."Processing Type"::VOID then begin
+          //Integration does not provide these values in void response so we copy manually
+          EftTransactionRequest."Card Number" := OriginalEftTransactionRequest."Card Number";
+          EftTransactionRequest."Card Name" := OriginalEftTransactionRequest."Card Name";
+          EftTransactionRequest."Card Application ID" := OriginalEftTransactionRequest."Card Application ID";
+          EftTransactionRequest."Card Issuer ID" := OriginalEftTransactionRequest."Card Issuer ID";
+        end;
+        //+NPR5.54 [364340]
 
         CreateGenericRequest(EftTransactionRequest);
         EftTransactionRequest.Insert(true);
@@ -197,10 +212,24 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateVoidRequest', '', false, false)]
     local procedure OnCreateVoidRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    var
+        OriginalEftTransactionRequest: Record "EFT Transaction Request";
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
           exit;
         Handled := true;
+
+        //-NPR5.54 [364340]
+        OriginalEftTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
+        if OriginalEftTransactionRequest.Recovered then
+          OriginalEftTransactionRequest.Get(OriginalEftTransactionRequest."Recovered by Entry No.");
+
+        //Integration does not provide these values in void response so we copy manually
+        EftTransactionRequest."Card Number" := OriginalEftTransactionRequest."Card Number";
+        EftTransactionRequest."Card Name" := OriginalEftTransactionRequest."Card Name";
+        EftTransactionRequest."Card Application ID" := OriginalEftTransactionRequest."Card Application ID";
+        EftTransactionRequest."Card Issuer ID" := OriginalEftTransactionRequest."Card Issuer ID";
+        //+NPR5.54 [364340]
 
         CreateGenericRequest(EftTransactionRequest);
         EftTransactionRequest.Recoverable := true;
@@ -374,25 +403,22 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         VoidedTrx: Record "EFT Transaction Request";
         PaymentTypePOS: Record "Payment Type POS";
         POSPaymentLine: Codeunit "POS Payment Line";
+        EFTPaymentMapping: Codeunit "EFT Payment Mapping";
     begin
         //-NPR5.53 [377533]
         //-NPR5.53 [377533]
         if EftTransactionRequest.Successful then begin
           Message(VOID_SUCCESS, EftTransactionRequest."Entry No.");
-          if not VoidedTrx.Get(EftTransactionRequest."Processed Entry No.") then
-            exit;
-          if VoidedTrx.Recovered then
-            if not VoidedTrx.Get(VoidedTrx."Recovered by Entry No.") then
-              exit;
 
-          if not POSPaymentLine.GetPaymentType(PaymentTypePOS, VoidedTrx."POS Payment Type Code", EftTransactionRequest."Register No.") then
-            exit;
-
-          EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
-          EftTransactionRequest."Card Number" := VoidedTrx."Card Number";
-          EftTransactionRequest."Card Name" := VoidedTrx."Card Name";
-          EftTransactionRequest."POS Description" := VoidedTrx."POS Description";
+        //-NPR5.54 [364340]
+          if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, PaymentTypePOS) then begin
+            EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
+            EftTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen (EftTransactionRequest."Card Name"));
+          end;
+          EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
           EftTransactionRequest.Modify;
+        //+NPR5.54 [364340]
+
         //+NPR5.53 [377533]
         end else begin
           Message(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
@@ -894,15 +920,17 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
           Message(ABORT_ACQUIRED_FAIL);
     end;
 
-    procedure AbortTransaction(EFTTransactionRequest: Record "EFT Transaction Request"): Boolean
+    procedure AbortTransaction(EFTTransactionRequest: Record "EFT Transaction Request";RegisterNo: Text;SalesTicketNo: Text): Boolean
     var
         EFTFrameworkMgt: Codeunit "EFT Framework Mgt.";
         AbortEFTTransactionRequest: Record "EFT Transaction Request";
         EFTSetup: Record "EFT Setup";
     begin
-        EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
+        //-NPR5.54 [364340]
+        EFTSetup.FindSetup(RegisterNo, EFTTransactionRequest."Original POS Payment Type Code");
 
-        EFTFrameworkMgt.CreateAuxRequest(AbortEFTTransactionRequest, EFTSetup, 1, EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
+        EFTFrameworkMgt.CreateAuxRequest(AbortEFTTransactionRequest, EFTSetup, 1, RegisterNo, SalesTicketNo);
+        //+NPR5.54 [364340]
         AbortEFTTransactionRequest."Processed Entry No." := EFTTransactionRequest."Entry No.";
         AbortEFTTransactionRequest.Modify;
         Commit;
@@ -956,9 +984,19 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         //-NPR5.53 [377533]
         if (EFTTransactionRequest."Initiated from Entry No." = 0) then
           exit;
+        //-NPR5.54 [387990]
+        if (EFTTransactionRequest."Processing Type" <> EFTTransactionRequest."Processing Type"::AUXILIARY) then
+          exit;
+        if (EFTTransactionRequest."Auxiliary Operation ID" <> 2) then
+          exit;
+        //+NPR5.54 [387990]
 
         OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
-        OriginalEFTTransactionRequest."External Result Received" := true; //We know the primary transaction "failed correctly" since we never started it in the first place.
+        OriginalEFTTransactionRequest."External Result Known" := true; //We know the primary transaction "failed correctly" since we never started it in the first place.
+        //-NPR5.54 [387990]
+        OriginalEFTTransactionRequest.Recoverable := false; //Not recoverable since we never started it in the first place.
+        OriginalEFTTransactionRequest."NST Error" := EFTTransactionRequest."NST Error";
+        //+NPR5.54 [387990]
         OriginalEFTTransactionRequest."Result Description" := EFTTransactionRequest."Result Description";
         OriginalEFTTransactionRequest."Result Display Text" := EFTTransactionRequest."Result Display Text";
         OriginalEFTTransactionRequest.Modify;

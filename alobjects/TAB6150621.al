@@ -29,6 +29,7 @@ table 6150621 "POS Entry"
     // NPR5.53/SARA/20191024 CASE 373672 Added Field 600..650
     // NPR5.53/ALPO/20191105 CASE 376035 Added field 180 "Event No." to save info about event used on sale
     // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
+    // NPR5.54/ALPO/20200324 CASE 397063 Global dimensions were not updated on assigned dimension change through ShowDimensions() function ("Dimensions" button)
 
     Caption = 'POS Entry';
     DrillDownPageID = "POS Entries";
@@ -444,7 +445,12 @@ table 6150621 "POS Entry"
         if (("Post Entry Status" = "Post Entry Status"::Posted) and ("Post Item Entry Status" = "Post Item Entry Status"::Posted)) then begin
           DimMgt.ShowDimensionSet("Dimension Set ID",StrSubstNo('%1 %2',TableCaption,"Entry No."));
         end else begin
-          "Dimension Set ID" := DimMgt.EditDimensionSet ("Dimension Set ID",StrSubstNo('%1 %2',TableCaption,"Entry No."));
+          //"Dimension Set ID" := DimMgt.EditDimensionSet ("Dimension Set ID",STRSUBSTNO('%1 %2',TABLECAPTION,"Entry No."));  //NPR5.54 [397063]-revoked
+          //-NPR5.54 [397063]
+          "Dimension Set ID" :=
+            DimMgt.EditDimensionSet2(
+              "Dimension Set ID",StrSubstNo('%1 %2',TableCaption,"Entry No."),"Shortcut Dimension 1 Code","Shortcut Dimension 2 Code");
+          //+NPR5.54 [397063]
           Modify ();
         end;
         //+NPR5.42 [314834]

@@ -10,6 +10,8 @@ report 6014446 "Salesperson Statistics"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.43/JDH /20180604 CASE 317971 Removed a danish unused label
+    // NPR5.54/YAHA/20200306 CASE 394845 Row visibility set to false for Inventory,Photo work, Afrunding, Combination & Customer
+    // NPR5.54/YAHA/20200324 CASE 394872 Removed Company Picture
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Salesperson Statistics.rdlc';
 

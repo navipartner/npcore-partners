@@ -1,0 +1,80 @@
+table 6150654 "POS Unit Receipt Text Profile"
+{
+    // NPR5.54/BHR /20200210 CASE 389444 Table 'POS Unit Receipt Text Profile'
+
+    Caption = 'POS Unit Receipt Text Profile';
+    LookupPageID = "POS Unit Receipt Text Profiles";
+
+    fields
+    {
+        field(1;"Code";Code[20])
+        {
+            Caption = 'Code';
+            Description = 'NPR5.54';
+        }
+        field(10;"Sales Ticket Line Text off";Option)
+        {
+            Caption = 'Sales Ticket Line Text off';
+            Description = 'NPR5.54';
+            OptionCaption = 'Pos Unit,Comment';
+            OptionMembers = "Pos Unit",Comment;
+        }
+        field(11;"Sales Ticket Line Text1";Code[50])
+        {
+            Caption = 'Sales Ticket Line Text1';
+            Description = 'NPR5.54';
+        }
+        field(12;"Sales Ticket Line Text2";Code[50])
+        {
+            Caption = 'Sales Ticket Line Text2';
+            Description = 'NPR5.54';
+        }
+        field(13;"Sales Ticket Line Text3";Code[50])
+        {
+            Caption = 'Sales Ticket Line Text3';
+            Description = 'NPR5.54';
+        }
+        field(14;"Sales Ticket Line Text4";Code[50])
+        {
+            Caption = 'Sales Ticket Line Text 4';
+            Description = 'NPR5.54';
+        }
+        field(15;"Sales Ticket Line Text5";Code[50])
+        {
+            Caption = 'Sales Ticket Line Text 5';
+            Description = 'NPR5.54';
+        }
+        field(16;"Sales Ticket Line Text6";Code[50])
+        {
+            Caption = 'Sales Ticket Line Text6';
+            Description = 'NPR5.54';
+        }
+        field(17;"Sales Ticket Line Text7";Code[50])
+        {
+            Caption = 'Sales Ticket Line Text7';
+            Description = 'NPR5.54';
+        }
+        field(18;"Sales Ticket Line Text8";Code[50])
+        {
+            Caption = 'Sales Ticket Line Text8';
+            Description = 'NPR5.54';
+        }
+        field(19;"Sales Ticket Line Text9";Code[50])
+        {
+            Caption = 'Sales Ticket Line Text9';
+            Description = 'NPR5.54';
+        }
+    }
+
+    keys
+    {
+        key(Key1;"Code")
+        {
+        }
+    }
+
+    fieldgroups
+    {
+    }
+}
+

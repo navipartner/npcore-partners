@@ -7,6 +7,7 @@ codeunit 6151169 "POS Action - NpGp Return"
     // NPR5.53/ALST/20191106 CASE 337539 removed setup check
     // NPR5.53/ALST/20191119 CASE 376308 added event handler for EAN box
     // NPR5.53/ALST/20191216 CASE 379255 changed EAN box handler
+    // NPR5.54/MMV /20200220 CASE 391871 Moved GUID creation from table subscribers to table trigger to have everything centralized.
 
     Permissions = TableData "Service Password" = rimd;
 
@@ -478,7 +479,9 @@ codeunit 6151169 "POS Action - NpGp Return"
                 SaleLinePOS."Return Sale Sales Ticket No." := TempNpGpPOSSalesEntry."Document No.";
                 SaleLinePOS."Return Sales Sales Type" := SalePOS."Sale type";
                 SaleLinePOS."Return Reason Code" := ReturnReasonCode;
-                SaleLinePOS."Retail ID" := CreateGuid;
+        //-NPR5.54 [391871]
+        //    SaleLinePOS."Retail ID" := CREATEGUID;
+        //+NPR5.54 [391871]
 
                 SaleLinePOS.Modify(true);
 
@@ -660,7 +663,9 @@ codeunit 6151169 "POS Action - NpGp Return"
                 else
                     SaleLinePOS.Validate(Quantity, -1);
 
-                SaleLinePOS."Retail ID" := CreateGuid;
+        //-NPR5.54 [391871]
+        //    SaleLinePOS."Retail ID" := CREATEGUID;
+        //+NPR5.54 [391871]
                 SaleLinePOS."Return Sale No." := SalePOS."Sales Ticket No.";
                 SaleLinePOS."Return Sale Register No." := SalePOS."Register No.";
                 SaleLinePOS."Return Sale Sales Ticket No." := TempNpGpPOSSalesEntry."Document No.";

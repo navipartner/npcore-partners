@@ -1,4 +1,4 @@
-pageextension 6014455 pageextension6014455 extends "Location Card" 
+pageextension 6014456 pageextension6014456 extends "Location Card" 
 {
     // NPR5.26/JLK /20160905  CASE 251231 Added field Store Group Code
     layout

@@ -18,6 +18,8 @@ page 6014433 "Payment Type - Card"
     // NPR5.51/TJ  /20190628 CASE 359385 Added field 110 "Open Drawer"
     // NPR5.51/JAKUBV/20190903  CASE 357069 Transport NPR5.51 - 3 September 2019
     // NPR5.52/JAKUBV/20191022  CASE 373294 Transport NPR5.52 - 22 October 2019
+    // NPR5.54/MMV /20200225 CASE 364340 Added tip & surcharge fields.
+    //                                   Removed legacy fields.
 
     Caption = 'Payment Type Card';
     PromotedActionCategories = 'New,Process,Prints,Master Data,Test5,Test6,Test7,Test8';
@@ -179,36 +181,6 @@ page 6014433 "Payment Type - Card"
                 field("Global Dimension 2 Code";"Global Dimension 2 Code")
                 {
                 }
-                field("Fee G/L Acc. No.";"Fee G/L Acc. No.")
-                {
-
-                    trigger OnValidate()
-                    begin
-                        
-                        //CurrForm."Fee %".EDITABLE := Fee <> '';
-                        //CurrForm."Fixed fee".EDITABLE := Fee <> '';
-                        //CurrForm."Fee item".EDITABLE := Fee <> '';
-                        //CurrForm."Max Amount".EDITABLE := Fee <> '';
-                        //{CurrForm."Min amount".EDITABLE := Fee <> '';
-                         /*
-                        "Fee%Editable":= Fee <> '';
-                        FixedFeeEditable:= Fee <> '';
-                        MaxAmountEditable:= Fee <> '';
-                        MinAmountEditable:= Fee <> '';
-                        FeeItemEditable:= Fee <> '';
-                        */
-
-                    end;
-                }
-                field("Fee Pct.";"Fee Pct.")
-                {
-                }
-                field("Fixed Fee";"Fixed Fee")
-                {
-                }
-                field("Fee Item No.";"Fee Item No.")
-                {
-                }
                 field("Maximum Amount";"Maximum Amount")
                 {
                 }
@@ -218,17 +190,16 @@ page 6014433 "Payment Type - Card"
                 field("Allow Refund";"Allow Refund")
                 {
                 }
+                field("EFT Surcharge Service Item No.";"EFT Surcharge Service Item No.")
+                {
+                }
+                field("EFT Tip Service Item No.";"EFT Tip Service Item No.")
+                {
+                }
             }
             group(Integration)
             {
                 Caption = 'Integration';
-                group("Member Card")
-                {
-                    Caption = 'Member Card';
-                    field("Loyalty Card Type";"Loyalty Card Type")
-                    {
-                    }
-                }
                 group(Specialization)
                 {
                     Caption = 'Specialization';

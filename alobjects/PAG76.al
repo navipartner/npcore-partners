@@ -1,4 +1,4 @@
-pageextension 6014475 pageextension6014475 extends "Resource Card" 
+pageextension 6014476 pageextension6014476 extends "Resource Card" 
 {
     // NPR5.29/TJ/20161013 CASE 248723 New field E-Mail
     // NPR5.32/TJ/20170519 CASE 275966 New field Over Capacitate Resource

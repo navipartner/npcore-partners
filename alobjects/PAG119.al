@@ -5,6 +5,7 @@ pageextension 6014401 pageextension6014401 extends "User Setup"
     // NPR5.48/TS  /20181220  CASE 338956 Field User Setup has been added.
     // NPR5.49/ZESO/20190313  CASE 348556 Field E-mail Removed as it was already displayed.
     // NPR5.52/ZESO/20190925  CASE 358656 Added Anonymize Customers
+    // NPR5.54/TSA /20200221 CASE 392247 Added "Block Role Center"
     layout
     {
         addafter("Time Sheet Admin.")
@@ -22,6 +23,9 @@ pageextension 6014401 pageextension6014401 extends "User Setup"
         addafter(Email)
         {
             field("Anonymize Customers";"Anonymize Customers")
+            {
+            }
+            field("Block Role Center";"Block Role Center")
             {
             }
         }

@@ -9,6 +9,7 @@ codeunit 6014502 SMS
     // NPR5.40/JDH /20180320 CASE 308647 cleaned up code and variables
     // NPR5.51/THRO/20190710 CASE 360944 Added option to send sms to Nc Endpoint
     // NPR5.53/ZESO/20200110 CASE 382779 Change in Credentials Old UserName : navipartner, Old password : n4vipartner
+    // NPR5.54/ZESO/20200309 CASE 382779 Change in URL, '+'no longer accepted in Phone Nos by LinkMobility
 
 
     trigger OnRun()
@@ -101,20 +102,34 @@ codeunit 6014502 SMS
           PhoneNo := '+45'+PhoneNo;
         end;
 
+        //-NPR5.54 [382779]
+        PhoneNo := DelChr(PhoneNo,'=','+');
+        //+NPR5.54 [382779]
+
         if ServiceCalc.useService(ServiceCode) then begin
           SMSMessage := DelChr(Util.Ansi2Ascii(SMSMessage),'%','');
           if not IsNull(HttpRequest) then
             Clear(HttpRequest);
-          HttpRequest := HttpRequest.Create('http://sms.coolsmsc.dk/sendsms.php?message=' +
-                                            SMSMessage +
-                                            '&to=' + PhoneNo +
-                                            '&from=' + From +
+
+          //-NPR5.54 [382779]
+          //HttpRequest := HttpRequest.Create('http://sms.coolsmsc.dk/sendsms.php?message=' +
+                                            //SMSMessage +
+                                            //'&to=' + PhoneNo +
+                                            //'&from=' + From +
                                             //-NPR5.53 [382779]
                                             //'&username=navipartner' +
                                             //'&password=n4vipartner');
-                                            '&username= O7LbM2B6' +
-                                            '&password=OujrSE78');
+                                           // '&username= O7LbM2B6' +
+                                            //'&password=OujrSE78');
                                             //+NPR5.53 [382779]
+
+          HttpRequest := HttpRequest.Create('https://wsx.sp247.net/linkdk/?' +
+                                            'username=2517_12D8'+
+                                            '&password=W36nshJ8'+
+                                            '&to=' + PhoneNo +
+                                            '&message=' + SMSMessage +
+                                            '&from=' + From);
+          //+NPR5.54 [382779]
           HttpRequest.Timeout := 10000;
           HttpRequest.UseDefaultCredentials(true);
           HttpRequest.Method := 'POST';
