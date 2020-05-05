@@ -13,7 +13,7 @@ codeunit 6184863 "Request Management"
         NullInputlXMLErr: Label 'Imput XML document must not be null';
         NoElementsErr: Label 'InputXML has 0 elements';
 
-    procedure HMACCryptography(var StringToSign: Text;"Key": Text;HMAC: Option HMACMD5,HMACSHA1,HMACSHA256,HMACSHA384,HMACSHA512)
+    procedure HMACCryptography(var StringToSign: Text; "Key": Text; HMAC: Option HMACMD5,HMACSHA1,HMACSHA256,HMACSHA384,HMACSHA512)
     var
         KeyedHashAlgorithm: DotNet npNetKeyedHashAlgorithm;
         Encoding: DotNet npNetEncoding;
@@ -29,7 +29,7 @@ codeunit 6184863 "Request Management"
         StringToSign := Convert.ToBase64String(HashBytes);
     end;
 
-    procedure HandleHttpRequest(HttpWebRequest: DotNet npNetHttpWebRequest;var Response: Text;Silent: Boolean): Boolean
+    procedure HandleHttpRequest(HttpWebRequest: DotNet npNetHttpWebRequest; var Response: Text; Silent: Boolean): Boolean
     var
         MockRequest: Codeunit "Mock Request";
         HttpWebResponse: DotNet npNetHttpWebResponse;
@@ -42,37 +42,37 @@ codeunit 6184863 "Request Management"
         ClearLastError;
 
         if MockRequest.GetResponse() > '' then begin
-          Response := MockRequest.GetResponse();
-          MockRequest.SetResponse('');
+            Response := MockRequest.GetResponse();
+            MockRequest.SetResponse('');
 
-          exit(true);
+            exit(true);
         end;
 
         if TrySendHttpRequest(HttpWebRequest, HttpWebResponse) then begin
-          if HttpWebResponse.GetResponseHeader('Content-Length') > '' then begin
-            //MemoryStream is cast to ConnectStream at runtime, most of its properties and methods will not be available
-            MemoryStream := HttpWebResponse.GetResponseStream();
-            BinaryReader := BinaryReader.BinaryReader(MemoryStream);
-            ByteArray := BinaryReader.ReadBytes(Convert.ToInt32(HttpWebResponse.GetResponseHeader('Content-Length')));
-            MemoryStream.FlushAsync();
+            if HttpWebResponse.GetResponseHeader('Content-Length') > '' then begin
+                //MemoryStream is cast to ConnectStream at runtime, most of its properties and methods will not be available
+                MemoryStream := HttpWebResponse.GetResponseStream();
+                BinaryReader := BinaryReader.BinaryReader(MemoryStream);
+                ByteArray := BinaryReader.ReadBytes(Convert.ToInt32(HttpWebResponse.GetResponseHeader('Content-Length')));
+                MemoryStream.FlushAsync();
 
-            Response := Convert.ToBase64String(ByteArray);
-          end else begin
-            StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream());
+                Response := Convert.ToBase64String(ByteArray);
+            end else begin
+                StreamReader := StreamReader.StreamReader(HttpWebResponse.GetResponseStream());
 
-            Response := StreamReader.ReadToEnd();
+                Response := StreamReader.ReadToEnd();
 
-            StreamReader.Dispose();
-          end;
+                StreamReader.Dispose();
+            end;
 
-          exit(true);
+            exit(true);
         end;
 
         if not Silent then
-          Error(GetLastErrorText);
+            Error(GetLastErrorText);
     end;
 
-    procedure HandleFTPRequest(FTPWebRequest: DotNet npNetFtpWebRequest;var Response: Text;Silent: Boolean): Boolean
+    procedure HandleFTPRequest(FTPWebRequest: DotNet npNetFtpWebRequest; var Response: Text; Silent: Boolean): Boolean
     var
         MockRequest: Codeunit "Mock Request";
         FTPWebResponse: DotNet npNetFtpWebResponse;
@@ -85,40 +85,40 @@ codeunit 6184863 "Request Management"
         ClearLastError;
 
         if MockRequest.GetResponse() > '' then begin
-          Response := MockRequest.GetResponse();
-          MockRequest.SetResponse('');
+            Response := MockRequest.GetResponse();
+            MockRequest.SetResponse('');
 
-          exit(true);
+            exit(true);
         end;
 
         if TrySendFTPRequest(FTPWebRequest, FTPWebResponse) then begin
-          if FTPWebRequest.Method = 'RETR' then begin
-            MemoryStream := FTPWebResponse.GetResponseStream();
-            BinaryReader := BinaryReader.BinaryReader(MemoryStream);
+            if FTPWebRequest.Method = 'RETR' then begin
+                MemoryStream := FTPWebResponse.GetResponseStream();
+                BinaryReader := BinaryReader.BinaryReader(MemoryStream);
 
-            while MemoryStream.CanRead do begin
-              ByteArray := BinaryReader.ReadBytes(1048576);
+                while MemoryStream.CanRead do begin
+                    ByteArray := BinaryReader.ReadBytes(1048576);
 
-              Response += Convert.ToBase64String(ByteArray);
+                    Response += Convert.ToBase64String(ByteArray);
+                end;
+
+                MemoryStream.FlushAsync();
+            end else begin
+                StreamReader := StreamReader.StreamReader(FTPWebResponse.GetResponseStream());
+
+                Response := StreamReader.ReadToEnd();
+
+                StreamReader.Dispose();
             end;
 
-            MemoryStream.FlushAsync();
-          end else begin
-            StreamReader := StreamReader.StreamReader(FTPWebResponse.GetResponseStream());
-
-            Response := StreamReader.ReadToEnd();
-
-            StreamReader.Dispose();
-          end;
-
-          exit(true);
+            exit(true);
         end;
 
         if not Silent then
-          Error(GetLastErrorText);
+            Error(GetLastErrorText);
     end;
 
-    procedure CreateFTPRequest(var FTPWebRequest: DotNet npNetFtpWebRequest;FTPHost: Text;FTPCode: Code[10];Command: Code[10];Secure: Boolean)
+    procedure CreateFTPRequest(var FTPWebRequest: DotNet npNetFtpWebRequest; FTPHost: Text; FTPCode: Code[10]; Command: Code[10]; Secure: Boolean)
     var
         FTPSetup: Record "FTP Setup";
         NetworkCredentials: DotNet npNetNetworkCredential;
@@ -136,13 +136,13 @@ codeunit 6184863 "Request Management"
     end;
 
     [TryFunction]
-    procedure TrySendHttpRequest(var HttpWebRequest: DotNet npNetHttpWebRequest;var HttpWebResponse: DotNet npNetHttpWebResponse)
+    procedure TrySendHttpRequest(var HttpWebRequest: DotNet npNetHttpWebRequest; var HttpWebResponse: DotNet npNetHttpWebResponse)
     begin
         HttpWebResponse := HttpWebRequest.GetResponse();
     end;
 
     [TryFunction]
-    procedure TrySendFTPRequest(var FTPWebRequest: DotNet npNetFtpWebRequest;var FTPWebResponse: DotNet npNetFtpWebResponse)
+    procedure TrySendFTPRequest(var FTPWebRequest: DotNet npNetFtpWebRequest; var FTPWebResponse: DotNet npNetFtpWebResponse)
     begin
         FTPWebResponse := FTPWebRequest.GetResponse();
     end;
@@ -156,12 +156,12 @@ codeunit 6184863 "Request Management"
         TempBlob.Blob.CreateInStream(InStr);
 
         repeat
-          Bytes := InStr.Read(Red);
-          Lenght += Bytes;
+            Bytes := InStr.Read(Red);
+            Lenght += Bytes;
         until Bytes = 0;
     end;
 
-    procedure StreamToHttpRequest(var HttpWebRequest: DotNet npNetHttpWebRequest;var TempBlob: Record TempBlob;ContentLenght: BigInteger)
+    procedure StreamToHttpRequest(var HttpWebRequest: DotNet npNetHttpWebRequest; var TempBlob: Record TempBlob; ContentLenght: BigInteger)
     var
         InStr: InStream;
         Stream: DotNet npNetStream;
@@ -180,7 +180,7 @@ codeunit 6184863 "Request Management"
         Stream.Close();
     end;
 
-    procedure StreamToFTPRequest(var FTPWebRequest: DotNet npNetFtpWebRequest;var TempBlob: Record TempBlob;ContentLenght: BigInteger)
+    procedure StreamToFTPRequest(var FTPWebRequest: DotNet npNetFtpWebRequest; var TempBlob: Record TempBlob; ContentLenght: BigInteger)
     var
         InStr: InStream;
         Stream: DotNet npNetStream;
@@ -211,10 +211,10 @@ codeunit 6184863 "Request Management"
         DateTimeOffset := DateTimeOffset.DateTimeOffset(DateTime);
         DateTimeOffset := DateTimeOffset.ToLocalTime;
 
-        exit(DateTimeOffset.ToString(Format,CultureInfo));
+        exit(DateTimeOffset.ToString(Format, CultureInfo));
     end;
 
-    procedure JsonAdd(var Json: Text;Property: Text;Value: Variant;JString: Boolean)
+    procedure JsonAdd(var Json: Text; Property: Text; Value: Variant; JString: Boolean)
     var
         CR: Char;
         LF: Char;
@@ -230,27 +230,27 @@ codeunit 6184863 "Request Management"
         JObject := JObject.JObject();
 
         if Json > '' then begin
-          TextReader := StringReader.StringReader(Json);
-          JSONTextReader := JSONTextReader.JsonTextReader(TextReader);
-          JObject := JToken.ReadFrom(JSONTextReader);
+            TextReader := StringReader.StringReader(Json);
+            JSONTextReader := JSONTextReader.JsonTextReader(TextReader);
+            JObject := JToken.ReadFrom(JSONTextReader);
         end;
 
         JObject.Add(Property, JToken);
 
         case true of
-          Value.IsBoolean:
-            ReplaceSubstringAnyLength(JObject.ToString(), TextValue, 'null', Format(Value, 0, 9));
-          Value.IsText, Value.IsCode:
-            begin
-              if not JString then
-                Quotes := '"';
+            Value.IsBoolean:
+                ReplaceSubstringAnyLength(JObject.ToString(), TextValue, 'null', Format(Value, 0, 9));
+            Value.IsText, Value.IsCode:
+                begin
+                    if not JString then
+                        Quotes := '"';
 
-              ReplaceSubstringAnyLength(JObject.ToString(), TextValue, 'null', Quotes + Format(Value) + Quotes);
-            end;
-          Value.IsDecimal, Value.IsBigInteger, Value.IsInteger:
-            ReplaceSubstringAnyLength(JObject.ToString(), TextValue, 'null', Format(Value, 0, 2));
-          else
-            Error(JSONValueDefErr);
+                    ReplaceSubstringAnyLength(JObject.ToString(), TextValue, 'null', Quotes + Format(Value) + Quotes);
+                end;
+            Value.IsDecimal, Value.IsBigInteger, Value.IsInteger:
+                ReplaceSubstringAnyLength(JObject.ToString(), TextValue, 'null', Format(Value, 0, 2));
+            else
+                Error(JSONValueDefErr);
         end;
 
         Json := TextValue;
@@ -261,7 +261,7 @@ codeunit 6184863 "Request Management"
         Json := DelChr(Json, '=', Format(CR) + Format(LF));
     end;
 
-    procedure GetJsonValueByPropertyNameSingleNode(JsonText: Text;PropertyName: Text): Text
+    procedure GetJsonValueByPropertyNameSingleNode(JsonText: Text; PropertyName: Text): Text
     var
         JObject: DotNet npNetJObject;
         JToken: DotNet npNetJToken;
@@ -280,7 +280,7 @@ codeunit 6184863 "Request Management"
         exit(JToken.ToString);
     end;
 
-    procedure GetXMLFromJsonArray(JsonText: Text;var XMLList: DotNet npNetXmlDocument;ArrayPropertyName: Text;ExtractFromProperty: Text;CheckProperty: Text;CheckPropertyValue: Text): Boolean
+    procedure GetXMLFromJsonArray(JsonText: Text; var XMLList: DotNet npNetXmlDocument; ArrayPropertyName: Text; ExtractFromProperty: Text; CheckProperty: Text; CheckPropertyValue: Text): Boolean
     var
         XMLElement: DotNet npNetXmlElement;
         XMLRoot: DotNet npNetXmlNode;
@@ -304,26 +304,26 @@ codeunit 6184863 "Request Management"
         Jarray := JObject.SelectToken(ArrayPropertyName);
 
         foreach JToken in Jarray do
-          if (CheckProperty = '') or
-            (GetJsonValueByPropertyNameSingleNode(JToken.ToString(), CheckProperty) = CheckPropertyValue)
-          then begin
-            XMLElement := XMLList.CreateElement(Format(DelChr(CreateGuid,'=','{-}')));
-            XMLElement.InnerText := Uri.UnescapeDataString(JToken.SelectToken(ExtractFromProperty).ToString());
-            XMLRoot.AppendChild(XMLElement);
-          end;
+            if (CheckProperty = '') or
+              (GetJsonValueByPropertyNameSingleNode(JToken.ToString(), CheckProperty) = CheckPropertyValue)
+            then begin
+                XMLElement := XMLList.CreateElement(Format(DelChr(CreateGuid, '=', '{-}')));
+                XMLElement.InnerText := Uri.UnescapeDataString(JToken.SelectToken(ExtractFromProperty).ToString());
+                XMLRoot.AppendChild(XMLElement);
+            end;
 
         exit(XMLRoot.ChildNodes.Count() > 0);
     end;
 
     [TryFunction]
-    procedure TryGetMIMEType(FileName: Text;var MIMEType: Text)
+    procedure TryGetMIMEType(FileName: Text; var MIMEType: Text)
     var
         MimeMapping: DotNet npNetMimeMapping;
     begin
         MIMEType := MimeMapping.GetMimeMapping(FileName);
     end;
 
-    procedure ReplaceSubstringAnyLength(Original: Text;var New: Text;FromStr: Text;ToStr: Text)
+    procedure ReplaceSubstringAnyLength(Original: Text; var New: Text; FromStr: Text; ToStr: Text)
     var
         Position: Integer;
         SubStr: Text;
@@ -331,9 +331,9 @@ codeunit 6184863 "Request Management"
         Position := StrPos(Original, FromStr);
 
         if Position = 0 then begin
-          New += Original;
+            New += Original;
 
-          exit;
+            exit;
         end;
 
         SubStr := CopyStr(Original, Position + StrLen(FromStr));
@@ -350,34 +350,34 @@ codeunit 6184863 "Request Management"
         WebExceptionStatus: DotNet npNetWebExceptionStatus;
     begin
         if IsNull(GetLastErrorObject) then
-          exit;
+            exit;
 
         Exception := GetLastErrorObject;
 
         WebException := WebException.WebException();
         if not Exception.InnerException.GetType.Equals(WebException.GetType()) then
-          Error(Exception.Message());
+            Error(Exception.Message());
 
         WebException := Exception.InnerException();
 
         //can't compare .Net variables directly
-        if WebException.Status().ToString() = WebExceptionStatus.NameResolutionFailure().ToString() then
-          Error(WrongPathErr);
+        if WebException.Status().ToString() = WebExceptionStatus.NameResolutionFailure.ToString() then
+            Error(WrongPathErr);
 
         Error(WebException.Message());
     end;
 
-    procedure FindLastOccuranceInString(String: Text;Char: Char) Position: Integer
+    procedure FindLastOccuranceInString(String: Text; Char: Char) Position: Integer
     var
         i: Integer;
     begin
         for i := 1 to StrLen(String) do
-          if CopyStr(String, i, 1) = Format(Char) then
-            Position := i;
+            if CopyStr(String, i, 1) = Format(Char) then
+                Position := i;
     end;
 
     [TryFunction]
-    procedure GetNodesFromXmlText(XMLText: Text;XPath: Text;var XMLNodeList: DotNet npNetXmlNodeList)
+    procedure GetNodesFromXmlText(XMLText: Text; XPath: Text; var XMLNodeList: DotNet npNetXmlNodeList)
     var
         XMLDocument: DotNet npNetXmlDocument;
     begin
@@ -386,34 +386,34 @@ codeunit 6184863 "Request Management"
         XMLNodeList := XMLDocument.SelectNodes(XPath);
     end;
 
-    procedure AppendXML(InputXML: DotNet npNetXmlDocument;ParentNodeName: Text;var OutputXML: DotNet npNetXmlDocument)
+    procedure AppendXML(InputXML: DotNet npNetXmlDocument; ParentNodeName: Text; var OutputXML: DotNet npNetXmlDocument)
     var
         XMLNode: DotNet npNetXmlNode;
         XMLRoot: DotNet npNetXmlNode;
     begin
         case true of
-          IsNull(InputXML):
-            Error(NullInputlXMLErr);
-          InputXML.ChildNodes.Count() = 0:
-            Error(NoElementsErr);
-          IsNull(OutputXML):
-            begin
-              if ParentNodeName = '' then
-                ParentNodeName := 'root';
+            IsNull(InputXML):
+                Error(NullInputlXMLErr);
+            InputXML.ChildNodes.Count() = 0:
+                Error(NoElementsErr);
+            IsNull(OutputXML):
+                begin
+                    if ParentNodeName = '' then
+                        ParentNodeName := 'root';
 
-              OutputXML := OutputXML.XmlDocument();
-              XMLRoot := OutputXML.CreateElement(ParentNodeName);
-              OutputXML.AppendChild(XMLRoot);
-            end;
+                    OutputXML := OutputXML.XmlDocument();
+                    XMLRoot := OutputXML.CreateElement(ParentNodeName);
+                    OutputXML.AppendChild(XMLRoot);
+                end;
         end;
 
         if ParentNodeName = '' then
-          XMLRoot := OutputXML.DocumentElement
+            XMLRoot := OutputXML.DocumentElement
         else
-          XMLRoot := OutputXML.SelectSingleNode(ParentNodeName);
+            XMLRoot := OutputXML.SelectSingleNode(ParentNodeName);
 
         foreach XMLNode in InputXML.FirstChild.ChildNodes do
-          XMLRoot.AppendChild(XMLRoot.OwnerDocument.ImportNode(XMLNode, true));
+            XMLRoot.AppendChild(XMLRoot.OwnerDocument.ImportNode(XMLNode, true));
     end;
 }
 

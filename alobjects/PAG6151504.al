@@ -49,12 +49,12 @@ page 6151504 "Nc Import List"
                 group(Filters)
                 {
                     Caption = 'Filters';
-                    field("COUNT";Count)
+                    field("COUNT"; Count)
                     {
                         Caption = 'Quantity';
                         Editable = false;
                     }
-                    field(FilterImportType;FilterImportType)
+                    field(FilterImportType; FilterImportType)
                     {
                         Caption = 'Import Type';
                         TableRelation = "Nc Import Type";
@@ -64,7 +64,7 @@ page 6151504 "Nc Import List"
                             SetPresetFilters();
                         end;
                     }
-                    field("Show Exported";ShowImported)
+                    field("Show Exported"; ShowImported)
                     {
                         Caption = 'Show Imported';
 
@@ -77,13 +77,13 @@ page 6151504 "Nc Import List"
                 group(Control6150632)
                 {
                     ShowCaption = false;
-                    field(Control6150622;'')
+                    field(Control6150622; '')
                     {
                         Caption = 'Error Message:                                                                                                                                                                                                                                                                                _';
                         HideValue = true;
                         ShowCaption = false;
                     }
-                    field(ErrorText;ErrorText)
+                    field(ErrorText; ErrorText)
                     {
                         Editable = false;
                         MultiLine = true;
@@ -94,53 +94,53 @@ page 6151504 "Nc Import List"
             repeater(Control6150613)
             {
                 ShowCaption = false;
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
                     Editable = false;
                 }
-                field(Date;Date)
+                field(Date; Date)
                 {
                     Editable = false;
                 }
-                field("<Filter Import Type>";"Import Type")
+                field("<Filter Import Type>"; "Import Type")
                 {
                 }
-                field("Document ID";"Document ID")
-                {
-                    Visible = false;
-                }
-                field("Sequence No.";"Sequence No.")
+                field("Document ID"; "Document ID")
                 {
                     Visible = false;
                 }
-                field("Document Name";"Document Name")
+                field("Sequence No."; "Sequence No.")
+                {
+                    Visible = false;
+                }
+                field("Document Name"; "Document Name")
                 {
                     Editable = false;
                 }
-                field(Imported;Imported)
+                field(Imported; Imported)
                 {
                     Editable = false;
                 }
-                field("Runtime Error";"Runtime Error")
+                field("Runtime Error"; "Runtime Error")
                 {
                 }
-                field("Last Error E-mail Sent at";"Last Error E-mail Sent at")
-                {
-                    Visible = false;
-                }
-                field("Last Error E-mail Sent to";"Last Error E-mail Sent to")
+                field("Last Error E-mail Sent at"; "Last Error E-mail Sent at")
                 {
                     Visible = false;
                 }
-                field("Import Started at";"Import Started at")
+                field("Last Error E-mail Sent to"; "Last Error E-mail Sent to")
                 {
                     Visible = false;
                 }
-                field("Import Completed at";"Import Completed at")
+                field("Import Started at"; "Import Started at")
                 {
                     Visible = false;
                 }
-                field("Import Duration";"Import Duration")
+                field("Import Completed at"; "Import Completed at")
+                {
+                    Visible = false;
+                }
+                field("Import Duration"; "Import Duration")
                 {
                     Visible = false;
                 }
@@ -255,8 +255,8 @@ page 6151504 "Nc Import List"
                     CalcFields("Document Source");
                     TempBlob.Blob := "Document Source";
                     if not TempBlob.Blob.HasValue then
-                      exit;
-                    Path := FileMgt.BLOBExport(TempBlob,TemporaryPath + "Document Name",true);
+                        exit;
+                    Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + "Document Name", true);
                     //+NC2.23 [360787]
                 end;
             }
@@ -281,11 +281,11 @@ page 6151504 "Nc Import List"
                     //FileName := FileMgt.BLOBImportWithFilter(TempBlob,'Import Layout','',FileFilterTxt,FileFilterTxt);
                     Extension := FileMgt.GetExtension("Document Name");
                     if Extension = '' then
-                      Extension := '*';
-                    FileName := FileMgt.BLOBImportWithFilter(TempBlob,Text005,"Document Name",FileMgt.GetToFilterText('',"Document Name"),'*.' + Extension);
+                        Extension := '*';
+                    FileName := FileMgt.BLOBImportWithFilter(TempBlob, Text005, "Document Name", FileMgt.GetToFilterText('', "Document Name"), '*.' + Extension);
                     //+NC2.24 [373525]
                     if FileName = '' then
-                      exit;
+                        exit;
 
                     "Document Source" := TempBlob.Blob;
                     Modify(true);
@@ -347,15 +347,15 @@ page 6151504 "Nc Import List"
         Filename: Text;
     begin
         //-NC2.08 [297159]
-        Filename := FileMgt.BLOBImport(TempBlob,'*.*');
+        Filename := FileMgt.BLOBImport(TempBlob, '*.*');
         if Filename = '' then
-          exit;
+            exit;
 
         Filename := FileMgt.GetFileName(Filename);
 
         Init;
         "Entry No." := 0;
-        "Document Name" := CopyStr(Filename,1,MaxStrLen("Document Name"));
+        "Document Name" := CopyStr(Filename, 1, MaxStrLen("Document Name"));
         "Document Source" := TempBlob.Blob;
         Date := CurrentDateTime;
         Insert(true);
@@ -372,14 +372,14 @@ page 6151504 "Nc Import List"
 
         Reset;
         if ShowImported then
-          SetRange(Imported)
+            SetRange(Imported)
         else
-          SetRange(Imported,false);
+            SetRange(Imported, false);
 
         if FilterImportType = '' then
-          SetRange("Import Type")
+            SetRange("Import Type")
         else
-          SetRange("Import Type",FilterImportType);
+            SetRange("Import Type", FilterImportType);
 
         FilterGroup(0);
         if Get(CurrentEntryNo) then;
@@ -390,8 +390,8 @@ page 6151504 "Nc Import List"
     var
         ActiveSession: Record "Active Session";
     begin
-        if ActiveSession.Get(ServiceInstanceId,SessionId) then
-          exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
+        if ActiveSession.Get(ServiceInstanceId, SessionId) then
+            exit(ActiveSession."Client Type" = ActiveSession."Client Type"::"Web Client");
         exit(false);
     end;
 
@@ -411,7 +411,7 @@ page 6151504 "Nc Import List"
         //    ErrorText += FORMAT(CR) + FORMAT(LF);
         //  ErrorText += Line;
         // END;
-        ErrorText := NcImportMgt.GetErrorMessage(Rec,false);
+        ErrorText := NcImportMgt.GetErrorMessage(Rec, false);
         //+NC2.02 [262318]
     end;
 
@@ -426,8 +426,8 @@ page 6151504 "Nc Import List"
     begin
         CalcFields("Document Source");
         TempBlob.Blob := "Document Source";
-        Path := FileMgt.BLOBExport(TempBlob,TemporaryPath + "Document Name",false);
-        SyncMgt.RunProcess('notepad.exe',Path,true);
+        Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + "Document Name", false);
+        SyncMgt.RunProcess('notepad.exe', Path, true);
         Path := FileMgt.UploadFileSilent(Path);
 
         f.Open(Path);
@@ -435,7 +435,7 @@ page 6151504 "Nc Import List"
         //-NC2.24 [373525]
         Clear(TempBlob);
         TempBlob.Blob.CreateOutStream(OutStr);
-        CopyStream(OutStr,InStr);
+        CopyStream(OutStr, InStr);
         //+NC2.24 [373525]
         f.Close;
         Erase(Path);
@@ -455,13 +455,13 @@ page 6151504 "Nc Import List"
         ImportedCount := 0;
         CurrPage.SetSelectionFilter(ImportEntry);
         if ImportEntry.FindSet then
-          repeat
-            NaviConnectSyncMgt.ProcessImportEntry(ImportEntry);
-            ImportEntry.Get(ImportEntry."Entry No.");
-            ImportedCount += 1;
-          until ImportEntry.Next = 0;
-        ImportEntry.SetRange("Runtime Error",true);
-        Message(StrSubstNo(Text004,ImportedCount,ImportEntry.Count));
+            repeat
+                NaviConnectSyncMgt.ProcessImportEntry(ImportEntry);
+                ImportEntry.Get(ImportEntry."Entry No.");
+                ImportedCount += 1;
+            until ImportEntry.Next = 0;
+        ImportEntry.SetRange("Runtime Error", true);
+        Message(StrSubstNo(Text004, ImportedCount, ImportEntry.Count));
         //+NC1.21
     end;
 
@@ -470,13 +470,13 @@ page 6151504 "Nc Import List"
         ImportEntry: Record "Nc Import Entry";
     begin
         CurrPage.SetSelectionFilter(ImportEntry);
-        if Confirm(StrSubstNo(Text002,ImportEntry.Count),true) then begin
-          //-NC2.16 [313184]
-          //ImportEntry.MODIFYALL("Runtime Error",FALSE,TRUE);
-          ImportEntry.ModifyAll(Imported,false,false);
-          ImportEntry.ModifyAll("Runtime Error",false,false);
-          //+NC2.16 [313184]
-          CurrPage.Update(false);
+        if Confirm(StrSubstNo(Text002, ImportEntry.Count), true) then begin
+            //-NC2.16 [313184]
+            //ImportEntry.MODIFYALL("Runtime Error",FALSE,TRUE);
+            ImportEntry.ModifyAll(Imported, false, false);
+            ImportEntry.ModifyAll("Runtime Error", false, false);
+            //+NC2.16 [313184]
+            CurrPage.Update(false);
         end;
     end;
 
@@ -486,8 +486,8 @@ page 6151504 "Nc Import List"
     begin
         ImportType.Get("Import Type");
         ImportType.TestField("Lookup Codeunit ID");
-        if not(CODEUNIT.Run(ImportType."Lookup Codeunit ID",Rec)) then
-          Message(Text003);
+        if not (CODEUNIT.Run(ImportType."Lookup Codeunit ID", Rec)) then
+            Message(Text003);
     end;
 
     local procedure ShowDocumentSource()
@@ -502,18 +502,18 @@ page 6151504 "Nc Import List"
         //-NC2.12 [308107]
         CalcFields("Document Source");
         if "Document Source".HasValue then
-          if IsWebClient() then begin
-            "Document Source".CreateInStream(InStr);
-            StreamReader := StreamReader.StreamReader(InStr);
-            Content := StreamReader.ReadToEnd();
-            Message(Content);
-          end else begin
-            TempBlob.Blob := "Document Source";
-            Path := FileMgt.BLOBExport(TempBlob,TemporaryPath + "Document Name",false);
-            HyperLink(Path);
-          end
+            if IsWebClient() then begin
+                "Document Source".CreateInStream(InStr);
+                StreamReader := StreamReader.StreamReader(InStr);
+                Content := StreamReader.ReadToEnd();
+                Message(Content);
+            end else begin
+                TempBlob.Blob := "Document Source";
+                Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + "Document Name", false);
+                HyperLink(Path);
+            end
         else
-          Message(Text001);
+            Message(Text001);
         //+NC2.12 [308107]
     end;
 
@@ -537,38 +537,38 @@ page 6151504 "Nc Import List"
         CalcFields("Document Source");
         if "Document Source".HasValue then begin
 
-          TestField("Import Type");
-          NcImportType.Get("Import Type");
+            TestField("Import Type");
+            NcImportType.Get("Import Type");
 
-          NcImportType.CalcFields("XML Stylesheet");
-          if not NcImportType."XML Stylesheet".HasValue then
-            Error(Text006);
+            NcImportType.CalcFields("XML Stylesheet");
+            if not NcImportType."XML Stylesheet".HasValue then
+                Error(Text006);
 
-          TempBlob.Blob := NcImportType."XML Stylesheet";
-          XMLStylesheetPath := FileMgt.BLOBExport(TempBlob,'Stylesheet.xslt',false);
-          //HYPERLINK(XMLStylesheetPath);
+            TempBlob.Blob := NcImportType."XML Stylesheet";
+            XMLStylesheetPath := FileMgt.BLOBExport(TempBlob, 'Stylesheet.xslt', false);
+            //HYPERLINK(XMLStylesheetPath);
 
-          XslCompiledTransform := XslCompiledTransform.XslCompiledTransform;
-          XslCompiledTransform.Load(XMLStylesheetPath);
+            XslCompiledTransform := XslCompiledTransform.XslCompiledTransform;
+            XslCompiledTransform.Load(XMLStylesheetPath);
 
-          LocalTempFile := FileMgt.ClientTempFileName('html');
+            LocalTempFile := FileMgt.ClientTempFileName('html');
 
-          TempBlob.Blob := "Document Source";
-          Path := FileMgt.BLOBExport(TempBlob,TemporaryPath + "Document Name",false);
+            TempBlob.Blob := "Document Source";
+            Path := FileMgt.BLOBExport(TempBlob, TemporaryPath + "Document Name", false);
 
-          XslCompiledTransform.Transform(Path, LocalTempFile);
+            XslCompiledTransform.Transform(Path, LocalTempFile);
 
-          ServerFileName := FileMgt.UploadFileSilent(LocalTempFile);
+            ServerFileName := FileMgt.UploadFileSilent(LocalTempFile);
 
-          HtmlContent := GetFormattedDocumentAsString(ServerFileName, true);//HYPERLINK(LocalTempFile);
-          PreviewFormattedDocument("Document Name", HtmlContent);
+            HtmlContent := GetFormattedDocumentAsString(ServerFileName, true);//HYPERLINK(LocalTempFile);
+            PreviewFormattedDocument("Document Name", HtmlContent);
 
         end else
-          Message(Text001);
+            Message(Text001);
         //+NPR5.54 [366790]
     end;
 
-    local procedure GetFormattedDocumentAsString(FileName: Text;DeleteFile: Boolean) String: Text
+    local procedure GetFormattedDocumentAsString(FileName: Text; DeleteFile: Boolean) String: Text
     var
         TempFile: File;
         Istream: InStream;
@@ -577,22 +577,22 @@ page 6151504 "Nc Import List"
     begin
         //-NPR5.54 [366790]
         if Exists(FileName) then begin
-          TempFile.Open(FileName);
-          TempFile.CreateInStream(Istream);
+            TempFile.Open(FileName);
+            TempFile.CreateInStream(Istream);
 
-          StreamReader := StreamReader.StreamReader(Istream,Encoding.Unicode);
-          String := StreamReader.ReadToEnd();
-          TempFile.Close;
+            StreamReader := StreamReader.StreamReader(Istream, Encoding.Unicode);
+            String := StreamReader.ReadToEnd();
+            TempFile.Close;
 
-          if DeleteFile then
-            FILE.Erase(FileName);
+            if DeleteFile then
+                FILE.Erase(FileName);
 
-          exit(String);
+            exit(String);
         end;
         //+NPR5.54 [366790]
     end;
 
-    local procedure PreviewFormattedDocument(Title: Text;Content: Text)
+    local procedure PreviewFormattedDocument(Title: Text; Content: Text)
     var
         HTMLContent: Text;
         JToken: DotNet npNetJToken;
@@ -608,34 +608,35 @@ page 6151504 "Nc Import List"
         WebBrowser: DotNet npNetWebBrowser;
         [RunOnClient]
         FormWindowState: DotNet npNetFormWindowState;
+        ActiveFormAlHelper: Variant;
     begin
         //-NPR5.54 [366790]
         if (Content = '') then
-          exit;
+            exit;
 
-        if CurrentClientType in [CLIENTTYPE::Tablet,CLIENTTYPE::Web,CLIENTTYPE::Phone] then begin
-          Message('Brigde framework is missing\Please use the RTC client for previewing');
+        if CurrentClientType in [CLIENTTYPE::Tablet, CLIENTTYPE::Web, CLIENTTYPE::Phone] then begin
+            Message('Brigde framework is missing\Please use the RTC client for previewing');
         end else begin
-          WinForm := WinForm.Form;
-          Colour := Colour.Color;
-          WinText := WinText.TextBox;
-          WinForm.Width := 1000;
-          WinForm.Height := 600;
-          WinForm.ActiveForm;
-          WinForm.Text := Title;
-          WinForm.WindowState := FormWindowState.Normal;
-          WinForm.ShowInTaskbar := false;
-          WinForm.ShowIcon := false;
+            WinForm := WinForm.Form;
+            Colour := Colour.Color;
+            WinText := WinText.TextBox;
+            WinForm.Width := 1000;
+            WinForm.Height := 600;
+            ActiveFormAlHelper := WinForm.ActiveForm;
+            WinForm.Text := Title;
+            WinForm.WindowState := FormWindowState.Normal;
+            WinForm.ShowInTaskbar := false;
+            WinForm.ShowIcon := false;
 
-          WebBrowser := WebBrowser.WebBrowser;
-          WebBrowser.Dock :=  DockStyle.Fill;
-          WebBrowser.DocumentText := '0';
-          WebBrowser.Document.OpenNew(true);
-          WebBrowser.Document.Write(Content);
-          WebBrowser.Refresh();
+            WebBrowser := WebBrowser.WebBrowser;
+            WebBrowser.Dock := DockStyle.Fill;
+            WebBrowser.DocumentText := '0';
+            WebBrowser.Document.OpenNew(true);
+            WebBrowser.Document.Write(Content);
+            WebBrowser.Refresh();
 
-          WinForm.Controls.Add(WebBrowser);
-          WinForm.ShowDialog;
+            WinForm.Controls.Add(WebBrowser);
+            WinForm.ShowDialog;
         end;
         //+NPR5.54 [366790]
     end;
