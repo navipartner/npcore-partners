@@ -1248,29 +1248,5 @@ codeunit 6151399 "CS UI Warehouse Activity V2"
 
         CSWarehouseActivityHandling.Modify(true);
     end;
-
-    trigger DOMxmlin::NodeInserting(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeInserted(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeRemoving(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeRemoved(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanging(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
-
-    trigger DOMxmlin::NodeChanged(sender: Variant;e: DotNet npNetXmlNodeChangedEventArgs)
-    begin
-    end;
 }
 
