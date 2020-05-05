@@ -1,3 +1,4 @@
+/*
 codeunit 6151306 "NpEc Upg. NPR5.54"
 {
     // #390380/MHA /20200311  CASE 390380 Object created - Upgrade Codeunit for Np E-commerce [VLOBJUPG] Object may be deleted after upgrade
@@ -25,4 +26,4 @@ codeunit 6151306 "NpEc Upg. NPR5.54"
         DataUpgradeMgt.SetTableSyncSetup(DATABASE::"Return Receipt Header",0,TableSynchSetup.Mode::Force);
     end;
 }
-
+*/
