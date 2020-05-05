@@ -1,4 +1,4 @@
-pageextension 6014456 pageextension6014456 extends "Item Cross Reference Entries" 
+pageextension 6014457 pageextension6014457 extends "Item Cross Reference Entries" 
 {
     // NPR5.47/CLVA/20181019 CASE 318296 New field Rfid Tag
     layout

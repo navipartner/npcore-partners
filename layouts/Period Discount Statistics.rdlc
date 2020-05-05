@@ -2682,22 +2682,6 @@
                 <PaddingBottom>2pt</PaddingBottom>
               </Style>
             </Textbox>
-            <Image Name="Image1">
-              <Source>Database</Source>
-              <Value>=Convert.ToBase64String(Fields!Picture_CompanyInformation.Value)</Value>
-              <MIMEType>image/bmp</MIMEType>
-              <Sizing>FitProportional</Sizing>
-              <Top>0.125in</Top>
-              <Left>8.35917in</Left>
-              <Height>0.46052in</Height>
-              <Width>2.5625in</Width>
-              <ZIndex>5</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-              </Style>
-            </Image>
             <Textbox Name="Textbox77">
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
@@ -2722,7 +2706,7 @@
               <Left>10.16471in</Left>
               <Height>0.51833cm</Height>
               <Width>0.35474in</Width>
-              <ZIndex>6</ZIndex>
+              <ZIndex>5</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -2757,7 +2741,7 @@
               <Left>10.53069in</Left>
               <Height>0.51833cm</Height>
               <Width>0.37848in</Width>
-              <ZIndex>7</ZIndex>
+              <ZIndex>6</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -3201,7 +3185,7 @@
               <Top>1.10083in</Top>
               <Height>0.7in</Height>
               <Width>10.96056in</Width>
-              <ZIndex>8</ZIndex>
+              <ZIndex>7</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>

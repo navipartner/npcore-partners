@@ -1,9 +1,15 @@
 codeunit 6150797 "POS Action - Cancel Sale"
 {
-    // NPR5.32/ANEN /20170321  CASE 269494 Adding to sal line pos, sale typ cancelled
+    // NPR5.32/ANEN/20170321 CASE 269494 Adding to sal line pos, sale typ cancelled
     // NPR5.38/MMV /20171120 CASE 296802 Use new delete function for robustness against invalid POSSaleLine state.
-    // NPR5.42/BHR/20180510  CASE 313914 Added Security functionality
+    // NPR5.42/BHR /20180510 CASE 313914 Added Security functionality
     // NPR5.46/TSA /20180914 CASE 314603 Refactored the security functionality to use secure methods
+    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale:
+    //                                   - Function CancelSale():
+    //                                     - removed unused call paramters: Context (DotNet Newtonsoft.Json.Linq.JObject.'Newtonsoft.Json) & FrontEnd (Codeunit POS Front End Management)
+    //                                     - added return value (boolean)
+    //                                     - set to global
+    // NPR5.54/MMV /20200217 CASE 364658 Added configurable start of new sale to allow business logic first.
 
 
     trigger OnRun()
@@ -49,7 +55,8 @@ codeunit 6150797 "POS Action - Cancel Sale"
         if not Action.IsThisAction(ActionCode) then
             exit;
 
-        CancelSale(Context, POSSession, FrontEnd);
+        //CancelSale (Context, POSSession, FrontEnd);  //NPR5.54 [364658]-revoked
+        CancelSaleAndStartNew(POSSession);  //NPR5.54 [364658]
         Handled := true;
     end;
 
@@ -64,23 +71,24 @@ codeunit 6150797 "POS Action - Cancel Sale"
     local procedure OnBeforeWorkflow("Action": Record "POS Action"; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; var Handled: Boolean)
     var
         Context: Codeunit "POS JSON Management";
-        POSPaymentLine: Codeunit "POS Payment Line";
-        SaleAmount: Decimal;
-        PaidAmount: Decimal;
-        ReturnAmount: Decimal;
-        Subtotal: Decimal;
     begin
-
+        
         if not Action.IsThisAction(ActionCode) then
             exit;
-
-        POSSession.GetPaymentLine(POSPaymentLine);
-        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
-        if (PaidAmount <> 0) then
-            Error(PartlyPaid);
-
+        
+        //-NPR5.54 [364658]-revoked
+        /*
+        POSSession.GetPaymentLine (POSPaymentLine);
+        POSPaymentLine.CalculateBalance (SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+        IF (PaidAmount <> 0) THEN
+          ERROR (PartlyPaid);
+        */
+        //+NPR5.54 [364658]-revoked
+        CheckSaleBeforeCancel(POSSession);  //NPR5.54 [364658]
+        
         FrontEnd.SetActionContext(ActionCode, Context);
         Handled := true;
+
     end;
 
     local procedure ActionCode(): Text
@@ -94,17 +102,47 @@ codeunit 6150797 "POS Action - Cancel Sale"
         exit('1.2'); //-+NPR5.46 [314603]
     end;
 
-    local procedure CancelSale(Context: JsonObject; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management")
+    procedure CheckSaleBeforeCancel(POSSession: Codeunit "POS Session")
+    var
+        POSPaymentLine: Codeunit "POS Payment Line";
+        PaidAmount: Decimal;
+        ReturnAmount: Decimal;
+        SaleAmount: Decimal;
+        Subtotal: Decimal;
+    begin
+        //-NPR5.54 [364658]
+        POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+        if (PaidAmount <> 0) then
+          Error(PartlyPaid);
+        //+NPR5.54 [364658]
+    end;
+
+    procedure CancelSaleAndStartNew(POSSession: Codeunit "POS Session"): Boolean
     var
         JSON: Codeunit "POS JSON Management";
         POSSaleLine: Codeunit "POS Sale Line";
         POSSale: Codeunit "POS Sale";
         Line: Record "Sale Line POS";
     begin
+        //-NPR5.54 [364658]
+        if not CancelSale(POSSession) then
+          exit(false);
 
-        JSON.InitializeJObjectParser(Context, FrontEnd);
-        POSSession.GetSaleLine(POSSaleLine);
+        POSSession.GetSale(POSSale);
+        POSSale.SelectViewForEndOfSale(POSSession);
+        exit(true);
+        //+NPR5.54 [364658]
+    end;
 
+    procedure CancelSale(POSSession: Codeunit "POS Session"): Boolean
+    var
+        POSSaleLine: Codeunit "POS Sale Line";
+        POSSale: Codeunit "POS Sale";
+        Line: Record "Sale Line POS";
+    begin
+        //-NPR5.54 [364658]
+        POSSession.GetSaleLine (POSSaleLine);
         POSSaleLine.DeleteAll();
 
         with Line do begin
@@ -112,11 +150,11 @@ codeunit 6150797 "POS Action - Cancel Sale"
             Description := StrSubstNo(CANCEL_SALE, CurrentDateTime);
             "Sale Type" := "Sale Type"::Cancelled;
         end;
-
         POSSaleLine.InsertLine(Line);
 
         POSSession.GetSale(POSSale);
-        POSSale.TryEndSale(POSSession);
+        exit(POSSale.TryEndSale2(POSSession, false));
+        //+NPR5.54 [364658]
     end;
 }
 

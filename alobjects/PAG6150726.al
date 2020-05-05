@@ -5,6 +5,7 @@ page 6150726 "POS Action Sequences"
     Caption = 'POS Action Sequences';
     PageType = List;
     SourceTable = "POS Action Sequence";
+    UsageCategory = Administration;
 
     layout
     {

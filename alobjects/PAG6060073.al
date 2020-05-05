@@ -2,8 +2,9 @@ page 6060073 "MM Membership Alteration Jnl"
 {
     // MM1.25/TSA /20171213 CASE 299783 Initial Version
     // MM1.26/TSA /20180131 CASE 303546 Added Customer No as alternative search term in external membership no field
-    // #334163/JDH /20181109 CASE 334163 Added Caption to Actions
+    // MM1.34/JDH /20181109 CASE 334163 Added Caption to Actions
     // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
+    // MM1.43/TSA /20200402 CASE 398329 Added action for batch renew
 
     Caption = 'Membership Alteration Journal';
     PageType = List;
@@ -114,6 +115,26 @@ page 6060073 "MM Membership Alteration Jnl"
                 begin
 
                     AlterMemberships (true);
+                end;
+            }
+            action("Batch Renew")
+            {
+                Caption = 'Batch Renew';
+                Ellipsis = true;
+                Image = CalculatePlan;
+                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedCategory = Process;
+                //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
+                //PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    BatchRenewReport: Report "MM Membership Batch Renew";
+                begin
+
+                    BatchRenewReport.LaunchAlterationJnlPage (false);
+                    BatchRenewReport.RunModal ();
+                    CurrPage.Update (false);
                 end;
             }
         }

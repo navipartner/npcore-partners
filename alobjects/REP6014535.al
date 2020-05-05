@@ -15,6 +15,7 @@ report 6014535 "Sales Statistics By Department"
     // TM1.39/THRO/20181126  CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
     // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
     // NPR5.51/BHR /20190708 CASE 361268  Add filter on blank dimension
+    // NPR5.54/YAHA/20200306 CASE 394848  Increase field Percentage in RDLC
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Sales Statistics By Department.rdlc';
 

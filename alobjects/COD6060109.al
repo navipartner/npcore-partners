@@ -4,6 +4,7 @@ codeunit 6060109 "TM Offline Ticket Validation"
     // TM1.24/TSA /20170807 CASE 286185 Added handling default handling for emptpy fields
     // TM1.40/TSA /20190318 CASE 348952 Fixed an issue when selecting an incorrect time
     // TM1.40/TSA /20190318 CASE 348952 Fixed an issue when ticket has more than one admission object
+    // TM90.1.46/TSA /20200127 CASE 376136 Close a possible reservation when registering offline admission
 
 
     trigger OnRun()
@@ -18,7 +19,9 @@ codeunit 6060109 "TM Offline Ticket Validation"
         DEFAULT_ADM: Label 'Default Admission Code selected.';
         DEFAULT_DATE: Label 'Default date selected.';
         DEFAULT_TIME: Label 'Default time selected.';
-        NO_ADMISSION_FOR_TIME: Label '%1 %2 does not identify a valid schedule entry.';
+        NO_ADMISSION_FOR_TIME: Label '%1 %2 does not identify a valid schedule entry for %3.';
+        RESERVATION_DATE: Label 'Reservation date selected.';
+        RESERVATION_TIME: Label 'Reservation time selected.';
 
     procedure ProcessImportBatch(ImportBatchNo: Integer)
     var
@@ -44,6 +47,7 @@ codeunit 6060109 "TM Offline Ticket Validation"
         TicketAdmissionBOM: Record "TM Ticket Admission BOM";
         InvalidEntry: Boolean;
         ScheduleEntryNo: Integer;
+        ExternalEntryNo: Integer;
     begin
 
         if (not OfflineTicketValidation.Get (EntryNo)) then
@@ -119,31 +123,37 @@ codeunit 6060109 "TM Offline Ticket Validation"
           exit (true);
         end;
 
-        if (OfflineTicketValidation."Event Date" = 0D) then begin
-          OfflineTicketValidation."Event Date" := Today;
-          OfflineTicketValidation."Process Response Text" := StrSubstNo ('%1 %2', OfflineTicketValidation."Process Response Text", DEFAULT_DATE);
-        end;
 
-        if (OfflineTicketValidation."Event Time" = 0T) then begin
-          OfflineTicketValidation."Event Time" := Time;
-          OfflineTicketValidation."Process Response Text" := StrSubstNo ('%1 %2', OfflineTicketValidation."Process Response Text", DEFAULT_TIME);
-        end;
-
+        //-TM90.1.46 [376136] - Get Reservation Time / restructured
         repeat
+
+          if (GetInitialEntry (Ticket."No.", AccessEntry."Admission Code", ExternalEntryNo)) then
+            SetInitialTime (ExternalEntryNo, false, OfflineTicketValidation);
+
+          if (GetReservation (Ticket."No.", AccessEntry."Admission Code", ExternalEntryNo)) then
+            SetReservationTime (ExternalEntryNo, true, OfflineTicketValidation);
+
+          if (OfflineTicketValidation."Event Date" = 0D) then begin
+            OfflineTicketValidation."Event Date" := Today;
+            OfflineTicketValidation."Process Response Text" := StrSubstNo ('%1 %2', OfflineTicketValidation."Process Response Text", DEFAULT_DATE);
+          end;
+
+          if (OfflineTicketValidation."Event Time" = 0T) then begin
+            OfflineTicketValidation."Event Time" := Time;
+            OfflineTicketValidation."Process Response Text" := StrSubstNo ('%1 %2', OfflineTicketValidation."Process Response Text", DEFAULT_TIME);
+          end;
+          //+TM90.1.46 [376136]
+
           ScheduleEntryNo := GetInternalScheduleEntryNo (AccessEntry."Admission Code", OfflineTicketValidation."Event Date", OfflineTicketValidation."Event Time");
 
-          //-TM1.40 [348952]
-          // RegisterArrival_Worker (AccessEntry."Entry No.", ScheduleEntryNo, OfflineTicketValidation."Event Date", OfflineTicketValidation."Event Time");
           if (ScheduleEntryNo = 0) then begin
             OfflineTicketValidation."Process Status" := OfflineTicketValidation."Process Status"::INVALID;
-            OfflineTicketValidation."Process Response Text" := StrSubstNo (NO_ADMISSION_FOR_TIME, OfflineTicketValidation."Event Date", OfflineTicketValidation."Event Time");
+            OfflineTicketValidation."Process Response Text" := StrSubstNo (NO_ADMISSION_FOR_TIME, OfflineTicketValidation."Event Date", OfflineTicketValidation."Event Time", AccessEntry."Admission Code");
           end else begin
             RegisterArrival_Worker (AccessEntry."Entry No.", ScheduleEntryNo, OfflineTicketValidation."Event Date", OfflineTicketValidation."Event Time");
           end;
-          //-TM1.40 [348952]
 
         until (AccessEntry.Next () = 0);
-        //+TM1.24 [286185]
 
         OfflineTicketValidation.Modify ();
         exit (true);
@@ -263,6 +273,47 @@ codeunit 6060109 "TM Offline Ticket Validation"
         AdmittedTicketAccessEntry."User ID" := UserId;
         AdmittedTicketAccessEntry."Scanner Station ID" := StrSubstNo ('Offline on %1', CurrentDateTime);
         AdmittedTicketAccessEntry.Insert ();
+
+        //-TM90.1.46 [376136]
+        CloseReservationEntry (AdmittedTicketAccessEntry);
+        //+TM90.1.46 [376136]
+    end;
+
+    local procedure CloseReservationEntry(var ClosedByAccessEntry: Record "TM Det. Ticket Access Entry"): Boolean
+    var
+        DetailedTicketAccessEntry: Record "TM Det. Ticket Access Entry";
+    begin
+
+        //-TM90.1.46 [376136]
+        exit (CloseTicketAccessEntry (ClosedByAccessEntry, DetailedTicketAccessEntry.Type::RESERVATION));
+        //+TM90.1.46 [376136]
+    end;
+
+    local procedure CloseTicketAccessEntry(var ClosedByAccessEntry: Record "TM Det. Ticket Access Entry";ClosingEntryType: Option) Closed: Boolean
+    var
+        DetailedTicketAccessEntry: Record "TM Det. Ticket Access Entry";
+    begin
+
+        //-TM90.1.46 [376136]
+        DetailedTicketAccessEntry.SetCurrentKey ("Ticket Access Entry No.", Type, Open, "Posting Date");
+        DetailedTicketAccessEntry.SetFilter ("Ticket Access Entry No.", '=%1', ClosedByAccessEntry."Ticket Access Entry No.");
+        DetailedTicketAccessEntry.SetFilter (Type, '=%1', ClosingEntryType);
+        DetailedTicketAccessEntry.SetFilter (Open, '=%1', true);
+        if (DetailedTicketAccessEntry.FindFirst ()) then begin
+          DetailedTicketAccessEntry."Closed By Entry No." := ClosedByAccessEntry."Entry No.";
+          DetailedTicketAccessEntry.Open := false;
+          DetailedTicketAccessEntry.Modify ();
+          Closed := true;
+        end;
+
+        if (ClosedByAccessEntry.Type = ClosedByAccessEntry.Type::DEPARTED) then
+          ClosedByAccessEntry."External Adm. Sch. Entry No." := DetailedTicketAccessEntry."External Adm. Sch. Entry No.";
+
+        if (ClosedByAccessEntry.Quantity < 0) then
+          ClosedByAccessEntry."External Adm. Sch. Entry No." := DetailedTicketAccessEntry."External Adm. Sch. Entry No.";
+
+        exit (Closed);
+        //+TM90.1.46 [376136]
     end;
 
     procedure GetInternalScheduleEntryNo(AdmissionCode: Code[20];ArrivalDate: Date;ArrivalTime: Time): Integer
@@ -279,6 +330,110 @@ codeunit 6060109 "TM Offline Ticket Validation"
         if (AdmissionScheduleEntry.FindFirst ()) then ;
 
         exit (AdmissionScheduleEntry."Entry No.");
+    end;
+
+    local procedure GetReservation(TicketNo: Code[20];AdmissionCode: Code[20];var ExternalReservationEntryNo: Integer): Boolean
+    var
+        TicketAccessEntry: Record "TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "TM Det. Ticket Access Entry";
+    begin
+
+        //-TM90.1.46 [376136]
+        if (AdmissionCode = '') then
+          exit (false);
+
+        if (AdmissionCode = '*') then
+          exit (false);
+
+        TicketAccessEntry.SetFilter ("Ticket No.", '=%1', TicketNo);
+        TicketAccessEntry.SetFilter ("Admission Code", '=%1', AdmissionCode);
+        if (not TicketAccessEntry.FindFirst ()) then
+          exit (false);
+
+        DetTicketAccessEntry.SetFilter ("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+        DetTicketAccessEntry.SetFilter (Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
+        if (not DetTicketAccessEntry.FindFirst ()) then
+          exit (false);
+
+        ExternalReservationEntryNo := DetTicketAccessEntry."External Adm. Sch. Entry No.";
+        exit (true);
+        //+TM90.1.46 [376136]
+    end;
+
+    local procedure SetReservationTime(ExternalAdmSchEntryNo: Integer;ForceUpdate: Boolean;var OfflineTicketValidation: Record "TM Offline Ticket Validation")
+    var
+        AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
+    begin
+
+        //-TM90.1.46 [376136]
+        AdmissionScheduleEntry.SetFilter ("External Schedule Entry No.", '=%1', ExternalAdmSchEntryNo);
+        AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
+        if (not AdmissionScheduleEntry.FindLast ()) then
+          exit;
+
+        if (OfflineTicketValidation."Event Date" = 0D) or (ForceUpdate) then begin
+          OfflineTicketValidation."Event Date" := AdmissionScheduleEntry."Admission Start Date";
+          OfflineTicketValidation."Process Response Text" := StrSubstNo ('%1 %2', OfflineTicketValidation."Process Response Text", RESERVATION_DATE);
+        end;
+
+        if (OfflineTicketValidation."Event Time" = 0T) or (ForceUpdate) then begin
+          OfflineTicketValidation."Event Time" := AdmissionScheduleEntry."Admission Start Time";
+          OfflineTicketValidation."Process Response Text" := StrSubstNo ('%1 %2', OfflineTicketValidation."Process Response Text", RESERVATION_TIME);
+        end;
+
+        //+TM90.1.46 [376136]
+    end;
+
+    local procedure GetInitialEntry(TicketNo: Code[20];AdmissionCode: Code[20];var ExternalAdmissionEntryNo: Integer): Boolean
+    var
+        TicketAccessEntry: Record "TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "TM Det. Ticket Access Entry";
+    begin
+
+        //-TM90.1.46 [376136]
+        if (AdmissionCode = '') then
+          exit (false);
+
+        if (AdmissionCode = '*') then
+          exit (false);
+
+        TicketAccessEntry.SetFilter ("Ticket No.", '=%1', TicketNo);
+        TicketAccessEntry.SetFilter ("Admission Code", '=%1', AdmissionCode);
+        if (not TicketAccessEntry.FindFirst ()) then
+          exit (false);
+
+        DetTicketAccessEntry.SetFilter ("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+        DetTicketAccessEntry.SetFilter (Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+        if (not DetTicketAccessEntry.FindFirst ()) then
+          exit (false);
+
+        ExternalAdmissionEntryNo := DetTicketAccessEntry."External Adm. Sch. Entry No.";
+        exit (true);
+        //+TM90.1.46 [376136]
+    end;
+
+    local procedure SetInitialTime(ExternalAdmSchEntryNo: Integer;ForceUpdate: Boolean;var OfflineTicketValidation: Record "TM Offline Ticket Validation")
+    var
+        AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
+    begin
+
+        //-TM90.1.46 [376136]
+        AdmissionScheduleEntry.SetFilter ("External Schedule Entry No.", '=%1', ExternalAdmSchEntryNo);
+        AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
+        if (not AdmissionScheduleEntry.FindLast ()) then
+          exit;
+
+        if (OfflineTicketValidation."Event Date" = 0D) or (ForceUpdate) then begin
+          OfflineTicketValidation."Event Date" := AdmissionScheduleEntry."Admission Start Date";
+          OfflineTicketValidation."Process Response Text" := StrSubstNo ('%1 %2', OfflineTicketValidation."Process Response Text", DEFAULT_DATE);
+        end;
+
+        if (OfflineTicketValidation."Event Time" = 0T) or (ForceUpdate) then begin
+          OfflineTicketValidation."Event Time" := AdmissionScheduleEntry."Admission Start Time";
+          OfflineTicketValidation."Process Response Text" := StrSubstNo ('%1 %2', OfflineTicketValidation."Process Response Text", DEFAULT_TIME);
+        end;
+
+        //+TM90.1.46 [376136]
     end;
 }
 

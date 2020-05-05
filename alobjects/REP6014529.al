@@ -4,6 +4,8 @@ report 6014529 "Vendor/Salesperson"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/TJ  /20180208  CASE 302634 Renamed Name property of controls totalTurnover and totalTotalTurnover
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
+    // NPR5.54/YAHA/20200603  CASE 394857 Removed Navipartner label
+    // NPR5.54/YAHA/20200324  CASE 394883 Removed footer NaviPartner  text
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/VendorSalesperson.rdlc';
 

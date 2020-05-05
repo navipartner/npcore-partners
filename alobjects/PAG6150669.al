@@ -1,8 +1,9 @@
 page 6150669 "NPRE Restaurant Setup"
 {
-    // NPR5.34/ANEN  /2017012  CASE 270255 Object Created for Hospitality - Version 1.0
-    // NPR5.35/ANEN /20170821 CASE 283376 Solution rename to NP Restaurant
-    // NPR5.41/THRO /20180412 CASE 309873 Replaced 2 template fields by a listpart page for setup of multiple templates
+    // NPR5.34/ANEN /2017012 CASE 270255 Object Created for Hospitality - Version 1.0
+    // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
+    // NPR5.41/THRO/20180412 CASE 309873 Replaced 2 template fields by a listpart page for setup of multiple templates
+    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
 
     Caption = 'Restaurant Setup';
     PageType = Card;
@@ -20,31 +21,89 @@ page 6150669 "NPRE Restaurant Setup"
                 {
                 }
             }
-            group(Print)
+            group(KitchenInegration)
             {
-                Caption = 'Print';
-                field("Auto Print Kitchen Order";"Auto Print Kitchen Order")
+                Caption = 'Kitchen Integration';
+                field("Auto Send Kitchen Order";"Auto Send Kitchen Order")
                 {
                 }
+                field("Resend All On New Lines";"Resend All On New Lines")
+                {
+                }
+                group(Print)
+                {
+                    Caption = 'Print';
+                    field("Kitchen Printing Active";"Kitchen Printing Active")
+                    {
+                    }
+                }
+                group(KDS)
+                {
+                    Caption = 'KDS';
+                    Visible = ShowKDS;
+                    field("KDS Active";"KDS Active")
+                    {
+                    }
+                    field("Order ID Assign. Method";"Order ID Assign. Method")
+                    {
+                    }
+                }
             }
-            part(Templates;"NPRE Print Templates Subpage")
+            part(PrintTemplates;"NPRE Print Templates Subpage")
             {
-                Caption = 'Templates';
+                Caption = 'Print Templates';
             }
         }
     }
 
     actions
     {
-        area(processing)
+        area(navigation)
         {
-            action("Print Category")
+            action("Print Categories")
             {
-                Caption = 'Print Category';
+                Caption = 'Print Categories';
                 Image = PrintForm;
                 RunObject = Page "NPRE Print Categories";
             }
+            action(Restaurants)
+            {
+                Caption = 'Restaurants';
+                Image = NewBranch;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                RunObject = Page "NPRE Restaurants";
+            }
+            group(Kitchen)
+            {
+                Caption = 'Kitchen';
+                action(KitchenStations)
+                {
+                    Caption = 'Stations';
+                    Image = Departments;
+                    RunObject = Page "NPRE Kitchen Stations";
+                    RunPageLink = "Restaurant Code"=CONST('');
+                }
+                action(KitchenStationSelection)
+                {
+                    Caption = 'Station Selection Setup';
+                    Image = Troubleshoot;
+                    RunObject = Page "NPRE Kitchen Station Selection";
+                    RunPageLink = "Restaurant Code"=CONST('');
+                }
+            }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        KitchenOrderMgt: Codeunit "NPRE Kitchen Order Mgt.";
+    begin
+        ShowKDS := KitchenOrderMgt.KDSAvailable();
+    end;
+
+    var
+        ShowKDS: Boolean;
 }
 

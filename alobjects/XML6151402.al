@@ -12,6 +12,8 @@ xmlport 6151402 "Magento Document Export"
     // MAG2.20/TSA /20190424 CASE 345376 Added currency_code element
     // MAG2.22/TSA /20190531 CASE 345376 Added more information to the shipment section
     // MAG2.22/TSA /20190531 CASE 345376 Added shipment method code on the related document section
+    // MAG2.25/TSA /20200210 CASE 390073 Added Sell-to Contact and Your Reference, Due Date and Remaining Amount
+    // MAG2.25/TSA /20200218 CASE 388058 Added Quotes to magento service
 
     Caption = 'Magento Document Export';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/naviconnect/documents';
@@ -40,6 +42,18 @@ xmlport 6151402 "Magento Document Export"
                 {
                 }
                 fieldelement(currency_code;SalesInvHeader."Currency Code")
+                {
+                }
+                fieldelement(sell_to_contact;SalesInvHeader."Sell-to Contact")
+                {
+                }
+                fieldelement(your_reference;SalesInvHeader."Your Reference")
+                {
+                }
+                fieldelement(due_date;SalesInvHeader."Due Date")
+                {
+                }
+                fieldelement(remaining_amount;SalesInvHeader."Remaining Amount")
                 {
                 }
                 textelement(salesinvlines)
@@ -205,6 +219,12 @@ xmlport 6151402 "Magento Document Export"
                 {
                 }
                 fieldelement(currency_code;SalesCrMemoHeader."Currency Code")
+                {
+                }
+                fieldelement(sell_to_contact;SalesCrMemoHeader."Sell-to Contact")
+                {
+                }
+                fieldelement(your_reference;SalesCrMemoHeader."Your Reference")
                 {
                 }
                 textelement(salescrmemolines)
@@ -396,6 +416,12 @@ xmlport 6151402 "Magento Document Export"
                 fieldelement(currency_code;SalesHeader."Currency Code")
                 {
                 }
+                fieldelement(sell_to_contact;SalesHeader."Sell-to Contact")
+                {
+                }
+                fieldelement(your_reference;SalesHeader."Your Reference")
+                {
+                }
                 textelement(saleslines)
                 {
                     MaxOccurs = Once;
@@ -576,6 +602,12 @@ xmlport 6151402 "Magento Document Export"
                 fieldelement(currency_code;SalesShipmentHeader."Currency Code")
                 {
                 }
+                fieldelement(sell_to_contact;SalesShipmentHeader."Sell-to Contact")
+                {
+                }
+                fieldelement(your_reference;SalesShipmentHeader."Your Reference")
+                {
+                }
                 textelement(shipment_address)
                 {
                     MaxOccurs = Once;
@@ -753,6 +785,168 @@ xmlport 6151402 "Magento Document Export"
                     //+MAG2.20 [345376]
                 end;
             }
+            tableelement(salesquote;"Sales Header")
+            {
+                MinOccurs = Zero;
+                XmlName = 'quote';
+                fieldattribute(no;SalesQuote."No.")
+                {
+                }
+                textattribute(salesquotedoctype)
+                {
+                    XmlName = 'document_type';
+
+                    trigger OnBeforePassVariable()
+                    begin
+
+                        SalesQuoteDocType := GetOrderDocTypeAsText (SalesQuote);
+                    end;
+                }
+                fieldelement(ext_no;SalesQuote."External Order No.")
+                {
+                }
+                fieldelement(posting_date;SalesQuote."Posting Date")
+                {
+                }
+                fieldelement(amount_excl_vat;SalesQuote.Amount)
+                {
+                }
+                fieldelement(amount_incl_vat;SalesQuote."Amount Including VAT")
+                {
+                }
+                fieldelement(order_date;SalesQuote."Order Date")
+                {
+                }
+                fieldelement(requested_delivery_date;SalesQuote."Requested Delivery Date")
+                {
+                }
+                fieldelement(salesperson_code;SalesQuote."Salesperson Code")
+                {
+                }
+                fieldelement(currency_code;SalesQuote."Currency Code")
+                {
+                }
+                fieldelement(sell_to_contact;SalesQuote."Sell-to Contact")
+                {
+                }
+                fieldelement(your_reference;SalesQuote."Your Reference")
+                {
+                }
+                textelement(quotelines)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                    XmlName = 'lines';
+                    tableelement(quoteline;"Sales Line")
+                    {
+                        LinkFields = "Document Type"=FIELD("Document Type"),"Document No."=FIELD("No.");
+                        LinkTable = SalesQuote;
+                        MinOccurs = Zero;
+                        XmlName = 'line';
+                        fieldattribute(line_no;QuoteLine."Line No.")
+                        {
+                        }
+                        textelement(quotelinetype)
+                        {
+                            XmlName = 'type';
+
+                            trigger OnBeforePassVariable()
+                            begin
+
+                                LineTypeList.TryGetValue(SalesLine.Type,QuoteLineType);
+                            end;
+                        }
+                        fieldelement(no;QuoteLine."No.")
+                        {
+                        }
+                        fieldelement(variant_code;QuoteLine."Variant Code")
+                        {
+                        }
+                        textelement(quotelineexternalno)
+                        {
+                            MaxOccurs = Once;
+                            XmlName = 'external_no';
+
+                            trigger OnBeforePassVariable()
+                            begin
+
+                                QuoteLineExternalNo := SalesLine."No.";
+                                if SalesLine."Variant Code" <> '' then
+                                  QuoteLineExternalNo += '_' + SalesLine."Variant Code";
+                            end;
+                        }
+                        fieldelement(quantity;QuoteLine.Quantity)
+                        {
+                        }
+                        fieldelement(unit_price;QuoteLine."Unit Price")
+                        {
+                        }
+                        fieldelement(line_discount_pct;QuoteLine."Line Discount %")
+                        {
+                        }
+                        fieldelement(line_discount_amount;QuoteLine."Line Discount Amount")
+                        {
+                        }
+                        fieldelement(amount;QuoteLine.Amount)
+                        {
+                        }
+                        fieldelement(vat_pct;QuoteLine."VAT %")
+                        {
+                        }
+                        fieldelement(amount_including_vat;QuoteLine."Amount Including VAT")
+                        {
+                        }
+                        fieldelement(planned_delivery_date;QuoteLine."Planned Delivery Date")
+                        {
+                        }
+                        fieldelement(description;QuoteLine.Description)
+                        {
+                        }
+                        fieldelement(outstanding_quantity;QuoteLine."Outstanding Quantity")
+                        {
+                        }
+
+                        trigger OnPreXmlItem()
+                        begin
+
+                            if (HideLines) then
+                              currXMLport.Break ();
+                        end;
+                    }
+                }
+                textelement(relateddocumentsquote)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                    XmlName = 'relateddocuments';
+                }
+
+                trigger OnAfterGetRecord()
+                begin
+
+                    if (TmpDocumentSearchResultOrder.IsTemporary()) then
+                      TmpDocumentSearchResultOrder.DeleteAll ();
+
+                    if (SalesQuote."Currency Code" = '') then
+                      SalesQuote."Currency Code" := GeneralLedgerSetup."LCY Code";
+
+                    if (SalesQuote."Due Date" < Today) then
+                      currXMLport.Skip;
+                end;
+
+                trigger OnPreXmlItem()
+                begin
+
+                    if not ExportQuotes then
+                      SalesHeader.SetFilter("No.",'=%1&<>%1','');
+
+                    SalesHeader.SetRange("Bill-to Customer No.",CustomerNo);
+                    SalesHeader.SetRange("Posting Date",StartDate,EndDate);
+
+                    if (DocumentNumber <> '') then
+                      SalesHeader.SetRange ("No.", DocumentNumber);
+                end;
+            }
         }
     }
 
@@ -795,6 +989,7 @@ xmlport 6151402 "Magento Document Export"
         DocumentNumber: Code[20];
         ExportShipments: Boolean;
         HideLines: Boolean;
+        ExportQuotes: Boolean;
 
     procedure SetFilters(NewCustomerNo: Code[20];NewDocumentNo: Code[20];NewStartDate: Date;NewEndDate: Date;NewHideLines: Boolean;NewExportInvoices: Boolean;NewExportCrMemos: Boolean;NewExportOrders: Boolean;NewExportShipments: Boolean)
     begin
@@ -808,11 +1003,35 @@ xmlport 6151402 "Magento Document Export"
         ExportOrders := NewExportOrders;
         //+MAG2.03
 
+        //-MAG2.25 [388058]
+        ExportQuotes := false;
+        //+MAG2.25 [388058]
+
         //-MAG2.20 [345376]
         DocumentNumber := NewDocumentNo;
         ExportShipments := NewExportShipments;
         HideLines := NewHideLines;
         //+MAG2.20 [345376]
+    end;
+
+    procedure SetQuoteFilter(NewCustomerNo: Code[20];NewDocumentNo: Code[20];NewStartDate: Date;NewEndDate: Date;NewHideLines: Boolean)
+    begin
+
+        //-MAG2.25 [388058]
+        CustomerNo := NewCustomerNo;
+        EndDate := NewEndDate;
+        StartDate := NewStartDate;
+
+        DocumentNumber := NewDocumentNo;
+        HideLines := NewHideLines;
+
+        ExportQuotes := true;
+
+        ExportCrMemos := false;
+        ExportInvoices := false;
+        ExportOrders := false;
+        ExportShipments := false;
+        //+MAG2.25 [388058]
     end;
 
     local procedure InitLineTypeList()
@@ -934,6 +1153,10 @@ xmlport 6151402 "Magento Document Export"
           LocalSalesHeader."Document Type"::Quote           : exit ('Quote');
           LocalSalesHeader."Document Type"::Order           : exit ('Order');
           LocalSalesHeader."Document Type"::"Return Order"  : exit ('Return Order');
+          //-MAG2.25 [388058]
+          LocalSalesHeader."Document Type"::Quote           : exit ('Quote');
+          //+MAG2.25 [388058]
+
         end;
     end;
 }

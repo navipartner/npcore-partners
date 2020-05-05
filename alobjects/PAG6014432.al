@@ -1105,7 +1105,7 @@ page 6014432 "Audit Roll"
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesShipmentHeader: Record "Sales Shipment Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         TempAuditRollArray: array [2] of Record "Audit Roll" temporary;
         RetailContractMgt: Codeunit "Retail Contract Mgt.";
         CounterNoFilter: Code[10];

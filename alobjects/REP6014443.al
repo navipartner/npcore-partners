@@ -4,6 +4,7 @@ report 6014443 "Period Discount Statistics"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on ControlContainer Caption in Request Page
     // NPR5.38/NPKNAV/20180126  CASE 299276 Transport NPR5.38 - 26 January 2018
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
+    // NPR5.54/YAHA/20200324  CASE 394872 Removed Company Picture
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Period Discount Statistics.rdlc';
 

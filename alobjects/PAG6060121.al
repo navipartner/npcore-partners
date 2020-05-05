@@ -18,7 +18,9 @@ page 6060121 "TM Ticket BOM"
     // TM1.42/TSA /20190411 CASE 351050 Added "Revisit Condition (Statistics)"
     // TM1.43/TSA /20190910 CASE 368043 Refactored usage of External Item Code
     // TM1.45/TSA /20191120 CASE 378212 Added "Sales Start Date", "Sales Until Date",
-    // #379766/TSA /20191127 CASE 379766 Deligates ticket activation method to Ticket BOM, added activation method to page
+    // TM1.45/TSA /20191127 CASE 379766 Deligates ticket activation method to Ticket BOM, added activation method to page
+    // TM90.1.46/TSA /20200123 CASE 386850 Set ignore schedule filter
+    // TM90.1.46/TSA /20200127 CASE 387138 Added "Publish Ticket URL"
 
     Caption = 'Ticket BOM';
     PageType = List;
@@ -110,6 +112,9 @@ page 6060121 "TM Ticket BOM"
                 {
                 }
                 field("eTicket Type Code";"eTicket Type Code")
+                {
+                }
+                field("Publish Ticket URL";"Publish Ticket URL")
                 {
                 }
             }
@@ -296,15 +301,13 @@ page 6060121 "TM Ticket BOM"
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
     begin
 
-        // TicketRequestManager.IssueTicketFromReservationToken (Token, true, ResponseMessage);
-        // COMMIT;
-
         repeat
           Clear (DisplayTicketeservationRequest);
           DisplayTicketeservationRequest.LoadTicketRequest (Token);
-          //-TM1.28 [305707]
           DisplayTicketeservationRequest.SetTicketItem (ItemNo, VariantCode);
-          //+TM1.28 [305707]
+          //-TM90.1.46 [386850]
+          DisplayTicketeservationRequest.SetIgnoreScheduleSelectionFilter (true);
+          //+TM90.1.46 [386850]
 
           DisplayTicketeservationRequest.AllowQuantityChange (true);
           DisplayTicketeservationRequest.LookupMode(true);

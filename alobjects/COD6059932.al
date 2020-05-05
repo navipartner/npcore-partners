@@ -7,6 +7,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
     // NPR5.29/BR/20170117 CASE 263705 Added support for FTP Import
     // NPR5.33/BR/20170216 CASE 266527 Added functions for FTP and local file export
     // NPR5.33/BR/20170420 CASE 266527 Added functions and subscribers to support more export buttons
+    // NPR5.54/THRO/20200212 CASE 389951 Close connection to ftp after last action
 
     Permissions = TableData "Sales Invoice Header" = m;
 
@@ -163,7 +164,9 @@ codeunit 6059932 "Doc. Exch. File Mgt."
             FTPserver := 'FTP://' + FTPserver;
         if FTPFileMask = '' then
             FTPFileMask := '*.*';
-        InitFTPWebRequest(FtpWebRequest, 'LIST', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFileMask, FTPUsePassive);
+        //-NPR5.54 [389951]
+        InitFTPWebRequest(FtpWebRequest,'LIST',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFileMask,FTPUsePassive,true);
+        //+NPR5.54 [389951]
         FtpWebResponse := FtpWebRequest.GetResponse;
         Stream := FtpWebResponse.GetResponseStream;
         StreamReader := StreamReader.StreamReader(Stream);
@@ -194,6 +197,9 @@ codeunit 6059932 "Doc. Exch. File Mgt."
             ImportFTPFile(FTPserver, FTPUsername, FTPPassword, FTPFolder, FileNameList[I], FTPArchiveFolder, FTPUsePassive, CreateDocument);
         until I >= FileCounter;
         //-NPR5.29 [263705]
+        //-NPR5.54 [389951]
+        DisconnectFTP(FTPserver,FTPUsername,FTPPassword,FTPUsePassive);
+        //+NPR5.54 [389951]
     end;
 
     local procedure ImportFTPFile(FTPserver: Text; FTPUsername: Text; FTPPassword: Text; FTPFolder: Text; FTPFilename: Text; FTPArchiveFolder: Text; FTPUsePassive: Boolean; CreateDocument: Boolean)
@@ -215,7 +221,9 @@ codeunit 6059932 "Doc. Exch. File Mgt."
     begin
         //-NPR5.29 [263705]
         //Download file and store in Blob
-        InitFTPWebRequest(FtpWebRequest, 'RETR', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive);
+        //-NPR5.54 [389951]
+        InitFTPWebRequest(FtpWebRequest,'RETR',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFilename,FTPUsePassive,true);
+        //+NPR5.54 [389951]
         FtpWebResponse := FtpWebRequest.GetResponse;
         Stream := FtpWebResponse.GetResponseStream;
         MemoryStream := MemoryStream.MemoryStream();
@@ -234,7 +242,9 @@ codeunit 6059932 "Doc. Exch. File Mgt."
 
             //If imported: Archive file
             if FTPArchiveFolder <> '' then begin
-                InitFTPWebRequest(FtpWebRequest, 'STOR', FTPserver, FTPUsername, FTPPassword, FTPArchiveFolder, FTPFilename, FTPUsePassive);
+            //-NPR5.54 [389951]
+            InitFTPWebRequest(FtpWebRequest,'STOR',FTPserver,FTPUsername,FTPPassword,FTPArchiveFolder,FTPFilename,FTPUsePassive,true);
+            //+NPR5.54 [389951]
                 TempBlob.Blob.CreateInStream(IStream, TEXTENCODING::UTF8);
                 IStream.Read(FileText);
                 Clear(IStream);
@@ -249,7 +259,9 @@ codeunit 6059932 "Doc. Exch. File Mgt."
             end;
 
             //If imported: Delete file
-            InitFTPWebRequest(FtpWebRequest, 'DELE', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive);
+          //-NPR5.54 [389951]
+          InitFTPWebRequest(FtpWebRequest,'DELE',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFilename,FTPUsePassive,true);
+          //+NPR5.54 [389951]
             FtpWebResponse := FtpWebRequest.GetResponse;
             FtpWebResponse.Close;
         end;
@@ -258,7 +270,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         //+NPR5.29 [263705]
     end;
 
-    local procedure InitFTPWebRequest(var FtpWebRequest: DotNet npNetFtpWebRequest; FTPMethod: Text; FTPServerName: Text; FTPUsername: Text; FTPPassword: Text; FTPFolder: Text; FTPFileNameOrMask: Text; FTPusePassive: Boolean)
+    local procedure InitFTPWebRequest(var FtpWebRequest: DotNet npNetFtpWebRequest;FTPMethod: Text;FTPServerName: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFileNameOrMask: Text;FTPusePassive: Boolean;FTPKeepAlive: Boolean)
     var
         NetworkCredential: DotNet npNetNetworkCredential;
     begin
@@ -266,11 +278,28 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         FtpWebRequest := FtpWebRequest.Create(GetFTPPath(FTPServerName, FTPFolder, FTPFileNameOrMask));
         FtpWebRequest.Credentials := NetworkCredential.NetworkCredential(FTPUsername, FTPPassword);
         FtpWebRequest.Method := FTPMethod;
-        FtpWebRequest.KeepAlive := true;
+        //-NPR5.54 [389951]
+        //FtpWebRequest.KeepAlive := TRUE;
+        FtpWebRequest.KeepAlive := FTPKeepAlive;
+        //+NPR5.54 [389951]
         FtpWebRequest.UseBinary := true;
         if FTPusePassive then
             FtpWebRequest.UsePassive := false;
         //+NPR5.29 [263705]
+    end;
+
+    local procedure DisconnectFTP(FTPserver: Text;FTPUsername: Text;FTPPassword: Text;FTPUsePassive: Boolean)
+    var
+        FtpWebRequest: DotNet npNetFtpWebRequest;
+        FtpWebResponse: DotNet npNetFtpWebResponse;
+    begin
+        //-NPR5.54 [389951]
+        if UpperCase(CopyStr(FTPserver,1,4)) <> 'FTP://' then
+          FTPserver := 'FTP://' + FTPserver;
+        InitFTPWebRequest(FtpWebRequest,'PWD',FTPserver,FTPUsername,FTPPassword,'','*.*',FTPUsePassive,false);
+        FtpWebResponse := FtpWebRequest.GetResponse;
+        FtpWebResponse.Close;
+        //+NPR5.54 [389951]
     end;
 
     local procedure GetFTPPath(FTPServerName: Text; FTPFolder: Text; FTPFileNameOrMask: Text): Text
@@ -1094,7 +1123,9 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         //-NPR5.33 [266527]
 
         //Upload file
-        InitFTPWebRequest(FtpWebRequest, 'STOR', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive);
+        //-NPR5.54 [389951]
+        InitFTPWebRequest(FtpWebRequest,'STOR',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFilename,FTPUsePassive,false);
+        //+NPR5.54 [389951]
         FileMgt.BLOBImportFromServerFile(TempBlob, ServerFilePath);
         TempBlob.Blob.CreateInStream(IStream, TEXTENCODING::UTF8);
         IStream.Read(FileText);

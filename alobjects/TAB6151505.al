@@ -10,6 +10,7 @@ table 6151505 "Nc Import Type"
     // NC2.12/MHA /20180418  CASE 308107 Length of field 1 "Code" extended from 10 to 20 and caption added to fields 10,20
     // NC2.12/MHA /20180502  CASE 313362 Added fields 400 "Server File Enabled", 405 "Server File Path"
     // NC2.16/MHA /20180917  CASE 328432 Added field 203 "Sftp"
+    // NPR5.54/CLVA/20200127 CASE 366790 Added field "XML Stylesheet"
 
     Caption = 'Nc Import Type';
     LookupPageID = "Nc Import Types";
@@ -128,6 +129,10 @@ table 6151505 "Nc Import Type"
         {
             Caption = 'Server File Path';
             Description = 'NC2.12';
+        }
+        field(500;"XML Stylesheet";BLOB)
+        {
+            Caption = 'XML Stylesheet';
         }
     }
 

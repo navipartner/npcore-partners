@@ -36,6 +36,7 @@ page 6151401 "Magento Setup"
     // MAG2.23/MHA /20190930  CASE 370831 B2B modules should not be visible for Magento 2
     // MAG2.23/MHA /20191011  CASE 371791 Added fields 720 "Post Tickets on Import", 730 "Post Memberships on Import"
     // MAG2.23/MHA /20191017  CASE 373262 Addded Post On Import Setup PagePart
+    // MAG2.25/MHA /20200204  CASE 387936 Added fields 750 "Send Order Confirmation", 760 "Order Conf. E-mail Template"
 
     Caption = 'Magento Setup';
     PromotedActionCategories = 'New,Tasks,Reports,Display';
@@ -383,6 +384,12 @@ page 6151401 "Magento Setup"
                 {
                 }
                 field("Release Order on Import";"Release Order on Import")
+                {
+                }
+                field("Send Order Confirmation";"Send Order Confirmation")
+                {
+                }
+                field("E-mail Template (Order Conf.)";"E-mail Template (Order Conf.)")
                 {
                 }
                 field("Use Blank Code for LCY";"Use Blank Code for LCY")

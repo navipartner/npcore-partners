@@ -12,6 +12,8 @@ codeunit 6151005 "POS Action - Load POS Quote"
     //                                    Moved filter from RetailSetup to parameter.
     // NPR5.53/MHA /20200113  CASE 384104 Removed SetLast in the event that there are no lines in selected view
     // NPR5.53/ALPO/20200129  CASE 388112 The sub-total on the POS Sales screen was not updated after retrieving POS Quote onto sale screen
+    // NPR5.54/ALPO/20200203  CASE 364658 Part of the code moved from OnActionLoadFromQuote() to a separate global function LoadFromQuote() to be able to call it from outside of the object
+    // NPR5.54/ALST/20200305  CASE 385040 no reason to get location or department code (shortcut dim 1) from POS Quote for a POS Sale
 
 
     trigger OnRun()
@@ -30,7 +32,7 @@ codeunit 6151005 "POS Action - Load POS Quote"
 
     local procedure ActionVersion(): Text
     begin
-        exit ('1.2'); //-+NPR5.51 [364694]
+        exit ('1.4'); //-+NPR5.51 [364694]
     end;
 
     [EventSubscriber(ObjectType::Table, 6150703, 'OnDiscoverActions', '', true, true)]
@@ -171,25 +173,28 @@ codeunit 6151005 "POS Action - Load POS Quote"
         POSQuoteEntry: Record "POS Quote Entry";
         POSQuoteLine: Record "POS Quote Line";
         SaleLinePOS: Record "Sale Line POS";
-        POSQuoteMgt: Codeunit "POS Quote Mgt.";
+        Register: Record Register;
+        SalePOS2: Record "Sale POS";
         POSSale: Codeunit "POS Sale";
         POSSaleLine: Codeunit "POS Sale Line";
-        XmlDoc: DotNet npNetXmlDocument;
         QuoteEntryNo: BigInteger;
     begin
         QuoteEntryNo := JSON.GetInteger('quote_entry_no',true);
         POSQuoteEntry.Get(QuoteEntryNo);
-
+        
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.Find;
-
+        
+        if LoadFromQuote(POSQuoteEntry,SalePOS) then begin  //NPR5.54 [364658]
+        //-NPR5.54 [364658]-revoked
+        /*
         //-NPR5.51 [364694]
-        POSQuoteEntry.SkipLineDeleteTrigger(true);
+        POSQuoteEntry.SkipLineDeleteTrigger(TRUE);
         //+NPR5.51 [364694]
-
+        
         //-NPR5.48 [338208]
-        if POSQuoteMgt.LoadPOSSaleData(POSQuoteEntry,XmlDoc) then begin
+        IF POSQuoteMgt.LoadPOSSaleData(POSQuoteEntry,XmlDoc) THEN BEGIN
           DeletePOSSalesLines(SalePOS);
           //-NPR5.51
           UpdateDates(XmlDoc,SalePOS);
@@ -198,10 +203,23 @@ codeunit 6151005 "POS Action - Load POS Quote"
           //-NPR5.49 [331208]
           OnAfterLoadFromQuote(POSQuoteEntry,SalePOS);
           //+NPR5.49 [331208]
-          POSQuoteEntry.Delete(true);
-
+          POSQuoteEntry.DELETE(TRUE);
+        */
+        //+NPR5.54 [364658]-revoked
+        
+          //-NPR5.54 [385040]
+          Register.Get(SalePOS."Register No.");
+          SalePOS."Location Code" := Register."Location Code";
+        
+          // reload proper dimensions
+          POSSale.GetCurrentSale(SalePOS2);
+        
+          SalePOS.Validate("POS Store Code", SalePOS2."POS Store Code");
+          SalePOS.Modify;
+          //+NPR5.54 [385040]
+        
           POSSale.Refresh(SalePOS);
-
+        
           //-NPR5.50
           POSSession.GetSaleLine(POSSaleLine);
           //POSSaleLine.GetCurrentSaleLine(SaleLinePOS);  //NPR5.53 [388112]-revoked
@@ -216,17 +234,17 @@ codeunit 6151005 "POS Action - Load POS Quote"
           if not SaleLinePOS.IsEmpty then
             POSSaleLine.SetLast();
           //+NPR5.53 [388112]
-
+        
           POSSession.RequestRefreshData();
           exit;
         end;
         //+NPR5.48 [338208]
-
+        
         //-NPR5.48 [336498]
         UpdatePOSSale(POSQuoteEntry,SalePOS);
         //+NPR5.48 [336498]
         POSSession.GetSaleLine(POSSaleLine);
-
+        
         POSQuoteLine.SetRange("Quote Entry No.",POSQuoteEntry."Entry No.");
         if POSQuoteLine.FindSet then
           repeat
@@ -235,16 +253,17 @@ codeunit 6151005 "POS Action - Load POS Quote"
             InsertPOSSaleLine(POSQuoteLine,POSSaleLine);
             //+NPR5.48 [336498]
           until POSQuoteLine.Next = 0;
-
+        
         //-NPR5.48 [338537]
         OnAfterLoadFromQuote(POSQuoteEntry,SalePOS);
         //+NPR5.48 [338537]
-
+        
         POSQuoteEntry.Delete(true);
         //-NPR5.48 [336498]
         POSSale.Refresh(SalePOS);
         //+NPR5.48 [336498]
         POSSession.RequestRefreshData();
+
     end;
 
     local procedure DeletePOSSalesLines(SalePOS: Record "Sale POS")
@@ -332,6 +351,27 @@ codeunit 6151005 "POS Action - Load POS Quote"
         foreach XmlElement in XmlDoc.SelectNodes('pos_sale/pos_sale_lines/pos_sale_line/fields/field[@field_no=' + Format(SaleLinePOS.FieldNo(Date)) + ']') do
           XmlElement.InnerText := Format(SalePOS.Date,0,9);
         //+NPR5.51
+    end;
+
+    procedure LoadFromQuote(var POSQuoteEntry: Record "POS Quote Entry";var SalePOS: Record "Sale POS"): Boolean
+    var
+        POSQuoteMgt: Codeunit "POS Quote Mgt.";
+        XmlDoc: DotNet npNetXmlDocument;
+    begin
+        //-NPR5.54 [364658]
+        POSQuoteEntry.SkipLineDeleteTrigger(true);
+
+        if not POSQuoteMgt.LoadPOSSaleData(POSQuoteEntry,XmlDoc) then
+          exit(false);
+
+        DeletePOSSalesLines(SalePOS);
+        UpdateDates(XmlDoc,SalePOS);
+        POSQuoteMgt.Xml2POSSale(XmlDoc,SalePOS);
+        OnAfterLoadFromQuote(POSQuoteEntry,SalePOS);
+        POSQuoteEntry.Delete(true);
+
+        exit(true);
+        //+NPR5.54 [364658]
     end;
 }
 

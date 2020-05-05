@@ -118,6 +118,10 @@ codeunit 6060127 "MM Membership Management"
     // MM1.42/TSA /20191209 CASE 361664 Middle name added to display name
     // MM1.42/TSA /20191220 CASE 382728 GetCommunicationMethod_Wallet(), CreateMemberCommunicationDefaultSetup()
     // MM1.42/TSA /20200117 CASE 384394 Refactored the ExtendMemberCards() functionality executed when membership are renewed etc, cleanup
+    // MM1.43/TSA /20200130 CASE 386080 Pre-Assigned Customer No and Contact from web when CreateMembership and AddMembershipMember are invoked
+    // MM1.43/TSA /20200303 CASE 394404 Added a guard when issuing new member cards to prevent endless looping
+    // MM1.43/TSA /20200310 CASE 394986 Card print on renew
+    // MM1.43/TSA /20200331 CASE 398328 Added presentation order sorting on alterations
 
 
     trigger OnRun()
@@ -165,10 +169,12 @@ codeunit 6060127 "MM Membership Management"
         MEMBERCARD_EXPIRED: Label 'The member card %1 has expired.';
         NO_ADMIN_MEMBER: Label 'At least one member must have an administrative role in the membership. This members information will not be synchronized to customer. Membership could not be created.';
         MEMBERCARD_BLANK: Label 'Membercard number can''t be empty or blank.';
+        INVALID_CONTACT: Label 'The contact number %1 is not valid in context of customer number %2';
         TO_MANY_MEMBERS_NO: Label '-127001';
         MEMBER_CARD_EXIST_NO: Label '-127002';
         NO_ADMIN_MEMBER_NO: Label '-127003';
         MEMBERCARD_BLANK_NO: Label '-127004';
+        INVALID_CONTACT_NO: Label '-127005';
         NO_LEDGER_ENTRY: Label 'The membership %1 is NOT valid.\\It must be activated, but there is no ledger entry associated with that membership that can be actived.';
         NOT_ACTIVATED: Label 'The membership is marked as activate on first use, but has not been activated yet. Retry the action after the membership has been activated.';
         NOT_FOUND: Label '%1 not found. %2';
@@ -393,6 +399,7 @@ codeunit 6060127 "MM Membership Management"
           MembershipRole.SetFilter ("Member Role", '=%1|=%2', MembershipRole."Member Role"::ADMIN, MembershipRole."Member Role"::DEPENDENT);
           MembershipRole.SetFilter (Blocked, '=%1', false);
           MembershipRole.FindFirst ();
+
           UpdateCustomerFromMember (MembershipEntryNo, MembershipRole."Member Entry No.");
           //+MM1.33 [324065]
 
@@ -2292,6 +2299,7 @@ codeunit 6060127 "MM Membership Management"
             begin
               MemberInfoCapture."Valid Until" := NewUntilDate;
               exit (IssueMemberCardWorker (FailWithError, MembershipEntryNo, MemberCard."Member Entry No.", MemberInfoCapture, false, MemberCardEntryNoOut, ResponseMessage, true));
+
             end;
 
           AlterationSetup."Card Expired Action"::UPDATE :
@@ -2315,6 +2323,7 @@ codeunit 6060127 "MM Membership Management"
         NewUntilDate: Date;
         UpdateRequired: Boolean;
         NewCardEntryNo: Integer;
+        LastEntryNo: Integer;
     begin
 
         //-MM1.42 [384394]
@@ -2322,6 +2331,15 @@ codeunit 6060127 "MM Membership Management"
 
         MemberCard.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
         MemberCard.SetFilter (Blocked, '=%1', false);
+
+        //-MM1.43 [394404] - to prevent new cards from being considered
+        if (not MemberCard.FindLast ()) then
+          exit (true);
+
+        LastEntryNo := MemberCard."Entry No.";
+        MemberCard.SetFilter ("Entry No.", '..%1', LastEntryNo);
+        //+MM1.43 [394404]
+
         if (not MemberCard.FindSet ()) then
           exit (true);
 
@@ -2345,8 +2363,15 @@ codeunit 6060127 "MM Membership Management"
             if (not ExtendMemberCard (FailWithError, MembershipEntryNo, MemberCard."Entry No.", ExpiredCardOption, NewTimeFrameEndDate, NewCardEntryNo, ResponseMessage)) then
               exit (false);
 
-            if (MemberCard."External Card No." = ExternalCardNo) then // The time entry will be tagged with responsible card entry no that requires printing
-              MemberCardEntryNoOut := NewCardEntryNo;
+            //-MM1.43 [394986]
+            // IF (MemberCard."External Card No." = ExternalCardNo) THEN // The time entry will be tagged with responsible card entry no that requires printing
+            //   MemberCardEntryNoOut := NewCardEntryNo;
+
+            // The time entry will be tagged with card entry no and that indicates that printing is required
+            if  (ExpiredCardOption = AlterationSetup."Card Expired Action"::NEW) then
+              if (MemberCardEntryNoOut = 0) then
+                MemberCardEntryNoOut := NewCardEntryNo;
+            //+MM1.43 [394986]
 
           end;
 
@@ -2524,6 +2549,10 @@ codeunit 6060127 "MM Membership Management"
         UnitPrice: Decimal;
     begin
 
+        //-MM1.43 [398328]
+        MembershipAlterationSetup.SetCurrentKey ("Presentation Order");
+        //+MM1.43 [398328]
+
         if (MembershipAlterationSetup.FindSet ()) then begin
           repeat
             EntryNo += 1;
@@ -2550,6 +2579,10 @@ codeunit 6060127 "MM Membership Management"
               TmpMembershipEntry.Description := MembershipAlterationSetup.Description;
               TmpMembershipEntry."Amount Incl VAT" := UnitPrice;
               TmpMembershipEntry."Unit Price" := Item."Unit Price";
+
+              //-MM1.43 [398328] So external apps can re-sort result
+              TmpMembershipEntry."Line No." := MembershipAlterationSetup."Presentation Order";
+              //-MM1.43 [398328]
 
               //-MM1.18 [265729]
               TmpMembershipEntry."Membership Code" := MembershipAlterationSetup."From Membership Code";
@@ -3262,12 +3295,10 @@ codeunit 6060127 "MM Membership Management"
           Membership."Membership Code" := MembershipCode;
           Membership."Company Name" := MemberInfoCapture."Company Name";
           Membership."Issued Date" := Today;
-          //-MM1.23 [257011]
           Membership."Document ID" := MemberInfoCapture."Import Entry Document ID";
           Membership."Modified At" := CurrentDateTime ();
           if (MemberInfoCapture."Information Context" = MemberInfoCapture."Information Context"::FOREIGN) then
             Membership."Replicated At" := CurrentDateTime ();
-          //+MM1.23 [257011]
 
           Membership.Insert (true);
           MembershipCreated := true;
@@ -3276,45 +3307,42 @@ codeunit 6060127 "MM Membership Management"
         Membership.FindFirst ();
         if (Community."Membership to Cust. Rel.") then begin
           if (Membership."Customer No." = '') then begin
-            Membership."Customer No." :=
-              //-#319296 [319296]
-              //CreateCustomerFromTemplate (MembershipSetup."Customer Config. Template Code", MembershipSetup."Contact Config. Template Code", Membership."External Membership No.");
-              CreateCustomerFromTemplate (Community."Customer No. Series", MembershipSetup."Customer Config. Template Code", MembershipSetup."Contact Config. Template Code", Membership."External Membership No.");
-              //+#319296 [319296]
 
-            //-MM1.22 [286922]
-            //-MM1.39 [350968]
-            // Membership."Auto-Renew" := MemberInfoCapture."Enable Auto-Renew";
+            //-MM1.43 [386080]
+            // Membership."Customer No." :=
+            //   //-#319296 [319296]
+            //   //CreateCustomerFromTemplate (MembershipSetup."Customer Config. Template Code", MembershipSetup."Contact Config. Template Code", Membership."External Membership No.");
+            //  CreateCustomerFromTemplate (Community."Customer No. Series", MembershipSetup."Customer Config. Template Code", MembershipSetup."Contact Config. Template Code", Membership."External Membership No.");
+            //  //+#319296 [319296]
+
+            if (MemberInfoCapture."Customer No." <> '') then begin
+              if (not ValidateUseCustomerNo (MemberInfoCapture."Customer No.")) then
+                Error ('The Customer Number %1 can not be assigned to membership.', MemberInfoCapture."Customer No.");
+              Membership."Customer No." := MemberInfoCapture."Customer No.";
+            end;
+
+            if (Membership."Customer No." = '') then
+              Membership."Customer No." :=
+                CreateCustomerFromTemplate (Community."Customer No. Series", MembershipSetup."Customer Config. Template Code", MembershipSetup."Contact Config. Template Code", Membership."External Membership No.");
+            //+MM1.43 [386080]
+
             if (MemberInfoCapture."Enable Auto-Renew") then
               Membership."Auto-Renew" := Membership."Auto-Renew"::YES_INTERNAL;
-            //+MM1.39 [350968]
 
             Membership."Auto-Renew Payment Method Code" := MemberInfoCapture."Auto-Renew Payment Method Code";
 
-            //-MM1.39 [350968]
-            //IF (Membership."Auto-Renew") THEN
-            // Membership.TESTFIELD ("Auto-Renew Payment Method Code");
             if (Membership."Auto-Renew" = Membership."Auto-Renew"::YES_INTERNAL) then
               Membership.TestField ("Auto-Renew Payment Method Code");
-            //+MM1.39 [350968]
-            //+MM1.22 [286922]
 
-            //-MM1.23 [257011]
             Membership."Modified At" := CurrentDateTime ();
-            //+MM1.23 [257011]
-
             Membership.Modify ();
           end;
         end;
 
-        //-#360242 [360242]
         TransferInfoCaptureAttributes (MemberInfoCapture."Entry No.", DATABASE::"MM Membership", Membership."Entry No.");
-        //-#360242 [360242]
 
-        //-MM1.22 [286922]
         if (MembershipCreated) then
           OnAfterMembershipCreateEvent (Membership);
-        //+MM1.22 [286922]
 
         exit (Membership."Entry No.");
     end;
@@ -3789,15 +3817,9 @@ codeunit 6060127 "MM Membership Management"
         Membership.Get (MembershipEntryNo);
         MembershipSetup.Get (Membership."Membership Code");
 
-        //-MM1.33 [324065]
         MembershipRoleGuardian.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
-        //-MM1.35 [333079]
-        //MembershipRoleGuardian.SETFILTER ("Member Role", '<>%1', MembershipRole."Member Role"::GUARDIAN);
         MembershipRoleGuardian.SetFilter ("Member Role", '=%1', MembershipRole."Member Role"::GUARDIAN);
-        //+MM1.35 [333079]
-
         MembershipRoleGuardian.SetFilter (Blocked, '=%1', false);
-        //+MM1.33 [324065]
 
         MembershipRole.SetFilter ("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipRole.SetFilter ("Member Role", '<>%1', MembershipRole."Member Role"::ANONYMOUS);
@@ -3833,13 +3855,8 @@ codeunit 6060127 "MM Membership Management"
 
         end;
 
-        //-MM1.32 [313795]
-        //-MM1.33 [324065]
-        // IF (MemberInfoCapture."Guardian External Member No." <> '') THEN
         if (MemberInfoCapture."Guardian External Member No." <> '') or (MembershipRoleGuardian.FindFirst ()) then
-        //+MM1.33 [324065]
           MembershipRole."Member Role" := MembershipRole."Member Role"::DEPENDENT;
-        //+MM1.32 [313795]
 
         MembershipRole."Community Code" := Membership."Community Code";
         MembershipRole."Membership Entry No." := MembershipEntryNo;
@@ -3849,16 +3866,23 @@ codeunit 6060127 "MM Membership Management"
         if (LogonIdExists (MembershipRole."Community Code", MembershipRole."User Logon ID")) then
           Error (LOGIN_ID_EXIST, MembershipRole."User Logon ID", Member."External Member No.");
 
-        //-MM1.32 [313795]
         MembershipRole."GDPR Agreement No." := MembershipSetup."GDPR Agreement No.";
         MembershipRole."GDPR Data Subject Id" := UpperCase(DelChr(Format(CreateGuid),'=','{}-'));
-        //+MM1.32 [313795]
+
+        //-MM1.43 [386080]
+        if (MemberInfoCapture."Contact No." <> '') then begin
+          if (not ValidateUseContactNo (Membership."Customer No.", MemberInfoCapture."Contact No.")) then begin
+            RaiseError (FailWithError, ResponseMessage, StrSubstNo (INVALID_CONTACT, MemberInfoCapture."Contact No.", Membership."Customer No."), INVALID_CONTACT_NO);
+            exit (false);
+          end;
+          MembershipRole."Contact No." := MemberInfoCapture."Contact No.";
+        end;
+        //+MM1.43 [386080]
 
         MembershipRole."Password Hash" := EncodeSHA1 (MemberInfoCapture."Password SHA1");
         MembershipRole."Created At" := CurrentDateTime;
         MembershipRole.Insert (true);
 
-        //-MM1.32 [313795]
         // To get the requests in the correct order.
         if (MembershipRole."Member Role" <> MembershipRole."Member Role"::DEPENDENT) then begin
           if (MembershipSetup."GDPR Mode" = MembershipSetup."GDPR Mode"::CONSENT) then
@@ -3867,15 +3891,8 @@ codeunit 6060127 "MM Membership Management"
           if (MemberInfoCapture."Guardian External Member No." = '') then
             MemberGDPRManagement.SetApprovalState (MembershipRole."GDPR Agreement No.", MembershipRole."GDPR Data Subject Id", MemberInfoCapture."GDPR Approval");
         end;
-        //+MM1.32 [313795]
 
         MemberCount := GetMembershipMemberCount (MembershipEntryNo);
-
-        //-MM1.33 [324065]
-        // Moved to calling function for clarity
-        // GuardianMemberEntryNo := GetMemberFromExtMemberNo (MemberInfoCapture."Guardian External Member No.");
-        // CreateGuardianRoleWorker (MembershipEntryNo, GuardianMemberEntryNo, MemberInfoCapture."GDPR Approval");
-        //
 
         exit (true);
     end;
@@ -4319,6 +4336,48 @@ codeunit 6060127 "MM Membership Management"
         MembershipRole.SetFilter (Blocked, '=%1', false);
 
         exit (MembershipRole.FindFirst ());
+    end;
+
+    local procedure ValidateUseCustomerNo(CustomerNo: Code[20]): Boolean
+    var
+        Customer: Record Customer;
+        Membership: Record "MM Membership";
+    begin
+
+        //-MM1.43 [386080]
+        if (not Customer.Get (CustomerNo)) then
+          exit (false);
+
+        Membership.SetFilter ("Customer No.", '=%1', CustomerNo);
+        Membership.SetFilter (Blocked, '=%1', false);
+        exit (Membership.IsEmpty ());
+        //+MM1.43 [386080]
+    end;
+
+    local procedure ValidateUseContactNo(CustomerNo: Code[20];ContactNo: Code[20]): Boolean
+    var
+        Customer: Record Customer;
+        Contact: Record Contact;
+        MembershipRole: Record "MM Membership Role";
+        ContactBusinessRelation: Record "Contact Business Relation";
+    begin
+
+        //-MM1.43 [386080]
+        if (not Customer.Get (CustomerNo)) then
+          exit (false);
+
+        if (not Contact.Get (ContactNo)) then
+          exit (false);
+
+        MembershipRole.SetFilter ("Contact No.", '=%1', ContactNo);
+        if (not MembershipRole.IsEmpty ()) then
+          exit (false);
+
+        ContactBusinessRelation.SetFilter ("Contact No.", '=%1', ContactNo);
+        ContactBusinessRelation.SetFilter ("Link to Table", '=%1', ContactBusinessRelation."Link to Table"::Customer);
+        ContactBusinessRelation.SetFilter ("No.", '=%1', CustomerNo);
+        exit (not ContactBusinessRelation.IsEmpty ());
+        //+MM1.43 [386080]
     end;
 
     local procedure SelectMemberLogonCredentials(CommunityCode: Code[20];Member: Record "MM Member";CustomLogonID: Code[80]) MemberLogonId: Code[80]

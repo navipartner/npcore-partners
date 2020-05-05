@@ -6,6 +6,7 @@ page 6060149 "RC Member Mgr Role Center"
     // MM1.26/TSA /20180222 CASE 304705 Added button for setup actions in ticket and member module
     // MM1.29/TSA /20180509 CASE 313795 Added GDPR actions
     // TM1.39/TS  /20181206 CASE 343939 Added Missing Picture to Action
+    // TM90.1.46/TSA /20200323 CASE 397084 Added ticket wizard
 
     Caption = 'Role Center';
     PageType = RoleCenter;
@@ -277,6 +278,18 @@ page 6060149 "RC Member Mgr Role Center"
                     PromotedIsBig = true;
                     RunObject = Page "TM Ticket Setup";
                 }
+                action("Ticket Item Wizard")
+                {
+                    Caption = 'Ticket Item Wizard';
+                    Ellipsis = true;
+                    Image = "Action";
+                    Promoted = true;
+                    PromotedIsBig = true;
+                    RunObject = Codeunit "TM Ticket Wizard";
+                }
+                separator(Separator6014425)
+                {
+                }
                 action("Ticket Type")
                 {
                     Caption = 'Ticket Types';
@@ -331,5 +344,9 @@ page 6060149 "RC Member Mgr Role Center"
             }
         }
     }
+
+    local procedure InvokeTicketWizard()
+    begin
+    end;
 }
 

@@ -35,6 +35,7 @@ codeunit 6151152 "M2 Budget WebService"
         GetBudgetEntries.GenerateResponse ();
     end;
 
+    [Scope('Personalization')]
     procedure GetSimpleBudgetData(var GetSimpleBudget: XMLport "M2 Get Simple Budget")
     begin
 

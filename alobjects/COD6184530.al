@@ -2,6 +2,8 @@ codeunit 6184530 "EFT Adyen Backgnd. Lookup Req."
 {
     // NPR5.53/MMV /20191120 CASE 377533 Created object
     // NPR5.53/MMV /20200126 CASE 377533 Added timeout param on lookup invoke
+    // NPR5.54/MMV /20200218 CASE 387990 Added response status code buffer.
+    // NPR5.54/MMV /20200226 CASE 364340 Added check for outdated request.
 
     TableNo = "EFT Transaction Async Request";
 
@@ -67,14 +69,19 @@ codeunit 6184530 "EFT Adyen Backgnd. Lookup Req."
             Sleep(1000 * 10);
             EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", 'Lookup buffer period passed, starting to loop lookup requests', '');
             Commit;
+        //-NPR5.54 [364340]
+          end else if LookupAttempt > 60 then begin
+            EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", 'Stopping lookup background session. (Timeout)', '');
+            exit;
           end else begin
             Sleep(1000 * 5);
           end;
 
-          if ((CurrentDateTime-StartTime) > (1000 * 60 * 10)) then begin
-            EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", 'Stopping lookup background session. (Timeout)', '');
+          if EFTTrxBackgroundSessionMgt.IsRequestOutdated(EFTTransactionAsyncRequest."Request Entry No", EFTTransactionAsyncRequest."Hardware ID") then begin
+            EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionAsyncRequest."Request Entry No", 'Stopping lookup background session. (Found newer request on same hardware)', '');
             exit;
           end;
+        //+NPR5.54 [364340]
 
           if EFTTrxBackgroundSessionMgt.IsRequestDone(EFTTransactionAsyncRequest."Request Entry No", false) then begin
             if EFTTrxBackgroundSessionMgt.IsRequestDone(EFTTransactionAsyncRequest."Request Entry No", true) then begin
@@ -141,6 +148,9 @@ codeunit 6184530 "EFT Adyen Backgnd. Lookup Req."
           EFTTransactionAsyncResponse.Error := true;
           EFTTransactionAsyncResponse."Error Text" := CopyStr(GetLastErrorText, 1, MaxStrLen(EFTTransactionAsyncResponse."Error Text"));
         end;
+        //-NPR5.54 [387990]
+        EFTTransactionAsyncResponse."Transaction Started" := true;
+        //+NPR5.54 [387990]
 
         EFTTransactionAsyncResponse.Insert;
     end;

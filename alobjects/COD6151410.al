@@ -18,6 +18,7 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
     // MAG2.22/MHA /20190617  CASE 357825 Resolution should be preserved after resize
     // MAG2.22/MHA /20190716  CASE 361598 Added function OnCancelMagentoOrder()
     // MAG14.00.2.22/MHA/20190717  CASE 362262 Removed DotNet Print functions GiftVoucherToTempBlob(), CreditvoucherToTempBlob()
+    // MAG2.25/MHA /20200123  CASE 386613 Amount on Gift- and Credit Vouchers must remain unchanged when posting Payment via Sales Order
 
 
     trigger OnRun()
@@ -352,7 +353,6 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         CreditVoucher: Record "Credit Voucher";
         GiftVoucher: Record "Gift Voucher";
         MagentoSetup: Record "Magento Setup";
-        VoucherAmount: Decimal;
     begin
         if not (MagentoSetup.Get and MagentoSetup."Gift Voucher Enabled") then
             exit;
@@ -368,8 +368,10 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         GiftVoucher.LockTable;
         GiftVoucher.SetRange("External Reference No.", PaymentLine."No.");
         if GiftVoucher.FindFirst then begin
-            VoucherAmount := GiftVoucher.Amount;
-            GiftVoucher.Amount := 0;
+          //-MAG2.25 [386613]
+          //VoucherAmount := GiftVoucher.Amount;
+          //GiftVoucher.Amount := 0;
+          //+MAG2.25 [386613]
             GiftVoucher.Status := GiftVoucher.Status::Cashed;
             GiftVoucher."Cashed Date" := SalesInvoiceHeader."Posting Date";
             GiftVoucher."Cashed Salesperson" := SalesInvoiceHeader."Salesperson Code";
@@ -384,8 +386,10 @@ codeunit 6151410 "Magento Gift Voucher Mgt."
         CreditVoucher.LockTable;
         CreditVoucher.SetRange("External Reference No.", PaymentLine."No.");
         if CreditVoucher.FindFirst then begin
-            VoucherAmount := CreditVoucher.Amount;
-            CreditVoucher.Amount := 0;
+          //-MAG2.25 [386613]
+          //VoucherAmount := CreditVoucher.Amount;
+          //CreditVoucher.Amount := 0;
+          //+MAG2.25 [386613]
             CreditVoucher.Status := CreditVoucher.Status::Cashed;
             CreditVoucher."Cashed Date" := SalesInvoiceHeader."Posting Date";
             CreditVoucher."Cashed Salesperson" := SalesInvoiceHeader."Salesperson Code";

@@ -28,6 +28,7 @@ codeunit 6060047 "Item Wsht. Imp. Exp. Mgt."
         TextImportFailed: Label 'Import Failed.';
         TextDialogImport: Label 'Import XML file';
 
+    [Scope('Personalization')]
     procedure Export(ItemWorksheetLine: Record "Item Worksheet Line")
     begin
         if ItemWorksheet.Get(ItemWorksheetLine."Worksheet Template Name",ItemWorksheetLine."Worksheet Name") then begin
@@ -50,6 +51,7 @@ codeunit 6060047 "Item Wsht. Imp. Exp. Mgt."
         end;
     end;
 
+    [Scope('Personalization')]
     procedure Import()
     var
         FileMgt: Codeunit "File Management";
@@ -62,6 +64,7 @@ codeunit 6060047 "Item Wsht. Imp. Exp. Mgt."
         ItemWkshtXmlFile.Close;
     end;
 
+    [Scope('Personalization')]
     procedure ExportToExcel(ParItemWorksheetLine: Record "Item Worksheet Line")
     var
         ExportExcelItemWorksheet: Report "Export Excel Item Worksheet";
@@ -77,6 +80,7 @@ codeunit 6060047 "Item Wsht. Imp. Exp. Mgt."
         //+NPR4.19
     end;
 
+    [Scope('Personalization')]
     procedure ImportFromExcel(ItemWorksheet: Record "Item Worksheet")
     var
         ImportExcelItemWorksheet: Report "Import Excel Item Worksheet";
@@ -87,6 +91,7 @@ codeunit 6060047 "Item Wsht. Imp. Exp. Mgt."
         ImportExcelItemWorksheet.Run;
     end;
 
+    [Scope('Personalization')]
     procedure SelectExcelToMap(ItemWorksheet: Record "Item Worksheet")
     var
         MapExcelItemWorksheet: Report "Map Excel Item Worksheet";
@@ -97,6 +102,7 @@ codeunit 6060047 "Item Wsht. Imp. Exp. Mgt."
         MapExcelItemWorksheet.Run;
     end;
 
+    [Scope('Personalization')]
     procedure SetImportActionWorksheetLine(var ItemWorksheetLine: Record "Item Worksheet Line")
     begin
         //-NPR5.22
@@ -110,6 +116,7 @@ codeunit 6060047 "Item Wsht. Imp. Exp. Mgt."
         //+NPR5.22
     end;
 
+    [Scope('Personalization')]
     procedure SetImportActionWorksheetVariantLine(ItemWorksheetLine: Record "Item Worksheet Line";ActionIfVariantUnknown: Option Skip,Create;ActionIfVarietyUnknown: Option Skip,Create;var ItemWorksheetVariantLine: Record "Item Worksheet Variant Line")
     var
         VarietyValue: Record "Variety Value";
@@ -134,6 +141,7 @@ codeunit 6060047 "Item Wsht. Imp. Exp. Mgt."
         //+NPR5.22
     end;
 
+    [Scope('Personalization')]
     procedure RaiseOnBeforeExportWorksheetLine(var ItemWorksheetLine: Record "Item Worksheet Line")
     begin
         //-NPR5.28 [259200]
@@ -141,6 +149,7 @@ codeunit 6060047 "Item Wsht. Imp. Exp. Mgt."
         //+NPR5.28 [259200]
     end;
 
+    [Scope('Personalization')]
     procedure RaiseOnBeforeExportWorksheetVariantLine(var ItemWorksheetVariantLine: Record "Item Worksheet Variant Line")
     begin
         //-NPR5.28 [259200]
@@ -148,6 +157,7 @@ codeunit 6060047 "Item Wsht. Imp. Exp. Mgt."
         //+NPR5.28 [259200]
     end;
 
+    [Scope('Personalization')]
     procedure RaiseOnAfterImportWorksheetLine(var ItemWorksheetLine: Record "Item Worksheet Line")
     begin
         //-NPR5.28 [259200]
@@ -155,6 +165,7 @@ codeunit 6060047 "Item Wsht. Imp. Exp. Mgt."
         //+NPR5.28 [259200]
     end;
 
+    [Scope('Personalization')]
     procedure RaiseOnAfterImportWorksheetVariantLine(var ItemWorksheetVariantLine: Record "Item Worksheet Variant Line")
     begin
         //-NPR5.28 [259200]

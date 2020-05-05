@@ -1,4 +1,4 @@
-pageextension 6014485 pageextension6014485 extends "Purch. Cr. Memo Subform" 
+pageextension 6014487 pageextension6014487 extends "Purch. Cr. Memo Subform" 
 {
     // NPR4.13/MMV /20150708 CASE 214173 Changed "No." to variable to handle barcode scanning OnValidate trigger.
     // NPR4.16/TS  /20151021 CASE 214173 Removed Code related to release 4.13

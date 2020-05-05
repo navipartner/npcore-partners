@@ -1,6 +1,7 @@
 codeunit 6151103 "NpRi Collect Vendor Ledgers"
 {
     // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
+    // NPR5.54/BHR /20200306  CASE 385924 Added date filter
 
 
     trigger OnRun()
@@ -133,6 +134,7 @@ codeunit 6151103 "NpRi Collect Vendor Ledgers"
         NpRiDataCollectionMgt: Codeunit "NpRi Data Collection Mgt.";
         TableView: Text;
         TableViewName: Text;
+        DataCollectionDatefilter: Text;
     begin
         Clear(VendLedgEntry);
 
@@ -148,6 +150,21 @@ codeunit 6151103 "NpRi Collect Vendor Ledgers"
         VendLedgEntry.SetFilter("Document Type",'%1|%2',VendLedgEntry."Document Type"::Invoice,VendLedgEntry."Document Type"::"Credit Memo");
         VendLedgEntry.FilterGroup(41);
         VendLedgEntry.SetFilter("Entry No.",'>%1',NpRiReimbursement."Last Data Collect Entry No.");
+        //-NPR5.54 [385924]
+        if NpRiReimbursement."From Date" <> 0D then
+          DataCollectionDatefilter := Format(NpRiReimbursement."From Date")+'..';
+
+        if NpRiReimbursement."To Date" <> 0D then begin
+          if DataCollectionDatefilter <> '' then
+           DataCollectionDatefilter := DataCollectionDatefilter + Format(NpRiReimbursement."To Date")
+          else
+            DataCollectionDatefilter := '..' + Format(NpRiReimbursement."To Date")
+
+        end;
+        if DataCollectionDatefilter <> '' then
+           VendLedgEntry.SetFilter("Posting Date",DataCollectionDatefilter);
+
+        //+NPR5.54 [385924]
         if NpRiParty.Get(NpRiReimbursement."Party Type",NpRiReimbursement."Party No.") then begin
           NpRiParty.CalcFields("Table No.");
           if NpRiParty."Table No." = DATABASE::Vendor then begin

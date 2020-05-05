@@ -1,7 +1,11 @@
 codeunit 6151127 "POS Action - Insert Item AddOn"
 {
-    // NPR5.48/MHA /20181113  CASE 334922 Object created - Insert Item AddOns directly from POS Action
-    // NPR5.52/ALPO/20190912  CASE 354309 Updated function call to respect the new signature
+    // NPR5.48/MHA /20181113 CASE 334922 Object created - Insert Item AddOns directly from POS Action
+    // NPR5.52/ALPO/20190912 CASE 354309 Updated function call to respect the new signature
+    // NPR5.54/ALPO/20200219 CASE 374666 Item AddOns: auto-insert fixed quantity lines regardless of user response
+    //                                     - Function Approve(): new call parameter: OnlyFixedQtyLines (boolean)
+    //                                     - Functions InitScript(), InitScriptData(), CreateUserInterface(), WebDepCode(), InitCss(), InitHtml()
+    //                                       moved out to CU 6151125 to avoid excessive code dublication
 
     SingleInstance = true;
 
@@ -110,6 +114,8 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
     var
         NpIaItemAddOn: Record "NpIa Item AddOn";
         SalePOS: Record "Sale POS";
+        AppliesToSaleLinePOS: Record "Sale Line POS";
+        NpIaItemAddOnMgt: Codeunit "NpIa Item AddOn Mgt.";
         POSSale: Codeunit "POS Sale";
         AddOnNo: Code[20];
     begin
@@ -121,95 +127,12 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         CurrNpIaItemAddOn := NpIaItemAddOn;
-        CreateUserInterface(SalePOS,NpIaItemAddOn);
-        ActiveModelID := FrontEnd.ShowModel(Model);
-    end;
-
-    local procedure "--- UI"()
-    begin
-    end;
-
-    local procedure CreateUserInterface(SalePOS: Record "Sale POS";NpIaItemAddOn: Record "NpIa Item AddOn")
-    begin
-        Model := Model.Model();
-        Model.AddHtml(InitHtml());
-        Model.AddStyle(InitCss());
-        Model.AddScript(InitScript(SalePOS,NpIaItemAddOn));
-    end;
-
-    local procedure "--- Init"()
-    begin
-    end;
-
-    local procedure WebDepCode(): Code[10]
-    begin
-        exit('ITEM_ADDON');
-    end;
-
-    local procedure InitCss() Css: Text
-    var
-        WebClientDependency: Record "Web Client Dependency";
-        StreamReader: DotNet npNetStreamReader;
-        InStr: InStream;
-    begin
-        if WebClientDependency.Get(WebClientDependency.Type::CSS,WebDepCode()) and WebClientDependency.BLOB.HasValue then begin
-          WebClientDependency.CalcFields(BLOB);
-          WebClientDependency.BLOB.CreateInStream(InStr);
-          StreamReader := StreamReader.StreamReader(InStr);
-          Css := StreamReader.ReadToEnd;
-
-          exit(Css);
-        end;
-    end;
-
-    local procedure InitHtml() Html: Text
-    var
-        WebClientDependency: Record "Web Client Dependency";
-        StreamReader: DotNet npNetStreamReader;
-        InStr: InStream;
-    begin
-        if WebClientDependency.Get(WebClientDependency.Type::HTML,WebDepCode()) and WebClientDependency.BLOB.HasValue then begin
-          WebClientDependency.CalcFields(BLOB);
-          WebClientDependency.BLOB.CreateInStream(InStr);
-          StreamReader := StreamReader.StreamReader(InStr);
-          Html := StreamReader.ReadToEnd;
-
-          exit(Html);
-        end;
-    end;
-
-    local procedure InitScript(SalePOS: Record "Sale POS";NpIaItemAddOn: Record "NpIa Item AddOn") Script: Text
-    var
-        RetailModelScriptLibrary: Codeunit "Retail Model Script Library";
-    begin
-        Script := RetailModelScriptLibrary.InitAngular();
-        Script += RetailModelScriptLibrary.InitJQueryUi();
-        Script += RetailModelScriptLibrary.InitTouchPunch();
-        Script += RetailModelScriptLibrary.InitEscClose();
-        Script += InitScriptData(SalePOS,NpIaItemAddOn);
-
-        exit(Script);
-    end;
-
-    local procedure InitScriptData(SalePOS: Record "Sale POS";NpIaItemAddOn: Record "NpIa Item AddOn") Script: Text
-    var
-        AppliesToSaleLinePOS: Record "Sale Line POS";
-        NpIaItemAddOnMgt: Codeunit "NpIa Item AddOn Mgt.";
-    begin
-        Script := '$(function () {' +
-          'var appElement = document.querySelector(''[ng-app=navApp]'');' +
-          'var $scope = angular.element(appElement).scope();' +
-          '$scope.$apply(function() {';
-
-        //Script += NpIaItemAddOnMgt.InitScriptAddOnLines(SalePOS,0,NpIaItemAddOn);  //NPR5.52 [354309]-revoked
-        //-NPR5.52 [354309]
+        //CreateUserInterface(SalePOS,NpIaItemAddOn);  //NPR5.54 [374666]-revoked
+        //-NPR5.54 [374666]
         Clear(AppliesToSaleLinePOS);
-        Script += NpIaItemAddOnMgt.InitScriptAddOnLines(SalePOS,AppliesToSaleLinePOS,NpIaItemAddOn);
-        //+NPR5.52 [354309]
-        Script += NpIaItemAddOnMgt.InitScriptLabels(NpIaItemAddOn);
-
-        Script += '});' +
-          '});';
+        NpIaItemAddOnMgt.CreateUserInterface(Model,SalePOS,AppliesToSaleLinePOS,NpIaItemAddOn);
+        //+NPR5.54 [374666]
+        ActiveModelID := FrontEnd.ShowModel(Model);
     end;
 
     local procedure "--- Approve"()
@@ -221,23 +144,32 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
     begin
         if ModelID <> ActiveModelID then
           exit;
-
+        
         Handled := true;
-
-        case Sender of
+        
+        //-NPR5.54 [374666]-revoked
+        /*
+        CASE Sender OF
           'approve':
-            begin
+            BEGIN
               Approve(EventName,FrontEnd);
               FrontEnd.CloseModel(ModelID);
-            end;
+            END;
           'cancel','close':
-            begin
+            BEGIN
               FrontEnd.CloseModel(ModelID);
-            end;
-        end;
+            END;
+        END;
+        */
+        //+NPR5.54 [374666]-revoked
+        //-NPR5.54 [374666]
+        Approve(EventName,FrontEnd,Sender <> 'approve');
+        FrontEnd.CloseModel(ModelID);
+        //+NPR5.54 [374666]
+
     end;
 
-    local procedure Approve(JsonText: Text;FrontEnd: Codeunit "POS Front End Management")
+    local procedure Approve(JsonText: Text;FrontEnd: Codeunit "POS Front End Management";OnlyFixedQtyLines: Boolean)
     var
         POSSession: Codeunit "POS Session";
         NpIaItemAddOnMgt: Codeunit "NpIa Item AddOn Mgt.";
@@ -246,7 +178,8 @@ codeunit 6151127 "POS Action - Insert Item AddOn"
     begin
         AddOnLines := AddOnLines.Parse(JsonText);
         FrontEnd.GetSession(POSSession);
-        NpIaItemAddOnMgt.InsertPOSAddOnLines(CurrNpIaItemAddOn,AddOnLines,POSSession,0);
+        //NpIaItemAddOnMgt.InsertPOSAddOnLines(CurrNpIaItemAddOn,AddOnLines,POSSession,0);  //NPR5.54 [374666]-revoked
+        NpIaItemAddOnMgt.InsertPOSAddOnLines(CurrNpIaItemAddOn,AddOnLines,POSSession,0,OnlyFixedQtyLines);  //NPR5.54 [374666]
 
         POSSession.RequestRefreshData();
         POSJavaScriptInterface.RefreshData(POSSession,FrontEnd);

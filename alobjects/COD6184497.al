@@ -74,7 +74,7 @@ codeunit 6184497 "Pepper Protocol"
     procedure SendTransaction(): Boolean
     var
         TextSetFixedCurrency: Label 'Transactions can only be refunded/reversed if the field %1 is set to the transactional currency %2 on %3.';
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         Register: Record Register;
     begin
         Success := false;
@@ -470,7 +470,7 @@ codeunit 6184497 "Pepper Protocol"
 
     local procedure WriteRequestReceipts()
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         RetailComment: Record "Retail Comment";
         Utility: Codeunit Utility;
         EntryNo: Integer;
@@ -610,7 +610,7 @@ codeunit 6184497 "Pepper Protocol"
 
     local procedure MakeReceipt(var StreamIn: InStream;var EntryNo: Integer;ReceiptType: Option CUSTOMER,MERCHANT)
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         RetailComment: Record "Retail Comment";
         Utility: Codeunit Utility;
         ReceiptLineText: Text;
@@ -676,7 +676,7 @@ codeunit 6184497 "Pepper Protocol"
         //+NPR5.28 [257214]
     end;
 
-    local procedure WriteRequestLine(var ParCreditCardTransaction: Record "Credit Card Transaction";ParEntryNo: Integer;ReceiptType: Option CUSTOMER,MERCHANT;ParText: Text)
+    local procedure WriteRequestLine(var ParCreditCardTransaction: Record "EFT Receipt";ParEntryNo: Integer;ReceiptType: Option CUSTOMER,MERCHANT;ParText: Text)
     begin
         with ParCreditCardTransaction do begin
           Validate("Register No.",SaleLinePOS."Register No.");
@@ -716,7 +716,7 @@ codeunit 6184497 "Pepper Protocol"
 
     local procedure WriteReceipt(ReceiptType: Option Open,Close,EndOfDay,Customer,Merchant,Recovery;ReceiptText: Text)
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         EntryNo: Integer;
         RemainingReceiptText: Text;
         ReceiptLineText: Text[100];

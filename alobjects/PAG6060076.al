@@ -5,6 +5,7 @@ page 6060076 "MM Membership Setup Card"
     // #334163/JDH /20181109 CASE 334163 Added Caption to Object
     // MM1.36/NPKNAV/20190125  CASE 343948 Transport MM1.36 - 25 January 2019
     // MM1.42/TSA /20191105 CASE 375381 Added Auto-Renew setup fields
+    // MM1.43/TSA /20200319 CASE 337112 Moved the ticket print setting to ticket tab
 
     Caption = 'Membership Setup Card';
     PageType = Card;
@@ -110,6 +111,22 @@ page 6060076 "MM Membership Setup Card"
                     {
                     }
                 }
+                group("Membercard Swipe")
+                {
+                    Caption = 'On Membercard Swipe';
+                    field("Ticket Print Model";"Ticket Print Model")
+                    {
+                    }
+                    field("Ticket Print Object Type";"Ticket Print Object Type")
+                    {
+                    }
+                    field("Ticket Print Object ID";"Ticket Print Object ID")
+                    {
+                    }
+                    field("Ticket Print Template Code";"Ticket Print Template Code")
+                    {
+                    }
+                }
             }
             group("CRM & Loyalty")
             {
@@ -168,18 +185,6 @@ page 6060076 "MM Membership Setup Card"
             group("On Membercard Swipe")
             {
                 field("Ticket Item Barcode";"Ticket Item Barcode")
-                {
-                }
-                field("Ticket Print Model";"Ticket Print Model")
-                {
-                }
-                field("Ticket Print Object Type";"Ticket Print Object Type")
-                {
-                }
-                field("Ticket Print Object ID";"Ticket Print Object ID")
-                {
-                }
-                field("Ticket Print Template Code";"Ticket Print Template Code")
                 {
                 }
             }

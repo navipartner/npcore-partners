@@ -20,6 +20,9 @@ report 6060151 "Event Team Template"
     // NPR5.41/TJ  /20180409 CASE 310426 Not showing rows for attributes which don't have values for any column
     // NPR5.48/TJ  /20181217 CASE 310452 Fixed deployed under 5.41 was pointing to wrong case no. Using proper case no. now
     // NPR5.51/TJ  /20190611 CASE 357701 Field Picture_Job removed from dataset
+    // NPR5.54/TJ  /20200302 CASE 392832 Added "Description 2", "Planning Date", "Starting Time" and "Ending Time" under ItemLine
+    //                                   Added "Creation Date" and "VAT Registration No." under Job
+    //                                   Formatting all time fields with new FormatTime function
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Event Team Template.rdlc';
 
@@ -87,10 +90,10 @@ report 6060151 "Event Team Template"
             column(InvoiceCurrencyCode_Job;Job."Invoice Currency Code")
             {
             }
-            column(StartingTime_Job;Format(Job."Starting Time",0,9))
+            column(StartingTime_Job;FormatTime(Job."Starting Time"))
             {
             }
-            column(EndingTime_Job;Format(Job."Ending Time",0,9))
+            column(EndingTime_Job;FormatTime(Job."Ending Time"))
             {
             }
             column(PreparationPeriod_Job;Job."Preparation Period")
@@ -106,6 +109,12 @@ report 6060151 "Event Team Template"
             {
             }
             column(PhoneNo_Job;Customer."Phone No.")
+            {
+            }
+            column(CreationDate_Job;FormatDate(Job."Creation Date"))
+            {
+            }
+            column(VATRegistrationNo_Job;Customer."VAT Registration No.")
             {
             }
             dataitem("Job Task";"Job Task")
@@ -176,10 +185,10 @@ report 6060151 "Event Team Template"
                     column(PlanningDate_TextLine;FormatDate(TextLine."Planning Date"))
                     {
                     }
-                    column(StartingTime_TextLine;Format(TextLine."Starting Time",0,9))
+                    column(StartingTime_TextLine;FormatTime(TextLine."Starting Time"))
                     {
                     }
-                    column(EndingTime_TextLine;Format(TextLine."Ending Time",0,9))
+                    column(EndingTime_TextLine;FormatTime(TextLine."Ending Time"))
                     {
                     }
                 }
@@ -194,10 +203,10 @@ report 6060151 "Event Team Template"
                     column(Description_ResourceLine;ResourceLine.Description)
                     {
                     }
-                    column(StartingTime_ResourceLine;Format(ResourceLine."Starting Time",0,9))
+                    column(StartingTime_ResourceLine;FormatTime(ResourceLine."Starting Time"))
                     {
                     }
-                    column(EndingTime_ResourceLine;Format(ResourceLine."Ending Time",0,9))
+                    column(EndingTime_ResourceLine;FormatTime(ResourceLine."Ending Time"))
                     {
                     }
                     column(Quantity_ResourceLine;ResourceLine.Quantity)
@@ -215,10 +224,22 @@ report 6060151 "Event Team Template"
                     DataItemLink = "Job No."=FIELD("Job No."),"Job Task No."=FIELD("Job Task No.");
                     DataItemTableView = WHERE(Type=CONST(Item));
                     RequestFilterHeading = 'Item Line';
+                    column(PlanningDate_ItemLine;FormatDate(ItemLine."Planning Date"))
+                    {
+                    }
+                    column(StartingTime_ItemLine;FormatTime(ItemLine."Starting Time"))
+                    {
+                    }
+                    column(EndingTime_ItemLine;FormatTime(ItemLine."Ending Time"))
+                    {
+                    }
                     column(No_ItemLine;ItemLine."No.")
                     {
                     }
                     column(Description_ItemLine;ItemLine.Description)
+                    {
+                    }
+                    column(Description2_ItemLine;ItemLine."Description 2")
                     {
                     }
                     column(Quantity_ItemLine;ItemLine.Quantity)
@@ -589,6 +610,15 @@ report 6060151 "Event Team Template"
         if Date <> 0D then
           exit(TypeHelper.FormatDate(Date,WindowsLanguage));
         exit('');
+    end;
+
+    local procedure FormatTime(Time: Time): Text
+    begin
+        //-NPR5.54 [392832]
+        if Time <> 0T then
+          exit(Format(Time,0,'<Hours24,2><Filler Character,0>:<Minutes,2>'));
+        exit('');
+        //+NPR5.54 [392832]
     end;
 }
 

@@ -10,6 +10,7 @@ codeunit 6151151 "M2 Account Manager"
     // MAG2.23/TSA /20191009 CASE 372257 Added some info to resetpassword request
     // MAG2.23.01/TSA /20191009 CASE 372257 Changed to Contact."No." rather then "Company No." in reset password request
     // MAG2.24/TSA /20191119 CASE 372304 Added Membership opt-out feature
+    // MAG2.25/BHR /20200319 CASE 368254 Mismatch of Email Address
 
 
     trigger OnRun()
@@ -969,7 +970,10 @@ codeunit 6151151 "M2 Account Manager"
         Account.Validate ("Country/Region Code", TmpAccount."Country/Region Code");
 
         if ( TmpAccount."E-Mail" <> '') then begin
-          if (TmpAccount."E-Mail" <> Account."E-Mail") then begin
+          //-MAG2.25 [368254]
+          //IF (TmpAccount."E-Mail" <> Account."E-Mail") THEN BEGIN
+          if (LowerCase(TmpAccount."E-Mail") <> LowerCase(Account."E-Mail")) then begin
+          //+MAG2.25 [368254]
             Contact.Reset ();
             Contact.SetFilter ("E-Mail", '=%1', LowerCase (TmpAccount."E-Mail"));
             if (not Contact.IsEmpty ()) then

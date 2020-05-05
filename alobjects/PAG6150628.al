@@ -13,6 +13,7 @@ page 6150628 "POS Payment Bin Checkpoint"
     // NPR5.49/TSA /20190314 CASE 348458 Added Forced Blind Count
     // NPR5.49/TSA /20190405 CASE 351350 Removed hide of the "Bank" transfer fields when doing BIN_TRANSFER
     // NPR5.50/TSA /20190429 CASE 353293 Handled the special scenario, when no bin checkpoint is included in manuel balancing
+    // NPR5.54/TSA /20200224 CASE 389250 Dont assume zero count when counting is virtual, allow negative transfer amount
 
     Caption = 'POS Payment Bin Checkpoint';
     //DataCaptionFields = Type,Field2,Field3;
@@ -180,7 +181,6 @@ page 6150628 "POS Payment Bin Checkpoint"
                     }
                     field("Bank Deposit Amount";"Bank Deposit Amount")
                     {
-                        MinValue = 0;
                         Style = Unfavorable;
                         StyleExpr = InvalidDistribution;
 
@@ -202,7 +202,6 @@ page 6150628 "POS Payment Bin Checkpoint"
                     }
                     field("Move to Bin Amount";"Move to Bin Amount")
                     {
-                        MinValue = 0;
                         Style = Unfavorable;
                         StyleExpr = InvalidDistribution;
 
@@ -354,6 +353,7 @@ page 6150628 "POS Payment Bin Checkpoint"
 
         //-NPR5.46 [322769]
         if (PageMode = PageMode::FINAL_COUNT) then begin
+
           POSPaymentBinCheckpoint.CopyFilters (Rec);
           POSPaymentBinCheckpoint.SetFilter ("Include In Counting", '=%1', POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL);
           if (POSPaymentBinCheckpoint.FindSet ()) then begin
@@ -397,6 +397,7 @@ page 6150628 "POS Payment Bin Checkpoint"
           POSPaymentBinCheckpoint.Reset ();
           POSPaymentBinCheckpoint.CopyFilters (Rec);
           POSPaymentBinCheckpoint.SetFilter ("Calculated Amount Incl. Float", '<%1', 0);
+          POSPaymentBinCheckpoint.SetFilter ("Include In Counting", '<>%1', POSPaymentBinCheckpoint."Include In Counting"::VIRTUAL); //-+NPR5.54 [389250]
           if (POSPaymentBinCheckpoint.FindSet ()) then begin
             repeat
               POSPaymentBinCheckpoint.Validate ("Counted Amount Incl. Float", 0);

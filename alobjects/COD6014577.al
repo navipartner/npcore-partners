@@ -144,7 +144,7 @@ codeunit 6014577 "Report - Tax Free Receipt"
         refund: Decimal;
         letterPrice: Text[50];
         creditNo: Code[100];
-        "Credit Card Transaction": Record "Credit Card Transaction";
+        "Credit Card Transaction": Record "EFT Receipt";
         flgCreditCard: Boolean;
         "Company Information": Record "Company Information";
         Salgslinie: Record "Audit Roll";

@@ -10,6 +10,7 @@ page 6014450 "Mixed Discount"
     // NPR5.45/MHA /20180820  CASE 323568 Added Time Intervals
     // NPR5.46/JDH /20181002 CASE 294354 Changed how mix discount are send to Retail Journal
     // NPR5.52/ANPA/20191001  CASE 370260 Removed Assist Edit for the Customer Disc. Group filter, added group around start date, end date, start time and end time
+    // NPR5.54/SARA/20200218  CASE 388008 Hide "Starting time" and "Ending time"
 
     Caption = 'Mix Discount';
     PageType = Card;
@@ -242,9 +243,11 @@ page 6014450 "Mixed Discount"
                     }
                     field("Starting time";"Starting time")
                     {
+                        Visible = false;
                     }
                     field("Ending time";"Ending time")
                     {
+                        Visible = false;
                     }
                     field("Customer Disc. Group Filter";"Customer Disc. Group Filter")
                     {

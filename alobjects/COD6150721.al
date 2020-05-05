@@ -10,6 +10,7 @@ codeunit 6150721 "POS Action - Login"
     // NPR5.51/TSA /20190622 CASE 359508 Adding a new pos period when the period is status closed (or missing) and the unit is open
     // NPR5.51/MMV /20190628 CASE 356076 Added system entry for login without balancing
     // NPR5.53/TJ  /20191202 CASE 379680 New publisher OnAfterFindSalesperson
+    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
 
 
     trigger OnRun()
@@ -254,17 +255,34 @@ codeunit 6150721 "POS Action - Login"
     var
         SalePOS: Record "Sale POS";
         POSAction: Record "POS Action";
+        POSResumeSale: Codeunit "POS Resume Sale Mgt.";
         POSSale: Codeunit "POS Sale";
         POSCreateEntry: Codeunit "POS Create Entry";
         POSSetup: Codeunit "POS Setup";
+        ResumeFromPOSQuoteNo: Integer;
+        ResumeExistingSale: Boolean;
     begin
+        //-NPR5.54 [364658]
+        ResumeExistingSale := POSResumeSale.SelectUnfinishedSaleToResume(SalePOS,POSSession,ResumeFromPOSQuoteNo);
+        //+NPR5.54 [364658]
+
         //-NPR5.51 [356076]
         POSSession.GetSetup(POSSetup);
         POSCreateEntry.InsertUnitLoginEntry(POSSetup.Register, POSSetup.Salesperson);
         //+NPR5.51 [356076]
 
-        POSSession.StartTransaction ();
+        //-NPR5.54 [364658]
+        if ResumeExistingSale and (ResumeFromPOSQuoteNo = 0) then
+          POSSession.ResumeTransaction(SalePOS)
+        else
+        //+NPR5.54 [364658]
+          POSSession.StartTransaction ();
         POSSession.GetSale (POSSale);
+        //-NPR5.54 [364658]
+        if ResumeFromPOSQuoteNo <> 0 then
+          if POSSale.ResumeFromPOSQuote(ResumeFromPOSQuoteNo) then
+            POSSession.RequestRefreshData();
+        //+NPR5.54 [364658]
         POSSale.GetCurrentSale (SalePOS);
         POSSession.ChangeViewSale();
     end;

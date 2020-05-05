@@ -7,6 +7,7 @@ page 6151205 "NpCs Collect Store Orders"
     // NPR5.53/MHA /20191105  CASE 374049 Promoted Action "Send Notification to Customer" and added UsageCategory = Lists
     // NPR5.53/MHA /20192811  CASE 379742 Added Action Print Confirmation
     // NPR5.53/MHA /20191128  CASE 378895 Removed Sorting Key
+    // NPR5.54/MHA /20200212  CASE 390479 Changed visibility for Action "Confirm Order" and "Reject Order" to also include #blank Processing Status
 
     Caption = 'Collect in Store Orders';
     CardPageID = "NpCs Collect Store Order Card";
@@ -231,7 +232,7 @@ page 6151205 "NpCs Collect Store Orders"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = ("Processing Status" = 1) AND ("Delivery Status" = 0);
+                    Visible = (("Processing Status" = 0) OR ("Processing Status" = 1)) AND ("Delivery Status" = 0);
 
                     trigger OnAction()
                     var
@@ -250,7 +251,7 @@ page 6151205 "NpCs Collect Store Orders"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = ("Processing Status" = 1) AND ("Delivery Status" = 0) AND ("Store Stock");
+                    Visible = (("Processing Status" = 0) OR ("Processing Status" = 1)) AND ("Delivery Status" = 0) AND ("Store Stock");
 
                     trigger OnAction()
                     var

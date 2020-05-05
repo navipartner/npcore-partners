@@ -1,10 +1,13 @@
 page 6150682 "NPRE W.Pad Line Pr.Log Entries"
 {
     // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
+    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
 
-    Caption = 'W. Pad Line Print Log Entries';
+    Caption = 'W. Pad Line Send Log Entries';
+    Editable = false;
     PageType = List;
     SourceTable = "NPRE W.Pad Line Prnt Log Entry";
+    UsageCategory = History;
 
     layout
     {
@@ -34,6 +37,9 @@ page 6150682 "NPRE W.Pad Line Pr.Log Entries"
                 {
                 }
                 field("Sent Date-Time";"Sent Date-Time")
+                {
+                }
+                field("Output Type";"Output Type")
                 {
                 }
                 field("Entry No.";"Entry No.")

@@ -4,6 +4,7 @@ table 6150666 "NPRE Seating Location"
     // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
     // NPR5.52/ALPO/20190813 CASE 360258 Location specific setting of 'Auto print kintchen order'
     // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
+    // NPR5.54/ALPO/20200401 CASE 382428 Kitchen Display System (KDS) for NP Restaurant
 
     Caption = 'Seating Location';
     DrillDownPageID = "NPRE Seating Location";
@@ -18,6 +19,12 @@ table 6150666 "NPRE Seating Location"
         field(2;Description;Text[50])
         {
             Caption = 'Description';
+        }
+        field(3;"Restaurant Code";Code[20])
+        {
+            Caption = 'Restaurant Code';
+            Description = 'NPR5.54';
+            TableRelation = "NPRE Restaurant";
         }
         field(10;Seatings;Integer)
         {
@@ -36,17 +43,24 @@ table 6150666 "NPRE Seating Location"
             Caption = 'POS Store';
             TableRelation = "POS Store".Code;
         }
-        field(30;"Auto Print Kitchen Order";Option)
+        field(30;"Auto Send Kitchen Order";Option)
         {
-            Caption = 'Auto Print Kitchen Order';
-            Description = 'NPR5.52';
+            Caption = 'Auto Send Kitchen Order';
+            Description = 'NPR5.52,NPR5.54';
             OptionCaption = 'Default,No,Yes,Ask';
             OptionMembers = Default,No,Yes,Ask;
         }
-        field(40;"Send by Prnt Category";Boolean)
+        field(31;"Resend All On New Lines";Option)
         {
-            Caption = 'Send by Prnt Category';
-            Description = 'NPR5.53';
+            Caption = 'Resend All On New Lines';
+            Description = 'NPR5.54';
+            OptionCaption = 'Default,No,Yes,Ask';
+            OptionMembers = Default,No,Yes,Ask;
+        }
+        field(40;"Send by Print Category";Boolean)
+        {
+            Caption = 'Send by Print Category';
+            Description = 'NPR5.53,NPR5.54';
         }
     }
 

@@ -4,6 +4,7 @@ codeunit 6014598 "POS End Sale - Dim. Sale Stat"
     // NPR5.40/TSA /20180126 CASE 303399 Using setup to dictate which action to run on view change
     // NPR5.40/TSA /20180305 CASE 303399 Refactored because action parameter storage has changed
     // NPR5.40/VB  /20180307 CASE 306347 Refactored retrieval of POS Action
+    // NPR5.54/TSA /20200220 CASE 391850 Handled the POSSetup per unit
 
 
     [EventSubscriber(ObjectType::Codeunit, 6150704, 'OnBeforeChangeToPaymentView', '', true, true)]
@@ -12,10 +13,16 @@ codeunit 6014598 "POS End Sale - Dim. Sale Stat"
         POSAction: Record "POS Action";
         POSSetup: Record "POS Setup";
         POSParameterValue: Record "POS Parameter Value";
+        Setup: Codeunit "POS Setup";
     begin
         //-NPR5.40 [303399]
 
-        POSSetup.Get();
+        //-NPR5.54 [391850]
+        // POSSetup.GET ();
+        POSSession.GetSetup (Setup);
+        Setup.GetNamedActionSetup (POSSetup);
+        //+NPR5.54 [391850]
+
         if (POSSetup."OnBeforePaymentView Action" <> '') then begin
             //-NPR5.40 [306347]
             //  POSAction.GET (POSSetup."OnBeforePaymentView Action");

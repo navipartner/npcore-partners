@@ -7,6 +7,7 @@ table 6059966 "MPOS App Setup"
     // NPR5.38/CLVA/20171011 CASE 289636 Added fields "Receipt Report ID" and "Receipt Report Caption"
     // NPR5.39/BR  /20180214 CASE 304312 Renamed field "Receipt Report ID" and "Receipt Report Caption" to "Audit Roll Report ID" and "Audit Roll Report Caption", and added fields "POS Entry Report ID" and "POS Entry Report Caption"
     // NPR5.39/JDH /20180220 CASE 305746 Audit Roll Report Caption + POS Entry Report Caption changed to 249 characters
+    // NPR5.54/TJ  /20200303 CASE 393290 Removed fields 14 "Audit Roll Report ID", 15 "Audit Roll Report Caption", 20 "POS Entry Report ID" and 21 "POS Entry Report Caption"
 
     Caption = 'MPOS App Setup';
 
@@ -34,24 +35,6 @@ table 6059966 "MPOS App Setup"
         {
             Caption = 'Ticket Admission Web Url';
         }
-        field(14;"Audit Roll Report ID";Integer)
-        {
-            Caption = 'Audit Roll Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE ("Object Type"=CONST(Report));
-
-            trigger OnValidate()
-            begin
-                CalcFields("Audit Roll Report Caption");
-            end;
-        }
-        field(15;"Audit Roll Report Caption";Text[249])
-        {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE ("Object Type"=CONST(Report),
-                                                                           "Object ID"=FIELD("Audit Roll Report ID")));
-            Caption = 'Audit Roll Report Caption';
-            Editable = false;
-            FieldClass = FlowField;
-        }
         field(16;"Receipt Web API";Text[250])
         {
             Caption = 'Receipt Web API';
@@ -70,28 +53,6 @@ table 6059966 "MPOS App Setup"
         {
             Caption = 'Encryption Key';
             ExtendedDatatype = Masked;
-        }
-        field(20;"POS Entry Report ID";Integer)
-        {
-            Caption = 'POS Entry Report ID';
-            Description = 'NPR5.39';
-            TableRelation = AllObjWithCaption."Object ID" WHERE ("Object Type"=CONST(Report));
-
-            trigger OnValidate()
-            begin
-                //-NPR5.39 [304312]
-                CalcFields("Audit Roll Report Caption");
-                //+NPR5.39 [304312]
-            end;
-        }
-        field(21;"POS Entry Report Caption";Text[249])
-        {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE ("Object Type"=CONST(Report),
-                                                                           "Object ID"=FIELD("POS Entry Report ID")));
-            Caption = 'POS Entry Report Caption';
-            Description = 'NPR5.39';
-            Editable = false;
-            FieldClass = FlowField;
         }
         field(100;Enable;Boolean)
         {

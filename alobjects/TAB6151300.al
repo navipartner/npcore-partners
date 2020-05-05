@@ -1,6 +1,7 @@
 table 6151300 "NpEc Store"
 {
     // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
+    // NPR5.54/MHA /20200129  CASE 367842 Added fields 160 "Allow Create Customers", 170 "Update Customers from Sales Order"
 
     Caption = 'Np E-commerce Store';
     DrillDownPageID = "NpEc Stores";
@@ -49,6 +50,18 @@ table 6151300 "NpEc Store"
         {
             Caption = 'Customer Config. Template Code';
             TableRelation = "Config. Template Header".Code WHERE ("Table ID"=CONST(18));
+        }
+        field(160;"Allow Create Customers";Boolean)
+        {
+            Caption = 'Allow Create Customers';
+            Description = 'NPR5.54';
+            InitValue = true;
+        }
+        field(170;"Update Customers from S. Order";Boolean)
+        {
+            Caption = 'Update Customers from Sales Order';
+            Description = 'NPR5.54';
+            InitValue = true;
         }
     }
 

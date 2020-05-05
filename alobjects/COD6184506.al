@@ -1,6 +1,7 @@
 codeunit 6184506 "EFT Trx Background Session Mgt"
 {
     // NPR5.53/MMV /20191120 CASE 377533 Created object
+    // NPR5.54/MMV /20200226 CASE 364340 Added method IsRequestOutdated & ResponseExists()
 
 
     trigger OnRun()
@@ -11,10 +12,13 @@ codeunit 6184506 "EFT Trx Background Session Mgt"
     begin
     end;
 
-    procedure CreateRequestRecord(TrxEntryNo: Integer;var EFTTransactionAsyncRequest: Record "EFT Transaction Async Request")
+    procedure CreateRequestRecord(EFTTransactionRequest: Record "EFT Transaction Request";var EFTTransactionAsyncRequest: Record "EFT Transaction Async Request")
     begin
         EFTTransactionAsyncRequest.Init;
-        EFTTransactionAsyncRequest."Request Entry No" := TrxEntryNo;
+        //-NPR5.54 [364340]
+        EFTTransactionAsyncRequest."Request Entry No" := EFTTransactionRequest."Entry No.";
+        EFTTransactionAsyncRequest."Hardware ID" := EFTTransactionRequest."Hardware ID";
+        //+NPR5.54 [364340]
         EFTTransactionAsyncRequest.Insert;
     end;
 
@@ -38,6 +42,17 @@ codeunit 6184506 "EFT Trx Background Session Mgt"
 
         EFTTransactionAsyncRequest.Get(TrxEntryNo);
         exit(EFTTransactionAsyncRequest."Abort Requested");
+    end;
+
+    procedure IsRequestOutdated(TrxEntryNo: Integer;HardwareID: Text): Boolean
+    var
+        EFTTransactionAsyncRequest: Record "EFT Transaction Async Request";
+    begin
+        //-NPR5.54 [364340]
+        EFTTransactionAsyncRequest.SetRange("Hardware ID", HardwareID);
+        EFTTransactionAsyncRequest.SetFilter("Request Entry No", '>%1', TrxEntryNo);
+        exit(not EFTTransactionAsyncRequest.IsEmpty);
+        //+NPR5.54 [364340]
     end;
 
     procedure MarkRequestAsDone(TrxEntryNo: Integer)
@@ -85,6 +100,16 @@ codeunit 6184506 "EFT Trx Background Session Mgt"
         EFTTransactionAsyncResponse.LockTable;
         EFTTransactionAsyncResponse.SetAutoCalcFields(Response);
         EFTTransactionAsyncResponse.Get(TrxEntryNo);
+    end;
+
+    procedure ResponseExists(TrxEntryNo: Integer): Boolean
+    var
+        EFTTransactionAsyncResponse: Record "EFT Transaction Async Response";
+    begin
+        //-NPR5.54 [364340]
+        EFTTransactionAsyncResponse.SetRange("Request Entry No", TrxEntryNo);
+        exit(not EFTTransactionAsyncResponse.IsEmpty);
+        //+NPR5.54 [364340]
     end;
 }
 

@@ -200,6 +200,7 @@ codeunit 6151533 "Nc Coll. Req. WebService Mgr"
     begin
     end;
 
+    [Scope('Personalization')]
     procedure Initialize()
     begin
 

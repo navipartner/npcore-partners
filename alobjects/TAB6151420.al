@@ -12,6 +12,7 @@ table 6151420 "Magento Store Item"
     // MAG9.00.2.11/TS  /20180301  CASE 305585 Added field Visibility.
     // MAG2.17/JDH /20181112 CASE 334163 Added Caption to Field 1025
     // MAG2.22/MHA /20190614  CASE 358258 Extended field 300 "Meta Title" from 70 to 100
+    // MAG2.25/MHA /20200416  CASE 395915 Added FlowField 1030 "Language Codee"
 
     Caption = 'Magento Store Item';
 
@@ -215,6 +216,13 @@ table 6151420 "Magento Store Item"
             Description = 'MAG9.00.2.11';
             OptionCaption = 'Visible,Hidden';
             OptionMembers = Visible,Hidden;
+        }
+        field(1030;"Language Code";Code[10])
+        {
+            CalcFormula = Lookup("Magento Store"."Language Code" WHERE (Code=FIELD("Store Code")));
+            Caption = 'Language Code';
+            Description = 'MAG2.25';
+            FieldClass = FlowField;
         }
     }
 

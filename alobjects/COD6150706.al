@@ -47,6 +47,7 @@ codeunit 6150706 "POS Sale Line"
     // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
     // NPR5.53/TSA /20191219 CASE 382035 Added possibility to show item count as part of the sales summary on POS
     // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
+    // NPR5.54/ALPO/20200331 CASE 398454 Price VAT recalculation using VAT parameters preset in passed line
 
 
     trigger OnRun()
@@ -70,6 +71,7 @@ codeunit 6150706 "POS Sale Line"
         Initialized: Boolean;
         CannotCalcPriceInclVATErr: Label 'Prices including VAT cannot be calculated when %1 is %2.';
         ItemCountWhenCalculatedBalance: Decimal;
+        UseLinePriceVATParams: Boolean;
 
     [Scope('Personalization')]
     procedure Init(RegisterNo: Code[20];SalesTicketNo: Code[20];SaleIn: Codeunit "POS Sale";SetupIn: Codeunit "POS Setup";FrontEndIn: Codeunit "POS Front End Management")
@@ -298,6 +300,11 @@ codeunit 6150706 "POS Sale Line"
 
           Validate("Allow Invoice Discount",Line."Allow Invoice Discount");
           Validate("Invoice Discount Amount", Line."Invoice Discount Amount");
+          //-NPR5.54 [398454]
+          if (Line."Unit Price" <> 0) and UseLinePriceVATParams then
+            ConvertPriceToVAT(Line."Price Includes VAT",Line."VAT Bus. Posting Group",Line."VAT Prod. Posting Group",Rec,Line."Unit Price")
+          else
+          //+NPR5.54 [398454]
           //-NPR5.51 [363243]
           if (Type = Type::Item) and ("No." <> '') and (Line."Unit Price" <> 0) then begin
             Item.Get("No.");
@@ -906,6 +913,13 @@ codeunit 6150706 "POS Sale Line"
         //-NPR5.52 [354309]
         xSaleLinePOS := xRec;
         //+NPR5.52 [354309]
+    end;
+
+    procedure SetUseLinePriceVATParams(Use: Boolean)
+    begin
+        //-NPR5.54 [398454]
+        UseLinePriceVATParams := Use;
+        //+NPR5.54 [398454]
     end;
 }
 

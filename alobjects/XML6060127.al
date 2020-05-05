@@ -9,6 +9,7 @@ xmlport 6060127 "MM Create Membership"
     // MM1.26/TSA /20180219 CASE 305631 Added element DocumentID
     // MM1.40/TSA /20190827 CASE 360242 Adding support for attributes
     // MM1.41/TSA /20191001 CASE 359703 Added the optional field company name
+    // MM1.43/TSA /20200130 CASE 386080 Added preassigned_customer_number
 
     Caption = 'Create Membership';
     FormatEvaluate = Xml;
@@ -35,6 +36,10 @@ xmlport 6060127 "MM Create Membership"
                         MinOccurs = Zero;
                     }
                     fieldelement(companyname;tmpMemberInfoCapture."Company Name")
+                    {
+                        MinOccurs = Zero;
+                    }
+                    fieldelement(preassigned_customer_number;tmpMemberInfoCapture."Customer No.")
                     {
                         MinOccurs = Zero;
                     }
@@ -87,6 +92,9 @@ xmlport 6060127 "MM Create Membership"
                         {
                         }
                         fieldelement(membershipnumber;tmpMembershipResponse."External Membership No.")
+                        {
+                        }
+                        fieldelement(customer_number;tmpMembershipResponse."Customer No.")
                         {
                         }
                         fieldelement(issuedate;tmpMembershipResponse."Issued Date")

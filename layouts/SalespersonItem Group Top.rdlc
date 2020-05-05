@@ -1810,7 +1810,7 @@
               <Width>7.62033cm</Width>
               <ZIndex>1</ZIndex>
               <Visibility>
-                <Hidden>=iif(IsNothing(Fields!CompanyInfoPicture.Value) = true,true,false)</Hidden>
+                <Hidden>true</Hidden>
               </Visibility>
               <DataElementOutput>NoOutput</DataElementOutput>
               <Style>

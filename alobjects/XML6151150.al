@@ -6,6 +6,9 @@ xmlport 6151150 "M2 Authenticate"
     // MAG2.23/TSA /20191015 CASE 373151 Changed cardinality for person section, added storecode
     // MAG2.24/TSA /20191015 CASE 373151 Added storecode
     // MAG2.24/TSA /20191119 CASE 372304 Added Membership section
+    // MAG2.25/TSA /20200225 CASE 390083 Adding SellTo Node with customer number and search name
+    // MAG2.25/TSA /20200228 CASE 391933 Expanding the login email to match a salesperson with same email, if found, also list those accounts
+    // MAG2.25/TSA /20200414 CASE 400138 Exclude affilliated true contact when "magento contact" is false
 
     Caption = 'Authenticate';
     Encoding = UTF8;
@@ -91,6 +94,10 @@ xmlport 6151150 "M2 Authenticate"
                                   TmpContactResponse."Company No." := '';
                             end;
                         }
+                        textattribute(isaffiliated)
+                        {
+                            XmlName = 'Affiliated';
+                        }
                         fieldelement(Name;TmpContactResponse.Name)
                         {
                         }
@@ -173,6 +180,49 @@ xmlport 6151150 "M2 Authenticate"
                             {
                             }
                         }
+                        tableelement(tmpcontactbusinessrelationresp;"Contact Business Relation")
+                        {
+                            LinkFields = "Contact No."=FIELD("No.");
+                            LinkTable = TmpContactResponse;
+                            MaxOccurs = Once;
+                            MinOccurs = Zero;
+                            XmlName = 'SellTo';
+                            UseTemporary = true;
+                            fieldattribute(Id;TmpContactBusinessRelationResp."No.")
+                            {
+                            }
+                            textelement(customersearchname)
+                            {
+                                XmlName = 'SearchName';
+                            }
+                            textelement(salesperson)
+                            {
+                                XmlName = 'Salesperson';
+                                textattribute(salespersoncode)
+                                {
+                                    XmlName = 'Code';
+                                }
+                            }
+
+                            trigger OnAfterGetRecord()
+                            var
+                                SalespersonPurchaser: Record "Salesperson/Purchaser";
+                            begin
+
+                                //-MAG2.25 [390083]
+                                if (not Customer.Get (TmpContactBusinessRelationResp."No.")) then
+                                  Clear (Customer);
+
+                                CustomerSearchName := Customer."Search Name";
+
+                                if (Customer."Salesperson Code" <> '') then begin
+                                  if (SalespersonPurchaser.Get (Customer."Salesperson Code")) then
+                                    Salesperson := SalespersonPurchaser.Name;
+                                  SalespersonCode := Customer."Salesperson Code";
+                                end;
+                                //+MAG2.25 [390083]
+                            end;
+                        }
 
                         trigger OnAfterGetRecord()
                         var
@@ -189,6 +239,10 @@ xmlport 6151150 "M2 Authenticate"
                                 if (not Customer.Get (ContactBusinessRelation."No.")) then
                                   Clear (Customer);
                             //-MAG2.24 [373151]
+
+                            //-#xx
+                            IsAffiliated := Format ((TmpOneTimePasswordRequest."E-Mail" <> TmpContactResponse."E-Mail"), 0, 9);
+                            //+#xx
                         end;
                     }
                 }
@@ -237,9 +291,15 @@ xmlport 6151150 "M2 Authenticate"
     procedure SetResponse(var TmpContact: Record Contact temporary)
     var
         MembershipRole: Record "MM Membership Role";
+        ContactBusinessRelation: Record "Contact Business Relation";
     begin
 
         TmpContact.Reset ();
+
+        //-MAG2.25 [391933]
+        AppendAffiliatedContacts (TmpContact);
+        //+MAG2.25 [391933]
+
         if (TmpContact.FindSet ()) then begin
           repeat
             TmpContactResponse.TransferFields (TmpContact, true);
@@ -254,6 +314,17 @@ xmlport 6151150 "M2 Authenticate"
               TmpMembershipRoleResponse.Insert ();
             end;
             //+MAG2.24 [372304]
+
+            //-MAG2.25 [390083]
+            ContactBusinessRelation.SetFilter ("Link to Table", '=%1', ContactBusinessRelation."Link to Table"::Customer);
+            ContactBusinessRelation.SetFilter ("Contact No.", '=%1', TmpContact."Company No.");
+            if (ContactBusinessRelation.FindFirst ()) then begin
+              TmpContactBusinessRelationResp.TransferFields (ContactBusinessRelation, true);
+              TmpContactBusinessRelationResp."Contact No." := TmpContact."No.";
+              if (not TmpContactBusinessRelationResp.Insert ()) then ;
+            end;
+            //+MAG2.25 [390083]
+
           until (TmpContact.Next () = 0);
         end;
 
@@ -270,6 +341,42 @@ xmlport 6151150 "M2 Authenticate"
         ExecutionTime := StrSubstNo ('%1 (ms)', Format (Time - StartTime, 0, 9));
         ResponseCode := 'ERROR';
         ResponseMessage := ReasonText;
+    end;
+
+    local procedure AppendAffiliatedContacts(var TmpContact: Record Contact temporary)
+    var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        PrimaryContact: Record Contact;
+        ContactBusinessRelation: Record "Contact Business Relation";
+    begin
+
+        //-MAG2.25 [391933]
+        if (TmpContact.FindSet ()) then begin
+          TmpOneTimePasswordRequest.Reset ();
+          TmpOneTimePasswordRequest.FindFirst ();
+
+          SalespersonPurchaser.SetFilter ("E-Mail", '=%1', TmpOneTimePasswordRequest."E-Mail");
+          if (SalespersonPurchaser.FindSet ()) then begin
+            repeat
+              Customer.SetFilter ("Salesperson Code", '=%1', SalespersonPurchaser.Code);
+              if (Customer.FindSet ()) then begin
+                repeat
+                  ContactBusinessRelation.SetFilter ("Link to Table", '=%1', ContactBusinessRelation."Link to Table"::Customer);
+                  ContactBusinessRelation.SetFilter ("No.", '=%1', Customer."No.");
+                  if (ContactBusinessRelation.FindFirst ()) then begin
+                    if (PrimaryContact.Get (ContactBusinessRelation."Contact No.")) then begin
+                      TmpContact.TransferFields (PrimaryContact, true);
+                      TmpContact."Company No." := TmpContact."No.";
+                      if (TmpContact."Magento Contact") then //-+MAG2.25 [400138]
+                        if (not TmpContact.Insert ()) then ;
+                    end;
+                  end;
+                until (Customer.Next () = 0);
+              end;
+            until (SalespersonPurchaser.Next () = 0);
+          end;
+        end;
+        //+MAG2.25 [391933]
     end;
 }
 

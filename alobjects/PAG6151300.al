@@ -7,6 +7,7 @@ page 6151300 "NpEc Stores"
     Editable = false;
     PageType = List;
     SourceTable = "NpEc Store";
+    UsageCategory = Administration;
 
     layout
     {

@@ -1,6 +1,7 @@
 codeunit 6184526 "EFT Verifone Vim Integration"
 {
     // NPR5.53/MMV /20191203 CASE 349520 Created object
+    // NPR5.54/MMV /20200414 CASE 364340 Added card data for voids
 
 
     trigger OnRun()
@@ -155,6 +156,16 @@ codeunit 6184526 "EFT Verifone Vim Integration"
         Handled := true;
 
         OriginalEftTrxRequest.Get(EftTransactionRequest."Processed Entry No.");
+        //-NPR5.54 [364340]
+        if OriginalEftTrxRequest.Recovered then
+          OriginalEftTrxRequest.Get(OriginalEftTrxRequest."Recovered by Entry No.");
+
+        //Integration does not provide these values in void response so we copy manually
+        EftTransactionRequest."Card Number" := OriginalEftTrxRequest."Card Number";
+        EftTransactionRequest."Card Name" := OriginalEftTrxRequest."Card Name";
+        EftTransactionRequest."Card Application ID" := OriginalEftTrxRequest."Card Application ID";
+        EftTransactionRequest."Card Issuer ID" := OriginalEftTrxRequest."Card Issuer ID";
+        //+NPR5.54 [364340]
         OriginalEftTrxRequest.TestField("External Transaction ID");
 
         EftTransactionRequest.Recoverable := true;
@@ -186,6 +197,15 @@ codeunit 6184526 "EFT Verifone Vim Integration"
 
         OriginalEftTrxRequest.Get(EftTransactionRequest."Processed Entry No.");
         OriginalEftTrxRequest.TestField("Reference Number Output");
+        //-NPR5.54 [364340]
+        if OriginalEftTrxRequest."Processing Type" = OriginalEftTrxRequest."Processing Type"::VOID then begin
+          //Integration does not provide these values in void response so we copy manually
+          EftTransactionRequest."Card Number" := OriginalEftTrxRequest."Card Number";
+          EftTransactionRequest."Card Name" := OriginalEftTrxRequest."Card Name";
+          EftTransactionRequest."Card Application ID" := OriginalEftTrxRequest."Card Application ID";
+          EftTransactionRequest."Card Issuer ID" := OriginalEftTrxRequest."Card Issuer ID";
+        end;
+        //+NPR5.54 [364340]
 
         EftTransactionRequest.Insert(true);
         EftTransactionRequest."Reference Number Input" := Format(EftTransactionRequest."Entry No.");
@@ -249,7 +269,7 @@ codeunit 6184526 "EFT Verifone Vim Integration"
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnPrintReceipt', '', false, false)]
     local procedure OnPrintReceipt(EFTTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
     begin
         if not EFTTransactionRequest.IsType(IntegrationType()) then
           exit;
@@ -541,7 +561,12 @@ codeunit 6184526 "EFT Verifone Vim Integration"
         if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::SETUP) and (EftTransactionRequest.Successful) then
           Message(EftTransactionRequest."Result Display Text");
 
-        if EftTransactionRequest."Processing Type" in [EftTransactionRequest."Processing Type"::PAYMENT, EftTransactionRequest."Processing Type"::REFUND, EftTransactionRequest."Processing Type"::LOOK_UP] then begin
+        //-NPR5.54 [364340]
+        if EftTransactionRequest."Processing Type" in [EftTransactionRequest."Processing Type"::PAYMENT,
+                                                       EftTransactionRequest."Processing Type"::REFUND,
+                                                       EftTransactionRequest."Processing Type"::LOOK_UP,
+                                                       EftTransactionRequest."Processing Type"::VOID] then begin
+        //+NPR5.54 [364340]
           if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, PaymentTypePOS) then begin
             EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
             EftTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen (EftTransactionRequest."Card Name"));

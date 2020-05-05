@@ -7,6 +7,7 @@ codeunit 6150813 "POS Action - Item Lookup"
     // NPR5.41/TSA /20180411  CASE 308522 Added Action option to filter item and SKU on location code from POS Store or Cash Register
     // NPR5.41/TSA /20180412  CASE 311104 Refactoring runmodal and invoke workflow as 2 step rather than one, since the workflow order gets out of sequence.
     // NPR5.46/MHA /20180925  CASE 329616 Position should be set based on current Sales Line in OnLookupItem()
+    // NPR5.54/TSA /20200220  CASE 391850 Added handling for POS Setup per unit
 
 
     trigger OnRun()
@@ -270,6 +271,7 @@ codeunit 6150813 "POS Action - Item Lookup"
     local procedure AddItemToSale(ItemNo: Code[20]; POSSession: Codeunit "POS Session"; FrontEnd: Codeunit "POS Front End Management"; Context: JsonObject)
     var
         POSSaleLine: Codeunit "POS Sale Line";
+        Setup: Codeunit "POS Setup";
         NewSaleLinePOS: Record "Sale Line POS";
         Register: Record Register;
         POSSetup: Record "POS Setup";
@@ -277,32 +279,19 @@ codeunit 6150813 "POS Action - Item Lookup"
     begin
         if ItemNo = '' then exit;
 
-        //-NPR5.36 [292281]
-        POSSetup.Get();
-        //-NPR5.40 [306347]
-        //POSAction.GET (POSSetup."Item Insert Action Code");
+        //-NPR5.54 [391850] also cleaned green code
+        //POSSetup.GET ();
+        POSSession.GetSetup (Setup);
+        Setup.GetNamedActionSetup (POSSetup);
+        //+NPR5.54 [391850]
+
         if not POSSession.RetrieveSessionAction(POSSetup."Item Insert Action Code", POSAction) then
             POSAction.Get(POSSetup."Item Insert Action Code");
-        //+NPR5.40 [306347]
+
         POSAction.SetWorkflowInvocationParameter('itemNo', ItemNo, FrontEnd);
         POSAction.SetWorkflowInvocationParameter('itemQuantity', 1, FrontEnd);
         POSAction.SetWorkflowInvocationParameter('itemIdentifyerType', 0, FrontEnd); //0 = ItemNumber
         FrontEnd.InvokeWorkflow(POSAction);
-
-        // POSSession.GetSaleLine(POSSaleLine);
-        // POSSaleLine.GetNewSaleLine(NewSaleLinePOS);
-        //
-        //
-        // WITH NewSaleLinePOS DO BEGIN
-        //  Type := NewSaleLinePOS.Type::Item;
-        //  "Sale Type" := "Sale Type"::Sale;
-        //  "No." := ItemNo;
-        //  Quantity := 1;
-        //  POSSaleLine.InsertLine(NewSaleLinePOS);
-        // END;
-        //
-        // POSSession.RequestRefreshData();
-        //+NPR5.36 [292281]
     end;
 
     local procedure CreateOptionString() OptionString: Text

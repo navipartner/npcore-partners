@@ -8,7 +8,7 @@ codeunit 6014562 "Report - Terminal Sales Ticket"
     //                                   Removed legacy cut logic.
     // NPR5.46/MMV /20181005 CASE 290734 EFT Framework refactored.
 
-    TableNo = "Credit Card Transaction";
+    TableNo = "EFT Receipt";
 
     trigger OnRun()
     begin
@@ -27,7 +27,7 @@ codeunit 6014562 "Report - Terminal Sales Ticket"
 
     var
         Printer: Codeunit "RP Line Print Mgt.";
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         Register: Record Register;
         First: Boolean;
         NotFirst: Boolean;
@@ -39,7 +39,7 @@ codeunit 6014562 "Report - Terminal Sales Ticket"
         ThisRequestEntryNo: Integer;
         EFTTransactionRequest: Record "EFT Transaction Request";
 
-    procedure PrintLines(var CreditCardTransaction: Record "Credit Card Transaction")
+    procedure PrintLines(var CreditCardTransaction: Record "EFT Receipt")
     begin
         with CreditCardTransaction do begin
           if FindSet then repeat
@@ -49,7 +49,7 @@ codeunit 6014562 "Report - Terminal Sales Ticket"
         end;
     end;
 
-    procedure PrintLine(var CreditCardTransaction: Record "Credit Card Transaction")
+    procedure PrintLine(var CreditCardTransaction: Record "EFT Receipt")
     var
         NewSlip: Boolean;
         CopyCaption: Text;
@@ -87,7 +87,7 @@ codeunit 6014562 "Report - Terminal Sales Ticket"
         Printer.AddLine(CreditCardTransaction.Text)
     end;
 
-    procedure CreditCardTransOnAftGetRecord(var CreditCardTransaction: Record "Credit Card Transaction")
+    procedure CreditCardTransOnAftGetRecord(var CreditCardTransaction: Record "EFT Receipt")
     begin
         with CreditCardTransaction do begin
           if First then begin
@@ -110,7 +110,7 @@ codeunit 6014562 "Report - Terminal Sales Ticket"
         end;
     end;
 
-    procedure GetRecords(var Rec: Record "Credit Card Transaction")
+    procedure GetRecords(var Rec: Record "EFT Receipt")
     var
         RetailFormCode: Codeunit "Retail Form Code";
     begin

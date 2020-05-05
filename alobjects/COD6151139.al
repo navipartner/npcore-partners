@@ -1,6 +1,7 @@
 codeunit 6151139 "TM Ticket Waiting List Mgr."
 {
     // TM1.45/TSA /20191204 CASE 380754 Initial Version
+    // TM90.1.46/TSA /20200304 CASE 399138 Provided admission code from admission schedule entry when missing on request
 
 
     trigger OnRun()
@@ -79,6 +80,11 @@ codeunit 6151139 "TM Ticket Waiting List Mgr."
         AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
         if (AdmissionScheduleEntry.FindFirst ()) then
           TicketWaitingList."Schedule Entry Description" := StrSubstNo ('%1 - %2', AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
+
+        //-TM90.1.46 [399138]
+        if (TicketReservationRequest."Admission Code" = '') then
+          TicketReservationRequest."Admission Code" := AdmissionScheduleEntry."Admission Code";
+        //-TM90.1.46 [399138]
 
         TicketWaitingList."External Schedule Entry No." := TicketReservationRequest."External Adm. Sch. Entry No.";
         TicketWaitingList."Admission Code" := TicketReservationRequest."Admission Code";

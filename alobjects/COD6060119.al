@@ -1279,6 +1279,7 @@ codeunit 6060119 "TM Ticket Request Manager"
                         end;
                     end;
             end;
+
         end else begin
             ReservationRequest."External Adm. Sch. Entry No." := ExternalAdmissionScheduleEntryNo;
         end;

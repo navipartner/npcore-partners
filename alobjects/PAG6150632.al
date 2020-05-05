@@ -6,8 +6,11 @@ page 6150632 "POS Audit Profiles"
     // NPR5.51/ALPO/20190802 CASE 362747 Added field 90 "Allow Printing Receipt Copy"
     // NPR5.52/ALPO/20191004 CASE 370427 Added field 100 "Do Not Print Receipt on Sale": option to skip receipt printing on sale
     // NPR5.53/ALPO/20191022 CASE 373743 Added field 110 "Sales Ticket No. Series": moved from "Cash Register" (Table 6014401)
+    // NPR5.54/BHR /20200228 CASE 393305 Set Card Page ID
 
     Caption = 'POS Audit Profiles';
+    CardPageID = "POS Audit Profile";
+    Editable = false;
     PageType = List;
     SourceTable = "POS Audit Profile";
 

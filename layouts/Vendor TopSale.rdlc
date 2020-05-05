@@ -8387,7 +8387,7 @@
               <Width>8.21401cm</Width>
               <ZIndex>8</ZIndex>
               <Visibility>
-                <Hidden>=iif(IsNothing(Fields!Picture_CompanyInfo.Value) = true,true,false)</Hidden>
+                <Hidden>true</Hidden>
               </Visibility>
               <DataElementOutput>NoOutput</DataElementOutput>
               <Style>

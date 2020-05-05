@@ -1,6 +1,7 @@
 table 6151017 "NpRv Sale Line POS Reference"
 {
     // NPR5.37/MHA /20171023  CASE 267346 Object created - NaviPartner Retail Voucher
+    // NPR5.54/MHA /20200310  CASE 372135 Added field 50 "Voucher No."
 
     Caption = 'Sale Line POS Retail Voucher Reference';
     DrillDownPageID = "NpRv POS Issue Voucher Refs.";
@@ -41,6 +42,11 @@ table 6151017 "NpRv Sale Line POS Reference"
         field(30;"Line No.";Integer)
         {
             Caption = 'Line No.';
+        }
+        field(50;"Voucher No.";Code[20])
+        {
+            Caption = 'Voucher No.';
+            Description = 'NPR5.54';
         }
         field(60;"Reference No.";Text[30])
         {

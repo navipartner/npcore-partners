@@ -14,10 +14,12 @@ report 6014430 "Item Sales Statistics/Provider"
     // NPR5.39/TJ  /20180206  CASE 302684 Changed Name property of request page control ValueMethod to english version
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.49/BHR /20190212  CASE 345313 Correct Report As per OMA
+    // NPR5.54/LS  /20200206  CASE 389134 Correct Report Caption from 'Sales Person Trn. by Item Gr.' to 'Item Sales Statistics/Provider'
+    // NPR5.54/YAHA/20200324  CASE 394872 Removed Company Logo
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Item Sales StatisticsProvider.rdlc';
 
-    Caption = 'Sales Person Trn. by Item Gr.';
+    Caption = 'Item Sales Statistics/Provider';
     UsageCategory = ReportsAndAnalysis;
 
     dataset

@@ -7,6 +7,7 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
     // NPR5.50/MHA /20190426  CASE 353079 Removed wrong quotation marks in workflow step voucher_input
     // NPR5.51/MHA /20190823  CASE 364542 VoucherType in EndSale() should depend on the Scanned Voucher in VoucherPayment()
     // NPR5.53/MHA /20190114 CASE 384841 Signature updated for CalculateRemainingPaymentSuggestion()
+    // NPR5.54/TSA /20200403 CASE 396652 Refactored the VoucherPayment() payment line create function to use payment line logic instead of sales line logic
 
 
     trigger OnRun()
@@ -145,16 +146,15 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
     var
         NpRvVoucherBuffer: Record "NpRv Voucher Buffer" temporary;
         SalePOS: Record "Sale POS";
-        SaleLinePOS: Record "Sale Line POS";
         SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";
         VoucherType: Record "NpRv Voucher Type";
         NpRvVoucherMgt: Codeunit "NpRv Voucher Mgt.";
         POSSale: Codeunit "POS Sale";
-        POSSaleLine: Codeunit "POS Sale Line";
-        POSSetup: Codeunit "POS Setup";
         VoucherTypeCode: Text;
         ReferenceNo: Text;
         Handled: Boolean;
+        POSPaymentLine: Codeunit "POS Payment Line";
+        POSLine: Record "Sale Line POS";
     begin
         JSON.SetScope('parameters',true);
         VoucherTypeCode := UpperCase(JSON.GetString('VoucherTypeCode',true));
@@ -184,32 +184,55 @@ codeunit 6151014 "NpRv Scan POS Action Mgt."
         VoucherType.Get(NpRvVoucherBuffer."Voucher Type");
         //+NPR5.49 [342811]
 
-        POSSession.GetSaleLine(POSSaleLine);
-        POSSaleLine.GetNewSaleLine(SaleLinePOS);
+        //-NPR5.54 [396652]
+        // POSSession.GetSaleLine(POSSaleLine);
+        // POSSaleLine.GetNewSaleLine(SaleLinePOS);
+        // SaleLinePOS.VALIDATE("Sale Type",SaleLinePOS."Sale Type"::Payment);
+        // SaleLinePOS.VALIDATE(Type,SaleLinePOS.Type::Payment);
+        // SaleLinePOS.VALIDATE("No.",VoucherType."Payment Type");
+        // //-NPR5.49 [342811]
+        // SaleLinePOS.Description := NpRvVoucherBuffer.Description;
+        // //+NPR5.49 [342811]
+        //
+        // POSSaleLine.InsertLine(SaleLinePOS);
+        // POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        //
+        // //-NPR5.49 [342811]
+        // SaleLinePOS."Currency Amount" := NpRvVoucherBuffer.Amount;
+        // SaleLinePOS."Amount Including VAT" := NpRvVoucherBuffer.Amount;
+        // //+NPR5.49 [342811]
+        // SaleLinePOS.MODIFY(TRUE);
+        //
+        // POSSession.RequestRefreshData();
+        //
+        // SaleLinePOSVoucher.INIT;
+        //
+        // SaleLinePOSVoucher."Register No." := SaleLinePOS."Register No.";
+        // SaleLinePOSVoucher."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+        // SaleLinePOSVoucher."Sale Type" := SaleLinePOS."Sale Type";
+        // SaleLinePOSVoucher."Sale Date" := SaleLinePOS.Date;
+        // SaleLinePOSVoucher."Sale Line No." := SaleLinePOS."Line No.";
+        POSSession.GetPaymentLine (POSPaymentLine);
+        POSPaymentLine.GetPaymentLine (POSLine);
 
-        SaleLinePOS.Validate("Sale Type",SaleLinePOS."Sale Type"::Payment);
-        SaleLinePOS.Validate(Type,SaleLinePOS.Type::Payment);
-        SaleLinePOS.Validate("No.",VoucherType."Payment Type");
-        //-NPR5.49 [342811]
-        SaleLinePOS.Description := NpRvVoucherBuffer.Description;
-        //+NPR5.49 [342811]
+        POSLine."No." := VoucherType."Payment Type";
+        POSLine."Register No." := SalePOS."Register No.";
+        POSLine.Description := NpRvVoucherBuffer.Description;
+        POSLine."Sales Ticket No." := SalePOS."Sales Ticket No.";
+        POSLine."Amount Including VAT" := NpRvVoucherBuffer.Amount;
+        POSPaymentLine.InsertPaymentLine (POSLine, 0);
+        POSPaymentLine.GetCurrentPaymentLine (POSLine);
 
-        POSSaleLine.InsertLine(SaleLinePOS);
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-
-        //-NPR5.49 [342811]
-        SaleLinePOS."Currency Amount" := NpRvVoucherBuffer.Amount;
-        SaleLinePOS."Amount Including VAT" := NpRvVoucherBuffer.Amount;
-        //+NPR5.49 [342811]
-        SaleLinePOS.Modify(true);
         POSSession.RequestRefreshData();
 
         SaleLinePOSVoucher.Init;
-        SaleLinePOSVoucher."Register No." := SaleLinePOS."Register No.";
-        SaleLinePOSVoucher."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        SaleLinePOSVoucher."Sale Type" := SaleLinePOS."Sale Type";
-        SaleLinePOSVoucher."Sale Date" := SaleLinePOS.Date;
-        SaleLinePOSVoucher."Sale Line No." := SaleLinePOS."Line No.";
+        SaleLinePOSVoucher."Register No." := SalePOS."Register No.";
+        SaleLinePOSVoucher."Sales Ticket No." :=SalePOS."Sales Ticket No.";
+        SaleLinePOSVoucher."Sale Type" := POSLine."Sale Type";
+        SaleLinePOSVoucher."Sale Date" := POSLine.Date;
+        SaleLinePOSVoucher."Sale Line No." := POSLine."Line No.";
+        //+NPR5.54 [396652]
+
         SaleLinePOSVoucher."Line No." := 10000;
         SaleLinePOSVoucher.Type := SaleLinePOSVoucher.Type::Payment;
         //-NPR5.49 [342811]

@@ -22,6 +22,8 @@ table 6150622 "POS Sales Line"
     // NPR5.52/TSA /20190925 CASE 369231 Added field "Retail Serial No." aka "Serial No. not Created"
     // NPR5.53/SARA/20191024 CASE 373672 Added Field 600..620
     // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
+    // NPR5.54/RA  /20200214 CASE 388514 Table relation to variant table was wrong, field 5402
+    // NPR5.54/ALPO/20200324 CASE 397063 Global dimensions were not updated on assigned dimension change through ShowDimensions() function ("Dimensions" button)
 
     Caption = 'POS Sales Line';
     DrillDownPageID = "POS Sales Line List";
@@ -466,7 +468,7 @@ table 6150622 "POS Sales Line"
         field(5402;"Variant Code";Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type=CONST(Item)) "Item Variant".Code WHERE (Code=FIELD("No."));
+            TableRelation = IF (Type=CONST(Item)) "Item Variant".Code WHERE ("Item No."=FIELD("No."));
         }
         field(5407;"Unit of Measure Code";Code[10])
         {
@@ -541,7 +543,12 @@ table 6150622 "POS Sales Line"
         if ((POSEntry."Post Entry Status" = POSEntry."Post Entry Status"::Posted) and (POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::Posted)) then begin
           DimMgt.ShowDimensionSet("Dimension Set ID",StrSubstNo('%1 %2 %3',TableCaption,"POS Entry No.", "Line No."));
         end else begin
-          "Dimension Set ID" := DimMgt.EditDimensionSet ("Dimension Set ID",StrSubstNo('%1 %2 %3',TableCaption,"POS Entry No.", "Line No."));
+          //"Dimension Set ID" := DimMgt.EditDimensionSet ("Dimension Set ID",STRSUBSTNO('%1 %2 %3',TABLECAPTION,"POS Entry No.", "Line No."));  //NPR5.54 [397063]-revoked
+          //-NPR5.54 [397063]
+          "Dimension Set ID" :=
+            DimMgt.EditDimensionSet2(
+              "Dimension Set ID",StrSubstNo('%1 %2 %3',TableCaption,"POS Entry No.","Line No."),"Shortcut Dimension 1 Code","Shortcut Dimension 2 Code");
+          //+NPR5.54 [397063]
           Modify ();
         end;
         //+NPR5.42 [314834]

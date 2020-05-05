@@ -1,6 +1,9 @@
 codeunit 6151301 "NpEc Sales Doc. Import Mgt."
 {
     // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
+    // NPR5.54/MHA /20200129  CASE 367842 Added "Allow Create Customers" and "Update Customers from Sales Order" to UpsertCustomer()
+    // NPR5.54/MHA /20200228  CASE 319135 Removed validation of "VAT Prod. Posting Group" to avoid reset of "Unit Price"
+    // NPR5.54/MHA /20200311  CASE 390380 E-commerce reference moved to NpEc Document
 
 
     trigger OnRun()
@@ -12,6 +15,7 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
         Text001: Label 'Invalid Line Type: %1';
         Text002: Label 'Customer Mapping within Country Code "%1" and Post Code "%2" not found';
         Text003: Label 'Unknown Item: %1 ';
+        Text004: Label 'Customer not found and %1 is not enabled';
 
     local procedure "--- Database"()
     begin
@@ -55,13 +59,26 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
     var
         ConfigTemplateHeader: Record "Config. Template Header";
         NpEcCustomerMapping: Record "NpEc Customer Mapping";
+        NpEcStore: Record "NpEc Store";
+        TempCust: Record Customer temporary;
         ConfigTemplateMgt: Codeunit "Config. Template Management";
         UpdateContFromCust: Codeunit "CustCont-Update";
         RecRef: RecordRef;
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         PrevCust: Text;
+        NewCustomer: Boolean;
     begin
+        //-NPR5.54 [367842]
+        FindStore(XmlElement,NpEcStore);
+        //+NPR5.54 [367842]
+
         if not FindCustomer(XmlElement,Customer) then begin
+          //-NPR5.54 [367842]
+          if not NpEcStore."Allow Create Customers" then
+            Error(Text004,NpEcStore.FieldCaption("Allow Create Customers"));
+          NewCustomer := true;
+
+          //+NPR5.54 [367842]
           Customer.Init;
           Customer."No." := '';
           Customer.Insert(true);
@@ -72,7 +89,17 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
         FindCustomerMapping(XmlElement,NpEcCustomerMapping);
 
         if (NpEcCustomerMapping."Config. Template Code" <> '') and ConfigTemplateHeader.Get(NpEcCustomerMapping."Config. Template Code") then begin
-          RecRef.GetTable(Customer);
+          //-NPR5.54 [367842]
+          if NpEcStore."Update Customers from S. Order" or NewCustomer then
+            RecRef.GetTable(Customer)
+          else begin
+            TempCust.Init;
+            TempCust := Customer;
+            TempCust.Insert;
+            RecRef.GetTable(TempCust);
+          end;
+          //+NPR5.54 [367842]
+
           ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader,RecRef);
           RecRef.SetTable(Customer);
         end;
@@ -95,6 +122,10 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
         Customer."Currency Code" := NpXmlDomMgt.GetElementCode(XmlElement,'/*/sales_order/currency_code',MaxStrLen(Customer."Currency Code"),true);
         Customer."Currency Code" := GetCurrencyCode(Customer."Currency Code");
 
+        //-NPR5.54 [367842]
+        if (not NpEcStore."Update Customers from S. Order") and (not NewCustomer) then
+          exit;
+        //+NPR5.54 [367842]
         if PrevCust = Format(Customer) then
           exit;
 
@@ -156,7 +187,9 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
         PaymentLine."Document Type" := SalesHeader."Document Type";
         PaymentLine."Document No." := SalesHeader."No.";
         PaymentLine."Line No." := LineNo;
-        PaymentLine.Description := CopyStr(PaymentMethod.Description + ' ' + SalesHeader."NpEc Document No.",1,MaxStrLen(PaymentLine.Description));
+        //-NPR5.54 [390380]
+        PaymentLine.Description := CopyStr(PaymentMethod.Description + ' ' + GetDocReferenceNo(SalesHeader),1,MaxStrLen(PaymentLine.Description));
+        //+NPR5.54 [390380]
         PaymentLine."Payment Type" := PaymentLine."Payment Type"::"Payment Method";
         PaymentLine."Account Type" := PaymentMethod."Bal. Account Type";
         PaymentLine."Account No." := PaymentMethod."Bal. Account No.";
@@ -193,6 +226,7 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
 
     procedure InsertOrderHeader(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
     var
+        NpEcDocument: Record "NpEc Document";
         NpEcStore: Record "NpEc Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         XmlElement2: DotNet npNetXmlElement;
@@ -205,12 +239,21 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
         SalesHeader.Init;
         SalesHeader."Document Type" := SalesHeader."Document Type"::Order;
         SalesHeader."No." := '';
-        SalesHeader."NpEc Store Code" := NpEcStore.Code;
-        SalesHeader."NpEc Document No." := GetOrderNo(XmlElement);
+        //-NPR5.54 [390380]
         SalesHeader."External Document No." := NpXmlDomMgt.GetElementCode(XmlElement,'external_document_no',MaxStrLen(SalesHeader."No."),false);
-        if SalesHeader."External Document No." = '' then
-          SalesHeader."External Document No." := CopyStr(SalesHeader."NpEc Document No.",1,MaxStrLen(SalesHeader."External Document No."));
         SalesHeader.Insert(true);
+
+        NpEcDocument.Init;
+        NpEcDocument."Entry No." := 0;
+        NpEcDocument."Store Code" := NpEcStore.Code;
+        NpEcDocument."Reference No." := GetOrderNo(XmlElement);
+        NpEcDocument."Document Type" := NpEcDocument."Document Type"::"Sales Order";
+        NpEcDocument."Document No." := SalesHeader."No.";
+        NpEcDocument.Insert(true);
+
+        if SalesHeader."External Document No." = '' then
+          SalesHeader."External Document No." := CopyStr(NpEcDocument."Reference No.",1,MaxStrLen(SalesHeader."External Document No."));
+        //+NPR5.54 [390380]
 
         SetSellToCustomer(XmlElement,SalesHeader);
         SetShipToCustomer(XmlElement,SalesHeader);
@@ -292,6 +335,9 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
         SalesLine.Insert(true);
         SalesLine.Validate(Type,SalesLine.Type::" ");
         SalesLine.Description := NpXmlDomMgt.GetElementText(XmlElement,'description',MaxStrLen(SalesLine.Description),true);
+        //-NPR5.54 [367842]
+        SalesLine."Description 2" := NpXmlDomMgt.GetElementText(XmlElement,'description_2',MaxStrLen(SalesLine."Description 2"),true);
+        //+NPR5.54 [367842]
         SalesLine.Modify(true);
     end;
 
@@ -336,12 +382,17 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
           SalesLine.Validate("Unit Price",UnitPrice)
         else
           SalesLine."Unit Price" := UnitPrice;
-        SalesLine.Validate("VAT Prod. Posting Group");
-
+        //-NPR5.54 [319135]
+        //SalesLine.VALIDATE("VAT Prod. Posting Group");
+        //+NPR5.54 [319135]
         if SalesLine."Unit Price" <> 0 then
           SalesLine.Validate("Line Amount",LineAmount)
         else
           SalesLine."Line Amount" := LineAmount;
+        //-NPR5.54 [367842]
+        SalesLine.Description := NpXmlDomMgt.GetElementText(XmlElement,'description',MaxStrLen(SalesLine.Description),true);
+        SalesLine."Description 2" := NpXmlDomMgt.GetElementText(XmlElement,'description_2',MaxStrLen(SalesLine."Description 2"),true);
+        //+NPR5.54 [367842]
         SalesLine.Modify(true);
     end;
 
@@ -373,6 +424,9 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
 
         SalesLine.Validate("Unit Price",UnitPrice);
         SalesLine.Description := NpXmlDomMgt.GetElementText(XmlElement,'description',MaxStrLen(SalesLine.Description),true);
+        //-NPR5.54 [367842]
+        SalesLine."Description 2" := NpXmlDomMgt.GetElementText(XmlElement,'description_2',MaxStrLen(SalesLine."Description 2"),true);
+        //+NPR5.54 [367842]
         SalesLine.Modify(true);
     end;
 
@@ -428,6 +482,7 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
 
     procedure UpdateOrderHeader(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
     var
+        SalesHeader2: Record "Sales Header";
         NpEcStore: Record "NpEc Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         XmlElement2: DotNet npNetXmlElement;
@@ -437,8 +492,13 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
         FindStore(XmlElement,NpEcStore);
 
         SalesHeader.SetHideValidationDialog(true);
-        SalesHeader.TestField("NpEc Store Code",NpEcStore.Code);
-        SalesHeader.TestField("NpEc Document No.",GetOrderNo(XmlElement));
+        //-NPR5.54 [390380]
+        if not FindOrder(XmlElement,SalesHeader2) then
+          exit;
+
+        SalesHeader.TestField("Document Type",SalesHeader2."Document Type");
+        SalesHeader.TestField("No.",SalesHeader2."No.");
+        //+NPR5.54 [390380]
 
         SetSellToCustomer(XmlElement,SalesHeader);
         SetShipToCustomer(XmlElement,SalesHeader);
@@ -457,6 +517,132 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
         SalesHeader.Modify(true);
     end;
 
+    local procedure "--- NpEc Document Mgt."()
+    begin
+    end;
+
+    [EventSubscriber(ObjectType::Table, 36, 'OnBeforeDeleteEvent', '', true, true)]
+    local procedure OnBeforeDeleteSalesHeader(var Rec: Record "Sales Header";RunTrigger: Boolean)
+    var
+        NpEcDocument: Record "NpEc Document";
+    begin
+        //-NPR5.54 [390380]
+        if Rec.IsTemporary then
+          exit;
+
+        case Rec."Document Type" of
+          Rec."Document Type"::Quote:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Quote");
+            end;
+          Rec."Document Type"::Order:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Order");
+            end;
+          Rec."Document Type"::Invoice:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Invoice");
+            end;
+          Rec."Document Type"::"Credit Memo":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Credit Memo");
+            end;
+          Rec."Document Type"::"Blanket Order":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Blanket Order");
+            end;
+          Rec."Document Type"::"Return Order":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Return Order");
+            end;
+        end;
+        NpEcDocument.SetRange("Document No.",Rec."No.");
+        if NpEcDocument.IsEmpty then
+          exit;
+
+        NpEcDocument.DeleteAll;
+        //+NPR5.54 [390380]
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 80, 'OnAfterPostSalesDoc', '', true, true)]
+    local procedure OnAfterPostSalesDoc(var SalesHeader: Record "Sales Header";SalesShptHdrNo: Code[20];RetRcpHdrNo: Code[20];SalesInvHdrNo: Code[20];SalesCrMemoHdrNo: Code[20])
+    var
+        NpEcDocument: Record "NpEc Document";
+        NpEcDocument2: Record "NpEc Document";
+    begin
+        //-NPR5.54 [390380]
+        case SalesHeader."Document Type" of
+          SalesHeader."Document Type"::Quote:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Quote");
+            end;
+          SalesHeader."Document Type"::Order:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Order");
+            end;
+          SalesHeader."Document Type"::Invoice:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Invoice");
+            end;
+          SalesHeader."Document Type"::"Credit Memo":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Credit Memo");
+            end;
+          SalesHeader."Document Type"::"Blanket Order":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Blanket Order");
+            end;
+          SalesHeader."Document Type"::"Return Order":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Return Order");
+            end;
+        end;
+        NpEcDocument.SetRange("Document No.",SalesHeader."No.");
+        if not NpEcDocument.FindLast then
+          exit;
+
+        if SalesInvHdrNo <> '' then begin
+          NpEcDocument2.Init;
+          NpEcDocument2."Entry No." := 0;
+          NpEcDocument2."Store Code" := NpEcDocument."Store Code";
+          NpEcDocument2."Reference No." := NpEcDocument."Reference No.";
+          NpEcDocument2."Document Type" := NpEcDocument2."Document Type"::"Posted Sales Invoice";
+          NpEcDocument2."Document No." := SalesInvHdrNo;
+          NpEcDocument2.Insert(true);
+        end;
+
+        if SalesCrMemoHdrNo <> '' then begin
+          NpEcDocument2.Init;
+          NpEcDocument2."Entry No." := 0;
+          NpEcDocument2."Store Code" := NpEcDocument."Store Code";
+          NpEcDocument2."Reference No." := NpEcDocument."Reference No.";
+          NpEcDocument2."Document Type" := NpEcDocument2."Document Type"::"Posted Sales Credit Memo";
+          NpEcDocument2."Document No." := SalesCrMemoHdrNo;
+          NpEcDocument2.Insert(true);
+        end;
+
+        if SalesShptHdrNo <> '' then begin
+          NpEcDocument2.Init;
+          NpEcDocument2."Entry No." := 0;
+          NpEcDocument2."Store Code" := NpEcDocument."Store Code";
+          NpEcDocument2."Reference No." := NpEcDocument."Reference No.";
+          NpEcDocument2."Document Type" := NpEcDocument2."Document Type"::"Posted Sales Shipment";
+          NpEcDocument2."Document No." := SalesShptHdrNo;
+          NpEcDocument2.Insert(true);
+        end;
+
+        if RetRcpHdrNo <> '' then begin
+          NpEcDocument2.Init;
+          NpEcDocument2."Entry No." := 0;
+          NpEcDocument2."Store Code" := NpEcDocument."Store Code";
+          NpEcDocument2."Reference No." := NpEcDocument."Reference No.";
+          NpEcDocument2."Document Type" := NpEcDocument2."Document Type"::"Posted Sales Return Receipt";
+          NpEcDocument2."Document No." := RetRcpHdrNo;
+          NpEcDocument2.Insert(true);
+        end;
+        //+NPR5.54 [390380]
+    end;
+
     local procedure "--- Set Order Header"()
     begin
     end;
@@ -470,6 +656,16 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
         FindSellToCustomer(XmlElement,XmlElement2);
         UpsertCustomer(XmlElement2,Customer);
         SalesHeader.Validate("Sell-to Customer No.",Customer."No.");
+        //-NPR5.54 [367842]
+        SalesHeader."Sell-to Customer Name" := Customer.Name;
+        SalesHeader."Sell-to Customer Name 2" := Customer."Name 2";
+        SalesHeader."Sell-to Address"  := Customer.Address;
+        SalesHeader."Sell-to Address 2" := Customer."Address 2";
+        SalesHeader."Sell-to Post Code" := Customer."Post Code";
+        SalesHeader."Sell-to City" := Customer.City;
+        SalesHeader."Sell-to Country/Region Code" := Customer."Country/Region Code";
+        SalesHeader."Sell-to Contact" := Customer.Contact;
+        //+NPR5.54 [367842]
     end;
 
     procedure SetShipToCustomer(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header")
@@ -564,8 +760,11 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
 
     local procedure FindCustomer(XmlElement: DotNet npNetXmlElement;var Customer: Record Customer): Boolean
     var
+        NpEcStore: Record "NpEc Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         CustomerNo: Text;
+        Email: Text;
+        PhoneNo: Text;
     begin
         Clear(Customer);
 
@@ -575,8 +774,41 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
           exit(true);
         end;
 
-        Customer.SetRange("E-Mail",NpXmlDomMgt.GetElementText(XmlElement,'email',MaxStrLen(Customer."E-Mail"),false));
-        exit(Customer.FindFirst and (Customer."E-Mail" <> ''));
+        //-NPR5.54 [367842]
+        Email := NpXmlDomMgt.GetElementText(XmlElement,'email',MaxStrLen(Customer."E-Mail"),false);
+        PhoneNo := NpXmlDomMgt.GetElementText(XmlElement,'phone',MaxStrLen(Customer."Phone No."),false);
+        FindStore(XmlElement,NpEcStore);
+        case NpEcStore."Customer Mapping" of
+          NpEcStore."Customer Mapping"::"E-mail":
+            begin
+              Customer.SetRange("E-Mail",Email);
+              exit(Customer.FindFirst and (Customer."E-Mail" <> ''));
+            end;
+          NpEcStore."Customer Mapping"::"Phone No.":
+            begin
+              Customer.SetRange("Phone No.",PhoneNo);
+              exit(Customer.FindFirst and (Customer."Phone No." <> ''));
+            end;
+          NpEcStore."Customer Mapping"::"E-mail OR Phone No.":
+            begin
+              Clear(Customer);
+              Customer.SetRange("E-Mail",Email);
+              if Customer.FindFirst and (Customer."E-Mail" <> '') then
+                exit(true);
+
+              Clear(Customer);
+              Customer.SetRange("Phone No.",PhoneNo);
+              exit(Customer.FindFirst and (Customer."Phone No." <> ''));
+            end;
+          NpEcStore."Customer Mapping"::"E-mail AND Phone No.":
+            begin
+              Clear(Customer);
+              Customer.SetRange("E-Mail",Email);
+              Customer.SetRange("Phone No.",PhoneNo);
+              exit(Customer.FindFirst and ((Customer."E-Mail" <> '') or (Customer."Phone No." <> '')));
+            end;
+        end;
+        //+NPR5.54 [367842]
     end;
 
     local procedure FindCustomerMapping(XmlElement: DotNet npNetXmlElement;var NpEcCustomerMapping: Record "NpEc Customer Mapping")
@@ -658,6 +890,7 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
 
     procedure FindOrder(XmlElement: DotNet npNetXmlElement;var SalesHeader: Record "Sales Header"): Boolean
     var
+        NpEcDocument: Record "NpEc Document";
         NpEcStore: Record "NpEc Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         OrderNo: Text;
@@ -670,23 +903,63 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
         if OrderNo = '' then
           exit(false);
 
-        SalesHeader.SetRange("Document Type",SalesHeader."Document Type"::Order);
-        SalesHeader.SetRange("NpEc Store Code",NpEcStore.Code);
-        SalesHeader.SetRange("NpEc Document No.",OrderNo);
-        exit(SalesHeader.FindFirst);
+        //-NPR5.54 [390380]
+        NpEcDocument.SetRange("Store Code",NpEcStore.Code);
+        NpEcDocument.SetRange("Reference No.",OrderNo);
+        NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Order");
+        if not NpEcDocument.FindLast then
+          exit(false);
+
+        exit(SalesHeader.Get(SalesHeader."Document Type"::Order,NpEcDocument."Document No."));
+        //+NPR5.54 [390380]
     end;
 
     procedure FindPostedInvoice(XmlElement: DotNet npNetXmlElement;var SalesInvHeader: Record "Sales Invoice Header"): Boolean
     var
+        NpEcDocument: Record "NpEc Document";
         NpEcStore: Record "NpEc Store";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         OrderNo: Text;
     begin
         FindStore(XmlElement,NpEcStore);
         OrderNo := GetOrderNo(XmlElement);
-        SalesInvHeader.SetRange("NpEc Store Code",NpEcStore.Code);
-        SalesInvHeader.SetRange("NpEc Document No.",OrderNo);
-        exit(SalesInvHeader.FindFirst);
+        //-NPR5.54 [390380]
+        NpEcDocument.SetRange("Store Code",NpEcStore.Code);
+        NpEcDocument.SetRange("Reference No.",OrderNo);
+        NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Posted Sales Invoice");
+        if not NpEcDocument.FindLast then
+          exit(false);
+
+        exit(SalesInvHeader.Get(NpEcDocument."Document No."));
+        //+NPR5.54 [390380]
+    end;
+
+    procedure FindPostedInvoices(XmlElement: DotNet npNetXmlElement;var TempSalesInvHeader: Record "Sales Invoice Header" temporary): Boolean
+    var
+        NpEcDocument: Record "NpEc Document";
+        NpEcStore: Record "NpEc Store";
+        SalesInvHeader: Record "Sales Invoice Header";
+        NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
+        OrderNo: Text;
+    begin
+        //-NPR5.54 [390380]
+        FindStore(XmlElement,NpEcStore);
+        OrderNo := GetOrderNo(XmlElement);
+        NpEcDocument.SetRange("Store Code",NpEcStore.Code);
+        NpEcDocument.SetRange("Reference No.",OrderNo);
+        NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Posted Sales Invoice");
+        if not NpEcDocument.FindSet then
+          exit(false);
+
+        repeat
+          if SalesInvHeader.Get(NpEcDocument."Document No.") and not TempSalesInvHeader.Get(SalesInvHeader."No.") then begin
+            TempSalesInvHeader.Init;
+            TempSalesInvHeader := SalesInvHeader;
+            TempSalesInvHeader.Insert;
+          end;
+        until NpEcDocument.Next = 0;
+        exit(TempSalesInvHeader.FindFirst);
+        //+NPR5.54 [390380]
     end;
 
     local procedure FindSalesOrder(XmlElement: DotNet npNetXmlElement;var XmlElement2: DotNet npNetXmlElement)
@@ -727,10 +1000,12 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
 
     local procedure GetOrderNo(XmlElement: DotNet npNetXmlElement) InvoiceNo: Text
     var
-        SalesHeader: Record "Sales Header";
+        NpEcDocument: Record "NpEc Document";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
     begin
-        InvoiceNo := NpXmlDomMgt.GetAttributeCode(XmlElement,'/*/sales_order','order_no',MaxStrLen(SalesHeader."NpEc Document No."),true);
+        //-NPR5.54 [390380]
+        InvoiceNo := NpXmlDomMgt.GetAttributeCode(XmlElement,'/*/sales_order','order_no',MaxStrLen(NpEcDocument."Reference No."),true);
+        //+NPR5.54 [390380]
         if InvoiceNo = '' then
           Error(Text000,'order_no','sales_order');
     end;
@@ -747,6 +1022,43 @@ codeunit 6151301 "NpEc Sales Doc. Import Mgt."
           exit(true);
 
         exit(false);
+    end;
+
+    procedure GetDocReferenceNo(SalesHeader: Record "Sales Header"): Text
+    var
+        NpEcDocument: Record "NpEc Document";
+    begin
+        //-NPR5.54 [390380]
+        case SalesHeader."Document Type" of
+          SalesHeader."Document Type"::Quote:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Quote");
+            end;
+          SalesHeader."Document Type"::Order:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Order");
+            end;
+          SalesHeader."Document Type"::Invoice:
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Invoice");
+            end;
+          SalesHeader."Document Type"::"Credit Memo":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Credit Memo");
+            end;
+          SalesHeader."Document Type"::"Blanket Order":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Blanket Order");
+            end;
+          SalesHeader."Document Type"::"Return Order":
+            begin
+              NpEcDocument.SetRange("Document Type",NpEcDocument."Document Type"::"Sales Return Order");
+            end;
+        end;
+        NpEcDocument.SetRange("Document No.",SalesHeader."No.");
+        if NpEcDocument.FindLast then;
+        exit(NpEcDocument."Reference No.");
+        //+NPR5.54 [390380]
     end;
 
     local procedure "--- Aux"()

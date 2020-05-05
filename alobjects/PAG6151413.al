@@ -9,6 +9,7 @@ page 6151413 "Magento Item Picture List"
     // MAG2.02/TS  /20170125  CASE 262261 Removed all reference to Variax
     // MAG2.22/MHA /20190625  CASE 359285 Added Variant Systems; Variety (Select on Item),Variety 1,Variety 2,Variety 3,Variety 4
     // MAG2.22/MHA /20190722  CASE 361003 Only variety values with active variants should be included
+    // MAG2.25/MHA /20200318  CASE 389934 Added PagePart MagentoPictureLinkSubform2 for prettier Web Client view on Non Variant Items
 
     Caption = 'Item Pictures';
     DeleteAllowed = false;
@@ -24,10 +25,10 @@ page 6151413 "Magento Item Picture List"
             group(Control6150618)
             {
                 ShowCaption = false;
+                Visible = HasVariants;
                 group(Variants)
                 {
                     Caption = 'Variants';
-                    Visible = HasVariants;
                     repeater(Group)
                     {
                         field("Item No."; "Item No.")
@@ -45,6 +46,12 @@ page 6151413 "Magento Item Picture List"
                     Caption = 'Pictures';
                     ShowFilter = false;
                 }
+            }
+            part(MagentoPictureLinkSubform2;"Magento Picture Link Subform")
+            {
+                Caption = 'Pictures';
+                ShowFilter = false;
+                Visible = (NOT HasVariants);
             }
         }
         area(factboxes)
@@ -122,6 +129,9 @@ page 6151413 "Magento Item Picture List"
     begin
         //-MAG1.21
         CurrPage.MagentoPictureLinkSubform.PAGE.SetItemNoFilter(ItemNo);
+        //-MAG2.25 [389934]
+        CurrPage.MagentoPictureLinkSubform2.PAGE.SetItemNoFilter(ItemNo);
+        //+MAG2.25 [389934]
         CurrPage.MagentoPictureDragDropAddin.PAGE.SetItemNo(ItemNo);
         CurrPage.MagentoPictureDragDropAddin.PAGE.SetHidePicture(true);
         SetupSourceTable();

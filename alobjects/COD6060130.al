@@ -4,12 +4,15 @@ codeunit 6060130 "MM Member Ticket Manager"
     // MM80.1.08/TSA/20160222  CASE 232494 Validating Member Assign Tickets in the self service ticket validation
     // MM1.17/TSA/20161208  CASE 259671 Extended functionality for handling the start date of membership, signature change on IsMembershipActive
     // MM1.36/TSA /20181119 CASE 335889 Fixed casting between external and internal item nos
-    // MM1.36/TSA /20181119 CASE 335889 Reactored, relocated PromptForMemberGuestArrival() and MemberFastCheckIn()
+    // MM1.36/TSA /20181119 CASE 335889 Refactored, relocated PromptForMemberGuestArrival() and MemberFastCheckIn()
     // MM1.37/TSA /20190327 CASE 350288 Signature Change
     // MM1.40/TSA /20190812 CASE 364741 Signature Change
     // MM1.41/TSA /20190906 CASE 367779 Signature Change to PromptForMemberGuestArrival() and MemberFastCheckIn() to include token used for ticket arrival
     // MM1.41/TSA /20190910 CASE 368119 Refactored usage of "External Item Code"
     // MM1.42/TSA /20191220 CASE 382728 Refactored usage of Notification Method
+    // MM1.43/TSA /20200214 CASE 391044 Incorrect table in BuildMemberGuestRequest ()
+    // MM1.43/TSA /20200302 CASE 337112 Printing of tickets from membercard scan
+    // MM1.43/TSA /20200305 CASE 337112 Removed green code
 
 
     trigger OnRun()
@@ -29,6 +32,7 @@ codeunit 6060130 "MM Member Ticket Manager"
         MEMBERGUEST_TICKET: Label 'Setup for %1 has an invalid entry for membership code %2, admission code %3, item %4. Setup does not match setup in %5.';
         MISSING_CROSSREF: Label 'The external number %1 does not translate to an item. Check Item Cross Reference for setup.';
         WELCOME: Label 'Welcome %1.';
+        ILLEGAL_VALUE: Label 'Value %1 is not a valid %2.';
 
     procedure ValidateMemberAssignedTickets(Token: Text[100];FailWithError: Boolean) Success: Boolean
     var
@@ -38,16 +42,13 @@ codeunit 6060130 "MM Member Ticket Manager"
         TicketReservationRequest.SetFilter ("Session Token ID", '=%1', Token);
         if (not (TicketReservationRequest.FindSet ())) then
           Error (TOKEN_NOT_FOUND, Token);
-        //-MM1.36 [335889]
+
         repeat
           TmpTicketReservationRequest.TransferFields (TicketReservationRequest, true);
           TmpTicketReservationRequest.Insert ();
         until (TicketReservationRequest.Next () = 0);
 
         exit (PreValidateMemberGuestTicketRequest (TmpTicketReservationRequest, FailWithError));
-
-        //+MM1.36 [335889]
-        // Code moved to worker function PreValidateMemberAssignedTickesRequest();
     end;
 
     procedure PreValidateMemberGuestTicketRequest(var TmpTicketReservationRequest: Record "TM Ticket Reservation Request" temporary;FailWithError: Boolean) Success: Boolean
@@ -80,17 +81,10 @@ codeunit 6060130 "MM Member Ticket Manager"
         end;
 
         Membership.Get (MembershipEntryNo);
-        //-MM1.41 [368119]
-        // MembershipAdmissionSetup.SETFILTER ("Membership  Code", '=%1', Membership."Membership Code");
-        // MembershipAdmissionSetup.SETFILTER ("Admission Code", '=%1', TmpTicketReservationRequest."Admission Code");
-        //+MM1.41 [368119]
         ExternalMemberNo := TmpTicketReservationRequest."External Member No.";
 
         repeat
           TmpTicketReservationRequest.TestField ("Admission Code");
-          //-MM1.41 [368119]
-          // TmpTicketReservationRequest.TESTFIELD ("External Item Code");
-          //+MM1.41 [368119]
 
           if (TmpTicketReservationRequest."External Member No." <> ExternalMemberNo) then begin
             if (not (FailWithError)) then
@@ -106,18 +100,13 @@ codeunit 6060130 "MM Member Ticket Manager"
 
           MembershipAdmissionSetup.SetFilter ("Ticket No.", '=%1', TmpTicketReservationRequest."External Item Code");
           if (not (MembershipAdmissionSetup.FindFirst ())) then begin
-            //-MM1.36 [335889]
-            //-MM1.41 [368119]
-            // TicketRequestManager.TranslateBarcodeToItemVariant (TmpTicketReservationRequest."External Item Code", ItemNo, VariantCode, ResolvingTable);
-            // MembershipAdmissionSetup.SETFILTER ("Ticket No. Type", '=%1', MembershipAdmissionSetup."Ticket No. Type"::ITEM);
-            //MembershipAdmissionSetup.SETFILTER ("Ticket No.", '=%1', ItemNo);
             if (TmpTicketReservationRequest."External Item Code" <> '') then begin
               MembershipAdmissionSetup.Reset ();
               MembershipAdmissionSetup.SetFilter ("Membership  Code", '=%1', Membership."Membership Code");
               MembershipAdmissionSetup.SetFilter ("Admission Code", '=%1', TmpTicketReservationRequest."Admission Code");
               MembershipAdmissionSetup.SetFilter ("Ticket No. Type", '=%1', MembershipAdmissionSetup."Ticket No. Type"::ITEM_CROSS_REF);
               MembershipAdmissionSetup.SetFilter ("Ticket No.", '=%1', TmpTicketReservationRequest."External Item Code");
-              FoundSetup := MembershipAdmissionSetup.FindFirst ()
+              FoundSetup := MembershipAdmissionSetup.FindFirst ();
             end;
             if (not FoundSetup) then begin
               MembershipAdmissionSetup.Reset ();
@@ -126,33 +115,20 @@ codeunit 6060130 "MM Member Ticket Manager"
               MembershipAdmissionSetup.SetFilter ("Ticket No. Type", '=%1', MembershipAdmissionSetup."Ticket No. Type"::ITEM);
               MembershipAdmissionSetup.SetFilter ("Ticket No.", '=%1', TmpTicketReservationRequest."Item No.");
             end;
-            //+MM1.41 [368119]
 
             if (not (MembershipAdmissionSetup.FindFirst ())) then begin
               if (not (FailWithError)) then
                 exit (false);
-              //-MM1.41 [368119]
-              // ERROR (INVALID_EXTERNAL_ITEM, TmpTicketReservationRequest."External Item Code", Membership."Membership Code");
               Error (INVALID_EXTERNAL_ITEM, TmpTicketReservationRequest."Item No.", Membership."Membership Code");
-              //+MM1.41 [368119]
 
             end;
-
-            //IF (NOT (FailWithError)) THEN
-            //  EXIT (FALSE);
-            //ERROR (INVALID_EXTERNAL_ITEM, TicketReservationRequest."External Item Code", Membership."Membership Code");
-            //+MM1.36 [335889]
           end;
 
           if (MembershipAdmissionSetup."Cardinality Type" = MembershipAdmissionSetup."Cardinality Type"::LIMITED) then begin
             if (TmpTicketReservationRequest.Quantity > MembershipAdmissionSetup."Max Cardinality") then begin
               if (not (FailWithError)) then
                 exit (false);
-              //-MM1.41 [368119]
-              //ERROR (TICKET_COUNT_EXCEEDED, MembershipAdmissionSetup."Max Cardinality", TmpTicketReservationRequest."External Item Code", Membership."Membership Code", TmpTicketReservationRequest."Admission Code");
               Error (TICKET_COUNT_EXCEEDED, MembershipAdmissionSetup."Max Cardinality", TmpTicketReservationRequest."Item No.", Membership."Membership Code", TmpTicketReservationRequest."Admission Code");
-              //+MM1.41 [368119]
-
             end;
           end;
 
@@ -212,13 +188,8 @@ codeunit 6060130 "MM Member Ticket Manager"
         if (not Member.Get (MemberEntryNo)) then
           Error (ErrorReason);
 
-        //-MM1.42 [382728]
-        // IF (NOT BuildMemberGuestRequest (Membership."Membership Code", Member, TmpTicketReservationRequest))
-        //  THEN EXIT;
-        if (not BuildMemberGuestRequest (MembershipEntryNo, MemberEntryNo, TmpTicketReservationRequest))
-          then exit;
-        //+MM1.42 [382728]
-
+        if (not BuildMemberGuestRequest (MembershipEntryNo, MemberEntryNo, TmpTicketReservationRequest)) then
+          exit;
 
         // Let user specify guest count for each ticket type
         Commit;
@@ -237,26 +208,18 @@ codeunit 6060130 "MM Member Ticket Manager"
         TmpTicketReservationRequest.DeleteAll ();
         TmpTicketReservationRequest.Reset ();
         if (TmpTicketReservationRequest.IsEmpty ()) then
-          exit (false); // all lined deleted - no guests
+          exit (false); // all lines deleted - no guests
 
         PreValidateMemberGuestTicketRequest (TmpTicketReservationRequest, true);
-
-        //-MM1.41 [367779]
-        // //-MM1.37 [350288]
-        // // IF (TicketRequestManager.RevalidateRequestForTicketReuse (TmpTicketReservationRequest, ReusedToken, ResponseMessage)) THEN
-        // //  EXIT (TRUE); // previously created tickets are reused.
-        // IF (TicketRequestManager.RevalidateRequestForTicketReuse (TmpTicketReservationRequest, ReusedToken, ResponseMessage)) THEN
-        //  EXIT (TRUE); // previously created tickets are reused.
-        // //+MM1.37 [350288]
 
         if (TicketRequestManager.RevalidateRequestForTicketReuse (TmpTicketReservationRequest, ReusedToken, ResponseMessage)) then begin
           TicketToken := ReusedToken;
           Commit;
+          //-MM1.43 [337112] Ticket print
+          PrintReusedGuestTickets (MembershipEntryNo, TmpTicketReservationRequest);
+          //+MM1.43 [337112]
           exit (true); // previously created tickets are reused.
         end;
-        //+MM1.41 [367779]
-
-
 
         // No ticket reuse.
         asserterror Error (''); // Rollback any partial updates done by RevalidateRequestForTicketReuse()
@@ -266,47 +229,27 @@ codeunit 6060130 "MM Member Ticket Manager"
         TmpTicketReservationRequest.FindSet ();
         Token := TicketRequestManager.GetNewToken();
         repeat
-          //-MM1.41 [368119]
-          // MemberRetailIntegration.TranslateBarcodeToItemVariant (TmpTicketReservationRequest."External Item Code", ItemNo, VariantCode, ResolvingTable);
-          // TicketAdmissionBOM.SETFILTER ("Item No.", '=%1', ItemNo);
-          // TicketAdmissionBOM.SETFILTER ("Variant Code", '=%1', VariantCode);
           TicketAdmissionBOM.SetFilter ("Item No.", '=%1', TmpTicketReservationRequest."Item No.");
           TicketAdmissionBOM.SetFilter ("Variant Code", '=%1', TmpTicketReservationRequest."Variant Code");
-          //+MM1.41 [368119]
 
           if (TmpTicketReservationRequest."Admission Code" <> '') then
             TicketAdmissionBOM.SetFilter ("Admission Code", '=%1', TmpTicketReservationRequest."Admission Code");
 
           if (TicketAdmissionBOM.FindSet ()) then begin
             repeat
-              //-MM1.41 [368119]
-              //      //-MM1.40 [364741]
-              //      // TicketRequestManager.POS_AppendToReservationRequest2 (Token,
-              //      //   '', 0,
-              //      //   ItemNo, VariantCode, TicketAdmissionBOM."Admission Code",
-              //      //  TmpTicketReservationRequest.Quantity, -1, Member."External Member No.", Member."External Member No.", '');
-              //
-              //      TicketRequestManager.POS_AppendToReservationRequest2 (Token,
-              //        '', 0,
-              //        ItemNo, VariantCode, TicketAdmissionBOM."Admission Code",
-              //        TmpTicketReservationRequest.Quantity, -1, Member."External Member No.", Member."External Member No.", '', TmpTicketReservationRequest."Notification Address");
-              //      //+MM1.40 [364741]
 
               TicketRequestManager.POS_AppendToReservationRequest2 (Token,
                 '', 0,
                 TmpTicketReservationRequest."Item No.", TmpTicketReservationRequest."Variant Code", TicketAdmissionBOM."Admission Code",
-                TmpTicketReservationRequest.Quantity, -1, Member."External Member No.", Member."External Member No.", '', TmpTicketReservationRequest."Notification Address");
-              //+MM1.41 [368119]
+                //TmpTicketReservationRequest.Quantity, -1, Member."External Member No.", Member."External Member No.", '', TmpTicketReservationRequest."Notification Address");
+                TmpTicketReservationRequest.Quantity, 0, Member."External Member No.", Member."External Member No.", '', TmpTicketReservationRequest."Notification Address");
 
             until (TicketAdmissionBOM.Next () = 0);
 
           end else begin
             Error (MEMBERGUEST_TICKET, MembershipAdmissionSetup.TableCaption,
               MembershipAdmissionSetup."Membership  Code", TmpTicketReservationRequest."Admission Code",
-              //-MM1.41 [368119]
-              //STRSUBSTNO ('%1 [%2;%3]',TmpTicketReservationRequest."External Item Code", ItemNo, VariantCode),
               StrSubstNo ('%1 [%2;%3]',TmpTicketReservationRequest."External Item Code", TmpTicketReservationRequest."Item No.", TmpTicketReservationRequest."Variant Code"),
-              //+MM1.41 [368119]
 
               TicketAdmissionBOM.TableCaption);
           end;
@@ -316,11 +259,6 @@ codeunit 6060130 "MM Member Ticket Manager"
         ResponseMessage := '';
 
         // Issue the tickets, validate, confirm and register arrival.
-        //-MM1.41 [368119]
-        // SaleLinePOS."No." := ItemNo;
-        // SaleLinePOS."Variant Code" := VariantCode;
-        //+MM1.41 [368119]
-
         if (not TicketRetailManagement.IssueTicket (Token, Member."External Member No.", false, ResponseCode, ResponseMessage, SaleLinePOS, false)) then begin
           TicketRequestManager.DeleteReservationRequest (Token, false);
           Error (ResponseMessage);
@@ -333,10 +271,12 @@ codeunit 6060130 "MM Member Ticket Manager"
 
         TicketRequestManager.RegisterArrivalRequest (Token);
 
-        //-MM1.41 [367779]
         Commit;
         TicketToken := Token;
-        //+MM1.41 [367779]
+
+        //-MM1.43 [337112] Ticket print
+        PrintGuestTicketBatch (MembershipEntryNo, Token);
+        //+MM1.43 [337112]
 
         exit (true);
     end;
@@ -347,26 +287,32 @@ codeunit 6060130 "MM Member Ticket Manager"
         MembershipManagement: Codeunit "MM Membership Management";
         TicketManagement: Codeunit "TM Ticket Management";
         Ticket: Record "TM Ticket";
+        TicketToPrint: Record "TM Ticket";
         Member: Record "MM Member";
         TicketReservationRequest: Record "TM Ticket Reservation Request";
+        Membership: Record "MM Membership";
+        MembershipSetup: Record "MM Membership Setup";
         MemberEntryNo: Integer;
         TicketNo: Code[20];
         ItemNo: Code[20];
         VariantCode: Code[10];
         ResolvingTable: Integer;
         ResponseCode: Integer;
+        MembershipEntryNo: Integer;
     begin
 
         MemberEntryNo := MembershipManagement.GetMemberFromExtCardNo (ExternalMemberCardNo, Today, ErrorReason);
         if (not Member.Get (MemberEntryNo)) then
           Error (ErrorReason);
 
+        //-MM1.43 [337112]
+        MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo (ExternalMemberCardNo, Today, ErrorReason);
+        if (MembershipEntryNo = 0) then
+          Error (ErrorReason);
+        //+MM1.43 [337112]
+
         if not (MemberRetailIntegration.TranslateBarcodeToItemVariant (ExternalItemNo, ItemNo, VariantCode, ResolvingTable)) then
           Error (MISSING_CROSSREF);
-
-        //-MM1.36 [335889]
-        // MemberRetailIntegration.IssueTicketFromMemberScan (TRUE, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
-        // TicketManagement.ValidateTicketForArrival (0, TicketNo, AdmissionCode, -1, TRUE, ErrorReason);
 
         Ticket.SetCurrentKey ("External Member Card No.");
         Ticket.SetFilter ("Item No.", '=%1', ItemNo);
@@ -375,9 +321,7 @@ codeunit 6060130 "MM Member Ticket Manager"
         Ticket.SetFilter ("External Member Card No.", '=%1', Member."External Member No.");
         Ticket.SetFilter (Blocked, '=%1', false);
         ResponseCode := -1;
-        //-MM1.41 [367779]
-        // IF (Ticket.FINDlast ()) THEN
-        //  ResponseCode := TicketManagement.ValidateTicketForArrival (0, Ticket."No.", AdmissionCode, -1, FALSE, ErrorReason); // Reuse existing ticket (if possible)
+
         if (Ticket.FindSet()) then begin
           repeat
             if (TicketReservationRequest.Get (Ticket."Ticket Reservation Entry No.")) then
@@ -390,22 +334,37 @@ codeunit 6060130 "MM Member Ticket Manager"
                     ResponseCode := TicketManagement.ValidateTicketForArrival (0, Ticket."No.", AdmissionCode, -1, false, ErrorReason); // Reuse existing ticket (if possible)
                 end;
           until ((Ticket.Next () = 0) or (ResponseCode = 0));
+          //-MM1.43 [337112]
+          if (ResponseCode = 0) then
+            TicketToPrint.Get (Ticket."No.");
+            TicketToPrint.SetRecFilter ();
+          //+MM1.43 [337112]
         end;
-        //+MM1.41 [367779]
 
         // Create new ticket
         if (ResponseCode <> 0) then begin
           MemberRetailIntegration.IssueTicketFromMemberScan (true, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
           TicketManagement.ValidateTicketForArrival (0, TicketNo, AdmissionCode, -1, true, ErrorReason);
+          //-MM1.43 [337112]
+          TicketToPrint.Get (TicketNo);
+          TicketToPrint.SetRecFilter ();
+          //+MM1.43 [337112]
         end;
-        //+MM1.36 [335889]
 
         Message (WELCOME, Member."Display Name");
+
+        //-MM1.43 [337112]
+        if (TicketToPrint.GetFilters () <> '') then begin
+          Membership.Get (MembershipEntryNo);
+          MembershipSetup.Get (Membership."Membership Code");
+          PrintTicket (MembershipSetup, TicketToPrint);
+        end;
+        //-MM1.43 [337112]
     end;
 
     local procedure BuildMemberGuestRequest(MembershipEntryNo: Integer;MemberEntryNo: Integer;var TmpTicketReservationRequest: Record "TM Ticket Reservation Request" temporary): Boolean
     var
-        Membership: Record "MM Membership Role";
+        Membership: Record "MM Membership";
         MembershipAdmissionSetup: Record "MM Membership Admission Setup";
         TicketRequestManager: Codeunit "TM Ticket Request Manager";
         ExternalItemNo: Code[20];
@@ -414,27 +373,22 @@ codeunit 6060130 "MM Member Ticket Manager"
         ResolvingTable: Integer;
     begin
 
-        //-MM1.42 [382728] refactored
-        // Build a new temporary request based on the admission setup lines for this membership code
-
-        // // Build a new temporary request based on the admission setup lines for this membership code
-        // MembershipAdmissionSetup.SETFILTER ("Membership  Code", '=%1', MembershipCode);
-        // IF (NOT MembershipAdmissionSetup.FINDSET ()) THEN
-        //  EXIT;
-
         Membership.Get (MembershipEntryNo);
         MembershipAdmissionSetup.SetFilter ("Membership  Code", '=%1', Membership."Membership Code");
         if (not MembershipAdmissionSetup.FindSet ()) then
           exit;
-        //-MM1.42 [382728]
 
         repeat
 
           ItemNo := MembershipAdmissionSetup."Ticket No.";
           VariantCode := '';
           if (MembershipAdmissionSetup."Ticket No. Type" = MembershipAdmissionSetup."Ticket No. Type"::ITEM_CROSS_REF) then
-            if (not TicketRequestManager.TranslateBarcodeToItemVariant (ExternalItemNo, ItemNo, VariantCode, ResolvingTable)) then
+            //-MM1.43 [337112]
+            //IF (NOT TicketRequestManager.TranslateBarcodeToItemVariant (ExternalItemNo, ItemNo, VariantCode, ResolvingTable)) THEN
+            //  ERROR ('Invalid Item Cross Reference barcode %1, it does not translate to an item / variant.', ItemNo);
+            if (not TicketRequestManager.TranslateBarcodeToItemVariant (MembershipAdmissionSetup."Ticket No.", ItemNo, VariantCode, ResolvingTable)) then
               Error ('Invalid Item Cross Reference barcode %1, it does not translate to an item / variant.', ItemNo);
+            //+MM1.43 [337112]
 
           PrefillTicketRequest (MemberEntryNo, MembershipEntryNo, ItemNo, VariantCode, MembershipAdmissionSetup."Admission Code", TmpTicketReservationRequest);
 
@@ -447,90 +401,6 @@ codeunit 6060130 "MM Member Ticket Manager"
         until (MembershipAdmissionSetup.Next () = 0);
 
         exit (not TmpTicketReservationRequest.IsEmpty ());
-
-
-        //  CASE MembershipAdmissionSetup."Ticket No. Type" OF
-        //    //-MM1.41 [368119]
-        // //    MembershipAdmissionSetup."Ticket No. Type"::ITEM :
-        // //      BEGIN
-        // //        ItemCrossReference.SETFILTER ("Item No.", '=%1', MembershipAdmissionSetup."Ticket No.");
-        // //        ItemCrossReference.SETFILTER ("Cross-Reference Type", '=%1', ItemCrossReference."Cross-Reference Type"::"Bar Code");
-        // //        ItemCrossReference.SETFILTER ("Discontinue Bar Code", '=%1', FALSE);
-        // //        ItemCrossReference.FINDFIRST ();
-        // //        TmpTicketReservationRequest."External Item Code" := ItemCrossReference."Cross-Reference No.";
-        // //      END;
-        // //
-        // //    MembershipAdmissionSetup."Ticket No. Type"::ITEM_CROSS_REF :
-        // //      BEGIN
-        // //        TmpTicketReservationRequest."External Item Code" := COPYSTR (MembershipAdmissionSetup."Ticket No.", 1, MAXSTRLEN (TmpTicketReservationRequest."External Item Code"));
-        // //      END;
-        //
-        //    MembershipAdmissionSetup."Ticket No. Type"::ITEM :
-        //      BEGIN
-        //        TmpTicketReservationRequest."Item No." :=  MembershipAdmissionSetup."Ticket No.";
-        //        TmpTicketReservationRequest."Variant Code" := '';
-        //        ItemCrossReference.SETFILTER ("Item No.", '=%1', MembershipAdmissionSetup."Ticket No.");
-        //        ItemCrossReference.SETFILTER ("Cross-Reference Type", '=%1', ItemCrossReference."Cross-Reference Type"::"Bar Code");
-        //        ItemCrossReference.SETFILTER ("Discontinue Bar Code", '=%1', FALSE);
-        //        IF (ItemCrossReference.FINDFIRST ()) THEN
-        //          TmpTicketReservationRequest."External Item Code" := ItemCrossReference."Cross-Reference No.";
-        //      END;
-        //
-        //    MembershipAdmissionSetup."Ticket No. Type"::ITEM_CROSS_REF :
-        //      BEGIN
-        //        TmpTicketReservationRequest."External Item Code" := COPYSTR (MembershipAdmissionSetup."Ticket No.", 1, MAXSTRLEN (TmpTicketReservationRequest."External Item Code"));
-        //        IF (NOT TicketRequestManager.TranslateBarcodeToItemVariant (TmpTicketReservationRequest."External Item Code", TmpTicketReservationRequest."Item No.", TmpTicketReservationRequest."Variant Code", ResolvingTable)) THEN
-        //          ERROR ('Invalid Item Cross Reference barcode %1, it does not translate to an item / variant.', TmpTicketReservationRequest."External Item Code");
-        //      END;
-        //    //+MM1.41 [368119]
-        //
-        //    MembershipAdmissionSetup."Ticket No. Type"::ALTERNATIVE_NUMBER :
-        //      BEGIN
-        //        ERROR ('Alternative numbers are being deprecated. Use Item Cross References instead. MembershipAdmissionSetup %1 %2 %3',
-        //          MembershipAdmissionSetup."Membership  Code", MembershipAdmissionSetup."Admission Code", MembershipAdmissionSetup."Ticket No.");
-        //      END;
-        //  END;
-        //
-        //  TmpTicketReservationRequest."Admission Code" := MembershipAdmissionSetup."Admission Code";
-        //  TmpTicketReservationRequest."Admission Description" := COPYSTR (MembershipAdmissionSetup.Description, 1, MAXSTRLEN (TmpTicketReservationRequest."Admission Description"));
-        //
-        //  //-MM1.36 [335889]
-        //  IF (TmpTicketReservationRequest."Admission Description" = '') THEN BEGIN
-        //    IF (Admission.GET (MembershipAdmissionSetup."Admission Code")) THEN
-        //      TmpTicketReservationRequest."Admission Description" := Admission.Description;
-        //  END;
-        //
-        //  //-MM1.42 [382728]
-        //  // TmpTicketReservationRequest."Notification Method" := Member."Notification Method";
-        //  // TmpTicketReservationRequest."Notification Address" := Member."E-Mail Address";
-        //  MembershipManagement.GetCommunicationMethod_Ticket (Member."Entry No.", 0, Method, TmpTicketReservationRequest."Notification Address");
-        //  CASE Method OF
-        //    'SMS'  : TmpTicketReservationRequest."Notification Method" := TmpTicketReservationRequest."Notification Method"::SMS;
-        //    'EMAIL': TmpTicketReservationRequest."Notification Method" := TmpTicketReservationRequest."Notification Method"::EMAIL;
-        //    'W-SMS':
-        //      BEGIN
-        //        TmpTicketReservationRequest."Notification Method" := TmpTicketReservationRequest."Notification Method"::SMS;
-        //        TmpTicketReservationRequest."Notification Format" := TmpTicketReservationRequest."Notification Format"::WALLET;
-        //      END;
-        //    'W-EMAIL':
-        //      BEGIN
-        //        TmpTicketReservationRequest."Notification Method" := TmpTicketReservationRequest."Notification Method"::EMAIL;
-        //        TmpTicketReservationRequest."Notification Format" := TmpTicketReservationRequest."Notification Format"::WALLET;
-        //      END;
-        //  ELSE
-        //    TmpTicketReservationRequest."Notification Method" := TmpTicketReservationRequest."Notification Method"::NA;
-        //  END;
-        //  //+MM1.42 [382728]
-        //
-        //  TmpTicketReservationRequest."External Member No." := Member."External Member No.";
-        //  //+MM1.36 [335889]
-
-        //  TmpTicketReservationRequest."Entry No." += 1;
-        //  TmpTicketReservationRequest.INSERT ();
-        //
-        // UNTIL (MembershipAdmissionSetup.NEXT () = 0);
-        //
-        // EXIT (NOT TmpTicketReservationRequest.ISEMPTY ());
     end;
 
     procedure PrefillTicketRequest(MemberEntryNo: Integer;MembershipEntryNo: Integer;ItemNo: Code[20];VariantCode: Code[10];AdmissionCode: Code[20];var TmpTicketReservationRequest: Record "TM Ticket Reservation Request" temporary)
@@ -576,6 +446,89 @@ codeunit 6060130 "MM Member Ticket Manager"
         TmpTicketReservationRequest."External Member No." := Member."External Member No.";
 
         //+MM1.42 [382728]
+    end;
+
+    local procedure PrintTicket(MembershipSetup: Record "MM Membership Setup";var Ticket: Record "TM Ticket")
+    var
+        ObjectOutputMgt: Codeunit "Object Output Mgt.";
+        LinePrintMgt: Codeunit "RP Line Print Mgt.";
+        ReportPrinterInterface: Codeunit "Report Printer Interface";
+        PrintTemplateMgt: Codeunit "RP Template Mgt.";
+    begin
+        //-MM1.43 [337112]
+
+        case MembershipSetup."Ticket Print Object Type" of
+          MembershipSetup."Ticket Print Object Type"::NO_PRINT :
+            exit;
+
+          MembershipSetup."Ticket Print Object Type"::CODEUNIT :
+            if (ObjectOutputMgt.GetCodeunitOutputPath (MembershipSetup."Ticket Print Object ID") <> '') then
+              LinePrintMgt.ProcessCodeunit (MembershipSetup."Ticket Print Object ID", Ticket)
+            else
+              CODEUNIT.Run (MembershipSetup."Ticket Print Object ID", Ticket);
+
+          MembershipSetup."Ticket Print Object Type"::REPORT :
+            ReportPrinterInterface.RunReport (MembershipSetup."Ticket Print Object ID", false, false, Ticket);
+
+          MembershipSetup."Ticket Print Object Type"::TEMPLATE :
+            PrintTemplateMgt.PrintTemplate (MembershipSetup."Ticket Print Template Code", Ticket, 0);
+
+          else
+            Error (ILLEGAL_VALUE, MembershipSetup."Ticket Print Object Type", MembershipSetup.FieldCaption ("Ticket Print Object Type"));
+        end;
+
+        //+MM1.43 [337112]
+    end;
+
+    local procedure PrintGuestTicketBatch(MembershipEntryNo: Integer;RequestToken: Text[100])
+    var
+        Membership: Record "MM Membership";
+        MembershipSetup: Record "MM Membership Setup";
+        Ticket: Record "TM Ticket";
+        TicketReservationRequest: Record "TM Ticket Reservation Request";
+    begin
+
+        //-MM1.43 [337112]
+        Membership.Get (MembershipEntryNo);
+        MembershipSetup.Get (Membership."Membership Code");
+
+        if (MembershipSetup."Ticket Print Model" = MembershipSetup."Ticket Print Model"::CONDENSED) then
+          exit;
+
+        TicketReservationRequest.Reset ();
+        TicketReservationRequest.SetFilter ("Session Token ID", '=%1', RequestToken);
+        if (TicketReservationRequest.FindSet ()) then begin
+          repeat
+            Ticket.SetFilter ("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+            if (not Ticket.IsEmpty ()) then
+              PrintTicket (MembershipSetup, Ticket);
+          until (TicketReservationRequest.Next () = 0);
+        end;
+        //+MM1.43 [337112]
+    end;
+
+    local procedure PrintReusedGuestTickets(MembershipEntryNo: Integer;var TmpTicketReservationRequest: Record "TM Ticket Reservation Request" temporary)
+    var
+        Membership: Record "MM Membership";
+        MembershipSetup: Record "MM Membership Setup";
+        Ticket: Record "TM Ticket";
+    begin
+
+        //-MM1.43 [337112]
+        Membership.Get (MembershipEntryNo);
+        MembershipSetup.Get (Membership."Membership Code");
+
+        if (MembershipSetup."Ticket Print Model" = MembershipSetup."Ticket Print Model"::CONDENSED) then
+          exit;
+
+        TmpTicketReservationRequest.Reset ();
+        TmpTicketReservationRequest.FindSet ();
+        repeat
+          Ticket.SetFilter ("Ticket Reservation Entry No.", '=%1', TmpTicketReservationRequest."Entry No.");
+          if (not Ticket.IsEmpty ()) then
+            PrintTicket (MembershipSetup, Ticket);
+        until (TmpTicketReservationRequest.Next () = 0);
+        //+MM1.43 [337112]
     end;
 }
 

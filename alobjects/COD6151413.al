@@ -68,6 +68,10 @@ codeunit 6151413 "Magento Sales Order Mgt."
     // MAG2.24/MHA /20191024  CASE 371807 Added "Phone No. to Customer No." GetCustomer()
     // MAG2.24/MHA /20191118  CASE 372315 Adjusted InsertSalesLineRetailVoucher() to support Top-up
     // MAG2.24/MHA /20191122  CASE 378597 Only Customer No., E-mail and Phone No. should be touched in UpdateRetailVoucherCustomerInfo()
+    // MAG2.25/ZESO/20200131  CASE 386010 Populate Issue Date and Salesperson Code on Credit Voucher
+    // MAG2.25/MHA /20200204  CASE 387936 Added function SendOrderConfirmation()
+    // MAG2.25/MHA /20200306  CASE 384262 Added import of <vat_percent> in InsertSalesLineRetailVoucher()
+    // MAG2.25/MHA /20200323  CASE 372135 Retail Voucher Description is now used on Sales Line
 
     TableNo = "Nc Import Entry";
 
@@ -88,6 +92,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
         Initialized: Boolean;
         Error001: Label 'Xml Element sell_to_customer is missing';
         Error002: Label 'Item %1 does not exist in %2';
+        Error003: Label 'Error during E-mail Confirmation: %1';
         Text000: Label 'Invalid Voucher Reference No. %1';
         Text001: Label 'Voucher %1 is already in use';
         Text002: Label 'Customer Create is not allowed when Customer Update Mode is %1';
@@ -116,6 +121,7 @@ codeunit 6151413 "Magento Sales Order Mgt."
     var
         SalesHeader: Record "Sales Header";
         ReleaseSalesDoc: Codeunit "Release Sales Document";
+        MailErrorMessage: Text;
     begin
         if IsNull(XmlElement) then
           exit(false);
@@ -139,6 +145,11 @@ codeunit 6151413 "Magento Sales Order Mgt."
         //-MAG2.23 [363864]
         UpdateRetailVoucherCustomerInfo(SalesHeader);
         //+MAG2.23 [363864]
+        //-MAG2.25 [387936]
+        Commit;
+        if MagentoSetup."Send Order Confirmation" then
+          MailErrorMessage := SendOrderConfirmation(XmlElement,SalesHeader);
+        //+MAG2.25 [387936]
         Commit;
         ActivateAndMailGiftVouchers(SalesHeader);
 
@@ -146,6 +157,12 @@ codeunit 6151413 "Magento Sales Order Mgt."
         Commit;
         PostOnImport(SalesHeader);
         //+MAG2.23 [371791]
+
+        //-MAG2.25 [387936]
+        Commit;
+        if MailErrorMessage <> '' then
+          Error(Error003,CopyStr(MailErrorMessage,1,900));
+        //+MAG2.25 [387936]
         exit(true);
     end;
 
@@ -505,6 +522,10 @@ codeunit 6151413 "Magento Sales Order Mgt."
           CreditVoucher."Shortcut Dimension 2 Code" := SalesHeader."Shortcut Dimension 2 Code";
           CreditVoucher."Sales Order No." := SalesHeader."No.";
           CreditVoucher."Currency Code" := SalesHeader."Currency Code";
+          //-MAG2.25 [386010]
+          CreditVoucher."Issue Date" := Today;
+          CreditVoucher.Salesperson := SalesHeader."Salesperson Code";
+          //+MAG2.25 [386010]
           CreditVoucher.Insert(true);
 
           NaviConnectPaymentLine2.Init;
@@ -1029,6 +1050,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
         Evaluate(Quantity,NpXmlDomMgt.GetXmlText(XmlElement,'quantity',0,true),9);
         Evaluate(UnitPrice,NpXmlDomMgt.GetXmlText(XmlElement,'unit_price_incl_vat',0,true),9);
         Evaluate(LineAmount,NpXmlDomMgt.GetXmlText(XmlElement,'line_amount_incl_vat',0,true),9);
+        //-MAG2.25 [384262]
+        Evaluate(VatPct,NpXmlDomMgt.GetXmlText(XmlElement,'vat_percent',0,true),9);
+        //+MAG2.25 [384262]
 
         LineNo += 10000;
         SalesLine.Init;
@@ -1039,6 +1063,9 @@ codeunit 6151413 "Magento Sales Order Mgt."
 
         SalesLine.Validate(Type,SalesLine.Type::"G/L Account");
         SalesLine.Validate("No.",NpRvVoucher."Account No.");
+        //-MAG2.25 [372135]
+        SalesLine.Description := NpRvVoucher.Description;
+        //+MAG2.25 [372135]
         SalesLine.Validate(Quantity,Quantity);
         SalesLine.Validate("VAT %",VatPct);
         SalesLine.Validate("Unit Price",UnitPrice);
@@ -1315,6 +1342,32 @@ codeunit 6151413 "Magento Sales Order Mgt."
 
     local procedure "--- Post On Import"()
     begin
+    end;
+
+    local procedure SendOrderConfirmation(XmlElement: DotNet npNetXmlElement;SalesHeader: Record "Sales Header") MailErrorMessage: Text
+    var
+        Customer: Record Customer;
+        EmailTemplateHeader: Record "E-mail Template Header";
+        ReportSelections: Record "Report Selections";
+        EmailMgt: Codeunit "E-mail Management";
+        RecRef: RecordRef;
+        RecipientEmail: Text;
+    begin
+        //-MAG2.25 [387936]
+        RecipientEmail := NpXmlDomMgt.GetXmlText(XmlElement,'sell_to_customer/email',0,true);
+        MagentoSetup.TestField("E-mail Template (Order Conf.)");
+        EmailTemplateHeader.Get(MagentoSetup."E-mail Template (Order Conf.)");
+        RecRef.GetTable(SalesHeader);
+        RecRef.SetRecFilter;
+        if EmailTemplateHeader."Report ID" <= 0 then begin
+          ReportSelections.SetRange(Usage,ReportSelections.Usage::"S.Order");
+          ReportSelections.SetFilter("Report ID",'>%1',0);
+          ReportSelections.FindFirst;
+          EmailTemplateHeader."Report ID" := ReportSelections."Report ID";
+        end;
+        MailErrorMessage := EmailMgt.SendReportTemplate(EmailTemplateHeader."Report ID",RecRef,EmailTemplateHeader,RecipientEmail,true);
+        exit(MailErrorMessage);
+        //+MAG2.25 [387936]
     end;
 
     local procedure PostOnImport(SalesHeader: Record "Sales Header")

@@ -40,6 +40,7 @@ codeunit 6060150 "Event Management"
     // NPR5.53/TJ  /20200110 CASE 346821 New functions to set statuses on Jobs Setup page
     //                                   New process to block deletion of events in specified status
     // NPR5.53/TJ  /20200206 CASE 385993 Fixed a bug preventing event delete with no setup
+    // NPR5.54/TJ  /20200306 CASE 395153 Fixed a bug where forced inventory posting was allowing sales invoice modifications
 
     Permissions = TableData "Job Ledger Entry"=imd,
                   TableData "Job Register"=imd,
@@ -499,6 +500,30 @@ codeunit 6060150 "Event Management"
               SalesHeader.Modify;
             end;
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, 37, 'OnBeforeModifyEvent', '', true, true)]
+    local procedure SalesLineOnBeforeModify(var Rec: Record "Sales Line";var xRec: Record "Sales Line";RunTrigger: Boolean)
+    var
+        JobPlanningLineInvoice: Record "Job Planning Line Invoice";
+        JobPlanningLine: Record "Job Planning Line";
+        PostedDocType: Integer;
+        JobPostLine: Codeunit "Job Post-Line";
+    begin
+        //-NPR5.54 [395153]
+        if not RunTrigger then
+          exit;
+        JobPlanningLineInvoice.SetRange("Line No.",Rec."Line No.");
+        if not JobPlanningLineInvoiceExists(DATABASE::"Sales Header",Rec."Document Type",Rec."Document No.",JobPlanningLineInvoice,PostedDocType) then
+          exit;
+        if Rec."Job Contract Entry No." <> 0 then
+          exit;
+        JobPlanningLineInvoice.FindFirst;
+        if not JobPlanningLine.Get(JobPlanningLineInvoice."Job No.",JobPlanningLineInvoice."Job Task No.",JobPlanningLineInvoice."Job Planning Line No.") then
+          exit;
+        Rec."Job Contract Entry No." := JobPlanningLine."Job Contract Entry No.";
+        JobPostLine.TestSalesLine(Rec);
+        //+NPR5.54 [395153]
     end;
 
     [EventSubscriber(ObjectType::Table, 37, 'OnBeforeDeleteEvent', '', true, true)]

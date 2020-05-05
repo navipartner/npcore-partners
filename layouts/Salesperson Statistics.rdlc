@@ -11647,9 +11647,15 @@
                   <KeepWithGroup>After</KeepWithGroup>
                 </TablixMember>
                 <TablixMember>
+                  <Visibility>
+                    <Hidden>true</Hidden>
+                  </Visibility>
                   <KeepWithGroup>After</KeepWithGroup>
                 </TablixMember>
                 <TablixMember>
+                  <Visibility>
+                    <Hidden>true</Hidden>
+                  </Visibility>
                   <KeepWithGroup>After</KeepWithGroup>
                 </TablixMember>
                 <TablixMember>
@@ -11664,7 +11670,7 @@
                     </SortExpression>
                   </SortExpressions>
                   <Visibility>
-                    <Hidden>=iif(Len(Fields!Number_DiscountStatistics.Value)=0,true,false)</Hidden>
+                    <Hidden>true</Hidden>
                   </Visibility>
                 </TablixMember>
               </TablixMembers>
@@ -11721,25 +11727,6 @@
                 <PaddingBottom>2pt</PaddingBottom>
               </Style>
             </Textbox>
-            <Image Name="Picutre">
-              <Source>Database</Source>
-              <Value>=Convert.ToBase64String(Fields!CompanyInfoPicture.Value)</Value>
-              <MIMEType>image/bmp</MIMEType>
-              <Sizing>Fit</Sizing>
-              <Left>19.55643cm</Left>
-              <Height>44.2502pt</Height>
-              <Width>7.02316cm</Width>
-              <ZIndex>1</ZIndex>
-              <Visibility>
-                <Hidden>=iif(IsNothing(Fields!CompanyInfoPicture.Value) = true,true,false)</Hidden>
-              </Visibility>
-              <DataElementOutput>NoOutput</DataElementOutput>
-              <Style>
-                <Border />
-                <FontFamily>Segoe UI</FontFamily>
-                <FontSize>8pt</FontSize>
-              </Style>
-            </Image>
             <Textbox Name="Date">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
@@ -11764,7 +11751,7 @@
               <Top>2.00201cm</Top>
               <Height>10pt</Height>
               <Width>10.67094cm</Width>
-              <ZIndex>2</ZIndex>
+              <ZIndex>1</ZIndex>
               <Style>
                 <Border />
                 <FontFamily>Segoe UI</FontFamily>
@@ -11795,7 +11782,7 @@
               <Top>2.47827cm</Top>
               <Height>9.99986pt</Height>
               <Width>10.67094cm</Width>
-              <ZIndex>3</ZIndex>
+              <ZIndex>2</ZIndex>
               <Style>
                 <Border />
                 <FontFamily>Segoe UI</FontFamily>
@@ -11826,7 +11813,7 @@
               <Top>1.61396cm</Top>
               <Height>9.99986pt</Height>
               <Width>26.57973cm</Width>
-              <ZIndex>4</ZIndex>
+              <ZIndex>3</ZIndex>
               <Style>
                 <Border />
                 <FontFamily>Segoe UI</FontFamily>
@@ -11858,7 +11845,7 @@
               <Left>19.55643cm</Left>
               <Height>9.99986pt</Height>
               <Width>7.02314cm</Width>
-              <ZIndex>5</ZIndex>
+              <ZIndex>4</ZIndex>
               <Style>
                 <Border />
                 <FontFamily>Segoe UI</FontFamily>
@@ -11890,7 +11877,7 @@
               <Left>0.00004cm</Left>
               <Height>9.99986pt</Height>
               <Width>10.6709cm</Width>
-              <ZIndex>6</ZIndex>
+              <ZIndex>5</ZIndex>
               <Style>
                 <Border />
                 <FontFamily>Segoe UI</FontFamily>

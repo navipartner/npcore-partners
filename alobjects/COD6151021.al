@@ -52,6 +52,7 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
         Voucher2Buffer(NpRvVoucher,NpRvExtVoucherBuffer);
     end;
 
+    [Scope('Personalization')]
     procedure GetVouchersByCustomerNo(CustomerNo: Text;var vouchers: XMLport "NpRv Ext. Vouchers")
     var
         NpRvVoucher: Record "NpRv Voucher";
@@ -81,6 +82,7 @@ codeunit 6151021 "NpRv Ext. Voucher Webservice"
         //+NPR5.52 [372315]
     end;
 
+    [Scope('Personalization')]
     procedure GetVouchersByEmail(Email: Text;var vouchers: XMLport "NpRv Ext. Vouchers")
     var
         NpRvVoucher: Record "NpRv Voucher";

@@ -1,4 +1,4 @@
-pageextension 6014434 pageextension6014434 extends "Sales Quote" 
+pageextension 6014435 pageextension6014435 extends "Sales Quote" 
 {
     // NPR7.100.000/LS/220114  : Retail Merge :
     //                                        Adddedactions : Matrix, E-Mail Log, Send AsPDF

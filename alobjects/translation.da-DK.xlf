@@ -3,29 +3,155 @@
   <file datatype="xml" source-language="en-US" target-language="da-DK" original="Please update this value">
     <body>
       <group id="body">
-        <trans-unit id="PageExtension 1673007532 - Change 3434943428 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+        <trans-unit id="PageExtension 1035310915 - Change 3434943428 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Shipping Agents</source>
           <target>Spedit�rer</target>
           <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension6014436 - Change "Shipping Agents" - Property Caption</note>
+          <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension6014437 - Change "Shipping Agents" - Property Caption</note>
         </trans-unit>
-        <trans-unit id="PageExtension 1673007532 - Change 931134756 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+        <trans-unit id="PageExtension 1035310915 - Change 931134756 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>&amp;Line</source>
           <target>&amp;Linje</target>
           <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension6014436 - Change "&amp;Line" - Property Caption</note>
+          <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension6014437 - Change "&amp;Line" - Property Caption</note>
         </trans-unit>
-        <trans-unit id="PageExtension 1673007532 - Change 3605739711 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+        <trans-unit id="PageExtension 1035310915 - Change 3605739711 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Shipping A&amp;gent Services</source>
           <target>Spe&amp;dit�rservice</target>
           <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension6014436 - Change ShippingAgentServices - Property Caption</note>
+          <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension6014437 - Change ShippingAgentServices - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 2981072930 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Whse. P&amp;hysical Invt. Journal</source>
+          <target>Lageropg�r&amp;elseskladde</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action "Whse. P&amp;hysical Invt. Journal" - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 2981072930 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Prepare to count inventories by preparing the documents that warehouse employees use when they perform a physical inventory of selected items or of all the inventory. When the physical count has been made, you enter the number of items that are in the bins in this window, and then you register the physical inventory.</source>
+          <target>Forbered opt�lling af lagerbeholdningen ved at klarg�re de dokumenter, som lagermedarbejderne skal bruge, n�r de foretager en lageropg�relse af bestemte varer eller af hele lagerstedet. N�r opt�llingen er f�rdig, skal du indtaste det antal varer, der findes p� placeringerne, i dette vindue, hvorefter du registrerer lageropg�relsen.</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action "Whse. P&amp;hysical Invt. Journal" - Property ToolTip</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 2208304167 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Whse. Item &amp;Journal</source>
+          <target>Lagerkla&amp;dde</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action "Whse. Item &amp;Journal" - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 2208304167 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Adjust the quantity of an item in a particular bin or bins. For instance, you might find some items in a bin that are not registered in the system, or you might not be able to pick the quantity needed because there are fewer items in a bin than was calculated by the program. The bin is then updated to correspond to the actual quantity in the bin. In addition, it creates a balancing quantity in the adjustment bin, for synchronization with item ledger entries, which you can then post with an item journal.</source>
+          <target>Reguler antallet af en vare p� �n eller flere placeringer. Det kan f.eks. v�re, at du finder nogle varer p� en placering, der ikke er registreret i systemet, eller at du ikke kan plukke det n�dvendige antal, fordi der er f�rre varer p� en placering, som programmet har beregnet. Placeringen opdateres derefter, s� den svarer til det faktiske antal p� placeringen. Desuden oprettes et udlignende antal p� reguleringsplaceringen til synkronisering med vareposter, som du derefter kan bogf�re med en varekladde.</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action "Whse. Item &amp;Journal" - Property ToolTip</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 506327307 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Pick &amp;Worksheet</source>
+          <target>Pl&amp;ukkladde</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action "Pick &amp;Worksheet" - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 506327307 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Plan and initialize picks of items. </source>
+          <target>Planl�g og start pluk af varer. </target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action "Pick &amp;Worksheet" - Property ToolTip</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 2600814814 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Put-&amp;away Worksheet</source>
+          <target>L�g-&amp;p�-lager-kladde</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action "Put-&amp;away Worksheet" - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 2600814814 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Plan and initialize item put-aways.</source>
+          <target>Planl�g og start l�g-p�-lager-vareaktiviteter.</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action "Put-&amp;away Worksheet" - Property ToolTip</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 3257200709 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>M&amp;ovement Worksheet</source>
+          <target>&amp;Bev�gelseskladde</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action "M&amp;ovement Worksheet" - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 3257200709 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Prepare to move items between bins within the warehouse.</source>
+          <target>G�r klar til at flytte varer mellem placeringer p� lageret.</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action "M&amp;ovement Worksheet" - Property ToolTip</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 502387840 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Whse. Phys. Invt. Journals</source>
+          <target>Lagerplacering - opg.kladder</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action WhsePhysInvtJournals - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 502387840 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Prepare to count inventories by preparing the documents that warehouse employees use when they perform a physical inventory of selected items or of all the inventory. When the physical count has been made, you enter the number of items that are in the bins in this window, and then you register the physical inventory.</source>
+          <target>Forbered opt�lling af lagerbeholdningen ved at klarg�re de dokumenter, som lagermedarbejderne skal bruge, n�r de foretager en lageropg�relse af bestemte varer eller af hele lagerstedet. N�r opt�llingen er f�rdig, skal du indtaste det antal varer, der findes p� placeringerne, i dette vindue, hvorefter du registrerer lageropg�relsen.</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action WhsePhysInvtJournals - Property ToolTip</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 3659324010 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Whse. Item Journals</source>
+          <target>Lagerkladder</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action WhseItem Journals - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 3659324010 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Adjust the quantity of an item in a particular bin or bins. For instance, you might find some items in a bin that are not registered in the system, or you might not be able to pick the quantity needed because there are fewer items in a bin than was calculated by the program. The bin is then updated to correspond to the actual quantity in the bin. In addition, it creates a balancing quantity in the adjustment bin, for synchronization with item ledger entries, which you can then post with an item journal.</source>
+          <target>Reguler antallet af en vare p� �n eller flere placeringer. Det kan f.eks. v�re, at du finder nogle varer p� en placering, der ikke er registreret i systemet, eller at du ikke kan plukke det n�dvendige antal, fordi der er f�rre varer p� en placering, som programmet har beregnet. Placeringen opdateres derefter, s� den svarer til det faktiske antal p� placeringen. Desuden oprettes et udlignende antal p� reguleringsplaceringen til synkronisering med vareposter, som du derefter kan bogf�re med en varekladde.</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action WhseItem Journals - Property ToolTip</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 2049596008 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Pick Worksheets</source>
+          <target>Plukkladder</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action PickWorksheets - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 2049596008 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Plan and initialize picks of items. </source>
+          <target>Planl�g og start pluk af varer. </target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action PickWorksheets - Property ToolTip</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 3182521534 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Put-away Worksheets</source>
+          <target>L�g-p�-lager-kladder</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action PutawayWorksheets - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 3182521534 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Plan and initialize item put-aways.</source>
+          <target>Planl�g og start l�g-p�-lager-vareaktiviteter.</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action PutawayWorksheets - Property ToolTip</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 1781548914 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Movement Worksheets</source>
+          <target>Bev�gelseskladder</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action MovementWorksheets - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Page 2881882475 - Action 1781548914 - Property 1295455071" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Plan and initiate movements of items between bins according to an advanced warehouse configuration.</source>
+          <target>Planl�g og start varebev�gelser mellem placeringer i henhold til en avanceret lagerkonfiguration.</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Page NP Retail EFT Role Center - Action MovementWorksheets - Property ToolTip</note>
         </trans-unit>
         <trans-unit id="Page 2811417786 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Global Voucher Setup</source>
           <target>Global voucher ops�tning</target>
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Page NpRv Global Voucher Setup - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="PageExtension 3451135487 - Control 3167270844 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>My User Tasks</source>
+          <target>Mine brugeropgaver</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">PageExtension pageextension6014477 - Control Control6014400 - Property Caption</note>
         </trans-unit>
         <trans-unit id="Query 3603994390 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>VAT Totals</source>
@@ -38,6 +164,30 @@
           <target>Rabat</target>
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Report Sales Ticket A4 - ReportLabel Discount_Lbl</note>
+        </trans-unit>
+        <trans-unit id="Report 1356223815 - Control 3586118911 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Avoid 0 Sales</source>
+          <target>Undlad 0 salg</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Report Sale Statistics per Vendor - Control Avoid0Sales - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Report 1949935883 - ReportLabel 291767072" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Sales Price</source>
+          <target>Salgspris</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Report Inventory per Date - ReportLabel SalesPrice_Caption</note>
+        </trans-unit>
+        <trans-unit id="Report 1949935883 - NamedType 3114637384" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Last Direct Cost</source>
+          <target>Sidste Kostpris</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Report Inventory per Date - NamedType Text001</note>
+        </trans-unit>
+        <trans-unit id="Report 1949935883 - NamedType 3752334001" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Unit cost</source>
+          <target>Kostpris</target>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Report Inventory per Date - NamedType Text002</note>
         </trans-unit>
         <trans-unit id="Report 3908757738 - ReportLabel 2707973462" size-unit="char" translate="yes" xml:space="preserve">
           <source>Sales (Unit Price)</source>

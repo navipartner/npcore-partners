@@ -12,7 +12,7 @@ report 6060105 "Terminal Sales Ticket IV"
 
     dataset
     {
-        dataitem("Credit Card Transaction";"Credit Card Transaction")
+        dataitem("EFT Receipt";"EFT Receipt")
         {
             RequestFilterFields = "Sales Ticket No.";
             column(EjCut;EjCut)
@@ -24,10 +24,10 @@ report 6060105 "Terminal Sales Ticket IV"
             column(ForsteLinieText;FirstLineText)
             {
             }
-            column(Text_CreditCardTransaction;DelChr("Credit Card Transaction".Text,'=',' '))
+            column(Text_CreditCardTransaction;DelChr("EFT Receipt".Text,'=',' '))
             {
             }
-            column(NoPrinted_CreditCardTransaction;"Credit Card Transaction"."No. Printed")
+            column(NoPrinted_CreditCardTransaction;"EFT Receipt"."No. Printed")
             {
             }
             column(txtCopy;TxtCopy)
@@ -60,22 +60,22 @@ report 6060105 "Terminal Sales Ticket IV"
                 end;
 
                 IsFirst := true;
-                FirstLineText := "Credit Card Transaction".Text;
+                FirstLineText := "EFT Receipt".Text;
                 if FirstLineText = '' then
                   EjCut := true
                 else
                   EjCut := false;
 
                 //-NPR7
-                Body1 := ((not EjCut) and NotFirst and (FirstLineText = "Credit Card Transaction".Text));
+                Body1 := ((not EjCut) and NotFirst and (FirstLineText = "EFT Receipt".Text));
 
-                Body2 := ((not EjCut) and NotFirst and (FirstLineText = "Credit Card Transaction".Text) and
-                                      ("Credit Card Transaction"."No. Printed" > 0));
+                Body2 := ((not EjCut) and NotFirst and (FirstLineText = "EFT Receipt".Text) and
+                                      ("EFT Receipt"."No. Printed" > 0));
 
                 if Body3Cnt = 0 then
                   Body3 := false
                 else
-                  Body3 := (not NotFirst and ("Credit Card Transaction"."No. Printed" > 0) );
+                  Body3 := (not NotFirst and ("EFT Receipt"."No. Printed" > 0) );
 
                 Body3Cnt += 1;
                 //+NPR7

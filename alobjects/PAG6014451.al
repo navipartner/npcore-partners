@@ -4,6 +4,7 @@ page 6014451 "Mixed Discount Lines"
     //                                     Set property 'Delayed on insert'= true
     // NPR5.31/MHA /20170110  CASE 262904 Added functions for enabling view: MixedDiscount."Mix Type"::::Combination
     //                                    Deleted unused functions and variables
+    // NPR5.54/YAHA/20200303  CASE 393386 Added Mix Discount Price
 
     Caption = 'Mix Discount Lines';
     DelayedInsert = true;
@@ -58,6 +59,10 @@ page 6014451 "Mixed Discount Lines"
                 }
                 field(Priority;Priority)
                 {
+                }
+                field(TotalAmount;TotalAmount)
+                {
+                    Caption = 'Mix Discount Price';
                 }
             }
             repeater(MixLines)
@@ -166,6 +171,7 @@ page 6014451 "Mixed Discount Lines"
         Text10600003: Label 'Saving %1 %2 %3';
         Lot: Boolean;
         MixType: Integer;
+        TotalAmount: Decimal;
 
     local procedure CalcExpectedAmount(FindMaxDisc: Boolean) ExpectedDiscAmount: Decimal
     var
@@ -229,6 +235,20 @@ page 6014451 "Mixed Discount Lines"
 
         CurrPage.Update(false);
         //+NPR5.31 [262904]
+    end;
+
+    procedure GetTotalAmount(): Decimal
+    var
+        MixedDiscount: Record "Mixed Discount";
+    begin
+        //-393386 [393386]
+        if "Disc. Grouping Type" <> "Disc. Grouping Type"::"Mix Discount" then
+          exit;
+        if not MixedDiscount.Get("No.") then
+          exit;
+
+        exit(MixedDiscount."Total Amount");
+        //+393386 [393386]
     end;
 }
 

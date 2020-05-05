@@ -31,6 +31,8 @@ codeunit 6151403 "Magento Webservice"
     // MAG2.20/TSA /20190424  CASE 345376 Added Shipment Statement as PDF
     // MAG2.22/MHA /20190711  CASE 361706 Removed explicit set of Magento."Variant System" in InitSetup()
     // MAG14.00.2.22/ALST/20190714 CASE 361943 removed call to standard object customization in GeneratePdfCustomerStatement()
+    // MAG2.25/TSA /20200218 CASE 388058 Added Quotes to magento service
+    // MAG2.25/TSA /20200320 CASE 396445 Added service GetCustomerAndContactNo()
 
 
     trigger OnRun()
@@ -170,6 +172,33 @@ codeunit 6151403 "Magento Webservice"
     end;
 
     [Scope('Personalization')]
+    procedure GeneratePdfQuote(DocumentNo: Code[20];CustomerNo: Code[20]) PdfQuote: Text
+    var
+        SalesHeader: Record "Sales Header";
+        ReportSelections: Record "Report Selections";
+        Filename: Text;
+    begin
+
+        //-MAG2.25 [388058]
+        ReportSelections.SetRange (Usage, ReportSelections.Usage::"S.Quote");
+        ReportSelections.SetFilter ("Report ID", '<>%1', 0);
+        ReportSelections.FindFirst ();
+
+        SalesHeader.Get (SalesHeader."Document Type"::Quote, DocumentNo);
+        SalesHeader.TestField ("Bill-to Customer No.", CustomerNo);
+        SalesHeader.SetRecFilter;
+
+        Filename := TemporaryPath + 'quote-' + DocumentNo + '.pdf';
+        REPORT.SaveAsPdf (ReportSelections."Report ID",Filename, SalesHeader);
+
+        PdfQuote := GetBase64 (Filename);
+        if (Erase(Filename)) then;
+
+        exit (PdfQuote);
+        //+MAG2.25 [388058]
+    end;
+
+    [Scope('Personalization')]
     procedure GetInvoices(CustomerNo: Code[20]; StartDate: Date; EndDate: Date; var documents: XMLport "Magento Document Export")
     begin
         //-MAG2.20 [345376]
@@ -208,6 +237,15 @@ codeunit 6151403 "Magento Webservice"
         //-MAG2.20 [345376]
         documents.SetFilters(CustomerNo, '', StartDate, EndDate, false, false, false, false, true);
         //+MAG2.20 [345376]
+    end;
+
+    [Scope('Personalization')]
+    procedure GetQuotes(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
+    begin
+
+        //-MAG2.25 [388058]
+        documents.SetQuoteFilter (CustomerNo, '', StartDate, EndDate, false);
+        //+MAG2.25 [388058]
     end;
 
     [Scope('Personalization')]
@@ -255,6 +293,15 @@ codeunit 6151403 "Magento Webservice"
     end;
 
     [Scope('Personalization')]
+    procedure ListQuotes(CustomerNo: Code[20];StartDate: Date;EndDate: Date;var documents: XMLport "Magento Document Export")
+    begin
+
+        //-MAG2.25 [388058]
+        documents.SetQuoteFilter (CustomerNo, '', StartDate, EndDate, true);
+        //+MAG2.25 [388058]
+    end;
+
+    [Scope('Personalization')]
     procedure GetInvoice(CustomerNo: Code[20]; DocumentNumber: Code[20]; var documents: XMLport "Magento Document Export")
     begin
 
@@ -299,6 +346,15 @@ codeunit 6151403 "Magento Webservice"
     end;
 
     [Scope('Personalization')]
+    procedure GetQuote(CustomerNo: Code[20];DocumentNumber: Code[20];var documents: XMLport "Magento Document Export")
+    begin
+
+        //-MAG2.25 [388058]
+        documents.SetQuoteFilter (CustomerNo, DocumentNumber, 0D, DMY2Date (31, 12, 9999), false);
+        //+MAG2.25 [388058]
+    end;
+
+    [Scope('Personalization')]
     procedure GetItemInventory(itemFilter: Text; variantFilter: Text; locationFilter: Text; var items: XMLport "Magento Avail. InventoryExport")
     begin
         Clear(items);
@@ -325,6 +381,26 @@ codeunit 6151403 "Magento Webservice"
             CustomerNo := SalesHeader."Sell-to Customer No.";
         exit(CustomerNo);
         //+MAG2.03
+    end;
+
+    [Scope('Personalization')]
+    procedure GetCustomerAndContactNo(OrderNo: Code[20];var CustomerNo: Code[20];var ContactNo: Code[20]): Boolean
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        //-MAG2.25 [396445]
+        if (OrderNo = '') then
+          exit (false);
+
+        SalesHeader.SetRange("Document Type",SalesHeader."Document Type"::Order);
+        SalesHeader.SetFilter("External Order No.",OrderNo);
+        if (not SalesHeader.FindFirst ()) then
+          exit (false);
+
+        CustomerNo :=  SalesHeader."Sell-to Customer No.";
+        ContactNo := SalesHeader."Sell-to Contact No.";
+        exit(true);
+        //+MAG2.25 [396445]
     end;
 
     [Scope('Personalization')]

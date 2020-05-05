@@ -1,6 +1,8 @@
 table 6151390 "CS Stock-Take Handling Rfid"
 {
     // NPR5.50/CLVA/20190207 CASE 344466 Object created - NP Capture Service
+    // NPR5.54/CLVA/20200214 CASE 389224 Added field "Stock-Take Id" and Area
+    // NPR5.54/CLVA/20200227 CASE 389224 Added key Created
 
     Caption = 'CS Stock-Take Handling Rfid';
 
@@ -9,6 +11,10 @@ table 6151390 "CS Stock-Take Handling Rfid"
         field(1;Id;Guid)
         {
             Caption = 'Id';
+        }
+        field(10;"Stock-Take Id";Guid)
+        {
+            Caption = 'Stock-Take Id';
         }
         field(11;"Batch Id";Guid)
         {
@@ -81,11 +87,20 @@ table 6151390 "CS Stock-Take Handling Rfid"
         {
             Caption = 'Posting Error Detail';
         }
+        field(28;"Area";Option)
+        {
+            Caption = 'Area';
+            OptionCaption = 'Warehouse,Salesfloor,Stockroom';
+            OptionMembers = Warehouse,Salesfloor,Stockroom;
+        }
     }
 
     keys
     {
         key(Key1;Id)
+        {
+        }
+        key(Key2;Created)
         {
         }
     }

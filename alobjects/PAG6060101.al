@@ -1,6 +1,7 @@
 page 6060101 "TM Ticket Request Mini"
 {
     // TM1.19/NPKNAV/20170309  CASE 266372 Transport TM1.19 - 8 March 2017
+    // TM90.1.46/TSA /20200304 CASE 399138 Added a currpage update as changes did not "stick"
 
     Caption = 'Ticket Request Mini';
     InsertAllowed = false;
@@ -21,6 +22,14 @@ page 6060101 "TM Ticket Request Mini"
                 }
                 field(Quantity;Quantity)
                 {
+
+                    trigger OnValidate()
+                    begin
+
+                        //-#337112 [337112]
+                        CurrPage.Update (true);
+                        //+#337112 [337112]
+                    end;
                 }
                 field("Admission Code";"Admission Code")
                 {
