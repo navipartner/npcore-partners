@@ -8,384 +8,383 @@ report 6060160 "NP Statement"
 
     dataset
     {
-        dataitem(Customer;Customer)
+        dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = SORTING ("No.");
             PrintOnlyIfDetail = true;
-            RequestFilterFields = "No.","Search Name","Print Statements","Currency Filter";
-            column(No_Cust;"No.")
+            RequestFilterFields = "No.", "Search Name", "Print Statements", "Currency Filter";
+            column(No_Cust; "No.")
             {
             }
-            dataitem("Integer";"Integer")
+            dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number=CONST(1));
+                DataItemTableView = SORTING (Number) WHERE (Number = CONST (1));
                 PrintOnlyIfDetail = true;
-                column(CompanyInfo1Picture;CompanyInfo1.Picture)
+                column(CompanyInfo1Picture; CompanyInfo1.Picture)
                 {
                 }
-                column(CompanyInfo2Picture;CompanyInfo2.Picture)
+                column(CompanyInfo2Picture; CompanyInfo2.Picture)
                 {
                 }
-                column(CompanyInfo3Picture;CompanyInfo3.Picture)
+                column(CompanyInfo3Picture; CompanyInfo3.Picture)
                 {
                 }
-                column(CustAddr1;CustAddr[1])
+                column(CustAddr1; CustAddr[1])
                 {
                 }
-                column(CompanyAddr1;CompanyAddr[1])
+                column(CompanyAddr1; CompanyAddr[1])
                 {
                 }
-                column(CustAddr2;CustAddr[2])
+                column(CustAddr2; CustAddr[2])
                 {
                 }
-                column(CompanyAddr2;CompanyAddr[2])
+                column(CompanyAddr2; CompanyAddr[2])
                 {
                 }
-                column(CustAddr3;CustAddr[3])
+                column(CustAddr3; CustAddr[3])
                 {
                 }
-                column(CompanyAddr3;CompanyAddr[3])
+                column(CompanyAddr3; CompanyAddr[3])
                 {
                 }
-                column(CustAddr4;CustAddr[4])
+                column(CustAddr4; CustAddr[4])
                 {
                 }
-                column(CompanyAddr4;CompanyAddr[4])
+                column(CompanyAddr4; CompanyAddr[4])
                 {
                 }
-                column(CustAddr5;CustAddr[5])
+                column(CustAddr5; CustAddr[5])
                 {
                 }
-                column(PhoneNo_CompanyInfo;CompanyInfo."Phone No.")
+                column(PhoneNo_CompanyInfo; CompanyInfo."Phone No.")
                 {
                 }
-                column(CustAddr6;CustAddr[6])
+                column(CustAddr6; CustAddr[6])
                 {
                 }
-                column(CompanyInfoEmail;CompanyInfo."E-Mail")
+                column(CompanyInfoEmail; CompanyInfo."E-Mail")
                 {
                 }
-                column(CompanyInfoHomePage;CompanyInfo."Home Page")
+                column(CompanyInfoHomePage; CompanyInfo."Home Page")
                 {
                 }
-                column(VATRegNo_CompanyInfo;CompanyInfo."VAT Registration No.")
+                column(VATRegNo_CompanyInfo; CompanyInfo."VAT Registration No.")
                 {
                 }
-                column(GiroNo_CompanyInfo;CompanyInfo."Giro No.")
+                column(GiroNo_CompanyInfo; CompanyInfo."Giro No.")
                 {
                 }
-                column(CompanyInfo_BankBranchNo;CompanyInfo."Bank Branch No.")
+                column(CompanyInfo_BankBranchNo; CompanyInfo."Bank Branch No.")
                 {
                 }
-                column(BankName_CompanyInfo;CompanyInfo."Bank Name")
+                column(BankName_CompanyInfo; CompanyInfo."Bank Name")
                 {
                 }
-                column(BankAccNo_CompanyInfo;CompanyInfo."Bank Account No.")
+                column(BankAccNo_CompanyInfo; CompanyInfo."Bank Account No.")
                 {
                 }
-                column(No1_Cust;Customer."No.")
+                column(No1_Cust; Customer."No.")
                 {
                 }
-                column(TodayFormatted;Format(Today))
+                column(TodayFormatted; Format(Today))
                 {
                 }
-                column(StartDate;Format(StartDate))
+                column(StartDate; Format(StartDate))
                 {
                 }
-                column(EndDate;Format(EndDate))
+                column(EndDate; Format(EndDate))
                 {
                 }
-                column(LastStatmntNo_Cust;Format(Customer."Last Statement No."))
-                {
-                    DecimalPlaces = 0:0;
-                }
-                column(CustAddr7;CustAddr[7])
+                column(LastStatmntNo_Cust; Format(Customer."Last Statement No."))
                 {
                 }
-                column(CustAddr8;CustAddr[8])
+                column(CustAddr7; CustAddr[7])
                 {
                 }
-                column(CompanyAddr7;CompanyAddr[7])
+                column(CustAddr8; CustAddr[8])
                 {
                 }
-                column(CompanyAddr8;CompanyAddr[8])
+                column(CompanyAddr7; CompanyAddr[7])
                 {
                 }
-                column(StatementCaption;StatementCaptionLbl)
+                column(CompanyAddr8; CompanyAddr[8])
                 {
                 }
-                column(PhoneNo_CompanyInfoCaption;PhoneNo_CompanyInfoCaptionLbl)
+                column(StatementCaption; StatementCaptionLbl)
                 {
                 }
-                column(VATRegNo_CompanyInfoCaption;VATRegNo_CompanyInfoCaptionLbl)
+                column(PhoneNo_CompanyInfoCaption; PhoneNo_CompanyInfoCaptionLbl)
                 {
                 }
-                column(GiroNo_CompanyInfoCaption;GiroNo_CompanyInfoCaptionLbl)
+                column(VATRegNo_CompanyInfoCaption; VATRegNo_CompanyInfoCaptionLbl)
                 {
                 }
-                column(BankName_CompanyInfoCaption;BankName_CompanyInfoCaptionLbl)
+                column(GiroNo_CompanyInfoCaption; GiroNo_CompanyInfoCaptionLbl)
                 {
                 }
-                column(BankAccNo_CompanyInfoCaption;BankAccNo_CompanyInfoCaptionLbl)
+                column(BankName_CompanyInfoCaption; BankName_CompanyInfoCaptionLbl)
                 {
                 }
-                column(No1_CustCaption;No1_CustCaptionLbl)
+                column(BankAccNo_CompanyInfoCaption; BankAccNo_CompanyInfoCaptionLbl)
                 {
                 }
-                column(StartDateCaption;StartDateCaptionLbl)
+                column(No1_CustCaption; No1_CustCaptionLbl)
                 {
                 }
-                column(EndDateCaption;EndDateCaptionLbl)
+                column(StartDateCaption; StartDateCaptionLbl)
                 {
                 }
-                column(LastStatmntNo_CustCaption;LastStatmntNo_CustCaptionLbl)
+                column(EndDateCaption; EndDateCaptionLbl)
                 {
                 }
-                column(PostDate_DtldCustLedgEntriesCaption;PostDate_DtldCustLedgEntriesCaptionLbl)
+                column(LastStatmntNo_CustCaption; LastStatmntNo_CustCaptionLbl)
                 {
                 }
-                column(DocNo_DtldCustLedgEntriesCaption;DtldCustLedgEntries.FieldCaption("Document No."))
+                column(PostDate_DtldCustLedgEntriesCaption; PostDate_DtldCustLedgEntriesCaptionLbl)
                 {
                 }
-                column(Desc_CustLedgEntry2Caption;CustLedgEntry2.FieldCaption(Description))
+                column(DocNo_DtldCustLedgEntriesCaption; DtldCustLedgEntries.FieldCaption("Document No."))
                 {
                 }
-                column(DueDate_CustLedgEntry2Caption;DueDate_CustLedgEntry2CaptionLbl)
+                column(Desc_CustLedgEntry2Caption; CustLedgEntry2.FieldCaption(Description))
                 {
                 }
-                column(RemainAmtCustLedgEntry2Caption;CustLedgEntry2.FieldCaption("Remaining Amount"))
+                column(DueDate_CustLedgEntry2Caption; DueDate_CustLedgEntry2CaptionLbl)
                 {
                 }
-                column(CustBalanceCaption;CustBalanceCaptionLbl)
+                column(RemainAmtCustLedgEntry2Caption; CustLedgEntry2.FieldCaption("Remaining Amount"))
                 {
                 }
-                column(OriginalAmt_CustLedgEntry2Caption;CustLedgEntry2.FieldCaption("Original Amount"))
+                column(CustBalanceCaption; CustBalanceCaptionLbl)
                 {
                 }
-                column(CompanyInfoHomepageCaption;CompanyInfoHomepageCaptionLbl)
+                column(OriginalAmt_CustLedgEntry2Caption; CustLedgEntry2.FieldCaption("Original Amount"))
                 {
                 }
-                column(CompanyInfoEmailCaption;CompanyInfoEmailCaptionLbl)
+                column(CompanyInfoHomepageCaption; CompanyInfoHomepageCaptionLbl)
                 {
                 }
-                column(DocDateCaption;DocDateCaptionLbl)
+                column(CompanyInfoEmailCaption; CompanyInfoEmailCaptionLbl)
                 {
                 }
-                column(Total_Caption2;Total_CaptionLbl)
+                column(DocDateCaption; DocDateCaptionLbl)
                 {
                 }
-                column(CurrReportPageNoCaption;CurrReportPageNoCaptionLbl)
+                column(Total_Caption2; Total_CaptionLbl)
                 {
                 }
-                dataitem(CurrencyLoop;"Integer")
+                column(CurrReportPageNoCaption; CurrReportPageNoCaptionLbl)
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number=FILTER(1..));
+                }
+                dataitem(CurrencyLoop; "Integer")
+                {
+                    DataItemTableView = SORTING (Number) WHERE (Number = FILTER (1 ..));
                     PrintOnlyIfDetail = true;
-                    dataitem(CustLedgEntryHdr;"Integer")
+                    dataitem(CustLedgEntryHdr; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number=CONST(1));
-                        column(Currency2Code_CustLedgEntryHdr;StrSubstNo(Text001,CurrencyCode3))
+                        DataItemTableView = SORTING (Number) WHERE (Number = CONST (1));
+                        column(Currency2Code_CustLedgEntryHdr; StrSubstNo(Text001, CurrencyCode3))
                         {
                         }
-                        column(StartBalance;StartBalance)
+                        column(StartBalance; StartBalance)
                         {
                             AutoFormatExpression = Currency2.Code;
                             AutoFormatType = 1;
                         }
-                        column(CurrencyCode3;CurrencyCode3)
+                        column(CurrencyCode3; CurrencyCode3)
                         {
                         }
-                        column(CustBalance_CustLedgEntryHdr;CustBalance)
+                        column(CustBalance_CustLedgEntryHdr; CustBalance)
                         {
                         }
-                        column(PrintLine;PrintLine)
+                        column(PrintLine; PrintLine)
                         {
                         }
-                        column(DtldCustLedgEntryType;Format(DtldCustLedgEntries."Entry Type",0,2))
+                        column(DtldCustLedgEntryType; Format(DtldCustLedgEntries."Entry Type", 0, 2))
                         {
                         }
-                        column(EntriesExists;EntriesExists)
+                        column(EntriesExists; EntriesExists)
                         {
                         }
-                        column(IsNewCustCurrencyGroup;IsNewCustCurrencyGroup)
+                        column(IsNewCustCurrencyGroup; IsNewCustCurrencyGroup)
                         {
                         }
-                        dataitem(DtldCustLedgEntries;"Detailed Cust. Ledg. Entry")
+                        dataitem(DtldCustLedgEntries; "Detailed Cust. Ledg. Entry")
                         {
-                            DataItemTableView = SORTING("Customer No.","Posting Date","Entry Type","Currency Code");
-                            column(PostDate_DtldCustLedgEntries;Format("Posting Date"))
+                            DataItemTableView = SORTING ("Customer No.", "Posting Date", "Entry Type", "Currency Code");
+                            column(PostDate_DtldCustLedgEntries; Format("Posting Date"))
                             {
                             }
-                            column(DocNo_DtldCustLedgEntries;"Document No.")
+                            column(DocNo_DtldCustLedgEntries; "Document No.")
                             {
                             }
-                            column(Description;Description)
+                            column(Description; Description)
                             {
                             }
-                            column(DueDate_DtldCustLedgEntries;Format("Due Date"))
+                            column(DueDate_DtldCustLedgEntries; Format("Due Date"))
                             {
                             }
-                            column(CurrCode_DtldCustLedgEntries;"Currency Code")
+                            column(CurrCode_DtldCustLedgEntries; "Currency Code")
                             {
                             }
-                            column(Amt_DtldCustLedgEntries;Amount)
+                            column(Amt_DtldCustLedgEntries; Amount)
                             {
                                 AutoFormatExpression = "Currency Code";
                                 AutoFormatType = 1;
                             }
-                            column(RemainAmt_DtldCustLedgEntries;"Remaining Amount")
+                            column(RemainAmt_DtldCustLedgEntries; "Remaining Amount")
                             {
                                 AutoFormatExpression = "Currency Code";
                                 AutoFormatType = 1;
                             }
-                            column(CustBalance;CustBalance)
+                            column(CustBalance; CustBalance)
                             {
                                 AutoFormatExpression = "Currency Code";
                                 AutoFormatType = 1;
                             }
-                            column(Currency2Code;Currency2.Code)
+                            column(Currency2Code; Currency2.Code)
                             {
                             }
 
                             trigger OnAfterGetRecord()
                             begin
                                 if SkipReversedUnapplied(DtldCustLedgEntries) or (Amount = 0) then
-                                  CurrReport.Skip;
+                                    CurrReport.Skip;
                                 "Remaining Amount" := 0;
                                 PrintLine := true;
                                 case "Entry Type" of
-                                  "Entry Type"::"Initial Entry":
-                                    begin
-                                      "Cust. Ledger Entry".Get("Cust. Ledger Entry No.");
-                                      Description := "Cust. Ledger Entry".Description;
-                                      "Due Date" := "Cust. Ledger Entry"."Due Date";
-                                      "Cust. Ledger Entry".SetRange("Date Filter",0D,EndDate);
-                                      "Cust. Ledger Entry".CalcFields("Remaining Amount");
-                                      "Remaining Amount" := "Cust. Ledger Entry"."Remaining Amount";
-                                      "Cust. Ledger Entry".SetRange("Date Filter");
-                                    end;
-                                  "Entry Type"::Application:
-                                    begin
-                                      DtldCustLedgEntries2.SetCurrentKey("Customer No.","Posting Date","Entry Type");
-                                      DtldCustLedgEntries2.SetRange("Customer No.","Customer No.");
-                                      DtldCustLedgEntries2.SetRange("Posting Date","Posting Date");
-                                      DtldCustLedgEntries2.SetRange("Entry Type","Entry Type"::Application);
-                                      DtldCustLedgEntries2.SetRange("Transaction No.","Transaction No.");
-                                      DtldCustLedgEntries2.SetFilter("Currency Code",'<>%1',"Currency Code");
-                                      if not DtldCustLedgEntries2.IsEmpty then begin
-                                        Description := Text005;
-                                        "Due Date" := 0D;
-                                      end else
-                                        PrintLine := false;
-                                    end;
-                                  "Entry Type"::"Payment Discount",
-                                  "Entry Type"::"Payment Discount (VAT Excl.)",
-                                  "Entry Type"::"Payment Discount (VAT Adjustment)",
-                                  "Entry Type"::"Payment Discount Tolerance",
-                                  "Entry Type"::"Payment Discount Tolerance (VAT Excl.)",
-                                  "Entry Type"::"Payment Discount Tolerance (VAT Adjustment)":
-                                    begin
-                                      Description := Text006;
-                                      "Due Date" := 0D;
-                                    end;
-                                  "Entry Type"::"Payment Tolerance",
-                                  "Entry Type"::"Payment Tolerance (VAT Excl.)",
-                                  "Entry Type"::"Payment Tolerance (VAT Adjustment)":
-                                    begin
-                                      Description := Text014;
-                                      "Due Date" := 0D;
-                                    end;
-                                  "Entry Type"::"Appln. Rounding",
-                                  "Entry Type"::"Correction of Remaining Amount":
-                                    begin
-                                      Description := Text007;
-                                      "Due Date" := 0D;
-                                    end;
+                                    "Entry Type"::"Initial Entry":
+                                        begin
+                                            "Cust. Ledger Entry".Get("Cust. Ledger Entry No.");
+                                            Description := "Cust. Ledger Entry".Description;
+                                            "Due Date" := "Cust. Ledger Entry"."Due Date";
+                                            "Cust. Ledger Entry".SetRange("Date Filter", 0D, EndDate);
+                                            "Cust. Ledger Entry".CalcFields("Remaining Amount");
+                                            "Remaining Amount" := "Cust. Ledger Entry"."Remaining Amount";
+                                            "Cust. Ledger Entry".SetRange("Date Filter");
+                                        end;
+                                    "Entry Type"::Application:
+                                        begin
+                                            DtldCustLedgEntries2.SetCurrentKey("Customer No.", "Posting Date", "Entry Type");
+                                            DtldCustLedgEntries2.SetRange("Customer No.", "Customer No.");
+                                            DtldCustLedgEntries2.SetRange("Posting Date", "Posting Date");
+                                            DtldCustLedgEntries2.SetRange("Entry Type", "Entry Type"::Application);
+                                            DtldCustLedgEntries2.SetRange("Transaction No.", "Transaction No.");
+                                            DtldCustLedgEntries2.SetFilter("Currency Code", '<>%1', "Currency Code");
+                                            if not DtldCustLedgEntries2.IsEmpty then begin
+                                                Description := Text005;
+                                                "Due Date" := 0D;
+                                            end else
+                                                PrintLine := false;
+                                        end;
+                                    "Entry Type"::"Payment Discount",
+                                    "Entry Type"::"Payment Discount (VAT Excl.)",
+                                    "Entry Type"::"Payment Discount (VAT Adjustment)",
+                                    "Entry Type"::"Payment Discount Tolerance",
+                                    "Entry Type"::"Payment Discount Tolerance (VAT Excl.)",
+                                    "Entry Type"::"Payment Discount Tolerance (VAT Adjustment)":
+                                        begin
+                                            Description := Text006;
+                                            "Due Date" := 0D;
+                                        end;
+                                    "Entry Type"::"Payment Tolerance",
+                                    "Entry Type"::"Payment Tolerance (VAT Excl.)",
+                                    "Entry Type"::"Payment Tolerance (VAT Adjustment)":
+                                        begin
+                                            Description := Text014;
+                                            "Due Date" := 0D;
+                                        end;
+                                    "Entry Type"::"Appln. Rounding",
+                                    "Entry Type"::"Correction of Remaining Amount":
+                                        begin
+                                            Description := Text007;
+                                            "Due Date" := 0D;
+                                        end;
                                 end;
 
                                 if PrintLine then begin
-                                  CustBalance := CustBalance + Amount;
-                                  IsNewCustCurrencyGroup := IsFirstPrintLine;
-                                  IsFirstPrintLine := false;
+                                    CustBalance := CustBalance + Amount;
+                                    IsNewCustCurrencyGroup := IsFirstPrintLine;
+                                    IsFirstPrintLine := false;
                                 end;
                             end;
 
                             trigger OnPreDataItem()
                             begin
-                                SetRange("Customer No.",Customer."No.");
-                                SetRange("Posting Date",StartDate,EndDate);
-                                SetRange("Currency Code",Currency2.Code);
+                                SetRange("Customer No.", Customer."No.");
+                                SetRange("Posting Date", StartDate, EndDate);
+                                SetRange("Currency Code", Currency2.Code);
 
                                 if Currency2.Code = '' then begin
-                                  GLSetup.TestField("LCY Code");
-                                  CurrencyCode3 := GLSetup."LCY Code"
+                                    GLSetup.TestField("LCY Code");
+                                    CurrencyCode3 := GLSetup."LCY Code"
                                 end else
-                                  CurrencyCode3 := Currency2.Code;
+                                    CurrencyCode3 := Currency2.Code;
 
                                 IsFirstPrintLine := true;
                             end;
                         }
                     }
-                    dataitem(CustLedgEntryFooter;"Integer")
+                    dataitem(CustLedgEntryFooter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number=CONST(1));
-                        column(CurrencyCode3_CustLedgEntryFooter;CurrencyCode3)
+                        DataItemTableView = SORTING (Number) WHERE (Number = CONST (1));
+                        column(CurrencyCode3_CustLedgEntryFooter; CurrencyCode3)
                         {
                         }
-                        column(Total_Caption;Total_CaptionLbl)
+                        column(Total_Caption; Total_CaptionLbl)
                         {
                         }
-                        column(CustBalance_CustLedgEntryHdrFooter;CustBalance)
+                        column(CustBalance_CustLedgEntryHdrFooter; CustBalance)
                         {
                             AutoFormatExpression = Currency2.Code;
                             AutoFormatType = 1;
                         }
-                        column(EntriesExistsl_CustLedgEntryFooterCaption;EntriesExists)
+                        column(EntriesExistsl_CustLedgEntryFooterCaption; EntriesExists)
                         {
                         }
                     }
-                    dataitem(CustLedgEntry2;"Cust. Ledger Entry")
+                    dataitem(CustLedgEntry2; "Cust. Ledger Entry")
                     {
-                        DataItemLink = "Customer No."=FIELD("No.");
+                        DataItemLink = "Customer No." = FIELD ("No.");
                         DataItemLinkReference = Customer;
-                        DataItemTableView = SORTING("Customer No.",Open,Positive,"Due Date");
-                        column(OverDueEntries;StrSubstNo(Text002,Currency2.Code))
+                        DataItemTableView = SORTING ("Customer No.", Open, Positive, "Due Date");
+                        column(OverDueEntries; StrSubstNo(Text002, Currency2.Code))
                         {
                         }
-                        column(RemainAmt_CustLedgEntry2;"Remaining Amount")
+                        column(RemainAmt_CustLedgEntry2; "Remaining Amount")
                         {
                             AutoFormatExpression = "Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(PostDate_CustLedgEntry2;Format("Posting Date"))
+                        column(PostDate_CustLedgEntry2; Format("Posting Date"))
                         {
                         }
-                        column(DocNo_CustLedgEntry2;"Document No.")
+                        column(DocNo_CustLedgEntry2; "Document No.")
                         {
                         }
-                        column(Desc_CustLedgEntry2;Description)
+                        column(Desc_CustLedgEntry2; Description)
                         {
                         }
-                        column(DueDate_CustLedgEntry2;Format("Due Date"))
+                        column(DueDate_CustLedgEntry2; Format("Due Date"))
                         {
                         }
-                        column(OriginalAmt_CustLedgEntry2;"Original Amount")
+                        column(OriginalAmt_CustLedgEntry2; "Original Amount")
                         {
                             AutoFormatExpression = "Currency Code";
                         }
-                        column(CurrCode_CustLedgEntry2;"Currency Code")
+                        column(CurrCode_CustLedgEntry2; "Currency Code")
                         {
                         }
-                        column(PrintEntriesDue;PrintEntriesDue)
+                        column(PrintEntriesDue; PrintEntriesDue)
                         {
                         }
-                        column(Currency2Code_CustLedgEntry2;Currency2.Code)
+                        column(Currency2Code_CustLedgEntry2; Currency2.Code)
                         {
                         }
-                        column(CurrencyCode3_CustLedgEntry2;CurrencyCode3)
+                        column(CurrencyCode3_CustLedgEntry2; CurrencyCode3)
                         {
                         }
-                        column(CustNo_CustLedgEntry2;"Customer No.")
+                        column(CustNo_CustLedgEntry2; "Customer No.")
                         {
                         }
 
@@ -394,52 +393,52 @@ report 6060160 "NP Statement"
                             CustLedgEntry: Record "Cust. Ledger Entry";
                         begin
                             if IncludeAgingBand then
-                              if ("Posting Date" > EndDate) and ("Due Date" >= EndDate) then
-                                CurrReport.Skip;
+                                if ("Posting Date" > EndDate) and ("Due Date" >= EndDate) then
+                                    CurrReport.Skip;
                             CustLedgEntry := CustLedgEntry2;
-                            CustLedgEntry.SetRange("Date Filter",0D,EndDate);
+                            CustLedgEntry.SetRange("Date Filter", 0D, EndDate);
                             CustLedgEntry.CalcFields("Remaining Amount");
                             "Remaining Amount" := CustLedgEntry."Remaining Amount";
                             if CustLedgEntry."Remaining Amount" = 0 then
-                              CurrReport.Skip;
+                                CurrReport.Skip;
 
                             if IncludeAgingBand and ("Posting Date" <= EndDate) then
-                              UpdateBuffer(Currency2.Code,GetDate("Posting Date","Due Date"),"Remaining Amount");
+                                UpdateBuffer(Currency2.Code, GetDate("Posting Date", "Due Date"), "Remaining Amount");
                             if "Due Date" >= EndDate then
-                              CurrReport.Skip;
+                                CurrReport.Skip;
                         end;
 
                         trigger OnPreDataItem()
                         begin
                             CurrReport.CreateTotals("Remaining Amount");
                             if not IncludeAgingBand then
-                              SetRange("Due Date",0D,EndDate - 1);
-                            SetRange("Currency Code",Currency2.Code);
+                                SetRange("Due Date", 0D, EndDate - 1);
+                            SetRange("Currency Code", Currency2.Code);
                             if (not PrintEntriesDue) and (not IncludeAgingBand) then
-                              CurrReport.Break;
+                                CurrReport.Break;
                         end;
                     }
 
                     trigger OnAfterGetRecord()
                     begin
                         if Number = 1 then
-                          Currency2.FindFirst;
+                            Currency2.FindFirst;
 
                         repeat
-                          if not IsFirstLoop then
-                            IsFirstLoop := true
-                          else
-                            if Currency2.Next = 0 then
-                              CurrReport.Break;
-                          "Cust. Ledger Entry".SetCurrentKey("Customer No.","Posting Date","Currency Code");
-                          "Cust. Ledger Entry".SetRange("Customer No.",Customer."No.");
-                          "Cust. Ledger Entry".SetRange("Posting Date",0D,EndDate);
-                          "Cust. Ledger Entry".SetRange("Currency Code",Currency2.Code);
-                          EntriesExists := not "Cust. Ledger Entry".IsEmpty;
+                            if not IsFirstLoop then
+                                IsFirstLoop := true
+                            else
+                                if Currency2.Next = 0 then
+                                    CurrReport.Break;
+                            "Cust. Ledger Entry".SetCurrentKey("Customer No.", "Posting Date", "Currency Code");
+                            "Cust. Ledger Entry".SetRange("Customer No.", Customer."No.");
+                            "Cust. Ledger Entry".SetRange("Posting Date", 0D, EndDate);
+                            "Cust. Ledger Entry".SetRange("Currency Code", Currency2.Code);
+                            EntriesExists := not "Cust. Ledger Entry".IsEmpty;
                         until EntriesExists;
                         Cust2 := Customer;
-                        Cust2.SetRange("Date Filter",0D,StartDate - 1);
-                        Cust2.SetRange("Currency Filter",Currency2.Code);
+                        Cust2.SetRange("Date Filter", 0D, StartDate - 1);
+                        Cust2.SetRange("Currency Filter", Currency2.Code);
                         Cust2.CalcFields("Net Change");
                         StartBalance := Cust2."Net Change";
                         CustBalance := Cust2."Net Change";
@@ -447,88 +446,88 @@ report 6060160 "NP Statement"
 
                     trigger OnPreDataItem()
                     begin
-                        Customer.CopyFilter("Currency Filter",Currency2.Code);
+                        Customer.CopyFilter("Currency Filter", Currency2.Code);
                     end;
                 }
-                dataitem(AgingBandLoop;"Integer")
+                dataitem(AgingBandLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number=FILTER(1..));
-                    column(AgingDate1;Format(AgingDate[1] + 1))
+                    DataItemTableView = SORTING (Number) WHERE (Number = FILTER (1 ..));
+                    column(AgingDate1; Format(AgingDate[1] + 1))
                     {
                     }
-                    column(AgingDate2;Format(AgingDate[2]))
+                    column(AgingDate2; Format(AgingDate[2]))
                     {
                     }
-                    column(AgingDate21;Format(AgingDate[2] + 1))
+                    column(AgingDate21; Format(AgingDate[2] + 1))
                     {
                     }
-                    column(AgingDate3;Format(AgingDate[3]))
+                    column(AgingDate3; Format(AgingDate[3]))
                     {
                     }
-                    column(AgingDate31;Format(AgingDate[3] + 1))
+                    column(AgingDate31; Format(AgingDate[3] + 1))
                     {
                     }
-                    column(AgingDate4;Format(AgingDate[4]))
+                    column(AgingDate4; Format(AgingDate[4]))
                     {
                     }
-                    column(AgingBandEndingDate;StrSubstNo(Text011,AgingBandEndingDate,PeriodLength,SelectStr(DateChoice + 1,Text013)))
+                    column(AgingBandEndingDate; StrSubstNo(Text011, AgingBandEndingDate, PeriodLength, SelectStr(DateChoice + 1, Text013)))
                     {
                     }
-                    column(AgingDate41;Format(AgingDate[4] + 1))
+                    column(AgingDate41; Format(AgingDate[4] + 1))
                     {
                     }
-                    column(AgingDate5;Format(AgingDate[5]))
+                    column(AgingDate5; Format(AgingDate[5]))
                     {
                     }
-                    column(AgingBandBufCol1Amt;AgingBandBuf."Column 1 Amt.")
-                    {
-                        AutoFormatExpression = AgingBandBuf."Currency Code";
-                        AutoFormatType = 1;
-                    }
-                    column(AgingBandBufCol2Amt;AgingBandBuf."Column 2 Amt.")
+                    column(AgingBandBufCol1Amt; AgingBandBuf."Column 1 Amt.")
                     {
                         AutoFormatExpression = AgingBandBuf."Currency Code";
                         AutoFormatType = 1;
                     }
-                    column(AgingBandBufCol3Amt;AgingBandBuf."Column 3 Amt.")
+                    column(AgingBandBufCol2Amt; AgingBandBuf."Column 2 Amt.")
                     {
                         AutoFormatExpression = AgingBandBuf."Currency Code";
                         AutoFormatType = 1;
                     }
-                    column(AgingBandBufCol4Amt;AgingBandBuf."Column 4 Amt.")
+                    column(AgingBandBufCol3Amt; AgingBandBuf."Column 3 Amt.")
                     {
                         AutoFormatExpression = AgingBandBuf."Currency Code";
                         AutoFormatType = 1;
                     }
-                    column(AgingBandBufCol5Amt;AgingBandBuf."Column 5 Amt.")
+                    column(AgingBandBufCol4Amt; AgingBandBuf."Column 4 Amt.")
                     {
                         AutoFormatExpression = AgingBandBuf."Currency Code";
                         AutoFormatType = 1;
                     }
-                    column(AgingBandCurrencyCode;AgingBandCurrencyCode)
+                    column(AgingBandBufCol5Amt; AgingBandBuf."Column 5 Amt.")
+                    {
+                        AutoFormatExpression = AgingBandBuf."Currency Code";
+                        AutoFormatType = 1;
+                    }
+                    column(AgingBandCurrencyCode; AgingBandCurrencyCode)
                     {
                     }
-                    column(beforeCaption;beforeCaptionLbl)
+                    column(beforeCaption; beforeCaptionLbl)
                     {
                     }
 
                     trigger OnAfterGetRecord()
                     begin
                         if Number = 1 then begin
-                          if not AgingBandBuf.Find('-') then
-                            CurrReport.Break;
+                            if not AgingBandBuf.Find('-') then
+                                CurrReport.Break;
                         end else
-                          if AgingBandBuf.Next = 0 then
-                            CurrReport.Break;
+                            if AgingBandBuf.Next = 0 then
+                                CurrReport.Break;
                         AgingBandCurrencyCode := AgingBandBuf."Currency Code";
                         if AgingBandCurrencyCode = '' then
-                          AgingBandCurrencyCode := GLSetup."LCY Code";
+                            AgingBandCurrencyCode := GLSetup."LCY Code";
                     end;
 
                     trigger OnPreDataItem()
                     begin
                         if not IncludeAgingBand then
-                          CurrReport.Break;
+                            CurrReport.Break;
                     end;
                 }
             }
@@ -539,44 +538,44 @@ report 6060160 "NP Statement"
                 CurrReport.Language := Language.GetLanguageID("Language Code");
                 PrintLine := false;
                 Cust2 := Customer;
-                CopyFilter("Currency Filter",Currency2.Code);
+                CopyFilter("Currency Filter", Currency2.Code);
                 if PrintAllHavingBal then begin
-                  if Currency2.Find('-') then
-                    repeat
-                      Cust2.SetRange("Date Filter",0D,EndDate);
-                      Cust2.SetRange("Currency Filter",Currency2.Code);
-                      Cust2.CalcFields("Net Change");
-                      PrintLine := Cust2."Net Change" <> 0;
-                    until (Currency2.Next = 0) or PrintLine;
+                    if Currency2.Find('-') then
+                        repeat
+                            Cust2.SetRange("Date Filter", 0D, EndDate);
+                            Cust2.SetRange("Currency Filter", Currency2.Code);
+                            Cust2.CalcFields("Net Change");
+                            PrintLine := Cust2."Net Change" <> 0;
+                        until (Currency2.Next = 0) or PrintLine;
                 end;
                 if (not PrintLine) and PrintAllHavingEntry then begin
-                  "Cust. Ledger Entry".Reset;
-                  "Cust. Ledger Entry".SetCurrentKey("Customer No.","Posting Date");
-                  "Cust. Ledger Entry".SetRange("Customer No.","No.");
-                  "Cust. Ledger Entry".SetRange("Posting Date",StartDate,EndDate);
-                  CopyFilter("Currency Filter","Cust. Ledger Entry"."Currency Code");
-                  PrintLine := not "Cust. Ledger Entry".IsEmpty;
+                    "Cust. Ledger Entry".Reset;
+                    "Cust. Ledger Entry".SetCurrentKey("Customer No.", "Posting Date");
+                    "Cust. Ledger Entry".SetRange("Customer No.", "No.");
+                    "Cust. Ledger Entry".SetRange("Posting Date", StartDate, EndDate);
+                    CopyFilter("Currency Filter", "Cust. Ledger Entry"."Currency Code");
+                    PrintLine := not "Cust. Ledger Entry".IsEmpty;
                 end;
                 if not PrintLine then
-                  CurrReport.Skip;
+                    CurrReport.Skip;
 
-                FormatAddr.Customer(CustAddr,Customer);
+                FormatAddr.Customer(CustAddr, Customer);
                 CurrReport.PageNo := 1;
 
                 if not CurrReport.Preview then begin
-                  LockTable;
-                  Find;
-                  "Last Statement No." := "Last Statement No." + 1;
-                  Modify;
-                  Commit;
+                    LockTable;
+                    Find;
+                    "Last Statement No." := "Last Statement No." + 1;
+                    Modify;
+                    Commit;
                 end else
-                  "Last Statement No." := "Last Statement No." + 1;
+                    "Last Statement No." := "Last Statement No." + 1;
 
                 if LogInteraction then
-                  if not CurrReport.Preview then
-                    SegManagement.LogDocument(
-                      7,Format("Last Statement No."),0,0,DATABASE::Customer,"No.","Salesperson Code",'',
-                      Text003 + Format("Last Statement No."),'');
+                    if not CurrReport.Preview then
+                        SegManagement.LogDocument(
+                          7, Format("Last Statement No."), 0, 0, DATABASE::Customer, "No.", "Salesperson Code", '',
+                          Text003 + Format("Last Statement No."), '');
                 IsFirstLoop := false;
             end;
 
@@ -587,16 +586,16 @@ report 6060160 "NP Statement"
                 CalcAgingBandDates;
 
                 CompanyInfo.Get;
-                FormatAddr.Company(CompanyAddr,CompanyInfo);
+                FormatAddr.Company(CompanyAddr, CompanyInfo);
 
                 Currency2.Code := '';
                 Currency2.Insert;
-                CopyFilter("Currency Filter",Currency.Code);
+                CopyFilter("Currency Filter", Currency.Code);
                 if Currency.Find('-') then
-                  repeat
-                    Currency2 := Currency;
-                    Currency2.Insert;
-                  until Currency.Next = 0;
+                    repeat
+                        Currency2 := Currency;
+                        Currency2.Insert;
+                    until Currency.Next = 0;
             end;
         }
     }
@@ -612,22 +611,22 @@ report 6060160 "NP Statement"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field("Start Date";StartDate)
+                    field("Start Date"; StartDate)
                     {
                         Caption = 'Start Date';
                     }
-                    field("End Date";EndDate)
+                    field("End Date"; EndDate)
                     {
                         Caption = 'End Date';
                     }
-                    field(ShowOverdueEntries;PrintEntriesDue)
+                    field(ShowOverdueEntries; PrintEntriesDue)
                     {
                         Caption = 'Show Overdue Entries';
                     }
                     group(Include)
                     {
                         Caption = 'Include';
-                        field(IncludeAllCustomerswithLE;PrintAllHavingEntry)
+                        field(IncludeAllCustomerswithLE; PrintAllHavingEntry)
                         {
                             Caption = 'Include All Customers with Ledger Entries';
                             MultiLine = true;
@@ -635,10 +634,10 @@ report 6060160 "NP Statement"
                             trigger OnValidate()
                             begin
                                 if not PrintAllHavingEntry then
-                                  PrintAllHavingBal := true;
+                                    PrintAllHavingBal := true;
                             end;
                         }
-                        field(IncludeAllCustomerswithBalance;PrintAllHavingBal)
+                        field(IncludeAllCustomerswithBalance; PrintAllHavingBal)
                         {
                             Caption = 'Include All Customers with a Balance';
                             MultiLine = true;
@@ -646,14 +645,14 @@ report 6060160 "NP Statement"
                             trigger OnValidate()
                             begin
                                 if not PrintAllHavingBal then
-                                  PrintAllHavingEntry := true;
+                                    PrintAllHavingEntry := true;
                             end;
                         }
-                        field(IncludeReversedEntries;PrintReversedEntries)
+                        field(IncludeReversedEntries; PrintReversedEntries)
                         {
                             Caption = 'Include Reversed Entries';
                         }
-                        field(IncludeUnappliedEntries;PrintUnappliedEntries)
+                        field(IncludeUnappliedEntries; PrintUnappliedEntries)
                         {
                             Caption = 'Include Unapplied Entries';
                         }
@@ -661,21 +660,21 @@ report 6060160 "NP Statement"
                     group("Aging Band")
                     {
                         Caption = 'Aging Band';
-                        field(IncludeAgingBand;IncludeAgingBand)
+                        field(IncludeAgingBand; IncludeAgingBand)
                         {
                             Caption = 'Include Aging Band';
                         }
-                        field(AgingBandPeriodLengt;PeriodLength)
+                        field(AgingBandPeriodLengt; PeriodLength)
                         {
                             Caption = 'Aging Band Period Length';
                         }
-                        field(AgingBandby;DateChoice)
+                        field(AgingBandby; DateChoice)
                         {
                             Caption = 'Aging Band by';
                             OptionCaption = 'Due Date,Posting Date';
                         }
                     }
-                    field(LogInteraction;LogInteraction)
+                    field(LogInteraction; LogInteraction)
                     {
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
@@ -684,7 +683,7 @@ report 6060160 "NP Statement"
                 group("Output Options")
                 {
                     Caption = 'Output Options';
-                    field(ReportOutput;SupportedOutputMethod)
+                    field(ReportOutput; SupportedOutputMethod)
                     {
                         Caption = 'Report Output';
                         OptionCaption = 'Print,Preview,PDF,Email,Excel,XML';
@@ -696,22 +695,22 @@ report 6060160 "NP Statement"
                             ShowPrintRemaining := (SupportedOutputMethod = SupportedOutputMethod::Email);
 
                             case SupportedOutputMethod of
-                              SupportedOutputMethod::Print:
-                                ChosenOutputMethod := CustomLayoutReporting.GetPrintOption;
-                              SupportedOutputMethod::Preview:
-                                ChosenOutputMethod := CustomLayoutReporting.GetPreviewOption;
-                              SupportedOutputMethod::PDF:
-                                ChosenOutputMethod := CustomLayoutReporting.GetPDFOption;
-                              SupportedOutputMethod::Email:
-                                ChosenOutputMethod := CustomLayoutReporting.GetEmailOption;
-                              SupportedOutputMethod::Excel:
-                                ChosenOutputMethod := CustomLayoutReporting.GetExcelOption;
-                              SupportedOutputMethod::XML:
-                                ChosenOutputMethod := CustomLayoutReporting.GetXMLOption;
+                                SupportedOutputMethod::Print:
+                                    ChosenOutputMethod := CustomLayoutReporting.GetPrintOption;
+                                SupportedOutputMethod::Preview:
+                                    ChosenOutputMethod := CustomLayoutReporting.GetPreviewOption;
+                                SupportedOutputMethod::PDF:
+                                    ChosenOutputMethod := CustomLayoutReporting.GetPDFOption;
+                                SupportedOutputMethod::Email:
+                                    ChosenOutputMethod := CustomLayoutReporting.GetEmailOption;
+                                SupportedOutputMethod::Excel:
+                                    ChosenOutputMethod := CustomLayoutReporting.GetExcelOption;
+                                SupportedOutputMethod::XML:
+                                    ChosenOutputMethod := CustomLayoutReporting.GetXMLOption;
                             end;
                         end;
                     }
-                    field(ChosenOutput;ChosenOutputMethod)
+                    field(ChosenOutput; ChosenOutputMethod)
                     {
                         Caption = 'Chosen Output';
                         Visible = false;
@@ -720,7 +719,7 @@ report 6060160 "NP Statement"
                     {
                         Caption = 'Email Options';
                         Visible = ShowPrintRemaining;
-                        field(PrintMissingAddresses;PrintRemaining)
+                        field(PrintMissingAddresses; PrintRemaining)
                         {
                             Caption = 'Print remaining statements';
                         }
@@ -750,23 +749,23 @@ report 6060160 "NP Statement"
         SalesSetup.Get;
 
         case SalesSetup."Logo Position on Documents" of
-          SalesSetup."Logo Position on Documents"::"No Logo":
-            ;
-          SalesSetup."Logo Position on Documents"::Left:
-            begin
-              CompanyInfo1.Get;
-              CompanyInfo1.CalcFields(Picture);
-            end;
-          SalesSetup."Logo Position on Documents"::Center:
-            begin
-              CompanyInfo2.Get;
-              CompanyInfo2.CalcFields(Picture);
-            end;
-          SalesSetup."Logo Position on Documents"::Right:
-            begin
-              CompanyInfo3.Get;
-              CompanyInfo3.CalcFields(Picture);
-            end;
+            SalesSetup."Logo Position on Documents"::"No Logo":
+                ;
+            SalesSetup."Logo Position on Documents"::Left:
+                begin
+                    CompanyInfo1.Get;
+                    CompanyInfo1.CalcFields(Picture);
+                end;
+            SalesSetup."Logo Position on Documents"::Center:
+                begin
+                    CompanyInfo2.Get;
+                    CompanyInfo2.CalcFields(Picture);
+                end;
+            SalesSetup."Logo Position on Documents"::Right:
+                begin
+                    CompanyInfo3.Get;
+                    CompanyInfo3.CalcFields(Picture);
+                end;
         end;
 
         LogInteractionEnable := true;
@@ -805,8 +804,8 @@ report 6060160 "NP Statement"
         StartDate: Date;
         EndDate: Date;
         "Due Date": Date;
-        CustAddr: array [8] of Text[50];
-        CompanyAddr: array [8] of Text[50];
+        CustAddr: array[8] of Text[50];
+        CompanyAddr: array[8] of Text[50];
         Description: Text[50];
         StartBalance: Decimal;
         CustBalance: Decimal;
@@ -820,7 +819,7 @@ report 6060160 "NP Statement"
         PeriodLength: DateFormula;
         PeriodLength2: DateFormula;
         DateChoice: Option "Due Date","Posting Date";
-        AgingDate: array [5] of Date;
+        AgingDate: array[5] of Date;
         Text008: Label 'You must specify the Aging Band Period Length.';
         AgingBandEndingDate: Date;
         Text010: Label 'You must specify Aging Band Ending Date.';
@@ -832,7 +831,7 @@ report 6060160 "NP Statement"
         Text014: Label 'Application Writeoffs';
         [InDataSet]
         LogInteractionEnable: Boolean;
-        Text036: Label '-%1', Comment='Negating the period length: %1 is the period length';
+        Text036: Label '-%1', Comment = 'Negating the period length: %1 is the period length';
         StatementCaptionLbl: Label 'Statement';
         PhoneNo_CompanyInfoCaptionLbl: Label 'Phone No.';
         VATRegNo_CompanyInfoCaptionLbl: Label 'VAT Registration No.';
@@ -865,10 +864,10 @@ report 6060160 "NP Statement"
         [InDataSet]
         ShowPrintRemaining: Boolean;
 
-    local procedure GetDate(PostingDate: Date;DueDate: Date): Date
+    local procedure GetDate(PostingDate: Date; DueDate: Date): Date
     begin
         if DateChoice = DateChoice::"Posting Date" then
-          exit(PostingDate);
+            exit(PostingDate);
 
         exit(DueDate);
     end;
@@ -876,22 +875,22 @@ report 6060160 "NP Statement"
     local procedure CalcAgingBandDates()
     begin
         if not IncludeAgingBand then
-          exit;
+            exit;
         if AgingBandEndingDate = 0D then
-          Error(Text010);
+            Error(Text010);
         if Format(PeriodLength) = '' then
-          Error(Text008);
-        Evaluate(PeriodLength2,StrSubstNo(Text036,PeriodLength));
+            Error(Text008);
+        Evaluate(PeriodLength2, StrSubstNo(Text036, PeriodLength));
         AgingDate[5] := AgingBandEndingDate;
-        AgingDate[4] := CalcDate(PeriodLength2,AgingDate[5]);
-        AgingDate[3] := CalcDate(PeriodLength2,AgingDate[4]);
-        AgingDate[2] := CalcDate(PeriodLength2,AgingDate[3]);
-        AgingDate[1] := CalcDate(PeriodLength2,AgingDate[2]);
+        AgingDate[4] := CalcDate(PeriodLength2, AgingDate[5]);
+        AgingDate[3] := CalcDate(PeriodLength2, AgingDate[4]);
+        AgingDate[2] := CalcDate(PeriodLength2, AgingDate[3]);
+        AgingDate[1] := CalcDate(PeriodLength2, AgingDate[2]);
         if AgingDate[2] <= AgingDate[1] then
-          Error(Text012);
+            Error(Text012);
     end;
 
-    local procedure UpdateBuffer(CurrencyCode: Code[10];Date: Date;Amount: Decimal)
+    local procedure UpdateBuffer(CurrencyCode: Code[10]; Date: Date; Amount: Decimal)
     var
         I: Integer;
         GoOn: Boolean;
@@ -899,36 +898,36 @@ report 6060160 "NP Statement"
         AgingBandBuf.Init;
         AgingBandBuf."Currency Code" := CurrencyCode;
         if not AgingBandBuf.Find then
-          AgingBandBuf.Insert;
+            AgingBandBuf.Insert;
         I := 1;
         GoOn := true;
         while (I <= 5) and GoOn do begin
-          if Date <= AgingDate[I] then
-            if I = 1 then begin
-              AgingBandBuf."Column 1 Amt." := AgingBandBuf."Column 1 Amt." + Amount;
-              GoOn := false;
-            end;
-          if Date <= AgingDate[I] then
-            if I = 2 then begin
-              AgingBandBuf."Column 2 Amt." := AgingBandBuf."Column 2 Amt." + Amount;
-              GoOn := false;
-            end;
-          if Date <= AgingDate[I] then
-            if I = 3 then begin
-              AgingBandBuf."Column 3 Amt." := AgingBandBuf."Column 3 Amt." + Amount;
-              GoOn := false;
-            end;
-          if Date <= AgingDate[I] then
-            if I = 4 then begin
-              AgingBandBuf."Column 4 Amt." := AgingBandBuf."Column 4 Amt." + Amount;
-              GoOn := false;
-            end;
-          if Date <= AgingDate[I] then
-            if I = 5 then begin
-              AgingBandBuf."Column 5 Amt." := AgingBandBuf."Column 5 Amt." + Amount;
-              GoOn := false;
-            end;
-          I := I + 1;
+            if Date <= AgingDate[I] then
+                if I = 1 then begin
+                    AgingBandBuf."Column 1 Amt." := AgingBandBuf."Column 1 Amt." + Amount;
+                    GoOn := false;
+                end;
+            if Date <= AgingDate[I] then
+                if I = 2 then begin
+                    AgingBandBuf."Column 2 Amt." := AgingBandBuf."Column 2 Amt." + Amount;
+                    GoOn := false;
+                end;
+            if Date <= AgingDate[I] then
+                if I = 3 then begin
+                    AgingBandBuf."Column 3 Amt." := AgingBandBuf."Column 3 Amt." + Amount;
+                    GoOn := false;
+                end;
+            if Date <= AgingDate[I] then
+                if I = 4 then begin
+                    AgingBandBuf."Column 4 Amt." := AgingBandBuf."Column 4 Amt." + Amount;
+                    GoOn := false;
+                end;
+            if Date <= AgingDate[I] then
+                if I = 5 then begin
+                    AgingBandBuf."Column 5 Amt." := AgingBandBuf."Column 5 Amt." + Amount;
+                    GoOn := false;
+                end;
+            I := I + 1;
         end;
         AgingBandBuf.Modify;
     end;
@@ -938,19 +937,19 @@ report 6060160 "NP Statement"
         CustLedgEntry: Record "Cust. Ledger Entry";
     begin
         if PrintReversedEntries and PrintUnappliedEntries then
-          exit(false);
+            exit(false);
         if not PrintUnappliedEntries then
-          if DtldCustLedgEntries.Unapplied then
-            exit(true);
+            if DtldCustLedgEntries.Unapplied then
+                exit(true);
         if not PrintReversedEntries then begin
-          CustLedgEntry.Get(DtldCustLedgEntries."Cust. Ledger Entry No.");
-          if CustLedgEntry.Reversed then
-            exit(true);
+            CustLedgEntry.Get(DtldCustLedgEntries."Cust. Ledger Entry No.");
+            if CustLedgEntry.Reversed then
+                exit(true);
         end;
         exit(false);
     end;
 
-    procedure InitializeRequest(NewPrintEntriesDue: Boolean;NewPrintAllHavingEntry: Boolean;NewPrintAllHavingBal: Boolean;NewPrintReversedEntries: Boolean;NewPrintUnappliedEntries: Boolean;NewIncludeAgingBand: Boolean;NewPeriodLength: Text[30];NewDateChoice: Option;NewLogInteraction: Boolean;NewStartDate: Date;NewEndDate: Date)
+    procedure InitializeRequest(NewPrintEntriesDue: Boolean; NewPrintAllHavingEntry: Boolean; NewPrintAllHavingBal: Boolean; NewPrintReversedEntries: Boolean; NewPrintUnappliedEntries: Boolean; NewIncludeAgingBand: Boolean; NewPeriodLength: Text[30]; NewDateChoice: Option; NewLogInteraction: Boolean; NewStartDate: Date; NewEndDate: Date)
     begin
         InitRequestPageDataInternal;
 
@@ -960,7 +959,7 @@ report 6060160 "NP Statement"
         PrintReversedEntries := NewPrintReversedEntries;
         PrintUnappliedEntries := NewPrintUnappliedEntries;
         IncludeAgingBand := NewIncludeAgingBand;
-        Evaluate(PeriodLength,NewPeriodLength);
+        Evaluate(PeriodLength, NewPeriodLength);
         DateChoice := NewDateChoice;
         LogInteraction := NewLogInteraction;
         StartDate := NewStartDate;
@@ -970,18 +969,18 @@ report 6060160 "NP Statement"
     procedure InitRequestPageDataInternal()
     begin
         if isInitialized then
-          exit;
+            exit;
 
         isInitialized := true;
 
         if (not PrintAllHavingEntry) and (not PrintAllHavingBal) then
-          PrintAllHavingBal := true;
+            PrintAllHavingBal := true;
 
         LogInteraction := SegManagement.FindInteractTmplCode(7) <> '';
         LogInteractionEnable := LogInteraction;
 
         if Format(PeriodLength) = '' then
-          Evaluate(PeriodLength,'<1M+CM>');
+            Evaluate(PeriodLength, '<1M+CM>');
 
         ShowPrintRemaining := (SupportedOutputMethod = SupportedOutputMethod::Email);
     end;
@@ -989,18 +988,18 @@ report 6060160 "NP Statement"
     local procedure VerifyDates()
     begin
         if StartDate = 0D then
-          Error(BlankStartDateErr);
+            Error(BlankStartDateErr);
         if EndDate = 0D then
-          Error(BlankEndDateErr);
+            Error(BlankEndDateErr);
         if StartDate > EndDate then
-          Error(StartDateLaterTheEndDateErr);
+            Error(StartDateLaterTheEndDateErr);
     end;
 
     procedure "--- PN"()
     begin
     end;
 
-    procedure SetSettings(NewPrintEntriesDue: Boolean;NewPrintAllHavingEntry: Boolean;NewPrintAllHavingBal: Boolean;NewPrintReversedEntries: Boolean;NewPrintUnappliedEntries: Boolean;NewIncludeAgingBand: Boolean;NewPeriodLength: DateFormula;NewDateChoice: Option "Due Date","Posting Date";NewLogInteraction: Boolean;NewStartDate: Date;NewEndDate: Date)
+    procedure SetSettings(NewPrintEntriesDue: Boolean; NewPrintAllHavingEntry: Boolean; NewPrintAllHavingBal: Boolean; NewPrintReversedEntries: Boolean; NewPrintUnappliedEntries: Boolean; NewIncludeAgingBand: Boolean; NewPeriodLength: DateFormula; NewDateChoice: Option "Due Date","Posting Date"; NewLogInteraction: Boolean; NewStartDate: Date; NewEndDate: Date)
     begin
         PrintEntriesDue := NewPrintEntriesDue;
         PrintAllHavingEntry := NewPrintAllHavingEntry;
