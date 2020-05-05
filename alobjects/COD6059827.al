@@ -1,3 +1,4 @@
+/*
 codeunit 6059827 "Upgrade NPR5.54"
 {
     // [VLOBJUPG] Object may be deleted after upgrade
@@ -234,4 +235,4 @@ codeunit 6059827 "Upgrade NPR5.54"
         //+NPR5.54 [394528]
     end;
 }
-
+*/
