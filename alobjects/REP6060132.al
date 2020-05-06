@@ -17,22 +17,22 @@ report 6060132 "MM Membership Status"
 
     dataset
     {
-        dataitem("MM Membership Setup";"MM Membership Setup")
+        dataitem("MM Membership Setup"; "MM Membership Setup")
         {
-            RequestFilterFields = "Code","Loyalty Code","Code";
-            dataitem("MM Membership";"MM Membership")
+            RequestFilterFields = "Code", "Loyalty Code";
+            dataitem("MM Membership"; "MM Membership")
             {
-                DataItemLink = "Membership Code"=FIELD(Code);
-                RequestFilterFields = "Company Name","Community Code","Membership Code","Customer No.";
-                dataitem("MM Membership Role";"MM Membership Role")
+                DataItemLink = "Membership Code" = FIELD (Code);
+                RequestFilterFields = "Company Name", "Community Code", "Membership Code", "Customer No.";
+                dataitem("MM Membership Role"; "MM Membership Role")
                 {
                     //The property 'DataItemTableView' shouldn't have an empty value.
                     //DataItemTableView = '';
                     RequestFilterFields = "Member Role";
-                    dataitem("MM Member";"MM Member")
+                    dataitem("MM Member"; "MM Member")
                     {
-                        DataItemLink = "Entry No."=FIELD("Member Entry No.");
-                        RequestFilterFields = "First Name","Middle Name","Last Name","Country Code";
+                        DataItemLink = "Entry No." = FIELD ("Member Entry No.");
+                        RequestFilterFields = "First Name", "Middle Name", "Last Name", "Country Code";
 
                         trigger OnAfterGetRecord()
                         var
@@ -49,8 +49,8 @@ report 6060132 "MM Membership Status"
                             //+MM1.24
 
                             //-MM1.41 [355444]
-                            TempMembers."Code 3" := Format (ValidUntilDate);
-                            TempMembers."Code 4" := Format (ValidFromDate);
+                            TempMembers."Code 3" := Format(ValidUntilDate);
+                            TempMembers."Code 4" := Format(ValidFromDate);
                             //+MM1.41 [355444]
 
                             TempMembers.Insert;
@@ -62,10 +62,10 @@ report 6060132 "MM Membership Status"
                         //-MM1.26 [303848]
                         //"MM Membership Role".SETFILTER ("Member Role", '=%1|=%2', "MM Membership Role"."Member Role"::ADMIN, "MM Membership Role"."Member Role"::MEMBER);
 
-                        "MM Membership Role".FilterGroup (2);
-                        "MM Membership Role".SetFilter ("Membership Entry No." ,'=%1', "MM Membership"."Entry No.");
-                        "MM Membership Role".SetFilter ("Member Role", '=%1|=%2', "MM Membership Role"."Member Role"::ADMIN, "MM Membership Role"."Member Role"::MEMBER);
-                        "MM Membership Role".FilterGroup (0);
+                        "MM Membership Role".FilterGroup(2);
+                        "MM Membership Role".SetFilter("Membership Entry No.", '=%1', "MM Membership"."Entry No.");
+                        "MM Membership Role".SetFilter("Member Role", '=%1|=%2', "MM Membership Role"."Member Role"::ADMIN, "MM Membership Role"."Member Role"::MEMBER);
+                        "MM Membership Role".FilterGroup(0);
                         //+MM1.26 [303848]
                     end;
                 }
@@ -79,161 +79,161 @@ report 6060132 "MM Membership Status"
                     NewRefDate: Date;
                 begin
 
-                    ValidForReferenceDate := MembershipManagement.GetMembershipValidDate ("MM Membership"."Entry No.", ReferenceDate, ValidFromDate, ValidUntilDate);
+                    ValidForReferenceDate := MembershipManagement.GetMembershipValidDate("MM Membership"."Entry No.", ReferenceDate, ValidFromDate, ValidUntilDate);
 
                     case MembershipStatus of
-                      MembershipStatus::Active :
-                        begin
+                        MembershipStatus::Active:
+                            begin
 
-                          if (not ValidForReferenceDate) then
-                            CurrReport.Skip;
+                                if (not ValidForReferenceDate) then
+                                    CurrReport.Skip;
 
-                          if (Format (ExpiresWithinDateformula) <> '') then
-                            if (CalcDate (ExpiresWithinDateformula, ReferenceDate) < ValidUntilDate) then
-                              CurrReport.Skip;
+                                if (Format(ExpiresWithinDateformula) <> '') then
+                                    if (CalcDate(ExpiresWithinDateformula, ReferenceDate) < ValidUntilDate) then
+                                        CurrReport.Skip;
 
-                        end;
+                            end;
 
-                      MembershipStatus::"Active and Renewed",
-                      MembershipStatus::"Active and Not Renewed" :
-                        begin
+                        MembershipStatus::"Active and Renewed",
+                        MembershipStatus::"Active and Not Renewed":
+                            begin
 
-                          if (not ValidForReferenceDate) then
-                            CurrReport.Skip;
+                                if (not ValidForReferenceDate) then
+                                    CurrReport.Skip;
 
-                          if (Format (ExpiresWithinDateformula) <> '') then
-                            if (CalcDate (ExpiresWithinDateformula, ReferenceDate) < ValidUntilDate) then
-                              CurrReport.Skip;
+                                if (Format(ExpiresWithinDateformula) <> '') then
+                                    if (CalcDate(ExpiresWithinDateformula, ReferenceDate) < ValidUntilDate) then
+                                        CurrReport.Skip;
 
-                          NewRefDate := CalcDate ('<+1D>', ValidUntilDate); // default renew is back-to-back
-                          if (Format (RenewedWithin) <> '') then
-                            NewRefDate := CalcDate (RenewedWithin, ValidUntilDate);
+                                NewRefDate := CalcDate('<+1D>', ValidUntilDate); // default renew is back-to-back
+                                if (Format(RenewedWithin) <> '') then
+                                    NewRefDate := CalcDate(RenewedWithin, ValidUntilDate);
 
-                          ValidForReferenceDate := MembershipManagement.GetMembershipValidDate ("MM Membership"."Entry No.", NewRefDate, ValidFromDate, ValidUntilDate);
+                                ValidForReferenceDate := MembershipManagement.GetMembershipValidDate("MM Membership"."Entry No.", NewRefDate, ValidFromDate, ValidUntilDate);
 
-                          if (ValidForReferenceDate) and (MembershipStatus = MembershipStatus::"Active and Not Renewed") then
-                            CurrReport.Skip;
+                                if (ValidForReferenceDate) and (MembershipStatus = MembershipStatus::"Active and Not Renewed") then
+                                    CurrReport.Skip;
 
-                          if (not ValidForReferenceDate) and (MembershipStatus = MembershipStatus::"Active and Renewed") then
-                            CurrReport.Skip;
+                                if (not ValidForReferenceDate) and (MembershipStatus = MembershipStatus::"Active and Renewed") then
+                                    CurrReport.Skip;
 
-                        end;
+                            end;
 
-                      MembershipStatus::"Not Active" :
-                        if (ValidForReferenceDate) then
-                          CurrReport.Skip;
+                        MembershipStatus::"Not Active":
+                            if (ValidForReferenceDate) then
+                                CurrReport.Skip;
                     end;
                 end;
             }
         }
-        dataitem(TempMembers;"NPR - TEMP Buffer")
+        dataitem(TempMembers; "NPR - TEMP Buffer")
         {
-            DataItemTableView = SORTING(Template,"Line No.");
+            DataItemTableView = SORTING (Template, "Line No.");
             UseTemporary = true;
-            column(Code_Membership;Template)
+            column(Code_Membership; Template)
             {
             }
-            column(EntryNo_Member;"Line No.")
+            column(EntryNo_Member; "Line No.")
             {
             }
-            column(ValidToDate;ConvValidDate)
+            column(ValidToDate; ConvValidDate)
             {
             }
-            column(FirstName_Member;MMMember2."First Name")
-            {
-                IncludeCaption = true;
-            }
-            column(LastName_Member;MMMember2."Last Name")
+            column(FirstName_Member; MMMember2."First Name")
             {
                 IncludeCaption = true;
             }
-            column(Address_Member;MMMember2.Address)
+            column(LastName_Member; MMMember2."Last Name")
             {
                 IncludeCaption = true;
             }
-            column(PostCode_Member;MMMember2."Post Code Code")
-            {
-            }
-            column(City_Member;MMMember2.City)
-            {
-            }
-            column(CountryCode_Member;MMMember2."Country Code")
-            {
-            }
-            column(Email_Member;MMMember2."E-Mail Address")
+            column(Address_Member; MMMember2.Address)
             {
                 IncludeCaption = true;
             }
-            column(EmailNewsLetter_Member;MMMember2."E-Mail News Letter")
+            column(PostCode_Member; MMMember2."Post Code Code")
+            {
+            }
+            column(City_Member; MMMember2.City)
+            {
+            }
+            column(CountryCode_Member; MMMember2."Country Code")
+            {
+            }
+            column(Email_Member; MMMember2."E-Mail Address")
             {
                 IncludeCaption = true;
             }
-            column(PageCaption;PageCaption)
+            column(EmailNewsLetter_Member; MMMember2."E-Mail News Letter")
+            {
+                IncludeCaption = true;
+            }
+            column(PageCaption; PageCaption)
             {
             }
-            column(ReportCaption;ReportCaption)
+            column(ReportCaption; ReportCaption)
             {
             }
-            column(MemberEntryNoCaption;MemberEntryNoCaption)
+            column(MemberEntryNoCaption; MemberEntryNoCaption)
             {
             }
-            column(DateCaption;DateCaption)
+            column(DateCaption; DateCaption)
             {
             }
-            column(Filters;Filters)
+            column(Filters; Filters)
             {
             }
-            column(FilterCaption;FilterCaption)
+            column(FilterCaption; FilterCaption)
             {
             }
-            column(ExternalMembershipNo_Membership;TempMembers."Code 1")
+            column(ExternalMembershipNo_Membership; TempMembers."Code 1")
             {
             }
-            column(ExternalMemberNo_Member;MMMember2."External Member No.")
+            column(ExternalMemberNo_Member; MMMember2."External Member No.")
             {
             }
-            column(IssuedDate_Membership;MMMembershipIssueDate)
+            column(IssuedDate_Membership; MMMembershipIssueDate)
             {
             }
-            column(ExternalMemberNoCaption;ExternalMemberNoCaption)
+            column(ExternalMemberNoCaption; ExternalMemberNoCaption)
             {
             }
-            column(ExternalMembershipNoCaption;ExternalMembershipNoCaption)
+            column(ExternalMembershipNoCaption; ExternalMembershipNoCaption)
             {
             }
-            column(IssuedDateCaption;MembershipIssuedDateCaption)
+            column(IssuedDateCaption; MembershipIssuedDateCaption)
             {
             }
-            column(ValidFromDate;ValidFromDate)
+            column(ValidFromDate; ValidFromDate)
             {
             }
-            column(ValidUntilDate;ValidUntilDate)
+            column(ValidUntilDate; ValidUntilDate)
             {
             }
-            column(Date2Caption;Date2Caption)
+            column(Date2Caption; Date2Caption)
             {
             }
-            column(City_Caption;City_Caption)
+            column(City_Caption; City_Caption)
             {
             }
-            column(ZipCode_Caption;ZipCode_Caption)
+            column(ZipCode_Caption; ZipCode_Caption)
             {
             }
-            column(Country_Caption;Country_Caption)
+            column(Country_Caption; Country_Caption)
             {
             }
-            column(MembershipType_Caption;MembershipType_Caption)
+            column(MembershipType_Caption; MembershipType_Caption)
             {
             }
 
             trigger OnAfterGetRecord()
             begin
-                Evaluate(ConvValidDate,Description);
-                Evaluate(MMMembershipIssueDate,"Description 2");
+                Evaluate(ConvValidDate, Description);
+                Evaluate(MMMembershipIssueDate, "Description 2");
 
                 //-MM1.41 [355444]
-                Evaluate (ValidUntilDate, TempMembers."Code 3");
-                Evaluate (ValidFromDate, TempMembers."Code 4");
+                Evaluate(ValidUntilDate, TempMembers."Code 3");
+                Evaluate(ValidFromDate, TempMembers."Code 4");
                 //+MM1.41 [355444]
 
                 // CLEAR(MemberName);
@@ -261,20 +261,20 @@ report 6060132 "MM Membership Status"
                 group(Control6150614)
                 {
                     ShowCaption = false;
-                    field(ReferenceDate;ReferenceDate)
+                    field(ReferenceDate; ReferenceDate)
                     {
                         Caption = 'Reference Date';
                     }
-                    field(MembershipStatus;MembershipStatus)
+                    field(MembershipStatus; MembershipStatus)
                     {
                         Caption = 'Membership Status On Reference Date';
                     }
-                    field(ExpiresWithinDateformula;ExpiresWithinDateformula)
+                    field(ExpiresWithinDateformula; ExpiresWithinDateformula)
                     {
                         Caption = 'Expires Within (Active)';
                         Editable = (MembershipStatus < 3);
                     }
-                    field(RenewedWithin;RenewedWithin)
+                    field(RenewedWithin; RenewedWithin)
                     {
                         Caption = 'Renewed Within (Active)';
                         Editable = (MembershipStatus < 3);
@@ -310,13 +310,13 @@ report 6060132 "MM Membership Status"
     begin
 
         if Filters = '' then
-          Filters += MembershipStatusCaption + ' ' + Format(MembershipStatus)
+            Filters += MembershipStatusCaption + ' ' + Format(MembershipStatus)
         else
-          Filters += ' | ' + MembershipStatusCaption + ' ' + Format(MembershipStatus);
+            Filters += ' | ' + MembershipStatusCaption + ' ' + Format(MembershipStatus);
 
         Filters += ' | ' + DateFilterCaption + ' ' + Format(ReferenceDate);
         Filters += ' | ' + ExpireWithinCaption + ' ' + Format(ExpiresWithinDateformula);
-        Filters += StrSubstNo (' | %1: %2', RenewedWithinCaption, Format(RenewedWithin));
+        Filters += StrSubstNo(' | %1: %2', RenewedWithinCaption, Format(RenewedWithin));
     end;
 
     var
