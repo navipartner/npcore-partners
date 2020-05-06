@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -9,106 +9,6 @@
       </ConnectionProperties>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="Code_Membership">
-          <DataField>Code_Membership</DataField>
-        </Field>
-        <Field Name="EntryNo_Member">
-          <DataField>EntryNo_Member</DataField>
-        </Field>
-        <Field Name="ValidToDate">
-          <DataField>ValidToDate</DataField>
-        </Field>
-        <Field Name="FirstName_Member">
-          <DataField>FirstName_Member</DataField>
-        </Field>
-        <Field Name="LastName_Member">
-          <DataField>LastName_Member</DataField>
-        </Field>
-        <Field Name="Address_Member">
-          <DataField>Address_Member</DataField>
-        </Field>
-        <Field Name="PostCode_Member">
-          <DataField>PostCode_Member</DataField>
-        </Field>
-        <Field Name="City_Member">
-          <DataField>City_Member</DataField>
-        </Field>
-        <Field Name="CountryCode_Member">
-          <DataField>CountryCode_Member</DataField>
-        </Field>
-        <Field Name="Email_Member">
-          <DataField>Email_Member</DataField>
-        </Field>
-        <Field Name="EmailNewsLetter_Member">
-          <DataField>EmailNewsLetter_Member</DataField>
-        </Field>
-        <Field Name="PageCaption">
-          <DataField>PageCaption</DataField>
-        </Field>
-        <Field Name="ReportCaption">
-          <DataField>ReportCaption</DataField>
-        </Field>
-        <Field Name="MemberEntryNoCaption">
-          <DataField>MemberEntryNoCaption</DataField>
-        </Field>
-        <Field Name="DateCaption">
-          <DataField>DateCaption</DataField>
-        </Field>
-        <Field Name="Filters">
-          <DataField>Filters</DataField>
-        </Field>
-        <Field Name="FilterCaption">
-          <DataField>FilterCaption</DataField>
-        </Field>
-        <Field Name="ExternalMembershipNo_Membership">
-          <DataField>ExternalMembershipNo_Membership</DataField>
-        </Field>
-        <Field Name="ExternalMemberNo_Member">
-          <DataField>ExternalMemberNo_Member</DataField>
-        </Field>
-        <Field Name="IssuedDate_Membership">
-          <DataField>IssuedDate_Membership</DataField>
-        </Field>
-        <Field Name="ExternalMemberNoCaption">
-          <DataField>ExternalMemberNoCaption</DataField>
-        </Field>
-        <Field Name="ExternalMembershipNoCaption">
-          <DataField>ExternalMembershipNoCaption</DataField>
-        </Field>
-        <Field Name="IssuedDateCaption">
-          <DataField>IssuedDateCaption</DataField>
-        </Field>
-        <Field Name="ValidFromDate">
-          <DataField>ValidFromDate</DataField>
-        </Field>
-        <Field Name="ValidUntilDate">
-          <DataField>ValidUntilDate</DataField>
-        </Field>
-        <Field Name="Date2Caption">
-          <DataField>Date2Caption</DataField>
-        </Field>
-        <Field Name="City_Caption">
-          <DataField>City_Caption</DataField>
-        </Field>
-        <Field Name="ZipCode_Caption">
-          <DataField>ZipCode_Caption</DataField>
-        </Field>
-        <Field Name="Country_Caption">
-          <DataField>Country_Caption</DataField>
-        </Field>
-        <Field Name="MembershipType_Caption">
-          <DataField>MembershipType_Caption</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -1746,4 +1646,104 @@ End Function
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
   <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="Code_Membership">
+          <DataField>Code_Membership</DataField>
+        </Field>
+        <Field Name="EntryNo_Member">
+          <DataField>EntryNo_Member</DataField>
+        </Field>
+        <Field Name="ValidToDate">
+          <DataField>ValidToDate</DataField>
+        </Field>
+        <Field Name="FirstName_Member">
+          <DataField>FirstName_Member</DataField>
+        </Field>
+        <Field Name="LastName_Member">
+          <DataField>LastName_Member</DataField>
+        </Field>
+        <Field Name="Address_Member">
+          <DataField>Address_Member</DataField>
+        </Field>
+        <Field Name="PostCode_Member">
+          <DataField>PostCode_Member</DataField>
+        </Field>
+        <Field Name="City_Member">
+          <DataField>City_Member</DataField>
+        </Field>
+        <Field Name="CountryCode_Member">
+          <DataField>CountryCode_Member</DataField>
+        </Field>
+        <Field Name="Email_Member">
+          <DataField>Email_Member</DataField>
+        </Field>
+        <Field Name="EmailNewsLetter_Member">
+          <DataField>EmailNewsLetter_Member</DataField>
+        </Field>
+        <Field Name="PageCaption">
+          <DataField>PageCaption</DataField>
+        </Field>
+        <Field Name="ReportCaption">
+          <DataField>ReportCaption</DataField>
+        </Field>
+        <Field Name="MemberEntryNoCaption">
+          <DataField>MemberEntryNoCaption</DataField>
+        </Field>
+        <Field Name="DateCaption">
+          <DataField>DateCaption</DataField>
+        </Field>
+        <Field Name="Filters">
+          <DataField>Filters</DataField>
+        </Field>
+        <Field Name="FilterCaption">
+          <DataField>FilterCaption</DataField>
+        </Field>
+        <Field Name="ExternalMembershipNo_Membership">
+          <DataField>ExternalMembershipNo_Membership</DataField>
+        </Field>
+        <Field Name="ExternalMemberNo_Member">
+          <DataField>ExternalMemberNo_Member</DataField>
+        </Field>
+        <Field Name="IssuedDate_Membership">
+          <DataField>IssuedDate_Membership</DataField>
+        </Field>
+        <Field Name="ExternalMemberNoCaption">
+          <DataField>ExternalMemberNoCaption</DataField>
+        </Field>
+        <Field Name="ExternalMembershipNoCaption">
+          <DataField>ExternalMembershipNoCaption</DataField>
+        </Field>
+        <Field Name="IssuedDateCaption">
+          <DataField>IssuedDateCaption</DataField>
+        </Field>
+        <Field Name="ValidFromDate">
+          <DataField>ValidFromDate</DataField>
+        </Field>
+        <Field Name="ValidUntilDate">
+          <DataField>ValidUntilDate</DataField>
+        </Field>
+        <Field Name="Date2Caption">
+          <DataField>Date2Caption</DataField>
+        </Field>
+        <Field Name="City_Caption">
+          <DataField>City_Caption</DataField>
+        </Field>
+        <Field Name="ZipCode_Caption">
+          <DataField>ZipCode_Caption</DataField>
+        </Field>
+        <Field Name="Country_Caption">
+          <DataField>Country_Caption</DataField>
+        </Field>
+        <Field Name="MembershipType_Caption">
+          <DataField>MembershipType_Caption</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

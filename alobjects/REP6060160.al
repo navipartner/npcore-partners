@@ -2,7 +2,7 @@ report 6060160 "NP Statement"
 {
     // NPR5.54/ALST/20200406 CASE 395181 New Object from report 116 created to add CompanyInfo."Bank Branch No." to dataset
     DefaultLayout = RDLC;
-    RDLCLayout = './NP Statement.rdlc';
+    RDLCLayout = './layouts/NP Statement.rdlc';
 
     Caption = 'Statement';
 
