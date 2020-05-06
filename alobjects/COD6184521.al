@@ -5,6 +5,7 @@ codeunit 6184521 "EFT Adyen Backgnd. Trx Req."
     // NPR5.49/MMV /20190409 CASE 351678 Renamed object
     // NPR5.50/MMV /20190515 CASE 355433 Added modify
     // NPR5.53/MMV /20191120 CASE 377533 Rewrote background session handling
+    // NPR5.54/MMV /20200218 CASE 387990 Use response status code to determine hard errors where transaction never started.
 
     TableNo = "EFT Transaction Async Request";
 
@@ -51,6 +52,7 @@ codeunit 6184521 "EFT Adyen Backgnd. Trx Req."
         Response: Text;
         Success: Boolean;
         EFTAdyenCloudProtocol: Codeunit "EFT Adyen Cloud Protocol";
+        TransactionStarted: Boolean;
     begin
         //-NPR5.53 [377533]
         EFTTransactionAsyncRequest.TestField("Request Entry No");
@@ -67,6 +69,9 @@ codeunit 6184521 "EFT Adyen Backgnd. Trx Req."
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
         Success := SendRequest(EFTTransactionRequest, EFTSetup, Response, EFTAdyenCloudProtocol);
+        //-NPR5.54 [387990]
+        TransactionStarted := (Success or (EFTAdyenCloudProtocol.GetResponseStatusCodeBuffer() in [0,200])); //Unknown or success
+        //+NPR5.54 [387990]
 
         LogTrxRequest(EFTTransactionAsyncRequest."Request Entry No", EFTSetup, EFTAdyenCloudProtocol, Success);
         Commit; //Log
@@ -78,7 +83,10 @@ codeunit 6184521 "EFT Adyen Backgnd. Trx Req."
           exit;
         end;
 
-        InsertTrxResponse(EFTTransactionAsyncRequest."Request Entry No", Success, Response);
+        //-NPR5.54 [387990]
+        //InsertTrxResponse(EFTTransactionAsyncRequest."Request Entry No", Success, Response);
+        InsertTrxResponse(EFTTransactionAsyncRequest."Request Entry No", Success, Response, TransactionStarted);
+        //+NPR5.54 [387990]
         EFTTrxBackgroundSessionMgt.MarkRequestAsDone(EFTTransactionAsyncRequest."Request Entry No");
         Commit; //Response
         //+NPR5.53 [377533]
@@ -129,7 +137,7 @@ codeunit 6184521 "EFT Adyen Backgnd. Trx Req."
         //+NPR5.53 [377533]
     end;
 
-    local procedure InsertTrxResponse(TrxEntryNo: Integer;Success: Boolean;Response: Text)
+    local procedure InsertTrxResponse(TrxEntryNo: Integer;Success: Boolean;Response: Text;TransactionStarted: Boolean)
     var
         OutStream: OutStream;
         EFTTransactionAsyncResponse: Record "EFT Transaction Async Response";
@@ -145,6 +153,10 @@ codeunit 6184521 "EFT Adyen Backgnd. Trx Req."
           EFTTransactionAsyncResponse.Error := true;
           EFTTransactionAsyncResponse."Error Text" := CopyStr(GetLastErrorText, 1, MaxStrLen(EFTTransactionAsyncResponse."Error Text"));
         end;
+
+        //-NPR5.54 [387990]
+        EFTTransactionAsyncResponse."Transaction Started" := TransactionStarted;
+        //+NPR5.54 [387990]
 
         EFTTransactionAsyncResponse.Insert;
         //+NPR5.53 [377533]

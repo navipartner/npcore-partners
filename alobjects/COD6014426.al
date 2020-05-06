@@ -23,6 +23,7 @@ codeunit 6014426 "Std. Table Code"
     // NPR5.50/RA  /20190403 CASE 350418 NPR5.48 is giving problems for "Politikens Boghal"
     // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
     // NPR5.53/ALPO/20191210 CASE 380609 Dimensions: NPRE Seating integration
+    // NPR5.54/ALPO/20200310 CASE 394528 Legacy global dim fields on cash register would not be updated, had the dimensions been changed on POS unit
 
 
     trigger OnRun()
@@ -381,20 +382,27 @@ codeunit 6014426 "Std. Table Code"
     end;
 
     [EventSubscriber(ObjectType::Table, 6150615, 'OnAfterModifyEvent', '', true, false)]
-    local procedure UpdateCashRegGlobalDimsOnPOSUnitGlobalDimChange(var Rec: Record "POS Unit";var xRec: Record "POS Unit";RunTrigger: Boolean)
+    local procedure UpdateCashRegFieldsOnPOSUnitModify(var Rec: Record "POS Unit";var xRec: Record "POS Unit";RunTrigger: Boolean)
     var
         CashRegister: Record Register;
     begin
         //-NPR5.53 [371956]
         with Rec do
-          if ("Global Dimension 1 Code" <> xRec."Global Dimension 1 Code") or
-             ("Global Dimension 2 Code" <> xRec."Global Dimension 2 Code")
-          then begin
-            CashRegister.Get("No.");
-            CashRegister."Global Dimension 1 Code" := "Global Dimension 1 Code";
-            CashRegister."Global Dimension 2 Code" := "Global Dimension 2 Code";
-            CashRegister.Modify;
-          end;
+          //-NPR5.54 [394528]-revoked
+          //IF ("Global Dimension 1 Code" <> xRec."Global Dimension 1 Code") OR
+          //   ("Global Dimension 2 Code" <> xRec."Global Dimension 2 Code")
+          //+NPR5.54 [394528]-revoked
+          //-NPR5.54 [394528]
+          if CashRegister.Get("No.") then
+            if ("Global Dimension 1 Code" <> CashRegister."Global Dimension 1 Code") or
+               ("Global Dimension 2 Code" <> CashRegister."Global Dimension 2 Code")
+          //+NPR5.54 [394528]
+            then begin
+              //CashRegister.GET("No.");  //NPR5.54 [394528]-revoked
+              CashRegister."Global Dimension 1 Code" := "Global Dimension 1 Code";
+              CashRegister."Global Dimension 2 Code" := "Global Dimension 2 Code";
+              CashRegister.Modify;
+            end;
         //+NPR5.53 [371956]
     end;
 

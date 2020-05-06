@@ -4,6 +4,7 @@ codeunit 6184514 "EFT MobilePay Protocol"
     // NPR5.47/MMV /20181030 CASE 334510 Added string length check
     // NPR5.49/MMV /20190312 CASE 345188 Renamed object
     // NPR5.53/MMV /20191112 CASE 375566 Do not clear activemodelID to prevent handling of late events.
+    // NPR5.54/MMV /20200206 CASE 388507 Attempt auto cancel if new purchase cannot be started.
 
     SingleInstance = true;
 
@@ -40,6 +41,7 @@ codeunit 6184514 "EFT MobilePay Protocol"
     var
         POSFrontEnd: Codeunit "POS Front End Management";
         POSSession: Codeunit "POS Session";
+        ErrorText: Text;
     begin
         if not POSSession.IsActiveSession(POSFrontEnd) then
             Error(ERROR_SESSION, IntegrationType());
@@ -47,8 +49,20 @@ codeunit 6184514 "EFT MobilePay Protocol"
         EntryNo := EftTransactionRequest."Entry No.";
         EFTMobilePayIntegration.InitializeGlobals(EftTransactionRequest."POS Payment Type Code", EftTransactionRequest."Register No.");
         if not EFTMobilePayIntegration.PaymentStart(EftTransactionRequest) then begin
-            HandleProtocolError(POSFrontEnd);
+        //-NPR5.54 [388507]
+          ErrorText := GetLastErrorText;
+          if not EFTMobilePayIntegration.PaymentCancel(EftTransactionRequest) then begin
+            HandleProtocolError(POSFrontEnd, ErrorText);
+        //+NPR5.54 [388507]
             exit;
+          end;
+
+        //-NPR5.54 [388507]
+          if not EFTMobilePayIntegration.PaymentStart(EftTransactionRequest) then begin
+            HandleProtocolError(POSFrontEnd, ErrorText);
+            exit;
+          end;
+        //+NPR5.54 [388507]
         end;
 
         CreateUserInterface(EftTransactionRequest);
@@ -143,7 +157,7 @@ codeunit 6184514 "EFT MobilePay Protocol"
 
         if CloseOnIdle and (EFTTransactionRequest."Result Code" = 10) then begin
             TransactionDone := true;
-            EFTTransactionRequest."External Result Received" := true;
+          EFTTransactionRequest."External Result Known" := true;
             FrontEnd.CloseModel(ActiveModelID);
         //-NPR5.53 [375566]
         //  CLEAR(ActiveModelID);
@@ -153,7 +167,9 @@ codeunit 6184514 "EFT MobilePay Protocol"
         end;
 
         if not EFTMobilePayIntegration.PaymentCancel(EFTTransactionRequest) then begin
-            HandleProtocolError(FrontEnd);
+        //-NPR5.54 [388507]
+          HandleProtocolError(FrontEnd, GetLastErrorText());
+        //+NPR5.54 [388507]
             exit;
         end;
 
@@ -169,13 +185,15 @@ codeunit 6184514 "EFT MobilePay Protocol"
     begin
         EFTTransactionRequest.Get(EntryNo);
         if not EFTMobilePayIntegration.GetPaymentStatus(EFTTransactionRequest) then begin
-            HandleProtocolError(FrontEnd);
+        //-NPR5.54 [388507]
+          HandleProtocolError(FrontEnd, GetLastErrorText());
+        //+NPR5.54 [388507]
             exit;
         end;
 
         if (EFTTransactionRequest.Successful) or (CloseOnIdle and (EFTTransactionRequest."Result Code" = 10)) then begin
             TransactionDone := true;
-            EFTTransactionRequest."External Result Received" := true;
+          EFTTransactionRequest."External Result Known" := true;
             FrontEnd.CloseModel(ActiveModelID);
         //-NPR5.53 [375566]
         //  CLEAR(ActiveModelID);
@@ -214,13 +232,14 @@ codeunit 6184514 "EFT MobilePay Protocol"
         //+NPR5.53 [375566]
     end;
 
-    local procedure HandleProtocolError(FrontEnd: Codeunit "POS Front End Management")
+    local procedure HandleProtocolError(FrontEnd: Codeunit "POS Front End Management";ErrorText: Text)
     var
         EFTTransactionRequest: Record "EFT Transaction Request";
-        ErrorText: Text;
     begin
         TransactionDone := true;
-        ErrorText := StrSubstNo(ProtocolError, IntegrationType(), GetLastErrorText);
+        //-NPR5.54 [388507]
+        ErrorText := StrSubstNo(ProtocolError, IntegrationType(), ErrorText);
+        //+NPR5.54 [388507]
 
         EFTTransactionRequest.Get(EntryNo);
         EFTTransactionRequest."NST Error" := CopyStr(ErrorText, 1, MaxStrLen(EFTTransactionRequest."NST Error"));

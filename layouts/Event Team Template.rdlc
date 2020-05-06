@@ -141,6 +141,12 @@ End Function
         <Field Name="PhoneNo_Job">
           <DataField>PhoneNo_Job</DataField>
         </Field>
+        <Field Name="CreationDate_Job">
+          <DataField>CreationDate_Job</DataField>
+        </Field>
+        <Field Name="VATRegistrationNo_Job">
+          <DataField>VATRegistrationNo_Job</DataField>
+        </Field>
         <Field Name="JobTaskNo_JobTask">
           <DataField>JobTaskNo_JobTask</DataField>
         </Field>
@@ -267,11 +273,23 @@ End Function
         <Field Name="ResourceEMail_ResourceLine">
           <DataField>ResourceEMail_ResourceLine</DataField>
         </Field>
+        <Field Name="PlanningDate_ItemLine">
+          <DataField>PlanningDate_ItemLine</DataField>
+        </Field>
+        <Field Name="StartingTime_ItemLine">
+          <DataField>StartingTime_ItemLine</DataField>
+        </Field>
+        <Field Name="EndingTime_ItemLine">
+          <DataField>EndingTime_ItemLine</DataField>
+        </Field>
         <Field Name="No_ItemLine">
           <DataField>No_ItemLine</DataField>
         </Field>
         <Field Name="Description_ItemLine">
           <DataField>Description_ItemLine</DataField>
+        </Field>
+        <Field Name="Description2_ItemLine">
+          <DataField>Description2_ItemLine</DataField>
         </Field>
         <Field Name="Quantity_ItemLine">
           <DataField>Quantity_ItemLine</DataField>

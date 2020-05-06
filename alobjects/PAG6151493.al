@@ -1,6 +1,7 @@
 page 6151493 "Raptor Actions"
 {
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
+    // NPR5.54/ALPO/20200302 CASE 355871 Possibility to specify user identifier parameter name
 
     Caption = 'Raptor Actions';
     DelayedInsert = true;
@@ -31,6 +32,10 @@ page 6151493 "Raptor Actions"
                 }
                 field(Comment;Comment)
                 {
+                }
+                field("User Identifier Param. Name";"User Identifier Param. Name")
+                {
+                    Visible = false;
                 }
                 field("Show Date-Time Created";"Show Date-Time Created")
                 {

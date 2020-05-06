@@ -7,6 +7,7 @@ codeunit 6184513 "EFT MobilePay Integration"
     // NPR5.49/MMV /20190312 CASE 345188 Renamed object
     // NPR5.51/MMV /20190821 CASE 363895 Rewrote unix timestamp to not use .NET
     // NPR5.51/MMV /20190827 CASE 352248 Made "assigned" fields editable for support edge cases.
+    // NPR5.54/MMV /20200206 CASE 388507 Updated sandbox URL & minor adjustments.
 
 
     trigger OnRun()
@@ -36,6 +37,7 @@ codeunit 6184513 "EFT MobilePay Integration"
         Text6014522: Label 'attachment to PoS Unit has now been removed.';
         Text6014523: Label 'attachment to PoS Unit has been correctly registered.';
         Text6014524: Label 'PoS Unit with ID %1 is attached to cash register %2 with PoS ID %3';
+        INCORRECT_POS_ID: Label 'Incorrect setup. PoS Unit %1 is currently attached to PoS ID %2';
         Text10: Label 'Idle, no payment requests in queue';
         Text20: Label 'Payment request is sent to customer';
         Text30: Label 'Awaiting customer check-in';
@@ -263,8 +265,12 @@ codeunit 6184513 "EFT MobilePay Integration"
           Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
 
         if Demo then begin
-          ServiceHost := 'mobilepaypos-extest.cloudapp.net';
-          ServiceBaseURL := 'http://mobilepaypos-extest.cloudapp.net/API/V06/';
+        //-NPR5.54 [388507]
+        //  ServiceHost := 'mobilepaypos-extest.cloudapp.net';
+        //  ServiceBaseURL := 'http://mobilepaypos-extest.cloudapp.net/API/V06/';
+          ServiceHost := 'sandprod-pos2.mobilepay.dk';
+          ServiceBaseURL := 'https://sandprod-pos2.mobilepay.dk/API/V06/';
+        //+NPR5.54 [388507]
         end else begin
           ServiceHost := 'mobilepaypos2.danskebank.dk';
           ServiceBaseURL := 'https://mobilepaypos2.danskebank.dk/API/V06/';
@@ -390,6 +396,9 @@ codeunit 6184513 "EFT MobilePay Integration"
             Message(Text6014523)
           else begin
             EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'PoS Unit ID', RegisteredPoSUnitId);
+        //-NPR5.54 [388507]
+            EFTTypePOSUnitGenParam.UpdateParameterValue(IntegrationType(), EFTSetup."POS Unit No.", 'PoS Unit Assigned', true);
+        //+NPR5.54 [388507]
             PoSUnitID := RegisteredPoSUnitId;
             Message(Text6014520, PoSUnitID, EFTSetup."POS Unit No.");
           end;
@@ -409,7 +418,10 @@ codeunit 6184513 "EFT MobilePay Integration"
         ClearLastError();
         InitializeGlobals(EFTSetupIn."Payment Type POS", EFTSetupIn."POS Unit No.");
 
-        RegisterPoSUnitId := ResolvePoSUnitId(RegisterPoSUnitId);
+        //-NPR5.54 [388507]
+        //RegisterPoSUnitId := ResolvePoSUnitId(RegisterPoSUnitId);
+        RegisterPoSUnitId := ResolvePoSUnitId(PoSUnitID);
+        //+NPR5.54 [388507]
         if InvokeReadPoSUnitAssignedPoSId(RegisterPoSUnitId,RegisterPoSId) then begin
           if RegisterPoSId <> '' then begin
             EFTTypePOSUnitGenParam.SetRange("Integration Type", IntegrationType());
@@ -418,7 +430,11 @@ codeunit 6184513 "EFT MobilePay Integration"
             Found := EFTTypePOSUnitGenParam.FindFirst;
           end;
           if Found then
-            Message(Text6014524,RegisterPoSUnitId,EFTTypePOSUnitGenParam."POS Unit No.",RegisterPoSId);
+            Message(Text6014524,RegisterPoSUnitId,EFTTypePOSUnitGenParam."POS Unit No.",RegisterPoSId)
+        //-NPR5.54 [388507]
+          else
+            Message(INCORRECT_POS_ID, RegisterPoSUnitId, RegisterPoSId);
+        //+NPR5.54 [388507]
         end else
           Error(GetLastErrorText);
     end;
@@ -565,7 +581,10 @@ codeunit 6184513 "EFT MobilePay Integration"
         if MerchantID = '' then
           Error(InvalidParameter, IntegrationType(), PaymentTypePOS.TableCaption, PaymentTypePOS."No.", 'Merchant ID');
 
-        RequestBody := StrSubstNo('{"MerchantId":"%1"}',PaymentTypePOS."MobilePay Merchant ID");
+        //-NPR5.54 [388507]
+        //RequestBody := STRSUBSTNO('{"MerchantId":"%1"}',PaymentTypePOS."MobilePay Merchant ID");
+        RequestBody := StrSubstNo('{"MerchantId":"%1"}',MerchantID);
+        //+NPR5.54 [388507]
 
         InvokeRESTHTTPRequest(RequestBody,'GetUniquePoSId',ResponseText);
         ReadJSONValue(ResponseText,'PoSId',PoSIdIn);

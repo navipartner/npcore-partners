@@ -3,6 +3,7 @@ codeunit 6150873 "POS Action - NETS Gift. Lookup"
     // NPR5.51/MMV /20190625 CASE 359385 Created object
     // NPR5.51/MHA /20190705  CASE 361164 Updated Exception Message parsing InvokeWebservice()
     // NPR5.53/MHA /20191212  CASE 374433 Fixed parsing of xml in OnAction()
+    // NPR5.54/MMV /20200131 CASE 387965 Made InvokeWebservice function global
 
 
     trigger OnRun()
@@ -87,7 +88,7 @@ codeunit 6150873 "POS Action - NETS Gift. Lookup"
         exit(JSON.GetString('input', true));
     end;
 
-    local procedure InvokeWebservice(CustomerID: Text; CardNo: Text; var ExpiryDateOut: Text; var BalanceOut: Decimal): Boolean
+    procedure InvokeWebservice(CustomerID: Text;CardNo: Text;var ExpiryDateOut: Text;var BalanceOut: Decimal): Boolean
     var
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         HttpWebRequest: DotNet npNetHttpWebRequest;

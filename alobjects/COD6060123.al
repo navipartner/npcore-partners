@@ -29,6 +29,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
     // TM1.45/TSA /20191025 CASE 374463 Playing with WF20
     // TM1.45/TSA /20191112 CASE 322432 Signature Change
     // TM1.45/TSA /20191203 CASE 380754 Signature Change
+    // TM90.1.46/TSA /20200129 CASE 387138 Signature change AquireTicketParticipant()
 
 
     trigger OnRun()
@@ -742,7 +743,11 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
             if (ResponseCode = 0) then begin
                 Commit;
 
-                AquireTicketParticipant(Token, ExternalMemberNo);
+            //-TM90.1.46 [387138]
+            //AquireTicketParticipant (Token, ExternalMemberNo);
+            AquireTicketParticipant (Token, ExternalMemberNo, false);
+            //+TM90.1.46 [387138]
+
 
                 // -TM1.41 [353981]
                 if (GetTicketUnitPrice(Token, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then begin
@@ -780,7 +785,11 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         if (ResponseCode = 0) then begin
             Commit;
 
-            AquireTicketParticipant(Token, ExternalMemberNo);
+            //-TM90.1.46 [387138]
+            //AquireTicketParticipant (Token, ExternalMemberNo);
+            AquireTicketParticipant (Token, ExternalMemberNo, false);
+            //+TM90.1.46 [387138]
+
 
             //-TM1.41 [353981]
             //  IF (GetTicketUnitPrice (Token, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) THEN BEGIN
@@ -1028,7 +1037,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         end;
 
         if (Token <> '') then
-            AquireTicketParticipant(Token, Ticket."External Member Card No.");
+          AquireTicketParticipant (Token, Ticket."External Member Card No.", true);
     end;
 
     local procedure GetGroupTicketQuantity(POSSession: Codeunit "POS Session"; JSON: Codeunit "POS JSON Management"; ExternalTicketNumber: Code[50]; AdmissionCode: Code[20]; FunctionId: Integer; var ShowQtyDialogOut: Boolean) TicketMaxQty: Integer
@@ -1322,7 +1331,7 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
         //+TM1.21
     end;
 
-    local procedure AquireTicketParticipant(Token: Text[100]; ExternalMemberNo: Code[20]): Boolean
+    local procedure AquireTicketParticipant(Token: Text[100];ExternalMemberNo: Code[20];ForceDialog: Boolean): Boolean
     var
         TicketNotifyParticipant: Codeunit "TM Ticket Notify Participant";
         MemberManagement: Codeunit "MM Membership Management";
@@ -1360,7 +1369,10 @@ codeunit 6060123 "TM POS Action - Ticket Mgmt."
             end;
         end;
 
-        exit(TicketNotifyParticipant.AquireTicketParticipant(Token, SuggestMethod, SuggestAddress));
+        //-TM90.1.46 [387138]
+        //EXIT (TicketNotifyParticipant.AquireTicketParticipant (Token, SuggestMethod, SuggestAddress));
+        exit (TicketNotifyParticipant.AquireTicketParticipantForce (Token, SuggestMethod, SuggestAddress, ForceDialog));
+        //+TM90.1.46 [387138]
     end;
 
     local procedure AssignSameSchedule(Token: Text[100])

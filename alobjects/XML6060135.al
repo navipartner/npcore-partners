@@ -6,6 +6,7 @@ xmlport 6060135 "MM Get Membership Change Items"
     // MM1.17/TSA /20161025  CASE 256152 Conform to OMA Guidelines
     // MM1.18/TSA/20170216  CASE 265729 Added membercardinality attribute
     // MM1.23/TSA /20170918 CASE 276869 Added filter on "Not Available Via Web Service"
+    // MM1.43/TSA/20200402  CASE 398328 Transport MM1.43 - 2 April 2020
 
     Caption = 'Get Membership Change Items';
     FormatEvaluate = Xml;
@@ -108,6 +109,9 @@ xmlport 6060135 "MM Get Membership Change Items"
                                         if (TargetMembershipSetup.Get (TmpMembershipEntry."Membership Code")) then
                                           membercardinality := Format (TargetMembershipSetup."Membership Member Cardinality");
                                     end;
+                                }
+                                fieldattribute(presentationorder;TmpMembershipEntry."Line No.")
+                                {
                                 }
                             }
                         }

@@ -1,10 +1,13 @@
 report 6014441 "POS Item Sales with Dimensions"
 {
     // NPR5.53/ALPO/20191016 CASE 371478 New report to get a list of POS item sales with selected dimensions
+    // NPR5.54/ALPO/20200212 CASE 390673 Fixed incorrect filter
+    // NPR5.54/ALPO/20200309 CASE 392052 Include into report POS Sales Lines marked with "Exclude from Posting" checkmark
     DefaultLayout = RDLC;
     RDLCLayout = './POS Item Sales with Dimensions.rdlc';
 
     Caption = 'POS Item Sales with Dimensions';
+    UsageCategory = ReportsAndAnalysis;
 
     dataset
     {
@@ -15,7 +18,7 @@ report 6014441 "POS Item Sales with Dimensions"
             dataitem("POS Sales Line"; "POS Sales Line")
             {
                 DataItemLink = "POS Entry No." = FIELD("Entry No.");
-                DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = CONST(Item), "Exclude from Posting" = CONST(false));
+                DataItemTableView = SORTING("POS Entry No.","Line No.") WHERE(Type=CONST(Item));
                 RequestFilterFields = "No.", "Location Code";
 
                 trigger OnPreDataItem()
@@ -50,7 +53,8 @@ report 6014441 "POS Item Sales with Dimensions"
                     POSEntryQry.SetFilter(No, "POS Sales Line".GetFilter("No."));
                 if "POS Sales Line".GetFilter("Location Code") <> '' then
                     POSEntryQry.SetFilter(Location_Code, "POS Sales Line".GetFilter("Location Code"));
-                POSEntryQry.SetRange(Exclude_from_Posting, false);  // #390673 - Manually fixed after discovered and discussed with ALPO
+                //POSEntryQry.SETRANGE(Exclude_from_Posting,"POS Sales Line"."Exclude from Posting"::"0");  //NPR5.54 [390673]-revoked
+                //POSEntryQry.SETRANGE(Exclude_from_Posting,FALSE);  //NPR5.54 [390673]  //NPR5.54 [392052]-revoked
                 if DimSetFilter <> '' then
                     POSEntryQry.SetFilter(Dimension_Set_ID, DimSetFilter);
                 POSEntryQry.Open;

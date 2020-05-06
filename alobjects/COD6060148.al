@@ -11,6 +11,7 @@ codeunit 6060148 "MM Membership Auto Renew"
     // MM1.28/TSA /20180202 CASE 303876 Adapting for different auto-renew models
     // MM1.28/TSA /20180411 CASE 303635 External Document No.
     // MM1.39/TSA/20190529  CASE 350968 Transport MM1.38.01 - 29 May 2019
+    // MM1.43/TSA /20200218 CASE 391041 Disabled document creation for auto-renew, when membership is marked as external.
 
 
     trigger OnRun()
@@ -266,6 +267,14 @@ codeunit 6060148 "MM Membership Auto Renew"
 
         if (not Membership.Get (MemberInfoCapture."Membership Entry No.")) then
           exit (false);
+
+        //-MM1.43 [391041]
+        if (Membership."Auto-Renew" = Membership."Auto-Renew"::YES_EXTERNAL) then begin
+          if (MemberInfoCapture."Document No." = Membership."External Membership No.") then
+            MemberInfoCapture."Document No." := '<EXTERNAL>';
+          exit (true);
+        end;
+        //+MM1.43 [391041]
 
         //-#303876 [303876]
         MembershipSetup.Get (Membership."Membership Code");

@@ -2,6 +2,8 @@ page 6151385 "CS Stock-Takes List"
 {
     // NPR5.50/CLVA/20190304  CASE 332844 Object created
     // NPR5.52/CLVA/20190905  CASE 364063 Added field "Journal Qty. (Calculated)"
+    // NPR5.54/CLVA/20200217  CASE 391080 Added field "Adjust Inventory","Unknown Entries" and action "Tag Data"
+    // NPR5.54/CLVA/20200227  CASE 389224 Added action "Approved Data" and "Batch Data" and ActionGroup "Process"
 
     Caption = 'CS Stock-Takes List';
     CardPageID = "CS Stock-Takes Card";
@@ -22,6 +24,9 @@ page 6151385 "CS Stock-Takes List"
             repeater(Group)
             {
                 field(Location;Location)
+                {
+                }
+                field("Adjust Inventory";"Adjust Inventory")
                 {
                 }
                 field(Created;Created)
@@ -58,6 +63,9 @@ page 6151385 "CS Stock-Takes List"
                 {
                 }
                 field("Refill Entries";"Refill Entries")
+                {
+                }
+                field("Unknown Entries";"Unknown Entries")
                 {
                 }
                 field("Inventory Calculated";"Inventory Calculated")
@@ -113,6 +121,13 @@ page 6151385 "CS Stock-Takes List"
                     CurrPage.Update();
                 end;
             }
+            action("Tag Data")
+            {
+                Caption = 'Tag Data';
+                Image = DataEntry;
+                RunObject = Page "CS Stock-Takes Data List";
+                RunPageLink = "Stock-Take Id"=FIELD("Stock-Take Id");
+            }
             group(Overview)
             {
                 Caption = 'Overview';
@@ -138,64 +153,148 @@ page 6151385 "CS Stock-Takes List"
                     RunObject = Page "Item Journal Batches";
                     RunPageView = WHERE("Template Type"=CONST("Phys. Inventory"));
                 }
+                action("Approved Data")
+                {
+                    Caption = 'Approved Data';
+                    Image = DataEntry;
+
+                    trigger OnAction()
+                    var
+                        CSApprovalData: Page "CS Approved Data";
+                    begin
+                        CSApprovalData.SetParameters("Stock-Take Id");
+                        CSApprovalData.Run;
+                    end;
+                }
+                action("Batch Data")
+                {
+                    Caption = 'Batch Data';
+                    Image = List;
+                    RunObject = Page "CS Stock-Take Batch List";
+                    RunPageLink = "Stock-Take Id"=FIELD("Stock-Take Id");
+                    RunPageView = SORTING(Created)
+                                  ORDER(Ascending);
+                }
             }
             group(Process)
             {
                 Caption = 'Process';
-                Visible = false;
-                action("1. Close Stockroom")
+                action("Re-Run Approvel")
                 {
-                    Caption = '1. Close Stockroom';
-                    Image = Close;
+                    Caption = 'Re-Run Approvel';
+                    Image = RefreshLines;
 
                     trigger OnAction()
                     var
-                        CSWS: Codeunit "CS WS";
+                        CSStockTakesData: Record "CS Stock-Takes Data";
+                        RecRef: RecordRef;
+                        CSPost: Codeunit "CS Post";
                     begin
-                        CSWS.CloseCounting("Stock-Take Id",'STOCKROOM');
+                        if not "Adjust Inventory" then
+                          exit;
+
+                        if Approved = 0DT then
+                          exit;
+
+
+                        Clear(CSStockTakesData);
+                        CSStockTakesData.SetRange("Stock-Take Id",Rec."Stock-Take Id");
+                        CSStockTakesData.SetRange("Stock-Take Config Code",Rec."Journal Template Name");
+                        CSStockTakesData.SetRange("Worksheet Name",Rec."Journal Batch Name");
+                        CSStockTakesData.ModifyAll("Transferred To Worksheet",false);
+
+                        RecRef.Open(DATABASE::"CS Stock-Takes");
+                        RecRef.Get(Rec.RecordId);
+
+                        CSPost.PostStoreApprovel(RecRef);
                     end;
                 }
-                action("2. Close Sales Floor")
+                action("Manual Posting")
                 {
-                    Caption = '2. Close Sales Floor';
-                    Image = Close;
+                    Caption = 'Manual Posting';
+                    Image = PostBatch;
 
                     trigger OnAction()
                     var
-                        CSWS: Codeunit "CS WS";
+                        RecRef: RecordRef;
+                        CSPost: Codeunit "CS Post";
+                        ItemJournalBatch: Record "Item Journal Batch";
                     begin
-                        CSWS.CloseCounting("Stock-Take Id",'SALESFLOOR');
+                        if not "Adjust Inventory" then
+                          exit;
+
+                        if Approved = 0DT then
+                          exit;
+
+                        if "Journal Posted" then
+                          exit;
+
+                        ItemJournalBatch.Get("Journal Template Name","Journal Batch Name");
+
+                        RecRef.Open(DATABASE::"Item Journal Batch");
+                        RecRef.Get(ItemJournalBatch.RecordId);
+
+                        CSPost.PostItemJournal(RecRef);
                     end;
                 }
-                action("3. Approve Counting")
+                action("Schedule Posting")
                 {
-                    Caption = '3. Approve Counting';
-                    Image = Approve;
+                    Caption = 'Schedule Posting';
+                    Image = PostBatch;
 
                     trigger OnAction()
                     var
-                        CSWS: Codeunit "CS WS";
+                        CSPost: Codeunit "CS Post";
+                        ItemJournalBatch: Record "Item Journal Batch";
+                        CSSetup: Record "CS Setup";
+                        PostingRecRef: RecordRef;
+                        CSPostingBuffer: Record "CS Posting Buffer";
+                        CSPostEnqueue: Codeunit "CS Post - Enqueue";
+                        RecRef: RecordRef;
                     begin
-                        CSWS.ApproveCounting("Stock-Take Id");
+                        CSSetup.Get;
+                        if not CSSetup."Post with Job Queue" then
+                          exit;
+
+                        if not "Adjust Inventory" then
+                          exit;
+
+                        if Approved = 0DT then
+                          exit;
+
+                        if "Journal Posted" then
+                          exit;
+
+                        ItemJournalBatch.Get("Journal Template Name","Journal Batch Name");
+
+                        RecRef.GetTable(ItemJournalBatch);
+                        Clear(CSPostingBuffer);
+                        CSPostingBuffer.SetRange("Table No.",RecRef.Number);
+                        CSPostingBuffer.SetRange("Record Id",RecRef.RecordId);
+                        CSPostingBuffer.SetRange(Executed,false);
+                        if CSPostingBuffer.FindSet then
+                          Error(Err_PostingIsScheduled,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
+
+                        PostingRecRef.GetTable(ItemJournalBatch);
+                        Clear(CSPostingBuffer);
+                        CSPostingBuffer.Init;
+                        CSPostingBuffer."Table No." := PostingRecRef.Number;
+                        CSPostingBuffer."Record Id" := PostingRecRef.RecordId;
+                        CSPostingBuffer."Job Type" := CSPostingBuffer."Job Type"::"Store Counting";
+                        CSPostingBuffer."Job Queue Priority for Post" := 2000;
+                        if CSPostingBuffer.Insert(true) then
+                          CSPostEnqueue.Run(CSPostingBuffer);
                     end;
                 }
-                action("4. View Refill Suggestions")
+                action("Force Close w/o Posting")
                 {
-                    Caption = '4. View Refill Suggestions';
-                    Image = View;
-                    RunObject = Page "CS Refill Data";
-                    RunPageLink = "Stock-Take Id"=FIELD("Stock-Take Id");
-                }
-                action("5. Close Refill")
-                {
-                    Caption = '5. Close Refill';
-                    Image = Close;
+                    Caption = 'Force Close w/o Posting';
+                    Image = CancelLine;
 
                     trigger OnAction()
-                    var
-                        CSWS: Codeunit "CS WS";
                     begin
-                        CSWS.CloseRefill("Stock-Take Id");
+                        CSHelperFunctions.CancelCountingWOPosting(Rec);
+                        CurrPage.Update();
                     end;
                 }
             }
@@ -205,5 +304,7 @@ page 6151385 "CS Stock-Takes List"
     var
         CSHelperFunctions: Codeunit "CS Helper Functions";
         Err_MissingLocation: Label 'Location is missing on POS Store';
+        Err_MissingData: Label 'There is none approved data';
+        Err_PostingIsScheduled: Label 'Phy. Inventory Journal is scheduled for posting: %1 %2. Delete the entry from the Posting Buffer before Schedule Posting.';
 }
 

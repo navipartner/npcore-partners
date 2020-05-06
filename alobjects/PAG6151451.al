@@ -15,6 +15,7 @@ page 6151451 "Magento DragDropPic. Addin"
     // MAG2.10/MHA /20180206  CASE 302910 DragDropPicture 1.05 update - Resize() functionality completely removed as it cleared compression
     // MAG2.17/TS  /20181017  CASE 324862 Added Icon Picture
     // MAG2.22/MHA /20190625  CASE 359285 Added Variety variables
+    // MAG2.25/MHA /20200401  CASE 385686 Added function OnSavePictureLinks()
 
     Caption = ' ';
     InsertAllowed = false;
@@ -163,13 +164,24 @@ page 6151451 "Magento DragDropPic. Addin"
         Commit;
     end;
 
+    [IntegrationEvent(false, TRUE)]
+    local procedure OnSavePictureLinks(PictureType: Integer;var TempMagentoPicture2: Record "Magento Picture" temporary;var Handled: Boolean)
+    begin
+    end;
+
     local procedure SavePictureLinks(PictureType: Integer;var TempMagentoPicture2: Record "Magento Picture" temporary)
     var
         ItemGroup: Record "Magento Item Group";
         MagentoPictureLink: Record "Magento Picture Link";
         Brand: Record "Magento Brand";
         LineNo: Integer;
+        Handled: Boolean;
     begin
+        //-MAG2.25 [385686]
+        OnSavePictureLinks(PictureType,TempMagentoPicture2,Handled);
+        if Handled then
+          exit;
+        //+MAG2.25 [385686]
         if PictureLinkNo = '' then
           exit;
 

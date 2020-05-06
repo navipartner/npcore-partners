@@ -7,6 +7,7 @@ report 6014615 "Sales Statistics Per Variety"
     // NPR5.46/BHR /20180824  CASE 322752 Replace record Object to Allobj
     // NPR5.46/ZESO/20180919  CASE 327284 Added Totals for Sales(Qty), Cost of Goods(LCY),Sale(LCY) and average of columns Profit and Profit %. and Option to print the totals or not.
     // NPR5.51/ANPA/20190607  CASE 356180 Corrected Inventory Calculation
+    // NPR5.54/BHR /20200212  CASE 390474 Add total Inventory Per Item
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Sales Statistics Per Variety.rdlc';
 

@@ -6,6 +6,7 @@ page 6151305 "NpEc Customer Mapping"
     DelayedInsert = true;
     PageType = List;
     SourceTable = "NpEc Customer Mapping";
+    UsageCategory = Administration;
 
     layout
     {

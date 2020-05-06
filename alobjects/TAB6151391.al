@@ -6,6 +6,8 @@ table 6151391 "CS Stock-Takes"
     // NPR5.52/CLVA/20191102 CASE 375749 Changed code to support version specific changes (NAV 2018+).
     // NPR5.53/CLVA/20191125  CASE 377563 Added OnDelete code
     // NPR5.53/CLVA/20191125  CASE 375919 Added field "Adjust Inventory"
+    // NPR5.54/CLVA/20200217  CASE 391080 Added fields "Unknown Entries" and "Manuel Posting"
+    // NPR5.54/CLVA/20200220  CASE 384506 Added filter OnInsert
 
     Caption = 'CS Stock-Takes';
 
@@ -165,6 +167,17 @@ table 6151391 "CS Stock-Takes"
         {
             Caption = 'Adjust Inventory';
         }
+        field(44;"Unknown Entries";Integer)
+        {
+            CalcFormula = Count("CS Stock-Takes Data" WHERE ("Stock-Take Id"=FIELD("Stock-Take Id"),
+                                                             "Item No."=FILTER('')));
+            Caption = 'Unknown Entries';
+            FieldClass = FlowField;
+        }
+        field(45;"Manuel Posting";Boolean)
+        {
+            Caption = 'Manuel Posting';
+        }
     }
 
     keys
@@ -196,9 +209,31 @@ table 6151391 "CS Stock-Takes"
     end;
 
     trigger OnInsert()
+    var
+        CSCountingSupervisor: Record "CS Counting Supervisor";
+        AdjustInventory: Boolean;
+        CSStoreUsers: Record "CS Store Users";
     begin
+        //-NPR5.54 [384506]
+        if CSCountingSupervisor.Get(UserId) then begin
+          AdjustInventory := true;
+        end else begin
+          Clear(CSStoreUsers);
+          CSStoreUsers.SetRange("User ID",UserId);
+          CSStoreUsers.SetRange("Adjust Inventory",true);
+          if CSStoreUsers.FindFirst then
+            AdjustInventory := true;
+        end;
+        //+#NPR5.54 [384506]
+
         CSStockTakes.SetRange(Location,Location);
         CSStockTakes.SetRange(Closed, 0DT);
+        //-NPR5.54 [384506]
+        if AdjustInventory then
+          CSStockTakes.SetRange("Adjust Inventory",true)
+        else
+          CSStockTakes.SetRange("Adjust Inventory",false);
+        //+NPR5.54 [384506]
         if CSStockTakes.FindSet then
          Error(Err_CSStockTakes,"Stock-Take Id");
     end;

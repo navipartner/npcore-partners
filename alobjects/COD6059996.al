@@ -45,6 +45,7 @@ codeunit 6059996 "Scanner Service WS"
         BarcodeNotFoundError: Label 'Barcode %1 doesn''t exist';
         ItemImageNotFoundError: Label 'No Image for itemno';
 
+    [Scope('Personalization')]
     procedure Process(var Request: BigText)
     var
         xmlrootnode: DotNet npNetXmlNode;
@@ -54,7 +55,7 @@ codeunit 6059996 "Scanner Service WS"
         ScannerServiceSetup.Get;
         if ScannerServiceSetup."Log Request" then begin
           ScannerServiceLog.Init;
-          ScannerServiceFunctions.CreateLogEntry(ScannerServiceLog,Request);
+          //ScannerServiceFunctions.CreateLogEntry(ScannerServiceLog,Request);
         end;
 
         ConvertBigTextToXml(XMLdocIn,Request);
@@ -410,6 +411,7 @@ codeunit 6059996 "Scanner Service WS"
         exit(tempbool);
     end;
 
+    [Scope('Personalization')]
     procedure IsInternalCall(LocalIsInternal: Boolean;LocalId: Guid)
     begin
         IsInternal := LocalIsInternal;

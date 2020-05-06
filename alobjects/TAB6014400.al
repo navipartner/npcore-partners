@@ -69,6 +69,7 @@ table 6014400 "Retail Setup"
     // NPR5.53/BHR /20190810  CASE 369354 Delete field 1002 "New Customer Creation"
     // NPR5.53/BHR /20191007  CASE 369361 Removed the fields "Company Function" - 6325,"Hotline no." - 5148, "Hosting Type" - 82
     //                                    Removed function For online/Offline Checks
+    // NPR5.54/TJ  /20200302  CASE 393478 Removed fields 4016 "Overwrite Item No.", 5155 "Finish Register Warning" and 5159 "Item remarks"
 
     Caption = 'Retail Setup';
 
@@ -458,11 +459,6 @@ table 6014400 "Retail Setup"
             Caption = 'Vendor When Creation';
             Description = 'Angiver om der skal sp�rges om leverand�r ved opret';
         }
-        field(4016;"Overwrite Item No.";Boolean)
-        {
-            Caption = 'Overwrite Item No.';
-            Description = 'Angiver om det skal v�re muligt at overskrive varenummeret i en ekspeditionslinie.';
-        }
         field(4019;"Item Description at 1 star";Boolean)
         {
             Caption = 'Item Description At *';
@@ -830,11 +826,6 @@ table 6014400 "Retail Setup"
             OptionCaption = 'Forced,Free';
             OptionMembers = Forced,Free;
         }
-        field(5155;"Finish Register Warning";Boolean)
-        {
-            Caption = 'Finish Cash Register Warning';
-            Description = 'Vis advarsel ved afslut kasse for f.eks. flere �bne ekspeditioner';
-        }
         field(5156;"Serialno. (Itemno nonexist)";Option)
         {
             Caption = 'Serial No. (Itemno. Does Not Exists)';
@@ -849,11 +840,6 @@ table 6014400 "Retail Setup"
                     if not Confirm(Text1060017) then
                       Error(Text1060018);
             end;
-        }
-        field(5159;"Item remarks";Boolean)
-        {
-            Caption = 'Item Remarks';
-            Description = 'Automatisk popup med varebem�rkninger p� ekspeditionsform';
         }
         field(5160;"Show vendoe Itemno.";Boolean)
         {

@@ -39,6 +39,8 @@ table 6014405 "Sale POS"
     // NPR5.53/BHR /20191008  CASE 369354 comment code in relation to 'New Customer Creation'
     // NPR5.53/TJ  /20191205 CASE 380453 Country Code is now properly populated when setting Customer No.
     // NPR5.53/ALPO/20191211 CASE 380609 NPRE: New guest arrival procedure. Store preselected Waiterpad No. and Seating Code as well as Number of Guests on Sale POS
+    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
+    // NPR5.54/MMV /20200220 CASE 391871 Moved GUID creation from table subscribers to table trigger to have everything centralized.
 
     Caption = 'Sale';
 
@@ -696,6 +698,65 @@ table 6014405 "Sale POS"
                 //+NPR5.53 [376035]
             end;
         }
+        field(200;"Device ID";Text[50])
+        {
+            Caption = 'Device ID';
+            Description = 'NPR5.54';
+        }
+        field(201;"Host Name";Text[100])
+        {
+            Caption = 'Host Name';
+            Description = 'NPR5.54';
+        }
+        field(210;"User ID";Code[50])
+        {
+            Caption = 'User ID';
+            Description = 'NPR5.54';
+            TableRelation = User."User Name";
+            ValidateTableRelation = false;
+        }
+        field(300;Amount;Decimal)
+        {
+            AutoFormatType = 1;
+            CalcFormula = Sum("Sale Line POS".Amount WHERE ("Register No."=FIELD("Register No."),
+                                                            "Sales Ticket No."=FIELD("Sales Ticket No."),
+                                                            "Sale Type"=FILTER(Sale|"Debit Sale"|"Gift Voucher"|"Credit Voucher"|Deposit),
+                                                            Type=FILTER(<>Comment&<>"Open/Close")));
+            Caption = 'Amount';
+            Description = 'NPR5.54';
+            Editable = false;
+            FieldClass = FlowField;
+
+            trigger OnValidate()
+            var
+                Trans0001: Label 'The sign on quantity and amount must be the same';
+            begin
+            end;
+        }
+        field(310;"Amount Including VAT";Decimal)
+        {
+            AutoFormatType = 1;
+            CalcFormula = Sum("Sale Line POS"."Amount Including VAT" WHERE ("Register No."=FIELD("Register No."),
+                                                                            "Sales Ticket No."=FIELD("Sales Ticket No."),
+                                                                            "Sale Type"=FILTER(Sale|"Debit Sale"|"Gift Voucher"|"Credit Voucher"|Deposit),
+                                                                            Type=FILTER(<>Comment&<>"Open/Close")));
+            Caption = 'Amount Including VAT';
+            Description = 'NPR5.54';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(320;"Payment Amount";Decimal)
+        {
+            AutoFormatType = 1;
+            CalcFormula = Sum("Sale Line POS"."Amount Including VAT" WHERE ("Register No."=FIELD("Register No."),
+                                                                            "Sales Ticket No."=FIELD("Sales Ticket No."),
+                                                                            "Sale Type"=FILTER(Payment|"Out payment"),
+                                                                            Type=FILTER(<>Comment&<>"Open/Close")));
+            Caption = 'Payment Amount';
+            Description = 'NPR5.54';
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(480;"Dimension Set ID";Integer)
         {
             Caption = 'Dimension Set ID';
@@ -791,17 +852,15 @@ table 6014405 "Sale POS"
 
         Register.Get("Register No.");
         "Location Code" := Register."Location Code";
-        //-NPR5.30 [261728]
-        //"Shortcut Dimension 1 Code" := Register."Global Dimension 1 Code";
-        //"Shortcut Dimension 2 Code" := Register."Global Dimension 2 Code";
-        //-NPR5.30 [261728]
-        //-NPR5.31 [263093]
         "Customer Disc. Group" := Register."Customer Disc. Group";
-        //+NPR5.31 [263093]
-        //-NPR5.29 [262628]
         "POS Sale ID" := 0;
-        //+NPR5.29 [262628]
         "Event No." := Register."Active Event No.";  //NPR5.53 [376035]
+
+        //-NPR5.54 [391871]
+        if IsNullGuid("Retail ID") then begin
+          "Retail ID" := CreateGuid();
+        end;
+        //+NPR5.54 [391871]
     end;
 
     var

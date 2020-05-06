@@ -20,6 +20,9 @@ codeunit 6150702 "POS UI Management"
     // NPR5.51/VB  /20190719  CASE 352582 POS Administrative Templates feature
     // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
     // NPR5.53/TSA /20191219 CASE 382035 Added new caption Item_Count
+    // NPR5.54/TSA /20200219 CASE 391850 Refresh of the POS Setup record when POS Unit is changed
+    // NPR5.54/TSA /20200220 CASE 392121 Added optionvalue for named workflow "Idle Timeout Action Code", removed some green code
+    // NPR5.54/TSA /20200221 CASE 392247 Adde optionvalue for POS Type. [Attended, Unattended]
 
 
     trigger OnRun()
@@ -717,59 +720,33 @@ codeunit 6150702 "POS UI Management"
         "Action": Record "POS Action" temporary;
         POSSetup: Record "POS Setup";
     begin
-        //-NPR5.40 [306347]
-        //Setup.Action_Item(Action);
+
+        //-+NPR5.54 [392121] removed green code
         Setup.Action_Item(Action, POSSession);
-        //+NPR5.40 [306347]
-        //-NPR5.50 [338666]
-        //ConfigureReusableWorkflow(Action,POSSession,STRSUBSTNO('%1, %2',POSSetup.TABLECAPTION,POSSetup.FIELDCAPTION("Item Insert Action Code")));
         ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Item Insert Action Code")), POSSetup.FieldNo("Item Insert Action Code"));
-        //+NPR5.50 [338666]
 
-        //-NPR5.40 [306347]
-        //Setup.Action_Payment(Action);
         Setup.Action_Payment(Action, POSSession);
-        //+NPR5.40 [306347]
-        //-NPR5.50 [338666]
-        //ConfigureReusableWorkflow(Action,POSSession,STRSUBSTNO('%1, %2',POSSetup.TABLECAPTION,POSSetup.FIELDCAPTION("Payment Action Code")));
         ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Payment Action Code")), POSSetup.FieldNo("Payment Action Code"));
-        //+NPR5.50 [338666]
 
-        //-NPR5.40 [306347]
-        //Setup.Action_Customer(Action);
         Setup.Action_Customer(Action, POSSession);
-        //+NPR5.40 [306347]
-        //-NPR5.50 [338666]
-        //ConfigureReusableWorkflow(Action,POSSession,STRSUBSTNO('%1, %2',POSSetup.TABLECAPTION,POSSetup.FIELDCAPTION("Customer Action Code")));
         ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Customer Action Code")), POSSetup.FieldNo("Customer Action Code"));
-        //+NPR5.50 [338666]
 
-        //-NPR5.37 [293905]
-        //-NPR5.40 [306347]
-        //Setup.Action_LockPOS(Action);
         Setup.Action_LockPOS(Action, POSSession);
-        //+NPR5.40 [306347]
-        //-NPR5.50 [338666]
-        //ConfigureReusableWorkflow(Action,POSSession,STRSUBSTNO('%1, %2',POSSetup.TABLECAPTION,POSSetup.FIELDCAPTION("Lock POS Action Code")));
         ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Lock POS Action Code")), POSSetup.FieldNo("Lock POS Action Code"));
-        //+NPR5.50 [338666]
 
-        //-NPR5.40 [306347]
-        //Setup.Action_UnlockPOS(Action);
         Setup.Action_UnlockPOS(Action, POSSession);
-        //+NPR5.40 [306347]
-        //-NPR5.50 [338666]
-        //ConfigureReusableWorkflow(Action,POSSession,STRSUBSTNO('%1, %2',POSSetup.TABLECAPTION,POSSetup.FIELDCAPTION("Unlock POS Action Code")));
         ConfigureReusableWorkflow(Action, POSSession, StrSubstNo('%1, %2', POSSetup.TableCaption, POSSetup.FieldCaption("Unlock POS Action Code")), POSSetup.FieldNo("Unlock POS Action Code"));
-        //+NPR5.50 [338666]
-        //+NPR5.37 [293905]
 
-        //-NPR5.53 [362777]
         Setup.Action_Login(Action,POSSession);
         ConfigureReusableWorkflow(Action,POSSession,StrSubstNo('%1, %2',POSSetup.TableCaption,POSSetup.FieldCaption("Login Action Code")),POSSetup.FieldNo("Login Action Code"));
+
         Setup.Action_TextEnter(Action,POSSession);
         ConfigureReusableWorkflow(Action,POSSession,StrSubstNo('%1, %2',POSSetup.TableCaption,POSSetup.FieldCaption("Text Enter Action Code")),POSSetup.FieldNo("Text Enter Action Code"));
-        //+NPR5.53 [362777]
+
+        //-NPR5.54 [392121]
+        Setup.Action_IdleTimeout (Action, POSSession);
+        ConfigureReusableWorkflow (Action, POSSession, StrSubstNo ('%1, %2',POSSetup.TableCaption, POSSetup.FieldCaption("Idle Timeout Action Code")), POSSetup.FieldNo("Idle Timeout Action Code"));
+        //+NPR5.54 [392121]
     end;
 
     procedure ConfigureReusableWorkflow("Action": Record "POS Action"; POSSession: Codeunit "POS Session"; Source: Text; FieldNumber: Integer)
@@ -777,20 +754,28 @@ codeunit 6150702 "POS UI Management"
         Button: Record "POS Menu Button";
         WorkflowAction: DotNet npNetWorkflowAction;
         POSParameterValue: Record "POS Parameter Value" temporary;
+        POSSetup: Codeunit "POS Setup";
+        POSUnit: Record "POS Unit";
     begin
+
+        //-NPR5.54 [391850]
+        POSSession.GetSetup (POSSetup);
+        POSSetup.GetPOSUnit (POSUnit);
+        //+NPR5.54 [391850]
+
+        //-+NPR5.54 [392121] removed green code
         with Button do begin
             "Action Type" := "Action Type"::Action;
             "Action Code" := Action.Code;
-            //-NPR5.42 [314128]
-            //GetAction(WorkflowAction,POSSession,Source,POSParameterValue,POSActionParameter);
-            //-NPR5.50 [338666]
-            RetrieveReusableWorkflowParameters(FieldNumber, POSParameterValue);
-            //+NPR5.50 [338666]
+
+          //-NPR5.54 [391850]
+          // RetrieveReusableWorkflowParameters(FieldNumber,POSParameterValue);
+          RetrieveReusableWorkflowParameters(FieldNumber, POSUnit."POS Named Actions Profile", POSParameterValue);
+          //+NPR5.54 [391850]
+
             GetAction(WorkflowAction, POSSession, Source, POSParameterValue);
-            //-NPR5.50 [338666]
+
             POSParameterValue.Reset();
-            //+NPR5.50 [338666]
-            //+NPR5.42 [314128]
             FrontEnd.ConfigureReusableWorkflow(WorkflowAction);
         end;
     end;
@@ -817,6 +802,15 @@ codeunit 6150702 "POS UI Management"
         //-NPR5.45 [323728]
         Options.Add('kioskUnlockEnabled', Setup.GetKioskUnlockEnabled());
         //+NPR5.45 [323728]
+
+        //-NPR5.54 [392121]
+        Options.Add('idleTimeoutWorkflow', Setup.ActionCode_IdleTimeout());
+        //+NPR5.54 [392121]
+
+        //-NPR5.54 [392247]
+        Options.Add ('posUnitType', Format (GetPOSUnitType(Setup), 0, 9));
+        //+NPR5.54 [392247]
+
         //-NPR5.51 [361184]
         Options.Add('nprVersion',GetNPRVersion());
         //+NPR5.51 [361184]
@@ -871,14 +865,19 @@ codeunit 6150702 "POS UI Management"
         //+NPR5.40 [307453]
     end;
 
-    local procedure RetrieveReusableWorkflowParameters(FieldNumber: Integer; var TmpPOSParameterValue: Record "POS Parameter Value" temporary)
+    local procedure RetrieveReusableWorkflowParameters(FieldNumber: Integer;POSSetupProfileCode: Code[20];var TmpPOSParameterValue: Record "POS Parameter Value" temporary)
     var
         POSParameterValue: Record "POS Parameter Value";
         POSSetup: Record "POS Setup";
     begin
-        //-NPR5.51 [359825]
-        POSSetup.Get;
-        //+NPR5.51 [359825]
+        //-NPR5.54 [391850]
+        // //-NPR5.51 [359825]
+        // POSSetup.GET;
+        // //+NPR5.51 [359825]
+
+        POSSetup.Get (POSSetupProfileCode);
+        //+NPR5.54 [391850]
+
 
         //-NPR5.50 [338666]
         POSParameterValue.SetRange("Table No.", DATABASE::"POS Setup");
@@ -908,6 +907,17 @@ codeunit 6150702 "POS UI Management"
           exit(Version);
         end;
         //+NPR5.51 [361184]
+    end;
+
+    local procedure GetPOSUnitType(POSSetup: Codeunit "POS Setup"): Integer
+    var
+        POSUnit: Record "POS Unit";
+    begin
+
+        //-NPR5.54 [392247]
+        POSSetup.GetPOSUnit (POSUnit);
+        exit (POSUnit."POS Type");
+        //+NPR5.54 [392247]
     end;
 }
 

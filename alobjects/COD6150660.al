@@ -15,6 +15,8 @@ codeunit 6150660 "NPRE Waiter Pad POS Management"
     // NPR5.53/ALPO/20191211 CASE 380609 NPRE: New guest arrival procedure. Use preselected Waiterpad No. and Seating Code as well as Number of Guests
     // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
     // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
+    // NPR5.54/ALPO/20200331 CASE 398454 Preserve price VAT parameters and use it when copying waiter pad lines to a POS sale
+    // NPR5.54/ALPO/20200414 CASE 400139 Item Add-On lines were not copied to waiter pads
 
 
     trigger OnRun()
@@ -91,8 +93,10 @@ codeunit 6150660 "NPRE Waiter Pad POS Management"
         repeat
           //MoveSaleLineFromPOSToWaiterPad(SaleLinePOS, WaiterPad);  //NPR5.53 [380609]-revoked
           MoveSaleLineFromPOSToWaiterPad(SaleLinePOS,WaiterPad,WaiterPadLine);  //NPR5.53 [380609]
-            SaleLinePOS.Delete(true);
+          //SaleLinePOS.DELETE(TRUE);  //NPR5.54 [400139]-revoked
         until SaleLinePOS.Next = 0;
+        SaleLinePOS.DeleteAll(true);  //NPR5.54 [400139]
+
         //-NPR5.53 [380609]
         WaiterPadLine.MarkedOnly(true);
         OnAfterMoveSaleFromPosToWaiterPad(WaiterPad,WaiterPadLine);
@@ -133,6 +137,11 @@ codeunit 6150660 "NPRE Waiter Pad POS Management"
         WaiterPadLine."Invoice Discount Amount" := SaleLinePOS."Invoice Discount Amount";
         WaiterPadLine."Amount Excl. VAT" := SaleLinePOS.Amount;
         WaiterPadLine."Amount Incl. VAT" := SaleLinePOS."Amount Including VAT";
+        //-NPR5.54 [398454]
+        WaiterPadLine."Price Includes VAT" := SaleLinePOS."Price Includes VAT";
+        WaiterPadLine."VAT Bus. Posting Group" := SaleLinePOS."VAT Bus. Posting Group";
+        WaiterPadLine."VAT Prod. Posting Group" := SaleLinePOS."VAT Prod. Posting Group";
+        //+NPR5.54 [398454]
         WaiterPadLine.Insert(true);
         WaiterPadLine.Mark(true);  //NPR5.53 [380609]
         
@@ -206,6 +215,11 @@ codeunit 6150660 "NPRE Waiter Pad POS Management"
 
         SaleLinePOS.Validate(Quantity, WaiterPadLine.Quantity);
         SaleLinePOS."Unit Price" := WaiterPadLine."Unit Price";
+        //-NPR5.54 [398454]
+        SaleLinePOS."Price Includes VAT" := WaiterPadLine."Price Includes VAT";
+        SaleLinePOS."VAT Bus. Posting Group" := WaiterPadLine."VAT Bus. Posting Group";
+        SaleLinePOS."VAT Prod. Posting Group" := WaiterPadLine."VAT Prod. Posting Group";
+        //+NPR5.54 [398454]
 
         SaleLinePOS."Discount Type" := WaiterPadLine."Discount Type";
         SaleLinePOS."Discount Code" := WaiterPadLine."Discount Code";
@@ -223,6 +237,7 @@ codeunit 6150660 "NPRE Waiter Pad POS Management"
         end;
         //+NPR5.53 [380918]
 
+        POSSaleLine.SetUseLinePriceVATParams(true);  //NPR5.54 [398454]
         POSSaleLine.InsertLine(SaleLinePOS);
         CopyPOSInfo(SaleLinePOS,WaiterPadLine."Waiter Pad No.",WaiterPadLine."Line No.",false);  //NPR5.53 [376538]
 

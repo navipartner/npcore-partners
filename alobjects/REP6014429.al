@@ -82,20 +82,20 @@ report 6014429 "Posting Overview Audit"
             column(AuditRollTotalInclVAT;AuditRollTotalInclVAT)
             {
             }
-            dataitem("Credit Card Transaction";"Credit Card Transaction")
+            dataitem("EFT Receipt";"EFT Receipt")
             {
                 DataItemLink = "Register No."=FIELD("Register No."),"Sales Ticket No."=FIELD("Sales Ticket No."),Date=FIELD("Sale Date");
                 DataItemTableView = SORTING("Register No.","Sales Ticket No.",Date) WHERE(Type=FILTER(<>1));
-                column(TransactionTime_CreditCardTransaction;"Credit Card Transaction"."Transaction Time")
+                column(TransactionTime_CreditCardTransaction;"EFT Receipt"."Transaction Time")
                 {
                 }
-                column(EntryNo_CreditCardTransaction;"Credit Card Transaction"."Entry No.")
+                column(EntryNo_CreditCardTransaction;"EFT Receipt"."Entry No.")
                 {
                 }
-                column(Type_CreditCardTransaction;"Credit Card Transaction".Type)
+                column(Type_CreditCardTransaction;"EFT Receipt".Type)
                 {
                 }
-                column(Text_CreditCardTransaction;"Credit Card Transaction".Text)
+                column(Text_CreditCardTransaction;"EFT Receipt".Text)
                 {
                 }
 

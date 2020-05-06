@@ -4,6 +4,7 @@ table 6060111 "TM Ticket Setup"
     // TM1.27/TSA /20171218 CASE 300395 Added field Timeout (ms)
     // TM1.38/TSA /20181012 CASE 332109 Adding NP-Pass for tickets
     // TM1.38/TSA /20181026 CASE 308962 Added some boolean fields to control prepaid / postpaid ticket creation flow
+    // TM90.1.46/TSA /20200320 CASE 397084 Added needed setup field in ordet to create tickets from a simple wizard
 
     Caption = 'Ticket Setup';
 
@@ -127,6 +128,41 @@ table 6060111 "TM Ticket Setup"
         {
             Caption = 'NP-Pass Token';
             Description = '//-TM1.38 [332109]';
+        }
+        field(300;"Wizard Ticket Type No. Series";Code[10])
+        {
+            Caption = 'Wizard Ticket Type No. Series';
+            TableRelation = "No. Series";
+        }
+        field(301;"Wizard Ticket Type Template";Code[10])
+        {
+            Caption = 'Wizard Ticket Type Template';
+            TableRelation = "Config. Template Header";
+        }
+        field(306;"Wizard Ticket Bom Template";Code[10])
+        {
+            Caption = 'Wizard Ticket Bom Template';
+            TableRelation = "Config. Template Header";
+        }
+        field(310;"Wizard Adm. Code No. Series";Code[10])
+        {
+            Caption = 'Wizard Adm. Code No. Series';
+            TableRelation = "No. Series";
+        }
+        field(311;"Wizard Admission Template";Code[10])
+        {
+            Caption = 'Wizard Admission Template';
+            TableRelation = "Config. Template Header";
+        }
+        field(315;"Wizard Sch. Code No. Series";Code[10])
+        {
+            Caption = 'Wizard Sch. Code No. Series';
+            TableRelation = "No. Series";
+        }
+        field(320;"Wizard Item No. Series";Code[10])
+        {
+            Caption = 'Wizard Item No. Series';
+            TableRelation = "No. Series";
         }
     }
 

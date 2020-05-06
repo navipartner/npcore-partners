@@ -331,7 +331,7 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
 
         if (CloseOnIdle and (EFTTransactionRequest."Result Code" = 2)) or (((Ticks - TickAbortRequested) > 5) and (AbortAttempts > 3)) then begin
             TransactionDone := true;
-            EFTTransactionRequest."External Result Received" := true;
+          EFTTransactionRequest."External Result Known" := true;
             FrontEnd.CloseModel(ActiveModelID);
             Clear(ActiveModelID);
             OnAfterProtocolResponse(EFTTransactionRequest);
@@ -365,7 +365,7 @@ codeunit 6184524 "EFT ISMP Baxi Protocol"
 
         if (EFTTransactionRequest.Successful) or (EFTTransactionRequest."Result Code" > 0) then begin
             TransactionDone := true;
-            EFTTransactionRequest."External Result Received" := true;
+          EFTTransactionRequest."External Result Known" := true;
             FrontEnd.CloseModel(ActiveModelID);
             Clear(ActiveModelID);
             if EFTTransactionRequest."Result Code" > 1 then

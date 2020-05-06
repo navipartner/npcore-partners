@@ -34,6 +34,7 @@ table 6060042 "Item Worksheet Line"
     // NPR5.49/BHR /20190111 CASE 341967 Increase size of Variety Tables from code 20 to code 40
     // NPR5.50/THRO/20190526 CASE 356260 Bugfix in CheckManualValidation
     // NPR5.52/THRO/20191002 CASE 370475 Set Item Category Code from Item
+    // NPR5.54/ZESO/20200225 CASE 385388 Set Magento Item, Profit % and Description2 from Item
 
     Caption = 'Item Worksheet Line';
     DrillDownPageID = "Item Worksheet Page";
@@ -183,6 +184,16 @@ table 6060042 "Item Worksheet Line"
                 //-NPR5.52 [370475]
                 "Item Category Code" := Item."Item Category Code";
                 //-NPR5.52 [370475]
+
+
+                //-NPR5.54 [385388]
+                "Profit %" := Item."Profit %";
+                "Description 2" := Item."Description 2";
+                if Item."Magento Item" then
+                  "Magento Item" := "Magento Item"::Yes
+                else
+                  "Magento Item" := "Magento Item"::No;
+                //+NPR5.54 [385388]
 
                 CopyItemAttributes(Item."No.");
 

@@ -122,6 +122,7 @@ codeunit 6014435 "Retail Form Code"
     // NPR5.53/ALPO/20191024 CASE 371955 Rounding related fields moved to POS Posting Profiles
     // NPR5.53/ALPO/20191025 CASE 371956 Dimensions: POS Store & POS Unit integration; discontinue dimensions on Cash Register
     // NPR5.53/BHR /20191008 CASE 369354 Removed Code For Customer Creation
+    // NPR5.54/TJ  /20200121 CASE 382465 Cancelling a sale with a retail document, will properly leave Type as Cancelled
 
     Permissions = TableData "Sales Invoice Header" = rimd,
                   TableData "Sales Invoice Line" = rimd,
@@ -1328,6 +1329,10 @@ codeunit 6014435 "Retail Form Code"
                                                            Sale."Retail Document Type", Sale."Customer No.", Sale."Retail Document No.");
                 Revisionsrulle."Allocated No." := Sale."Retail Document No.";
                 Revisionsrulle.Type := Revisionsrulle.Type::"Debit Sale";
+            //-NPR5.54 [382465]
+            if Ekspeditionslinie."Sale Type" = Ekspeditionslinie."Sale Type"::Cancelled then
+              Revisionsrulle.Type := Revisionsrulle.Type::Cancelled;
+            //+NPR5.54 [382465]
                 Revisionsrulle.Lokationskode := Kasse."Location Code";
             //-NPR5.53 [371956]-revoked
             //Revisionsrulle."Shortcut Dimension 1 Code" := Kasse."Global Dimension 1 Code";

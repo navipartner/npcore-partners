@@ -12,6 +12,8 @@ xmlport 6151402 "Magento Document Export"
     // MAG2.20/TSA /20190424 CASE 345376 Added currency_code element
     // MAG2.22/TSA /20190531 CASE 345376 Added more information to the shipment section
     // MAG2.22/TSA /20190531 CASE 345376 Added shipment method code on the related document section
+    // MAG2.25/TSA /20200210 CASE 390073 Added Sell-to Contact and Your Reference, Due Date and Remaining Amount
+    // MAG2.25/TSA /20200218 CASE 388058 Added Quotes to magento service
 
     Caption = 'Magento Document Export';
     DefaultNamespace = 'urn:microsoft-dynamics-nav/naviconnect/documents';
@@ -26,20 +28,32 @@ xmlport 6151402 "Magento Document Export"
     {
         textelement(documents)
         {
-            tableelement(salesinvheader;"Sales Invoice Header")
+            tableelement(salesinvheader; "Sales Invoice Header")
             {
                 MinOccurs = Zero;
                 XmlName = 'invoice';
-                fieldattribute(no;SalesInvHeader."No.")
+                fieldattribute(no; SalesInvHeader."No.")
                 {
                 }
-                fieldelement(posting_date;SalesInvHeader."Posting Date")
+                fieldelement(posting_date; SalesInvHeader."Posting Date")
                 {
                 }
-                fieldelement(amount_excl_vat;SalesInvHeader."Amount Including VAT")
+                fieldelement(amount_excl_vat; SalesInvHeader."Amount Including VAT")
                 {
                 }
-                fieldelement(currency_code;SalesInvHeader."Currency Code")
+                fieldelement(currency_code; SalesInvHeader."Currency Code")
+                {
+                }
+                fieldelement(sell_to_contact; SalesInvHeader."Sell-to Contact")
+                {
+                }
+                fieldelement(your_reference; SalesInvHeader."Your Reference")
+                {
+                }
+                fieldelement(due_date; SalesInvHeader."Due Date")
+                {
+                }
+                fieldelement(remaining_amount; SalesInvHeader."Remaining Amount")
                 {
                 }
                 textelement(salesinvlines)
@@ -47,13 +61,13 @@ xmlport 6151402 "Magento Document Export"
                     MaxOccurs = Once;
                     MinOccurs = Zero;
                     XmlName = 'lines';
-                    tableelement(salesinvline;"Sales Invoice Line")
+                    tableelement(salesinvline; "Sales Invoice Line")
                     {
-                        LinkFields = "Document No."=FIELD("No.");
+                        LinkFields = "Document No." = FIELD ("No.");
                         LinkTable = SalesInvHeader;
                         MinOccurs = Zero;
                         XmlName = 'line';
-                        fieldattribute(line_no;SalesInvLine."Line No.")
+                        fieldattribute(line_no; SalesInvLine."Line No.")
                         {
                         }
                         textelement(salesinvlinetype)
@@ -63,14 +77,14 @@ xmlport 6151402 "Magento Document Export"
                             trigger OnBeforePassVariable()
                             begin
                                 //-MAG2.12 [309647]
-                                LineTypeList.TryGetValue(SalesInvLine.Type,SalesInvLineType);
+                                LineTypeList.TryGetValue(SalesInvLine.Type, SalesInvLineType);
                                 //+MAG2.12 [309647]
                             end;
                         }
-                        fieldelement(no;SalesInvLine."No.")
+                        fieldelement(no; SalesInvLine."No.")
                         {
                         }
-                        fieldelement(variant_code;SalesInvLine."Variant Code")
+                        fieldelement(variant_code; SalesInvLine."Variant Code")
                         {
                         }
                         textelement(salesinvlineexternalno)
@@ -83,29 +97,29 @@ xmlport 6151402 "Magento Document Export"
                                 //-MAG2.12 [309647]
                                 SalesInvLineExternalNo := SalesInvLine."No.";
                                 if SalesInvLine."Variant Code" <> '' then
-                                  SalesInvLineExternalNo += '_' + SalesInvLine."Variant Code";
+                                    SalesInvLineExternalNo += '_' + SalesInvLine."Variant Code";
                                 //+MAG2.12 [309647]
                             end;
                         }
-                        fieldelement(quantity;SalesInvLine.Quantity)
+                        fieldelement(quantity; SalesInvLine.Quantity)
                         {
                         }
-                        fieldelement(unit_price;SalesInvLine."Unit Price")
+                        fieldelement(unit_price; SalesInvLine."Unit Price")
                         {
                         }
-                        fieldelement(line_discount_pct;SalesInvLine."Line Discount %")
+                        fieldelement(line_discount_pct; SalesInvLine."Line Discount %")
                         {
                         }
-                        fieldelement(line_discount_amount;SalesInvLine."Line Discount Amount")
+                        fieldelement(line_discount_amount; SalesInvLine."Line Discount Amount")
                         {
                         }
-                        fieldelement(amount;SalesInvLine.Amount)
+                        fieldelement(amount; SalesInvLine.Amount)
                         {
                         }
-                        fieldelement(vat_pct;SalesInvLine."VAT %")
+                        fieldelement(vat_pct; SalesInvLine."VAT %")
                         {
                         }
-                        fieldelement(amount_including_vat;SalesInvLine."Amount Including VAT")
+                        fieldelement(amount_including_vat; SalesInvLine."Amount Including VAT")
                         {
                         }
 
@@ -114,7 +128,7 @@ xmlport 6151402 "Magento Document Export"
 
                             //+MAG2.20 [345376]
                             if (HideLines) then
-                              currXMLport.Break ();
+                                currXMLport.Break();
                             //+MAG2.20 [345376]
                         end;
                     }
@@ -124,11 +138,11 @@ xmlport 6151402 "Magento Document Export"
                     MaxOccurs = Once;
                     MinOccurs = Zero;
                     XmlName = 'relateddocuments';
-                    tableelement(tmpdocumentsearchresultinvoice;"Document Search Result")
+                    tableelement(tmpdocumentsearchresultinvoice; "Document Search Result")
                     {
                         MinOccurs = Zero;
                         XmlName = 'document';
-                        SourceTableView = WHERE("Doc. Type"=FILTER(<100));
+                        SourceTableView = WHERE ("Doc. Type" = FILTER (< 100));
                         UseTemporary = true;
                         textattribute(relatedtypeinvoice)
                         {
@@ -136,13 +150,13 @@ xmlport 6151402 "Magento Document Export"
 
                             trigger OnBeforePassVariable()
                             begin
-                                RelatedTypeInvoice := GetRelatedDocTypeAsText (TmpDocumentSearchResultInvoice."Doc. Type");
+                                RelatedTypeInvoice := GetRelatedDocTypeAsText(TmpDocumentSearchResultInvoice."Doc. Type");
                             end;
                         }
-                        fieldattribute(number;TmpDocumentSearchResultInvoice."Doc. No.")
+                        fieldattribute(number; TmpDocumentSearchResultInvoice."Doc. No.")
                         {
                         }
-                        fieldattribute(package_tracking_no;TmpDocumentSearchResultInvoice.Description)
+                        fieldattribute(package_tracking_no; TmpDocumentSearchResultInvoice.Description)
                         {
                             Occurrence = Optional;
                         }
@@ -155,8 +169,8 @@ xmlport 6151402 "Magento Document Export"
                             begin
                                 //-MAG2.22 [345376]
                                 Invoice_ShipmentMethod := '';
-                                if (TmpDocumentSearchResultInvoice.Get (120, TmpDocumentSearchResultInvoice."Doc. No.", 0)) then
-                                  Invoice_ShipmentMethod := TmpDocumentSearchResultInvoice.Description;
+                                if (TmpDocumentSearchResultInvoice.Get(120, TmpDocumentSearchResultInvoice."Doc. No.", 0)) then
+                                    Invoice_ShipmentMethod := TmpDocumentSearchResultInvoice.Description;
                                 //+MAG2.22 [345376]
                             end;
                         }
@@ -168,43 +182,49 @@ xmlport 6151402 "Magento Document Export"
 
                     //-MAG2.20 [345376]
                     if (TmpDocumentSearchResultInvoice.IsTemporary()) then
-                      TmpDocumentSearchResultInvoice.DeleteAll ();
+                        TmpDocumentSearchResultInvoice.DeleteAll();
 
-                    GetRelatedDocs (SalesInvHeader."Order No.", SalesInvHeader."No.", TmpDocumentSearchResultInvoice);
+                    GetRelatedDocs(SalesInvHeader."Order No.", SalesInvHeader."No.", TmpDocumentSearchResultInvoice);
 
                     if (SalesInvHeader."Currency Code" = '') then
-                      SalesInvHeader."Currency Code" := GeneralLedgerSetup."LCY Code";
+                        SalesInvHeader."Currency Code" := GeneralLedgerSetup."LCY Code";
                     //+MAG2.20 [345376]
                 end;
 
                 trigger OnPreXmlItem()
                 begin
                     if not ExportInvoices then
-                      SalesInvHeader.SetFilter("No.",'=%1&<>%1','');
+                        SalesInvHeader.SetFilter("No.", '=%1&<>%1', '');
 
-                    SalesInvHeader.SetRange("Bill-to Customer No.",CustomerNo);
-                    SalesInvHeader.SetRange("Posting Date",StartDate,EndDate);
+                    SalesInvHeader.SetRange("Bill-to Customer No.", CustomerNo);
+                    SalesInvHeader.SetRange("Posting Date", StartDate, EndDate);
 
                     //-MAG2.20 [345376]
                     if (DocumentNumber <> '') then
-                      SalesInvHeader.SetRange ("No.", DocumentNumber);
+                        SalesInvHeader.SetRange("No.", DocumentNumber);
                     //+MAG2.20 [345376]
                 end;
             }
-            tableelement(salescrmemoheader;"Sales Cr.Memo Header")
+            tableelement(salescrmemoheader; "Sales Cr.Memo Header")
             {
                 MinOccurs = Zero;
                 XmlName = 'cr_memo';
-                fieldattribute(no;SalesCrMemoHeader."No.")
+                fieldattribute(no; SalesCrMemoHeader."No.")
                 {
                 }
-                fieldelement(posting_date;SalesCrMemoHeader."Posting Date")
+                fieldelement(posting_date; SalesCrMemoHeader."Posting Date")
                 {
                 }
-                fieldelement(amount_excl_vat;SalesCrMemoHeader."Amount Including VAT")
+                fieldelement(amount_excl_vat; SalesCrMemoHeader."Amount Including VAT")
                 {
                 }
-                fieldelement(currency_code;SalesCrMemoHeader."Currency Code")
+                fieldelement(currency_code; SalesCrMemoHeader."Currency Code")
+                {
+                }
+                fieldelement(sell_to_contact; SalesCrMemoHeader."Sell-to Contact")
+                {
+                }
+                fieldelement(your_reference; SalesCrMemoHeader."Your Reference")
                 {
                 }
                 textelement(salescrmemolines)
@@ -212,13 +232,13 @@ xmlport 6151402 "Magento Document Export"
                     MaxOccurs = Once;
                     MinOccurs = Zero;
                     XmlName = 'lines';
-                    tableelement(salescrmemoline;"Sales Cr.Memo Line")
+                    tableelement(salescrmemoline; "Sales Cr.Memo Line")
                     {
-                        LinkFields = "Document No."=FIELD("No.");
+                        LinkFields = "Document No." = FIELD ("No.");
                         LinkTable = SalesCrMemoHeader;
                         MinOccurs = Zero;
                         XmlName = 'line';
-                        fieldattribute(line_no;SalesCrMemoLine."Line No.")
+                        fieldattribute(line_no; SalesCrMemoLine."Line No.")
                         {
                         }
                         textelement(salescrmemolinetype)
@@ -228,14 +248,14 @@ xmlport 6151402 "Magento Document Export"
                             trigger OnBeforePassVariable()
                             begin
                                 //-MAG2.12 [309647]
-                                LineTypeList.TryGetValue(SalesCrMemoLine.Type,SalesCrMemoLineType);
+                                LineTypeList.TryGetValue(SalesCrMemoLine.Type, SalesCrMemoLineType);
                                 //+MAG2.12 [309647]
                             end;
                         }
-                        fieldelement(no;SalesCrMemoLine."No.")
+                        fieldelement(no; SalesCrMemoLine."No.")
                         {
                         }
-                        fieldelement(variant_code;SalesCrMemoLine."Variant Code")
+                        fieldelement(variant_code; SalesCrMemoLine."Variant Code")
                         {
                         }
                         textelement(salescrmemolineexternalno)
@@ -248,29 +268,29 @@ xmlport 6151402 "Magento Document Export"
                                 //-MAG2.12 [309647]
                                 SalesCrMemoLineExternalNo := SalesCrMemoLine."No.";
                                 if SalesCrMemoLine."Variant Code" <> '' then
-                                  SalesCrMemoLineExternalNo += '_' + SalesCrMemoLine."Variant Code";
+                                    SalesCrMemoLineExternalNo += '_' + SalesCrMemoLine."Variant Code";
                                 //+MAG2.12 [309647]
                             end;
                         }
-                        fieldelement(quantity;SalesCrMemoLine.Quantity)
+                        fieldelement(quantity; SalesCrMemoLine.Quantity)
                         {
                         }
-                        fieldelement(unit_price;SalesCrMemoLine."Unit Price")
+                        fieldelement(unit_price; SalesCrMemoLine."Unit Price")
                         {
                         }
-                        fieldelement(line_discount_pct;SalesCrMemoLine."Line Discount %")
+                        fieldelement(line_discount_pct; SalesCrMemoLine."Line Discount %")
                         {
                         }
-                        fieldelement(line_discount_amount;SalesCrMemoLine."Line Discount Amount")
+                        fieldelement(line_discount_amount; SalesCrMemoLine."Line Discount Amount")
                         {
                         }
-                        fieldelement(amount;SalesCrMemoLine.Amount)
+                        fieldelement(amount; SalesCrMemoLine.Amount)
                         {
                         }
-                        fieldelement(vat_pct;SalesCrMemoLine."VAT %")
+                        fieldelement(vat_pct; SalesCrMemoLine."VAT %")
                         {
                         }
-                        fieldelement(amount_including_vat;SalesCrMemoLine."Amount Including VAT")
+                        fieldelement(amount_including_vat; SalesCrMemoLine."Amount Including VAT")
                         {
                         }
 
@@ -279,7 +299,7 @@ xmlport 6151402 "Magento Document Export"
 
                             //+MAG2.20 [345376]
                             if (HideLines) then
-                              currXMLport.Break ();
+                                currXMLport.Break();
                             //+MAG2.20 [345376]
                         end;
                     }
@@ -289,11 +309,11 @@ xmlport 6151402 "Magento Document Export"
                     MaxOccurs = Once;
                     MinOccurs = Zero;
                     XmlName = 'relateddocuments';
-                    tableelement(tmpdocumentsearchresultcrmemo;"Document Search Result")
+                    tableelement(tmpdocumentsearchresultcrmemo; "Document Search Result")
                     {
                         MinOccurs = Zero;
                         XmlName = 'document';
-                        SourceTableView = WHERE("Doc. Type"=FILTER(<100));
+                        SourceTableView = WHERE ("Doc. Type" = FILTER (< 100));
                         UseTemporary = true;
                         textattribute(relatedtypecrmemo)
                         {
@@ -301,13 +321,13 @@ xmlport 6151402 "Magento Document Export"
 
                             trigger OnBeforePassVariable()
                             begin
-                                RelatedTypeCrMemo := GetRelatedDocTypeAsText (TmpDocumentSearchResultCrMemo."Doc. Type");
+                                RelatedTypeCrMemo := GetRelatedDocTypeAsText(TmpDocumentSearchResultCrMemo."Doc. Type");
                             end;
                         }
-                        fieldattribute(number;TmpDocumentSearchResultCrMemo."Doc. No.")
+                        fieldattribute(number; TmpDocumentSearchResultCrMemo."Doc. No.")
                         {
                         }
-                        fieldattribute(package_tracking_no;TmpDocumentSearchResultCrMemo.Description)
+                        fieldattribute(package_tracking_no; TmpDocumentSearchResultCrMemo.Description)
                         {
                             Occurrence = Optional;
                         }
@@ -320,8 +340,8 @@ xmlport 6151402 "Magento Document Export"
                             begin
                                 //-MAG2.22 [345376]
                                 CrMemo_ShipmentMethod := '';
-                                if (TmpDocumentSearchResultCrMemo.Get (120, TmpDocumentSearchResultCrMemo."Doc. No.", 0)) then
-                                  CrMemo_ShipmentMethod := TmpDocumentSearchResultCrMemo.Description;
+                                if (TmpDocumentSearchResultCrMemo.Get(120, TmpDocumentSearchResultCrMemo."Doc. No.", 0)) then
+                                    CrMemo_ShipmentMethod := TmpDocumentSearchResultCrMemo.Description;
                                 //+MAG2.22 [345376]
                             end;
                         }
@@ -333,34 +353,34 @@ xmlport 6151402 "Magento Document Export"
 
                     //-MAG2.20 [345376]
                     if (TmpDocumentSearchResultCrMemo.IsTemporary()) then
-                      TmpDocumentSearchResultCrMemo.DeleteAll ();
+                        TmpDocumentSearchResultCrMemo.DeleteAll();
 
-                    GetRelatedDocs (SalesCrMemoHeader."Return Order No.", SalesCrMemoHeader."No.", TmpDocumentSearchResultCrMemo);
+                    GetRelatedDocs(SalesCrMemoHeader."Return Order No.", SalesCrMemoHeader."No.", TmpDocumentSearchResultCrMemo);
 
                     if (SalesCrMemoHeader."Currency Code" = '') then
-                      SalesCrMemoHeader."Currency Code" := GeneralLedgerSetup."LCY Code";
+                        SalesCrMemoHeader."Currency Code" := GeneralLedgerSetup."LCY Code";
                     //+MAG2.20 [345376]
                 end;
 
                 trigger OnPreXmlItem()
                 begin
                     if not ExportCrMemos then
-                      SalesCrMemoHeader.SetFilter("No.",'=%1&<>%1','');
+                        SalesCrMemoHeader.SetFilter("No.", '=%1&<>%1', '');
 
-                    SalesCrMemoHeader.SetRange("Posting Date",StartDate,EndDate);
-                    SalesCrMemoHeader.SetRange("Bill-to Customer No.",CustomerNo);
+                    SalesCrMemoHeader.SetRange("Posting Date", StartDate, EndDate);
+                    SalesCrMemoHeader.SetRange("Bill-to Customer No.", CustomerNo);
 
                     //-MAG2.20 [345376]
                     if (DocumentNumber <> '') then
-                      SalesCrMemoHeader.SetRange ("No.", DocumentNumber);
+                        SalesCrMemoHeader.SetRange("No.", DocumentNumber);
                     //+MAG2.20 [345376]
                 end;
             }
-            tableelement(salesheader;"Sales Header")
+            tableelement(salesheader; "Sales Header")
             {
                 MinOccurs = Zero;
                 XmlName = 'order';
-                fieldattribute(no;SalesHeader."No.")
+                fieldattribute(no; SalesHeader."No.")
                 {
                 }
                 textattribute(salesheaderdoctype)
@@ -369,31 +389,37 @@ xmlport 6151402 "Magento Document Export"
 
                     trigger OnBeforePassVariable()
                     begin
-                        SalesHeaderDocType := GetOrderDocTypeAsText (SalesHeader);
+                        SalesHeaderDocType := GetOrderDocTypeAsText(SalesHeader);
                     end;
                 }
-                fieldelement(ext_no;SalesHeader."External Order No.")
+                fieldelement(ext_no; SalesHeader."External Order No.")
                 {
                 }
-                fieldelement(posting_date;SalesHeader."Posting Date")
+                fieldelement(posting_date; SalesHeader."Posting Date")
                 {
                 }
-                fieldelement(amount_excl_vat;SalesHeader.Amount)
+                fieldelement(amount_excl_vat; SalesHeader.Amount)
                 {
                 }
-                fieldelement(amount_incl_vat;SalesHeader."Amount Including VAT")
+                fieldelement(amount_incl_vat; SalesHeader."Amount Including VAT")
                 {
                 }
-                fieldelement(order_date;SalesHeader."Order Date")
+                fieldelement(order_date; SalesHeader."Order Date")
                 {
                 }
-                fieldelement(requested_delivery_date;SalesHeader."Requested Delivery Date")
+                fieldelement(requested_delivery_date; SalesHeader."Requested Delivery Date")
                 {
                 }
-                fieldelement(salesperson_code;SalesHeader."Salesperson Code")
+                fieldelement(salesperson_code; SalesHeader."Salesperson Code")
                 {
                 }
-                fieldelement(currency_code;SalesHeader."Currency Code")
+                fieldelement(currency_code; SalesHeader."Currency Code")
+                {
+                }
+                fieldelement(sell_to_contact; SalesHeader."Sell-to Contact")
+                {
+                }
+                fieldelement(your_reference; SalesHeader."Your Reference")
                 {
                 }
                 textelement(saleslines)
@@ -401,13 +427,13 @@ xmlport 6151402 "Magento Document Export"
                     MaxOccurs = Once;
                     MinOccurs = Zero;
                     XmlName = 'lines';
-                    tableelement(salesline;"Sales Line")
+                    tableelement(salesline; "Sales Line")
                     {
-                        LinkFields = "Document Type"=FIELD("Document Type"),"Document No."=FIELD("No.");
+                        LinkFields = "Document Type" = FIELD ("Document Type"), "Document No." = FIELD ("No.");
                         LinkTable = SalesHeader;
                         MinOccurs = Zero;
                         XmlName = 'line';
-                        fieldattribute(line_no;SalesLine."Line No.")
+                        fieldattribute(line_no; SalesLine."Line No.")
                         {
                         }
                         textelement(saleslinetype)
@@ -417,14 +443,14 @@ xmlport 6151402 "Magento Document Export"
                             trigger OnBeforePassVariable()
                             begin
                                 //-MAG2.12 [309647]
-                                LineTypeList.TryGetValue(SalesLine.Type,SalesLineType);
+                                LineTypeList.TryGetValue(SalesLine.Type, SalesLineType);
                                 //+MAG2.12 [309647]
                             end;
                         }
-                        fieldelement(no;SalesLine."No.")
+                        fieldelement(no; SalesLine."No.")
                         {
                         }
-                        fieldelement(variant_code;SalesLine."Variant Code")
+                        fieldelement(variant_code; SalesLine."Variant Code")
                         {
                         }
                         textelement(saleslineexternalno)
@@ -437,38 +463,38 @@ xmlport 6151402 "Magento Document Export"
                                 //-MAG2.12 [309647]
                                 SalesLineExternalNo := SalesLine."No.";
                                 if SalesLine."Variant Code" <> '' then
-                                  SalesLineExternalNo += '_' + SalesLine."Variant Code";
+                                    SalesLineExternalNo += '_' + SalesLine."Variant Code";
                                 //+MAG2.12 [309647]
                             end;
                         }
-                        fieldelement(quantity;SalesLine.Quantity)
+                        fieldelement(quantity; SalesLine.Quantity)
                         {
                         }
-                        fieldelement(unit_price;SalesLine."Unit Price")
+                        fieldelement(unit_price; SalesLine."Unit Price")
                         {
                         }
-                        fieldelement(line_discount_pct;SalesLine."Line Discount %")
+                        fieldelement(line_discount_pct; SalesLine."Line Discount %")
                         {
                         }
-                        fieldelement(line_discount_amount;SalesLine."Line Discount Amount")
+                        fieldelement(line_discount_amount; SalesLine."Line Discount Amount")
                         {
                         }
-                        fieldelement(amount;SalesLine.Amount)
+                        fieldelement(amount; SalesLine.Amount)
                         {
                         }
-                        fieldelement(vat_pct;SalesLine."VAT %")
+                        fieldelement(vat_pct; SalesLine."VAT %")
                         {
                         }
-                        fieldelement(amount_including_vat;SalesLine."Amount Including VAT")
+                        fieldelement(amount_including_vat; SalesLine."Amount Including VAT")
                         {
                         }
-                        fieldelement(planned_delivery_date;SalesLine."Planned Delivery Date")
+                        fieldelement(planned_delivery_date; SalesLine."Planned Delivery Date")
                         {
                         }
-                        fieldelement(description;SalesLine.Description)
+                        fieldelement(description; SalesLine.Description)
                         {
                         }
-                        fieldelement(outstanding_quantity;SalesLine."Outstanding Quantity")
+                        fieldelement(outstanding_quantity; SalesLine."Outstanding Quantity")
                         {
                         }
 
@@ -477,7 +503,7 @@ xmlport 6151402 "Magento Document Export"
 
                             //+MAG2.20 [345376]
                             if (HideLines) then
-                              currXMLport.Break ();
+                                currXMLport.Break();
                             //+MAG2.20 [345376]
                         end;
                     }
@@ -487,11 +513,11 @@ xmlport 6151402 "Magento Document Export"
                     MaxOccurs = Once;
                     MinOccurs = Zero;
                     XmlName = 'relateddocuments';
-                    tableelement(tmpdocumentsearchresultorder;"Document Search Result")
+                    tableelement(tmpdocumentsearchresultorder; "Document Search Result")
                     {
                         MinOccurs = Zero;
                         XmlName = 'document';
-                        SourceTableView = WHERE("Doc. Type"=FILTER(<100));
+                        SourceTableView = WHERE ("Doc. Type" = FILTER (< 100));
                         UseTemporary = true;
                         textattribute(relatedtypeorder)
                         {
@@ -501,14 +527,14 @@ xmlport 6151402 "Magento Document Export"
                             begin
 
                                 //-MAG2.20 [345376]
-                                RelatedTypeOrder := GetRelatedDocTypeAsText (TmpDocumentSearchResultOrder."Doc. Type");
+                                RelatedTypeOrder := GetRelatedDocTypeAsText(TmpDocumentSearchResultOrder."Doc. Type");
                                 //+MAG2.20 [345376]
                             end;
                         }
-                        fieldattribute(number;TmpDocumentSearchResultOrder."Doc. No.")
+                        fieldattribute(number; TmpDocumentSearchResultOrder."Doc. No.")
                         {
                         }
-                        fieldattribute(package_tracking_no;TmpDocumentSearchResultOrder.Description)
+                        fieldattribute(package_tracking_no; TmpDocumentSearchResultOrder.Description)
                         {
                             Occurrence = Optional;
                         }
@@ -521,8 +547,8 @@ xmlport 6151402 "Magento Document Export"
                             begin
                                 //-MAG2.22 [345376]
                                 Order_ShipmentMethod := '';
-                                if (TmpDocumentSearchResultOrder.Get (120, TmpDocumentSearchResultOrder."Doc. No.", 0)) then
-                                  Order_ShipmentMethod := TmpDocumentSearchResultOrder.Description;
+                                if (TmpDocumentSearchResultOrder.Get(120, TmpDocumentSearchResultOrder."Doc. No.", 0)) then
+                                    Order_ShipmentMethod := TmpDocumentSearchResultOrder.Description;
                                 //+MAG2.22 [345376]
                             end;
                         }
@@ -534,12 +560,12 @@ xmlport 6151402 "Magento Document Export"
 
                     //-MAG2.20 [345376]
                     if (TmpDocumentSearchResultOrder.IsTemporary()) then
-                      TmpDocumentSearchResultOrder.DeleteAll ();
+                        TmpDocumentSearchResultOrder.DeleteAll();
 
-                    GetRelatedDocs (SalesHeader."No.", SalesHeader."No.", TmpDocumentSearchResultOrder);
+                    GetRelatedDocs(SalesHeader."No.", SalesHeader."No.", TmpDocumentSearchResultOrder);
 
                     if (SalesHeader."Currency Code" = '') then
-                      SalesHeader."Currency Code" := GeneralLedgerSetup."LCY Code";
+                        SalesHeader."Currency Code" := GeneralLedgerSetup."LCY Code";
                     //+MAG2.20 [345376]
                 end;
 
@@ -547,61 +573,67 @@ xmlport 6151402 "Magento Document Export"
                 begin
                     //-MAG2.03
                     if not ExportOrders then
-                      SalesHeader.SetFilter("No.",'=%1&<>%1','');
+                        SalesHeader.SetFilter("No.", '=%1&<>%1', '');
 
-                    SalesHeader.SetRange("Bill-to Customer No.",CustomerNo);
-                    SalesHeader.SetRange("Posting Date",StartDate,EndDate);
+                    SalesHeader.SetRange("Bill-to Customer No.", CustomerNo);
+                    SalesHeader.SetRange("Posting Date", StartDate, EndDate);
 
                     //-MAG2.20 [345376]
                     if (DocumentNumber <> '') then
-                      SalesHeader.SetRange ("No.", DocumentNumber);
+                        SalesHeader.SetRange("No.", DocumentNumber);
                     //+MAG2.20 [345376]
 
                     //+MAG2.03
                 end;
             }
-            tableelement(salesshipmentheader;"Sales Shipment Header")
+            tableelement(salesshipmentheader; "Sales Shipment Header")
             {
                 MinOccurs = Zero;
                 XmlName = 'shipment';
-                fieldattribute(no;SalesShipmentHeader."No.")
+                fieldattribute(no; SalesShipmentHeader."No.")
                 {
                 }
-                fieldelement(posting_date;SalesShipmentHeader."Posting Date")
+                fieldelement(posting_date; SalesShipmentHeader."Posting Date")
                 {
                 }
-                fieldelement(order_date;SalesShipmentHeader."Order Date")
+                fieldelement(order_date; SalesShipmentHeader."Order Date")
                 {
                 }
-                fieldelement(currency_code;SalesShipmentHeader."Currency Code")
+                fieldelement(currency_code; SalesShipmentHeader."Currency Code")
+                {
+                }
+                fieldelement(sell_to_contact; SalesShipmentHeader."Sell-to Contact")
+                {
+                }
+                fieldelement(your_reference; SalesShipmentHeader."Your Reference")
                 {
                 }
                 textelement(shipment_address)
                 {
                     MaxOccurs = Once;
                     XmlName = 'address';
-                    fieldattribute(no;SalesShipmentHeader."Ship-to Code")
+                    fieldattribute(no; SalesShipmentHeader."Ship-to Code")
                     {
                     }
-                    fieldelement(name;SalesShipmentHeader."Ship-to Name")
+                    fieldelement(name; SalesShipmentHeader."Ship-to Name")
                     {
                     }
-                    fieldelement(name2;SalesShipmentHeader."Ship-to Name 2")
+                    fieldelement(name2; SalesShipmentHeader."Ship-to Name 2")
                     {
                     }
-                    fieldelement(address;SalesShipmentHeader."Ship-to Address")
+                    fieldelement(address; SalesShipmentHeader."Ship-to Address")
                     {
                     }
-                    fieldelement(address2;SalesShipmentHeader."Ship-to Address 2")
+                    fieldelement(address2; SalesShipmentHeader."Ship-to Address 2")
                     {
                     }
-                    fieldelement(postcode;SalesShipmentHeader."Ship-to Post Code")
+                    fieldelement(postcode; SalesShipmentHeader."Ship-to Post Code")
                     {
                     }
-                    fieldelement(city;SalesShipmentHeader."Ship-to City")
+                    fieldelement(city; SalesShipmentHeader."Ship-to City")
                     {
                     }
-                    fieldelement(contact;SalesShipmentHeader."Ship-to Contact")
+                    fieldelement(contact; SalesShipmentHeader."Ship-to Contact")
                     {
                     }
                 }
@@ -609,22 +641,22 @@ xmlport 6151402 "Magento Document Export"
                 {
                     MaxOccurs = Once;
                     XmlName = 'details';
-                    fieldelement(shipment_date;SalesShipmentHeader."Shipment Date")
+                    fieldelement(shipment_date; SalesShipmentHeader."Shipment Date")
                     {
                     }
-                    fieldelement(shipment_method_code;SalesShipmentHeader."Shipment Method Code")
+                    fieldelement(shipment_method_code; SalesShipmentHeader."Shipment Method Code")
                     {
                     }
-                    fieldelement(shipping_agent_code;SalesShipmentHeader."Shipping Agent Code")
+                    fieldelement(shipping_agent_code; SalesShipmentHeader."Shipping Agent Code")
                     {
                     }
-                    fieldelement(shipping_agent_service_code;SalesShipmentHeader."Shipping Agent Service Code")
+                    fieldelement(shipping_agent_service_code; SalesShipmentHeader."Shipping Agent Service Code")
                     {
                     }
-                    fieldelement(package_tracking_no;SalesShipmentHeader."Package Tracking No.")
+                    fieldelement(package_tracking_no; SalesShipmentHeader."Package Tracking No.")
                     {
                     }
-                    fieldelement(number_of_packages;SalesShipmentHeader.Kolli)
+                    fieldelement(number_of_packages; SalesShipmentHeader.Kolli)
                     {
                     }
                 }
@@ -633,13 +665,13 @@ xmlport 6151402 "Magento Document Export"
                     MaxOccurs = Once;
                     MinOccurs = Zero;
                     XmlName = 'lines';
-                    tableelement(salesshipmentline;"Sales Shipment Line")
+                    tableelement(salesshipmentline; "Sales Shipment Line")
                     {
-                        LinkFields = "Document No."=FIELD("No.");
+                        LinkFields = "Document No." = FIELD ("No.");
                         LinkTable = SalesShipmentHeader;
                         MinOccurs = Zero;
                         XmlName = 'line';
-                        fieldattribute(line_no;SalesShipmentLine."Line No.")
+                        fieldattribute(line_no; SalesShipmentLine."Line No.")
                         {
                         }
                         textelement(shipmentlinetype)
@@ -650,23 +682,23 @@ xmlport 6151402 "Magento Document Export"
                             begin
 
                                 //-MAG2.20 [345376]
-                                LineTypeList.TryGetValue (SalesShipmentLine.Type, ShipmentLineType);
+                                LineTypeList.TryGetValue(SalesShipmentLine.Type, ShipmentLineType);
                                 //+MAG2.20 [345376]
                             end;
                         }
-                        fieldelement(no;SalesShipmentLine."No.")
+                        fieldelement(no; SalesShipmentLine."No.")
                         {
                         }
-                        fieldelement(variant_code;SalesShipmentLine."Variant Code")
+                        fieldelement(variant_code; SalesShipmentLine."Variant Code")
                         {
                         }
                         textelement(external_no)
                         {
                         }
-                        fieldelement(quantity;SalesShipmentLine.Quantity)
+                        fieldelement(quantity; SalesShipmentLine.Quantity)
                         {
                         }
-                        fieldelement(description;SalesShipmentLine.Description)
+                        fieldelement(description; SalesShipmentLine.Description)
                         {
                         }
 
@@ -675,7 +707,7 @@ xmlport 6151402 "Magento Document Export"
 
                             //+MAG2.20 [345376]
                             if (HideLines) then
-                              currXMLport.Break ();
+                                currXMLport.Break();
                             //+MAG2.20 [345376]
                         end;
                     }
@@ -684,10 +716,10 @@ xmlport 6151402 "Magento Document Export"
                 {
                     MaxOccurs = Once;
                     MinOccurs = Zero;
-                    tableelement(tmpdocsearchresultshipment;"Document Search Result")
+                    tableelement(tmpdocsearchresultshipment; "Document Search Result")
                     {
                         XmlName = 'document';
-                        SourceTableView = WHERE("Doc. Type"=FILTER(<100));
+                        SourceTableView = WHERE ("Doc. Type" = FILTER (< 100));
                         UseTemporary = true;
                         textattribute(relatedtypeshipment)
                         {
@@ -696,14 +728,14 @@ xmlport 6151402 "Magento Document Export"
                             trigger OnBeforePassVariable()
                             begin
                                 //-MAG2.20 [345376]
-                                RelatedTypeShipment := GetRelatedDocTypeAsText (TmpDocSearchResultShipment."Doc. Type");
+                                RelatedTypeShipment := GetRelatedDocTypeAsText(TmpDocSearchResultShipment."Doc. Type");
                                 //+MAG2.20 [345376]
                             end;
                         }
-                        fieldattribute(number;TmpDocSearchResultShipment."Doc. No.")
+                        fieldattribute(number; TmpDocSearchResultShipment."Doc. No.")
                         {
                         }
-                        fieldattribute(package_tracking_no;TmpDocSearchResultShipment.Description)
+                        fieldattribute(package_tracking_no; TmpDocSearchResultShipment.Description)
                         {
                             Occurrence = Optional;
                         }
@@ -716,8 +748,8 @@ xmlport 6151402 "Magento Document Export"
                             begin
                                 //-MAG2.22 [345376]
                                 Shipment_ShipmentMethod := '';
-                                if (TmpDocSearchResultShipment.Get (120, TmpDocSearchResultShipment."Doc. No.", 0)) then
-                                  Shipment_ShipmentMethod := TmpDocSearchResultShipment.Description;
+                                if (TmpDocSearchResultShipment.Get(120, TmpDocSearchResultShipment."Doc. No.", 0)) then
+                                    Shipment_ShipmentMethod := TmpDocSearchResultShipment.Description;
                                 //+MAG2.22 [345376]
                             end;
                         }
@@ -729,12 +761,12 @@ xmlport 6151402 "Magento Document Export"
 
                     //-MAG2.20 [345376]
                     if (TmpDocSearchResultShipment.IsTemporary()) then
-                      TmpDocSearchResultShipment.DeleteAll ();
+                        TmpDocSearchResultShipment.DeleteAll();
 
-                    GetRelatedDocs (SalesShipmentHeader."Order No.", SalesShipmentHeader."No.", TmpDocSearchResultShipment);
+                    GetRelatedDocs(SalesShipmentHeader."Order No.", SalesShipmentHeader."No.", TmpDocSearchResultShipment);
 
                     if (SalesShipmentHeader."Currency Code" = '') then
-                      SalesShipmentHeader."Currency Code" := GeneralLedgerSetup."LCY Code";
+                        SalesShipmentHeader."Currency Code" := GeneralLedgerSetup."LCY Code";
                     //+MAG2.20 [345376]
                 end;
 
@@ -743,14 +775,176 @@ xmlport 6151402 "Magento Document Export"
 
                     //-MAG2.20 [345376]
                     if not ExportShipments then
-                      SalesShipmentHeader.SetFilter("No.",'=%1&<>%1','');
+                        SalesShipmentHeader.SetFilter("No.", '=%1&<>%1', '');
 
-                    SalesShipmentHeader.SetRange ("Posting Date", StartDate, EndDate);
-                    SalesShipmentHeader.SetRange ("Bill-to Customer No.", CustomerNo);
+                    SalesShipmentHeader.SetRange("Posting Date", StartDate, EndDate);
+                    SalesShipmentHeader.SetRange("Bill-to Customer No.", CustomerNo);
 
                     if (DocumentNumber <> '') then
-                      SalesShipmentHeader.SetRange ("No.", DocumentNumber);
+                        SalesShipmentHeader.SetRange("No.", DocumentNumber);
                     //+MAG2.20 [345376]
+                end;
+            }
+            tableelement(salesquote; "Sales Header")
+            {
+                MinOccurs = Zero;
+                XmlName = 'quote';
+                fieldattribute(no; SalesQuote."No.")
+                {
+                }
+                textattribute(salesquotedoctype)
+                {
+                    XmlName = 'document_type';
+
+                    trigger OnBeforePassVariable()
+                    begin
+
+                        SalesQuoteDocType := GetOrderDocTypeAsText(SalesQuote);
+                    end;
+                }
+                fieldelement(ext_no; SalesQuote."External Order No.")
+                {
+                }
+                fieldelement(posting_date; SalesQuote."Posting Date")
+                {
+                }
+                fieldelement(amount_excl_vat; SalesQuote.Amount)
+                {
+                }
+                fieldelement(amount_incl_vat; SalesQuote."Amount Including VAT")
+                {
+                }
+                fieldelement(order_date; SalesQuote."Order Date")
+                {
+                }
+                fieldelement(requested_delivery_date; SalesQuote."Requested Delivery Date")
+                {
+                }
+                fieldelement(salesperson_code; SalesQuote."Salesperson Code")
+                {
+                }
+                fieldelement(currency_code; SalesQuote."Currency Code")
+                {
+                }
+                fieldelement(sell_to_contact; SalesQuote."Sell-to Contact")
+                {
+                }
+                fieldelement(your_reference; SalesQuote."Your Reference")
+                {
+                }
+                textelement(quotelines)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                    XmlName = 'lines';
+                    tableelement(quoteline; "Sales Line")
+                    {
+                        LinkFields = "Document Type" = FIELD ("Document Type"), "Document No." = FIELD ("No.");
+                        LinkTable = SalesQuote;
+                        MinOccurs = Zero;
+                        XmlName = 'line';
+                        fieldattribute(line_no; QuoteLine."Line No.")
+                        {
+                        }
+                        textelement(quotelinetype)
+                        {
+                            XmlName = 'type';
+
+                            trigger OnBeforePassVariable()
+                            begin
+
+                                LineTypeList.TryGetValue(SalesLine.Type, QuoteLineType);
+                            end;
+                        }
+                        fieldelement(no; QuoteLine."No.")
+                        {
+                        }
+                        fieldelement(variant_code; QuoteLine."Variant Code")
+                        {
+                        }
+                        textelement(quotelineexternalno)
+                        {
+                            MaxOccurs = Once;
+                            XmlName = 'external_no';
+
+                            trigger OnBeforePassVariable()
+                            begin
+
+                                QuoteLineExternalNo := SalesLine."No.";
+                                if SalesLine."Variant Code" <> '' then
+                                    QuoteLineExternalNo += '_' + SalesLine."Variant Code";
+                            end;
+                        }
+                        fieldelement(quantity; QuoteLine.Quantity)
+                        {
+                        }
+                        fieldelement(unit_price; QuoteLine."Unit Price")
+                        {
+                        }
+                        fieldelement(line_discount_pct; QuoteLine."Line Discount %")
+                        {
+                        }
+                        fieldelement(line_discount_amount; QuoteLine."Line Discount Amount")
+                        {
+                        }
+                        fieldelement(amount; QuoteLine.Amount)
+                        {
+                        }
+                        fieldelement(vat_pct; QuoteLine."VAT %")
+                        {
+                        }
+                        fieldelement(amount_including_vat; QuoteLine."Amount Including VAT")
+                        {
+                        }
+                        fieldelement(planned_delivery_date; QuoteLine."Planned Delivery Date")
+                        {
+                        }
+                        fieldelement(description; QuoteLine.Description)
+                        {
+                        }
+                        fieldelement(outstanding_quantity; QuoteLine."Outstanding Quantity")
+                        {
+                        }
+
+                        trigger OnPreXmlItem()
+                        begin
+
+                            if (HideLines) then
+                                currXMLport.Break();
+                        end;
+                    }
+                }
+                textelement(relateddocumentsquote)
+                {
+                    MaxOccurs = Once;
+                    MinOccurs = Zero;
+                    XmlName = 'relateddocuments';
+                }
+
+                trigger OnAfterGetRecord()
+                begin
+
+                    if (TmpDocumentSearchResultOrder.IsTemporary()) then
+                        TmpDocumentSearchResultOrder.DeleteAll();
+
+                    if (SalesQuote."Currency Code" = '') then
+                        SalesQuote."Currency Code" := GeneralLedgerSetup."LCY Code";
+
+                    if (SalesQuote."Due Date" < Today) then
+                        currXMLport.Skip;
+                end;
+
+                trigger OnPreXmlItem()
+                begin
+
+                    if not ExportQuotes then
+                        SalesHeader.SetFilter("No.", '=%1&<>%1', '');
+
+                    SalesHeader.SetRange("Bill-to Customer No.", CustomerNo);
+                    SalesHeader.SetRange("Posting Date", StartDate, EndDate);
+
+                    if (DocumentNumber <> '') then
+                        SalesHeader.SetRange("No.", DocumentNumber);
                 end;
             }
         }
@@ -779,7 +973,7 @@ xmlport 6151402 "Magento Document Export"
     begin
 
         //-MAG2.20 [345376]
-        GeneralLedgerSetup.Get ();
+        GeneralLedgerSetup.Get();
         //+MAG2.20 [345376]
     end;
 
@@ -795,8 +989,9 @@ xmlport 6151402 "Magento Document Export"
         DocumentNumber: Code[20];
         ExportShipments: Boolean;
         HideLines: Boolean;
+        ExportQuotes: Boolean;
 
-    procedure SetFilters(NewCustomerNo: Code[20];NewDocumentNo: Code[20];NewStartDate: Date;NewEndDate: Date;NewHideLines: Boolean;NewExportInvoices: Boolean;NewExportCrMemos: Boolean;NewExportOrders: Boolean;NewExportShipments: Boolean)
+    procedure SetFilters(NewCustomerNo: Code[20]; NewDocumentNo: Code[20]; NewStartDate: Date; NewEndDate: Date; NewHideLines: Boolean; NewExportInvoices: Boolean; NewExportCrMemos: Boolean; NewExportOrders: Boolean; NewExportShipments: Boolean)
     begin
 
         CustomerNo := NewCustomerNo;
@@ -808,11 +1003,35 @@ xmlport 6151402 "Magento Document Export"
         ExportOrders := NewExportOrders;
         //+MAG2.03
 
+        //-MAG2.25 [388058]
+        ExportQuotes := false;
+        //+MAG2.25 [388058]
+
         //-MAG2.20 [345376]
         DocumentNumber := NewDocumentNo;
         ExportShipments := NewExportShipments;
         HideLines := NewHideLines;
         //+MAG2.20 [345376]
+    end;
+
+    procedure SetQuoteFilter(NewCustomerNo: Code[20]; NewDocumentNo: Code[20]; NewStartDate: Date; NewEndDate: Date; NewHideLines: Boolean)
+    begin
+
+        //-MAG2.25 [388058]
+        CustomerNo := NewCustomerNo;
+        EndDate := NewEndDate;
+        StartDate := NewStartDate;
+
+        DocumentNumber := NewDocumentNo;
+        HideLines := NewHideLines;
+
+        ExportQuotes := true;
+
+        ExportCrMemos := false;
+        ExportInvoices := false;
+        ExportOrders := false;
+        ExportShipments := false;
+        //+MAG2.25 [388058]
     end;
 
     local procedure InitLineTypeList()
@@ -831,19 +1050,19 @@ xmlport 6151402 "Magento Document Export"
         FieldRef := RecRef.Field(SalesInvLine.FieldNo(Type));
         OptionString := FieldRef.OptionString;
         while OptionString <> '' do begin
-          Position := StrPos(OptionString,',');
-          if Position = 0 then
-            Position := StrLen(OptionString) + 1;
-          LineType := DelStr(OptionString,Position);
-          LineTypeList.Add(i,LineType);
+            Position := StrPos(OptionString, ',');
+            if Position = 0 then
+                Position := StrLen(OptionString) + 1;
+            LineType := DelStr(OptionString, Position);
+            LineTypeList.Add(i, LineType);
 
-          i += 1;
-          OptionString := DelStr(OptionString,1,Position);
+            i += 1;
+            OptionString := DelStr(OptionString, 1, Position);
         end;
         //+MAG2.12 [309647]
     end;
 
-    local procedure GetRelatedDocs(DocumentNumber: Code[20];LinkedFromDocNo: Code[20];var TmpDocumentSearchResult: Record "Document Search Result" temporary)
+    local procedure GetRelatedDocs(DocumentNumber: Code[20]; LinkedFromDocNo: Code[20]; var TmpDocumentSearchResult: Record "Document Search Result" temporary)
     var
         LocalSalesShipmentHeader: Record "Sales Shipment Header";
         LocalOrder: Record "Sales Header";
@@ -853,61 +1072,61 @@ xmlport 6151402 "Magento Document Export"
     begin
 
         if (DocumentNumber = '') then
-          exit;
+            exit;
 
-        LocalOrder.SetFilter ("No.", '=%1', DocumentNumber);
-        if (LocalOrder.FindSet ()) then begin
-          repeat
-            TmpDocumentSearchResult.Init;
-            TmpDocumentSearchResult."Doc. Type" := 10; //LocalOrder."Document Type";
-            TmpDocumentSearchResult."Doc. No." := LocalOrder."No.";
-            if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
-              if (TmpDocumentSearchResult.Insert ()) then;
-          until (LocalOrder.Next () = 0);
+        LocalOrder.SetFilter("No.", '=%1', DocumentNumber);
+        if (LocalOrder.FindSet()) then begin
+            repeat
+                TmpDocumentSearchResult.Init;
+                TmpDocumentSearchResult."Doc. Type" := 10; //LocalOrder."Document Type";
+                TmpDocumentSearchResult."Doc. No." := LocalOrder."No.";
+                if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
+                    if (TmpDocumentSearchResult.Insert()) then;
+            until (LocalOrder.Next() = 0);
         end;
 
-        LocalSalesShipmentHeader.SetFilter ("Order No.", '=%1', DocumentNumber);
-        if (LocalSalesShipmentHeader.FindSet ()) then begin
-          repeat
-            TmpDocumentSearchResult.Init;
-            TmpDocumentSearchResult."Doc. Type" := 20;
-            TmpDocumentSearchResult."Doc. No." := LocalSalesShipmentHeader."No.";
-            TmpDocumentSearchResult.Description := CopyStr (LocalSalesShipmentHeader."Package Tracking No.", 1, MaxStrLen (TmpDocumentSearchResult.Description));
-            if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
-              if (TmpDocumentSearchResult.Insert ()) then ;
+        LocalSalesShipmentHeader.SetFilter("Order No.", '=%1', DocumentNumber);
+        if (LocalSalesShipmentHeader.FindSet()) then begin
+            repeat
+                TmpDocumentSearchResult.Init;
+                TmpDocumentSearchResult."Doc. Type" := 20;
+                TmpDocumentSearchResult."Doc. No." := LocalSalesShipmentHeader."No.";
+                TmpDocumentSearchResult.Description := CopyStr(LocalSalesShipmentHeader."Package Tracking No.", 1, MaxStrLen(TmpDocumentSearchResult.Description));
+                if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
+                    if (TmpDocumentSearchResult.Insert()) then;
 
-            //-MAG2.22 [345376]
-            TmpDocumentSearchResult.Init;
-            TmpDocumentSearchResult."Doc. Type" := 120;
-            TmpDocumentSearchResult."Doc. No." := LocalSalesShipmentHeader."No.";
-            TmpDocumentSearchResult.Description := CopyStr (LocalSalesShipmentHeader."Shipment Method Code", 1, MaxStrLen (TmpDocumentSearchResult.Description));
-            if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
-              if (TmpDocumentSearchResult.Insert ()) then ;
-            //+MAG2.22 [345376]
+                //-MAG2.22 [345376]
+                TmpDocumentSearchResult.Init;
+                TmpDocumentSearchResult."Doc. Type" := 120;
+                TmpDocumentSearchResult."Doc. No." := LocalSalesShipmentHeader."No.";
+                TmpDocumentSearchResult.Description := CopyStr(LocalSalesShipmentHeader."Shipment Method Code", 1, MaxStrLen(TmpDocumentSearchResult.Description));
+                if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
+                    if (TmpDocumentSearchResult.Insert()) then;
+                //+MAG2.22 [345376]
 
-          until (LocalSalesShipmentHeader.Next () = 0);
+            until (LocalSalesShipmentHeader.Next() = 0);
         end;
 
-        LocalSalesInvoiceHeader.SetFilter ("Order No.", '=%1', DocumentNumber);
-        if (LocalSalesInvoiceHeader.FindSet ()) then begin
-          repeat
-            TmpDocumentSearchResult.Init;
-            TmpDocumentSearchResult."Doc. Type" := 30;
-            TmpDocumentSearchResult."Doc. No." := LocalSalesInvoiceHeader."No.";
-            if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
-              if (TmpDocumentSearchResult.Insert ()) then;
-          until (LocalSalesInvoiceHeader.Next () = 0);
+        LocalSalesInvoiceHeader.SetFilter("Order No.", '=%1', DocumentNumber);
+        if (LocalSalesInvoiceHeader.FindSet()) then begin
+            repeat
+                TmpDocumentSearchResult.Init;
+                TmpDocumentSearchResult."Doc. Type" := 30;
+                TmpDocumentSearchResult."Doc. No." := LocalSalesInvoiceHeader."No.";
+                if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
+                    if (TmpDocumentSearchResult.Insert()) then;
+            until (LocalSalesInvoiceHeader.Next() = 0);
         end;
 
-        LocalSalesCrMemoHeader.SetFilter ("Return Order No.", '=%1', DocumentNumber);
-        if (LocalSalesCrMemoHeader.FindSet ()) then begin
-          repeat
-            TmpDocumentSearchResult.Init;
-            TmpDocumentSearchResult."Doc. Type" := 40;
-            TmpDocumentSearchResult."Doc. No." := LocalSalesCrMemoHeader."No.";
-            if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
-              if (TmpDocumentSearchResult.Insert ()) then;
-          until (LocalSalesCrMemoHeader.Next () = 0);
+        LocalSalesCrMemoHeader.SetFilter("Return Order No.", '=%1', DocumentNumber);
+        if (LocalSalesCrMemoHeader.FindSet()) then begin
+            repeat
+                TmpDocumentSearchResult.Init;
+                TmpDocumentSearchResult."Doc. Type" := 40;
+                TmpDocumentSearchResult."Doc. No." := LocalSalesCrMemoHeader."No.";
+                if (TmpDocumentSearchResult."Doc. No." <> LinkedFromDocNo) then
+                    if (TmpDocumentSearchResult.Insert()) then;
+            until (LocalSalesCrMemoHeader.Next() = 0);
         end;
     end;
 
@@ -917,10 +1136,14 @@ xmlport 6151402 "Magento Document Export"
     begin
 
         case DocType of
-          10 : exit ('Order');
-          20 : exit ('Shipment');
-          30 : exit ('Invoice');
-          40 : exit ('Credit Memo');
+            10:
+                exit('Order');
+            20:
+                exit('Shipment');
+            30:
+                exit('Invoice');
+            40:
+                exit('Credit Memo');
         end;
     end;
 
@@ -928,12 +1151,18 @@ xmlport 6151402 "Magento Document Export"
     begin
 
         case LocalSalesHeader."Document Type" of
-          LocalSalesHeader."Document Type"::"Blanket Order" : exit ('Blank Order');
-          LocalSalesHeader."Document Type"::"Credit Memo"   : exit ('Credit Memo');
-          LocalSalesHeader."Document Type"::Invoice         : exit ('Invoice');
-          LocalSalesHeader."Document Type"::Quote           : exit ('Quote');
-          LocalSalesHeader."Document Type"::Order           : exit ('Order');
-          LocalSalesHeader."Document Type"::"Return Order"  : exit ('Return Order');
+            LocalSalesHeader."Document Type"::"Blanket Order":
+                exit('Blank Order');
+            LocalSalesHeader."Document Type"::"Credit Memo":
+                exit('Credit Memo');
+            LocalSalesHeader."Document Type"::Invoice:
+                exit('Invoice');
+            LocalSalesHeader."Document Type"::Quote:
+                exit('Quote');
+            LocalSalesHeader."Document Type"::Order:
+                exit('Order');
+            LocalSalesHeader."Document Type"::"Return Order":
+                exit('Return Order');
         end;
     end;
 }

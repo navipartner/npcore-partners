@@ -97,6 +97,7 @@ codeunit 6151199 "NpCs Collect Webservice"
         store_inventory.Import;
     end;
 
+    [Scope('Personalization')]
     procedure UpdateProcessingStatus(var collect_documents: XMLport "NpCs Collect Documents")
     var
         NpCsDocument: Record "NpCs Document";

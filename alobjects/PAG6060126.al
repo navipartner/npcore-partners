@@ -15,6 +15,7 @@ page 6060126 "MM Members"
     // MM1.41/TSA /20191007 CASE 365970 Update Contact
     // MM1.42/TSA /20191219 CASE 382728 Added Preferred Com. Method related action
     // MM1.42/TSA /20200114 CASE 385449 Added CreateMembership action
+    // MM1.43/ALPO/20191125 CASE 387750 Added Raptor integration page actions: Browsing History, Recommendations
 
     Caption = 'Members';
     CardPageID = "MM Member Card";
@@ -22,6 +23,7 @@ page 6060126 "MM Members"
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
+    PromotedActionCategories = 'New,Process,Report,History,Raptor';
     SourceTable = "MM Member";
     UsageCategory = Lists;
 
@@ -327,8 +329,69 @@ page 6060126 "MM Members"
                 RunObject = Page "MM Member Arrival Log";
                 RunPageLink = "External Member No." = FIELD("External Member No.");
             }
+            group("Raptor Integration")
+            {
+                Caption = 'Raptor Integration';
+                action(RaptorBrowsingHistory)
+                {
+                    Caption = 'Browsing History';
+                    Enabled = RaptorEnabled;
+                    Image = ViewRegisteredOrder;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    Visible = RaptorEnabled;
+
+                    trigger OnAction()
+                    var
+                        RaptorAction: Record "Raptor Action";
+                        RaptorMgt: Codeunit "Raptor Management";
+                    begin
+                        //-MM1.43 [387750]
+                        if (Membership."Customer No." = '') then
+                          Error(NO_ENTRIES,"External Member No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory,true,RaptorAction) then
+                          RaptorMgt.ShowRaptorData(RaptorAction,Membership."Customer No.");
+                        //+MM1.43 [387750]
+                    end;
+                }
+                action(RaptorReShowRaptorDatacommendations)
+                {
+                    Caption = 'Recommendations';
+                    Enabled = RaptorEnabled;
+                    Image = SuggestElectronicDocument;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    Visible = RaptorEnabled;
+
+                    trigger OnAction()
+                    var
+                        RaptorAction: Record "Raptor Action";
+                        RaptorMgt: Codeunit "Raptor Management";
+                    begin
+                        //-MM1.43 [387750]
+                        if (Membership."Customer No." = '') then
+                          Error(NO_ENTRIES,"External Member No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations,true,RaptorAction) then
+                          RaptorMgt.ShowRaptorData(RaptorAction,Membership."Customer No.");
+                        //+MM1.43 [387750]
+                    end;
+                }
+            }
         }
     }
+
+    trigger OnAfterGetCurrRecord()
+    var
+        MembershipRole: Record "MM Membership Role";
+    begin
+        //-MM1.43 [387750]
+        Clear(Membership);
+        MembershipRole.SetRange("Member Entry No.","Entry No.");
+        MembershipRole.SetRange(Blocked,false);
+        if MembershipRole.FindFirst() then
+          Membership.Get(MembershipRole."Membership Entry No.");
+        //+MM1.43 [387750]
+    end;
 
     trigger OnAfterGetRecord()
     begin
@@ -339,6 +402,8 @@ page 6060126 "MM Members"
     end;
 
     trigger OnOpenPage()
+    var
+        RaptorSetup: Record "Raptor Setup";
     begin
 
         //-MM1.40 [360242]
@@ -355,9 +420,13 @@ page 6060126 "MM Members"
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
         //+MM1.40 [360242]
+        //-MM1.43 [387750]
+        RaptorEnabled := (RaptorSetup.Get and RaptorSetup."Enable Raptor Functions");
+        //+MM1.43 [387750]
     end;
 
     var
+        Membership: Record "MM Membership";
         NPRAttrTextArray: array[40] of Text[250];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
@@ -373,6 +442,8 @@ page 6060126 "MM Members"
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
         CONFIRM_SYNC: Label 'Do you want to sync the contacts for %1 members?';
+        RaptorEnabled: Boolean;
+        NO_ENTRIES: Label 'No entries found for member %1.';
 
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin

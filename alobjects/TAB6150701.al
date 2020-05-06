@@ -19,6 +19,8 @@ table 6150701 "POS Menu Button"
     // NPR5.43/VB  /20180611 CASE 314603 Implemented secure method behavior functionality.
     // NPR5.50/VB  /20180204 CASE 338666 When configuring actions for front end, parameters are not filtered if they already contain a filter on Table No.
     //                                   Support for Item, Customer, and Payment metadata in actions. This allows additional information to be passed to front-end workflows.
+    // NPR5.54/TSA /20200221 CASE 392247 Added "Requires POS Type" to workflow content
+    // NPR5.54/VB  /20200408 CASE 399736 Added "Show Plus/Minus Buttons" field.
 
     Caption = 'POS Menu Button';
     DrillDownPageID = "POS Menu Buttons";
@@ -209,6 +211,19 @@ table 6150701 "POS Menu Button"
                 SecureMethodTmp.RunDiscovery();
                 SecureMethodTmp.Get("Secure Method Code");
                 //+NPR5.43 [314603]
+            end;
+        }
+        field(34;"Show Plus/Minus Buttons";Boolean)
+        {
+            Caption = 'Show Plus/Minus Buttons';
+            Description = 'NPR5.54';
+
+            trigger OnValidate()
+            begin
+                //-NPR5.54 [399736]
+                if "Show Plus/Minus Buttons" then
+                  TestField("Action Type","Action Type"::Item);
+                //+NPR5.54 [399736]
             end;
         }
         field(41;"Register Type";Code[10])
@@ -517,6 +532,7 @@ table 6150701 "POS Menu Button"
     var
         ActionMgt: Codeunit "POS Action Management";
         ErrorText: Text;
+        POSAction: Record "POS Action";
     begin
         case "Action Type" of
           "Action Type"::Action: GetWorkflowAction(ActionOut,POSSession);
@@ -531,8 +547,14 @@ table 6150701 "POS Menu Button"
           StoreButtonParameters(ActionOut,POSParameterValue);
           //+NPR5.42 [314128]
           StoreDataSource(ActionOut);
-          StoreActionOtherConfiguration(ActionOut);
+
+          //-NPR5.54 [392247]
+          // StoreActionOtherConfiguration(ActionOut);
+          StoreActionOtherConfiguration(ActionOut, POSSession);
+          //+NPR5.54 [392247]
+
           ActionMgt.IsValidActionConfiguration(POSSession,ActionOut,Source,ErrorText,true);
+
         end;
     end;
 
@@ -577,6 +599,7 @@ table 6150701 "POS Menu Button"
             WorkflowAction.Workflow := WorkflowObj.FromJsonString('{}',GetDotNetType(WorkflowObj));
             WorkflowAction.Workflow.Name := Code;
           end;
+
           ActionOut := WorkflowAction;
         end;
     end;
@@ -592,6 +615,11 @@ table 6150701 "POS Menu Button"
         OnRetrieveItemMetadata(Metadata);
         ActionOut.Content.Add('Metadata',Metadata);
         //+NPR5.50 [338666]
+
+        //-NPR5.54 [399736]
+        if "Show Plus/Minus Buttons" then
+          ActionOut.Content.Add('ShowPlusMinus',true);
+        //+NPR5.54 [399736]
     end;
 
     local procedure GetMenuAction(var ActionOut: DotNet npNetAction)
@@ -672,9 +700,10 @@ table 6150701 "POS Menu Button"
         //+NPR5.42 [314128]
     end;
 
-    local procedure StoreActionOtherConfiguration(ActionIn: DotNet npNetAction)
+    local procedure StoreActionOtherConfiguration(ActionIn: DotNet npNetAction;POSSession: Codeunit "POS Session")
     var
         TempParam: Record "POS Parameter Value" temporary;
+        POSAction: Record "POS Action";
         RecRef: RecordRef;
         FieldRef: FieldRef;
     begin
@@ -682,6 +711,13 @@ table 6150701 "POS Menu Button"
         if "Blocking UI" then
           ActionIn.Content.Add('Blocking',true);
         //+NPR5.36 [281618]
+
+        //-NPR5.54 [392247]
+        if (not POSSession.RetrieveSessionAction("Action Code", POSAction)) then
+          exit;
+
+        ActionIn.Content.Add ('requirePosUnitType', Format (POSAction."Requires POS Type", 0, 9));
+        //+NPR5.54 [392247]
     end;
 
     local procedure StoreDataSource(ActionIn: DotNet npNetAction)

@@ -3,6 +3,8 @@ page 6150705 "POS Parameter Values"
     // NPR5.34/BR  /20170703  CASE 282915 Highlight non-default parameters
     // NPR5.40/VB  /20180228  CASE 306347 Replacing BLOB-based temporary-table parameters with physical-table parameters
     // NPR5.40/MMV /20180321  CASE 308050 Added support for parameter caption and parameter description.
+    // NPR5.54/ALPO/20200330  CASE 335834 Enable lookup and value translations for parameters of type boolean
+    //                                    Functions GetOptionStringCaption() and TrySelectStr() moved to the source table to avoid code dublication
 
     Caption = 'POS Parameter Values';
     DelayedInsert = true;
@@ -140,34 +142,15 @@ page 6150705 "POS Parameter Values"
         Clear(ParameterOptionString);
         Clear(ParameterValue);
         OnGetParameterOptionStringCaption(Rec, ParameterOptionString);
+        //-NPR5.54 [335834]
+        if "Data Type" = "Data Type"::Boolean then
+          ParameterValue := GetBooleanStringCaption()
+        else
+        //+NPR5.54 [335834]
         if (ParameterOptionString = '') or ("Data Type" <> "Data Type"::Option) then
           ParameterValue := Value
         else
           ParameterValue := GetOptionStringCaption(ParameterOptionString)
-        //+NPR5.40 [308050]
-    end;
-
-    local procedure GetOptionStringCaption(ParameterOptionStringCaption: Text): Text
-    var
-        POSActionParameter: Record "POS Action Parameter";
-        TypeHelper: Codeunit "Type Helper";
-        OptionCaption: Text;
-    begin
-        //-NPR5.40 [308050]
-        POSActionParameter.Get("Action Code", Name);
-
-        if TrySelectStr(TypeHelper.GetOptionNo(Value, POSActionParameter.Options), ParameterOptionStringCaption, OptionCaption) then
-          exit(OptionCaption)
-        else
-          exit(Value);
-        //+NPR5.40 [308050]
-    end;
-
-    [TryFunction]
-    local procedure TrySelectStr(Ordinal: Integer;OptionString: Text;var OptionOut: Text)
-    begin
-        //-NPR5.40 [308050]
-        OptionOut := SelectStr(Ordinal+1, OptionString);
         //+NPR5.40 [308050]
     end;
 }

@@ -12,6 +12,7 @@ xmlport 6060128 "MM Add Member"
     // MM1.29/TSA /20180516 CASE 313795 - Added GDPR Approval status
     // MM1.40/TSA /20190827 CASE 360242 - Added Attributes
     // MM1.42/TSA /20191205 CASE 381222 - Added notification method
+    // MM1.43/TSA /20200130 CASE 386080 - Added preassigned_contact_number
 
     Caption = 'Add Member';
     FormatEvaluate = Xml;
@@ -131,6 +132,10 @@ xmlport 6060128 "MM Add Member"
                     fieldelement(notificationmethod;tmpMemberInfoCapture."Notification Method")
                     {
                         MaxOccurs = Once;
+                        MinOccurs = Zero;
+                    }
+                    fieldelement(preassigned_contact_number;tmpMemberInfoCapture."Contact No.")
+                    {
                         MinOccurs = Zero;
                     }
                 }

@@ -4,6 +4,7 @@ page 6014506 "Used Goods Reg. Card"
     // NPR5.27/TS/20161027 CASE 246761 Removed Unued/Deleted Fields.
     // NPR5.30/TS/20161221  CASE 246761 Renamed variables
     // NPR5.41/TS  /20180105 CASE 300893 Removed Caption on ActionContainer
+    // NPR5.54/MITH/20200304 CASE 394335 Added button to print label after creating item from used goods.
 
     Caption = 'Used Item Registration Card';
     SourceTable = "Used Goods Registration";
@@ -348,6 +349,31 @@ page 6014506 "Used Goods Reg. Card"
                         xUsedGoodsRegistration.SetRange("No.",xUsedGoodsRegistration."No.");
                         xUsedGoodsRegistration.FilterGroup := 0;
                         REPORT.RunModal(REPORT::"Register Used Goods",true,false,xUsedGoodsRegistration);
+                    end;
+                }
+                action("Create Used Item and Print Label")
+                {
+                    Caption = 'Create Used Item and Print Label';
+                    Image = ElectronicNumber;
+                    Visible = false;
+
+                    trigger OnAction()
+                    var
+                        Item: Record Item;
+                        PrintLabelAndDisplay: Codeunit "Label Library";
+                        ReportSelectionRetail: Record "Report Selection Retail";
+                    begin
+                        //+NPR5.54
+                        TestField(Subject);
+                        TestField("Purchased By Customer No.");
+                        TestField("Salesperson Code");
+                        TestField("Salgspris inkl. Moms");
+                        CODEUNIT.Run((CODEUNIT::"Convert used goods"),Rec);
+
+                        TestField("Item No. Created");
+                        Item.Get("Item No. Created");
+                        PrintLabelAndDisplay.ResolveVariantAndPrintItem(Item, ReportSelectionRetail."Report Type"::"Price Label");
+                        //-NPR5.54
                     end;
                 }
             }

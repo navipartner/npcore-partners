@@ -14,6 +14,7 @@ page 6060127 "MM Memberships"
     // NPR5.46/BHR/20180110 CASE 330112 Added field "Auto-Renew Payment Method Code"
     // MM1.40/TSA /20190822 CASE 360242 Adding NPR Attributes
     // MM1.40.01/TSA /20190822 CASE 360242 removing grouping withing repeater
+    // MM1.43/ALPO/20191125 CASE 387750 Added Raptor integration page actions: Browsing History, Recommendations
 
     Caption = 'Memberships';
     CardPageID = "MM Membership Card";
@@ -21,6 +22,7 @@ page 6060127 "MM Memberships"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    PromotedActionCategories = 'New,Process,Report,History,Raptor';
     SourceTable = "MM Membership";
     UsageCategory = Lists;
 
@@ -245,6 +247,52 @@ page 6060127 "MM Memberships"
                 RunObject = Page "NpDc Coupons";
                 RunPageLink = "Customer No." = FIELD("Customer No.");
             }
+            group("Raptor Integration")
+            {
+                Caption = 'Raptor Integration';
+                action(RaptorBrowsingHistory)
+                {
+                    Caption = 'Browsing History';
+                    Enabled = RaptorEnabled;
+                    Image = ViewRegisteredOrder;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    Visible = RaptorEnabled;
+
+                    trigger OnAction()
+                    var
+                        RaptorAction: Record "Raptor Action";
+                        RaptorMgt: Codeunit "Raptor Management";
+                    begin
+                        //-MM1.43 [387750]
+                        TestField("Customer No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserIdHistory,true,RaptorAction) then
+                          RaptorMgt.ShowRaptorData(RaptorAction,"Customer No.");
+                        //+MM1.43 [387750]
+                    end;
+                }
+                action(RaptorRecommendations)
+                {
+                    Caption = 'Recommendations';
+                    Enabled = RaptorEnabled;
+                    Image = SuggestElectronicDocument;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    Visible = RaptorEnabled;
+
+                    trigger OnAction()
+                    var
+                        RaptorAction: Record "Raptor Action";
+                        RaptorMgt: Codeunit "Raptor Management";
+                    begin
+                        //-MM1.43 [387750]
+                        TestField("Customer No.");
+                        if RaptorMgt.SelectRaptorAction(RaptorMgt.RaptorModule_GetUserRecommendations,true,RaptorAction) then
+                          RaptorMgt.ShowRaptorData(RaptorAction,"Customer No.");
+                        //+MM1.43 [387750]
+                    end;
+                }
+            }
         }
         area(processing)
         {
@@ -327,6 +375,7 @@ page 6060127 "MM Memberships"
 
     trigger OnOpenPage()
     var
+        RaptorSetup: Record "Raptor Setup";
         n: Integer;
     begin
 
@@ -347,6 +396,9 @@ page 6060127 "MM Memberships"
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
         //+MM1.40 [360242]
+        //-MM1.43 [387750]
+        RaptorEnabled := (RaptorSetup.Get and RaptorSetup."Enable Raptor Functions");
+        //+MM1.43 [387750]
     end;
 
     var
@@ -367,6 +419,7 @@ page 6060127 "MM Memberships"
         NPRAttrVisible08: Boolean;
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
+        RaptorEnabled: Boolean;
 
     local procedure SyncContacts()
     var

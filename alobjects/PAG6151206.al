@@ -6,6 +6,8 @@ page 6151206 "NpCs Collect Store Order Card"
     // NPR5.51/MHA /20190819  CASE 364557 Added Posting fields 250 "Post on", 255 "Posting Document Type", 260 "Posting Document No."
     // NPR5.53/MHA /20191105  CASE 374049 Promoted Action "Send Notification to Customer"
     // NPR5.53/MHA /20192811  CASE 379742 Added Action Print Confirmation
+    // NPR5.54/MHA /20200212  CASE 390479 Changed visibility for Action "Confirm Order" and "Reject Order" to also include #blank Processing Status
+    // NPR5.54/MHA /20200130  CASE 378956 Added Store Notification Fields
 
     Caption = 'Collect in Store Order Card';
     SourceTable = "NpCs Document";
@@ -179,6 +181,36 @@ page 6151206 "NpCs Collect Store Order Card"
                 {
                     Importance = Promoted;
                 }
+                group(Control6014468)
+                {
+                    ShowCaption = false;
+                    field("Notify Store via E-mail";"Notify Store via E-mail")
+                    {
+                    }
+                    field("Store E-mail Temp. (Pending)";"Store E-mail Temp. (Pending)")
+                    {
+                        Importance = Additional;
+                    }
+                    field("Store E-mail Temp. (Expired)";"Store E-mail Temp. (Expired)")
+                    {
+                        Importance = Additional;
+                    }
+                }
+                group(Control6014475)
+                {
+                    ShowCaption = false;
+                    field("Notify Store via Sms";"Notify Store via Sms")
+                    {
+                    }
+                    field("Store Sms Template (Pending)";"Store Sms Template (Pending)")
+                    {
+                        Importance = Additional;
+                    }
+                    field("Store Sms Template (Expired)";"Store Sms Template (Expired)")
+                    {
+                        Importance = Additional;
+                    }
+                }
                 group(Control6014441)
                 {
                     ShowCaption = false;
@@ -325,7 +357,7 @@ page 6151206 "NpCs Collect Store Order Card"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = ("Processing Status" = 1) AND ("Delivery Status" = 0);
+                    Visible = (("Processing Status" = 0) OR ("Processing Status" = 1)) AND ("Delivery Status" = 0);
 
                     trigger OnAction()
                     var
@@ -344,7 +376,7 @@ page 6151206 "NpCs Collect Store Order Card"
                     Promoted = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = ("Processing Status" = 1) AND ("Delivery Status" = 0) AND ("Store Stock");
+                    Visible = (("Processing Status" = 0) OR ("Processing Status" = 1)) AND ("Delivery Status" = 0) AND ("Store Stock");
 
                     trigger OnAction()
                     var

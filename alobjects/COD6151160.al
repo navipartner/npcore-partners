@@ -481,7 +481,7 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
 
     local procedure CreateReservePointsSlip(EFTTransactionRequest: Record "EFT Transaction Request";ReceiptType: Option CUSTOMER,MERCHANT) ReceiptText: Text
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         POSUnit: Record "POS Unit";
         TicketWidth: Integer;
         Separator: Text;
@@ -582,7 +582,7 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
 
     local procedure CreateRegisterPointsSlip(EFTTransactionRequest: Record "EFT Transaction Request";ReceiptType: Option CUSTOMER,MERCHANT;PointsEarned: Integer;PointsBurned: Integer;NewBalance: Integer) ReceiptText: Text
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         POSUnit: Record "POS Unit";
         TicketWidth: Integer;
         Separator: Text;
@@ -668,7 +668,7 @@ codeunit 6151160 "MM Loyalty Points Mgr (Client)"
         ReceiptText += WriteSlipLine (CreditCardTransaction, '');
     end;
 
-    local procedure WriteSlipLine(var CreditCardTransaction: Record "Credit Card Transaction";LineText: Text): Text
+    local procedure WriteSlipLine(var CreditCardTransaction: Record "EFT Receipt";LineText: Text): Text
     var
         EntryNo: Integer;
         CRLF: Text[2];

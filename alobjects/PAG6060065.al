@@ -4,6 +4,8 @@ page 6060065 "TM Ticket Notification Entry"
     // TM1.39/NPKNAV/20190125  CASE 310057 Transport TM1.39 - 25 January 2019
     // TM1.45/TSA /20191202 CASE 374620 Send Stakeholder Nofification Manually
     // TM1.45/TSA /20191204 CASE 380754 Added field "Waiting List Reference Code"
+    // TM90.1.46/TSA /20200129 CASE 387138 Changed caption on action and change name of function
+    // TM90.1.46/TSA /20200318 CASE 374620 Added a commit after changing status to pending
 
     Caption = 'Ticket Notification Entry';
     InsertAllowed = false;
@@ -208,9 +210,9 @@ page 6060065 "TM Ticket Notification Entry"
             separator(Separator6014444)
             {
             }
-            action("Send Stakeholder Notification")
+            action("Send Notification")
             {
-                Caption = 'Send Stakeholder Notification';
+                Caption = 'Send Notification';
                 Image = SendElectronicDocument;
                 Promoted = true;
                 PromotedCategory = Process;
@@ -220,10 +222,12 @@ page 6060065 "TM Ticket Notification Entry"
                     TicketNotificationEntry: Record "TM Ticket Notification Entry";
                     TicketNotifyParticipant: Codeunit "TM Ticket Notify Participant";
                 begin
+                    //-+TM90.1.46 [387138] Function name change
 
                     //-TM1.45 [374620]
                     "Notification Send Status" := "Notification Send Status"::PENDING;
                     Modify ();
+                    Commit(); //-+TM90.1.46 [374620]
 
                     CurrPage.SetSelectionFilter (TicketNotificationEntry);
                     TicketNotifyParticipant.SendGeneralNotification (TicketNotificationEntry);

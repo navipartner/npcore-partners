@@ -4,6 +4,7 @@ codeunit 6184515 "EFT Flexiiterm Integration"
     // NPR5.48/MMV /20190125 CASE 341237 Renamed desc
     // NPR5.49/MMV /20190312 CASE 345188 Renamed object
     // NPR5.51/MMV /20190626 CASE 359385 Added gift card load support.
+    // NPR5.54/MMV /20200131 CASE 387965 Reintroduced gift card balance check integration.
 
 
     trigger OnRun()
@@ -55,6 +56,9 @@ codeunit 6184515 "EFT Flexiiterm Integration"
 
         GetCVM(EFTSetup);
         GetTransactionType(EFTSetup);
+        //-NPR5.54 [387965]
+        GetGiftVoucherCustomerID(EFTSetup);
+        //+NPR5.54 [387965]
 
         EFTSetup.ShowEftPaymentParameters();
     end;
@@ -175,6 +179,15 @@ codeunit 6184515 "EFT Flexiiterm Integration"
         EFTTypePaymentGenParam: Record "EFT Type Payment Gen. Param.";
     begin
         exit(EFTTypePaymentGenParam.GetOptionParameterValue(IntegrationType(), EFTSetup."Payment Type POS", 'Transaction Type', 0, 'Not Forced,Forced Online,Forced Offline', true));
+    end;
+
+    procedure GetGiftVoucherCustomerID(EFTSetup: Record "EFT Setup"): Text
+    var
+        EFTTypePaymentGenParam: Record "EFT Type Payment Gen. Param.";
+    begin
+        //-NPR5.54 [387965]
+        exit(EFTTypePaymentGenParam.GetTextParameterValue(IntegrationType(), EFTSetup."Payment Type POS", 'Gift Voucher Customer ID', '', true));
+        //+NPR5.54 [387965]
     end;
 }
 

@@ -55,6 +55,7 @@ page 6014424 "Retail Setup"
     // NPR5.53/ALPO/20191024 CASE 371955 Removed field 13 "Amount Rounding Precision": rounding related fields moved to POS Posting Profiles
     // NPR5.53/BHR /20190810 CASE 369354 Removed Fields 'New Customer creation'
     // NPR5.53/BHR /20191007  CASE 369361 Removed the fields "Company Function" - 6325,"Hotline no." - 5148, "Hosting Type" - 82
+    // NPR5.54/TJ  /20200302 CASE 393478 Removed fields "Overwrite Item No.", "Item remarks" and "Finish Register Warning"
 
     Caption = 'Retail Setup';
     Editable = true;
@@ -363,12 +364,6 @@ page 6014424 "Retail Setup"
                     field("Show Create Credit Voucher";"Show Create Credit Voucher")
                     {
                     }
-                    field("Finish Register Warning";"Finish Register Warning")
-                    {
-                    }
-                    field("Item remarks";"Item remarks")
-                    {
-                    }
                     field("Ask for Reference";"Ask for Reference")
                     {
                     }
@@ -376,9 +371,6 @@ page 6014424 "Retail Setup"
                     {
                     }
                     field("Reason for Return Mandatory";"Reason for Return Mandatory")
-                    {
-                    }
-                    field("Overwrite Item No.";"Overwrite Item No.")
                     {
                     }
                     field("Sales Lines from Selection";"Sales Lines from Selection")

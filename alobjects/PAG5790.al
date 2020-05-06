@@ -1,4 +1,4 @@
-pageextension 6014461 pageextension6014461 extends "Shipping Agent Services" 
+pageextension 6014462 pageextension6014462 extends "Shipping Agent Services" 
 {
     // PS1.00/LS/20141201  CASE 200150 Fields "Service Demand", "Notification Service", "Default Option"
     // NPR5.29/BHR/20161026 CASE 248684 Add fields "Sell to contact Mandatory","Email Mandatory","Phone Mandatory"

@@ -37,6 +37,9 @@ codeunit 6151401 "Magento Setup Mgt."
     // MAG2.22/MHA /20190625  CASE 359285 Added Picture Variety Type in SetupNpXmlTemplates()
     // MAG2.23/MHA /20191018  CASE 373610 Bumped version list in MagentoVersionNo()
     // MAG2.24/MHA /20191018  CASE 386235 Bumped version list in MagentoVersionNo()
+    // #374800/BHR /20200212  CASE 374800 Add confirmation box to prevent setup overide
+    // MAG2.25/MHA /20200214  CASE 390939 Member- and Ticket Template should only be created if Ticket Module is enabled
+    // MAG2.25/MHA /20200416  CASE 400486 Bumped version list in MagentoVersionNo()
 
 
     trigger OnRun()
@@ -51,6 +54,8 @@ codeunit 6151401 "Magento Setup Mgt."
         Text10020: Label 'Check VAT Business Posting Groups?';
         Text10030: Label 'Check VAT Product Posting Groups?';
         Text10040: Label '%1 does not exist in the database';
+        Text10050: Label 'Do you want Update Existing Order Import Type Setup?';
+        Text10060: Label 'Do you want Update Existing  Return Order Import Type Setup?';
 
     procedure "--- Magento Setup"()
     begin
@@ -218,6 +223,11 @@ codeunit 6151401 "Magento Setup Mgt."
           NaviConnectImportType."Webservice Function" := 'ImportSalesOrders';
           NaviConnectImportType.Insert(true);
         end else begin
+          //-#374800 [374800]
+          if GuiAllowed then
+            if not Confirm(Text10050,true) then
+              exit;
+          //+#374800 [374800]
           NaviConnectImportType.Description := 'magento_services';
           NaviConnectImportType."Import Codeunit ID" := CODEUNIT::"Magento Sales Order Mgt.";
           //-MAG2.08 [288763]
@@ -252,7 +262,11 @@ codeunit 6151401 "Magento Setup Mgt."
         end;
 
         PrevRec := Format(NcImportType);
-
+          //-#374800 [374800]
+          if GuiAllowed then
+            if not Confirm(Text10060,true) then
+              exit;
+          //+#374800 [374800]
         NcImportType.Description := 'magento_services';
         NcImportType."Import Codeunit ID" := CODEUNIT::"Magento Import Return Order";
         NcImportType."Lookup Codeunit ID" := CODEUNIT::"Magento Lookup Return Order";
@@ -531,10 +545,10 @@ codeunit 6151401 "Magento Setup Mgt."
         NpXmlSetupMgt.SetupTemplateSalesPrice(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Sales Prices Enabled");
         NpXmlSetupMgt.SetupTemplateSalesLineDiscount(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Sales Line Discounts Enabled");
         NpXmlSetupMgt.SetupTemplateItemDiscountGroup(TempBlob,MagentoSetup."Magento Enabled" and MagentoSetup."Item Disc. Group Enabled");
-        //-MAG2.02
-        NpXmlSetupMgt.SetupTemplateTicket(TempBlob,true);
-        NpXmlSetupMgt.SetupTemplateMember(TempBlob,true);
-        //+MAG2.02
+        //-MAG2.25 [390939]
+        NpXmlSetupMgt.SetupTemplateTicket(TempBlob,MagentoSetup."Tickets Enabled");
+        NpXmlSetupMgt.SetupTemplateMember(TempBlob,MagentoSetup."Tickets Enabled");
+        //+MAG2.25 [390939]
         NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/manufacturer','',MagentoSetup."Brands Enabled");
         NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/product_external_attributes','',MagentoSetup."Attributes Enabled");
         NpXmlSetupMgt.SetItemElementEnabled(TempBlob,'product/related_products','',MagentoSetup."Product Relations Enabled");
@@ -992,12 +1006,9 @@ codeunit 6151401 "Magento Setup Mgt."
 
     procedure MagentoVersionNo(): Code[20]
     begin
-        //-MAG2.24
-        exit('2.24');
-        //+MAG2.24
-        //-MAG2.23
-        exit('2.23');
-        //+MAG2.23
+        //-MAG2.25 [400486]
+        exit('2.25');
+        //+MAG2.25 [400486]
     end;
 
     procedure UpdateVersionNo(var MagentoSetup: Record "Magento Setup")

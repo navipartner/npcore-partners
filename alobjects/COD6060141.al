@@ -6,7 +6,9 @@ codeunit 6060141 "MM Loyalty WebService"
     // MM1.40/TSA /20190813 CASE 343352 Added GetCouponEligibility(), TransformPointsToCoupon()
     // MM1.40/TSA /20190828 CASE 365879 Added ReceiptList and Receipt as PDF
     // MM1.42/TSA /20191024 CASE 374403 Changed signature on IssueOneCoupon(), IssueOneCouponAndPrint(), and IssueCoupon()
-    // #370398/TSA /20200113 CASE 370398 Added the ListCoupons() service
+    // MM1.43/TSA /20200113 CASE 370398 Added the ListCoupons() service
+    // MM1.43/TSA /20200123 CASE 387009 Fixed an initialization issue with CreateCoupon()
+    // MM1.43/MHA /20200217 CASE 390998 Added default report in GetMembershipReceiptPdf()
 
 
     trigger OnRun()
@@ -98,6 +100,7 @@ codeunit 6060141 "MM Loyalty WebService"
         MemberInfoCapture.DeleteAll ();
     end;
 
+    [Scope('Personalization')]
     procedure GetMembershipReceiptList(var GetLoyaltyReceiptList: XMLport "MM Get Loyalty Receipt List")
     var
         ImportEntry: Record "Nc Import Entry";
@@ -142,6 +145,7 @@ codeunit 6060141 "MM Loyalty WebService"
         //+MM1.40 [365879]
     end;
 
+    [Scope('Personalization')]
     procedure GetMembershipReceiptPdf(ExternalMembershipNumber: Code[20];ReceiptEntryNo: Integer) PdfDoc: Text
     var
         ReportSelections: Record "Report Selection Retail";
@@ -153,7 +157,11 @@ codeunit 6060141 "MM Loyalty WebService"
         //-MM1.40 [365879]
         ReportSelections.SetFilter ("Report Type", '=%1', ReportSelections."Report Type"::"Large Sales Receipt (POS Entry)");
         ReportSelections.SetFilter ("Report ID",'<>%1',0);
-        ReportSelections.FindFirst;
+        //-MM1.43 [390998]
+        //ReportSelections.FINDFIRST;
+        if not ReportSelections.FindFirst then
+          ReportSelections."Report ID" := REPORT::"Sales Ticket A4 - POS Rdlc";
+        //+MM1.43 [390998]
 
         Membership.SetFilter ("External Membership No.", '=%1', ExternalMembershipNumber);
         Membership.FindFirst ();
@@ -287,6 +295,7 @@ codeunit 6060141 "MM Loyalty WebService"
     begin
     end;
 
+    [Scope('Personalization')]
     procedure GetLoyaltyConfiguration(var GetLoyaltyConfiguration: XMLport "MM Get Loyalty Configuration")
     var
         TmpAuthorization: Record "MM Loyalty Ledger Entry (Srvr)" temporary;
@@ -343,6 +352,7 @@ codeunit 6060141 "MM Loyalty WebService"
     begin
     end;
 
+    [Scope('Personalization')]
     procedure GetCouponEligibility(var LoyaltyCouponEligibility: XMLport "MM Loyalty Coupon Eligibility")
     var
         TmpLoyaltyPointsSetup: Record "MM Loyalty Points Setup" temporary;
@@ -403,11 +413,12 @@ codeunit 6060141 "MM Loyalty WebService"
         //+MM1.40 [343352]
     end;
 
+    [Scope('Personalization')]
     procedure CreateCoupon(var LoyaltyCreateCoupon: XMLport "MM Loyalty Create Coupon")
     var
         TmpMemberInfoCapture: Record "MM Member Info Capture" temporary;
         TmpLoyaltyPointsSetup: Record "MM Loyalty Points Setup" temporary;
-        LoyaltyPointsSetup: Record "MM Loyalty Points Setup";
+        TmpLoyaltyPointsSetupEligible: Record "MM Loyalty Points Setup" temporary;
         ImportEntry: Record "Nc Import Entry";
         Coupon: Record "NpDc Coupon";
         TmpCoupon: Record "NpDc Coupon" temporary;
@@ -445,8 +456,15 @@ codeunit 6060141 "MM Loyalty WebService"
           TmpLoyaltyPointsSetup.Reset ();
           if (TmpLoyaltyPointsSetup.FindSet ()) then begin
             repeat
-              if (LoyaltyPointsSetup.Get (TmpLoyaltyPointsSetup.Code, TmpLoyaltyPointsSetup."Line No.")) then begin
-                TmpLoyaltyPointsSetup.TransferFields (LoyaltyPointsSetup, true);
+
+              //-MM1.43 [387009]
+              // IF (LoyaltyPointsSetup.GET (TmpLoyaltyPointsSetup.Code, TmpLoyaltyPointsSetup."Line No.")) THEN BEGIN
+              TmpLoyaltyPointsSetupEligible.DeleteAll ();
+              LoyaltyPointManagement.GetCouponToRedeemWS (MembershipEntryNo, TmpLoyaltyPointsSetupEligible, TmpMemberInfoCapture."Amount Incl VAT", ResponseMessage);
+              if (TmpLoyaltyPointsSetupEligible.Get (TmpLoyaltyPointsSetup.Code, TmpLoyaltyPointsSetup."Line No.")) then begin
+              //+MM1.43 [387009]
+
+                TmpLoyaltyPointsSetup.TransferFields (TmpLoyaltyPointsSetupEligible, true);
                 //-MM1.42 [374403]
                 //IF (Coupon.GET (LoyaltyPointManagement.IssueOneCoupon (MembershipEntryNo, TmpLoyaltyPointsSetup, TmpMemberInfoCapture."Amount Incl VAT"))) THEN BEGIN
                 with TmpMemberInfoCapture do
@@ -481,6 +499,7 @@ codeunit 6060141 "MM Loyalty WebService"
         ImportEntry.Modify (true);
     end;
 
+    [Scope('Personalization')]
     procedure ListCoupons(var LoyaltyListCoupon: XMLport "MM Loyalty List Coupon")
     var
         TmpMemberInfoCapture: Record "MM Member Info Capture" temporary;
@@ -495,7 +514,7 @@ codeunit 6060141 "MM Loyalty WebService"
         MembershipEntryNo: Integer;
     begin
 
-        //-#370398 [370398]
+        //-MM1.43 [370398]
         LoyaltyListCoupon.Import ();
 
         InsertImportEntry ('LoyaltyListCoupon', ImportEntry);
@@ -555,7 +574,7 @@ codeunit 6060141 "MM Loyalty WebService"
         ImportEntry."Runtime Error" := false;
 
         ImportEntry.Modify (true);
-        //+#370398 [370398]
+        //+MM1.43 [370398]
     end;
 
     local procedure "--Locals"()

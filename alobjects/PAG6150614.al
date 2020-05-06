@@ -8,6 +8,7 @@ page 6150614 "POS Store List"
     // NPR5.48/TS  /20181213  CASE 339803 Added field Store Group Code
     // NPR5.50/CLVA/20190304 CASE 332844 Added Action Group "Stock-Take"
     // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
+    // NPR5.54/SARA/20200301 CASE 395944 Added 'Location Code','VAT Bus. Posting Group',Gen. Bus. Posting Group'
 
     Caption = 'POS Store List';
     CardPageID = "POS Store Card";
@@ -47,6 +48,15 @@ page 6150614 "POS Store List"
                 {
                 }
                 field("Store Locality Code";"Store Locality Code")
+                {
+                }
+                field("Location Code";"Location Code")
+                {
+                }
+                field("Gen. Bus. Posting Group";"Gen. Bus. Posting Group")
+                {
+                }
+                field("VAT Bus. Posting Group";"VAT Bus. Posting Group")
                 {
                 }
             }

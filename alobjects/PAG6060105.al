@@ -6,6 +6,7 @@ page 6060105 "MM Loyalty Setup"
     // MM1.37/TSA /20190227 CASE 343053 Expire points functionality
     // MM1.38/TSA /20190425 CASE 338215 Added Loyalty Point Server setups
     // MM1.40/TSA /20190816 CASE 361664 Added field "Auto Upgrade Point Source" and Action to "Auto Upgrade Point Threshold" page
+    // MM1.43/TSA /20200203 CASE 388058 Adde expire points at calculation for "as you go"
 
     Caption = 'Loyalty Setup';
     PageType = List;
@@ -247,6 +248,14 @@ page 6060105 "MM Loyalty Setup"
           PeriodCalculationIssue := not LoyaltyPointManagement.ValidateFixedPeriodCalculation (Rec, ReasonText);
         end;
         //+MM1.37 [343053]
+
+        //-MM1.43 [388058]
+        if (Rec."Collection Period" = Rec."Collection Period"::AS_YOU_GO) then begin
+          if ("Expire Uncollected Points") then
+            if (Format ("Expire Uncollected After") <> '') then
+              ExpirePointsAt := CalcDate ("Expire Uncollected After", Today);
+        end;
+        //+MM1.43 [388058]
     end;
 
     trigger OnInit()

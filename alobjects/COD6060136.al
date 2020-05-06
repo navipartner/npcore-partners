@@ -19,6 +19,8 @@ codeunit 6060136 "MM Member Notification"
     // MM1.41/TSA /20191004 CASE 367471 Added invokation of sponsorship ticket notification
     // MM1.42/TSA /20191128 CASE 378212 Added SELECTLATESTVERSION
     // MM1.42/TSA /20191220 CASE 382728 Refactored usage of Member."Notification Method"
+    // MM1.43/TSA /20200214 CASE 390938 Fixed notification issue with Wallet_Update
+    // MM1.43/TSA /20200214 CASE 390938 Changed variable name FieldNo and Count because they are reserved words
 
 
     trigger OnRun()
@@ -283,12 +285,21 @@ codeunit 6060136 "MM Member Notification"
               //  ELSE ERROR (NOT_IMPLEMENTED, Member.FIELDCAPTION (Member."Notification Method"), Member."Notification Method");
               //END;
 
-              with MembershipNotification do
+              //-MM1.43 [390938]
+              // WITH MembershipNotification DO
+              //   CASE "Notification Trigger" OF
+              //    "Notification Trigger"::WELCOME       : MembershipManagement.GetCommunicationMethod_Welcome ("Member Entry No.", "Membership Entry No.", Method, Address);
+              //    "Notification Trigger"::RENEWAL       : MembershipManagement.GetCommunicationMethod_Renew ("Member Entry No.", "Membership Entry No.", Method, Address);
+              //    "Notification Trigger"::WALLET_CREATE : MembershipManagement.GetCommunicationMethod_MemberCard ("Member Entry No.", "Membership Entry No.", Method, Address);
+              //  END;
+              with MemberNotificationEntry do
                 case "Notification Trigger" of
                   "Notification Trigger"::WELCOME       : MembershipManagement.GetCommunicationMethod_Welcome ("Member Entry No.", "Membership Entry No.", Method, Address);
                   "Notification Trigger"::RENEWAL       : MembershipManagement.GetCommunicationMethod_Renew ("Member Entry No.", "Membership Entry No.", Method, Address);
                   "Notification Trigger"::WALLET_CREATE : MembershipManagement.GetCommunicationMethod_MemberCard ("Member Entry No.", "Membership Entry No.", Method, Address);
+                  "Notification Trigger"::WALLET_UPDATE : MembershipManagement.GetCommunicationMethod_MemberCard ("Member Entry No.", "Membership Entry No.", Method, Address);
                 end;
+              //+MM1.43 [390938]
 
               with MemberNotificationEntry do
                 case Method of
@@ -316,7 +327,7 @@ codeunit 6060136 "MM Member Notification"
 
                     if (MemberNotificationEntry.Insert()) then;
                 end;
-            until ((MembershipRole.Next() = 0) or (MembershipNotification."Target Member Role" = MembershipNotification."Target Member Role"::FIRST_ADMIN))
+          until ((MembershipRole.Next () = 0) or (MembershipNotification."Target Member Role" = MembershipNotification."Target Member Role"::FIRST_ADMIN));
         end;
     end;
 
@@ -785,9 +796,8 @@ codeunit 6060136 "MM Member Notification"
     procedure AssignDataToPassTemplate(var RecRef: RecordRef; Line: Text) NewLine: Text
     var
         FieldRef: FieldRef;
-        "Count": Integer;
         EndPos: Integer;
-        FieldNo: Integer;
+        FieldNumber: Integer;
         i: Integer;
         OptionInt: Integer;
         StartPos: Integer;
@@ -809,10 +819,10 @@ codeunit 6060136 "MM Member Notification"
             StartPos := StrPos(NewLine, StartSeparator);
             EndPos := StrPos(NewLine, EndSeparator);
 
-            Evaluate(FieldNo, CopyStr(NewLine, StartPos + SeparatorLength, EndPos - StartPos - SeparatorLength));
-            if (RecRef.FieldExist(FieldNo)) then begin
+          Evaluate (FieldNumber, CopyStr (NewLine,StartPos + SeparatorLength,EndPos - StartPos - SeparatorLength));
+          if (RecRef.FieldExist(FieldNumber)) then begin
 
-                FieldRef := RecRef.Field(FieldNo);
+            FieldRef := RecRef.Field(FieldNumber);
                 if UpperCase(Format(FieldRef.Class)) = 'FLOWFIELD' then
                     FieldRef.CalcField;
 
@@ -830,7 +840,7 @@ codeunit 6060136 "MM Member Notification"
                     NewLine := InsStr(NewLine, DelChr(Format(FieldRef.Value, 0, 9), '<=>', '"'), StartPos);
                 end;
             end else
-                case FieldNo of
+            case FieldNumber of
                     -100: // thumbnail
                         begin
                             FieldRef := RecRef.Field(MemberNotificationEntry.FieldNo("Member Entry No."));
@@ -842,7 +852,7 @@ codeunit 6060136 "MM Member Notification"
                             NewLine := InsStr(NewLine, B64Image, StartPos);
                         end;
                     else
-                        Error(BAD_REFERENCE, FieldNo, Line);
+                Error(BAD_REFERENCE, FieldNumber, Line);
                 end;
             Line := NewLine;
         end;

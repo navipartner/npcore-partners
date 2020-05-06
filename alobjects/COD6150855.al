@@ -1,6 +1,7 @@
 codeunit 6150855 "POS Action - Ret. Amt. Dialog"
 {
     // NPR5.46/MMV /20180716 CASE 290734 Created object
+    // NPR5.54/MMV /20200220 CASE 364658 Skip for cancelled sales
 
 
     trigger OnRun()
@@ -128,6 +129,7 @@ codeunit 6150855 "POS Action - Ret. Amt. Dialog"
         POSSession: Codeunit "POS Session";
         POSFrontEnd: Codeunit "POS Front End Management";
         POSAction: Record "POS Action";
+        POSEntry: Record "POS Entry";
     begin
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
@@ -137,6 +139,13 @@ codeunit 6150855 "POS Action - Ret. Amt. Dialog"
             exit;
         if not POSSession.IsActiveSession(POSFrontEnd) then
             exit;
+
+        //-NPR5.54 [364658]
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        POSEntry.SetRange("Entry Type", POSEntry."Entry Type"::"Cancelled Sale");
+        if not POSEntry.IsEmpty then
+          exit;
+        //+NPR5.54 [364658]
 
         POSFrontEnd.GetSession(POSSession);
         POSSession.RetrieveSessionAction(ActionCode, POSAction);

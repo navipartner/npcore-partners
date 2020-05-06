@@ -950,7 +950,7 @@ codeunit 6014417 "Call Terminal Integration"
     end;
 
     var
-        Dankorttransaktion: Record "Credit Card Transaction";
+        Dankorttransaktion: Record "EFT Receipt";
         Betalingsvalg: Record "Payment Type POS";
         RetailSetup: Record "Retail Setup";
         // TODO: CTRLUPGRADE - declares a removed codeunit; all dependent functionality must be refactored
@@ -958,7 +958,7 @@ codeunit 6014417 "Call Terminal Integration"
         Filnavn: Text[80];
         Len: Integer;
         "Filter": Code[30];
-        DkTrans: Record "Credit Card Transaction";
+        DkTrans: Record "EFT Receipt";
         filrec: File;
         AttemptNo: Integer;
         nullinie: Boolean;

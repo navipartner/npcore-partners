@@ -32,6 +32,7 @@ table 6060134 "MM Member Info Capture"
     // MM1.32/TSA /20180710 CASE 318132 Added field "Member Card Type" option
     // MM1.40/TSA /20190730 CASE 360275 Added field "Auto-Admit Member"
     // MM1.42/TSA /20191205 CASE 381222 Changed InitValue for Notification Method from EMAIL to new option DEFAULT
+    // MM1.43/TSA /20200130 CASE 386080 Added field Customer No and Contact No
 
     Caption = 'Member Info Capture';
 
@@ -200,6 +201,14 @@ table 6060134 "MM Member Info Capture"
         field(115;"Replace External Card No.";Text[50])
         {
             Caption = 'Replace External Card No.';
+        }
+        field(120;"Customer No.";Code[20])
+        {
+            Caption = 'Customer No.';
+        }
+        field(121;"Contact No.";Code[20])
+        {
+            Caption = 'Contact No.';
         }
         field(200;"User Logon ID";Code[50])
         {

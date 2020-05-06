@@ -18,6 +18,9 @@ table 6150615 "POS Unit"
     // NPR5.52/SARA/20190924 CASE 368395 Delete field 'SMS Profile'(SMS profile move to POS End of Day Profile)
     // NPR5.52/MHA /20191016 CASE 371388 Field 400 "Global POS Sales Setup" moved from Np Retail Setup to POS Unit
     // NPR5.53/ALPO/20191021 CASE 371956 Dimensions: POS Store & POS Unit integration
+    // NPR5.54/BHR /20200210 CASE 389444 Create field 'POS Unit Receipt Text Profile'
+    // NPR5.54/TSA /20200219 CASE 391850 Added "POS Named Actions Profile"
+    // NPR5.54/TSA /20200221 CASE 392247 Added "POS Type"
 
     Caption = 'POS Unit';
     DataCaptionFields = "No.",Name;
@@ -84,7 +87,11 @@ table 6150615 "POS Unit"
             var
                 POSSetup: Record "POS Setup";
             begin
-                POSSetup.Get ();
+                //-NPR5.54 [391850]
+                // POSSetup.GET ();
+                POSSetup.Get ("POS Named Actions Profile");
+                //+NPR5.54 [391850]
+
                 if ("Lock Timeout" <> "Lock Timeout"::NEVER) then
                   POSSetup.TestField ("Lock POS Action Code");
             end;
@@ -93,6 +100,13 @@ table 6150615 "POS Unit"
         {
             Caption = 'Kiosk Mode Unlock PIN';
             Description = 'NPR5.45';
+        }
+        field(60;"POS Type";Option)
+        {
+            Caption = 'POS Type';
+            Description = 'NPR5.54';
+            OptionCaption = 'Attended,Unattended';
+            OptionMembers = ATTENDED,UNATTENDED;
         }
         field(200;"Ean Box Sales Setup";Code[20])
         {
@@ -225,6 +239,18 @@ table 6150615 "POS Unit"
             Caption = 'POS Posting Profile';
             Description = 'NPR5.52';
             TableRelation = "POS Posting Profile";
+        }
+        field(540;"POS Unit Receipt Text Profile";Code[20])
+        {
+            Caption = 'POS Unit Receipt Text Profile';
+            Description = 'NPR5.54';
+            TableRelation = "POS Unit Receipt Text Profile";
+        }
+        field(550;"POS Named Actions Profile";Code[20])
+        {
+            Caption = 'POS Named Actions Profile';
+            Description = 'NPR5.54';
+            TableRelation = "POS Setup";
         }
     }
 

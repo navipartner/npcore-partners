@@ -340,6 +340,7 @@ codeunit 6151150 "M2 Account WebService"
         //+NPR5.51 [362020]
     end;
 
+    [Scope('Personalization')]
     procedure GetShopperRecognition(var ShopperRecognition: XMLport "M2 Shopper Recognition")
     var
         TmpEFTShopperRecognition: Record "EFT Shopper Recognition" temporary;

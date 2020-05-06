@@ -1,6 +1,7 @@
 table 6184506 "EFT Transaction Async Response"
 {
     // NPR5.48/MMV /20190124 CASE 341237 Created object
+    // NPR5.54/MMV /20200218 CASE 387990 Added "Transaction Started" bool to track how critical error is.
 
     Caption = 'EFT Transaction Async Response';
 
@@ -21,6 +22,10 @@ table 6184506 "EFT Transaction Async Response"
         field(4;"Error Text";Text[250])
         {
             Caption = 'Error Text';
+        }
+        field(5;"Transaction Started";Boolean)
+        {
+            Caption = 'Transaction Started';
         }
     }
 

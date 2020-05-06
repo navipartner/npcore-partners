@@ -20,6 +20,7 @@ codeunit 6151373 "CS Helper Functions"
     // NPR5.52/CLVA/20191102 CASE 375749 Changed code to support version specific changes (NAV 2018+).
     // NPR5.53/CLVA/20191203 CASE 375919 Added Counting Supervisor functionality. Added function CreateNewCountingV2
     // NPR5.53/CLVA/20200207 CASE 389864 Changed code to support version specific changes (NAV 2018+).
+    // NPR5.54/CLVA/20200220 CASE 384506 Added Supervisor and POS user filter on GetStoreDataV2 and GetStoreDataByStoreUser;
 
 
     trigger OnRun()
@@ -37,7 +38,10 @@ codeunit 6151373 "CS Helper Functions"
         Text002: Label 'Calculate Inventory for Location %1';
         Text003: Label 'There is no Items on Location %1';
         Err_PostingNotDone: Label 'The posting of the last counting is not finalised. Try again later.';
+        Err_PostingIsPosted: Label 'Phy. Inventory Journal is already posted: %1 %2';
+        Txt014: Label 'Only Super User countings can be posted';
         Txt013: Label 'User Id is not setup as Store User';
+        Err_ConfirmForceCloseWOPosting: Label 'This will delete Phy. Inventory Journal: %1 %2 and cancel posting';
 
     procedure PublishWebService(Enable: Boolean)
     var
@@ -890,149 +894,7 @@ codeunit 6151373 "CS Helper Functions"
         CSStockTakes: Record "CS Stock-Takes";
         NewCSStockTakes: Record "CS Stock-Takes";
     begin
-        //IF NOT LocationRec.GET(GETFILTER(Location)) THEN
-        //  ERROR(Err_MissingLocation);
-
-        //-NPR5.52 [364063]
-        Clear(CSStockTakes);
-        CSStockTakes.SetRange(Location,Location.Code);
-        CSStockTakes.SetRange(Closed, 0DT);
-        if CSStockTakes.FindSet then
-         Error(Err_CSStockTakes,CSStockTakes."Stock-Take Id");
-
-        Clear(CSStockTakes);
-        CSStockTakes.SetRange(Location,Location.Code);
-        CSStockTakes.SetFilter(Closed, '<>%1', 0DT);
-        CSStockTakes.SetRange("Journal Posted", false);
-        if CSStockTakes.FindSet then
-         Error(Err_PostingNotDone);
-
-        CSSetup.Get;
-        CSSetup.TestField("Phys. Inv Jour Temp Name");
-        ItemJournalTemplate.Get(CSSetup."Phys. Inv Jour Temp Name");
-        if not ItemJournalBatch.Get(CSSetup."Phys. Inv Jour Temp Name",Location.Code) then begin
-          ItemJournalBatch.Init;
-          ItemJournalBatch.Validate("Journal Template Name",CSSetup."Phys. Inv Jour Temp Name");
-          ItemJournalBatch.Validate(Name,Location.Code);
-          ItemJournalBatch.Description := StrSubstNo(Text001,Location.Code);
-          ItemJournalBatch.Validate("No. Series",CSSetup."Phys. Inv Jour No. Series");
-          ItemJournalBatch."Reason Code" := ItemJournalTemplate."Reason Code";
-          ItemJournalBatch.Insert(true);
-        end else begin
-          RecRef.GetTable(ItemJournalBatch);
-          Clear(CSPostingBuffer);
-          CSPostingBuffer.SetRange("Table No.",RecRef.Number);
-          CSPostingBuffer.SetRange("Record Id",RecRef.RecordId);
-          CSPostingBuffer.SetRange(Executed,false);
-          if CSPostingBuffer.FindSet then
-            Error(Err_PostingIsScheduled,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
-
-          Clear(ItemJournalLine);
-          ItemJournalLine.SetRange("Journal Template Name",ItemJournalBatch."Journal Template Name");
-          ItemJournalLine.SetRange("Journal Batch Name",ItemJournalBatch.Name);
-          if ItemJournalLine.Count > 0 then
-            Error(Err_StockTakeWorksheetNotEmpty,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name);
-        end;
-
-        NewCSStockTakes.Init;
-        NewCSStockTakes."Stock-Take Id" := CreateGuid;
-        NewCSStockTakes.Created := CurrentDateTime;
-        NewCSStockTakes."Created By" := UserId;
-        NewCSStockTakes.Location := Location.Code;
-        NewCSStockTakes."Journal Template Name" := ItemJournalBatch."Journal Template Name";
-        NewCSStockTakes."Journal Batch Name" := ItemJournalBatch.Name;
-        //-NPR5.53 [375919]
-        NewCSStockTakes."Adjust Inventory" := true;
-        //+NPR5.53 [375919]
-        NewCSStockTakes.Insert(true);
-
-        Commit;
-
-        if GuiAllowed then begin
-          if Confirm(StrSubstNo(Text002,Location.Code,true)) then begin
-            Clear(ItemJournalLine);
-            ItemJournalLine.Init;
-            ItemJournalLine.Validate("Journal Template Name",NewCSStockTakes."Journal Template Name");
-            ItemJournalLine.Validate("Journal Batch Name",NewCSStockTakes."Journal Batch Name");
-            ItemJournalLine."Location Code" := NewCSStockTakes.Location;
-
-            Clear(NoSeriesMgt);
-            ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series",ItemJournalLine."Posting Date",false);
-            ItemJournalLine."Source Code" := ItemJournalTemplate."Source Code";
-            ItemJournalLine."Reason Code" := ItemJournalBatch."Reason Code";
-            ItemJournalLine."Posting No. Series" := ItemJournalBatch."Posting No. Series";
-
-            Clear(Item);
-            Item.SetFilter("Location Filter",NewCSStockTakes.Location);
-            if not Item.FindSet then
-              Error(Text003,Location);
-
-            Clear(CalculateInventory);
-            CalculateInventory.UseRequestPage(false);
-            CalculateInventory.SetTableView(Item);
-            CalculateInventory.SetItemJnlLine(ItemJournalLine);
-            //-NPR5.52 [375749]
-            //CalculateInventory.InitializeRequest(WORKDATE,ItemJournalLine."Document No.",FALSE);
-            CalculateInventory.InitializeRequest(WorkDate,ItemJournalLine."Document No.",false,false);
-            //+NPR5.52 [375749]
-            CalculateInventory.RunModal;
-
-            Clear(ItemJournalLine);
-            ItemJournalLine.SetRange("Journal Template Name",NewCSStockTakes."Journal Template Name");
-            ItemJournalLine.SetRange("Journal Batch Name",NewCSStockTakes."Journal Batch Name");
-            ItemJournalLine.SetRange("Location Code",NewCSStockTakes.Location);
-            if ItemJournalLine.FindSet then begin
-              repeat
-                QtyCalculated += ItemJournalLine."Qty. (Calculated)"
-              until ItemJournalLine.Next = 0;
-            end;
-
-            NewCSStockTakes."Predicted Qty." := QtyCalculated;
-            NewCSStockTakes."Inventory Calculated" := true;
-            NewCSStockTakes.Modify(true);
-          end;
-        end else begin
-          Clear(ItemJournalLine);
-          ItemJournalLine.Init;
-          ItemJournalLine.Validate("Journal Template Name",NewCSStockTakes."Journal Template Name");
-          ItemJournalLine.Validate("Journal Batch Name",NewCSStockTakes."Journal Batch Name");
-          ItemJournalLine."Location Code" := NewCSStockTakes.Location;
-
-          Clear(NoSeriesMgt);
-          ItemJournalLine."Document No." := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series",ItemJournalLine."Posting Date",false);
-          ItemJournalLine."Source Code" := ItemJournalTemplate."Source Code";
-          ItemJournalLine."Reason Code" := ItemJournalBatch."Reason Code";
-          ItemJournalLine."Posting No. Series" := ItemJournalBatch."Posting No. Series";
-
-          Clear(Item);
-          Item.SetFilter("Location Filter",NewCSStockTakes.Location);
-          if not Item.FindSet then
-            Error(Text003,Location);
-
-          Clear(CalculateInventory);
-          CalculateInventory.UseRequestPage(false);
-          CalculateInventory.SetTableView(Item);
-          CalculateInventory.SetItemJnlLine(ItemJournalLine);
-          //-NPR5.52 [375749]
-          //CalculateInventory.InitializeRequest(WORKDATE,ItemJournalLine."Document No.",FALSE);
-          CalculateInventory.InitializeRequest(WorkDate,ItemJournalLine."Document No.",false,false);
-          //+NPR5.52 [375749]
-          CalculateInventory.RunModal;
-
-          Clear(ItemJournalLine);
-          ItemJournalLine.SetRange("Journal Template Name",NewCSStockTakes."Journal Template Name");
-          ItemJournalLine.SetRange("Journal Batch Name",NewCSStockTakes."Journal Batch Name");
-          ItemJournalLine.SetRange("Location Code",NewCSStockTakes.Location);
-          if ItemJournalLine.FindSet then begin
-            repeat
-              QtyCalculated += ItemJournalLine."Qty. (Calculated)"
-            until ItemJournalLine.Next = 0;
-          end;
-
-          NewCSStockTakes."Predicted Qty." := QtyCalculated;
-          NewCSStockTakes."Inventory Calculated" := true;
-          NewCSStockTakes.Modify(true);
-        end;
+        CreateNewCountingV2(Location);
     end;
 
     procedure CancelCounting(var CSStockTakes: Record "CS Stock-Takes")
@@ -1106,24 +968,7 @@ codeunit 6151373 "CS Helper Functions"
         //IF NOT LocationRec.GET(GETFILTER(Location)) THEN
         //  ERROR(Err_MissingLocation);
 
-        //-NPR5.52 [364063]
-        Clear(CSStockTakes);
-        CSStockTakes.SetRange(Location,Location.Code);
-        CSStockTakes.SetRange(Closed, 0DT);
-        if CSStockTakes.FindSet then
-         Error(Err_CSStockTakes,CSStockTakes."Stock-Take Id");
-
-        Clear(CSStockTakes);
-        CSStockTakes.SetRange(Location,Location.Code);
-        CSStockTakes.SetFilter(Closed, '<>%1', 0DT);
-        CSStockTakes.SetRange("Journal Posted", false);
-        //-NPR5.53
-        CSStockTakes.SetRange("Adjust Inventory",true);
-        //+NPR5.53
-        if CSStockTakes.FindSet then
-         Error(Err_PostingNotDone);
-
-        //-NPR5.53
+        //-NPR5.54 [384506]
         if CSCountingSupervisor.Get(UserId) then begin
           AdjustInventory := true;
         end else begin
@@ -1133,6 +978,49 @@ codeunit 6151373 "CS Helper Functions"
           if CSStoreUsers.FindFirst then
             AdjustInventory := true;
         end;
+        //+NPR5.54 [384506]
+
+        //-NPR5.52 [364063]
+        Clear(CSStockTakes);
+        CSStockTakes.SetRange(Location,Location.Code);
+        CSStockTakes.SetRange(Closed, 0DT);
+        //-NPR5.54 [384506]
+        if AdjustInventory then
+          CSStockTakes.SetRange("Adjust Inventory",true)
+        else
+          CSStockTakes.SetRange("Adjust Inventory",false);
+        //+NPR5.54 [384506]
+        if CSStockTakes.FindSet then
+         Error(Err_CSStockTakes,CSStockTakes."Stock-Take Id");
+
+        //-NPR5.54 [384506]
+        if AdjustInventory then begin
+        //+NPR5.54 [384506]
+          Clear(CSStockTakes);
+          CSStockTakes.SetRange(Location,Location.Code);
+          CSStockTakes.SetFilter(Closed, '<>%1', 0DT);
+          CSStockTakes.SetRange("Journal Posted", false);
+          //-NPR5.53
+          CSStockTakes.SetRange("Adjust Inventory",true);
+          //+NPR5.53
+          if CSStockTakes.FindSet then
+           Error(Err_PostingNotDone);
+          //-NPR5.53
+        //-NPR5.54 [384506]
+        end;
+        //+NPR5.54 [384506]
+
+        //-NPR5.54 [384506]
+        // IF CSCountingSupervisor.GET(USERID) THEN BEGIN
+        //  AdjustInventory := TRUE;
+        // END ELSE BEGIN
+        //  CLEAR(CSStoreUsers);
+        //  CSStoreUsers.SETRANGE("User ID",USERID);
+        //  CSStoreUsers.SETRANGE("Adjust Inventory",TRUE);
+        //  IF CSStoreUsers.FINDFIRST THEN
+        //    AdjustInventory := TRUE;
+        // END;
+        //+NPR5.54 [384506]
 
         if AdjustInventory then begin
         //+NPR5.53
@@ -1275,6 +1163,89 @@ codeunit 6151373 "CS Helper Functions"
           end;
           //+NPR5.53
         end;
+    end;
+
+    procedure PostCounting(var CSStockTakes: Record "CS Stock-Takes")
+    var
+        ItemJournalBatch: Record "Item Journal Batch";
+        ItemJnlTemplate: Record "Item Journal Template";
+        ItemJnlPostBatch: Codeunit "Item Jnl.-Post Batch";
+        ItemJournalLine: Record "Item Journal Line";
+        DocumentNo: Code[20];
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+    begin
+        if CSStockTakes."Journal Posted" then
+          Error(Err_PostingIsPosted,CSStockTakes."Journal Template Name",CSStockTakes."Journal Batch Name");
+
+        if not CSStockTakes."Adjust Inventory" then
+          Error(Txt014);
+
+        ItemJournalBatch.Get(CSStockTakes."Journal Template Name",CSStockTakes."Journal Batch Name");
+        ItemJnlTemplate.Get(ItemJournalBatch."Journal Template Name");
+        ItemJnlTemplate.TestField("Force Posting Report",false);
+
+        if (ItemJournalBatch."No. Series" <> '') then begin
+          DocumentNo := NoSeriesMgt.GetNextNo(ItemJournalBatch."No. Series",WorkDate,false);
+          Clear(ItemJournalLine);
+          ItemJournalLine.SetRange("Journal Template Name",ItemJournalBatch."Journal Template Name");
+          ItemJournalLine.SetRange("Journal Batch Name",ItemJournalBatch.Name);
+          ItemJournalLine.ModifyAll("Document No.",DocumentNo,false);
+        end;
+
+        Clear(ItemJournalLine);
+        ItemJournalLine.SetRange("Journal Template Name",ItemJournalBatch."Journal Template Name");
+        ItemJournalLine.SetRange("Journal Batch Name",ItemJournalBatch.Name);
+        if ItemJournalLine.FindSet then begin
+          repeat
+            ItemJnlPostBatch.Run(ItemJournalLine);
+          until ItemJournalLine.Next = 0;
+        end;
+
+        if CSStockTakes.Closed = 0DT then begin
+            CSStockTakes.Closed := CurrentDateTime;
+            CSStockTakes."Closed By" := UserId;
+        end;
+
+        CSStockTakes."Journal Posted" := true;
+        CSStockTakes.Modify(true);
+    end;
+
+    procedure CancelCountingWOPosting(var CSStockTakes: Record "CS Stock-Takes")
+    var
+        ItemJournalBatch: Record "Item Journal Batch";
+        LocationRec: Record Location;
+        RecRef: RecordRef;
+        CSPostingBuffer: Record "CS Posting Buffer";
+    begin
+        if CSStockTakes."Journal Posted" then
+          exit;
+
+        if not LocationRec.Get(CSStockTakes.Location) then
+          Error(Err_MissingLocation);
+
+        if ItemJournalBatch.Get(CSStockTakes."Journal Template Name",CSStockTakes."Journal Batch Name") then begin
+
+          if not Confirm(StrSubstNo(Err_ConfirmForceCloseWOPosting,ItemJournalBatch."Journal Template Name",ItemJournalBatch.Name),true) then
+            exit;
+
+          RecRef.GetTable(ItemJournalBatch);
+          Clear(CSPostingBuffer);
+          CSPostingBuffer.SetRange("Table No.",RecRef.Number);
+          CSPostingBuffer.SetRange("Record Id",RecRef.RecordId);
+          CSPostingBuffer.SetRange(Executed,false);
+          if CSPostingBuffer.FindSet then
+            CSPostingBuffer.Delete(true);
+
+          ItemJournalBatch.Delete(true);
+
+        end;
+
+        CSStockTakes."Journal Posted" := CSStockTakes."Adjust Inventory";
+        CSStockTakes.Closed := CurrentDateTime;
+        CSStockTakes."Closed By" := UserId;
+        CSStockTakes.Note := Txt_CountingCancelled;
+
+        CSStockTakes.Modify(true);
     end;
 
     local procedure "-- Subscribers"()

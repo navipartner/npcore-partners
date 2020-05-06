@@ -1,10 +1,14 @@
 report 6150660 "NPRE - Rest. Daily Turnover"
 {
     // NPR5.53/ALPO/20191217 CASE 380918 New report to get turnover and average turnover per table/per guest broken down by period and selected dimensions
+    // NPR5.54/ALPO/20200212 CASE 390673 Fixed incorrect filter
+    // NPR5.54/ALPO/20200309 CASE 392052 Include into report POS Sales Lines marked with "Exclude from Posting" checkmark
+    // NPR5.54/ALPO/20200327 CASe 380918 Some formatting adjustments: column name changes, hide empty columns, hide division by zero errors in cells
     DefaultLayout = RDLC;
     RDLCLayout = './NPRE - Rest. Daily Turnover.rdlc';
 
     Caption = 'Restaurant Daily Turnover';
+    UsageCategory = ReportsAndAnalysis;
 
     dataset
     {
@@ -15,7 +19,7 @@ report 6150660 "NPRE - Rest. Daily Turnover"
             dataitem("POS Sales Line"; "POS Sales Line")
             {
                 DataItemLink = "POS Entry No." = FIELD("Entry No.");
-                DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = CONST(Item), "Exclude from Posting" = CONST(false));
+                DataItemTableView = SORTING("POS Entry No.","Line No.") WHERE(Type=CONST(Item));
                 RequestFilterFields = "No.", "Location Code";
 
                 trigger OnPreDataItem()
@@ -58,7 +62,8 @@ report 6150660 "NPRE - Rest. Daily Turnover"
                     POSEntryQry.SetFilter(No, "POS Sales Line".GetFilter("No."));
                 if "POS Sales Line".GetFilter("Location Code") <> '' then
                     POSEntryQry.SetFilter(Location_Code, "POS Sales Line".GetFilter("Location Code"));
-                POSEntryQry.SetRange(Exclude_from_Posting, false);   // #390673 - Manually fixed after discovered and discussed with ALPO
+                //POSEntryQry.SETRANGE(Exclude_from_Posting,"POS Sales Line"."Exclude from Posting"::"0");  //NPR5.54 [390673]-revoked
+                //POSEntryQry.SETRANGE(Exclude_from_Posting,FALSE);  //NPR5.54 [390673]  //NPR5.54 [392052]-revoked
                 if DimSetFilter <> '' then
                     POSEntryQry.SetFilter(Dimension_Set_ID, DimSetFilter);
                 POSEntryQry.Open;
@@ -210,6 +215,7 @@ report 6150660 "NPRE - Rest. Daily Turnover"
 
     requestpage
     {
+        SaveValues = true;
 
         layout
         {
@@ -250,10 +256,10 @@ report 6150660 "NPRE - Rest. Daily Turnover"
     {
         AppliedFiltersLbl = 'Filters:';
         AveragePerGuestLbl = 'Average per Guest';
-        AveragePerTableLbl = 'Average per Table';
+        AveragePerTableLbl = 'Average per Sale';
         DateLbl = 'Date';
         NoOfGuestsLbl = 'No. of Guests';
-        NoOfTablesLbl = 'No. of Tables';
+        NoOfTablesLbl = 'No. of Sales';
         TableNoLbl = 'Table No.';
         TurnoverLbl = 'Turnover';
     }

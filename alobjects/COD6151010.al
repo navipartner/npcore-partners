@@ -14,6 +14,7 @@ codeunit 6151010 "NpRv Voucher Mgt."
     // NPR5.53/MHA /20191114  CASE 372315 Added Top-up functionality from Sales Invoice
     // NPR5.53/MHA /20192211  CASE 378597 Added support for Sales Line Quantity greater than 1
     // NPR5.53/MHA /20191209  CASE 380284 Vouchers with balance should be Send again upon Payment and Topup
+    // NPR5.54/MHA /20200310  CASE 372135 Adjusted function signature of IssueVoucher() to allow for Voucher No. to also be parsed
 
 
     trigger OnRun()
@@ -389,27 +390,42 @@ codeunit 6151010 "NpRv Voucher Mgt."
         if SaleLinePOSReference.FindSet then;
 
         for i := 1 to SaleLinePOS.Quantity do begin
-          IssueVoucher(VoucherType,SaleLinePOS,SaleLinePOSVoucher,SaleLinePOSReference."Reference No.");
-          if SaleLinePOSReference.Next = 0 then
+          //-NPR5.54 [372135]
+          //IssueVoucher(VoucherType,SaleLinePOS,SaleLinePOSVoucher,SaleLinePOSReference."Reference No.");
+          //IF SaleLinePOSReference.NEXT = 0 THEN
+          //  SaleLinePOSReference."Reference No." := '';
+          IssueVoucher(VoucherType,SaleLinePOS,SaleLinePOSVoucher,SaleLinePOSReference);
+          if SaleLinePOSReference.Next = 0 then begin
+            SaleLinePOSReference."Voucher No." := '';
             SaleLinePOSReference."Reference No." := '';
+          end;
+          //+NPR5.54 [372135]
         end;
     end;
 
-    local procedure IssueVoucher(VoucherType: Record "NpRv Voucher Type";SaleLinePOS: Record "Sale Line POS";var SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";ReferenceNo: Text)
+    local procedure IssueVoucher(VoucherType: Record "NpRv Voucher Type";SaleLinePOS: Record "Sale Line POS";var SaleLinePOSVoucher: Record "NpRv Sale Line POS Voucher";SaleLinePOSReference: Record "NpRv Sale Line POS Reference")
     var
         Voucher: Record "NpRv Voucher";
         PrevVoucher: Text;
     begin
         if SaleLinePOS."Unit Price" <= 0 then
           exit;
-        if ReferenceNo <> '' then
+        //-NPR5.54 [372135]
+        //IF ReferenceNo <> '' THEN
+        //  VoucherType.TESTFIELD("Reference No. Pattern");
+        if SaleLinePOSReference."Reference No." = '' then
           VoucherType.TestField("Reference No. Pattern");
+        //+NPR5.54 [372135]
 
         Voucher.Init;
         Voucher."Starting Date" := SaleLinePOSVoucher."Starting Date";
         Voucher.Validate("Voucher Type",VoucherType.Code);
-        Voucher."No." := '';
-        Voucher."Reference No." := ReferenceNo;
+        //-NPR5.54 [372135]
+        // Voucher."No." := '';
+        // Voucher."Reference No." := ReferenceNo;
+        Voucher."No." := SaleLinePOSReference."Voucher No.";
+        Voucher."Reference No." := SaleLinePOSReference."Reference No.";
+        //+NPR5.54 [372135]
         //-NPR5.50 [356003]
         OnBeforeInsertIssuedVoucher(Voucher, SaleLinePOSVoucher);
         //+NPR5.50 [356003]
@@ -1097,6 +1113,22 @@ codeunit 6151010 "NpRv Voucher Mgt."
 
     local procedure "--- Generate Reference No"()
     begin
+    end;
+
+    procedure GenerateTempVoucher(VoucherType: Record "NpRv Voucher Type";var TempVoucher: Record "NpRv Voucher" temporary)
+    var
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+    begin
+        //-NPR5.54 [372135]
+        TempVoucher.Init;
+        TempVoucher."No." := '';
+        TempVoucher.Validate("Voucher Type",VoucherType.Code);
+        if VoucherType."No. Series" <> '' then begin
+          NoSeriesMgt.InitSeries(TempVoucher."No. Series",'',0D,TempVoucher."No.",TempVoucher."No. Series");
+          TempVoucher.Description := CopyStr(VoucherType.Description + ' ' + TempVoucher."No.",1,MaxStrLen(TempVoucher.Description));
+        end;
+        TempVoucher."Reference No." := GenerateReferenceNo(TempVoucher);
+        //9+NPR5.54 [372135]
     end;
 
     procedure GenerateReferenceNo(Voucher: Record "NpRv Voucher") ReferenceNo: Text

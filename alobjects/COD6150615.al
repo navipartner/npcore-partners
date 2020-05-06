@@ -40,6 +40,8 @@ codeunit 6150615 "POS Post Entries"
     // NPR5.53/ALPO/20191104 CASE 375258 Check posted dimension consistency
     // NPR5.53/TSA /20191122 CASE 367393 Removed old subscribers from previous implementation
     // NPR5.53/SARA/20191205 CASE 380054 Change Account Type for Difference Amount posting
+    // NPR5.53/TSA /20200124 CASE 386737 Fixed sales tax aggregation in batch mode posting
+    // NPR5.54/TSA /20200224 CASE 389250 Posting negative bin transfers
 
     TableNo = "POS Entry";
 
@@ -612,7 +614,8 @@ codeunit 6150615 "POS Post Entries"
                         end;
                         AmountToPostToAccount := -POSBalancingLine."Balanced Diff. Amount";
 
-                        if POSBalancingLine."Move-To Bin Amount" > 0 then begin
+            // IF POSBalancingLine."Move-To Bin Amount" > 0 THEN BEGIN //-+NPR5.54 [389250]
+            if (POSBalancingLine."Move-To Bin Amount" <> 0) then begin
                             POSBalancingLine.TestField("Move-To Bin Code");
                             if not GetPostingSetup(POSBalancingLine."POS Store Code", POSBalancingLine."POS Payment Method Code", POSBalancingLine."Move-To Bin Code", POSPostingSetupNewBin) then
                                 //-+NPR5.45 [322769] ERROR(TextPostingSetupMissing,POSPostingSetup.TABLECAPTION,POSBalancingLine.TABLECAPTION,POSBalancingLine.FIELDCAPTION("POS Entry No."),POSBalancingLine."POS Entry No.");
@@ -628,7 +631,8 @@ codeunit 6150615 "POS Post Entries"
                             end;
                         end;
 
-                        if POSBalancingLine."Deposit-To Bin Amount" > 0 then begin
+            //IF POSBalancingLine."Deposit-To Bin Amount" > 0 THEN BEGIN //-+NPR5.54 [389250]
+            if (POSBalancingLine."Deposit-To Bin Amount" <> 0) then begin
                             POSBalancingLine.TestField("Deposit-To Bin Code");
                             if not GetPostingSetup(POSBalancingLine."POS Store Code", POSBalancingLine."POS Payment Method Code", POSBalancingLine."Deposit-To Bin Code", POSPostingSetupNewBin) then
                                 //-+NPR5.45 [322769] ERROR(TextPostingSetupMissing,POSPostingSetup.TABLECAPTION,POSBalancingLine.TABLECAPTION,POSBalancingLine.FIELDCAPTION("POS Entry No."),POSBalancingLine."POS Entry No.");
@@ -689,22 +693,22 @@ codeunit 6150615 "POS Post Entries"
                     //-NPR5.53 [376362]
                     //    IF StopOnErrorVar THEN BEGIN
                     //
-                    //      //-#372920 [372920] PostAssembly native code commits before posting
+            //      //-NPR5.52 [372920] PostAssembly native code commits before posting
                     //      COMMIT;
                     //      POSPostItemEntries.PostAssemblyOrders (POSEntry, TRUE);
                     //      COMMIT;
-                    //      //+#372920 [372920]
+            //      //+NPR5.52 [372920]
                     //
                     //      POSPostItemEntries.RUN(POSEntry);
                     //      POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::Posted);
                     //      POSEntry.MODIFY;
                     //
                     //    END ELSE BEGIN
-                    //      //-#369668 [369668]
+            //      //-NPR5.52 [369668]
                     //      COMMIT;
-                    //      //+#369668 [369668]
+            //      //+NPR5.52 [369668]
                     //
-                    //      //-#372920 [372920]
+            //      //-NPR5.52 [372920]
                     //      // IF POSPostItemEntries.RUN(POSEntry) THEN BEGIN
                     //      //   POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::Posted);
                     //      // END ELSE BEGIN
@@ -717,7 +721,7 @@ codeunit 6150615 "POS Post Entries"
                     //        IF POSPostItemEntries.RUN(POSEntry) THEN
                     //          POSEntry.VALIDATE("Post Item Entry Status",POSEntry."Post Item Entry Status"::Posted);
                     //
-                    //      //+#372920 [372920]
+            //      //+NPR5.52 [372920]
                     //      POSEntry.MODIFY;
                     //      COMMIT;
                     //
@@ -1702,6 +1706,7 @@ codeunit 6150615 "POS Post Entries"
 
     local procedure CreateGenJournalLinesFromSalesTax(var POSEntry: Record "POS Entry"; var GenJnlLine: Record "Gen. Journal Line")
     var
+        POSEntry2: Record "POS Entry";
         TaxJurisdiction: Record "Tax Jurisdiction";
         CurrExchRate: Record "Currency Exchange Rate";
         CustPostingGr: Record "Customer Posting Group";
@@ -1723,37 +1728,48 @@ codeunit 6150615 "POS Post Entries"
         RecRef.GetTable(GenJnlLine);
         IsNALocalized := RecRef.FieldExist(10011);
 
-        TempPOSTaxAmountLine.DeleteAll;
-        POSTaxAmountLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSTaxAmountLine.SetRange("Tax Calculation Type", TempPOSTaxAmountLine."Tax Calculation Type"::"Sales Tax");
-        if POSTaxAmountLine.FindSet then
-            repeat
-                if IsNALocalized then begin
-                    TempPOSTaxAmountLine := POSTaxAmountLine;
-                    TempPOSTaxAmountLine.Insert;
-                end else begin
-                    //IF Not in NA database, post as one line because of checks in Standard NAV
-                    TempPOSTaxAmountLine.Reset;
-                    TempPOSTaxAmountLine.SetRange("Tax Calculation Type", POSTaxAmountLine."Tax Calculation Type");
-                    TempPOSTaxAmountLine.SetRange("Tax Area Code", POSTaxAmountLine."Tax Area Code");
-                    TempPOSTaxAmountLine.SetRange("Tax Group Code", POSTaxAmountLine."Tax Group Code");
-                    TempPOSTaxAmountLine.SetRange("Use Tax", POSTaxAmountLine."Use Tax");
-                    TempPOSTaxAmountLine.SetRange("Tax Area Code for Key", POSTaxAmountLine."Tax Area Code for Key");
-                    if not TempPOSTaxAmountLine.FindFirst then begin
-                        TempPOSTaxAmountLine := POSTaxAmountLine;
-                        TempPOSTaxAmountLine.Insert;
-                    end else begin
-                        TempPOSTaxAmountLine.Quantity := TempPOSTaxAmountLine.Quantity + POSTaxAmountLine.Quantity;
-                        TempPOSTaxAmountLine."Calculated Tax Amount" := TempPOSTaxAmountLine."Calculated Tax Amount" + POSTaxAmountLine."Calculated Tax Amount";
-                        TempPOSTaxAmountLine."Tax Difference" := TempPOSTaxAmountLine."Tax Difference" + POSTaxAmountLine."Tax Difference";
-                        TempPOSTaxAmountLine."Invoice Discount Amount" := TempPOSTaxAmountLine."Invoice Discount Amount" + POSTaxAmountLine."Invoice Discount Amount";
-                        TempPOSTaxAmountLine."Tax Amount" := TempPOSTaxAmountLine."Tax Amount" + POSTaxAmountLine."Tax Amount";
-                        TempPOSTaxAmountLine."Amount Including Tax" := TempPOSTaxAmountLine."Amount Including Tax" + POSTaxAmountLine."Tax Amount";
-                        TempPOSTaxAmountLine."Tax Base Amount FCY" := TempPOSTaxAmountLine."Tax Base Amount FCY" + POSTaxAmountLine."Tax Base Amount FCY";
-                        TempPOSTaxAmountLine.Modify;
-                    end;
-                end;
-            until POSTaxAmountLine.Next = 0;
+        //-#NPR5.53 [386737]
+        if (TempPOSTaxAmountLine.IsTemporary ()) then
+          TempPOSTaxAmountLine.DeleteAll;
+
+        POSEntry2.CopyFilters (POSEntry);
+        POSEntry2.SetFilter ("Post Entry Status", '=%1|=%2', POSEntry2."Post Entry Status"::Unposted, POSEntry2."Post Entry Status"::"Error while Posting");
+        if POSEntry2.FindSet then repeat
+          // POSTaxAmountLine.SETRANGE("POS Entry No.",POSEntry."Entry No.");
+          POSTaxAmountLine.SetFilter ("POS Entry No.", '=%1', POSEntry2."Entry No.");
+          //+NPR5.53 [386737]
+
+          POSTaxAmountLine.SetRange("Tax Calculation Type",TempPOSTaxAmountLine."Tax Calculation Type"::"Sales Tax");
+          if POSTaxAmountLine.FindSet then repeat
+            if IsNALocalized then begin
+              TempPOSTaxAmountLine := POSTaxAmountLine;
+              TempPOSTaxAmountLine.Insert;
+            end else begin
+              //IF Not in NA database, post as one line because of checks in Standard NAV
+              TempPOSTaxAmountLine.Reset;
+              TempPOSTaxAmountLine.SetRange("Tax Calculation Type",POSTaxAmountLine."Tax Calculation Type");
+              TempPOSTaxAmountLine.SetRange("Tax Area Code",POSTaxAmountLine."Tax Area Code");
+              TempPOSTaxAmountLine.SetRange("Tax Group Code",POSTaxAmountLine."Tax Group Code");
+              TempPOSTaxAmountLine.SetRange("Use Tax",POSTaxAmountLine."Use Tax");
+              TempPOSTaxAmountLine.SetRange("Tax Area Code for Key",POSTaxAmountLine."Tax Area Code for Key");
+              if not TempPOSTaxAmountLine.FindFirst then begin
+                TempPOSTaxAmountLine := POSTaxAmountLine;
+                TempPOSTaxAmountLine.Insert;
+              end else begin
+                TempPOSTaxAmountLine.Quantity := TempPOSTaxAmountLine.Quantity + POSTaxAmountLine.Quantity;
+                TempPOSTaxAmountLine."Calculated Tax Amount" := TempPOSTaxAmountLine."Calculated Tax Amount" + POSTaxAmountLine."Calculated Tax Amount";
+                TempPOSTaxAmountLine."Tax Difference" := TempPOSTaxAmountLine."Tax Difference" + POSTaxAmountLine."Tax Difference";
+                TempPOSTaxAmountLine."Invoice Discount Amount" := TempPOSTaxAmountLine."Invoice Discount Amount" + POSTaxAmountLine."Invoice Discount Amount";
+                TempPOSTaxAmountLine."Tax Amount" := TempPOSTaxAmountLine."Tax Amount" + POSTaxAmountLine."Tax Amount";
+                TempPOSTaxAmountLine."Amount Including Tax" := TempPOSTaxAmountLine."Amount Including Tax" + POSTaxAmountLine."Tax Amount";
+                TempPOSTaxAmountLine."Tax Base Amount FCY" := TempPOSTaxAmountLine."Tax Base Amount FCY" + POSTaxAmountLine."Tax Base Amount FCY";
+                TempPOSTaxAmountLine.Modify;
+              end;
+            end;
+          until POSTaxAmountLine.Next = 0;
+          TempPOSTaxAmountLine.Reset;
+        until (POSEntry2.Next () = 0); //-+NPR5.53 [386737]
+
         TempPOSTaxAmountLine.Reset;
 
         if POSEntry.FindFirst then

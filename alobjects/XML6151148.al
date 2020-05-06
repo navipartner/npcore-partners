@@ -1,6 +1,7 @@
 xmlport 6151148 "M2 Customer Item By Period"
 {
     // NPR5.49/TSA /20190307 CASE 345375 Initial Version
+    // MAG2.25/TSA /20200401 CASE 399020 Added a conditional filter for location code
 
     Caption = 'Customer Item By Period';
     Encoding = UTF8;
@@ -482,7 +483,8 @@ xmlport 6151148 "M2 Customer Item By Period"
         SalesLine.SetFilter ("Sell-to Customer No.", '=%1', SellToCustomerNo);
         SalesLine.SetFilter ("Planned Shipment Date", '%1..%2', PeriodStart, PeriodEnd);
         SalesLine.SetFilter ("Variant Code", '=%1', VariantCode);
-        SalesLine.SetFilter ("Location Code", '=%1', LocationCode);
+        if (LocationCode <> '') then //-+MAG2.25 [399020]
+          SalesLine.SetFilter ("Location Code", '=%1', LocationCode);
 
         if (SalesLine.FindSet ()) then begin
           repeat
@@ -517,7 +519,8 @@ xmlport 6151148 "M2 Customer Item By Period"
         ItemLedgerEntry.SetFilter ("Entry Type", '=%1', ItemLedgerEntry."Entry Type"::Sale);
         ItemLedgerEntry.SetFilter ("Item No.", '=%1', ItemNo);
         ItemLedgerEntry.SetFilter ("Variant Code", '=%1', VariantCode);
-        ItemLedgerEntry.SetFilter ("Location Code", '=%1', LocationCode);
+        if (LocationCode <> '') then //-+MAG2.25 [399020]
+          ItemLedgerEntry.SetFilter ("Location Code", '=%1', LocationCode);
         ItemLedgerEntry.SetFilter ("Source Type", '=%1', ItemLedgerEntry."Source Type"::Customer);
         ItemLedgerEntry.SetFilter ("Source No.", '=%1', SellToCustomerNo);
         ItemLedgerEntry.SetFilter ("Posting Date", '%1..%2', PeriodStart, PeriodEnd);
@@ -565,7 +568,8 @@ xmlport 6151148 "M2 Customer Item By Period"
         ValueEntry.SetFilter ("Item Ledger Entry Type", '=%1', ValueEntry."Item Ledger Entry Type"::Sale);
         ValueEntry.SetFilter ("Item No.", '=%1', ItemNo);
         ValueEntry.SetFilter ("Variant Code", '=%1', VariantCode);
-        ValueEntry.SetFilter ("Location Code", '=%1', LocationCode);
+        if (LocationCode <> '') then //-+MAG2.25 [399020]
+          ValueEntry.SetFilter ("Location Code", '=%1', LocationCode);
         ValueEntry.SetFilter ("Source Type", '=%1', ValueEntry."Source Type"::Customer);
         ValueEntry.SetFilter ("Source No.", '=%1', SellToCustomerNo);
         ValueEntry.SetFilter ("Posting Date", '%1..%2', PeriodStart, PeriodEnd);

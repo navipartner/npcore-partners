@@ -3,6 +3,7 @@ page 6151198 "NpCs Workflow Card"
     // NPR5.50/MHA /20190531  CASE 345261 Object created - Collect in Store
     // NPR5.51/MHA /20190723  CASE 362443 Removed "Auto Post Order on" and added "Archive on Delivery"
     // NPR5.51/MHA /20190819  CASE 364557 Added fields 350 "Store Stock", 360 "Post on", 380 "Bill via"
+    // NPR5.54/MHA /20200130  CASE 378956 Added Store Notification Fields
 
     Caption = 'Collect Workflow Card';
     PageType = Card;
@@ -43,7 +44,10 @@ page 6151198 "NpCs Workflow Card"
                     field("Notify Store via E-mail";"Notify Store via E-mail")
                     {
                     }
-                    field("E-mail Template";"E-mail Template")
+                    field("Store E-mail Temp. (Pending)";"Store E-mail Temp. (Pending)")
+                    {
+                    }
+                    field("Store E-mail Temp. (Expired)";"Store E-mail Temp. (Expired)")
                     {
                     }
                 }
@@ -53,7 +57,10 @@ page 6151198 "NpCs Workflow Card"
                     field("Notify Store via Sms";"Notify Store via Sms")
                     {
                     }
-                    field("Sms Template";"Sms Template")
+                    field("Store Sms Template (Pending)";"Store Sms Template (Pending)")
+                    {
+                    }
+                    field("Store Sms Template (Expired)";"Store Sms Template (Expired)")
                     {
                     }
                 }

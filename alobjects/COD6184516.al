@@ -7,7 +7,19 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
     // NPR5.51/MMV /20190718 CASE 331463 Match card prefix again after result if it switched during trx. (This final match is too late for any surcharge).
     // NPR5.53/MMV /20191219 CASE 383259 Corrections to #331463
     // NPR5.53/MMV /20200113 CASE 385078 Send cashback value to flexiiterm
+    // NPR5.54/MMV /20200131 CASE 387965 Reintroduced gift card balance check integration.
+    // NPR5.54/MMV /20200225 CASE 364340 Discontinued support for surcharge.
 
+    SingleInstance = true;
+
+    trigger OnRun()
+    begin
+    end;
+
+    var
+        Err001: Label 'Terminal amount is 0';
+        AuxNotSupported: Label 'Aux functions are not supported for this credit card solution.';
+        GlobalGiftCardCustomerID: Text;
 
     procedure SendRequest(EFTTransactionRequest: Record "EFT Transaction Request")
     var
@@ -20,7 +32,7 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         //+NPR5.51 [359385]
           EFTTransactionRequest."Processing Type"::PAYMENT,
           EFTTransactionRequest."Processing Type"::REFUND :
-                PaymentTransaction(EFTTransactionRequest);
+            PaymentTransaction(EFTTransactionRequest);
         end;
     end;
 
@@ -35,7 +47,7 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         POSFrontEnd: Codeunit "POS Front End Management";
     begin
         if not POSSession.IsActiveSession(POSFrontEnd) then
-            Error('Critical error');
+          Error('Critical error');
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
 
         State := State.State();
@@ -47,7 +59,9 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         State.ReceiptNo := EFTTransactionRequest."Sales Ticket No.";
         State.VerificationMethod := EFTFlexiitermIntegration.GetCVM(EFTSetup);
         State.TransactionType := EFTFlexiitermIntegration.GetTransactionType(EFTSetup);
-        State.UseFee := EFTFlexiitermIntegration.GetSurchargeStatus(EFTSetup);
+        //-NPR5.54 [364340]
+        //State.UseFee := EFTFlexiitermIntegration.GetSurchargeStatus(EFTSetup);
+        //+NPR5.54 [364340]
         State.IsBarcode := false;
         State.CardSwipeActivatesTerminal := true;
         //-NPR5.53 [385078]
@@ -58,7 +72,11 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         GatewayRequest.Path := EFTFlexiitermIntegration.GetFolderPath(EFTSetup);
         GatewayRequest.State := State;
 
-        POSFrontEnd.InvokeDevice(GatewayRequest, 'Flexiiterm_EftTrx', 'EftTrx');
+        POSFrontEnd.InvokeDevice (GatewayRequest, 'Flexiiterm_EftTrx', 'EftTrx');
+    end;
+
+    local procedure "--- Protocol Events"()
+    begin
     end;
 
     local procedure CloseForm(Data: Text)
@@ -74,7 +92,7 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
 
         State := State.Deserialize(Data);
 
-        EFTTransactionRequest.Get(State.RequestEntryNo);
+        EFTTransactionRequest.Get (State.RequestEntryNo);
         //-NPR5.51 [331463]
         //-NPR5.53 [383259]
         // IF EFTTransactionRequest."Card Number" <> State.CardPan THEN BEGIN //Card was switched around during transaction
@@ -98,12 +116,12 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         EFTTransactionRequest."Amount Output" := State.CapturedAmount;
         EFTTransactionRequest."Result Amount" := State.CapturedAmount;
         EFTTransactionRequest."POS Description" := EFTFlexiitermIntegration.GetPOSDescription(EFTTransactionRequest);
-        EFTTransactionRequest.Modify();
+        EFTTransactionRequest.Modify ();
 
-        OnAfterProtocolResponse(EFTTransactionRequest);
+        OnAfterProtocolResponse (EFTTransactionRequest);
     end;
 
-    local procedure FindPaymentType(Data: Text; var ReturnData: Text)
+    local procedure FindPaymentType(Data: Text;var ReturnData: Text)
     var
         PaymentTypePOS: Record "Payment Type POS";
         RetailSalesLineCode: Codeunit "Retail Sales Line Code";
@@ -120,33 +138,37 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
 
         State := State.Deserialize(Data);
 
-        EFTTransactionRequest.Get(State.RequestEntryNo);
-        Register.Get(EFTTransactionRequest."Register No.");
+        EFTTransactionRequest.Get (State.RequestEntryNo);
+        Register.Get (EFTTransactionRequest."Register No.");
 
-        State.CardPan := CreditCardHelper.CutCardPan(State.CardPan);
+        State.CardPan := CreditCardHelper.CutCardPan (State.CardPan);
 
         SalePOS.Get(State.RegisterNo, State.ReceiptNo);
 
-        if (CreditCardHelper.FindPaymentType(State.CardPan, PaymentTypePOS, SalePOS."Location Code")) then begin
-            State.SalesAmountInclVat := EFTTransactionRequest."Amount Input";
-            State.PaymentNo := PaymentTypePOS."No.";
+        if (CreditCardHelper.FindPaymentType (State.CardPan, PaymentTypePOS, SalePOS."Location Code")) then begin
+          State.SalesAmountInclVat := EFTTransactionRequest."Amount Input";
+          State.PaymentNo := PaymentTypePOS."No.";
 
-            State.MatchSalesAmount := PaymentTypePOS."Match Sales Amount";
+          State.MatchSalesAmount := PaymentTypePOS."Match Sales Amount";
 
-        //-NPR5.51 [359385]
-        //  State.CardPanValidGiftVoucher := ((PaymentTypePOS."PBS Gift Voucher" AND (PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::"Gift Voucher")));
-        //+NPR5.51 [359385]
+          EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
+        //-NPR5.54 [387965]
+          Clear(GlobalGiftCardCustomerID);
+          if (PaymentTypePOS."Processing Type" = PaymentTypePOS."Processing Type"::"Gift Voucher") and (EFTFlexiitermIntegration.GetGiftVoucherCustomerID(EFTSetup) <> '' ) then begin
+            State.CardPanValidGiftVoucher := true;
+            GlobalGiftCardCustomerID := EFTFlexiitermIntegration.GetGiftVoucherCustomerID(EFTSetup);
+          end;
+        //+NPR5.54 [387965]
+        //-NPR5.54 [364340]
+        //  ConfirmFee := EFTFlexiitermIntegration.GetSurchargeDialogStatus(EFTSetup);
+        //  State.NewFee := CreditCardHelper.CalcTransFee (PaymentTypePOS, EFTTransactionRequest."Amount Input", ConfirmFee);
+        //  State.FeeItem := PaymentTypePOS."Fee Item No.";
+        //+NPR5.54 [364340]
 
-            EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."POS Payment Type Code");
-            ConfirmFee := EFTFlexiitermIntegration.GetSurchargeDialogStatus(EFTSetup);
-            State.NewFee := CreditCardHelper.CalcTransFee(PaymentTypePOS, EFTTransactionRequest."Amount Input", ConfirmFee);
-            State.FeeItem := PaymentTypePOS."Fee Item No.";
+          EFTTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
+          EFTTransactionRequest."Card Name" := CopyStr (PaymentTypePOS.Description, 1, MaxStrLen (EFTTransactionRequest."Card Name"));;
 
-            EFTTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
-            EFTTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EFTTransactionRequest."Card Name"));
-            ;
-
-            EFTTransactionRequest.Modify();
+          EFTTransactionRequest.Modify();
         end;
 
         ReturnData := State.Serialize();
@@ -159,80 +181,95 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         EFTTransactionRequest: Record "EFT Transaction Request";
         State: DotNet npNetState6;
     begin
-
-        State := State.Deserialize(Data);
-
-        EFTTransactionRequest.Get(State.RequestEntryNo);
-        EFTTransactionRequest."Fee Amount" := State.NewFee;
-        EFTTransactionRequest.Modify;
-
-        SaleLinePOS.Reset;
-        Clear(SaleLinePOS);
-        SaleLinePOS.SetFilter("Register No.", '=%1', EFTTransactionRequest."Register No.");
-        SaleLinePOS.SetFilter("Sales Ticket No.", '=%1', EFTTransactionRequest."Sales Ticket No.");
-        if (SaleLinePOS.FindLast()) then;
-
-        SaleLinePOSFee.Init();
-        SaleLinePOSFee."Register No." := SaleLinePOS."Register No.";
-        SaleLinePOSFee."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
-        SaleLinePOSFee."Location Code" := SaleLinePOS."Location Code";
-        SaleLinePOSFee.Date := SaleLinePOS.Date;
-        SaleLinePOSFee."Line No." := SaleLinePOS."Line No." + 10000;
-        SaleLinePOSFee."Sale Type" := SaleLinePOS."Sale Type"::Sale;
-
-        SaleLinePOSFee.Validate(Type, SaleLinePOS.Type::Item);
-        SaleLinePOSFee.Validate("No.", State.FeeItem);
-        SaleLinePOSFee.Validate(Quantity, 1);
-        SaleLinePOSFee.Validate("Unit Price", State.NewFee);
-        SaleLinePOSFee.Insert();
+        //-NPR5.54 [364340]
+        // State := State.Deserialize(Data);
+        //
+        // EFTTransactionRequest.GET (State.RequestEntryNo);
+        // EFTTransactionRequest."Fee Amount" := State.NewFee;
+        // EFTTransactionRequest.MODIFY;
+        //
+        // SaleLinePOS.RESET;
+        // CLEAR (SaleLinePOS);
+        // SaleLinePOS.SETFILTER ("Register No.", '=%1', EFTTransactionRequest."Register No.");
+        // SaleLinePOS.SETFILTER ("Sales Ticket No.", '=%1', EFTTransactionRequest."Sales Ticket No.");
+        // IF (SaleLinePOS.FINDLAST ()) THEN ;
+        //
+        // SaleLinePOSFee.INIT();
+        // SaleLinePOSFee."Register No." := SaleLinePOS."Register No.";
+        // SaleLinePOSFee."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+        // SaleLinePOSFee."Location Code" := SaleLinePOS."Location Code";
+        // SaleLinePOSFee.Date := SaleLinePOS.Date;
+        // SaleLinePOSFee."Line No." := SaleLinePOS."Line No." + 10000;
+        // SaleLinePOSFee."Sale Type" := SaleLinePOS."Sale Type"::Sale;
+        //
+        // SaleLinePOSFee.VALIDATE (Type, SaleLinePOS.Type::Item);
+        // SaleLinePOSFee.VALIDATE ("No.", State.FeeItem);
+        // SaleLinePOSFee.VALIDATE (Quantity, 1);
+        // SaleLinePOSFee.VALIDATE ("Unit Price", State.NewFee);
+        // SaleLinePOSFee.INSERT();
+        //+NPR5.54 [364340]
     end;
 
-    local procedure CheckTransactionFromCheckResult(Data: Text; var ReturnData: Text)
+    local procedure GetGiftVoucherBalance(GiftVoucherNo: Text;var ReturnData: Text)
+    var
+        GiftVoucherBalance: Decimal;
+        ExpiryDate: Text;
+        POSActionNETSGiftLookup: Codeunit "POS Action - NETS Gift. Lookup";
+    begin
+        //-NPR5.54 [387965]
+        if POSActionNETSGiftLookup.InvokeWebservice(GlobalGiftCardCustomerID, GiftVoucherNo, ExpiryDate, GiftVoucherBalance) then
+          ReturnData := SerializeJson(GiftVoucherBalance)
+        else
+          ReturnData := SerializeJson(0);
+        //+NPR5.54 [387965]
+    end;
+
+    local procedure CheckTransactionFromCheckResult(Data: Text;var ReturnData: Text)
     var
         EFTTransactionRequest: Record "EFT Transaction Request";
         Result: Boolean;
         State: DotNet npNetState6;
     begin
 
-        State := State.Deserialize(Data);
+        State := State.Deserialize (Data);
 
-        Result := EFTTransactionRequest.Get(State.RequestEntryNo);
+        Result := EFTTransactionRequest.Get (State.RequestEntryNo);
         if Result then
-            Result := EFTTransactionRequest."Receipt 1".HasValue;
-        ReturnData := State.Serialize(Result);
+          Result := EFTTransactionRequest."Receipt 1".HasValue;
+        ReturnData := State.Serialize (Result);
     end;
 
     local procedure ModifyTransactionFromCheckResult(Data: Text)
     var
         EFTTransactionRequest: Record "EFT Transaction Request";
         CreditCardHelper: Codeunit "Credit Card Protocol Helper";
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         State: DotNet npNetState6;
     begin
 
-        State := State.Deserialize(Data);
-        EFTTransactionRequest.Get(State.RequestEntryNo);
+        State := State.Deserialize (Data);
+        EFTTransactionRequest.Get (State.RequestEntryNo);
 
         EFTTransactionRequest."Result Code" := 3;
         EFTTransactionRequest.Successful := true;
         EFTTransactionRequest."Result Display Text" := 'Approved';
-        EFTTransactionRequest."Card Number" := CreditCardHelper.CutCardPan(State.CardPan);
+        EFTTransactionRequest."Card Number" := CreditCardHelper.CutCardPan (State.CardPan);
         EFTTransactionRequest."Transaction Date" := Today;
         EFTTransactionRequest."Transaction Time" := Time;
-        EFTTransactionRequest."External Result Received" := true;
+        EFTTransactionRequest."External Result Known" := true;
         EFTTransactionRequest.Modify();
     end;
 
     local procedure RejectTransactionIfFound(Data: Text)
     var
         EFTTransactionRequest: Record "EFT Transaction Request";
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         CreditCardHelper: Codeunit "Credit Card Protocol Helper";
         State: DotNet npNetState6;
     begin
 
-        State := State.Deserialize(Data);
-        EFTTransactionRequest.Get(State.RequestEntryNo);
+        State := State.Deserialize (Data);
+        EFTTransactionRequest.Get (State.RequestEntryNo);
 
         EFTTransactionRequest."Result Code" := 1;
         EFTTransactionRequest.Successful := false;
@@ -240,7 +277,7 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         EFTTransactionRequest."Card Number" := CreditCardHelper.CutCardPan(State.CardPan);
         EFTTransactionRequest."Transaction Date" := Today;
         EFTTransactionRequest."Transaction Time" := Time;
-        EFTTransactionRequest."External Result Received" := true;
+        EFTTransactionRequest."External Result Known" := true;
         EFTTransactionRequest.Modify();
     end;
 
@@ -251,25 +288,25 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         OStream: OutStream;
         Util: Codeunit Utility;
         ReceiptLine: Text;
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         EntryNo: Integer;
         ReceiptNo: Integer;
         State: DotNet npNetState6;
     begin
 
         State := State.Deserialize(Data);
-        EFTTransactionRequest.Get(State.RequestEntryNo);
+        EFTTransactionRequest.Get (State.RequestEntryNo);
         EFTTransactionRequest."Receipt 1".CreateOutStream(OStream);
 
         Lines := State.ReceiptData;
         EntryNo := 1;
 
-        CreditCardTransaction.SetRange("Register No.", EFTTransactionRequest."Register No.");
-        CreditCardTransaction.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
+        CreditCardTransaction.SetRange ("Register No.", EFTTransactionRequest."Register No.");
+        CreditCardTransaction.SetRange ("Sales Ticket No.",EFTTransactionRequest."Sales Ticket No.");
 
         if (CreditCardTransaction.FindLast()) then begin
-            EntryNo := CreditCardTransaction."Entry No." + 1;
-            ReceiptNo := CreditCardTransaction."Receipt No." + 1
+          EntryNo := CreditCardTransaction."Entry No." + 1;
+          ReceiptNo := CreditCardTransaction."Receipt No." + 1
         end;
 
         CreditCardTransaction.Init;
@@ -282,14 +319,14 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
         CreditCardTransaction."Receipt No." := ReceiptNo;
 
         foreach ReceiptLine in Lines do begin
-            Util.Ansi2Ascii(ReceiptLine);
-            ReceiptLine := StrSubstNo('%1', ConvertStr(ReceiptLine, '���������', '�����ԙ��'));
-            OStream.Write(ReceiptLine);
+          Util.Ansi2Ascii(ReceiptLine);
+          ReceiptLine := StrSubstNo ('%1',ConvertStr(ReceiptLine,'���������','�����ԙ��'));
+          OStream.Write (ReceiptLine);
 
-            CreditCardTransaction."Entry No." := EntryNo;
-            CreditCardTransaction.Text := ReceiptLine;
-            CreditCardTransaction.Insert;
-            EntryNo += 1;
+          CreditCardTransaction."Entry No." := EntryNo;
+          CreditCardTransaction.Text := ReceiptLine;
+          CreditCardTransaction.Insert;
+          EntryNo += 1;
         end;
 
         EFTTransactionRequest.Modify();
@@ -303,39 +340,38 @@ codeunit 6184516 "EFT Flexiiterm Protocol"
 
     local procedure SerializeJson("Object": Variant): Text
     var
-        JsonConvert: DotNet JsonConvert;
+        JsonConvert: DotNet npNetJsonConvert;
     begin
         exit(JsonConvert.SerializeObject(Object));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6150716, 'OnAppGatewayProtocol', '', false, false)]
-    local procedure OnDeviceEvent(ActionName: Text; EventName: Text; Data: Text; ResponseRequired: Boolean; var ReturnData: Text; var Handled: Boolean)
+    local procedure OnDeviceEvent(ActionName: Text;EventName: Text;Data: Text;ResponseRequired: Boolean;var ReturnData: Text;var Handled: Boolean)
     var
         PaymentRequest: Integer;
         EFTTransactionRequest: Record "EFT Transaction Request";
     begin
 
         if (ActionName <> 'Flexiiterm_EftTrx') then
-            exit;
+          exit;
 
         Handled := true;
 
         case EventName of
           'CloseForm':                         CloseForm(Data);
           'FindPaymentType':                   FindPaymentType(Data,ReturnData);
-        //-NPR5.51 [359385]
-        //  'GetGiftVoucherBalance':             GetGiftVoucherBalance(Data,ReturnData);
-        //+NPR5.51 [359385]
-          'InsertSaleLineFee':                 InsertSaleLineFee(Data);
+        //-NPR5.54 [364340]
+          'InsertSaleLineFee':                 ; //Delete when event is completely gone from stargate assembly.
+        //+NPR5.54 [364340]
           'CheckTransactionFromCheckResult':   CheckTransactionFromCheckResult(Data,ReturnData);
           'ModifyTransactionFromCheckResult':  ModifyTransactionFromCheckResult(Data);
           'RejectTransactionIfFound':          RejectTransactionIfFound(Data);
           'ReadReceipt':                       HandleReceipt(Data);
           'PrintReceipts' : ; //Delete when event is completely gone from stargate assembly.
           'NumPad' : ; //Delete when event is completely gone from stargate assembly.
-        //-NPR5.51 [359385]
-          'GetGiftVoucherBalance' : ; //Delete when event is completely gone from stargate assembly.
-        //+NPR5.51 [359385]
+        //-NPR5.54 [387965]
+          'GetGiftVoucherBalance' : GetGiftVoucherBalance(Data,ReturnData);
+        //+NPR5.54 [387965]
           else
             Error ('Unhandled event sent from PaymentGateway %1', EventName);
         end;

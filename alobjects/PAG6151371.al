@@ -23,6 +23,7 @@ page 6151371 "CS Setup"
     // NPR5.53/CLVA/20191125 CASE 377467 Added action Schedule
     // NPR5.53/CLVA/20191128 CASE 379973 Added field "Earliest Start Date/Time"
     // NPR5.53/CLVA/20191125 CASE 377467 Added action "Counting Supervisor"
+    // NPR5.54/CLVA/20202003 CASE 389224 Added field "Batch Size"
 
     Caption = 'CS Setup';
     PageType = Card;
@@ -79,6 +80,9 @@ page 6151371 "CS Setup"
                 {
                 }
                 field("Earliest Start Date/Time";"Earliest Start Date/Time")
+                {
+                }
+                field("Batch Size";"Batch Size")
                 {
                 }
             }

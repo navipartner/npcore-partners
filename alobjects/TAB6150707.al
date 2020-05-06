@@ -3,14 +3,21 @@ table 6150707 "POS Setup"
     // NPR5.37/TSA /20171024 CASE 293905 Added fields Lock POS Action Code, Unlock POS Action Code
     // NPR5.39/TSA /20180126 CASE 303399 Added field OnBeforePaymentView Action
     // NPR5.40/VB  /20180228 CASE 306347 Replacing BLOB-based temporary-table parameters with physical-table parameters
+    // NPR5.54/TSA /20200219 CASE 391850 Added Description
+    // NPR5.54/TSA /20200220 CASE 392121 Added "Idle Timeout Action Code"
 
     Caption = 'POS Setup';
+    LookupPageID = "POS Setup List";
 
     fields
     {
         field(1;"Primary Key";Code[10])
         {
             Caption = 'Primary Key';
+        }
+        field(10;Description;Text[30])
+        {
+            Caption = 'Description';
         }
         field(100;"Login Action Code";Code[20])
         {
@@ -196,6 +203,29 @@ table 6150707 "POS Setup"
                 //+NPR5.40 [306347]
             end;
         }
+        field(140;"Idle Timeout Action Code";Code[20])
+        {
+            Caption = 'Idle Timeout Action Code';
+            TableRelation = "POS Action";
+
+            trigger OnLookup()
+            begin
+
+                //-NPR5.54 [392121]
+                if ActionMgt.LookupAction("Idle Timeout Action Code") then
+                  Validate("Idle Timeout Action Code");
+                //+NPR5.54 [392121]
+            end;
+
+            trigger OnValidate()
+            begin
+
+                //-NPR5.54 [392121]
+                ParamMgt.ClearParametersForRecord (RecordId, FieldNo ("Idle Timeout Action Code"));
+                ParamMgt.CopyFromActionToField ("Idle Timeout Action Code", RecordId, FieldNo ("Lock POS Action Code"));
+                //+NPR5.54 [392121]
+            end;
+        }
     }
 
     keys
@@ -208,6 +238,14 @@ table 6150707 "POS Setup"
     fieldgroups
     {
     }
+
+    trigger OnDelete()
+    begin
+
+        //-NPR5.54 [391850]
+        TestField ("Primary Key");
+        //+NPR5.54 [391850]
+    end;
 
     var
         ParamMgt: Codeunit "POS Action Parameter Mgt.";

@@ -24,6 +24,7 @@ table 6014402 "Payment Type POS"
     // NPR5.52/BHR /20190925 CASE 369605 Delete Null Key
     // NPR5.52/MHA /20191016 CASE 373294 Added field 120 "Allow Cashback"
     // NPR5.53/MHA /20191202 CASE 373294 Renamed field 120 to "Allow Refund"
+    // NPR5.54/MMV /20200224 CASE 364340 Added surcharge & tip fields
 
     Caption = 'Payment Type';
     LookupPageID = "Payment Type - Register";
@@ -462,6 +463,7 @@ table 6014402 "Payment Type POS"
         field(49; "Fee G/L Acc. No."; Code[20])
         {
             Caption = 'Fee';
+            Description = 'Deprecated';
             TableRelation = "G/L Account";
 
             trigger OnValidate()
@@ -478,14 +480,17 @@ table 6014402 "Payment Type POS"
         field(50; "Fee Pct."; Decimal)
         {
             Caption = 'Fee Pct';
+            Description = 'Deprecated';
         }
         field(51; "Fixed Fee"; Decimal)
         {
             Caption = 'Fixed fee';
+            Description = 'Deprecated';
         }
         field(52; "Fee Item No."; Code[20])
         {
             Caption = 'Fee item';
+            Description = 'Deprecated';
             TableRelation = Item;
         }
         field(53; "Norm. Sales in Audit Excl. VAT"; Decimal)
@@ -665,16 +670,17 @@ table 6014402 "Payment Type POS"
         field(200; "PBS Gift Voucher"; Boolean)
         {
             Caption = 'PBS Gift Voucher';
-            Description = 'PBS Gift Voucher if true card balance will be checked.';
+            Description = 'Deprecated';
         }
         field(201; "PBS Customer ID"; Text[30])
         {
             Caption = 'PBS Customer ID';
-            Description = 'PBS Inquiry ID';
+            Description = 'Deprecated';
         }
         field(202; "PBS Gift Voucher Barcode"; Boolean)
         {
             Caption = 'PBS Gift Voucher Barcode';
+            Description = 'Deprecated';
         }
         field(250; "Loyalty Card Type"; Code[20])
         {
@@ -751,6 +757,16 @@ table 6014402 "Payment Type POS"
         field(510; "Dev Term"; Boolean)
         {
             Caption = 'Dev Term';
+        }
+        field(520;"EFT Surcharge Service Item No.";Code[20])
+        {
+            Caption = 'Surcharge Service Item No.';
+            TableRelation = Item WHERE (Type=CONST(Service));
+        }
+        field(530;"EFT Tip Service Item No.";Code[20])
+        {
+            Caption = 'Tip Service Item No.';
+            TableRelation = Item WHERE (Type=CONST(Service));
         }
         field(6184471; "MobilePay Merchant ID"; Code[20])
         {

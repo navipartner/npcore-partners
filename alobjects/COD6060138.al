@@ -24,6 +24,7 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
     // MM1.41/TSA /20190918 CASE 368608 Add the select member onAfterLogin workflow
     // MM1.41/TSA /20191002 CASE 368608 Adding new action to edit current membership
     // MM1.42/TSA /20200114 CASE 385449 Changed the member lookup on login to show member list rather than member card list due to search limits on pages shown in browser
+    // MM1.43/TSA /20200226 CASE 392087 Switching from the POS Member Card page to the full Member Card page after a member is selected after login
 
 
     trigger OnRun()
@@ -1124,6 +1125,7 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
         MemberRetailIntegration: Codeunit "MM Member Retail Integration";
         POSSale: Codeunit "POS Sale";
         POSMemberCard: Page "MM POS Member Card";
+        POSMemberCardEdit: Page "MM Member Card";
         ExternalMemberCardNo: Text[100];
         ExternalMemberNo: Code[20];
         MembershipSelected: Boolean;
@@ -1165,12 +1167,21 @@ codeunit 6060138 "MM POS Action - Member Mgmt."
             SelectMemberUI (ExternalMemberNo);
 
           if (Member.Get (MembershipManagement.GetMemberFromExtMemberNo (ExternalMemberNo))) then begin
-            POSMemberCard.LookupMode (true);
-            POSMemberCard.SetRecord (Member);
-            //POSMemberCard.SetMembershipEntryNo (Membership."Entry No.");
 
-            if (POSMemberCard.RunModal() = ACTION::LookupOK) then
+            //-MM1.43 [392087]
+            //  POSMemberCard.LOOKUPMODE (TRUE);
+            //  POSMemberCard.SETRECORD (Member);
+            //  //POSMemberCard.SetMembershipEntryNo (Membership."Entry No.");
+            //
+            //  IF (POSMemberCard.RUNMODAL() = ACTION::LookupOK) THEN
+            //    MembershipSelected := AssignPOSMember (SalePOS, ExternalMemberNo);
+
+            POSMemberCardEdit.SetRecord (Member);
+            POSMemberCardEdit.LookupMode (true);
+            if (POSMemberCardEdit.RunModal() = ACTION::LookupOK) then
               MembershipSelected := AssignPOSMember (SalePOS, ExternalMemberNo);
+            //+MM1.43 [392087]
+
           end;
 
           if (not MembershipSelected) then begin

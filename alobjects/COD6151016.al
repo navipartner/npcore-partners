@@ -10,7 +10,9 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
     // NPR5.52/MHA /20191015  CASE 373127 SaleLinePOS Quantity should be modified to 1
     // NPR5.53/THRO/20191216  CASE 382232 "Minimum Amount" for issuing voucher moved to NpRv Voucher Type
     // NPR5.53/MHA /20200103  CASE 384055 Customer No. is carried to Retail Voucher in IssueReturnVoucher()
-    // NPR5.53/MHA /20190114 CASE 384841 Signature updated for CalculateRemainingPaymentSuggestion()
+    // NPR5.53/MHA /20190114  CASE 384841 Signature updated for CalculateRemainingPaymentSuggestion()
+    // NPR5.54/MHA /20200310  CASE 372135 Added Generation of Voucher- and Reference No. in IssueReturnVoucher() in order to display Reference No on POS Sales Line
+    // NPR5.54/MHA /20200413  CASE 399997 Fixed check on Rounding Amount Precision in EndSale()
 
 
     trigger OnRun()
@@ -313,8 +315,10 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
         //-NPR5.48 [342920]
         POSSession.GetSetup(POSSetup);
         POSSetup.GetRegisterRecord(Register);
-        if Abs(Subtotal) >= Abs(POSSetup.AmountRoundingPrecision()) then
+        //-NPR5.54 [399997]
+        if Abs(Subtotal) > Abs(POSSetup.AmountRoundingPrecision()) then
             exit;
+        //+NPR5.54 [399997]
 
         JSON.SetScope('parameters', true);
         VoucherTypeCode := UpperCase(JSON.GetString('VoucherTypeCode', true));
@@ -340,7 +344,10 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
         VoucherType: Record "NpRv Voucher Type";
         SalePOS: Record "Sale POS";
         SaleLinePOS: Record "Sale Line POS";
+        SaleLinePOSReference: Record "NpRv Sale Line POS Reference";
         PaymentTypePOS: Record "Payment Type POS";
+        TempVoucher: Record "NpRv Voucher" temporary;
+        NpRvVoucherMgt: Codeunit "NpRv Voucher Mgt.";
         POSPaymentLine: Codeunit "POS Payment Line";
         POSSale: Codeunit "POS Sale";
         POSSaleLine: Codeunit "POS Sale Line";
@@ -433,6 +440,28 @@ codeunit 6151016 "NpRv Return POS Action Mgt."
             SaleLinePOSVoucher."Phone No." := CopyStr(JSON.GetString('input', false), 1, MaxStrLen(SaleLinePOSVoucher."Phone No."));
         //+NPR5.50
         SaleLinePOSVoucher.Insert;
+
+        //-NPR5.54 [372135]
+        NpRvVoucherMgt.GenerateTempVoucher(VoucherType,TempVoucher);
+
+        SaleLinePOSVoucher.Description := TempVoucher.Description;
+        SaleLinePOSVoucher.Modify;
+
+        SaleLinePOSReference.Init;
+        SaleLinePOSReference."Register No." := SaleLinePOSVoucher."Register No.";
+        SaleLinePOSReference."Sales Ticket No." := SaleLinePOSVoucher."Sales Ticket No.";
+        SaleLinePOSReference."Sale Type" := SaleLinePOSVoucher."Sale Type";
+        SaleLinePOSReference."Sale Date" := SaleLinePOSVoucher."Sale Date";
+        SaleLinePOSReference."Sale Line No." := SaleLinePOSVoucher."Sale Line No.";
+        SaleLinePOSReference."Voucher Line No." := SaleLinePOSVoucher."Line No.";
+        SaleLinePOSReference."Voucher No." := TempVoucher."No.";
+        SaleLinePOSReference."Reference No." := TempVoucher."Reference No.";
+        SaleLinePOSReference.Insert;
+
+        SaleLinePOS.Description := TempVoucher.Description;
+        SaleLinePOS.Modify;
+        POSSession.RequestRefreshData();
+        //+NPR5.54 [372135]
     end;
 
     local procedure VoucherTypeInput(JSON: Codeunit "POS JSON Management"; FrontEnd: Codeunit "POS Front End Management")

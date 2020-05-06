@@ -5,6 +5,7 @@ codeunit 6060093 "MM Admission Service WS"
     // NPR5.43/CLVA  /20180612  CASE 318579 Added function GetTurnstileImages and GetImageContentAndExtension
     // NPR5.43/CLVA  /20180627  CASE 318579 Added extra info to MM Admission Service Entry. Added upgraded function GuestArrivalV2 to support additional info on the login screen/display name
     // NPR5.44/NPKNAV/20180727  CASE 318579-01 Transport NPR5.44 - 27 July 2018
+    // NPR5.54/CLVA  /20200316  CASE 364422 Added function GuestValidationV2
 
 
     trigger OnRun()
@@ -34,6 +35,7 @@ codeunit 6060093 "MM Admission Service WS"
         ErrorTooManyLogins: Label 'TooManyLogins';
         TicketDisplayName: Label 'Ticket';
 
+    [Scope('Personalization')]
     procedure GuestValidation(Barcode: Text[50];ScannerStationId: Code[10];var No: Code[20];var Token: Code[50];var ErrorNumber: Code[10];var ErrorDescription: Text): Boolean
     var
         MMMemberWebService: Codeunit "MM Member WebService";
@@ -215,6 +217,7 @@ codeunit 6060093 "MM Admission Service WS"
         exit(MMAdmissionServiceLog."Return Value");
     end;
 
+    [Scope('Personalization')]
     procedure GuestArrival(No: Text;Token: Text;ScannerStationId: Code[10];var Name: Text;var PictureBase64: Text;var Transaktion: Code[10];var ErrorNumber: Code[10];var ErrorDescription: Text): Boolean
     var
         MMAdmissionServiceLog: Record "MM Admission Service Log";
@@ -329,6 +332,7 @@ codeunit 6060093 "MM Admission Service WS"
         exit(MMAdmissionServiceLog."Return Value");
     end;
 
+    [Scope('Personalization')]
     procedure GuestArrivalV2(No: Text;Token: Text;ScannerStationId: Code[10];var Name: Text;var PictureBase64: Text;var Transaktion: Code[10];var ErrorNumber: Code[10];var ErrorDescription: Text): Boolean
     var
         MMAdmissionServiceLog: Record "MM Admission Service Log";
@@ -454,11 +458,13 @@ codeunit 6060093 "MM Admission Service WS"
         exit(MMAdmissionServiceLog."Return Value");
     end;
 
+    [Scope('Personalization')]
     procedure ValidateConnection(ScannerStationId: Code[10]): Text
     begin
         exit('Hallo ' + ScannerStationId);
     end;
 
+    [Scope('Personalization')]
     procedure GetTurnstileImages(ScannerStationId: Code[10];var PictureBase64Default: Text;var PictureExtensionDefault: Text;var PictureBase64Error: Text;var PictureExtensionError: Text): Text
     var
         InStrDefault: InStream;
@@ -617,6 +623,192 @@ codeunit 6060093 "MM Admission Service WS"
         Clear(MemoryStream);
         Clear(Bytes);
         Clear(InS);
+    end;
+
+    [Scope('Personalization')]
+    procedure GuestValidationV2(Barcode: Text[50];ScannerStationId: Code[10];var No: Code[20];var Token: Code[50];var ErrorNumber: Code[10];var ErrorDescription: Text;var LightColor: Text[30]): Boolean
+    var
+        MMMemberWebService: Codeunit "MM Member WebService";
+        MemberCard: Record "MM Member Card";
+        Member: Record "MM Member";
+        TMTicketWebService: Codeunit "TM Ticket WebService";
+        MMAdmissionServiceEntry: Record "MM Admission Service Entry";
+        DataError: Boolean;
+        AdmissionIsValid: Boolean;
+        MMAdmissionServiceLog: Record "MM Admission Service Log";
+        MMAdmissionServiceSetup: Record "MM Admission Service Setup";
+        MessageText: Text[250];
+        TMTicket: Record "TM Ticket";
+        TMTicketType: Record "TM Ticket Type";
+        MMMembership: Record "MM Membership";
+        Item: Record Item;
+        MMMembershipSetup: Record "MM Membership Setup";
+    begin
+        MMAdmissionServiceLog.Init;
+        MMAdmissionServiceLog.Action := MMAdmissionServiceLog.Action::"Guest Validation";
+        MMAdmissionServiceLog."Request Barcode" := Barcode;
+        MMAdmissionServiceLog."Scanner Station Id" := ScannerStationId;
+        MMAdmissionServiceLog."Request Scanner Station Id" := MMAdmissionServiceLog."Scanner Station Id";
+        MMAdmissionServiceLog."Created Date" := CurrentDateTime;
+        MMAdmissionServiceLog.Insert(true);
+
+        MMAdmissionServiceSetup.Get;
+
+        MMAdmissionServiceEntry.Init;
+        MMAdmissionServiceEntry."Created Date" := MMAdmissionServiceLog."Created Date";
+        MMAdmissionServiceEntry.Insert(true);
+
+        MMAdmissionServiceLog."Entry No." := MMAdmissionServiceEntry."Entry No.";
+        MMAdmissionServiceLog.Modify(true);
+        Commit;
+
+        No := '';
+        Token := '';
+
+        ErrorNumber := '';
+        ErrorDescription := '';
+
+        LightColor := '0';
+
+        if Barcode = '' then begin
+          ErrorNumber := '1';
+          ErrorDescription := ErrorBarcodeIsBlank;
+          DataError := true;
+        end;
+
+        if (ScannerStationId = '') and MMAdmissionServiceSetup."Validate Scanner Station" then begin
+          ErrorNumber := '2';
+          ErrorDescription := ErrorScannerStationIdIsBlank;
+          DataError := true;
+        end;
+
+        if not DataError then begin
+          if MMAdmissionServiceSetup."Validate Members" and not AdmissionIsValid then begin
+            if MMMemberWebService.MemberCardNumberValidation(Barcode,ScannerStationId) then begin
+              MemberCard.SetCurrentKey("External Card No.");
+              MemberCard.SetRange("External Card No.",Barcode);
+              if MemberCard.FindLast then begin
+                if Member.Get(MemberCard."Member Entry No.") then begin
+                  MMAdmissionServiceLog."Response No" := Member."External Member No.";
+                  MMAdmissionServiceLog."Response Token" := CreateToken();
+                  No := MMAdmissionServiceLog."Response No";
+                  Token := MMAdmissionServiceLog."Response Token";
+
+                  MMAdmissionServiceEntry.Type := MMAdmissionServiceEntry.Type::Membership;
+                  MMAdmissionServiceEntry.Key := MMAdmissionServiceLog."Response No";
+                  MMAdmissionServiceEntry."Card Entry No." := MemberCard."Entry No.";
+                  MMAdmissionServiceEntry."External Card No." := MemberCard."External Card No.";
+                  MMAdmissionServiceEntry."Member Entry No." := MemberCard."Member Entry No.";
+                  MMAdmissionServiceEntry."External Member No." := MemberCard."External Member No.";
+                  MMAdmissionServiceEntry."Membership Entry No." := MemberCard."Membership Entry No.";
+                  MMAdmissionServiceEntry."External Membership No." := MemberCard."External Membership No.";
+                  MMAdmissionServiceEntry."Display Name" := Member."Display Name";
+
+                  //-NPR5.43 [318579]
+                  if MMMembership.Get(MemberCard."Membership Entry No.") then begin
+                    MMAdmissionServiceEntry."Membership Code" := MMMembership."Membership Code";
+                    if MMMembershipSetup.Get(MMMembership."Membership Code") then
+                      MMAdmissionServiceEntry."Membership Description" := MMMembershipSetup.Description;
+                  end;
+                  //+NPR5.43 [318579]
+
+                  AdmissionIsValid := true;
+                  LightColor := '2';
+                end;
+              end;
+            end;
+          end;
+          if MMAdmissionServiceSetup."Validate Tickes" and not AdmissionIsValid then begin
+            if TMTicketWebService.ValidateTicketArrival('',Barcode,ScannerStationId,MessageText) then begin
+
+              MMAdmissionServiceLog."Response No" := Barcode;
+              MMAdmissionServiceLog."Response Token" := CreateToken();
+              No := MMAdmissionServiceLog."Response No";
+              Token := MMAdmissionServiceLog."Response Token";
+
+              TMTicket.SetCurrentKey("External Ticket No.");
+              TMTicket.SetFilter("External Ticket No.", '=%1', CopyStr (Barcode, 1, MaxStrLen(TMTicket."External Ticket No.")));
+              TMTicket.FindFirst;
+
+              MMAdmissionServiceEntry.Type := MMAdmissionServiceEntry.Type::Ticket;
+              MMAdmissionServiceEntry.Key := MMAdmissionServiceLog."Response No";
+              MMAdmissionServiceEntry."Display Name" := TicketDisplayName;
+              MMAdmissionServiceEntry.Message := MessageText;
+              MMAdmissionServiceEntry."Ticket Entry No." := TMTicket."No.";
+              MMAdmissionServiceEntry."External Ticket No." := TMTicket."External Ticket No.";
+              MMAdmissionServiceEntry."External Card No." := TMTicket."External Member Card No.";
+
+              //-NPR5.44 [318579]
+        //      IF TMTicketType.GET(TMTicket."Ticket Type Code") THEN BEGIN
+        //        MMAdmissionServiceEntry."Ticket Type Code" := TMTicketType.Code;
+        //        MMAdmissionServiceEntry."Ticket Type Description" := TMTicketType.Description;
+        //      END;
+              if Item.Get(TMTicket."Item No.") then begin
+                MMAdmissionServiceEntry."Ticket Type Code" := Item."No.";
+                if StrLen(Item.Description) > MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description") then
+                  MMAdmissionServiceEntry."Ticket Type Description" := CopyStr(Item.Description,1, MaxStrLen(MMAdmissionServiceEntry."Ticket Type Description"))
+                else
+                  MMAdmissionServiceEntry."Ticket Type Description" := Item.Description;
+                //MMAdmissionServiceEntry."Ticket Type Description" := Item.Description;
+              end;
+              //+NPR5.44 [318579]
+
+              MemberCard.SetCurrentKey("External Card No.");
+              MemberCard.SetRange("External Card No.",MMAdmissionServiceEntry."External Card No.");
+              if MemberCard.FindLast then begin
+                if Member.Get(MemberCard."Member Entry No.") then begin
+                  MMAdmissionServiceEntry."Card Entry No." := MemberCard."Entry No.";
+                  MMAdmissionServiceEntry."Member Entry No." := MemberCard."Member Entry No.";
+                  MMAdmissionServiceEntry."External Member No." := MemberCard."External Member No.";
+                  MMAdmissionServiceEntry."Membership Entry No." := MemberCard."Membership Entry No.";
+                  MMAdmissionServiceEntry."External Membership No." := MemberCard."External Membership No.";
+                  MMAdmissionServiceEntry."Display Name" := Member."Display Name";
+
+                  if MMMembership.Get(MemberCard."Membership Entry No.") then begin
+                    MMAdmissionServiceEntry."Membership Code" := MemberCard."Membership Code";
+                    MMAdmissionServiceEntry."Membership Description" := MMMembership.Description;
+                  end;
+                end;
+              end;
+              AdmissionIsValid := true;
+              LightColor := '2';
+            end else begin
+              MMAdmissionServiceLog."Response No" := Barcode;
+
+              MMAdmissionServiceEntry.Type := MMAdmissionServiceEntry.Type::Ticket;
+              MMAdmissionServiceEntry.Key := MMAdmissionServiceLog."Response No";
+              MMAdmissionServiceEntry."Display Name" := TicketDisplayName;
+              MMAdmissionServiceEntry.Message := MessageText;
+            end;
+          end;
+          if not AdmissionIsValid then begin
+            if StrPos(MessageText,'-1004') > 0 then begin
+              //ErrorNumber := '1002';
+              //ErrorDescription := ErrorTooManyLogins;
+              //DataError := TRUE;
+            end else begin
+              ErrorNumber := '3';
+              ErrorDescription := ErrorInvalidGuest;
+              DataError := true;
+            end;
+          end;
+        end;
+
+        MMAdmissionServiceEntry.Token := Token;
+        MMAdmissionServiceEntry."Scanner Station Id" := MMAdmissionServiceLog."Scanner Station Id";
+        MMAdmissionServiceEntry."Admission Is Valid" := AdmissionIsValid;
+        MMAdmissionServiceEntry.Modify(true);
+
+        MMAdmissionServiceLog."Error Number" := ErrorNumber;
+        MMAdmissionServiceLog."Error Description" := ErrorDescription;
+        MMAdmissionServiceLog."Return Value" := (DataError <> true);
+        MMAdmissionServiceLog."Entry No." := MMAdmissionServiceEntry."Entry No.";
+        MMAdmissionServiceLog.Key := No;
+        MMAdmissionServiceLog.Token := Token;
+        MMAdmissionServiceLog.Modify(true);
+        Commit;
+
+        exit(MMAdmissionServiceLog."Return Value");
     end;
 }
 

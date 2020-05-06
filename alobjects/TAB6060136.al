@@ -11,6 +11,7 @@ table 6060136 "MM Membership Alteration Setup"
     // MM1.30/TSA /20180605 CASE 317428 Added "Grace Period Calculation"
     // MM1.40/TSA /20190730 CASE 360275 Added field 85 "Auto-Admit Member On Sale"
     // MM1.41/TSA /20191016 CASE 373297 Added Grace Period Preset
+    // MM1.43/TSA /20200331 CASE 398328 Added new field "Presentation Order" and key
 
     Caption = 'Membership Alteration Setup';
 
@@ -48,6 +49,10 @@ table 6060136 "MM Membership Alteration Setup"
                 if (Item.Get ("Sales Item No.")) then
                   Description := Item.Description;
             end;
+        }
+        field(9;"Presentation Order";Integer)
+        {
+            Caption = 'Presentation Order';
         }
         field(10;Description;Text[50])
         {
@@ -164,6 +169,9 @@ table 6060136 "MM Membership Alteration Setup"
     keys
     {
         key(Key1;"Alteration Type","From Membership Code","Sales Item No.")
+        {
+        }
+        key(Key2;"Presentation Order")
         {
         }
     }

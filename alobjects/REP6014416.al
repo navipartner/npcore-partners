@@ -7,6 +7,9 @@ report 6014416 "Sale Statistics per Vendor"
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.40/TJ  /20180319  CASE 307717 Replaced hardcoded dates with DMY2DATE structure
+    // NPR5.54/LS  /20190205  CASE 389133 Changed Global var Report_Caption_Lbl from 'Item Sale per Vendor' to 'Sale Statistics per Vendor'
+    // NPR5.54/LS  /20190206  CASE 389133 Changed Global var Inventory_Caption_Lbl from 'Net Inv. Change' to 'Inventory per Date'
+    // NPR5.54/ANPA/20200327  CASE 392703 Avoid 0 sales and changed Net_Change_Item from Net change to Inventory
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Sale Statistics per Vendor.rdlc';
 
@@ -82,6 +85,9 @@ report 6014416 "Sale Statistics per Vendor"
             column(Name_Vendor;Vendor.Name)
             {
             }
+            column(Avoid0Sales;Avoid0Sales)
+            {
+            }
             column(InventoryDate;InventoryDate)
             {
             }
@@ -136,6 +142,9 @@ report 6014416 "Sale Statistics per Vendor"
                 column(Speed;Speed)
                 {
                 }
+                column(Inventory;Inventory)
+                {
+                }
                 column(AvgInventory;AvgInventory)
                 {
                 }
@@ -154,6 +163,9 @@ report 6014416 "Sale Statistics per Vendor"
                     ItemUsage          := 0;
                     AvgInventory       := 0;
                     Speed              := 0;
+                    //-NPR5.54 [384505]
+                    Inventory :=  0;
+                    //+NPR5.54 [384505]
 
                     Item1.Get("No.");
                     Item1.CalcFields("Net Change");
@@ -200,6 +212,16 @@ report 6014416 "Sale Statistics per Vendor"
                       PeriodPurchaseQty :=  Item2."Purchases (Qty.)";
                     end;
 
+                    //-NPR5.54 [384505]
+                    Item2.Reset;
+                    if Item2.Get(Item."No.") then begin
+                      Item2.CopyFilters(Item);
+                      Item2.SetFilter("Date Filter", '..%1', InventoryDate);
+                      Item2.CalcFields("Net Change");
+                      Inventory :=  Item2."Net Change";
+                    end;
+                    //+NPR5.54 [384505]
+
                     ItemUsage := (StartDateInventory + PeriodPurchaseQty) - EndDateInventory;
 
                     if (StartDateInventory + EndDateInventory) <> 0 then
@@ -212,7 +234,10 @@ report 6014416 "Sale Statistics per Vendor"
                     InventoryValVendor   += InventoryValuation;
                     SalesValVendor       += ActualSales;
                     dbVendor             := dbVendor + db;
-                    NetChangeVendor      += Item1."Net Change";
+                    //-NPR5.54 [384505]
+                    //NetChangeVendor      += Item1."Net Change";
+                    NetChangeVendor      += Inventory;
+                    //+NPR5.54 [384505]
                     SalesQtyVendor       += Item."Sales (Qty.)";
                     COGS_LCY_Vendor      += Item."COGS (LCY)";
                     Sales_LCY_Vendor     += Item."Sales (LCY)";
@@ -359,6 +384,10 @@ report 6014416 "Sale Statistics per Vendor"
                     {
                         Caption = 'Totals Only';
                     }
+                    field(Avoid0Sales;Avoid0Sales)
+                    {
+                        Caption = 'Avoid 0 Sales';
+                    }
                 }
             }
         }
@@ -439,11 +468,11 @@ report 6014416 "Sale Statistics per Vendor"
         Speed: Decimal;
         Text10600000: Label ' total';
         PageNoCaptionLbl: Label 'Page';
-        Report_Caption_Lbl: Label 'Item Sale per Vendor';
+        Report_Caption_Lbl: Label 'Sale Statistics per Vendor';
         Date_Filters_Caption_Lbl: Label 'Date filter';
         Creditor_Filter_Caption_Lbl: Label 'Creditor filter';
         Name_Caption_Lbl: Label 'Name';
-        Inventory_Caption_Lbl: Label 'Net Inv. Change';
+        Inventory_Caption_Lbl: Label 'Inventory per Date';
         InventoryValue_Caption_Lbl: Label 'Inv.Value @ Cost';
         Unit_Value_Caption_Lbl: Label 'Inv. Value @ S.Price';
         Profit_LCY_Caption_Lbl: Label 'Profit (LCY)';
@@ -472,5 +501,7 @@ report 6014416 "Sale Statistics per Vendor"
         PageGroupNo: Integer;
         NextPageGroupNo: Integer;
         TextNetChangeDate: Text;
+        Avoid0Sales: Boolean;
+        Inventory: Integer;
 }
 

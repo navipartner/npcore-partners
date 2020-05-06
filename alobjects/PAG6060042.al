@@ -20,6 +20,7 @@ page 6060042 "Item Worksheet Page"
     // NPR5.50/THRO/20190526  CASE 356260 Removed FieldsVisible and ShowAllInfo variables - Let user deside which fields to see. Field hidden by the variables set to visible=false
     // NPR5.51/MHA /20190819  CASE 365377 Removed action "GIM import document"
     // NPR5.52/SARA/20190906  CASE 366969 Added action 'Shelf Label' and 'Price Label'
+    // NPR5.54/ZESO/20200225  CASE 385388 Added fields Magento Item, Profit % and Description2
 
     AutoSplitKey = true;
     Caption = 'Item Worksheet Page';
@@ -112,6 +113,15 @@ page 6060042 "Item Worksheet Page"
                     Editable = FieldsEditable;
                 }
                 field(Description;Description)
+                {
+                }
+                field("Description 2";"Description 2")
+                {
+                }
+                field("Profit %";"Profit %")
+                {
+                }
+                field("Magento Item";"Magento Item")
                 {
                 }
                 field(Status;Status)

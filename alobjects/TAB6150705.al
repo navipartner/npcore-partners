@@ -5,6 +5,7 @@ table 6150705 "POS Parameter Value"
     // NPR5.40/MMV /20180321 CASE 308050 Added event OnGetParameterInfo()
     // NPR5.43/THRO/20180607 CASE 318038 Added events OnLookupValue and OnValidateValue
     // NPR5.50/VB  /20190205 CASE 338666 Introduced functionality to keep track of parameter filter state, for the purpose of passing specific parameters for workflow 2.0
+    // NPR5.54/ALPO/20200330 CASE 335834 Enable lookup and value translations for parameters of type boolean
 
     Caption = 'POS Parameter Value';
 
@@ -128,6 +129,10 @@ table 6150705 "POS Parameter Value"
         //+NPR5.43 [318038]
         Param."Data Type" := "Data Type";
         Param.Options := GetOptions();
+        //-NPR5.54 [335834]
+        if Param."Data Type" = Param."Data Type"::Boolean then
+          OptionsCaption := BoolOptionMLCaptions();
+        //+NPR5.54 [335834]
         //-NPR5.40 [308050]
         OnGetParameterOptionStringCaption(Rec, OptionsCaption);
         if OptionsCaption <> '' then
@@ -238,6 +243,11 @@ table 6150705 "POS Parameter Value"
         Param: Record "POS Action Parameter";
     begin
         if Param.Get("Action Code", Name) then
+          //-NPR5.54 [335834]
+          if Param."Data Type" = Param."Data Type"::Boolean then
+            exit(BoolOptionNames())
+          else
+          //+NPR5.54 [335834]
             exit(Param.Options);
     end;
 
@@ -273,12 +283,35 @@ table 6150705 "POS Parameter Value"
                         TempRetailList.Insert;
                     end;
                 end;
+
+          //-NPR5.54 [335834]
+          "Data Type"::Boolean :
+            begin
+              POSActionParamMgt.SplitString(BoolOptionMLCaptions(),Parts);
+              foreach Part in Parts do begin
+                TempRetailList.Number += 1;
+                TempRetailList.Choice := Part;
+                TempRetailList.Insert;
+              end;
+            end;
+          //+NPR5.54 [335834]
             else
                 exit;
         end;
 
         if TempRetailList.IsEmpty then
             exit;
+        //-NPR5.54 [335834]
+        if Value <> '' then
+          case "Data Type" of
+            "Data Type"::Boolean:
+              TempRetailList.SetRange(Choice,GetBooleanStringCaption());
+            "Data Type"::Option:
+              TempRetailList.SetRange(Choice,GetOptionStringCaption(OptionsCaption));
+          end;
+        if TempRetailList.FindFirst then;
+        TempRetailList.SetRange(Choice);
+        //+NPR5.54 [335834]
 
         if PAGE.RunModal(PAGE::"Retail List", TempRetailList) = ACTION::LookupOK then
             Validate(Value, TempRetailList.Choice);
@@ -378,6 +411,59 @@ table 6150705 "POS Parameter Value"
     local procedure OnValidateValue(var POSParameterValue: Record "POS Parameter Value")
     begin
         //-NPR5.43 [318038]
+    end;
+
+    local procedure BoolOptionNames(): Text
+    begin
+        //-NPR5.54 [335834]
+        exit('false,true');
+        //+NPR5.54 [335834]
+    end;
+
+    local procedure BoolOptionMLCaptions(): Text
+    var
+        BoolMLOptionList: Label 'false,true';
+    begin
+        //-NPR5.54 [335834]
+        exit(BoolMLOptionList);
+        //+NPR5.54 [335834]
+    end;
+
+    procedure GetOptionStringCaption(ParameterOptionStringCaption: Text): Text
+    var
+        POSActionParameter: Record "POS Action Parameter";
+        TypeHelper: Codeunit "Type Helper";
+        OptionCaption: Text;
+    begin
+        //-NPR5.54 [335834]
+        POSActionParameter.Get("Action Code", Name);
+
+        if TrySelectStr(TypeHelper.GetOptionNo(Value, POSActionParameter.Options), ParameterOptionStringCaption, OptionCaption) then
+          exit(OptionCaption)
+        else
+          exit(Value);
+        //+NPR5.54 [335834]
+    end;
+
+    procedure GetBooleanStringCaption(): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+        OptionCaption: Text;
+    begin
+        //-NPR5.54 [335834]
+        if TrySelectStr(TypeHelper.GetOptionNo(Value,BoolOptionNames),BoolOptionMLCaptions,OptionCaption) then
+          exit(OptionCaption)
+        else
+          exit(Value);
+        //+NPR5.54 [335834]
+    end;
+
+    [TryFunction]
+    local procedure TrySelectStr(Ordinal: Integer;OptionString: Text;var OptionOut: Text)
+    begin
+        //-NPR5.54 [335834]
+        OptionOut := SelectStr(Ordinal+1, OptionString);
+        //+NPR5.54 [335834]
     end;
 }
 

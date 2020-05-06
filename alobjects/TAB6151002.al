@@ -4,6 +4,8 @@ table 6151002 "POS Quote Entry"
     // NPR5.48/MHA /20181129  CASE 336498 Added Customer fields 25, 30, 35, 40, 45, 50
     // NPR5.48/MHA /20181130  CASE 338208 Added 200 "POS Sales Data"
     // NPR5.51/MMV /20190820  CASE 364694 Added field 1010
+    // NPR5.54/MMV /20200320 CASE 364340 Added field 60
+    // NPR5.54/ALPO/20200406 CASE 390414 Updated Amount and Amount Including VAT flow field calc.formulas to include only relevant amounts
 
     Caption = 'POS Quote Entry';
     DrillDownPageID = "POS Quotes";
@@ -72,6 +74,10 @@ table 6151002 "POS Quote Entry"
             Caption = 'Reference';
             Description = 'NPR5.48';
         }
+        field(60;"Retail ID";Guid)
+        {
+            Caption = 'Retail ID';
+        }
         field(200;"POS Sales Data";BLOB)
         {
             Caption = 'POS Sales Data';
@@ -79,7 +85,9 @@ table 6151002 "POS Quote Entry"
         }
         field(1000;Amount;Decimal)
         {
-            CalcFormula = Sum("POS Quote Line".Amount WHERE ("Quote Entry No."=FIELD("Entry No.")));
+            CalcFormula = Sum("POS Quote Line".Amount WHERE ("Quote Entry No."=FIELD("Entry No."),
+                                                             "Sale Type"=FILTER(Sale|"Debit Sale"|"Gift Voucher"|"Credit Voucher"|Deposit),
+                                                             Type=FILTER(<>Comment&<>"Open/Close")));
             Caption = 'Amount';
             DecimalPlaces = 2:2;
             Editable = false;
@@ -87,7 +95,9 @@ table 6151002 "POS Quote Entry"
         }
         field(1005;"Amount Including VAT";Decimal)
         {
-            CalcFormula = Sum("POS Quote Line"."Amount Including VAT" WHERE ("Quote Entry No."=FIELD("Entry No.")));
+            CalcFormula = Sum("POS Quote Line"."Amount Including VAT" WHERE ("Quote Entry No."=FIELD("Entry No."),
+                                                                             "Sale Type"=FILTER(Sale|"Debit Sale"|"Gift Voucher"|"Credit Voucher"|Deposit),
+                                                                             Type=FILTER(<>Comment&<>"Open/Close")));
             Caption = 'Amount Including VAT';
             Editable = false;
             FieldClass = FlowField;

@@ -27,10 +27,12 @@ codeunit 6151387 "CS UI Warehouse Activity"
     //                                   Updating both Place and Take lines
     //                                   Fixed suggested quantity after scan
     //                                   Fixed quantity assign on split lines
-    // #348151/TJ  /20190308 CASE 348151 Fixed issue with UpdateTakeLine
+    // NPR5.52/TJ  /20190308 CASE 348151 Fixed issue with UpdateTakeLine
     // NPR5.53/CLVA/20191112 CASE 377135 Object was not insync with hotfix 348151
     // NPR5.53/CLVA/20191114 CASE 377135 Added posting options
     // NPR5.53/CLVA/20191115 CASE 377135 Changed posting rutine
+    // NPR5.54/CLVA/20200220 CASE 391080 Added DeleteTransferredDataLines
+    // NPR5.54/CLVA/20200225 CASE 392901 Changed modify handling of record.
 
     TableNo = "CS UI Header";
 
@@ -139,7 +141,10 @@ codeunit 6151387 "CS UI Warehouse Activity"
         case FuncGroup.KeyDef of
           FuncGroup.KeyDef::Esc:
             begin
-              DeleteEmptyDataLines();
+              //-NPR5.54 [391080]
+              //DeleteEmptyDataLines();
+              DeleteTransferredDataLines();
+              //+NPR5.54 [391080]
               CSCommunication.RunPreviousUI(DOMxmlin);
             end;
           FuncGroup.KeyDef::"Function":
@@ -194,7 +199,10 @@ codeunit 6151387 "CS UI Warehouse Activity"
               //+NPR5.48 [335606]
               Register(CSWarehouseActivityHandling,ActionIndex);
               if Remark = '' then begin
-                DeleteEmptyDataLines();
+                //-NPR5.54 [391080]
+                //DeleteEmptyDataLines();
+                DeleteTransferredDataLines();
+                //+NPR5.54 [391080]
                 CSCommunication.RunPreviousUI(DOMxmlin)
               end else
                 SendForm(ActiveInputField,CSWarehouseActivityHandling);
@@ -327,6 +335,7 @@ codeunit 6151387 "CS UI Warehouse Activity"
         QtytoHandle: Decimal;
         QtyOutstanding: Decimal;
         CSSetup: Record "CS Setup";
+        UpdatedCSWarehouseActivityHandling: Record "CS Warehouse Activity Handling";
     begin
         if InputValue = '' then begin
           Remark := Text005;
@@ -346,6 +355,12 @@ codeunit 6151387 "CS UI Warehouse Activity"
 
           CSWarehouseActivityHandling."Item No." := ItemNo;
           CSWarehouseActivityHandling."Variant Code" := VariantCode;
+          //+NPR5.54 [392901]
+          CSWarehouseActivityHandling.Modify(true);
+          UpdatedCSWarehouseActivityHandling.Get(CSWarehouseActivityHandling.Id,CSWarehouseActivityHandling."Line No.");
+          Clear(CSWarehouseActivityHandling);
+          CSWarehouseActivityHandling := UpdatedCSWarehouseActivityHandling;
+          //+NPR5.54 [392901]
 
           //-NPR5.48 [335606]
           if (ResolvingTable = DATABASE::"Item Cross Reference") then begin
@@ -354,8 +369,18 @@ codeunit 6151387 "CS UI Warehouse Activity"
                 SetCurrentKey("Cross-Reference Type", "Cross-Reference No.");
                 SetFilter("Cross-Reference Type", '=%1', "Cross-Reference Type"::"Bar Code");
                 SetFilter("Cross-Reference No.", '=%1', UpperCase (InputValue));
-                if FindFirst() then
+                //+NPR5.54 [392901]
+                //IF FINDFIRST() THEN
+                if FindFirst() then begin
+                //+NPR5.54 [392901]
                   CSWarehouseActivityHandling."Unit of Measure" := ItemCrossReference."Unit of Measure";
+                  //+NPR5.54 [392901]
+                  CSWarehouseActivityHandling.Modify(true);
+                  UpdatedCSWarehouseActivityHandling.Get(CSWarehouseActivityHandling.Id,CSWarehouseActivityHandling."Line No.");
+                  Clear(CSWarehouseActivityHandling);
+                  CSWarehouseActivityHandling := UpdatedCSWarehouseActivityHandling;
+                end;
+                  //+NPR5.54 [392901]
               end;
             end;
           end;
@@ -370,7 +395,7 @@ codeunit 6151387 "CS UI Warehouse Activity"
         CSSetup.Get;
         if CSSetup."Sum Qty. to Handle" then begin
         //+NPR5.52 [365967]
-          //-#360425 [360425]
+          //-NPR5.51 [360425]
           QtytoHandle := 0;
           QtyOutstanding := 0;
 
@@ -394,9 +419,15 @@ codeunit 6151387 "CS UI Warehouse Activity"
             until WhseActivityLine.Next = 0;
 
             CSWarehouseActivityHandling.Qty := QtyOutstanding - QtytoHandle;
+            //+NPR5.54 [392901]
+            CSWarehouseActivityHandling.Modify(true);
+            UpdatedCSWarehouseActivityHandling.Get(CSWarehouseActivityHandling.Id,CSWarehouseActivityHandling."Line No.");
+            Clear(CSWarehouseActivityHandling);
+            CSWarehouseActivityHandling := UpdatedCSWarehouseActivityHandling;
+            //+NPR5.54 [392901]
 
           end;
-          //+#360425 [360425]
+          //+NPR5.51 [360425]
         //-NPR5.52 [365967]
         end;
         //+NPR5.52 [365967]
@@ -1024,13 +1055,13 @@ codeunit 6151387 "CS UI Warehouse Activity"
 
         if WhseActivityLine.FindSet then begin
 
-          //-#357577 [357577]
+          //-NPR5.51 [357577]
           if MiniformHeader."Update Posting Date" then begin
             WarehouseActivityHeader.Get(CSWarehouseActivityHandling."Activity Type",CSWarehouseActivityHandling."No.");
             WarehouseActivityHeader.Validate("Posting Date",Today);
             WarehouseActivityHeader.Modify(true);
           end;
-          //+#357577 [357577]
+          //+NPR5.51 [357577]
           //-NPR5.53 [377135]
           Posted := false;
           //+NPR5.53 [377135]
@@ -1046,18 +1077,18 @@ codeunit 6151387 "CS UI Warehouse Activity"
                   end;
                 end;
               CSWarehouseActivityHandling."Activity Type"::"Invt. Pick",CSWarehouseActivityHandling."Activity Type"::"Invt. Put-away" : begin
-                  //-#359268 [359268]
+                  //-NPR5.51 [359268]
                   if WhseActivityLine."Qty. to Handle" <> 0 then begin
-                  //+#359268 [359268]
+                  //+NPR5.51 [359268]
                     WhseActivityPost.SetInvoiceSourceDoc(Index = 2);
                     WhseActivityPost.Run(WhseActivityLine);
                     Clear(WhseActivityPost);
                     //-NPR5.53 [377135]
                     Posted := true;
                     //+NPR5.53 [377135]
-                  //-#359268 [359268]
+                  //-NPR5.51 [359268]
                   end;
-                  //+#359268 [359268]
+                  //+NPR5.51 [359268]
                 end;
             end;
           //-NPR5.53 [377135]
@@ -1419,10 +1450,10 @@ codeunit 6151387 "CS UI Warehouse Activity"
         //+NPR5.50 [348151]
         
         //-NPR5.49 [346070]
-        //-#348151 [348151]
+        //-NPR5.52 [348151]
         IF NOT (WhseActivityLine."Action Type" = WhseActivityLine."Action Type"::Place) THEN
           EXIT;
-        //+#348151 [348151]
+        //+NPR5.52 [348151]
         IF ActionToTake = ActionToTake::Decrease THEN
           QtyToHandle := -1 * QtyToHandle;
         WhseActivityLineTake.SETRANGE("Activity Type",WhseActivityLine."Activity Type");
@@ -1512,6 +1543,14 @@ codeunit 6151387 "CS UI Warehouse Activity"
         WarehouseActivityLine.Validate("Qty. to Handle",0);
         WarehouseActivityLine.Modify(true);
         //+NPR5.50 [346066]
+    end;
+
+    local procedure DeleteTransferredDataLines()
+    var
+        CSWarehouseActivityHandling: Record "CS Warehouse Activity Handling";
+    begin
+        CSWarehouseActivityHandling.SetRange("Created By",UserId);
+        CSWarehouseActivityHandling.DeleteAll(true);
     end;
 }
 

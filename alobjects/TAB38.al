@@ -11,6 +11,7 @@ tableextension 6014434 tableextension6014434 extends "Purchase Header"
     // NPR5.39/THRO/20180222 CASE 304256 Moved code on OnAfterValidate "Pay-to Vendor No." to subscriber
     // NPR5.44/BHR/20180709 CASE 321560 New fields "Sell-to" 6014420 to 6014430
     // NPR5.53/MHA /20191211 CASE 380837 Added fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
+    // NPR5.54/MHA /20200311  CASE 390380 Removed fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
     fields
     {
         field(6014401;Sent;Boolean)
@@ -70,17 +71,6 @@ tableextension 6014434 tableextension6014434 extends "Purchase Header"
         {
             CalcFormula = Lookup(Customer."Phone No." WHERE ("No."=FIELD("Sell-to Customer No.")));
             FieldClass = FlowField;
-        }
-        field(6151300;"NpEc Store Code";Code[20])
-        {
-            Caption = 'E-commerce Store Code';
-            Description = 'NPR5.53';
-            TableRelation = "NpEc Store";
-        }
-        field(6151305;"NpEc Document No.";Code[50])
-        {
-            Caption = 'E-commerce Document No.';
-            Description = 'NPR5.53';
         }
     }
 }

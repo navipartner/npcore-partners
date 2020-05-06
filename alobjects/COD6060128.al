@@ -848,6 +848,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
+    [Scope('Personalization')]
     procedure ValidateNotificationToken(Token: Text[64];var ExternalMembershipNumber: Code[20];var ExternalMemberNumber: Code[20]): Boolean
     var
         MembershipRole: Record "MM Membership Role";
@@ -869,6 +870,7 @@ codeunit 6060128 "MM Member WebService"
         //+MM1.38 [355234]
     end;
 
+    [Scope('Personalization')]
     procedure ExpireNotificationToken(Token: Text[64])
     var
         MembershipRole: Record "MM Membership Role";
@@ -887,6 +889,7 @@ codeunit 6060128 "MM Member WebService"
         //+MM1.38 [355234]
     end;
 
+    [Scope('Personalization')]
     procedure GenerateNotificationToken(ExternalMembershipNumber: Code[20];ExternalMemberNumber: Code[20];var Token: Text[64]): Boolean
     var
         MembershipRole: Record "MM Membership Role";
@@ -914,6 +917,7 @@ codeunit 6060128 "MM Member WebService"
         //+MM1.38 [355234]
     end;
 
+    [Scope('Personalization')]
     procedure GetSetComOptions(var GetSetMemberComOptions: XMLport "MM Member Communication")
     var
         ImportEntry: Record "Nc Import Entry";
@@ -1094,6 +1098,7 @@ codeunit 6060128 "MM Member WebService"
         Commit ();
     end;
 
+    [Scope('Personalization')]
     procedure GetSetAutoRenew(var GetSetAutoRenew: XMLport "MM GetSet AutoRenew Option")
     var
         ImportEntry: Record "Nc Import Entry";

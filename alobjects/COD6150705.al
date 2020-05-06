@@ -30,6 +30,8 @@ codeunit 6150705 "POS Sale"
     //                                   Added init handling
     // NPR5.53/MMV /20191106 CASE 376362 Added explicit pos entry auto post invoke.
     // NPR5.53/MHA /20190114 CASE 384841 Signature updated for CalculateRemainingPaymentSuggestion()
+    // NPR5.54/ALPO/20200203 CASE 364658 Resume POS Sale
+    // NPR5.54/MMV /20200217 CASE 364658 Added configurable start of new sale to allow business logic first.
 
 
     trigger OnRun()
@@ -149,6 +151,7 @@ codeunit 6150705 "POS Sale"
           /* tjek om der er ekspeditioner p� rev.rullen efter d.d. */
           TouchScreenFunctions.TestSalesDate;
         
+          UpdateSaleDeviceID(Rec);  //NPR5.54 [364658]
           Insert(true);
         
           //-NPR5.31 [271728]
@@ -363,14 +366,18 @@ codeunit 6150705 "POS Sale"
     [Scope('Personalization')]
     procedure SetShortcutDimCode2(DimensionValue: Code[20])
     begin
-
-        //-NPR5.34 [283019]
         Rec.Validate (Rec."Shortcut Dimension 2 Code", DimensionValue);
-        //+NPR5.34 [283019]
     end;
 
     [Scope('Personalization')]
     procedure TryEndSale(POSSession: Codeunit "POS Session"): Boolean
+    begin
+        //-NPR5.54 [364658]
+        exit(TryEndSale2(POSSession, true));
+        //+NPR5.54 [364658]
+    end;
+
+    procedure TryEndSale2(POSSession: Codeunit "POS Session";StartNew: Boolean): Boolean
     var
         ReturnPaymentType: Record "Payment Type POS";
         SalePOS: Record "Sale POS";
@@ -388,12 +395,10 @@ codeunit 6150705 "POS Sale"
         POSGiveChange: Codeunit "POS Give Change";
         POSRounding: Codeunit "POS Rounding";
     begin
-
-        //-323975 [323975]
+        //-NPR5.54 [364658]
         if not Initialized then
           exit(false);
         RefreshCurrent();
-        //+323975 [323975]
 
         OnAttemptEndSale (Rec);
 
@@ -402,11 +407,11 @@ codeunit 6150705 "POS Sale"
         if SubTotal <> 0 then
           exit (false);
 
-        if EndSale(POSSession) then begin
-          EndedSalesAmount := SalesAmount;
-          EndedPaidAmount := PaidAmount;
-          exit(true);
-        end;
+        EndSale(POSSession, StartNew);
+        EndedSalesAmount := SalesAmount;
+        EndedPaidAmount := PaidAmount;
+        exit(true);
+        //+NPR5.54 [364658]
     end;
 
     [Scope('Personalization')]
@@ -425,11 +430,9 @@ codeunit 6150705 "POS Sale"
         //PaymentType: The payment type just used in sale, triggering this end attempt.
         //ReturnPaymentType: The payment type to use for round & change in case of overtender.
 
-        //-323975 [323975]
         if not Initialized then
           exit(false);
         RefreshCurrent();
-        //+323975 [323975]
 
         OnAttemptEndSale (Rec);
 
@@ -441,16 +444,18 @@ codeunit 6150705 "POS Sale"
         ChangeAmount := POSGiveChange.InsertChange(Rec, ReturnPaymentType, PaidAmount-SalesAmount);
         RoundAmount := POSRounding.InsertRounding(Rec, ReturnPaymentType, PaidAmount-SalesAmount-ChangeAmount);
 
-        if EndSale(POSSession) then begin
-          EndedSalesAmount := SalesAmount;
-          EndedPaidAmount := PaidAmount;
-          EndedChangeAmount := ChangeAmount;
-          EndedRoundingAmount := RoundAmount;
-          exit(true);
-        end;
+        //-NPR5.54 [364658]
+        EndSale(POSSession, true);
+        EndedSalesAmount := SalesAmount;
+        EndedPaidAmount := PaidAmount;
+        EndedChangeAmount := ChangeAmount;
+        EndedRoundingAmount := RoundAmount;
+
+        exit(true);
+        //-NPR5.54 [364658]
     end;
 
-    local procedure EndSale(POSSession: Codeunit "POS Session"): Boolean
+    local procedure EndSale(POSSession: Codeunit "POS Session";StartNew: Boolean)
     var
         SalePOS: Record "Sale POS";
         SalesAmount: Decimal;
@@ -465,28 +470,26 @@ codeunit 6150705 "POS Sale"
 
         PaymentLine.CalculateBalance (SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
-        //-NPR5.50 [300557]
         RetailSalesDocMgt.HandleLinkedDocuments(POSSession);
-        //+NPR5.50 [300557]
+
         OnBeforeEndSale (Rec);
 
         SalePOS := Rec;
 
-        //-NPR5.43 [315838]
         StartTime := CurrentDateTime;
-        //+NPR5.43 [315838]
         RetailFormCode.FinishSale (Rec, SubTotal, 0, true, TempSalesHeader, SalesAmount);
         Commit;
         Ended := true;
-        //-NPR5.43 [315838]
+
         LogStopwatch('FINISH_SALE', CurrentDateTime-StartTime);
-        //+NPR5.43 [315838]
 
         RunAfterEndSale(SalePOS);
 
-        SelectViewForEndOfSale(POSSession);
-
-        exit (true);
+        //-NPR5.54 [364658]
+        if StartNew then begin
+          SelectViewForEndOfSale(POSSession);
+        end;
+        //+NPR5.54 [364658]
     end;
 
     local procedure IsPaymentValidForEndingSale(PaymentType: Record "Payment Type POS";ReturnPaymentType: Record "Payment Type POS";SalesAmount: Decimal;PaidAmount: Decimal): Boolean
@@ -497,27 +500,18 @@ codeunit 6150705 "POS Sale"
         if not PaymentType."Auto End Sale" then
           exit (false);
 
-        //-NPR5.53 [384841]
         exit (POSPaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, PaymentType, ReturnPaymentType, false) = 0);
-        //+NPR5.53 [384841]
     end;
 
     [Scope('Personalization')]
     procedure SelectViewForEndOfSale(POSSession: Codeunit "POS Session")
     begin
-        //-NPR5.32 [266226]
         if (Register."Touch Screen Login Type" = Register."Touch Screen Login Type"::Automatic) then begin
           POSSession.StartTransaction ();
           POSSession.ChangeViewSale ();
         end else begin
-          // POSSession.ChangeViewLogin ();
-          // POSSession.InitializeSession ();
-          //-NPR5.34 [279495]
           POSSession.StartPOSSession ();
-          //+NPR5.34 [279495]
-
         end;
-        //+NPR5.32 [266226]
     end;
 
     [Scope('Personalization')]
@@ -537,14 +531,12 @@ codeunit 6150705 "POS Sale"
         VATAmount: Decimal;
         TotalAmount: Decimal;
     begin
-        //TODO: Refactor the business logic below. Currently copied from "Touch - Sale POS (Web)" and most likely contains bloated logic.
-
         OnBeforeLoadSavedSale (SalePOS."Sales Ticket No.", Rec."Sales Ticket No.");
 
         with Rec do begin
           "Customer No."          := SalePOS."Customer No.";
           "Customer Type"         := SalePOS."Customer Type";
-          //-NPR5.38 [302221]
+
           "Customer Name" := SalePOS."Customer Name";
           Name := SalePOS.Name;
           Address := SalePOS.Address;
@@ -553,7 +545,7 @@ codeunit 6150705 "POS Sale"
           City := SalePOS.City;
           "Contact No.":= SalePOS."Contact No.";
           Reference := SalePOS.Reference;
-          //+NPR5.38 [302221]
+
           Date                    := Today;
           "Start Time"            := Time;
           "External Document No." := SalePOS."External Document No.";
@@ -641,6 +633,112 @@ codeunit 6150705 "POS Sale"
         InitializeNewSale (Register, FrontEnd, Setup, EmptySelf);
     end;
 
+    procedure ResumeExistingSale(SalePOS_ToResume: Record "Sale POS";RegisterIn: Record Register;FrontEndIn: Codeunit "POS Front End Management";SetupIn: Codeunit "POS Setup";ThisIn: Codeunit "POS Sale")
+    var
+        SalePOS: Record "Sale POS";
+    begin
+        //-NPR5.54 [364658]
+        Initialized := true;
+
+        FrontEnd := FrontEndIn;
+        Register := RegisterIn;
+        Setup := SetupIn;
+        This := ThisIn;
+
+        RetailSetup.Get();
+
+        Clear(Rec);
+        Clear(LastSaleRetrieved);
+
+        OnBeforeResumeSale(Rec,FrontEnd);
+        ResumeSale(SalePOS_ToResume);
+        OnAfterResumeSale(Rec,FrontEnd);
+
+        if not IsMock then
+          FrontEnd.StartTransaction(Rec);
+        //+NPR5.54 [364658]
+    end;
+
+    local procedure ResumeSale(SalePOS_ToResume: Record "Sale POS")
+    var
+        SaleLinePOS: Record "Sale Line POS";
+        TouchScreenFunctions: Codeunit "Touch Screen - Functions";
+    begin
+        //-NPR5.54 [364658]
+        Rec := SalePOS_ToResume;
+        with Rec do begin
+          Register.TestField("Return Payment Type");
+          UpdateSaleDeviceID(Rec);
+
+          "Salesperson Code" := Setup.Salesperson();
+          if "Salesperson Code" <> SalePOS_ToResume."Salesperson Code" then
+            CreateDim(
+              DATABASE::"POS Unit","Register No.",
+              DATABASE::"POS Store","POS Store Code",
+              DATABASE::Job,"Event No.",
+              DATABASE::Customer,"Customer No.",
+              DATABASE::"Salesperson/Purchaser","Salesperson Code");
+
+          Modify(true);
+
+          SaleLine.Init("Register No.","Sales Ticket No.",This,Setup,FrontEnd);
+          SaleLinePOS.SetRange("Register No.","Register No.");
+          SaleLinePOS.SetRange("Sales Ticket No.","Sales Ticket No.");
+          SaleLinePOS.SetFilter(Type,'<>%1',SaleLinePOS.Type::Payment);
+          if not SaleLinePOS.IsEmpty then
+            SaleLine.SetLast();
+
+          PaymentLine.Init("Register No.","Sales Ticket No.",This,Setup,FrontEnd);
+
+          FilterGroup := 2;
+          SetRange("Register No.","Register No.");
+          SetRange("Sales Ticket No.","Sales Ticket No.");
+          FilterGroup := 0;
+
+          IsModified := true;
+        end;
+        //+NPR5.54 [364658]
+    end;
+
+    procedure ResumeFromPOSQuote(POSQuoteNo: Integer): Boolean
+    var
+        SaleLinePOS: Record "Sale Line POS";
+        POSResumeSale: Codeunit "POS Resume Sale Mgt.";
+        Ok: Boolean;
+    begin
+        //-NPR5.54 [364658]
+        Ok := POSResumeSale.LoadFromPOSQuote(Rec,POSQuoteNo);
+        if Ok then begin
+          SaleLinePOS.SetRange("Register No.",Rec."Register No.");
+          SaleLinePOS.SetRange("Sales Ticket No.",Rec."Sales Ticket No.");
+          SaleLinePOS.SetFilter(Type,'<>%1',SaleLinePOS.Type::Payment);
+          if not SaleLinePOS.IsEmpty then
+            SaleLine.SetLast();
+
+          IsModified := true;
+        end;
+
+        exit(Ok);
+        //+NPR5.54 [364658]
+    end;
+
+    local procedure UpdateSaleDeviceID(var SalePOS: Record "Sale POS")
+    var
+        POSUnitIdentity: Record "POS Unit Identity";
+    begin
+        //-NPR5.54 [364658]
+        Setup.GetPOSUnitIdentity(POSUnitIdentity);
+        with SalePOS do begin
+          if POSUnitIdentity."Entry No." = 0 then
+            "Device ID" := ''  //Configured using temporary pos unit identity
+          else
+            "Device ID" := POSUnitIdentity."Device ID";
+          "Host Name" := POSUnitIdentity."Host Name";
+          "User ID" := POSUnitIdentity."User ID";
+        end;
+        //+NPR5.54 [364658]
+    end;
+
     local procedure RunAfterEndSale(xRec: Record "Sale POS")
     var
         Success: Boolean;
@@ -713,6 +811,18 @@ codeunit 6150705 "POS Sale"
     [IntegrationEvent(TRUE, false)]
     local procedure OnAfterLoadSavedSale(OriginalSalesTicketNo: Code[20];NewSalesTicketNo: Code[20])
     begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeResumeSale(SalePOS: Record "Sale POS";FrontEnd: Codeunit "POS Front End Management")
+    begin
+        //NPR5.54 [364658]
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterResumeSale(SalePOS: Record "Sale POS";FrontEnd: Codeunit "POS Front End Management")
+    begin
+        //NPR5.54 [364658]
     end;
 
     [IntegrationEvent(TRUE, false)]

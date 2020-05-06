@@ -15,6 +15,9 @@ report 6014417 "Inventory per Date"
     // NPR5.51/ANPA/20190712  CASE 361236 The headlines have been changed so that they carry on to the next page
     // NPR5.53/TILA/20191003 CASE 371374 Layout update - EAN no. column expanded
     // NPR5.53/TILA/20191022 CASE 371374 Layout update - Expanded description column, removed "Last Inv. Cost" and "Total Profit" columns
+    // NPR5.54/YAHA/20200309 CASE 394927 Added Last Direct Cost
+    // NPR5.54/YAHA/20200309 CASE 394927 Added Sales Price caption and changed remove unit price labal to be replaced by Sales Price
+    // NPR5.54/ANPA/20200326  CASE 384505 Changed labels such that there is a danish caption for 'Last Cost Price' and 'Sales Price' and made it possible to select SelectCaltMethod.
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Inventory per Date.rdlc';
 
@@ -246,12 +249,16 @@ report 6014417 "Inventory per Date"
         PerDate_Caption = 'Per Date';
         Footer_Caption = '�NAVIPARTNER K�benhavn 2002';
         LastPurchaseDate_Caption = 'Last Purchase Date';
+        LastCostPrice_Caption = 'Last Cost Price';
+        SalesPrice_Caption = 'Sales Price';
     }
 
     trigger OnInitReport()
     begin
         EndDate := Today();
-        SelectCalcMethod := SelectCalcMethod::"Sidste Kostpris";
+        //-NPR5.54 [384505]
+        //SelectCalcMethod := SelectCalcMethod::"Sidste Kostpris";
+        //+NPR5.54 [384505]
     end;
 
     trigger OnPreReport()

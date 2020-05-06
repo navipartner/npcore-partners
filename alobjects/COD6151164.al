@@ -10,6 +10,7 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
     begin
     end;
 
+    [Scope('Personalization')]
     procedure WebServiceApi(LoyaltyEndpointClient: Record "MM NPR Remote Endpoint Setup";SoapAction: Text;var ReasonText: Text;var XmlDocIn: DotNet npNetXmlDocument;var XmlDocOut: DotNet npNetXmlDocument): Boolean
     var
         NPRMembership: Codeunit "MM NPR Membership";
@@ -60,6 +61,7 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
         //+MM1.40 [357360]
     end;
 
+    [Scope('Personalization')]
     procedure ToBase64(StringToEncode: Text) B64String: Text
     var
         TempBlob: Record TempBlob temporary;
@@ -85,6 +87,7 @@ codeunit 6151164 "MM Loyalty Points WS (Client)"
         Clear(MemoryStream);
     end;
 
+    [Scope('Personalization')]
     procedure XmlSafe(InText: Text): Text
     begin
 

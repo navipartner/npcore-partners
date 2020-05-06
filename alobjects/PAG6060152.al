@@ -19,6 +19,7 @@ page 6060152 "Event List"
     //                                   Action Job Task Lines renamed to Event Task Lines and changed page to run
     // NPR5.49/TJ  /20190307 CASE 345048 Added field "Bill-to Name"
     // NPR5.50/JAVA/20190429 CASE 353381 BC14: Implement changes done in page 542 (use generic SetMultiRecord() function instead of specific functions).
+    // NPR5.54/TJ  /20200302 CASE 392832 Added field "Creation Date"
 
     Caption = 'Event List';
     CardPageID = "Event Card";
@@ -94,6 +95,9 @@ page 6060152 "Event List"
                     Caption = '% Invoiced';
                     Editable = false;
                     Visible = false;
+                }
+                field("Creation Date";"Creation Date")
+                {
                 }
             }
         }

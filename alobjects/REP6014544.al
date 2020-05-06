@@ -4,6 +4,7 @@ report 6014544 "Item Loss - Return Reason"
     // NPR5.31/JLK /20170331  CASE 268274 Changed ENU Caption
     // NPR5.48/TJ  /20180102  CASE 340615 Removed Product Group Code from ReqFilterFields property on dataitem Item
     // NPR5.48/BHR /20190111  CASE 341976 Comment Code as per OMA
+    // NPR5.54/SARA/20200216  CASE 387978 Increment 'Line No.' in NPR - TEMP Buffer table
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Item Loss - Return Reason.rdlc';
 
@@ -308,7 +309,10 @@ report 6014544 "Item Loss - Return Reason"
 
               TmpReportSorting.Init;
               TmpReportSorting.Template          := lItemEntryRec."Item No.";
-              TmpReportSorting."Line No."        := 1;
+              //-NPR5.54 [387978]
+              //TmpReportSorting."Line No."        := 1;
+              TmpReportSorting."Line No."        += 1;
+              //+NPR5.54 [387978]
               TmpReportSorting."Short Code 1"    := lItemEntryRec."Item No.";
               TmpReportSorting."Decimal 3"       := -lItemEntryRec.Quantity;
               TmpReportSorting."Code 1"          := lValueEntryRec."Reason Code";

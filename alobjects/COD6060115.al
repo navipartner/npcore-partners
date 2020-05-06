@@ -20,6 +20,7 @@ codeunit 6060115 "TM Ticket WebService"
     // TM1.36/TSA /20180830 CASE 326733 Removed ResolveIdentifiers()
     // TM1.38/TSA /20181025 CASE 332109 SendETicket()
     // TM1.45/TSA /20200114 CASE 384490 Ticket blocked checked for complementary item
+    // TM90.1.46/TSA /20200128 CASE 387877 Added ListTicketItems() service
 
 
     trigger OnRun()
@@ -429,6 +430,16 @@ codeunit 6060115 "TM Ticket WebService"
         SendETicket.Import ();
         SendETicket.CreateResponse ();
         //+TM1.38 [332109]
+    end;
+
+    [Scope('Personalization')]
+    procedure ListTicketItems(var ListTicketItems: XMLport "TM List Ticket Items")
+    begin
+
+        //-TM90.1.46 [387877]
+        // implicit export
+        ListTicketItems.CreateResponse ();
+        //+TM90.1.46 [387877]
     end;
 
     local procedure "--"()

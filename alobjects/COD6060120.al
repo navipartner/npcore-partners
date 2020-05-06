@@ -7,6 +7,8 @@ codeunit 6060120 "TM Ticket Notify Participant"
     // TM1.38/TSA/20181025  CASE 332109 Transport TM1.38 - 25 October 2018
     // TM1.45/TSA /20191101 CASE 374620 Added OnNotifyStakeholder()
     // TM1.45/TSA /20191202 CASE 374620 SendGeneralNotification()
+    // TM90.1.46/TSA /20200127 CASE 387138 CreateDiyPrintNotification()
+    // TM90.1.46/TSA /20200331 CASE 390657 Added PrePaid and PostPaid as confirmed payment for stakeholder notifications
 
 
     trigger OnRun()
@@ -195,6 +197,22 @@ codeunit 6060120 "TM Ticket Notify Participant"
     end;
 
     procedure AquireTicketParticipant(Token: Text[100];SuggestNotificationMethod: Option NA,EMAIL,SMS;SuggestNotificationAddress: Text[100]): Boolean
+    begin
+
+        //-TM90.1.46 [387138] refactored, moved code to local worker
+        exit (AquireTicketParticipantWorker (Token, SuggestNotificationMethod, SuggestNotificationAddress, false));
+        //+TM90.1.46 [387138]
+    end;
+
+    procedure AquireTicketParticipantForce(Token: Text[100];SuggestNotificationMethod: Option NA,EMAIL,SMS;SuggestNotificationAddress: Text[100];ForceDialog: Boolean): Boolean
+    begin
+
+        //-TM90.1.46 [387138]
+        exit (AquireTicketParticipantWorker (Token, SuggestNotificationMethod, SuggestNotificationAddress, ForceDialog));
+        //+TM90.1.46 [387138]
+    end;
+
+    local procedure AquireTicketParticipantWorker(Token: Text[100];SuggestNotificationMethod: Option NA,EMAIL,SMS;SuggestNotificationAddress: Text[100];ForceDialog: Boolean): Boolean
     var
         PageAction: Action;
         TicketReservationRequest: Record "TM Ticket Reservation Request";
@@ -211,6 +229,7 @@ codeunit 6060120 "TM Ticket Notify Participant"
         AttributeManagement: Codeunit "NPR Attribute Management";
     begin
 
+        //-TM90.1.46 [387138]
         if (not (TicketRequestManager.GetTokenTicket (Token, TicketNo))) then
           exit (false);
 
@@ -242,11 +261,33 @@ codeunit 6060120 "TM Ticket Notify Participant"
             if (SuggestNotificationAddress = '') then
               RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
           end;
+
+          //-TM90.1.46 [387138]
+          TicketAdmissionBOM.Reset ();
+          TicketAdmissionBOM.SetFilter ("Item No.", '=%1', Ticket."Item No.");
+          TicketAdmissionBOM.SetFilter ("Variant Code", '=%1', Ticket."Variant Code");
+          TicketAdmissionBOM.SetFilter ("Publish Ticket URL", '=%1', TicketAdmissionBOM."Publish Ticket URL"::SEND);
+          if (TicketAdmissionBOM.FindFirst ()) then begin
+            AdmissionCode := TicketAdmissionBOM."Admission Code";
+            SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
+            if (SuggestNotificationAddress = '') then
+              RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
+          end;
+          //+TM90.1.46 [387138]
+
         end;
         //+TM1.38 [332109]
 
-        if (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) then
-          exit (false);
+        //-TM90.1.46 [387138]
+        //IF (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) THEN
+        //  EXIT (FALSE);
+        if (not ForceDialog) then
+          if (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) then
+            exit (false);
+
+        if (AdmissionCode = '') then
+          AdmissionCode := Admission."Admission Code";
+        //+TM90.1.46 [387138]
 
         TicketReservationRequest.Reset ();
         TicketReservationRequest.FilterGroup(2);
@@ -284,6 +325,7 @@ codeunit 6060120 "TM Ticket Notify Participant"
         until (TicketReservationRequest.Next () = 0);
 
         exit (PageAction = ACTION::LookupOK);
+        //+TM90.1.46 [387138]
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6059784, 'OnDetailedTicketEvent', '', true, true)]
@@ -298,8 +340,13 @@ codeunit 6060120 "TM Ticket Notify Participant"
 
         //-TM1.45 [374620]
         if (DetTicketAccessEntry."External Adm. Sch. Entry No." <= 0) then begin
-          if (DetTicketAccessEntry.Type <> DetTicketAccessEntry.Type::PAYMENT) then
+
+          //-TM90.1.46 [390657]
+          //IF (DetTicketAccessEntry.Type <> DetTicketAccessEntry.Type::PAYMENT) THEN
+          //   EXIT;
+          if (not (DetTicketAccessEntry.Type in [DetTicketAccessEntry.Type::PAYMENT, DetTicketAccessEntry.Type::PREPAID, DetTicketAccessEntry.Type::POSTPAID])) then
             exit;
+          //+TM90.1.46 [390657]
 
           ReserveTicketAccessEntry.SetFilter ("Ticket Access Entry No.", '=%1', DetTicketAccessEntry."Ticket Access Entry No.");
           ReserveTicketAccessEntry.SetFilter (Type, '=%1', ReserveTicketAccessEntry.Type::RESERVATION);
@@ -401,6 +448,7 @@ codeunit 6060120 "TM Ticket Notify Participant"
         NotificationEntry."Quantity To Admit" := TicketReservationRequest.Quantity;
 
         NotificationEntry."Ticket Holder E-Mail" := TicketReservationRequest."Notification Address";
+        NotificationEntry."External Order No." := TicketReservationRequest."External Order No."; //-+#TM1.46 [387138]
 
         NotificationEntry."Relevant Date" := AdmissionScheduleEntry."Admission Start Date";
         NotificationEntry."Relevant Time" := AdmissionScheduleEntry."Admission Start Time";
@@ -416,6 +464,107 @@ codeunit 6060120 "TM Ticket Notify Participant"
         NotificationEntry."Notification Process Method" := NotificationEntry."Notification Process Method"::BATCH;
         NotificationEntry.Insert ();
         //+TM1.45 [374620]
+    end;
+
+    procedure CreateDiyPrintNotification(TicketNo: Code[20]) NotificationEntryNo: Integer
+    var
+        NotificationEntry: Record "TM Ticket Notification Entry";
+        TicketSetup: Record "TM Ticket Setup";
+        Ticket: Record "TM Ticket";
+        TicketReservationRequest: Record "TM Ticket Reservation Request";
+        Admission: Record "TM Admission";
+        Schedule: Record "TM Admission Schedule";
+        AdmissionScheduleEntry: Record "TM Admission Schedule Entry";
+        DetTicketAccessEntry: Record "TM Det. Ticket Access Entry";
+        TicketBom: Record "TM Ticket Admission BOM";
+        TicketAccessEntry: Record "TM Ticket Access Entry";
+    begin
+
+        //-TM90.1.46 [387138]
+        if (not TicketSetup.Get ()) then
+          exit;
+
+        Ticket.Get (TicketNo);
+        TicketReservationRequest.Get (Ticket."Ticket Reservation Entry No.");
+
+        TicketBom.SetFilter ("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.SetFilter (Default, '=%1', true);
+        if (TicketBom.IsEmpty()) then
+          TicketBom.SetFilter (Default, '=%1', false);
+
+        if not (TicketBom.FindFirst ()) then
+          exit;
+
+        if (not Admission.Get (TicketBom."Admission Code")) then
+          exit;
+
+        TicketAccessEntry.SetFilter ("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.SetFilter ("Admission Code", '=%1', TicketBom."Admission Code");
+        if (not TicketAccessEntry.FindFirst ()) then
+          exit;
+
+        DetTicketAccessEntry.SetFilter ("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+        DetTicketAccessEntry.SetFilter (Type, '=%1', DetTicketAccessEntry.Type::RESERVATION);
+        if (DetTicketAccessEntry.IsEmpty ()) then
+          DetTicketAccessEntry.SetFilter (Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
+        if (not DetTicketAccessEntry.FindFirst ()) then
+          exit;
+
+        AdmissionScheduleEntry.SetFilter ("External Schedule Entry No.", '=%1', DetTicketAccessEntry."External Adm. Sch. Entry No.");
+        AdmissionScheduleEntry.SetFilter (Cancelled, '=%1', false);
+        if (not AdmissionScheduleEntry.FindFirst ()) then
+          exit;
+
+        NotificationEntry."Entry No." := 0;
+
+        NotificationEntry."Notification Trigger" := NotificationEntry."Notification Trigger"::TICKETSERVER;
+        NotificationEntry."Ticket Trigger Type" := NotificationEntry."Ticket Trigger Type"::SALES;
+        NotificationEntry."Date To Notify" := Today;
+
+        NotificationEntry."Det. Ticket Access Entry No." := DetTicketAccessEntry."Entry No.";
+        NotificationEntry."Admission Schedule Entry No." := AdmissionScheduleEntry."Entry No.";
+        NotificationEntry."Published Ticket URL" := StrSubstNo ('%1%2', TicketSetup."Print Server Order URL", TicketReservationRequest."Session Token ID");
+
+        NotificationEntry."Ticket Type Code" := Ticket."Ticket Type Code";
+        NotificationEntry."Ticket No." := Ticket."No.";
+        NotificationEntry."External Ticket No." := Ticket."External Ticket No.";
+        NotificationEntry."Ticket No. for Printing" := Ticket."External Ticket No.";
+
+        NotificationEntry."Ticket Item No." := Ticket."Item No.";
+        NotificationEntry."Ticket Variant Code" := Ticket."Variant Code";
+        NotificationEntry."Ticket External Item No." := TicketReservationRequest."External Item Code";
+        NotificationEntry."Ticket Token" := TicketReservationRequest."Session Token ID";
+
+        NotificationEntry."Ticket BOM Description" := TicketBom.Description;
+        NotificationEntry."Ticket BOM Adm. Description" := TicketBom."Admission Description";
+        NotificationEntry."Adm. Location Description" := Admission.Description;
+        NotificationEntry."Adm. Event Description" := Admission.Description;
+        NotificationEntry."Admission Code" := Admission."Admission Code";
+        NotificationEntry."Adm. Event Description" := Admission.Description;
+        NotificationEntry."Quantity To Admit" := TicketReservationRequest.Quantity;
+
+        NotificationEntry."Ticket Holder E-Mail" := TicketReservationRequest."Notification Address";
+
+        NotificationEntry."Relevant Date" := AdmissionScheduleEntry."Admission Start Date";
+        NotificationEntry."Relevant Time" := AdmissionScheduleEntry."Admission Start Time";
+        NotificationEntry."Relevant Datetime" := CreateDateTime (NotificationEntry."Relevant Date", NotificationEntry."Relevant Time");
+        NotificationEntry."Event Start Date" := AdmissionScheduleEntry."Admission Start Date";
+        NotificationEntry."Event Start Time" := AdmissionScheduleEntry."Admission Start Time";
+
+        NotificationEntry."Notification Address" := TicketReservationRequest."Notification Address";
+        NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::NA;
+
+        if (StrPos (TicketReservationRequest."Notification Address", '@') > 0) then
+          NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::EMAIL;
+
+        if (StrLen (DelChr (NotificationEntry."Notification Address", '<=>', '+0123456789 ')) = 0) then
+          NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::SMS;
+
+        NotificationEntry."Notification Process Method" := NotificationEntry."Notification Process Method"::INLINE;
+        NotificationEntry.Insert ();
+
+        exit (NotificationEntry."Entry No.");
+        //+TM90.1.46 [387138]
     end;
 
     procedure SendGeneralNotification(var TicketNotificationEntryFilters: Record "TM Ticket Notification Entry")

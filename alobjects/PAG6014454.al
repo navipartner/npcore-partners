@@ -12,6 +12,7 @@ page 6014454 "Campaign Discount Lines"
     // NPR5.38/TS  /20180105  CASE 300893 Renamed OnAfterGetCurrRecord to AfterGetCurrentRecord
     // NPR5.38/TS  /20171213  CASE 299281 Added Field Comment
     // NPR5.40/MMV /20180214  CASE 294655 Performance optimization
+    // NPR5.54/BHR /20200129  CASE 387439 removed unused functions and fields as per case.
 
     Caption = 'Period Discount Lines';
     DelayedInsert = true;
@@ -116,38 +117,6 @@ page 6014454 "Campaign Discount Lines"
                 {
                 }
             }
-            grid(Control10)
-            {
-                ShowCaption = false;
-                group(Control6150613)
-                {
-                    ShowCaption = false;
-                    field(ItemDescription;ItemDescription)
-                    {
-                        Caption = 'Description';
-                        Editable = false;
-                    }
-                }
-                group(Control6150614)
-                {
-                    ShowCaption = false;
-                    field(DB;DB)
-                    {
-                        Caption = 'Profit (LCY)';
-                        Editable = false;
-                    }
-                }
-                group(Control6150615)
-                {
-                    ShowCaption = false;
-                    field(DG;DG)
-                    {
-                        Caption = 'Profit (%)';
-                        DecimalPlaces = 1:1;
-                        Editable = false;
-                    }
-                }
-            }
         }
     }
 
@@ -187,80 +156,12 @@ page 6014454 "Campaign Discount Lines"
         //+NPR5.38 [300893]
     end;
 
-    trigger OnOpenPage()
-    begin
-          OnActivateForm;
-    end;
-
     var
-        VATPostingSetup: Record "VAT Posting Setup";
-        ItemDescription: Text[50];
-        DB: Decimal;
-        DG: Decimal;
-        VATPct: Decimal;
         Item: Record Item;
-
-    procedure Calculate()
-    var
-        ItemGroupMsg: Label 'The item does not belong to any itemgroup';
-        ItemGroup: Record "Item Group";
-    begin
-        if "Campaign Unit Price" <> 0 then begin
-          Item.Get("Item No.");
-          ItemDescription := Item.Description;
-          if Item."Item Group" = '' then begin
-            ItemDescription := ItemGroupMsg;
-            DB := 0;
-            DG := 0;
-            exit;
-          end;
-          if ItemGroup.Get(Item."Item Group") then;
-          VATPostingSetup.SetRange(VATPostingSetup."VAT Bus. Posting Group",ItemGroup."VAT Bus. Posting Group");
-          VATPostingSetup.SetRange(VATPostingSetup."VAT Prod. Posting Group",ItemGroup."VAT Prod. Posting Group");
-          if VATPostingSetup.Find('-') then
-            VATPct := VATPostingSetup."VAT %";
-
-          if Item."Price Includes VAT" then begin
-            DB := Round(("Campaign Unit Price"/(1 + VATPct / 100) - Item."Unit Cost"),0.001);
-            if ("Campaign Unit Price"/(1 + VATPct / 100)) <> 0 then
-              DG := Round(DB/("Campaign Unit Price"/(1 + VATPct / 100)) * 100,0.01)
-            else
-              DG := 0;
-          end else begin
-            DB := Round(("Campaign Unit Price" - Item."Unit Cost"),0.001);
-            DG := Round((DB / "Campaign Unit Price" * 100),0.01);
-          end;
-
-        end else begin
-          ItemDescription := '';
-          DB := 0;
-          DG := 0;
-        end;
-    end;
 
     procedure GetCurrLine(var PeriodDiscountLine: Record "Period Discount Line")
     begin
         PeriodDiscountLine := Rec;
-    end;
-
-    procedure CallShowComment()
-    begin
-        ShowComment;
-    end;
-
-    procedure GetSelectionFilter(var Lines: Record "Period Discount Line")
-    var
-        t001: Label 'no lines chosen!\choose with the mouse or keyboard';
-        t002: Label 'only one item chosen!continue?';
-    begin
-        CurrPage.SetSelectionFilter(Lines);
-
-        if Lines.Count = 0 then
-          Error(t001);
-
-        if Lines.Count = 1 then
-          if not Confirm(t002,true) then
-            Error('');
     end;
 
     local procedure AfterGetCurrRecord()
@@ -270,43 +171,6 @@ page 6014454 "Campaign Discount Lines"
         CalcFields("Unit Price Incl. VAT");
         //CALCFIELDS(Status,"Unit Price Incl. VAT");
         //+NPR5.40 [294655]
-    end;
-
-    local procedure ItemNoOnActivate()
-    begin
-        Calculate();
-    end;
-
-    local procedure CampaignUnitpriceOnActivate()
-    begin
-        Calculate();
-    end;
-
-    local procedure OnDeactivateForm()
-    begin
-        ItemDescription := '';
-        DB := 0;
-        DG := 0;
-    end;
-
-    local procedure OnActivateForm()
-    begin
-        if Code <> '' then
-          Calculate();
-        CurrPage.Update;
-    end;
-
-    local procedure ItemNoOnAfterInput(var Text: Text[1024])
-    var
-        AlternativeNo: Record "Alternative No.";
-    begin
-        if not Item.Get(Text) then begin
-          AlternativeNo.SetRange("Alt. No.",Text);
-          if AlternativeNo.Find('-') then begin
-            Text := AlternativeNo.Code;
-            "Variant Code" := AlternativeNo."Variant Code";
-          end;
-        end;
     end;
 }
 

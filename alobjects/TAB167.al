@@ -11,6 +11,7 @@ tableextension 6014422 tableextension6014422 extends Job
     //                                 Changed TableRelation property of field "Organizer E-Mail" from default to "Event Exch. Int. E-Mail"
     // NPR5.48/TJ/20190131 CASE 342308 Added field "Est. Total Amount Incl. VAT"
     // NPR5.53/TJ/20191119 CASE 374886 Added field Locked
+    // NPR5.54/TJ/20200324 CASE 397743 Added field "Admission Code"
     fields
     {
         field(6060150;"Starting Time";Time)
@@ -112,6 +113,12 @@ tableextension 6014422 tableextension6014422 extends Job
         {
             Caption = 'Locked';
             Description = 'NPR5.53';
+        }
+        field(6151580;"Admission Code";Code[20])
+        {
+            Caption = 'Admission Code';
+            Description = 'NPR5.54';
+            TableRelation = "TM Admission";
         }
     }
 }
