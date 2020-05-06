@@ -20,3 +20,4 @@ jobs:
         feed: NprAddIns
         definition: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
         version: 5.54.0
+    appFeed: NpCore/NaviPartner.NPCore.BC
