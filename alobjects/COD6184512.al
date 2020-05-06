@@ -307,13 +307,13 @@ codeunit 6184512 "EFT Mock Client Protocol"
                 begin
                     EftTransactionRequest."Result Description" := 'Terminal is closed';
                     EftTransactionRequest."Result Display Text" := CopyStr(State.ResultString, 1, MaxStrLen(EftTransactionRequest."Result Display Text"));
-                    EftTransactionRequest."External Result Received" := true;
+              EftTransactionRequest."External Result Known" := true;
                 end;
             -101: //Connection failed - request never started
                 begin
                     EftTransactionRequest."Result Description" := 'Connection failed';
                     EftTransactionRequest."Result Display Text" := CopyStr(State.ResultString, 1, MaxStrLen(EftTransactionRequest."Result Display Text"));
-                    EftTransactionRequest."External Result Received" := true;
+              EftTransactionRequest."External Result Known" := true;
                 end
             else
                 exit(true); //No generic errors
@@ -339,7 +339,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
         EftTransactionRequest."Reference Number Output" := State.ExternalReferenceNo;
         EftTransactionRequest."Amount Output" := State.AmountOut;
         EftTransactionRequest."Result Amount" := State.AmountOut;
-        EftTransactionRequest."External Result Received" := State.ExternalResultReceived;
+        EftTransactionRequest."External Result Known" := State.ExternalResultReceived;
         EftTransactionRequest."Receipt 1".CreateOutStream(OutStream, TEXTENCODING::UTF8);
         OutStream.Write(State.Receipt);
         //-NPR5.48 [339930]
@@ -413,7 +413,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
         EftTransactionRequest."Result Display Text" := CopyStr(State.ResultString, 1, MaxStrLen(EftTransactionRequest."Result Display Text"));
         EftTransactionRequest."External Transaction ID" := State.ExternalReferenceNo;
         EftTransactionRequest."Reference Number Output" := State.ExternalReferenceNo;
-        EftTransactionRequest."External Result Received" := State.ExternalResultReceived;
+        EftTransactionRequest."External Result Known" := State.ExternalResultReceived;
         EftTransactionRequest."Receipt 1".CreateOutStream(OutStream, TEXTENCODING::UTF8);
         OutStream.Write(State.Receipt);
         //-NPR5.48 [339930]
@@ -445,7 +445,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
         EftTransactionRequest."Result Display Text" := CopyStr(State.ResultString, 1, MaxStrLen(EftTransactionRequest."Result Display Text"));
         EftTransactionRequest."External Transaction ID" := State.ExternalReferenceNo;
         EftTransactionRequest."Reference Number Output" := State.ExternalReferenceNo;
-        EftTransactionRequest."External Result Received" := State.ExternalResultReceived;
+        EftTransactionRequest."External Result Known" := State.ExternalResultReceived;
 
         if EftTransactionRequest.Successful then begin
             EftTransactionRequest."Amount Output" := EftTransactionRequest."Amount Input";
@@ -526,7 +526,7 @@ codeunit 6184512 "EFT Mock Client Protocol"
 
     local procedure HandleReceipt(EftTransactionRequest: Record "EFT Transaction Request"; var State: DotNet npNetState5)
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         EntryNo: Integer;
         ReceiptNo: Integer;
         StringReader: DotNet npNetStringReader;

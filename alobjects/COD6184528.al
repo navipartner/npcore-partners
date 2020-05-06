@@ -1,6 +1,7 @@
 codeunit 6184528 "EFT Verifone Vim Resp. Parser"
 {
     // NPR5.53/MMV /20191204 CASE 349520 Added object
+    // NPR5.54/MMV /20200325 CASE 364340 Handle sign correctly whend voiding refund
 
 
     trigger OnRun()
@@ -112,7 +113,7 @@ codeunit 6184528 "EFT Verifone Vim Resp. Parser"
 
         EFTTransactionRequest.Get(EftTransactionEntryNo);
         EFTTransactionRequest.Successful := TransactionResponse.Success;
-        EFTTransactionRequest."External Result Received" := TransactionResponse.ReceivedExternalResponse;
+        EFTTransactionRequest."External Result Known" := TransactionResponse.ReceivedExternalResponse;
         EFTTransactionRequest."Client Assembly Version" := TransactionResponse.ExecutingAssemblyVersion;
 
         ParseTransactionResponseContents(EFTTransactionRequest, TransactionResponse);
@@ -141,7 +142,7 @@ codeunit 6184528 "EFT Verifone Vim Resp. Parser"
 
         EFTTransactionRequest.Get(EftTransactionEntryNo);
         EFTTransactionRequest.Successful := TransactionStatusResponse.LookupSuccess;
-        EFTTransactionRequest."External Result Received" := TransactionStatusResponse.LookupReceivedExternalResponse;
+        EFTTransactionRequest."External Result Known" := TransactionStatusResponse.LookupReceivedExternalResponse;
         EFTTransactionRequest."Client Assembly Version" := TransactionStatusResponse.ExecutingAssemblyVersion;
 
         if EFTTransactionRequest.Successful then begin
@@ -172,7 +173,7 @@ codeunit 6184528 "EFT Verifone Vim Resp. Parser"
 
         EFTTransactionRequest.Get(EftTransactionEntryNo);
         EFTTransactionRequest.Successful := BalanceEnquiryResponse.Success;
-        EFTTransactionRequest."External Result Received" := BalanceEnquiryResponse.ReceivedExternalResponse;
+        EFTTransactionRequest."External Result Known" := BalanceEnquiryResponse.ReceivedExternalResponse;
         EFTTransactionRequest."Client Assembly Version" := BalanceEnquiryResponse.ExecutingAssemblyVersion;
 
         EFTTransactionRequest."Currency Code" := BalanceEnquiryResponse.Currency;
@@ -249,7 +250,7 @@ codeunit 6184528 "EFT Verifone Vim Resp. Parser"
 
     local procedure ParseReceipt(EFTTransactionRequest: Record "EFT Transaction Request";Receipt: DotNet npNetList_Of_T;var BlobStream: OutStream): Boolean
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         EntryNo: Integer;
         ReceiptNo: Integer;
         Line: Text;
@@ -295,6 +296,8 @@ codeunit 6184528 "EFT Verifone Vim Resp. Parser"
         OutStream: OutStream;
         ProcessingType: Integer;
         OriginalEftTrxReq: Record "EFT Transaction Request";
+        VoidedEftTrxReq: Record "EFT Transaction Request";
+        TextBuffer: Text;
     begin
         EFTTransactionRequest."Tip Amount" := TransactionResponse.TipAmount;
         EFTTransactionRequest."Hardware ID" := TransactionResponse.TerminalID;
@@ -304,9 +307,19 @@ codeunit 6184528 "EFT Verifone Vim Resp. Parser"
         EFTTransactionRequest."Reconciliation ID" := TransactionResponse.TerminalReconciliationId;
         EFTTransactionRequest."Authorisation Number" := TransactionResponse.ApprovalCode;
         EFTTransactionRequest."Client Assembly Version" := TransactionResponse.ExecutingAssemblyVersion;
-        EFTTransactionRequest."Card Number" := TransactionResponse.MaskedPan;
-        EFTTransactionRequest."Card Issuer ID" := TransactionResponse.PaymentBrand;
-        EFTTransactionRequest."Card Name" := TransactionResponse.PaymentBrand;
+
+        //-NPR5.54 [364340]
+        TextBuffer := TransactionResponse.MaskedPan;
+        if TextBuffer <> '' then begin
+          EFTTransactionRequest."Card Number" := TextBuffer;
+        end;
+
+        TextBuffer := TransactionResponse.PaymentBrand;
+        if TextBuffer <> '' then begin
+          EFTTransactionRequest."Card Issuer ID" := TextBuffer;
+          EFTTransactionRequest."Card Name" := TextBuffer;
+        end;
+        //+NPR5.54 [364340]
 
         if not IsNull(TransactionResponse.TerminalTrxTimestamp) then begin
           DotNetDateTime := TransactionResponse.TerminalTrxTimestamp;
@@ -315,25 +328,38 @@ codeunit 6184528 "EFT Verifone Vim Resp. Parser"
           EFTTransactionRequest."Transaction Time" := DT2Time(TrxDateTime);
         end;
 
+        //-NPR5.54 [364340]
         if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::LOOK_UP then begin
           OriginalEftTrxReq.Get(EFTTransactionRequest."Processed Entry No.");
-          ProcessingType := OriginalEftTrxReq."Processing Type";
         end else begin
-          ProcessingType := EFTTransactionRequest."Processing Type";
+          OriginalEftTrxReq.Get(EFTTransactionRequest."Entry No.");
         end;
-        case ProcessingType of
-          EFTTransactionRequest."Processing Type"::PAYMENT :
+
+        case OriginalEftTrxReq."Processing Type" of
+          OriginalEftTrxReq."Processing Type"::PAYMENT :
             begin
               EFTTransactionRequest."Amount Output" := TransactionResponse.AuthorizedAmount;
               EFTTransactionRequest."Result Amount" := TransactionResponse.AuthorizedAmount;
             end;
-          EFTTransactionRequest."Processing Type"::REFUND,
-          EFTTransactionRequest."Processing Type"::VOID:
+          OriginalEftTrxReq."Processing Type"::GIFTCARD_LOAD,
+          OriginalEftTrxReq."Processing Type"::REFUND :
             begin
-              EFTTransactionRequest."Amount Output" := TransactionResponse.AuthorizedAmount * -1;
+              EFTTransactionRequest."Amount Output" := TransactionResponse.AuthorizedAmount;
               EFTTransactionRequest."Result Amount" := TransactionResponse.AuthorizedAmount * -1;
             end;
+          OriginalEftTrxReq."Processing Type"::VOID :
+            begin
+              EFTTransactionRequest."Amount Output" := TransactionResponse.AuthorizedAmount;
+
+              VoidedEftTrxReq.Get(OriginalEftTrxReq."Processed Entry No.");
+              case VoidedEftTrxReq."Processing Type" of
+                VoidedEftTrxReq."Processing Type"::PAYMENT : EFTTransactionRequest."Result Amount" := TransactionResponse.AuthorizedAmount * -1;
+                VoidedEftTrxReq."Processing Type"::GIFTCARD_LOAD : EFTTransactionRequest."Result Amount" := TransactionResponse.AuthorizedAmount;
+                VoidedEftTrxReq."Processing Type"::REFUND : EFTTransactionRequest."Result Amount" := TransactionResponse.AuthorizedAmount;
+              end;
+            end;
         end;
+        //+NPR5.54 [364340]
 
         EFTTransactionRequest."Result Code" := TransactionResponse.ErrorCode;
         EFTTransactionRequest."Result Description" := CopyStr(TransactionResponse.ErrorReason,1,MaxStrLen(EFTTransactionRequest."Result Description"));

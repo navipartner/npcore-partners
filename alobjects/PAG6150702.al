@@ -11,6 +11,7 @@ page 6150702 "POS Menu Buttons"
     // NPR5.42.01/MMV /20180627  CASE 320622 Filter parameters correctly.
     // NPR5.43/VB  /20180611  CASE 314603 Implemented secure method behavior functionality.
     // NPR5.51/THRO/20190718 CASE 361514 Action "Refresh Action Code Parameters" named RefreshActionCodeParameters (for AL Conversion)
+    // NPR5.54/VB  /20200408 CASE 399736 Added "Show Plus/Minus Buttons" field.
 
     Caption = 'POS Menu Buttons';
     PageType = List;
@@ -50,6 +51,9 @@ page 6150702 "POS Menu Buttons"
                     Visible = false;
                 }
                 field(Blocked;Blocked)
+                {
+                }
+                field("Show Plus/Minus Buttons";"Show Plus/Minus Buttons")
                 {
                 }
                 field("Background Color";"Background Color")

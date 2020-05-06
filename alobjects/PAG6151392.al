@@ -2,6 +2,7 @@ page 6151392 "CS Posting Buffer"
 {
     // NPR5.51/CLVA/20190813  CASE 365967 Object created - NP Capture Service
     // NPR5.52/CLVA/20190813  CASE 365967 Added fields "Job Queue Status","Job Queue Entry ID" and "Job Type"
+    // NPR5.54/CLVA/20200217  CASE 391080 Added action "Re-Schedule Posting" and "Job Queue Entry"
 
     Caption = 'CS Posting Buffer';
     Editable = false;
@@ -86,6 +87,55 @@ page 6151392 "CS Posting Buffer"
 
                     Delete(true);
                     CurrPage.Update;
+                end;
+            }
+            action("Re-Schedule Posting")
+            {
+                Caption = 'Re-Schedule Posting';
+                Image = RefreshPlanningLine;
+
+                trigger OnAction()
+                var
+                    CSSetup: Record "CS Setup";
+                    CSPostEnqueue: Codeunit "CS Post - Enqueue";
+                    CSPost: Codeunit "CS Post";
+                    JobQueueEntry: Record "Job Queue Entry";
+                begin
+                    if "Job Queue Status" in ["Job Queue Status"::" ","Job Queue Status"::Posting] then
+                      exit;
+
+                    if not IsNullGuid(Rec."Job Queue Entry ID") then begin
+                      if JobQueueEntry.Get(Rec."Job Queue Entry ID") then
+                        JobQueueEntry.Delete(true);
+                      Rec."Job Queue Status" := Rec."Job Queue Status"::" ";
+                      Clear(Rec."Job Queue Entry ID");
+                      Rec.Executed := false;
+                      Rec.Modify(true);
+                      Commit;
+                    end;
+
+                    CSSetup.Get;
+                    if CSSetup."Post with Job Queue" then begin
+                      CSPostEnqueue.Run(Rec);
+                    end else begin
+                      if CSPost.Run(Rec) then begin
+                        Rec.Executed := true;
+                        Rec.Modify(true);
+                      end;
+                    end;
+                end;
+            }
+            action("Job Queue Entry")
+            {
+                Caption = 'Job Queue Entry';
+                Image = Job;
+
+                trigger OnAction()
+                var
+                    JobQueueEntry: Record "Job Queue Entry";
+                begin
+                    if JobQueueEntry.Get(Rec."Job Queue Entry ID") then
+                      PAGE.RunModal(PAGE::"Job Queue Entry Card",JobQueueEntry);
                 end;
             }
         }

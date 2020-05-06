@@ -8,6 +8,7 @@ report 6014405 "Salesperson/Item Group Top"
     // NPR4.21/LS/20160309  CASE 221836 Redesign Layout/ remove duplicate colum DB/format the header/headings,
     //                                      renamed the report caption/name/displayname from "Sales code/Item group top" to "Salesperson/Item Group Top"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
+    // NPR5.54/YAHA/20200306 CASE  394854 Set Visibility to FALSE for logo
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/SalespersonItem Group Top.rdlc';
 

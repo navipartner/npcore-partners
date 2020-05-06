@@ -12,6 +12,8 @@ table 6150623 "POS Payment Line"
     // NPR5.42/TSA /20180511 CASE 314834 Dimensions are editable when entry is unposted
     // NPR5.50/TSA /20190520 CASE 354832 Added VAT related fields 84-106 for reversing unrealized VAT when using a voucher with preliminary VAT
     // NPR5.53/SARA/20191024 CASE 373672 Added Field 600..620
+    // NPR5.54/MMV /20200220 CASE 391871 Added field "Retail ID" for payment lines.
+    // NPR5.54/ALPO/20200324 CASE 397063 Global dimensions were not updated on assigned dimension change through ShowDimensions() function ("Dimensions" button)
 
     Caption = 'POS Payment Line';
     DrillDownPageID = "POS Payment Line List";
@@ -210,6 +212,10 @@ table 6150623 "POS Payment Line"
             Caption = 'Orig. POS Line No.';
             Description = 'NPR5.32';
         }
+        field(170;"Retail ID";Guid)
+        {
+            Caption = 'Retail ID';
+        }
         field(480;"Dimension Set ID";Integer)
         {
             Caption = 'Dimension Set ID';
@@ -293,7 +299,12 @@ table 6150623 "POS Payment Line"
         if ((POSEntry."Post Entry Status" = POSEntry."Post Entry Status"::Posted) and (POSEntry."Post Item Entry Status" = POSEntry."Post Item Entry Status"::Posted)) then begin
           DimMgt.ShowDimensionSet("Dimension Set ID",StrSubstNo('%1 %2 %3',TableCaption,"POS Entry No.", "Line No."));
         end else begin
-          "Dimension Set ID" := DimMgt.EditDimensionSet ("Dimension Set ID",StrSubstNo('%1 %2 %3',TableCaption,"POS Entry No.", "Line No."));
+          //"Dimension Set ID" := DimMgt.EditDimensionSet ("Dimension Set ID",STRSUBSTNO('%1 %2 %3',TABLECAPTION,"POS Entry No.", "Line No."));  //NPR5.54 [397063]-revoked
+          //-NPR5.54 [397063]
+          "Dimension Set ID" :=
+            DimMgt.EditDimensionSet2(
+              "Dimension Set ID",StrSubstNo('%1 %2 %3',TableCaption,"POS Entry No.","Line No."),"Shortcut Dimension 1 Code","Shortcut Dimension 2 Code");
+          //+NPR5.54 [397063]
           Modify ();
         end;
         //+NPR5.42 [314834]

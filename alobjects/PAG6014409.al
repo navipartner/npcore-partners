@@ -3,7 +3,7 @@ page 6014409 "Credit card transaction ticket"
     Caption = 'Credit Card Transaction Receipt';
     Editable = false;
     PageType = List;
-    SourceTable = "Credit Card Transaction";
+    SourceTable = "EFT Receipt";
     SourceTableView = WHERE(Type=FILTER(0|3));
 
     layout

@@ -25,6 +25,7 @@ page 6014490 "Retail Journal Header"
     // NPR5.53/ZESO/20191108 CASE 334538 Enabled Function for Sales Return
     // NPR5.53/TJ  /20191118 CASE 375557 Restored old print option List
     // NPR5.53/MHA /20191121 CASE 374290 Added filter fields
+    // NPR5.54/SARA/20200316 CASE 395769 Re activate button 'Invert Selection'
 
     Caption = 'Retail Journal';
     PageType = Card;
@@ -271,7 +272,6 @@ page 6014490 "Retail Journal Header"
                     Image = Change;
                     Promoted = true;
                     PromotedCategory = "Report";
-                    Visible = (NOT IsWebClient);
 
                     trigger OnAction()
                     begin

@@ -18,6 +18,7 @@ codeunit 6014548 "RP Line Printer Interface"
     //                                   Added missing bind variables to GetDeviceList().
     // NPR5.34.02/MMV /20170816 CASE 287060 Fixed invalid unbound call.
     // NPR5.37/MMV /20171002 CASE 269767 Added ripac device library.
+    // NPR5.54/MITH/20200129 CASE 369235 Added Boca Device Library.
 
     SingleInstance = true;
 
@@ -31,9 +32,11 @@ codeunit 6014548 "RP Line Printer Interface"
         BixolonDispCommandLibrary: Codeunit "RP Bixolon Disp. Device Lib.";
         Error_NoHandler: Label 'No device handler found for ''%1''';
         RipacCommandLibrary: Codeunit "RP Ripac Device Library";
+        BocaCommandLibrary: Codeunit "RP Boca FGL Device Library";
         EpsonVBound: Boolean;
         BixolonBound: Boolean;
         RipacBound: Boolean;
+        BocaBound: Boolean;
 
     procedure Construct(PrinterDevice: Text)
     begin
@@ -46,6 +49,9 @@ codeunit 6014548 "RP Line Printer Interface"
           //-NPR5.37 [269767]
           RipacCommandLibrary.IsThisDevice(PrinterDevice) : RipacBound := BindSubscription(RipacCommandLibrary);
           //+NPR5.37 [269767]
+          //-NPR5.54
+          BocaCommandLibrary.IsThisDevice(PrinterDevice) : BocaBound := BindSubscription(BocaCommandLibrary);
+          //+NPR5.54
           else
             Error(Error_NoHandler, PrinterDevice);
         end;
@@ -65,6 +71,10 @@ codeunit 6014548 "RP Line Printer Interface"
         if RipacBound then
           UnbindSubscription(RipacCommandLibrary);
         //+NPR5.37 [269767]
+        //-NPR5.54
+        if BocaBound then
+          UnbindSubscription(BocaCommandLibrary);
+        //+NPR5.54
 
         ClearAll;
     end;
@@ -79,6 +89,9 @@ codeunit 6014548 "RP Line Printer Interface"
         //-NPR5.37 [269767]
         RipacBound := BindSubscription(RipacCommandLibrary);
         //+NPR5.37 [269767]
+        //-NPR5.54
+        BocaBound := BindSubscription(BocaCommandLibrary);
+        //+NPR5.54
 
         OnBuildDeviceList(tmpRetailList);
 

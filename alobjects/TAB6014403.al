@@ -1,4 +1,4 @@
-table 6014403 "Credit Card Transaction"
+table 6014403 "EFT Receipt"
 {
     // NPR5.20/BR/20160229   CASE 231481 Changed Fieldlength for text from 40 to 60, to support Pepper integration
     // NPR5.27/MMV/20161006  CASE 254376 Refactored & Renamed UdskrivBon().
@@ -10,8 +10,9 @@ table 6014403 "Credit Card Transaction"
     // NPR5.40/TS  /20180307 CASE 307425 Deleted Field 101
     // NPR5.43/JDH /20180702 CASE 321012 Reintroduces Field 101 (Sales Ticket amount) - some customers was using it
     // NPR5.46/MMV /20180920 CASE 290734 New EFT print flow
+    // NPR5.54/MMV /20200213 CASE 387990 Renamed to EFT Receipt to make its purpose clear.
 
-    Caption = 'Credit Card Transaction';
+    Caption = 'EFT Receipt';
     LookupPageID = "Credit card transaction list";
 
     fields
@@ -119,21 +120,8 @@ table 6014403 "Credit Card Transaction"
         RecRef: RecordRef;
     begin
         RecRef.GetTable(Rec);
-        //-NPR5.46 [290734]
-        //RetailReportSelMgt.SetRequestWindow(VisAnfordring);
-        //+NPR5.46 [290734]
         RetailReportSelMgt.SetRegisterNo(RetailFormCode.FetchRegisterNumber() );
         RetailReportSelMgt.RunObjects(RecRef, ReportSelectionRetail."Report Type"::"Terminal Receipt");
-
-        //-NPR5.46 [290734]
-        // IF FINDSET(TRUE) THEN BEGIN
-        //  REPEAT
-        //    "No. Printed" += 1;
-        //    MODIFY;
-        //  UNTIL NEXT = 0;
-        //  COMMIT;
-        // END;
-        //+NPR5.46 [290734]
     end;
 }
 

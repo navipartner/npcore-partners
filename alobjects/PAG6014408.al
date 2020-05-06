@@ -9,7 +9,7 @@ page 6014408 "Credit card transaction list"
     CardPageID = "Credit card transaction ticket";
     Editable = false;
     PageType = List;
-    SourceTable = "Credit Card Transaction";
+    SourceTable = "EFT Receipt";
     SourceTableView = WHERE(Type=FILTER(0|3|10));
 
     layout
@@ -60,7 +60,7 @@ page 6014408 "Credit card transaction list"
 
                     trigger OnAction()
                     var
-                        trans: Record "Credit Card Transaction";
+                        trans: Record "EFT Receipt";
                     begin
 
                         trans.SetRange(trans."Register No.", "Register No.");

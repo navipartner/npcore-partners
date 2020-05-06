@@ -33,6 +33,9 @@
                   <Width>0.75524in</Width>
                 </TablixColumn>
                 <TablixColumn>
+                  <Width>0.72383in</Width>
+                </TablixColumn>
+                <TablixColumn>
                   <Width>0.73477in</Width>
                 </TablixColumn>
                 <TablixColumn>
@@ -211,7 +214,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Parameters!UnitPrice_Caption.Value</Value>
+                                  <Value EvaluationMode="Auto">=Parameters!SalesPrice_Caption.Value</Value>
                                   <Style>
                                     <FontSize>8pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -239,6 +242,46 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox1">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto">=Fields!CalcMethod.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox1</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
+                            <PaddingLeft>1pt</PaddingLeft>
+                            <PaddingRight>1pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -522,6 +565,37 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox2">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto" />
+                                  <Style>
+                                    <FontSize>6pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style />
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox2</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox44">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -773,6 +847,39 @@
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>UnitPrice_Item</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox3">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto">=Fields!LastDirectCost_Item.Value</Value>
+                                  <Style>
+                                    <FontSize>6pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox3</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1111,6 +1218,49 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox5">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto" />
+                                  <Style>
+                                    <FontSize>6pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox5</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <TopBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="kostv�rdi2">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -1253,6 +1403,7 @@
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
+                <TablixMember />
               </TablixMembers>
             </TablixColumnHierarchy>
             <TablixRowHierarchy>
@@ -1302,7 +1453,7 @@
             <Top>0.36554in</Top>
             <Left>0.00636in</Left>
             <Height>0.87163in</Height>
-            <Width>7.38006in</Width>
+            <Width>8.10389in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1338,7 +1489,7 @@
             <Top>0.2582cm</Top>
             <Left>9.2798cm</Left>
             <Height>0.635cm</Height>
-            <Width>9.48171cm</Width>
+            <Width>11.32024cm</Width>
             <ZIndex>1</ZIndex>
             <Style>
               <Border>
@@ -1407,7 +1558,7 @@
         <Height>3.14242cm</Height>
         <Style />
       </Body>
-      <Width>18.86311cm</Width>
+      <Width>20.60004cm</Width>
       <Page>
         <PageHeader>
           <Height>2.88397cm</Height>
@@ -1540,7 +1691,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>1.58333cm</Top>
-              <Left>14.44831cm</Left>
+              <Left>15.08331cm</Left>
               <Height>0.423cm</Height>
               <Width>4.3132cm</Width>
               <ZIndex>4</ZIndex>
@@ -1570,7 +1721,7 @@
               <Top>2.19717cm</Top>
               <Left>0.1495cm</Left>
               <Height>0.52917cm</Height>
-              <Width>18.61201cm</Width>
+              <Width>20.45054cm</Width>
               <ZIndex>5</ZIndex>
               <Style>
                 <Border>
@@ -1616,7 +1767,7 @@
               <Top>0.49775cm</Top>
               <Left>0.1495cm</Left>
               <Height>0.423cm</Height>
-              <Width>18.61201cm</Width>
+              <Width>20.45054cm</Width>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
               </Style>
@@ -1640,9 +1791,9 @@
                 </Paragraph>
               </Paragraphs>
               <Top>0.11675cm</Top>
-              <Left>11.47406cm</Left>
+              <Left>14.01406cm</Left>
               <Height>0.37008cm</Height>
-              <Width>7.28745cm</Width>
+              <Width>6.58598cm</Width>
               <ZIndex>1</ZIndex>
               <Style>
                 <VerticalAlign>Middle</VerticalAlign>
@@ -1784,6 +1935,24 @@
       </DefaultValue>
       <Prompt>LastPurchaseDate_Caption</Prompt>
     </ReportParameter>
+    <ReportParameter Name="LastCostPrice_Caption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>LastCostPrice_Caption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>LastCostPrice_Caption</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="SalesPrice_Caption">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>SalesPrice_Caption</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>SalesPrice_Caption</Prompt>
+    </ReportParameter>
     <ReportParameter Name="No_ItemCaption">
       <DataType>String</DataType>
       <DefaultValue>
@@ -1815,7 +1984,7 @@
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>16</NumberOfRows>
+      <NumberOfRows>18</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -1885,16 +2054,26 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>13</RowIndex>
-          <ParameterName>No_ItemCaption</ParameterName>
+          <ParameterName>LastCostPrice_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>14</RowIndex>
-          <ParameterName>LastDirectCost_ItemCaption</ParameterName>
+          <ParameterName>SalesPrice_Caption</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>15</RowIndex>
+          <ParameterName>No_ItemCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>16</RowIndex>
+          <ParameterName>LastDirectCost_ItemCaption</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>17</RowIndex>
           <ParameterName>ItemGroup_ItemCaption</ParameterName>
         </CellDefinition>
       </CellDefinitions>

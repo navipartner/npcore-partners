@@ -251,7 +251,7 @@ report 6150614 "Posting Overview POS"
                         TotalAmountInclTax += "Amount Incl. VAT";
                     end;
                 }
-                dataitem("Credit Card Transaction";"Credit Card Transaction")
+                dataitem("EFT Receipt";"EFT Receipt")
                 {
                     DataItemLink = "Sales Ticket No."=FIELD("Document No."),"Register No."=FIELD("POS Store Code"),Date=FIELD("Entry Date");
                     DataItemLinkReference = POS_Entry;

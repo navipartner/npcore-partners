@@ -2,6 +2,7 @@ codeunit 6151185 "MM Sponsorship Ticket Mgmt."
 {
     // MM1.41/TSA /20191004 CASE 367471 Initial Version
     // MM1.42/TSA/20200122  CASE 382728 Transport MM1.43 - 22 January 2020
+    // MM1.43/TSA /20200226 CASE 392659 Shifted all code from OnAfterInsertMembershipEntry() to a global function OnMembershipPayment();
 
 
     trigger OnRun()
@@ -505,46 +506,7 @@ codeunit 6151185 "MM Sponsorship Ticket Mgmt."
         exit (true);
     end;
 
-    local procedure "--Subscribers"()
-    begin
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6060127, 'OnAfterMemberCreateEvent', '', true, true)]
-    local procedure OnAfterMemberCreateEvent(var Membership: Record "MM Membership";var Member: Record "MM Member")
-    var
-        MembershipRole: Record "MM Membership Role";
-        SponsorshipTicketSetup: Record "MM Sponsorship Ticket Setup";
-        ResponseMessage: Text;
-    begin
-
-        // When first admin member is created, we check if there are sponsorship tickets to be created.
-        SponsorshipTicketSetup.SetFilter ("Membership Code", '=%1', Membership."Membership Code");
-        SponsorshipTicketSetup.SetFilter (Blocked, '=%1', false);
-        SponsorshipTicketSetup.SetFilter ("External Membership No.", '=%1', Membership."External Membership No.");
-        SponsorshipTicketSetup.SetFilter ("Event Type", '=%1', SponsorshipTicketSetup."Event Type"::ONNEW);
-        if (SponsorshipTicketSetup.IsEmpty ()) then
-          SponsorshipTicketSetup.SetFilter ("External Membership No.", '=%1', '');
-
-        if (SponsorshipTicketSetup.IsEmpty ()) then
-          exit;
-
-        // Only when adding first member
-        MembershipRole.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
-        MembershipRole.SetFilter (Blocked, '=%1', false);
-        if (MembershipRole.Count <> 1) then
-          exit;
-
-        MembershipRole.Get (Membership."Entry No.", Member."Entry No.");
-        if (MembershipRole."Member Role" <> MembershipRole."Member Role"::ADMIN) then
-          exit;
-
-        SponsorshipTicketSetup.FindSet ();
-
-        MakeTickets (true, MembershipRole, SponsorshipTicketSetup, ResponseMessage);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, 6060127, 'OnAfterInsertMembershipEntry', '', true, true)]
-    local procedure OnAfterInsertMembershipEntry(MembershipEntry: Record "MM Membership Entry")
+    procedure OnMembershipPayment(MembershipEntry: Record "MM Membership Entry")
     var
         Membership: Record "MM Membership";
         MembershipRole: Record "MM Membership Role";
@@ -552,6 +514,7 @@ codeunit 6151185 "MM Sponsorship Ticket Mgmt."
         ResponseMessage: Text;
     begin
 
+        //-MM1.43 [392659] moved from event body OnAfterInsertMembershipEntry to separate function
 
         // When sponsorship is active for membership
         // New membership - activate created tickets
@@ -594,6 +557,55 @@ codeunit 6151185 "MM Sponsorship Ticket Mgmt."
             if (MakeTickets (true, MembershipRole, SponsorshipTicketSetup, ResponseMessage)) then
               FinalizeTicketReservation (true, MembershipRole, SponsorshipTicketSetup, ResponseMessage);
         end;
+
+        //+MM1.43 [392659]
+    end;
+
+    local procedure "--Subscribers"()
+    begin
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6060127, 'OnAfterMemberCreateEvent', '', true, true)]
+    local procedure OnAfterMemberCreateEvent(var Membership: Record "MM Membership";var Member: Record "MM Member")
+    var
+        MembershipRole: Record "MM Membership Role";
+        SponsorshipTicketSetup: Record "MM Sponsorship Ticket Setup";
+        ResponseMessage: Text;
+    begin
+
+        // When first admin member is created, we check if there are sponsorship tickets to be created.
+        SponsorshipTicketSetup.SetFilter ("Membership Code", '=%1', Membership."Membership Code");
+        SponsorshipTicketSetup.SetFilter (Blocked, '=%1', false);
+        SponsorshipTicketSetup.SetFilter ("External Membership No.", '=%1', Membership."External Membership No.");
+        SponsorshipTicketSetup.SetFilter ("Event Type", '=%1', SponsorshipTicketSetup."Event Type"::ONNEW);
+        if (SponsorshipTicketSetup.IsEmpty ()) then
+          SponsorshipTicketSetup.SetFilter ("External Membership No.", '=%1', '');
+
+        if (SponsorshipTicketSetup.IsEmpty ()) then
+          exit;
+
+        // Only when adding first member
+        MembershipRole.SetFilter ("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipRole.SetFilter (Blocked, '=%1', false);
+        if (MembershipRole.Count <> 1) then
+          exit;
+
+        MembershipRole.Get (Membership."Entry No.", Member."Entry No.");
+        if (MembershipRole."Member Role" <> MembershipRole."Member Role"::ADMIN) then
+          exit;
+
+        SponsorshipTicketSetup.FindSet ();
+
+        MakeTickets (true, MembershipRole, SponsorshipTicketSetup, ResponseMessage);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, 6060127, 'OnAfterInsertMembershipEntry', '', true, true)]
+    local procedure OnAfterInsertMembershipEntry(MembershipEntry: Record "MM Membership Entry")
+    begin
+
+        //-MM1.43 [392659] refactored, move all code to function OnMembershipPayment ()
+        OnMembershipPayment (MembershipEntry);
+        //+MM1.43 [392659]
     end;
 }
 

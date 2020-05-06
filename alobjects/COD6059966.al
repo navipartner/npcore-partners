@@ -589,7 +589,7 @@ codeunit 6059966 "MPOS Payment API"
 
     local procedure HandlePrint(var mPOSNetsTransactionsResponse: Record "MPOS Nets Transactions")
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         TempBlob: Record TempBlob temporary;
         MPOSAppSetup: Record "MPOS App Setup";
     begin
@@ -626,7 +626,7 @@ codeunit 6059966 "MPOS Payment API"
 
     local procedure CreateReceiptData(RegisterNo: Code[10]; SalesTicketNo: Code[20]; LineNo: Integer; var TempBlob: Record TempBlob temporary)
     var
-        CreditCardTransaction: Record "Credit Card Transaction";
+        CreditCardTransaction: Record "EFT Receipt";
         ReceiptNo: Integer;
         InStream: InStream;
         Line: Text;

@@ -1,8 +1,13 @@
 page 6150675 "POS Entry Card"
 {
     // NPR5.53/SARA/20191024 CASE 373672 Object create(Copy of POS Entry List)
+    // NPR5.54/SARA/20200218 CASE 391359 Hide field 'Last Open Sales Doc' and 'Last Posted Sales Doc'
+    // NPR5.54/SARA/20200218 CASE 391360 Remove Shortcut 'POS Audit Log' and 'POS Info Audit Roll'
+    // NPR5.54/SARA/20200228 CASE 393492 Remove Delete button
+    // NPR5.54/SARA/20200323 CASE 397581 Added Section NpRV Voucher under Navigate Ribbon
 
     Caption = 'POS Entry Card';
+    DeleteAllowed = false;
     Editable = false;
     PageType = Document;
     RefreshOnActivate = true;
@@ -95,6 +100,7 @@ page 6150675 "POS Entry Card"
                 field(LastOpenSalesDocumentNo;LastOpenSalesDocumentNo)
                 {
                     Caption = 'Last Open Sales Doc.';
+                    Visible = false;
 
                     trigger OnDrillDown()
                     var
@@ -112,6 +118,7 @@ page 6150675 "POS Entry Card"
                 field(LastPostedSalesDocumentNo;LastPostedSalesDocumentNo)
                 {
                     Caption = 'Last Posted Sales Doc.';
+                    Visible = false;
 
                     trigger OnDrillDown()
                     var
@@ -128,6 +135,7 @@ page 6150675 "POS Entry Card"
                 }
                 field("No. of Print Output Entries";"No. of Print Output Entries")
                 {
+                    Visible = false;
                 }
                 field("Post Item Entry Status";"Post Item Entry Status")
                 {
@@ -298,9 +306,9 @@ page 6150675 "POS Entry Card"
                     //+NPR5.38 [302690]
                 end;
             }
-            action("POS Info")
+            action("POS Info POS Entry")
             {
-                Caption = 'POS Info';
+                Caption = 'POS Info POS Entry';
                 Image = Info;
                 RunObject = Page "POS Info POS Entry";
                 RunPageLink = "POS Entry No."=FIELD("Entry No.");
@@ -312,11 +320,13 @@ page 6150675 "POS Entry Card"
                 Image = "Action";
                 RunObject = Page "POS Info Audit Roll";
                 RunPageLink = "Sales Ticket No."=FIELD("Document No.");
+                Visible = false;
             }
             action("POS Audit Log")
             {
                 Caption = 'POS Audit Log';
                 Image = InteractionLog;
+                Visible = false;
 
                 trigger OnAction()
                 var
@@ -426,6 +436,41 @@ page 6150675 "POS Entry Card"
                         RunObject = Page "Tax Free Voucher";
                         RunPageLink = "Sales Receipt No."=FIELD("Document No.");
                     }
+                }
+            }
+            group("NpRv Vouchers")
+            {
+                Caption = 'NpRv Vouchers';
+                action("Voucher Lines")
+                {
+                    Caption = 'Voucher Lines';
+                    Image = RefreshVoucher;
+                    RunObject = Page "NpRv Vouchers";
+                    RunPageLink = "Issue Document No."=FIELD("Document No.");
+
+                    trigger OnAction()
+                    var
+                        TaxFree: Codeunit "Tax Free Handler Mgt.";
+                    begin
+                    end;
+                }
+                action("Voucher List")
+                {
+                    Caption = 'Voucher List';
+                    Image = VoucherDescription;
+                    RunObject = Page "NpRv Vouchers";
+
+                    trigger OnAction()
+                    var
+                        TaxFree: Codeunit "Tax Free Handler Mgt.";
+                    begin
+                    end;
+                }
+                action("Voucher Types")
+                {
+                    Caption = 'Voucher Types';
+                    Image = VoucherGroup;
+                    RunObject = Page "NpRv Voucher Types";
                 }
             }
             group(EFT)
@@ -593,6 +638,7 @@ page 6150675 "POS Entry Card"
             {
                 Caption = 'Compare Preview Post Entry to Audit Roll Posting';
                 Image = CompareCOA;
+                Visible = false;
 
                 trigger OnAction()
                 var

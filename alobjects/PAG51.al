@@ -1,4 +1,4 @@
-pageextension 6014449 pageextension6014449 extends "Purchase Invoice" 
+pageextension 6014450 pageextension6014450 extends "Purchase Invoice" 
 {
     // NPR4.15/TS/20151013 CASE 224751 Added NpAttribute Factbox
     // NPR4.18/TS/20151211  CASE 228030 Added field Posting Description

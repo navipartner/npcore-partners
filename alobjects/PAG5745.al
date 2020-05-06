@@ -1,4 +1,4 @@
-pageextension 6014460 pageextension6014460 extends "Posted Transfer Receipt" 
+pageextension 6014461 pageextension6014461 extends "Posted Transfer Receipt" 
 {
     // NPR5.46/JDH /20181002 CASE 294354 added RetailPrint and PriceLabel
     actions

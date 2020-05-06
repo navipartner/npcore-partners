@@ -1,6 +1,9 @@
 table 6151102 "NpRi Reimbursement"
 {
     // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
+    // NPR5.54/JKL /20191213  CASE 382066 New field 310 Deactivated added
+    // NPR5.54/BHR /20200306  CASE 385924 Add fields 315, 316
+    // NPR5.54/JAKUBV/20200408  CASE 368254 Transport NPR5.54 - 8 April 2020
 
     Caption = 'Reimbursement';
     DrillDownPageID = "NpRi Reimbursements";
@@ -99,6 +102,27 @@ table 6151102 "NpRi Reimbursement"
             Caption = 'Date Filter';
             FieldClass = FlowFilter;
         }
+        field(310;Deactivated;Boolean)
+        {
+            Caption = 'Deactivated';
+            Description = 'NPR5.54';
+        }
+        field(315;"From Date";Date)
+        {
+            Caption = 'From Date';
+            Description = 'NPR5.54';
+        }
+        field(316;"To Date";Date)
+        {
+            Caption = 'To Date';
+            Description = 'NPR5.54';
+
+            trigger OnValidate()
+            begin
+                if "From Date" = 0D then
+                  Error(Err000);
+            end;
+        }
     }
 
     keys
@@ -142,5 +166,6 @@ table 6151102 "NpRi Reimbursement"
         Text000: Label 'Are you sure you want to delete this Reimbursement including all Entries?';
         Text001: Label 'Delete aborted';
         Text002: Label 'Rename is not allowed on Reimbursements with entries';
+        Err000: Label 'From Date should not be blank';
 }
 

@@ -1,6 +1,7 @@
 codeunit 6151326 "NpEc P.Invoice Lookup"
 {
     // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
+    // NPR5.54/MHA /20200417  CASE 390380 Updated functions for finding purchase invoices
 
     TableNo = "Nc Import Entry";
 
@@ -23,23 +24,20 @@ codeunit 6151326 "NpEc P.Invoice Lookup"
     procedure GetInvoiceDocuments(ImportEntry: Record "Nc Import Entry";var TempPurchHeader: Record "Purchase Header" temporary;var TempPurchInvHeader: Record "Purch. Inv. Header" temporary): Boolean
     var
         PurchHeader: Record "Purchase Header";
-        PurchInvHeader: Record "Purch. Inv. Header";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         NpEcPurchDocImportMgt: Codeunit "NpEc Purch. Doc. Import Mgt.";
-        RecRef: RecordRef;
         XmlDoc: DotNet npNetXmlDocument;
         XmlElement: DotNet npNetXmlElement;
         XmlNodeList: DotNet npNetXmlNodeList;
-        OrderNo: Code[20];
         i: Integer;
     begin
-        RecRef.GetTable(TempPurchHeader);
-        if not RecRef.IsTemporary then
+        //-NPR5.54 [390380]
+          if not TempPurchHeader.IsTemporary then
           exit(false);
 
-        RecRef.GetTable(TempPurchInvHeader);
-        if not RecRef.IsTemporary then
+        if not TempPurchInvHeader.IsTemporary then
           exit(false);
+        //+NPR5.54 [390380]
 
         TempPurchHeader.DeleteAll;
         TempPurchInvHeader.DeleteAll;
@@ -53,27 +51,15 @@ codeunit 6151326 "NpEc P.Invoice Lookup"
 
         for i := 0 to XmlNodeList.Count - 1 do begin
           XmlElement := XmlNodeList.ItemOf(i);
-          if NpEcPurchDocImportMgt.FindInvoice(XmlElement,PurchHeader) then begin
-            PurchHeader.FindSet;
-            repeat
-              if not TempPurchHeader.Get(PurchHeader."Document Type",PurchHeader."No.") then begin
-                TempPurchHeader.Init;
-                TempPurchHeader := PurchHeader;
-                TempPurchHeader.Insert;
-              end;
-            until PurchHeader.Next = 0;
+          //-NPR5.54 [390380]
+          if NpEcPurchDocImportMgt.FindInvoice(XmlElement,PurchHeader) and not TempPurchHeader.Get(PurchHeader."Document Type",PurchHeader."No.") then begin
+            TempPurchHeader.Init;
+            TempPurchHeader := PurchHeader;
+            TempPurchHeader.Insert;
           end;
 
-          if NpEcPurchDocImportMgt.FindPostedInvoice(XmlElement,PurchInvHeader) then begin
-            PurchInvHeader.FindSet;
-            repeat
-              if not TempPurchInvHeader.Get(PurchInvHeader."No.") then begin
-                TempPurchInvHeader.Init;
-                TempPurchInvHeader := PurchInvHeader;
-                TempPurchInvHeader.Insert;
-              end;
-            until PurchInvHeader.Next = 0;
-          end;
+          NpEcPurchDocImportMgt.FindPostedInvoices(XmlElement,TempPurchInvHeader);
+          //+NPR5.54 [390380]
         end;
 
         exit(TempPurchHeader.FindSet or TempPurchInvHeader.FindSet);

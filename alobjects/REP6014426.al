@@ -8,6 +8,7 @@ report 6014426 "Vendor Top/Sale"
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
     // NPR5.43/ZESO/20180607 CASE 317517 Corrected bug
     // NPR5.49/BHR /20190207 CASE 343119 Corrected report as per OMA
+    // NPR5.54/YAHA/20200306 CASE 394856 Set logo visibility set to false
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Vendor TopSale.rdlc';
 

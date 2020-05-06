@@ -1,6 +1,7 @@
 codeunit 6151101 "NpRi Data Collection Mgt."
 {
     // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
+    // NPR5.54/JKL /20191213 CASE 382066  Added code to omit deactivated reinbursments
 
     TableNo = "NpRi Reimbursement";
 
@@ -190,8 +191,14 @@ codeunit 6151101 "NpRi Data Collection Mgt."
     begin
         if NpRiReimbursement.FindSet then
           repeat
-            RunDataCollection(NpRiReimbursement);
-            Commit;
+            //-NPR5.54 [382066]
+            //RunDataCollection(NpRiReimbursement);
+            //COMMIT;
+            if not NpRiReimbursement.Deactivated then begin
+              RunDataCollection(NpRiReimbursement);
+              Commit;
+            end;
+            //+NPR5.54 [382066]
           until NpRiReimbursement.Next = 0;
     end;
 

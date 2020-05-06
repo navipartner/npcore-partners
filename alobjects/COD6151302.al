@@ -1,6 +1,7 @@
 codeunit 6151302 "NpEc S.Order Lookup"
 {
     // NPR5.53/MHA /20191205  CASE 380837 Object created - NaviPartner General E-Commerce
+    // NPR5.54/MHA /20200417  CASE 390380 Updated functions for finding sales invoices
 
     TableNo = "Nc Import Entry";
 
@@ -24,23 +25,20 @@ codeunit 6151302 "NpEc S.Order Lookup"
     procedure GetOrderDocuments(ImportEntry: Record "Nc Import Entry";var TempSalesHeader: Record "Sales Header" temporary;var TempSalesInvHeader: Record "Sales Invoice Header" temporary): Boolean
     var
         SalesHeader: Record "Sales Header";
-        SalesInvHeader: Record "Sales Invoice Header";
         NpXmlDomMgt: Codeunit "NpXml Dom Mgt.";
         NpEcSalesDocImportMgt: Codeunit "NpEc Sales Doc. Import Mgt.";
-        RecRef: RecordRef;
         XmlDoc: DotNet npNetXmlDocument;
         XmlElement: DotNet npNetXmlElement;
         XmlNodeList: DotNet npNetXmlNodeList;
-        OrderNo: Code[20];
         i: Integer;
     begin
-        RecRef.GetTable(TempSalesHeader);
-        if not RecRef.IsTemporary then
+        //-NPR5.54 [390380]
+        if not TempSalesHeader.IsTemporary then
           exit(false);
 
-        RecRef.GetTable(TempSalesInvHeader);
-        if not RecRef.IsTemporary then
+        if not TempSalesInvHeader.IsTemporary then
           exit(false);
+        //+NPR5.54 [390380]
 
         TempSalesHeader.DeleteAll;
         TempSalesInvHeader.DeleteAll;
@@ -54,27 +52,15 @@ codeunit 6151302 "NpEc S.Order Lookup"
 
         for i := 0 to XmlNodeList.Count - 1 do begin
           XmlElement := XmlNodeList.ItemOf(i);
-          if NpEcSalesDocImportMgt.FindOrder(XmlElement,SalesHeader) then begin
-            SalesHeader.FindSet;
-            repeat
-              if not TempSalesHeader.Get(SalesHeader."Document Type",SalesHeader."No.") then begin
-                TempSalesHeader.Init;
-                TempSalesHeader := SalesHeader;
-                TempSalesHeader.Insert;
-              end;
-            until SalesHeader.Next = 0;
+          //-NPR5.54 [390380]
+          if NpEcSalesDocImportMgt.FindOrder(XmlElement,SalesHeader) and not TempSalesHeader.Get(SalesHeader."Document Type",SalesHeader."No.") then begin
+            TempSalesHeader.Init;
+            TempSalesHeader := SalesHeader;
+            TempSalesHeader.Insert;
           end;
 
-          if NpEcSalesDocImportMgt.FindPostedInvoice(XmlElement,SalesInvHeader) then begin
-            SalesInvHeader.FindSet;
-            repeat
-              if not TempSalesInvHeader.Get(SalesInvHeader."No.") then begin
-                TempSalesInvHeader.Init;
-                TempSalesInvHeader := SalesInvHeader;
-                TempSalesInvHeader.Insert;
-              end;
-            until SalesInvHeader.Next = 0;
-          end;
+          NpEcSalesDocImportMgt.FindPostedInvoices(XmlElement,TempSalesInvHeader);
+          //+NPR5.54 [390380]
         end;
 
         exit(TempSalesHeader.FindSet or TempSalesInvHeader.FindSet);

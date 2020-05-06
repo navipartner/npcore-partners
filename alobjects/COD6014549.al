@@ -91,6 +91,7 @@ codeunit 6014549 "RP Line Print Mgt."
     // NPR5.41/MMV /20180416 CASE 311633 Added support for more than 2 decimals.
     // NPR5.44/MMV /20180706 CASE 315362 Changed function signatuer in data join buffer.
     //                                   Cleanup and refactoring.
+    // NPR5.54/MITH/20200207 CASE 369235 Changed length of FontName(input) in SetFont and CurrentFont(var) from 10 to 30.
 
     SingleInstance = true;
 
@@ -105,7 +106,7 @@ codeunit 6014549 "RP Line Print Mgt."
         Buffer: Record "RP Print Buffer" temporary;
         LinePrinter: Codeunit "RP Line Printer Interface";
         CurrentLineNo: Integer;
-        CurrentFont: Text[10];
+        CurrentFont: Text[30];
         PadChar: Text[1];
         AutoLineBreak: Boolean;
         CurrentBold: Boolean;
@@ -162,7 +163,7 @@ codeunit 6014549 "RP Line Print Mgt."
     begin
     end;
 
-    procedure SetFont(FontName: Text[10])
+    procedure SetFont(FontName: Text[30])
     begin
         CurrentFont := FontName;
     end;

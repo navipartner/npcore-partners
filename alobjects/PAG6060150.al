@@ -31,6 +31,10 @@ page 6060150 "Event Card"
     // NPR5.49/TJ  /20190218 CASE 345047 Added field Language Code
     // NPR5.49/TJ  /20190318 CASE 346693 Added action Sales Documents
     // NPR5.53/TJ  /20191119 CASE 374886 All controls are editable per setup based on Locked field
+    // NPR5.54/TJ  /20200324 CASE 397743 New field "Admission Code"
+    //                                   New action AdmissionScheduleEntry in ActionGroup Tickets
+    //                                   Actions TicketAdmissions and AdmissionScheduleLines set to be run with "Admission Code" filter if not empty
+    // NPR5.54/TJ  /20200324 CASE 397749 New ActionGroup Tickets with actions TicketSchedules, TicketAdmissions and AdmissionScheduleLines added under RelatedInformation
 
     Caption = 'Event Card';
     PageType = Card;
@@ -172,6 +176,9 @@ page 6060150 "Event Card"
                         SetGlobalEditable();
                         //+NPR5.53 [374886]
                     end;
+                }
+                field("Admission Code";"Admission Code")
+                {
                 }
                 group("Additional Information")
                 {
@@ -1275,6 +1282,73 @@ page 6060150 "Event Card"
                     RunObject = Page "Res. Gr. Allocated per Job";
                 }
             }
+            group(Tickets)
+            {
+                Caption = 'Tickets';
+                action(TicketSchedules)
+                {
+                    Caption = 'Ticket Schedules';
+                    Image = Workdays;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+                    RunObject = Page "TM Ticket Schedules";
+                }
+                action(TicketAdmissions)
+                {
+                    Caption = 'Ticket Admissions';
+                    Image = WorkCenter;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+
+                    trigger OnAction()
+                    var
+                        TicketAdmissions: Page "TM Ticket Admissions";
+                        Admission: Record "TM Admission";
+                    begin
+                        //-NPR5.54 [397743]
+                        Admission.SetRange("Admission Code",Rec."Admission Code");
+                        if Rec."Admission Code" = '' then
+                          Admission.SetRange("Admission Code");
+                        TicketAdmissions.SetTableView(Admission);
+                        TicketAdmissions.Run;
+                        //+NPR5.54 [397743]
+                    end;
+                }
+                action(AdmissionScheduleLines)
+                {
+                    Caption = 'Admission Schedule Lines';
+                    Image = CalendarWorkcenter;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+
+                    trigger OnAction()
+                    var
+                        AdmissionScheduleLines: Page "TM Admission Schedule Lines";
+                        AdmissionScheduleLine: Record "TM Admission Schedule Lines";
+                    begin
+                        //-NPR5.54 [397743]
+                        AdmissionScheduleLine.SetRange("Admission Code",Rec."Admission Code");
+                        if Rec."Admission Code" = '' then
+                          AdmissionScheduleLine.SetRange("Admission Code");
+                        AdmissionScheduleLines.SetTableView(AdmissionScheduleLine);
+                        AdmissionScheduleLines.Run;
+                        //+NPR5.54 [397743]
+                    end;
+                }
+                action(AdmissionScheduleEntry)
+                {
+                    Caption = 'Admission Schedule Entry';
+                    Image = WorkCenterLoad;
+                    Promoted = true;
+                    PromotedCategory = Category5;
+                    PromotedIsBig = true;
+                    RunObject = Page "TM Admission Schedule Entry";
+                    RunPageLink = "Admission Code"=FIELD("Admission Code");
+                }
+            }
             group(History)
             {
                 Caption = 'History';
@@ -1294,7 +1368,7 @@ page 6060150 "Event Card"
         }
         area(processing)
         {
-            group(Tickets)
+            group(ActionGroup6014519)
             {
                 Caption = 'Tickets';
                 action(CollectTicketPrintouts)

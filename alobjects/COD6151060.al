@@ -2,6 +2,9 @@ codeunit 6151060 "NP GDPR Management"
 {
     // NPR5.52/ZESO/20190925 CASE 358656 Object Created
     // NPR5.53/ZESO/20200115 CASE 358656 Reworked Codeunit to cater for new job parameters, check for ILES, remove customer no from email address
+    // NPR5.54/ZESO/20200303 CASE 358656 Anonymize Customers where To Anomymize On is less than or equal to TODAY.
+    // NPR5.54/ZESO/20200303 CASE 358656 Count of Customers which are actually being anonymized.
+    // NPR5.54/ZESO/20200310 CASE 358656 Refactored Code which gives list of Customers to be anonymised.
 
     Permissions = TableData "Sales Shipment Header"=rm,
                   TableData "Sales Invoice Header"=rm,
@@ -14,7 +17,6 @@ codeunit 6151060 "NP GDPR Management"
         Customer: Record Customer;
         ReasonText: Text;
         VarNoOfCustomers: Integer;
-        VarCount: Integer;
         CustToAnonymise: Record "Customers to Anonymize";
         GDPRSetup: Record "Customer GDPR SetUp";
     begin
@@ -42,7 +44,10 @@ codeunit 6151060 "NP GDPR Management"
             begin
               Customer.Reset;
               Customer.SetRange(Customer.Anonymized,false);
-              Customer.SetRange(Customer."To Anonymize On",Today);
+              //-NPR5.54 [358656]
+              //Customer.SETRANGE(Customer."To Anonymize On",TODAY);
+              Customer.SetFilter(Customer."To Anonymize On",'>%1&<=%2',0D,Today);
+              //+NPR5.54 [358656]
               if Customer.FindSet then
                 repeat
                   DoAnonymization(Customer."No.",ReasonText);
@@ -57,7 +62,9 @@ codeunit 6151060 "NP GDPR Management"
                 repeat
                   DoAnonymization(CustToAnonymise."Customer No",ReasonText);
                   CustToAnonymise.Delete;
-                  VarCount += 1;
+                  //-NPR5.54 [358656]
+                  //VarCount += 1;
+                  //+NPR5.54 [358656]
                 until (CustToAnonymise.Next =0) or (VarCount = VarNoOfCustomers);
             end;
         end;
@@ -73,6 +80,7 @@ codeunit 6151060 "NP GDPR Management"
         Text003: Label 'Customer %1 is a member. Please use Member Anonymization.';
         Text004: Label 'You do not have permission to anonymize customers. Contact your administrator to give you access.';
         VarCheckPeriod: Boolean;
+        VarCount: Integer;
 
     procedure DoAnonymization(CustNo: Code[20];var VarReason: Text): Boolean
     var
@@ -167,6 +175,9 @@ codeunit 6151060 "NP GDPR Management"
 
         if (OpenDocFound = false) and (TransactionFound =false) and (OpenTransactionFound = false) and (MemberFound = false) then begin
           AnonymizeCustomer(CustNo);
+          //-NPR5.54 [358656]
+          VarCount += 1;
+          //+NPR5.54 [358656]
           InsertLogEntry(CustNo,true,OpenDocFound,OpenTransactionFound,TransactionFound,MemberFound);
           VarReason := StrSubstNo (Text001, CustNo);
           exit(true) ;
@@ -634,6 +645,7 @@ codeunit 6151060 "NP GDPR Management"
         NoCLE: Boolean;
         NoILE: Boolean;
         VarDateToUse: Date;
+        NoTrans: Boolean;
     begin
         //-NPR5.53 [358656]
         CustToAnonymize.Reset;
@@ -651,9 +663,40 @@ codeunit 6151060 "NP GDPR Management"
         Customer.SetRange(Customer.Anonymized,false);
         Customer.SetFilter(Customer."Customer Posting Group",GDPRSetup."Customer Posting Group Filter");
         Customer.SetFilter(Customer."Gen. Bus. Posting Group",GDPRSetup."Gen. Bus. Posting Group Filter");
+        //-NPR5.54 [358656]
+        Customer.SetFilter("Last Date Modified",'<>%1',0D);
+        //+NPR5.54 [358656]
         if Customer.FindSet then
           repeat
-            if (Today - Customer."Last Date Modified") >= (Today - CalcDate(VarPeriod,Today)) then begin
+            //-NPR5.54 [358656]
+            //IF (TODAY - Customer."Last Date Modified") >= (TODAY - CALCDATE(VarPeriod,TODAY)) THEN BEGIN
+
+            NoTrans := true;
+
+            CLE.Reset;
+            CLE.SetCurrentKey("Customer No.","Posting Date","Currency Code");
+            CLE.SetRange("Customer No.",Customer."No.");
+            NoTrans := CLE.FindFirst;
+
+            if NoTrans then begin
+              ILE.Reset;
+              ILE.SetCurrentKey("Source Type","Source No.","Item No.","Variant Code","Posting Date");
+              ILE.SetRange(ILE."Source Type",ILE."Source Type"::Customer);
+              ILE.SetRange(ILE."Source No.",Customer."No.");
+              NoTrans := ILE.FindFirst;
+            end;
+
+            if NoTrans then begin
+              if (Today - Customer."Last Date Modified") >= (Today - CalcDate(VarPeriod,Today)) then begin
+                CustToAnonymize.Init;
+                CustToAnonymize."Entry No" := VarEntryNo;
+                CustToAnonymize."Customer No" := Customer."No.";
+                CustToAnonymize."Customer Name" := Customer.Name;
+                CustToAnonymize.Insert;
+                VarEntryNo += 1;
+              end;
+            end else begin
+          //-NPR5.54 [358656]
               NoCLE := false;
               NoILE := false;
               CLE.Reset;

@@ -64,6 +64,8 @@ codeunit 6150614 "POS Create Entry"
     // NPR5.53/ALPO/20191204 CASE 379729 Total amounts were not calculated on POS Entry for Credit Sales and Credit Memos
     // NPR5.53/ALPO/20200108 CASE 380918 Post Seating Code and Number of Guests to POS Entries (for further sales analysis breakedown)
     // NPR5.53/MMV /20200108 CASE 373453 Support for storing links to posted documents when unposted document fields are blank.
+    // NPR5.54/TJ  /20200211 CASE 347209 Cancelled sale gets a similar description as on Audit Roll
+    // NPR5.54/MMV /20200220 CASE 391871 Added field "Retail ID" for payment lines.
 
     TableNo = "Sale POS";
 
@@ -120,6 +122,7 @@ codeunit 6150614 "POS Create Entry"
         TXT_DIRECT_SALE_END: Label 'POS Direct Sale Ended';
         TXT_CREDIT_SALE_END: Label 'POS Credit Sale Ended';
         TXT_CANCEL_SALE_END: Label 'POS Sale Cancelled';
+        CANCEL_SALE: Label 'Sale was cancelled';
 
     local procedure CreateLines(var POSEntry: Record "POS Entry";var SalePOS: Record "Sale POS")
     var
@@ -273,6 +276,10 @@ codeunit 6150614 "POS Create Entry"
                   SalespersonPurchaser.Name := StrSubstNo ('%1: %2', SalespersonPurchaser.TableCaption, SalePOS."Salesperson Code");
                 POSEntry.Description := SalespersonPurchaser.Name;
               end;
+            //-NPR5.54 [347209]
+            POSEntry."Entry Type"::"Cancelled Sale":
+              POSEntry.Description := CANCEL_SALE;
+            //+NPR5.54 [347209]
           end;
         end;
         //+NPR5.38 [302963]
@@ -582,6 +589,10 @@ codeunit 6150614 "POS Create Entry"
           //"POS Payment Bin Code" := "POS Unit No."; //POS Unit = POS Payment Bin default for now
           "POS Payment Bin Code" := SelectUnitBin ("POS Unit No.");
           //+NPR5.40 [307267]
+
+        //-NPR5.54 [391871]
+          "Retail ID" := SaleLinePOS."Retail ID";
+        //+NPR5.54 [391871]
 
           Description := SaleLinePOS.Description;
           if SaleLinePOS."Currency Amount" <> 0 then begin

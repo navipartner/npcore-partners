@@ -9,8 +9,11 @@ page 6150653 "POS Sale Line Subpage"
     // NPR5.48/TJ  /20190122  CASE 335967 Added field "Unit of Measure Code"
     // NPR5.50/MMV /20190328  CASE 300557 Refactored sales doc. handling
     // NPR5.51/MHA /20190718  CASE 362329 Added field 500 "Exclude from Posting"
+    // NPR5.54/YAHA/20200218  CASE 391363 Removed Button New & Delete Line
 
     Caption = 'POS Sale Line Subpage';
+    DelayedInsert = false;
+    DeleteAllowed = false;
     Editable = false;
     ModifyAllowed = false;
     PageType = ListPart;

@@ -3,6 +3,8 @@ page 6150707 "POS Setup"
     // NPR5.37/TSA /20171024 CASE 293905 Added "Lock POS Action Code", "Unlock POS Action Code"
     // NPR5.39/TSA /20180126 CASE 303399 Added "OnBeforePaymentView Action"
     // NPR5.40/VB  /20180228 CASE 306347  Replacing BLOB-based parameters with phyisical-table parameters.
+    // NPR5.54/TSA /20200219 CASE 391850 Added Description
+    // NPR5.54/TSA /20200220 CASE 392121 Added "Idle Timeout Action Code"
 
     Caption = 'POS Setup';
     DeleteAllowed = false;
@@ -17,6 +19,9 @@ page 6150707 "POS Setup"
         {
             group(General)
             {
+                field(Description;Description)
+                {
+                }
             }
             group("Actions")
             {
@@ -177,6 +182,17 @@ page 6150707 "POS Setup"
                         //-NPR5.40 [306347]
                         //CurrPage.SAVERECORD();
                         //+NPR5.40 [306347]
+                    end;
+                }
+                field("Idle Timeout Action Code";"Idle Timeout Action Code")
+                {
+
+                    trigger OnAssistEdit()
+                    begin
+
+                        //-NPR5.54 [392121]
+                        AssistEdit ("Idle Timeout Action Code", FieldNo ("Idle Timeout Action Code"));
+                        //+NPR5.54 [392121]
                     end;
                 }
             }

@@ -11,6 +11,7 @@ codeunit 6150859 "POS Action - Doc. Export"
     // NPR5.53/MMV /20191219 CASE 377510 Rolled back #357277.
     //                                   Added new param for exporting with blank customer, selected manually later in card page.
     //                                   Moved prompts for payment of exported document to after export.
+    // NPR5.54/ALPO/20200228 CASE 392239 Possibility to use location code from POS store, POS sale or specific location as an alternative to using location from Register
 
 
     trigger OnRun()
@@ -118,6 +119,12 @@ codeunit 6150859 "POS Action - Doc. Export"
         DescBlockEmptySale: Label 'Block creation of document if sale is empty';
         CaptionDocPaymentMenu: Label 'Show Payment Menu';
         DescDocPaymentMenu: Label 'Prompt with different payment methods for handling in new sale, after export is done.';
+        CaptionUseLocationFrom: Label 'Use Location From';
+        DescUseLocationFrom: Label 'Select source to get location code from for sales document';
+        OptionUseLocationFrom: Label 'Cash Register,POS Store,POS Sale Header,Specific Location';
+        CaptionUseSpecLocationCode: Label 'Use Specific Location Code';
+        DescUseSpecLocationCode: Label 'Select location code to be used for sales document, if parameter ''Use Location From'' is set to ''Specific Location''';
+        SpecLocationCodeMustBeSpecified: Label 'POS Action''s parameter ''Use Location From'' is set to ''Specific Location''. You must specify location code to be used for sale document as a parameter of the POS action (the parameter name is ''Use Specific Location Code'')';
 
     local procedure ActionCode(): Text
     begin
@@ -126,6 +133,7 @@ codeunit 6150859 "POS Action - Doc. Export"
 
     local procedure ActionVersion(): Text
     begin
+        exit ('1.8'); //NPR5.54 [392239]
         exit('1.7'); //-+NPR5.53 [377510]
     end;
 
@@ -193,6 +201,10 @@ codeunit 6150859 "POS Action - Doc. Export"
                 RegisterBooleanParameter('ShowDocumentPaymentMenu', false);
                 RegisterBooleanParameter('BlockEmptySale', true);
                 //+NPR5.53 [377510]
+            //-NPR5.54 [392239]
+            RegisterOptionParameter('UseLocationFrom', 'Register,POS Store,POS Sale,SpecificLocation', 'Register');
+            RegisterTextParameter('UseSpecLocationCode','');
+            //+NPR5.54 [392239]
             end;
         end;
     end;
@@ -242,7 +254,6 @@ codeunit 6150859 "POS Action - Doc. Export"
         POSSale: Codeunit "POS Sale";
         Customer: Record Customer;
         SalesHeader: Record "Sales Header";
-        SelectCustomerParam: Boolean;
     begin
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
@@ -437,6 +448,8 @@ codeunit 6150859 "POS Action - Doc. Export"
         AmountInclVAT: Decimal;
         DocumentTypePozitive: Option "Order",Invoice,Quote,Restrict;
         DocumentTypeNegative: Option ReturnOrder,CreditMemo,Restrict;
+        LocationSource: Option Register,"POS Store","POS Sale",SpecificLocation;
+        SpecificLocationCode: Code[10];
     begin
         RetailSalesDocMgt.SetAsk(JSON.GetBooleanParameter('SetAsk', true));
         RetailSalesDocMgt.SetPrint(JSON.GetBooleanParameter('SetPrint', true));
@@ -489,6 +502,14 @@ codeunit 6150859 "POS Action - Doc. Export"
                     Error(WrongNegativeSignErr, SelectStr(DocumentTypePozitive + 1, OptionDocTypePozitive));
             //+NPR5.53 [313966]
             end;
+
+        //-NPR5.54 [392239]
+        LocationSource := JSON.GetIntegerParameter('UseLocationFrom',true);
+        SpecificLocationCode := JSON.GetStringParameter('UseSpecLocationCode',false);
+        if (LocationSource = LocationSource::SpecificLocation) and (SpecificLocationCode = '') then
+          Error(SpecLocationCodeMustBeSpecified);
+        RetailSalesDocMgt.SetLocationSource(LocationSource,SpecificLocationCode);
+        //+NPR5.54 [392239]
     end;
 
     local procedure GetPrepaymentValue(var JSON: Codeunit "POS JSON Management"): Decimal
@@ -732,6 +753,10 @@ codeunit 6150859 "POS Action - Doc. Export"
             'BlockEmptySale':
                 Caption := CaptionBlockEmptySale;
         //+NPR5.53 [377510]
+          //-NPR5.54 [392239]
+          'UseLocationFrom': Caption :=  CaptionUseLocationFrom;
+          'UseSpecLocationCode': Caption := CaptionUseSpecLocationCode;
+          //+NPR5.54 [392239]
         end;
     end;
 
@@ -818,6 +843,10 @@ codeunit 6150859 "POS Action - Doc. Export"
             'BlockEmptySale':
                 Caption := DescBlockEmptySale;
         //+NPR5.53 [377510]
+          //-NPR5.54 [392239]
+          'UseLocationFrom': Caption :=  DescUseLocationFrom;
+          'UseSpecLocationCode': Caption := DescUseSpecLocationCode;
+          //+NPR5.54 [392239]
         end;
     end;
 
@@ -828,11 +857,52 @@ codeunit 6150859 "POS Action - Doc. Export"
             exit;
 
         case POSParameterValue.Name of
-            'SetDocumentType':
-                Caption := OptionDocTypePozitive;
-            'SetNegBalDocumentType':
-                Caption := OptionDocTypeNegative;
+          'SetDocumentType' : Caption := OptionDocTypePozitive;
+          'SetNegBalDocumentType' : Caption := OptionDocTypeNegative;
+          'UseLocationFrom': Caption :=  OptionUseLocationFrom;  //NPR5.54 [392239]
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, 6150705, 'OnLookupValue', '', false, false)]
+    local procedure OnLookupValue(var POSParameterValue: Record "POS Parameter Value";Handled: Boolean)
+    var
+        Location: Record Location;
+    begin
+        //-NPR5.54 [392239]
+        if POSParameterValue."Action Code" <> ActionCode() then
+          exit;
+
+        case POSParameterValue.Name of
+          'UseSpecLocationCode': begin
+            Location.FilterGroup(2);
+            Location.SetRange("Use As In-Transit",false);
+            Location.FilterGroup(0);
+            if PAGE.RunModal(0,Location) = ACTION::LookupOK then
+              POSParameterValue.Value := Location.Code;
+          end;
+        end;
+        //+NPR5.54 [392239]
+    end;
+
+    [EventSubscriber(ObjectType::Table, 6150705, 'OnValidateValue', '', false, false)]
+    local procedure OnValidateValue(var POSParameterValue: Record "POS Parameter Value")
+    var
+        Location: Record Location;
+    begin
+        //-NPR5.54 [392239]
+        if POSParameterValue."Action Code" <> ActionCode() then
+          exit;
+
+        case POSParameterValue.Name of
+          'UseSpecLocationCode': begin
+            if POSParameterValue.Value = '' then
+              exit;
+            Location.SetRange("Use As In-Transit",false);
+            Location.Code := CopyStr(POSParameterValue.Value,1,MaxStrLen(Location.Code));
+            Location.Find;
+          end;
+        end;
+        //+NPR5.54 [392239]
     end;
 }
 

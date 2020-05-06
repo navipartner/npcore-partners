@@ -3161,39 +3161,6 @@
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
-            <Textbox Name="Textbox6">
-              <CanGrow>true</CanGrow>
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>="�NAVIPARTNER K�benhavn 2000"</Value>
-                      <Style>
-                        <FontSize>6pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>Textbox6</rd:DefaultName>
-              <Top>0.18697cm</Top>
-              <Left>11.46871cm</Left>
-              <Height>0.36188cm</Height>
-              <Width>6.41138cm</Width>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-                <PaddingLeft>2pt</PaddingLeft>
-                <PaddingRight>2pt</PaddingRight>
-                <PaddingTop>2pt</PaddingTop>
-                <PaddingBottom>2pt</PaddingBottom>
-              </Style>
-            </Textbox>
             <Textbox Name="Textbox7">
               <CanGrow>true</CanGrow>
               <KeepTogether>true</KeepTogether>
@@ -3217,7 +3184,6 @@
               <Left>0.22212cm</Left>
               <Height>0.36188cm</Height>
               <Width>17.65797cm</Width>
-              <ZIndex>1</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>

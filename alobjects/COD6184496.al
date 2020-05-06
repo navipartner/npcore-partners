@@ -42,7 +42,7 @@ codeunit 6184496 "Pepper Event Subscribers"
         LineNo: Integer;
         PepperProtocol: Codeunit "Pepper Protocol";
         t004: Label 'Terminal succesfully closed.';
-        CCTrans: Record "Credit Card Transaction";
+        CCTrans: Record "EFT Receipt";
     begin
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         if SaleLinePOS.FindLast then;

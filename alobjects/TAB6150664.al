@@ -4,6 +4,7 @@ table 6150664 "NPRE Flow Status"
     // NPR5.34/NPKNAV/20170801 CASE 283328 Transport NPR5.34 - 1 August 2017
     // NPR5.35/ANEN/20170821 CASE 283376 Solution rename to NP Restaurant
     // NPR5.53/ALPO/20200102 CASE 360258 Possibility to send to kitchen only selected waiter pad lines or lines of specific print category
+    // NPR5.54/ALPO/20200226 CASE 392956 Send to kitchen print waiter pad lines with no print category assigned
 
     Caption = 'Status';
     DrillDownPageID = "NPRE Flow Status";
@@ -51,6 +52,7 @@ table 6150664 "NPRE Flow Status"
 
     var
         InQuotes: Label '''%1''';
+        EmptyCodeINQuotes: Label '''''', Comment='{Fixed}';
 
     procedure AssignedPrintCategoriesAsFilterString(): Text
     var
@@ -83,6 +85,11 @@ table 6150664 "NPRE Flow Status"
               PrintCategoryString := PrintCategoryString + StrSubstNo(InQuotes,PrintCategory.Code);
             end;
           until PrintCategory.Next = 0;
+
+        //-NPR5.54 [392956]
+        if (Code = '') and (PrintCategoryString <> '') and not PrintCategory.Get('') then
+          PrintCategoryString := StrSubstNo('%1|%2',EmptyCodeINQuotes,PrintCategoryString);
+        //+NPR5.54 [392956]
         exit(PrintCategoryString);
         //+NPR5.53 [360258]
     end;

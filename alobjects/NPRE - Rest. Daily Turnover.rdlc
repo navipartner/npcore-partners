@@ -330,7 +330,7 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>2.5cm</Width>
+                  <Width>2.2cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -482,7 +482,7 @@
                   <TablixMembers>
                     <TablixMember>
                       <TablixHeader>
-                        <Size>2.5cm</Size>
+                        <Size>2.2cm</Size>
                         <CellContents>
                           <Textbox Name="SeatingCode">
                             <CanGrow>true</CanGrow>
@@ -554,7 +554,7 @@
                           <TablixMembers>
                             <TablixMember>
                               <TablixHeader>
-                                <Size>1.7cm</Size>
+                                <Size>2.2cm</Size>
                                 <CellContents>
                                   <Textbox Name="NumberOfTables">
                                     <CanGrow>true</CanGrow>
@@ -589,7 +589,7 @@
                               <TablixMembers>
                                 <TablixMember>
                                   <TablixHeader>
-                                    <Size>1.7cm</Size>
+                                    <Size>2.2cm</Size>
                                     <CellContents>
                                       <Textbox Name="NumberOfGuests">
                                         <CanGrow>true</CanGrow>
@@ -633,7 +633,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=iif(Fields!NumberOfTables.Value &lt;&gt; 0, ROUND(Fields!TurnoverAmt.Value / Fields!NumberOfTables.Value, 4), 0)</Value>
+                                                    <Value EvaluationMode="Auto">=iif(Fields!NumberOfTables.Value &lt;&gt; 0, ROUND(Fields!TurnoverAmt.Value / iif(Fields!NumberOfTables.Value &lt;&gt; 0, Fields!NumberOfTables.Value, 1), 4), 0)</Value>
                                                     <Style>
                                                       <FontFamily>Segoe UI</FontFamily>
                                                       <FontSize>8pt</FontSize>
@@ -669,7 +669,7 @@
                                                   <Paragraph>
                                                     <TextRuns>
                                                       <TextRun>
-                                                        <Value>=iif(Fields!NumberOfGuests.Value &lt;&gt; 0, ROUND(Fields!TurnoverAmt.Value / Fields!NumberOfGuests.Value, 4), 0)</Value>
+                                                        <Value EvaluationMode="Auto">=iif(Fields!NumberOfGuests.Value &lt;&gt; 0, ROUND(Fields!TurnoverAmt.Value / iif(Fields!NumberOfGuests.Value &lt;&gt; 0, Fields!NumberOfGuests.Value, 1), 4), 0)</Value>
                                                         <Style>
                                                           <FontFamily>Segoe UI</FontFamily>
                                                           <FontSize>8pt</FontSize>
@@ -691,7 +691,6 @@
                                                   <PaddingRight>2pt</PaddingRight>
                                                 </Style>
                                               </Textbox>
-                                              <rd:Selected>true</rd:Selected>
                                             </CellContents>
                                           </TablixHeader>
                                         </TablixMember>
@@ -721,7 +720,10 @@
             </Filters>
             <Top>1.52639cm</Top>
             <Height>0.9cm</Height>
-            <Width>17cm</Width>
+            <Width>17.4cm</Width>
+            <Visibility>
+              <Hidden>=NOT First(Fields!ShowTableNo.Value, "DataSet_Result")</Hidden>
+            </Visibility>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -732,10 +734,10 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>4.5cm</Width>
+                  <Width>4.2cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>15cm</Width>
+                  <Width>13.2cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -910,7 +912,7 @@
               </Filter>
             </Filters>
             <Height>1.35cm</Height>
-            <Width>19.5cm</Width>
+            <Width>17.4cm</Width>
             <ZIndex>1</ZIndex>
             <Visibility>
               <Hidden>=Sum(iif(IsNothing(Fields!LineNo.Value),1,0)) = 0</Hidden>
@@ -921,11 +923,595 @@
               </Border>
             </Style>
           </Tablix>
+          <Tablix Name="ReportDataMatrix2">
+            <TablixCorner>
+              <TablixCornerRows>
+                <TablixCornerRow>
+                  <TablixCornerCell>
+                    <CellContents>
+                      <Textbox Name="DateLbl2">
+                        <CanGrow>true</CanGrow>
+                        <KeepTogether>true</KeepTogether>
+                        <Paragraphs>
+                          <Paragraph>
+                            <TextRuns>
+                              <TextRun>
+                                <Value EvaluationMode="Auto">=Parameters!DateLbl.Value</Value>
+                                <Style>
+                                  <FontFamily>Segoe UI</FontFamily>
+                                  <FontSize>8pt</FontSize>
+                                  <FontWeight>Bold</FontWeight>
+                                </Style>
+                              </TextRun>
+                            </TextRuns>
+                            <Style>
+                              <TextAlign>Left</TextAlign>
+                            </Style>
+                          </Paragraph>
+                        </Paragraphs>
+                        <Style>
+                          <Border>
+                            <Style>None</Style>
+                          </Border>
+                          <BottomBorder>
+                            <Style>Solid</Style>
+                          </BottomBorder>
+                          <PaddingLeft>2pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                        </Style>
+                      </Textbox>
+                    </CellContents>
+                  </TablixCornerCell>
+                  <TablixCornerCell>
+                    <CellContents>
+                      <Textbox Name="SalesAmtInclVATLbl2">
+                        <CanGrow>true</CanGrow>
+                        <KeepTogether>true</KeepTogether>
+                        <Paragraphs>
+                          <Paragraph>
+                            <TextRuns>
+                              <TextRun>
+                                <Value EvaluationMode="Auto">=Parameters!TurnoverLbl.Value</Value>
+                                <Style>
+                                  <FontFamily>Segoe UI</FontFamily>
+                                  <FontSize>8pt</FontSize>
+                                  <FontWeight>Bold</FontWeight>
+                                </Style>
+                              </TextRun>
+                            </TextRuns>
+                            <Style>
+                              <TextAlign>Right</TextAlign>
+                            </Style>
+                          </Paragraph>
+                        </Paragraphs>
+                        <Style>
+                          <Border>
+                            <Style>None</Style>
+                          </Border>
+                          <BottomBorder>
+                            <Style>Solid</Style>
+                          </BottomBorder>
+                          <PaddingLeft>5pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                        </Style>
+                      </Textbox>
+                    </CellContents>
+                  </TablixCornerCell>
+                  <TablixCornerCell>
+                    <CellContents>
+                      <Textbox Name="NoOfTablesLbl2">
+                        <CanGrow>true</CanGrow>
+                        <KeepTogether>true</KeepTogether>
+                        <Paragraphs>
+                          <Paragraph>
+                            <TextRuns>
+                              <TextRun>
+                                <Value EvaluationMode="Auto">=Parameters!NoOfTablesLbl.Value</Value>
+                                <Style>
+                                  <FontFamily>Segoe UI</FontFamily>
+                                  <FontSize>8pt</FontSize>
+                                  <FontWeight>Bold</FontWeight>
+                                </Style>
+                              </TextRun>
+                            </TextRuns>
+                            <Style>
+                              <TextAlign>Right</TextAlign>
+                            </Style>
+                          </Paragraph>
+                        </Paragraphs>
+                        <Style>
+                          <Border>
+                            <Style>None</Style>
+                          </Border>
+                          <BottomBorder>
+                            <Style>Solid</Style>
+                          </BottomBorder>
+                          <PaddingLeft>2pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                        </Style>
+                      </Textbox>
+                    </CellContents>
+                  </TablixCornerCell>
+                  <TablixCornerCell>
+                    <CellContents>
+                      <Textbox Name="NoOfGuestsLbl2">
+                        <CanGrow>true</CanGrow>
+                        <KeepTogether>true</KeepTogether>
+                        <Paragraphs>
+                          <Paragraph>
+                            <TextRuns>
+                              <TextRun>
+                                <Value EvaluationMode="Auto">=Parameters!NoOfGuestsLbl.Value</Value>
+                                <Style>
+                                  <FontFamily>Segoe UI</FontFamily>
+                                  <FontSize>8pt</FontSize>
+                                  <FontWeight>Bold</FontWeight>
+                                </Style>
+                              </TextRun>
+                            </TextRuns>
+                            <Style>
+                              <TextAlign>Right</TextAlign>
+                            </Style>
+                          </Paragraph>
+                        </Paragraphs>
+                        <Style>
+                          <Border>
+                            <Style>None</Style>
+                          </Border>
+                          <BottomBorder>
+                            <Style>Solid</Style>
+                          </BottomBorder>
+                          <PaddingLeft>2pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                        </Style>
+                      </Textbox>
+                    </CellContents>
+                  </TablixCornerCell>
+                  <TablixCornerCell>
+                    <CellContents>
+                      <Textbox Name="AveragePerTableLbl2">
+                        <CanGrow>true</CanGrow>
+                        <KeepTogether>true</KeepTogether>
+                        <Paragraphs>
+                          <Paragraph>
+                            <TextRuns>
+                              <TextRun>
+                                <Value EvaluationMode="Auto">=Parameters!AveragePerTableLbl.Value</Value>
+                                <Style>
+                                  <FontFamily>Segoe UI</FontFamily>
+                                  <FontSize>8pt</FontSize>
+                                  <FontWeight>Bold</FontWeight>
+                                </Style>
+                              </TextRun>
+                            </TextRuns>
+                            <Style>
+                              <TextAlign>Right</TextAlign>
+                            </Style>
+                          </Paragraph>
+                        </Paragraphs>
+                        <Style>
+                          <Border>
+                            <Style>None</Style>
+                          </Border>
+                          <BottomBorder>
+                            <Style>Solid</Style>
+                          </BottomBorder>
+                          <PaddingLeft>2pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                        </Style>
+                      </Textbox>
+                    </CellContents>
+                  </TablixCornerCell>
+                  <TablixCornerCell>
+                    <CellContents>
+                      <Textbox Name="AveragePerGuestLbl2">
+                        <CanGrow>true</CanGrow>
+                        <KeepTogether>true</KeepTogether>
+                        <Paragraphs>
+                          <Paragraph>
+                            <TextRuns>
+                              <TextRun>
+                                <Value EvaluationMode="Auto">=Parameters!AveragePerGuestLbl.Value</Value>
+                                <Style>
+                                  <FontFamily>Segoe UI</FontFamily>
+                                  <FontSize>8pt</FontSize>
+                                  <FontWeight>Bold</FontWeight>
+                                </Style>
+                              </TextRun>
+                            </TextRuns>
+                            <Style>
+                              <TextAlign>Right</TextAlign>
+                            </Style>
+                          </Paragraph>
+                        </Paragraphs>
+                        <Style>
+                          <Border>
+                            <Style>None</Style>
+                          </Border>
+                          <BottomBorder>
+                            <Style>Solid</Style>
+                          </BottomBorder>
+                          <PaddingLeft>2pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                        </Style>
+                      </Textbox>
+                    </CellContents>
+                  </TablixCornerCell>
+                </TablixCornerRow>
+              </TablixCornerRows>
+            </TablixCorner>
+            <TablixBody>
+              <TablixColumns>
+                <TablixColumn>
+                  <Width>2.2cm</Width>
+                </TablixColumn>
+              </TablixColumns>
+              <TablixRows>
+                <TablixRow>
+                  <Height>0.45cm</Height>
+                  <TablixCells>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="DimValueCode2">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value EvaluationMode="Auto">=Fields!DimValueCode.Value</Value>
+                                  <Style>
+                                    <FontFamily>Segoe UI</FontFamily>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <Style>
+                            <Border>
+                              <Color>LightGrey</Color>
+                              <Style>Solid</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                  </TablixCells>
+                </TablixRow>
+              </TablixRows>
+            </TablixBody>
+            <TablixColumnHierarchy>
+              <TablixMembers>
+                <TablixMember>
+                  <Group Name="Dimension2">
+                    <GroupExpressions>
+                      <GroupExpression>=Fields!DimCode.Value</GroupExpression>
+                    </GroupExpressions>
+                  </Group>
+                  <SortExpressions>
+                    <SortExpression>
+                      <Value>=Fields!DimName.Value</Value>
+                    </SortExpression>
+                  </SortExpressions>
+                  <TablixHeader>
+                    <Size>0.45cm</Size>
+                    <CellContents>
+                      <Textbox Name="DimName2">
+                        <CanGrow>true</CanGrow>
+                        <KeepTogether>true</KeepTogether>
+                        <Paragraphs>
+                          <Paragraph>
+                            <TextRuns>
+                              <TextRun>
+                                <Value EvaluationMode="Auto">=Fields!DimName.Value</Value>
+                                <Style>
+                                  <FontFamily>Segoe UI</FontFamily>
+                                  <FontSize>8pt</FontSize>
+                                  <FontWeight>Bold</FontWeight>
+                                </Style>
+                              </TextRun>
+                            </TextRuns>
+                            <Style>
+                              <TextAlign>Left</TextAlign>
+                            </Style>
+                          </Paragraph>
+                        </Paragraphs>
+                        <rd:DefaultName>DimName</rd:DefaultName>
+                        <Style>
+                          <Border>
+                            <Style>None</Style>
+                          </Border>
+                          <BottomBorder>
+                            <Style>Solid</Style>
+                          </BottomBorder>
+                          <PaddingLeft>2pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                        </Style>
+                      </Textbox>
+                    </CellContents>
+                  </TablixHeader>
+                </TablixMember>
+              </TablixMembers>
+            </TablixColumnHierarchy>
+            <TablixRowHierarchy>
+              <TablixMembers>
+                <TablixMember>
+                  <Group Name="RowGroup2">
+                    <GroupExpressions>
+                      <GroupExpression>=Fields!PostingDate.Value</GroupExpression>
+                      <GroupExpression>=Fields!SeatingCode.Value</GroupExpression>
+                      <GroupExpression>=Fields!DimSetID.Value</GroupExpression>
+                    </GroupExpressions>
+                  </Group>
+                  <SortExpressions>
+                    <SortExpression>
+                      <Value>=Fields!PostingDate.Value</Value>
+                    </SortExpression>
+                    <SortExpression>
+                      <Value>=Fields!SeatingCode.Value</Value>
+                    </SortExpression>
+                  </SortExpressions>
+                  <TablixHeader>
+                    <Size>2cm</Size>
+                    <CellContents>
+                      <Textbox Name="PostingDate2">
+                        <CanGrow>true</CanGrow>
+                        <KeepTogether>true</KeepTogether>
+                        <Paragraphs>
+                          <Paragraph>
+                            <TextRuns>
+                              <TextRun>
+                                <Value EvaluationMode="Auto">=Fields!PostingDate.Value</Value>
+                                <Style>
+                                  <FontFamily>Segoe UI</FontFamily>
+                                  <FontSize>8pt</FontSize>
+                                  <Format>d</Format>
+                                </Style>
+                              </TextRun>
+                            </TextRuns>
+                            <Style>
+                              <TextAlign>Left</TextAlign>
+                            </Style>
+                          </Paragraph>
+                        </Paragraphs>
+                        <rd:DefaultName>PostingDate</rd:DefaultName>
+                        <Style>
+                          <Border>
+                            <Color>LightGrey</Color>
+                            <Style>Solid</Style>
+                          </Border>
+                          <PaddingLeft>2pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                        </Style>
+                      </Textbox>
+                    </CellContents>
+                  </TablixHeader>
+                  <TablixMembers>
+                    <TablixMember>
+                      <TablixHeader>
+                        <Size>2.2cm</Size>
+                        <CellContents>
+                          <Textbox Name="TurnoverAmt2">
+                            <CanGrow>true</CanGrow>
+                            <KeepTogether>true</KeepTogether>
+                            <Paragraphs>
+                              <Paragraph>
+                                <TextRuns>
+                                  <TextRun>
+                                    <Value EvaluationMode="Auto">=Fields!TurnoverAmt.Value</Value>
+                                    <Style>
+                                      <FontFamily>Segoe UI</FontFamily>
+                                      <FontSize>8pt</FontSize>
+                                      <Format>=Fields!TurnoverAmtFormat.Value</Format>
+                                    </Style>
+                                  </TextRun>
+                                </TextRuns>
+                                <Style>
+                                  <TextAlign>Right</TextAlign>
+                                </Style>
+                              </Paragraph>
+                            </Paragraphs>
+                            <Style>
+                              <Border>
+                                <Color>LightGrey</Color>
+                                <Style>Solid</Style>
+                              </Border>
+                              <PaddingLeft>2pt</PaddingLeft>
+                              <PaddingRight>2pt</PaddingRight>
+                            </Style>
+                          </Textbox>
+                        </CellContents>
+                      </TablixHeader>
+                      <TablixMembers>
+                        <TablixMember>
+                          <TablixHeader>
+                            <Size>2.2cm</Size>
+                            <CellContents>
+                              <Textbox Name="NumberOfTables2">
+                                <CanGrow>true</CanGrow>
+                                <KeepTogether>true</KeepTogether>
+                                <Paragraphs>
+                                  <Paragraph>
+                                    <TextRuns>
+                                      <TextRun>
+                                        <Value EvaluationMode="Auto">=Fields!NumberOfTables.Value</Value>
+                                        <Style>
+                                          <FontFamily>Segoe UI</FontFamily>
+                                          <FontSize>8pt</FontSize>
+                                        </Style>
+                                      </TextRun>
+                                    </TextRuns>
+                                    <Style>
+                                      <TextAlign>Right</TextAlign>
+                                    </Style>
+                                  </Paragraph>
+                                </Paragraphs>
+                                <Style>
+                                  <Border>
+                                    <Color>LightGrey</Color>
+                                    <Style>Solid</Style>
+                                  </Border>
+                                  <PaddingLeft>2pt</PaddingLeft>
+                                  <PaddingRight>2pt</PaddingRight>
+                                </Style>
+                              </Textbox>
+                            </CellContents>
+                          </TablixHeader>
+                          <TablixMembers>
+                            <TablixMember>
+                              <TablixHeader>
+                                <Size>2.2cm</Size>
+                                <CellContents>
+                                  <Textbox Name="NumberOfGuests2">
+                                    <CanGrow>true</CanGrow>
+                                    <KeepTogether>true</KeepTogether>
+                                    <Paragraphs>
+                                      <Paragraph>
+                                        <TextRuns>
+                                          <TextRun>
+                                            <Value EvaluationMode="Auto">=Fields!NumberOfGuests.Value</Value>
+                                            <Style>
+                                              <FontFamily>Segoe UI</FontFamily>
+                                              <FontSize>8pt</FontSize>
+                                            </Style>
+                                          </TextRun>
+                                        </TextRuns>
+                                        <Style>
+                                          <TextAlign>Right</TextAlign>
+                                        </Style>
+                                      </Paragraph>
+                                    </Paragraphs>
+                                    <Style>
+                                      <Border>
+                                        <Color>LightGrey</Color>
+                                        <Style>Solid</Style>
+                                      </Border>
+                                      <PaddingLeft>2pt</PaddingLeft>
+                                      <PaddingRight>2pt</PaddingRight>
+                                    </Style>
+                                  </Textbox>
+                                </CellContents>
+                              </TablixHeader>
+                              <TablixMembers>
+                                <TablixMember>
+                                  <TablixHeader>
+                                    <Size>2.2cm</Size>
+                                    <CellContents>
+                                      <Textbox Name="AveragePerTable2">
+                                        <CanGrow>true</CanGrow>
+                                        <KeepTogether>true</KeepTogether>
+                                        <Paragraphs>
+                                          <Paragraph>
+                                            <TextRuns>
+                                              <TextRun>
+                                                <Value EvaluationMode="Auto">=iif(Fields!NumberOfTables.Value &lt;&gt; 0, ROUND(Fields!TurnoverAmt.Value / iif(Fields!NumberOfTables.Value &lt;&gt; 0, Fields!NumberOfTables.Value, 1), 4), 0)</Value>
+                                                <Style>
+                                                  <FontFamily>Segoe UI</FontFamily>
+                                                  <FontSize>8pt</FontSize>
+                                                  <Format>=Fields!TurnoverAmtFormat.Value</Format>
+                                                </Style>
+                                              </TextRun>
+                                            </TextRuns>
+                                            <Style>
+                                              <TextAlign>Right</TextAlign>
+                                            </Style>
+                                          </Paragraph>
+                                        </Paragraphs>
+                                        <Style>
+                                          <Border>
+                                            <Color>LightGrey</Color>
+                                            <Style>Solid</Style>
+                                          </Border>
+                                          <PaddingLeft>2pt</PaddingLeft>
+                                          <PaddingRight>2pt</PaddingRight>
+                                        </Style>
+                                      </Textbox>
+                                      <rd:Selected>true</rd:Selected>
+                                    </CellContents>
+                                  </TablixHeader>
+                                  <TablixMembers>
+                                    <TablixMember>
+                                      <TablixHeader>
+                                        <Size>2.2cm</Size>
+                                        <CellContents>
+                                          <Textbox Name="AveragePerGuest2">
+                                            <CanGrow>true</CanGrow>
+                                            <KeepTogether>true</KeepTogether>
+                                            <Paragraphs>
+                                              <Paragraph>
+                                                <TextRuns>
+                                                  <TextRun>
+                                                    <Value EvaluationMode="Auto">=iif(Fields!NumberOfGuests.Value &lt;&gt; 0, ROUND(Fields!TurnoverAmt.Value / iif(Fields!NumberOfGuests.Value &lt;&gt; 0, Fields!NumberOfGuests.Value, 1), 4), 0)</Value>
+                                                    <Style>
+                                                      <FontFamily>Segoe UI</FontFamily>
+                                                      <FontSize>8pt</FontSize>
+                                                      <Format>=Fields!TurnoverAmtFormat.Value</Format>
+                                                    </Style>
+                                                  </TextRun>
+                                                </TextRuns>
+                                                <Style>
+                                                  <TextAlign>Right</TextAlign>
+                                                </Style>
+                                              </Paragraph>
+                                            </Paragraphs>
+                                            <Style>
+                                              <Border>
+                                                <Color>LightGrey</Color>
+                                                <Style>Solid</Style>
+                                              </Border>
+                                              <PaddingLeft>2pt</PaddingLeft>
+                                              <PaddingRight>2pt</PaddingRight>
+                                            </Style>
+                                          </Textbox>
+                                        </CellContents>
+                                      </TablixHeader>
+                                    </TablixMember>
+                                  </TablixMembers>
+                                </TablixMember>
+                              </TablixMembers>
+                            </TablixMember>
+                          </TablixMembers>
+                        </TablixMember>
+                      </TablixMembers>
+                    </TablixMember>
+                  </TablixMembers>
+                </TablixMember>
+              </TablixMembers>
+            </TablixRowHierarchy>
+            <DataSetName>DataSet_Result</DataSetName>
+            <Filters>
+              <Filter>
+                <FilterExpression>=Microsoft.VisualBasic.Information.IsNothing(Fields!LineNo.Value)</FilterExpression>
+                <Operator>Equal</Operator>
+                <FilterValues>
+                  <FilterValue DataType="Boolean">false</FilterValue>
+                </FilterValues>
+              </Filter>
+            </Filters>
+            <Top>2.53222cm</Top>
+            <Height>0.9cm</Height>
+            <Width>15.2cm</Width>
+            <ZIndex>2</ZIndex>
+            <Visibility>
+              <Hidden>=First(Fields!ShowTableNo.Value, "DataSet_Result")</Hidden>
+            </Visibility>
+            <Style>
+              <Border>
+                <Style>None</Style>
+              </Border>
+            </Style>
+          </Tablix>
         </ReportItems>
-        <Height>2.42639cm</Height>
+        <Height>3.43222cm</Height>
         <Style />
       </Body>
-      <Width>19.5cm</Width>
+      <Width>17.4cm</Width>
       <Page>
         <PageHeight>29.7cm</PageHeight>
         <PageWidth>21cm</PageWidth>

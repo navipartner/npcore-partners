@@ -2,6 +2,7 @@ xmlport 6151146 "M2 Item Price Request"
 {
     // NPR5.48/TSA /20181207 CASE 320426 Initial Version
     // MAG2.21/TSA /20190423 CASE 350006 Added optional request attribute OrderDate
+    // MAG2.25/TSA /20200226 CASE 391299 Removed NPR version tag
 
     Caption = 'Item Price Request';
     Encoding = UTF8;

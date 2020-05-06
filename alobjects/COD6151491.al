@@ -1,8 +1,9 @@
 codeunit 6151491 "Raptor Management"
 {
-    // NPR5.51/CLVA/20190710  CASE 355871 Object created
+    // NPR5.51/CLVA/20190710 CASE 355871 Object created
     // NPR5.53/ALPO/20191125 CASE 377727 Raptor integration enhancements
     // NPR5.53/ALPO/20191128 CASE 379012 Raptor tracking integration: send info about sold products to Raptor
+    // NPR5.54/ALPO/20200227 CASE 355871 Possibility to define Raptor tracking service types
 
 
     trigger OnRun()
@@ -21,6 +22,8 @@ codeunit 6151491 "Raptor Management"
         NothingToShowErr: Label 'There are no Raptor %1 available for the customer %2.';
         NaviConnectIsNotEnabled: Label 'You must setup and enable NaviConnect before proceeding.';
         SendDataToRaptrorLbl: Label 'Daily export of tracking data to Raptor.';
+        TrackServDescr_rsa: Label 'Raptor service for tracking in a no-javascript environment';
+        UnknownValue: Label 'The %1 = %2 is not defined in the system.';
 
     procedure SendRaptorGetDataRequst(RaptorAction: Record "Raptor Action";UserIdentifier: Text;var ErrorMsg: Text): Text
     var
@@ -37,14 +40,20 @@ codeunit 6151491 "Raptor Management"
         RaptorAction.TestField("Raptor Module Code");
         if RaptorAction."Number of Entries to Return" <= 0 then
           RaptorAction."Number of Entries to Return" := 10;
+        //-NPR5.54 [355871]
+        if RaptorAction."User Identifier Param. Name" = '' then
+          RaptorAction."User Identifier Param. Name" := 'UserIdentifier';
+        //+NPR5.54 [355871]
 
         Baseurl := RaptorSetup."Base Url";
         Path :=
-          StrSubstNo('/v1/%1/%2/%3/%4?UserIdentifier=%5&json=True',
+          //STRSUBSTNO('/v1/%1/%2/%3/%4?UserIdentifier=%5&json=True',  //NPR5.54 [355871]-revoked
+          StrSubstNo('/v1/%1/%2/%3/%4?%5=%6&json=True',  //NPR5.54 [355871]
             RaptorSetup."Customer ID",
             RaptorAction.RaptorActionAPIReqString,
             RaptorAction."Number of Entries to Return",
             RaptorSetup."API Key",
+            RaptorAction."User Identifier Param. Name",  //NPR5.54 [355871]
             UserIdentifier);
 
         exit(RaptorAPI.SendRaptorRequest(Baseurl,Path,ErrorMsg));
@@ -62,7 +71,8 @@ codeunit 6151491 "Raptor Management"
         Result :=
           RaptorAPI.SendRaptorRequest(
             RaptorSetup."Tracking Service Url",
-            StrSubstNo('/%1.rsa',RaptorSetup."Customer ID") + GenerateUrlQueryString(Parameters),
+            //STRSUBSTNO('/%1.rsa',RaptorSetup."Customer ID") + GenerateUrlQueryString(Parameters),  //NPR5.54 [355871]-revoked
+            StrSubstNo('/%1.%2',RaptorSetup."Customer ID",RaptorSetup."Tracking Service Type") + GenerateUrlQueryString(Parameters),  //NPR5.54 [355871]
             ErrorMsg);
 
         if ErrorMsg <> '' then
@@ -214,6 +224,7 @@ codeunit 6151491 "Raptor Management"
             if not RaptorSetup."Send Data to Raptor" then
               exit(false);
             RaptorSetup.TestField("Tracking Service Url");
+            RaptorSetup.TestField("Tracking Service Type");  //NPR5.54 [355871]
           end;
         end;
         RaptorSetup.TestField("Customer ID");
@@ -327,6 +338,69 @@ codeunit 6151491 "Raptor Management"
         exit(NoOfDays * 86400000);
     end;
 
+    procedure SelectTrackingServiceType(var TrackingServiceType: Text): Boolean
+    var
+        ListOfTrackingServiceTypes: Record "Name/Value Buffer" temporary;
+    begin
+        //-NPR5.54 [355871]
+        GetListOfTrackingServiceTypes(ListOfTrackingServiceTypes);
+        if TrackingServiceType <> '' then begin
+          ListOfTrackingServiceTypes.SetRange(Value,TrackingServiceType);
+          if ListOfTrackingServiceTypes.Find('=><') then;
+          ListOfTrackingServiceTypes.SetRange(Value);
+        end;
+        if PAGE.RunModal(PAGE::"Name/Value Lookup",ListOfTrackingServiceTypes) = ACTION::LookupOK then begin
+          TrackingServiceType := CopyStr(ListOfTrackingServiceTypes.Value,1,MaxStrLen(RaptorSetup."Tracking Service Type"));
+          exit(true);
+        end else
+          exit(false);
+        //+NPR5.54 [355871]
+    end;
+
+    procedure ValidateTrackingServiceType(TrackingServiceType: Text)
+    var
+        ListOfTrackingServiceTypes: Record "Name/Value Buffer" temporary;
+    begin
+        //-NPR5.54 [355871]
+        if TrackingServiceType = '' then
+          exit;
+        GetListOfTrackingServiceTypes(ListOfTrackingServiceTypes);
+        ListOfTrackingServiceTypes.SetRange(Value,TrackingServiceType);
+        if ListOfTrackingServiceTypes.IsEmpty then
+          Error(UnknownValue,RaptorSetup.FieldCaption("Tracking Service Type"),TrackingServiceType);
+        //+NPR5.54 [355871]
+    end;
+
+    procedure GetDefaultTrackingServiceType(var TrackingServiceType: Text): Text
+    var
+        Handled: Boolean;
+    begin
+        //-NPR5.54 [355871]
+        OnGetDefaultTrackingServiceType(TrackingServiceType,Handled);
+        if not Handled then
+          TrackingServiceType := RaptorTrackService_rsa;
+        //+NPR5.54 [355871]
+    end;
+
+    local procedure GetListOfTrackingServiceTypes(var ListOfTrackingServiceTypes: Record "Name/Value Buffer")
+    begin
+        //-NPR5.54 [355871]
+        if not ListOfTrackingServiceTypes.IsTemporary then
+          Error('Function call on a non-temporary variable. This is a critical programming error.');
+
+        ListOfTrackingServiceTypes.Reset;
+        ListOfTrackingServiceTypes.DeleteAll;
+
+        ListOfTrackingServiceTypes.Init;
+        ListOfTrackingServiceTypes.ID += 1;
+        ListOfTrackingServiceTypes.Name := CopyStr(TrackServDescr_rsa,1,MaxStrLen(ListOfTrackingServiceTypes.Name));
+        ListOfTrackingServiceTypes.Value := RaptorTrackService_rsa;
+        ListOfTrackingServiceTypes.Insert;
+
+        OnGetListOfTrackingServiceTypes(ListOfTrackingServiceTypes);
+        //+NPR5.54 [355871]
+    end;
+
     procedure RaptorModule_GetUserIdHistory(): Text
     begin
         exit('GetUserIdHistory');
@@ -335,6 +409,13 @@ codeunit 6151491 "Raptor Management"
     procedure RaptorModule_GetUserRecommendations(): Text
     begin
         exit('GetUserRecommendations');
+    end;
+
+    local procedure RaptorTrackService_rsa(): Text[30]
+    begin
+        //-NPR5.54 [355871]
+        exit('rsa');
+        //+NPR5.54 [355871]
     end;
 
     procedure RaptorDataLogSubscriber(): Code[30]
@@ -355,6 +436,18 @@ codeunit 6151491 "Raptor Management"
     [IntegrationEvent(TRUE, false)]
     procedure OnInitializeDefaultActions(Silent: Boolean)
     begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnGetListOfTrackingServiceTypes(var ListOfTrackingServiceTypes: Record "Name/Value Buffer")
+    begin
+        //NPR5.54 [355871]
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnGetDefaultTrackingServiceType(var TrackingServiceType: Text;var Handled: Boolean)
+    begin
+        //NPR5.54 [355871]
     end;
 }
 

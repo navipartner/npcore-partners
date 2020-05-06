@@ -11,6 +11,7 @@ page 6060141 "MM Membership Alteration"
     // MM1.30/TSA/20180615  CASE 317428 Transport MM1.30 - 15 June 2018
     // MM1.40/TSA /20190730 CASE 360275 Added field "Auto-Admit Member On Sale"
     // MM1.41/TSA /20191016 CASE 373297 Added "Grace Period Presets" and made some grace period settings fields not visible (by default)
+    // MM1.43/TSA /20200331 CASE 398328 added "Presentation Order"
 
     Caption = 'Membership Alteration';
     PageType = List;
@@ -36,6 +37,9 @@ page 6060141 "MM Membership Alteration"
                 {
                 }
                 field("To Membership Code";"To Membership Code")
+                {
+                }
+                field("Presentation Order";"Presentation Order")
                 {
                 }
                 field("Alteration Activate From";"Alteration Activate From")

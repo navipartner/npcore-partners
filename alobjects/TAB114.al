@@ -12,6 +12,7 @@ tableextension 6014407 tableextension6014407 extends "Sales Cr.Memo Header"
     // NPR5.39/BHR/20181202 CASE 305071 Change field size of field 6014400 (Sales Ticket No.) from 10 to 20
     // MAG2.12/MHA /20180425  CASE 309647 Added fields 6151400 "Magento Payment Amount",6151405 "External Order No."
     // NPR5.53/MHA /20191211  CASE 380837 Added fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
+    // NPR5.54/MHA /20200311  CASE 390380 Removed fields 6151300 "NpEc Store Code", 6151305 "NpEc Document No."
     fields
     {
         field(6014400;"Sales Ticket No.";Code[20])
@@ -63,17 +64,6 @@ tableextension 6014407 tableextension6014407 extends "Sales Cr.Memo Header"
         {
             Caption = 'Doc. Exch. File Exists';
             Description = 'NPR5.33';
-        }
-        field(6151300;"NpEc Store Code";Code[20])
-        {
-            Caption = 'E-commerce Store Code';
-            Description = 'NPR5.53';
-            TableRelation = "NpEc Store";
-        }
-        field(6151305;"NpEc Document No.";Code[50])
-        {
-            Caption = 'E-commerce Document No.';
-            Description = 'NPR5.53';
         }
         field(6151400;"Magento Payment Amount";Decimal)
         {

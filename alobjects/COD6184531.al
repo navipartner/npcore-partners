@@ -1,6 +1,7 @@
 codeunit 6184531 "EFT Adyen Abort Unfinished Trx"
 {
     // NPR5.53/MMV /20200126 CASE 377533 Created object
+    // NPR5.54/MMV /20200415 CASE 364340 Set sales ticket number correctly.
 
     TableNo = "EFT Transaction Request";
 
@@ -37,11 +38,13 @@ codeunit 6184531 "EFT Adyen Abort Unfinished Trx"
 
         if not LastEFTTransactionRequest.Get(EntryNoToCheck) then
           exit;
-        if LastEFTTransactionRequest."External Result Received" then
+        if LastEFTTransactionRequest."External Result Known" then
           exit;
 
         EFTTransactionLoggingMgt.WriteLogEntry(EFTTransactionRequest."Entry No.", StrSubstNo('Creating abort request for entry %1', EntryNoToCheck), '');
-        EFTAdyenCloudIntegration.AbortTransaction(LastEFTTransactionRequest);
+        //-NPR5.54 [364340]
+        EFTAdyenCloudIntegration.AbortTransaction(LastEFTTransactionRequest, EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
+        //+NPR5.54 [364340]
     end;
 
     local procedure GetLastTransaction(EFTTransactionRequest: Record "EFT Transaction Request"): Integer

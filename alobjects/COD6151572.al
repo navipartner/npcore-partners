@@ -5,6 +5,7 @@ codeunit 6151572 "AF API WebService"
     // NPR5.38/CLVA/20171117 CASE 292987 Added Variant 4
     // NPR5.39/BR  /20180214 CASE 304312 Added Support for POS Entry
     // NPR5.40/CLVA/20180315 CASE 307195 Added GetReportByJObjectAsBase64
+    // NPR5.54/TJ  /20200303 CASE 393290 Refactored function GetReceiptAsPDF and added new parameter ReportId
 
 
     trigger OnRun()
@@ -458,7 +459,7 @@ codeunit 6151572 "AF API WebService"
     end;
 
     [Scope('Personalization')]
-    procedure GetReceiptAsPDF(SalesTicketNo: Code[20]): Text
+    procedure GetReceiptAsPDF(SalesTicketNo: Code[20];ReportId: Integer): Text
     var
         AuditRoll: Record "Audit Roll";
         TempFile: File;
@@ -467,52 +468,75 @@ codeunit 6151572 "AF API WebService"
         MemoryStream: DotNet npNetMemoryStream;
         Bytes: DotNet npNetArray;
         Convert: DotNet npNetConvert;
-        MPOSAppSetup: Record "MPOS App Setup";
         NPRetailSetup: Record "NP Retail Setup";
         POSEntry: Record "POS Entry";
         ReportBasedOn: Option "None",POSEntry,AuditRoll;
     begin
         if SalesTicketNo = '' then
             exit;
-
-        if not MPOSAppSetup.FindFirst then
-            exit;
-
+        
+        //-NPR5.54 [393290]
+        /*
+        IF NOT MPOSAppSetup.FINDFIRST THEN
+          EXIT;
+        */
+        if ReportId = 0 then
+          exit;
+        //+NPR5.54 [393290]
+        
         //-NPR5.39 [304312]
         ReportBasedOn := ReportBasedOn::None;
         if NPRetailSetup.Get then begin
             if NPRetailSetup."Advanced Posting Activated" then begin
-                Clear(POSEntry);
+            //-NPR5.54 [393290]
+            //CLEAR(POSEntry);
+            //+NPR5.54 [393290]
                 POSEntry.SetRange("Document No.", SalesTicketNo);
-                if POSEntry.FindSet then begin
-                    if MPOSAppSetup."POS Entry Report ID" <> 0 then begin
+            //-NPR5.54 [393290]
+            //IF POSEntry.FINDSET THEN BEGIN
+            //  IF MPOSAppSetup."POS Entry Report ID" <> 0 THEN BEGIN
+            if not POSEntry.IsEmpty then
+            //+NPR5.54 [393290]
                         ReportBasedOn := ReportBasedOn::POSEntry;
-                    end;
-                end;
+            //-NPR5.54 [393290]
+            //  END;
+            //END;
+            //+NPR5.54 [393290]
             end;
         end;
         if ReportBasedOn = ReportBasedOn::None then begin
-            Clear(AuditRoll);
+          //-NPR5.54 [393290]
+          //CLEAR(AuditRoll);
+          //+NPR5.54 [393290]
             AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
             AuditRoll.SetRange("Sales Ticket No.", SalesTicketNo);
-            if AuditRoll.FindSet then begin
-                if MPOSAppSetup."Audit Roll Report ID" <> 0 then begin
+          //-NPR5.54 [393290]
+          //IF AuditRoll.FINDSET THEN BEGIN
+          //  IF MPOSAppSetup."Audit Roll Report ID" <> 0 THEN BEGIN
+          if not AuditRoll.IsEmpty then
+          //+NPR5.54 [393290]
                     ReportBasedOn := ReportBasedOn::AuditRoll;
-                end;
-            end;
+          //-NPR5.54 [393290]
+          //  END;
+          //END;
+          //+NPR5.54 [393290]
         end;
-
+        
         if ReportBasedOn = ReportBasedOn::None then
             exit;
-
+        
         TempFile.CreateTempFile;
         Filename := TempFile.Name;
         TempFile.Close();
         case ReportBasedOn of
-            ReportBasedOn::AuditRoll:
-                REPORT.SaveAsPdf(MPOSAppSetup."Audit Roll Report ID", Filename, AuditRoll);
-            ReportBasedOn::POSEntry:
-                REPORT.SaveAsPdf(MPOSAppSetup."POS Entry Report ID", Filename, POSEntry);
+          //-NPR5.54 [393290]
+          /*
+          ReportBasedOn::AuditRoll: REPORT.SAVEASPDF(MPOSAppSetup."Audit Roll Report ID",Filename,AuditRoll);
+          ReportBasedOn::POSEntry : REPORT.SAVEASPDF(MPOSAppSetup."POS Entry Report ID",Filename,POSEntry);
+          */
+          ReportBasedOn::AuditRoll: REPORT.SaveAsPdf(ReportId,Filename,AuditRoll);
+          ReportBasedOn::POSEntry : REPORT.SaveAsPdf(ReportId,Filename,POSEntry);
+          //+NPR5.54 [393290]
         end;
         // IF MPOSAppSetup."Audit Roll Report ID" = 0 THEN
         //  EXIT;
@@ -534,19 +558,20 @@ codeunit 6151572 "AF API WebService"
         // Filename := TempFile.NAME;
         // TempFile.CLOSE();
         //+NPR5.39 [304312]
-
+        
         if Exists(Filename) then begin
             TempFile.Open(Filename);
             TempFile.CreateInStream(Istream);
             MemoryStream := MemoryStream.MemoryStream();
             CopyStream(MemoryStream, Istream);
             Bytes := MemoryStream.GetBuffer();
-
+        
             TempFile.Close;
             FILE.Erase(Filename);
-
+        
             exit(Convert.ToBase64String(Bytes));
         end;
+
     end;
 
     [Scope('Personalization')]

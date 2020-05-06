@@ -6,7 +6,7 @@ xmlport 6014412 "Dankort Transaktion"
 
     schema
     {
-        tableelement("Credit Card Transaction";"Credit Card Transaction")
+        tableelement("EFT Receipt";"EFT Receipt")
         {
             XmlName = 'CreditCardTransaction';
         }

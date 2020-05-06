@@ -2,6 +2,8 @@ page 6151102 "NpRi Reimbursements"
 {
     // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
     // NPR5.46/MHA /20181002  CASE 323942 Set DelayedInsert to Yes
+    // NPR5.54/JKL /20191213  CASE 382066 New field 310 Deactivated added
+    // NPR5.54/BHR /20200306  CASE 385924 Add fields 315, 316
 
     Caption = 'Reimbursements';
     DelayedInsert = true;
@@ -36,6 +38,12 @@ page 6151102 "NpRi Reimbursements"
                 field("Data Collection Summary";"Data Collection Summary")
                 {
                 }
+                field("From Date";"From Date")
+                {
+                }
+                field("To Date";"To Date")
+                {
+                }
                 field("Last Data Collect Entry No.";"Last Data Collect Entry No.")
                 {
                     Visible = false;
@@ -66,6 +74,9 @@ page 6151102 "NpRi Reimbursements"
                 {
                 }
                 field(Balance;Balance)
+                {
+                }
+                field(Deactivated;Deactivated)
                 {
                 }
             }

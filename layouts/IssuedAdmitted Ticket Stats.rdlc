@@ -1313,7 +1313,7 @@
                         <TablixMember>
                           <Group Name="Variant">
                             <GroupExpressions>
-                              <GroupExpression>=Fields!Variant.Value</GroupExpression>
+                              <GroupExpression>=Fields!VariantCode.Value</GroupExpression>
                             </GroupExpressions>
                           </Group>
                           <SortExpressions>
@@ -1516,6 +1516,7 @@
                       <Value>=First(Fields!FilterStartDate.Value, "DataSet_Result") + System.Environment.NewLine + 
 First(Fields!FilterEndDate.Value, "DataSet_Result") + System.Environment.NewLine + 
 First(Fields!FilterCustomer.Value, "DataSet_Result") + System.Environment.NewLine + 
+First(Fields!AdmissionCode.Value, "DataSet_Result")+ System.Environment.NewLine + 
 First(Fields!Getfilters.Value, "DataSet_Result")</Value>
                       <Style>
                         <FontFamily>Segoe UI</FontFamily>
@@ -1765,6 +1766,9 @@ End Function
         </Field>
         <Field Name="ShowVariantLine">
           <DataField>ShowVariantLine</DataField>
+        </Field>
+        <Field Name="AdmissionCode">
+          <DataField>AdmissionCode</DataField>
         </Field>
         <Field Name="No_Item">
           <DataField>No_Item</DataField>

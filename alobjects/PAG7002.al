@@ -1,4 +1,4 @@
-pageextension 6014469 pageextension6014469 extends "Sales Prices" 
+pageextension 6014470 pageextension6014470 extends "Sales Prices" 
 {
     // VRT1.00/JDH/20150304 CASE 201022 Show Variety Matrix
     // NPR5.22/TJ/20160411 CASE 238601 Moved code from Variety function to NPR Event Subscriber codeunit

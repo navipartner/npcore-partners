@@ -7,6 +7,9 @@ codeunit 6151145 "M2 POS Price WebService"
     // MAG2.21/TSA /20190423 CASE 350006 Corrected a spelling mistake.
     // MAG2.23/TSA /20190930 CASE 370652 Customer No. was not set on request record passeed to ERP Price Calculation, removed TryFunction from TryPosQuoteRequest
     // MAG2.23/TSA /20190930 CASE 370652 Unit of Measure Code was not set on request record passed to ERP Price Calculation,
+    // MAG2.25/TSA /20200213 CASE 349999 Added EstimateDeliveryDate(), GetWorkingDayCalendar ()
+    // MAG2.25/TSA /20200226 CASE 391299 Added a "Allow Line Disc." check on the best price calculation.
+    // MAG2.25/TSA /20200323 CASE 397545 Default VAT percent setup not supplied in itemprice response
 
 
     trigger OnRun()
@@ -309,6 +312,10 @@ codeunit 6151145 "M2 POS Price WebService"
             if (not ItemUnitofMeasure.Get (Item."No.", TmpSalesPriceResponse."Unit of Measure Code")) then
               RequestLineErrorMessage += StrSubstNo ('Unit of Measure Code "%1" is not valid for item "%2".;', TmpSalesPriceResponse."Unit of Measure Code", Item."No.");
 
+            //-MAG2.25 [397545]
+            TmpSalesPriceResponse."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
+            //+MAG2.25 [397545]
+
             // Validate the customer
             if (Customer."No." <> TmpSalesPriceRequest."Source Code") then
               Clear (Customer);
@@ -579,7 +586,12 @@ codeunit 6151145 "M2 POS Price WebService"
             TmpSalesLine."Customer Price Group" := Customer."Customer Price Group";
 
             SalesPriceCalcMgt.FindSalesLinePrice (TmpSalesHeader, TmpSalesLine, 0);
-            SalesPriceCalcMgt.FindSalesLineLineDisc (TmpSalesHeader, TmpSalesLine);
+
+            //-MAG2.25 [391299]
+            // SalesPriceCalcMgt.FindSalesLineLineDisc (TmpSalesHeader, TmpSalesLine);
+            if (TmpSalesLine."Allow Line Disc.") then
+              SalesPriceCalcMgt.FindSalesLineLineDisc (TmpSalesHeader, TmpSalesLine);
+            //+MAG2.25 [391299]
 
             TmpPricePoint.TransferFields (TmpSalesPriceResponse);
             TmpPricePoint."Unit Price Base" := TmpSalesLine."Unit Price";
@@ -684,6 +696,26 @@ codeunit 6151145 "M2 POS Price WebService"
 
         // All logic in XML port to generate output on export
         //+NPR5.49 [345375]
+    end;
+
+    [Scope('Personalization')]
+    procedure EstimateDeliveryDate(var EstimateDeliveryDate: XMLport "M2 Estimate Delivery Date")
+    begin
+
+        //-MAG2.25 [349999]
+        EstimateDeliveryDate.Import ();
+        EstimateDeliveryDate.PrepareResult ();
+        //+MAG2.25 [349999]
+    end;
+
+    [Scope('Personalization')]
+    procedure GetWorkingDayCalendar(var GetWorkingDayCalendar: XMLport "M2 Get WorkingDay Calendar")
+    begin
+
+        //-MAG2.25 [349999]
+        GetWorkingDayCalendar.Import ();
+        GetWorkingDayCalendar.PrepareResponse ();
+        //+MAG2.25 [349999]
     end;
 }
 

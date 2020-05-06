@@ -24,6 +24,9 @@ page 6060113 "TM Ticket Make Reservation"
     // TM1.45/TSA /20191126 CASE 379541 Detecting change to reservation when customer no and external reference changes
     // TM1.45/TSA /20200114 CASE 380754 Waitinglist, Added Time Overlap confirmation
     // TM1.45/TSA /20200114 CASE 382535 Dynamic Admission
+    // TM90.1.46/TSA /20200123 CASE 386850 Added SetIgnoreScheduleSelectionFilter() to show all schedules rather then applying the POS schedule filter
+    // TM90.1.46/TSA /20200127 CASE 387138 Ticket Server - show eTicket notification address field
+    // TM90.1.46/TSA /20200304 CASE 399138 Make sure deliver-to field is displayed when allocation changes to waitinglist
 
     Caption = 'Make your reservation';
     DataCaptionExpression = StrSubstNo ('%1  - %2', Today, Time);
@@ -379,6 +382,7 @@ page 6060113 "TM Ticket Make Reservation"
         QTY_NOT_EDITABLE: Label 'Quantity can not be changed for admissions that are not included.';
         NOT_EDITABLE: Label '%1 can not be changed when admission is required.';
         NOT_REQUIRED: Label '%1 can not be chanegd to required when intial value was optional.';
+        gIgnoreScheduleFilter: Boolean;
 
     local procedure ChangeQuantity(NewQuantity: Integer)
     var
@@ -428,9 +432,15 @@ page 6060113 "TM Ticket Make Reservation"
         //-TM1.21
         //Selecting end range for from-date
         if TMAdmission.Get("Admission Code") then begin
-          if TMAdmission."POS Schedule Selection Date F." <> "0DF" then begin
+          if (TMAdmission."POS Schedule Selection Date F." <> "0DF") then begin
             ToDate := CalcDate (TMAdmission."POS Schedule Selection Date F.", Today);
-            AdmissionScheduleEntry.SetRange ("Admission Start Date", Today, ToDate);
+
+            //-TM90.1.46 [386850]
+            // 31041AdmissionScheduleEntry.SETRANGE ("Admission Start Date", TODAY, ToDate);
+            if (not gIgnoreScheduleFilter) then
+              AdmissionScheduleEntry.SetRange ("Admission Start Date", Today, ToDate);
+            //+TM90.1.46 [386850]
+
           end;
         end;
         //-TM1.21
@@ -453,18 +463,20 @@ page 6060113 "TM Ticket Make Reservation"
           //-TM1.45 [380754]
           if (AdmissionScheduleEntry."Allocation By" = AdmissionScheduleEntry."Allocation By"::WAITINGLIST) then begin
             "Scheduled Time Description" := StrSubstNo ('%1', WAITING_LIST);
+            //-TM90.1.46 [399138]
+            gShowDeliverTo := true;
+            //+TM90.1.46 [399138]
           end;
 
           if (gLimitToDateSelected = 0D) then
             gLimitToDateSelected := AdmissionScheduleEntry."Admission Start Date";
 
-          if (gLimitToDateSelected <> 0D) then begin
+          if (gLimitToDateSelected <> 0D) then
             if (gLimitToDateSelected <> AdmissionScheduleEntry."Admission Start Date") then begin
               if (not Confirm (DIFFERENT_DATES, false, AdmissionScheduleEntry."Admission Start Date", gLimitToDateSelected)) then
                 Error ('');
               gLimitToDateSelected := AdmissionScheduleEntry."Admission Start Date";
             end;
-          end;
           //+TM1.45 [380754]
 
           Modify ();
@@ -584,7 +596,7 @@ page 6060113 "TM Ticket Make Reservation"
 
         //-TM1.45 [380754]
         if (ShowDifferentDatesWarning) then
-          Message (DIFFERENT_DATES_WARNING, AdmissionScheduleEntry."Admission Start Date", gLimitToDateSelected)
+          Message (DIFFERENT_DATES_WARNING, AdmissionScheduleEntry."Admission Start Date", gLimitToDateSelected);
         //+TM1.45 [380754]
     end;
 
@@ -592,6 +604,7 @@ page 6060113 "TM Ticket Make Reservation"
     var
         Item: Record Item;
         TicketType: Record "TM Ticket Type";
+        TicketBOM: Record "TM Ticket Admission BOM";
     begin
         gTicketItemNo := ItemNo;
         gTicketVariantCode := VariantCode;
@@ -601,6 +614,13 @@ page 6060113 "TM Ticket Make Reservation"
           if (TicketType.Get (Item."Ticket Type")) then
             gShowDeliverTo := TicketType."eTicket Activated";
         //+TM1.38 [332109]
+
+        //-TM90.1.46 [387138]
+        TicketBOM.SetFilter ("Item No.", '=%1', ItemNo);
+        TicketBOM.SetFilter ("Publish Ticket URL", '<>%1', TicketBOM."Publish Ticket URL"::DISABLE);
+        if (not gShowDeliverTo) then
+          gShowDeliverTo := TicketBOM.FindFirst ();
+        //+TM90.1.46 [387138]
     end;
 
     procedure AllowQuantityChange(AllowQuantityChange: Boolean)
@@ -750,6 +770,16 @@ page 6060113 "TM Ticket Make Reservation"
             Error ('');
 
         //+#380754 [380754]
+    end;
+
+    procedure SetIgnoreScheduleSelectionFilter(IgnoreFilter: Boolean): Boolean
+    begin
+
+        //-TM90.1.46 [386850]
+        gIgnoreScheduleFilter := IgnoreFilter;
+        exit (gIgnoreScheduleFilter);
+
+        //+TM90.1.46 [386850]
     end;
 }
 

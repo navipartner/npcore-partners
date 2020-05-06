@@ -1,6 +1,7 @@
 table 6151369 "CS Rfid Lines"
 {
     // NPR5.53/CLVA  /20191121  CASE 377563 Object created - NP Capture Service
+    // NPR5.54/JAKUBV/20200408  CASE 379709 Transport NPR5.54 - 8 April 2020
 
     Caption = 'CS Rfid Lines';
 
@@ -63,6 +64,36 @@ table 6151369 "CS Rfid Lines"
         {
             Caption = 'Match';
             Editable = false;
+        }
+        field(17;"Item Group Code";Code[10])
+        {
+            Caption = 'Item Group Code';
+            TableRelation = "Item Group";
+        }
+        field(18;"Item Group Description";Text[50])
+        {
+            CalcFormula = Lookup("Item Group".Description WHERE ("No."=FIELD("Item Group Code")));
+            Caption = 'Item Group Description';
+            Editable = false;
+            FieldClass = FlowField;
+        }
+        field(19;"Transferred To";Option)
+        {
+            Caption = 'Transferred To';
+            OptionCaption = ',Sales Order,Whse. Receipt,Transfer Order';
+            OptionMembers = ,"Sales Order","Whse. Receipt","Transfer Order";
+        }
+        field(20;"Transferred to Doc";Code[20])
+        {
+            Caption = 'Transferred to Doc';
+        }
+        field(21;"Transferred Date";DateTime)
+        {
+            Caption = 'Transferred Date';
+        }
+        field(22;"Transferred By";Code[20])
+        {
+            Caption = 'Transferred By';
         }
     }
 

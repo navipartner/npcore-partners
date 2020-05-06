@@ -3,6 +3,7 @@ codeunit 6151102 "NpRi Reimbursement Mgt."
     // NPR5.44/MHA /20180723  CASE 320133 Object Created - NaviPartner Reimbursement
     // NPR5.46/MHA /20181002  CASE 323942 Corrected Exit clause on "Reimbursement Date" in RunReimbursement()
     // NPR5.53/MHA /20191105  CASE 364131 Next Reimbursement Date should still be calculated even when no open entries
+    // NPR5.54/JKL /20191213 CASE 382066  added code to omit deactivated reinbursments
 
     TableNo = "NpRi Reimbursement";
 
@@ -170,8 +171,14 @@ codeunit 6151102 "NpRi Reimbursement Mgt."
     begin
         if NpRiReimbursement.FindSet then
           repeat
-            RunReimbursement(NpRiReimbursement);
-            Commit;
+            //-NPR5.54 [382066]
+            //RunReimbursement(NpRiReimbursement);
+            //COMMIT;
+            if not NpRiReimbursement.Deactivated then begin
+              RunReimbursement(NpRiReimbursement);
+              Commit;
+            end;
+            //+NPR5.54 [382066]
           until NpRiReimbursement.Next = 0;
     end;
 

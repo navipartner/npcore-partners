@@ -12,6 +12,7 @@ table 6150703 "POS Action"
     // NPR5.46/MHA /20180927  CASE 329621 Removed redundant INSERT/MODIFY that caused error during Upgrade procedure in HandleActionUpdates()
     // NPR5.50/VB  /20181205  CASE 338666 Supporting Workflows 2.0
     //                                    Modifying the behavior of "Subscriber Instances Allowed" - it's now obsolete.
+    // NPR5.54/TSA /20200221 CASE 392247 Added field "Requires POS Type"
 
     Caption = 'POS Action';
     DrillDownPageID = "POS Actions";
@@ -98,6 +99,12 @@ table 6150703 "POS Action"
         {
             Caption = 'Workflow Engine Version';
             InitValue = '1.0';
+        }
+        field(20;"Requires POS Type";Option)
+        {
+            Caption = 'Requires POS Type';
+            OptionCaption = 'Attended,Unattended';
+            OptionMembers = ATTENDED,UNATTENDED;
         }
     }
 
@@ -787,6 +794,48 @@ table 6150703 "POS Action"
     [IntegrationEvent(false, false)]
     local procedure OnAfterActionUpdated("Action": Record "POS Action")
     begin
+    end;
+
+    procedure SetWorkflowTypeAttended()
+    var
+        POSAction: Record "POS Action";
+    begin
+
+        //-NPR5.54 [392247]
+        "Requires POS Type" := "Requires POS Type"::ATTENDED;
+        POSSession.DiscoverSessionAction (Rec);
+        if (IsTemporary ()) then begin
+          if (POSAction.Get (Code)) then begin
+            POSAction."Requires POS Type" := "Requires POS Type"::UNATTENDED;
+            POSAction.Modify ();
+          end;
+        end;
+        //+NPR5.54 [392247]
+    end;
+
+    procedure SetWorkflowTypeUnattended()
+    var
+        POSAction: Record "POS Action";
+    begin
+
+        //-NPR5.54 [392247]
+        "Requires POS Type" := "Requires POS Type"::UNATTENDED;
+        POSSession.DiscoverSessionAction (Rec);
+        if (IsTemporary ()) then begin
+          if (POSAction.Get (Code)) then begin
+            POSAction."Requires POS Type" := "Requires POS Type"::UNATTENDED;
+            POSAction.Modify ();
+          end;
+        end;
+        //+NPR5.54 [392247]
+    end;
+
+    procedure GetWorkflowType(): Integer
+    begin
+
+        //-NPR5.54 [392247]
+        exit ("Requires POS Type");
+        //+NPR5.54 [392247]
     end;
 }
 

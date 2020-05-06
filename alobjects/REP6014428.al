@@ -6,6 +6,7 @@ report 6014428 "Shelf Labels"
     // TM1.39/THRO/20181126 CASE 334644 Replaced Coudeunit 1 by Wrapper Codeunit
     // NPR5.50/ZESO/201905006 CASE 353382 Remove Reference to Wrapper Codeunit
     // NPR5.53/ANPA/20191029  CASE 374286 Made the report able to print more than one of each label
+    // NPR5.54/SARA/20200114  CASE 384891 Added option to print 'Item Unit Price' or 'Campaign Unit Price'
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Shelf Labels.rdlc';
 
@@ -119,10 +120,21 @@ report 6014428 "Shelf Labels"
                   TMPItemGroup := ItemGroup.Description;
 
                 TMPBeforeUnitPrice := TMPRetail_Journal_Line_Col1."Discount Price Incl. Vat";
+                //-NPR5.54 [384891]
+                TMPUnitPriceCard := Item."Unit Price";
+                TMPRetailLineDiscount := TMPRetail_Journal_Line_Col1."Discount Price Incl. Vat";
+                //+NPR5.54 [384891]
                 if (TMPRetail_Journal_Line_Col1."Discount Type" = TMPRetail_Journal_Line_Col1."Discount Type"::Campaign) and (TMPRetail_Journal_Line_Col1."Discount Code" <> '') then
                   CalculatePriceCampaign("Item No.",TMPBeforeUnitPrice,TMPUnitPrice)
                 else
                   CalculatePrice("Item No.",TMPBeforeUnitPrice,TMPUnitPrice);
+
+                //-NPR5.54 [384891]
+                case UnitPriceOption of
+                  UnitPriceOption::"Use Retail Journal Line Prices":TMPUnitPrice := TMPRetailLineDiscount;
+                  UnitPriceOption::"Use Item Card Unit Prices":TMPUnitPrice := TMPUnitPriceCard;
+                end;
+                //+NPR5.54 [384891]
 
                 BeforeCaptionTxt := '';
                 if TMPUnitPrice <> TMPBeforeUnitPrice then
@@ -154,6 +166,14 @@ report 6014428 "Shelf Labels"
 
         layout
         {
+            area(content)
+            {
+                field(CampaignUnitPrice;UnitPriceOption)
+                {
+                    Caption = 'Unit Price';
+                    OptionCaption = 'Use Retail Journal Line Prices,Use Item Card Unit Prices,Use Campaign Unit Prices';
+                }
+            }
         }
 
         actions
@@ -189,6 +209,8 @@ report 6014428 "Shelf Labels"
         TMPUnitPriceWhole: Text;
         TMPUnitPriceDecimal: Text;
         TMPUnitPrice: Decimal;
+        TMPUnitPriceCard: Decimal;
+        TMPRetailLineDiscount: Decimal;
         StringLibrary: Codeunit "String Library";
         NPRAtrributeTextArray: array [20] of Text[50];
         NPRAttributeTextArrayText: array [20] of Text[50];
@@ -198,6 +220,7 @@ report 6014428 "Shelf Labels"
         BeforeCaptionTxt: Text;
         ItemVariant: Record "Item Variant";
         k: Integer;
+        UnitPriceOption: Option "Use Retail Journal Line Prices","Use Item Card Unit Prices","Use Campaign Unit Prices";
 
     local procedure GetItemNPRAttr(ItemRec: Record Item)
     var

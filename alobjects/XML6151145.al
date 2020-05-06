@@ -2,6 +2,7 @@ xmlport 6151145 "M2 POS Quote Price Request"
 {
     // NPR5.48/TSA /20181009 CASE 320429 Initial Version
     // MAG2.21/TSA /20190423 CASE 350006 Added optional request field OrderDate
+    // MAG2.25/TSA /20200226 CASE 391299 Removed NPR version tag
 
     Caption = 'POS Price Quote';
     Encoding = UTF8;

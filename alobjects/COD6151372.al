@@ -26,10 +26,14 @@ codeunit 6151372 "CS WS"
     // NPR5.53/CLVA/20191122 CASE 377462 Added Priority for Post for ApproveStoreCounting
     // NPR5.53/CLVA/20191203 CASE 375919 Added Counting Supervisor functionality. Addded function CreateStoreCountingV2, SearchPOSStore and GetStoreDataV2
     // NPR5.53/CLVA/20200207 CASE 389864 Changed code to support version specific changes (NAV 2018+).
+    // NPR5.54/CLVA/20202020 CASE 384506 Added Supervisor and POS user filter on GetStoreDataV2 and GetStoreDataByStoreUser;
+    // NPR5.54/CLVA/20200227 CASE 389224 Added batch handling
+    // NPR5.54/CLVA/20200310 CASE 384506 Added function CreateStoreRefillDataV2
 
 
     trigger OnRun()
     begin
+        Message(CreateStoreRefillDataV2('{dac13779-be4d-4a13-802b-c419c0a6b2f2}'));
     end;
 
     var
@@ -60,6 +64,7 @@ codeunit 6151372 "CS WS"
         Txt021: Label 'There is no Items on Location %1';
         Txt022: Label 'POS Store Code is not valid: %1';
 
+    [Scope('Personalization')]
     procedure ProcessDocument(var Document: Text)
     var
         XMLDOMManagement: Codeunit "XML DOM Management";
@@ -81,6 +86,7 @@ codeunit 6151372 "CS WS"
         CSHelperFunctions.UpdateLogEntry(CSCommunicationLog, 'ProcessDocument', IsInternal, InternalCallId, Document, LogCommunication, '');
     end;
 
+    [Scope('Personalization')]
     procedure ProcessData(DeviceId: Code[10]; BatchId: Text; BatchNo: Text; PostData: Text; StockTakeConfig: Text; WorksheetName: Text; var Data: Text)
     var
         CSStockTakeHandlingRfid: Record "CS Stock-Take Handling Rfid";
@@ -150,12 +156,14 @@ codeunit 6151372 "CS WS"
         CSStockTakeHandlingRfid.Modify(false);
     end;
 
+    [Scope('Personalization')]
     procedure IsInternalCall(LocalIsInternal: Boolean; LocalId: Guid)
     begin
         IsInternal := LocalIsInternal;
         InternalCallId := LocalId;
     end;
 
+    [Scope('Personalization')]
     procedure GetItemInfoByBarcode(Barcode: Code[20]): Text
     var
         Item: Record Item;
@@ -220,6 +228,7 @@ codeunit 6151372 "CS WS"
         exit(StrSubstNo('%1#%2', DetailTxt, MasterTxt));
     end;
 
+    [Scope('Personalization')]
     procedure GetItemPicture(Barcode: Code[20]) PictureBase64: Text
     var
         Item: Record Item;
@@ -244,6 +253,7 @@ codeunit 6151372 "CS WS"
         //+NPR5.53 [374331]
     end;
 
+    [Scope('Personalization')]
     procedure SearchItem(Word: Text): Text
     var
         CSItemSeachHandling: Record "CS Item Seach Handling" temporary;
@@ -359,6 +369,7 @@ codeunit 6151372 "CS WS"
         exit(Result);
     end;
 
+    [Scope('Personalization')]
     procedure GetRfidOfflineDataDelta(DeviceId: Code[20]): Text
     var
         CSHelperFunctions: Codeunit "CS Helper Functions";
@@ -366,6 +377,7 @@ codeunit 6151372 "CS WS"
         exit(CSHelperFunctions.CreateOfflineRfidDataDelta(DeviceId));
     end;
 
+    [Scope('Personalization')]
     procedure UpdateRfidDeviceInfo(DeviceId: Code[20]; Lasttimestamp: Text; Location: Code[20]): Text
     var
         CSHelperFunctions: Codeunit "CS Helper Functions";
@@ -380,6 +392,7 @@ codeunit 6151372 "CS WS"
         exit(CSHelperFunctions.UpdateDeviceInfo(DeviceId, Timestamp, Location));
     end;
 
+    [Scope('Personalization')]
     procedure GetRefillData(StockTakeId: Text): Text
     var
         CSHelperFunctions: Codeunit "CS Helper Functions";
@@ -387,6 +400,7 @@ codeunit 6151372 "CS WS"
         exit(CSHelperFunctions.CreateRefillData(StockTakeId));
     end;
 
+    [Scope('Personalization')]
     procedure GetRfidTagData(TagId: Text): Text
     var
         CSRfidData: Record "CS Rfid Data";
@@ -415,6 +429,7 @@ codeunit 6151372 "CS WS"
             exit('UNKNOWNITEM');
     end;
 
+    [Scope('Personalization')]
     procedure SetRfidTagData(StockTakeId: Text; StockTakeConfigCode: Text; WorksheetName: Text; TagId: Text): Text
     var
         CSStockTakesData: Record "CS Stock-Takes Data";
@@ -441,6 +456,7 @@ codeunit 6151372 "CS WS"
             exit(Result);
     end;
 
+    [Scope('Personalization')]
     procedure SetRfidTagDataByType(StockTakeId: Text; StockTakeConfigCode: Text; WorksheetName: Text; TagId: Text; "Area": Text): Text
     var
         CSStockTakesData: Record "CS Stock-Takes Data";
@@ -475,6 +491,7 @@ codeunit 6151372 "CS WS"
             exit(Result);
     end;
 
+    [Scope('Personalization')]
     procedure GetRfidWhseReceiptData(DocNo: Text): Text
     var
         WhseReceiptLine: Record "Warehouse Receipt Line";
@@ -539,6 +556,7 @@ codeunit 6151372 "CS WS"
         exit(Result);
     end;
 
+    [Scope('Personalization')]
     procedure ValidateRfidWhseReceiptData(DocNo: Text; TagId: Text): Text
     var
         CSRfidData: Record "CS Rfid Data";
@@ -555,6 +573,7 @@ codeunit 6151372 "CS WS"
             exit('UNKNOWNITEM#2');
     end;
 
+    [Scope('Personalization')]
     procedure SaveRfidWhseReceiptData(DocNo: Text): Text
     var
         CSWhseReceiptData: Record "CS Whse. Receipt Data";
@@ -599,6 +618,7 @@ codeunit 6151372 "CS WS"
         end;
     end;
 
+    [Scope('Personalization')]
     procedure CloseCounting(StockTakeId: Text; WorksheetName: Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
@@ -637,6 +657,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeId);
     end;
 
+    [Scope('Personalization')]
     procedure CloseRefill(StockTakeId: Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
@@ -655,6 +676,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeId);
     end;
 
+    [Scope('Personalization')]
     procedure UpdateRefill(StockTakeId: Text; ItemNo: Text; Refilled: Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
@@ -687,6 +709,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeId);
     end;
 
+    [Scope('Personalization')]
     procedure ApproveCounting(StockTakeId: Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
@@ -716,6 +739,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeId);
     end;
 
+    [Scope('Personalization')]
     procedure CloseWarehouseCounting(StockTakeConfigCode: Text; WorksheetName: Text): Text
     var
         StockTakeWorksheet: Record "Stock-Take Worksheet";
@@ -847,11 +871,13 @@ codeunit 6151372 "CS WS"
         //+NPR5.52
     end;
 
+    [Scope('Personalization')]
     procedure ResetWarehouseCounting(StockTakeConfigCode: Text; WorksheetName: Text): Text
     var
         CSSetup: Record "CS Setup";
         ItemJournalBatch: Record "Item Journal Batch";
         CSStockTakesData: Record "CS Stock-Takes Data";
+        CSStockTakeHandlingRfid: Record "CS Stock-Take Handling Rfid";
     begin
         //-NPR5.51
         //IF NOT StockTakeWorksheet.GET(StockTakeConfigCode,WorksheetName) THEN
@@ -863,6 +889,9 @@ codeunit 6151372 "CS WS"
         //+NPR5.51
 
         CSStockTakesData.SetRange("Transferred To Worksheet", false);
+        //-NPR5.54 [389224]
+        CSStockTakesData.SetRange(Area,CSStockTakesData.Area::Warehouse);
+        //+NPR5.54 [389224]
         //-NPR5.51
         //CSStockTakesData.SETRANGE("Stock-Take Config Code",StockTakeWorksheet."Stock-Take Config Code");
         //CSStockTakesData.SETRANGE("Worksheet Name",StockTakeWorksheet.Name);
@@ -871,9 +900,18 @@ codeunit 6151372 "CS WS"
         //+NPR5.51
         CSStockTakesData.DeleteAll();
 
+        //-NPR5.54 [389224]
+        Clear(CSStockTakeHandlingRfid);
+        CSStockTakeHandlingRfid.SetRange("Stock-Take Config Code",StockTakeConfigCode);
+        CSStockTakeHandlingRfid.SetRange("Worksheet Name",ItemJournalBatch."Journal Template Name");
+        CSStockTakeHandlingRfid.SetRange(Area,CSStockTakeHandlingRfid.Area::Warehouse);
+        CSStockTakeHandlingRfid.DeleteAll();
+        //+NPR5.54 [389224]
+
         exit(StockTakeConfigCode);
     end;
 
+    [Scope('Personalization')]
     procedure GetItemObject(Barcode: Code[20]): Text
     var
         Item: Record Item;
@@ -909,6 +947,7 @@ codeunit 6151372 "CS WS"
         //+NPR5.53 [374331]
     end;
 
+    [Scope('Personalization')]
     procedure GetWarehouseCountingDetails(BatchName: Text): Text
     var
         ItemJournalTemplate: Record "Item Journal Template";
@@ -936,6 +975,7 @@ codeunit 6151372 "CS WS"
         exit(Format(PredictedQty));
     end;
 
+    [Scope('Personalization')]
     procedure GetStoreData(CurrUser: Text): Text
     var
         CSStoreUsers: Record "CS Store Users";
@@ -1110,6 +1150,15 @@ codeunit 6151372 "CS WS"
             else
                 WriteValue('1');
 
+              //-NPR5.54 [389224]
+              CSSetup.Get;
+              WritePropertyName('BatchSize');
+              if (CSSetup."Batch Size" > 10) and (CSSetup."Batch Size" < 1000) then
+                WriteValue(CSSetup."Batch Size")
+              else
+                WriteValue('10');
+              //-NPR5.54 [389224]
+
             WriteEndObject;
 
             WriteEndArray;
@@ -1123,6 +1172,7 @@ codeunit 6151372 "CS WS"
         exit(Result);
     end;
 
+    [Scope('Personalization')]
     procedure StartStoreCounting(StockTakeId: Text; "Area": Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
@@ -1167,6 +1217,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeId);
     end;
 
+    [Scope('Personalization')]
     procedure CloseStoreCounting(StockTakeId: Text; "Area": Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
@@ -1202,6 +1253,7 @@ codeunit 6151372 "CS WS"
         exit(StockTakeId);
     end;
 
+    [Scope('Personalization')]
     procedure ApproveStoreCounting(StockTakeId: Text): Text
     var
         StockTakeWorksheet: Record "Stock-Take Worksheet";
@@ -1394,19 +1446,28 @@ codeunit 6151372 "CS WS"
         if CSStockTakes.Closed = 0DT then begin
           CSStockTakes.Closed := CurrentDateTime;
           CSStockTakes."Closed By" := UserId;
-          CSStockTakes."Journal Posted" := CSStockTakes."Adjust Inventory";
-          CSStockTakes.Modify(true);
+          //-NPR5.54 [384506]
+          //CSStockTakes."Journal Posted" := CSStockTakes."Adjust Inventory";
+          //CSStockTakes.MODIFY(TRUE);
+          //+NPR5.54 [384506]
         end;
         //+NPR5.53 [375919]
+
+        //-NPR5.54 [384506]
+        CSStockTakes."Journal Posted" := CSStockTakes."Adjust Inventory";
+        CSStockTakes.Modify(true);
+        //+NPR5.54 [384506]
 
         exit(StockTakeId)
     end;
 
+    [Scope('Personalization')]
     procedure ResetCounting(StockTakeConfigCode: Text; WorksheetName: Text; "Area": Text): Text
     var
         CSSetup: Record "CS Setup";
         ItemJournalBatch: Record "Item Journal Batch";
         CSStockTakesData: Record "CS Stock-Takes Data";
+        CSStockTakeHandlingRfid: Record "CS Stock-Take Handling Rfid";
     begin
         Clear(CSStockTakesData);
         CSStockTakesData.SetRange("Transferred To Worksheet", false);
@@ -1422,9 +1483,22 @@ codeunit 6151372 "CS WS"
         end;
         CSStockTakesData.DeleteAll();
 
+        //-NPR5.54 [389224]
+        Clear(CSStockTakeHandlingRfid);
+        CSStockTakeHandlingRfid.SetRange("Stock-Take Config Code",StockTakeConfigCode);
+        CSStockTakeHandlingRfid.SetRange("Worksheet Name",WorksheetName);
+        case Area of
+          '0' : CSStockTakeHandlingRfid.SetRange(Area,CSStockTakeHandlingRfid.Area::Warehouse);
+          '1' : CSStockTakeHandlingRfid.SetRange(Area,CSStockTakeHandlingRfid.Area::Salesfloor);
+          '2' : CSStockTakeHandlingRfid.SetRange(Area,CSStockTakeHandlingRfid.Area::Stockroom);
+        end;
+        CSStockTakeHandlingRfid.DeleteAll();
+        //+NPR5.54 [389224]
+
         exit(StockTakeConfigCode);
     end;
 
+    [Scope('Personalization')]
     procedure CreateStoreRefillData(StockTakeId: Text) Result: Text
     var
         CSRefillData: Record "CS Refill Data";
@@ -1574,6 +1648,7 @@ codeunit 6151372 "CS WS"
         Result := JObject.ToString();
     end;
 
+    [Scope('Personalization')]
     procedure CreateStoreCounting(Location: Code[10]): Text
     var
         CSHelperFunctions: Codeunit "CS Helper Functions";
@@ -1584,6 +1659,7 @@ codeunit 6151372 "CS WS"
         exit('');
     end;
 
+    [Scope('Personalization')]
     procedure CreateStoreCountingV2(Location: Code[10]): Text
     var
         CSHelperFunctions: Codeunit "CS Helper Functions";
@@ -1594,6 +1670,7 @@ codeunit 6151372 "CS WS"
         exit('');
     end;
 
+    [Scope('Personalization')]
     procedure SearchPOSStore(Word: Text): Text
     var
         CSItemSeachHandling: Record "CS Item Seach Handling" temporary;
@@ -1626,7 +1703,7 @@ codeunit 6151372 "CS WS"
             CSItemSeachHandling.Init;
             CSItemSeachHandling."No." := POSStore.Code;
             CSItemSeachHandling.Description := POSStore.Name;
-            CSItemSeachHandling."Description 2" := POSStore."Location Code";
+            CSItemSeachHandling."Description 2" := POSStore."Post Code";
             CSItemSeachHandling.Rank := 1;
             CSItemSeachHandling.Insert;
             ItemsCounter += 1;
@@ -1640,7 +1717,7 @@ codeunit 6151372 "CS WS"
                 CSItemSeachHandling.Init;
                 CSItemSeachHandling."No." := POSStore.Code;
                 CSItemSeachHandling.Description := POSStore.Name;
-                CSItemSeachHandling."Description 2" := POSStore."Location Code";
+                CSItemSeachHandling."Description 2" := POSStore."Post Code";
                 CSItemSeachHandling.Rank := 2;
                 CSItemSeachHandling.Insert;
                 ItemsCounter += 1;
@@ -1658,24 +1735,26 @@ codeunit 6151372 "CS WS"
                 CSItemSeachHandling.Init;
                 CSItemSeachHandling."No." := POSStore.Code;
                 CSItemSeachHandling.Description := POSStore.Name;
-                CSItemSeachHandling."Description 2" := POSStore."Location Code";
+                CSItemSeachHandling."Description 2" := POSStore."Post Code";
                 CSItemSeachHandling.Rank := 3;
                 CSItemSeachHandling.Insert;
                 ItemsCounter += 1;
               end;
             until (POSStore.Next = 0) or (ItemsCounter = MaxItems);
           end;
+        end;
 
+        if (StrLen(Word) <= MaxStrLen(POSStore.City)) then begin
           Clear(POSStore);
-          POSStore.SetFilter("Location Code",'%1','@*' + Word + '*');
+          POSStore.SetFilter(City,'%1','@*' + Word + '*');
           if POSStore.FindSet and (ItemsCounter < MaxItems) then begin
             repeat
               if not CSItemSeachHandling.Get(POSStore.Code) then begin
                 CSItemSeachHandling.Init;
                 CSItemSeachHandling."No." := POSStore.Code;
                 CSItemSeachHandling.Description := POSStore.Name;
-                CSItemSeachHandling."Description 2" := POSStore."Location Code";
-                CSItemSeachHandling.Rank := 4;
+                CSItemSeachHandling."Description 2" := POSStore."Post Code";
+                CSItemSeachHandling.Rank := 5;
                 CSItemSeachHandling.Insert;
                 ItemsCounter += 1;
               end;
@@ -1710,6 +1789,7 @@ codeunit 6151372 "CS WS"
         exit(Result);
     end;
 
+    [Scope('Personalization')]
     procedure GetStoreDataV2(CurrUser: Text;POSStoreCode: Text): Text
     var
         CSStockTakes: Record "CS Stock-Takes";
@@ -1763,8 +1843,13 @@ codeunit 6151372 "CS WS"
             CSStockTakes.SetRange(Location,Location.Code);
             CSStockTakes.SetRange(Closed,0DT);
             CSStockTakes.SetRange("Journal Posted",false);
+            //-NPR5.54 [384506]
+            CSStockTakes.SetRange("Adjust Inventory",true);
+            //+NPR5.54 [384506]
             if CSStockTakes.FindFirst then begin
-              if CSStockTakes."Adjust Inventory" then begin
+              //-NPR5.54 [384506]
+              //IF CSStockTakes."Adjust Inventory" THEN BEGIN
+              //+NPR5.54 [384506]
                 CSStockTakes.TestField("Journal Template Name");
                 CSStockTakes.TestField("Journal Batch Name");
 
@@ -1822,7 +1907,9 @@ codeunit 6151372 "CS WS"
                   CSStockTakes.Modify(true);
 
                 end;
-              end;
+              //-NPR5.54 [384506]
+              //END;
+              //+NPR5.54 [384506]
             end;
           end;
         end;
@@ -1897,6 +1984,15 @@ codeunit 6151372 "CS WS"
               else
                 WriteValue('1');
 
+              //-NPR5.54 [389224]
+              CSSetup.Get;
+              WritePropertyName('BatchSize');
+              if (CSSetup."Batch Size" > 10) and (CSSetup."Batch Size" < 1000) then
+                WriteValue(CSSetup."Batch Size")
+              else
+                WriteValue('10');
+              //-NPR5.54 [389224]
+
             WriteEndObject;
 
           WriteEndArray;
@@ -1910,6 +2006,7 @@ codeunit 6151372 "CS WS"
         exit(Result);
     end;
 
+    [Scope('Personalization')]
     procedure GetStoreDataByStoreUser(CurrUser: Text): Text
     var
         CSStoreUsers: Record "CS Store Users";
@@ -1954,6 +2051,12 @@ codeunit 6151372 "CS WS"
         CSStockTakes.SetRange(Location,POSStore."Location Code");
         CSStockTakes.SetRange(Closed,0DT);
         CSStockTakes.SetRange("Journal Posted",false);
+        //-NPR5.54 [384506]
+        if CSStoreUsers."Adjust Inventory" then
+          CSStockTakes.SetRange("Adjust Inventory",true)
+        else
+          CSStockTakes.SetRange("Adjust Inventory",false);
+        //+NPR5.54 [384506]
         if CSStockTakes.FindFirst then begin
           //-NPR5.53 [375919]
           if CSStockTakes."Adjust Inventory" then begin
@@ -2095,6 +2198,15 @@ codeunit 6151372 "CS WS"
               else
                 WriteValue('1');
 
+              //-NPR5.54 [389224]
+              CSSetup.Get;
+              WritePropertyName('BatchSize');
+              if (CSSetup."Batch Size" > 10) and (CSSetup."Batch Size" < 1000) then
+                WriteValue(CSSetup."Batch Size")
+              else
+                WriteValue('10');
+              //-NPR5.54 [389224]
+
             WriteEndObject;
 
           WriteEndArray;
@@ -2106,6 +2218,254 @@ codeunit 6151372 "CS WS"
         end;
 
         exit(Result);
+    end;
+
+    [Scope('Personalization')]
+    procedure SetRfidTagDataByTypeBatch(StockTakeId: Text;StockTakeConfigCode: Text;WorksheetName: Text;TagIds: Text;"Area": Text;DeviceId: Code[10];BatchId: Text) ResultData: Text
+    var
+        CSStockTakeHandlingRfid: Record "CS Stock-Take Handling Rfid";
+        OK: Boolean;
+        SessionID: Integer;
+        Ostream: OutStream;
+        BigTextData: BigText;
+        ValInt: Integer;
+        ValBool: Boolean;
+        CommaString: DotNet npNetString;
+        Separator: DotNet npNetString;
+        Value: Text;
+        Values: DotNet npNetArray;
+        TagData: Text;
+    begin
+        BigTextData.AddText(TagIds);
+
+        CSStockTakeHandlingRfid.Init;
+        CSStockTakeHandlingRfid.Id := CreateGuid;
+        CSStockTakeHandlingRfid."Batch Id" := BatchId;
+        CSStockTakeHandlingRfid.Created := CurrentDateTime;
+        CSStockTakeHandlingRfid."Created By" := UserId;
+        CSStockTakeHandlingRfid."Request Function" := 'StockTakeRfid';
+        CSStockTakeHandlingRfid."Stock-Take Id" := StockTakeId;
+        CSStockTakeHandlingRfid."Stock-Take Config Code" := StockTakeConfigCode;
+        CSStockTakeHandlingRfid."Worksheet Name" := WorksheetName;
+        case Area of
+          '0' : CSStockTakeHandlingRfid.Area := CSStockTakeHandlingRfid.Area::Warehouse;
+          '1' : CSStockTakeHandlingRfid.Area := CSStockTakeHandlingRfid.Area::Salesfloor;
+          '2' : CSStockTakeHandlingRfid.Area := CSStockTakeHandlingRfid.Area::Stockroom;
+        end;
+        CSStockTakeHandlingRfid."Device Id" := DeviceId;
+        CSStockTakeHandlingRfid."Posting Started" := CurrentDateTime;
+        CSStockTakeHandlingRfid."Request Data".CreateOutStream(Ostream);
+        BigTextData.Write(Ostream);
+
+        CSStockTakeHandlingRfid.Insert(false);
+        Commit;
+
+        CommaString := TagIds;
+        Separator := ',';
+        Values := CommaString.Split(Separator.ToCharArray());
+        CSStockTakeHandlingRfid.Tags := Values.Length;
+        CSStockTakeHandlingRfid.Modify(false);
+        Commit;
+
+        Clear(Ostream);
+        Clear(BigTextData);
+
+        ResultData := '';
+        TagData := '';
+
+        foreach Value in Values do begin
+          if Value <> '' then begin
+            TagData := Value + '|' + SetRfidTagDataByType(CSStockTakeHandlingRfid."Stock-Take Id",
+                                            CSStockTakeHandlingRfid."Stock-Take Config Code",
+                                            CSStockTakeHandlingRfid."Worksheet Name",
+                                            Value,
+                                            Area);
+            if ResultData = '' then
+              ResultData := TagData
+            else
+              ResultData := ResultData + ',' + TagData;
+          end;
+        end;
+
+        CSStockTakeHandlingRfid."Batch Posting" := true;
+        CSStockTakeHandlingRfid."Posting Ended" := CurrentDateTime;
+        CSStockTakeHandlingRfid.Handled := true;
+        CSStockTakeHandlingRfid.Modify(true);
+
+        BigTextData.AddText(ResultData);
+        CSStockTakeHandlingRfid."Response Data".CreateOutStream(Ostream);
+        BigTextData.Write(Ostream);
+        CSStockTakeHandlingRfid.Modify(false);
+        exit(ResultData);
+    end;
+
+    [Scope('Personalization')]
+    procedure CreateStoreRefillDataV2(StockTakeId: Text) Result: Text
+    var
+        CSRefillData: Record "CS Refill Data" temporary;
+        Item: Record Item;
+        ItemGroup: Record "Item Group";
+        MagentoPicture: Record "Magento Picture";
+        MagentoPictureLink: Record "Magento Picture Link";
+        JObject: DotNet npNetJObject;
+        JTokenWriter: DotNet npNetJTokenWriter;
+        CSSetup: Record "CS Setup";
+        CSStockTakes: Record "CS Stock-Takes";
+        CSStockTakesData: Record "CS Stock-Takes Data";
+        CSRefillSectionData: Record "CS Refill Section Data" temporary;
+    begin
+        if not CSSetup.Get then
+          exit;
+
+        if not CSSetup."Enable Capture Service" then
+          exit;
+
+        if not CSStockTakes.Get(StockTakeId) then
+          exit;
+
+        Clear(CSRefillData);
+        Clear(CSRefillSectionData);
+
+        CSStockTakes."Create Refill Data Started" := CurrentDateTime;
+
+        CSStockTakesData.SetRange("Stock-Take Id",CSStockTakes."Stock-Take Id");
+        CSStockTakesData.SetRange(Area,CSStockTakesData.Area::Salesfloor);
+        CSStockTakesData.SetRange("Transferred To Worksheet",false);
+        if CSStockTakesData.FindSet then begin
+          repeat
+            if CSStockTakesData."Item No." <> '' then begin
+              if not CSRefillData.Get(CSStockTakesData."Item No.",CSStockTakesData."Variant Code",CSStockTakes.Location,CSStockTakes."Stock-Take Id") then begin
+                CSStockTakesData.CalcFields("Item Description","Variant Description");
+                CSRefillData.Init;
+                CSRefillData.Validate("Item No.",CSStockTakesData."Item No.");
+                CSRefillData.Validate("Variant Code",CSStockTakesData."Variant Code");
+                CSRefillData.Validate(Location,CSStockTakes.Location);
+                CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
+                CSRefillData."Item Description" := CSStockTakesData."Item Description";
+                CSRefillData."Variant Description" := CSStockTakesData."Variant Description";
+                CSRefillData.Insert(true);
+              end;
+
+              if CSRefillData."Variant Code" <> '' then
+                CSRefillData."Combined key" := CSRefillData."Item No." + '-' + CSRefillData."Variant Code"
+              else
+                CSRefillData."Combined key" := CSRefillData."Item No.";
+
+              CSRefillData."Qty. in Store" += 1;
+
+              CSRefillData.Modify(true);
+
+            end;
+          until CSStockTakesData.Next = 0;
+        end;
+
+        Clear(CSStockTakesData);
+        CSStockTakesData.SetRange("Stock-Take Id",CSStockTakes."Stock-Take Id");
+        CSStockTakesData.SetRange(Area,CSStockTakesData.Area::Stockroom);
+        CSStockTakesData.SetRange("Transferred To Worksheet",false);
+        if CSStockTakesData.FindSet then begin
+          repeat
+            if CSStockTakesData."Item No." <> '' then begin
+              if not CSRefillData.Get(CSStockTakesData."Item No.",CSStockTakesData."Variant Code",CSStockTakes.Location,CSStockTakes."Stock-Take Id") then begin
+                CSStockTakesData.CalcFields("Item Description","Variant Description");
+                CSRefillData.Init;
+                CSRefillData.Validate("Item No.",CSStockTakesData."Item No.");
+                CSRefillData.Validate("Variant Code",CSStockTakesData."Variant Code");
+                CSRefillData.Validate(Location,CSStockTakes.Location);
+                CSRefillData."Stock-Take Id" := CSStockTakes."Stock-Take Id";
+                CSRefillData."Item Description" := CSStockTakesData."Item Description";
+                CSRefillData."Variant Description" := CSStockTakesData."Variant Description";
+                CSRefillData.Insert(true);
+              end;
+
+              if CSRefillData."Variant Code" <> '' then
+                CSRefillData."Combined key" := CSRefillData."Item No." + '-' + CSRefillData."Variant Code"
+              else
+                CSRefillData."Combined key" := CSRefillData."Item No.";
+
+              CSRefillData."Qty. in Stock" += 1;
+
+              CSRefillData.Modify(true);
+            end;
+          until CSStockTakesData.Next = 0;
+        end;
+
+        CSRefillData.SetFilter("Qty. in Store",'>0');
+        CSRefillData.DeleteAll(false);
+        CSRefillData.Reset;
+
+        if CSRefillData.FindFirst then begin
+          repeat
+            if not CSRefillSectionData.Get(CSStockTakesData."Item No.") then begin
+              CSRefillSectionData.Init;
+              CSRefillSectionData.Validate("Item No.",CSRefillData."Item No.");
+              CSRefillSectionData."Item Description" := CSRefillData."Item Description";
+              CSRefillSectionData.Refilled := CSRefillData.Refilled;
+              CSRefillSectionData.Insert(true);
+            end;
+          until CSRefillData.Next = 0;
+        end;
+
+        CSStockTakes."Create Refill Data Ended" := CurrentDateTime;
+        CSStockTakes.Modify;
+
+        JTokenWriter := JTokenWriter.JTokenWriter;
+        with JTokenWriter do begin
+        WriteStartObject;
+
+        WritePropertyName('section');
+        WriteStartArray;
+        if CSRefillSectionData.FindFirst then begin
+          repeat
+            WriteStartObject;
+            WritePropertyName('key');
+            WriteValue(CSRefillSectionData."Item No.");
+            WritePropertyName('title');
+            WriteValue(CSRefillSectionData."Item Description");
+            WritePropertyName('itemgroup');
+            WriteValue('');
+            WritePropertyName('marked');
+            WriteValue(CSRefillSectionData.Refilled);
+            WriteEndObject;
+          until CSRefillSectionData.Next = 0;
+        end;
+        WriteEndArray;
+
+        WritePropertyName('item');
+        WriteStartArray;
+        if CSRefillData.FindFirst then begin
+          repeat
+            WriteStartObject;
+            WritePropertyName('key');
+            WriteValue(CSRefillData."Combined key");
+            WritePropertyName('title');
+            WriteValue(CSRefillData."Item Description");
+            WritePropertyName('itemno');
+            WriteValue(CSRefillData."Item No.");
+            WritePropertyName('variantcode');
+            WriteValue(CSRefillData."Variant Code");
+            WritePropertyName('varianttitle');
+            WriteValue(CSRefillData."Variant Description");
+            WritePropertyName('itemgroup');
+            WriteValue(CSRefillData."Item Group Code");
+            WritePropertyName('imageurl');
+            WriteValue(CSRefillData."Image Url");
+            WritePropertyName('qtystock');
+            WriteValue(CSRefillData."Qty. in Stock");
+            WritePropertyName('qtystore');
+            WriteValue(CSRefillData."Qty. in Store");
+            WritePropertyName('marked');
+            WriteValue(CSRefillData.Refilled);
+            WriteEndObject;
+          until CSRefillData.Next = 0;
+        end;
+        WriteEndArray;
+
+        WriteEndObject;
+        JObject := Token;
+        end;
+
+        Result := JObject.ToString();
     end;
 }
 

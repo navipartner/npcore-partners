@@ -2,6 +2,8 @@ page 6151386 "CS Stock-Takes Card"
 {
     // NPR5.50/CLVA/20190304  CASE 332844 Object created
     // NPR5.52/CLVA/20190905  CASE 364063 Added field "Journal Template Name","Journal Batch Name","Inventory Calculated" and "Journal Qty. (Calculated)"
+    // NPR5.54/CLVA/20200217  CASE 391080 Added fields "Unknown Entries" and "Manuel Posting". Added action "Tag Data"
+    // NPR5.54/CLVA/20200225  CASE 392901 Added action "Update Predicted Qty."
 
     Caption = 'CS Stock-Takes Card';
     DelayedInsert = false;
@@ -48,10 +50,22 @@ page 6151386 "CS Stock-Takes Card"
                 field("Journal Batch Name";"Journal Batch Name")
                 {
                 }
+                field("Journal Posted";"Journal Posted")
+                {
+                }
                 field("Inventory Calculated";"Inventory Calculated")
                 {
                 }
                 field("Predicted Qty.";"Predicted Qty.")
+                {
+                }
+                field("Unknown Entries";"Unknown Entries")
+                {
+                }
+                field("Manuel Posting";"Manuel Posting")
+                {
+                }
+                field("Adjust Inventory";"Adjust Inventory")
                 {
                 }
                 field(Note;Note)
@@ -143,6 +157,13 @@ page 6151386 "CS Stock-Takes Card"
                     //+NPR5.52 [364063]
                 end;
             }
+            action("Tag Data")
+            {
+                Caption = 'Tag Data';
+                Image = DataEntry;
+                RunObject = Page "CS Stock-Takes Data List";
+                RunPageLink = "Stock-Take Id"=FIELD("Stock-Take Id");
+            }
             group(Overview)
             {
                 Caption = 'Overview';
@@ -165,60 +186,73 @@ page 6151386 "CS Stock-Takes Card"
             group(Process)
             {
                 Caption = 'Process';
-                Visible = false;
-                action("1. Close Stockroom")
+                action("Update Predicted Qty.")
                 {
-                    Caption = '1. Close Stockroom';
+                    Caption = 'Update Predicted Qty.';
+
+                    trigger OnAction()
+                    var
+                        CalcItemJournalLine: Record "Item Journal Line";
+                        QtyCalculated: Decimal;
+                    begin
+                        if "Journal Posted" then
+                          exit;
+
+                        QtyCalculated := 0;
+                        Clear(CalcItemJournalLine);
+                        CalcItemJournalLine.SetRange("Journal Template Name","Journal Template Name");
+                        CalcItemJournalLine.SetRange("Journal Batch Name","Journal Batch Name");
+                        CalcItemJournalLine.SetRange("Location Code",Location);
+                        if CalcItemJournalLine.FindSet then begin
+                          repeat
+                            QtyCalculated += CalcItemJournalLine."Qty. (Calculated)"
+                          until CalcItemJournalLine.Next = 0;
+                        end;
+
+                        if Confirm(StrSubstNo(Txt001,Rec."Predicted Qty.",QtyCalculated),true) then begin
+                          "Predicted Qty." := QtyCalculated;
+                          Modify;
+                        end;
+                    end;
+                }
+                action("Set Manuel Posting")
+                {
+                    Caption = 'Set Manuel Posting';
+                    Image = Add;
+
+                    trigger OnAction()
+                    begin
+                        if "Journal Posted" then
+                          exit;
+
+                        "Manuel Posting" := true;
+                        Modify;
+                    end;
+                }
+                action("Remove Posting Flag")
+                {
+                    Caption = 'Remove Posting Flag';
+                    Image = ReOpen;
+
+                    trigger OnAction()
+                    begin
+                        if "Journal Posted" then begin
+                          "Journal Posted" := false;
+                          Modify;
+                        end;
+                    end;
+                }
+                action("Set Posting Flag")
+                {
+                    Caption = 'Set Posting Flag';
                     Image = Close;
 
                     trigger OnAction()
-                    var
-                        CSWS: Codeunit "CS WS";
                     begin
-                        CSWS.CloseCounting("Stock-Take Id",'STOCKROOM');
-                    end;
-                }
-                action("2. Close Sales Floor")
-                {
-                    Caption = '2. Close Sales Floor';
-                    Image = Close;
-
-                    trigger OnAction()
-                    var
-                        CSWS: Codeunit "CS WS";
-                    begin
-                        CSWS.CloseCounting("Stock-Take Id",'SALESFLOOR');
-                    end;
-                }
-                action("3. Approve Counting")
-                {
-                    Caption = '3. Approve Counting';
-                    Image = Approve;
-
-                    trigger OnAction()
-                    var
-                        CSWS: Codeunit "CS WS";
-                    begin
-                        CSWS.ApproveCounting("Stock-Take Id");
-                    end;
-                }
-                action("4. View Refill Suggestions")
-                {
-                    Caption = '4. View Refill Suggestions';
-                    Image = View;
-                    RunObject = Page "CS Refill Data";
-                    RunPageLink = "Stock-Take Id"=FIELD("Stock-Take Id");
-                }
-                action("5. Close Refill")
-                {
-                    Caption = '5. Close Refill';
-                    Image = Close;
-
-                    trigger OnAction()
-                    var
-                        CSWS: Codeunit "CS WS";
-                    begin
-                        CSWS.CloseRefill("Stock-Take Id");
+                        if not "Journal Posted" then begin
+                          "Journal Posted" := true;
+                          Modify;
+                        end;
                     end;
                 }
             }
@@ -227,5 +261,6 @@ page 6151386 "CS Stock-Takes Card"
 
     var
         CSHelperFunctions: Codeunit "CS Helper Functions";
+        Txt001: Label 'Update Predicted Qty. from %1 to %2';
 }
 

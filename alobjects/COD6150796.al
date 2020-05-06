@@ -7,6 +7,7 @@ codeunit 6150796 "POS Action - Delete POS Line"
     // NPR5.46/TSA /20180914  CASE 314603 Refactored the security functionality to use secure methods
     // NPR5.48/MHA /20181121  CASE 330181 Added function DeleteAccessories()
     // NPR5.53/TJ  /20191021  CASE 373234 Added new publisher OnBeforeDeleteSaleLinePOS()
+    // NPR5.54/TSA /20200205 CASE 387912 Made OnBeforeDeleteSaleLinePOS() public
 
 
     trigger OnRun()
@@ -145,7 +146,7 @@ codeunit 6150796 "POS Action - Delete POS Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeDeleteSaleLinePOS(POSSaleLine: Codeunit "POS Sale Line")
+    procedure OnBeforeDeleteSaleLinePOS(POSSaleLine: Codeunit "POS Sale Line")
     begin
     end;
 }

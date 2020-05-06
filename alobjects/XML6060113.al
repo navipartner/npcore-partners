@@ -8,8 +8,9 @@ xmlport 6060113 "TM Admission Capacity Check"
     // TM1.41/TSA/20190527  CASE 353981 Transport TM1.41 - 27 May 2019
     // TM1.45/TSA /20191121 CASE 378339 Added Sales and Event Arrival cut-off dates and times
     // TM1.45/TSA /20191210 CASE 380754 Added filter by admission code to get the current schedules and added some for data to response, including waitinglist info
+    // TM90.1.46/TSA /20200203 CASE 387877 Added admission code and schedule code for easier grouping
 
-    Caption = 'TM Admission Capacity Check';
+    Caption = 'Admission Capacity Check';
     Encoding = UTF8;
     FormatEvaluate = Xml;
     UseDefaultNamespace = true;
@@ -49,6 +50,12 @@ xmlport 6060113 "TM Admission Capacity Check"
                 {
                     XmlName = 'admission_schedule_entry';
                     UseTemporary = true;
+                    fieldattribute(admission_code;TmpAdmScheduleEntryResponse."Admission Code")
+                    {
+                    }
+                    fieldattribute(schedule_code;TmpAdmScheduleEntryResponse."Schedule Code")
+                    {
+                    }
                     fieldattribute(external_entry_no;TmpAdmScheduleEntryResponse."External Schedule Entry No.")
                     {
                     }

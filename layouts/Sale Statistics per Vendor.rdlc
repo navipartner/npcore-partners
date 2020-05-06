@@ -1285,7 +1285,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=Fields!Net_Change_Item.Value</Value>
+                                                    <Value EvaluationMode="Auto">=Fields!Inventory.Value</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
                                                       <Format>=Fields!Net_Change_ItemFormat.Value</Format>
@@ -1812,7 +1812,7 @@
                                               <Paragraph>
                                                 <TextRuns>
                                                   <TextRun>
-                                                    <Value>=SUM(Fields!Net_Change_Item.Value)</Value>
+                                                    <Value EvaluationMode="Auto">=SUM(Fields!Inventory.Value)</Value>
                                                     <Style>
                                                       <FontSize>6pt</FontSize>
                                                       <FontWeight>Normal</FontWeight>
@@ -2471,7 +2471,7 @@
                                   <TablixMember>
                                     <Group Name="Details" />
                                     <Visibility>
-                                      <Hidden>=iif(First(Fields!OnlyTotal.Value, "DataSet_Result")=FALSE,FALSE,TRUE)</Hidden>
+                                      <Hidden>=iif(First(Fields!OnlyTotal.Value, "DataSet_Result")=FALSE,FALSE,TRUE) Or (Fields!Avoid0Sales.Value AND Fields!Inventory.Value = 0 AND Fields!SalesQty_Item.Value =0)</Hidden>
                                     </Visibility>
                                   </TablixMember>
                                   <TablixMember>
@@ -3607,6 +3607,9 @@ End Function
         <Field Name="Name_Vendor">
           <DataField>Name_Vendor</DataField>
         </Field>
+        <Field Name="Avoid0Sales">
+          <DataField>Avoid0Sales</DataField>
+        </Field>
         <Field Name="InventoryDate">
           <DataField>InventoryDate</DataField>
         </Field>
@@ -3690,6 +3693,12 @@ End Function
         </Field>
         <Field Name="SpeedFormat">
           <DataField>SpeedFormat</DataField>
+        </Field>
+        <Field Name="Inventory">
+          <DataField>Inventory</DataField>
+        </Field>
+        <Field Name="InventoryFormat">
+          <DataField>InventoryFormat</DataField>
         </Field>
         <Field Name="AvgInventory">
           <DataField>AvgInventory</DataField>

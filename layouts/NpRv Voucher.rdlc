@@ -204,6 +204,15 @@ End Function
         <Field Name="IssueUserID_NpRvVoucher">
           <DataField>IssueUserID_NpRvVoucher</DataField>
         </Field>
+        <Field Name="StartingDate_DateFormat">
+          <DataField>StartingDate_DateFormat</DataField>
+        </Field>
+        <Field Name="EndingDate_DateFormat">
+          <DataField>EndingDate_DateFormat</DataField>
+        </Field>
+        <Field Name="IssuedDate_DateFormat">
+          <DataField>IssuedDate_DateFormat</DataField>
+        </Field>
       </Fields>
       <Query>
         <DataSourceName>DataSource</DataSourceName>

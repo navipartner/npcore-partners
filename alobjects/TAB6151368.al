@@ -1,6 +1,7 @@
 table 6151368 "CS Rfid Header"
 {
     // NPR5.53/CLVA  /20191121  CASE 377563 Object created - NP Capture Service
+    // NPR5.54/CLVA  /20200120  CASE 379709 Added fields Closed,Location,"Transferred To","Transferred to Doc","Transferred Date" and "Transferred By"
 
     Caption = 'CS Rfid Data By Document';
 
@@ -35,6 +36,32 @@ table 6151368 "CS Rfid Header"
         {
             Caption = 'Predicted Qty.';
             Editable = false;
+        }
+        field(13;Closed;DateTime)
+        {
+            Caption = 'Closed';
+        }
+        field(14;Location;Code[10])
+        {
+            Caption = 'Location';
+        }
+        field(15;"Transferred To";Option)
+        {
+            Caption = 'Transferred To';
+            OptionCaption = ',Sales Order,Whse. Receipt,Transfer Order';
+            OptionMembers = ,"Sales Order","Whse. Receipt","Transfer Order";
+        }
+        field(16;"Transferred to Doc";Code[20])
+        {
+            Caption = 'Transferred to Doc';
+        }
+        field(17;"Transferred Date";DateTime)
+        {
+            Caption = 'Transferred Date';
+        }
+        field(18;"Transferred By";Code[20])
+        {
+            Caption = 'Transferred By';
         }
     }
 

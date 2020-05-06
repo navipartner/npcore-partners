@@ -24,6 +24,7 @@ codeunit 6150704 "POS Front End Management"
     // NPR5.50/VB  /20181223 CASE 338666 Supporting Workflows 2.0
     // NPR5.51/VB  /20190719  CASE 352582 POS Administrative Templates feature
     // NPR5.53/VB  /20190917  CASE 362777 Support for workflow sequencing (configuring/registering "before" and "after" workflow sequences that execute before or after another workflow)
+    // NPR5.54/MMV /20200305 CASE 364340 Added mock constructor.
 
 
     var
@@ -55,6 +56,7 @@ codeunit 6150704 "POS Front End Management"
         Text013: Label 'A method call was made on an uninitialized instance of the POS Front End Management codeunit, that requires an active and initialized instance to succeed.';
         Text014: Label 'A generic front-end method call was made without method context.';
         Text015: Label 'A function that requires Workflow 2.0 engine to be initialized has been invoked from a Workflow 1.0 action.';
+        IsMock: Boolean;
 
     [Scope('Personalization')]
     procedure Initialize(TranscendenceIn: ControlAddIn Transcendence; SessionIn: Codeunit "POS Session")
@@ -73,6 +75,21 @@ codeunit 6150704 "POS Front End Management"
         // The following variable is used only in debugging sessions to indicate whether this instance of the codeunit has actually
         // been initialized. There is no other purpose to this variable, but it is absolutely indispensable for debugging purposes.
         Initialized := true;
+    end;
+
+    procedure MockInitialize(SessionIn: Codeunit "POS Session")
+    begin
+        //-NPR5.54 [364340]
+        POSSession := SessionIn;
+
+        RegisteredWorkflows := RegisteredWorkflows.List();
+        WorkflowStack := WorkflowStack.Stack();
+        ActionStack := ActionStack.Stack();
+        QueuedWorkflows := QueuedWorkflows.List;
+
+        IsMock := true;
+        Initialized := true;
+        //+NPR5.54 [364340]
     end;
 
     local procedure IsActiveSession(): Boolean
@@ -200,7 +217,11 @@ codeunit 6150704 "POS Front End Management"
 
     local procedure MakeSureFrameworkIsAvailable(WithError: Boolean): Boolean
     begin
-        if not Initialized then
+        //-NPR5.54 [364340]
+        if IsMock then
+          exit(true);
+        //+NPR5.54 [364340]
+
             if IsActiveSession() then
                 exit(true);
 
@@ -215,7 +236,11 @@ codeunit 6150704 "POS Front End Management"
 
     local procedure MakeSureFrameworkIsAvailableIn20(WithError: Boolean): Boolean
     begin
-        //-NPR5.50 [338666]
+        //-NPR5.54 [364340]
+        if IsMock then
+          exit(true);
+        //+NPR5.54 [364340]
+
         if WorkflowID = 0 then begin
             if WithError then
                 Error(GetBugErrorMessage(Text015))
@@ -224,12 +249,15 @@ codeunit 6150704 "POS Front End Management"
         end;
 
         exit(MakeSureFrameworkIsAvailable(WithError));
-        //+NPR5.50 [338666]
     end;
 
     local procedure MakeSureFrameworkfIsInitialized()
     begin
-        if (not Initialized) then
+        //-NPR5.54 [364340]
+        if IsMock then
+          exit;
+        //+NPR5.54 [364340]
+
             ReportBug(Text013);
     end;
 
@@ -249,18 +277,13 @@ codeunit 6150704 "POS Front End Management"
         if RegisteredWorkflows.Contains(Name) then
             exit;
 
-        //-NPR5.40 [306347]
-        //IF NOT POSAction.GET(Name) THEN
         if not POSSession.RetrieveSessionAction(Name, POSAction) then
-            //+NPR5.40 [306347]
             ReportBug(StrSubstNo(Text006, Name));
 
         Button."Action Type" := Button."Action Type"::Action;
         Button."Action Code" := POSAction.Code;
-        //-NPR5.42 [314128]
-        //Button.GetAction(WorkflowAction,POSSession,STRSUBSTNO(Text007,Name),POSParameterValue,POSActionParameter);
         Button.GetAction(WorkflowAction, POSSession, StrSubstNo(Text007, Name), POSParameterValue);
-        //+NPR5.42 [314128]
+
         ConfigureReusableWorkflow(WorkflowAction);
     end;
 
@@ -305,9 +328,7 @@ codeunit 6150704 "POS Front End Management"
     var
         ViewType: DotNet npNetViewType0;
     begin
-        //-NPR5.37 [293905]
         SetView(ViewType.Locked, Setup);
-        //+NPR5.37 [293905]
     end;
 
     local procedure "---Front-End Methods---"()
@@ -320,43 +341,32 @@ codeunit 6150704 "POS Front End Management"
         ServerStopwatch: Text;
         JRequest: JsonObject;
     begin
-        //-NPR5.40 [306347]
-        //-NPR5.43 [315838]
-        //Request.Content.Add('debug_trace',POSSession.DebugFlush());
+        //-NPR5.54 [364340]
+        if IsMock then
+          exit;
+        //+NPR5.54 [364340]
+
         DebugTrace := POSSession.DebugFlush();
         if DebugTrace <> '' then
-            //-NPR5.45 [315838]
-            //  Request.Content.Add('debug_trace',DebugTrace);
             Trace(Request, 'debug_trace', DebugTrace);
-        //+NPR5.45 [315838]
 
         ServerStopwatch := POSSession.ServerStopwatchFlush();
         if ServerStopwatch <> '' then
-            //-NPR5.45 [315838]
-            //  Request.Content.Add('server_stopwatch',ServerStopwatch);
             Trace(Request, 'server_stopwatch', ServerStopwatch);
-        //+NPR5.45 [315838]
-        //+NPR5.43 [315838]
 
         JRequest.ReadFrom(Request.ToJsonString());
         Transcendence.InvokeFrontEndAsync(JRequest);
-        //+NPR5.40 [306347]
     end;
 
     [Scope('Personalization')]
     procedure InvokeFrontEndMethod(Request: DotNet npNetJsonRequest)
     begin
-        //-NPR5.38 [255773]
         MakeSureFrameworkIsAvailable(true);
 
         if IsNull(Request) then
             ReportBug(Text014);
 
-        //-NPR5.40 [306347]
-        //Framework.InvokeFrontEndAsync(Request);
         InvokeFrontEndAsync(Request);
-        //+NPR5.40 [306347]
-        //+NPR5.38 [255773]
     end;
 
     [Scope('Personalization')]
@@ -371,10 +381,7 @@ codeunit 6150704 "POS Front End Management"
             ErrorObject := GetLastErrorObject;
             if not IsNull(ErrorObject) then
                 Request.StoreLastErrorObjectInfo(GetLastErrorObject);
-            //-NPR5.40 [306347]
-            //  Framework.InvokeFrontEndAsync(Request);
             InvokeFrontEndAsync(Request);
-            //+NPR5.40 [306347]
 
             // Error must be thrown now, and transaction aborted and rolled back. It is mandatory.
             // DO NOT change this behavior.
@@ -394,10 +401,8 @@ codeunit 6150704 "POS Front End Management"
             Request.Content.Add('warning', true);
             if WithError then
                 Request.Content.Add('withError', true);
-            //-NPR5.40 [306347]
-            //  Framework.InvokeFrontEndAsync(Request);
+
             InvokeFrontEndAsync(Request);
-            //+NPR5.40 [306347]
             if WithError then
                 Error(ErrorText);
         end else begin

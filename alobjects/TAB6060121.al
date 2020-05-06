@@ -15,6 +15,7 @@ table 6060121 "TM Ticket Admission BOM"
     // TM1.42/TSA /20190411 CASE 351050 Added field "Revisit Condition (Statistics)"
     // TM1.45/TSA /20191120 CASE 378212 Added Sales cut-off dates
     // TM1.45/TSA /20191216 CASE 382535 Added "Admission Inclusion", "Admission Unit Price"
+    // TM90.1.46/TSA /20200127 CASE 387138 Added "Publish Ticket URL"
 
     Caption = 'Ticket Admission BOM';
 
@@ -155,6 +156,27 @@ table 6060121 "TM Ticket Admission BOM"
             Caption = 'eTicket Type Code';
             Description = '//-TM1.38 [332109]';
         }
+        field(95;"Publish Ticket URL";Option)
+        {
+            Caption = 'Publish Ticket URL';
+            OptionCaption = 'Disable,Publish,Publish & Send';
+            OptionMembers = DISABLE,PUBLISH,SEND;
+
+            trigger OnValidate()
+            var
+                Item: Record Item;
+                TicketType: Record "TM Ticket Type";
+            begin
+
+                //-TM90.1.46 [387138]
+                if ("Publish Ticket URL" >= "Publish Ticket URL"::PUBLISH) then begin
+                  Item.Get ("Item No.");
+                  TicketType.Get (Item."Ticket Type");
+                  TicketType.TestField (TicketType."DIY Print Layout Code");
+                end;
+                //+TM90.1.46 [387138]
+            end;
+        }
         field(100;"Admission Description";Text[50])
         {
             Caption = 'Admission Description';
@@ -189,17 +211,17 @@ table 6060121 "TM Ticket Admission BOM"
     {
     }
 
+    local procedure UpdateItemDescription()
     var
         Item: Record Item;
-        Admission: Record "TM Admission";
-
-    local procedure UpdateItemDescription()
     begin
         if (Item.Get ("Item No.")) then
           Description := Item.Description;
     end;
 
     local procedure UpdateAdmissionDescription()
+    var
+        Admission: Record "TM Admission";
     begin
         if (Admission.Get ("Admission Code")) then
           "Admission Description" := Admission.Description;

@@ -23,6 +23,7 @@ table 6060124 "MM Membership Setup"
     // #314131/TSA /20180517 CASE 314131 Added field "Activate NP Pass Integration"
     // MM1.32/TSA/20180725  CASE 318132 Transport MM1.32 - 25 July 2018
     // MM1.36/TSA /20181126 CASE 337110 Added Ticket Print option on member card swipe
+    // MM1.43/TSA /20200317 CASE 337112 Changed spelling, "Ticket Print Model"::CONDENSED
 
     Caption = 'Membership Setup';
     DrillDownPageID = "MM Membership Setup";
@@ -172,8 +173,8 @@ table 6060124 "MM Membership Setup"
         field(41;"Ticket Print Model";Option)
         {
             Caption = 'Ticket Print Model';
-            OptionCaption = 'Individual,Condenced';
-            OptionMembers = INDIVIDUAL,CONDENCED;
+            OptionCaption = 'Individual,Condensed';
+            OptionMembers = INDIVIDUAL,CONDENSED;
         }
         field(42;"Ticket Print Object Type";Option)
         {

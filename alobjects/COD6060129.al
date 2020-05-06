@@ -42,7 +42,9 @@ codeunit 6060129 "MM Member WebService Mgr"
     // MM1.42/TSA /20191205 CASE  Added notification method
     // MM1.42/TSA /20191210 CASE 381356 Correct VAT calculation for membership amount
     // MM1.42/TSA /20191212 CASE 382170 General enhancements
-    // #382728/TSA /20191231 CASE 382728 Added GetSetMemberCommunicationOption service
+    // MM1.42/TSA /20191231 CASE 382728 Added GetSetMemberCommunicationOption service
+    // MM1.43/TSA /20200130 CASE 386080 Added customer no and contact no to membership info for pre-assign customers/contacts
+    // MM1.43/TSA /20200226 CASE 392659 Added finalization for sponsorship tickets
 
     TableNo = "Nc Import Entry";
 
@@ -240,6 +242,7 @@ codeunit 6060129 "MM Member WebService Mgr"
         MembershipEntry: Record "MM Membership Entry";
         Item: Record Item;
         SalesHeader: Record "Sales Header";
+        SponsorshipTicketMgmt: Codeunit "MM Sponsorship Ticket Mgmt.";
         TargetDocumentId: Text[100];
     begin
 
@@ -277,6 +280,10 @@ codeunit 6060129 "MM Member WebService Mgr"
           MembershipEntry."Amount Incl VAT" := MemberInfoCapture."Amount Incl VAT";
 
         MembershipEntry.Modify();
+
+        //-MM1.43 [392659]
+        SponsorshipTicketMgmt.OnMembershipPayment  (MembershipEntry);
+        //+MM1.43 [392659]
 
         exit(true);
         //+MM1.26 [305631]
@@ -1131,6 +1138,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         //-MM1.41 [359703]
         MemberInfoCapture."Company Name" := NpXmlDomMgt.GetXmlText (XmlElement, 'companyname', MaxStrLen (MemberInfoCapture."Company Name"), false);
         //+MM1.41 [359703]
+
+        //-MM1.43 [386080]
+        MemberInfoCapture."Customer No." := NpXmlDomMgt.GetXmlText (XmlElement, 'preassigned_customer_number', MaxStrLen (MemberInfoCapture."Customer No."), false);
+        //+MM1.43 [386080]
     end;
 
     local procedure GetXmlMembershipMemberInfo(XmlElement: DotNet npNetXmlElement;var MemberInfoCapture: Record "MM Member Info Capture")
@@ -1262,6 +1273,10 @@ codeunit 6060129 "MM Member WebService Mgr"
         MemberInfoCapture."Member Card Type" := MemberInfoCapture."Member Card Type"::NONE;
         //+MM1.32 [318132]
 
+        //-MM1.43 [386080]
+        MemberInfoCapture."Customer No." := NpXmlDomMgt.GetXmlText (XmlElement, 'preassigned_customer_number', MaxStrLen (MemberInfoCapture."Customer No."), false);
+        MemberInfoCapture."Contact No." := NpXmlDomMgt.GetXmlText (XmlElement, 'preassigned_contact_number', MaxStrLen (MemberInfoCapture."Contact No."), false);
+        //+MM1.43 [386080]
 
         MemberInfoCapture.Insert ();
     end;

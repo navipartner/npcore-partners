@@ -4,6 +4,7 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
     // TM1.26/TSA /20171122  CASE 285601-01 Transport TM1.26 - 22 November 2017
     // TM1.27/TSA /20171218 CASE 300395 Added setup Timeout (ms)
     // TM1.43/TSA /20191004 CASE 367471 refactored signatures to return fault message
+    // TM90.1.46/TSA /20200127 CASE 387138 Added CheckPublishTicketUrl(), CheckSendTicketUrl(), PublishTicketUrl(), SendTicketUrl()
     // 
     // 
     // *** TICKET SERVER setup ***
@@ -27,6 +28,75 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
             Error(FailReason);
 
         Message('Ok (%1)', FailReason);
+    end;
+
+    var
+        GEN_NOT_ISSUE: Label 'There was a problem creating the notification entry.';
+
+    procedure CheckPublishTicketUrl(TicketNo: Code[20]): Boolean
+    var
+        Ticket: Record "TM Ticket";
+        TicketBOM: Record "TM Ticket Admission BOM";
+    begin
+
+        //-TM90.1.46 [387138]
+        if (not Ticket.Get (TicketNo)) then
+          exit (false);
+
+        TicketBOM.SetFilter ("Item No.", '=%1', Ticket."Item No.");
+        TicketBOM.SetFilter ("Publish Ticket URL", '>=%1', TicketBOM."Publish Ticket URL"::PUBLISH);
+        exit (not TicketBOM.IsEmpty);
+        //+TM90.1.46 [387138]
+    end;
+
+    procedure PublishTicketUrl(TicketNo: Code[20];var ResponseMessage: Text): Boolean
+    var
+        Ticket: Record "TM Ticket";
+    begin
+
+        //-TM90.1.46 [387138]
+        if (not Ticket.Get (TicketNo)) then
+          exit (false);
+
+        exit (GenerateTicketPrint (Ticket."Ticket Reservation Entry No.", true, ResponseMessage));
+        //+TM90.1.46 [387138]
+    end;
+
+    procedure CheckSendTicketUrl(TicketNo: Code[20]): Boolean
+    var
+        Ticket: Record "TM Ticket";
+        TicketBOM: Record "TM Ticket Admission BOM";
+    begin
+
+        //-TM90.1.46 [387138]
+        if (not Ticket.Get (TicketNo)) then
+          exit (false);
+
+        TicketBOM.SetFilter ("Item No.", '=%1', Ticket."Item No.");
+        TicketBOM.SetFilter ("Publish Ticket URL", '=%1', TicketBOM."Publish Ticket URL"::SEND);
+        exit (not TicketBOM.IsEmpty);
+        //+TM90.1.46 [387138]
+    end;
+
+    procedure SendTicketUrl(TicketNo: Code[20];var ResponseMessage: Text): Boolean
+    var
+        TicketNotificationEntry: Record "TM Ticket Notification Entry";
+        NotifyParticipant: Codeunit "TM Ticket Notify Participant";
+        EntryNo: Integer;
+    begin
+
+        EntryNo := NotifyParticipant.CreateDiyPrintNotification (TicketNo);
+        if (EntryNo = 0) then begin
+          ResponseMessage := GEN_NOT_ISSUE;
+          exit (false);
+        end;
+
+        TicketNotificationEntry.SetFilter ("Entry No.", '=%1', EntryNo);
+        NotifyParticipant.SendGeneralNotification (TicketNotificationEntry);
+
+        if (TicketNotificationEntry.Get (EntryNo)) then ;
+        ResponseMessage := TicketNotificationEntry."Failed With Message";
+        exit (ResponseMessage = '');
     end;
 
     procedure GenerateTicketPrint(EntryNo: Integer; MarkTicketAsPrinted: Boolean; var FailReasonText: Text): Boolean
@@ -313,7 +383,7 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
         TempBlob: Record TempBlob temporary;
         OutStr: OutStream;
         TicketTicketServerRequest: XMLport "TM Ticket TicketServer Request";
-        InsStr: InStream;
+        InStr: InStream;
     begin
 
         TempBlob.Insert();
@@ -333,8 +403,8 @@ codeunit 6060113 "TM Ticket DIY Ticket Print"
         if (not TempBlob.Blob.HasValue()) then
             Error('XML generation failed for token %1', Token);
 
-        TempBlob.Blob.CreateInStream(InsStr, TEXTENCODING::UTF8);
-        InsStr.Read(XmlText);
+        TempBlob.Blob.CreateInStream (InStr, TEXTENCODING::UTF8);
+        InStr.Read (XmlText);
 
         Clear(XmlDoc);
         XmlDoc := XmlDoc.XmlDocument;

@@ -5,6 +5,7 @@ report 6014420 "Item Group Top"
     //                                     Corrected the ShowQty and rdlc layout
     // NPR5.38/JLK /20180124  CASE 300892 Removed AL Error on obsolite property CurrReport_PAGENO
     // NPR5.39/JLK /20180219  CASE 300892 Removed warning/error from AL
+    // NPR5.54/YAHA/20200324  CASE 394883 Removed footer NaviPartner  text
     DefaultLayout = RDLC;
     RDLCLayout = './layouts/Item Group Top.rdlc';
 

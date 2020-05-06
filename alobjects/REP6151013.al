@@ -2,6 +2,7 @@ report 6151013 "NpRv Voucher"
 {
     // NPR5.48/MHA /20190123  CASE 341711 Object created
     // NPR5.53/MHA /20191211  CASE 380284 Added field 76 "Initial Amount"
+    // NPR5.54/BHR /20190612  CASE 357298 Add Formatted Date to be use on word format
     RDLCLayout = './layouts/NpRv Voucher.rdlc';
     WordLayout = './layouts/NpRv Voucher.docx';
 
@@ -147,6 +148,22 @@ report 6151013 "NpRv Voucher"
             column(IssueUserID_NpRvVoucher; "NpRv Voucher"."Issue User ID")
             {
             }
+            column(StartingDate_DateFormat;StartingDate)
+            {
+            }
+            column(EndingDate_DateFormat;EndingDate)
+            {
+            }
+            column(IssuedDate_DateFormat;IssuedDate)
+            {
+            }
+
+            trigger OnAfterGetRecord()
+            begin
+                Evaluate(StartingDate,Format(DT2Date("NpRv Voucher"."Starting Date")));
+                Evaluate(EndingDate,Format(DT2Date("NpRv Voucher"."Ending Date")));
+                Evaluate(IssuedDate,Format("NpRv Voucher"."Issue Date"));
+            end;
         }
     }
 
@@ -165,5 +182,10 @@ report 6151013 "NpRv Voucher"
     labels
     {
     }
+
+    var
+        IssuedDate: Text;
+        StartingDate: Text;
+        EndingDate: Text;
 }
 
