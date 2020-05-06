@@ -1,0 +1,11 @@
+{
+    "name": "Global ruleset",
+    "description": "These rules must be respected by all the AL code written within the company.",
+    "rules": [
+        {
+            "id": "AS0016",
+            "action": "Warning",
+            "justification": "Since we're targeting internal, ApplicationArea is not yet mandatory. "
+        }
+    ]
+}
