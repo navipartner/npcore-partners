@@ -14,6 +14,7 @@ jobs:
     serverInstanceName: NAV
     containerAdminUsername: admin
     containerAdminPassword: P@ssword1
+    licenseFilePath: 'Devops\BC 140 Developer.flf'
     scriptsRepo: ScriptsRepo
     dependancyPackages:
       - type: NuGet
