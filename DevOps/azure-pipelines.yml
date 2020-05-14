@@ -17,8 +17,6 @@ jobs:
     licenseFilePath: 'Devops\BC 140 Developer.flf'
     scriptsRepo: ScriptsRepo
     dependancyPackages:
-      - type: NuGet
-        feed: NprAddIns
-        definition: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
-        version: 5.54.0
-    appFeed: NpCore/NaviPartner.NPCore.BC
+      - source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
+        id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
+    appNuGetSource: https://pkgs.dev.azure.com/navipartner/NpCore/_packaging/NaviPartner.NPCore.BC/nuget/v3/index.json
