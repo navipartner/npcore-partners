@@ -1,0 +1,33 @@
+trigger: none
+
+resources:
+  repositories:
+  - repository: scriptsRepo
+    type: git
+    name:  'NpCore/NpDevOps'
+    ref: 'refs/heads/master'  
+
+pool:
+  name: NP Deployment
+  demands: 
+  - docker
+  # Now only 2019 is available but in the future it will be every newer version.
+  # Then we will probably remove this requirement as it will alwyas TRUE.
+  - com.navipartner.docker.osversion -equals 2019
+
+jobs:
+- template: YAML/Templates/Job/BuildALApp.yml@scriptsRepo
+  parameters:
+    containerImageName: ### Specify BC 16 onprem image mcr.microsoft.com/businesscentral/onprem:1904-w1-ltsc2019
+    containerName: Build-$(Build.BuildId)
+    serverInstanceName: NAV
+    containerAdminUsername: admin
+    containerAdminPassword: P@ssword1
+    licenseSecureFileName: ### Specify BC 16 dev license 'BC 140 Developer.flf'
+    scriptsRepo: ScriptsRepo
+    dependancyPackages:
+      - source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
+        id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
+    appNuGetSource: #Create and specify V16 NuGet feed https://pkgs.dev.azure.com/navipartner/NpCore/_packaging/NaviPartner.NPCore.BC/nuget/v3/index.json
+    versionVariableName: 'LastUsedVerNo'
+    versionRevisionSeed: 9000
