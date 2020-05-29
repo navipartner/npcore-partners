@@ -18,16 +18,18 @@ pool:
 jobs:
 - template: YAML/Templates/Job/BuildALApp.yml@scriptsRepo
   parameters:
-    containerImageName: ### Specify BC 16 onprem image mcr.microsoft.com/businesscentral/onprem:1904-w1-ltsc2019
+    containerImageName: mcr.microsoft.com/businesscentral/onprem:2004-w1-ltsc2019
     containerName: Build-$(Build.BuildId)
     serverInstanceName: NAV
     containerAdminUsername: admin
     containerAdminPassword: P@ssword1
-    licenseSecureFileName: ### Specify BC 16 dev license 'BC 140 Developer.flf'
+    licenseSecureFileName: 'DEV_BC OP 16.flf'
     scriptsRepo: ScriptsRepo
     dependancyPackages:
       - source: 'https://api.nuget.org/v3/index.json;https://pkgs.dev.azure.com/navipartner/_packaging/NprAddIns/nuget/v3/index.json'
         id: NaviPartner.NPRetail.AddIns.BC #CASE SENSITIVE!
-    appNuGetSource: #Create and specify V16 NuGet feed https://pkgs.dev.azure.com/navipartner/NpCore/_packaging/NaviPartner.NPCore.BC/nuget/v3/index.json
+    appNuGetSource: 
+        source: 'https://pkgs.dev.azure.com/navipartner/_packaging/NpCore/nuget/v3/index.json'
+        id: NaviPartner.NPCore.BC160
     versionVariableName: 'LastUsedVerNo'
     versionRevisionSeed: 9000
