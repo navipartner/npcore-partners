@@ -33,3 +33,4 @@ jobs:
         id: NaviPartner.NPCore.BC160
     versionVariableName: 'LastUsedVerNo'
     versionRevisionSeed: 9000
+    nuGetSuffix: Prerelease
