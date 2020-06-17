@@ -20,7 +20,7 @@ jobs:
   parameters:
     containerImageName: mcr.microsoft.com/businesscentral/onprem:2004-w1-ltsc2019
     containerName: Build-$(Build.BuildId)
-    serverInstanceName: NAV
+    serverInstanceName: BC
     containerAdminUsername: admin
     containerAdminPassword: P@ssword1
     licenseSecureFileName: 'DEV_BC OP 16.flf'
