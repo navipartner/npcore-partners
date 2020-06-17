@@ -12,8 +12,8 @@
   "logo": "./media/NP-small-logo.png",
   "dependencies": [],
   "screenshots": [],
-  "platform": "14.0.0.0",
-  "application": "14.0.0.0",
+  "platform": "16.0.0.0",
+  "application": "16.0.0.0",
   "idRanges": [
     {
       "from": 6014400,
@@ -22,7 +22,7 @@
   ],
   "contextSensitiveHelpUrl": "https://ALProject14.com/help/",
   "showMyCode": true,
-  "runtime": "3.0",
-  "target": "Internal",
+  "runtime": "5.0",
+  "target": "OnPrem",
   "features": [ "TranslationFile" ]
 }
