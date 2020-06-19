@@ -38,4 +38,4 @@ jobs:
         id: NaviPartner.NPCore.BC160
     versionVariableName: 'LastUsedVerNo'
     versionRevisionSeed: 0
-    deployToContainer: false
+    runtimePackage: TRUE
