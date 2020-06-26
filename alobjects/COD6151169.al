@@ -211,7 +211,7 @@ codeunit 6151169 "POS Action - NpGp Return"
         RetailCrossReference: Record "Retail Cross Reference";
         ObjectMetadata: Record "Object Metadata";
         POSUnit: Record "POS Unit";
-        ServicePassword: Record "Service Password";
+        ServicePassword: Text;
         SalePOS: Record "Sale POS";
         NpGpUserSaleReturn: Page "NpGp User Sale Return";
         NpGpPOSSalesSetupCard: Page "NpGp POS Sales Setup Card";
@@ -257,12 +257,11 @@ codeunit 6151169 "POS Action - NpGp Return"
 
         NpXmlDomMgt.SetTrustedCertificateValidation(HttpWebRequest);
 
-        ServicePassword.SetRange(Key, NpGpPOSSalesSetup."Service Password");
-        if not ServicePassword.FindFirst then
+        if not IsolatedStorage.Get(NpGpPOSSalesSetup."Service Password", DataScope::Company, ServicePassword) then
             Error(ServicePasswordErr, NpGpPOSSalesSetupCard.Caption);
 
         HttpWebRequest.UseDefaultCredentials(false);
-        Credential := Credential.NetworkCredential(NpGpPOSSalesSetup."Service Username", ServicePassword.GetPassword);
+        Credential := Credential.NetworkCredential(NpGpPOSSalesSetup."Service Username", ServicePassword);
         HttpWebRequest.Credentials(Credential);
 
         ServiceName := GetServiceName(NpGpPOSSalesSetup."Service Url");
@@ -479,9 +478,9 @@ codeunit 6151169 "POS Action - NpGp Return"
                 SaleLinePOS."Return Sale Sales Ticket No." := TempNpGpPOSSalesEntry."Document No.";
                 SaleLinePOS."Return Sales Sales Type" := SalePOS."Sale type";
                 SaleLinePOS."Return Reason Code" := ReturnReasonCode;
-        //-NPR5.54 [391871]
-        //    SaleLinePOS."Retail ID" := CREATEGUID;
-        //+NPR5.54 [391871]
+                //-NPR5.54 [391871]
+                //    SaleLinePOS."Retail ID" := CREATEGUID;
+                //+NPR5.54 [391871]
 
                 SaleLinePOS.Modify(true);
 
@@ -663,9 +662,9 @@ codeunit 6151169 "POS Action - NpGp Return"
                 else
                     SaleLinePOS.Validate(Quantity, -1);
 
-        //-NPR5.54 [391871]
-        //    SaleLinePOS."Retail ID" := CREATEGUID;
-        //+NPR5.54 [391871]
+                //-NPR5.54 [391871]
+                //    SaleLinePOS."Retail ID" := CREATEGUID;
+                //+NPR5.54 [391871]
                 SaleLinePOS."Return Sale No." := SalePOS."Sales Ticket No.";
                 SaleLinePOS."Return Sale Register No." := SalePOS."Register No.";
                 SaleLinePOS."Return Sale Sales Ticket No." := TempNpGpPOSSalesEntry."Document No.";

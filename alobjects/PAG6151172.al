@@ -6,7 +6,6 @@ page 6151172 "NpGp POS Sales Setup Card"
 
     Caption = 'Global POS Sales Setup Card';
     PageType = Card;
-    Permissions = TableData "Service Password"=rimd;
     SourceTable = "NpGp POS Sales Setup";
 
     layout
@@ -18,23 +17,23 @@ page 6151172 "NpGp POS Sales Setup Card"
                 group(Control6014407)
                 {
                     ShowCaption = false;
-                    field("Code";Code)
+                    field("Code"; Code)
                     {
                     }
-                    field("Company Name";"Company Name")
+                    field("Company Name"; "Company Name")
                     {
                     }
                 }
                 group(Control6014408)
                 {
                     ShowCaption = false;
-                    field("Service Url";"Service Url")
+                    field("Service Url"; "Service Url")
                     {
                     }
-                    field("Service Username";"Service Username")
+                    field("Service Username"; "Service Username")
                     {
                     }
-                    field(Password;Password)
+                    field(Password; Password)
                     {
                         Caption = 'Service Password';
                         ExtendedDatatype = Masked;
@@ -46,7 +45,7 @@ page 6151172 "NpGp POS Sales Setup Card"
                             //+NPR5.51 [337539]
                         end;
                     }
-                    field("Sync POS Sales Immediately";"Sync POS Sales Immediately")
+                    field("Sync POS Sales Immediately"; "Sync POS Sales Immediately")
                     {
                     }
                 }
@@ -71,26 +70,19 @@ page 6151172 "NpGp POS Sales Setup Card"
                     NpGpPOSSalesSyncMgt: Codeunit "NpGp POS Sales Sync Mgt.";
                 begin
                     if NpGpPOSSalesSyncMgt.TryGetGlobalPosSalesService(Rec) then
-                      Message(Text001)
+                        Message(Text001)
                     else
-                      Error(GetLastErrorText);
+                        Error(GetLastErrorText);
                 end;
             }
         }
     }
 
     trigger OnAfterGetRecord()
-    var
-        ServicePassword: Record "Service Password";
     begin
-        //-NPR5.51 [337539]
-        if IsNullGuid("Service Password") then
-          exit;
-
-        ServicePassword.SetRange(Key,"Service Password");
-        ServicePassword.FindFirst;
-        Password := ServicePassword.GetPassword;
-        //+NPR5.51 [337539]
+        if not IsNullGuid("Service Password") then begin
+            IsolatedStorage.Get("Service Password", DataScope::Company, Password);
+        end;
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -98,7 +90,7 @@ page 6151172 "NpGp POS Sales Setup Card"
         NpGpPOSSalesSyncMgt: Codeunit "NpGp POS Sales Sync Mgt.";
     begin
         if not NpGpPOSSalesSyncMgt.TryGetGlobalPosSalesService(Rec) then
-          exit(Confirm(Text000,false));
+            exit(Confirm(Text000, false));
     end;
 
     var
