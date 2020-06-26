@@ -1,4 +1,4 @@
-pageextension 6014422 pageextension6014422 extends "Customer Card" 
+pageextension 6014422 pageextension6014422 extends "Customer Card"
 {
     // PN1.00/MH/20140725  NAV-AddOn: PDF2NAV
     //   - Added Field 6014415 "Document Processing" for defining Print action on Sales Doc. Posting (Billing-page).
@@ -34,29 +34,26 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
     // NPR5.53/ZESO/20200115 CASE 358656 Use Field 'To Anonymize On' instead of 'To Anonymize'.
     layout
     {
-        addafter(Name)
+        modify("Name 2")
         {
-            field("Name 2";"Name 2")
-            {
-                Importance = Additional;
-            }
+            Visible = true;
         }
         addafter(AdjProfitPct)
         {
-            field("To Anonymize On";"To Anonymize On")
+            field("To Anonymize On"; "To Anonymize On")
             {
                 Editable = ToAnonymizeEditable;
             }
-            field(Anonymized;Anonymized)
+            field(Anonymized; Anonymized)
             {
             }
-            field("Anonymized Date";"Anonymized Date")
+            field("Anonymized Date"; "Anonymized Date")
             {
             }
         }
         addafter("Disable Search by Name")
         {
-            field(NPRAttrTextArray_01;NPRAttrTextArray[1])
+            field(NPRAttrTextArray_01; NPRAttrTextArray[1])
             {
                 CaptionClass = '6014555,18,1,2';
                 Editable = NPRAttrEditable;
@@ -64,10 +61,10 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 1, "No.", NPRAttrTextArray[1]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 1, "No.", NPRAttrTextArray[1]);
                 end;
             }
-            field(NPRAttrTextArray_02;NPRAttrTextArray[2])
+            field(NPRAttrTextArray_02; NPRAttrTextArray[2])
             {
                 CaptionClass = '6014555,18,2,2';
                 Editable = NPRAttrEditable;
@@ -75,10 +72,10 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 2, "No.", NPRAttrTextArray[2]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 2, "No.", NPRAttrTextArray[2]);
                 end;
             }
-            field(NPRAttrTextArray_03;NPRAttrTextArray[3])
+            field(NPRAttrTextArray_03; NPRAttrTextArray[3])
             {
                 CaptionClass = '6014555,18,3,2';
                 Editable = NPRAttrEditable;
@@ -86,10 +83,10 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 3, "No.", NPRAttrTextArray[3]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 3, "No.", NPRAttrTextArray[3]);
                 end;
             }
-            field(NPRAttrTextArray_04;NPRAttrTextArray[4])
+            field(NPRAttrTextArray_04; NPRAttrTextArray[4])
             {
                 CaptionClass = '6014555,18,4,2';
                 Editable = NPRAttrEditable;
@@ -97,10 +94,10 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 4, "No.", NPRAttrTextArray[4]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 4, "No.", NPRAttrTextArray[4]);
                 end;
             }
-            field(NPRAttrTextArray_05;NPRAttrTextArray[5])
+            field(NPRAttrTextArray_05; NPRAttrTextArray[5])
             {
                 CaptionClass = '6014555,18,5,2';
                 Editable = NPRAttrEditable;
@@ -108,7 +105,7 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
 
                 trigger OnValidate()
                 begin
-                    NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 5, "No.", NPRAttrTextArray[5]);
+                    NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 5, "No.", NPRAttrTextArray[5]);
                 end;
             }
         }
@@ -117,18 +114,18 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
             group(Magento)
             {
                 Caption = 'Magento';
-                field("Magento Display Group";"Magento Display Group")
+                field("Magento Display Group"; "Magento Display Group")
                 {
                 }
-                field("Magento Store Code";"Magento Store Code")
-                {
-                    Visible = (MagentoVersion >= 2);
-                }
-                field("Magento Shipping Group";"Magento Shipping Group")
+                field("Magento Store Code"; "Magento Store Code")
                 {
                     Visible = (MagentoVersion >= 2);
                 }
-                field("Magento Payment Group";"Magento Payment Group")
+                field("Magento Shipping Group"; "Magento Shipping Group")
+                {
+                    Visible = (MagentoVersion >= 2);
+                }
+                field("Magento Payment Group"; "Magento Payment Group")
                 {
                     Visible = (MagentoVersion >= 2);
                 }
@@ -136,7 +133,7 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
             group("Extra Fields")
             {
                 Caption = 'Extra Fields';
-                field(NPRAttrTextArray_06;NPRAttrTextArray[6])
+                field(NPRAttrTextArray_06; NPRAttrTextArray[6])
                 {
                     CaptionClass = '6014555,18,6,2';
                     Editable = NPRAttrEditable;
@@ -144,10 +141,10 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 6, "No.", NPRAttrTextArray[6]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 6, "No.", NPRAttrTextArray[6]);
                     end;
                 }
-                field(NPRAttrTextArray_07;NPRAttrTextArray[7])
+                field(NPRAttrTextArray_07; NPRAttrTextArray[7])
                 {
                     CaptionClass = '6014555,18,7,2';
                     Editable = NPRAttrEditable;
@@ -155,10 +152,10 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 7, "No.", NPRAttrTextArray[7]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 7, "No.", NPRAttrTextArray[7]);
                     end;
                 }
-                field(NPRAttrTextArray_08;NPRAttrTextArray[8])
+                field(NPRAttrTextArray_08; NPRAttrTextArray[8])
                 {
                     CaptionClass = '6014555,18,8,2';
                     Editable = NPRAttrEditable;
@@ -166,10 +163,10 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 8, "No.", NPRAttrTextArray[8]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 8, "No.", NPRAttrTextArray[8]);
                     end;
                 }
-                field(NPRAttrTextArray_09;NPRAttrTextArray[9])
+                field(NPRAttrTextArray_09; NPRAttrTextArray[9])
                 {
                     CaptionClass = '6014555,18,9,2';
                     Editable = NPRAttrEditable;
@@ -177,10 +174,10 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 9, "No.", NPRAttrTextArray[9]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 9, "No.", NPRAttrTextArray[9]);
                     end;
                 }
-                field(NPRAttrTextArray_10;NPRAttrTextArray[10])
+                field(NPRAttrTextArray_10; NPRAttrTextArray[10])
                 {
                     CaptionClass = '6014555,18,10,2';
                     Editable = NPRAttrEditable;
@@ -188,23 +185,16 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
 
                     trigger OnValidate()
                     begin
-                        NPRAttrManagement.SetMasterDataAttributeValue (DATABASE::Customer, 10, "No.", NPRAttrTextArray[10]);
+                        NPRAttrManagement.SetMasterDataAttributeValue(DATABASE::Customer, 10, "No.", NPRAttrTextArray[10]);
                     end;
                 }
             }
         }
-        addafter("VAT Registration No.")
-        {
-            field("Tax Liable";"Tax Liable")
-            {
-            }
-            field("Tax Area Code";"Tax Area Code")
-            {
-            }
-        }
+        moveafter("VAT Registration No."; "Tax Liable")
+        moveafter("VAT Registration No."; "Tax Area Code")
         addafter("Prepayment %")
         {
-            field("Document Processing";"Document Processing")
+            field("Document Processing"; "Document Processing")
             {
             }
         }
@@ -221,9 +211,9 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
                     Caption = 'Selections contracts';
                     Image = Document;
                     RunObject = Page "Retail Document Header";
-                    RunPageLink = "Document Type"=CONST("Selection Contract"),
-                                  "Customer No."=FIELD("No."),
-                                  "Customer Type"=CONST(Alm);
+                    RunPageLink = "Document Type" = CONST("Selection Contract"),
+                                  "Customer No." = FIELD("No."),
+                                  "Customer Type" = CONST(Alm);
                 }
             }
             group(Retail)
@@ -234,7 +224,7 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
                     Caption = 'Used Goods';
                     Image = "Action";
                     RunObject = Page "Used Goods Reg. Card";
-                    RunPageLink = "Purchased By Customer No."=FIELD("No.");
+                    RunPageLink = "Purchased By Customer No." = FIELD("No.");
                 }
                 action(ItemLedgerEntries)
                 {
@@ -257,15 +247,15 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
                     Caption = 'Reparation';
                     Image = ServiceZone;
                     RunObject = Page "Customer Repair List";
-                    RunPageLink = "Customer No."=FIELD("No."),
-                                  "Customer Type"=CONST(Ordinary);
+                    RunPageLink = "Customer No." = FIELD("No."),
+                                  "Customer Type" = CONST(Ordinary);
                 }
                 action("Member Cards")
                 {
                     Caption = 'Member Cards';
                     Image = Card;
                     RunObject = Page "Member Card Issued Cards";
-                    RunPageLink = "Customer No"=FIELD("No.");
+                    RunPageLink = "Customer No" = FIELD("No.");
                 }
                 action(PrintShippingLabel)
                 {
@@ -295,8 +285,8 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
                 Caption = 'POS Info';
                 Image = Info;
                 RunObject = Page "POS Info Links";
-                RunPageLink = "Table ID"=CONST(18),
-                              "Primary Key"=FIELD("No.");
+                RunPageLink = "Table ID" = CONST(18),
+                              "Primary Key" = FIELD("No.");
             }
         }
         addafter("Item &Tracking Entries")
@@ -334,11 +324,11 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
                     GDPRManagement: Codeunit "NP GDPR Management";
                 begin
                     //-NPR5.52 [358656]
-                    TestField(Anonymized,false);
-                    TestField("To Anonymize",true);
-                    if (GDPRManagement.DoAnonymization("No.",ReasonText)) then
-                      if (not Confirm(Text000,false) )then
-                        Error('');
+                    TestField(Anonymized, false);
+                    TestField("To Anonymize", true);
+                    if (GDPRManagement.DoAnonymization("No.", ReasonText)) then
+                        if (not Confirm(Text000, false)) then
+                            Error('');
 
 
                     Message(ReasonText);
@@ -352,10 +342,10 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
         DynamicEditable: Boolean;
 
     var
-        NPRAttrTextArray: array [40] of Text[100];
+        NPRAttrTextArray: array[40] of Text[100];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
-        NPRAttrVisibleArray: array [40] of Boolean;
+        NPRAttrVisibleArray: array[40] of Boolean;
         NPRAttrVisible01: Boolean;
         NPRAttrVisible02: Boolean;
         NPRAttrVisible03: Boolean;
@@ -380,32 +370,32 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
     //trigger OnAfterGetRecord()
     //>>>> ORIGINAL CODE:
     //begin
-        /*
-        ActivateFields;
-        StyleTxt := SetStyle;
-        */
+    /*
+    ActivateFields;
+    StyleTxt := SetStyle;
+    */
     //end;
     //>>>> MODIFIED CODE:
     //begin
-        /*
-        ActivateFields;
-        StyleTxt := SetStyle;
+    /*
+    ActivateFields;
+    StyleTxt := SetStyle;
 
-        //-NPR4.11
-        NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Customer, "No.");
-        NPRAttrEditable := CurrPage.Editable ();
-        //+NPR4.11
+    //-NPR4.11
+    NPRAttrManagement.GetMasterDataAttributeValue (NPRAttrTextArray, DATABASE::Customer, "No.");
+    NPRAttrEditable := CurrPage.Editable ();
+    //+NPR4.11
 
 
-        //-NPR5.52 [358656]
-        if UserSetup.Get(UserId) then
-          if UserSetup."Anonymize Customers" then
-            ToAnonymizeEditable := true
-          else
-            ToAnonymizeEditable := false;
+    //-NPR5.52 [358656]
+    if UserSetup.Get(UserId) then
+      if UserSetup."Anonymize Customers" then
+        ToAnonymizeEditable := true
+      else
+        ToAnonymizeEditable := false;
 
-        //-NPR5.52 [358656]
-        */
+    //-NPR5.52 [358656]
+    */
     //end;
 
 
@@ -415,25 +405,25 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
     //Parameters and return type have not been exported.
     //>>>> ORIGINAL CODE:
     //begin
-        /*
-        FoundationOnly := ApplicationAreaMgmtFacade.IsFoundationEnabled;
+    /*
+    FoundationOnly := ApplicationAreaMgmtFacade.IsFoundationEnabled;
 
-        SetCustomerNoVisibilityOnFactBoxes;
-        #4..8
-        CaptionTxt := CurrPage.Caption;
-        SetCaption(CaptionTxt);
-        CurrPage.Caption(CaptionTxt);
-        */
+    SetCustomerNoVisibilityOnFactBoxes;
+    #4..8
+    CaptionTxt := CurrPage.Caption;
+    SetCaption(CaptionTxt);
+    CurrPage.Caption(CaptionTxt);
+    */
     //end;
     //>>>> MODIFIED CODE:
     //begin
-        /*
-        #1..11
+    /*
+    #1..11
 
-        //-NPR5.52 [358656]
-        ToAnonymizeEditable := false;
-        //+NPR5.52 [358656]
-        */
+    //-NPR5.52 [358656]
+    ToAnonymizeEditable := false;
+    //+NPR5.52 [358656]
+    */
     //end;
 
 
@@ -442,51 +432,51 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
     //trigger OnOpenPage()
     //>>>> ORIGINAL CODE:
     //begin
-        /*
-        ActivateFields;
+    /*
+    ActivateFields;
 
-        CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled;
-        #4..8
-        if FoundationOnly then
-          CurrPage.PriceAndLineDisc.PAGE.InitPage(false);
+    CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled;
+    #4..8
+    if FoundationOnly then
+      CurrPage.PriceAndLineDisc.PAGE.InitPage(false);
 
-        ShowCharts := "No." <> '';
-        */
+    ShowCharts := "No." <> '';
+    */
     //end;
     //>>>> MODIFIED CODE:
     //begin
-        /*
-        #1..11
-        //-NPR4.11
-        NPRAttrManagement.GetAttributeVisibility (DATABASE::Customer, NPRAttrVisibleArray);
-        NPRAttrVisible01 := NPRAttrVisibleArray[1];
-        NPRAttrVisible02 := NPRAttrVisibleArray[2];
-        NPRAttrVisible03 := NPRAttrVisibleArray[3];
-        NPRAttrVisible04 := NPRAttrVisibleArray[4];
-        NPRAttrVisible05 := NPRAttrVisibleArray[5];
-        NPRAttrVisible06 := NPRAttrVisibleArray[6];
-        NPRAttrVisible07 := NPRAttrVisibleArray[7];
-        NPRAttrVisible08 := NPRAttrVisibleArray[8];
-        NPRAttrVisible09 := NPRAttrVisibleArray[9];
-        NPRAttrVisible10 := NPRAttrVisibleArray[10];
+    /*
+    #1..11
+    //-NPR4.11
+    NPRAttrManagement.GetAttributeVisibility (DATABASE::Customer, NPRAttrVisibleArray);
+    NPRAttrVisible01 := NPRAttrVisibleArray[1];
+    NPRAttrVisible02 := NPRAttrVisibleArray[2];
+    NPRAttrVisible03 := NPRAttrVisibleArray[3];
+    NPRAttrVisible04 := NPRAttrVisibleArray[4];
+    NPRAttrVisible05 := NPRAttrVisibleArray[5];
+    NPRAttrVisible06 := NPRAttrVisibleArray[6];
+    NPRAttrVisible07 := NPRAttrVisibleArray[7];
+    NPRAttrVisible08 := NPRAttrVisibleArray[8];
+    NPRAttrVisible09 := NPRAttrVisibleArray[9];
+    NPRAttrVisible10 := NPRAttrVisibleArray[10];
 
-        NPRAttrEditable := CurrPage.Editable ();
-        //+NPR4.11
-        //-MAG2.20 [320423]
-        SetMagentoVersion();
-        //+MAG2.20 [320423]
+    NPRAttrEditable := CurrPage.Editable ();
+    //+NPR4.11
+    //-MAG2.20 [320423]
+    SetMagentoVersion();
+    //+MAG2.20 [320423]
 
-        ShowCharts := "No." <> '';
+    ShowCharts := "No." <> '';
 
-        //-NPR5.52 [358656]
-        if UserSetup.Get(UserId) then
-          if UserSetup."Anonymize Customers" then
-            ToAnonymizeEditable := true
-          else
-            ToAnonymizeEditable := false;
+    //-NPR5.52 [358656]
+    if UserSetup.Get(UserId) then
+      if UserSetup."Anonymize Customers" then
+        ToAnonymizeEditable := true
+      else
+        ToAnonymizeEditable := false;
 
-        //-NPR5.52 [358656]
-        */
+    //-NPR5.52 [358656]
+    */
     //end;
 
     local procedure SetMagentoVersion()
@@ -495,13 +485,13 @@ pageextension 6014422 pageextension6014422 extends "Customer Card"
     begin
         //-MAG2.20 [320423]
         if not MagentoSetup.Get then
-          exit;
+            exit;
 
         case MagentoSetup."Magento Version" of
-          MagentoSetup."Magento Version"::"1":
-            MagentoVersion := 1;
-          MagentoSetup."Magento Version"::"2":
-            MagentoVersion := 2;
+            MagentoSetup."Magento Version"::"1":
+                MagentoVersion := 1;
+            MagentoSetup."Magento Version"::"2":
+                MagentoVersion := 2;
         end;
         //+MAG2.20 [320423]
     end;
