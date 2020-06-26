@@ -7,16 +7,15 @@ table 6151170 "NpGp POS Sales Setup"
     Caption = 'Global POS Sales Setup';
     DrillDownPageID = "NpGp Global POS Sales Setups";
     LookupPageID = "NpGp Global POS Sales Setups";
-    Permissions = TableData "Service Password"=rimd;
 
     fields
     {
-        field(1;"Code";Code[10])
+        field(1; "Code"; Code[10])
         {
             Caption = 'Code';
             NotBlank = true;
         }
-        field(5;"Company Name";Text[100])
+        field(5; "Company Name"; Text[100])
         {
             Caption = 'Company Name';
             TableRelation = Company;
@@ -28,28 +27,28 @@ table 6151170 "NpGp POS Sales Setup"
                 Url: Text;
             begin
                 if StrLen("Company Name") > MaxStrLen(Company.Name) then
-                  exit;
+                    exit;
                 if not Company.Get("Company Name") then
-                  exit;
+                    exit;
 
                 NpGpPOSSalesSyncMgt.InitGlobalPosSalesService();
-                Url := GetUrl(CLIENTTYPE::SOAP,Company.Name,OBJECTTYPE::Codeunit,CODEUNIT::"NpGp POS Sales Webservice");
-                "Service Url" := CopyStr(Url,1,MaxStrLen("Service Url"));
+                Url := GetUrl(CLIENTTYPE::SOAP, Company.Name, OBJECTTYPE::Codeunit, CODEUNIT::"NpGp POS Sales Webservice");
+                "Service Url" := CopyStr(Url, 1, MaxStrLen("Service Url"));
             end;
         }
-        field(10;"Service Url";Text[250])
+        field(10; "Service Url"; Text[250])
         {
             Caption = 'Service Url';
         }
-        field(15;"Service Username";Text[250])
+        field(15; "Service Username"; Text[250])
         {
             Caption = 'Service Username';
         }
-        field(20;"Service Password";Guid)
+        field(20; "Service Password"; Guid)
         {
             Caption = 'Service Password';
         }
-        field(25;"Sync POS Sales Immediately";Boolean)
+        field(25; "Sync POS Sales Immediately"; Boolean)
         {
             Caption = 'Sync POS Sales Immediately';
         }
@@ -57,7 +56,7 @@ table 6151170 "NpGp POS Sales Setup"
 
     keys
     {
-        key(Key1;"Code")
+        key(Key1; "Code")
         {
         }
     }
@@ -67,27 +66,19 @@ table 6151170 "NpGp POS Sales Setup"
     }
 
     procedure HandlePassword(Password: Text): Text
-    var
-        ServicePassword: Record "Service Password";
     begin
-        //-NPR5.51 [337539]
-        ServicePassword.SetRange(Key,"Service Password");
         if Password = '' then begin
-          if ServicePassword.FindFirst then
-            ServicePassword.Delete;
-          exit;
+            if IsolatedStorage.Contains("Service Password", DataScope::Company) then
+                IsolatedStorage.Delete("Service Password", DataScope::Company);
+            exit;
         end;
 
-        if not ServicePassword.FindFirst then begin
-          "Service Password" := CreateGuid;
-          Modify;
-          ServicePassword.Key := "Service Password";
-          ServicePassword.Insert;
+        if not IsolatedStorage.Contains("Service Password", DataScope::Company) then begin
+            "Service Password" := CreateGuid();
+            Modify;
         end;
+        IsolatedStorage.Set("Service Password", Password, DataScope::Company);
 
-        ServicePassword.SavePassword(Password);
-        ServicePassword.Modify;
-        //+NPR5.51 [337539]
     end;
 }
 
