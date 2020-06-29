@@ -8,32 +8,32 @@ table 6151093 "Nc RapidConnect Trigger Field"
 
     fields
     {
-        field(1;"Setup Code";Code[20])
+        field(1; "Setup Code"; Code[20])
         {
             Caption = 'Setup Code';
             NotBlank = true;
             TableRelation = "Nc RapidConnect Setup";
         }
-        field(5;"Table ID";Integer)
+        field(5; "Table ID"; Integer)
         {
             Caption = 'Table ID';
             NotBlank = true;
-            TableRelation = AllObjWithCaption."Object ID" WHERE ("Object Type"=CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
         }
-        field(10;"Field No.";Integer)
+        field(10; "Field No."; Integer)
         {
             BlankZero = true;
             Caption = 'Field No.';
             NotBlank = true;
-            TableRelation = Field."No." WHERE (TableNo=FIELD("Table ID"));
+            TableRelation = Field."No." WHERE(TableNo = FIELD("Table ID"));
 
             trigger OnLookup()
             var
                 "Field": Record "Field";
             begin
-                Field.SetRange(TableNo,"Table ID");
-                if PAGE.RunModal(PAGE::"Field List",Field) = ACTION::LookupOK then
-                  "Field No." := Field."No.";
+                Field.SetRange(TableNo, "Table ID");
+                if PAGE.RunModal(PAGE::"Field Lookup", Field) = ACTION::LookupOK then
+                    "Field No." := Field."No.";
 
                 CalcFields("Field Name");
             end;
@@ -43,10 +43,10 @@ table 6151093 "Nc RapidConnect Trigger Field"
                 CalcFields("Field Name");
             end;
         }
-        field(15;"Field Name";Text[50])
+        field(15; "Field Name"; Text[50])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE (TableNo=FIELD("Table ID"),
-                                                        "No."=FIELD("Field No.")));
+            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Table ID"),
+                                                        "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -61,7 +61,7 @@ table 6151093 "Nc RapidConnect Trigger Field"
 
     keys
     {
-        key(Key1;"Setup Code","Table ID","Field No.")
+        key(Key1; "Setup Code", "Table ID", "Field No.")
         {
         }
     }

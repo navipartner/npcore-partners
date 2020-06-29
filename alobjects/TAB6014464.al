@@ -40,7 +40,7 @@ table 6014464 "E-mail Template Filter"
                 Field.FilterGroup(2);
                 Field.SetRange(TableNo,"Table No.");
                 Field.FilterGroup(0);
-                if PAGE.RunModal(PAGE::"Field List",Field) = ACTION::LookupOK then
+                if PAGE.RunModal(PAGE::"Field Lookup",Field) = ACTION::LookupOK then
                   "Field No." := Field."No.";
                 //+PN1.08
             end;

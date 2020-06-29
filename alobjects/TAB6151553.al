@@ -14,7 +14,7 @@ table 6151553 "NpXml Filter"
 
     fields
     {
-        field(1;"Xml Template Code";Code[20])
+        field(1; "Xml Template Code"; Code[20])
         {
             Caption = 'Xml Template Code';
             Description = 'NC1.05';
@@ -23,38 +23,38 @@ table 6151553 "NpXml Filter"
             //TestTableRelation = false;
             ValidateTableRelation = false;
         }
-        field(5;"Xml Element Line No.";Integer)
+        field(5; "Xml Element Line No."; Integer)
         {
             Caption = 'Xml Element Line No.';
             Description = 'NC1.07';
         }
-        field(10;"Line No.";Integer)
+        field(10; "Line No."; Integer)
         {
             Caption = 'Line No.';
         }
-        field(20;"Template Version No.";Code[20])
+        field(20; "Template Version No."; Code[20])
         {
             Caption = 'Template Version No.';
             Description = 'NC1.21';
         }
-        field(100;"Parent Table No.";Integer)
+        field(100; "Parent Table No."; Integer)
         {
             Caption = 'Parent Table No.';
             Editable = false;
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Table));
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
-        field(110;"Parent Field No.";Integer)
+        field(110; "Parent Field No."; Integer)
         {
             Caption = 'Parent Field No.';
-            TableRelation = Field."No." WHERE (TableNo=FIELD("Parent Table No."));
+            TableRelation = Field."No." WHERE(TableNo = FIELD("Parent Table No."));
 
             trigger OnLookup()
             var
                 "Field": Record "Field";
             begin
-                Field.SetRange(TableNo,"Parent Table No.");
-                if PAGE.RunModal(PAGE::"Field List",Field) = ACTION::LookupOK then
-                  "Parent Field No." := Field."No.";
+                Field.SetRange(TableNo, "Parent Table No.");
+                if PAGE.RunModal(Page::"Field Lookup", Field) = ACTION::LookupOK then
+                    "Parent Field No." := Field."No.";
 
                 CalcFields("Parent Table Name");
             end;
@@ -64,18 +64,18 @@ table 6151553 "NpXml Filter"
                 CalcFields("Parent Table Name");
             end;
         }
-        field(120;"Parent Table Name";Text[50])
+        field(120; "Parent Table Name"; Text[50])
         {
-            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=CONST(Table),
-                                                             "Object ID"=FIELD("Parent Table No.")));
+            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+                                                             "Object ID" = FIELD("Parent Table No.")));
             Caption = 'Parent Table Name';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(130;"Parent Field Name";Text[50])
+        field(130; "Parent Field Name"; Text[50])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE (TableNo=FIELD("Parent Table No."),
-                                                        "No."=FIELD("Parent Field No.")));
+            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Parent Table No."),
+                                                        "No." = FIELD("Parent Field No.")));
             Caption = 'Parent Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -86,24 +86,24 @@ table 6151553 "NpXml Filter"
             begin
             end;
         }
-        field(200;"Table No.";Integer)
+        field(200; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Table));
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
-        field(210;"Field No.";Integer)
+        field(210; "Field No."; Integer)
         {
             Caption = 'Field No.';
             NotBlank = true;
-            TableRelation = Field."No." WHERE (TableNo=FIELD("Table No."));
+            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
 
             trigger OnLookup()
             var
                 "Field": Record "Field";
             begin
-                Field.SetRange(TableNo,"Table No.");
-                if PAGE.RunModal(PAGE::"Field List",Field) = ACTION::LookupOK then
-                  "Field No." := Field."No.";
+                Field.SetRange(TableNo, "Table No.");
+                if PAGE.RunModal(Page::"Field Lookup", Field) = ACTION::LookupOK then
+                    "Field No." := Field."No.";
 
                 CalcFields("Table Name");
             end;
@@ -113,18 +113,18 @@ table 6151553 "NpXml Filter"
                 CalcFields("Table Name");
             end;
         }
-        field(220;"Table Name";Text[50])
+        field(220; "Table Name"; Text[50])
         {
-            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=CONST(Table),
-                                                             "Object ID"=FIELD("Table No.")));
+            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+                                                             "Object ID" = FIELD("Table No.")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(230;"Field Name";Text[50])
+        field(230; "Field Name"; Text[50])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE (TableNo=FIELD("Table No."),
-                                                        "No."=FIELD("Field No.")));
+            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Table No."),
+                                                        "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -135,14 +135,14 @@ table 6151553 "NpXml Filter"
             begin
             end;
         }
-        field(300;"Filter Type";Option)
+        field(300; "Filter Type"; Option)
         {
             Caption = 'Filter Type';
             Description = 'NC1.11';
             OptionCaption = 'Table Link,Constant,Filter';
             OptionMembers = TableLink,Constant,"Filter";
         }
-        field(310;"Filter Value";Text[250])
+        field(310; "Filter Value"; Text[250])
         {
             Caption = 'Filter Value';
             Description = 'NC1.08';
@@ -155,11 +155,11 @@ table 6151553 "NpXml Filter"
                 ////-NC1.08
                 //NpXmlMgt.LookupFieldValue("Table No.","Field No.","Filter Value");
                 ////+NC1.08
-                NpXmlTemplateMgt.LookupFieldValue("Table No.","Field No.","Filter Value");
+                NpXmlTemplateMgt.LookupFieldValue("Table No.", "Field No.", "Filter Value");
                 //+NC1.13
             end;
         }
-        field(320;"Last Modified at";DateTime)
+        field(320; "Last Modified at"; DateTime)
         {
             Caption = 'Last Modified at';
             Description = 'NC1.21';
@@ -168,7 +168,7 @@ table 6151553 "NpXml Filter"
 
     keys
     {
-        key(Key1;"Xml Template Code","Xml Element Line No.","Line No.")
+        key(Key1; "Xml Template Code", "Xml Element Line No.", "Line No.")
         {
         }
     }
@@ -208,7 +208,7 @@ table 6151553 "NpXml Filter"
         //XmlTemplateChanged;
         "Template Version No." := GetTemplateVersionNo();
         //+NC1.22
-        "Last Modified at" := CreateDateTime(Today,Time);
+        "Last Modified at" := CreateDateTime(Today, Time);
         //+NC1.21
     end;
 

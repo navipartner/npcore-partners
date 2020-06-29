@@ -7,28 +7,28 @@ table 6014679 "Endpoint Query Filter"
 
     fields
     {
-        field(10;"Endpoint Query No.";BigInteger)
+        field(10; "Endpoint Query No."; BigInteger)
         {
             Caption = 'Endpoint Query No.';
             TableRelation = "Endpoint Query";
         }
-        field(20;"Table No.";Integer)
+        field(20; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Table));
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
-        field(30;"Field No.";Integer)
+        field(30; "Field No."; Integer)
         {
             Caption = 'Field No.';
-            TableRelation = Field."No." WHERE (TableNo=FIELD("Table No."));
+            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
 
             trigger OnLookup()
             var
                 "Field": Record "Field";
             begin
-                Field.SetRange(TableNo,"Table No.");
-                if PAGE.RunModal(PAGE::"Field List",Field) = ACTION::LookupOK then
-                  "Field No." := Field."No.";
+                Field.SetRange(TableNo, "Table No.");
+                if PAGE.RunModal(PAGE::"Field Lookup", Field) = ACTION::LookupOK then
+                    "Field No." := Field."No.";
             end;
 
             trigger OnValidate()
@@ -36,15 +36,15 @@ table 6014679 "Endpoint Query Filter"
                 CalcFields("Field Name");
             end;
         }
-        field(35;"Field Name";Text[30])
+        field(35; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE (TableNo=FIELD("Table No."),
-                                                        "No."=FIELD("Field No.")));
+            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Table No."),
+                                                        "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(40;"Filter Text";Text[250])
+        field(40; "Filter Text"; Text[250])
         {
             Caption = 'Filter Text';
         }
@@ -52,7 +52,7 @@ table 6014679 "Endpoint Query Filter"
 
     keys
     {
-        key(Key1;"Endpoint Query No.","Table No.","Field No.")
+        key(Key1; "Endpoint Query No.", "Table No.", "Field No.")
         {
         }
     }
