@@ -111,12 +111,10 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     var
         EFTTypePOSUnitGenParam: Record "EFT Type POS Unit Gen. Param.";
         EFTTypePOSUnitBLOBParam: Record "EFT Type POS Unit BLOB Param.";
-        Blob1: Record TempBlob temporary;
-        Blob2: Record TempBlob temporary;
         EFTInterface: Codeunit "EFT Interface";
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         GetPOIID(EFTSetup);
 
@@ -129,7 +127,7 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         EFTAdyenPaymentTypeSetup: Record "EFT Adyen Payment Type Setup";
     begin
         if EFTSetup."EFT Integration Type" <> IntegrationType() then
-          exit;
+            exit;
 
         GetPaymentTypeParameters(EFTSetup, EFTAdyenPaymentTypeSetup);
         Commit;
@@ -137,10 +135,10 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreatePaymentOfGoodsRequest', '', false, false)]
-    local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreatePaymentOfGoodsRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         CreateGenericRequest(EftTransactionRequest);
@@ -156,22 +154,22 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateLookupTransactionRequest', '', false, false)]
-    local procedure OnCreateLookupTransactionRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateLookupTransactionRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     var
         OriginalEftTransactionRequest: Record "EFT Transaction Request";
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         //-NPR5.54 [364340]
         OriginalEftTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
         if OriginalEftTransactionRequest."Processing Type" = OriginalEftTransactionRequest."Processing Type"::VOID then begin
-          //Integration does not provide these values in void response so we copy manually
-          EftTransactionRequest."Card Number" := OriginalEftTransactionRequest."Card Number";
-          EftTransactionRequest."Card Name" := OriginalEftTransactionRequest."Card Name";
-          EftTransactionRequest."Card Application ID" := OriginalEftTransactionRequest."Card Application ID";
-          EftTransactionRequest."Card Issuer ID" := OriginalEftTransactionRequest."Card Issuer ID";
+            //Integration does not provide these values in void response so we copy manually
+            EftTransactionRequest."Card Number" := OriginalEftTransactionRequest."Card Number";
+            EftTransactionRequest."Card Name" := OriginalEftTransactionRequest."Card Name";
+            EftTransactionRequest."Card Application ID" := OriginalEftTransactionRequest."Card Application ID";
+            EftTransactionRequest."Card Issuer ID" := OriginalEftTransactionRequest."Card Issuer ID";
         end;
         //+NPR5.54 [364340]
 
@@ -182,18 +180,18 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateRefundRequest', '', false, false)]
-    local procedure OnCreateRefundRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateRefundRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     var
         OriginalEftTransactionRequest: Record "EFT Transaction Request";
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         if EftTransactionRequest."Processed Entry No." <> 0 then begin
-          OriginalEftTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
-          if OriginalEftTransactionRequest.Recovered then
-            OriginalEftTransactionRequest.Get(OriginalEftTransactionRequest."Recovered by Entry No.");
+            OriginalEftTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
+            if OriginalEftTransactionRequest.Recovered then
+                OriginalEftTransactionRequest.Get(OriginalEftTransactionRequest."Recovered by Entry No.");
         end;
 
         EftTransactionRequest."Amount Input" := Abs(EftTransactionRequest."Amount Input");
@@ -211,18 +209,18 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateVoidRequest', '', false, false)]
-    local procedure OnCreateVoidRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateVoidRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     var
         OriginalEftTransactionRequest: Record "EFT Transaction Request";
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         //-NPR5.54 [364340]
         OriginalEftTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
         if OriginalEftTransactionRequest.Recovered then
-          OriginalEftTransactionRequest.Get(OriginalEftTransactionRequest."Recovered by Entry No.");
+            OriginalEftTransactionRequest.Get(OriginalEftTransactionRequest."Recovered by Entry No.");
 
         //Integration does not provide these values in void response so we copy manually
         EftTransactionRequest."Card Number" := OriginalEftTransactionRequest."Card Number";
@@ -239,10 +237,10 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateVerifySetupRequest', '', false, false)]
-    local procedure OnCreateVerifySetupRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateVerifySetupRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         CreateGenericRequest(EftTransactionRequest);
@@ -252,10 +250,10 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnCreateAuxRequest', '', false, false)]
-    local procedure OnCreateAuxRequest(var EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnCreateAuxRequest(var EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         CreateGenericRequest(EftTransactionRequest);
@@ -265,16 +263,16 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnSendEftDeviceRequest', '', false, false)]
-    local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "EFT Transaction Request";var Handled: Boolean)
+    local procedure OnSendEftDeviceRequest(EftTransactionRequest: Record "EFT Transaction Request"; var Handled: Boolean)
     var
         EFTAdyenCloudProtocol: Codeunit "EFT Adyen Cloud Protocol";
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
         Handled := true;
 
         if AcquireCardBeforeTransaction(EftTransactionRequest) then
-          exit;
+            exit;
 
         EFTAdyenCloudProtocol.SendEftDeviceRequest(EftTransactionRequest);
     end;
@@ -283,43 +281,43 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     local procedure OnAfterFinancialCommit(EftTransactionRequest: Record "EFT Transaction Request")
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
 
         if not CODEUNIT.Run(CODEUNIT::"EFT Try Print Receipt", EftTransactionRequest) then
-          Message(GetLastErrorText);
+            Message(GetLastErrorText);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnAfterPaymentConfirm', '', false, false)]
-    local procedure OnAfterPaymentConfirm(EftTransactionRequest: Record "EFT Transaction Request";var DoNotResume: Boolean)
+    local procedure OnAfterPaymentConfirm(EftTransactionRequest: Record "EFT Transaction Request"; var DoNotResume: Boolean)
     var
         EFTAdyenCloudProtocol: Codeunit "EFT Adyen Cloud Protocol";
         EFTAdyenCloudSignDialog: Codeunit "EFT Adyen Cloud Sign Dialog";
     begin
         if not EftTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
 
         case EftTransactionRequest."Signature Type" of
-          EftTransactionRequest."Signature Type"::"On Receipt" :
-            if not Confirm(SIGNATURE_APPROVAL) then begin
-              VoidTransactionAfterSignatureDecline(EftTransactionRequest);
-            end;
+            EftTransactionRequest."Signature Type"::"On Receipt":
+                if not Confirm(SIGNATURE_APPROVAL) then begin
+                    VoidTransactionAfterSignatureDecline(EftTransactionRequest);
+                end;
 
-          EftTransactionRequest."Signature Type"::"On Terminal" :
-            begin
-              DoNotResume := true; //Since the approval is async, we postpone resume of front end workflow for now.
-              EFTAdyenCloudSignDialog.ApproveSignature(EftTransactionRequest);
-            end;
+            EftTransactionRequest."Signature Type"::"On Terminal":
+                begin
+                    DoNotResume := true; //Since the approval is async, we postpone resume of front end workflow for now.
+                    EFTAdyenCloudSignDialog.ApproveSignature(EftTransactionRequest);
+                end;
 
-          EftTransactionRequest."Signature Type"::"On POS" :
-            Error('Signature written in POS is not supported');
+            EftTransactionRequest."Signature Type"::"On POS":
+                Error('Signature written in POS is not supported');
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnBeforePauseFrontEnd', '', false, false)]
-    local procedure OnBeforePauseFrontEnd(EFTTransactionRequest: Record "EFT Transaction Request";var Skip: Boolean)
+    local procedure OnBeforePauseFrontEnd(EFTTransactionRequest: Record "EFT Transaction Request"; var Skip: Boolean)
     begin
         if not EFTTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
 
         with EFTTransactionRequest do
             Skip :=
@@ -329,21 +327,21 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6184479, 'OnBeforeResumeFrontEnd', '', false, false)]
-    local procedure OnBeforeResumeFrontEnd(EFTTransactionRequest: Record "EFT Transaction Request";var Skip: Boolean)
+    local procedure OnBeforeResumeFrontEnd(EFTTransactionRequest: Record "EFT Transaction Request"; var Skip: Boolean)
     var
         POSFrontEnd: Codeunit "POS Front End Management";
         POSSession: Codeunit "POS Session";
     begin
         if not POSSession.IsActiveSession(POSFrontEnd) then
-          exit;
+            exit;
         if not EFTTransactionRequest.IsType(IntegrationType()) then
-          exit;
+            exit;
 
         with EFTTransactionRequest do
-        //-NPR5.53 [377533]
-          Skip := (("Processing Type" = EFTTransactionRequest."Processing Type"::AUXILIARY) and ("Auxiliary Operation ID" in [1,2,3,6]))
-        //+NPR5.53 [377533]
-                  or (("Processing Type" in ["Processing Type"::SETUP, "Processing Type"::VOID, "Processing Type"::LOOK_UP]) and (not POSFrontEnd.IsPaused));
+            //-NPR5.53 [377533]
+            Skip := (("Processing Type" = EFTTransactionRequest."Processing Type"::AUXILIARY) and ("Auxiliary Operation ID" in [1, 2, 3, 6]))
+                    //+NPR5.53 [377533]
+                    or (("Processing Type" in ["Processing Type"::SETUP, "Processing Type"::VOID, "Processing Type"::LOOK_UP]) and (not POSFrontEnd.IsPaused));
 
         //POS is not robust against Pause & Resume without client ping-pong so we skip both for SETUP,VOID,LOOKUP operations as they are all server-side synchronous API requests in Adyen
     end;
@@ -356,23 +354,26 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     begin
         //-NPR5.53 [377533]
         case EftTransactionRequest."Processing Type" of
-          EftTransactionRequest."Processing Type"::PAYMENT,
+            EftTransactionRequest."Processing Type"::PAYMENT,
           EftTransactionRequest."Processing Type"::REFUND,
-          EftTransactionRequest."Processing Type"::LOOK_UP :
-            HandleTrxResponse(EftTransactionRequest);
+          EftTransactionRequest."Processing Type"::LOOK_UP:
+                HandleTrxResponse(EftTransactionRequest);
 
-          EftTransactionRequest."Processing Type"::VOID :
-            HandleVoidResponse(EftTransactionRequest);
+            EftTransactionRequest."Processing Type"::VOID:
+                HandleVoidResponse(EftTransactionRequest);
 
-          EftTransactionRequest."Processing Type"::SETUP :
-            HandleSetupResponse(EftTransactionRequest);
+            EftTransactionRequest."Processing Type"::SETUP:
+                HandleSetupResponse(EftTransactionRequest);
 
-          EftTransactionRequest."Processing Type"::AUXILIARY :
-            case EftTransactionRequest."Auxiliary Operation ID" of
-              1,2,3 : ;
-              4,5 : HandleDetectShopperResponse(EftTransactionRequest);
-              6 : HandleClearShopperContractResponse(EftTransactionRequest);
-            end;
+            EftTransactionRequest."Processing Type"::AUXILIARY:
+                case EftTransactionRequest."Auxiliary Operation ID" of
+                    1, 2, 3:
+                        ;
+                    4, 5:
+                        HandleDetectShopperResponse(EftTransactionRequest);
+                    6:
+                        HandleClearShopperContractResponse(EftTransactionRequest);
+                end;
         end;
 
         EFTInterface.EftIntegrationResponse(EftTransactionRequest);
@@ -386,12 +387,12 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     begin
         //-NPR5.53 [377533]
         if not EftTransactionRequest.Successful then
-          Message(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
+            Message(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
 
 
         if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, PaymentTypePOS) then begin
-          EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
-          EftTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen (EftTransactionRequest."Card Name"));
+            EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
+            EftTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
         end;
         EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
         EftTransactionRequest.Modify;
@@ -408,20 +409,20 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         //-NPR5.53 [377533]
         //-NPR5.53 [377533]
         if EftTransactionRequest.Successful then begin
-          Message(VOID_SUCCESS, EftTransactionRequest."Entry No.");
+            Message(VOID_SUCCESS, EftTransactionRequest."Entry No.");
 
-        //-NPR5.54 [364340]
-          if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, PaymentTypePOS) then begin
-            EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
-            EftTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen (EftTransactionRequest."Card Name"));
-          end;
-          EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
-          EftTransactionRequest.Modify;
-        //+NPR5.54 [364340]
+            //-NPR5.54 [364340]
+            if EFTPaymentMapping.FindPaymentType(EftTransactionRequest, PaymentTypePOS) then begin
+                EftTransactionRequest."POS Payment Type Code" := PaymentTypePOS."No.";
+                EftTransactionRequest."Card Name" := CopyStr(PaymentTypePOS.Description, 1, MaxStrLen(EftTransactionRequest."Card Name"));
+            end;
+            EftTransactionRequest."POS Description" := CopyStr(GetPOSDescription(EftTransactionRequest), 1, MaxStrLen(EftTransactionRequest."POS Description"));
+            EftTransactionRequest.Modify;
+            //+NPR5.54 [364340]
 
-        //+NPR5.53 [377533]
+            //+NPR5.53 [377533]
         end else begin
-          Message(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
+            Message(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
         end;
         //+NPR5.53 [377533]
     end;
@@ -430,9 +431,9 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     begin
         //-NPR5.53 [377533]
         if EftTransactionRequest.Successful then
-          Message(EftTransactionRequest."Result Display Text")
+            Message(EftTransactionRequest."Result Display Text")
         else
-          Message(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
+            Message(TRX_ERROR, Format(EftTransactionRequest."Processing Type"), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
         //+NPR5.53 [377533]
     end;
 
@@ -440,7 +441,7 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     begin
         //-NPR5.53 [377533]
         if not EftTransactionRequest.Successful then
-          Message(TRX_ERROR, Format(EftTransactionRequest."Auxiliary Operation Desc."), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
+            Message(TRX_ERROR, Format(EftTransactionRequest."Auxiliary Operation Desc."), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
         //+NPR5.53 [377533]
     end;
 
@@ -448,9 +449,9 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     begin
         //-NPR5.53 [377533]
         if EftTransactionRequest.Successful then
-          Message(DISABLE_SHOPPER_SUCCESS, EftTransactionRequest."External Customer ID")
+            Message(DISABLE_SHOPPER_SUCCESS, EftTransactionRequest."External Customer ID")
         else
-          Message(TRX_ERROR, Format(EftTransactionRequest."Auxiliary Operation Desc."), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
+            Message(TRX_ERROR, Format(EftTransactionRequest."Auxiliary Operation Desc."), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
         //+NPR5.53 [377533]
     end;
 
@@ -513,14 +514,14 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         exit(EFTAdyenPaymentTypeSetup."Log Level");
     end;
 
-    local procedure GetPaymentTypeParameters(EFTSetup: Record "EFT Setup";var EFTAdyenPaymentTypeSetupOut: Record "EFT Adyen Payment Type Setup")
+    local procedure GetPaymentTypeParameters(EFTSetup: Record "EFT Setup"; var EFTAdyenPaymentTypeSetupOut: Record "EFT Adyen Payment Type Setup")
     begin
         EFTSetup.TestField("Payment Type POS");
 
         if not EFTAdyenPaymentTypeSetupOut.Get(EFTSetup."Payment Type POS") then begin
-          EFTAdyenPaymentTypeSetupOut.Init;
-          EFTAdyenPaymentTypeSetupOut."Payment Type POS" := EFTSetup."Payment Type POS";
-          EFTAdyenPaymentTypeSetupOut.Insert;
+            EFTAdyenPaymentTypeSetupOut.Init;
+            EFTAdyenPaymentTypeSetupOut."Payment Type POS" := EFTSetup."Payment Type POS";
+            EFTAdyenPaymentTypeSetupOut.Insert;
         end;
     end;
 
@@ -582,10 +583,10 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         EFTTransactionRequest."Integration Version Code" := '3.0'; //Adyen Terminal API Protocol v3.0
         EFTTransactionRequest."Hardware ID" := GetPOIID(EFTSetup);
         if GetEnvironment(EFTSetup) <> 0 then
-          EFTTransactionRequest.Mode := EFTTransactionRequest.Mode::"TEST Remote";
+            EFTTransactionRequest.Mode := EFTTransactionRequest.Mode::"TEST Remote";
 
         if not GetCashbackAllowed(EFTSetup) then
-          EFTTransactionRequest.TestField("Cashback Amount", 0);
+            EFTTransactionRequest.TestField("Cashback Amount", 0);
     end;
 
     procedure VoidTransactionAfterSignatureDecline(EFTTransactionRequest: Record "EFT Transaction Request")
@@ -611,15 +612,15 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         SalePOS: Record "Sale POS";
     begin
         if not (EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND]) then
-          exit(false);
+            exit(false);
 
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
         if not (GetAcquireCardFirst(EFTSetup) or (GetCreateRecurringContract(EFTSetup) <> 0)) then
-          exit(false);
+            exit(false);
 
         if not POSSession.IsActiveSession(POSFrontEndManagement) then
-          exit(false);
+            exit(false);
         POSFrontEndManagement.GetSession(POSSession);
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -639,20 +640,20 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     procedure GetPOSDescription(EFTTransactionRequest: Record "EFT Transaction Request"): Text
     begin
         if EFTTransactionRequest."Card Name" <> '' then begin
-          if (StrLen(EFTTransactionRequest."Card Number") > 8) then
-            exit(StrSubstNo ('%1: %2', EFTTransactionRequest."Card Name", CopyStr(EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number")-7)))
-          else
-            exit(StrSubstNo(EFTTransactionRequest."Card Name"));
+            if (StrLen(EFTTransactionRequest."Card Number") > 8) then
+                exit(StrSubstNo('%1: %2', EFTTransactionRequest."Card Name", CopyStr(EFTTransactionRequest."Card Number", StrLen(EFTTransactionRequest."Card Number") - 7)))
+            else
+                exit(StrSubstNo(EFTTransactionRequest."Card Name"));
         end;
 
         if EFTTransactionRequest."Stored Value Account Type" <> '' then
-          exit(EFTTransactionRequest."Stored Value Account Type");
+            exit(EFTTransactionRequest."Stored Value Account Type");
 
         if EFTTransactionRequest."Payment Instrument Type" <> '' then
-          exit(EFTTransactionRequest."Payment Instrument Type");
+            exit(EFTTransactionRequest."Payment Instrument Type");
 
         if EFTTransactionRequest."Card Number" <> '' then
-          exit(StrSubstNo(CARD, EFTTransactionRequest."Card Number"));
+            exit(StrSubstNo(CARD, EFTTransactionRequest."Card Number"));
 
         exit(UNKNOWN);
     end;
@@ -668,7 +669,7 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         if GetCreateRecurringContract(EFTSetup) = 0 then
-          exit;
+            exit;
 
         POSSession.GetSession(POSSession, true);
         POSSession.GetSale(POSSale);
@@ -678,26 +679,26 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         EFTShopperRecognition.SetRange("Integration Type", IntegrationType());
         EFTShopperRecognition.SetRange("Entity Key", SalePOS."Customer No.");
         if SalePOS."Customer Type" = SalePOS."Customer Type"::Cash then
-          EFTShopperRecognition.SetRange("Entity Type", EFTShopperRecognition."Entity Type"::Contact)
+            EFTShopperRecognition.SetRange("Entity Type", EFTShopperRecognition."Entity Type"::Contact)
         else
-          EFTShopperRecognition.SetRange("Entity Type", EFTShopperRecognition."Entity Type"::Customer);
+            EFTShopperRecognition.SetRange("Entity Type", EFTShopperRecognition."Entity Type"::Customer);
 
         if not EFTShopperRecognition.FindFirst then begin
-          EFTShopperRecognition.Init;
-          EFTShopperRecognition."Integration Type" := IntegrationType();
-          EFTShopperRecognition."Shopper Reference" := CopyStr(Format(CreateGuid), 2, 36);
-          EFTShopperRecognition."Entity Key" := SalePOS."Customer No.";
-          if SalePOS."Customer Type" = SalePOS."Customer Type"::Cash then
-            EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Contact
-          else
-            EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Customer;
-          EFTShopperRecognition.Insert;
+            EFTShopperRecognition.Init;
+            EFTShopperRecognition."Integration Type" := IntegrationType();
+            EFTShopperRecognition."Shopper Reference" := CopyStr(Format(CreateGuid), 2, 36);
+            EFTShopperRecognition."Entity Key" := SalePOS."Customer No.";
+            if SalePOS."Customer Type" = SalePOS."Customer Type"::Cash then
+                EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Contact
+            else
+                EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Customer;
+            EFTShopperRecognition.Insert;
         end;
 
         EFTTransactionRequest."Internal Customer ID" := EFTShopperRecognition."Shopper Reference";
     end;
 
-    procedure ContinueAfterAcquireCard(POSSession: Codeunit "POS Session";TransactionEntryNo: Integer;var ContinueOnTransactionEntryNo: Integer): Boolean
+    procedure ContinueAfterAcquireCard(POSSession: Codeunit "POS Session"; TransactionEntryNo: Integer; var ContinueOnTransactionEntryNo: Integer): Boolean
     var
         EFTTransactionRequest: Record "EFT Transaction Request";
         BeforeAmount: Decimal;
@@ -705,47 +706,47 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         POSSale: Codeunit "POS Sale";
     begin
         if not EFTTransactionRequest.Get(TransactionEntryNo) then
-          exit(false);
+            exit(false);
 
         if EFTTransactionRequest."Processing Type" <> EFTTransactionRequest."Processing Type"::AUXILIARY then
-          exit(false);
+            exit(false);
 
         //-NPR5.53 [377533]
         case EFTTransactionRequest."Auxiliary Operation ID" of
-          2 :
-            begin
-              exit(ShouldProceedToPurchaseTransaction(POSSession, EFTTransactionRequest, ContinueOnTransactionEntryNo));
-            end;
-          4 :
-            begin
-              DetectShopper(POSSession, EFTTransactionRequest);
-              exit(false);
-            end;
-          5 :
-            begin
-              ClearShopperContract(POSSession, EFTTransactionRequest);
-              exit(false);
-            end;
-          else
-            EFTTransactionRequest.FieldError("Auxiliary Operation ID");
+            2:
+                begin
+                    exit(ShouldProceedToPurchaseTransaction(POSSession, EFTTransactionRequest, ContinueOnTransactionEntryNo));
+                end;
+            4:
+                begin
+                    DetectShopper(POSSession, EFTTransactionRequest);
+                    exit(false);
+                end;
+            5:
+                begin
+                    ClearShopperContract(POSSession, EFTTransactionRequest);
+                    exit(false);
+                end;
+            else
+                EFTTransactionRequest.FieldError("Auxiliary Operation ID");
         end;
         //+NPR5.53 [377533]
     end;
 
-    local procedure ShouldProceedToPurchaseTransaction(POSSession: Codeunit "POS Session";EFTTransactionRequest: Record "EFT Transaction Request";var ContinueOnTransactionEntryNo: Integer): Boolean
+    local procedure ShouldProceedToPurchaseTransaction(POSSession: Codeunit "POS Session"; EFTTransactionRequest: Record "EFT Transaction Request"; var ContinueOnTransactionEntryNo: Integer): Boolean
     var
         EFTAdyenCloudProtocol: Codeunit "EFT Adyen Cloud Protocol";
         EFTPaymentTransactionRequest: Record "EFT Transaction Request";
     begin
         //-NPR5.53 [377533]
         if not EFTTransactionRequest.Successful then
-          exit(false);
+            exit(false);
 
         if not ContinueAfterShopperRecognition(EFTTransactionRequest, POSSession) then
-          exit(false);
+            exit(false);
 
         if CancelContractCreation(EFTTransactionRequest, POSSession) then
-          exit(false);
+            exit(false);
 
         EFTPaymentTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
         EFTPaymentTransactionRequest.Recoverable := true;
@@ -757,7 +758,7 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         //+NPR5.53 [377533]
     end;
 
-    local procedure ClearShopperContract(POSSession: Codeunit "POS Session";EFTTransactionRequest: Record "EFT Transaction Request")
+    local procedure ClearShopperContract(POSSession: Codeunit "POS Session"; EFTTransactionRequest: Record "EFT Transaction Request")
     var
         EFTShopperRecognition: Record "EFT Shopper Recognition";
         EFTAdyenCloudProtocol: Codeunit "EFT Adyen Cloud Protocol";
@@ -767,21 +768,21 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     begin
         //-NPR5.53 [377533]
         if not (EFTTransactionRequest.Successful) then
-          exit;
+            exit;
 
         AbortAcquireCard(EFTTransactionRequest, '');
 
         if EFTTransactionRequest."External Customer ID" = '' then begin
-          Message(NO_SHOPPER_ON_CARD);
-          exit;
+            Message(NO_SHOPPER_ON_CARD);
+            exit;
         end;
 
         if EFTShopperRecognition.Get(IntegrationType(), EFTTransactionRequest."External Customer ID") then begin
-          if not Confirm(CLEAR_SHOPPER_PROMPT_MATCH, false, EFTTransactionRequest."External Customer ID", EFTShopperRecognition."Entity Type", EFTShopperRecognition."Entity Key") then
-            exit;
+            if not Confirm(CLEAR_SHOPPER_PROMPT_MATCH, false, EFTTransactionRequest."External Customer ID", EFTShopperRecognition."Entity Type", EFTShopperRecognition."Entity Key") then
+                exit;
         end else begin
-          if not Confirm(CLEAR_SHOPPER_PROMPT, false, EFTTransactionRequest."External Customer ID") then
-            exit;
+            if not Confirm(CLEAR_SHOPPER_PROMPT, false, EFTTransactionRequest."External Customer ID") then
+                exit;
         end;
 
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
@@ -794,7 +795,7 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         //+NPR5.53 [377533]
     end;
 
-    local procedure ContinueAfterShopperRecognition(EFTTransactionRequest: Record "EFT Transaction Request";POSSession: Codeunit "POS Session"): Boolean
+    local procedure ContinueAfterShopperRecognition(EFTTransactionRequest: Record "EFT Transaction Request"; POSSession: Codeunit "POS Session"): Boolean
     var
         POSSale: Codeunit "POS Sale";
         BeforeAmount: Decimal;
@@ -804,61 +805,61 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
 
         BeforeAmount := GetRemainingPaymentSuggestion(EFTTransactionRequest, POSSession);
         if DetectShopperSilent(EFTTransactionRequest, POSSale) then begin
-          AfterAmount := GetRemainingPaymentSuggestion(EFTTransactionRequest, POSSession);
-          if BeforeAmount <> AfterAmount then begin
-            exit(HandleAcquireCardPriceChange(EFTTransactionRequest, BeforeAmount, AfterAmount));
-          end;
+            AfterAmount := GetRemainingPaymentSuggestion(EFTTransactionRequest, POSSession);
+            if BeforeAmount <> AfterAmount then begin
+                exit(HandleAcquireCardPriceChange(EFTTransactionRequest, BeforeAmount, AfterAmount));
+            end;
         end;
 
         exit(true);
     end;
 
-    local procedure DetectShopper(POSSession: Codeunit "POS Session";EFTTransactionRequest: Record "EFT Transaction Request")
+    local procedure DetectShopper(POSSession: Codeunit "POS Session"; EFTTransactionRequest: Record "EFT Transaction Request")
     var
         EFTShopperRecognition: Record "EFT Shopper Recognition";
     begin
         //-NPR5.53 [377533]
         if not (EFTTransactionRequest.Successful) then
-          exit;
+            exit;
 
         AbortAcquireCard(EFTTransactionRequest, '');
 
         if EFTTransactionRequest."External Customer ID" = '' then begin
-          Message(NO_SHOPPER_ON_CARD);
-          exit;
+            Message(NO_SHOPPER_ON_CARD);
+            exit;
         end;
 
         if not EFTShopperRecognition.Get(IntegrationType(), EFTTransactionRequest."External Customer ID") then begin
-          Message(UNKNOWN_SHOPPER, EFTTransactionRequest."External Customer ID");
-          exit;
+            Message(UNKNOWN_SHOPPER, EFTTransactionRequest."External Customer ID");
+            exit;
         end;
 
         Commit;
         if not CODEUNIT.Run(CODEUNIT::"EFT Try Add Shopper", EFTShopperRecognition) then
-          Message(GetLastErrorText);
+            Message(GetLastErrorText);
         //+NPR5.53 [377533]
     end;
 
-    local procedure DetectShopperSilent(EftTransactionRequest: Record "EFT Transaction Request";POSSale: Codeunit "POS Sale"): Boolean
+    local procedure DetectShopperSilent(EftTransactionRequest: Record "EFT Transaction Request"; POSSale: Codeunit "POS Sale"): Boolean
     var
         EFTShopperRecognition: Record "EFT Shopper Recognition";
         SalePOS: Record "Sale POS";
     begin
         if EftTransactionRequest."External Customer ID" = '' then
-          exit(false);
+            exit(false);
 
         if not EFTShopperRecognition.Get(IntegrationType(), EftTransactionRequest."External Customer ID") then
-          exit(false);
+            exit(false);
 
         POSSale.GetCurrentSale(SalePOS);
         if (SalePOS."Customer No." <> '') then
-          exit(false);
+            exit(false);
 
         Commit;
         exit(CODEUNIT.Run(CODEUNIT::"EFT Try Add Shopper", EFTShopperRecognition));
     end;
 
-    local procedure GetRemainingPaymentSuggestion(EFTTransactionRequest: Record "EFT Transaction Request";POSSession: Codeunit "POS Session"): Decimal
+    local procedure GetRemainingPaymentSuggestion(EFTTransactionRequest: Record "EFT Transaction Request"; POSSession: Codeunit "POS Session"): Decimal
     var
         PaymentTypePOS: Record "Payment Type POS";
         POSPaymentLine: Codeunit "POS Payment Line";
@@ -866,12 +867,12 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         POSSession.GetPaymentLine(POSPaymentLine);
 
         if not POSPaymentLine.GetPaymentType(PaymentTypePOS, EFTTransactionRequest."Original POS Payment Type Code", EFTTransactionRequest."Register No.") then
-          Error('%1 %2 could not be retrieved. This is a programming bug, not a user error.', PaymentTypePOS.TableCaption, EFTTransactionRequest."Original POS Payment Type Code");
+            Error('%1 %2 could not be retrieved. This is a programming bug, not a user error.', PaymentTypePOS.TableCaption, EFTTransactionRequest."Original POS Payment Type Code");
 
         exit(POSPaymentLine.CalculateRemainingPaymentSuggestionInCurrentSale(PaymentTypePOS));
     end;
 
-    local procedure HandleAcquireCardPriceChange(EFTTransactionRequest: Record "EFT Transaction Request";BeforeAmount: Decimal;AfterAmount: Decimal): Boolean
+    local procedure HandleAcquireCardPriceChange(EFTTransactionRequest: Record "EFT Transaction Request"; BeforeAmount: Decimal; AfterAmount: Decimal): Boolean
     var
         EFTSetup: Record "EFT Setup";
         SilentAllowed: Boolean;
@@ -882,11 +883,11 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
 
         EFTPaymentTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
         if (0 < BeforeAmount) and (0 < AfterAmount) and (AfterAmount < BeforeAmount) and (EFTPaymentTransactionRequest."Amount Input" = BeforeAmount) and (SilentAllowed) then begin
-          EFTPaymentTransactionRequest."Amount Input" := AfterAmount;
-          EFTPaymentTransactionRequest.Modify;
-          Commit;
+            EFTPaymentTransactionRequest."Amount Input" := AfterAmount;
+            EFTPaymentTransactionRequest.Modify;
+            Commit;
 
-          exit(true); //Positive amount before and after, original payment was on full remaining amount, and silent allowed is set.
+            exit(true); //Positive amount before and after, original payment was on full remaining amount, and silent allowed is set.
         end;
 
         //-NPR5.53 [377533]
@@ -895,32 +896,32 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         exit(false);
     end;
 
-    local procedure AbortAcquireCard(EFTTransactionRequest: Record "EFT Transaction Request";Reason: Text)
+    local procedure AbortAcquireCard(EFTTransactionRequest: Record "EFT Transaction Request"; Reason: Text)
     var
         OriginalEFTTransactionRequest: Record "EFT Transaction Request";
         AbortAttempts: Integer;
         Aborted: Boolean;
     begin
         while (not Aborted) and (AbortAttempts < 2) do begin
-          Aborted := SendAbortAcquireCardRequest(EFTTransactionRequest);
-          AbortAttempts += 1;
-          Sleep(500);
+            Aborted := SendAbortAcquireCardRequest(EFTTransactionRequest);
+            AbortAttempts += 1;
+            Sleep(500);
         end;
 
         //-NPR5.53 [377533]
         if Reason <> '' then
-        //+NPR5.53 [377533]
-          Message(Reason);
+            //+NPR5.53 [377533]
+            Message(Reason);
 
         //-NPR5.53 [377533]
         ProcessOriginalTrxAfterAcquireCardFailure(EFTTransactionRequest);
         //+NPR5.53 [377533]
 
         if not Aborted then
-          Message(ABORT_ACQUIRED_FAIL);
+            Message(ABORT_ACQUIRED_FAIL);
     end;
 
-    procedure AbortTransaction(EFTTransactionRequest: Record "EFT Transaction Request";RegisterNo: Text;SalesTicketNo: Text): Boolean
+    procedure AbortTransaction(EFTTransactionRequest: Record "EFT Transaction Request"; RegisterNo: Text; SalesTicketNo: Text): Boolean
     var
         EFTFrameworkMgt: Codeunit "EFT Framework Mgt.";
         AbortEFTTransactionRequest: Record "EFT Transaction Request";
@@ -956,7 +957,7 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
         exit(AbortEFTTransactionRequest.Successful);
     end;
 
-    local procedure CancelContractCreation(EFTTransactionRequest: Record "EFT Transaction Request";POSSession: Codeunit "POS Session"): Boolean
+    local procedure CancelContractCreation(EFTTransactionRequest: Record "EFT Transaction Request"; POSSession: Codeunit "POS Session"): Boolean
     var
         EFTSetup: Record "EFT Setup";
         EFTShopperRecognition: Record "EFT Shopper Recognition";
@@ -964,14 +965,14 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         if GetCreateRecurringContract(EFTSetup) = 0 then
-          exit(false);
+            exit(false);
 
         if EFTTransactionRequest."External Customer ID" <> '' then begin
-          CurrentShopperRef := EFTTransactionRequest."External Customer ID";
-          if EFTShopperRecognition.Get(IntegrationType(), EFTTransactionRequest."External Customer ID") then
-            CurrentShopperRef += StrSubstNo(', %1 %2', Format(EFTShopperRecognition."Entity Type"), EFTShopperRecognition."Entity Key");
-          AbortAcquireCard(EFTTransactionRequest, StrSubstNo(CONTRACT_DUPLICATE, EFTShopperRecognition.FieldCaption("Shopper Reference"), CurrentShopperRef));
-          exit(true);
+            CurrentShopperRef := EFTTransactionRequest."External Customer ID";
+            if EFTShopperRecognition.Get(IntegrationType(), EFTTransactionRequest."External Customer ID") then
+                CurrentShopperRef += StrSubstNo(', %1 %2', Format(EFTShopperRecognition."Entity Type"), EFTShopperRecognition."Entity Key");
+            AbortAcquireCard(EFTTransactionRequest, StrSubstNo(CONTRACT_DUPLICATE, EFTShopperRecognition.FieldCaption("Shopper Reference"), CurrentShopperRef));
+            exit(true);
         end;
 
         exit(false);
@@ -983,12 +984,12 @@ codeunit 6184517 "EFT Adyen Cloud Integration"
     begin
         //-NPR5.53 [377533]
         if (EFTTransactionRequest."Initiated from Entry No." = 0) then
-          exit;
+            exit;
         //-NPR5.54 [387990]
         if (EFTTransactionRequest."Processing Type" <> EFTTransactionRequest."Processing Type"::AUXILIARY) then
-          exit;
+            exit;
         if (EFTTransactionRequest."Auxiliary Operation ID" <> 2) then
-          exit;
+            exit;
         //+NPR5.54 [387990]
 
         OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");

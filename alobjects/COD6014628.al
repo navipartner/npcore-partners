@@ -37,7 +37,7 @@ codeunit 6014628 "Managed Package Mgt."
         GlobalLoadMethodOverwritten: Boolean;
         IsDialogOpen: Boolean;
         ProgressDialog: Dialog;
-        DialogValues: array [2] of Integer;
+        DialogValues: array[2] of Integer;
 
     procedure AddExpectedTableID(ID: Integer)
     var
@@ -61,7 +61,7 @@ codeunit 6014628 "Managed Package Mgt."
     procedure ImportFromFile()
     var
         FileMgt: Codeunit "File Management";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         JObject: DotNet JObject;
         InStream: InStream;
         JSON: Text;
@@ -69,11 +69,11 @@ codeunit 6014628 "Managed Package Mgt."
         PrimaryPackageTable: Integer;
         ManagedDependencyMgt: Codeunit "Managed Dependency Mgt.";
     begin
-        if FileMgt.BLOBImportWithFilter(TempBlob,Caption_SelectPackage,'','JSON File (*.json)|*.json','json') = '' then
-          exit;
+        if FileMgt.BLOBImportWithFilter(TempBlob, Caption_SelectPackage, '', 'JSON File (*.json)|*.json', 'json') = '' then
+            exit;
 
         //-NPR5.38 [294095]
-        TempBlob.Blob.CreateInStream(InStream, TEXTENCODING::UTF8);
+        TempBlob.CreateInStream(InStream, TEXTENCODING::UTF8);
 
         InStream.Read(JSON);
         ManagedDependencyMgt.ParseJSON(JSON, JObject);
@@ -82,7 +82,7 @@ codeunit 6014628 "Managed Package Mgt."
 
         OnLoadPackage(Handled, PrimaryPackageTable, JObject, 0);
         if Handled then
-          exit;
+            exit;
 
         LoadPackage(JObject);
 
@@ -90,7 +90,7 @@ codeunit 6014628 "Managed Package Mgt."
         //+NPR5.38 [294095]
     end;
 
-    procedure ImportFromBlob(var TempBlob: Record TempBlob temporary)
+    procedure ImportFromBlob(var TempBlob: Codeunit "Temp Blob")
     var
         JObject: DotNet JObject;
         InStream: InStream;
@@ -102,7 +102,7 @@ codeunit 6014628 "Managed Package Mgt."
         // Note: This function is made for manually importing a package manifest file/blob, so it will not expect
         // the JArray "Data" to be the root which is the case when parsing the base64 blob straight from ground control.
 
-        TempBlob.Blob.CreateInStream(InStream, TEXTENCODING::UTF8);
+        TempBlob.CreateInStream(InStream, TEXTENCODING::UTF8);
 
         InStream.Read(JSON);
         //-NPR5.38 [294095]
@@ -117,7 +117,7 @@ codeunit 6014628 "Managed Package Mgt."
         //OnLoadPackage(Handled, PrimaryPackageTable, JObject);
         //+NPR5.38 [294095]
         if Handled then
-          exit;
+            exit;
 
         LoadPackage(JObject);
     end;
@@ -135,45 +135,45 @@ codeunit 6014628 "Managed Package Mgt."
         Handled: Boolean;
     begin
         with ManagedDependencyMgt do begin
-          GetDependencyMgtSetup(DepMgtSetup);
-          if not DepMgtSetup.Configured then
-            exit(false);
+            GetDependencyMgtSetup(DepMgtSetup);
+            if not DepMgtSetup.Configured then
+                exit(false);
 
-          if not GetJSON(DepMgtSetup, 'ManagedDataPackageList', JObject, CreateFilterText(PrimaryPackageTable, DepMgtSetup), false) then
-            exit(false);
+            if not GetJSON(DepMgtSetup, 'ManagedDataPackageList', JObject, CreateFilterText(PrimaryPackageTable, DepMgtSetup), false) then
+                exit(false);
 
-          for i := 0 to JObject.Count - 1 do begin
-            Package := JObject.Item(i);
-            TmpManagedPackageLookup.Index := i;
-            TmpManagedPackageLookup.Name := Format(Package.Item('Name'));
-            TmpManagedPackageLookup.Version := Format(Package.Item('Version'));
-            TmpManagedPackageLookup.Description := Format(Package.Item('Description'));
-            TmpManagedPackageLookup.Status := Format(Package.Item('Status'));
-            TmpManagedPackageLookup.Tags := Format(Package.Item('Tags'));
-            TmpManagedPackageLookup.Insert;
-          end;
-
-          if TmpManagedPackageLookup.IsEmpty then
-            exit(false);
-
-          if not (PAGE.RunModal(PAGE::"Managed Package Lookup", TmpManagedPackageLookup) = ACTION::LookupOK) then
-            exit(false);
-
-          Package := JObject.Item(TmpManagedPackageLookup.Index);
-          if GetJSON(DepMgtSetup, 'ManagedDependency', Package, StrSubstNo(FilterSpecific,Package.Item('Type'),Package.Item('Name'),Package.Item('Version')), true) then
-            if Base64StringToJObject(Package.Item('BLOB').ToString(), Data) then begin
-              //-NPR5.38 [294095]
-              //OnLoadPackage(Handled, PrimaryPackageTable, Data)
-              OnLoadPackage(Handled, PrimaryPackageTable, Data, 2);
-              //+NPR5.38 [294095]
-              if Handled then
-                exit(UpdateLog(Package));
-
-              if LoadPackage(Data) then
-                exit(UpdateLog(Package));
+            for i := 0 to JObject.Count - 1 do begin
+                Package := JObject.Item(i);
+                TmpManagedPackageLookup.Index := i;
+                TmpManagedPackageLookup.Name := Format(Package.Item('Name'));
+                TmpManagedPackageLookup.Version := Format(Package.Item('Version'));
+                TmpManagedPackageLookup.Description := Format(Package.Item('Description'));
+                TmpManagedPackageLookup.Status := Format(Package.Item('Status'));
+                TmpManagedPackageLookup.Tags := Format(Package.Item('Tags'));
+                TmpManagedPackageLookup.Insert;
             end;
 
-          exit(false);
+            if TmpManagedPackageLookup.IsEmpty then
+                exit(false);
+
+            if not (PAGE.RunModal(PAGE::"Managed Package Lookup", TmpManagedPackageLookup) = ACTION::LookupOK) then
+                exit(false);
+
+            Package := JObject.Item(TmpManagedPackageLookup.Index);
+            if GetJSON(DepMgtSetup, 'ManagedDependency', Package, StrSubstNo(FilterSpecific, Package.Item('Type'), Package.Item('Name'), Package.Item('Version')), true) then
+                if Base64StringToJObject(Package.Item('BLOB').ToString(), Data) then begin
+                    //-NPR5.38 [294095]
+                    //OnLoadPackage(Handled, PrimaryPackageTable, Data)
+                    OnLoadPackage(Handled, PrimaryPackageTable, Data, 2);
+                    //+NPR5.38 [294095]
+                    if Handled then
+                        exit(UpdateLog(Package));
+
+                    if LoadPackage(Data) then
+                        exit(UpdateLog(Package));
+                end;
+
+            exit(false);
         end;
     end;
 
@@ -184,44 +184,45 @@ codeunit 6014628 "Managed Package Mgt."
         RecRef: RecordRef;
     begin
         if JObject.Count < 1 then
-          exit;
+            exit;
 
         if GlobalLoadMethodOverwritten then
-          LoadMethod := GlobalLoadMethod
+            LoadMethod := GlobalLoadMethod
         else begin
-          Selection := StrMenu(StrSubstNo('%1,%2,%3',Caption_OnlyInsert,Caption_InsertModify,Caption_DeleteFirst), 1, Caption_LoadMethod);
-          if Selection = 0 then
-            exit(false);
-
-          LoadMethod := Selection-1;
-
-          case LoadMethod of
-            LoadMethod::DeleteFirst:
-              if not Confirm(StrSubstNo(Caption_DeleteWarning,GlobalTableString), false) then
+            Selection := StrMenu(StrSubstNo('%1,%2,%3', Caption_OnlyInsert, Caption_InsertModify, Caption_DeleteFirst), 1, Caption_LoadMethod);
+            if Selection = 0 then
                 exit(false);
-            LoadMethod::InsertOrModify:
-              if not Confirm(StrSubstNo(Caption_ModifyWarning,GlobalTableString), false) then
-                exit(false);
-          end;
+
+            LoadMethod := Selection - 1;
+
+            case LoadMethod of
+                LoadMethod::DeleteFirst:
+                    if not Confirm(StrSubstNo(Caption_DeleteWarning, GlobalTableString), false) then
+                        exit(false);
+                LoadMethod::InsertOrModify:
+                    if not Confirm(StrSubstNo(Caption_ModifyWarning, GlobalTableString), false) then
+                        exit(false);
+            end;
         end;
 
-        if (LoadMethod = LoadMethod::DeleteFirst) and GlobalTableListTmp.FindSet then repeat
-          RecRef.Open(GlobalTableListTmp."Object ID");
+        if (LoadMethod = LoadMethod::DeleteFirst) and GlobalTableListTmp.FindSet then
+            repeat
+                RecRef.Open(GlobalTableListTmp."Object ID");
 
-          if not RecRef.WritePermission then
-            Error(Error_MissingPermission, RecRef.Number);
+                if not RecRef.WritePermission then
+                    Error(Error_MissingPermission, RecRef.Number);
 
-          RecRef.DeleteAll;
-          RecRef.Close;
-        until GlobalTableListTmp.Next = 0;
+                RecRef.DeleteAll;
+                RecRef.Close;
+            until GlobalTableListTmp.Next = 0;
 
         if not LoadRecords(JObject, LoadMethod) then
-          Error(Error_PackageLoad);
+            Error(Error_PackageLoad);
 
         exit(true);
     end;
 
-    local procedure LoadRecords(JObject: DotNet JObject;LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst): Boolean
+    local procedure LoadRecords(JObject: DotNet JObject; LoadMethod: Option OnlyInsert,InsertOrModify,DeleteFirst): Boolean
     var
         RecRef: RecordRef;
         FieldRef: FieldRef;
@@ -238,37 +239,38 @@ codeunit 6014628 "Managed Package Mgt."
         OpenDialog;
 
         for i := 0 to Total - 1 do begin
-          Itt += 1;
+            Itt += 1;
 
-          Evaluate(Record,JObject.Item(i).Item('Record').ToString());
+            Evaluate(Record, JObject.Item(i).Item('Record').ToString());
 
-          UpdateDialog(1,Record);
-          UpdateProgressDialog(2,Itt,Total);
+            UpdateDialog(1, Record);
+            UpdateProgressDialog(2, Itt, Total);
 
-          if not GlobalTableListTmp.Get(GlobalTableListTmp."Object Type"::Table, Record) then //Only accept data for expected tables.
-            exit(false);
-
-          RecRef.Open(Record);
-
-          FieldsJObject := JObject.Item(i).Item('Fields');
-          foreach KeyValuePair in FieldsJObject do
-            if FieldRefByID(RecRef,KeyValuePair.Key,FieldRef) then
-              if not ManagedDependencyMgt.TextToFieldRef(KeyValuePair.Value,FieldRef) then
+            if not GlobalTableListTmp.Get(GlobalTableListTmp."Object Type"::Table, Record) then //Only accept data for expected tables.
                 exit(false);
 
-          case LoadMethod of
-            LoadMethod::DeleteFirst:
-              if not RecRef.Insert then
-                exit(false);
-            LoadMethod::OnlyInsert:
-              if not RecRef.Insert then;
-            LoadMethod::InsertOrModify:
-              if not RecRef.Insert then
-                if not RecRef.Modify then
-                  exit(false);
-          end;
+            RecRef.Open(Record);
 
-          RecRef.Close;
+            FieldsJObject := JObject.Item(i).Item('Fields');
+            foreach KeyValuePair in FieldsJObject do
+                if FieldRefByID(RecRef, KeyValuePair.Key, FieldRef) then
+                    if not ManagedDependencyMgt.TextToFieldRef(KeyValuePair.Value, FieldRef) then
+                        exit(false);
+
+            case LoadMethod of
+                LoadMethod::DeleteFirst:
+                    if not RecRef.Insert then
+                        exit(false);
+                LoadMethod::OnlyInsert:
+                    if not RecRef.Insert then
+                        ;
+                LoadMethod::InsertOrModify:
+                    if not RecRef.Insert then
+                        if not RecRef.Modify then
+                            exit(false);
+            end;
+
+            RecRef.Close;
         end;
 
         CloseDialog;
@@ -276,7 +278,7 @@ codeunit 6014628 "Managed Package Mgt."
         exit(true);
     end;
 
-    local procedure CreateFilterText(PrimaryPackageTable: Integer;var DepMgtSetup: Record "Dependency Management Setup") "Filter": Text
+    local procedure CreateFilterText(PrimaryPackageTable: Integer; var DepMgtSetup: Record "Dependency Management Setup") "Filter": Text
     var
         Uri: DotNet npNetUri;
         ManagedDependencyMgt: Codeunit "Managed Dependency Mgt.";
@@ -293,15 +295,15 @@ codeunit 6014628 "Managed Package Mgt."
         Filter += StrSubstNo('(Primary_Package_Table eq %1)', PrimaryPackageTable);
     end;
 
-    procedure FieldRefByID(var RecRef: RecordRef;ID: Text;var FieldRef: FieldRef): Boolean
+    procedure FieldRefByID(var RecRef: RecordRef; ID: Text; var FieldRef: FieldRef): Boolean
     var
         IntBuffer: Integer;
     begin
         if not Evaluate(IntBuffer, ID) then
-          exit(false);
+            exit(false);
 
         if not RecRef.FieldExist(IntBuffer) then
-          exit(false);
+            exit(false);
 
         FieldRef := RecRef.Field(IntBuffer);
         exit(true);
@@ -312,7 +314,7 @@ codeunit 6014628 "Managed Package Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnLoadPackage(var Handled: Boolean;PrimaryPackageTable: Integer;JObject: DotNet JObject;LoadType: Option File,Blob,Download)
+    local procedure OnLoadPackage(var Handled: Boolean; PrimaryPackageTable: Integer; JObject: DotNet JObject; LoadType: Option File,Blob,Download)
     begin
         // Use this event to overwrite default import dialog flow and logic for your specific package type.
     end;
@@ -324,36 +326,36 @@ codeunit 6014628 "Managed Package Mgt."
     local procedure OpenDialog()
     begin
         if GuiAllowed then
-          if not IsDialogOpen then begin
-            ProgressDialog.Open('Table ##1######\@@2@@@@@@@@@@@@@@@@@');
-            IsDialogOpen := true;
-          end;
+            if not IsDialogOpen then begin
+                ProgressDialog.Open('Table ##1######\@@2@@@@@@@@@@@@@@@@@');
+                IsDialogOpen := true;
+            end;
     end;
 
-    local procedure UpdateDialog(ValueNo: Integer;Value: Integer)
+    local procedure UpdateDialog(ValueNo: Integer; Value: Integer)
     begin
         if GuiAllowed then
-          if Value <> DialogValues[ValueNo] then begin
-            DialogValues[ValueNo] := Value;
-            ProgressDialog.Update(ValueNo,Value);
-          end;
+            if Value <> DialogValues[ValueNo] then begin
+                DialogValues[ValueNo] := Value;
+                ProgressDialog.Update(ValueNo, Value);
+            end;
     end;
 
-    local procedure UpdateProgressDialog(ValueNo: Integer;Progress: Integer;Total: Integer)
+    local procedure UpdateProgressDialog(ValueNo: Integer; Progress: Integer; Total: Integer)
     begin
         if GuiAllowed then begin
-          Progress := Round(Progress/Total *10000,1,'>');
-          if Progress <> DialogValues[ValueNo] then begin
-            DialogValues[ValueNo] := Progress;
-            ProgressDialog.Update(ValueNo, DialogValues[ValueNo]);
-          end;
+            Progress := Round(Progress / Total * 10000, 1, '>');
+            if Progress <> DialogValues[ValueNo] then begin
+                DialogValues[ValueNo] := Progress;
+                ProgressDialog.Update(ValueNo, DialogValues[ValueNo]);
+            end;
         end;
     end;
 
     local procedure CloseDialog()
     begin
         if GuiAllowed then
-          ProgressDialog.Close;
+            ProgressDialog.Close;
 
         IsDialogOpen := false;
     end;

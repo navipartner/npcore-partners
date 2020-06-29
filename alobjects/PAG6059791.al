@@ -24,55 +24,55 @@ page 6059791 "E-mail Template"
         {
             group(Generelt)
             {
-                field("Code";Code)
+                field("Code"; Code)
                 {
                     Style = Standard;
                     StyleExpr = TRUE;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                 }
-                field("Table No.";"Table No.")
+                field("Table No."; "Table No.")
                 {
                 }
-                field(Filename;Filename)
+                field(Filename; Filename)
                 {
                 }
-                field(Subject;Subject)
+                field(Subject; Subject)
                 {
                 }
-                field("Verify Recipient";"Verify Recipient")
+                field("Verify Recipient"; "Verify Recipient")
                 {
                 }
-                field("Sender as bcc";"Sender as bcc")
+                field("Sender as bcc"; "Sender as bcc")
                 {
                 }
-                field("From E-mail Name";"From E-mail Name")
+                field("From E-mail Name"; "From E-mail Name")
                 {
                 }
-                field("From E-mail Address";"From E-mail Address")
+                field("From E-mail Address"; "From E-mail Address")
                 {
                 }
-                field("Default Recipient Address";"Default Recipient Address")
+                field("Default Recipient Address"; "Default Recipient Address")
                 {
                 }
-                field("Default Recipient Address CC";"Default Recipient Address CC")
+                field("Default Recipient Address CC"; "Default Recipient Address CC")
                 {
                 }
-                field("Default Recipient Address BCC";"Default Recipient Address BCC")
+                field("Default Recipient Address BCC"; "Default Recipient Address BCC")
                 {
                 }
-                field("Report ID";"Report ID")
+                field("Report ID"; "Report ID")
                 {
                 }
                 group(Control6150644)
                 {
                     ShowCaption = false;
                     Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
-                    field("Use HTML Template";"Use HTML Template")
+                    field("Use HTML Template"; "Use HTML Template")
                     {
                     }
-                    field("FORMAT(""HTML Template"".HASVALUE)";Format("HTML Template".HasValue))
+                    field("FORMAT(""HTML Template"".HASVALUE)"; Format("HTML Template".HasValue))
                     {
                         AssistEdit = true;
                         Caption = 'HTML Template';
@@ -80,7 +80,7 @@ page 6059791 "E-mail Template"
                         trigger OnAssistEdit()
                         var
                             TextEditorPage: Page "E-mail Text Editor Dialog";
-                            TempBlob: Record TempBlob;
+                            TempBlob: Codeunit "Temp Blob";
                             HtmlText: Text;
                             Instream: InStream;
                             Outstream: OutStream;
@@ -91,35 +91,35 @@ page 6059791 "E-mail Template"
                             HtmlText := '';
                             //-NPR5.48 [341711]
                             //"HTML Template".CREATEINSTREAM(Instream);
-                            "HTML Template".CreateInStream(Instream,TEXTENCODING::UTF8);
+                            "HTML Template".CreateInStream(Instream, TEXTENCODING::UTF8);
                             //+NPR5.48 [341711]
                             Instream.ReadText(HtmlText);
                             if TextEditorPage.EditText(HtmlText) then begin
-                              Clear("HTML Template");
-                              //-NPR5.48 [341711]
-                              //"HTML Template".CREATEOUTSTREAM(Outstream);
-                              "HTML Template".CreateOutStream(Outstream,TEXTENCODING::UTF8);
-                              //+NPR5.48 [341711]
-                              Outstream.WriteText(HtmlText);
-                              Modify;
+                                Clear("HTML Template");
+                                //-NPR5.48 [341711]
+                                //"HTML Template".CREATEOUTSTREAM(Outstream);
+                                "HTML Template".CreateOutStream(Outstream, TEXTENCODING::UTF8);
+                                //+NPR5.48 [341711]
+                                Outstream.WriteText(HtmlText);
+                                Modify;
                             end;
                             //+PN1.07
                         end;
                     }
                 }
-                field("Fieldnumber Start Tag";"Fieldnumber Start Tag")
+                field("Fieldnumber Start Tag"; "Fieldnumber Start Tag")
                 {
                     Importance = Additional;
                 }
-                field("Fieldnumber End Tag";"Fieldnumber End Tag")
+                field("Fieldnumber End Tag"; "Fieldnumber End Tag")
                 {
                     Importance = Additional;
                 }
-                field(Group;Group)
+                field(Group; Group)
                 {
                     Importance = Additional;
                 }
-                field("Transactional E-mail";"Transactional E-mail")
+                field("Transactional E-mail"; "Transactional E-mail")
                 {
                     Importance = Additional;
 
@@ -136,7 +136,7 @@ page 6059791 "E-mail Template"
                 {
                     ShowCaption = false;
                     Visible = ("Transactional E-mail" = 1);
-                    field("Transactional E-mail Code";"Transactional E-mail Code")
+                    field("Transactional E-mail Code"; "Transactional E-mail Code")
                     {
                         Importance = Additional;
 
@@ -151,23 +151,23 @@ page 6059791 "E-mail Template"
                     }
                 }
             }
-            part("Mail line";"E-mail Template Subform")
+            part("Mail line"; "E-mail Template Subform")
             {
                 Caption = 'Mail line';
                 ShowFilter = false;
-                SubPageLink = "E-mail Template Code"=FIELD(Code);
-                SubPageView = SORTING("E-mail Template Code","Line No.");
+                SubPageLink = "E-mail Template Code" = FIELD(Code);
+                SubPageView = SORTING("E-mail Template Code", "Line No.");
                 Visible = ("Transactional E-mail" = 0) OR ("Transactional E-mail Code" = '');
             }
         }
         area(factboxes)
         {
-            part("Fields";"E-mail Field List")
+            part("Fields"; "E-mail Field List")
             {
                 Caption = 'Fields';
                 ShowFilter = false;
-                SubPageLink = TableNo=FIELD("Table No.");
-                SubPageView = SORTING(TableNo,"No.");
+                SubPageLink = TableNo = FIELD("Table No.");
+                SubPageView = SORTING(TableNo, "No.");
             }
         }
     }
@@ -218,7 +218,7 @@ page 6059791 "E-mail Template"
                     Path: Text;
                 begin
                     //-NPR5.48 [341711]
-                    EmailTemplateMgt.ImportHtmlTemplate(Path,true,Rec);
+                    EmailTemplateMgt.ImportHtmlTemplate(Path, true, Rec);
                     //+NPR5.48 [341711]
                 end;
             }
@@ -233,7 +233,7 @@ page 6059791 "E-mail Template"
                     EmailTemplateMgt: Codeunit "E-mail Template Mgt.";
                 begin
                     //-NPR5.48 [341711]
-                    EmailTemplateMgt.ExportHtmlTemplate(Rec,true);
+                    EmailTemplateMgt.ExportHtmlTemplate(Rec, true);
                     //+NPR5.48 [341711]
                 end;
             }
@@ -275,7 +275,7 @@ page 6059791 "E-mail Template"
                 Caption = 'E-mail Log';
                 Image = ListPage;
                 RunObject = Page "E-mail Log";
-                RunPageLink = "Table No."=FIELD("Table No.");
+                RunPageLink = "Table No." = FIELD("Table No.");
                 RunPageView = SORTING("Entry No.");
             }
             action(EmailTemplateFilters)
@@ -283,9 +283,9 @@ page 6059791 "E-mail Template"
                 Caption = 'Email Template Filters';
                 Image = UseFilters;
                 RunObject = Page "E-mail Template Filters";
-                RunPageLink = "E-mail Template Code"=FIELD(Code),
-                              "Table No."=FIELD("Table No.");
-                RunPageView = SORTING("E-mail Template Code","Table No.","Line No.");
+                RunPageLink = "E-mail Template Code" = FIELD(Code),
+                              "Table No." = FIELD("Table No.");
+                RunPageView = SORTING("E-mail Template Code", "Table No.", "Line No.");
             }
             action(AttachedFiles)
             {
@@ -299,9 +299,9 @@ page 6059791 "E-mail Template"
                 begin
                     RecRef.GetTable(Rec);
                     Clear(RetailAttachments);
-                    RetailAttachments.SetRange("Table No.",RecRef.Number);
-                    RetailAttachments.SetRange("Primary Key",RecRef.GetPosition(false));
-                    PAGE.Run(PAGE::"E-mail Attachments",RetailAttachments);
+                    RetailAttachments.SetRange("Table No.", RecRef.Number);
+                    RetailAttachments.SetRange("Primary Key", RecRef.GetPosition(false));
+                    PAGE.Run(PAGE::"E-mail Attachments", RetailAttachments);
                 end;
             }
             action(AdditionalReports)
@@ -309,7 +309,7 @@ page 6059791 "E-mail Template"
                 Caption = 'Additional Reports';
                 Image = "Report";
                 RunObject = Page "E-mail Template Reports";
-                RunPageLink = "E-mail Template Code"=FIELD(Code);
+                RunPageLink = "E-mail Template Code" = FIELD(Code);
             }
         }
     }

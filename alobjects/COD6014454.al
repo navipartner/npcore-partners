@@ -59,10 +59,11 @@ codeunit 6014454 "Permission Set Mgt."
 until AllObj.Next = 0;
 
         //-NPR5.53 [375070]
-        AllObj.SetRange("Object ID",9650);
-        if AllObj.FindSet then repeat
-          GiveExecutePermission(RoleID,AllObj."Object Type",AllObj."Object ID")
-        until AllObj.Next = 0;
+        AllObj.SetRange("Object ID", 9650);
+        if AllObj.FindSet then
+            repeat
+                GiveExecutePermission(RoleID, AllObj."Object Type", AllObj."Object ID")
+until AllObj.Next = 0;
         //+NPR5.53 [375070]
 
 
@@ -154,9 +155,7 @@ until AllObj.Next = 0;
           PAGE::"Profile Card",
           PAGE::"Profile List",
           PAGE::"User Personalization List",
-          PAGE::"Delete Profile Configuration",
-          PAGE::"Delete User Personalization",
-          PAGE::"Session List",
+          PAGE::"Concurrent Session List",
           PAGE::"Custom Report Layouts",
           PAGE::"Report Layout Selection",
           PAGE::Users,

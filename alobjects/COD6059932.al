@@ -165,7 +165,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         if FTPFileMask = '' then
             FTPFileMask := '*.*';
         //-NPR5.54 [389951]
-        InitFTPWebRequest(FtpWebRequest,'LIST',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFileMask,FTPUsePassive,true);
+        InitFTPWebRequest(FtpWebRequest, 'LIST', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFileMask, FTPUsePassive, true);
         //+NPR5.54 [389951]
         FtpWebResponse := FtpWebRequest.GetResponse;
         Stream := FtpWebResponse.GetResponseStream;
@@ -198,7 +198,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         until I >= FileCounter;
         //-NPR5.29 [263705]
         //-NPR5.54 [389951]
-        DisconnectFTP(FTPserver,FTPUsername,FTPPassword,FTPUsePassive);
+        DisconnectFTP(FTPserver, FTPUsername, FTPPassword, FTPUsePassive);
         //+NPR5.54 [389951]
     end;
 
@@ -211,29 +211,33 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         MemoryStream: DotNet npNetMemoryStream;
         UTF8Encoding: DotNet npNetEncoding;
         FileLength: Integer;
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         OStream: OutStream;
         IStream: InStream;
         IncomingDocument: Record "Incoming Document";
         IncomingDocumentAttachment: Record "Incoming Document Attachment";
         ImportAttachIncDoc: Codeunit "Import Attachment - Inc. Doc.";
         FileText: Text;
+        RecRef: RecordRef;
     begin
         //-NPR5.29 [263705]
         //Download file and store in Blob
         //-NPR5.54 [389951]
-        InitFTPWebRequest(FtpWebRequest,'RETR',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFilename,FTPUsePassive,true);
+        InitFTPWebRequest(FtpWebRequest, 'RETR', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive, true);
         //+NPR5.54 [389951]
         FtpWebResponse := FtpWebRequest.GetResponse;
         Stream := FtpWebResponse.GetResponseStream;
         MemoryStream := MemoryStream.MemoryStream();
-        TempBlob.Blob.CreateOutStream(OStream);
+        TempBlob.CreateOutStream(OStream);
         Stream.CopyTo(OStream);
         Stream.Close;
         FtpWebResponse.Close;
 
         //Import file from Blob
-        IncomingDocumentAttachment.Content := TempBlob.Blob;
+        RecRef.GetTable(IncomingDocumentAttachment);
+        TempBlob.ToRecordRef(RecRef, IncomingDocumentAttachment.FieldNo(Content));
+        RecRef.SetTable(IncomingDocumentAttachment);
+
         if ImportAttachIncDoc.ImportAttachment(IncomingDocumentAttachment, FTPFilename) then begin
             if CreateDocument then begin
                 IncomingDocument.Get(IncomingDocumentAttachment."Incoming Document Entry No.");
@@ -242,10 +246,10 @@ codeunit 6059932 "Doc. Exch. File Mgt."
 
             //If imported: Archive file
             if FTPArchiveFolder <> '' then begin
-            //-NPR5.54 [389951]
-            InitFTPWebRequest(FtpWebRequest,'STOR',FTPserver,FTPUsername,FTPPassword,FTPArchiveFolder,FTPFilename,FTPUsePassive,true);
-            //+NPR5.54 [389951]
-                TempBlob.Blob.CreateInStream(IStream, TEXTENCODING::UTF8);
+                //-NPR5.54 [389951]
+                InitFTPWebRequest(FtpWebRequest, 'STOR', FTPserver, FTPUsername, FTPPassword, FTPArchiveFolder, FTPFilename, FTPUsePassive, true);
+                //+NPR5.54 [389951]
+                TempBlob.CreateInStream(IStream, TEXTENCODING::UTF8);
                 IStream.Read(FileText);
                 Clear(IStream);
                 UTF8Encoding := UTF8Encoding.UTF8;
@@ -259,9 +263,9 @@ codeunit 6059932 "Doc. Exch. File Mgt."
             end;
 
             //If imported: Delete file
-          //-NPR5.54 [389951]
-          InitFTPWebRequest(FtpWebRequest,'DELE',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFilename,FTPUsePassive,true);
-          //+NPR5.54 [389951]
+            //-NPR5.54 [389951]
+            InitFTPWebRequest(FtpWebRequest, 'DELE', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive, true);
+            //+NPR5.54 [389951]
             FtpWebResponse := FtpWebRequest.GetResponse;
             FtpWebResponse.Close;
         end;
@@ -270,7 +274,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         //+NPR5.29 [263705]
     end;
 
-    local procedure InitFTPWebRequest(var FtpWebRequest: DotNet npNetFtpWebRequest;FTPMethod: Text;FTPServerName: Text;FTPUsername: Text;FTPPassword: Text;FTPFolder: Text;FTPFileNameOrMask: Text;FTPusePassive: Boolean;FTPKeepAlive: Boolean)
+    local procedure InitFTPWebRequest(var FtpWebRequest: DotNet npNetFtpWebRequest; FTPMethod: Text; FTPServerName: Text; FTPUsername: Text; FTPPassword: Text; FTPFolder: Text; FTPFileNameOrMask: Text; FTPusePassive: Boolean; FTPKeepAlive: Boolean)
     var
         NetworkCredential: DotNet npNetNetworkCredential;
     begin
@@ -288,15 +292,15 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         //+NPR5.29 [263705]
     end;
 
-    local procedure DisconnectFTP(FTPserver: Text;FTPUsername: Text;FTPPassword: Text;FTPUsePassive: Boolean)
+    local procedure DisconnectFTP(FTPserver: Text; FTPUsername: Text; FTPPassword: Text; FTPUsePassive: Boolean)
     var
         FtpWebRequest: DotNet npNetFtpWebRequest;
         FtpWebResponse: DotNet npNetFtpWebResponse;
     begin
         //-NPR5.54 [389951]
-        if UpperCase(CopyStr(FTPserver,1,4)) <> 'FTP://' then
-          FTPserver := 'FTP://' + FTPserver;
-        InitFTPWebRequest(FtpWebRequest,'PWD',FTPserver,FTPUsername,FTPPassword,'','*.*',FTPUsePassive,false);
+        if UpperCase(CopyStr(FTPserver, 1, 4)) <> 'FTP://' then
+            FTPserver := 'FTP://' + FTPserver;
+        InitFTPWebRequest(FtpWebRequest, 'PWD', FTPserver, FTPUsername, FTPPassword, '', '*.*', FTPUsePassive, false);
         FtpWebResponse := FtpWebRequest.GetResponse;
         FtpWebResponse.Close;
         //+NPR5.54 [389951]
@@ -902,7 +906,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
                     SalesCrMemoHeader.Modify;
                     RecordRef.GetTable(SalesCrMemoHeader);
                 end;
-                //+NPR5.33 [266527]
+        //+NPR5.33 [266527]
 
         end;
 
@@ -933,13 +937,18 @@ codeunit 6059932 "Doc. Exch. File Mgt."
 
     local procedure ProcessFile(FilePath: Text; CreateDocument: Boolean)
     var
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         IncomingDocumentAttachment: Record "Incoming Document Attachment";
         ImportAttachIncDoc: Codeunit "Import Attachment - Inc. Doc.";
         IncomingDocument: Record "Incoming Document";
+        RecRef: RecordRef;
     begin
         FileMgt.BLOBImportFromServerFile(TempBlob, FilePath);
-        IncomingDocumentAttachment.Content := TempBlob.Blob;
+
+        RecRef.GetTable(IncomingDocumentAttachment);
+        TempBlob.ToRecordRef(RecRef, IncomingDocumentAttachment.FieldNo(Content));
+        RecRef.SetTable(IncomingDocumentAttachment);
+
         if ImportAttachIncDoc.ImportAttachment(IncomingDocumentAttachment, FilePath) then begin
             if CreateDocument then begin
                 IncomingDocument.Get(IncomingDocumentAttachment."Incoming Document Entry No.");
@@ -1112,7 +1121,7 @@ codeunit 6059932 "Doc. Exch. File Mgt."
         MemoryStream: DotNet npNetMemoryStream;
         UTF8Encoding: DotNet npNetEncoding;
         FileLength: Integer;
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         OStream: OutStream;
         IStream: InStream;
         IncomingDocument: Record "Incoming Document";
@@ -1124,10 +1133,10 @@ codeunit 6059932 "Doc. Exch. File Mgt."
 
         //Upload file
         //-NPR5.54 [389951]
-        InitFTPWebRequest(FtpWebRequest,'STOR',FTPserver,FTPUsername,FTPPassword,FTPFolder,FTPFilename,FTPUsePassive,false);
+        InitFTPWebRequest(FtpWebRequest, 'STOR', FTPserver, FTPUsername, FTPPassword, FTPFolder, FTPFilename, FTPUsePassive, false);
         //+NPR5.54 [389951]
         FileMgt.BLOBImportFromServerFile(TempBlob, ServerFilePath);
-        TempBlob.Blob.CreateInStream(IStream, TEXTENCODING::UTF8);
+        TempBlob.CreateInStream(IStream, TEXTENCODING::UTF8);
         IStream.Read(FileText);
         Clear(IStream);
         UTF8Encoding := UTF8Encoding.UTF8;

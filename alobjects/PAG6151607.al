@@ -7,8 +7,8 @@ page 6151607 "NpDc Extra Item Qty. Subform"
     DelayedInsert = true;
     PageType = ListPart;
     SourceTable = "NpDc Coupon List Item";
-    SourceTableView = SORTING("Coupon Type","Line No.")
-                      WHERE("Line No."=FILTER(>=0));
+    SourceTableView = SORTING("Coupon Type", "Line No.")
+                      WHERE("Line No." = FILTER(>= 0));
 
     layout
     {
@@ -16,25 +16,25 @@ page 6151607 "NpDc Extra Item Qty. Subform"
         {
             repeater(Group)
             {
-                field(Type;Type)
+                field(Type; Type)
                 {
                 }
-                field("No.";"No.")
+                field("No."; "No.")
                 {
                 }
-                field(Description;Description)
-                {
-                    Editable = false;
-                }
-                field("Unit Price";"Unit Price")
+                field(Description; Description)
                 {
                     Editable = false;
                 }
-                field("Profit %";"Profit %")
+                field("Unit Price"; "Unit Price")
                 {
                     Editable = false;
                 }
-                field("Qty. per Lot";"Validation Quantity")
+                field("Profit %"; "Profit %")
+                {
+                    Editable = false;
+                }
+                field("Qty. per Lot"; "Validation Quantity")
                 {
                     Caption = 'Qty. per Lot';
                     Visible = (LotValidation);
@@ -79,15 +79,15 @@ page 6151607 "NpDc Extra Item Qty. Subform"
         NewPriority: Integer;
     begin
         if not RunDynamicRequestPage(Item) then
-          exit;
+            exit;
         if not NpDcRequestPriority.RequestPriority(NewPriority) then
-          exit;
+            exit;
 
-        InsertItems(Item,NewPriority);
+        InsertItems(Item, NewPriority);
         CurrPage.Update(false);
     end;
 
-    local procedure InsertItems(var Item: Record Item;NewPriority: Integer)
+    local procedure InsertItems(var Item: Record Item; NewPriority: Integer)
     var
         NpDcCouponListItem: Record "NpDc Coupon List Item";
         CouponType: Code[20];
@@ -97,27 +97,27 @@ page 6151607 "NpDc Extra Item Qty. Subform"
         CouponType := GetRangeMax("Coupon Type");
         FilterGroup(0);
         if CouponType = '' then
-          exit;
+            exit;
 
-        NpDcCouponListItem.SetRange("Coupon Type",CouponType);
+        NpDcCouponListItem.SetRange("Coupon Type", CouponType);
         if NpDcCouponListItem.FindLast then;
         LineNo := NpDcCouponListItem."Line No.";
 
         Item.FindSet;
         repeat
-          NpDcCouponListItem.SetRange("Coupon Type",CouponType);
-          NpDcCouponListItem.SetRange(Type,NpDcCouponListItem.Type::Item);
-          NpDcCouponListItem.SetRange("No.",Item."No.");
-          if NpDcCouponListItem.IsEmpty then begin
-            LineNo += 10000;
-            NpDcCouponListItem.Init;
-            NpDcCouponListItem."Coupon Type" := CouponType;
-            NpDcCouponListItem."Line No." := LineNo;
-            NpDcCouponListItem.Type := NpDcCouponListItem.Type::Item;
-            NpDcCouponListItem.Validate("No.",Item."No.");
-            NpDcCouponListItem.Priority := NewPriority;
-            NpDcCouponListItem.Insert(true);
-          end;
+            NpDcCouponListItem.SetRange("Coupon Type", CouponType);
+            NpDcCouponListItem.SetRange(Type, NpDcCouponListItem.Type::Item);
+            NpDcCouponListItem.SetRange("No.", Item."No.");
+            if NpDcCouponListItem.IsEmpty then begin
+                LineNo += 10000;
+                NpDcCouponListItem.Init;
+                NpDcCouponListItem."Coupon Type" := CouponType;
+                NpDcCouponListItem."Line No." := LineNo;
+                NpDcCouponListItem.Type := NpDcCouponListItem.Type::Item;
+                NpDcCouponListItem.Validate("No.", Item."No.");
+                NpDcCouponListItem.Priority := NewPriority;
+                NpDcCouponListItem.Insert(true);
+            end;
         until Item.Next = 0;
     end;
 
@@ -125,7 +125,7 @@ page 6151607 "NpDc Extra Item Qty. Subform"
     var
         RecRef: RecordRef;
         TableMetadata: Record "Table Metadata";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
         FilterPageBuilder: FilterPageBuilder;
         OutStream: OutStream;
@@ -135,28 +135,28 @@ page 6151607 "NpDc Extra Item Qty. Subform"
         Clear(Item);
         RecRef.GetTable(Item);
         TableMetadata.Get(RecRef.Number);
-        EntityID := CopyStr(Text000,1,20);
-        if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder,EntityID,RecRef.Number) then
-          exit(false);
+        EntityID := CopyStr(Text000, 1, 20);
+        if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number) then
+            exit(false);
 
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name,Item.FieldNo("No."));
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name,Item.FieldNo("Vendor No."));
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name,Item.FieldNo("Item Group"));
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name,Item.FieldNo("Item Disc. Group"));
-        FilterPageBuilder.AddFieldNo(TableMetadata.Name,Item.FieldNo("Search Description"));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("No."));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Vendor No."));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Item Group"));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Item Disc. Group"));
+        FilterPageBuilder.AddFieldNo(TableMetadata.Name, Item.FieldNo("Search Description"));
         FilterPageBuilder.PageCaption := Text000;
         if not FilterPageBuilder.RunModal then
-          exit(false);
+            exit(false);
 
-        ReturnFilters := RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder,EntityID,RecRef.Number);
+        ReturnFilters := RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number);
 
         RecRef.Reset;
         if ReturnFilters <> '' then begin
-          Clear(TempBlob);
-          TempBlob.Blob.CreateOutStream(OutStream);
-          OutStream.WriteText(ReturnFilters);
-          if not RequestPageParametersHelper.ConvertParametersToFilters(RecRef,TempBlob) then
-            exit(false);
+            Clear(TempBlob);
+            TempBlob.CreateOutStream(OutStream);
+            OutStream.WriteText(ReturnFilters);
+            if not RequestPageParametersHelper.ConvertParametersToFilters(RecRef, TempBlob) then
+                exit(false);
         end;
 
         RecRef.SetTable(Item);

@@ -30,55 +30,55 @@ codeunit 6151550 "NpXml Task Mgt."
         NpXmlTriggerMgt.ResetOutput();
         Clear(RecRef);
         Clear(PrevRecRef);
-        NcTaskMgt.RestoreRecord("Entry No.",PrevRecRef);
+        NcTaskMgt.RestoreRecord("Entry No.", PrevRecRef);
         ProcessComplete := true;
         case Type of
-          Type::Insert:
-            begin
-              if NcTaskMgt.GetRecRef(Rec,RecRef) then begin
-                NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef,Rec,true,false,false,UniqueTaskBuffer);
-                ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
-              end;
-            end;
-          Type::Modify:
-            begin
-              if NcTaskMgt.GetRecRef(Rec,RecRef) then begin
-                NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef,Rec,false,true,false,UniqueTaskBuffer);
-                ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
-              end;
-            end;
-          Type::Delete:
-            begin
-              RecRef2 := PrevRecRef.Duplicate;
-              //-NC2.22 [355993]
-              if NcTaskMgt.RecExists(RecRef2,"Company Name") then
-                RecRef2.Find;
-              //+NC2.22 [355993]
+            Type::Insert:
+                begin
+                    if NcTaskMgt.GetRecRef(Rec, RecRef) then begin
+                        NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef, Rec, true, false, false, UniqueTaskBuffer);
+                        ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
+                    end;
+                end;
+            Type::Modify:
+                begin
+                    if NcTaskMgt.GetRecRef(Rec, RecRef) then begin
+                        NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef, Rec, false, true, false, UniqueTaskBuffer);
+                        ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
+                    end;
+                end;
+            Type::Delete:
+                begin
+                    RecRef2 := PrevRecRef.Duplicate;
+                    //-NC2.22 [355993]
+                    if NcTaskMgt.RecExists(RecRef2, "Company Name") then
+                        RecRef2.Find;
+                    //+NC2.22 [355993]
 
-              NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef2,Rec,false,false,true,UniqueTaskBuffer);
-              ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
-            end;
-          Type::Rename:
-            begin
-              RecRef2 := PrevRecRef.Duplicate;
-              //-NC2.22 [355993]
-              if NcTaskMgt.RecExists(RecRef2,"Company Name") then
-                RecRef2.Find;
-              //+NC2.22 [355993]
+                    NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef2, Rec, false, false, true, UniqueTaskBuffer);
+                    ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
+                end;
+            Type::Rename:
+                begin
+                    RecRef2 := PrevRecRef.Duplicate;
+                    //-NC2.22 [355993]
+                    if NcTaskMgt.RecExists(RecRef2, "Company Name") then
+                        RecRef2.Find;
+                    //+NC2.22 [355993]
 
-              NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef2,Rec,false,false,true,UniqueTaskBuffer);
-              ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
-              if NcTaskMgt.GetRecRef(Rec,RecRef) then begin
-                NpXmlTriggerMgt.RunTriggers(TaskProcessor,PrevRecRef,RecRef,Rec,true,true,false,UniqueTaskBuffer);
-                ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
-              end;
-            end;
+                    NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef2, Rec, false, false, true, UniqueTaskBuffer);
+                    ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
+                    if NcTaskMgt.GetRecRef(Rec, RecRef) then begin
+                        NpXmlTriggerMgt.RunTriggers(TaskProcessor, PrevRecRef, RecRef, Rec, true, true, false, UniqueTaskBuffer);
+                        ProcessComplete := NpXmlTriggerMgt.GetProcessComplete and ProcessComplete;
+                    end;
+                end;
         end;
 
         CommitOutput(Rec);
         CommitResponse(Rec);
         if not ProcessComplete then
-          Error(GetLastErrorText);
+            Error(GetLastErrorText);
     end;
 
     var
@@ -91,37 +91,45 @@ codeunit 6151550 "NpXml Task Mgt."
 
     local procedure CommitOutput(var Task: Record "Nc Task")
     var
-        OutputTempBlob: Record TempBlob temporary;
-        TempBlob: Record TempBlob temporary;
+        OutputTempBlob: Codeunit "Temp Blob";
+        TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         OutStream: OutStream;
+        RecRef: RecordRef;
     begin
         Clear(TempBlob);
-        TempBlob.Blob.CreateOutStream(OutStream);
+        TempBlob.CreateOutStream(OutStream);
 
         Task.CalcFields("Data Output");
         if Task."Data Output".HasValue then begin
-          Task."Data Output".CreateInStream(InStream);
-          CopyStream(OutStream,InStream);
+            Task."Data Output".CreateInStream(InStream);
+            CopyStream(OutStream, InStream);
         end;
 
         if NpXmlTriggerMgt.GetOutput(OutputTempBlob) then begin
-          OutputTempBlob.Blob.CreateInStream(InStream);
-          CopyStream(OutStream,InStream);
+            OutputTempBlob.CreateInStream(InStream);
+            CopyStream(OutStream, InStream);
         end;
 
-        Task."Data Output" := TempBlob.Blob;
+        RecRef.GetTable(Task);
+        TempBlob.ToRecordRef(RecRef, Task.FieldNo("Data Output"));
+        RecRef.SetTable(Task);
+
         Task.Modify(true);
         Commit;
     end;
 
     local procedure CommitResponse(var Task: Record "Nc Task")
     var
-        ResponseTempBlob: Record TempBlob temporary;
+        ResponseTempBlob: Codeunit "Temp Blob";
+        RecRef: RecordRef;
     begin
         Clear(Task.Response);
-        if NpXmlTriggerMgt.GetResponse(ResponseTempBlob) then
-          Task.Response := ResponseTempBlob.Blob;
+        if NpXmlTriggerMgt.GetResponse(ResponseTempBlob) then begin
+            RecRef.GetTable(Task);
+            ResponseTempBlob.ToRecordRef(RecRef, Task.FieldNo(Response));
+            RecRef.SetTable(Task);
+        end;
         Task.Modify(true);
         Commit;
         Clear(ResponseTempBlob);
@@ -135,11 +143,11 @@ codeunit 6151550 "NpXml Task Mgt."
     var
         NpXmlTemplate: Record "NpXml Template";
     begin
-        NpXmlTemplate.SetRange("Transaction Task",true);
+        NpXmlTemplate.SetRange("Transaction Task", true);
         if NpXmlTemplate.FindSet then
-          repeat
-            NpXmlTemplate.UpdateNaviConnectSetup();
-          until NpXmlTemplate.Next = 0;
+            repeat
+                NpXmlTemplate.UpdateNaviConnectSetup();
+            until NpXmlTemplate.Next = 0;
     end;
 
     local procedure "--- Unique Task"()
@@ -147,47 +155,47 @@ codeunit 6151550 "NpXml Task Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6151501, 'IsUniqueTask', '', true, true)]
-    local procedure IsUniqueTask(TaskProcessor: Record "Nc Task Processor";var TempTask: Record "Nc Task" temporary;var UniqueTaskBuffer: Record "Nc Unique Task Buffer" temporary;var IsUnique: Boolean;var Checked: Boolean)
+    local procedure IsUniqueTask(TaskProcessor: Record "Nc Task Processor"; var TempTask: Record "Nc Task" temporary; var UniqueTaskBuffer: Record "Nc Unique Task Buffer" temporary; var IsUnique: Boolean; var Checked: Boolean)
     var
         NcTaskMgt: Codeunit "Nc Task Mgt.";
         PrevRecRef: RecordRef;
         RecRef: RecordRef;
     begin
         if not TempTask.IsTemporary then
-          exit;
-        if not IsNpXmlTask(TaskProcessor,TempTask) then
-          exit;
+            exit;
+        if not IsNpXmlTask(TaskProcessor, TempTask) then
+            exit;
 
         Checked := true;
 
-        if not NcTaskMgt.RestoreRecordFromDataLog(TempTask."Entry No.",TempTask."Company Name",PrevRecRef) then
-          exit;
+        if not NcTaskMgt.RestoreRecordFromDataLog(TempTask."Entry No.", TempTask."Company Name", PrevRecRef) then
+            exit;
 
-        if not NcTaskMgt.GetRecRef(TempTask,RecRef) then
-          RecRef := PrevRecRef.Duplicate;
+        if not NcTaskMgt.GetRecRef(TempTask, RecRef) then
+            RecRef := PrevRecRef.Duplicate;
 
         if NpXmlTriggerMgt.IsUniqueTask(TaskProcessor,
-          TempTask.Type in [TempTask.Type::Insert,TempTask.Type::Rename],
-          TempTask.Type in [TempTask.Type::Modify,TempTask.Type::Rename],
-          TempTask.Type in [TempTask.Type::Delete,TempTask.Type::Rename],
+          TempTask.Type in [TempTask.Type::Insert, TempTask.Type::Rename],
+          TempTask.Type in [TempTask.Type::Modify, TempTask.Type::Rename],
+          TempTask.Type in [TempTask.Type::Delete, TempTask.Type::Rename],
           PrevRecRef,
           RecRef,
           UniqueTaskBuffer)
         then
-          IsUnique:= true;
+            IsUnique := true;
     end;
 
-    local procedure IsNpXmlTask(TaskProcessor: Record "Nc Task Processor";Task: Record "Nc Task"): Boolean
+    local procedure IsNpXmlTask(TaskProcessor: Record "Nc Task Processor"; Task: Record "Nc Task"): Boolean
     var
         NcTaskSetup: Record "Nc Task Setup";
         NpXmlSetup: Record "NpXml Setup";
     begin
         if not (NpXmlSetup.Get and NpXmlSetup."NpXml Enabled") then
-          exit(false);
+            exit(false);
 
-        NcTaskSetup.SetRange("Task Processor Code",TaskProcessor.Code);
-        NcTaskSetup.SetRange("Table No.",Task."Table No.");
-        NcTaskSetup.SetRange("Codeunit ID",CODEUNIT::"NpXml Task Mgt.");
+        NcTaskSetup.SetRange("Task Processor Code", TaskProcessor.Code);
+        NcTaskSetup.SetRange("Table No.", Task."Table No.");
+        NcTaskSetup.SetRange("Codeunit ID", CODEUNIT::"NpXml Task Mgt.");
         exit(NcTaskSetup.FindFirst);
     end;
 }

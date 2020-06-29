@@ -12,64 +12,64 @@ codeunit 6060080 "MCS Rec. Build Model Data"
     var
         TextContinued: Label 'Continued....';
 
-    procedure PreviewDataToSend(SendType: Option Catalog,History,BusinessRules;MCSRecommendationsModel: Record "MCS Recommendations Model")
+    procedure PreviewDataToSend(SendType: Option Catalog,History,BusinessRules; MCSRecommendationsModel: Record "MCS Recommendations Model")
     var
         OStr: OutStream;
         IStr: InStream;
         DisplayText: Text;
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
         HasMoreLines: Boolean;
     begin
-        TempBlob.Blob.CreateOutStream(OStr);
+        TempBlob.CreateOutStream(OStr);
         case SendType of
-          SendType::Catalog :
-            GetCatalogStream(MCSRecommendationsModel,false,false,OStr);
-          SendType::History :
-            begin
-              MCSRecommendationsModel."Last Item Ledger Entry No." := 0;
-              repeat
-                  GetHistoryStream(MCSRecommendationsModel,false,OStr,HasMoreLines);
-                  if HasMoreLines then begin
-                    TempBlob.Blob.CreateInStream(IStr);
-                    IStr.Read(DisplayText);
-                    Message(DisplayText + TextContinued);
-                    Clear(IStr);
-                    Clear(OStr);
-                    Clear(DisplayText);
-                    Clear(TempBlob);
-                    TempBlob.Blob.CreateOutStream(OStr);
-                  end;
-                until HasMoreLines = false;
-              end;
-          SendType::BusinessRules :
-            ;
+            SendType::Catalog:
+                GetCatalogStream(MCSRecommendationsModel, false, false, OStr);
+            SendType::History:
+                begin
+                    MCSRecommendationsModel."Last Item Ledger Entry No." := 0;
+                    repeat
+                        GetHistoryStream(MCSRecommendationsModel, false, OStr, HasMoreLines);
+                        if HasMoreLines then begin
+                            TempBlob.CreateInStream(IStr);
+                            IStr.Read(DisplayText);
+                            Message(DisplayText + TextContinued);
+                            Clear(IStr);
+                            Clear(OStr);
+                            Clear(DisplayText);
+                            Clear(TempBlob);
+                            TempBlob.CreateOutStream(OStr);
+                        end;
+                    until HasMoreLines = false;
+                end;
+            SendType::BusinessRules:
+                ;
         end;
 
-        TempBlob.Blob.CreateInStream(IStr);
+        TempBlob.CreateInStream(IStr);
         IStr.Read(DisplayText);
         Message(DisplayText);
     end;
 
-    procedure GetCatalogStream(MCSRecommendationsModel: Record "MCS Recommendations Model";ModifiedItemsOnly: Boolean;MarkAsModified: Boolean;var Outstr: OutStream)
+    procedure GetCatalogStream(MCSRecommendationsModel: Record "MCS Recommendations Model"; ModifiedItemsOnly: Boolean; MarkAsModified: Boolean; var Outstr: OutStream)
     var
         MCSRecommendationsCatalog: XMLport "MCS Recommendations Catalog";
     begin
         Clear(MCSRecommendationsCatalog);
         MCSRecommendationsCatalog.SetModel(MCSRecommendationsModel);
         if MCSRecommendationsModel."Language Code" <> '' then
-          MCSRecommendationsCatalog.SetLanguageCode(MCSRecommendationsModel."Language Code");
+            MCSRecommendationsCatalog.SetLanguageCode(MCSRecommendationsModel."Language Code");
         if ModifiedItemsOnly then
-          if MCSRecommendationsModel."Last Catalog Export Date Time" <> 0DT then
-            MCSRecommendationsCatalog.SetLastModifiedDate(DT2Date(MCSRecommendationsModel."Last Catalog Export Date Time"));
+            if MCSRecommendationsModel."Last Catalog Export Date Time" <> 0DT then
+                MCSRecommendationsCatalog.SetLastModifiedDate(DT2Date(MCSRecommendationsModel."Last Catalog Export Date Time"));
         MCSRecommendationsCatalog.SetDestination(Outstr);
         MCSRecommendationsCatalog.Export;
         if MarkAsModified then begin
-          MCSRecommendationsModel."Last Catalog Export Date Time" := CurrentDateTime;
-          MCSRecommendationsModel.Modify(true);
+            MCSRecommendationsModel."Last Catalog Export Date Time" := CurrentDateTime;
+            MCSRecommendationsModel.Modify(true);
         end;
     end;
 
-    procedure GetHistoryStream(var MCSRecommendationsModel: Record "MCS Recommendations Model";MarkAsModified: Boolean;var Outstr: OutStream;var HasMoreLines: Boolean)
+    procedure GetHistoryStream(var MCSRecommendationsModel: Record "MCS Recommendations Model"; MarkAsModified: Boolean; var Outstr: OutStream; var HasMoreLines: Boolean)
     var
         MCSRecommendationsHistory: XMLport "MCS Recommendations History";
         ItemLedgerEntry: Record "Item Ledger Entry";
@@ -86,10 +86,10 @@ codeunit 6060080 "MCS Rec. Build Model Data"
         MCSRecommendationsModel."Last Item Ledger Entry No." := MCSRecommendationsHistory.GetLastEntryNo;
         HasMoreLines := MCSRecommendationsHistory.GetHasMoreLines;
         if MarkAsModified then
-          MCSRecommendationsModel.Modify(true);
+            MCSRecommendationsModel.Modify(true);
     end;
 
-    procedure GetCatalogCSV(MCSRecommendationsModel: Record "MCS Recommendations Model";ModifiedItemsOnly: Boolean;MarkAsModified: Boolean) Filename: Text
+    procedure GetCatalogCSV(MCSRecommendationsModel: Record "MCS Recommendations Model"; ModifiedItemsOnly: Boolean; MarkAsModified: Boolean) Filename: Text
     var
         MCSRecommendationsCatalog: XMLport "MCS Recommendations Catalog";
         TempFile: File;
@@ -102,22 +102,22 @@ codeunit 6060080 "MCS Rec. Build Model Data"
         Clear(MCSRecommendationsCatalog);
         MCSRecommendationsCatalog.SetModel(MCSRecommendationsModel);
         if MCSRecommendationsModel."Language Code" <> '' then
-          MCSRecommendationsCatalog.SetLanguageCode(MCSRecommendationsModel."Language Code");
+            MCSRecommendationsCatalog.SetLanguageCode(MCSRecommendationsModel."Language Code");
         if ModifiedItemsOnly then
-          if MCSRecommendationsModel."Last Catalog Export Date Time" <> 0DT then
-            MCSRecommendationsCatalog.SetLastModifiedDate(DT2Date(MCSRecommendationsModel."Last Catalog Export Date Time"));
+            if MCSRecommendationsModel."Last Catalog Export Date Time" <> 0DT then
+                MCSRecommendationsCatalog.SetLastModifiedDate(DT2Date(MCSRecommendationsModel."Last Catalog Export Date Time"));
         MCSRecommendationsCatalog.SetDestination(Outstr);
         MCSRecommendationsCatalog.Export;
         if MarkAsModified then begin
-          MCSRecommendationsModel."Last Catalog Export Date Time" := CurrentDateTime;
-          MCSRecommendationsModel.Modify(true);
+            MCSRecommendationsModel."Last Catalog Export Date Time" := CurrentDateTime;
+            MCSRecommendationsModel.Modify(true);
         end;
 
         TempFile.Close();
         exit(Filename);
     end;
 
-    procedure GetHistoryCSV(var MCSRecommendationsModel: Record "MCS Recommendations Model";MarkAsModified: Boolean;var HasMoreLines: Boolean) Filename: Text
+    procedure GetHistoryCSV(var MCSRecommendationsModel: Record "MCS Recommendations Model"; MarkAsModified: Boolean; var HasMoreLines: Boolean) Filename: Text
     var
         MCSRecommendationsHistory: XMLport "MCS Recommendations History";
         ItemLedgerEntry: Record "Item Ledger Entry";
@@ -128,7 +128,7 @@ codeunit 6060080 "MCS Rec. Build Model Data"
         GetSetup(MCSRecommendationsSetup);
         Filename := TemporaryPath + 'usage.csv';
         if Exists(Filename) then
-          Erase(Filename);
+            Erase(Filename);
         Tempfile.Create(Filename);
         Tempfile.CreateOutStream(Outstr);
 
@@ -143,7 +143,7 @@ codeunit 6060080 "MCS Rec. Build Model Data"
         MCSRecommendationsModel."Last Item Ledger Entry No." := MCSRecommendationsHistory.GetLastEntryNo;
         HasMoreLines := MCSRecommendationsHistory.GetHasMoreLines;
         if MarkAsModified then
-          MCSRecommendationsModel.Modify(true);
+            MCSRecommendationsModel.Modify(true);
 
         Tempfile.Close();
         exit(Filename);
@@ -152,7 +152,7 @@ codeunit 6060080 "MCS Rec. Build Model Data"
     local procedure GetSetup(var MCSRecommendationsSetup: Record "MCS Recommendations Setup")
     begin
         if MCSRecommendationsSetup.Get then
-          exit;
+            exit;
         MCSRecommendationsSetup.Init;
         MCSRecommendationsSetup.Insert(true);
     end;
@@ -178,11 +178,11 @@ codeunit 6060080 "MCS Rec. Build Model Data"
         UsageFile: Text;
         HasMoreLines: Boolean;
     begin
-        CatalogFile := GetCatalogCSV(MCSRecommendationsModel,false,true);
-        MCSRecServiceAPI.UploadCatalog(MCSRecommendationsModel,CatalogFile);
+        CatalogFile := GetCatalogCSV(MCSRecommendationsModel, false, true);
+        MCSRecServiceAPI.UploadCatalog(MCSRecommendationsModel, CatalogFile);
         repeat
-          UsageFile := GetHistoryCSV(MCSRecommendationsModel,true,HasMoreLines);
-          MCSRecServiceAPI.UploadUsageData(MCSRecommendationsModel,UsageFile);
+            UsageFile := GetHistoryCSV(MCSRecommendationsModel, true, HasMoreLines);
+            MCSRecServiceAPI.UploadUsageData(MCSRecommendationsModel, UsageFile);
         until HasMoreLines = false;
     end;
 
@@ -190,7 +190,7 @@ codeunit 6060080 "MCS Rec. Build Model Data"
     var
         MCSRecServiceAPI: Codeunit "MCS Rec. Service API";
     begin
-        MCSRecServiceAPI.CreateRecommendationsBuild(MCSRecommendationsModel,true);
+        MCSRecServiceAPI.CreateRecommendationsBuild(MCSRecommendationsModel, true);
     end;
 
     procedure SetActiveBuild(var MCSRecommendationsModel: Record "MCS Recommendations Model")
@@ -200,11 +200,11 @@ codeunit 6060080 "MCS Rec. Build Model Data"
         MCSRecServiceAPI.SetActiveBuild(MCSRecommendationsModel);
     end;
 
-    procedure TestGetRecommendations(var MCSRecommendationsModel: Record "MCS Recommendations Model";ItemNo: Code[20])
+    procedure TestGetRecommendations(var MCSRecommendationsModel: Record "MCS Recommendations Model"; ItemNo: Code[20])
     var
         MCSRecServiceAPI: Codeunit "MCS Rec. Service API";
     begin
-        MCSRecServiceAPI.GetRecommendations(MCSRecommendationsModel,ItemNo,true);
+        MCSRecServiceAPI.GetRecommendations(MCSRecommendationsModel, ItemNo, true);
     end;
 
     procedure CreateRecommendationsModel(var MCSRecommendationsModel: Record "MCS Recommendations Model")
@@ -220,7 +220,7 @@ codeunit 6060080 "MCS Rec. Build Model Data"
 
         //DataFilePath := GetHistoryCSV(MCSRecommendationsModel,FALSE,FALSE);
         //MCSRecServiceAPI.UploadUsageData(MCSRecommendationsModel,DataFilePath);
-        MCSRecServiceAPI.CreateRecommendationsBuild(MCSRecommendationsModel,true);
+        MCSRecServiceAPI.CreateRecommendationsBuild(MCSRecommendationsModel, true);
         Commit;
         MCSRecServiceAPI.SetActiveBuild(MCSRecommendationsModel);
     end;
@@ -234,15 +234,15 @@ codeunit 6060080 "MCS Rec. Build Model Data"
         MCSRecommendationsHandler: Codeunit "MCS Recommendations Handler";
     begin
         repeat
-          UsageFile := GetHistoryCSV(MCSRecommendationsModel,true,HasMoreLines);
-          MCSRecServiceAPI.UploadUsageData(MCSRecommendationsModel,UsageFile);
+            UsageFile := GetHistoryCSV(MCSRecommendationsModel, true, HasMoreLines);
+            MCSRecServiceAPI.UploadUsageData(MCSRecommendationsModel, UsageFile);
         until HasMoreLines = false;
 
-        MCSRecServiceAPI.CreateRecommendationsBuild(MCSRecommendationsModel,true);
+        MCSRecServiceAPI.CreateRecommendationsBuild(MCSRecommendationsModel, true);
         Commit;
         MCSRecServiceAPI.SetActiveBuild(MCSRecommendationsModel);
         //NPR5.36-
-        MCSRecommendationsHandler.RefreshRecommendations(MCSRecommendationsModel,true);
+        MCSRecommendationsHandler.RefreshRecommendations(MCSRecommendationsModel, true);
         //NPR5.36+
     end;
 }

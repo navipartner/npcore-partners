@@ -58,8 +58,8 @@ codeunit 6151551 "NpXml Mgt."
 
     var
         NpXmlTemplate2: Record "NpXml Template";
-        OutputTempBlob: Record TempBlob temporary;
-        ResponseTempBlob: Record TempBlob temporary;
+        OutputTempBlob: Codeunit "Temp Blob";
+        ResponseTempBlob: Codeunit "Temp Blob";
         Error001: Label 'NpXml Template: %1\API Error:\%2';
         Error002: Label 'Record in %1 within the filters does not exist';
         Error003: Label '<%1> does not contain value %2';
@@ -264,12 +264,12 @@ codeunit 6151551 "NpXml Mgt."
                     NPXmlElement2 := NPXmlElement;
                 if NpXmlAttribute."Default Field Type" then
                     NPXmlElement2."Field Type" := NPXmlElement2."Field Type"::" ";
-              //-NC2.22 [355993]
-              if NpXmlAttribute."Default Field Type" then begin
-                NPXmlElement2."Custom Codeunit ID" := 0;
-                NPXmlElement2."Xml Value Codeunit ID" := 0;
-              end;
-              //+NC2.22 [355993]
+                //-NC2.22 [355993]
+                if NpXmlAttribute."Default Field Type" then begin
+                    NPXmlElement2."Custom Codeunit ID" := 0;
+                    NPXmlElement2."Xml Value Codeunit ID" := 0;
+                end;
+                //+NC2.22 [355993]
                 AttributeValue := NpXmlValueMgt.GetXmlValue(RecRef, NPXmlElement2, NpXmlAttribute."Attribute Field No.");
                 if (NpXmlAttribute."Default Value" <> '') and (AttributeValue = '') then
                     AttributeValue := NpXmlAttribute."Default Value";
@@ -334,10 +334,10 @@ codeunit 6151551 "NpXml Mgt."
         NpXmlFilter.SetRange("Xml Element Line No.", NpXmlElement."Line No.");
         if NpXmlFilter.FindSet then
             repeat
-            //-NC2.25 [392967]
-            i += 1;
-            RecRef2.FilterGroup(i);
-            //+NC2.25 [392967]
+                //-NC2.25 [392967]
+                i += 1;
+                RecRef2.FilterGroup(i);
+                //+NC2.25 [392967]
                 FieldRef2 := RecRef2.Field(NpXmlFilter."Field No.");
                 case NpXmlFilter."Filter Type" of
                     NpXmlFilter."Filter Type"::TableLink:
@@ -400,7 +400,7 @@ codeunit 6151551 "NpXml Mgt."
     local procedure ExportToFile(NPXmlTemplate: Record "NpXml Template"; var XmlDoc: DotNet npNetXmlDocument; Filename: Text[250])
     var
         "Field": Record "Field";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         InStream: InStream;
         OutStream: OutStream;
@@ -419,12 +419,11 @@ codeunit 6151551 "NpXml Mgt."
         Filepath := NPXmlTemplate."File Path" + '\';
         if Filepath[StrLen(Filepath)] <> '\' then
             Filepath += '\';
-        TempBlob.Init;
-        TempBlob.Blob.CreateOutStream(OutStream);
+        TempBlob.CreateOutStream(OutStream);
         XmlDoc.Save(OutStream);
-        if not TempBlob.Blob.HasValue then
+        if not TempBlob.HasValue then
             exit;
-        TempBlob.Blob.CreateInStream(InStream);
+        TempBlob.CreateInStream(InStream);
 
         TempFile := FileMgt.BLOBExport(TempBlob, Filename, false);
         FileMgt.MoveFile(TempFile, Filepath + Filename);
@@ -778,7 +777,7 @@ codeunit 6151551 "NpXml Mgt."
         CR: Char;
     begin
         InitializeOutput();
-        if ResponseTempBlob.Blob.HasValue then begin
+        if ResponseTempBlob.HasValue then begin
             LF := 10;
             CR := 13;
             ResponseOutStr.WriteText(Format(CR) + Format(LF));
@@ -789,7 +788,7 @@ codeunit 6151551 "NpXml Mgt."
     local procedure AddTextToOutputTempBlob(var OutputText: Text)
     begin
         InitializeOutput();
-        if OutputTempBlob.Blob.HasValue then
+        if OutputTempBlob.HasValue then
             OutputOutStr.WriteText(GetChar(13) + GetChar(10) + GetChar(13) + GetChar(10));
 
         OutputOutStr.Write(OutputText);
@@ -801,7 +800,7 @@ codeunit 6151551 "NpXml Mgt."
         InStr: InStream;
     begin
         InitializeOutput();
-        if OutputTempBlob.Blob.HasValue then begin
+        if OutputTempBlob.HasValue then begin
             OutputOutStr.WriteText(GetChar(13) + GetChar(10) + GetChar(13) + GetChar(10));
         end;
         if Comment <> '' then
@@ -815,42 +814,34 @@ codeunit 6151551 "NpXml Mgt."
         Clear(MemoryStream);
     end;
 
-    procedure GetOutput(var TempBlob: Record TempBlob temporary) HasOutput: Boolean
+    procedure GetOutput(var TempBlob: Codeunit "Temp Blob") HasOutput: Boolean
     begin
         if not OutputInitialized then begin
             Clear(TempBlob);
             exit(false);
         end;
-        OutputTempBlob.Modify;
-        OutputTempBlob.CalcFields(Blob);
         TempBlob := OutputTempBlob;
-        exit(TempBlob.Blob.HasValue);
+        exit(TempBlob.HasValue);
     end;
 
-    procedure GetResponse(var TempBlob: Record TempBlob temporary) HasOutput: Boolean
+    procedure GetResponse(var TempBlob: Codeunit "Temp Blob") HasOutput: Boolean
     begin
         if not OutputInitialized then begin
             Clear(TempBlob);
             exit(false);
         end;
-        ResponseTempBlob.Modify;
-        ResponseTempBlob.CalcFields(Blob);
         TempBlob := ResponseTempBlob;
-        exit(TempBlob.Blob.HasValue);
+        exit(TempBlob.HasValue);
     end;
 
     procedure InitializeOutput()
     begin
         if not OutputInitialized then begin
-            OutputTempBlob.Init;
-            OutputTempBlob.Insert;
-            OutputTempBlob.CalcFields(Blob);
-            OutputTempBlob.Blob.CreateOutStream(OutputOutStr, TEXTENCODING::UTF8);
+            Clear(OutputTempBlob);
+            OutputTempBlob.CreateOutStream(OutputOutStr, TEXTENCODING::UTF8);
 
-            ResponseTempBlob.Init;
-            ResponseTempBlob.Insert;
-            ResponseTempBlob.CalcFields(Blob);
-            ResponseTempBlob.Blob.CreateOutStream(ResponseOutStr, TEXTENCODING::UTF8);
+            Clear(ResponseTempBlob);
+            ResponseTempBlob.CreateOutStream(ResponseOutStr, TEXTENCODING::UTF8);
         end;
 
         OutputInitialized := true;
@@ -858,9 +849,9 @@ codeunit 6151551 "NpXml Mgt."
 
     procedure ResetOutput()
     begin
-        OutputTempBlob.DeleteAll;
+        Clear(OutputTempBlob);
 
-        ResponseTempBlob.DeleteAll;
+        Clear(ResponseTempBlob);
         OutputInitialized := false;
     end;
 
@@ -1100,8 +1091,8 @@ codeunit 6151551 "NpXml Mgt."
     var
         NpXmlElement: Record "NpXml Element";
         NpXmlTemplate: Record "NpXml Template";
-        TempBlob: Record TempBlob temporary;
-        TempBlob2: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
+        TempBlob2: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         XmlDocNode: DotNet npNetXmlNode;
         XmlDoc: DotNet npNetXmlDocument;
@@ -1166,24 +1157,24 @@ codeunit 6151551 "NpXml Mgt."
 
         AddXmlNamespaces(NpXmlTemplate, XmlDoc);
         Clear(TempBlob);
-        TempBlob.Blob.CreateOutStream(OutStream);
+        TempBlob.CreateOutStream(OutStream);
         XmlDoc.Save(OutStream);
-        if not TempBlob.Blob.HasValue then
+        if not TempBlob.HasValue then
             exit;
 
         if NpXmlTemplate."API Type" = NpXmlTemplate."API Type"::"REST (Json)" then begin
             JsonString := Xml2Json(XmlDoc, NpXmlTemplate);
 
-            TempBlob.Blob.CreateInStream(InStream);
-            TempBlob2.Blob.CreateOutStream(OutStream);
+            TempBlob.CreateInStream(InStream);
+            TempBlob2.CreateOutStream(OutStream);
 
             CopyStream(OutStream, InStream);
             OutStream.Write(GetChar(13) + GetChar(10) + GetChar(13) + GetChar(10));
             OutStream.Write(JsonString);
 
-            TempBlob.Blob := TempBlob2.Blob;
+            TempBlob := TempBlob2;
         end;
-        TempBlob.Blob.CreateInStream(InStream);
+        TempBlob.CreateInStream(InStream);
 
         Filename := FileMgt.BLOBExport(TempBlob, Filename, false);
         NpXmlTemplateMgt.RunProcess('notepad.exe', Filename, false);

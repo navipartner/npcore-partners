@@ -13,26 +13,26 @@ page 6060108 "RC Ticket Activities"
             cuegroup("Events (Today)")
             {
                 Caption = 'Events (Today)';
-                field("Event Count 1";"Event Count 1")
+                field("Event Count 1"; "Event Count 1")
                 {
                     Image = Library;
                 }
-                field("Event Capacity 1";"Event Capacity 1")
+                field("Event Capacity 1"; "Event Capacity 1")
                 {
                     Image = people;
                 }
-                field("Event Open Reservations 1";"Event Open Reservations 1")
+                field("Event Open Reservations 1"; "Event Open Reservations 1")
                 {
                     Image = person;
                 }
-                field("Event Admitted 1";"Event Admitted 1")
+                field("Event Admitted 1"; "Event Admitted 1")
                 {
                     Image = person;
                 }
-                field("Event Utilization Avg. 1";"Event Utilization Avg. 1")
+                field("Event Utilization Avg. 1"; "Event Utilization Avg. 1")
                 {
                 }
-                field(Control6150619;'')
+                field(Control6150619; '')
                 {
                     Image = Heart;
                     ShowCaption = false;
@@ -41,23 +41,23 @@ page 6060108 "RC Ticket Activities"
             cuegroup("Events (Tomorrow)")
             {
                 Caption = 'Events (Tomorrow)';
-                field("Event Count 2";"Event Count 2")
+                field("Event Count 2"; "Event Count 2")
                 {
                     Image = Library;
                 }
-                field("Event Capacity 2";"Event Capacity 2")
+                field("Event Capacity 2"; "Event Capacity 2")
                 {
                     Image = people;
                 }
-                field("Event Open Reservations 2";"Event Open Reservations 2")
+                field("Event Open Reservations 2"; "Event Open Reservations 2")
                 {
                     Image = person;
                 }
-                field("Event Admitted 2";"Event Admitted 2")
+                field("Event Admitted 2"; "Event Admitted 2")
                 {
                     Image = person;
                 }
-                field("Event Utilization Avg. 2";"Event Utilization Avg. 2")
+                field("Event Utilization Avg. 2"; "Event Utilization Avg. 2")
                 {
                     Image = Heart;
                 }
@@ -77,10 +77,10 @@ page 6060108 "RC Ticket Activities"
                 trigger OnAction()
                 var
                     CueRecordRef: RecordRef;
-                    CueSetup: Codeunit "Cue Setup";
+                    CuesAndKpis: Codeunit "Cues And KPIs";
                 begin
                     CueRecordRef.GetTable(Rec);
-                    CueSetup.OpenCustomizePageForCurrentUser(CueRecordRef.Number);
+                    CuesAndKpis.OpenCustomizePageForCurrentUser(CueRecordRef.Number);
                 end;
             }
         }
@@ -88,15 +88,15 @@ page 6060108 "RC Ticket Activities"
 
     trigger OnAfterGetRecord()
     begin
-        CalculateCues ();
+        CalculateCues();
     end;
 
     trigger OnOpenPage()
     begin
         Reset;
         if not Get then begin
-          Init;
-          Insert;
+            Init;
+            Insert;
         end;
     end;
 }

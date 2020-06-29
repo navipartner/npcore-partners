@@ -49,7 +49,7 @@ codeunit 6014531 "Retail Logo Mgt."
         Text000001: Label 'Insert Keyword';
         Text_UploadCaption: Label 'Choose logo file';
 
-    procedure GetRetailLogo(KeywordIn: Code[20];RegisterNo: Code[10];var RetailLogo: Record "Retail Logo"): Boolean
+    procedure GetRetailLogo(KeywordIn: Code[20]; RegisterNo: Code[10]; var RetailLogo: Record "Retail Logo"): Boolean
     var
         InStream: InStream;
         ByteArray: DotNet npNetArray;
@@ -62,12 +62,12 @@ codeunit 6014531 "Retail Logo Mgt."
         //Use RetailLogo.SETAUTOCALCFIELDS() on the blobs you need, before you call this function.
 
         if RegisterNo = '' then
-          RegisterNo := RetailFormCode.FetchRegisterNumber();
+            RegisterNo := RetailFormCode.FetchRegisterNumber();
 
         RetailLogo.SetRange(Keyword, KeywordIn);
         RetailLogo.SetRange("Register No.", RegisterNo);
         if RetailLogo.IsEmpty then
-          RetailLogo.SetRange("Register No.",'');
+            RetailLogo.SetRange("Register No.", '');
 
         RetailLogo.SetFilter("Start Date", '<=%1|=%2', Today, 0D);
         RetailLogo.SetFilter("End Date", '>=%1|=%2', Today, 0D);
@@ -88,7 +88,7 @@ codeunit 6014531 "Retail Logo Mgt."
         ESCPOS: Text;
     begin
         if not ImportImage(Bitmap) then
-          exit(false);
+            exit(false);
 
         exit(UploadLogoFromBitmap(Bitmap));
     end;
@@ -102,9 +102,9 @@ codeunit 6014531 "Retail Logo Mgt."
         ESCPOS := ConvertToESCPOS(Bitmap);
 
         if StrLen(ESCPOS) > 65523 then
-          Error(Error000001, Format(StrLen(ESCPOS)));
+            Error(Error000001, Format(StrLen(ESCPOS)));
 
-        CreateRecord(Bitmap,ESCPOS);
+        CreateRecord(Bitmap, ESCPOS);
 
         exit(true);
     end;
@@ -129,32 +129,32 @@ codeunit 6014531 "Retail Logo Mgt."
         ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Sales Receipt");
         ReportSelectionRetail.SetRange("Register No.", RetailFormCode.FetchRegisterNumber());
         if ReportSelectionRetail.IsEmpty then
-          ReportSelectionRetail.SetRange("Register No.", '');
+            ReportSelectionRetail.SetRange("Register No.", '');
         if not (ReportSelectionRetail.FindFirst and ((ReportSelectionRetail."Codeunit ID" > 0) or (StrLen(ReportSelectionRetail."Print Template") <> 0))) then
-          Error(Error000004);
+            Error(Error000004);
 
         if not ObjectOutputMgt.TryGetOutputRec(ObjectOutputSelection."Object Type"::Codeunit, ReportSelectionRetail."Codeunit ID", ReportSelectionRetail."Print Template", UserId, ObjectOutputSelection) then
-          Error(Error000002, Format(ReportSelectionRetail."Codeunit ID"));
+            Error(Error000002, Format(ReportSelectionRetail."Codeunit ID"));
 
         if (ObjectOutputSelection."Output Type" <> ObjectOutputSelection."Output Type"::"Printer Name") or (not EpsonVLib.IsThisDevice(ObjectOutputSelection."Output Path")) then
-          Error(Error000003);
+            Error(Error000003);
 
         if RetailLogo.ESCPOSLogo.HasValue then begin
-          RetailLogo.CalcFields(ESCPOSLogo);
-          RetailLogo.ESCPOSLogo.CreateInStream(InStream);
-          MemoryStream := MemoryStream.MemoryStream;
-          CopyStream(MemoryStream, InStream);
-          ByteArray := MemoryStream.ToArray;
-          Encoding := Encoding.GetEncoding('utf-8');
-          ESCPOS := Encoding.GetString(ByteArray);
+            RetailLogo.CalcFields(ESCPOSLogo);
+            RetailLogo.ESCPOSLogo.CreateInStream(InStream);
+            MemoryStream := MemoryStream.MemoryStream;
+            CopyStream(MemoryStream, InStream);
+            ByteArray := MemoryStream.ToArray;
+            Encoding := Encoding.GetEncoding('utf-8');
+            ESCPOS := Encoding.GetString(ByteArray);
 
-          EpsonVLib.Init(tmpDeviceSettings);
-          //-NPR5.40 [284505]
-          //EpsonVLib.PrintBitmapFromESCPOS(ESCPOS,RetailLogo.Height);
-          EpsonVLib.PrintBitmapFromESCPOS(ESCPOS, RetailLogo."ESCPOS Height Low Byte", RetailLogo."ESCPOS Height High Byte", RetailLogo."ESCPOS Cmd Low Byte", RetailLogo."ESCPOS Cmd High Byte");
-          //+NPR5.40 [284505]
-          EpsonVLib.PrintData('P','Control',false,false,false,0,0);
-          PrintMethodMgt.PrintBytesLocal(ObjectOutputMgt.ResolvePrinterName(ObjectOutputSelection."Output Path"), EpsonVLib.GetPrintBytes(), 'iso-8859-1');
+            EpsonVLib.Init(tmpDeviceSettings);
+            //-NPR5.40 [284505]
+            //EpsonVLib.PrintBitmapFromESCPOS(ESCPOS,RetailLogo.Height);
+            EpsonVLib.PrintBitmapFromESCPOS(ESCPOS, RetailLogo."ESCPOS Height Low Byte", RetailLogo."ESCPOS Height High Byte", RetailLogo."ESCPOS Cmd Low Byte", RetailLogo."ESCPOS Cmd High Byte");
+            //+NPR5.40 [284505]
+            EpsonVLib.PrintData('P', 'Control', false, false, false, 0, 0);
+            PrintMethodMgt.PrintBytesLocal(ObjectOutputMgt.ResolvePrinterName(ObjectOutputSelection."Output Path"), EpsonVLib.GetPrintBytes(), 'iso-8859-1');
         end;
     end;
 
@@ -166,14 +166,14 @@ codeunit 6014531 "Retail Logo Mgt."
     var
         FileMgt: Codeunit "File Management";
         FilePath: Text;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
     begin
-        FileMgt.BLOBImportWithFilter(TempBlob,Text_UploadCaption,'','Image Files (*.BMP;*.GIF;*.JPG;*.PNG;*.TIFF;*.EXIF)|*.BMP;*.GIF;*.JPG;*.PNG;*.TIFF;*.EXIF','bmp,gif,jpg,png,tiff,exif');
-        if not TempBlob.Blob.HasValue then
-          exit(false);
+        FileMgt.BLOBImportWithFilter(TempBlob, Text_UploadCaption, '', 'Image Files (*.BMP;*.GIF;*.JPG;*.PNG;*.TIFF;*.EXIF)|*.BMP;*.GIF;*.JPG;*.PNG;*.TIFF;*.EXIF', 'bmp,gif,jpg,png,tiff,exif');
+        if not TempBlob.HasValue then
+            exit(false);
 
-        TempBlob.Blob.CreateInStream(InStream);
+        TempBlob.CreateInStream(InStream);
         Bitmap := Bitmap.Bitmap(InStream);
 
         exit(true);
@@ -194,38 +194,38 @@ codeunit 6014531 "Retail Logo Mgt."
     begin
         Threshold := 127.0;
         Index := 0;
-        for y := 0 to Bitmap.Height-1 do
-          for x := 0 to Bitmap.Width-1 do begin
-            Color     := Bitmap.GetPixel(x,y);
-            Luminance := (Color.R * 0.3) + (Color.G * 0.59) + (Color.B * 0.11);
-            Black := Luminance < Threshold;
+        for y := 0 to Bitmap.Height - 1 do
+            for x := 0 to Bitmap.Width - 1 do begin
+                Color := Bitmap.GetPixel(x, y);
+                Luminance := (Color.R * 0.3) + (Color.G * 0.59) + (Color.B * 0.11);
+                Black := Luminance < Threshold;
 
-            //Since we have no bit-shifting in C/AL, we use a string SliceBits to build up a byte, bit by bit. Each bit corresponds to a burn by the printerhead on that exact x,y coordinate.
-            if Black then begin
-              SliceBits += '1';
-              Bitmap.SetPixel(x,y,Color.Black);
-            end else begin
-              SliceBits += '0';
-              Bitmap.SetPixel(x,y,Color.White);
+                //Since we have no bit-shifting in C/AL, we use a string SliceBits to build up a byte, bit by bit. Each bit corresponds to a burn by the printerhead on that exact x,y coordinate.
+                if Black then begin
+                    SliceBits += '1';
+                    Bitmap.SetPixel(x, y, Color.Black);
+                end else begin
+                    SliceBits += '0';
+                    Bitmap.SetPixel(x, y, Color.White);
+                end;
+
+                if ((Index + 1) mod 8) = 0 then begin
+                    Char := Convert.ToInt32(SliceBits, 2); //Converts a textual representation of an 8-bit binary number (=byte) to integer so we can print the corresponding character.
+                    ESCPOS += Format(Char);
+                    SliceBits := '';
+                end;
+
+                Index += 1;
             end;
-
-            if ((Index+1) mod 8) = 0 then begin
-              Char := Convert.ToInt32(SliceBits,2); //Converts a textual representation of an 8-bit binary number (=byte) to integer so we can print the corresponding character.
-              ESCPOS += Format(Char);
-              SliceBits := '';
-            end;
-
-            Index += 1;
-          end;
 
         if SliceBits <> '' then begin
-          SliceBits := PadStr(SliceBits,8,'0');
-          Char := Convert.ToInt32(SliceBits,2);
-          ESCPOS += Format(Char);
+            SliceBits := PadStr(SliceBits, 8, '0');
+            Char := Convert.ToInt32(SliceBits, 2);
+            ESCPOS += Format(Char);
         end;
     end;
 
-    local procedure CreateRecord(var Bitmap: DotNet npNetBitmap;ESCPOS: Text)
+    local procedure CreateRecord(var Bitmap: DotNet npNetBitmap; ESCPOS: Text)
     var
         RetailLogo: Record "Retail Logo";
         OutStream: OutStream;
@@ -238,8 +238,8 @@ codeunit 6014531 "Retail Logo Mgt."
         RetailLogo.Init;
         RetailLogo.NewRecord;
         RetailLogo.Keyword := Text000001;
-        RetailLogo.Width   := Bitmap.Width;
-        RetailLogo.Height  := Bitmap.Height;
+        RetailLogo.Width := Bitmap.Width;
+        RetailLogo.Height := Bitmap.Height;
 
         //-NPR5.40 [284505]
         ByteArray := BitConverter.GetBytes(RetailLogo.Height);
@@ -279,23 +279,23 @@ codeunit 6014531 "Retail Logo Mgt."
         PaddedHeight: Integer;
     begin
         if BitmapIn.Width < 513 then begin
-          Width  := BitmapIn.Width;
-          Height := BitmapIn.Height;
+            Width := BitmapIn.Width;
+            Height := BitmapIn.Height;
         end else begin
-          Ratio  := 512 / BitmapIn.Width;
-          Height := Round(BitmapIn.Height*Ratio,1,'=');
-          Width  := 512;
+            Ratio := 512 / BitmapIn.Width;
+            Height := Round(BitmapIn.Height * Ratio, 1, '=');
+            Width := 512;
         end;
 
         if Height mod 24 <> 0 then
-          PaddedHeight := Height + (24 - (Height mod 24))
+            PaddedHeight := Height + (24 - (Height mod 24))
         else
-          PaddedHeight := Height;
+            PaddedHeight := Height;
 
         Bitmap := Bitmap.Bitmap(512, PaddedHeight, PixelFormat.Format32bppArgb);
-        Bitmap.SetResolution(96,96);
+        Bitmap.SetResolution(96, 96);
 
-        Rectangle := Rectangle.Rectangle(0,0,Width,Height);
+        Rectangle := Rectangle.Rectangle(0, 0, Width, Height);
         Graphics := Graphics.FromImage(Bitmap);
         Graphics.Clear(Color.White);
         Graphics.PixelOffsetMode := PixelOffsetMode.HighQuality;
@@ -307,14 +307,13 @@ codeunit 6014531 "Retail Logo Mgt."
     procedure ExportImageBMP(RetailLogo: Record "Retail Logo")
     var
         FileManagement: Codeunit "File Management";
-        TempBlob: Record TempBlob;
+        TempBlob: Codeunit "Temp Blob";
     begin
         //-NPR5.46 [327525]
         RetailLogo.CalcFields(Logo);
         if RetailLogo.Logo.HasValue then begin
-          TempBlob.Init;
-          TempBlob.Blob := RetailLogo.Logo;
-          FileManagement.BLOBExport(TempBlob,RetailLogo.Keyword+Format(RetailLogo.Sequence)+'.bmp',true);
+            TempBlob.FromRecord(RetailLogo, RetailLogo.FieldNo(Logo));
+            FileManagement.BLOBExport(TempBlob, RetailLogo.Keyword + Format(RetailLogo.Sequence) + '.bmp', true);
         end;
         //-NPR5.46 [327525]
     end;

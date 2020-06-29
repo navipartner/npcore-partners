@@ -6,35 +6,29 @@ table 6151367 "CS Counting Supervisor"
 
     fields
     {
-        field(1;"User ID";Code[50])
+        field(1; "User ID"; Code[50])
         {
             Caption = 'User ID';
             NotBlank = true;
             TableRelation = User."User Name";
             ValidateTableRelation = false;
-
-            trigger OnLookup()
-            var
-                UserMgt: Codeunit "User Management";
-            begin
-                UserManagement.LookupUserID("User ID");
-            end;
+            DataClassification = EndUserIdentifiableInformation;
 
             trigger OnValidate()
             var
-                UserMgt: Codeunit "User Management";
+                UserSelection: Codeunit "User Selection";
             begin
-                UserManagement.ValidateUserID("User ID");
+                UserSelection.ValidateUserName("User ID");
             end;
         }
-        field(10;"Full Name";Text[80])
+        field(10; "Full Name"; Text[80])
         {
-            CalcFormula = Lookup(User."Full Name" WHERE ("User Name"=FIELD("User ID")));
+            CalcFormula = Lookup (User."Full Name" WHERE("User Name" = FIELD("User ID")));
             Caption = 'Full Name';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(11;Pin;Code[6])
+        field(11; Pin; Code[6])
         {
             Caption = 'Pin';
             ExtendedDatatype = Masked;
@@ -44,7 +38,7 @@ table 6151367 "CS Counting Supervisor"
 
     keys
     {
-        key(Key1;"User ID")
+        key(Key1; "User ID")
         {
         }
     }

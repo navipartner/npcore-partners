@@ -85,23 +85,16 @@ table 6151061 "Retai Repl. Demand Line"
         field(13; "Requester ID"; Code[50])
         {
             Caption = 'Requester ID';
+            NotBlank = true;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
-
-            trigger OnLookup()
-            var
-                UserMgt: Codeunit "User Management";
-            begin
-                UserMgt.LookupUserID("Requester ID");
-            end;
+            DataClassification = EndUserIdentifiableInformation;
 
             trigger OnValidate()
             var
-                UserMgt: Codeunit "User Management";
+                UserSelection: Codeunit "User Selection";
             begin
-                UserMgt.ValidateUserID("Requester ID");
+                UserSelection.ValidateUserName("Requester ID");
             end;
         }
         field(14; Confirmed; Boolean)
@@ -406,14 +399,14 @@ table 6151061 "Retai Repl. Demand Line"
             Caption = 'User ID';
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
+            ValidateTableRelation = false;
+            DataClassification = EndUserIdentifiableInformation;
 
-            trigger OnLookup()
+            trigger OnValidate()
             var
-                UserMgt: Codeunit "User Management";
+                UserSelection: Codeunit "User Selection";
             begin
-                UserMgt.LookupUserID("User ID");
+                UserSelection.ValidateUserName("User ID");
             end;
         }
         field(5701; "Item Category Code"; Code[20])

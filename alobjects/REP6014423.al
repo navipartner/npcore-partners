@@ -6,15 +6,15 @@ report 6014423 "Rent Overview"
 
     dataset
     {
-        dataitem("Payment Terms";"Payment Terms")
+        dataitem("Payment Terms"; "Payment Terms")
         {
-            column(TempBlob1;TempBlob1.Blob)
+            column(TempBlob1; TempBlob1.Blob)
             {
             }
-            column(TempBlob2;TempBlob2.Blob)
+            column(TempBlob2; TempBlob2.Blob)
             {
             }
-            column(TempBlob3;TempBlob3.Blob)
+            column(TempBlob3; TempBlob3.Blob)
             {
             }
         }
@@ -43,15 +43,15 @@ report 6014423 "Rent Overview"
         test.SetDpiX(1000);
         test.SetSizeX(0.6);
         test.SetBarcodeType('EAN13');
-        test.GenerateBarcode('2712',TempBlob1);
+        test.GenerateBarcode('2712', TempBlob1);
         //test.Init('2712345546111',TempBlob1);
         //test.GenerateBarcode('2712345546111',TempBlob1);
     end;
 
     var
-        TempBlob1: Record TempBlob;
-        TempBlob2: Record TempBlob;
-        TempBlob3: Record TempBlob;
+        TempBlob1: Codeunit "Temp Blob";
+        TempBlob2: Codeunit "Temp Blob";
+        TempBlob3: Codeunit "Temp Blob";
         test: Codeunit "Barcode Library";
 }
 

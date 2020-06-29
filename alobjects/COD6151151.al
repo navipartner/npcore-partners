@@ -19,16 +19,25 @@ codeunit 6151151 "M2 Account Manager"
         //-MAG2.21.01 [353964]
 
         case SelectedAccountFunction of
-          AccountFunctions::AUTHENTICATE :    AuthenticatePasswordWorker (TmpGlobalOneTimePassword, TmpGlobalContact, true);
-          AccountFunctions::CHANGE_PASSWORD : ChangePasswordWorker (TmpGlobalOneTimePassword, TmpGlobalContact);
-          AccountFunctions::CREATE_ACCOUNT :  CreateAccountWorker (TmpGlobalContact, TmpGlobalCustomer1, TmpGlobalAccount);
-          AccountFunctions::UPDATE_ACCOUNT :  UpdateAccountWorker (TmpGlobalContact, TmpGlobalCustomer1, TmpGlobalAccount);
-          AccountFunctions::ADD_ACCOUNT :     AddAccountWorker (TmpGlobalContact, TmpGlobalAccount);
-          AccountFunctions::DELETE_ACCOUNT : DeleteAccountWorker (TmpGlobalContact);
+            AccountFunctions::AUTHENTICATE:
+                AuthenticatePasswordWorker(TmpGlobalOneTimePassword, TmpGlobalContact, true);
+            AccountFunctions::CHANGE_PASSWORD:
+                ChangePasswordWorker(TmpGlobalOneTimePassword, TmpGlobalContact);
+            AccountFunctions::CREATE_ACCOUNT:
+                CreateAccountWorker(TmpGlobalContact, TmpGlobalCustomer1, TmpGlobalAccount);
+            AccountFunctions::UPDATE_ACCOUNT:
+                UpdateAccountWorker(TmpGlobalContact, TmpGlobalCustomer1, TmpGlobalAccount);
+            AccountFunctions::ADD_ACCOUNT:
+                AddAccountWorker(TmpGlobalContact, TmpGlobalAccount);
+            AccountFunctions::DELETE_ACCOUNT:
+                DeleteAccountWorker(TmpGlobalContact);
 
-          AccountFunctions::CREATE_SHIPTO : CreateShiptoAddressWorker (TmpGlobalAccount, TmpGlobsalShiptoAddressRequest, TmpGlobalShiptoAddressResponse);
-          AccountFunctions::UPDATE_SHIPTO : UpdateShiptoAddressWorker (TmpGlobalAccount, TmpGlobsalShiptoAddressRequest, TmpGlobalShiptoAddressResponse);
-          AccountFunctions::DELETE_SHIPTO : DeleteShiptoAddressWorker (TmpGlobalAccount, TmpGlobsalShiptoAddressRequest);
+            AccountFunctions::CREATE_SHIPTO:
+                CreateShiptoAddressWorker(TmpGlobalAccount, TmpGlobsalShiptoAddressRequest, TmpGlobalShiptoAddressResponse);
+            AccountFunctions::UPDATE_SHIPTO:
+                UpdateShiptoAddressWorker(TmpGlobalAccount, TmpGlobsalShiptoAddressRequest, TmpGlobalShiptoAddressResponse);
+            AccountFunctions::DELETE_SHIPTO:
+                DeleteShiptoAddressWorker(TmpGlobalAccount, TmpGlobsalShiptoAddressRequest);
         end;
         //+MAG2.21.01 [353964]
     end;
@@ -54,65 +63,65 @@ codeunit 6151151 "M2 Account Manager"
         //+MAG2.21.01 [353964]
     end;
 
-    procedure AuthenticatePassword(var TmpOneTimePassword: Record "M2 One Time Password" temporary;var TmpContact: Record Contact temporary;var ReasonText: Text): Boolean
+    procedure AuthenticatePassword(var TmpOneTimePassword: Record "M2 One Time Password" temporary; var TmpContact: Record Contact temporary; var ReasonText: Text): Boolean
     begin
 
         //-NPR5.49 [320425]
         // IF (TryAuthenticatePassword (TmpOneTimePassword, TmpContact)) THEN BEGIN
-        if (TryAuthenticatePassword (TmpOneTimePassword, TmpContact, true)) then begin
-        //+NPR5.49 [320425]
-          ReasonText := '';
-          AddLogEntry (LogEntry.Type::AUTHENTICATE, LogEntry.Status::OK, TmpOneTimePassword."E-Mail", ReasonText);
+        if (TryAuthenticatePassword(TmpOneTimePassword, TmpContact, true)) then begin
+            //+NPR5.49 [320425]
+            ReasonText := '';
+            AddLogEntry(LogEntry.Type::AUTHENTICATE, LogEntry.Status::OK, TmpOneTimePassword."E-Mail", ReasonText);
 
         end else begin
-          ReasonText := GetLastErrorText ();
-          AddLogEntry (LogEntry.Type::AUTHENTICATE, LogEntry.Status::FAIL, TmpOneTimePassword."E-Mail", ReasonText);
+            ReasonText := GetLastErrorText();
+            AddLogEntry(LogEntry.Type::AUTHENTICATE, LogEntry.Status::FAIL, TmpOneTimePassword."E-Mail", ReasonText);
 
         end;
 
-        exit (ReasonText = '');
+        exit(ReasonText = '');
     end;
 
-    procedure ChangePassword(var TmpOneTimePassword: Record "M2 One Time Password" temporary;var TmpContact: Record Contact temporary;var ReasonText: Text): Boolean
+    procedure ChangePassword(var TmpOneTimePassword: Record "M2 One Time Password" temporary; var TmpContact: Record Contact temporary; var ReasonText: Text): Boolean
     begin
 
         //-NPR5.49 [320425]a
         //IF (TryAuthenticatePassword (TmpOneTimePassword, TmpContact)) THEN BEGIN
-        if (TryAuthenticatePassword (TmpOneTimePassword, TmpContact, true)) then begin
-        //+NPR5.49 [320425]
+        if (TryAuthenticatePassword(TmpOneTimePassword, TmpContact, true)) then begin
+            //+NPR5.49 [320425]
 
-          if (TryChangePassword (TmpOneTimePassword, TmpContact)) then begin
-            ReasonText := '';
-            AddLogEntry (LogEntry.Type::PASSWORD_CHANGE, LogEntry.Status::OK, TmpOneTimePassword."E-Mail", ReasonText);
-            exit (true);
-          end;
+            if (TryChangePassword(TmpOneTimePassword, TmpContact)) then begin
+                ReasonText := '';
+                AddLogEntry(LogEntry.Type::PASSWORD_CHANGE, LogEntry.Status::OK, TmpOneTimePassword."E-Mail", ReasonText);
+                exit(true);
+            end;
         end;
 
-        ReasonText := GetLastErrorText ();
+        ReasonText := GetLastErrorText();
 
-        AddLogEntry (LogEntry.Type::PASSWORD_CHANGE, LogEntry.Status::FAIL, TmpOneTimePassword."E-Mail", ReasonText);
-        exit (false);
+        AddLogEntry(LogEntry.Type::PASSWORD_CHANGE, LogEntry.Status::FAIL, TmpOneTimePassword."E-Mail", ReasonText);
+        exit(false);
     end;
 
-    procedure ResetPassword(var TmpOneTimePassword: Record "M2 One Time Password" temporary;var ReasonText: Text): Boolean
+    procedure ResetPassword(var TmpOneTimePassword: Record "M2 One Time Password" temporary; var ReasonText: Text): Boolean
     begin
 
-        if (not TmpOneTimePassword.FindFirst ()) then ;
+        if (not TmpOneTimePassword.FindFirst()) then;
 
-        if (TryResetPassword (TmpOneTimePassword."E-Mail")) then begin
-          ReasonText := '';
-          AddLogEntry (LogEntry.Type::RESET_PASSWORD_REQUEST, LogEntry.Status::OK, TmpOneTimePassword."E-Mail", ReasonText);
+        if (TryResetPassword(TmpOneTimePassword."E-Mail")) then begin
+            ReasonText := '';
+            AddLogEntry(LogEntry.Type::RESET_PASSWORD_REQUEST, LogEntry.Status::OK, TmpOneTimePassword."E-Mail", ReasonText);
 
         end else begin
-          ReasonText := GetLastErrorText ();
-          AddLogEntry (LogEntry.Type::RESET_PASSWORD_REQUEST, LogEntry.Status::FAIL, TmpOneTimePassword."E-Mail", ReasonText);
+            ReasonText := GetLastErrorText();
+            AddLogEntry(LogEntry.Type::RESET_PASSWORD_REQUEST, LogEntry.Status::FAIL, TmpOneTimePassword."E-Mail", ReasonText);
 
         end;
 
-        exit (ReasonText = '');
+        exit(ReasonText = '');
     end;
 
-    procedure GetAccount(ContactNo: Code[20];var TmpContact: Record Contact temporary;var TmpSellToCustomer: Record Customer temporary;var TmpBillToCustomer: Record Customer temporary;var TmpShipToAddress: Record "Ship-to Address" temporary): Boolean
+    procedure GetAccount(ContactNo: Code[20]; var TmpContact: Record Contact temporary; var TmpSellToCustomer: Record Customer temporary; var TmpBillToCustomer: Record Customer temporary; var TmpShipToAddress: Record "Ship-to Address" temporary): Boolean
     var
         Contact: Record Contact;
         SellToCustomer: Record Customer;
@@ -122,114 +131,114 @@ codeunit 6151151 "M2 Account Manager"
         ContactBusinessRelation: Record "Contact Business Relation";
         MagentoContactShiptoAdrs: Record "Magento Contact Ship-to Adrs.";
     begin
-        ClearLastError ();
-        exit (GetAccountWorker (ContactNo, TmpContact, TmpSellToCustomer, TmpBillToCustomer, TmpShipToAddress));
+        ClearLastError();
+        exit(GetAccountWorker(ContactNo, TmpContact, TmpSellToCustomer, TmpBillToCustomer, TmpShipToAddress));
     end;
 
-    procedure CreateAccount(var TmpContact: Record Contact temporary;var TmpCustomer: Record Customer temporary;var TmpAccount: Record Contact temporary;var ReasonText: Text): Boolean
+    procedure CreateAccount(var TmpContact: Record Contact temporary; var TmpCustomer: Record Customer temporary; var TmpAccount: Record Contact temporary; var ReasonText: Text): Boolean
     begin
 
-        if (TryCreateAccount (TmpContact, TmpCustomer, TmpAccount)) then begin
-          ReasonText := '';
-          exit (true);
+        if (TryCreateAccount(TmpContact, TmpCustomer, TmpAccount)) then begin
+            ReasonText := '';
+            exit(true);
 
         end else begin
-          ReasonText := GetLastErrorText ();
-          exit (false);
+            ReasonText := GetLastErrorText();
+            exit(false);
 
         end;
     end;
 
-    procedure UpdateAccount(var TmpContact: Record Contact temporary;var TmpCustomer: Record Customer temporary;var TmpAccount: Record Contact temporary;var ReasonText: Text): Boolean
+    procedure UpdateAccount(var TmpContact: Record Contact temporary; var TmpCustomer: Record Customer temporary; var TmpAccount: Record Contact temporary; var ReasonText: Text): Boolean
     begin
 
-        if (TryUpdateAccount (TmpContact, TmpCustomer, TmpAccount)) then begin
-          ReasonText := '';
-          exit (true);
+        if (TryUpdateAccount(TmpContact, TmpCustomer, TmpAccount)) then begin
+            ReasonText := '';
+            exit(true);
 
         end else begin
-          ReasonText := GetLastErrorText ();
-          exit (false);
+            ReasonText := GetLastErrorText();
+            exit(false);
 
         end;
     end;
 
-    procedure AddAccount(var TmpAccount: Record Contact temporary;var TmpAccountResponse: Record Contact temporary;var ReasonText: Text): Boolean
+    procedure AddAccount(var TmpAccount: Record Contact temporary; var TmpAccountResponse: Record Contact temporary; var ReasonText: Text): Boolean
     var
         TmpOneTimePassword: Record "M2 One Time Password" temporary;
     begin
 
-        if (TryAddAccount (TmpAccount, TmpAccountResponse)) then begin
-          ReasonText := '';
+        if (TryAddAccount(TmpAccount, TmpAccountResponse)) then begin
+            ReasonText := '';
 
-          if (TmpAccountResponse.FindFirst()) then begin
-            if (not TryResetPassword (LowerCase (TmpAccount."E-Mail 2"))) then begin
-              //-NPR5.51 [356090]
-              // New Account has been commit, exit false will signal that the whole process failed.
-              // ReasonText := GETLASTERRORTEXT ();
-              // EXIT (FALSE);
-              //+NPR5.51 [356090]
+            if (TmpAccountResponse.FindFirst()) then begin
+                if (not TryResetPassword(LowerCase(TmpAccount."E-Mail 2"))) then begin
+                    //-NPR5.51 [356090]
+                    // New Account has been commit, exit false will signal that the whole process failed.
+                    // ReasonText := GETLASTERRORTEXT ();
+                    // EXIT (FALSE);
+                    //+NPR5.51 [356090]
+                end;
+
+                exit(true);
+
             end;
 
-            exit (true);
+        end else begin
+            ReasonText := GetLastErrorText();
+            exit(false);
 
-          end;
+        end;
+    end;
+
+    procedure DeleteAccount(var ContactNo: Code[20]; var ReasonText: Text): Boolean
+    begin
+
+        if (TryDeleteAccount(ContactNo)) then begin
+            ReasonText := '';
+            exit(true);
 
         end else begin
-          ReasonText := GetLastErrorText ();
-          exit (false);
+            ReasonText := GetLastErrorText();
+            exit(false);
 
         end;
     end;
 
-    procedure DeleteAccount(var ContactNo: Code[20];var ReasonText: Text): Boolean
+    procedure CreateShiptoAddress(var TmpAccount: Record Contact temporary; var TmpShiptoAddressRequest: Record "Ship-to Address" temporary; var TmpShiptoAddressResponse: Record "Ship-to Address" temporary; var ReasonText: Text): Boolean
     begin
 
-        if (TryDeleteAccount (ContactNo)) then begin
-          ReasonText := '';
-          exit (true);
-
-        end else begin
-          ReasonText := GetLastErrorText ();
-          exit (false);
-
-        end;
-    end;
-
-    procedure CreateShiptoAddress(var TmpAccount: Record Contact temporary;var TmpShiptoAddressRequest: Record "Ship-to Address" temporary;var TmpShiptoAddressResponse: Record "Ship-to Address" temporary;var ReasonText: Text): Boolean
-    begin
-
-        if (TryAddShiptoAddress (TmpAccount, TmpShiptoAddressRequest, TmpShiptoAddressResponse)) then begin
-          ReasonText := '';
-          exit (true);
+        if (TryAddShiptoAddress(TmpAccount, TmpShiptoAddressRequest, TmpShiptoAddressResponse)) then begin
+            ReasonText := '';
+            exit(true);
         end;
 
         ReasonText := GetLastErrorText;
-        exit (false);
+        exit(false);
     end;
 
-    procedure UpdateShiptoAddress(var TmpAccount: Record Contact temporary;var TmpShiptoAddressRequest: Record "Ship-to Address" temporary;var TmpShiptoAddressResponse: Record "Ship-to Address" temporary;var ReasonText: Text): Boolean
+    procedure UpdateShiptoAddress(var TmpAccount: Record Contact temporary; var TmpShiptoAddressRequest: Record "Ship-to Address" temporary; var TmpShiptoAddressResponse: Record "Ship-to Address" temporary; var ReasonText: Text): Boolean
     begin
 
-        if (TryUpdateShiptoAddress (TmpAccount, TmpShiptoAddressRequest, TmpShiptoAddressResponse)) then begin
-          ReasonText := '';
-          exit (true);
+        if (TryUpdateShiptoAddress(TmpAccount, TmpShiptoAddressRequest, TmpShiptoAddressResponse)) then begin
+            ReasonText := '';
+            exit(true);
         end;
 
         ReasonText := GetLastErrorText;
-        exit (false);
+        exit(false);
     end;
 
-    procedure DeleteShiptoAddress(var TmpAccount: Record Contact temporary;var TmpShiptoAddressRequest: Record "Ship-to Address" temporary;var ReasonText: Text): Boolean
+    procedure DeleteShiptoAddress(var TmpAccount: Record Contact temporary; var TmpShiptoAddressRequest: Record "Ship-to Address" temporary; var ReasonText: Text): Boolean
     begin
 
-        if (TryDeleteShiptoAddress (TmpAccount, TmpShiptoAddressRequest)) then begin
-          ReasonText := '';
-          exit (true);
+        if (TryDeleteShiptoAddress(TmpAccount, TmpShiptoAddressRequest)) then begin
+            ReasonText := '';
+            exit(true);
         end;
 
         ReasonText := GetLastErrorText;
-        exit (false);
+        exit(false);
     end;
 
     [EventSubscriber(ObjectType::Page, 5050, 'OnAfterActionEvent', 'ResetMagentoPassword', true, true)]
@@ -241,8 +250,8 @@ codeunit 6151151 "M2 Account Manager"
 
         //-MAG2.21.01 [320424]
         Contact := Rec;
-        if not (ResetMagentoPassword (Contact, ReasonText)) then
-          Error (ReasonText);
+        if not (ResetMagentoPassword(Contact, ReasonText)) then
+            Error(ReasonText);
         //+MAG2.21.01 [320424]
     end;
 
@@ -254,12 +263,12 @@ codeunit 6151151 "M2 Account Manager"
     begin
 
         //-MAG2.21.01 [353964]
-        TmpContact.Reset ();
-        if (TmpContact.FindSet ()) then begin
-          repeat
-            TmpGlobalContact.TransferFields (TmpContact, true);
-            TmpGlobalContact.Insert ();
-          until (TmpContact.Next () = 0);
+        TmpContact.Reset();
+        if (TmpContact.FindSet()) then begin
+            repeat
+                TmpGlobalContact.TransferFields(TmpContact, true);
+                TmpGlobalContact.Insert();
+            until (TmpContact.Next() = 0);
         end;
         //+MAG2.21.01 [353964]
     end;
@@ -268,15 +277,15 @@ codeunit 6151151 "M2 Account Manager"
     begin
 
         //-MAG2.21.01 [353964]
-        if (TmpContact.IsTemporary ()) then
-          TmpContact.DeleteAll ();
+        if (TmpContact.IsTemporary()) then
+            TmpContact.DeleteAll();
 
-        TmpGlobalContact.Reset ();
-        if (TmpGlobalContact.FindSet ()) then begin
-          repeat
-            TmpContact.TransferFields (TmpGlobalContact, true);
-            TmpContact.Insert ();
-          until (TmpGlobalContact.Next () = 0);
+        TmpGlobalContact.Reset();
+        if (TmpGlobalContact.FindSet()) then begin
+            repeat
+                TmpContact.TransferFields(TmpGlobalContact, true);
+                TmpContact.Insert();
+            until (TmpGlobalContact.Next() = 0);
         end;
         //+MAG2.21.01 [353964]
     end;
@@ -285,12 +294,12 @@ codeunit 6151151 "M2 Account Manager"
     begin
 
         //-MAG2.21.01 [353964]
-        TmpContact.Reset ();
-        if (TmpContact.FindSet ()) then begin
-          repeat
-            TmpGlobalAccount.TransferFields (TmpContact, true);
-            TmpGlobalAccount.Insert ();
-          until (TmpContact.Next () = 0);
+        TmpContact.Reset();
+        if (TmpContact.FindSet()) then begin
+            repeat
+                TmpGlobalAccount.TransferFields(TmpContact, true);
+                TmpGlobalAccount.Insert();
+            until (TmpContact.Next() = 0);
         end;
         //+MAG2.21.01 [353964]
     end;
@@ -299,15 +308,15 @@ codeunit 6151151 "M2 Account Manager"
     begin
 
         //-MAG2.21.01 [353964]
-        if (TmpContact.IsTemporary ()) then
-          TmpContact.DeleteAll ();
+        if (TmpContact.IsTemporary()) then
+            TmpContact.DeleteAll();
 
-        TmpGlobalAccount.Reset ();
-        if (TmpGlobalAccount.FindSet ()) then begin
-          repeat
-            TmpContact.TransferFields (TmpGlobalAccount, true);
-            TmpContact.Insert ();
-          until (TmpGlobalAccount.Next () = 0);
+        TmpGlobalAccount.Reset();
+        if (TmpGlobalAccount.FindSet()) then begin
+            repeat
+                TmpContact.TransferFields(TmpGlobalAccount, true);
+                TmpContact.Insert();
+            until (TmpGlobalAccount.Next() = 0);
         end;
         //+MAG2.21.01 [353964]
     end;
@@ -316,12 +325,12 @@ codeunit 6151151 "M2 Account Manager"
     begin
 
         //-MAG2.21.01 [353964]
-        TmpCustomer.Reset ();
-        if (TmpCustomer.FindSet ()) then begin
-          repeat
-            TmpGlobalCustomer1.TransferFields (TmpCustomer, true);
-            TmpGlobalCustomer1.Insert ();
-          until (TmpCustomer.Next () = 0);
+        TmpCustomer.Reset();
+        if (TmpCustomer.FindSet()) then begin
+            repeat
+                TmpGlobalCustomer1.TransferFields(TmpCustomer, true);
+                TmpGlobalCustomer1.Insert();
+            until (TmpCustomer.Next() = 0);
         end;
         //+MAG2.21.01 [353964]
     end;
@@ -331,14 +340,14 @@ codeunit 6151151 "M2 Account Manager"
 
         //-MAG2.21.01 [353964]
         if (TmpCustomer.IsTemporary) then
-          TmpCustomer.DeleteAll ();
+            TmpCustomer.DeleteAll();
 
-        TmpGlobalCustomer1.Reset ();
-        if (TmpGlobalCustomer1.FindSet ()) then begin
-          repeat
-            TmpCustomer.TransferFields (TmpGlobalCustomer1, true);
-            TmpCustomer.Insert ();
-          until (TmpGlobalCustomer1.Next () = 0);
+        TmpGlobalCustomer1.Reset();
+        if (TmpGlobalCustomer1.FindSet()) then begin
+            repeat
+                TmpCustomer.TransferFields(TmpGlobalCustomer1, true);
+                TmpCustomer.Insert();
+            until (TmpGlobalCustomer1.Next() = 0);
         end;
         //+MAG2.21.01 [353964]
     end;
@@ -346,26 +355,26 @@ codeunit 6151151 "M2 Account Manager"
     procedure TransferSetShiptoAddress(var TmpShiptoAddress: Record "Ship-to Address" temporary)
     begin
 
-        TmpShiptoAddress.Reset ();
-        if (TmpShiptoAddress.FindSet ()) then begin
-          repeat
-            TmpGlobsalShiptoAddressRequest.TransferFields (TmpShiptoAddress, true);
-            TmpGlobsalShiptoAddressRequest.Insert ();
-          until (TmpShiptoAddress.Next () = 0);
+        TmpShiptoAddress.Reset();
+        if (TmpShiptoAddress.FindSet()) then begin
+            repeat
+                TmpGlobsalShiptoAddressRequest.TransferFields(TmpShiptoAddress, true);
+                TmpGlobsalShiptoAddressRequest.Insert();
+            until (TmpShiptoAddress.Next() = 0);
         end;
     end;
 
     procedure TransferGetShiptoAddress(var TmpShiptoAddress: Record "Ship-to Address" temporary)
     begin
 
-        if (TmpShiptoAddress.IsTemporary ()) then
-          TmpShiptoAddress.DeleteAll ();
+        if (TmpShiptoAddress.IsTemporary()) then
+            TmpShiptoAddress.DeleteAll();
 
-        if (TmpGlobalShiptoAddressResponse.FindSet ()) then begin
-          repeat
-            TmpShiptoAddress.TransferFields (TmpGlobalShiptoAddressResponse, true);
-            TmpShiptoAddress.Insert ();
-          until (TmpGlobalShiptoAddressResponse.Next () = 0);
+        if (TmpGlobalShiptoAddressResponse.FindSet()) then begin
+            repeat
+                TmpShiptoAddress.TransferFields(TmpGlobalShiptoAddressResponse, true);
+                TmpShiptoAddress.Insert();
+            until (TmpGlobalShiptoAddressResponse.Next() = 0);
         end;
     end;
 
@@ -373,12 +382,12 @@ codeunit 6151151 "M2 Account Manager"
     begin
 
         //-MAG2.21.01 [353964]
-        TmpOneTimePassword.Reset ();
-        if (TmpOneTimePassword.FindSet ()) then begin
-          repeat
-            TmpGlobalOneTimePassword.TransferFields (TmpOneTimePassword, true);
-            TmpGlobalOneTimePassword.Insert ();
-          until (TmpGlobalOneTimePassword.Next () = 0);
+        TmpOneTimePassword.Reset();
+        if (TmpOneTimePassword.FindSet()) then begin
+            repeat
+                TmpGlobalOneTimePassword.TransferFields(TmpOneTimePassword, true);
+                TmpGlobalOneTimePassword.Insert();
+            until (TmpGlobalOneTimePassword.Next() = 0);
         end;
         //+MAG2.21.01 [353964]
     end;
@@ -387,7 +396,7 @@ codeunit 6151151 "M2 Account Manager"
     begin
     end;
 
-    local procedure TryAuthenticatePassword(var TmpOneTimePassword: Record "M2 One Time Password" temporary;var TmpContact: Record Contact temporary;AllowBlankPassword: Boolean) bOk: Boolean
+    local procedure TryAuthenticatePassword(var TmpOneTimePassword: Record "M2 One Time Password" temporary; var TmpContact: Record Contact temporary; AllowBlankPassword: Boolean) bOk: Boolean
     var
         Contact: Record Contact;
         OneTimePassword: Record "M2 One Time Password";
@@ -395,19 +404,19 @@ codeunit 6151151 "M2 Account Manager"
     begin
 
         //-MAG2.21.01 [353964]
-        Clear (AccountManager);
-        AccountManager.SetFunction (AccountFunctions::AUTHENTICATE);
-        AccountManager.TransferSetOTP (TmpOneTimePassword);
-        AccountManager.TransferSetContact (TmpContact);
+        Clear(AccountManager);
+        AccountManager.SetFunction(AccountFunctions::AUTHENTICATE);
+        AccountManager.TransferSetOTP(TmpOneTimePassword);
+        AccountManager.TransferSetContact(TmpContact);
 
-        bOk := AccountManager.Run ();
+        bOk := AccountManager.Run();
 
-        AccountManager.TransferGetContact (TmpContact);
-        exit (bOk);
+        AccountManager.TransferGetContact(TmpContact);
+        exit(bOk);
         //+MAG2.21.01 [353964]
     end;
 
-    local procedure TryChangePassword(var TmpOneTimePassword: Record "M2 One Time Password" temporary;var TmpContact: Record Contact temporary) bOk: Boolean
+    local procedure TryChangePassword(var TmpOneTimePassword: Record "M2 One Time Password" temporary; var TmpContact: Record Contact temporary) bOk: Boolean
     var
         Contact: Record Contact;
     begin
@@ -415,15 +424,15 @@ codeunit 6151151 "M2 Account Manager"
         //-MAG2.21.01 [353964]
         // ChangePasswordWorker (TmpOneTimePassword, TmpContact);
 
-        Clear (AccountManager);
-        AccountManager.SetFunction (AccountFunctions::CHANGE_PASSWORD);
-        AccountManager.TransferSetOTP (TmpOneTimePassword);
-        AccountManager.TransferSetContact (TmpContact);
+        Clear(AccountManager);
+        AccountManager.SetFunction(AccountFunctions::CHANGE_PASSWORD);
+        AccountManager.TransferSetOTP(TmpOneTimePassword);
+        AccountManager.TransferSetContact(TmpContact);
 
-        bOk := AccountManager.Run ();
+        bOk := AccountManager.Run();
 
-        AccountManager.TransferGetContact (TmpContact);
-        exit (bOk);
+        AccountManager.TransferGetContact(TmpContact);
+        exit(bOk);
         //+MAG2.21.01 [353964]
     end;
 
@@ -444,13 +453,13 @@ codeunit 6151151 "M2 Account Manager"
     begin
 
         if (Email = '') then
-          Error ('No account to reset.');
+            Error('No account to reset.');
 
-        Contact.Reset ();
-        Contact.SetFilter ("E-Mail", '=%1', LowerCase (Email));
-        Contact.SetFilter ("Magento Contact", '=%1', true);
-        if (Contact.IsEmpty ()) then
-          Error ('E-Mail does not identify a magento contact.');
+        Contact.Reset();
+        Contact.SetFilter("E-Mail", '=%1', LowerCase(Email));
+        Contact.SetFilter("Magento Contact", '=%1', true);
+        if (Contact.IsEmpty()) then
+            Error('E-Mail does not identify a magento contact.');
 
         //-MAG2.23 [372257]
         // Contact.FINDFIRST ();
@@ -465,31 +474,31 @@ codeunit 6151151 "M2 Account Manager"
 
         // Body := Body.Parse (STRSUBSTNO ('{"customer":{"email":"%1"}}', Email));
 
-        Contact.FindSet ();
+        Contact.FindSet();
         repeat
 
-          if (Contact."Company No." = '') then
-            Contact."Company No." := Contact."No.";
+            if (Contact."Company No." = '') then
+                Contact."Company No." := Contact."No.";
 
-          if (MarketingSetup.Get ()) then
-            if (ContactBusinessRelation.Get (Contact."Company No." , MarketingSetup."Bus. Rel. Code for Customers")) then
-              if (Customer.Get (ContactBusinessRelation."No.")) then
-                ;
+            if (MarketingSetup.Get()) then
+                if (ContactBusinessRelation.Get(Contact."Company No.", MarketingSetup."Bus. Rel. Code for Customers")) then
+                    if (Customer.Get(ContactBusinessRelation."No.")) then
+                        ;
 
-          Customer.TestField ("Magento Store Code");
-          msg := msg + StrSubstNo (',{"id":"%1","storecode":"%2"}', Contact."No.", Customer."Magento Store Code");
+            Customer.TestField("Magento Store Code");
+            msg := msg + StrSubstNo(',{"id":"%1","storecode":"%2"}', Contact."No.", Customer."Magento Store Code");
 
-        until (Contact.Next () = 0);
+        until (Contact.Next() = 0);
 
         // {"account": {"email":"tim@sannes.se", "accounts" : [{"id":"a","storecode":"dk"},{"id":"b","storecode":"fi"}]}}
-        Body := Body.Parse (StrSubstNo ('{"account": {"email":"%1", "accounts":[%2]}}', Email, CopyStr (msg, 2)));
+        Body := Body.Parse(StrSubstNo('{"account": {"email":"%1", "accounts":[%2]}}', Email, CopyStr(msg, 2)));
         //+MAG2.23 [372257]
 
-        MagentoApiPost ('passwordreset', Body, Result);
+        MagentoApiPost('passwordreset', Body, Result);
         //+MAG2.21.01 [320424]
     end;
 
-    local procedure TryCreateAccount(var TmpContact: Record Contact temporary;var TmpCustomer: Record Customer temporary;var TmpAccount: Record Contact temporary) bOk: Boolean
+    local procedure TryCreateAccount(var TmpContact: Record Contact temporary; var TmpCustomer: Record Customer temporary; var TmpAccount: Record Contact temporary) bOk: Boolean
     var
         Contact: Record Contact;
         Customer: Record Customer;
@@ -507,56 +516,56 @@ codeunit 6151151 "M2 Account Manager"
         //-MAG2.21.01 [353964]
         // ChangePasswordWorker (TmpOneTimePassword, TmpContact);
 
-        Clear (AccountManager);
-        AccountManager.SetFunction (AccountFunctions::CREATE_ACCOUNT);
-        AccountManager.TransferSetOTP (TmpOneTimePassword);
-        AccountManager.TransferSetContact (TmpContact);
-        AccountManager.TransferSetCustomer1 (TmpCustomer);
-        AccountManager.TransferSetAccount (TmpAccount);
+        Clear(AccountManager);
+        AccountManager.SetFunction(AccountFunctions::CREATE_ACCOUNT);
+        AccountManager.TransferSetOTP(TmpOneTimePassword);
+        AccountManager.TransferSetContact(TmpContact);
+        AccountManager.TransferSetCustomer1(TmpCustomer);
+        AccountManager.TransferSetAccount(TmpAccount);
 
-        bOk := AccountManager.Run ();
+        bOk := AccountManager.Run();
 
-        AccountManager.TransferGetContact (TmpContact);
-        AccountManager.TransferGetCustomer1 (TmpCustomer);
-        AccountManager.TransferGetAccount (TmpAccount);
+        AccountManager.TransferGetContact(TmpContact);
+        AccountManager.TransferGetCustomer1(TmpCustomer);
+        AccountManager.TransferGetAccount(TmpAccount);
 
-        exit (bOk);
+        exit(bOk);
         //+MAG2.21.01 [353964]
     end;
 
-    local procedure TryUpdateAccount(var TmpAccount: Record Contact temporary;var TmpCustomer: Record Customer temporary;var TmpAccountResponse: Record Contact temporary) bOK: Boolean
+    local procedure TryUpdateAccount(var TmpAccount: Record Contact temporary; var TmpCustomer: Record Customer temporary; var TmpAccountResponse: Record Contact temporary) bOK: Boolean
     begin
 
         //-MAG2.21.01 [353964]
-        Clear (AccountManager);
-        AccountManager.SetFunction (AccountFunctions::UPDATE_ACCOUNT);
-        AccountManager.TransferSetContact (TmpAccount);
-        AccountManager.TransferSetCustomer1 (TmpCustomer);
-        AccountManager.TransferSetAccount (TmpAccountResponse);
+        Clear(AccountManager);
+        AccountManager.SetFunction(AccountFunctions::UPDATE_ACCOUNT);
+        AccountManager.TransferSetContact(TmpAccount);
+        AccountManager.TransferSetCustomer1(TmpCustomer);
+        AccountManager.TransferSetAccount(TmpAccountResponse);
 
-        bOK := AccountManager.Run ();
+        bOK := AccountManager.Run();
 
-        AccountManager.TransferGetContact (TmpAccount);
-        AccountManager.TransferGetCustomer1 (TmpCustomer);
-        AccountManager.TransferGetAccount (TmpAccountResponse);
+        AccountManager.TransferGetContact(TmpAccount);
+        AccountManager.TransferGetCustomer1(TmpCustomer);
+        AccountManager.TransferGetAccount(TmpAccountResponse);
 
-        exit (bOK);
+        exit(bOK);
         //+MAG2.21.01 [353964]
     end;
 
-    local procedure TryAddAccount(var TmpAccount: Record Contact temporary;var TmpAccountResponse: Record Contact temporary) bOk: Boolean
+    local procedure TryAddAccount(var TmpAccount: Record Contact temporary; var TmpAccountResponse: Record Contact temporary) bOk: Boolean
     begin
 
         //-MAG2.21.01 [353964]
-        Clear (AccountManager);
-        AccountManager.SetFunction (AccountFunctions::ADD_ACCOUNT);
-        AccountManager.TransferSetContact (TmpAccount);
+        Clear(AccountManager);
+        AccountManager.SetFunction(AccountFunctions::ADD_ACCOUNT);
+        AccountManager.TransferSetContact(TmpAccount);
 
-        bOk := AccountManager.Run ();
+        bOk := AccountManager.Run();
 
-        AccountManager.TransferGetAccount (TmpAccountResponse);
+        AccountManager.TransferGetAccount(TmpAccountResponse);
 
-        exit (bOk);
+        exit(bOk);
         //+MAG2.21.01 [353964]
     end;
 
@@ -566,69 +575,69 @@ codeunit 6151151 "M2 Account Manager"
         TmpContact: Record Contact temporary;
     begin
 
-        Account.Get (ContactNo);
-        TmpContact.TransferFields (Account, true);
-        TmpContact.Insert ();
+        Account.Get(ContactNo);
+        TmpContact.TransferFields(Account, true);
+        TmpContact.Insert();
 
         //-MAG2.21.01 [353964]
-        Clear (AccountManager);
-        AccountManager.SetFunction (AccountFunctions::DELETE_ACCOUNT);
-        AccountManager.TransferSetContact (TmpContact);
+        Clear(AccountManager);
+        AccountManager.SetFunction(AccountFunctions::DELETE_ACCOUNT);
+        AccountManager.TransferSetContact(TmpContact);
 
-        bOk := AccountManager.Run ();
+        bOk := AccountManager.Run();
 
-        exit (bOk);
+        exit(bOk);
         //+MAG2.21.01 [353964]
     end;
 
-    local procedure TryAddShiptoAddress(var TmpAccount: Record Contact temporary;var TmpShiptoAddressRequest: Record "Ship-to Address" temporary;var TmpShiptoAddressResponse: Record "Ship-to Address" temporary) bOk: Boolean
+    local procedure TryAddShiptoAddress(var TmpAccount: Record Contact temporary; var TmpShiptoAddressRequest: Record "Ship-to Address" temporary; var TmpShiptoAddressResponse: Record "Ship-to Address" temporary) bOk: Boolean
     begin
 
-        Clear (AccountManager);
-        AccountManager.SetFunction (AccountFunctions::CREATE_SHIPTO);
-        AccountManager.TransferSetAccount (TmpAccount);
-        AccountManager.TransferSetShiptoAddress (TmpShiptoAddressRequest);
+        Clear(AccountManager);
+        AccountManager.SetFunction(AccountFunctions::CREATE_SHIPTO);
+        AccountManager.TransferSetAccount(TmpAccount);
+        AccountManager.TransferSetShiptoAddress(TmpShiptoAddressRequest);
 
-        bOk := AccountManager.Run ();
+        bOk := AccountManager.Run();
 
-        AccountManager.TransferGetShiptoAddress (TmpShiptoAddressResponse);
+        AccountManager.TransferGetShiptoAddress(TmpShiptoAddressResponse);
 
-        exit (bOk);
+        exit(bOk);
     end;
 
-    local procedure TryUpdateShiptoAddress(var TmpAccount: Record Contact temporary;var TmpShiptoAddressRequest: Record "Ship-to Address" temporary;var TmpShiptoAddressResponse: Record "Ship-to Address" temporary) bOk: Boolean
+    local procedure TryUpdateShiptoAddress(var TmpAccount: Record Contact temporary; var TmpShiptoAddressRequest: Record "Ship-to Address" temporary; var TmpShiptoAddressResponse: Record "Ship-to Address" temporary) bOk: Boolean
     begin
 
-        Clear (AccountManager);
-        AccountManager.SetFunction (AccountFunctions::UPDATE_SHIPTO);
-        AccountManager.TransferSetAccount (TmpAccount);
-        AccountManager.TransferSetShiptoAddress (TmpShiptoAddressRequest);
+        Clear(AccountManager);
+        AccountManager.SetFunction(AccountFunctions::UPDATE_SHIPTO);
+        AccountManager.TransferSetAccount(TmpAccount);
+        AccountManager.TransferSetShiptoAddress(TmpShiptoAddressRequest);
 
-        bOk := AccountManager.Run ();
+        bOk := AccountManager.Run();
 
-        AccountManager.TransferGetShiptoAddress (TmpShiptoAddressResponse);
+        AccountManager.TransferGetShiptoAddress(TmpShiptoAddressResponse);
 
-        exit (bOk);
+        exit(bOk);
     end;
 
-    local procedure TryDeleteShiptoAddress(var TmpAccount: Record Contact temporary;var TmpShiptoAddressRequest: Record "Ship-to Address" temporary) bOk: Boolean
+    local procedure TryDeleteShiptoAddress(var TmpAccount: Record Contact temporary; var TmpShiptoAddressRequest: Record "Ship-to Address" temporary) bOk: Boolean
     begin
 
-        Clear (AccountManager);
-        AccountManager.SetFunction (AccountFunctions::DELETE_SHIPTO);
-        AccountManager.TransferSetAccount (TmpAccount);
-        AccountManager.TransferSetShiptoAddress (TmpShiptoAddressRequest);
+        Clear(AccountManager);
+        AccountManager.SetFunction(AccountFunctions::DELETE_SHIPTO);
+        AccountManager.TransferSetAccount(TmpAccount);
+        AccountManager.TransferSetShiptoAddress(TmpShiptoAddressRequest);
 
-        bOk := AccountManager.Run ();
+        bOk := AccountManager.Run();
 
-        exit (bOk);
+        exit(bOk);
     end;
 
     local procedure "--Workers"()
     begin
     end;
 
-    local procedure AuthenticatePasswordWorker(var TmpOneTimePassword: Record "M2 One Time Password" temporary;var TmpContact: Record Contact temporary;AllowBlankPassword: Boolean)
+    local procedure AuthenticatePasswordWorker(var TmpOneTimePassword: Record "M2 One Time Password" temporary; var TmpContact: Record Contact temporary; AllowBlankPassword: Boolean)
     var
         Contact: Record Contact;
         OneTimePassword: Record "M2 One Time Password";
@@ -636,117 +645,117 @@ codeunit 6151151 "M2 Account Manager"
     begin
 
         //-MAG2.21.01 [353964]
-        if (TmpContact.IsTemporary ()) then
-          TmpContact.DeleteAll ();
+        if (TmpContact.IsTemporary()) then
+            TmpContact.DeleteAll();
 
-        TmpOneTimePassword.Reset ();
-        if (not TmpOneTimePassword.FindFirst ()) then
-          Error ('No account to validate.');
+        TmpOneTimePassword.Reset();
+        if (not TmpOneTimePassword.FindFirst()) then
+            Error('No account to validate.');
 
         if (TmpOneTimePassword."E-Mail" = '') then
-          Error ('E-Mail must not be blank.');
+            Error('E-Mail must not be blank.');
 
         //-NPR5.49 [320425]
         // IF (TmpOneTimePassword."Password (Md5)" = '') THEN
         //  ERROR ('Password must not be blank.');
         if (TmpOneTimePassword."Password (Hash)" = '') and (not AllowBlankPassword) then
-          Error ('Password must not be blank.');
+            Error('Password must not be blank.');
         //+NPR5.49 [320425]
 
-        OneTimePassword.SetFilter ("E-Mail", '=%1', LowerCase (TmpOneTimePassword."E-Mail"));
-        OneTimePassword.SetFilter ("Password (Hash)", '=%1', TmpOneTimePassword."Password (Hash)");
-        OTPAuthentication := OneTimePassword.FindFirst ();
+        OneTimePassword.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
+        OneTimePassword.SetFilter("Password (Hash)", '=%1', TmpOneTimePassword."Password (Hash)");
+        OTPAuthentication := OneTimePassword.FindFirst();
 
         if (OTPAuthentication) then begin
-          if (TmpOneTimePassword."Password (Hash)" = '') then
-            Error ('Password must not be blank.'); // OTP must never be blank
+            if (TmpOneTimePassword."Password (Hash)" = '') then
+                Error('Password must not be blank.'); // OTP must never be blank
 
-          if (OneTimePassword."Used At" <> 0DT) then
-            Error ('The security token %1 has already been used.', TmpOneTimePassword."Password (Hash)");
+            if (OneTimePassword."Used At" <> 0DT) then
+                Error('The security token %1 has already been used.', TmpOneTimePassword."Password (Hash)");
 
-          if (OneTimePassword."Valid Until" < CurrentDateTime) then
-            Error ('The security token %1 has expired.', TmpOneTimePassword."Password (Hash)");
+            if (OneTimePassword."Valid Until" < CurrentDateTime) then
+                Error('The security token %1 has expired.', TmpOneTimePassword."Password (Hash)");
 
-          OneTimePassword."Used At" := CurrentDateTime;
-          OneTimePassword.Modify ();
+            OneTimePassword."Used At" := CurrentDateTime;
+            OneTimePassword.Modify();
         end;
 
-        Contact.SetFilter ("E-Mail", '=%1', LowerCase (TmpOneTimePassword."E-Mail"));
-        Contact.SetFilter ("Magento Contact", '=%1', true);
+        Contact.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
+        Contact.SetFilter("Magento Contact", '=%1', true);
 
         if (not OTPAuthentication) then
-          Contact.SetFilter ("Magento Password (Md5)", '=%1', TmpOneTimePassword."Password (Hash)");
+            Contact.SetFilter("Magento Password (Md5)", '=%1', TmpOneTimePassword."Password (Hash)");
 
         //-NPR5.49 [320425]
         if (not OTPAuthentication) and (AllowBlankPassword) and (TmpOneTimePassword."Password (Hash)" = '') then
-          Contact.SetFilter ("Magento Password (Md5)", '');
+            Contact.SetFilter("Magento Password (Md5)", '');
         //+NPR5.49 [320425]
 
-        if (Contact.IsEmpty ()) then begin
-          Contact.Reset ();
-          Contact.SetFilter ("E-Mail", '=%1', LowerCase (TmpOneTimePassword."E-Mail"));
-          Contact.SetFilter ("Magento Contact", '=%1', true);
-          Contact.SetFilter ("Magento Password (Md5)", '<>%1', '');
-          if (not Contact.IsEmpty ()) then
-            Error ('E-Mail and password does not identify a valid magento contact.');
-          Error ('Contact not found.');
+        if (Contact.IsEmpty()) then begin
+            Contact.Reset();
+            Contact.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
+            Contact.SetFilter("Magento Contact", '=%1', true);
+            Contact.SetFilter("Magento Password (Md5)", '<>%1', '');
+            if (not Contact.IsEmpty()) then
+                Error('E-Mail and password does not identify a valid magento contact.');
+            Error('Contact not found.');
         end;
 
-        Contact.Reset ();
-        Contact.SetFilter ("E-Mail", '=%1', LowerCase (TmpOneTimePassword."E-Mail"));
-        Contact.SetFilter ("Magento Contact", '=%1', true);
-        if (Contact.FindSet ()) then begin
-          repeat
-            TmpContact.TransferFields (Contact, true);
-            TmpContact.Insert ();
-          until (Contact.Next () = 0);
+        Contact.Reset();
+        Contact.SetFilter("E-Mail", '=%1', LowerCase(TmpOneTimePassword."E-Mail"));
+        Contact.SetFilter("Magento Contact", '=%1', true);
+        if (Contact.FindSet()) then begin
+            repeat
+                TmpContact.TransferFields(Contact, true);
+                TmpContact.Insert();
+            until (Contact.Next() = 0);
         end;
         //+MAG2.21.01 [353964]
     end;
 
-    local procedure ChangePasswordWorker(var TmpOneTimePassword: Record "M2 One Time Password" temporary;var TmpContact: Record Contact temporary)
+    local procedure ChangePasswordWorker(var TmpOneTimePassword: Record "M2 One Time Password" temporary; var TmpContact: Record Contact temporary)
     var
         Contact: Record Contact;
     begin
 
-        TmpContact.Reset ();
-        if (TmpContact.IsEmpty ()) then
-          Error ('E-Mail and password does not identify a magento contact.');
+        TmpContact.Reset();
+        if (TmpContact.IsEmpty()) then
+            Error('E-Mail and password does not identify a magento contact.');
 
         if (TmpOneTimePassword."Password2 (Hash)" = '') then
-          Error ('New password must not be blank.');
+            Error('New password must not be blank.');
 
-        TmpOneTimePassword.FindFirst ();
-        TmpContact.FindSet ();
+        TmpOneTimePassword.FindFirst();
+        TmpContact.FindSet();
         repeat
-          Contact.Get (TmpContact."No.");
-          Contact."Magento Password (Md5)" := TmpOneTimePassword."Password2 (Hash)";
-          Contact.Modify ();
-        until (TmpContact.Next () = 0);
+            Contact.Get(TmpContact."No.");
+            Contact."Magento Password (Md5)" := TmpOneTimePassword."Password2 (Hash)";
+            Contact.Modify();
+        until (TmpContact.Next() = 0);
     end;
 
-    procedure ResetMagentoPassword(Contact: Record Contact;var ReasonText: Text): Boolean
+    procedure ResetMagentoPassword(Contact: Record Contact; var ReasonText: Text): Boolean
     begin
 
         //-MAG2.21.01 [320424]
-        Contact.TestField ("E-Mail");
+        Contact.TestField("E-Mail");
 
-        if (TryResetPassword (Contact."E-Mail")) then begin
-          ReasonText := '';
-          AddLogEntry (LogEntry.Type::RESET_PASSWORD_REQUEST, LogEntry.Status::OK, Contact."E-Mail", ReasonText);
-          Message (RESET_EMAIL_SENT, Contact."E-Mail");
+        if (TryResetPassword(Contact."E-Mail")) then begin
+            ReasonText := '';
+            AddLogEntry(LogEntry.Type::RESET_PASSWORD_REQUEST, LogEntry.Status::OK, Contact."E-Mail", ReasonText);
+            Message(RESET_EMAIL_SENT, Contact."E-Mail");
 
         end else begin
-          ReasonText := GetLastErrorText ();
-          AddLogEntry (LogEntry.Type::RESET_PASSWORD_REQUEST, LogEntry.Status::FAIL, Contact."E-Mail", ReasonText);
+            ReasonText := GetLastErrorText();
+            AddLogEntry(LogEntry.Type::RESET_PASSWORD_REQUEST, LogEntry.Status::FAIL, Contact."E-Mail", ReasonText);
 
         end;
 
-        exit (ReasonText = '');
+        exit(ReasonText = '');
         //+MAG2.21.01 [320424]
     end;
 
-    local procedure CreateAccountWorker(var TmpContact: Record Contact temporary;var TmpCustomer: Record Customer temporary;var TmpAccount: Record Contact temporary)
+    local procedure CreateAccountWorker(var TmpContact: Record Contact temporary; var TmpCustomer: Record Customer temporary; var TmpAccount: Record Contact temporary)
     var
         Contact: Record Contact;
         Customer: Record Customer;
@@ -761,14 +770,14 @@ codeunit 6151151 "M2 Account Manager"
         ReasonText: Text;
     begin
 
-        if (not MarketingSetup.Get ()) then
-          Error ('Marketing Setup not found.');
+        if (not MarketingSetup.Get()) then
+            Error('Marketing Setup not found.');
 
         if (MarketingSetup."Bus. Rel. Code for Customers" = '') then
-          Error ('Business Relation Code for Customers in Marketing Setup must not be blank.');
+            Error('Business Relation Code for Customers in Marketing Setup must not be blank.');
 
         if (TmpContact."E-Mail" = '') then
-          Error ('E-Mail can not be empty.');
+            Error('E-Mail can not be empty.');
 
         //-NPR5.49 [320425]
         // IF (TmpContact."Magento Password (Md5)" = '') THEN
@@ -790,59 +799,59 @@ codeunit 6151151 "M2 Account Manager"
         //+NPR5.49 [320425]
 
 
-        TmpContact.FindFirst ();
-        TmpCustomer.FindFirst ();
+        TmpContact.FindFirst();
+        TmpCustomer.FindFirst();
 
         Customer."No." := '';
 
         //-NPR5.51 [356090]
         //Customer.INSERT (TRUE);
-        if (not CreateMembership (TmpContact, TmpCustomer, Customer)) then
-          Customer.Insert (true);
+        if (not CreateMembership(TmpContact, TmpCustomer, Customer)) then
+            Customer.Insert(true);
         //+NPR5.51 [356090]
 
-        if (MagentoSetup.Get ()) then begin
-          if (MagentoSetup."Customer Config. Template Code" <> '') then begin
-            ConfigTemplateHeader.Get (MagentoSetup."Customer Config. Template Code");
-            RecRef.GetTable(Customer);
-            ConfigTemplateMgt.UpdateRecord (ConfigTemplateHeader, RecRef);
-            RecRef.SetTable(Customer);
-          end;
+        if (MagentoSetup.Get()) then begin
+            if (MagentoSetup."Customer Config. Template Code" <> '') then begin
+                ConfigTemplateHeader.Get(MagentoSetup."Customer Config. Template Code");
+                RecRef.GetTable(Customer);
+                ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
+                RecRef.SetTable(Customer);
+            end;
         end;
 
         //-NPR5.51 [364644]
         if (TmpContact."Company Name" = '') then
-          TmpContact."Company Name" := CalculatedName(TmpContact."First Name", TmpContact."Middle Name", TmpContact.Surname);
+            TmpContact."Company Name" := CalculatedName(TmpContact."First Name", TmpContact."Middle Name", TmpContact.Surname);
         //+NPR5.51 [364644]
 
-        Customer.Validate (Name, TmpContact."Company Name");
-        Customer.Validate ("Name 2", TmpContact."Name 2");
+        Customer.Validate(Name, TmpContact."Company Name");
+        Customer.Validate("Name 2", TmpContact."Name 2");
 
-        Customer.Validate (Address , TmpContact.Address);
-        Customer.Validate ("Address 2", TmpContact."Address 2");
+        Customer.Validate(Address, TmpContact.Address);
+        Customer.Validate("Address 2", TmpContact."Address 2");
 
         //-MAG2.24 [372304] validation order is important in BC
         if (TmpContact."Country/Region Code" <> '') then
-          Customer.Validate ("Country/Region Code", TmpContact."Country/Region Code");
+            Customer.Validate("Country/Region Code", TmpContact."Country/Region Code");
         //-MAG2.24 [372304]
         if (TmpContact."Post Code" <> '') then
-          Customer.Validate ("Post Code", TmpContact."Post Code");
+            Customer.Validate("Post Code", TmpContact."Post Code");
         if (TmpContact.City <> '') then
-          Customer.Validate (City, TmpContact.City);
+            Customer.Validate(City, TmpContact.City);
         //IF (TmpContact."Country/Region Code" <> '') THEN
         //  Customer.VALIDATE ("Country/Region Code", TmpContact."Country/Region Code");
 
         if (TmpContact."Currency Code" <> '') then
-          Customer.Validate ("Currency Code", TmpContact."Currency Code");
+            Customer.Validate("Currency Code", TmpContact."Currency Code");
 
         if (TmpContact."VAT Registration No." <> '') then
-          Customer.Validate ("VAT Registration No.", TmpContact."VAT Registration No.");
+            Customer.Validate("VAT Registration No.", TmpContact."VAT Registration No.");
 
         if (TmpContact."E-Mail" <> '') then
-          Customer.Validate ("E-Mail", LowerCase (TmpContact."E-Mail"));
+            Customer.Validate("E-Mail", LowerCase(TmpContact."E-Mail"));
 
         if (TmpContact."Phone No." <> '') then
-          Customer.Validate ("Phone No.", TmpContact."Phone No.");
+            Customer.Validate("Phone No.", TmpContact."Phone No.");
 
         //-NPR5.51 [364644]
         // IF (TmpContact.Surname = '') AND (TmpContact."First Name" <> '') THEN
@@ -859,54 +868,54 @@ codeunit 6151151 "M2 Account Manager"
         Customer."Magento Payment Group" := TmpCustomer."Magento Payment Group";
         Customer."Magento Shipping Group" := TmpCustomer."Magento Shipping Group";
         Customer."Magento Store Code" := TmpCustomer."Magento Store Code";
-        Customer.Modify (true);
+        Customer.Modify(true);
 
         // Contact Type Company
-        ContactBusinessRelation.SetFilter ("No.", '=%1', Customer."No.");
-        ContactBusinessRelation.SetFilter ("Link to Table", '=%1', ContactBusinessRelation."Link to Table"::Customer);
-        if (ContactBusinessRelation.FindFirst ()) then begin
+        ContactBusinessRelation.SetFilter("No.", '=%1', Customer."No.");
+        ContactBusinessRelation.SetFilter("Link to Table", '=%1', ContactBusinessRelation."Link to Table"::Customer);
+        if (ContactBusinessRelation.FindFirst()) then begin
 
-          // TODO Apply contact template
+            // TODO Apply contact template
 
-          CustContUpdate.OnModify (Customer);
+            CustContUpdate.OnModify(Customer);
 
-          Contact.Get (ContactBusinessRelation."Contact No.");
+            Contact.Get(ContactBusinessRelation."Contact No.");
 
-          Contact."Magento Customer Group" := TmpContact."Magento Customer Group";
-          Contact."Magento Contact" := (Contact."E-Mail" <> '');
-          Contact."Magento Password (Md5)" := TmpContact."Magento Password (Md5)";
-
-          //-NPR5.51 [364644]
-          Contact."First Name" := TmpContact."First Name";
-          Contact.Surname := TmpContact.Surname;
-          //+NPR5.51 [364644]
-
-          Contact.Modify ();
-
-          // Company Result
-          TmpAccount.TransferFields (Contact, true);
-          TmpAccount.Insert ();
-
-          // Contact Type Person
-          Contact.Reset();
-          Contact.SetFilter (Contact.Type, '=%1', Contact.Type::Person);
-          Contact.SetFilter ("Company No.", '=%1', ContactBusinessRelation."Contact No.");
-          if (Contact.FindFirst ()) then begin
             Contact."Magento Customer Group" := TmpContact."Magento Customer Group";
             Contact."Magento Contact" := (Contact."E-Mail" <> '');
             Contact."Magento Password (Md5)" := TmpContact."Magento Password (Md5)";
 
-            Contact.Modify ();
+            //-NPR5.51 [364644]
+            Contact."First Name" := TmpContact."First Name";
+            Contact.Surname := TmpContact.Surname;
+            //+NPR5.51 [364644]
 
-            // Person Result
-            TmpAccount.TransferFields (Contact, true);
-            TmpAccount.Insert ();
-          end;
+            Contact.Modify();
+
+            // Company Result
+            TmpAccount.TransferFields(Contact, true);
+            TmpAccount.Insert();
+
+            // Contact Type Person
+            Contact.Reset();
+            Contact.SetFilter(Contact.Type, '=%1', Contact.Type::Person);
+            Contact.SetFilter("Company No.", '=%1', ContactBusinessRelation."Contact No.");
+            if (Contact.FindFirst()) then begin
+                Contact."Magento Customer Group" := TmpContact."Magento Customer Group";
+                Contact."Magento Contact" := (Contact."E-Mail" <> '');
+                Contact."Magento Password (Md5)" := TmpContact."Magento Password (Md5)";
+
+                Contact.Modify();
+
+                // Person Result
+                TmpAccount.TransferFields(Contact, true);
+                TmpAccount.Insert();
+            end;
 
         end;
     end;
 
-    local procedure UpdateAccountWorker(var TmpAccount: Record Contact temporary;var TmpCustomer: Record Customer temporary;var TmpAccountResponse: Record Contact temporary)
+    local procedure UpdateAccountWorker(var TmpAccount: Record Contact temporary; var TmpCustomer: Record Customer temporary; var TmpAccountResponse: Record Contact temporary)
     var
         Account: Record Contact;
         Contact: Record Contact;
@@ -918,80 +927,80 @@ codeunit 6151151 "M2 Account Manager"
         UpdateCustomerData: Boolean;
     begin
 
-        TmpAccount.FindFirst ();
-        UpdateCustomerData := TmpCustomer.FindFirst ();
+        TmpAccount.FindFirst();
+        UpdateCustomerData := TmpCustomer.FindFirst();
 
-        Account.Get (TmpAccount."No.");
+        Account.Get(TmpAccount."No.");
         if (not Account."Magento Contact") then
-          Error ('Not a valid Magento contact.');
+            Error('Not a valid Magento contact.');
 
         //-NPR5.51 [356090]
-        if (UpdateMember (TmpAccount)) then
-          Account.Get (TmpAccount."No.");
+        if (UpdateMember(TmpAccount)) then
+            Account.Get(TmpAccount."No.");
         //+NPR5.51 [356090]
 
         if (Account.Type = Account.Type::Company) then begin
-          ContactXrec.Get (Account."No.");
-          Contact.TransferFields (Account, true);
+            ContactXrec.Get(Account."No.");
+            Contact.TransferFields(Account, true);
 
-          MarketingSetup.Get ();
-          ContactBusinessRelation.Get (Contact."No.", MarketingSetup."Bus. Rel. Code for Customers");
+            MarketingSetup.Get();
+            ContactBusinessRelation.Get(Contact."No.", MarketingSetup."Bus. Rel. Code for Customers");
 
-          Customer.Get (ContactBusinessRelation."No.");
-          if (UpdateCustomerData) then begin
-            Customer."Magento Display Group" := TmpCustomer."Magento Display Group";
-            Customer."Magento Payment Group" := TmpCustomer."Magento Payment Group";
-            Customer."Magento Shipping Group" := TmpCustomer."Magento Shipping Group";
-            Customer."Magento Store Code" := TmpCustomer."Magento Store Code";
-            Customer.Modify ();
-          end;
+            Customer.Get(ContactBusinessRelation."No.");
+            if (UpdateCustomerData) then begin
+                Customer."Magento Display Group" := TmpCustomer."Magento Display Group";
+                Customer."Magento Payment Group" := TmpCustomer."Magento Payment Group";
+                Customer."Magento Shipping Group" := TmpCustomer."Magento Shipping Group";
+                Customer."Magento Store Code" := TmpCustomer."Magento Store Code";
+                Customer.Modify();
+            end;
 
-          Account.Validate (Name, TmpAccount."Company Name");
-          Account.Validate ("VAT Registration No.", TmpAccount."VAT Registration No.");
-          Account.Validate ("Currency Code", TmpAccount."Currency Code");
+            Account.Validate(Name, TmpAccount."Company Name");
+            Account.Validate("VAT Registration No.", TmpAccount."VAT Registration No.");
+            Account.Validate("Currency Code", TmpAccount."Currency Code");
 
-          //-NPR5.51 [364644]
-          Account."First Name" := TmpAccount."First Name";
-          Account.Surname := TmpAccount.Surname;
-          //+NPR5.51 [364644]
+            //-NPR5.51 [364644]
+            Account."First Name" := TmpAccount."First Name";
+            Account.Surname := TmpAccount.Surname;
+            //+NPR5.51 [364644]
 
         end;
 
         if (Account.Type = Account.Type::Person) then begin
-          Account.Validate ("First Name", TmpAccount."First Name");
-          Account.Validate (Surname, TmpAccount.Surname);
+            Account.Validate("First Name", TmpAccount."First Name");
+            Account.Validate(Surname, TmpAccount.Surname);
         end;
 
-        Account.Validate ("Name 2", TmpAccount."Name 2");
-        Account.Validate (Address, TmpAccount.Address);
-        Account.Validate ("Address 2", TmpAccount."Address 2");
-        Account.Validate ("Post Code", TmpAccount."Post Code");
-        Account.Validate (City, TmpAccount.City);
-        Account.Validate ("Country/Region Code", TmpAccount."Country/Region Code");
+        Account.Validate("Name 2", TmpAccount."Name 2");
+        Account.Validate(Address, TmpAccount.Address);
+        Account.Validate("Address 2", TmpAccount."Address 2");
+        Account.Validate("Post Code", TmpAccount."Post Code");
+        Account.Validate(City, TmpAccount.City);
+        Account.Validate("Country/Region Code", TmpAccount."Country/Region Code");
 
-        if ( TmpAccount."E-Mail" <> '') then begin
-          //-MAG2.25 [368254]
-          //IF (TmpAccount."E-Mail" <> Account."E-Mail") THEN BEGIN
-          if (LowerCase(TmpAccount."E-Mail") <> LowerCase(Account."E-Mail")) then begin
-          //+MAG2.25 [368254]
-            Contact.Reset ();
-            Contact.SetFilter ("E-Mail", '=%1', LowerCase (TmpAccount."E-Mail"));
-            if (not Contact.IsEmpty ()) then
-              Error ('Merging this account with an existing account is not possible.');
-          end;
+        if (TmpAccount."E-Mail" <> '') then begin
+            //-MAG2.25 [368254]
+            //IF (TmpAccount."E-Mail" <> Account."E-Mail") THEN BEGIN
+            if (LowerCase(TmpAccount."E-Mail") <> LowerCase(Account."E-Mail")) then begin
+                //+MAG2.25 [368254]
+                Contact.Reset();
+                Contact.SetFilter("E-Mail", '=%1', LowerCase(TmpAccount."E-Mail"));
+                if (not Contact.IsEmpty()) then
+                    Error('Merging this account with an existing account is not possible.');
+            end;
 
-          Account.Validate ("E-Mail", LowerCase (TmpAccount."E-Mail"));
+            Account.Validate("E-Mail", LowerCase(TmpAccount."E-Mail"));
         end;
 
-        Account.Validate ("Phone No.", TmpAccount."Phone No.");
-        Account.Modify ();
-        Account.OnModify (ContactXrec);
+        Account.Validate("Phone No.", TmpAccount."Phone No.");
+        Account.Modify();
+        Account.OnModify(ContactXrec);
 
-        TmpAccountResponse.TransferFields (Account, true);
-        TmpAccountResponse.Insert ();
+        TmpAccountResponse.TransferFields(Account, true);
+        TmpAccountResponse.Insert();
     end;
 
-    local procedure GetAccountWorker(ContactNo: Code[20];var TmpContact: Record Contact temporary;var TmpSellToCustomer: Record Customer temporary;var TmpBillToCustomer: Record Customer temporary;var TmpShipToAddress: Record "Ship-to Address" temporary): Boolean
+    local procedure GetAccountWorker(ContactNo: Code[20]; var TmpContact: Record Contact temporary; var TmpSellToCustomer: Record Customer temporary; var TmpBillToCustomer: Record Customer temporary; var TmpShipToAddress: Record "Ship-to Address" temporary): Boolean
     var
         Contact: Record Contact;
         SellToCustomer: Record Customer;
@@ -1002,63 +1011,63 @@ codeunit 6151151 "M2 Account Manager"
         MagentoContactShiptoAdrs: Record "Magento Contact Ship-to Adrs.";
     begin
 
-        Contact.Get (ContactNo);
+        Contact.Get(ContactNo);
         if (not Contact."Magento Contact") then
-          Error ('Not a valid Magento contact.');
+            Error('Not a valid Magento contact.');
 
-        TmpContact.TransferFields (Contact, true);
-        TmpContact.Insert ();
+        TmpContact.TransferFields(Contact, true);
+        TmpContact.Insert();
 
-        if (not MarketingSetup.Get ()) then
-          exit;
+        if (not MarketingSetup.Get()) then
+            exit;
 
         if (MarketingSetup."Bus. Rel. Code for Customers" = '') then
-          exit;
+            exit;
 
         if (Contact."Company No." = '') then
-          exit;
+            exit;
 
-        ContactBusinessRelation.SetFilter ("Contact No.", '=%1', Contact."Company No.");
-        ContactBusinessRelation.SetFilter ("Business Relation Code", '=%1', MarketingSetup."Bus. Rel. Code for Customers");
-        if (not ContactBusinessRelation.FindFirst ()) then
-          exit;
+        ContactBusinessRelation.SetFilter("Contact No.", '=%1', Contact."Company No.");
+        ContactBusinessRelation.SetFilter("Business Relation Code", '=%1', MarketingSetup."Bus. Rel. Code for Customers");
+        if (not ContactBusinessRelation.FindFirst()) then
+            exit;
 
-        if (not SellToCustomer.Get (ContactBusinessRelation."No.")) then
-          exit;
-        TmpSellToCustomer.TransferFields (SellToCustomer, true);
-        TmpSellToCustomer.Insert ();
+        if (not SellToCustomer.Get(ContactBusinessRelation."No.")) then
+            exit;
+        TmpSellToCustomer.TransferFields(SellToCustomer, true);
+        TmpSellToCustomer.Insert();
 
-        BillToCustomer.Get (TmpSellToCustomer.GetBillToCustomerNo());
-        TmpBillToCustomer.TransferFields (BillToCustomer, true);
-        TmpBillToCustomer.Insert ();
+        BillToCustomer.Get(TmpSellToCustomer.GetBillToCustomerNo());
+        TmpBillToCustomer.TransferFields(BillToCustomer, true);
+        TmpBillToCustomer.Insert();
 
-        ShipToAddress.SetFilter ("Customer No.", '=%1', TmpSellToCustomer."No.");
-        if (ShipToAddress.FindSet ()) then begin
-          repeat
-            TmpShipToAddress.TransferFields (ShipToAddress, true);
+        ShipToAddress.SetFilter("Customer No.", '=%1', TmpSellToCustomer."No.");
+        if (ShipToAddress.FindSet()) then begin
+            repeat
+                TmpShipToAddress.TransferFields(ShipToAddress, true);
 
-            MagentoContactShiptoAdrs.SetFilter ("Customer No.", '=%1', ShipToAddress."Customer No.");
-            MagentoContactShiptoAdrs.SetFilter ("Ship-to Code", '=%1', ShipToAddress.Code);
-            if (MagentoContactShiptoAdrs.FindFirst ()) then begin
+                MagentoContactShiptoAdrs.SetFilter("Customer No.", '=%1', ShipToAddress."Customer No.");
+                MagentoContactShiptoAdrs.SetFilter("Ship-to Code", '=%1', ShipToAddress.Code);
+                if (MagentoContactShiptoAdrs.FindFirst()) then begin
 
-              if (MagentoContactShiptoAdrs.Visibility = MagentoContactShiptoAdrs.Visibility::PUBLIC) then
-                  TmpShipToAddress.Insert ();
+                    if (MagentoContactShiptoAdrs.Visibility = MagentoContactShiptoAdrs.Visibility::PUBLIC) then
+                        TmpShipToAddress.Insert();
 
-              if ((MagentoContactShiptoAdrs."Created By Contact No." = ContactNo) and (MagentoContactShiptoAdrs.Visibility = MagentoContactShiptoAdrs.Visibility::PRIVATE)) then
-                TmpShipToAddress.Insert ();
+                    if ((MagentoContactShiptoAdrs."Created By Contact No." = ContactNo) and (MagentoContactShiptoAdrs.Visibility = MagentoContactShiptoAdrs.Visibility::PRIVATE)) then
+                        TmpShipToAddress.Insert();
 
-            end else begin
-              // No visibility rules defined for this address
-              TmpShipToAddress.Insert ();
-            end;
+                end else begin
+                    // No visibility rules defined for this address
+                    TmpShipToAddress.Insert();
+                end;
 
-          until (ShipToAddress.Next () = 0);
+            until (ShipToAddress.Next() = 0);
         end;
 
-        exit (true);
+        exit(true);
     end;
 
-    local procedure AddAccountWorker(var TmpAccount: Record Contact temporary;var TmpAccountResponse: Record Contact temporary)
+    local procedure AddAccountWorker(var TmpAccount: Record Contact temporary; var TmpAccountResponse: Record Contact temporary)
     var
         TmpOneTimePassword: Record "M2 One Time Password" temporary;
         tmpCorporateAccount: Record Contact temporary;
@@ -1067,21 +1076,21 @@ codeunit 6151151 "M2 Account Manager"
     begin
 
         if (TmpAccount."E-Mail" = '') then
-          Error ('E-Mail can not be empty.');
+            Error('E-Mail can not be empty.');
 
         if (TmpAccount."Magento Password (Md5)" = '') then
-          Error ('Password must not be blank.');
+            Error('Password must not be blank.');
 
         TmpOneTimePassword."Password (Hash)" := TmpAccount."Magento Password (Md5)";
-        TmpOneTimePassword."E-Mail" := LowerCase (TmpAccount."E-Mail");
+        TmpOneTimePassword."E-Mail" := LowerCase(TmpAccount."E-Mail");
         TmpOneTimePassword.Insert();
 
-        if (not AuthenticatePassword (TmpOneTimePassword, tmpCorporateAccount, ReasonText)) then
-          Error ('Invalid account, password combination.');
+        if (not AuthenticatePassword(TmpOneTimePassword, tmpCorporateAccount, ReasonText)) then
+            Error('Invalid account, password combination.');
 
-        tmpCorporateAccount.SetFilter ("Company No.", '=%1', TmpAccount."Company No.");
-        if (not tmpCorporateAccount.FindFirst ()) then
-          Error ('Invalid corporate id %1 for account, password combination.', TmpAccount."Company No.");
+        tmpCorporateAccount.SetFilter("Company No.", '=%1', TmpAccount."Company No.");
+        if (not tmpCorporateAccount.FindFirst()) then
+            Error('Invalid corporate id %1 for account, password combination.', TmpAccount."Company No.");
 
 
 
@@ -1091,51 +1100,51 @@ codeunit 6151151 "M2 Account Manager"
 
         //-NPR5.51 [356090]
         // Contact.INSERT (TRUE);
-        if (not AddMembershipMember (TmpAccount, Contact, tmpCorporateAccount."No.")) then
-          Contact.Insert (true);
+        if (not AddMembershipMember(TmpAccount, Contact, tmpCorporateAccount."No.")) then
+            Contact.Insert(true);
         //+NPR5.51 [356090]
 
         //-NPR5.49 [346698]
         //Contact.InheritCompanyToPersonData (tmpCorporateAccount, TRUE);
-        Contact.InheritCompanyToPersonData (tmpCorporateAccount);
+        Contact.InheritCompanyToPersonData(tmpCorporateAccount);
         //+NPR5.49 [346698]
 
-        Contact.Validate (Name, TmpAccount."Company Name");
-        Contact.Validate ("Name 2", TmpAccount."Name 2");
+        Contact.Validate(Name, TmpAccount."Company Name");
+        Contact.Validate("Name 2", TmpAccount."Name 2");
 
-        Contact.Validate (Address , TmpAccount.Address);
-        Contact.Validate ("Address 2", TmpAccount."Address 2");
+        Contact.Validate(Address, TmpAccount.Address);
+        Contact.Validate("Address 2", TmpAccount."Address 2");
 
         if (TmpAccount."Post Code" <> '') then
-          Contact.Validate ("Post Code", TmpAccount."Post Code");
+            Contact.Validate("Post Code", TmpAccount."Post Code");
         if (TmpAccount.City <> '') then
-          Contact.Validate (City, TmpAccount.City);
+            Contact.Validate(City, TmpAccount.City);
         if (TmpAccount."Country/Region Code" <> '') then
-          Contact.Validate ("Country/Region Code", TmpAccount."Country/Region Code");
+            Contact.Validate("Country/Region Code", TmpAccount."Country/Region Code");
 
         if (TmpAccount."Currency Code" <> '') then
-          Contact.Validate ("Currency Code", TmpAccount."Currency Code");
+            Contact.Validate("Currency Code", TmpAccount."Currency Code");
 
         if (TmpAccount."VAT Registration No." <> '') then
-          Contact.Validate ("VAT Registration No.", TmpAccount."VAT Registration No.");
+            Contact.Validate("VAT Registration No.", TmpAccount."VAT Registration No.");
 
         if (TmpAccount."E-Mail 2" <> '') then
-          Contact.Validate ("E-Mail", LowerCase (TmpAccount."E-Mail 2"));
+            Contact.Validate("E-Mail", LowerCase(TmpAccount."E-Mail 2"));
 
         if (TmpAccount."Phone No." <> '') then
-          Contact.Validate ("Phone No.", TmpAccount."Phone No.");
+            Contact.Validate("Phone No.", TmpAccount."Phone No.");
 
         if (TmpAccount."First Name" <> '') then
-          Contact.Validate ("First Name", TmpAccount."First Name");
+            Contact.Validate("First Name", TmpAccount."First Name");
 
         if (TmpAccount.Surname <> '') then
-          Contact.Validate (Surname, TmpAccount.Surname);
+            Contact.Validate(Surname, TmpAccount.Surname);
 
         Contact."Magento Contact" := true;
-        Contact.Modify ();
+        Contact.Modify();
 
-        TmpAccountResponse.TransferFields (Contact, true);
-        TmpAccountResponse.Insert ();
+        TmpAccountResponse.TransferFields(Contact, true);
+        TmpAccountResponse.Insert();
     end;
 
     local procedure DeleteAccountWorker(var TmpContact: Record Contact)
@@ -1149,23 +1158,23 @@ codeunit 6151151 "M2 Account Manager"
         CustContUpdate: Codeunit "CustCont-Update";
     begin
 
-        TmpContact.FindFirst ();
-        Account.Get (TmpContact."No.");
+        TmpContact.FindFirst();
+        Account.Get(TmpContact."No.");
 
         if (Account.Type = Account.Type::Company) then begin
-          Account.SetFilter ("Company No.",' =%1', TmpContact."No.");
-          Account.ModifyAll ("Magento Contact", false);
+            Account.SetFilter("Company No.", ' =%1', TmpContact."No.");
+            Account.ModifyAll("Magento Contact", false);
         end else begin
-          Account."Magento Contact" := false;
-          Account.Modify ();
+            Account."Magento Contact" := false;
+            Account.Modify();
         end;
 
         //-NPR5.51 [356090]
-        BlockMember (Account);
+        BlockMember(Account);
         //+NPR5.51 [356090]
     end;
 
-    local procedure CreateShiptoAddressWorker(var TmpAccount: Record Contact temporary;var TmpShiptoAddressRequest: Record "Ship-to Address" temporary;var TmpShiptoAddressResponse: Record "Ship-to Address" temporary)
+    local procedure CreateShiptoAddressWorker(var TmpAccount: Record Contact temporary; var TmpShiptoAddressRequest: Record "Ship-to Address" temporary; var TmpShiptoAddressResponse: Record "Ship-to Address" temporary)
     var
         AccountSetup: Record "M2 Account Setup";
         Account: Record Contact;
@@ -1177,60 +1186,62 @@ codeunit 6151151 "M2 Account Manager"
         NoSeriesManagement: Codeunit NoSeriesManagement;
     begin
 
-        if (not AccountSetup.Get ()) then begin
-          AccountSetup.Init ();
-          AccountSetup.Insert ();
+        if (not AccountSetup.Get()) then begin
+            AccountSetup.Init();
+            AccountSetup.Insert();
         end;
 
         if (AccountSetup."No. Series Ship-to Address" = '') then begin
-          AccountSetup."No. Series Ship-to Address" := CreateNoSerie ('NPR-SHIPTO', 'CA00000000', 'Auto assigned ship-to codes.');
-          AccountSetup.Modify ();
+            AccountSetup."No. Series Ship-to Address" := CreateNoSerie('NPR-SHIPTO', 'CA00000000', 'Auto assigned ship-to codes.');
+            AccountSetup.Modify();
         end;
 
 
-        if (not MarketingSetup.Get ()) then
-          Error ('Marketing Setup not found.');
+        if (not MarketingSetup.Get()) then
+            Error('Marketing Setup not found.');
 
         if (MarketingSetup."Bus. Rel. Code for Customers" = '') then
-          Error ('Business Relation Code for Customers in Marketing Setup must not be blank.');
+            Error('Business Relation Code for Customers in Marketing Setup must not be blank.');
 
-        TmpAccount.FindFirst ();
-        Account.Get (TmpAccount."No.");
+        TmpAccount.FindFirst();
+        Account.Get(TmpAccount."No.");
 
         if (Account.Type = Account.Type::Person) then
-          Contact.Get (Account."Company No.");
+            Contact.Get(Account."Company No.");
 
         if (Account.Type = Account.Type::Company) then
-          Contact.TransferFields (Account, true);
+            Contact.TransferFields(Account, true);
 
-        ContactBusinessRelation.Get (Contact."No.", MarketingSetup."Bus. Rel. Code for Customers");
+        ContactBusinessRelation.Get(Contact."No.", MarketingSetup."Bus. Rel. Code for Customers");
 
-        TmpShiptoAddressRequest.FindSet ();
+        TmpShiptoAddressRequest.FindSet();
         repeat
-          ShiptoAddress."Customer No." := ContactBusinessRelation."No.";
-          ShiptoAddress.Code := NoSeriesManagement.GetNextNo (AccountSetup."No. Series Ship-to Address", Today, true);
-          ShiptoAddress.Insert (true);
+            ShiptoAddress."Customer No." := ContactBusinessRelation."No.";
+            ShiptoAddress.Code := NoSeriesManagement.GetNextNo(AccountSetup."No. Series Ship-to Address", Today, true);
+            ShiptoAddress.Insert(true);
 
-          ShiptoAddress.TransferFields (TmpShiptoAddressRequest, false);
-          ShiptoAddress.Modify (true);
+            ShiptoAddress.TransferFields(TmpShiptoAddressRequest, false);
+            ShiptoAddress.Modify(true);
 
-          MagentoContactShiptoAdrs."Customer No." := ShiptoAddress."Customer No.";
-          MagentoContactShiptoAdrs."Ship-to Code" := ShiptoAddress.Code;
-          MagentoContactShiptoAdrs."Created By Contact No." := Account."No.";
-          MagentoContactShiptoAdrs."Created At" := CurrentDateTime ();
-          case Account.Type of
-            Account.Type::Person : MagentoContactShiptoAdrs.Visibility := MagentoContactShiptoAdrs.Visibility::PRIVATE;
-            Account.Type::Company : MagentoContactShiptoAdrs.Visibility := MagentoContactShiptoAdrs.Visibility::PUBLIC;
-          end;
-          MagentoContactShiptoAdrs.Insert ();
+            MagentoContactShiptoAdrs."Customer No." := ShiptoAddress."Customer No.";
+            MagentoContactShiptoAdrs."Ship-to Code" := ShiptoAddress.Code;
+            MagentoContactShiptoAdrs."Created By Contact No." := Account."No.";
+            MagentoContactShiptoAdrs."Created At" := CurrentDateTime();
+            case Account.Type of
+                Account.Type::Person:
+                    MagentoContactShiptoAdrs.Visibility := MagentoContactShiptoAdrs.Visibility::PRIVATE;
+                Account.Type::Company:
+                    MagentoContactShiptoAdrs.Visibility := MagentoContactShiptoAdrs.Visibility::PUBLIC;
+            end;
+            MagentoContactShiptoAdrs.Insert();
 
-          TmpShiptoAddressResponse.TransferFields (ShiptoAddress, true);
-          TmpShiptoAddressResponse.Insert ();
+            TmpShiptoAddressResponse.TransferFields(ShiptoAddress, true);
+            TmpShiptoAddressResponse.Insert();
 
-        until (TmpShiptoAddressRequest.Next () = 0);
+        until (TmpShiptoAddressRequest.Next() = 0);
     end;
 
-    local procedure UpdateShiptoAddressWorker(var TmpAccount: Record Contact temporary;var TmpShiptoAddressRequest: Record "Ship-to Address" temporary;var TmpShiptoAddressResponse: Record "Ship-to Address" temporary)
+    local procedure UpdateShiptoAddressWorker(var TmpAccount: Record Contact temporary; var TmpShiptoAddressRequest: Record "Ship-to Address" temporary; var TmpShiptoAddressResponse: Record "Ship-to Address" temporary)
     var
         AccountSetup: Record "M2 Account Setup";
         Account: Record Contact;
@@ -1243,53 +1254,53 @@ codeunit 6151151 "M2 Account Manager"
         AllowAction: Boolean;
     begin
 
-        TmpAccount.FindFirst ();
-        Account.Get (TmpAccount."No.");
+        TmpAccount.FindFirst();
+        Account.Get(TmpAccount."No.");
 
         if (Account.Type = Account.Type::Person) then
-          Contact.Get (Account."Company No.");
+            Contact.Get(Account."Company No.");
 
         if (Account.Type = Account.Type::Company) then
-          Contact.TransferFields (Account, true);
+            Contact.TransferFields(Account, true);
 
-        MarketingSetup.Get ();
-        ContactBusinessRelation.Get (Contact."No.", MarketingSetup."Bus. Rel. Code for Customers");
+        MarketingSetup.Get();
+        ContactBusinessRelation.Get(Contact."No.", MarketingSetup."Bus. Rel. Code for Customers");
 
-        TmpShiptoAddressRequest.FindSet ();
+        TmpShiptoAddressRequest.FindSet();
         repeat
 
-          AllowAction := false;
+            AllowAction := false;
 
-          MagentoContactShiptoAdrs.SetFilter ("Customer No.", '=%1', ContactBusinessRelation."No.");
-          MagentoContactShiptoAdrs.SetFilter ("Ship-to Code", '=%1', TmpShiptoAddressRequest.Code);
-          if (MagentoContactShiptoAdrs.FindFirst ()) then begin
+            MagentoContactShiptoAdrs.SetFilter("Customer No.", '=%1', ContactBusinessRelation."No.");
+            MagentoContactShiptoAdrs.SetFilter("Ship-to Code", '=%1', TmpShiptoAddressRequest.Code);
+            if (MagentoContactShiptoAdrs.FindFirst()) then begin
 
-            if ((MagentoContactShiptoAdrs.Visibility = MagentoContactShiptoAdrs.Visibility::PUBLIC) and (Account.Type = Account.Type::Company)) then
-              AllowAction := true;
+                if ((MagentoContactShiptoAdrs.Visibility = MagentoContactShiptoAdrs.Visibility::PUBLIC) and (Account.Type = Account.Type::Company)) then
+                    AllowAction := true;
 
-            if ((MagentoContactShiptoAdrs."Created By Contact No." = TmpAccount."No.") and (MagentoContactShiptoAdrs.Visibility = MagentoContactShiptoAdrs.Visibility::PRIVATE)) then
-              AllowAction := true;
+                if ((MagentoContactShiptoAdrs."Created By Contact No." = TmpAccount."No.") and (MagentoContactShiptoAdrs.Visibility = MagentoContactShiptoAdrs.Visibility::PRIVATE)) then
+                    AllowAction := true;
 
-          end else begin
-            // No visibility rules defined for this address
-            if (Account.Type = Account.Type::Company) then
-              AllowAction := true;
-          end;
+            end else begin
+                // No visibility rules defined for this address
+                if (Account.Type = Account.Type::Company) then
+                    AllowAction := true;
+            end;
 
-          if (not AllowAction) then
-            Error ('You are not allowed to update the ship-to address %1.', TmpShiptoAddressRequest.Code);
+            if (not AllowAction) then
+                Error('You are not allowed to update the ship-to address %1.', TmpShiptoAddressRequest.Code);
 
-          ShiptoAddress.Get (ContactBusinessRelation."No.", TmpShiptoAddressRequest.Code);
-          ShiptoAddress.TransferFields (TmpShiptoAddressRequest, false);
-          ShiptoAddress.Modify (true);
+            ShiptoAddress.Get(ContactBusinessRelation."No.", TmpShiptoAddressRequest.Code);
+            ShiptoAddress.TransferFields(TmpShiptoAddressRequest, false);
+            ShiptoAddress.Modify(true);
 
-          TmpShiptoAddressResponse.TransferFields (ShiptoAddress, true);
-          TmpShiptoAddressResponse.Insert ();
+            TmpShiptoAddressResponse.TransferFields(ShiptoAddress, true);
+            TmpShiptoAddressResponse.Insert();
 
-        until (TmpShiptoAddressRequest.Next () = 0);
+        until (TmpShiptoAddressRequest.Next() = 0);
     end;
 
-    local procedure DeleteShiptoAddressWorker(var TmpAccount: Record Contact temporary;var TmpShiptoAddressRequest: Record "Ship-to Address" temporary)
+    local procedure DeleteShiptoAddressWorker(var TmpAccount: Record Contact temporary; var TmpShiptoAddressRequest: Record "Ship-to Address" temporary)
     var
         AccountSetup: Record "M2 Account Setup";
         Account: Record Contact;
@@ -1302,52 +1313,52 @@ codeunit 6151151 "M2 Account Manager"
         AllowAction: Boolean;
     begin
 
-        TmpAccount.FindFirst ();
-        Account.Get (TmpAccount."No.");
+        TmpAccount.FindFirst();
+        Account.Get(TmpAccount."No.");
 
         if (Account.Type = Account.Type::Person) then
-          Contact.Get (Account."Company No.");
+            Contact.Get(Account."Company No.");
 
         if (Account.Type = Account.Type::Company) then
-          Contact.TransferFields (Account, true);
+            Contact.TransferFields(Account, true);
 
-        MarketingSetup.Get ();
-        ContactBusinessRelation.Get (Contact."No.", MarketingSetup."Bus. Rel. Code for Customers");
+        MarketingSetup.Get();
+        ContactBusinessRelation.Get(Contact."No.", MarketingSetup."Bus. Rel. Code for Customers");
 
-        TmpShiptoAddressRequest.FindSet ();
+        TmpShiptoAddressRequest.FindSet();
         repeat
 
-          AllowAction := false;
-          MagentoContactShiptoAdrs.SetFilter ("Customer No.", '=%1', ContactBusinessRelation."No.");
-          MagentoContactShiptoAdrs.SetFilter ("Ship-to Code", '=%1', TmpShiptoAddressRequest.Code);
-          if (MagentoContactShiptoAdrs.FindFirst ()) then begin
+            AllowAction := false;
+            MagentoContactShiptoAdrs.SetFilter("Customer No.", '=%1', ContactBusinessRelation."No.");
+            MagentoContactShiptoAdrs.SetFilter("Ship-to Code", '=%1', TmpShiptoAddressRequest.Code);
+            if (MagentoContactShiptoAdrs.FindFirst()) then begin
 
-            if ((MagentoContactShiptoAdrs.Visibility = MagentoContactShiptoAdrs.Visibility::PUBLIC) and (Account.Type = Account.Type::Company)) then
-              AllowAction := true;
+                if ((MagentoContactShiptoAdrs.Visibility = MagentoContactShiptoAdrs.Visibility::PUBLIC) and (Account.Type = Account.Type::Company)) then
+                    AllowAction := true;
 
-            if ((MagentoContactShiptoAdrs."Created By Contact No." = TmpAccount."No.") and (MagentoContactShiptoAdrs.Visibility = MagentoContactShiptoAdrs.Visibility::PRIVATE)) then
-              AllowAction := true;
+                if ((MagentoContactShiptoAdrs."Created By Contact No." = TmpAccount."No.") and (MagentoContactShiptoAdrs.Visibility = MagentoContactShiptoAdrs.Visibility::PRIVATE)) then
+                    AllowAction := true;
 
-          end else begin
-            // No visibility rules defined for this address
-            if (Account.Type = Account.Type::Company) then
-              AllowAction := true;
-          end;
+            end else begin
+                // No visibility rules defined for this address
+                if (Account.Type = Account.Type::Company) then
+                    AllowAction := true;
+            end;
 
-          if (not AllowAction) then
-            Error ('You are not allowed to delet the ship-to address %1.', TmpShiptoAddressRequest.Code);
+            if (not AllowAction) then
+                Error('You are not allowed to delet the ship-to address %1.', TmpShiptoAddressRequest.Code);
 
-          ShiptoAddress.Get (ContactBusinessRelation."No.", TmpShiptoAddressRequest.Code);
-          ShiptoAddress.Delete (true);
+            ShiptoAddress.Get(ContactBusinessRelation."No.", TmpShiptoAddressRequest.Code);
+            ShiptoAddress.Delete(true);
 
-        until (TmpShiptoAddressRequest.Next () = 0);
+        until (TmpShiptoAddressRequest.Next() = 0);
     end;
 
     local procedure "---Member Management"()
     begin
     end;
 
-    local procedure CreateMembership(var TmpContact: Record Contact temporary;var TmpCustomer: Record Customer temporary;var Customer: Record Customer): Boolean
+    local procedure CreateMembership(var TmpContact: Record Contact temporary; var TmpCustomer: Record Customer temporary; var Customer: Record Customer): Boolean
     var
         MembershipSalesSetup: Record "MM Membership Sales Setup";
         MemberInfoCapture: Record "MM Member Info Capture";
@@ -1357,29 +1368,29 @@ codeunit 6151151 "M2 Account Manager"
 
         //-MAG2.24 [372304] Opt-out on membership create
         if (TmpContact."Exclude from Segment") then
-          exit (false);
+            exit(false);
         //+MAG2.24 [372304]
 
         //-NPR5.51 [356090]
-        MembershipSalesSetup.SetFilter ("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
-        MembershipSalesSetup.SetFilter ("Magento M2 Membership Sign-up", '=%1', true);
-        if (not MembershipSalesSetup.FindFirst ()) then
-          exit (false);
+        MembershipSalesSetup.SetFilter("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
+        MembershipSalesSetup.SetFilter("Magento M2 Membership Sign-up", '=%1', true);
+        if (not MembershipSalesSetup.FindFirst()) then
+            exit(false);
 
-        TransferToInfoCapture (TmpContact, MemberInfoCapture);
-        if (not MemberInfoCapture.Insert ()) then
-          exit (false);
+        TransferToInfoCapture(TmpContact, MemberInfoCapture);
+        if (not MemberInfoCapture.Insert()) then
+            exit(false);
 
         // These functions will blow-up when failing and the error message will propregate back to caller
-        Membership.Get (MembershipManagement.CreateMembershipAll (MembershipSalesSetup, MemberInfoCapture, true));
-        Customer.Get (Membership."Customer No.");
+        Membership.Get(MembershipManagement.CreateMembershipAll(MembershipSalesSetup, MemberInfoCapture, true));
+        Customer.Get(Membership."Customer No.");
         MemberInfoCapture.Delete();
 
-        exit (true);
+        exit(true);
         //+NPR5.51 [356090]
     end;
 
-    local procedure AddMembershipMember(var TmpContact: Record Contact temporary;var Contact: Record Contact;CorporateContactNo: Code[20]): Boolean
+    local procedure AddMembershipMember(var TmpContact: Record Contact temporary; var Contact: Record Contact; CorporateContactNo: Code[20]): Boolean
     var
         MemberInfoCapture: Record "MM Member Info Capture";
         MembershipManagement: Codeunit "MM Membership Management";
@@ -1389,24 +1400,24 @@ codeunit 6151151 "M2 Account Manager"
     begin
 
         //-NPR5.51 [356090]
-        MembershipRole.SetFilter ("Contact No.", '=%1', CorporateContactNo);
-        if (not MembershipRole.FindFirst ()) then
-          exit (false);
+        MembershipRole.SetFilter("Contact No.", '=%1', CorporateContactNo);
+        if (not MembershipRole.FindFirst()) then
+            exit(false);
 
-        TransferToInfoCapture (TmpContact, MemberInfoCapture);
+        TransferToInfoCapture(TmpContact, MemberInfoCapture);
 
-        if (not MemberInfoCapture.Insert ()) then
-          exit (false);
+        if (not MemberInfoCapture.Insert()) then
+            exit(false);
 
         // These functions will blow-up when failing and the error message will propregate back to caller
-        MembershipManagement.AddMemberAndCard (true, MembershipRole."Membership Entry No.", MemberInfoCapture, true, MemberEntryNo, ReasonText);
+        MembershipManagement.AddMemberAndCard(true, MembershipRole."Membership Entry No.", MemberInfoCapture, true, MemberEntryNo, ReasonText);
 
-        MembershipRole.Get (MembershipRole."Membership Entry No.", MemberEntryNo);
-        Contact.Get (MembershipRole."Contact No.");
+        MembershipRole.Get(MembershipRole."Membership Entry No.", MemberEntryNo);
+        Contact.Get(MembershipRole."Contact No.");
 
         MemberInfoCapture.Delete();
 
-        exit (true);
+        exit(true);
         //+NPR5.51 [356090]
     end;
 
@@ -1418,15 +1429,15 @@ codeunit 6151151 "M2 Account Manager"
     begin
 
         //-NPR5.51 [356090]
-        MembershipRole.SetFilter ("Contact No.", '=%1', TmpContact."No.");
-        if (not MembershipRole.FindFirst ()) then
-          exit (false);
+        MembershipRole.SetFilter("Contact No.", '=%1', TmpContact."No.");
+        if (not MembershipRole.FindFirst()) then
+            exit(false);
 
-        TransferToInfoCapture (TmpContact, MemberInfoCapture);
-        if (not MemberInfoCapture.Insert ()) then
-          exit (false);
+        TransferToInfoCapture(TmpContact, MemberInfoCapture);
+        if (not MemberInfoCapture.Insert()) then
+            exit(false);
 
-        exit (MembershipManagement.UpdateMember (MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", MemberInfoCapture));
+        exit(MembershipManagement.UpdateMember(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", MemberInfoCapture));
         //+NPR5.51 [356090]
     end;
 
@@ -1439,41 +1450,43 @@ codeunit 6151151 "M2 Account Manager"
     begin
 
         //-NPR5.51 [356090]
-        MembershipRole.SetFilter ("Contact No.", '=%1', Contact."No.");
-        if (not MembershipRole.FindFirst ()) then
-          exit (false);
+        MembershipRole.SetFilter("Contact No.", '=%1', Contact."No.");
+        if (not MembershipRole.FindFirst()) then
+            exit(false);
 
         case Contact.Type of
-          Contact.Type::Company : MembershipManagement.BlockMembership (MembershipRole."Membership Entry No.", true);
-          Contact.Type::Person  : MembershipManagement.BlockMember (MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", true)
+            Contact.Type::Company:
+                MembershipManagement.BlockMembership(MembershipRole."Membership Entry No.", true);
+            Contact.Type::Person:
+                MembershipManagement.BlockMember(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", true)
         end;
 
-        exit (true);
+        exit(true);
         //+NPR5.51 [356090]
     end;
 
-    local procedure TransferToInfoCapture(var TmpContact: Record Contact temporary;var MemberInfoCapture: Record "MM Member Info Capture")
+    local procedure TransferToInfoCapture(var TmpContact: Record Contact temporary; var MemberInfoCapture: Record "MM Member Info Capture")
     begin
 
         //-NPR5.51 [356090]
         with MemberInfoCapture do begin
-          Init;
-          "Entry No." := 0;
-          "Information Context" := MemberInfoCapture."Information Context"::NEW;
-          "Company Name" := CopyStr (TmpContact."Company Name", 1, MaxStrLen ("Company Name"));
-          "First Name" := CopyStr (TmpContact."First Name", 1, MaxStrLen ("First Name"));
-          "Middle Name" := CopyStr (TmpContact."Middle Name", 1, MaxStrLen ("Middle Name"));
-          "Last Name" := CopyStr (TmpContact.Surname, 1, MaxStrLen ("Last Name"));
-          Address := CopyStr (TmpContact.Address, 1, MaxStrLen (Address));
-          "Post Code Code" := CopyStr (TmpContact."Post Code", 1, MaxStrLen ("Post Code Code"));
-          City := CopyStr (TmpContact.City, 1, MaxStrLen (City));
-          "Country Code" := CopyStr (TmpContact."Country/Region Code", 1, MaxStrLen ("Country Code"));
+            Init;
+            "Entry No." := 0;
+            "Information Context" := MemberInfoCapture."Information Context"::NEW;
+            "Company Name" := CopyStr(TmpContact."Company Name", 1, MaxStrLen("Company Name"));
+            "First Name" := CopyStr(TmpContact."First Name", 1, MaxStrLen("First Name"));
+            "Middle Name" := CopyStr(TmpContact."Middle Name", 1, MaxStrLen("Middle Name"));
+            "Last Name" := CopyStr(TmpContact.Surname, 1, MaxStrLen("Last Name"));
+            Address := CopyStr(TmpContact.Address, 1, MaxStrLen(Address));
+            "Post Code Code" := CopyStr(TmpContact."Post Code", 1, MaxStrLen("Post Code Code"));
+            City := CopyStr(TmpContact.City, 1, MaxStrLen(City));
+            "Country Code" := CopyStr(TmpContact."Country/Region Code", 1, MaxStrLen("Country Code"));
 
-          "Phone No." := CopyStr (TmpContact."Phone No.", 1, MaxStrLen ("Phone No."));
-          "E-Mail Address" := CopyStr (TmpContact."E-Mail", 1, MaxStrLen ("E-Mail Address"));
+            "Phone No." := CopyStr(TmpContact."Phone No.", 1, MaxStrLen("Phone No."));
+            "E-Mail Address" := CopyStr(TmpContact."E-Mail", 1, MaxStrLen("E-Mail Address"));
 
-          if (TmpContact."E-Mail 2" <> '') then
-            "E-Mail Address" := CopyStr (TmpContact."E-Mail 2", 1, MaxStrLen ("E-Mail Address"));
+            if (TmpContact."E-Mail 2" <> '') then
+                "E-Mail Address" := CopyStr(TmpContact."E-Mail 2", 1, MaxStrLen("E-Mail Address"));
         end;
         //+NPR5.51 [356090]
     end;
@@ -1487,50 +1500,50 @@ codeunit 6151151 "M2 Account Manager"
         OneTimePassword: Record "M2 One Time Password";
         AccountSetup: Record "M2 Account Setup";
     begin
-        if (not AccountSetup.Get ()) then ;
+        if (not AccountSetup.Get()) then;
 
         if (AccountSetup."OTP Validity (Hours)" = 0) then
-          AccountSetup."OTP Validity (Hours)" := 24;
+            AccountSetup."OTP Validity (Hours)" := 24;
 
-        OneTimePassword."Password (Hash)" := UpperCase(DelChr(Format(CreateGuid),'=','{}-'));
-        OneTimePassword."E-Mail" := LowerCase (EMail);
+        OneTimePassword."Password (Hash)" := UpperCase(DelChr(Format(CreateGuid), '=', '{}-'));
+        OneTimePassword."E-Mail" := LowerCase(EMail);
         OneTimePassword."Created At" := CurrentDateTime;
         OneTimePassword."Valid Until" := CurrentDateTime + AccountSetup."OTP Validity (Hours)" * 3600 * 1000;
 
-        OneTimePassword.Insert ();
+        OneTimePassword.Insert();
 
-        AddLogEntry (LogEntry.Type::OTP_CREATE, LogEntry.Status::OK, EMail, '');
+        AddLogEntry(LogEntry.Type::OTP_CREATE, LogEntry.Status::OK, EMail, '');
 
-        exit (OneTimePassword."Password (Hash)");
+        exit(OneTimePassword."Password (Hash)");
     end;
 
-    procedure CreateResetPasswordCommunicationTemplate(Contact: Record Contact;Token: Text[40]) EntryNo: Integer
+    procedure CreateResetPasswordCommunicationTemplate(Contact: Record Contact; Token: Text[40]) EntryNo: Integer
     var
         AccountComTemplate: Record "M2 Account Com. Template";
         AccountSetup: Record "M2 Account Setup";
         AuthenticationLog: Record "Authentication Log";
     begin
 
-        if (not AccountSetup.Get ()) then ;
+        if (not AccountSetup.Get()) then;
 
         if (AccountSetup."Reset Password URL" = '') then
-          AccountSetup."Reset Password URL" := 'http://test.shop.navipartner.dk/changepassword?token=%1&b64email=%2';
+            AccountSetup."Reset Password URL" := 'http://test.shop.navipartner.dk/changepassword?token=%1&b64email=%2';
 
         AccountComTemplate.Type := AccountComTemplate.Type::PW_RESET;
         AccountComTemplate."Company Name" := Contact.Name;
         AccountComTemplate."First Name" := Contact."First Name";
         AccountComTemplate."Last Name" := Contact.Surname;
-        AccountComTemplate."E-Mail" := LowerCase (Contact."E-Mail");
+        AccountComTemplate."E-Mail" := LowerCase(Contact."E-Mail");
         AccountComTemplate."Security Token" := Token;
-        AccountComTemplate."B64 Email" := ToBase64 (LowerCase (Contact."E-Mail"));
-        AccountComTemplate.URL1 := StrSubstNo (AccountSetup."Reset Password URL", Token, AccountComTemplate."B64 Email");
+        AccountComTemplate."B64 Email" := ToBase64(LowerCase(Contact."E-Mail"));
+        AccountComTemplate.URL1 := StrSubstNo(AccountSetup."Reset Password URL", Token, AccountComTemplate."B64 Email");
 
-        AccountComTemplate.Insert ();
+        AccountComTemplate.Insert();
 
-        exit (AccountComTemplate."Entry No.");
+        exit(AccountComTemplate."Entry No.");
     end;
 
-    local procedure SendMail(AccountComTemplate: Record "M2 Account Com. Template";var ResponseMessage: Text): Boolean
+    local procedure SendMail(AccountComTemplate: Record "M2 Account Com. Template"; var ResponseMessage: Text): Boolean
     var
         RecordRef: RecordRef;
         EMailMgt: Codeunit "E-mail Management";
@@ -1540,14 +1553,14 @@ codeunit 6151151 "M2 Account Manager"
 
         ResponseMessage := 'E-Mail address is missing.';
         if (AccountComTemplate."E-Mail" <> '') then
-          ResponseMessage := EMailMgt.SendEmail(RecordRef, AccountComTemplate."E-Mail", true);
+            ResponseMessage := EMailMgt.SendEmail(RecordRef, AccountComTemplate."E-Mail", true);
 
-        exit (ResponseMessage = '');
+        exit(ResponseMessage = '');
     end;
 
     local procedure ToBase64(StringToEncode: Text) B64String: Text
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         BinaryReader: DotNet npNetBinaryReader;
         MemoryStream: DotNet npNetMemoryStream;
         Convert: DotNet npNetConvert;
@@ -1556,10 +1569,10 @@ codeunit 6151151 "M2 Account Manager"
     begin
 
         Clear(TempBlob);
-        TempBlob.Blob.CreateOutStream(Outstr);
+        TempBlob.CreateOutStream(Outstr);
         Outstr.WriteText(StringToEncode);
 
-        TempBlob.Blob.CreateInStream(InStr);
+        TempBlob.CreateInStream(InStr);
         MemoryStream := InStr;
         BinaryReader := BinaryReader.BinaryReader(InStr);
 
@@ -1570,7 +1583,7 @@ codeunit 6151151 "M2 Account Manager"
         Clear(MemoryStream);
     end;
 
-    local procedure AddLogEntry(Type: Option;Status: Option;EMail: Text[80];ReasonText: Text)
+    local procedure AddLogEntry(Type: Option; Status: Option; EMail: Text[80]; ReasonText: Text)
     var
         AuthenticationLog: Record "Authentication Log";
     begin
@@ -1581,39 +1594,39 @@ codeunit 6151151 "M2 Account Manager"
         AuthenticationLog."Created At" := CurrentDateTime;
         AuthenticationLog."Account Id" := EMail;
         AuthenticationLog.Status := Status;
-        AuthenticationLog."Result Message" := CopyStr (ReasonText, 1, MaxStrLen (AuthenticationLog."Result Message"));
-        AuthenticationLog.UserId := CopyStr (UserId, 1, MaxStrLen (AuthenticationLog."Result Message"));
-        AuthenticationLog.Insert ();
+        AuthenticationLog."Result Message" := CopyStr(ReasonText, 1, MaxStrLen(AuthenticationLog."Result Message"));
+        AuthenticationLog.UserId := CopyStr(UserId, 1, MaxStrLen(AuthenticationLog."Result Message"));
+        AuthenticationLog.Insert();
     end;
 
-    local procedure CreateNoSerie(NoSerieCode: Code[10];StartNumber: Code[20];Description: Text[30]): Code[10]
+    local procedure CreateNoSerie(NoSerieCode: Code[10]; StartNumber: Code[20]; Description: Text[30]): Code[10]
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
     begin
 
-        if (not NoSeries.Get (NoSerieCode)) then begin
-          NoSeries.Code := NoSerieCode;
-          NoSeries.Insert ();
+        if (not NoSeries.Get(NoSerieCode)) then begin
+            NoSeries.Code := NoSerieCode;
+            NoSeries.Insert();
         end;
 
         NoSeries.Description := Description;
         NoSeries."Default Nos." := true;
-        NoSeries.Modify ();
+        NoSeries.Modify();
 
-        if (not NoSeriesLine.Get (NoSerieCode, 10000)) then begin
-          NoSeriesLine."Series Code" := NoSerieCode;
-          NoSeriesLine."Line No." := 10000;
-          NoSeriesLine."Starting Date" := CalcDate ('<CY-1Y+1D>', Today);
-          NoSeriesLine."Starting No." := StartNumber;
-          NoSeriesLine."Increment-by No." := 1;
-          NoSeriesLine.Insert ();
+        if (not NoSeriesLine.Get(NoSerieCode, 10000)) then begin
+            NoSeriesLine."Series Code" := NoSerieCode;
+            NoSeriesLine."Line No." := 10000;
+            NoSeriesLine."Starting Date" := CalcDate('<CY-1Y+1D>', Today);
+            NoSeriesLine."Starting No." := StartNumber;
+            NoSeriesLine."Increment-by No." := 1;
+            NoSeriesLine.Insert();
         end;
 
-        exit (NoSerieCode);
+        exit(NoSerieCode);
     end;
 
-    local procedure CalculatedName(FirstName: Text[30];MiddleName: Text[30];LastName: Text[30]) NewName: Text[50]
+    local procedure CalculatedName(FirstName: Text[30]; MiddleName: Text[30]; LastName: Text[30]) NewName: Text[50]
     var
         NewName92: Text[92];
     begin
@@ -1622,13 +1635,13 @@ codeunit 6151151 "M2 Account Manager"
         NewName92 := FirstName;
 
         if (MiddleName <> '') then
-          NewName92 += ' ' + MiddleName;
+            NewName92 += ' ' + MiddleName;
 
         if (LastName <> '') then
-          NewName92 += ' ' + LastName;
+            NewName92 += ' ' + LastName;
 
-        NewName92 := DelChr (NewName92,'<',' ');
-        NewName := CopyStr (NewName92, 1, MaxStrLen(NewName));
+        NewName92 := DelChr(NewName92, '<', ' ');
+        NewName := CopyStr(NewName92, 1, MaxStrLen(NewName));
         //-NPR5.51 [364644]
     end;
 
@@ -1636,7 +1649,7 @@ codeunit 6151151 "M2 Account Manager"
     begin
     end;
 
-    procedure MagentoApiPost(Method: Text;var Body: DotNet JToken;var Result: DotNet JToken)
+    procedure MagentoApiPost(Method: Text; var Body: DotNet JToken; var Result: DotNet JToken)
     var
         MagentoSetup: Record "Magento Setup";
         HttpWebRequest: DotNet npNetHttpWebRequest;
@@ -1648,35 +1661,35 @@ codeunit 6151151 "M2 Account Manager"
     begin
         Clear(Response);
         if Method = '' then
-          exit;
+            exit;
 
         MagentoSetup.Get;
         MagentoSetup.TestField("Api Url");
         if MagentoSetup."Api Url"[StrLen(MagentoSetup."Api Url")] <> '/' then
-          MagentoSetup."Api Url" += '/';
+            MagentoSetup."Api Url" += '/';
 
-        if (CopyStr (MagentoSetup."Api Url", StrLen (MagentoSetup."Api Url" ) - (StrLen ('naviconnect/')) + 1) = 'naviconnect/') then
-          MagentoSetup."Api Url" := CopyStr (MagentoSetup."Api Url", 1, StrLen (MagentoSetup."Api Url" ) - (StrLen ('naviconnect/'))) + 'b2b_customer/';
+        if (CopyStr(MagentoSetup."Api Url", StrLen(MagentoSetup."Api Url") - (StrLen('naviconnect/')) + 1) = 'naviconnect/') then
+            MagentoSetup."Api Url" := CopyStr(MagentoSetup."Api Url", 1, StrLen(MagentoSetup."Api Url") - (StrLen('naviconnect/'))) + 'b2b_customer/';
 
-        HttpWebRequest := HttpWebRequest.Create(MagentoSetup."Api Url"+ Method);
+        HttpWebRequest := HttpWebRequest.Create(MagentoSetup."Api Url" + Method);
         HttpWebRequest.Timeout := 1000 * 60;
 
         HttpWebRequest.Method := 'POST';
         MagentoSetup.Get;
         if MagentoSetup."Api Authorization" <> '' then
-          HttpWebRequest.Headers.Add('Authorization',MagentoSetup."Api Authorization")
+            HttpWebRequest.Headers.Add('Authorization', MagentoSetup."Api Authorization")
         else
-          HttpWebRequest.Headers.Add('Authorization','Basic ' + MagentoSetup.GetBasicAuthInfo());
+            HttpWebRequest.Headers.Add('Authorization', 'Basic ' + MagentoSetup.GetBasicAuthInfo());
 
-        HttpWebRequest.ContentType ('naviconnect/json');
+        HttpWebRequest.ContentType('naviconnect/json');
 
         ReqStream := HttpWebRequest.GetRequestStream;
         ReqStreamWriter := ReqStreamWriter.StreamWriter(ReqStream);
-        ReqStreamWriter.Write (Body.ToString());
+        ReqStreamWriter.Write(Body.ToString());
         ReqStreamWriter.Flush;
         ReqStreamWriter.Close;
-        Clear (ReqStreamWriter);
-        Clear (ReqStream);
+        Clear(ReqStreamWriter);
+        Clear(ReqStream);
 
         HttpWebResponse := HttpWebRequest.GetResponse();
 

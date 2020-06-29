@@ -14,16 +14,16 @@ page 6151510 "Nc Task Output List"
         {
             repeater(Group)
             {
-                field(Name;Name)
+                field(Name; Name)
                 {
                 }
-                field("Last Modified at";"Last Modified at")
+                field("Last Modified at"; "Last Modified at")
                 {
                 }
-                field("Process Count";"Process Count")
+                field("Process Count"; "Process Count")
                 {
                 }
-                field("Entry No.";"Entry No.")
+                field("Entry No."; "Entry No.")
                 {
                 }
             }
@@ -33,63 +33,63 @@ page 6151510 "Nc Task Output List"
                 group(Control6151412)
                 {
                     ShowCaption = false;
-                    field(" ";'')
+                    field(" "; '')
                     {
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                     }
-                    field(Control6151420;'')
+                    field(Control6151420; '')
                     {
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                     }
-                    field(Control6151419;'')
+                    field(Control6151419; '')
                     {
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                     }
-                    field(Control6151418;'')
+                    field(Control6151418; '')
                     {
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                     }
-                    field(Control6151417;'')
+                    field(Control6151417; '')
                     {
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                     }
-                    field(Control6151416;'')
+                    field(Control6151416; '')
                     {
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                     }
-                    field(Control6151415;'')
+                    field(Control6151415; '')
                     {
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                     }
-                    field(Control6151414;'')
+                    field(Control6151414; '')
                     {
                         Caption = ' ';
                         Enabled = false;
                         HideValue = true;
                         ShowCaption = false;
                     }
-                    field(Control6151413;'')
+                    field(Control6151413; '')
                     {
                         Caption = ' ';
                         Enabled = false;
@@ -100,13 +100,13 @@ page 6151510 "Nc Task Output List"
                 group(Control6151410)
                 {
                     ShowCaption = false;
-                    field(Control6151409;'')
+                    field(Control6151409; '')
                     {
                         Caption = 'Response:                                                                                                                                                                                                                                                                                ';
                         HideValue = true;
                         ShowCaption = false;
                     }
-                    field(ResponseText;ResponseText)
+                    field(ResponseText; ResponseText)
                     {
                         Editable = false;
                         MultiLine = true;
@@ -148,7 +148,7 @@ page 6151510 "Nc Task Output List"
 
     local procedure ShowOutput()
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         InStr: InStream;
         Path: Text;
@@ -156,13 +156,13 @@ page 6151510 "Nc Task Output List"
     begin
         CalcFields(Data);
         if not Data.HasValue then begin
-          Message(Text000);
-          exit;
+            Message(Text000);
+            exit;
         end;
 
-        Data.CreateInStream(InStr,TEXTENCODING::UTF8);
+        Data.CreateInStream(InStr, TEXTENCODING::UTF8);
         Path := TemporaryPath + Name;
-        DownloadFromStream(InStr,'Export',FileMgt.Magicpath,'.' + FileMgt.GetExtension(Name),Path);
+        DownloadFromStream(InStr, 'Export', FileMgt.Magicpath, '.' + FileMgt.GetExtension(Name), Path);
         HyperLink(Path);
     end;
 
@@ -176,9 +176,9 @@ page 6151510 "Nc Task Output List"
     begin
         ResponseText := '';
         if not Response.HasValue then
-          exit;
+            exit;
         CalcFields(Response);
-        Response.CreateInStream(InStream,TEXTENCODING::UTF8);
+        Response.CreateInStream(InStream, TEXTENCODING::UTF8);
         StreamReader := StreamReader.StreamReader(InStream);
         ResponseText := StreamReader.ReadToEnd();
     end;

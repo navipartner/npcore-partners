@@ -75,10 +75,10 @@ codeunit 6014613 "Tax Free GB I2"
 
         GlobalBlueParameters.Get(TaxFreeRequest."POS Unit No.");
         if (GlobalBlueParameters."Date Last Auto Configured" < Today) then begin
-          TaxFreeInterface.UnitAutoConfigure(GlobalTaxFreeUnit, true); //Will silently run desk config & verify that NAS jobs are configured.
-          GlobalBlueParameters.Get(TaxFreeRequest."POS Unit No.");
-          if GlobalBlueParameters."Date Last Auto Configured" <> Today then
-            Error(Error_AutoConfigureFailure, TaxFreeRequest."Handler ID");
+            TaxFreeInterface.UnitAutoConfigure(GlobalTaxFreeUnit, true); //Will silently run desk config & verify that NAS jobs are configured.
+            GlobalBlueParameters.Get(TaxFreeRequest."POS Unit No.");
+            if GlobalBlueParameters."Date Last Auto Configured" <> Today then
+                Error(Error_AutoConfigureFailure, TaxFreeRequest."Handler ID");
         end;
 
         GlobalBlueServices.SetRange("Tax Free Unit", TaxFreeRequest."POS Unit No.");
@@ -102,49 +102,49 @@ codeunit 6014613 "Tax Free GB I2"
         ServiceIDFilterString: Text;
     begin
         if (GlobalBlueParameters."Shop ID" = '') or (GlobalBlueParameters."Desk ID" = '') or (GlobalBlueParameters.Username = '') or (GlobalBlueParameters.Password = '') then
-          Error(Error_MinimumParameters);
+            Error(Error_MinimumParameters);
 
         GetDeskConfiguration(TaxFreeRequest);
         HandleResponse(TaxFreeRequest, 'GetDeskConfiguration', XMLDoc, IsError);
         if IsError then
-          Error(TaxFreeRequest."Error Message");
+            Error(TaxFreeRequest."Error Message");
 
         if not TrySelectSingleNodeText(XMLDoc, '//ClientIdentification/ShopCountryCode', Value) then
-          Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
         Evaluate(GlobalBlueParameters."Shop Country Code", Value, 9);
 
         Services := XMLDoc.GetElementsByTagName('Service');
         ServiceCount := Services.Count;
         if not (ServiceCount > 0) then
-          Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
-
-        for i := 0 to (ServiceCount-1) do begin //Update or create service records
-          Service := Services.ItemOf(i);
-
-          if not TryGetItemInnerText(Service, 'ServiceID', Value) then
             Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
-          Evaluate(ServiceID, Value, 9);
 
-          if not GlobalBlueServices.Get(GlobalTaxFreeUnit."POS Unit No.", ServiceID) then begin
-            GlobalBlueServices.Init;
-            GlobalBlueServices."Tax Free Unit" := GlobalTaxFreeUnit."POS Unit No.";
-            GlobalBlueServices."Service ID" := ServiceID;
-            GlobalBlueServices.Insert(true);
-          end;
+        for i := 0 to (ServiceCount - 1) do begin //Update or create service records
+            Service := Services.ItemOf(i);
 
-          if TryGetItemInnerText(Service, 'Name', Value) then
-            GlobalBlueServices.Name := Value;
-          if TryGetItemInnerText(Service, 'MinimumPurchaseAmount', Value) then
-            Evaluate(GlobalBlueServices."Minimum Purchase Amount", Value, 9);
-          if TryGetItemInnerText(Service, 'MaximumPurchaseAmount', Value) then
-            Evaluate(GlobalBlueServices."Maximum Purchase Amount", Value, 9);
-          if TryGetItemInnerText(Service, 'VoidLimitInDays', Value) then
-            Evaluate(GlobalBlueServices."Void Limit In Days", Value, 9);
+            if not TryGetItemInnerText(Service, 'ServiceID', Value) then
+                Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
+            Evaluate(ServiceID, Value, 9);
 
-          GlobalBlueServices.Modify(true);
-          if ServiceIDFilterString <> '' then
-            ServiceIDFilterString += '&';
-          ServiceIDFilterString += '<>' + Format(ServiceID);
+            if not GlobalBlueServices.Get(GlobalTaxFreeUnit."POS Unit No.", ServiceID) then begin
+                GlobalBlueServices.Init;
+                GlobalBlueServices."Tax Free Unit" := GlobalTaxFreeUnit."POS Unit No.";
+                GlobalBlueServices."Service ID" := ServiceID;
+                GlobalBlueServices.Insert(true);
+            end;
+
+            if TryGetItemInnerText(Service, 'Name', Value) then
+                GlobalBlueServices.Name := Value;
+            if TryGetItemInnerText(Service, 'MinimumPurchaseAmount', Value) then
+                Evaluate(GlobalBlueServices."Minimum Purchase Amount", Value, 9);
+            if TryGetItemInnerText(Service, 'MaximumPurchaseAmount', Value) then
+                Evaluate(GlobalBlueServices."Maximum Purchase Amount", Value, 9);
+            if TryGetItemInnerText(Service, 'VoidLimitInDays', Value) then
+                Evaluate(GlobalBlueServices."Void Limit In Days", Value, 9);
+
+            GlobalBlueServices.Modify(true);
+            if ServiceIDFilterString <> '' then
+                ServiceIDFilterString += '&';
+            ServiceIDFilterString += '<>' + Format(ServiceID);
         end;
 
         //Delete any old services that was not part of the latest auto configuration response
@@ -177,25 +177,25 @@ codeunit 6014613 "Tax Free GB I2"
         GetCountries(TaxFreeRequest);
         HandleResponse(TaxFreeRequest, 'GetCountries', XMLDoc, IsError);
         if IsError then
-          Error(TaxFreeRequest."Error Message");
+            Error(TaxFreeRequest."Error Message");
 
         Countries := XMLDoc.GetElementsByTagName('Country');
         CountryCount := Countries.Count();
         if not (CountryCount > 0) then
-          Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
 
         GlobalBlueCountries.DeleteAll(false);
-        for i := 0 to (CountryCount-1) do begin
-          Country := Countries.ItemOf(i);
+        for i := 0 to (CountryCount - 1) do begin
+            Country := Countries.ItemOf(i);
 
-          GlobalBlueCountries.Init;
-          Evaluate(GlobalBlueCountries."Country Code", Country.Item('CountryCode').InnerText(), 9);
-          GlobalBlueCountries.Name := Country.Item('Name').InnerText();
-          if TryGetItemInnerText(Country, 'PhonePrefix', Value) then
-            Evaluate(GlobalBlueCountries."Phone Prefix", Value, 9);
-          if TryGetItemInnerText(Country, 'PassportCode', Value) then
-            Evaluate(GlobalBlueCountries."Passport Code", Value, 9);
-          GlobalBlueCountries.Insert(false);
+            GlobalBlueCountries.Init;
+            Evaluate(GlobalBlueCountries."Country Code", Country.Item('CountryCode').InnerText(), 9);
+            GlobalBlueCountries.Name := Country.Item('Name').InnerText();
+            if TryGetItemInnerText(Country, 'PhonePrefix', Value) then
+                Evaluate(GlobalBlueCountries."Phone Prefix", Value, 9);
+            if TryGetItemInnerText(Country, 'PassportCode', Value) then
+                Evaluate(GlobalBlueCountries."Passport Code", Value, 9);
+            GlobalBlueCountries.Insert(false);
         end;
         Commit;
 
@@ -217,23 +217,23 @@ codeunit 6014613 "Tax Free GB I2"
         GetBlockedCountries(TaxFreeRequest);
         HandleResponse(TaxFreeRequest, 'GetBlockedCountries', XMLDoc, IsError);
         if IsError then
-          Error(TaxFreeRequest."Error Message");
+            Error(TaxFreeRequest."Error Message");
 
         Countries := XMLDoc.SelectNodes('//CountryCode');
         CountryCount := Countries.Count();
         if not (CountryCount > 0) then
-          Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
 
         GlobalBlueBlockedCountries.SetRange("Shop Country Code", GlobalBlueParameters."Shop Country Code");
         GlobalBlueBlockedCountries.DeleteAll(false);
         GlobalBlueBlockedCountries.Reset;
-        for i := 0 to (CountryCount-1) do begin
-          Country := Countries.ItemOf(i);
+        for i := 0 to (CountryCount - 1) do begin
+            Country := Countries.ItemOf(i);
 
-          GlobalBlueBlockedCountries.Init;
-          GlobalBlueBlockedCountries."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
-          Evaluate(GlobalBlueBlockedCountries."Country Code", Country.InnerText(), 9);
-          GlobalBlueBlockedCountries.Insert(false);
+            GlobalBlueBlockedCountries.Init;
+            GlobalBlueBlockedCountries."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
+            Evaluate(GlobalBlueBlockedCountries."Country Code", Country.InnerText(), 9);
+            GlobalBlueBlockedCountries.Insert(false);
         end;
         Commit;
 
@@ -255,24 +255,24 @@ codeunit 6014613 "Tax Free GB I2"
         GetCondensedTred(TaxFreeRequest);
         HandleResponse(TaxFreeRequest, 'GetCondensedTred', XMLDoc, IsError);
         if IsError then
-          Error(TaxFreeRequest."Error Message");
+            Error(TaxFreeRequest."Error Message");
 
         Ranges := XMLDoc.GetElementsByTagName('Range');
         RangeCount := Ranges.Count();
         if not (RangeCount > 0) then
-          Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, GlobalTaxFreeUnit."Handler ID", TaxFreeRequest."Request Type");
 
         GlobalBlueIINBlacklist.SetRange("Shop Country Code", GlobalBlueParameters."Shop Country Code");
         GlobalBlueIINBlacklist.DeleteAll(false);
         GlobalBlueIINBlacklist.Reset;
-        for i := 0 to (RangeCount-1) do begin
-          Range := Ranges.ItemOf(i);
+        for i := 0 to (RangeCount - 1) do begin
+            Range := Ranges.ItemOf(i);
 
-          GlobalBlueIINBlacklist.Init;
-          GlobalBlueIINBlacklist."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
-          Evaluate(GlobalBlueIINBlacklist."Range Inclusive Start", Range.Item('PrefixFrom').InnerText(), 9);
-          Evaluate(GlobalBlueIINBlacklist."Range Exclusive End", Range.Item('PrefixTo').InnerText(), 9);
-          GlobalBlueIINBlacklist.Insert(false);
+            GlobalBlueIINBlacklist.Init;
+            GlobalBlueIINBlacklist."Shop Country Code" := GlobalBlueParameters."Shop Country Code";
+            Evaluate(GlobalBlueIINBlacklist."Range Inclusive Start", Range.Item('PrefixFrom').InnerText(), 9);
+            Evaluate(GlobalBlueIINBlacklist."Range Exclusive End", Range.Item('PrefixTo').InnerText(), 9);
+            GlobalBlueIINBlacklist.Insert(false);
         end;
         Commit;
 
@@ -281,7 +281,7 @@ codeunit 6014613 "Tax Free GB I2"
         TaxFreeRequest."Time End" := Time;
     end;
 
-    local procedure IssueVoucher(var TaxFreeRequest: Record "Tax Free Request";var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary;var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary)
+    local procedure IssueVoucher(var TaxFreeRequest: Record "Tax Free Request"; var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary; var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary)
     var
         ServiceID: Text;
         CustomerXML: Text;
@@ -290,7 +290,8 @@ codeunit 6014613 "Tax Free GB I2"
         XMLDoc: DotNet npNetXmlDocument;
         IsError: Boolean;
         Value: Text;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
+        RecRef: RecordRef;
     begin
         //tmpTaxFreeConsolidation carries the sales receipts/documents to be consolidated into one tax free voucher.
         //In a normal flow with a single sale, it only holds one record.
@@ -303,48 +304,54 @@ codeunit 6014613 "Tax Free GB I2"
         IssueRenderedCheque(TaxFreeRequest, PurchaseXML, PaymentXML, CustomerXML);
         HandleResponse(TaxFreeRequest, 'IssueRenderedCheque', XMLDoc, IsError);
         if IsError then
-          Error(TaxFreeRequest."Error Message");
+            Error(TaxFreeRequest."Error Message");
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/NumericDocIdentifier', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         TaxFreeRequest."External Voucher No." := Value;
         TaxFreeRequest."External Voucher Barcode" := Value;
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/TotalGrossAmount', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         Evaluate(TaxFreeRequest."Total Amount Incl. VAT", Value, 9);
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/TotalRefundAmount', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         Evaluate(TaxFreeRequest."Refund Amount", Value, 9);
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/@mimetype', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
-        case true of
-          Value = 'application/pdf' : TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::PDF;
-          Value = 'text/plain' : TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::Thermal;
-          else
             Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+        case true of
+            Value = 'application/pdf':
+                TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::PDF;
+            Value = 'text/plain':
+                TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::Thermal;
+            else
+                Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         end;
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/BinaryData/Value', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         Base64ToBlob(Value, TempBlob);
-        TaxFreeRequest.Print := TempBlob.Blob;
+
+        RecRef.GetTable(TaxFreeRequest);
+        TempBlob.ToRecordRef(RecRef, TaxFreeRequest.FieldNo(Print));
+        RecRef.SetTable(TaxFreeRequest);
     end;
 
-    local procedure ReissueVoucher(var TaxFreeRequest: Record "Tax Free Request";TaxFreeVoucher: Record "Tax Free Voucher")
+    local procedure ReissueVoucher(var TaxFreeRequest: Record "Tax Free Request"; TaxFreeVoucher: Record "Tax Free Voucher")
     var
         VoucherService: Record "Tax Free GB I2 Service";
         XMLDoc: DotNet npNetXmlDocument;
         IsError: Boolean;
         Value: Text;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
+        RecRef: RecordRef;
     begin
         if VoucherService.Get(TaxFreeVoucher."POS Unit No.", TaxFreeVoucher."Service ID") then
-          if VoucherService."Void Limit In Days" <> 0 then
-            if CalcDate(StrSubstNo('<%1D>', VoucherService."Void Limit In Days"), TaxFreeVoucher."Issued Date") < Today then
-              Error(Error_VoidLimit, TaxFreeVoucher."External Voucher No.", VoucherService."Void Limit In Days");
+            if VoucherService."Void Limit In Days" <> 0 then
+                if CalcDate(StrSubstNo('<%1D>', VoucherService."Void Limit In Days"), TaxFreeVoucher."Issued Date") < Today then
+                    Error(Error_VoidLimit, TaxFreeVoucher."External Voucher No.", VoucherService."Void Limit In Days");
 
         if not Confirm(
           Caption_ReissueConfirm,
@@ -355,52 +362,57 @@ codeunit 6014613 "Tax Free GB I2"
           TaxFreeVoucher."Issued Date",
           TaxFreeVoucher.FieldCaption("Total Amount Incl. VAT"),
           TaxFreeVoucher."Total Amount Incl. VAT") then
-          Error(Error_UserCancel);
+            Error(Error_UserCancel);
 
         TaxFreeRequest."Service ID" := TaxFreeVoucher."Service ID"; //Reuse service ID.
         ReissueRenderedCheque(TaxFreeRequest, TaxFreeVoucher."External Voucher No.", Format(TaxFreeVoucher."Total Amount Incl. VAT", 0, 9));
         HandleResponse(TaxFreeRequest, 'ReissueRenderedCheque', XMLDoc, IsError);
         if IsError then
-          Error(TaxFreeRequest."Error Message");
+            Error(TaxFreeRequest."Error Message");
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/NumericDocIdentifier', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         TaxFreeRequest."External Voucher No." := Value;
         TaxFreeRequest."External Voucher Barcode" := Value;
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/TotalGrossAmount', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         Evaluate(TaxFreeRequest."Total Amount Incl. VAT", Value, 9);
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/TotalRefundAmount', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         Evaluate(TaxFreeRequest."Refund Amount", Value, 9);
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/@mimetype', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
-        case true of
-          Value = 'application/pdf' : TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::PDF;
-          Value = 'text/plain' : TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::Thermal;
-          else
             Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+        case true of
+            Value = 'application/pdf':
+                TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::PDF;
+            Value = 'text/plain':
+                TaxFreeRequest."Print Type" := TaxFreeRequest."Print Type"::Thermal;
+            else
+                Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         end;
 
         if not TrySelectSingleNodeText(XMLDoc, '//RenderedTFSFormRes/BinaryData/Value', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         Base64ToBlob(Value, TempBlob);
-        TaxFreeRequest.Print := TempBlob.Blob;
+
+        RecRef.GetTable(TaxFreeRequest);
+        TempBlob.ToRecordRef(RecRef, TaxFreeRequest.FieldNo(Print));
+        RecRef.SetTable(TaxFreeRequest);
     end;
 
-    local procedure VoidVoucher(var TaxFreeRequest: Record "Tax Free Request";TaxFreeVoucher: Record "Tax Free Voucher")
+    local procedure VoidVoucher(var TaxFreeRequest: Record "Tax Free Request"; TaxFreeVoucher: Record "Tax Free Voucher")
     var
         VoucherService: Record "Tax Free GB I2 Service";
         XMLDoc: DotNet npNetXmlDocument;
         IsError: Boolean;
     begin
         if VoucherService.Get(TaxFreeVoucher."POS Unit No.", TaxFreeVoucher."Service ID") then
-          if VoucherService."Void Limit In Days" <> 0 then
-            if CalcDate(StrSubstNo('<%1D>', VoucherService."Void Limit In Days"), TaxFreeVoucher."Issued Date") < Today then
-              Error(Error_VoidLimit, TaxFreeVoucher."External Voucher No.", VoucherService."Void Limit In Days");
+            if VoucherService."Void Limit In Days" <> 0 then
+                if CalcDate(StrSubstNo('<%1D>', VoucherService."Void Limit In Days"), TaxFreeVoucher."Issued Date") < Today then
+                    Error(Error_VoidLimit, TaxFreeVoucher."External Voucher No.", VoucherService."Void Limit In Days");
 
         if not Confirm(
           Caption_VoidConfirm,
@@ -411,12 +423,12 @@ codeunit 6014613 "Tax Free GB I2"
           TaxFreeVoucher."Issued Date",
           TaxFreeVoucher.FieldCaption("Total Amount Incl. VAT"),
           TaxFreeVoucher."Total Amount Incl. VAT") then
-          Error(Error_UserCancel);
+            Error(Error_UserCancel);
 
         VoidCheque(TaxFreeRequest, TaxFreeVoucher."External Voucher No.", Format(TaxFreeVoucher."Total Amount Incl. VAT", 0, 9));
         HandleResponse(TaxFreeRequest, 'VoidCheque', XMLDoc, IsError);
         if IsError then
-          Error(TaxFreeRequest."Error Message");
+            Error(TaxFreeRequest."Error Message");
     end;
 
     local procedure CheckIIN(IIN: Text): Boolean
@@ -425,14 +437,14 @@ codeunit 6014613 "Tax Free GB I2"
         IINInteger: Integer;
     begin
         if StrLen(IIN) < 6 then
-          exit(false);
+            exit(false);
 
         IIN := CopyStr(IIN, 1, 6);
         if not Evaluate(IINInteger, IIN) then
-          exit(false);
+            exit(false);
 
         if GlobalBlueIINBlacklist.IsEmpty then
-          exit(false);
+            exit(false);
 
         GlobalBlueIINBlacklist.SetRange("Shop Country Code", GlobalBlueParameters."Shop Country Code");
         GlobalBlueIINBlacklist.SetFilter("Range Inclusive Start", '<=%1', IINInteger);
@@ -460,65 +472,65 @@ codeunit 6014613 "Tax Free GB I2"
         GetTraveller(TaxFreeRequest, tmpCustomerInfoCapture);
         HandleResponse(TaxFreeRequest, 'GetTraveller', XMLDoc, IsError);
         if IsError then
-          Error(TaxFreeRequest."Error Message");
+            Error(TaxFreeRequest."Error Message");
 
         //Necessary data for UI confirm
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/FirstName', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         tmpCustomerInfoCapture."First Name" := Value;
 
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/LastName', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         tmpCustomerInfoCapture."Last Name" := Value;
 
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Passport/PassportNumber', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         tmpCustomerInfoCapture."Passport Number" := Value;
 
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Address/CountryCode', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         Evaluate(tmpCustomerInfoCapture."Country Of Residence Code", Value, 9);
 
         if not TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Address/CountryName', Value) then
-          Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
+            Error(Error_InvalidResponse, TaxFreeRequest."Handler ID", TaxFreeRequest."Request Type");
         tmpCustomerInfoCapture."Country Of Residence" := Value;
 
         //Non-essential data:
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Address/Street', Value) then
-          tmpCustomerInfoCapture.Street := Value;
+            tmpCustomerInfoCapture.Street := Value;
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Address/PostalCode', Value) then
-          tmpCustomerInfoCapture."Postal Code" := Value;
+            tmpCustomerInfoCapture."Postal Code" := Value;
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Address/Town', Value) then
-          tmpCustomerInfoCapture.Town := Value;
+            tmpCustomerInfoCapture.Town := Value;
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Email', Value) then
-          tmpCustomerInfoCapture."E-mail" := Value;
+            tmpCustomerInfoCapture."E-mail" := Value;
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/MobileNumber', Value) then
-          tmpCustomerInfoCapture."Mobile No." := Value;
+            tmpCustomerInfoCapture."Mobile No." := Value;
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/TravelDetails/DepartureDate', Value) then
-          Evaluate(tmpCustomerInfoCapture."Departure Date", Value, 9);
+            Evaluate(tmpCustomerInfoCapture."Departure Date", Value, 9);
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/TravelDetails/ArrivalDate', Value) then
-          Evaluate(tmpCustomerInfoCapture."Arrival Date", Value, 9);
+            Evaluate(tmpCustomerInfoCapture."Arrival Date", Value, 9);
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/TravelDetails/FinalDestinationCountryCode', Value) then
-          Evaluate(tmpCustomerInfoCapture."Final Destination Country Code", Value, 9);
+            Evaluate(tmpCustomerInfoCapture."Final Destination Country Code", Value, 9);
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/TravelDetails/FinalDestinationCountryName', Value) then
-          tmpCustomerInfoCapture."Final Destination Country" := Value;
+            tmpCustomerInfoCapture."Final Destination Country" := Value;
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Passport/PassportCountryCode', Value) then
-          Evaluate(tmpCustomerInfoCapture."Passport Country Code", Value, 9);
+            Evaluate(tmpCustomerInfoCapture."Passport Country Code", Value, 9);
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/Passport/PassportCountryName', Value) then
-          tmpCustomerInfoCapture."Passport Country" := Value;
+            tmpCustomerInfoCapture."Passport Country" := Value;
 
         if TrySelectSingleNodeText(XMLDoc, '//TravellerRes/DateOfBirth', Value) then
-          Evaluate(tmpCustomerInfoCapture."Date Of Birth", CopyStr(Value, 1, StrPos(Value, 'T') - 1), 9);
+            Evaluate(tmpCustomerInfoCapture."Date Of Birth", CopyStr(Value, 1, StrPos(Value, 'T') - 1), 9);
 
         TaxFreeRequest.Success := true;
         TaxFreeRequest."Date End" := Today;
@@ -533,8 +545,10 @@ codeunit 6014613 "Tax Free GB I2"
     local procedure TryPrintVoucher(TaxFreeRequest: Record "Tax Free Request")
     begin
         case TaxFreeRequest."Print Type" of
-          TaxFreeRequest."Print Type"::Thermal : PrintThermal(TaxFreeRequest);
-          TaxFreeRequest."Print Type"::PDF : PrintPDF(TaxFreeRequest);
+            TaxFreeRequest."Print Type"::Thermal:
+                PrintThermal(TaxFreeRequest);
+            TaxFreeRequest."Print Type"::PDF:
+                PrintPDF(TaxFreeRequest);
         end;
     end;
 
@@ -548,15 +562,15 @@ codeunit 6014613 "Tax Free GB I2"
     begin
         Output := ObjectOutputMgt.GetCodeunitOutputPath(CODEUNIT::"Report - Tax Free Receipt");
         if Output = '' then
-          Error(Error_MissingPrintSetup);
+            Error(Error_MissingPrintSetup);
 
-        Printer.SetThreeColumnDistribution(0.33,0.33,0.33);
+        Printer.SetThreeColumnDistribution(0.33, 0.33, 0.33);
         Printer.SetAutoLineBreak(false);
 
         TaxFreeRequest.Print.CreateInStream(InStream, TEXTENCODING::UTF8);
         while (not InStream.EOS) do begin
-          InStream.ReadText(Line);
-          PrintThermalLine(Printer, Line);
+            InStream.ReadText(Line);
+            PrintThermalLine(Printer, Line);
         end;
 
         PrintThermalLine(Printer, '<TearOff>'); //A final cut is not included in the printjob from I2 server.
@@ -564,7 +578,7 @@ codeunit 6014613 "Tax Free GB I2"
         Printer.ProcessBufferForCodeunit(CODEUNIT::"Report - Tax Free Receipt", ''); //Use the object output selection of old object so no new setup is needed.
     end;
 
-    local procedure PrintThermalLine(var Printer: Codeunit "RP Line Print Mgt.";Line: Text)
+    local procedure PrintThermalLine(var Printer: Codeunit "RP Line Print Mgt."; Line: Text)
     var
         Center: Boolean;
         Inverse: Boolean;
@@ -582,73 +596,73 @@ codeunit 6014613 "Tax Free GB I2"
         StringUpper := UpperCase(Line);
 
         if StringUpper.Contains('<BC>') then begin
-          String := String.Replace('<BC>', '');
-          String := String.Replace('</BC>', '');
-          String := String.Replace('<bc>', '');
-          String := String.Replace('</bc>', '');
-          Value := String;
-          Printer.AddBarcode('ITF', Value, 2);
-          exit;
+            String := String.Replace('<BC>', '');
+            String := String.Replace('</BC>', '');
+            String := String.Replace('<bc>', '');
+            String := String.Replace('</bc>', '');
+            Value := String;
+            Printer.AddBarcode('ITF', Value, 2);
+            exit;
         end;
 
         if StringUpper.Contains('<IMG>') then begin
-          Printer.SetFont('Logo');
-          Printer.AddLine('TAXFREE');
-          exit;
+            Printer.SetFont('Logo');
+            Printer.AddLine('TAXFREE');
+            exit;
         end;
 
         if StringUpper.Contains('<TEAROFF>') or StringUpper.Contains('<TEAROFF/>') then begin
-          Printer.SetFont('Control');
-          Printer.AddLine('P');
-          exit;
+            Printer.SetFont('Control');
+            Printer.AddLine('P');
+            exit;
         end;
 
         if StringUpper.Contains('<CENTER>') or StringUpper.Contains('<C>') then begin
-          String := String.Replace('<CENTER>', '');
-          String := String.Replace('</CENTER>', '');
-          String := String.Replace('<C>', '');
-          String := String.Replace('</C>', '');
-          String := String.Replace('<center>', '');
-          String := String.Replace('</center>', '');
-          String := String.Replace('<c>', '');
-          String := String.Replace('</c>', '');
-          Center := true;
+            String := String.Replace('<CENTER>', '');
+            String := String.Replace('</CENTER>', '');
+            String := String.Replace('<C>', '');
+            String := String.Replace('</C>', '');
+            String := String.Replace('<center>', '');
+            String := String.Replace('</center>', '');
+            String := String.Replace('<c>', '');
+            String := String.Replace('</c>', '');
+            Center := true;
         end;
 
         if StringUpper.Contains('<INVERSE>') or StringUpper.Contains('<I>') then begin
-          String := String.Replace('<INVERSE>', '');
-          String := String.Replace('</INVERSE>', '');
-          String := String.Replace('<I>', '');
-          String := String.Replace('</I>', '');
-          String := String.Replace('<inverse>', '');
-          String := String.Replace('</inverse>', '');
-          String := String.Replace('<i>', '');
-          String := String.Replace('</i>', '');
-          Inverse := true;
+            String := String.Replace('<INVERSE>', '');
+            String := String.Replace('</INVERSE>', '');
+            String := String.Replace('<I>', '');
+            String := String.Replace('</I>', '');
+            String := String.Replace('<inverse>', '');
+            String := String.Replace('</inverse>', '');
+            String := String.Replace('<i>', '');
+            String := String.Replace('</i>', '');
+            Inverse := true;
         end;
 
         if StringUpper.Contains('<HFONT>') or StringUpper.Contains('<H>') then begin
-          String := String.Replace('<HFONT>', '');
-          String := String.Replace('</HFONT>', '');
-          String := String.Replace('<H>', '');
-          String := String.Replace('</H>', '');
-          String := String.Replace('<hfont>', '');
-          String := String.Replace('</hfont>', '');
-          String := String.Replace('<h>', '');
-          String := String.Replace('</h>', '');
-          HFont := true;
+            String := String.Replace('<HFONT>', '');
+            String := String.Replace('</HFONT>', '');
+            String := String.Replace('<H>', '');
+            String := String.Replace('</H>', '');
+            String := String.Replace('<hfont>', '');
+            String := String.Replace('</hfont>', '');
+            String := String.Replace('<h>', '');
+            String := String.Replace('</h>', '');
+            HFont := true;
         end;
 
         if StringUpper.Contains('<BOLD>') or StringUpper.Contains('<B>') then begin
-          String := String.Replace('<BOLD>', '');
-          String := String.Replace('</BOLD>', '');
-          String := String.Replace('<B>', '');
-          String := String.Replace('</B>', '');
-          String := String.Replace('<bold>', '');
-          String := String.Replace('</bold>', '');
-          String := String.Replace('<b>', '');
-          String := String.Replace('</b>', '');
-          Bold := true;
+            String := String.Replace('<BOLD>', '');
+            String := String.Replace('</BOLD>', '');
+            String := String.Replace('<B>', '');
+            String := String.Replace('</B>', '');
+            String := String.Replace('<bold>', '');
+            String := String.Replace('</bold>', '');
+            String := String.Replace('<b>', '');
+            String := String.Replace('</b>', '');
+            Bold := true;
         end;
 
         Line := String;
@@ -656,20 +670,20 @@ codeunit 6014613 "Tax Free GB I2"
         Printer.SetBold(Bold or Inverse);
         Printer.SetUnderLine(Inverse); //As per agreement inverse will not actually be inverted colors. It will be highlighted via other means.
         if HFont then
-          Printer.SetFont('B21')
+            Printer.SetFont('B21')
         else
-          Printer.SetFont('A11');
+            Printer.SetFont('A11');
 
         if Line = '' then
-          Line := ' ';
+            Line := ' ';
 
         while (Line <> '') do begin
-          if Center then
-            Printer.AddTextField(2, 1, CopyStr(Line, 1, 42))
-          else
-            Printer.AddTextField(1, 0, CopyStr(Line, 1, 42));
-          Line := CopyStr(Line, 43);
-          Printer.NewLine();
+            if Center then
+                Printer.AddTextField(2, 1, CopyStr(Line, 1, 42))
+            else
+                Printer.AddTextField(1, 0, CopyStr(Line, 1, 42));
+            Line := CopyStr(Line, 43);
+            Printer.NewLine();
         end;
     end;
 
@@ -691,16 +705,19 @@ codeunit 6014613 "Tax Free GB I2"
         OutputType := ObjectOutputMgt.GetCodeunitOutputType(CODEUNIT::"Report - Tax Free Receipt");
 
         if Output = '' then
-          Error(Error_MissingPrintSetup);
+            Error(Error_MissingPrintSetup);
 
         case OutputType of
-          ObjectOutputSelection."Output Type"::"Google Print" : PrintMethodMgt.PrintViaGoogleCloud(Output, MemoryStream, 'application/pdf', 1, CODEUNIT::"Report - Tax Free Receipt");
-          ObjectOutputSelection."Output Type"::"E-mail"       : PrintMethodMgt.PrintViaEmail(Output, MemoryStream);
-          ObjectOutputSelection."Output Type"::"Printer Name" : PrintMethodMgt.PrintFileLocal(Output, MemoryStream, 'pdf');
+            ObjectOutputSelection."Output Type"::"Google Print":
+                PrintMethodMgt.PrintViaGoogleCloud(Output, MemoryStream, 'application/pdf', 1, CODEUNIT::"Report - Tax Free Receipt");
+            ObjectOutputSelection."Output Type"::"E-mail":
+                PrintMethodMgt.PrintViaEmail(Output, MemoryStream);
+            ObjectOutputSelection."Output Type"::"Printer Name":
+                PrintMethodMgt.PrintFileLocal(Output, MemoryStream, 'pdf');
         end;
     end;
 
-    local procedure Base64ToBlob(base64: Text;var TempBlobOut: Record TempBlob temporary)
+    local procedure Base64ToBlob(base64: Text; var TempBlobOut: Codeunit "Temp Blob")
     var
         OutStream: OutStream;
         MemoryStream: DotNet npNetMemoryStream;
@@ -708,10 +725,8 @@ codeunit 6014613 "Tax Free GB I2"
     begin
         MemoryStream := MemoryStream.MemoryStream(Convert.FromBase64String(base64));
 
-        TempBlobOut.Init;
-        TempBlobOut.Blob.CreateOutStream(OutStream);
+        TempBlobOut.CreateOutStream(OutStream);
         CopyStream(OutStream, MemoryStream);
-        TempBlobOut.Insert;
     end;
 
     local procedure "--- API Functions"()
@@ -750,7 +765,7 @@ codeunit 6014613 "Tax Free GB I2"
         InvokeService(Request, TaxFreeRequest);
     end;
 
-    local procedure GetTraveller(var TaxFreeRequest: Record "Tax Free Request";var tmpCustomerInfoCapture: Record "Tax Free GB I2 Info Capture" temporary)
+    local procedure GetTraveller(var TaxFreeRequest: Record "Tax Free Request"; var tmpCustomerInfoCapture: Record "Tax Free GB I2 Info Capture" temporary)
     var
         Request: Text;
     begin
@@ -788,7 +803,7 @@ codeunit 6014613 "Tax Free GB I2"
         InvokeService(Request, TaxFreeRequest);
     end;
 
-    local procedure IssueRenderedCheque(var TaxFreeRequest: Record "Tax Free Request";PurchaseDetailsXML: Text;PaymentMethodsXML: Text;TravellerInfoXML: Text)
+    local procedure IssueRenderedCheque(var TaxFreeRequest: Record "Tax Free Request"; PurchaseDetailsXML: Text; PaymentMethodsXML: Text; TravellerInfoXML: Text)
     var
         Request: Text;
     begin
@@ -828,7 +843,7 @@ codeunit 6014613 "Tax Free GB I2"
         InvokeService(Request, TaxFreeRequest);
     end;
 
-    local procedure ReissueRenderedCheque(var TaxFreeRequest: Record "Tax Free Request";VoucherID: Text;TotalGrossAmount: Text)
+    local procedure ReissueRenderedCheque(var TaxFreeRequest: Record "Tax Free Request"; VoucherID: Text; TotalGrossAmount: Text)
     var
         Request: Text;
     begin
@@ -857,7 +872,7 @@ codeunit 6014613 "Tax Free GB I2"
                 '<ShopCountryCode>' + Format(GlobalBlueParameters."Shop Country Code") + '</ShopCountryCode>' +
               '</ShopInfo>' +
               '<NumericDocIdentifier>' + VoucherID + '</NumericDocIdentifier>' +
-              '<TotalGrossAmount>' + TotalGrossAmount +'</TotalGrossAmount>' +
+              '<TotalGrossAmount>' + TotalGrossAmount + '</TotalGrossAmount>' +
             '</ReissueReq>' +
           '</Message>' +
         '</GripsMXRequest>';
@@ -865,7 +880,7 @@ codeunit 6014613 "Tax Free GB I2"
         InvokeService(Request, TaxFreeRequest);
     end;
 
-    local procedure VoidCheque(var TaxFreeRequest: Record "Tax Free Request";VoucherID: Text;TotalGrossAmount: Text)
+    local procedure VoidCheque(var TaxFreeRequest: Record "Tax Free Request"; VoucherID: Text; TotalGrossAmount: Text)
     var
         Request: Text;
     begin
@@ -894,7 +909,7 @@ codeunit 6014613 "Tax Free GB I2"
                 '<ShopCountryCode>' + Format(GlobalBlueParameters."Shop Country Code") + '</ShopCountryCode>' +
               '</ShopInfo>' +
               '<NumericDocIdentifier>' + VoucherID + '</NumericDocIdentifier>' +
-              '<TotalGrossAmount>' + TotalGrossAmount +'</TotalGrossAmount>' +
+              '<TotalGrossAmount>' + TotalGrossAmount + '</TotalGrossAmount>' +
             '</VoidTFSFormReq>' +
           '</Message>' +
         '</GripsMXRequest>';
@@ -999,7 +1014,7 @@ codeunit 6014613 "Tax Free GB I2"
         InvokeService(Request, TaxFreeRequest);
     end;
 
-    local procedure InvokeService(XMLRequest: Text;var TaxFreeRequest: Record "Tax Free Request"): Text
+    local procedure InvokeService(XMLRequest: Text; var TaxFreeRequest: Record "Tax Free Request"): Text
     var
         BaseAddress: Text;
         HttpClient: DotNet npNetHttpClient;
@@ -1019,14 +1034,14 @@ codeunit 6014613 "Tax Free GB I2"
         HttpClient.DefaultRequestHeaders.Clear();
 
         if TaxFreeRequest.Mode = TaxFreeRequest.Mode::PROD then
-          HttpClient.BaseAddress := Uri.Uri(ServicePROD)
+            HttpClient.BaseAddress := Uri.Uri(ServicePROD)
         else
-          HttpClient.BaseAddress := Uri.Uri(ServiceTEST);
+            HttpClient.BaseAddress := Uri.Uri(ServiceTEST);
 
         if TaxFreeRequest."Timeout (ms)" > 0 then
-          HttpClient.Timeout := TimeSpan.TimeSpan(0, 0, 0, TaxFreeRequest."Timeout (ms)")
+            HttpClient.Timeout := TimeSpan.TimeSpan(0, 0, 0, TaxFreeRequest."Timeout (ms)")
         else
-          HttpClient.Timeout := TimeSpan.TimeSpan(0, 0, 10);
+            HttpClient.Timeout := TimeSpan.TimeSpan(0, 0, 10);
 
         StringContent := StringContent.StringContent(XMLRequest, Encoding.UTF8, 'text/xml');
         HttpResponseMessage := HttpClient.PostAsync('', StringContent).Result();
@@ -1036,7 +1051,7 @@ codeunit 6014613 "Tax Free GB I2"
         OutStream.Write(Result);
     end;
 
-    local procedure HandleResponse(var TaxFreeRequest: Record "Tax Free Request";ExpectedOperation: Text;var XMLDoc: DotNet npNetXmlDocument;var IsError: Boolean)
+    local procedure HandleResponse(var TaxFreeRequest: Record "Tax Free Request"; ExpectedOperation: Text; var XMLDoc: DotNet npNetXmlDocument; var IsError: Boolean)
     var
         InStream: InStream;
         Value: Text;
@@ -1053,34 +1068,34 @@ codeunit 6014613 "Tax Free GB I2"
         NpXmlDomMgt.RemoveNameSpaces(XMLDoc);
 
         if not (TrySelectSingleNodeText(XMLDoc, '//Header/Operation', Value)) then begin
-          //Undocumented critical error
-          IsError := true;
-          TaxFreeRequest."Error Message" := Error_Unknown;
-          exit;
+            //Undocumented critical error
+            IsError := true;
+            TaxFreeRequest."Error Message" := Error_Unknown;
+            exit;
         end;
 
         if Value <> ExpectedOperation then begin
-          IsError := true;
-          if Value = 'Error' then begin
-            //Validation error
-            if TrySelectSingleNodeText(XMLDoc, '//Message/Error/ErrorCode', Value) then
-              TaxFreeRequest."Error Code" := Value;
-            if TrySelectSingleNodeText(XMLDoc, '//Message/Error/ErrorMessage', Value) then
-              TaxFreeRequest."Error Message" := Value;
-          end else
-            //Undocumented critical error
-            TaxFreeRequest."Error Message" := Error_Unknown;
-          exit;
+            IsError := true;
+            if Value = 'Error' then begin
+                //Validation error
+                if TrySelectSingleNodeText(XMLDoc, '//Message/Error/ErrorCode', Value) then
+                    TaxFreeRequest."Error Code" := Value;
+                if TrySelectSingleNodeText(XMLDoc, '//Message/Error/ErrorMessage', Value) then
+                    TaxFreeRequest."Error Message" := Value;
+            end else
+                //Undocumented critical error
+                TaxFreeRequest."Error Message" := Error_Unknown;
+            exit;
         end;
 
         if TrySelectSingleNodeText(XMLDoc, '//Message/ErrorRes', Value) then begin
-          //Operation result error
-          IsError := true;
-          if TrySelectSingleNodeText(XMLDoc, '//Message/ErrorRes/ErrorCode', Value) then
-            TaxFreeRequest."Error Code" := Value;
-          if TrySelectSingleNodeText(XMLDoc, '//Message/ErrorRes/Message', Value) then
-            TaxFreeRequest."Error Message" := Value;
-          exit;
+            //Operation result error
+            IsError := true;
+            if TrySelectSingleNodeText(XMLDoc, '//Message/ErrorRes/ErrorCode', Value) then
+                TaxFreeRequest."Error Code" := Value;
+            if TrySelectSingleNodeText(XMLDoc, '//Message/ErrorRes/Message', Value) then
+                TaxFreeRequest."Error Message" := Value;
+            exit;
         end;
 
         //No errors found in response!
@@ -1120,17 +1135,17 @@ codeunit 6014613 "Tax Free GB I2"
 
     local procedure FormattedDateTime(): Text
     begin
-        exit(Format(CurrentDateTime,0,9));
+        exit(Format(CurrentDateTime, 0, 9));
     end;
 
     [TryFunction]
-    local procedure TrySelectSingleNodeText(var XMLDoc: DotNet npNetXmlDocument;XPath: Text;var Value: Text)
+    local procedure TrySelectSingleNodeText(var XMLDoc: DotNet npNetXmlDocument; XPath: Text; var Value: Text)
     begin
         Value := XMLDoc.SelectSingleNode(XPath).InnerText();
     end;
 
     [TryFunction]
-    local procedure TryGetItemInnerText(var XmlNode: DotNet npNetXmlNode;ItemName: Text;var Value: Text)
+    local procedure TryGetItemInnerText(var XmlNode: DotNet npNetXmlNode; ItemName: Text; var Value: Text)
     begin
         Value := XmlNode.Item(ItemName).InnerText;
     end;
@@ -1149,19 +1164,19 @@ codeunit 6014613 "Tax Free GB I2"
         tmpCustomerInfoCapture.Insert;
 
         if Confirm(Caption_UseID) then begin
-          if not ScanCustomerID(tmpCustomerInfoCapture) then
-            exit(CaptureCustomerInfo()); //Aborted - Restart capture flow
-          LookupCompleted := true;
+            if not ScanCustomerID(tmpCustomerInfoCapture) then
+                exit(CaptureCustomerInfo()); //Aborted - Restart capture flow
+            LookupCompleted := true;
         end;
 
         if not IsAllRequiredCustomerInfoCaptured(tmpCustomerInfoCapture) then begin
-          tmpCustomerInfoCapture."Is Identity Checked" := false;
-          if not ManualCustomerInfoEntry(tmpCustomerInfoCapture, LookupCompleted) then begin
-            if Confirm(Caption_CancelOperation) then
-              Error(Error_UserCancel)
-            else
-              exit(CaptureCustomerInfo()); //Restart capture flow
-          end;
+            tmpCustomerInfoCapture."Is Identity Checked" := false;
+            if not ManualCustomerInfoEntry(tmpCustomerInfoCapture, LookupCompleted) then begin
+                if Confirm(Caption_CancelOperation) then
+                    Error(Error_UserCancel)
+                else
+                    exit(CaptureCustomerInfo()); //Restart capture flow
+            end;
         end;
 
         exit(GetCustomerInfoXML(tmpCustomerInfoCapture));
@@ -1175,17 +1190,21 @@ codeunit 6014613 "Tax Free GB I2"
         IDType := StrMenu(StrSubstNo('%1,%2,%3', Caption_MemberCard, Caption_MobileNo, Caption_Passport), 1, Caption_IdentifierType);
 
         case IDType of
-          0: exit(false); //Restart capture flow
-          1: Captured := GetGlobalBlueCardIdentifier(tmpCustomerInfoCapture);
-          2: Captured := GetMobileNoIdentifier(tmpCustomerInfoCapture);
-          3: Captured := GetPassportIdentifier(tmpCustomerInfoCapture);
+            0:
+                exit(false); //Restart capture flow
+            1:
+                Captured := GetGlobalBlueCardIdentifier(tmpCustomerInfoCapture);
+            2:
+                Captured := GetMobileNoIdentifier(tmpCustomerInfoCapture);
+            3:
+                Captured := GetPassportIdentifier(tmpCustomerInfoCapture);
         end;
 
         if not Captured then
-          exit(false); //Restart capture flow
+            exit(false); //Restart capture flow
 
-        if not Confirm(Caption_ConfirmIdentity, false, tmpCustomerInfoCapture."First Name"+' '+tmpCustomerInfoCapture."Last Name", tmpCustomerInfoCapture."Passport Number", tmpCustomerInfoCapture."Country Of Residence") then
-          exit(false); //Restart capture flow
+        if not Confirm(Caption_ConfirmIdentity, false, tmpCustomerInfoCapture."First Name" + ' ' + tmpCustomerInfoCapture."Last Name", tmpCustomerInfoCapture."Passport Number", tmpCustomerInfoCapture."Country Of Residence") then
+            exit(false); //Restart capture flow
 
         tmpCustomerInfoCapture."Is Identity Checked" := true;
         exit(true);
@@ -1208,7 +1227,7 @@ codeunit 6014613 "Tax Free GB I2"
         TravellerInfoCapture.SetRec(tmpMobilePhoneNoCapture);
         TravellerInfoCapture.LookupMode(true);
         if TravellerInfoCapture.RunModal <> ACTION::LookupOK then
-          exit(false); //Restart capture flow
+            exit(false); //Restart capture flow
 
         TravellerInfoCapture.GetRec(tmpMobilePhoneNoCapture);
         tmpCustomerInfoCapture."Mobile No." := tmpMobilePhoneNoCapture."Mobile No.";
@@ -1219,12 +1238,12 @@ codeunit 6014613 "Tax Free GB I2"
         //Identifer = [00][Country Prefix][Mobile No.]
         tmpCustomerInfoCapture."Global Blue Identifier" := '00';
         if tmpCustomerInfoCapture."Mobile No. Prefix" <> 0 then
-          tmpCustomerInfoCapture."Global Blue Identifier" += Format(tmpCustomerInfoCapture."Mobile No. Prefix");
+            tmpCustomerInfoCapture."Global Blue Identifier" += Format(tmpCustomerInfoCapture."Mobile No. Prefix");
         tmpCustomerInfoCapture."Global Blue Identifier" += tmpCustomerInfoCapture."Mobile No.";
 
         if not TryLookupTraveller(tmpCustomerInfoCapture) then begin
-          Message(Caption_TravellerLookupFail);
-          exit(false); //Restart capture flow
+            Message(Caption_TravellerLookupFail);
+            exit(false); //Restart capture flow
         end;
 
         exit(true);
@@ -1248,7 +1267,7 @@ codeunit 6014613 "Tax Free GB I2"
         TravellerInfoCapture.SetRec(tmpPassportCapture);
         TravellerInfoCapture.LookupMode(true);
         if TravellerInfoCapture.RunModal <> ACTION::LookupOK then
-          exit(false); //Restart capture flow
+            exit(false); //Restart capture flow
 
         TravellerInfoCapture.GetRec(tmpPassportCapture);
         tmpCustomerInfoCapture."Passport Country" := tmpPassportCapture."Passport Country";
@@ -1259,8 +1278,8 @@ codeunit 6014613 "Tax Free GB I2"
         tmpCustomerInfoCapture."Global Blue Identifier" := Format(tmpCustomerInfoCapture."Passport Country Code") + '+' + UpperCase(tmpCustomerInfoCapture."Passport Number");
 
         if not TryLookupTraveller(tmpCustomerInfoCapture) then begin
-          Message(Caption_TravellerLookupFail);
-          exit(false); //Restart capture flow
+            Message(Caption_TravellerLookupFail);
+            exit(false); //Restart capture flow
         end;
 
         exit(true);
@@ -1276,24 +1295,24 @@ codeunit 6014613 "Tax Free GB I2"
         InputDialog.SetInput(1, Input, Caption_GlobalBlueIdentifier);
         ScanAction := InputDialog.RunModal;
         if (ScanAction <> ACTION::LookupOK) or (InputDialog.InputText(1, Input) <> 1) then
-          exit(false);
+            exit(false);
 
         if StrLen(Input) < 10 then begin
-          Message(Caption_InvalidIdentifier, Input);
-          exit(false);
+            Message(Caption_InvalidIdentifier, Input);
+            exit(false);
         end;
 
         tmpCustomerInfoCapture."Global Blue Identifier" := Input;
 
         if not TryLookupTraveller(tmpCustomerInfoCapture) then begin
-          Message(Caption_TravellerLookupFail);
-          exit(false); //Restart capture flow
+            Message(Caption_TravellerLookupFail);
+            exit(false); //Restart capture flow
         end;
 
         exit(true);
     end;
 
-    local procedure ManualCustomerInfoEntry(var tmpCustomerInfoCapture: Record "Tax Free GB I2 Info Capture" temporary;LookupCompleted: Boolean): Boolean
+    local procedure ManualCustomerInfoEntry(var tmpCustomerInfoCapture: Record "Tax Free GB I2 Info Capture" temporary; LookupCompleted: Boolean): Boolean
     var
         TravellerInfoCapture: Page "Tax Free GB I2 Info Capture";
     begin
@@ -1301,8 +1320,8 @@ codeunit 6014613 "Tax Free GB I2"
         TravellerInfoCapture.SetRec(tmpCustomerInfoCapture); //Will set filled out data as read-only.
         TravellerInfoCapture.LookupMode(true);
         if TravellerInfoCapture.RunModal = ACTION::LookupOK then begin
-          TravellerInfoCapture.GetRec(tmpCustomerInfoCapture);
-          exit(true);
+            TravellerInfoCapture.GetRec(tmpCustomerInfoCapture);
+            exit(true);
         end;
 
         //TODO?: When full manual customer entry (LookupCompleted=FALSE), suggest pulling from NAV customer/contact if any is present on sale.
@@ -1312,79 +1331,79 @@ codeunit 6014613 "Tax Free GB I2"
     local procedure IsAllRequiredCustomerInfoCaptured(var tmpCustomerInfoCapture: Record "Tax Free GB I2 Info Capture" temporary): Boolean
     begin
         if GlobalBlueParameters."(Dialog) Arrival Date" = GlobalBlueParameters."(Dialog) Arrival Date"::Required then
-          if tmpCustomerInfoCapture."Arrival Date" = 0D then
-            exit(false);
+            if tmpCustomerInfoCapture."Arrival Date" = 0D then
+                exit(false);
 
         if GlobalBlueParameters."(Dialog) Country Code" = GlobalBlueParameters."(Dialog) Country Code"::Required then
-          if tmpCustomerInfoCapture."Country Of Residence Code" = 0 then
-            exit(false);
+            if tmpCustomerInfoCapture."Country Of Residence Code" = 0 then
+                exit(false);
 
         if GlobalBlueParameters."(Dialog) Date Of Birth" = GlobalBlueParameters."(Dialog) Date Of Birth"::Required then
-          if tmpCustomerInfoCapture."Date Of Birth" = 0D then
-            exit(false);
+            if tmpCustomerInfoCapture."Date Of Birth" = 0D then
+                exit(false);
 
         if GlobalBlueParameters."(Dialog) Departure Date" = GlobalBlueParameters."(Dialog) Departure Date"::Required then
-          if tmpCustomerInfoCapture."Departure Date" = 0D then
-            exit(false);
+            if tmpCustomerInfoCapture."Departure Date" = 0D then
+                exit(false);
 
         if GlobalBlueParameters."(Dialog) Dest. Country Code" = GlobalBlueParameters."(Dialog) Dest. Country Code"::Required then
-          if tmpCustomerInfoCapture."Final Destination Country Code" = 0 then
-            exit(false);
+            if tmpCustomerInfoCapture."Final Destination Country Code" = 0 then
+                exit(false);
 
         if GlobalBlueParameters."(Dialog) Email" = GlobalBlueParameters."(Dialog) Email"::Required then
-          if tmpCustomerInfoCapture."E-mail" = '' then
-            exit(false);
+            if tmpCustomerInfoCapture."E-mail" = '' then
+                exit(false);
 
         if GlobalBlueParameters."(Dialog) First Name" = GlobalBlueParameters."(Dialog) First Name"::Required then
-          if tmpCustomerInfoCapture."First Name" = '' then
-            exit(false);
+            if tmpCustomerInfoCapture."First Name" = '' then
+                exit(false);
 
         if GlobalBlueParameters."(Dialog) Last Name" = GlobalBlueParameters."(Dialog) Last Name"::Required then
-          if tmpCustomerInfoCapture."Last Name" = '' then
-            exit(false);
+            if tmpCustomerInfoCapture."Last Name" = '' then
+                exit(false);
 
         if GlobalBlueParameters."(Dialog) Mobile No." = GlobalBlueParameters."(Dialog) Mobile No."::Required then
-          if tmpCustomerInfoCapture."Mobile No." = '' then
-            exit(false);
+            if tmpCustomerInfoCapture."Mobile No." = '' then
+                exit(false);
 
         if GlobalBlueParameters."(Dialog) Passport Country Code" = GlobalBlueParameters."(Dialog) Passport Country Code"::Required then
-          if tmpCustomerInfoCapture."Passport Country Code" = 0 then
-            exit(false);
+            if tmpCustomerInfoCapture."Passport Country Code" = 0 then
+                exit(false);
 
         if GlobalBlueParameters."(Dialog) Passport Number" = GlobalBlueParameters."(Dialog) Passport Number"::Required then
-          if tmpCustomerInfoCapture."Passport Number" = '' then
-            exit(false);
+            if tmpCustomerInfoCapture."Passport Number" = '' then
+                exit(false);
 
         if GlobalBlueParameters."(Dialog) Postal Code" = GlobalBlueParameters."(Dialog) Postal Code"::Required then
-          if tmpCustomerInfoCapture."Postal Code" = '' then
-            exit(false);
+            if tmpCustomerInfoCapture."Postal Code" = '' then
+                exit(false);
 
         if GlobalBlueParameters."(Dialog) Street" = GlobalBlueParameters."(Dialog) Street"::Required then
-          if tmpCustomerInfoCapture.Street = '' then
-            exit(false);
+            if tmpCustomerInfoCapture.Street = '' then
+                exit(false);
 
         if GlobalBlueParameters."(Dialog) Town" = GlobalBlueParameters."(Dialog) Town"::Required then
-          if tmpCustomerInfoCapture.Town = '' then
-            exit(false);
+            if tmpCustomerInfoCapture.Town = '' then
+                exit(false);
 
         exit(true);
     end;
 
-    local procedure IsConsolidationEligible(var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary;var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary): Boolean
+    local procedure IsConsolidationEligible(var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary; var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary): Boolean
     begin
         if not GlobalBlueParameters."Consolidation Allowed" then
-          exit(false);
+            exit(false);
 
         if not tmpTaxFreeConsolidation.FindSet then
-          exit(false);
+            exit(false);
 
         if GlobalBlueParameters."Consolidation Separate Limits" then
-          exit(IsConsolidationEligibleSeperate(tmpTaxFreeConsolidation, tmpEligibleServices))
+            exit(IsConsolidationEligibleSeperate(tmpTaxFreeConsolidation, tmpEligibleServices))
         else
-          exit(IsConsolidationEligibleShared(tmpTaxFreeConsolidation, tmpEligibleServices));
+            exit(IsConsolidationEligibleShared(tmpTaxFreeConsolidation, tmpEligibleServices));
     end;
 
-    local procedure IsConsolidationEligibleSeperate(var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary;var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary): Boolean
+    local procedure IsConsolidationEligibleSeperate(var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary; var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary): Boolean
     var
         tmpSharedEligibleServices: Record "Tax Free GB I2 Service" temporary;
         First: Boolean;
@@ -1395,87 +1414,87 @@ codeunit 6014613 "Tax Free GB I2"
 
         First := true;
         repeat
-          Eligible := IsStoredSaleEligible(tmpTaxFreeConsolidation."Sales Ticket No.", tmpEligibleServices);
+            Eligible := IsStoredSaleEligible(tmpTaxFreeConsolidation."Sales Ticket No.", tmpEligibleServices);
 
-          if Eligible then begin
-            tmpEligibleServices.FindSet;
-            repeat
-              if First then begin
-                tmpSharedEligibleServices.Init;
-                tmpSharedEligibleServices.TransferFields(tmpEligibleServices);
-                tmpSharedEligibleServices.Insert;
-              end else begin
-                if not tmpSharedEligibleServices.Get(tmpEligibleServices."Tax Free Unit", tmpEligibleServices."Service ID") then begin
-                  if FilterString <> '' then
-                    FilterString += '&';
-                  FilterString += '<>' + Format(tmpEligibleServices."Service ID");
+            if Eligible then begin
+                tmpEligibleServices.FindSet;
+                repeat
+                    if First then begin
+                        tmpSharedEligibleServices.Init;
+                        tmpSharedEligibleServices.TransferFields(tmpEligibleServices);
+                        tmpSharedEligibleServices.Insert;
+                    end else begin
+                        if not tmpSharedEligibleServices.Get(tmpEligibleServices."Tax Free Unit", tmpEligibleServices."Service ID") then begin
+                            if FilterString <> '' then
+                                FilterString += '&';
+                            FilterString += '<>' + Format(tmpEligibleServices."Service ID");
+                        end;
+                    end;
+                until tmpEligibleServices.Next = 0;
+
+                if FilterString <> '' then begin
+                    //Delete every non-shared service
+                    tmpSharedEligibleServices.SetFilter("Service ID", FilterString);
+                    tmpSharedEligibleServices.DeleteAll;
+                    tmpSharedEligibleServices.SetRange("Service ID");
                 end;
-              end;
-            until tmpEligibleServices.Next = 0;
-
-            if FilterString <> '' then begin
-              //Delete every non-shared service
-              tmpSharedEligibleServices.SetFilter("Service ID", FilterString);
-              tmpSharedEligibleServices.DeleteAll;
-              tmpSharedEligibleServices.SetRange("Service ID");
             end;
-          end;
 
-          First := false;
-          tmpEligibleServices.DeleteAll;
-          Clear(tmpEligibleServices);
-          Clear(FilterString);
-          Eligible := Eligible and (not tmpSharedEligibleServices.IsEmpty);
+            First := false;
+            tmpEligibleServices.DeleteAll;
+            Clear(tmpEligibleServices);
+            Clear(FilterString);
+            Eligible := Eligible and (not tmpSharedEligibleServices.IsEmpty);
         until (tmpTaxFreeConsolidation.Next = 0) or (not Eligible);
 
         if Eligible then
-          tmpEligibleServices.Copy(tmpSharedEligibleServices, true);
+            tmpEligibleServices.Copy(tmpSharedEligibleServices, true);
 
         exit(Eligible);
     end;
 
-    local procedure IsConsolidationEligibleShared(var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary;var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary): Boolean
+    local procedure IsConsolidationEligibleShared(var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary; var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary): Boolean
     var
         AuditRoll: Record "Audit Roll";
         SalesAmount: Decimal;
         Item: Record Item;
     begin
         repeat
-          AuditRoll.Reset;
-          Clear(AuditRoll);
+            AuditRoll.Reset;
+            Clear(AuditRoll);
 
-          AuditRoll.SetRange("Sales Ticket No.", tmpTaxFreeConsolidation."Sales Ticket No.");
-          AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-          AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-          AuditRoll.SetFilter(Quantity, '>0');
-          AuditRoll.SetFilter("VAT %", '>0');
+            AuditRoll.SetRange("Sales Ticket No.", tmpTaxFreeConsolidation."Sales Ticket No.");
+            AuditRoll.SetRange(Type, AuditRoll.Type::Item);
+            AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
+            AuditRoll.SetFilter(Quantity, '>0');
+            AuditRoll.SetFilter("VAT %", '>0');
 
-          if not AuditRoll.FindSet then
-            exit(false);
+            if not AuditRoll.FindSet then
+                exit(false);
 
-          if CalcDate(GlobalBlueParameters."Voucher Issue Date Limit", AuditRoll."Sale Date") < Today then
-            exit(false);
+            if CalcDate(GlobalBlueParameters."Voucher Issue Date Limit", AuditRoll."Sale Date") < Today then
+                exit(false);
 
-          if GlobalBlueParameters."Count Zero VAT Goods For Limit" then
-            AuditRoll.SetRange("VAT %");
+            if GlobalBlueParameters."Count Zero VAT Goods For Limit" then
+                AuditRoll.SetRange("VAT %");
 
-          if GlobalBlueParameters."Services Eligible" then begin
-            AuditRoll.CalcSums("Amount Including VAT");
-            SalesAmount += AuditRoll."Amount Including VAT";
-          end else begin
-            repeat
-              Item.Get(AuditRoll."No.");
-              if Item.Type = Item.Type::Inventory then
+            if GlobalBlueParameters."Services Eligible" then begin
+                AuditRoll.CalcSums("Amount Including VAT");
                 SalesAmount += AuditRoll."Amount Including VAT";
-            until AuditRoll.Next = 0;
-          end;
+            end else begin
+                repeat
+                    Item.Get(AuditRoll."No.");
+                    if Item.Type = Item.Type::Inventory then
+                        SalesAmount += AuditRoll."Amount Including VAT";
+                until AuditRoll.Next = 0;
+            end;
         until tmpTaxFreeConsolidation.Next = 0;
 
         GetEligibleServices(SalesAmount, tmpEligibleServices);
         exit(not tmpEligibleServices.IsEmpty);
     end;
 
-    local procedure IsStoredSaleEligible(SalesTicketNo: Text;var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary): Boolean
+    local procedure IsStoredSaleEligible(SalesTicketNo: Text; var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary): Boolean
     var
         AuditRoll: Record "Audit Roll";
         SaleAmount: Decimal;
@@ -1489,30 +1508,30 @@ codeunit 6014613 "Tax Free GB I2"
         AuditRoll.SetFilter("VAT %", '>0');
 
         if not AuditRoll.FindSet then
-          exit(false);
+            exit(false);
 
         if CalcDate(GlobalBlueParameters."Voucher Issue Date Limit", AuditRoll."Sale Date") < Today then
-          exit(false);
+            exit(false);
 
         if GlobalBlueParameters."Count Zero VAT Goods For Limit" then
-          AuditRoll.SetRange("VAT %");
+            AuditRoll.SetRange("VAT %");
 
         if GlobalBlueParameters."Services Eligible" then begin
-          AuditRoll.CalcSums("Amount Including VAT");
-          SaleAmount := AuditRoll."Amount Including VAT";
+            AuditRoll.CalcSums("Amount Including VAT");
+            SaleAmount := AuditRoll."Amount Including VAT";
         end else begin
-          repeat
-            Item.Get(AuditRoll."No.");
-            if Item.Type = Item.Type::Inventory then
-              SaleAmount += AuditRoll."Amount Including VAT";
-          until AuditRoll.Next = 0;
+            repeat
+                Item.Get(AuditRoll."No.");
+                if Item.Type = Item.Type::Inventory then
+                    SaleAmount += AuditRoll."Amount Including VAT";
+            until AuditRoll.Next = 0;
         end;
 
         GetEligibleServices(SaleAmount, tmpEligibleServices);
         exit(not tmpEligibleServices.IsEmpty);
     end;
 
-    local procedure IsActiveSaleEligible(SalesTicketNo: Text;var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary): Boolean
+    local procedure IsActiveSaleEligible(SalesTicketNo: Text; var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary): Boolean
     var
         SaleLinePOS: Record "Sale Line POS";
         Item: Record Item;
@@ -1526,69 +1545,71 @@ codeunit 6014613 "Tax Free GB I2"
         SaleLinePOS.SetFilter("VAT %", '>0');
 
         if not SaleLinePOS.FindSet then
-          exit(false);
+            exit(false);
 
         SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
         if CalcDate(GlobalBlueParameters."Voucher Issue Date Limit", SalePOS.Date) < Today then
-          exit(false);
+            exit(false);
 
         if GlobalBlueParameters."Count Zero VAT Goods For Limit" then
-          SaleLinePOS.SetRange("VAT %");
+            SaleLinePOS.SetRange("VAT %");
 
         if GlobalBlueParameters."Services Eligible" then begin
-          SaleLinePOS.CalcSums("Amount Including VAT");
-          SaleAmount := SaleLinePOS."Amount Including VAT";
+            SaleLinePOS.CalcSums("Amount Including VAT");
+            SaleAmount := SaleLinePOS."Amount Including VAT";
         end else begin
-          repeat
-            Item.Get(SaleLinePOS."No.");
-            if Item.Type = Item.Type::Inventory then
-              SaleAmount += SaleLinePOS."Amount Including VAT";
-          until SaleLinePOS.Next = 0;
+            repeat
+                Item.Get(SaleLinePOS."No.");
+                if Item.Type = Item.Type::Inventory then
+                    SaleAmount += SaleLinePOS."Amount Including VAT";
+            until SaleLinePOS.Next = 0;
         end;
 
         GetEligibleServices(SaleAmount, tmpEligibleServices);
         exit(not tmpEligibleServices.IsEmpty);
     end;
 
-    local procedure GetEligibleServices(SaleAmount: Decimal;var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary)
+    local procedure GetEligibleServices(SaleAmount: Decimal; var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary)
     begin
-        if GlobalBlueServices.FindSet then repeat
-          if (GlobalBlueServices."Minimum Purchase Amount" <> 0) and (GlobalBlueServices."Maximum Purchase Amount" <> 0) then begin //Both upper and lower bound
-            if (GlobalBlueServices."Minimum Purchase Amount" <= SaleAmount) and (SaleAmount <= GlobalBlueServices."Maximum Purchase Amount") then begin
-              tmpEligibleServices.Init;
-              tmpEligibleServices.TransferFields(GlobalBlueServices);
-              tmpEligibleServices.Insert;
-            end;
-          end else if (GlobalBlueServices."Maximum Purchase Amount" = 0) then begin //Only lower bound
-            if (GlobalBlueServices."Minimum Purchase Amount" <= SaleAmount) then begin
-              tmpEligibleServices.Init;
-              tmpEligibleServices.TransferFields(GlobalBlueServices);
-              tmpEligibleServices.Insert;
-            end;
-          end else begin //Only upper bound
-            if ( SaleAmount <= GlobalBlueServices."Maximum Purchase Amount") then begin
-              tmpEligibleServices.Init;
-              tmpEligibleServices.TransferFields(GlobalBlueServices);
-              tmpEligibleServices.Insert;
-            end;
-          end;
-        until GlobalBlueServices.Next = 0;
+        if GlobalBlueServices.FindSet then
+            repeat
+                if (GlobalBlueServices."Minimum Purchase Amount" <> 0) and (GlobalBlueServices."Maximum Purchase Amount" <> 0) then begin //Both upper and lower bound
+                    if (GlobalBlueServices."Minimum Purchase Amount" <= SaleAmount) and (SaleAmount <= GlobalBlueServices."Maximum Purchase Amount") then begin
+                        tmpEligibleServices.Init;
+                        tmpEligibleServices.TransferFields(GlobalBlueServices);
+                        tmpEligibleServices.Insert;
+                    end;
+                end else
+                    if (GlobalBlueServices."Maximum Purchase Amount" = 0) then begin //Only lower bound
+                        if (GlobalBlueServices."Minimum Purchase Amount" <= SaleAmount) then begin
+                            tmpEligibleServices.Init;
+                            tmpEligibleServices.TransferFields(GlobalBlueServices);
+                            tmpEligibleServices.Insert;
+                        end;
+                    end else begin //Only upper bound
+                        if (SaleAmount <= GlobalBlueServices."Maximum Purchase Amount") then begin
+                            tmpEligibleServices.Init;
+                            tmpEligibleServices.TransferFields(GlobalBlueServices);
+                            tmpEligibleServices.Insert;
+                        end;
+                    end;
+            until GlobalBlueServices.Next = 0;
     end;
 
     local procedure SelectService(var tmpEligibleServices: Record "Tax Free GB I2 Service" temporary): Integer
     begin
         if tmpEligibleServices.Count = 1 then
-          exit(tmpEligibleServices."Service ID");
+            exit(tmpEligibleServices."Service ID");
 
         tmpEligibleServices.FindSet;
         //-NPR5.49 [293106]
         //IF PAGE.RUNMODAL(PAGE::"Generic Filter Page", tmpEligibleServices) <> ACTION::LookupOK THEN BEGIN
         if PAGE.RunModal(PAGE::"Tax Free GB I2 Service Select", tmpEligibleServices) <> ACTION::LookupOK then begin
-        //+NPR5.49 [293106]
-          if Confirm(Caption_CancelOperation) then
-            Error(Error_UserCancel)
-          else
-            exit(SelectService(tmpEligibleServices));
+            //+NPR5.49 [293106]
+            if Confirm(Caption_CancelOperation) then
+                Error(Error_UserCancel)
+            else
+                exit(SelectService(tmpEligibleServices));
         end;
 
         exit(tmpEligibleServices."Service ID");
@@ -1605,34 +1626,34 @@ codeunit 6014613 "Tax Free GB I2"
         XML := '<PurchaseDetails>';
         tmpTaxFreeConsolidation.FindSet;
         repeat
-          AuditRoll.Reset;
-          Clear(AuditRoll);
-          AuditRoll.SetRange("Sales Ticket No.", tmpTaxFreeConsolidation."Sales Ticket No.");
-          AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
-          AuditRoll.SetRange(Type, AuditRoll.Type::Item);
-          AuditRoll.SetFilter(Quantity, '>0');
-          //AuditRoll.SETFILTER("VAT %", '>0');
-          AuditRoll.FindSet;
+            AuditRoll.Reset;
+            Clear(AuditRoll);
+            AuditRoll.SetRange("Sales Ticket No.", tmpTaxFreeConsolidation."Sales Ticket No.");
+            AuditRoll.SetRange("Sale Type", AuditRoll."Sale Type"::Sale);
+            AuditRoll.SetRange(Type, AuditRoll.Type::Item);
+            AuditRoll.SetFilter(Quantity, '>0');
+            //AuditRoll.SETFILTER("VAT %", '>0');
+            AuditRoll.FindSet;
 
-          XML += '<Receipt>';
-          XML += StrSubstNo('<ReceiptDateTime>%1</ReceiptDateTime>', Format(CreateDateTime(AuditRoll."Sale Date", AuditRoll."Closing Time"), 0, 9));
-          XML += StrSubstNo('<ReceiptNumber>%1</ReceiptNumber>', Format(AuditRoll."Sales Ticket No.", 0, 9));
-          XML += '<PurchaseItems>';
-          repeat
-            Item.Get(AuditRoll."No.");
-            if (Item.Type = Item.Type::Inventory) or (GlobalBlueParameters."Services Eligible") then
-              XML +=
-              '<PurchaseItem>' +
-                '<VATRate>' + Format(AuditRoll."VAT %",0,'<Precision,2:2><Standard Format,2>') + '</VATRate>' +
-                '<GrossAmount>' + Format(AuditRoll."Amount Including VAT",0,'<Precision,2:2><Standard Format,2>') + '</GrossAmount>' +
-                '<VATAmount>' + Format(AuditRoll."Amount Including VAT" - AuditRoll.Amount,0,'<Precision,2:2><Standard Format,2>') + '</VATAmount>' +
-                '<NetAmount>' + Format(AuditRoll.Amount,0,'<Precision,2:2><Standard Format,2>') + '</NetAmount>' +
-                '<Quantity>' + Format(Round(AuditRoll.Quantity,1,'>')) + '</Quantity>' + //Round up - They only accept integer quantity
-                '<GoodDescription>' + Format(CopyStr(EscapeSpecialChars(AuditRoll.Description), 1, 50)) + '</GoodDescription>' +
-              '</PurchaseItem>';
-          until AuditRoll.Next = 0;
-          XML += '</PurchaseItems>';
-          XML += '</Receipt>';
+            XML += '<Receipt>';
+            XML += StrSubstNo('<ReceiptDateTime>%1</ReceiptDateTime>', Format(CreateDateTime(AuditRoll."Sale Date", AuditRoll."Closing Time"), 0, 9));
+            XML += StrSubstNo('<ReceiptNumber>%1</ReceiptNumber>', Format(AuditRoll."Sales Ticket No.", 0, 9));
+            XML += '<PurchaseItems>';
+            repeat
+                Item.Get(AuditRoll."No.");
+                if (Item.Type = Item.Type::Inventory) or (GlobalBlueParameters."Services Eligible") then
+                    XML +=
+                    '<PurchaseItem>' +
+                      '<VATRate>' + Format(AuditRoll."VAT %", 0, '<Precision,2:2><Standard Format,2>') + '</VATRate>' +
+                      '<GrossAmount>' + Format(AuditRoll."Amount Including VAT", 0, '<Precision,2:2><Standard Format,2>') + '</GrossAmount>' +
+                      '<VATAmount>' + Format(AuditRoll."Amount Including VAT" - AuditRoll.Amount, 0, '<Precision,2:2><Standard Format,2>') + '</VATAmount>' +
+                      '<NetAmount>' + Format(AuditRoll.Amount, 0, '<Precision,2:2><Standard Format,2>') + '</NetAmount>' +
+                      '<Quantity>' + Format(Round(AuditRoll.Quantity, 1, '>')) + '</Quantity>' + //Round up - They only accept integer quantity
+                      '<GoodDescription>' + Format(CopyStr(EscapeSpecialChars(AuditRoll.Description), 1, 50)) + '</GoodDescription>' +
+                    '</PurchaseItem>';
+            until AuditRoll.Next = 0;
+            XML += '</PurchaseItems>';
+            XML += '</Receipt>';
         until tmpTaxFreeConsolidation.Next = 0;
         XML += '</PurchaseDetails>';
 
@@ -1650,76 +1671,76 @@ codeunit 6014613 "Tax Free GB I2"
         XML: Text;
     begin
         if (tmpCustomerInfoCapture."Global Blue Identifier" <> '') and (tmpCustomerInfoCapture."Is Identity Checked") then begin
-          //Verified autofill - nothing else is required.
-          XML := '<Traveller>' +
-                   '<IsIdentityChecked>true</IsIdentityChecked>' +
-                 '</Traveller>' +
-                 '<TravellerIdentifier>' +
-                   StrSubstNo('<IdentifierLookupValue>%1</IdentifierLookupValue>', EscapeSpecialChars(tmpCustomerInfoCapture."Global Blue Identifier")) +
-                 '</TravellerIdentifier>';
-          exit(XML);
+            //Verified autofill - nothing else is required.
+            XML := '<Traveller>' +
+                     '<IsIdentityChecked>true</IsIdentityChecked>' +
+                   '</Traveller>' +
+                   '<TravellerIdentifier>' +
+                     StrSubstNo('<IdentifierLookupValue>%1</IdentifierLookupValue>', EscapeSpecialChars(tmpCustomerInfoCapture."Global Blue Identifier")) +
+                   '</TravellerIdentifier>';
+            exit(XML);
         end;
 
         XML += '<Traveller>';
-          if tmpCustomerInfoCapture."First Name" <> '' then
+        if tmpCustomerInfoCapture."First Name" <> '' then
             XML += StrSubstNo('<FirstName>%1</FirstName>', EscapeSpecialChars(tmpCustomerInfoCapture."First Name"));
-          if tmpCustomerInfoCapture."Last Name" <> '' then
+        if tmpCustomerInfoCapture."Last Name" <> '' then
             XML += StrSubstNo('<LastName>%1</LastName>', EscapeSpecialChars(tmpCustomerInfoCapture."Last Name"));
-          if tmpCustomerInfoCapture."E-mail" <> '' then
+        if tmpCustomerInfoCapture."E-mail" <> '' then
             XML += StrSubstNo('<Email>%1</Email>', EscapeSpecialChars(tmpCustomerInfoCapture."E-mail"));
-          if tmpCustomerInfoCapture."Date Of Birth" <> 0D then
+        if tmpCustomerInfoCapture."Date Of Birth" <> 0D then
             XML += StrSubstNo('<DateOfBirth>%1</DateOfBirth>', EscapeSpecialChars(Format(tmpCustomerInfoCapture."Date Of Birth", 0, 9)));
-          if tmpCustomerInfoCapture."Global Blue Identifier" <> '' then //We have an identifier attached but manual entry was still used.
+        if tmpCustomerInfoCapture."Global Blue Identifier" <> '' then //We have an identifier attached but manual entry was still used.
             XML += '<IsIdentityChecked>false</IsIdentityChecked>';
 
-          if (tmpCustomerInfoCapture."Passport Number" <> '') or (tmpCustomerInfoCapture."Passport Country Code" <> 0) then begin
+        if (tmpCustomerInfoCapture."Passport Number" <> '') or (tmpCustomerInfoCapture."Passport Country Code" <> 0) then begin
             XML += '<Passport>';
-              if tmpCustomerInfoCapture."Passport Number" <> '' then
+            if tmpCustomerInfoCapture."Passport Number" <> '' then
                 XML += StrSubstNo('<PassportNumber>%1</PassportNumber>', EscapeSpecialChars(tmpCustomerInfoCapture."Passport Number"));
-              if tmpCustomerInfoCapture."Passport Country Code" <> 0 then
+            if tmpCustomerInfoCapture."Passport Country Code" <> 0 then
                 XML += StrSubstNo('<PassportCountryCode>%1</PassportCountryCode>', Format(tmpCustomerInfoCapture."Passport Country Code"));
             XML += '</Passport>';
-          end;
+        end;
 
-          if (tmpCustomerInfoCapture."Departure Date" <> 0D) or (tmpCustomerInfoCapture."Arrival Date" <> 0D) or (tmpCustomerInfoCapture."Final Destination Country Code" <> 0) then begin
+        if (tmpCustomerInfoCapture."Departure Date" <> 0D) or (tmpCustomerInfoCapture."Arrival Date" <> 0D) or (tmpCustomerInfoCapture."Final Destination Country Code" <> 0) then begin
             XML += '<TravelDetails>';
-              if tmpCustomerInfoCapture."Departure Date" <> 0D then
+            if tmpCustomerInfoCapture."Departure Date" <> 0D then
                 XML += StrSubstNo('<DepartureDate>%1</DepartureDate>', EscapeSpecialChars(Format(tmpCustomerInfoCapture."Departure Date", 0, 9)));
-              if tmpCustomerInfoCapture."Arrival Date" <> 0D then
+            if tmpCustomerInfoCapture."Arrival Date" <> 0D then
                 XML += StrSubstNo('<ArrivalDate>%1</ArrivalDate>', EscapeSpecialChars(Format(tmpCustomerInfoCapture."Arrival Date", 0, 9)));
-              if tmpCustomerInfoCapture."Final Destination Country Code" <> 0 then
+            if tmpCustomerInfoCapture."Final Destination Country Code" <> 0 then
                 XML += StrSubstNo('<FinalDestinationCountryCode>%1</FinalDestinationCountryCode>', Format(tmpCustomerInfoCapture."Final Destination Country Code"));
             XML += '</TravelDetails>';
-          end;
+        end;
 
-          if (tmpCustomerInfoCapture."Postal Code" <> '') or
-             (tmpCustomerInfoCapture.Street <> '') or
-             (tmpCustomerInfoCapture."Country Of Residence Code" <> 0) or
-             (tmpCustomerInfoCapture.Town <> '')
-              then begin
+        if (tmpCustomerInfoCapture."Postal Code" <> '') or
+           (tmpCustomerInfoCapture.Street <> '') or
+           (tmpCustomerInfoCapture."Country Of Residence Code" <> 0) or
+           (tmpCustomerInfoCapture.Town <> '')
+            then begin
             XML += '<Address>';
-              if tmpCustomerInfoCapture."Postal Code" <> '' then
+            if tmpCustomerInfoCapture."Postal Code" <> '' then
                 XML += StrSubstNo('<PostalCode>%1</PostalCode>', EscapeSpecialChars(tmpCustomerInfoCapture."Postal Code"));
-              if tmpCustomerInfoCapture.Street <> '' then
+            if tmpCustomerInfoCapture.Street <> '' then
                 XML += StrSubstNo('<Street>%1</Street>', EscapeSpecialChars(tmpCustomerInfoCapture.Street));
-              if tmpCustomerInfoCapture."Country Of Residence Code" <> 0 then
+            if tmpCustomerInfoCapture."Country Of Residence Code" <> 0 then
                 XML += StrSubstNo('<CountryCode>%1</CountryCode>', Format(tmpCustomerInfoCapture."Country Of Residence Code"));
-              if tmpCustomerInfoCapture.Town <> '' then
+            if tmpCustomerInfoCapture.Town <> '' then
                 XML += StrSubstNo('<Town>%1</Town>', EscapeSpecialChars(tmpCustomerInfoCapture.Town));
             XML += '</Address>'
-          end;
+        end;
 
-          if tmpCustomerInfoCapture."Mobile No." <> '' then //Docs doesn't specify if this should also be prefixed with 00 and country prefix.
+        if tmpCustomerInfoCapture."Mobile No." <> '' then //Docs doesn't specify if this should also be prefixed with 00 and country prefix.
             if tmpCustomerInfoCapture."Mobile No. Prefix" <> 0 then
-              XML += StrSubstNo('<MobileNumber>%1</MobileNumber>', EscapeSpecialChars('00' + Format(tmpCustomerInfoCapture."Mobile No. Prefix") + tmpCustomerInfoCapture."Mobile No."))
+                XML += StrSubstNo('<MobileNumber>%1</MobileNumber>', EscapeSpecialChars('00' + Format(tmpCustomerInfoCapture."Mobile No. Prefix") + tmpCustomerInfoCapture."Mobile No."))
             else
-              XML += StrSubstNo('<MobileNumber>%1</MobileNumber>', EscapeSpecialChars('00' + tmpCustomerInfoCapture."Mobile No."));
+                XML += StrSubstNo('<MobileNumber>%1</MobileNumber>', EscapeSpecialChars('00' + tmpCustomerInfoCapture."Mobile No."));
         XML += '</Traveller>';
 
         if (tmpCustomerInfoCapture."Global Blue Identifier" <> '') then
-          XML += '<TravellerIdentifier>' +
-                   StrSubstNo('<IdentifierLookupValue>%1</IdentifierLookupValue>', EscapeSpecialChars(tmpCustomerInfoCapture."Global Blue Identifier")) +
-                 '</TravellerIdentifier>';
+            XML += '<TravellerIdentifier>' +
+                     StrSubstNo('<IdentifierLookupValue>%1</IdentifierLookupValue>', EscapeSpecialChars(tmpCustomerInfoCapture."Global Blue Identifier")) +
+                   '</TravellerIdentifier>';
 
         exit(XML);
     end;
@@ -1735,30 +1756,30 @@ codeunit 6014613 "Tax Free GB I2"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnLookupHandlerParameters', '', false, false)]
-    local procedure OnLookupHandlerParameter(TaxFreeUnit: Record "Tax Free POS Unit";var Handled: Boolean;var tmpHandlerParameters: Record "Tax Free Handler Parameters" temporary)
+    local procedure OnLookupHandlerParameter(TaxFreeUnit: Record "Tax Free POS Unit"; var Handled: Boolean; var tmpHandlerParameters: Record "Tax Free Handler Parameters" temporary)
     begin
         if not TaxFreeUnit.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Error(Error_NotSupported, TaxFreeUnit."Handler ID");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnSetUnitParameters', '', false, false)]
-    local procedure OnSetUnitParameters(TaxFreeUnit: Record "Tax Free POS Unit";var Handled: Boolean)
+    local procedure OnSetUnitParameters(TaxFreeUnit: Record "Tax Free POS Unit"; var Handled: Boolean)
     var
         GlobalBlueParameters: Record "Tax Free GB I2 Parameter";
         GlobalBlueParameterPage: Page "Tax Free GB I2 Parameters";
     begin
-        if not TaxFreeUnit.IsThisHandler(HandlerID)then
-          exit;
+        if not TaxFreeUnit.IsThisHandler(HandlerID) then
+            exit;
 
         Handled := true;
 
         if not GlobalBlueParameters.Get(TaxFreeUnit."POS Unit No.") then begin
-          GlobalBlueParameters.Init;
-          GlobalBlueParameters."Tax Free Unit" := TaxFreeUnit."POS Unit No.";
-          GlobalBlueParameters.Insert;
-          Commit;
+            GlobalBlueParameters.Init;
+            GlobalBlueParameters."Tax Free Unit" := TaxFreeUnit."POS Unit No.";
+            GlobalBlueParameters.Insert;
+            Commit;
         end;
 
         GlobalBlueParameterPage.SetRecord(GlobalBlueParameters);
@@ -1767,14 +1788,14 @@ codeunit 6014613 "Tax Free GB I2"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnUnitAutoConfigure', '', false, false)]
-    local procedure OnUnitAutoConfigure(var TaxFreeRequest: Record "Tax Free Request";Silent: Boolean;var Handled: Boolean)
+    local procedure OnUnitAutoConfigure(var TaxFreeRequest: Record "Tax Free Request"; Silent: Boolean; var Handled: Boolean)
     var
         GetCountriesJob: Codeunit "Tax Free GB I2 GetCountries";
         GetBlockedCountriesJob: Codeunit "Tax Free GB I2 GetBCountries";
         GetIINBlacklistJob: Codeunit "Tax Free GB I2 GetBlockedIIN";
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
 
@@ -1783,20 +1804,20 @@ codeunit 6014613 "Tax Free GB I2"
         DownloadDeskConfiguration(TaxFreeRequest);
 
         if not Silent then begin
-          if not GetCountriesJob.IsScheduled() then
-            GetCountriesJob.Schedule();
-          if not GetBlockedCountriesJob.IsScheduled() then
-            GetBlockedCountriesJob.Schedule();
-          if not GetIINBlacklistJob.IsScheduled() then
-            GetIINBlacklistJob.Schedule();
+            if not GetCountriesJob.IsScheduled() then
+                GetCountriesJob.Schedule();
+            if not GetBlockedCountriesJob.IsScheduled() then
+                GetBlockedCountriesJob.Schedule();
+            if not GetIINBlacklistJob.IsScheduled() then
+                GetIINBlacklistJob.Schedule();
         end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnUnitTestConnection', '', false, false)]
-    local procedure OnUnitTestConnection(var TaxFreeRequest: Record "Tax Free Request";var Handled: Boolean)
+    local procedure OnUnitTestConnection(var TaxFreeRequest: Record "Tax Free Request"; var Handled: Boolean)
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
 
@@ -1806,21 +1827,21 @@ codeunit 6014613 "Tax Free GB I2"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherIssueFromPOSSale', '', false, false)]
-    local procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "Tax Free Request";SalesReceiptNo: Code[20];var Handled: Boolean;var SkipRecordHandling: Boolean)
+    local procedure OnVoucherIssueFromPOSSale(var TaxFreeRequest: Record "Tax Free Request"; SalesReceiptNo: Code[20]; var Handled: Boolean; var SkipRecordHandling: Boolean)
     var
         tmpEligibleServices: Record "Tax Free GB I2 Service" temporary;
         tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary;
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         InitializeHandler(TaxFreeRequest);
 
         if not IsStoredSaleEligible(SalesReceiptNo, tmpEligibleServices) then
-          Error(Error_Ineligible);
+            Error(Error_Ineligible);
         if tmpEligibleServices.IsEmpty then
-          Error(Error_Ineligible);
+            Error(Error_Ineligible);
 
         tmpTaxFreeConsolidation.Init;
         tmpTaxFreeConsolidation."Sales Ticket No." := SalesReceiptNo;
@@ -1830,10 +1851,10 @@ codeunit 6014613 "Tax Free GB I2"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherVoid', '', false, false)]
-    local procedure OnVoucherVoid(var TaxFreeRequest: Record "Tax Free Request";TaxFreeVoucher: Record "Tax Free Voucher";var Handled: Boolean)
+    local procedure OnVoucherVoid(var TaxFreeRequest: Record "Tax Free Request"; TaxFreeVoucher: Record "Tax Free Voucher"; var Handled: Boolean)
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         InitializeHandler(TaxFreeRequest);
@@ -1841,10 +1862,10 @@ codeunit 6014613 "Tax Free GB I2"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherReissue', '', false, false)]
-    local procedure OnVoucherReissue(var TaxFreeRequest: Record "Tax Free Request";TaxFreeVoucher: Record "Tax Free Voucher";var Handled: Boolean)
+    local procedure OnVoucherReissue(var TaxFreeRequest: Record "Tax Free Request"; TaxFreeVoucher: Record "Tax Free Voucher"; var Handled: Boolean)
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         InitializeHandler(TaxFreeRequest);
@@ -1852,54 +1873,54 @@ codeunit 6014613 "Tax Free GB I2"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherLookup', '', false, false)]
-    local procedure OnVoucherLookup(var TaxFreeRequest: Record "Tax Free Request";VoucherNo: Text;var Handled: Boolean)
+    local procedure OnVoucherLookup(var TaxFreeRequest: Record "Tax Free Request"; VoucherNo: Text; var Handled: Boolean)
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         Error(Error_NotSupported, TaxFreeRequest."Handler ID");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherPrint', '', false, false)]
-    local procedure OnVoucherPrint(var TaxFreeRequest: Record "Tax Free Request";TaxFreeVoucher: Record "Tax Free Voucher";IsRecentVoucher: Boolean;var Handled: Boolean)
+    local procedure OnVoucherPrint(var TaxFreeRequest: Record "Tax Free Request"; TaxFreeVoucher: Record "Tax Free Voucher"; IsRecentVoucher: Boolean; var Handled: Boolean)
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         if not IsRecentVoucher then //I2 only allows for reprint of recent voucher which is stored for the session. This can either be a just-issued voucher or a print-last attempt.
-          Error(Error_NotSupported, TaxFreeRequest."Handler ID");
+            Error(Error_NotSupported, TaxFreeRequest."Handler ID");
 
         ClearLastError;
         if not TryPrintVoucher(TaxFreeRequest) then
-          Error(Error_PrintFail, TaxFreeVoucher."External Voucher No.", GetLastErrorText);
+            Error(Error_PrintFail, TaxFreeVoucher."External Voucher No.", GetLastErrorText);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnVoucherConsolidate', '', false, false)]
-    local procedure OnVoucherConsolidate(var TaxFreeRequest: Record "Tax Free Request";var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary;var Handled: Boolean)
+    local procedure OnVoucherConsolidate(var TaxFreeRequest: Record "Tax Free Request"; var tmpTaxFreeConsolidation: Record "Tax Free Consolidation" temporary; var Handled: Boolean)
     var
         tmpEligibleServices: Record "Tax Free GB I2 Service" temporary;
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         InitializeHandler(TaxFreeRequest);
 
         if not IsConsolidationEligible(tmpTaxFreeConsolidation, tmpEligibleServices) then
-          Error(Error_ConsolidationEligible);
+            Error(Error_ConsolidationEligible);
         if tmpEligibleServices.IsEmpty then
-          Error(Error_ConsolidationEligible);
+            Error(Error_ConsolidationEligible);
 
         IssueVoucher(TaxFreeRequest, tmpTaxFreeConsolidation, tmpEligibleServices);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnIsValidTerminalIIN', '', false, false)]
-    local procedure OnIsValidTerminalIIN(var TaxFreeRequest: Record "Tax Free Request";MaskedCardNo: Text;var IsForeignIIN: Boolean;var Handled: Boolean)
+    local procedure OnIsValidTerminalIIN(var TaxFreeRequest: Record "Tax Free Request"; MaskedCardNo: Text; var IsForeignIIN: Boolean; var Handled: Boolean)
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         InitializeHandler(TaxFreeRequest);
@@ -1907,12 +1928,12 @@ codeunit 6014613 "Tax Free GB I2"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnIsActiveSaleEligible', '', false, false)]
-    local procedure OnIsActiveSaleEligible(var TaxFreeRequest: Record "Tax Free Request";SalesTicketNo: Code[20];var Eligible: Boolean;var Handled: Boolean)
+    local procedure OnIsActiveSaleEligible(var TaxFreeRequest: Record "Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean; var Handled: Boolean)
     var
         tmpEligibleServices: Record "Tax Free GB I2 Service" temporary;
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         InitializeHandler(TaxFreeRequest);
@@ -1920,12 +1941,12 @@ codeunit 6014613 "Tax Free GB I2"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, 6014610, 'OnIsStoredSaleEligible', '', false, false)]
-    local procedure OnIsStoredSaleEligible(var TaxFreeRequest: Record "Tax Free Request";SalesTicketNo: Code[20];var Eligible: Boolean;var Handled: Boolean)
+    local procedure OnIsStoredSaleEligible(var TaxFreeRequest: Record "Tax Free Request"; SalesTicketNo: Code[20]; var Eligible: Boolean; var Handled: Boolean)
     var
         tmpEligibleServices: Record "Tax Free GB I2 Service" temporary;
     begin
         if not TaxFreeRequest.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         Handled := true;
         InitializeHandler(TaxFreeRequest);
@@ -1933,16 +1954,16 @@ codeunit 6014613 "Tax Free GB I2"
     end;
 
     [EventSubscriber(ObjectType::Table, 6014641, 'OnAfterDeleteEvent', '', false, false)]
-    local procedure OnAfterTaxFreeUnitDelete(var Rec: Record "Tax Free POS Unit";RunTrigger: Boolean)
+    local procedure OnAfterTaxFreeUnitDelete(var Rec: Record "Tax Free POS Unit"; RunTrigger: Boolean)
     var
         GlobalBlueParameters: Record "Tax Free GB I2 Parameter";
         GlobalBlueServices: Record "Tax Free GB I2 Service";
     begin
         if Rec.IsTemporary or (not RunTrigger) then
-          exit;
+            exit;
 
         if not Rec.IsThisHandler(HandlerID) then
-          exit;
+            exit;
 
         GlobalBlueParameters.SetRange("Tax Free Unit", Rec."POS Unit No.");
         GlobalBlueParameters.DeleteAll(true);

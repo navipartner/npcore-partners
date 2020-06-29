@@ -15,31 +15,31 @@ table 6014664 "Stock-Take Worksheet Line"
 
     fields
     {
-        field(1;"Stock-Take Config Code";Code[10])
+        field(1; "Stock-Take Config Code"; Code[10])
         {
             Caption = 'Stock-Take Conf. Code';
             TableRelation = "Stock-Take Configuration".Code;
         }
-        field(2;"Worksheet Name";Code[10])
+        field(2; "Worksheet Name"; Code[10])
         {
             Caption = 'Worksheet Name';
-            TableRelation = "Stock-Take Worksheet".Name WHERE ("Stock-Take Config Code"=FIELD("Stock-Take Config Code"));
+            TableRelation = "Stock-Take Worksheet".Name WHERE("Stock-Take Config Code" = FIELD("Stock-Take Config Code"));
         }
-        field(3;"Line No.";Integer)
+        field(3; "Line No."; Integer)
         {
             Caption = 'Line No.';
         }
-        field(10;Barcode;Text[30])
+        field(10; Barcode; Text[30])
         {
             Caption = 'Barcode';
 
             trigger OnValidate()
             begin
-                StockTakeMgr.TranslateBarcode (Rec);
-                StockTakeMgr.AssignItemCost (Rec);
+                StockTakeMgr.TranslateBarcode(Rec);
+                StockTakeMgr.AssignItemCost(Rec);
             end;
         }
-        field(11;"Item No.";Code[20])
+        field(11; "Item No."; Code[20])
         {
             Caption = 'Item No.';
             TableRelation = Item."No.";
@@ -48,148 +48,148 @@ table 6014664 "Stock-Take Worksheet Line"
             var
                 Item: Record Item;
             begin
-                Validate ("Variant Code", '');
-                Validate ("Item Translation Source", 0);
+                Validate("Variant Code", '');
+                Validate("Item Translation Source", 0);
 
                 //-NPR5.51
                 if Item.Get("Item No.") then begin
-                  "Item Tracking Code" := Item."Item Tracking Code";
+                    "Item Tracking Code" := Item."Item Tracking Code";
                 end;
                 //+NPR5.51
 
-                StockTakeMgr.AssignItemCost (Rec);
+                StockTakeMgr.AssignItemCost(Rec);
             end;
         }
-        field(12;"Variant Code";Code[10])
+        field(12; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE ("Item No."=FIELD("Item No."));
+            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
 
             trigger OnValidate()
             begin
-                Validate ("Item Translation Source", 0);
+                Validate("Item Translation Source", 0);
             end;
         }
-        field(13;"Qty. (Counted)";Decimal)
+        field(13; "Qty. (Counted)"; Decimal)
         {
             Caption = 'Qty. (Counted)';
         }
-        field(14;"Unit Cost";Decimal)
+        field(14; "Unit Cost"; Decimal)
         {
             Caption = 'Unit Cost';
 
             trigger OnValidate()
             begin
-                StockTakeConfig.Get ("Stock-Take Config Code");
-                StockTakeConfig.TestField ("Allow Unit Cost Change", true);
+                StockTakeConfig.Get("Stock-Take Config Code");
+                StockTakeConfig.TestField("Allow Unit Cost Change", true);
             end;
         }
-        field(15;"Date of Inventory";Date)
+        field(15; "Date of Inventory"; Date)
         {
             Caption = 'Date of Inventory';
         }
-        field(16;Blocked;Boolean)
+        field(16; Blocked; Boolean)
         {
-            CalcFormula = Lookup(Item.Blocked WHERE ("No."=FIELD("Item No.")));
+            CalcFormula = Lookup (Item.Blocked WHERE("No." = FIELD("Item No.")));
             Caption = 'Blocked';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(17;"Require Variant Code";Boolean)
+        field(17; "Require Variant Code"; Boolean)
         {
-            CalcFormula = Exist("Item Variant" WHERE ("Item No."=FIELD("Item No.")));
+            CalcFormula = Exist ("Item Variant" WHERE("Item No." = FIELD("Item No.")));
             Caption = 'Require Variant Code';
             FieldClass = FlowField;
         }
-        field(20;"Shelf  No.";Code[10])
+        field(20; "Shelf  No."; Code[10])
         {
             Caption = 'Shelf  No.';
         }
-        field(34;"Shortcut Dimension 1 Code";Code[20])
+        field(34; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(1));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
 
             trigger OnValidate()
             begin
-                StockTakeMgr.ValidateShortcutDimCode (Rec, 1,"Shortcut Dimension 1 Code", "Dimension Set ID");
+                StockTakeMgr.ValidateShortcutDimCode(Rec, 1, "Shortcut Dimension 1 Code", "Dimension Set ID");
             end;
         }
-        field(35;"Shortcut Dimension 2 Code";Code[20])
+        field(35; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE ("Global Dimension No."=CONST(2));
+            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
 
             trigger OnValidate()
             begin
-                StockTakeMgr.ValidateShortcutDimCode (Rec, 2,"Shortcut Dimension 2 Code", "Dimension Set ID");
+                StockTakeMgr.ValidateShortcutDimCode(Rec, 2, "Shortcut Dimension 2 Code", "Dimension Set ID");
             end;
         }
-        field(50;"Item Translation Source";Integer)
+        field(50; "Item Translation Source"; Integer)
         {
             Caption = 'Item Translation Source';
         }
-        field(60;"Session ID";Guid)
+        field(60; "Session ID"; Guid)
         {
             Caption = 'Session ID';
             Editable = false;
         }
-        field(61;"Session Name";Text[30])
+        field(61; "Session Name"; Text[30])
         {
             Caption = 'Session Name';
         }
-        field(62;"Session DateTime";DateTime)
+        field(62; "Session DateTime"; DateTime)
         {
             Caption = 'Session DateTime';
             Editable = false;
         }
-        field(63;"Transfer State";Option)
+        field(63; "Transfer State"; Option)
         {
             Caption = 'Transfer Option';
             OptionCaption = 'Ready,Ignore,Transferred';
             OptionMembers = READY,IGNORE,TRANSFERRED;
         }
-        field(80;"Item Description";Text[50])
+        field(80; "Item Description"; Text[50])
         {
-            CalcFormula = Lookup(Item.Description WHERE ("No."=FIELD("Item No.")));
+            CalcFormula = Lookup (Item.Description WHERE("No." = FIELD("Item No.")));
             Caption = 'Item Description';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(81;"Variant Description";Text[50])
+        field(81; "Variant Description"; Text[50])
         {
-            CalcFormula = Lookup("Item Variant".Description WHERE (Code=FIELD("Variant Code"),
-                                                                   "Item No."=FIELD("Item No.")));
+            CalcFormula = Lookup ("Item Variant".Description WHERE(Code = FIELD("Variant Code"),
+                                                                   "Item No." = FIELD("Item No.")));
             Caption = 'Variant Description';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(82;"Item Trans. Source Desc.";Text[50])
+        field(82; "Item Trans. Source Desc."; Text[50])
         {
-            CalcFormula = Lookup(AllObj."Object Name" WHERE ("Object Type"=CONST(Table),
-                                                             "Object ID"=FIELD("Item Translation Source")));
+            CalcFormula = Lookup (AllObj."Object Name" WHERE("Object Type" = CONST(Table),
+                                                             "Object ID" = FIELD("Item Translation Source")));
             Caption = 'Item Trans. Source Desc.';
             Editable = false;
             FieldClass = FlowField;
             InitValue = 'Invalid Barcode';
         }
-        field(300;"Qty. (Total Counted)";Decimal)
+        field(300; "Qty. (Total Counted)"; Decimal)
         {
-            CalcFormula = Sum("Stock-Take Worksheet Line"."Qty. (Counted)" WHERE ("Stock-Take Config Code"=FIELD("Stock-Take Config Code"),
-                                                                                  "Item No."=FIELD("Item No."),
-                                                                                  "Variant Code"=FIELD("Variant Code")));
+            CalcFormula = Sum ("Stock-Take Worksheet Line"."Qty. (Counted)" WHERE("Stock-Take Config Code" = FIELD("Stock-Take Config Code"),
+                                                                                  "Item No." = FIELD("Item No."),
+                                                                                  "Variant Code" = FIELD("Variant Code")));
             Caption = 'Qty. (Total Counted)';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(310;"Phys. Inv. Batch Name Filter";Code[20])
+        field(310; "Phys. Inv. Batch Name Filter"; Code[20])
         {
             Caption = 'Phys. Inv. Batch Name Filter';
             FieldClass = FlowFilter;
         }
-        field(480;"Dimension Set ID";Integer)
+        field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
             Editable = false;
@@ -200,7 +200,7 @@ table 6014664 "Stock-Take Worksheet Line"
                 ShowDimensions;
             end;
         }
-        field(500;"Item Tracking Code";Code[10])
+        field(500; "Item Tracking Code"; Code[10])
         {
             Caption = 'Item Tracking Code';
             Editable = false;
@@ -210,14 +210,14 @@ table 6014664 "Stock-Take Worksheet Line"
 
     keys
     {
-        key(Key1;"Stock-Take Config Code","Worksheet Name","Line No.")
+        key(Key1; "Stock-Take Config Code", "Worksheet Name", "Line No.")
         {
         }
-        key(Key2;"Stock-Take Config Code","Worksheet Name","Item No.","Variant Code")
+        key(Key2; "Stock-Take Config Code", "Worksheet Name", "Item No.", "Variant Code")
         {
             SumIndexFields = "Qty. (Counted)";
         }
-        key(Key3;"Item No.","Variant Code")
+        key(Key3; "Item No.", "Variant Code")
         {
         }
     }
@@ -234,31 +234,31 @@ table 6014664 "Stock-Take Worksheet Line"
 
     trigger OnInsert()
     begin
-        TestField ("Stock-Take Config Code");
-        TestField ("Worksheet Name");
+        TestField("Stock-Take Config Code");
+        TestField("Worksheet Name");
 
-        StockTakeWorksheet.Get ("Stock-Take Config Code", "Worksheet Name");
-        StockTakeMgr.ImportPreHandler (StockTakeWorksheet);
+        StockTakeWorksheet.Get("Stock-Take Config Code", "Worksheet Name");
+        StockTakeMgr.ImportPreHandler(StockTakeWorksheet);
 
         "Session DateTime" := CurrentDateTime();
-        "Session ID" := CreateGuid ();
+        "Session ID" := CreateGuid();
 
-        StockTakeMgr.CreateDefaultDim (Rec);
+        StockTakeMgr.CreateDefaultDim(Rec);
     end;
 
     trigger OnModify()
     begin
-        TestField ("Stock-Take Config Code");
-        TestField ("Worksheet Name");
+        TestField("Stock-Take Config Code");
+        TestField("Worksheet Name");
 
         "Session DateTime" := CurrentDateTime();
-        StockTakeMgr.CreateDefaultDim (Rec);
+        StockTakeMgr.CreateDefaultDim(Rec);
     end;
 
     trigger OnRename()
     begin
-        TestField ("Stock-Take Config Code");
-        TestField ("Worksheet Name");
+        TestField("Stock-Take Config Code");
+        TestField("Worksheet Name");
     end;
 
     var
@@ -270,10 +270,10 @@ table 6014664 "Stock-Take Worksheet Line"
     procedure ShowDimensions()
     begin
         "Dimension Set ID" :=
-          DimMgt.EditDimensionSet2(
-            "Dimension Set ID",StrSubstNo('%1 %2 %3',"Stock-Take Config Code","Worksheet Name","Line No."),
-            "Shortcut Dimension 1 Code","Shortcut Dimension 2 Code");
-        Modify ();
+          DimMgt.EditDimensionSet(
+            "Dimension Set ID", StrSubstNo('%1 %2 %3', "Stock-Take Config Code", "Worksheet Name", "Line No."),
+            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
+        Modify();
     end;
 }
 

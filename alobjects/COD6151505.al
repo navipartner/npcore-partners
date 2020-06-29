@@ -368,8 +368,9 @@ codeunit 6151505 "Nc Sync. Mgt."
     procedure InsertImportEntry2(NcImportType: Record "Nc Import Type"; Filename: Text)
     var
         NcImportEntry: Record "Nc Import Entry";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
+        RecRef: RecordRef;
     begin
         //-NC2.12 [313362]
         FileMgt.BLOBImportFromServerFile(TempBlob, Filename);
@@ -384,7 +385,11 @@ codeunit 6151505 "Nc Sync. Mgt."
         //+NC.2.15 [306532]
         NcImportEntry.Imported := false;
         NcImportEntry."Runtime Error" := false;
-        NcImportEntry."Document Source" := TempBlob.Blob;
+
+        RecRef.GetTable(NcImportEntry);
+        TempBlob.ToRecordRef(RecRef, NcImportEntry.FieldNo("Document Source"));
+        RecRef.SetTable(NcImportEntry);
+
         NcImportEntry.Insert(true);
 
         if Erase(Filename) then;
@@ -435,7 +440,7 @@ codeunit 6151505 "Nc Sync. Mgt."
                 //-NC2.16 [313184]
                 if (CurrentDateTime > SyncEndTime) and (SyncEndTime <> 0DT) then
                     exit;
-                //+NC2.16 [313184]
+            //+NC2.16 [313184]
             until ImportEntry.Next = 0;
     end;
 
@@ -479,7 +484,7 @@ codeunit 6151505 "Nc Sync. Mgt."
                 //-NC2.16 [313184]
                 if (CurrentDateTime > SyncEndTime) and (SyncEndTime <> 0DT) then
                     exit;
-                //+NC2.16 [313184]
+            //+NC2.16 [313184]
             until Task.Next = 0;
     end;
 
@@ -534,10 +539,11 @@ codeunit 6151505 "Nc Sync. Mgt."
         ClearLastError;
         Commit;
         //-NC2.23 [369170]
-        asserterror begin
-          NcImportMgt.SendErrorMail(ImportEntry);
-          Commit;
-          Error('');
+        asserterror
+        begin
+            NcImportMgt.SendErrorMail(ImportEntry);
+            Commit;
+            Error('');
         end;
         //+NC2.23 [369170]
     end;
@@ -679,7 +685,7 @@ codeunit 6151505 "Nc Sync. Mgt."
             CutNextLine(ListDirectoryDetails, Details);
             //-NC2.05 [275177]
             Filename := Details;
-            //+NC2.05 [275177]
+        //+NC2.05 [275177]
         until (Filename <> '') or (ListDirectoryDetails = '');
 
         exit((Filename <> '') or (ListDirectoryDetails <> ''));

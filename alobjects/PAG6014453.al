@@ -44,35 +44,35 @@ page 6014453 "Campaign Discount"
             group(General)
             {
                 Caption = 'General';
-                field("Code";Code)
+                field("Code"; Code)
                 {
 
                     trigger OnAssistEdit()
                     begin
                         if AssistEdit(xRec) then
-                          CurrPage.Update;
+                            CurrPage.Update;
                     end;
                 }
-                field(Description;Description)
+                field(Description; Description)
                 {
                     Importance = Promoted;
                 }
-                field("Created Date";"Created Date")
+                field("Created Date"; "Created Date")
                 {
                     Editable = false;
                 }
-                field("Last Date Modified";"Last Date Modified")
+                field("Last Date Modified"; "Last Date Modified")
                 {
                     Caption = 'Last Changed';
                     Editable = false;
                 }
-                field(Status;Status)
+                field(Status; Status)
                 {
                 }
-                field("Block Custom Disc.";"Block Custom Disc.")
+                field("Block Custom Disc."; "Block Custom Disc.")
                 {
                 }
-                field(Control6014404;Comment)
+                field(Control6014404; Comment)
                 {
                     ShowCaption = false;
                 }
@@ -80,55 +80,55 @@ page 6014453 "Campaign Discount"
             group(Conditions)
             {
                 Caption = 'Conditions';
-                field("Starting date 2";"Starting Date")
+                field("Starting date 2"; "Starting Date")
                 {
                     Importance = Promoted;
                     Lookup = false;
                 }
-                field("Ending date 2";"Ending Date")
+                field("Ending date 2"; "Ending Date")
                 {
                     Importance = Promoted;
                 }
-                field("Starting Time";"Starting Time")
+                field("Starting Time"; "Starting Time")
                 {
                 }
-                field("Ending Time";"Ending Time")
+                field("Ending Time"; "Ending Time")
                 {
                 }
-                field("Period Type";"Period Type")
+                field("Period Type"; "Period Type")
                 {
                 }
                 group(Period)
                 {
                     Caption = 'Period';
                     Visible = ("Period Type" = 1);
-                    field("Period Description";"Period Description")
+                    field("Period Description"; "Period Description")
                     {
                         Editable = false;
                     }
-                    field(Monday;Monday)
+                    field(Monday; Monday)
                     {
                     }
-                    field(Tuesday;Tuesday)
+                    field(Tuesday; Tuesday)
                     {
                     }
-                    field(Wednesday;Wednesday)
+                    field(Wednesday; Wednesday)
                     {
                     }
-                    field(Thursday;Thursday)
+                    field(Thursday; Thursday)
                     {
                     }
-                    field(Friday;Friday)
+                    field(Friday; Friday)
                     {
                     }
-                    field(Saturday;Saturday)
+                    field(Saturday; Saturday)
                     {
                     }
-                    field(Sunday;Sunday)
+                    field(Sunday; Sunday)
                     {
                     }
                 }
-                field("Customer Disc. Group Filter";"Customer Disc. Group Filter")
+                field("Customer Disc. Group Filter"; "Customer Disc. Group Filter")
                 {
 
                     trigger OnAssistEdit()
@@ -139,9 +139,9 @@ page 6014453 "Campaign Discount"
                     end;
                 }
             }
-            part(SubForm;"Campaign Discount Lines")
+            part(SubForm; "Campaign Discount Lines")
             {
-                SubPageLink = Code=FIELD(Code);
+                SubPageLink = Code = FIELD(Code);
                 Visible = SubFormVisible;
             }
         }
@@ -168,7 +168,7 @@ page 6014453 "Campaign Discount"
                     begin
                         RetailSetup.Get;
                         if RetailSetup."Use Adv. dimensions" then
-                          NPRDimMgt.OpenFormDefaultDimensions(DATABASE::"Period Discount",Code);
+                            NPRDimMgt.OpenFormDefaultDimensions(DATABASE::"Period Discount", Code);
                     end;
                 }
             }
@@ -180,8 +180,8 @@ page 6014453 "Campaign Discount"
                     Caption = 'Comment';
                     Image = Comment;
                     RunObject = Page "Retail Comments";
-                    RunPageLink = "Table ID"=CONST(6014413),
-                                  "No."=FIELD(Code);
+                    RunPageLink = "Table ID" = CONST(6014413),
+                                  "No." = FIELD(Code);
                 }
                 action("Item Card")
                 {
@@ -195,8 +195,8 @@ page 6014453 "Campaign Discount"
                         PeriodDiscountLine: Record "Period Discount Line";
                     begin
                         CurrPage.SubForm.PAGE.GetRecord(PeriodDiscountLine);
-                        Item2.SetRange("No.",PeriodDiscountLine."Item No.");
-                        PAGE.Run(6014425,Item2,Item2."No.");
+                        Item2.SetRange("No.", PeriodDiscountLine."Item No.");
+                        PAGE.Run(6014425, Item2, Item2."No.");
                     end;
                 }
             }
@@ -242,12 +242,12 @@ page 6014453 "Campaign Discount"
                             Clear(ItemList);
                             ItemList.LookupMode := true;
                             if (ItemList.RunModal = ACTION::LookupOK) then begin
-                              ItemList.GetRecord(Item);
-                              Item.SetRange("No.",Item."No.");
-                              Item.Find('-');
-                              if Item."Unit Price" = 0 then
-                                Error(ErrUnitPrice,Item."No.");
-                              TransferToPeriod();
+                                ItemList.GetRecord(Item);
+                                Item.SetRange("No.", Item."No.");
+                                Item.Find('-');
+                                if Item."Unit Price" = 0 then
+                                    Error(ErrUnitPrice, Item."No.");
+                                TransferToPeriod();
                             end;
                         end;
                     }
@@ -264,11 +264,11 @@ page 6014453 "Campaign Discount"
                             Clear(ItemGroupTree);
                             ItemGroupTree.LookupMode := true;
                             if (ItemGroupTree.RunModal = ACTION::LookupOK) then begin
-                              Item.Reset;
-                              ItemGroupTree.GetRecord(ItemGroup);
-                              Item.SetRange("Item Group",ItemGroup."No.");
-                              Item.SetFilter("Unit Price",'<>0');
-                              TransferToPeriod();
+                                Item.Reset;
+                                ItemGroupTree.GetRecord(ItemGroup);
+                                Item.SetRange("Item Group", ItemGroup."No.");
+                                Item.SetFilter("Unit Price", '<>0');
+                                TransferToPeriod();
                             end;
                         end;
                     }
@@ -285,11 +285,11 @@ page 6014453 "Campaign Discount"
                             Clear(VendorList);
                             VendorList.LookupMode := true;
                             if (VendorList.RunModal = ACTION::LookupOK) then begin
-                              VendorList.GetRecord(Vendor);
-                              Item.Reset;
-                              Item.SetRange("Vendor No.",Vendor."No.");
-                              Item.SetFilter("Unit Price",'<>0');
-                              TransferToPeriod();
+                                VendorList.GetRecord(Vendor);
+                                Item.Reset;
+                                Item.SetRange("Vendor No.", Vendor."No.");
+                                Item.SetFilter("Unit Price", '<>0');
+                                TransferToPeriod();
                             end;
                         end;
                     }
@@ -308,9 +308,9 @@ page 6014453 "Campaign Discount"
                             MsgOkCancel: Label 'Do you wish to transfer all items to this period?';
                         begin
                             Item.Reset;
-                            Item.SetFilter("Unit Price",'<>0');
-                            if DIALOG.Confirm(MsgOkCancel,false) then
-                              TransferToPeriod();
+                            Item.SetFilter("Unit Price", '<>0');
+                            if DIALOG.Confirm(MsgOkCancel, false) then
+                                TransferToPeriod();
                         end;
                     }
                 }
@@ -336,8 +336,8 @@ page 6014453 "Campaign Discount"
 
                     trigger OnAction()
                     begin
-                        SetRange(Code,Code);
-                        REPORT.RunModal(6060100,false,false,Rec);
+                        SetRange(Code, Code);
+                        REPORT.RunModal(6060100, false, false, Rec);
                         SetRange(Code);
                     end;
                 }
@@ -395,21 +395,21 @@ page 6014453 "Campaign Discount"
                         PeriodDiscountLine: Record "Period Discount Line";
                     begin
                         //-NPR5.30 [265244]
-                        if PAGE.RunModal(PAGE::"Campaign Discount List",PeriodDiscount1) <> ACTION::LookupOK then
-                          exit;
+                        if PAGE.RunModal(PAGE::"Campaign Discount List", PeriodDiscount1) <> ACTION::LookupOK then
+                            exit;
                         PeriodDiscountLine1.Reset;
-                        PeriodDiscountLine1.SetRange(Code,Code);
+                        PeriodDiscountLine1.SetRange(Code, Code);
                         PeriodDiscountLine1.DeleteAll;
 
                         PeriodDiscountLine1.Reset;
-                        PeriodDiscountLine1.SetRange(Code,PeriodDiscount1.Code);
+                        PeriodDiscountLine1.SetRange(Code, PeriodDiscount1.Code);
                         if PeriodDiscountLine1.FindSet then
-                          repeat
-                            PeriodDiscountLine.Init;
-                            PeriodDiscountLine.TransferFields(PeriodDiscountLine1);
-                            PeriodDiscountLine.Code := Code;
-                            PeriodDiscountLine.Insert(true);
-                          until PeriodDiscountLine1.Next=0;
+                            repeat
+                                PeriodDiscountLine.Init;
+                                PeriodDiscountLine.TransferFields(PeriodDiscountLine1);
+                                PeriodDiscountLine.Code := Code;
+                                PeriodDiscountLine.Insert(true);
+                            until PeriodDiscountLine1.Next = 0;
 
                         //+NPR5.30 [265244]
                     end;
@@ -443,8 +443,8 @@ page 6014453 "Campaign Discount"
         //UpdateStatus();
         //+NPR5.38 [295330]
         if not PeriodDiscount.Find('-') then begin
-          SubFormVisible := false;
-          SubFormVisible := true;
+            SubFormVisible := false;
+            SubFormVisible := true;
         end;
     end;
 
@@ -477,37 +477,37 @@ page 6014453 "Campaign Discount"
         OkMsg: Label '%1 Items has been transferred to Period %2';
     begin
         if not Item.Find('-') then
-          Error(ErrorNo1);
+            Error(ErrorNo1);
         Clear(CampaignDiscountList);
         Percentage := 0;
 
-        InputDialog.SetInput(1,Percentage,Text10600000);
+        InputDialog.SetInput(1, Percentage, Text10600000);
         if InputDialog.RunModal = ACTION::OK then
-          InputDialog.InputDecimal(1,Percentage);
+            InputDialog.InputDecimal(1, Percentage);
 
         if Percentage = 0 then
-          exit;
+            exit;
         repeat
-          if PeriodDiscountLine.Get(Code,Item."No.") then
-            Message(ErrorNo2,Item."No.")
-          else begin
-            PeriodDiscountLine.Init;
-            PeriodDiscountLine.Code := Code;
-            PeriodDiscountLine."Item No." := Item."No.";
-            PeriodDiscountLine."Campaign Unit Price" := (100 - Percentage) / 100 * Item."Unit Price";
-            PeriodDiscountLine."Discount %" := Percentage;
-            PeriodDiscountLine.Validate("Discount Amount",Item."Unit Price" - PeriodDiscountLine."Campaign Unit Price");
-            PeriodDiscountLine."Campaign Unit Cost" := Item."Unit Cost";
-            PeriodDiscountLine.Description := Item.Description;
-            PeriodDiscountLine."Unit Price Incl. VAT" := true;
-            PeriodDiscountLine."Starting Date" := "Starting Date";
-            PeriodDiscountLine."Ending Date" := "Ending Date";
-            PeriodDiscountLine.Status := Status;
-            // Periodelinie.VALIDATE("Unit price", Vare."Unit Price");
-            PeriodDiscountLine.Insert(true);
-          end;
+            if PeriodDiscountLine.Get(Code, Item."No.") then
+                Message(ErrorNo2, Item."No.")
+            else begin
+                PeriodDiscountLine.Init;
+                PeriodDiscountLine.Code := Code;
+                PeriodDiscountLine."Item No." := Item."No.";
+                PeriodDiscountLine."Campaign Unit Price" := (100 - Percentage) / 100 * Item."Unit Price";
+                PeriodDiscountLine."Discount %" := Percentage;
+                PeriodDiscountLine.Validate("Discount Amount", Item."Unit Price" - PeriodDiscountLine."Campaign Unit Price");
+                PeriodDiscountLine."Campaign Unit Cost" := Item."Unit Cost";
+                PeriodDiscountLine.Description := Item.Description;
+                PeriodDiscountLine."Unit Price Incl. VAT" := true;
+                PeriodDiscountLine."Starting Date" := "Starting Date";
+                PeriodDiscountLine."Ending Date" := "Ending Date";
+                PeriodDiscountLine.Status := Status;
+                // Periodelinie.VALIDATE("Unit price", Vare."Unit Price");
+                PeriodDiscountLine.Insert(true);
+            end;
         until Item.Next = 0;
-        Message(OkMsg,Item.Count,Code);
+        Message(OkMsg, Item.Count, Code);
     end;
 
     procedure PrintEANLabel()
@@ -517,7 +517,7 @@ page 6014453 "Campaign Discount"
         //PrintEANLabel()
         CurrPage.SubForm.PAGE.GetCurrLine(PeriodDiscountLineGlobal);
         Item.Get(PeriodDiscountLineGlobal."Item No.");
-        RetailFormCode.PrintLabelItemCard(Item,true,0,true);
+        RetailFormCode.PrintLabelItemCard(Item, true, 0, true);
     end;
 
     procedure TransferToRetailJournalLine()
@@ -529,34 +529,34 @@ page 6014453 "Campaign Discount"
     begin
         if RetailJournalLine.Find('+') then;
         if RetailJournalLine."Line No." <> 0 then
-          NextLineNo := RetailJournalLine."Line No." + 1
+            NextLineNo := RetailJournalLine."Line No." + 1
         else
-          NextLineNo := 1;
+            NextLineNo := 1;
         FirstLineNo := NextLineNo;
 
-        PeriodDiscountLine2.SetRange(Code,Code);
+        PeriodDiscountLine2.SetRange(Code, Code);
         if PeriodDiscountLine2.Find('-') then
-          repeat
-            RetailJournalLine.Init();
-            RetailJournalLine.Validate("Line No.",NextLineNo);
-            RetailJournalLine.Validate("Item No.",PeriodDiscountLine2."Item No.");
-            RetailJournalLine.Insert();
-            RetailJournalLine.Validate(RetailJournalLine."Quantity to Print",1);
-            RetailJournalLine.Validate("Discount Price Incl. Vat",PeriodDiscountLine2."Campaign Unit Price");
-            RetailJournalLine.Validate("Last Direct Cost",PeriodDiscountLine2."Unit Cost Purchase");
-            RetailJournalLine.Modify();
-            NextLineNo += 1;
-          until PeriodDiscountLine2.Next = 0;
+            repeat
+                RetailJournalLine.Init();
+                RetailJournalLine.Validate("Line No.", NextLineNo);
+                RetailJournalLine.Validate("Item No.", PeriodDiscountLine2."Item No.");
+                RetailJournalLine.Insert();
+                RetailJournalLine.Validate(RetailJournalLine."Quantity to Print", 1);
+                RetailJournalLine.Validate("Discount Price Incl. Vat", PeriodDiscountLine2."Campaign Unit Price");
+                RetailJournalLine.Validate("Last Direct Cost", PeriodDiscountLine2."Unit Cost Purchase");
+                RetailJournalLine.Modify();
+                NextLineNo += 1;
+            until PeriodDiscountLine2.Next = 0;
 
         Commit();
 
         Clear(RetailJournalLine);
-        RetailJournalLine.SetRange("Line No.",FirstLineNo,NextLineNo);
-        ReportSelectionRetail.SetRange("Report Type",ReportSelectionRetail."Report Type"::"Shelf Label");
-        ReportSelectionRetail.SetFilter("Report ID",'<>0');
+        RetailJournalLine.SetRange("Line No.", FirstLineNo, NextLineNo);
+        ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Shelf Label");
+        ReportSelectionRetail.SetFilter("Report ID", '<>0');
         ReportSelectionRetail.Find('-');
         repeat
-          REPORT.RunModal(ReportSelectionRetail."Report ID",true,false,RetailJournalLine);
+            REPORT.RunModal(ReportSelectionRetail."Report ID", true, false, RetailJournalLine);
         until ReportSelectionRetail.Next = 0;
     end;
 
@@ -573,63 +573,63 @@ page 6014453 "Campaign Discount"
     begin
         Clear(RetailList);
         if RetailList.Count > 0 then
-          RetailList.DeleteAll;
+            RetailList.DeleteAll;
         Counter := 1;
         if "Location Code" <> '' then
-          Location.SetFilter(Code,'<>%1',"Location Code");
+            Location.SetFilter(Code, '<>%1', "Location Code");
         if Location.Find('-') then
-          repeat
-            RetailList.Init;
-            RetailList.Number := Counter;
-            RetailList.Choice := Location.Code;
-            RetailList.Insert;
-            Counter := Counter + 1;
-          until Location.Next = 0;
+            repeat
+                RetailList.Init;
+                RetailList.Number := Counter;
+                RetailList.Choice := Location.Code;
+                RetailList.Insert;
+                Counter := Counter + 1;
+            until Location.Next = 0;
         Commit;
 
         Clear(RetailListPage);
         if ACTION::LookupOK = RetailListPage.RunModal then begin
-          Error('Getselection filter ISSUE');
-          //retailListForm.getSelectionFilter(retailListRec);
-          //retailListRec.MARKEDONLY(TRUE);
-          if RetailList.Find('-') then
-            repeat
-              LocationsString := LocationsString + CopyStr(RetailList.Choice,1,StrLen(RetailList.Choice)) + ',' ;
-            until RetailList.Next = 0;
-
-          LocationsString := CopyStr(LocationsString,1,StrLen(LocationsString) - 1);
-          if Confirm(TxtDoYouWantToCopyLoc + LocationsString + ' ?') then begin
+            Error('Getselection filter ISSUE');
+            //retailListForm.getSelectionFilter(retailListRec);
+            //retailListRec.MARKEDONLY(TRUE);
             if RetailList.Find('-') then
-              repeat
-                if Location.Get(RetailList.Choice) then
-                  Clear(PeriodDiscount);
-                PeriodDiscount.Init;
-                PeriodDiscount.Copy(Rec);
-                if StrPos(PeriodDiscount.Code, '_') > 0 then
-                  CampaignCode := CopyStr(PeriodDiscount.Code, 1, StrPos(PeriodDiscount.Code, '_') - 1)
-                else
-                  CampaignCode := PeriodDiscount.Code;
-                CampaignCode := CampaignCode + '_' + Location.Code;
-                PeriodDiscount.Code := CampaignCode;
-                PeriodDiscount."Location Code" := Location.Code;
-                PeriodDiscount.Insert(true);
-                PeriodDiscount."Global Dimension 1 Code" := "Global Dimension 1 Code";
-                PeriodDiscount."Global Dimension 2 Code" := "Global Dimension 2 Code";
-                PeriodDiscount.Modify(true);
-                CurrPage.SubForm.PAGE.GetCurrLine(PeriodDiscountLineGlobal);
-                PeriodDiscountLineGlobal.SetRange(Code,Code);
-                if PeriodDiscountLineGlobal.Find('-') then
-                  repeat
-                    Clear(PeriodDiscountLine);
-                    PeriodDiscountLine.Init;
-                    PeriodDiscountLine.Copy(PeriodDiscountLineGlobal);
-                    PeriodDiscountLine.Code := CampaignCode;
-                    PeriodDiscountLine.Insert(true);
-                  until PeriodDiscountLineGlobal.Next = 0;
-                PeriodDiscountLineGlobal.SetRange(Code);
-              until RetailList.Next = 0;
+                repeat
+                    LocationsString := LocationsString + CopyStr(RetailList.Choice, 1, StrLen(RetailList.Choice)) + ',';
+                until RetailList.Next = 0;
 
-          end;
+            LocationsString := CopyStr(LocationsString, 1, StrLen(LocationsString) - 1);
+            if Confirm(TxtDoYouWantToCopyLoc + LocationsString + ' ?') then begin
+                if RetailList.Find('-') then
+                    repeat
+                        if Location.Get(RetailList.Choice) then
+                            Clear(PeriodDiscount);
+                        PeriodDiscount.Init;
+                        PeriodDiscount.Copy(Rec);
+                        if StrPos(PeriodDiscount.Code, '_') > 0 then
+                            CampaignCode := CopyStr(PeriodDiscount.Code, 1, StrPos(PeriodDiscount.Code, '_') - 1)
+                        else
+                            CampaignCode := PeriodDiscount.Code;
+                        CampaignCode := CampaignCode + '_' + Location.Code;
+                        PeriodDiscount.Code := CampaignCode;
+                        PeriodDiscount."Location Code" := Location.Code;
+                        PeriodDiscount.Insert(true);
+                        PeriodDiscount."Global Dimension 1 Code" := "Global Dimension 1 Code";
+                        PeriodDiscount."Global Dimension 2 Code" := "Global Dimension 2 Code";
+                        PeriodDiscount.Modify(true);
+                        CurrPage.SubForm.PAGE.GetCurrLine(PeriodDiscountLineGlobal);
+                        PeriodDiscountLineGlobal.SetRange(Code, Code);
+                        if PeriodDiscountLineGlobal.Find('-') then
+                            repeat
+                                Clear(PeriodDiscountLine);
+                                PeriodDiscountLine.Init;
+                                PeriodDiscountLine.Copy(PeriodDiscountLineGlobal);
+                                PeriodDiscountLine.Code := CampaignCode;
+                                PeriodDiscountLine.Insert(true);
+                            until PeriodDiscountLineGlobal.Next = 0;
+                        PeriodDiscountLineGlobal.SetRange(Code);
+                    until RetailList.Next = 0;
+
+            end;
         end;
 
         RetailList.ClearMarks;
@@ -651,65 +651,65 @@ page 6014453 "Campaign Discount"
     begin
         Clear(RetailList);
         if RetailList.Count > 0 then
-          RetailList.DeleteAll;
+            RetailList.DeleteAll;
         Counter := 1;
-        DimensionValue.SetRange("Global Dimension No.",1);
+        DimensionValue.SetRange("Global Dimension No.", 1);
         if "Global Dimension 1 Code" <> '' then
-          DimensionValue.SetFilter(Code,'<>%1',"Global Dimension 1 Code");
+            DimensionValue.SetFilter(Code, '<>%1', "Global Dimension 1 Code");
         if DimensionValue.Find('-') then
-          repeat
-            RetailList.Init;
-            RetailList.Number := Counter;
-            RetailList.Choice := DimensionValue.Code;
-            RetailList.Insert;
-            Counter := Counter + 1;
-          until DimensionValue.Next = 0;
+            repeat
+                RetailList.Init;
+                RetailList.Number := Counter;
+                RetailList.Choice := DimensionValue.Code;
+                RetailList.Insert;
+                Counter := Counter + 1;
+            until DimensionValue.Next = 0;
         Commit;
 
         Clear(RetailListPage);
         if ACTION::LookupOK = RetailListPage.RunModal then begin
-          Error('Getselection filter ISSUE');
-          // retailListForm.getSelectionFilter(retailListRec);
-          if RetailList.Find('-') then
-            repeat
-              LocationsString := LocationsString + CopyStr(RetailList.Choice,1,StrLen(RetailList.Choice)) + ',' ;
-            until RetailList.Next = 0;
-
-          LocationsString := CopyStr(LocationsString,1,StrLen(LocationsString) - 1);
-          if Confirm(TxtDoYouWantToCopyDim1 + LocationsString + ' ?') then begin
+            Error('Getselection filter ISSUE');
+            // retailListForm.getSelectionFilter(retailListRec);
             if RetailList.Find('-') then
-              repeat
-                DimensionValue.SetCurrentKey(Code,"Global Dimension No.");
-                DimensionValue.SetRange(Code,RetailList.Choice);
-                DimensionValue.SetRange("Global Dimension No.",1);
-                if DimensionValue.Find('-') then
-                  Clear(PeriodDiscount);
-                PeriodDiscount.Init;
-                PeriodDiscount.Copy(Rec);
-                if StrPos(PeriodDiscount.Code, '_') > 0 then
-                  CampaignCode := CopyStr(PeriodDiscount.Code,1,StrPos(PeriodDiscount.Code,'_') - 1)
-                else
-                  CampaignCode := PeriodDiscount.Code;
-                CampaignCode := CampaignCode + '_' + DimensionValue.Code;
-                PeriodDiscount.Code := CampaignCode;
-                PeriodDiscount."Location Code" := '';
-                PeriodDiscount.Insert(true);
-                PeriodDiscount."Global Dimension 1 Code" := DimensionValue.Code;
-                PeriodDiscount.Modify(true);
-                CurrPage.SubForm.PAGE.GetCurrLine(PeriodDiscountLineGlobal);
-                PeriodDiscountLineGlobal.SetRange(Code, Code);
-                if PeriodDiscountLineGlobal.Find('-') then
-                  repeat
-                    Clear(PeriodDiscountLine);
-                    PeriodDiscountLine.Init;
-                    PeriodDiscountLine.Copy(PeriodDiscountLineGlobal);
-                    PeriodDiscountLine.Code := CampaignCode;
-                    PeriodDiscountLine.Insert(true);
-                  until PeriodDiscountLineGlobal.Next = 0;
-                PeriodDiscountLineGlobal.SetRange(Code);
-              until RetailList.Next = 0;
+                repeat
+                    LocationsString := LocationsString + CopyStr(RetailList.Choice, 1, StrLen(RetailList.Choice)) + ',';
+                until RetailList.Next = 0;
 
-          end;
+            LocationsString := CopyStr(LocationsString, 1, StrLen(LocationsString) - 1);
+            if Confirm(TxtDoYouWantToCopyDim1 + LocationsString + ' ?') then begin
+                if RetailList.Find('-') then
+                    repeat
+                        DimensionValue.SetCurrentKey(Code, "Global Dimension No.");
+                        DimensionValue.SetRange(Code, RetailList.Choice);
+                        DimensionValue.SetRange("Global Dimension No.", 1);
+                        if DimensionValue.Find('-') then
+                            Clear(PeriodDiscount);
+                        PeriodDiscount.Init;
+                        PeriodDiscount.Copy(Rec);
+                        if StrPos(PeriodDiscount.Code, '_') > 0 then
+                            CampaignCode := CopyStr(PeriodDiscount.Code, 1, StrPos(PeriodDiscount.Code, '_') - 1)
+                        else
+                            CampaignCode := PeriodDiscount.Code;
+                        CampaignCode := CampaignCode + '_' + DimensionValue.Code;
+                        PeriodDiscount.Code := CampaignCode;
+                        PeriodDiscount."Location Code" := '';
+                        PeriodDiscount.Insert(true);
+                        PeriodDiscount."Global Dimension 1 Code" := DimensionValue.Code;
+                        PeriodDiscount.Modify(true);
+                        CurrPage.SubForm.PAGE.GetCurrLine(PeriodDiscountLineGlobal);
+                        PeriodDiscountLineGlobal.SetRange(Code, Code);
+                        if PeriodDiscountLineGlobal.Find('-') then
+                            repeat
+                                Clear(PeriodDiscountLine);
+                                PeriodDiscountLine.Init;
+                                PeriodDiscountLine.Copy(PeriodDiscountLineGlobal);
+                                PeriodDiscountLine.Code := CampaignCode;
+                                PeriodDiscountLine.Insert(true);
+                            until PeriodDiscountLineGlobal.Next = 0;
+                        PeriodDiscountLineGlobal.SetRange(Code);
+                    until RetailList.Next = 0;
+
+            end;
         end;
 
         RetailList.ClearMarks;
@@ -749,19 +749,19 @@ page 6014453 "Campaign Discount"
         Caption: Text;
     begin
         //-NPR5.33 [278733]
-        if not SetFiltersOnRecRef(AssistFieldNo,RecRef) then
-          exit;
+        if not SetFiltersOnRecRef(AssistFieldNo, RecRef) then
+            exit;
         Caption := GetFieldCaption(AssistFieldNo);
-        if not RunDynamicRequestPage(Caption,RecRef) then
-          exit;
+        if not RunDynamicRequestPage(Caption, RecRef) then
+            exit;
 
-        UpdateFiltersOnCurrRec(AssistFieldNo,RecRef);
+        UpdateFiltersOnCurrRec(AssistFieldNo, RecRef);
         //+NPR5.33 [278733]
     end;
 
-    local procedure RunDynamicRequestPage(Caption: Text;var RecRef: RecordRef): Boolean
+    local procedure RunDynamicRequestPage(Caption: Text; var RecRef: RecordRef): Boolean
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
         FilterPageBuilder: FilterPageBuilder;
         OutStream: OutStream;
@@ -769,48 +769,48 @@ page 6014453 "Campaign Discount"
         EntityID: Code[20];
     begin
         //-NPR5.33 [278733]
-        EntityID := CopyStr(Caption,1,20);
-        if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder,EntityID,RecRef.Number) then
-          exit(false);
-        FilterPageBuilder.SetView(RecRef.Caption,RecRef.GetView);
+        EntityID := CopyStr(Caption, 1, 20);
+        if not RequestPageParametersHelper.BuildDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number) then
+            exit(false);
+        FilterPageBuilder.SetView(RecRef.Caption, RecRef.GetView);
         FilterPageBuilder.PageCaption := Caption;
         if not FilterPageBuilder.RunModal then
-          exit(false);
+            exit(false);
 
-        ReturnFilters := RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder,EntityID,RecRef.Number);
+        ReturnFilters := RequestPageParametersHelper.GetViewFromDynamicRequestPage(FilterPageBuilder, EntityID, RecRef.Number);
 
         RecRef.Reset;
         if ReturnFilters <> '' then begin
-          Clear(TempBlob);
-          TempBlob.Blob.CreateOutStream(OutStream);
-          OutStream.WriteText(ReturnFilters);
-          if not RequestPageParametersHelper.ConvertParametersToFilters(RecRef,TempBlob) then
-            exit;
+            Clear(TempBlob);
+            TempBlob.CreateOutStream(OutStream);
+            OutStream.WriteText(ReturnFilters);
+            if not RequestPageParametersHelper.ConvertParametersToFilters(RecRef, TempBlob) then
+                exit;
         end;
 
         exit(true);
         //+NPR5.33 [278733]
     end;
 
-    local procedure SetFiltersOnRecRef(FilterFieldNo: Integer;var RecRef: RecordRef): Boolean
+    local procedure SetFiltersOnRecRef(FilterFieldNo: Integer; var RecRef: RecordRef): Boolean
     var
         CustomerDiscountGroup: Record "Customer Discount Group";
     begin
         //-NPR5.33 [278733]
         case FilterFieldNo of
-          FieldNo("Customer Disc. Group Filter"):
-            begin
-              CustomerDiscountGroup.SetFilter(Code,"Customer Disc. Group Filter");
-              RecRef.GetTable(CustomerDiscountGroup);
-              exit(true);
-            end;
+            FieldNo("Customer Disc. Group Filter"):
+                begin
+                    CustomerDiscountGroup.SetFilter(Code, "Customer Disc. Group Filter");
+                    RecRef.GetTable(CustomerDiscountGroup);
+                    exit(true);
+                end;
         end;
 
         exit(false);
         //+NPR5.33 [278733]
     end;
 
-    local procedure UpdateFiltersOnCurrRec(FilterFieldNo: Integer;RecRef: RecordRef)
+    local procedure UpdateFiltersOnCurrRec(FilterFieldNo: Integer; RecRef: RecordRef)
     var
         CurrRecRef: RecordRef;
         CurrFieldRef: FieldRef;
@@ -821,17 +821,17 @@ page 6014453 "Campaign Discount"
         CurrFieldRef := CurrRecRef.Field(FilterFieldNo);
 
         if RecRef.IsEmpty then begin
-          CurrFieldRef.Value := '';
-          CurrRecRef.SetTable(Rec);
-          exit;
+            CurrFieldRef.Value := '';
+            CurrRecRef.SetTable(Rec);
+            exit;
         end;
 
         RecRef.FindSet;
         PrimaryKeyFilter := GetPrimaryKeyValue(RecRef);
         while RecRef.Next <> 0 do
-          PrimaryKeyFilter += '|' + GetPrimaryKeyValue(RecRef);
+            PrimaryKeyFilter += '|' + GetPrimaryKeyValue(RecRef);
 
-        CurrFieldRef.Value := CopyStr(PrimaryKeyFilter,1,CurrFieldRef.Length);
+        CurrFieldRef.Value := CopyStr(PrimaryKeyFilter, 1, CurrFieldRef.Length);
         CurrRecRef.SetTable(Rec);
         //+NPR5.33 [278733]
     end;

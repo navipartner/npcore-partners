@@ -21,7 +21,7 @@ codeunit 6151220 "PrintNode API Mgt."
         ResponseHeaders: DotNet npNetNameValueCollection;
         JObject: DotNet npNetJObject;
         JToken: DotNet npNetJToken;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         HttpWebRequestMgt: Codeunit "Http Web Request Mgt.";
         ResponseInStream: InStream;
         ResponseText: Text;
@@ -32,8 +32,8 @@ codeunit 6151220 "PrintNode API Mgt."
         HttpWebRequestMgt.SetContentType('application/json');
 
         Clear(TempBlob);
-        TempBlob.Init;
-        TempBlob.Blob.CreateInStream(ResponseInStream);
+        Clear(TempBlob);
+        TempBlob.CreateInStream(ResponseInStream);
         if not HttpWebRequestMgt.GetResponse(ResponseInStream, HttpStatusCode, ResponseHeaders) then begin
             if ShowMessage then
                 ErrorHandler();
@@ -56,7 +56,7 @@ codeunit 6151220 "PrintNode API Mgt."
         ResponseHeaders: DotNet npNetNameValueCollection;
         JArray: DotNet npNetJArray;
         JToken: DotNet npNetJToken;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         HttpWebRequestMgt: Codeunit "Http Web Request Mgt.";
         ResponseInStream: InStream;
         ResponseText: Text;
@@ -69,8 +69,8 @@ codeunit 6151220 "PrintNode API Mgt."
         HttpWebRequestMgt.SetContentType('application/json');
 
         Clear(TempBlob);
-        TempBlob.Init;
-        TempBlob.Blob.CreateInStream(ResponseInStream);
+        Clear(TempBlob);
+        TempBlob.CreateInStream(ResponseInStream);
         if not HttpWebRequestMgt.GetResponse(ResponseInStream, HttpStatusCode, ResponseHeaders) then begin
             HttpWebRequestMgt.ProcessFaultXMLResponse('', '', '', '');
             exit(false);
@@ -104,7 +104,7 @@ codeunit 6151220 "PrintNode API Mgt."
         HttpStatusCode: DotNet npNetHttpStatusCode;
         ResponseHeaders: DotNet npNetNameValueCollection;
         JObject: DotNet npNetJObject;
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         HttpWebRequestMgt: Codeunit "Http Web Request Mgt.";
         ResponseInStream: InStream;
         BodyStream: OutStream;
@@ -130,14 +130,14 @@ codeunit 6151220 "PrintNode API Mgt."
         if Authentication <> '' then
             AddJPropertyToJObject(JObject, 'authentication', Authentication);
 
-        TempBlob.Init;
-        TempBlob.Blob.CreateOutStream(BodyStream);
+        Clear(TempBlob);
+        TempBlob.CreateOutStream(BodyStream);
         BodyStream.WriteText(JObject.ToString());
         HttpWebRequestMgt.AddBodyBlob(TempBlob);
 
         Clear(TempBlob);
-        TempBlob.Init;
-        TempBlob.Blob.CreateInStream(ResponseInStream);
+        Clear(TempBlob);
+        TempBlob.CreateInStream(ResponseInStream);
         if not HttpWebRequestMgt.GetResponse(ResponseInStream, HttpStatusCode, ResponseHeaders) then begin
             ErrorHandler();
             HttpWebRequestMgt.ProcessFaultXMLResponse('', '', '', '');

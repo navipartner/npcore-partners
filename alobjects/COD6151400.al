@@ -94,34 +94,39 @@ codeunit 6151400 "Magento Generic Setup Mgt."
 
     procedure InitGenericMagentoSetup(var MagentoSetup: Record "Magento Setup")
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         MagentoNpXmlSetupMgt: Codeunit "Magento NpXml Setup Mgt.";
+        RecRef: RecordRef;
     begin
         MagentoSetup.Get;
         if MagentoSetup."Generic Setup".HasValue then
             MagentoSetup.CalcFields("Generic Setup");
 
-        TempBlob.Blob := MagentoSetup."Generic Setup";
+        TempBlob.FromRecord(MagentoSetup, MagentoSetup.FieldNo("Generic Setup"));
         InitGenericSetup(TempBlob);
         //-MAG2.00
         MagentoNpXmlSetupMgt.InitNpXmlTemplateSetup(TempBlob);
         //+MAG2.00
-        MagentoSetup."Generic Setup" := TempBlob.Blob;
+
+        RecRef.GetTable(MagentoSetup);
+        TempBlob.ToRecordRef(RecRef, MagentoSetup.FieldNo("Generic Setup"));
+        RecRef.SetTable(MagentoSetup);
+
         MagentoSetup.Modify;
     end;
 
-    local procedure InitGenericSetup(var TempBlob: Record TempBlob temporary)
+    local procedure InitGenericSetup(var TempBlob: Codeunit "Temp Blob")
     var
         XmlDoc: DotNet npNetXmlDocument;
         OutStream: OutStream;
     begin
-        if TempBlob.Blob.HasValue then
+        if TempBlob.HasValue then
             exit;
 
         XmlDoc := XmlDoc.XmlDocument;
         XmlDoc.LoadXml('<?xml version="1.0" encoding="UTF-8"?>' +
                         '<generic_setup />');
-        TempBlob.Blob.CreateOutStream(OutStream);
+        TempBlob.CreateOutStream(OutStream);
         XmlDoc.Save(OutStream);
     end;
 
@@ -162,7 +167,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         end;
     end;
 
-    local procedure EditGenericSetup(var TempBlob: Record TempBlob temporary; NodePath: Text)
+    local procedure EditGenericSetup(var TempBlob: Codeunit "Temp Blob"; NodePath: Text)
     var
         TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary;
         XmlDoc: DotNet npNetXmlDocument;
@@ -199,21 +204,26 @@ codeunit 6151400 "Magento Generic Setup Mgt."
                 XmlElement2 := XmlElement.SelectSingleNode(TempGenericSetupBuffer."Node Path");
                 XmlElement2.InnerText := TempGenericSetupBuffer.Value;
             until TempGenericSetupBuffer.Next = 0;
-        Clear(TempBlob.Blob);
-        TempBlob.Blob.CreateOutStream(OutStream);
+        Clear(TempBlob);
+        TempBlob.CreateOutStream(OutStream);
         XmlDoc.Save(OutStream);
     end;
 
     procedure EditGenericMagentoSetup(NodePath: Text)
     var
         MagentoSetup: Record "Magento Setup";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
+        RecRef: RecordRef;
     begin
         InitGenericMagentoSetup(MagentoSetup);
         Commit;
-        TempBlob.Blob := MagentoSetup."Generic Setup";
+        TempBlob.FromRecord(MagentoSetup, MagentoSetup.FieldNo("Generic Setup"));
         EditGenericSetup(TempBlob, NodePath);
-        MagentoSetup."Generic Setup" := TempBlob.Blob;
+
+        RecRef.GetTable(MagentoSetup);
+        TempBlob.ToRecordRef(RecRef, MagentoSetup.FieldNo("Generic Setup"));
+        RecRef.SetTable(MagentoSetup);
+
         MagentoSetup.Modify(true);
     end;
 
@@ -221,7 +231,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
     end;
 
-    procedure LookupGenericSetup(var TempBlob: Record TempBlob temporary; RootNodePath: Text): Text
+    procedure LookupGenericSetup(var TempBlob: Codeunit "Temp Blob"; RootNodePath: Text): Text
     var
         TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary;
         GenericSetupBuffer: Page "Magento Generic Setup Buffer";
@@ -247,13 +257,13 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
     end;
 
-    procedure GetValueInteger(var TempBlob: Record TempBlob temporary; NodePath: Text) Value: Integer
+    procedure GetValueInteger(var TempBlob: Codeunit "Temp Blob"; NodePath: Text) Value: Integer
     var
         XmlDoc: DotNet npNetXmlDocument;
         XmlElement: DotNet npNetXmlElement;
         InStream: InStream;
     begin
-        TempBlob.Blob.CreateInStream(InStream);
+        TempBlob.CreateInStream(InStream);
         XmlDoc := XmlDoc.XmlDocument;
         XmlDoc.Load(InStream);
 
@@ -264,13 +274,13 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         exit(0);
     end;
 
-    procedure GetValueDecimal(var TempBlob: Record TempBlob temporary; NodePath: Text) Value: Decimal
+    procedure GetValueDecimal(var TempBlob: Codeunit "Temp Blob"; NodePath: Text) Value: Decimal
     var
         XmlDoc: DotNet npNetXmlDocument;
         XmlElement: DotNet npNetXmlElement;
         InStream: InStream;
     begin
-        TempBlob.Blob.CreateInStream(InStream);
+        TempBlob.CreateInStream(InStream);
         XmlDoc := XmlDoc.XmlDocument;
         XmlDoc.Load(InStream);
 
@@ -281,13 +291,13 @@ codeunit 6151400 "Magento Generic Setup Mgt."
         exit(0);
     end;
 
-    procedure GetValueText(var TempBlob: Record TempBlob temporary; NodePath: Text): Text[250]
+    procedure GetValueText(var TempBlob: Codeunit "Temp Blob"; NodePath: Text): Text[250]
     var
         XmlDoc: DotNet npNetXmlDocument;
         XmlElement: DotNet npNetXmlElement;
         InStream: InStream;
     begin
-        TempBlob.Blob.CreateInStream(InStream);
+        TempBlob.CreateInStream(InStream);
         XmlDoc := XmlDoc.XmlDocument;
         XmlDoc.Load(InStream);
 
@@ -301,20 +311,20 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     begin
     end;
 
-    procedure LoadGenericSetup(var TempBlob: Record TempBlob temporary; var XmlDoc: DotNet npNetXmlDocument): Boolean
+    procedure LoadGenericSetup(var TempBlob: Codeunit "Temp Blob"; var XmlDoc: DotNet npNetXmlDocument): Boolean
     var
         InStream: InStream;
     begin
-        if not TempBlob.Blob.HasValue then
+        if not TempBlob.HasValue then
             exit(false);
 
-        TempBlob.Blob.CreateInStream(InStream);
+        TempBlob.CreateInStream(InStream);
         XmlDoc := XmlDoc.XmlDocument;
         XmlDoc.Load(InStream);
         exit(true);
     end;
 
-    procedure LoadGenericSetupBuffer(var TempBlob: Record TempBlob temporary; RootNodePath: Text; var TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary)
+    procedure LoadGenericSetupBuffer(var TempBlob: Codeunit "Temp Blob"; RootNodePath: Text; var TempGenericSetupBuffer: Record "Magento Generic Setup Buffer" temporary)
     var
         XmlDoc: DotNet npNetXmlDocument;
         XmlElement: DotNet npNetXmlElement;
@@ -449,7 +459,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
     procedure LookupVariantPictureDimension(): Text
     var
         MagentoSetup: Record "Magento Setup";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         XmlDoc: DotNet npNetXmlDocument;
         OutStream: OutStream;
     begin
@@ -466,7 +476,7 @@ codeunit 6151400 "Magento Generic Setup Mgt."
                 end;
         end;
 
-        TempBlob.Blob.CreateOutStream(OutStream);
+        TempBlob.CreateOutStream(OutStream);
         XmlDoc.Save(OutStream);
         exit(LookupGenericSetup(TempBlob, "ElementName.VariantDimension"));
         //+MAG2.00
@@ -474,10 +484,9 @@ codeunit 6151400 "Magento Generic Setup Mgt."
 
     local procedure SetupDimensionBuffer(var XmlDoc: DotNet npNetXmlDocument): Boolean
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
     begin
         //-MAG2.00
-        TempBlob.DeleteAll;
         InitGenericSetup(TempBlob);
         LoadGenericSetup(TempBlob, XmlDoc);
         AddContainer(XmlDoc, '', "ElementName.VariantDimension");

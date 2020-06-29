@@ -13,7 +13,7 @@ report 6014617 "NP Purchase Order"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING ("Document Type", "No.") WHERE ("Document Type" = CONST (Order));
+            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
             RequestFilterHeading = 'Purchase Order';
             column(DocType_PurchHeader; "Document Type")
@@ -87,10 +87,10 @@ report 6014617 "NP Purchase Order"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING (Number);
+                DataItemTableView = SORTING(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING (Number) WHERE (Number = CONST (1));
+                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
                     column(DeliveryAddrLbl; DeliveryAddrLbl)
                     {
                     }
@@ -274,7 +274,7 @@ report 6014617 "NP Purchase Order"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING (Number) WHERE (Number = FILTER (1 ..));
+                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
                         column(HdrDimCaption; HdrDimCaptionLbl)
                         {
                         }
@@ -315,9 +315,9 @@ report 6014617 "NP Purchase Order"
                     }
                     dataitem("Purchase Line"; "Purchase Line")
                     {
-                        DataItemLink = "Document Type" = FIELD ("Document Type"), "Document No." = FIELD ("No.");
+                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING ("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -326,7 +326,7 @@ report 6014617 "NP Purchase Order"
                     }
                     dataitem(RoundLoop; "Integer")
                     {
-                        DataItemTableView = SORTING (Number);
+                        DataItemTableView = SORTING(Number);
                         column(LineAmt_PurchLine; PurchLine."Line Amount")
                         {
                             AutoFormatExpression = "Purchase Line"."Currency Code";
@@ -480,7 +480,7 @@ report 6014617 "NP Purchase Order"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING (Number) WHERE (Number = FILTER (1 ..));
+                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
                             column(LineDimCaption; LineDimCaptionLbl)
                             {
                             }
@@ -584,7 +584,7 @@ report 6014617 "NP Purchase Order"
                     }
                     dataitem(Totals; "Integer")
                     {
-                        DataItemTableView = SORTING (Number) WHERE (Number = CONST (1));
+                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
                         column(TotalNetAmount_Totals; TotalAmount)
                         {
                             AutoFormatExpression = "Purchase Header"."Currency Code";
@@ -631,7 +631,7 @@ report 6014617 "NP Purchase Order"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING (Number);
+                        DataItemTableView = SORTING(Number);
                         column(VATAmtLineVATBase; VATAmountLine."VAT Base")
                         {
                             AutoFormatExpression = "Purchase Header"."Currency Code";
@@ -682,7 +682,7 @@ report 6014617 "NP Purchase Order"
                     }
                     dataitem(VATCounterLCY; "Integer")
                     {
-                        DataItemTableView = SORTING (Number);
+                        DataItemTableView = SORTING(Number);
                         column(VALExchRate; VALExchRate)
                         {
                         }
@@ -731,7 +731,7 @@ report 6014617 "NP Purchase Order"
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING (Number) WHERE (Number = CONST (1));
+                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
                         column(PayToVendNo_PurchHeader; "Purchase Header"."Pay-to Vendor No.")
                         {
                         }
@@ -774,7 +774,7 @@ report 6014617 "NP Purchase Order"
                     }
                     dataitem(Total3; "Integer")
                     {
-                        DataItemTableView = SORTING (Number) WHERE (Number = CONST (1));
+                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
                         column(SellToCustNo_PurchHeader; "Purchase Header"."Sell-to Customer No.")
                         {
                         }
@@ -817,7 +817,7 @@ report 6014617 "NP Purchase Order"
                     }
                     dataitem(PrepmtLoop; "Integer")
                     {
-                        DataItemTableView = SORTING (Number) WHERE (Number = FILTER (1 ..));
+                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
                         column(PrepmtLineAmount; PrepmtLineAmount)
                         {
                             AutoFormatExpression = "Purchase Header"."Currency Code";
@@ -869,7 +869,7 @@ report 6014617 "NP Purchase Order"
                         }
                         dataitem(PrepmtDimLoop; "Integer")
                         {
-                            DataItemTableView = SORTING (Number) WHERE (Number = FILTER (1 ..));
+                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
 
                             trigger OnAfterGetRecord()
                             begin
@@ -929,7 +929,7 @@ report 6014617 "NP Purchase Order"
                     }
                     dataitem(PrepmtVATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING (Number);
+                        DataItemTableView = SORTING(Number);
                         column(PrepmtVATAmtLineVATAmt; PrepmtVATAmountLine."VAT Amount")
                         {
                             AutoFormatExpression = "Purchase Header"."Currency Code";
@@ -996,7 +996,7 @@ report 6014617 "NP Purchase Order"
                     PurchPostPrepmt.CalcVATAmountLines("Purchase Header", PrepmtPurchLine, PrepmtVATAmountLine, 0);
                     PrepmtVATAmountLine.DeductVATAmountLine(PrePmtVATAmountLineDeduct);
                     PurchPostPrepmt.UpdateVATOnLines("Purchase Header", PrepmtPurchLine, PrepmtVATAmountLine, 0);
-                    PurchPostPrepmt.BuildInvLineBuffer2("Purchase Header", PrepmtPurchLine, 0, PrepmtInvBuf);
+                    PurchPostPrepmt.BuildInvLineBuffer("Purchase Header", PrepmtPurchLine, 0, PrepmtInvBuf);
                     PrepmtVATAmount := PrepmtVATAmountLine.GetTotalVATAmount;
                     PrepmtVATBaseAmount := PrepmtVATAmountLine.GetTotalVATBase;
                     PrepmtTotalAmountInclVAT := PrepmtVATAmountLine.GetTotalAmountInclVAT;

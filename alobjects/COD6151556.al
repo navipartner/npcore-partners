@@ -146,7 +146,7 @@ codeunit 6151556 "NpXml Template Mgt."
     procedure ExportNpXmlTemplate(TemplateCode: Code[20])
     var
         NpXmlTemplate: Record "NpXml Template";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
     begin
         //-NC1.21
@@ -187,7 +187,7 @@ codeunit 6151556 "NpXml Template Mgt."
     procedure ImportNpXmlTemplate(): Boolean
     var
         NpXmlTemplate: Record "NpXml Template";
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
         PathHelper: DotNet npNetPath;
         MemoryStream: DotNet npNetMemoryStream;
@@ -207,7 +207,7 @@ codeunit 6151556 "NpXml Template Mgt."
 
         TemplateCode := PathHelper.GetFileNameWithoutExtension(FilePath);
         if not NpXmlTemplate.Get(TemplateCode) then begin
-            TempBlob.Blob.CreateInStream(InStr);
+            TempBlob.CreateInStream(InStr);
             MemoryStream := InStr;
             XmlDoc := XmlDoc.XmlDocument;
             XmlDoc.Load(MemoryStream);
@@ -534,10 +534,11 @@ codeunit 6151556 "NpXml Template Mgt."
 
     procedure Archive(var NpXmlTemplate: Record "NpXml Template"): Boolean
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         NpXmlTemplateArchive: Record "NpXml Template Archive";
         NpXmlTemplateHistory: Record "NpXml Template History";
         NpXmlSetup: Record "NpXml Setup";
+        RecRef: RecordRef;
     begin
         //-NC1.21
         //-NC1.22
@@ -560,7 +561,11 @@ codeunit 6151556 "NpXml Template Mgt."
             NpXmlTemplateArchive.Code := NpXmlTemplate.Code;
             NpXmlTemplateArchive."Version Description" := NpXmlTemplate."Version Description";
             NpXmlTemplateArchive."Template Version No." := NpXmlTemplate."Template Version";
-            NpXmlTemplateArchive."Archived Template" := TempBlob.Blob;
+
+            RecRef.GetTable(NpXmlTemplateArchive);
+            TempBlob.ToRecordRef(RecRef, NpXmlTemplateArchive.FieldNo("Archived Template"));
+            RecRef.SetTable(NpXmlTemplateArchive);
+
             NpXmlTemplateArchive."Archived by" := UserId;
             NpXmlTemplateArchive."Archived at" := CreateDateTime(Today, Time);
             NpXmlTemplateArchive.Insert;
@@ -604,17 +609,17 @@ codeunit 6151556 "NpXml Template Mgt."
 
     procedure ExportArchivedNpXmlTemplate(NpXmlTemplateArchive: Record "NpXml Template Archive")
     var
-        TempBlob: Record TempBlob temporary;
+        TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
     begin
         //-NC1.21
         NpXmlTemplateArchive.CalcFields("Archived Template");
-        TempBlob.Blob := NpXmlTemplateArchive."Archived Template";
+        TempBlob.FromRecord(NpXmlTemplateArchive, NpXmlTemplateArchive.FieldNo("Archived Template"));
         FileMgt.BLOBExport(TempBlob, LowerCase(NpXmlTemplateArchive.Code + ' ' + NpXmlTemplateArchive."Template Version No.") + '.xml', true);
         //+NC1.21
     end;
 
-    procedure NpXmlTemplateToBlob(var NpXmlTemplate: Record "NpXml Template"; var TempBlob: Record TempBlob): Boolean
+    procedure NpXmlTemplateToBlob(var NpXmlTemplate: Record "NpXml Template"; var TempBlob: Codeunit "Temp Blob"): Boolean
     var
         NpXmlApiHeader: Record "NpXml Api Header";
         NpXmlAttribute: Record "NpXml Attribute";
@@ -685,10 +690,10 @@ codeunit 6151556 "NpXml Template Mgt."
             until NpXmlApiHeader.Next = 0;
         //+NC2.06 [265779]
         Clear(TempBlob);
-        TempBlob.Blob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         XmlDoc.Save(OutStr);
 
-        exit(TempBlob.Blob.HasValue);
+        exit(TempBlob.HasValue);
         //+NC1.21
     end;
 
@@ -1132,7 +1137,7 @@ codeunit 6151556 "NpXml Template Mgt."
                 //-NC2.00
                 //DeleteNpXmlElement(NpXmlElement);
                 NpXmlElement.Delete;
-                //+NC2.00
+            //+NC2.00
             until NpXmlElement.Next = 0;
 
         InsertNpXmlAttributes(TempNpXmlAttribute);
