@@ -7,28 +7,28 @@ table 6151526 "Nc Collector Filter"
 
     fields
     {
-        field(10;"Collector Code";Code[20])
+        field(10; "Collector Code"; Code[20])
         {
             Caption = 'Collector Code';
             TableRelation = "Nc Collector";
         }
-        field(20;"Table No.";Integer)
+        field(20; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type"=CONST(Table));
+            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
         }
-        field(30;"Field No.";Integer)
+        field(30; "Field No."; Integer)
         {
             Caption = 'Field No.';
-            TableRelation = Field."No." WHERE (TableNo=FIELD("Table No."));
+            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
 
             trigger OnLookup()
             var
                 "Field": Record "Field";
             begin
-                Field.SetRange(TableNo,"Table No.");
-                if PAGE.RunModal(PAGE::"Field List",Field) = ACTION::LookupOK then
-                  "Field No." := Field."No.";
+                Field.SetRange(TableNo, "Table No.");
+                if PAGE.RunModal(PAGE::"Field Lookup", Field) = ACTION::LookupOK then
+                    "Field No." := Field."No.";
             end;
 
             trigger OnValidate()
@@ -36,19 +36,19 @@ table 6151526 "Nc Collector Filter"
                 CalcFields("Field Name");
             end;
         }
-        field(35;"Field Name";Text[30])
+        field(35; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE (TableNo=FIELD("Table No."),
-                                                        "No."=FIELD("Field No.")));
+            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Table No."),
+                                                        "No." = FIELD("Field No.")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(40;"Filter Text";Text[250])
+        field(40; "Filter Text"; Text[250])
         {
             Caption = 'Filter Text';
         }
-        field(50;"Collect When Modified";Boolean)
+        field(50; "Collect When Modified"; Boolean)
         {
             Caption = 'Collect When Modified';
             Description = 'NC2.08';
@@ -57,7 +57,7 @@ table 6151526 "Nc Collector Filter"
 
     keys
     {
-        key(Key1;"Collector Code","Table No.","Field No.")
+        key(Key1; "Collector Code", "Table No.", "Field No.")
         {
         }
     }
@@ -71,11 +71,11 @@ table 6151526 "Nc Collector Filter"
         NcCollector: Record "Nc Collector";
     begin
         if ("Table No." = 0) and ("Collector Code" <> '') then begin
-           NcCollector.Get("Collector Code");
-           "Table No." := NcCollector."Table No.";
+            NcCollector.Get("Collector Code");
+            "Table No." := NcCollector."Table No.";
         end;
         if "Table No." = 0 then
-          Error(TxtSpecifyTableInCollector);
+            Error(TxtSpecifyTableInCollector);
     end;
 
     var
